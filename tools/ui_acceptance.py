@@ -48,6 +48,23 @@ def shortcuts(window):
     click(window, "toolMove")
 
 
+def shading_controls(controller, window, output):
+    before = controller.session.document
+    viewport = find(window, "viewport")
+    assert not viewport.property("xray")
+    click(window, "xrayToggle")
+    assert viewport.property("xray")
+    assert window.grabWindow().save(str(output / "ui-xray.png"))
+    QTest.keyClick(window, Qt.Key.Key_Z, Qt.KeyboardModifier.AltModifier)
+    assert not viewport.property("xray")
+    click(window, "outlinerSearch")
+    QTest.keyClick(window, Qt.Key.Key_Z, Qt.KeyboardModifier.AltModifier)
+    assert not viewport.property("xray")
+    assert controller.session.document == before
+    find(window, "outlinerSearch").setProperty("text", "")
+    click(window, "toolMove")
+
+
 def field_edit(controller, window):
     root = controller.session.document.entities[0].id
     before = controller.session.document.entity(root).matrix
@@ -109,6 +126,7 @@ def layout_checks(controller, window, output):
 
 def verify(controller, window, output):
     shortcuts(window)
+    shading_controls(controller, window, output)
     field_edit(controller, window)
     panel_controls(controller, window)
     resize_panel(window)

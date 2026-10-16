@@ -44,3 +44,8 @@ def update_workspace(session: "Session", **settings: Any) -> None:
     workspaces = list(session.document.workspaces)
     workspaces[session.active_workspace] = changed
     session.replace_document(workspaces=tuple(workspaces))
+
+
+def include_created(session: "Session", ids: set[str]) -> None:
+    if session.workspace.focused:
+        update_workspace(session, members=sorted(set(session.workspace.members) | ids))

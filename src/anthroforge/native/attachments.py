@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 
 from anthroforge.core.entities import SCP
+from anthroforge.core.results import geometry_asset
 
 from .mesh import GeometryEngine, Mesh, doubles, pointer
 
@@ -50,7 +51,8 @@ def capture_options(child: SCP) -> tuple[Any, ...]:
 
 
 def handle(entity: SCP, meshes: dict[str, Mesh]) -> int:
-    return meshes[entity.asset].handle if entity.asset else 0
+    key = geometry_asset(entity)
+    return meshes[key].handle if key else 0
 
 
 def ordered(entities: tuple[SCP, ...]) -> list[SCP]:

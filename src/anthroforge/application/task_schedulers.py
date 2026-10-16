@@ -1,0 +1,133 @@
+"""Per-task admission policies. Only the coordinator owns queues and execution."""
+
+from collections import defaultdict, deque
+from dataclasses import replace
+from typing import Literal, Protocol
+
+from anthroforge.core.document import Document
+from anthroforge.core.jobs import Job
+from anthroforge.core.scheduling import Assessment, Schedule, Workload
+
+INLINE_BUDGET_MS = 2.0
+INLINE_WINDOW_MS = 16.0
+MAX_INTERACTIVE_WAIT_MS = 100.0
+
+
+class TaskScheduler(Protocol):
+    def assess(self, job: Job, document: Document) -> Assessment: ...
+
+    def observe(self, job: Job) -> None: ...
+
+
+class MeasuredTaskScheduler:
+    def __init__(self) -> None:
+        self.samples: dict[tuple[int, ...], deque[float]] = defaultdict(lambda: deque(maxlen=32))
+
+    def assess(self, job: Job, document: Document) -> Assessment:
+        workload = job.workload(document)
+        plan = self.plan(workload, job.interactive)
+        samples = self.samples.get(workload.bucket(), ())
+        estimate = (
+            max(plan.estimated_ms or 0.0, max(samples) * 1.25) if samples else plan.estimated_ms
+        )
+        plan = replace(plan, estimated_ms=estimate)
+        return Assessment(workload, self.adjust(plan, job.interactive))
+
+    def observe(self, job: Job) -> None:
+        if job.assessment is not None and job.state == "succeeded":
+            cost = job.prepare_ms + job.compute_ms + job.publish_ms
+            self.samples[job.assessment.workload.bucket()].append(cost)
+
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule()
+
+    def adjust(self, plan: Schedule, interactive: bool) -> Schedule:
+        return plan
+
+
+class AttachmentTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = attachment_cost(workload)
+        bounded = (
+            workload.entities <= 64 and workload.candidates <= 64 and workload.triangles <= 256
+        )
+        mode: Literal["inline", "worker"] = "worker"
+        if interactive and bounded and cost <= INLINE_BUDGET_MS:
+            mode = "inline"
+        reason = (
+            "Bounded native attachment update" if mode == "inline" else "Background attachments"
+        )
+        return Schedule(mode, cost, reason=reason)
+
+    def adjust(self, plan: Schedule, interactive: bool) -> Schedule:
+        estimate = plan.estimated_ms or 0.0
+        if plan.execution == "inline" and estimate > INLINE_BUDGET_MS:
+            plan = replace(plan, execution="worker", reason="Measured cost exceeds inline budget")
+        if interactive and plan.execution == "worker":
+            delay = min(MAX_INTERACTIVE_WAIT_MS, max(INLINE_WINDOW_MS, estimate * 2))
+            return replace(plan, delay_ms=delay, max_wait_ms=MAX_INTERACTIVE_WAIT_MS)
+        return plan
+
+
+def attachment_cost(workload: Workload) -> float:
+    # Includes current full-document ordering/packing, not only affected objects.
+    return (
+        0.1
+        + 0.006 * workload.entities
+        + 0.0002 * workload.entities**2
+        + 0.01 * workload.affected
+        + 0.002 * workload.candidates
+        + 0.001 * workload.triangles
+    )
+
+
+class ImportTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule(reason="Explicit mesh import; parsing and BVH construction stay background")
+
+
+class OpenProjectTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule(reason="Explicit project open; decompression stays background")
+
+
+class SaveProjectTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule(reason="Explicit project save; compression and disk writes stay background")
+
+
+class ConstructionTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        from .construction_scheduling import estimate
+
+        cost = estimate(workload.stages)
+        return Schedule(
+            "worker",
+            cost,
+            max_wait_ms=MAX_INTERACTIVE_WAIT_MS,
+            reason="Native stage pipeline, normals, buffers and spatial indexing",
+        )
+
+    def adjust(self, plan: Schedule, interactive: bool) -> Schedule:
+        cost = plan.estimated_ms or 0
+        delay = min(MAX_INTERACTIVE_WAIT_MS, max(INLINE_WINDOW_MS, cost)) if interactive else 0
+        return replace(plan, delay_ms=delay)
+
+
+class ControlAttachmentTaskScheduler(AttachmentTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return replace(
+            super().plan(workload, interactive), reason="Native shared-control frame resolution"
+        )
+
+
+def task_schedulers() -> dict[str, TaskScheduler]:
+    return {
+        "generic": MeasuredTaskScheduler(),
+        "attachments": AttachmentTaskScheduler(),
+        "mesh_import": ImportTaskScheduler(),
+        "project_open": OpenProjectTaskScheduler(),
+        "project_save": SaveProjectTaskScheduler(),
+        "construction": ConstructionTaskScheduler(),
+        "control_attachments": ControlAttachmentTaskScheduler(),
+    }

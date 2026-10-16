@@ -8,6 +8,8 @@ from pathlib import Path
 
 import PySide6
 
+from anthroforge import __version__
+
 ROOT = Path(__file__).resolve().parents[1]
 STAGE = ROOT / "build" / "package-input"
 DIST = ROOT / "dist" / "AnthroForge.dist"
@@ -51,6 +53,7 @@ def nuitka_options():
         "--include-module=PySide6.QtQuick3D --nofollow-import-to=scipy,pytest,matplotlib,IPython "
         "--include-distribution-metadata=numpy --include-distribution-metadata=PySide6 "
         "--assume-yes-for-downloads --report=compilation-report.xml"
+        f" --product-name=AnthroForge --product-version={__version__} --file-version={__version__}"
     )
 
 
@@ -62,11 +65,20 @@ def finish():
         ROOT / "src/anthroforge/desktop/qml", DIST / "anthroforge/desktop/qml", dirs_exist_ok=True
     )
     shutil.copytree(ROOT / "examples", DIST / "examples", dirs_exist_ok=True)
-    shutil.copytree(ROOT / "docs", DIST / "docs", dirs_exist_ok=True)
-    shutil.copy2(ROOT / "README.md", DIST / "README.md")
+    copy_documentation()
     copy_qt_notices()
     licenses()
     print(DIST / "AnthroForge.exe")
+
+
+def copy_documentation():
+    shutil.copytree(ROOT / "docs", DIST / "docs", dirs_exist_ok=True)
+    for name in (
+        "README.md",
+        "standalone_application_recommendations.md",
+        "standalone_technology_stack_analysis.md",
+    ):
+        shutil.copy2(ROOT / name, DIST / name)
 
 
 def copy_runtime(runtime):
@@ -88,9 +100,21 @@ def licenses():
         shutil.copy2(source, target / source.name)
     shutil.copy2(ROOT / "native/vendor/MPL-2.0.txt", target / "MPL-2.0.txt")
     shutil.copytree(ROOT / "licenses", target, dirs_exist_ok=True)
+    copy_native_provenance(target)
     shutil.copy2(Path(sys.base_prefix) / "LICENSE.txt", target / "CPython-LICENSE.txt")
     for package in PACKAGES:
         package_notices(package, target)
+
+
+def copy_native_provenance(target):
+    source_target = DIST / "native/migration"
+    source_target.mkdir(parents=True, exist_ok=True)
+    for name in ("BLENDER_PRIMITIVES.md", "blender_501_sources.json"):
+        shutil.copy2(ROOT / "native/migration" / name, target / name)
+        shutil.copy2(ROOT / "native/migration" / name, source_target / name)
+    vendor = DIST / "native/vendor"
+    vendor.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / "native/vendor/PROVENANCE.md", vendor / "PROVENANCE.md")
 
 
 def copy_qt_notices():

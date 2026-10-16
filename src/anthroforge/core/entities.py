@@ -2,7 +2,13 @@
 
 from dataclasses import dataclass, field
 from math import isfinite
+from typing import TYPE_CHECKING
 from uuid import uuid4
+
+from .results import EvaluationResult
+
+if TYPE_CHECKING:
+    from .construction import Deformer, Primitive, Thickness
 
 IDENTITY = (1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
 
@@ -44,6 +50,13 @@ class SCP:
     error: str = ""
     capture_parent_matrix: tuple[float, ...] = ()
     capture_parent_offset: tuple[float, ...] = (0.0, 0.0, 0.0)
+    primitive: "Primitive | None" = None
+    deformers: tuple["Deformer", ...] = ()
+    thickness: "Thickness | None" = None
+    result: EvaluationResult = field(default_factory=EvaluationResult)
+    result_generation: int = 0
+    pose_revision: int = 0
+    construction_revision: int = 0
 
     def __post_init__(self) -> None:
         if not self.id or not self.name.strip():

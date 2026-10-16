@@ -16,6 +16,7 @@ using Vertices = Eigen::Matrix<double,Eigen::Dynamic,3,Eigen::RowMajor>;
 using Triangles = Eigen::Matrix<int,Eigen::Dynamic,3,Eigen::RowMajor>;
 using Faces = std::vector<std::vector<int64_t>>;
 struct Mesh {
+    bool generated=false;
     Vertices vertices;
     Triangles triangles;
     std::vector<int64_t> corners, offsets, polygons;

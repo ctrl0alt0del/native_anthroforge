@@ -2,7 +2,7 @@
 
 Updated: 2026-10-16
 
-Status: product specification confirmed by the user on 2026-10-16 after questions Q1–Q58, together with categorized source recommendations. Section 1 is authoritative where source recommendations differ. Priorities and technology proposals are recommendations unless explicitly identified as agreed. This is not an implementation completion report or a claim of measured standalone performance.
+Status: general product specification confirmed by the user on 2026-10-16 after questions Q1–Q58, with the subsequent 0.1.2 primitive/deformer interview confirmed in Q32. Section 1 and its linked confirmed feature specifications are authoritative where source recommendations differ. Priorities and technology proposals are recommendations unless explicitly identified as agreed. This is not an implementation completion report or a claim of measured standalone performance.
 
 ## Contents
 
@@ -27,7 +27,7 @@ Status: product specification confirmed by the user on 2026-10-16 after question
 The user has established the following scope:
 
 - AnthroForge uses its own application framework and runs without Blender for normal editing, saving, and reopening.
-- The first version has a limited collection of parametric primitives with the required modifiers built into their behavior.
+- The first version has a limited collection of parametric primitives and separate, editable deformers/geometry modifiers. Apply/Bake is permanently unavailable.
 - General Blender mesh editing, sculpting, retopology, rigging, and animation capabilities are outside the first-version scope.
 - Blender may remain an optional conversion and downstream content-creation tool.
 - Reusing Blender source under its applicable license is acceptable. Particular components still require dependency and license review when selected.
@@ -47,7 +47,15 @@ The primary work is remapping current addon functionality, implemented in stages
 
 ### 1.2 Confirmed primitives, assembly, and export
 
-Two editable primitive families are planned: (a) sets of curves with neighboring curves lofted, and (b) connected curves joined through hook/elbow controls, each driving a cube/cylinder-like piece. Exact primitive constructions and built-in modifiers will be discussed with user examples. Imported custom meshes are geometry-only primitives with translation, rotation, and scale; preserving imported UVs, vertex colors, materials, or textures is outside version one. This does not remove AnthroForge's native SCP colors or diagnostic presentation.
+The [confirmed 0.1.2 primitive and deformer specification](docs/primitives_012.md) defines the release behavior and supersedes the earlier 0.1.1 allocation. Primitive families are imported mesh, ordered-curve loft, and curve-deformed body with box/cylinder/capsule bases. One SCP can contain multiple curves or body pieces and attachment locations, but different primitive families cannot be mixed within one SCP through 1.0. Curves are editable open/closed Béziers; body curves expose radius and tilt. Neighboring loft strips share boundary vertices; sampling has common start/span settings and per-curve overrides.
+
+Hooks and lattices are independently addable/removable deformers, with shared controls distinct from their per-target bindings. Reproduce Blender's native Hook behavior for Empty-like targets and native lattice behavior for the supported geometry. Thickness is a separate geometry modifier, with lattice before thickness. Hook connections between different SCPs preserve bound offsets without welding their geometry. Controls explicitly follow an SCP or the document frame. Anatomical shortcut/driver parameters are outside 0.1.x.
+
+Imported source meshes remain unchanged and support TRS, lattice deformation, and vertex selection/weights for hooks; general mesh-vertex editing remains outside scope. Preserving imported UVs, vertex colors, materials, or textures is outside version one. This does not remove native SCP colors or diagnostic presentation. **Apply/Bake is permanently unavailable through UI and APIs:** all primitive and remaining deformer parameters stay editable, and generated meshes are derived results rather than replacements for authored definitions.
+
+Resolution and other attachment-mesh topology changes are locked while an SCP has children or incoming surface attachments, including from shared controls. Shape edits preserving that topology remain available; the lock is removed once both conditions are absent. Automatic attachment remapping across resolution/topology changes is excluded through 1.0. Control-dependency cycles may be authored, but evaluation skips cyclic and dependent work, retains previous successful output, and terminates affected jobs unsuccessfully so saving can finish. The SCP hierarchy remains a tree. Dedicated issue/cycle-reporting UI is deferred to a later 0.x release.
+
+Ordinary selection selects an SCP; Edit Primitive exposes its construction controls. Hooks and lattice cages are independently selectable. Multiple deformers may be ordered on the same target. Removing one target's binding preserves the shared control and its other targets. Each affected SCP retains its own effective update mode under the existing task coordinator, including when a deformer is shared. Complete details, reference evidence, and required future validation are in the linked specification; these are confirmed requirements, not implemented capabilities.
 
 Import creates an independent copy with new entity identities. Remap internal relationships and preserve source document/entity/revision provenance. In a populated document, the user chooses the SCP that parents the imported root; in an empty document, the imported root establishes the tree. Missing non-hierarchy references remain visible and explicitly resolvable; block only operations needing them, and never guess a binding by name. Future transfer of changes from a copy to its source must be explicit, never automatic.
 
@@ -91,9 +99,16 @@ Headless computation must not require a window or initialized renderer. Offscree
 
 There are no hard numerical responsiveness release thresholds. Improve smoothness across preparation, solving, validation, publication, and rendering. Around 30 FPS navigation, input feedback around 50 ms, and cancellation acknowledgement around 100 ms are useful soft goals when attainable without disproportionate effort. Worker termination is separately measured and occurs at safe points. Record frame/input distributions and worst stalls on declared production fixtures and viewport sizes; averages alone are insufficient.
 
+Follow-up decision (2026-10-16): provide a dedicated scheduling policy for each task type,
+managed by one task coordinator. Before admission, quickly assess task complexity and
+choose an appropriate delay, including zero for cheap or explicit work. Preserve one
+authority for shared execution resources, output reservations, cancellation, publication
+and checkpoints. This refines the coordinated-scheduler requirement; it does not create
+independent worker pools per feature or relax the job/history/save contracts above.
+
 ### 1.8 Deferred decisions and provisional rules
 
-- Concrete primitive examples, built-in modifiers, attachment/correspondence implementation, file container, export format, and feature-specific scheduling are decided during their feature work.
+- Primitive/deformer behavior and reference examples are now confirmed in [the 0.1.2 specification](docs/primitives_012.md). Native implementation details, correspondence beyond the confirmed topology lock, export format, and feature-specific scheduling mechanics remain implementation or later-feature work.
 - Dependency prerequisites may inherit workspace priority. If a job genuinely requires a failed result, dependent work should finish with an explicit dependency failure while unrelated work continues. Both rules are provisionally accepted and must be revisited against actual feature dependencies rather than assuming a universal calculation chain.
 - Newer copies do not automatically update their sources. Explicit copy-to-source transfer, paused-calculation resumption, persisted undo history, and actual crash recovery are outside version one.
 - Q48 deliberately deferred the technology selection/prototype decision until a full analysis of this specification and the addon implementation. The earlier Qt/Python/Quick 3D proposal is not a confirmed stack. Analysis recommendations must remain distinguishable from user-approved product requirements.
@@ -498,7 +513,7 @@ Useful existing references: [runtime contract](<C:/Users/alexe/AppData/Roaming/B
 | 4. Migrate the focused anatomy workflows | Selected primitive families and modifiers, bindings, Free/Controlled fibers, muscle/tissue behavior, mirrors, layering, and skin/topology export. | Existing hard fixtures preserve geometry, attachment semantics, diagnostics, persistence, and independent review dimensions. |
 | 5. Add justified extensions | Atlas/review catalogue and resumable reconstruction queue, lightweight variants, richer profiles, specialized tissue painting, broader comparison tools, optional backend acceleration, or a shared volume framework. | Demonstrated improvement on the failed or incomplete task; correct checkpoint/promotion/ownership behavior; no reliance on unrelated benchmark wins. |
 
-Instrument and test persistence at every stage. Stages describe dependency order, not time estimates or permission gates. The exact primitive catalogue and modifier set remain to be selected.
+Instrument and test persistence at every stage. Stages describe dependency order, not time estimates or permission gates. The 0.1.2 primitive catalogue and modifier behavior are now defined in [the confirmed feature specification](docs/primitives_012.md).
 
 ## 16. Validation matrix and measurable targets
 
@@ -562,9 +577,9 @@ Other important cautions from the source threads:
 
 The general specification is confirmed. The following decisions were deliberately deferred, not left silently assumed.
 
-1. Concrete curve-loft and connected-curve primitive examples, built-in modifiers, and feature-by-feature migration ordering.
+1. Implementation sequencing and native integration for the [confirmed 0.1.2 primitives/deformers](docs/primitives_012.md); their product scope and reference examples are settled.
 2. Adopt and validate the recommended stack from the completed [technology analysis](<E:/development/anthroforge/standalone_technology_stack_analysis.md>). The representative viewport experiment, combined runtime packaging, and numerical parity checks remain implementation work; they were not performed by the analysis.
-3. Stable attachment domains and correspondence rules for each primitive family and actual topology changes.
+3. Attachment implementation under the confirmed topology lock. Automatic preservation across resolution/topology changes is excluded through 1.0; it is not an unresolved 0.1.2 feature.
 4. Native ownership, scheduling mechanics, cancellation checkpoints, and memory/publication budgets implementing the confirmed behavior.
 5. Physical project container and schema migration implementation. Self-contained assets, checkpoint behavior, canonical units, and no persisted undo history are already settled.
 6. A skin/topology interchange format. Export scope is settled; broader Blender conversion and game packaging are deferred.

@@ -10,6 +10,8 @@ from pathlib import Path
 import numpy as np
 from PySide6.QtGui import QImage
 
+CHECKS = ("import", "attachments", "primitives", "deformers", "save", "inspect", "render", "GUI")
+
 
 def clean_environment():
     env = {
@@ -78,10 +80,24 @@ def run(executable, cwd):
     cwd.mkdir(parents=True, exist_ok=True)
     shutil.copytree(executable.parent / "examples", cwd / "examples", dirs_exist_ok=True)
     doctor = headless(executable, cwd)
+    primitives(executable, cwd)
     desktop(executable, cwd)
     report = portable_report(executable, doctor)
     (cwd / "portable-check.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report))
+
+
+def primitives(executable, cwd):
+    invoke(executable, cwd, "--cli", "run", "examples/primitives.json")
+    state = json.loads(invoke(executable, cwd, "--cli", "inspect", "primitives.anthroforge"))
+    assert state["entity_count"] == 4 and len(state["controls"]) == 2
+    assert all(e["result"]["status"] == "ready" for e in state["entities"])
+    assert all(e["result"]["asset"] for e in state["entities"] if e["primitive"])
+    kinds = {e["primitive"]["kind"] for e in state["entities"] if e["primitive"]}
+    assert kinds == {"LOFT", "BODY", "IMPORTED"}
+    arguments = ("--project", "primitives.anthroforge", "--smoke-test", "--screenshot")
+    smoke = invoke(executable, cwd, *arguments, str(cwd / "primitives.png"))
+    assert json.loads(smoke)["desktop_smoke"]
 
 
 def desktop(executable, cwd):
@@ -103,7 +119,7 @@ def portable_report(executable, doctor):
         executable=str(executable),
         environment="minimal PATH",
         doctor=doctor,
-        checks=["import", "attachments", "save", "inspect", "render", "GUI"],
+        checks=CHECKS,
     )
     return report
 

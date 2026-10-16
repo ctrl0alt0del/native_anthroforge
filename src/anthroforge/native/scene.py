@@ -12,6 +12,12 @@ def configure(engine: GeometryEngine) -> None:
     double_pointer = c.POINTER(c.c_double)
     engine.bind("af_quaternion", [double_pointer, double_pointer])
     engine.bind("af_geometry_matrix", [double_pointer, double_pointer, double_pointer])
+    engine.bind("af_scene_bounds", [c.c_int, c.POINTER(c.c_uint64), double_pointer, double_pointer])
+    configure_picking(engine)
+
+
+def configure_picking(engine: GeometryEngine) -> None:
+    double_pointer = c.POINTER(c.c_double)
     engine.bind(
         "af_scene_pick",
         [
@@ -37,6 +43,26 @@ def geometry_matrix(engine: GeometryEngine, matrix: Any, offset: Any) -> Any:
         engine.library.af_geometry_matrix(pointer(source), pointer(local), pointer(output))
     )
     return output
+
+
+def entity_frame(engine: GeometryEngine, entity: Any) -> tuple[float, ...]:
+    return tuple(geometry_matrix(engine, entity.matrix, entity.geometry_offset).tolist())
+
+
+def bounds(engine: GeometryEngine, handles: Any, matrices: Any) -> list[float]:
+    meshes, frames = np.ascontiguousarray(handles, dtype=np.uint64), doubles(matrices)
+    if frames.size != len(meshes) * 16:
+        raise ValueError("Scene bounds require one transform per mesh.")
+    output = np.empty(6)
+    engine.check(
+        engine.library.af_scene_bounds(
+            len(meshes),
+            meshes.ctypes.data_as(c.POINTER(c.c_uint64)),
+            pointer(frames),
+            pointer(output),
+        )
+    )
+    return list(output.tolist())
 
 
 def pick(

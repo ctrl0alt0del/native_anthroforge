@@ -5,21 +5,70 @@ from time import perf_counter as monotonic
 
 import numpy as np
 
-from anthroforge.native import scene
+from anthroforge.core.results import geometry_asset
+from anthroforge.native import components, scene
 from anthroforge.native.attachments import anchor_points, ordered
+
+from .values import qml
 
 
 def record(controller, entity, depth):
     session = controller.session
-    row = asdict(entity)
+    row = entity_metadata(entity)
     row["geometry_offset"] = list(entity.geometry_offset)
     row.update(depth=depth, trs=session.engine.decompose(entity.matrix))
     row["quaternion"] = scene.quaternion(session.engine, entity.matrix)
     row.update(presentation_flags(session.workspace, entity.id))
     row["anchors"] = markers(session, entity)
     row["opacity"] = 0.08 if row["readonly"] else 1.0
-    row["handle"] = session.assets[entity.asset].mesh.handle if entity.asset else 0
-    row["chunks"] = session.assets[entity.asset].mesh.counts[4] if entity.asset else 0
+    row.update(geometry_metadata(session, entity))
+    return qml(row)
+
+
+def entity_metadata(entity):
+    names = ("id", "name", "parent", "asset", "matrix", "color", "update_mode", "status", "error")
+    row = {name: getattr(entity, name) for name in names}
+    row["attachment"] = asdict(entity.attachment)
+    row["primitive"] = {"kind": entity.primitive.kind} if entity.primitive else None
+    return row
+
+
+def geometry_metadata(session, entity):
+    key = geometry_asset(entity)
+    mesh = session.assets[key].mesh if key else None
+    return dict(
+        handle=mesh.handle if mesh else 0, chunks=mesh.counts[4] if mesh else 0, is_control=False
+    )
+
+
+def control_record(controller, control):
+    from anthroforge.application.control_frames import display_frame
+    from anthroforge.application.control_operations import affected
+
+    session = controller.session
+    matrix = display_frame(session, control)
+    row = control_metadata(control, matrix)
+    row.update(
+        trs=session.engine.decompose(matrix), quaternion=scene.quaternion(session.engine, matrix)
+    )
+    row.update(presentation_flags(session.workspace, control.id))
+    row.update(opacity=0.08 if row["readonly"] else 1, affected=affected(session, control.id))
+    return qml(row)
+
+
+def control_metadata(control, matrix):
+    row = dict(
+        id=control.id,
+        name=control.name,
+        kind=control.kind,
+        follow=control.follow,
+        parent="",
+        asset="",
+        status=control.result.status,
+        error=control.result.error,
+    )
+    row.update(depth=0, handle=0, chunks=0, anchors=[])
+    row.update(geometry_offset=[0, 0, 0], matrix=matrix, is_control=True, color="#dfaf6c")
     return row
 
 
@@ -37,7 +86,8 @@ def markers(session, entity):
     if not entity.parent or not entity.attachment.binding:
         return []
     parent = session.document.entity(entity.parent)
-    handle = session.assets[parent.asset].mesh.handle if parent.asset else 0
+    key = geometry_asset(parent)
+    handle = session.assets[key].mesh.handle if key else 0
     try:
         return anchor_points(session.engine, entity, parent, handle)
     except ValueError:
@@ -50,6 +100,9 @@ def records(controller):
         depth = depths.get(entity.parent, -1) + 1
         depths[entity.id] = depth
         rows.append(record(controller, entity, depth))
+    rows.extend(
+        control_record(controller, control) for control in controller.session.document.controls
+    )
     return rows
 
 
@@ -71,19 +124,28 @@ def picking_inputs(controller, rows):
         for row in eligible
     ]
     controller.pick_matrices = np.ascontiguousarray(matrices, dtype=np.float64)
+    control_picking_inputs(controller)
 
 
-def picked(controller, origin, direction, depth):
+def control_picking_inputs(controller):
+    eligible = [r for r in controller.rows if r["pickable"] and not r["handle"]]
+    controller.pick_control_ids = [row["id"] for row in eligible]
+    controller.pick_control_points = np.ascontiguousarray(
+        [row["trs"][:3] for row in eligible], dtype=np.float64
+    )
+
+
+def picked(controller, origin, direction, depth, radius):
     started = monotonic()
     try:
-        return pick_scene(controller, origin, direction, depth)
+        return pick_scene(controller, origin, direction, depth, radius)
     finally:
         controller.session.scheduler.metrics.observe("picking", monotonic() - started)
 
 
-def pick_scene(controller, origin, direction, depth):
+def mesh_hits(controller, origin, direction):
     if not controller.pick_ids:
-        return {}
+        return []
     hits = scene.pick(
         controller.session.engine,
         controller.pick_handles,
@@ -91,10 +153,32 @@ def pick_scene(controller, origin, direction, depth):
         origin,
         direction,
     )
-    if not hits:
-        return {}
-    hit = hits[depth % len(hits)]
-    return hit_record(controller.pick_ids, hit)
+    return [hit_record(controller.pick_ids, hit) for hit in hits]
+
+
+def control_hits(controller, origin, direction, radius):
+    hits = components.hits(
+        controller.session.engine, controller.pick_control_points, origin, direction, radius
+    )
+    return [
+        dict(
+            id=controller.pick_control_ids[int(index)],
+            distance=distance,
+            face=-1,
+            triangle=-1,
+            vertex=-1,
+            point=controller.pick_control_points[int(index)].tolist(),
+        )
+        for index, distance in hits
+    ]
+
+
+def pick_scene(controller, origin, direction, depth, radius):
+    hits = mesh_hits(controller, origin, direction) + control_hits(
+        controller, origin, direction, radius
+    )
+    hits.sort(key=lambda hit: hit["distance"])
+    return hits[depth % len(hits)] if hits else {}
 
 
 def hit_record(ids, hit):

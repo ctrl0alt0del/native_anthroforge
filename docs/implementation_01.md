@@ -17,7 +17,8 @@ in standalone_application_recommendations.md remain authoritative.
 
 ## Explicit exclusions
 
-Curve primitives move to 0.1.1. Linked mirroring, project merging, legacy conversion,
+Native curve primitives and separate deformers move to [0.1.2](primitives_012.md),
+superseding the earlier 0.1.1 allocation. Linked mirroring, project merging, legacy conversion,
 fibers, muscles, tissues, skin and topology are later milestones. No geometry export
 is available until skin construction exists. No persisted undo or crash recovery.
 

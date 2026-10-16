@@ -23,6 +23,8 @@ static void validate_face(const Mesh& mesh,const std::vector<int64_t>& face) {
     }
 }
 static std::vector<uint32_t> triangulate(const Mesh& mesh,const std::vector<int64_t>& face) {
+    if(mesh.generated&&face.size()==3) return {0,1,2};
+    if(mesh.generated&&face.size()==4) return {0,1,2,0,2,3};
     const V3 normal=polygon_normal(mesh,face);
     if(face.size()==3) return {0,1,2};
     Eigen::Index dropped; normal.cwiseAbs().maxCoeff(&dropped);
@@ -48,8 +50,10 @@ static void add_face(Mesh& mesh,const std::vector<int64_t>& face,std::vector<Eig
 static void append_triangle(const Mesh& mesh,int index,std::vector<float>& output) {
     const V3 a=mesh.vertices.row(mesh.triangles(index,0)), b=mesh.vertices.row(mesh.triangles(index,1));
     const V3 c=mesh.vertices.row(mesh.triangles(index,2));
-    const V3 normal=(b-a).cross(c-a).normalized();
-    if(!normal.allFinite()) throw std::runtime_error("Degenerate render triangle.");
+    V3 normal=(b-a).cross(c-a);
+    if(normal.norm()>1e-20) normal.normalize();
+    else if(mesh.generated) normal=V3::Zero();
+    else throw std::runtime_error("Degenerate render triangle.");
     for(const V3& point:{a,b,c}) {
         for(int axis=0;axis<3;++axis) output.push_back(float(point[axis]));
         for(int axis=0;axis<3;++axis) output.push_back(float(normal[axis]));
@@ -65,6 +69,12 @@ static void render_chunks(Mesh& mesh,uint64_t cancel) {
         for(int i=first;i<last;++i) append_triangle(mesh,i,chunk);
     }
 }
+void rebuild_mesh(Mesh& mesh,uint64_t cancel) {
+    mesh.chunks.clear();
+    af_bounds3d(mesh.vertices.data(),mesh.vertices.rows(),mesh.bounds);
+    check_cancel(cancel); mesh.tree.init(mesh.vertices,mesh.triangles);
+    render_chunks(mesh,cancel);
+}
 void prepare_mesh(Mesh& mesh,const Faces& faces,uint64_t cancel) {
     if(mesh.vertices.rows()==0||!mesh.vertices.allFinite()||faces.empty())
         throw std::runtime_error("Mesh needs finite vertices and polygon faces.");
@@ -74,8 +84,6 @@ void prepare_mesh(Mesh& mesh,const Faces& faces,uint64_t cancel) {
     }
     mesh.triangles.resize(triangles.size(),3);
     for(size_t i=0;i<triangles.size();++i) mesh.triangles.row(i)=triangles[i];
-    af_bounds3d(mesh.vertices.data(),mesh.vertices.rows(),mesh.bounds);
-    check_cancel(cancel); mesh.tree.init(mesh.vertices,mesh.triangles);
-    render_chunks(mesh,cancel);
+    rebuild_mesh(mesh,cancel);
 }
 }

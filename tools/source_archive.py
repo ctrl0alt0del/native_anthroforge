@@ -3,6 +3,8 @@
 import zipfile
 from pathlib import Path
 
+from anthroforge import __version__
+
 ROOT = Path(__file__).resolve().parents[1]
 FOLDERS = ("src", "native", "tests", "tools", "docs", "examples", "licenses", ".github", ".vscode")
 
@@ -22,7 +24,7 @@ def sources():
 
 
 def main():
-    target = ROOT / "dist/AnthroForge-0.1.0-source.zip"
+    target = ROOT / f"dist/AnthroForge-{__version__}-source.zip"
     with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sources():
             archive.write(path, "anthroforge/" + path.relative_to(ROOT).as_posix())

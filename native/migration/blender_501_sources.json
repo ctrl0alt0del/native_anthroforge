@@ -1,0 +1,87 @@
+{
+  "version": "5.0.1",
+  "build": "a3db93c5b259",
+  "license": "GPL-2.0-or-later",
+  "files": [
+    {
+      "file": "anim_path.cc",
+      "sha256": "023677ea5fe2c1d8124d57c5c96b8efc4d221c6d5bbb6a3c9d7b38f3c740dfdd",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "colortools.cc",
+      "sha256": "42bd3a090326e3e32a1714aefe971c9af1340adc60aaca29e693810627d3389f",
+      "attribution": "SPDX-FileCopyrightText: 2005 Blender Authors"
+    },
+    {
+      "file": "curve.cc",
+      "sha256": "6a5c660ab6a447fa08a6154ebbc8e32f34753be05519b85c735759914a36f597",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "curve_deform.cc",
+      "sha256": "0286fdf939eaef6703f8600ca8ce77bd278b354ee163147d589d79e37f6c0b5d",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "displist.cc",
+      "sha256": "1b6f8b444759491494a1e8f5b161823140a8cd542ad057cb00aa1f0b1f481dbc",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "DNA_color_types.h",
+      "sha256": "e4061091ad29ce7c3c4628ccedf81e5f74aec592ef10e244c3a9c4c338b34416",
+      "attribution": "SPDX-FileCopyrightText: 2006 Blender Authors"
+    },
+    {
+      "file": "key.cc",
+      "sha256": "973d0f578f17faafd54b80609933ea43f5934423635326713bd98c30ef4885e3",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "lattice.cc",
+      "sha256": "f98a02bb4f941e81a3169173c3c1275974cab56a25eb4cc253c7a44edfa45726",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "lattice_deform.cc",
+      "sha256": "c85ea370c7c4083714084623b1f1228301d406c4b200ad4079d63a421f9a38d7",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "math_rotation_c.cc",
+      "sha256": "922acb2de5d18b137a76a40df9ab389bb66563e6b46b810b2be5842d5f30fbd5",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "math_vector.cc",
+      "sha256": "7b197857a487444410eabdf9221fc1c65974081183616db35c02efce01dbf721",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "MOD_hook.cc",
+      "sha256": "800b241ab0c0f331ac2686707b6ddde22eb0a3d3f8ff8d81488f8e0acad49d56",
+      "attribution": "SPDX-FileCopyrightText: 2005 Blender Authors"
+    },
+    {
+      "file": "MOD_lattice.cc",
+      "sha256": "40902abf8013a3d0b5cf76b261b85b0c75836702df8121495e2fb6e20477e63c",
+      "attribution": "SPDX-FileCopyrightText: 2005 Blender Authors"
+    },
+    {
+      "file": "MOD_solidify_extrude.cc",
+      "sha256": "dbbad6c02f70f3b7bc63b921348eb4791a2aeefff3a6da7546fb4c229a805c84",
+      "attribution": "SPDX-FileCopyrightText: 2023 Blender Authors"
+    },
+    {
+      "file": "object_hook.cc",
+      "sha256": "c5818894fd603c54d5705dd0963be1db2e24046425f992464bd2c0512345fc21",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "rna_lattice.cc",
+      "sha256": "14d230df45a84c7b585d7eacf318ab45d93420d3fd6814e5215967529e24cd6b",
+      "attribution": "SPDX-FileCopyrightText: 2023 Blender Authors"
+    }
+  ]
+}

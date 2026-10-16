@@ -1,8 +1,9 @@
 """Asynchronous file preparation/publication with modal blocked-save semantics."""
 
+from functools import partial
 from pathlib import Path
 
-from anthroforge.application import projects
+from anthroforge.application import projects, task_workloads
 from anthroforge.application.history import History
 from anthroforge.application.storage import atomic_save, read_package
 from anthroforge.core.jobs import Job
@@ -21,7 +22,7 @@ def save(controller, path, policy):
     if policy == "wait" and session.scheduler.blocked:
         session.waiting_save = True
         controller.pending_save = path
-        controller.changed.emit()
+        controller.notify()
         return
     start_save(controller, path, policy)
 
@@ -49,6 +50,8 @@ def save_job(controller, target, snapshot, lock):
         lambda document, cancel: atomic_save(target, document, assets),
         lambda _: saved(controller, target, lock, snapshot.revision),
         writes=False,
+        kind="project_save",
+        workload=lambda _: task_workloads.project_save(assets, snapshot),
     )
     job.cleanup = lambda state: cleanup(controller, lock, state)
     return job
@@ -59,7 +62,7 @@ def saved(controller, path, lock, revision):
     controller.message = f"Saved revision {revision}: {path.name}"
     controller.pending_save = ""
     controller.session.waiting_save = False
-    controller.changed.emit()
+    controller.notify()
     continue_after_save(controller)
 
 
@@ -81,7 +84,7 @@ def cleanup(controller, lock, state):
         controller.session.waiting_save = False
         controller.pending_save, controller.after_save = "", None
         controller.message = "File operation did not complete. See Activity for the error."
-        controller.changed.emit()
+        controller.notify()
 
 
 def queue_document(controller, path):
@@ -108,19 +111,24 @@ def poll(controller):
 
 
 def start_open(controller, path):
-    session = controller.session
     target = Path(local_path(path)).resolve(strict=True)
-    lock = projects.lock_target(session, target)
+    lock = projects.lock_target(controller.session, target)
+    controller.temporary_locks.append(lock)
+    controller.session.scheduler.submit(open_job(controller, target, lock))
+
+
+def open_job(controller, target, lock):
     job = Job(
         "Open project",
         frozenset(("@document",)),
         lambda _: target,
-        lambda file, cancel: read_package(file, session.engine),
+        lambda file, cancel: read_package(file, controller.session.engine),
         lambda result: opened(controller, target, lock, result),
+        kind="project_open",
+        workload=partial(task_workloads.source_file, target),
     )
-    controller.temporary_locks.append(lock)
     job.cleanup = lambda state: cleanup(controller, lock, state)
-    session.scheduler.submit(job)
+    return job
 
 
 def opened(controller, path, lock, result):

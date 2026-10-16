@@ -21,8 +21,8 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property bool typing: !!activeFocusItem && activeFocusItem.selectByMouse !== undefined
     readonly property bool modalOpen: importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible
-    readonly property var activeJobs: workspace.state.jobs.filter(job => ["queued","preparing","running","publishing","cancelling"].indexOf(job.state) >= 0)
-    readonly property bool jobFailed: workspace.state.jobs.some(job => job.state === "failed")
+    readonly property var activeJobs: workspace.jobs.filter(job => ["queued","preparing","running","publishing","cancelling"].indexOf(job.state) >= 0)
+    readonly property bool jobFailed: workspace.jobs.some(job => job.state === "failed")
     readonly property bool viewportKeys: !typing && !modalOpen && !workspace.state.waiting
     function inspectScene(): string { return viewport.inspectScene(); }
     function saveProject() {
@@ -47,7 +47,7 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 10; spacing: 10
                 Label { text: "ANTHROFORGE"; font.bold: true; font.pixelSize: 12; font.letterSpacing: 1; color: Theme.text }
-                Label { text: "0.1"; color: Theme.accent; font.pixelSize: 10 }
+                Label { text: "0.1.2"; color: Theme.accent; font.pixelSize: 10 }
                 MenuBar {
                     background: Item {}
                     Menu { title: "File"; MenuItem { action: newAction } MenuItem { action: openAction } MenuSeparator {} MenuItem { action: saveAction } MenuItem { action: saveAsAction } MenuSeparator {} MenuItem { action: importAction } }
@@ -56,6 +56,7 @@ ApplicationWindow {
                         title: "View"
                         MenuItem { text: "Frame selected    F"; onTriggered: workspace.frameSelection() }
                         MenuItem { text: "Orthographic"; checkable: true; checked: viewport.orthographic; onTriggered: viewport.orthographic = checked }
+                        MenuItem { text: "X-ray    Alt+Z"; checkable: true; checked: viewport.xray; onTriggered: viewport.xray = checked }
                         MenuSeparator {}
                         MenuItem { text: "Transform handles"; checkable: true; checked: workspace.state.handles; onTriggered: workspace.run("workspace.update",{handles:checked}) }
                         MenuItem { text: "Attachment markers"; checkable: true; checked: workspace.state.anchors; onTriggered: workspace.run("workspace.update",{anchors:checked}) }
@@ -74,7 +75,8 @@ ApplicationWindow {
             Layout.fillWidth: true; implicitHeight: 42; color: Theme.panel
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10; spacing: 6
-                UiButton { action: importAction; glyph: "import"; primary: true; hint: "Import an OBJ, STL or PLY mesh (Ctrl+I)" }
+                UiButton { objectName: "createPrimitive"; text: "Create Primitive"; glyph: "plus"; primary: true; enabled: !workspace.state.waiting; onClicked: createMenu.popup() }
+                UiButton { action: importAction; glyph: "import"; hint: "Import an OBJ, STL or PLY mesh (Ctrl+I)" }
                 UiButton { action: saveAction; glyph: "save"; hint: "Save project (Ctrl+S)" }
                 Rectangle { Layout.leftMargin: 6; Layout.rightMargin: 6; implicitWidth: 1; implicitHeight: 20; color: Theme.border }
                 UiButton { glyph: "undo"; hint: "Undo (Ctrl+Z)"; enabled: undoAction.enabled; onClicked: undoAction.trigger() }
@@ -150,6 +152,16 @@ ApplicationWindow {
             Label { text: "Rev " + workspace.state.revision + (workspace.state.dirty ? " · Unsaved" : " · Saved"); color: workspace.state.dirty ? Theme.accent : Theme.muted; font.pixelSize: 11 }
         }
     }
+    Menu {
+        id: createMenu
+        MenuItem { text: "Ordered curve loft"; onTriggered: authoring.create("LOFT","CAPSULE") }
+        MenuSeparator {}
+        MenuItem { text: "Curve-deformed box"; onTriggered: authoring.create("BODY","BOX") }
+        MenuItem { text: "Curve-deformed cylinder"; onTriggered: authoring.create("BODY","CYLINDER") }
+        MenuItem { text: "Curve-deformed capsule"; onTriggered: authoring.create("BODY","CAPSULE") }
+        MenuSeparator {}
+        MenuItem { text: "Import mesh…"; onTriggered: importFile.open() }
+    }
     Popup {
         id: overlays; x: Math.max(0,window.width-650); y: 110; padding: 14
         background: Rectangle { color: Theme.panel; border.color: Theme.border; radius: 6 }
@@ -162,7 +174,7 @@ ApplicationWindow {
     }
     Dialog {
         id: helpDialog; title: "Navigation and shortcuts"; modal: true; anchors.centerIn: parent; standardButtons: Dialog.Close
-        Label { text: "W / E / R    Move / Rotate / Scale\nF    Frame selected\n1 / 3 / 7    Front / Right / Top\n5    Perspective / Orthographic\nAlt-click    Select through overlapping objects\nMiddle or right drag    Orbit\nShift + drag    Pan\nMouse wheel    Zoom\nEscape    Cancel transform or anchor picking\nCtrl+I    Import mesh"; lineHeight: 1.7; color: Theme.text }
+        Label { text: "W / E / R    Move / Rotate / Scale\nF    Frame selected\n1 / 3 / 7    Front / Right / Top\n5    Perspective / Orthographic\nAlt+Z    X-ray\nAlt-click    Select through overlapping objects\nMiddle or right drag    Orbit\nShift + drag    Pan\nMouse wheel    Zoom\nEscape    Cancel transform or anchor picking\nCtrl+I    Import mesh"; lineHeight: 1.7; color: Theme.text }
     }
     Dialog { id: messageDialog; title: "Last operation"; modal: true; anchors.centerIn: parent; width: Math.min(560, window.width-80); standardButtons: Dialog.Close; Label { width: parent.width; text: workspace.state.message; wrapMode: Text.WrapAnywhere; color: Theme.text } }
     FileDialog { id: importFile; title: "Import primitive mesh"; nameFilters: ["Mesh files (*.obj *.stl *.ply)"]; onAccepted: { window.chosenImport = selectedFile.toString(); importUnits.currentIndex = 0; importOptions.open(); } }
@@ -176,7 +188,7 @@ ApplicationWindow {
             Label { text: "Source units (required)" }
             UiCombo { id: importUnits; Layout.fillWidth: true; model: ["Choose source units…","Metres","Centimetres","Millimetres"] }
             Label { text: "Parent SCP"; visible: workspace.treeRows.length > 0 }
-            UiCombo { id: importParent; visible: workspace.treeRows.length > 0; Layout.fillWidth: true; model: workspace.treeRows; textRole: "name"; valueRole: "id"; currentIndex: Math.max(0,indexOfValue(workspace.selectedId)) }
+            UiCombo { id: importParent; visible: workspace.treeRows.length > 0; Layout.fillWidth: true; model: workspace.treeRows.filter(row => !row.is_control); textRole: "name"; valueRole: "id"; currentIndex: Math.max(0,indexOfValue(workspace.selectedId)) }
             UiCheck { id: sourceYUp; text: "Convert Y-up source to Z-up" }
             Label { text: "One SCP per file. Geometry only; materials and textures are ignored."; Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.muted }
             RowLayout {
@@ -247,5 +259,6 @@ ApplicationWindow {
     Shortcut { sequence: "3"; enabled: window.viewportKeys; onActivated: viewport.setView("Right") }
     Shortcut { sequence: "7"; enabled: window.viewportKeys; onActivated: viewport.setView("Top") }
     Shortcut { sequence: "5"; enabled: window.viewportKeys; onActivated: viewport.orthographic = !viewport.orthographic }
+    Shortcut { sequence: "Alt+Z"; enabled: window.viewportKeys; onActivated: viewport.xray = !viewport.xray }
     Shortcut { sequence: "Escape"; enabled: !window.modalOpen; onActivated: { workspace.endTransform(true); viewport.anchorMode = ""; viewport.forceActiveFocus(); } }
 }

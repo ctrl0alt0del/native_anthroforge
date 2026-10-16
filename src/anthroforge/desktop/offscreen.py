@@ -31,15 +31,19 @@ class Offscreen:
         self.control = QQuickRenderControl()
         self.window = QQuickWindow(self.control)
         self.engine = QQmlEngine()
-        self.engine.addImportPath(str(build_directory() / "qml"))
-        self.engine.rootContext().setContextProperty("workspace", controller)
-        self.engine.warnings.connect(lambda errors: warnings.extend(e.toString() for e in errors))
+        self.configure_engine(controller, warnings)
         self.load_view()
         if not self.control.initialize():
             raise RuntimeError("Cannot initialize the offscreen GPU renderer.")
         self.rhi = self.control.rhi()
         self.create_buffers()
         self.create_target()
+
+    def configure_engine(self, controller, warnings):
+        self.engine.addImportPath(str(build_directory() / "qml"))
+        self.engine.rootContext().setContextProperty("workspace", controller)
+        self.engine.rootContext().setContextProperty("authoring", controller.authoring)
+        self.engine.warnings.connect(lambda errors: warnings.extend(e.toString() for e in errors))
 
     def load_view(self):
         path = Path(__file__).parent / "qml/Viewport.qml"

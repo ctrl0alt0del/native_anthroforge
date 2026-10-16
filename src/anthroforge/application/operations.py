@@ -2,11 +2,12 @@
 
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any
-from uuid import uuid4
 
 from anthroforge.core.entities import SCP, Attachment, descendants
+from anthroforge.core.results import Port, geometry_asset
 
 from . import evaluation
+from .presentation import include_created
 
 if TYPE_CHECKING:
     from .session import Session
@@ -37,6 +38,7 @@ def empty(session: "Session", name: str, parent: str = "") -> str:
         attachment=Attachment(parent_mode="OBJECT_ORIGIN", child_mode="OBJECT_ORIGIN"),
     )
     session.replace_document(entities=(*session.document.entities, entity))
+    include_created(session, {entity.id})
     if parent:
         evaluation.request(session, {entity.id}, {entity.id})
     return entity.id
@@ -48,35 +50,39 @@ def rename(session: "Session", entity: str, name: str) -> None:
 
 
 def delete(session: "Session", entity: str) -> None:
+
     session.editable(entity)
     removed = descendants(session.document.entities, entity)
     for entity_id in removed:
         session.editable(entity_id)
+    remove_entities(session, removed)
+
+
+def remove_entities(session: "Session", removed: set[str]) -> None:
+    from .control_frames import remove_supports
+    from .control_operations import refresh_references
+
     session.scheduler.invalidate(removed)
+    changed = {
+        c.id for c in session.document.controls if c.follow in removed or c.support in removed
+    }
     session.replace_document(
-        entities=tuple(e for e in session.document.entities if e.id not in removed)
+        entities=tuple(e for e in session.document.entities if e.id not in removed),
+        controls=remove_supports(session, removed),
     )
+    refresh_references(session, changed)
 
 
 def duplicate(session: "Session", entity: str, parent: str = "") -> str:
+    from .construction_copy import duplicate as duplicate_construction
+
     source = session.editable(entity)
     parent = parent_for(session, parent or source.parent or source.id)
     ids = descendants(session.document.entities, entity)
-    mapping = {key: str(uuid4()) for key in ids}
-    copies = [copied(item, mapping, parent) for item in session.document.entities if item.id in ids]
-    session.replace_document(entities=(*session.document.entities, *copies))
+    mapping = duplicate_construction(session, ids, parent)
+    include_created(session, set(mapping.values()))
     evaluation.request(session, set(mapping.values()), {mapping[entity]})
     return mapping[entity]
-
-
-def copied(item: SCP, mapping: dict[str, str], parent: str) -> SCP:
-    return replace(
-        item,
-        id=mapping[item.id],
-        parent=mapping.get(item.parent, parent),
-        name=item.name + " copy",
-        generation=0,
-    )
 
 
 def reparent(session: "Session", entity: str, parent: str) -> None:
@@ -94,7 +100,7 @@ def reparent(session: "Session", entity: str, parent: str) -> None:
 def origin_if_empty(session: "Session", parent: str, settings: Attachment) -> Attachment:
     return (
         settings
-        if session.document.entity(parent).asset
+        if geometry_asset(session.document.entity(parent))
         else replace(settings, parent_mode="OBJECT_ORIGIN")
     )
 
@@ -110,6 +116,7 @@ def wrap_root(session: "Session", name: str = "Assembly") -> str:
     )
     entities = tuple(changed if item.id == root.id else item for item in session.document.entities)
     session.replace_document(entities=(group, *entities))
+    include_created(session, {group.id})
     evaluation.request(session, {root.id}, {root.id})
     return group.id
 
@@ -121,19 +128,33 @@ def make_group(name: str) -> SCP:
 
 def transform(session: "Session", entity: str, values: list[float]) -> None:
     item = session.editable(entity)
+    affected = descendants(session.document.entities, entity)
+    queued_since = session.scheduler.pending_since(affected, "attachments")
     changed = remember_parent(session, replace(item, matrix=session.engine.transform(values)))
     session.replace_entities({entity: changed})
-    schedule_edit(session, entity)
+    schedule_edit(session, entity, affected, queued_since)
+    transform_dependents(session, entity)
 
 
-def schedule_edit(session: "Session", entity: str) -> None:
+def transform_dependents(session: "Session", entity: str) -> None:
+    from .construction_tasks import edited
+    from .control_tasks import edited as controls_edited
+    from .dependencies import Port
+    from .dependencies import affected as graph_affected
+
+    controls_edited(session, {Port(entity, "pose")})
+    edited(session, graph_affected(session.document, {Port(entity, "pose")}))
+
+
+def schedule_edit(
+    session: "Session", entity: str, affected: set[str], queued_since: float | None
+) -> None:
     item = session.document.entity(entity)
-    affected = descendants(session.document.entities, entity)
-    session.scheduler.invalidate(affected)
+    session.scheduler.invalidate_ports({Port(key, "pose") for key in affected})
     mode = session.document.update_mode if item.update_mode == "INHERIT" else item.update_mode
     mark_edited(session, entity, affected)
     if mode == "LIVE" and session.document.attachments_enabled:
-        evaluation.request(session, affected, {entity})
+        evaluation.request(session, affected, {entity}, interactive=True, queued_since=queued_since)
 
 
 def mark_edited(session: "Session", entity: str, affected: set[str]) -> None:
@@ -156,6 +177,19 @@ def mark_entity(item: SCP, directly_edited: bool) -> SCP:
 
 
 def released(session: "Session") -> None:
+    from .construction_policy import mode
+    from .construction_tasks import schedule
+
+    pending = {
+        e.id
+        for e in session.document.entities
+        if e.result.status == "pending" and mode(session.document, e.id) == "ON_RELEASE"
+    }
+    schedule(session, pending, released=True)
+    release_attachments(session)
+
+
+def release_attachments(session: "Session") -> None:
     roots = {
         e.id
         for e in session.document.entities
@@ -176,9 +210,11 @@ def attachment(session: "Session", entity: str, **options: Any) -> None:
     validate_attachment(settings)
     if not item.parent:
         raise ValueError("The root has no parent attachment.")
-    if settings.parent_mode == "SURFACE_NEAREST" and not session.document.entity(item.parent).asset:
+    if settings.parent_mode == "SURFACE_NEAREST" and not geometry_asset(
+        session.document.entity(item.parent)
+    ):
         raise ValueError("Parent has no surface; choose Object Origin.")
-    if settings.child_mode != "OBJECT_ORIGIN" and not item.asset:
+    if settings.child_mode != "OBJECT_ORIGIN" and not geometry_asset(item):
         raise ValueError("Child has no geometry; choose Object Origin.")
     changed = remember_parent(session, replace(item, attachment=settings, status="edited"))
     session.replace_entities({entity: changed})
@@ -205,15 +241,20 @@ def recapture(session: "Session", entity: str) -> str:
 def move_origin(session: "Session", entity: str) -> None:
     from anthroforge.native.attachments import move_origin as native_origin
 
-    item = native_origin(session.engine, session.editable(entity))
+    from .control_frames import rebase_followers
+
+    before = session.editable(entity)
+    item = native_origin(session.engine, before)
     session.replace_entities({entity: item})
+    rebase_followers(session, before, item)
+    transform_dependents(session, entity)
     targets = descendants(session.document.entities, entity)
     evaluation.request(session, targets, targets)
 
 
 def toggle_attachments(session: "Session", enabled: bool) -> None:
     ids = {e.id for e in session.document.entities}
-    session.scheduler.invalidate(ids)
+    session.scheduler.invalidate_ports({Port(key, "pose") for key in ids})
     session.replace_document(attachments_enabled=bool(enabled))
     if enabled:
         evaluation.request(session, ids, ids)
@@ -227,6 +268,14 @@ def update_mode(session: "Session", mode: str, entity: str = "") -> None:
         session.replace_entities({entity: replace(item, update_mode=mode)})
     else:
         session.replace_document(update_mode=mode)
+    resume_pending(session)
+
+
+def resume_pending(session: "Session") -> None:
+    from .construction_tasks import schedule
+
+    pending = {e.id for e in session.document.entities if e.result.status == "pending"}
+    schedule(session, pending)
 
 
 def color(session: "Session", entity: str, value: str) -> None:

@@ -1,17 +1,22 @@
-# AnthroForge 0.1
+# AnthroForge 0.1.2
 
-A standalone imported-SCP assembly editor for Windows, built with a shared Python
+A standalone SCP and primitive editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **dist/AnthroForge.dist/AnthroForge.exe** to use the portable build.
+Open **AnthroForge.exe** in the portable folder (`dist/AnthroForge.dist` in the project).
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.
 
-0.1 includes OBJ/STL/PLY import with explicit units, SCP hierarchy and transforms,
+0.1.2 includes editable Bézier lofts and curve-deformed box/cylinder/capsule bodies,
+shared Hooks and lattice cages, Simple Solidify thickness, and OBJ/STL/PLY imports.
+It retains explicit units, SCP hierarchy and transforms,
 attachments and anchor controls, transactions/undo, background calculation scheduling,
 portable project files, focused workspaces, precise picking and diagnostics.
-Curve primitives belong to 0.1.1. Skin construction and export are later milestones.
+The [primitive specification](docs/primitives_012.md) defines the implemented scope.
+Try **Create Primitive**, then **Edit Primitive**, or run the shared authoring example
+[examples/primitives.json](examples/primitives.json). Skin construction and export are
+later milestones. Editable anatomy is preserved permanently; Apply/Bake is unavailable.
 
 ## Development
 
@@ -24,6 +29,7 @@ cd E:\development\anthroforge
 
 See [development commands](docs/development.md), [implementation contract](docs/implementation_01.md),
 [observed validation](docs/development_status.md), and [architecture](docs/architecture.md).
+Follow the [engineering guidelines](docs/engineering_guidelines.md) for fixes, features and design review.
 The [confirmed specification](standalone_application_recommendations.md) remains authoritative;
 the [stack analysis](standalone_technology_stack_analysis.md) records the technology decisions.
 
@@ -39,5 +45,5 @@ the [stack analysis](standalone_technology_stack_analysis.md) records the techno
 
 Application source is GPL-3.0-or-later. Third-party code retains its own licenses;
 see [notices](licenses/THIRD_PARTY.md) and [native provenance](native/vendor/PROVENANCE.md).
-The original Blender addon is a migration reference and is not required to run 0.1.
+The original Blender addon is a migration reference and is not required to run 0.1.2.
 The unrelated pre-existing root __init__.py is preserved outside the standalone package.

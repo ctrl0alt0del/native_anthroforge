@@ -15,11 +15,15 @@ import numpy as np
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Attachment, Workspace
 from anthroforge.native.mesh import GeometryEngine
+from anthroforge.native.topology import restore
 
 from .assets import Asset
+from .construction_codec import control, entity_construction
+from .geometry_ownership import assets_used
 
 FORMAT = "anthroforge-project"
-VERSION = 1
+VERSION = 2
+BUFFERS = ("vertices", "corners", "offsets", "triangles", "polygons")
 
 
 class FileLock:
@@ -55,7 +59,7 @@ class FileLock:
 def manifest(document: Document, assets: dict[str, Asset]) -> dict[str, Any]:
     state = asdict(document)
     state["id"] = str(document.id)
-    used = {item.asset for item in document.entities if item.asset}
+    used = assets_used(document)
     sources = {
         key: {
             "source": assets[key].source,
@@ -78,7 +82,7 @@ def write_package(path: Path, document: Document, assets: dict[str, Asset]) -> N
     with zipfile.ZipFile(path, "w", allowZip64=True) as archive:
         archive.writestr("manifest.json", json.dumps(data, indent=2, allow_nan=False))
         for key in data["assets"]:
-            for kind, label in enumerate(("vertices", "corners", "offsets")):
+            for kind, label in enumerate(BUFFERS):
                 write_array(archive, f"assets/{key}/{label}.npy", assets[key].mesh.array(kind))
 
 
@@ -100,7 +104,7 @@ def read_array(archive: zipfile.ZipFile, name: str) -> Any:
 
 
 def decode_entity(data: dict[str, Any]) -> SCP:
-    data = dict(data)
+    data = entity_construction(data)
     attachment = dict(data.pop("attachment"))
     attachment["binding"] = tuple(attachment.get("binding", ()))
     data["matrix"] = tuple(data["matrix"])
@@ -124,31 +128,33 @@ def decode_document(data: dict[str, Any]) -> Document:
     data["id"] = UUID(data["id"])
     data["entities"] = tuple(decode_entity(item) for item in data["entities"])
     data["workspaces"] = tuple(decode_workspace(item) for item in data["workspaces"])
+    data["controls"] = tuple(control(item) for item in data.get("controls", ()))
     if not data["workspaces"]:
         raise ValueError("Project has no workspace.")
     return Document(**data)
 
 
 def read_asset(
-    archive: zipfile.ZipFile, key: str, source: dict[str, Any], engine: GeometryEngine
+    archive: zipfile.ZipFile, key: str, source: dict[str, Any], engine: GeometryEngine, version: int
 ) -> Asset:
     arrays = [
         read_array(archive, f"assets/{key}/{label}.npy")
-        for label in ("vertices", "corners", "offsets")
+        for label in (BUFFERS if version == 2 else BUFFERS[:3])
     ]
-    mesh = engine.create_mesh(*arrays)
+    mesh = restore(engine, arrays) if version == 2 else engine.create_mesh(*arrays)
     return Asset(mesh, source["source"], source["digest"], source["units"], source["y_up"])
 
 
 def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, dict[str, Asset]]:
     with zipfile.ZipFile(path) as archive:
         data = json.loads(archive.read("manifest.json"))
-        if data.get("format") != FORMAT or data.get("version") != VERSION:
+        if data.get("format") != FORMAT or data.get("version") not in (1, VERSION):
             raise ValueError("Unsupported AnthroForge project format/version.")
         document = decode_document(data["document"])
         assets = {
-            key: read_asset(archive, key, source, engine) for key, source in data["assets"].items()
+            key: read_asset(archive, key, source, engine, data["version"])
+            for key, source in data["assets"].items()
         }
-        if any(item.asset and item.asset not in assets for item in document.entities):
+        if assets_used(document) - assets.keys():
             raise ValueError("Project is missing a required mesh asset.")
         return document, assets

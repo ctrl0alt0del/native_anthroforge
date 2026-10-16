@@ -100,6 +100,8 @@ The first primitive family currently depends on Geometry Nodes construction in [
 
 Those behaviors need native evaluators with parity fixtures. A Qt cube primitive cannot substitute for their modifier semantics. User examples must establish curve parameterization, frames/twist, joins, caps, profile behavior, and attachment correspondence. Examine the relevant Blender implementation when specifying each evaluator; this analysis did not audit Blender's C++ kernels for direct extraction. Start with the required operations, rather than transplanting Blender's entire dependency graph or modifier stack.
 
+Subsequent confirmed feature work: the [0.1.2 primitive/deformer specification](docs/primitives_012.md) now records the user's reference scenes, node-graph and Hook/Lattice source inspection, construction/deformation separation, connected loft seams, topology locks, and permanent exclusion of Apply/Bake. It supersedes the open product choices in this paragraph. Native extraction, integration, and standalone parity remain implementation work; the earlier analysis's inspection limits are historical.
+
 ### 4.4 Port the full skin/topology pipeline deliberately
 
 [Draft skin solving](<C:/Users/alexe/AppData/Roaming/Blender Foundation/Blender/5.0/scripts/addons/anthroforge/core/draft_skin/solver.py>) already has substantial host-independent NumPy/SciPy/scikit-image logic and native numerical stages. The [topology engine directory](<C:/Users/alexe/AppData/Roaming/Blender Foundation/Blender/5.0/scripts/addons/anthroforge/adapters/topology/engine>) contains reusable array algorithms despite its adapter location. Classify by actual dependencies, not directory name.

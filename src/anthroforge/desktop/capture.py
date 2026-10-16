@@ -48,16 +48,23 @@ def load_revision(controller, project, revision):
 
 
 def draw(app, controller, renderer):
-    while controller.render_model.pending:
-        controller.render_model.drain()
-        app.processEvents()
+    stage_geometry(app, controller, renderer)
     if controller.rows:
         controller.select(controller.rows[0]["id"])
         controller.frameSelection()
     for _ in range(3):
         app.processEvents()
         image = renderer.frame()
+        controller.frame_presented()
     return image
+
+
+def stage_geometry(app, controller, renderer):
+    while controller.render_model.pending:
+        controller.render_model.drain()
+        app.processEvents()
+        renderer.frame()
+        controller.frame_presented()
 
 
 def finish(controller, renderer, image, output, warnings):

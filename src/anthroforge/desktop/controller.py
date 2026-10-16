@@ -12,6 +12,7 @@ from .models import RenderModel
 
 class Controller(QObject):
     changed = Signal()
+    activityChanged = Signal()
     selectionChanged = Signal()
     saveChoiceRequested = Signal(str)
     discardRequested = Signal(str)
@@ -24,7 +25,11 @@ class Controller(QObject):
         self.session = Session()
         scene.configure(self.session.engine)
         self.render_model = RenderModel(self)
+        self.render_model.activated.connect(self.activate_geometry)
         self._initialize_state()
+        from .authoring import Authoring
+
+        self.authoring = Authoring(self)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.tick)
         self.timer.start(16)
@@ -74,6 +79,24 @@ class Controller(QObject):
 
     @Property("QVariantMap", notify=changed)
     def state(self):
+        return self._state
+
+    @Property("QVariantList", notify=activityChanged)
+    def jobs(self):
+        return self._jobs
+
+    @Property("QVariantMap", notify=activityChanged)
+    def metrics(self):
+        return self._metrics
+
+    def notify(self):
+        self._state = self.snapshot()
+        self._jobs = [job.describe() for job in self.session.scheduler.jobs[-40:]]
+        self._metrics = self.session.scheduler.metrics.report()
+        self.changed.emit()
+        self.activityChanged.emit()
+
+    def snapshot(self):
         return {
             **self.view_state(),
             "message": self.message,
@@ -83,8 +106,6 @@ class Controller(QObject):
             "waiting": self.session.waiting_save,
             "publishing": len(self.render_model.pending),
             "path": str(self.session.path or ""),
-            "jobs": [job.describe() for job in self.session.scheduler.jobs[-40:]],
-            "metrics": self.session.scheduler.metrics.report(),
         }
 
     def view_state(self):
@@ -108,7 +129,7 @@ class Controller(QObject):
         except Exception as error:
             self.message = str(error)
             self.session.waiting_save = False
-            self.changed.emit()
+            self.notify()
         self.session.scheduler.metrics.observe("tick", monotonic() - started)
 
     def process_tick(self):
@@ -118,13 +139,21 @@ class Controller(QObject):
         self.refresh_if_needed()
         self.tick_count += 1
         if self.tick_count % 15 == 0:
-            self.changed.emit()
+            self.notify()
 
     @Slot()
     def frame_presented(self):
         now = monotonic()
         self.session.scheduler.metrics.observe("frame_interval", now - self.last_frame)
         self.last_frame = now
+        self.render_model.presented()
+
+    def activate_geometry(self):
+        scene_state.picking_inputs(self, self.render_model.active_rows())
+        from anthroforge.application.geometry_ownership import collect
+
+        collect(self.session)
+        self.notify()
 
     def refresh_if_needed(self):
         if (self.last_revision, self.last_workspace) != (
@@ -135,14 +164,14 @@ class Controller(QObject):
 
     def refresh(self):
         self.rows = scene_state.records(self)
-        self.render_model.publish(scene_state.render_rows(self.rows))
-        scene_state.picking_inputs(self, self.rows)
+        self.render_model.publish(scene_state.render_rows(self.rows), self.session.assets)
+        scene_state.picking_inputs(self, self.render_model.active_rows())
         if self.selection and not any(row["id"] == self.selection for row in self.rows):
             self.selection = ""
         self.last_revision = self.session.document.revision
         self.last_workspace = self.session.active_workspace
         self.selectionChanged.emit()
-        self.changed.emit()
+        self.notify()
         self.restore_camera()
 
     def restore_camera(self):
@@ -170,7 +199,7 @@ class Controller(QObject):
     def select(self, entity):
         self.selection = entity
         self.selectionChanged.emit()
-        self.changed.emit()
+        self.notify()
 
     @Slot(str, float, str, bool)
     def importMesh(self, path, units, parent, y_up):
@@ -181,23 +210,23 @@ class Controller(QObject):
         if result:
             self.message = "Import queued. You can keep navigating and editing."
 
-    @Slot("QVariantList", "QVariantList", int, bool, result="QVariantMap")
-    def pick(self, origin, direction, depth, select):
-        self.last_hit = scene_state.picked(self, origin, direction, depth)
+    @Slot("QVariantList", "QVariantList", int, bool, float, result="QVariantMap")
+    def pick(self, origin, direction, depth, select, radius=0.03):
+        self.last_hit = scene_state.picked(self, origin, direction, depth, radius)
         previous = self.hovered
         self.hovered = self.last_hit.get("id", "")
         if select:
             self.selection = self.hovered
             self.selectionChanged.emit()
         if select or previous != self.hovered:
-            self.changed.emit()
+            self.notify()
         return self.last_hit
 
     @Slot(str)
     def lockAnchor(self, mode):
         if self.last_hit.get("id") != self.selection:
             self.message = "Point at a face or vertex on the selected child SCP first."
-            self.changed.emit()
+            self.notify()
             return
         key = "face_lock" if mode == "FACE_CENTER" else "vertex_lock"
         index = self.last_hit["face" if key == "face_lock" else "vertex"]
@@ -209,7 +238,7 @@ class Controller(QObject):
             actions.start_transform(self, mode)
         except Exception as error:
             self.message = str(error)
-            self.changed.emit()
+            self.notify()
 
     @Slot(int, float)
     def dragTransform(self, axis, amount):
@@ -230,7 +259,7 @@ class Controller(QObject):
         except Exception as error:
             self.message = str(error)
             self.session.waiting_save = False
-            self.changed.emit()
+            self.notify()
 
     @Slot()
     def cancelSaveWait(self):
@@ -241,7 +270,7 @@ class Controller(QObject):
         self.after_save = None
         self.pending_document = None
         self.session.waiting_save = False
-        self.changed.emit()
+        self.notify()
 
     @Slot(str)
     def requestDocument(self, path):

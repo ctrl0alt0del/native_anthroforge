@@ -20,6 +20,8 @@ AF_API int af_decompose(const double* matrix, double* trs);
 AF_API int af_point(const double* matrix, const double* point, double* output);
 AF_API int af_quaternion(const double* matrix, double* quaternion);
 AF_API int af_geometry_matrix(const double* matrix, const double* offset, double* output);
+/* Conservative world bounds from transformed local bounds; O(mesh count). */
+AF_API int af_scene_bounds(int count, const uint64_t* meshes, const double* matrices, double* bounds);
 AF_API int af_scene_pick(int count, const uint64_t* meshes, const double* matrices,
     const double* origin, const double* direction, double* hits);
 /* Hit: world distance, polygon, triangle, nearest vertex, world xyz, barycentrics. */

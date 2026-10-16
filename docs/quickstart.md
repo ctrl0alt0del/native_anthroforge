@@ -1,4 +1,4 @@
-# AnthroForge 0.1 quick start
+# AnthroForge 0.1.2 quick start
 
 ## Portable Windows application
 
@@ -24,6 +24,11 @@ selection. W/E/R selects Move/Rotate/Scale; 1/3/7 selects Front/Right/Top and 5 
 orthographic projection. These viewport shortcuts leave text entry alone. Alt-click
 cycles through deeper eligible SCP hits. Hover predicts ordinary selection.
 
+Meshes use opaque studio shading by default, with lighting that follows the camera
+and preserves object colors. **X-ray** beside the view buttons (or **Alt+Z**) makes
+surfaces translucent for inspection; selected and hovered objects remain more visible.
+Focused workspaces still show outside objects as faint, read-only context.
+
 The searchable **Outliner** has expandable branches, an eye for visibility and a target
 for viewport picking. Drag the panel dividers to resize the outliner and properties.
 Properties are grouped into collapsible Transform, Attachment, and Display & evaluation
@@ -37,13 +42,19 @@ The global update mode and each SCP's override support **Live**, **On Release** 
 Disabling attachments freezes dependent poses; re-enabling captures the current poses
 before subsequent parent changes. **Move origin to anchor** preserves mesh position.
 
+Small Live attachment updates move parents and children together immediately. Larger
+updates run in the background with a short, workload-dependent delay that combines
+rapid edits. Enable diagnostics to see estimated cost, planned wait and actual execution
+time in Activity. Imports, project opening, saving and explicit recalculation have no
+added coalescing delay.
+
 Use **Focus…** beside the workspace selector to create a named workspace, optionally including existing
 descendants. Other SCPs remain transparent and read-only; their dependency relations
 still participate in calculations. Workspace cameras, visibility and overlays are
 saved separately from anatomical undo. Copies are independent; no linked mirroring.
 Viewport **Overlays** controls handles, anchors and diagnostics. The reference grid is
 spaced at 0.25 metres and can be toggled beside the orientation buttons. Panel widths,
-grid visibility, search and collapsed sections are temporary editor layout settings.
+grid visibility, X-ray, search and collapsed sections are temporary editor layout settings.
 
 When calculations are pending, Save offers cancel, the latest committed checkpoint,
 or wait for running and queued writes and then save. Waiting blocks edits. The
@@ -59,6 +70,7 @@ From PowerShell in the portable application directory:
 ```powershell
 ./AnthroForge.exe --cli doctor --require-native
 ./AnthroForge.exe --cli run examples/assembly.json
+./AnthroForge.exe --cli run examples/primitives.json
 ./AnthroForge.exe --cli inspect assembly.anthroforge
 ./AnthroForge.exe --cli render assembly.anthroforge assembly.png --revision 11
 ```
@@ -82,11 +94,54 @@ results and explicitly save before ending a session; EOF does not save automatic
 
 ## Boundaries
 
-0.1 imports OBJ and ASCII/binary STL/PLY, keeps canonical polygons and derives render
+0.1.2 imports OBJ and ASCII/binary STL/PLY, keeps canonical polygons and derives render
 triangles. OBJ objects are combined into one SCP. Mesh materials/textures are ignored.
 Source units and optional Y-up conversion are explicit; documents use metres.
 
-This release edits imported SCP assemblies and attachments. It does not build skin,
+This release edits imported SCP assemblies, native primitives and shared deformers.
+It does not build skin,
 export geometry, edit mesh vertices, migrate Blender projects, merge documents, preserve
-undo across sessions, or provide crash recovery. Curve/loft/hooked primitives start in
-0.1.1. Fibres, muscles, tissues, skin and topology are later milestones.
+undo across sessions, or provide crash recovery. Fibres, muscles, tissues, skin and
+topology are later milestones. Simple Solidify is supported; Complex mode is deferred.
+
+## Create and edit primitives
+
+1. Choose **Create Primitive > Loft**. A new SCP starts with two Bézier curves.
+   **Edit Primitive** exposes its curve points and handles. Click a curve to select its
+   points, click a point/handle for a component, and Shift-click to extend selection.
+   Use Move/Rotate/Scale or the matching numeric fields. Radius and tilt are geometric
+   parameters; tilt is in radians. Control cages show authored coordinates before deformers.
+2. In **Curves**, add/copy/remove and reorder curves. Adjacent pairs form connected
+   strips with shared boundaries. Sampling start/span can be overridden per curve.
+   Closed cross-sections can be capped; **Thickness** adds an editable shell.
+3. Create a **Box**, **Cylinder** or **Capsule** to start a curve-driven body. Edit its
+   path and body width/depth. It fits the entire curve by default; disable that option
+   for a fixed length and position along the path. Additional curves create body pieces.
+4. Select an SCP and use **Deformers > Add Lattice**. The fitted cage appears separately
+   in the outliner. Select cage points and move them, or edit coordinates numerically.
+   Resolution, interpolation and Outside are cage settings. Resizing uses Blender's
+   linear transfer semantics and clears cage weights; it need not preserve exact shape.
+5. Select curve controls, cage points or imported/base vertices, then **Add Hook**
+   in Deformers. The new shared control initially preserves their positions. Move that control
+   to deform the selected target. Imported/base vertices permit membership and weights,
+   without direct coordinate editing. **Select members**, **Assign selected**, and
+   selected-weight editing are available in the binding inspector.
+6. Deformer bindings expose enabled state, order, strength and weights; Hooks also have
+   falloff, custom curve points/handle modes, reset and recenter. A shared control can be
+   bound to another SCP through its inspector. Curve/BASE/LATTICE bindings are scoped to
+   their construction target; generated-geometry bindings act afterward.
+7. A control can follow the document or an SCP, preserving world placement when changed.
+   Local attachments can use an SCP surface or another control. The inspector lists
+   affected SCPs. Removing a binding preserves the control and its other consumers.
+   Deleting the shared control displays its affected SCPs before removing their bindings.
+8. Topology edits lock while children or incoming surface attachments exist. Shape edits
+   remain available. Remove those dependents to unlock topology. A real dependency cycle
+   retains previous results and finishes as a failure shown in Activity.
+
+Live, On Release and Manual apply per SCP even when controls are shared. During work,
+the previous complete mesh remains visible until its replacement is ready. A Live target
+may use a Manual support's last accepted surface and report pending upstream changes.
+**Recalculate this SCP** evaluates its required prerequisites through the shared core;
+the top toolbar's **Recalculate** evaluates the whole document.
+Save/reopen retains construction parameters, source assets, bindings and accepted results.
+Apply/Bake is never available.

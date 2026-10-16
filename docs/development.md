@@ -1,5 +1,9 @@
 # Development guide
 
+Apply the [engineering guidelines](engineering_guidelines.md) and [agent rules](../AGENTS.md)
+when implementing, fixing or reviewing behavior. They define architectural diagnosis,
+practical SOLID criteria, pattern selection and proportionate validation.
+
 ## Setup and daily use
 
 Requirements: PowerShell, uv, Visual Studio C++/Windows SDK tools and LLVM/clang-cl.
@@ -26,7 +30,12 @@ Qt 6.12 compiler-specific archive location. It retains aqt checksum verification
 | ./tools/check.ps1 | Lock, Ruff, configured mypy, native/style checks, pytest, numerical imports, doctor |
 | uv run --no-sync python -m anthroforge run examples/assembly.json | Create and save the example assembly |
 | uv run --no-sync python tools/gui_acceptance.py assembly.anthroforge | Real QQuickWindow drag/undo and save/reopen |
+| uv run --no-sync python tools/scheduling_acceptance.py assembly.anthroforge | Parent/child coherence during real viewport drags, timing and captures |
 | uv run --no-sync python tools/ui_acceptance.py assembly.anthroforge | Text-safe shortcuts, numeric edit/undo, search, sections, resizing and empty-state captures |
+| uv run --no-sync python tools/primitive_acceptance.py | Loft/cage/Hook editing, save/reopen and actual GUI captures |
+| uv run --no-sync python tools/primitive_acceptance.py --interaction | Curve/component picking, inspector selection, topology policies and imported/base Hook editing |
+| uv run --no-sync python tools/primitive_acceptance.py --performance | 133,116-triangle publication, 1,000 cage points, rapid edits, cancellation, frame/picking measurements |
+| uv run --no-sync python -m anthroforge run examples/primitives.json | Complete headless primitive/deformer workshop |
 | ./tools/smoke-desktop.ps1 | Bounded desktop startup and capture |
 | ./tools/build-package.ps1 | Development wheel/source package |
 | ./tools/package.ps1 | Portable Windows executable and dependencies |
@@ -75,5 +84,19 @@ Future migrations should add equivalent parity evidence instead of treating the 
 addon as already portable.
 
 Development numerics extras remain installed for future work. They are excluded from
-the 0.1 portable runtime because 0.1 does not use them. In particular pytetwild[all]
+the 0.1.2 portable runtime because 0.1.2 does not use them. In particular pytetwild[all]
 supplies its required PyVista accessor dependency while Qt remains the application renderer.
+
+Primitive parity fixtures under tests/fixtures/primitives pin Blender 5.0.1 outputs.
+Generators are capture_primitive_parity.py, capture_deformer_edges.py,
+capture_solidify_edges.py, capture_curve_parity.py and capture_anatomy_primitives.py.
+Read their CLI entrypoints before regeneration; anatomical capture needs the explicit
+source path and output JSON path. Use `--disable-autoexec` with background Blender.
+Never save either original .blend file. Native source provenance is recorded in
+[BLENDER_PRIMITIVES.md](../native/migration/BLENDER_PRIMITIVES.md).
+
+The companion archive is `dist/AnthroForge-0.1.2-source.zip`. The portable folder stays
+`dist/AnthroForge.dist` and the executable's product/file version identifies 0.1.2.
+Packaging includes all new QML inspectors, native algorithms, example batches and notices.
+`uv run --no-sync python tools/primitive_acceptance.py --workshop` runs the complete
+primitives batch, opens its result in the desktop and captures the loft and curved body.

@@ -6,13 +6,17 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 from uuid import uuid4
 
+from anthroforge.core.construction import Primitive
 from anthroforge.core.entities import SCP
 from anthroforge.core.jobs import Job
+from anthroforge.core.results import EvaluationResult
 from anthroforge.native.mesh import NativeCancellation
 
 from .assets import Asset, imported
 from .history import Entry
 from .operations import origin_if_empty, parent_for, require_name
+from .presentation import include_created
+from .task_workloads import source_file
 
 if TYPE_CHECKING:
     from .session import Session
@@ -42,6 +46,11 @@ def prepare_import(session: "Session", path: str, parent: str, name: str) -> tup
 
 def imported_entity(session: "Session", name: str, parent: str) -> SCP:
     entity = SCP(name, parent=parent, asset=str(uuid4()))
+    entity = replace(
+        entity,
+        primitive=Primitive("IMPORTED", source=entity.asset),
+        result=EvaluationResult(asset=entity.asset),
+    )
     if parent:
         entity = replace(entity, attachment=origin_if_empty(session, parent, entity.attachment))
     return entity
@@ -59,9 +68,17 @@ def enqueue(
         partial(import_asset, session, source, units, y_up),
         lambda result: publish(session, entity, origin, result),
     )
+    configure_job(session, job, source, units, y_up, entity, origin)
+    return session.scheduler.submit(job)
+
+
+def configure_job(
+    session: "Session", job: Job, source: Path, units: float, y_up: bool, entity: SCP, origin: int
+) -> None:
     job.cancel = NativeCancellation(session.engine)
     job.retry = partial(enqueue, session, source, units, y_up, entity, origin)
-    return session.scheduler.submit(job)
+    job.kind = "mesh_import"
+    job.workload = partial(source_file, source)
 
 
 def import_asset(
@@ -79,6 +96,7 @@ def publish(session: "Session", entity: SCP, origin: int, asset: Asset) -> None:
         if found:
             merge_entry(session, entry, entity)
     session.document = session.history.entries[session.history.cursor].document
+    include_created(session, {entity.id})
     if entity.parent:
         from .evaluation import request
 

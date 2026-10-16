@@ -26,6 +26,7 @@ def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicatio
     engine = QQmlApplicationEngine()
     engine.addImportPath(str(build_directory() / "qml"))
     engine.rootContext().setContextProperty("workspace", controller)
+    engine.rootContext().setContextProperty("authoring", controller.authoring)
     engine.warnings.connect(lambda errors: warnings.extend(error.toString() for error in errors))
     engine.load(QUrl.fromLocalFile(str(Path(__file__).parent / "qml" / "Main.qml")))
     if engine.rootObjects():

@@ -27,6 +27,13 @@ class GeometryEngine(NativeEngine):
         super().__init__(path)
         self._mesh_signatures()
         self._query_signatures()
+        self._construction_signatures()
+
+    def _construction_signatures(self) -> None:
+        from . import bodies, components, construction, curve_editing, falloff, scene, topology
+
+        for module in (bodies, components, construction, curve_editing, falloff, scene, topology):
+            module.configure(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

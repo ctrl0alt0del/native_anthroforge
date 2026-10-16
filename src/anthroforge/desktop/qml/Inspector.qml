@@ -12,6 +12,7 @@ ScrollView {
     signal pickAnchor(string mode)
     clip: true; contentWidth: availableWidth
     function validParent(row) {
+        if(row.is_control) return false;
         let current = row;
         while (current) {
             if (current.id === selected.id) return false;
@@ -34,7 +35,7 @@ ScrollView {
         }
         Label { visible: !!inspector.selected.readonly; text: "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         ColumnLayout {
-            visible: !!inspector.selected.id
+            visible: !!inspector.selected.id && !inspector.selected.is_control
             enabled: !inspector.selected.readonly && !workspace.state.waiting
             Layout.fillWidth: true; spacing: 10
             RowLayout {
@@ -47,7 +48,7 @@ ScrollView {
                     onEditingFinished: if (inspector.selected.id && text !== inspector.selected.name) workspace.run("scp.rename",{entity:inspector.selected.id,name:text})
                 }
             }
-            Label { text: (inspector.selected.parent ? "Child SCP" : "Document root") + (inspector.selected.asset ? "  ·  Imported mesh" : "  ·  Empty group"); color: Theme.muted; font.pixelSize: 11 }
+            Label { text: (inspector.selected.parent ? "Child SCP" : "Document root") + (inspector.selected.primitive ? "  ·  " + inspector.selected.primitive.kind : "  ·  Empty group"); color: Theme.muted; font.pixelSize: 11 }
             UiSection {
                 title: "Transform"; objectName: "transformSection"
                 Repeater {
@@ -128,6 +129,7 @@ ScrollView {
                     UiButton { text: "Origin to anchor"; hint: "Move the origin while preserving mesh position"; onClicked: workspace.run("scp.origin",{entity:inspector.selected.id}) }
                 }
             }
+            PrimitiveInspector { visible: !!inspector.selected.primitive }
             UiSection {
                 title: "Display & evaluation"
                 RowLayout {
@@ -147,6 +149,7 @@ ScrollView {
                 UiButton { text: "Delete…"; hint: "Delete this SCP and its descendants"; onClicked: deleteDialog.open() }
             }
         }
+        ControlInspector { visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         Label { text: inspector.selected.error || ""; visible: !!text; color: Theme.danger; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         Item { implicitHeight: 8 }
     }

@@ -1,0 +1,121 @@
+"""Independent construction copies with one remapping for internally shared controls."""
+
+from dataclasses import replace
+from typing import TYPE_CHECKING
+from uuid import uuid4
+
+from anthroforge.core.construction import Control, Deformer, Primitive
+from anthroforge.core.document import Document
+from anthroforge.core.entities import SCP
+from anthroforge.core.results import EvaluationResult, ReadRevision
+
+from .membership import remap, remap_weights
+from .presentation import include_created
+
+if TYPE_CHECKING:
+    from .session import Session
+
+
+def copied_controls(document: Document, entities: set[str]) -> set[str]:
+    found = {b.control for e in document.entities if e.id in entities for b in e.deformers}
+    pending = list(found)
+    while pending:
+        control = document.control(pending.pop())
+        references = {b.control for b in control.deformers}
+        references |= {control.support} & {c.id for c in document.controls}
+        pending.extend(references - found)
+        found |= references
+    return found
+
+
+def identities(document: Document, entities: set[str], controls: set[str]) -> set[str]:
+    result = entities | controls
+    for item in document.entities:
+        if item.id in entities:
+            result |= {b.id for b in item.deformers}
+            if item.primitive:
+                result |= {c.id for c in item.primitive.curves}
+                result |= {p.id for c in item.primitive.curves for p in c.points}
+                result |= {p.id for p in item.primitive.pieces}
+    result |= {b.id for c in document.controls if c.id in controls for b in c.deformers}
+    return result
+
+
+def binding(source: Deformer, mapping: dict[str, str]) -> Deformer:
+    target = replace(
+        source.target,
+        owner=mapping.get(source.target.owner, source.target.owner),
+        component=mapping.get(source.target.component, source.target.component),
+    )
+    return replace(
+        source,
+        id=mapping[source.id],
+        control=mapping.get(source.control, source.control),
+        target=target,
+        members=remap(source.members, mapping),
+        weighted_members=remap_weights(source, mapping),
+    )
+
+
+def primitive(source: Primitive | None, mapping: dict[str, str]) -> Primitive | None:
+    if source is None:
+        return None
+    curves = tuple(
+        replace(c, id=mapping[c.id], points=tuple(replace(p, id=mapping[p.id]) for p in c.points))
+        for c in source.curves
+    )
+    pieces = tuple(replace(p, id=mapping[p.id], curve=mapping[p.curve]) for p in source.pieces)
+    return replace(source, curves=curves, pieces=pieces)
+
+
+def control(source: Control, mapping: dict[str, str]) -> Control:
+    return replace(
+        source,
+        id=mapping[source.id],
+        name=source.name + " copy",
+        generation=0,
+        follow=mapping.get(source.follow, source.follow),
+        support=mapping.get(source.support, source.support),
+        deformers=tuple(binding(b, mapping) for b in source.deformers),
+        result=replace(source.result, inputs=remap_inputs(source.result.inputs, mapping)),
+    )
+
+
+def entity(source: SCP, mapping: dict[str, str], parent: str) -> SCP:
+    return replace(
+        source,
+        id=mapping[source.id],
+        name=source.name + " copy",
+        generation=0,
+        parent=mapping.get(source.parent, parent),
+        primitive=primitive(source.primitive, mapping),
+        deformers=tuple(binding(b, mapping) for b in source.deformers),
+        result=remap_result(source.result, mapping),
+    )
+
+
+def remap_inputs(
+    inputs: tuple[ReadRevision, ...], mapping: dict[str, str]
+) -> tuple[ReadRevision, ...]:
+    return tuple(replace(value, owner=mapping.get(value.owner, value.owner)) for value in inputs)
+
+
+def remap_result(result: EvaluationResult, mapping: dict[str, str]) -> EvaluationResult:
+    return replace(
+        result,
+        inputs=remap_inputs(result.inputs, mapping),
+        pending=tuple(mapping.get(key, key) for key in result.pending),
+    )
+
+
+def duplicate(session: "Session", ids: set[str], parent: str) -> dict[str, str]:
+    controls = copied_controls(session.document, ids)
+    mapping = {key: str(uuid4()) for key in identities(session.document, ids, controls)}
+    copies = tuple(entity(e, mapping, parent) for e in session.document.entities if e.id in ids)
+    shared = tuple(control(c, mapping) for c in session.document.controls if c.id in controls)
+    session.replace_document(
+        entities=(*session.document.entities, *copies),
+        controls=(*session.document.controls, *shared),
+    )
+    include_created(session, {c.id for c in shared})
+    return {key: mapping[key] for key in ids}

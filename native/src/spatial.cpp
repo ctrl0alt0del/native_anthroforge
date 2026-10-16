@@ -42,6 +42,23 @@ static void write_hit(const Mesh& mesh,const M4& matrix,const V3& origin,const i
     output[2]=hit.id; output[3]=closest_corner(mesh,matrix,int(mesh.polygons[hit.id]),world);
     for(int i=0;i<3;++i) { output[4+i]=world[i]; output[7+i]=weights[i]; }
 }
+static void extend_bounds(Eigen::AlignedBox3d& bounds,const Mesh& mesh,const M4& matrix) {
+    for(int corner=0;corner<8;++corner) {
+        V3 local;
+        for(int axis=0;axis<3;++axis) local[axis]=mesh.bounds[axis+((corner&(1<<axis))?3:0)];
+        bounds.extend(point(matrix,local));
+    }
+}
+}
+int af_scene_bounds(int count,const uint64_t* meshes,const double* matrices,double* output) {
+    try {
+        if(count<1) throw std::runtime_error("Scene bounds require at least one mesh.");
+        Eigen::AlignedBox3d bounds;
+        for(int i=0;i<count;++i) af::extend_bounds(bounds,*af::mesh(meshes[i]),Eigen::Map<const af::M4>(matrices+16*i));
+        if(!bounds.min().allFinite()||!bounds.max().allFinite()) throw std::runtime_error("Scene bounds must be finite.");
+        for(int axis=0;axis<3;++axis) { output[axis]=bounds.min()[axis]; output[axis+3]=bounds.max()[axis]; }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_pick(uint64_t handle,const double* matrix,const double* origin,const double* direction,double* output) {
     try {

@@ -5,6 +5,12 @@ kernel is preserved in native/migration/attachment_wave_reference.hpp. Its origi
 qualification are recorded in docs/development_status.md. No Blender executable is
 required or bundled.
 
+Blender 5.0.1 primitive/deformer algorithms are adapted in the native library.
+Their original NaN Holding BV and Blender Authors attribution, source paths and hashes
+are recorded in [primitive provenance](../native/migration/BLENDER_PRIMITIVES.md).
+Upstream GPL-2.0-or-later algorithms are distributed here under GPL-3.0-or-later;
+both license texts and corresponding adapted sources accompany the release.
+
 | Component | Version/source | License and source |
 | --- | --- | --- |
 | CPython | 3.12.12 | PSF and bundled notices in CPython-LICENSE.txt; https://www.python.org/downloads/release/python-31212/ |

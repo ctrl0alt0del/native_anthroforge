@@ -12,7 +12,12 @@ ComboBox {
     ToolTip.visible: hovered && !!hint
     ToolTip.text: hint; ToolTip.delay: 500
     contentItem: Text { text: control.displayText; color: control.enabled ? Theme.text : Theme.muted; font: control.font; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
-    indicator: Text { text: "⌄"; color: Theme.muted; x: control.width-19; y: 4; font.pixelSize: 15 }
+    indicator: Image {
+        source: "icons/chevron-down.svg"
+        width: 12; height: 12; sourceSize: Qt.size(12,12)
+        x: control.width-width-9; y: (control.height-height)/2
+        opacity: control.enabled ? 1 : .45
+    }
     background: Rectangle { radius: 4; color: Theme.field; border.color: control.activeFocus ? Theme.accent : Theme.border }
     delegate: ItemDelegate {
         required property int index

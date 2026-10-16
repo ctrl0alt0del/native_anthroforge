@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "AnthroForge desktop",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "anthroforge.desktop.app",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "AnthroForge: build native"
+    },
+    {
+      "name": "AnthroForge CLI",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "anthroforge",
+      "args": ["doctor", "--require-native"],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

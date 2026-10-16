@@ -1,0 +1,11 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": ["tests"],
+  "cmake.useCMakePresets": "always",
+  "cmake.configureOnOpen": false,
+  "files.exclude": {"**/__pycache__": true},
+  "search.exclude": {".tools": true, ".venv": true, "build": true, "uv.lock": true},
+  "[python]": {"editor.defaultFormatter": "charliermarsh.ruff", "editor.formatOnSave": true}
+}

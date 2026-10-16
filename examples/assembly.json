@@ -1,0 +1,12 @@
+[
+  {"id":"root", "operation":"import", "arguments":{"path":"examples/primitives/cube.obj","units":1,"name":"Root cube"}},
+  {"operation":"wait"},
+  {"id":"child", "operation":"import", "arguments":{"path":"examples/primitives/cube.obj","units":1,"parent":"$root.entity_id","name":"Child cube"}},
+  {"operation":"wait"},
+  {"operation":"scp.transform", "arguments":{"entity":"$child.entity_id","values":[1,0,0,0,0,0,0.2,0.2,0.2]}},
+  {"operation":"wait"},
+  {"operation":"scp.transform", "arguments":{"entity":"$root.entity_id","values":[0,0,0,0,0,25,1,1,1]}},
+  {"operation":"wait"},
+  {"operation":"save", "arguments":{"path":"assembly.anthroforge","blocked_policy":"wait"}},
+  {"operation":"inspect"}
+]

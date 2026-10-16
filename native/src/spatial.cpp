@@ -1,0 +1,67 @@
+#include "mesh_internal.hpp"
+#include <igl/Hit.h>
+
+namespace af {
+Surface::Surface(const Mesh& mesh,const M4& matrix):triangles(&mesh.triangles) {
+    vertices=(mesh.vertices*matrix.block<3,3>(0,0).transpose()).rowwise()+matrix.block<3,1>(0,3).transpose();
+    tree.init(vertices,*triangles);
+}
+V3 barycentric(const V3& p,const V3& a,const V3& b,const V3& c) {
+    const V3 v0=b-a,v1=c-a,v2=p-a;
+    const double d00=v0.dot(v0),d01=v0.dot(v1),d11=v1.dot(v1),den=d00*d11-d01*d01;
+    if(std::abs(den)<1e-30) throw std::runtime_error("Degenerate attachment triangle.");
+    const double v=(d11*v2.dot(v0)-d01*v2.dot(v1))/den;
+    const double w=(d00*v2.dot(v1)-d01*v2.dot(v0))/den;
+    return {1-v-w,v,w};
+}
+Hit nearest(const Surface& surface,const V3& point) {
+    Hit hit; Eigen::RowVector3d nearest;
+    hit.distance=surface.tree.squared_distance(surface.vertices,*surface.triangles,point.transpose(),hit.triangle,nearest);
+    hit.point=nearest.transpose();
+    if(hit.triangle<0) throw std::runtime_error("No usable attachment surface.");
+    const auto tri=surface.triangles->row(hit.triangle);
+    hit.weights=barycentric(hit.point,surface.vertices.row(tri[0]),surface.vertices.row(tri[1]),surface.vertices.row(tri[2]));
+    return hit;
+}
+static int closest_corner(const Mesh& mesh,const M4& matrix,int polygon,const V3& world) {
+    int closest=-1; double distance=std::numeric_limits<double>::infinity();
+    for(auto i=mesh.offsets[polygon];i<mesh.offsets[polygon+1];++i) {
+        const int vertex=int(mesh.corners[i]);
+        const double candidate=(point(matrix,mesh.vertices.row(vertex))-world).squaredNorm();
+        if(candidate<distance) { closest=vertex; distance=candidate; }
+    }
+    return closest;
+}
+static void write_hit(const Mesh& mesh,const M4& matrix,const V3& origin,const igl::Hit& hit,double* output) {
+    const auto triangle=mesh.triangles.row(hit.id);
+    const V3 weights(1-hit.u-hit.v,hit.u,hit.v);
+    V3 local=V3::Zero();
+    for(int i=0;i<3;++i) local+=weights[i]*mesh.vertices.row(triangle[i]).transpose();
+    const V3 world=point(matrix,local);
+    output[0]=(world-origin).norm(); output[1]=double(mesh.polygons[hit.id]);
+    output[2]=hit.id; output[3]=closest_corner(mesh,matrix,int(mesh.polygons[hit.id]),world);
+    for(int i=0;i<3;++i) { output[4+i]=world[i]; output[7+i]=weights[i]; }
+}
+}
+int af_pick(uint64_t handle,const double* matrix,const double* origin,const double* direction,double* output) {
+    try {
+        const auto mesh=af::mesh(handle); const af::M4 world=Eigen::Map<const af::M4>(matrix);
+        const af::M4 inverse=world.inverse(); const af::V3 ray=Eigen::Map<const af::V3>(direction);
+        const af::V3 start=Eigen::Map<const af::V3>(origin);
+        const Eigen::RowVector3d local_start=af::point(inverse,start).transpose();
+        const Eigen::RowVector3d local_ray=(inverse.block<3,3>(0,0)*ray).transpose();
+        igl::Hit hit;
+        if(!mesh->tree.intersect_ray(mesh->vertices,mesh->triangles,local_start,local_ray,hit)) return 0;
+        af::write_hit(*mesh,world,start,hit,output); return 1;
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}
+int af_scene_pick(int count,const uint64_t* meshes,const double* matrices,
+                   const double* origin,const double* direction,double* hits) {
+    int found=0;
+    for(int i=0;i<count;++i) {
+        const int result=af_pick(meshes[i],matrices+16*i,origin,direction,hits+11*found+1);
+        if(result<0) return -1;
+        if(result) { hits[11*found]=i; ++found; }
+    }
+    return found;
+}

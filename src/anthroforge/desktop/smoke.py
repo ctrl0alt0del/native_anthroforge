@@ -1,0 +1,33 @@
+import json
+from pathlib import Path
+
+from PySide6.QtCore import QTimer
+
+
+def save_frame(frame, screenshot: str | None) -> bool:
+    if screenshot:
+        target = Path(screenshot).resolve()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        return frame.save(str(target))
+    return True
+
+
+def finish(app, engine, screenshot: str | None, warnings: list[str]) -> None:
+    frame = engine.rootObjects()[0].grabWindow()
+    saved = save_frame(frame, screenshot) if not frame.isNull() else False
+    valid = not frame.isNull() and not warnings and saved
+    print(
+        json.dumps(
+            {
+                "desktop_smoke": valid,
+                "warnings": warnings,
+                "frame": [frame.width(), frame.height()],
+                "screenshot": screenshot,
+            }
+        )
+    )
+    app.exit(0 if valid else 1)
+
+
+def schedule(app, engine, screenshot: str | None, warnings: list[str]) -> None:
+    QTimer.singleShot(2000, lambda: finish(app, engine, screenshot, warnings))

@@ -1,0 +1,36 @@
+name: Core and native boundary
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  core:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            library: af_native.dll
+          - os: ubuntu-latest
+            library: libaf_native.so
+    runs-on: ${{ matrix.os }}
+    env:
+      ANTHROFORGE_NATIVE_LIBRARY: ${{ github.workspace }}/build/core/bin/${{ matrix.library }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.9.29"
+          python-version: "3.12.12"
+      - uses: ilammy/msvc-dev-cmd@v1
+        if: runner.os == 'Windows'
+      - run: uv sync --locked
+      - run: uv run --no-sync ruff check src tests tools
+      - run: uv run --no-sync ruff format --check src tests tools
+      - run: uv run --no-sync mypy
+      - run: uv run --no-sync cmake --preset portable-core
+      - run: uv run --no-sync cmake --build --preset portable-core
+      - run: uv run --no-sync ctest --preset portable-core
+      - run: uv run --no-sync pytest
+      - run: uv build
+      - run: uv run --no-sync python tools/check_wheel.py

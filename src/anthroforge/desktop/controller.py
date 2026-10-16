@@ -1,0 +1,265 @@
+from time import perf_counter as monotonic
+
+from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
+
+from anthroforge.application.session import Session
+from anthroforge.native import scene
+
+from . import controller_actions as actions
+from . import project_actions, scene_state
+from .models import RenderModel
+
+
+class Controller(QObject):
+    changed = Signal()
+    selectionChanged = Signal()
+    saveChoiceRequested = Signal(str)
+    discardRequested = Signal(str)
+    frameRequested = Signal(list)
+    cameraRequested = Signal(list, bool)
+    closeReady = Signal()
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.session = Session()
+        scene.configure(self.session.engine)
+        self.render_model = RenderModel(self)
+        self._initialize_state()
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.tick)
+        self.timer.start(16)
+        self.refresh()
+
+    def _initialize_state(self):
+        self.selection, self.hovered, self.message = "", "", ""
+        self.last_revision, self.last_workspace = -1, -1
+        self.rows, self.drag_values, self.pick_ids = [], [], []
+        self.pending_save, self.pending_document = "", None
+        self.temporary_locks = []
+        self.drag_mode = "Move"
+        self.last_hit = {}
+        self.tick_count = 0
+        self.after_save = None
+        self.camera_workspace = None
+        self.capture_mode = False
+        self.last_frame = monotonic()
+
+    @Property(str, notify=changed)
+    def documentName(self) -> str:
+        return self.session.document.name
+
+    @Property(str, notify=changed)
+    def documentId(self) -> str:
+        return str(self.session.document.id)
+
+    @Property(QObject, constant=True)
+    def meshModel(self):
+        return self.render_model
+
+    @Property("QVariantList", notify=selectionChanged)
+    def treeRows(self):
+        return self.rows
+
+    @Property("QVariantMap", notify=selectionChanged)
+    def selectedData(self):
+        return next((row for row in self.rows if row["id"] == self.selection), {})
+
+    @Property(str, notify=selectionChanged)
+    def selectedId(self):
+        return self.selection
+
+    @Property(str, notify=changed)
+    def hoveredId(self):
+        return self.hovered
+
+    @Property("QVariantMap", notify=changed)
+    def state(self):
+        return {
+            **self.view_state(),
+            "message": self.message,
+            "revision": self.session.document.revision,
+            "dirty": self.session.saved_revision != self.session.document.revision,
+            "blocked": self.session.scheduler.blocked,
+            "waiting": self.session.waiting_save,
+            "publishing": len(self.render_model.pending),
+            "path": str(self.session.path or ""),
+            "jobs": [job.describe() for job in self.session.scheduler.jobs[-40:]],
+            "metrics": self.session.scheduler.metrics.report(),
+        }
+
+    def view_state(self):
+        return {
+            "attachments": self.session.document.attachments_enabled,
+            "mode": self.session.document.update_mode,
+            "workspace": self.session.active_workspace,
+            "hidden": list(self.session.workspace.hidden),
+            "unpickable": list(self.session.workspace.unpickable),
+            "workspaces": [w.name for w in self.session.document.workspaces],
+            "handles": self.session.workspace.handles,
+            "anchors": self.session.workspace.anchors,
+            "diagnostics": self.session.workspace.diagnostics,
+        }
+
+    @Slot()
+    def tick(self):
+        started = monotonic()
+        try:
+            self.process_tick()
+        except Exception as error:
+            self.message = str(error)
+            self.session.waiting_save = False
+            self.changed.emit()
+        self.session.scheduler.metrics.observe("tick", monotonic() - started)
+
+    def process_tick(self):
+        self.session.scheduler.tick()
+        project_actions.poll(self)
+        self.render_model.drain()
+        self.refresh_if_needed()
+        self.tick_count += 1
+        if self.tick_count % 15 == 0:
+            self.changed.emit()
+
+    @Slot()
+    def frame_presented(self):
+        now = monotonic()
+        self.session.scheduler.metrics.observe("frame_interval", now - self.last_frame)
+        self.last_frame = now
+
+    def refresh_if_needed(self):
+        if (self.last_revision, self.last_workspace) != (
+            self.session.document.revision,
+            self.session.active_workspace,
+        ):
+            self.refresh()
+
+    def refresh(self):
+        self.rows = scene_state.records(self)
+        self.render_model.publish(scene_state.render_rows(self.rows))
+        scene_state.picking_inputs(self, self.rows)
+        if self.selection and not any(row["id"] == self.selection for row in self.rows):
+            self.selection = ""
+        self.last_revision = self.session.document.revision
+        self.last_workspace = self.session.active_workspace
+        self.selectionChanged.emit()
+        self.changed.emit()
+        self.restore_camera()
+
+    def restore_camera(self):
+        identity = (str(self.session.document.id), self.session.active_workspace)
+        if identity != self.camera_workspace:
+            self.camera_workspace = identity
+            self.cameraRequested.emit(
+                list(self.session.workspace.camera), self.session.workspace.orthographic
+            )
+
+    @Slot("QVariantList", bool)
+    def saveCamera(self, values, orthographic):
+        if not self.session.waiting_save and not self.capture_mode:
+            self.session.command("workspace.update", camera=values, orthographic=orthographic)
+
+    @Slot(str)
+    def afterSave(self, action):
+        self.after_save = action
+
+    @Slot(str, "QVariantMap", result="QVariant")
+    def run(self, operation, arguments):
+        return actions.run(self, operation, arguments)
+
+    @Slot(str)
+    def select(self, entity):
+        self.selection = entity
+        self.selectionChanged.emit()
+        self.changed.emit()
+
+    @Slot(str, float, str, bool)
+    def importMesh(self, path, units, parent, y_up):
+        result = self.run(
+            "import",
+            {"path": actions.local_path(path), "units": units, "parent": parent, "y_up": y_up},
+        )
+        if result:
+            self.message = "Import queued. You can keep navigating and editing."
+
+    @Slot("QVariantList", "QVariantList", int, bool, result="QVariantMap")
+    def pick(self, origin, direction, depth, select):
+        self.last_hit = scene_state.picked(self, origin, direction, depth)
+        previous = self.hovered
+        self.hovered = self.last_hit.get("id", "")
+        if select:
+            self.selection = self.hovered
+            self.selectionChanged.emit()
+        if select or previous != self.hovered:
+            self.changed.emit()
+        return self.last_hit
+
+    @Slot(str)
+    def lockAnchor(self, mode):
+        if self.last_hit.get("id") != self.selection:
+            self.message = "Point at a face or vertex on the selected child SCP first."
+            self.changed.emit()
+            return
+        key = "face_lock" if mode == "FACE_CENTER" else "vertex_lock"
+        index = self.last_hit["face" if key == "face_lock" else "vertex"]
+        self.run("scp.attachment", {"entity": self.selection, "child_mode": mode, key: index})
+
+    @Slot(str)
+    def beginTransform(self, mode):
+        try:
+            actions.start_transform(self, mode)
+        except Exception as error:
+            self.message = str(error)
+            self.changed.emit()
+
+    @Slot(int, float)
+    def dragTransform(self, axis, amount):
+        actions.drag_transform(self, axis, amount)
+
+    @Slot(bool)
+    def endTransform(self, cancel):
+        actions.end_transform(self, cancel)
+
+    @Slot()
+    def frameSelection(self):
+        actions.frame(self)
+
+    @Slot(str, str)
+    def saveProject(self, path, policy):
+        try:
+            project_actions.save(self, path, policy)
+        except Exception as error:
+            self.message = str(error)
+            self.session.waiting_save = False
+            self.changed.emit()
+
+    @Slot()
+    def cancelSaveWait(self):
+        for job in self.session.scheduler.jobs:
+            if job.active and "@document" in job.outputs:
+                self.session.scheduler.cancel_job(job.id)
+        self.pending_save = ""
+        self.after_save = None
+        self.pending_document = None
+        self.session.waiting_save = False
+        self.changed.emit()
+
+    @Slot(str)
+    def requestDocument(self, path):
+        if self.session.document.revision != self.session.saved_revision:
+            self.discardRequested.emit(path)
+        else:
+            self.replaceDocument(path)
+
+    @Slot(str)
+    def replaceDocument(self, path):
+        project_actions.queue_document(self, path)
+
+    @Slot()
+    def newDocument(self) -> None:
+        self.requestDocument("")
+
+    def close(self):
+        self.timer.stop()
+        self.session.close()
+        for lock in self.temporary_locks:
+            lock.close()

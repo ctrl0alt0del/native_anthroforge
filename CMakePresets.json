@@ -1,0 +1,45 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {"major": 3, "minor": 24, "patch": 0},
+  "configurePresets": [
+    {
+      "name": "windows-dev",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/dev",
+      "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_CXX_COMPILER": "clang-cl",
+        "CMAKE_PREFIX_PATH": "${sourceDir}/.tools/qt/6.12.0/msvc2022_64",
+        "AF_BUILD_QT_BRIDGE": "ON",
+        "BUILD_TESTING": "ON"
+      }
+    },
+    {
+      "name": "addon-check",
+      "inherits": "windows-dev",
+      "binaryDir": "${sourceDir}/build/addon-check",
+      "cacheVariables": {"AF_BUILD_QT_BRIDGE": "OFF"}
+    },
+    {
+      "name": "portable-core",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/core",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "AF_BUILD_QT_BRIDGE": "OFF",
+        "BUILD_TESTING": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {"name": "windows-dev", "configurePreset": "windows-dev"},
+    {"name": "portable-core", "configurePreset": "portable-core"},
+    {"name": "addon-check", "configurePreset": "addon-check"}
+  ],
+  "testPresets": [
+    {"name": "windows-dev", "configurePreset": "windows-dev", "output": {"outputOnFailure": true}},
+    {"name": "portable-core", "configurePreset": "portable-core", "output": {"outputOnFailure": true}},
+    {"name": "addon-check", "configurePreset": "addon-check", "output": {"outputOnFailure": true}}
+  ]
+}

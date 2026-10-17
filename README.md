@@ -1,4 +1,4 @@
-# AnthroForge 0.1.4
+# AnthroForge 0.1.5
 
 A standalone SCP and primitive editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
@@ -8,11 +8,14 @@ Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.
 
-0.1.4 adds runtime performance recording: press **F12**, reproduce a slowdown, then
+0.1.5 updates Activity incrementally: job rows retain their identity, changed fields
+update without rebuilding the list, and the header uses separate status summaries.
+Cancel/Retry, errors, target names, diagnostics and the latest 40 jobs remain available.
+
+Runtime performance recording: press **F12**, reproduce a slowdown, then
 press F12 again and share the `.afprofile.zip` under your local AnthroForge `Profiles`
 folder. Recording works during edits; no restart or rebuild is needed. See
-[recording and interpreting reports](docs/profiling.md). The Activity-panel performance
-fix remains deferred; reports now expose its binding/model churn.
+[recording and interpreting reports](docs/profiling.md).
 
 The editor includes distinct move/rotate/scale gizmos, selection outlines, translucent curve editing,
 and keyboard/tree deletion that preserves children. Hold Shift to preview curve-point insertion

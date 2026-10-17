@@ -21,8 +21,8 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property bool typing: keyboard.typing
     readonly property bool modalOpen: importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
-    readonly property var activeJobs: workspace.jobs.filter(job => ["queued","preparing","running","publishing","cancelling"].indexOf(job.state) >= 0)
-    readonly property bool jobFailed: workspace.jobs.some(job => job.state === "failed")
+    readonly property int activeJobCount: workspace.activityModel.activeCount
+    readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
     function saveProject() {
         viewport.forceActiveFocus();
@@ -46,7 +46,7 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 10; spacing: 10
                 Label { text: "ANTHROFORGE"; font.bold: true; font.pixelSize: 12; font.letterSpacing: 1; color: Theme.text }
-                Label { text: "0.1.4"; color: Theme.accent; font.pixelSize: 10 }
+                Label { text: "0.1.5"; color: Theme.accent; font.pixelSize: 10 }
                 MenuBar {
                     background: Item {}
                     Menu { title: "File"; MenuItem { action: newAction } MenuItem { action: openAction } MenuSeparator {} MenuItem { action: saveAction } MenuItem { action: saveAsAction } MenuSeparator {} MenuItem { action: importAction } }
@@ -129,7 +129,7 @@ ApplicationWindow {
                 RowLayout {
                     anchors.fill: parent; anchors.leftMargin: 7; anchors.rightMargin: 8
                     UiButton { objectName: "activityToggle"; flatStyle: true; text: (window.activityOpen ? "▾" : "▸") + "  Activity"; onClicked: window.activityOpen = !window.activityOpen }
-                    Label { text: window.activeJobs.length ? window.activeJobs.length + " jobs in progress" : window.jobFailed ? "A calculation failed · open Activity" : "Up to date"; color: window.jobFailed ? Theme.danger : window.activeJobs.length ? Theme.accent : Theme.muted; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
+                    Label { text: window.activeJobCount ? window.activeJobCount + " jobs in progress" : window.jobFailed ? "A calculation failed · open Activity" : "Up to date"; color: window.jobFailed ? Theme.danger : window.activeJobCount ? Theme.accent : Theme.muted; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
                     Label { text: workspace.treeRows.length + " objects · metres"; color: Theme.muted; font.pixelSize: 11 }
                 }
             }

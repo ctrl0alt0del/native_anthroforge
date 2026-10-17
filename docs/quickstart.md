@@ -1,4 +1,8 @@
-# AnthroForge 0.1.4 quick start
+# AnthroForge 0.1.5 quick start
+
+The Activity panel retains its job rows while status and elapsed time update. It shows
+the latest 40 jobs, newest first; Cancel and Retry continue to act on the named job.
+Use F12 performance recording when reporting an editing slowdown.
 
 ## Portable Windows application
 

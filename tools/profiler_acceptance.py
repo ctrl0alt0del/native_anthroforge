@@ -52,18 +52,31 @@ class CanceledTrial(RecordingTrial):
         self.deleteLater()
 
 
-def verify_bundle(path):
+def verify_bundle(path, opened=None):
     with ZipFile(path) as archive:
         manifest = json.loads(archive.read("manifest.json"))
         summary = json.loads(archive.read("summary.json"))
-    counts, durations = summary["event_counts"], summary["durations"]
-    assert any("Activity.qml" in key for key in durations)
-    assert any("model/modelChanged" in key for key in counts)
+        trace = json.loads(archive.read("trace.json"))["traceEvents"]
+    durations = summary["durations"]
+    assert any(key.startswith("qml.binding/") for key in durations)
+    if opened is not None:
+        verify_activity(trace, durations, opened)
     assert "input/dispatch" in durations and "ui/Controller.notify" in durations
     assert any(key.startswith("native/") for key in durations)
     assert manifest["complete"], manifest
     verify_interval(manifest, summary)
     return dict(path=str(path), summary=summary, manifest=manifest)
+
+
+def verify_activity(trace, durations, opened):
+    events = [event for event in trace if event.get("cat") == "model"]
+    incremental = [event for event in events if event["args"].get("class") == "ActivityModel"]
+    assert any(event["name"] == "dataChanged" for event in incremental)
+    assert any(event["name"] == "rowsInserted" for event in incremental)
+    assert not any(event["name"] == "modelReset" for event in incremental)
+    assert not any(event["args"].get("source") == "Activity.qml" for event in events)
+    if opened:
+        assert any("Activity.qml" in key for key in durations)
 
 
 def verify_interval(manifest, summary):
@@ -88,7 +101,8 @@ def trial(controller, window, point, snapping, opened, canceled=False):
     await_export(controller)
     path = controller.session.profiler.path
     assert window.grabWindow().save(str(OUTPUT / f"{snapping}-{opened}.png"))
-    return dict(snapping=snapping, activity_open=opened, canceled=canceled, **verify_bundle(path))
+    result = verify_bundle(path, opened)
+    return dict(snapping=snapping, activity_open=opened, canceled=canceled, **result)
 
 
 def await_export(controller):

@@ -1,4 +1,4 @@
-# Runtime performance recording (0.1.4)
+# Runtime performance recording (0.1.5)
 
 Press **F12** (also while holding Ctrl/Shift/Alt or dragging) to start recording.
 Reproduce the slowdown and press F12 again. The **Record/Stop** button and View menu
@@ -109,9 +109,12 @@ Do not run builds or other benchmarks concurrently. `--disable-profiling-support
 is a desktop diagnostic baseline, not the normal launch mode. The explicit
 `--profile-probe <file>` argument checks packaged Qt collector availability.
 
-The [Activity investigation](tasks/snap-drag-investigation.md) remains the first
-diagnostic case. Profiling does not include its deferred production optimization.
-Recorded measurements and their limits are in [release qualification](development_status.md#runtime-profiler-014).
+The [Activity investigation](tasks/snap-drag-investigation.md) was the first diagnostic
+case. The [0.1.5 optimization](tasks/activity-panel-015.md) replaces repeated list
+rebuilding with stable incremental rows. Its before/after reports retain the same
+profiler schema and expose Qt row notifications without Activity-specific markers.
+Profiler qualification and its limits are retained in [0.1.4 evidence](development_status.md#runtime-profiler-014);
+current Activity comparisons are in [0.1.5 evidence](development_status.md#activity-presentation-015).
 
 
 Official integration references: [Qt profiling service selection](https://doc.qt.io/qt-6/qqmldebuggingenabler.html),

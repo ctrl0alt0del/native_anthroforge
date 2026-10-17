@@ -1,7 +1,73 @@
 # AnthroForge development validation
 
-Current release qualification is in [Runtime profiler 0.1.4](#runtime-profiler-014).
+Current qualification is in [Activity presentation 0.1.5](#activity-presentation-015).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Activity presentation 0.1.5
+
+The desktop now owns one stable `ActivityModel`. Its latest 40 jobs retain their
+identities while changed roles update in place. The header consumes change-only
+summary properties, and diagnostics metrics have a separate notification. Jobs,
+scheduling, cancellation/retry eligibility, undo and save semantics retain their
+existing owners. There is no second queue, timer or job registry.
+
+Serial comparison against the 0.1.4 source/runtime snapshot at `3fa664d` used the
+imported cube plus Body curve fixture, 120 moves per gesture, 1500×950 window at
+1.5 pixel ratio on Windows 11. Each unrecorded condition ran baseline/candidate/
+candidate/baseline; recording comparisons ran separately. Candidate production code
+was `a4501be`, with measurement-tool changes in the working tree. Both sources used
+the same native binaries. All 48 gestures passed their snapping and undo assertions.
+
+| Gesture / Activity | Normal handler, before → after | Ctrl-snap handler, before → after |
+| --- | --- | --- |
+| Mouse / closed | 29.32 → 12.71 ms | 33.39 → 13.55 ms |
+| Mouse / open | 31.58 → 13.10 ms | 35.80 → 13.80 ms |
+| G-key / closed | 28.80 → 12.71 ms | 33.82 → 13.48 ms |
+| G-key / open | 31.43 → 12.87 ms | 35.41 → 13.42 ms |
+
+These are means of two unrecorded runs per version/condition: **55.9–62.1% less
+synchronous input handling time**. Mean GUI frame callbacks improved from 55–65 ms
+to 24–32 ms across these conditions. They measure GUI receipt of frameSwapped, not
+physical display latency or GPU execution. Normal movement precedes Ctrl movement;
+this experiment establishes before/after improvements, not a controlled Ctrl-only
+cost. Background/thermal state is uncontrolled; system busy fractions ranged
+27.3–32.0%, including the application. The nonactivating visible window prevents
+desktop focus interruptions. This is a representative small editing fixture, not
+full-body or arbitrary-project performance certification.
+
+All eight recorded comparisons stopped cleanly without collector loss. Their 128 MiB
+owned-storage budgets evicted older events. Within retained intervals, baseline
+Activity model replacement occurred 116–170 times; candidate captures show zero,
+with row/data notifications instead. Inclusive Controller.notify means fell from
+27.5–33.1 ms to 3.5–4.3 ms while recording. Native snapping calls remain separately
+attributed. Inclusive nested timings overlap and cannot be summed. Recording itself
+still adds measurable overhead; the main speed claim uses unrecorded trials.
+
+[Evidence JSON](tasks/activity-panel-015-evidence.json) retains run distributions,
+load, hashes, profiler costs, retained intervals and scoped model counts. Reproduce
+with `tools/activity_comparison.py`, then summarize with `tools/activity_evidence.py`.
+After the shared retryability/property cleanup, four final unrecorded confirmations
+passed with 12.19–14.17 ms handler means and correct snapping/undo. These are preserved
+separately in the evidence JSON, not pooled into the counterbalanced comparison.
+
+The development gate passed with 421 tests, lint/format, configured mypy, native build,
+CTest/style, script rules, numerics and doctor. Qt model tests cover stable identity,
+changed roles, history bounds, target names and terminal state behavior. Actual GUI
+Cancel/Retry, failure messages, hidden updates, rename and New passed; screenshot
+inspected. F12 during four drag variants, cancellation, focus/privacy and New/Open
+recording passed. Perfetto imported the final snapped/open-panel trace as 84,053
+slices with no nonzero error statistics.
+
+The portable Windows executable was built from clean production checkpoint `ce64fc3`
+(file/product version 0.1.5.0). A relocated copy passed `check_portable.py` with minimal
+PATH and developer Qt/Python variables removed: imports, attachments, primitives,
+deformers, deletion, subdivision, save/reopen, GPU image capture, GUI and desktop/headless
+profiler reports. The desktop capture was visually inspected. Reports identify the
+packaged build and correct collector capabilities. Release artifacts are local under
+`dist/AnthroForge.dist` and `dist/AnthroForge-0.1.5-source.zip`; raw validation remains
+under ignored `build/activity-015`. Source, evidence and recovery context are in Git.
+
+## Original 0.1 baseline
 
 Implementation and checks performed on 2026-10-16, Windows 11 x64. The original Blender addon
 was read and exercised in a separate background process; its source and user scenes were

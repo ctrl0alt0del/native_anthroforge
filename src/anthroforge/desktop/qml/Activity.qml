@@ -5,41 +5,43 @@ import QtQuick.Layouts
 ColumnLayout {
     id: activity
     spacing: 5
-    function targets(outputs) {
-        const names={};
-        for (const row of workspace.treeRows) names[row.id]=row.name;
-        return outputs.map(id => names[id] || "Project").join(", ");
-    }
-    function scheduling(details) {
-        if (!details || !details.execution) return "";
-        const estimate = details.estimated_ms == null ? "unmeasured" : details.estimated_ms.toFixed(2) + " ms";
-        return (details.execution === "inline" ? "Immediate" : "Background") +
-            " · planned wait " + details.delay_ms.toFixed(0) + " ms · estimate " + estimate +
-            " · actual " + details.actual_ms.toFixed(2) + " ms";
-    }
     ListView {
+        objectName: "activityList"
         Layout.fillWidth: true; Layout.fillHeight: true
         clip: true
-        model: workspace.jobs.slice().reverse()
+        model: workspace.activityModel
         spacing: 4
         delegate: RowLayout {
-            required property var modelData
+            id: jobRow
+            required property string jobId
+            required property string label
+            required property string jobState
+            required property string error
+            required property string progress
+            required property real elapsed
+            required property string targets
+            required property bool retryable
+            required property bool cancellable
+            required property string scheduling
+            objectName: "activityJob-" + jobId
             width: ListView.view.width
             ColumnLayout {
                 Layout.fillWidth: true
-                Label { text: modelData.label + " · " + modelData.state; color: modelData.error ? "#edab91" : "#bbcede"; elide: Text.ElideRight; Layout.fillWidth: true }
-                Label { text: modelData.error || modelData.progress + " · " + modelData.elapsed.toFixed(2) + " s · " + targets(modelData.outputs); color: "#839aaf"; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
-                Label { visible: workspace.state.diagnostics; text: activity.scheduling(modelData.scheduling); color: Theme.muted; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
+                Label { text: jobRow.label + " · " + jobRow.jobState; color: jobRow.error ? "#edab91" : "#bbcede"; elide: Text.ElideRight; Layout.fillWidth: true }
+                Label { text: jobRow.error || jobRow.progress + " · " + jobRow.elapsed.toFixed(2) + " s · " + jobRow.targets; color: "#839aaf"; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
+                Label { visible: workspace.state.diagnostics; text: jobRow.scheduling; color: Theme.muted; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
             }
             UiButton {
-                visible: modelData.retryable
+                visible: jobRow.retryable
+                objectName: "retryJob-" + jobRow.jobId
                 text: "Retry"
-                onClicked: workspace.run("job.retry",{job_id:modelData.id})
+                onClicked: workspace.run("job.retry",{job_id:jobRow.jobId})
             }
             UiButton {
-                visible: ["queued","preparing","running","publishing","cancelling"].indexOf(modelData.state) >= 0
+                visible: jobRow.cancellable
+                objectName: "cancelJob-" + jobRow.jobId
                 text: "Cancel"
-                onClicked: workspace.run("job.cancel",{job_id:modelData.id})
+                onClicked: workspace.run("job.cancel",{job_id:jobRow.jobId})
             }
         }
     }

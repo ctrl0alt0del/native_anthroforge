@@ -86,7 +86,7 @@ def restore_activity(window):
     expression = QQmlExpression(
         QQmlEngine.contextForObject(view),
         view,
-        "model = Qt.binding(function() { return workspace.jobs.slice().reverse(); })",
+        "model = Qt.binding(function() { return workspace.activityModel; })",
     )
     expression.evaluate()
     assert not expression.hasError(), expression.error().toString()

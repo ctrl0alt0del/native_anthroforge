@@ -1,0 +1,3498 @@
+{
+  "methodology": {
+    "fixture": "examples/primitives/cube.obj plus Body primitive; 120 moves per gesture",
+    "sequence": "Serial baseline/candidate/candidate/baseline for each unrecorded condition",
+    "sources": "0.1.4 at 3fa664d; 0.1.5 production at a4501be; same native binaries",
+    "recordings": "One baseline and candidate recording per condition; order alternates",
+    "display": "1500x950 nonactivating window, DPR 1.5, Windows 11; no parallel test/build",
+    "handler": "Synchronous input handling; excludes OS queue wait and physical input latency",
+    "frames": "GUI receipt of frameSwapped; not physical display or GPU execution time",
+    "retention": "128 MiB owned budget; complete means clean stop, not zero ring eviction",
+    "limits": "Two unrecorded repeats; normal then Ctrl; background/thermal state uncontrolled",
+    "overlap": "Profiler inclusive spans overlap; do not sum or subtract collector costs"
+  },
+  "runs": [
+    {
+      "file": "drag-0-dormant-0-baseline.json",
+      "sha256": "8b38f3e2cef5c5ebf839ac62ce5b5b9ef5af0d03c9db7d0f231949de8dfe7eaf",
+      "version": "0.1.4",
+      "activity_open": false,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.29712163416898796,
+        "application_cpu_seconds": 12.25,
+        "wall_seconds": 11.225934900001448,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 29.111875000095704,
+            "p95": 37.949740000294696,
+            "maximum": 40.929000002506655
+          },
+          "frame_ms": {
+            "count": 71,
+            "mean": 61.15812112673179,
+            "p95": 111.10134999762522,
+            "maximum": 117.12919999990845
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 33.737764166592875,
+            "p95": 40.785194999261876,
+            "maximum": 41.756500002520625
+          },
+          "frame_ms": {
+            "count": 83,
+            "mean": 60.87293493977316,
+            "p95": 111.55634999959143,
+            "maximum": 121.53070000204025
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-0-dormant-1-candidate.json",
+      "sha256": "125cfbe0cdedc81f50f883643d6fe8891ce4c7f2ee66afb27c1ff892e4482a68",
+      "version": "0.1.5",
+      "activity_open": false,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.3195169712793734,
+        "application_cpu_seconds": 6.765625,
+        "wall_seconds": 5.984622399999353,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 12.842189166561488,
+            "p95": 16.133439999794064,
+            "maximum": 27.389399998355657
+          },
+          "frame_ms": {
+            "count": 67,
+            "mean": 32.02898805971221,
+            "p95": 52.42547000088962,
+            "maximum": 72.02569999935804
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.597792500028541,
+            "p95": 16.638105000311043,
+            "maximum": 19.045400000322843
+          },
+          "frame_ms": {
+            "count": 75,
+            "mean": 30.522817333306495,
+            "p95": 51.4833000008366,
+            "maximum": 58.51719999918714
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-0-dormant-2-candidate.json",
+      "sha256": "d362795bd8b58a899c407281467d1c0774247f7a60dab3e1049f05dde7b5b10d",
+      "version": "0.1.5",
+      "activity_open": false,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.2895996518711923,
+        "application_cpu_seconds": 6.359375,
+        "wall_seconds": 5.982108500000322,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 12.57413583343805,
+            "p95": 15.481480000744341,
+            "maximum": 22.932400002900977
+          },
+          "frame_ms": {
+            "count": 66,
+            "mean": 32.728592424257045,
+            "p95": 49.6338500015554,
+            "maximum": 57.92289999953937
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.49803916655219,
+            "p95": 16.55330999965372,
+            "maximum": 17.56749999913154
+          },
+          "frame_ms": {
+            "count": 76,
+            "mean": 30.870493421054178,
+            "p95": 51.65965000014694,
+            "maximum": 95.60349999810569
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-0-dormant-3-baseline.json",
+      "sha256": "ba3d6539275e399ce8426dc08bf6c3e76b953466e4fc15bfa18f169d17f7d149",
+      "version": "0.1.4",
+      "activity_open": false,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.2948214079297191,
+        "application_cpu_seconds": 11.8125,
+        "wall_seconds": 11.26002040000094,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 29.521223333388964,
+            "p95": 39.924824999980046,
+            "maximum": 47.04100000162725
+          },
+          "frame_ms": {
+            "count": 77,
+            "mean": 57.284072727246915,
+            "p95": 99.51029999865571,
+            "maximum": 139.97419999941485
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 33.051714999783144,
+            "p95": 39.950889997817285,
+            "maximum": 41.78059999685502
+          },
+          "frame_ms": {
+            "count": 80,
+            "mean": 61.69664624999314,
+            "p95": 115.04505499960942,
+            "maximum": 126.21969999963767
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-0-record-0-baseline.json",
+      "sha256": "525770ad6ce4c66f9797e504f344856251ac6eb834c81498e795ec3011f49676",
+      "version": "0.1.4",
+      "activity_open": false,
+      "interaction": "drag",
+      "mode": "record",
+      "system_load": {
+        "system_busy_fraction": 0.2891156462585034,
+        "application_cpu_seconds": 19.53125,
+        "wall_seconds": 15.317258400002174,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 40.85212916685729,
+            "p95": 69.9890649990266,
+            "maximum": 87.21539999896777
+          },
+          "frame_ms": {
+            "count": 74,
+            "mean": 81.2821810810616,
+            "p95": 125.89092500093102,
+            "maximum": 188.1941999999981
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 48.095866666608345,
+            "p95": 74.42232000139482,
+            "maximum": 91.79760000188253
+          },
+          "frame_ms": {
+            "count": 79,
+            "mean": 87.4263455696541,
+            "p95": 153.3174499989399,
+            "maximum": 208.68759999939357
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-0-record-1-candidate.json",
+      "sha256": "3a86e282f8ed6bb47a8a0cda34f74643d9adbb6928d7b71cedf5cd1c83833282",
+      "version": "0.1.5",
+      "activity_open": false,
+      "interaction": "drag",
+      "mode": "record",
+      "system_load": {
+        "system_busy_fraction": 0.31402552810330675,
+        "application_cpu_seconds": 12.109375,
+        "wall_seconds": 8.728058600001532,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 21.424608333503176,
+            "p95": 53.05493000196293,
+            "maximum": 71.15299999713898
+          },
+          "frame_ms": {
+            "count": 71,
+            "mean": 46.317202816924336,
+            "p95": 92.17700000044715,
+            "maximum": 99.52020000127959
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 23.884914166622668,
+            "p95": 55.324840000321274,
+            "maximum": 70.47679999959655
+          },
+          "frame_ms": {
+            "count": 79,
+            "mean": 49.149725316458934,
+            "p95": 89.07195000065254,
+            "maximum": 107.36330000145244
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-1-dormant-0-baseline.json",
+      "sha256": "96a7e630aa36f4e9bea0b23e0e49455e8e5a5b25808bc9c041b0069c9254c9ea",
+      "version": "0.1.4",
+      "activity_open": true,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.30470462593446124,
+        "application_cpu_seconds": 12.390625,
+        "wall_seconds": 11.587509699998918,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 31.175631666489306,
+            "p95": 41.657925001527474,
+            "maximum": 43.694200001482386
+          },
+          "frame_ms": {
+            "count": 69,
+            "mean": 64.56051304348216,
+            "p95": 104.53634000150483,
+            "maximum": 116.78899999969872
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 35.20469916635799,
+            "p95": 42.307369998525246,
+            "maximum": 44.03459999957704
+          },
+          "frame_ms": {
+            "count": 84,
+            "mean": 60.392664285722105,
+            "p95": 107.08611499921969,
+            "maximum": 129.11399999939022
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-1-dormant-1-candidate.json",
+      "sha256": "f8cc9af02665e7d27901b15f62759a69852c563add95af60d91c1e0de847b596",
+      "version": "0.1.5",
+      "activity_open": true,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.29131997945557264,
+        "application_cpu_seconds": 7.078125,
+        "wall_seconds": 6.335835599998973,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 12.94089499982268,
+            "p95": 15.335405000223544,
+            "maximum": 30.01840000069933
+          },
+          "frame_ms": {
+            "count": 83,
+            "mean": 28.277369879511554,
+            "p95": 48.372120001658914,
+            "maximum": 58.61720000029891
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.717150833326741,
+            "p95": 16.626690000521194,
+            "maximum": 18.435999998473562
+          },
+          "frame_ms": {
+            "count": 81,
+            "mean": 30.917645679033335,
+            "p95": 51.497699998435564,
+            "maximum": 61.10650000118767
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-1-dormant-2-candidate.json",
+      "sha256": "19ee28a358b647fa8b2e44959287a6bf8c95be801b32ae50ab8612a92f1907f9",
+      "version": "0.1.5",
+      "activity_open": true,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.29237117552334946,
+        "application_cpu_seconds": 7.28125,
+        "wall_seconds": 6.469333299999562,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.265435000054518,
+            "p95": 16.72684000186564,
+            "maximum": 28.8061999999627
+          },
+          "frame_ms": {
+            "count": 77,
+            "mean": 30.96957402597688,
+            "p95": 53.837059999932535,
+            "maximum": 61.13310000000638
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.875711666726906,
+            "p95": 16.713504998188,
+            "maximum": 17.595400000573136
+          },
+          "frame_ms": {
+            "count": 77,
+            "mean": 32.94363896103195,
+            "p95": 54.953080000996124,
+            "maximum": 67.36779999846476
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-1-dormant-3-baseline.json",
+      "sha256": "a740b7619a747a7c3a9e574d4587c057ed161940fe6626594690212c9cdbce15",
+      "version": "0.1.4",
+      "activity_open": true,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.2794914317302377,
+        "application_cpu_seconds": 12.515625,
+        "wall_seconds": 11.781605600001058,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 31.986641666844662,
+            "p95": 43.152479998752824,
+            "maximum": 53.76990000149817
+          },
+          "frame_ms": {
+            "count": 69,
+            "mean": 66.07516811593509,
+            "p95": 120.40419999830185,
+            "maximum": 131.73070000266307
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 36.38693000023826,
+            "p95": 43.00187500011816,
+            "maximum": 46.50670000046375
+          },
+          "frame_ms": {
+            "count": 79,
+            "mean": 65.49696708859727,
+            "p95": 117.14565999973271,
+            "maximum": 134.97609999831184
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-1-record-0-candidate.json",
+      "sha256": "8a90695a743a5166e59ac9671fa5cd9a719bde54a8a23b5a3a5c4f212b68b933",
+      "version": "0.1.5",
+      "activity_open": true,
+      "interaction": "drag",
+      "mode": "record",
+      "system_load": {
+        "system_busy_fraction": 0.30819507290095527,
+        "application_cpu_seconds": 14.84375,
+        "wall_seconds": 10.365605300001334,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 24.12579333337514,
+            "p95": 63.5699949987611,
+            "maximum": 83.3760000023176
+          },
+          "frame_ms": {
+            "count": 85,
+            "mean": 47.6531682352823,
+            "p95": 92.00223999869195,
+            "maximum": 109.9729000015941
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 26.019170000108716,
+            "p95": 69.8005549975278,
+            "maximum": 86.29149999978836
+          },
+          "frame_ms": {
+            "count": 76,
+            "mean": 59.44008421049244,
+            "p95": 110.51362500074902,
+            "maximum": 142.08720000169706
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-1-record-1-baseline.json",
+      "sha256": "9bfdb3a8d9a5a17fe4591138fe5ed863846159814567f07a4fd5d19e7871623f",
+      "version": "0.1.4",
+      "activity_open": true,
+      "interaction": "drag",
+      "mode": "record",
+      "system_load": {
+        "system_busy_fraction": 0.31564327485380117,
+        "application_cpu_seconds": 23.71875,
+        "wall_seconds": 17.812838800000463,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 47.31787999993079,
+            "p95": 80.23081999745045,
+            "maximum": 87.13920000081998
+          },
+          "frame_ms": {
+            "count": 68,
+            "mean": 102.53243823525041,
+            "p95": 148.63008000120317,
+            "maximum": 180.84799999996903
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 55.779790000087814,
+            "p95": 83.95751000098244,
+            "maximum": 104.48560000077123
+          },
+          "frame_ms": {
+            "count": 78,
+            "mean": 105.22087820512145,
+            "p95": 164.7337899996272,
+            "maximum": 186.36360000164132
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-0-dormant-0-baseline.json",
+      "sha256": "a63f21b8c6c9fe2f0c4775e1da32d48d13895b95d573d5e4d5c74dd1144f8abe",
+      "version": "0.1.4",
+      "activity_open": false,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.2997311827956989,
+        "application_cpu_seconds": 11.046875,
+        "wall_seconds": 10.181593900000735,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 29.006036666760338,
+            "p95": 38.97531500097102,
+            "maximum": 46.66049999650568
+          },
+          "frame_ms": {
+            "count": 73,
+            "mean": 55.49701232876156,
+            "p95": 97.07405999870386,
+            "maximum": 134.0680000030261
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 32.76928166684835,
+            "p95": 38.89991999894846,
+            "maximum": 42.66700000152923
+          },
+          "frame_ms": {
+            "count": 82,
+            "mean": 55.73934268294379,
+            "p95": 90.1566249998723,
+            "maximum": 121.79590000232565
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-0-dormant-1-candidate.json",
+      "sha256": "272c1dd8c999e5caf699d7245639a61acb5597e790442887663973c7a69ea421",
+      "version": "0.1.5",
+      "activity_open": false,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.3053500986193294,
+        "application_cpu_seconds": 6.21875,
+        "wall_seconds": 5.274952100000519,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 12.451082499925784,
+            "p95": 14.802715001678733,
+            "maximum": 30.915699997422053
+          },
+          "frame_ms": {
+            "count": 86,
+            "mean": 22.884895348862873,
+            "p95": 43.334874998436135,
+            "maximum": 57.72159999833093
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.394135000150223,
+            "p95": 15.785105001305054,
+            "maximum": 17.039400001522154
+          },
+          "frame_ms": {
+            "count": 87,
+            "mean": 24.38425862068282,
+            "p95": 39.3096500003594,
+            "maximum": 56.80200000279001
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-0-dormant-2-candidate.json",
+      "sha256": "79ea2c6822c665264dbd708e16af7d8c335712b93e81fdb279d3abbb68343280",
+      "version": "0.1.5",
+      "activity_open": false,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.28464419475655434,
+        "application_cpu_seconds": 5.5,
+        "wall_seconds": 5.3885081999978865,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 12.965569166559968,
+            "p95": 16.207244998804526,
+            "maximum": 29.508499999792548
+          },
+          "frame_ms": {
+            "count": 77,
+            "mean": 25.830649350680616,
+            "p95": 38.98628000024474,
+            "maximum": 65.34520000059274
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.573818333134113,
+            "p95": 16.569814998365473,
+            "maximum": 18.822199999704026
+          },
+          "frame_ms": {
+            "count": 83,
+            "mean": 25.822114457827936,
+            "p95": 43.137170000045444,
+            "maximum": 58.88559999948484
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-0-dormant-3-baseline.json",
+      "sha256": "6c420c6157cd8bdd62ac65d619dd8a529c024f7ba16bcfdb5e758c828b7984a5",
+      "version": "0.1.4",
+      "activity_open": false,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.2863279332351497,
+        "application_cpu_seconds": 11.4375,
+        "wall_seconds": 10.616728499997407,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 28.597296666733502,
+            "p95": 38.91350499798136,
+            "maximum": 44.333300000289455
+          },
+          "frame_ms": {
+            "count": 72,
+            "mean": 54.94863055557491,
+            "p95": 105.09580499929143,
+            "maximum": 113.87670000112848
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 34.873072499946524,
+            "p95": 40.5336099998749,
+            "maximum": 42.91989999910584
+          },
+          "frame_ms": {
+            "count": 77,
+            "mean": 63.27349870130624,
+            "p95": 117.32498000128544,
+            "maximum": 137.72790000075474
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-0-record-0-baseline.json",
+      "sha256": "99dcdb9ef267bb96f2edaff8f054fc7927a4da69ae6685119fe37ab47bfafc42",
+      "version": "0.1.4",
+      "activity_open": false,
+      "interaction": "modal",
+      "mode": "record",
+      "system_load": {
+        "system_busy_fraction": 0.28557527454705534,
+        "application_cpu_seconds": 18.53125,
+        "wall_seconds": 14.044117199999164,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 41.28869583331228,
+            "p95": 68.26663999854645,
+            "maximum": 76.90939999883994
+          },
+          "frame_ms": {
+            "count": 67,
+            "mean": 85.72559701491654,
+            "p95": 134.2338500016922,
+            "maximum": 161.6578000030131
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 47.432922499986795,
+            "p95": 72.24342500066996,
+            "maximum": 98.55950000201119
+          },
+          "frame_ms": {
+            "count": 80,
+            "mean": 83.11916500001644,
+            "p95": 134.74807000220608,
+            "maximum": 183.30910000076983
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-0-record-1-candidate.json",
+      "sha256": "5f02e2b75334eadf41842a86c4f1972681b379c924c55efdba68e6f81f853056",
+      "version": "0.1.5",
+      "activity_open": false,
+      "interaction": "modal",
+      "mode": "record",
+      "system_load": {
+        "system_busy_fraction": 0.2987023929895517,
+        "application_cpu_seconds": 10.4375,
+        "wall_seconds": 7.724287799999729,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 20.386941666887044,
+            "p95": 53.1487999998717,
+            "maximum": 65.56170000112616
+          },
+          "frame_ms": {
+            "count": 68,
+            "mean": 43.06796323528354,
+            "p95": 85.590885001875,
+            "maximum": 104.31199999948149
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 22.54876833315696,
+            "p95": 51.43425999849569,
+            "maximum": 66.23799999943003
+          },
+          "frame_ms": {
+            "count": 74,
+            "mean": 44.69198243242391,
+            "p95": 84.88424499973915,
+            "maximum": 114.02900000030058
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-1-dormant-0-baseline.json",
+      "sha256": "55421a110b5655ac5952ed83d999b69c5262b7d54ea3422b87695e1675186de7",
+      "version": "0.1.4",
+      "activity_open": true,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.2871490661341478,
+        "application_cpu_seconds": 11.671875,
+        "wall_seconds": 11.083850099999836,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 31.629534999956377,
+            "p95": 42.53742000073544,
+            "maximum": 48.57129999800236
+          },
+          "frame_ms": {
+            "count": 72,
+            "mean": 61.62528611109034,
+            "p95": 104.63418499948602,
+            "maximum": 136.01849999758997
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 35.252945000077794,
+            "p95": 42.84094000231562,
+            "maximum": 44.384299999364885
+          },
+          "frame_ms": {
+            "count": 80,
+            "mean": 63.01239999997961,
+            "p95": 119.98909499834554,
+            "maximum": 133.41349999973318
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-1-dormant-1-candidate.json",
+      "sha256": "e867e7b62d35e434891eb2ddc79017bd99fdf6076241fecb279263dd59902627",
+      "version": "0.1.5",
+      "activity_open": true,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.3060422282120395,
+        "application_cpu_seconds": 6.5,
+        "wall_seconds": 5.8045603999999,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.211590833361697,
+            "p95": 16.228395001780882,
+            "maximum": 32.13479999976698
+          },
+          "frame_ms": {
+            "count": 89,
+            "mean": 25.60401685393495,
+            "p95": 48.70712000119965,
+            "maximum": 62.143000002834015
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.397014166457666,
+            "p95": 15.928420001364428,
+            "maximum": 18.323399999644607
+          },
+          "frame_ms": {
+            "count": 79,
+            "mean": 28.942748101248004,
+            "p95": 47.90800999908242,
+            "maximum": 55.43699999907403
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-1-dormant-2-candidate.json",
+      "sha256": "a6f848664b32e9536da54970139e924081226665527bc7f808bfb294c0774a5d",
+      "version": "0.1.5",
+      "activity_open": true,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.29629203132197146,
+        "application_cpu_seconds": 6.4375,
+        "wall_seconds": 5.641314700002113,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 12.521054999979242,
+            "p95": 15.245890001278893,
+            "maximum": 17.21009999891976
+          },
+          "frame_ms": {
+            "count": 86,
+            "mean": 25.4610604650986,
+            "p95": 44.07282500051224,
+            "maximum": 53.56969999775174
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.435149166555979,
+            "p95": 16.195180001341214,
+            "maximum": 18.628100002388237
+          },
+          "frame_ms": {
+            "count": 78,
+            "mean": 29.124462820525366,
+            "p95": 46.841635000419004,
+            "maximum": 56.50160000004689
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-1-dormant-3-baseline.json",
+      "sha256": "29b7254918fad8c2a76af345859b7b3e3e78357a62ed2101af123a67d9ceb726",
+      "version": "0.1.4",
+      "activity_open": true,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.27255335684820947,
+        "application_cpu_seconds": 11.734375,
+        "wall_seconds": 10.888927600000898,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 31.24028916666551,
+            "p95": 42.45480999888969,
+            "maximum": 47.353099998872494
+          },
+          "frame_ms": {
+            "count": 75,
+            "mean": 57.637610666667264,
+            "p95": 99.7083800008113,
+            "maximum": 124.38340000153403
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 35.56696583318626,
+            "p95": 43.41037000085635,
+            "maximum": 45.313400001759874
+          },
+          "frame_ms": {
+            "count": 78,
+            "mean": 63.382244871788245,
+            "p95": 113.9036250002391,
+            "maximum": 136.29289999880712
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-1-record-0-candidate.json",
+      "sha256": "e024850133f85ef66e0d942bc274f5ac4aeb42c44fa00c7dc67d466d66a43170",
+      "version": "0.1.5",
+      "activity_open": true,
+      "interaction": "modal",
+      "mode": "record",
+      "system_load": {
+        "system_busy_fraction": 0.30321298897033633,
+        "application_cpu_seconds": 13.640625,
+        "wall_seconds": 9.508785400001216,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 22.929574999852775,
+            "p95": 62.61405499681132,
+            "maximum": 74.81969999935245
+          },
+          "frame_ms": {
+            "count": 84,
+            "mean": 45.06237619045264,
+            "p95": 96.7972100013867,
+            "maximum": 110.79040000186069
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 26.115539166645856,
+            "p95": 68.8896099987687,
+            "maximum": 90.64799999759998
+          },
+          "frame_ms": {
+            "count": 74,
+            "mean": 56.54462432431575,
+            "p95": 116.19490500033862,
+            "maximum": 137.49060000191093
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-1-record-1-baseline.json",
+      "sha256": "a8ab213985abf29280f50cfb428f27a9c9f09db76d918af6ece733316b56919b",
+      "version": "0.1.4",
+      "activity_open": true,
+      "interaction": "modal",
+      "mode": "record",
+      "system_load": {
+        "system_busy_fraction": 0.29905037159372416,
+        "application_cpu_seconds": 21.59375,
+        "wall_seconds": 15.771504300002562,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 45.31085000016901,
+            "p95": 76.91862000137917,
+            "maximum": 100.6948000031116
+          },
+          "frame_ms": {
+            "count": 66,
+            "mean": 98.52059545455356,
+            "p95": 144.3788750002568,
+            "maximum": 159.86730000076932
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 52.55053000018961,
+            "p95": 78.47779999974591,
+            "maximum": 102.67060000114725
+          },
+          "frame_ms": {
+            "count": 78,
+            "mean": 94.78241794871185,
+            "p95": 156.69763500009137,
+            "maximum": 174.94449999867356
+          },
+          "jobs": 120
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "interaction": "drag",
+      "activity_open": false,
+      "snapping": false,
+      "versions": {
+        "0.1.4": {
+          "handler_mean_ms": 29.316549166742334,
+          "handler_mean_range_ms": [
+            29.111875000095704,
+            29.521223333388964
+          ],
+          "frame_callback_mean_ms": 59.221096926989354
+        },
+        "0.1.5": {
+          "handler_mean_ms": 12.70816249999977,
+          "handler_mean_range_ms": [
+            12.842189166561488,
+            12.57413583343805
+          ],
+          "frame_callback_mean_ms": 32.37879024198463
+        }
+      },
+      "handler_reduction_percent": 56.651915518023074
+    },
+    {
+      "interaction": "drag",
+      "activity_open": false,
+      "snapping": true,
+      "versions": {
+        "0.1.4": {
+          "handler_mean_ms": 33.39473958318801,
+          "handler_mean_range_ms": [
+            33.737764166592875,
+            33.051714999783144
+          ],
+          "frame_callback_mean_ms": 61.28479059488315
+        },
+        "0.1.5": {
+          "handler_mean_ms": 13.547915833290364,
+          "handler_mean_range_ms": [
+            13.597792500028541,
+            13.49803916655219
+          ],
+          "frame_callback_mean_ms": 30.696655377180335
+        }
+      },
+      "handler_reduction_percent": 59.43098822632885
+    },
+    {
+      "interaction": "drag",
+      "activity_open": true,
+      "snapping": false,
+      "versions": {
+        "0.1.4": {
+          "handler_mean_ms": 31.581136666666985,
+          "handler_mean_range_ms": [
+            31.175631666489306,
+            31.986641666844662
+          ],
+          "frame_callback_mean_ms": 65.31784057970862
+        },
+        "0.1.5": {
+          "handler_mean_ms": 13.103164999938599,
+          "handler_mean_range_ms": [
+            12.94089499982268,
+            13.265435000054518
+          ],
+          "frame_callback_mean_ms": 29.623471952744218
+        }
+      },
+      "handler_reduction_percent": 58.5095206095966
+    },
+    {
+      "interaction": "drag",
+      "activity_open": true,
+      "snapping": true,
+      "versions": {
+        "0.1.4": {
+          "handler_mean_ms": 35.795814583298124,
+          "handler_mean_range_ms": [
+            35.20469916635799,
+            36.38693000023826
+          ],
+          "frame_callback_mean_ms": 62.94481568715969
+        },
+        "0.1.5": {
+          "handler_mean_ms": 13.796431250026824,
+          "handler_mean_range_ms": [
+            13.717150833326741,
+            13.875711666726906
+          ],
+          "frame_callback_mean_ms": 31.930642320032643
+        }
+      },
+      "handler_reduction_percent": 61.45797655219707
+    },
+    {
+      "interaction": "modal",
+      "activity_open": false,
+      "snapping": false,
+      "versions": {
+        "0.1.4": {
+          "handler_mean_ms": 28.801666666746918,
+          "handler_mean_range_ms": [
+            29.006036666760338,
+            28.597296666733502
+          ],
+          "frame_callback_mean_ms": 55.22282144216824
+        },
+        "0.1.5": {
+          "handler_mean_ms": 12.708325833242876,
+          "handler_mean_range_ms": [
+            12.451082499925784,
+            12.965569166559968
+          ],
+          "frame_callback_mean_ms": 24.357772349771743
+        }
+      },
+      "handler_reduction_percent": 55.87642208249245
+    },
+    {
+      "interaction": "modal",
+      "activity_open": false,
+      "snapping": true,
+      "versions": {
+        "0.1.4": {
+          "handler_mean_ms": 33.82117708339744,
+          "handler_mean_range_ms": [
+            32.76928166684835,
+            34.873072499946524
+          ],
+          "frame_callback_mean_ms": 59.50642069212502
+        },
+        "0.1.5": {
+          "handler_mean_ms": 13.483976666642167,
+          "handler_mean_range_ms": [
+            13.394135000150223,
+            13.573818333134113
+          ],
+          "frame_callback_mean_ms": 25.10318653925538
+        }
+      },
+      "handler_reduction_percent": 60.13155712057889
+    },
+    {
+      "interaction": "modal",
+      "activity_open": true,
+      "snapping": false,
+      "versions": {
+        "0.1.4": {
+          "handler_mean_ms": 31.43491208331094,
+          "handler_mean_range_ms": [
+            31.629534999956377,
+            31.24028916666551
+          ],
+          "frame_callback_mean_ms": 59.6314483888788
+        },
+        "0.1.5": {
+          "handler_mean_ms": 12.86632291667047,
+          "handler_mean_range_ms": [
+            13.211590833361697,
+            12.521054999979242
+          ],
+          "frame_callback_mean_ms": 25.532538659516774
+        }
+      },
+      "handler_reduction_percent": 59.06995736914655
+    },
+    {
+      "interaction": "modal",
+      "activity_open": true,
+      "snapping": true,
+      "versions": {
+        "0.1.4": {
+          "handler_mean_ms": 35.40995541663203,
+          "handler_mean_range_ms": [
+            35.252945000077794,
+            35.56696583318626
+          ],
+          "frame_callback_mean_ms": 63.197322435883926
+        },
+        "0.1.5": {
+          "handler_mean_ms": 13.416081666506823,
+          "handler_mean_range_ms": [
+            13.397014166457666,
+            13.435149166555979
+          ],
+          "frame_callback_mean_ms": 29.033605460886683
+        }
+      },
+      "handler_reduction_percent": 62.11211929341967
+    }
+  ],
+  "profiles": [
+    {
+      "file": "drag-0-record-0-baseline.afprofile.zip",
+      "sha256": "c669f152fc0dd7e64db4f00e3e33fc9f848ec25d6c6f5abfe6fb4219742b23f6",
+      "environment": {
+        "application_version": "0.1.4",
+        "python": "3.12.12",
+        "os": "Windows",
+        "os_release": "11",
+        "architecture": "AMD64",
+        "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+        "logical_cpus": 24,
+        "build": {
+          "revision": "3fa664db4a5661672a93d7d806b03c5fd78f95b0",
+          "tracked_changes": false,
+          "packaged": false,
+          "source_snapshot": true
+        }
+      },
+      "complete": true,
+      "losses": {},
+      "storage": {
+        "received": 268755,
+        "retained": 151776,
+        "evicted": 116979,
+        "oversized": 0,
+        "boundary_filtered": 3,
+        "owned_bytes": 67108836,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "requested_interval_ns": [
+        22647328483300,
+        22662645882000
+      ],
+      "profiler": {
+        "activation_wall_ns": 15125200,
+        "span_bookkeeping_inclusive_ns": 581934200,
+        "record_wall_ns": 1709774300,
+        "drain_inclusive_wall_ns": 3651554600,
+        "qt_encode_wall_ns": 909573200,
+        "qt_decode_inclusive_wall_ns": 3100370800,
+        "qt_decode_thread_cpu_ns": 2968750000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      },
+      "retained_interval_us": [
+        22653310250.2,
+        22662645722.5
+      ],
+      "frame_submission_intervals": {
+        "count": 127,
+        "inclusive_total_us": 9208193.099998474,
+        "mean_us": 72505.45748030294,
+        "max_us": 167804.90000152588,
+        "p50_upper_us": 68436.52660516299,
+        "p95_upper_us": 142934.02953590066
+      },
+      "activity_model_events": {
+        "modelChanged": 160
+      },
+      "selected_durations": {
+        "qml.creating/creating:Activity.qml:28": {
+          "count": 319,
+          "inclusive_total_us": 18401.2,
+          "mean_us": 57.684012539184955,
+          "max_us": 189.9,
+          "p50_upper_us": 50.53569062237614,
+          "p95_upper_us": 127.0
+        },
+        "qml.creating/creating:Activity.qml:25": {
+          "count": 319,
+          "inclusive_total_us": 86841.39999999995,
+          "mean_us": 272.230094043887,
+          "max_us": 1729.4,
+          "p50_upper_us": 78.47889997270298,
+          "p95_upper_us": 723.0773439350247
+        },
+        "qml.binding/binding:Activity.qml:23": {
+          "count": 160,
+          "inclusive_total_us": 3361951.200000001,
+          "mean_us": 21012.195000000007,
+          "max_us": 65446.5,
+          "p50_upper_us": 20345.598393011962,
+          "p95_upper_us": 38966.93874440916
+        },
+        "ui/Controller.notify": {
+          "count": 160,
+          "inclusive_total_us": 4401440.599979401,
+          "mean_us": 27509.003749871255,
+          "max_us": 77941.40000152588,
+          "p50_upper_us": 25266.5821634837,
+          "p95_upper_us": 57547.87079111228
+        },
+        "qml.javascript/javascript:Activity.qml:11": {
+          "count": 205,
+          "inclusive_total_us": 164.79999999999995,
+          "mean_us": 0.8039024390243901,
+          "max_us": 2.1,
+          "p50_upper_us": 0.8340080864093424,
+          "p95_upper_us": 1.483715624146968
+        },
+        "qml.javascript/javascript:Activity.qml:8": {
+          "count": 205,
+          "inclusive_total_us": 98704.40000000004,
+          "mean_us": 481.4848780487807,
+          "max_us": 10559.9,
+          "p50_upper_us": 180.01933598375618,
+          "p95_upper_us": 2772.515360126756
+        },
+        "qml.javascript/javascript:Activity.qml:31": {
+          "count": 205,
+          "inclusive_total_us": 99893.10000000005,
+          "mean_us": 487.2834146341466,
+          "max_us": 10567.7,
+          "p50_upper_us": 188.03374668025592,
+          "p95_upper_us": 2772.515360126756
+        },
+        "qml.binding/binding:Activity.qml:31": {
+          "count": 205,
+          "inclusive_total_us": 102138.39999999998,
+          "mean_us": 498.2360975609755,
+          "max_us": 10609.3,
+          "p50_upper_us": 188.03374668025592,
+          "p95_upper_us": 2895.309375740099
+        },
+        "qml.javascript/javascript:Activity.qml:32": {
+          "count": 535,
+          "inclusive_total_us": 164819.89999999997,
+          "mean_us": 308.07457943925226,
+          "max_us": 13967.4,
+          "p50_upper_us": 13.67206469127474,
+          "p95_upper_us": 63.0
+        },
+        "qml.binding/binding:Activity.qml:32": {
+          "count": 535,
+          "inclusive_total_us": 168508.19999999995,
+          "mean_us": 314.96859813084103,
+          "max_us": 13975.3,
+          "p50_upper_us": 25.908685288118864,
+          "p95_upper_us": 78.47889997270298
+        },
+        "qml.javascript/javascript:Activity.qml:23": {
+          "count": 159,
+          "inclusive_total_us": 2678431.6999999993,
+          "mean_us": 16845.482389937104,
+          "max_us": 47547,
+          "p50_upper_us": 17108.381651290747,
+          "p95_upper_us": 21246.419263402142
+        },
+        "qml.creating/creating:Activity.qml:30": {
+          "count": 318,
+          "inclusive_total_us": 8639.499999999993,
+          "mean_us": 27.16823899371067,
+          "max_us": 84.5,
+          "p50_upper_us": 20.668088750990282,
+          "p95_upper_us": 57.68825876509896
+        },
+        "qml.creating/creating:Activity.qml:31": {
+          "count": 318,
+          "inclusive_total_us": 3762.199999999998,
+          "mean_us": 11.830817610062887,
+          "max_us": 63.4,
+          "p50_upper_us": 6.33603234563737,
+          "p95_upper_us": 27.10003456597279
+        },
+        "qml.creating/creating:Activity.qml:32": {
+          "count": 318,
+          "inclusive_total_us": 2131.1999999999994,
+          "mean_us": 6.701886792452828,
+          "max_us": 37.2,
+          "p50_upper_us": 7.35419025941931,
+          "p95_upper_us": 15.0
+        },
+        "qml.creating/creating:Activity.qml:29": {
+          "count": 159,
+          "inclusive_total_us": 308.29999999999995,
+          "mean_us": 1.9389937106918236,
+          "max_us": 11,
+          "p50_upper_us": 1.8284271247461903,
+          "p95_upper_us": 3.0
+        },
+        "qml.creating/creating:Activity.qml:34": {
+          "count": 159,
+          "inclusive_total_us": 45100.49999999996,
+          "mean_us": 283.6509433962262,
+          "max_us": 818.2,
+          "p50_upper_us": 278.16997956230597,
+          "p95_upper_us": 411.2855249790091
+        },
+        "qml.creating/creating:Activity.qml:39": {
+          "count": 159,
+          "inclusive_total_us": 17383.299999999996,
+          "mean_us": 109.32893081761003,
+          "max_us": 704.7,
+          "p50_upper_us": 93.51687334012796,
+          "p95_upper_us": 223.80027652778233
+        },
+        "qml.javascript/javascript:Activity.qml:40": {
+          "count": 159,
+          "inclusive_total_us": 886.3999999999999,
+          "mean_us": 5.574842767295596,
+          "max_us": 11.7,
+          "p50_upper_us": 5.441961327797017,
+          "p95_upper_us": 9.374716437208077
+        },
+        "qml.binding/binding:Activity.qml:40": {
+          "count": 159,
+          "inclusive_total_us": 1290.5999999999995,
+          "mean_us": 8.116981132075468,
+          "max_us": 19.8,
+          "p50_upper_us": 7.7240618613220615,
+          "p95_upper_us": 14.32165249117718
+        },
+        "qml.javascript/javascript:Activity.qml:35": {
+          "count": 159,
+          "inclusive_total_us": 130.7,
+          "mean_us": 0.8220125786163521,
+          "max_us": 2.3,
+          "p50_upper_us": 0.8340080864093424,
+          "p95_upper_us": 1.483715624146968
+        },
+        "qml.binding/binding:Activity.qml:35": {
+          "count": 159,
+          "inclusive_total_us": 319.6999999999999,
+          "mean_us": 2.01069182389937,
+          "max_us": 20,
+          "p50_upper_us": 1.378414230005442,
+          "p95_upper_us": 2.830413122794295
+        },
+        "qml.javascript/javascript:Activity.qml:13": {
+          "count": 159,
+          "inclusive_total_us": 1439.6000000000013,
+          "mean_us": 9.054088050314473,
+          "max_us": 29.6,
+          "p50_upper_us": 8.513656920021768,
+          "p95_upper_us": 14.32165249117718
+        },
+        "qml.javascript/javascript:Activity.qml:30": {
+          "count": 318,
+          "inclusive_total_us": 300.79999999999967,
+          "mean_us": 0.9459119496855336,
+          "max_us": 9.2,
+          "p50_upper_us": 0.6104903319492543,
+          "p95_upper_us": 3.3620309306610308
+        },
+        "qml.binding/binding:Activity.qml:30": {
+          "count": 318,
+          "inclusive_total_us": 2088.0,
+          "mean_us": 6.566037735849057,
+          "max_us": 48.3,
+          "p50_upper_us": 5.727171322029716,
+          "p95_upper_us": 13.050017282986396
+        },
+        "qml.javascript/javascript:Activity.qml:27": {
+          "count": 159,
+          "inclusive_total_us": 1469.1,
+          "mean_us": 9.239622641509433,
+          "max_us": 28,
+          "p50_upper_us": 8.513656920021768,
+          "p95_upper_us": 15.0
+        },
+        "native/af_scene_pick": {
+          "count": 121,
+          "inclusive_total_us": 19041.300003051758,
+          "mean_us": 157.36611572770047,
+          "max_us": 6278.800003051758,
+          "p50_upper_us": 44.254833995939045,
+          "p95_upper_us": 180.01933598375618
+        },
+        "native/af_surface_normal": {
+          "count": 121,
+          "inclusive_total_us": 2953.099998474121,
+          "mean_us": 24.405785111356373,
+          "max_us": 184.20000076293945,
+          "p50_upper_us": 20.668088750990282,
+          "p95_upper_us": 33.896247445288246
+        }
+      }
+    },
+    {
+      "file": "drag-0-record-1-candidate.afprofile.zip",
+      "sha256": "1eb02124bb25dd8dc2ea1018cb0ce91b8f9f22c672c80fc57f11637e33895726",
+      "environment": {
+        "application_version": "0.1.5",
+        "python": "3.12.12",
+        "os": "Windows",
+        "os_release": "11",
+        "architecture": "AMD64",
+        "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+        "logical_cpus": 24,
+        "build": {
+          "revision": "a4501beab3670c3e673aab335601786953290349",
+          "tracked_changes": true,
+          "packaged": false
+        }
+      },
+      "complete": true,
+      "losses": {},
+      "storage": {
+        "received": 203519,
+        "retained": 150489,
+        "evicted": 53030,
+        "oversized": 0,
+        "boundary_filtered": 6,
+        "owned_bytes": 67108581,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "requested_interval_ns": [
+        22680769908700,
+        22689498175900
+      ],
+      "profiler": {
+        "activation_wall_ns": 14920300,
+        "span_bookkeeping_inclusive_ns": 552185700,
+        "record_wall_ns": 1246529600,
+        "drain_inclusive_wall_ns": 2569376700,
+        "qt_encode_wall_ns": 668365200,
+        "qt_decode_inclusive_wall_ns": 2240309100,
+        "qt_decode_thread_cpu_ns": 2140625000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      },
+      "retained_interval_us": [
+        22682851939.25,
+        22689497991.7
+      ],
+      "frame_submission_intervals": {
+        "count": 146,
+        "inclusive_total_us": 6543310.5,
+        "mean_us": 44817.19520547945,
+        "max_us": 97421.09999847412,
+        "p50_upper_us": 40692.196786023924,
+        "p95_upper_us": 88751.4915240562
+      },
+      "activity_model_events": {
+        "rowsRemoved": 179,
+        "rowsInserted": 179,
+        "dataChanged": 742
+      },
+      "selected_durations": {
+        "ui/Controller.notify": {
+          "count": 210,
+          "inclusive_total_us": 743250.6000213623,
+          "mean_us": 3539.288571530297,
+          "max_us": 50308.90000152588,
+          "p50_upper_us": 2137.6727064113434,
+          "p95_upper_us": 11093.061440507025
+        },
+        "native/af_scene_pick": {
+          "count": 121,
+          "inclusive_total_us": 14681.200016021729,
+          "mean_us": 121.33223153736965,
+          "max_us": 6133.600002288818,
+          "p50_upper_us": 40.49886574883231,
+          "p95_upper_us": 81.99773149766462
+        },
+        "native/af_surface_normal": {
+          "count": 121,
+          "inclusive_total_us": 2457.7000007629395,
+          "mean_us": 20.311570254239168,
+          "max_us": 71.0,
+          "p50_upper_us": 19.749432874416154,
+          "p95_upper_us": 31.0
+        }
+      }
+    },
+    {
+      "file": "drag-1-record-0-candidate.afprofile.zip",
+      "sha256": "247f0b55a828f1e634d652d1d611569508625254ddf1eb96de204995f1a38a67",
+      "environment": {
+        "application_version": "0.1.5",
+        "python": "3.12.12",
+        "os": "Windows",
+        "os_release": "11",
+        "architecture": "AMD64",
+        "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+        "logical_cpus": 24,
+        "build": {
+          "revision": "a4501beab3670c3e673aab335601786953290349",
+          "tracked_changes": true,
+          "packaged": false
+        }
+      },
+      "complete": true,
+      "losses": {},
+      "storage": {
+        "received": 270339,
+        "retained": 151909,
+        "evicted": 118430,
+        "oversized": 0,
+        "boundary_filtered": 5,
+        "owned_bytes": 67108600,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "requested_interval_ns": [
+        22759713088700,
+        22770081148000
+      ],
+      "profiler": {
+        "activation_wall_ns": 15397400,
+        "span_bookkeeping_inclusive_ns": 575138600,
+        "record_wall_ns": 1691778300,
+        "drain_inclusive_wall_ns": 3475426100,
+        "qt_encode_wall_ns": 923539800,
+        "qt_decode_inclusive_wall_ns": 3132809900,
+        "qt_decode_thread_cpu_ns": 3015625000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      },
+      "retained_interval_us": [
+        22763882658.85,
+        22770078618.3
+      ],
+      "frame_submission_intervals": {
+        "count": 126,
+        "inclusive_total_us": 6157289.200000763,
+        "mean_us": 48867.37460318066,
+        "max_us": 135400.29999923706,
+        "p50_upper_us": 40692.196786023924,
+        "p95_upper_us": 101069.3286539348
+      },
+      "activity_model_events": {
+        "rowsRemoved": 132,
+        "rowsInserted": 132,
+        "dataChanged": 544
+      },
+      "selected_durations": {
+        "qml.javascript/javascript:Activity.qml:27": {
+          "count": 219,
+          "inclusive_total_us": 1293.8000000000006,
+          "mean_us": 5.907762557077628,
+          "max_us": 23.2,
+          "p50_upper_us": 5.727171322029716,
+          "p95_upper_us": 10.313708498984761
+        },
+        "qml.javascript/javascript:Activity.qml:26": {
+          "count": 219,
+          "inclusive_total_us": 2008.3,
+          "mean_us": 9.170319634703196,
+          "max_us": 1870.1,
+          "p50_upper_us": 0.6104903319492543,
+          "p95_upper_us": 1.1810154653305154
+        },
+        "qml.javascript/javascript:Activity.qml:36": {
+          "count": 219,
+          "inclusive_total_us": 129.89999999999995,
+          "mean_us": 0.5931506849315066,
+          "max_us": 1.9,
+          "p50_upper_us": 0.6104903319492543,
+          "p95_upper_us": 1.0
+        },
+        "qml.javascript/javascript:Activity.qml:42": {
+          "count": 219,
+          "inclusive_total_us": 2935.6,
+          "mean_us": 13.404566210045662,
+          "max_us": 2754.9,
+          "p50_upper_us": 0.7562521603732995,
+          "p95_upper_us": 1.2775772695133831
+        },
+        "qml.creating/creating:Activity.qml:28": {
+          "count": 437,
+          "inclusive_total_us": 17430.899999999983,
+          "mean_us": 39.88764302059493,
+          "max_us": 159.5,
+          "p50_upper_us": 33.896247445288246,
+          "p95_upper_us": 89.50966799187809
+        },
+        "qml.creating/creating:Activity.qml:14": {
+          "count": 437,
+          "inclusive_total_us": 62101.59999999998,
+          "mean_us": 142.1089244851258,
+          "max_us": 708,
+          "p50_upper_us": 102.07138124475227,
+          "p95_upper_us": 411.2855249790091
+        },
+        "qml.javascript/javascript:Activity.qml:32": {
+          "count": 2170,
+          "inclusive_total_us": 107857.69999999984,
+          "mean_us": 49.70400921658979,
+          "max_us": 14092,
+          "p50_upper_us": 18.869724993175744,
+          "p95_upper_us": 42.336177501980565
+        },
+        "qml.binding/binding:Activity.qml:32": {
+          "count": 2170,
+          "inclusive_total_us": 114638.49999999999,
+          "mean_us": 52.82880184331797,
+          "max_us": 14099.5,
+          "p50_upper_us": 20.668088750990282,
+          "p95_upper_us": 44.254833995939045
+        },
+        "qml.javascript/javascript:Activity.qml:30": {
+          "count": 630,
+          "inclusive_total_us": 798.9999999999998,
+          "mean_us": 1.268253968253968,
+          "max_us": 38.7,
+          "p50_upper_us": 1.0,
+          "p95_upper_us": 2.512504320746599
+        },
+        "qml.binding/binding:Activity.qml:30": {
+          "count": 630,
+          "inclusive_total_us": 11342.700000000013,
+          "mean_us": 18.004285714285736,
+          "max_us": 125.3,
+          "p50_upper_us": 6.025008641493198,
+          "p95_upper_us": 65.83352207535448
+        },
+        "qml.javascript/javascript:Activity.qml:31": {
+          "count": 582,
+          "inclusive_total_us": 2518.599999999999,
+          "mean_us": 4.327491408934706,
+          "max_us": 28,
+          "p50_upper_us": 4.187358218604039,
+          "p95_upper_us": 8.110309078053533
+        },
+        "qml.binding/binding:Activity.qml:31": {
+          "count": 582,
+          "inclusive_total_us": 13858.89999999999,
+          "mean_us": 23.812542955326442,
+          "max_us": 300.1,
+          "p50_upper_us": 18.869724993175744,
+          "p95_upper_us": 52.81737057623773
+        },
+        "qml.javascript/javascript:Activity.qml:41": {
+          "count": 339,
+          "inclusive_total_us": 478.4,
+          "mean_us": 1.4112094395280235,
+          "max_us": 5.4,
+          "p50_upper_us": 1.378414230005442,
+          "p95_upper_us": 3.5551545390267663
+        },
+        "qml.binding/binding:Activity.qml:41": {
+          "count": 339,
+          "inclusive_total_us": 2878.7,
+          "mean_us": 8.49174041297935,
+          "max_us": 31.5,
+          "p50_upper_us": 4.907304583757997,
+          "p95_upper_us": 21.627416997969522
+        },
+        "ui/Controller.notify": {
+          "count": 160,
+          "inclusive_total_us": 691343.3999862671,
+          "mean_us": 4320.896249914169,
+          "max_us": 64026.29999923706,
+          "p50_upper_us": 2434.4961715255727,
+          "p95_upper_us": 4276.345412822687
+        },
+        "qml.creating/creating:Activity.qml:30": {
+          "count": 436,
+          "inclusive_total_us": 6026.599999999997,
+          "mean_us": 13.822477064220177,
+          "max_us": 72.6,
+          "p50_upper_us": 10.814609167515995,
+          "p95_upper_us": 35.44123631221413
+        },
+        "qml.creating/creating:Activity.qml:31": {
+          "count": 436,
+          "inclusive_total_us": 3759.699999999999,
+          "mean_us": 8.623165137614677,
+          "max_us": 33.2,
+          "p50_upper_us": 4.907304583757997,
+          "p95_upper_us": 21.627416997969522
+        },
+        "qml.creating/creating:Activity.qml:32": {
+          "count": 436,
+          "inclusive_total_us": 2628.900000000001,
+          "mean_us": 6.029587155963305,
+          "max_us": 17.9,
+          "p50_upper_us": 3.0,
+          "p95_upper_us": 14.32165249117718
+        },
+        "qml.creating/creating:Activity.qml:29": {
+          "count": 218,
+          "inclusive_total_us": 395.4999999999997,
+          "mean_us": 1.8142201834862373,
+          "max_us": 4.3,
+          "p50_upper_us": 1.7085110938737853,
+          "p95_upper_us": 3.0
+        },
+        "qml.creating/creating:Activity.qml:34": {
+          "count": 218,
+          "inclusive_total_us": 28617.1,
+          "mean_us": 131.2711009174312,
+          "max_us": 417.4,
+          "p50_upper_us": 116.37651753019792,
+          "p95_upper_us": 255.0
+        },
+        "qml.creating/creating:Activity.qml:40": {
+          "count": 218,
+          "inclusive_total_us": 11307.599999999995,
+          "mean_us": 51.86972477064218,
+          "max_us": 227.3,
+          "p50_upper_us": 46.25843667006398,
+          "p95_upper_us": 102.07138124475227
+        },
+        "qml.javascript/javascript:Activity.qml:35": {
+          "count": 218,
+          "inclusive_total_us": 178.59999999999997,
+          "mean_us": 0.8192660550458714,
+          "max_us": 16.3,
+          "p50_upper_us": 0.7562521603732995,
+          "p95_upper_us": 1.378414230005442
+        },
+        "qml.binding/binding:Activity.qml:35": {
+          "count": 218,
+          "inclusive_total_us": 684.4000000000003,
+          "mean_us": 3.1394495412844052,
+          "max_us": 23.4,
+          "p50_upper_us": 2.830413122794295,
+          "p95_upper_us": 5.727171322029716
+        },
+        "native/af_scene_pick": {
+          "count": 121,
+          "inclusive_total_us": 18323.89995956421,
+          "mean_us": 151.43718974846453,
+          "max_us": 5279.699996948242,
+          "p50_upper_us": 40.49886574883231,
+          "p95_upper_us": 111.40013826389117
+        },
+        "native/af_surface_normal": {
+          "count": 121,
+          "inclusive_total_us": 4342.69998550415,
+          "mean_us": 35.89008252482769,
+          "max_us": 1956.599998474121,
+          "p50_upper_us": 19.749432874416154,
+          "p95_upper_us": 25.908685288118864
+        }
+      }
+    },
+    {
+      "file": "drag-1-record-1-baseline.afprofile.zip",
+      "sha256": "919a38eb744699d4cb0d1a96792a002096d37242767e2fda36e2c99818a91ea5",
+      "environment": {
+        "application_version": "0.1.4",
+        "python": "3.12.12",
+        "os": "Windows",
+        "os_release": "11",
+        "architecture": "AMD64",
+        "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+        "logical_cpus": 24,
+        "build": {
+          "revision": "3fa664db4a5661672a93d7d806b03c5fd78f95b0",
+          "tracked_changes": false,
+          "packaged": false,
+          "source_snapshot": true
+        }
+      },
+      "complete": true,
+      "losses": {},
+      "storage": {
+        "received": 370147,
+        "retained": 152383,
+        "evicted": 217764,
+        "oversized": 0,
+        "boundary_filtered": 740,
+        "owned_bytes": 67108415,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "requested_interval_ns": [
+        22789562306200,
+        22807375314700
+      ],
+      "profiler": {
+        "activation_wall_ns": 13993100,
+        "span_bookkeeping_inclusive_ns": 646781500,
+        "record_wall_ns": 2467279800,
+        "drain_inclusive_wall_ns": 5220092500,
+        "qt_encode_wall_ns": 1310899700,
+        "qt_decode_inclusive_wall_ns": 4521022200,
+        "qt_decode_thread_cpu_ns": 4437500000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      },
+      "retained_interval_us": [
+        22799650327.2,
+        22807375140.5
+      ],
+      "frame_submission_intervals": {
+        "count": 74,
+        "inclusive_total_us": 7519173.800003052,
+        "mean_us": 101610.456756798,
+        "max_us": 204177.80000305176,
+        "p50_upper_us": 110216.97494013487,
+        "p95_upper_us": 177503.9830481124
+      },
+      "activity_model_events": {
+        "modelChanged": 116
+      },
+      "selected_durations": {
+        "qml.javascript/javascript:Activity.qml:32": {
+          "count": 1514,
+          "inclusive_total_us": 194266.49999999985,
+          "mean_us": 128.31340819022446,
+          "max_us": 10804.5,
+          "p50_upper_us": 13.67206469127474,
+          "p95_upper_us": 50.53569062237614
+        },
+        "qml.binding/binding:Activity.qml:32": {
+          "count": 1514,
+          "inclusive_total_us": 200835.49999999983,
+          "mean_us": 132.652245706737,
+          "max_us": 10811.3,
+          "p50_upper_us": 19.749432874416154,
+          "p95_upper_us": 57.68825876509896
+        },
+        "qml.javascript/javascript:Activity.qml:23": {
+          "count": 116,
+          "inclusive_total_us": 2066357.7,
+          "mean_us": 17813.428448275863,
+          "max_us": 40632.8,
+          "p50_upper_us": 17865.878691987582,
+          "p95_upper_us": 25266.5821634837
+        },
+        "qml.creating/creating:Activity.qml:30": {
+          "count": 758,
+          "inclusive_total_us": 11374.500000000002,
+          "mean_us": 15.005936675461744,
+          "max_us": 127.9,
+          "p50_upper_us": 12.454342644059432,
+          "p95_upper_us": 42.336177501980565
+        },
+        "qml.creating/creating:Activity.qml:31": {
+          "count": 758,
+          "inclusive_total_us": 6729.199999999996,
+          "mean_us": 8.87757255936675,
+          "max_us": 72,
+          "p50_upper_us": 8.110309078053533,
+          "p95_upper_us": 22.62921833503199
+        },
+        "qml.creating/creating:Activity.qml:32": {
+          "count": 758,
+          "inclusive_total_us": 4599.199999999999,
+          "mean_us": 6.067546174142479,
+          "max_us": 38.5,
+          "p50_upper_us": 5.727171322029716,
+          "p95_upper_us": 13.67206469127474
+        },
+        "qml.creating/creating:Activity.qml:29": {
+          "count": 379,
+          "inclusive_total_us": 582.1999999999997,
+          "mean_us": 1.5361477572559359,
+          "max_us": 12.1,
+          "p50_upper_us": 1.483715624146968,
+          "p95_upper_us": 2.512504320746599
+        },
+        "qml.creating/creating:Activity.qml:28": {
+          "count": 757,
+          "inclusive_total_us": 31218.200000000015,
+          "mean_us": 41.239365918097775,
+          "max_us": 415.1,
+          "p50_upper_us": 35.44123631221413,
+          "p95_upper_us": 97.70149282610821
+        },
+        "qml.creating/creating:Activity.qml:34": {
+          "count": 379,
+          "inclusive_total_us": 59034.200000000026,
+          "mean_us": 155.7630606860159,
+          "max_us": 692,
+          "p50_upper_us": 138.58498978115298,
+          "p95_upper_us": 290.52989049771304
+        },
+        "qml.creating/creating:Activity.qml:39": {
+          "count": 379,
+          "inclusive_total_us": 24811.60000000001,
+          "mean_us": 65.46596306068604,
+          "max_us": 628.4,
+          "p50_upper_us": 55.20006913194558,
+          "p95_upper_us": 138.58498978115298
+        },
+        "qml.creating/creating:Activity.qml:25": {
+          "count": 757,
+          "inclusive_total_us": 122600.19999999998,
+          "mean_us": 161.9553500660502,
+          "max_us": 898.3,
+          "p50_upper_us": 121.57321992941743,
+          "p95_upper_us": 511.0
+        },
+        "qml.javascript/javascript:Activity.qml:40": {
+          "count": 379,
+          "inclusive_total_us": 1540.8999999999983,
+          "mean_us": 4.0656992084432675,
+          "max_us": 89.7,
+          "p50_upper_us": 2.830413122794295,
+          "p95_upper_us": 7.7240618613220615
+        },
+        "qml.binding/binding:Activity.qml:40": {
+          "count": 379,
+          "inclusive_total_us": 2549.400000000001,
+          "mean_us": 6.726649076517153,
+          "max_us": 95.3,
+          "p50_upper_us": 5.441961327797017,
+          "p95_upper_us": 13.67206469127474
+        },
+        "qml.javascript/javascript:Activity.qml:35": {
+          "count": 379,
+          "inclusive_total_us": 258.9,
+          "mean_us": 0.6831134564643799,
+          "max_us": 10.7,
+          "p50_upper_us": 0.6104903319492543,
+          "p95_upper_us": 1.1810154653305154
+        },
+        "qml.binding/binding:Activity.qml:35": {
+          "count": 379,
+          "inclusive_total_us": 1313.3000000000004,
+          "mean_us": 3.4651715039577846,
+          "max_us": 17.6,
+          "p50_upper_us": 2.830413122794295,
+          "p95_upper_us": 7.7240618613220615
+        },
+        "qml.javascript/javascript:Activity.qml:13": {
+          "count": 378,
+          "inclusive_total_us": 2478.7999999999997,
+          "mean_us": 6.557671957671957,
+          "max_us": 41.9,
+          "p50_upper_us": 5.441961327797017,
+          "p95_upper_us": 12.454342644059432
+        },
+        "qml.javascript/javascript:Activity.qml:11": {
+          "count": 708,
+          "inclusive_total_us": 352.2999999999994,
+          "mean_us": 0.49759887005649633,
+          "max_us": 2.6,
+          "p50_upper_us": 0.41421356237309515,
+          "p95_upper_us": 1.1810154653305154
+        },
+        "qml.javascript/javascript:Activity.qml:8": {
+          "count": 708,
+          "inclusive_total_us": 275682.4000000001,
+          "mean_us": 389.3819209039549,
+          "max_us": 15812.2,
+          "p50_upper_us": 164.99546299532923,
+          "p95_upper_us": 278.16997956230597
+        },
+        "qml.javascript/javascript:Activity.qml:31": {
+          "count": 708,
+          "inclusive_total_us": 279005.19999999984,
+          "mean_us": 394.0751412429376,
+          "max_us": 15820.8,
+          "p50_upper_us": 164.99546299532923,
+          "p95_upper_us": 290.52989049771304
+        },
+        "qml.binding/binding:Activity.qml:31": {
+          "count": 708,
+          "inclusive_total_us": 283685.6000000001,
+          "mean_us": 400.6858757062148,
+          "max_us": 15886.3,
+          "p50_upper_us": 172.34471000792226,
+          "p95_upper_us": 303.4370214406966
+        },
+        "qml.javascript/javascript:Activity.qml:30": {
+          "count": 756,
+          "inclusive_total_us": 641.6999999999988,
+          "mean_us": 0.8488095238095222,
+          "max_us": 10.8,
+          "p50_upper_us": 0.6104903319492543,
+          "p95_upper_us": 2.2209806638985086
+        },
+        "qml.binding/binding:Activity.qml:30": {
+          "count": 756,
+          "inclusive_total_us": 4045.7999999999993,
+          "mean_us": 5.3515873015873,
+          "max_us": 22.9,
+          "p50_upper_us": 4.907304583757997,
+          "p95_upper_us": 10.814609167515995
+        },
+        "qml.javascript/javascript:Activity.qml:27": {
+          "count": 378,
+          "inclusive_total_us": 2400.2000000000003,
+          "mean_us": 6.349735449735451,
+          "max_us": 54.4,
+          "p50_upper_us": 6.025008641493198,
+          "p95_upper_us": 11.883922655594034
+        },
+        "qml.binding/binding:Activity.qml:23": {
+          "count": 116,
+          "inclusive_total_us": 3028851.8999999994,
+          "mean_us": 26110.792241379306,
+          "max_us": 76126.5,
+          "p50_upper_us": 22187.12288101405,
+          "p95_upper_us": 57547.87079111228
+        },
+        "ui/Controller.notify": {
+          "count": 116,
+          "inclusive_total_us": 3842861.4999542236,
+          "mean_us": 33128.11637891572,
+          "max_us": 87510.5,
+          "p50_upper_us": 27553.493735033717,
+          "p95_upper_us": 68436.52660516299
+        },
+        "native/af_scene_pick": {
+          "count": 100,
+          "inclusive_total_us": 6223.500019073486,
+          "mean_us": 62.235000190734866,
+          "max_us": 485.4000015258789,
+          "p50_upper_us": 46.25843667006398,
+          "p95_upper_us": 116.37651753019792
+        },
+        "native/af_surface_normal": {
+          "count": 100,
+          "inclusive_total_us": 2110.0000038146973,
+          "mean_us": 21.100000038146973,
+          "max_us": 73.60000228881836,
+          "p50_upper_us": 19.749432874416154,
+          "p95_upper_us": 31.0
+        }
+      }
+    },
+    {
+      "file": "modal-0-record-0-baseline.afprofile.zip",
+      "sha256": "85df8f90e5c07a7d4606717ff93449c5158de1b68fa66e411a2667c21b371cc7",
+      "environment": {
+        "application_version": "0.1.4",
+        "python": "3.12.12",
+        "os": "Windows",
+        "os_release": "11",
+        "architecture": "AMD64",
+        "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+        "logical_cpus": 24,
+        "build": {
+          "revision": "3fa664db4a5661672a93d7d806b03c5fd78f95b0",
+          "tracked_changes": false,
+          "packaged": false,
+          "source_snapshot": true
+        }
+      },
+      "complete": true,
+      "losses": {},
+      "storage": {
+        "received": 245170,
+        "retained": 151665,
+        "evicted": 93505,
+        "oversized": 0,
+        "boundary_filtered": 3,
+        "owned_bytes": 67108780,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "requested_interval_ns": [
+        22863788152400,
+        22877832472200
+      ],
+      "profiler": {
+        "activation_wall_ns": 15683100,
+        "span_bookkeeping_inclusive_ns": 581598900,
+        "record_wall_ns": 1584419600,
+        "drain_inclusive_wall_ns": 3241507800,
+        "qt_encode_wall_ns": 856311700,
+        "qt_decode_inclusive_wall_ns": 2986665800,
+        "qt_decode_thread_cpu_ns": 2859375000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      },
+      "retained_interval_us": [
+        22868540105.35,
+        22877832298.0
+      ],
+      "frame_submission_intervals": {
+        "count": 126,
+        "inclusive_total_us": 9170027.399997711,
+        "mean_us": 72777.99523807707,
+        "max_us": 157484.20000076294,
+        "p50_upper_us": 74630.65196741454,
+        "p95_upper_us": 131071.0
+      },
+      "activity_model_events": {
+        "modelChanged": 170
+      },
+      "selected_durations": {
+        "qml.javascript/javascript:Activity.qml:23": {
+          "count": 170,
+          "inclusive_total_us": 2911507.7,
+          "mean_us": 17126.515882352942,
+          "max_us": 45961.3,
+          "p50_upper_us": 17108.381651290747,
+          "p95_upper_us": 28773.43539555614
+        },
+        "qml.creating/creating:Activity.qml:30": {
+          "count": 340,
+          "inclusive_total_us": 8726.0,
+          "mean_us": 25.66470588235294,
+          "max_us": 82.4,
+          "p50_upper_us": 19.749432874416154,
+          "p95_upper_us": 50.53569062237614
+        },
+        "qml.creating/creating:Activity.qml:31": {
+          "count": 340,
+          "inclusive_total_us": 3876.0000000000005,
+          "mean_us": 11.400000000000002,
+          "max_us": 42.9,
+          "p50_upper_us": 4.656854249492381,
+          "p95_upper_us": 25.908685288118864
+        },
+        "qml.creating/creating:Activity.qml:32": {
+          "count": 340,
+          "inclusive_total_us": 2194.499999999999,
+          "mean_us": 6.454411764705879,
+          "max_us": 47.5,
+          "p50_upper_us": 6.66082624558859,
+          "p95_upper_us": 13.67206469127474
+        },
+        "qml.creating/creating:Activity.qml:29": {
+          "count": 170,
+          "inclusive_total_us": 303.3,
+          "mean_us": 1.7841176470588236,
+          "max_us": 6.8,
+          "p50_upper_us": 1.7085110938737853,
+          "p95_upper_us": 2.668016172818685
+        },
+        "qml.creating/creating:Activity.qml:28": {
+          "count": 340,
+          "inclusive_total_us": 18981.000000000007,
+          "mean_us": 55.82647058823532,
+          "max_us": 160,
+          "p50_upper_us": 50.53569062237614,
+          "p95_upper_us": 116.37651753019792
+        },
+        "qml.creating/creating:Activity.qml:34": {
+          "count": 170,
+          "inclusive_total_us": 35938.299999999996,
+          "mean_us": 211.40176470588233,
+          "max_us": 420.6,
+          "p50_upper_us": 214.2694823049509,
+          "p95_upper_us": 290.52989049771304
+        },
+        "qml.creating/creating:Activity.qml:39": {
+          "count": 170,
+          "inclusive_total_us": 10720.1,
+          "mean_us": 63.059411764705885,
+          "max_us": 186,
+          "p50_upper_us": 55.20006913194558,
+          "p95_upper_us": 132.66704415070896
+        },
+        "qml.creating/creating:Activity.qml:25": {
+          "count": 340,
+          "inclusive_total_us": 71364.7,
+          "mean_us": 209.89617647058822,
+          "max_us": 694.1,
+          "p50_upper_us": 55.20006913194558,
+          "p95_upper_us": 533.6681766028358
+        },
+        "qml.javascript/javascript:Activity.qml:40": {
+          "count": 170,
+          "inclusive_total_us": 897.6000000000003,
+          "mean_us": 5.280000000000001,
+          "max_us": 12.4,
+          "p50_upper_us": 5.168843301631763,
+          "p95_upper_us": 9.374716437208077
+        },
+        "qml.binding/binding:Activity.qml:40": {
+          "count": 170,
+          "inclusive_total_us": 1294.1000000000004,
+          "mean_us": 7.612352941176472,
+          "max_us": 21.7,
+          "p50_upper_us": 7.0,
+          "p95_upper_us": 14.32165249117718
+        },
+        "qml.javascript/javascript:Activity.qml:35": {
+          "count": 170,
+          "inclusive_total_us": 145.59999999999997,
+          "mean_us": 0.8564705882352939,
+          "max_us": 2.6,
+          "p50_upper_us": 0.8340080864093424,
+          "p95_upper_us": 1.378414230005442
+        },
+        "qml.binding/binding:Activity.qml:35": {
+          "count": 170,
+          "inclusive_total_us": 451.6000000000001,
+          "mean_us": 2.656470588235295,
+          "max_us": 173.7,
+          "p50_upper_us": 1.483715624146968,
+          "p95_upper_us": 2.668016172818685
+        },
+        "qml.javascript/javascript:Activity.qml:32": {
+          "count": 574,
+          "inclusive_total_us": 183832.9,
+          "mean_us": 320.2663763066202,
+          "max_us": 11284.9,
+          "p50_upper_us": 13.67206469127474,
+          "p95_upper_us": 89.50966799187809
+        },
+        "qml.binding/binding:Activity.qml:32": {
+          "count": 574,
+          "inclusive_total_us": 187909.90000000023,
+          "mean_us": 327.3691637630666,
+          "max_us": 11287.6,
+          "p50_upper_us": 24.76784531118807,
+          "p95_upper_us": 97.70149282610821
+        },
+        "qml.javascript/javascript:Activity.qml:13": {
+          "count": 170,
+          "inclusive_total_us": 1518.8000000000004,
+          "mean_us": 8.934117647058827,
+          "max_us": 31.4,
+          "p50_upper_us": 8.110309078053533,
+          "p95_upper_us": 14.32165249117718
+        },
+        "qml.javascript/javascript:Activity.qml:11": {
+          "count": 224,
+          "inclusive_total_us": 173.00000000000009,
+          "mean_us": 0.7723214285714289,
+          "max_us": 1.9,
+          "p50_upper_us": 0.8340080864093424,
+          "p95_upper_us": 1.378414230005442
+        },
+        "qml.javascript/javascript:Activity.qml:8": {
+          "count": 224,
+          "inclusive_total_us": 161066.1000000001,
+          "mean_us": 719.0450892857147,
+          "max_us": 26433.3,
+          "p50_upper_us": 172.34471000792226,
+          "p95_upper_us": 4276.345412822687
+        },
+        "qml.javascript/javascript:Activity.qml:31": {
+          "count": 224,
+          "inclusive_total_us": 162350.79999999993,
+          "mean_us": 724.7803571428568,
+          "max_us": 26444.1,
+          "p50_upper_us": 180.01933598375618,
+          "p95_upper_us": 4276.345412822687
+        },
+        "qml.binding/binding:Activity.qml:31": {
+          "count": 224,
+          "inclusive_total_us": 164878.2,
+          "mean_us": 736.063392857143,
+          "max_us": 26500.7,
+          "p50_upper_us": 188.03374668025592,
+          "p95_upper_us": 4276.345412822687
+        },
+        "qml.javascript/javascript:Activity.qml:30": {
+          "count": 340,
+          "inclusive_total_us": 356.79999999999984,
+          "mean_us": 1.0494117647058818,
+          "max_us": 5.5,
+          "p50_upper_us": 0.7562521603732995,
+          "p95_upper_us": 3.5551545390267663
+        },
+        "qml.binding/binding:Activity.qml:30": {
+          "count": 340,
+          "inclusive_total_us": 2167.3,
+          "mean_us": 6.374411764705883,
+          "max_us": 34.7,
+          "p50_upper_us": 5.441961327797017,
+          "p95_upper_us": 11.883922655594034
+        },
+        "qml.javascript/javascript:Activity.qml:27": {
+          "count": 170,
+          "inclusive_total_us": 1475.9000000000005,
+          "mean_us": 8.681764705882356,
+          "max_us": 17.8,
+          "p50_upper_us": 8.110309078053533,
+          "p95_upper_us": 14.32165249117718
+        },
+        "qml.binding/binding:Activity.qml:23": {
+          "count": 170,
+          "inclusive_total_us": 3656286.5000000014,
+          "mean_us": 21507.567647058833,
+          "max_us": 64182.9,
+          "p50_upper_us": 19482.96937220458,
+          "p95_upper_us": 40692.196786023924
+        },
+        "ui/Controller.notify": {
+          "count": 170,
+          "inclusive_total_us": 4842305.099998474,
+          "mean_us": 28484.14764704985,
+          "max_us": 79895.10000228882,
+          "p50_upper_us": 24195.319575072757,
+          "p95_upper_us": 55107.98747006743
+        },
+        "native/af_scene_pick": {
+          "count": 122,
+          "inclusive_total_us": 22035.09999847412,
+          "mean_us": 180.6155737579846,
+          "max_us": 9188.099998474121,
+          "p50_upper_us": 48.350746413054104,
+          "p95_upper_us": 205.14276248950455
+        },
+        "native/af_surface_normal": {
+          "count": 122,
+          "inclusive_total_us": 6772.900005340576,
+          "mean_us": 55.515573814267015,
+          "max_us": 3217.1000022888184,
+          "p50_upper_us": 21.627416997969522,
+          "p95_upper_us": 55.20006913194558
+        }
+      }
+    },
+    {
+      "file": "modal-0-record-1-candidate.afprofile.zip",
+      "sha256": "06b2936aa753bb2492adfd9b44fc1c081dfc909d23884804161fb601f43e9370",
+      "environment": {
+        "application_version": "0.1.5",
+        "python": "3.12.12",
+        "os": "Windows",
+        "os_release": "11",
+        "architecture": "AMD64",
+        "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+        "logical_cpus": 24,
+        "build": {
+          "revision": "a4501beab3670c3e673aab335601786953290349",
+          "tracked_changes": true,
+          "packaged": false
+        }
+      },
+      "complete": true,
+      "losses": {},
+      "storage": {
+        "received": 180427,
+        "retained": 150589,
+        "evicted": 29838,
+        "oversized": 0,
+        "boundary_filtered": 7,
+        "owned_bytes": 67108802,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "requested_interval_ns": [
+        22895871141900,
+        22903595513500
+      ],
+      "profiler": {
+        "activation_wall_ns": 15517900,
+        "span_bookkeeping_inclusive_ns": 524565200,
+        "record_wall_ns": 1054935700,
+        "drain_inclusive_wall_ns": 2035274500,
+        "qt_encode_wall_ns": 583339200,
+        "qt_decode_inclusive_wall_ns": 1962832700,
+        "qt_decode_thread_cpu_ns": 2000000000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      },
+      "retained_interval_us": [
+        22897007641.6,
+        22903595397.8
+      ],
+      "frame_submission_intervals": {
+        "count": 153,
+        "inclusive_total_us": 6502120.5,
+        "mean_us": 42497.51960784314,
+        "max_us": 100203.70000076294,
+        "p50_upper_us": 38966.93874440916,
+        "p95_upper_us": 88751.4915240562
+      },
+      "activity_model_events": {
+        "rowsRemoved": 202,
+        "rowsInserted": 202,
+        "dataChanged": 824
+      },
+      "selected_durations": {
+        "ui/Controller.notify": {
+          "count": 232,
+          "inclusive_total_us": 853929.9000167847,
+          "mean_us": 3680.732327658555,
+          "max_us": 51928.09999847412,
+          "p50_upper_us": 2047.0,
+          "p95_upper_us": 17865.878691987582
+        },
+        "native/af_scene_pick": {
+          "count": 122,
+          "inclusive_total_us": 12425.900009155273,
+          "mean_us": 101.85163941930551,
+          "max_us": 3767.5,
+          "p50_upper_us": 38.73944998635149,
+          "p95_upper_us": 278.16997956230597
+        },
+        "native/af_surface_normal": {
+          "count": 122,
+          "inclusive_total_us": 2586.400016784668,
+          "mean_us": 21.200000137579245,
+          "max_us": 262.70000076293945,
+          "p50_upper_us": 18.027313840043536,
+          "p95_upper_us": 27.10003456597279
+        }
+      }
+    },
+    {
+      "file": "modal-1-record-0-candidate.afprofile.zip",
+      "sha256": "ce9660eb0c3b6e6b275806d692a74df398d27b3b8857a277d35f01fe5de6ead7",
+      "environment": {
+        "application_version": "0.1.5",
+        "python": "3.12.12",
+        "os": "Windows",
+        "os_release": "11",
+        "architecture": "AMD64",
+        "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+        "logical_cpus": 24,
+        "build": {
+          "revision": "a4501beab3670c3e673aab335601786953290349",
+          "tracked_changes": true,
+          "packaged": false
+        }
+      },
+      "complete": true,
+      "losses": {},
+      "storage": {
+        "received": 248894,
+        "retained": 151851,
+        "evicted": 97043,
+        "oversized": 0,
+        "boundary_filtered": 6,
+        "owned_bytes": 67108712,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "requested_interval_ns": [
+        22972175452500,
+        22981684331900
+      ],
+      "profiler": {
+        "activation_wall_ns": 15185700,
+        "span_bookkeeping_inclusive_ns": 584368300,
+        "record_wall_ns": 1559383000,
+        "drain_inclusive_wall_ns": 3049779500,
+        "qt_encode_wall_ns": 838468100,
+        "qt_decode_inclusive_wall_ns": 2896511700,
+        "qt_decode_thread_cpu_ns": 2843750000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      },
+      "retained_interval_us": [
+        22975557549.95,
+        22981684232.7
+      ],
+      "frame_submission_intervals": {
+        "count": 124,
+        "inclusive_total_us": 6088747.099998474,
+        "mean_us": 49102.799193536084,
+        "max_us": 138309.5,
+        "p50_upper_us": 42493.838526804284,
+        "p95_upper_us": 105544.09439462633
+      },
+      "activity_model_events": {
+        "rowsRemoved": 143,
+        "rowsInserted": 143,
+        "dataChanged": 594
+      },
+      "selected_durations": {
+        "qml.javascript/javascript:Activity.qml:32": {
+          "count": 2335,
+          "inclusive_total_us": 91860.59999999983,
+          "mean_us": 39.34072805139179,
+          "max_us": 12120.7,
+          "p50_upper_us": 17.220618156107065,
+          "p95_upper_us": 38.73944998635149
+        },
+        "qml.binding/binding:Activity.qml:32": {
+          "count": 2335,
+          "inclusive_total_us": 98880.10000000002,
+          "mean_us": 42.34693790149894,
+          "max_us": 12128.8,
+          "p50_upper_us": 19.749432874416154,
+          "p95_upper_us": 40.49886574883231
+        },
+        "qml.javascript/javascript:Activity.qml:30": {
+          "count": 687,
+          "inclusive_total_us": 787.8999999999988,
+          "mean_us": 1.1468704512372618,
+          "max_us": 6.1,
+          "p50_upper_us": 1.0,
+          "p95_upper_us": 2.512504320746599
+        },
+        "qml.binding/binding:Activity.qml:30": {
+          "count": 687,
+          "inclusive_total_us": 11850.300000000001,
+          "mean_us": 17.24934497816594,
+          "max_us": 189.7,
+          "p50_upper_us": 6.025008641493198,
+          "p95_upper_us": 57.68825876509896
+        },
+        "qml.javascript/javascript:Activity.qml:31": {
+          "count": 628,
+          "inclusive_total_us": 4637.899999999994,
+          "mean_us": 7.385191082802539,
+          "max_us": 1856.7,
+          "p50_upper_us": 4.187358218604039,
+          "p95_upper_us": 8.513656920021768
+        },
+        "qml.binding/binding:Activity.qml:31": {
+          "count": 628,
+          "inclusive_total_us": 16463.900000000005,
+          "mean_us": 26.21640127388536,
+          "max_us": 1909.9,
+          "p50_upper_us": 18.027313840043536,
+          "p95_upper_us": 52.81737057623773
+        },
+        "qml.javascript/javascript:Activity.qml:41": {
+          "count": 368,
+          "inclusive_total_us": 467.3000000000001,
+          "mean_us": 1.2698369565217396,
+          "max_us": 7.3,
+          "p50_upper_us": 1.378414230005442,
+          "p95_upper_us": 2.830413122794295
+        },
+        "qml.binding/binding:Activity.qml:41": {
+          "count": 368,
+          "inclusive_total_us": 2889.8000000000015,
+          "mean_us": 7.852717391304352,
+          "max_us": 24.6,
+          "p50_upper_us": 4.417022187747571,
+          "p95_upper_us": 18.869724993175744
+        },
+        "ui/Controller.notify": {
+          "count": 171,
+          "inclusive_total_us": 651988.2999610901,
+          "mean_us": 3812.7970757958483,
+          "max_us": 42922.89999771118,
+          "p50_upper_us": 2542.3247991264952,
+          "p95_upper_us": 6048.079893768189
+        },
+        "qml.creating/creating:Activity.qml:30": {
+          "count": 474,
+          "inclusive_total_us": 6264.700000000007,
+          "mean_us": 13.216666666666681,
+          "max_us": 66.2,
+          "p50_upper_us": 10.814609167515995,
+          "p95_upper_us": 32.41676103767724
+        },
+        "qml.creating/creating:Activity.qml:31": {
+          "count": 474,
+          "inclusive_total_us": 4855.100000000002,
+          "mean_us": 10.242827004219414,
+          "max_us": 452.6,
+          "p50_upper_us": 4.656854249492381,
+          "p95_upper_us": 21.627416997969522
+        },
+        "qml.creating/creating:Activity.qml:32": {
+          "count": 474,
+          "inclusive_total_us": 3050.800000000003,
+          "mean_us": 6.43628691983123,
+          "max_us": 82.8,
+          "p50_upper_us": 6.025008641493198,
+          "p95_upper_us": 13.67206469127474
+        },
+        "qml.creating/creating:Activity.qml:29": {
+          "count": 237,
+          "inclusive_total_us": 390.29999999999995,
+          "mean_us": 1.6468354430379746,
+          "max_us": 4.4,
+          "p50_upper_us": 1.7085110938737853,
+          "p95_upper_us": 2.512504320746599
+        },
+        "qml.creating/creating:Activity.qml:28": {
+          "count": 474,
+          "inclusive_total_us": 19702.100000000013,
+          "mean_us": 41.56561181434602,
+          "max_us": 596.7,
+          "p50_upper_us": 33.896247445288246,
+          "p95_upper_us": 85.67235500396113
+        },
+        "qml.creating/creating:Activity.qml:34": {
+          "count": 237,
+          "inclusive_total_us": 40179.999999999985,
+          "mean_us": 169.53586497890288,
+          "max_us": 454.2,
+          "p50_upper_us": 144.76494524885652,
+          "p95_upper_us": 330.99092599065847
+        },
+        "qml.creating/creating:Activity.qml:40": {
+          "count": 237,
+          "inclusive_total_us": 18304.499999999993,
+          "mean_us": 77.23417721518985,
+          "max_us": 917.4,
+          "p50_upper_us": 63.0,
+          "p95_upper_us": 157.95779994540595
+        },
+        "qml.creating/creating:Activity.qml:14": {
+          "count": 474,
+          "inclusive_total_us": 83397.90000000005,
+          "mean_us": 175.94493670886087,
+          "max_us": 1256.6,
+          "p50_upper_us": 102.07138124475227,
+          "p95_upper_us": 533.6681766028358
+        },
+        "qml.javascript/javascript:Activity.qml:35": {
+          "count": 237,
+          "inclusive_total_us": 159.19999999999993,
+          "mean_us": 0.6717299578059068,
+          "max_us": 2.3,
+          "p50_upper_us": 0.6104903319492543,
+          "p95_upper_us": 1.0
+        },
+        "qml.binding/binding:Activity.qml:35": {
+          "count": 237,
+          "inclusive_total_us": 600.1,
+          "mean_us": 2.532067510548523,
+          "max_us": 7.9,
+          "p50_upper_us": 2.363585661014858,
+          "p95_upper_us": 4.656854249492381
+        },
+        "qml.javascript/javascript:Activity.qml:27": {
+          "count": 237,
+          "inclusive_total_us": 1278.7,
+          "mean_us": 5.39535864978903,
+          "max_us": 15.6,
+          "p50_upper_us": 5.441961327797017,
+          "p95_upper_us": 8.934862496587872
+        },
+        "qml.javascript/javascript:Activity.qml:26": {
+          "count": 237,
+          "inclusive_total_us": 145.99999999999997,
+          "mean_us": 0.6160337552742615,
+          "max_us": 4.1,
+          "p50_upper_us": 0.6104903319492543,
+          "p95_upper_us": 1.0
+        },
+        "qml.javascript/javascript:Activity.qml:36": {
+          "count": 237,
+          "inclusive_total_us": 135.49999999999991,
+          "mean_us": 0.5717299578059069,
+          "max_us": 1.6,
+          "p50_upper_us": 0.5422108254079407,
+          "p95_upper_us": 0.9152065613971474
+        },
+        "qml.javascript/javascript:Activity.qml:42": {
+          "count": 237,
+          "inclusive_total_us": 132.39999999999998,
+          "mean_us": 0.5586497890295358,
+          "max_us": 1.3,
+          "p50_upper_us": 0.5422108254079407,
+          "p95_upper_us": 0.9152065613971474
+        },
+        "native/af_scene_pick": {
+          "count": 122,
+          "inclusive_total_us": 20398.700004577637,
+          "mean_us": 167.20245905391505,
+          "max_us": 5020.599998474121,
+          "p50_upper_us": 40.49886574883231,
+          "p95_upper_us": 93.51687334012796
+        },
+        "native/af_surface_normal": {
+          "count": 122,
+          "inclusive_total_us": 5602.7999839782715,
+          "mean_us": 45.92459003260878,
+          "max_us": 2979.3999977111816,
+          "p50_upper_us": 19.749432874416154,
+          "p95_upper_us": 40.49886574883231
+        }
+      }
+    },
+    {
+      "file": "modal-1-record-1-baseline.afprofile.zip",
+      "sha256": "21de3a60deb863fab48d5683f58a4d85df030db4a228c382cc453bf013d3befc",
+      "environment": {
+        "application_version": "0.1.4",
+        "python": "3.12.12",
+        "os": "Windows",
+        "os_release": "11",
+        "architecture": "AMD64",
+        "cpu": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+        "logical_cpus": 24,
+        "build": {
+          "revision": "3fa664db4a5661672a93d7d806b03c5fd78f95b0",
+          "tracked_changes": false,
+          "packaged": false,
+          "source_snapshot": true
+        }
+      },
+      "complete": true,
+      "losses": {},
+      "storage": {
+        "received": 335205,
+        "retained": 152180,
+        "evicted": 183025,
+        "oversized": 0,
+        "boundary_filtered": 2116,
+        "owned_bytes": 67108719,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "requested_interval_ns": [
+        23002284710500,
+        23018056385800
+      ],
+      "profiler": {
+        "activation_wall_ns": 14978900,
+        "span_bookkeeping_inclusive_ns": 556423400,
+        "record_wall_ns": 2092067600,
+        "drain_inclusive_wall_ns": 4349654900,
+        "qt_encode_wall_ns": 1174160900,
+        "qt_decode_inclusive_wall_ns": 3970607900,
+        "qt_decode_thread_cpu_ns": 3968750000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      },
+      "retained_interval_us": [
+        23010645141.2,
+        23018056205.5
+      ],
+      "frame_submission_intervals": {
+        "count": 78,
+        "inclusive_total_us": 7314991.5,
+        "mean_us": 93781.94230769231,
+        "max_us": 157069.90000152588,
+        "p50_upper_us": 96784.27830029103,
+        "p95_upper_us": 155870.75497763665
+      },
+      "activity_model_events": {
+        "modelChanged": 124
+      },
+      "selected_durations": {
+        "qml.javascript/javascript:Activity.qml:32": {
+          "count": 1548,
+          "inclusive_total_us": 246993.69999999992,
+          "mean_us": 159.55665374676997,
+          "max_us": 11347.5,
+          "p50_upper_us": 13.67206469127474,
+          "p95_upper_us": 52.81737057623773
+        },
+        "qml.binding/binding:Activity.qml:32": {
+          "count": 1548,
+          "inclusive_total_us": 253984.29999999984,
+          "mean_us": 164.07254521963813,
+          "max_us": 11354.4,
+          "p50_upper_us": 19.749432874416154,
+          "p95_upper_us": 57.68825876509896
+        },
+        "qml.javascript/javascript:Activity.qml:23": {
+          "count": 124,
+          "inclusive_total_us": 2115815.399999999,
+          "mean_us": 17063.027419354832,
+          "max_us": 51532,
+          "p50_upper_us": 17108.381651290747,
+          "p95_upper_us": 22187.12288101405
+        },
+        "qml.creating/creating:Activity.qml:30": {
+          "count": 774,
+          "inclusive_total_us": 11121.499999999996,
+          "mean_us": 14.368863049095603,
+          "max_us": 72.4,
+          "p50_upper_us": 10.814609167515995,
+          "p95_upper_us": 40.49886574883231
+        },
+        "qml.creating/creating:Activity.qml:31": {
+          "count": 774,
+          "inclusive_total_us": 6709.700000000001,
+          "mean_us": 8.668863049095608,
+          "max_us": 82.2,
+          "p50_upper_us": 7.7240618613220615,
+          "p95_upper_us": 23.675373206527052
+        },
+        "qml.creating/creating:Activity.qml:32": {
+          "count": 774,
+          "inclusive_total_us": 5128.7999999999965,
+          "mean_us": 6.626356589147282,
+          "max_us": 445.1,
+          "p50_upper_us": 5.727171322029716,
+          "p95_upper_us": 13.67206469127474
+        },
+        "qml.creating/creating:Activity.qml:29": {
+          "count": 387,
+          "inclusive_total_us": 558.6999999999998,
+          "mean_us": 1.4436692506459943,
+          "max_us": 8.9,
+          "p50_upper_us": 1.378414230005442,
+          "p95_upper_us": 2.363585661014858
+        },
+        "qml.creating/creating:Activity.qml:28": {
+          "count": 774,
+          "inclusive_total_us": 31752.499999999978,
+          "mean_us": 41.0239018087855,
+          "max_us": 486.2,
+          "p50_upper_us": 32.41676103767724,
+          "p95_upper_us": 102.07138124475227
+        },
+        "qml.creating/creating:Activity.qml:34": {
+          "count": 387,
+          "inclusive_total_us": 26128.199999999993,
+          "mean_us": 67.51472868217053,
+          "max_us": 428.5,
+          "p50_upper_us": 60.28660996470872,
+          "p95_upper_us": 121.57321992941743
+        },
+        "qml.creating/creating:Activity.qml:39": {
+          "count": 387,
+          "inclusive_total_us": 10964.800000000007,
+          "mean_us": 28.332816537467718,
+          "max_us": 342.5,
+          "p50_upper_us": 25.908685288118864,
+          "p95_upper_us": 44.254833995939045
+        },
+        "qml.creating/creating:Activity.qml:25": {
+          "count": 774,
+          "inclusive_total_us": 76237.50000000001,
+          "mean_us": 98.49806201550389,
+          "max_us": 599,
+          "p50_upper_us": 89.50966799187809,
+          "p95_upper_us": 290.52989049771304
+        },
+        "qml.javascript/javascript:Activity.qml:40": {
+          "count": 387,
+          "inclusive_total_us": 1342.7999999999993,
+          "mean_us": 3.4697674418604634,
+          "max_us": 9.7,
+          "p50_upper_us": 2.668016172818685,
+          "p95_upper_us": 7.7240618613220615
+        },
+        "qml.binding/binding:Activity.qml:40": {
+          "count": 387,
+          "inclusive_total_us": 2369.500000000001,
+          "mean_us": 6.122739018087858,
+          "max_us": 184.4,
+          "p50_upper_us": 4.907304583757997,
+          "p95_upper_us": 12.454342644059432
+        },
+        "qml.javascript/javascript:Activity.qml:35": {
+          "count": 387,
+          "inclusive_total_us": 246.40000000000023,
+          "mean_us": 0.6366925064599489,
+          "max_us": 2.6,
+          "p50_upper_us": 0.6104903319492543,
+          "p95_upper_us": 1.1810154653305154
+        },
+        "qml.binding/binding:Activity.qml:35": {
+          "count": 387,
+          "inclusive_total_us": 987.0000000000007,
+          "mean_us": 2.5503875968992267,
+          "max_us": 7.1,
+          "p50_upper_us": 2.2209806638985086,
+          "p95_upper_us": 5.168843301631763
+        },
+        "qml.javascript/javascript:Activity.qml:13": {
+          "count": 387,
+          "inclusive_total_us": 2541.9000000000015,
+          "mean_us": 6.568217054263569,
+          "max_us": 38.4,
+          "p50_upper_us": 5.441961327797017,
+          "p95_upper_us": 13.67206469127474
+        },
+        "qml.javascript/javascript:Activity.qml:11": {
+          "count": 729,
+          "inclusive_total_us": 357.89999999999986,
+          "mean_us": 0.490946502057613,
+          "max_us": 2.8,
+          "p50_upper_us": 0.41421356237309515,
+          "p95_upper_us": 1.1810154653305154
+        },
+        "qml.javascript/javascript:Activity.qml:8": {
+          "count": 729,
+          "inclusive_total_us": 224040.2000000002,
+          "mean_us": 307.3253772290812,
+          "max_us": 10208.1,
+          "p50_upper_us": 157.95779994540595,
+          "p95_upper_us": 330.99092599065847
+        },
+        "qml.javascript/javascript:Activity.qml:31": {
+          "count": 729,
+          "inclusive_total_us": 229492.59999999998,
+          "mean_us": 314.80466392318243,
+          "max_us": 10235.3,
+          "p50_upper_us": 164.99546299532923,
+          "p95_upper_us": 345.6894200158445
+        },
+        "qml.binding/binding:Activity.qml:31": {
+          "count": 729,
+          "inclusive_total_us": 234040.4000000002,
+          "mean_us": 321.0430727023322,
+          "max_us": 10248.2,
+          "p50_upper_us": 164.99546299532923,
+          "p95_upper_us": 377.06749336051183
+        },
+        "qml.javascript/javascript:Activity.qml:30": {
+          "count": 774,
+          "inclusive_total_us": 633.5999999999991,
+          "mean_us": 0.8186046511627896,
+          "max_us": 5.5,
+          "p50_upper_us": 0.6104903319492543,
+          "p95_upper_us": 2.0844216508158815
+        },
+        "qml.binding/binding:Activity.qml:30": {
+          "count": 774,
+          "inclusive_total_us": 4059.999999999999,
+          "mean_us": 5.24547803617571,
+          "max_us": 36.3,
+          "p50_upper_us": 4.656854249492381,
+          "p95_upper_us": 10.313708498984761
+        },
+        "qml.javascript/javascript:Activity.qml:27": {
+          "count": 387,
+          "inclusive_total_us": 3270.1999999999994,
+          "mean_us": 8.450129198966406,
+          "max_us": 912.7,
+          "p50_upper_us": 5.727171322029716,
+          "p95_upper_us": 12.454342644059432
+        },
+        "qml.binding/binding:Activity.qml:23": {
+          "count": 124,
+          "inclusive_total_us": 3036931.099999998,
+          "mean_us": 24491.379838709665,
+          "max_us": 59291.1,
+          "p50_upper_us": 22187.12288101405,
+          "p95_upper_us": 52771.547197313164
+        },
+        "ui/Controller.notify": {
+          "count": 124,
+          "inclusive_total_us": 3827889.5000190735,
+          "mean_us": 30870.076613057045,
+          "max_us": 98225.29999923706,
+          "p50_upper_us": 26385.273598656582,
+          "p95_upper_us": 62756.488603861726
+        },
+        "native/af_scene_pick": {
+          "count": 110,
+          "inclusive_total_us": 13514.800018310547,
+          "mean_us": 122.8618183482777,
+          "max_us": 5679.700000762939,
+          "p50_upper_us": 42.336177501980565,
+          "p95_upper_us": 106.63474115247546
+        },
+        "native/af_surface_normal": {
+          "count": 110,
+          "inclusive_total_us": 9789.000011444092,
+          "mean_us": 88.99090919494628,
+          "max_us": 5652.099998474121,
+          "p50_upper_us": 19.749432874416154,
+          "p95_upper_us": 31.0
+        }
+      }
+    }
+  ],
+  "final_confirmation": [
+    {
+      "file": "drag-False.json",
+      "sha256": "b5382e1d7a29c0787a3f4d0e6cbc9c64acb0ed8959c15fe08b71d4db200e291a",
+      "version": "0.1.5",
+      "activity_open": false,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.2523662903409739,
+        "application_cpu_seconds": 6.203125,
+        "wall_seconds": 5.7044336999970255,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 12.68344749996686,
+            "p95": 15.540120000150637,
+            "maximum": 30.871400002070004
+          },
+          "frame_ms": {
+            "count": 78,
+            "mean": 26.802819230793737,
+            "p95": 48.82438499971612,
+            "maximum": 55.201100003614556
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.11915999995108,
+            "p95": 16.034029998445476,
+            "maximum": 16.750799997680588
+          },
+          "frame_ms": {
+            "count": 76,
+            "mean": 28.21285394738401,
+            "p95": 42.2595750014807,
+            "maximum": 55.23470000116504
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "drag-True.json",
+      "sha256": "b5374c26cd154bc8d2c67238aa0d1f1761dba8255b10c7bb3bd440b696e388fa",
+      "version": "0.1.5",
+      "activity_open": true,
+      "interaction": "drag",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.2879398050021196,
+        "application_cpu_seconds": 6.5,
+        "wall_seconds": 6.150824100001046,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 12.19073499987644,
+            "p95": 15.404560001115895,
+            "maximum": 28.069599997252226
+          },
+          "frame_ms": {
+            "count": 79,
+            "mean": 27.242463291143775,
+            "p95": 49.15738000127021,
+            "maximum": 55.666399999608984
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.897479999832285,
+            "p95": 17.635830000654096,
+            "maximum": 23.7715000002936
+          },
+          "frame_ms": {
+            "count": 72,
+            "mean": 34.10862361114495,
+            "p95": 56.562089998988085,
+            "maximum": 74.02340000044205
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-False.json",
+      "sha256": "f2dd23169ad5ffe1d2d91eb31e37d41544c99fd7e860309133e6c9a0e4579259",
+      "version": "0.1.5",
+      "activity_open": false,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.33544776119402986,
+        "application_cpu_seconds": 5.578125,
+        "wall_seconds": 5.238399399997434,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 12.80061333300182,
+            "p95": 15.388375001020904,
+            "maximum": 28.654499998083338
+          },
+          "frame_ms": {
+            "count": 77,
+            "mean": 25.43058571429899,
+            "p95": 39.5449199990253,
+            "maximum": 55.562099998496706
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.535235000078197,
+            "p95": 16.51642500055459,
+            "maximum": 17.708600000332808
+          },
+          "frame_ms": {
+            "count": 85,
+            "mean": 24.1504823529634,
+            "p95": 41.505439998582006,
+            "maximum": 61.20300000111456
+          },
+          "jobs": 120
+        }
+      ]
+    },
+    {
+      "file": "modal-True.json",
+      "sha256": "80fa67e05892e6e213a1e532a1c0b687aa01e2a2054c9bdec00532270ed43d8e",
+      "version": "0.1.5",
+      "activity_open": true,
+      "interaction": "modal",
+      "mode": "dormant",
+      "system_load": {
+        "system_busy_fraction": 0.328028293545535,
+        "application_cpu_seconds": 6.296875,
+        "wall_seconds": 5.885115000000951,
+        "note": "System busy includes this app; other processes and thermal state are uncontrolled."
+      },
+      "trials": [
+        {
+          "snapping": false,
+          "snap_hits": 0,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 13.319965833306924,
+            "p95": 15.959684999506862,
+            "maximum": 28.557900001032976
+          },
+          "frame_ms": {
+            "count": 88,
+            "mean": 26.536902272709995,
+            "p95": 46.81900499999753,
+            "maximum": 58.48379999952158
+          },
+          "jobs": 120
+        },
+        {
+          "snapping": true,
+          "snap_hits": 120,
+          "events": 120,
+          "handler_ms": {
+            "count": 120,
+            "mean": 14.174594166494595,
+            "p95": 16.95420499818283,
+            "maximum": 19.141200002195546
+          },
+          "frame_ms": {
+            "count": 73,
+            "mean": 31.925926027438372,
+            "p95": 50.56748000133664,
+            "maximum": 61.60280000040075
+          },
+          "jobs": 120
+        }
+      ]
+    }
+  ]
+}

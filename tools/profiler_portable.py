@@ -3,6 +3,8 @@
 import json
 from zipfile import ZipFile
 
+from anthroforge import __version__
+
 
 def validate(path, desktop):
     with ZipFile(path) as archive:
@@ -11,7 +13,7 @@ def validate(path, desktop):
     manifest, summary = data["manifest.json"], data["summary.json"]
     assert manifest["schema_version"] == 1 and manifest["complete"], manifest
     assert manifest["environment"]["build"]["packaged"]
-    assert manifest["environment"]["application_version"] == "0.1.4"
+    assert manifest["environment"]["application_version"] == __version__
     verify_capabilities(manifest, desktop)
     verify_durations(summary, desktop)
     verify_events(data["trace.json"]["traceEvents"])
@@ -28,7 +30,7 @@ def verify_capabilities(manifest, desktop):
 def verify_durations(summary, desktop):
     keys = summary["durations"]
     assert (
-        any("Activity.qml" in k for k in keys)
+        any(k.startswith("qml.binding/") and "Main.qml" in k for k in keys)
         if desktop
         else any(k.startswith("native/") for k in keys)
     )

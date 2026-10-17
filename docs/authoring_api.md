@@ -1,4 +1,4 @@
-# Local authoring API, version 0.1.4
+# Local authoring API, version 0.1.5
 
 The desktop and JSON clients call application/commands.py. A request has operation,
 arguments (an object) and optionally id. Success responses contain ok, revision and

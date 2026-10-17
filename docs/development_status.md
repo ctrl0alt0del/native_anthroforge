@@ -441,3 +441,58 @@ save/reopen, rendering and GUI startup passed. Packaged QML and both native DLLs
 tested sources/build. The packaged desktop capture was visually inspected; qualification
 results and captures are under `build/view-gesture-review/portable`. The detailed gesture
 acceptance above runs against the source application, separately from portable smoke checks.
+
+## Codex Cloud preparation (2026-10-17)
+
+Revision `cb51bbc` passed [remote Linux and Windows qualification](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39039142051).
+Both jobs built the portable C++ library and passed CTest, all **396 pytest tests**, the
+separate primitive/deformer CLI save/reopen workshop, and Python wheel/source packaging.
+Ubuntu 24.04 ran the exact `tools/cloud/setup.sh`, including host library checks,
+ShellCheck and clang-tidy, then successfully ran refresh in a separate shell.
+Windows Server ran the same core gate. The local Windows development gate also passed
+396 tests, native/PowerShell style checks, optional numerical imports and native loading.
+
+The clean runners exposed platform-specific file-lock typing and compiler diagnostics
+inside imported Happly, Eigen and the preserved addon attachment kernel. The fixes keep
+warnings scoped to those include boundaries; authored native code retains warnings as
+errors. The algorithms and immutable migration reference were not changed.
+
+The actual Codex Cloud setup exposed an unprivileged base image without sudo and a
+read-only home binary/cache location. Setup now uses pinned uv, Python, validation tools
+and cache under the checkout. It can use existing compiler/runtime libraries, checks
+that they load, and retains the complete gate. It does not silently skip missing tools.
+The `cloud` dependency group pins clang-tidy and ShellCheck without changing runtime
+dependencies or requiring Linux desktop release support.
+
+Ownership review: shell scripts own environment preparation and refresh; `check_core.py`
+owns the cross-platform validation sequence; storage owns platform-specific locking;
+native include adapters own imported compiler accommodations. Application scheduling,
+geometry algorithms and UI behavior are unchanged. Cloud/core checks do not certify
+Windows GUI gestures, GPU behavior, standalone executable packaging or new anatomy.
+Account environment publication and a fresh-task check are tracked separately from CI.
+
+The actual Codex Cloud setup session also passed at `cb51bbc` on Linux/glibc 2.41:
+`bash tools/cloud/setup.sh` exited zero in 136 seconds; its JUnit report recorded 396 tests,
+zero failures/errors/skips (4.349 seconds). The report confirmed the owned native library,
+Python 3.12.12, NumPy 1.26.4, PySide6 6.12.0 and native style checking. Refresh and native
+loading passed in a new shell, with no tracked changes. This was a fresh setup after the
+first trial's executor became unavailable, not a report inferred from GitHub CI.
+
+The environment was published as **AnthroForge Standalone**, with **Only me** visibility.
+A fresh task then loaded the preserved uv 0.9.29, Python 3.12.12 and native ABI 1 without
+setup or dependency installation, and passed the entire gate with `UV_OFFLINE=1` and
+Python downloads disabled: **396 passed, zero errors/failures/skips** (4.520 seconds).
+Native contracts/style, CLI save/reopen and wheel/source checks passed; Git remained clean.
+
+Offline refresh could not resolve the editable-build helper `editables` from cache. Normal
+refresh initially hit the default shell sandbox's network restriction. Retrying through
+the runtime's supported additional network-permission path passed with the Package managers
+allowlist enforced. Separate-shell doctor and the CLI workshop passed afterward. This did
+not change security settings, source files or Git remotes. Dependency refresh may require
+package access; fully offline dependency changes are not a promised capability.
+
+Account evidence: [setup session](https://chatgpt.com/local/01a14a2e-948d-7224-908c-a4776cc8a044)
+and [fresh-task verification](https://chatgpt.com/local/01a14a36-2da3-7609-8e41-9bab9cffa04b)
+are account-private records. Source/build qualification is at `cb51bbc`; later documentation
+updates do not change the qualified code. The publication capture is a local ignored artifact
+under `build/cloud-review`, not a required runtime file.

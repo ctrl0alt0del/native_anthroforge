@@ -5,6 +5,10 @@ Use Codex Cloud for code changes, numerical/core builds, the full pytest suite, 
 Blender parity fixtures, headless authoring and Python package builds while the PC is off.
 The repository is `ctrl0alt0del/native_anthroforge`; the shared branch is `main`.
 
+The account environment **AnthroForge Standalone** is published with **Only me** visibility.
+For ordinary work, start a new Codex chat, choose **Work in > Cloud**, then select that
+environment. The setup section below is for rebuilding or recreating it.
+
 ## Create the environment once
 
 In Codex on web or the desktop app, choose **Work in > Cloud > Create environment**
@@ -64,6 +68,12 @@ Refresh uses locked dependencies, rebuilds the native library and checks it load
 full gate before delivery. Codex repository refresh does not automatically rerun the install
 command. If OS dependencies change, update/retest setup and republish the environment.
 
+Package refresh can need network access to rebuild the editable Python package. The Cloud
+environment's Package managers allowlist and the command's shell permissions are separate.
+If a fetch fails with `Operation not permitted`, use the runtime's supported additional
+network-permission/approval path; do not disable the allowlist or TLS checks. The baseline
+gate passed offline in a fresh task, but offline dependency refresh is not guaranteed.
+
 ## What the gate proves
 
 - Ruff, configured mypy and the authored 15-line Python function limit.
@@ -108,15 +118,17 @@ environments, and do not force-push to reconcile them.
 ## Evidence and current account setup
 
 The October 17 initial CI runs exposed platform-specific mypy guards and imported native
-compiler diagnostics. Revision `691f401` passed the complete portable gate on Ubuntu 24.04
-and Windows in [GitHub Actions run 39038728775](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39038728775).
-The subsequent setup change supports the actual Codex Cloud shell without root access;
-its validation is recorded in `development_status.md` once observed.
+compiler diagnostics. Revision `cb51bbc` passed the complete portable gate on Ubuntu 24.04
+and Windows in [GitHub Actions run 39039142051](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39039142051).
+The actual Codex Cloud setup then passed the same gate and refresh on an unprivileged
+Linux/glibc 2.41 base, with all 396 tests passing and zero skips. See `development_status.md`.
 
 Creating/publishing the account's Codex Cloud environment is separate from repository setup.
-Sign-in and repository access are connected. The actual setup session exposed an unprivileged
-base image with the required compiler/runtime libraries but no sudo. Until its updated
-setup and a fresh task have run, do not label the environment as published or Codex-verified.
+The private environment **AnthroForge Standalone** was published and tested in a fresh task.
+That task passed the complete gate with dependency downloads disabled, then passed refresh
+through the supported network-permission path, followed by the doctor and CLI workshop.
+No tracked files changed. Publication and fresh-task results are recorded separately from
+setup and CI in `development_status.md`.
 
 References: [Codex Cloud environment setup](https://learn.chatgpt.com/docs/environments/cloud-environments),
 [projects and file access](https://learn.chatgpt.com/docs/projects),

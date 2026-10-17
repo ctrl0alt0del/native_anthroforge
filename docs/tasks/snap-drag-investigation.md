@@ -44,6 +44,29 @@ invalid for end-to-end conclusions. Current raw results are local-only under
 build/snap-drag-investigation/delivery-baseline.json and delivery-profile.json.
 GUI frame callbacks are GUI-received frameSwapped timestamps, not GPU presentation.
 
+Confirmed a causal UI bottleneck: replacing only the hidden Activity ListView's
+model with an empty model, while preserving controller notifications, scheduling,
+geometry and snapping, approximately halves input-handler wall time. In a same-
+process 16-trial balanced comparison (120 moves/trial, Body lifted to the cube's
+top plane so normal/snapped motions can match), original snapped trials averaged
+38.7–46.8 ms/handler; empty-list trials 20.8–23.1 ms. Normal drags also improve.
+Controller.notify emits activityChanged and Activity.qml assigns a newly reversed
+QVariantList on every update, even while its containing panel is hidden.
+Central diagnostic spans attribute most drag cost to Controller.refresh/notify;
+surface_hit including normal lookup takes around 0.11–0.12 ms per snapped move.
+This establishes a major drag bottleneck, not the claimed consistent 2x difference
+between snapping and ordinary dragging. External application load is substantial
+(observed about 11 CPU-core equivalents on this 24-thread PC), so absolute frame
+times are not idle-machine benchmarks. Paired controls preserve that distinction.
+
+Added opt-in diagnostic spans and activity-model counterfactuals in tools only.
+No application import, native rebuild, product version bump or shipped profiler.
+Discarded cProfile mode: mixed Qt/Python callback attribution is not a qualified
+thread-specific CPU profile. Direct wall spans are labeled as such. Final harness
+records source/platform/options, raw input positions and timing, GUI frame callback
+timestamps, job lifecycle snapshots, and verifies snapping/undo. Final repetitions
+and the development gate are pending at this checkpoint.
+
 ## Verification
 
 Architecture checks passed (2 tests); diagnostic Ruff cleanup passed. Actual GUI
@@ -53,9 +76,9 @@ Preserve the unrelated untracked root __init__.py.
 
 ## Next actions and blockers
 
-1. Build a repeatable cube/Body dragging diagnostic and collect uninstrumented comparisons.
-2. Attribute extra work and test a discriminating intervention.
-3. Record verified cause, uncertainty and profiler requirements derived from the evidence.
+1. Complete final paired recording, including identical-path and undo checks.
+2. Capture optional spans/model-change counts and run tools/check.ps1.
+3. Preserve compact quantitative evidence and profiler requirements; report limitations.
 
 ## Recovery inputs
 

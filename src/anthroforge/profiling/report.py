@@ -5,7 +5,7 @@ import os
 import platform
 import tempfile
 from pathlib import Path
-from time import perf_counter_ns, process_time_ns
+from time import perf_counter_ns, process_time_ns, thread_time_ns
 from zipfile import ZIP_DEFLATED, ZipFile
 
 from anthroforge import __version__
@@ -61,14 +61,20 @@ def write_bundle(path, buffer, manifest):
 
 
 def export_contents(path, buffer, manifest):
-    start, cpu = perf_counter_ns(), process_time_ns()
+    start, cpu, process = perf_counter_ns(), thread_time_ns(), process_time_ns()
     with ZipFile(path, "w", ZIP_DEFLATED, compresslevel=1) as archive:
         summary = write_trace(archive, buffer)
-        manifest["export"] = dict(
-            wall_ns=perf_counter_ns() - start,
-            process_cpu_ns=process_time_ns() - cpu,
-            scope="trace serialization and compression, excludes final ZIP close",
-        )
+        manifest["export"] = export_costs(start, cpu, process)
         summary["profiler"] = manifest["profiler"]
         write_json(archive, "summary.json", summary)
         write_json(archive, "manifest.json", manifest)
+
+
+def export_costs(start, cpu, process):
+    return dict(
+        wall_ns=perf_counter_ns() - start,
+        thread_cpu_ns=thread_time_ns() - cpu,
+        process_cpu_ns=process_time_ns() - process,
+        scope="trace serialization and compression, excludes final ZIP close",
+        process_cpu_scope="whole process during export; includes concurrent application work",
+    )

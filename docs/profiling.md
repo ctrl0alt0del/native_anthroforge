@@ -17,6 +17,10 @@ either retention bound is reached. Qt also owns transient producer buffers; thes
 are periodically flushed and are not a hard cap on total application RSS. Reports
 state their actual retained interval and losses. Recording is off until requested.
 
+`complete` describes collector completeness within the retained window. Intentional
+ring eviction is counted separately; it does not mean the full recording was retained.
+Events outside start/stop are filtered, and crossing spans are clipped and marked.
+
 ## Shared runtime API
 
 These operations work through the usual Session/JSON authoring API, independently of
@@ -38,6 +42,9 @@ and export_failed. `profile.stop` with `wait:true` is for headless callers; the 
 uses asynchronous completion to keep Qt processing events. Starting another capture
 before the current one is saved/retried is rejected. Settings accept 1–3600 seconds
 and 16–1024 MiB headless, or 96–1024 MiB with the Qt collector.
+
+Invoke runtime operations on the owning session thread, like other application
+operations. Worker threads can contribute spans; they do not control recording state.
 
 ## Reading a report
 
@@ -61,6 +68,11 @@ a binding can include JavaScript. Do not add their totals. The percentile fields
 are upper bounds from logarithmic histograms (1/16-octave buckets). Truncated spans
 remain in the timeline but are excluded from duration distributions. Python spans
 also include executing-thread CPU time where collected; wall time is not CPU time.
+The export field `process_cpu_ns` measures the whole process during export and may
+include concurrent application work. It is not isolated exporter-thread CPU cost.
+`thread_cpu_ns` measures CPU used by the exporting thread itself.
+Synthetic Qt trace lanes are described in `manifest.clock`; the QML lane represents
+GUI-thread work, not an additional independent CPU thread.
 
 Frame milestones are captured directly on the render thread. Submission does not
 mean the monitor displayed a frame. OS input-queue wait, physical input latency,
@@ -97,6 +109,7 @@ is a desktop diagnostic baseline, not the normal launch mode. The explicit
 
 The [Activity investigation](tasks/snap-drag-investigation.md) remains the first
 diagnostic case. Profiling does not include its deferred production optimization.
+Recorded measurements and their limits are in [release qualification](development_status.md#runtime-profiler-014).
 
 
 Official integration references: [Qt profiling service selection](https://doc.qt.io/qt-6/qqmldebuggingenabler.html),

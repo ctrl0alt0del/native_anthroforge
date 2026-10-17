@@ -116,3 +116,11 @@ Two supplementary foreground benchmarks were invalidated by window deactivation
 (the diagnostic confirmed the gesture had already canceled); they are excluded.
 The nonactivating diagnostic option keeps subsequent benchmark input isolated from
 foreground focus changes, and its timings are recorded as a separate series.
+
+Portable first pass: relocated/minimal-PATH import, edits, save, rendering and GUI
+checks succeeded. Both headless and Qt report bundles were written, but the probe's
+QGuiApplication.quit() encountered the ordinary unsaved-project close prompt and the
+check timed out. The diagnostic now uses the existing smoke-mode exit convention;
+the same saved-project development probe exits successfully. Export now reports
+isolated exporter-thread CPU as well as explicitly labeled whole-process CPU. Ruff,
+mypy and all 413 tests pass after these changes. Rebuilding for final portable rerun.

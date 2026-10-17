@@ -36,4 +36,4 @@ class ProfileProbe(QObject):
         report = self.controller.session.profiler.status()
         self.output.parent.mkdir(parents=True, exist_ok=True)
         self.output.write_text(json.dumps(report), encoding="utf-8")
-        self.app.quit()
+        self.app.exit(0 if report["state"] == "saved" else 1)

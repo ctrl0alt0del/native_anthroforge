@@ -3,7 +3,7 @@
 - Task branch: `codex/power-outage-continuity`
 - Integration branch: `main`
 - Starting revision: `4301134`
-- Status: in progress
+- Status: implementation and verification complete; see integration recovery below
 - Last updated: 2026-10-17 (Europe/Bucharest)
 - Active writer: this desktop chat; no cloud writer for this task.
 
@@ -43,16 +43,27 @@ recovery in a separate checkout; and completed documentation merged and pushed t
   README.md and the cloud guide link to [work continuity](../work_continuity.md).
 - [The reusable handoff template](TEMPLATE.md) covers decisions, acceptance, relevant files,
   actual verification, immediate next actions, blockers and unavailable inputs.
-- `git diff --check` passed; a Python pathlib/Markdown-link check resolved all 23 local
-  links in the six affected documents on Windows. Content review checked authority scope,
+- `git diff --check` passed; a Python pathlib/Markdown-link check resolved local links
+  in all six affected documents on Windows. Content review checked authority scope,
   checkpoint-versus-acceptance semantics and preservation of divergent/unrelated work.
 - No application tests were rerun for these documentation-only changes.
+- Workflow checkpoint `e4a9af91e04935f5fc6d117a76ec68b073a1df0a` was pushed and recovered with
+  `git clone --single-branch --branch codex/power-outage-continuity --depth 5
+  https://github.com/ctrl0alt0del/native_anthroforge.git build/continuity-recovery-e4a9af9`.
+  The fresh checkout was clean, HEAD matched the source and remote tip, and SHA-256
+  comparisons matched all six instruction/context documents. Its diff from `4301134`
+  contained only those six documents. The actual recovered task record was inspected.
+- The recovery checkout is ignored and remains available locally for inspection. This
+  demonstrates retrieval from GitHub without the original chat or uncommitted files;
+  it is not a simulated power failure or another cloud-runtime qualification.
 
-## Next actions
+## Integration recovery
 
-1. Commit/push the reviewed workflow and handoff documents.
-2. Recover the task branch in a separate ignored checkout and verify context/code match.
-3. Record the outcome, then merge into main and push without rewriting history.
+No implementation work remains. Commit/push this verification record, then merge into
+main and push normally. A final record cannot assert that its own future push succeeded.
+After fetching, use `git merge-base --is-ancestor origin/codex/power-outage-continuity
+origin/main` to determine delivery: exit 0 means the task is integrated remotely; otherwise
+finish the documented integration steps. Do not repeat completed setup or recovery checks.
 
 ## Recovery inputs and limitations
 

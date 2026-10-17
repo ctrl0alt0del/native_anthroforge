@@ -1,0 +1,133 @@
+"""Snapshot-owned indexes; reuse validated relationships across value-only edits."""
+
+from collections import deque
+from collections.abc import Mapping
+from dataclasses import dataclass
+from types import MappingProxyType
+from typing import TYPE_CHECKING, Any
+
+from . import construction_validation, dependency_graph
+from .construction import Control
+from .entities import SCP, validate_tree
+
+if TYPE_CHECKING:
+    from .document import Document
+
+
+def reference_signature(item: SCP | Control) -> tuple[Any, ...]:
+    bindings = tuple((b.id, b.control, b.kind, b.target, b.enabled) for b in item.deformers)
+    ids = tuple(construction_validation.identities(item))
+    if isinstance(item, Control):
+        return (ids, bindings, item.kind, item.follow, item.support, item.attachment.parent_mode)
+    primitive = item.primitive
+    targets = (
+        (tuple(c.id for c in primitive.curves), tuple(p.id for p in primitive.pieces))
+        if primitive
+        else None
+    )
+    return (ids, bindings, item.parent, item.attachment.parent_mode, targets)
+
+
+@dataclass(frozen=True, slots=True)
+class Structure:
+    signatures: Mapping[str, tuple[Any, ...]]
+    order: tuple[str, ...]
+    children: Mapping[str, tuple[str, ...]]
+    depths: Mapping[str, int]
+    dependencies: dependency_graph.DependencyGraph
+    attachments: bool
+
+
+@dataclass(frozen=True, slots=True)
+class DocumentIndex:
+    source_entities: tuple[SCP, ...]
+    source_controls: tuple[Control, ...]
+    entities: Mapping[str, SCP]
+    controls: Mapping[str, Control]
+    structure: Structure
+
+
+def signatures(document: "Document", previous: DocumentIndex | None) -> dict[str, tuple[Any, ...]]:
+    result = {}
+    items: tuple[SCP | Control, ...] = (*document.entities, *document.controls)
+    for item in items:
+        old = previous.entities.get(item.id) or previous.controls.get(item.id) if previous else None
+        result[item.id] = (
+            previous.structure.signatures[item.id]
+            if previous and old is item
+            else reference_signature(item)
+        )
+    return result
+
+
+def tree_layout(
+    entities: tuple[SCP, ...],
+) -> tuple[tuple[str, ...], Mapping[str, tuple[str, ...]], Mapping[str, int]]:
+    children: dict[str, list[str]] = {}
+    for item in entities:
+        children.setdefault(item.parent, []).append(item.id)
+    order, depths = breadth_first(children)
+    return order, MappingProxyType({k: tuple(v) for k, v in children.items()}), depths
+
+
+def breadth_first(children: Mapping[str, list[str]]) -> tuple[tuple[str, ...], Mapping[str, int]]:
+    order, depths = [], {}
+    pending = deque((key, 0) for key in children.get("", ()))
+    while pending:
+        key, depth = pending.popleft()
+        order.append(key)
+        depths[key] = depth
+        pending.extend((child, depth + 1) for child in children.get(key, ()))
+    return tuple(order), MappingProxyType(depths)
+
+
+def validated_structure(document: "Document", signature: dict[str, tuple[Any, ...]]) -> Structure:
+    validate_tree(document.entities)
+    construction_validation.document(document)
+    order, children, depths = tree_layout(document.entities)
+    graph = dependency_graph.build(
+        document.entities, document.controls, document.attachments_enabled
+    )
+    return Structure(
+        MappingProxyType(signature), order, children, depths, graph, document.attachments_enabled
+    )
+
+
+def structure(document: "Document", previous: DocumentIndex | None) -> Structure:
+    signature = signatures(document, previous)
+    if previous and previous.structure.attachments == document.attachments_enabled:
+        if signature == previous.structure.signatures and same_order(document, previous):
+            return previous.structure
+    return validated_structure(document, signature)
+
+
+def same_order(document: "Document", previous: DocumentIndex) -> bool:
+    return tuple(e.id for e in document.entities) == tuple(previous.entities) and tuple(
+        c.id for c in document.controls
+    ) == tuple(previous.controls)
+
+
+def record_maps(
+    document: "Document", previous: DocumentIndex | None
+) -> tuple[Mapping[str, SCP], Mapping[str, Control]]:
+    entities = previous.entities if previous else None
+    controls = previous.controls if previous else None
+    if not previous or document.entities is not previous.source_entities:
+        entities = MappingProxyType({e.id: e for e in document.entities})
+    if not previous or document.controls is not previous.source_controls:
+        controls = MappingProxyType({c.id: c for c in document.controls})
+    assert entities is not None and controls is not None
+    return entities, controls
+
+
+def build(document: "Document", previous: DocumentIndex | None) -> DocumentIndex:
+    if (
+        previous
+        and document.entities is previous.source_entities
+        and document.controls is previous.source_controls
+    ):
+        if document.attachments_enabled == previous.structure.attachments:
+            return previous
+    relationships = structure(document, previous)
+    entities, controls = record_maps(document, previous)
+    return DocumentIndex(document.entities, document.controls, entities, controls, relationships)

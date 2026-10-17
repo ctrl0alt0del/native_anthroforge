@@ -64,8 +64,7 @@ static Samples base_samples(int count,int shape,double length,double radius,bool
     }
     return samples;
 }
-}
-uint64_t af_body_base(int count,int shape,int sides,double width,double depth,double length,int closed,uint64_t cancel) {
+static uint64_t body_base(int count,int shape,int sides,double width,double depth,double length,int closed,uint64_t cancel,bool complete) {
     try {
         if(shape<0||shape>2||sides<3||width<=0||depth<=0||length<=0||count<3)
             throw std::runtime_error("Invalid body base settings.");
@@ -74,6 +73,13 @@ uint64_t af_body_base(int count,int shape,int sides,double width,double depth,do
         if(shape==0) sides=4;
         const auto points=af::body_points(samples,shape,sides,width,depth,closed!=0);
         const auto faces=af::body_faces(count,sides,shape==2&&!closed,closed!=0);
-        return af::retain(af::make_mesh(points,faces,cancel));
+        return af::retain(af::make_mesh(points,faces,cancel,complete));
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
+}
+}
+uint64_t af_body_base(int count,int shape,int sides,double width,double depth,double length,int closed,uint64_t cancel) {
+    return af::body_base(count,shape,sides,width,depth,length,closed,cancel,true);
+}
+uint64_t af_body_base_geometry(int count,int shape,int sides,double width,double depth,double length,int closed,uint64_t cancel) {
+    return af::body_base(count,shape,sides,width,depth,length,closed,cancel,false);
 }

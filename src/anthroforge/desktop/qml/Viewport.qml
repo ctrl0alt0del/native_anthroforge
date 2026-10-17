@@ -268,7 +268,7 @@ Item {
     SelectionOutline {
         id: selectionOutline; objectName: "selectionOutline"; anchors.fill: parent
         sourceCamera: view.camera; orthographic: viewport.orthographic
-        visible: !!workspace.selectedData.asset && workspace.selectedData.visible
+        visible: !!workspace.selectedData.asset && !!workspace.selectedData.visible
     }
     AuthoringView {
         anchors.fill: parent; sourceCamera: view.camera

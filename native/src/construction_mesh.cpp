@@ -1,12 +1,12 @@
 #include "construction_internal.hpp"
 
 namespace af {
-std::shared_ptr<Mesh> make_mesh(const Points& points,const Faces& faces,uint64_t cancel) {
+std::shared_ptr<Mesh> make_mesh(const Points& points,const Faces& faces,uint64_t cancel,bool complete) {
     auto result=std::make_shared<Mesh>();
     result->generated=true;
     result->vertices.resize(points.size(),3);
     for(size_t i=0;i<points.size();++i) result->vertices.row(i)=points[i];
-    prepare_mesh(*result,faces,cancel);
+    prepare_mesh(*result,faces,cancel,complete);
     return result;
 }
 Faces mesh_faces(const Mesh& source) {
@@ -15,17 +15,22 @@ Faces mesh_faces(const Mesh& source) {
         result.emplace_back(source.corners.begin()+source.offsets[i-1],source.corners.begin()+source.offsets[i]);
     return result;
 }
-std::shared_ptr<Mesh> deform_mesh(const Mesh& source,const Vertices& vertices,uint64_t cancel) {
+static void copy_topology(const Mesh& source,Mesh& target) {
+    target.triangles=source.triangles;
+    target.corners=source.corners;
+    target.offsets=source.offsets;
+    target.polygons=source.polygons;
+}
+std::shared_ptr<Mesh> deform_mesh(const Mesh& source,const Vertices& vertices,uint64_t cancel,bool complete) {
     if(vertices.rows()!=source.vertices.rows()||!vertices.allFinite())
         throw std::runtime_error("Deformation must preserve vertex count and finite coordinates.");
     auto result=std::make_shared<Mesh>();
     result->vertices=vertices;
     result->generated=true;
-    result->triangles=source.triangles;
-    result->corners=source.corners;
-    result->offsets=source.offsets;
-    result->polygons=source.polygons;
-    rebuild_mesh(*result,cancel);
+    copy_topology(source,*result);
+    check_cancel(cancel);
+    if(complete) rebuild_mesh(*result,cancel);
+    else af_bounds3d(vertices.data(),vertices.rows(),result->bounds);
     return result;
 }
 Samples read_samples(const double* values,int count) {
@@ -38,22 +43,24 @@ Samples read_samples(const double* values,int count) {
     return samples;
 }
 static std::shared_ptr<Mesh> join_meshes(const uint64_t* sources,int count,uint64_t cancel) {
-    Points points; Faces faces;
+    Points points; Faces faces; bool complete=true;
     for(int i=0;i<count;++i) {
         check_cancel(cancel);
         const auto source=mesh(sources[i]); const auto offset=int64_t(points.size());
+        complete=complete&&source->prepared;
         for(int j=0;j<source->vertices.rows();++j) points.push_back(source->vertices.row(j));
         for(auto face:mesh_faces(*source)) {
             for(auto& index:face) index+=offset;
             faces.push_back(std::move(face));
         }
     }
-    return make_mesh(points,faces,cancel);
+    return make_mesh(points,faces,cancel,complete);
 }
 }
 uint64_t af_mesh_deformed(uint64_t source,const double* points,int64_t count,uint64_t cancel) {
     try {
-        return af::retain(af::deform_mesh(*af::mesh(source),Eigen::Map<const af::Vertices>(points,count,3),cancel));
+        const auto input=af::mesh(source);
+        return af::retain(af::deform_mesh(*input,Eigen::Map<const af::Vertices>(points,count,3),cancel,input->prepared));
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }
 uint64_t af_mesh_join(const uint64_t* sources,int count,uint64_t cancel) {

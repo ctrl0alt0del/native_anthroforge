@@ -1,65 +1,23 @@
-"""Output-specific dependencies. Pose-following is distinct from geometry feedback."""
+"""Application traversal and job contracts over snapshot-owned dependency indexes."""
 
 from collections import deque
+from collections.abc import Set
 
-from anthroforge.core.construction import Deformer
+from anthroforge.core import dependency_graph as index
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job
 from anthroforge.core.results import Port as Port
 
 
-def graph(document: Document) -> dict[Port, set[Port]]:
-    result: dict[Port, set[Port]] = {}
-    for entity in document.entities:
-        pose, geometry = Port(entity.id, "pose"), Port(entity.id, "geometry")
-        result[pose] = parent_inputs(document, entity.id)
-        inputs = binding_inputs(entity.deformers)
-        result[geometry] = inputs | ({pose} if inputs else set())
-    for control in document.controls:
-        result[Port(control.id, "control")] = control_inputs(document, control.id)
-        result[Port(control.id, "cage")] = {Port(control.id, "control")} | binding_inputs(
-            control.deformers
-        )
-    return result
+def graph(document: Document) -> index.DependencyGraph:
+    return document.index.structure.dependencies
 
 
-def parent_inputs(document: Document, entity: str) -> set[Port]:
-    item = document.entity(entity)
-    if not item.parent or not document.attachments_enabled:
-        return set()
-    result = {Port(item.parent, "pose")}
-    if item.attachment.parent_mode == "SURFACE_NEAREST":
-        result.add(Port(item.parent, "geometry"))
-    return result
+def reverse(graph: index.Edges) -> index.Edges:
+    return graph.consumers if isinstance(graph, index.DependencyGraph) else index.reverse(graph)
 
 
-def binding_inputs(bindings: tuple[Deformer, ...]) -> set[Port]:
-    return {
-        Port(b.control, "cage" if b.kind == "LATTICE" else "control") for b in bindings if b.enabled
-    }
-
-
-def control_inputs(document: Document, control: str) -> set[Port]:
-    item = document.control(control)
-    if item.support:
-        if any(c.id == item.support for c in document.controls):
-            return {Port(item.support, "control")}
-        inputs = {Port(item.support, "pose")}
-        if item.attachment.parent_mode == "SURFACE_NEAREST":
-            inputs.add(Port(item.support, "geometry"))
-        return inputs
-    return {Port(item.follow, "pose")} if item.follow else set()
-
-
-def reverse(graph: dict[Port, set[Port]]) -> dict[Port, set[Port]]:
-    result: dict[Port, set[Port]] = {node: set() for node in graph}
-    for node, inputs in graph.items():
-        for source in inputs:
-            result.setdefault(source, set()).add(node)
-    return result
-
-
-def closure(graph: dict[Port, set[Port]], seeds: set[Port]) -> set[Port]:
+def closure(graph: index.Edges, seeds: Set[Port]) -> set[Port]:
     found, queue = set(seeds), deque(seeds)
     while queue:
         for node in graph.get(queue.popleft(), ()):
@@ -69,18 +27,12 @@ def closure(graph: dict[Port, set[Port]], seeds: set[Port]) -> set[Port]:
     return found
 
 
-def blocked(graph: dict[Port, set[Port]]) -> set[Port]:
-    remaining = {node: len(inputs) for node, inputs in graph.items()}
-    consumers = reverse(graph)
-    ready = deque(node for node, count in remaining.items() if not count)
-    while ready:
-        node = ready.popleft()
-        del remaining[node]
-        for consumer in consumers[node]:
-            remaining[consumer] -= 1
-            if not remaining[consumer]:
-                ready.append(consumer)
-    return set(remaining)
+def blocked(graph: index.Edges) -> frozenset[Port]:
+    return (
+        graph.blocked
+        if isinstance(graph, index.DependencyGraph)
+        else index.unresolved(graph, reverse(graph))
+    )
 
 
 def affected(document: Document, seeds: set[Port]) -> set[str]:

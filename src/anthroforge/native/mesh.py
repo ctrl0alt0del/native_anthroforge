@@ -7,6 +7,7 @@ from typing import Any
 
 import numpy as np
 
+from .base_cache import BaseCache
 from .bridge import NativeEngine
 
 D = c.POINTER(c.c_double)
@@ -28,6 +29,7 @@ class GeometryEngine(NativeEngine):
         self._mesh_signatures()
         self._query_signatures()
         self._construction_signatures()
+        self.bases = BaseCache()
 
     def _construction_signatures(self) -> None:
         from . import bodies, components, construction, curve_editing, falloff, scene, topology

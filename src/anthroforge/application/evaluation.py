@@ -69,7 +69,7 @@ def absorb_overlaps(
     session: "Session", targets: set[str], captures: set[str]
 ) -> tuple[set[str], set[str], float | None]:
     pending = []
-    for job in session.scheduler.jobs:
+    for job in session.scheduler.active_jobs:
         if job.active and job.key.startswith("attachments:") and targets.intersection(job.outputs):
             targets |= set(job.outputs)
             captures |= set(job.captures)

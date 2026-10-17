@@ -33,6 +33,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_curve_handles", [D, INT, INT])
     engine.bind("af_curve_sample", [D, INT, INT, INT, INT, F, F, D, D, U])
     engine.bind("af_loft", [D, INT, INT, INT, INT, INT, U], U)
+    engine.bind("af_loft_geometry", [D, INT, INT, INT, INT, INT, U], U)
     engine.bind("af_mesh_deformed", [U, D, c.c_int64, U], U)
     engine.bind("af_mesh_join", [c.POINTER(U), INT, U], U)
     engine.bind("af_matrix_relative", [D, D, D])
@@ -98,21 +99,33 @@ def owned_mesh(engine: GeometryEngine, handle: int) -> Mesh:
     return Mesh(engine, handle)
 
 
-def loft(engine: GeometryEngine, definition: Primitive, samples: list[Any], cancel: int) -> Mesh:
+def loft(
+    engine: GeometryEngine,
+    definition: Primitive,
+    samples: list[Any],
+    cancel: int,
+    *,
+    complete: bool = True,
+) -> Mesh:
+    data = doubles(samples)
+    args = loft_arguments(definition, data, cancel)
+    operation = engine.library.af_loft if complete else engine.library.af_loft_geometry
+    return owned_mesh(engine, operation(*args))
+
+
+def loft_arguments(definition: Primitive, data: Any, cancel: int) -> tuple[Any, ...]:
     closed = all(cyclic(c, definition) for c in definition.curves)
     if any(c.closed for c in definition.curves) and not all(c.closed for c in definition.curves):
         raise ValueError("Loft curves must agree on open or closed topology.")
-    data = doubles(samples)
-    args = (
+    return (
         pointer(data),
-        len(samples),
+        len(data),
         definition.samples,
         definition.strips,
         closed,
         definition.caps,
         cancel,
     )
-    return owned_mesh(engine, engine.library.af_loft(*args))
 
 
 def deformed(source: Mesh, points: Any, cancel: int = 0) -> Mesh:

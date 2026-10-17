@@ -29,14 +29,20 @@ static void cap_loft(Faces& faces,int rows,int count,bool closed) {
     faces.push_back(std::move(first));
     faces.push_back(std::move(last));
 }
-}
-uint64_t af_loft(const double* samples,int curves,int count,int strips,int closed,int caps,uint64_t cancel) {
+static uint64_t loft(const double* samples,int curves,int count,int strips,int closed,int caps,uint64_t cancel,bool complete) {
     try {
         if(!samples||curves<2||count<2||strips<1) throw std::runtime_error("Invalid loft inputs.");
         const int rows=(curves-1)*strips+1;
         const auto points=af::loft_points(samples,curves,count,strips);
         auto faces=af::loft_faces(rows,count,closed!=0);
         if(caps) af::cap_loft(faces,rows,count,closed!=0);
-        return af::retain(af::make_mesh(points,faces,cancel));
+        return af::retain(af::make_mesh(points,faces,cancel,complete));
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
+}
+}
+uint64_t af_loft(const double* samples,int curves,int count,int strips,int closed,int caps,uint64_t cancel) {
+    return af::loft(samples,curves,count,strips,closed,caps,cancel,true);
+}
+uint64_t af_loft_geometry(const double* samples,int curves,int count,int strips,int closed,int caps,uint64_t cancel) {
+    return af::loft(samples,curves,count,strips,closed,caps,cancel,false);
 }

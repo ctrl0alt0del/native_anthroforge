@@ -10,7 +10,7 @@ def describe(job):
         kind=job.kind,
         origin=job.origin,
         epoch=job.epoch,
-        revision=job.snapshot.revision if job.snapshot else None,
+        revision=job.dispatch_revision,
         outputs=sorted(job.outputs)[:128],
         reads=sorted(job.reads)[:128],
         output_count=len(job.outputs),
@@ -51,7 +51,7 @@ def snapshot(session, state):
     if not session.profiler.active:
         return
     document_snapshot(session, state)
-    active = (job for job in session.scheduler.jobs if job.active)
+    active = session.scheduler.active_jobs
     for index, job in enumerate(active):
         if index >= 4096:
             session.profiler.losses["job_snapshot_limit"] += 1

@@ -7,6 +7,7 @@ from anthroforge.profiling.spans import measured
 
 from . import authoring_picking
 from . import authoring_state as state
+from .property_projection import PropertyProjection
 
 
 class Authoring(QObject):
@@ -26,11 +27,11 @@ class Authoring(QObject):
         from .curve_interaction import CurveInteraction
 
         self.interaction = CurveInteraction(self)
-        self._state, self._point_rows, self._component_rows = {}, [], []
+        self._state, self._point_rows, self._component_rows = PropertyProjection(self), [], []
         self._component_lookup = {}
-        controller.selectionChanged.connect(self.refresh)
+        self._layers, self._highlights = {}, {}
 
-    @Property("QVariantMap", notify=changed)
+    @Property(QObject, constant=True)
     def state(self):
         return self._state
 
@@ -40,15 +41,11 @@ class Authoring(QObject):
 
     @Property("QVariantMap", notify=geometryChanged)
     def visualLayers(self):
-        from .authoring_visuals import layers
-
-        return layers(self)
+        return self._layers
 
     @Property("QVariantMap", notify=hoverChanged)
     def highlights(self):
-        from .authoring_visuals import highlights
-
-        return highlights(self)
+        return self._highlights
 
     @Property("QVariantList", notify=geometryChanged)
     def points(self):
@@ -84,9 +81,15 @@ class Authoring(QObject):
 
     @measured("ui", lambda owner: owner.controller.session.profiler)
     def notify(self):
-        self.hoverChanged.emit()
-        self._state = state.data(self)
+        self.refresh_highlights()
+        self._state.synchronize(state.data(self))
         self.changed.emit()
+
+    def refresh_highlights(self):
+        from .authoring_visuals import highlights
+
+        self._highlights = highlights(self)
+        self.hoverChanged.emit()
 
     @Property(bool, notify=changed)
     def active(self):
@@ -104,9 +107,9 @@ class Authoring(QObject):
     def transformData(self):
         selected = self.selectedPoints
         if not self.active or self.state.get("kind") == "HOOK":
-            return self.controller.selectedData
+            return self.controller.selectedData.as_dict()
         if not selected:
-            return self.controller.selectedData if self.state.get("is_control") else {}
+            return self.controller.selectedData.as_dict() if self.state.get("is_control") else {}
         center = state.selection_center(self, selected)
         readonly = self.controller.selectedData.get("readonly", False) or state.imported_selection(
             self
@@ -130,7 +133,10 @@ class Authoring(QObject):
         self.notify()
 
     def publish_geometry(self):
+        from .authoring_visuals import layers
+
         self.interaction.rebuild()
+        self._layers = layers(self)
         self._point_rows = self._points.tolist()
         self._component_rows = [
             dict(ref, key=state.component_key(ref), world=world, local=list(local))
@@ -213,7 +219,7 @@ class Authoring(QObject):
     def update_hover(self, index, curve=""):
         if (index, curve) != (self.hover_index, self.hover_curve):
             self.hover_index, self.hover_curve = index, curve
-            self.hoverChanged.emit()
+            self.refresh_highlights()
 
     @Slot(str)
     def addDeformer(self, kind):

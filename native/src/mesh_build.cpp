@@ -74,8 +74,9 @@ void rebuild_mesh(Mesh& mesh,uint64_t cancel) {
     af_bounds3d(mesh.vertices.data(),mesh.vertices.rows(),mesh.bounds);
     check_cancel(cancel); mesh.tree.init(mesh.vertices,mesh.triangles);
     render_chunks(mesh,cancel);
+    mesh.prepared=true;
 }
-void prepare_mesh(Mesh& mesh,const Faces& faces,uint64_t cancel) {
+void prepare_mesh(Mesh& mesh,const Faces& faces,uint64_t cancel,bool complete) {
     if(mesh.vertices.rows()==0||!mesh.vertices.allFinite()||faces.empty())
         throw std::runtime_error("Mesh needs finite vertices and polygon faces.");
     std::vector<Eigen::Vector3i> triangles; mesh.offsets={0};
@@ -84,6 +85,7 @@ void prepare_mesh(Mesh& mesh,const Faces& faces,uint64_t cancel) {
     }
     mesh.triangles.resize(triangles.size(),3);
     for(size_t i=0;i<triangles.size();++i) mesh.triangles.row(i)=triangles[i];
-    rebuild_mesh(mesh,cancel);
+    if(complete) rebuild_mesh(mesh,cancel);
+    else af_bounds3d(mesh.vertices.data(),mesh.vertices.rows(),mesh.bounds);
 }
 }

@@ -26,6 +26,16 @@ AF_API uint64_t af_curve_deform(uint64_t base, const double* samples, int count,
 AF_API uint64_t af_mesh_deformed(uint64_t source, const double* points, int64_t count, uint64_t cancel);
 AF_API uint64_t af_mesh_join(const uint64_t* sources, int count, uint64_t cancel);
 AF_API uint64_t af_mesh_reuse_topology(uint64_t source, uint64_t previous, uint64_t cancel);
+/* Geometry-only roots propagate deferred preparation through deformation/join/solidify.
+ * Draft handles expose immutable arrays/bounds, but cannot be queried or displayed.
+ * Finalization creates a separate ready handle, preserving accepted canonical topology. */
+AF_API uint64_t af_mesh_draft(uint64_t source, uint64_t cancel);
+AF_API uint64_t af_mesh_storage_bytes(uint64_t source);
+AF_API uint64_t af_mesh_finalize(uint64_t source, uint64_t previous, uint64_t cancel);
+AF_API uint64_t af_loft_geometry(const double* samples, int curves, int count, int strips,
+    int closed, int caps, uint64_t cancel);
+AF_API uint64_t af_body_base_geometry(int count, int shape, int sides, double width, double depth,
+    double length, int closed, uint64_t cancel);
 AF_API uint64_t af_mesh_restore(const double* vertices, int64_t count, const int64_t* corners,
     const int64_t* offsets, int64_t faces, const int32_t* triangles, const int64_t* polygons,
     int64_t triangle_count);

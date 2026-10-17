@@ -6,7 +6,7 @@ import os
 import sys
 import tempfile
 import zipfile
-from dataclasses import asdict
+from dataclasses import asdict, fields
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -58,8 +58,7 @@ class FileLock:
 
 
 def manifest(document: Document, assets: dict[str, Asset]) -> dict[str, Any]:
-    state = asdict(document)
-    state["id"] = str(document.id)
+    state = document_state(document)
     used = assets_used(document)
     sources = {
         key: {
@@ -71,6 +70,16 @@ def manifest(document: Document, assets: dict[str, Asset]) -> dict[str, Any]:
         for key in used
     }
     return {"format": FORMAT, "version": VERSION, "document": state, "assets": sources}
+
+
+def document_state(document: Document) -> dict[str, Any]:
+    state = {
+        f.name: getattr(document, f.name) for f in fields(document) if not f.name.startswith("_")
+    }
+    state["id"] = str(document.id)
+    for name in ("entities", "controls", "workspaces"):
+        state[name] = [asdict(value) for value in state[name]]
+    return state
 
 
 def write_array(archive: zipfile.ZipFile, name: str, array: Any) -> None:
@@ -124,6 +133,8 @@ def decode_workspace(data: dict[str, Any]) -> Workspace:
 
 def decode_document(data: dict[str, Any]) -> Document:
     data = dict(data)
+    if any(key.startswith("_") for key in data):
+        raise ValueError("Project cannot supply derived runtime indexes.")
     if data.pop("metres_per_unit") != 1.0:
         raise ValueError("Project geometry must use canonical metres.")
     data["id"] = UUID(data["id"])

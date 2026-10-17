@@ -3,6 +3,7 @@
 
 namespace af {
 Surface::Surface(const Mesh& mesh,const M4& matrix):triangles(&mesh.triangles) {
+    if(!mesh.prepared) throw std::runtime_error("Surface queries require a finalized mesh.");
     vertices=(mesh.vertices*matrix.block<3,3>(0,0).transpose()).rowwise()+matrix.block<3,1>(0,3).transpose();
     tree.init(vertices,*triangles);
 }
@@ -63,6 +64,7 @@ int af_scene_bounds(int count,const uint64_t* meshes,const double* matrices,doub
 int af_pick(uint64_t handle,const double* matrix,const double* origin,const double* direction,double* output) {
     try {
         const auto mesh=af::mesh(handle); const af::M4 world=Eigen::Map<const af::M4>(matrix);
+        if(!mesh->prepared) throw std::runtime_error("Picking requires a finalized mesh.");
         const af::M4 inverse=world.inverse(); const af::V3 ray=Eigen::Map<const af::V3>(direction);
         const af::V3 start=Eigen::Map<const af::V3>(origin);
         const Eigen::RowVector3d local_start=af::point(inverse,start).transpose();

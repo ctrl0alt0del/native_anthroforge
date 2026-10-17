@@ -1,18 +1,16 @@
 """Construction presentation projections and reusable native picking arrays."""
 
-from dataclasses import asdict, fields
+from dataclasses import fields
 
 from anthroforge.application.control_frames import display_frame
 from anthroforge.native import bodies, components, construction
 from anthroforge.native.scene import entity_frame
 
-from .values import qml
-
 
 def data(editor):
     session, selected = editor.controller.session, editor.controller.selection
-    entity = next((e for e in session.document.entities if e.id == selected), None)
-    control = next((c for c in session.document.controls if c.id == selected), None)
+    entity = session.document.index.entities.get(selected)
+    control = session.document.index.controls.get(selected)
     item = entity or control
     result = projected_item(item, control is not None)
     result["is_control"] = control is not None
@@ -20,25 +18,33 @@ def data(editor):
         result["trs"] = session.engine.decompose(control.matrix)
     result["editing"] = editor.editing
     result["category"] = editor.category
-    result["components"] = editor.selection
+    result["components"] = tuple(editor.selection)
     result["deformers"] = binding_records(item)
     result.update(construction_data(entity, session))
-    return qml(result)
+    return result
 
 
 def projected_item(item, control):
     if item is None:
         return {}
-    if not control:
-        return asdict(item)
     result = {
         field.name: getattr(item, field.name)
         for field in fields(item)
         if field.name not in ("points", "deformers", "attachment", "result")
     }
-    result["attachment"] = asdict(item.attachment)
-    result["result"] = dict(status=item.result.status, error=item.result.error)
+    result["attachment"] = item.attachment
+    result["result"] = result_status(item.result)
+    if not control and item.primitive:
+        result["primitive"] = primitive_parameters(item.primitive)
     return result
+
+
+def primitive_parameters(primitive):
+    return {f.name: getattr(primitive, f.name) for f in fields(primitive) if f.name != "curves"}
+
+
+def result_status(result):
+    return dict(status=result.status, error=result.error, pending=getattr(result, "pending", ()))
 
 
 def binding_records(item):
@@ -48,7 +54,7 @@ def binding_records(item):
         return []
     curves = {c.id: c for c in item.primitive.curves} if getattr(item, "primitive", None) else {}
     return [
-        asdict(resolve(b, curves[b.target.component])) if b.target.stage == "CURVE" else asdict(b)
+        resolve(b, curves[b.target.component]) if b.target.stage == "CURVE" else b
         for b in item.deformers
     ]
 
@@ -60,9 +66,7 @@ def construction_data(entity, session):
     result["topology_dependents"] = (
         list(topology_dependents(session.document, entity.id)) if entity else []
     )
-    result["curves"] = (
-        [asdict(c) for c in entity.primitive.curves] if entity and entity.primitive else []
-    )
+    result["curves"] = entity.primitive.curves if entity and entity.primitive else ()
     result["controls"] = [
         dict(id=c.id, name=c.name, kind=c.kind) for c in session.document.controls
     ]
@@ -123,10 +127,10 @@ def imported_components(session, entity):
 
 def components_for(editor):
     session, selected = editor.controller.session, editor.controller.selection
-    control = next((c for c in session.document.controls if c.id == selected), None)
+    control = session.document.index.controls.get(selected)
     if control:
         return control_components(session, control)
-    entity = next((e for e in session.document.entities if e.id == selected), None)
+    entity = session.document.index.entities.get(selected)
     return entity_components(session, entity, editor.category) if entity and editor.editing else []
 
 
@@ -157,8 +161,9 @@ def retained_selection(editor):
 
 def cache_key(editor):
     session, selected = editor.controller.session, editor.controller.selection
-    items = (*session.document.entities, *session.document.controls)
-    item = next((value for value in items if value.id == selected), None)
+    item = session.document.index.entities.get(selected) or session.document.index.controls.get(
+        selected
+    )
     return (
         selected,
         item.generation if item else -1,

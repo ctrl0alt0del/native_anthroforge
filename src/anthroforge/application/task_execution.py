@@ -36,6 +36,7 @@ class InlineBudget:
 def execute(job: Job, payload: Any, profiler: Any = None) -> Any:
     started = perf_counter()
     try:
+        assert job.cancel is not None
         if job.cancel.is_set():
             return None
         job.state, job.progress = "running", "Computing"

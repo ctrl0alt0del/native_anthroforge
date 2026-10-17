@@ -6,7 +6,7 @@ from typing import Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Workspace
-from anthroforge.core.jobs import Job
+from anthroforge.core.jobs import Job, Restart
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.profiling import RuntimeProfiler
 from anthroforge.profiling.spans import measured
@@ -14,6 +14,7 @@ from anthroforge.profiling.tasks import command_metadata
 from anthroforge.profiling.tasks import operation as profile_operation
 
 from .assets import Asset
+from .changes import ChangeJournal
 from .coordinator import TaskCoordinator
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
@@ -22,7 +23,7 @@ from .history import History
 
 class Session:
     def __init__(self, name: str = "Untitled", profiler: RuntimeProfiler | None = None) -> None:
-        self.document = Document(name=name)
+        self.changes, self._document = ChangeJournal(), Document(name=name)
         self.history = History(self.document)
         self.assets: dict[str, Asset] = {}
         self.initialize_runtime(profiler)
@@ -39,6 +40,15 @@ class Session:
         self.owns_profiler = profiler is None
         self.profiler = profiler if profiler is not None else RuntimeProfiler()
         self.initialize_scheduler()
+
+    @property
+    def document(self) -> Document:
+        return self._document
+
+    @document.setter
+    def document(self, value: Document) -> None:
+        self.changes.record(self._document, value)
+        self._document = value
 
     def initialize_scheduler(self) -> None:
         self.scheduler = TaskCoordinator(lambda: self.document)
@@ -125,12 +135,11 @@ class Session:
             self.history.replay()
         self.resume_calculations()
 
-    def remember_restarts(self, jobs: list[Job]) -> None:
-        for job in jobs:
-            revision = job.snapshot.revision if job.snapshot else job.origin
+    def remember_restarts(self, restarts: list[Restart]) -> None:
+        for restart in restarts:
             for entry in self.history.entries[self.history.cursor + 1 :]:
-                if revision in entry.versions and job.restart_on_redo and job.retry:
-                    entry.restarts.append(job.retry)
+                if restart.revision in entry.versions:
+                    entry.restarts.append(restart.callback)
                     break
 
     def resume_calculations(self) -> None:
@@ -186,6 +195,7 @@ class Session:
         self.scheduler.close()
         if self._engine is not None:
             self.profiler.native.detach(self._engine)
+            self._engine.bases.clear()
         if self.owns_profiler:
             self.profiler.close()
         if self.file_lock:
@@ -193,10 +203,12 @@ class Session:
 
 
 def changed_ids(previous: Document, current: Document) -> set[str]:
-    changed = {e.id for e in previous.entities if e not in current.entities}
-    return changed | {c.id for c in previous.controls if c not in current.controls}
+    changed = {e.id for e in previous.entities if e != current.index.entities.get(e.id)}
+    return changed | {c.id for c in previous.controls if c != current.index.controls.get(c.id)}
 
 
 def merge_entity(previous: SCP, current: SCP) -> SCP:
+    if current is previous:
+        return current
     moved = differs(previous, current, POSE_FIELDS)
     return replace(current, pose_revision=previous.pose_revision + 1) if moved else current

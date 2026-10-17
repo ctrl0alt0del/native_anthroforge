@@ -7,20 +7,11 @@ ScrollView {
     id: inspector
     property var selected: workspace.selectedData
     readonly property var attachment: selected.attachment || {}
-    readonly property var candidates: workspace.treeRows.filter(row => validParent(row))
+    readonly property var candidates: workspace.sceneChoices.parents
     readonly property bool dialogVisible: colorDialog.visible
     signal pickAnchor(string mode)
     signal deleteRequested(string entity)
     clip: true; contentWidth: availableWidth
-    function validParent(row) {
-        if(row.is_control) return false;
-        let current = row;
-        while (current) {
-            if (current.id === selected.id) return false;
-            current = workspace.treeRows.find(item => item.id === current.parent);
-        }
-        return true;
-    }
     function setAttachment(key, value) {
         const options = {entity:selected.id};
         options[key] = value;

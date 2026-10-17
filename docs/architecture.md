@@ -1,4 +1,4 @@
-# AnthroForge 0.1.4 architecture
+# AnthroForge 0.1.5 architecture
 
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through
@@ -169,7 +169,7 @@ MCP, additional primitive families, fibres, muscles and skin remain separate fea
 
 Qt/PySide versions must match when rebuilding the native viewport plugin. Windows DLL
 preloading intentionally ensures Python and Qt use the same geometry registry. The current
-portable package contains only dependencies needed by 0.1.4; numerical development extras
+portable package contains only dependencies needed by 0.1.5; numerical development extras
 remain available for later migrations.
 
 ## Interaction and selection presentation (0.1.3)

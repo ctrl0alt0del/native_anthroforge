@@ -3,7 +3,7 @@
 - Task branch: `codex/activity-panel-015`
 - Integration branch: `main`
 - Starting revision: `3fa664db4a5661672a93d7d806b03c5fd78f95b0`
-- Status: in progress
+- Status: complete
 - Last updated: 2026-10-17, Europe/Bucharest
 - Active writer: desktop implementation chat
 
@@ -57,14 +57,26 @@ The first gate had 420 passing tests and one function-length failure in an unfin
 evidence tool. The full gate rerun passed: 421 pytest tests, lint/format, configured
 mypy, native build/CTest/style, PowerShell style, numerical checks and native doctor.
 The evidence summary/portable assertion updates also pass lint and architecture checks.
-Portable/source release remain pending. The task branch is ready for packaging.
+The portable build from clean checkpoint ce64fc3 passed relocated minimal-PATH
+acceptance: import, attachments, primitives/deformers, deletion, subdivision, saving,
+inspection, GPU capture, GUI and desktop/headless runtime reports. Version is 0.1.5.0;
+the final desktop capture was inspected. Perfetto imported the snapped/open-panel
+trace (84,053 slices) with zero nonzero error statistics. No production code changed
+after the build checkpoint; subsequent changes are release documentation.
+
+Deliverables: dist/AnthroForge.dist/AnthroForge.exe (keep its folder together) and
+dist/AnthroForge-0.1.5-source.zip (integrity, version and expected source contents checked).
+Raw comparison/confirmation/GUI/package logs live
+under build/activity-015; profiler gesture captures are under build/profiler-acceptance.
+Integration uses the normal task-branch merge/push to main; no PR or history rewrite.
 
 ## Ownership review
 
 Coordinator-authored review, separate from test outcomes: ActivityModel owns only a
 bounded GUI-thread projection and change notifications. It keeps no Job references,
-does not mutate job state and creates no competing queue/timer. Job remains the
-authority for active/retryable states; GUI actions still invoke the existing commands.
+does not mutate job state and creates no competing queue/timer. Job supplies active
+state and the reported Retry-button availability shared with describe(); execution
+validation remains in the coordinator. GUI actions still invoke the existing commands.
 Core/application/native remain Qt-independent. No geometry algorithms, worker/publication
 contracts, undo, saves or profiler lifecycle changed. The render model is deliberately
 separate because it owns staged geometry leases, unlike Activity's small value rows.

@@ -55,8 +55,19 @@ CTest/style, script rules, numerics and doctor. Qt model tests cover stable iden
 changed roles, history bounds, target names and terminal state behavior. Actual GUI
 Cancel/Retry, failure messages, hidden updates, rename and New passed; screenshot
 inspected. F12 during four drag variants, cancellation, focus/privacy and New/Open
-recording passed. Portable/source release qualification remains in progress in the
-[task record](tasks/activity-panel-015.md).
+recording passed. Perfetto imported the final snapped/open-panel trace as 84,053
+slices with no nonzero error statistics.
+
+The portable Windows executable was built from clean production checkpoint `ce64fc3`
+(file/product version 0.1.5.0). A relocated copy passed `check_portable.py` with minimal
+PATH and developer Qt/Python variables removed: imports, attachments, primitives,
+deformers, deletion, subdivision, save/reopen, GPU image capture, GUI and desktop/headless
+profiler reports. The desktop capture was visually inspected. Reports identify the
+packaged build and correct collector capabilities. Release artifacts are local under
+`dist/AnthroForge.dist` and `dist/AnthroForge-0.1.5-source.zip`; raw validation remains
+under ignored `build/activity-015`. Source, evidence and recovery context are in Git.
+
+## Original 0.1 baseline
 
 Implementation and checks performed on 2026-10-16, Windows 11 x64. The original Blender addon
 was read and exercised in a separate background process; its source and user scenes were

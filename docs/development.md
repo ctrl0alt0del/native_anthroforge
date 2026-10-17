@@ -147,5 +147,6 @@ with Activity open/closed and direct/modal movement. It uses a nonactivating win
 to avoid focus interruptions and records system utilization; do not mix these absolute
 timings with ordinary foreground captures or run concurrent builds during measurements.
 Summarize the saved results with `tools/activity_evidence.py <comparison-directory>
-<output.json> [--confirmation <final-run-directory>]`. It preserves per-run variance and capture completeness/retention,
+<output.json> [--confirmation <final-run-directory>]`. It preserves per-run variance
+and capture completeness/retention,
 separates Activity notifications from other models, and does not sum nested durations.

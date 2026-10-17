@@ -27,10 +27,29 @@ number is specified; retain 0.1.5 and record the source revision of the delivere
 ## Current state and next action
 
 Baseline source/native snapshot is preserved under ignored
-build/standalone-optimizations/baseline. Initial work is desktop projection ownership,
-stable inspector choices and change-specific notifications. No production edits yet.
-Implement and verify each increment before proceeding to the next; checkpoint about
-every ten minutes. Final integrated gate, GUI, native parity and packaging are pending.
+build/standalone-optimizations/baseline.
+
+Stage 1 is integrated: a bounded application ChangeJournal describes record/field
+changes, SceneProjection caches scene metadata and parent choices, and desktop-owned
+PropertyProjection objects notify individual QML fields while preserving curve/point
+and outliner identities. Authored dataclasses are projected without repeated deep
+serialization. Visual-layer arrays are prepared once per component geometry update.
+RenderModel retains existing staged leases; picking changes with displayed results.
+
+425 tests, lint and mypy pass. Primitive and curve interaction GUI acceptance pass;
+loft/lattice screenshots were inspected. A transient undefined-to-bool warning in the
+outline visibility binding was fixed. Serial ABBA open-Activity mouse drags (80 events
+per normal/Ctrl gesture) measured baseline handler means 12.41-13.83 ms and candidate
+5.21-5.97 ms. Both recorded comparison runs stopped successfully. The candidate pilot
+capture retained all events and reported zero curveChoice model replacements. Complete
+comparison artifacts: build/standalone-optimizations/stage1-comparison. These are stage
+measurements, not final integrated results. PySide 6.12 exposes only QQmlPropertyMap's
+deprecated constructor; Python emits a deprecation warning, while actual QML has no
+warnings. This adapter is isolated in desktop/property_projection.py.
+
+Next: implement indexed immutable documents and reusable dependency structure. Then
+native intermediate geometry/finalization and active-job indexing, in that order.
+Final integrated gate, broader GUI/native parity and packaging remain pending.
 
 ## Recovery
 

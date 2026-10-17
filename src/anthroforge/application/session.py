@@ -14,6 +14,7 @@ from anthroforge.profiling.tasks import command_metadata
 from anthroforge.profiling.tasks import operation as profile_operation
 
 from .assets import Asset
+from .changes import ChangeJournal
 from .coordinator import TaskCoordinator
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
@@ -22,7 +23,7 @@ from .history import History
 
 class Session:
     def __init__(self, name: str = "Untitled", profiler: RuntimeProfiler | None = None) -> None:
-        self.document = Document(name=name)
+        self.changes, self._document = ChangeJournal(), Document(name=name)
         self.history = History(self.document)
         self.assets: dict[str, Asset] = {}
         self.initialize_runtime(profiler)
@@ -39,6 +40,15 @@ class Session:
         self.owns_profiler = profiler is None
         self.profiler = profiler if profiler is not None else RuntimeProfiler()
         self.initialize_scheduler()
+
+    @property
+    def document(self) -> Document:
+        return self._document
+
+    @document.setter
+    def document(self, value: Document) -> None:
+        self.changes.record(self._document, value)
+        self._document = value
 
     def initialize_scheduler(self) -> None:
         self.scheduler = TaskCoordinator(lambda: self.document)

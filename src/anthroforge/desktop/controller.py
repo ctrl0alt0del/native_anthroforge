@@ -8,7 +8,7 @@ from anthroforge.profiling import RuntimeProfiler
 from anthroforge.profiling.spans import measured
 
 from . import controller_actions as actions
-from . import project_actions, scene_state
+from . import project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
 from .models import RenderModel
 
@@ -17,6 +17,7 @@ class Controller(QObject):
     changed = Signal()
     metricsChanged = Signal()
     selectionChanged = Signal()
+    treeChanged = Signal()
     saveChoiceRequested = Signal(str)
     discardRequested = Signal(str)
     frameRequested = Signal(list)
@@ -30,6 +31,7 @@ class Controller(QObject):
         self.render_model = RenderModel(self)
         self.render_model.activated.connect(self.activate_geometry)
         self._initialize_state()
+        scene_projection.initialize(self)
         from .authoring import Authoring
 
         self.authoring = Authoring(self)
@@ -69,13 +71,17 @@ class Controller(QObject):
     def meshModel(self):
         return self.render_model
 
-    @Property("QVariantList", notify=selectionChanged)
+    @Property("QVariantList", notify=treeChanged)
     def treeRows(self):
-        return self.rows
+        return self.scene_projection.view.value("rows")
 
-    @Property("QVariantMap", notify=selectionChanged)
+    @Property(QObject, constant=True)
     def selectedData(self):
-        return next((row for row in self.rows if row["id"] == self.selection), {})
+        return self.scene_projection.selected
+
+    @Property(QObject, constant=True)
+    def sceneChoices(self):
+        return self.scene_projection.view
 
     @Property(str, notify=selectionChanged)
     def selectedId(self):
@@ -85,7 +91,7 @@ class Controller(QObject):
     def hoveredId(self):
         return self.hovered
 
-    @Property("QVariantMap", notify=changed)
+    @Property(QObject, constant=True)
     def state(self):
         return self._state
 
@@ -99,7 +105,7 @@ class Controller(QObject):
 
     @measured("ui", lambda owner: owner.session.profiler)
     def notify(self):
-        self._state = self.snapshot()
+        self._state.synchronize(self.snapshot())
         self.changed.emit()
         names = {row["id"]: row["name"] for row in self.rows}
         self.activity_model.synchronize(self.session.scheduler.jobs, names)
@@ -173,22 +179,19 @@ class Controller(QObject):
         self.notify()
 
     def refresh_if_needed(self):
-        if (self.last_revision, self.last_workspace) != (
-            self.session.document.revision,
-            self.session.active_workspace,
+        projection = self.scene_projection
+        if (
+            projection.session is not self.session
+            or projection.cursor != self.session.changes.serial
+            or self.last_workspace != self.session.active_workspace
         ):
             self.refresh()
 
     @measured("ui", lambda owner: owner.session.profiler)
     def refresh(self):
-        self.rows = scene_state.records(self)
-        self.render_model.publish(scene_state.render_rows(self.rows), self.session.assets)
-        scene_state.picking_inputs(self, self.render_model.active_rows())
-        if self.selection and not any(row["id"] == self.selection for row in self.rows):
-            self.selection = ""
+        scene_projection.refresh(self)
         self.last_revision = self.session.document.revision
         self.last_workspace = self.session.active_workspace
-        self.selectionChanged.emit()
         self.notify()
         self.restore_camera()
 
@@ -216,7 +219,11 @@ class Controller(QObject):
     @Slot(str)
     def select(self, entity):
         self.selection = entity
-        self.selectionChanged.emit()
+        self.scene_projection.synchronize_selection()
+        self.scene_projection.view.synchronize(
+            dict(rows=self.rows, parents=self.scene_projection.parents())
+        )
+        self.authoring.refresh()
         self.notify()
 
     @Slot(str, float, str, bool)
@@ -234,8 +241,7 @@ class Controller(QObject):
         previous = self.hovered
         self.hovered = self.last_hit.get("id", "")
         if select:
-            self.selection = self.hovered
-            self.selectionChanged.emit()
+            self.select(self.hovered)
         if select or previous != self.hovered:
             self.notify()
         return self.last_hit

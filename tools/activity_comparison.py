@@ -33,7 +33,7 @@ def measure(case, args):
     path = args.output / f"{interaction}-{int(opened)}-{mode}-{index}-{source}.json"
     invoke(case, args, path)
     report = json.loads(path.read_text())
-    expected = "0.1.4" if source == "baseline" else "0.1.5"
+    expected = args.baseline_version if source == "baseline" else args.candidate_version
     assert report["version"] == expected, report["version"]
     print(path.name, [round(t["handler_ms"]["mean"], 2) for t in report["trials"]], flush=True)
 
@@ -57,15 +57,32 @@ def comparison_environment(source, baseline):
     return dict(os.environ, PYTHONPATH=str(baseline if source == "baseline" else ROOT / "src"))
 
 
-def main():
+def arguments():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--baseline", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--events", type=int, default=120)
-    args = parser.parse_args()
+    parser.add_argument("--baseline-version", default="0.1.4")
+    parser.add_argument("--candidate-version", default="0.1.5")
+    parser.add_argument("--interaction", choices=("both", "drag", "modal"), default="both")
+    parser.add_argument("--activity", choices=("both", "open", "closed"), default="both")
+    return parser.parse_args()
+
+
+def selected_cases(args):
+    for case in cases():
+        if args.interaction != "both" and case[0] != args.interaction:
+            continue
+        if args.activity != "both" and case[1] != (args.activity == "open"):
+            continue
+        yield case
+
+
+def main():
+    args = arguments()
     args.baseline, args.output = args.baseline.resolve(), args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=True)
-    for case in cases():
+    for case in selected_cases(args):
         measure(case, args)
 
 

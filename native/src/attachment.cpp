@@ -2,8 +2,6 @@
 #include "mesh_internal.hpp"
 #include <chrono>
 #include <cstring>
-#pragma clang diagnostic ignored "-Wlogical-op-parentheses"
-#pragma clang diagnostic ignored "-Wunknown-pragmas"
 struct Vec { double x,y,z; };
 static Vec add(Vec a,Vec b) { return {a.x+b.x,a.y+b.y,a.z+b.z}; }
 static Vec sub(Vec a,Vec b) { return {a.x-b.x,a.y-b.y,a.z-b.z}; }
@@ -13,7 +11,28 @@ static double norm(Vec a) { return std::sqrt(dot(a,a)); }
 static Vec cross(Vec a,Vec b) { return {a.y*b.z-a.z*b.y,a.z*b.x-a.x*b.z,a.x*b.y-a.y*b.x}; }
 static constexpr int af_requested_workers=1;
 #define AF_EXPORT extern "C" AF_API
+// Keep compiler accommodations inside the unchanged migration-kernel boundary.
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wlogical-op-parentheses"
+#pragma clang diagnostic ignored "-Wunknown-pragmas"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wparentheses"
+#pragma GCC diagnostic ignored "-Wmisleading-indentation"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#elif defined(_MSC_VER)
+#pragma warning(push)
+#pragma warning(disable:4068)
+#endif
 #include "../migration/attachment_wave_reference.hpp"
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#pragma warning(pop)
+#endif
 
 namespace af {
 struct Capture {

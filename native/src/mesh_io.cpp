@@ -1,7 +1,15 @@
 #include "mesh_internal.hpp"
 #include <igl/readOBJ.h>
 #include <igl/readSTL.h>
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(push)
+// Happly's type dispatch contains intentional unreachable fallback branches.
+#pragma warning(disable:4702)
+#endif
 #include <happly.h>
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma warning(pop)
+#endif
 #include <filesystem>
 #include <fstream>
 

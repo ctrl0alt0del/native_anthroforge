@@ -12,7 +12,7 @@ from anthroforge.native import construction as native
 from anthroforge.native.attachments import capture, propagate
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 from anthroforge.native.scene import entity_frame
-from anthroforge.native.topology import preserve
+from anthroforge.native.topology import draft, finalize
 
 from .membership import resolve
 
@@ -125,10 +125,12 @@ class Evaluation:
         if definition is None:
             raise ValueError("Grouping SCP has no construction.")
         if definition.kind == "IMPORTED":
-            return self.meshes[definition.source]
+            return draft(self.meshes[definition.source], self.cancel.handle)
         samples = {curve.id: self.curve(entity, curve, definition) for curve in definition.curves}
         if definition.kind == "LOFT":
-            return native.loft(self.engine, definition, list(samples.values()), self.cancel.handle)
+            return native.loft(
+                self.engine, definition, list(samples.values()), self.cancel.handle, complete=False
+            )
         return self.body(entity, definition, samples)
 
     def body(self, entity: SCP, definition: Primitive, samples: dict[str, Any]) -> Mesh:
@@ -144,16 +146,20 @@ class Evaluation:
     def body_piece(self, entity: SCP, definition: Primitive, piece: Any, samples: Any) -> Mesh:
         curve = next(c for c in definition.curves if c.id == piece.curve)
         closed = cyclic(curve, definition)
-        base = bodies.base(self.engine, piece, definition.samples, closed, self.cancel.handle)
+        base = bodies.draft_base(self.engine, piece, definition.samples, closed, self.cancel.handle)
         frame = native.matrix(self.engine, entity_frame(self.engine, entity), curve.matrix)
-        points = self.deform(base.array(0), entity.deformers, "BASE", piece.id, frame)
-        base = native.deformed(base, points, self.cancel.handle)
+        original = base.array(0)
+        points = self.deform(original, entity.deformers, "BASE", piece.id, frame)
+        if points is not original:
+            base = native.deformed(base, points, self.cancel.handle)
         bent = bodies.bend(base, samples, piece, closed, self.cancel.handle)
-        return native.deformed(
-            bent,
-            components.transformed(self.engine, bent.array(0), curve.matrix),
-            self.cancel.handle,
-        )
+        return self.transform_mesh(bent, curve.matrix)
+
+    def transform_mesh(self, mesh: Mesh, matrix: tuple[float, ...]) -> Mesh:
+        if matrix == IDENTITY:
+            return mesh
+        points = components.transformed(self.engine, mesh.array(0), matrix)
+        return native.deformed(mesh, points, self.cancel.handle)
 
     def geometry(self, entity: SCP) -> Mesh:
         mesh = self.construct(entity)
@@ -165,7 +171,7 @@ class Evaluation:
             mesh = native.deformed(mesh, points, self.cancel.handle)
         if entity.thickness and entity.thickness.enabled:
             mesh = native.solidify(mesh, entity.thickness, self.cancel.handle)
-        return preserve(mesh, self.meshes.get(geometry_asset(entity)), self.cancel.handle)
+        return finalize(mesh, self.meshes.get(geometry_asset(entity)), self.cancel.handle)
 
 
 def control_entity(control: Control, parent: str) -> SCP:

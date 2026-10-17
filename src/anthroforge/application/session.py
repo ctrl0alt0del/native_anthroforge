@@ -196,6 +196,7 @@ class Session:
         self.scheduler.close()
         if self._engine is not None:
             self.profiler.native.detach(self._engine)
+            self._engine.bases.clear()
         if self.owns_profiler:
             self.profiler.close()
         if self.file_lock:

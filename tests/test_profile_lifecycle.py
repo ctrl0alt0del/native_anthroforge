@@ -128,7 +128,7 @@ def test_borrowed_profiler_survives_session_close_and_observes_replacement(tmp_p
     captured = events(tmp_path / "replaced.zip")
     commands = [e for e in captured if e["cat"] == "command" and e["name"] == "primitive.create"]
     assert len({e["args"]["document"] for e in commands}) == 2
-    assert len([e for e in captured if e["name"] == "af_body_base"]) == 2
+    assert len([e for e in captured if e["name"] == "af_body_base_geometry"]) == 2
 
 
 def test_open_keeps_profiler_on_replacement_scheduler(session, tmp_path):

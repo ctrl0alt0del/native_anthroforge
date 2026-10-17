@@ -13,11 +13,9 @@ from .mesh import D, GeometryEngine, Mesh, U, doubles, pointer
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_curve_path", [D, c.c_int, c.c_int, c.c_int, D, c.POINTER(c.c_int), U])
-    engine.bind(
-        "af_body_base",
-        [c.c_int, c.c_int, c.c_int, c.c_double, c.c_double, c.c_double, c.c_int, U],
-        U,
-    )
+    base_args = [c.c_int, c.c_int, c.c_int, c.c_double, c.c_double, c.c_double, c.c_int, U]
+    engine.bind("af_body_base", base_args, U)
+    engine.bind("af_body_base_geometry", base_args, U)
     engine.bind("af_curve_deform", [U, D, c.c_int, c.c_int, c.c_double, c.c_double, c.c_int, U], U)
 
 
@@ -38,8 +36,12 @@ def path(engine: GeometryEngine, curve: Curve, cancel: int, records: Any = None)
 
 
 def base(engine: GeometryEngine, piece: BodyPiece, count: int, closed: bool, cancel: int) -> Mesh:
+    return owned_mesh(engine, engine.library.af_body_base(*base_key(piece, count, closed), cancel))
+
+
+def base_key(piece: BodyPiece, count: int, closed: bool) -> tuple[Any, ...]:
     shape = ("BOX", "CYLINDER", "CAPSULE").index(piece.shape)
-    args = (
+    return (
         max(3, count),
         shape,
         piece.sides,
@@ -47,9 +49,18 @@ def base(engine: GeometryEngine, piece: BodyPiece, count: int, closed: bool, can
         piece.depth,
         piece.length,
         closed,
-        cancel,
     )
-    return owned_mesh(engine, engine.library.af_body_base(*args))
+
+
+def draft_base(
+    engine: GeometryEngine, piece: BodyPiece, count: int, closed: bool, cancel: int
+) -> Mesh:
+    key = base_key(piece, count, closed)
+    cached = engine.bases.get(key)
+    if cached is not None:
+        return cached
+    mesh = owned_mesh(engine, engine.library.af_body_base_geometry(*key, cancel))
+    return engine.bases.put(key, mesh)
 
 
 def bend(mesh: Mesh, samples: Any, piece: BodyPiece, closed: bool, cancel: int) -> Mesh:

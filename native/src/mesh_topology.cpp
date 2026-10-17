@@ -51,3 +51,28 @@ uint64_t af_mesh_reuse_topology(uint64_t source,uint64_t previous,uint64_t cance
         return af::retain(current);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }
+uint64_t af_mesh_draft(uint64_t source,uint64_t cancel) {
+    try {
+        const auto mesh=af::mesh(source);
+        return af::retain(af::deform_mesh(*mesh,mesh->vertices,cancel,false));
+    } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
+}
+uint64_t af_mesh_finalize(uint64_t source,uint64_t previous,uint64_t cancel) {
+    try {
+        af::check_cancel(cancel); const auto mesh=af::mesh(source);
+        auto topology=previous?af::mesh(previous):mesh;
+        if(mesh->vertices.rows()!=topology->vertices.rows()||mesh->corners!=topology->corners||mesh->offsets!=topology->offsets)
+            topology=mesh;
+        if(mesh->prepared&&mesh->triangles.rows()==topology->triangles.rows()&&mesh->triangles==topology->triangles&&mesh->polygons==topology->polygons)
+            return af::retain(mesh);
+        return af::retain(af::deform_mesh(*topology,mesh->vertices,cancel));
+    } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
+}
+uint64_t af_mesh_storage_bytes(uint64_t source) {
+    try {
+        const auto mesh=af::mesh(source);
+        if(mesh->prepared) throw std::runtime_error("Storage accounting requires a geometry-only draft.");
+        return sizeof(af::Mesh)+mesh->vertices.size()*sizeof(double)+mesh->triangles.size()*sizeof(int)
+            +(mesh->corners.capacity()+mesh->offsets.capacity()+mesh->polygons.capacity())*sizeof(int64_t);
+    } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
+}

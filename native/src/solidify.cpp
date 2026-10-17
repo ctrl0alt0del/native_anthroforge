@@ -154,7 +154,7 @@ static std::shared_ptr<Mesh> solidify(const Mesh& mesh,const double* s,const dou
     if(s[4]) even_correction(data,mesh);
     if(s[8]) clamp_angles(data,mesh,s[4]!=0);
     const auto mapping=shell_mapping(data,int(mesh.vertices.rows()),!(s[2]&&s[3]));
-    return make_mesh(shell_points(mesh,data,s,weights,mapping),shell_faces(data,s,mapping),cancel);
+    return make_mesh(shell_points(mesh,data,s,weights,mapping),shell_faces(data,s,mapping),cancel,mesh.prepared);
 }
 }
 uint64_t af_solidify(uint64_t source,const double* settings,const double* weights,uint64_t cancel) {

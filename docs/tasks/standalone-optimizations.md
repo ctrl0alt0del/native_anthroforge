@@ -58,7 +58,20 @@ The 1,024-SCP synthetic admission median is approximately 1.4 ms versus the audi
 86.8 ms. This measures admission without worker dispatch or GUI. Evidence and an
 ordinary runtime profiler capture are in build/standalone-optimizations/stage2.
 
-Next: native intermediate geometry/finalization and active-job indexing, in that order.
+Stage 3 is integrated: explicit native geometry-only roots propagate through deformation,
+joining and Simple Solidify. One finalization chooses accepted topology before building
+spatial/render data. Existing prepared APIs remain available and unchanged. Drafts are
+rejected by picking; no lazy render-thread work was introduced. A per-engine, locked
+base cache is capped at 64 entries/32 MiB of accounted native storage plus record allowance;
+it includes every base-shape input and releases its ownership on eviction/session close.
+21 new checks cover prepared/deferred equivalence, transforms, closed curves, hooks,
+lattices, thickness, loft/caps/join/import, cancellation and cache invalidation/lifetime.
+The serial geometry-only comparison measures 1.8 -> 0.43 ms (482 vertices), 20 -> 4.2 ms
+(4,034), and 87 -> 16.3 ms (16,258); the last large baseline trial rose to 130 ms, so final
+qualification must report that variance rather than claim a precise whole-app speedup.
+The runtime capture is build/standalone-optimizations/stage3/geometry.afprofile.zip.
+
+Next: active-job indexing and compact terminal ownership, then integrated qualification.
 Final integrated gate, broader GUI/native parity and packaging remain pending.
 
 ## Recovery

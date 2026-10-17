@@ -55,6 +55,6 @@ uint64_t af_curve_deform(uint64_t base,const double* samples,int count,int fit,d
         const auto source=af::mesh(base);
         const auto curve=af::path(samples,count,closed!=0);
         const auto vertices=af::bent_vertices(*source,curve,fit!=0,length,position,cancel);
-        return af::retain(af::deform_mesh(*source,vertices,cancel));
+        return af::retain(af::deform_mesh(*source,vertices,cancel,source->prepared));
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }

@@ -26,6 +26,7 @@ using Triangles = Eigen::Matrix<int,Eigen::Dynamic,3,Eigen::RowMajor>;
 using Faces = std::vector<std::vector<int64_t>>;
 struct Mesh {
     bool generated=false;
+    bool prepared=false;
     Vertices vertices;
     Triangles triangles;
     std::vector<int64_t> corners, offsets, polygons;
@@ -44,7 +45,7 @@ struct Cancellation { std::atomic<bool> cancelled{false}; };
 std::shared_ptr<Mesh> mesh(uint64_t handle);
 uint64_t retain(std::shared_ptr<Mesh> mesh);
 std::shared_ptr<Mesh> read_mesh(const std::string& path, double units, bool y_up, uint64_t cancel);
-void prepare_mesh(Mesh& mesh, const Faces& faces, uint64_t cancel=0);
+void prepare_mesh(Mesh& mesh, const Faces& faces, uint64_t cancel=0,bool complete=true);
 void set_error(const std::string& message);
 void check_cancel(uint64_t token);
 V3 point(const M4& matrix, const V3& value);

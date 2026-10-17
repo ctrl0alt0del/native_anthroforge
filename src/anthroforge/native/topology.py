@@ -12,6 +12,9 @@ INT32 = c.POINTER(c.c_int32)
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_mesh_reuse_topology", [U, U, U], U)
+    engine.bind("af_mesh_draft", [U, U], U)
+    engine.bind("af_mesh_storage_bytes", [U], U)
+    engine.bind("af_mesh_finalize", [U, U, U], U)
     engine.bind(
         "af_mesh_restore", [D, c.c_int64, INT64, INT64, c.c_int64, INT32, INT64, c.c_int64], U
     )
@@ -45,5 +48,19 @@ def preserve(mesh: Mesh, previous: Mesh | None, cancel: int) -> Mesh:
     if previous is None:
         return mesh
     handle = mesh.engine.library.af_mesh_reuse_topology(mesh.handle, previous.handle, cancel)
+    mesh.engine.check(not handle)
+    return Mesh(mesh.engine, handle)
+
+
+def draft(mesh: Mesh, cancel: int) -> Mesh:
+    handle = mesh.engine.library.af_mesh_draft(mesh.handle, cancel)
+    mesh.engine.check(not handle)
+    return Mesh(mesh.engine, handle)
+
+
+def finalize(mesh: Mesh, previous: Mesh | None, cancel: int) -> Mesh:
+    handle = mesh.engine.library.af_mesh_finalize(
+        mesh.handle, previous.handle if previous else 0, cancel
+    )
     mesh.engine.check(not handle)
     return Mesh(mesh.engine, handle)

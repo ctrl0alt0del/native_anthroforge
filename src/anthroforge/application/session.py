@@ -6,7 +6,7 @@ from typing import Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Workspace
-from anthroforge.core.jobs import Job
+from anthroforge.core.jobs import Job, Restart
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.profiling import RuntimeProfiler
 from anthroforge.profiling.spans import measured
@@ -135,12 +135,11 @@ class Session:
             self.history.replay()
         self.resume_calculations()
 
-    def remember_restarts(self, jobs: list[Job]) -> None:
-        for job in jobs:
-            revision = job.snapshot.revision if job.snapshot else job.origin
+    def remember_restarts(self, restarts: list[Restart]) -> None:
+        for restart in restarts:
             for entry in self.history.entries[self.history.cursor + 1 :]:
-                if revision in entry.versions and job.restart_on_redo and job.retry:
-                    entry.restarts.append(job.retry)
+                if restart.revision in entry.versions:
+                    entry.restarts.append(restart.callback)
                     break
 
     def resume_calculations(self) -> None:

@@ -19,7 +19,7 @@ def save(session: "Session", path: str, blocked_policy: str) -> dict[str, Any]:
     if session.scheduler.blocked and blocked_policy == "pending":
         return {
             "status": "pending",
-            "jobs": [j.id for j in session.scheduler.jobs if j.active and j.writes],
+            "jobs": [j.id for j in session.scheduler.active_jobs if j.writes],
         }
     if blocked_policy == "wait":
         session.scheduler.wait()

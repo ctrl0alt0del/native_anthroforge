@@ -90,7 +90,7 @@ def cleanup(controller, lock, state):
 def queue_document(controller, path):
     controller.pending_document = path
     controller.session.waiting_save = True
-    for job in controller.session.scheduler.jobs:
+    for job in controller.session.scheduler.active_jobs:
         if job.active:
             controller.session.scheduler.cancel_job(job.id)
 
@@ -100,9 +100,7 @@ def poll(controller):
     if controller.pending_save and not session.scheduler.blocked:
         path, controller.pending_save = controller.pending_save, ""
         start_save(controller, path, "wait")
-    if controller.pending_document is not None and not any(
-        j.active for j in session.scheduler.jobs
-    ):
+    if controller.pending_document is not None and not session.scheduler.active_jobs:
         path, controller.pending_document = controller.pending_document, None
         if path:
             start_open(controller, path)

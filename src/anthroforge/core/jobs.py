@@ -15,6 +15,16 @@ from .scheduling import Assessment, Workload
 TERMINAL = frozenset(("succeeded", "failed", "cancelled", "obsolete"))
 
 
+def retired(*args: Any) -> Any:
+    raise RuntimeError("Completed job execution data has been released.")
+
+
+@dataclass(frozen=True, slots=True)
+class Restart:
+    revision: int
+    callback: Callable[[], Any]
+
+
 @dataclass
 class Job:
     label: str
@@ -30,8 +40,9 @@ class Job:
     origin: int = 0
     epoch: int = 0
     snapshot: Document | None = None
+    dispatch_revision: int | None = None
     future: Future[Any] | None = None
-    cancel: Event = field(default_factory=Event)
+    cancel: Event | None = field(default_factory=Event)
     obsolete: bool = False
     created: float = field(default_factory=monotonic)
     started: float = 0.0
@@ -67,6 +78,16 @@ class Job:
     @property
     def retryable(self) -> bool:
         return self.retry is not None and self.state in ("failed", "cancelled")
+
+    def retire(self) -> None:
+        if self.snapshot is not None:
+            self.dispatch_revision = self.snapshot.revision
+        self.snapshot = self.future = self.cleanup = self.cancel = None
+        self.prepare = self.execute = self.publish = self.workload = retired
+        self.prerequisites = self.provides = self.observes = frozenset()
+        self.reads = self.captures = frozenset()
+        if not self.retryable:
+            self.retry = None
 
     def describe(self) -> dict[str, Any]:
         end = self.finished or monotonic()

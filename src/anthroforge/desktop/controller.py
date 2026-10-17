@@ -306,7 +306,7 @@ class Controller(QObject):
 
     @Slot()
     def cancelSaveWait(self):
-        for job in self.session.scheduler.jobs:
+        for job in self.session.scheduler.active_jobs:
             if job.active and "@document" in job.outputs:
                 self.session.scheduler.cancel_job(job.id)
         self.pending_save = ""

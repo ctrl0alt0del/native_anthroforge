@@ -29,7 +29,7 @@ def select_workspace(session: "Session", index: int) -> None:
     if not 0 <= index < len(session.document.workspaces):
         raise ValueError("Unknown workspace.")
     session.active_workspace = index
-    for job in session.scheduler.jobs:
+    for job in session.scheduler.active_jobs:
         if job.state == "queued":
             job.priority = session.priority(set(job.outputs))
 

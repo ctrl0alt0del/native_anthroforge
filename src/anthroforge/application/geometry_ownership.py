@@ -18,7 +18,7 @@ def assets_used(document: Document) -> set[str]:
 def retained_documents(session: "Session") -> list[Document]:
     documents = [session.document, session.scheduler.checkpoint]
     documents.extend(entry.document for entry in session.history.entries)
-    documents.extend(job.snapshot for job in session.scheduler.jobs if job.active and job.snapshot)
+    documents.extend(job.snapshot for job in session.scheduler.active_jobs if job.snapshot)
     if session.history.before:
         documents.append(session.history.before)
     return documents

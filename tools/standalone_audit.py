@@ -98,7 +98,8 @@ def completed_job(index, document):
 def job_scaling(count):
     document = Document()
     coordinator = TaskCoordinator(lambda: document)
-    coordinator.jobs = [completed_job(i, document) for i in range(count)]
+    for i in range(count):
+        coordinator.registry.add(completed_job(i, document))
     try:
         return dict(
             completed_jobs=count,

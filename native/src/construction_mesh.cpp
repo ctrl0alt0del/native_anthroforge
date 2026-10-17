@@ -15,16 +15,19 @@ Faces mesh_faces(const Mesh& source) {
         result.emplace_back(source.corners.begin()+source.offsets[i-1],source.corners.begin()+source.offsets[i]);
     return result;
 }
+static void copy_topology(const Mesh& source,Mesh& target) {
+    target.triangles=source.triangles;
+    target.corners=source.corners;
+    target.offsets=source.offsets;
+    target.polygons=source.polygons;
+}
 std::shared_ptr<Mesh> deform_mesh(const Mesh& source,const Vertices& vertices,uint64_t cancel,bool complete) {
     if(vertices.rows()!=source.vertices.rows()||!vertices.allFinite())
         throw std::runtime_error("Deformation must preserve vertex count and finite coordinates.");
     auto result=std::make_shared<Mesh>();
     result->vertices=vertices;
     result->generated=true;
-    result->triangles=source.triangles;
-    result->corners=source.corners;
-    result->offsets=source.offsets;
-    result->polygons=source.polygons;
+    copy_topology(source,*result);
     check_cancel(cancel);
     if(complete) rebuild_mesh(*result,cancel);
     else af_bounds3d(vertices.data(),vertices.rows(),result->bounds);

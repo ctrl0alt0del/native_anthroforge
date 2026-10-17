@@ -71,7 +71,19 @@ The serial geometry-only comparison measures 1.8 -> 0.43 ms (482 vertices), 20 -
 qualification must report that variance rather than claim a precise whole-app speedup.
 The runtime capture is build/standalone-optimizations/stage3/geometry.afprofile.zip.
 
-Next: active-job indexing and compact terminal ownership, then integrated qualification.
+Stage 4 is integrated: JobRegistry owns active ID/key/owner/port/output indexes and
+separate history. Tick, admission, dependency waiting, cancellation, invalidation,
+checkpoint, save, viewport polling and profiler snapshots use active work only.
+Terminal records retain diagnostics and retry recipes when relevant, but release
+snapshots, futures, native cancellation handles and execution/cleanup closures.
+Undo captures a compact restart recipe before retirement, including dispatch revision.
+Six new ownership/index/cleanup/restart tests pass. Synthetic 50,000-row history now
+has approximately 0.0013 ms idle ticks (audit: approximately 33 ms). A real 5,000-job
+soak completed both unrecorded and recorded with zero retained snapshots/cancellation
+objects. Evidence: build/standalone-optimizations/stage4 (including soak.afprofile.zip).
+
+Next: integrated development gate, serial GUI comparisons/interaction acceptance,
+ownership review, portable build and package qualification, then normal integration.
 Final integrated gate, broader GUI/native parity and packaging remain pending.
 
 ## Recovery

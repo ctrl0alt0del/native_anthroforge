@@ -7,11 +7,12 @@ from time import sleep
 from typing import Any
 
 from anthroforge.core.document import Document
-from anthroforge.core.jobs import Job
+from anthroforge.core.jobs import Job, Restart
 from anthroforge.core.metrics import Metrics
 from anthroforge.core.results import Port
 from anthroforge.profiling import tasks as trace
 
+from .job_registry import JobRegistry
 from .task_execution import InlineBudget, completed_future, execute
 from .task_schedulers import task_schedulers
 
@@ -24,7 +25,7 @@ class TaskCoordinator:
         clock: Callable[[], float] = monotonic,
     ) -> None:
         self.current, self.clock = current, clock
-        self.jobs: list[Job] = []
+        self.registry = JobRegistry()
         self.pool = ThreadPoolExecutor(max_workers=workers, thread_name_prefix="anthroforge")
         self.workers = workers
         self.checkpoint = current()
@@ -41,8 +42,16 @@ class TaskCoordinator:
         self.coalescing: dict[str, tuple[float, float]] = {}
 
     @property
+    def jobs(self) -> list[Job]:
+        return self.registry.history
+
+    @property
+    def active_jobs(self) -> tuple[Job, ...]:
+        return tuple(self.registry.active.values())
+
+    @property
     def blocked(self) -> bool:
-        return any(job.active and job.writes for job in self.jobs)
+        return any(job.writes for job in self.registry.active.values())
 
     def submit(self, job: Job) -> str:
         if job.kind not in self.task_schedulers:
@@ -52,7 +61,7 @@ class TaskCoordinator:
         self._supersede(job)
         job.origin, job.epoch = self.current().revision, self.epoch
         job.queued_since = self.clock() if job.queued_since is None else job.queued_since
-        self.jobs.append(job)
+        self.registry.add(job)
         trace.event(self.profiler, job, "queued")
         self._admit(job)
         self._checkpoint()
@@ -62,7 +71,7 @@ class TaskCoordinator:
         previous = self.coalescing.pop(job.key, None)
         if previous and self.clock() <= previous[1]:
             job.queued_since = previous[0]
-        for existing in self.jobs:
+        for existing in self.registry.matching("key", (job.key,)):
             if job.key and existing.key == job.key and existing.active:
                 if existing.queued_since is not None:
                     job.queued_since = min(
@@ -74,7 +83,7 @@ class TaskCoordinator:
     def pending_since(self, outputs: set[str], kind: str) -> float | None:
         pending = (
             job.queued_since
-            for job in self.jobs
+            for job in self.registry.matching("output", outputs)
             if job.active
             and job.kind == kind
             and job.outputs & outputs
@@ -111,11 +120,16 @@ class TaskCoordinator:
                 bool(j.provides & job.prerequisites)
                 or (j.future is not None and bool(j.outputs & job.outputs))
             )
-            for j in self.jobs
+            for j in self.blockers(job)
+        )
+
+    def blockers(self, job: Job) -> list[Job]:
+        return self.registry.matching("provides", job.prerequisites) + self.registry.matching(
+            "output", job.outputs
         )
 
     def cancel_job(self, job_id: str, obsolete: bool = False) -> None:
-        job = next(item for item in self.jobs if item.id == job_id)
+        job = self.registry.by_id[job_id]
         if not job.active:
             return
         if obsolete:
@@ -130,6 +144,7 @@ class TaskCoordinator:
     def _request_cancel(self, job: Job) -> None:
         started = monotonic()
         job.cancel_requested = job.cancel_requested or started
+        assert job.cancel is not None
         job.cancel.set()
         trace.event(self.profiler, job, "cancel_requested")
         self.metrics.observe("cancel_request", monotonic() - started)
@@ -141,36 +156,39 @@ class TaskCoordinator:
         self.coalescing[job.key] = (job.queued_since, self.clock() + wait / 1000)
 
     def invalidate(self, affected: set[str]) -> None:
-        for job in self.jobs:
+        for job in self.registry.matching("owner", affected):
             if job.active and (job.outputs | job.reads).intersection(affected):
                 self.cancel_job(job.id, obsolete=True)
 
     def invalidate_ports(self, affected: set[Port]) -> None:
         owners = {port.owner for port in affected}
-        for job in self.jobs:
+        for job in self.registry.matching("port", affected) + self.registry.matching(
+            "legacy", owners
+        ):
             reads = job.observes | job.prerequisites | job.provides
             legacy = not reads and bool((job.outputs | job.reads) & owners)
             if job.active and (bool(reads & affected) or legacy):
                 self.cancel_job(job.id, obsolete=True)
 
     def retry(self, job_id: str) -> Any:
-        job = next(item for item in self.jobs if item.id == job_id)
+        job = self.registry.by_id[job_id]
         if job.active or job.retry is None:
             raise ValueError("This calculation cannot be retried in its current state.")
         return job.retry()
 
-    def restore(self, surviving: set[int]) -> list[Job]:
+    def restore(self, surviving: set[int]) -> list[Restart]:
         self.epoch += 1
         removed = []
-        for job in self.jobs:
+        for job in self.active_jobs:
             revision = job.snapshot.revision if job.snapshot else job.origin
             if job.active and (revision not in surviving or job.origin not in surviving):
+                if job.restart_on_redo and job.retry:
+                    removed.append(Restart(revision, job.retry))
                 self.cancel_job(job.id, obsolete=True)
-                removed.append(job)
         return removed
 
     def tick(self) -> None:
-        for job in tuple(self.jobs):
+        for job in self.active_jobs:
             if (
                 job.active
                 and job.future is not None
@@ -182,7 +200,7 @@ class TaskCoordinator:
         self._checkpoint()
 
     def _dispatch(self) -> None:
-        running = [job for job in self.jobs if job.active and job.future is not None]
+        running = [job for job in self.active_jobs if job.future is not None]
         reserved = set().union(*(job.outputs for job in running))
         for job in self.queued():
             if len(running) >= self.workers:
@@ -199,12 +217,13 @@ class TaskCoordinator:
 
     def queued(self) -> list[Job]:
         return sorted(
-            (job for job in self.jobs if job.state == "queued"),
+            (job for job in self.active_jobs if job.state == "queued"),
             key=lambda job: (-(job.priority + 100 * job.interactive), job.created),
         )
 
     def _start(self, job: Job) -> None:
         job.snapshot, job.started = self.current(), monotonic()
+        job.dispatch_revision = job.snapshot.revision
         job.state, job.progress = "preparing", "Preparing owned input"
         try:
             self._assess(job)
@@ -233,6 +252,7 @@ class TaskCoordinator:
 
     def _finish(self, job: Job) -> None:
         try:
+            assert job.cancel is not None
             if job.cancel.is_set():
                 self._terminal(job, "obsolete" if job.obsolete else "cancelled")
                 return
@@ -258,17 +278,25 @@ class TaskCoordinator:
 
     def _terminal(self, job: Job, state: str) -> None:
         job.state, job.finished = state, monotonic()
-        trace.event(self.profiler, job, state)
         if job.cancel_requested:
             self.metrics.observe("cancel_finish", job.finished - job.cancel_requested)
         job.progress = job.error or state.capitalize()
+        self._cleanup(job, state)
         self.task_schedulers[job.kind].observe(job)
-        if job.cleanup is not None:
-            job.cleanup(state)
-        job.future = None
+        trace.event(self.profiler, job, job.state)
+        self.registry.finish(job)
+
+    def _cleanup(self, job: Job, state: str) -> None:
+        try:
+            if job.cleanup is not None:
+                job.cleanup(state)
+        except Exception as error:
+            job.state, job.error = "failed", str(error)
+            job.progress = job.error
+            self.errors.append(job.error)
 
     def _checkpoint(self) -> None:
-        running = [j for j in self.jobs if j.active and j.writes and j.snapshot is not None]
+        running = [j for j in self.active_jobs if j.writes and j.snapshot is not None]
         if running:
             earliest = min(running, key=lambda j: j.started)
             if earliest.snapshot is not None:
@@ -278,14 +306,14 @@ class TaskCoordinator:
 
     def wait(self, timeout: float | None = None) -> None:
         started = monotonic()
-        while any(job.active for job in self.jobs):
+        while self.registry.active:
             self.tick()
             if timeout is not None and monotonic() - started >= timeout:
                 raise TimeoutError("Calculations are still pending.")
             sleep(0.002)
 
     def close(self) -> None:
-        for job in self.jobs:
+        for job in self.active_jobs:
             if job.active:
                 self.cancel_job(job.id)
         self.pool.shutdown(wait=True, cancel_futures=True)

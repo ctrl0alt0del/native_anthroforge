@@ -35,6 +35,8 @@ cd E:\development\anthroforge
 For Codex Cloud or Ubuntu development, run `bash tools/cloud/setup.sh`.
 See [cloud development and phone workflow](docs/cloud_development.md) for environment
 creation, dependency refresh, verification and the Windows GUI/release boundary.
+Use [work continuity](docs/work_continuity.md) for task branches, frequent pushed
+checkpoints and resuming the same work after a power outage.
 
 See [development commands](docs/development.md), [implementation contract](docs/implementation_01.md),
 [observed validation](docs/development_status.md), and [architecture](docs/architecture.md).

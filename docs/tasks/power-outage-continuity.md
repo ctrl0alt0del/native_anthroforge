@@ -29,23 +29,30 @@ recovery in a separate checkout; and completed documentation merged and pushed t
 - Resume an existing task branch after an outage; create a new branch for new work.
 - One active writer per task branch. Never force-push away another machine's work.
 
-## Current evidence
+## Current state and evidence
 
 - Local main and fetched origin/main both pointed to `4301134` at task start.
-- Existing AGENTS.md requires per-request remote authorization; cloud_development.md
-  repeats that rule. Neither defines a branch-specific recovery record.
+- At task start, AGENTS.md required per-request remote authorization; cloud_development.md
+  repeated that rule. Neither defined a branch-specific recovery record.
 - Official OpenAI guidance supports durable AGENTS.md rules and separate task context;
   Git's branch/commit/push model provides versioned remote checkpoints.
 - No application behavior changes are needed. Documentation/link review is the relevant
   gate, not another C++/GUI build.
+- Initial scope/next-step checkpoint `057d976` was pushed successfully to the task branch.
+- AGENTS.md now records standing authorization and checkpoint/resume/integration rules.
+  README.md and the cloud guide link to [work continuity](../work_continuity.md).
+- [The reusable handoff template](TEMPLATE.md) covers decisions, acceptance, relevant files,
+  actual verification, immediate next actions, blockers and unavailable inputs.
+- `git diff --check` passed; a Python pathlib/Markdown-link check resolved all 23 local
+  links in the six affected documents on Windows. Content review checked authority scope,
+  checkpoint-versus-acceptance semantics and preservation of divergent/unrelated work.
+- No application tests were rerun for these documentation-only changes.
 
 ## Next actions
 
-1. Update AGENTS.md and the cloud guide with the new standing workflow.
-2. Add a concise continuity guide and handoff template; link from README.md.
-3. Review links, consistency and diff; commit/push a recoverable checkpoint.
-4. Recover the task branch in a separate ignored checkout and verify context/code match.
-5. Record the outcome, then merge into main and push without rewriting history.
+1. Commit/push the reviewed workflow and handoff documents.
+2. Recover the task branch in a separate ignored checkout and verify context/code match.
+3. Record the outcome, then merge into main and push without rewriting history.
 
 ## Recovery inputs and limitations
 

@@ -49,5 +49,13 @@ def job_records(jobs):
 
 
 def save_recording(args, results, warnings=None):
-    data = dict(schema_version=1, metadata=args.metadata, results=results, warnings=warnings or [])
-    args.output.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    data = dict(
+        schema_version=1,
+        metadata=args.metadata,
+        results=results,
+        complete=warnings is not None,
+        warnings=warnings or [],
+    )
+    temporary = args.output.with_suffix(".json.tmp")
+    temporary.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    temporary.replace(args.output)

@@ -8,7 +8,7 @@ from weakref import WeakSet
 class NativeCalls:
     def __init__(self, profiler):
         self.profiler, self.engines = profiler, WeakSet()
-        self.originals = []
+        self.originals = {}
 
     def attach(self, engine: Any) -> None:
         if engine in self.engines:
@@ -24,9 +24,10 @@ class NativeCalls:
                 self.bind(engine, name, function)
 
     def bind(self, engine, name, function):
-        if not self.profiler.active or hasattr(function, "_profile_original"):
+        key = id(engine.library), name
+        if not self.profiler.active or key in self.originals:
             return
-        self.originals.append((engine.library, name, function))
+        self.originals[key] = (engine.library, name, function)
         setattr(engine.library, name, self.wrap(name, function))
 
     def wrap(self, name, function):
@@ -42,6 +43,6 @@ class NativeCalls:
             self.install_engine(engine)
 
     def stop(self):
-        for library, name, function in reversed(self.originals):
+        for library, name, function in self.originals.values():
             setattr(library, name, function)
         self.originals.clear()

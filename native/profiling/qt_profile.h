@@ -23,6 +23,7 @@ public:
     void end();
     void close();
     void synchronize(qint64 stamp);
+    void completeCapture();
     QByteArray drain();
     QByteArray status();
     void record(QJsonObject event);

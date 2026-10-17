@@ -4,6 +4,11 @@ import math
 from array import array
 from collections import Counter
 
+ATTRIBUTION_GAPS = [
+    "No stacks, GPU execution or physical input/display latency",
+    "Source-less events and uninstrumented internal work remain unknown",
+]
+
 
 class Distribution:
     def __init__(self):
@@ -80,4 +85,18 @@ class Summary:
             retained_interval_us=[self.start, self.end],
             percentile_method="log2 bins, 1/16 octave",
             interpretation="Inclusive wall durations overlap; do not add categories together.",
+            slowest=slowest(durations),
+            attribution_gaps=ATTRIBUTION_GAPS,
         )
+
+
+def slowest(durations):
+    categories = ("input/", "qml.binding/", "task/", "native/", "ui/", "profiler/")
+    return {
+        prefix: sorted(
+            [dict(name=key, **value) for key, value in durations.items() if key.startswith(prefix)],
+            key=lambda item: item["max_us"],
+            reverse=True,
+        )[:10]
+        for prefix in categories
+    }

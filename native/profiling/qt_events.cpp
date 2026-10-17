@@ -14,10 +14,11 @@ QJsonObject ProfileReceiver::describe(const QQmlProfilerEventType& type) const {
     const auto location=type.location();
     static const char* categories[]={"painting","compiling","creating","binding","signal","javascript"};
     const int range=int(type.rangeType());
+    const bool isRange=range>=0 && range<6;
     const QString file=QUrl(location.filename()).fileName();
-    const QString category=file=="ProfileStatus.qml"?"profiler_ui":range<6?categories[range]:"scenegraph";
+    const QString category=file=="ProfileStatus.qml"?"profiler_ui":isRange?categories[range]:"scenegraph";
     return {{"cat","qml."+category},{"name",category+":"+file+":"+QString::number(location.line())},
-        {"pid",1},{"tid",range<6?-1:-2},
+        {"pid",1},{"tid",isRange?-1:-2},
         {"args",QJsonObject{{"file",file},{"line",location.line()},{"column",location.column()},
             {"detail",type.detailType()}}}};
 }
@@ -54,4 +55,17 @@ void ProfileReceiver::instant(const char* category,const char* name,QJsonObject 
     record({{"cat",category},{"name",name},{"ph","i"},{"s","t"},{"pid",1},
         {"tid",qint64(quintptr(QThread::currentThreadId()))},
         {"ts",double(profileClock())/1000},{"args",args}});
+}
+
+void ProfileReceiver::completeCapture() {
+    while (!ranges.isEmpty()) {
+        const auto range=ranges.takeLast();
+        auto data=describe(types[range.type]);
+        auto args=data["args"].toObject(); args.insert("truncated_end",true);
+        const double start=double(range.start+offset)/1000;
+        data.insert("args",args); data.insert("ph","X"); data.insert("ts",start);
+        data.insert("dur",qMax(0.0,double(profileClock())/1000-start));
+        record(data);
+    }
+    finished=true; active=false;
 }

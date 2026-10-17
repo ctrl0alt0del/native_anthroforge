@@ -14,7 +14,14 @@ class Spans:
     def __init__(self, profiler):
         self.profiler, self.local = profiler, local()
         self.pending, self.serial = {}, 0
-        self.bytes = 0
+        self.bytes = self.observation_cost_ns = 0
+
+    def measure(self, function, *args):
+        start = perf_counter_ns()
+        try:
+            return function(*args)
+        finally:
+            self.observation_cost_ns += perf_counter_ns() - start
 
     def begin(self, category, name, metadata):
         self.serial += 1

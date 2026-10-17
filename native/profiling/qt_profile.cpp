@@ -56,7 +56,7 @@ void ProfileReceiver::setup(const QString& socket) {
     connect(connection,&QQmlDebugConnection::connected,this,[this] { connected=true; });
     connect(connection,&QQmlDebugConnection::disconnected,this,[this] { connected=false; });
     connect(client,&QQmlProfilerClient::traceStarted,this,[this](qint64 t) { synchronize(t); });
-    connect(client,&QQmlProfilerClient::complete,this,[this] { finished=true; active=false; });
+    connect(client,&QQmlProfilerClient::complete,this,&ProfileReceiver::completeCapture);
     connection->startLocalServer(socket);
 }
 

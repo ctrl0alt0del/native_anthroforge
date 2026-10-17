@@ -1,4 +1,6 @@
 import json
+import subprocess
+import sys
 from threading import Event
 from time import sleep
 from zipfile import ZipFile
@@ -99,3 +101,13 @@ def test_native_hooks_are_removed_and_second_capture_still_works(session, tmp_pa
         session.command("profile.stop", path=str(tmp_path / f"{index}.zip"), wait=True)
         assert session.engine.library.af_transform is original
         assert any(e["name"] == "af_transform" for e in events(tmp_path / f"{index}.zip"))
+
+
+def test_headless_profiler_does_not_import_qt(tmp_path):
+    script = (
+        "import sys; from anthroforge.profiling import RuntimeProfiler; "
+        "p=RuntimeProfiler(); p.start(); p.call('test','sum',sum,[1]); "
+        "p.stop(sys.argv[1],wait=True); "
+        "assert not any(m.startswith(('PySide6','shiboken6')) for m in sys.modules)"
+    )
+    subprocess.run([sys.executable, "-c", script, str(tmp_path / "headless.zip")], check=True)

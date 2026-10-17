@@ -23,6 +23,7 @@ def arguments():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--events", type=int, default=120)
     parser.add_argument("--seconds", type=int, default=120)
+    parser.add_argument("--warmup", type=int, default=0)
     return parser.parse_args()
 
 
@@ -64,15 +65,27 @@ def run(args):
     controller.capture_mode, controller.qt_profiler = True, profiler
     engine = create_engine(controller, warnings)
     try:
-        window = engine.rootObjects()[0]
-        point = fixture(controller, window, 0.5)
-        run_trials(controller, window, point, args)
+        exercise(controller, engine.rootObjects()[0], args)
         assert not warnings, warnings
     finally:
         controller.close()
         delete(engine)
         if profiler:
             profiler.close()
+
+
+def exercise(controller, window, args):
+    point = fixture(controller, window, 0.5)
+    warmup(controller, window, point, args.warmup)
+    run_trials(controller, window, point, args)
+
+
+def warmup(controller, window, point, count):
+    if count:
+        args = SimpleNamespace(events=count, interval=16, probes=Probes(), spans=False)
+        trial = DragTrial(controller, window, point, False, args)
+        trial.record()
+        trial.finish()
 
 
 if __name__ == "__main__":

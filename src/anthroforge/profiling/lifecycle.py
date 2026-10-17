@@ -35,10 +35,12 @@ def start_collectors(profiler):
         profiler.active, profiler.state = True, "recording"
         profiler.native.start()
         profiler.launch_worker()
+        profiler.activation_cost_ns = perf_counter_ns() - profiler.started_ns
     except Exception:
         profiler.active, profiler.state = False, "idle"
         profiler.native.stop()
         stop_collector(profiler)
+        profiler.buffer = None
         profiler.done.set()
         raise
 
@@ -186,6 +188,8 @@ def capabilities(profiler):
 
 def costs(profiler):
     return dict(
+        activation_wall_ns=getattr(profiler, "activation_cost_ns", 0),
+        span_bookkeeping_inclusive_ns=profiler.spans.observation_cost_ns,
         record_wall_ns=profiler.record_cost_ns,
         drain_inclusive_wall_ns=profiler.drain_cost_ns,
         qt_encode_wall_ns=profiler.collector_status.get("encode_ns", 0),

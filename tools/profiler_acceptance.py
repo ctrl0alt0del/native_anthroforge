@@ -5,6 +5,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from zipfile import ZipFile
 
+import numpy as np
 from PySide6.QtCore import QEvent, Qt
 from PySide6.QtGui import QGuiApplication, QKeyEvent
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -13,6 +14,7 @@ from shiboken6 import delete
 from snap_drag_diagnostic import DragTrial, fixture
 from snap_drag_probes import Probes
 from ui_acceptance import find
+from view_gesture_acceptance import position
 
 from anthroforge.desktop.app import create_engine, open_controller
 from anthroforge.desktop.qt_profiler import QtProfiler, profiler_application
@@ -38,6 +40,17 @@ class RecordingTrial(DragTrial):
         assert self.controller.session.profiler.active == (self.index == 10)
 
 
+class CanceledTrial(RecordingTrial):
+    def finish(self):
+        QTest.keyClick(self.window, Qt.Key_Escape)
+        QTest.keyRelease(self.window, Qt.Key_Control)
+        QTest.mouseRelease(self.window, Qt.LeftButton, pos=self.last)
+        assert self.controller.session.history.before is None
+        np.testing.assert_allclose(position(self.controller, self.point_id), self.before, atol=1e-8)
+        self.window.frameSwapped.disconnect(self.frame)
+        self.deleteLater()
+
+
 def verify_bundle(path):
     with ZipFile(path) as archive:
         manifest = json.loads(archive.read("manifest.json"))
@@ -51,21 +64,27 @@ def verify_bundle(path):
     return dict(path=str(path), summary=summary, manifest=manifest)
 
 
-def trial(controller, window, point, snapping, opened):
+def trial(controller, window, point, snapping, opened, canceled=False):
     window.setProperty("activityOpen", opened)
     QTest.qWait(250)
     args = SimpleNamespace(events=100, interval=16, probes=Probes(), spans=False)
-    gesture = RecordingTrial(controller, window, point, snapping, args)
+    kind = CanceledTrial if canceled else RecordingTrial
+    gesture = kind(controller, window, point, snapping, args)
     result = gesture.record()
     assert result["snap_hits"] == (100 if snapping else 0)
     gesture.finish()
+    await_export(controller)
+    path = controller.session.profiler.path
+    assert window.grabWindow().save(str(OUTPUT / f"{snapping}-{opened}.png"))
+    return dict(snapping=snapping, activity_open=opened, canceled=canceled, **verify_bundle(path))
+
+
+def await_export(controller):
     for _ in range(400):
         if controller.session.profiler.done.is_set():
             break
         QTest.qWait(25)
-    path = controller.session.profiler.path
-    assert window.grabWindow().save(str(OUTPUT / f"{snapping}-{opened}.png"))
-    return dict(snapping=snapping, activity_open=opened, **verify_bundle(path))
+    assert controller.session.profiler.state == "saved", controller.session.profiler.status()
 
 
 def run():
@@ -85,11 +104,13 @@ def run():
 
 
 def capture_trials(controller, window, point):
-    return [
+    results = [
         trial(controller, window, point, snap, opened)
         for opened in (False, True)
         for snap in (False, True)
     ]
+    results.append(trial(controller, window, point, True, False, True))
+    return results
 
 
 def save_results(results):

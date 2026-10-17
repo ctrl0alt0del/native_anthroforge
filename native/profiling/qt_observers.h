@@ -11,9 +11,11 @@ public:
     bool eventFilter(QObject* watched,QEvent* event) override;
 private slots:
     void changed();
+    void action(const QString& name);
 private:
     ProfileReceiver* receiver;
     QSet<QObject*> watched;
+    int pending=0;
     void connectSignals(QObject* object);
 };
 

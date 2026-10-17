@@ -81,3 +81,18 @@ fixed histogram storage, build identity, explicit Qt decoding costs and UI activ
 snapshots. Native build and 15 targeted tests pass. A tighter initial summary-name cap
 hid Activity attribution in the GUI rerun; restored a 2,048-name budget with compact
 histogram arrays. Final GUI rerun, overhead trials, full gate/package remain pending.
+
+Final review added: bounded pending model-discovery events, incomplete Qt span endings,
+semantic shortcut events, safe command target IDs, compact slowest-source summaries,
+Qt-free subprocess coverage, timestamp-ordered late-batch eviction and pending-span
+budget tests. Package checks now exercise full headless/desktop report export.
+
+Serial full-recorder trials (120 normal + 120 snapped inputs each) found cold means
+24.88/29.18 ms with support disabled, 25.75/29.09 dormant, 35.25/40.52 recording.
+The first normal-drag dormant difference is retained as an unresolved first-use effect;
+it is not erased by the warmed result. Eight counterbalanced trials after 60 warm-up
+moves gave disabled 31.62/32.01 ms and dormant 31.30/32.38 ms, within run-to-run variation.
+Forced disk caching did not establish a remedy and was not adopted. More Activity
+history after warm-up changes absolute workload; compare only within each series.
+Latest final metadata additions require refreshed recording/GUI evidence. Full gate,
+packaged reports, short-window stress, trace import and final review remain pending.

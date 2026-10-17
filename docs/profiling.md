@@ -98,3 +98,7 @@ is a desktop diagnostic baseline, not the normal launch mode. The explicit
 The [Activity investigation](tasks/snap-drag-investigation.md) remains the first
 diagnostic case. Profiling does not include its deferred production optimization.
 
+
+Official integration references: [Qt profiling service selection](https://doc.qt.io/qt-6/qqmldebuggingenabler.html),
+[Qt Quick render signals](https://doc.qt.io/qt-6/qquickwindow.html),
+[Perfetto external trace formats](https://perfetto.dev/docs/getting-started/other-formats).

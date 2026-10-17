@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+from profiler_portable import profiling
 from PySide6.QtGui import QImage
 
 CHECKS = (
@@ -21,6 +22,7 @@ CHECKS = (
     "inspect",
     "render",
     "GUI",
+    "runtime profiling",
 )
 
 
@@ -95,6 +97,7 @@ def run(executable, cwd):
     deletion(executable, cwd)
     curve_edits(executable, cwd)
     desktop(executable, cwd)
+    profiling(executable, cwd, invoke)
     report = portable_report(executable, doctor)
     (cwd / "portable-check.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report))

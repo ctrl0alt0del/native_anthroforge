@@ -10,6 +10,7 @@ from anthroforge.core.jobs import Job
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.profiling import RuntimeProfiler
 from anthroforge.profiling.spans import measured
+from anthroforge.profiling.tasks import command_metadata
 from anthroforge.profiling.tasks import operation as profile_operation
 
 from .assets import Asset
@@ -152,7 +153,7 @@ class Session:
             self,
             operation,
             arguments,
-            _metadata={"revision": self.document.revision},
+            _metadata=command_metadata(self, arguments),
         )
 
     def wait(self, timeout: float | None = None) -> None:

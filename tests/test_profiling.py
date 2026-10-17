@@ -39,6 +39,26 @@ def test_ring_bounds_bytes_and_rejects_oversized_events():
     assert buffer.oversized == 1
 
 
+def test_delayed_batches_evict_by_timestamp_not_arrival():
+    buffer = EventBuffer(seconds=1, byte_limit=2000)
+    for stamp in (1_500_000, 0, 800_000, 2_000_000, 200_000):
+        buffer.append(event(stamp))
+    assert [e["ts"] for e in buffer.events()] == [1_500_000, 2_000_000]
+    assert buffer.evicted == 3 and buffer.describe()["retained"] == 2
+
+
+def test_unfinished_span_metadata_is_bounded(tmp_path):
+    profiler = RuntimeProfiler()
+    profiler.start(memory_mib=16)
+    for _ in range(1000):
+        profiler.spans.begin("test", "nested", {"ids": "x" * 1000})
+    assert profiler.spans.bytes <= 512 * 1024
+    assert profiler.losses["span_capacity"] > 0
+    profiler.stop(tmp_path / "bounded.zip", wait=True)
+    assert profiler.spans.bytes == 0
+    assert not bundle(tmp_path / "bounded.zip")["manifest.json"]["complete"]
+
+
 def test_disabled_profiler_does_not_collect_or_create_worker():
     profiler = RuntimeProfiler()
     assert profiler.call("test", "sum", sum, [1, 2]) == 3

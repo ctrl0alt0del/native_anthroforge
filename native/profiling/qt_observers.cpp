@@ -18,6 +18,8 @@ void ModelObserver::watch(QObject* object) {
     object->installEventFilter(this);
     connect(object,&QObject::destroyed,this,[this,object] { watched.remove(object); });
     connectSignals(object);
+    if (object->objectName()=="keyboardManager")
+        connect(object,SIGNAL(requested(QString)),this,SLOT(action(QString)),Qt::DirectConnection);
     for (auto* child:object->children()) watch(child);
 }
 
@@ -34,8 +36,10 @@ void ModelObserver::connectSignals(QObject* object) {
 
 bool ModelObserver::eventFilter(QObject*,QEvent* event) {
     if (event->type()==QEvent::ChildAdded) {
+        if (pending>=4096) { ++receiver->modelWatchSkipped; return false; }
+        ++pending;
         QPointer<QObject> child=static_cast<QChildEvent*>(event)->child();
-        QTimer::singleShot(0,this,[this,child] { if (child) watch(child); });
+        QTimer::singleShot(0,this,[this,child] { --pending; if (child) watch(child); });
     }
     return false;
 }
@@ -48,6 +52,10 @@ void ModelObserver::changed() {
     receiver->instant("model",signal.constData(),{{"object",object->objectName()},
         {"class",object->metaObject()->className()},
         {"source",context?context->baseUrl().fileName():QString()}});
+}
+
+void ModelObserver::action(const QString& name) {
+    receiver->instant("input.action",name.toUtf8().constData());
 }
 
 void observeModels(QObject* root,ProfileReceiver* receiver) {

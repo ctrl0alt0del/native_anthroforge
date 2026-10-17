@@ -38,6 +38,7 @@ class RuntimeProfiler:
         self.stop_event.clear()
         self.done.clear()
         self.started_ns, self.stopped_ns = perf_counter_ns(), 0
+        self.spans.observation_cost_ns = 0
         lifecycle.start_collectors(self)
         return self.status()
 
@@ -86,12 +87,16 @@ class RuntimeProfiler:
 
     def measured_call(self, category, name, function, args, kwargs, metadata):
         with self.lock:
-            token = self.spans.begin(category, name, metadata) if self.active else None
+            token = (
+                self.spans.measure(self.spans.begin, category, name, metadata)
+                if self.active
+                else None
+            )
         try:
             return function(*args, **kwargs)
         finally:
             with self.lock:
-                self.spans.finish(token)
+                self.spans.measure(self.spans.finish, token)
 
     def record(self, event):
         with self.lock:

@@ -28,11 +28,16 @@ Follow [engineering guidelines](../engineering_guidelines.md), including 15-line
 
 ## Current state and next steps
 
-Research and owning-boundary inspection complete; no production changes yet.
-1. Preserve a 0.1.4 baseline and prepare serial hidden/visible Activity comparisons.
-2. Implement stable presentation, integrate every jobs/summary consumer and test behavior.
-3. Compare ordinary and recorded drags, validate controls and document switching.
-4. Run the full gate, package/source archive, update docs, merge and push normally.
+Stable ActivityModel and lightweight job projection are integrated. The header reads
+change-only summary properties; diagnostics metrics have their own notification.
+Recent-history scope remains 40 jobs. Six model tests plus architecture checks pass;
+Qt's model tester checks insert/move/remove contracts. Actual GUI cancel/retry, failure,
+target rename, hidden updates and New pass. Screenshot inspected. The first recorded
+modal pilot has no Activity model replacements, only incremental row notifications.
+
+The 0.1.4 source/native snapshot is under build/activity-015/baseline. Next: serial
+counterbalanced comparisons, complete profiler/gesture acceptance, full gate and
+portable/source release. Performance improvement is not yet qualified by repeated trials.
 
 ## Recovery inputs
 

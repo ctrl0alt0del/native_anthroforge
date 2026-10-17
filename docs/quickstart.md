@@ -1,4 +1,4 @@
-# AnthroForge 0.1.4 quick start
+# AnthroForge 0.1.5 quick start
 
 ## Portable Windows application
 

@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
+from activity_benchmark import ModalTrial
 from profiler_system_load import system_load, system_times
 from PySide6.QtCore import Qt
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -35,6 +36,8 @@ def arguments():
     parser.add_argument("--seconds", type=int, default=120)
     parser.add_argument("--warmup", type=int, default=0)
     parser.add_argument("--background", action="store_true")
+    parser.add_argument("--activity-open", action="store_true")
+    parser.add_argument("--interaction", choices=("drag", "modal"), default="drag")
     return parser.parse_args()
 
 
@@ -44,13 +47,17 @@ def run_trials(controller, window, point, args):
         controller.session.command("profile.start", seconds=args.seconds)
     options = SimpleNamespace(events=args.events, interval=16, probes=Probes(), spans=False)
     for snapping in (False, True):
-        trial = BenchmarkTrial(controller, window, point, snapping, options)
-        result = trial.record()
-        trials.append(
-            {k: v for k, v in result.items() if k not in ("inputs", "job_records", "frames")}
-        )
+        kind = ModalTrial if args.interaction == "modal" else BenchmarkTrial
+        trial = kind(controller, window, point, snapping, options)
+        trials.append(record_trial(trial))
         trial.finish()
     finish_capture(args, controller, trials, system_load(load))
+
+
+def record_trial(trial):
+    result = trial.record()
+    assert result["snap_hits"] == (trial.count if trial.snapping else 0)
+    return {k: v for k, v in result.items() if k not in ("inputs", "job_records", "frames")}
 
 
 def finish_capture(args, controller, trials, load):
@@ -63,8 +70,19 @@ def finish_capture(args, controller, trials, load):
                 break
             QTest.qWait(25)
         assert controller.session.profiler.state == "saved", controller.session.profiler.status()
-    state = controller.session.profiler.status()
-    report = dict(mode=args.mode, trials=trials, profiler=state, system_load=load)
+    save_result(args, controller.session.profiler.status(), trials, load)
+
+
+def save_result(args, state, trials, load):
+    report = dict(
+        mode=args.mode,
+        activity_open=args.activity_open,
+        interaction=args.interaction,
+        background=args.background,
+        trials=trials,
+        profiler=state,
+        system_load=load,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report), encoding="utf-8")
     print(json.dumps(dict(mode=args.mode, trials=trials, system_load=load)), flush=True)
@@ -93,6 +111,8 @@ def exercise(controller, window, args):
     else:
         window.requestActivate()
     point = fixture(controller, window, 0.5)
+    window.setProperty("activityOpen", args.activity_open)
+    QTest.qWait(250)
     warmup(controller, window, point, args.warmup)
     run_trials(controller, window, point, args)
 

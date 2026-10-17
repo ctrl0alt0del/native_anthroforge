@@ -9,12 +9,13 @@ from anthroforge.profiling.spans import measured
 
 from . import controller_actions as actions
 from . import project_actions, scene_state
+from .activity_model import ActivityModel
 from .models import RenderModel
 
 
 class Controller(QObject):
     changed = Signal()
-    activityChanged = Signal()
+    metricsChanged = Signal()
     selectionChanged = Signal()
     saveChoiceRequested = Signal(str)
     discardRequested = Signal(str)
@@ -25,6 +26,7 @@ class Controller(QObject):
     def __init__(self) -> None:
         super().__init__()
         self.initialize_session()
+        self.activity_model = ActivityModel(self)
         self.render_model = RenderModel(self)
         self.render_model.activated.connect(self.activate_geometry)
         self._initialize_state()
@@ -87,21 +89,27 @@ class Controller(QObject):
     def state(self):
         return self._state
 
-    @Property("QVariantList", notify=activityChanged)
-    def jobs(self):
-        return self._jobs
+    @Property(QObject, constant=True)
+    def activityModel(self):
+        return self.activity_model
 
-    @Property("QVariantMap", notify=activityChanged)
+    @Property("QVariantMap", notify=metricsChanged)
     def metrics(self):
         return self._metrics
 
     @measured("ui", lambda owner: owner.session.profiler)
     def notify(self):
         self._state = self.snapshot()
-        self._jobs = [job.describe() for job in self.session.scheduler.jobs[-40:]]
-        self._metrics = self.session.scheduler.metrics.report()
         self.changed.emit()
-        self.activityChanged.emit()
+        names = {row["id"]: row["name"] for row in self.rows}
+        self.activity_model.synchronize(self.session.scheduler.jobs, names)
+        self.refresh_metrics()
+
+    def refresh_metrics(self):
+        metrics = self.session.scheduler.metrics.report()
+        if metrics != getattr(self, "_metrics", None):
+            self._metrics = metrics
+            self.metricsChanged.emit()
 
     def snapshot(self):
         return {

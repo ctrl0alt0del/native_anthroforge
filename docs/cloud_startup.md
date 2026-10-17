@@ -15,7 +15,7 @@ git remote get-url origin
 Then fetch and read a consistent revision of the latest integration-branch guidance:
 
 ```bash
-git fetch origin
+git fetch origin refs/heads/main:refs/remotes/origin/main
 af_guidance_revision=$(git rev-parse origin/main)
 git show "${af_guidance_revision}:AGENTS.md"
 git show "${af_guidance_revision}:docs/work_continuity.md"

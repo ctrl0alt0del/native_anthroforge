@@ -25,12 +25,19 @@ verify the displayed saved instructions. Preserve existing work and environment 
 - Prepared docs/cloud_startup.md and linked it from the cloud guide; local link checks
   and git diff --check passed. The original published setup chat allowed editing the
   Start skill, but Save draft was rejected by the service without identifying a field.
-  The update is not yet saved/published. Continue through Settings > Codex Cloud > Edit.
+  Reopening through Settings > Codex Cloud > Edit accepted the draft; initial publication
+  is running in chat 01a14a7c-4326-7624-b719-0559b07cd05f.
+- A local check against the existing single-branch recovery clone showed ordinary
+  `git fetch origin` did not create origin/main. The repository startup text now explicitly
+  fetches refs/heads/main:refs/remotes/origin/main. Executing that exact fetch/read block
+  with Git Bash succeeded, read all three guidance files at `4fa6f31`, and preserved the
+  task branch and working tree. This refinement still needs application to the Cloud field.
 
 ## Verification and next actions
 
-1. Open the existing published environment through its normal Edit flow; apply the exact
-   text from docs/cloud_startup.md, save and republish, then inspect persistence.
+1. Inspect publication status in the current Edit chat. Apply the exact latest text from
+   docs/cloud_startup.md, including the explicit main refspec, save/publish and inspect
+   persistence. Use the normal Edit flow if the current published draft is no longer editable.
 2. Record configuration evidence and merge/push documentation after link/content checks.
 
 No application code changes or application rebuild are needed. No new cloud chat is

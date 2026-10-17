@@ -189,15 +189,15 @@ class TaskCoordinator:
 
     def tick(self) -> None:
         for job in self.active_jobs:
-            if (
-                job.active
-                and job.future is not None
-                and job.future.done()
-                and self.can_publish(job)
-            ):
+            if self._finishable(job):
                 self._finish(job)
         self._dispatch()
         self._checkpoint()
+
+    def _finishable(self, job: Job) -> bool:
+        done = job.future is not None and job.future.done()
+        cancelled = job.cancel is not None and job.cancel.is_set()
+        return job.active and done and (cancelled or self.can_publish(job))
 
     def _dispatch(self) -> None:
         running = [job for job in self.active_jobs if job.future is not None]

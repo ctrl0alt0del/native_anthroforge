@@ -82,9 +82,40 @@ has approximately 0.0013 ms idle ticks (audit: approximately 33 ms). A real 5,00
 soak completed both unrecorded and recorded with zero retained snapshots/cancellation
 objects. Evidence: build/standalone-optimizations/stage4 (including soak.afprofile.zip).
 
-Next: integrated development gate, serial GUI comparisons/interaction acceptance,
-ownership review, portable build and package qualification, then normal integration.
-Final integrated gate, broader GUI/native parity and packaging remain pending.
+Integrated checks: the development gate passed with 458 tests before the final ownership
+guards; targeted tests pass for the added cancellation-close, finalized-asset and control
+projection boundaries. Seven GUI suites pass (primitive, interaction, workshop, large
+geometry, curve gestures, camera gestures, profiler gestures), with no QML warnings.
+Actual lattice and Body/Hook screenshots were inspected. The 66,560-vertex/133,116-triangle,
+1,000-point cage retained complete geometry during staging and passed picking/cancellation.
+
+Serial ABBA GUI comparisons used 80 events per normal/Ctrl gesture, mouse and keyboard
+transforms, Activity open/closed, with recordings separately paired. Dormant handler means
+were 9.27-11.20 ms baseline and 3.99-4.94 ms candidate (approximately 54-58% lower).
+Every Ctrl case hit all 80 expected targets; confirmation/cancellation/undo passed.
+Candidate traces report no curveChoice model events. Native snapping remains separately
+attributed. All comparative captures are complete with no ring evictions or losses.
+See [machine-readable evidence](standalone-optimizations-evidence.json) for individual
+trials, frame distributions, system load, geometry timings and collector counts.
+
+Limits: the large-cage spot check improved accepted computation from 443 to 234 ms,
+but edit commands still average 67 ms (baseline 74 ms); frame mean is 43 ms. This is a
+single paired spot check, not an ABBA speedup claim, and it does not meet the soft
+50-ms/30-FPS targets. General Python coordinate-to-presentation preparation for dense
+cages remains a future measured optimization; no renderer/algorithm replacement is claimed.
+
+Ownership review: document indexes are immutable and snapshot-owned; the bounded journal
+retains descriptions rather than documents. QObject projections are desktop-only. Native
+drafts cannot enter Asset storage or picking, finalization does not mutate cached/published
+meshes, and cache eviction preserves active owners. Coordinator indexes are lifecycle-owned,
+removed before execution payload disposal; historical rows keep no native cancellation or
+snapshot references. Restart recipes are captured before retirement. Qualified geometry
+formulas, staged renderer leases and shared application policies remain intact.
+
+Next: rerun the complete gate after final guards, build/check the portable executable,
+then normal integration. Production version remains 0.1.5; identify the optimized binary
+by its embedded source revision. No remaining product behavior is deferred within these
+four optimizations; the explicitly reported soft responsiveness limit is broader work.
 
 ## Recovery
 

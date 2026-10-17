@@ -1,7 +1,8 @@
 """Incremental scene metadata, separate from authored definitions and render leases."""
 
+from anthroforge.application.dependencies import closure
 from anthroforge.core.entities import descendants
-from anthroforge.core.results import geometry_asset
+from anthroforge.core.results import Port, geometry_asset
 
 from . import scene_state
 from .property_projection import PropertyProjection
@@ -26,6 +27,27 @@ def structural_changes(changes):
         or bool(changes.document & {"entities.order", "controls.order"})
         or any(values & {"@membership", "parent"} for values in changes.entities.values())
         or any("@membership" in values for values in changes.controls.values())
+    )
+
+
+def control_targets(document, changes, full):
+    if full or control_relationships_changed(changes):
+        return set(document.index.controls)
+    owners = {
+        key
+        for key, fields in changes.entities.items()
+        if fields & {"matrix", "geometry_offset", "result", "asset", "attachment"}
+    }
+    seeds = {Port(key, output) for key in owners for output in ("pose", "geometry")}
+    seeds.update(Port(key, output) for key in changes.controls for output in ("control", "cage"))
+    affected = closure(document.index.structure.dependencies.consumers, seeds)
+    return set(changes.controls) | {p.owner for p in affected if p.owner in document.index.controls}
+
+
+def control_relationships_changed(changes):
+    fields = (*changes.entities.values(), *changes.controls.values())
+    return "attachments_enabled" in changes.document or any(
+        value & {"deformers", "follow", "support", "attachment"} for value in fields
     )
 
 
@@ -65,9 +87,14 @@ class SceneProjection:
         for key in changes.entities:
             targets.update(document.index.structure.children.get(key, ()))
         self.update_entities(entities, targets, session.workspace)
-        if full or changes.entities or changes.controls:
-            for control in document.controls:
-                self.records[control.id] = scene_state.control_record(self.controller, control)
+        self.update_controls(document, changes, full or structural)
+
+    def update_controls(self, document, changes, full):
+        for key in control_targets(document, changes, full):
+            if key in document.index.controls:
+                self.records[key] = scene_state.control_record(
+                    self.controller, document.control(key)
+                )
 
     def update_entities(self, entities, targets, workspace):
         depths = self.controller.session.document.index.structure.depths

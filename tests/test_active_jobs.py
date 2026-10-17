@@ -2,6 +2,7 @@
 
 import weakref
 from dataclasses import replace
+from threading import Event
 
 from anthroforge.application.coordinator import TaskCoordinator
 from anthroforge.core.document import Document
@@ -105,3 +106,19 @@ def test_cleanup_failure_retires_job_once_and_does_not_block():
     assert job.state == "failed" and not scheduler.active_jobs
     assert len(scheduler.errors) == 1 and job.cancel is None
     scheduler.close()
+
+
+def test_close_releases_cancelled_worker_when_publication_is_blocked():
+    scheduler = TaskCoordinator(Document)
+    gate = Event()
+    job = quick_job()
+    job.kind = "generic"
+    job.execute = lambda d, cancel: gate.wait(1)
+    scheduler.can_publish = lambda job: False
+    scheduler.submit(job)
+    scheduler.tick()
+    assert job.future is not None
+    gate.set()
+    scheduler.close()
+    assert job.state == "cancelled" and not scheduler.active_jobs
+    assert job.future is None and job.cancel is None

@@ -6,6 +6,7 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
+from anthroforge.application.assets import Asset
 from anthroforge.application.primitive_operations import default_primitive
 from anthroforge.core.construction import (
     BodyPiece,
@@ -100,6 +101,14 @@ def test_cancelled_finalization_does_not_mutate_shared_base(engine):
         topology.finalize(draft, None, cancel.handle)
     equivalent(bodies.base(engine, piece, 32, False, 0), topology.finalize(draft, None, 0))
     assert bodies.draft_base(engine, piece, 32, False, 0) is draft
+
+
+def test_asset_boundary_rejects_unfinished_geometry(engine):
+    draft = bodies.draft_base(engine, BodyPiece("curve"), 32, False, 0)
+    with pytest.raises(ValueError, match="finalized"):
+        Asset(draft, "generated", "", 1.0, False)
+    ready = topology.finalize(draft, None, 0)
+    assert Asset(ready, "generated", "", 1.0, False).mesh is ready
 
 
 @pytest.mark.parametrize(

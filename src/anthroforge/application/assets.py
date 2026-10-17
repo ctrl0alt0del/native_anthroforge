@@ -15,6 +15,10 @@ class Asset:
     units: float
     y_up: bool
 
+    def __post_init__(self) -> None:
+        if not self.mesh.counts[4]:
+            raise ValueError("An asset requires finalized spatial and render geometry.")
+
 
 def imported(
     engine: GeometryEngine, path: Path, units: float, y_up: bool, cancel: NativeCancellation

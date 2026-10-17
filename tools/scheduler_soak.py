@@ -5,13 +5,13 @@ import json
 from pathlib import Path
 from time import perf_counter
 
-from anthroforge.profiling.service import RuntimeProfiler
 from standalone_audit import measure
 
 from anthroforge.application.coordinator import TaskCoordinator
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job
 from anthroforge.profiling.identity import build_identity
+from anthroforge.profiling.service import RuntimeProfiler
 
 
 def job():

@@ -50,8 +50,9 @@ revisions are distinct. entity_revisions.py classifies authored changes. A pose 
 does not cancel unrelated local geometry work. Attachment publication merges only pose
 outputs into current state, preserving a newer primitive, result, name or color.
 
-dependencies.py owns output ports and reverse traversal: pose, control frame, cage and
-geometry. Jobs declare prerequisites and provided ports as well as complete object
+core/dependency_graph.py owns immutable output relationships: pose, control frame, cage
+and geometry. application/dependencies.py owns traversal and job contracts over those
+indexes. Jobs declare prerequisites and provided ports as well as complete object
 writer reservations. A cage following its SCP pose is valid; feedback from that SCP's
 surface is a real cycle. Cyclic/downstream outputs fail boundedly and retain accepted
 data. Missing accepted surfaces fail instead of waiting indefinitely.
@@ -287,3 +288,42 @@ headless job descriptions, cancellation/retry operations and checkpoints are unc
 This is a presentation adapter for existing job contracts, not a second task registry.
 The profiler's generic Qt model collector observes incremental notifications without
 Activity-specific timing instrumentation.
+
+## Incremental evaluation and presentation
+
+`core/DocumentIndex` belongs to an immutable snapshot. It holds read-only entity/control
+lookups and a shared `Structure` containing validated authored identities, hierarchy order,
+depths, forward/reverse dependency edges and blocked outputs. Value edits reuse structure;
+reference, membership or attachment-policy changes revalidate it completely. Revision-only
+replacement reuses the entire index. Indexes are runtime data, excluded from schema 2.
+
+The application `ChangeJournal` retains 64 compact field-change descriptions, without
+owning old documents. Desktop consumers have independent cursors; a missed interval or
+document replacement requires a complete refresh. `SceneProjection` reuses scene rows,
+parent choices and unchanged render projections. `PropertyProjection` owns stable,
+read-only QML objects for authored records and updates individual fields. Curves and points
+retain their QObject identities across coordinate edits; membership/order changes still
+notify their collection. Published render leases and displayed-revision picking remain
+owned by `RenderModel`, independently of these metadata projections.
+
+Native geometry-only construction roots expose immutable vertices, canonical topology
+and inexpensive bounds. Deformation, joins and Simple Solidify propagate this deferred
+state. `af_mesh_finalize` first selects compatible accepted topology, then constructs
+spatial acceleration and render chunks once. It returns a separate ready handle; published
+meshes and cached bases are never mutated. Draft picking is rejected, and no lazy native
+work runs during viewport adoption. Prepared C ABI entry points remain available.
+
+Each `GeometryEngine` owns a locked Body base cache, bounded to 64 entries and 32 MiB
+of native buffer storage plus a per-record allowance. Keys include sampling, shape,
+sides, dimensions, length and closure. Fit/position and deformer settings operate later
+on independent geometry. Eviction releases only the cache's ownership; workers retaining
+a base remain valid. Session close clears the cache after workers stop.
+
+`JobRegistry` separates active scheduling indexes from historical rows. Only active jobs
+participate in tick, admission, dependency waiting, invalidation and checkpoints. Terminal
+records retain output IDs, timing/assessment, state and actionable retry recipes; they
+release execution callbacks, captured documents, futures and native cancellation handles.
+Undo records a compact restart recipe before cancellation retires a job. Cancelled workers
+can finish cleanup while transaction publication is blocked. Cleanup registers dependent
+work before retirement, preserving continuous save blocking. History remains inspectable;
+the Activity panel's 40-row limit does not truncate application history.

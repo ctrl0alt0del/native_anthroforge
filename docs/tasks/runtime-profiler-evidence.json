@@ -1,0 +1,1102 @@
+{
+  "version": "0.1.4",
+  "date": "2026-10-17",
+  "packaged_code_commit": "55bf4e28242ef4a8a5cada59db0180f791d4c9c5",
+  "trials": {
+    "final": [
+      {
+        "file": "final-0-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          24.924023333551304,
+          29.548125833540933
+        ],
+        "frame_mean_ms": [
+          49.821037499997246,
+          52.0549901234461
+        ],
+        "system_busy_fraction": 0.20053333333333334
+      },
+      {
+        "file": "final-1-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          25.416922499728873,
+          29.469025833107782
+        ],
+        "frame_mean_ms": [
+          48.81079599998581,
+          49.73926117647138
+        ],
+        "system_busy_fraction": 0.195024077046549
+      },
+      {
+        "file": "final-2-record.json",
+        "mode": "record",
+        "handler_mean_ms": [
+          35.21286416659374,
+          40.1733100002275
+        ],
+        "frame_mean_ms": [
+          71.99471126757128,
+          76.38868701296697
+        ],
+        "system_busy_fraction": 0.21758166076347896
+      },
+      {
+        "file": "final-3-record.json",
+        "mode": "record",
+        "handler_mean_ms": [
+          35.281341666874745,
+          40.873117499935084
+        ],
+        "frame_mean_ms": [
+          69.67434324326098,
+          75.03427051279944
+        ],
+        "system_busy_fraction": 0.22287640901771333
+      },
+      {
+        "file": "final-4-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          25.4760533333562,
+          28.87896333346968
+        ],
+        "frame_mean_ms": [
+          50.592387500020976,
+          54.59736710523239
+        ],
+        "system_busy_fraction": 0.1669912039213053
+      },
+      {
+        "file": "final-5-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          24.668693333236053,
+          28.94830750001347
+        ],
+        "frame_mean_ms": [
+          47.61931333331935,
+          51.39952409637816
+        ],
+        "system_busy_fraction": 0.19413333333333338
+      },
+      {
+        "file": "final-6-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          26.773724166741886,
+          28.85850000029677
+        ],
+        "frame_mean_ms": [
+          52.09639452054757,
+          49.85545487805921
+        ],
+        "system_busy_fraction": 0.20820000000000005
+      },
+      {
+        "file": "final-7-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          25.221852499907982,
+          29.2819483334218
+        ],
+        "frame_mean_ms": [
+          50.34685972219045,
+          51.98465374996886
+        ],
+        "system_busy_fraction": 0.18300697879260108
+      },
+      {
+        "file": "final-8-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          24.71900583338235,
+          28.931404166754266
+        ],
+        "frame_mean_ms": [
+          46.563835064935354,
+          49.39099036144683
+        ],
+        "system_busy_fraction": 0.1763980263157895
+      },
+      {
+        "file": "final-9-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          25.319265833301568,
+          29.169555833565635
+        ],
+        "frame_mean_ms": [
+          48.933935135111724,
+          48.59166046510434
+        ],
+        "system_busy_fraction": 0.18366664437161395
+      }
+    ],
+    "warm": [
+      {
+        "file": "warm-0-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          30.880530833110242,
+          31.518149166580162
+        ],
+        "frame_mean_ms": [
+          56.14729875001103,
+          58.39589610393462
+        ],
+        "system_busy_fraction": 0.1872195297074134
+      },
+      {
+        "file": "warm-1-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          31.17003250002502,
+          32.38923500002784
+        ],
+        "frame_mean_ms": [
+          58.45571298702346,
+          54.81931860468162
+        ],
+        "system_busy_fraction": 0.19067796610169496
+      },
+      {
+        "file": "warm-2-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          31.8081408332849,
+          32.52305833332988
+        ],
+        "frame_mean_ms": [
+          65.13724225355168,
+          56.734556097580935
+        ],
+        "system_busy_fraction": 0.22013692162417375
+      },
+      {
+        "file": "warm-3-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          32.16400916671773,
+          31.883027499892098
+        ],
+        "frame_mean_ms": [
+          64.04831527778596,
+          53.187269767455966
+        ],
+        "system_busy_fraction": 0.20617715617715615
+      },
+      {
+        "file": "warm-4-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          30.828545833446697,
+          31.999557500057563
+        ],
+        "frame_mean_ms": [
+          60.12966986301065,
+          56.84018641975989
+        ],
+        "system_busy_fraction": 0.19942196531791911
+      },
+      {
+        "file": "warm-5-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          31.457443333389772,
+          32.04820249978487
+        ],
+        "frame_mean_ms": [
+          66.3310761194035,
+          55.77727831326459
+        ],
+        "system_busy_fraction": 0.21058238636363635
+      },
+      {
+        "file": "warm-6-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          31.960653333438433,
+          32.58890583322985
+        ],
+        "frame_mean_ms": [
+          58.796505194810116,
+          56.59391097562947
+        ],
+        "system_busy_fraction": 0.22834737827715357
+      },
+      {
+        "file": "warm-7-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          31.410544166798598,
+          32.588152500041666
+        ],
+        "frame_mean_ms": [
+          65.07353857144024,
+          57.778150617252074
+        ],
+        "system_busy_fraction": 0.23961267605633807
+      }
+    ],
+    "cache": [
+      {
+        "file": "cache-0-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          24.786255833441828,
+          29.452169999907102
+        ],
+        "frame_mean_ms": [
+          49.44443749996531,
+          50.30910843377197
+        ],
+        "system_busy_fraction": 0.1925711982804944
+      },
+      {
+        "file": "cache-1-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          25.572685000073154,
+          37.02356999998907
+        ],
+        "frame_mean_ms": [
+          48.38636000000406,
+          68.25111948051784
+        ],
+        "system_busy_fraction": 0.3385945815191098
+      },
+      {
+        "file": "cache-2-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          28.89691250005247,
+          31.8846350000058
+        ],
+        "frame_mean_ms": [
+          55.046098684215394,
+          55.549161445781806
+        ],
+        "system_busy_fraction": 0.22565335305719925
+      },
+      {
+        "file": "cache-3-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          26.554142499753652,
+          31.243508333288144
+        ],
+        "frame_mean_ms": [
+          52.72159577464368,
+          53.6836678571663
+        ],
+        "system_busy_fraction": 0.21736869474778986
+      }
+    ],
+    "recheck": [
+      {
+        "file": "recheck-0-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          28.24157416653179,
+          31.803599166475276
+        ],
+        "frame_mean_ms": [
+          55.893434722242496,
+          54.67854047622365
+        ],
+        "system_busy_fraction": 0.22847847847847846
+      },
+      {
+        "file": "recheck-1-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          27.16537416684635,
+          31.166855000052845
+        ],
+        "frame_mean_ms": [
+          55.500876056356276,
+          52.98823764708633
+        ],
+        "system_busy_fraction": 0.20144157814871022
+      },
+      {
+        "file": "recheck-2-record.json",
+        "mode": "record",
+        "handler_mean_ms": [
+          38.76584499991319,
+          45.17609666669765
+        ],
+        "frame_mean_ms": [
+          79.74191884062273,
+          81.67052000003423
+        ],
+        "system_busy_fraction": 0.18948824343015214
+      },
+      {
+        "file": "recheck-3-record.json",
+        "mode": "record",
+        "handler_mean_ms": [
+          38.702981666695756,
+          44.53034833319786
+        ],
+        "frame_mean_ms": [
+          77.38863521127045,
+          79.22288375002609
+        ],
+        "system_busy_fraction": 0.2163010873640795
+      }
+    ],
+    "background": [
+      {
+        "file": "background-0-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          30.08861083329369,
+          34.40080333327084
+        ],
+        "frame_mean_ms": [
+          62.95782394365335,
+          64.06433625002137
+        ],
+        "system_busy_fraction": 0.22721088435374148
+      },
+      {
+        "file": "background-1-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          31.64638166666312,
+          36.3122841665548
+        ],
+        "frame_mean_ms": [
+          68.07076666666325,
+          68.16061392403097
+        ],
+        "system_busy_fraction": 0.21559384482011268
+      },
+      {
+        "file": "background-2-dormant.json",
+        "mode": "dormant",
+        "handler_mean_ms": [
+          31.632519166669226,
+          35.614113333303976
+        ],
+        "frame_mean_ms": [
+          66.05604929576093,
+          64.96317283947266
+        ],
+        "system_busy_fraction": 0.2544956140350877
+      },
+      {
+        "file": "background-3-none.json",
+        "mode": "none",
+        "handler_mean_ms": [
+          30.897800000305626,
+          36.65368583312253
+        ],
+        "frame_mean_ms": [
+          64.07968169012645,
+          66.64166172835573
+        ],
+        "system_busy_fraction": 0.2197862129144852
+      }
+    ]
+  },
+  "gui": [
+    {
+      "snapping": false,
+      "activity_open": false,
+      "canceled": false,
+      "sha256": "955e124badaa02b18d3ba36abe9cc0ae6a37321eee9b74bbc7f293d002bfeaa6",
+      "durations": {
+        "input/dispatch": {
+          "count": 89,
+          "inclusive_total_us": 3199858.1,
+          "mean_us": 35953.46179775281,
+          "max_us": 91007.9,
+          "p50_upper_us": 37314.82598370727,
+          "p95_upper_us": 68436.52660516299
+        },
+        "ui/Controller.notify": {
+          "count": 84,
+          "inclusive_total_us": 1787438.000011444,
+          "mean_us": 21279.023809660048,
+          "max_us": 54612.5,
+          "p50_upper_us": 21246.419263402142,
+          "p95_upper_us": 42493.838526804284
+        },
+        "qml.javascript/javascript:Activity.qml:23": {
+          "count": 82,
+          "inclusive_total_us": 1137794.9999999998,
+          "mean_us": 13875.548780487801,
+          "max_us": 20178.7,
+          "p50_upper_us": 15023.194243865333,
+          "p95_upper_us": 19482.96937220458
+        },
+        "qml.binding/binding:Activity.qml:23": {
+          "count": 82,
+          "inclusive_total_us": 1357168.5000000002,
+          "mean_us": 16550.83536585366,
+          "max_us": 36657.9,
+          "p50_upper_us": 17108.381651290747,
+          "p95_upper_us": 30047.388487730666
+        }
+      },
+      "model_changes": 248,
+      "complete": true,
+      "storage": {
+        "received": 80058,
+        "retained": 80058,
+        "evicted": 0,
+        "oversized": 0,
+        "boundary_filtered": 870,
+        "owned_bytes": 35406844,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "qt": {
+        "active": false,
+        "clock_uncertainty_ns": 159450,
+        "connected": true,
+        "decode_cpu_ns": 843750000,
+        "decode_inclusive_ns": 899556600,
+        "dropped": 0,
+        "encode_ns": 271218700,
+        "failure": "",
+        "finished": true,
+        "graphics_api": 4,
+        "model_watch_skipped": 0,
+        "qt_version": "6.12.0",
+        "queued_bytes": 0,
+        "services": [
+          "CanvasFrameRate",
+          "EngineControl",
+          "DebugMessages"
+        ],
+        "types": 567,
+        "bridge_clock_error_ns": 3350,
+        "presentation": {
+          "width": 1500,
+          "height": 950,
+          "pixel_ratio": 1.5,
+          "modifier_bindings": {
+            "deeperSelection": 134217728,
+            "extendSelection": 67108864,
+            "insertPoint": 33554432,
+            "pan": 33554432,
+            "precision": 33554432,
+            "snapSurface": 67108864
+          },
+          "input_types": {
+            "2": "mouse_press",
+            "3": "mouse_release",
+            "5": "mouse_move",
+            "6": "key_press",
+            "7": "key_release",
+            "31": "wheel"
+          }
+        }
+      },
+      "profiler": {
+        "activation_wall_ns": 14144200,
+        "span_bookkeeping_inclusive_ns": 166024600,
+        "record_wall_ns": 442634900,
+        "drain_inclusive_wall_ns": 869484900,
+        "qt_encode_wall_ns": 271218700,
+        "qt_decode_inclusive_wall_ns": 899556600,
+        "qt_decode_thread_cpu_ns": 843750000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      }
+    },
+    {
+      "snapping": true,
+      "activity_open": false,
+      "canceled": false,
+      "sha256": "7f225ecaec6731656dccd9f2075d41243046f131df7c71f7608c3b6fc688f4ed",
+      "durations": {
+        "input/dispatch": {
+          "count": 89,
+          "inclusive_total_us": 3453221.8000000003,
+          "mean_us": 38800.24494382023,
+          "max_us": 77586.8,
+          "p50_upper_us": 38966.93874440916,
+          "p95_upper_us": 62756.488603861726
+        },
+        "native/af_scene_pick": {
+          "count": 80,
+          "inclusive_total_us": 4588.300003051758,
+          "mean_us": 57.35375003814697,
+          "max_us": 1032.5,
+          "p50_upper_us": 37.05462768008707,
+          "p95_upper_us": 132.66704415070896
+        },
+        "native/af_surface_normal": {
+          "count": 80,
+          "inclusive_total_us": 2904.799964904785,
+          "mean_us": 36.309999561309816,
+          "max_us": 981.8999977111816,
+          "p50_upper_us": 18.027313840043536,
+          "p95_upper_us": 68.79249489057649
+        },
+        "ui/Controller.notify": {
+          "count": 85,
+          "inclusive_total_us": 2322907.500011444,
+          "mean_us": 27328.3235295464,
+          "max_us": 64251.79999923706,
+          "p50_upper_us": 24195.319575072757,
+          "p95_upper_us": 50534.1643269674
+        },
+        "qml.javascript/javascript:Activity.qml:23": {
+          "count": 84,
+          "inclusive_total_us": 1462378.7000000004,
+          "mean_us": 17409.270238095243,
+          "max_us": 56786.1,
+          "p50_upper_us": 16383.0,
+          "p95_upper_us": 30047.388487730666
+        },
+        "qml.binding/binding:Activity.qml:23": {
+          "count": 84,
+          "inclusive_total_us": 1782050.9,
+          "mean_us": 21214.891666666666,
+          "max_us": 59057.2,
+          "p50_upper_us": 19482.96937220458,
+          "p95_upper_us": 37314.82598370727
+        }
+      },
+      "model_changes": 250,
+      "complete": true,
+      "storage": {
+        "received": 83907,
+        "retained": 83907,
+        "evicted": 0,
+        "oversized": 0,
+        "boundary_filtered": 887,
+        "owned_bytes": 37107861,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "qt": {
+        "active": false,
+        "clock_uncertainty_ns": 168950,
+        "connected": true,
+        "decode_cpu_ns": 812500000,
+        "decode_inclusive_ns": 938592600,
+        "dropped": 0,
+        "encode_ns": 275165700,
+        "failure": "",
+        "finished": true,
+        "graphics_api": 4,
+        "model_watch_skipped": 0,
+        "qt_version": "6.12.0",
+        "queued_bytes": 0,
+        "services": [
+          "CanvasFrameRate",
+          "EngineControl",
+          "DebugMessages"
+        ],
+        "types": 576,
+        "bridge_clock_error_ns": 3350,
+        "presentation": {
+          "width": 1500,
+          "height": 950,
+          "pixel_ratio": 1.5,
+          "modifier_bindings": {
+            "deeperSelection": 134217728,
+            "extendSelection": 67108864,
+            "insertPoint": 33554432,
+            "pan": 33554432,
+            "precision": 33554432,
+            "snapSurface": 67108864
+          },
+          "input_types": {
+            "2": "mouse_press",
+            "3": "mouse_release",
+            "5": "mouse_move",
+            "6": "key_press",
+            "7": "key_release",
+            "31": "wheel"
+          }
+        }
+      },
+      "profiler": {
+        "activation_wall_ns": 15953000,
+        "span_bookkeeping_inclusive_ns": 194118000,
+        "record_wall_ns": 469317900,
+        "drain_inclusive_wall_ns": 963607400,
+        "qt_encode_wall_ns": 275165700,
+        "qt_decode_inclusive_wall_ns": 938592600,
+        "qt_decode_thread_cpu_ns": 812500000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      }
+    },
+    {
+      "snapping": false,
+      "activity_open": true,
+      "canceled": false,
+      "sha256": "d28b263a67a81693c161aa4b38e53f99b60b3464747a7c844c9d1c65177a3515",
+      "durations": {
+        "input/dispatch": {
+          "count": 89,
+          "inclusive_total_us": 3845635.3000000007,
+          "mean_us": 43209.38539325844,
+          "max_us": 85555,
+          "p50_upper_us": 40692.196786023924,
+          "p95_upper_us": 77934.87748881833
+        },
+        "ui/Controller.notify": {
+          "count": 83,
+          "inclusive_total_us": 2483497.899997711,
+          "mean_us": 29921.661445755555,
+          "max_us": 71625.5,
+          "p50_upper_us": 25266.5821634837,
+          "p95_upper_us": 60095.77697546133
+        },
+        "qml.javascript/javascript:Activity.qml:23": {
+          "count": 81,
+          "inclusive_total_us": 1409845.6999999995,
+          "mean_us": 17405.502469135798,
+          "max_us": 38590.2,
+          "p50_upper_us": 17108.381651290747,
+          "p95_upper_us": 30047.388487730666
+        },
+        "qml.binding/binding:Activity.qml:23": {
+          "count": 81,
+          "inclusive_total_us": 1973282.1,
+          "mean_us": 24361.507407407407,
+          "max_us": 67915.5,
+          "p50_upper_us": 21246.419263402142,
+          "p95_upper_us": 55107.98747006743
+        }
+      },
+      "model_changes": 246,
+      "complete": true,
+      "storage": {
+        "received": 104183,
+        "retained": 104183,
+        "evicted": 0,
+        "oversized": 0,
+        "boundary_filtered": 1347,
+        "owned_bytes": 45845881,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "qt": {
+        "active": false,
+        "clock_uncertainty_ns": 233750,
+        "connected": true,
+        "decode_cpu_ns": 1359375000,
+        "decode_inclusive_ns": 1387506700,
+        "dropped": 0,
+        "encode_ns": 382147000,
+        "failure": "",
+        "finished": true,
+        "graphics_api": 4,
+        "model_watch_skipped": 0,
+        "qt_version": "6.12.0",
+        "queued_bytes": 0,
+        "services": [
+          "CanvasFrameRate",
+          "EngineControl",
+          "DebugMessages"
+        ],
+        "types": 566,
+        "bridge_clock_error_ns": 3350,
+        "presentation": {
+          "width": 1500,
+          "height": 950,
+          "pixel_ratio": 1.5,
+          "modifier_bindings": {
+            "deeperSelection": 134217728,
+            "extendSelection": 67108864,
+            "insertPoint": 33554432,
+            "pan": 33554432,
+            "precision": 33554432,
+            "snapSurface": 67108864
+          },
+          "input_types": {
+            "2": "mouse_press",
+            "3": "mouse_release",
+            "5": "mouse_move",
+            "6": "key_press",
+            "7": "key_release",
+            "31": "wheel"
+          }
+        }
+      },
+      "profiler": {
+        "activation_wall_ns": 14943200,
+        "span_bookkeeping_inclusive_ns": 160932000,
+        "record_wall_ns": 595919000,
+        "drain_inclusive_wall_ns": 1146709800,
+        "qt_encode_wall_ns": 382147000,
+        "qt_decode_inclusive_wall_ns": 1387506700,
+        "qt_decode_thread_cpu_ns": 1359375000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      }
+    },
+    {
+      "snapping": true,
+      "activity_open": true,
+      "canceled": false,
+      "sha256": "7c18186ff2b411050bb408fa55e5f489658adf663d9b984b89e2b22e4e40962a",
+      "durations": {
+        "input/dispatch": {
+          "count": 89,
+          "inclusive_total_us": 3904097.6,
+          "mean_us": 43866.26516853933,
+          "max_us": 92480.9,
+          "p50_upper_us": 42493.838526804284,
+          "p95_upper_us": 77934.87748881833
+        },
+        "native/af_scene_pick": {
+          "count": 80,
+          "inclusive_total_us": 6743.5,
+          "mean_us": 84.29375,
+          "max_us": 2606.099998474121,
+          "p50_upper_us": 38.73944998635149,
+          "p95_upper_us": 144.76494524885652
+        },
+        "native/af_surface_normal": {
+          "count": 80,
+          "inclusive_total_us": 1554.3999862670898,
+          "mean_us": 19.429999828338623,
+          "max_us": 54.39999771118164,
+          "p50_upper_us": 18.869724993175744,
+          "p95_upper_us": 29.64330498235436
+        },
+        "ui/Controller.notify": {
+          "count": 85,
+          "inclusive_total_us": 2617506.100025177,
+          "mean_us": 30794.189412060907,
+          "max_us": 78054.90000152588,
+          "p50_upper_us": 26385.273598656582,
+          "p95_upper_us": 65535.0
+        },
+        "qml.javascript/javascript:Activity.qml:23": {
+          "count": 84,
+          "inclusive_total_us": 1382037.8000000005,
+          "mean_us": 16452.83095238096,
+          "max_us": 45495.1,
+          "p50_upper_us": 16383.0,
+          "p95_upper_us": 21246.419263402142
+        },
+        "qml.binding/binding:Activity.qml:23": {
+          "count": 84,
+          "inclusive_total_us": 2028970.2,
+          "mean_us": 24154.40714285714,
+          "max_us": 73686.2,
+          "p50_upper_us": 21246.419263402142,
+          "p95_upper_us": 50534.1643269674
+        }
+      },
+      "model_changes": 250,
+      "complete": true,
+      "storage": {
+        "received": 114256,
+        "retained": 114256,
+        "evicted": 0,
+        "oversized": 0,
+        "boundary_filtered": 2510,
+        "owned_bytes": 50337838,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "qt": {
+        "active": false,
+        "clock_uncertainty_ns": 153500,
+        "connected": true,
+        "decode_cpu_ns": 1218750000,
+        "decode_inclusive_ns": 1314052800,
+        "dropped": 0,
+        "encode_ns": 390430800,
+        "failure": "",
+        "finished": true,
+        "graphics_api": 4,
+        "model_watch_skipped": 0,
+        "qt_version": "6.12.0",
+        "queued_bytes": 0,
+        "services": [
+          "CanvasFrameRate",
+          "EngineControl",
+          "DebugMessages"
+        ],
+        "types": 576,
+        "bridge_clock_error_ns": 3350,
+        "presentation": {
+          "width": 1500,
+          "height": 950,
+          "pixel_ratio": 1.5,
+          "modifier_bindings": {
+            "deeperSelection": 134217728,
+            "extendSelection": 67108864,
+            "insertPoint": 33554432,
+            "pan": 33554432,
+            "precision": 33554432,
+            "snapSurface": 67108864
+          },
+          "input_types": {
+            "2": "mouse_press",
+            "3": "mouse_release",
+            "5": "mouse_move",
+            "6": "key_press",
+            "7": "key_release",
+            "31": "wheel"
+          }
+        }
+      },
+      "profiler": {
+        "activation_wall_ns": 14368900,
+        "span_bookkeeping_inclusive_ns": 179864000,
+        "record_wall_ns": 653324700,
+        "drain_inclusive_wall_ns": 1316844500,
+        "qt_encode_wall_ns": 390430800,
+        "qt_decode_inclusive_wall_ns": 1314052800,
+        "qt_decode_thread_cpu_ns": 1218750000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      }
+    },
+    {
+      "snapping": true,
+      "activity_open": false,
+      "canceled": true,
+      "sha256": "e1a1bfe17b4d9513cfda4f57ce3651e4090f00e86b01c5fc548de38a47d48489",
+      "durations": {
+        "input/dispatch": {
+          "count": 89,
+          "inclusive_total_us": 3876381.4000000004,
+          "mean_us": 43554.84719101124,
+          "max_us": 96291.6,
+          "p50_upper_us": 40692.196786023924,
+          "p95_upper_us": 77934.87748881833
+        },
+        "native/af_scene_pick": {
+          "count": 80,
+          "inclusive_total_us": 39174.99998474121,
+          "mean_us": 489.68749980926515,
+          "max_us": 16968.29999923706,
+          "p50_upper_us": 35.44123631221413,
+          "p95_upper_us": 180.01933598375618
+        },
+        "native/af_surface_normal": {
+          "count": 80,
+          "inclusive_total_us": 14993.999996185303,
+          "mean_us": 187.42499995231628,
+          "max_us": 10395.70000076294,
+          "p50_upper_us": 18.869724993175744,
+          "p95_upper_us": 46.25843667006398
+        },
+        "ui/Controller.notify": {
+          "count": 85,
+          "inclusive_total_us": 2389803.0999908447,
+          "mean_us": 28115.330588127585,
+          "max_us": 77796.5,
+          "p50_upper_us": 25266.5821634837,
+          "p95_upper_us": 57547.87079111228
+        },
+        "qml.javascript/javascript:Activity.qml:23": {
+          "count": 83,
+          "inclusive_total_us": 1344424.1,
+          "mean_us": 16197.880722891567,
+          "max_us": 37358,
+          "p50_upper_us": 16383.0,
+          "p95_upper_us": 22187.12288101405
+        },
+        "qml.binding/binding:Activity.qml:23": {
+          "count": 83,
+          "inclusive_total_us": 1921950.4000000004,
+          "mean_us": 23156.028915662657,
+          "max_us": 72650.1,
+          "p50_upper_us": 20345.598393011962,
+          "p95_upper_us": 52771.547197313164
+        }
+      },
+      "model_changes": 250,
+      "complete": true,
+      "storage": {
+        "received": 110864,
+        "retained": 110864,
+        "evicted": 0,
+        "oversized": 0,
+        "boundary_filtered": 1233,
+        "owned_bytes": 48779336,
+        "byte_limit": 67108864,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 67108864
+      },
+      "qt": {
+        "active": false,
+        "clock_uncertainty_ns": 178550,
+        "connected": true,
+        "decode_cpu_ns": 1171875000,
+        "decode_inclusive_ns": 1239638200,
+        "dropped": 0,
+        "encode_ns": 368772400,
+        "failure": "",
+        "finished": true,
+        "graphics_api": 4,
+        "model_watch_skipped": 0,
+        "qt_version": "6.12.0",
+        "queued_bytes": 0,
+        "services": [
+          "CanvasFrameRate",
+          "EngineControl",
+          "DebugMessages"
+        ],
+        "types": 576,
+        "bridge_clock_error_ns": 3350,
+        "presentation": {
+          "width": 1500,
+          "height": 950,
+          "pixel_ratio": 1.5,
+          "modifier_bindings": {
+            "deeperSelection": 134217728,
+            "extendSelection": 67108864,
+            "insertPoint": 33554432,
+            "pan": 33554432,
+            "precision": 33554432,
+            "snapSurface": 67108864
+          },
+          "input_types": {
+            "2": "mouse_press",
+            "3": "mouse_release",
+            "5": "mouse_move",
+            "6": "key_press",
+            "7": "key_release",
+            "31": "wheel"
+          }
+        }
+      },
+      "profiler": {
+        "activation_wall_ns": 15414300,
+        "span_bookkeeping_inclusive_ns": 187731600,
+        "record_wall_ns": 638512900,
+        "drain_inclusive_wall_ns": 1307382200,
+        "qt_encode_wall_ns": 368772400,
+        "qt_decode_inclusive_wall_ns": 1239638200,
+        "qt_decode_thread_cpu_ns": 1171875000,
+        "note": "Measured collector wall time can overlap; export is measured separately."
+      }
+    }
+  ],
+  "retention": {
+    "storage": {
+      "received": 641880,
+      "retained": 30801,
+      "evicted": 611079,
+      "oversized": 0,
+      "owned_bytes": 13625991,
+      "byte_limit": 100663296,
+      "window_seconds": 2.0,
+      "owned_budget_bytes": 134217728,
+      "reserved_bytes": 33554432
+    },
+    "complete": true,
+    "collector_drops": 0
+  },
+  "interpretation": [
+    "Serial trials; no simultaneous build. System busy includes this app.",
+    "Warm series adds 60 warm-up moves and therefore more Activity history; compare modes only within each series.",
+    "Cache series forced disk caching; load varied and this setting was not adopted.",
+    "Two final foreground trials were interrupted by deactivation and excluded; background series uses a nonactivating test window.",
+    "Initial cold normal-drag difference was not reproduced with a consistent sign in later foreground trials. Warm differences were within run-to-run variation; this does not establish zero idle overhead.",
+    "Qt/native spans are inclusive. Direct observer costs overlap and cannot be subtracted as an exact tax."
+  ],
+  "trace_import": {
+    "tool": "Perfetto trace_processor v58.2",
+    "slices": 114256,
+    "nonzero_error_statistics": 0,
+    "activity_binding_count": 84,
+    "activity_binding_mean_ms": 24.154
+  },
+  "portable": {
+    "passed": true,
+    "isolated_environment": "minimal PATH; developer Python/Qt settings removed",
+    "captures": {
+      "headless": {
+        "complete": true,
+        "build": {
+          "revision": "55bf4e28242ef4a8a5cada59db0180f791d4c9c5",
+          "tracked_changes": false,
+          "packaged": true
+        },
+        "capabilities": {
+          "commands": true,
+          "tasks": true,
+          "native_calls": true,
+          "qml": false,
+          "input": false,
+          "frames": false,
+          "model_changes": false,
+          "stack_sampling": false
+        },
+        "export": {
+          "wall_ns": 1237600,
+          "thread_cpu_ns": 0,
+          "process_cpu_ns": 0,
+          "scope": "trace serialization and compression, excludes final ZIP close",
+          "process_cpu_scope": "whole process during export; includes concurrent application work"
+        }
+      },
+      "desktop": {
+        "complete": true,
+        "build": {
+          "revision": "55bf4e28242ef4a8a5cada59db0180f791d4c9c5",
+          "tracked_changes": false,
+          "packaged": true
+        },
+        "capabilities": {
+          "commands": true,
+          "tasks": true,
+          "native_calls": true,
+          "qml": true,
+          "input": true,
+          "frames": true,
+          "model_changes": true,
+          "stack_sampling": false
+        },
+        "export": {
+          "wall_ns": 54768500,
+          "thread_cpu_ns": 62500000,
+          "process_cpu_ns": 62500000,
+          "scope": "trace serialization and compression, excludes final ZIP close",
+          "process_cpu_scope": "whole process during export; includes concurrent application work"
+        }
+      }
+    },
+    "trace_import": {
+      "tool": "Perfetto trace_processor v58.2",
+      "slices": 5282,
+      "nonzero_error_statistics": 0
+    }
+  },
+  "document_lifecycle": {
+    "new_before_record": true,
+    "new_while_recording": true,
+    "open_while_recording": true,
+    "headless_open_tasks": true,
+    "borrowed_session_close": true,
+    "gui_exit_code": 0
+  },
+  "development_gate": {
+    "passed": true,
+    "pytest": 415,
+    "ruff": true,
+    "mypy": true,
+    "native_ctest": true,
+    "native_and_script_style": true,
+    "numerics": true,
+    "doctor": true,
+    "code_revision": "55bf4e28242ef4a8a5cada59db0180f791d4c9c5"
+  }
+}

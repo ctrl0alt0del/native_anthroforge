@@ -1,4 +1,4 @@
-# AnthroForge 0.1.3 quick start
+# AnthroForge 0.1.4 quick start
 
 ## Portable Windows application
 
@@ -201,3 +201,12 @@ targets within the gesture and resets when the gesture finishes or is canceled.
 Curves are purple, control points gold, and handle points/links blue. Selected and hovered
 components retain their type colors with larger markers. The help menu lists the defaults;
 modifier choices are owned by the keyboard manager, alongside existing shortcut bindings.
+
+## Recording a slowdown
+
+Press **F12**, reproduce the problem, then press F12 again. You can toggle recording
+while dragging and while holding Ctrl/Shift/Alt. The top bar shows recording/export
+status and **Show file** after completion. Share that `.afprofile.zip` file.
+Windows reports are under `%LOCALAPPDATA%/AnthroForge/Profiles`. The default capture
+keeps the latest 120 seconds within its storage budget. See [profiling](profiling.md)
+for headless operations, privacy, limits and interpreting costs.

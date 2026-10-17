@@ -39,7 +39,10 @@ class GeometryEngine(NativeEngine):
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)
+        function = getattr(function, "_profile_original", function)
         function.argtypes, function.restype = args, result
+        if self.profile_bind is not None:
+            self.profile_bind(name, function)
 
     def _mesh_signatures(self) -> None:
         self.bind("af_last_error", [], c.c_char_p)

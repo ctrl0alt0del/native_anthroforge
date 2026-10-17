@@ -3,8 +3,9 @@
 import ctypes
 import os
 import sys
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import Any
 
 
 def library_path() -> Path:
@@ -21,6 +22,7 @@ def library_path() -> Path:
 
 class NativeEngine:
     def __init__(self, path: Path | None = None) -> None:
+        self.profile_bind: Callable[[str, Any], None] | None = None
         self.path = path or library_path()
         self.library = ctypes.CDLL(str(self.path))
         self._configure()

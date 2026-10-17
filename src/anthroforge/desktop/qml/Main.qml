@@ -46,7 +46,7 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 10; spacing: 10
                 Label { text: "ANTHROFORGE"; font.bold: true; font.pixelSize: 12; font.letterSpacing: 1; color: Theme.text }
-                Label { text: "0.1.3"; color: Theme.accent; font.pixelSize: 10 }
+                Label { text: "0.1.4"; color: Theme.accent; font.pixelSize: 10 }
                 MenuBar {
                     background: Item {}
                     Menu { title: "File"; MenuItem { action: newAction } MenuItem { action: openAction } MenuSeparator {} MenuItem { action: saveAction } MenuItem { action: saveAsAction } MenuSeparator {} MenuItem { action: importAction } }
@@ -62,10 +62,13 @@ ApplicationWindow {
                         MenuItem { text: "Attachment markers"; checkable: true; checked: workspace.state.anchors; onTriggered: workspace.run("workspace.update",{anchors:checked}) }
                         MenuItem { text: "Performance diagnostics"; checkable: true; checked: workspace.state.diagnostics; onTriggered: workspace.run("workspace.update",{diagnostics:checked}) }
                         MenuItem { text: "Activity panel"; checkable: true; checked: window.activityOpen; onTriggered: window.activityOpen = checked }
+                        MenuSeparator {}
+                        MenuItem { text: (performance.state.recording ? "Stop recording" : "Record performance") + "    " + keyboard.shortcut("recordPerformance"); onTriggered: performance.toggle() }
                     }
                     Menu { title: "Help"; MenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() } }
                 }
                 Item { Layout.fillWidth: true }
+                ProfileStatus { }
                 Label { text: "Workspace"; color: Theme.muted; font.pixelSize: 11 }
                 UiCombo { Layout.preferredWidth: 175; model: workspace.state.workspaces; currentIndex: workspace.state.workspace; onActivated: workspace.run("workspace.select",{index:currentIndex}) }
                 UiButton { text: "Focus…"; hint: "Create a workspace from the selected SCP"; enabled: !!workspace.selectedId && !workspace.state.waiting; onClicked: focusDialog.open() }
@@ -268,6 +271,7 @@ ApplicationWindow {
         grab: () => viewport.startModalTransform("Move"), turn: () => viewport.startModalTransform("Rotate"), resize: () => viewport.startModalTransform("Scale"),
         viewX: () => viewport.setView("Right"), viewY: () => viewport.setView("Front"), viewZ: () => viewport.setView("Top"),
         restoreView: () => viewport.restoreView(),
+        recordPerformance: () => performance.toggle(),
         confirm: () => viewport.confirmTransform(),
         projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,
         cancel: () => { viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }

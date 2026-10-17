@@ -50,6 +50,7 @@ Item {
         {command:"viewY", key:"2", duringTransform:true, allowModifiers:true},
         {command:"viewZ", key:"3", duringTransform:true, allowModifiers:true},
         {command:"restoreView", key:"4", duringTransform:true, allowModifiers:true},
+        {command:"recordPerformance", key:"F12", duringTransform:true, allowModifiers:true, allowTyping:true},
         {command:"confirm", key:"Return", duringTransform:true, allowModifiers:true},
         {command:"confirm", key:"Enter", duringTransform:true, allowModifiers:true},
         {command:"projection", key:"5"}, {command:"xray", key:"Alt+Z"},
@@ -62,7 +63,7 @@ Item {
             sequences: modelData.allowModifiers ? manager.modifierPrefixes.map(prefix => prefix+modelData.key) : [modelData.key]
             context: Qt.WindowShortcut
             autoRepeat: false
-            enabled: !manager.blocked && (!manager.typing || modelData.scope === "document") && (!manager.transforming || !!modelData.duringTransform)
+            enabled: !manager.blocked && (!manager.typing || modelData.scope === "document" || !!modelData.allowTyping) && (!manager.transforming || !!modelData.duringTransform)
             onActivated: manager.requested(modelData.command)
         }
     }

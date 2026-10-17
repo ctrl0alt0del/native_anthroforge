@@ -25,9 +25,17 @@ both license texts and corresponding adapted sources accompany the release.
 Qt source archives for the pinned SDK are available at
 https://download.qt.io/online/qtsdkrepository/all_os/qt/qt6_6120_windows_line_endings_src/qt.qt6.6120/.
 Qt for Python component notices: https://doc.qt.io/qtforpython-6/licenses.html.
-The release keeps Qt libraries dynamically replaceable and includes the matching SDK
+The release keeps Qt shared libraries dynamically replaceable and includes the matching SDK
 SBOM files when available. Upstream commercial-license text included in a wheel is
 retained as upstream metadata; this application uses the open-source license alternatives.
+
+The 0.1.4 `af_profiler` adapter links Qt 6.12.0's private QmlDebug and PacketProtocol
+client support statically; the surrounding Qt runtime remains shared. This is an
+isolated, version-pinned integration under the GPL-compatible Qt licensing terms.
+Matching Qt source is available from the pinned SDK source location above, including
+`qtdeclarative/src/qmldebug` and `qtdeclarative/src/plugins/qmltooling`. The authored
+adapter source/build instructions are included in the companion source archive.
+It enables profiling services only; debugger and inspector services are excluded.
 
 The companion source archive includes application/native sources, pinned dependency
 lockfile, tests, build scripts and unchanged vendored headers. The portable runtime

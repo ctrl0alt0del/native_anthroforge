@@ -10,6 +10,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job
 from anthroforge.core.metrics import Metrics
 from anthroforge.core.results import Port
+from anthroforge.profiling import tasks as trace
 
 from .task_execution import InlineBudget, completed_future, execute
 from .task_schedulers import task_schedulers
@@ -33,6 +34,7 @@ class TaskCoordinator:
         self._initialize_scheduling(clock)
 
     def _initialize_scheduling(self, clock: Callable[[], float]) -> None:
+        self.profiler: Any = None
         self.metrics = Metrics()
         self.task_schedulers = task_schedulers()
         self.inline_budget = InlineBudget(clock)
@@ -51,6 +53,7 @@ class TaskCoordinator:
         job.origin, job.epoch = self.current().revision, self.epoch
         job.queued_since = self.clock() if job.queued_since is None else job.queued_since
         self.jobs.append(job)
+        trace.event(self.profiler, job, "queued")
         self._admit(job)
         self._checkpoint()
         return job.id
@@ -95,7 +98,9 @@ class TaskCoordinator:
 
     def _assess(self, job: Job) -> None:
         started = monotonic()
-        job.assessment = self.task_schedulers[job.kind].assess(job, self.current())
+        job.assessment = trace.call(
+            self.profiler, job, "assess", self.task_schedulers[job.kind].assess, job, self.current()
+        )
         self.metrics.observe("scheduling", monotonic() - started)
 
     def _waiting(self, job: Job) -> bool:
@@ -126,6 +131,7 @@ class TaskCoordinator:
         started = monotonic()
         job.cancel_requested = job.cancel_requested or started
         job.cancel.set()
+        trace.event(self.profiler, job, "cancel_requested")
         self.metrics.observe("cancel_request", monotonic() - started)
 
     def _remember_coalescing(self, job: Job) -> None:
@@ -202,7 +208,7 @@ class TaskCoordinator:
         job.state, job.progress = "preparing", "Preparing owned input"
         try:
             self._assess(job)
-            payload = job.prepare(job.snapshot)
+            payload = trace.call(self.profiler, job, "prepare", job.prepare, job.snapshot)
             job.prepare_ms = (monotonic() - job.started) * 1000
             self.metrics.observe("prepare", job.prepare_ms / 1000)
             self._execute(job, payload)
@@ -212,7 +218,7 @@ class TaskCoordinator:
     def _execute(self, job: Job, payload: Any) -> None:
         if self.can_publish(job) and self.inline_budget.permits(job):
             job.execution = "inline"
-            job.future = completed_future(job, payload)
+            job.future = completed_future(job, payload, self.profiler)
             self._finish(job)
             self.inline_budget.charge(job)
         else:
@@ -223,7 +229,7 @@ class TaskCoordinator:
                     if self.can_publish(job)
                     else "Publication deferred by the editing transaction"
                 )
-            job.future = self.pool.submit(execute, job, payload)
+            job.future = self.pool.submit(execute, job, payload, self.profiler)
 
     def _finish(self, job: Job) -> None:
         try:
@@ -245,13 +251,14 @@ class TaskCoordinator:
         job.state, job.progress = "publishing", "Publishing complete result"
         started = monotonic()
         try:
-            job.publish(result)
+            trace.call(self.profiler, job, "publish", job.publish, result)
         finally:
             job.publish_ms = (monotonic() - started) * 1000
             self.metrics.observe("publication", job.publish_ms / 1000)
 
     def _terminal(self, job: Job, state: str) -> None:
         job.state, job.finished = state, monotonic()
+        trace.event(self.profiler, job, state)
         if job.cancel_requested:
             self.metrics.observe("cancel_finish", job.finished - job.cancel_requested)
         job.progress = job.error or state.capitalize()

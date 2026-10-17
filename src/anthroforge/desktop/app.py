@@ -20,6 +20,8 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--smoke-test", action="store_true")
     parser.add_argument("--screenshot")
     parser.add_argument("--project")
+    parser.add_argument("--disable-profiling-support", action="store_true")
+    parser.add_argument("--profile-probe")
     return parser.parse_args()
 
 
@@ -28,18 +30,37 @@ def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicatio
     engine.addImportPath(str(build_directory() / "qml"))
     engine.rootContext().setContextProperty("workspace", controller)
     engine.rootContext().setContextProperty("authoring", controller.authoring)
+    setup_profile_controls(controller, engine)
     inputs = InputState(engine)
     engine.rootContext().setContextProperty("heldInput", inputs)
     engine.warnings.connect(lambda errors: warnings.extend(error.toString() for error in errors))
     engine.load(QUrl.fromLocalFile(str(Path(__file__).parent / "qml" / "Main.qml")))
-    if engine.rootObjects():
-        engine.rootObjects()[0].frameSwapped.connect(controller.frame_presented)
-        engine.rootObjects()[0].installEventFilter(inputs)
+    attach_window(engine, controller, inputs)
     return engine
 
 
-def launch(args: argparse.Namespace, app: QGuiApplication) -> int:
+def attach_window(engine, controller, inputs):
+    if not engine.rootObjects():
+        return
+    window = engine.rootObjects()[0]
+    window.frameSwapped.connect(controller.frame_presented)
+    window.installEventFilter(inputs)
+    if getattr(controller, "qt_profiler", None):
+        controller.qt_profiler.attach(window, controller)
+
+
+def setup_profile_controls(controller, engine):
+    from .profile_controls import ProfileControls
+
+    controller.profile_controls = ProfileControls(
+        controller, getattr(controller, "qt_profiler", None)
+    )
+    engine.rootContext().setContextProperty("performance", controller.profile_controls)
+
+
+def launch(args: argparse.Namespace, app: QGuiApplication, profiler=None) -> int:
     controller, warnings = open_controller(args.project), []
+    controller.qt_profiler = profiler
     app.aboutToQuit.connect(controller.close)
     engine = create_engine(controller, warnings)
     prepare_view(controller, args.project)
@@ -47,9 +68,17 @@ def launch(args: argparse.Namespace, app: QGuiApplication) -> int:
         print("Cannot load desktop; run tools/setup.ps1 and inspect QML errors.", file=sys.stderr)
         print("\n".join(warnings), file=sys.stderr)
         return 1
+    schedule_diagnostics(args, app, engine, controller, warnings)
+    return app.exec()
+
+
+def schedule_diagnostics(args, app, engine, controller, warnings):
     if args.smoke_test:
         smoke.schedule(app, engine, args.screenshot, warnings)
-    return app.exec()
+    if args.profile_probe:
+        from .profile_probe import ProfileProbe
+
+        ProfileProbe(app, controller, args.profile_probe)
 
 
 def open_controller(project):
@@ -73,10 +102,32 @@ def prepare_view(controller, project):
 def main() -> int:
     args = arguments()
     QQuickStyle.setStyle("Basic")
-    app = QGuiApplication([sys.argv[0]])
-    app.setApplicationName("AnthroForge")
     with native_runtime():
-        return launch(args, app)
+        return run_application(args)
+
+
+def run_application(args):
+    from shiboken6 import delete
+
+    from .qt_profiler import profiler_application
+
+    app = profiler_application()
+    app.setApplicationName("AnthroForge")
+    try:
+        return profiled_launch(args, app)
+    finally:
+        delete(app)
+
+
+def profiled_launch(args, app):
+    from .qt_profiler import QtProfiler
+
+    profiler = None if args.disable_profiling_support else QtProfiler()
+    try:
+        return launch(args, app, profiler)
+    finally:
+        if profiler:
+            profiler.close()
 
 
 if __name__ == "__main__":

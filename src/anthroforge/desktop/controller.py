@@ -4,6 +4,8 @@ from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
 from anthroforge.application.session import Session
 from anthroforge.native import scene
+from anthroforge.profiling import RuntimeProfiler
+from anthroforge.profiling.spans import measured
 
 from . import controller_actions as actions
 from . import project_actions, scene_state
@@ -22,8 +24,7 @@ class Controller(QObject):
 
     def __init__(self) -> None:
         super().__init__()
-        self.session = Session()
-        scene.configure(self.session.engine)
+        self.initialize_session()
         self.render_model = RenderModel(self)
         self.render_model.activated.connect(self.activate_geometry)
         self._initialize_state()
@@ -34,6 +35,11 @@ class Controller(QObject):
         self.timer.timeout.connect(self.tick)
         self.timer.start(16)
         self.refresh()
+
+    def initialize_session(self):
+        self.profiler = RuntimeProfiler()
+        self.session = Session(profiler=self.profiler)
+        scene.configure(self.session.engine)
 
     def _initialize_state(self):
         self.selection, self.hovered, self.message = "", "", ""
@@ -89,6 +95,7 @@ class Controller(QObject):
     def metrics(self):
         return self._metrics
 
+    @measured("ui", lambda owner: owner.session.profiler)
     def notify(self):
         self._state = self.snapshot()
         self._jobs = [job.describe() for job in self.session.scheduler.jobs[-40:]]
@@ -132,6 +139,7 @@ class Controller(QObject):
             self.notify()
         self.session.scheduler.metrics.observe("tick", monotonic() - started)
 
+    @measured("ui", lambda owner: owner.session.profiler)
     def process_tick(self):
         self.session.scheduler.tick()
         project_actions.poll(self)
@@ -148,6 +156,7 @@ class Controller(QObject):
         self.last_frame = now
         self.render_model.presented()
 
+    @measured("publication", lambda owner: owner.session.profiler)
     def activate_geometry(self):
         scene_state.picking_inputs(self, self.render_model.active_rows())
         from anthroforge.application.geometry_ownership import collect
@@ -162,6 +171,7 @@ class Controller(QObject):
         ):
             self.refresh()
 
+    @measured("ui", lambda owner: owner.session.profiler)
     def refresh(self):
         self.rows = scene_state.records(self)
         self.render_model.publish(scene_state.render_rows(self.rows), self.session.assets)
@@ -309,5 +319,6 @@ class Controller(QObject):
     def close(self):
         self.timer.stop()
         self.session.close()
+        self.profiler.close()
         for lock in self.temporary_locks:
             lock.close()

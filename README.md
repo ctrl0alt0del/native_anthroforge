@@ -1,4 +1,4 @@
-# AnthroForge 0.1.3
+# AnthroForge 0.1.4
 
 A standalone SCP and primitive editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
@@ -8,7 +8,13 @@ Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.
 
-0.1.3 adds distinct move/rotate/scale gizmos, selection outlines, translucent curve editing,
+0.1.4 adds runtime performance recording: press **F12**, reproduce a slowdown, then
+press F12 again and share the `.afprofile.zip` under your local AnthroForge `Profiles`
+folder. Recording works during edits; no restart or rebuild is needed. See
+[recording and interpreting reports](docs/profiling.md). The Activity-panel performance
+fix remains deferred; reports now expose its binding/model churn.
+
+The editor includes distinct move/rotate/scale gizmos, selection outlines, translucent curve editing,
 and keyboard/tree deletion that preserves children. Hold Shift to preview curve-point insertion
 and click repeatedly; hold Ctrl during a point drag to snap to other SCP surfaces. Curves,
 points and handles have distinct colors. G/R/S starts mouse transforms; 1/2/3 centers X/Y/Z

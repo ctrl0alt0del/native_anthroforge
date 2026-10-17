@@ -1,6 +1,6 @@
 # AnthroForge development validation
 
-Current release qualification is in [Usability release 0.1.3](#usability-release-013).
+Current release qualification is in [Runtime profiler 0.1.4](#runtime-profiler-014).
 The earlier sections retain the evidence and limitations of their respective revisions.
 
 Implementation and checks performed on 2026-10-16, Windows 11 x64. The original Blender addon
@@ -520,3 +520,86 @@ minimal PATH: import, attachments, primitives/deformers, deletion/subdivision, s
 GPU rendering and GUI smoke checks. Packaged camera QML hashes match the qualified source;
 the packaged desktop capture was inspected. Evidence is in `build/camera-restore-portable-check`.
 The source archive and portable documentation were refreshed; these build outputs remain local.
+
+## Runtime profiler 0.1.4
+
+Validated on 2026-10-17, Windows 11 x64, Python 3.12.12 and Qt/PySide6 6.12.0.
+The recording service, native Qt adapter, UI controls, runtime API and report format
+are described in [profiling](profiling.md). The Activity production fix remains deferred.
+[Compact qualification evidence](tasks/runtime-profiler-evidence.json) preserves
+measurements and capture hashes without committing the large raw traces.
+
+The development gate passes **415 tests**, plus Ruff, mypy, native CTest, native and
+PowerShell function/style checks, numerical checks and the native doctor. Coverage
+includes normal lifecycle/retry, unavailable collectors, active/queued/interrupted
+jobs, cancellation, native hook restoration, repeated captures, byte/time eviction,
+delayed batches, bounded pending spans and clipping at recording boundaries. A fresh
+headless process creates/evaluates a body and exports a report without importing Qt.
+
+The final portable executable was built from clean tracked source at `55bf4e2`, with
+file/product version 0.1.4.0. A relocated copy passed import, attachments, primitives,
+deformers, deletion, subdivision, save/inspect/render, GUI and profiling checks under
+a minimal PATH with developer Python/Qt settings removed. Both packaged report bundles
+were complete; Qt profiling services excluded debugger/inspector. Perfetto imported
+the packaged trace as 5,282 slices with no nonzero error statistics. The actual packaged
+viewport was visually inspected. Distribution and source archive remain local artifacts
+under `dist/AnthroForge.dist` and `dist/AnthroForge-0.1.4-source.zip`.
+
+Actual Qt mouse/key acceptance passed normal and Ctrl-snapped dragging with Activity
+both hidden and shown, F12 start/stop inside the gesture, confirmation, cancellation,
+undo, repeated recordings and text-focus preservation. Typed text was absent from the
+capture. The final five drag reports had no collector loss, and retained intervals
+were inside the requested start/stop times. Screenshots were visually inspected.
+
+From the final visible-Activity snapped report alone: Activity.qml:23 binding mean
+24.15 ms, Controller.notify 30.79 ms, native pick 0.084 ms and surface-normal query
+0.019 ms. There were 250 generic model replacements across observed UI models.
+These inclusive timings overlap and include recording perturbation. They establish
+attribution, not an unprofiled speed claim or proof of a snap-specific 2x regression.
+Perfetto v58.2 imported the final trace as 114,256 slices with no nonzero error stats.
+
+A 34-second stress capture with a two-second window received 641,880 events,
+intentionally evicted 611,079, retained exactly two seconds and had zero collector
+loss. Default desktop storage is partitioned conservatively: 64 MiB retained event
+storage plus 64 MiB reserved for bounded queues, metadata, observers and export.
+A default-budget recording separately reached the byte bound, evicting oldest events
+while staying below 64 MiB of charged retained storage. Qt's transient producer
+allocations are outside this owned-storage budget; it is not a process RSS ceiling.
+
+### Overhead interpretation
+
+Trials ran serially with system utilization recorded, without concurrent builds.
+The initial normal/snapped handler means were 24.88/29.18 ms with Qt support disabled,
+25.75/29.09 dormant, and 35.25/40.52 recording. Four counterbalanced trials per idle
+mode after 60 warm-up moves gave 31.62/32.01 versus 31.30/32.38 ms; run standard
+deviations were 0.26–0.57 ms. Warm-up adds Activity history, so absolute values from
+these series must not be pooled. Later valid foreground comparisons changed the
+sign of the cold idle difference. A separate nonactivating-window series is retained
+as supplementary evidence; it changes presentation conditions.
+
+The small cold/first-use differences are not a zero-overhead guarantee. No stable
+steady-state idle penalty was resolved above the observed variation in the warmed
+series. Recording has a substantial, measured observer effect in this binding-heavy
+case; directly measured costs and comparison estimates are reported separately.
+Forced disk caching was investigated and not adopted. Two supplementary foreground
+trials lost window focus and canceled their gesture; they are excluded, not counted
+as passing timing trials. The diagnostic now detects this interruption explicitly.
+
+### Ownership review
+
+Reviewed separately from tests: the recorder owns no anatomy, accepted geometry,
+undo entries or scheduler policy. The desktop controller owns the Qt-independent
+service across document replacement; headless sessions own or explicitly borrow it. Shared
+commands, transactions, native binding registration and coordinator stages supply
+coverage. Qt private APIs are isolated in one pinned native adapter. Render events
+stay in C++; the generic model observer is installed only during recording. Stop
+freezes application spans, clips delayed Qt data, resets periodic flush wiring and
+streams bounded records to atomic export. Failure retains a frozen capture for retry;
+restarts wait for the previous exporter to finish. No Activity-specific timing marker
+or production Activity optimization was introduced. GPU timing, detailed stack
+sampling and report viewing remain outside this release.
+Final lifecycle review found and corrected New retaining stale recording controls and
+headless Open losing task observation. The full GUI acceptance passes after the fixes,
+including New before recording and New/Open during recording. Focus and gestures are
+preserved; closing a borrowing session releases native observation without stopping
+the application recorder.

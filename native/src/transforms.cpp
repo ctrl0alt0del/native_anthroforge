@@ -56,6 +56,17 @@ int af_quaternion(const double* matrix,double* output) {
 int af_geometry_matrix(const double* matrix,const double* offset,double* output) {
     Eigen::Map<af::M4> result(output); result=af::geometry_matrix(matrix,offset); return 0;
 }
+int af_axis_rotation(const double* axis,double angle,double* output) {
+    try {
+        const af::V3 direction=Eigen::Map<const af::V3>(axis);
+        if(!direction.allFinite()||direction.norm()<1e-12||!std::isfinite(angle))
+            throw std::runtime_error("Rotation requires a finite angle and nonzero axis.");
+        const af::M3 rotation=Eigen::AngleAxisd(angle*3.141592653589793/180.,direction.normalized()).toRotationMatrix();
+        const af::V3 zyx=rotation.eulerAngles(2,1,0);
+        Eigen::Map<af::V3> result(output);
+        result=af::V3(zyx.z(),zyx.y(),zyx.x())*(180./3.141592653589793); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 int af_move_origin(const double* matrix,const double* offset,const double* binding,
                    double* updated_matrix,double* updated_offset) {
     const af::M4 value=Eigen::Map<const af::M4>(matrix);

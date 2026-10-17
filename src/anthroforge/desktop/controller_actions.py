@@ -27,6 +27,7 @@ def run(controller, operation, arguments):
 
 
 def start_transform(controller, mode):
+    controller.drag_mode = mode
     if controller.authoring.active:
         from .authoring_actions import start_transform as start_components
 
@@ -40,26 +41,52 @@ def start_transform(controller, mode):
 
 
 def drag_transform(controller, axis, amount):
-    if controller.authoring.active:
-        from .authoring_actions import drag_transform as drag_components
+    from .transform_delta import axis_values
 
-        return drag_components(controller.authoring, axis, amount)
-    if not controller.drag_values:
+    transform_delta(controller, axis_values(controller.drag_mode, axis, amount))
+
+
+def transform_delta(controller, values):
+    from .transform_delta import object_values
+
+    if controller.authoring.active:
+        from .authoring_actions import transform_delta as component_delta
+
+        return component_delta(controller.authoring, values)
+    if not controller.drag_values or controller.session.history.before is None:
         return
-    values = list(controller.drag_values)
-    mode = controller.drag_mode
-    index = axis + {"Move": 0, "Rotate": 3, "Scale": 6}[mode]
-    if mode == "Scale":
-        values[index] *= max(0.01, 1.0 + amount)
-    else:
-        values[index] += amount * (60.0 if mode == "Rotate" else 1.0)
-    run(controller, "scp.transform", {"entity": controller.selection, "values": values})
+    result = object_values(controller.session.engine, controller.drag_values, values)
+    run(controller, "scp.transform", {"entity": controller.selection, "values": result})
 
 
 def end_transform(controller, cancel=False):
     if controller.session.history.before is not None:
         run(controller, "cancel" if cancel else "commit", {})
     controller.drag_values = []
+
+
+def rebase_transform(controller, mode=""):
+    if controller.session.history.before is None:
+        return
+    if controller.authoring.active:
+        from .authoring_actions import capture_transform
+
+        controller.authoring.drag_mode = mode or controller.authoring.drag_mode
+        capture_transform(controller.authoring)
+    else:
+        controller.drag_values = list(controller.selectedData["trs"])
+
+
+def selection_center(controller):
+    selected = controller.authoring.transformData
+    if not selected:
+        selected = controller.selectedData
+    if not selected:
+        return []
+    if selected["id"] == "components" or selected.get("is_control"):
+        return selected["trs"][:3]
+    item = controller.session.document.entity(selected["id"])
+    return frame_bounds(controller.session, item, selected["trs"][6:])[0]
 
 
 def new_document(controller):

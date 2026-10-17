@@ -232,17 +232,36 @@ class Controller(QObject):
         index = self.last_hit["face" if key == "face_lock" else "vertex"]
         self.run("scp.attachment", {"entity": self.selection, "child_mode": mode, key: index})
 
-    @Slot(str)
+    @Slot(str, result=bool)
     def beginTransform(self, mode):
         try:
             actions.start_transform(self, mode)
+            return self.session.history.before is not None
         except Exception as error:
             self.message = str(error)
             self.notify()
+            return False
+
+    @Slot()
+    @Slot(str)
+    def rebaseTransform(self, mode=""):
+        actions.rebase_transform(self, mode)
+
+    @Slot(result="QVariantList")
+    def selectionCenter(self):
+        return actions.selection_center(self)
+
+    @Slot("QVariantList", float, result="QVariantList")
+    def rotationDelta(self, axis, angle):
+        return [0, 0, 0, *scene.axis_rotation(self.session.engine, axis, angle), 1, 1, 1]
 
     @Slot(int, float)
     def dragTransform(self, axis, amount):
         actions.drag_transform(self, axis, amount)
+
+    @Slot("QVariantList")
+    def transformDelta(self, values):
+        actions.transform_delta(self, values)
 
     @Slot(bool)
     def endTransform(self, cancel):

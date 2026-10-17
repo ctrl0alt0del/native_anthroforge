@@ -8,8 +8,9 @@ ScrollView {
     property var selected: workspace.selectedData
     readonly property var attachment: selected.attachment || {}
     readonly property var candidates: workspace.treeRows.filter(row => validParent(row))
-    readonly property bool dialogVisible: deleteDialog.visible || colorDialog.visible
+    readonly property bool dialogVisible: colorDialog.visible
     signal pickAnchor(string mode)
+    signal deleteRequested(string entity)
     clip: true; contentWidth: availableWidth
     function validParent(row) {
         if(row.is_control) return false;
@@ -146,18 +147,12 @@ ScrollView {
             RowLayout {
                 Layout.fillWidth: true
                 UiButton { text: "Duplicate"; Layout.fillWidth: true; hint: "Create an independent copy"; onClicked: workspace.run("scp.duplicate",{entity:inspector.selected.id}) }
-                UiButton { text: "Delete…"; hint: "Delete this SCP and its descendants"; onClicked: deleteDialog.open() }
+                UiButton { text: "Delete…"; hint: "Delete this SCP, preserving children"; onClicked: inspector.deleteRequested(inspector.selected.id) }
             }
         }
-        ControlInspector { visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
+        ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         Label { text: inspector.selected.error || ""; visible: !!text; color: Theme.danger; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         Item { implicitHeight: 8 }
-    }
-    Dialog {
-        id: deleteDialog; parent: Overlay.overlay; anchors.centerIn: parent
-        title: "Delete object and children?"; modal: true; standardButtons: Dialog.Ok | Dialog.Cancel
-        Label { text: "This removes the selected SCP and all its descendants.\nYou can undo this action."; color: Theme.text }
-        onAccepted: workspace.run("scp.delete",{entity:inspector.selected.id})
     }
     ColorDialog { id: colorDialog; title: "Object color"; onAccepted: workspace.run("scp.color",{entity:inspector.selected.id,value:selectedColor.toString()}) }
 }

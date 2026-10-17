@@ -1,4 +1,4 @@
-# AnthroForge 0.1.2 architecture
+# AnthroForge 0.1.3 architecture
 
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through
@@ -169,5 +169,73 @@ MCP, additional primitive families, fibres, muscles and skin remain separate fea
 
 Qt/PySide versions must match when rebuilding the native viewport plugin. Windows DLL
 preloading intentionally ensures Python and Qt use the same geometry registry. The current
-portable package contains only dependencies needed by 0.1.2; numerical development extras
+portable package contains only dependencies needed by 0.1.3; numerical development extras
 remain available for later migrations.
+
+## Interaction and selection presentation (0.1.3)
+
+`input_state.py` tracks physical held modifiers on the application window, including release,
+auto-repeat suppression and window deactivation. `KeyboardManager.qml` owns semantic modifier
+bindings and focus/modal policy; gesture consumers request insertion, surface snapping, extended
+selection, precision, pan or deeper selection without knowing which modifier implements them.
+Ctrl-click selection is resolved on release, allowing Ctrl to be held before a point drag.
+
+`CurveEditor.qml` owns direct pointer gestures and transient preview lifetime; `curve_interaction.py`
+adapts native cursor queries to `curve.split` and existing transform transactions. Cached world-space
+cubics are rebuilt when authored geometry or its frame changes. C++ performs bounded closest-ray
+queries and de Casteljau subdivision. Adjacent handles become Free to preserve the authored shape;
+sampling resolution and stable references remain unchanged. Preview is never a document edit.
+
+Surface snapping follows the addon's `core/scp_runtime/viewport_picker.py` contract: transform
+the ray into mesh coordinates, raycast each eligible surface, and choose the nearest world hit.
+The standalone's existing native batch scene/BVH queries already implement this numerical work.
+Snapping uses displayed mesh revisions and their retained leases, excludes the edited SCP, and
+allows visible read-only context as a target. It changes positions through shared point commands,
+without adding an attachment. Complete gestures retain one undo transaction.
+
+The viewport builds parallel orthographic rays and perspective rays from camera parameters.
+Free translation uses the original pivot's camera depth. Editing geometry has a transparent
+overlay pass with a shared camera projection, so outlines cannot hide component colors.
+Curves, points and handles have distinct theme colors; point markers are native triangle buffers.
+`PresentationCamera.qml` supplies the same camera to the outline and editing passes.
+
+`KeyboardManager.qml` owns shortcut registration and context policy. Semantic commands
+in the window reuse existing actions and the shared Delete dialog. Shortcut activation
+is suppressed in modal/file dialogs and blocked saves; text fields retain editing keys,
+and an active transform accepts explicitly declared view/transform/confirmation/cancellation
+commands. No key event implements a core operation. Physical wheel/button capture belongs to
+`InputState`; its semantic bindings and capture eligibility belong to the keyboard manager.
+
+`TransformGizmo` owns gesture lifetime, `GizmoGeometry.js` owns projected handles/hit tests,
+and `GizmoPaint.js` draws them. Projections refresh after frame synchronization, keyed by
+camera, viewport, mode and transform. The Python transform adapter converts a complete
+translation/angle/scale delta through native matrix operations and shared commands.
+Object scaling remains local to avoid introducing shear into the existing TRS model;
+world rotation is composed rather than added to Euler angles. Curve/cage transforms share
+the same pivot/delta contract. Legacy axis-drag adapters remain compatible.
+
+`ModalTransform` handles keyboard-started pointer transforms, using those same shared commands.
+View changes recapture the current transform inputs without ending the original transaction.
+Each gesture then resets its pointer reference in the new camera frame; stored cursor coordinates
+are values, not live Qt property wrappers. Cancellation restores the original transaction snapshot.
+Axis views center component selection or SCP bounds, retaining pixels per world unit at that depth.
+Modal rotation uses a native axis-angle adapter around the view direction. Selected curve points
+include their handles during rotation/scale, while translation retains automatic handle behavior.
+
+The transient curve interaction owns the signed snap offset. It reuses the displayed surface hit
+and asks native code for its world normal, with inverse-transpose handling of nonuniform/mirrored
+transforms. Wheel/reset events update the same active transform, not camera zoom or a second edit.
+Offset and feedback clear on snapping release and gesture completion/cancellation.
+
+`SelectionOutline` renders a depth-tested selection mask with the same cameras, displayed
+mesh resources and active staging flags as the main view. A small screen-space dilation
+shader extracts the silhouette at two logical pixels, including open surfaces and concavities.
+Opaque context occludes it; X-ray excludes context occluders. Qt Shader Tools compiles the
+shader into the native viewport plugin's resources during the existing CMake build.
+The pass adds rendering work but no duplicate Python/native mesh conversion. Curve-edit
+opacity and the mask never modify authored records or trigger construction calculations.
+
+`application/deletion.py` owns single-SCP removal, root replacement, pose-preserving child
+promotion, control detachment and rescheduling. It installs a valid hierarchy atomically
+and retains existing history/checkpoint contracts. UI, keyboard and JSON clients call the
+same `scp.delete`; shared-control deletion continues using `control.delete`.

@@ -21,6 +21,9 @@ class Authoring(QObject):
         self._lines, self.hover_index = [], -1
         self._curve_lines, self.hover_curve = {}, ""
         self.category = "CURVE"
+        from .curve_interaction import CurveInteraction
+
+        self.interaction = CurveInteraction(self)
         self._state, self._point_rows, self._component_rows = {}, [], []
         self._component_lookup = {}
         controller.selectionChanged.connect(self.refresh)
@@ -28,6 +31,22 @@ class Authoring(QObject):
     @Property("QVariantMap", notify=changed)
     def state(self):
         return self._state
+
+    @Property(QObject, constant=True)
+    def curveInteraction(self):
+        return self.interaction
+
+    @Property("QVariantMap", notify=geometryChanged)
+    def visualLayers(self):
+        from .authoring_visuals import layers
+
+        return layers(self)
+
+    @Property("QVariantMap", notify=hoverChanged)
+    def highlights(self):
+        from .authoring_visuals import highlights
+
+        return highlights(self)
 
     @Property("QVariantList", notify=geometryChanged)
     def points(self):
@@ -62,6 +81,7 @@ class Authoring(QObject):
         return self._component_lookup.get(self.selection[0], {}) if self.selection else {}
 
     def notify(self):
+        self.hoverChanged.emit()
         self._state = state.data(self)
         self.changed.emit()
 
@@ -80,7 +100,7 @@ class Authoring(QObject):
     @Property("QVariantMap", notify=changed)
     def transformData(self):
         selected = self.selectedPoints
-        if not self.active:
+        if not self.active or self.state.get("kind") == "HOOK":
             return self.controller.selectedData
         if not selected:
             return self.controller.selectedData if self.state.get("is_control") else {}
@@ -106,6 +126,7 @@ class Authoring(QObject):
         self.notify()
 
     def publish_geometry(self):
+        self.interaction.rebuild()
         self._point_rows = self._points.tolist()
         self._component_rows = [
             dict(ref, key=state.component_key(ref), world=world, local=list(local))

@@ -14,7 +14,7 @@ def resolve(value, results):
         parts = value[1:].split(".")
         result = results[parts[0]]
         for part in parts[1:]:
-            result = result[int(part)] if isinstance(result, list) else result[part]
+            result = result[int(part)] if isinstance(result, (list, tuple)) else result[part]
         return result
     if isinstance(value, dict):
         return {key: resolve(item, results) for key, item in value.items()}

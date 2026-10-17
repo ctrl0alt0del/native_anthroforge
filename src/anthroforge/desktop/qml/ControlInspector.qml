@@ -4,6 +4,7 @@ import QtQuick.Layouts
 
 ColumnLayout {
     id: panel
+    signal deleteRequested(string entity)
     readonly property var item: authoring.state
     readonly property var scps: workspace.treeRows.filter(row=>!row.is_control)
     readonly property var reference: authoring.selectedComponent
@@ -52,10 +53,5 @@ ColumnLayout {
         UiField { Layout.fillWidth: true; placeholderText: "Cage weights, comma separated"; text: (panel.item.weights || []).join(", "); onEditingFinished: panel.set("weights",text.trim()?text.split(",").map(Number):[]) }
     }
     DeformerStack { item: panel.item; visible: panel.item.kind === "LATTICE" }
-    UiButton { text: "Delete shared control…"; Layout.fillWidth: true; onClicked: deleteDialog.open() }
-    Dialog {
-        id: deleteDialog; parent: Overlay.overlay; modal: true; width: 390; anchors.centerIn: parent; title: "Delete shared control?"; standardButtons: Dialog.Ok | Dialog.Cancel
-        Label { width: 340; wrapMode: Text.WordWrap; text: "This removes bindings from: " + workspace.treeRows.filter(row=>(workspace.selectedData.affected || []).indexOf(row.id)>=0).map(row=>row.name).join(", ") + ". Editable primitives remain." }
-        onAccepted: authoring.edit("control.delete",{control:panel.item.id})
-    }
+    UiButton { text: "Delete shared control…"; Layout.fillWidth: true; onClicked: panel.deleteRequested(panel.item.id) }
 }

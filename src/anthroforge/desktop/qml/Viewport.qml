@@ -7,7 +7,17 @@ import AnthroForge.Native 1.0
 
 Item {
     id: viewport
+    clip: true
     signal importRequested()
+    property var keyboard: inactiveInput
+    QtObject {
+        id: inactiveInput
+        readonly property bool blocked: true
+        readonly property int modifiers: 0
+        function held(action) { return false; }
+        function matches(action, mask) { return false; }
+        function shortcut(command) { return ""; }
+    }
     property bool gridVisible: true
     property bool xray: false
     property string viewName: "User view"
@@ -21,7 +31,14 @@ Item {
     property bool cameraDirty: true
     property bool restoringCamera: false
     readonly property var selected: authoring.transformData
-    readonly property real gizmoSize: distance * 0.16
+    readonly property bool modalTransforming: modalTransform.active
+    readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming
+    readonly property bool snapping: keyboard.held("snapSurface") && authoring.active &&
+        (curveEditor.dragging || (gizmo.dragging && toolMode==="Move") || (modalTransforming && modalTransform.gesture.mode==="Move"))
+    readonly property bool insertionPreview: curveEditor.previewActive
+    readonly property bool navigating: !!(navigation.pressedButtons & (Qt.MiddleButton | Qt.RightButton))
+    readonly property var cameraState: [cameraOrigin.x,cameraOrigin.y,cameraOrigin.z,cameraOrigin.eulerRotation.x,cameraOrigin.eulerRotation.y,cameraOrigin.eulerRotation.z,orthographic]
+    readonly property real gizmoSize: distance * 1.1 * 90 / Math.max(1,height)
 
     function inspectScene(): string {
         let vertices = 0, finite = true;
@@ -30,14 +47,25 @@ Item {
             vertices += model.geometry.vertexCount;
             finite = finite && isFinite(p.x) && isFinite(p.y) && isFinite(p.z);
         }
-        const handle=handleRepeater.itemAt(0), p=handle.mapToItem(null,12,12);
-        return JSON.stringify({chunks:meshRepeater.count,vertices:vertices,finite:finite,gizmo:[p.x,p.y],handle:handle.visible});
+        const p=gizmo.probe(0);
+        return JSON.stringify({chunks:meshRepeater.count,vertices:vertices,finite:finite,gizmo:[p.x,p.y],handle:gizmo.visible});
     }
 
+    function cameraPoint(x,y,depth) {
+        if(orthographic) return Qt.vector3d((x-width/2)/orthoCamera.horizontalMagnification,(height/2-y)/orthoCamera.verticalMagnification,-depth);
+        const extent=perspectiveCamera.fieldOfViewOrientation===PerspectiveCamera.Horizontal?width:height;
+        const factor=2*depth*Math.tan(perspectiveCamera.fieldOfView*Math.PI/360)/Math.max(1,extent);
+        return Qt.vector3d((x-width/2)*factor,(height/2-y)*factor,-depth);
+    }
+    function worldRay(x,y) {
+        const camera=view.camera;
+        const a=camera.mapPositionToScene(cameraPoint(x,y,camera.clipNear));
+        const local=orthographic?Qt.vector3d(0,0,-1):cameraPoint(x,y,1);
+        const d=camera.mapDirectionToScene(local);
+        return {origin:[a.x,-a.z,a.y],direction:[d.x,-d.z,d.y]};
+    }
     function rayAt(x, y, select, extend) {
-        const a = view.mapTo3DScene(Qt.vector3d(x, y, 1));
-        const b = view.mapTo3DScene(Qt.vector3d(x, y, 2));
-        const origin=[a.x,-a.z,a.y], direction=[b.x-a.x,a.z-b.z,b.y-a.y];
+        const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
         if(authoring.visible) {
             if(authoring.pick(origin,direction,distance*.012,depthIndex,select,!!extend) || authoring.state.editing) return {};
         }
@@ -52,8 +80,34 @@ Item {
         return projectPoint(x,y,z);
     }
     function projectPoint(x: real,y: real,z: real): point {
-        const result=view.mapFrom3DScene(Qt.vector3d(x,z,-y));
-        return Qt.point(result.x,result.y);
+        const p=view.camera.mapPositionFromScene(Qt.vector3d(x,z,-y));
+        const magnification=pixelsPerUnit(-p.z);
+        return Qt.point(width/2+p.x*magnification,height/2-p.y*magnification);
+    }
+    function pixelsPerUnit(depth) {
+        if(orthographic) return orthoCamera.verticalMagnification;
+        const extent=perspectiveCamera.fieldOfViewOrientation===PerspectiveCamera.Horizontal?width:height;
+        return extent/(2*Math.max(perspectiveCamera.clipNear,depth)*Math.tan(perspectiveCamera.fieldOfView*Math.PI/360));
+    }
+    function cancelTransform() { modalTransform.finish(true); curveEditor.finish(true); gizmo.cancel(); workspace.endTransform(true); }
+    function confirmTransform() { if(modalTransforming) modalTransform.finish(false); }
+    function startModalTransform(mode) { modalTransform.begin(mode); }
+    function updateTransform() { curveEditor.updateDrag(); gizmo.updateDrag(pointerPosition); modalTransform.update(); }
+    function surfaceOffset(steps) {
+        const p=selected.trs, local=view.camera.mapPositionFromScene(Qt.vector3d(p[0],p[2],-p[1]));
+        const step=8/pixelsPerUnit(-local.z)*(keyboard.held("precision") ? .1 : 1);
+        authoring.curveInteraction.adjustOffset(steps*step); updateTransform();
+    }
+    function resetSurfaceOffset() { authoring.curveInteraction.resetOffset(); updateTransform(); }
+    function screenTranslation(delta) {
+        return screenTranslationAt(delta,selected.trs);
+    }
+    function screenTranslationAt(delta,pivot) {
+        const camera=view.camera, local=camera.mapPositionFromScene(Qt.vector3d(pivot[0],pivot[2],-pivot[1]));
+        const depth=Math.max(camera.clipNear,-local.z);
+        const offset=cameraPoint(width/2+delta.x,height/2+delta.y,depth).minus(cameraPoint(width/2,height/2,depth));
+        const d=camera.mapDirectionToScene(offset);
+        return [d.x,-d.z,d.y];
     }
     function pan(dx, dy) {
         const camera = orthographic ? orthoCamera : perspectiveCamera;
@@ -67,15 +121,22 @@ Item {
     }
     function setView(name) {
         const rotations = {Front:[0,0,0], Right:[0,90,0], Top:[-90,0,0]};
-        const angles = rotations[name];
+        const angles = rotations[name], center=workspace.selectionCenter();
+        workspace.rebaseTransform();
+        centerView(center);
         cameraOrigin.eulerRotation = Qt.vector3d(angles[0],angles[1],angles[2]);
         orthographic = true; viewName = name;
+        curveEditor.rebase(); gizmo.rebase(); modalTransform.rebase();
         cameraDirty = true; cameraSave.restart();
     }
+    function centerView(center) {
+        if(!center.length) return;
+        const position=Qt.vector3d(center[0],center[2],-center[1]);
+        const depth=-view.camera.mapPositionFromScene(position).z;
+        if(!orthographic) distance=height/(pixelsPerUnit(depth)*1.1);
+        cameraOrigin.position=position;
+    }
     function refreshOverlays() {
-        for (let i=0;i<handleRepeater.count;i++)
-            handleRepeater.itemAt(i).endpoint = viewport.screenPoint(i);
-        gizmoLines.requestPaint();
         anchorMarkers.requestPaint();
     }
     onOrthographicChanged: cameraSave.restart()
@@ -121,31 +182,6 @@ Item {
         }
         Node {
             eulerRotation.x: -90
-            Model {
-                visible: authoring.visible
-                geometry: ControlGeometry { points: authoring.lines; segments: true }
-                materials: DefaultMaterial { diffuseColor: "#5a9daa"; lighting: DefaultMaterial.NoLighting }
-            }
-            Model {
-                visible: authoring.visible
-                geometry: ControlGeometry { points: authoring.points; radius: viewport.distance*.0025 }
-                materials: DefaultMaterial { diffuseColor: "#6fcbe1"; lighting: DefaultMaterial.NoLighting }
-            }
-            Model {
-                visible: authoring.visible
-                geometry: ControlGeometry { points: authoring.selectedPoints; radius: viewport.distance*.004 }
-                materials: DefaultMaterial { diffuseColor: "#ffcc73"; lighting: DefaultMaterial.NoLighting }
-            }
-            Model {
-                visible: authoring.visible
-                geometry: ControlGeometry { points: authoring.hoveredPoints; radius: viewport.distance*.0045 }
-                materials: DefaultMaterial { diffuseColor: "#ffffff"; lighting: DefaultMaterial.NoLighting }
-            }
-            Model {
-                visible: authoring.visible
-                geometry: ControlGeometry { points: authoring.hoveredLines; segments: true }
-                materials: DefaultMaterial { diffuseColor: "#ffffff"; lighting: DefaultMaterial.NoLighting }
-            }
             Repeater3D {
                 id: meshRepeater
                 model: workspace.meshModel
@@ -157,10 +193,11 @@ Item {
                     scale: Qt.vector3d(item.trs[6], item.trs[7], item.trs[8])
                     Model {
                         id: meshNode
+                        objectName: "surface_" + item.id + "_" + item.chunk
                         visible: item.active
                         position: Qt.vector3d(item.geometry_offset[0], item.geometry_offset[1], item.geometry_offset[2])
                         geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk }
-                        opacity: item.readonly ? .08 : !viewport.xray ? 1 : item.id === workspace.selectedId ? .65 : item.id === workspace.hoveredId ? .5 : .3
+                        opacity: item.readonly ? .08 : authoring.state.editing && item.id === workspace.selectedId && ["LOFT","BODY"].indexOf(authoring.state.primitive?.kind) >= 0 ? .35 : !viewport.xray ? 1 : item.id === workspace.selectedId ? .65 : item.id === workspace.hoveredId ? .5 : .3
                         materials: PrincipledMaterial {
                             baseColor: item.color
                             alphaMode: PrincipledMaterial.Opaque
@@ -169,6 +206,19 @@ Item {
                             cullMode: Material.NoCulling
                             emissiveFactor: item.id === workspace.selectedId ? Qt.vector3d(.015,.015,.015) :
                                             item.id === workspace.hoveredId ? Qt.vector3d(.035,.035,.035) : Qt.vector3d(0,0,0)
+                        }
+                    }
+                    Node {
+                        parent: selectionOutline.sceneRoot
+                        position: Qt.vector3d(item.trs[0],item.trs[1],item.trs[2])
+                        rotation: Qt.quaternion(item.quaternion[0],item.quaternion[1],item.quaternion[2],item.quaternion[3])
+                        scale: Qt.vector3d(item.trs[6],item.trs[7],item.trs[8])
+                        Model {
+                            objectName: "mask_" + item.key
+                            visible: item.active && (item.id === workspace.selectedId || (!viewport.xray && !item.readonly))
+                            position: meshNode.position
+                            geometry: meshNode.geometry
+                            materials: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: item.id === workspace.selectedId ? "white" : "black"; cullMode: Material.NoCulling }
                         }
                     }
                     ResourceLoader { geometries: [meshNode.geometry] }
@@ -188,6 +238,15 @@ Item {
             }
         }
     }
+    SelectionOutline {
+        id: selectionOutline; objectName: "selectionOutline"; anchors.fill: parent
+        sourceCamera: view.camera; orthographic: viewport.orthographic
+        visible: !!workspace.selectedData.asset && workspace.selectedData.visible
+    }
+    AuthoringView {
+        anchors.fill: parent; sourceCamera: view.camera
+        orthographic: viewport.orthographic; distance: viewport.distance
+    }
     MouseArea {
         id: navigation
         anchors.fill: parent
@@ -198,15 +257,15 @@ Item {
             viewport.forceActiveFocus();
             previous = Qt.point(mouse.x,mouse.y);
             if (mouse.button !== Qt.LeftButton) return;
-            viewport.depthIndex = mouse.modifiers & Qt.AltModifier ? viewport.depthIndex + 1 : 0;
-            viewport.rayAt(mouse.x,mouse.y,!viewport.anchorMode,!!(mouse.modifiers & Qt.ShiftModifier));
+            viewport.depthIndex = keyboard.matches("deeperSelection",mouse.modifiers) ? viewport.depthIndex + 1 : 0;
+            viewport.rayAt(mouse.x,mouse.y,!viewport.anchorMode,keyboard.matches("extendSelection",mouse.modifiers));
             if (viewport.anchorMode) { workspace.lockAnchor(viewport.anchorMode); viewport.anchorMode = ""; }
         }
         onPositionChanged: function(mouse) {
             viewport.pointerPosition = Qt.point(mouse.x,mouse.y);
             if (!(pressedButtons & (Qt.MiddleButton | Qt.RightButton))) return;
             const dx = mouse.x-previous.x, dy = mouse.y-previous.y;
-            if (mouse.modifiers & Qt.ShiftModifier) viewport.pan(dx,dy);
+            if (keyboard.matches("pan",mouse.modifiers)) viewport.pan(dx,dy);
             else { cameraOrigin.eulerRotation = Qt.vector3d(cameraOrigin.eulerRotation.x-dy*.35,cameraOrigin.eulerRotation.y-dx*.35,0); viewport.viewName = "User view"; }
             previous = Qt.point(mouse.x,mouse.y);
             viewport.cameraDirty = true;
@@ -219,60 +278,10 @@ Item {
         }
         onDoubleClicked: workspace.frameSelection()
     }
-    Canvas {
-        id: gizmoLines
-        anchors.fill: parent
-        visible: workspace.state.handles && !!viewport.selected.id && !viewport.selected.readonly
-        function axis(context, center, index) {
-            const end = viewport.screenPoint(index);
-            context.strokeStyle = ["#f47779", "#7ed6a5", "#79b7ff"][index];
-            context.beginPath(); context.moveTo(center.x,center.y); context.lineTo(end.x,end.y); context.stroke();
-        }
-        onPaint: {
-            const context = getContext("2d");
-            context.clearRect(0,0,width,height); context.lineWidth = 3;
-            const center = viewport.screenPoint(-1);
-            for (let i=0;i<3;i++) axis(context,center,i);
-        }
-    }
-    Repeater {
-        id: handleRepeater
-        model: 3
-        delegate: Rectangle {
-            id: handle
-            required property int index
-            objectName: "gizmo_" + index
-            property point endpoint: Qt.point(-100,-100)
-            x: endpoint.x-12; y: endpoint.y-12
-            width: 24; height: 24; radius: 12
-            visible: workspace.state.handles && !!viewport.selected.id && !viewport.selected.readonly
-            color: ["#c84d55", "#3b9a69", "#4283cb"][index]
-            border.color: "#dae8ee"
-            Label { anchors.centerIn: parent; text: ["X","Y","Z"][index]; color: "white"; font.bold: true }
-            MouseArea {
-                anchors.fill: parent
-                property point startPoint
-                property point projectedAxis
-                property real worldSize
-                onPressed: function(mouse) {
-                    startPoint = mapToItem(viewport,mouse.x,mouse.y);
-                    const center = viewport.screenPoint(-1), end = viewport.screenPoint(handle.index);
-                    projectedAxis = Qt.point(end.x-center.x,end.y-center.y);
-                    worldSize = viewport.gizmoSize;
-                    workspace.beginTransform(viewport.toolMode);
-                }
-                onPositionChanged: function(mouse) {
-                    if (!pressed) return;
-                    const now = mapToItem(viewport,mouse.x,mouse.y);
-                    const denominator = Math.max(100,projectedAxis.x*projectedAxis.x+projectedAxis.y*projectedAxis.y);
-                    const amount = ((now.x-startPoint.x)*projectedAxis.x+(now.y-startPoint.y)*projectedAxis.y)/denominator*worldSize;
-                    workspace.dragTransform(handle.index,amount);
-                }
-                onReleased: workspace.endTransform(false)
-                onCanceled: workspace.endTransform(true)
-            }
-        }
-    }
+    TransformGizmo { id: gizmo; objectName: "transformGizmo"; anchors.fill: parent; viewport: viewport }
+    CurveEditor { id: curveEditor; objectName: "curveEditor"; anchors.fill: parent; viewport: viewport; keyboard: viewport.keyboard }
+    CurveFeedback { anchors.fill: parent; viewport: viewport }
+    ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     Canvas {
         id: anchorMarkers; anchors.fill: parent
         visible: workspace.state.anchors && !!viewport.selected.id
@@ -290,6 +299,7 @@ Item {
         anchors.left: parent.left; anchors.bottom: parent.bottom; anchors.margins: 14; spacing: 5
         width: parent.width-28
         Label { text: viewport.viewName + (viewport.orthographic ? " · Orthographic" : " · Perspective"); color: Theme.muted; font.pixelSize: 11 }
+        Label { visible: viewport.snapping; text: "Wheel: surface offset · Middle click: reset · Release snapping modifier: reset"; color: Theme.snapColor; font.pixelSize: 11 }
         Label { visible: !!viewport.anchorMode; text: "Pick a " + (viewport.anchorMode === "FACE_CENTER" ? "face" : "vertex") + " on the selected child · Esc to cancel"; color: Theme.accent; wrapMode: Text.WordWrap; width: parent.width }
         Label { visible: workspace.state.publishing > 0; text: "Preparing viewport · " + workspace.state.publishing + " chunks pending"; color: Theme.accent }
         Label {
@@ -303,8 +313,8 @@ Item {
     Row {
         anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 10; spacing: 4
         Repeater {
-            model: ["Front","Right","Top"]
-            UiButton { required property string modelData; text: modelData; flatStyle: true; hint: "Look from " + modelData.toLowerCase(); onClicked: viewport.setView(modelData) }
+            model: [{name:"Right",axis:"X",command:"viewX"},{name:"Front",axis:"Y",command:"viewY"},{name:"Top",axis:"Z",command:"viewZ"}]
+            UiButton { required property var modelData; text: modelData.axis+" · "+keyboard.shortcut(modelData.command); flatStyle: true; hint: modelData.name+" view · Center selection and preserve zoom"; onClicked: viewport.setView(modelData.name) }
         }
         UiButton { glyph: "grid"; flatStyle: true; checked: viewport.gridVisible; checkable: true; hint: "Toggle reference grid (0.25 m spacing)"; onClicked: viewport.gridVisible = checked }
         UiButton { objectName: "xrayToggle"; text: "X-ray"; flatStyle: true; checked: viewport.xray; checkable: true; hint: "See through surfaces (Alt+Z)"; onClicked: viewport.xray = checked }
@@ -326,7 +336,7 @@ Item {
         onTriggered: {
             if (viewport.pointerPosition.x !== viewport.previousPointer.x ||
                 viewport.pointerPosition.y !== viewport.previousPointer.y || viewport.cameraDirty) {
-                if (viewport.pointerPosition.x >= 0) viewport.rayAt(viewport.pointerPosition.x,viewport.pointerPosition.y,false);
+                if (viewport.pointerPosition.x >= 0 && !viewport.insertionPreview && !viewport.transforming) viewport.rayAt(viewport.pointerPosition.x,viewport.pointerPosition.y,false);
                 viewport.previousPointer = viewport.pointerPosition;
                 viewport.cameraDirty = false;
             }
@@ -342,6 +352,7 @@ Item {
         }
         function onCameraRequested(values, orthographic) {
             viewport.restoringCamera = true;
+            viewport.viewName = "User view";
             cameraOrigin.position = Qt.vector3d(values[0],values[2],-values[1]);
             cameraOrigin.eulerRotation = Qt.vector3d(values[3],values[4],values[5]);
             viewport.distance = values[6]; viewport.orthographic = orthographic;

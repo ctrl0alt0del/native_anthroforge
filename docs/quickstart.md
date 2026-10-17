@@ -1,4 +1,4 @@
-# AnthroForge 0.1.2 quick start
+# AnthroForge 0.1.3 quick start
 
 ## Portable Windows application
 
@@ -20,9 +20,35 @@ required to run this distribution.
    the original OBJ/STL/PLY file is no longer needed.
 
 Right/middle drag orbits; Shift plus that drag pans; the wheel zooms; F frames the
-selection. W/E/R selects Move/Rotate/Scale; 1/3/7 selects Front/Right/Top and 5 toggles
-orthographic projection. These viewport shortcuts leave text entry alone. Alt-click
+selection. **G/R/S** starts Move/Rotate/Scale: move the mouse, then left-click or press
+Enter to confirm; right-click or Escape cancels. W/E selects the Move/Rotate gizmo.
+**1/2/3** looks along global X/Y/Z, respectively, in orthographic projection; 5 toggles
+projection. Axis views center the active selection and preserve apparent zoom. During
+component editing they center the selected points; otherwise they center the SCP geometry.
+Switch views during a drag or modal transform to adjust another pair of coordinates;
+the current edit stays open, without jumping or adding an undo step. These shortcuts leave text entry alone. Alt-click
 cycles through deeper eligible SCP hits. Hover predicts ordinary selection.
+
+Move arrows constrain to a world axis; the small planes constrain to two axes, and the
+center circle moves in the view plane. Rotate rings turn around world axes. Scale squares
+use an object's local axes; the center square scales uniformly. Component transforms use
+world axes around their selection center. Hold Shift for a finer adjustment. Every gesture
+is one undo action; Escape restores its starting state.
+Modal rotation turns around the viewing direction; modal scale is uniform. Rotating or
+scaling selected curve points also transforms their handles. Explicitly transformed
+automatic/vector handles become editable through the existing handle-editing rules.
+
+The selected SCP has an orange silhouette outline. Editing a loft or body curve makes its
+surface translucent; **Finish editing** restores normal shading. Neither effect changes
+saved anatomy or object colors.
+
+Press **Delete**, choose **Edit > Delete selected**, or use the tree's trash icon. Only the
+chosen SCP is removed: children move to its parent with their world poses preserved.
+Deleting a root with children replaces it with an empty grouping root. Deleting a leaf
+root leaves an empty document. Controls supported by the deleted SCP detach at their
+current world poses. A shared control can also be deleted; the dialog explains that its
+bindings will be removed while primitives remain. Deletion is undoable. Keyboard commands
+respect text entry, modal dialogs, active transforms and blocked-save state.
 
 Meshes use opaque studio shading by default, with lighting that follows the camera
 and preserves object colors. **X-ray** beside the view buttons (or **Alt+Z**) makes
@@ -30,7 +56,7 @@ surfaces translucent for inspection; selected and hovered objects remain more vi
 Focused workspaces still show outside objects as faint, read-only context.
 
 The searchable **Outliner** has expandable branches, an eye for visibility and a target
-for viewport picking. Drag the panel dividers to resize the outliner and properties.
+for viewport picking, plus a trash icon for deletion. Drag the panel dividers to resize the outliner and properties.
 Properties are grouped into collapsible Transform, Attachment, and Display & evaluation
 sections. X/Y/Z fields use matching axis colors; Enter commits and leaves the field.
 Use the top menus for project operations and **Help > Navigation and shortcuts** for
@@ -94,7 +120,7 @@ results and explicitly save before ending a session; EOF does not save automatic
 
 ## Boundaries
 
-0.1.2 imports OBJ and ASCII/binary STL/PLY, keeps canonical polygons and derives render
+0.1.3 imports OBJ and ASCII/binary STL/PLY, keeps canonical polygons and derives render
 triangles. OBJ objects are combined into one SCP. Mesh materials/textures are ignored.
 Source units and optional Y-up conversion are explicit; documents use metres.
 
@@ -108,7 +134,7 @@ topology are later milestones. Simple Solidify is supported; Complex mode is def
 
 1. Choose **Create Primitive > Loft**. A new SCP starts with two Bézier curves.
    **Edit Primitive** exposes its curve points and handles. Click a curve to select its
-   points, click a point/handle for a component, and Shift-click to extend selection.
+   points, click a point/handle for a component, and Ctrl-click to extend selection.
    Use Move/Rotate/Scale or the matching numeric fields. Radius and tilt are geometric
    parameters; tilt is in radians. Control cages show authored coordinates before deformers.
 2. In **Curves**, add/copy/remove and reorder curves. Adjacent pairs form connected
@@ -145,3 +171,29 @@ may use a Manual support's last accepted surface and report pending upstream cha
 the top toolbar's **Recalculate** evaluates the whole document.
 Save/reopen retains construction parameters, source assets, bindings and accepted results.
 Apply/Bake is never available.
+
+While editing curves, hold **Shift** to preview a new point at the closest curve location
+to the cursor. Each left click inserts a point; keep Shift held to insert more. Releasing
+Shift hides the preview without adding anything. Each click is one undo step. Subdivision
+preserves the authored Bézier shape, interpolates radius/tilt, and changes the two adjoining
+points' handles to Free so automatic handles cannot reshape the curve. Other point identities
+and Hook memberships remain stable; primitive sample resolution is unchanged.
+
+Drag a point directly, or use its Move gizmo. Hold **Ctrl** before or during that drag to
+snap the selected point to the nearest visible SCP surface under the pointer. Move across
+SCPs freely; the edited SCP is excluded. Context outside a focused workspace can provide a
+snap surface without being edited. Releasing Ctrl restores movement in the original view
+plane; a miss also uses ordinary movement. Snapping places the point without creating a
+persistent attachment. Escape or switching applications cancels an active drag.
+
+While snapping, the mouse wheel changes a signed offset along the hit surface's world
+normal. Positive values follow its authored normal; negative values go into the surface.
+The marker displays the offset in metres. One notch uses the world distance corresponding
+to eight screen pixels at the selection depth; Shift makes the adjustment ten times finer.
+The wheel does not zoom during snapping. **Middle-click or release Ctrl** to reset the
+offset to zero. Middle-click preserves the active edit. The offset carries across snap
+targets within the gesture and resets when the gesture finishes or is canceled.
+
+Curves are purple, control points gold, and handle points/links blue. Selected and hovered
+components retain their type colors with larger markers. The help menu lists the defaults;
+modifier choices are owned by the keyboard manager, alongside existing shortcut bindings.

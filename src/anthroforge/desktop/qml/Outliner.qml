@@ -5,6 +5,7 @@ import QtQuick.Layouts
 ColumnLayout {
     id: outliner
     signal importRequested()
+    signal deleteRequested(string entity)
     property var collapsed: []
     readonly property var rows: workspace.treeRows
     readonly property var filtered: rows.filter(row => accepts(row))
@@ -56,6 +57,7 @@ ColumnLayout {
                 Image { source: row.modelData.asset ? "icons/mesh.svg" : "icons/folder.svg"; sourceSize: Qt.size(14,14); opacity: row.modelData.readonly ? .4 : .85 }
                 Label { text: row.modelData.name; Layout.fillWidth: true; elide: Text.ElideRight; color: row.modelData.readonly ? Theme.muted : Theme.text; font.pixelSize: 12 }
                 UiButton { glyph: "eye"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.visible ? .85 : .3; hint: row.modelData.visible ? "Hide object" : "Show object"; onClicked: workspace.run("workspace.update",{hidden:outliner.toggle(workspace.state.hidden,row.modelData.id)}) }
+                UiButton { glyph: "delete"; objectName: "delete_" + row.modelData.id; flatStyle: true; implicitWidth: 23; implicitHeight: 24; enabled: !row.modelData.readonly && !workspace.state.waiting; hint: "Delete, preserving children"; onClicked: outliner.deleteRequested(row.modelData.id) }
                 UiButton { glyph: "target"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.pickable ? .85 : .3; hint: "Toggle viewport picking"; onClicked: workspace.run("workspace.update",{unpickable:outliner.toggle(workspace.state.unpickable,row.modelData.id)}) }
             }
         }

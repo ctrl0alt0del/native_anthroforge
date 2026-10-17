@@ -31,9 +31,11 @@ class GeometryEngine(NativeEngine):
 
     def _construction_signatures(self) -> None:
         from . import bodies, components, construction, curve_editing, falloff, scene, topology
+        from .curve_queries import configure as configure_curve_queries
 
         for module in (bodies, components, construction, curve_editing, falloff, scene, topology):
             module.configure(self)
+        configure_curve_queries(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

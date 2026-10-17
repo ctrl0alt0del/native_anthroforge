@@ -1,4 +1,4 @@
-# Local authoring API, version 0.1.2
+# Local authoring API, version 0.1.3
 
 The desktop and JSON clients call application/commands.py. A request has operation,
 arguments (an object) and optionally id. Success responses contain ok, revision and
@@ -18,7 +18,7 @@ serve continues scheduling between requests. Ending the process does not save.
 | scp.color | entity, value="#RRGGBB" | Authored SCP colour |
 | scp.transform | entity, values=[x,y,z,rx,ry,rz,sx,sy,sz] | World transform; metres and Euler degrees |
 | scp.duplicate | entity; optional parent | Independent subtree copy ID |
-| scp.delete | entity | Delete its subtree |
+| scp.delete | entity | Remove only this SCP and preserve children; returns the new parent/group ID, or empty string |
 | scp.reparent | entity, parent | Preserve pose, change relation and capture |
 | scp.attachment | entity and any settings below | Change/capture attachment |
 | scp.recapture | entity | Queue capture from the current pose |
@@ -43,6 +43,13 @@ Parent is required when adding to a populated document; an empty document's firs
 is the root. The root cannot be reparented; wrap it in an empty root first. Imported
 geometry is immutable, while its transform and attachment remain editable.
 units is metres per source unit: 1 for metres, 0.01 for centimetres, 0.001 for millimetres.
+
+Deleting an SCP promotes its direct children to its parent, preserving world poses and
+recapturing attachment bindings. A root with children is replaced with an empty grouping
+root at the former root's pose; a leaf root leaves an empty document. Referencing controls
+detach at their accepted world pose, other consumers remain, and obsolete jobs cannot publish.
+Deletion is one undoable operation and indirect child changes respect the full dependency
+graph even outside the focused workspace. This intentionally replaces 0.1.2 subtree deletion.
 
 Attachment settings:
 
@@ -82,6 +89,7 @@ creating a connected loft, Hook-driven cage, thickness, curved capsule and impor
 | curve.add | entity; optional source curve ID | Add a curve, or independent copy; BODY also gains a piece |
 | curve.remove | entity, curve | Remove owned curve/piece; first remove bindings targeting it |
 | curve.order | entity, curves=[all owned IDs] | Set complete curve order |
+| curve.split | entity, curve, segment, parameter | Split a zero-based Bézier segment at 0 < parameter < 1; returns the new point ID |
 | curve.update | entity, curve; name, closed, matrix, start, span, resolution | Curve coordinates, evaluation and optional loft sampling override |
 | point.insert | entity, curve, index, point={...} | Insert a Bézier control point |
 | point.update | entity, curve, point; position, left, right, left_mode, right_mode, radius, tilt | Geometric edit; handles follow Blender modes |

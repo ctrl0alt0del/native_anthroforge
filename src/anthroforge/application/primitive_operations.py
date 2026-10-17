@@ -148,6 +148,16 @@ def point_remove(session: "Session", entity: str, curve: str, point: str) -> Non
     replace_curve(session, entity, primitive, replace(selected, points=points))
 
 
+def curve_split(session: "Session", entity: str, curve: str, segment: int, parameter: float) -> str:
+    from anthroforge.native.curve_queries import split
+
+    primitive = definition(session, entity)
+    selected = next(c for c in primitive.curves if c.id == curve)
+    changed = split(session.engine, selected, segment, parameter)
+    replace_curve(session, entity, primitive, changed)
+    return changed.points[segment + 1].id
+
+
 def curve_add(session: "Session", entity: str, source: str = "") -> str:
     primitive = definition(session, entity)
     require_topology_edit(session.document, entity)

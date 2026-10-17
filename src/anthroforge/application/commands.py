@@ -31,6 +31,7 @@ EDITS = {
     "curve.add": primitives.curve_add,
     "curve.remove": primitives.curve_remove,
     "curve.order": primitives.curve_order,
+    "curve.split": primitives.curve_split,
     "point.update": primitives.point_update,
     "point.insert": primitives.point_insert,
     "point.remove": primitives.point_remove,

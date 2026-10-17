@@ -1,6 +1,6 @@
 # AnthroForge development validation
 
-Current release qualification is in [Primitive and deformer release 0.1.2](#primitive-and-deformer-release-012).
+Current release qualification is in [Usability release 0.1.3](#usability-release-013).
 The earlier sections retain the evidence and limitations of their respective revisions.
 
 Implementation and checks performed on 2026-10-16, Windows 11 x64. The original Blender addon
@@ -271,3 +271,173 @@ portable folder when moving it. No Git remote operations or commits were perform
 Only Windows was executed locally. The CI workflow is prepared but was not run remotely.
 No skin/export, Blender-project conversion, linked mirroring,
 crash recovery or persisted undo is claimed. See the confirmed specification for future work.
+
+
+## Usability release 0.1.3
+
+Implemented and inspected on Windows 11 x64, 2026-10-17. This release changes the existing
+editing workflow; it adds no primitive families. The original addon deletion implementation
+was inspected: it cleared invalid parent references rather than promoting children. The
+standalone now implements the user's requested promotion semantics, including the confirmed
+empty grouping root replacement.
+
+- Move: world-axis arrows, plane handles and a view-plane center. Rotate: world-axis rings.
+  Scale: local-axis squares and a uniform center. Shift provides precision; Escape cancels.
+  Shared deltas compose world rotation correctly and preserve negative scale and pivots.
+- Curve-edit transparency is temporary presentation. The selected SCP's orange silhouette
+  comes from a depth-tested selection mask and screen-space edge dilation; open lofts,
+  curved bodies and imported meshes were inspected in actual GUI captures.
+- Central shortcut registry and context policy cover existing shortcuts and Delete. A shared
+  dialog serves keyboard, tree and inspectors. Text entry, modal dialogs, active drags and
+  blocked saves retain their interaction boundaries.
+- Core deletion preserves children/world poses, recaptures their new attachments, detaches
+  referenced controls, rejects obsolete output and reschedules surviving dependencies.
+  Root replacement, empty documents, focused workspaces, undo/redo and save/reopen are covered.
+
+### Validation evidence
+
+The development gate passed: 364 Python tests, strict typing, Ruff, native build/contract,
+clang-tidy, script checks, numerical imports and native doctor. Existing Blender fixture
+parity remains passing. The native style run prints upstream-header warning totals; there
+were no failing authored-code diagnostics.
+
+`tools/usability_acceptance.py` passed real pointer checks for 45-degree rotation in orthographic and perspective views, axis and
+uniform scaling, two-axis/free movement, coherent undo and Escape rollback. It also passed
+text-field Delete protection, modal shortcut blocking, keyboard root deletion, tree deletion
+and opacity restoration without an authored edit. No QML warnings were reported.
+Existing UI, scheduling and primitive interaction/workshop acceptance passed. The scheduling
+check observed 20/20 small attachment updates inline with maximum parent-child displacement
+error below 3e-16 metres.
+
+`tools/usability_acceptance.py --render` qualified a 512-sample/64-strip thick loft with a
+1,000-point cage. The old complete surface remained displayed during staging. Mask delegate
+counts matched displayed/staged mesh delegates after replacement, deletion and undo, confirming
+that the additional scene does not retain deleted resources. The mask shares the main geometry
+objects instead of rebuilding mesh buffers.
+
+The paired orbit run measured frame intervals with outline enabled at mean 17.3 ms / p95
+30.8 ms, versus 23.8 / 38.8 ms without it in the preceding pass. These are short, order-sensitive
+GUI measurements, not evidence that the added pass speeds rendering up. The large edit command
+took 23.6 ms; measured result publication was below 0.5 ms. Full interaction/capture runs include
+startup, file operations and screenshot stalls and had p95 intervals around 75–82 ms. These data
+support the soft responsiveness goals for the measured orbit, not a universal FPS guarantee.
+Captures and machine-readable reports are in ignored `build/usability-review`.
+
+### Ownership review
+
+Reviewed directly in this task, separately from test results. Keyboard mapping/context policy,
+gizmo geometry/hit testing, paint, transform application, deletion semantics and silhouette
+rendering have distinct owners. Both desktop and headless deletion use application commands.
+No authored state carries hover, outline or editing opacity. Native geometry ownership and
+staged publication remain authoritative; the new render pass follows the same active chunks.
+The existing axis-drag API is retained as a compatibility adapter. No speculative scheduler,
+renderer replacement or duplicate hierarchy implementation was introduced.
+
+
+A perspective-only diagnostic exposed about 5 degrees of error in the first projected-ellipse
+rotation approximation. It was replaced with mouse-ray/rotation-plane intersection. The
+final 45-degree perspective gesture measured 44.57 degrees with integer-pixel mouse input;
+orthographic and perspective regression checks both pass. Edge-on rings retain a screen
+tangent interaction where a ray-plane intersection is ill-conditioned.
+
+### Distribution qualification
+
+The Nuitka portable build is `dist/AnthroForge.dist/AnthroForge.exe`, product/file version
+0.1.3.0. A fresh copy at `C:/Users/alexe/AppData/Local/Temp/anthroforge-013-qualified`
+passed with a minimal PATH and no development Python/Qt settings: imports, attachments,
+primitive/deformer evaluation, single-SCP and root deletion, saving, inspection, GPU capture
+and GUI smoke checks. The compiled deletion check saved/reopened the promoted hierarchy.
+The packaged desktop was visually inspected, including its selected geometry outline.
+Reports are under `build/usability-review/portable`. Packaged QML/JavaScript/icons match
+the tested sources byte-for-byte. The shader is embedded in the native viewport DLL.
+
+The wheel, source distribution and `dist/AnthroForge-0.1.3-source.zip` were regenerated;
+the archive includes the new interaction, deletion and shader sources and excludes the
+unrelated legacy root `__init__.py`. Changes remain uncommitted. No Git remote operations
+were performed.
+
+
+### Curve editing follow-up (2026-10-17)
+
+The 0.1.3 follow-up adds held insertion preview, repeated left-click confirmation,
+Ctrl surface snapping during direct-point and Move-gizmo drags, and distinct curve/point/handle
+colors. Modifier bindings belong to the keyboard manager and can be rebound independently of
+interaction code. Ctrl-click extends selection; its click action is deferred so holding Ctrl
+before dragging a selected point still starts a snap gesture.
+
+The development gate passed with **387 tests**, including open/closed subdivision with all four
+handle modes, transformed closest-curve queries, invalid requests, unchanged attachment mesh
+connectivity, undo, editable persistence and held-input lifecycle. Existing native Blender
+reference comparisons remain passing. Native/style/type checks passed.
+
+`tools/curve_interaction_acceptance.py` passed actual Qt keyboard/mouse gestures for repeated
+insertion, release cancellation, switching snap targets, self exclusion, read-only focused
+workspace context, snapping with Ctrl pressed before or during a drag, modifier rebinding,
+text-focus suppression, window-deactivation cancellation and one-step undo. Direct dragging
+and gizmo snapping were checked in orthographic and perspective views. It reported no QML
+warnings. Existing primitive-interaction, gizmo/deletion and staged-render acceptance also
+passed. Captures were inspected under `build/curve-interaction-review`.
+
+These tests exposed inaccurate orthographic ray construction and perspective free-drag depth
+in the earlier projection helper. Shared camera-based rays and view-plane translation replaced
+that helper; surface hit positions and released-snap plane motion now match the displayed
+camera in both projections. The editing overlay preserves type colors above the selection
+outline, using shared camera parameters and native marker buffers.
+
+The recorded gesture run measured curve projection p95 **0.084 ms** and surface snapping p95
+**0.094 ms** on the small, transformed loft/two-SCP fixture. Complete capture runs include
+startup, image capture and scripted waits (frame-interval p95 about 78 ms); these are not an
+interactive FPS guarantee. The large staged-render regression retained old geometry and passed
+resource-lifetime checks; result publication stayed below 0.5 ms in that run.
+
+Direct ownership review: input bindings, transient gesture state, native curve queries,
+authored subdivision and presentation have separate owners. Preview does not enter history;
+confirmed insertion and snapping use existing shared commands and transactions. Snapping uses
+leased displayed geometry, including read-only context, and creates no persistent attachment.
+Native query buffers are cached by authored geometry/frame revision. No scheduler replacement
+or duplicate Blender runtime was added.
+
+The rebuilt portable application passed all checks from a separate folder with a minimal
+PATH and no development Python/Qt settings. The compiled batch check now covers subdivision
+and editable save/reopen as well as existing imports, attachments, deformers, deletion,
+rendering and desktop startup. Qualification exposed and fixed two integration defects:
+offscreen viewports now supply an inactive input context, and batch references can index
+the tuple-valued curve collections returned by inspection. The latter has a regression test.
+The report and packaged screenshots are under `build/curve-interaction-review/portable`.
+
+### Axis views and continuous editing (2026-10-17)
+
+1/2/3 now centers the active selection in X/Y/Z orthographic views and preserves apparent
+zoom. G/R/S starts modal mouse transforms with confirm/cancel. View changes capture a new
+gesture reference frame while retaining the original transaction and undo snapshot. Existing
+direct-point and gizmo drags use the same recapture boundary. Mouse coordinates are copied
+when captured; a Qt value-property alias initially made the modal start position follow the
+cursor, which the actual-input acceptance exposed and the value copy corrected.
+
+Surface snapping supports signed normal offset through the wheel, with reset on middle-click
+or modifier release. Reset input is consumed before it can become orbit or transform release.
+Normals are evaluated natively with nonuniform/mirrored transforms. Rotation/scale of curve
+points includes their handles; previously only the selected point positions were transformed.
+The correction is shared by keyboard and gizmo transforms and has regression coverage.
+
+The development gate passed **396 tests**, including native axis rotation, transformed normals,
+handle transformations/cancellation and captured reset-button release. Native contracts,
+type/style and 15-line checks passed. `tools/view_gesture_acceptance.py` verified actual
+keyboard/mouse/wheel behavior for zoom/centering, uninterrupted direct/gizmo/modal edits,
+axis constraints, one-step undo, signed offsets, target switching and text-entry isolation.
+Existing curve-interaction and usability acceptance also passed with no QML warnings.
+Captures under `build/view-gesture-review` were visually inspected.
+
+Direct ownership review: keyboard policy owns bindings; physical input capture owns wheel/
+button delivery; gesture adapters own pointer mapping; the existing transform adapters own
+recapture and shared commands. Native code owns axis-angle conversion and surface normals.
+No new history, scheduler or persistence mechanism was introduced. Camera changes remain
+workspace presentation state; snapping offset remains temporary gesture state.
+
+The rebuilt portable application passed qualification after relocation to
+`%TEMP%/anthroforge-013-views-qualified`, with a minimal PATH and development Python/Qt
+settings removed. Imports, attachments, primitives, deformers, deletion, subdivision,
+save/reopen, rendering and GUI startup passed. Packaged QML and both native DLLs match the
+tested sources/build. The packaged desktop capture was visually inspected; qualification
+results and captures are under `build/view-gesture-review/portable`. The detailed gesture
+acceptance above runs against the source application, separately from portable smoke checks.

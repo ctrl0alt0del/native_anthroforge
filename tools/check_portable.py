@@ -10,7 +10,18 @@ from pathlib import Path
 import numpy as np
 from PySide6.QtGui import QImage
 
-CHECKS = ("import", "attachments", "primitives", "deformers", "save", "inspect", "render", "GUI")
+CHECKS = (
+    "import",
+    "attachments",
+    "primitives",
+    "deformers",
+    "deletion",
+    "curve subdivision",
+    "save",
+    "inspect",
+    "render",
+    "GUI",
+)
 
 
 def clean_environment():
@@ -81,10 +92,36 @@ def run(executable, cwd):
     shutil.copytree(executable.parent / "examples", cwd / "examples", dirs_exist_ok=True)
     doctor = headless(executable, cwd)
     primitives(executable, cwd)
+    deletion(executable, cwd)
+    curve_edits(executable, cwd)
     desktop(executable, cwd)
     report = portable_report(executable, doctor)
     (cwd / "portable-check.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report))
+
+
+def deletion(executable, cwd):
+    requests = deletion_requests()
+    (cwd / "deletion.json").write_text(json.dumps(requests), encoding="utf-8")
+    invoke(executable, cwd, "--cli", "run", "deletion.json")
+    state = json.loads(invoke(executable, cwd, "--cli", "inspect", "deleted.anthroforge"))
+    assert state["entity_count"] == 2
+    group = next(e for e in state["entities"] if not e["parent"])
+    leaf = next(e for e in state["entities"] if e["name"] == "Leaf")
+    assert group["name"] == "Root group" and group["primitive"] is None
+    assert leaf["parent"] == group["id"]
+
+
+def deletion_requests():
+    return [
+        dict(id="root", operation="scp.empty", arguments=dict(name="Root")),
+        dict(id="branch", operation="scp.empty", arguments=dict(name="Branch", parent="$root")),
+        dict(operation="scp.empty", arguments=dict(name="Leaf", parent="$branch")),
+        dict(operation="scp.delete", arguments=dict(entity="$branch")),
+        dict(operation="scp.delete", arguments=dict(entity="$root")),
+        dict(operation="wait", arguments={}),
+        dict(operation="save", arguments=dict(path="deleted.anthroforge", blocked_policy="wait")),
+    ]
 
 
 def primitives(executable, cwd):
@@ -98,6 +135,33 @@ def primitives(executable, cwd):
     arguments = ("--project", "primitives.anthroforge", "--smoke-test", "--screenshot")
     smoke = invoke(executable, cwd, *arguments, str(cwd / "primitives.png"))
     assert json.loads(smoke)["desktop_smoke"]
+
+
+def curve_edits(executable, cwd):
+    batch = cwd / "curve-edits.json"
+    batch.write_text(json.dumps(curve_requests()), encoding="utf-8")
+    invoke(executable, cwd, "--cli", "run", batch.name)
+    state = json.loads(invoke(executable, cwd, "--cli", "inspect", "curve-edits.anthroforge"))
+    points = state["entities"][0]["primitive"]["curves"][0]["points"]
+    assert len(points) == 3 and points[1]["left_mode"] == "FREE"
+    assert abs(points[1]["position"][0]) < 0.01
+
+
+def curve_requests():
+    return [
+        dict(id="body", operation="primitive.create", arguments=dict(kind="BODY")),
+        dict(id="definition", operation="primitive.inspect", arguments=dict(entity="$body")),
+        dict(
+            operation="curve.split",
+            arguments=dict(
+                entity="$body", curve="$definition.primitive.curves.0.id", segment=0, parameter=0.5
+            ),
+        ),
+        dict(operation="wait", arguments={}),
+        dict(
+            operation="save", arguments=dict(path="curve-edits.anthroforge", blocked_policy="wait")
+        ),
+    ]
 
 
 def desktop(executable, cwd):

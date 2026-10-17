@@ -38,3 +38,16 @@ def test_headless_server_publishes_while_waiting_for_input(server):
     assert result["entity_count"] == 1 and not result["save_blocked"]
     request(server, "scp.rename", entity=result["entities"][0]["id"], name="Renamed")
     assert request(server, "inspect")["entities"][0]["name"] == "Renamed"
+
+
+def test_batch_splits_curve_referenced_from_inspection(session):
+    from anthroforge.authoring import dispatch
+
+    entity = session.command("primitive.create", kind="BODY")
+    results = {"entity": entity, "definition": session.command("primitive.inspect", entity=entity)}
+    arguments = dict(
+        entity="$entity", curve="$definition.primitive.curves.0.id", segment=0, parameter=0.5
+    )
+    response = dispatch(session, dict(operation="curve.split", arguments=arguments), results)
+    curve = session.document.entity(entity).primitive.curves[0]
+    assert len(curve.points) == 3 and curve.points[1].id == response["result"]

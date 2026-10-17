@@ -21,7 +21,7 @@ def pointer(window, world, click=False, extend=False):
     QTest.mouseMove(window, position)
     QTest.qWait(100)
     if click:
-        modifier = Qt.KeyboardModifier.ShiftModifier if extend else Qt.KeyboardModifier.NoModifier
+        modifier = Qt.KeyboardModifier.ControlModifier if extend else Qt.KeyboardModifier.NoModifier
         QTest.mouseClick(window, Qt.MouseButton.LeftButton, modifier, position)
         QTest.qWait(100)
 

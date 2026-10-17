@@ -115,6 +115,16 @@ independent worker pools per feature or relax the job/history/save contracts abo
 
 The user confirmed this specification in Q58 and explicitly authorized updating this document and performing the full stack analysis. The interview is complete; feature details deliberately deferred above are not missing approval gates.
 
+### Confirmed 0.1.3 usability update
+
+The 0.1.3 release improves existing editing: distinct move/rotate/scale gizmos, transient
+surface transparency during curve editing, geometry silhouette outlines, and deletion
+through a central keyboard manager and tree icon. Deleting an SCP preserves its children
+and moves them to its parent. The user explicitly chose an empty grouping replacement
+when deleting a root with children. A leaf root can leave an empty document. These deletion
+semantics supersede the 0.1.2 subtree-removal implementation. See the updated
+[walkthrough](docs/quickstart.md) and [shared API](docs/authoring_api.md).
+
 ## 2. Sources and interpretation
 
 The original five-file submission contained a duplicate in place of S3. The subsequently supplied missing S3 is now included, and the previously duplicated material is retained once as S4. Together with the existing 21-item requirements document and the user's inline summary, S1–S6 contain **132 original numbered recommendations**, organized below into **66 consolidated recommendations**. The appendix maps every original item to the consolidated IDs.
@@ -177,6 +187,20 @@ Numerical optimization remains native C++: iterative fitting, objectives, Jacobi
 The intended flow is: explicit command → document transaction → affected dependency revisions → owned worker inputs → native evaluation and validation → revision-qualified result bundle → bounded publication → presented frame. Rendering consumes results; it does not define attachment identity or authored anatomy.
 
 ## 5. A — Anatomical document, identity, and representations
+
+Curve editing also supports a held insertion modifier (Shift by default): preview the closest
+curve location under the cursor, confirm with left click, continue inserting while held,
+and hide the preview on release. A separate held snapping modifier (Ctrl by default) lets
+a dragged point use any visible SCP surface except its own, switching targets during the
+same gesture. Releasing it restores ordinary dragging. Both modifiers use the keyboard
+manager. Curves, points and handles have distinct colors per type.
+
+The follow-up view workflow maps 1/2/3 to global X/Y/Z orthographic views, centering the
+active selection with apparent zoom preserved. View changes must preserve an ongoing edit
+and its original undo/cancel boundary. G/R/S starts mouse-driven Move/Rotate/Scale, confirmed
+with left-click/Enter and canceled with right-click/Escape. Bindings remain centralized.
+During point snapping, the wheel adjusts signed surface-normal offset; middle-click or
+release of the snapping modifier resets the offset. Reset must not end the current edit.
 
 ### A01 — Own a typed, parametric anatomical document [P0]
 

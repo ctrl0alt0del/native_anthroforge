@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(AnthroForge VERSION 0.1.2 LANGUAGES CXX)
+project(AnthroForge VERSION 0.1.3 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -13,7 +13,7 @@ set(AF_ADDON_SOURCE "" CACHE PATH "Optional existing addon checkout, read-only r
 include(CTest)
 add_subdirectory(native)
 if(AF_BUILD_QT_BRIDGE)
-    find_package(Qt6 6.12.0 EXACT REQUIRED COMPONENTS Quick Quick3D Qml)
+    find_package(Qt6 6.12.0 EXACT REQUIRED COMPONENTS Quick Quick3D Qml ShaderTools)
     add_subdirectory(native/qt)
 endif()
 if(AF_ADDON_SOURCE)

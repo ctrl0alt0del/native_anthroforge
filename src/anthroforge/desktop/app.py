@@ -11,6 +11,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 
 from anthroforge.desktop import smoke
 from anthroforge.desktop.controller import Controller
+from anthroforge.desktop.input_state import InputState
 from anthroforge.desktop.runtime import build_directory, native_runtime
 
 
@@ -27,10 +28,13 @@ def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicatio
     engine.addImportPath(str(build_directory() / "qml"))
     engine.rootContext().setContextProperty("workspace", controller)
     engine.rootContext().setContextProperty("authoring", controller.authoring)
+    inputs = InputState(engine)
+    engine.rootContext().setContextProperty("heldInput", inputs)
     engine.warnings.connect(lambda errors: warnings.extend(error.toString() for error in errors))
     engine.load(QUrl.fromLocalFile(str(Path(__file__).parent / "qml" / "Main.qml")))
     if engine.rootObjects():
         engine.rootObjects()[0].frameSwapped.connect(controller.frame_presented)
+        engine.rootObjects()[0].installEventFilter(inputs)
     return engine
 
 

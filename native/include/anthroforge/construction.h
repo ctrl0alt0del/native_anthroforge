@@ -8,6 +8,11 @@ extern "C" {
 AF_API int af_curve_sample(const double* points, int count, int closed, int resolution,
     int samples, double start, double span, const double* matrix, double* output, uint64_t cancel);
 AF_API int af_curve_handles(double* points, int count, int closed);
+/* Cubics: four world-space xyz controls per segment. Output: t, xyz, ray distance. */
+AF_API int af_curve_closest(const double* cubics, int count, const double* origin,
+    const double* direction, double* output);
+AF_API int af_curve_split(const double* points, int count, int closed, int segment,
+    double t, double* output);
 AF_API int af_curve_path(const double* points, int count, int closed, int resolution,
     double* output, int* output_count, uint64_t cancel);
 AF_API int af_curve_point_edit(double* points, int count, int closed, int index,

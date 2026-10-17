@@ -19,11 +19,10 @@ ApplicationWindow {
     property bool closingConfirmed: false
     property bool activityOpen: false
     property string activeTool: "Move"
-    readonly property bool typing: !!activeFocusItem && activeFocusItem.selectByMouse !== undefined
-    readonly property bool modalOpen: importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible
+    readonly property bool typing: keyboard.typing
+    readonly property bool modalOpen: importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property var activeJobs: workspace.jobs.filter(job => ["queued","preparing","running","publishing","cancelling"].indexOf(job.state) >= 0)
     readonly property bool jobFailed: workspace.jobs.some(job => job.state === "failed")
-    readonly property bool viewportKeys: !typing && !modalOpen && !workspace.state.waiting
     function inspectScene(): string { return viewport.inspectScene(); }
     function saveProject() {
         viewport.forceActiveFocus();
@@ -33,13 +32,13 @@ ApplicationWindow {
     onClosing: function(close) {
         if (workspace.state.dirty && !closingConfirmed) { close.accepted = false; closeDialog.open(); }
     }
-    Action { id: newAction; text: "New project"; shortcut: StandardKey.New; enabled: !window.modalOpen; onTriggered: { viewport.forceActiveFocus(); workspace.newDocument(); } }
-    Action { id: openAction; text: "Open project…"; shortcut: StandardKey.Open; enabled: !window.modalOpen; onTriggered: { viewport.forceActiveFocus(); openDialog.open(); } }
-    Action { id: saveAction; text: "Save"; shortcut: StandardKey.Save; enabled: !window.modalOpen; onTriggered: window.saveProject() }
-    Action { id: saveAsAction; text: "Save as…"; shortcut: StandardKey.SaveAs; enabled: !window.modalOpen; onTriggered: { viewport.forceActiveFocus(); saveDialog.open(); } }
-    Action { id: importAction; text: "Import mesh…"; shortcut: "Ctrl+I"; enabled: !window.modalOpen; onTriggered: importFile.open() }
-    Action { id: undoAction; text: "Undo"; shortcut: StandardKey.Undo; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("undo",{}) }
-    Action { id: redoAction; text: "Redo"; shortcut: StandardKey.Redo; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("redo",{}) }
+    Action { id: newAction; text: "New project"; enabled: !window.modalOpen; onTriggered: { viewport.forceActiveFocus(); workspace.newDocument(); } }
+    Action { id: openAction; text: "Open project…"; enabled: !window.modalOpen; onTriggered: { viewport.forceActiveFocus(); openDialog.open(); } }
+    Action { id: saveAction; text: "Save"; enabled: !window.modalOpen; onTriggered: window.saveProject() }
+    Action { id: saveAsAction; text: "Save as…"; enabled: !window.modalOpen; onTriggered: { viewport.forceActiveFocus(); saveDialog.open(); } }
+    Action { id: importAction; text: "Import mesh…"; enabled: !window.modalOpen; onTriggered: importFile.open() }
+    Action { id: undoAction; text: "Undo"; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("undo",{}) }
+    Action { id: redoAction; text: "Redo"; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("redo",{}) }
     header: ColumnLayout {
         spacing: 0
         Rectangle {
@@ -47,11 +46,11 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 10; spacing: 10
                 Label { text: "ANTHROFORGE"; font.bold: true; font.pixelSize: 12; font.letterSpacing: 1; color: Theme.text }
-                Label { text: "0.1.2"; color: Theme.accent; font.pixelSize: 10 }
+                Label { text: "0.1.3"; color: Theme.accent; font.pixelSize: 10 }
                 MenuBar {
                     background: Item {}
                     Menu { title: "File"; MenuItem { action: newAction } MenuItem { action: openAction } MenuSeparator {} MenuItem { action: saveAction } MenuItem { action: saveAsAction } MenuSeparator {} MenuItem { action: importAction } }
-                    Menu { title: "Edit"; MenuItem { action: undoAction } MenuItem { action: redoAction } }
+                    Menu { title: "Edit"; MenuItem { action: undoAction } MenuItem { action: redoAction } MenuSeparator {} MenuItem { text: "Delete selected…    Delete"; enabled: !!workspace.selectedId && !workspace.selectedData.readonly; onTriggered: deleteDialog.request(workspace.selectedId) } }
                     Menu {
                         title: "View"
                         MenuItem { text: "Frame selected    F"; onTriggered: workspace.frameSelection() }
@@ -96,7 +95,7 @@ ApplicationWindow {
         Rectangle {
             SplitView.preferredWidth: 240; SplitView.minimumWidth: 195; SplitView.maximumWidth: 440
             color: Theme.panel
-            Outliner { anchors.fill: parent; anchors.margins: 10; onImportRequested: importFile.open() }
+            Outliner { anchors.fill: parent; anchors.margins: 10; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
         }
         ColumnLayout {
             SplitView.fillWidth: true; SplitView.minimumWidth: 300; spacing: 0
@@ -112,12 +111,12 @@ ApplicationWindow {
             }
             Item {
                 Layout.fillWidth: true; Layout.fillHeight: true
-                Viewport { id: viewport; objectName: "viewport"; anchors.fill: parent; toolMode: window.activeTool; onImportRequested: importFile.open() }
+                Viewport { id: viewport; objectName: "viewport"; anchors.fill: parent; toolMode: window.activeTool; keyboard: keyboard; onImportRequested: importFile.open() }
                 Column {
                     anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 10; spacing: 5
                     Repeater {
-                        model: [{name:"Move",icon:"move",key:"W"},{name:"Rotate",icon:"rotate",key:"E"},{name:"Scale",icon:"scale",key:"R"}]
-                        UiButton { required property var modelData; objectName: "tool"+modelData.name; width: 34; height: 34; glyph: modelData.icon; checkable: true; checked: window.activeTool === modelData.name; hint: modelData.name + " (" + modelData.key + ")"; onClicked: window.activeTool = modelData.name }
+                        model: [{name:"Move",icon:"move",command:"grab"},{name:"Rotate",icon:"rotate",command:"turn"},{name:"Scale",icon:"scale",command:"resize"}]
+                        UiButton { required property var modelData; objectName: "tool"+modelData.name; width: 34; height: 34; glyph: modelData.icon; checkable: true; checked: window.activeTool === modelData.name; hint: modelData.name+" gizmo · "+keyboard.shortcut(modelData.command)+": mouse transform"; onClicked: window.activeTool = modelData.name }
                     }
                 }
             }
@@ -138,7 +137,7 @@ ApplicationWindow {
             ColumnLayout {
                 anchors.fill: parent; spacing: 0
                 Rectangle { Layout.fillWidth: true; implicitHeight: 33; color: Theme.header; Label { anchors.verticalCenter: parent.verticalCenter; x: 12; text: "PROPERTIES"; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1 } }
-                Inspector { id: inspector; objectName: "inspector"; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: 10; onPickAnchor: function(mode) { viewport.anchorMode = mode; } }
+                Inspector { id: inspector; objectName: "inspector"; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: 10; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity) }
             }
         }
     }
@@ -174,7 +173,7 @@ ApplicationWindow {
     }
     Dialog {
         id: helpDialog; title: "Navigation and shortcuts"; modal: true; anchors.centerIn: parent; standardButtons: Dialog.Close
-        Label { text: "W / E / R    Move / Rotate / Scale\nF    Frame selected\n1 / 3 / 7    Front / Right / Top\n5    Perspective / Orthographic\nAlt+Z    X-ray\nAlt-click    Select through overlapping objects\nMiddle or right drag    Orbit\nShift + drag    Pan\nMouse wheel    Zoom\nEscape    Cancel transform or anchor picking\nCtrl+I    Import mesh"; lineHeight: 1.7; color: Theme.text }
+        Label { text: "G / R / S    Start Move / Rotate / Scale\nLeft click / Enter    Confirm transform\nRight click / Escape    Cancel transform\nW / E    Select Move / Rotate gizmo\nF    Frame selected\n1 / 2 / 3    X / Y / Z view, centered with zoom preserved\n5    Perspective / Orthographic\nAlt+Z    X-ray\nAlt-click    Select through overlapping objects\nMiddle or right drag    Orbit\nShift + drag    Pan\nMouse wheel    Zoom\nEscape    Cancel transform or anchor picking\nCtrl+I    Import mesh\nDelete    Remove selected object, preserving children\nShift while transforming    Fine adjustment\nShift in curve editing    Preview; click to insert points\nCtrl while moving a curve point    Snap to another SCP\nWheel while snapping    Surface offset\nMiddle click / release Ctrl    Reset offset\nCtrl-click a component    Extend selection"; lineHeight: 1.7; color: Theme.text }
     }
     Dialog { id: messageDialog; title: "Last operation"; modal: true; anchors.centerIn: parent; width: Math.min(560, window.width-80); standardButtons: Dialog.Close; Label { width: parent.width; text: workspace.state.message; wrapMode: Text.WrapAnywhere; color: Theme.text } }
     FileDialog { id: importFile; title: "Import primitive mesh"; nameFilters: ["Mesh files (*.obj *.stl *.ply)"]; onAccepted: { window.chosenImport = selectedFile.toString(); importUnits.currentIndex = 0; importOptions.open(); } }
@@ -251,14 +250,28 @@ ApplicationWindow {
         function onDiscardRequested(path) { window.replacementPath = path; discardDialog.open(); }
         function onCloseReady() { window.closingConfirmed = true; window.close(); }
     }
-    Shortcut { sequence: "F"; enabled: window.viewportKeys; onActivated: workspace.frameSelection() }
-    Shortcut { sequence: "W"; enabled: window.viewportKeys; onActivated: window.activeTool = "Move" }
-    Shortcut { sequence: "E"; enabled: window.viewportKeys; onActivated: window.activeTool = "Rotate" }
-    Shortcut { sequence: "R"; enabled: window.viewportKeys; onActivated: window.activeTool = "Scale" }
-    Shortcut { sequence: "1"; enabled: window.viewportKeys; onActivated: viewport.setView("Front") }
-    Shortcut { sequence: "3"; enabled: window.viewportKeys; onActivated: viewport.setView("Right") }
-    Shortcut { sequence: "7"; enabled: window.viewportKeys; onActivated: viewport.setView("Top") }
-    Shortcut { sequence: "5"; enabled: window.viewportKeys; onActivated: viewport.orthographic = !viewport.orthographic }
-    Shortcut { sequence: "Alt+Z"; enabled: window.viewportKeys; onActivated: viewport.xray = !viewport.xray }
-    Shortcut { sequence: "Escape"; enabled: !window.modalOpen; onActivated: { workspace.endTransform(true); viewport.anchorMode = ""; viewport.forceActiveFocus(); } }
+    DeleteDialog { id: deleteDialog }
+    KeyboardManager {
+        id: keyboard; window: window; blocked: window.modalOpen || workspace.state.waiting; transforming: viewport.transforming; snapping: viewport.snapping
+        onRequested: command => window.dispatchShortcut(command)
+        onCanceled: viewport.cancelTransform()
+        onOffsetRequested: steps => viewport.surfaceOffset(steps)
+        onOffsetReset: viewport.resetSurfaceOffset()
+    }
+    readonly property var shortcutCommands: ({
+        new: () => newAction.trigger(), open: () => openAction.trigger(), save: () => saveAction.trigger(),
+        saveAs: () => saveAsAction.trigger(), importMesh: () => importAction.trigger(),
+        undo: () => undoAction.trigger(), redo: () => redoAction.trigger(),
+        deleteSelection: () => deleteDialog.request(workspace.selectedId), frame: () => workspace.frameSelection(),
+        move: () => activeTool = "Move", rotate: () => activeTool = "Rotate", scale: () => activeTool = "Scale",
+        grab: () => viewport.startModalTransform("Move"), turn: () => viewport.startModalTransform("Rotate"), resize: () => viewport.startModalTransform("Scale"),
+        viewX: () => viewport.setView("Right"), viewY: () => viewport.setView("Front"), viewZ: () => viewport.setView("Top"),
+        confirm: () => viewport.confirmTransform(),
+        projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,
+        cancel: () => { viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
+    })
+    function dispatchShortcut(command) {
+        const action = shortcutCommands[command];
+        if (action) action();
+    }
 }

@@ -122,16 +122,36 @@ def selected_weights(editor, binding, value):
 
 
 def start_transform(editor, mode):
-    session = editor.controller.session
-    editor.drag_rows = selected_rows(editor)
+    editor.drag_mode = mode
+    capture_transform(editor)
+    editor.controller.session.begin()
+
+
+def capture_transform(editor):
+    editor.drag_rows = transform_rows(editor)
     if any(ref["part"] in ("vertex", "base") for ref, _, _ in editor.drag_rows):
         raise ValueError(
             "Imported vertices are selectable for Hook membership, not direct editing."
         )
-    editor.drag_mode = mode
     editor.drag_center = editor.transformData.get("trs", [0, 0, 0])[:3]
     editor.drag_control = selected_control_frame(editor)
-    session.begin()
+
+
+def transform_rows(editor):
+    selected = selected_rows(editor)
+    if editor.drag_mode == "Move":
+        return selected
+    points = {
+        (r["owner"], r.get("curve"), r.get("point"))
+        for r, _, _ in selected
+        if r["part"] == "position"
+    }
+    return [
+        row
+        for row in editor.rows
+        if authoring_state.component_key(row[0]) in editor.selection
+        or (row[0]["owner"], row[0].get("curve"), row[0].get("point")) in points
+    ]
 
 
 def selected_control_frame(editor):
@@ -144,49 +164,45 @@ def selected_control_frame(editor):
 
 
 def drag_transform(editor, axis, amount):
+    from .transform_delta import axis_values
+
+    transform_delta(editor, axis_values(editor.drag_mode, axis, amount))
+
+
+def transform_delta(editor, values):
     session = editor.controller.session
     if session.history.before is None:
         return
     try:
-        if editor.drag_control and (
-            not editor.drag_rows or editor.drag_rows[0][0]["part"] == "control"
-        ):
-            return drag_control(editor, axis, amount)
-        matrix = drag_matrix(editor, axis, amount)
-        points = components.transformed(session.engine, [r[1] for r in editor.drag_rows], matrix)
-        apply_points(editor, points)
+        apply_delta(editor, values)
         editor.controller.refresh()
     except ValueError as error:
         report_error(editor.controller, error)
 
 
-def drag_control(editor, axis, amount):
+def apply_delta(editor, values):
+    from .transform_delta import matrix
+
+    if editor.drag_control and (
+        not editor.drag_rows or editor.drag_rows[0][0]["part"] == "control"
+    ):
+        return drag_control(editor, values)
+    engine = editor.controller.session.engine
+    delta = matrix(engine, editor.drag_center, values)
+    points = components.transformed(engine, [r[1] for r in editor.drag_rows], delta)
+    apply_points(editor, points)
+
+
+def drag_control(editor, delta):
+    from .transform_delta import object_values
+
     session = editor.controller.session
-    world = construction.matrix(
-        session.engine, drag_matrix(editor, axis, amount), editor.drag_control
-    )
+    initial = session.engine.decompose(editor.drag_control)
+    world = session.engine.transform(object_values(session.engine, initial, delta))
     control = session.document.control(editor.controller.selection)
     local = control_frames.authored_frame(session, control, world)
     values = session.engine.decompose(local)
-    editor.controller.run(
-        "control.transform", dict(control=editor.controller.selection, values=values)
-    )
-
-
-def drag_matrix(editor, axis, amount):
-    engine = editor.controller.session.engine
-    values = [0, 0, 0, 0, 0, 0, 1, 1, 1]
-    index = axis + {"Move": 0, "Rotate": 3, "Scale": 6}[editor.drag_mode]
-    values[index] = (
-        max(0.01, 1 + amount)
-        if editor.drag_mode == "Scale"
-        else amount * (60 if editor.drag_mode == "Rotate" else 1)
-    )
-    pivot = engine.transform([*editor.drag_center, 0, 0, 0, 1, 1, 1])
-    inverse = construction.matrix(engine, pivot, IDENTITY, relative=True)
-    return construction.matrix(
-        engine, construction.matrix(engine, pivot, engine.transform(values)), inverse
-    )
+    editor.controller.run("control.transform", dict(control=control.id, values=values))
 
 
 def local_position(editor, reference, world):

@@ -19,6 +19,10 @@ AF_API int af_transform(const double* trs, double* matrix);
 AF_API int af_decompose(const double* matrix, double* trs);
 AF_API int af_point(const double* matrix, const double* point, double* output);
 AF_API int af_quaternion(const double* matrix, double* quaternion);
+/* Unit axis and degrees to world XYZ Euler angles (degrees). */
+AF_API int af_axis_rotation(const double* axis, double angle, double* angles);
+/* Unit world normal, respecting nonuniform scale and mirrored transforms. */
+AF_API int af_surface_normal(uint64_t mesh, const double* matrix, int triangle, double* normal);
 AF_API int af_geometry_matrix(const double* matrix, const double* offset, double* output);
 /* Conservative world bounds from transformed local bounds; O(mesh count). */
 AF_API int af_scene_bounds(int count, const uint64_t* meshes, const double* matrices, double* bounds);

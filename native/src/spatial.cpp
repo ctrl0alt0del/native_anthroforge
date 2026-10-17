@@ -82,3 +82,15 @@ int af_scene_pick(int count,const uint64_t* meshes,const double* matrices,
     }
     return found;
 }
+int af_surface_normal(uint64_t handle,const double* matrix,int triangle,double* output) {
+    try {
+        const auto mesh=af::mesh(handle); const af::M4 world=Eigen::Map<const af::M4>(matrix);
+        if(triangle<0||triangle>=mesh->triangles.rows()) throw std::runtime_error("Invalid surface triangle.");
+        const auto face=mesh->triangles.row(triangle);
+        const af::V3 a=mesh->vertices.row(face[1])-mesh->vertices.row(face[0]);
+        const af::V3 b=mesh->vertices.row(face[2])-mesh->vertices.row(face[0]);
+        const af::V3 normal=world.block<3,3>(0,0).inverse().transpose()*a.cross(b);
+        if(!normal.allFinite()||normal.norm()<1e-15) throw std::runtime_error("Degenerate surface normal.");
+        Eigen::Map<af::V3> result(output); result=normal.normalized(); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}

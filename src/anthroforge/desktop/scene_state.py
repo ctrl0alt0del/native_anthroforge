@@ -116,6 +116,7 @@ def render_rows(rows):
 
 
 def picking_inputs(controller, rows):
+    snapping_inputs(controller, rows)
     eligible = [row for row in rows if row["pickable"] and row["handle"]]
     controller.pick_ids = [row["id"] for row in eligible]
     controller.pick_handles = np.array([row["handle"] for row in eligible], dtype=np.uint64)
@@ -125,6 +126,19 @@ def picking_inputs(controller, rows):
     ]
     controller.pick_matrices = np.ascontiguousarray(matrices, dtype=np.float64)
     control_picking_inputs(controller)
+
+
+def snapping_inputs(controller, rows):
+    eligible = [row for row in rows if row["visible"] and row["handle"]]
+    controller.snap_ids = [row["id"] for row in eligible]
+    controller.snap_handles = np.array([row["handle"] for row in eligible], dtype=np.uint64)
+    controller.snap_matrices = np.ascontiguousarray(
+        [
+            scene.geometry_matrix(controller.session.engine, row["matrix"], row["geometry_offset"])
+            for row in eligible
+        ],
+        dtype=np.float64,
+    )
 
 
 def control_picking_inputs(controller):

@@ -7,4 +7,7 @@ qt_add_qml_module(af_viewport
             control_geometry.h control_geometry.cpp
 )
 target_link_libraries(af_viewport PRIVATE Qt6::Quick3D af_native)
+qt_add_shaders(af_viewport "selection_shaders"
+    PREFIX "/anthroforge/shaders" BASE "shaders"
+    FILES "shaders/outline.frag")
 

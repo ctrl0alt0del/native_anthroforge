@@ -49,28 +49,10 @@ def rename(session: "Session", entity: str, name: str) -> None:
     session.replace_entities({entity: replace(item, name=require_name(name))}, authored=False)
 
 
-def delete(session: "Session", entity: str) -> None:
+def delete(session: "Session", entity: str) -> str:
+    from .deletion import delete as delete_scp
 
-    session.editable(entity)
-    removed = descendants(session.document.entities, entity)
-    for entity_id in removed:
-        session.editable(entity_id)
-    remove_entities(session, removed)
-
-
-def remove_entities(session: "Session", removed: set[str]) -> None:
-    from .control_frames import remove_supports
-    from .control_operations import refresh_references
-
-    session.scheduler.invalidate(removed)
-    changed = {
-        c.id for c in session.document.controls if c.follow in removed or c.support in removed
-    }
-    session.replace_document(
-        entities=tuple(e for e in session.document.entities if e.id not in removed),
-        controls=remove_supports(session, removed),
-    )
-    refresh_references(session, changed)
+    return delete_scp(session, entity)
 
 
 def duplicate(session: "Session", entity: str, parent: str = "") -> str:

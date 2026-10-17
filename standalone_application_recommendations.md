@@ -199,6 +199,11 @@ The follow-up view workflow maps 1/2/3 to global X/Y/Z orthographic views, cente
 active selection with apparent zoom preserved. View changes must preserve an ongoing edit
 and its original undo/cancel boundary. G/R/S starts mouse-driven Move/Rotate/Scale, confirmed
 with left-click/Enter and canceled with right-click/Escape. Bindings remain centralized.
+Entering an axis view by keyboard or its UI action preserves the original camera settings.
+4 and the Restore action return to that position, rotation, zoom and projection without
+ending an edit. Consecutive axis switches retain the first saved camera; restoring consumes
+it, and the next axis switch captures a new one. This temporary return point is scoped to
+the current document/workspace and clears when another workspace camera is loaded.
 During point snapping, the wheel adjusts signed surface-normal offset; middle-click or
 release of the snapping modifier resets the offset. Reset must not end the current edit.
 

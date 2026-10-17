@@ -94,6 +94,7 @@ def modal_move(controller, window, point_id):
         pointer += QPoint(24, -17)
         modal_step(controller, window, point_id, code, axis, pointer)
         assert controller.session.history.cursor == cursor
+    restore_edit(controller, window, lambda: position(controller, point_id))
     assert window.grabWindow().save(str(OUTPUT / "modal-axis-edit.png"))
     key(window, Qt.Key_Return)
     check_undo(controller, point_id, before, cursor)
@@ -126,9 +127,7 @@ def direct_views(controller, window, point_id):
     pointer += QPoint(30, 20)
     QTest.mouseMove(window, pointer)
     QTest.qWait(60)
-    old = position(controller, point_id)
-    key(window, Qt.Key_1)
-    np.testing.assert_allclose(position(controller, point_id), old, atol=1e-7)
+    switch_and_restore(controller, window, lambda: position(controller, point_id))
     assert find(window, "curveEditor").property("dragging")
     QTest.mouseMove(window, pointer + QPoint(20, -20))
     QTest.mouseRelease(window, LEFT, pos=pointer + QPoint(20, -20))
@@ -182,6 +181,8 @@ def snap_view_switch(controller, window, point_id):
         np.testing.assert_allclose(position(controller, point_id), before, atol=1e-7)
         assert controller.authoring.interaction.offset == offset
         assert controller.session.history.before is not None
+    restore_edit(controller, window, lambda: position(controller, point_id), CTRL)
+    assert controller.authoring.interaction.offset == offset
 
 
 def offset_steps(controller, window, point_id, pointer, targets):
@@ -250,6 +251,7 @@ def object_gesture(controller, window, code):
     assert changed != before
     key(window, Qt.Key_2)
     np.testing.assert_allclose(current_matrix(controller), changed)
+    restore_edit(controller, window, lambda: current_matrix(controller))
     QTest.mouseMove(window, pointer + QPoint(50, 60))
     QTest.qWait(50)
     assert current_matrix(controller) != changed
@@ -270,7 +272,7 @@ def gizmo_view(controller, window, point_id):
     QTest.mouseMove(window, pointer + QPoint(20, 15))
     QTest.qWait(50)
     before = position(controller, point_id)
-    key(window, Qt.Key_1)
+    switch_and_restore(controller, window, lambda: position(controller, point_id))
     QTest.mouseMove(window, pointer + QPoint(35, 30))
     QTest.qWait(50)
     assert np.linalg.norm(position(controller, point_id) - before) > 0.01
@@ -280,11 +282,27 @@ def gizmo_view(controller, window, point_id):
 
 def focus_checks(controller, window):
     click(window, "outlinerSearch")
-    for code in (Qt.Key_1, Qt.Key_G, Qt.Key_R, Qt.Key_S):
+    for code in (Qt.Key_1, Qt.Key_4, Qt.Key_G, Qt.Key_R, Qt.Key_S):
         key(window, code)
     assert not find(window, "modalTransform").property("active")
     find(window, "outlinerSearch").setProperty("text", "")
     find(window, "viewport").forceActiveFocus()
+
+
+def switch_and_restore(controller, window, read):
+    before = read()
+    key(window, Qt.Key_1)
+    np.testing.assert_allclose(read(), before, atol=1e-7)
+    restore_edit(controller, window, read)
+
+
+def restore_edit(controller, window, read, modifiers=Qt.NoModifier):
+    before, transaction = read(), controller.session.history.before
+    key(window, Qt.Key_4, modifiers)
+    np.testing.assert_allclose(read(), before, atol=1e-7)
+    assert find(window, "viewport").property("transforming")
+    assert not find(window, "viewport").property("canRestoreView")
+    assert controller.session.history.before is transaction
 
 
 def verify(controller, window):

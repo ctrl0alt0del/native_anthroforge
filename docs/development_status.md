@@ -496,3 +496,27 @@ and [fresh-task verification](https://chatgpt.com/local/01a14a36-2da3-7609-8e41-
 are account-private records. Source/build qualification is at `cb51bbc`; later documentation
 updates do not change the qualified code. The publication capture is a local ignored artifact
 under `build/cloud-review`, not a required runtime file.
+
+## Camera restoration (2026-10-17)
+
+At `a3667ad`, the Windows development gate passed all **396 tests**, native build/CTest,
+style/type checks, numerical dependency imports and native loading. The real-window
+`camera_restore_acceptance.py` passed perspective and orthographic restoration after mixed
+axis keys/buttons and projection/zoom changes, repeat/no-op restore, subsequent snapshots,
+the View menu action, text focus, rebinding, workspace invalidation and persisted camera values.
+`view_gesture_acceptance.py` passed restore during direct/gizmo/modal editing and Ctrl-snapping,
+with no point jump, retained snap offset, one-step undo and cancellation. Neither run reported
+QML warnings. Original/restored and active-edit captures were inspected visually under
+`build/camera-restore-review` and `build/view-gesture-review`.
+
+Ownership review: the existing viewport owns a bounded, transient camera snapshot and the
+shared camera-change/rebase lifecycle. Keyboard bindings remain in the keyboard manager;
+buttons and menu invoke the same viewport operation. No anatomical state, scheduler, native
+geometry or project-format responsibilities changed. Workspace persistence stores the current
+camera using its existing path, while the temporary return point is cleared on camera loading.
+
+The full Windows `tools/package.ps1` rebuild passed. `tools/check_portable.py` passed with
+minimal PATH: import, attachments, primitives/deformers, deletion/subdivision, save/inspect,
+GPU rendering and GUI smoke checks. Packaged camera QML hashes match the qualified source;
+the packaged desktop capture was inspected. Evidence is in `build/camera-restore-portable-check`.
+The source archive and portable documentation were refreshed; these build outputs remain local.

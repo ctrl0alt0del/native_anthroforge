@@ -120,5 +120,9 @@ rebound input bindings, focus loss and undo with real mouse events in both proje
 Captures and query timings are written under `build/curve-interaction-review`.
 
 `uv run python tools/view_gesture_acceptance.py` checks centered axis views, zoom preservation,
-view changes during direct/gizmo/modal transforms, one-step undo and cancellation, and signed
+view changes/restoration during direct/gizmo/modal transforms, one-step undo and cancellation, and signed
 surface offsets with real wheel/middle-button events. Outputs go to `build/view-gesture-review`.
+
+`uv run python tools/camera_restore_acceptance.py` checks original-camera restoration across
+axis keys/buttons, projection and zoom changes, the menu action, text focus, rebinding,
+workspace changes and camera persistence. Outputs go to `build/camera-restore-review`.

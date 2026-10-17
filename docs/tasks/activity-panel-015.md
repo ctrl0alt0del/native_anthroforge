@@ -35,9 +35,39 @@ Qt's model tester checks insert/move/remove contracts. Actual GUI cancel/retry, 
 target rename, hidden updates and New pass. Screenshot inspected. The first recorded
 modal pilot has no Activity model replacements, only incremental row notifications.
 
-The 0.1.4 source/native snapshot is under build/activity-015/baseline. Next: serial
-counterbalanced comparisons, complete profiler/gesture acceptance, full gate and
-portable/source release. Performance improvement is not yet qualified by repeated trials.
+The 0.1.4 source/native snapshot is under build/activity-015/baseline. The complete
+serial comparison passed: 24 processes, 48 gestures, 120 moves per gesture, normal
+and Ctrl snapping, mouse and G-key movement, Activity open and closed. Unrecorded
+handler means decreased 55.9–62.1%; all snapping hit counts and undo checks passed.
+See [machine-readable evidence](activity-panel-015-evidence.json). All eight recorded
+captures stopped cleanly without collector loss; their bounded rings evicted older
+events. Retained candidate intervals contain incremental notifications and no Activity
+model replacement. Absolute event totals across unequal retained windows are not comparable.
+
+After the comparison, Job.retryable became the shared authority for both describe()
+and Activity; the projection also uses Job.active and preserves the empty-name fallback.
+These are equivalent-rule ownership cleanups, not another scheduling or UI optimization.
+Final candidate confirmation passed all four conditions: eight gestures, handler
+means 12.19–14.17 ms, all snapping and undo checks successful. Profiler GUI acceptance
+passes F12 during four drag variants, cancellation, text focus/privacy and New/Open.
+It now checks incremental Activity notifications instead of requiring the eliminated
+hidden-panel binding work. Activity GUI acceptance passed again on 0.1.5; screenshot
+visually inspected, including diagnostics, failed/cancelled/succeeded rows and renamed targets.
+The first gate had 420 passing tests and one function-length failure in an unfinished
+evidence tool. The full gate rerun passed: 421 pytest tests, lint/format, configured
+mypy, native build/CTest/style, PowerShell style, numerical checks and native doctor.
+The evidence summary/portable assertion updates also pass lint and architecture checks.
+Portable/source release remain pending. The task branch is ready for packaging.
+
+## Ownership review
+
+Coordinator-authored review, separate from test outcomes: ActivityModel owns only a
+bounded GUI-thread projection and change notifications. It keeps no Job references,
+does not mutate job state and creates no competing queue/timer. Job remains the
+authority for active/retryable states; GUI actions still invoke the existing commands.
+Core/application/native remain Qt-independent. No geometry algorithms, worker/publication
+contracts, undo, saves or profiler lifecycle changed. The render model is deliberately
+separate because it owns staged geometry leases, unlike Activity's small value rows.
 
 ## Recovery inputs
 

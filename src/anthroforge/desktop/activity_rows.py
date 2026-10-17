@@ -1,7 +1,5 @@
 """Read-only job presentation; scheduler objects remain owned by the application."""
 
-from anthroforge.core.jobs import TERMINAL
-
 
 def job_row(job, names, now):
     return dict(
@@ -11,9 +9,9 @@ def job_row(job, names, now):
         error=job.error,
         progress=job.progress,
         elapsed=round((job.finished or now) - (job.started or job.created), 2),
-        targets=", ".join(names.get(key, "Project") for key in sorted(job.outputs)),
-        retryable=job.retry is not None and job.state in ("failed", "cancelled"),
-        cancellable=job.state not in TERMINAL,
+        targets=", ".join(names.get(key) or "Project" for key in sorted(job.outputs)),
+        retryable=job.retryable,
+        cancellable=job.active,
         scheduling=scheduling_text(job),
     )
 

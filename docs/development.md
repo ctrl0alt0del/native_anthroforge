@@ -132,3 +132,20 @@ variants) and `tools/profiler_qualification.py --mode none|dormant|record --outp
 Run overhead trials serially, with counterbalanced modes and no simultaneous builds.
 `tools/check_portable.py` checks both packaged headless reports and runtime Qt reports.
 See [profiling](profiling.md) for report interpretation and ownership/storage limits.
+
+Activity 0.1.5 acceptance uses `tools/activity_acceptance.py` for real Cancel/Retry,
+failure/target updates, hidden progress and New-document handling. Model unit tests use
+Qt's QAbstractItemModelTester and persistent indexes, including retention and role-only
+updates. `tools/profiler_qualification.py` accepts `--activity-open` and
+`--interaction drag|modal`; each trial verifies snapping and undo.
+
+For a source/runtime snapshot of the baseline, run `tools/activity_comparison.py
+--baseline <snapshot>/src --output build/activity-015/comparison`. The snapshot needs
+the baseline `anthroforge` package and its native `_runtime/bin` and `_runtime/qml`.
+The driver runs serial ABBA nonrecording trials and separate recorded comparisons,
+with Activity open/closed and direct/modal movement. It uses a nonactivating window
+to avoid focus interruptions and records system utilization; do not mix these absolute
+timings with ordinary foreground captures or run concurrent builds during measurements.
+Summarize the saved results with `tools/activity_evidence.py <comparison-directory>
+<output.json> [--confirmation <final-run-directory>]`. It preserves per-run variance and capture completeness/retention,
+separates Activity notifications from other models, and does not sum nested durations.

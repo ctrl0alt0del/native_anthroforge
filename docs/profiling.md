@@ -1,4 +1,4 @@
-# Runtime performance recording (0.1.4)
+# Runtime performance recording (0.1.5)
 
 Press **F12** (also while holding Ctrl/Shift/Alt or dragging) to start recording.
 Reproduce the slowdown and press F12 again. The **Record/Stop** button and View menu

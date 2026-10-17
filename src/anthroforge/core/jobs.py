@@ -64,6 +64,10 @@ class Job:
     def active(self) -> bool:
         return self.state not in TERMINAL
 
+    @property
+    def retryable(self) -> bool:
+        return self.retry is not None and self.state in ("failed", "cancelled")
+
     def describe(self) -> dict[str, Any]:
         end = self.finished or monotonic()
         return {
@@ -76,7 +80,7 @@ class Job:
             "progress": self.progress,
             "obsolete": self.obsolete,
             "writes": self.writes,
-            "retryable": self.retry is not None and self.state in ("failed", "cancelled"),
+            "retryable": self.retryable,
             "scheduling": self.scheduling_details(),
         }
 

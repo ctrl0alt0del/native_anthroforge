@@ -30,7 +30,7 @@ def verify_capabilities(manifest, desktop):
 def verify_durations(summary, desktop):
     keys = summary["durations"]
     assert (
-        any("Activity.qml" in k for k in keys)
+        any(k.startswith("qml.binding/") and "Main.qml" in k for k in keys)
         if desktop
         else any(k.startswith("native/") for k in keys)
     )

@@ -14,6 +14,7 @@ from shiboken6 import delete
 from snap_drag_diagnostic import DragTrial, fixture
 from snap_drag_probes import Probes
 
+from anthroforge import __version__
 from anthroforge.desktop.app import create_engine, open_controller
 from anthroforge.desktop.qt_profiler import QtProfiler, profiler_application
 from anthroforge.desktop.runtime import native_runtime
@@ -74,18 +75,20 @@ def finish_capture(args, controller, trials, load):
 
 
 def save_result(args, state, trials, load):
-    report = dict(
+    report = dict(settings(args), trials=trials, profiler=state, system_load=load)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(report), encoding="utf-8")
+    print(json.dumps(dict(mode=args.mode, trials=trials, system_load=load)), flush=True)
+
+
+def settings(args):
+    return dict(
         mode=args.mode,
         activity_open=args.activity_open,
         interaction=args.interaction,
         background=args.background,
-        trials=trials,
-        profiler=state,
-        system_load=load,
+        version=__version__,
     )
-    args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report), encoding="utf-8")
-    print(json.dumps(dict(mode=args.mode, trials=trials, system_load=load)), flush=True)
 
 
 def run(args):

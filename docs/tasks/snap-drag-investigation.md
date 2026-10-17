@@ -172,3 +172,11 @@ Raw captures remain local; compact evidence, code and this handoff are committed
 Next product work: implement and qualify the recording service against this case,
 then optimize activity presentation using recorded evidence. The exact reported
 snap-specific doubling still needs an in-app recording if it persists.
+
+## Follow-up
+
+The runtime profiler shipped in 0.1.4. The user's packaged report confirmed repeated
+Activity replacement and inexpensive native picking. The [0.1.5 task](activity-panel-015.md)
+implements stable Activity rows; its [comparison evidence](activity-panel-015-evidence.json)
+records serial before/after measurements and remaining release qualification. The
+historical measurements and diagnostic-only limitations above apply to this original investigation.

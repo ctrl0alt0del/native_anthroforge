@@ -269,3 +269,21 @@ an atomic report ZIP. Failed exports retain the ring for retry. Late task return
 cannot append to an exporting capture. Revision/job metadata connects work without
 making the profiler a scheduler or geometry owner. Read sets, publication and undo
 rules are unchanged. See [report limits and interpretation](profiling.md).
+
+## Activity presentation (0.1.5)
+
+`desktop/ActivityModel` owns a stable QAbstractListModel for the latest 40 jobs, newest
+first. Its read-only `activity_rows` projection uses job fields without serializing
+full scheduling workloads. Rows are keyed by job ID; insertion/removal/movement use
+Qt model notifications and field changes emit only the affected roles. Completed
+elapsed times stay fixed, and target-name updates preserve row identity.
+
+The controller owns the model across document replacement and synchronizes it on the
+GUI thread using the existing notification cadence. Active count/failure summary changes
+are independent of row changes; diagnostic metrics have a separate signal. QML never
+reverses/replaces the job list or scans it to compute header status. The coordinator,
+headless job descriptions, cancellation/retry operations and checkpoints are unchanged.
+
+This is a presentation adapter for existing job contracts, not a second task registry.
+The profiler's generic Qt model collector observes incremental notifications without
+Activity-specific timing instrumentation.

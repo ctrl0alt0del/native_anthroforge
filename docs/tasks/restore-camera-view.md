@@ -36,14 +36,16 @@ snapshot, text focus, rebinding, workspace invalidation and persisted camera val
 Passed: `uv run --no-sync python tools/view_gesture_acceptance.py` with restoration during
 direct/gizmo/modal transforms and Ctrl-snapping, unchanged points, undo and cancellation.
 Original/restored camera captures and active-edit capture inspected visually.
-Passed focused Ruff and architecture checks. Full development gate and portable checks pending.
+Passed `./tools/check.ps1` at `a3667ad`: all 396 tests, native build/CTest, style/type checks,
+numerical imports and native loading. Full portable rebuild is running via `./tools/package.ps1`;
+its log is `build/camera-restore-package.log`. Portable runtime checks remain pending.
 Initial repository is clean apart from the unrelated untracked root `__init__.py`.
 
 ## Next actions and blockers
 
-1. Run `./tools/check.ps1` and address any failures.
-2. Refresh portable QML assets through the maintained packaging tool, verify packaged runtime.
-3. Record final validation and ownership review, then merge/push against latest main.
+1. Finish the portable rebuild, then run `tools/check_portable.py` against the resulting executable.
+2. Inspect packaged capture and refresh corresponding source archive.
+3. Record final validation, then merge/push against latest main; ownership review is in development_status.md.
 
 ## Recovery inputs
 

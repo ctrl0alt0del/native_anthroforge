@@ -1,7 +1,7 @@
 {
   "version": "0.1.4",
   "date": "2026-10-17",
-  "packaged_code_commit": "94631a209ea95fe2136e38aead11c1770963a848",
+  "packaged_code_commit": "55bf4e28242ef4a8a5cada59db0180f791d4c9c5",
   "trials": {
     "final": [
       {
@@ -1021,11 +1021,15 @@
   },
   "portable": {
     "passed": true,
-    "environment": "relocated distribution, minimal PATH",
-    "application_version": "0.1.4",
-    "reports": {
+    "isolated_environment": "minimal PATH; developer Python/Qt settings removed",
+    "captures": {
       "headless": {
         "complete": true,
+        "build": {
+          "revision": "55bf4e28242ef4a8a5cada59db0180f791d4c9c5",
+          "tracked_changes": false,
+          "packaged": true
+        },
         "capabilities": {
           "commands": true,
           "tasks": true,
@@ -1036,22 +1040,21 @@
           "model_changes": false,
           "stack_sampling": false
         },
-        "build": {
-          "revision": "94631a209ea95fe2136e38aead11c1770963a848",
-          "tracked_changes": false,
-          "packaged": true
-        },
-        "collector_drops": 0,
         "export": {
-          "wall_ns": 1616500,
-          "thread_cpu_ns": 15625000,
-          "process_cpu_ns": 15625000,
+          "wall_ns": 1237600,
+          "thread_cpu_ns": 0,
+          "process_cpu_ns": 0,
           "scope": "trace serialization and compression, excludes final ZIP close",
           "process_cpu_scope": "whole process during export; includes concurrent application work"
         }
       },
       "desktop": {
         "complete": true,
+        "build": {
+          "revision": "55bf4e28242ef4a8a5cada59db0180f791d4c9c5",
+          "tracked_changes": false,
+          "packaged": true
+        },
         "capabilities": {
           "commands": true,
           "tasks": true,
@@ -1062,20 +1065,19 @@
           "model_changes": true,
           "stack_sampling": false
         },
-        "build": {
-          "revision": "94631a209ea95fe2136e38aead11c1770963a848",
-          "tracked_changes": false,
-          "packaged": true
-        },
-        "collector_drops": 0,
         "export": {
-          "wall_ns": 60979300,
+          "wall_ns": 54768500,
           "thread_cpu_ns": 62500000,
-          "process_cpu_ns": 93750000,
+          "process_cpu_ns": 62500000,
           "scope": "trace serialization and compression, excludes final ZIP close",
           "process_cpu_scope": "whole process during export; includes concurrent application work"
         }
       }
+    },
+    "trace_import": {
+      "tool": "Perfetto trace_processor v58.2",
+      "slices": 5282,
+      "nonzero_error_statistics": 0
     }
   },
   "document_lifecycle": {
@@ -1085,5 +1087,16 @@
     "headless_open_tasks": true,
     "borrowed_session_close": true,
     "gui_exit_code": 0
+  },
+  "development_gate": {
+    "passed": true,
+    "pytest": 415,
+    "ruff": true,
+    "mypy": true,
+    "native_ctest": true,
+    "native_and_script_style": true,
+    "numerics": true,
+    "doctor": true,
+    "code_revision": "55bf4e28242ef4a8a5cada59db0180f791d4c9c5"
   }
 }

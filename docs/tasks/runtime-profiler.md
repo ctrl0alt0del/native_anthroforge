@@ -3,7 +3,7 @@
 - Task branch: `codex/runtime-profiler`
 - Integration branch: `main`
 - Starting revision: `7e6451e9c6760474b6d0c00c0e4f6746fcf238a4`
-- Status: final validation; implementation complete, integration pending
+- Status: implementation and release qualification complete
 - Active writer: desktop implementation chat
 
 ## Delivered behavior
@@ -27,20 +27,22 @@ and trace hashes. [Development status](../development_status.md#runtime-profiler
 explains validation and measurement limits; [profiling](../profiling.md) documents the
 workflow, report schema, ownership budget and overhead interpretation.
 
-Completed: prior full gate (413 tests), repeated five-case GUI drag/undo/cancel/focus
+Completed: full gate (415 tests), repeated five-case GUI drag/undo/cancel/focus
 acceptance, current GUI New/Open lifecycle checks, headless lifecycle tests, bounded
 retention stress, Perfetto import, and relocated minimal-PATH desktop/headless portable
-checks. The final New/Open ownership fix has targeted tests and GUI acceptance; the
-full gate and portable rebuild are running again before integration.
+checks on the final package. The New/Open ownership fix has passed the full gate and
+GUI acceptance. The final executable is built from clean tracked source at `55bf4e2`;
+desktop/headless captures are complete and the packaged trace imports without errors.
 
 Overhead comparisons ran serially and counterbalanced, with system utilization recorded.
 Warmed idle differences stayed within observed run variation; small cold/first-use
 variations remain uncertain. Recording has a measurable observer effect. No exact
 subtraction or zero-overhead claim is made. Two focus-interrupted benchmarks are excluded.
 
-Next: finish gate, commit/push the lifecycle fix, rebuild/requalify the portable executable,
-refresh evidence and source archive, then merge/push normally to main. Preserve the
-unrelated untracked root __init__.py. No additional agents are active.
+The lifecycle fix is pushed at `55bf4e2`. Delivery uses a normal merge/push to main;
+Git history records the integration commit. The portable executable and corresponding
+source archive are local under dist; source, documentation and evidence are pushed.
+Preserve the unrelated untracked root __init__.py. No additional agents are active.
 
 ## Maintenance lessons
 

@@ -529,12 +529,21 @@ are described in [profiling](profiling.md). The Activity production fix remains 
 [Compact qualification evidence](tasks/runtime-profiler-evidence.json) preserves
 measurements and capture hashes without committing the large raw traces.
 
-The development gate passes **413 tests** before the final document-lifetime fix, plus Ruff, mypy, native CTest, native and
+The development gate passes **415 tests**, plus Ruff, mypy, native CTest, native and
 PowerShell function/style checks, numerical checks and the native doctor. Coverage
 includes normal lifecycle/retry, unavailable collectors, active/queued/interrupted
 jobs, cancellation, native hook restoration, repeated captures, byte/time eviction,
 delayed batches, bounded pending spans and clipping at recording boundaries. A fresh
 headless process creates/evaluates a body and exports a report without importing Qt.
+
+The final portable executable was built from clean tracked source at `55bf4e2`, with
+file/product version 0.1.4.0. A relocated copy passed import, attachments, primitives,
+deformers, deletion, subdivision, save/inspect/render, GUI and profiling checks under
+a minimal PATH with developer Python/Qt settings removed. Both packaged report bundles
+were complete; Qt profiling services excluded debugger/inspector. Perfetto imported
+the packaged trace as 5,282 slices with no nonzero error statistics. The actual packaged
+viewport was visually inspected. Distribution and source archive remain local artifacts
+under `dist/AnthroForge.dist` and `dist/AnthroForge-0.1.4-source.zip`.
 
 Actual Qt mouse/key acceptance passed normal and Ctrl-snapped dragging with Activity
 both hidden and shown, F12 start/stop inside the gesture, confirmation, cancellation,

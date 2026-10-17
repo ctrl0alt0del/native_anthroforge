@@ -5,6 +5,7 @@ from threading import Event
 from time import sleep
 from zipfile import ZipFile
 
+from anthroforge.application.session import Session
 from anthroforge.core.jobs import Job
 from anthroforge.profiling import RuntimeProfiler
 
@@ -112,3 +113,31 @@ def test_headless_profiler_does_not_import_qt(tmp_path):
         "assert not any(m.startswith(('PySide6','shiboken6')) for m in sys.modules)"
     )
     subprocess.run([sys.executable, "-c", script, str(tmp_path / "headless.zip")], check=True)
+
+
+def test_borrowed_profiler_survives_session_close_and_observes_replacement(tmp_path):
+    profiler = RuntimeProfiler()
+    profiler.start()
+    for _ in range(2):
+        session = Session(profiler=profiler)
+        session.command("primitive.create", kind="BODY")
+        session.wait()
+        session.close()
+        assert profiler.active and not profiler.native.originals
+    profiler.stop(tmp_path / "replaced.zip", wait=True)
+    captured = events(tmp_path / "replaced.zip")
+    commands = [e for e in captured if e["cat"] == "command" and e["name"] == "primitive.create"]
+    assert len({e["args"]["document"] for e in commands}) == 2
+    assert len([e for e in captured if e["name"] == "af_body_base"]) == 2
+
+
+def test_open_keeps_profiler_on_replacement_scheduler(session, tmp_path):
+    path = str(tmp_path / "saved.anthroforge")
+    session.command("save", path=path, blocked_policy="wait")
+    session.command("profile.start")
+    session.command("open", path=path)
+    session.command("primitive.create", kind="BODY")
+    session.wait()
+    session.command("profile.stop", path=str(tmp_path / "opened.zip"), wait=True)
+    states = {e["name"] for e in events(tmp_path / "opened.zip") if e["cat"] == "task.lifecycle"}
+    assert {"queued", "succeeded"} <= states

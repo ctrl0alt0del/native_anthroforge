@@ -249,9 +249,13 @@ same `scp.delete`; shared-control deletion continues using `control.delete`.
 
 `profiling/RuntimeProfiler` owns explicit recording, bounded immutable events and
 atomic background export. It has no dependency on Qt, documents or task policy.
-Session composes it with command/transaction boundaries, task lifecycle adapters and
+The desktop controller owns it across New/Open; headless sessions own a recorder by
+default or borrow an explicitly supplied one. Session composes it with command/transaction
+boundaries, task lifecycle adapters and
 registered native calls. UI and API operations use the same runtime operations;
 recording is never an authored revision or checkpoint-blocking job.
+Closing a borrowing session detaches its native engine without stopping the recorder.
+Replacing a task coordinator always reconnects the same runtime service.
 
 `desktop/QtProfiler` is the C ABI adapter to `native/profiling`. The Qt 6.12.0 private
 client runs on its own thread and enables only profiling services via a local socket.

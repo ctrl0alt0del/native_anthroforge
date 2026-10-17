@@ -16,6 +16,7 @@ from snap_drag_probes import Probes
 from ui_acceptance import find
 from view_gesture_acceptance import position
 
+from anthroforge.desktop import project_actions
 from anthroforge.desktop.app import create_engine, open_controller
 from anthroforge.desktop.qt_profiler import QtProfiler, profiler_application
 from anthroforge.desktop.runtime import native_runtime
@@ -104,9 +105,9 @@ def run():
     engine = create_engine(controller, warnings)
     try:
         window = engine.rootObjects()[0]
-        point = fixture(controller, window, 0.5)
-        results = capture_trials(controller, window, point)
+        results = capture_trials(controller, window, fixture(controller, window, 0.5))
         focus_recording(controller, window)
+        document_recording(controller, window)
         assert not warnings, warnings
         save_results(results)
     finally:
@@ -139,6 +140,32 @@ def focus_recording(controller, window):
     with ZipFile(controller.session.profiler.path) as archive:
         assert b"PRIVATE_TEXT_SENTINEL" not in archive.read("trace.json")
     field.setProperty("text", "")
+
+
+def document_recording(controller, window):
+    profiler = controller.profiler
+    path = str(OUTPUT / "document-lifecycle.anthroforge")
+    controller.session.command("save", path=path, blocked_policy="wait")
+    replace_document(controller, "")
+    QTest.keyClick(window, Qt.Key_F12)
+    for target in (path, "", path):
+        replace_document(controller, target)
+        assert controller.profiler is profiler and profiler.active
+        assert controller.session.scheduler.profiler is profiler
+    QTest.keyClick(window, Qt.Key_F12)
+    await_export(controller)
+    verify_bundle(profiler.path)
+
+
+def replace_document(controller, path):
+    controller.replaceDocument(path)
+    for _ in range(400):
+        project_actions.poll(controller)
+        controller.session.scheduler.tick()
+        QTest.qWait(25)
+        if controller.pending_document is None and not controller.session.waiting_save:
+            return
+    raise AssertionError("Document replacement did not finish")
 
 
 def save_results(results):

@@ -23,6 +23,14 @@ class NativeCalls:
             if name.startswith("af_") and callable(function):
                 self.bind(engine, name, function)
 
+    def detach(self, engine: Any) -> None:
+        for key, (library, name, function) in list(self.originals.items()):
+            if library is engine.library:
+                setattr(library, name, function)
+                del self.originals[key]
+        self.engines.discard(engine)
+        engine.profile_bind = None
+
     def bind(self, engine, name, function):
         key = id(engine.library), name
         if not self.profiler.active or key in self.originals:

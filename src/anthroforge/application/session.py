@@ -21,11 +21,11 @@ from .history import History
 
 
 class Session:
-    def __init__(self, name: str = "Untitled") -> None:
+    def __init__(self, name: str = "Untitled", profiler: RuntimeProfiler | None = None) -> None:
         self.document = Document(name=name)
         self.history = History(self.document)
         self.assets: dict[str, Asset] = {}
-        self.initialize_runtime()
+        self.initialize_runtime(profiler)
         self._engine: GeometryEngine | None = None
         self.serial = 0
         self.path: Path | None = None
@@ -35,8 +35,12 @@ class Session:
         self.waiting_save = False
         self.replay_callback: Any = None
 
-    def initialize_runtime(self) -> None:
-        self.profiler = RuntimeProfiler()
+    def initialize_runtime(self, profiler: RuntimeProfiler | None) -> None:
+        self.owns_profiler = profiler is None
+        self.profiler = profiler if profiler is not None else RuntimeProfiler()
+        self.initialize_scheduler()
+
+    def initialize_scheduler(self) -> None:
         self.scheduler = TaskCoordinator(lambda: self.document)
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
@@ -180,7 +184,10 @@ class Session:
 
     def close(self) -> None:
         self.scheduler.close()
-        self.profiler.close()
+        if self._engine is not None:
+            self.profiler.native.detach(self._engine)
+        if self.owns_profiler:
+            self.profiler.close()
         if self.file_lock:
             self.file_lock.close()
 

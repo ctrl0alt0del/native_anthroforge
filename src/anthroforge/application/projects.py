@@ -68,14 +68,11 @@ def open_project(session: "Session", path: str) -> dict[str, Any]:
 
 
 def adopt(session: "Session", document: Any, assets: Any) -> None:
-    from .coordinator import TaskCoordinator
-
     session.scheduler.close()
     session.document, session.assets = document, assets
     session.history = History(document)
     session.serial = document.revision
-    session.scheduler = TaskCoordinator(lambda: session.document)
-    session.scheduler.can_publish = session.can_publish
+    session.initialize_scheduler()
     session.active_workspace = 0
 
 

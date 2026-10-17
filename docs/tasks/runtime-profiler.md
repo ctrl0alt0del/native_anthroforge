@@ -3,124 +3,59 @@
 - Task branch: `codex/runtime-profiler`
 - Integration branch: `main`
 - Starting revision: `7e6451e9c6760474b6d0c00c0e4f6746fcf238a4`
-- Status: in progress
+- Status: final validation; implementation complete, integration pending
 - Active writer: desktop implementation chat
 
-## Outcome and acceptance
+## Delivered behavior
 
-Implement the confirmed 0.1.4 runtime profiler: explicit start/reproduce/stop/share,
-automatic QML attribution, shared input/command/task/native/publication boundaries,
-120-second/128-MiB recent-history capture and a versioned JSON trace ZIP. Runtime
-operations and headless collection must not change document or scheduler semantics.
-Activity presentation remains unchanged; its deferred bottleneck is the acceptance
-case recorded in [snap-drag investigation](snap-drag-investigation.md).
+Explicit F12/Record → reproduce → Stop → one `.afprofile.zip`, with automatic Qt
+binding/source attribution, native input/render/model collectors, shared command/task/
+native-call boundaries, bounded 120-second/128-MiB capture and atomic background export.
+Desktop and Qt-free headless clients use profile.start/status/stop. Export failure keeps
+the frozen capture for retry. New/Open preserve the application recorder and subsequent
+native/task observation. Recording does not change undo, scheduling or save checkpoints.
 
-## Decisions
+Qt 6.12.0 private APIs are isolated in native/profiling; debugger and inspector services
+are excluded. Detailed stack sampling, GPU profiling and report viewing are deferred.
+The Activity production fix remains deferred, as recorded in
+[snap-drag investigation](snap-drag-investigation.md).
 
-Qt 6.12.0 private profiling client is isolated in a native desktop adapter. Dormant
-profiling support initializes before the QML engine; debugger/inspector services
-remain excluded. Detailed Python/C++ stack sampling and report viewing are deferred.
-The report distinguishes inclusive wall time, collector costs, unavailable CPU/GPU
-attribution, clock uncertainty and dropped/truncated records. Recording is never an
-authored operation, calculation, undo entry, or reason to block project saving.
+## Evidence and remaining work
 
-## Current state and verification
+[Qualification evidence](runtime-profiler-evidence.json) stores compact measurements
+and trace hashes. [Development status](../development_status.md#runtime-profiler-014)
+explains validation and measurement limits; [profiling](../profiling.md) documents the
+workflow, report schema, ownership budget and overhead interpretation.
 
-Native Qt adapter and development startup qualification are implemented. Real UI
-capture identifies Activity.qml:23 and records QML bindings/JavaScript/signals and
-render-thread frame milestones. Native build/contracts, function-size tests and
-new native-file style checks pass. Shutdown required explicitly destroying the
-profiler client before its connection: the client owns other connection children.
-The corrected development process exits successfully. Portable build is in progress.
-The shared runtime service, bounded ring, atomic ZIP export/retry, runtime API,
-F12 controls, model observer, native input dispatch and shared application boundaries
-are now implemented. Nine new headless/buffer/lifecycle tests and mypy pass. Native
-build passes; desktop smoke and screenshot inspection pass with clean shutdown.
-This checkpoint is still not merge-ready. Preserve untracked __init__.py.
+Completed: prior full gate (413 tests), repeated five-case GUI drag/undo/cancel/focus
+acceptance, current GUI New/Open lifecycle checks, headless lifecycle tests, bounded
+retention stress, Perfetto import, and relocated minimal-PATH desktop/headless portable
+checks. The final New/Open ownership fix has targeted tests and GUI acceptance; the
+full gate and portable rebuild are running again before integration.
 
-Development qualification: `python -m anthroforge.desktop.app --profile-probe
-build/profiler-qualification/development.json` produced 1,748 binding events with
-source locations, 144 frame milestones, zero adapter drops, and clean shutdown.
-Portable qualification also passed with cleaned environment: 1,710 QML binding
-events, Activity source locations, no drops, clean exit. Complete final packaging
-must be repeated after the rest of the implementation.
-`tools/profiler_qualification.py` prepares serial cube/body drag comparisons; it
-ran a serial none/dormant/dormant/none/record comparison. Handler means (normal/snap)
-were 28.43/33.82, 29.56/33.36, 29.75/33.10, 29.50/32.62 ms. The first recording had
-adapter drops because its diagnostic drainer only transferred one chunk per tick;
-production draining now handles bounded batches on its background worker. Final
-complete-build comparison and clock/memory/error qualification remain outstanding.
+Overhead comparisons ran serially and counterbalanced, with system utilization recorded.
+Warmed idle differences stayed within observed run variation; small cold/first-use
+variations remain uncertain. Recording has a measurable observer effect. No exact
+subtraction or zero-overhead claim is made. Two focus-interrupted benchmarks are excluded.
 
-Full recorder GUI acceptance passed the first two hidden-Activity normal/snapped
-gestures: F12 start/stop preserved the drag and undo, files had zero drops. Snapped
-report alone shows Activity.qml:23 binding mean 19.45 ms, Controller.notify 25.78 ms,
-native pick 0.030 ms and normal query 0.016 ms. This is attribution evidence, not an
-unprofiled performance estimate. The visible-panel harness initially began its drag
-before panel layout settled; it is corrected to settle layout before projection.
-Complete four-case rerun, robustness review, final gate and packaging still pending.
+Next: finish gate, commit/push the lifecycle fix, rebuild/requalify the portable executable,
+refresh evidence and source archive, then merge/push normally to main. Preserve the
+unrelated untracked root __init__.py. No additional agents are active.
 
-## Next actions
+## Maintenance lessons
 
-1. Implement/qualify the Qt adapter in development and the packaged executable.
-2. Build bounded runtime collection, shared boundaries, controls and export.
-3. Exercise lifecycle/error/ring/headless and actual GUI acceptance; compare disabled,
-   dormant and recording costs, run the gate, package and integrate only when qualified.
+- Destroy the Qt profiler client before its connection; the client owns connection children.
+- Start with periodic flush disabled; reset it only after recording completion is acknowledged.
+- Probe mode uses app.exit, matching smoke mode, because app.quit can encounter the normal
+  unsaved-document close prompt. Production close/save semantics remain unchanged.
+- A native render callback must never enter Python. GUI timestamps describe submission,
+  not physical display latency. Overlapping inclusive spans are not additive.
+- Session replacement must not replace the desktop recording service. Scheduler construction
+  reconnects profiling through one shared initialization path; borrowed engines detach on close.
 
 ## Recovery
 
-Use normal Windows setup/build tools; Qt SDK and .venv live in ignored directories.
-Production fixture is generated from examples/primitives/cube.obj plus a body curve.
-Push coherent checkpoints under work_continuity.md; no additional agents are active.
-
-2026-10-17 checkpoint: four GUI cases passed on the preceding recorder build, and
-Perfetto v58.2 imported the trace (112,293 slices, no import errors). The development
-gate passed 405 tests before subsequent robustness changes. New lifecycle tests cover
-active/queued jobs, cancellation, collector failure and native hook restoration.
-Current robustness changes add heap-ordered retention, bounded unfinished-span metadata,
-fixed histogram storage, build identity, explicit Qt decoding costs and UI active-job
-snapshots. Native build and 15 targeted tests pass. A tighter initial summary-name cap
-hid Activity attribution in the GUI rerun; restored a 2,048-name budget with compact
-histogram arrays. Final GUI rerun, overhead trials, full gate/package remain pending.
-
-Final review added: bounded pending model-discovery events, incomplete Qt span endings,
-semantic shortcut events, safe command target IDs, compact slowest-source summaries,
-Qt-free subprocess coverage, timestamp-ordered late-batch eviction and pending-span
-budget tests. Package checks now exercise full headless/desktop report export.
-
-Serial full-recorder trials (120 normal + 120 snapped inputs each) found cold means
-24.88/29.18 ms with support disabled, 25.75/29.09 dormant, 35.25/40.52 recording.
-The first normal-drag dormant difference is retained as an unresolved first-use effect;
-it is not erased by the warmed result. Eight counterbalanced trials after 60 warm-up
-moves gave disabled 31.62/32.01 ms and dormant 31.30/32.38 ms, within run-to-run variation.
-Forced disk caching did not establish a remedy and was not adopted. More Activity
-history after warm-up changes absolute workload; compare only within each series.
-Latest final metadata additions require refreshed recording/GUI evidence. Full gate,
-packaged reports, short-window stress, trace import and final review remain pending.
-
-Expanded GUI acceptance now passes all four variants plus cancellation after toggling
-and text-focus/privacy checks. A 34-second native recording with a 2-second window
-received 641,880 events, intentionally evicted 611,079, retained exactly 2 seconds,
-and reported zero collector loss. The full development gate passed 412 tests; latest
-summary/clock metadata additions have targeted checks pending before packaging.
-Default desktop budgeting reserves 64 MiB for queues/metadata/observers/export and
-64 MiB for retained events. This conservative partition still fits the observed GUI
-captures (largest inspected ~56 MiB). Portable runtime and final trace import pending.
-
-Final boundary pass: development gate now passes 413 tests, native/style/numerical
-checks included. Five GUI captures (four normal/snap/Activity variants plus canceled
-drag) and text-focus/privacy checks pass again. Reports assert their retained
-interval is contained within start/stop; late Qt flush records are clipped/marked.
-Qt periodic flush wiring resets between recordings. Lifecycle restart joins the
-finished previous exporter before reusing state. Portable build is next.
-Two supplementary foreground benchmarks were invalidated by window deactivation
-(the diagnostic confirmed the gesture had already canceled); they are excluded.
-The nonactivating diagnostic option keeps subsequent benchmark input isolated from
-foreground focus changes, and its timings are recorded as a separate series.
-
-Portable first pass: relocated/minimal-PATH import, edits, save, rendering and GUI
-checks succeeded. Both headless and Qt report bundles were written, but the probe's
-QGuiApplication.quit() encountered the ordinary unsaved-project close prompt and the
-check timed out. The diagnostic now uses the existing smoke-mode exit convention;
-the same saved-project development probe exits successfully. Export now reports
-isolated exporter-thread CPU as well as explicitly labeled whole-process CPU. Ruff,
-mypy and all 413 tests pass after these changes. Rebuilding for final portable rerun.
+Use the ordinary Windows setup/build tools; Qt SDK, environment, captures and binaries
+are ignored local artifacts. Generate the fixture from examples/primitives/cube.obj and
+a body curve. Continue the existing branch, inspect remote/checkpoint state and use normal
+checkpoint pushes under work_continuity.md. No force pushes or Git history replacement.

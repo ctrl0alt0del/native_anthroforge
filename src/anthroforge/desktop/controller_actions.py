@@ -91,7 +91,7 @@ def selection_center(controller):
 
 def new_document(controller):
     old = controller.session
-    controller.session = Session()
+    controller.session = Session(profiler=controller.profiler)
     scene.configure(controller.session.engine)
     old.close()
     controller.selection, controller.last_revision = "", -1

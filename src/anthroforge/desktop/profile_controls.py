@@ -13,8 +13,8 @@ class ProfileControls(QObject):
 
     def __init__(self, controller, collector):
         super().__init__(controller)
-        self.session = controller.session
-        self.profiler = controller.session.profiler
+        self.controller = controller
+        self.profiler = controller.profiler
         self.profiler.collector = collector
         self._state = self.profiler.status()
         self.timer = QTimer(self)
@@ -29,9 +29,9 @@ class ProfileControls(QObject):
     def toggle(self):
         try:
             if self.profiler.state in ("recording", "export_failed"):
-                self.session.command("profile.stop")
+                self.controller.session.command("profile.stop")
             elif self.profiler.state in ("idle", "saved"):
-                self.session.command("profile.start")
+                self.controller.session.command("profile.start")
             self.timer.start()
             self.refresh()
         except Exception as error:

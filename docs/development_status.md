@@ -529,7 +529,7 @@ are described in [profiling](profiling.md). The Activity production fix remains 
 [Compact qualification evidence](tasks/runtime-profiler-evidence.json) preserves
 measurements and capture hashes without committing the large raw traces.
 
-The development gate passes **413 tests**, plus Ruff, mypy, native CTest, native and
+The development gate passes **413 tests** before the final document-lifetime fix, plus Ruff, mypy, native CTest, native and
 PowerShell function/style checks, numerical checks and the native doctor. Coverage
 includes normal lifecycle/retry, unavailable collectors, active/queued/interrupted
 jobs, cancellation, native hook restoration, repeated captures, byte/time eviction,
@@ -543,11 +543,11 @@ capture. The final five drag reports had no collector loss, and retained interva
 were inside the requested start/stop times. Screenshots were visually inspected.
 
 From the final visible-Activity snapped report alone: Activity.qml:23 binding mean
-24.22 ms, Controller.notify 30.11 ms, native pick 0.056 ms and surface-normal query
-0.025 ms. There were 250 generic model replacements across observed UI models.
+24.15 ms, Controller.notify 30.79 ms, native pick 0.084 ms and surface-normal query
+0.019 ms. There were 250 generic model replacements across observed UI models.
 These inclusive timings overlap and include recording perturbation. They establish
 attribution, not an unprofiled speed claim or proof of a snap-specific 2x regression.
-Perfetto v58.2 imported the final trace as 114,621 slices with no nonzero error stats.
+Perfetto v58.2 imported the final trace as 114,256 slices with no nonzero error stats.
 
 A 34-second stress capture with a two-second window received 641,880 events,
 intentionally evicted 611,079, retained exactly two seconds and had zero collector
@@ -579,7 +579,8 @@ as passing timing trials. The diagnostic now detects this interruption explicitl
 ### Ownership review
 
 Reviewed separately from tests: the recorder owns no anatomy, accepted geometry,
-undo entries or scheduler policy. Session composes a Qt-independent service; shared
+undo entries or scheduler policy. The desktop controller owns the Qt-independent
+service across document replacement; headless sessions own or explicitly borrow it. Shared
 commands, transactions, native binding registration and coordinator stages supply
 coverage. Qt private APIs are isolated in one pinned native adapter. Render events
 stay in C++; the generic model observer is installed only during recording. Stop
@@ -588,3 +589,8 @@ streams bounded records to atomic export. Failure retains a frozen capture for r
 restarts wait for the previous exporter to finish. No Activity-specific timing marker
 or production Activity optimization was introduced. GPU timing, detailed stack
 sampling and report viewing remain outside this release.
+Final lifecycle review found and corrected New retaining stale recording controls and
+headless Open losing task observation. The full GUI acceptance passes after the fixes,
+including New before recording and New/Open during recording. Focus and gestures are
+preserved; closing a borrowing session releases native observation without stopping
+the application recorder.

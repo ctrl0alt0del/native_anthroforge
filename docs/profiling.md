@@ -4,6 +4,8 @@ Press **F12** (also while holding Ctrl/Shift/Alt or dragging) to start recording
 Reproduce the slowdown and press F12 again. The **Record/Stop** button and View menu
 provide the same action. Recording does not end an edit, change the document or add
 an undo entry. **Show file** opens the report folder after background export finishes.
+New and Open preserve the recording; document identifiers distinguish commands from
+different documents within the same capture.
 
 Reports are saved under `%LOCALAPPDATA%/AnthroForge/Profiles` on Windows. Share the
 single `.afprofile.zip`. There is no report viewer in this release. An unsuccessful

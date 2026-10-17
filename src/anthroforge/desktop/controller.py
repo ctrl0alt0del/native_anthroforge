@@ -4,6 +4,7 @@ from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
 from anthroforge.application.session import Session
 from anthroforge.native import scene
+from anthroforge.profiling import RuntimeProfiler
 from anthroforge.profiling.spans import measured
 
 from . import controller_actions as actions
@@ -23,8 +24,7 @@ class Controller(QObject):
 
     def __init__(self) -> None:
         super().__init__()
-        self.session = Session()
-        scene.configure(self.session.engine)
+        self.initialize_session()
         self.render_model = RenderModel(self)
         self.render_model.activated.connect(self.activate_geometry)
         self._initialize_state()
@@ -35,6 +35,11 @@ class Controller(QObject):
         self.timer.timeout.connect(self.tick)
         self.timer.start(16)
         self.refresh()
+
+    def initialize_session(self):
+        self.profiler = RuntimeProfiler()
+        self.session = Session(profiler=self.profiler)
+        scene.configure(self.session.engine)
 
     def _initialize_state(self):
         self.selection, self.hovered, self.message = "", "", ""
@@ -314,5 +319,6 @@ class Controller(QObject):
     def close(self):
         self.timer.stop()
         self.session.close()
+        self.profiler.close()
         for lock in self.temporary_locks:
             lock.close()

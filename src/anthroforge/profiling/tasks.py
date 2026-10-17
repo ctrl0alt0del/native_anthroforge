@@ -63,6 +63,7 @@ def document_snapshot(session, state):
     session.profiler.event(
         "document",
         state,
+        document=str(session.document.id),
         revision=session.document.revision,
         entities=len(session.document.entities),
         controls=len(session.document.controls),
@@ -78,7 +79,10 @@ def call(profiler: Any, job: Any, stage: str, function: Any, *args: Any) -> Any:
 def command_metadata(session: Any, arguments: dict[str, Any]) -> dict[str, Any] | None:
     if not session.profiler.active:
         return None
-    metadata: dict[str, Any] = {"revision": session.document.revision}
+    metadata: dict[str, Any] = {
+        "document": str(session.document.id),
+        "revision": session.document.revision,
+    }
     for key in ("entity", "curve", "point", "control", "binding", "job_id"):
         value = arguments.get(key)
         if isinstance(value, str):

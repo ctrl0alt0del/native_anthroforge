@@ -28,11 +28,27 @@ release builds to record actionable profiles without rebuilding for each investi
 
 Inspected CurveEditor.qml, curve_interaction.py, task execution, existing metrics and
 GUI acceptance fixtures. Researched Qt scene-graph timing and binding profiling.
-No reproduction or cause established yet. No production behavior changed.
+Added tools/snap_drag_diagnostic.py: the user's cube/Body fixture, repeated normal/
+snapped drags, raw input/frame callback timestamps, CPU/wall measurements and optional
+call attribution. No production behavior changed. Initial stable 120-event ABBA run
+had normal handler means 28.1/30.7 ms and snapped 33.8/32.2 ms; surface picking averaged
+0.08 ms. This does not establish a consistent 2x snap-specific regression. Broad Qt
+signal/UI refresh costs dominate call attribution; next isolate their consumers.
+
+Rejected the first QTest.mouseMove timing approach: QtTest internally calls
+processEvents, so its duration includes unrelated queued work. Several such runs
+crashed in Qt Core/Quick3D. Replaced measured move delivery with QMouseEvent/sendEvent
+without nested event processing; the complete ABBA experiment then passed. The
+crash's root cause is not established. Old normal-profile/snap-profile outputs are
+invalid for end-to-end conclusions. Current raw results are local-only under
+build/snap-drag-investigation/delivery-baseline.json and delivery-profile.json.
+GUI frame callbacks are GUI-received frameSwapped timestamps, not GPU presentation.
 
 ## Verification
 
-Pending controlled reproduction, call attribution and causal intervention.
+Architecture checks passed (2 tests); diagnostic Ruff cleanup passed. Actual GUI
+capture inspected: selected Body curve editing against imported cube. Stable snap
+trials hit the target for all 120 moves. Pending causal intervention and final gate.
 Preserve the unrelated untracked root __init__.py.
 
 ## Next actions and blockers

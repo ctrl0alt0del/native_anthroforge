@@ -94,7 +94,11 @@ transforms, Activity open/closed, with recordings separately paired. Dormant han
 were 9.27-11.20 ms baseline and 3.99-4.94 ms candidate (approximately 54-58% lower).
 Every Ctrl case hit all 80 expected targets; confirmation/cancellation/undo passed.
 Candidate traces report no curveChoice model events. Native snapping remains separately
-attributed. All comparative captures are complete with no ring evictions or losses.
+attributed. All captures completed export and report no collector losses. Candidate
+captures retained every event; the two baseline Activity-open captures reached the
+ring budget and evicted 34,009 and 17,583 oldest events respectively. Baseline trace
+counts are therefore retained-window lower bounds; the unrecorded ABBA timings do
+not have this limitation. This retention is explicit in the manifest/evidence.
 See [machine-readable evidence](standalone-optimizations-evidence.json) for individual
 trials, frame distributions, system load, geometry timings and collector counts.
 
@@ -103,6 +107,9 @@ but edit commands still average 67 ms (baseline 74 ms); frame mean is 43 ms. Thi
 single paired spot check, not an ABBA speedup claim, and it does not meet the soft
 50-ms/30-FPS targets. General Python coordinate-to-presentation preparation for dense
 cages remains a future measured optimization; no renderer/algorithm replacement is claimed.
+The repeated geometry comparison measured 1.85-1.89 -> 0.42-0.44 ms at 482 vertices,
+20.0-21.0 -> 4.20-4.27 ms at 4,034, and 91.7-92.6 -> 17.5-25.5 ms at 16,258.
+The large-case variance prevents treating a single ratio as a universal speedup.
 
 Ownership review: document indexes are immutable and snapshot-owned; the bounded journal
 retains descriptions rather than documents. QObject projections are desktop-only. Native

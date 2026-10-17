@@ -22,13 +22,16 @@ verify the displayed saved instructions. Preserve existing work and environment 
 - Do not reset, clean, force-push, or automatically replace a dirty/diverged checkout.
 - Keep existing install command, private visibility, network permissions and dependencies.
 - Store the exact startup text in repository documentation for reproducible configuration.
+- Prepared docs/cloud_startup.md and linked it from the cloud guide; local link checks
+  and git diff --check passed. The original published setup chat allowed editing the
+  Start skill, but Save draft was rejected by the service without identifying a field.
+  The update is not yet saved/published. Continue through Settings > Codex Cloud > Edit.
 
 ## Verification and next actions
 
-1. Prepare and review startup instructions, including existing environment activation,
-   refresh and qualification commands.
-2. Edit the existing environment's Start skill, save and publish, then inspect persistence.
-3. Record configuration evidence and merge/push documentation after link/content checks.
+1. Open the existing published environment through its normal Edit flow; apply the exact
+   text from docs/cloud_startup.md, save and republish, then inspect persistence.
+2. Record configuration evidence and merge/push documentation after link/content checks.
 
 No application code changes or application rebuild are needed. No new cloud chat is
 requested; validation will distinguish published configuration from fresh-chat execution.

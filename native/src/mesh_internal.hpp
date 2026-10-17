@@ -1,7 +1,16 @@
 #pragma once
 #include "anthroforge/mesh.h"
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+// Eigen's FromTwoVectors computes full V before reading its SVD nullspace.
+// GCC 13 misdiagnoses that template path; keep the exception inside Eigen.
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 #include <igl/AABB.h>
 #include <atomic>
 #include <memory>

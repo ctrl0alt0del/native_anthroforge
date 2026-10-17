@@ -32,6 +32,9 @@ public:
     std::atomic<bool> connected{false};
     std::atomic<qint64> offset{0};
     std::atomic<qint64> uncertainty{0};
+    std::atomic<qint64> decodeNs{0};
+    std::atomic<qint64> decodeCpuNs{0};
+    std::atomic<qint64> modelWatchSkipped{0};
 private:
     struct Range { qint64 start; int type; };
     QQmlDebugConnection* connection=nullptr;

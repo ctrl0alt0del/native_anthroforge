@@ -5,12 +5,15 @@ from pathlib import Path
 from PySide6.QtCore import Property, QObject, QTimer, QUrl, Signal, Slot
 from PySide6.QtGui import QDesktopServices
 
+from anthroforge.profiling.spans import measured
+
 
 class ProfileControls(QObject):
     changed = Signal()
 
     def __init__(self, controller, collector):
         super().__init__(controller)
+        self.session = controller.session
         self.profiler = controller.session.profiler
         self.profiler.collector = collector
         self._state = self.profiler.status()
@@ -26,9 +29,9 @@ class ProfileControls(QObject):
     def toggle(self):
         try:
             if self.profiler.state in ("recording", "export_failed"):
-                self.profiler.stop()
+                self.session.command("profile.stop")
             elif self.profiler.state in ("idle", "saved"):
-                self.profiler.start()
+                self.session.command("profile.start")
             self.timer.start()
             self.refresh()
         except Exception as error:
@@ -36,6 +39,7 @@ class ProfileControls(QObject):
             self.changed.emit()
 
     @Slot()
+    @measured("profiler", lambda owner: owner.profiler)
     def refresh(self):
         self._state = self.profiler.status()
         if self._state["state"] in ("idle", "saved", "export_failed"):

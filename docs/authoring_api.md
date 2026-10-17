@@ -1,4 +1,4 @@
-# Local authoring API, version 0.1.3
+# Local authoring API, version 0.1.4
 
 The desktop and JSON clients call application/commands.py. A request has operation,
 arguments (an object) and optionally id. Success responses contain ok, revision and
@@ -38,6 +38,12 @@ serve continues scheduling between requests. Ending the process does not save.
 | workspace.create | name, members; optional children=false | Create and activate focused workspace |
 | workspace.select | index | Activate named workspace |
 | workspace.update | presentation settings below | Update active workspace without an anatomical undo step |
+| profile.start | optional seconds=120, memory_mib=128 | Start explicit runtime recording without an authored edit |
+| profile.status | none | Recording/export state, storage, output path and collector health |
+| profile.stop | optional path, wait=false | Freeze and export, or retry failed export; headless can wait for completion |
+
+Profiling operations use a session-owned runtime service, outside the document command
+catalogue and save checkpoints. See [profiler report/API details](profiling.md).
 
 Parent is required when adding to a populated document; an empty document's first SCP
 is the root. The root cannot be reparented; wrap it in an empty root first. Imported

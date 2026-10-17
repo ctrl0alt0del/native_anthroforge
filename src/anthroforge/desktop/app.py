@@ -46,7 +46,7 @@ def attach_window(engine, controller, inputs):
     window.frameSwapped.connect(controller.frame_presented)
     window.installEventFilter(inputs)
     if getattr(controller, "qt_profiler", None):
-        controller.qt_profiler.attach(window)
+        controller.qt_profiler.attach(window, controller)
 
 
 def setup_profile_controls(controller, engine):

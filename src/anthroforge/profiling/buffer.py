@@ -1,44 +1,48 @@
 """Bounded immutable event storage with explicit loss and retention accounting."""
 
 import json
-from collections import deque
+from heapq import heappop, heappush
 from threading import Lock
 
 
 class EventBuffer:
     def __init__(self, seconds=120, byte_limit=128 * 1024 * 1024):
         self.window_us, self.limit = seconds * 1_000_000, byte_limit
-        self.records, self.lock = deque(), Lock()
+        self.records, self.lock = [], Lock()
         self.bytes = self.evicted = self.oversized = self.received = 0
         self.watermark = 0.0
 
     def append(self, event):
         payload = json.dumps(event, separators=(",", ":"), allow_nan=False).encode()
-        size, end = len(payload) + 128, event["ts"] + event.get("dur", 0)
+        size, end = len(payload) + 256, event["ts"] + event.get("dur", 0)
         with self.lock:
             self.received += 1
             self.watermark = max(self.watermark, end)
             if size > min(self.limit, 16384):
                 self.oversized += 1
                 return
-            self.records.append((end, size, payload))
+            heappush(self.records, (end, self.received, size, payload))
             self.bytes += size
             self.trim()
 
     def trim(self):
         cutoff = self.watermark - self.window_us
         while self.records and (self.bytes > self.limit or self.records[0][0] < cutoff):
-            _, size, _ = self.records.popleft()
+            _, _, size, _ = heappop(self.records)
             self.bytes -= size
             self.evicted += 1
 
     def events(self):
         cutoff = self.watermark - self.window_us
-        for end, _, payload in self.records:
+        for end, _, _, payload in sorted(self.records):
             if end >= cutoff:
                 yield clip_event(json.loads(payload), cutoff)
 
     def describe(self):
+        with self.lock:
+            return self.snapshot()
+
+    def snapshot(self):
         return dict(
             received=self.received,
             retained=len(self.records),

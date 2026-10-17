@@ -1,4 +1,4 @@
-# AnthroForge 0.1.3 architecture
+# AnthroForge 0.1.4 architecture
 
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through
@@ -169,7 +169,7 @@ MCP, additional primitive families, fibres, muscles and skin remain separate fea
 
 Qt/PySide versions must match when rebuilding the native viewport plugin. Windows DLL
 preloading intentionally ensures Python and Qt use the same geometry registry. The current
-portable package contains only dependencies needed by 0.1.3; numerical development extras
+portable package contains only dependencies needed by 0.1.4; numerical development extras
 remain available for later migrations.
 
 ## Interaction and selection presentation (0.1.3)
@@ -244,3 +244,24 @@ opacity and the mask never modify authored records or trigger construction calcu
 promotion, control detachment and rescheduling. It installs a valid hierarchy atomically
 and retains existing history/checkpoint contracts. UI, keyboard and JSON clients call the
 same `scp.delete`; shared-control deletion continues using `control.delete`.
+
+## Runtime profiling (0.1.4)
+
+`profiling/RuntimeProfiler` owns explicit recording, bounded immutable events and
+atomic background export. It has no dependency on Qt, documents or task policy.
+Session composes it with command/transaction boundaries, task lifecycle adapters and
+registered native calls. UI and API operations use the same runtime operations;
+recording is never an authored revision or checkpoint-blocking job.
+
+`desktop/QtProfiler` is the C ABI adapter to `native/profiling`. The Qt 6.12.0 private
+client runs on its own thread and enables only profiling services via a local socket.
+Native input dispatch, model observers and render signals feed a bounded queue. No
+Python callback executes on the render thread. Collection is inactive until requested;
+only recording/export uses a Python polling worker and status timer. Qt engine support
+is initialized dormant before engine creation and qualified separately for idle cost.
+
+Stop freezes application spans, flushes the collector and streams the frozen ring to
+an atomic report ZIP. Failed exports retain the ring for retry. Late task returns
+cannot append to an exporting capture. Revision/job metadata connects work without
+making the profiler a scheduler or geometry owner. Read sets, publication and undo
+rules are unchanged. See [report limits and interpretation](profiling.md).

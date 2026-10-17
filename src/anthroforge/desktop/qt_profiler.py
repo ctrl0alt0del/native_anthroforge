@@ -4,10 +4,20 @@ import ctypes as c
 import json
 from time import perf_counter_ns
 
+from PySide6.QtCore import QObject
 from PySide6.QtGui import QGuiApplication
 from shiboken6 import getCppPointer, wrapInstance
 
 from .runtime import build_directory
+
+INPUT_TYPES = {
+    2: "mouse_press",
+    3: "mouse_release",
+    5: "mouse_move",
+    6: "key_press",
+    7: "key_release",
+    31: "wheel",
+}
 
 
 def profiler_application():
@@ -23,6 +33,7 @@ class QtProfiler:
         self.library = c.CDLL(str(build_directory() / "bin" / "af_profiler.dll"))
         self.library.af_profile_read.argtypes = [c.c_void_p, c.c_int, c.c_int]
         self.library.af_profile_window.argtypes = [c.c_void_p]
+        self.library.af_profile_root.argtypes = [c.c_void_p]
         self.library.af_profile_clock.restype = c.c_int64
         before = perf_counter_ns()
         native = self.library.af_profile_clock()
@@ -30,11 +41,17 @@ class QtProfiler:
         self.clock_offset = (before + after) // 2 - native
         self.clock_error = (after - before) // 2
         self.library.af_profile_initialize()
+        self.window, self.presentation = None, {}
 
-    def attach(self, window):
+    def attach(self, window, controller=None):
+        self.window = window
         self.library.af_profile_window(getCppPointer(window)[0])
+        if controller:
+            self.library.af_profile_root(getCppPointer(controller)[0])
 
     def start(self):
+        if self.window:
+            self.presentation = presentation(self.window)
         self.library.af_profile_start()
         state = self.status()
         if state["failure"]:
@@ -57,7 +74,23 @@ class QtProfiler:
         return events
 
     def status(self):
-        return dict(json.loads(self.read(True)), bridge_clock_error_ns=self.clock_error)
+        return dict(
+            json.loads(self.read(True)),
+            bridge_clock_error_ns=self.clock_error,
+            presentation=self.presentation,
+        )
 
     def close(self):
         self.library.af_profile_shutdown()
+
+
+def presentation(window):
+    keyboard = window.findChild(QObject, "keyboardManager")
+    bindings = keyboard.property("modifierBindings") if keyboard else {}
+    return dict(
+        width=window.width(),
+        height=window.height(),
+        pixel_ratio=window.devicePixelRatio(),
+        modifier_bindings=bindings.toVariant() if hasattr(bindings, "toVariant") else bindings,
+        input_types=INPUT_TYPES,
+    )

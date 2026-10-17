@@ -10,6 +10,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 
 from anthroforge import __version__
 
+from .identity import build_identity
 from .summary import Summary
 
 
@@ -27,6 +28,7 @@ def environment():
         architecture=platform.machine(),
         cpu=platform.processor(),
         logical_cpus=os.cpu_count(),
+        build=build_identity(),
     )
 
 

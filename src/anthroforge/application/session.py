@@ -10,6 +10,7 @@ from anthroforge.core.jobs import Job
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.profiling import RuntimeProfiler
 from anthroforge.profiling.spans import measured
+from anthroforge.profiling.tasks import operation as profile_operation
 
 from .assets import Asset
 from .coordinator import TaskCoordinator
@@ -143,7 +144,7 @@ class Session:
         from .commands import execute
 
         if operation.startswith("profile."):
-            return self.profiler.operation(operation, arguments)
+            return profile_operation(self, operation, arguments)
         return self.profiler.call(
             "command",
             operation,

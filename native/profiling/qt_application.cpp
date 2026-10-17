@@ -1,6 +1,9 @@
 #include "qt_profile.h"
 #include <QGuiApplication>
 #include <QInputEvent>
+#include <QScopedValueRollback>
+
+namespace { thread_local bool dispatchingInput=false; }
 
 class ProfileApplication final : public QGuiApplication {
 public:
@@ -16,7 +19,8 @@ static bool inputEvent(QEvent* event) {
 
 bool ProfileApplication::notify(QObject* object,QEvent* event) {
     auto* sink=profileRuntime().receiver;
-    if (!sink || !sink->active || !inputEvent(event)) return QGuiApplication::notify(object,event);
+    if (!sink || !sink->active || dispatchingInput || !inputEvent(event)) return QGuiApplication::notify(object,event);
+    QScopedValueRollback<bool> guard(dispatchingInput,true);
     const auto start=profileClock();
     const int type=int(event->type()),mods=int(static_cast<QInputEvent*>(event)->modifiers());
     const bool result=QGuiApplication::notify(object,event);

@@ -71,3 +71,13 @@ Complete four-case rerun, robustness review, final gate and packaging still pend
 Use normal Windows setup/build tools; Qt SDK and .venv live in ignored directories.
 Production fixture is generated from examples/primitives/cube.obj plus a body curve.
 Push coherent checkpoints under work_continuity.md; no additional agents are active.
+
+2026-10-17 checkpoint: four GUI cases passed on the preceding recorder build, and
+Perfetto v58.2 imported the trace (112,293 slices, no import errors). The development
+gate passed 405 tests before subsequent robustness changes. New lifecycle tests cover
+active/queued jobs, cancellation, collector failure and native hook restoration.
+Current robustness changes add heap-ordered retention, bounded unfinished-span metadata,
+fixed histogram storage, build identity, explicit Qt decoding costs and UI active-job
+snapshots. Native build and 15 targeted tests pass. A tighter initial summary-name cap
+hid Activity attribution in the GUI rerun; restored a 2,048-name budget with compact
+histogram arrays. Final GUI rerun, overhead trials, full gate/package remain pending.

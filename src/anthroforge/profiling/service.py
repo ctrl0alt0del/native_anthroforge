@@ -25,6 +25,7 @@ class RuntimeProfiler:
         self.memory_limit, self.seconds = 128 * 1024 * 1024, 120
         self.manifest = {}
         self.lock = RLock()
+        self.collector_disabled = False
 
     def start(self, seconds=120, memory_mib=128):
         lifecycle.validate_start(self, seconds, memory_mib)
@@ -32,6 +33,7 @@ class RuntimeProfiler:
         self.recording_id, self.generation = str(uuid4()), self.generation + 1
         self.buffer = EventBuffer(seconds, self.memory_limit - lifecycle.reserve(self))
         self.losses, self.collector_status = Counter(), {}
+        self.collector_disabled = False
         self.path, self.error, self.record_cost_ns, self.drain_cost_ns = "", "", 0, 0
         self.stop_event.clear()
         self.done.clear()
@@ -134,5 +136,5 @@ class RuntimeProfiler:
         if self.state == "recording":
             self.stop()
         if self.worker:
-            self.worker.join(timeout=4)
+            self.worker.join()
         self.native.stop()

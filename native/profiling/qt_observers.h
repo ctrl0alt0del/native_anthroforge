@@ -19,3 +19,4 @@ private:
 
 void observeModels(QObject* root,ProfileReceiver* receiver);
 void stopObservingModels();
+void observeModelRoot(QObject* root);

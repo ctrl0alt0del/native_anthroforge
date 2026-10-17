@@ -14,8 +14,8 @@ QJsonObject ProfileReceiver::describe(const QQmlProfilerEventType& type) const {
     const auto location=type.location();
     static const char* categories[]={"painting","compiling","creating","binding","signal","javascript"};
     const int range=int(type.rangeType());
-    const QString category=range<6?categories[range]:"scenegraph";
     const QString file=QUrl(location.filename()).fileName();
+    const QString category=file=="ProfileStatus.qml"?"profiler_ui":range<6?categories[range]:"scenegraph";
     return {{"cat","qml."+category},{"name",category+":"+file+":"+QString::number(location.line())},
         {"pid",1},{"tid",range<6?-1:-2},
         {"args",QJsonObject{{"file",file},{"line",location.line()},{"column",location.column()},

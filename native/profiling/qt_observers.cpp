@@ -12,7 +12,8 @@ ModelObserver::ModelObserver(QObject* root,ProfileReceiver* sink): QObject(root)
 }
 
 void ModelObserver::watch(QObject* object) {
-    if (watched.contains(object) || object==this || watched.size()>=16384) return;
+    if (watched.contains(object) || object==this) return;
+    if (watched.size()>=16384) { ++receiver->modelWatchSkipped; return; }
     watched.insert(object);
     object->installEventFilter(this);
     connect(object,&QObject::destroyed,this,[this,object] { watched.remove(object); });
@@ -55,3 +56,5 @@ void observeModels(QObject* root,ProfileReceiver* receiver) {
 }
 
 void stopObservingModels() { delete observer; }
+
+void observeModelRoot(QObject* root) { if (observer && root) observer->watch(root); }

@@ -2,6 +2,7 @@
 
 import configparser
 import importlib.metadata
+import json
 import shutil
 import sys
 from pathlib import Path
@@ -9,6 +10,7 @@ from pathlib import Path
 import PySide6
 
 from anthroforge import __version__
+from anthroforge.profiling.identity import build_identity
 
 ROOT = Path(__file__).resolve().parents[1]
 STAGE = ROOT / "build" / "package-input"
@@ -18,6 +20,7 @@ PACKAGES = ("numpy", "PySide6", "PySide6_Essentials", "PySide6_Addons", "shiboke
 
 def stage():
     STAGE.mkdir(parents=True, exist_ok=True)
+    (STAGE / "build.json").write_text(json.dumps(dict(build_identity(), packaged=True)))
     shutil.copy2(ROOT / "launch.py", STAGE / "AnthroForge.py")
     shutil.copytree(
         ROOT / "src/anthroforge",
@@ -83,6 +86,7 @@ def copy_documentation():
 
 def copy_runtime(runtime):
     (runtime / "bin").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(STAGE / "build.json", runtime / "build.json")
     for name in ("af_native.dll", "af_viewport.dll", "af_profiler.dll"):
         shutil.copy2(ROOT / "build/dev/bin" / name, runtime / "bin" / name)
     shutil.copytree(

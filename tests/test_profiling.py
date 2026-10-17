@@ -48,7 +48,7 @@ def test_disabled_profiler_does_not_collect_or_create_worker():
 
 def test_recording_is_not_a_document_edit_or_calculation(session, tmp_path):
     before, history = session.document, len(session.history.entries)
-    session.command("profile.start", memory_mib=2)
+    session.command("profile.start", memory_mib=16)
     assert session.document is before and not session.scheduler.blocked
     session.command("inspect")
     result = session.command("profile.stop", path=str(tmp_path / "report.zip"), wait=True)
@@ -61,7 +61,7 @@ def test_recording_is_not_a_document_edit_or_calculation(session, tmp_path):
 
 
 def test_capture_native_and_task_stages(session, tmp_path):
-    session.command("profile.start", memory_mib=4)
+    session.command("profile.start", memory_mib=16)
     session.command("primitive.create", kind="BODY")
     session.command("wait", timeout=5)
     path = tmp_path / "body.zip"
@@ -75,7 +75,7 @@ def test_capture_native_and_task_stages(session, tmp_path):
 
 def test_export_failure_keeps_capture_for_retry(tmp_path):
     profiler = RuntimeProfiler()
-    profiler.start(memory_mib=2)
+    profiler.start(memory_mib=16)
     profiler.call("test", "sum", sum, [1, 2])
     blocked = tmp_path / "blocked"
     blocked.write_text("file, not directory")
@@ -90,7 +90,7 @@ def test_export_failure_keeps_capture_for_retry(tmp_path):
 def test_repeated_recordings_do_not_retain_previous_events(tmp_path):
     profiler = RuntimeProfiler()
     for name in ("first", "second"):
-        profiler.start(memory_mib=2)
+        profiler.start(memory_mib=16)
         profiler.call("test", name, sum, [1])
         profiler.stop(tmp_path / f"{name}.zip", wait=True)
     data = bundle(tmp_path / "second.zip")["summary.json"]["durations"]
@@ -101,7 +101,7 @@ def test_recording_lifecycle_rejects_overlapping_start(tmp_path):
     profiler = RuntimeProfiler()
     with pytest.raises(ValueError):
         profiler.stop()
-    profiler.start(memory_mib=2)
+    profiler.start(memory_mib=16)
     with pytest.raises(ValueError):
         profiler.start()
     profiler.stop(tmp_path / "done.zip", wait=True)
@@ -109,7 +109,7 @@ def test_recording_lifecycle_rejects_overlapping_start(tmp_path):
 
 def test_stop_marks_running_span_and_late_return_does_not_change_report(tmp_path):
     profiler, entered, release = RuntimeProfiler(), Event(), Event()
-    profiler.start(memory_mib=2)
+    profiler.start(memory_mib=16)
     with ThreadPoolExecutor() as pool:
         work = pool.submit(profiler.call, "test", "waiting", blocking, entered, release)
         assert entered.wait(2)

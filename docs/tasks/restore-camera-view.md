@@ -3,7 +3,7 @@
 - Task branch: `codex/restore-camera-view`
 - Integration branch: `main`
 - Starting revision: `24761722f666ff33c23f22ca9188303b80998fe5`
-- Status: pending validation
+- Status: complete
 - Last updated: 2026-10-17 (Europe/Bucharest)
 - Active writer: desktop chat implementing camera restoration
 
@@ -37,19 +37,22 @@ Passed: `uv run --no-sync python tools/view_gesture_acceptance.py` with restorat
 direct/gizmo/modal transforms and Ctrl-snapping, unchanged points, undo and cancellation.
 Original/restored camera captures and active-edit capture inspected visually.
 Passed `./tools/check.ps1` at `a3667ad`: all 396 tests, native build/CTest, style/type checks,
-numerical imports and native loading. Full portable rebuild is running via `./tools/package.ps1`;
-its log is `build/camera-restore-package.log`. Portable runtime checks remain pending.
+numerical imports and native loading. Passed full rebuild via `./tools/package.ps1` and
+`uv run --no-sync python tools/check_portable.py dist/AnthroForge.dist/AnthroForge.exe build/camera-restore-portable-check`.
+Packaged QML matches qualified source; packaged desktop capture inspected. Later commits
+update documentation only. Ownership review is recorded in development_status.md.
 Initial repository is clean apart from the unrelated untracked root `__init__.py`.
 
 ## Next actions and blockers
 
-1. Finish the portable rebuild, then run `tools/check_portable.py` against the resulting executable.
-2. Inspect packaged capture and refresh corresponding source archive.
-3. Record final validation, then merge/push against latest main; ownership review is in development_status.md.
+No remaining implementation or acceptance work. Deliver the completed task through the normal
+merge/push to main; inspect Git history for the merge and remote reachability.
 
 ## Recovery inputs
 
 Use the existing Windows setup and ignored native build. GUI fixtures are generated
 by maintained acceptance tools; no external anatomical models are required.
 Ignored GUI evidence: `build/camera-restore-review` and `build/view-gesture-review`.
+Portable executable: `dist/AnthroForge.dist/AnthroForge.exe`; corresponding source archive:
+`dist/AnthroForge-0.1.3-source.zip`. Build/portable logs and captures are local-only ignored files.
 The containing Git commit identifies this checkpoint; inspect branch/remote history.

@@ -514,3 +514,9 @@ shared camera-change/rebase lifecycle. Keyboard bindings remain in the keyboard 
 buttons and menu invoke the same viewport operation. No anatomical state, scheduler, native
 geometry or project-format responsibilities changed. Workspace persistence stores the current
 camera using its existing path, while the temporary return point is cleared on camera loading.
+
+The full Windows `tools/package.ps1` rebuild passed. `tools/check_portable.py` passed with
+minimal PATH: import, attachments, primitives/deformers, deletion/subdivision, save/inspect,
+GPU rendering and GUI smoke checks. Packaged camera QML hashes match the qualified source;
+the packaged desktop capture was inspected. Evidence is in `build/camera-restore-portable-check`.
+The source archive and portable documentation were refreshed; these build outputs remain local.

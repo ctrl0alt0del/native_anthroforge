@@ -1,5 +1,6 @@
 #include "qt_profile.h"
 #include <QUrl>
+#include <QJsonArray>
 
 void ProfileReceiver::addEventType(const QQmlProfilerEventType& type) {
     const auto size=256+2*(type.data().size()+type.location().filename().size());
@@ -16,7 +17,7 @@ QJsonObject ProfileReceiver::describe(const QQmlProfilerEventType& type) const {
     const QString category=range<6?categories[range]:"scenegraph";
     const QString file=QUrl(location.filename()).fileName();
     return {{"cat","qml."+category},{"name",category+":"+file+":"+QString::number(location.line())},
-        {"pid",1},{"tid",range<6?"qml":"scenegraph"},
+        {"pid",1},{"tid",range<6?-1:-2},
         {"args",QJsonObject{{"file",file},{"line",location.line()},{"column",location.column()},
             {"detail",type.detailType()}}}};
 }
@@ -40,6 +41,9 @@ void ProfileReceiver::addEvent(const QQmlProfilerEvent& event) {
     const auto& type=types[event.typeIndex()];
     if (type.rangeType()<MaximumRangeType) { rangeEvent(event); return; }
     auto data=describe(type);
+    QJsonArray values;
+    for (int i=0;i<8;++i) values.append(event.number<qint64>(i));
+    auto args=data["args"].toObject(); args.insert("qt_values",values); data.insert("args",args);
     data.insert("ph","i"); data.insert("s","t");
     data.insert("ts",double(event.timestamp()+offset)/1000);
     record(data);
@@ -48,6 +52,6 @@ void ProfileReceiver::addEvent(const QQmlProfilerEvent& event) {
 void ProfileReceiver::instant(const char* category,const char* name,QJsonObject args) {
     if (!active) return;
     record({{"cat",category},{"name",name},{"ph","i"},{"s","t"},{"pid",1},
-        {"tid",QString::number(quintptr(QThread::currentThreadId()))},
+        {"tid",qint64(quintptr(QThread::currentThreadId()))},
         {"ts",double(profileClock())/1000},{"args",args}});
 }

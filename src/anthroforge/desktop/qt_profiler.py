@@ -4,9 +4,18 @@ import ctypes as c
 import json
 from time import perf_counter_ns
 
-from shiboken6 import getCppPointer
+from PySide6.QtGui import QGuiApplication
+from shiboken6 import getCppPointer, wrapInstance
 
 from .runtime import build_directory
+
+
+def profiler_application():
+    library = c.CDLL(str(build_directory() / "bin" / "af_profiler.dll"))
+    library.af_profile_application.restype = c.c_void_p
+    app = wrapInstance(library.af_profile_application(), QGuiApplication)
+    app._profiler_library = library
+    return app
 
 
 class QtProfiler:

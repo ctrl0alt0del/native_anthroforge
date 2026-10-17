@@ -30,6 +30,7 @@ def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicatio
     engine.addImportPath(str(build_directory() / "qml"))
     engine.rootContext().setContextProperty("workspace", controller)
     engine.rootContext().setContextProperty("authoring", controller.authoring)
+    setup_profile_controls(controller, engine)
     inputs = InputState(engine)
     engine.rootContext().setContextProperty("heldInput", inputs)
     engine.warnings.connect(lambda errors: warnings.extend(error.toString() for error in errors))
@@ -46,6 +47,15 @@ def attach_window(engine, controller, inputs):
     window.installEventFilter(inputs)
     if getattr(controller, "qt_profiler", None):
         controller.qt_profiler.attach(window)
+
+
+def setup_profile_controls(controller, engine):
+    from .profile_controls import ProfileControls
+
+    controller.profile_controls = ProfileControls(
+        controller, getattr(controller, "qt_profiler", None)
+    )
+    engine.rootContext().setContextProperty("performance", controller.profile_controls)
 
 
 def launch(args: argparse.Namespace, app: QGuiApplication, profiler=None) -> int:
@@ -92,10 +102,21 @@ def prepare_view(controller, project):
 def main() -> int:
     args = arguments()
     QQuickStyle.setStyle("Basic")
-    app = QGuiApplication([sys.argv[0]])
-    app.setApplicationName("AnthroForge")
     with native_runtime():
+        return run_application(args)
+
+
+def run_application(args):
+    from shiboken6 import delete
+
+    from .qt_profiler import profiler_application
+
+    app = profiler_application()
+    app.setApplicationName("AnthroForge")
+    try:
         return profiled_launch(args, app)
+    finally:
+        delete(app)
 
 
 def profiled_launch(args, app):

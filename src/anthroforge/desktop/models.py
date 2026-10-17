@@ -2,6 +2,13 @@
 
 from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt, Signal
 
+from anthroforge.profiling.spans import measured
+
+
+def model_profiler(model):
+    session = getattr(model.parent(), "session", None)
+    return session.profiler if session else None
+
 
 class RenderModel(QAbstractListModel):
     activated = Signal()
@@ -27,6 +34,7 @@ class RenderModel(QAbstractListModel):
             return self.rows[index.row()]
         return None
 
+    @measured("publication", model_profiler)
     def publish(self, rows, assets=None):
         self.wanted = {row["key"]: row for row in rows}
         if assets:
@@ -54,6 +62,7 @@ class RenderModel(QAbstractListModel):
                 self.rows[index] = changed
                 self.dataChanged.emit(self.index(index), self.index(index))
 
+    @measured("publication", model_profiler)
     def drain(self):
         for _ in range(min(2, len(self.pending))):
             row = self.pending.pop(0)
@@ -63,6 +72,7 @@ class RenderModel(QAbstractListModel):
             self.endInsertRows()
             self.staged_frame = self.frame
 
+    @measured("publication", model_profiler)
     def presented(self):
         self.frame += 1
         self._record_displayed()

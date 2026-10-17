@@ -62,10 +62,13 @@ ApplicationWindow {
                         MenuItem { text: "Attachment markers"; checkable: true; checked: workspace.state.anchors; onTriggered: workspace.run("workspace.update",{anchors:checked}) }
                         MenuItem { text: "Performance diagnostics"; checkable: true; checked: workspace.state.diagnostics; onTriggered: workspace.run("workspace.update",{diagnostics:checked}) }
                         MenuItem { text: "Activity panel"; checkable: true; checked: window.activityOpen; onTriggered: window.activityOpen = checked }
+                        MenuSeparator {}
+                        MenuItem { text: (performance.state.recording ? "Stop recording" : "Record performance") + "    " + keyboard.shortcut("recordPerformance"); onTriggered: performance.toggle() }
                     }
                     Menu { title: "Help"; MenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() } }
                 }
                 Item { Layout.fillWidth: true }
+                ProfileStatus { }
                 Label { text: "Workspace"; color: Theme.muted; font.pixelSize: 11 }
                 UiCombo { Layout.preferredWidth: 175; model: workspace.state.workspaces; currentIndex: workspace.state.workspace; onActivated: workspace.run("workspace.select",{index:currentIndex}) }
                 UiButton { text: "Focus…"; hint: "Create a workspace from the selected SCP"; enabled: !!workspace.selectedId && !workspace.state.waiting; onClicked: focusDialog.open() }
@@ -268,6 +271,7 @@ ApplicationWindow {
         grab: () => viewport.startModalTransform("Move"), turn: () => viewport.startModalTransform("Rotate"), resize: () => viewport.startModalTransform("Scale"),
         viewX: () => viewport.setView("Right"), viewY: () => viewport.setView("Front"), viewZ: () => viewport.setView("Top"),
         restoreView: () => viewport.restoreView(),
+        recordPerformance: () => performance.toggle(),
         confirm: () => viewport.confirmTransform(),
         projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,
         cancel: () => { viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }

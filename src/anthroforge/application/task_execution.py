@@ -6,6 +6,7 @@ from time import perf_counter
 from typing import Any
 
 from anthroforge.core.jobs import Job
+from anthroforge.profiling import tasks as trace
 
 from .task_schedulers import INLINE_BUDGET_MS, INLINE_WINDOW_MS
 
@@ -32,21 +33,22 @@ class InlineBudget:
         self.spent_ms += job.prepare_ms + job.compute_ms + job.publish_ms
 
 
-def execute(job: Job, payload: Any) -> Any:
+def execute(job: Job, payload: Any, profiler: Any = None) -> Any:
     started = perf_counter()
     try:
         if job.cancel.is_set():
             return None
         job.state, job.progress = "running", "Computing"
-        return job.execute(payload, job.cancel)
+        trace.event(profiler, job, "running")
+        return trace.call(profiler, job, "execute", job.execute, payload, job.cancel)
     finally:
         job.compute_ms = (perf_counter() - started) * 1000
 
 
-def completed_future(job: Job, payload: Any) -> Future[Any]:
+def completed_future(job: Job, payload: Any, profiler: Any = None) -> Future[Any]:
     future: Future[Any] = Future()
     try:
-        future.set_result(execute(job, payload))
+        future.set_result(execute(job, payload, profiler))
     except Exception as error:
         future.set_exception(error)
     return future

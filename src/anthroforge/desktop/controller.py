@@ -4,6 +4,7 @@ from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
 from anthroforge.application.session import Session
 from anthroforge.native import scene
+from anthroforge.profiling.spans import measured
 
 from . import controller_actions as actions
 from . import project_actions, scene_state
@@ -89,6 +90,7 @@ class Controller(QObject):
     def metrics(self):
         return self._metrics
 
+    @measured("ui", lambda owner: owner.session.profiler)
     def notify(self):
         self._state = self.snapshot()
         self._jobs = [job.describe() for job in self.session.scheduler.jobs[-40:]]
@@ -132,6 +134,7 @@ class Controller(QObject):
             self.notify()
         self.session.scheduler.metrics.observe("tick", monotonic() - started)
 
+    @measured("ui", lambda owner: owner.session.profiler)
     def process_tick(self):
         self.session.scheduler.tick()
         project_actions.poll(self)
@@ -148,6 +151,7 @@ class Controller(QObject):
         self.last_frame = now
         self.render_model.presented()
 
+    @measured("publication", lambda owner: owner.session.profiler)
     def activate_geometry(self):
         scene_state.picking_inputs(self, self.render_model.active_rows())
         from anthroforge.application.geometry_ownership import collect
@@ -162,6 +166,7 @@ class Controller(QObject):
         ):
             self.refresh()
 
+    @measured("ui", lambda owner: owner.session.profiler)
     def refresh(self):
         self.rows = scene_state.records(self)
         self.render_model.publish(scene_state.render_rows(self.rows), self.session.assets)

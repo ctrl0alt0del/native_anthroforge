@@ -8,6 +8,8 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Workspace
 from anthroforge.core.jobs import Job
 from anthroforge.native.mesh import GeometryEngine
+from anthroforge.profiling import RuntimeProfiler
+from anthroforge.profiling.spans import measured
 
 from .assets import Asset
 from .coordinator import TaskCoordinator
@@ -21,8 +23,7 @@ class Session:
         self.document = Document(name=name)
         self.history = History(self.document)
         self.assets: dict[str, Asset] = {}
-        self.scheduler = TaskCoordinator(lambda: self.document)
-        self.scheduler.can_publish = self.can_publish
+        self.initialize_runtime()
         self._engine: GeometryEngine | None = None
         self.serial = 0
         self.path: Path | None = None
@@ -32,10 +33,17 @@ class Session:
         self.waiting_save = False
         self.replay_callback: Any = None
 
+    def initialize_runtime(self) -> None:
+        self.profiler = RuntimeProfiler()
+        self.scheduler = TaskCoordinator(lambda: self.document)
+        self.scheduler.profiler = self.profiler
+        self.scheduler.can_publish = self.can_publish
+
     @property
     def engine(self) -> GeometryEngine:
         if self._engine is None:
             self._engine = GeometryEngine()
+            self.profiler.native.attach(self._engine)
         return self._engine
 
     def can_publish(self, job: Job) -> bool:
@@ -77,11 +85,13 @@ class Session:
             key: authored_entity(self.document.entity(key), value) for key, value in changed.items()
         }
 
+    @measured("transaction", lambda session: session.profiler)
     def begin(self) -> None:
         if self.waiting_save:
             raise ValueError("Editing is blocked while waiting to save.")
         self.history.begin(self.document)
 
+    @measured("transaction", lambda session: session.profiler)
     def commit(self) -> None:
         self.history.commit(self.document, self.replay_callback)
         self.replay_callback = None
@@ -89,12 +99,14 @@ class Session:
 
         released(self)
 
+    @measured("transaction", lambda session: session.profiler)
     def cancel(self) -> None:
         self.document = replace(self.history.cancel(), workspaces=self.document.workspaces)
         self.scheduler.restore(self.history.surviving())
         self.replay_callback = None
         self.resume_calculations()
 
+    @measured("transaction", lambda session: session.profiler)
     def navigate(self, direction: int) -> None:
         if self.waiting_save:
             raise ValueError("History is blocked while waiting to save.")
@@ -130,7 +142,17 @@ class Session:
     def command(self, operation: str, **arguments: Any) -> Any:
         from .commands import execute
 
-        return execute(self, operation, arguments)
+        if operation.startswith("profile."):
+            return self.profiler.operation(operation, arguments)
+        return self.profiler.call(
+            "command",
+            operation,
+            execute,
+            self,
+            operation,
+            arguments,
+            _metadata={"revision": self.document.revision},
+        )
 
     def wait(self, timeout: float | None = None) -> None:
         from .geometry_ownership import collect
@@ -156,6 +178,7 @@ class Session:
 
     def close(self) -> None:
         self.scheduler.close()
+        self.profiler.close()
         if self.file_lock:
             self.file_lock.close()
 

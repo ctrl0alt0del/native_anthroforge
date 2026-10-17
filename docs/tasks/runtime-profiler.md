@@ -32,15 +32,32 @@ render-thread frame milestones. Native build/contracts, function-size tests and
 new native-file style checks pass. Shutdown required explicitly destroying the
 profiler client before its connection: the client owns other connection children.
 The corrected development process exits successfully. Portable build is in progress.
-The shared runtime service, controls, report/export and lifecycle integration remain
-unimplemented; this checkpoint is not merge-ready. Preserve untracked __init__.py.
+The shared runtime service, bounded ring, atomic ZIP export/retry, runtime API,
+F12 controls, model observer, native input dispatch and shared application boundaries
+are now implemented. Nine new headless/buffer/lifecycle tests and mypy pass. Native
+build passes; desktop smoke and screenshot inspection pass with clean shutdown.
+This checkpoint is still not merge-ready. Preserve untracked __init__.py.
 
 Development qualification: `python -m anthroforge.desktop.app --profile-probe
 build/profiler-qualification/development.json` produced 1,748 binding events with
 source locations, 144 frame milestones, zero adapter drops, and clean shutdown.
-This proves collector functionality, not overhead or the complete acceptance case.
+Portable qualification also passed with cleaned environment: 1,710 QML binding
+events, Activity source locations, no drops, clean exit. Complete final packaging
+must be repeated after the rest of the implementation.
 `tools/profiler_qualification.py` prepares serial cube/body drag comparisons; it
-must run without competing builds/benchmarks before interpreting measurements.
+ran a serial none/dormant/dormant/none/record comparison. Handler means (normal/snap)
+were 28.43/33.82, 29.56/33.36, 29.75/33.10, 29.50/32.62 ms. The first recording had
+adapter drops because its diagnostic drainer only transferred one chunk per tick;
+production draining now handles bounded batches on its background worker. Final
+complete-build comparison and clock/memory/error qualification remain outstanding.
+
+Full recorder GUI acceptance passed the first two hidden-Activity normal/snapped
+gestures: F12 start/stop preserved the drag and undo, files had zero drops. Snapped
+report alone shows Activity.qml:23 binding mean 19.45 ms, Controller.notify 25.78 ms,
+native pick 0.030 ms and normal query 0.016 ms. This is attribution evidence, not an
+unprofiled performance estimate. The visible-panel harness initially began its drag
+before panel layout settled; it is corrected to settle layout before projection.
+Complete four-case rerun, robustness review, final gate and packaging still pending.
 
 ## Next actions
 

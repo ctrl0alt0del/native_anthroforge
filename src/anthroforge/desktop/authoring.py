@@ -3,6 +3,8 @@
 import numpy as np
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
+from anthroforge.profiling.spans import measured
+
 from . import authoring_picking
 from . import authoring_state as state
 
@@ -80,6 +82,7 @@ class Authoring(QObject):
     def selectedComponent(self):
         return self._component_lookup.get(self.selection[0], {}) if self.selection else {}
 
+    @measured("ui", lambda owner: owner.controller.session.profiler)
     def notify(self):
         self.hoverChanged.emit()
         self._state = state.data(self)
@@ -110,6 +113,7 @@ class Authoring(QObject):
         )
         return dict(id="components", trs=[*center, 0, 0, 0, 1, 1, 1], readonly=readonly)
 
+    @measured("ui", lambda owner: owner.controller.session.profiler)
     def refresh(self):
         key = state.cache_key(self)
         if key == self._cache_key:

@@ -40,7 +40,11 @@ in environment settings; do not disable TLS verification.
 Review the setup results and **Publish** the environment. Open a new cloud task from it
 and run the checks below to verify the published filesystem, not only the setup session.
 If the interface has a startup skill/instructions field, use the new-shell and refresh
-instructions below. No background application server is required. For the legacy interface,
+instructions in [the saved startup text](cloud_startup.md). It fetches current main guidance
+at the beginning of each new chat before selecting or resuming a task branch, preserving
+local work. Keep the actual environment's Start skill synchronized with this file when it
+changes; editing the repository copy alone does not update the account configuration.
+No background application server is required. For the legacy interface,
 use `bash tools/cloud/setup.sh` as setup and `bash tools/cloud/refresh.sh` as maintenance.
 
 ## Start or resume work

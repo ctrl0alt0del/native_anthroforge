@@ -3,7 +3,7 @@
 - Task branch: `codex/restore-camera-view`
 - Integration branch: `main`
 - Starting revision: `24761722f666ff33c23f22ca9188303b80998fe5`
-- Status: in progress
+- Status: pending validation
 - Last updated: 2026-10-17 (Europe/Bucharest)
 - Active writer: desktop chat implementing camera restoration
 
@@ -23,22 +23,31 @@ Clear it when loading another document/workspace camera. No application/schema c
 
 ## Current state
 
-Inspected camera navigation, controller camera restoration and real-window gesture
-acceptance. No implementation yet. Qt Camera/Shortcut documentation reviewed.
+Implemented the viewport-owned snapshot and shared restore lifecycle, semantic key 4,
+viewport Restore button and View menu action. Consecutive axis switches preserve the
+first snapshot; workspace/document camera restoration clears it. Updated user guidance.
+Qt Camera/Shortcut documentation reviewed. No native or application-model changes needed.
 
 ## Verification
 
-Not yet run: development gate, GUI regression and portable runtime checks.
+Passed on Windows: `uv run --no-sync python tools/camera_restore_acceptance.py`
+(perspective/orthographic, mixed keys/buttons, menu action, no-op restore, fresh subsequent
+snapshot, text focus, rebinding, workspace invalidation and persisted camera values).
+Passed: `uv run --no-sync python tools/view_gesture_acceptance.py` with restoration during
+direct/gizmo/modal transforms and Ctrl-snapping, unchanged points, undo and cancellation.
+Original/restored camera captures and active-edit capture inspected visually.
+Passed focused Ruff and architecture checks. Full development gate and portable checks pending.
 Initial repository is clean apart from the unrelated untracked root `__init__.py`.
 
 ## Next actions and blockers
 
-1. Add shared camera capture/restore, keyboard binding and visible restore controls.
-2. Extend actual QQuickWindow acceptance for navigation, active edits and text focus.
-3. Run gates, inspect GUI evidence, qualify packaged runtime and integrate normally.
+1. Run `./tools/check.ps1` and address any failures.
+2. Refresh portable QML assets through the maintained packaging tool, verify packaged runtime.
+3. Record final validation and ownership review, then merge/push against latest main.
 
 ## Recovery inputs
 
 Use the existing Windows setup and ignored native build. GUI fixtures are generated
 by maintained acceptance tools; no external anatomical models are required.
+Ignored GUI evidence: `build/camera-restore-review` and `build/view-gesture-review`.
 The containing Git commit identifies this checkpoint; inspect branch/remote history.

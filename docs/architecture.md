@@ -219,6 +219,11 @@ View changes recapture the current transform inputs without ending the original 
 Each gesture then resets its pointer reference in the new camera frame; stored cursor coordinates
 are values, not live Qt property wrappers. Cancellation restores the original transaction snapshot.
 Axis views center component selection or SCP bounds, retaining pixels per world unit at that depth.
+The viewport captures a temporary camera value snapshot before the first axis alignment,
+shared by keyboard and button paths. Further axis switches retain it; restore consumes it.
+Position, Euler rotation, distance, projection and view label are restored through the same
+gesture-rebase lifecycle as alignment. Workspace/document camera loading clears the snapshot.
+Only the displayed camera uses existing workspace persistence; the return point is transient.
 Modal rotation uses a native axis-angle adapter around the view direction. Selected curve points
 include their handles during rotation/scale, while translation retains automatic handle behavior.
 

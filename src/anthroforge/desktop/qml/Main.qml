@@ -54,6 +54,7 @@ ApplicationWindow {
                     Menu {
                         title: "View"
                         MenuItem { text: "Frame selected    F"; onTriggered: workspace.frameSelection() }
+                        MenuItem { objectName: "restoreViewMenu"; text: "Restore view    "+keyboard.shortcut("restoreView"); enabled: viewport.canRestoreView; onTriggered: viewport.restoreView() }
                         MenuItem { text: "Orthographic"; checkable: true; checked: viewport.orthographic; onTriggered: viewport.orthographic = checked }
                         MenuItem { text: "X-ray    Alt+Z"; checkable: true; checked: viewport.xray; onTriggered: viewport.xray = checked }
                         MenuSeparator {}
@@ -173,7 +174,7 @@ ApplicationWindow {
     }
     Dialog {
         id: helpDialog; title: "Navigation and shortcuts"; modal: true; anchors.centerIn: parent; standardButtons: Dialog.Close
-        Label { text: "G / R / S    Start Move / Rotate / Scale\nLeft click / Enter    Confirm transform\nRight click / Escape    Cancel transform\nW / E    Select Move / Rotate gizmo\nF    Frame selected\n1 / 2 / 3    X / Y / Z view, centered with zoom preserved\n5    Perspective / Orthographic\nAlt+Z    X-ray\nAlt-click    Select through overlapping objects\nMiddle or right drag    Orbit\nShift + drag    Pan\nMouse wheel    Zoom\nEscape    Cancel transform or anchor picking\nCtrl+I    Import mesh\nDelete    Remove selected object, preserving children\nShift while transforming    Fine adjustment\nShift in curve editing    Preview; click to insert points\nCtrl while moving a curve point    Snap to another SCP\nWheel while snapping    Surface offset\nMiddle click / release Ctrl    Reset offset\nCtrl-click a component    Extend selection"; lineHeight: 1.7; color: Theme.text }
+        Label { text: "G / R / S    Start Move / Rotate / Scale\nLeft click / Enter    Confirm transform\nRight click / Escape    Cancel transform\nW / E    Select Move / Rotate gizmo\nF    Frame selected\n1 / 2 / 3    X / Y / Z view, centered with zoom preserved\n"+keyboard.shortcut("restoreView")+"    Restore camera before axis views\n5    Perspective / Orthographic\nAlt+Z    X-ray\nAlt-click    Select through overlapping objects\nMiddle or right drag    Orbit\nShift + drag    Pan\nMouse wheel    Zoom\nEscape    Cancel transform or anchor picking\nCtrl+I    Import mesh\nDelete    Remove selected object, preserving children\nShift while transforming    Fine adjustment\nShift in curve editing    Preview; click to insert points\nCtrl while moving a curve point    Snap to another SCP\nWheel while snapping    Surface offset\nMiddle click / release Ctrl    Reset offset\nCtrl-click a component    Extend selection"; lineHeight: 1.7; color: Theme.text }
     }
     Dialog { id: messageDialog; title: "Last operation"; modal: true; anchors.centerIn: parent; width: Math.min(560, window.width-80); standardButtons: Dialog.Close; Label { width: parent.width; text: workspace.state.message; wrapMode: Text.WrapAnywhere; color: Theme.text } }
     FileDialog { id: importFile; title: "Import primitive mesh"; nameFilters: ["Mesh files (*.obj *.stl *.ply)"]; onAccepted: { window.chosenImport = selectedFile.toString(); importUnits.currentIndex = 0; importOptions.open(); } }
@@ -266,6 +267,7 @@ ApplicationWindow {
         move: () => activeTool = "Move", rotate: () => activeTool = "Rotate", scale: () => activeTool = "Scale",
         grab: () => viewport.startModalTransform("Move"), turn: () => viewport.startModalTransform("Rotate"), resize: () => viewport.startModalTransform("Scale"),
         viewX: () => viewport.setView("Right"), viewY: () => viewport.setView("Front"), viewZ: () => viewport.setView("Top"),
+        restoreView: () => viewport.restoreView(),
         confirm: () => viewport.confirmTransform(),
         projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,
         cancel: () => { viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }

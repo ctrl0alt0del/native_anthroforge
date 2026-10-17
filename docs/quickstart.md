@@ -25,7 +25,11 @@ Enter to confirm; right-click or Escape cancels. W/E selects the Move/Rotate giz
 **1/2/3** looks along global X/Y/Z, respectively, in orthographic projection; 5 toggles
 projection. Axis views center the active selection and preserve apparent zoom. During
 component editing they center the selected points; otherwise they center the SCP geometry.
-Switch views during a drag or modal transform to adjust another pair of coordinates;
+Press **4** or click **Restore** to return to the camera before entering axis views,
+including its position, rotation, zoom and projection. Repeated axis keys or buttons
+keep that original camera until restored; afterward the next axis switch captures a
+new original. Switching workspaces or documents clears this temporary return point.
+Switch views or restore during a drag or modal transform to adjust another pair of coordinates;
 the current edit stays open, without jumping or adding an undo step. These shortcuts leave text entry alone. Alt-click
 cycles through deeper eligible SCP hits. Hover predicts ordinary selection.
 

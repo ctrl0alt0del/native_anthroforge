@@ -30,6 +30,8 @@ Item {
     property point previousPointer: Qt.point(-2, -2)
     property bool cameraDirty: true
     property bool restoringCamera: false
+    property var preservedCamera: null
+    readonly property bool canRestoreView: preservedCamera !== null
     readonly property var selected: authoring.transformData
     readonly property bool modalTransforming: modalTransform.active
     readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming
@@ -122,12 +124,37 @@ Item {
     function setView(name) {
         const rotations = {Front:[0,0,0], Right:[0,90,0], Top:[-90,0,0]};
         const angles = rotations[name], center=workspace.selectionCenter();
+        if(!angles) return;
+        if(!canRestoreView) preservedCamera=captureCamera();
         workspace.rebaseTransform();
         centerView(center);
         cameraOrigin.eulerRotation = Qt.vector3d(angles[0],angles[1],angles[2]);
         orthographic = true; viewName = name;
-        curveEditor.rebase(); gizmo.rebase(); modalTransform.rebase();
-        cameraDirty = true; cameraSave.restart();
+        finishCameraChange();
+    }
+    function captureCamera() {
+        const p=cameraOrigin.position, r=cameraOrigin.eulerRotation;
+        return {position:[p.x,p.y,p.z],rotation:[r.x,r.y,r.z],
+            distance:distance,orthographic:orthographic,name:viewName};
+    }
+    function restoreView() {
+        if(!canRestoreView) return;
+        const saved=preservedCamera, p=saved.position, r=saved.rotation;
+        workspace.rebaseTransform();
+        cameraOrigin.position=Qt.vector3d(p[0],p[1],p[2]);
+        cameraOrigin.eulerRotation=Qt.vector3d(r[0],r[1],r[2]);
+        distance=saved.distance;
+        orthographic=saved.orthographic;
+        viewName=saved.name;
+        preservedCamera=null;
+        finishCameraChange();
+    }
+    function finishCameraChange() {
+        curveEditor.rebase();
+        gizmo.rebase();
+        modalTransform.rebase();
+        cameraDirty=true;
+        cameraSave.restart();
     }
     function centerView(center) {
         if(!center.length) return;
@@ -314,8 +341,9 @@ Item {
         anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 10; spacing: 4
         Repeater {
             model: [{name:"Right",axis:"X",command:"viewX"},{name:"Front",axis:"Y",command:"viewY"},{name:"Top",axis:"Z",command:"viewZ"}]
-            UiButton { required property var modelData; text: modelData.axis+" · "+keyboard.shortcut(modelData.command); flatStyle: true; hint: modelData.name+" view · Center selection and preserve zoom"; onClicked: viewport.setView(modelData.name) }
+            UiButton { required property var modelData; objectName: modelData.command; text: modelData.axis+" · "+keyboard.shortcut(modelData.command); flatStyle: true; hint: modelData.name+" view · Center selection and preserve zoom"; onClicked: viewport.setView(modelData.name) }
         }
+        UiButton { objectName: "restoreView"; text: "Restore · "+keyboard.shortcut("restoreView"); flatStyle: true; enabled: viewport.canRestoreView; hint: "Restore the view before axis alignment, including zoom and projection"; onClicked: viewport.restoreView() }
         UiButton { glyph: "grid"; flatStyle: true; checked: viewport.gridVisible; checkable: true; hint: "Toggle reference grid (0.25 m spacing)"; onClicked: viewport.gridVisible = checked }
         UiButton { objectName: "xrayToggle"; text: "X-ray"; flatStyle: true; checked: viewport.xray; checkable: true; hint: "See through surfaces (Alt+Z)"; onClicked: viewport.xray = checked }
     }
@@ -352,6 +380,7 @@ Item {
         }
         function onCameraRequested(values, orthographic) {
             viewport.restoringCamera = true;
+            viewport.preservedCamera = null;
             viewport.viewName = "User view";
             cameraOrigin.position = Qt.vector3d(values[0],values[2],-values[1]);
             cameraOrigin.eulerRotation = Qt.vector3d(values[3],values[4],values[5]);

@@ -59,7 +59,9 @@ Item {
     }
     Label {
         anchors.horizontalCenter: parent.horizontalCenter; y: 55
-        text: modal.active ? modal.gesture.mode+" · Left click / Enter: confirm · Right click / Esc: cancel · 1 / 2 / 3: axis view" : ""
+        text: modal.active ? modal.gesture.mode+" · Left click / Enter: confirm · Right click / Esc: cancel\n"+
+            ["viewX","viewY","viewZ"].map(command => viewport.keyboard.shortcut(command)).join(" / ")+": axis view · "+viewport.keyboard.shortcut("restoreView")+": restore view" : ""
+        horizontalAlignment: Text.AlignHCenter
         color: Theme.accent; style: Text.Outline; styleColor: "#24262b"
     }
     Connections { target: viewport.keyboard; function onModifiersChanged() { modal.update(); } }

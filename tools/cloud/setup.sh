@@ -25,8 +25,12 @@ install_uv() {
     local target="$AF_REPO_ROOT/.tools/bootstrap"
     if [[ -x "$target/uv/uv" ]] && [[ "$("$target/uv/uv" --version)" == "uv 0.9.29"* ]]; then return; fi
     mkdir -p -- "$target"
-    python3 -m pip install --disable-pip-version-check --no-cache-dir --no-deps \
-        --only-binary=:all: --upgrade --target "$target" uv==0.9.29
+    if command -v uv >/dev/null; then
+        uv pip install --no-deps --only-binary=:all: --upgrade --target "$target" uv==0.9.29
+    else
+        python3 -m pip install --disable-pip-version-check --no-cache-dir --no-deps \
+            --only-binary=:all: --upgrade --target "$target" uv==0.9.29
+    fi
 }
 
 if [[ "$(uname -s)" != Linux ]] || ! command -v apt-get >/dev/null; then

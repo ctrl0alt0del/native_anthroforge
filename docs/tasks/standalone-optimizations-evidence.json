@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "collected_from": {
-    "revision": "4293f02af4f4b78164c30c85afe3a74f119ce60b",
+    "revision": "74367907fee7453e0be652b36f56af5524b2f958",
     "tracked_changes": true,
     "packaged": false
   },
@@ -3172,5 +3172,54 @@
       "model_events": {},
       "curve_choice_model_events": 0
     }
-  ]
+  ],
+  "qualification": {
+    "portable": {
+      "passed": true,
+      "executable": "E:\\development\\anthroforge\\build\\standalone-optimizations\\portable relocation\\AnthroForge.dist\\AnthroForge.exe",
+      "environment": "minimal PATH",
+      "doctor": {
+        "application": "0.1.5",
+        "python": "3.12.12",
+        "platform": "Windows-11-10.0.26220-SP0",
+        "native": {
+          "available": true,
+          "abi": 1,
+          "path": "E:\\development\\anthroforge\\build\\standalone-optimizations\\portable relocation\\AnthroForge.dist\\anthroforge\\_runtime\\bin\\af_native.dll"
+        },
+        "packages": {
+          "PySide6": "6.12.0",
+          "numpy": "1.26.4",
+          "scipy": null,
+          "scikit-image": null,
+          "pyinstantmeshes": null,
+          "pytetwild": null
+        }
+      },
+      "checks": [
+        "import",
+        "attachments",
+        "primitives",
+        "deformers",
+        "deletion",
+        "curve subdivision",
+        "save",
+        "inspect",
+        "render",
+        "GUI",
+        "runtime profiling"
+      ]
+    },
+    "build": {
+      "revision": "74367907fee7453e0be652b36f56af5524b2f958",
+      "tracked_changes": false,
+      "packaged": true
+    },
+    "long_curve": {
+      "passed": true,
+      "entities": 512,
+      "curve_points": 128,
+      "inspector_visible_and_hidden": true
+    }
+  }
 }

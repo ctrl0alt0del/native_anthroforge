@@ -92,6 +92,16 @@ def profiles(folder):
     return [capture(path) for path in paths]
 
 
+def qualification(folder):
+    portable = read(folder / "portable-check/portable-check.json")
+    runtime = Path(portable["executable"]).parent / "anthroforge/_runtime/build.json"
+    return dict(
+        portable=portable,
+        build=read(runtime),
+        long_curve=read(folder / "projection/acceptance.json"),
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("folder", type=Path)
@@ -103,6 +113,7 @@ def main():
         baseline="d810557795c2af002da0d86cfa7797317f9af4c4",
         measurements=measurements(args.folder),
         captures=profiles(args.folder),
+        qualification=qualification(args.folder),
     )
     args.output.write_text(json.dumps(result, indent=2) + "\n")
     print(args.output)

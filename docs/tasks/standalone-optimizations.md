@@ -3,7 +3,7 @@
 - Branch: codex/standalone-optimizations
 - Integration: main
 - Baseline: d810557795c2af002da0d86cfa7797317f9af4c4 (0.1.5)
-- Status: in progress
+- Status: implementation and validation complete
 - Updated: 2026-10-18, Europe/Bucharest
 - Writer: desktop implementation chat; direct work, no delegation
 
@@ -119,10 +119,24 @@ removed before execution payload disposal; historical rows keep no native cancel
 snapshot references. Restart recipes are captured before retirement. Qualified geometry
 formulas, staged renderer leases and shared application policies remain intact.
 
-Next: rerun the complete gate after final guards, build/check the portable executable,
-then normal integration. Production version remains 0.1.5; identify the optimized binary
-by its embedded source revision. No remaining product behavior is deferred within these
-four optimizations; the explicitly reported soft responsiveness limit is broader work.
+Final qualification: tools/check.ps1 passes with **462 tests**, native build/CTest/style,
+Blender-reference parity, Python/PowerShell checks, numerical checks and native doctor.
+The added projection acceptance exercises a 128-point curve in 512 SCPs with the inspector
+visible/hidden, stable point selection, undo and explicit evaluation. Its screenshot and
+the relocated executable's rendered primitives were inspected. PySide constructor
+deprecation warnings are the documented isolated adapter warning; QML checks are clean.
+
+Portable packaging and relocation checks pass under a minimal PATH with developer
+Python/Qt environment variables removed: import, attachments, all primitive/deformer
+families, deletion, subdivision, saving/reopening, rendering, GUI and runtime profiling.
+The optimized executable is dist/AnthroForge.dist/AnthroForge.exe. Its embedded source
+revision is **74367907fee7453e0be652b36f56af5524b2f958**, tracked_changes=false. Later commits
+add only qualification tooling/evidence. Version remains 0.1.5. Raw captures and binaries
+remain local/ignored; the committed evidence includes portable and long-curve results.
+
+All four requested optimizations are complete. Delivery uses the normal task-branch
+merge/push to main; Git ancestry records the integration. The explicitly reported soft
+responsiveness limit for dense cages is broader work, not a deferred part of these changes.
 
 ## Recovery
 

@@ -26,10 +26,21 @@ authored operation, calculation, undo entry, or reason to block project saving.
 
 ## Current state and verification
 
-Baseline inspected: clean tracked main, matching origin/main. Preserve unrelated
-untracked root __init__.py. Implementation has not started and is not merge-ready.
-Qt SDK includes QmlDebugPrivate client headers/library and packaged qmltooling plugins.
-Runtime and portable qualification still required; header availability is not proof.
+Native Qt adapter and development startup qualification are implemented. Real UI
+capture identifies Activity.qml:23 and records QML bindings/JavaScript/signals and
+render-thread frame milestones. Native build/contracts, function-size tests and
+new native-file style checks pass. Shutdown required explicitly destroying the
+profiler client before its connection: the client owns other connection children.
+The corrected development process exits successfully. Portable build is in progress.
+The shared runtime service, controls, report/export and lifecycle integration remain
+unimplemented; this checkpoint is not merge-ready. Preserve untracked __init__.py.
+
+Development qualification: `python -m anthroforge.desktop.app --profile-probe
+build/profiler-qualification/development.json` produced 1,748 binding events with
+source locations, 144 frame milestones, zero adapter drops, and clean shutdown.
+This proves collector functionality, not overhead or the complete acceptance case.
+`tools/profiler_qualification.py` prepares serial cube/body drag comparisons; it
+must run without competing builds/benchmarks before interpreting measurements.
 
 ## Next actions
 

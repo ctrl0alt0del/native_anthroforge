@@ -83,7 +83,7 @@ def copy_documentation():
 
 def copy_runtime(runtime):
     (runtime / "bin").mkdir(parents=True, exist_ok=True)
-    for name in ("af_native.dll", "af_viewport.dll"):
+    for name in ("af_native.dll", "af_viewport.dll", "af_profiler.dll"):
         shutil.copy2(ROOT / "build/dev/bin" / name, runtime / "bin" / name)
     shutil.copytree(
         ROOT / "build/dev/qml",

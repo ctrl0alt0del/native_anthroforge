@@ -9,7 +9,8 @@ The repository is `ctrl0alt0del/native_anthroforge`; the shared branch is `main`
 
 In Codex on web or the desktop app, choose **Work in > Cloud > Create environment**
 (or **Settings > Codex Cloud > Environments > Create environment**). Select this repository
-and request an Ubuntu/Debian Linux environment with root or passwordless sudo for setup.
+and use an Ubuntu/Debian Linux environment. Setup supports an unprivileged cloud shell
+when its base image already supplies Python/pip, a C++ compiler and the required Qt libraries.
 Use a private environment; no application secrets or OpenAI API key are needed.
 
 Supply this install command from the repository root:
@@ -18,15 +19,17 @@ Supply this install command from the repository root:
 bash tools/cloud/setup.sh
 ```
 
-The script installs system/compiler libraries and pinned uv 0.9.29, then uses
+With root or passwordless sudo, the script installs system/compiler libraries. Otherwise it
+validates the existing host without attempting privilege escalation. It installs pinned uv
+0.9.29 from PyPI into the repository's ignored tools directory, then uses
 `.python-version` (CPython 3.12.12) and `uv.lock` to install development dependencies,
-NumPy and PySide6 6.12.0. It builds the C++17 library with the existing `portable-core`
+NumPy and PySide6 6.12.0. The locked `cloud` dependency group supplies clang-tidy 18.1.8
+and ShellCheck 0.10.0, so those checks do not need system installation. It builds the C++17 library with the existing `portable-core`
 preset and runs the validation gate. CMake compilation defaults to two parallel jobs to
 bound memory use. Setup does not modify global shell profiles or change the lockfile.
 
-Allow package-manager network access during setup. In addition to the package-manager
-preset, allow `astral.sh` and `releases.astral.sh` for the pinned uv installer. The setup
-also needs the configured Ubuntu/Debian apt mirrors, `pypi.org`, `files.pythonhosted.org`,
+Allow package-manager network access during setup. The setup needs the configured
+Ubuntu/Debian apt mirrors when installing system packages, `pypi.org`, `files.pythonhosted.org`,
 `github.com` and GitHub release download hosts for Python. A network failure must be fixed
 in environment settings; do not disable TLS verification.
 
@@ -104,14 +107,16 @@ environments, and do not force-push to reconcile them.
 
 ## Evidence and current account setup
 
-The October 17 initial CI run failed Linux mypy on platform-specific file locking; the Windows
-job was canceled by matrix fail-fast. The cloud preparation changes use mypy-recognized
-platform guards, install the desktop test dependency and run independent platform jobs.
-Record the successful qualification run in `development_status.md` once observed.
+The October 17 initial CI runs exposed platform-specific mypy guards and imported native
+compiler diagnostics. Revision `691f401` passed the complete portable gate on Ubuntu 24.04
+and Windows in [GitHub Actions run 39038728775](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39038728775).
+The subsequent setup change supports the actual Codex Cloud shell without root access;
+its validation is recorded in `development_status.md` once observed.
 
 Creating/publishing the account's Codex Cloud environment is separate from repository setup.
-The in-app browser sign-in currently reports an authentication failure. Until a real cloud
-setup and fresh task have run, do not label the environment as published or Codex-verified.
+Sign-in and repository access are connected. The actual setup session exposed an unprivileged
+base image with the required compiler/runtime libraries but no sudo. Until its updated
+setup and a fresh task have run, do not label the environment as published or Codex-verified.
 
 References: [Codex Cloud environment setup](https://learn.chatgpt.com/docs/environments/cloud-environments),
 [projects and file access](https://learn.chatgpt.com/docs/projects),

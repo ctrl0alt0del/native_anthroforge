@@ -7,29 +7,36 @@ cd -- "$AF_REPO_ROOT"
 
 install_system_packages() {
     local elevate=()
-    if [[ "$EUID" -ne 0 ]]; then elevate=(sudo -n); fi
+    if [[ "$EUID" -ne 0 ]]; then
+        if command -v sudo >/dev/null && sudo -n true 2>/dev/null; then
+            elevate=(sudo -n)
+        else
+            echo 'Using existing compiler/runtime libraries; host checks still required.'
+            return
+        fi
+    fi
     "${elevate[@]}" apt-get update
     "${elevate[@]}" env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        build-essential ca-certificates curl git clang-tidy shellcheck \
+        build-essential ca-certificates git python3-pip \
         libegl1 libgl1 libopengl0 libxkbcommon0 libdbus-1-3
 }
 
 install_uv() {
-    local target="$AF_REPO_ROOT/.tools/uv"
-    if [[ -x "$target/uv" ]] && [[ "$("$target/uv" --version)" == "uv 0.9.29"* ]]; then return; fi
+    local target="$AF_REPO_ROOT/.tools/bootstrap"
+    if [[ -x "$target/uv/uv" ]] && [[ "$("$target/uv/uv" --version)" == "uv 0.9.29"* ]]; then return; fi
     mkdir -p -- "$target"
-    curl --fail --show-error --silent --location --retry 3 \
-        https://astral.sh/uv/0.9.29/install.sh -o "$target/install.sh"
-    UV_UNMANAGED_INSTALL="$target" sh "$target/install.sh"
+    python3 -m pip install --disable-pip-version-check --no-cache-dir --no-deps \
+        --only-binary=:all: --upgrade --target "$target" uv==0.9.29
 }
 
 if [[ "$(uname -s)" != Linux ]] || ! command -v apt-get >/dev/null; then
-    echo 'Cloud setup requires Ubuntu/Debian Linux with root or passwordless sudo.' >&2
+    echo 'Cloud setup requires Ubuntu/Debian Linux with Python/pip and a C++ toolchain.' >&2
     exit 1
 fi
 install_system_packages
 install_uv
-uv python install "$(cat .python-version)"
-uv sync --locked --extra desktop
+uv python install --no-bin "$(cat .python-version)"
+uv sync --locked --extra desktop --group cloud
+uv run --no-sync python tools/check_cloud_host.py
 shellcheck tools/cloud/*.sh
 uv run --no-sync python tools/check_core.py --native-style

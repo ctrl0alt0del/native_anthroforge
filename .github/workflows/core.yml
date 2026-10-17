@@ -1,19 +1,25 @@
-name: Core and native boundary
+name: Core and cloud development
 on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read
 jobs:
-  core:
-    strategy:
-      matrix:
-        include:
-          - os: windows-latest
-            library: af_native.dll
-          - os: ubuntu-latest
-            library: libaf_native.so
-    runs-on: ${{ matrix.os }}
-    env:
-      ANTHROFORGE_NATIVE_LIBRARY: ${{ github.workspace }}/build/core/bin/${{ matrix.library }}
+  ubuntu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install and qualify the Codex Cloud setup
+        run: bash tools/cloud/setup.sh
+      - name: Check repeatable refresh without global shell state
+        run: |
+          bash tools/cloud/refresh.sh
+          source tools/cloud/environment.sh
+          uv run --no-sync anthroforge doctor --require-native
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -22,15 +28,6 @@ jobs:
         with:
           version: "0.9.29"
           python-version: "3.12.12"
-      - uses: ilammy/msvc-dev-cmd@v1
-        if: runner.os == 'Windows'
-      - run: uv sync --locked
-      - run: uv run --no-sync ruff check src tests tools
-      - run: uv run --no-sync ruff format --check src tests tools
-      - run: uv run --no-sync mypy
-      - run: uv run --no-sync cmake --preset portable-core
-      - run: uv run --no-sync cmake --build --preset portable-core
-      - run: uv run --no-sync ctest --preset portable-core
-      - run: uv run --no-sync pytest
-      - run: uv build
-      - run: uv run --no-sync python tools/check_wheel.py
+      - uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1.13.0
+      - run: uv sync --locked --extra desktop
+      - run: uv run --no-sync python tools/check_core.py

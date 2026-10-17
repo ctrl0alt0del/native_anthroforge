@@ -32,6 +32,10 @@ cd E:\development\anthroforge
 ./tools/run.ps1
 ```
 
+For Codex Cloud or Ubuntu development, run `bash tools/cloud/setup.sh`.
+See [cloud development and phone workflow](docs/cloud_development.md) for environment
+creation, dependency refresh, verification and the Windows GUI/release boundary.
+
 See [development commands](docs/development.md), [implementation contract](docs/implementation_01.md),
 [observed validation](docs/development_status.md), and [architecture](docs/architecture.md).
 Follow the [engineering guidelines](docs/engineering_guidelines.md) for fixes, features and design review.

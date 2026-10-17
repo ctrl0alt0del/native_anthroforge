@@ -73,10 +73,13 @@ the preserved addon kernel retain upstream formatting. Shared core/application/n
 Python code cannot import Blender or Qt. Numerical geometry and optimization loops belong
 in C++, with owned batched inputs/results across the boundary.
 
-CMake portable-core builds the numerical engine without Qt. Windows execution is verified;
-Linux/macOS runtime paths and the Windows/Linux CI workflow are prepared but not locally
-certified. The old root __init__.py is an unrelated Blender stub; preserve it and use the
-src package and configured test paths.
+CMake portable-core builds the numerical engine without the Qt viewport bridge. The shared
+`tools/check_core.py` gate runs the complete pytest suite, including Qt input tests, native
+contracts, a headless workshop/save/reopen and wheel checks. CI invokes the same gate on
+Windows and the [cloud setup](cloud_development.md) on Ubuntu 24.04. Consult the recorded
+validation for observed results; a core pass does not certify the graphical desktop or macOS.
+The old root __init__.py is an unrelated Blender stub; preserve it and use the src package
+and configured test paths.
 
 The optional addon-check CMake preset still accepts AF_ADDON_SOURCE for the original
 smoothing kernel qualification. It reads source in place and writes only build outputs.

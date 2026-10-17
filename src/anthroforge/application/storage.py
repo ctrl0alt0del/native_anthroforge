@@ -3,6 +3,7 @@
 import io
 import json
 import os
+import sys
 import tempfile
 import zipfile
 from dataclasses import asdict
@@ -43,14 +44,14 @@ class FileLock:
             ) from error
 
     def _acquire(self) -> None:
-        if os.name == "nt":
+        if sys.platform == "win32":
             import msvcrt
 
             msvcrt.locking(self.stream.fileno(), msvcrt.LK_NBLCK, 1)
         else:
             import fcntl
 
-            fcntl.flock(self.stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)  # type: ignore[attr-defined]
+            fcntl.flock(self.stream.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
 
     def close(self) -> None:
         self.stream.close()

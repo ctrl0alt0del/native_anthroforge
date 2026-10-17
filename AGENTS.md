@@ -10,6 +10,7 @@
 - Preserve the exact scheduling, undo, checkpoint, blocked-save, import, unit, startup, and skin-only export decisions in the specification. Do not invent simplified product semantics while scaffolding.
 - Reuse qualified addon kernels and contracts. Inspect existing capabilities before recommending replacement; distinguish observed failures, hypotheses, and verified improvements.
 - Tests must exercise behavior and relevant failure cases. Run tools/check.ps1 for the development checks. GUI/packaging checks are separate and must be reported honestly.
+- In Codex Cloud/Linux, follow [cloud development](docs/cloud_development.md). Run `bash tools/cloud/setup.sh` for first setup; source `tools/cloud/environment.sh` in new shells and run `uv run --no-sync python tools/check_core.py --native-style` for the portable gate. This gate includes the complete pytest suite but does not certify Windows GUI or executable packaging.
 - Existing root __init__.py is an unrelated legacy Blender stub. Preserve it; the standalone package lives in src/anthroforge.
 - Keep local SDKs, environments, outputs, fixtures, and captures in ignored directories. Do not commit large binaries or production anatomy assets.
 

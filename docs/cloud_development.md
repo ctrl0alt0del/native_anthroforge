@@ -106,14 +106,22 @@ for the checked-in parity fixtures and are not copied from the PC automatically.
 
 ## Working through a power outage
 
-Commit and push useful checkpoints before an outage. Only pushed code and explicitly provided
-assets are accessible in the cloud; uncommitted PC work, local SDKs, personal skills and local
-MCP servers do not appear automatically. Keep lasting decisions in repository documentation.
-Start tasks from the published environment using Codex on mobile/web and review their diffs.
-Commit/push completed work, then bring it into the local checkout when power returns. Respect
-the repository rule requiring authorization for Git remote operations; this guide does not
-grant blanket permission to future chats. Avoid concurrent edits to the same branch from both
-environments, and do not force-push to reconcile them.
+Follow [work continuity](work_continuity.md): each change request has a `codex/<task-slug>`
+branch and a tracked `docs/tasks/<task-slug>.md` handoff. Push the initial record and useful
+intermediate checkpoints while working, rather than waiting for the entire request to finish.
+The user has authorized routine fetch/commit/push and validated integration for this repository.
+
+Start a cloud chat in **AnthroForge Standalone** and identify the existing task branch.
+Fetch its current GitHub tip before editing; a published environment or old checkout is not
+proof of the latest code. Read its handoff, refresh dependencies as needed and continue the
+first unfinished step. Resume that same branch, with only one machine actively writing it.
+When power returns, stop the cloud writer and reconcile the desktop checkout before editing.
+The continuity guide covers local changes, divergence and final integration without force-push.
+
+Only successfully pushed code/context and explicitly provided assets are recoverable while
+the PC is off. Uncommitted work, unpushed commits, local SDKs, personal skills and local MCP
+servers do not appear automatically. A network or permission failure means the checkpoint is
+still local; report it and retry through the supported network/authentication path.
 
 ## Evidence and current account setup
 

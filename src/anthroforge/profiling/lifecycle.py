@@ -17,13 +17,13 @@ LIMITATIONS = [
 
 
 def reserve(profiler):
-    return (32 if profiler.collector else 8) * 1024 * 1024
+    return (64 if profiler.collector else 8) * 1024 * 1024
 
 
 def validate_start(profiler, seconds, memory_mib):
     if profiler.state in ("recording", "stopping", "exporting", "export_failed"):
         raise ValueError("Finish or retry the current performance capture first")
-    minimum = 64 if profiler.collector else 16
+    minimum = 96 if profiler.collector else 16
     if not 1 <= seconds <= 3600 or not minimum <= memory_mib <= 1024:
         raise ValueError(f"Recording requires 1–3600 seconds and {minimum}–1024 MiB")
 
@@ -142,7 +142,7 @@ def manifest(profiler):
         schema_version=1,
         recording_id=profiler.recording_id,
         environment=report.environment(),
-        clock="monotonic perf_counter, microseconds",
+        clock=clock_info(),
         storage=storage(profiler),
         requested_interval_ns=[profiler.started_ns, profiler.stopped_ns],
         complete=complete(profiler),
@@ -159,6 +159,18 @@ def storage(profiler):
         profiler.buffer.describe(),
         owned_budget_bytes=profiler.memory_limit,
         reserved_bytes=reserve(profiler),
+    )
+
+
+def clock_info():
+    return dict(
+        source="monotonic perf_counter",
+        trace_unit="microseconds",
+        synthetic_lanes={
+            "-1": "Qt QML on the GUI thread, represented as a separate logical lane",
+            "-2": "Qt scene-graph events; originating thread is not supplied by this protocol",
+        },
+        alignment="Native clock calibrated at startup; Qt request/response uncertainty is in qt",
     )
 
 

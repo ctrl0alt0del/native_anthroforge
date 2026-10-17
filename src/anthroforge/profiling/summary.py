@@ -4,6 +4,8 @@ import math
 from array import array
 from collections import Counter
 
+from .hotspots import Hotspots
+
 ATTRIBUTION_GAPS = [
     "No stacks, GPU execution or physical input/display latency",
     "Source-less events and uninstrumented internal work remain unknown",
@@ -44,6 +46,7 @@ class Summary:
     def __init__(self):
         self.durations, self.counts, self.frames = {}, Counter(), Distribution()
         self.inputs = {}
+        self.hotspots = Hotspots()
         self.last_frame, self.start, self.end, self.truncated = None, None, 0.0, 0
 
     def observe(self, event):
@@ -58,6 +61,7 @@ class Summary:
         if "dur" in event and not partial:
             self.durations.setdefault(key, Distribution()).add(event["dur"])
             self.input(event)
+            self.hotspots.observe(event)
         if event["cat"] == "frame" and event["name"] == "submitted":
             self.frame(event["ts"])
 
@@ -86,6 +90,7 @@ class Summary:
             percentile_method="log2 bins, 1/16 octave",
             interpretation="Inclusive wall durations overlap; do not add categories together.",
             slowest=slowest(durations),
+            slowest_spans=self.hotspots.report(),
             attribution_gaps=ATTRIBUTION_GAPS,
         )
 

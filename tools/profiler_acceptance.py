@@ -95,6 +95,7 @@ def run():
         window = engine.rootObjects()[0]
         point = fixture(controller, window, 0.5)
         results = capture_trials(controller, window, point)
+        focus_recording(controller, window)
         assert not warnings, warnings
         save_results(results)
     finally:
@@ -111,6 +112,22 @@ def capture_trials(controller, window, point):
     ]
     results.append(trial(controller, window, point, True, False, True))
     return results
+
+
+def focus_recording(controller, window):
+    field = find(window, "outlinerSearch")
+    field.forceActiveFocus()
+    focus = window.activeFocusItem()
+    QTest.keyClick(window, Qt.Key_F12)
+    assert controller.session.profiler.active and window.activeFocusItem() is focus
+    event = QKeyEvent(QEvent.KeyPress, Qt.Key_X, Qt.NoModifier, "PRIVATE_TEXT_SENTINEL")
+    QGuiApplication.sendEvent(window, event)
+    QTest.keyClick(window, Qt.Key_F12)
+    assert not controller.session.profiler.active and window.activeFocusItem() is focus
+    await_export(controller)
+    with ZipFile(controller.session.profiler.path) as archive:
+        assert b"PRIVATE_TEXT_SENTINEL" not in archive.read("trace.json")
+    field.setProperty("text", "")
 
 
 def save_results(results):

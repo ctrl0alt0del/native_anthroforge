@@ -75,10 +75,10 @@ def call(profiler: Any, job: Any, stage: str, function: Any, *args: Any) -> Any:
     return profiler.call("task", stage, function, *args, _metadata=describe(job))
 
 
-def command_metadata(session, arguments):
+def command_metadata(session: Any, arguments: dict[str, Any]) -> dict[str, Any] | None:
     if not session.profiler.active:
         return None
-    metadata = {"revision": session.document.revision}
+    metadata: dict[str, Any] = {"revision": session.document.revision}
     for key in ("entity", "curve", "point", "control", "binding", "job_id"):
         value = arguments.get(key)
         if isinstance(value, str):

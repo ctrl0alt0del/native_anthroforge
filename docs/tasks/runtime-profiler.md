@@ -96,3 +96,12 @@ Forced disk caching did not establish a remedy and was not adopted. More Activit
 history after warm-up changes absolute workload; compare only within each series.
 Latest final metadata additions require refreshed recording/GUI evidence. Full gate,
 packaged reports, short-window stress, trace import and final review remain pending.
+
+Expanded GUI acceptance now passes all four variants plus cancellation after toggling
+and text-focus/privacy checks. A 34-second native recording with a 2-second window
+received 641,880 events, intentionally evicted 611,079, retained exactly 2 seconds,
+and reported zero collector loss. The full development gate passed 412 tests; latest
+summary/clock metadata additions have targeted checks pending before packaging.
+Default desktop budgeting reserves 64 MiB for queues/metadata/observers/export and
+64 MiB for retained events. This conservative partition still fits the observed GUI
+captures (largest inspected ~56 MiB). Portable runtime and final trace import pending.

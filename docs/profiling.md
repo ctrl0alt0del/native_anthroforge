@@ -11,8 +11,8 @@ export keeps the frozen capture; **Retry save** retries it. The runtime API can 
 with another destination. Only one capture/export is active at a time.
 
 The default ring retains up to 120 seconds within a 128 MiB owned-storage budget.
-The desktop reserves 32 MiB for adapter storage, bounded metadata and transfer work;
-96 MiB holds immutable application/Qt events. Older events are overwritten when
+The desktop reserves 64 MiB for adapter storage, bounded metadata, observers and export work;
+64 MiB holds immutable application/Qt events. Older events are overwritten when
 either retention bound is reached. Qt also owns transient producer buffers; these
 are periodically flushed and are not a hard cap on total application RSS. Reports
 state their actual retained interval and losses. Recording is off until requested.
@@ -37,7 +37,7 @@ and collector information. States are idle, recording, stopping, exporting, save
 and export_failed. `profile.stop` with `wait:true` is for headless callers; the desktop
 uses asynchronous completion to keep Qt processing events. Starting another capture
 before the current one is saved/retried is rejected. Settings accept 1–3600 seconds
-and 16–1024 MiB headless, or 64–1024 MiB with the Qt collector.
+and 16–1024 MiB headless, or 96–1024 MiB with the Qt collector.
 
 ## Reading a report
 

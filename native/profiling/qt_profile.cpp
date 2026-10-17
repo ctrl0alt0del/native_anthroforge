@@ -1,6 +1,7 @@
 #include "qt_profile.h"
 #include <QQmlDebuggingEnabler>
 #include <QJsonDocument>
+#include <QJsonArray>
 #include <QUuid>
 #include <QQuickWindow>
 #include <chrono>
@@ -128,6 +129,7 @@ QByteArray ProfileReceiver::status() {
         {"clock_uncertainty_ns",qint64(uncertainty)},{"encode_ns",encodeNs},
         {"decode_inclusive_ns",qint64(decodeNs)},{"decode_cpu_ns",qint64(decodeCpuNs)},
         {"model_watch_skipped",qint64(modelWatchSkipped)},
+        {"services",QJsonArray::fromStringList(QQmlDebuggingEnabler::profilerServices())},
         {"failure",failure},{"types",qint64(types.size())},{"qt_version",qVersion()},
         {"graphics_api",int(QQuickWindow::graphicsApi())}};
     return QJsonDocument(data).toJson(QJsonDocument::Compact);

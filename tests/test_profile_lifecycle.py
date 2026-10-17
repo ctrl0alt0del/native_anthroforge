@@ -105,9 +105,10 @@ def test_native_hooks_are_removed_and_second_capture_still_works(session, tmp_pa
 
 def test_headless_profiler_does_not_import_qt(tmp_path):
     script = (
-        "import sys; from anthroforge.profiling import RuntimeProfiler; "
-        "p=RuntimeProfiler(); p.start(); p.call('test','sum',sum,[1]); "
-        "p.stop(sys.argv[1],wait=True); "
+        "import sys; from anthroforge.application.session import Session; "
+        "s=Session(); s.command('profile.start'); "
+        "s.command('primitive.create',kind='BODY'); s.command('wait'); "
+        "s.command('profile.stop',path=sys.argv[1],wait=True); s.close(); "
         "assert not any(m.startswith(('PySide6','shiboken6')) for m in sys.modules)"
     )
     subprocess.run([sys.executable, "-c", script, str(tmp_path / "headless.zip")], check=True)

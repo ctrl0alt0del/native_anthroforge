@@ -68,4 +68,6 @@ void ProfileReceiver::completeCapture() {
         record(data);
     }
     finished=true; active=false;
+    client->setFlushInterval(0);
+    client->sendRecordingStatus();
 }

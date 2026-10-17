@@ -53,7 +53,6 @@ void ProfileReceiver::setup(const QString& socket) {
     const quint64 features=(1ULL<<ProfileJavaScript)|(1ULL<<ProfileBinding)|
         (1ULL<<ProfileHandlingSignal)|(1ULL<<ProfileCreating)|(1ULL<<ProfileSceneGraph);
     client=new MeasuredClient(connection,this,features);
-    client->setFlushInterval(100);
     connect(connection,&QQmlDebugConnection::connected,this,[this] { connected=true; });
     connect(connection,&QQmlDebugConnection::disconnected,this,[this] { connected=false; });
     connect(client,&QQmlProfilerClient::traceStarted,this,[this](qint64 t) { synchronize(t); });
@@ -65,6 +64,7 @@ void ProfileReceiver::begin() {
     if (!connected) { fail("Qt profiling connection is unavailable"); return; }
     client->clearAll();
     clear();
+    client->setFlushInterval(100);
     requested=profileClock();
     finished=false;
     active=true;

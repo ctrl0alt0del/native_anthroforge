@@ -61,7 +61,18 @@ def verify_bundle(path):
     assert "input/dispatch" in durations and "ui/Controller.notify" in durations
     assert any(key.startswith("native/") for key in durations)
     assert manifest["complete"], manifest
+    verify_interval(manifest, summary)
     return dict(path=str(path), summary=summary, manifest=manifest)
+
+
+def verify_interval(manifest, summary):
+    start, stop = (v / 1000 for v in manifest["requested_interval_ns"])
+    assert (
+        start - 1
+        <= summary["retained_interval_us"][0]
+        <= summary["retained_interval_us"][1]
+        <= stop + 1
+    )
 
 
 def trial(controller, window, point, snapping, opened, canceled=False):

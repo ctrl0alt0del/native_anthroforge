@@ -11,6 +11,7 @@ class EventBuffer:
         self.records, self.lock = [], Lock()
         self.bytes = self.evicted = self.oversized = self.received = 0
         self.watermark = 0.0
+        self.boundary_filtered = 0
 
     def append(self, event):
         payload = json.dumps(event, separators=(",", ":"), allow_nan=False).encode()
@@ -48,6 +49,7 @@ class EventBuffer:
             retained=len(self.records),
             evicted=self.evicted,
             oversized=self.oversized,
+            boundary_filtered=self.boundary_filtered,
             owned_bytes=self.bytes,
             byte_limit=self.limit,
             window_seconds=self.window_us / 1_000_000,
@@ -60,4 +62,15 @@ def clip_event(event, cutoff):
         if "dur" in event:
             event["dur"] -= cutoff - event["ts"]
         event["ts"] = cutoff
+    return event
+
+
+def capture_interval(event, start, stop):
+    end = event["ts"] + event.get("dur", 0)
+    if end < start or (stop and event["ts"] > stop):
+        return None
+    event = clip_event(event, start)
+    if stop and end > stop and "dur" in event:
+        event["dur"] = max(0, stop - event["ts"])
+        event["args"] = dict(event.get("args", {}), truncated_end=True)
     return event

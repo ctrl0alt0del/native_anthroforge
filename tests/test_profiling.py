@@ -6,7 +6,7 @@ from zipfile import ZipFile
 import pytest
 
 from anthroforge.profiling import RuntimeProfiler
-from anthroforge.profiling.buffer import EventBuffer
+from anthroforge.profiling.buffer import EventBuffer, capture_interval
 
 
 def bundle(path):
@@ -57,6 +57,14 @@ def test_unfinished_span_metadata_is_bounded(tmp_path):
     profiler.stop(tmp_path / "bounded.zip", wait=True)
     assert profiler.spans.bytes == 0
     assert not bundle(tmp_path / "bounded.zip")["manifest.json"]["complete"]
+
+
+def test_late_collector_flush_cannot_extend_recorded_interval():
+    assert capture_interval(event(2100), 1000, 2000) is None
+    assert capture_interval(event(900), 1000, 2000) is None
+    bounded = capture_interval(event(900, 1500), 1000, 2000)
+    assert bounded["ts"] == 1000 and bounded["dur"] == 1000
+    assert bounded["args"]["truncated_start"] and bounded["args"]["truncated_end"]
 
 
 def test_disabled_profiler_does_not_collect_or_create_worker():

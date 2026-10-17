@@ -12,10 +12,17 @@ def validate(path, desktop):
     assert manifest["schema_version"] == 1 and manifest["complete"], manifest
     assert manifest["environment"]["build"]["packaged"]
     assert manifest["environment"]["application_version"] == "0.1.4"
-    assert manifest["capabilities"]["qml"] == desktop
+    verify_capabilities(manifest, desktop)
     verify_durations(summary, desktop)
     verify_events(data["trace.json"]["traceEvents"])
     return manifest
+
+
+def verify_capabilities(manifest, desktop):
+    assert manifest["capabilities"]["qml"] == desktop
+    if desktop:
+        expected = {"CanvasFrameRate", "EngineControl", "DebugMessages"}
+        assert set(manifest["qt"]["services"]) == expected
 
 
 def verify_durations(summary, desktop):

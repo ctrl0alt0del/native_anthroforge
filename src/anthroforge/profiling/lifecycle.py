@@ -26,6 +26,8 @@ def validate_start(profiler, seconds, memory_mib):
     minimum = 96 if profiler.collector else 16
     if not 1 <= seconds <= 3600 or not minimum <= memory_mib <= 1024:
         raise ValueError(f"Recording requires 1–3600 seconds and {minimum}–1024 MiB")
+    if profiler.worker:
+        profiler.worker.join()
 
 
 def start_collectors(profiler):
@@ -59,6 +61,8 @@ def request_stop(profiler, path):
 
 
 def retry_export(profiler, path):
+    if profiler.worker:
+        profiler.worker.join()
     profiler.error, profiler.path = "", str(path or profiler.path)
     profiler.done.clear()
     profiler.launch_worker()

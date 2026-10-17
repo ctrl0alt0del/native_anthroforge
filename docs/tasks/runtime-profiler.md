@@ -105,3 +105,14 @@ summary/clock metadata additions have targeted checks pending before packaging.
 Default desktop budgeting reserves 64 MiB for queues/metadata/observers/export and
 64 MiB for retained events. This conservative partition still fits the observed GUI
 captures (largest inspected ~56 MiB). Portable runtime and final trace import pending.
+
+Final boundary pass: development gate now passes 413 tests, native/style/numerical
+checks included. Five GUI captures (four normal/snap/Activity variants plus canceled
+drag) and text-focus/privacy checks pass again. Reports assert their retained
+interval is contained within start/stop; late Qt flush records are clipped/marked.
+Qt periodic flush wiring resets between recordings. Lifecycle restart joins the
+finished previous exporter before reusing state. Portable build is next.
+Two supplementary foreground benchmarks were invalidated by window deactivation
+(the diagnostic confirmed the gesture had already canceled); they are excluded.
+The nonactivating diagnostic option keeps subsequent benchmark input isolated from
+foreground focus changes, and its timings are recorded as a separate series.

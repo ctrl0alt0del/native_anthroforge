@@ -6,6 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 from profiler_system_load import system_load, system_times
+from PySide6.QtCore import Qt
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from shiboken6 import delete
@@ -17,6 +18,15 @@ from anthroforge.desktop.qt_profiler import QtProfiler, profiler_application
 from anthroforge.desktop.runtime import native_runtime
 
 
+class BenchmarkTrial(DragTrial):
+    def finish(self):
+        assert self.controller.session.history.before is not None, (
+            "Benchmark gesture ended before release",
+            self.window.isActive(),
+        )
+        super().finish()
+
+
 def arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mode", choices=("none", "dormant", "record"), required=True)
@@ -24,6 +34,7 @@ def arguments():
     parser.add_argument("--events", type=int, default=120)
     parser.add_argument("--seconds", type=int, default=120)
     parser.add_argument("--warmup", type=int, default=0)
+    parser.add_argument("--background", action="store_true")
     return parser.parse_args()
 
 
@@ -33,7 +44,7 @@ def run_trials(controller, window, point, args):
         controller.session.command("profile.start", seconds=args.seconds)
     options = SimpleNamespace(events=args.events, interval=16, probes=Probes(), spans=False)
     for snapping in (False, True):
-        trial = DragTrial(controller, window, point, snapping, options)
+        trial = BenchmarkTrial(controller, window, point, snapping, options)
         result = trial.record()
         trials.append(
             {k: v for k, v in result.items() if k not in ("inputs", "job_records", "frames")}
@@ -75,6 +86,12 @@ def run(args):
 
 
 def exercise(controller, window, args):
+    window.activeChanged.connect(lambda: print("Window active:", window.isActive(), flush=True))
+    if args.background:
+        window.setFlag(Qt.WindowDoesNotAcceptFocus, True)
+        window.show()
+    else:
+        window.requestActivate()
     point = fixture(controller, window, 0.5)
     warmup(controller, window, point, args.warmup)
     run_trials(controller, window, point, args)

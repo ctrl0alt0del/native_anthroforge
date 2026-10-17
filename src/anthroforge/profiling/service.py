@@ -8,7 +8,7 @@ from typing import Any
 from uuid import uuid4
 
 from . import lifecycle
-from .buffer import EventBuffer
+from .buffer import EventBuffer, capture_interval
 from .native_calls import NativeCalls
 from .spans import Spans
 
@@ -101,7 +101,11 @@ class RuntimeProfiler:
     def record(self, event):
         with self.lock:
             if self.state in ("recording", "stopping"):
-                self.append(event)
+                event = capture_interval(event, self.started_ns / 1000, self.stopped_ns / 1000)
+                if event is not None:
+                    self.append(event)
+                elif self.buffer:
+                    self.buffer.boundary_filtered += 1
 
     def append(self, event):
         if self.buffer is None:

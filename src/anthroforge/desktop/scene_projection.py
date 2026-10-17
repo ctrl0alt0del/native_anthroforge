@@ -2,7 +2,6 @@
 
 from anthroforge.core.entities import descendants
 from anthroforge.core.results import geometry_asset
-from anthroforge.native.attachments import ordered
 
 from . import scene_state
 from .property_projection import PropertyProjection
@@ -57,32 +56,30 @@ class SceneProjection:
 
     def update_records(self, changes, full, structural):
         session, document = self.controller.session, self.controller.session.document
-        entities = {e.id: e for e in document.entities}
+        entities = document.index.entities
         if structural:
-            self.order = [e.id for e in ordered(document.entities)] + [
-                c.id for c in document.controls
-            ]
+            self.order = [*document.index.structure.order, *(c.id for c in document.controls)]
             self.records = {key: row for key, row in self.records.items() if key in self.order}
             self.keys = {key: value for key, value in self.keys.items() if key in self.order}
         targets = set(entities) if full or structural else set(changes.entities)
-        targets.update(e.id for e in document.entities if e.parent in changes.entities)
+        for key in changes.entities:
+            targets.update(document.index.structure.children.get(key, ()))
         self.update_entities(entities, targets, session.workspace)
         if full or changes.entities or changes.controls:
             for control in document.controls:
                 self.records[control.id] = scene_state.control_record(self.controller, control)
 
     def update_entities(self, entities, targets, workspace):
-        depths = {}
-        for key in self.order:
+        depths = self.controller.session.document.index.structure.depths
+        for key in targets:
             if key not in entities:
                 continue
             entity = entities[key]
-            depth = depths[key] = depths.get(entity.parent, -1) + 1
-            if key in targets:
-                cache = (entity_key(entity, entities.get(entity.parent), workspace), depth)
-                if self.keys.get(key) != cache:
-                    self.records[key] = scene_state.record(self.controller, entity, depth)
-                    self.keys[key] = cache
+            depth = depths[key]
+            cache = (entity_key(entity, entities.get(entity.parent), workspace), depth)
+            if self.keys.get(key) != cache:
+                self.records[key] = scene_state.record(self.controller, entity, depth)
+                self.keys[key] = cache
 
     def parents(self):
         document = self.controller.session.document

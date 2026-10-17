@@ -47,8 +47,18 @@ measurements, not final integrated results. PySide 6.12 exposes only QQmlPropert
 deprecated constructor; Python emits a deprecation warning, while actual QML has no
 warnings. This adapter is isolated in desktop/property_projection.py.
 
-Next: implement indexed immutable documents and reusable dependency structure. Then
-native intermediate geometry/finalization and active-job indexing, in that order.
+Stage 2 is integrated: snapshot-owned, immutable entity/control lookups and hierarchy/
+dependency indexes reuse fully validated relationship structure across value-only
+changes. Relationship changes still run complete validation and rebuild their graph.
+Revision-only replacements reuse the entire index. Runtime indexes are excluded from
+project serialization. Native attachment ordering is linear instead of repeated scans.
+431 tests and configured mypy pass, including structural invalidation, identity
+collisions, cycle classification, historical snapshot isolation and serialization.
+The 1,024-SCP synthetic admission median is approximately 1.4 ms versus the audit's
+86.8 ms. This measures admission without worker dispatch or GUI. Evidence and an
+ordinary runtime profiler capture are in build/standalone-optimizations/stage2.
+
+Next: native intermediate geometry/finalization and active-job indexing, in that order.
 Final integrated gate, broader GUI/native parity and packaging remain pending.
 
 ## Recovery

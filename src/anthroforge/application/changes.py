@@ -1,6 +1,7 @@
 """Bounded, client-independent change descriptions between immutable documents."""
 
 from collections import deque
+from collections.abc import Mapping
 from dataclasses import dataclass, field, fields
 from typing import Any
 
@@ -31,11 +32,12 @@ def changed_fields(before: Any, after: Any) -> set[str]:
     return {f.name for f in fields(after) if getattr(before, f.name) != getattr(after, f.name)}
 
 
-def record_changes(before: tuple[Any, ...], after: tuple[Any, ...]) -> dict[str, set[str]]:
+def record_changes(before: Mapping[str, Any], after: Mapping[str, Any]) -> dict[str, set[str]]:
     if before is after:
         return {}
-    old, new = {v.id: v for v in before}, {v.id: v for v in after}
-    result = {key: changed_fields(old.get(key), new.get(key)) for key in old.keys() | new.keys()}
+    result = {
+        key: changed_fields(before.get(key), after.get(key)) for key in before.keys() | after.keys()
+    }
     return {key: value for key, value in result.items() if value}
 
 
@@ -51,8 +53,8 @@ class ChangeJournal:
         names = ("name", "workspaces", "attachments_enabled", "update_mode")
         delta = DocumentChanges(
             before.id != after.id,
-            record_changes(before.entities, after.entities),
-            record_changes(before.controls, after.controls),
+            record_changes(before.index.entities, after.index.entities),
+            record_changes(before.index.controls, after.index.controls),
             {name for name in names if getattr(before, name) != getattr(after, name)},
         )
         record_order(delta, before, after)
@@ -69,6 +71,8 @@ class ChangeJournal:
 
 
 def record_order(delta: DocumentChanges, before: Document, after: Document) -> None:
+    if before.index.structure is after.index.structure:
+        return
     for name in ("entities", "controls"):
         old, new = getattr(before, name), getattr(after, name)
         if old is not new and tuple(v.id for v in old) != tuple(v.id for v in new):

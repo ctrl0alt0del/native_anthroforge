@@ -99,13 +99,16 @@ def validate_matrix(matrix: tuple[float, ...]) -> None:
 
 
 def descendants(entities: tuple[SCP, ...], entity_id: str) -> set[str]:
+    children: dict[str, list[str]] = {}
+    for item in entities:
+        children.setdefault(item.parent, []).append(item.id)
     result, pending = set(), [entity_id]
     while pending:
         current = pending.pop()
         if current in result:
             raise ValueError("Cyclic SCP hierarchy.")
         result.add(current)
-        pending.extend(item.id for item in entities if item.parent == current)
+        pending.extend(children.get(current, ()))
     return result
 
 

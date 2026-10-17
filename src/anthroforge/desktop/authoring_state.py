@@ -9,8 +9,8 @@ from anthroforge.native.scene import entity_frame
 
 def data(editor):
     session, selected = editor.controller.session, editor.controller.selection
-    entity = next((e for e in session.document.entities if e.id == selected), None)
-    control = next((c for c in session.document.controls if c.id == selected), None)
+    entity = session.document.index.entities.get(selected)
+    control = session.document.index.controls.get(selected)
     item = entity or control
     result = projected_item(item, control is not None)
     result["is_control"] = control is not None
@@ -127,10 +127,10 @@ def imported_components(session, entity):
 
 def components_for(editor):
     session, selected = editor.controller.session, editor.controller.selection
-    control = next((c for c in session.document.controls if c.id == selected), None)
+    control = session.document.index.controls.get(selected)
     if control:
         return control_components(session, control)
-    entity = next((e for e in session.document.entities if e.id == selected), None)
+    entity = session.document.index.entities.get(selected)
     return entity_components(session, entity, editor.category) if entity and editor.editing else []
 
 
@@ -161,8 +161,9 @@ def retained_selection(editor):
 
 def cache_key(editor):
     session, selected = editor.controller.session, editor.controller.selection
-    items = (*session.document.entities, *session.document.controls)
-    item = next((value for value in items if value.id == selected), None)
+    item = session.document.index.entities.get(selected) or session.document.index.controls.get(
+        selected
+    )
     return (
         selected,
         item.generation if item else -1,

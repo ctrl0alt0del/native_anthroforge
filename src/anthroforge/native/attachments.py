@@ -1,6 +1,7 @@
 """Batch attachment capture and propagation, without host or UI objects."""
 
 import ctypes as c
+from collections import deque
 from dataclasses import replace
 from threading import Event
 from typing import Any
@@ -56,11 +57,14 @@ def handle(entity: SCP, meshes: dict[str, Mesh]) -> int:
 
 
 def ordered(entities: tuple[SCP, ...]) -> list[SCP]:
-    result, pending = [], [item for item in entities if not item.parent]
+    children: dict[str, list[SCP]] = {}
+    for item in entities:
+        children.setdefault(item.parent, []).append(item)
+    result, pending = [], deque(children.get("", ()))
     while pending:
-        item = pending.pop(0)
+        item = pending.popleft()
         result.append(item)
-        pending.extend(child for child in entities if child.parent == item.id)
+        pending.extend(children.get(item.id, ()))
     if len(result) != len(entities):
         raise ValueError("Invalid attachment hierarchy.")
     return result

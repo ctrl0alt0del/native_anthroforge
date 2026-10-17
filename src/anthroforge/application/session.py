@@ -203,10 +203,12 @@ class Session:
 
 
 def changed_ids(previous: Document, current: Document) -> set[str]:
-    changed = {e.id for e in previous.entities if e not in current.entities}
-    return changed | {c.id for c in previous.controls if c not in current.controls}
+    changed = {e.id for e in previous.entities if e != current.index.entities.get(e.id)}
+    return changed | {c.id for c in previous.controls if c != current.index.controls.get(c.id)}
 
 
 def merge_entity(previous: SCP, current: SCP) -> SCP:
+    if current is previous:
+        return current
     moved = differs(previous, current, POSE_FIELDS)
     return replace(current, pose_revision=previous.pose_revision + 1) if moved else current

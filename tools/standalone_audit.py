@@ -124,6 +124,23 @@ def command_profile(output):
         session.close()
 
 
+def runtime_profile(output):
+    session = Session()
+    session.document = document_fixture(1024, "LIVE")
+    session.history = History(session.document)
+    session.begin()
+    edit = point_editor(session)
+    edit()
+    try:
+        path = str((output / "admission.afprofile.zip").resolve())
+        session.command("profile.start")
+        for _ in range(9):
+            edit()
+        session.command("profile.stop", path=path, wait=True)
+    finally:
+        session.close()
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=Path)
@@ -135,6 +152,7 @@ def main():
     result["document"] = [document_scaling(n) for n in (16, 64, 256, 1024)]
     result["jobs"] = [job_scaling(n) for n in (0, 1000, 10000, 50000)]
     command_profile(args.output)
+    runtime_profile(args.output)
     (args.output / "scaling.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result))
 

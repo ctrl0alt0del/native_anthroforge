@@ -40,6 +40,8 @@ def authored_points(source: Curve, spec: ConversionSpec) -> tuple[CurvePoint, ..
         raise ValueError("An open route must retain both endpoints.")
     if isinstance(source, Fiber) and not {b.point for b in source.bindings} <= selected:
         raise ValueError("Retain every anatomically bound point as a routing constraint.")
+    if not {p.id for p in source.points if p.junction} <= selected:
+        raise ValueError("Retain every shared junction point as a routing constraint.")
     return tuple(point for point in source.points if point.id in selected)
 
 
@@ -52,13 +54,23 @@ def sampled_points(value: ConversionInput, cancel: int) -> tuple[CurvePoint, ...
     )
     points = tuple(sample_point(row) for row in rows)
     identities = {int(index): key for index, (_, key) in zip(indices, retained, strict=True)}
-    return tuple(replace(p, id=identities.get(i, p.id)) for i, p in enumerate(points))
+    return preserved_points(value.source, points, identities)
+
+
+def preserved_points(
+    source: Curve, points: tuple[CurvePoint, ...], identities: dict[int, str]
+) -> tuple[CurvePoint, ...]:
+    shared = {p.id: p.junction for p in source.points}
+    return tuple(
+        replace(p, id=identities.get(i, p.id), junction=shared.get(identities.get(i, ""), ""))
+        for i, p in enumerate(points)
+    )
 
 
 def retained_points(value: ConversionInput) -> tuple[tuple[int, str], ...]:
     assert value.asset is not None
     source = value.source
-    keys = endpoint_ids(source)
+    keys = endpoint_ids(source) | {p.id for p in source.points if p.junction}
     if isinstance(source, Fiber):
         keys |= {b.point for b in source.bindings}
     accepted = value.asset.authored.points

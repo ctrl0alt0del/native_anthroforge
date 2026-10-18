@@ -79,6 +79,7 @@ ColumnLayout {
         NumericSetting { visible: panel.primitive.kind === "LOFT" && panel.curve.span !== null; label: "Curve span"; value: panel.curve.span || 1; onEdited: value => panel.curveSetting("span",value) }
         Label { text: "Control point"; color: Theme.muted }
         FiberBinding { curve: panel.curve; point: panel.point }
+        CurveJunction { curve: panel.curve; point: panel.point }
         UiCombo { id: pointChoice; objectName: "pointChoice"; Layout.fillWidth: true; model: panel.points.map((p,i)=>"Point "+(i+1)); onActivated: { const rows=authoring.componentRows.filter(r=>r.point===panel.point.id && r.part==="position"); if(rows.length) authoring.selectComponent(rows[0].key,false); } }
         VectorSetting { length: true; label: "Point position"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
         Repeater {

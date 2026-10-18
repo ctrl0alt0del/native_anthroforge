@@ -235,6 +235,12 @@ class Authoring(QObject):
 
         command(self, operation, arguments)
 
+    @Slot(str, str, result="QVariantMap")
+    def junctionOptions(self, curve, point):
+        from .junction_tools import choices
+
+        return choices(self.controller, curve, point)
+
     @Slot(str, str, "QVariant")
     def setting(self, operation, key, value):
         selected = self.controller.selection

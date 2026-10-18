@@ -659,3 +659,16 @@ Evidence covers edits from either member, Any-parent and explicit-parent rebindi
 parent movement without recapture/drift, Manual inputs, mixed Curve/Fiber membership,
 one-action undo and save/reopen. Desktop controls, conversion/copy identities, branches
 and remaining release qualification are still pending; this is not release-ready.
+
+### Junction interaction and identity
+
+The curve inspector now exposes a collapsed Shared junction section with explicit source
+selection, join and detach operations. Full-QML offscreen checks invoke these controls,
+verify membership, detach and undo, retain editing/selection, and produce no QML warnings.
+No desktop input or visible native window was used.
+
+Sampled conversion preserves shared point IDs/membership; routed conversion requires those
+points as explicit constraints. Anatomical assembly copies remap junctions within the copied
+set (including accepted path metadata and dependency output IDs), without linking originals.
+Single independent copies clear membership. Five focused identity/architecture tests pass;
+configured mypy (169 modules) passes. Full suite and branch construction remain pending.

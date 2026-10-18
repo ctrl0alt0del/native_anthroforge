@@ -9,7 +9,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import EvaluationResult, ReadRevision
 
-from . import curve_sources
+from . import curve_sources, junction_copies
 from .curve_copy_resources import Copies
 from .membership import remap, remap_weights
 
@@ -107,7 +107,20 @@ def entity(source: SCP, mapping: dict[str, str], parent: str) -> SCP:
 def remap_inputs(
     inputs: tuple[ReadRevision, ...], mapping: dict[str, str]
 ) -> tuple[ReadRevision, ...]:
-    return tuple(replace(value, owner=mapping.get(value.owner, value.owner)) for value in inputs)
+    return tuple(
+        replace(
+            value,
+            owner=mapping.get(value.owner, value.owner),
+            output=remap_output(value.output, mapping),
+        )
+        for value in inputs
+    )
+
+
+def remap_output(output: str, mapping: dict[str, str]) -> str:
+    if output.startswith("junction:"):
+        return "junction:" + mapping.get(output[9:], output[9:])
+    return output
 
 
 def remap_result(result: EvaluationResult, mapping: dict[str, str]) -> EvaluationResult:
@@ -121,12 +134,15 @@ def remap_result(result: EvaluationResult, mapping: dict[str, str]) -> Evaluatio
 def duplicate(session: "Session", ids: set[str], parent: str) -> dict[str, str]:
     controls = copied_controls(session.document, ids)
     mapping = {key: str(uuid4()) for key in identities(session.document, ids, controls)}
+    mapping = junction_copies.identities(session.document, mapping)
     copies = tuple(entity(e, mapping, parent) for e in session.document.entities if e.id in ids)
     shared = tuple(control(c, mapping) for c in session.document.controls if c.id in controls)
+    junctions = session.document.junctions + junction_copies.records(session.document, mapping)
     session.replace_document(
         entities=(*session.document.entities, *copies),
         controls=(*session.document.controls, *shared),
         objects=(*session.document.objects, *copied_curves(session, mapping)),
+        junctions=junctions,
     )
     return {key: mapping[key] for key in ids}
 

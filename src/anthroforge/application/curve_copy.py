@@ -4,7 +4,7 @@ from dataclasses import replace
 from typing import Any
 from uuid import uuid4
 
-from anthroforge.core.construction import Curve
+from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.core.curve_engines import RoutingSettings
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.results import EvaluationResult
@@ -21,13 +21,20 @@ def clone(curve: Curve, identities: dict[str, str]) -> Curve:
         name=curve.name + " copy",
         parent=identities.get(curve.parent, curve.parent),
         owners=tuple(identities.get(key, key) for key in curve.owners),
-        points=tuple(replace(p, id=identities[p.id], junction="") for p in curve.points),
+        points=point_copies(curve, identities),
         generation=0,
         pose_revision=0,
         construction_revision=0,
         result=EvaluationResult(),
         engine_settings=engine_settings(curve, identities),
         **binding_changes(curve, identities),
+    )
+
+
+def point_copies(curve: Curve, identities: dict[str, str]) -> tuple[CurvePoint, ...]:
+    return tuple(
+        replace(p, id=identities[p.id], junction=identities.get(p.junction, ""))
+        for p in curve.points
     )
 
 

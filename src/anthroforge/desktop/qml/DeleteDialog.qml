@@ -11,7 +11,7 @@ UiDialog {
     standardButtons: Dialog.Ok | Dialog.Cancel
     property var target: ({})
     property string explanation: ""
-    title: "Delete “" + (target.name || "") + "”?"
+    title: "Delete “" + (target?.name || "") + "”?"
     function request(entity) {
         const row = workspace.treeRows.find(item => item.id === entity);
         if (!row || row.readonly || workspace.state.waiting) return;

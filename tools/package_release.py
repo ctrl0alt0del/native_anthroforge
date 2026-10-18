@@ -52,8 +52,11 @@ def configure(config):
 
 
 def nuitka_options():
+    # PySide uses deploy_main.py when QML options exceed Windows' command limit.
+    # Keep the output contract independent of that temporary entry point.
     return (
         "--noinclude-qt-translations --windows-console-mode=attach --mingw64 --jobs=4 "
+        "--output-filename=AnthroForge.exe --output-folder-name=AnthroForge "
         "--include-module=PySide6.QtQuick3D --nofollow-import-to=scipy,pytest,matplotlib,IPython "
         "--include-distribution-metadata=numpy --include-distribution-metadata=PySide6 "
         "--assume-yes-for-downloads --report=compilation-report.xml"

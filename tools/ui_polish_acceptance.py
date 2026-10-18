@@ -6,7 +6,7 @@ from pathlib import Path
 import inspection_acceptance as inspection
 import issues_acceptance as issues
 from activity_acceptance import wait_for
-from PySide6.QtCore import QMetaObject, QObject, QPointF, Qt
+from PySide6.QtCore import QObject, QPointF, Qt
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from shiboken6 import delete
@@ -67,7 +67,7 @@ def combo_containment(window):
     capture(window, "workspace-dropdown")
     QTest.keyClick(window, Qt.Key.Key_Escape)
     capture(window, "workspace")
-    QMetaObject.invokeMethod(find(window, "workspaceManager"), "close")
+    dialog_button(window, "workspaceManager", "Close")
 
 
 def disclosure_checks(controller, window):
@@ -76,6 +76,7 @@ def disclosure_checks(controller, window):
     capture(window, "measurements-compact")
     inspection.display_units(controller, window)
     inspection.bookmarks(controller, window)
+    assert find(window, "measurementCoordinates").isVisible()
     capture(window, "measurements-details")
     click(window, "inspectionToolsToggle")
     click(window, "menuBarHelp")
@@ -83,7 +84,7 @@ def disclosure_checks(controller, window):
     QTest.keyClick(window, Qt.Key.Key_Return)
     assert find(window, "shortcutHelp").property("visible")
     capture(window, "shortcuts")
-    QMetaObject.invokeMethod(find(window, "shortcutHelp"), "close")
+    dialog_button(window, "shortcutHelp", "Close")
 
 
 def issue_details(controller, window):
@@ -109,9 +110,31 @@ def reveal_evidence(window):
     click(window, "Details & evidenceToggle")
 
 
-def exercise(controller, window):
-    inspection.fixture(controller)
-    inspection.pickability(controller)
+def dialog_button(window, name, text):
+    dialog = find(window, name)
+    buttons = descendants(dialog.property("footer"))
+    button = next(item for item in buttons if item.property("text") == text)
+    point = button.mapToScene(QPointF(button.width() / 2, button.height() / 2)).toPoint()
+    QTest.mouseClick(window, Qt.MouseButton.LeftButton, pos=point)
+    QTest.qWait(100)
+    assert not dialog.property("visible")
+
+
+def dialog_deletion(controller, window):
+    root = controller.selection
+    find(window, "viewport").forceActiveFocus()
+    QTest.keyClick(window, Qt.Key.Key_Delete)
+    dialog_button(window, "deleteDialog", "Cancel")
+    assert controller.session.document.entity(root)
+    QTest.keyClick(window, Qt.Key.Key_Delete)
+    dialog_button(window, "deleteDialog", "OK")
+    assert not controller.session.document.entities
+    controller.run("undo", {})
+    controller.select(root)
+    assert controller.session.document.entity(root)
+
+
+def layout_checks(window):
     for width, height in ((1440, 900), (1050, 680)):
         window.resize(width, height)
         QTest.qWait(120)
@@ -119,8 +142,15 @@ def exercise(controller, window):
         for title in ("File", "Edit", "View", "Help"):
             menu_hover(window, title)
         combo_containment(window)
+
+
+def exercise(controller, window):
+    inspection.fixture(controller)
+    inspection.pickability(controller)
+    layout_checks(window)
     window.resize(1440, 900)
     disclosure_checks(controller, window)
+    dialog_deletion(controller, window)
     window.resize(1050, 680)
     issue_details(controller, window)
 

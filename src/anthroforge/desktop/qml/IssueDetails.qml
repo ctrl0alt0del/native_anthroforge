@@ -18,7 +18,7 @@ ScrollView {
             UiButton { objectName: "issueSelectTarget"; text: "Select target"; visible: !!panel.issue.target; enabled: panel.service.state.canNavigate; onClicked: panel.service.navigate(panel.issue.target,false) }
             UiButton { objectName: "issueFrameTarget"; text: "Frame target"; visible: !!panel.issue.target; enabled: panel.service.state.canNavigate; onClicked: panel.service.navigate(panel.issue.target,true) }
             UiButton { objectName: "issueRecheck"; text: "Recheck provider"; visible: !!panel.issue.id; onClicked: panel.service.run("issues.recheck",{provider:panel.issue.provider}) }
-            UiButton { objectName: "issueDismiss"; text: panel.issue.dismissed ? "Restore" : "Dismiss"; visible: !!panel.issue.id; onClicked: panel.service.run("issues.dismiss",{identity:panel.issue.id,dismissed:!panel.issue.dismissed}) }
+            UiButton { objectName: "issueDismiss"; text: panel.issue.dismissed ? "Restore" : "Dismiss"; visible: !!panel.issue.exists; onClicked: panel.service.run("issues.dismiss",{identity:panel.issue.id,dismissed:!panel.issue.dismissed}) }
         }
         Repeater {
             model: panel.issue.fixes || []

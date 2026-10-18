@@ -55,6 +55,7 @@ def controlled(label, output, gate, published):
 
 
 def queued_pair(session):
+    session.wait(5)
     first, second, published = Event(), Event(), []
     jobs = [
         controlled("first", "shared", first, published),

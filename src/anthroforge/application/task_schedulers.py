@@ -124,7 +124,7 @@ class ControlAttachmentTaskScheduler(AttachmentTaskScheduler):
 class IssueTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         cost = 0.1 + 0.005 * workload.affected
-        delay = min(150.0, max(25.0, cost * 2))
+        delay = 0.0 if workload.affected < 64 else min(150.0, max(25.0, cost * 2))
         return Schedule("worker", cost, delay, 150.0, "Read-only advisory checks after editing")
 
 

@@ -127,6 +127,7 @@ class Session:
         self.document = replace(self.history.cancel(), workspaces=self.document.workspaces)
         self.scheduler.restore(self.history.surviving())
         self.replay_callback = None
+        self.issues.reset()
         self.resume_calculations()
 
     @measured("transaction", lambda session: session.profiler)
@@ -138,6 +139,7 @@ class Session:
         self.remember_restarts(self.scheduler.restore(self.history.surviving()))
         changed = changed_ids(previous, self.document)
         self.scheduler.invalidate(changed)
+        self.issues.reset()
         if direction > 0:
             self.history.replay()
         self.resume_calculations()

@@ -10,6 +10,8 @@ if TYPE_CHECKING:
 
 
 def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    session.issues.listening.discover_changes()
+    session.issues.tasks.prune()
     commands = catalogue(session)
     if operation not in commands:
         raise ValueError("Unknown issue operation: " + operation)

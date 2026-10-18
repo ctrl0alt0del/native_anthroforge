@@ -3,6 +3,8 @@
 from dataclasses import replace
 from threading import Event
 
+import pytest
+
 from anthroforge.application.issues.providers import Provider
 from anthroforge.core.issues import Issue
 from tests.test_construction_contracts import create, hook
@@ -69,16 +71,15 @@ def slow_provider(entered, release):
     return Provider("slow", lambda _: {"document"}, lambda *_: set(), lambda d, _: d.id, check)
 
 
-def test_cancelled_readonly_check_cannot_publish_or_block_save(session, tmp_path):
+@pytest.mark.parametrize("policy", ["pending", "wait", "checkpoint"])
+def test_cancelled_readonly_check_cannot_publish_or_block_save(session, tmp_path, policy):
     session.wait(5)
     entered, release = Event(), Event()
     session.issues.listening.register(slow_provider(entered, release))
     session.scheduler.tick()
-    for job in session.scheduler.active_jobs:
-        job.ready_at = 0
-    session.scheduler.tick()
     assert entered.wait(2) and not session.scheduler.blocked
-    session.command("save", path=str(tmp_path / "advisory.anthroforge"), blocked_policy="pending")
+    session.command("save", path=str(tmp_path / "advisory.anthroforge"), blocked_policy=policy)
+    assert session.issues.listening.running["slow"].active
     session.command("issues.cancel", provider="slow")
     release.set()
     session.wait(5)

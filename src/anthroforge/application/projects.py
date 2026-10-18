@@ -22,7 +22,7 @@ def save(session: "Session", path: str, blocked_policy: str) -> dict[str, Any]:
             "jobs": [j.id for j in session.scheduler.active_jobs if j.writes],
         }
     if blocked_policy == "wait":
-        session.scheduler.wait()
+        session.scheduler.wait(writes_only=True)
     document = session.scheduler.checkpoint if session.scheduler.blocked else session.document
     return save_snapshot(session, Path(path).resolve(), document)
 
@@ -68,6 +68,7 @@ def open_project(session: "Session", path: str) -> dict[str, Any]:
 
 
 def adopt(session: "Session", document: Any, assets: Any) -> None:
+    session.issues.close()
     session.scheduler.close()
     session.document, session.assets = document, assets
     session.history = History(document)

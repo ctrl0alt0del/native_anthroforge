@@ -310,16 +310,17 @@ class TaskCoordinator:
         elif not self.blocked:
             self.checkpoint = self.current()
 
-    def wait(self, timeout: float | None = None) -> None:
+    def wait(self, timeout: float | None = None, writes_only: bool = False) -> None:
         started = monotonic()
         self.tick()
-        while self.registry.active:
+        while self.blocked if writes_only else self.registry.active:
             self.tick()
             if timeout is not None and monotonic() - started >= timeout:
                 raise TimeoutError("Calculations are still pending.")
             sleep(0.002)
 
     def close(self) -> None:
+        self.service_tick = lambda: None
         for job in self.active_jobs:
             if job.active:
                 self.cancel_job(job.id)

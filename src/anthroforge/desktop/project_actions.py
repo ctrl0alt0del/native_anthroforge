@@ -137,6 +137,7 @@ def opened(controller, path, lock, result):
     session.active_workspace = 0
     session.waiting_save = False
     projects.finish_save(session, path, lock, session.serial)
+    session.issues.reset()
     projects.synchronize_loaded(session)
     controller.selection, controller.last_revision = "", -1
     controller.refresh()

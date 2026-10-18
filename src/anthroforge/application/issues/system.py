@@ -35,6 +35,7 @@ class IssueSystem:
         scheduler.lifecycle = self.tasks.event
 
     def synchronize(self) -> None:
+        self.tasks.prune()
         self.listening.synchronize()
         if not self.listening.closed:
             repairs.tick(self.session)
@@ -51,6 +52,7 @@ class IssueSystem:
                 callback()
 
     def reset(self) -> None:
+        self.listening.cancel()
         self.reporting.reset()
         self.resolution.running.clear()
         self.listening.reset()

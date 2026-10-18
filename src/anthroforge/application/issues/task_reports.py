@@ -17,6 +17,7 @@ class TaskReports:
     def __init__(self, session: "Session", reporting: Reporting) -> None:
         self.session, self.reporting = session, reporting
         self.latest: dict[str, str] = {}
+        self.cursor = session.changes.serial
         self.recheck()
 
     def event(self, job: Job, phase: str) -> None:
@@ -25,6 +26,8 @@ class TaskReports:
         scope = fingerprint((job.kind, job.key, sorted(job.outputs)))
         if phase == "submitted":
             self.latest[scope] = job.id
+            if self.reporting.repository.scopes.get((self.name, scope)):
+                self.reporting.invalidate(self.name, scope)
         elif self.latest.get(scope) == job.id:
             self.publish(scope, job)
 
@@ -46,8 +49,25 @@ class TaskReports:
                 self.publish(scope, job)
         self.reporting.complete(self.reporting.begin(self.name, "document"), ())
 
+    def prune(self) -> None:
+        journal = self.session.changes
+        if self.cursor == journal.serial:
+            return
+        delta = journal.since(self.cursor)
+        self.cursor = journal.serial
+        live = (
+            self.session.document.index.entities.keys()
+            | self.session.document.index.controls.keys()
+        )
+        removed = (delta.entities.keys() | delta.controls.keys()) - live
+        for row in tuple(self.reporting.repository.records.values()):
+            if row.provider == self.name and row.target in removed:
+                self.reporting.remove(self.name, row.scope)
+                self.latest.pop(row.scope, None)
+
     def reset(self) -> None:
         self.latest.clear()
+        self.cursor = self.session.changes.serial
         self.recheck()
 
 

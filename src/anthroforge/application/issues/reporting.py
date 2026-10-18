@@ -40,7 +40,9 @@ class Reporting:
     def report(self, issue: Issue) -> None:
         key = issue.provider, issue.scope
         prior = self.repository.scopes.get(key, {})
-        rows = tuple(row for row in prior.values() if row.id != issue.id) + (issue,)
+        rows = tuple(row for row in prior.values() if semantic_key(row) != semantic_key(issue)) + (
+            issue,
+        )
         self.complete(self.begin(*key), rows)
 
     def invalidate(self, provider: str, scope: str) -> None:
@@ -55,3 +57,7 @@ class Reporting:
         self.epoch += 1
         self.generations.clear()
         self.repository.clear()
+
+
+def semantic_key(issue: Issue) -> tuple[str, ...]:
+    return issue.provider, issue.scope, issue.stage, issue.code, issue.local_key

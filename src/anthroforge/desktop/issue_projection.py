@@ -22,17 +22,22 @@ def rows(panel):
 
 def detail(panel):
     system = panel.controller.session.issues
-    if panel.selected not in system.repository.records:
+    repair = system.resolution.running.get(panel.selected)
+    source = system.repository.records.get(panel.selected) or (repair.issue if repair else None)
+    if source is None:
         return {}
-    value = system.presentation.get(panel.selected)
+    value = system.presentation.serialize(source)
+    value["exists"] = panel.selected in system.repository.records
     value["targetLabel"] = target_label(panel.controller, value["target"])
     value["fixes"] = available(panel.controller.session, panel.selected)
     value["evidenceText"] = json.dumps(value["evidence"], indent=2)
-    value["relatedTargets"] = [
-        dict(id=key, label=target_label(panel.controller, key)) for key in value["related"]
-    ]
-    value.update(repair_state(system.resolution.running.get(panel.selected)))
+    value["relatedTargets"] = related_targets(panel.controller, value["related"])
+    value.update(repair_state(repair))
     return value
+
+
+def related_targets(controller, targets):
+    return [dict(id=key, label=target_label(controller, key)) for key in targets]
 
 
 def repair_state(repair):

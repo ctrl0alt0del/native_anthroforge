@@ -83,7 +83,9 @@ def document_switch(controller, window):
     index = QPersistentModelIndex(model.index(0))
     new_document(controller)
     QTest.qWait(100)
-    assert controller.activity_model is model and model.rowCount() == 0
+    assert controller.activity_model is model
+    jobs = controller.session.scheduler.registry.by_id
+    assert all(jobs[row["jobId"]].kind == "issue_check" for row in model.rows)
     assert not index.isValid() and not model.hasFailures and not model.activeCount
     assert window.grabWindow().save(str(OUTPUT / "new-document.png"))
 

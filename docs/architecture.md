@@ -1,8 +1,20 @@
-# AnthroForge 0.1.5 architecture
+# AnthroForge 0.1.6 architecture
 
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through
 the same core in later releases.
+
+## Issue reporting (0.1.6)
+
+Each Session owns an `IssueSystem`, separate from document/history state. Reporting,
+listening, presentation and explicit resolution share a provider-scoped repository.
+See [the addon-to-standalone component mapping and contracts](issues.md).
+Checks are read-only jobs in the existing task coordinator; failed or cancelled
+checks retain stale evidence. Repairs invoke shared application operations and must
+pass a fresh verification. Document replacement and history navigation invalidate
+check epochs. UI/JSON clients share `issues.*`; geometry diagnostics do not run in draw.
+`RecordModel` supplies stable keyed Qt rows to both Activity and Issues. These
+diagnostics do not certify unimplemented fiber, skin, collision or anatomy checks.
 
 The [confirmed 0.1.2 specification](primitives_012.md) defines primitive and deformer behavior. Primitive
 construction, deformers, shared controls and per-target bindings have separate

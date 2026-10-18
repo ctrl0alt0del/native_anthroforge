@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from anthroforge.core.issues import Check
 from anthroforge.core.jobs import Job
 
+from ..changes import DocumentChanges
 from . import checking
 from .providers import Provider
 from .reporting import Reporting
@@ -27,7 +28,7 @@ class Listening:
         if provider.name in self.providers:
             raise ValueError("Duplicate issue provider.")
         self.providers[provider.name] = provider
-        self.invalidate(provider.name, provider.scopes(self.session.document))
+        self.recheck(provider.name)
 
     def unregister(self, name: str) -> None:
         self.require(name)
@@ -51,7 +52,7 @@ class Listening:
     def recheck(self, provider: str | None = None) -> None:
         selected = (self.require(provider),) if provider else tuple(self.providers.values())
         for value in selected:
-            self.invalidate(value.name, value.scopes(self.session.document))
+            self.discover(value, None)
 
     def synchronize(self) -> None:
         if self.closed:
@@ -73,15 +74,31 @@ class Listening:
         delta = journal.since(self.cursor)
         self.cursor = journal.serial
         for provider in self.providers.values():
-            live = provider.scopes(self.session.document)
-            scopes = live if delta.reset else provider.affected(self.session.document, delta)
-            self.invalidate(provider.name, scopes & live)
-            self.remove_absent(provider.name, live)
+            self.discover(provider, delta)
+
+    def discover(self, provider: Provider, delta: DocumentChanges | None) -> None:
+        try:
+            self.update_scopes(provider, delta)
+            if (provider.name, "@provider") in self.reporting.repository.states:
+                self.reporting.remove(provider.name, "@provider")
+        except Exception as error:
+            ticket = self.reporting.begin(provider.name, "@provider")
+            self.reporting.fail(ticket, str(error) or type(error).__name__)
+
+    def update_scopes(self, provider: Provider, delta: DocumentChanges | None) -> None:
+        live = provider.scopes(self.session.document)
+        scopes = (
+            live
+            if delta is None or delta.reset
+            else provider.affected(self.session.document, delta)
+        )
+        self.invalidate(provider.name, scopes & live)
+        self.remove_absent(provider.name, live)
 
     def remove_absent(self, name: str, live: set[str]) -> None:
         self.pending.setdefault(name, set()).intersection_update(live)
         for provider, scope in tuple(self.reporting.repository.states):
-            if provider == name and scope not in live:
+            if provider == name and scope not in live and scope != "@provider":
                 self.reporting.remove(provider, scope)
 
     def cancel(self, provider: str | None = None) -> None:

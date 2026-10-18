@@ -22,11 +22,18 @@ def exercise(controller, renderer, app):
     assert frames(controller, renderer, app, 20).save(str(OUTPUT / "skull-fibers.png"))
     controller.cameraRequested.emit([0.15, -0.45, 1.35, 0, 0, 0, 3], True)
     assert frames(controller, renderer, app).save(str(OUTPUT / "skull-front.png"))
+    save_construction_views(controller, renderer, app, targets)
+    assert len(controller.path_model.active_rows()) == 4
+    assert all(o.result.status == "ready" for o in controller.session.document.objects)
+
+
+def save_construction_views(controller, renderer, app, targets):
+    controller.run("workspace.update", dict(hidden=targets))
+    assert frames(controller, renderer, app).save(str(OUTPUT / "paths-and-loft.png"))
+    controller.run("workspace.update", dict(hidden=[]))
     controller.session.command(
         "save", path=str(OUTPUT / "skull.anthroforge"), blocked_policy="wait"
     )
-    assert len(controller.path_model.active_rows()) == 4
-    assert all(o.result.status == "ready" for o in controller.session.document.objects)
 
 
 def run(app):

@@ -81,16 +81,11 @@ def source(session: Any, target: str, curve: str, **values: Any) -> None:
 
 
 def order(session: Any, target: str, curves: list[str]) -> None:
+    from .surface_sources import configured as configure_sources
+
     item = editable(session, target)
     if item.branches:
         raise ValueError("Remove branches before changing the main source order.")
     if len(curves) != len(item.curves) or set(curves) != {u.curve for u in item.curves}:
         raise ValueError("Reordering requires every surface source exactly once.")
-    uses = {u.curve: u for u in item.curves}
-    alignment = dict(zip(uses, item.alignment, strict=False))
-    changed = replace(
-        item,
-        curves=tuple(uses[key] for key in curves),
-        alignment=tuple(alignment[key] for key in curves) if alignment else (),
-    )
-    object_operations.install(session, changed)
+    object_operations.install(session, configure_sources(session, item, curves))

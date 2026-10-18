@@ -4,7 +4,7 @@
 - Integration branch: `main`
 - Starting revision: `b539697`
 - Status: in progress; not release-ready
-- Last updated: 2026-10-18, Europe/Bucharest
+- Last updated: 2026-10-19, Europe/Bucharest
 - Recovery update: 2026-10-19. Earlier checkpoint sections below are historical;
   the latest checkpoints supersede their incomplete-feature statements.
 - Active writer: local desktop implementation chat
@@ -45,12 +45,12 @@ Profiler memory snapshots now include typed mesh/path/image totals and per-kind 
 with bounded native path enumeration, weak job observations and bounded catalogue/history
 collection. Disabled profiling performs no inventory queries. Image resource identity avoids
 hashing image payloads during observations; reports contain sizes and provenance, not pixels.
-Standalone curves now have Construction navigation, shared editing, staged native display
-and picking (details below). ROUTED is not implemented in the standalone engine and is
-explicitly rejected by native path dispatch. Image import/replacement/calibration and native
-texture preparation, image UI/display and picking are implemented (evidence limits below).
-Fiber/Surface production operations/native algorithms/UI remain unfinished.
-Direct control.attach is still present and must be retired as planned.
+Standalone curves have Construction navigation, shared editing, staged display and picking.
+BEZIER/POLYLINE/ROUTED engines, native drawing/fitting, images, Fiber attachment deformation,
+current-shape editing, explicit junctions and generic loft/patch/branch surfaces are integrated
+with desktop controls and the shared API. Routing includes native warm-span remapping and
+actual skull donor parity. Authored-engine collision checks use the read-only Issues service.
+Direct control.attach is retired; shared controls use ordinary transform relationships.
 No 0.2.0 release qualification or version bump has occurred.
 The current coordinator, attachment kernels, Issues, profiler, transactions and
 staged renderer must be extended at their owning boundaries, not duplicated.
@@ -80,13 +80,11 @@ Use background/offscreen checks and state their limits.
 
 ## Next actions and blockers
 
-1. Extend remaining inspection/Issues clients to generic objects; retire control anatomical
-   attachments in favor of ordinary relationships. Path/image profiler ownership is integrated.
-2. Add Construction UI and standalone curve editing/creation; curve consumers already have
-   shared command operations. Then complete native drawing, embedded reference images,
-   Fiber bindings/routing/junctions and generic surfaces in the planned order.
-3. Keep removing contradictory active baseline text as each boundary is integrated.
-4. Run native/parity, headless, offscreen and portable release qualification before merge.
+1. Finish active documentation, API examples and package notices for the complete workflow.
+2. Run the stable integrated offscreen suite, development gate and ownership/coupling review.
+3. Build and qualify the relocated portable executable, headless and invisible rendering,
+   before the versioned release/source archive and validated merge. No interactive acceptance
+   may be claimed while validation is background-only.
 
 Important findings: ordinary parenting and consumer frames need an atomic rebind to avoid
 double transforms after a new shared ancestor is introduced. Local path/local-pose ports
@@ -841,3 +839,29 @@ skull context; the loft interpolates between them and can be occluded by the cur
 (surface collision correction belongs to later volume work). 16 parity/architecture tests,
 native build/3 CTests, warm clang-tidy, mypy and Ruff pass. Repeated profiling/resource trials,
 remaining lifecycle review, documentation/examples and package qualification are next.
+
+### Drawing depth and shared-construction qualification
+
+Surface source insertion/removal/reordering now retains the existing density of unchanged
+adjacent source pairs; new pairs use the configured strip count. A regression exercises all
+three operations. 12 focused surface/workflow/architecture checks pass.
+
+Pinned Blender source inspection and five failing tests identified target-before-substep
+projection and first-event plane locking differences. The native adapter now uses the last
+successful depth and precomputed target sample as Blender does, including a missed first ray.
+43 drawing/parity/architecture tests, native build/3 CTests and drawing clang-tidy pass.
+The invisible D3D11 drawing/tracing/conversion/undo workflow passes without QML warnings.
+
+`tools/construction_profile_qualification.py` runs serial off/on/on/off trials over the skull
+fixture with four shared loft consumers and 32 controller drag updates per trial. Mean work
+including synchronous GPU readback was 15.01/20.20/22.75/19.17 ms; p95 was
+18.29/29.06/30.99/21.26 ms. These are offscreen work intervals, not display latency or a
+precise profiler perturbation estimate. System busy was about 14–17%; background activity
+and thermal state were uncontrolled. Both recorded reports are complete without model resets.
+Measured preparation maxima were 0.035 ms; publication 1.032/0.484 ms; viewport activation
+1.545/1.698 ms. After settling, jobs/staging retained no geometry. Document/history ownership
+overlaps and must not be summed. New Document followed by renderer draining released all
+observed native geometry (zero bytes). Reports and measurements are under
+`build/020-construction-profile`; the tool is maintained, generated reports are local evidence.
+The skull paths-and-loft-only capture was also inspected, confirming a continuous surface.
+No visible window or desktop input was used. Full final gate/package qualification is pending.

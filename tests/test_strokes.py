@@ -42,6 +42,38 @@ def mesh_stroke(session, assembly, **options):
     return stroke(session, [mesh.handle], [IDENTITY], surface=True, **options)
 
 
+def island(session, x, z):
+    vertices = [[x + dx, y, z] for dx, y in ((-0.01, -1), (0.01, -1), (0.01, 1), (-0.01, 1))]
+    return session.engine.create_mesh(vertices, [0, 1, 2, 3], [0, 4])
+
+
+def test_blender_projects_target_before_depth_substeps(session):
+    meshes = [island(session, x, z) for x, z in ((0, 0.5), (0.12, 1.5))]
+    value = stroke(session, [m.handle for m in meshes], [IDENTITY] * 2, surface=True)
+    value.append(pointer(0), False)
+    value.append(pointer(0.12), True)
+    np.testing.assert_allclose(value.read()[:, 2], [0.5, 1.5, 1.5, 1.5, 1.5])
+
+
+def test_missed_target_keeps_precomputed_depth_but_next_event_uses_substep_hit(session):
+    meshes = [island(session, x, z) for x, z in ((0, 0.5), (0.12, 1.5))]
+    value = stroke(session, [m.handle for m in meshes], [IDENTITY] * 2, surface=True)
+    value.append(pointer(-0.06), False)
+    value.append(pointer(0.18), True)
+    assert value.read()[-1, 2] == pytest.approx(0)
+    value.append(pointer(0.2), False)
+    assert value.read()[-1, 2] == pytest.approx(1.5)
+
+
+@pytest.mark.parametrize("first", [1, 2, 3])
+def test_first_event_plane_locks_even_when_initial_ray_misses_surface(session, first):
+    mesh = island(session, 0.12, 1.5)
+    value = stroke(session, [mesh.handle], [IDENTITY], surface=True, first=first)
+    value.append(pointer(0), False)
+    value.append(pointer(0.12), False)
+    np.testing.assert_allclose(value.read()[:, 2], [0, 0])
+
+
 def test_surface_offset_and_miss_use_last_valid_depth(session, assembly):
     value = mesh_stroke(session, assembly, offset=0.1)
     assert value.probe(pointer())[2] == pytest.approx(0.6)

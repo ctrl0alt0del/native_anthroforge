@@ -50,3 +50,19 @@ def test_patch_source_replacement_preserves_both_independent_curves(session):
     assert session.document.object(target).curves[0].curve == b
     assert {a, b} <= session.document.registry.records.keys()
     assert len(vertices(session, target))
+
+
+def test_existing_pair_density_follows_adjacency_when_sources_change(session):
+    a, b, c, d = [curve(session, y) for y in (0, 0.4, 0.7, 1.2)]
+    target = surface(session, [a, b, c], strips=5)
+    before = session.document.object(target).across
+    assert len(before) == 2 and any(before)
+    session.command("surface.source.add", target=target, curve=d)
+    session.wait()
+    assert session.document.object(target).across[:2] == before
+    session.command("surface.order", target=target, curves=[d, c, b, a])
+    session.wait()
+    assert session.document.object(target).across[1:] == before[::-1]
+    session.command("surface.source.remove", target=target, curve=d)
+    session.wait()
+    assert session.document.object(target).across == before[::-1]

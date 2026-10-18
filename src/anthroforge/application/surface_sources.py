@@ -26,7 +26,19 @@ def configured(session: Any, item: Any, curves: list[str]) -> Any:
         item,
         curves=uses,
         alignment=tuple(alignment.get(key, SurfaceAlignment()) for key in curves),
-        across=(),
+        across=retained_counts(item, curves),
+    )
+
+
+def retained_counts(item: Any, curves: list[str]) -> tuple[int, ...]:
+    if not item.across:
+        return ()
+    old = [use.curve for use in item.curves]
+    pairs = (frozenset(pair) for pair in zip(old, old[1:], strict=False))
+    counts = dict(zip(pairs, item.across, strict=True))
+    default = max(1, item.strips) - 1
+    return tuple(
+        counts.get(frozenset(pair), default) for pair in zip(curves, curves[1:], strict=False)
     )
 
 

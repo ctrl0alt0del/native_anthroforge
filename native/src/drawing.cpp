@@ -10,7 +10,7 @@ using Pointer=Eigen::Matrix<double,9,1>;
 using Sample=std::array<double,4>;
 struct DrawingSurface { std::shared_ptr<Mesh> mesh; M4 frame; };
 struct Projection {
-    V3 origin,normal,previous;
+    V3 origin,normal,previous,depth;
     bool surface=false,locked=false;
     int first=0;
     double offset=0;
@@ -85,18 +85,20 @@ static void lock_plane(Projection& state,const V3& point,const V3& normal) {
         if(tangent.norm()>1e-15) state.normal=tangent.normalized();
     }
 }
-static Sample project(const Stroke& stroke,Projection& state,const Pointer& ray) {
-    V3 point,normal;
-    if(state.surface&&!state.locked&&surface_hit(stroke,ray,point,normal)) {
+static Sample project(const Stroke& stroke,Projection& state,const Pointer& ray,bool* depth_found=nullptr) {
+    V3 point,normal=state.normal; bool found=!state.surface||state.locked;
+    if(state.surface&&!state.locked&&(found=surface_hit(stroke,ray,point,normal))) {
         point+=normal*state.offset*(state.relative?ray[8]:1);
-        if(state.first) lock_plane(state,point,normal);
-    } else point=plane_hit(ray,state.surface&&!state.locked?state.previous:state.origin,state.normal);
+    } else point=plane_hit(ray,state.surface&&!state.locked?state.depth:state.origin,state.normal);
+    if(found) state.depth=point;
+    if(state.surface&&state.first&&!state.locked) lock_plane(state,state.depth,normal);
+    if(depth_found) *depth_found=found;
     state.previous=point; return {point.x(),point.y(),point.z(),ray[8]};
 }
 static std::shared_ptr<Stroke> make_stroke(int count,const uint64_t* meshes,const double* matrices,const double* plane,const double* settings) {
     if(count<0||!plane||!settings||(count&&(!meshes||!matrices))) throw std::runtime_error("Invalid stroke inputs.");
     auto value=std::make_shared<Stroke>(); auto& state=value->projection;
-    state.origin=state.previous=Eigen::Map<const V3>(plane); state.normal=Eigen::Map<const V3>(plane+3);
+    state.origin=state.previous=state.depth=Eigen::Map<const V3>(plane); state.normal=Eigen::Map<const V3>(plane+3);
     if(!state.origin.allFinite()||!state.normal.allFinite()||state.normal.norm()<1e-15||!std::isfinite(settings[2]))
         throw std::runtime_error("Invalid drawing depth or offset.");
     state.normal.normalize(); state.surface=settings[0]!=0; state.first=int(settings[1]);
@@ -105,11 +107,23 @@ static std::shared_ptr<Stroke> make_stroke(int count,const uint64_t* meshes,cons
     for(int i=0;i<count;++i) value->surfaces.push_back({mesh(meshes[i]),Eigen::Map<const M4>(matrices+i*16)});
     return value;
 }
-static void append_sample(Stroke& stroke,const Pointer& ray) {
+static void append_projected(Stroke& stroke,const Pointer& ray,const Sample& sample,const Projection& state) {
     if(stroke.samples.size()>=100000) throw std::runtime_error("Stroke sample limit reached.");
-    auto state=stroke.projection; const auto sample=project(stroke,state,ray);
     stroke.states.push_back(stroke.projection); stroke.samples.push_back(sample);
     stroke.pointers.push_back(ray); stroke.projection=state;
+}
+static void append_segment(Stroke& stroke,const Pointer& previous,const Pointer& ray,int steps) {
+    auto target_state=stroke.projection; bool found=false;
+    const auto target=project(stroke,target_state,ray,&found);
+    for(int i=1;i<steps;++i) {
+        const Pointer pointer=previous+(ray-previous)*(double(i)/steps); auto state=stroke.projection;
+        if(found) state.depth=target_state.depth;
+        const auto sample=project(stroke,state,pointer);
+        if(found) state.depth=target_state.depth;
+        append_projected(stroke,pointer,sample,state);
+    }
+    if(!found) target_state.depth=stroke.projection.depth;
+    append_projected(stroke,ray,target,target_state);
 }
 static int append_pointer(Stroke& stroke,const Pointer& ray,int mode) {
     StrokeCheckpoint checkpoint(stroke);
@@ -119,7 +133,7 @@ static int append_pointer(Stroke& stroke,const Pointer& ray,int mode) {
     if(!stroke.samples.empty()&&mode&&!stroke.rebased&&distance<=1) return int(stroke.samples.size());
     const int steps=mode==1&&!stroke.rebased&&!stroke.samples.empty()?int(std::ceil(distance))/3:1;
     if(steps>100000-int(stroke.samples.size())) throw std::runtime_error("Stroke sample limit reached.");
-    for(int i=1;i<=std::max(1,steps);++i) append_sample(stroke,previous+(ray-previous)*(double(i)/std::max(1,steps)));
+    append_segment(stroke,previous,ray,std::max(1,steps));
     stroke.rebased=false; checkpoint.committed=true;
     return int(stroke.samples.size());
 }

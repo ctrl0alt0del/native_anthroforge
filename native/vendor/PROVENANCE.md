@@ -29,3 +29,7 @@ substep count, screen-to-world tolerance ratio and eight-pixel closure test. Qt 
 pixels supply the UI scale. Automatic closure is disabled when a stroke changes view;
 world-space tolerance remains available. Exact cached mesh rays replace Blender's raster
 depth buffer, so silhouette/normal differences from raster depth are intentional.
+Target events are projected before intermediate depth substeps, as in the pinned source.
+Misses retain the last successful depth, while a first-point plane locks even when its
+initial ray misses. The regression fixtures distinguish these cases from sequential
+projection and continuously moving fallback planes.

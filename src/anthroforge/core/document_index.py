@@ -155,7 +155,7 @@ def object_links(document: "Document") -> tuple[Any, ...]:
             o.id,
             type(o).__name__,
             o.parent,
-            frozenset(construction_inputs(o)),
+            frozenset(construction_inputs(o, document.objects)),
             tuple(c.curve for c in getattr(o, "curves", ())),
         )
         for o in document.objects

@@ -123,6 +123,10 @@ def control_components(session, control):
 
 
 def entity_components(session, entity, category):
+    from anthroforge.core.entities import SCP
+
+    if not isinstance(entity, SCP):
+        return []
     entity = for_editing(session, entity)
     if not entity.primitive:
         return []

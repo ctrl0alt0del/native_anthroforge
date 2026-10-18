@@ -4,7 +4,7 @@ from anthroforge.application.dependencies import closure
 from anthroforge.core.entities import descendants
 from anthroforge.core.results import Port, geometry_asset
 
-from . import scene_state
+from . import scene_state, surface_scene
 from .property_projection import PropertyProjection
 
 
@@ -158,7 +158,7 @@ def refresh(controller):
 
 
 def publish(controller):
-    rows = [render_record(row) for row in controller.rows]
+    rows = [render_record(row) for row in [*controller.rows, *surface_scene.records(controller)]]
     if rows != controller._render_rows:
         controller._render_rows = rows
         controller.render_model.publish(

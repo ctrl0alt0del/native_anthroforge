@@ -1,4 +1,4 @@
-"""Current SCP/control checks; no geometry computation or automatic repairs."""
+"""Current object checks; no geometry computation or automatic repairs."""
 
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -6,11 +6,18 @@ from threading import Event
 from typing import Any
 
 from anthroforge.core.document import Document
+from anthroforge.core.entities import SCP
 from anthroforge.core.issues import Issue, evidence, fingerprint
+from anthroforge.core.object_registry import kind
 from anthroforge.core.results import Port, geometry_asset
 
 from ..changes import DocumentChanges
 from . import dependency_reports
+
+GRAPH_FIELDS = frozenset(
+    {"@membership", "parent", "follow", "deformers", "attachment", "curves"}
+    | {"engine_settings", "bindings", "supports", "edit"}
+)
 
 
 @dataclass(frozen=True)
@@ -23,7 +30,7 @@ class Provider:
 
 
 def item(document: Document, scope: str) -> Any:
-    return document.index.entities.get(scope) or document.index.controls.get(scope)
+    return document.registry.records.get(scope)
 
 
 def entity_source(document: Document, scope: str) -> Any:
@@ -44,12 +51,12 @@ def entity_source(document: Document, scope: str) -> Any:
 
 
 def entity_scopes(document: Document) -> set[str]:
-    return {"document", *document.index.entities, *document.index.controls}
+    return {"document", *document.registry.records}
 
 
 def entity_changes(document: Document, changes: DocumentChanges) -> set[str]:
     relevant = {"@membership", "generation", "result", "status", "error", "pose_revision"}
-    rows = {**changes.entities, **changes.controls}
+    rows = {**changes.entities, **changes.controls, **changes.objects}
     selected = {key for key, fields in rows.items() if fields & relevant}
     graph = document.index.structure.dependencies
     selected.update(
@@ -59,6 +66,8 @@ def entity_changes(document: Document, changes: DocumentChanges) -> set[str]:
 
 
 def support_source(document: Document, value: Any) -> Any:
+    if not isinstance(value, SCP):
+        return None
     support = getattr(value, "parent", "")
     parent = document.index.entities.get(support)
     return (
@@ -70,14 +79,13 @@ def support_source(document: Document, value: Any) -> Any:
 
 
 def finding(document: Document, scope: str, code: str, summary: str, **values: Any) -> Issue:
-    kind = "SCP" if scope in document.index.entities else "CONTROL"
     return Issue(
         "evaluation.v1",
         scope,
         code,
         summary,
         target=scope,
-        kind=kind,
+        kind=kind(document.object(scope)),
         source=fingerprint(entity_source(document, scope)),
         **values,
     )
@@ -145,6 +153,8 @@ def pending_support(document: Document, scope: str, value: Any) -> tuple[Issue, 
 
 
 def missing_surface(document: Document, scope: str, value: Any) -> tuple[Issue, ...]:
+    if not isinstance(value, SCP):
+        return ()
     support = getattr(value, "parent", "")
     if not support or value.attachment.parent_mode != "SURFACE_NEAREST":
         return ()
@@ -170,11 +180,10 @@ def surface_issue(document: Document, scope: str, support: str) -> Issue:
 
 
 def graph_changes(document: Document, changes: DocumentChanges) -> set[str]:
-    fields = {"@membership", "parent", "follow", "deformers", "attachment"}
-    rows = (*changes.entities.values(), *changes.controls.values())
+    rows = (*changes.entities.values(), *changes.controls.values(), *changes.objects.values())
     return (
         {"document"}
-        if "attachments_enabled" in changes.document or any(fields & v for v in rows)
+        if "attachments_enabled" in changes.document or any(GRAPH_FIELDS & v for v in rows)
         else set()
     )
 

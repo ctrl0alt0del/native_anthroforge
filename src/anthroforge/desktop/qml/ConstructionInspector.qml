@@ -22,4 +22,5 @@ ColumnLayout {
     UiButton { text: "Delete construction object"; Layout.fillWidth: true; onClicked: workspace.run("object.delete",{target:panel.selected.id}) }
     PrimitiveInspector { visible: panel.selected.kind === "CURVE" || panel.selected.kind === "FIBER" }
     ImageInspector { id: imageInspector; visible: panel.selected.kind === "IMAGE" }
+    SurfaceInspector { visible: panel.selected.kind === "SURFACE" }
 }

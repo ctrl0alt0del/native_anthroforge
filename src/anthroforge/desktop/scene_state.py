@@ -155,7 +155,10 @@ def picking_inputs(controller, rows):
 
 
 def snapping_inputs(controller, rows):
-    eligible = [row for row in rows if row["surface_visible"] and row["handle"]]
+    anatomy = controller.session.document.index.entities
+    eligible = [
+        row for row in rows if row["id"] in anatomy and row["surface_visible"] and row["handle"]
+    ]
     controller.snap_ids = [row["id"] for row in eligible]
     controller.snap_handles = np.array([row["handle"] for row in eligible], dtype=np.uint64)
     controller.snap_matrices = np.ascontiguousarray(

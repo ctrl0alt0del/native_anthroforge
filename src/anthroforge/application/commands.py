@@ -25,6 +25,7 @@ from . import (
     path_tasks,
     presentation,
     projects,
+    surface_operations,
 )
 from . import control_operations as controls
 from . import deformer_operations as deformers
@@ -34,6 +35,11 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "surface.create": surface_operations.create,
+    "surface.update": surface_operations.update,
+    "surface.source": surface_operations.source,
+    "surface.order": surface_operations.order,
+    "surface.realign": surface_operations.realign,
     "fiber.create": fiber_operations.create,
     "fiber.binding.scope": fiber_operations.binding_scope,
     "fiber.binding.set": fiber_bindings.assign,

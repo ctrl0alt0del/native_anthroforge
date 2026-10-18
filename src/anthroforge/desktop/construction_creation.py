@@ -8,6 +8,15 @@ def selected_curves(controller):
     return [key for key in controller.selectedObjects if isinstance(records.get(key), Curve)]
 
 
+def surface(controller, kind):
+    from .image_tools import context_owner
+
+    return controller.run(
+        "surface.create",
+        dict(curves=selected_curves(controller), kind=kind, owner=context_owner(controller)),
+    )
+
+
 def create(editor, kind, shape):
     controller, args = editor.controller, editor.create_arguments(kind, shape)
     curves = selected_curves(controller)

@@ -7,6 +7,7 @@ from anthroforge.core.construction import BodyPiece, Primitive
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
+from anthroforge.core.surfaces import Surface
 from anthroforge.native.construction import matrix
 from anthroforge.native.scene import entity_frame
 
@@ -44,26 +45,33 @@ def source_definition(
 
 def ancestors(document: Document, key: str) -> tuple[str, ...]:
     result = []
-    while key:
+    while key and key not in result:
         result.append(key)
         item = document.object(key)
-        key = getattr(item, "parent", "")
+        key = getattr(item, "parent", "") or getattr(item, "follow", "")
     return tuple(result)
 
 
-def bind(session: "Session", entity: SCP, key: str) -> CurveUse:
+def bind(session: "Session", entity: SCP | Surface, key: str) -> CurveUse:
     curve = curve_sources.source(session.document, key)
     common = common_frame(session.document, entity, curve.parent)
     absolute = curve_sources.world(session.engine, session.document, key)
     frame = curve_sources.world(session.engine, session.document, common)
-    local = matrix(session.engine, entity_frame(session.engine, entity), absolute, relative=True)
+    local = matrix(session.engine, consumer_frame(session, entity), absolute, relative=True)
     bound = matrix(session.engine, frame, absolute, relative=True)
     return CurveUse(key, matrix=local, bind_matrix=bound, reference_frame=common)
 
 
-def common_frame(document: Document, entity: SCP, source_parent: str) -> str:
+def common_frame(document: Document, entity: SCP | Surface, source_parent: str) -> str:
     owners = set(ancestors(document, entity.parent)) | {entity.id}
     return next((p for p in ancestors(document, source_parent) if p in owners), "")
+
+
+def consumer_frame(session: "Session", item: SCP | Surface) -> tuple[float, ...]:
+    if isinstance(item, SCP):
+        return entity_frame(session.engine, item)
+    parent = curve_sources.world(session.engine, session.document, item.parent)
+    return matrix(session.engine, parent, item.matrix)
 
 
 def transform_mode(session: "Session", entity: str, curve: str, mode: str) -> None:

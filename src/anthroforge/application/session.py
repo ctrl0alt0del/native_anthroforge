@@ -166,6 +166,7 @@ class Session:
         from . import evaluation
         from .construction_tasks import schedule
         from .control_tasks import resume
+        from .geometry_outputs import items
         from .path_tasks import pending
 
         resume(self)
@@ -174,7 +175,7 @@ class Session:
         captures = {e.id for e in self.document.entities if e.status == "edited"}
         if targets and self.document.attachments_enabled and self.document.update_mode != "MANUAL":
             evaluation.request(self, targets, captures)
-        schedule(self, {e.id for e in self.document.entities if e.result.status == "pending"})
+        schedule(self, {e.id for e in items(self.document) if e.result.status == "pending"})
 
     def command(self, operation: str, **arguments: Any) -> Any:
         from .commands import execute

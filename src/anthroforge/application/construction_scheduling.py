@@ -33,11 +33,17 @@ class ThicknessStagePolicy:
         return 0.1 + workload.points * 0.002 + workload.polygons * 0.003
 
 
+class SurfaceStagePolicy:
+    def estimate(self, workload: StageWorkload) -> float:
+        return 0.2 + workload.points * 0.003 + workload.polygons * 0.004
+
+
 POLICIES: dict[str, StagePolicy] = {
     "construction": PrimitiveStagePolicy(),
     "HOOK": HookStagePolicy(),
     "LATTICE": LatticeStagePolicy(),
     "thickness": ThicknessStagePolicy(),
+    "surface": SurfaceStagePolicy(),
 }
 
 

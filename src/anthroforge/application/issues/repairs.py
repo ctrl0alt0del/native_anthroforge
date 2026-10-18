@@ -13,14 +13,15 @@ if TYPE_CHECKING:
 
 
 def editable(session: "Session", issue: Issue) -> bool:
+    from ..workspace_policy import included
+
     if session.waiting_save or session.history.before is not None:
         return False
-    workspace = session.workspace
-    return not workspace.focused or bool(issue.target and issue.target in workspace.members)
+    return bool(issue.target and included(session.document, session.workspace, issue.target))
 
 
 def can_evaluate(session: "Session", issue: Issue) -> bool:
-    live = session.document.index.entities.keys() | session.document.index.controls.keys()
+    live = session.document.registry.records.keys()
     return editable(session, issue) and issue.target in live
 
 

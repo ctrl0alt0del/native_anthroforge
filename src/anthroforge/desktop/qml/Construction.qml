@@ -36,6 +36,9 @@ ColumnLayout {
         UiMenuItem { text: "Place curve points"; onTriggered: workspace.drawingTools.begin("POINTS") }
         UiMenuItem { text: "Draw curves"; onTriggered: workspace.drawingTools.begin("DRAW") }
         MenuSeparator {}
+        UiMenuItem { objectName: "createLoftSurface"; text: "Loft selected curves"; onTriggered: workspace.createSurface("LOFT") }
+        UiMenuItem { objectName: "createPatchSurface"; text: "Patch selected closed curve"; onTriggered: workspace.createSurface("PATCH") }
+        MenuSeparator {}
         UiMenuItem { text: "3D cursor settings"; onTriggered: workspace.drawingTools.begin("CURSOR") }
     }
 }

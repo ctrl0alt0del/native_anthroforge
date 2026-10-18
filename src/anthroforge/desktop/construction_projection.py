@@ -5,6 +5,7 @@ from anthroforge.core import presentation
 from anthroforge.core.object_registry import kind
 from anthroforge.native import scene
 
+from . import surface_scene
 from .construction_metadata import describe
 from .record_model import RecordModel
 from .values import qml
@@ -63,7 +64,8 @@ def record(session, item, frame):
         local_trs=session.engine.decompose(item.matrix),
         quaternion=scene.quaternion(session.engine, frame),
     )
-    return qml(dict(row, **flags(session, item), **describe(session, item)))
+    row.update(**flags(session, item), **describe(session, item))
+    return qml(dict(row, **surface_scene.metadata(session, item, row)))
 
 
 def result_record(result):

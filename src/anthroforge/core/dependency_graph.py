@@ -125,15 +125,17 @@ def object_edges(objects: tuple[ConstructionObject, ...]) -> dict[Port, set[Port
         result[pose] = {Port(item.id, "local_pose")} | (
             {Port(item.parent, "pose")} if item.parent else set()
         )
-        result[Port(item.id, output(item))] = construction_inputs(item)
+        result[Port(item.id, output(item))] = construction_inputs(item, objects)
     return result
 
 
-def construction_inputs(item: ConstructionObject) -> set[Port]:
+def construction_inputs(
+    item: ConstructionObject, objects: tuple[ConstructionObject, ...]
+) -> set[Port]:
     if isinstance(item, Curve):
         return curve_path_inputs(item)
     if isinstance(item, Surface):
-        return {Port(use.curve, "path") for use in item.curves}
+        return set().union(*(curve_inputs(use, objects) for use in item.curves))
     return set()
 
 

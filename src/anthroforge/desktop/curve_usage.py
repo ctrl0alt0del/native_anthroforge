@@ -3,6 +3,7 @@
 from dataclasses import asdict
 
 from anthroforge.application import curve_sources
+from anthroforge.core.surfaces import Surface
 
 
 def users(document, target):
@@ -13,9 +14,9 @@ def users(document, target):
 
 
 def uses(session, entity):
-    item = session.document.index.entities.get(entity.id) if entity else None
-    if item is None or item.primitive is None:
-        return []
+    item = session.document.registry.records.get(entity.id) if entity else None
+    definition = item if isinstance(item, Surface) else getattr(item, "primitive", None)
     return [
-        dict(asdict(use), users=users(session.document, use.curve)) for use in item.primitive.curves
+        dict(asdict(use), users=users(session.document, use.curve))
+        for use in getattr(definition, "curves", ())
     ]

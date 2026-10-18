@@ -47,7 +47,7 @@ def install(session: "Session", item: Construction) -> None:
     ports = object_revisions.changed_ports(before, changed)
     session.scheduler.invalidate_ports(ports)
     install_state(session, before, changed)
-    dependent_tasks.changed(session, ports)
+    dependent_tasks.changed(session, ports, published=False)
 
 
 def install_state(session: "Session", before: Construction, changed: Construction) -> None:

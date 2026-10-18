@@ -157,11 +157,12 @@ def mark_entity(item: SCP, directly_edited: bool) -> SCP:
 def released(session: "Session") -> None:
     from .construction_policy import mode
     from .construction_tasks import schedule
+    from .geometry_outputs import items
     from .path_tasks import pending as paths_pending
 
     pending = {
         e.id
-        for e in session.document.entities
+        for e in items(session.document)
         if e.result.status == "pending" and mode(session.document, e.id) == "ON_RELEASE"
     }
     paths_pending(session, released=True)
@@ -261,10 +262,11 @@ def set_update_mode(session: "Session", entity: str, mode: str) -> None:
 
 def resume_pending(session: "Session") -> None:
     from .construction_tasks import schedule
+    from .geometry_outputs import items
     from .path_tasks import pending as paths_pending
 
     paths_pending(session)
-    pending = {e.id for e in session.document.entities if e.result.status == "pending"}
+    pending = {e.id for e in items(session.document) if e.result.status == "pending"}
     schedule(session, pending)
 
 

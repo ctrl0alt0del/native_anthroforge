@@ -216,6 +216,12 @@ class Controller(QObject):
 
         return parent_choices(self)
 
+    @Slot(str)
+    def createSurface(self, kind):
+        from .construction_creation import surface
+
+        surface(self, kind)
+
     @Slot(result="QVariantList")
     def anatomicalSurfaces(self):
         from anthroforge.core.results import geometry_asset

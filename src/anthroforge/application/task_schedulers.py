@@ -97,6 +97,14 @@ class CurveDrawingTaskScheduler(MeasuredTaskScheduler):
         return Schedule("worker", cost, reason="Native stroke fitting and path preparation")
 
 
+class SurfaceLayoutTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + workload.candidates**2 * 0.001 + workload.triangles * 0.004
+        return Schedule(
+            "worker", cost, reason="Explicit native surface correspondence and construction"
+        )
+
+
 class OpenProjectTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         return Schedule(reason="Explicit project open; decompression stays background")
@@ -196,6 +204,7 @@ def curve_schedulers() -> dict[str, TaskScheduler]:
         "curve_path": CurvePathTaskScheduler(),
         "curve_routing": RoutingTaskScheduler(),
         "curve_draw": CurveDrawingTaskScheduler(),
+        "surface_layout": SurfaceLayoutTaskScheduler(),
         "fiber_capture": FiberCaptureTaskScheduler(),
         "fiber_path": FiberPathTaskScheduler(),
     }

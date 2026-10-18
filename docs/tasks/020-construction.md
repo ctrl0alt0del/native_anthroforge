@@ -565,3 +565,23 @@ and changed-native style pass. Ruff and configured mypy pass. Surface applicatio
 stable identity serialization, desktop/API creation and editing are not integrated yet.
 This is a recoverable numerical-kernel checkpoint, not a completed surface increment.
 Junction/branch work, remaining parity/performance and release qualification remain.
+
+## Surface application integration checkpoint
+
+Loft/patch creation and explicit Realign now use asynchronous authored jobs. Stable
+point identities retain closed correspondence. Surface geometry uses the existing
+coordinator, revision checks, accepted mesh storage and staged renderer. Live, On Release
+and Manual tests exposed and fixed a distinction between authored geometry invalidation
+and output publication in the shared dependent-task boundary. Generic evaluation Issues
+now include construction objects instead of only SCPs/controls.
+
+27 focused surface/construction/architecture tests pass; configured mypy and Ruff pass.
+Full-QML offscreen acceptance invokes the actual creation menu, Realign, normals and undo,
+with no QML warnings. Consumer settings are projected separately from editable curves.
+This verifies desktop entry points and staging records, not GPU visual or interactive
+acceptance. No visible window or desktop input was used.
+
+Still pending in this increment: shared Surface consumer reparenting/independence/removal,
+queued prerequisites and broader lifecycle/Issues tests, actual invisible GPU render/pick
+checks, and a full development gate. Junctions/branches, remaining parity/performance and
+release qualification also remain. This checkpoint is not merge-ready; version is 0.1.9.

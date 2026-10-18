@@ -4,6 +4,7 @@ from itertools import product
 
 from anthroforge.application import curve_sources, object_operations
 from anthroforge.core.reference_images import ReferenceImage
+from anthroforge.core.surfaces import Surface
 from anthroforge.native import components
 
 
@@ -35,5 +36,8 @@ def bounds(session, item):
 def local_bounds(session, item):
     if isinstance(item, ReferenceImage):
         return (-item.width / 2, -item.height / 2, 0, item.width / 2, item.height / 2, 0)
+    if isinstance(item, Surface):
+        asset = session.assets.get(item.result.asset)
+        return asset.mesh.bounds if asset else None
     resource = session.resources.paths.get(item.result.asset)
     return resource.path.bounds if resource else None

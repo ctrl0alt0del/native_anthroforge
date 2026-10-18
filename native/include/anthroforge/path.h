@@ -19,6 +19,12 @@ AF_API int af_path_sample(uint64_t handle, int count, double start, double span,
 AF_API int af_path_body(uint64_t handle, int reverse, int closed_start,
     double* output, uint64_t cancel);
 AF_API int af_path_memory_snapshot(uint64_t* rows, int capacity, uint64_t* total);
+/* Render-only closing vertex; bounded chunks share one boundary vertex. */
+AF_API int af_path_chunk(uint64_t handle, int chunk, const float** data, int* count);
+AF_API int af_path_chunk_count(uint64_t handle);
+/* One nearest segment hit per path: input index, ray distance, segment, XYZ. */
+AF_API int af_paths_pick(int count, const uint64_t* paths, const double* matrices,
+    const double* origin, const double* direction, double radius, double* output);
 #ifdef __cplusplus
 }
 #endif

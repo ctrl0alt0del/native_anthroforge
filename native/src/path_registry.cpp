@@ -1,4 +1,5 @@
 #include "path_internal.hpp"
+#include "component_index.hpp"
 #include <mutex>
 #include <unordered_map>
 
@@ -7,7 +8,8 @@ static std::mutex path_mutex;
 static std::unordered_map<uint64_t,std::shared_ptr<Path>> paths;
 static uint64_t next_path=1;
 static uint64_t path_bytes(const Path& path) {
-    return sizeof(Path)+(path.samples.capacity()+path.parameters.capacity())*sizeof(double);
+    return sizeof(Path)+(path.samples.capacity()+path.parameters.capacity())*sizeof(double)
+        +path.render.capacity()*sizeof(float)+(path.index?component_bytes(*path.index):0);
 }
 std::shared_ptr<Path> path(uint64_t handle) {
     std::lock_guard<std::mutex> lock(path_mutex);
@@ -47,7 +49,7 @@ std::shared_ptr<Path> make_path(const EvaluatedPath& evaluated,bool closed,uint6
             throw std::runtime_error("Path has non-finite or degenerate geometry.");
         append_sample(*result,sample);
     }
-    validate_path(*result); return result;
+    validate_path(*result); prepare_path(*result,cancel); return result;
 }
 }
 uint64_t af_path_evaluate(const double* records,int count,int engine,int closed,int resolution,uint64_t cancel) {

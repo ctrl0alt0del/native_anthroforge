@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .entities import Workspace
 
-CATEGORIES = ("geometry", "curves", "points", "handles", "hooks", "cages", "anchors")
+CATEGORIES = ("geometry", "curves", "points", "handles", "hooks", "cages", "anchors", "images")
 PRESETS = {
     "all": ((), ()),
     "shape": (("anchors",), ("geometry",)),

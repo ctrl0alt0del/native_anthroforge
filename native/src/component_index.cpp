@@ -1,12 +1,8 @@
 // Cached point/segment AABBs; precise finite-segment tests, independent of Qt picking.
-#include "construction_internal.hpp"
+#include "component_index.hpp"
 #include <unordered_set>
 
 namespace af {
-using Edges=Eigen::Matrix<int,Eigen::Dynamic,2,Eigen::RowMajor>;
-using ComponentTree=igl::AABB<Vertices,3>;
-struct ComponentIndex { Vertices vertices; Edges edges; ComponentTree tree; std::vector<int> labels; };
-struct ComponentRay { V3 origin,direction; double radius; };
 static double segment_distance(const V3& a,const V3& b,const ComponentRay& ray,double& along) {
     const V3 edge=b-a,offset=ray.origin-a;
     const double length=edge.squaredNorm(),projection=ray.direction.dot(edge);
@@ -61,6 +57,46 @@ static int pick(const ComponentIndex& index,const ComponentRay& ray,int depth) {
     std::vector<int> unique; std::unordered_set<int> found;
     for(const auto& hit:hits) if(found.insert(hit.second).second) unique.push_back(hit.second);
     return unique.empty()?-1:unique[std::max(0,depth)%unique.size()];
+}
+std::shared_ptr<ComponentIndex> path_index(const double* samples,int count,bool closed,uint64_t cancel) {
+    auto index=std::make_shared<ComponentIndex>(); index->vertices.resize(count,3);
+    const int edges=count-(closed?0:1); index->edges.resize(edges,2); index->labels.reserve(edges);
+    for(int i=0;i<count;++i) {
+        check_cancel(cancel); index->vertices.row(i)=V3(samples+11*i).transpose();
+        if(i<edges) { index->edges.row(i)<<i,(i+1)%count; index->labels.push_back(i); }
+    }
+    index->tree.init(index->vertices,index->edges); check_cancel(cancel); return index;
+}
+uint64_t component_bytes(const ComponentIndex& index) {
+    const uint64_t nodes=index.edges.rows()?2*index.edges.rows()-1:0;
+    return sizeof(ComponentIndex)+index.vertices.size()*sizeof(double)+index.edges.size()*sizeof(int)
+        +index.labels.capacity()*sizeof(int)+(nodes?nodes-1:0)*sizeof(ComponentTree);
+}
+struct WorldQuery { M4 frame; ComponentRay world,local; std::pair<double,int> best{INFINITY,-1}; };
+static void world_leaf(const ComponentIndex& index,int element,WorldQuery& query) {
+    const V3 a=point(query.frame,index.vertices.row(index.edges(element,0)));
+    const V3 b=point(query.frame,index.vertices.row(index.edges(element,1))); double along=0;
+    if(segment_distance(a,b,query.world,along)<=query.world.radius*query.world.radius&&along<query.best.first)
+        query.best={along,index.labels[element]};
+}
+static void query_world(const ComponentIndex& index,const ComponentTree& tree,WorldQuery& query) {
+    if(!intersects(tree.m_box,query.local)) return;
+    if(tree.m_primitive>=0) world_leaf(index,tree.m_primitive,query);
+    else {
+        if(tree.m_left) query_world(index,*tree.m_left,query);
+        if(tree.m_right) query_world(index,*tree.m_right,query);
+    }
+}
+std::pair<double,int> component_nearest(const ComponentIndex& index,const M4& frame,const ComponentRay& ray) {
+    const M4 inverse=frame.inverse();
+    if(!inverse.allFinite()||!ray.origin.allFinite()||!ray.direction.allFinite()||ray.direction.norm()<1e-20
+        ||!std::isfinite(ray.radius)||ray.radius<0) throw std::runtime_error("Invalid path picking ray or transform.");
+    const ComponentRay world{ray.origin,ray.direction.normalized(),ray.radius};
+    const ComponentRay local{point(inverse,ray.origin),inverse.block<3,3>(0,0)*world.direction,
+        ray.radius*inverse.block<3,3>(0,0).norm()};
+    WorldQuery query{frame,world,local};
+    if(!index.labels.empty()) query_world(index,index.tree,query);
+    return query.best;
 }
 }
 uint64_t af_component_index_create(const double* points,int count,int segments,const int* labels) {

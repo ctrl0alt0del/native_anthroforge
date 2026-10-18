@@ -156,7 +156,10 @@ def publish(controller):
     rows = [render_record(row) for row in controller.rows]
     if rows != controller._render_rows:
         controller._render_rows = rows
-        controller.render_model.publish(scene_state.render_rows(rows), controller.session.assets)
+        controller.render_model.publish(
+            scene_state.render_rows(rows), (a.mesh for a in controller.session.assets.values())
+        )
+    controller.construction.publish()
     scene_state.control_picking_inputs(controller)
 
 

@@ -143,7 +143,7 @@ ApplicationWindow {
                     UiButton { objectName: "activityToggle"; flatStyle: true; text: (window.activityOpen ? "▾" : "▸") + "  Activity"; onClicked: { window.activityOpen = !window.activityOpen; if(window.activityOpen) window.issuesOpen = false; } }
                     UiButton { objectName: "issuesToggle"; flatStyle: true; text: (window.issuesOpen ? "▾" : "▸") + "  Issues ("+(workspace.issuePanel.state.count || 0)+")"; hint: workspace.issuePanel.state.summary || "Issue reporting"; onClicked: { window.issuesOpen = !window.issuesOpen; if(window.issuesOpen) window.activityOpen = false; } }
                     Label { text: window.activeJobCount ? window.activeJobCount + " jobs in progress" : window.jobFailed ? "A calculation failed · open Activity" : "Up to date"; color: window.jobFailed ? Theme.danger : window.activeJobCount ? Theme.accent : Theme.muted; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Label { text: workspace.treeRows.length + " objects · "+workspace.state.display_units; color: Theme.muted; font.pixelSize: 11 }
+                    Label { text: workspace.state.object_count + " objects · "+workspace.state.display_units; color: Theme.muted; font.pixelSize: 11 }
                 }
             }
             Rectangle { Layout.fillWidth: true; implicitHeight: window.activityOpen ? 160 : 0; visible: window.activityOpen; color: Theme.panel; Activity { anchors.fill: parent; anchors.margins: 10 } }

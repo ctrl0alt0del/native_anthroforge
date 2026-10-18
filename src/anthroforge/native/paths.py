@@ -19,6 +19,8 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_path_release", [U], None)
     engine.bind("af_path_sample", [U, c.c_int, c.c_double, c.c_double, D, c.c_int, D, U])
     engine.bind("af_path_body", [U, c.c_int, c.c_int, D, U])
+    engine.bind("af_path_chunk_count", [U])
+    engine.bind("af_paths_pick", [c.c_int, c.POINTER(U), D, D, D, c.c_double, D])
 
 
 class Path:
@@ -29,6 +31,7 @@ class Path:
         engine.check(engine.library.af_path_info(handle, counts, bounds))
         self.count, self.closed, self.bytes = counts[0], bool(counts[1]), counts[2]
         self.bounds = tuple(bounds)
+        self.chunks = engine.library.af_path_chunk_count(handle)
         if engine.resource_observer is not None:
             engine.resource_observer(self)
 
@@ -48,6 +51,21 @@ class Path:
     def __del__(self) -> None:
         if getattr(self, "handle", 0):
             self.engine.library.af_path_release(self.handle)
+
+
+def pick(
+    engine: GeometryEngine, handles: Any, matrices: Any, origin: Any, direction: Any, radius: float
+) -> Any:
+    handles = np.ascontiguousarray(handles, dtype=np.uint64)
+    matrices, origin, direction = doubles(matrices), doubles(origin), doubles(direction)
+    if matrices.size != len(handles) * 16 or origin.size != 3 or direction.size != 3:
+        raise ValueError("Path picking requires one transform per handle and a 3D ray.")
+    output = np.empty((len(handles), 6))
+    ray = (pointer(origin), pointer(direction), radius, pointer(output))
+    identifiers = handles.ctypes.data_as(c.POINTER(U))
+    count = engine.library.af_paths_pick(len(handles), identifiers, pointer(matrices), *ray)
+    engine.check(count < 0)
+    return output[:count]
 
 
 def evaluate(engine: GeometryEngine, curve: Curve, cancel: int = 0, records: Any = None) -> Path:

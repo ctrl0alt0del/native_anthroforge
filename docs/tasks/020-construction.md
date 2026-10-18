@@ -122,3 +122,23 @@ QML acceptance only: no visible desktop input, full interaction rendering or pac
 Curves still need staged native display/picking outside edit mode. Image/fiber/surface production
 workflows, drawing, complete Construction controls, legacy control-attachment retirement and
 release qualification remain incomplete. Do not release or merge this checkpoint as 0.2.0.
+
+## Native path presentation checkpoint
+
+Native accepted paths now own bounded float render chunks and a segment AABB index, built
+before publication. Batched picking uses world-space distance with exact nonuniform/reflected
+transforms and cached local trees. The existing staged renderer now accepts explicit resource
+leases; paths use their own handle namespace/model and switch picking to the displayed revision.
+Profiler viewport ownership includes path leases and native inventory includes derived buffers.
+A native single-affine-instance adapter preserves shear from ordinary transform parenting instead
+of discarding it through TRS decomposition. Curve category visibility/pickability is respected.
+Empty-document presentation uses the generic object registry rather than only the anatomical tree.
+
+Validation: 608 tests pass, Ruff/mypy pass, native build/contracts and changed-native clang-tidy
+pass. `tools/path_scene_acceptance.py` renders the actual viewport through QQuickRenderControl
+into a D3D11 texture without a visible window. Hover/click results agree; replacement retains
+old buffers and releases them after activation; a pixel check verifies a rotated path under a
+nonuniformly scaled ordinary parent. Captures were inspected in build/020-path-scene. Generic
+Qt offscreen QPA could not initialize D3D11, so this render check uses the platform backend with
+an explicitly invisible render-control window. No desktop input or interactive acceptance.
+The controller/QML standalone editor acceptance also passes. Full 0.2.0 remains incomplete.

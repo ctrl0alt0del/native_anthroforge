@@ -33,8 +33,7 @@ class Controller(QObject):
         super().__init__()
         self.initialize_session()
         self.activity_model = ActivityModel(self)
-        self.render_model = RenderModel(self)
-        self.render_model.activated.connect(self.activate_geometry)
+        self.initialize_renderers()
         self._initialize_state()
         scene_projection.initialize(self)
         from .authoring import Authoring
@@ -56,15 +55,18 @@ class Controller(QObject):
         self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
 
     def memory_owners(self, owners):
-        model = getattr(self, "render_model", None)
-        if model is not None:
-            staged = [row for row in model.rows if not row["active"]] + model.pending
-            for name, rows in (
-                ("viewport_displayed", model.displayed),
-                ("viewport_staging", staged),
-            ):
-                handles = {row["handle"] for row in rows}
-                owners[name].update(mesh for key, mesh in model.leases.items() if key in handles)
+        for attribute in ("render_model", "path_model"):
+            model = getattr(self, attribute, None)
+            if model is not None:
+                model.memory_owners(owners)
+
+    def initialize_renderers(self):
+        from .path_scene import prepare_picking
+
+        self.render_model, self.path_model = RenderModel(self), RenderModel(self)
+        self.render_model.activated.connect(self.activate_geometry)
+        self.path_model.activated.connect(self.activate_geometry)
+        prepare_picking(self)
 
     def _initialize_state(self):
         self.selection, self.hovered, self.message = "", "", ""
@@ -91,6 +93,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def meshModel(self):
         return self.render_model
+
+    @Property(QObject, constant=True)
+    def pathModel(self):
+        return self.path_model
 
     @Property("QVariantList", notify=treeChanged)
     def treeRows(self):
@@ -170,7 +176,7 @@ class Controller(QObject):
             "dirty": self.session.saved_revision != self.session.document.revision,
             "blocked": self.session.scheduler.blocked,
             "waiting": self.session.waiting_save,
-            "publishing": len(self.render_model.pending),
+            "publishing": len(self.render_model.pending) + len(self.path_model.pending),
             "path": str(self.session.path or ""),
         }
 
@@ -204,6 +210,7 @@ class Controller(QObject):
         self.session.scheduler.tick()
         project_actions.poll(self)
         self.render_model.drain()
+        self.path_model.drain()
         self.refresh_if_needed()
         self.issue_panel.synchronize()
         self.tick_count += 1
@@ -216,10 +223,14 @@ class Controller(QObject):
         self.session.scheduler.metrics.observe("frame_interval", now - self.last_frame)
         self.last_frame = now
         self.render_model.presented()
+        self.path_model.presented()
 
     @measured("publication", lambda owner: owner.session.profiler)
     def activate_geometry(self):
+        from .path_scene import prepare_picking
+
         scene_state.picking_inputs(self, self.render_model.active_rows())
+        prepare_picking(self)
         from anthroforge.application.geometry_ownership import collect
 
         collect(self.session)

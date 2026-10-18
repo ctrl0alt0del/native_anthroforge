@@ -9,7 +9,7 @@ def publish(model, handle, chunks, x=0):
     rows = [
         dict(id="scp", key=f"scp:{handle}:{i}", handle=handle, chunk=i, x=x) for i in range(chunks)
     ]
-    model.publish(rows, {str(handle): SimpleNamespace(mesh=SimpleNamespace(handle=handle))})
+    model.publish(rows, [SimpleNamespace(handle=handle)])
 
 
 def initial_model():

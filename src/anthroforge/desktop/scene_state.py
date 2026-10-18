@@ -205,9 +205,12 @@ def control_hits(controller, origin, direction, radius):
 
 
 def pick_scene(controller, origin, direction, depth, radius):
+    from .path_scene import hits as path_hits
+
     hits = mesh_hits(controller, origin, direction) + control_hits(
         controller, origin, direction, radius
     )
+    hits += path_hits(controller, origin, direction, radius)
     hits.sort(key=lambda hit: hit["distance"])
     return hits[depth % len(hits)] if hits else {}
 

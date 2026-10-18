@@ -5,6 +5,7 @@ from math import isfinite
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from .inspection_views import CameraBookmark, Measurement
 from .presentation import validate_categories
 from .results import EvaluationResult
 from .units import factor
@@ -87,6 +88,8 @@ class Workspace:
     hidden_categories: tuple[str, ...] = ()
     unpickable_categories: tuple[str, ...] = ()
     display_units: str = "m"
+    measurements: tuple[Measurement, ...] = ()
+    bookmarks: tuple[CameraBookmark, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.name.strip():

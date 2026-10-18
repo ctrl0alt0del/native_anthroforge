@@ -40,7 +40,11 @@ def geometry_metadata(session, entity):
     key = geometry_asset(entity)
     mesh = session.assets[key].mesh if key else None
     return dict(
-        handle=mesh.handle if mesh else 0, chunks=mesh.counts[4] if mesh else 0, is_control=False
+        handle=mesh.handle if mesh else 0,
+        chunks=mesh.counts[4] if mesh else 0,
+        is_control=False,
+        geometry_asset=key,
+        geometry_revision=entity.result.revision,
     )
 
 
@@ -130,6 +134,7 @@ def render_rows(rows):
 def picking_inputs(controller, rows):
     snapping_inputs(controller, rows)
     eligible = [row for row in rows if row["surface_pickable"] and row["handle"]]
+    controller.pick_rows = {row["id"]: row for row in eligible}
     controller.pick_ids = [row["id"] for row in eligible]
     controller.pick_handles = np.array([row["handle"] for row in eligible], dtype=np.uint64)
     matrices = [
@@ -215,4 +220,5 @@ def hit_record(ids, hit):
         "triangle": int(hit[3]),
         "vertex": int(hit[4]),
         "point": hit[5:8],
+        "weights": hit[8:11],
     }

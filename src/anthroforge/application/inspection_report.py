@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.jobs import Job
 
-from . import inspection, report_archive, task_workloads
+from . import inspection, measurements, report_archive, task_workloads
 from .inspection_context import InspectionContext, freeze
 
 if TYPE_CHECKING:
@@ -43,9 +43,9 @@ def metadata(frozen: Capture) -> dict[str, Any]:
         view=frozen.view,
         coordinate_system="right-handed Z-up; canonical metres; row-major affine matrices",
         workspace=asdict(source.workspace),
+        measurements=measurements.inspect(source),
         issues=frozen.issues,
         entities=[inspection.target(source, key) for key in inspection.all_targets(source)],
-        scope="Full document metadata; image uses the declared workspace and camera.",
     )
 
 

@@ -7,6 +7,16 @@ static std::mutex registry_mutex;
 static std::unordered_map<uint64_t,std::shared_ptr<Mesh>> registry;
 static uint64_t next_id=1;
 static thread_local std::string last_error;
+static void memory_row(uint64_t handle,const Mesh& value,uint64_t* row) {
+    row[0]=handle; row[1]=reinterpret_cast<uint64_t>(&value);
+    row[2]=sizeof(Mesh)+value.vertices.size()*sizeof(double)+value.triangles.size()*sizeof(int)
+        +(value.corners.capacity()+value.offsets.capacity()+value.polygons.capacity())*sizeof(int64_t);
+    // libigl AABB has one leaf per triangle and two children per internal node; root is in Mesh.
+    row[3]=value.prepared?uint64_t(std::max<int64_t>(0,2*value.triangles.rows()-2))*sizeof(value.tree):0;
+    row[4]=value.chunks.capacity()*sizeof(std::vector<float>);
+    for(const auto& chunk:value.chunks) row[4]+=chunk.capacity()*sizeof(float);
+    row[5]=value.vertices.rows(); row[6]=value.triangles.rows();
+}
 void set_error(const std::string& message) { last_error=message; }
 std::shared_ptr<Mesh> mesh(uint64_t handle) {
     std::lock_guard<std::mutex> lock(registry_mutex);
@@ -24,6 +34,16 @@ void check_cancel(uint64_t token) {
 }
 }
 const char* af_last_error() { return af::last_error.c_str(); }
+int af_mesh_memory_snapshot(uint64_t* rows,int capacity,uint64_t* total_handles) {
+    if(capacity<0||!total_handles||(capacity>0&&!rows)) return -1;
+    std::lock_guard<std::mutex> lock(af::registry_mutex);
+    *total_handles=af::registry.size(); int count=0;
+    for(const auto& entry:af::registry) {
+        if(count>=capacity) break;
+        af::memory_row(entry.first,*entry.second,rows+7*count); ++count;
+    }
+    return count;
+}
 uint64_t af_cancel_create() { return reinterpret_cast<uint64_t>(new af::Cancellation()); }
 void af_cancel_request(uint64_t token) {
     if(token) reinterpret_cast<af::Cancellation*>(token)->cancelled.store(true);

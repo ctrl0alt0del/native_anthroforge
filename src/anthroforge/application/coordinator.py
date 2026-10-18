@@ -10,6 +10,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job, Restart
 from anthroforge.core.metrics import Metrics
 from anthroforge.core.results import Port
+from anthroforge.profiling import causes
 from anthroforge.profiling import tasks as trace
 
 from .job_registry import JobRegistry
@@ -70,6 +71,10 @@ class TaskCoordinator:
         self._checkpoint()
         return job.id
 
+    def sample_resources(self) -> None:
+        if self.profiler is not None and self.profiler.active:
+            self.profiler.resources.sample()
+
     def _supersede(self, job: Job) -> None:
         previous = self.coalescing.pop(job.key, None)
         if previous and self.clock() <= previous[1]:
@@ -81,7 +86,9 @@ class TaskCoordinator:
                         job.queued_since if job.queued_since is not None else self.clock(),
                         existing.queued_since,
                     )
-                self.cancel_job(existing.id, obsolete=True)
+                self.cancel_job(
+                    existing.id, obsolete=True, reason="newer_request", replacement=job.id
+                )
 
     def pending_since(self, outputs: set[str], kind: str) -> float | None:
         pending = (
@@ -131,10 +138,20 @@ class TaskCoordinator:
             "output", job.outputs
         )
 
-    def cancel_job(self, job_id: str, obsolete: bool = False) -> None:
+    def cancel_job(
+        self,
+        job_id: str,
+        obsolete: bool = False,
+        reason: str = "explicit_cancel",
+        replacement: str = "",
+    ) -> None:
         job = self.registry.by_id[job_id]
         if not job.active:
             return
+        causes.cancellation(self, job, reason, replacement)
+        self._cancel_active(job, obsolete)
+
+    def _cancel_active(self, job: Job, obsolete: bool) -> None:
         if obsolete:
             self._remember_coalescing(job)
         job.obsolete |= obsolete
@@ -158,12 +175,14 @@ class TaskCoordinator:
         wait = job.assessment.schedule.max_wait_ms if job.assessment else 0
         self.coalescing[job.key] = (job.queued_since, self.clock() + wait / 1000)
 
-    def invalidate(self, affected: set[str]) -> None:
+    def invalidate(self, affected: set[str], reason: str = "input_owner_changed") -> None:
+        causes.invalidated(self, affected, reason)
         for job in self.registry.matching("owner", affected):
             if job.active and (job.outputs | job.reads).intersection(affected):
-                self.cancel_job(job.id, obsolete=True)
+                self.cancel_job(job.id, obsolete=True, reason=reason)
 
-    def invalidate_ports(self, affected: set[Port]) -> None:
+    def invalidate_ports(self, affected: set[Port], reason: str = "input_output_changed") -> None:
+        causes.invalidated(self, affected, reason, ports=True)
         owners = {port.owner for port in affected}
         for job in self.registry.matching("port", affected) + self.registry.matching(
             "legacy", owners
@@ -171,7 +190,7 @@ class TaskCoordinator:
             reads = job.observes | job.prerequisites | job.provides
             legacy = not reads and bool((job.outputs | job.reads) & owners)
             if job.active and (bool(reads & affected) or legacy):
-                self.cancel_job(job.id, obsolete=True)
+                self.cancel_job(job.id, obsolete=True, reason=reason)
 
     def retry(self, job_id: str) -> Any:
         job = self.registry.by_id[job_id]
@@ -187,7 +206,7 @@ class TaskCoordinator:
             if job.active and (revision not in surviving or job.origin not in surviving):
                 if job.restart_on_redo and job.retry:
                     removed.append(Restart(revision, job.retry))
-                self.cancel_job(job.id, obsolete=True)
+                self.cancel_job(job.id, obsolete=True, reason="history_revision_removed")
         return removed
 
     def tick(self) -> None:
@@ -198,6 +217,7 @@ class TaskCoordinator:
         self._dispatch()
         self.service_tick()
         self._checkpoint()
+        self.sample_resources()
 
     def _finishable(self, job: Job) -> bool:
         done = job.future is not None and job.future.done()
@@ -323,6 +343,6 @@ class TaskCoordinator:
         self.service_tick = lambda: None
         for job in self.active_jobs:
             if job.active:
-                self.cancel_job(job.id)
+                self.cancel_job(job.id, reason="session_closed")
         self.pool.shutdown(wait=True, cancel_futures=True)
         self.tick()

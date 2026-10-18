@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 
 import numpy as np
+from inspection_portable import inspection
 from issues_portable import issues
 from profiler_portable import profiling
 from PySide6.QtGui import QImage
@@ -27,6 +28,7 @@ CHECKS = (
     "runtime profiling",
     "issue reporting and verified repair",
     "workflow inspection, units, workspace policies and image/JSON report",
+    "surface rulers, named cameras and explanatory profile diagnostics",
 )
 
 
@@ -104,6 +106,7 @@ def run(executable, cwd):
     profiling(executable, cwd, invoke)
     issues(executable, cwd, invoke)
     workflow(executable, cwd, invoke)
+    inspection(executable, cwd, invoke)
     report = portable_report(executable, doctor)
     (cwd / "portable-check.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report))

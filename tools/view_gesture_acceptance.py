@@ -113,7 +113,12 @@ def modal_step(controller, window, point_id, code, axis, pointer):
 def check_undo(controller, point_id, before, cursor):
     settle(controller)
     assert controller.session.history.before is None
-    assert controller.session.history.cursor == cursor + 1
+    assert controller.session.history.cursor == cursor + 1, (
+        cursor,
+        controller.session.history.cursor,
+        before,
+        position(controller, point_id),
+    )
     controller.run("undo", {})
     settle(controller)
     np.testing.assert_allclose(position(controller, point_id), before, atol=1e-7)

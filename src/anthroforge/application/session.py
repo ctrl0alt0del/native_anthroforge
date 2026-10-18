@@ -8,7 +8,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Workspace
 from anthroforge.core.jobs import Job, Restart
 from anthroforge.native.mesh import GeometryEngine
-from anthroforge.profiling import RuntimeProfiler
+from anthroforge.profiling import RuntimeProfiler, causes
 from anthroforge.profiling.spans import measured
 from anthroforge.profiling.tasks import command_metadata
 from anthroforge.profiling.tasks import operation as profile_operation
@@ -42,6 +42,7 @@ class Session:
 
         self.owns_profiler = profiler is None
         self.profiler = profiler if profiler is not None else RuntimeProfiler()
+        self.profiler.resources.sessions.add(self)
         self.initialize_scheduler()
         self.issues = IssueSystem(self)
         register(self)
@@ -53,6 +54,7 @@ class Session:
     @document.setter
     def document(self, value: Document) -> None:
         self.changes.record(self._document, value)
+        causes.document(self, self._document, value)
         self._document = value
 
     def initialize_scheduler(self) -> None:
@@ -204,8 +206,8 @@ class Session:
         self.issues.close()
         self.scheduler.close()
         if self._engine is not None:
-            self.profiler.native.detach(self._engine)
             self._engine.bases.clear()
+            self.profiler.native.detach(self._engine)
         if self.owns_profiler:
             self.profiler.close()
         if self.file_lock:

@@ -66,6 +66,10 @@ EDITS = {
 
 
 def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    if operation.startswith(("measurement.", "bookmark.")):
+        from .inspection_commands import execute as inspect_command
+
+        return inspect_command(session, operation, arguments)
     if operation.startswith("issues."):
         from .issues.commands import execute as issue_command
 
@@ -111,7 +115,7 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
-        "job.cancel": session.scheduler.cancel_job,
+        "job.cancel": lambda job_id, obsolete=False: session.scheduler.cancel_job(job_id, obsolete),
         "job.retry": session.scheduler.retry,
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),
         "control.affected": lambda **a: controls.affected(session, **a),

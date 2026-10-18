@@ -1,4 +1,5 @@
 from time import perf_counter as monotonic
+from weakref import WeakMethod
 
 from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
@@ -12,6 +13,7 @@ from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
 from .inspection_export import InspectionExport
 from .inspection_panel import InspectionPanel
+from .inspection_tools import InspectionTools
 from .issue_panel import IssuePanel
 from .models import RenderModel
 
@@ -50,6 +52,19 @@ class Controller(QObject):
         self.issue_panel = IssuePanel(self)
         self.inspection_panel = InspectionPanel(self)
         self.inspection_export = InspectionExport(self)
+        self.inspection_tools = InspectionTools(self)
+        self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
+
+    def memory_owners(self, owners):
+        model = getattr(self, "render_model", None)
+        if model is not None:
+            staged = [row for row in model.rows if not row["active"]] + model.pending
+            for name, rows in (
+                ("viewport_displayed", model.displayed),
+                ("viewport_staging", staged),
+            ):
+                handles = {row["handle"] for row in rows}
+                owners[name].update(mesh for key, mesh in model.leases.items() if key in handles)
 
     def _initialize_state(self):
         self.selection, self.hovered, self.message = "", "", ""
@@ -117,6 +132,10 @@ class Controller(QObject):
     def inspectionExport(self):
         return self.inspection_export
 
+    @Property(QObject, constant=True)
+    def inspectionTools(self):
+        return self.inspection_tools
+
     @Property("QVariantMap", notify=metricsChanged)
     def metrics(self):
         return self._metrics
@@ -131,6 +150,7 @@ class Controller(QObject):
         self.issue_panel.synchronize()
         self.inspection_panel.synchronize()
         self.inspection_export.synchronize()
+        self.inspection_tools.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()

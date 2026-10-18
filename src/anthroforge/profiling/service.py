@@ -10,6 +10,7 @@ from uuid import uuid4
 from . import lifecycle
 from .buffer import EventBuffer, capture_interval
 from .native_calls import NativeCalls
+from .resources import Resources
 from .spans import Spans
 
 
@@ -26,6 +27,7 @@ class RuntimeProfiler:
         self.manifest = {}
         self.lock = RLock()
         self.collector_disabled = False
+        self.resources = Resources(self)
 
     def start(self, seconds=120, memory_mib=128):
         lifecycle.validate_start(self, seconds, memory_mib)
@@ -119,6 +121,7 @@ class RuntimeProfiler:
 
     def event(self, category, name, **metadata):
         if self.active:
+            metadata.setdefault("parent", self.spans.parent())
             self.record(
                 dict(
                     cat=category,
@@ -129,6 +132,20 @@ class RuntimeProfiler:
                     tid=get_native_id(),
                     ts=perf_counter_ns() / 1000,
                     args=metadata,
+                )
+            )
+
+    def counter(self, category, name, **values):
+        if self.active:
+            self.record(
+                dict(
+                    cat=category,
+                    name=name,
+                    ph="C",
+                    pid=1,
+                    tid=get_native_id(),
+                    ts=perf_counter_ns() / 1000,
+                    args=values,
                 )
             )
 

@@ -54,6 +54,7 @@ def request_stop(profiler, path):
     if profiler.state != "recording":
         raise ValueError("No performance recording is active")
     profiler.path = str(path or default_path(profiler))
+    profiler.resources.stop()
     freeze_application(profiler)
     profiler.native.stop()
     stop_collector(profiler)
@@ -199,12 +200,16 @@ def capabilities(profiler):
         frames=profiler.collector is not None,
         model_changes=profiler.collector is not None,
         stack_sampling=False,
+        invalidation_reasons=True,
+        cache_events=True,
+        geometry_ownership=True,
     )
 
 
 def costs(profiler):
     return dict(
         activation_wall_ns=getattr(profiler, "activation_cost_ns", 0),
+        resource_observation=profiler.resources.costs(),
         span_bookkeeping_inclusive_ns=profiler.spans.observation_cost_ns,
         record_wall_ns=profiler.record_cost_ns,
         drain_inclusive_wall_ns=profiler.drain_cost_ns,

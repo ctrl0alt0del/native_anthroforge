@@ -15,6 +15,7 @@ import numpy as np
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Attachment, Workspace
+from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.native.topology import restore
 
@@ -130,6 +131,8 @@ def decode_workspace(data: dict[str, Any]) -> Workspace:
         data[key] = tuple(data[key])
     for key in ("hidden_categories", "unpickable_categories"):
         data[key] = tuple(data.get(key, ()))
+    data["measurements"] = tuple(map(decode_measurement, data.get("measurements", ())))
+    data["bookmarks"] = tuple(map(decode_bookmark, data.get("bookmarks", ())))
     return Workspace(**data)
 
 

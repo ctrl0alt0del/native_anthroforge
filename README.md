@@ -1,16 +1,20 @@
-# AnthroForge 0.1.7
+# AnthroForge 0.1.8
 
 A standalone SCP and primitive editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the portable folder. This qualified 0.1.7 build is in
-`dist/0.1.7/AnthroForge.dist`; the default packaging location remains `dist/AnthroForge.dist`.
+Open **AnthroForge.exe** in the portable folder. The 0.1.8 build is in
+`dist/0.1.8/AnthroForge.dist`; the default packaging location remains `dist/AnthroForge.dist`.
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.
 
-0.1.7 adds [relationship inspection, workspace management, display units and shareable
-inspection reports](docs/workflow_inspection.md). The Issues panel distinguishes cycle
+0.1.8 adds [two-point surface rulers with XYZ readouts and named camera bookmarks](docs/workflow_inspection.md#measurements-and-named-views-018).
+Rulers and views persist per workspace and are included in inspection reports.
+[Profiler reports](docs/profiling.md#recalculation-cache-and-memory-evidence-018) now explain
+invalidation, base-cache reuse and native geometry retention by overlapping owners.
+Relationship inspection, workspace management, display units and shareable reports
+remain available. The Issues panel distinguishes cycle
 participants from downstream blocked outputs. Existing checks, dismissal, navigation
 and verified repairs remain available; diagnostics never change anatomy or block saving.
 

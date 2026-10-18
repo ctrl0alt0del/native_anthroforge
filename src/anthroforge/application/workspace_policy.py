@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import Workspace, descendants
+from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
 
 if TYPE_CHECKING:
     from .session import Session
@@ -13,7 +14,11 @@ TUPLES = {"members", "hidden", "unpickable", "camera", "hidden_categories", "unp
 
 
 def settings(values: dict[str, Any]) -> dict[str, Any]:
-    return {key: tuple(value) if key in TUPLES else value for key, value in values.items()}
+    result = {key: tuple(value) if key in TUPLES else value for key, value in values.items()}
+    for key, decode in (("bookmarks", decode_bookmark), ("measurements", decode_measurement)):
+        if key in values:
+            result[key] = tuple(decode(v) if isinstance(v, dict) else v for v in values[key])
+    return result
 
 
 def members(document: Document, values: list[str], children: bool = False) -> tuple[str, ...]:

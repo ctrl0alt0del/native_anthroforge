@@ -22,6 +22,10 @@ def validate(path, desktop):
 
 def verify_capabilities(manifest, desktop):
     assert manifest["capabilities"]["qml"] == desktop
+    assert all(
+        manifest["capabilities"][k]
+        for k in ("invalidation_reasons", "cache_events", "geometry_ownership")
+    )
     if desktop:
         expected = {"CanvasFrameRate", "EngineControl", "DebugMessages"}
         assert set(manifest["qt"]["services"]) == expected
@@ -34,10 +38,12 @@ def verify_durations(summary, desktop):
         if desktop
         else any(k.startswith("native/") for k in keys)
     )
+    memory = summary["diagnostics"]["geometry_memory"]
+    assert memory["samples"] and memory["latest"]["unique_bytes"] > 0
 
 
 def verify_events(events):
-    assert all(e["ph"] in ("X", "i") and isinstance(e["tid"], int) for e in events)
+    assert all(e["ph"] in ("X", "i", "C") and isinstance(e["tid"], int) for e in events)
 
 
 def profiling(executable, cwd, invoke):

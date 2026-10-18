@@ -9,6 +9,7 @@
       "condition": {"type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows"},
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
         "CMAKE_PREFIX_PATH": "${sourceDir}/.tools/qt/6.12.0/msvc2022_64",
         "AF_BUILD_QT_BRIDGE": "ON",

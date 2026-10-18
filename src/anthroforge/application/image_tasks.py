@@ -64,7 +64,7 @@ def publish(
     if replacing:
         validate_replacement(session, document, item.id)
     else:
-        from .image_operations import validate_parent
+        from .object_creation import validate_parent
 
         validate_parent(session, item)
     merge = partial(replace_assignment if replacing else append_image, item, asset)
@@ -73,7 +73,7 @@ def publish(
 
 
 def validate_replacement(session: "Session", document: Document, target: str) -> None:
-    from .image_operations import validate_parent
+    from .object_creation import validate_parent
 
     before, current = document.object(target), session.document.object(target)
     if not isinstance(before, ReferenceImage) or not isinstance(current, ReferenceImage):

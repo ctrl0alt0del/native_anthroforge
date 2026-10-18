@@ -202,3 +202,18 @@ and function-length checks pass. An exploratory `mypy src` invocation also check
 modules outside the configured gate and reported existing untyped-adapter errors; it is not
 the repository's type-check command. Full development gate passed immediately before this
 Python/QML-only increment. Drawing/cursor and the remaining release work above are still pending.
+
+## Native fitting checkpoint (desktop integration in progress)
+
+Vendored Blender 5.0.1's unchanged BSD curve_fit_nd C kernel with hashes/notices and a narrow
+C++ adapter. REFIT/SPLIT fitting, corner handle modes, closure, optional radius channel and exact
+polyline creation share one owned-output boundary. `curve.draw` fits and prepares the accepted
+path on a dedicated coordinator policy, then uses shared async authored publication. Parent
+validation/placement was extracted from images into object_creation for both clients.
+
+Native build/contracts, changed-native clang-tidy, Ruff/configured mypy and 11 focused drawing/
+architecture tests pass. Tests include shape error/endpoints, closure, cancellation, interleaved
+undo authorship and persistence. Image import regressions passed during the extraction. Full
+suite is pending for this increment. This is not completed Draw UX: stroke projection, cursor,
+desktop input/preview, actual Blender operator parity and performance evidence are next.
+The kernel cannot cancel internally; measure its atomic interval before claiming responsiveness.

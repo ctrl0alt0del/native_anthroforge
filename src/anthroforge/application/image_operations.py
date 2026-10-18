@@ -6,11 +6,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
-from anthroforge.core.entities import IDENTITY
 from anthroforge.core.reference_images import ImageCalibration, ReferenceImage
 from anthroforge.native import images
 
 from . import authored_jobs, curve_sources, image_tasks, object_operations
+from .object_creation import placement, validate_parent
 from .operations import require_name
 
 if TYPE_CHECKING:
@@ -51,22 +51,6 @@ def new_image(
     )
     validate_parent(session, item)
     return item
-
-
-def placement(
-    session: "Session", parent: str, owner: str, values: list[float] | None
-) -> dict[str, Any]:
-    if owner:
-        session.editable(owner)
-    frame = session.engine.transform(values) if values is not None else IDENTITY
-    return dict(parent=parent, owners=(owner,) if owner else (), matrix=frame)
-
-
-def validate_parent(session: "Session", item: ReferenceImage) -> None:
-    if item.parent:
-        parent = session.document.object(item.parent)
-        if isinstance(parent, ReferenceImage):
-            raise ValueError("Reference images cannot parent other objects.")
 
 
 def replace_source(session: "Session", target: str, path: str) -> dict[str, str]:

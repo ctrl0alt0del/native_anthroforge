@@ -20,6 +20,7 @@ both license texts and corresponding adapted sources accompany the release.
 | Eigen/libigl | Vendored addon snapshots | MPL-2.0 and original header notices; source is included under native/vendor |
 | happly | Snapshot hash in native/vendor/PROVENANCE.md | MIT; included source and license |
 | earcut.hpp | 2.2.4 | ISC; included source and license |
+| curve_fit_nd | Blender 5.0.1, unchanged sources | BSD-3-Clause, DWANGO Co., Ltd.; full notice in native/vendor/curve_fit_nd/curve_fit_nd.h and CURVE-FIT-LICENSE.txt |
 | Nuitka | 4.1.1 build/runtime support | Apache-2.0; https://nuitka.net/pages/overview.html |
 
 Qt source archives for the pinned SDK are available at

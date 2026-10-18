@@ -91,6 +91,12 @@ class ImageTaskScheduler(MeasuredTaskScheduler):
         return Schedule(reason="Image decode and texture tile preparation stay background")
 
 
+class CurveDrawingTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + workload.candidates * 0.02
+        return Schedule("worker", cost, reason="Native stroke fitting and path preparation")
+
+
 class OpenProjectTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         return Schedule(reason="Explicit project open; decompression stays background")
@@ -159,6 +165,7 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
         "curve_path": CurvePathTaskScheduler(),
+        "curve_draw": CurveDrawingTaskScheduler(),
         "control_attachments": ControlAttachmentTaskScheduler(),
         "issue_check": IssueTaskScheduler(),
         "inspection_report": InspectionTaskScheduler(),

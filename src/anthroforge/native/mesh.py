@@ -42,9 +42,9 @@ class GeometryEngine(NativeEngine):
         self._curve_signatures()
 
     def _curve_signatures(self) -> None:
-        from . import curve_editing, curve_queries, paths
+        from . import curve_editing, curve_queries, drawing, paths
 
-        for module in (curve_editing, curve_queries, paths):
+        for module in (curve_editing, curve_queries, drawing, paths):
             module.configure(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:

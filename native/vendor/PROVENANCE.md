@@ -9,3 +9,17 @@
 
 These vendored snapshots need no network access during application builds.
 Project function-length rules apply to authored adapters, not unchanged upstream sources.
+
+## Curve fitting
+
+`curve_fit_nd/` is unchanged from Blender tag `v5.0.1`, retrieved 2026-10-18:
+https://github.com/blender/blender/tree/v5.0.1/extern/curve_fit_nd.
+BSD-3-Clause, Copyright 2016 DWANGO Co., Ltd.; complete notices remain in every source.
+Compiled as C separately from the authored C++ adapter. No Blender runtime or object system.
+File SHA-256 values are recorded in `curve_fit_nd/SHA256SUMS`.
+
+The adapter's deduplication, fit flags, split corner detection radii and handle-mode policy
+follow Blender `source/blender/editors/curve/editcurve_paint.cc` at the same tag, GPL-2.0-or-later.
+The application retains its GPL-3.0-or-later distribution license. Fitting is an atomic upstream
+call with cooperative cancellation checks immediately before/after it; no mid-fit cancellation
+or exact display-latency guarantee is claimed.

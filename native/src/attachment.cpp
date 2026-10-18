@@ -1,5 +1,6 @@
 // Captures owned SCP inputs and applies the addon's unchanged attachment kernel.
 #include "mesh_internal.hpp"
+#include "anthroforge/attachments.h"
 #include <chrono>
 #include <cstring>
 struct Vec { double x,y,z; };
@@ -38,7 +39,7 @@ namespace af {
 struct Capture {
     std::shared_ptr<Mesh> child,parent;
     M4 child_world,parent_world,child_geometry,parent_geometry;
-    std::unique_ptr<Surface> surface;
+    std::shared_ptr<Surface> surface;
     int parent_mode,child_mode,locked,flow,index=-1;
     V3 anchor=V3::Zero(); Hit hit;
     double* output;
@@ -129,7 +130,7 @@ static void write_capture(Capture& capture) {
 static void initialize_surface(Capture& capture) {
     if(!capture.parent_mode) return;
     if(!capture.parent) throw std::runtime_error("Parent has no geometry; use Object Origin.");
-    capture.surface=std::make_unique<Surface>(*capture.parent,capture.parent_geometry);
+    capture.surface=std::make_shared<Surface>(*capture.parent,capture.parent_geometry);
 }
 static AfAttachmentScpOp operation(const double* binding,const M4& child,int mode,int follows,int flow) {
     AfAttachmentScpOp op{}; op.parent=0; op.child=1; op.surface=mode?0:-1;
@@ -198,6 +199,83 @@ int af_propagate(int count,const uint64_t* meshes,const int* parents,double* mat
             if(modes[i]&&!mesh) { status[i]=1; continue; }
             const auto surface=af::parent_surface(mesh,offsets+3*p);
             status[i]=!af::apply_one(mesh.get(),surface,op,Eigen::Map<const af::M4>(matrices+16*p),matrices+16*i);
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+
+namespace af {
+static Capture point_surface(uint64_t handle,const double* frame,bool prepare) {
+    Capture value;
+    value.parent=mesh(handle); value.parent_world=Eigen::Map<const M4>(frame);
+    if(!value.parent_world.allFinite()||std::abs(value.parent_world.determinant())<1e-15)
+        throw std::runtime_error("Invalid anatomical surface transform.");
+    value.parent_geometry=value.parent_world; value.parent_mode=1; value.child_mode=2;
+    value.child_world=M4::Identity(); value.flow=0; value.locked=-1;
+    if(prepare) initialize_surface(value);
+    return value;
+}
+static std::vector<Capture> point_surfaces(int count,const uint64_t* meshes,const double* frames,bool prepare,uint64_t cancel) {
+    if(count<1||count>100000||!meshes||!frames) throw std::runtime_error("Point attachments need anatomical surfaces.");
+    std::vector<Capture> result; result.reserve(count);
+    for(int i=0;i<count;++i) { check_cancel(cancel); result.push_back(point_surface(meshes[i],frames+16*i,prepare)); }
+    return result;
+}
+static int capture_point(std::vector<Capture>& surfaces,const V3& point,int forced,double* binding) {
+    if(!point.allFinite()||forced<-1||forced>=int(surfaces.size())) throw std::runtime_error("Invalid point capture input.");
+    double best=std::numeric_limits<double>::infinity(); int owner=-1;
+    for(int i=0;i<int(surfaces.size());++i) {
+        if(forced>=0&&forced!=i) continue;
+        auto& value=surfaces[i]; value.child_world.block<3,1>(0,3)=point;
+        const double previous=best; consider(value,-1,best);
+        if(best<previous) owner=i;
+    }
+    if(owner<0) throw std::runtime_error("No valid anatomical attachment surface.");
+    surfaces[owner].output=binding; write_capture(surfaces[owner]); return owner;
+}
+static void require_point_binding(const Mesh& mesh,const double* binding) {
+    for(int i=0;i<28;++i) if(!std::isfinite(binding[i])) throw std::runtime_error("Nonfinite point binding.");
+    binding_point(mesh,binding);
+    if(std::abs(binding[3]+binding[4]+binding[5]-1)>1e-6)
+        throw std::runtime_error("Point binding weights must sum to one.");
+    for(int i=3;i<6;++i) if(binding[i]<-1e-6||binding[i]>1+1e-6)
+        throw std::runtime_error("Point binding weights are outside the surface triangle.");
+}
+static M4 resolve_point(const Capture& value,const double* binding) {
+    require_point_binding(*value.parent,binding); int64_t triangle[3];
+    for(int i=0;i<3;++i) triangle[i]=int64_t(binding[i]);
+    const double zero[3]{0,0,0}; const auto surface=parent_surface(value.parent,zero);
+    Eigen::Matrix<double,3,3,Eigen::RowMajor> rotation_matrix=rotation(value.parent_world);
+    AfBasis resolved; Vec location;
+    if(!af_surface_frame(surface,value.parent->vertices.data(),value.parent_world.data(),
+        rotation_matrix.data(),triangle,binding+3,resolved,location)) throw std::runtime_error("Point attachment no longer resolves.");
+    double raw[9]; af_basis_matrix(resolved,raw); M4 result=M4::Identity();
+    result.block<3,3>(0,0)=Eigen::Map<Eigen::Matrix<double,3,3,Eigen::RowMajor>>(raw);
+    result.block<3,1>(0,3)=V3(location.x,location.y,location.z)+result.block<3,3>(0,0)*V3(binding+15);
+    return result;
+}
+}
+int af_point_attachment_capture(int surface_count,const uint64_t* meshes,const double* frames,int count,
+    const double* points,const int* forced,int* targets,double* bindings,uint64_t cancel) {
+    try {
+        if(count<1||count>1000000||!points||!forced||!targets||!bindings) throw std::runtime_error("Invalid point capture buffers.");
+        auto surfaces=af::point_surfaces(surface_count,meshes,frames,true,cancel);
+        for(int i=0;i<count;++i) {
+            af::check_cancel(cancel);
+            targets[i]=af::capture_point(surfaces,af::V3(points+3*i),forced[i],bindings+28*i);
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_point_attachment_resolve(int surface_count,const uint64_t* meshes,const double* frames,int count,
+    const int* targets,const double* bindings,double* output,uint64_t cancel) {
+    try {
+        if(count<1||count>1000000||!targets||!bindings||!output) throw std::runtime_error("Invalid point resolution buffers.");
+        const auto surfaces=af::point_surfaces(surface_count,meshes,frames,false,cancel);
+        for(int i=0;i<count;++i) {
+            af::check_cancel(cancel);
+            if(targets[i]<0||targets[i]>=surface_count) throw std::runtime_error("Point binding target is missing.");
+            Eigen::Map<af::M4> frame(output+16*i); frame=af::resolve_point(surfaces[targets[i]],bindings+28*i);
         }
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }

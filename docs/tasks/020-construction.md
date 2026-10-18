@@ -290,3 +290,30 @@ junctions, generic surfaces, control-attachment retirement, complete performance
 qualification and portable release. Conversion with interior fiber bindings will need preserved
 constraint correspondence; current sampled conversion requires authored mode for those inputs.
 Version stays 0.1.9 and this checkpoint is not a 0.2.0 release.
+The subsequent complete development gate passed with 662 tests.
+
+## Shared anatomical point attachment kernels (fiber integration pending)
+
+Inspection found that addon fibers bind all committed nodes to nearby anatomical surfaces,
+then retain bind-time C2 owner transitions along hard-pin-partitioned arcs. This behavior is
+more than interpolating endpoint displacement. Ported the Python owner-weight numerical loops
+to C++; 11 extracted addon reference cases agree, including uneven/cyclic/zero-length spans.
+
+Added batched generic point capture/resolution to the existing attachment library, reusing
+canonical 28-value attachment records and the unchanged surface-frame kernel. It accepts
+forced or nearest eligible targets at capture and never changes owners at resolution. No
+document SCP proxies are created. Native cancellation and transformed-surface preparation stay
+within the batch. Python packs inputs and unpacks records only.
+
+Native build/contracts, changed-native style, configured mypy and 90 focused tests pass.
+The tests include existing SCP/Blender attachment parity, point round trips under reflected
+nonuniform transforms, fixed-owner propagation, geometry changes and cancellation. This is a
+qualified kernel increment, not a completed fiber workflow. Fiber creation, dependency reads,
+current-shape editing/rebinding, routing and surface consumers still need integration.
+
+Before selecting the fiber shape-binding representation, preserve the distinction between the
+addon's dense committed-node bindings and editable Bézier knots/handles. Do not claim dense
+deformation parity from a control-point-only approximation. Inspect/qualify that integration
+against actual addon fixtures. Routing uses the current production facade in
+core/vcp/v3/production.py; its native SQP controller already exists, while Python still owns
+numerical planner/span preparation that must move behind the new native boundary.

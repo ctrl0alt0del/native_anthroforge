@@ -42,10 +42,12 @@ class GeometryEngine(NativeEngine):
         self._curve_signatures()
 
     def _curve_signatures(self) -> None:
-        from . import curve_editing, curve_queries, drawing, paths, strokes
+        from . import attachment_weights, curve_editing, curve_queries, drawing, paths, strokes
+        from .point_attachments import configure as configure_points
 
-        for module in (curve_editing, curve_queries, drawing, paths, strokes):
+        for module in (attachment_weights, curve_editing, curve_queries, drawing, paths, strokes):
             module.configure(self)
+        configure_points(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

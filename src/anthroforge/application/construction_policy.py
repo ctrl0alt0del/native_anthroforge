@@ -14,6 +14,22 @@ def topology_dependents(document: Document, entity: str) -> tuple[str, ...]:
     return tuple((*children, *controls))
 
 
+def topology_locks(document: Document, target: str) -> list[dict[str, str]]:
+    from .curve_sources import consumers
+
+    owners = consumers(document, {target}) if target in document.registry.construction else {target}
+    return [
+        dict(
+            id=key,
+            name=document.object(key).name,
+            consumer=owner,
+            reason="Incoming attachment on " + document.object(owner).name,
+        )
+        for owner in sorted(owners)
+        for key in topology_dependents(document, owner)
+    ]
+
+
 def require_topology_edit(document: Document, entity: str) -> None:
     dependents = topology_dependents(document, entity)
     if dependents:

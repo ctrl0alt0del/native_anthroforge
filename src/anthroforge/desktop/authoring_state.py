@@ -4,13 +4,18 @@ from dataclasses import fields
 
 from anthroforge.application.control_frames import display_frame
 from anthroforge.application.curve_sources import for_editing
+from anthroforge.core.construction import Curve
+from anthroforge.core.entities import IDENTITY
+from anthroforge.core.objects import ConstructionObject
 from anthroforge.native import bodies, components, construction
 from anthroforge.native.scene import entity_frame
+
+from . import curve_context
 
 
 def data(editor):
     session, selected = editor.controller.session, editor.controller.selection
-    entity = for_editing(session, session.document.index.entities.get(selected))
+    entity = curve_context.owner(editor)
     control = session.document.index.controls.get(selected)
     item = entity or control
     result = projected_item(item, control is not None)
@@ -33,9 +38,9 @@ def projected_item(item, control):
         for field in fields(item)
         if field.name not in ("points", "deformers", "attachment", "result")
     }
-    result["attachment"] = item.attachment
+    result["attachment"] = getattr(item, "attachment", None)
     result["result"] = result_status(item.result)
-    if not control and item.primitive:
+    if not control and getattr(item, "primitive", None):
         result["primitive"] = primitive_parameters(item.primitive)
     return result
 
@@ -56,22 +61,32 @@ def binding_records(item):
     curves = {c.id: c for c in item.primitive.curves} if getattr(item, "primitive", None) else {}
     return [
         resolve(b, curves[b.target.component]) if b.target.stage == "CURVE" else b
-        for b in item.deformers
+        for b in getattr(item, "deformers", ())
     ]
 
 
 def construction_data(entity, session):
-    from anthroforge.application.construction_policy import topology_dependents
+    from anthroforge.application.construction_policy import topology_locks
 
     result = {}
     result["topology_dependents"] = (
-        list(topology_dependents(session.document, entity.id)) if entity else []
+        topology_locks(session.document, entity.id) if entity else []
     )
-    result["curves"] = entity.primitive.curves if entity and entity.primitive else ()
+    result["standalone"] = isinstance(entity, Curve)
+    result["curves"] = editor_curves(entity)
     result["controls"] = [
         dict(id=c.id, name=c.name, kind=c.kind) for c in session.document.controls
     ]
     return result
+
+
+def editor_curves(item):
+    from dataclasses import replace
+
+    if isinstance(item, Curve):
+        return (replace(item, matrix=IDENTITY),)
+    definition = getattr(item, "primitive", None)
+    return definition.curves if definition else ()
 
 
 def selection_center(editor, selected):
@@ -82,14 +97,17 @@ def selection_center(editor, selected):
 def curve_components(session, entity, curve):
     records = construction.resolved_curve(session.engine, curve)
     local = records[:, [3, 4, 5, 0, 1, 2, 6, 7, 8]].reshape((-1, 3))
-    frame = construction.matrix(session.engine, entity_frame(session.engine, entity), curve.matrix)
+    frame = curve_context.frame(session, entity, curve)
     world = components.transformed(session.engine, local, frame)
     refs = [
         dict(owner=entity.id, curve=curve.id, point=p.id, part=part, index=i * 3 + j)
         for i, p in enumerate(curve.points)
         for j, part in enumerate(("left", "position", "right"))
     ]
-    return list(zip(refs, world.tolist(), local.tolist(), strict=True))
+    rows = list(zip(refs, world.tolist(), local.tolist(), strict=True))
+    return (
+        rows if curve.engine == "BEZIER" else [row for row in rows if row[0]["part"] == "position"]
+    )
 
 
 def control_components(session, control):
@@ -132,7 +150,9 @@ def components_for(editor):
     control = session.document.index.controls.get(selected)
     if control:
         return control_components(session, control)
-    entity = session.document.index.entities.get(selected)
+    entity = curve_context.owner(editor)
+    if isinstance(entity, Curve) and editor.editing:
+        return curve_components(session, entity, entity)
     return entity_components(session, entity, editor.category) if entity and editor.editing else []
 
 
@@ -171,8 +191,9 @@ def cache_key(editor):
         selected,
         item.generation if item else -1,
         getattr(item, "pose_revision", 0),
+        getattr(getattr(item, "result", None), "revision", 0),
         source_revisions(session, item),
-        display_frame(session, item) if item and not hasattr(item, "primitive") else None,
+        displayed_frame(session, item),
         editor.editing,
         editor.category,
         session.workspace.hidden_categories,
@@ -180,10 +201,21 @@ def cache_key(editor):
     )
 
 
+def displayed_frame(session, item):
+    if isinstance(item, ConstructionObject):
+        from anthroforge.application.curve_sources import world
+
+        return world(session.engine, session.document, item.id)
+    return display_frame(session, item) if item and not hasattr(item, "primitive") else None
+
+
 def source_revisions(session, item):
     if not getattr(item, "primitive", None):
         return ()
-    return tuple(session.document.object(c.id).generation for c in item.primitive.curves)
+    return tuple(
+        (session.document.object(c.id).generation, session.document.object(c.id).result.revision)
+        for c in item.primitive.curves
+    )
 
 
 def imported_selection(editor):

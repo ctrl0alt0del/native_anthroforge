@@ -7,6 +7,7 @@ from anthroforge.core.units import convert
 from . import (
     construction_tasks,
     curve_consumers,
+    curve_edit_operations,
     curve_independence,
     evaluation,
     importing,
@@ -29,6 +30,9 @@ EDITS = {
     "curve.create": object_operations.create_curve,
     "curve.edit": object_operations.edit_curve,
     "curve.point.update": object_operations.edit_point,
+    "curve.point.insert": curve_edit_operations.insert,
+    "curve.point.remove": curve_edit_operations.remove,
+    "curve.subdivide": curve_edit_operations.subdivide,
     "object.rename": object_operations.rename,
     "object.transform": object_operations.transform,
     "object.reparent": object_operations.reparent,

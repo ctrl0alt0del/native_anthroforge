@@ -7,6 +7,8 @@ from anthroforge.core.entities import descendants
 from anthroforge.core.results import geometry_asset
 from anthroforge.native import scene
 
+from . import object_interaction
+
 
 def local_path(value):
     url = QUrl(value)
@@ -34,7 +36,7 @@ def start_transform(controller, mode):
         return start_components(controller.authoring, mode)
     if not controller.selection:
         return
-    controller.session.editable(controller.selection)
+    object_interaction.editable(controller)
     controller.session.begin()
     controller.drag_values = list(controller.selectedData["trs"])
     controller.drag_mode = mode
@@ -56,7 +58,7 @@ def transform_delta(controller, values):
     if not controller.drag_values or controller.session.history.before is None:
         return
     result = object_values(controller.session.engine, controller.drag_values, values)
-    run(controller, "scp.transform", {"entity": controller.selection, "values": result})
+    run(controller, *object_interaction.transform_command(controller, result))
 
 
 def end_transform(controller, cancel=False):
@@ -85,7 +87,7 @@ def selection_center(controller):
         return []
     if selected["id"] == "components" or selected.get("is_control"):
         return selected["trs"][:3]
-    item = controller.session.document.entity(selected["id"])
+    item = controller.session.document.object(selected["id"])
     return frame_bounds(controller.session, item, selected["trs"][6:])[0]
 
 
@@ -106,12 +108,14 @@ def frame(controller):
     if selected.get("is_control"):
         controller.frameRequested.emit([*selected["trs"][:3], 1.0])
         return
-    item = controller.session.document.entity(selected["id"])
+    item = controller.session.document.object(selected["id"])
     center, radius = frame_bounds(controller.session, item, selected["trs"][6:])
     controller.frameRequested.emit([*center, max(0.02, radius * 2.5)])
 
 
 def frame_bounds(session, item, scales):
+    if item.id in session.document.registry.construction:
+        return object_interaction.bounds(session, item)
     key = geometry_asset(item)
     if not key:
         return group_bounds(session, item)

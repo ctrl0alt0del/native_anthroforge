@@ -218,12 +218,20 @@ def local_positions(editor, points):
         groups.setdefault(point_target(reference), []).append(index)
     result = [None] * len(points)
     for target, indices in groups.items():
-        frame = deformer_operations.frame(session, target)
+        frame = target_frame(session, target)
         inverse = construction.matrix(session.engine, frame, IDENTITY, relative=True)
         local = components.transformed(session.engine, [points[i] for i in indices], inverse)
         for index, value in zip(indices, local.tolist(), strict=True):
             result[index] = value
     return result
+
+
+def target_frame(session, target):
+    if target.owner in session.document.registry.construction:
+        from anthroforge.application.curve_sources import world
+
+        return world(session.engine, session.document, target.owner)
+    return deformer_operations.frame(session, target)
 
 
 def apply_points(editor, points):
@@ -236,6 +244,13 @@ def apply_points(editor, points):
             key = (reference["owner"], reference["curve"], reference["point"])
             grouped.setdefault(key, {})[reference["part"]] = value
     for (entity, curve, point), options in grouped.items():
+        update_curve_point(session, entity, curve, point, options)
+
+
+def update_curve_point(session, entity, curve, point, options):
+    if entity in session.document.registry.construction:
+        session.command("curve.point.update", curve=curve, point=point, **options)
+    else:
         session.command("point.update", entity=entity, curve=curve, point=point, **options)
 
 

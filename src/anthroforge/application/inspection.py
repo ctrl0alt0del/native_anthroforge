@@ -3,12 +3,13 @@
 from dataclasses import asdict
 from typing import TYPE_CHECKING, Any
 
+from anthroforge.core.object_registry import kind
 from anthroforge.core.results import geometry_asset
 
 from . import attachment_inspection as attachments
-from .construction_policy import topology_dependents
 from .dependency_inspection import relationships
 from .inspection_context import InspectionContext
+from .workspace_policy import included
 
 if TYPE_CHECKING:
     from .session import Session
@@ -16,7 +17,7 @@ if TYPE_CHECKING:
 
 def target(session: "Session | InspectionContext", entity: str) -> dict[str, Any]:
     document = session.document
-    item = document.index.entities.get(entity) or document.index.controls.get(entity)
+    item = document.registry.records.get(entity)
     if item is None:
         raise ValueError("Unknown inspection target.")
     return dict(
@@ -33,45 +34,31 @@ def identity(session: "Session | InspectionContext", item: Any) -> dict[str, Any
     return dict(
         id=item.id,
         name=item.name,
-        kind="SCP" if item.id in document.index.entities else item.kind,
+        kind=item.kind if item.id in document.index.controls else kind(item),
         document_revision=document.revision,
         generation=item.generation,
         construction_revision=getattr(item, "construction_revision", None),
         pose_revision=getattr(item, "pose_revision", None),
         result=asdict(item.result),
-        editable=not session.workspace.focused or item.id in session.workspace.members,
+        editable=included(document, session.workspace, item.id),
     )
 
 
 def locks(session: "Session | InspectionContext", entity: str) -> list[dict[str, str]]:
-    document = session.document
-    if entity not in document.index.entities:
-        return []
-    return [
-        dict(
-            id=key,
-            name=(document.index.entities.get(key) or document.control(key)).name,
-            reason="Child SCP"
-            if key in document.index.entities
-            else "Incoming control surface attachment",
-        )
-        for key in topology_dependents(document, entity)
-    ]
+    from .construction_policy import topology_locks
+
+    return topology_locks(session.document, entity)
 
 
 def geometry(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
+    from . import construction_inspection
+
+    if item.id in session.document.registry.construction:
+        return construction_inspection.geometry(session, item)
     key = geometry_asset(item) if item.id in session.document.index.entities else ""
     if not key:
         return dict(available=False)
-    mesh = session.assets[key].mesh
-    return dict(
-        available=True,
-        asset=key,
-        vertices=int(mesh.counts[0]),
-        polygons=int(mesh.counts[1]),
-        triangles=int(mesh.counts[3]),
-        bounds_local_metres=list(mesh.bounds),
-    )
+    return construction_inspection.mesh_geometry(session.assets[key].mesh, key)
 
 
 def snapshot(session: "Session", entities: list[str] | None = None) -> dict[str, Any]:
@@ -91,7 +78,7 @@ def snapshot(session: "Session", entities: list[str] | None = None) -> dict[str,
 
 
 def all_targets(session: "Session | InspectionContext") -> list[str]:
-    return [*session.document.index.entities, *session.document.index.controls]
+    return list(session.document.registry.records)
 
 
 def issue_records(session: "Session") -> dict[str, Any]:

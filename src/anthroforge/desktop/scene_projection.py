@@ -74,6 +74,7 @@ class SceneProjection:
         rows = [self.records[key] for key in self.order]
         self.view.synchronize(dict(rows=rows, parents=self.parents()))
         self.controller.rows = rows
+        self.controller.construction.synchronize()
         self.synchronize_selection()
 
     def update_records(self, changes, full, structural):
@@ -122,15 +123,19 @@ class SceneProjection:
 
     def synchronize_selection(self):
         controller = self.controller
-        if controller.selection not in self.records:
+        records = self.records | controller.construction.records
+        if controller.selection not in records:
             controller.selection = ""
-        self.selected.synchronize(self.records.get(controller.selection, {}))
+        self.selected.synchronize(records.get(controller.selection, {}))
         if self.selection != controller.selection:
             self.selection = controller.selection
             controller.selectionChanged.emit()
 
 
 def initialize(controller):
+    from .construction_projection import ConstructionProjection
+
+    controller.construction = ConstructionProjection(controller)
     controller.scene_projection = SceneProjection(controller)
     controller._state = PropertyProjection(controller)
     controller._render_rows = []

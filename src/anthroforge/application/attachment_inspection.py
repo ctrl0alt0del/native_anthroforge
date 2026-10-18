@@ -4,6 +4,7 @@ from dataclasses import asdict, replace
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.entities import SCP
+from anthroforge.core.objects import ConstructionObject
 from anthroforge.core.results import geometry_asset
 from anthroforge.native.attachments import anchor_points
 
@@ -23,6 +24,14 @@ def frame(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
 
 
 def describe(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
+    if isinstance(item, ConstructionObject):
+        from .construction_inspection import attachment
+
+        return attachment(session, item)
+    return anatomical(session, item)
+
+
+def anatomical(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
     support = getattr(item, "support", "") or getattr(item, "parent", "")
     binding = getattr(item.result, "binding", ()) or item.attachment.binding
     result = dict(settings=asdict(item.attachment), support=support, captured=bool(binding))

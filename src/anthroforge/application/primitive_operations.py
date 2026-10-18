@@ -109,7 +109,11 @@ def require_source_topology(session: "Session", primitive: ResolvedPrimitive) ->
         c.id
         for c in primitive.curves
         if c.id in session.document.registry.records
-        and c.closed != curve_sources.source(session.document, c.id).closed
+        and (c.closed, c.resolution)
+        != (
+            curve_sources.source(session.document, c.id).closed,
+            curve_sources.source(session.document, c.id).resolution,
+        )
     }
     for consumer in curve_sources.consumers(session.document, changed):
         require_topology_edit(session.document, consumer)

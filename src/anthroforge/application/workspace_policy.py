@@ -50,11 +50,13 @@ def validate(session: "Session", workspace: Workspace, index: int) -> None:
 
 def validate_references(session: "Session", workspace: Workspace, previous: Workspace) -> None:
     # Retain deleted IDs for undo; validate new references, not historical membership.
-    live = session.document.index.entities.keys() | session.document.index.controls.keys()
     for field in ("members", "hidden", "unpickable"):
+        live = set(session.document.registry.records)
+        if field == "members":
+            live = session.document.index.entities.keys() | session.document.index.controls.keys()
         added = set(getattr(workspace, field)) - set(getattr(previous, field))
         if added - live:
-            raise ValueError("Workspace references an unknown SCP or control.")
+            raise ValueError("Workspace references an unknown or incompatible object.")
 
 
 def associations(document: Document, target: str) -> set[str]:

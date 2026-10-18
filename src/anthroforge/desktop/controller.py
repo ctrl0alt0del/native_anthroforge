@@ -97,6 +97,10 @@ class Controller(QObject):
         return self.scene_projection.view.value("rows")
 
     @Property(QObject, constant=True)
+    def constructionModel(self):
+        return self.construction.model
+
+    @Property(QObject, constant=True)
     def selectedData(self):
         return self.scene_projection.selected
 
@@ -268,6 +272,12 @@ class Controller(QObject):
         )
         self.authoring.refresh()
         self.notify()
+
+    @Slot(str, result="QVariantMap")
+    def objectRecord(self, target):
+        return self.scene_projection.records.get(target) or self.construction.records.get(
+            target, {}
+        )
 
     @Slot(str, float, str, bool)
     def importMesh(self, path, units, parent, y_up):

@@ -56,8 +56,15 @@ def rename(session: "Session", target: str, name: str) -> None:
     install(session, replace(editable(session, target), name=require_name(name)))
 
 
-def transform(session: "Session", target: str, values: list[float]) -> None:
-    install(session, replace(editable(session, target), matrix=session.engine.transform(values)))
+def transform(session: "Session", target: str, values: list[float], world: bool = False) -> None:
+    from anthroforge.native.construction import matrix
+
+    item = editable(session, target)
+    frame = session.engine.transform(values)
+    if world:
+        parent = curve_sources.world(session.engine, session.document, item.parent)
+        frame = matrix(session.engine, parent, frame, relative=True)
+    install(session, replace(item, matrix=frame))
 
 
 def reparent(session: "Session", target: str, parent: str = "") -> None:

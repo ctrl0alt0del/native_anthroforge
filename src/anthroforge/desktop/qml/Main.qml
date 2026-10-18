@@ -107,7 +107,11 @@ ApplicationWindow {
         Rectangle {
             SplitView.preferredWidth: 240; SplitView.minimumWidth: 195; SplitView.maximumWidth: 440
             color: Theme.panel
-            Outliner { anchors.fill: parent; anchors.margins: Theme.inset; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
+            SplitView {
+                anchors.fill: parent; anchors.margins: Theme.inset; orientation: Qt.Vertical
+                Outliner { SplitView.fillHeight: true; SplitView.minimumHeight: 150; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
+                Construction { SplitView.preferredHeight: 240; SplitView.minimumHeight: 120 }
+            }
         }
         ColumnLayout {
             SplitView.fillWidth: true; SplitView.minimumWidth: 300; spacing: 0

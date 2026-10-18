@@ -27,7 +27,7 @@ UiScrollView {
         }
         Label { visible: !!inspector.selected.readonly; text: "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         ColumnLayout {
-            visible: !!inspector.selected.id && !inspector.selected.is_control
+            visible: !!inspector.selected.id && !inspector.selected.is_control && !inspector.selected.is_construction
             enabled: !inspector.selected.readonly && !workspace.state.waiting
             Layout.fillWidth: true; spacing: 10
             RowLayout {
@@ -143,6 +143,7 @@ UiScrollView {
             }
         }
         ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
+        ConstructionInspector { visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         DependencyInspector { visible: !!inspector.selected.id }
         Label { text: inspector.selected.error || ""; visible: !!text; color: Theme.danger; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         Item { implicitHeight: 8 }

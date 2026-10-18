@@ -41,7 +41,7 @@ class NativeEngine:
         return int(self.library.af_abi_version())
 
     def bounds(self, coordinates: Sequence[float]) -> tuple[float, ...]:
-        if not coordinates or len(coordinates) % 3:
+        if len(coordinates) == 0 or len(coordinates) % 3:
             raise ValueError("Expected one or more packed XYZ positions.")
         source = (ctypes.c_double * len(coordinates))(*coordinates)
         result = (ctypes.c_double * 6)()

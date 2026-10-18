@@ -105,3 +105,20 @@ Addon migration reference: `C:/Users/alexe/AppData/Roaming/Blender Foundation/Bl
 Original geometry references remain under `E:/development/WIP_models`; do not commit
 large source assets. Copy compact reproducible fixtures with source provenance.
 Push every coherent checkpoint; incomplete work stays on this branch.
+
+## Standalone editor checkpoint
+
+Construction has its own incremental list and selection records. Existing point/handle editing,
+transforms, insertion previews and undo now accept standalone curves. Generic inspection reports
+path resources, ordinary parents and source-consumer topology locks without an anatomical proxy.
+Object transforms accept an explicit world-space request and resolve ordinary parent-local state.
+Resolution changes through both primitive and source APIs enforce the shared lock. Construction
+visibility/pickability can be stored independently. Keyboard deletion resolves construction objects.
+
+Validation: 602 tests pass; Ruff and mypy pass. `tools/construction_editor_acceptance.py` loads the
+actual desktop QML on the offscreen platform and exercises standalone selection, inspection,
+framing, point drag/undo, insertion and canceled transforms without warnings. This is controller/
+QML acceptance only: no visible desktop input, full interaction rendering or package acceptance.
+Curves still need staged native display/picking outside edit mode. Image/fiber/surface production
+workflows, drawing, complete Construction controls, legacy control-attachment retirement and
+release qualification remain incomplete. Do not release or merge this checkpoint as 0.2.0.

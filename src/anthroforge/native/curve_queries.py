@@ -52,6 +52,8 @@ class CurveQuery:
 
 def split(engine: GeometryEngine, curve: Curve, segment: int, parameter: float) -> Curve:
     data, output = construction.curve_records(curve), np.empty((len(curve.points) + 1, 13))
+    if curve.engine == "POLYLINE":
+        data = construction.resolved_curve(engine, curve)
     engine.check(
         engine.library.af_curve_split(
             pointer(data), len(data), curve.closed, segment, parameter, pointer(output)

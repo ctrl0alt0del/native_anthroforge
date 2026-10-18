@@ -87,6 +87,8 @@ def curve_records(curve: Curve) -> Any:
 def resolved_curve(engine: GeometryEngine, curve: Curve, records: Any = None) -> Any:
     records = curve_records(curve) if records is None else doubles(records)
     records[:, 11:13] %= 4
+    if curve.engine == "POLYLINE":
+        records[:, 11:13] = 3
     engine.check(engine.library.af_curve_handles(pointer(records), len(curve.points), curve.closed))
     return records
 

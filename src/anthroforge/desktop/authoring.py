@@ -192,7 +192,7 @@ class Authoring(QObject):
         selected = self.state
         return (
             selected.get("follow")
-            or (selected.get("id") if not selected.get("is_control") else "")
+            or (selected.get("id") if selected.get("id") in document.index.entities else "")
             or document.entities[0].id
         )
 
@@ -229,7 +229,9 @@ class Authoring(QObject):
 
     @Slot(str, "QVariantMap")
     def edit(self, operation, arguments):
-        self.controller.run(operation, arguments)
+        from .curve_context import command
+
+        command(self, operation, arguments)
 
     @Slot(str, str, "QVariant")
     def setting(self, operation, key, value):

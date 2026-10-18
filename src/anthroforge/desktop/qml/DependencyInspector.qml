@@ -13,7 +13,9 @@ UiSection {
     function vector(values) { return values ? values.map(v=>(v/workspace.state.unit_factor).toFixed(3)).join(", ")+" "+workspace.state.display_units : "Unavailable"; }
     UiDetail { label: "Result"; value: panel.detail.result?.status || "Unavailable" }
     UiDetail { label: "Support"; value: panel.attachment.support_name || panel.attachment.follow || "None" }
-    UiDetail { label: "Surface"; visible: !!panel.detail.geometry?.available; value: (panel.detail.geometry?.vertices || 0)+" vertices · "+(panel.detail.geometry?.triangles || 0)+" triangles" }
+    UiDetail { label: "Transform parent"; visible: !!panel.attachment.transform_parent; value: panel.attachment.transform_parent_name || "None" }
+    UiDetail { label: "Path"; visible: panel.detail.geometry?.kind === "PATH"; value: (panel.detail.geometry?.samples || 0)+" evaluated samples" }
+    UiDetail { label: "Surface"; visible: !!panel.detail.geometry?.available && panel.detail.geometry?.kind === "MESH"; value: (panel.detail.geometry?.vertices || 0)+" vertices · "+(panel.detail.geometry?.triangles || 0)+" triangles" }
     Repeater {
         model: panel.detail.relationships || []
         ColumnLayout {

@@ -15,7 +15,8 @@ static Route projected(const Planning& plan,double factor) {
     }
     result.push_back(plan.end); unique_adjacent(result); return result;
 }
-static bool route_clear(const Planning& plan,const Route& route) {
+bool route_clear(const Planning& plan,const Route& route) {
+    if(route.size()<2) return false;
     for(size_t i=1;i<route.size();++i)
         if(!clear(plan,route[i-1],route[i],i==1?plan.first:0,i+1==route.size()?plan.last:0)) return false;
     return true;
@@ -26,6 +27,6 @@ Route surface_route(const Planning& plan) {
         const auto route=projected(plan,factor);
         if(route_clear(plan,route)) return shortcut(plan,route);
     }
-    return {};
+    return mesh_surface_route(plan);
 }
 }

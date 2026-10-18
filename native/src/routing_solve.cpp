@@ -14,6 +14,11 @@ static double regularization_scale(const std::vector<Vec>& points,double epsilon
     }
     return std::max(median(diagonal),floor);
 }
+static double initial_penalty(size_t count) {
+    const double weight=0.9*(count-1); std::vector<double> diagonal(count,0.01+2*weight);
+    diagonal.front()-=weight; diagonal.back()-=weight;
+    return std::max(1.0,median(diagonal));
+}
 static kernel::AfV3SqpConfig configuration(const World& world,const Span& span,const Input& input) {
     kernel::AfV3SqpConfig value{}; const double radius=input.options.radius;
     value.length_weight=0.9; value.fidelity_weight=0.01; value.radius=radius;
@@ -23,8 +28,7 @@ static kernel::AfV3SqpConfig configuration(const World& world,const Span& span,c
     value.trust_radius=std::max(8*radius,0.01*world.length); value.min_trust=std::max(0.25*radius,world.floor);
     value.max_trust=std::max(value.trust_radius,0.25*world.length);
     value.regularization_scale=regularization_scale(span.reference,value.epsilon,world.floor);
-    value.regularization=1e-6*value.regularization_scale;
-    value.penalty=std::max(1.0,0.01+0.9*(span.reference.size()-1)*(span.reference.size()==2?1:2));
+    value.regularization=1e-6*value.regularization_scale; value.penalty=initial_penalty(span.reference.size());
     value.accepted_cap=input.options.accepted_steps; value.trial_cap=std::max(32,8*value.accepted_cap);
     value.ccd_mode=kernel::AF_V3_SQP_CCD_INDEXED; value.ccd_budget=262143;
     return value;

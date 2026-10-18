@@ -44,25 +44,19 @@ static void graph_row(const Route& points,int index,int limit,std::vector<int64_
     links.push_back(1); links.push_back(0); int used=0;
     for(int j:order) if(j!=index&&used++<limit&&j>1) links.push_back(j);
 }
+Graph neighbors(const Route& points,int limit) {
+    Graph graph(points.size());
+    for(int i=0;i<int(points.size());++i) graph_row(points,i,limit,graph[i]);
+    return graph;
+}
 Route search(const Planning& plan,const Route& points,int limit) {
-    std::vector<int64_t> offsets{0},links,path(points.size());
-    for(int i=0;i<int(points.size());++i) {
-        check_cancel(plan.input.cancel); graph_row(points,i,limit,links); offsets.push_back(int64_t(links.size()));
-    }
-    kernel::AfSearchResult result{};
-    kernel::af_world_lazy_path(plan.world.collision.get(),reinterpret_cast<const double*>(points.data()),
-        int(points.size()),offsets.data(),links.data(),plan.first,plan.last,plan.span,plan.threshold,
-        512,path.data(),int(path.size()),&result);
-    Route route;
-    if(result.status==0) for(int i=0;i<result.path_count;++i) route.push_back(points[path[i]]);
-    return shortcut(plan,route);
+    return shortcut(plan,search_graph(plan,points,neighbors(points,limit)));
 }
 static Route corridor(const Planning& plan) {
     if(clear(plan,plan.start,plan.end,plan.first,plan.last)) return {plan.start,plan.end};
     const auto surface=surface_route(plan);
     if(!surface.empty()) return surface;
-    const auto points=compatibility(plan);
-    return search(plan,points,points.size()<=48?int(points.size()):48);
+    return ordinary_roadmap(plan);
 }
 static std::vector<Route> corridors(const Input& input,World& world,const Reference& reference) {
     std::vector<Route> routes;

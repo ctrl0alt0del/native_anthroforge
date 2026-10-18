@@ -421,3 +421,29 @@ Do not claim these four small fixtures establish all routing acceptance.
 
 This checkpoint also fixes the fixture helper's formatting-induced function-length failure.
 Version remains 0.1.9. Full gate is pending this kernel increment; no visible UI was used.
+
+## Native planner continuation
+
+The full Python suite passed with 702 tests after correcting a process-wide inventory
+test's measurement boundary: collect unreachable objects before paired snapshots and
+temporarily exclude GC between them. Exact alias and byte-deduplication assertions remain.
+The preceding full gate reached pytest; rerun the complete gate after this increment.
+
+Native preparation now includes mesh-surface routes, sparse/dense shells, owner exit
+access, expanded roadmaps, and bounded deterministic pin-exit recovery. The accepted
+addon tree fixture was captured without Blender: all 1,050 nodes, parent indices and
+the final path agree within 1e-13 in the native test. PCG64 and bounded integer behavior
+are pinned to NumPy 1.26.4 with upstream notices; no Python numerical loop is retained.
+Cancellation is checked between collision queries and graph-neighbor preparation rows.
+
+Inspection found the donor lazy graph allocated count-squared metric and state arrays.
+The adapter now stores only actual graph edges and shared undirected collision proofs,
+retaining A* ordering and lazy validation semantics. This structural memory improvement
+still needs representative workload measurement and broader route parity qualification.
+Native build and tree contracts pass; focused Python checks and native style pass for
+the preceding planner changes. Sparse-search follow-up validation is in progress.
+
+Routing is still not application-integrated. Warm inputs, independent handoff validation,
+diagnostic publication and representative anatomical qualification remain. Binding
+lifecycle, junctions, generic surfaces and the other release work above remain open.
+Do not label this checkpoint a completed 0.2.0 release.

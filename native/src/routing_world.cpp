@@ -12,6 +12,17 @@ static bool closed_mesh(const Triangles& triangles) {
         }
     return std::all_of(edges.begin(),edges.end(),[](const auto& edge){return edge.second==2;});
 }
+static kernel::Bounds transformed_bounds(const Mesh& mesh,const M4& matrix) {
+    auto bounds=kernel::empty_bounds();
+    for(int i=0;i<mesh.vertices.rows();++i) {
+        const V3 vertex=point(matrix,mesh.vertices.row(i));
+        for(int axis=0;axis<3;++axis) {
+            bounds.lo[axis]=std::min(bounds.lo[axis],vertex[axis]);
+            bounds.hi[axis]=std::max(bounds.hi[axis],vertex[axis]);
+        }
+    }
+    return bounds;
+}
 static void add_surface(World& world,const Mesh& mesh,const M4& matrix,int owner) {
     if(mesh.triangles.rows()==0) throw std::runtime_error("Routing surface has no triangles.");
     if(!matrix.fullPivLu().isInvertible()) throw std::runtime_error("Routing surface transform is singular.");
@@ -19,6 +30,7 @@ static void add_surface(World& world,const Mesh& mesh,const M4& matrix,int owner
     const int index=kernel::af_world_add_collider(world.collision.get(),mesh.vertices.data(),
         triangles.data(),int(triangles.rows()),owner,owner,closed_mesh(mesh.triangles),matrix.data(),inverse.data());
     if(index<0) throw std::runtime_error("Routing surface capture failed.");
+    world.collision->items[index].bounds=transformed_bounds(mesh,matrix);
 }
 static void snapshot_geometry(World& world,uint64_t cancel) {
     std::vector<double> vertices; std::vector<int64_t> triangles;

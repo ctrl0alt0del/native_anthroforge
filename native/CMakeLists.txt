@@ -7,7 +7,10 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/path_registry.cpp src/path_presentation.cpp src/image.cpp src/image_placement.cpp
     src/curve_fit.cpp src/drawing.cpp src/attachment_weights.cpp src/path_editing.cpp
     src/routing.cpp src/routing_world.cpp src/routing_reference.cpp src/routing_solve.cpp
-    src/routing_planner.cpp src/routing_candidates.cpp src/routing_surface.cpp src/routing_handoff.cpp)
+    src/routing_planner.cpp src/routing_candidates.cpp src/routing_surface.cpp src/routing_handoff.cpp
+    src/routing_mesh_surface.cpp src/routing_shells.cpp src/routing_access.cpp src/routing_roadmap.cpp
+    src/routing_random.cpp src/routing_pin_tree.cpp src/routing_pin_growth.cpp
+    src/routing_pin_graph.cpp src/routing_pin_recovery.cpp src/routing_search.cpp)
 
 add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_cubic_refit.c
@@ -29,5 +32,12 @@ if(BUILD_TESTING)
     add_executable(af_native_tests tests/api_test.cpp)
     target_link_libraries(af_native_tests PRIVATE af_native)
     add_test(NAME native_contract COMMAND af_native_tests)
+    add_executable(af_routing_tests tests/routing_tree_test.cpp src/routing_random.cpp
+        src/routing_pin_tree.cpp src/routing_pin_growth.cpp)
+    target_include_directories(af_routing_tests PRIVATE src include)
+    target_include_directories(af_routing_tests SYSTEM PRIVATE vendor)
+    target_compile_definitions(af_routing_tests PRIVATE NOMINMAX)
+    add_test(NAME native_routing_tree COMMAND af_routing_tests
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/pin_tree.txt")
 endif()
 

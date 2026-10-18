@@ -11,4 +11,5 @@
 *.yml text eol=lf
 *.png binary
 native/vendor/curve_fit_nd/** text eol=lf
+native/migration/routing/*.hpp -text
 

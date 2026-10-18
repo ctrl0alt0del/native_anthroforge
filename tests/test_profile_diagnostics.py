@@ -48,10 +48,7 @@ def test_report_explains_revision_changes_and_warm_cache_reuse(session, tmp_path
 def test_native_allocation_aliases_and_owner_overlap_do_not_double_count(session, tmp_path):
     entity = create(session, kind="BODY")
     session.command("profile.start", memory_mib=16)
-    resource = session.profiler.resources
-    before = inventory(session.profiler, resource.owners())
-    alias = topology.finalize(mesh(session, entity), None, 0)
-    after = inventory(session.profiler, resource.owners())
+    before, alias, after = alias_inventories(session, entity)
     assert alias.handle != mesh(session, entity).handle
     assert after["handles"] == before["handles"] + 1
     assert after["unique_bytes"] == before["unique_bytes"]
@@ -59,6 +56,20 @@ def test_native_allocation_aliases_and_owner_overlap_do_not_double_count(session
     assert sum(v["bytes"] for v in after["owners"].values()) > attributed
     assert after["owners"]["document"]["bytes"] > 0
     report(session, tmp_path / "memory.zip")
+
+
+def alias_inventories(session, entity):
+    # Registry totals span all tests; unrelated cyclic disposal cannot delimit this measurement.
+    gc.collect()
+    enabled, resource = gc.isenabled(), session.profiler.resources
+    gc.disable()
+    try:
+        before = inventory(session.profiler, resource.owners())
+        alias = topology.finalize(mesh(session, entity), None, 0)
+        return before, alias, inventory(session.profiler, resource.owners())
+    finally:
+        if enabled:
+            gc.enable()
 
 
 def test_profiler_off_does_not_query_memory_or_observe_cache(session, monkeypatch):

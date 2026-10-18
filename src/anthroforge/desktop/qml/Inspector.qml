@@ -11,7 +11,7 @@ ScrollView {
     readonly property bool dialogVisible: colorDialog.visible
     signal pickAnchor(string mode)
     signal deleteRequested(string entity)
-    clip: true; contentWidth: availableWidth
+    clip: true; contentWidth: availableWidth; rightPadding: effectiveScrollBarWidth
     function setAttachment(key, value) {
         const options = {entity:selected.id};
         options[key] = value;
@@ -124,7 +124,7 @@ ScrollView {
             }
             PrimitiveInspector { visible: !!inspector.selected.primitive }
             UiSection {
-                title: "Display & evaluation"
+                title: "Display & evaluation"; expanded: false
                 RowLayout {
                     Rectangle { implicitWidth: 24; implicitHeight: 24; radius: 4; color: inspector.selected.color || "#72b8ad"; border.color: Theme.border }
                     UiButton { text: "Object color…"; Layout.fillWidth: true; onClicked: { colorDialog.selectedColor = inspector.selected.color; colorDialog.open(); } }

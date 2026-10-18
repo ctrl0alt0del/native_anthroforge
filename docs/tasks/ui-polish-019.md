@@ -14,7 +14,8 @@ run the development gate and relevant GUI regressions before integration.
 - Branch: `codex/ui-polish-019`; integration: `main`.
 - Starting revision: `ca4e4e24ec9344f44fa9abe2d2dd53acc6f5beb1`.
 - Preserve unrelated untracked root `__init__.py`.
-- Status: investigation; implementation and validation pending.
+- Status: shared styles and progressive details implemented. Source UI and ruler/camera
+  acceptance pass with no QML warnings. Full visual matrix, regression gate and packaging pending.
 
 ## Findings and ownership
 
@@ -29,8 +30,9 @@ run the development gate and relevant GUI regressions before integration.
 
 ## Next
 
-Capture baseline; implement shared styles, consistent insets and progressive details;
-qualify real interactions and screenshots, then package and deliver 0.1.9.
+Run tools/ui_polish_acceptance.py and inspect captures, finish regression/gate, then
+package and deliver 0.1.9. Existing UI test had a stale key 7 expectation (current key 3);
+ruler test now waits for displayed picking revisions instead of assuming a 50ms frame.
 
 ## References
 

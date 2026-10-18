@@ -5,6 +5,7 @@ from pathlib import Path
 from zipfile import ZipFile
 
 import numpy as np
+from activity_acceptance import wait_for
 from curve_interaction_acceptance import screen
 from PySide6.QtCore import QPoint, Qt
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -58,7 +59,7 @@ def pickability(controller):
         tools.probe([0, -3, 0], [0, 1, 0], 0, False)
         assert not tools.hover
         controller.run("workspace.update", {setting: []})
-        QTest.qWait(50)
+        wait_for(controller, lambda: bool(controller.pick_ids))
         tools.probe([0, -3, 0], [0, 1, 0], 0, False)
         assert tools.hover
     tools.cancel()
@@ -79,6 +80,9 @@ def bookmarks(controller, window):
 
 
 def display_units(controller, window):
+    assert not find(window, "measurementCoordinates").isVisible()
+    click(window, "measurementDetails")
+    assert find(window, "measurementCoordinates").isVisible()
     row = controller.session.command("measurement.list")[0]
     for unit, scale in (("mm", 1000), ("cm", 100), ("m", 1)):
         controller.run("workspace.update", dict(display_units=unit))

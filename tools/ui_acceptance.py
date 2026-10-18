@@ -91,7 +91,7 @@ def panel_controls(controller, window):
     click(window, "TransformToggle")
     viewport = find(window, "viewport")
     viewport.forceActiveFocus()
-    QTest.keyClick(window, Qt.Key.Key_7)
+    QTest.keyClick(window, Qt.Key.Key_3)
     assert viewport.property("viewName") == "Top" and viewport.property("orthographic")
     QTest.keyClick(window, Qt.Key.Key_5)
 

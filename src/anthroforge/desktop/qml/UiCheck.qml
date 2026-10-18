@@ -3,7 +3,7 @@ import QtQuick.Controls
 
 CheckBox {
     id: control
-    implicitHeight: 26
+    implicitHeight: Theme.controlHeight; padding: 0
     spacing: 8
     font.pixelSize: 12
     indicator: Rectangle {
@@ -12,5 +12,5 @@ CheckBox {
         border.color: control.checked || control.activeFocus ? Theme.accent : Theme.border
         Text { anchors.centerIn: parent; text: "✓"; visible: control.checked; color: Theme.accent; font.pixelSize: 12 }
     }
-    contentItem: Text { leftPadding: 24; text: control.text; font: control.font; color: control.enabled ? Theme.text : Theme.muted; verticalAlignment: Text.AlignVCenter }
+    contentItem: Text { leftPadding: control.text ? 24 : 0; text: control.text; font: control.font; color: control.enabled ? Theme.text : Theme.muted; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
 }

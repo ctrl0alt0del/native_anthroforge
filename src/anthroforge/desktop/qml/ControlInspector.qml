@@ -35,7 +35,7 @@ ColumnLayout {
         }
     }
     UiSection {
-        title: "Lattice cage"; visible: panel.item.kind === "LATTICE"
+        title: "Lattice cage"; hint: "Select cage points in the viewport. Ctrl-click extends selection."; visible: panel.item.kind === "LATTICE"
         VectorSetting { label: "Resolution · U / V / W"; values: panel.item.resolution || [2,2,2]; onEdited: values => authoring.edit("lattice.resize",{control:panel.item.id,resolution:values.map(Math.round)}) }
         Repeater {
             model: 3
@@ -47,7 +47,6 @@ ColumnLayout {
             }
         }
         UiCheck { text: "Outside points only"; checked: panel.item.outside || false; onClicked: panel.set("outside",checked) }
-        Label { text: "Select cage points in the viewport. Shift-click adds to selection."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
         NumericSetting { label: "Select point index"; value: panel.reference.index || 0; decimals: 0; onEdited: value => { const row=authoring.componentRows.find(r=>r.index===Math.round(value)); if(row) authoring.selectComponent(row.key,false); } }
         VectorSetting { label: "Selected point · cage coordinates"; values: panel.reference.local || [0,0,0]; enabled: panel.reference.index !== undefined; onEdited: values => authoring.edit("lattice.point",{control:panel.item.id,index:panel.reference.index,position:values}) }
         UiField { Layout.fillWidth: true; placeholderText: "Cage weights, comma separated"; text: (panel.item.weights || []).join(", "); onEditingFinished: panel.set("weights",text.trim()?text.split(",").map(Number):[]) }

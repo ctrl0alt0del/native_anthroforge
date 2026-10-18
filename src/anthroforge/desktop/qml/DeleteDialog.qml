@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 
-Dialog {
+UiDialog {
     id: dialog
     objectName: "deleteDialog"
     parent: Overlay.overlay

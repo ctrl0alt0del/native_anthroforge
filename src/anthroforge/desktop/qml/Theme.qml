@@ -2,6 +2,10 @@ pragma Singleton
 import QtQuick
 
 QtObject {
+    readonly property int gap: 8
+    readonly property int inset: 12
+    readonly property int controlHeight: 30
+    readonly property int radius: 4
     readonly property color background: "#202124"
     readonly property color panel: "#2b2c30"
     readonly property color header: "#323338"

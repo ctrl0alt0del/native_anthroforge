@@ -17,7 +17,8 @@ run the development gate and relevant GUI regressions before integration.
 - Status: implementation complete; 541-test development gate passed. Off-screen Qt
   UI polish, ruler/camera, workflow, Issues, Activity and view/gesture acceptance passed.
   Real Close/Cancel/OK buttons, deletion and undo also pass off-screen.
-  Packaging and final qualification pending.
+  Clean packaged build and relocated background portable qualification passed.
+  Implementation and validation complete; normal integration/push remains.
 - User is playing a game: no visible windows, desktop screenshots or mouse/keyboard
   automation. Our launched 0.1.8 window is closed. Continue only background checks.
   Off-screen Qt needs QT_QPA_FONTDIR=C:/Windows/Fonts for meaningful text/layout.
@@ -35,14 +36,31 @@ run the development gate and relevant GUI regressions before integration.
 
 - Packaging found a reproducible PySide deploy boundary: the larger QML argument list
   triggers its Windows deploy_main.py wrapper and changes Nuitka output names. Explicit
-  executable/distribution names now preserve the packaging contract; rebuild pending.
+  executable/distribution names now preserve the packaging contract. The clean rebuild
+  and relocated portable check qualify the fix.
+
+## Validation and artifacts
+
+- Full development gate: 541 tests, native CTest, typing, style, numerical checks and
+  native doctor passed. Existing QQmlPropertyMap warnings remain.
+- Actual QML controls passed at 1440×900 and 1050×680: menu contrast at least 4.5:1,
+  popup containment, coordinate disclosure persistence, issue details and dialog actions.
+  Off-screen UI polish, ruler/camera, workflow, Issues, Activity and gesture checks passed.
+- Final executable: `dist/0.1.9/AnthroForge.dist/AnthroForge.exe`, built from clean
+  `ddee3cb`. Relocated `check_portable.py --offscreen` passed with minimal PATH.
+  Packaged UI captures and hidden QQuickRenderControl GPU surfaces were inspected.
+  Native-window tests were not rerun after the user's desktop-use restriction.
+- Local evidence: `build/ui-polish-019/check.log`, `package-final.log`, acceptance logs
+  and `portable/portable-check.json`. These ignored artifacts are not cloud evidence.
+- Corresponding source: `dist/AnthroForge-0.1.9-source.zip`. Keep the whole portable
+  folder together; previous releases and the unrelated root stub are preserved.
 
 ## Next
 
-Package from a clean checkpoint and run tools/check_portable.py with --offscreen.
-Inspect saved images without interacting with the desktop. Preserve the native-window
-validation distinction in the final report. Existing UI test had a stale key 7 expectation (current key 3);
-ruler test now waits for displayed picking revisions instead of assuming a 50ms frame.
+Refresh the packaged documentation and source archive, then merge/push normally after
+checking the latest main. No further desktop interaction. Existing UI test had a stale
+key 7 expectation (current key 3); the ruler test now waits for displayed picking
+revisions instead of assuming a 50ms frame.
 
 ## References
 

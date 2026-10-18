@@ -1,7 +1,55 @@
 # AnthroForge development validation
 
-Current source qualification is in [Measurements and profiling 0.1.8](#measurements-and-profiling-018).
+Current source qualification is in [UI polish 0.1.9](#ui-polish-019).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## UI polish 0.1.9
+
+Shared dark menu, menu-item, dialog, help and scrolling components own presentation
+states and spacing. Qt Basic's unassigned light/mid palette roles caused light hover
+backgrounds against light text. Popup delegates also used the outer control width
+inside a padded popup. The fixes cover the menu bar, creation menu and dropdowns.
+Feature panels use concise summaries and explicit disclosures for ruler coordinates,
+attachment data and issue evidence. Workspace visibility columns are aligned; keyboard
+help is grouped. Measurement expansion survives presentation-model replacement.
+
+The development gate passed 541 tests, native CTest, lock/Ruff/mypy, native/script
+style, numerical checks and native doctor. Seven existing QQmlPropertyMap warnings
+remain. Follow-up architecture/style checks cover the packaging and acceptance changes.
+No application, geometry, scheduling or document semantics changed.
+
+Source editor/ruler acceptance initially ran with native Windows rendering. After the
+user requested uninterrupted desktop use, all further GUI checks used Qt's offscreen
+platform with Windows fonts explicitly available. UI-polish, ruler/camera, workflow,
+Issues, Activity and view/gesture acceptance passed without QML warnings. Captures of
+menus, compact panels, coordinates, workspace columns and shortcut help were inspected.
+Tests check hover contrast at least 4.5:1, popup containment, actual Close/Cancel/OK
+buttons, deletion/undo and preserved coordinate disclosure. Window sizes were 1440×900
+and 1050×680. Offscreen Qt does not establish native-window or desktop surface rendering.
+
+Ownership review: shared controls own presentation mechanics; feature panels own
+grouping and transient disclosures. Existing commands, lazy relationship inspection,
+incremental Activity updates and authoritative data remain their owners' responsibility.
+The background portable-test option explicitly records its platform and still checks
+surface pixels through the hidden QQuickRenderControl renderer. It does not silently
+claim native-window acceptance.
+
+Packaging exposed Qt's long-command wrapper changing the compiled entry-point name.
+Explicit Nuitka executable/distribution names now preserve the packaging contract.
+The final executable was built from clean source `ddee3cb`, version 0.1.9.0. The
+complete relocated portable check passed with minimal PATH and `--offscreen`, including
+editing, persistence, primitives/deformers, issues, workspace tools, rulers/bookmarks,
+and complete desktop and Qt-free numerical headless profile reports. Packaged UI
+captures and the hidden QQuickRenderControl GPU capture were inspected. The latter
+renders the expected cube surfaces; no native-window retest was performed while the
+user was gaming. Local evidence is under `build/ui-polish-019`, with portable results
+in `portable/portable-check.json` and final build output in `package-final.log`.
+
+The qualified executable is `dist/0.1.9/AnthroForge.dist/AnthroForge.exe`, SHA-256
+`941618976e03d437b08a2dfdd9f180aaef1f6c9bef4b116badbd298142526ae8`.
+Keep the whole portable folder together. Corresponding source is
+`dist/AnthroForge-0.1.9-source.zip`; prior release folders are preserved. Final task
+documentation is newer than the compiled source revision and does not change code.
 
 ## Measurements and profiling 0.1.8
 

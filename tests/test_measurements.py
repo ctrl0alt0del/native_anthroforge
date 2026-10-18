@@ -5,6 +5,21 @@ import pytest
 from tests.test_construction_contracts import create
 
 
+def test_native_world_coordinates_and_distance_use_canonical_metres(session):
+    from anthroforge.native.measurement import distance
+
+    entity = create(session)
+    original = endpoints(session, entity)[0]["position"]
+    session.command("scp.transform", entity=entity, values=[2, 3, 4, 0, 0, 0, 2, 3, 4])
+    point = endpoints(session, entity)[0]["position"]
+    expected = [
+        value * scale + offset
+        for value, scale, offset in zip(original, (2, 3, 4), (2, 3, 4), strict=True)
+    ]
+    assert point == pytest.approx(expected)
+    assert distance(session.engine, [1, 2, 3], [4, 6, 3]) == pytest.approx([3, 4, 0, 5])
+
+
 def endpoints(session, entity):
     return [
         session.command("measurement.point", entity=entity, triangle=0, weights=w)

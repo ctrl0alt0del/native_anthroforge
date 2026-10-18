@@ -46,8 +46,19 @@ peaks are outside coverage. No new resource queries run while recording is off.
 Visual inspection of the first portable ruler caught inverted mm display conversion;
 API coordinates were already correct. The new GUI regression verifies XYZ/distance
 in m/cm/mm and clicks the actual bookmark Go button during an active edit. Two repeated
-passes and the corrected exported PNG establish the fix. Final portable rebuild and
-relocation qualification are pending at this source checkpoint.
+passes and the corrected exported PNG establish the fix. A final full suite passed
+541 tests after adding explicit native coordinate and 3-4-5 distance checks.
+
+The final executable was built from clean source `d005bda`, version 0.1.8.0. Relocated
+portable checks passed with minimal PATH: primitives/deformers/attachments, editing,
+save/reopen, rendering, GUI, issues, workflows, rulers/bookmarks and complete desktop
+and Qt-free numerical headless profile reports. The packaged ruler PNG was inspected:
+its 1.41421356 m diagonal displays 1414.214 mm. Final evidence is under
+`build/inspection-018/portable-final`; later source changes affect tests/docs only.
+The qualified executable is `dist/0.1.8/AnthroForge.dist/AnthroForge.exe`, SHA-256
+`abe23810632bbe72b3381b46f992489bfc5f638d59756d24533a0d1cdad5ad28`.
+Keep the whole portable folder together. Corresponding source is
+`dist/AnthroForge-0.1.8-source.zip`; prior release folders are preserved.
 
 ## Workflow improvements 0.1.7
 

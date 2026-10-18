@@ -3,7 +3,7 @@
 - Task branch: `codex/inspection-measurements-profiler`
 - Integration branch: `main`
 - Starting revision: `089b114180fc1ee6a8493b4dbfb9d6f2f8f6df12`
-- Status: implementation in progress
+- Status: complete
 - Active writer: desktop chat, direct work
 - Updated: 2026-10-18
 
@@ -35,65 +35,50 @@ profile summaries/caches, disabled behavior and shared allocation accounting.
 Run development gate, GUI acceptance, profiler report inspection, relocated portable
 checks, source archive and normal main integration. Push coherent checkpoints.
 
-## Current implementation and next action
+## Delivered and validated
 
-Baseline 0.1.7 is clean except the preserved legacy stub. Existing native surface
-picking, shared workspace camera, runtime recorder and bounded Body base cache are
-available. Coordinator invalidation currently loses its cause. Geometry collection
-traces document/history/checkpoint/job references; renderer leases need explicit
-observation for accurate shared ownership. Inspect their boundaries, then implement
-measurement/bookmark records and profiler observation without altering scheduling.
+Both recommendations are delivered in 0.1.8. Typed workspace rulers freeze two surface
+witnesses with XYZ/delta/distance and explicit stale status; named cameras preserve
+projection and ongoing edits. Native measurement queries and displayed-revision picking
+serve shared GUI/headless operations. Projects and frozen reports preserve this evidence.
 
-First increment implemented: native surface witness/distance queries, typed frozen
-rulers and camera bookmarks persisted per workspace, shared commands, ruler pointer
-workflow and overlays, named view management, report measurements. Display staging
-now retains the matching asset/revision metadata with its old visible handle.
-Stale/deleted source geometry is explicit; rulers retain values, not geometry payloads.
-13 focused/architecture/export tests, strict mypy and native build/CTest passed.
-Real GUI picks, bookmark save/restore and export during edits passed; viewport and
-report images were visually inspected under `build/inspection-018`. No QML warnings.
-Recommendation 7 now implemented: shared revision/invalidation/cancellation causes,
-Body base-cache events, native allocation inventory and weak ownership observations
-for document/history/checkpoint/jobs/catalogue/cache and displayed/staged viewport
-leases. Summaries include bounded explanations, deduplicated totals and overlapping
-owner bytes. Observation is recording-only; native AABB capacity is an estimate and
-Python/Qt/GPU allocation sizes remain outside coverage. Observer failures are explicit.
-The full suite passed (538 tests); a subsequent late-worker/repeated-capture regression
-also passed with focused tests. Actual GUI acceptance now includes bookmark restoration
-during a modal curve move, unchanged geometry at restoration and one undo action.
+The runtime recorder now captures shared revision/invalidation/cancellation causes,
+Body base-cache reuse/eviction and deduplicated native allocation ownership. Weak job
+and viewport observation does not extend mesh lifetime. Owner totals overlap; AABB
+capacity is estimated. Python/Qt/GPU allocations and transient peaks remain outside
+coverage. Disabled profiling performs no new inventory queries or cache collection.
 
-Five actual GUI profiler captures now pass (normal/snapped, Activity closed/open,
-cancelled gesture); repeated recording and document replacement also pass. Captures
-expose input-output invalidation, newer-request cancellation, warm base-cache hits and
-document/history/job/displayed ownership. Perfetto imports 31,822 slices and all ten
-memory counter tracks without importer errors. Six serial counterbalanced baseline,
-dormant and recording trials completed under `build/inspection-018/performance-qualified`.
-Idle means were 16.48–16.95 ms/frame, recording 18.36–19.10 ms on the cube/body fixture.
-The benchmark wait now uses a real Qt loop: repeated QTest.qWait had starved Python
-export while the desktop event loop itself remained functional. No production export
-change was needed. Documentation/version and portable acceptance are prepared.
+Validation:
+- Development gate passed with 540 tests; the final full suite passed 541 after adding
+  an explicit native world-coordinate and 3-4-5 distance contract.
+- Actual GUI: surface picks, category filtering, m/cm/mm XYZ/distance, stale witnesses,
+  bookmark Go during a modal curve move, one undo action and frozen report export.
+  Existing axis/restore/gizmo/snap and prior workspace workflows also pass.
+- Five complete desktop gesture profiles cover normal/snapped input, Activity open/closed
+  and cancellation. Repeated recording/document replacement pass. Perfetto imported
+  31,822 slices and ten memory tracks without importer errors.
+- Six serial counterbalanced none/dormant/record trials: idle mean frame intervals
+  16.48–16.95 ms; recording 18.36–19.10 ms on the cube/body fixture. These do not certify
+  full-body performance or zero dormant overhead.
+- Final relocated executable passed every portable check with minimal PATH, including
+  headless/desktop profiles, project round-trip and image reports. Packaged ruler image
+  visually verified: 1.41421356 m diagonal displayed as 1414.214 mm.
+- Ownership/coupling reviewed separately from tests; see development_status.md.
 
-First development gate found one 16-line acceptance function and an overly broad
-owner-overlap test assertion (the process registry can include other sessions' meshes).
-Both were corrected; focused tests pass. Re-run the gate and final GUI, then build and
-check relocated 0.1.8 packaging, source archive and normal main integration. Full task
-completion and portable qualification remain pending at this checkpoint.
+A visual check caught inverted ruler display-unit conversion in the first packaged
+candidate, despite correct stored coordinates. That candidate was replaced after the
+m/cm/mm GUI regression and repeated gesture checks passed. The benchmark wait was also
+corrected to use a real Qt loop: repeated QTest waits had starved Python export; production
+export did not need a change.
 
-Final source gate now passes (540 tests and all native/numerical/style checks). Actual
-inspection, view-gesture and prior workflow GUI checks pass; ruler category picks are
-checked after the frame boundary publishes visibility. Updated PNGs were inspected.
-Next build from the clean source checkpoint, run the extended relocated portable gate,
-record package evidence, create the source archive and merge/push main normally.
+Qualified executable: dist/0.1.8/AnthroForge.dist/AnthroForge.exe
+Build source: d005bda595c57c745c87738879b9b238308227fb (clean tracked source).
+Executable SHA-256: abe23810632bbe72b3381b46f992489bfc5f638d59756d24533a0d1cdad5ad28.
+Later changes are validation tests and release documentation only.
+Companion source: dist/AnthroForge-0.1.8-source.zip.
+Local evidence: build/inspection-018, especially portable-final and profiles.
+Source/continuity records are committed and pushed; binaries/captures remain local.
+The unrelated root __init__.py is preserved.
 
-First portable candidate passed its API/packaging gate, but actual PNG inspection caught
-inverted display-unit conversion in the ruler (a 1 m edge labelled 0.001 mm). Stored API
-values were correct. Fixed all new ruler readouts and the overlay through the existing
-metres-per-display-unit contract; shared length formatting prevents label/overlay drift.
-The GUI now asserts XYZ/distance in m/cm/mm and uses the actual bookmark Go button
-during a modal curve move. Two repeated GUI passes and focused tests passed; the new
-exported PNG correctly shows 502.857 mm for the pixel-picked ~0.503 m span. Rebuild the
-portable candidate from this fix and repeat relocation qualification before release.
-
-References: Qt 6.12 View3D/pickResult and Perfetto counter tracks documentation were
-researched before implementation. Qt bounding-box picks do not replace our native
-displayed-geometry picking; trace counters are suitable for byte snapshots.
+References: official Qt 6.12 View3D/pickResult and Perfetto counter-track documentation
+were researched before implementation. Native displayed-geometry picking remains authoritative.

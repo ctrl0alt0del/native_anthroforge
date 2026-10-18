@@ -15,6 +15,7 @@ def construction(executable, cwd, invoke):
     objects = verify_objects(state)
     image = next(o["state"] for o in objects if o["kind"] == "reference_image")
     embedded_image(executable, cwd, invoke, image)
+    jpeg_image(executable, cwd, invoke, image)
     arguments = ("--project", "construction.anthroforge", "--smoke-test", "--screenshot")
     smoke = invoke(executable, cwd, *arguments, str(cwd / "construction-ui.png"))
     assert json.loads(smoke)["desktop_smoke"]
@@ -71,3 +72,20 @@ def verify_image_pixels(cwd):
 
 def request(operation, **arguments):
     return dict(operation=operation, arguments=arguments)
+
+
+def jpeg_image(executable, cwd, invoke, image):
+    source = cwd / "oriented.jpeg"
+    value = Image.new("RGB", (80, 40), "#4488aa")
+    exif = Image.Exif()
+    exif[274] = 6
+    value.save(source, exif=exif)
+    commands = [request("image.replace", target=image["id"], path=str(source)), request("wait")]
+    commands.append(request("image.inspect", target=image["id"]))
+    (cwd / "jpeg.json").write_text(json.dumps(commands))
+    output = invoke(
+        executable, cwd, "--cli", "run", "jpeg.json", "--project", "construction.anthroforge"
+    )
+    records = [json.loads(line) for line in output.splitlines() if line.startswith("{")]
+    assert all(record["ok"] for record in records), records
+    assert records[-1]["result"]["dimensions"] == [2, 4]

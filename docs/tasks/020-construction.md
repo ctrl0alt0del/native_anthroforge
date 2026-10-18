@@ -906,3 +906,18 @@ atomic upstream fitting retains its documented before/after cancellation boundar
 authored identity traversal is still Python orchestration; measured costs do not establish a
 current blocker or justify an unmeasured replacement. This is direct review, not an independent
 agent review. Version metadata is advanced only for final candidate packaging; not yet released.
+
+### Portable candidate progress
+
+Candidate compiled source is ac19e77, version 0.2.0. The native versioned rebuild and
+3 CTests pass. The Python wheel/sdist build and wheel resource check pass. Windows standalone
+compilation is running (`build/package-020.log`); executable qualification is still pending.
+Portable checks now include both a 64-tile embedded PNG and JPEG EXIF orientation. The JPEG
+development transport check confirms rotated dimensions and preserved physical width.
+Active documentation links resolve; remaining old schema-2 architecture text is corrected.
+
+A bounded branch experiment used 4,096 samples on each main source and 254 branch roots.
+Three runs with a timer requesting cancellation after 5 ms returned in 9.0–14.9 ms; one
+observed cancellation and two completed before it was observed. Timer scheduling and
+concurrent compilation prevent a precise cancellation-latency claim. The result supports
+safe bounded completion for this fixture, not a universal responsiveness guarantee.

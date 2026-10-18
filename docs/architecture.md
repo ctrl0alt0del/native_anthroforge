@@ -196,13 +196,14 @@ Named workspaces preserve camera, orthographic mode, hidden/unpickable sets, mem
 independent overlays. Outside entities remain transparent/read-only while their dependencies
 remain present. These presentation changes do not create anatomical undo steps.
 
-Project schema 2 uses ZIP64 containers with JSON metadata and canonical NPY arrays
+Project schema 3 uses ZIP64 containers with JSON metadata and canonical NPY arrays
 (allow_pickle=False). Saving writes a sibling temporary file, flushes it and atomically
 replaces the target. A cooperative file lock prevents two writable application sessions.
-Source and accepted meshes are embedded, with canonical triangulation retained through
-deformation and reload. Native handles never serialize. Schema-1 meshes migrate to
-imported definitions and accepted results; old applications reject schema 2. Loaded SCP attachments receive the addon's
-equivalent startup synchronization; unrelated future solvers are not launched.
+Source/accepted geometry, paths, attachment fields and deduplicated image bytes are embedded.
+Canonical triangulation survives deformation and reload. Native handles never serialize.
+Unsupported older schemas are rejected clearly. The 0.1.x schema-1 migration belongs to
+that historical release, not the current loader. Loaded SCP attachments receive equivalent
+startup synchronization; unrelated solvers are not launched and paths do not blanket-reroute.
 
 ## Measurement and extension
 
@@ -345,7 +346,7 @@ Activity-specific timing instrumentation.
 lookups and a shared `Structure` containing validated authored identities, hierarchy order,
 depths, forward/reverse dependency edges and blocked outputs. Value edits reuse structure;
 reference, membership or attachment-policy changes revalidate it completely. Revision-only
-replacement reuses the entire index. Indexes are runtime data, excluded from schema 2.
+replacement reuses the entire index. Indexes are runtime data, excluded from project files.
 
 The application `ChangeJournal` retains 64 compact field-change descriptions, without
 owning old documents. Desktop consumers have independent cursors; a missed interval or

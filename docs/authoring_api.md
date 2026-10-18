@@ -176,8 +176,8 @@ Use `wait` to finish queued checks and repairs, then query again. A check can fi
 successfully while reporting a defect. Failed checks retain earlier evidence with
 `freshness=stale`; an empty filtered page is not a clean certificate. Dismissals and
 check records are session state and reset on opening a document or navigating history.
-Built-in providers are evaluation.v1, dependencies.v1 and the direct lifecycle
-producer tasks.v1. Only asynchronous detectors can be cancelled. Registration ports
+Built-in providers are evaluation.v1, dependencies.v1, fiber_collisions.v1 and the direct
+lifecycle producer tasks.v1. Only asynchronous detectors can be cancelled. Registration ports
 for Python integrations are `session.issues.listening.register(Provider(...))`,
 `session.issues.reporting.report(Issue(...))`, and `session.issues.resolution.register(Solver(...))`.
 

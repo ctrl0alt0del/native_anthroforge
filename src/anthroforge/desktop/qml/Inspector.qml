@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
-ScrollView {
+UiScrollView {
     id: inspector
     property var selected: workspace.selectedData
     readonly property var attachment: selected.attachment || {}
@@ -11,7 +11,7 @@ ScrollView {
     readonly property bool dialogVisible: colorDialog.visible
     signal pickAnchor(string mode)
     signal deleteRequested(string entity)
-    clip: true; contentWidth: availableWidth; rightPadding: effectiveScrollBarWidth
+    clip: true; contentWidth: availableWidth
     function setAttachment(key, value) {
         const options = {entity:selected.id};
         options[key] = value;

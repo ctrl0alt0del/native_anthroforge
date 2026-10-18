@@ -5,7 +5,8 @@ from pathlib import Path
 
 import inspection_acceptance as inspection
 import issues_acceptance as issues
-from PySide6.QtCore import QMetaObject, QPointF, Qt
+from activity_acceptance import wait_for
+from PySide6.QtCore import QMetaObject, QObject, QPointF, Qt
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from shiboken6 import delete
@@ -58,7 +59,7 @@ def menu_hover(window, title):
 def combo_containment(window):
     click(window, "manageWorkspace")
     combo = click(window, "displayUnits")
-    popup = combo.property("popup")
+    popup = combo.findChild(QObject, "comboPopup")
     view = popup.property("contentItem")
     rows = [r for r in descendants(view) if "ItemDelegate" in r.metaObject().className()]
     assert rows and all(r.width() <= view.width() for r in rows)
@@ -87,15 +88,25 @@ def disclosure_checks(controller, window):
 
 def issue_details(controller, window):
     controller.replaceDocument("")
+    wait_for(controller, lambda: not controller.session.waiting_save)
     issues.create_cycle(controller)
     click(window, "issuesToggle")
     issues.select_first(controller, window)
     evidence = find(window, "issueEvidence")
     assert not evidence.isVisible()
     capture(window, "issues-compact")
-    click(window, "Technical evidenceToggle")
+    reveal_evidence(window)
     assert evidence.isVisible() and evidence.property("text")
     capture(window, "issues-evidence")
+
+
+def reveal_evidence(window):
+    panel = find(window, "issueDetails")
+    toggle = find(window, "Details & evidenceToggle")
+    position = toggle.mapToItem(panel, QPointF(0, 0)).y()
+    panel.property("contentItem").setProperty("contentY", max(0, position - 20))
+    QTest.qWait(80)
+    click(window, "Details & evidenceToggle")
 
 
 def exercise(controller, window):

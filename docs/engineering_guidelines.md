@@ -99,6 +99,13 @@ composition point over automatic discovery unless discovery is itself required.
 
 ## 6. Preserve AnthroForge's runtime boundaries
 
+Desktop presentation uses the shared `Ui*` controls and `Theme` metrics. Keep primary
+actions and concise state visible; put optional explanations in help and technical
+evidence in explicit disclosures. Preserve actionable failures and access to complete
+details. Check hover/focus contrast, scrolling and narrow layouts with actual QML;
+inspect captures as well as assertions. Background-only requests prohibit visible
+test windows and desktop input; off-screen checks must state their rendering limits.
+
 The UI and headless adapters invoke the same document operations. Authored anatomy,
 accepted calculation results, provisional previews and per-view presentation have
 distinct ownership. Workers receive owned inputs rather than live UI objects.

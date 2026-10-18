@@ -10,7 +10,7 @@ ColumnLayout {
     GridLayout {
         columns: panel.width < 660 ? 3 : 5
         Layout.fillWidth: true
-        UiField { id: search; objectName: "issueSearch"; Layout.fillWidth: true; Layout.columnSpan: panel.width < 660 ? 2 : 1; placeholderText: "Filter issues by object, code or text…"; onTextChanged: panel.filterRows() }
+        UiField { id: search; objectName: "issueSearch"; Layout.fillWidth: true; Layout.columnSpan: panel.width < 660 ? 2 : 1; placeholderText: "Search issues…"; onTextChanged: panel.filterRows() }
         UiCombo { id: severity; objectName: "issueSeverity"; implicitWidth: 125; model: ["All severities","Errors","Warnings","Information"]; onActivated: panel.filterRows() }
         UiCheck { id: dismissed; objectName: "issueShowDismissed"; text: "Dismissed"; onClicked: panel.filterRows() }
         UiButton { objectName: "issueRecheckAll"; text: "Recheck"; hint: "Run available checks without changing geometry"; onClicked: panel.service.run("issues.recheck",{}) }

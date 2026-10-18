@@ -3,6 +3,7 @@ import QtQuick.Controls
 
 CheckBox {
     id: control
+    implicitWidth: text ? contentItem.implicitWidth : indicator.width
     implicitHeight: Theme.controlHeight; padding: 0
     spacing: 8
     font.pixelSize: 12

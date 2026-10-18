@@ -12,8 +12,8 @@ UiDialog {
         if(checked) values.push(key);
         const args={}; args[field]=values; workspace.run("workspace.update",args);
     }
-    ScrollView {
-        id: scroll; anchors.fill: parent; clip: true; contentWidth: availableWidth; rightPadding: effectiveScrollBarWidth
+    UiScrollView {
+        id: scroll; anchors.fill: parent; clip: true; contentWidth: availableWidth
         ColumnLayout {
             width: scroll.availableWidth; spacing: Theme.inset
             RowLayout {

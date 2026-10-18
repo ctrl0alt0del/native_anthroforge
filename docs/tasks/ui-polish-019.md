@@ -14,8 +14,12 @@ run the development gate and relevant GUI regressions before integration.
 - Branch: `codex/ui-polish-019`; integration: `main`.
 - Starting revision: `ca4e4e24ec9344f44fa9abe2d2dd53acc6f5beb1`.
 - Preserve unrelated untracked root `__init__.py`.
-- Status: shared styles and progressive details implemented. Source UI and ruler/camera
-  acceptance pass with no QML warnings. Full visual matrix, regression gate and packaging pending.
+- Status: implementation complete; 541-test development gate passed. Off-screen Qt
+  UI polish, ruler/camera, workflow, Issues, Activity and view/gesture acceptance passed.
+  Packaging and final qualification pending.
+- User is playing a game: no visible windows, desktop screenshots or mouse/keyboard
+  automation. Our launched 0.1.8 window is closed. Continue only background checks.
+  Off-screen Qt needs QT_QPA_FONTDIR=C:/Windows/Fonts for meaningful text/layout.
 
 ## Findings and ownership
 
@@ -30,8 +34,9 @@ run the development gate and relevant GUI regressions before integration.
 
 ## Next
 
-Run tools/ui_polish_acceptance.py and inspect captures, finish regression/gate, then
-package and deliver 0.1.9. Existing UI test had a stale key 7 expectation (current key 3);
+Package from a clean checkpoint and run tools/check_portable.py with --offscreen.
+Inspect saved images without interacting with the desktop. Preserve the native-window
+validation distinction in the final report. Existing UI test had a stale key 7 expectation (current key 3);
 ruler test now waits for displayed picking revisions instead of assuming a 50ms frame.
 
 ## References

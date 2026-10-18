@@ -30,6 +30,7 @@ ComboBox {
         background: Rectangle { radius: Theme.radius; color: parent.highlighted || parent.hovered ? Theme.hover : Theme.panel }
     }
     popup: Popup {
+        objectName: "comboPopup"
         y: control.height + 3; width: control.width
         implicitHeight: Math.min(contentItem.implicitHeight + 8, 330); padding: 4
         background: Rectangle { color: Theme.panel; border.color: Theme.border; radius: 4 }

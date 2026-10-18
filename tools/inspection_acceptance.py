@@ -90,9 +90,14 @@ def display_units(controller, window):
         expected = f"{row['distance'] * scale:.3f} {unit}"
         assert expected in find(window, "measurementDistance").property("text")
         xyz = ", ".join(f"{value * scale:.3f}" for value in row["start"]["position"])
-        assert xyz in find(window, "measurementCoordinates").property("text")
+        verify_coordinates(window, xyz)
     controller.run("workspace.update", dict(display_units="mm"))
     QTest.qWait(70)
+
+
+def verify_coordinates(window, expected):
+    label = find(window, "measurementCoordinates")
+    assert label.isVisible() and expected in label.property("text")
 
 
 def export(controller, entity):

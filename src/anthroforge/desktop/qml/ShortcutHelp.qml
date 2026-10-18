@@ -9,9 +9,9 @@ UiDialog {
     title: "Navigation & shortcuts"; modal: true
     width: 580; height: Math.min(660, parent.height-40)
     standardButtons: Dialog.Close
-    ScrollView {
+    UiScrollView {
         id: scroll
-        anchors.fill: parent; clip: true; contentWidth: availableWidth; rightPadding: effectiveScrollBarWidth
+        anchors.fill: parent; clip: true; contentWidth: availableWidth
         ColumnLayout {
             width: scroll.availableWidth; spacing: Theme.inset
             Repeater {

@@ -27,6 +27,18 @@ static void validate_grid(const int* n) {
     if(!n||n[0]<1||n[1]<1||n[2]<1||n[0]>64||n[1]>64||n[2]>64||n[0]*n[1]*n[2]>32000)
         throw std::runtime_error("Invalid lattice resolution.");
 }
+static int grid_edges(const double* points,int index,const int* n,const M4& matrix,double* output) {
+    const int strides[3]={1,n[0],n[0]*n[1]}; int written=0;
+    for(int axis=0;axis<3;++axis) {
+        const int stride=strides[axis];
+        if(index/stride%n[axis]+1>=n[axis]) continue;
+        Eigen::Map<V3> a(output+3*written),b(output+3*(written+1));
+        a=point(matrix,V3(points+3*index));
+        b=point(matrix,V3(points+3*(index+stride)));
+        written+=2;
+    }
+    return written;
+}
 struct LatticeQuery { std::array<Weights,3> weights; std::array<int,3> base; };
 static LatticeQuery lattice_query(const V3& point,const int* n,const int* interpolation) {
     LatticeQuery query;
@@ -110,4 +122,14 @@ int af_lattice_outside(double* cage,const int* n) {
         }
         return 0;
     } catch(const std::exception& e) { af::set_error(e.what()); return 1; }
+}
+int af_lattice_lines(const double* points,int count,const int* n,const double* matrix,double* output) {
+    try {
+        af::validate_grid(n);
+        if(count!=n[0]*n[1]*n[2]||!points||!matrix||!output)
+            throw std::runtime_error("Lattice display points must match resolution.");
+        const af::M4 frame=Eigen::Map<const af::M4>(matrix); int written=0;
+        for(int i=0;i<count;++i) written+=af::grid_edges(points,i,n,frame,output+3*written);
+        return written;
+    } catch(const std::exception& e) { af::set_error(e.what()); return -1; }
 }

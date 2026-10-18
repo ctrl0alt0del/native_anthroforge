@@ -205,18 +205,31 @@ def drag_control(editor, delta):
     editor.controller.run("control.transform", dict(control=control.id, values=values))
 
 
-def local_position(editor, reference, world):
+def point_target(reference):
     stage = "LATTICE" if reference["part"] == "lattice" else "CURVE"
-    target = Target(reference["owner"], stage, reference.get("curve", ""))
-    frame = deformer_operations.frame(editor.controller.session, target)
-    inverse = construction.matrix(editor.controller.session.engine, frame, IDENTITY, relative=True)
-    return components.transformed(editor.controller.session.engine, [world], inverse)[0].tolist()
+    return Target(reference["owner"], stage, reference.get("curve", ""))
+
+
+def local_positions(editor, points):
+    session, groups = editor.controller.session, {}
+    if len(points) != len(editor.drag_rows):
+        raise ValueError("Transform points must match the selected components.")
+    for index, (reference, _, _) in enumerate(editor.drag_rows):
+        groups.setdefault(point_target(reference), []).append(index)
+    result = [None] * len(points)
+    for target, indices in groups.items():
+        frame = deformer_operations.frame(session, target)
+        inverse = construction.matrix(session.engine, frame, IDENTITY, relative=True)
+        local = components.transformed(session.engine, [points[i] for i in indices], inverse)
+        for index, value in zip(indices, local.tolist(), strict=True):
+            result[index] = value
+    return result
 
 
 def apply_points(editor, points):
     session, grouped = editor.controller.session, {}
-    for (reference, _, _), world in zip(editor.drag_rows, points, strict=True):
-        value = local_position(editor, reference, world)
+    local = local_positions(editor, points)
+    for (reference, _, _), value in zip(editor.drag_rows, local, strict=True):
         if reference["part"] == "lattice":
             update_lattice_point(session, reference, value)
         else:

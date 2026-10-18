@@ -504,3 +504,25 @@ three native contracts pass. Changed-native style passes. Full-QML offscreen acc
 invokes actual Bind/Remove actions plus fiber creation and gesture undo. This is not
 interactive visual acceptance. Copy-resource remapping, full interior-binding conversion,
 junctions, surfaces, wider parity/performance evidence and release qualification remain.
+
+## Copy and conversion completion
+
+Independent construction copies now remap accepted path metadata, dense attachment target
+identities, routing obstacles and pending edit baselines through one resource-copy context.
+Immutable native allocations remain shared safely. Manual consumers retain their accepted
+path immediately instead of losing geometry while their independent copy is pending.
+Tests duplicate an anatomical subtree, move an original support without moving the copy,
+and save/reopen a pending copy after authored-point removal before evaluating it.
+
+Sampled engine conversion now preserves interior anatomical binding identities and exact
+positions. Native resampling allocates the requested count between required anchors,
+including closed wrapping; too-small budgets fail explicitly. This reuses the production
+routing edge allocation and existing path interpolation. Open/closed conversion tests retain
+bindings, undo and subsequent parent motion. The actual QML Preview/Accept actions also pass
+offscreen with an interior binding. No interactive geometry acceptance is claimed.
+
+22 focused conversion/copy/routing/architecture checks pass, plus the earlier 38 shared-curve
+checks. Native build, three contracts, changed-native style, configured mypy and offscreen
+fiber-editor acceptance pass. Ruff import cleanup is applied. Full development gate follows
+this checkpoint. Junctions, generic surfaces, control-attachment retirement, broader geometry
+and performance qualification and complete release delivery remain. Version stays 0.1.9.

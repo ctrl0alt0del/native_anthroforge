@@ -65,14 +65,14 @@ static CurveSample interpolate(const CurveSample& a,const CurveSample& b,double 
     return {(1-t)*a.position+t*b.position,tangent.normalized(),V3::Zero(),
             (1-t)*a.radius+t*b.radius,(1-t)*a.tilt+t*b.tilt};
 }
-static std::vector<double> curve_lengths(const Samples& samples) {
+std::vector<double> curve_lengths(const Samples& samples) {
     std::vector<double> lengths{0};
     for(size_t i=1;i<samples.size();++i)
         lengths.push_back(lengths.back()+(samples[i].position-samples[i-1].position).norm());
     if(lengths.back()<1e-12) throw std::runtime_error("Curve has zero length.");
     return lengths;
 }
-static CurveSample at_distance(const Samples& samples,const std::vector<double>& lengths,double distance) {
+CurveSample at_distance(const Samples& samples,const std::vector<double>& lengths,double distance) {
     auto found=std::lower_bound(lengths.begin()+1,lengths.end(),distance);
     const size_t index=std::min(size_t(found-lengths.begin()),lengths.size()-1);
     const double span=lengths[index]-lengths[index-1];
@@ -108,7 +108,7 @@ static void frames(Samples& samples) {
         previous=sample.tangent;
     }
 }
-static void write_samples(const Samples& samples,double* output) {
+void write_samples(const Samples& samples,double* output) {
     for(size_t i=0;i<samples.size();++i) {
         const auto& p=samples[i]; double* o=output+i*11;
         for(int a=0;a<3;++a) { o[a]=p.position[a]; o[a+3]=p.tangent[a]; o[a+6]=p.normal[a]; }

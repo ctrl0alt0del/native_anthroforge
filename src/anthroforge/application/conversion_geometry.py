@@ -6,7 +6,6 @@ from dataclasses import dataclass, replace
 from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.core.curve_conversion import ConversionSpec
 from anthroforge.core.curve_engines import RoutingSettings
-from anthroforge.core.entities import IDENTITY
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.results import EvaluationResult
 from anthroforge.native import paths
@@ -47,14 +46,25 @@ def authored_points(source: Curve, spec: ConversionSpec) -> tuple[CurvePoint, ..
 def sampled_points(value: ConversionInput, cancel: int) -> tuple[CurvePoint, ...]:
     if value.asset is None:
         raise ValueError("Conversion needs an accepted path; evaluate the curve first.")
-    source, count = value.source, value.spec.samples
-    if isinstance(source, Fiber) and any(
-        b.point not in endpoint_ids(source) for b in source.bindings
-    ):
-        raise ValueError("Use authored conversion to retain interior anatomical bindings.")
-    rows = paths.sample(value.asset.path, count, 0, 1, IDENTITY, cancel=cancel)
+    retained = retained_points(value)
+    rows, indices = paths.sample_anchored(
+        value.asset.path, value.spec.samples, [i for i, _ in retained], cancel
+    )
     points = tuple(sample_point(row) for row in rows)
-    return preserve_endpoints(source, points)
+    identities = {int(index): key for index, (_, key) in zip(indices, retained, strict=True)}
+    return tuple(replace(p, id=identities.get(i, p.id)) for i, p in enumerate(points))
+
+
+def retained_points(value: ConversionInput) -> tuple[tuple[int, str], ...]:
+    assert value.asset is not None
+    source = value.source
+    keys = endpoint_ids(source)
+    if isinstance(source, Fiber):
+        keys |= {b.point for b in source.bindings}
+    accepted = value.asset.authored.points
+    if keys - {p.id for p in accepted}:
+        raise ValueError("Evaluate pending structural point changes before sampled conversion.")
+    return tuple((i, p.id) for i, p in enumerate(accepted) if p.id in keys)
 
 
 def endpoint_ids(source: Curve) -> set[str]:
@@ -70,10 +80,3 @@ def sample_point(row: Sequence[float]) -> CurvePoint:
         radius=values[9],
         tilt=values[10],
     )
-
-
-def preserve_endpoints(source: Curve, points: tuple[CurvePoint, ...]) -> tuple[CurvePoint, ...]:
-    points = (replace(points[0], id=source.points[0].id), *points[1:])
-    if not source.closed:
-        points = (*points[:-1], replace(points[-1], id=source.points[-1].id))
-    return points

@@ -58,6 +58,7 @@ def run():
         create(controller, engine)
         editing(controller)
         bindings(controller, engine)
+        conversion(controller, engine)
         assert not warnings, warnings
         print("Offscreen desktop fiber creation, binding edits, gestures and staged path passed.")
     finally:
@@ -132,6 +133,19 @@ def click_binding(controller, engine, name):
         button, "clicked", Qt.DirectConnection
     )
     settle(controller)
+
+
+def conversion(controller, engine):
+    from ui_acceptance import find
+
+    click_binding(controller, engine, "setFiberBinding")
+    find(engine.rootObjects()[0], "conversionEngine").setProperty("currentIndex", 1)
+    click_binding(controller, engine, "previewCurveConversion")
+    assert controller.session.conversion.state == "ready", controller.session.conversion.error
+    click_binding(controller, engine, "acceptCurveConversion")
+    item = controller.session.document.object(controller.selection)
+    assert item.engine == "POLYLINE" and len(item.bindings) == 3
+    assert item.result.status == "ready", item.result.error
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ ColumnLayout {
     UiButton { id: expand; text: "Change path engine"; checkable: true; Layout.fillWidth: true }
     ColumnLayout {
         visible: expand.checked; Layout.fillWidth: true; spacing: Theme.gap
-        UiCombo { id: engine; model: ["BEZIER","POLYLINE","ROUTED"]; Layout.fillWidth: true }
+        UiCombo { id: engine; objectName: "conversionEngine"; model: ["BEZIER","POLYLINE","ROUTED"]; Layout.fillWidth: true }
         UiCombo { id: sampling; visible: !panel.routed; model: ["Sample accepted shape","Keep authored points"]; Layout.fillWidth: true }
         NumericSetting { visible: !panel.routed && sampling.currentIndex===0; label: "Conversion points"; decimals: 0; value: panel.count; onEdited: value=>panel.count=Math.max(3,Math.min(4096,Math.round(value))) }
         Label { visible: panel.routed; text: "Choose structural routing points, including open endpoints."; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }

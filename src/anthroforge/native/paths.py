@@ -10,6 +10,8 @@ from anthroforge.core.construction import Curve
 from .construction import curve_records
 from .mesh import INT64, D, GeometryEngine, U, doubles, pointer
 
+INT = c.POINTER(c.c_int)
+
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_path_evaluate", [D, c.c_int, c.c_int, c.c_int, c.c_int, U], U)
@@ -21,6 +23,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_path_body", [U, c.c_int, c.c_int, D, U])
     engine.bind("af_path_chunk_count", [U])
     engine.bind("af_paths_pick", [c.c_int, c.POINTER(U), D, D, D, c.c_double, D])
+    engine.bind("af_path_sample_anchored", [U, INT, c.c_int, c.c_int, D, INT, U])
 
 
 class Path:
@@ -121,3 +124,17 @@ def body(path: Path, closed_start: int = 0, reverse: bool = False, cancel: int =
         )
     )
     return output
+
+
+def sample_anchored(path: Path, count: int, knots: Any, cancel: int = 0) -> tuple[Any, Any]:
+    anchors = np.ascontiguousarray(knots, dtype=np.int32)
+    if anchors.ndim != 1 or not 2 <= count <= 1000000:
+        raise ValueError("Invalid anchored path sampling request.")
+    output, indices = np.empty((count, 11)), np.empty(len(anchors), dtype=np.int32)
+    args = (path.handle, anchors.ctypes.data_as(INT), len(anchors), count)
+    path.engine.check(
+        path.engine.library.af_path_sample_anchored(
+            *args, pointer(output), indices.ctypes.data_as(INT), cancel
+        )
+    )
+    return output, indices

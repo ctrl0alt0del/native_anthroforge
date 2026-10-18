@@ -9,7 +9,8 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import EvaluationResult, ReadRevision
 
-from . import curve_copy, curve_sources
+from . import curve_sources
+from .curve_copy_resources import Copies
 from .membership import remap, remap_weights
 from .presentation import include_created
 
@@ -126,15 +127,16 @@ def duplicate(session: "Session", ids: set[str], parent: str) -> dict[str, str]:
     session.replace_document(
         entities=(*session.document.entities, *copies),
         controls=(*session.document.controls, *shared),
-        objects=(*session.document.objects, *copied_curves(session.document, mapping)),
+        objects=(*session.document.objects, *copied_curves(session, mapping)),
     )
     include_created(session, {c.id for c in shared})
     return {key: mapping[key] for key in ids}
 
 
-def copied_curves(document: Document, mapping: dict[str, str]) -> tuple[Curve, ...]:
+def copied_curves(session: "Session", mapping: dict[str, str]) -> tuple[Curve, ...]:
+    copies = Copies(session.resources, mapping)
     return tuple(
-        curve_copy.clone(item, mapping)
-        for item in document.objects
+        copies.record(item)
+        for item in session.document.objects
         if isinstance(item, Curve) and item.id in mapping
     )

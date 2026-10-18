@@ -16,6 +16,9 @@ AF_API int af_path_info(uint64_t handle, int64_t* counts, double* bounds);
 AF_API const double* af_path_buffer(uint64_t handle, int kind);
 AF_API int af_path_sample(uint64_t handle, int count, double start, double span,
     const double* matrix, int reverse, double* output, uint64_t cancel);
+/* Resample between required authored knots; output indices preserve their identities. */
+AF_API int af_path_sample_anchored(uint64_t handle,const int* knots,int anchors,int count,
+    double* output,int* indices,uint64_t cancel);
 AF_API int af_path_body(uint64_t handle, int reverse, int closed_start,
     double* output, uint64_t cancel);
 AF_API int af_path_memory_snapshot(uint64_t* rows, int capacity, uint64_t* total);

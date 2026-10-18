@@ -13,6 +13,10 @@ std::shared_ptr<Mesh> make_mesh(const Points& points,const Faces& faces,uint64_t
 std::shared_ptr<Mesh> deform_mesh(const Mesh& source,const Vertices& vertices,uint64_t cancel,bool complete=true);
 Faces mesh_faces(const Mesh& source);
 Samples read_samples(const double* values,int count);
+void write_samples(const Samples& samples,double* output);
+std::vector<double> curve_lengths(const Samples& samples);
+CurveSample at_distance(const Samples& samples,const std::vector<double>& lengths,double distance);
+std::vector<int> allocate_edges(const std::vector<double>& lengths,int edges);
 void rebuild_mesh(Mesh& mesh,uint64_t cancel);
 void curve_frames(Samples& samples,bool closed,uint64_t cancel,bool rebuild_tangents=true);
 }

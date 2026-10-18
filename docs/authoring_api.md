@@ -319,6 +319,8 @@ an alias for its typed setting. Curve/Fiber consumers still share the same path 
   starts a read-only coordinator job. EVALUATED resamples the accepted path into editable
   vector-handle points; AUTHORED retains authored points. Routing requires AUTHORED plus an
   explicit point-ID selection including open endpoints and all anatomical bindings.
+  Sampled conversion retains bound point identities and positions, allocating its exact
+  point budget between required anchors in native work. Insufficient budgets fail explicitly.
 - `curve.conversion.status()` returns the token, job, state and candidate point count/settings.
 - `curve.conversion.accept(token)` validates the captured read set and shared topology locks,
   then commits one undoable edit. It preserves metadata edited after preview and retains
@@ -358,6 +360,8 @@ endpoint to transfer its parent choice to the new endpoint; opening a closed fib
 choosing both endpoint bindings first. Pending capture requests survive Manual-mode saving.
 Parent movement resolves its retained binding without choosing a new
 parent. Entering edit mode is a read-only query. Routed fibers edit authored constraints,
-then resolve their connecting path through the solver. Binding addition/removal, full conversion
-coverage and release qualification are still under implementation; these
+then resolve their connecting path through the solver. Independent copies remap attachment
+resource owners, routing obstacles and pending edit baselines together. Shared immutable
+geometry buffers remain retained by their resource owners. Broader anatomical parity and
+release qualification remain in progress; these
 commands do not certify the complete 0.2.0 workflow.

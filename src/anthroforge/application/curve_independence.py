@@ -7,6 +7,7 @@ from anthroforge.core.construction import Curve, Primitive
 from anthroforge.core.entities import SCP
 
 from . import construction_copy, construction_tasks, curve_copy, curve_sources
+from .curve_copy_resources import Copies
 
 if TYPE_CHECKING:
     from .session import Session
@@ -20,7 +21,7 @@ def make_independent(session: "Session", entity: str, curve: str) -> str:
         raise ValueError("Primitive does not reference this curve.")
     source = curve_sources.source(session.document, curve)
     identities = curve_copy.mapping(source)
-    copied = curve_copy.clone(source, identities)
+    copied = Copies(session.resources, identities).record(source)
     install(session, item, copied, identities)
     construction_tasks.edited(session, {entity})
     return copied.id

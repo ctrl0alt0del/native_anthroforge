@@ -30,6 +30,7 @@ def enqueue(session: Any, item: Surface, existing: bool, origin: int) -> str:
     path_tasks.require_inputs(session, inputs(session.document, item, existing))
     job = make_job(session, item, existing, origin)
     job.cancel = NativeCancellation(session.engine)
+    job.restart_on_input_change = True
     job.retry = partial(enqueue, session, item, existing, origin)
     job.observes = frozenset(inputs(session.document, item, existing))
     job.provides = frozenset((Port(item.id, "geometry"),))

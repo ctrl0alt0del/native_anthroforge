@@ -5,6 +5,8 @@
 - Starting revision: `b539697`
 - Status: in progress; not release-ready
 - Last updated: 2026-10-18, Europe/Bucharest
+- Recovery update: 2026-10-19. Earlier checkpoint sections below are historical;
+  the latest checkpoints supersede their incomplete-feature statements.
 - Active writer: local desktop implementation chat
 
 ## Outcome and acceptance
@@ -797,3 +799,19 @@ mypy (181 modules), Ruff and full-QML offscreen selection/frame/rename acceptanc
 The check describes accepted sampled centerlines, not continuous-curve or radius clearance.
 No interactive desktop input or visible windows were used. The full gate and broader
 anatomical routing/performance/resource/release qualification remain pending.
+
+### Async creation invalidation checkpoint
+
+A forced queued/running test reproduced silently lost surface/fiber creation when an input
+changed. Jobs now declare whether input invalidation requests restart. The coordinator
+retains the obsolete job until a safe terminal point, schedules its replacement before
+reporting completion, and captures current inputs at dispatch. Explicit cancel, undo,
+supersession and session close suppress restart; missing inputs report failure. This policy
+is enabled only for authored surface/fiber creation, not previews or ordinary result jobs.
+
+Fiber historical creation now shares accepted-result read validation with surface history.
+Earlier snapshots receive pending construction when captured inputs belong to a later pose;
+undo resolves their attachment field against the correct parent state. 19 focused creation,
+history, fiber and architecture tests, mypy (181 modules) and Ruff pass. New tests include
+queued/running input edits, cancel, undo/redo, deletion failure and historical pose validity.
+Full development gate and the release work above remain pending.

@@ -17,6 +17,7 @@ from anthroforge.native.mesh import NativeCancellation
 from . import attachment_assets, authored_jobs, curve_copy, curve_sources, dependencies
 from .construction_policy import revisions
 from .consumed_paths import accepted
+from .evaluation_results import matches
 from .path_assets import PathAsset
 
 if TYPE_CHECKING:
@@ -38,6 +39,7 @@ def inputs(document: Any, source: str) -> set[Port]:
 def enqueue(session: "Session", spec: "FiberCreation", origin: int) -> str:
     job = make_job(session, spec, origin)
     job.cancel = NativeCancellation(session.engine)
+    job.restart_on_input_change = True
     job.retry = partial(enqueue, session, spec, origin)
     job.observes = job.prerequisites = frozenset(inputs(session.document, spec.source))
     job.reads = frozenset(port.owner for port in job.observes)
@@ -142,6 +144,14 @@ def publish(session: "Session", spec: "FiberCreation", origin: int, payload: Any
     item = replace(
         item, result=EvaluationResult(key, 1, item.construction_revision, revisions(source, ports))
     )
-    authored_jobs.publish(session, origin, partial(authored_jobs.append_object, item=item))
+    authored_jobs.publish(session, origin, partial(merge, item=item))
     session.resources.paths[key] = path
     session.resources.attachments[spec.attachment_asset] = attachment
+
+
+def merge(document: Any, item: Fiber) -> Any:
+    if any(target not in document.index.entities for target in item.supports):
+        return document
+    if not matches(document, item.result):
+        item = replace(item, result=EvaluationResult(status="pending"))
+    return authored_jobs.append_object(document, item)

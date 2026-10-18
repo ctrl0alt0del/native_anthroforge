@@ -8,6 +8,13 @@ from anthroforge.core.results import EvaluationResult, Port
 from .construction_policy import revisions
 
 
+def matches(source: Document, result: EvaluationResult) -> bool:
+    ports = {Port(value.owner, value.output) for value in result.inputs}
+    return all(port.owner in source.registry.records for port in ports) and (
+        revisions(source, ports) == result.inputs
+    )
+
+
 def accepted_result(source: Document, item: Any, inputs: set[Port], key: str) -> EvaluationResult:
     pending = tuple(
         e.id

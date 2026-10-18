@@ -824,5 +824,215 @@
       },
       "losses": {}
     }
+  },
+  "qualification": {
+    "development_gate": {
+      "passed": true,
+      "tests": 487,
+      "log": "build/native-boundary-audit/gate.log"
+    },
+    "gui": {
+      "primitive": {
+        "primitive_acceptance": true,
+        "warnings": [],
+        "metrics": {
+          "tick": {
+            "count": 7,
+            "p95_ms": 0.037699996028095484,
+            "max_ms": 0.42860000394284725,
+            "mean_ms": 0.08662856998853385
+          },
+          "frame_interval": {
+            "count": 3,
+            "p95_ms": 34.077100004651584,
+            "max_ms": 34.96739999536658,
+            "mean_ms": 30.679566666852526
+          }
+        }
+      },
+      "primitive_interaction": {
+        "primitive_acceptance": true,
+        "warnings": [],
+        "metrics": {
+          "pointer_selection": true,
+          "topology_ui": true,
+          "imported_weights": true,
+          "body_base_hook": true
+        }
+      },
+      "curve_interaction": {
+        "repeated_insertion": true,
+        "surface_switching": true,
+        "modifier_release": true,
+        "one_drag_undo": true,
+        "focus_rules": true,
+        "rebound_modifier": true,
+        "both_projections": true,
+        "metrics": {
+          "scheduling": {
+            "count": 40,
+            "p95_ms": 0.10520000068936497,
+            "max_ms": 0.15039999561849982,
+            "mean_ms": 0.0484124995637103
+          },
+          "prepare": {
+            "count": 16,
+            "p95_ms": 0.12710000009974465,
+            "max_ms": 0.15390000044135377,
+            "mean_ms": 0.062474999140249565
+          },
+          "tick": {
+            "count": 256,
+            "p95_ms": 0.9682000018074177,
+            "max_ms": 2.8469000026234426,
+            "mean_ms": 0.1640210940365705
+          },
+          "frame_interval": {
+            "count": 188,
+            "p95_ms": 55.204099997354206,
+            "max_ms": 757.1663000053377,
+            "mean_ms": 32.42613031916528
+          },
+          "publication": {
+            "count": 16,
+            "p95_ms": 0.5257000011624768,
+            "max_ms": 1.577399998495821,
+            "mean_ms": 0.3002625003318826
+          },
+          "curve_projection": {
+            "count": 8,
+            "p95_ms": 0.08959999831859022,
+            "max_ms": 0.10789999942062423,
+            "mean_ms": 0.06993750048422953
+          },
+          "surface_snap": {
+            "count": 9,
+            "p95_ms": 0.06890000076964498,
+            "max_ms": 0.0866999980644323,
+            "mean_ms": 0.05772222195648485
+          },
+          "cancel_request": {
+            "count": 8,
+            "p95_ms": 0.016400001186411828,
+            "max_ms": 0.018200000340584666,
+            "mean_ms": 0.01311249980062712
+          },
+          "cancel_finish": {
+            "count": 8,
+            "p95_ms": 0.018100006855092943,
+            "max_ms": 0.02050000330200419,
+            "mean_ms": 0.014900001588102896
+          }
+        }
+      },
+      "view_gestures": {
+        "axis_views": true,
+        "modal_transforms": true,
+        "continuous_undo": true,
+        "surface_offset": true,
+        "metrics": {
+          "scheduling": {
+            "count": 69,
+            "p95_ms": 0.08630000229459256,
+            "max_ms": 0.12260000221431255,
+            "mean_ms": 0.04087681219865824
+          },
+          "prepare": {
+            "count": 31,
+            "p95_ms": 0.09390000195708126,
+            "max_ms": 0.12540000170702115,
+            "mean_ms": 0.04841612943921298
+          },
+          "tick": {
+            "count": 256,
+            "p95_ms": 0.8407999994233251,
+            "max_ms": 4.705400002421811,
+            "mean_ms": 0.16236523441648387
+          },
+          "frame_interval": {
+            "count": 256,
+            "p95_ms": 38.98230000049807,
+            "max_ms": 168.95439999643713,
+            "mean_ms": 25.159473046869607
+          },
+          "publication": {
+            "count": 28,
+            "p95_ms": 0.2876999933505431,
+            "max_ms": 1.4494999995804392,
+            "mean_ms": 0.2048071429661442
+          },
+          "cancel_request": {
+            "count": 13,
+            "p95_ms": 0.01290000363951549,
+            "max_ms": 0.0202999945031479,
+            "mean_ms": 0.008953846610473612
+          },
+          "cancel_finish": {
+            "count": 10,
+            "p95_ms": 17.210999998496845,
+            "max_ms": 19.13349999813363,
+            "mean_ms": 4.277660000661854
+          },
+          "surface_snap": {
+            "count": 11,
+            "p95_ms": 0.10149999434361234,
+            "max_ms": 0.11929999891435727,
+            "mean_ms": 0.06976363577202639
+          },
+          "picking": {
+            "count": 1,
+            "p95_ms": 0.0596999961999245,
+            "max_ms": 0.0596999961999245,
+            "mean_ms": 0.0596999961999245
+          }
+        }
+      }
+    },
+    "runtime_profiler_gestures": {
+      "passed": true,
+      "captures": 5,
+      "log": "build/native-boundary-audit/gui-profiler.log"
+    },
+    "portable": {
+      "passed": true,
+      "executable": "E:\\development\\anthroforge\\build\\native-boundary-audit\\portable relocation\\AnthroForge.dist\\AnthroForge.exe",
+      "environment": "minimal PATH",
+      "doctor": {
+        "application": "0.1.5",
+        "python": "3.12.12",
+        "platform": "Windows-11-10.0.26220-SP0",
+        "native": {
+          "available": true,
+          "abi": 1,
+          "path": "E:\\development\\anthroforge\\build\\native-boundary-audit\\portable relocation\\AnthroForge.dist\\anthroforge\\_runtime\\bin\\af_native.dll"
+        },
+        "packages": {
+          "PySide6": "6.12.0",
+          "numpy": "1.26.4",
+          "scipy": null,
+          "scikit-image": null,
+          "pyinstantmeshes": null,
+          "pytetwild": null
+        }
+      },
+      "checks": [
+        "import",
+        "attachments",
+        "primitives",
+        "deformers",
+        "deletion",
+        "curve subdivision",
+        "save",
+        "inspect",
+        "render",
+        "GUI",
+        "runtime profiling"
+      ]
+    },
+    "packaged_build": {
+      "revision": "42af2d9eb8abeb4beb7d94db58de767e818bc37d",
+      "tracked_changes": false,
+      "packaged": true
+    }
   }
 }

@@ -3,7 +3,7 @@
 - Task branch: `codex/native-boundary-audit`
 - Integration: `main`
 - Starting revision: `7c55151999d043269d09a417623e6ac73e92302c`
-- Status: implementation in progress
+- Status: implementation and qualification complete; ready for normal integration
 - Writer: desktop, direct work; 2026-10-18 Europe/Bucharest
 
 ## Outcome
@@ -40,7 +40,15 @@ The first gate caught a missing new adapter parameter annotation, now fixed. Exi
 QQmlPropertyMap constructor deprecation warnings remain isolated to that adapter.
 GUI primitive creation/editing, imported-vertex weights, base Hooks, insertion/snapping,
 selection, undo and camera gesture acceptance pass without QML warnings. Runtime
-profiler gesture qualification and portable packaging are still pending.
+profiler gesture qualification passes five captures, including recording boundaries
+during normal/Ctrl drags, cancellation, undo and Activity open/closed. Curve/handle
+colors and deformed cage/loft display were visually inspected.
+
+Portable packaging and relocation checks pass under a minimal PATH without developer
+Python/Qt settings: headless import, attachments, primitives/deformers, deletion,
+subdivision, save/reopen, rendering, GUI and runtime profiling. Executable:
+`dist/AnthroForge.dist/AnthroForge.exe`, version 0.1.5, packaged source
+`42af2d9eb8abeb4beb7d94db58de767e818bc37d`, tracked_changes=false.
 
 Serial ABBA, 25 unrecorded calls per case per leg, identical rounded output hashes:
 
@@ -92,10 +100,30 @@ Official references: [Qt C++ models](https://doc.qt.io/qt-6/qtquick-modelviewsda
 CDLL releases the GIL during native calls; Python preparation still has its own cost,
 and a synchronous native call still occupies the calling UI thread.
 
-## Acceptance and next actions
+## Verification and ownership review
 
-1. Run development gate, relevant GUI and packaged application checks.
-2. Record the audited boundary and measured limitations, then integrate and push.
+Commands: `tools/check.ps1`; `uv run --no-sync python tools/native_boundary_audit.py
+<output>` in serial baseline/candidate/candidate/baseline processes; GUI tools
+`primitive_acceptance.py` (ordinary and `--interaction`),
+`curve_interaction_acceptance.py`, `view_gesture_acceptance.py`,
+`profiler_acceptance.py`; `tools/package.ps1`; `tools/check_portable.py` against
+`build/native-boundary-audit/portable relocation/AnthroForge.dist/AnthroForge.exe`.
+
+Direct ownership review, separate from test results: one native influence owner serves
+Hook and Lattice; display/query preparation is Qt independent; Python adapters own
+buffer lifetime and record packing. Existing C ABI operations remain compatible.
+Geometry semantics are unchanged, including explicit-empty membership, invert without
+weights, cyclic curves, degenerate grid axes, negative/nonuniform transforms and safe
+cancellation. Grouping respects target identity and preserves input order; conversion
+finishes before document edits. No parallel scheduler, document representation or
+rendering framework was introduced. Remaining UI record costs are explicitly scoped
+above, not hidden behind the numerical-kernel results.
+
+## Integration
+
+Implementation and required checks are complete. Merge and push normally to main;
+Git ancestry identifies integration. Raw captures, source snapshot, logs and portable
+outputs are local/ignored; compact evidence and reproducible tooling are tracked.
 
 Preserve unrelated root `__init__.py`. Captures/builds stay in ignored
 `build/native-boundary-audit`; compact evidence will be committed. Prior optimization

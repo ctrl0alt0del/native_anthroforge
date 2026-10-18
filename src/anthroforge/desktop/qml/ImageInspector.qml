@@ -34,6 +34,7 @@ ColumnLayout {
         UiCombo { Layout.fillWidth: true; model: ["Both sides","Front side","Back side"]; currentIndex: Math.max(0,["BOTH","FRONT","BACK"].indexOf(panel.style.side)); onActivated: panel.appearance("side",["BOTH","FRONT","BACK"][currentIndex]) }
         UiCheck { text: "Orthographic views"; checked: panel.style.orthographic ?? true; onClicked: panel.appearance("orthographic",checked) }
         UiCheck { text: "Perspective views"; checked: panel.style.perspective ?? true; onClicked: panel.appearance("perspective",checked) }
+        UiCheck { objectName: "imageAxisVisibility"; text: "Only axis-aligned views"; checked: panel.style.only_axis_aligned ?? false; onClicked: panel.appearance("only_axis_aligned",checked) }
         UiCheck { text: "Pick in viewport"; checked: panel.style.pickable ?? true; onClicked: panel.appearance("pickable",checked) }
     }
     FileDialog { id: replaceFile; title: "Replace reference image"; nameFilters: ["Reference images (*.png *.jpg *.jpeg)"]; onAccepted: workspace.imageTools.importFile(selectedFile.toString(),true) }

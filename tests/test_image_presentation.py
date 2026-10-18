@@ -69,6 +69,30 @@ def test_native_image_pick_rejects_bad_inputs(session):
         images.pick(session.engine, [IDENTITY], [[1, 1]], [0], [0, 0, 0], [0, 0, 0])
 
 
+def test_native_axis_visibility_uses_blender_local_z_tolerance(session):
+    frames = [
+        session.engine.transform([0, 0, 0, angle, 0, 0, 2, 3, -4]) for angle in (0, 0.1, 0.2, 90)
+    ]
+    assert images.aligned(session.engine, frames, [0, 0, -2]).tolist() == [1, 1, 0, 0]
+    shear = list(IDENTITY)
+    shear[2] = 1
+    assert images.aligned(session.engine, [shear], [1, 0, 1]).tolist() == [1]
+    assert images.aligned(session.engine, [shear], [0, 0, 1]).tolist() == [0]
+    with pytest.raises(ValueError, match="view axis"):
+        images.aligned(session.engine, frames, [0, 0, 0])
+
+
+def test_axis_visibility_is_presentation_only_and_persists(session, tmp_path):
+    target = loaded(session, source(tmp_path))
+    original, cursor = session.document.object(target), session.history.cursor
+    session.command("image.presentation", target=target, only_axis_aligned=True)
+    assert session.document.object(target) == original and session.history.cursor == cursor
+    path = tmp_path / "aligned.anthroforge"
+    storage.atomic_save(path, session.document, session.resources)
+    restored, _ = storage.read_package(path, session.engine)
+    assert settings(restored.workspaces[0], target).only_axis_aligned
+
+
 def test_reflected_image_side_matches_transformed_winding(session):
     frame = session.engine.transform([0, 0, 0, 0, 0, 0, -1, 1, 1])
     front = images.pick(session.engine, [frame], [[2, 1]], [1], [0, 0, 3], [0, 0, -1])

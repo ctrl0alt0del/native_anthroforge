@@ -77,6 +77,7 @@ def orientation(renderer, image):
 def exercise(controller, renderer, app):
     renderer.root.setProperty("gridVisible", False)
     target = fixture(controller)
+    axis_visibility(controller, renderer, app, target)
     image = frames(controller, renderer, app)
     image.save(str(OUTPUT / "quadrants-view.png"))
     orientation(renderer, image)
@@ -94,6 +95,29 @@ def editing(controller, renderer, app, target):
     frames(controller, renderer, app)
     depth_occlusion(controller, renderer, app, target)
     replacement(controller, renderer, app, target)
+
+
+def axis_visibility(controller, renderer, app, target):
+    controller.run("image.presentation", dict(target=target, only_axis_aligned=True))
+    for depth in ("NORMAL", "FRONT", "BACK"):
+        controller.run("image.presentation", dict(target=target, depth=depth))
+        for orthographic in (True, False):
+            for angle, visible in ((-90, True), (-70, False)):
+                controller.cameraRequested.emit([0, 0, 0, angle, 0, 0, 3], orthographic)
+                image = frames(controller, renderer, app)
+                check_axis_view(controller, renderer, image, target, visible)
+    image.save(str(OUTPUT / "axis-hidden.png"))
+    controller.run(
+        "image.presentation", dict(target=target, only_axis_aligned=False, depth="NORMAL")
+    )
+    controller.cameraRequested.emit([0, 0, 0, -90, 0, 0, 3], True)
+
+
+def check_axis_view(controller, renderer, image, target, visible):
+    color = color_at(renderer, image, [-0.5, 0.3, 0])
+    assert (color[0] > 200 and color[1] < 30) == visible, (color, visible)
+    hit = controller.pick([-0.5, 0.3, 2], [0, 0, -1], 0, False, 0.02)
+    assert (hit.get("id") == target) == visible, (hit, visible)
 
 
 def calibration(controller, target):

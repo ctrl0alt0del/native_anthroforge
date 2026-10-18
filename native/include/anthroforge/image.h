@@ -15,6 +15,8 @@ AF_API int af_image_calibration(const double* frame, const double* dimensions,
 /* Batch plane hits: index, distance, u, v, world xyz, front. UV origin is top left. */
 AF_API int af_images_pick(const double* frames, const double* sizes, const int* sides, int count,
     const double* origin, const double* direction, double* hits);
+/* Blender 5.0.1 local-Z/view-axis alignment policy; one visibility value per frame. */
+AF_API int af_images_axis_aligned(const double* frames, int count, const double* view_axis, int* visible);
 /* Six local rectangle vertices (xyz, normal, uv) for one prepared image tile. */
 AF_API int af_image_vertices(uint64_t handle, int tile, double width, double height, float* output);
 #ifdef __cplusplus

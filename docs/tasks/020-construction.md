@@ -921,3 +921,20 @@ Three runs with a timer requesting cancellation after 5 ms returned in 9.0–14.
 observed cancellation and two completed before it was observed. Timer scheduling and
 concurrent compilation prevent a precise cancellation-latency claim. The result supports
 safe bounded completion for this fixture, not a universal responsiveness guarantee.
+
+### Final contract correction: image alignment visibility
+
+The final specification audit found that Face axis rotations did not implement the distinct
+presentation setting for axis-only visibility. Added `only_axis_aligned` per workspace and
+an actual inspector checkbox. Rendering and picking share one native batched local-Z/view-axis
+predicate adapted from pinned Blender object.cc (source/hash in native provenance). Camera
+direction is transient view state; changing it neither authors image placement nor schedules
+geometry. Both projection types, all depth layers, reflected/scaled/sheared frames and current
+view picking are covered. Appearance round-trips without affecting anatomical undo.
+
+Native build/3 CTests, modified native style, mypy/Ruff, image and architecture tests pass.
+The actual offscreen inspector checkbox and invisible D3D11 visibility/picking matrix pass.
+The first ac19e77 executable finished building but is superseded before release qualification;
+rebuild the candidate with this correction. The portable image test also checks the visibility
+flag in an aligned capture and its disappearance after an oblique camera change. Final gate
+and revised package qualification are pending. No visible window or desktop input was used.

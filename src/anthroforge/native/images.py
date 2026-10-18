@@ -14,6 +14,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_image_release", [U], None)
     engine.bind("af_image_calibration", [D, D, D, c.c_double, D])
     engine.bind("af_images_pick", [D, D, c.POINTER(c.c_int), c.c_int, D, D, D])
+    engine.bind("af_images_axis_aligned", [D, c.c_int, D, c.POINTER(c.c_int)])
 
 
 class Image:
@@ -72,6 +73,23 @@ def picking_ray(origin: Any, direction: Any) -> tuple[Any, Any]:
     if origin.size != 3 or direction.size != 3:
         raise ValueError("Image picking requires a 3D ray.")
     return origin, direction
+
+
+def aligned(engine: GeometryEngine, frames: Any, direction: Any) -> Any:
+    configure(engine)
+    frames, direction = doubles(frames).reshape((-1, 16)), doubles(direction)
+    if direction.size != 3:
+        raise ValueError("Image view axis must contain three coordinates.")
+    output = np.empty(len(frames), dtype=np.int32)
+    engine.check(
+        engine.library.af_images_axis_aligned(
+            pointer(frames),
+            len(frames),
+            pointer(direction),
+            output.ctypes.data_as(c.POINTER(c.c_int)),
+        )
+    )
+    return output
 
 
 def picking_arrays(frames: Any, sizes: Any, sides: Any) -> tuple[Any, Any, Any]:

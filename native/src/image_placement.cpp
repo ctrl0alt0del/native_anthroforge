@@ -26,6 +26,22 @@ static void image_quad(const int* info,const uint64_t* size,double width,double 
     image_vertex(output+32,right,top,1,0); image_vertex(output+40,left,top,0,0);
 }
 }
+// Blender Authors, object.cc BKE_object_empty_image_data_is_visible_in_view3d,
+// v5.0.1, GPL-2.0-or-later. The normalized local Z axis projects onto the view plane.
+int af_images_axis_aligned(const double* frames,int count,const double* view_axis,int* visible) {
+    try {
+        if(count<0||!view_axis||(count&&(!frames||!visible))) throw std::runtime_error("Invalid image view arrays.");
+        const af::V3 view=Eigen::Map<const af::V3>(view_axis);
+        if(!view.allFinite()||view.norm()<1e-15) throw std::runtime_error("Invalid image view axis.");
+        const af::V3 direction=view.normalized();
+        for(int i=0;i<count;++i) {
+            const af::M4 frame=Eigen::Map<const af::M4>(frames+16*i);
+            const af::V3 axis=frame.block<3,1>(0,2).normalized();
+            visible[i]=frame.allFinite()&&axis.squaredNorm()>0&&(axis-direction*axis.dot(direction)).squaredNorm()<=1e-5;
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 int af_images_pick(const double* frames,const double* sizes,const int* sides,int count,
                   const double* origin,const double* direction,double* hits) {
     try {

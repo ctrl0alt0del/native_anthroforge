@@ -88,10 +88,15 @@ class Controller(QObject):
             key: RenderLayer(self.image_model, key) for key in ("NORMAL", "FRONT", "BACK")
         }
         self.viewport_orthographic = False
+        self.viewport_direction = (0, 0, 1)
 
     @Slot(bool)
     def setViewportProjection(self, orthographic):
         self.viewport_orthographic = orthographic
+
+    @Slot(list)
+    def setViewportDirection(self, direction):
+        self.viewport_direction = tuple(direction)
 
     def _initialize_state(self):
         self.object_selection = ObjectSelection()

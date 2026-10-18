@@ -6,6 +6,7 @@ Repeater3D {
     id: images
     required property string layer
     required property bool orthographic
+    required property vector3d viewAxis
     model: workspace.imageLayer(layer)
     delegate: Node {
         required property var item
@@ -13,9 +14,9 @@ Repeater3D {
         Model {
             id: tile
             objectName: "image_" + item.id + "_" + item.chunk
-            visible: item.active && item.visible && (images.orthographic ? style.orthographic : style.perspective)
+            visible: item.active && item.visible && (images.orthographic ? style.orthographic : style.perspective) && (!style.only_axis_aligned || imageGeometry.axisAligned(images.viewAxis, item.matrix))
             opacity: style.opacity * (item.readonly ? .12 : 1)
-            geometry: ImageGeometry { assetId: item.handle; tile: item.chunk; dimensions: Qt.size(item.content.dimensions[0],item.content.dimensions[1]); frame: item.matrix }
+            geometry: ImageGeometry { id: imageGeometry; assetId: item.handle; tile: item.chunk; dimensions: Qt.size(item.content.dimensions[0],item.content.dimensions[1]); frame: item.matrix }
             materials: DefaultMaterial {
                 lighting: DefaultMaterial.NoLighting
                 cullMode: style.side === "FRONT" ? Material.BackFaceCulling : style.side === "BACK" ? Material.FrontFaceCulling : Material.NoCulling

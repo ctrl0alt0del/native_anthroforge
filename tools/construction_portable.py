@@ -35,18 +35,23 @@ def verify_objects(state):
 def embedded_image(executable, cwd, invoke, image):
     source = cwd / "large-reference.png"
     Image.new("RGB", (2048, 2048), "#e030d0").save(source)
-    commands = [
-        request("image.replace", target=image["id"], path=str(source)),
-        request("wait"),
-        request("image.presentation", target=image["id"], depth="FRONT", opacity=1),
-        request("save", path="embedded.anthroforge", blocked_policy="wait"),
-    ]
+    commands = embedded_commands(image["id"], source)
     (cwd / "embedded.json").write_text(json.dumps(commands))
     invoke(
         executable, cwd, "--cli", "run", "embedded.json", "--project", "construction.anthroforge"
     )
     source.unlink()
     verify_embedded(executable, cwd, invoke, image["id"])
+
+
+def embedded_commands(target, source):
+    appearance = dict(target=target, depth="FRONT", opacity=1, only_axis_aligned=True)
+    return [
+        request("image.replace", target=target, path=str(source)),
+        request("wait"),
+        request("image.presentation", **appearance),
+        request("save", path="embedded.anthroforge", blocked_policy="wait"),
+    ]
 
 
 def verify_embedded(executable, cwd, invoke, image):
@@ -58,16 +63,34 @@ def verify_embedded(executable, cwd, invoke, image):
     view_arguments = ("--revision", str(state["revision"]), "--view", "construction-view.json")
     invoke(executable, cwd, *arguments, *view_arguments)
     verify_image_pixels(cwd)
+    verify_hidden(executable, cwd, invoke, state["revision"], view)
 
 
 def verify_image_pixels(cwd):
-    pixels = np.asarray(Image.open(cwd / "embedded.png").convert("RGB"))
-    magenta = (pixels[:, :, 0] > 170) & (pixels[:, :, 1] < 100) & (pixels[:, :, 2] > 170)
-    assert np.count_nonzero(magenta) > 100000, "Embedded image did not completely publish"
+    assert magenta_pixels(cwd / "embedded.png") > 100000, (
+        "Embedded image did not completely publish"
+    )
     metadata = json.loads((cwd / "embedded.png.json").read_text())
     assert metadata["captured"] and not metadata["window_visible"]
     with ZipFile(cwd / "embedded.anthroforge") as archive:
         assert archive.testzip() is None
+
+
+def magenta_pixels(path):
+    pixels = np.asarray(Image.open(path).convert("RGB"))
+    magenta = (pixels[:, :, 0] > 170) & (pixels[:, :, 1] < 100) & (pixels[:, :, 2] > 170)
+    return np.count_nonzero(magenta)
+
+
+def verify_hidden(executable, cwd, invoke, revision, view):
+    view = dict(view, camera=[0, 0, 0, -70, 0, 0, 3])
+    (cwd / "construction-view.json").write_text(json.dumps(view))
+    arguments = ("--cli", "render", "embedded.anthroforge", "hidden.png")
+    view_arguments = ("--revision", str(revision), "--view", "construction-view.json")
+    invoke(executable, cwd, *arguments, *view_arguments)
+    assert magenta_pixels(cwd / "hidden.png") < 100, (
+        "Axis-only image remained visible in oblique view"
+    )
 
 
 def request(operation, **arguments):

@@ -67,6 +67,9 @@ Construction **Image…** imports PNG/JPEG, normalizes EXIF orientation and embe
 Use Instance for another placement sharing the asset. Ordinary parenting preserves world
 placement; images cannot be parents. Width, axis alignment, opacity, depth, sides,
 orthographic/perspective visibility and viewport pickability are exposed in the inspector.
+**Only axis-aligned views** hides the image when the view deviates from its local Z axis;
+it changes visibility and picking rather than rotating the image. Face axis buttons rotate
+the authored placement separately.
 
 **Calibrate distance…** takes two image landmarks and a known distance as one undo action.
 Replace changes the selected assignment, retains position/physical width, adjusts aspect

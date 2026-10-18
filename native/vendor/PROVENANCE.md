@@ -33,3 +33,14 @@ Target events are projected before intermediate depth substeps, as in the pinned
 Misses retain the last successful depth, while a first-point plane locks even when its
 initial ray misses. The regression fixtures distinguish these cases from sequential
 projection and continuously moving fallback planes.
+
+## Reference-image view alignment
+
+`af_images_axis_aligned` adapts Blender 5.0.1
+`BKE_object_empty_image_data_is_visible_in_view3d` in
+https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenkernel/intern/object.cc.
+Original source SHA-256: `618a1ce89ee4077e3d94c27e20259ba468baf8b074ec01bf7d09dccb13f72eb8`.
+Blender Authors, GPL-2.0-or-later. The normalized object local Z axis is projected into
+the view plane; squared residual must be at most 1e-5. The same batched native predicate
+serves picking and the Qt geometry adapter. It intentionally uses local Z even under shear,
+as the source does, rather than silently substituting the transformed polygon normal.

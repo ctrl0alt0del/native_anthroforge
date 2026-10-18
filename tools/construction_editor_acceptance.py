@@ -8,6 +8,7 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image
+from PySide6.QtCore import QMetaObject, Qt
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from shiboken6 import delete
@@ -187,6 +188,18 @@ def repeated_draws(controller):
     assert controller.session.history.cursor == before + 2 and tool.stroke is None
 
 
+def image_axis_control(controller, engine):
+    target = next(
+        row["id"] for row in controller.construction.records.values() if row["kind"] == "IMAGE"
+    )
+    controller.select(target)
+    settle(controller)
+    checkbox = find(engine.rootObjects()[0], "imageAxisVisibility")
+    checkbox.setProperty("checked", True)
+    assert QMetaObject.invokeMethod(checkbox, "clicked", Qt.DirectConnection)
+    assert controller.session.workspace.reference_images[-1].only_axis_aligned
+
+
 def run():
     controller, warnings = Controller(), []
     engine = create_engine(controller, warnings)
@@ -194,6 +207,7 @@ def run():
         assert engine.rootObjects(), warnings
         interactions(controller)
         control_navigation(controller, engine)
+        image_axis_control(controller, engine)
         assert not controller.message, controller.message
         assert not warnings, warnings
         print("Offscreen construction editor: curves, images and ordered source selection passed.")

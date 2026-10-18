@@ -6,6 +6,7 @@ View3D {
     required property var sourceCamera
     required property bool orthographic
     required property string depthLayer
+    required property vector3d viewAxis
     visible: workspace.imageLayer(depthLayer).count > 0
     camera: rig.camera
     environment: SceneEnvironment {
@@ -14,5 +15,5 @@ View3D {
         antialiasingQuality: SceneEnvironment.High
     }
     PresentationCamera { id: rig; sourceCamera: viewLayer.sourceCamera; orthographic: viewLayer.orthographic }
-    Node { eulerRotation.x: -90; ImageScene { layer: viewLayer.depthLayer; orthographic: viewLayer.orthographic } }
+    Node { eulerRotation.x: -90; ImageScene { layer: viewLayer.depthLayer; orthographic: viewLayer.orthographic; viewAxis: viewLayer.viewAxis } }
 }

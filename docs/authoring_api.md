@@ -283,7 +283,9 @@ Image operations use the same session command API, with no Qt dependency:
   `object.rename` and `object.delete` also apply. Images cannot be transform parents.
 - `image.presentation(target, **settings)` updates the current workspace without anatomical
   undo or geometry work. Settings: `opacity` (0–1), `depth` (`NORMAL`, `FRONT`, `BACK`),
-  `side` (`BOTH`, `FRONT`, `BACK`), `orthographic`, `perspective`, and `pickable`.
+  `side` (`BOTH`, `FRONT`, `BACK`), `orthographic`, `perspective`, `only_axis_aligned`,
+  and `pickable`. Axis-only visibility uses Blender's local-Z/view-axis tolerance and
+  affects both drawing and picking without changing the image's transform.
 
 `wait` includes image jobs. Import/replacement uses the initiating undo step; cancel/failure
 never publishes a partial image. Source bytes are embedded once per unique asset in schema 3.

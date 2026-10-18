@@ -3,6 +3,7 @@
 #include <QtCore/QVariantList>
 #include <QtQuick3D/QQuick3DGeometry>
 #include <QtQml/qqmlregistration.h>
+#include <QtGui/QVector3D>
 
 class ImageGeometry : public QQuick3DGeometry {
     Q_OBJECT
@@ -21,6 +22,7 @@ public:
     void setTile(int value);
     void setDimensions(QSizeF value);
     void setFrame(const QVariantList& value);
+    Q_INVOKABLE bool axisAligned(QVector3D direction,const QVariantList& frame) const;
 signals:
     void geometryChanged();
 private:

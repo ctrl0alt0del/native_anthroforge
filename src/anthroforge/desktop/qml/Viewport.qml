@@ -24,6 +24,8 @@ Item {
     property string toolMode: "Move"
     property string anchorMode: ""
     property bool orthographic: false
+    readonly property vector3d imageViewAxis: Qt.vector3d(view.camera.forward.x, -view.camera.forward.z, view.camera.forward.y)
+    onImageViewAxisChanged: workspace.setViewportDirection([imageViewAxis.x,imageViewAxis.y,imageViewAxis.z])
     property real distance: 4
     property int depthIndex: 0
     property point pointerPosition: Qt.point(-1, -1)
@@ -190,7 +192,7 @@ Item {
 
     Rectangle { anchors.fill: parent; color: "#24262b" }
     ImageLayer {
-        id: backImages; anchors.fill: parent; sourceCamera: view.camera; orthographic: viewport.orthographic
+        id: backImages; anchors.fill: parent; sourceCamera: view.camera; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis
         depthLayer: "BACK"
     }
     View3D {
@@ -235,7 +237,7 @@ Item {
         Node {
             id: worldScene
             eulerRotation.x: -90
-            ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic }
+            ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis }
             Repeater3D {
                 id: meshRepeater
                 model: workspace.meshModel
@@ -293,7 +295,7 @@ Item {
         }
     }
     ImageLayer {
-        id: frontImages; anchors.fill: parent; sourceCamera: view.camera; orthographic: viewport.orthographic
+        id: frontImages; anchors.fill: parent; sourceCamera: view.camera; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis
         depthLayer: "FRONT"
     }
     SelectionOutline {

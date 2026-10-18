@@ -16,6 +16,7 @@ class ImagePresentation:
     side: str = "BOTH"
     orthographic: bool = True
     perspective: bool = True
+    only_axis_aligned: bool = False
     pickable: bool = True
 
     def __post_init__(self) -> None:

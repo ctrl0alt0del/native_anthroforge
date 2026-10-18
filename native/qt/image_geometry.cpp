@@ -25,6 +25,13 @@ static QMatrix4x4 image_frame(const QVariantList& frame) {
     for(int i=0;i<16;++i) values[i]=frame[i].toFloat();
     return QMatrix4x4(values);
 }
+bool ImageGeometry::axisAligned(QVector3D direction,const QVariantList& frame) const {
+    if(frame.size()!=16) return false;
+    double values[16];
+    for(int i=0;i<16;++i) values[i]=frame[i].toDouble();
+    const double axis[3]={direction.x(),direction.y(),direction.z()}; int visible=0;
+    return af_images_axis_aligned(values,1,axis,&visible)==0&&visible!=0;
+}
 static std::pair<QVector3D,QVector3D> transform_quad(float* vertices,const QMatrix4x4& frame) {
     const QVector3D normal=QVector3D::crossProduct(frame.mapVector(QVector3D(1,0,0)),frame.mapVector(QVector3D(0,1,0))).normalized();
     QVector3D low,high;

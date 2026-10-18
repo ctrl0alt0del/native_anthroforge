@@ -54,11 +54,25 @@ def hits(controller, origin, direction):
         origin,
         direction,
     )
-    projection = "orthographic" if controller.viewport_orthographic else "perspective"
+    visible = view_mask(controller, controller.image_pick_rows, controller.image_matrices)
     return [
         hit_record(controller.image_pick_rows[int(row[0])], row)
         for row in records
-        if controller.image_pick_rows[int(row[0])]["image_style"][projection]
+        if visible[int(row[0])]
+    ]
+
+
+def view_mask(controller, rows, frames):
+    projection = "orthographic" if controller.viewport_orthographic else "perspective"
+    restricted = [row["image_style"].get("only_axis_aligned", False) for row in rows]
+    aligned = (
+        images.aligned(controller.session.engine, frames, controller.viewport_direction)
+        if any(restricted)
+        else ()
+    )
+    return [
+        row["image_style"][projection] and (not restricted[i] or bool(aligned[i]))
+        for i, row in enumerate(rows)
     ]
 
 
@@ -78,7 +92,7 @@ def hit_record(item, hit):
 def probe(controller, target, origin, direction):
     rows = controller.image_model.active_rows()
     row = next((r for r in rows if r["id"] == target and r["visible"]), None)
-    if row is None:
+    if row is None or not view_mask(controller, [row], [row["matrix"]])[0]:
         return {}
     side = ("BOTH", "FRONT", "BACK").index(row["image_style"]["side"])
     hits = images.pick(

@@ -59,7 +59,7 @@ def entity_changes(document: Document, changes: DocumentChanges) -> set[str]:
 
 
 def support_source(document: Document, value: Any) -> Any:
-    support = getattr(value, "support", "") or getattr(value, "parent", "")
+    support = getattr(value, "parent", "")
     parent = document.index.entities.get(support)
     return (
         document.attachments_enabled,
@@ -145,7 +145,7 @@ def pending_support(document: Document, scope: str, value: Any) -> tuple[Issue, 
 
 
 def missing_surface(document: Document, scope: str, value: Any) -> tuple[Issue, ...]:
-    support = getattr(value, "support", "") or getattr(value, "parent", "")
+    support = getattr(value, "parent", "")
     if not support or value.attachment.parent_mode != "SURFACE_NEAREST":
         return ()
     if scope in document.index.entities and not document.attachments_enabled:
@@ -170,7 +170,7 @@ def surface_issue(document: Document, scope: str, support: str) -> Issue:
 
 
 def graph_changes(document: Document, changes: DocumentChanges) -> set[str]:
-    fields = {"@membership", "parent", "support", "follow", "deformers", "attachment"}
+    fields = {"@membership", "parent", "follow", "deformers", "attachment"}
     rows = (*changes.entities.values(), *changes.controls.values())
     return (
         {"document"}

@@ -57,13 +57,14 @@ def test_graph_reuse_tracks_enabling_and_distinguishes_pose_from_geometry_cycles
     document = hooked_document()
     graph = dependencies.graph(document)
     assert not dependencies.blocked(graph)
-    control = replace(document.control("hook"), follow="", support="body")
+    control = replace(document.control("hook"), follow="hook")
     cyclic = replace(document, controls=(control,))
     assert Port("body", "geometry") in dependencies.blocked(dependencies.graph(cyclic))
     item = document.entity("body")
     disabled = replace(item, deformers=(replace(item.deformers[0], enabled=False),))
     changed = replace(cyclic, entities=(disabled,))
-    assert not dependencies.blocked(dependencies.graph(changed))
+    assert Port("body", "geometry") not in dependencies.blocked(dependencies.graph(changed))
+    assert Port("hook", "control") in dependencies.blocked(dependencies.graph(changed))
     assert dependencies.graph(document) is graph and not dependencies.blocked(graph)
 
 

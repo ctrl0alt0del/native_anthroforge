@@ -74,6 +74,10 @@ def construction_consumers(document: "Document") -> Mapping[str, frozenset[str]]
         definition = getattr(item, "primitive", None) or item
         for use in getattr(definition, "curves", ()):
             users.setdefault(use.curve, set()).add(item.id)
+    owners: tuple[SCP | Control, ...] = (*document.entities, *document.controls)
+    for owner in owners:
+        for binding in owner.deformers:
+            users.setdefault(binding.control, set()).add(owner.id)
     return MappingProxyType({key: frozenset(value) for key, value in users.items()})
 
 

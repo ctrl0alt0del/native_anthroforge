@@ -205,9 +205,8 @@ creating a connected loft, Hook-driven cage, thickness, curved capsule and impor
 | body.update | entity, piece; shape, width, depth, fit, length, position, sides | Body piece settings |
 | thickness.update | entity; optional remove=true, or Simple Solidify settings below | Separate editable thickness after geometry deformers |
 | control.create | optional kind=HOOK/LATTICE, entity, name, values | New shared control ID; follows entity or document; lattice fits entity unless values supplied |
-| control.transform | control, values=[x,y,z,rx,ry,rz,sx,sy,sz] | Local TRS for an SCP-following or control-supported control; world TRS for document-frame or SCP-attached controls, recapturing the latter's surface/origin placement |
-| control.follow | control; optional entity="" | Change follow source preserving world placement; clear local attachment |
-| control.attach | control, support; optional surface=true | Bind to SCP surface/origin or another control |
+| control.transform | control, values=[x,y,z,rx,ry,rz,sx,sy,sz] | Ordinary parent-local TRS, or world TRS without a parent |
+| control.follow | control; optional entity="" | Follow any eligible ordinary transform source, preserving world placement; images cannot be parents |
 | control.update | control; name, interpolation, outside, weights | Shared settings |
 | control.affected | control | Affected SCP IDs, including indirect consumers |
 | control.delete | control | Remove this control and its bindings; return deleted/affected IDs |
@@ -220,6 +219,12 @@ creating a connected loft, Hook-driven cage, thickness, curved capsule and impor
 | deformer.remove | binding | Remove influence, preserve other consumers and authored primitive |
 | hook.reset | binding | Reset binding transform using current target/control frames |
 | hook.recenter | binding, center=[x,y,z] | Set target-local falloff center |
+
+In 0.2.0 `control.attach` is retired and rejected as an unknown operation. Hook and
+lattice controls never have anatomical bindings. They appear in Construction;
+workspace inclusion follows their anatomical associations and deformer consumers,
+while explicit workspace membership accepts anatomy only. Ordinary following does
+not lock topology. Deleting a transform parent preserves its children's world frames.
 
 `target` is `{owner, stage, component}`. Default stage GEOMETRY uses an SCP's generated
 vertices. CURVE requires its owned curve ID; BASE requires a BODY piece ID; LATTICE

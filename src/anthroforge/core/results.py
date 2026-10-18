@@ -35,7 +35,6 @@ class ControlResult:
     revision: int = 0
     status: str = "ready"
     error: str = ""
-    binding: tuple[float, ...] = ()
 
 
 def geometry_asset(entity: object) -> str:

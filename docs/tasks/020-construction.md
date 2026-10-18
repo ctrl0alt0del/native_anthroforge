@@ -526,3 +526,26 @@ checks. Native build, three contracts, changed-native style, configured mypy and
 fiber-editor acceptance pass. Ruff import cleanup is applied. Full development gate follows
 this checkpoint. Junctions, generic surfaces, control-attachment retirement, broader geometry
 and performance qualification and complete release delivery remain. Version stays 0.1.9.
+
+## Ordinary controls and anatomical boundaries
+
+The full gate at fc4c5a7 passed with 722 tests, native contracts/style, type checks,
+dependency validation and doctor (`build/check-020-binding-copy.log`).
+
+Hook/lattice anatomical attachment state and `control.attach` are now removed. Controls
+follow eligible ordinary objects through a shared cached transform resolver and cycle guard.
+Their dedicated scheduling policy no longer captures all mesh resources to resolve a pose.
+Controls appear in Construction; anatomical workspace membership excludes them, while
+association and consumer relationships determine their workspace accessibility.
+
+Generic parent deletion preserves world placement and propagates changed inputs through
+the shared dependent-task boundary. Origin relocation exposed a geometry-offset/object-frame
+confusion: ordinary frames now exclude geometry offsets, and origin changes atomically rebase
+ordinary children plus consumer placement. Regression tests cover actual Hook deformation,
+curve consumers, deletion/undo, workspace inclusion and rejection of the retired operation.
+
+726 pytest tests pass (9 existing Qt property-map deprecation warnings); Ruff, configured
+mypy and the 15-line architecture rule pass. The full-QML offscreen Construction acceptance
+checks control navigation, the actual ordinary-parent combo and parent-driven transforms.
+No visible window, desktop input or interactive visual acceptance was used. Broader gate,
+junctions, generic surfaces, geometry/performance qualification and release delivery remain.

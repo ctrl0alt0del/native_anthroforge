@@ -18,7 +18,7 @@ def reference_signature(item: SCP | Control) -> tuple[Any, ...]:
     bindings = tuple((b.id, b.control, b.kind, b.target, b.enabled) for b in item.deformers)
     ids = tuple(construction_validation.identities(item))
     if isinstance(item, Control):
-        return (ids, bindings, item.kind, item.follow, item.support, item.attachment.parent_mode)
+        return (ids, bindings, item.kind, item.follow)
     primitive = item.primitive
     targets = primitive_references(primitive) if primitive else None
     return (ids, bindings, item.parent, item.attachment.parent_mode, targets)

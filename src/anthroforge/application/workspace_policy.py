@@ -38,15 +38,15 @@ def settings(values: dict[str, Any]) -> dict[str, Any]:
 
 def members(document: Document, values: list[str], children: bool = False) -> tuple[str, ...]:
     selected = set(values)
-    live = document.index.entities.keys() | document.index.controls.keys()
+    live = document.index.entities.keys()
     if selected - live:
-        raise ValueError("Workspace contains an unknown SCP or control.")
+        raise ValueError("Workspace membership requires anatomical SCP/VCP objects.")
     if children:
         for key in values:
             if key in document.index.entities:
                 selected |= descendants(document.entities, key)
     if not selected:
-        raise ValueError("A focused workspace needs at least one SCP or control.")
+        raise ValueError("A focused workspace needs at least one anatomical object.")
     return tuple(sorted(selected))
 
 
@@ -80,7 +80,7 @@ def validate_references(session: "Session", workspace: Workspace, previous: Work
     for field in ("members", "hidden", "unpickable"):
         live = set(session.document.registry.records)
         if field == "members":
-            live = session.document.index.entities.keys() | session.document.index.controls.keys()
+            live = set(session.document.index.entities)
         added = set(getattr(workspace, field)) - set(getattr(previous, field))
         if added - live:
             raise ValueError("Workspace references an unknown or incompatible object.")
@@ -95,10 +95,10 @@ def associations(document: Document, target: str) -> set[str]:
         if key in seen:
             continue
         seen.add(key)
-        if key in document.registry.construction:
-            anatomy.update(object_anatomy(document.registry.construction[key]))
+        if key in document.registry.construction or key in document.index.controls:
+            anatomy.update(object_anatomy(document.object(key)))
             pending.extend(consumers(document, {key}))
-        elif key in document.index.entities or key in document.index.controls:
+        elif key in document.index.entities:
             anatomy.add(key)
     return anatomy
 

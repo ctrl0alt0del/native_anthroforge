@@ -26,7 +26,7 @@ def test_cycle_is_reported_then_cleared_without_losing_accepted_geometry(session
     entity = create(session)
     control = hook(session, entity)
     asset = session.document.entity(entity).asset
-    session.command("control.attach", control=control, support=entity)
+    session.command("control.follow", control=control, entity=control)
     session.wait(5)
     assert records(session, code="DEPENDENCY_BLOCKED")
     assert session.document.entity(entity).asset == asset

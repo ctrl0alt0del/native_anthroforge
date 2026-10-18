@@ -7,12 +7,7 @@ from anthroforge.core.results import Port, ReadRevision
 
 def topology_dependents(document: Document, entity: str) -> tuple[str, ...]:
     children = [e.id for e in document.entities if e.parent == entity]
-    controls = [
-        c.id
-        for c in document.controls
-        if c.support == entity and c.attachment.parent_mode == "SURFACE_NEAREST"
-    ]
-    return tuple((*children, *controls, *bound_fibers(document, entity)))
+    return tuple((*children, *bound_fibers(document, entity)))
 
 
 def bound_fibers(document: Document, entity: str) -> tuple[str, ...]:
@@ -65,7 +60,7 @@ def revisions(document: Document, ports: set[Port]) -> tuple[ReadRevision, ...]:
 def revision(document: Document, port: Port) -> ReadRevision:
     if port.owner in document.registry.construction:
         return object_revision(document, port)
-    if port.output in ("control", "cage"):
+    if port.owner in document.index.controls:
         control = document.control(port.owner)
         return ReadRevision(port.owner, port.output, control.generation, 0)
     entity = document.entity(port.owner)

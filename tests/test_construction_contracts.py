@@ -1,7 +1,5 @@
 """End-to-end construction contracts: dependency failures, history and persistence."""
 
-from dataclasses import replace
-
 import numpy as np
 import pytest
 
@@ -9,6 +7,7 @@ from anthroforge.application.control_frames import display_frame
 from anthroforge.application.geometry_ownership import collect
 from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.native import curve_editing
+from tests.test_fiber_creation import bind
 
 
 def create(session, parent="", kind="LOFT"):
@@ -77,14 +76,13 @@ def test_aligned_handle_edit_moves_opposite_handle(session):
     np.testing.assert_allclose(changed.right, [0, -2, 0])
 
 
-def test_surface_control_locks_then_unlocks_topology(session):
+def test_fiber_binding_locks_then_unlocks_topology(session):
     entity = create(session)
-    control = session.command("control.create", entity=entity)
-    session.command("control.attach", control=control, support=entity)
-    session.command("wait", timeout=5)
+    source = session.document.entity(entity).primitive.curves[0].id
+    fiber = bind(session, entity, source)
     with pytest.raises(ValueError, match="Topology is locked"):
         session.command("primitive.update", entity=entity, samples=40)
-    session.command("control.follow", control=control, entity=entity)
+    session.command("object.delete", target=fiber.id)
     session.command("primitive.update", entity=entity, samples=40)
     session.command("wait", timeout=5)
     assert mesh(session, entity).counts[0] == 80
@@ -94,7 +92,7 @@ def test_cycle_finishes_preserves_result_and_can_be_broken(session):
     entity = create(session)
     control = hook(session, entity)
     previous = mesh(session, entity)
-    session.command("control.attach", control=control, support=entity)
+    session.command("control.follow", control=control, entity=control)
     session.command("wait", timeout=5)
     assert not session.scheduler.blocked
     assert session.document.entity(entity).result.status == "failed"
@@ -107,8 +105,8 @@ def test_cycle_finishes_preserves_result_and_can_be_broken(session):
 def test_control_cycle_can_be_removed_and_unrelated_geometry_runs(session):
     entity = create(session)
     a, b = hook(session, entity), session.command("control.create", entity=entity)
-    session.command("control.attach", control=a, support=b)
-    session.command("control.attach", control=b, support=a)
+    session.command("control.follow", control=a, entity=b)
+    session.command("control.follow", control=b, entity=a)
     other = create(session, entity)
     assert mesh(session, other).counts[0] > 0
     session.command("control.delete", control=b)
@@ -125,7 +123,7 @@ def test_scp_deletion_detaches_control_in_world_frame(session):
     before = display_frame(session, session.document.control(control))
     session.command("scp.delete", entity=entity)
     item = session.document.control(control)
-    assert not item.follow and not item.support
+    assert not item.follow and not item.owners
     np.testing.assert_allclose(item.matrix, before)
 
 
@@ -168,24 +166,20 @@ def test_duplicate_remaps_internal_sharing_once(session):
     assert first.deformers[0].control == child.deformers[0].control != control
 
 
-def test_missing_accepted_surface_finishes_as_failure(session):
+def test_retired_control_attachment_operation_rejects_without_mutation(session):
     entity = create(session)
     control = hook(session, entity)
-    root = session.command("scp.wrap_root", name="Group")
-    current = session.document.control(control)
-    changed = replace(current, follow="", support=root)
-    session.replace_document(controls=(changed,))
-    session.command("evaluate", entities=[entity])
-    session.command("wait", timeout=5)
-    assert session.document.entity(entity).result.status == "failed"
-    assert not session.scheduler.blocked
+    before = session.document
+    with pytest.raises(ValueError, match="Unknown"):
+        session.command("control.attach", control=control, support=entity)
+    assert session.document is before
 
 
 def surface_consumer(session):
     parent = create(session)
-    child = create(session, parent)
-    control = hook(session, child)
-    session.command("control.attach", control=control, support=parent)
+    source = session.document.entity(parent).primitive.curves[0].id
+    fiber = bind(session, parent, source)
+    child = session.command("primitive.from_curves", curves=[fiber.id], kind="BODY", parent=parent)
     session.command("wait", timeout=5)
     return parent, child
 
@@ -220,7 +214,7 @@ def test_pose_following_worker_does_not_wait_for_its_geometry_consumer(session):
 
     entity = create(session)
     control = hook(session, entity)
-    session.scheduler.task_schedulers["control_attachments"] = MeasuredTaskScheduler()
+    session.scheduler.task_schedulers["control_pose"] = MeasuredTaskScheduler()
     move_control(session, control, 0.4)
     session.command("wait", timeout=3)
     assert mesh(session, entity).bounds[5] == pytest.approx(0.4)

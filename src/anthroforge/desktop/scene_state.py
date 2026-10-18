@@ -58,7 +58,7 @@ def control_record(controller, control):
     row.update(
         trs=session.engine.decompose(matrix), quaternion=scene.quaternion(session.engine, matrix)
     )
-    row.update(control_flags(session.workspace, control))
+    row.update(control_flags(session, control))
     row.update(surface_visible=False, surface_pickable=False)
     row.update(opacity=0.08 if row["readonly"] else 1, affected=affected(session, control.id))
     return qml(row)
@@ -90,11 +90,20 @@ def presentation_flags(workspace, entity):
     )
 
 
-def control_flags(workspace, control):
-    flags = presentation_flags(workspace, control.id)
+def control_flags(session, control):
+    from anthroforge.application.workspace_policy import associations, included
+
+    workspace = session.workspace
+    readonly = not included(session.document, workspace, control.id)
+    flags = dict(
+        readonly=readonly,
+        visible=control.id not in workspace.hidden,
+        pickable=not readonly and control.id not in workspace.unpickable,
+        unassigned=not associations(session.document, control.id),
+    )
     category = "cages" if control.kind == "LATTICE" else "hooks"
     flags["visible"] &= visible(workspace, category)
-    flags["pickable"] &= pickable(workspace, category)
+    flags["pickable"] &= flags["visible"] and pickable(workspace, category)
     return flags
 
 

@@ -156,15 +156,15 @@ even thickness, high-quality normals, normal flipping and clamping. Complex mode
 
 ### 3.4 Transforms and attachments
 
-Each shared control explicitly follows an SCP or the document frame. New controls
+Each shared control explicitly follows an eligible ordinary object or the document frame. New controls
 created for one SCP follow that SCP initially. Sharing preserves the selected
 transform source. Explicitly changing the source preserves world placement.
 Transform following and the targets influenced by the deformer are separate data.
 
-Retain the SCP's overall hierarchy attachment and support distinct local control or
-hook attachment sites to other SCP surfaces or controls. A construction's local
-attachment sites may use different supports. The SCP hierarchy remains a single
-tree even when additional control dependencies form a more general graph.
+The 0.2.0 contract supersedes the original local control-surface attachment design:
+controls use ordinary transform following only. Anatomical bindings remain on anatomy
+and fibers. The SCP hierarchy remains a single tree while construction dependencies
+form a general graph. Control following never captures a surface binding.
 
 ## 4. Attachment stability and dependency evaluation
 
@@ -175,7 +175,7 @@ across resolution changes. Automatic attachment remapping across these changes i
 excluded through 1.0. Therefore:
 
 - Disable resolution and other topology-changing edits while an SCP has children
-  **or** incoming surface attachments, including those from shared controls.
+  **or** incoming surface attachments, including fiber bindings and dense supports.
 - This includes changes that alter attachment mesh indexing/connectivity, such as
   adding/removing loft curves or changing caps. Apply the same rule through UI and APIs.
 - Unlock these operations when the SCP has neither children nor incoming surface

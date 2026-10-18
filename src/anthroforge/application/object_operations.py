@@ -11,14 +11,14 @@ from anthroforge.core.objects import ConstructionObject
 from anthroforge.native import curve_editing
 
 from . import (
-    construction_tasks,
     curve_edit_state,
     curve_sources,
-    dependencies,
+    dependent_tasks,
     object_revisions,
     path_tasks,
 )
 from .construction_policy import require_topology_edit
+from .object_removal import install as install_removal
 from .operations import require_name
 
 if TYPE_CHECKING:
@@ -47,8 +47,7 @@ def install(session: "Session", item: Construction) -> None:
     ports = object_revisions.changed_ports(before, changed)
     session.scheduler.invalidate_ports(ports)
     install_state(session, before, changed)
-    path_tasks.edited(session, ports)
-    construction_tasks.edited(session, dependencies.affected(session.document, ports))
+    dependent_tasks.changed(session, ports)
 
 
 def install_state(session: "Session", before: Construction, changed: Construction) -> None:
@@ -189,6 +188,7 @@ def inspect(session: "Session", target: str) -> dict[str, Any]:
 
 
 def delete(session: "Session", target: str) -> None:
+    from .control_frames import remove_supports
     from .object_removal import retain_frames, retain_objects
 
     item = editable(session, target)
@@ -199,4 +199,6 @@ def delete(session: "Session", target: str) -> None:
     objects = tuple(o for o in retain_objects(session, item, parent) if o.id != target)
     entities = retain_frames(session, session.document.entities, target)
     session.scheduler.invalidate({target})
-    session.replace_document(objects=objects, entities=entities)
+    install_removal(
+        session, objects=objects, entities=entities, controls=remove_supports(session, {target})
+    )

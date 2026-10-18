@@ -369,9 +369,7 @@ class Controller(QObject):
     def select(self, entity, extend=False):
         self.object_selection.choose(entity, extend)
         self.scene_projection.synchronize_selection()
-        self.scene_projection.view.synchronize(
-            dict(rows=self.rows, parents=self.scene_projection.parents())
-        )
+        self.scene_projection.publish_records()
         self.authoring.refresh()
         self.notify()
 

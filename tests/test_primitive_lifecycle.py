@@ -49,14 +49,6 @@ def test_captured_child_anchor_does_not_cycle_pose_following_geometry(session):
     assert not session.scheduler.errors
 
 
-def attached_control(session, support):
-    control = session.command("control.create", entity=support)
-    session.command("control.attach", control=control, support=support)
-    session.command("wait", timeout=5)
-    assert session.document.control(control).result.binding
-    return control
-
-
 def world_vertices(session, entity):
     frame = entity_frame(session.engine, session.document.entity(entity))
     return components.transformed(session.engine, mesh(session, entity).array(0), frame)
@@ -80,20 +72,20 @@ def test_origin_relocation_preserves_deformation_and_following_controls(
     assert not session.scheduler.errors
 
 
-def test_surface_binding_survives_save_and_history(session, tmp_path):
+def test_ordinary_control_following_survives_save_and_history(session, tmp_path):
     support = create(session)
-    control = attached_control(session, support)
-    binding = session.document.control(control).result.binding
+    control = session.command("control.create", entity=support)
+    frame = display_frame(session, session.document.control(control))
     path = str(tmp_path / "attached.anthroforge")
     session.command("save", path=path, blocked_policy="wait")
     session.command("open", path=path)
     lift_first_point(session, support)
     session.command("wait", timeout=5)
-    assert session.document.control(control).result.binding == binding
+    np.testing.assert_allclose(display_frame(session, session.document.control(control)), frame)
     session.command("undo")
     session.command("redo")
     session.command("wait", timeout=5)
-    assert session.document.control(control).result.binding == binding
+    np.testing.assert_allclose(display_frame(session, session.document.control(control)), frame)
     assert session.document.control(control).result.status == "ready"
 
 

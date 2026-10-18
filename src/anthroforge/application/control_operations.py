@@ -4,7 +4,7 @@ from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.construction import Control, Deformer, Target
-from anthroforge.core.entities import IDENTITY, SCP, Attachment
+from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.core.results import geometry_asset
 from anthroforge.native import construction as native
 from anthroforge.native.mesh import NativeCancellation
@@ -12,9 +12,14 @@ from anthroforge.native.mesh import NativeCancellation
 from . import construction_codec as codec
 from . import construction_tasks as tasks
 from . import dependencies as dep
+from . import dependent_tasks
 from .construction_evaluator import Evaluation
 from .control_frames import detached, remember, stable_frame
-from .presentation import include_created
+from .object_creation import require_parent
+from .object_frames import Frames
+from .object_removal import install as install_removal
+from .object_removal import retain_frames, retain_objects
+from .workspace_policy import associations, included
 
 if TYPE_CHECKING:
     from .session import Session
@@ -32,29 +37,22 @@ def evaluation(session: "Session") -> Evaluation:
 def editable(session: "Session", control: str) -> Control:
     if session.waiting_save:
         raise ValueError("Editing is blocked while waiting to save.")
-    if session.workspace.focused and control not in session.workspace.members:
+    if not included(session.document, session.workspace, control):
         raise ValueError("This control is outside the focused workspace and is read-only.")
     return session.document.control(control)
 
 
 def install(session: "Session", item: Control) -> None:
-    from .control_tasks import edited
-
     item = replace(item, generation=item.generation + 1)
     controls = tuple(item if c.id == item.id else c for c in session.document.controls)
     session.scheduler.invalidate({item.id})
     session.replace_document(controls=controls)
-    edited(session, {dep.Port(item.id, "control")})
-    targets = dep.affected(
-        session.document, {dep.Port(item.id, "control"), dep.Port(item.id, "cage")}
-    )
-    tasks.edited(session, targets)
+    dependent_tasks.changed(session, {dep.Port(item.id, "control"), dep.Port(item.id, "cage")})
 
 
 def add(session: "Session", item: Control) -> str:
     item = remember(item, evaluation(session).follow_frame(item))
     session.replace_document(controls=(*session.document.controls, item))
-    include_created(session, {item.id})
     return item.id
 
 
@@ -68,9 +66,10 @@ def create(
     validate_owner(session, entity)
     transform = session.engine.transform(values) if values else IDENTITY
     points = new_cage_points(session, kind)
-    if kind == "LATTICE" and entity and values is None:
+    if kind == "LATTICE" and entity in session.document.index.entities and values is None:
         transform = fitted_cage(session, entity)
-    item = Control(name, kind, follow=entity, matrix=transform, points=points)
+    owners = tuple(sorted(associations(session.document, entity))) if entity else ()
+    item = Control(name, kind, follow=entity, owners=owners, matrix=transform, points=points)
     return add(session, item)
 
 
@@ -80,8 +79,9 @@ def new_cage_points(session: "Session", kind: str) -> tuple[tuple[float, ...], .
 
 
 def validate_owner(session: "Session", entity: str) -> None:
-    if entity:
-        session.editable(entity)
+    require_parent(session, entity)
+    if entity and not included(session.document, session.workspace, entity):
+        raise ValueError("The control's creation context is outside this workspace.")
 
 
 def fitted_cage(session: "Session", entity: str) -> tuple[float, ...]:
@@ -97,21 +97,16 @@ def fitted_cage(session: "Session", entity: str) -> tuple[float, ...]:
 
 def transform(session: "Session", control: str, values: list[float]) -> None:
     item = editable(session, control)
-    changed = replace(item, matrix=session.engine.transform(values))
-    if item.support and any(e.id == item.support for e in session.document.entities):
-        surface = item.attachment.parent_mode == "SURFACE_NEAREST"
-        changed = surface_attached(session, changed, item.support, changed.matrix, surface)
-    install(session, changed)
+    install(session, replace(item, matrix=session.engine.transform(values)))
 
 
 def follow(session: "Session", control: str, entity: str = "") -> None:
     item = editable(session, control)
+    require_parent(session, entity)
     world = stable_frame(session, item)
-    parent = session.document.entity(entity).matrix if entity else IDENTITY
+    parent = Frames(session.engine, session.document).world(entity)
     local = native.matrix(session.engine, parent, world, relative=True)
-    install(
-        session, replace(item, follow=entity, matrix=local, support="", attachment=Attachment())
-    )
+    install(session, replace(item, follow=entity, matrix=local))
 
 
 def update(session: "Session", control: str, **options: Any) -> None:
@@ -158,28 +153,33 @@ def affected(session: "Session", control: str) -> list[str]:
 
 
 def delete(session: "Session", control: str) -> dict[str, Any]:
-    editable(session, control)
+    item = editable(session, control)
     targets = affected(session, control)
+    entities, controls = removed_bindings(session, control, targets)
+    session.scheduler.invalidate({control, *targets})
+    install_removal(
+        session,
+        entities=retain_frames(session, entities, control),
+        controls=controls,
+        objects=retain_objects(session, item, None),
+    )
+    tasks.edited(session, set(targets))
+    return {"deleted": control, "affected": targets}
+
+
+def removed_bindings(session: "Session", control: str, targets: list[str]) -> tuple[Any, Any]:
     entities = tuple(
         without_bindings(e, control, e.id in targets) for e in session.document.entities
     )
     controls = tuple(
         detach_reference(session, c, control) for c in session.document.controls if c.id != control
     )
-    changed = {c.id for c in controls if c != session.document.control(c.id)}
-    session.scheduler.invalidate({control, *targets})
-    session.replace_document(entities=entities, controls=controls)
-    refresh_references(session, changed)
-    tasks.edited(session, set(targets))
-    return {"deleted": control, "affected": targets}
+    return entities, controls
 
 
 def refresh_references(session: "Session", controls: set[str]) -> None:
-    from .control_tasks import edited
-
     seeds = {dep.Port(key, "control") for key in controls}
-    edited(session, seeds)
-    tasks.edited(session, dep.affected(session.document, seeds))
+    dependent_tasks.changed(session, seeds)
 
 
 def without_bindings(item: SCP, control: str, affected: bool) -> SCP:
@@ -192,34 +192,8 @@ def without_bindings(item: SCP, control: str, affected: bool) -> SCP:
 
 def detach_reference(session: "Session", item: Control, removed: str) -> Control:
     deformers = tuple(b for b in item.deformers if b.control != removed)
-    if item.support != removed:
+    if item.follow != removed:
         return replace(
             item, deformers=deformers, generation=item.generation + int(deformers != item.deformers)
         )
     return replace(detached(session, item), deformers=deformers)
-
-
-def attach(session: "Session", control: str, support: str, surface: bool = True) -> None:
-    item = editable(session, control)
-    world = stable_frame(session, item)
-    item = remember(item, world)
-    other = next((c for c in session.document.controls if c.id == support), None)
-    if other:
-        parent = stable_frame(session, other)
-        local = native.matrix(session.engine, parent, world, relative=True)
-        install(session, replace(item, support=support, follow="", matrix=local))
-    else:
-        install(session, surface_attached(session, item, support, world, surface))
-
-
-def surface_attached(
-    session: "Session", item: Control, support: str, world: tuple[float, ...], surface: bool
-) -> Control:
-    session.document.entity(support)
-    settings = Attachment(
-        parent_mode="SURFACE_NEAREST" if surface else "OBJECT_ORIGIN", child_mode="OBJECT_ORIGIN"
-    )
-    result = replace(item.result, matrix=world, binding=())
-    return replace(
-        item, support=support, follow="", matrix=world, attachment=settings, result=result
-    )

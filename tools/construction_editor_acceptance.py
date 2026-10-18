@@ -11,6 +11,7 @@ from PIL import Image
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from shiboken6 import delete
+from ui_acceptance import find
 
 from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
@@ -120,6 +121,22 @@ def interactions(controller):
     conversion_preview(controller)
 
 
+def control_navigation(controller, engine):
+    curve = controller.run("curve.create", {})
+    control = controller.run("control.create", dict(entity=curve))
+    settle(controller)
+    controller.select(control)
+    assert control in controller.construction.records
+    assert all(row["id"] != control for row in controller.treeRows)
+    assert controller.selectedData["is_control"]
+    assert controller.authoring.state["follow"] == curve
+    parent = find(engine.rootObjects()[0], "controlParent")
+    assert parent.property("currentValue") == curve
+    controller.run("object.transform", dict(target=curve, values=[0.4, 0, 0, 0, 0, 0, 1, 1, 1]))
+    settle(controller)
+    assert controller.selectedData["trs"][0] == 0.4
+
+
 def conversion_preview(controller):
     key = controller.run("curve.create", {})
     settle(controller)
@@ -176,6 +193,7 @@ def run():
     try:
         assert engine.rootObjects(), warnings
         interactions(controller)
+        control_navigation(controller, engine)
         assert not controller.message, controller.message
         assert not warnings, warnings
         print("Offscreen construction editor: curves, images and ordered source selection passed.")

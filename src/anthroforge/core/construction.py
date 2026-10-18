@@ -8,7 +8,7 @@ from .construction_values import integer as integer
 from .construction_values import validate_range as validate_range
 from .curve_engines import BezierSettings, PathSettings, PolylineSettings, RoutingSettings
 from .curve_uses import CurveUse
-from .entities import IDENTITY, Attachment, validate_matrix
+from .entities import IDENTITY, validate_matrix
 from .objects import ConstructionObject
 from .results import ControlResult
 
@@ -284,6 +284,7 @@ class Control:
     kind: str = "HOOK"
     id: str = field(default_factory=identity)
     follow: str = ""
+    owners: tuple[str, ...] = ()
     matrix: tuple[float, ...] = IDENTITY
     points: tuple[tuple[float, ...], ...] = ()
     resolution: tuple[int, ...] = (2, 2, 2)
@@ -291,8 +292,6 @@ class Control:
     outside: bool = False
     weights: tuple[float, ...] = ()
     deformers: tuple[Deformer, ...] = ()
-    support: str = ""
-    attachment: Attachment = field(default_factory=Attachment)
     generation: int = 0
     result: ControlResult = field(default_factory=ControlResult)
 

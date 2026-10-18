@@ -91,7 +91,6 @@ EDITS = {
     "control.transform": controls.transform,
     "control.follow": controls.follow,
     "control.update": controls.update,
-    "control.attach": controls.attach,
     "control.delete": controls.delete,
     "lattice.point": controls.lattice_point,
     "lattice.resize": controls.lattice_resize,

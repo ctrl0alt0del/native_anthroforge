@@ -41,7 +41,7 @@ excluded from UI and APIs.
   safe cancellation, publication and save checkpoints. Jobs acquire their input revision
   at dispatch. Queued writers also block commitment; read-only jobs do not.
 - application/task_schedulers.py supplies dedicated attachment, import, project-open
-  project-save, construction and control-attachment policies. Construction composes
+  project-save, construction and control-pose policies. Construction composes
   separate curve/body/loft, Hook, Lattice and Thickness stage estimates.
   Each assesses cheap metadata before admission and again
   before execution, returning an execution mode, estimated cost and coalescing delay.
@@ -114,7 +114,11 @@ evaluation, component display and picking. Moving an origin rebases its followin
 to retain world placement and leaves the rendered geometry unchanged.
 World-aligned viewport gizmos convert through control_frames.authored_frame before issuing
 control.transform. Numeric fields continue to expose authored TRS in the documented frame;
-the UI does not duplicate attachment/follow frame rules.
+the UI does not duplicate follow frame rules. In 0.2.0 controls use only ordinary
+transform following. `object_frames.Frames` resolves generic object transforms with
+one cycle guard; geometry offsets remain geometry-space data. Origin relocation
+rebases ordinary children and live consumer placement atomically. Controls live in
+the Construction projection, while the anatomical outliner contains only anatomy.
 
 construction_policy.py and core construction validation own topology, references and
 compatibility. Desktop controls expose those policies. Children and incoming surface

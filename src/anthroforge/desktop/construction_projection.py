@@ -18,11 +18,13 @@ class ConstructionProjection:
 
     def synchronize(self):
         session = self.controller.session
-        live = set(session.document.registry.construction)
+        live = set(session.document.registry.construction) | session.document.index.controls.keys()
         self.records = {key: row for key, row in self.records.items() if key in live}
         self.keys = {key: value for key, value in self.keys.items() if key in live}
         for item in session.document.objects:
             self.update_record(session, item)
+        for item in session.document.controls:
+            self.records[item.id] = self.controller.scene_projection.records[item.id]
         self.model.synchronize_records(
             [dict(id=key, item=row) for key, row in self.records.items()]
         )

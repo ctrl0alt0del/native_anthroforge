@@ -125,11 +125,13 @@ class ConstructionTaskScheduler(MeasuredTaskScheduler):
         return replace(plan, delay_ms=delay)
 
 
-class ControlAttachmentTaskScheduler(AttachmentTaskScheduler):
+class ControlPoseTaskScheduler(AttachmentTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
-        return replace(
-            super().plan(workload, interactive), reason="Native shared-control frame resolution"
+        cost = 0.1 + 0.01 * workload.candidates
+        execution: Literal["inline", "worker"] = (
+            "inline" if interactive and workload.candidates <= 32 else "worker"
         )
+        return Schedule(execution, cost, reason="Ordinary control transform resolution")
 
 
 class CurvePathTaskScheduler(AttachmentTaskScheduler):
@@ -183,7 +185,7 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
         **curve_schedulers(),
-        "control_attachments": ControlAttachmentTaskScheduler(),
+        "control_pose": ControlPoseTaskScheduler(),
         "issue_check": IssueTaskScheduler(),
         "inspection_report": InspectionTaskScheduler(),
     }

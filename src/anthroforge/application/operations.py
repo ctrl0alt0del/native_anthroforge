@@ -221,12 +221,11 @@ def recapture(session: "Session", entity: str) -> str:
 def move_origin(session: "Session", entity: str) -> None:
     from anthroforge.native.attachments import move_origin as native_origin
 
-    from .control_frames import rebase_followers
+    from .origin_rebasing import relocate
 
     before = session.editable(entity)
     item = native_origin(session.engine, before)
-    session.replace_entities({entity: item})
-    rebase_followers(session, before, item)
+    relocate(session, before, item)
     transform_dependents(session, entity)
     targets = descendants(session.document.entities, entity)
     evaluation.request(session, targets, targets)

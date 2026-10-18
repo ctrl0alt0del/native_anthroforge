@@ -40,14 +40,15 @@ def control_targets(document, changes, full):
     }
     seeds = {Port(key, output) for key in owners for output in ("pose", "geometry")}
     seeds.update(Port(key, output) for key in changes.controls for output in ("control", "cage"))
+    seeds.update(Port(key, "pose") for key in changes.objects)
     affected = closure(document.index.structure.dependencies.consumers, seeds)
     return set(changes.controls) | {p.owner for p in affected if p.owner in document.index.controls}
 
 
 def control_relationships_changed(changes):
-    fields = (*changes.entities.values(), *changes.controls.values())
+    fields = (*changes.entities.values(), *changes.controls.values(), *changes.objects.values())
     return "attachments_enabled" in changes.document or any(
-        value & {"deformers", "follow", "support", "attachment"} for value in fields
+        value & {"deformers", "follow", "parent", "attachment"} for value in fields
     )
 
 
@@ -71,11 +72,16 @@ class SceneProjection:
             session.changes.serial,
             session.workspace,
         )
-        rows = [self.records[key] for key in self.order]
-        self.view.synchronize(dict(rows=rows, parents=self.parents()))
-        self.controller.rows = rows
+        self.publish_records()
         self.controller.construction.synchronize()
         self.synchronize_selection()
+
+    def publish_records(self):
+        rows = [self.records[key] for key in self.order]
+        self.view.synchronize(
+            dict(rows=[r for r in rows if not r["is_control"]], parents=self.parents())
+        )
+        self.controller.rows = rows
 
     def update_records(self, changes, full, structural):
         session, document = self.controller.session, self.controller.session.document

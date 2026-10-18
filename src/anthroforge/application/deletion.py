@@ -9,7 +9,7 @@ from anthroforge.core.results import geometry_asset
 
 from . import evaluation
 from .control_frames import remove_supports
-from .control_operations import refresh_references
+from .object_removal import install as install_construction_removal
 from .object_removal import retain_frames, retain_objects
 from .operations import make_group
 from .presentation import include_created
@@ -25,10 +25,8 @@ def delete(session: "Session", entity: str) -> str:
     affected = descendants(session.document.entities, entity)
     session.scheduler.invalidate({entity})
     controls = remove_supports(session, {entity})
-    changed = {c.id for c in controls if c != session.document.control(c.id)}
     parent = replacement_parent(session, item, bool(children))
     install_removal(session, item, parent, controls)
-    refresh_references(session, changed)
     resume_children(session, affected - {entity}, children)
     return parent.id if parent else ""
 
@@ -60,7 +58,7 @@ def install_removal(
         remaining = (parent, *remaining)
     objects = retain_objects(session, item, parent)
     remaining = retain_frames(session, remaining, item.id)
-    session.replace_document(entities=remaining, controls=controls, objects=objects)
+    install_construction_removal(session, entities=remaining, controls=controls, objects=objects)
     if not item.parent and parent:
         include_created(session, {parent.id})
 

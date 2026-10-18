@@ -74,14 +74,7 @@ def parent_inputs(item: SCP, enabled: bool) -> set[Port]:
     return result
 
 
-def control_inputs(item: Control, controls: set[str]) -> set[Port]:
-    if item.support:
-        if item.support in controls:
-            return {Port(item.support, "control")}
-        inputs = {Port(item.support, "pose")}
-        if item.attachment.parent_mode == "SURFACE_NEAREST":
-            inputs.add(Port(item.support, "geometry"))
-        return inputs
+def control_inputs(item: Control) -> set[Port]:
     return {Port(item.follow, "pose")} if item.follow else set()
 
 
@@ -108,9 +101,9 @@ def build(
 ) -> DependencyGraph:
     result = entity_edges(entities, enabled, objects)
     result.update(object_edges(objects))
-    control_ids = {c.id for c in controls}
     for control in controls:
-        result[Port(control.id, "control")] = control_inputs(control, control_ids)
+        result[Port(control.id, "control")] = control_inputs(control)
+        result[Port(control.id, "pose")] = {Port(control.id, "control")}
         result[Port(control.id, "cage")] = {Port(control.id, "control")} | binding_inputs(
             control.deformers
         )

@@ -15,7 +15,6 @@ from anthroforge.core.construction import (
 )
 from anthroforge.core.curve_engines import fields as curve_fields
 from anthroforge.core.curve_uses import CurveUse
-from anthroforge.core.entities import Attachment
 from anthroforge.core.results import ControlResult, EvaluationResult, ReadRevision
 
 
@@ -59,7 +58,6 @@ def deformer(data: dict[str, Any]) -> Deformer:
 def control(data: dict[str, Any]) -> Control:
     state = tuples(data)
     state["deformers"] = tuple(deformer(d) for d in state.get("deformers", ()))
-    state["attachment"] = Attachment(**tuples(state.get("attachment", {})))
     state["result"] = ControlResult(**result_fields(state.get("result", {})))
     return Control(**state)
 

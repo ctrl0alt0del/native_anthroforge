@@ -6,14 +6,13 @@ from typing import TYPE_CHECKING, Any
 from anthroforge.core.construction import Curve, Primitive, ResolvedPrimitive
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.document import Document
-from anthroforge.core.entities import IDENTITY, SCP
-from anthroforge.core.objects import ConstructionObject
+from anthroforge.core.entities import SCP
 from anthroforge.core.results import Port
 from anthroforge.native.construction import matrix
 from anthroforge.native.mesh import GeometryEngine
-from anthroforge.native.scene import entity_frame
 
 from . import object_revisions
+from .object_frames import Frames
 
 if TYPE_CHECKING:
     from .session import Session
@@ -27,18 +26,7 @@ def source(document: Document, key: str) -> Curve:
 
 
 def world(engine: GeometryEngine, document: Document, key: str) -> tuple[float, ...]:
-    if not key:
-        return IDENTITY
-    item = document.object(key)
-    if isinstance(item, SCP):
-        return entity_frame(engine, item)
-    if isinstance(item, ConstructionObject):
-        return matrix(engine, world(engine, document, item.parent), item.matrix)
-    from anthroforge.native.mesh import NativeCancellation
-
-    from .construction_evaluator import Evaluation
-
-    return Evaluation(engine, document, {}, NativeCancellation(engine)).control_frame(item)
+    return Frames(engine, document).world(key)
 
 
 def parameters(value: Primitive | ResolvedPrimitive) -> dict[str, Any]:

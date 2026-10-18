@@ -12,7 +12,6 @@ from anthroforge.core.results import EvaluationResult, ReadRevision
 from . import curve_sources
 from .curve_copy_resources import Copies
 from .membership import remap, remap_weights
-from .presentation import include_created
 
 if TYPE_CHECKING:
     from .session import Session
@@ -24,7 +23,7 @@ def copied_controls(document: Document, entities: set[str]) -> set[str]:
     while pending:
         control = document.control(pending.pop())
         references = {b.control for b in control.deformers}
-        references |= {control.support} & {c.id for c in document.controls}
+        references |= {control.follow} & {c.id for c in document.controls}
         pending.extend(references - found)
         found |= references
     return found
@@ -85,7 +84,7 @@ def control(source: Control, mapping: dict[str, str]) -> Control:
         name=source.name + " copy",
         generation=0,
         follow=mapping.get(source.follow, source.follow),
-        support=mapping.get(source.support, source.support),
+        owners=tuple(mapping.get(k, k) for k in source.owners),
         deformers=tuple(binding(b, mapping) for b in source.deformers),
         result=replace(source.result, inputs=remap_inputs(source.result.inputs, mapping)),
     )
@@ -129,7 +128,6 @@ def duplicate(session: "Session", ids: set[str], parent: str) -> dict[str, str]:
         controls=(*session.document.controls, *shared),
         objects=(*session.document.objects, *copied_curves(session, mapping)),
     )
-    include_created(session, {c.id for c in shared})
     return {key: mapping[key] for key in ids}
 
 

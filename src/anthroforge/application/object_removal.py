@@ -3,11 +3,12 @@
 from dataclasses import replace
 from typing import TYPE_CHECKING
 
-from anthroforge.core.construction import Primitive
+from anthroforge.core.construction import Control, Primitive
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import SCP
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.object_registry import Construction, SceneObject
+from anthroforge.core.results import Port
 from anthroforge.native.construction import matrix
 
 from . import curve_sources
@@ -17,8 +18,34 @@ if TYPE_CHECKING:
     from .session import Session
 
 
+def install(
+    session: "Session",
+    entities: tuple[SCP, ...],
+    controls: tuple[Control, ...],
+    objects: tuple[Construction, ...],
+) -> None:
+    from .dependent_tasks import changed
+
+    ports = changed_inputs(session, controls, objects)
+    session.scheduler.invalidate_ports(ports)
+    session.replace_document(entities=entities, controls=controls, objects=objects)
+    changed(session, ports)
+
+
+def changed_inputs(
+    session: "Session", controls: tuple[Control, ...], objects: tuple[Construction, ...]
+) -> set[Port]:
+    from .object_revisions import changed_ports
+
+    before = session.document.registry.records
+    sources = session.document.registry.construction
+    ports = set().union(*(changed_ports(sources[o.id], o) for o in objects))
+    ports.update(Port(c.id, "control") for c in controls if c != before[c.id])
+    return ports
+
+
 def retain_objects(
-    session: "Session", removed: SCP | Construction, parent: SceneObject | None
+    session: "Session", removed: SceneObject, parent: SceneObject | None
 ) -> tuple[Construction, ...]:
     for item in session.document.objects:
         if isinstance(item, Fiber) and (
@@ -31,7 +58,7 @@ def retain_objects(
 
 
 def retain_object(
-    session: "Session", item: Construction, removed: SCP | Construction, parent: SceneObject | None
+    session: "Session", item: Construction, removed: SceneObject, parent: SceneObject | None
 ) -> Construction:
     owners = tuple(key for key in item.owners if key != removed.id)
     if item.parent != removed.id:

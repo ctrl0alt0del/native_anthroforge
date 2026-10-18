@@ -41,6 +41,6 @@ std::vector<Route> handoff(std::vector<Route> routes,const Input& input,World& w
     while(edge_count(routes)>budget) if(!remove_corner(routes,plan)) return {};
     const auto allocation=allocate_edges(lengths(routes),budget); int cursor=0;
     for(auto& route:routes) { check_cancel(input.cancel); route=subdivide(route,allocation,cursor); }
-    return routes;
+    return valid_handoff(routes,input,world)?routes:std::vector<Route>{};
 }
 }

@@ -469,3 +469,17 @@ mypy pass. The desktop check passes. Native warm support builds and both native 
 pass. Full gate follows this checkpoint. Still required: independent planner handoff
 validation, broader routing/warm parity and representative performance/geometry evidence,
 remaining binding/conversion cases, junctions, surfaces and all final release work.
+
+## Independent planner validation
+
+The complete development gate at 51f7ad7 passed with 706 tests, native checks,
+style checks, dependency validation and doctor. No interactive acceptance was performed.
+
+Planner handoff now receives the addon's separate static clearance check after
+corner-preserving resampling. Native contact intervals walk both directions along
+the path, including closed wrapping and overlapping owner exemptions. The check
+tests non-exempt nodes for containment and remaining edge fragments for clearance;
+rejected handoffs leave the solver's direct-reference attempt intact.
+All three native contracts and 11 routing/parity/workflow tests pass. Changed-native
+style passes. Broader anatomical/warm qualification and the remaining 0.2.0 workflow
+remain required; version is still 0.1.9.

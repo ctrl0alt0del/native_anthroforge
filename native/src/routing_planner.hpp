@@ -38,5 +38,6 @@ Route sampled(const Route& points,int count);
 Route bounds_shell(const kernel::Bounds& bounds,double padding,bool dense);
 Route resample(const Route& points,int count);
 std::vector<Route> handoff(std::vector<Route> routes,const Input& input,World& world);
+bool valid_handoff(const std::vector<Route>& routes,const Input& input,World& world);
 void prepare_routes(const Input& input,World& world,const Reference& reference,std::vector<Span>& spans);
 }

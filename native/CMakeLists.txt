@@ -10,6 +10,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/routing_planner.cpp src/routing_candidates.cpp src/routing_surface.cpp src/routing_handoff.cpp
     src/routing_mesh_surface.cpp src/routing_shells.cpp src/routing_access.cpp src/routing_roadmap.cpp
     src/routing_random.cpp src/routing_pin_tree.cpp src/routing_pin_growth.cpp
+    src/path_contacts.cpp src/routing_clearance.cpp
     src/routing_pin_graph.cpp src/routing_pin_recovery.cpp src/routing_search.cpp src/routing_warm.cpp)
 
 add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
@@ -39,5 +40,8 @@ if(BUILD_TESTING)
     target_compile_definitions(af_routing_tests PRIVATE NOMINMAX)
     add_test(NAME native_routing_tree COMMAND af_routing_tests
         "${CMAKE_CURRENT_SOURCE_DIR}/tests/fixtures/pin_tree.txt")
+    add_executable(af_contact_tests tests/path_contacts_test.cpp src/path_contacts.cpp)
+    target_include_directories(af_contact_tests PRIVATE src)
+    add_test(NAME native_path_contacts COMMAND af_contact_tests)
 endif()
 

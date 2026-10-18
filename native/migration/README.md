@@ -27,7 +27,7 @@ and the unchanged migration kernel's `af_surface_frame`. Batched input avoids sy
 SCPs and per-point Python numerical queries. Bindings retain canonical triangle vertices,
 barycentric coordinates and frame offsets; ordinary resolution never selects a new parent.
 
-## Production routing kernel closure (integration in progress)
+## Production routing kernel closure
 
 `routing/sources.json` pins the production addon's numerical headers and the collision
 portion of `af_fiber_ccd.cpp` by source hashes and exact line ranges. Reproduce with
@@ -43,14 +43,28 @@ path correspondence and output preparation. Planner preparation ports
 `core/vcp/v2/planner.py` and its production session helpers, including sparse/dense/expanded,
 pin-exit and warm recovery plus the separate handoff clearance check. A pinned 1050-node
 pin-tree fixture checks its graph and thirteen paths; compact end-to-end cases remain
-separate evidence. Broader anatomical and warm-path qualification is still required.
+separate evidence. Warm continuation remapping ports `core/vcp/v3/warm.py`: each previous
+authored span is arc-length resampled to the newly allocated pin interval, then pins are
+restored exactly. Authored point identities, closure and binding parents gate compatibility.
+Six donor-generated cases cover open/closed curves and 24/32/48 samples after anchor motion;
+both remapping and resulting solves agree to absolute 1e-10.
 
 `tests/fixtures/routing/addon.json` contains compact actual addon outputs and loaded-source
 hashes. The four current cases cover clear open/closed paths and a cube detour/bound route.
-They match the standalone numerical output to absolute 1e-10. This does not establish
-production anatomical, full planner, GUI or release acceptance. Capture through
+They match the standalone numerical output to absolute 1e-10. Capture through
 `tools/capture_routing_reference.py ADDON_PATH OUTPUT_PATH` without Blender/desktop input.
-# Accepted authored-fiber collision checks
+
+`tests/fixtures/routing/skull.json` additionally pins four evaluated SCP meshes from the
+original `skull_muscles.blend` (9,158 vertices), explicit endpoint choices from four saved
+fiber paths, nearest-parent choices and actual addon cold/warm solve outputs. Blender/file
+and loaded-addon source hashes are included. Saved BAKE paths supply endpoints, not expected
+solver output. These four cold/warm pairs match to absolute 1e-10. Extraction uses background
+factory-startup Blender and does not save or modify the source. Reproduce with
+`capture_skull_routing.py`, `skull_routing_qualification.py`, then
+`capture_skull_routing_reference.py`. These fixtures establish those cases, not unrestricted
+anatomical route correctness or complete release acceptance.
+
+## Accepted authored-fiber collision checks
 
 `path_collisions.cpp` uses the pinned routing collision-world, segment-triangle distance and
 closed-mesh containment kernels for read-only advisory checks. `routing_world.cpp` separates

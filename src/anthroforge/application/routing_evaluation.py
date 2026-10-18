@@ -25,9 +25,13 @@ def owners(item: Curve, surfaces: tuple[str, ...]) -> tuple[int, ...]:
 def warm_path(item: Curve, asset: PathAsset | None) -> Any:
     if asset is None or asset.authored.engine != "ROUTED":
         return None
-    before = tuple(point.id for point in asset.authored.points)
-    after = tuple(point.id for point in item.points)
+    before, after = warm_identity(asset.authored), warm_identity(item)
     return asset.path if before == after else None
+
+
+def warm_identity(item: Curve) -> tuple[Any, ...]:
+    bindings = tuple((b.point, b.target) for b in item.bindings) if isinstance(item, Fiber) else ()
+    return tuple(point.id for point in item.points), bindings, item.closed
 
 
 def evaluate(

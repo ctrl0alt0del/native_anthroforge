@@ -815,3 +815,29 @@ undo resolves their attachment field against the correct parent state. 19 focuse
 history, fiber and architecture tests, mypy (181 modules) and Ruff pass. New tests include
 queued/running input edits, cancel, undo/redo, deletion failure and historical pose validity.
 Full development gate and the release work above remain pending.
+
+### Full lifecycle gate and anatomical routing checkpoint
+
+At 9bb0cbb the complete gate passes: 852 pytest tests (9 existing Qt warnings), 3 native
+CTests, native style, Python types/style/function limits, PowerShell and native doctor.
+Log: `build/check-020-lifecycle.log`.
+
+Inspection found the warm-start adapter did not port the addon's per-span remapping. Six
+donor cases reproduced differences up to 0.45 model units when anchors or sample counts
+changed. Native warm continuation now resamples between corresponding authored pins;
+all six match the actual addon solve within absolute 1e-10. No Python numerical work was
+added. Compatibility also checks binding parent identities and closure.
+
+Read-only background extraction from the original skull captured four evaluated SCPs
+(9,158 vertices) and explicit endpoints from four saved BAKE paths. Fresh donor solves,
+not those baked paths, provide expected outputs. All four cold/warm pairs match to 1e-10.
+Source/file/Blender/addon hashes are pinned in the compact fixture. First native recorded
+calls measured 18–44 ms; this is exploratory timing, not a repeatable performance claim.
+
+The public API builds actual Fiber objects, previews/accepts routing conversion, removes
+the independent source curves, creates a common-contract scalp loft and saves successfully.
+Invisible D3D11 captures in `build/020-skull-scene` were inspected: paths follow the selected
+skull context; the loft interpolates between them and can be occluded by the curved skull
+(surface collision correction belongs to later volume work). 16 parity/architecture tests,
+native build/3 CTests, warm clang-tidy, mypy and Ruff pass. Repeated profiling/resource trials,
+remaining lifecycle review, documentation/examples and package qualification are next.

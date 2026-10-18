@@ -728,7 +728,20 @@
         "af_points_transform": 3006,
         "af_curve_handles": 3
       },
-      "completeness": null
+      "complete": true,
+      "storage": {
+        "received": 15054,
+        "retained": 15054,
+        "evicted": 0,
+        "oversized": 0,
+        "boundary_filtered": 0,
+        "owned_bytes": 6378829,
+        "byte_limit": 125829120,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 8388608
+      },
+      "losses": {}
     },
     "b1": {
       "native_calls": {
@@ -743,7 +756,20 @@
         "af_curve_cubics": 3,
         "af_points_transform": 3
       },
-      "completeness": null
+      "complete": true,
+      "storage": {
+        "received": 72,
+        "retained": 72,
+        "evicted": 0,
+        "oversized": 0,
+        "boundary_filtered": 0,
+        "owned_bytes": 30221,
+        "byte_limit": 125829120,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 8388608
+      },
+      "losses": {}
     },
     "b2": {
       "native_calls": {
@@ -758,7 +784,20 @@
         "af_curve_cubics": 3,
         "af_points_transform": 3
       },
-      "completeness": null
+      "complete": true,
+      "storage": {
+        "received": 72,
+        "retained": 72,
+        "evicted": 0,
+        "oversized": 0,
+        "boundary_filtered": 0,
+        "owned_bytes": 30132,
+        "byte_limit": 125829120,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 8388608
+      },
+      "losses": {}
     },
     "a2": {
       "native_calls": {
@@ -770,7 +809,20 @@
         "af_points_transform": 3006,
         "af_curve_handles": 3
       },
-      "completeness": null
+      "complete": true,
+      "storage": {
+        "received": 15054,
+        "retained": 15054,
+        "evicted": 0,
+        "oversized": 0,
+        "boundary_filtered": 0,
+        "owned_bytes": 6376004,
+        "byte_limit": 125829120,
+        "window_seconds": 120.0,
+        "owned_budget_bytes": 134217728,
+        "reserved_bytes": 8388608
+      },
+      "losses": {}
     }
   }
 }

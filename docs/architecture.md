@@ -35,6 +35,30 @@ excluded from UI and APIs.
   Numerical loops do not call Python per sample or iteration. Blender provenance and
   fixture limits are in native/migration/BLENDER_PRIMITIVES.md.
 
+Python is an application-layer choice, not a Blender requirement. The original stack
+decision retained it for command/authoring contracts, immutable document records,
+scheduling policy, persistence and PySide adapters. Qt Quick also supports C++ models;
+the headless API and AI integration do not intrinsically require Python. A full C++
+application core is possible, but is a separate migration of those responsibilities.
+
+The [native boundary audit](tasks/native-boundary-audit.md) checked current production
+Python, native adapters and migration provenance. Influence inversion/membership,
+display polyline/cage connectivity and cubic query preparation now run in native
+batches. Default unit influence is represented by a null weight buffer. Component
+editing groups world-to-local conversions by target frame, preserving selection order
+and applying document commands only after all coordinate conversion succeeds.
+Native callers retain buffer ownership through each call; nothing calls Python per
+geometry sample or numerical iteration. Numerical algorithm ports must retain that rule.
+
+Python still packs authored records/identities, applies document operations, validates
+input and constructs Qt presentation records. Scalar UI arithmetic and fixed-size input
+validation remain there. Those are not Blender algorithm fallbacks, but their allocation,
+conversion and notification costs are real: eliminating Python numerical loops does not
+establish a zero-overhead UI. Dense component presentation still materializes point
+records and must be evaluated separately using actual GUI reports. The algorithms for
+fibers, muscles, skin and warm-start fitting are not yet migrated into this release;
+addon Python optimization loops must be ported in full when their features migrate.
+
 ## Construction and dependency boundaries
 
 core/construction.py holds immutable Primitive, Curve, CurvePoint, BodyPiece, Control,

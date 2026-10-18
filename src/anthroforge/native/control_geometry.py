@@ -14,17 +14,13 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_curve_cubics", [D, c.c_int, c.c_int, D, D])
 
 
-def polylines(engine: GeometryEngine, points: Any, matrix: Any, closed=False, group=0) -> Any:
+def polylines(
+    engine: GeometryEngine, points: Any, matrix: Any, closed: bool = False, group: int = 0
+) -> Any:
     data, frame = doubles(points).reshape((-1, 3)), doubles(matrix)
     output = np.empty((2 * len(data), 3))
-    count = engine.library.af_polyline_lines(
-        pointer(data),
-        len(data),
-        group or max(1, len(data)),
-        closed,
-        pointer(frame),
-        pointer(output),
-    )
+    args = (pointer(data), len(data), group or max(1, len(data)), closed)
+    count = engine.library.af_polyline_lines(*args, pointer(frame), pointer(output))
     engine.check(count < 0)
     return output[:count]
 

@@ -34,7 +34,13 @@ Added native influence evaluation (default influence requires no allocated weigh
 array), display polyline/cage connectivity and cubic query packing. Grouped selected
 point conversion by target frame while preserving input order and command semantics.
 Native construction/Blender parity tests pass (143); focused preparation, curve-query,
-gesture and architecture tests pass (55). Full gate/GUI/package still pending.
+gesture and architecture tests pass (55). The development gate passes with 487 tests,
+native build/CTest/style, mypy, formatting/lint, numerical dependencies and native doctor.
+The first gate caught a missing new adapter parameter annotation, now fixed. Existing
+QQmlPropertyMap constructor deprecation warnings remain isolated to that adapter.
+GUI primitive creation/editing, imported-vertex weights, base Hooks, insertion/snapping,
+selection, undo and camera gesture acceptance pass without QML warnings. Runtime
+profiler gesture qualification and portable packaging are still pending.
 
 Serial ABBA, 25 unrecorded calls per case per leg, identical rounded output hashes:
 
@@ -50,6 +56,41 @@ The last experiment intercepts command publication to isolate preparation; it do
 not establish full multi-point gesture speed. Each leg also exports an ordinary
 runtime report; [compact evidence](native-boundary-audit-evidence.json) records timings,
 output checksums and native calls. Source snapshots/reports remain local ignored data.
+
+## Audit coverage and remaining Python
+
+Inspected production Python arithmetic/array operations and loops, the native ABI and
+its callers, addon attachment-kernel provenance, Blender primitive provenance, and
+the original stack decision. Existing native owners cover mesh import/triangulation,
+bounds/BVH/normals/render buffers, attachment capture/propagation, matrices and point
+transforms, Bézier handles/sampling/frames/subdivision/nearest queries, lofts/bodies,
+curve deformation, Hooks, custom falloff, lattices/resizing, and Simple Solidify.
+There is no standalone Python solver, optimizer iteration or Blender API fallback.
+
+Remaining Python array work is authored-record packing, stride/column layout conversion,
+mode-flag normalization, validation, and serialization. Document dependency traversal,
+reference/membership identity mapping, command edits, scheduler state and UI projection
+are application logic. Fixed-size arithmetic remains for 3D UI offsets, fitted bounds,
+TRS values and matrix validity. Moving each scalar operation to a separate native call
+would not create useful batching. Per-point Qt records and multiple document updates
+are still a potential scaling cost; this task does not claim those costs are eliminated.
+
+The original choice of Python was reuse of application/authoring contracts and development
+convenience. Neither Qt, headless execution nor AI requires it. The current geometry
+engine is usable without Python through its C ABI; the document/command application
+core is still Python. A full C++ document/UI backend would require migrating those
+contracts and their persistence/history/scheduling behavior, not just replacing kernels.
+
+Later anatomy algorithms have not been copied into the standalone yet. In particular,
+the addon's `core/warm_start/arap.py` still has a Python optimization loop; that is future
+migration work, not an algorithm currently executed by this application. Its entire
+retained loop must become C++, consistent with the existing engineering rules.
+
+Official references: [Qt C++ models](https://doc.qt.io/qt-6/qtquick-modelviewsdata-cppmodels.html),
+[Qt performance guidance](https://doc.qt.io/qt-6.12/qtquick-performance.html),
+[ctypes native calls](https://docs.python.org/3.12/library/ctypes.html).
+CDLL releases the GIL during native calls; Python preparation still has its own cost,
+and a synchronous native call still occupies the calling UI thread.
 
 ## Acceptance and next actions
 

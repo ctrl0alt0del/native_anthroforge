@@ -18,6 +18,7 @@ ApplicationWindow {
     property string replacementPath: ""
     property bool closingConfirmed: false
     property bool activityOpen: false
+    property bool issuesOpen: false
     property string activeTool: "Move"
     readonly property bool typing: keyboard.typing
     readonly property bool modalOpen: importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
@@ -46,7 +47,7 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 10; spacing: 10
                 Label { text: "ANTHROFORGE"; font.bold: true; font.pixelSize: 12; font.letterSpacing: 1; color: Theme.text }
-                Label { text: "0.1.5"; color: Theme.accent; font.pixelSize: 10 }
+                Label { text: "0.1.6"; color: Theme.accent; font.pixelSize: 10 }
                 MenuBar {
                     background: Item {}
                     Menu { title: "File"; MenuItem { action: newAction } MenuItem { action: openAction } MenuSeparator {} MenuItem { action: saveAction } MenuItem { action: saveAsAction } MenuSeparator {} MenuItem { action: importAction } }
@@ -62,6 +63,7 @@ ApplicationWindow {
                         MenuItem { text: "Attachment markers"; checkable: true; checked: workspace.state.anchors; onTriggered: workspace.run("workspace.update",{anchors:checked}) }
                         MenuItem { text: "Performance diagnostics"; checkable: true; checked: workspace.state.diagnostics; onTriggered: workspace.run("workspace.update",{diagnostics:checked}) }
                         MenuItem { text: "Activity panel"; checkable: true; checked: window.activityOpen; onTriggered: window.activityOpen = checked }
+                        MenuItem { text: "Issues panel"; checkable: true; checked: window.issuesOpen; onTriggered: { window.issuesOpen = checked; if(checked) window.activityOpen = false; } }
                         MenuSeparator {}
                         MenuItem { text: (performance.state.recording ? "Stop recording" : "Record performance") + "    " + keyboard.shortcut("recordPerformance"); onTriggered: performance.toggle() }
                     }
@@ -128,12 +130,14 @@ ApplicationWindow {
                 Layout.fillWidth: true; implicitHeight: 30; color: Theme.header
                 RowLayout {
                     anchors.fill: parent; anchors.leftMargin: 7; anchors.rightMargin: 8
-                    UiButton { objectName: "activityToggle"; flatStyle: true; text: (window.activityOpen ? "▾" : "▸") + "  Activity"; onClicked: window.activityOpen = !window.activityOpen }
+                    UiButton { objectName: "activityToggle"; flatStyle: true; text: (window.activityOpen ? "▾" : "▸") + "  Activity"; onClicked: { window.activityOpen = !window.activityOpen; if(window.activityOpen) window.issuesOpen = false; } }
+                    UiButton { objectName: "issuesToggle"; flatStyle: true; text: (window.issuesOpen ? "▾" : "▸") + "  Issues ("+(workspace.issuePanel.state.count || 0)+")"; hint: workspace.issuePanel.state.summary || "Issue reporting"; onClicked: { window.issuesOpen = !window.issuesOpen; if(window.issuesOpen) window.activityOpen = false; } }
                     Label { text: window.activeJobCount ? window.activeJobCount + " jobs in progress" : window.jobFailed ? "A calculation failed · open Activity" : "Up to date"; color: window.jobFailed ? Theme.danger : window.activeJobCount ? Theme.accent : Theme.muted; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
                     Label { text: workspace.treeRows.length + " objects · metres"; color: Theme.muted; font.pixelSize: 11 }
                 }
             }
             Rectangle { Layout.fillWidth: true; implicitHeight: window.activityOpen ? 160 : 0; visible: window.activityOpen; color: Theme.panel; Activity { anchors.fill: parent; anchors.margins: 10 } }
+            Rectangle { Layout.fillWidth: true; implicitHeight: window.issuesOpen ? 290 : 0; visible: window.issuesOpen; color: Theme.panel; Issues { anchors.fill: parent; anchors.margins: 10 } }
         }
         Rectangle {
             SplitView.preferredWidth: 310; SplitView.minimumWidth: 280; SplitView.maximumWidth: 500

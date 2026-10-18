@@ -29,5 +29,15 @@ def finish(app, engine, screenshot: str | None, warnings: list[str]) -> None:
     app.exit(0 if valid else 1)
 
 
-def schedule(app, engine, screenshot: str | None, warnings: list[str]) -> None:
+def schedule(
+    app, engine, screenshot: str | None, warnings: list[str], panel="", controller=None
+) -> None:
+    if panel:
+        QTimer.singleShot(500, lambda: show_panel(engine.rootObjects()[0], controller, panel))
     QTimer.singleShot(2000, lambda: finish(app, engine, screenshot, warnings))
+
+
+def show_panel(window, controller, panel):
+    window.setProperty(panel + "Open", True)
+    if panel == "issues" and controller.issue_panel.model.rows:
+        controller.issue_panel.selectIssue(controller.issue_panel.model.rows[0]["issueId"])

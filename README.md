@@ -1,4 +1,4 @@
-# AnthroForge 0.1.5
+# AnthroForge 0.1.6
 
 A standalone SCP and primitive editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
@@ -8,7 +8,12 @@ Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.
 
-0.1.5 updates Activity incrementally: job rows retain their identity, changed fields
+0.1.6 adds the [Issues panel and shared issue API](docs/issues.md): current SCP/control
+checks, dependency and calculation failures, stale evidence, filtering, dismissal,
+target navigation and explicit verified recalculation/retry. Checks remain read-only
+and do not block saving or change undo history.
+
+Activity updates incrementally: job rows retain their identity, changed fields
 update without rebuilding the list, and the header uses separate status summaries.
 Cancel/Retry, errors, target names, diagnostics and the latest 40 jobs remain available.
 
@@ -66,5 +71,5 @@ the [stack analysis](standalone_technology_stack_analysis.md) records the techno
 
 Application source is GPL-3.0-or-later. Third-party code retains its own licenses;
 see [notices](licenses/THIRD_PARTY.md) and [native provenance](native/vendor/PROVENANCE.md).
-The original Blender addon is a migration reference and is not required to run 0.1.2.
+The original Blender addon is a migration reference and is not required at runtime.
 The unrelated pre-existing root __init__.py is preserved outside the standalone package.

@@ -1,4 +1,4 @@
-# Local authoring API, version 0.1.5
+# Local authoring API, version 0.1.6
 
 The desktop and JSON clients call application/commands.py. A request has operation,
 arguments (an object) and optionally id. Success responses contain ok, revision and
@@ -71,7 +71,7 @@ Presentation camera angles are degrees. Setting a workspace does not remove enti
 relations from the document. Its outside entities are read-only for authoring commands.
 
 save requires an explicit policy even if no calculation is running:
-wait drains calculations; checkpoint saves the historical committed revision when blocked;
+wait drains document-writing calculations; checkpoint saves the historical committed revision when blocked;
 pending reports that saving is blocked without writing. Read-only background work does
 not block commitment. A failed calculation is terminal and its failed state can be saved.
 
@@ -79,6 +79,36 @@ Use begin/update/commit for a drag-like sequence. A single editing command impli
 creates one transaction. Manual mode needs evaluate. Do not infer calculation completion
 from a returned job ID: use wait or inspect jobs. File inspection and revision-matched GPU
 capture also have process-level CLI commands documented in quickstart.md.
+
+## Issue reporting operations
+
+All operations use the session issue system; numerical headless use initializes no Qt.
+See [component responsibilities and coverage](issues.md) and the executable
+[JSON example](../examples/issues.json). Rechecking never repairs or changes undo state.
+
+| Operation | Arguments | Result/meaning |
+| --- | --- | --- |
+| issues.list | optional filters={}, text="", offset=0, limit=100, include_dismissed=false | Paginated records and whole-document check coverage; maximum page size 200 |
+| issues.status | none | Repository revision, issue/dismissal counts, check states, complete and clean flags |
+| issues.get | identity | Finding, immutable evidence, source identity, target/related IDs, freshness |
+| issues.recheck | optional provider | Request a fresh check from one/all available providers |
+| issues.cancel | optional provider | Cancel queued/running diagnostic checks; retained evidence becomes stale |
+| issues.dismiss | identity, optional dismissed=true | Hide current finding; false restores it |
+| issues.fixes | identity | Applicable explicit repair names/labels; empty when stale or read-only |
+| issues.fix | identity, name | Start registered repair; result is not proof of resolution |
+| issues.repairs | none | REQUESTED/VERIFYING/DONE/FAILED/CANCELLED/UNRESOLVED records |
+| issues.cancel_fix | identity | Request safe cancellation of a repair's submitted jobs |
+
+Filters are provider, scope, target, kind, stage, severity and code. Invalid filters
+are rejected. Status/coverage is global even when the returned rows are filtered.
+Use `wait` to finish queued checks and repairs, then query again. A check can finish
+successfully while reporting a defect. Failed checks retain earlier evidence with
+`freshness=stale`; an empty filtered page is not a clean certificate. Dismissals and
+check records are session state and reset on opening a document or navigating history.
+Built-in providers are evaluation.v1, dependencies.v1 and the direct lifecycle
+producer tasks.v1. Only asynchronous detectors can be cancelled. Registration ports
+for Python integrations are `session.issues.listening.register(Provider(...))`,
+`session.issues.reporting.report(Issue(...))`, and `session.issues.resolution.register(Solver(...))`.
 
 ## Primitive and shared-control operations
 

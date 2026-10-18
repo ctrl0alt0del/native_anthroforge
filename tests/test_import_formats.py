@@ -58,7 +58,7 @@ def test_triangulation_preserves_outward_winding(session):
 def test_bad_mesh_never_creates_scp(session, tmp_path, face):
     path = tmp_path / "invalid.obj"
     path.write_text("v 0 0 0\nv 1 1 0\nv 0 1 0\nv 1 0 0\nf " + face)
-    session.command("import", path=str(path), units=1)
+    result = session.command("import", path=str(path), units=1)
     session.command("wait")
     assert not session.document.entities
-    assert session.scheduler.jobs[-1].state == "failed"
+    assert session.scheduler.registry.by_id[result["job_id"]].state == "failed"

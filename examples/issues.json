@@ -1,0 +1,14 @@
+[
+  {"id":"body","operation":"primitive.create","arguments":{"kind":"BODY","name":"Issue reporting example"}},
+  {"operation":"wait","arguments":{}},
+  {"operation":"update_mode","arguments":{"mode":"MANUAL"}},
+  {"operation":"primitive.update","arguments":{"entity":"$body","samples":40}},
+  {"operation":"wait","arguments":{}},
+  {"id":"pending","operation":"issues.list","arguments":{"filters":{"code":"OUTPUT_PENDING"}}},
+  {"operation":"save","arguments":{"path":"issues-pending.anthroforge","blocked_policy":"wait"}},
+  {"operation":"issues.fixes","arguments":{"identity":"$pending.records.0.id"}},
+  {"operation":"issues.fix","arguments":{"identity":"$pending.records.0.id","name":"evaluate"}},
+  {"operation":"wait","arguments":{}},
+  {"id":"repairs","operation":"issues.repairs","arguments":{}},
+  {"id":"final","operation":"issues.list","arguments":{}}
+]

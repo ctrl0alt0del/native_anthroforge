@@ -37,9 +37,14 @@ class Session:
         self.replay_callback: Any = None
 
     def initialize_runtime(self, profiler: RuntimeProfiler | None) -> None:
+        from .issues.repairs import register
+        from .issues.system import IssueSystem
+
         self.owns_profiler = profiler is None
         self.profiler = profiler if profiler is not None else RuntimeProfiler()
         self.initialize_scheduler()
+        self.issues = IssueSystem(self)
+        register(self)
 
     @property
     def document(self) -> Document:
@@ -54,6 +59,8 @@ class Session:
         self.scheduler = TaskCoordinator(lambda: self.document)
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
+        if hasattr(self, "issues"):
+            self.issues.reset()
 
     @property
     def engine(self) -> GeometryEngine:
@@ -120,6 +127,7 @@ class Session:
         self.document = replace(self.history.cancel(), workspaces=self.document.workspaces)
         self.scheduler.restore(self.history.surviving())
         self.replay_callback = None
+        self.issues.reset()
         self.resume_calculations()
 
     @measured("transaction", lambda session: session.profiler)
@@ -131,6 +139,7 @@ class Session:
         self.remember_restarts(self.scheduler.restore(self.history.surviving()))
         changed = changed_ids(previous, self.document)
         self.scheduler.invalidate(changed)
+        self.issues.reset()
         if direction > 0:
             self.history.replay()
         self.resume_calculations()
@@ -192,6 +201,7 @@ class Session:
         }
 
     def close(self) -> None:
+        self.issues.close()
         self.scheduler.close()
         if self._engine is not None:
             self.profiler.native.detach(self._engine)

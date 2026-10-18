@@ -35,6 +35,8 @@ class TaskCoordinator:
         self._initialize_scheduling(clock)
 
     def _initialize_scheduling(self, clock: Callable[[], float]) -> None:
+        self.service_tick: Callable[[], None] = lambda: None
+        self.lifecycle: Callable[[Job, str], None] = lambda job, phase: None
         self.profiler: Any = None
         self.metrics = Metrics()
         self.task_schedulers = task_schedulers()
@@ -62,6 +64,7 @@ class TaskCoordinator:
         job.origin, job.epoch = self.current().revision, self.epoch
         job.queued_since = self.clock() if job.queued_since is None else job.queued_since
         self.registry.add(job)
+        self.lifecycle(job, "submitted")
         trace.event(self.profiler, job, "queued")
         self._admit(job)
         self._checkpoint()
@@ -188,10 +191,12 @@ class TaskCoordinator:
         return removed
 
     def tick(self) -> None:
+        self.service_tick()
         for job in self.active_jobs:
             if self._finishable(job):
                 self._finish(job)
         self._dispatch()
+        self.service_tick()
         self._checkpoint()
 
     def _finishable(self, job: Job) -> bool:
@@ -284,6 +289,7 @@ class TaskCoordinator:
         self._cleanup(job, state)
         self.task_schedulers[job.kind].observe(job)
         trace.event(self.profiler, job, job.state)
+        self.lifecycle(job, "terminal")
         self.registry.finish(job)
 
     def _cleanup(self, job: Job, state: str) -> None:
@@ -304,15 +310,17 @@ class TaskCoordinator:
         elif not self.blocked:
             self.checkpoint = self.current()
 
-    def wait(self, timeout: float | None = None) -> None:
+    def wait(self, timeout: float | None = None, writes_only: bool = False) -> None:
         started = monotonic()
-        while self.registry.active:
+        self.tick()
+        while self.blocked if writes_only else self.registry.active:
             self.tick()
             if timeout is not None and monotonic() - started >= timeout:
                 raise TimeoutError("Calculations are still pending.")
             sleep(0.002)
 
     def close(self) -> None:
+        self.service_tick = lambda: None
         for job in self.active_jobs:
             if job.active:
                 self.cancel_job(job.id)

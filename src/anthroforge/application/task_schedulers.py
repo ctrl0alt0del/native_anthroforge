@@ -121,6 +121,13 @@ class ControlAttachmentTaskScheduler(AttachmentTaskScheduler):
         )
 
 
+class IssueTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.1 + 0.005 * workload.affected
+        delay = 0.0 if workload.affected < 64 else min(150.0, max(25.0, cost * 2))
+        return Schedule("worker", cost, delay, 150.0, "Read-only advisory checks after editing")
+
+
 def task_schedulers() -> dict[str, TaskScheduler]:
     return {
         "generic": MeasuredTaskScheduler(),
@@ -130,4 +137,5 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
         "control_attachments": ControlAttachmentTaskScheduler(),
+        "issue_check": IssueTaskScheduler(),
     }

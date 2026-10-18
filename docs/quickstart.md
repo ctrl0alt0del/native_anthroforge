@@ -1,4 +1,4 @@
-# AnthroForge 0.1.5 quick start
+# AnthroForge 0.1.6 quick start
 
 The Activity panel retains its job rows while status and elapsed time update. It shows
 the latest 40 jobs, newest first; Cancel and Retry continue to act on the named job.
@@ -205,6 +205,18 @@ targets within the gesture and resets when the gesture finishes or is canceled.
 Curves are purple, control points gold, and handle points/links blue. Selected and hovered
 components retain their type colors with larger markers. The help menu lists the defaults;
 modifier choices are owned by the keyboard manager, alongside existing shortcut bindings.
+
+## Inspecting issues
+
+Open **Issues** below the viewport. Select a finding for its evidence and related
+objects; **Select target** and **Frame target** help locate it. Filter by text or
+severity. **Dismiss** hides only the current source revision; **Dismissed** allows
+restoring it. **Recheck** detects problems without editing geometry.
+
+An available **Recalculate target** or **Retry calculation** action is explicit and
+requires a fresh verification before being marked resolved. Check failures retain
+old findings as stale. “No findings in available checks” is not a general geometry
+or anatomical certificate. See [issue reporting](issues.md) for coverage and APIs.
 
 ## Recording a slowdown
 

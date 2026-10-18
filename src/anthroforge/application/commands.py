@@ -55,6 +55,10 @@ EDITS = {
 
 
 def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    if operation.startswith("issues."):
+        from .issues.commands import execute as issue_command
+
+        return issue_command(session, operation, arguments)
     if operation in EDITS:
         return edit(session, operation, arguments)
     direct = direct_commands(session)

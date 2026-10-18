@@ -1,0 +1,262 @@
+{
+  "scope": "Cube plus curve-body, 100 normal/snapped drag events per trial, Issues closed/open/open/closed, runtime recording; projection fixed at 300 pixels/metre to keep the same drag path on the cube after panel resize",
+  "limitations": "Recording perturbs timings; no claim of physical display latency or zero overhead; initial run with resized viewport let the fixed pixel path leave the cube and is excluded",
+  "trials": [
+    {
+      "issues_open": false,
+      "snapped": false,
+      "report": "20261018-020740-0d64cba1.afprofile.zip",
+      "sha256": "87d60c66b12d979520b769828a07fb0aec5ef5630d134e182d8d7bb085c20fa9",
+      "complete": true,
+      "input": {
+        "count": 89,
+        "inclusive_total_us": 580990.4999999999,
+        "mean_us": 6527.983146067414,
+        "max_us": 36231,
+        "p50_upper_us": 6048.079893768189,
+        "p95_upper_us": 18656.912991853635
+      },
+      "tick": {
+        "count": 78,
+        "inclusive_total_us": 56288.20000457764,
+        "mean_us": 721.6435898022773,
+        "max_us": 8902.700004577637,
+        "p50_upper_us": 468.50607012079166,
+        "p95_upper_us": 2331.2391239817043
+      },
+      "frames": {
+        "count": 68,
+        "inclusive_total_us": 1320997.2000045776,
+        "mean_us": 19426.429411832025,
+        "max_us": 48756.69999694824,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 35732.757383975164
+      },
+      "issue_model_events": 0
+    },
+    {
+      "issues_open": false,
+      "snapped": true,
+      "report": "20261018-020744-aaf813f1.afprofile.zip",
+      "sha256": "84fb11f876007341d05780ab4fda9ed62ce1f19fb81d87b1818a46becfc0ea3d",
+      "complete": true,
+      "input": {
+        "count": 89,
+        "inclusive_total_us": 604617.0,
+        "mean_us": 6793.449438202248,
+        "max_us": 32521.2,
+        "p50_upper_us": 6315.895540870925,
+        "p95_upper_us": 22187.12288101405
+      },
+      "tick": {
+        "count": 76,
+        "inclusive_total_us": 55363.59999847412,
+        "mean_us": 728.4684210325543,
+        "max_us": 9750.599998474121,
+        "p50_upper_us": 511.0,
+        "p95_upper_us": 2331.2391239817043
+      },
+      "frames": {
+        "count": 63,
+        "inclusive_total_us": 1295753.7000045776,
+        "mean_us": 20567.51904769171,
+        "max_us": 44305.79999542236,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 38966.93874440916
+      },
+      "issue_model_events": 0
+    },
+    {
+      "issues_open": true,
+      "snapped": false,
+      "report": "20261018-020748-d8071451.afprofile.zip",
+      "sha256": "083d3d1c8f55aedc5bf98af1eda78a49762e93b6e13114c019eaca8bbf2b2bc6",
+      "complete": true,
+      "input": {
+        "count": 89,
+        "inclusive_total_us": 567072.9000000001,
+        "mean_us": 6371.60561797753,
+        "max_us": 39101.9,
+        "p50_upper_us": 5791.618751480198,
+        "p95_upper_us": 16383.0
+      },
+      "tick": {
+        "count": 75,
+        "inclusive_total_us": 59899.60001373291,
+        "mean_us": 798.6613335164388,
+        "max_us": 23183.40000152588,
+        "p50_upper_us": 429.5389646099018,
+        "p95_upper_us": 1960.171518870679
+      },
+      "frames": {
+        "count": 68,
+        "inclusive_total_us": 1287467.7000045776,
+        "mean_us": 18933.348529479084,
+        "max_us": 55226.0,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 34217.763302581494
+      },
+      "issue_model_events": 0
+    },
+    {
+      "issues_open": true,
+      "snapped": true,
+      "report": "20261018-020753-5b41375d.afprofile.zip",
+      "sha256": "ac2c1f787eb81ff327e67d553e01aeaf0daa452f48d28a63a02bd726f5a34112",
+      "complete": true,
+      "input": {
+        "count": 89,
+        "inclusive_total_us": 603968.1000000001,
+        "mean_us": 6786.1584269662935,
+        "max_us": 35324.8,
+        "p50_upper_us": 6048.079893768189,
+        "p95_upper_us": 14386.21769777807
+      },
+      "tick": {
+        "count": 77,
+        "inclusive_total_us": 44830.70001220703,
+        "mean_us": 582.216883275416,
+        "max_us": 2671.599998474121,
+        "p50_upper_us": 489.29287971766973,
+        "p95_upper_us": 2047.0
+      },
+      "frames": {
+        "count": 70,
+        "inclusive_total_us": 1301232.2999954224,
+        "mean_us": 18589.03285707746,
+        "max_us": 66553.80000305176,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 40692.196786023924
+      },
+      "issue_model_events": 0
+    },
+    {
+      "issues_open": true,
+      "snapped": false,
+      "report": "20261018-020758-bdb6716e.afprofile.zip",
+      "sha256": "dc8b585382812016e7b4dc23f40d4bdce2a881c126e8813786004bc311bee3da",
+      "complete": true,
+      "input": {
+        "count": 89,
+        "inclusive_total_us": 594472.6000000001,
+        "mean_us": 6679.467415730338,
+        "max_us": 29563.8,
+        "p50_upper_us": 6595.5683996641455,
+        "p95_upper_us": 11093.061440507025
+      },
+      "tick": {
+        "count": 81,
+        "inclusive_total_us": 102946.39999389648,
+        "mean_us": 1270.9432098011912,
+        "max_us": 12576.599998474121,
+        "p50_upper_us": 511.0,
+        "p95_upper_us": 6887.623433758429
+      },
+      "frames": {
+        "count": 69,
+        "inclusive_total_us": 1353639.0,
+        "mean_us": 19617.956521739132,
+        "max_us": 52093.0,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 38966.93874440916
+      },
+      "issue_model_events": 0
+    },
+    {
+      "issues_open": true,
+      "snapped": true,
+      "report": "20261018-020802-d403ad70.afprofile.zip",
+      "sha256": "17795bc256525f2231a5f86049bc5d135c71c839a6d3ffe28196d5327b2fe793",
+      "complete": true,
+      "input": {
+        "count": 89,
+        "inclusive_total_us": 621295.5,
+        "mean_us": 6980.848314606742,
+        "max_us": 40546.5,
+        "p50_upper_us": 6595.5683996641455,
+        "p95_upper_us": 19482.96937220458
+      },
+      "tick": {
+        "count": 78,
+        "inclusive_total_us": 71488.69998931885,
+        "mean_us": 916.521794734857,
+        "max_us": 7849.5,
+        "p50_upper_us": 489.29287971766973,
+        "p95_upper_us": 5546.030720253512
+      },
+      "frames": {
+        "count": 70,
+        "inclusive_total_us": 1306667.6999969482,
+        "mean_us": 18666.68142852783,
+        "max_us": 58218.90000152588,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 37314.82598370727
+      },
+      "issue_model_events": 0
+    },
+    {
+      "issues_open": false,
+      "snapped": false,
+      "report": "20261018-020808-fc327296.afprofile.zip",
+      "sha256": "9a3ba19850a517debfcd0d49baf0dbddb150d93d05e88a3d52a33118e40b4749",
+      "complete": true,
+      "input": {
+        "count": 89,
+        "inclusive_total_us": 564615.0000000002,
+        "mean_us": 6343.988764044946,
+        "max_us": 27944.7,
+        "p50_upper_us": 6048.079893768189,
+        "p95_upper_us": 12097.159787536379
+      },
+      "tick": {
+        "count": 80,
+        "inclusive_total_us": 78608.89999389648,
+        "mean_us": 982.611249923706,
+        "max_us": 9787.599998474121,
+        "p50_upper_us": 489.29287971766973,
+        "p95_upper_us": 4465.7196729968955
+      },
+      "frames": {
+        "count": 69,
+        "inclusive_total_us": 1354153.4000015259,
+        "mean_us": 19625.411594225014,
+        "max_us": 54645.90000152588,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 37314.82598370727
+      },
+      "issue_model_events": 0
+    },
+    {
+      "issues_open": false,
+      "snapped": true,
+      "report": "20261018-020812-ffbdf491.afprofile.zip",
+      "sha256": "a3c71b5bdaf2f26a6be11e534acbc198d93817d4e94b11c9cbae50585f6df86d",
+      "complete": true,
+      "input": {
+        "count": 89,
+        "inclusive_total_us": 639994.0,
+        "mean_us": 7190.943820224719,
+        "max_us": 31658.9,
+        "p50_upper_us": 6315.895540870925,
+        "p95_upper_us": 20345.598393011962
+      },
+      "tick": {
+        "count": 80,
+        "inclusive_total_us": 64518.99996948242,
+        "mean_us": 806.4874996185303,
+        "max_us": 9722.799995422363,
+        "p50_upper_us": 511.0,
+        "p95_upper_us": 2232.3598364984477
+      },
+      "frames": {
+        "count": 68,
+        "inclusive_total_us": 1301698.2000045776,
+        "mean_us": 19142.620588302612,
+        "max_us": 44058.90000152588,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 42493.838526804284
+      },
+      "issue_model_events": 0
+    }
+  ]
+}

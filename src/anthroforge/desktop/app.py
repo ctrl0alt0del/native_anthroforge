@@ -18,6 +18,7 @@ from anthroforge.desktop.runtime import build_directory, native_runtime
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="anthroforge-desktop")
     parser.add_argument("--smoke-test", action="store_true")
+    parser.add_argument("--smoke-panel", choices=("activity", "issues"), default="")
     parser.add_argument("--screenshot")
     parser.add_argument("--project")
     parser.add_argument("--disable-profiling-support", action="store_true")
@@ -74,7 +75,7 @@ def launch(args: argparse.Namespace, app: QGuiApplication, profiler=None) -> int
 
 def schedule_diagnostics(args, app, engine, controller, warnings):
     if args.smoke_test:
-        smoke.schedule(app, engine, args.screenshot, warnings)
+        smoke.schedule(app, engine, args.screenshot, warnings, args.smoke_panel, controller)
     if args.profile_probe:
         from .profile_probe import ProfileProbe
 

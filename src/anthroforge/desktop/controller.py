@@ -222,6 +222,12 @@ class Controller(QObject):
 
         surface(self, kind)
 
+    @Slot(str, str, result="QVariantMap")
+    def surfaceOptions(self, target, boundary):
+        from .surface_tools import choices
+
+        return choices(self, target, boundary)
+
     @Slot(result="QVariantList")
     def anatomicalSurfaces(self):
         from anthroforge.core.results import geometry_asset

@@ -686,3 +686,22 @@ and round-trip editable branch identities. Application tests cover creation/undo
 shared edits, deletion and save/reopen. 16 native/workflow/architecture checks and configured
 mypy pass. Desktop branch controls, invisible visual qualification, source-list edits,
 branched-source independence and the previously recorded release work remain pending.
+
+### Branch desktop and independent assembly
+
+The Surface inspector now offers collapsed branch choices derived from explicit junctions,
+ordered root selection, removal, undo and a clearly labelled Make assembly independent.
+Connected surface sources copy together with new point/junction identities; moving originals
+leaves the detached surface unchanged. Schema decoding now restores immutable branch tuples,
+and a complete Surface-record roundtrip test passes.
+
+Full-QML offscreen branch add/remove/undo/independence passes without warnings. Invisible
+D3D11 captures `build/020-branch-scene/branch.png` and `edited-branch.png` were inspected;
+the seam remains connected before and after a shared point edit. Displayed mesh/picking
+revision changes atomically and obsolete viewport leases release. This is texture/offscreen
+evidence, not interactive acceptance. 23 focused tests, mypy (174 modules) and Ruff pass.
+
+Next: broader gate; surface source-list edits/closed-layout preview, shared authored-job
+historical result provenance, per-consumer primitive sampling, authored-fiber collision
+Issues, drawing parity details, representative anatomical routing/profiler workloads and
+release documentation/examples/package qualification. Keep version 0.1.9 until complete.

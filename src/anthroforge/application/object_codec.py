@@ -31,7 +31,7 @@ def decode(data: dict[str, Any]) -> Construction:
     if kind == "surface":
         state["curves"] = tuple(CurveUse(**tuples(use)) for use in state["curves"])
         state["alignment"] = tuple(SurfaceAlignment(**row) for row in state.get("alignment", ()))
-        state["branches"] = tuple(SurfaceBranch(**row) for row in state.get("branches", ()))
+        state["branches"] = tuple(SurfaceBranch(**tuples(row)) for row in state.get("branches", ()))
         return Surface(**state)
     if kind == "reference_image":
         calibration = state.get("calibration")

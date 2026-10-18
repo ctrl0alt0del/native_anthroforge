@@ -16,12 +16,12 @@ UiSection {
             Layout.fillWidth: true; spacing: Theme.gap
             RowLayout {
                 UiButton { Layout.fillWidth: true; text: workspace.objectRecord(modelData.curve).name || "Curve"; onClicked: workspace.select(modelData.curve) }
-                UiButton { text: "↑"; enabled: index>0; onClicked: panel.move(index,-1) }
-                UiButton { text: "↓"; enabled: index+1<panel.item.uses.length; onClicked: panel.move(index,1) }
+                UiButton { text: "↑"; enabled: !panel.item.branches?.length && index>0; onClicked: panel.move(index,-1) }
+                UiButton { text: "↓"; enabled: !panel.item.branches?.length && index+1<panel.item.uses.length; onClicked: panel.move(index,1) }
             }
             UiCombo { Layout.fillWidth: true; model: [{name:"Shape and transform",id:"SHAPE_AND_TRANSFORM"},{name:"Shape only",id:"SHAPE_ONLY"}]; textRole:"name"; valueRole:"id"; currentIndex:indexOfValue(modelData.mode); onActivated: panel.update(modelData.curve,"mode",currentValue) }
             UiCheck { text: "Reverse direction"; checked: modelData.reverse; onClicked: panel.update(modelData.curve,"reverse",checked) }
-            UiButton { objectName:"surfaceIndependent"+index; text:"Make Independent"; onClicked:workspace.run("consumer.make_independent",{entity:panel.item.id,curve:modelData.curve}) }
+            UiButton { objectName:"surfaceIndependent"+index; text:panel.item.branches?.length?"Make assembly independent":"Make Independent"; hint:"Connected branch sources are copied together to preserve their junctions"; onClicked:workspace.run("consumer.make_independent",{entity:panel.item.id,curve:modelData.curve}) }
             NumericSetting { label:"Uniform samples"; value:modelData.samples; decimals:0; enabled:!panel.item.exact; onEdited: value=>panel.update(modelData.curve,"samples",Math.round(value)) }
             NumericSetting { label:"Start fraction"; value:modelData.start || 0; onEdited: value=>panel.update(modelData.curve,"start",value) }
             NumericSetting { label:"Span fraction"; value:modelData.span ?? 1; onEdited: value=>panel.update(modelData.curve,"span",value) }

@@ -15,7 +15,13 @@ if TYPE_CHECKING:
 
 
 def make_independent(session: "Session", entity: str, curve: str) -> str:
+    from .surface_independence import independent
+
     item, _ = curve_consumers.selected_use(session, entity, curve)
+    if isinstance(item, Surface) and item.branches:
+        copied_id = independent(session, item, curve)
+        construction_tasks.edited(session, {entity})
+        return copied_id
     source = curve_sources.source(session.document, curve)
     identities = curve_copy.mapping(source)
     copied = Copies(session.resources, identities).record(source)
@@ -55,8 +61,12 @@ def remapped(item: SCP | Surface, identities: dict[str, str]) -> SCP | Surface:
 
 
 def remapped_surface(item: Surface, identities: dict[str, str]) -> Surface:
+    from .surface_independence import remapped_branch
+
     return replace(
         item,
         curves=tuple(replace(u, curve=identities.get(u.curve, u.curve)) for u in item.curves),
         alignment=tuple(replace(a, point=identities.get(a.point, a.point)) for a in item.alignment),
+        main=tuple(identities.get(key, key) for key in item.main),
+        branches=tuple(remapped_branch(b, identities) for b in item.branches),
     )

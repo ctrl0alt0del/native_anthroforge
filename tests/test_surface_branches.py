@@ -94,3 +94,27 @@ def test_removing_branch_unlocks_junction_and_leaves_last_loft(session):
     session.command("junction.remove", junction=joint)
     session.wait()
     assert len(vertices(session, target))
+
+
+def test_make_independent_copies_connected_assembly_without_jumps_or_original_links(session):
+    keys, target, _ = branched(session)
+    before = vertices(session, target)
+    copy = session.command("consumer.make_independent", entity=target, curve=keys[2])
+    session.wait()
+    item = session.document.object(target)
+    assert copy in {u.curve for u in item.curves} and not set(keys) & {u.curve for u in item.curves}
+    np.testing.assert_allclose(vertices(session, target), before, atol=1e-12)
+    session.command("curve.point.update", **reference(session, keys[2]), position=[0.2, 0, 0.3])
+    session.wait()
+    np.testing.assert_allclose(vertices(session, target), before, atol=1e-12)
+
+
+def test_complete_branch_record_roundtrip_preserves_immutable_relationships(session, tmp_path):
+    _, target, _ = branched(session)
+    before = session.document.object(target)
+    location = tmp_path / "immutable.anthroforge"
+    session.command("save", path=str(location), blocked_policy="wait")
+    session.wait()
+    session.command("open", path=str(location))
+    session.wait()
+    assert session.document.object(target) == before

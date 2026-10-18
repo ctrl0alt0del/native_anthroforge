@@ -9,7 +9,7 @@ ColumnLayout {
     function setting(key,value) { const args={target:item.id}; args[key]=value; workspace.run("surface.update",args); }
     UiSection {
         title: "Curve surface"
-        Label { text: panel.item.kind === "PATCH" ? "Closed boundary patch" : "Ordered curve loft"; color: Theme.muted }
+        Label { text: panel.item.kind === "PATCH" ? "Closed boundary patch" : panel.item.kind === "BRANCHED" ? "Branched open loft" : "Ordered curve loft"; color: Theme.muted }
         UiCheck { objectName: "surfaceExact"; text: "Preserve evaluated corners"; checked: panel.item.exact ?? true; onClicked: panel.setting("exact",checked) }
         UiCheck { objectName: "surfaceFlip"; text: "Flip normals"; checked: panel.item.flip || false; onClicked: panel.setting("flip",checked) }
         UiCheck { visible: panel.item.kind === "LOFT"; text: "Connect first and last rows"; checked: panel.item.close_across || false; onClicked: panel.setting("close_across",checked) }
@@ -18,4 +18,5 @@ ColumnLayout {
         UiButton { objectName: "surfaceRealign"; text: "Realign correspondence"; hint: "Recalculate direction, starting correspondence and fitted row density"; onClicked: workspace.run("surface.realign",{target:panel.item.id}) }
     }
     SurfaceSources { item: panel.item }
+    SurfaceBranches { item: panel.item }
 }

@@ -90,6 +90,27 @@ def geometry_filter(controller, entity):
     assert entity in controller.pick_ids
 
 
+def controls(controller, entity, hook):
+    cage = controller.run("control.create", dict(entity=entity, kind="LATTICE"))
+    settle(controller)
+    controller.run("workspace.update", dict(hidden_categories=["handles", "hooks"]))
+    controller.select(cage)
+    assert controller.authoring.visualLayers["links"]
+    assert hook not in controller.pick_control_ids
+    controller.run("workspace.update", dict(unpickable_categories=["cages"]))
+    assert controller.authoring._point_index.pick([0, 0, 10], [0, 0, -1], 100, 0) == -1
+    controller.run("workspace.preset", dict(name="all"))
+    controller.select(entity)
+
+
+def navigate(controller, window, root, entity):
+    cursor = controller.session.history.cursor
+    click(window, "relatedSelect_" + root)
+    assert controller.selection == root and controller.selectedData.get("readonly")
+    assert controller.session.history.cursor == cursor
+    controller.select(entity)
+
+
 def inspect_ui(controller, window):
     inspector = find(window, "inspector")
     panel = find(window, "dependencyInspector")
@@ -121,16 +142,22 @@ def run(app):
     engine = create_engine(controller, warnings)
     window = engine.rootObjects()[0]
     try:
-        root, entity, hook = fixture(controller)
-        workspace_ui(controller, window, entity, hook)
-        units_ui(controller, window, entity)
-        filters(controller, window, entity)
-        inspect_ui(controller, window)
-        export_report(controller, window, entity)
+        interactions(controller, window)
         assert not warnings, warnings
     finally:
         controller.close()
         delete(engine)
+
+
+def interactions(controller, window):
+    root, entity, hook = fixture(controller)
+    workspace_ui(controller, window, entity, hook)
+    units_ui(controller, window, entity)
+    filters(controller, window, entity)
+    controls(controller, entity, hook)
+    inspect_ui(controller, window)
+    navigate(controller, window, root, entity)
+    export_report(controller, window, entity)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ import QtQuick.Controls
 
 TextField {
     id: control
-    implicitHeight: 28
+    implicitHeight: Theme.controlHeight
     leftPadding: 9; rightPadding: 9
     font.pixelSize: 12
     color: enabled ? Theme.text : Theme.muted

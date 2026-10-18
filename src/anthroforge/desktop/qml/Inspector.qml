@@ -3,7 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Dialogs
 
-ScrollView {
+UiScrollView {
     id: inspector
     property var selected: workspace.selectedData
     readonly property var attachment: selected.attachment || {}
@@ -124,7 +124,7 @@ ScrollView {
             }
             PrimitiveInspector { visible: !!inspector.selected.primitive }
             UiSection {
-                title: "Display & evaluation"
+                title: "Display & evaluation"; expanded: false
                 RowLayout {
                     Rectangle { implicitWidth: 24; implicitHeight: 24; radius: 4; color: inspector.selected.color || "#72b8ad"; border.color: Theme.border }
                     UiButton { text: "Object color…"; Layout.fillWidth: true; onClicked: { colorDialog.selectedColor = inspector.selected.color; colorDialog.open(); } }

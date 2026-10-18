@@ -7,35 +7,37 @@ Rectangle {
     required property var viewport
     readonly property var model: workspace.inspectionTools
     property bool expanded: false
-    width: 310; height: expanded ? Math.min(430, viewport.height-100) : 34
+    property var expandedMeasurements: []
+    width: Math.min(320, viewport.width-24)
+    height: expanded ? Math.min(content.implicitHeight+header.height+32, viewport.height-100) : header.height+16
     color: Theme.panel; border.color: Theme.border; radius: 4
     function xyz(point) { return point.map(v=>(v/workspace.state.unit_factor).toFixed(3)).join(", "); }
     function saveBookmark() { viewport.storeCamera(); workspace.run("bookmark.add",{name:bookmarkName.text.trim() || "Inspection view"}); }
+    function toggleMeasurement(identity) {
+        const existing=model.state.measurements.map(row=>row.id);
+        const retained=expandedMeasurements.filter(id=>existing.includes(id) && id!==identity);
+        expandedMeasurements=retained.concat(expandedMeasurements.includes(identity) ? [] : [identity]);
+    }
     ColumnLayout {
-        anchors.fill: parent; anchors.margins: 6; spacing: 6
+        anchors.fill: parent; anchors.margins: Theme.gap; spacing: Theme.gap
         RowLayout {
-            UiButton { objectName: "inspectionToolsToggle"; text: "Measurements & views"; flatStyle: true; Layout.fillWidth: true; onClicked: tools.expanded=!tools.expanded }
+            id: header
+            UiButton { objectName: "inspectionToolsToggle"; text: "Measurements & views"; flatStyle: true; alignLeft: true; Layout.fillWidth: true; onClicked: tools.expanded=!tools.expanded }
             UiButton { objectName: "measureSurface"; text: "Ruler"; checked: tools.model.state.active; enabled: !viewport.transforming && !workspace.state.waiting; hint: "Pick two surface points · Esc to finish"; onClicked: { tools.expanded=true; tools.model.toggle(); viewport.forceActiveFocus(); } }
         }
-        ScrollView {
-            visible: tools.expanded; Layout.fillWidth: true; Layout.fillHeight: true; clip: true; contentWidth: availableWidth
+        UiScrollView {
+            id: scroll; visible: tools.expanded; Layout.fillWidth: true; Layout.fillHeight: true; clip: true; contentWidth: availableWidth
             ColumnLayout {
-                width: parent.width; spacing: 8
-                Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.muted; text: tools.model.state.active ? "Pick "+(tools.model.state.start.entity ? "second" : "first")+" surface point. Esc finishes. Alt-click selects deeper surfaces." : "Rulers capture fixed coordinates; changed surfaces are marked stale." }
-                Label { Layout.fillWidth: true; wrapMode: Text.WrapAnywhere; color: Theme.accent; visible: !!tools.model.state.hover.entity; text: tools.model.state.hover.position ? "XYZ: "+tools.xyz(tools.model.state.hover.position)+" "+workspace.state.display_units : "" }
-                Repeater {
-                    model: tools.model.state.measurements
-                    ColumnLayout {
-                        required property var modelData
-                        Layout.fillWidth: true
-                        RowLayout {
-                            Label { objectName: "measurementDistance"; Layout.fillWidth: true; color: modelData.stale ? "#ffcc64" : Theme.text; text: modelData.name+": "+viewport.formatLength(modelData.distance)+(modelData.stale ? " · stale" : "") }
-                            UiButton { glyph: "delete"; flatStyle: true; hint: "Remove measurement"; onClicked: workspace.run("measurement.remove",{measurement:modelData.id}) }
-                        }
-                        Label { objectName: "measurementCoordinates"; Layout.fillWidth: true; wrapMode: Text.WrapAnywhere; color: Theme.muted; text: "A: "+tools.xyz(modelData.start.position)+"\nB: "+tools.xyz(modelData.end.position)+"\nΔ: "+tools.xyz(modelData.delta)+" "+workspace.state.display_units }
-                    }
+                id: content; width: scroll.availableWidth; spacing: Theme.gap
+                Label { visible: tools.model.state.active; Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.accent; text: "Pick "+(tools.model.state.start.entity ? "second" : "first")+" surface point · Esc to finish" }
+                Label { Layout.fillWidth: true; wrapMode: Text.WrapAnywhere; color: Theme.muted; visible: !!tools.model.state.hover.entity; text: tools.model.state.hover.position ? "XYZ: "+tools.xyz(tools.model.state.hover.position)+" "+workspace.state.display_units : "" }
+                UiSection {
+                    title: "Measurements"; hint: "Pick two surface points with Ruler. Alt-click reaches deeper surfaces. Expand a measurement for XYZ coordinates. Rulers keep fixed coordinates; changed surfaces are marked stale."
+                    Label { visible: !tools.model.state.measurements.length; text: "No measurements yet"; color: Theme.muted }
+                    Repeater { model: tools.model.state.measurements; MeasurementRow { required property var modelData; measurement: modelData; viewport: tools.viewport; expanded: tools.expandedMeasurements.includes(modelData.id); onToggleDetails: tools.toggleMeasurement(modelData.id) } }
                 }
-                Label { text: "Named cameras"; color: Theme.text; font.bold: true }
+                UiSection {
+                    title: "Named cameras"; hint: "Save the current camera, then use Go to restore it. Restoring a view preserves an active edit."
                 RowLayout {
                     UiField { id: bookmarkName; objectName: "bookmarkName"; Layout.fillWidth: true; placeholderText: "View name" }
                     UiButton { objectName: "saveBookmark"; text: "Save"; enabled: !workspace.state.waiting; onClicked: tools.saveBookmark() }
@@ -48,6 +50,7 @@ Rectangle {
                         UiButton { objectName: "restoreBookmark"; text: "Go"; enabled: !workspace.state.waiting; onClicked: { tools.model.restoreBookmark(modelData.id); viewport.forceActiveFocus(); } }
                         UiButton { glyph: "delete"; flatStyle: true; hint: "Remove bookmark"; onClicked: workspace.run("bookmark.remove",{bookmark:modelData.id}) }
                     }
+                }
                 }
             }
         }

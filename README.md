@@ -1,15 +1,18 @@
-# AnthroForge 0.1.8
+# AnthroForge 0.1.9
 
 A standalone SCP and primitive editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the portable folder. The 0.1.8 build is in
-`dist/0.1.8/AnthroForge.dist`; the default packaging location remains `dist/AnthroForge.dist`.
+Open **AnthroForge.exe** in the portable folder. The 0.1.9 build is in
+`dist/0.1.9/AnthroForge.dist`; the default packaging location remains `dist/AnthroForge.dist`.
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.
 
-0.1.8 adds [two-point surface rulers with XYZ readouts and named camera bookmarks](docs/workflow_inspection.md#measurements-and-named-views-018).
+0.1.9 refines the editor with consistent dark menus, aligned controls and expandable
+inspection details. See [UI polish](docs/ui_polish.md).
+
+0.1.8 added [two-point surface rulers with XYZ readouts and named camera bookmarks](docs/workflow_inspection.md#measurements-and-named-views-018).
 Rulers and views persist per workspace and are included in inspection reports.
 [Profiler reports](docs/profiling.md#recalculation-cache-and-memory-evidence-018) now explain
 invalidation, base-cache reuse and native geometry retention by overlapping owners.

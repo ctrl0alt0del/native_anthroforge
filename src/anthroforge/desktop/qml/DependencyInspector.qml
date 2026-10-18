@@ -11,13 +11,9 @@ UiSection {
     onExpandedChanged: workspace.inspectionPanel.activate(expanded && visible)
     onVisibleChanged: workspace.inspectionPanel.activate(expanded && visible)
     function vector(values) { return values ? values.map(v=>(v/workspace.state.unit_factor).toFixed(3)).join(", ")+" "+workspace.state.display_units : "Unavailable"; }
-    Label { text: "Authored generation "+(panel.detail.generation || 0)+" · accepted result "+(panel.detail.result?.revision || 0); wrapMode: Text.Wrap; Layout.fillWidth: true; color: Theme.muted }
-    Label { text: "Result: "+(panel.detail.result?.status || "unavailable"); color: Theme.muted }
-    Label { text: "Support: "+(panel.attachment.support_name || panel.attachment.follow || "None"); elide: Text.ElideMiddle; Layout.fillWidth: true; color: Theme.muted }
-    Label { text: "Parent anchor: "+(panel.attachment.settings?.parent_mode || "—")+"\nChild anchor: "+(panel.attachment.settings?.child_mode || "—"); color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true }
-    Label { text: panel.attachment.captured && panel.attachment.settings?.parent_mode==="SURFACE_NEAREST" ? "Captured surface vertices: "+(panel.binding.surface_vertices || []).join(", ")+"\nBarycentric: "+(panel.binding.barycentric || []).map(v=>v.toFixed(4)).join(", ")+"\nFrame offset: "+panel.vector(panel.binding.frame_offset_metres) : panel.attachment.captured ? "Origin attachment · offset: "+panel.vector(panel.binding.frame_offset_metres) : "No captured attachment"; wrapMode: Text.Wrap; Layout.fillWidth: true; color: Theme.muted }
-    Label { visible: !!panel.attachment.anchors?.available; text: "Owner anchor: "+panel.vector(panel.attachment.anchors?.owner_world_metres)+"\nSupport anchor: "+panel.vector(panel.attachment.anchors?.support_world_metres); wrapMode: Text.Wrap; Layout.fillWidth: true; color: Theme.muted }
-    Label { visible: !!panel.detail.geometry?.available; text: (panel.detail.geometry?.vertices || 0)+" vertices · "+(panel.detail.geometry?.triangles || 0)+" triangles"; color: Theme.muted }
+    UiDetail { label: "Result"; value: panel.detail.result?.status || "Unavailable" }
+    UiDetail { label: "Support"; value: panel.attachment.support_name || panel.attachment.follow || "None" }
+    UiDetail { label: "Surface"; visible: !!panel.detail.geometry?.available; value: (panel.detail.geometry?.vertices || 0)+" vertices · "+(panel.detail.geometry?.triangles || 0)+" triangles" }
     Repeater {
         model: panel.detail.relationships || []
         ColumnLayout {
@@ -32,4 +28,16 @@ UiSection {
     }
     Label { text: (panel.detail.topology_locks || []).length ? "Topology locked by" : "Topology is unlocked"; color: Theme.muted }
     Repeater { model: panel.detail.topology_locks || []; RelatedObject { required property var modelData; targetId: modelData.id; label: modelData.name+" · "+modelData.reason } }
+    UiSection {
+        title: "Attachment details"; expanded: false
+        UiDetail { label: "Authored"; value: String(panel.detail.generation || 0) }
+        UiDetail { label: "Accepted"; value: String(panel.detail.result?.revision || 0) }
+        UiDetail { label: "Parent anchor"; value: panel.attachment.settings?.parent_mode || "—" }
+        UiDetail { label: "Child anchor"; value: panel.attachment.settings?.child_mode || "—" }
+        UiDetail { label: "Vertices"; visible: !!panel.attachment.captured && panel.attachment.settings?.parent_mode==="SURFACE_NEAREST"; value: (panel.binding.surface_vertices || []).join(", ") }
+        UiDetail { label: "Barycentric"; visible: !!panel.attachment.captured && panel.attachment.settings?.parent_mode==="SURFACE_NEAREST"; value: (panel.binding.barycentric || []).map(v=>v.toFixed(4)).join(", ") }
+        UiDetail { label: "Frame offset"; value: panel.attachment.captured ? panel.vector(panel.binding.frame_offset_metres) : "No captured attachment" }
+        UiDetail { label: "Owner anchor"; visible: !!panel.attachment.anchors?.available; value: panel.vector(panel.attachment.anchors?.owner_world_metres) }
+        UiDetail { label: "Support anchor"; visible: !!panel.attachment.anchors?.available; value: panel.vector(panel.attachment.anchors?.support_world_metres) }
+    }
 }

@@ -13,6 +13,10 @@ ApplicationWindow {
     palette.window: Theme.panel; palette.windowText: Theme.text; palette.text: Theme.text
     palette.buttonText: Theme.text; palette.button: Theme.header; palette.base: Theme.field
     palette.highlight: Theme.selection; palette.highlightedText: Theme.text
+    palette.light: Theme.hover; palette.midlight: Theme.selection; palette.mid: Theme.hover
+    palette.dark: Theme.border; palette.alternateBase: Theme.header; palette.toolTipBase: Theme.header
+    palette.toolTipText: Theme.text; palette.placeholderText: Theme.muted
+    palette.disabled.windowText: Theme.muted; palette.disabled.buttonText: Theme.muted
     property string chosenImport: ""
     property string blockedSavePath: ""
     property string replacementPath: ""
@@ -20,6 +24,7 @@ ApplicationWindow {
     property bool activityOpen: false
     property bool issuesOpen: false
     property string activeTool: "Move"
+    readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
     readonly property bool modalOpen: reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
@@ -43,31 +48,31 @@ ApplicationWindow {
     header: ColumnLayout {
         spacing: 0
         Rectangle {
-            Layout.fillWidth: true; implicitHeight: 35; color: "#25262a"
+            Layout.fillWidth: true; implicitHeight: 40; color: "#25262a"
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 10; spacing: 10
                 Label { text: "ANTHROFORGE"; font.bold: true; font.pixelSize: 12; font.letterSpacing: 1; color: Theme.text }
-                Label { text: "0.1.8"; color: Theme.accent; font.pixelSize: 10 }
-                MenuBar {
+                Label { text: "0.1.9"; color: Theme.accent; font.pixelSize: 10 }
+                UiMenuBar {
                     background: Item {}
-                    Menu { title: "File"; MenuItem { action: newAction } MenuItem { action: openAction } MenuSeparator {} MenuItem { action: saveAction } MenuItem { action: saveAsAction } MenuSeparator {} MenuItem { action: importAction } MenuSeparator {} MenuItem { objectName: "exportInspectionMenu"; text: "Export inspection report…"; enabled: !workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered: { viewport.storeCamera(); reportDialog.open(); } } }
-                    Menu { title: "Edit"; MenuItem { action: undoAction } MenuItem { action: redoAction } MenuSeparator {} MenuItem { text: "Delete selected…    Delete"; enabled: !!workspace.selectedId && !workspace.selectedData.readonly; onTriggered: deleteDialog.request(workspace.selectedId) } }
-                    Menu {
+                    UiMenu { title: "File"; UiMenuItem { action: newAction } UiMenuItem { action: openAction } MenuSeparator {} UiMenuItem { action: saveAction } UiMenuItem { action: saveAsAction } MenuSeparator {} UiMenuItem { action: importAction } MenuSeparator {} UiMenuItem { objectName: "exportInspectionMenu"; text: "Export inspection report…"; enabled: !workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered: { viewport.storeCamera(); reportDialog.open(); } } }
+                    UiMenu { title: "Edit"; UiMenuItem { action: undoAction } UiMenuItem { action: redoAction } MenuSeparator {} UiMenuItem { text: "Delete selected…"; shortcutHint: keyboard.shortcut("deleteSelection"); enabled: !!workspace.selectedId && !workspace.selectedData.readonly; onTriggered: deleteDialog.request(workspace.selectedId) } }
+                    UiMenu {
                         title: "View"
-                        MenuItem { text: "Frame selected    F"; onTriggered: workspace.frameSelection() }
-                        MenuItem { objectName: "restoreViewMenu"; text: "Restore view    "+keyboard.shortcut("restoreView"); enabled: viewport.canRestoreView; onTriggered: viewport.restoreView() }
-                        MenuItem { text: "Orthographic"; checkable: true; checked: viewport.orthographic; onTriggered: viewport.orthographic = checked }
-                        MenuItem { text: "X-ray    Alt+Z"; checkable: true; checked: viewport.xray; onTriggered: viewport.xray = checked }
+                        UiMenuItem { text: "Frame selected"; shortcutHint: "F"; onTriggered: workspace.frameSelection() }
+                        UiMenuItem { objectName: "restoreViewMenu"; text: "Restore view"; shortcutHint: keyboard.shortcut("restoreView"); enabled: viewport.canRestoreView; onTriggered: viewport.restoreView() }
+                        UiMenuItem { text: "Orthographic"; checkable: true; checked: viewport.orthographic; onTriggered: viewport.orthographic = checked }
+                        UiMenuItem { text: "X-ray"; shortcutHint: "Alt+Z"; checkable: true; checked: viewport.xray; onTriggered: viewport.xray = checked }
                         MenuSeparator {}
-                        MenuItem { text: "Transform handles"; checkable: true; checked: workspace.state.handles; onTriggered: workspace.run("workspace.update",{handles:checked}) }
-                        MenuItem { text: "Attachment markers"; checkable: true; checked: workspace.state.anchors; onTriggered: workspace.run("workspace.update",{anchors:checked}) }
-                        MenuItem { text: "Performance diagnostics"; checkable: true; checked: workspace.state.diagnostics; onTriggered: workspace.run("workspace.update",{diagnostics:checked}) }
-                        MenuItem { text: "Activity panel"; checkable: true; checked: window.activityOpen; onTriggered: window.activityOpen = checked }
-                        MenuItem { text: "Issues panel"; checkable: true; checked: window.issuesOpen; onTriggered: { window.issuesOpen = checked; if(checked) window.activityOpen = false; } }
+                        UiMenuItem { text: "Transform handles"; checkable: true; checked: workspace.state.handles; onTriggered: workspace.run("workspace.update",{handles:checked}) }
+                        UiMenuItem { text: "Attachment markers"; checkable: true; checked: workspace.state.anchors; onTriggered: workspace.run("workspace.update",{anchors:checked}) }
+                        UiMenuItem { text: "Performance diagnostics"; checkable: true; checked: workspace.state.diagnostics; onTriggered: workspace.run("workspace.update",{diagnostics:checked}) }
+                        UiMenuItem { text: "Activity panel"; checkable: true; checked: window.activityOpen; onTriggered: window.activityOpen = checked }
+                        UiMenuItem { text: "Issues panel"; checkable: true; checked: window.issuesOpen; onTriggered: { window.issuesOpen = checked; if(checked) window.activityOpen = false; } }
                         MenuSeparator {}
-                        MenuItem { text: (performance.state.recording ? "Stop recording" : "Record performance") + "    " + keyboard.shortcut("recordPerformance"); onTriggered: performance.toggle() }
+                        UiMenuItem { text: performance.state.recording ? "Stop recording" : "Record performance"; shortcutHint: keyboard.shortcut("recordPerformance"); onTriggered: performance.toggle() }
                     }
-                    Menu { title: "Help"; MenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() } }
+                    UiMenu { title: "Help"; UiMenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() } }
                 }
                 Item { Layout.fillWidth: true }
                 ProfileStatus { }
@@ -102,7 +107,7 @@ ApplicationWindow {
         Rectangle {
             SplitView.preferredWidth: 240; SplitView.minimumWidth: 195; SplitView.maximumWidth: 440
             color: Theme.panel
-            Outliner { anchors.fill: parent; anchors.margins: 10; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
+            Outliner { anchors.fill: parent; anchors.margins: Theme.inset; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
         }
         ColumnLayout {
             SplitView.fillWidth: true; SplitView.minimumWidth: 300; spacing: 0
@@ -146,7 +151,7 @@ ApplicationWindow {
             ColumnLayout {
                 anchors.fill: parent; spacing: 0
                 Rectangle { Layout.fillWidth: true; implicitHeight: 33; color: Theme.header; Label { anchors.verticalCenter: parent.verticalCenter; x: 12; text: "PROPERTIES"; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1 } }
-                Inspector { id: inspector; objectName: "inspector"; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: 10; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity) }
+                Inspector { id: inspector; objectName: "inspector"; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity) }
             }
         }
     }
@@ -161,15 +166,15 @@ ApplicationWindow {
             Label { text: "Rev " + workspace.state.revision + (workspace.state.dirty ? " · Unsaved" : " · Saved"); color: workspace.state.dirty ? Theme.accent : Theme.muted; font.pixelSize: 11 }
         }
     }
-    Menu {
+    UiMenu {
         id: createMenu
-        MenuItem { text: "Ordered curve loft"; onTriggered: authoring.create("LOFT","CAPSULE") }
+        UiMenuItem { text: "Ordered curve loft"; onTriggered: authoring.create("LOFT","CAPSULE") }
         MenuSeparator {}
-        MenuItem { text: "Curve-deformed box"; onTriggered: authoring.create("BODY","BOX") }
-        MenuItem { text: "Curve-deformed cylinder"; onTriggered: authoring.create("BODY","CYLINDER") }
-        MenuItem { text: "Curve-deformed capsule"; onTriggered: authoring.create("BODY","CAPSULE") }
+        UiMenuItem { text: "Curve-deformed box"; onTriggered: authoring.create("BODY","BOX") }
+        UiMenuItem { text: "Curve-deformed cylinder"; onTriggered: authoring.create("BODY","CYLINDER") }
+        UiMenuItem { text: "Curve-deformed capsule"; onTriggered: authoring.create("BODY","CAPSULE") }
         MenuSeparator {}
-        MenuItem { text: "Import mesh…"; onTriggered: importFile.open() }
+        UiMenuItem { text: "Import mesh…"; onTriggered: importFile.open() }
     }
     FileDialog { id: reportDialog; title: "Export inspection report"; fileMode: FileDialog.SaveFile; defaultSuffix: "afinspection.zip"; nameFilters: ["Inspection report (*.afinspection.zip)"]; onAccepted: workspace.inspectionExport.start(selectedFile.toString()) }
     WorkspaceManager { id: workspaceManager; anchors.centerIn: parent }
@@ -183,19 +188,16 @@ ApplicationWindow {
             UiCheck { text: "Performance diagnostics"; checked: workspace.state.diagnostics; onClicked: workspace.run("workspace.update",{diagnostics:checked}) }
         }
     }
-    Dialog {
-        id: helpDialog; title: "Navigation and shortcuts"; modal: true; anchors.centerIn: parent; standardButtons: Dialog.Close
-        Label { text: "G / R / S    Start Move / Rotate / Scale\nLeft click / Enter    Confirm transform\nRight click / Escape    Cancel transform\nW / E    Select Move / Rotate gizmo\nF    Frame selected\n1 / 2 / 3    X / Y / Z view, centered with zoom preserved\n"+keyboard.shortcut("restoreView")+"    Restore camera before axis views\n5    Perspective / Orthographic\nAlt+Z    X-ray\nAlt-click    Select through overlapping objects\nMiddle or right drag    Orbit\nShift + drag    Pan\nMouse wheel    Zoom\nEscape    Cancel transform or anchor picking\nCtrl+I    Import mesh\nDelete    Remove selected object, preserving children\nShift while transforming    Fine adjustment\nShift in curve editing    Preview; click to insert points\nCtrl while moving a curve point    Snap to another SCP\nWheel while snapping    Surface offset\nMiddle click / release Ctrl    Reset offset\nCtrl-click a component    Extend selection"; lineHeight: 1.7; color: Theme.text }
-    }
-    Dialog { id: messageDialog; title: "Last operation"; modal: true; anchors.centerIn: parent; width: Math.min(560, window.width-80); standardButtons: Dialog.Close; Label { width: parent.width; text: workspace.state.message; wrapMode: Text.WrapAnywhere; color: Theme.text } }
+    ShortcutHelp { id: helpDialog; keyboard: window.keyboardManager; anchors.centerIn: parent }
+    UiDialog { id: messageDialog; title: "Last operation"; modal: true; anchors.centerIn: parent; width: Math.min(560, window.width-80); standardButtons: Dialog.Close; Label { width: parent.width; text: workspace.state.message; wrapMode: Text.WrapAnywhere; color: Theme.text } }
     FileDialog { id: importFile; title: "Import primitive mesh"; nameFilters: ["Mesh files (*.obj *.stl *.ply)"]; onAccepted: { window.chosenImport = selectedFile.toString(); importUnits.currentIndex = 0; importOptions.open(); } }
     FileDialog { id: openDialog; title: "Open AnthroForge project"; nameFilters: ["AnthroForge project (*.anthroforge)"]; onAccepted: workspace.requestDocument(selectedFile.toString()) }
     FileDialog { id: saveDialog; title: "Save AnthroForge project"; fileMode: FileDialog.SaveFile; defaultSuffix: "anthroforge"; nameFilters: ["AnthroForge project (*.anthroforge)"]; onAccepted: workspace.saveProject(selectedFile.toString(),""); onRejected: workspace.cancelSaveWait() }
-    Dialog {
+    UiDialog {
         id: importOptions; title: "Import primitive"; modal: true; anchors.centerIn: parent; width: 420
         ColumnLayout {
             anchors.fill: parent
-            Label { text: window.chosenImport; Layout.fillWidth: true; wrapMode: Text.WrapAnywhere; color: Theme.muted }
+            Label { text: window.chosenImport; Layout.fillWidth: true; elide: Text.ElideMiddle; color: Theme.muted; ToolTip.visible: pathHover.hovered; ToolTip.text: text; HoverHandler { id: pathHover } }
             Label { text: "Source units (required)" }
             UiCombo { id: importUnits; Layout.fillWidth: true; model: ["Choose source units…","Metres","Centimetres","Millimetres"] }
             Label { text: "Parent SCP"; visible: workspace.treeRows.length > 0 }
@@ -212,7 +214,7 @@ ApplicationWindow {
             }
         }
     }
-    Dialog {
+    UiDialog {
         id: focusDialog; title: "Create focused workspace"; modal: true; anchors.centerIn: parent
         standardButtons: Dialog.Ok | Dialog.Cancel
         ColumnLayout {
@@ -222,7 +224,7 @@ ApplicationWindow {
         }
         onAccepted: workspace.run("workspace.create",{name:focusName.text,members:[workspace.selectedId],children:includeChildren.checked})
     }
-    Dialog {
+    UiDialog {
         id: saveChoice; title: "Calculations are still running"; modal: true; anchors.centerIn: parent; closePolicy: Popup.NoAutoClose
         ColumnLayout {
             Label { text: "Choose the document revision to save." }
@@ -231,7 +233,7 @@ ApplicationWindow {
             UiButton { text: "Cancel save"; Layout.fillWidth: true; onClicked: { saveChoice.close(); workspace.cancelSaveWait(); } }
         }
     }
-    Dialog {
+    UiDialog {
         id: waitingDialog; title: "Finishing project operation"; modal: true; anchors.centerIn: parent; closePolicy: Popup.NoAutoClose
         visible: workspace.state.waiting
         ColumnLayout {
@@ -240,7 +242,7 @@ ApplicationWindow {
             UiButton { text: "Cancel waiting"; onClicked: workspace.cancelSaveWait() }
         }
     }
-    Dialog {
+    UiDialog {
         id: discardDialog; title: "Unsaved changes"; modal: true; anchors.centerIn: parent
         ColumnLayout {
             Label { text: "Save the current project before replacing it, or discard its changes."; width: 330; wrapMode: Text.WordWrap }
@@ -249,7 +251,7 @@ ApplicationWindow {
             UiButton { text: "Cancel"; Layout.fillWidth: true; onClicked: discardDialog.close() }
         }
     }
-    Dialog {
+    UiDialog {
         id: closeDialog; title: "Close with unsaved changes?"; modal: true; anchors.centerIn: parent
         standardButtons: Dialog.Save | Dialog.Discard | Dialog.Cancel
         Label { text: "Save your project to keep these changes." }

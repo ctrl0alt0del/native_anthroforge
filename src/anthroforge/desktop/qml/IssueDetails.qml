@@ -2,17 +2,16 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-ScrollView {
+UiScrollView {
     id: panel
+    objectName: "issueDetails"
     required property var service
     readonly property var issue: service.detail
-    clip: true
+    clip: true; leftPadding: Theme.inset
     contentWidth: availableWidth
     ColumnLayout {
-        width: panel.availableWidth; spacing: 6
-        Label { Layout.fillWidth: true; text: panel.issue.summary || "Select an issue to inspect its evidence"; color: Theme.text; font.bold: true; wrapMode: Text.Wrap }
-        Label { Layout.fillWidth: true; visible: !!panel.issue.id; text: (panel.issue.provider || "")+" / "+(panel.issue.stage || "")+" · "+(panel.issue.check_state || ""); color: Theme.muted; wrapMode: Text.Wrap }
-        Label { Layout.fillWidth: true; visible: !!panel.issue.details; text: panel.issue.details || ""; color: Theme.text; wrapMode: Text.WrapAnywhere }
+        width: panel.availableWidth; spacing: Theme.gap
+        Label { Layout.fillWidth: true; text: panel.issue.summary || "Select an issue to inspect its evidence"; color: Theme.text; font.bold: true; wrapMode: Text.Wrap; maximumLineCount: 3; elide: Text.ElideRight }
         Flow {
             Layout.fillWidth: true; spacing: 5
             UiButton { objectName: "issueSelectTarget"; text: "Select target"; visible: !!panel.issue.target; enabled: panel.service.state.canNavigate; onClicked: panel.service.navigate(panel.issue.target,false) }
@@ -30,6 +29,11 @@ ScrollView {
             model: panel.issue.relatedTargets || []
             UiButton { required property var modelData; text: "Related: "+modelData.label; flatStyle: true; enabled: panel.service.state.canNavigate; onClicked: panel.service.navigate(modelData.id,true) }
         }
-        TextArea { Layout.fillWidth: true; visible: !!panel.issue.id; text: (panel.issue.code || "")+"\n"+(panel.issue.evidenceText || ""); readOnly: true; selectByMouse: true; wrapMode: TextEdit.WrapAnywhere; font.family: "Consolas"; font.pixelSize: 10; color: Theme.muted; background: Rectangle { color: Theme.field; radius: 3 } }
+        UiSection {
+            title: "Details & evidence"; expanded: false; visible: !!panel.issue.id
+        Label { Layout.fillWidth: true; visible: !!panel.issue.id; text: (panel.issue.provider || "")+" / "+(panel.issue.stage || "")+" · "+(panel.issue.check_state || ""); color: Theme.muted; wrapMode: Text.Wrap }
+        Label { Layout.fillWidth: true; visible: !!panel.issue.details; text: panel.issue.details || ""; color: Theme.text; wrapMode: Text.WrapAnywhere }
+            TextArea { objectName: "issueEvidence"; Layout.fillWidth: true; visible: !!panel.issue.id; text: (panel.issue.code || "")+"\n"+(panel.issue.evidenceText || ""); readOnly: true; selectByMouse: true; wrapMode: TextEdit.WrapAnywhere; font.family: "Consolas"; font.pixelSize: 10; color: Theme.muted; background: Rectangle { color: Theme.field; radius: 3 } }
+        }
     }
 }

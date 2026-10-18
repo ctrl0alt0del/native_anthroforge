@@ -7,13 +7,14 @@ ColumnLayout {
     readonly property var service: workspace.issuePanel
     spacing: 6
     function filterRows() { service.filter(search.text, ["","error","warning","info"][severity.currentIndex], dismissed.checked); }
-    RowLayout {
+    GridLayout {
+        columns: panel.width < 660 ? 3 : 5
         Layout.fillWidth: true
-        TextField { id: search; objectName: "issueSearch"; Layout.fillWidth: true; placeholderText: "Filter issues by object, code or text…"; onTextChanged: panel.filterRows() }
-        UiCombo { id: severity; objectName: "issueSeverity"; implicitWidth: 110; model: ["All severities","Errors","Warnings","Information"]; onActivated: panel.filterRows() }
+        UiField { id: search; objectName: "issueSearch"; Layout.fillWidth: true; Layout.columnSpan: panel.width < 660 ? 2 : 1; placeholderText: "Search issues…"; onTextChanged: panel.filterRows() }
+        UiCombo { id: severity; objectName: "issueSeverity"; implicitWidth: 125; model: ["All severities","Errors","Warnings","Information"]; onActivated: panel.filterRows() }
         UiCheck { id: dismissed; objectName: "issueShowDismissed"; text: "Dismissed"; onClicked: panel.filterRows() }
         UiButton { objectName: "issueRecheckAll"; text: "Recheck"; hint: "Run available checks without changing geometry"; onClicked: panel.service.run("issues.recheck",{}) }
-        UiButton { objectName: "issueCancelChecks"; text: "Cancel checks"; enabled: !panel.service.state.complete; onClicked: panel.service.run("issues.cancel",{}) }
+        UiButton { objectName: "issueCancelChecks"; text: "Cancel"; hint: "Cancel running checks"; enabled: !panel.service.state.complete; onClicked: panel.service.run("issues.cancel",{}) }
     }
     Label { Layout.fillWidth: true; text: panel.service.state.summary || "Not checked"; color: panel.service.state.complete ? Theme.muted : Theme.accent; elide: Text.ElideRight; ToolTip.visible: statusHover.hovered; ToolTip.text: text; HoverHandler { id: statusHover } }
     SplitView {

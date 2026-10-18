@@ -4,7 +4,7 @@ import QtQuick.Controls
 ComboBox {
     id: control
     property string hint: ""
-    implicitHeight: 28; implicitWidth: 150
+    implicitHeight: Theme.controlHeight; implicitWidth: 150
     font.pixelSize: 12
     leftPadding: 9; rightPadding: 24
     hoverEnabled: true
@@ -21,14 +21,16 @@ ComboBox {
     background: Rectangle { radius: 4; color: Theme.field; border.color: control.activeFocus ? Theme.accent : Theme.border }
     delegate: ItemDelegate {
         required property int index
-        width: control.width; height: 29
+        width: ListView.view ? ListView.view.width : control.availableWidth
+        height: Theme.controlHeight; leftPadding: Theme.gap; rightPadding: Theme.gap
         text: control.textAt(index)
         font.pixelSize: 12
         highlighted: control.highlightedIndex === index
         contentItem: Text { text: parent.text; font: parent.font; color: Theme.text; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
-        background: Rectangle { color: parent.highlighted ? Theme.selection : Theme.panel }
+        background: Rectangle { radius: Theme.radius; color: parent.highlighted || parent.hovered ? Theme.hover : Theme.panel }
     }
     popup: Popup {
+        objectName: "comboPopup"
         y: control.height + 3; width: control.width
         implicitHeight: Math.min(contentItem.implicitHeight + 8, 330); padding: 4
         background: Rectangle { color: Theme.panel; border.color: Theme.border; radius: 4 }

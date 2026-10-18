@@ -6,11 +6,11 @@ UiSection {
     id: panel
     property var item: ({})
     title: "Deformers"
+    hint: "Select points in Edit Primitive to bind a Hook to a selection."
     RowLayout {
         UiButton { text: "Add Hook"; onClicked: authoring.addDeformer("HOOK"); Layout.fillWidth: true }
         UiButton { text: "Add Lattice"; visible: !panel.item.is_control; onClicked: authoring.addDeformer("LATTICE"); Layout.fillWidth: true }
     }
-    Label { text: "Select points in Edit Primitive to bind a Hook to a selection."; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true; font.pixelSize: 11 }
     Repeater {
         model: panel.item.deformers || []
         ColumnLayout {
@@ -44,7 +44,8 @@ UiSection {
                 UiField { visible: bindingPanel.binding.falloff === "CURVE"; Layout.fillWidth: true; placeholderText: "AUTO / VECTOR / AUTO_CLAMPED per point"; text: bindingPanel.binding.custom_handles.join(", "); onEditingFinished: bindingPanel.set("custom_handles",text.trim()?text.split(",").map(s=>s.trim().toUpperCase()):[]) }
                 UiCheck { visible: bindingPanel.binding.falloff === "CURVE"; text: "Extrapolate falloff ends"; checked: bindingPanel.binding.custom_extrapolate; onClicked: bindingPanel.set("custom_extrapolate",checked) }
                 UiField { Layout.fillWidth: true; placeholderText: "Member indices (empty = none)"; text: bindingPanel.binding.indices.join(", "); onEditingFinished: bindingPanel.set("indices",text.trim()?text.split(",").map(Number):[]) }
-                RowLayout {
+                Flow {
+                    Layout.fillWidth: true; spacing: 4
                     UiButton { text: "Assign selected"; onClicked: authoring.members(bindingPanel.binding.id,true) }
                     UiButton { text: "Select members"; onClicked: authoring.members(bindingPanel.binding.id,false) }
                     UiButton { text: "Reset"; onClicked: authoring.edit("hook.reset",{binding:bindingPanel.binding.id}) }

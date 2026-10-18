@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import sys
+from functools import partial
 from pathlib import Path
 
 import numpy as np
@@ -32,7 +33,7 @@ CHECKS = (
 )
 
 
-def clean_environment():
+def clean_environment(background=False):
     env = {
         k: v
         for k, v in os.environ.items()
@@ -40,14 +41,21 @@ def clean_environment():
     }
     system = os.environ["SystemRoot"]
     env["PATH"] = str(Path(system) / "System32") + ";" + system
+    return platform_environment(env, background)
+
+
+def platform_environment(env, background):
+    if background:
+        env["QT_QPA_PLATFORM"] = "offscreen"
+        env["QT_QPA_FONTDIR"] = str(Path(os.environ["SystemRoot"]) / "Fonts")
     return env
 
 
-def invoke(executable, cwd, *arguments):
+def invoke(executable, cwd, *arguments, background=False):
     result = subprocess.run(
         [str(executable), *arguments],
         cwd=cwd,
-        env=clean_environment(),
+        env=clean_environment(background),
         capture_output=True,
         text=True,
         timeout=90,
@@ -56,17 +64,17 @@ def invoke(executable, cwd, *arguments):
     return result.stdout
 
 
-def headless(executable, cwd):
+def headless(executable, cwd, invoke=invoke):
     doctor = json.loads(invoke(executable, cwd, "--cli", "doctor", "--require-native"))
     assert Path(doctor["native"]["path"]).is_relative_to(executable.parent)
     invoke(executable, cwd, "--cli", "run", "examples/assembly.json")
     state = json.loads(invoke(executable, cwd, "--cli", "inspect", "assembly.anthroforge"))
     assert state["entity_count"] == 2
-    render(executable, cwd, state["revision"])
+    render(executable, cwd, state["revision"], invoke)
     return doctor
 
 
-def render(executable, cwd, revision):
+def render(executable, cwd, revision, invoke=invoke):
     arguments = (
         "--cli",
         "render",
@@ -95,24 +103,20 @@ def verify_geometry_pixels(path):
     assert np.count_nonzero(foreground) > 10000, "Missing expected cube surface pixels"
 
 
-def run(executable, cwd):
+def run(executable, cwd, background=False):
     cwd.mkdir(parents=True, exist_ok=True)
     shutil.copytree(executable.parent / "examples", cwd / "examples", dirs_exist_ok=True)
-    doctor = headless(executable, cwd)
-    primitives(executable, cwd)
-    deletion(executable, cwd)
-    curve_edits(executable, cwd)
-    desktop(executable, cwd)
-    profiling(executable, cwd, invoke)
-    issues(executable, cwd, invoke)
-    workflow(executable, cwd, invoke)
-    inspection(executable, cwd, invoke)
-    report = portable_report(executable, doctor)
+    command = partial(invoke, background=background)
+    doctor = headless(executable, cwd, command)
+    for check in (primitives, deletion, curve_edits, profiling, issues, workflow, inspection):
+        check(executable, cwd, command)
+    desktop(executable, cwd, command, background)
+    report = portable_report(executable, doctor, background)
     (cwd / "portable-check.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report))
 
 
-def deletion(executable, cwd):
+def deletion(executable, cwd, invoke=invoke):
     requests = deletion_requests()
     (cwd / "deletion.json").write_text(json.dumps(requests), encoding="utf-8")
     invoke(executable, cwd, "--cli", "run", "deletion.json")
@@ -136,7 +140,7 @@ def deletion_requests():
     ]
 
 
-def primitives(executable, cwd):
+def primitives(executable, cwd, invoke=invoke):
     invoke(executable, cwd, "--cli", "run", "examples/primitives.json")
     state = json.loads(invoke(executable, cwd, "--cli", "inspect", "primitives.anthroforge"))
     assert state["entity_count"] == 4 and len(state["controls"]) == 2
@@ -149,7 +153,7 @@ def primitives(executable, cwd):
     assert json.loads(smoke)["desktop_smoke"]
 
 
-def curve_edits(executable, cwd):
+def curve_edits(executable, cwd, invoke=invoke):
     batch = cwd / "curve-edits.json"
     batch.write_text(json.dumps(curve_requests()), encoding="utf-8")
     invoke(executable, cwd, "--cli", "run", batch.name)
@@ -176,7 +180,7 @@ def curve_requests():
     ]
 
 
-def desktop(executable, cwd):
+def desktop(executable, cwd, invoke=invoke, background=False):
     arguments = (
         "--project",
         "assembly.anthroforge",
@@ -186,14 +190,18 @@ def desktop(executable, cwd):
     )
     smoke = invoke(executable, cwd, *arguments)
     assert json.loads(smoke)["desktop_smoke"]
-    verify_geometry_pixels(cwd / "desktop.png")
+    if not background:
+        verify_geometry_pixels(cwd / "desktop.png")
 
 
-def portable_report(executable, doctor):
+def portable_report(executable, doctor, background=False):
     report = dict(
         passed=True,
         executable=str(executable),
         environment="minimal PATH",
+        desktop_platform="offscreen" if background else "windows",
+        native_window_verified=not background,
+        viewport_pixels="hidden QQuickRenderControl" if background else "hidden and desktop",
         doctor=doctor,
         checks=CHECKS,
     )
@@ -201,4 +209,4 @@ def portable_report(executable, doctor):
 
 
 if __name__ == "__main__":
-    run(Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve())
+    run(Path(sys.argv[1]).resolve(), Path(sys.argv[2]).resolve(), "--offscreen" in sys.argv[3:])

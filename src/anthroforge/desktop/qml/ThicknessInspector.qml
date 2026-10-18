@@ -7,7 +7,8 @@ UiSection {
     property var item: ({})
     property bool topologyLocked: false
     readonly property var settings: item.thickness || {}
-    title: "Thickness · Simple Solidify"
+    title: "Thickness"; expanded: !!item.thickness
+    hint: "Simple Solidify adds thickness while keeping the surface editable."
     function set(key,value) { const args={entity:item.id}; args[key]=value; authoring.edit("thickness.update",args); }
     UiButton { visible: !panel.item.thickness; text: "Add thickness"; enabled: !panel.topologyLocked; Layout.fillWidth: true; onClicked: panel.set("thickness",.01) }
     ColumnLayout {

@@ -9,9 +9,9 @@ Button {
     property bool primary: false
     property bool flatStyle: false
     property bool alignLeft: false
-    implicitHeight: 28
+    implicitHeight: Theme.controlHeight
     implicitWidth: Math.max(28, contentItem.implicitWidth + 18)
-    padding: 6
+    padding: 6; leftPadding: Theme.gap; rightPadding: Theme.gap
     hoverEnabled: true
     font.pixelSize: 12
     Accessible.name: hint || text
@@ -21,7 +21,7 @@ Button {
     contentItem: RowLayout {
         spacing: 6
         Image { visible: !!control.glyph; source: control.glyph ? "icons/" + control.glyph + ".svg" : ""; sourceSize: Qt.size(16,16); opacity: control.enabled ? 1 : .35 }
-        Text { visible: !!control.text; text: control.text; font: control.font; color: control.enabled ? Theme.text : Theme.muted; horizontalAlignment: control.alignLeft ? Text.AlignLeft : Text.AlignHCenter; Layout.fillWidth: true }
+        Text { visible: !!control.text; text: control.text; font: control.font; color: control.enabled ? Theme.text : Theme.muted; horizontalAlignment: control.alignLeft ? Text.AlignLeft : Text.AlignHCenter; Layout.fillWidth: true; elide: Text.ElideRight }
     }
     background: Rectangle {
         radius: 4

@@ -1,5 +1,10 @@
 # AnthroForge 0.1.9
 
+Development of 0.2.0 follows the [confirmed specification](docs/specification_020.md)
+and [implementation plan](docs/implementation_020.md). See the
+[task record](docs/tasks/020-construction.md) for actual progress; the release described
+below remains 0.1.9 until the new desktop and headless workflows are qualified.
+
 A standalone SCP and primitive editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 

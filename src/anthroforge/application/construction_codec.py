@@ -27,6 +27,7 @@ def immutable(value: Any) -> Any:
 def curve(data: dict[str, Any]) -> Curve:
     state = tuples(data)
     state["points"] = tuple(CurvePoint(**tuples(p)) for p in state["points"])
+    state["result"] = EvaluationResult(**result_fields(state.get("result", {})))
     return Curve(**state)
 
 

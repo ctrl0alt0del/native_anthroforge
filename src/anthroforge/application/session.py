@@ -196,9 +196,8 @@ class Session:
             "skin_available": False,
             "entities": [asdict(item) for item in self.document.entities],
             "controls": [asdict(item) for item in self.document.controls],
-            "jobs": [job.describe() for job in self.scheduler.jobs],
-            "save_blocked": self.scheduler.blocked,
-            "checkpoint_revision": self.scheduler.checkpoint.revision,
+            "objects": object_descriptions(self.document),
+            **activity_description(self),
             "workspace": asdict(self.workspace),
         }
 
@@ -216,7 +215,24 @@ class Session:
 
 def changed_ids(previous: Document, current: Document) -> set[str]:
     changed = {e.id for e in previous.entities if e != current.index.entities.get(e.id)}
-    return changed | {c.id for c in previous.controls if c != current.index.controls.get(c.id)}
+    changed |= {c.id for c in previous.controls if c != current.index.controls.get(c.id)}
+    return changed | {
+        o.id for o in previous.objects if o != current.registry.construction.get(o.id)
+    }
+
+
+def object_descriptions(document: Document) -> list[dict[str, Any]]:
+    from .object_codec import encode
+
+    return [encode(item) for item in document.objects]
+
+
+def activity_description(session: Session) -> dict[str, Any]:
+    return {
+        "jobs": [job.describe() for job in session.scheduler.jobs],
+        "save_blocked": session.scheduler.blocked,
+        "checkpoint_revision": session.scheduler.checkpoint.revision,
+    }
 
 
 def merge_entity(previous: SCP, current: SCP) -> SCP:

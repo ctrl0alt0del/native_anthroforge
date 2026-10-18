@@ -19,12 +19,13 @@ from anthroforge.core.inspection_views import decode_bookmark, decode_measuremen
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.native.topology import restore
 
+from . import object_codec
 from .assets import Asset
 from .construction_codec import control, entity_construction
 from .geometry_ownership import assets_used
 
 FORMAT = "anthroforge-project"
-VERSION = 2
+VERSION = 3
 BUFFERS = ("vertices", "corners", "offsets", "triangles", "polygons")
 
 
@@ -80,6 +81,7 @@ def document_state(document: Document) -> dict[str, Any]:
     state["id"] = str(document.id)
     for name in ("entities", "controls", "workspaces"):
         state[name] = [asdict(value) for value in state[name]]
+    state["objects"] = [object_codec.encode(value) for value in document.objects]
     return state
 
 
@@ -146,31 +148,28 @@ def decode_document(data: dict[str, Any]) -> Document:
     data["entities"] = tuple(decode_entity(item) for item in data["entities"])
     data["workspaces"] = tuple(decode_workspace(item) for item in data["workspaces"])
     data["controls"] = tuple(control(item) for item in data.get("controls", ()))
+    data["objects"] = tuple(object_codec.decode(item) for item in data.get("objects", ()))
     if not data["workspaces"]:
         raise ValueError("Project has no workspace.")
     return Document(**data)
 
 
 def read_asset(
-    archive: zipfile.ZipFile, key: str, source: dict[str, Any], engine: GeometryEngine, version: int
+    archive: zipfile.ZipFile, key: str, source: dict[str, Any], engine: GeometryEngine
 ) -> Asset:
-    arrays = [
-        read_array(archive, f"assets/{key}/{label}.npy")
-        for label in (BUFFERS if version == 2 else BUFFERS[:3])
-    ]
-    mesh = restore(engine, arrays) if version == 2 else engine.create_mesh(*arrays)
+    arrays = [read_array(archive, f"assets/{key}/{label}.npy") for label in BUFFERS]
+    mesh = restore(engine, arrays)
     return Asset(mesh, source["source"], source["digest"], source["units"], source["y_up"])
 
 
 def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, dict[str, Asset]]:
     with zipfile.ZipFile(path) as archive:
         data = json.loads(archive.read("manifest.json"))
-        if data.get("format") != FORMAT or data.get("version") not in (1, VERSION):
+        if data.get("format") != FORMAT or data.get("version") != VERSION:
             raise ValueError("Unsupported AnthroForge project format/version.")
         document = decode_document(data["document"])
         assets = {
-            key: read_asset(archive, key, source, engine, data["version"])
-            for key, source in data["assets"].items()
+            key: read_asset(archive, key, source, engine) for key, source in data["assets"].items()
         }
         if assets_used(document) - assets.keys():
             raise ValueError("Project is missing a required mesh asset.")

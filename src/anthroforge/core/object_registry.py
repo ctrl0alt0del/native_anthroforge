@@ -1,0 +1,114 @@
+"""Typed document lookup and relationship integrity without an anatomical wrapper."""
+
+from collections.abc import Mapping
+from dataclasses import dataclass
+from types import MappingProxyType
+from typing import TYPE_CHECKING
+
+from .construction import Control, Curve
+from .entities import SCP
+from .fibers import Fiber
+from .reference_images import ReferenceImage
+from .surfaces import Surface
+
+if TYPE_CHECKING:
+    from .document import Document
+
+type Construction = Curve | Surface | ReferenceImage
+type SceneObject = SCP | Control | Construction
+
+
+@dataclass(frozen=True, slots=True)
+class ObjectRegistry:
+    records: Mapping[str, SceneObject]
+    construction: Mapping[str, Construction]
+    source: tuple[Construction, ...]
+    entities: tuple[SCP, ...]
+    controls: tuple[Control, ...]
+
+    def get(self, key: str) -> SceneObject:
+        if key not in self.records:
+            raise ValueError(f"Unknown object: {key}")
+        return self.records[key]
+
+
+def build(document: "Document", previous: ObjectRegistry | None) -> ObjectRegistry:
+    if previous is not None and reusable(document, previous):
+        return previous
+    items = (*document.entities, *document.controls, *document.objects)
+    records = {item.id: item for item in items}
+    if len(records) != len(items):
+        raise ValueError("Object identities must be unique across all object categories.")
+    validate(document, records)
+    return ObjectRegistry(
+        MappingProxyType(records),
+        MappingProxyType({v.id: v for v in document.objects}),
+        document.objects,
+        document.entities,
+        document.controls,
+    )
+
+
+def reusable(document: "Document", previous: ObjectRegistry | None) -> bool:
+    return bool(
+        previous is not None
+        and document.objects is previous.source
+        and document.entities is previous.entities
+        and document.controls is previous.controls
+    )
+
+
+def validate(document: "Document", records: dict[str, SceneObject]) -> None:
+    for item in document.objects:
+        if item.parent and (
+            item.parent not in records or isinstance(records[item.parent], ReferenceImage)
+        ):
+            raise ValueError("Transform parent must exist and cannot be a reference image.")
+        if set(item.owners) - document.index.entities.keys():
+            raise ValueError("Workspace associations require anatomical objects.")
+        if isinstance(item, Fiber):
+            validate_bindings(item, records)
+        if isinstance(item, Surface):
+            validate_sources(item, records)
+    validate_parenting(document.objects)
+    validate_point_ids(document)
+
+
+def validate_bindings(item: Fiber, records: dict[str, SceneObject]) -> None:
+    for binding in item.bindings:
+        if not isinstance(records.get(binding.target), SCP):
+            raise ValueError("Fiber binding target must be an anatomical surface provider.")
+
+
+def validate_sources(item: Surface, records: dict[str, SceneObject]) -> None:
+    sources = [records.get(use.curve) for use in item.curves]
+    if any(not isinstance(source, Curve) for source in sources):
+        raise ValueError("Surface sources must be curves or fibers.")
+    closed = {source.closed for source in sources if isinstance(source, Curve)}
+    if len(closed) != 1 or (item.kind == "PATCH" and closed != {True}):
+        raise ValueError("Surface sources have incompatible closure.")
+    if item.kind == "BRANCHED" and closed != {False}:
+        raise ValueError("Branched surfaces require open curves.")
+
+
+def validate_parenting(objects: tuple[Construction, ...]) -> None:
+    parents, visited = {item.id: item.parent for item in objects}, set()
+    for item in objects:
+        pending, key = set(), item.id
+        while key in parents and key not in visited:
+            if key in pending:
+                raise ValueError("Cyclic ordinary transform parenting.")
+            pending.add(key)
+            key = parents[key]
+        visited.update(pending)
+
+
+def validate_point_ids(document: "Document") -> None:
+    from .construction_validation import identities
+
+    items: tuple[SCP | Control, ...] = (*document.entities, *document.controls)
+    existing = [key for item in items for key in identities(item)]
+    keys = [*existing, *(item.id for item in document.objects)]
+    keys.extend(p.id for item in document.objects if isinstance(item, Curve) for p in item.points)
+    if any(not key for key in keys) or len(set(keys)) != len(keys):
+        raise ValueError("Authored identities must be nonempty and unique across the document.")

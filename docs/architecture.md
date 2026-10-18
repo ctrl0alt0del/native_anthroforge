@@ -1,4 +1,11 @@
-# AnthroForge 0.1.6 architecture
+# AnthroForge architecture
+
+The [0.2.0 specification](specification_020.md) and
+[implementation plan](implementation_020.md) define the approved next boundaries:
+first-class construction objects, referenced curves, Fiber as Curve subclass,
+general surfaces, embedded images and schema 3 without older-schema migration.
+See [implementation status](tasks/020-construction.md) for what is actually integrated.
+Sections labelled with earlier release numbers describe their qualified baseline.
 
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through

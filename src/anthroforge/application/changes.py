@@ -14,11 +14,12 @@ class DocumentChanges:
     entities: dict[str, set[str]] = field(default_factory=dict)
     controls: dict[str, set[str]] = field(default_factory=dict)
     document: set[str] = field(default_factory=set)
+    objects: dict[str, set[str]] = field(default_factory=dict)
 
     def include(self, other: "DocumentChanges") -> None:
         self.reset |= other.reset
         self.document.update(other.document)
-        for name in ("entities", "controls"):
+        for name in ("entities", "controls", "objects"):
             target = getattr(self, name)
             for key, values in getattr(other, name).items():
                 target.setdefault(key, set()).update(values)
@@ -28,6 +29,8 @@ def changed_fields(before: Any, after: Any) -> set[str]:
     if before is after:
         return set()
     if before is None or after is None:
+        return {"@membership"}
+    if type(before) is not type(after):
         return {"@membership"}
     return {f.name for f in fields(after) if getattr(before, f.name) != getattr(after, f.name)}
 
@@ -56,6 +59,7 @@ class ChangeJournal:
             record_changes(before.index.entities, after.index.entities),
             record_changes(before.index.controls, after.index.controls),
             {name for name in names if getattr(before, name) != getattr(after, name)},
+            record_changes(before.registry.construction, after.registry.construction),
         )
         record_order(delta, before, after)
         self.records.append((self.serial, delta))
@@ -71,9 +75,9 @@ class ChangeJournal:
 
 
 def record_order(delta: DocumentChanges, before: Document, after: Document) -> None:
-    if before.index.structure is after.index.structure:
+    if before.index.structure is after.index.structure and before.objects is after.objects:
         return
-    for name in ("entities", "controls"):
+    for name in ("entities", "controls", "objects"):
         old, new = getattr(before, name), getattr(after, name)
         if old is not new and tuple(v.id for v in old) != tuple(v.id for v in new):
             delta.document.add(name + ".order")

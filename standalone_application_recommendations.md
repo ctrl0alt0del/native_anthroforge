@@ -1,6 +1,13 @@
 # AnthroForge standalone application: consolidated recommendations
 
-Updated: 2026-10-16
+Updated: 2026-10-18
+
+The [confirmed 0.2.0 specification](docs/specification_020.md) is authoritative for
+curves, fibers, surfaces, reference images, object relationships and project-format
+compatibility. It replaces the earlier Free/Controlled classification with curve
+engines, requires independent curve-to-fiber copies, and includes all these features
+in 0.2.0. Muscles/soft tissues move to 0.2.1. Historical source terminology in the
+evidence/coverage appendix is retained only to identify the original addon behavior.
 
 Status: general product specification confirmed by the user on 2026-10-16 after questions Q1–Q58, with the subsequent 0.1.2 primitive/deformer interview confirmed in Q32. Section 1 and its linked confirmed feature specifications are authoritative where source recommendations differ. Priorities and technology proposals are recommendations unless explicitly identified as agreed. This is not an implementation completion report or a claim of measured standalone performance.
 
@@ -337,9 +344,9 @@ Present attachment of a point, influence of a supporting surface on the interior
 
 Directly inspect and edit endpoints, intermediate touches, loops, shared junctions, and interior influences. Selecting a shared point reveals all incident fibers before an edit affects them. Display deformed paths and fixed anchors together, with anatomical ownership and source/mirror relationships intact.
 
-### D05 — Preserve Free/Controlled and deformation/rerouting semantics [P0]
+### D05 — Preserve authored-shape and routed-engine semantics [P0]
 
-Free fibers preserve authored paths and expose collision problems. Controlled fibers may reroute while retaining structural anchors. Separate moving with anatomy, editing the trajectory, and explicitly running the planner/solver. Compare previous and proposed routes before acceptance where appropriate. A failed Free route must not silently invoke automatic planning.
+Bézier/polyline engines preserve authored paths and expose collision problems. The routed engine may reroute while retaining structural anchors. Fiber is a Curve subclass with anatomical bindings, not a separate Free/Controlled type. Separate moving with anatomy, editing the trajectory, and explicitly running the solver. Compare previous and proposed routes before acceptance where appropriate. Failure must not silently change engines. See the [0.2.0 contract](docs/specification_020.md).
 
 ### D06 — Provide a deliberate skeleton-update workflow [P1]
 

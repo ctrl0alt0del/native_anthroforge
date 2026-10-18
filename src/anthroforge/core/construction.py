@@ -5,6 +5,7 @@ from math import isfinite
 from uuid import uuid4
 
 from .entities import IDENTITY, Attachment, validate_matrix
+from .objects import ConstructionObject
 from .results import ControlResult
 
 
@@ -50,19 +51,23 @@ class CurvePoint:
 
 
 @dataclass(frozen=True, slots=True)
-class Curve:
+class Curve(ConstructionObject):
     points: tuple[CurvePoint, ...]
-    id: str = field(default_factory=identity)
-    name: str = "Curve"
+    name: str = field(default="Curve", kw_only=True)
     closed: bool = False
-    matrix: tuple[float, ...] = IDENTITY
     start: float | None = None
     span: float | None = None
     resolution: int = 24
+    engine: str = "BEZIER"
 
     def __post_init__(self) -> None:
+        ConstructionObject.__post_init__(self)
         if len(self.points) < 2 or len({p.id for p in self.points}) != len(self.points):
             raise ValueError("A curve needs at least two distinct control points.")
+        if self.closed and len(self.points) < 3:
+            raise ValueError("A closed curve needs at least three authored points.")
+        if self.engine not in ("BEZIER", "POLYLINE", "ROUTED"):
+            raise ValueError("Unknown curve path engine.")
         if not integer(self.resolution, 1, 1024):
             raise ValueError("Curve resolution must be between 1 and 1024.")
         validate_matrix(self.matrix)

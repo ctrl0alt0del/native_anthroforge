@@ -1,5 +1,11 @@
 # Local authoring API, version 0.1.8
 
+This table describes the existing API baseline. The approved
+[0.2.0 contract](specification_020.md) adds object/curve/fiber/surface/image operation
+families and retires direct control-surface attachment. Actual integration status is
+tracked in [the implementation record](tasks/020-construction.md); planned commands
+must not be treated as available until implemented and tested.
+
 The desktop and JSON clients call application/commands.py. A request has operation,
 arguments (an object) and optionally id. Success responses contain ok, revision and
 result; failures contain ok=false, error and revision. An ID stores the result for

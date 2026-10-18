@@ -1,5 +1,11 @@
 # AnthroForge 0.1.2: primitives and deformers
 
+Historical release contract. For current development, the
+[0.2.0 specification](specification_020.md) supersedes embedded curve ownership,
+direct anatomical attachments on controls and older-schema compatibility. Primitives
+reference first-class curves; per-consumer placement/sampling remains independent.
+The geometry/deformer parity requirements below remain applicable where not superseded.
+
 Status: confirmed product specification, 2026-10-16. The user confirmed primitive
 interview Q1–Q31 and the consolidated scope in Q32. This document records required
 behavior. Implementation evidence and its limits are recorded in

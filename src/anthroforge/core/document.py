@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 
+from . import object_registry
 from .construction import Control
 from .document_index import DocumentIndex, build
 from .entities import SCP, Workspace
@@ -19,7 +20,11 @@ class Document:
     update_mode: str = "LIVE"
     workspaces: tuple[Workspace, ...] = (Workspace(),)
     controls: tuple[Control, ...] = ()
+    objects: tuple[object_registry.Construction, ...] = ()
     _index: DocumentIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
+    _registry: object_registry.ObjectRegistry | None = field(
+        default=None, repr=False, compare=False, kw_only=True
+    )
 
     def __post_init__(self) -> None:
         if not self.name.strip():
@@ -27,6 +32,7 @@ class Document:
         if self.revision < 0:
             raise ValueError("Document revision must not be negative.")
         object.__setattr__(self, "_index", build(self, self._index))
+        object.__setattr__(self, "_registry", object_registry.build(self, self._registry))
         if self.update_mode not in ("LIVE", "ON_RELEASE", "MANUAL"):
             raise ValueError("Invalid document update mode.")
 
@@ -39,6 +45,14 @@ class Document:
         if control_id not in self.index.controls:
             raise ValueError(f"Unknown control: {control_id}")
         return self.index.controls[control_id]
+
+    @property
+    def registry(self) -> object_registry.ObjectRegistry:
+        assert self._registry is not None
+        return self._registry
+
+    def object(self, object_id: str) -> object_registry.SceneObject:
+        return self.registry.get(object_id)
 
     @property
     def index(self) -> DocumentIndex:

@@ -221,18 +221,12 @@ def write_legacy(path, session):
                 storage.write_array(archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind))
 
 
-def test_version_one_import_migrates_and_keeps_source_after_deformation(session, tmp_path):
-    entity = session.command("import", path="examples/primitives/cube.obj", units=1)["entity_id"]
+def test_legacy_import_is_rejected_without_replacing_current_document(session, tmp_path):
+    session.command("import", path="examples/primitives/cube.obj", units=1)
     session.command("wait", timeout=5)
     path = tmp_path / "legacy.anthroforge"
     write_legacy(path, session)
-    session.command("open", path=str(path))
-    definition = session.document.entity(entity).primitive
-    source = session.assets[definition.source].mesh.array(0).copy()
-    control = hook(session, entity)
-    move_control(session, control, 0.3)
-    session.command("wait", timeout=5)
-    np.testing.assert_array_equal(session.assets[definition.source].mesh.array(0), source)
-    session.command("save", path=str(path), blocked_policy="wait")
-    with zipfile.ZipFile(path) as archive:
-        assert json.loads(archive.read("manifest.json"))["version"] == 2
+    before = session.document
+    with pytest.raises(ValueError, match="Unsupported AnthroForge project"):
+        session.command("open", path=str(path))
+    assert session.document is before

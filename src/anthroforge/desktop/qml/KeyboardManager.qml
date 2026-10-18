@@ -53,6 +53,7 @@ Item {
         {command:"recordPerformance", key:"F12", duringTransform:true, allowModifiers:true, allowTyping:true},
         {command:"confirm", key:"Return", duringTransform:true, allowModifiers:true},
         {command:"confirm", key:"Enter", duringTransform:true, allowModifiers:true},
+        {command:"removeLastPoint", key:"Backspace", duringTransform:true},
         {command:"projection", key:"5"}, {command:"xray", key:"Alt+Z"},
         {command:"cancel", key:"Escape", allowModifiers:true, duringTransform:true}
     ]

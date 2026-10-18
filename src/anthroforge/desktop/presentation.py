@@ -25,12 +25,8 @@ def state(controller):
         unpickable_categories=view.unpickable_categories,
         editing=controller.session.history.before is not None,
         object_count=len(controller.session.document.registry.records),
-        image_layers=image_layers(controller),
+        cursor=view.cursor,
     )
-
-
-def image_layers(controller):
-    return sorted({r["image_style"]["depth"] for r in controller.image_model.active_rows()})
 
 
 def allows(editor, category, picking=False):

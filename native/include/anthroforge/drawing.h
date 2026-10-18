@@ -9,6 +9,19 @@ extern "C" {
 AF_API int af_curve_fit(const double* points, int count, int dimensions, int method,
     int closed, double error, double angle, double** output, int* output_count, uint64_t cancel);
 AF_API void af_curve_fit_free(double* output);
+/* Stroke owns immutable mesh snapshots; samples are xyz/radius. Plane is point/normal.
+ * Settings: surface, first-hit plane (0:none,1:view,2:surface), offset, relative offset.
+ * Pointer input: ray origin/direction, screen xy, radius. Append returns total count;
+ * probe does not mutate the stroke. All access is serialized by the owning input tool. */
+AF_API uint64_t af_stroke_create(int count,const uint64_t* meshes,const double* matrices,
+    const double* plane,const double* settings);
+AF_API void af_stroke_release(uint64_t handle);
+AF_API int af_stroke_append(uint64_t handle,const double* pointer,int interpolate);
+AF_API int af_stroke_probe(uint64_t handle,const double* pointer,double* output);
+AF_API int af_stroke_read(uint64_t handle,int start,int capacity,double* output);
+AF_API int af_stroke_pop(uint64_t handle);
+AF_API int af_drawing_plane(const double* frame,double* output);
+AF_API int af_stroke_view(uint64_t handle,const double* normal);
 #ifdef __cplusplus
 }
 #endif

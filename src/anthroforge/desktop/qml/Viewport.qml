@@ -32,10 +32,11 @@ Item {
     property bool restoringCamera: false
     property var preservedCamera: null
     readonly property bool canRestoreView: preservedCamera !== null
-    readonly property bool measuring: workspace.inspectionTools.state.active || workspace.imageTools.state.active
+    readonly property bool drawing: workspace.drawingTools.state.active
+    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active
     readonly property var selected: authoring.transformData
     readonly property bool modalTransforming: modalTransform.active
-    readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming
+    readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming || workspace.drawingTools.state.painting
     readonly property bool snapping: keyboard.held("snapSurface") && authoring.active &&
         (curveEditor.dragging || (gizmo.dragging && toolMode==="Move") || (modalTransforming && modalTransform.gesture.mode==="Move"))
     readonly property bool insertionPreview: curveEditor.previewActive
@@ -70,6 +71,7 @@ Item {
         return {origin:[a.x,-a.z,a.y],direction:[d.x,-d.z,d.y]};
     }
     function rayAt(x, y, select, extend) {
+        if(drawing) return {};
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
         if(workspace.imageTools.state.active) { workspace.imageTools.probe(origin,direction,select); return {}; }
         if(measuring) { workspace.inspectionTools.probe(origin,direction,depthIndex,select); return {}; }
@@ -101,7 +103,7 @@ Item {
         return extent/(2*Math.max(perspectiveCamera.clipNear,depth)*Math.tan(perspectiveCamera.fieldOfView*Math.PI/360));
     }
     function cancelTransform() { modalTransform.finish(true); curveEditor.finish(true); gizmo.cancel(); workspace.endTransform(true); }
-    function confirmTransform() { if(modalTransforming) modalTransform.finish(false); }
+    function confirmTransform() { if(drawing) workspace.drawingTools.finish(); else if(modalTransforming) modalTransform.finish(false); }
     function startModalTransform(mode) { if(!measuring) modalTransform.begin(mode); }
     function applyBookmark(values, orthographic, name) {
         if(!canRestoreView) preservedCamera=captureCamera();
@@ -229,10 +231,10 @@ Item {
             materials: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: "#33363c"; cullMode: Material.NoCulling }
             opacity: .22
         }
+        PathScene {}
         Node {
             id: worldScene
             eulerRotation.x: -90
-            PathScene {}
             ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic }
             Repeater3D {
                 id: meshRepeater
@@ -340,6 +342,7 @@ Item {
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     MeasurementOverlay { id: measurementOverlay; viewport: viewport }
     ImageCalibrationOverlay { viewport: viewport }
+    DrawingOverlay { viewport: viewport }
     InspectionTools { viewport: viewport; anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.margins: 12; z: 10 }
     Connections {
         target: workspace.inspectionTools
@@ -385,7 +388,7 @@ Item {
     }
     ColumnLayout {
         anchors.centerIn: parent; width: Math.min(320, parent.width-90); spacing: 14
-        visible: workspace.state.object_count === 0
+        visible: workspace.state.object_count === 0 && !viewport.drawing
         Image { source: "icons/mesh.svg"; sourceSize: Qt.size(40,40); opacity: .4; Layout.alignment: Qt.AlignHCenter }
         Label { text: "Start your assembly"; color: Theme.text; font.pixelSize: 22; Layout.alignment: Qt.AlignHCenter }
         Label { text: "Import your first primitive, then build its hierarchy and attachments."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; lineHeight: 1.4 }

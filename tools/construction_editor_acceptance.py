@@ -116,6 +116,42 @@ def interactions(controller):
     insertion(controller, key)
     image_inspector(controller)
     shared_sources(controller)
+    drawing_gestures(controller)
+
+
+def stroke_pointer(x, y=0):
+    return [x, y, 3, 0, 0, -1, 100 + x * 100, 100 + y * 100, 1]
+
+
+def drawing_gestures(controller):
+    tool = controller.drawing_tools
+    controller.run("workspace.update", dict(cursor=[0, 0, 0.4]))
+    tool.begin("POINTS")
+    before = controller.session.history.cursor
+    tool.pointer(stroke_pointer(0), [0, 0, -1], True)
+    tool.pointer(stroke_pointer(0.4), [0, 0, -1], True)
+    tool.removeLast()
+    assert tool.stroke.count == 1
+    tool.pointer(stroke_pointer(0.5), [0, 0, -1], True)
+    tool.finish()
+    settle(controller)
+    assert controller.session.history.cursor == before + 1 and tool.mode == "POINTS"
+    repeated_draws(controller)
+
+
+def repeated_draws(controller):
+    tool = controller.drawing_tools
+    tool.begin("DRAW")
+    before = controller.session.history.cursor
+    for y in (0.2, 0.4):
+        tool.pointer(stroke_pointer(0, y), [0, 0, -1], True)
+        tool.pointer(stroke_pointer(0.3, y), [0, 0, -1], False)
+        tool.release()
+    settle(controller)
+    assert controller.session.history.cursor == before + 2 and tool.mode == "DRAW"
+    tool.pointer(stroke_pointer(0), [0, 0, -1], True)
+    tool.cancel()
+    assert controller.session.history.cursor == before + 2 and tool.stroke is None
 
 
 def run():

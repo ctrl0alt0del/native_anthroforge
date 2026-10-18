@@ -11,6 +11,7 @@ from anthroforge.profiling.spans import measured
 from . import controller_actions as actions
 from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
+from .drawing_tools import DrawingTools
 from .image_tools import ImageTools
 from .inspection_export import InspectionExport
 from .inspection_panel import InspectionPanel
@@ -55,6 +56,7 @@ class Controller(QObject):
         self.inspection_export = InspectionExport(self)
         self.inspection_tools = InspectionTools(self)
         self.image_tools = ImageTools(self)
+        self.drawing_tools = DrawingTools(self)
         self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
 
     def memory_owners(self, owners):
@@ -62,6 +64,7 @@ class Controller(QObject):
             model = getattr(self, attribute, None)
             if model is not None:
                 model.memory_owners(owners)
+        owners["drawing_preview"].update(self.drawing_tools.leases)
 
     def initialize_renderers(self):
         from .image_scene import prepare_picking as prepare_images
@@ -191,6 +194,10 @@ class Controller(QObject):
     def imageTools(self):
         return self.image_tools
 
+    @Property(QObject, constant=True)
+    def drawingTools(self):
+        return self.drawing_tools
+
     @Slot(result="QVariantList")
     def ordinaryParents(self):
         from .image_tools import parent_choices
@@ -213,6 +220,7 @@ class Controller(QObject):
         self.inspection_export.synchronize()
         self.inspection_tools.synchronize()
         self.image_tools.synchronize()
+        self.drawing_tools.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()
@@ -456,6 +464,7 @@ class Controller(QObject):
 
     def close(self):
         self.timer.stop()
+        self.drawing_tools.cancel()
         self.session.close()
         self.profiler.close()
         for lock in self.temporary_locks:

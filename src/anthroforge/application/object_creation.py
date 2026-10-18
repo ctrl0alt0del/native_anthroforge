@@ -22,7 +22,7 @@ def placement(
 
 def require_parent(session: "Session", parent: str) -> None:
     if parent and isinstance(session.document.object(parent), ReferenceImage):
-        raise ValueError("Reference images cannot parent other objects.")
+        raise ValueError("Transform parent cannot be a reference image.")
 
 
 def validate_parent(session: "Session", item: ConstructionObject) -> None:

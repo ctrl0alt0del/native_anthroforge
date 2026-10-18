@@ -92,6 +92,7 @@ class Workspace:
     measurements: tuple[Measurement, ...] = ()
     bookmarks: tuple[CameraBookmark, ...] = ()
     reference_images: tuple[ImagePresentation, ...] = ()
+    cursor: tuple[float, ...] = (0.0, 0.0, 0.0)
 
     def __post_init__(self) -> None:
         if not self.name.strip():
@@ -103,6 +104,8 @@ class Workspace:
             raise ValueError("Image appearance must have unique targets.")
         if len(self.camera) != 7 or not all(map(isfinite, self.camera)) or self.camera[6] <= 0:
             raise ValueError("Invalid workspace camera.")
+        if len(self.cursor) != 3 or not all(map(isfinite, self.cursor)):
+            raise ValueError("Cursor needs three finite world coordinates.")
 
 
 def validate_matrix(matrix: tuple[float, ...]) -> None:

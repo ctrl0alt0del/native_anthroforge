@@ -116,3 +116,17 @@ def test_unknown_or_invalid_fit_settings_fail_without_history(session):
     with pytest.raises(ValueError, match="positive"):
         replace(FitSettings(), error=0)
     assert session.document == before
+
+
+def test_cursor_placement_creates_curve_at_world_cursor_without_parenting_side_effect(session):
+    root = session.command("scp.empty", name="Root")
+    session.command("scp.transform", entity=root, values=[2, 0, 0, 0, 0, 0, 1, 1, 1])
+    before = session.history.cursor
+    session.command("workspace.update", cursor=[1, 2, 3])
+    assert session.history.cursor == before
+    curve = session.command("curve.create", owner=root, parent=root)
+    item = session.document.object(curve)
+    assert item.matrix[3:12:4] == pytest.approx([-1, 2, 3])
+    assert item.owners == (root,)
+    session.command("undo")
+    assert session.workspace.cursor == (1, 2, 3)

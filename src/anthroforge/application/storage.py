@@ -12,7 +12,6 @@ from uuid import UUID
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Attachment, Workspace
-from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
 from anthroforge.native.mesh import GeometryEngine
 
 from . import object_codec, resource_storage
@@ -106,17 +105,9 @@ def decode_entity(data: dict[str, Any]) -> SCP:
 
 
 def decode_workspace(data: dict[str, Any]) -> Workspace:
-    from anthroforge.core.image_presentation import decode as decode_image
+    from .workspace_policy import settings
 
-    data = dict(data)
-    for key in ("members", "hidden", "unpickable", "camera"):
-        data[key] = tuple(data[key])
-    for key in ("hidden_categories", "unpickable_categories"):
-        data[key] = tuple(data.get(key, ()))
-    data["measurements"] = tuple(map(decode_measurement, data.get("measurements", ())))
-    data["bookmarks"] = tuple(map(decode_bookmark, data.get("bookmarks", ())))
-    data["reference_images"] = tuple(map(decode_image, data.get("reference_images", ())))
-    return Workspace(**data)
+    return Workspace(**settings(data))
 
 
 def decode_document(data: dict[str, Any]) -> Document:

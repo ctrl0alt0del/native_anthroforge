@@ -85,9 +85,26 @@ def create_curve(
     owner: str = "",
     engine: str = "BEZIER",
     closed: bool = False,
+    values: list[float] | None = None,
 ) -> str:
     curve = replace(new_curve(name, points, parent, owner), engine=engine, closed=closed)
+    curve = replace(curve, matrix=creation_frame(session, parent, values))
     return install_new_curve(session, curve)
+
+
+def creation_frame(
+    session: "Session", parent: str, values: list[float] | None
+) -> tuple[float, ...]:
+    from anthroforge.native.construction import matrix
+
+    from .object_creation import require_parent
+
+    require_parent(session, parent)
+    if values is not None:
+        return session.engine.transform(values)
+    absolute = session.engine.transform([*session.workspace.cursor, 0, 0, 0, 1, 1, 1])
+    frame = curve_sources.world(session.engine, session.document, parent)
+    return matrix(session.engine, frame, absolute, relative=True)
 
 
 def install_new_curve(session: "Session", curve: Curve) -> str:

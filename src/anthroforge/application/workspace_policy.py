@@ -11,7 +11,15 @@ if TYPE_CHECKING:
     from .session import Session
 
 
-TUPLES = {"members", "hidden", "unpickable", "camera", "hidden_categories", "unpickable_categories"}
+TUPLES = {
+    "members",
+    "hidden",
+    "unpickable",
+    "camera",
+    "cursor",
+    "hidden_categories",
+    "unpickable_categories",
+}
 RECORDS = {
     "bookmarks": decode_bookmark,
     "measurements": decode_measurement,

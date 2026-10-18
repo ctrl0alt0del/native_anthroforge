@@ -155,7 +155,12 @@ ApplicationWindow {
             ColumnLayout {
                 anchors.fill: parent; spacing: 0
                 Rectangle { Layout.fillWidth: true; implicitHeight: 33; color: Theme.header; Label { anchors.verticalCenter: parent.verticalCenter; x: 12; text: "PROPERTIES"; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1 } }
-                Inspector { id: inspector; objectName: "inspector"; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity) }
+                Inspector { id: inspector; objectName: "inspector"; visible: !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity) }
+                UiScrollView {
+                    id: drawingSettings; visible: workspace.drawingTools.state.active
+                    Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; contentWidth: availableWidth
+                    DrawingSettings { width: drawingSettings.availableWidth }
+                }
             }
         }
     }
@@ -272,7 +277,7 @@ ApplicationWindow {
     KeyboardManager {
         id: keyboard; window: window; blocked: window.modalOpen || workspace.state.waiting; transforming: viewport.transforming; snapping: viewport.snapping
         onRequested: command => window.dispatchShortcut(command)
-        onCanceled: viewport.cancelTransform()
+        onCanceled: { viewport.cancelTransform(); workspace.drawingTools.clearStroke(); }
         onOffsetRequested: steps => viewport.surfaceOffset(steps)
         onOffsetReset: viewport.resetSurfaceOffset()
     }
@@ -287,8 +292,9 @@ ApplicationWindow {
         restoreView: () => viewport.restoreView(),
         recordPerformance: () => performance.toggle(),
         confirm: () => viewport.confirmTransform(),
+        removeLastPoint: () => workspace.drawingTools.removeLast(),
         projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,
-        cancel: () => { workspace.inspectionTools.cancel(); workspace.imageTools.cancel(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
+        cancel: () => { workspace.inspectionTools.cancel(); workspace.imageTools.cancel(); workspace.drawingTools.cancel(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
     })
     function dispatchShortcut(command) {
         const action = shortcutCommands[command];

@@ -217,3 +217,34 @@ undo authorship and persistence. Image import regressions passed during the extr
 suite is pending for this increment. This is not completed Draw UX: stroke projection, cursor,
 desktop input/preview, actual Blender operator parity and performance evidence are next.
 The kernel cannot cancel internally; measure its atomic interval before claiming responsiveness.
+
+## Drawing/cursor integration checkpoint
+
+Added native owned stroke projection/sampling with surface snapshots, last-valid-depth fallback,
+normal offsets, radius-relative offsets, first-hit view/surface planes and view rebasing.
+Desktop Add Curve, Place Points and Draw use shared authoring; completed draws fit asynchronously
+and remain one undo action. Draw stays ready for another stroke. Cursor coordinates are persisted
+workspace presentation; curve creation resolves their world position even under ordinary parents.
+Reference-image tracing captures a plane without an enduring image reference.
+
+Six compact fixtures captured with Blender 5.0.1's actual background Draw operator pass native
+parity (open arcs, corners, closed loops; REFIT/SPLIT). Reproduction is in capture_drawing_parity.py;
+the preserved source is build/reference-fixtures/blender501_drawing.blend (ignored local artifact).
+Offscreen full-QML checks cover repeated drawings, point removal, cancellation and one-action undo.
+Texture-only drawing_scene_acceptance.py verifies preview/final display, pixel/picking agreement,
+and independence after image deletion; captures were inspected. Image/path rendering regressions
+also pass. No visible windows, desktop input or interactive acceptance were used.
+
+The texture check exposed a flattened top-view path despite correct authored/native coordinates.
+Explicit instanceRoot did not fix it. PathScene now supplies the complete application-to-display
+coordinate matrix outside the anatomy rotation node; top-view and affine-parenting pixel checks
+pass. Earlier path checks did not cover this view and were insufficient evidence for it.
+
+A runtime report is at build/020-drawing-scene/drawing.afprofile.zip. Its small tracing fixture
+shows native fitting separately (~0.66 ms), path preparation (~0.11 ms) and pointer projection
+(~0.01–0.02 ms). This is attribution evidence, not a responsiveness benchmark: texture readback
+and scripted pauses dominate frame intervals, and Qt binding profiling was not enabled here.
+Larger fitting/cancellation trials, complete drawing option parity/headless projection operations,
+engine conversion, routing/fibers/surfaces and release qualification remain required.
+Full gate is being rerun; last full pytest run had 641 passes and one error-message expectation
+regression, now corrected. Focused parity and image regressions pass after that correction.

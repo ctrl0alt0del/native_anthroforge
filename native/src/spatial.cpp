@@ -50,6 +50,15 @@ static void extend_bounds(Eigen::AlignedBox3d& bounds,const Mesh& mesh,const M4&
         bounds.extend(point(matrix,local));
     }
 }
+int pick_surface(const Mesh& mesh,const M4& world,const V3& start,const V3& ray,double* output) {
+    if(!mesh.prepared) throw std::runtime_error("Picking requires a finalized mesh.");
+    const M4 inverse=world.inverse();
+    const Eigen::RowVector3d local_start=point(inverse,start).transpose();
+    const Eigen::RowVector3d local_ray=(inverse.block<3,3>(0,0)*ray).transpose();
+    igl::Hit hit;
+    if(!mesh.tree.intersect_ray(mesh.vertices,mesh.triangles,local_start,local_ray,hit)) return 0;
+    write_hit(mesh,world,start,hit,output); return 1;
+}
 }
 int af_scene_bounds(int count,const uint64_t* meshes,const double* matrices,double* output) {
     try {
@@ -64,14 +73,7 @@ int af_scene_bounds(int count,const uint64_t* meshes,const double* matrices,doub
 int af_pick(uint64_t handle,const double* matrix,const double* origin,const double* direction,double* output) {
     try {
         const auto mesh=af::mesh(handle); const af::M4 world=Eigen::Map<const af::M4>(matrix);
-        if(!mesh->prepared) throw std::runtime_error("Picking requires a finalized mesh.");
-        const af::M4 inverse=world.inverse(); const af::V3 ray=Eigen::Map<const af::V3>(direction);
-        const af::V3 start=Eigen::Map<const af::V3>(origin);
-        const Eigen::RowVector3d local_start=af::point(inverse,start).transpose();
-        const Eigen::RowVector3d local_ray=(inverse.block<3,3>(0,0)*ray).transpose();
-        igl::Hit hit;
-        if(!mesh->tree.intersect_ray(mesh->vertices,mesh->triangles,local_start,local_ray,hit)) return 0;
-        af::write_hit(*mesh,world,start,hit,output); return 1;
+        return af::pick_surface(*mesh,world,Eigen::Map<const af::V3>(origin),Eigen::Map<const af::V3>(direction),output);
     } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
 }
 int af_scene_pick(int count,const uint64_t* meshes,const double* matrices,

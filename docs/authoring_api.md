@@ -1,4 +1,4 @@
-# Local authoring API, version 0.1.6
+# Local authoring API, version 0.1.7
 
 The desktop and JSON clients call application/commands.py. A request has operation,
 arguments (an object) and optionally id. Success responses contain ok, revision and
@@ -33,6 +33,13 @@ serve continues scheduling between requests. Ending the process does not save.
 | job.cancel | job_id | Request cooperative cancellation |
 | job.retry | job_id | Restart a retryable terminal job |
 | inspect | none | Current entities, jobs, checkpoint and workspace |
+| inspect.target | entity (SCP or control ID) | Read-only relationships, attachment/frame, revision, geometry and topology-lock details |
+| inspect.snapshot | optional entities=[IDs] | JSON inspection with full issue coverage/freshness; no Qt initialization |
+| inspection.export | path ending .afinspection.zip; optional selected="", editing=false, wait=false | Frozen current revision, image/JSON archive; returns job/path/revision/state; read-only background work |
+| units.convert | value; optional source="m", target="m" | Convert length between m/cm/mm; API geometry always uses metres |
+| workspace.remove | index > 0 | Remove named workspace; active removal selects whole document |
+| workspace.preset | name=all/shape/surface/attachments | Apply category show/select preset |
+
 | save | path, blocked_policy | Saved revision/path or pending jobs |
 | open | path | Load the project and queue equivalent SCP startup synchronization |
 | workspace.create | name, members; optional children=false | Create and activate focused workspace |
@@ -42,6 +49,14 @@ serve continues scheduling between requests. Ending the process does not save.
 | profile.status | none | Recording/export state, storage, output path and collector health |
 | profile.stop | optional path, wait=false | Freeze and export, or retry failed export; headless can wait for completion |
 
+`workspace.create` accepts mixed SCP/control `members`; `children=true` expands only
+SCP descendants. `workspace.update` accepts an optional `index` (default active),
+`name`, `members`, `display_units` (m/cm/mm), `hidden_categories` and
+`unpickable_categories` in addition to existing camera/object/overlay settings.
+Categories are geometry/curves/points/handles/hooks/cages/anchors; anchors are visual
+markers. The whole-document workspace cannot restrict membership. New unknown
+references are rejected; references retained for undo after deletion are allowed.
+See [workflow inspection](workflow_inspection.md) for archive contents and CLI usage.
 Profiling operations use a session-owned runtime service, outside the document command
 catalogue and save checkpoints. See [profiler report/API details](profiling.md).
 

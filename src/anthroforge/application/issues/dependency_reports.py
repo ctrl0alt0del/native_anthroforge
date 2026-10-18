@@ -18,7 +18,8 @@ BLOCKED = Issue(
     severity="error",
 )
 PARTICIPANT_DETAILS = (
-    "The listed outputs form a strongly connected cycle component. Accepted output is retained."
+    "This output belongs to member_component. The cycles list also includes upstream causes. "
+    "Accepted output is retained."
 )
 DOWNSTREAM_DETAILS = (
     "This output is outside the cycle and is blocked by the listed upstream cycle components. "

@@ -86,3 +86,16 @@ def test_workspace_guards_and_units_preserve_anatomy(session, assembly):
     with pytest.raises(ValueError, match="Finish"):
         session.command("workspace.create", name="During edit", members=[root])
     session.cancel()
+
+
+def test_workspace_preserves_deleted_members_for_undo_without_blocking_settings(session):
+    entity = create(session)
+    session.command("workspace.create", name="Detail", members=[entity])
+    session.command("workspace.update", hidden=[entity], unpickable=[entity])
+    session.command("scp.delete", entity=entity)
+    session.command("workspace.update", display_units="mm")
+    session.command("undo")
+    assert entity in session.workspace.members and entity in session.workspace.hidden
+    assert session.workspace.display_units == "mm"
+    with pytest.raises(ValueError, match="unknown"):
+        session.command("workspace.update", members=["invented"])

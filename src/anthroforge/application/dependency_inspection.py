@@ -33,6 +33,7 @@ def cycle_records(document: Document, port: Port) -> dict[str, Any]:
     context = cycle_context(graph, port)
     return dict(
         participant=context["participant"],
+        member_component=port_records(document, context["own"]),
         blocked=port in graph.blocked,
         cycles=[port_records(document, group) for group in context["components"]],
     )

@@ -2,6 +2,7 @@
 
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from time import monotonic, sleep
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.jobs import Job
@@ -57,12 +58,21 @@ def export(
     job = create_job(target, frozen)
     session.scheduler.submit(job)
     if wait:
-        session.wait(180)
-        if job.state != "succeeded":
-            raise ValueError(job.error or "Inspection export " + job.state)
+        wait_for_export(session, job)
     return dict(
         job=job.id, path=str(target), revision=frozen.source.document.revision, state=job.state
     )
+
+
+def wait_for_export(session: "Session", job: Job) -> None:
+    deadline = monotonic() + 180
+    while job.active and monotonic() < deadline:
+        session.scheduler.tick()
+        sleep(0.005)
+    if job.active:
+        session.scheduler.cancel_job(job.id)
+    if job.state != "succeeded":
+        raise ValueError(job.error or "Inspection export " + job.state)
 
 
 def validate(session: "Session", target: Path) -> None:

@@ -11,6 +11,7 @@ import numpy as np
 from issues_portable import issues
 from profiler_portable import profiling
 from PySide6.QtGui import QImage
+from workflow_portable import workflow
 
 CHECKS = (
     "import",
@@ -25,6 +26,7 @@ CHECKS = (
     "GUI",
     "runtime profiling",
     "issue reporting and verified repair",
+    "workflow inspection, units, workspace policies and image/JSON report",
 )
 
 
@@ -101,6 +103,7 @@ def run(executable, cwd):
     desktop(executable, cwd)
     profiling(executable, cwd, invoke)
     issues(executable, cwd, invoke)
+    workflow(executable, cwd, invoke)
     report = portable_report(executable, doctor)
     (cwd / "portable-check.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report))

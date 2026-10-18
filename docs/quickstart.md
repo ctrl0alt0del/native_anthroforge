@@ -196,7 +196,7 @@ persistent attachment. Escape or switching applications cancels an active drag.
 
 While snapping, the mouse wheel changes a signed offset along the hit surface's world
 normal. Positive values follow its authored normal; negative values go into the surface.
-The marker displays the offset in metres. One notch uses the world distance corresponding
+The marker displays the offset in the workspace display unit. One notch uses the world distance corresponding
 to eight screen pixels at the selection depth; Shift makes the adjustment ten times finer.
 The wheel does not zoom during snapping. **Middle-click or release Ctrl** to reset the
 offset to zero. Middle-click preserves the active edit. The offset carries across snap
@@ -226,3 +226,11 @@ status and **Show file** after completion. Share that `.afprofile.zip` file.
 Windows reports are under `%LOCALAPPDATA%/AnthroForge/Profiles`. The default capture
 keeps the latest 120 seconds within its storage budget. See [profiling](profiling.md)
 for headless operations, privacy, limits and interpreting costs.
+
+## Relationships, workspaces and reports
+
+Expand **Relationships & attachments** in Properties for inputs, consumers, surface
+anchors and topology locks. Use **Manage…** beside the workspace selector to edit
+mixed SCP/control membership, choose display units and adjust category show/select
+filters. **File → Export inspection report…** saves a frozen image/JSON archive while
+you continue working. See [the workflow walkthrough](workflow_inspection.md).

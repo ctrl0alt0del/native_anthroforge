@@ -28,6 +28,14 @@ def prepare_indices(editor, engine):
     labels = [index for index, path in enumerate(paths) for _ in range(len(path) // 2)]
     editor._curve_index = PickIndex(engine, segments, segments=True, labels=labels)
     editor._curve_ids = list(editor._curve_lines)
+    retain_hover(editor, indices, paths)
+
+
+def retain_hover(editor, indices, paths):
+    if editor.hover_index not in indices:
+        editor.hover_index = -1
+    if not paths:
+        editor.hover_curve = ""
 
 
 def curve_members(rows):

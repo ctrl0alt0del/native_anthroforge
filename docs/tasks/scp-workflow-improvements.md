@@ -3,7 +3,7 @@
 - Task branch: `codex/scp-workflow-improvements`
 - Integration branch: `main`
 - Starting revision: `e8565e28328a205f10575f03928737ccd782d0d1`
-- Status: implementation in progress
+- Status: source and GUI qualified; portable qualification in progress
 - Last updated: 2026-10-18, Europe/Bucharest
 - Active writer: desktop chat, direct work
 
@@ -64,6 +64,13 @@ under ignored `build/workflow-017` were inspected; a workspace combo update-orde
 defect found visually was fixed. New export tests cover frozen geometry ownership,
 failure/retry, cancellation, atomic destination preservation and Qt-free orchestration.
 Full release gate, more interaction coverage and portable acceptance still pending.
+
+Latest: the development gate passed 523 tests and all typing/style/native checks.
+Expanded actual GUI checks cover hooks/cages, independent selection filters and
+navigation into read-only context. Eight counterbalanced recorded drag trials passed;
+see `scp-workflow-evidence.json` and `../development_status.md` for measured limits.
+Version/docs are now 0.1.7. The next step is packaging the clean source checkpoint,
+relocated portable checks (including the new report CLI), source archive and integration.
 
 ## Next actions
 

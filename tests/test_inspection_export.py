@@ -16,7 +16,7 @@ def fake_render(root, revision, cancel):
     report_archive.check(cancel)
     view = json.loads((root / "view.json").read_text())
     (root / "image.png").write_bytes(b"test image")
-    data = dict(captured=True, revision=revision, inspection_view=view)
+    data = dict(captured=True, revision=revision, inspection_view=view, scene=view)
     (root / "image.png.json").write_text(json.dumps(data))
 
 

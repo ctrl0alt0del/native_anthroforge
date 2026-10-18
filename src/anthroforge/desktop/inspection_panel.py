@@ -26,7 +26,7 @@ class InspectionPanel(QObject):
         if not self.enabled:
             return
         owner = self.controller
-        signature = (owner.session, owner.session.document.revision, owner.selection)
+        signature = self.context()
         if signature == self.signature:
             return
         self.signature = signature
@@ -36,6 +36,15 @@ class InspectionPanel(QObject):
             else {}
         )
         self.projection.synchronize(result)
+
+    def context(self):
+        owner = self.controller
+        return (
+            owner.session,
+            owner.session.document.revision,
+            owner.selection,
+            owner.session.active_workspace,
+        )
 
     @Slot(str, bool)
     def navigate(self, target, frame):

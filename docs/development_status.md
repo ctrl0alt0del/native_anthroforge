@@ -1,7 +1,47 @@
 # AnthroForge development validation
 
-Current qualification is in [Issue reporting 0.1.6](#issue-reporting-016).
+Current source qualification is in [Workflow improvements 0.1.7](#workflow-improvements-017).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Workflow improvements 0.1.7
+
+The five postponed recommendations are integrated: attachment/dependency inspection,
+precise cycle-member versus downstream issues, mixed workspace management/category
+filters/presets, mm/cm/m display and entry, and frozen image/JSON inspection reports.
+The shared API and [walkthrough](workflow_inspection.md) describe the contracts.
+
+The Windows development gate passed **523 tests**, Ruff/formatting, strict typing,
+native CTest, native/PowerShell function checks, numerical imports and native loading.
+Seven existing Qt deprecation warnings remain. Additional coverage exercises frozen
+geometry ownership, read-only export, atomic failure/retry/cancellation, deleted
+workspace membership through undo, native attachment anchors, full persistence and
+cycle causes including a 3,000-output chain. The report checks the observed rendered
+camera, projection, selection and revision against its declared snapshot.
+
+Actual GUI acceptance passed unit entry (250 mm stored as 0.25 m), mixed membership,
+independent geometry/curve/handle/hook/cage filtering, native picking exclusions,
+relationship navigation into read-only context, and exporting while the selected
+object is renamed. The Issues GUI regression passed. Rendered workspace, inspector
+and report images were visually inspected; final runs had no QML warnings.
+
+Eight serial profiler trials used inspector closed/open/open/closed, with normal and
+Ctrl-snapped dragging in each pair. Every report was complete; F12 during the gesture,
+confirmation and undo passed. Mean inclusive input dispatch was 7.93–8.76 ms closed
+versus 8.68–8.71 ms open for normal dragging, and 8.36–8.97 ms versus 9.38–9.48 ms for
+snapping. These recorded times include profiler perturbation and ordinary background
+load, not a claim about unprofiled overhead or physical display latency. The small
+cube/body fixture does not qualify full-body performance. [Evidence and hashes](tasks/scp-workflow-evidence.json)
+retain each trial and frame-submission statistics.
+
+Direct ownership/coupling review: dependency evidence is shared between Issues,
+inspection and report export; workspace policy owns reference/editability validation;
+presentation filters feed cached native picking indexes. Unit conversion lives at
+the dimensional input boundary. The report job owns frozen references and temporary
+files/processes under the existing coordinator, without a second worker pool or save
+barrier. Geometry queries remain native; Python handles domain graphs and orchestration.
+Inspector details are opt-in and revision-gated. Numerical algorithms are unchanged.
+
+Portable executable qualification is in progress; source checks alone do not establish it.
 
 ## Issue reporting 0.1.6
 

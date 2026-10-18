@@ -15,11 +15,17 @@ def layers(editor):
             result[category(ref)].append(world)
     curves = [p for path in editor._curve_lines.values() for p in path]
     result["curves"] = curves if presentation.allows(editor, "curves") else []
-    category_name = "cages" if editor.state.get("kind") == "LATTICE" else "handles"
+    category_name = link_category(editor)
     result["links"] = (
         editor._lines[len(curves) :] if presentation.allows(editor, category_name) else []
     )
     return result
+
+
+def link_category(editor):
+    owner = editor.controller
+    control = owner.session.document.index.controls.get(owner.selection)
+    return "cages" if control and control.kind == "LATTICE" else "handles"
 
 
 def highlights(editor):

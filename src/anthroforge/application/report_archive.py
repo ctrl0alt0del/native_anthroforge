@@ -4,6 +4,7 @@ import json
 import os
 import tempfile
 import zipfile
+from math import isclose
 from pathlib import Path
 from threading import Event
 from typing import Any
@@ -38,7 +39,16 @@ def verify(image: dict[str, Any], metadata: dict[str, Any]) -> None:
         raise ValueError("Renderer did not capture the declared revision.")
     if image.get("inspection_view") != metadata["view"]:
         raise ValueError("Renderer view does not match the report snapshot.")
+    verify_camera(image["scene"], metadata["view"])
     image.pop("image", None)  # Do not publish temporary paths.
+
+
+def verify_camera(scene: dict[str, Any], view: dict[str, Any]) -> None:
+    pairs = zip(scene["camera"], view["camera"], strict=True)
+    if not all(isclose(a, b, rel_tol=1e-5, abs_tol=1e-5) for a, b in pairs):
+        raise ValueError("Rendered camera differs from the declared inspection camera.")
+    if scene["selected"] != view["selected"] or scene["orthographic"] != view["orthographic"]:
+        raise ValueError("Rendered selection/projection differs from the inspection view.")
 
 
 def archive(path: Path, image: Path, metadata: dict[str, Any], cancel: Event) -> None:

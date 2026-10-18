@@ -67,9 +67,9 @@ requests safe cancellation of its submitted jobs; it does not undo accepted resu
 
 - `evaluation.v1`: failed SCP/control evaluation, pending output, accepted output
   with pending upstream changes, and attachments lacking an accepted support surface.
-- `dependencies.v1`: blocked pose/control/cage/geometry outputs from the existing
-  dependency graph, with direct input identities. A blocked output may be in a cycle
-  or downstream of one; this release does not claim an exact cycle path.
+- `dependencies.v1`: `DEPENDENCY_CYCLE` for pose/control/cage/geometry outputs inside
+  actual cycle components, and `DEPENDENCY_BLOCKED` for downstream blocked outputs.
+  Evidence names the causal strongly connected components; it is not an ordered path.
 - `tasks.v1`: calculation failures, including import/file failures without an SCP
   target. Successful retries retire the matching failure. Cancelling a retry retains
   its original failure as retryable evidence. Activity retains job history.
@@ -81,8 +81,8 @@ geometry parameters. Shared workspace and active-edit restrictions apply.
 The addon's fiber-anchor collision checks and skin/topology mesh-quality checks
 depend on systems not yet present in the standalone application. Their detectors
 and repair solvers are not falsely advertised as migrated. The framework has the
-registration ports needed when those features arrive. The wider attachment inspector,
-workspace manager, units, and inspection-package recommendations remain separate work.
+registration ports needed when those features arrive. The [0.1.7 workflow tools](workflow_inspection.md)
+add attachment inspection, workspace management, units and inspection archives.
 
 ## Scheduling, persistence and performance
 

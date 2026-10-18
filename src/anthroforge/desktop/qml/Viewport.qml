@@ -50,7 +50,9 @@ Item {
             finite = finite && isFinite(p.x) && isFinite(p.y) && isFinite(p.z);
         }
         const p=gizmo.probe(0);
-        return JSON.stringify({chunks:meshRepeater.count,vertices:vertices,finite:finite,gizmo:[p.x,p.y],handle:gizmo.visible});
+        const c=cameraOrigin.position, r=cameraOrigin.eulerRotation;
+        return JSON.stringify({chunks:meshRepeater.count,vertices:vertices,finite:finite,gizmo:[p.x,p.y],handle:gizmo.visible,
+            camera:[c.x,-c.z,c.y,r.x,r.y,r.z,distance],orthographic:orthographic,selected:workspace.selectedId});
     }
 
     function cameraPoint(x,y,depth) {

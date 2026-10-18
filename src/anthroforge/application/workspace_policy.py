@@ -40,8 +40,13 @@ def validate(session: "Session", workspace: Workspace, index: int) -> None:
         raise ValueError("The whole-document workspace cannot restrict membership.")
     if index != 0 and not workspace.focused:
         raise ValueError("Named workspaces must retain explicit membership.")
-    if workspace.focused and workspace.members:
-        members(session.document, list(workspace.members))
+    validate_references(session, workspace, session.document.workspaces[index])
+
+
+def validate_references(session: "Session", workspace: Workspace, previous: Workspace) -> None:
+    # Retain deleted IDs for undo; validate new references, not historical membership.
     live = session.document.index.entities.keys() | session.document.index.controls.keys()
-    if (set(workspace.hidden) | set(workspace.unpickable)) - live:
-        raise ValueError("Workspace presentation references an unknown object.")
+    for field in ("members", "hidden", "unpickable"):
+        added = set(getattr(workspace, field)) - set(getattr(previous, field))
+        if added - live:
+            raise ValueError("Workspace references an unknown SCP or control.")

@@ -79,9 +79,22 @@ Final build uses `AF_PACKAGE_OUTPUT=E:/development/anthroforge/dist/0.1.7`, prod
 
 ## Next actions
 
-1. Complete category/control and inspector navigation checks, including reporter error paths.
-2. Run development/profiler/portable qualification; update API/walkthrough and release versions.
-3. Qualify 0.1.7, archive corresponding source, merge/push normally after all checks pass.
+1. Finish the current preliminary package process, then rebuild from current clean HEAD
+   with `AF_PACKAGE_OUTPUT=E:/development/anthroforge/dist/0.1.7`. The preliminary build
+   at cb29a96 predates the launcher fix and is not the release candidate.
+2. Copy the final distribution to an ignored relocation directory and run
+   `tools/check_portable.py <relocated AnthroForge.exe> <isolated working directory>`.
+   The gate now includes workspace/units/inspection CLI and isolated report rendering.
+3. Record results, create `dist/AnthroForge-0.1.7-source.zip`, and merge/push main normally.
+
+Final source suite: **525 passed**, including queued-writer reprioritization when
+workspace membership changes (read-only advisory priority is preserved). Latest
+functional fix is 2ff31af: packaged report workers must launch `sys.argv[0]`, since
+Nuitka gives `sys.executable` a nonexistent `python.exe` path. The preliminary relocated
+test failed with WinError 2; a temporary alias made that same report succeed and was
+removed. Source regression verifies the real executable path even when renamed.
+Do not ship an alias or mark the final package accepted before its actual test passes.
+Early diagnostic copy: `build/portable-017/early`; final logs: `build/workflow-017`.
 
 ## Recovery inputs
 

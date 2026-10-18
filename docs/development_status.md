@@ -12,6 +12,8 @@ The shared API and [walkthrough](workflow_inspection.md) describe the contracts.
 
 The Windows development gate passed **523 tests**, Ruff/formatting, strict typing,
 native CTest, native/PowerShell function checks, numerical imports and native loading.
+The final source suite passed **525 tests** after adding packaged-launcher and queued
+writer reprioritization regressions; typing/style checks also passed after those changes.
 Seven existing Qt deprecation warnings remain. Additional coverage exercises frozen
 geometry ownership, read-only export, atomic failure/retry/cancellation, deleted
 workspace membership through undo, native attachment anchors, full persistence and
@@ -42,6 +44,11 @@ barrier. Geometry queries remain native; Python handles domain graphs and orches
 Inspector details are opt-in and revision-gated. Numerical algorithms are unchanged.
 
 Portable executable qualification is in progress; source checks alone do not establish it.
+The preliminary relocated report test found Nuitka's `sys.executable` naming an absent
+`python.exe`. A disposable interpreter-name alias made the same image/JSON export pass,
+isolating the launcher path as the cause. The production adapter now uses the compiled
+application's `sys.argv[0]`; it does not ship the alias. Final rebuilt acceptance remains
+required. The running 0.1.6 app is preserved; 0.1.7 is built in `dist/0.1.7/AnthroForge.dist`.
 
 ## Issue reporting 0.1.6
 

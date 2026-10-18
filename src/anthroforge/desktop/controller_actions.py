@@ -17,7 +17,7 @@ def local_path(value):
 
 def run(controller, operation, arguments):
     try:
-        result = controller.session.command(operation, **arguments)
+        result = controller.session.command(operation, **command_values(arguments))
         if operation in ("scp.empty", "scp.duplicate", "scp.wrap_root"):
             controller.selection = result
         controller.refresh()
@@ -26,6 +26,17 @@ def run(controller, operation, arguments):
         controller.message = str(error)
         controller.notify()
         return None
+
+
+def command_values(value):
+    """JavaScript has one numeric type; restore exact integers at the Qt transport boundary."""
+    if isinstance(value, dict):
+        return {key: command_values(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [command_values(item) for item in value]
+    if type(value) is float and value.is_integer():
+        return int(value)
+    return value
 
 
 def start_transform(controller, mode):

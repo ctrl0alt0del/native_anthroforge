@@ -49,6 +49,8 @@ ColumnLayout {
             visible: !panel.item.standalone; Layout.fillWidth: true
             UiCombo { Layout.fillWidth: true; model: ["Shape and transform","Shape only"]; currentIndex: panel.use.mode === "SHAPE_ONLY" ? 1 : 0; hint: "Switching preserves current placement"; onActivated: workspace.run("primitive.curve_mode",{entity:panel.item.id,curve:panel.curve.id,mode:currentIndex===1?"SHAPE_ONLY":"SHAPE_AND_TRANSFORM"}) }
             UiCheck { text: "Reverse direction"; checked: panel.use.reverse || false; onClicked: workspace.run("primitive.curve_reverse",{entity:panel.item.id,curve:panel.curve.id,enabled:checked}) }
+            UiCheck { objectName:"curveSampleOverride"; text:"Override sample count"; enabled:!panel.topologyLocked; checked:panel.use.samples!==null && panel.use.samples!==undefined; onClicked:workspace.run("consumer.sampling",{entity:panel.item.id,curve:panel.curve.id,samples:checked ? panel.primitive.samples : null}) }
+            NumericSetting { objectName:"curveSamples"; visible:!!panel.use.samples; label:panel.primitive.kind==="LOFT" ? "Minimum loft samples" : "Curve samples"; decimals:0; value:panel.use.samples || 32; enabled:!panel.topologyLocked; onEdited:value=>workspace.run("consumer.sampling",{entity:panel.item.id,curve:panel.curve.id,samples:Math.round(value)}) }
             Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.muted; text: "Used by: "+(panel.use.users || []).map(u=>u.name).join(", ") }
             RowLayout {
                 UiButton { text: "Select source"; onClicked: workspace.select(panel.curve.id) }

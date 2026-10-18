@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job
+from anthroforge.core.primitive_sampling import counts
 from anthroforge.core.scheduling import Workload
 from anthroforge.core.surfaces import Surface
 from anthroforge.native.mesh import NativeCancellation
@@ -65,7 +66,7 @@ def primitive_workload(session: "Session", entity: str, document: Document) -> W
     points = (
         sum(len(source_curve(document, c.id).points) for c in primitive.curves) if primitive else 0
     )
-    vertices = primitive.samples * max(len(primitive.curves), 1) if primitive else 0
+    vertices = sum(counts(primitive).values()) if primitive else 0
     return Workload(
         entities=len(document.entities),
         affected=1,

@@ -18,6 +18,7 @@ a claim that the complete 0.2.0 desktop workflow or release is available.
 | `primitive.from_curves` | ordered `curves`, `kind` BODY/LOFT, optional `parent`, `name`, `shape` | SCP ID with live curve references. |
 | `primitive.curve_mode` | `entity`, `curve`, `mode` SHAPE_ONLY/SHAPE_AND_TRANSFORM | Changes transform following without a visible jump. |
 | `primitive.make_independent` | `entity`, `curve` | New curve ID; remaps that consumer and its memberships. |
+| `consumer.sampling` | `entity`, `curve`, `samples` | Consumer-owned override; null inherits primitive density (32 for surfaces). Incoming attachments lock changes. |
 
 Primitive inspect retains resolved curve records for editing clients; project storage
 holds references and separate objects. Schema 3 rejects older files. Standalone path
@@ -391,4 +392,15 @@ commands do not certify the complete 0.2.0 workflow.
 
 These commands share the desktop Construction menu and inspector policies. Accepted meshes
 remain visible on pending/failed calculation; Issues expose failure and explicit recalculation.
-Branched construction is not yet integrated and is rejected explicitly in this checkpoint.
+Primitive loft boundaries share the highest effective requested count; each body piece uses
+its source reference's count. Defaults remain inherited until explicitly overridden.
+
+`surface.sources(target, curves)`, `surface.source.add(target, curve, index?)` and
+`surface.source.remove(target, curve)` manage live sources while preserving existing settings
+and correspondence. Removed sources remain in the document. For branched assemblies, remove
+branches before changing main source order or membership.
+
+`surface.branch.add(target, boundary, curves)` connects open branch curves through explicit
+junctions on an outer main boundary. Roots must be ordered, interior and nonoverlapping;
+closed/nested branches are rejected. `surface.branch.remove(target, branch)` preserves source
+curves. Making a branched consumer independent copies its complete source/junction assembly.

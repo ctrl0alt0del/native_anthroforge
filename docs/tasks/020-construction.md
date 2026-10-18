@@ -746,3 +746,17 @@ configured mypy (176 modules), Ruff and invisible D3D11 drawing acceptance pass.
 tracing capture was inspected; repeated open/closed drawing, cancellation and one-action undo
 also pass. Full development gate has not been rerun. Remaining release work listed above
 still applies except these drawing sampling/closure details.
+
+### Consumer density and desktop transport checkpoint
+
+CurveUse density is now an optional override, inheriting the primitive's default (32 for
+surfaces). Body pieces use independent counts; loft boundaries share the highest effective
+request. One core sampling policy supplies construction, scheduling estimates and base-vertex
+selection. The shared `consumer.sampling` operation enforces incoming topology locks, and
+the primitive inspector exposes the override. Ordinary source edits remain independent.
+
+39 focused primitive/shared-curve/surface/architecture tests pass. Full-QML offscreen checks
+exercise actual numeric signals, matching base vertices, locked controls and unlocking.
+This caught Qt transporting integral JavaScript values as doubles; the common desktop command
+adapter now restores exact integers recursively, retaining strict core validation. Configured
+mypy (177 modules) and Ruff pass. A complete gate remains pending after these changes.

@@ -138,6 +138,10 @@ class Primitive(PrimitiveParameters):
         PrimitiveParameters.__post_init__(self)
         if any(not isinstance(use, CurveUse) for use in self.curves):
             raise ValueError("Primitive definitions require curve references, not embedded curves.")
+        if self.kind == "BODY" and any(
+            use.samples is not None and use.samples < 3 for use in self.curves
+        ):
+            raise ValueError("Body construction needs at least three longitudinal samples.")
         validate_family(self)
 
 

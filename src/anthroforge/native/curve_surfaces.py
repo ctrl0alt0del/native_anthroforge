@@ -58,7 +58,7 @@ def row(path: Path, frame: Any, use: Any, origin: float = -1, reverse: bool = Fa
         1 if use.span is None else use.span,
         origin,
         use.reverse,
-        use.samples,
+        32 if use.samples is None else use.samples,
         reverse,
     )
     result._path_owner = path

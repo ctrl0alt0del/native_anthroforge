@@ -162,9 +162,12 @@ def components_for(editor):
 
 
 def base_components(session, entity, piece):
+    from anthroforge.core.primitive_sampling import count
+
+    density = count(session.document.entity(entity.id).primitive, piece.curve)
     entity = for_editing(session, entity)
     curve = next(c for c in entity.primitive.curves if c.id == piece.curve)
-    mesh = bodies.base(session.engine, piece, entity.primitive.samples, curve.closed, 0)
+    mesh = bodies.base(session.engine, piece, density, curve.closed, 0)
     frame = construction.matrix(session.engine, entity_frame(session.engine, entity), curve.matrix)
     world = components.transformed(session.engine, mesh.array(0), frame).tolist()
     return [

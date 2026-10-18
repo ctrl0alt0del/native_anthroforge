@@ -76,6 +76,7 @@ EDITS = {
     "primitive.curve_reverse": curve_consumers.reverse,
     "primitive.make_independent": curve_independence.make_independent,
     "consumer.make_independent": curve_independence.make_independent,
+    "consumer.sampling": curve_consumers.sampling,
     "junction.create": junction_operations.create,
     "junction.remove": junction_operations.remove,
     "scp.empty": operations.empty,

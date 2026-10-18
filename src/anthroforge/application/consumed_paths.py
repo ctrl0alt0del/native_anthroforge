@@ -6,6 +6,7 @@ from typing import Any
 from anthroforge.core.construction import Curve, ResolvedPrimitive
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
+from anthroforge.core.primitive_sampling import count
 from anthroforge.native import paths
 from anthroforge.native.mesh import GeometryEngine
 
@@ -33,7 +34,7 @@ def definition(
         )
         for c in authored.curves
     )
-    return replace(authored, curves=curves)
+    return replace(authored, curves=curves, samples=count(entity.primitive))
 
 
 def samples(

@@ -85,6 +85,16 @@ def reverse(session: "Session", entity: str, curve: str, enabled: bool) -> None:
     install_use(session, item, replace(use, reverse=enabled))
 
 
+def sampling(session: "Session", entity: str, curve: str, samples: int | None) -> None:
+    from .construction_policy import require_topology_edit
+
+    item, use = selected_use(session, entity, curve)
+    changed = replace(use, samples=samples)
+    if changed != use:
+        require_topology_edit(session.document, entity)
+        install_use(session, item, changed)
+
+
 def selected_use(session: "Session", entity: str, curve: str) -> tuple[SCP | Surface, CurveUse]:
     from . import object_operations
 

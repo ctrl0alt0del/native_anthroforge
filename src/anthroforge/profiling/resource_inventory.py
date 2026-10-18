@@ -74,6 +74,8 @@ def session_owners(session, output, profiler):
         )
         output[owner].update(bounded(references, 4096, profiler))
     output["catalogue"].update(bounded(catalogue_resources(session), 4096, profiler))
+    if session.conversion.asset is not None:
+        output["conversion_preview"].add(session.conversion.asset.path)
 
 
 def catalogue_resources(session):

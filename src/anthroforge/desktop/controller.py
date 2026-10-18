@@ -132,6 +132,16 @@ class Controller(QObject):
     def pathModel(self):
         return self.path_model
 
+    @Property("QVariantMap", notify=changed)
+    def conversionState(self):
+        from anthroforge.application.curve_conversion import status
+
+        return status(self.session)
+
+    def conversion_key(self):
+        value = self.session.conversion
+        return value.token, value.state, id(value.asset)
+
     @Property(QObject, constant=True)
     def imageModel(self):
         return self.image_model
@@ -310,6 +320,7 @@ class Controller(QObject):
             projection.session is not self.session
             or projection.cursor != self.session.changes.serial
             or self.last_workspace != self.session.active_workspace
+            or getattr(self, "_conversion_key", None) != self.conversion_key()
         ):
             self.refresh()
 
@@ -318,6 +329,7 @@ class Controller(QObject):
         scene_projection.refresh(self)
         self.last_revision = self.session.document.revision
         self.last_workspace = self.session.active_workspace
+        self._conversion_key = self.conversion_key()
         self.notify()
         self.restore_camera()
 

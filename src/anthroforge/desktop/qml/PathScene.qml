@@ -19,7 +19,7 @@ Repeater3D {
             opacity: item.readonly ? .12 : 1
             materials: DefaultMaterial {
                 lighting: DefaultMaterial.NoLighting
-                diffuseColor: workspace.selectedObjects.includes(item.id) ? Theme.accent : workspace.hoveredId === item.id ? Theme.curveHoverColor : Theme.curveColor
+                diffuseColor: item.preview ? Theme.success : workspace.selectedObjects.includes(item.id) ? Theme.accent : workspace.hoveredId === item.id ? Theme.curveHoverColor : Theme.curveColor
                 lineWidth: 2
             }
         }

@@ -21,7 +21,7 @@ a claim that the complete 0.2.0 desktop workflow or release is available.
 
 Primitive inspect retains resolved curve records for editing clients; project storage
 holds references and separate objects. Schema 3 rejects older files. Standalone path
-evaluation, the other engines and their UI remain tracked in the task record below.
+evaluation and conversion are described below; routed evaluation remains in progress.
 
 ## Existing command catalogue
 
@@ -306,3 +306,26 @@ Native projection uses exact triangle queries rather than Blender's depth-buffer
 The first-hit/fallback/offset policies are adapted from Blender 5.0.1. Fitting uses its
 pinned curve_fit_nd implementation. Cancellation is checked around the atomic fit call;
 obsolete output cannot publish. `tools/drawing_qualification.py` records this interval.
+
+## Curve engine conversion (0.2.0 candidate)
+
+Authored curves store typed `engine_settings`: Bézier (`kind`, `resolution`), exact
+polyline (`kind`), or routing (`kind`, `samples`, `radius`, `accepted_steps`, `obstacles`).
+There is no public solver generation selector. `curve.create` accepts `engine` and a
+`settings` dictionary; the existing Bézier `curve.edit(resolution=...)` operation remains
+an alias for its typed setting. Curve/Fiber consumers still share the same path contract.
+
+- `curve.conversion.preview(curve, engine, mode="EVALUATED", samples=64, points=[], settings={})`
+  starts a read-only coordinator job. EVALUATED resamples the accepted path into editable
+  vector-handle points; AUTHORED retains authored points. Routing requires AUTHORED plus an
+  explicit point-ID selection including open endpoints and all anatomical bindings.
+- `curve.conversion.status()` returns the token, job, state and candidate point count/settings.
+- `curve.conversion.accept(token)` validates the captured read set and shared topology locks,
+  then commits one undoable edit. It preserves metadata edited after preview and retains
+  accepted geometry while the converted path evaluates.
+- `curve.conversion.cancel()` releases the candidate and cancels pending preview work.
+
+Only one preview is retained. It does not alter saving, document state or undo; it is not
+serialized. The desktop displays it in green and excludes it from picking. Source edits
+invalidate acceptance. Routing execution is still pending on this development branch;
+requesting it currently reports that limitation rather than substituting an authored engine.

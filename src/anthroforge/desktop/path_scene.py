@@ -21,6 +21,41 @@ def rows(controller):
     ]
 
 
+def resources(controller):
+    yield from (asset.path for asset in controller.session.resources.paths.values())
+    if controller.session.conversion.asset is not None:
+        yield controller.session.conversion.asset.path
+
+
+def preview_rows(controller):
+    from anthroforge.application.curve_conversion import current
+
+    value = controller.session.conversion
+    source = controller.construction.records.get(value.target)
+    if (
+        value.state != "ready"
+        or value.asset is None
+        or not source
+        or not current(controller.session, value)
+    ):
+        return []
+    return [preview_record(source, value, chunk) for chunk in range(value.asset.path.chunks)]
+
+
+def preview_record(source, value, chunk):
+    return dict(
+        source,
+        id="preview:" + value.token,
+        key=f"preview:{value.token}:{chunk}",
+        handle=value.asset.path.handle,
+        geometry_asset=value.token,
+        chunk=chunk,
+        pickable=False,
+        readonly=False,
+        preview=True,
+    )
+
+
 def prepare_picking(controller):
     displayed = controller.path_model.active_rows()
     eligible = [row for row in displayed if row["pickable"] and row["visible"]]

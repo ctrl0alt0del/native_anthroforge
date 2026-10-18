@@ -16,6 +16,7 @@ from anthroforge.profiling.tasks import operation as profile_operation
 from .assets import Asset
 from .changes import ChangeJournal
 from .coordinator import TaskCoordinator
+from .curve_conversion import ConversionPreview
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
 from .history import History
@@ -63,6 +64,7 @@ class Session:
         self._document = value
 
     def initialize_scheduler(self) -> None:
+        self.conversion = ConversionPreview()
         self.scheduler = TaskCoordinator(lambda: self.document)
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
@@ -213,6 +215,7 @@ class Session:
     def close(self) -> None:
         self.issues.close()
         self.scheduler.close()
+        self.conversion = ConversionPreview()
         if self._engine is not None:
             self._engine.bases.clear()
             self.profiler.native.detach(self._engine)

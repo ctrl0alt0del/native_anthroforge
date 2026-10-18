@@ -39,7 +39,9 @@ class ConstructionProjection:
 
         resources = self.controller.session.resources
         self.publish_kind(
-            "path", path_scene.rows(self.controller), (a.path for a in resources.paths.values())
+            "path",
+            path_scene.rows(self.controller) + path_scene.preview_rows(self.controller),
+            path_scene.resources(self.controller),
         )
         self.publish_kind("image", image_scene.rows(self.controller), resources.images.values())
 

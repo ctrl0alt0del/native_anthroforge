@@ -4,6 +4,7 @@ from dataclasses import asdict
 from typing import Any
 
 from anthroforge.core.construction import Curve, CurvePoint
+from anthroforge.core.curve_engines import fields as curve_fields
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import Attachment
 from anthroforge.core.fibers import Fiber, FiberBinding
@@ -37,6 +38,7 @@ def decode(data: dict[str, Any]) -> Construction:
 
 
 def decode_curve(kind: str, state: dict[str, Any]) -> Curve:
+    state = curve_fields(state)
     state["points"] = tuple(CurvePoint(**tuples(point)) for point in state["points"])
     if kind == "fiber":
         state["bindings"] = tuple(decode_binding(binding) for binding in state["bindings"])

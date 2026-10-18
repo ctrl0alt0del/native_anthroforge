@@ -70,7 +70,8 @@ ColumnLayout {
             }
         }
         UiCheck { text: "Closed curve"; checked: panel.curve.closed || false; enabled: !panel.topologyLocked; onClicked: panel.curveSetting("closed",checked) }
-        NumericSetting { label: "Curve evaluation resolution"; value: panel.curve.resolution || 24; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.curveSetting("resolution",Math.round(value)) }
+        NumericSetting { visible: panel.curve.engine === "BEZIER"; label: "Curve evaluation resolution"; value: panel.curve.resolution || 24; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.curveSetting("resolution",Math.round(value)) }
+        CurveConversion { curve: panel.curve; enabled: !panel.topologyLocked }
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Override sampling range"; checked: panel.curve.start !== null && panel.curve.start !== undefined; onClicked: { panel.curveSetting("start",checked?0:null); panel.curveSetting("span",checked?1:null); } }
         NumericSetting { visible: panel.primitive.kind === "LOFT" && panel.curve.start !== null; label: "Curve start"; value: panel.curve.start || 0; onEdited: value => panel.curveSetting("start",value) }
         NumericSetting { visible: panel.primitive.kind === "LOFT" && panel.curve.span !== null; label: "Curve span"; value: panel.curve.span || 1; onEdited: value => panel.curveSetting("span",value) }

@@ -117,6 +117,22 @@ def interactions(controller):
     image_inspector(controller)
     shared_sources(controller)
     drawing_gestures(controller)
+    conversion_preview(controller)
+
+
+def conversion_preview(controller):
+    key = controller.run("curve.create", {})
+    settle(controller)
+    controller.select(key)
+    result = controller.run("curve.conversion.preview", dict(curve=key, engine="POLYLINE"))
+    settle(controller)
+    assert controller.conversionState["state"] == "ready"
+    rows = [row for row in controller.path_model.wanted.values() if row.get("preview")]
+    assert rows and all(not row["pickable"] for row in rows)
+    controller.run("curve.conversion.accept", dict(token=result["token"]))
+    settle(controller)
+    assert controller.session.document.object(key).engine == "POLYLINE"
+    assert not any(row.get("preview") for row in controller.path_model.rows)
 
 
 def stroke_pointer(x, y=0):

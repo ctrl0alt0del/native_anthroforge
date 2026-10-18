@@ -113,11 +113,51 @@ def run(app):
     renderer = Offscreen(controller, warnings)
     try:
         exercise(controller, renderer, app)
+        conversion_scene(controller, renderer, app)
         assert not warnings, warnings
         print(json.dumps(dict(passed=True, visible_window=False, image_dependency=False)))
     finally:
         renderer.close()
         controller.close()
+
+
+def conversion_scene(controller, renderer, app):
+    points = [dict(position=p) for p in ((-0.6, -0.45, 0.2), (0, -0.1, 0.2), (0.6, -0.45, 0.2))]
+    key = controller.run("curve.create", dict(points=points))
+    controller.session.wait(5)
+    controller.refresh()
+    before = controller.session.document.object(key)
+    result = controller.run(
+        "curve.conversion.preview", dict(curve=key, engine="POLYLINE", mode="AUTHORED")
+    )
+    controller.session.wait(5)
+    controller.refresh()
+    image = frames(controller, renderer, app)
+    image.save(str(OUTPUT / "conversion-preview.png"))
+    assert_preview_pixel(renderer, image, [-0.3, -0.275, 0.2])
+    assert_conversion_accept(controller, key, result["token"], before)
+
+
+def assert_preview_pixel(renderer, image, point):
+    pixel = project(renderer, point)
+    colors = [
+        image.pixelColor(round(pixel.x()) + x, round(pixel.y()) + y)
+        for x in range(-3, 4)
+        for y in range(-3, 4)
+    ]
+    assert any(c.green() > c.red() + 30 and c.green() > c.blue() + 20 for c in colors)
+
+
+def assert_conversion_accept(controller, key, token, before):
+    assert all(
+        not row["pickable"] for row in controller.path_model.active_rows() if row.get("preview")
+    )
+    controller.run("curve.conversion.accept", dict(token=token))
+    controller.session.wait(5)
+    controller.refresh()
+    assert controller.session.document.object(key).engine == "POLYLINE"
+    controller.run("undo", {})
+    assert controller.session.document.object(key).points == before.points
 
 
 if __name__ == "__main__":

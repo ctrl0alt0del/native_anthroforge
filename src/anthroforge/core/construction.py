@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from .construction_values import integer as integer
 from .construction_values import validate_range as validate_range
+from .curve_engines import BezierSettings, PathSettings, PolylineSettings, RoutingSettings
 from .curve_uses import CurveUse
 from .entities import IDENTITY, Attachment, validate_matrix
 from .objects import ConstructionObject
@@ -56,8 +57,19 @@ class Curve(ConstructionObject):
     closed: bool = False
     start: float | None = None
     span: float | None = None
-    resolution: int = 24
-    engine: str = "BEZIER"
+    engine_settings: PathSettings = field(default_factory=BezierSettings)
+
+    @property
+    def engine(self) -> str:
+        return self.engine_settings.kind
+
+    @property
+    def resolution(self) -> int:
+        return (
+            self.engine_settings.resolution
+            if isinstance(self.engine_settings, BezierSettings)
+            else 1
+        )
 
     def __post_init__(self) -> None:
         ConstructionObject.__post_init__(self)
@@ -65,10 +77,10 @@ class Curve(ConstructionObject):
             raise ValueError("A curve needs at least two distinct control points.")
         if self.closed and len(self.points) < 3:
             raise ValueError("A closed curve needs at least three authored points.")
-        if self.engine not in ("BEZIER", "POLYLINE", "ROUTED"):
-            raise ValueError("Unknown curve path engine.")
-        if not integer(self.resolution, 1, 1024):
-            raise ValueError("Curve resolution must be between 1 and 1024.")
+        if not isinstance(
+            self.engine_settings, (BezierSettings, PolylineSettings, RoutingSettings)
+        ):
+            raise ValueError("Curve requires typed path engine settings.")
         validate_matrix(self.matrix)
         validate_range(self.start, self.span)
 

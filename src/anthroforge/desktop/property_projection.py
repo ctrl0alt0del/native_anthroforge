@@ -4,12 +4,17 @@ from dataclasses import asdict, fields, is_dataclass
 
 from PySide6.QtQml import QQmlPropertyMap
 
+from anthroforge.core.construction import Curve
+
 from .values import qml
 
 
 def members(value):
     if is_dataclass(value):
-        return {f.name: getattr(value, f.name) for f in fields(value)}
+        data = {f.name: getattr(value, f.name) for f in fields(value)}
+        if isinstance(value, Curve):
+            data.update(engine=value.engine, resolution=value.resolution)
+        return data
     return value
 
 

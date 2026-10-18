@@ -10,6 +10,7 @@ from anthroforge.application import storage
 from anthroforge.application.changes import ChangeJournal
 from anthroforge.application.resources import Resources
 from anthroforge.core.construction import Curve, CurvePoint
+from anthroforge.core.curve_engines import fields as curve_fields
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Attachment
@@ -20,7 +21,7 @@ from anthroforge.core.surfaces import Surface
 
 def curve(**options):
     points = (CurvePoint(position=(0, 0, 0)), CurvePoint(position=(1, 0, 0)))
-    return Curve(points, **options)
+    return Curve(points, **curve_fields(options))
 
 
 def bound_fiber(source, target):

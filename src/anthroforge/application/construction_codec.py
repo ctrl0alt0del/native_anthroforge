@@ -13,6 +13,7 @@ from anthroforge.core.construction import (
     Target,
     Thickness,
 )
+from anthroforge.core.curve_engines import fields as curve_fields
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import Attachment
 from anthroforge.core.results import ControlResult, EvaluationResult, ReadRevision
@@ -27,7 +28,7 @@ def immutable(value: Any) -> Any:
 
 
 def curve(data: dict[str, Any]) -> Curve:
-    state = tuples(data)
+    state = curve_fields(tuples(data))
     state["points"] = tuple(CurvePoint(**tuples(p)) for p in state["points"])
     state["result"] = EvaluationResult(**result_fields(state.get("result", {})))
     return Curve(**state)

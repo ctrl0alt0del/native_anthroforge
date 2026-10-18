@@ -7,6 +7,7 @@ from anthroforge.core.units import convert
 from . import (
     construction_tasks,
     curve_consumers,
+    curve_conversion,
     curve_edit_operations,
     curve_independence,
     drawing_operations,
@@ -39,6 +40,7 @@ EDITS = {
     "image.align": image_operations.align,
     "curve.create": object_operations.create_curve,
     "curve.draw": drawing_operations.draw,
+    "curve.conversion.accept": curve_conversion.accept,
     "curve.edit": object_operations.edit_curve,
     "curve.point.update": object_operations.edit_point,
     "curve.point.insert": curve_edit_operations.insert,
@@ -162,6 +164,9 @@ def query_commands(session: "Session") -> dict[str, Any]:
 
 def drawing_commands(session: "Session") -> dict[str, Any]:
     return {
+        "curve.conversion.preview": lambda **a: curve_conversion.preview(session, **a),
+        "curve.conversion.status": lambda: curve_conversion.status(session),
+        "curve.conversion.cancel": lambda: curve_conversion.cancel(session),
         "drawing.project": lambda **a: drawing_projection.project(session, **a),
         "curve.evaluate": lambda curve: path_tasks.schedule(session, {curve}, explicit=True),
     }

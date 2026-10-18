@@ -264,3 +264,29 @@ and an ordinary profiler report under build/020-drawing-qualification. Serial tr
 returned after about 1509 ms in the largest smooth trial, rejecting output. The kernel's atomic
 interval is an observed limitation, not a claim of immediate cancellation or a UI-frame test.
 These are single-fixture trials with profiling enabled, not a controlled speed comparison.
+
+## Typed engines and explicit conversion checkpoint
+
+Curves now own typed engine settings; Bézier sampling, exact polyline and routing configuration
+are separate records. The API's existing Bézier resolution command resolves to that setting.
+Persistence, primitive adapters, UI projections and fixtures were migrated together. Routing
+configuration does not expose an implementation generation; native routed evaluation is next.
+
+One bounded conversion preview uses read-only coordinator work and explicit input revisions.
+It does not author or block saving. Accept checks shared topology locks and freshness, preserves
+current metadata and accepted geometry, and commits through ordinary operations. Preview paths
+use staged publication and retained leases, appear green and are unpickable. Cancellation and
+project adoption release preview ownership. Profiler ownership includes the preview resource.
+
+Nine behavioral tests cover history, stale rejection, closed correspondence, shared locks,
+explicit routing constraints, ownership release, typed persistence and cancellation. Full-QML
+offscreen checks and texture-only preview/accept/undo checks pass; conversion-preview.png was
+visually inspected alongside pixel assertions. No visible-window interaction was performed.
+Ruff, mypy and function-length checks pass. Last full pytest run before conversion had 652
+passing behavior tests plus a length-check failure, corrected; the complete gate is next.
+
+Remaining: routed engine/native preparation, attachment deformation and fiber creation/editing,
+junctions, generic surfaces, control-attachment retirement, complete performance/lifecycle
+qualification and portable release. Conversion with interior fiber bindings will need preserved
+constraint correspondence; current sampled conversion requires authored mode for those inputs.
+Version stays 0.1.9 and this checkpoint is not a 0.2.0 release.

@@ -3,6 +3,7 @@
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
+from anthroforge.core import curve_engines
 from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.core.object_registry import Construction
 from anthroforge.core.objects import ConstructionObject
@@ -86,8 +87,10 @@ def create_curve(
     engine: str = "BEZIER",
     closed: bool = False,
     values: list[float] | None = None,
+    settings: dict[str, Any] | None = None,
 ) -> str:
-    curve = replace(new_curve(name, points, parent, owner), engine=engine, closed=closed)
+    config = curve_engines.decode(engine, settings)
+    curve = replace(new_curve(name, points, parent, owner), engine_settings=config, closed=closed)
     curve = replace(curve, matrix=creation_frame(session, parent, values))
     return install_new_curve(session, curve)
 
@@ -139,7 +142,15 @@ def edit_curve(session: "Session", curve: str, **options: Any) -> None:
     if set(options) & {"closed", "resolution"}:
         for consumer in curve_sources.consumers(session.document, {curve}):
             require_topology_edit(session.document, consumer)
-    install(session, replace(item, **tuples(options)))
+    install(session, updated_curve(item, tuples(options)))
+
+
+def updated_curve(item: Curve, options: dict[str, Any]) -> Curve:
+    settings = dict(options)
+    if "resolution" in settings:
+        config = curve_engines.decode(item.engine, dict(resolution=settings.pop("resolution")))
+        settings["engine_settings"] = config
+    return replace(item, **settings)
 
 
 def edit_point(session: "Session", curve: str, point: str, **options: Any) -> None:

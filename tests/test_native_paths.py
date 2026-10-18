@@ -9,6 +9,7 @@ import pytest
 
 from anthroforge.application.primitive_operations import straight_curve
 from anthroforge.core.construction import CurvePoint, ResolvedPrimitive
+from anthroforge.core.curve_engines import decode
 from anthroforge.native import bodies, construction, paths
 from anthroforge.native.mesh import NativeCancellation
 
@@ -28,7 +29,7 @@ def test_native_bezier_path_preserves_existing_open_curve_evaluation(session):
 
 
 def test_polyline_is_exact_not_fitted_or_resampled(session):
-    curve = replace(triangle(), engine="POLYLINE", closed=False)
+    curve = replace(triangle(), engine_settings=decode("POLYLINE"), closed=False)
     path = paths.evaluate(session.engine, curve)
     np.testing.assert_array_equal(path.array()[:, :3], [p.position for p in curve.points])
     np.testing.assert_array_equal(path.array(1), [0, 1, 2])
@@ -37,7 +38,7 @@ def test_polyline_is_exact_not_fitted_or_resampled(session):
 
 @pytest.mark.parametrize("engine", ["BEZIER", "POLYLINE"])
 def test_closed_paths_keep_authored_start_and_omit_duplicate_endpoint(session, engine):
-    curve = replace(triangle(), engine=engine)
+    curve = replace(triangle(), engine_settings=decode(engine))
     path = paths.evaluate(session.engine, curve)
     np.testing.assert_array_equal(path.array()[0, :3], curve.points[0].position)
     assert not np.array_equal(path.array()[0, :3], path.array()[-1, :3])
@@ -80,7 +81,9 @@ def test_native_path_evaluation_obeys_cancellation(session):
 def test_zero_length_path_does_not_publish_nan_frames(session):
     point = CurvePoint(position=(0, 0, 0))
     curve = replace(
-        straight_curve(), points=(point, replace(point, id="second")), engine="POLYLINE"
+        straight_curve(),
+        points=(point, replace(point, id="second")),
+        engine_settings=decode("POLYLINE"),
     )
     with pytest.raises(ValueError, match="zero length|degenerate"):
         paths.evaluate(session.engine, curve)

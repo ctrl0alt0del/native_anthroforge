@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from anthroforge.core.construction import Curve, CurvePoint
+from anthroforge.core.curve_engines import decode
 from anthroforge.core.document import Document
 from anthroforge.core.drawing import FitSettings
 from anthroforge.core.jobs import Job
@@ -66,7 +67,7 @@ def compute(
     records = drawing.fit(session.engine, samples, options, cancel.handle)
     points = tuple(curve_editing.unpack(CurvePoint(), row) for row in records)
     engine = "POLYLINE" if options.method == "POLYLINE" else "BEZIER"
-    item = Curve(points, closed=options.closed, engine=engine, **metadata)
+    item = Curve(points, closed=options.closed, engine_settings=decode(engine), **metadata)
     return item, path_assets.evaluate(session.engine, item, cancel.handle)
 
 

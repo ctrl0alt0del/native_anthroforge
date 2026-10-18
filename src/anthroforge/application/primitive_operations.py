@@ -130,6 +130,8 @@ def update(session: "Session", entity: str, **options: Any) -> None:
 
 
 def curve_update(session: "Session", entity: str, curve: str, **options: Any) -> None:
+    from .object_operations import updated_curve
+
     primitive = definition(session, entity)
     require_loft_settings(primitive, options)
     selected = next(c for c in primitive.curves if c.id == curve)
@@ -137,12 +139,8 @@ def curve_update(session: "Session", entity: str, curve: str, **options: Any) ->
         require_topology_edit(session.document, entity)
     if set(options) - {"name", "closed", "matrix", "start", "span", "resolution"}:
         raise ValueError("Unknown curve setting.")
-    changed = replace(selected, **codec.tuples(options))
-    install(
-        session,
-        entity,
-        replace(primitive, curves=tuple(changed if c.id == curve else c for c in primitive.curves)),
-    )
+    changed = updated_curve(selected, codec.tuples(options))
+    replace_curve(session, entity, primitive, changed)
 
 
 def point_update(session: "Session", entity: str, curve: str, point: str, **options: Any) -> None:

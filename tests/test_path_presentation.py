@@ -8,6 +8,7 @@ import pytest
 
 from anthroforge.application.primitive_operations import straight_curve
 from anthroforge.core.construction import CurvePoint
+from anthroforge.core.curve_engines import decode
 from anthroforge.core.entities import IDENTITY
 from anthroforge.native import paths
 from anthroforge.native.mesh import U
@@ -26,7 +27,7 @@ def chunk(path, index):
 
 
 def test_closed_render_path_has_closing_edge_without_adding_authored_sample(session):
-    path = paths.evaluate(session.engine, replace(triangle(), engine="POLYLINE"))
+    path = paths.evaluate(session.engine, replace(triangle(), engine_settings=decode("POLYLINE")))
     rendered = chunk(path, 0)
     assert path.count == 3 and len(rendered) == 4
     np.testing.assert_array_equal(rendered[0], rendered[-1])
@@ -36,7 +37,7 @@ def test_closed_render_path_has_closing_edge_without_adding_authored_sample(sess
 def test_long_path_uses_bounded_chunks_with_shared_seams(session):
     points = tuple(CurvePoint(position=(i * 0.01, 0, 0)) for i in range(5000))
     path = paths.evaluate(
-        session.engine, replace(straight_curve(), points=points, engine="POLYLINE")
+        session.engine, replace(straight_curve(), points=points, engine_settings=decode("POLYLINE"))
     )
     chunks = [chunk(path, i) for i in range(path.chunks)]
     assert path.chunks == 3 and max(map(len, chunks)) <= 2049
@@ -49,7 +50,9 @@ def test_long_path_uses_bounded_chunks_with_shared_seams(session):
 
 @pytest.mark.parametrize("scales", [(1, 1, 1), (-2, 0.25, 3)])
 def test_cached_path_picking_uses_world_distance_under_nonuniform_transforms(session, scales):
-    path = paths.evaluate(session.engine, replace(straight_curve(), engine="POLYLINE"))
+    path = paths.evaluate(
+        session.engine, replace(straight_curve(), engine_settings=decode("POLYLINE"))
+    )
     matrix = session.engine.transform([1, 2, 0, 0, 0, 37, *scales])
     hits = paths.pick(session.engine, [path.handle], [matrix], [1, 2, 4], [0, 0, -2], 0.01)
     assert hits.shape == (1, 6) and hits[0, 1] == pytest.approx(4)
@@ -58,7 +61,7 @@ def test_cached_path_picking_uses_world_distance_under_nonuniform_transforms(ses
 
 
 def test_closed_path_final_edge_is_pickable_and_empty_batch_is_valid(session):
-    path = paths.evaluate(session.engine, replace(triangle(), engine="POLYLINE"))
+    path = paths.evaluate(session.engine, replace(triangle(), engine_settings=decode("POLYLINE")))
     center = (path.array()[0, :3] + path.array()[-1, :3]) * 0.5
     hits = paths.pick(
         session.engine, [path.handle], [IDENTITY], center + [0, 0, 2], [0, 0, -1], 0.01

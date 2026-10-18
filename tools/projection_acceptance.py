@@ -14,6 +14,7 @@ from ui_acceptance import find
 
 from anthroforge.application.history import History
 from anthroforge.core.construction import CurvePoint
+from anthroforge.core.curve_engines import BezierSettings
 from anthroforge.core.entities import Attachment
 from anthroforge.desktop.app import create_engine, open_controller
 from anthroforge.desktop.runtime import native_runtime
@@ -25,7 +26,7 @@ def setup(controller):
     document = document_fixture(512)
     body = document.entity("body")
     points = tuple(CurvePoint(position=(i / 127 - 0.5, 0, 0)) for i in range(128))
-    curve = replace(body.primitive.curves[0], points=points, resolution=4)
+    curve = replace(body.primitive.curves[0], points=points, engine_settings=BezierSettings(4))
     body = long_body(body, curve)
     document = replace(document, entities=(*document.entities[:-1], body))
     session = controller.session

@@ -16,7 +16,15 @@ from anthroforge.profiling.identity import build_identity
 ROOT = Path(__file__).resolve().parents[1]
 STAGE = ROOT / "build" / "package-input"
 DIST = Path(os.environ.get("AF_PACKAGE_OUTPUT", ROOT / "dist")).resolve() / "AnthroForge.dist"
-PACKAGES = ("numpy", "PySide6", "PySide6_Essentials", "PySide6_Addons", "shiboken6", "nuitka")
+PACKAGES = (
+    "numpy",
+    "Pillow",
+    "PySide6",
+    "PySide6_Essentials",
+    "PySide6_Addons",
+    "shiboken6",
+    "nuitka",
+)
 
 
 def stage():
@@ -115,14 +123,18 @@ def licenses():
 
 
 def copy_native_provenance(target):
-    source_target = DIST / "native/migration"
-    source_target.mkdir(parents=True, exist_ok=True)
-    for name in ("BLENDER_PRIMITIVES.md", "blender_501_sources.json"):
-        shutil.copy2(ROOT / "native/migration" / name, target / name)
-        shutil.copy2(ROOT / "native/migration" / name, source_target / name)
-    vendor = DIST / "native/vendor"
-    vendor.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ROOT / "native/vendor/PROVENANCE.md", vendor / "PROVENANCE.md")
+    for path in (ROOT / "native/migration").rglob("*"):
+        if path.is_file() and path.suffix in (".md", ".json"):
+            copy_relative(path, ROOT, DIST)
+    for name in ("PROVENANCE.md", "numpy_random/PROVENANCE.md", "numpy_random/LICENSE.txt"):
+        copy_relative(ROOT / "native/vendor" / name, ROOT, DIST)
+    shutil.copy2(ROOT / "native/vendor/numpy_random/LICENSE.txt", target / "NumPy-random.txt")
+
+
+def copy_relative(path, source_root, target_root):
+    destination = target_root / path.relative_to(source_root)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(path, destination)
 
 
 def copy_qt_notices():

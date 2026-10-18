@@ -865,3 +865,24 @@ observed native geometry (zero bytes). Reports and measurements are under
 `build/020-construction-profile`; the tool is maintained, generated reports are local evidence.
 The skull paths-and-loft-only capture was also inspected, confirming a continuous surface.
 No visible window or desktop input was used. Full final gate/package qualification is pending.
+
+### Integrated offscreen and package preparation
+
+Thirteen stable-content editor/renderer scripts pass: Construction, paths, images, Fiber,
+routing, junctions, surfaces, closed preview, branch editing/rendering, consumer sampling,
+and collision Issues. QML/controller checks use the offscreen platform; D3D11 texture checks
+use an explicitly invisible QQuickRenderControl window. Forcing the offscreen platform on
+D3D11 failed to initialize RHI; selecting the appropriate backend fixed the harness, not
+production behavior. Logs are `build/020-<tool>.log`.
+
+Saved-revision capture previously drained only mesh staging. It now drains mesh/path/image
+models before final frames. A no-mesh/64-tile regression and a real CLI capture pass. The new
+JSON example creates source curves, independent fibers, a loft and a synthetic embedded
+reference grid. A 2048-square replacement remains renderable after its external source is
+deleted; the saved image contains the expected pixels. These development transport checks
+also load the complete QML application offscreen. Native portable execution remains pending.
+
+The portable checker now follows first-class curve references and covers construction/image
+workflow. Packaging includes Pillow codec notices, native routing provenance and PCG notices.
+Active architecture/API/recommendation text is reconciled; `docs/construction_020.md` provides
+the workflow and exact limitations. Ruff and focused architecture/capture tests pass.

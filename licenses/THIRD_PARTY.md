@@ -15,6 +15,7 @@ both license texts and corresponding adapted sources accompany the release.
 | --- | --- | --- |
 | CPython | 3.12.12 | PSF and bundled notices in CPython-LICENSE.txt; https://www.python.org/downloads/release/python-31212/ |
 | NumPy | 1.26.4 | BSD and bundled dependency notices copied from its installed distribution; https://github.com/numpy/numpy/releases/tag/v1.26.4 |
+| Pillow | 12.3.0 | MIT-CMU and bundled codec notices copied from its installed distribution; https://github.com/python-pillow/Pillow |
 | PySide6/Shiboken | 6.12.0 | LGPL-3.0 / GPL alternatives recorded in wheel metadata; https://download.qt.io/official_releases/QtForPython/ |
 | Qt | 6.12.0 | GPL/LGPL and component-specific notices; https://doc.qt.io/qt-6/licensing.html |
 | Eigen/libigl | Vendored addon snapshots | MPL-2.0 and original header notices; source is included under native/vendor |

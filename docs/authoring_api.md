@@ -1,4 +1,4 @@
-# Local authoring API, version 0.1.8
+# Local authoring API, 0.2.0 candidate
 
 ## 0.2.0 development commands
 
@@ -7,7 +7,7 @@ a claim that the complete 0.2.0 desktop workflow or release is available.
 
 | Operation | Arguments | Result |
 | --- | --- | --- |
-| `curve.create` | optional `name`, `points` (CurvePoint records), `parent`, anatomical `owner` | Independent Bézier curve ID; no SCP needed. |
+| `curve.create` | optional `name`, `points` (CurvePoint records), `parent`, anatomical `owner`, `engine`, typed `settings`, `closed`, TRS `values` | Independent curve ID; BEZIER default; POLYLINE and ROUTED supported; no SCP needed. |
 | `curve.edit` | `curve`, optional `name`, `closed`, `resolution` | Shared authored edit; validates all consumers' topology locks. |
 | `curve.point.update` | `curve`, `point`, point/handle/radius/tilt fields | Shared point edit using native handle behavior. |
 | `object.inspect` | `target` | Typed authored construction record and consumer IDs. |
@@ -22,15 +22,13 @@ a claim that the complete 0.2.0 desktop workflow or release is available.
 
 Primitive inspect retains resolved curve records for editing clients; project storage
 holds references and separate objects. Schema 3 rejects older files. Standalone path
-evaluation and conversion are described below; routed evaluation remains in progress.
+evaluation and explicit engine conversion, including native routing, are described below.
 
 ## Existing command catalogue
 
-This table describes the existing API baseline. The approved
-[0.2.0 contract](specification_020.md) adds object/curve/fiber/surface/image operation
-families and retires direct control-surface attachment. Actual integration status is
-tracked in [the implementation record](tasks/020-construction.md); planned commands
-must not be treated as available until implemented and tested.
+The [0.2.0 contract](specification_020.md) adds object/curve/fiber/surface/image operations
+and retires direct control-surface attachment. The commands below are implemented; release
+qualification is tracked in [the implementation record](tasks/020-construction.md).
 
 The desktop and JSON clients call application/commands.py. A request has operation,
 arguments (an object) and optionally id. Success responses contain ok, revision and
@@ -352,7 +350,9 @@ explicit bound knots permit their expected surface contact. This is a centerline
 the accepted sampled path, not a continuous Bézier proof or a physical fiber-radius test.
 It never changes engines, geometry, undo history or save checkpoints. Stale captures cannot
 publish current findings; failed or cancelled checks remain explicitly incomplete.
-Representative anatomical parity, performance and complete release qualification remain pending.
+Pinned actual-addon fixtures cover cold/warm skull routes, attachment deformation and surfaces.
+Recorded shared-fiber profiling includes preparation, publication and resource release; evidence
+and its limits are in [the task record](tasks/020-construction.md). Release qualification is separate.
 
 ### Fiber creation (0.2.0 development branch)
 
@@ -378,9 +378,8 @@ Parent movement resolves its retained binding without choosing a new
 parent. Entering edit mode is a read-only query. Routed fibers edit authored constraints,
 then resolve their connecting path through the solver. Independent copies remap attachment
 resource owners, routing obstacles and pending edit baselines together. Shared immutable
-geometry buffers remain retained by their resource owners. Broader anatomical parity and
-release qualification remain in progress; these
-commands do not certify the complete 0.2.0 workflow.
+geometry buffers remain retained by their resource owners. These are construction operations;
+they do not certify anatomical accuracy or reconstruct muscles.
 
 ## Curve surfaces (0.2.0 candidate)
 

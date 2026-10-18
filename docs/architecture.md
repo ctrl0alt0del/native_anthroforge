@@ -1,7 +1,7 @@
 # AnthroForge architecture
 
 The [0.2.0 specification](specification_020.md) and
-[implementation plan](implementation_020.md) define the approved next boundaries:
+[implementation plan](implementation_020.md) define the current boundaries:
 first-class construction objects, referenced curves, Fiber as Curve subclass,
 general surfaces, embedded images and schema 3 without older-schema migration.
 See [implementation status](tasks/020-construction.md) for what is actually integrated.
@@ -9,7 +9,7 @@ Sections labelled with earlier release numbers describe their qualified baseline
 
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through
-the same core in later releases.
+the same core; muscles and soft tissues follow in 0.2.1.
 
 ## Issue reporting (0.1.6)
 
@@ -21,7 +21,8 @@ checks retain stale evidence. Repairs invoke shared application operations and m
 pass a fresh verification. Document replacement and history navigation invalidate
 check epochs. UI/JSON clients share `issues.*`; geometry diagnostics do not run in draw.
 `RecordModel` supplies stable keyed Qt rows to both Activity and Issues. These
-diagnostics do not certify unimplemented fiber, skin, collision or anatomy checks.
+diagnostics do not certify anatomical correctness or unimplemented skin/volume checks.
+Authored fiber centerline collisions are read-only native checks over accepted geometry.
 
 The [confirmed 0.1.2 specification](primitives_012.md) defines primitive and deformer behavior. Primitive
 construction, deformers, shared controls and per-target bindings have separate
@@ -74,9 +75,10 @@ input and constructs Qt presentation records. Scalar UI arithmetic and fixed-siz
 validation remain there. Those are not Blender algorithm fallbacks, but their allocation,
 conversion and notification costs are real: eliminating Python numerical loops does not
 establish a zero-overhead UI. Dense component presentation still materializes point
-records and must be evaluated separately using actual GUI reports. The algorithms for
-fibers, muscles, skin and warm-start fitting are not yet migrated into this release;
-addon Python optimization loops must be ported in full when their features migrate.
+records and must be evaluated separately using actual GUI reports. Curve drawing/fitting,
+Fiber deformation, routing preparation/solving/warm remapping, and surface construction
+now run in C++. Muscles and skin remain later work; their numerical loops must follow
+the same native-only boundary when they migrate.
 
 ## Construction and dependency boundaries
 
@@ -458,5 +460,30 @@ uses `construction_tasks`, with a surface workload strategy and generic geometry
 publication. Native loft/patch work returns complete finalized meshes. Construction
 projection sends these to the same staged mesh model and displayed-revision picking used
 by SCPs, while excluding them from anatomical snapping/attachment candidates. Issues use
-generic object scopes and the shared evaluation operation. Junction/branch integration
-and full release qualification remain in progress.
+generic object scopes and the shared evaluation operation. Explicit junctions supply shared
+source identities to branch assembly; no proximity welding or separate Fiber loft exists.
+
+## Curve engines, bindings and construction lifetime (0.2.0)
+
+The object registry provides generic identities and poses without substituting construction
+ownership for ordinary parenting or anatomical attachment. A Fiber subclasses Curve; its
+bindings resolve current shape before the same engine interface evaluates it. No public
+Free/Controlled or solver-generation hierarchy exists. Engine-specific settings are typed;
+conversion owns a read-only preview and a separate undoable acceptance operation.
+
+Junction output ports distinguish canonical source publication from followers' path outputs.
+Atomic authored edits update incident points together; the dependency graph retains accepted
+Manual prerequisites and detects genuine cycles. Surface consumers own correspondence and
+sampling, including persistent closed alignment and per-pair density. Primitive consumers
+use the same source-reference and placement policies.
+
+Authored creation jobs opt into input-invalidation restart through an explicit Job contract.
+The coordinator waits for safe termination, registers replacement work before reporting the
+old job terminal, and captures fresh inputs at dispatch. Explicit cancellation and history
+navigation suppress that restart. Historical result adoption validates the complete read set;
+an older document cannot inherit geometry evaluated against a newer pose.
+
+Resources retain mesh/path/image/attachment allocations across current state, undo/checkpoints,
+workers and displayed/staged leases. Profiler observation is read-only and recording-only.
+Saved-revision rendering drains all staged resource models before capture. Schema 3 persists
+owned editable state and accepted results, never native handles, undo history or preview data.

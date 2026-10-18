@@ -73,8 +73,10 @@ def inspection_view(controller, settings):
 
 
 def stage_geometry(app, controller, renderer):
-    while controller.render_model.pending:
-        controller.render_model.drain()
+    models = (controller.render_model, controller.path_model, controller.image_model)
+    while any(model.pending for model in models):
+        for model in models:
+            model.drain()
         app.processEvents()
         renderer.frame()
         controller.frame_presented()

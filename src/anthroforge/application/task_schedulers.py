@@ -150,6 +150,12 @@ class IssueTaskScheduler(MeasuredTaskScheduler):
         return Schedule("worker", cost, delay, 150.0, "Read-only advisory checks after editing")
 
 
+class FiberCaptureTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + workload.candidates * max(1, workload.entities) * 0.02
+        return Schedule("worker", cost, reason="Dense anatomical capture and owner blending")
+
+
 class InspectionTaskScheduler(SaveProjectTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         return Schedule(reason="Frozen inspection export; file and GPU work stay background")
@@ -164,9 +170,16 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_open": OpenProjectTaskScheduler(),
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
-        "curve_path": CurvePathTaskScheduler(),
-        "curve_draw": CurveDrawingTaskScheduler(),
+        **curve_schedulers(),
         "control_attachments": ControlAttachmentTaskScheduler(),
         "issue_check": IssueTaskScheduler(),
         "inspection_report": InspectionTaskScheduler(),
+    }
+
+
+def curve_schedulers() -> dict[str, TaskScheduler]:
+    return {
+        "curve_path": CurvePathTaskScheduler(),
+        "curve_draw": CurveDrawingTaskScheduler(),
+        "fiber_capture": FiberCaptureTaskScheduler(),
     }

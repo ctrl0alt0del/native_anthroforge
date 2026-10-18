@@ -6,11 +6,13 @@ from dataclasses import dataclass, field
 from anthroforge.core.construction import Curve
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
+from anthroforge.core.fibers import Fiber
 from anthroforge.core.object_registry import Construction
 from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.core.surfaces import Surface
 
 from .assets import Asset
+from .attachment_assets import AttachmentAsset
 from .image_assets import ImageAsset
 from .path_assets import PathAsset
 
@@ -20,9 +22,12 @@ class Resources:
     meshes: dict[str, Asset] = field(default_factory=dict)
     paths: dict[str, PathAsset] = field(default_factory=dict)
     images: dict[str, ImageAsset] = field(default_factory=dict)
+    attachments: dict[str, AttachmentAsset] = field(default_factory=dict)
 
     def snapshot(self) -> "Resources":
-        return Resources(dict(self.meshes), dict(self.paths), dict(self.images))
+        return Resources(
+            dict(self.meshes), dict(self.paths), dict(self.images), dict(self.attachments)
+        )
 
     def selected(self, document: Document) -> "Resources":
         self.require(document)
@@ -56,7 +61,6 @@ def references(entities: Iterable[SCP], objects: Iterable[Construction]) -> dict
     meshes.update(o.result.asset for o in objects if isinstance(o, Surface))
     paths = {o.result.asset for o in objects if isinstance(o, Curve)}
     images = {o.source for o in objects if isinstance(o, ReferenceImage)}
-    return {
-        key: values - {""}
-        for key, values in dict(meshes=meshes, paths=paths, images=images).items()
-    }
+    attachments = {o.attachment_asset for o in objects if isinstance(o, Fiber)}
+    groups = dict(meshes=meshes, paths=paths, images=images, attachments=attachments)
+    return {key: values - {""} for key, values in groups.items()}

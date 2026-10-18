@@ -119,13 +119,9 @@ def transform(session: "Session", entity: str, values: list[float]) -> None:
 
 
 def transform_dependents(session: "Session", entity: str) -> None:
-    from .construction_tasks import edited
-    from .control_tasks import edited as controls_edited
-    from .dependencies import Port
-    from .dependencies import affected as graph_affected
+    from .dependent_tasks import changed
 
-    controls_edited(session, {Port(entity, "pose")})
-    edited(session, graph_affected(session.document, {Port(entity, "pose")}))
+    changed(session, {Port(entity, "pose")})
 
 
 def schedule_edit(

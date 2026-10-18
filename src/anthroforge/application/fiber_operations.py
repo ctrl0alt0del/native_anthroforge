@@ -1,0 +1,61 @@
+"""Independent curve-to-fiber authoring, using shared asynchronous transactions."""
+
+from dataclasses import dataclass
+from functools import partial
+from typing import TYPE_CHECKING, Any
+from uuid import uuid4
+
+from anthroforge.core.construction import Curve
+from anthroforge.core.results import geometry_asset
+
+from . import authored_jobs, curve_copy, fiber_tasks
+from .object_operations import editable
+from .operations import require_name
+
+if TYPE_CHECKING:
+    from .session import Session
+
+
+@dataclass(frozen=True)
+class FiberCreation:
+    source: str
+    identities: dict[str, str]
+    bindings: tuple[tuple[str, str, str], ...]
+    name: str
+    attachment_asset: str
+
+
+def create(
+    session: "Session", curve: str, bindings: list[dict[str, Any]], name: str = "Fiber"
+) -> str:
+    item = editable(session, curve)
+    if not isinstance(item, Curve):
+        raise ValueError("Fiber creation requires a curve source.")
+    anchors = requested_bindings(session, item, bindings)
+    spec = FiberCreation(curve, curve_copy.mapping(item), anchors, require_name(name), str(uuid4()))
+    return authored_jobs.begin(session, partial(fiber_tasks.enqueue, session, spec))
+
+
+def requested_bindings(
+    session: "Session", item: Curve, values: list[dict[str, Any]]
+) -> tuple[Any, ...]:
+    result = tuple(
+        (str(row["point"]), str(row["target"]), str(row.get("capture_scope", "CURRENT_PARENT")))
+        for row in values
+    )
+    keys = [row[0] for row in result]
+    if len(keys) != len(set(keys)) or set(keys) - {p.id for p in item.points}:
+        raise ValueError("Bindings require distinct authored curve points.")
+    endpoints = {item.points[0].id, item.points[-1].id}
+    if not result or (not item.closed and not endpoints.issubset(keys)):
+        raise ValueError("Bind both open endpoints, or at least one chosen closed-curve point.")
+    validate_targets(session, result)
+    return result
+
+
+def validate_targets(session: "Session", result: tuple[Any, ...]) -> None:
+    for _, target, scope in result:
+        if not geometry_asset(session.document.entity(target)):
+            raise ValueError("Fiber binding requires an accepted anatomical surface.")
+        if scope not in ("CURRENT_PARENT", "ANY_PARENT"):
+            raise ValueError("Invalid endpoint capture scope.")

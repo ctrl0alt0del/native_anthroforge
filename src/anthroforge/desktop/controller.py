@@ -216,6 +216,16 @@ class Controller(QObject):
 
         return parent_choices(self)
 
+    @Slot(result="QVariantList")
+    def anatomicalSurfaces(self):
+        from anthroforge.core.results import geometry_asset
+
+        return [
+            dict(id=item.id, name=item.name)
+            for item in self.session.document.entities
+            if geometry_asset(item)
+        ]
+
     @Property("QVariantMap", notify=metricsChanged)
     def metrics(self):
         return self._metrics

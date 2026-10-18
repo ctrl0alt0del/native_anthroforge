@@ -164,19 +164,15 @@ def publish(
 
 
 def publish_pose_dependents(session: "Session", source: Document, changed: dict[str, SCP]) -> None:
-    from .construction_tasks import edited
-    from .control_tasks import edited as controls_edited
-    from .dependencies import Port, affected
+    from .dependencies import Port
+    from .dependent_tasks import changed as changed_outputs
 
     seeds = {
         Port(key, "pose")
         for key, item in changed.items()
         if item.matrix != source.entity(key).matrix
     }
-    targets = affected(session.document, seeds)
-    controls_edited(session, seeds)
-    if targets:
-        edited(session, targets)
+    changed_outputs(session, seeds)
 
 
 def merge_result(session: "Session", item: SCP) -> SCP:

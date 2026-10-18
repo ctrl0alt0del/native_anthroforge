@@ -329,3 +329,17 @@ Only one preview is retained. It does not alter saving, document state or undo; 
 serialized. The desktop displays it in green and excludes it from picking. Source edits
 invalidate acceptance. Routing execution is still pending on this development branch;
 requesting it currently reports that limitation rather than substituting an authored engine.
+
+### Fiber creation (0.2.0 development branch)
+
+`fiber.create(curve, bindings, name="Fiber")` starts an asynchronous independent copy.
+Each binding is `{point: authored_point_id, target: anatomical_surface_id,
+capture_scope: "CURRENT_PARENT" | "ANY_PARENT"}`. Supply both open endpoints or
+at least one point on a closed curve. It returns the job identifier; completed creation
+appears in the Construction registry as `kind: "fiber"`. The source has no continuing
+reference to its copy. Invalid/incomplete bindings leave an ordinary curve unchanged.
+
+The accepted path follows captured anatomical surfaces through the common coordinator.
+Dense attachment fields are independently owned project resources; source edits cannot
+change them. Current-shape fiber editing/rebinding and routed evaluation remain under
+implementation on this branch; this entry does not certify the complete 0.2.0 workflow.

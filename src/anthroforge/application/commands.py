@@ -13,6 +13,7 @@ from . import (
     drawing_operations,
     drawing_projection,
     evaluation,
+    fiber_operations,
     image_operations,
     image_presentation,
     importing,
@@ -32,6 +33,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "fiber.create": fiber_operations.create,
     "image.import": image_operations.import_image,
     "image.replace": image_operations.replace_source,
     "image.instance": image_operations.instance,

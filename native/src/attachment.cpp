@@ -208,7 +208,7 @@ namespace af {
 static Capture point_surface(uint64_t handle,const double* frame,bool prepare) {
     Capture value;
     value.parent=mesh(handle); value.parent_world=Eigen::Map<const M4>(frame);
-    if(!value.parent_world.allFinite()||std::abs(value.parent_world.determinant())<1e-15)
+    if(!value.parent_world.allFinite()||!value.parent_world.fullPivLu().isInvertible())
         throw std::runtime_error("Invalid anatomical surface transform.");
     value.parent_geometry=value.parent_world; value.parent_mode=1; value.child_mode=2;
     value.child_world=M4::Identity(); value.flow=0; value.locked=-1;
@@ -276,6 +276,134 @@ int af_point_attachment_resolve(int surface_count,const uint64_t* meshes,const d
             af::check_cancel(cancel);
             if(targets[i]<0||targets[i]>=surface_count) throw std::runtime_error("Point binding target is missing.");
             Eigen::Map<af::M4> frame(output+16*i); frame=af::resolve_point(surfaces[targets[i]],bindings+28*i);
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+
+#include "path_internal.hpp"
+namespace af {
+struct CurveCapture {
+    std::shared_ptr<Path> source;
+    std::vector<V3> points;
+    std::vector<int> knots,pins,forced;
+    int nodes=0;
+};
+static int knot_sample(const Path& path,int knot) {
+    const auto it=std::lower_bound(path.parameters.begin(),path.parameters.end(),double(knot));
+    if(it==path.parameters.end()||std::abs(*it-knot)>1e-8)
+        throw std::runtime_error("Attachment path must retain every authored knot.");
+    return int(it-path.parameters.begin());
+}
+static CurveCapture curve_capture(uint64_t handle,const double* records,int count,const double* frame) {
+    if(!records||!frame||count<2) throw std::runtime_error("Invalid curve attachment inputs.");
+    CurveCapture result; result.source=path(handle); result.nodes=int(result.source->parameters.size());
+    const M4 world=Eigen::Map<const M4>(frame);
+    if(!world.allFinite()||!world.fullPivLu().isInvertible()) throw std::runtime_error("Invalid curve transform.");
+    result.forced.resize(result.nodes,-1); result.points.reserve(result.nodes+3*count);
+    for(int i=0;i<result.nodes;++i) result.points.push_back(point(world,V3(result.source->samples.data()+11*i)));
+    for(int i=0;i<count;++i) {
+        result.knots.push_back(knot_sample(*result.source,i));
+        for(int offset:{0,3,6}) result.points.push_back(point(world,V3(records+13*i+offset)));
+    }
+    return result;
+}
+static void curve_pins(CurveCapture& value,const int* pins,const int* parents,int count,int surfaces) {
+    if(count<1||count>int(value.knots.size())||!pins||!parents) throw std::runtime_error("Invalid fiber anchors.");
+    for(int i=0;i<count;++i) {
+        if(pins[i]<0||pins[i]>=int(value.knots.size())||parents[i]<0||parents[i]>=surfaces)
+            throw std::runtime_error("Fiber anchor requires an authored knot and anatomical surface.");
+        const int index=value.knots[pins[i]];
+        if(value.forced[index]>=0) throw std::runtime_error("Duplicate fiber anchor.");
+        value.pins.push_back(index); value.forced[index]=parents[i];
+    }
+}
+static void curve_owner_weights(CurveCapture& value,std::vector<Capture>& surfaces,int* owners,double* weights,uint64_t cancel) {
+    std::vector<int> nearest(value.nodes); std::vector<double> positions(3*value.nodes); double binding[28];
+    for(int i=0;i<value.nodes;++i) {
+        check_cancel(cancel); store_vector(positions.data()+3*i,value.points[i]);
+        nearest[i]=capture_point(surfaces,value.points[i],value.forced[i],binding);
+    }
+    if(af_attachment_weights(positions.data(),nearest.data(),value.nodes,value.pins.data(),int(value.pins.size()),
+        value.source->closed,owners,weights,cancel)) throw std::runtime_error(af_last_error());
+    for(size_t i=0;i<value.knots.size()*3;++i) {
+        const int sample=value.knots[i/3],row=value.nodes+int(i);
+        std::copy_n(owners+2*sample,2,owners+2*row); std::copy_n(weights+2*sample,2,weights+2*row);
+    }
+}
+static void capture_influences(const CurveCapture& value,std::vector<Capture>& surfaces,const int* owners,double* output,uint64_t cancel) {
+    for(size_t row=0;row<value.points.size();++row) {
+        check_cancel(cancel);
+        for(int slot=0;slot<2;++slot) {
+            double* binding=output+(2*row+slot)*28; std::fill_n(binding,28,0.0);
+            if(owners[2*row+slot]>=0) capture_point(surfaces,value.points[row],owners[2*row+slot],binding);
+        }
+    }
+}
+static V3 blended_point(const std::vector<Capture>& surfaces,const int* owners,const double* weights,const double* bindings) {
+    V3 result=V3::Zero(); double total=0;
+    for(int slot=0;slot<2;++slot) {
+        if(!std::isfinite(weights[slot])||weights[slot]<0||weights[slot]>1) throw std::runtime_error("Invalid attachment influence.");
+        if(!weights[slot]) continue;
+        if(owners[slot]<0||owners[slot]>=int(surfaces.size())) throw std::runtime_error("Missing attachment influence surface.");
+        result+=weights[slot]*resolve_point(surfaces[owners[slot]],bindings+28*slot).block<3,1>(0,3);
+        total+=weights[slot];
+    }
+    if(std::abs(total-1)>1e-9) throw std::runtime_error("Attachment influences must sum to one.");
+    return result;
+}
+static void attached_tangents(Samples& samples,bool closed) {
+    for(size_t i=0;i<samples.size();++i) {
+        const size_t next=i+1<samples.size()?i+1:(closed?0:i);
+        const size_t before=i?i-1:(closed?samples.size()-1:i);
+        const V3 difference=samples[next].position-samples[before].position;
+        if(difference.norm()>1e-20) samples[i].tangent=difference.normalized();
+    }
+}
+}
+int af_curve_attachment_capture(int count,const uint64_t* meshes,const double* frames,uint64_t path,
+    const double* records,int knots,const double* world,const int* pins,const int* parents,int pin_count,
+    int* owners,double* weights,double* bindings,uint64_t cancel) {
+    try {
+        if(!owners||!weights||!bindings) throw std::runtime_error("Missing curve attachment outputs.");
+        auto value=af::curve_capture(path,records,knots,world);
+        auto surfaces=af::point_surfaces(count,meshes,frames,true,cancel);
+        af::curve_pins(value,pins,parents,pin_count,count);
+        af::curve_owner_weights(value,surfaces,owners,weights,cancel);
+        af::capture_influences(value,surfaces,owners,bindings,cancel); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_blended_attachment_resolve(int surfaces,const uint64_t* meshes,const double* frames,int count,
+    const int* owners,const double* weights,const double* bindings,double* points,uint64_t cancel) {
+    try {
+        if(count<1||count>1000000||!owners||!weights||!bindings||!points) throw std::runtime_error("Invalid blended binding buffers.");
+        const auto prepared=af::point_surfaces(surfaces,meshes,frames,false,cancel);
+        for(int i=0;i<count;++i) {
+            af::check_cancel(cancel);
+            af::store_vector(points+3*i,af::blended_point(prepared,owners+2*i,weights+2*i,bindings+56*i));
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+uint64_t af_attached_path(uint64_t handle,const double* points,const double* world,uint64_t cancel) {
+    try {
+        const auto source=af::path(handle); const af::M4 inverse=Eigen::Map<const af::M4>(world).inverse();
+        af::EvaluatedPath value{af::read_samples(source->samples.data(),int(source->parameters.size())),source->parameters};
+        for(size_t i=0;i<value.samples.size();++i) {
+            af::check_cancel(cancel); value.samples[i].position=af::point(inverse,af::V3(points+3*i));
+        }
+        af::attached_tangents(value.samples,source->closed); af::curve_frames(value.samples,source->closed,cancel,true);
+        return af::retain_path(af::make_path(value,source->closed,cancel));
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+int af_attached_controls(const double* records,int count,const double* points,const double* world,double* output) {
+    try {
+        if(count<2||!records||!points||!world||!output) throw std::runtime_error("Invalid attached control buffers.");
+        const af::M4 inverse=Eigen::Map<const af::M4>(world).inverse();
+        std::copy_n(records,count*13,output);
+        for(int i=0;i<count;++i) {
+            for(int slot=0;slot<3;++slot) af::store_vector(output+13*i+3*slot,af::point(inverse,af::V3(points+9*i+3*slot)));
+            output[13*i+11]=int(output[13*i+11])%4; output[13*i+12]=int(output[13*i+12])%4;
         }
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }

@@ -88,3 +88,16 @@ int af_attachment_weights(const double* points,const int* owners,int count,const
         af::check_cancel(cancel); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_attachment_compact(int count,const int* owners,int surfaces,int* output,int* used) {
+    try {
+        if(count<1||surfaces<1||!owners||!output||!used) throw std::runtime_error("Invalid attachment owner buffers.");
+        std::vector<int> mapping(surfaces,-1); int size=0;
+        for(int i=0;i<count;++i) {
+            if(owners[i]<-1||owners[i]>=surfaces) throw std::runtime_error("Attachment owner is outside the candidate set.");
+            if(owners[i]>=0) mapping[owners[i]]=0;
+        }
+        for(int i=0;i<surfaces;++i) if(mapping[i]==0) { mapping[i]=size; used[size++]=i; }
+        for(int i=0;i<count;++i) output[i]=owners[i]<0?-1:mapping[owners[i]];
+        return size;
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}

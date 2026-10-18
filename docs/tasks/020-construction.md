@@ -317,3 +317,33 @@ deformation parity from a control-point-only approximation. Inspect/qualify that
 against actual addon fixtures. Routing uses the current production facade in
 core/vcp/v3/production.py; its native SQP controller already exists, while Python still owns
 numerical planner/span preparation that must move behind the new native boundary.
+
+## Dense fiber capture and propagation checkpoint
+
+`fiber.create` now makes an independent actual `Fiber(Curve)` through the shared asynchronous
+creation/history contract. Both open endpoints or at least one closed authored point must bind.
+A native field captures every evaluated node plus editable control triples, retains the addon's
+arc-length owner blending, and resolves current anatomical surface frames in a single batch.
+Candidate compaction and repeated numerical work stay in C++; no dummy SCP is created.
+
+Separate attachment resources retain their bind-time path and typed immutable arrays. They are
+serialized in schema 3, collected across history/checkpoints/jobs, and attributed in profiler
+inventories. Native frame and owner validation rejects malformed inputs. A shared dependent-output
+fan-out now reaches paths as well as controls and meshes after anatomical pose/geometry publication.
+Mesh and path result provenance share the same pending-Manual-input policy. Incoming fiber support
+bindings participate in topology locks and anatomical deletion protection.
+
+The desktop inspector exposes explicit surface choices and independent creation through the same
+command. Offscreen full-QML testing invokes its actual action, checks Construction/path publication,
+and selects the resulting Fiber. This found and fixed a QML id collision with Item.anchors that
+otherwise omitted the last mandatory endpoint. No visible desktop interaction was performed.
+
+Focused checks cover independent identities, one-action undo/redo, open/closed dense-node parent
+motion, source preservation, archive round trips, cancellation, typed buffer validation and native
+weighted deformation. Existing construction-editor offscreen checks pass. Native build/contracts,
+configured mypy, Ruff and function-length checks pass at this checkpoint; full gate is next.
+
+This is still incomplete 0.2.0 development. Fiber current-shape editing/rebinding, routing,
+junctions, generic surfaces and final release qualification remain. Do not treat control-triple
+capture as a substitute for dense-node attachments or claim full addon shape parity from the
+translation/owner-weight tests. Do not bump the version or merge the release yet.

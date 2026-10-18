@@ -23,6 +23,8 @@ class FiberBinding:
 @dataclass(frozen=True, slots=True)
 class Fiber(Curve):
     bindings: tuple[FiberBinding, ...] = ()
+    attachment_asset: str = ""
+    supports: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         Curve.__post_init__(self)

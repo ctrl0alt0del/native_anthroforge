@@ -9,7 +9,7 @@ import numpy as np
 from anthroforge.native import paths, topology
 from anthroforge.native.mesh import GeometryEngine
 
-from . import image_assets, object_codec
+from . import attachment_storage, image_assets, object_codec
 from .assets import Asset
 from .path_assets import PathAsset
 from .resources import Resources
@@ -24,6 +24,7 @@ def describe(resources: Resources) -> dict[str, Any]:
             key: object_codec.encode(asset.authored) for key, asset in resources.paths.items()
         },
         "images": {key: {"digest": image.digest} for key, image in resources.images.items()},
+        "attachments": attachment_storage.describe(resources.attachments),
     }
 
 
@@ -50,6 +51,7 @@ def write(archive: zipfile.ZipFile, resources: Resources) -> None:
         write_array(archive, f"paths/{key}/parameters.npy", curve.path.array(1))
     for key, image in resources.images.items():
         archive.writestr(f"images/{key}/source", image.encoded)
+    attachment_storage.write(archive, resources.attachments)
 
 
 def read_mesh(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> Asset:
@@ -81,4 +83,8 @@ def read(archive: zipfile.ZipFile, data: Any, engine: GeometryEngine) -> Resourc
     meshes = {key: read_mesh(archive, key, value, engine) for key, value in data["assets"].items()}
     curves = {key: read_path(archive, key, value, engine) for key, value in data["paths"].items()}
     images = {key: read_image(archive, key, value, engine) for key, value in data["images"].items()}
-    return Resources(meshes, curves, images)
+    attachments = {
+        key: attachment_storage.read(archive, key, value, engine)
+        for key, value in data.get("attachments", {}).items()
+    }
+    return Resources(meshes, curves, images, attachments)

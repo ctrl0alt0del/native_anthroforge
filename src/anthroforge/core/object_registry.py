@@ -111,8 +111,8 @@ def validate_primitives(document: "Document", records: dict[str, SceneObject]) -
 
 
 def validate_bindings(item: Fiber, records: dict[str, SceneObject]) -> None:
-    for binding in item.bindings:
-        if not isinstance(records.get(binding.target), SCP):
+    for target in {*item.supports, *(binding.target for binding in item.bindings)}:
+        if not isinstance(records.get(target), SCP):
             raise ValueError("Fiber binding target must be an anatomical surface provider.")
 
 

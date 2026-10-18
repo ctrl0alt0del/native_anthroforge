@@ -12,10 +12,11 @@ from anthroforge.core.results import EvaluationResult, Port
 from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
+from . import curve_evaluation
 from . import dependencies as dep
-from . import path_assets
 from .construction_policy import mode, revisions
 from .curve_sources import source
+from .evaluation_results import accepted_result
 
 if TYPE_CHECKING:
     from .session import Session
@@ -38,7 +39,7 @@ def make_job(session: "Session", curve: str) -> Job:
     return Job(
         "Evaluate " + source(session.document, curve).name,
         frozenset((curve,)),
-        lambda document: document,
+        lambda document: (document, session.resources.snapshot()),
         partial(compute, session, curve),
         partial(publish, session, curve),
         key="path:" + curve,
@@ -56,10 +57,13 @@ def workload(curve: str, document: Document) -> Workload:
     )
 
 
-def compute(session: "Session", curve: str, document: Document, cancel: Any) -> Any:
+def compute(session: "Session", curve: str, payload: Any, cancel: Any) -> Any:
+    document, resources = payload
     if Port(curve, "path") in dep.blocked(dep.graph(document)):
         raise ValueError("Cyclic or missing curve dependency; last accepted path retained.")
-    return document, path_assets.evaluate(session.engine, source(document, curve), cancel.handle)
+    return document, curve_evaluation.evaluate(
+        session.engine, document, resources, curve, cancel.handle
+    )
 
 
 def publish(session: "Session", curve: str, payload: Any) -> None:
@@ -70,9 +74,7 @@ def publish(session: "Session", curve: str, payload: Any) -> None:
     item = source(session.document, curve)
     key = str(uuid4())
     session.resources.paths[key] = asset
-    result = EvaluationResult(
-        key, item.result.revision + 1, item.construction_revision, revisions(document, inputs)
-    )
+    result = accepted_result(document, item, inputs, key)
     install_result(session, curve, result)
     propagate(session, curve)
 

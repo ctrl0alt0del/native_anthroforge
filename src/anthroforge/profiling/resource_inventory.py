@@ -5,6 +5,7 @@ from itertools import islice
 
 from anthroforge.application.image_assets import ImageAsset
 from anthroforge.native import memory
+from anthroforge.native.attachment_fields import Field
 from anthroforge.native.mesh import Mesh
 from anthroforge.native.paths import Path
 
@@ -16,6 +17,9 @@ LIMITATIONS = [
     "Pre-recording job payload references may be unattributed; job snapshots are included",
     "Snapshots are event-driven at most once per second, plus recording boundaries",
 ]
+RESOURCE_FIELDS = frozenset(
+    ("mesh", "assets", "path", "paths", "meshes", "images", "resources", "field", "attachments")
+)
 
 
 def payload_resources(value, profiler):
@@ -27,8 +31,8 @@ def payload_resources(value, profiler):
         if id(item) in seen:
             continue
         seen.add(id(item))
-        if isinstance(item, (Mesh, Path, ImageAsset)):
-            found.add(item)
+        if isinstance(item, (Mesh, Path, ImageAsset, Field)):
+            found.update((item, item.path) if isinstance(item, Field) else (item,))
         else:
             pending.extend(bounded(children(item), 8192 - len(seen) - len(pending), profiler))
     return finish_payload(found, pending, profiler)
@@ -47,9 +51,7 @@ def children(value):
         return value
     if is_dataclass(value) and not isinstance(value, type):
         return (
-            getattr(value, field.name)
-            for field in fields(value)
-            if field.name in ("mesh", "assets", "path", "paths", "meshes", "images", "resources")
+            getattr(value, field.name) for field in fields(value) if field.name in RESOURCE_FIELDS
         )
     return ()
 
@@ -82,6 +84,8 @@ def catalogue_resources(session):
     yield from (a.mesh for a in session.resources.meshes.values())
     yield from (a.path for a in session.resources.paths.values())
     yield from session.resources.images.values()
+    yield from (a.field for a in session.resources.attachments.values())
+    yield from (a.field.path for a in session.resources.attachments.values())
 
 
 def bounded(values, limit, profiler):
@@ -98,15 +102,21 @@ def document_resources(session, document, profiler):
     keys = references(
         bounded(document.entities, 4096, profiler), bounded(document.objects, 4096, profiler)
     )
-    meshes, paths, images = (
-        session.resources.meshes,
-        session.resources.paths,
-        session.resources.images,
-    )
+    resources = session.resources
+    meshes, paths, images = resources.meshes, resources.paths, resources.images
     result = [meshes[key].mesh for key in keys["meshes"] if key in meshes]
     result.extend(paths[key].path for key in keys["paths"] if key in paths)
     result.extend(images[key] for key in keys["images"] if key in images)
+    result.extend(attachment_resources(session, keys["attachments"]))
     return result
+
+
+def attachment_resources(session, keys):
+    for key in keys:
+        if key in session.resources.attachments:
+            field = session.resources.attachments[key].field
+            yield field
+            yield field.path
 
 
 def inventory(profiler, owners):

@@ -1,6 +1,7 @@
 """Shared authoring constraints used by desktop and headless operations."""
 
 from anthroforge.core.document import Document
+from anthroforge.core.fibers import Fiber
 from anthroforge.core.results import Port, ReadRevision
 
 
@@ -11,7 +12,16 @@ def topology_dependents(document: Document, entity: str) -> tuple[str, ...]:
         for c in document.controls
         if c.support == entity and c.attachment.parent_mode == "SURFACE_NEAREST"
     ]
-    return tuple((*children, *controls))
+    return tuple((*children, *controls, *bound_fibers(document, entity)))
+
+
+def bound_fibers(document: Document, entity: str) -> tuple[str, ...]:
+    return tuple(
+        item.id
+        for item in document.objects
+        if isinstance(item, Fiber)
+        and (entity in item.supports or any(b.target == entity for b in item.bindings))
+    )
 
 
 def topology_locks(document: Document, target: str) -> list[dict[str, str]]:

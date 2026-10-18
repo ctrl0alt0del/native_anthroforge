@@ -139,7 +139,9 @@ def object_edges(objects: tuple[ConstructionObject, ...]) -> dict[Port, set[Port
 def construction_inputs(item: ConstructionObject) -> set[Port]:
     if isinstance(item, Fiber):
         return {Port(item.id, "pose")} | {
-            Port(b.target, role) for b in item.bindings for role in ("geometry", "pose")
+            Port(target, role)
+            for target in {*item.supports, *(b.target for b in item.bindings)}
+            for role in ("geometry", "pose")
         }
     if isinstance(item, Surface):
         return {Port(use.curve, "path") for use in item.curves}

@@ -43,11 +43,13 @@ class GeometryEngine(NativeEngine):
 
     def _curve_signatures(self) -> None:
         from . import attachment_weights, curve_editing, curve_queries, drawing, paths, strokes
+        from .attachment_fields import configure as configure_fields
         from .point_attachments import configure as configure_points
 
         for module in (attachment_weights, curve_editing, curve_queries, drawing, paths, strokes):
             module.configure(self)
         configure_points(self)
+        configure_fields(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

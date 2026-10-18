@@ -21,7 +21,9 @@ def retain_objects(
     session: "Session", removed: SCP | Construction, parent: SceneObject | None
 ) -> tuple[Construction, ...]:
     for item in session.document.objects:
-        if isinstance(item, Fiber) and any(b.target == removed.id for b in item.bindings):
+        if isinstance(item, Fiber) and (
+            removed.id in item.supports or any(b.target == removed.id for b in item.bindings)
+        ):
             raise ValueError(
                 "Rebind the dependent fiber before deleting its attachment target: " + item.name
             )

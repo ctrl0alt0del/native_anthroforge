@@ -17,6 +17,7 @@ from .construction_evaluator import Evaluation
 from .construction_policy import mode, revisions
 from .construction_scheduling import stages
 from .curve_sources import source as source_curve
+from .evaluation_results import accepted_result as accepted_result
 
 if TYPE_CHECKING:
     from .session import Session
@@ -105,23 +106,6 @@ def install_result(item: Any, key: str, accepted: EvaluationResult) -> Any:
     )
 
 
-def accepted_result(
-    source: Document, item: Any, inputs: set[dep.Port], key: str
-) -> EvaluationResult:
-    pending = tuple(
-        e.id
-        for e in (*source.entities, *source.objects)
-        if any(p.owner == e.id for p in inputs) and e.id != item.id and e.result.status == "pending"
-    )
-    return EvaluationResult(
-        key,
-        item.result.revision + 1,
-        item.construction_revision,
-        revisions(source, inputs),
-        pending,
-    )
-
-
 def completed(session: "Session", entity: str, job: Job, state: str) -> None:
     if state == "failed" and any(e.id == entity for e in session.document.entities):
         item = session.document.entity(entity)
@@ -135,15 +119,13 @@ def propagate_result(session: "Session", entity: str) -> None:
     from anthroforge.core.entities import descendants
 
     from . import evaluation
-    from .control_tasks import edited as controls_edited
+    from .dependent_tasks import changed
 
-    controls_edited(session, {dep.Port(entity, "geometry")})
+    changed(session, {dep.Port(entity, "geometry")})
     targets = descendants(session.document.entities, entity) - {entity}
     live = {key for key in targets if mode(session.document, key) != "MANUAL"}
     if live and session.document.attachments_enabled:
         evaluation.request(session, live)
-    affected = dep.affected(session.document, {dep.Port(entity, "geometry")}) - {entity}
-    schedule(session, affected)
 
 
 def schedule(

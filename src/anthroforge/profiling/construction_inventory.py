@@ -2,6 +2,7 @@
 
 from anthroforge.application.image_assets import ImageAsset
 from anthroforge.native import memory
+from anthroforge.native.attachment_fields import Field
 from anthroforge.native.paths import Path
 from anthroforge.native.strokes import Stroke
 
@@ -11,7 +12,19 @@ def inventories(profiler, owners):
         paths=path_inventory(profiler, owners),
         images=image_inventory(owners),
         strokes=stroke_inventory(owners),
+        attachments=attachment_inventory(owners),
     )
+
+
+def attachment_inventory(owners):
+    from .resource_inventory import memory_totals
+
+    fields = {v for values in owners.values() for v in values if isinstance(v, Field)}
+    sizes = {id(v): v.bytes for v in fields}
+    groups = {
+        name: {id(v) for v in values if isinstance(v, Field)} for name, values in owners.items()
+    }
+    return memory_totals(list(fields), sizes, groups, len(fields))
 
 
 def path_inventory(profiler, owners):

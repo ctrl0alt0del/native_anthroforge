@@ -177,7 +177,7 @@ quadrant orientation, hover/click, front/back/normal occlusion against a cube, c
 with one-action undo, complete old-image retention during replacement and lease release.
 Captures in `build/020-image-scene` were visually inspected. Path rendering regression and
 offscreen construction-editor checks pass. No visible windows or desktop input were used;
-interactive and packaged acceptance remain unperformed. Full gate is pending for this increment.
+interactive and packaged acceptance remain unperformed. The full development gate passed.
 
 Diagnostic findings: instanced custom image quads were invisible in this setup; normals and
 indices did not fix it. Non-instanced quads with six native-transformed vertices render
@@ -186,3 +186,19 @@ layer models preserve it. These findings and ownership boundaries are in archite
 Remaining release work still includes native drawing/fitting/cursor, conversion previews,
 complete consumer/navigation controls, fibers/routing/attachments/junctions, generic surfaces,
 legacy control-attachment retirement, performance evidence and full release qualification.
+
+## Ordered sources and consumer controls checkpoint
+
+Object selection now preserves selection order, with extension handled through the existing
+keyboard abstraction. Creating a primitive from selected curves keeps live references in that
+order. Inspectors expose usage, transform-consumption mode, reverse direction and Make Independent.
+The document registry owns the shared reverse consumer index, avoiding repeated full scans in
+usage queries. This is a structural improvement; no timing improvement is claimed without profiling.
+
+Validation: 626 tests pass, including consumer-index changes across independence/deletion/undo
+and reversing one consumer without changing its source or other consumers. Offscreen full-QML
+checks cover ordered creation, usage projection and selection pruning. Ruff, configured mypy
+and function-length checks pass. An exploratory `mypy src` invocation also checked desktop
+modules outside the configured gate and reported existing untyped-adapter errors; it is not
+the repository's type-check command. Full development gate passed immediately before this
+Python/QML-only increment. Drawing/cursor and the remaining release work above are still pending.

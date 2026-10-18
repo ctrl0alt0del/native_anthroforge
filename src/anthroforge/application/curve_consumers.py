@@ -67,18 +67,32 @@ def common_frame(document: Document, entity: SCP, source_parent: str) -> str:
 
 
 def transform_mode(session: "Session", entity: str, curve: str, mode: str) -> None:
+    item, use = selected_use(session, entity, curve)
+    install_use(session, item, rebound_use(session, use, mode))
+
+
+def reverse(session: "Session", entity: str, curve: str, enabled: bool) -> None:
+    item, use = selected_use(session, entity, curve)
+    install_use(session, item, replace(use, reverse=enabled))
+
+
+def selected_use(session: "Session", entity: str, curve: str) -> tuple[SCP, CurveUse]:
     item = session.editable(entity)
     if not isinstance(item.primitive, Primitive):
         raise ValueError("Select a constructed primitive.")
     use = next((u for u in item.primitive.curves if u.curve == curve), None)
     if use is None:
         raise ValueError("Primitive does not reference this curve.")
-    changed = rebound_use(session, use, mode)
-    uses = tuple(changed if u.curve == curve else u for u in item.primitive.curves)
+    return item, use
+
+
+def install_use(session: "Session", item: SCP, changed: CurveUse) -> None:
+    assert isinstance(item.primitive, Primitive)
+    uses = tuple(changed if u.curve == changed.curve else u for u in item.primitive.curves)
     session.replace_entities(
-        {entity: replace(item, primitive=replace(item.primitive, curves=uses))}
+        {item.id: replace(item, primitive=replace(item.primitive, curves=uses))}
     )
-    construction_tasks.edited(session, {entity})
+    construction_tasks.edited(session, {item.id})
 
 
 def rebound_use(session: "Session", use: CurveUse, mode: str) -> CurveUse:

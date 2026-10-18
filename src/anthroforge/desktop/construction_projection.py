@@ -5,6 +5,7 @@ from anthroforge.core import presentation
 from anthroforge.core.object_registry import kind
 from anthroforge.native import scene
 
+from .construction_metadata import describe
 from .record_model import RecordModel
 from .values import qml
 
@@ -49,8 +50,6 @@ class ConstructionProjection:
 
 
 def record(session, item, frame):
-    from .image_scene import metadata
-
     names = ("id", "name", "parent", "update_mode")
     row = {name: getattr(item, name) for name in names}
     row.update(kind=kind(item), **result_record(item.result))
@@ -60,7 +59,7 @@ def record(session, item, frame):
         local_trs=session.engine.decompose(item.matrix),
         quaternion=scene.quaternion(session.engine, frame),
     )
-    return qml(dict(row, **flags(session, item), **metadata(session, item)))
+    return qml(dict(row, **flags(session, item), **describe(session, item)))
 
 
 def result_record(result):

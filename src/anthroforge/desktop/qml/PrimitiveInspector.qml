@@ -8,6 +8,7 @@ ColumnLayout {
     readonly property var primitive: item.primitive || {}
     readonly property var curves: item.curves || []
     readonly property var curve: curves[curveChoice.currentIndex] || {}
+    readonly property var use: (item.uses || []).find(u => u.curve === curve.id) || {}
     readonly property var points: curve.points || []
     readonly property var point: points[pointChoice.currentIndex] || {}
     readonly property var piece: (primitive.pieces || []).find(p => p.curve === curve.id) || {}
@@ -44,6 +45,16 @@ ColumnLayout {
     UiSection {
         title: "Curves"; visible: panel.item.editing && panel.curves.length > 0
         UiCombo { id: curveChoice; objectName: "curveChoice"; Layout.fillWidth: true; model: panel.curves; textRole: "name" }
+        ColumnLayout {
+            visible: !panel.item.standalone; Layout.fillWidth: true
+            UiCombo { Layout.fillWidth: true; model: ["Shape and transform","Shape only"]; currentIndex: panel.use.mode === "SHAPE_ONLY" ? 1 : 0; hint: "Switching preserves current placement"; onActivated: workspace.run("primitive.curve_mode",{entity:panel.item.id,curve:panel.curve.id,mode:currentIndex===1?"SHAPE_ONLY":"SHAPE_AND_TRANSFORM"}) }
+            UiCheck { text: "Reverse direction"; checked: panel.use.reverse || false; onClicked: workspace.run("primitive.curve_reverse",{entity:panel.item.id,curve:panel.curve.id,enabled:checked}) }
+            Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.muted; text: "Used by: "+(panel.use.users || []).map(u=>u.name).join(", ") }
+            RowLayout {
+                UiButton { text: "Select source"; onClicked: workspace.select(panel.curve.id) }
+                UiButton { text: "Make independent"; hint: "Copy this consumer's source with new identities"; onClicked: workspace.run("primitive.make_independent",{entity:panel.item.id,curve:panel.curve.id}) }
+            }
+        }
         RowLayout {
             visible: !panel.item.standalone
             UiButton { text: "Add"; enabled: !panel.topologyLocked; onClicked: authoring.edit("curve.add",{entity:panel.item.id}) }

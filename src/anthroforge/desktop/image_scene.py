@@ -1,22 +1,8 @@
 """Image stages, presentation and native picking use one displayed content revision."""
 
-from dataclasses import asdict
-
 import numpy as np
 
-from anthroforge.core.image_presentation import settings
-from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.native import images
-
-
-def metadata(session, item):
-    if not isinstance(item, ReferenceImage):
-        return {}
-    return dict(
-        source=item.source,
-        dimensions=[item.width, item.height],
-        image_style=asdict(settings(session.workspace, item.id)),
-    )
 
 
 def rows(controller):

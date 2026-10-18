@@ -84,18 +84,49 @@ def image_inspector(controller):
     controller.frameSelection()
 
 
+def shared_sources(controller):
+    keys = [controller.run("curve.create", {}) for _ in range(2)]
+    controller.select(keys[1])
+    controller.select(keys[0], True)
+    assert controller.selectedObjects == keys[::-1]
+    controller.authoring.create("LOFT", "CAPSULE")
+    settle(controller)
+    item = controller.session.document.entity(controller.selection)
+    assert [u.curve for u in item.primitive.curves] == keys[::-1]
+    assert controller.authoring.state.get("uses")[0]["users"][0]["id"] == item.id
+    assert item.result.status == "ready"
+    selection_removal(controller, item.id, keys)
+
+
+def selection_removal(controller, consumer, keys):
+    controller.run("scp.delete", dict(entity=consumer))
+    controller.select(keys[0])
+    controller.select(keys[1], True)
+    controller.run("object.delete", dict(target=keys[1]))
+    assert controller.selectedObjects == [keys[0]]
+    controller.run("undo", {})
+    controller.select(keys[1], True)
+    controller.select(keys[0], True)
+    assert controller.selectedObjects == [keys[1]]
+
+
+def interactions(controller):
+    key = setup(controller)
+    component_drag(controller, key)
+    insertion(controller, key)
+    image_inspector(controller)
+    shared_sources(controller)
+
+
 def run():
     controller, warnings = Controller(), []
     engine = create_engine(controller, warnings)
     try:
         assert engine.rootObjects(), warnings
-        key = setup(controller)
-        component_drag(controller, key)
-        insertion(controller, key)
-        image_inspector(controller)
+        interactions(controller)
         assert not controller.message, controller.message
         assert not warnings, warnings
-        print("Offscreen construction editor: curve editing and image inspector/transform passed.")
+        print("Offscreen construction editor: curves, images and ordered source selection passed.")
     finally:
         controller.close()
         delete(engine)

@@ -76,7 +76,7 @@ Item {
         if(authoring.visible) {
             if(authoring.pick(origin,direction,distance*.012,depthIndex,select,!!extend) || authoring.state.editing) return {};
         }
-        return workspace.pick(origin, direction, depthIndex, select, distance*.012);
+        return workspace.pick(origin, direction, depthIndex, select, distance*.012, !!extend);
     }
     function screenPoint(axis) {
         if (!selected.id) return Qt.point(-100, -100);

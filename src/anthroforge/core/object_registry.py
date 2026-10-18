@@ -36,6 +36,7 @@ class ObjectRegistry:
     source: tuple[Construction, ...]
     entities: tuple[SCP, ...]
     controls: tuple[Control, ...]
+    consumers: Mapping[str, frozenset[str]]
 
     def get(self, key: str) -> SceneObject:
         if key not in self.records:
@@ -46,18 +47,33 @@ class ObjectRegistry:
 def build(document: "Document", previous: ObjectRegistry | None) -> ObjectRegistry:
     if previous is not None and reusable(document, previous):
         return previous
-    items = (*document.entities, *document.controls, *document.objects)
-    records = {item.id: item for item in items}
-    if len(records) != len(items):
-        raise ValueError("Object identities must be unique across all object categories.")
-    validate(document, records)
+    records = validated_records(document)
     return ObjectRegistry(
         MappingProxyType(records),
         MappingProxyType({v.id: v for v in document.objects}),
         document.objects,
         document.entities,
         document.controls,
+        construction_consumers(document),
     )
+
+
+def validated_records(document: "Document") -> dict[str, SceneObject]:
+    items = (*document.entities, *document.controls, *document.objects)
+    records = {item.id: item for item in items}
+    if len(records) != len(items):
+        raise ValueError("Object identities must be unique across all object categories.")
+    validate(document, records)
+    return records
+
+
+def construction_consumers(document: "Document") -> Mapping[str, frozenset[str]]:
+    users: dict[str, set[str]] = {}
+    for item in (*document.entities, *document.objects):
+        definition = getattr(item, "primitive", None) or item
+        for use in getattr(definition, "curves", ()):
+            users.setdefault(use.curve, set()).add(item.id)
+    return MappingProxyType({key: frozenset(value) for key, value in users.items()})
 
 
 def reusable(document: "Document", previous: ObjectRegistry | None) -> bool:

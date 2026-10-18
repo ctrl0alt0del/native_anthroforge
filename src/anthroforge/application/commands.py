@@ -47,6 +47,7 @@ EDITS = {
     "object.delete": object_operations.delete,
     "primitive.from_curves": curve_consumers.from_curves,
     "primitive.curve_mode": curve_consumers.transform_mode,
+    "primitive.curve_reverse": curve_consumers.reverse,
     "primitive.make_independent": curve_independence.make_independent,
     "scp.empty": operations.empty,
     "scp.rename": operations.rename,

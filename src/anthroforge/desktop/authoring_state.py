@@ -68,10 +68,13 @@ def binding_records(item):
 def construction_data(entity, session):
     from anthroforge.application.construction_policy import topology_locks
 
+    from .curve_usage import uses
+
     result = {}
     result["topology_dependents"] = topology_locks(session.document, entity.id) if entity else []
     result["standalone"] = isinstance(entity, Curve)
     result["curves"] = editor_curves(entity)
+    result["uses"] = uses(session, entity)
     result["controls"] = [
         dict(id=c.id, name=c.name, kind=c.kind) for c in session.document.controls
     ]

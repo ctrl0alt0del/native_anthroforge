@@ -17,6 +17,7 @@ from .inspection_panel import InspectionPanel
 from .inspection_tools import InspectionTools
 from .issue_panel import IssuePanel
 from .models import RenderModel
+from .object_selection import ObjectSelection
 
 
 class Controller(QObject):
@@ -88,6 +89,7 @@ class Controller(QObject):
         self.viewport_orthographic = orthographic
 
     def _initialize_state(self):
+        self.object_selection = ObjectSelection()
         self.selection, self.hovered, self.message = "", "", ""
         self.last_revision, self.last_workspace = -1, -1
         self.rows, self.drag_values, self.pick_ids = [], [], []
@@ -100,6 +102,14 @@ class Controller(QObject):
         self.camera_workspace = None
         self.capture_mode = False
         self.last_frame = monotonic()
+
+    @property
+    def selection(self):
+        return self.object_selection.primary
+
+    @selection.setter
+    def selection(self, value):
+        self.object_selection.choose(value)
 
     @Property(str, notify=changed)
     def documentName(self) -> str:
@@ -144,6 +154,10 @@ class Controller(QObject):
     @Property(str, notify=selectionChanged)
     def selectedId(self):
         return self.selection
+
+    @Property("QVariantList", notify=selectionChanged)
+    def selectedObjects(self):
+        return self.object_selection.items
 
     @Property(str, notify=changed)
     def hoveredId(self):
@@ -319,8 +333,9 @@ class Controller(QObject):
         return actions.run(self, operation, arguments)
 
     @Slot(str)
-    def select(self, entity):
-        self.selection = entity
+    @Slot(str, bool)
+    def select(self, entity, extend=False):
+        self.object_selection.choose(entity, extend)
         self.scene_projection.synchronize_selection()
         self.scene_projection.view.synchronize(
             dict(rows=self.rows, parents=self.scene_projection.parents())
@@ -344,12 +359,13 @@ class Controller(QObject):
             self.message = "Import queued. You can keep navigating and editing."
 
     @Slot("QVariantList", "QVariantList", int, bool, float, result="QVariantMap")
-    def pick(self, origin, direction, depth, select, radius=0.03):
+    @Slot("QVariantList", "QVariantList", int, bool, float, bool, result="QVariantMap")
+    def pick(self, origin, direction, depth, select, radius=0.03, extend=False):
         self.last_hit = scene_state.picked(self, origin, direction, depth, radius)
         previous = self.hovered
         self.hovered = self.last_hit.get("id", "")
         if select:
-            self.select(self.hovered)
+            self.select(self.hovered, extend)
         if select or previous != self.hovered:
             self.notify()
         return self.last_hit

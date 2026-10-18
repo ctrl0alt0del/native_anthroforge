@@ -110,7 +110,7 @@ ApplicationWindow {
             SplitView {
                 anchors.fill: parent; anchors.margins: Theme.inset; orientation: Qt.Vertical
                 Outliner { SplitView.fillHeight: true; SplitView.minimumHeight: 150; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
-                Construction { id: constructionPane; SplitView.preferredHeight: 240; SplitView.minimumHeight: 120 }
+                Construction { id: constructionPane; keyboard: window.keyboardManager; SplitView.preferredHeight: 240; SplitView.minimumHeight: 120 }
             }
         }
         ColumnLayout {

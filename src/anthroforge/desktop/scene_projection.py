@@ -58,7 +58,7 @@ class SceneProjection:
         self.records, self.keys, self.order = {}, {}, []
         self.view, self.selected = PropertyProjection(controller), PropertyProjection(controller)
         self.view.synchronize(dict(rows=[], parents=[]))
-        self.selection = ""
+        self.selection = ()
         self._parent_key, self._parents = None, []
 
     def synchronize(self):
@@ -124,11 +124,10 @@ class SceneProjection:
     def synchronize_selection(self):
         controller = self.controller
         records = self.records | controller.construction.records
-        if controller.selection not in records:
-            controller.selection = ""
+        controller.object_selection.retain(records)
         self.selected.synchronize(records.get(controller.selection, {}))
-        if self.selection != controller.selection:
-            self.selection = controller.selection
+        if self.selection != tuple(controller.object_selection.items):
+            self.selection = tuple(controller.object_selection.items)
             controller.selectionChanged.emit()
 
 

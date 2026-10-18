@@ -174,3 +174,27 @@ def test_parented_shared_source_does_not_apply_parent_pose_twice(session):
     assert session.document.entity(first).matrix[3] == pytest.approx(0.5)
     assert session.document.entity(second).matrix[3] == pytest.approx(0.5)
     np.testing.assert_allclose(vertices(session, first), before)
+
+
+def test_consumer_index_follows_independence_deletion_and_undo(session):
+    _, curve, first, second = assembly(session)
+    assert session.document.registry.consumers[curve] == {first, second}
+    copied = session.command("primitive.make_independent", entity=first, curve=curve)
+    assert session.document.registry.consumers[curve] == {second}
+    assert session.document.registry.consumers[copied] == {first}
+    session.command("scp.delete", entity=second)
+    assert curve not in session.document.registry.consumers
+    session.command("undo")
+    assert session.document.registry.consumers[curve] == {second}
+
+
+def test_reversing_consumer_keeps_authored_source_and_other_consumers(session):
+    _, curve, first, second = assembly(session)
+    source, before = session.document.object(curve), vertices(session, second)
+    session.command("primitive.curve_reverse", entity=first, curve=curve, enabled=True)
+    session.wait(5)
+    assert session.document.object(curve) is source
+    np.testing.assert_allclose(vertices(session, second), before)
+    assert not np.allclose(vertices(session, first), before)
+    session.command("undo")
+    np.testing.assert_allclose(vertices(session, first), before)

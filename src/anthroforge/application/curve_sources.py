@@ -97,16 +97,7 @@ def create_records(
 
 
 def consumers(document: Document, curves: set[str]) -> set[str]:
-    scps = {
-        item.id
-        for item in document.entities
-        if item.primitive and any(use.id in curves for use in item.primitive.curves)
-    }
-    return scps | {
-        item.id
-        for item in document.objects
-        if any(use.curve in curves for use in getattr(item, "curves", ()))
-    }
+    return set().union(*(document.registry.consumers.get(key, ()) for key in curves))
 
 
 def edited_source(session: "Session", use: CurveUse, curve: Curve) -> Curve:

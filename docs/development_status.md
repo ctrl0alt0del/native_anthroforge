@@ -43,8 +43,16 @@ undo state, geometry-output reservation or save barrier belongs to diagnostics.
 Project/undo resets invalidate prior epochs; retired jobs release captured documents.
 No second worker pool, Blender dependency or Python numerical geometry solver was added.
 
-Portable qualification and delivery state are tracked in the
-[task handoff](tasks/issue-reporting.md).
+After outage recovery, the Windows executable built from clean tracked source at
+`7e98a91`, with file/product version 0.1.6.0. The relocated distribution passed the
+complete portable gate under a minimal PATH, including imports, attachments,
+primitives/deformers, deletion/subdivision, save/reopen, rendering, GUI, runtime
+profiling and the shared issue/verified-repair workflow. The packaged Issues panel
+capture was visually inspected; all 30 QML files and three native DLLs match the
+qualified inputs. Distribution and source archive are local artifacts under
+`dist/AnthroForge.dist` and `dist/AnthroForge-0.1.6-source.zip`. Portable evidence is
+under `build/issues-016/portable`; [the task handoff](tasks/issue-reporting.md) records
+recovery and integration context.
 
 ## Activity presentation 0.1.5
 

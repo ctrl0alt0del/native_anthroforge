@@ -3,7 +3,7 @@
 - Task branch: `codex/issue-reporting`
 - Integration branch: `main`
 - Starting revision: `c5facaa3e13ab615a9b2026b7101cd809057b46d`
-- Status: pending release qualification
+- Status: implementation and validation complete; ready for integration
 - Last updated: 2026-10-18, Europe/Bucharest
 - Active writer: desktop chat, direct implementation
 
@@ -58,8 +58,8 @@ native/style/type checks and native runtime/numerics loading at `069a05d`.
 The final lifecycle changes also passed 15 targeted tests. Actual Issues GUI acceptance
 was rerun successfully at that revision, with no QML warnings; captures were inspected.
 `tools/activity_acceptance.py` and `tools/issues_acceptance.py` passed actual GUI checks;
-captures under `build/issues-016/gui` were inspected. Portable qualification remains
-pending; this checkpoint is not merge-ready.
+captures under `build/issues-016/gui` were inspected. Portable qualification also passed
+after outage recovery, as recorded below.
 
 `tools/issues_profile_acceptance.py` passed eight serial normal/snapped drag recordings
 with Issues closed/open/open/closed, F12 toggling within each gesture, confirmation and
@@ -71,12 +71,21 @@ The initial unqualified trial let its fixed pixel path leave the cube when openi
 the panel shrank the viewport. Fixed projection preserves 300 pixels/metre across
 variants; the failed fixture run is excluded, not counted as success.
 
-## Next actions and blockers
+The resumed package build completed from clean tracked source at `7e98a91`, with
+file/product version 0.1.6.0. A relocated distribution passed the complete portable
+gate with minimal PATH and developer Python/Qt settings removed: imports, attachments,
+primitives/deformers, deletion/subdivision, saving, inspection, rendering, GUI, runtime
+profiling, and the issue detection/verified repair JSON workflow. The packaged Issues
+capture was visually inspected. All 30 packaged QML files and three native DLLs match
+the qualified inputs. Evidence is under `build/issues-016/portable` and the resumed
+build log is `build/issues-016-package.log`; the interrupted log is retained separately.
 
-1. Build/qualify 0.1.6 portable distribution, including issues JSON workflow and
-   actual packaged Issues panel; inspect its screenshot and create source archive.
-2. Document final evidence,
-   then merge/push only after required checks pass.
+## Delivery and integration
+
+Application: `dist/AnthroForge.dist/AnthroForge.exe`.
+Corresponding source archive: `dist/AnthroForge-0.1.6-source.zip`.
+No product or validation work remains. Final integration is a normal merge/push into
+`main`; Git ancestry records its completion. Preserve the task branch for recovery.
 
 ## Ownership and coupling review
 

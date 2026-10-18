@@ -11,7 +11,9 @@ from .attachment_candidates import eligible
 
 
 def current(session: Any, item: Any) -> Any:
-    if not isinstance(item, Fiber) or item.edit:
+    if not isinstance(item, Curve) or getattr(item, "edit", None):
+        return item
+    if not isinstance(item, Fiber) and not any(p.junction for p in item.points):
         return item
     asset = session.resources.paths.get(item.result.asset)
     return replace(item, points=asset.authored.points) if asset else item

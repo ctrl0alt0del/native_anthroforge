@@ -131,9 +131,11 @@ def authored_matrix(
 
 
 def install(session: "Session", entity: SCP, definition: ResolvedPrimitive) -> set[str]:
+    from .junction_edits import expand
+
     assert isinstance(entity.primitive, Primitive)
     previous = {use.id: use for use in entity.primitive.curves}
-    curves = edited_curves(session, entity.id, previous, definition)
+    curves = expand(session, edited_curves(session, entity.id, previous, definition))
     uses = tuple(updated_use(previous, c, entity.id) for c in definition.curves)
     changed = {
         key for key, value in curves.items() if value != session.document.registry.records.get(key)

@@ -7,6 +7,7 @@ from . import object_registry
 from .construction import Control
 from .document_index import DocumentIndex, build
 from .entities import SCP, Workspace
+from .junctions import Junction
 
 
 @dataclass(frozen=True, slots=True)
@@ -21,6 +22,7 @@ class Document:
     workspaces: tuple[Workspace, ...] = (Workspace(),)
     controls: tuple[Control, ...] = ()
     objects: tuple[object_registry.Construction, ...] = ()
+    junctions: tuple[Junction, ...] = ()
     _index: DocumentIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _registry: object_registry.ObjectRegistry | None = field(
         default=None, repr=False, compare=False, kw_only=True

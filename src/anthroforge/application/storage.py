@@ -12,6 +12,7 @@ from uuid import UUID
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Attachment, Workspace
+from anthroforge.core.junctions import decode as decode_junction
 from anthroforge.native.mesh import GeometryEngine
 
 from . import object_codec, resource_storage
@@ -67,7 +68,7 @@ def document_state(document: Document) -> dict[str, Any]:
         f.name: getattr(document, f.name) for f in fields(document) if not f.name.startswith("_")
     }
     state["id"] = str(document.id)
-    for name in ("entities", "controls", "workspaces"):
+    for name in ("entities", "controls", "workspaces", "junctions"):
         state[name] = [asdict(value) for value in state[name]]
     state["objects"] = [object_codec.encode(value) for value in document.objects]
     return state
@@ -121,6 +122,7 @@ def decode_document(data: dict[str, Any]) -> Document:
     data["workspaces"] = tuple(decode_workspace(item) for item in data["workspaces"])
     data["controls"] = tuple(control(item) for item in data.get("controls", ()))
     data["objects"] = tuple(object_codec.decode(item) for item in data.get("objects", ()))
+    data["junctions"] = tuple(decode_junction(item) for item in data.get("junctions", ()))
     if not data["workspaces"]:
         raise ValueError("Project has no workspace.")
     return Document(**data)

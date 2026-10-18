@@ -53,7 +53,7 @@ class ChangeJournal:
         if before is after:
             return
         self.serial += 1
-        names = ("name", "workspaces", "attachments_enabled", "update_mode")
+        names = ("name", "workspaces", "attachments_enabled", "update_mode", "junctions")
         delta = DocumentChanges(
             before.id != after.id,
             record_changes(before.index.entities, after.index.entities),

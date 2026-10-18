@@ -5,6 +5,7 @@ from collections.abc import Iterator, Mapping, Set
 from dataclasses import dataclass
 from types import MappingProxyType
 
+from . import junctions
 from .construction import Control, Curve, Deformer
 from .curve_dependencies import inputs as curve_path_inputs
 from .cycle_analysis import cycles
@@ -98,16 +99,24 @@ def build(
     controls: tuple[Control, ...],
     enabled: bool,
     objects: tuple[ConstructionObject, ...] = (),
+    shared: tuple[junctions.Junction, ...] = (),
 ) -> DependencyGraph:
     result = entity_edges(entities, enabled, objects)
-    result.update(object_edges(objects))
+    result.update(object_edges(objects, shared))
+    result.update(junctions.edges(shared))
+    result.update(control_edges(controls))
+    return indexed(result)
+
+
+def control_edges(controls: tuple[Control, ...]) -> dict[Port, set[Port]]:
+    result = {}
     for control in controls:
         result[Port(control.id, "control")] = control_inputs(control)
         result[Port(control.id, "pose")] = {Port(control.id, "control")}
         result[Port(control.id, "cage")] = {Port(control.id, "control")} | binding_inputs(
             control.deformers
         )
-    return indexed(result)
+    return result
 
 
 def indexed(result: dict[Port, set[Port]]) -> DependencyGraph:
@@ -117,7 +126,9 @@ def indexed(result: dict[Port, set[Port]]) -> DependencyGraph:
     )
 
 
-def object_edges(objects: tuple[ConstructionObject, ...]) -> dict[Port, set[Port]]:
+def object_edges(
+    objects: tuple[ConstructionObject, ...], shared: tuple[junctions.Junction, ...] = ()
+) -> dict[Port, set[Port]]:
     result: dict[Port, set[Port]] = {}
     for item in objects:
         pose = Port(item.id, "pose")
@@ -125,15 +136,17 @@ def object_edges(objects: tuple[ConstructionObject, ...]) -> dict[Port, set[Port
         result[pose] = {Port(item.id, "local_pose")} | (
             {Port(item.parent, "pose")} if item.parent else set()
         )
-        result[Port(item.id, output(item))] = construction_inputs(item, objects)
+        result[Port(item.id, output(item))] = construction_inputs(item, objects, shared)
     return result
 
 
 def construction_inputs(
-    item: ConstructionObject, objects: tuple[ConstructionObject, ...]
+    item: ConstructionObject,
+    objects: tuple[ConstructionObject, ...],
+    shared: tuple[junctions.Junction, ...] = (),
 ) -> set[Port]:
     if isinstance(item, Curve):
-        return curve_path_inputs(item)
+        return curve_path_inputs(item) | junctions.inputs(item, shared)
     if isinstance(item, Surface):
         return set().union(*(curve_inputs(use, objects) for use in item.curves))
     return set()

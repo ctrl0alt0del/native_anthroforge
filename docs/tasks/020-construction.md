@@ -621,3 +621,26 @@ jobs without a target. The shared repair policy now retains the original documen
 behavior while using workspace association for object targets. The rerun passes all
 765 pytest tests (9 existing Qt deprecation warnings); numerical imports and doctor pass.
 Logs: `build/check-020-surfaces.log`, `build/pytest-020-surfaces.log`.
+
+## Junction model and ordinary-curve checkpoint
+
+Authored points carry explicit junction membership; a document Junction identifies its
+designated source point. Junctions are relationships, not fake anatomical or scene objects.
+The source's accepted path/pose supplies a distinct junction output; incident paths depend
+on it without adding a source self-cycle. Actual cycles remain authored and diagnosed.
+Schema 3 persists identities, and independent curve copies clear junction membership.
+
+Shared create/remove/inspect commands and point-edit expansion now support ordinary curves.
+Point edits update incident authored records atomically; object transforms remain separate.
+Engine input resolution consumes accepted source provenance and applies native handle/path
+editing, retaining attachment residuals where present. Publication fans out to dependent
+paths through the same coordinator. Manual sources retain accepted output until publication.
+Sources without junctions keep an early no-op path.
+
+33 focused junction/shared-curve/surface/architecture tests and configured mypy pass; Ruff
+passes. Contract tests cover identity, source changes, actual cycles and serialization;
+workflow tests cover both-member edits, one-action undo/redo, transform following, detaching
+without a jump, deletion protection and Manual publication. This is an incomplete checkpoint:
+shared Fiber binding ownership/propagation, conversion anchors, copied-set junction sharing,
+desktop junction controls, branches and the other release requirements remain. Do not treat
+generic acceptance of a Fiber record as qualification of its shared binding behavior.

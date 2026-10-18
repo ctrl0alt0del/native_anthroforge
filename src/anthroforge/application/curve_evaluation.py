@@ -9,6 +9,7 @@ from . import (
     attachment_assets,
     curve_sources,
     fiber_edit_evaluation,
+    junction_evaluation,
     path_assets,
     routing_evaluation,
 )
@@ -63,6 +64,9 @@ def edited_fiber(
 def engine_path(
     engine: Any, document: Any, resources: Any, item: Any, cancel: int, resolved: Any = None
 ) -> Any:
+    item, resolved = junction_evaluation.resolved(
+        engine, document, resources, item, cancel, resolved
+    )
     if item.engine == "ROUTED":
         return routing_evaluation.evaluate(engine, document, resources, item, cancel, resolved)
     return resolved or path_assets.evaluate(engine, item, cancel)

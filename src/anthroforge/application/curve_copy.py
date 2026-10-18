@@ -21,7 +21,7 @@ def clone(curve: Curve, identities: dict[str, str]) -> Curve:
         name=curve.name + " copy",
         parent=identities.get(curve.parent, curve.parent),
         owners=tuple(identities.get(key, key) for key in curve.owners),
-        points=tuple(replace(p, id=identities[p.id]) for p in curve.points),
+        points=tuple(replace(p, id=identities[p.id], junction="") for p in curve.points),
         generation=0,
         pose_revision=0,
         construction_revision=0,

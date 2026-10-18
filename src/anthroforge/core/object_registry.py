@@ -9,6 +9,8 @@ from .construction import Control, Curve
 from .curve_dependencies import targets as curve_targets
 from .entities import SCP
 from .fibers import Fiber
+from .junctions import Junction
+from .junctions import validate as validate_junctions
 from .reference_images import ReferenceImage
 from .surfaces import Surface
 
@@ -38,6 +40,7 @@ class ObjectRegistry:
     entities: tuple[SCP, ...]
     controls: tuple[Control, ...]
     consumers: Mapping[str, frozenset[str]]
+    junctions: tuple[Junction, ...]
 
     def get(self, key: str) -> SceneObject:
         if key not in self.records:
@@ -56,6 +59,7 @@ def build(document: "Document", previous: ObjectRegistry | None) -> ObjectRegist
         document.entities,
         document.controls,
         construction_consumers(document),
+        document.junctions,
     )
 
 
@@ -87,24 +91,32 @@ def reusable(document: "Document", previous: ObjectRegistry | None) -> bool:
         and document.objects is previous.source
         and document.entities is previous.entities
         and document.controls is previous.controls
+        and document.junctions is previous.junctions
     )
 
 
 def validate(document: "Document", records: dict[str, SceneObject]) -> None:
+    validate_junctions(document.junctions, document.objects)
     validate_primitives(document, records)
     for item in document.objects:
-        if item.parent and (
-            item.parent not in records or isinstance(records[item.parent], ReferenceImage)
-        ):
-            raise ValueError("Transform parent must exist and cannot be a reference image.")
-        if set(item.owners) - document.index.entities.keys():
-            raise ValueError("Workspace associations require anatomical objects.")
+        validate_placement(document, item, records)
         if isinstance(item, Curve):
             validate_bindings(item, records)
         if isinstance(item, Surface):
             validate_sources(item, records)
     validate_parenting(document.objects)
     validate_point_ids(document)
+
+
+def validate_placement(
+    document: "Document", item: Construction, records: Mapping[str, SceneObject]
+) -> None:
+    if item.parent and (
+        item.parent not in records or isinstance(records[item.parent], ReferenceImage)
+    ):
+        raise ValueError("Transform parent must exist and cannot be a reference image.")
+    if set(item.owners) - document.index.entities.keys():
+        raise ValueError("Workspace associations require anatomical objects.")
 
 
 def validate_primitives(document: "Document", records: dict[str, SceneObject]) -> None:
@@ -152,6 +164,7 @@ def validate_point_ids(document: "Document") -> None:
     items: tuple[SCP | Control, ...] = (*document.entities, *document.controls)
     existing = [key for item in items for key in identities(item)]
     keys = [*existing, *(item.id for item in document.objects)]
+    keys.extend(j.id for j in document.junctions)
     keys.extend(p.id for item in document.objects if isinstance(item, Curve) for p in item.points)
     if any(not key for key in keys) or len(set(keys)) != len(keys):
         raise ValueError("Authored identities must be nonempty and unique across the document.")

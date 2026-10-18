@@ -20,6 +20,7 @@ from . import (
     importing,
     inspection,
     inspection_report,
+    junction_operations,
     object_operations,
     operations,
     path_tasks,
@@ -68,6 +69,8 @@ EDITS = {
     "primitive.curve_reverse": curve_consumers.reverse,
     "primitive.make_independent": curve_independence.make_independent,
     "consumer.make_independent": curve_independence.make_independent,
+    "junction.create": junction_operations.create,
+    "junction.remove": junction_operations.remove,
     "scp.empty": operations.empty,
     "scp.rename": operations.rename,
     "scp.color": operations.color,
@@ -161,17 +164,24 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
         **drawing_commands(session),
-        "image.inspect": lambda **a: image_operations.inspect(session, **a),
+        **construction_queries(session),
         "image.presentation": lambda **a: image_presentation.update(session, **a),
-        "object.inspect": lambda **a: object_operations.inspect(session, **a),
         "job.cancel": lambda job_id, obsolete=False: session.scheduler.cancel_job(job_id, obsolete),
         "job.retry": session.scheduler.retry,
-        "primitive.inspect": lambda **a: primitives.inspect(session, **a),
-        "control.affected": lambda **a: controls.affected(session, **a),
-        "deformer.members": lambda **a: deformers.members(session, **a),
         "inspect.target": lambda **a: inspection.target(session, **a),
         "inspect.snapshot": lambda **a: inspection.snapshot(session, **a),
         "units.convert": convert,
+    }
+
+
+def construction_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "image.inspect": lambda **a: image_operations.inspect(session, **a),
+        "object.inspect": lambda **a: object_operations.inspect(session, **a),
+        "primitive.inspect": lambda **a: primitives.inspect(session, **a),
+        "control.affected": lambda **a: controls.affected(session, **a),
+        "deformer.members": lambda **a: deformers.members(session, **a),
+        "junction.inspect": lambda **a: junction_operations.inspect(session, **a),
     }
 
 

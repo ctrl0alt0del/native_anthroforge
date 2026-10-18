@@ -39,7 +39,11 @@ def editable(session: "Session", target: str) -> Construction:
 
 
 def install(session: "Session", item: Construction) -> None:
+    from . import junction_operations
+
     before = editable(session, item.id)
+    if junction_operations.edit(session, item):
+        return
     item = curve_edit_state.prepare(session, before, item)
     changed = object_revisions.authored(before, item)
     if changed is before:
@@ -188,12 +192,10 @@ def inspect(session: "Session", target: str) -> dict[str, Any]:
 
 def delete(session: "Session", target: str) -> None:
     from .control_frames import remove_supports
-    from .object_removal import retain_frames, retain_objects
+    from .object_removal import require_removable, retain_frames, retain_objects
 
     item = editable(session, target)
-    users = curve_sources.consumers(session.document, {target})
-    if users:
-        raise ValueError("Object is referenced by consumers: " + ", ".join(sorted(users)))
+    require_removable(session, item)
     parent = session.document.object(item.parent) if item.parent else None
     objects = tuple(o for o in retain_objects(session, item, parent) if o.id != target)
     entities = retain_frames(session, session.document.entities, target)

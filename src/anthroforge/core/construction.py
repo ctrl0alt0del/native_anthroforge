@@ -39,6 +39,7 @@ class CurvePoint:
     radius: float = 1.0
     tilt: float = 0.0
     id: str = field(default_factory=identity)
+    junction: str = ""
 
     def __post_init__(self) -> None:
         for value in (self.position, self.left, self.right):

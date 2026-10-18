@@ -3,7 +3,7 @@
 from dataclasses import replace
 from typing import TYPE_CHECKING
 
-from anthroforge.core.construction import Control
+from anthroforge.core.construction import Control, Curve
 from anthroforge.core.curve_consumption import uses, with_uses
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import SCP
@@ -18,6 +18,14 @@ from .object_revisions import authored
 
 if TYPE_CHECKING:
     from .session import Session
+
+
+def require_removable(session: "Session", item: Construction) -> None:
+    if isinstance(item, Curve) and any(p.junction for p in item.points):
+        raise ValueError("Detach shared junctions before deleting this curve.")
+    users = curve_sources.consumers(session.document, {item.id})
+    if users:
+        raise ValueError("Object is referenced by consumers: " + ", ".join(sorted(users)))
 
 
 def install(

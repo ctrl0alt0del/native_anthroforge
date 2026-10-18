@@ -72,7 +72,17 @@ def resolve(engine: GeometryEngine, document: Document, entity: SCP) -> Resolved
 def for_editing(session: "Session", entity: SCP | None) -> SCP | None:
     if entity is None or entity.primitive is None:
         return entity
-    return replace(entity, primitive=resolve(session.engine, session.document, entity))
+    return replace(entity, primitive=editing_definition(session, entity))
+
+
+def editing_definition(session: "Session", entity: SCP) -> ResolvedPrimitive:
+    from .curve_edit_state import current
+
+    definition = resolve(session.engine, session.document, entity)
+    curves = tuple(
+        replace(curve, points=current(session, curve).points) for curve in definition.curves
+    )
+    return replace(definition, curves=curves)
 
 
 def owned_use(curve: Curve, owner: str) -> CurveUse:
@@ -101,6 +111,8 @@ def consumers(document: Document, curves: set[str]) -> set[str]:
 
 
 def edited_source(session: "Session", use: CurveUse, curve: Curve) -> Curve:
+    from .curve_edit_state import prepare
+
     original = source(session.document, use.curve)
     changes = {
         f.name: getattr(curve, f.name)
@@ -110,7 +122,7 @@ def edited_source(session: "Session", use: CurveUse, curve: Curve) -> Curve:
     changed = replace(original, **changes)
     if curve.matrix != use_frame(session.engine, session.document, use):
         changed = replace(changed, matrix=authored_matrix(session, use, curve.matrix))
-    return object_revisions.authored(original, changed)
+    return object_revisions.authored(original, prepare(session, original, changed))
 
 
 def authored_matrix(

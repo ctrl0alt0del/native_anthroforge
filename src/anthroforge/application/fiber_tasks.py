@@ -67,6 +67,18 @@ def workload(spec: "FiberCreation", document: Any) -> Workload:
     )
 
 
+def path_workload(session: "Session", item: Fiber, document: Any) -> Workload:
+    asset = session.resources.attachments.get(item.attachment_asset)
+    rows = len(asset.field.owners) if asset else len(item.points) * item.resolution
+    targets = item.edit.candidates if item.edit else ()
+    triangles = sum(
+        session.assets[geometry_asset(document.entity(key))].mesh.counts[3]
+        for key in targets
+        if geometry_asset(document.entity(key)) in session.assets
+    )
+    return Workload(affected=1, candidates=rows, entities=len(targets), triangles=triangles)
+
+
 def capture(session: "Session", spec: "FiberCreation", document: Any, resources: Any) -> Any:
     item = curve_sources.source(document, spec.source)
     original = accepted(document, resources.paths, spec.source)

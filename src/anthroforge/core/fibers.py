@@ -7,6 +7,13 @@ from .entities import Attachment
 
 
 @dataclass(frozen=True, slots=True)
+class FiberEdit:
+    baseline: str
+    candidates: tuple[str, ...]
+    rebind: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
 class FiberBinding:
     point: str
     target: str
@@ -25,6 +32,7 @@ class Fiber(Curve):
     bindings: tuple[FiberBinding, ...] = ()
     attachment_asset: str = ""
     supports: tuple[str, ...] = ()
+    edit: FiberEdit | None = None
 
     def __post_init__(self) -> None:
         Curve.__post_init__(self)

@@ -7,6 +7,7 @@ from uuid import uuid4
 
 from anthroforge.core.construction import Curve
 from anthroforge.core.document import Document
+from anthroforge.core.fibers import Fiber
 from anthroforge.core.jobs import Job
 from anthroforge.core.results import EvaluationResult, Port
 from anthroforge.core.scheduling import Workload
@@ -29,7 +30,7 @@ def request(session: "Session", curve: str, interactive: bool = False) -> str:
     job.publish_during_edit = job.restart_on_redo = True
     job.retry = partial(request, session, curve)
     job.cleanup = partial(completed, session, curve, job)
-    job.workload = partial(workload, curve)
+    job.workload = partial(workload, session, curve)
     dep.contract(job, session.document, {Port(curve, "path")})
     return session.scheduler.submit(job)
 
@@ -43,13 +44,17 @@ def make_job(session: "Session", curve: str) -> Job:
         partial(compute, session, curve),
         partial(publish, session, curve),
         key="path:" + curve,
-        kind="curve_path",
+        kind="fiber_path" if isinstance(source(session.document, curve), Fiber) else "curve_path",
         reads=reads,
     )
 
 
-def workload(curve: str, document: Document) -> Workload:
+def workload(session: "Session", curve: str, document: Document) -> Workload:
     item = source(document, curve)
+    if isinstance(item, Fiber):
+        from .fiber_tasks import path_workload
+
+        return path_workload(session, item, document)
     return Workload(
         affected=1,
         candidates=len(item.points),
@@ -67,21 +72,23 @@ def compute(session: "Session", curve: str, payload: Any, cancel: Any) -> Any:
 
 
 def publish(session: "Session", curve: str, payload: Any) -> None:
-    document, asset = payload
+    document, evaluation = payload
     inputs = dep.ports(document, Port(curve, "path"))
     if revisions(document, inputs) != revisions(session.document, inputs):
         raise ValueError("Curve inputs changed before publication.")
-    item = source(session.document, curve)
+    item = curve_evaluation.adopt(session, source(session.document, curve), evaluation)
     key = str(uuid4())
-    session.resources.paths[key] = asset
+    session.resources.paths[key] = evaluation.asset
     result = accepted_result(document, item, inputs, key)
-    install_result(session, curve, result)
+    install_result(session, curve, result, item)
     propagate(session, curve)
 
 
-def install_result(session: "Session", curve: str, result: EvaluationResult) -> None:
+def install_result(
+    session: "Session", curve: str, result: EvaluationResult, item: Curve | None = None
+) -> None:
     objects = tuple(
-        replace(o, result=result) if o.id == curve else o for o in session.document.objects
+        replace(item or o, result=result) if o.id == curve else o for o in session.document.objects
     )
     session.replace_document(objects=objects)
 

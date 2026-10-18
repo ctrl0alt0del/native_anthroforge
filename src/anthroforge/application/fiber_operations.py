@@ -1,11 +1,12 @@
 """Independent curve-to-fiber authoring, using shared asynchronous transactions."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import partial
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from anthroforge.core.construction import Curve
+from anthroforge.core.fibers import Fiber
 from anthroforge.core.results import geometry_asset
 
 from . import authored_jobs, curve_copy, fiber_tasks
@@ -59,3 +60,15 @@ def validate_targets(session: "Session", result: tuple[Any, ...]) -> None:
             raise ValueError("Fiber binding requires an accepted anatomical surface.")
         if scope not in ("CURRENT_PARENT", "ANY_PARENT"):
             raise ValueError("Invalid endpoint capture scope.")
+
+
+def binding_scope(session: "Session", curve: str, point: str, scope: str) -> None:
+    from .object_operations import install
+
+    item = editable(session, curve)
+    if not isinstance(item, Fiber) or point not in {b.point for b in item.bindings}:
+        raise ValueError("Select a fiber anatomical binding.")
+    bindings = tuple(
+        replace(b, capture_scope=scope) if b.point == point else b for b in item.bindings
+    )
+    install(session, replace(item, bindings=bindings))

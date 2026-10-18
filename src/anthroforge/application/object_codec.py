@@ -7,7 +7,7 @@ from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.core.curve_engines import fields as curve_fields
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import Attachment
-from anthroforge.core.fibers import Fiber, FiberBinding
+from anthroforge.core.fibers import Fiber, FiberBinding, FiberEdit
 from anthroforge.core.object_registry import Construction
 from anthroforge.core.reference_images import ImageCalibration, ReferenceImage
 from anthroforge.core.results import EvaluationResult
@@ -42,6 +42,7 @@ def decode_curve(kind: str, state: dict[str, Any]) -> Curve:
     state["points"] = tuple(CurvePoint(**tuples(point)) for point in state["points"])
     if kind == "fiber":
         state["bindings"] = tuple(decode_binding(binding) for binding in state["bindings"])
+        state["edit"] = FiberEdit(**tuples(state["edit"])) if state.get("edit") else None
         return Fiber(**state)
     return Curve(**state)
 

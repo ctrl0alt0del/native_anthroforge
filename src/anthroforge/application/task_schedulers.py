@@ -156,6 +156,12 @@ class FiberCaptureTaskScheduler(MeasuredTaskScheduler):
         return Schedule("worker", cost, reason="Dense anatomical capture and owner blending")
 
 
+class FiberPathTaskScheduler(AttachmentTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.1 + workload.candidates * 0.02 + workload.triangles * 0.002
+        return Schedule("worker", cost, reason="Dense fiber resolution or edit and recapture")
+
+
 class InspectionTaskScheduler(SaveProjectTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         return Schedule(reason="Frozen inspection export; file and GPU work stay background")
@@ -182,4 +188,5 @@ def curve_schedulers() -> dict[str, TaskScheduler]:
         "curve_path": CurvePathTaskScheduler(),
         "curve_draw": CurveDrawingTaskScheduler(),
         "fiber_capture": FiberCaptureTaskScheduler(),
+        "fiber_path": FiberPathTaskScheduler(),
     }

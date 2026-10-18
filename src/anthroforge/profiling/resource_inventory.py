@@ -18,7 +18,19 @@ LIMITATIONS = [
     "Snapshots are event-driven at most once per second, plus recording boundaries",
 ]
 RESOURCE_FIELDS = frozenset(
-    ("mesh", "assets", "path", "paths", "meshes", "images", "resources", "field", "attachments")
+    (
+        "mesh",
+        "asset",
+        "assets",
+        "path",
+        "paths",
+        "meshes",
+        "images",
+        "resources",
+        "field",
+        "attachment",
+        "attachments",
+    )
 )
 
 

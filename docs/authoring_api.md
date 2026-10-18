@@ -341,5 +341,10 @@ reference to its copy. Invalid/incomplete bindings leave an ordinary curve uncha
 
 The accepted path follows captured anatomical surfaces through the common coordinator.
 Dense attachment fields are independently owned project resources; source edits cannot
-change them. Current-shape fiber editing/rebinding and routed evaluation remain under
-implementation on this branch; this entry does not certify the complete 0.2.0 workflow.
+change them. Current-shape point edits use the ordinary curve operations. They retain the current dense
+shape, rebind changed anchors and preserve unchanged canonical anchors in the same transaction.
+`fiber.binding.scope(curve, point, scope)` chooses `CURRENT_PARENT` or `ANY_PARENT` for a
+bound authored point. Parent movement resolves its retained binding without choosing a new
+parent. Entering edit mode is a read-only query. Binding addition/removal, full conversion
+coverage, routed evaluation and release qualification are still under implementation; these
+commands do not certify the complete 0.2.0 workflow.

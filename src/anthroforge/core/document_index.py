@@ -148,12 +148,14 @@ def build(document: "Document", previous: DocumentIndex | None) -> DocumentIndex
 
 
 def object_links(document: "Document") -> tuple[Any, ...]:
+    from .dependency_graph import construction_inputs
+
     return tuple(
         (
             o.id,
             type(o).__name__,
             o.parent,
-            tuple(b.target for b in getattr(o, "bindings", ())),
+            frozenset(construction_inputs(o)),
             tuple(c.curve for c in getattr(o, "curves", ())),
         )
         for o in document.objects

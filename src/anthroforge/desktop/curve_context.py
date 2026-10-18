@@ -3,6 +3,7 @@
 from dataclasses import replace
 
 from anthroforge.application import curve_sources
+from anthroforge.application.curve_edit_state import current
 from anthroforge.core.construction import Curve
 from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.native import construction
@@ -12,7 +13,11 @@ from anthroforge.native.scene import entity_frame
 def owner(editor):
     session = editor.controller.session
     item = session.document.registry.records.get(editor.controller.selection)
-    return curve_sources.for_editing(session, item) if isinstance(item, SCP) else item
+    return (
+        curve_sources.for_editing(session, item)
+        if isinstance(item, SCP)
+        else current(session, item)
+    )
 
 
 def curves(editor):

@@ -80,7 +80,7 @@ def install_new(session: "Session", entity: SCP, definition: ResolvedPrimitive) 
 
 
 def definition(session: "Session", entity: str) -> ResolvedPrimitive:
-    return curve_sources.resolve(session.engine, session.document, session.editable(entity))
+    return curve_sources.editing_definition(session, session.editable(entity))
 
 
 def install(session: "Session", entity: str, primitive: ResolvedPrimitive) -> None:

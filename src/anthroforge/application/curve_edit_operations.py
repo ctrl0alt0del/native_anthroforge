@@ -7,6 +7,7 @@ from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.native import curve_queries
 
 from .construction_codec import tuples
+from .curve_edit_state import current
 from .object_operations import editable, install
 
 if TYPE_CHECKING:
@@ -14,7 +15,7 @@ if TYPE_CHECKING:
 
 
 def selected(session: "Session", curve: str) -> Curve:
-    item = editable(session, curve)
+    item = current(session, editable(session, curve))
     if not isinstance(item, Curve):
         raise ValueError("Select a curve or fiber.")
     return item

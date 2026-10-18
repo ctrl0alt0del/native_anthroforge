@@ -9,7 +9,14 @@ from anthroforge.core.object_registry import Construction
 from anthroforge.core.objects import ConstructionObject
 from anthroforge.native import curve_editing
 
-from . import construction_tasks, curve_sources, dependencies, object_revisions, path_tasks
+from . import (
+    construction_tasks,
+    curve_edit_state,
+    curve_sources,
+    dependencies,
+    object_revisions,
+    path_tasks,
+)
 from .construction_policy import require_topology_edit
 from .operations import require_name
 
@@ -32,6 +39,7 @@ def editable(session: "Session", target: str) -> Construction:
 
 def install(session: "Session", item: Construction) -> None:
     before = editable(session, item.id)
+    item = curve_edit_state.prepare(session, before, item)
     changed = object_revisions.authored(before, item)
     if changed is before:
         return
@@ -156,7 +164,7 @@ def updated_curve(item: Curve, options: dict[str, Any]) -> Curve:
 def edit_point(session: "Session", curve: str, point: str, **options: Any) -> None:
     from .construction_codec import tuples
 
-    item = editable(session, curve)
+    item = curve_edit_state.current(session, editable(session, curve))
     if not isinstance(item, Curve):
         raise ValueError("Select a curve or fiber.")
     index = next((i for i, p in enumerate(item.points) if p.id == point), -1)

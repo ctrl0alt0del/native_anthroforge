@@ -140,7 +140,11 @@ def construction_inputs(item: ConstructionObject) -> set[Port]:
     if isinstance(item, Fiber):
         return {Port(item.id, "pose")} | {
             Port(target, role)
-            for target in {*item.supports, *(b.target for b in item.bindings)}
+            for target in {
+                *item.supports,
+                *(item.edit.candidates if item.edit else ()),
+                *(b.target for b in item.bindings),
+            }
             for role in ("geometry", "pose")
         }
     if isinstance(item, Surface):

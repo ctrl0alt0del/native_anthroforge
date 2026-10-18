@@ -34,6 +34,7 @@ if TYPE_CHECKING:
 
 EDITS = {
     "fiber.create": fiber_operations.create,
+    "fiber.binding.scope": fiber_operations.binding_scope,
     "image.import": image_operations.import_image,
     "image.replace": image_operations.replace_source,
     "image.instance": image_operations.instance,

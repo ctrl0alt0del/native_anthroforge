@@ -14,7 +14,8 @@ from .point_attachments import HANDLES, INT
 def configure(engine: GeometryEngine) -> None:
     prefix = [c.c_int, HANDLES, D]
     engine.bind(
-        "af_curve_attachment_capture", [*prefix, U, D, c.c_int, D, INT, INT, c.c_int, INT, D, D, U]
+        "af_curve_attachment_capture",
+        [*prefix, U, D, c.c_int, D, INT, INT, c.c_int, D, INT, D, D, U],
     )
     engine.bind("af_blended_attachment_resolve", [*prefix, c.c_int, INT, D, D, D, U])
     engine.bind("af_attached_path", [U, D, D, U], U)
@@ -54,6 +55,7 @@ class Capture:
     world: Any
     pins: Any
     parents: Any
+    retained: Any = None
 
 
 def validate_arrays(field: Field) -> None:
@@ -105,7 +107,17 @@ def capture_arguments(spec: Capture, records: Any, world: Any, pins: Any, parent
         pins.ctypes.data_as(INT),
         parents.ctypes.data_as(INT),
         len(pins),
+        retained_bindings(spec, len(pins)),
     )
+
+
+def retained_bindings(spec: Capture, count: int) -> Any:
+    if spec.retained is None:
+        return None
+    records = doubles(spec.retained)
+    if records.shape != (count, 28) or not np.isfinite(records).all():
+        raise ValueError("Retained fiber anchors require finite attachment records.")
+    return pointer(records)
 
 
 def capture_pins(spec: Capture) -> tuple[Any, Any]:

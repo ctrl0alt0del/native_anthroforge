@@ -311,7 +311,7 @@ static CurveCapture curve_capture(uint64_t handle,const double* records,int coun
 static void curve_pins(CurveCapture& value,const int* pins,const int* parents,int count,int surfaces) {
     if(count<1||count>int(value.knots.size())||!pins||!parents) throw std::runtime_error("Invalid fiber anchors.");
     for(int i=0;i<count;++i) {
-        if(pins[i]<0||pins[i]>=int(value.knots.size())||parents[i]<0||parents[i]>=surfaces)
+        if(pins[i]<0||pins[i]>=int(value.knots.size())||parents[i]<-1||parents[i]>=surfaces)
             throw std::runtime_error("Fiber anchor requires an authored knot and anatomical surface.");
         const int index=value.knots[pins[i]];
         if(value.forced[index]>=0) throw std::runtime_error("Duplicate fiber anchor.");
@@ -340,6 +340,15 @@ static void capture_influences(const CurveCapture& value,std::vector<Capture>& s
         }
     }
 }
+static void retain_pins(const CurveCapture& value,const int* knots,const double* retained,int count,double* bindings) {
+    if(!retained) return;
+    for(int i=0;i<count;++i) {
+        const double* record=retained+28*i;
+        if(record[0]<0) continue;
+        std::copy_n(record,28,bindings+56*value.knots[knots[i]]);
+        std::copy_n(record,28,bindings+56*(value.nodes+knots[i]*3));
+    }
+}
 static V3 blended_point(const std::vector<Capture>& surfaces,const int* owners,const double* weights,const double* bindings) {
     V3 result=V3::Zero(); double total=0;
     for(int slot=0;slot<2;++slot) {
@@ -362,7 +371,7 @@ static void attached_tangents(Samples& samples,bool closed) {
 }
 }
 int af_curve_attachment_capture(int count,const uint64_t* meshes,const double* frames,uint64_t path,
-    const double* records,int knots,const double* world,const int* pins,const int* parents,int pin_count,
+    const double* records,int knots,const double* world,const int* pins,const int* parents,int pin_count,const double* retained,
     int* owners,double* weights,double* bindings,uint64_t cancel) {
     try {
         if(!owners||!weights||!bindings) throw std::runtime_error("Missing curve attachment outputs.");
@@ -370,7 +379,8 @@ int af_curve_attachment_capture(int count,const uint64_t* meshes,const double* f
         auto surfaces=af::point_surfaces(count,meshes,frames,true,cancel);
         af::curve_pins(value,pins,parents,pin_count,count);
         af::curve_owner_weights(value,surfaces,owners,weights,cancel);
-        af::capture_influences(value,surfaces,owners,bindings,cancel); return 0;
+        af::capture_influences(value,surfaces,owners,bindings,cancel);
+        af::retain_pins(value,pins,retained,pin_count,bindings); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_blended_attachment_resolve(int surfaces,const uint64_t* meshes,const double* frames,int count,

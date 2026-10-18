@@ -30,7 +30,7 @@ def bind(session, target, source):
     )
     session.wait()
     fibers = [item for item in session.document.objects if isinstance(item, Fiber)]
-    assert fibers, [job.error for job in session.scheduler.jobs.values()]
+    assert fibers, [job.error for job in session.scheduler.jobs]
     return fibers[-1]
 
 

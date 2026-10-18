@@ -17,7 +17,7 @@ AF_API int af_point_attachment_resolve(int surfaces,const uint64_t* meshes,const
 /* Dense path nodes followed by knot/left/right controls; two weighted influences per row. */
 AF_API int af_curve_attachment_capture(int surfaces,const uint64_t* meshes,const double* frames,
     uint64_t path,const double* records,int knots,const double* world,const int* pins,
-    const int* parents,int pin_count,int* owners,double* weights,double* bindings,uint64_t cancel);
+    const int* parents,int pin_count,const double* retained,int* owners,double* weights,double* bindings,uint64_t cancel);
 AF_API int af_blended_attachment_resolve(int surfaces,const uint64_t* meshes,const double* frames,
     int count,const int* owners,const double* weights,const double* bindings,double* points,uint64_t cancel);
 AF_API uint64_t af_attached_path(uint64_t path,const double* points,const double* world,uint64_t cancel);

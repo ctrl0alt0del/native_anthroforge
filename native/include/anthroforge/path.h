@@ -19,6 +19,10 @@ AF_API int af_path_sample(uint64_t handle, int count, double start, double span,
 AF_API int af_path_body(uint64_t handle, int reverse, int closed_start,
     double* output, uint64_t cancel);
 AF_API int af_path_memory_snapshot(uint64_t* rows, int capacity, uint64_t* total);
+/* Rebase an explicit edit over the current dense attachment shape. Missing knot mappings
+ * use ordered nearest correspondence. Entering edit mode never calls this operation. */
+AF_API uint64_t af_path_rebase(uint64_t current,uint64_t opening,uint64_t draft,
+    const double* records,const int* indices,int count,double* controls,uint64_t cancel);
 /* Render-only closing vertex; bounded chunks share one boundary vertex. */
 AF_API int af_path_chunk(uint64_t handle, int chunk, const float** data, int* count);
 AF_API int af_path_chunk_count(uint64_t handle);

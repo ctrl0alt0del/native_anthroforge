@@ -347,3 +347,43 @@ This is still incomplete 0.2.0 development. Fiber current-shape editing/rebindin
 junctions, generic surfaces and final release qualification remain. Do not treat control-triple
 capture as a substitute for dense-node attachments or claim full addon shape parity from the
 translation/owner-weight tests. Do not bump the version or merge the release yet.
+
+## Current-shape fiber editing checkpoint
+
+The preceding complete development gate passed with 686 tests. Current-shape fiber editing is
+now integrated through the same point commands, including edits presented through primitive
+consumers. Entering edit mode queries accepted resolved controls without changing document state.
+An explicit edit retains its accepted baseline and candidate surfaces while work is pending.
+Native correspondence rebases the authored engine's change over the currently deformed dense
+path, then captures new bindings. Unedited anchor records remain exact; edited endpoints either
+stay on their current parent or choose any eligible parent according to the shared scope policy.
+
+Publication installs the complete path, controls, captured relationships and attachment resource
+without incrementing the authored-change revision. Pending baselines participate in serialization
+and resource reachability. Cancellation and undo restore the previous path and attachment field.
+The inspector exposes endpoint capture scope; its actual desktop transform path is exercised in
+an offscreen QML check after anatomical parent movement.
+
+Six new behavior checks cover non-mutating editor queries, current-shape interior edits, retained
+anchors, parent motion after rebinding, cancellation, Any-parent selection and point insertion.
+62 focused checks, configured mypy, Ruff, Python limits, changed-native style, native contracts,
+and both offscreen construction/fiber editor checks pass. No visible-window acceptance performed.
+
+Remaining fiber work includes adding/removing/reassigning structural bindings, complete topology
+and conversion cases, routed evaluation, collision diagnostics, junctions and representative
+addon parity/visual qualification. The deformation residual used for native authored engines is
+an explicit adaptation to editable Bezier/polyline controls; addon Free paths store all sampled
+points. Do not claim that every edit/rebase or routing case is already qualified. Generic surfaces,
+control-attachment retirement and full 0.2.0 release qualification also remain.
+
+Follow-up qualification found that the structure-cache signature omitted dense support references.
+It now derives construction links from the shared dependency policy, so new internal surface
+owners participate in invalidation and cycle checks. A regression test moves a newly captured
+internal support while both explicit endpoints retain their original parent. Automatic capture
+excludes surfaces generated downstream from the same curve; otherwise editing a fiber consumed
+by a body could create an unintended self-dependency. Explicit cycles remain diagnosable.
+
+Fiber path work has its own conservative worker scheduling policy, estimating dense record count
+and recapture triangle workload instead of using the cheap ordinary-curve inline threshold.
+Two additional tests cover consumer editing and newly captured support invalidation. The latest
+focused checks and desktop gesture acceptance pass; full development gate follows this checkpoint.

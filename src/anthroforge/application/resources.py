@@ -60,6 +60,7 @@ def references(entities: Iterable[SCP], objects: Iterable[Construction]) -> dict
     meshes.update(e.primitive.source for e in entities if e.primitive)
     meshes.update(o.result.asset for o in objects if isinstance(o, Surface))
     paths = {o.result.asset for o in objects if isinstance(o, Curve)}
+    paths.update(o.edit.baseline for o in objects if isinstance(o, Fiber) and o.edit)
     images = {o.source for o in objects if isinstance(o, ReferenceImage)}
     attachments = {o.attachment_asset for o in objects if isinstance(o, Fiber)}
     groups = dict(meshes=meshes, paths=paths, images=images, attachments=attachments)

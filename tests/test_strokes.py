@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 from anthroforge.core.entities import IDENTITY
+from anthroforge.native.mesh import NativeCancellation
 from anthroforge.native.strokes import Stroke, plane
 
 
@@ -83,3 +84,63 @@ def test_view_change_preserves_samples_and_rebases_next_segment(session):
     np.testing.assert_array_equal(value.read()[:2], previous)
     np.testing.assert_allclose(value.read()[-1], [0.1, 0.2, 0.3, 1])
     assert value.count == 3
+
+
+def test_batch_matches_pointer_projection_without_authoring(session, assembly):
+    rays = [pointer(0.1), pointer(0.3), pointer(0.8)]
+    value = mesh_stroke(session, assembly, offset=0.05)
+    for ray in rays:
+        value.append(ray)
+    before = session.document
+    result = session.command(
+        "drawing.project",
+        rays=rays,
+        surfaces=[assembly[0]],
+        plane=[0, 0, 0, 0, 0, 1],
+        settings=dict(depth="SURFACE", offset=0.05),
+    )
+    np.testing.assert_allclose(result, value.read())
+    assert session.document is before
+
+
+def test_failed_batch_rolls_back_partial_projection_and_can_continue(session):
+    value = stroke(session)
+    value.append(pointer())
+    bad = pointer(0.2)
+    bad[3:6] = [1, 0, 0]
+    with pytest.raises(ValueError, match="parallel"):
+        value.batch([pointer(0.1), bad], False)
+    assert value.count == 1 and len(value.read()) == 1
+    value.append(pointer(0.3), False)
+    assert value.count == 2
+
+
+def test_batch_cancellation_preserves_existing_stroke(session):
+    value = stroke(session)
+    value.append(pointer())
+    cancel = NativeCancellation(session.engine)
+    cancel.set()
+    with pytest.raises(ValueError, match="cancel"):
+        value.batch([pointer(0.1)], cancel=cancel.handle)
+    assert value.count == 1
+
+
+def test_tangent_view_plane_preserves_surface_tangent_during_camera_change(session):
+    mesh = session.engine.create_mesh([[-2, -2, -2], [2, -2, 2], [0, 2, 0]], [0, 1, 2], [0, 3])
+    value = stroke(session, [mesh.handle], [IDENTITY], surface=True, first=3)
+    value.append(pointer(), False)
+    # View normal projected into the z=x surface: the locked plane has z=-x.
+    assert value.probe(pointer(0.2))[:3] == pytest.approx([0.2, 0, -0.2])
+    value.view([1, 0, 0])
+    assert value.probe(pointer(0.3))[:3] == pytest.approx([0.3, 0, -0.3])
+
+
+def test_profiler_attributes_owned_preview_capacity(session):
+    from anthroforge.profiling.construction_inventory import stroke_inventory
+
+    value = stroke(session)
+    empty = value.bytes
+    value.batch([pointer(0), pointer(0.3)])
+    report = stroke_inventory(dict(preview={value}))
+    assert report["unique_bytes"] == value.bytes > empty
+    assert report["unattributed_bytes"] == 0

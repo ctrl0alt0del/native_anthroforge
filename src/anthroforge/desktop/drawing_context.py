@@ -1,5 +1,9 @@
 """Capture displayed geometry once per stroke, never authored or staged replacements."""
 
+from dataclasses import asdict
+from math import isfinite, radians
+
+from anthroforge.core.drawing import FitSettings, ProjectionSettings
 from anthroforge.native import strokes
 
 
@@ -7,13 +11,10 @@ def capture(tool, normal):
     controller, options = tool.controller, tool.options
     handles, frames = surface_inputs(tool)
     plane = depth_plane(tool, normal)
-    settings = [
-        options["depth"] == "SURFACE",
-        options["first_plane"],
-        options["offset"],
-        options["relative"],
-    ]
-    return strokes.Stroke(controller.session.engine, handles, frames, plane, settings)
+    settings = ProjectionSettings(
+        **{key: options[key] for key in ("depth", "first_plane", "offset", "relative")}
+    )
+    return strokes.Stroke(controller.session.engine, handles, frames, plane, settings.packed())
 
 
 def surface_inputs(tool):
@@ -43,3 +44,23 @@ def depth_plane(tool, normal):
 
 def point_records(samples):
     return [dict(position=row[:3], radius=row[3]) for row in samples]
+
+
+def fit_settings(options):
+    return asdict(
+        FitSettings(
+            method=options["method"],
+            error=options["error"],
+            closed=options["closed"],
+            corner_angle=radians(options["corner_angle"]),
+        )
+    )
+
+
+def validate_settings(options):
+    ProjectionSettings(
+        **{key: options[key] for key in ("depth", "first_plane", "offset", "relative")}
+    )
+    fit_settings(options)
+    if not isfinite(options["radius"]) or options["radius"] < 0:
+        raise ValueError("Drawing radius must be finite and nonnegative.")

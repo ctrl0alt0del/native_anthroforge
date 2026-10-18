@@ -98,8 +98,14 @@ class DrawingTools(QObject):
     def setting(self, key, value):
         if key not in self.options or (self.stroke and self.stroke.count):
             return
-        self.options = dict(self.options, **{key: value})
-        self.clear_stroke()
+        candidate = dict(self.options, **{key: value})
+        try:
+            drawing_context.validate_settings(candidate)
+            self.options = candidate
+            self.clear_stroke()
+        except (ValueError, TypeError) as error:
+            self.controller.message = str(error)
+            self.controller.notify()
 
     @Slot("QVariantList")
     def viewChanged(self, normal):
@@ -166,10 +172,7 @@ class DrawingTools(QObject):
                 engine="POLYLINE" if self.options["method"] == "POLYLINE" else "BEZIER",
             )
             return self.controller.run("curve.create", args)
-        from math import radians
-
-        settings = {key: self.options[key] for key in ("method", "error", "closed")}
-        settings["corner_angle"] = radians(self.options["corner_angle"])
+        settings = drawing_context.fit_settings(self.options)
         return self.controller.run("curve.draw", dict(args, points=samples, settings=settings))
 
     @Slot()

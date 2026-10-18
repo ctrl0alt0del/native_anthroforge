@@ -284,3 +284,25 @@ Image operations use the same session command API, with no Qt dependency:
 `wait` includes image jobs. Import/replacement uses the initiating undo step; cancel/failure
 never publishes a partial image. Source bytes are embedded once per unique asset in schema 3.
 This documents the implemented image increment; it does not mark the entire 0.2.0 release complete.
+## First-class drawing (0.2.0 candidate)
+
+`curve.create` creates an editable standalone curve; no SCP is required. Its optional
+placement defaults to the workspace 3D cursor. `curve.draw(points, settings)` accepts
+world-space xyz or xyz/radius samples, fits asynchronously and returns `object_id` and
+`job_id`. A complete accepted curve is published into the initiating undo entry.
+Settings: `method` (`REFIT`, `SPLIT`, `POLYLINE`), `error` in document units,
+`corner_angle` in radians, and `closed`. Fitting remains editable, with no baked-only path.
+
+`drawing.project(rays, plane, surfaces, image, settings, interpolate)` is a Qt-free
+read-only operation. Each ray is `[ox,oy,oz,dx,dy,dz,screen_x,screen_y,radius]`.
+`plane` is `[px,py,pz,nx,ny,nz]`; `surfaces` lists SCPs with accepted geometry.
+Projection settings: `depth` (`VIEW`, `SURFACE`, `IMAGE`), `first_plane` (0 follow,
+1 view, 2 surface, 3 tangent view), `offset`, `relative`. IMAGE depth uses `image`'s
+world plane. Returned xyz/radius samples can be supplied to `curve.draw`; neither
+operation creates an enduring source-image/surface relationship. Surface snapshots use
+accepted results; desktop drawing instead captures the exact displayed revision.
+
+Native projection uses exact triangle queries rather than Blender's depth-buffer pixels.
+The first-hit/fallback/offset policies are adapted from Blender 5.0.1. Fitting uses its
+pinned curve_fit_nd implementation. Cancellation is checked around the atomic fit call;
+obsolete output cannot publish. `tools/drawing_qualification.py` records this interval.

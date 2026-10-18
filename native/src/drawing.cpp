@@ -24,6 +24,20 @@ struct Stroke {
     Pointer pointer=Pointer::Zero();
     bool rebased=false;
 };
+struct StrokeCheckpoint {
+    Stroke& stroke;
+    size_t count;
+    Projection projection;
+    Pointer pointer;
+    bool rebased,committed=false;
+    explicit StrokeCheckpoint(Stroke& value):stroke(value),count(value.samples.size()),
+        projection(value.projection),pointer(value.pointer),rebased(value.rebased) {}
+    ~StrokeCheckpoint() {
+        if(committed) return;
+        stroke.samples.resize(count); stroke.states.resize(count);
+        stroke.projection=projection; stroke.pointer=pointer; stroke.rebased=rebased;
+    }
+};
 static std::mutex stroke_mutex;
 static std::unordered_map<uint64_t,std::shared_ptr<Stroke>> strokes;
 static uint64_t next_stroke=1;
@@ -64,14 +78,19 @@ static V3 plane_hit(const Pointer& ray,const V3& point,const V3& normal) {
     if(distance<0) throw std::runtime_error("Drawing depth plane is behind the camera.");
     return ray.head<3>()+direction*distance;
 }
+static void lock_plane(Projection& state,const V3& point,const V3& normal) {
+    state.origin=point; state.locked=true;
+    if(state.first==2) state.normal=normal;
+    if(state.first==3) {
+        const V3 tangent=normal.cross(state.normal.cross(normal));
+        if(tangent.norm()>1e-15) state.normal=tangent.normalized();
+    }
+}
 static Sample project(const Stroke& stroke,Projection& state,const Pointer& ray) {
     V3 point,normal;
     if(state.surface&&!state.locked&&surface_hit(stroke,ray,point,normal)) {
         point+=normal*state.offset*(state.relative?ray[8]:1);
-        if(state.first) {
-            state.origin=point; state.locked=true;
-            if(state.first==2) state.normal=normal;
-        }
+        if(state.first) lock_plane(state,point,normal);
     } else point=plane_hit(ray,state.surface&&!state.locked?state.previous:state.origin,state.normal);
     state.previous=point; return {point.x(),point.y(),point.z(),ray[8]};
 }
@@ -83,7 +102,7 @@ static std::shared_ptr<Stroke> make_stroke(int count,const uint64_t* meshes,cons
         throw std::runtime_error("Invalid drawing depth or offset.");
     state.normal.normalize(); state.surface=settings[0]!=0; state.first=int(settings[1]);
     state.offset=settings[2]; state.relative=settings[3]!=0;
-    if(state.first<0||state.first>2) throw std::runtime_error("Unknown first-hit plane setting.");
+    if(state.first<0||state.first>3) throw std::runtime_error("Unknown first-hit plane setting.");
     for(int i=0;i<count;++i) value->surfaces.push_back({mesh(meshes[i]),Eigen::Map<const M4>(matrices+i*16)});
     return value;
 }
@@ -94,6 +113,7 @@ static void append_sample(Stroke& stroke,const Pointer& ray) {
     stroke.projection=state; stroke.pointer=ray;
 }
 static int append_pointer(Stroke& stroke,const Pointer& ray,bool interpolate) {
+    StrokeCheckpoint checkpoint(stroke);
     const Pointer previous=stroke.pointer;
     const double distance=(ray.segment<2>(6)-previous.segment<2>(6)).norm();
     if(distance>300000||!std::isfinite(distance)) throw std::runtime_error("Pointer step exceeds stroke sample limit.");
@@ -101,7 +121,7 @@ static int append_pointer(Stroke& stroke,const Pointer& ray,bool interpolate) {
     const int steps=interpolate&&!stroke.rebased&&!stroke.samples.empty()?int(std::ceil(distance/3)):1;
     if(steps>100000-int(stroke.samples.size())) throw std::runtime_error("Stroke sample limit reached.");
     for(int i=1;i<=std::max(1,steps);++i) append_sample(stroke,previous+(ray-previous)*(double(i)/std::max(1,steps)));
-    stroke.rebased=false;
+    stroke.rebased=false; checkpoint.committed=true;
     return int(stroke.samples.size());
 }
 }
@@ -161,8 +181,27 @@ int af_stroke_view(uint64_t handle,const double* normal) {
         const af::V3 direction=Eigen::Map<const af::V3>(normal);
         if(!direction.allFinite()||direction.norm()<1e-15) throw std::runtime_error("View normal must be finite and nonzero.");
         auto value=af::stroke(handle); auto& state=value->projection;
-        if(!(state.locked&&state.first==2)) state.normal=direction.normalized();
+        if(!(state.locked&&state.first>=2)) state.normal=direction.normalized();
         if(!state.surface&&!value->samples.empty()) state.origin=state.previous;
         value->rebased=true; return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_stroke_batch(uint64_t handle,int count,const double* pointers,int interpolate,uint64_t token) {
+    try {
+        if(count<0||count>100000||(count&&!pointers)) throw std::runtime_error("Invalid pointer batch.");
+        const auto value=af::stroke(handle); af::StrokeCheckpoint checkpoint(*value);
+        for(int i=0;i<count;++i) {
+            af::check_cancel(token);
+            af::append_pointer(*value,af::pointer_input(pointers+i*9),interpolate!=0);
+        }
+        checkpoint.committed=true; return int(value->samples.size());
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}
+uint64_t af_stroke_bytes(uint64_t handle) {
+    try {
+        const auto value=af::stroke(handle);
+        return sizeof(af::Stroke)+value->samples.capacity()*sizeof(af::Sample)
+            +value->states.capacity()*sizeof(af::Projection)
+            +value->surfaces.capacity()*sizeof(af::DrawingSurface);
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

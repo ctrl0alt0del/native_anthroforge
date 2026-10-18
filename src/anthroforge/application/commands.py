@@ -10,6 +10,7 @@ from . import (
     curve_edit_operations,
     curve_independence,
     drawing_operations,
+    drawing_projection,
     evaluation,
     image_operations,
     image_presentation,
@@ -144,10 +145,10 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
+        **drawing_commands(session),
         "image.inspect": lambda **a: image_operations.inspect(session, **a),
         "image.presentation": lambda **a: image_presentation.update(session, **a),
         "object.inspect": lambda **a: object_operations.inspect(session, **a),
-        "curve.evaluate": lambda curve: path_tasks.schedule(session, {curve}, explicit=True),
         "job.cancel": lambda job_id, obsolete=False: session.scheduler.cancel_job(job_id, obsolete),
         "job.retry": session.scheduler.retry,
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),
@@ -156,6 +157,13 @@ def query_commands(session: "Session") -> dict[str, Any]:
         "inspect.target": lambda **a: inspection.target(session, **a),
         "inspect.snapshot": lambda **a: inspection.snapshot(session, **a),
         "units.convert": convert,
+    }
+
+
+def drawing_commands(session: "Session") -> dict[str, Any]:
+    return {
+        "drawing.project": lambda **a: drawing_projection.project(session, **a),
+        "curve.evaluate": lambda curve: path_tasks.schedule(session, {curve}, explicit=True),
     }
 
 

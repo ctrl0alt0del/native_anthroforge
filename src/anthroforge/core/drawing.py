@@ -22,3 +22,22 @@ class FitSettings:
     @property
     def method_index(self) -> int:
         return ("REFIT", "SPLIT", "POLYLINE").index(self.method)
+
+
+@dataclass(frozen=True, slots=True)
+class ProjectionSettings:
+    depth: str = "VIEW"
+    first_plane: int = 0
+    offset: float = 0.0
+    relative: bool = False
+
+    def __post_init__(self) -> None:
+        if self.depth not in ("VIEW", "SURFACE", "IMAGE"):
+            raise ValueError("Unknown drawing depth mode.")
+        if self.first_plane not in (0, 1, 2, 3):
+            raise ValueError("Unknown first-hit plane setting.")
+        if not isfinite(self.offset):
+            raise ValueError("Surface offset must be finite.")
+
+    def packed(self) -> list[float]:
+        return [self.depth == "SURFACE", self.first_plane, self.offset, self.relative]

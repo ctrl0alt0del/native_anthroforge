@@ -246,5 +246,21 @@ shows native fitting separately (~0.66 ms), path preparation (~0.11 ms) and poin
 and scripted pauses dominate frame intervals, and Qt binding profiling was not enabled here.
 Larger fitting/cancellation trials, complete drawing option parity/headless projection operations,
 engine conversion, routing/fibers/surfaces and release qualification remain required.
-Full gate is being rerun; last full pytest run had 641 passes and one error-message expectation
-regression, now corrected. Focused parity and image regressions pass after that correction.
+Full development gate passed: 648 tests, native contracts/style, Ruff, configured mypy and
+headless dependency checks. The earlier error-message regression is corrected.
+
+## Shared drawing projection follow-up
+
+Added `drawing.project` for Qt-free clients using the same native owned stroke projection
+as desktop input, including Blender's tangent-view first-hit plane. Batched projection runs
+its repeated queries in C++, supports cancellation and restores the provisional stroke on
+failure. Desktop settings now validate before adoption; preview-owned buffer capacities are
+reported separately from shared mesh leases in profiler inventories.
+
+Native contracts, changed-native style, 23 focused checks, configured mypy and the full-QML
+offscreen construction editor pass. `tools/drawing_qualification.py` produces measurements
+and an ordinary profiler report under build/020-drawing-qualification. Serial trials measured
+1k samples at 2–9 ms, 10k at 52–96 ms and 100k at 840–1263 ms. Cancellation requested at 20 ms
+returned after about 1509 ms in the largest smooth trial, rejecting output. The kernel's atomic
+interval is an observed limitation, not a claim of immediate cancellation or a UI-frame test.
+These are single-fixture trials with profiling enabled, not a controlled speed comparison.

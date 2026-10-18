@@ -17,6 +17,8 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_stroke_pop", [U])
     engine.bind("af_drawing_plane", [D, D])
     engine.bind("af_stroke_view", [U, D])
+    engine.bind("af_stroke_batch", [U, c.c_int, D, c.c_int, U])
+    engine.bind("af_stroke_bytes", [U], U)
 
 
 def plane(engine: GeometryEngine, frame: Any) -> list[float]:
@@ -43,10 +45,26 @@ class Stroke:
         )
         engine.check(not self.handle)
 
+    @property
+    def bytes(self) -> int:
+        return int(self.engine.library.af_stroke_bytes(self.handle))
+
+    def batch(self, rays: Any, interpolate: bool = True, cancel: int = 0) -> int:
+        data = doubles(rays)
+        if data.ndim != 2 or data.shape[1] != 9 or len(data) > 100000:
+            raise ValueError("Pointer batch requires at most 100000 ray/screen/radius rows.")
+        count = self.engine.library.af_stroke_batch(
+            self.handle, len(data), pointer(data), interpolate, cancel
+        )
+        self.engine.check(count < 0)
+        self.count = count
+        return self.count
+
     def append(self, ray: Any, interpolate: bool = True) -> int:
         data = pointer_input(ray)
-        self.count = self.engine.library.af_stroke_append(self.handle, pointer(data), interpolate)
-        self.engine.check(self.count < 0)
+        count = self.engine.library.af_stroke_append(self.handle, pointer(data), interpolate)
+        self.engine.check(count < 0)
+        self.count = count
         return self.count
 
     def probe(self, ray: Any) -> list[float]:

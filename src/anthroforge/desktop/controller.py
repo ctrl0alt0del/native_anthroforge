@@ -65,6 +65,8 @@ class Controller(QObject):
             if model is not None:
                 model.memory_owners(owners)
         owners["drawing_preview"].update(self.drawing_tools.leases)
+        if self.drawing_tools.stroke is not None:
+            owners["drawing_preview"].add(self.drawing_tools.stroke)
 
     def initialize_renderers(self):
         from .image_scene import prepare_picking as prepare_images

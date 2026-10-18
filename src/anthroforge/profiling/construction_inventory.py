@@ -3,9 +3,18 @@
 from anthroforge.application.image_assets import ImageAsset
 from anthroforge.native import memory
 from anthroforge.native.paths import Path
+from anthroforge.native.strokes import Stroke
 
 
 def inventories(profiler, owners):
+    return dict(
+        paths=path_inventory(profiler, owners),
+        images=image_inventory(owners),
+        strokes=stroke_inventory(owners),
+    )
+
+
+def path_inventory(profiler, owners):
     from .resource_inventory import memory_totals
 
     rows, total = path_rows(profiler)
@@ -15,7 +24,18 @@ def inventories(profiler, owners):
         for name, values in owners.items()
     }
     groups = {name: keys & sizes.keys() for name, keys in groups.items()}
-    return dict(paths=memory_totals(rows, sizes, groups, total), images=image_inventory(owners))
+    return memory_totals(rows, sizes, groups, total)
+
+
+def stroke_inventory(owners):
+    from .resource_inventory import memory_totals
+
+    strokes = {v for values in owners.values() for v in values if isinstance(v, Stroke)}
+    sizes = {id(v): v.bytes for v in strokes}
+    groups = {
+        name: {id(v) for v in values if isinstance(v, Stroke)} for name, values in owners.items()
+    }
+    return memory_totals(list(strokes), sizes, groups, len(strokes))
 
 
 def image_inventory(owners):

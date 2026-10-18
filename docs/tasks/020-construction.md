@@ -51,7 +51,8 @@ current-shape editing, explicit junctions and generic loft/patch/branch surfaces
 with desktop controls and the shared API. Routing includes native warm-span remapping and
 actual skull donor parity. Authored-engine collision checks use the read-only Issues service.
 Direct control.attach is retired; shared controls use ordinary transform relationships.
-No 0.2.0 release qualification or version bump has occurred.
+Source and offscreen qualification has passed; version metadata is now 0.2.0 for portable
+candidate packaging. The release remains unmerged until relocated package checks pass.
 The current coordinator, attachment kernels, Issues, profiler, transactions and
 staged renderer must be extended at their owning boundaries, not duplicated.
 
@@ -886,3 +887,22 @@ The portable checker now follows first-class curve references and covers constru
 workflow. Packaging includes Pillow codec notices, native routing provenance and PCG notices.
 Active architecture/API/recommendation text is reconciled; `docs/construction_020.md` provides
 the workflow and exact limitations. Ruff and focused architecture/capture tests pass.
+
+### Source gate and ownership review
+
+At 11dd5b8, `tools/check.ps1` passes: 869 tests (9 existing QQmlPropertyMap deprecation
+warnings), 3 native CTests, all native style, Ruff, mypy on 181 modules, PowerShell checks,
+locked dependencies, numerical imports and native doctor. Log: `build/check-020-candidate.log`.
+The complete construction JSON example also runs in a fresh process without importing
+PySide6, Shiboken or Blender. Origin/main remains at the original integration baseline.
+
+Separate coordinator-authored ownership review traced registry, generic source consumption,
+Fiber substitution, input capture/read validation, async creation restart, historical
+publication, junction dependency aliases and resource reachability. New work extends the
+existing coordinator, Issues and staged renderer; no parallel queue or Python numerical
+fallback was introduced. Preview and displayed resources own leases independently. Numerical
+branch assembly has explicit budgets and cancellation checks in sampled-grid/vertex work;
+atomic upstream fitting retains its documented before/after cancellation boundary. Dense
+authored identity traversal is still Python orchestration; measured costs do not establish a
+current blocker or justify an unmeasured replacement. This is direct review, not an independent
+agent review. Version metadata is advanced only for final candidate packaging; not yet released.

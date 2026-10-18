@@ -19,6 +19,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_stroke_view", [U, D])
     engine.bind("af_stroke_batch", [U, c.c_int, D, c.c_int, U])
     engine.bind("af_stroke_bytes", [U], U)
+    engine.bind("af_stroke_settings", [U, c.c_double, c.c_double, D])
 
 
 def plane(engine: GeometryEngine, frame: Any) -> list[float]:
@@ -60,12 +61,22 @@ class Stroke:
         self.count = count
         return self.count
 
-    def append(self, ray: Any, interpolate: bool = True) -> int:
+    def append(self, ray: Any, interpolate: bool = True, sample: bool = False) -> int:
         data = pointer_input(ray)
-        count = self.engine.library.af_stroke_append(self.handle, pointer(data), interpolate)
+        mode = 1 if interpolate else 2 if sample else 0
+        count = self.engine.library.af_stroke_append(self.handle, pointer(data), mode)
         self.engine.check(count < 0)
         self.count = count
         return self.count
+
+    def settings(self, pixels: float = 8.0, close_radius: float = 8.0) -> dict[str, Any]:
+        output = np.empty(2)
+        self.engine.check(
+            self.engine.library.af_stroke_settings(
+                self.handle, pixels, close_radius, pointer(output)
+            )
+        )
+        return dict(error=float(output[0]), closed=bool(output[1]))
 
     def probe(self, ray: Any) -> list[float]:
         data, output = pointer_input(ray), np.empty(4)

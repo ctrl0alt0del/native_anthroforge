@@ -74,6 +74,11 @@ selected-only projection, normal offset, first-hit plane options, misses/fallbac
 fitting error and corner handling. Reference-image plane tracing is an explicit extension.
 Tracing creates no lasting image-to-curve attachment; common ordinary parenting is allowed.
 
+Draw defaults to screen-pixel fitting tolerance and closes endpoints within eight logical
+pixels; both behaviors can be overridden. Only fitted surface strokes add depth substeps.
+Changing the camera during a stroke preserves the gesture and disables automatic closure
+for that stroke, since its endpoint screen coordinates no longer share a view.
+
 ## Curve consumers
 
 Primitive and surface creation accepts preselected curves and stores live references.

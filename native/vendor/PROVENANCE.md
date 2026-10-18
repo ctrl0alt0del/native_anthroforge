@@ -23,3 +23,9 @@ follow Blender `source/blender/editors/curve/editcurve_paint.cc` at the same tag
 The application retains its GPL-3.0-or-later distribution license. Fitting is an atomic upstream
 call with cooperative cancellation checks immediately before/after it; no mid-fit cancellation
 or exact display-latency guarantee is claimed.
+
+The stroke adapter also follows that source's one-pixel motion threshold, depth-only
+substep count, screen-to-world tolerance ratio and eight-pixel closure test. Qt logical
+pixels supply the UI scale. Automatic closure is disabled when a stroke changes view;
+world-space tolerance remains available. Exact cached mesh rays replace Blender's raster
+depth buffer, so silhouette/normal differences from raster depth are intentional.

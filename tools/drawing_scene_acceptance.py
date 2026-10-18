@@ -114,6 +114,7 @@ def run(app):
     try:
         exercise(controller, renderer, app)
         conversion_scene(controller, renderer, app)
+        repeated_strokes(controller)
         assert not warnings, warnings
         print(json.dumps(dict(passed=True, visible_window=False, image_dependency=False)))
     finally:
@@ -158,6 +159,34 @@ def assert_conversion_accept(controller, key, token, before):
     assert controller.session.document.object(key).engine == "POLYLINE"
     controller.run("undo", {})
     assert controller.session.document.object(key).points == before.points
+
+
+def repeated_strokes(controller):
+    tool = controller.drawing_tools
+    tool.cancel()
+    tool.setting("depth", "VIEW")
+    tool.setting("method", "POLYLINE")
+    tool.begin("DRAW")
+    for closed in (True, False):
+        stroke_undo(controller, tool, closed)
+    before = controller.session.document
+    tool.pointer(pointer(0, 0), [0, 0, 1], True)
+    tool.cancel()
+    assert controller.session.document is before
+
+
+def stroke_undo(controller, tool, closed):
+    before = controller.session.history.cursor
+    points = [(0, 0), (0.4, 0), (0.4, 0.4), (0.02 if closed else 0.8, 0)]
+    for index, (x, y) in enumerate(points):
+        tool.pointer(pointer(x, y), [0, 0, 1], index == 0)
+    tool.release()
+    controller.session.wait(5)
+    curve = controller.session.document.objects[-1]
+    assert curve.closed == closed and tool.mode == "DRAW" and tool.stroke is None
+    assert controller.session.history.cursor == before + 1
+    controller.run("undo", {})
+    assert curve.id not in controller.session.document.registry.records
 
 
 if __name__ == "__main__":

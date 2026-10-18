@@ -12,7 +12,8 @@ AF_API void af_curve_fit_free(double* output);
 /* Stroke owns immutable mesh snapshots; samples are xyz/radius. Plane is point/normal.
  * Settings: surface, first-hit plane (0:none,1:view,2:surface,3:tangent view), offset, relative offset.
  * Pointer input: ray origin/direction, screen xy, radius. Append returns total count;
- * probe does not mutate the stroke. All access is serialized by the owning input tool. */
+ * Sampling mode: 0=discrete, 1=distance filter and depth substeps, 2=distance filter only.
+ * Probe does not mutate the stroke. All access is serialized by the owning input tool. */
 AF_API uint64_t af_stroke_create(int count,const uint64_t* meshes,const double* matrices,
     const double* plane,const double* settings);
 AF_API void af_stroke_release(uint64_t handle);
@@ -25,6 +26,8 @@ AF_API int af_stroke_view(uint64_t handle,const double* normal);
 AF_API int af_stroke_batch(uint64_t handle,int count,const double* pointers,int interpolate,uint64_t cancel);
 /* Owned capacities, excluding shared source meshes and allocator overhead. */
 AF_API uint64_t af_stroke_bytes(uint64_t handle);
+/* Returns world fit tolerance and closure eligibility from logical screen pixels. */
+AF_API int af_stroke_settings(uint64_t handle,double pixels,double close_radius,double* output);
 #ifdef __cplusplus
 }
 #endif

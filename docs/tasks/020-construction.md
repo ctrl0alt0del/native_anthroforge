@@ -731,3 +731,18 @@ Remaining: closed-loft initial alignment preview, per-consumer primitive samplin
 fiber collision Issues, Blender drawing auto-closure/substep details, representative anatomy/
 warm routing and profiler workloads, resource edge cases, examples/docs and portable release.
 The broader requested release remains incomplete; no version bump or main merge yet.
+
+### Drawing sampling and closure checkpoint
+
+Compared Blender 5.0.1 `editcurve_paint.cc`: corrected native motion filtering and substep
+rounding; only fitted surface drawing requests depth substeps. Native stroke storage now
+owns pointer history for pop/rollback, screen-to-world fit tolerance and endpoint closure.
+Desktop defaults to pixel tolerance and near-start closure with explicit overrides;
+camera changes preserve the gesture but disable automatic closure for that stroke.
+Exact mesh projection versus Blender raster depth is documented as an intentional difference.
+
+38 focused drawing/parity/architecture tests pass. Native build/3 CTests, drawing clang-tidy,
+configured mypy (176 modules), Ruff and invisible D3D11 drawing acceptance pass. Actual image
+tracing capture was inspected; repeated open/closed drawing, cancellation and one-action undo
+also pass. Full development gate has not been rerun. Remaining release work listed above
+still applies except these drawing sampling/closure details.

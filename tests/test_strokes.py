@@ -144,3 +144,42 @@ def test_profiler_attributes_owned_preview_capacity(session):
     report = stroke_inventory(dict(preview={value}))
     assert report["unique_bytes"] == value.bytes > empty
     assert report["unattributed_bytes"] == 0
+
+
+@pytest.mark.parametrize("pixels,count", [(1, 1), (1.1, 2), (4, 2), (5.9, 3), (8, 3), (9, 4)])
+def test_blender_distance_filter_and_depth_substep_rounding(session, pixels, count):
+    value = stroke(session)
+    value.append(pointer())
+    value.append(pointer(pixels / 100))
+    assert value.count == count
+
+
+def test_sampled_plane_stroke_filters_motion_without_depth_substeps(session):
+    value = stroke(session)
+    value.append(pointer(), False, sample=True)
+    value.append(pointer(0.009), False, sample=True)
+    value.append(pointer(0.5), False, sample=True)
+    assert value.count == 2
+    value.append(pointer(0.5), False)
+    assert value.count == 3  # Explicit placement does not apply the motion filter.
+
+
+def test_pixel_tolerance_and_closure_are_native_and_nonmutating(session):
+    value = stroke(session)
+    value.batch([pointer(0), pointer(1), pointer(1, 1), pointer(0.08)], False)
+    before = value.read().copy()
+    assert value.settings() == pytest.approx(dict(error=0.08, closed=True))
+    assert not value.settings(close_radius=7.9)["closed"]
+    np.testing.assert_array_equal(value.read(), before)
+    value.pop()
+    assert not value.settings()["closed"]
+    value.append(pointer(0), False)
+    assert value.settings()["closed"]
+
+
+def test_view_change_prevents_closure_using_unrelated_screen_coordinates(session):
+    value = stroke(session)
+    value.batch([pointer(0), pointer(1), pointer(1, 1)], False)
+    value.view([1, 0, 0])
+    value.append([3, 0, 0, -1, 0, 0, 0, 0, 1], False)
+    assert not value.settings()["closed"]

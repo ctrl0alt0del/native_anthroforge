@@ -16,6 +16,9 @@ DEFAULTS = dict(
     error=0.002,
     corner_angle=70.0,
     closed=False,
+    auto_close=True,
+    screen_error=True,
+    error_pixels=8.0,
     image="",
 )
 
@@ -134,7 +137,8 @@ class DrawingTools(QObject):
         self.hover = self.stroke.probe(ray)[:3]
         if press or (self.mode == "DRAW" and self.painting):
             start = self.stroke.count
-            self.stroke.append(ray, self.mode == "DRAW")
+            substeps = drawing_context.substeps(self.options, self.mode)
+            self.stroke.append(ray, substeps, sample=self.mode == "DRAW")
             self.pointsAdded.emit(self.stroke.read(start).tolist())
             self.painting = self.mode == "DRAW"
 
@@ -172,7 +176,7 @@ class DrawingTools(QObject):
                 engine="POLYLINE" if self.options["method"] == "POLYLINE" else "BEZIER",
             )
             return self.controller.run("curve.create", args)
-        settings = drawing_context.fit_settings(self.options)
+        settings = drawing_context.finish_settings(self)
         return self.controller.run("curve.draw", dict(args, points=samples, settings=settings))
 
     @Slot()

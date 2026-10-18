@@ -21,21 +21,20 @@ struct Stroke {
     Projection projection;
     std::vector<Sample> samples;
     std::vector<Projection> states;
-    Pointer pointer=Pointer::Zero();
-    bool rebased=false;
+    std::vector<Pointer> pointers;
+    bool rebased=false,same_view=true;
 };
 struct StrokeCheckpoint {
     Stroke& stroke;
     size_t count;
     Projection projection;
-    Pointer pointer;
     bool rebased,committed=false;
     explicit StrokeCheckpoint(Stroke& value):stroke(value),count(value.samples.size()),
-        projection(value.projection),pointer(value.pointer),rebased(value.rebased) {}
+        projection(value.projection),rebased(value.rebased) {}
     ~StrokeCheckpoint() {
         if(committed) return;
-        stroke.samples.resize(count); stroke.states.resize(count);
-        stroke.projection=projection; stroke.pointer=pointer; stroke.rebased=rebased;
+        stroke.samples.resize(count); stroke.states.resize(count); stroke.pointers.resize(count);
+        stroke.projection=projection; stroke.rebased=rebased;
     }
 };
 static std::mutex stroke_mutex;
@@ -110,19 +109,27 @@ static void append_sample(Stroke& stroke,const Pointer& ray) {
     if(stroke.samples.size()>=100000) throw std::runtime_error("Stroke sample limit reached.");
     auto state=stroke.projection; const auto sample=project(stroke,state,ray);
     stroke.states.push_back(stroke.projection); stroke.samples.push_back(sample);
-    stroke.projection=state; stroke.pointer=ray;
+    stroke.pointers.push_back(ray); stroke.projection=state;
 }
-static int append_pointer(Stroke& stroke,const Pointer& ray,bool interpolate) {
+static int append_pointer(Stroke& stroke,const Pointer& ray,int mode) {
     StrokeCheckpoint checkpoint(stroke);
-    const Pointer previous=stroke.pointer;
+    const Pointer previous=stroke.pointers.empty()?ray:stroke.pointers.back();
     const double distance=(ray.segment<2>(6)-previous.segment<2>(6)).norm();
     if(distance>300000||!std::isfinite(distance)) throw std::runtime_error("Pointer step exceeds stroke sample limit.");
-    if(!stroke.samples.empty()&&interpolate&&!stroke.rebased&&distance<1) return int(stroke.samples.size());
-    const int steps=interpolate&&!stroke.rebased&&!stroke.samples.empty()?int(std::ceil(distance/3)):1;
+    if(!stroke.samples.empty()&&mode&&!stroke.rebased&&distance<=1) return int(stroke.samples.size());
+    const int steps=mode==1&&!stroke.rebased&&!stroke.samples.empty()?int(std::ceil(distance))/3:1;
     if(steps>100000-int(stroke.samples.size())) throw std::runtime_error("Stroke sample limit reached.");
     for(int i=1;i<=std::max(1,steps);++i) append_sample(stroke,previous+(ray-previous)*(double(i)/std::max(1,steps)));
     stroke.rebased=false; checkpoint.committed=true;
     return int(stroke.samples.size());
+}
+static double screen_scale(const Stroke& stroke) {
+    double world=0,screen=0;
+    for(size_t i=1;i<stroke.samples.size();++i) {
+        world+=(Eigen::Map<const V3>(stroke.samples[i].data())-Eigen::Map<const V3>(stroke.samples[i-1].data())).norm();
+        screen+=(stroke.pointers[i].segment<2>(6)-stroke.pointers[i-1].segment<2>(6)).norm();
+    }
+    return screen>0?world/screen:0;
 }
 }
 uint64_t af_stroke_create(int count,const uint64_t* meshes,const double* matrices,const double* plane,const double* settings) {
@@ -136,7 +143,7 @@ void af_stroke_release(uint64_t handle) {
     std::lock_guard<std::mutex> lock(af::stroke_mutex); af::strokes.erase(handle);
 }
 int af_stroke_append(uint64_t handle,const double* pointer,int interpolate) {
-    try { return af::append_pointer(*af::stroke(handle),af::pointer_input(pointer),interpolate!=0); }
+    try { return af::append_pointer(*af::stroke(handle),af::pointer_input(pointer),interpolate); }
     catch(const std::exception& error) { af::set_error(error.what()); return -1; }
 }
 int af_stroke_probe(uint64_t handle,const double* pointer,double* output) {
@@ -160,7 +167,7 @@ int af_stroke_pop(uint64_t handle) {
     try {
         auto value=af::stroke(handle);
         if(!value->samples.empty()) {
-            value->projection=value->states.back(); value->states.pop_back(); value->samples.pop_back();
+            value->projection=value->states.back(); value->states.pop_back(); value->samples.pop_back(); value->pointers.pop_back();
         }
         return int(value->samples.size());
     } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
@@ -183,7 +190,7 @@ int af_stroke_view(uint64_t handle,const double* normal) {
         auto value=af::stroke(handle); auto& state=value->projection;
         if(!(state.locked&&state.first>=2)) state.normal=direction.normalized();
         if(!state.surface&&!value->samples.empty()) state.origin=state.previous;
-        value->rebased=true; return 0;
+        value->rebased=true; value->same_view=false; return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_stroke_batch(uint64_t handle,int count,const double* pointers,int interpolate,uint64_t token) {
@@ -192,7 +199,7 @@ int af_stroke_batch(uint64_t handle,int count,const double* pointers,int interpo
         const auto value=af::stroke(handle); af::StrokeCheckpoint checkpoint(*value);
         for(int i=0;i<count;++i) {
             af::check_cancel(token);
-            af::append_pointer(*value,af::pointer_input(pointers+i*9),interpolate!=0);
+            af::append_pointer(*value,af::pointer_input(pointers+i*9),interpolate);
         }
         checkpoint.committed=true; return int(value->samples.size());
     } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
@@ -202,6 +209,18 @@ uint64_t af_stroke_bytes(uint64_t handle) {
         const auto value=af::stroke(handle);
         return sizeof(af::Stroke)+value->samples.capacity()*sizeof(af::Sample)
             +value->states.capacity()*sizeof(af::Projection)
+            +value->pointers.capacity()*sizeof(af::Pointer)
             +value->surfaces.capacity()*sizeof(af::DrawingSurface);
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+int af_stroke_settings(uint64_t handle,double pixels,double close_radius,double* output) {
+    try {
+        if(!output||!std::isfinite(pixels)||pixels<0||!std::isfinite(close_radius)||close_radius<0)
+            throw std::runtime_error("Drawing pixel tolerances must be finite and nonnegative.");
+        const auto value=af::stroke(handle);
+        output[0]=pixels*af::screen_scale(*value); output[1]=0;
+        if(value->samples.size()>2&&value->same_view)
+            output[1]=(value->pointers.front().segment<2>(6)-value->pointers.back().segment<2>(6)).norm()<=close_radius;
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }

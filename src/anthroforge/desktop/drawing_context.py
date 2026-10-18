@@ -57,6 +57,20 @@ def fit_settings(options):
     )
 
 
+def substeps(options, mode):
+    return mode == "DRAW" and options["depth"] == "SURFACE" and options["method"] != "POLYLINE"
+
+
+def finish_settings(tool):
+    settings = fit_settings(tool.options)
+    measured = tool.stroke.settings(tool.options["error_pixels"])
+    if tool.options["auto_close"]:
+        settings["closed"] = settings["closed"] or measured["closed"]
+    if tool.options["screen_error"] and measured["error"] > 0:
+        settings["error"] = measured["error"]
+    return settings
+
+
 def validate_settings(options):
     ProjectionSettings(
         **{key: options[key] for key in ("depth", "first_plane", "offset", "relative")}
@@ -64,3 +78,5 @@ def validate_settings(options):
     fit_settings(options)
     if not isfinite(options["radius"]) or options["radius"] < 0:
         raise ValueError("Drawing radius must be finite and nonnegative.")
+    if not isfinite(options["error_pixels"]) or options["error_pixels"] <= 0:
+        raise ValueError("Drawing pixel tolerance must be positive and finite.")

@@ -73,6 +73,7 @@ class Resolution:
         repair.state = "VERIFYING"
         self.recheck(repair.issue.provider)
         self.repository.revision += 1
+        self.verified(repair)
 
     def verified(self, repair: Repair) -> None:
         issue = repair.issue

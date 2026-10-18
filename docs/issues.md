@@ -71,7 +71,8 @@ requests safe cancellation of its submitted jobs; it does not undo accepted resu
   dependency graph, with direct input identities. A blocked output may be in a cycle
   or downstream of one; this release does not claim an exact cycle path.
 - `tasks.v1`: calculation failures, including import/file failures without an SCP
-  target. Successful retries retire the matching failure. Activity retains job history.
+  target. Successful retries retire the matching failure. Cancelling a retry retains
+  its original failure as retryable evidence. Activity retains job history.
 
 Available repairs reuse **Recalculate target** and **Retry calculation**. No repair
 silently detaches controls, changes attachment modes, breaks cycles, or changes
@@ -105,7 +106,7 @@ existing domain state and native evaluation outcomes. Future geometric checks mu
 retain the repository's batched C++ boundary.
 
 Source checks: `pytest tests/test_issue_reporting.py tests/test_issue_integration.py
-tests/test_issue_lifecycle.py`, `tools/issues_acceptance.py`, and
+tests/test_issue_lifecycle.py tests/test_issue_retries.py`, `tools/issues_acceptance.py`, and
 `tools/issues_profile_acceptance.py`. GUI/profile artifacts are ignored local output
 under `build/issues-016`; release evidence is recorded in the task handoff.
 

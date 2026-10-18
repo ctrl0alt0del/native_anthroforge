@@ -40,11 +40,16 @@ passes. Failed detector scopes are isolated; queued cancellation, late old callb
 scope retirement, undo/redo and desktop/headless Open reset were hardened. Headless
 save(wait) now drains only document writers, preserving read-only diagnostics semantics.
 Release versions are updated to 0.1.6. Preserve untracked root `__init__.py`.
+Final lifecycle review added cancellation/retry coverage: cancellation retains the original
+failure as retryable evidence, and successful synchronous task rechecks complete repair
+verification immediately. Malformed duplicate detector identities are isolated per scope.
+A subprocess exercises issue detection/repair with no Qt or Blender imports.
 
 ## Verification
 
-Ruff/mypy and the 15-line architecture gate pass. Full pytest passed 510 tests
-(seven existing Qt deprecation warnings) before the version/package probe additions.
+The full development gate passed 510 tests (seven existing Qt deprecation warnings),
+native/style/type checks and native runtime/numerics loading. The final lifecycle
+changes above passed 15 targeted tests; rerun the full gate before packaging.
 `tools/activity_acceptance.py` and `tools/issues_acceptance.py` passed actual GUI checks;
 captures under `build/issues-016/gui` were inspected. Full development and portable
 gates remain pending; this checkpoint is not merge-ready.

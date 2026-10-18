@@ -15,12 +15,14 @@ from tests.test_issue_integration import records
 def faulty(document, scope, cancel):
     if scope == "bad":
         raise RuntimeError("Diagnostic unavailable")
+    if scope == "duplicate":
+        return (Issue("isolation", scope, "DUPLICATE", "Duplicate identity"),) * 2
     return (Issue("isolation", scope, "GOOD", "Independent evidence"),)
 
 
 def test_one_failed_scope_does_not_hide_other_checks(session):
     provider = Provider(
-        "isolation", lambda _: {"bad", "good"}, lambda *_: set(), lambda *_: 1, faulty
+        "isolation", lambda _: {"bad", "duplicate", "good"}, lambda *_: set(), lambda *_: 1, faulty
     )
     session.issues.listening.register(provider)
     session.wait(5)
@@ -28,6 +30,7 @@ def test_one_failed_scope_does_not_hide_other_checks(session):
     status = session.command("issues.status")
     assert not status["complete"] and not status["clean"]
     assert any(c["scope"] == "bad" and c["status"] == "FAILED" for c in status["checks"])
+    assert any(c["scope"] == "duplicate" and c["status"] == "FAILED" for c in status["checks"])
 
 
 def broken_discovery(document):

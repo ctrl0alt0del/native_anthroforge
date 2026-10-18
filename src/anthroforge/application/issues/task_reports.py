@@ -31,22 +31,32 @@ class TaskReports:
         elif self.latest.get(scope) == job.id:
             self.publish(scope, job)
 
-    def publish(self, scope: str, job: Job) -> None:
+    def publish(self, scope: str, job: Job, force: bool = False) -> None:
+        if job.state == "cancelled":
+            self.retain(scope)
+            return
         if job.state not in ("failed", "succeeded"):
             return
-        if job.state == "succeeded" and not self.reporting.repository.scopes.get(
-            (self.name, scope)
+        if (
+            job.state == "succeeded"
+            and not force
+            and not self.reporting.repository.scopes.get((self.name, scope))
         ):
             return
         ticket = self.reporting.begin(self.name, scope)
         rows = (task_issue(self.session, scope, job),) if job.state == "failed" else ()
         self.reporting.complete(ticket, rows)
 
+    def retain(self, scope: str) -> None:
+        rows = self.reporting.repository.scopes.get((self.name, scope), {})
+        if rows:
+            self.reporting.complete(self.reporting.begin(self.name, scope), tuple(rows.values()))
+
     def recheck(self) -> None:
         for scope, identity in self.latest.items():
             job = self.session.scheduler.registry.by_id.get(identity)
             if job is not None:
-                self.publish(scope, job)
+                self.publish(scope, job, (self.name, scope) in self.reporting.repository.states)
         self.reporting.complete(self.reporting.begin(self.name, "document"), ())
 
     def prune(self) -> None:

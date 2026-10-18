@@ -79,10 +79,12 @@ def compute(
 
 def check_scope(provider: Provider, document: Document, scope: str, cancel: Event) -> Outcome:
     try:
-        rows = provider.check(document, scope, cancel)
+        rows = tuple(provider.check(document, scope, cancel))
         if any((row.provider, row.scope) != (provider.name, scope) for row in rows):
             raise ValueError("Detector returned evidence belonging to another provider/scope.")
-        return Outcome(tuple(rows))
+        if len({row.id for row in rows}) != len(rows):
+            raise ValueError("Detector returned duplicate issue identities.")
+        return Outcome(rows)
     except Exception as error:
         return Outcome(error=str(error) or type(error).__name__)
 

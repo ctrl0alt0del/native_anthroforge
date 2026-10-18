@@ -89,6 +89,17 @@ def size(session: "Session", target: str, width: float) -> None:
     object_operations.install(session, replace(item, width=width, height=height, calibration=None))
 
 
+def align(session: "Session", target: str, axis: str) -> None:
+    selected(session, target)
+    orientations = {"X": (0, 90, 0), "Y": (-90, 0, 0), "Z": (0, 0, 0)}
+    if axis not in orientations:
+        raise ValueError("Image alignment requires X, Y or Z.")
+    frame = curve_sources.world(session.engine, session.document, target)
+    values = list(session.engine.decompose(frame))
+    values[3:6] = orientations[axis]
+    object_operations.transform(session, target, values, world=True)
+
+
 def calibrate(
     session: "Session", target: str, first: list[float], second: list[float], distance: float
 ) -> None:

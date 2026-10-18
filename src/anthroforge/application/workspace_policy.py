@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import Workspace, descendants
+from anthroforge.core.image_presentation import decode as decode_image
 from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
 
 if TYPE_CHECKING:
@@ -11,11 +12,16 @@ if TYPE_CHECKING:
 
 
 TUPLES = {"members", "hidden", "unpickable", "camera", "hidden_categories", "unpickable_categories"}
+RECORDS = {
+    "bookmarks": decode_bookmark,
+    "measurements": decode_measurement,
+    "reference_images": decode_image,
+}
 
 
 def settings(values: dict[str, Any]) -> dict[str, Any]:
     result = {key: tuple(value) if key in TUPLES else value for key, value in values.items()}
-    for key, decode in (("bookmarks", decode_bookmark), ("measurements", decode_measurement)):
+    for key, decode in RECORDS.items():
         if key in values:
             result[key] = tuple(decode(v) if isinstance(v, dict) else v for v in values[key])
     return result
@@ -46,6 +52,18 @@ def validate(session: "Session", workspace: Workspace, index: int) -> None:
     if index != 0 and not workspace.focused:
         raise ValueError("Named workspaces must retain explicit membership.")
     validate_references(session, workspace, session.document.workspaces[index])
+    validate_images(session, workspace, session.document.workspaces[index])
+
+
+def validate_images(session: "Session", workspace: Workspace, previous: Workspace) -> None:
+    from anthroforge.core.reference_images import ReferenceImage
+
+    existing = {style.target for style in previous.reference_images}
+    for style in workspace.reference_images:
+        if style.target not in existing and not isinstance(
+            session.document.object(style.target), ReferenceImage
+        ):
+            raise ValueError("Image appearance requires a reference image.")
 
 
 def validate_references(session: "Session", workspace: Workspace, previous: Workspace) -> None:

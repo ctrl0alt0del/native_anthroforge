@@ -26,7 +26,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: constructionPane.dialogVisible || reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -110,7 +110,7 @@ ApplicationWindow {
             SplitView {
                 anchors.fill: parent; anchors.margins: Theme.inset; orientation: Qt.Vertical
                 Outliner { SplitView.fillHeight: true; SplitView.minimumHeight: 150; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
-                Construction { SplitView.preferredHeight: 240; SplitView.minimumHeight: 120 }
+                Construction { id: constructionPane; SplitView.preferredHeight: 240; SplitView.minimumHeight: 120 }
             }
         }
         ColumnLayout {
@@ -288,7 +288,7 @@ ApplicationWindow {
         recordPerformance: () => performance.toggle(),
         confirm: () => viewport.confirmTransform(),
         projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,
-        cancel: () => { workspace.inspectionTools.cancel(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
+        cancel: () => { workspace.inspectionTools.cancel(); workspace.imageTools.cancel(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
     })
     function dispatchShortcut(command) {
         const action = shortcutCommands[command];

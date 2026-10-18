@@ -66,7 +66,7 @@ int af_image_calibration(const double* frame,const double* dimensions,const doub
         if(!frame||!dimensions||!landmarks||!output||!std::isfinite(distance)||distance<=0)
             throw std::runtime_error("Invalid calibration input.");
         const af::M4 matrix=Eigen::Map<const af::M4>(frame);
-        const af::V3 delta((landmarks[2]-landmarks[0])*dimensions[0],(landmarks[3]-landmarks[1])*dimensions[1],0);
+        const af::V3 delta((landmarks[2]-landmarks[0])*dimensions[0],(landmarks[1]-landmarks[3])*dimensions[1],0);
         const double length=(matrix.block<3,3>(0,0)*delta).norm();
         if(!std::isfinite(length)||length<1e-15) throw std::runtime_error("Calibration landmarks must be distinct.");
         output[0]=dimensions[0]*distance/length; output[1]=dimensions[1]*distance/length; return 0;

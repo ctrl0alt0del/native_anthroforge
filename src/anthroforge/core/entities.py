@@ -5,6 +5,7 @@ from math import isfinite
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from .image_presentation import ImagePresentation
 from .inspection_views import CameraBookmark, Measurement
 from .presentation import validate_categories
 from .results import EvaluationResult
@@ -90,6 +91,7 @@ class Workspace:
     display_units: str = "m"
     measurements: tuple[Measurement, ...] = ()
     bookmarks: tuple[CameraBookmark, ...] = ()
+    reference_images: tuple[ImagePresentation, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.name.strip():
@@ -97,6 +99,8 @@ class Workspace:
         factor(self.display_units)
         validate_categories(self.hidden_categories)
         validate_categories(self.unpickable_categories)
+        if len({v.target for v in self.reference_images}) != len(self.reference_images):
+            raise ValueError("Image appearance must have unique targets.")
         if len(self.camera) != 7 or not all(map(isfinite, self.camera)) or self.camera[6] <= 0:
             raise ValueError("Invalid workspace camera.")
 

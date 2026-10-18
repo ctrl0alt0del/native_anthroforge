@@ -45,8 +45,8 @@ collection. Disabled profiling performs no inventory queries. Image resource ide
 hashing image payloads during observations; reports contain sizes and provenance, not pixels.
 Standalone curves now have Construction navigation, shared editing, staged native display
 and picking (details below). ROUTED is not implemented in the standalone engine and is
-explicitly rejected by native path dispatch. Image API import/replacement/calibration and
-native texture preparation are implemented; image UI/display remains in progress.
+explicitly rejected by native path dispatch. Image import/replacement/calibration and native
+texture preparation, image UI/display and picking are implemented (evidence limits below).
 Fiber/Surface production operations/native algorithms/UI remain unfinished.
 Direct control.attach is still present and must be retired as planned.
 No 0.2.0 release qualification or version bump has occurred.
@@ -161,3 +161,28 @@ instance independence, transformed calibration and undo, interrupted import undo
 embedded persistence without the original source, invalid input, and existing mesh-import
 regressions. The full development gate passed on the preceding path checkpoint (608 tests).
 No image rendering, interactive acceptance, or 0.2.0 packaging acceptance is claimed here.
+
+## Image presentation and editing checkpoint
+
+Construction now exposes image import, source replacement, shared-asset instances, numeric
+size/transform, ordinary parenting, world-axis alignment and two-landmark calibration.
+Per-workspace image appearance includes opacity, depth, side visibility, projection modes
+and pickability. Native plane picking uses displayed dimensions/provenance and current view
+projection. Images have their own staged model and asset leases, included in profiler owners.
+Native image quads preserve affine transforms without decomposing shear.
+
+Validation: 624 tests pass; Ruff/format/mypy pass; native build/contracts and changed-native
+clang-tidy pass. Texture-only D3D11 checks in `tools/image_scene_acceptance.py` cover exact
+quadrant orientation, hover/click, front/back/normal occlusion against a cube, calibration
+with one-action undo, complete old-image retention during replacement and lease release.
+Captures in `build/020-image-scene` were visually inspected. Path rendering regression and
+offscreen construction-editor checks pass. No visible windows or desktop input were used;
+interactive and packaged acceptance remain unperformed. Full gate is pending for this increment.
+
+Diagnostic findings: instanced custom image quads were invisible in this setup; normals and
+indices did not fix it. Non-instanced quads with six native-transformed vertices render
+correctly. Reparenting existing nodes between View3D scenes lost display; staged filtered
+layer models preserve it. These findings and ownership boundaries are in architecture.md.
+Remaining release work still includes native drawing/fitting/cursor, conversion previews,
+complete consumer/navigation controls, fibers/routing/attachments/junctions, generic surfaces,
+legacy control-attachment retirement, performance evidence and full release qualification.

@@ -11,6 +11,7 @@ from anthroforge.profiling.spans import measured
 from . import controller_actions as actions
 from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
+from .image_tools import ImageTools
 from .inspection_export import InspectionExport
 from .inspection_panel import InspectionPanel
 from .inspection_tools import InspectionTools
@@ -52,21 +53,39 @@ class Controller(QObject):
         self.inspection_panel = InspectionPanel(self)
         self.inspection_export = InspectionExport(self)
         self.inspection_tools = InspectionTools(self)
+        self.image_tools = ImageTools(self)
         self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
 
     def memory_owners(self, owners):
-        for attribute in ("render_model", "path_model"):
+        for attribute in ("render_model", "path_model", "image_model"):
             model = getattr(self, attribute, None)
             if model is not None:
                 model.memory_owners(owners)
 
     def initialize_renderers(self):
+        from .image_scene import prepare_picking as prepare_images
         from .path_scene import prepare_picking
 
         self.render_model, self.path_model = RenderModel(self), RenderModel(self)
+        self.image_model = RenderModel(self)
+        self.initialize_image_layers()
         self.render_model.activated.connect(self.activate_geometry)
         self.path_model.activated.connect(self.activate_geometry)
+        self.image_model.activated.connect(self.activate_geometry)
         prepare_picking(self)
+        prepare_images(self)
+
+    def initialize_image_layers(self):
+        from .render_layer import RenderLayer
+
+        self.image_layers = {
+            key: RenderLayer(self.image_model, key) for key in ("NORMAL", "FRONT", "BACK")
+        }
+        self.viewport_orthographic = False
+
+    @Slot(bool)
+    def setViewportProjection(self, orthographic):
+        self.viewport_orthographic = orthographic
 
     def _initialize_state(self):
         self.selection, self.hovered, self.message = "", "", ""
@@ -97,6 +116,14 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def pathModel(self):
         return self.path_model
+
+    @Property(QObject, constant=True)
+    def imageModel(self):
+        return self.image_model
+
+    @Slot(str, result=QObject)
+    def imageLayer(self, depth):
+        return self.image_layers[depth]
 
     @Property("QVariantList", notify=treeChanged)
     def treeRows(self):
@@ -146,6 +173,16 @@ class Controller(QObject):
     def inspectionTools(self):
         return self.inspection_tools
 
+    @Property(QObject, constant=True)
+    def imageTools(self):
+        return self.image_tools
+
+    @Slot(result="QVariantList")
+    def ordinaryParents(self):
+        from .image_tools import parent_choices
+
+        return parent_choices(self)
+
     @Property("QVariantMap", notify=metricsChanged)
     def metrics(self):
         return self._metrics
@@ -161,6 +198,7 @@ class Controller(QObject):
         self.inspection_panel.synchronize()
         self.inspection_export.synchronize()
         self.inspection_tools.synchronize()
+        self.image_tools.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()
@@ -176,7 +214,9 @@ class Controller(QObject):
             "dirty": self.session.saved_revision != self.session.document.revision,
             "blocked": self.session.scheduler.blocked,
             "waiting": self.session.waiting_save,
-            "publishing": len(self.render_model.pending) + len(self.path_model.pending),
+            "publishing": sum(
+                len(m.pending) for m in (self.render_model, self.path_model, self.image_model)
+            ),
             "path": str(self.session.path or ""),
         }
 
@@ -211,6 +251,7 @@ class Controller(QObject):
         project_actions.poll(self)
         self.render_model.drain()
         self.path_model.drain()
+        self.image_model.drain()
         self.refresh_if_needed()
         self.issue_panel.synchronize()
         self.tick_count += 1
@@ -224,13 +265,16 @@ class Controller(QObject):
         self.last_frame = now
         self.render_model.presented()
         self.path_model.presented()
+        self.image_model.presented()
 
     @measured("publication", lambda owner: owner.session.profiler)
     def activate_geometry(self):
+        from .image_scene import prepare_picking as prepare_images
         from .path_scene import prepare_picking
 
         scene_state.picking_inputs(self, self.render_model.active_rows())
         prepare_picking(self)
+        prepare_images(self)
         from anthroforge.application.geometry_ownership import collect
 
         collect(self.session)

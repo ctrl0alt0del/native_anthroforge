@@ -106,6 +106,8 @@ def decode_entity(data: dict[str, Any]) -> SCP:
 
 
 def decode_workspace(data: dict[str, Any]) -> Workspace:
+    from anthroforge.core.image_presentation import decode as decode_image
+
     data = dict(data)
     for key in ("members", "hidden", "unpickable", "camera"):
         data[key] = tuple(data[key])
@@ -113,6 +115,7 @@ def decode_workspace(data: dict[str, Any]) -> Workspace:
         data[key] = tuple(data.get(key, ()))
     data["measurements"] = tuple(map(decode_measurement, data.get("measurements", ())))
     data["bookmarks"] = tuple(map(decode_bookmark, data.get("bookmarks", ())))
+    data["reference_images"] = tuple(map(decode_image, data.get("reference_images", ())))
     return Workspace(**data)
 
 

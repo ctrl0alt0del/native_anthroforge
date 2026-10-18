@@ -113,4 +113,7 @@ def presentation(previous, current):
         chunk=previous["chunk"],
         geometry_asset=previous.get("geometry_asset", ""),
         geometry_revision=previous.get("geometry_revision", 0),
+        content=previous.get("content", {})
+        if previous["key"] != current["key"]
+        else current.get("content", {}),
     )

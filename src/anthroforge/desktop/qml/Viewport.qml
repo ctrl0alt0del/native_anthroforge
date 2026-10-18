@@ -32,7 +32,7 @@ Item {
     property bool restoringCamera: false
     property var preservedCamera: null
     readonly property bool canRestoreView: preservedCamera !== null
-    readonly property bool measuring: workspace.inspectionTools.state.active
+    readonly property bool measuring: workspace.inspectionTools.state.active || workspace.imageTools.state.active
     readonly property var selected: authoring.transformData
     readonly property bool modalTransforming: modalTransform.active
     readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming
@@ -71,6 +71,7 @@ Item {
     }
     function rayAt(x, y, select, extend) {
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
+        if(workspace.imageTools.state.active) { workspace.imageTools.probe(origin,direction,select); return {}; }
         if(measuring) { workspace.inspectionTools.probe(origin,direction,depthIndex,select); return {}; }
         if(authoring.visible) {
             if(authoring.pick(origin,direction,distance*.012,depthIndex,select,!!extend) || authoring.state.editing) return {};
@@ -183,15 +184,19 @@ Item {
         anchorMarkers.requestPaint();
         measurementOverlay.requestPaint();
     }
-    onOrthographicChanged: cameraSave.restart()
+    onOrthographicChanged: { workspace.setViewportProjection(orthographic); cameraSave.restart(); }
 
+    Rectangle { anchors.fill: parent; color: "#24262b" }
+    ImageLayer {
+        id: backImages; anchors.fill: parent; sourceCamera: view.camera; orthographic: viewport.orthographic
+        depthLayer: "BACK"
+    }
     View3D {
         id: view
         anchors.fill: parent
         camera: viewport.orthographic ? orthoCamera : perspectiveCamera
         environment: SceneEnvironment {
-            backgroundMode: SceneEnvironment.Color
-            clearColor: "#24262b"
+            backgroundMode: SceneEnvironment.Transparent
             antialiasingMode: SceneEnvironment.MSAA
             antialiasingQuality: SceneEnvironment.High
         }
@@ -225,8 +230,10 @@ Item {
             opacity: .22
         }
         Node {
+            id: worldScene
             eulerRotation.x: -90
             PathScene {}
+            ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic }
             Repeater3D {
                 id: meshRepeater
                 model: workspace.meshModel
@@ -283,6 +290,10 @@ Item {
             }
         }
     }
+    ImageLayer {
+        id: frontImages; anchors.fill: parent; sourceCamera: view.camera; orthographic: viewport.orthographic
+        depthLayer: "FRONT"
+    }
     SelectionOutline {
         id: selectionOutline; objectName: "selectionOutline"; anchors.fill: parent
         sourceCamera: view.camera; orthographic: viewport.orthographic
@@ -328,6 +339,7 @@ Item {
     CurveFeedback { anchors.fill: parent; viewport: viewport }
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     MeasurementOverlay { id: measurementOverlay; viewport: viewport }
+    ImageCalibrationOverlay { viewport: viewport }
     InspectionTools { viewport: viewport; anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.margins: 12; z: 10 }
     Connections {
         target: workspace.inspectionTools

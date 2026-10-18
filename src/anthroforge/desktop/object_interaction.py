@@ -3,6 +3,7 @@
 from itertools import product
 
 from anthroforge.application import curve_sources, object_operations
+from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.native import components
 
 
@@ -21,12 +22,18 @@ def transform_command(controller, values):
 
 def bounds(session, item):
     frame = curve_sources.world(session.engine, session.document, item.id)
-    resource = session.resources.paths.get(item.result.asset)
-    if resource is None:
+    local = local_bounds(session, item)
+    if local is None:
         return session.engine.world_point(frame, (0, 0, 0)), 1.0
-    local = resource.path.bounds
     corners = list(product(*[(local[i], local[i + 3]) for i in range(3)]))
     world = session.engine.bounds(components.transformed(session.engine, corners, frame).ravel())
     return [(world[i] + world[i + 3]) * 0.5 for i in range(3)], max(
         world[i + 3] - world[i] for i in range(3)
     )
+
+
+def local_bounds(session, item):
+    if isinstance(item, ReferenceImage):
+        return (-item.width / 2, -item.height / 2, 0, item.width / 2, item.height / 2, 0)
+    resource = session.resources.paths.get(item.result.asset)
+    return resource.path.bounds if resource else None

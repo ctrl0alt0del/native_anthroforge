@@ -1,8 +1,10 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtQuick.Dialogs
 
 ColumnLayout {
+    readonly property bool dialogVisible: imageFile.visible
     spacing: Theme.gap
     RowLayout {
         Label { text: "CONSTRUCTION"; color: Theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
@@ -11,6 +13,7 @@ ColumnLayout {
             const id=workspace.run("curve.create",{owner:owner});
             if(id) { workspace.select(id); authoring.setEditing(true); }
         } }
+        UiButton { text: "Image…"; hint: "Import a world reference image"; onClicked: imageFile.open() }
     }
     ListView {
         Layout.fillWidth: true; Layout.fillHeight: true; clip: true
@@ -29,4 +32,5 @@ ColumnLayout {
             MouseArea { id: pointer; anchors.fill: parent; hoverEnabled: true; onClicked: workspace.select(parent.item.id) }
         }
     }
+    FileDialog { id: imageFile; title: "Import reference image"; nameFilters: ["Reference images (*.png *.jpg *.jpeg)"]; onAccepted: workspace.imageTools.importFile(selectedFile.toString(),false) }
 }

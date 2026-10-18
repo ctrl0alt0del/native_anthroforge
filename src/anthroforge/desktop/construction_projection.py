@@ -12,7 +12,7 @@ from .values import qml
 class ConstructionProjection:
     def __init__(self, controller):
         self.controller, self.records, self.keys = controller, {}, {}
-        self.rendered = []
+        self.rendered = {}
         self.model = RecordModel(controller, ("item",), "id")
 
     def synchronize(self):
@@ -34,16 +34,23 @@ class ConstructionProjection:
             self.records[item.id], self.keys[item.id] = record(session, item, frame), key
 
     def publish(self):
-        from .path_scene import rows
+        from . import image_scene, path_scene
 
-        desired = rows(self.controller)
-        if desired != self.rendered:
-            self.rendered = desired
-            resources = self.controller.session.resources.paths.values()
-            self.controller.path_model.publish(desired, (asset.path for asset in resources))
+        resources = self.controller.session.resources
+        self.publish_kind(
+            "path", path_scene.rows(self.controller), (a.path for a in resources.paths.values())
+        )
+        self.publish_kind("image", image_scene.rows(self.controller), resources.images.values())
+
+    def publish_kind(self, kind, desired, resources):
+        if desired != self.rendered.get(kind):
+            self.rendered[kind] = desired
+            getattr(self.controller, kind + "_model").publish(desired, resources)
 
 
 def record(session, item, frame):
+    from .image_scene import metadata
+
     names = ("id", "name", "parent", "update_mode")
     row = {name: getattr(item, name) for name in names}
     row.update(kind=kind(item), **result_record(item.result))
@@ -53,7 +60,7 @@ def record(session, item, frame):
         local_trs=session.engine.decompose(item.matrix),
         quaternion=scene.quaternion(session.engine, frame),
     )
-    return qml(dict(row, **flags(session, item)))
+    return qml(dict(row, **flags(session, item), **metadata(session, item)))
 
 
 def result_record(result):

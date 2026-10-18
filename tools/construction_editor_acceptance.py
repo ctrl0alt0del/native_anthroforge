@@ -4,7 +4,10 @@ import os
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
+from pathlib import Path
+
 import numpy as np
+from PIL import Image
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from shiboken6 import delete
@@ -66,6 +69,21 @@ def insertion(controller, key):
     assert controller.session.document.object(key).matrix[11] == 0
 
 
+def image_inspector(controller):
+    path = Path("build/020-image-scene/inspector.png")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    Image.new("RGB", (8, 4), "blue").save(path)
+    result = controller.run("image.import", dict(path=str(path)))
+    settle(controller)
+    controller.select(result["object_id"])
+    assert controller.selectedData["kind"] == "IMAGE"
+    assert controller.ordinaryParents()
+    assert controller.beginTransform("Move")
+    controller.transformDelta([0, 0, 0.2, 0, 0, 0, 1, 1, 1])
+    controller.endTransform(True)
+    controller.frameSelection()
+
+
 def run():
     controller, warnings = Controller(), []
     engine = create_engine(controller, warnings)
@@ -74,9 +92,10 @@ def run():
         key = setup(controller)
         component_drag(controller, key)
         insertion(controller, key)
+        image_inspector(controller)
         assert not controller.message, controller.message
         assert not warnings, warnings
-        print("Offscreen curve editor: selection, inspection, drag/undo, insertion, cancel passed.")
+        print("Offscreen construction editor: curve editing and image inspector/transform passed.")
     finally:
         controller.close()
         delete(engine)

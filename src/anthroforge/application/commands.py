@@ -11,6 +11,7 @@ from . import (
     curve_independence,
     evaluation,
     image_operations,
+    image_presentation,
     importing,
     inspection,
     inspection_report,
@@ -33,6 +34,7 @@ EDITS = {
     "image.instance": image_operations.instance,
     "image.size": image_operations.size,
     "image.calibrate": image_operations.calibrate,
+    "image.align": image_operations.align,
     "curve.create": object_operations.create_curve,
     "curve.edit": object_operations.edit_curve,
     "curve.point.update": object_operations.edit_point,
@@ -140,6 +142,7 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
         "image.inspect": lambda **a: image_operations.inspect(session, **a),
+        "image.presentation": lambda **a: image_presentation.update(session, **a),
         "object.inspect": lambda **a: object_operations.inspect(session, **a),
         "curve.evaluate": lambda curve: path_tasks.schedule(session, {curve}, explicit=True),
         "job.cancel": lambda job_id, obsolete=False: session.scheduler.cancel_job(job_id, obsolete),

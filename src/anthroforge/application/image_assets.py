@@ -23,6 +23,14 @@ class ImageAsset:
     format: str
     texture: "NativeImage | None" = None
 
+    @property
+    def handle(self) -> int:
+        return self.texture.handle if self.texture else 0
+
+    @property
+    def chunks(self) -> int:
+        return self.texture.chunks if self.texture else 0
+
 
 def decode(encoded: bytes, engine: "GeometryEngine | None" = None, cancel: int = 0) -> ImageAsset:
     from PIL import Image, ImageOps

@@ -259,3 +259,28 @@ after `wait`; successful command dispatch alone does not guarantee successful ca
 Schema 2 embeds editable definitions, source meshes, bindings and accepted results for
 the selected revision. Version-1 projects migrate on read. Native handles and undo history
 are not serialized. Older application versions reject schema 2.
+# Reference images (0.2.0 development branch)
+
+Image operations use the same session command API, with no Qt dependency:
+
+- `image.import(path, width=1, name="", parent="", owner="", values=None)` returns
+  `object_id` and `job_id`. PNG/JPEG decoding and native preparation are asynchronous.
+  `values` uses the existing position/rotation/scale convention, in metres/degrees.
+- `image.replace(target, path)` replaces one assignment asynchronously. Position and
+  physical width remain; height follows the new aspect ratio; landmark calibration clears.
+- `image.instance(source, name="")` creates an independent placement sharing its image asset.
+- `image.size(target, width)` preserves aspect ratio and clears landmark calibration.
+- `image.align(target, axis)` faces world X, Y or Z while retaining position and scale.
+- `image.calibrate(target, first, second, distance)` takes two normalized image UV points
+  (top-left origin, each component in `[0,1]`) and a positive world distance in metres.
+  Native calibration respects the complete parent/world transform and creates one undo step.
+- `image.inspect(target)` returns asset identity, pixel dimensions, format, physical size
+  and calibration status. Generic `object.inspect`, `object.transform`, `object.reparent`,
+  `object.rename` and `object.delete` also apply. Images cannot be transform parents.
+- `image.presentation(target, **settings)` updates the current workspace without anatomical
+  undo or geometry work. Settings: `opacity` (0–1), `depth` (`NORMAL`, `FRONT`, `BACK`),
+  `side` (`BOTH`, `FRONT`, `BACK`), `orthographic`, `perspective`, and `pickable`.
+
+`wait` includes image jobs. Import/replacement uses the initiating undo step; cancel/failure
+never publishes a partial image. Source bytes are embedded once per unique asset in schema 3.
+This documents the implemented image increment; it does not mark the entire 0.2.0 release complete.

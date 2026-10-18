@@ -414,3 +414,28 @@ displayed/staged native leases through a weak adapter callback. Alias identities
 deduplicated before export; raw allocation addresses are not serialized. Owner totals
 overlap and unobserved/transient or non-native allocations are explicitly outside coverage.
 Recording off performs no new inventory queries, traversal or cache event collection.
+
+## Construction image ownership and presentation (0.2.0 development)
+
+`authored_jobs` owns the common initiating-history-step publication used by mesh and
+image imports. Image jobs decode PNG/JPEG and apply EXIF orientation off-thread, then
+prepare native 256-pixel RGBA tiles. Assignments own physical dimensions and ordinary
+parent-local transforms; assets own source bytes and decoded/native image storage.
+Multiple instances share one asset. History/checkpoints/jobs and viewport leases preserve
+that asset until their last owner releases it. Native plane queries and calibration share
+top-left normalized UV coordinates and full affine frames.
+
+Workspace `ImagePresentation` records own opacity, depth, sides, projection visibility and
+pickability. These changes do not author geometry or trigger calculation. Displayed-content
+records preserve old dimensions and provenance during replacement. The shared staged model
+filters content into Qt render layers; each layer creates only its own tile delegates.
+Native image geometry transforms six vertices per tile, retaining affine shear. Texture
+data is unchanged during transforms. Picking follows displayed content and the current
+viewport projection rather than the delayed saved camera settings.
+
+Texture-only experiments found instanced custom image quads invisible on this D3D11 setup;
+adding normals/index buffers did not resolve it, whereas native-transformed non-instanced
+quads rendered correctly. Dynamic reparenting between Qt View3D scenes also lost display.
+The maintained implementation uses transformed quads and staged layer models, with tests
+for orientation, occlusion and complete replacement. These are scoped observed results,
+not a claim about every Qt backend. No visible-window acceptance has been performed.

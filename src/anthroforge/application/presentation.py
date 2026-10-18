@@ -3,7 +3,10 @@
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
-from anthroforge.core.entities import Workspace, descendants
+from anthroforge.core.entities import Workspace
+from anthroforge.core.presentation import PRESETS
+
+from . import workspace_policy as policy
 
 if TYPE_CHECKING:
     from .session import Session
@@ -12,40 +15,70 @@ if TYPE_CHECKING:
 def create_workspace(
     session: "Session", name: str, members: list[str], children: bool = False
 ) -> int:
-    ids = set(members)
-    for entity_id in members:
-        session.document.entity(entity_id)
-        if children:
-            ids |= descendants(session.document.entities, entity_id)
-    if not name.strip() or not ids:
-        raise ValueError("A focused workspace needs a name and at least one SCP.")
-    workspace = Workspace(name=name.strip(), members=tuple(sorted(ids)), focused=True)
+    policy.available(session)
+    ids = policy.members(session.document, members, children)
+    workspace = replace(session.workspace, name=name.strip(), members=ids, focused=True)
     session.replace_document(workspaces=(*session.document.workspaces, workspace))
-    session.active_workspace = len(session.document.workspaces) - 1
+    select_workspace(session, len(session.document.workspaces) - 1)
     return session.active_workspace
 
 
 def select_workspace(session: "Session", index: int) -> None:
+    policy.available(session)
     if not 0 <= index < len(session.document.workspaces):
         raise ValueError("Unknown workspace.")
     session.active_workspace = index
+    reprioritize(session)
+
+
+def reprioritize(session: "Session") -> None:
     for job in session.scheduler.active_jobs:
-        if job.state == "queued":
+        if job.state == "queued" and job.writes:
             job.priority = session.priority(set(job.outputs))
 
 
-def update_workspace(session: "Session", **settings: Any) -> None:
-    for key in ("members", "hidden", "unpickable", "camera"):
-        if key in settings:
-            settings[key] = tuple(settings[key])
-    changed = replace(session.workspace, **settings)
-    if changed == session.workspace:
+def update_workspace(session: "Session", index: int | None = None, **settings: Any) -> None:
+    index = session.active_workspace if index is None else index
+    if not 0 <= index < len(session.document.workspaces):
+        raise ValueError("Unknown workspace.")
+    if "members" in settings or "focused" in settings:
+        policy.available(session)
+    changed = replace(session.document.workspaces[index], **policy.settings(settings))
+    policy.validate(session, changed, index)
+    if changed == session.document.workspaces[index]:
         return
+    install(session, index, changed)
+
+
+def install(session: "Session", index: int, changed: Workspace) -> None:
     workspaces = list(session.document.workspaces)
-    workspaces[session.active_workspace] = changed
+    workspaces[index] = changed
     session.replace_document(workspaces=tuple(workspaces))
+    if index == session.active_workspace:
+        reprioritize(session)
 
 
 def include_created(session: "Session", ids: set[str]) -> None:
     if session.workspace.focused:
-        update_workspace(session, members=sorted(set(session.workspace.members) | ids))
+        changed = replace(
+            session.workspace, members=tuple(sorted(set(session.workspace.members) | ids))
+        )
+        install(session, session.active_workspace, changed)
+
+
+def remove_workspace(session: "Session", index: int) -> None:
+    policy.available(session)
+    if not 0 < index < len(session.document.workspaces):
+        raise ValueError("Only named workspaces can be removed.")
+    values = tuple(w for i, w in enumerate(session.document.workspaces) if i != index)
+    selected = 0 if index == session.active_workspace else session.active_workspace
+    session.active_workspace = selected - (index < selected)
+    session.replace_document(workspaces=values)
+    select_workspace(session, session.active_workspace)
+
+
+def preset(session: "Session", name: str) -> None:
+    if name not in PRESETS:
+        raise ValueError("Unknown presentation preset.")
+    hidden, unpickable = PRESETS[name]
+    update_workspace(session, hidden_categories=hidden, unpickable_categories=unpickable)

@@ -2,7 +2,18 @@
 
 from typing import TYPE_CHECKING, Any
 
-from . import construction_tasks, evaluation, importing, operations, presentation, projects
+from anthroforge.core.units import convert
+
+from . import (
+    construction_tasks,
+    evaluation,
+    importing,
+    inspection,
+    inspection_report,
+    operations,
+    presentation,
+    projects,
+)
 from . import control_operations as controls
 from . import deformer_operations as deformers
 from . import primitive_operations as primitives
@@ -105,16 +116,22 @@ def query_commands(session: "Session") -> dict[str, Any]:
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),
         "control.affected": lambda **a: controls.affected(session, **a),
         "deformer.members": lambda **a: deformers.members(session, **a),
+        "inspect.target": lambda **a: inspection.target(session, **a),
+        "inspect.snapshot": lambda **a: inspection.snapshot(session, **a),
+        "units.convert": convert,
     }
 
 
 def file_commands(session: "Session") -> dict[str, Any]:
     return {
         "save": lambda **a: projects.save(session, **a),
+        "inspection.export": lambda **a: inspection_report.export(session, **a),
         "open": lambda **a: projects.open_project(session, **a),
         "workspace.create": lambda **a: presentation.create_workspace(session, **a),
         "workspace.select": lambda **a: presentation.select_workspace(session, **a),
         "workspace.update": lambda **a: presentation.update_workspace(session, **a),
+        "workspace.remove": lambda **a: presentation.remove_workspace(session, **a),
+        "workspace.preset": lambda **a: presentation.preset(session, **a),
     }
 
 

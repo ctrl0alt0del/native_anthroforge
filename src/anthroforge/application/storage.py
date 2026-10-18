@@ -128,6 +128,8 @@ def decode_workspace(data: dict[str, Any]) -> Workspace:
     data = dict(data)
     for key in ("members", "hidden", "unpickable", "camera"):
         data[key] = tuple(data[key])
+    for key in ("hidden_categories", "unpickable_categories"):
+        data[key] = tuple(data.get(key, ()))
     return Workspace(**data)
 
 

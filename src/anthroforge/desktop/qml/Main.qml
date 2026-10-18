@@ -21,7 +21,7 @@ ApplicationWindow {
     property bool issuesOpen: false
     property string activeTool: "Move"
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -47,10 +47,10 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 10; spacing: 10
                 Label { text: "ANTHROFORGE"; font.bold: true; font.pixelSize: 12; font.letterSpacing: 1; color: Theme.text }
-                Label { text: "0.1.6"; color: Theme.accent; font.pixelSize: 10 }
+                Label { text: "0.1.7"; color: Theme.accent; font.pixelSize: 10 }
                 MenuBar {
                     background: Item {}
-                    Menu { title: "File"; MenuItem { action: newAction } MenuItem { action: openAction } MenuSeparator {} MenuItem { action: saveAction } MenuItem { action: saveAsAction } MenuSeparator {} MenuItem { action: importAction } }
+                    Menu { title: "File"; MenuItem { action: newAction } MenuItem { action: openAction } MenuSeparator {} MenuItem { action: saveAction } MenuItem { action: saveAsAction } MenuSeparator {} MenuItem { action: importAction } MenuSeparator {} MenuItem { objectName: "exportInspectionMenu"; text: "Export inspection report…"; enabled: !workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered: { viewport.storeCamera(); reportDialog.open(); } } }
                     Menu { title: "Edit"; MenuItem { action: undoAction } MenuItem { action: redoAction } MenuSeparator {} MenuItem { text: "Delete selected…    Delete"; enabled: !!workspace.selectedId && !workspace.selectedData.readonly; onTriggered: deleteDialog.request(workspace.selectedId) } }
                     Menu {
                         title: "View"
@@ -73,6 +73,7 @@ ApplicationWindow {
                 ProfileStatus { }
                 Label { text: "Workspace"; color: Theme.muted; font.pixelSize: 11 }
                 UiCombo { Layout.preferredWidth: 175; model: workspace.state.workspaces; currentIndex: workspace.state.workspace; onActivated: workspace.run("workspace.select",{index:currentIndex}) }
+                UiButton { objectName: "manageWorkspace"; text: "Manage…"; enabled: !workspace.state.waiting && !workspace.state.editing; onClicked: workspaceManager.open() }
                 UiButton { text: "Focus…"; hint: "Create a workspace from the selected SCP"; enabled: !!workspace.selectedId && !workspace.state.waiting; onClicked: focusDialog.open() }
             }
         }
@@ -133,7 +134,7 @@ ApplicationWindow {
                     UiButton { objectName: "activityToggle"; flatStyle: true; text: (window.activityOpen ? "▾" : "▸") + "  Activity"; onClicked: { window.activityOpen = !window.activityOpen; if(window.activityOpen) window.issuesOpen = false; } }
                     UiButton { objectName: "issuesToggle"; flatStyle: true; text: (window.issuesOpen ? "▾" : "▸") + "  Issues ("+(workspace.issuePanel.state.count || 0)+")"; hint: workspace.issuePanel.state.summary || "Issue reporting"; onClicked: { window.issuesOpen = !window.issuesOpen; if(window.issuesOpen) window.activityOpen = false; } }
                     Label { text: window.activeJobCount ? window.activeJobCount + " jobs in progress" : window.jobFailed ? "A calculation failed · open Activity" : "Up to date"; color: window.jobFailed ? Theme.danger : window.activeJobCount ? Theme.accent : Theme.muted; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Label { text: workspace.treeRows.length + " objects · metres"; color: Theme.muted; font.pixelSize: 11 }
+                    Label { text: workspace.treeRows.length + " objects · "+workspace.state.display_units; color: Theme.muted; font.pixelSize: 11 }
                 }
             }
             Rectangle { Layout.fillWidth: true; implicitHeight: window.activityOpen ? 160 : 0; visible: window.activityOpen; color: Theme.panel; Activity { anchors.fill: parent; anchors.margins: 10 } }
@@ -156,6 +157,7 @@ ApplicationWindow {
             Rectangle { implicitWidth: 6; implicitHeight: 6; radius: 3; color: workspace.state.blocked ? Theme.accent : Theme.success }
             Label { text: workspace.state.message || "Middle/right drag: orbit   ·   Shift-drag: pan   ·   Wheel: zoom"; color: Theme.muted; font.pixelSize: 11; elide: Text.ElideRight; Layout.fillWidth: true }
             UiButton { visible: !!workspace.state.message; flatStyle: true; text: "Details"; implicitHeight: 22; onClicked: messageDialog.open() }
+            UiButton { text: "Report folder"; visible: !!workspace.inspectionExport.state.path && !workspace.inspectionExport.state.busy; implicitHeight: 22; onClicked: workspace.inspectionExport.showFolder() }
             Label { text: "Rev " + workspace.state.revision + (workspace.state.dirty ? " · Unsaved" : " · Saved"); color: workspace.state.dirty ? Theme.accent : Theme.muted; font.pixelSize: 11 }
         }
     }
@@ -169,6 +171,8 @@ ApplicationWindow {
         MenuSeparator {}
         MenuItem { text: "Import mesh…"; onTriggered: importFile.open() }
     }
+    FileDialog { id: reportDialog; title: "Export inspection report"; fileMode: FileDialog.SaveFile; defaultSuffix: "afinspection.zip"; nameFilters: ["Inspection report (*.afinspection.zip)"]; onAccepted: workspace.inspectionExport.start(selectedFile.toString()) }
+    WorkspaceManager { id: workspaceManager; anchors.centerIn: parent }
     Popup {
         id: overlays; x: Math.max(0,window.width-650); y: 110; padding: 14
         background: Rectangle { color: Theme.panel; border.color: Theme.border; radius: 6 }

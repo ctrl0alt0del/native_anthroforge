@@ -87,7 +87,7 @@ Future migrations should add equivalent parity evidence instead of treating the 
 addon as already portable.
 
 Development numerics extras remain installed for future work. They are excluded from
-the 0.1.6 portable runtime because 0.1.6 does not use them. In particular pytetwild[all]
+the 0.1.7 portable runtime because 0.1.7 does not use them. In particular pytetwild[all]
 supplies its required PyVista accessor dependency while Qt remains the application renderer.
 
 Primitive parity fixtures under tests/fixtures/primitives pin Blender 5.0.1 outputs.
@@ -98,9 +98,13 @@ source path and output JSON path. Use `--disable-autoexec` with background Blend
 Never save either original .blend file. Native source provenance is recorded in
 [BLENDER_PRIMITIVES.md](../native/migration/BLENDER_PRIMITIVES.md).
 
-The companion archive is `dist/AnthroForge-0.1.6-source.zip`. The portable folder stays
-`dist/AnthroForge.dist` and the executable's product/file version identifies 0.1.6.
+The companion archive is `dist/AnthroForge-0.1.7-source.zip`. The default portable folder is
+`dist/AnthroForge.dist` and the executable's product/file version identifies 0.1.7.
+The qualified 0.1.7 delivery uses `dist/0.1.7/AnthroForge.dist` to preserve the existing app.
 Packaging includes all new QML inspectors, native algorithms, example batches and notices.
+Set `AF_PACKAGE_OUTPUT` to an absolute output directory before `tools/package.ps1`
+when an existing portable app is running. For example, `E:/development/anthroforge/dist/0.1.7`
+produces `AnthroForge.dist` there without changing the running distribution.
 `uv run --no-sync python tools/primitive_acceptance.py --workshop` runs the complete
 primitives batch, opens its result in the desktop and captures the loft and curved body.
 

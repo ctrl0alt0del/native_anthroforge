@@ -8,8 +8,10 @@ from anthroforge.profiling import RuntimeProfiler
 from anthroforge.profiling.spans import measured
 
 from . import controller_actions as actions
-from . import project_actions, scene_projection, scene_state
+from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
+from .inspection_export import InspectionExport
+from .inspection_panel import InspectionPanel
 from .issue_panel import IssuePanel
 from .models import RenderModel
 
@@ -46,6 +48,8 @@ class Controller(QObject):
         self.session = Session(profiler=self.profiler)
         scene.configure(self.session.engine)
         self.issue_panel = IssuePanel(self)
+        self.inspection_panel = InspectionPanel(self)
+        self.inspection_export = InspectionExport(self)
 
     def _initialize_state(self):
         self.selection, self.hovered, self.message = "", "", ""
@@ -105,6 +109,14 @@ class Controller(QObject):
     def issuePanel(self):
         return self.issue_panel
 
+    @Property(QObject, constant=True)
+    def inspectionPanel(self):
+        return self.inspection_panel
+
+    @Property(QObject, constant=True)
+    def inspectionExport(self):
+        return self.inspection_export
+
     @Property("QVariantMap", notify=metricsChanged)
     def metrics(self):
         return self._metrics
@@ -117,6 +129,8 @@ class Controller(QObject):
         self.activity_model.synchronize(self.session.scheduler.jobs, names)
         self.refresh_metrics()
         self.issue_panel.synchronize()
+        self.inspection_panel.synchronize()
+        self.inspection_export.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()
@@ -138,12 +152,13 @@ class Controller(QObject):
 
     def view_state(self):
         return {
+            **presentation.state(self),
             "attachments": self.session.document.attachments_enabled,
             "mode": self.session.document.update_mode,
+            "workspaces": [w.name for w in self.session.document.workspaces],
             "workspace": self.session.active_workspace,
             "hidden": list(self.session.workspace.hidden),
             "unpickable": list(self.session.workspace.unpickable),
-            "workspaces": [w.name for w in self.session.document.workspaces],
             "handles": self.session.workspace.handles,
             "anchors": self.session.workspace.anchors,
             "diagnostics": self.session.workspace.diagnostics,

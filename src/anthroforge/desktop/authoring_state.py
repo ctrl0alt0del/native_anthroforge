@@ -155,7 +155,9 @@ def component_key(reference):
 
 
 def retained_selection(editor):
-    available = {component_key(row[0]) for row in editor.rows}
+    from .presentation import component
+
+    available = {component_key(r[0]) for r in editor.rows if component(editor, r[0], True)}
     return [key for key in editor.selection if key in available]
 
 
@@ -171,6 +173,8 @@ def cache_key(editor):
         display_frame(session, item) if item and not hasattr(item, "primitive") else None,
         editor.editing,
         editor.category,
+        session.workspace.hidden_categories,
+        session.workspace.unpickable_categories,
     )
 
 

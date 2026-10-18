@@ -128,6 +128,11 @@ class IssueTaskScheduler(MeasuredTaskScheduler):
         return Schedule("worker", cost, delay, 150.0, "Read-only advisory checks after editing")
 
 
+class InspectionTaskScheduler(SaveProjectTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule(reason="Frozen inspection export; file and GPU work stay background")
+
+
 def task_schedulers() -> dict[str, TaskScheduler]:
     return {
         "generic": MeasuredTaskScheduler(),
@@ -138,4 +143,5 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "construction": ConstructionTaskScheduler(),
         "control_attachments": ControlAttachmentTaskScheduler(),
         "issue_check": IssueTaskScheduler(),
+        "inspection_report": InspectionTaskScheduler(),
     }

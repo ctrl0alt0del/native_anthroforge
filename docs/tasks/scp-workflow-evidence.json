@@ -1,0 +1,234 @@
+{
+  "method": "Eight serial runtime recordings: closed/open/open/closed, normal and snapped dragging. F12 during gesture; confirmation and undo verified.",
+  "limitations": "Recorded inclusive wall times, not unprofiled overhead or physical display latency. Small synthetic cube/body fixture. No concurrent builds/tests during trials; ordinary desktop background load uncontrolled.",
+  "source": "Task branch after aa76e54 with pending workflow qualification changes; original runtime manifests are retained inside the hashed local profile archives.",
+  "trials": [
+    {
+      "profile": "20261018-115028-2c545f05.afprofile.zip",
+      "sha256": "263916f8a99f4083520a0e81458040293e12ce854e06feb9663fda4985ed68e8",
+      "inspector_open": false,
+      "snapping": false,
+      "complete": true,
+      "input_dispatch": {
+        "count": 89,
+        "inclusive_total_us": 705432.5,
+        "mean_us": 7926.20786516854,
+        "max_us": 33952,
+        "p50_upper_us": 6595.5683996641455,
+        "p95_upper_us": 25266.5821634837
+      },
+      "frame_submission": {
+        "count": 66,
+        "inclusive_total_us": 1335986.1999998093,
+        "mean_us": 20242.21515151226,
+        "max_us": 51236.400000572205,
+        "p50_upper_us": 17865.878691987582,
+        "p95_upper_us": 38966.93874440916
+      }
+    },
+    {
+      "profile": "20261018-115036-2ad70484.afprofile.zip",
+      "sha256": "cf4a98ab016dca2bda2d4c7a63ada68bf036b87bdc1ab9e52d168e225d0db9f8",
+      "inspector_open": false,
+      "snapping": true,
+      "complete": true,
+      "input_dispatch": {
+        "count": 89,
+        "inclusive_total_us": 797913.4999999999,
+        "mean_us": 8965.3202247191,
+        "max_us": 38027.3,
+        "p50_upper_us": 7511.097121932667,
+        "p95_upper_us": 26385.273598656582
+      },
+      "frame_submission": {
+        "count": 67,
+        "inclusive_total_us": 1388260.5,
+        "mean_us": 20720.305970149253,
+        "max_us": 60753.10000038147,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 48391.639150145515
+      }
+    },
+    {
+      "profile": "20261018-115045-ee47b097.afprofile.zip",
+      "sha256": "3418515fa4dbc29f4268de55f201171f1401d45aa20a9196edf9c2675a955ce5",
+      "inspector_open": true,
+      "snapping": false,
+      "complete": true,
+      "input_dispatch": {
+        "count": 89,
+        "inclusive_total_us": 772479.4,
+        "mean_us": 8679.543820224719,
+        "max_us": 62138.8,
+        "p50_upper_us": 7843.686075482716,
+        "p95_upper_us": 22187.12288101405
+      },
+      "frame_submission": {
+        "count": 64,
+        "inclusive_total_us": 1400473.4000005722,
+        "mean_us": 21882.39687500894,
+        "max_us": 82038.0,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 46339.95001184158
+      }
+    },
+    {
+      "profile": "20261018-115054-dfa90448.afprofile.zip",
+      "sha256": "801b28f34c2f01b3fd75fb96e81891368b632b35d5aa49e78ba594d8157118f6",
+      "inspector_open": true,
+      "snapping": true,
+      "complete": true,
+      "input_dispatch": {
+        "count": 89,
+        "inclusive_total_us": 843292.4,
+        "mean_us": 9475.195505617978,
+        "max_us": 36195,
+        "p50_upper_us": 8191.0,
+        "p95_upper_us": 27553.493735033717
+      },
+      "frame_submission": {
+        "count": 67,
+        "inclusive_total_us": 1414287.6999998093,
+        "mean_us": 21108.771641788197,
+        "max_us": 62741.10000038147,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 46339.95001184158
+      }
+    },
+    {
+      "profile": "20261018-115103-034c870b.afprofile.zip",
+      "sha256": "ed0c5d732f2313a971c326c04762bedc35789ea6467ef59f618bd66bedc878cf",
+      "inspector_open": true,
+      "snapping": false,
+      "complete": true,
+      "input_dispatch": {
+        "count": 89,
+        "inclusive_total_us": 775186.6999999997,
+        "mean_us": 8709.962921348311,
+        "max_us": 38079.2,
+        "p50_upper_us": 7843.686075482716,
+        "p95_upper_us": 25266.5821634837
+      },
+      "frame_submission": {
+        "count": 65,
+        "inclusive_total_us": 1395377.0999994278,
+        "mean_us": 21467.339999991196,
+        "max_us": 70484.19999980927,
+        "p50_upper_us": 17865.878691987582,
+        "p95_upper_us": 44375.2457620281
+      }
+    },
+    {
+      "profile": "20261018-115112-cdbbef1e.afprofile.zip",
+      "sha256": "a8f187391ebbd199108d19b96ea549e65de8b771a7e5df47e84a86fac3d46f43",
+      "inspector_open": true,
+      "snapping": true,
+      "complete": true,
+      "input_dispatch": {
+        "count": 89,
+        "inclusive_total_us": 834496.2000000003,
+        "mean_us": 9376.361797752812,
+        "max_us": 36847.9,
+        "p50_upper_us": 8553.690825645373,
+        "p95_upper_us": 31377.744301930863
+      },
+      "frame_submission": {
+        "count": 68,
+        "inclusive_total_us": 1419238.8000001907,
+        "mean_us": 20871.158823532216,
+        "max_us": 60645.10000038147,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 44375.2457620281
+      }
+    },
+    {
+      "profile": "20261018-115121-43ae6313.afprofile.zip",
+      "sha256": "069eca0313b01cce591fda15fc11b0835b219b9ce2c8aa6aece5e0c5d7f7b00b",
+      "inspector_open": false,
+      "snapping": false,
+      "complete": true,
+      "input_dispatch": {
+        "count": 89,
+        "inclusive_total_us": 779961.0999999997,
+        "mean_us": 8763.607865168537,
+        "max_us": 48956.7,
+        "p50_upper_us": 7192.608848889035,
+        "p95_upper_us": 28773.43539555614
+      },
+      "frame_submission": {
+        "count": 67,
+        "inclusive_total_us": 1411870.5,
+        "mean_us": 21072.694029850747,
+        "max_us": 62565.70000076294,
+        "p50_upper_us": 17865.878691987582,
+        "p95_upper_us": 42493.838526804284
+      }
+    },
+    {
+      "profile": "20261018-115129-2b0e6de6.afprofile.zip",
+      "sha256": "8437ba77b9b52909ce34a1289982151e4b347628b5db54b8fee1e981d258eec5",
+      "inspector_open": false,
+      "snapping": true,
+      "complete": true,
+      "input_dispatch": {
+        "count": 89,
+        "inclusive_total_us": 744203.0000000001,
+        "mean_us": 8361.831460674159,
+        "max_us": 34483.4,
+        "p50_upper_us": 7511.097121932667,
+        "p95_upper_us": 25266.5821634837
+      },
+      "frame_submission": {
+        "count": 67,
+        "inclusive_total_us": 1408966.8999996185,
+        "mean_us": 21029.356716412218,
+        "max_us": 55775.29999923706,
+        "p50_upper_us": 17108.381651290747,
+        "p95_upper_us": 44375.2457620281
+      }
+    }
+  ],
+  "portable_qualification": {
+    "passed": true,
+    "executable": "E:\\development\\anthroforge\\build\\portable-017\\final\\AnthroForge.dist\\AnthroForge.exe",
+    "environment": "minimal PATH",
+    "doctor": {
+      "application": "0.1.7",
+      "python": "3.12.12",
+      "platform": "Windows-11-10.0.26220-SP0",
+      "native": {
+        "available": true,
+        "abi": 1,
+        "path": "E:\\development\\anthroforge\\build\\portable-017\\final\\AnthroForge.dist\\anthroforge\\_runtime\\bin\\af_native.dll"
+      },
+      "packages": {
+        "PySide6": "6.12.0",
+        "numpy": "1.26.4",
+        "scipy": null,
+        "scikit-image": null,
+        "pyinstantmeshes": null,
+        "pytetwild": null
+      }
+    },
+    "checks": [
+      "import",
+      "attachments",
+      "primitives",
+      "deformers",
+      "deletion",
+      "curve subdivision",
+      "save",
+      "inspect",
+      "render",
+      "GUI",
+      "runtime profiling",
+      "issue reporting and verified repair",
+      "workflow inspection, units, workspace policies and image/JSON report"
+    ],
+    "source_revision": "190d387625a8dd95d48f42c127d4ec9f3c3c1d2a",
+    "tracked_changes": false,
+    "executable_sha256": "c366f3b4f4d094face8146ee6efafb1678c953d2e9daa639fcfba60226fb4b1a",
+    "inspection_archive_sha256": "55fbfd7aa9fb466a27168a0bd19cb06b1ad06ac369d1965f8d3f3e045fff9a70",
+    "visual_review": "Packaged primitives viewport and selected loft report inspected; context transparency, camera, selection and revisions match."
+  }
+}

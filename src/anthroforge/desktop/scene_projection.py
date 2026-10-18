@@ -158,4 +158,5 @@ def publish(controller):
 def render_record(row):
     names = ("id", "handle", "chunks", "matrix", "geometry_offset", "trs", "quaternion")
     names += ("visible", "pickable", "readonly", "opacity", "color", "asset", "anchors")
+    names += ("surface_visible", "surface_pickable")
     return {name: row[name] for name in names}

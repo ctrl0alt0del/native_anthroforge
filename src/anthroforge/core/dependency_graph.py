@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 
 from .construction import Control, Deformer
+from .cycle_analysis import cycles
 from .entities import SCP
 from .results import Port
 
@@ -42,6 +43,7 @@ class DependencyGraph(Mapping[Port, frozenset[Port]]):
     inputs: Mapping[Port, frozenset[Port]]
     consumers: Mapping[Port, frozenset[Port]]
     blocked: frozenset[Port]
+    cycles: tuple[frozenset[Port], ...] = ()
 
     def __getitem__(self, key: Port) -> frozenset[Port]:
         return self.inputs[key]
@@ -100,4 +102,6 @@ def build(
             control.deformers
         )
     consumers = reverse(result)
-    return DependencyGraph(frozen(result), frozen(consumers), unresolved(result, consumers))
+    return DependencyGraph(
+        frozen(result), frozen(consumers), unresolved(result, consumers), cycles(result, consumers)
+    )

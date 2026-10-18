@@ -50,7 +50,9 @@ Item {
             finite = finite && isFinite(p.x) && isFinite(p.y) && isFinite(p.z);
         }
         const p=gizmo.probe(0);
-        return JSON.stringify({chunks:meshRepeater.count,vertices:vertices,finite:finite,gizmo:[p.x,p.y],handle:gizmo.visible});
+        const c=cameraOrigin.position, r=cameraOrigin.eulerRotation;
+        return JSON.stringify({chunks:meshRepeater.count,vertices:vertices,finite:finite,gizmo:[p.x,p.y],handle:gizmo.visible,
+            camera:[c.x,-c.z,c.y,r.x,r.y,r.z,distance],orthographic:orthographic,selected:workspace.selectedId});
     }
 
     function cameraPoint(x,y,depth) {
@@ -268,7 +270,7 @@ Item {
     SelectionOutline {
         id: selectionOutline; objectName: "selectionOutline"; anchors.fill: parent
         sourceCamera: view.camera; orthographic: viewport.orthographic
-        visible: !!workspace.selectedData.asset && !!workspace.selectedData.visible
+        visible: !!workspace.selectedData.asset && !!workspace.selectedData.surface_visible
     }
     AuthoringView {
         anchors.fill: parent; sourceCamera: view.camera
@@ -311,7 +313,7 @@ Item {
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     Canvas {
         id: anchorMarkers; anchors.fill: parent
-        visible: workspace.state.anchors && !!viewport.selected.id
+        visible: workspace.state.anchors && !workspace.state.hidden_categories.includes("anchors") && !!viewport.selected.id
         onPaint: {
             const ctx=getContext("2d"), points=viewport.selected.anchors || [];
             ctx.clearRect(0,0,width,height);

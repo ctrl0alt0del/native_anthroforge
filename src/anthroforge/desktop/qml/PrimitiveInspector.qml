@@ -63,14 +63,14 @@ ColumnLayout {
         NumericSetting { visible: panel.primitive.kind === "LOFT" && panel.curve.span !== null; label: "Curve span"; value: panel.curve.span || 1; onEdited: value => panel.curveSetting("span",value) }
         Label { text: "Control point"; color: Theme.muted }
         UiCombo { id: pointChoice; objectName: "pointChoice"; Layout.fillWidth: true; model: panel.points.map((p,i)=>"Point "+(i+1)); onActivated: { const rows=authoring.componentRows.filter(r=>r.point===panel.point.id && r.part==="position"); if(rows.length) authoring.selectComponent(rows[0].key,false); } }
-        VectorSetting { label: "Point position · m"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
+        VectorSetting { length: true; label: "Point position"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
         Repeater {
             model: ["left","right"]
             ColumnLayout {
                 required property string modelData
                 Layout.fillWidth: true
                 UiCombo { Layout.fillWidth: true; model: ["AUTO","ALIGNED","FREE","VECTOR"]; currentIndex: Math.max(0,model.indexOf(panel.point[modelData+"_mode"])); onActivated: panel.pointSetting(modelData+"_mode",currentText) }
-                VectorSetting { label: modelData === "left" ? "Left handle" : "Right handle"; values: panel.point[modelData] || [0,0,0]; enabled: panel.point[modelData+"_mode"] === "FREE" || panel.point[modelData+"_mode"] === "ALIGNED"; onEdited: values => panel.pointSetting(modelData,values) }
+                VectorSetting { length: true; label: modelData === "left" ? "Left handle" : "Right handle"; values: panel.point[modelData] || [0,0,0]; enabled: panel.point[modelData+"_mode"] === "FREE" || panel.point[modelData+"_mode"] === "ALIGNED"; onEdited: values => panel.pointSetting(modelData,values) }
             }
         }
         NumericSetting { label: "Radius"; value: panel.point.radius === undefined ? 1 : panel.point.radius; onEdited: value => panel.pointSetting("radius",value) }
@@ -83,11 +83,11 @@ ColumnLayout {
     UiSection {
         title: "Body piece"; visible: panel.item.editing && !!panel.piece.id
         UiCombo { Layout.fillWidth: true; model: ["BOX","CYLINDER","CAPSULE"]; currentIndex: Math.max(0,model.indexOf(panel.piece.shape)); enabled: !panel.topologyLocked; onActivated: panel.pieceSetting("shape",currentText) }
-        NumericSetting { label: "Width · m"; value: panel.piece.width || .1; onEdited: value => panel.pieceSetting("width",value) }
-        NumericSetting { label: "Depth · m"; value: panel.piece.depth || .1; onEdited: value => panel.pieceSetting("depth",value) }
+        NumericSetting { length: true; label: "Width"; value: panel.piece.width || .1; onEdited: value => panel.pieceSetting("width",value) }
+        NumericSetting { length: true; label: "Depth"; value: panel.piece.depth || .1; onEdited: value => panel.pieceSetting("depth",value) }
         UiCheck { text: "Fit entire curve"; checked: panel.piece.fit === undefined || panel.piece.fit; onClicked: panel.pieceSetting("fit",checked) }
-        NumericSetting { label: "Fixed length · m"; value: panel.piece.length || 1; enabled: !panel.piece.fit; onEdited: value => panel.pieceSetting("length",value) }
-        NumericSetting { label: "Position along curve · m"; value: panel.piece.position || 0; onEdited: value => panel.pieceSetting("position",value) }
+        NumericSetting { length: true; label: "Fixed length"; value: panel.piece.length || 1; enabled: !panel.piece.fit; onEdited: value => panel.pieceSetting("length",value) }
+        NumericSetting { length: true; label: "Position along curve"; value: panel.piece.position || 0; onEdited: value => panel.pieceSetting("position",value) }
         NumericSetting { label: "Radial sides"; value: panel.piece.sides || 16; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.pieceSetting("sides",Math.round(value)) }
     }
     DeformerStack { item: panel.item }

@@ -363,3 +363,27 @@ Undo records a compact restart recipe before cancellation retires a job. Cancell
 can finish cleanup while transaction publication is blocked. Cleanup registers dependent
 work before retirement, preserving continuous save blocking. History remains inspectable;
 the Activity panel's 40-row limit does not truncate application history.
+
+## Workflow inspection and presentation
+
+The dependency structure caches strongly connected components alongside reverse edges
+and blocked outputs. Shared inspection queries label true cycle members and downstream
+causes, expose attachment frames through existing batched native queries, and report
+topology restrictions from their existing application policy. The desktop inspector is
+opt-in and revision-gated; it reuses field-level property projection.
+
+Workspace policies own mixed SCP/control membership and reference validation. Deleted
+references remain valid presentation history for undo; new unknown references are
+rejected. Category visibility/pickability are shared policies. Desktop projections apply
+them to displayed geometry and cached native component indexes; pointer movement does
+not introduce Python geometry scans. Numeric/vector adapters convert dimensional fields
+at the UI boundary; canonical geometry and headless operations remain in metres.
+
+Inspection export freezes document/geometry ownership and presentation at invocation.
+Its read-only job uses the existing coordinator and a dedicated background scheduling
+policy. Metadata generation, temporary project encoding, isolated GPU rendering and atomic
+archive publication run outside the GUI thread. The child renderer disables its scheduler
+timer and uses explicit saved-revision inputs; observed camera/selection are verified.
+Job retirement releases snapshot assets; temporary files and processes have bounded,
+cancellable owners. Export failure cannot replace a previous report. The headless core
+does not import Qt; JSON-only inspection has no renderer dependency.

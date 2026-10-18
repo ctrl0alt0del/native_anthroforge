@@ -1,7 +1,63 @@
 # AnthroForge development validation
 
-Current qualification is in [Issue reporting 0.1.6](#issue-reporting-016).
+Current source qualification is in [Workflow improvements 0.1.7](#workflow-improvements-017).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Workflow improvements 0.1.7
+
+The five postponed recommendations are integrated: attachment/dependency inspection,
+precise cycle-member versus downstream issues, mixed workspace management/category
+filters/presets, mm/cm/m display and entry, and frozen image/JSON inspection reports.
+The shared API and [walkthrough](workflow_inspection.md) describe the contracts.
+
+The Windows development gate passed **523 tests**, Ruff/formatting, strict typing,
+native CTest, native/PowerShell function checks, numerical imports and native loading.
+The final source suite passed **525 tests** after adding packaged-launcher and queued
+writer reprioritization regressions; typing/style checks also passed after those changes.
+Seven existing Qt deprecation warnings remain. Additional coverage exercises frozen
+geometry ownership, read-only export, atomic failure/retry/cancellation, deleted
+workspace membership through undo, native attachment anchors, full persistence and
+cycle causes including a 3,000-output chain. The report checks the observed rendered
+camera, projection, selection and revision against its declared snapshot.
+
+Actual GUI acceptance passed unit entry (250 mm stored as 0.25 m), mixed membership,
+independent geometry/curve/handle/hook/cage filtering, native picking exclusions,
+relationship navigation into read-only context, and exporting while the selected
+object is renamed. The Issues GUI regression passed. Rendered workspace, inspector
+and report images were visually inspected; final runs had no QML warnings.
+
+Eight serial profiler trials used inspector closed/open/open/closed, with normal and
+Ctrl-snapped dragging in each pair. Every report was complete; F12 during the gesture,
+confirmation and undo passed. Mean inclusive input dispatch was 7.93–8.76 ms closed
+versus 8.68–8.71 ms open for normal dragging, and 8.36–8.97 ms versus 9.38–9.48 ms for
+snapping. These recorded times include profiler perturbation and ordinary background
+load, not a claim about unprofiled overhead or physical display latency. The small
+cube/body fixture does not qualify full-body performance. [Evidence and hashes](tasks/scp-workflow-evidence.json)
+retain each trial and frame-submission statistics.
+
+Direct ownership/coupling review: dependency evidence is shared between Issues,
+inspection and report export; workspace policy owns reference/editability validation;
+presentation filters feed cached native picking indexes. Unit conversion lives at
+the dimensional input boundary. The report job owns frozen references and temporary
+files/processes under the existing coordinator, without a second worker pool or save
+barrier. Geometry queries remain native; Python handles domain graphs and orchestration.
+Inspector details are opt-in and revision-gated. Numerical algorithms are unchanged.
+
+The final executable was built from clean tracked source at `190d387`, version 0.1.7.0.
+A relocated copy passed the complete portable gate with minimal PATH and developer
+Python/Qt settings removed: import, attachments, primitives/deformers, deletion,
+subdivision, save/reopen, render pixels, GUI, runtime profiling, verified issue repair,
+and mixed workspace/units/image+JSON report export. Packaged viewport and report images
+were visually inspected. The report retained revision 36, its selected loft, mixed
+workspace, millimetres and selection filters; the other geometry remained transparent.
+Executable/report hashes and the exact check list are retained in the compact evidence.
+
+The preliminary relocated report test found Nuitka's `sys.executable` naming an absent
+`python.exe`. A disposable interpreter-name alias isolated that launcher failure; the
+production adapter now uses the actual compiled application's `sys.argv[0]`. The final
+relocated export passed without any alias. The original distribution was preserved;
+the qualified executable is `dist/0.1.7/AnthroForge.dist/AnthroForge.exe`, with companion
+source archive `dist/AnthroForge-0.1.7-source.zip`. Keep the entire portable folder together.
 
 ## Issue reporting 0.1.6
 

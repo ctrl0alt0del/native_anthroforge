@@ -37,9 +37,9 @@ UiSection {
             ColumnLayout {
                 visible: bindingPanel.binding.kind === "HOOK"; Layout.fillWidth: true
                 UiCombo { Layout.fillWidth: true; model: ["NONE","CURVE","SMOOTH","SPHERE","ROOT","SHARP","LINEAR","CONSTANT","INVERSE_SQUARE"]; currentIndex: model.indexOf(bindingPanel.binding.falloff); onActivated: bindingPanel.set("falloff",currentText) }
-                NumericSetting { label: "Falloff radius · m"; value: bindingPanel.binding.radius; onEdited: value => bindingPanel.set("radius",value) }
+                NumericSetting { length: true; label: "Falloff radius"; value: bindingPanel.binding.radius; onEdited: value => bindingPanel.set("radius",value) }
                 UiCheck { text: "Uniform falloff"; checked: bindingPanel.binding.uniform; onClicked: bindingPanel.set("uniform",checked) }
-                VectorSetting { label: "Falloff center"; values: bindingPanel.binding.center; onEdited: values => authoring.edit("hook.recenter",{binding:bindingPanel.binding.id,center:values}) }
+                VectorSetting { length: true; label: "Falloff center"; values: bindingPanel.binding.center; onEdited: values => authoring.edit("hook.recenter",{binding:bindingPanel.binding.id,center:values}) }
                 UiField { visible: bindingPanel.binding.falloff === "CURVE"; Layout.fillWidth: true; placeholderText: "Falloff XY pairs"; text: bindingPanel.binding.custom.join(", "); onEditingFinished: bindingPanel.set("custom",text.split(",").map(Number)) }
                 UiField { visible: bindingPanel.binding.falloff === "CURVE"; Layout.fillWidth: true; placeholderText: "AUTO / VECTOR / AUTO_CLAMPED per point"; text: bindingPanel.binding.custom_handles.join(", "); onEditingFinished: bindingPanel.set("custom_handles",text.trim()?text.split(",").map(s=>s.trim().toUpperCase()):[]) }
                 UiCheck { visible: bindingPanel.binding.falloff === "CURVE"; text: "Extrapolate falloff ends"; checked: bindingPanel.binding.custom_extrapolate; onClicked: bindingPanel.set("custom_extrapolate",checked) }

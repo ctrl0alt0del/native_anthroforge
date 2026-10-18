@@ -13,6 +13,7 @@ from . import (
     drawing_operations,
     drawing_projection,
     evaluation,
+    fiber_bindings,
     fiber_operations,
     image_operations,
     image_presentation,
@@ -35,6 +36,8 @@ if TYPE_CHECKING:
 EDITS = {
     "fiber.create": fiber_operations.create,
     "fiber.binding.scope": fiber_operations.binding_scope,
+    "fiber.binding.set": fiber_bindings.assign,
+    "fiber.binding.remove": fiber_bindings.remove,
     "image.import": image_operations.import_image,
     "image.replace": image_operations.replace_source,
     "image.instance": image_operations.instance,

@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.construction import Curve, CurvePoint
+from anthroforge.core.curve_shapes import reshaped
 from anthroforge.native import curve_queries
 
 from .construction_codec import tuples
@@ -49,7 +50,7 @@ def insert(session: "Session", curve: str, index: int, point: dict[str, Any]) ->
     if not 0 <= index <= len(item.points):
         raise ValueError("Point insertion index is outside the curve.")
     added = CurvePoint(**tuples(point))
-    install(session, replace(item, points=(*item.points[:index], added, *item.points[index:])))
+    install(session, reshaped(item, points=(*item.points[:index], added, *item.points[index:])))
     return added.id
 
 
@@ -57,7 +58,7 @@ def remove(session: "Session", curve: str, point: str) -> None:
     item = selected(session, curve)
     if point not in {p.id for p in item.points}:
         raise ValueError("Unknown authored curve point.")
-    install(session, replace(item, points=tuple(p for p in item.points if p.id != point)))
+    install(session, reshaped(item, points=tuple(p for p in item.points if p.id != point)))
 
 
 def subdivide(session: "Session", curve: str, segment: int, parameter: float) -> str:

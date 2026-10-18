@@ -4,6 +4,7 @@ from dataclasses import asdict, replace
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.construction import BodyPiece, Curve, CurvePoint, ResolvedPrimitive, Thickness
+from anthroforge.core.curve_shapes import reshaped
 from anthroforge.core.entities import SCP, Attachment
 from anthroforge.core.results import EvaluationResult
 from anthroforge.native import curve_editing
@@ -149,7 +150,7 @@ def point_update(session: "Session", entity: str, curve: str, point: str, **opti
     index = next(i for i, p in enumerate(selected.points) if p.id == point)
     changed = curve_editing.point(session.engine, selected, index, codec.tuples(options))
     points = tuple(changed if p.id == point else p for p in selected.points)
-    replace_curve(session, entity, primitive, replace(selected, points=points))
+    replace_curve(session, entity, primitive, reshaped(selected, points=points))
 
 
 def replace_curve(
@@ -173,7 +174,7 @@ def point_insert(
         raise ValueError("Point insertion index is outside the curve.")
     added = CurvePoint(**codec.tuples(point))
     points = (*selected.points[:index], added, *selected.points[index:])
-    replace_curve(session, entity, primitive, replace(selected, points=points))
+    replace_curve(session, entity, primitive, reshaped(selected, points=points))
     return added.id
 
 
@@ -181,7 +182,7 @@ def point_remove(session: "Session", entity: str, curve: str, point: str) -> Non
     primitive = definition(session, entity)
     selected = next(c for c in primitive.curves if c.id == curve)
     points = tuple(p for p in selected.points if p.id != point)
-    replace_curve(session, entity, primitive, replace(selected, points=points))
+    replace_curve(session, entity, primitive, reshaped(selected, points=points))
 
 
 def curve_split(session: "Session", entity: str, curve: str, segment: int, parameter: float) -> str:

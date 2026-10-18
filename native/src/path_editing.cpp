@@ -12,6 +12,7 @@ static ParameterPath parameter_path(uint64_t handle) {
     return {value,read_samples(value->samples.data(),int(value->parameters.size())),end};
 }
 static V3 parameter_point(const ParameterPath& value,double parameter) {
+    if(value.path->closed&&value.end>0) parameter=std::fmod(parameter,value.end);
     const auto& p=value.path->parameters; const auto& samples=value.samples;
     const auto next=std::upper_bound(p.begin(),p.end(),parameter);
     if(next==p.begin()) return samples.front().position;
@@ -35,18 +36,24 @@ static double nearest_parameter(const ParameterPath& value,const V3& point,doubl
     }
     return chosen;
 }
+static std::vector<double> initial_mapping(const ParameterPath& opening,const int* indices,int count,bool closed) {
+    std::vector<double> result(indices,indices+count);
+    const double last=opening.end-(opening.path->closed?1:0);
+    if(result.front()<0) result.front()=0;
+    if(!closed&&result.back()<0) result.back()=last;
+    result.push_back(closed&&opening.path->closed?opening.end+result.front():opening.end);
+    return result;
+}
 static std::vector<double> correspondence(const ParameterPath& opening,const double* records,
     const int* indices,int count,bool closed,uint64_t cancel) {
     if(count<(closed?3:2)||!records||!indices) throw std::runtime_error("Invalid edit correspondence.");
-    std::vector<double> result(indices,indices+count); result.push_back(opening.end);
-    const double last=opening.end-(opening.path->closed?1:0);
-    if(result.front()!=0||(!closed&&result[count-1]!=last)) throw std::runtime_error("Preserve curve endpoint correspondence.");
+    auto result=initial_mapping(opening,indices,count,closed);
     for(int i=1;i<count;++i) {
         if(result[i]>=0) continue;
         int next=i+1; while(result[next]<0) ++next;
         result[i]=nearest_parameter(opening,V3(records+13*i),result[i-1],result[next],cancel);
     }
-    if(!std::is_sorted(result.begin(),result.end())||result.back()>opening.end)
+    if(!std::is_sorted(result.begin(),result.end())||result[count-1]>opening.end-(opening.path->closed?1:0))
         throw std::runtime_error("Authored point ordering must preserve correspondence.");
     return result;
 }
@@ -55,11 +62,23 @@ static double remap_parameter(const std::vector<double>& mapping,double paramete
     const double t=std::clamp(parameter-double(index),0.0,1.0);
     return mapping[index]*(1-t)+mapping[index+1]*t;
 }
+static V3 residual(const ParameterPath& current,const ParameterPath& opening,double parameter) {
+    return parameter_point(current,parameter)-parameter_point(opening,parameter);
+}
+static V3 mapped_residual(const ParameterPath& current,const ParameterPath& opening,
+                          const std::vector<double>& mapping,double parameter,bool closed) {
+    const double segment=std::floor(parameter);
+    if(closed&&!opening.path->closed&&segment==double(mapping.size()-2)) {
+        const double t=parameter-segment;
+        return residual(current,opening,mapping[mapping.size()-2])*(1-t)+residual(current,opening,mapping.front())*t;
+    }
+    return residual(current,opening,remap_parameter(mapping,parameter));
+}
 static void rebase_samples(EvaluatedPath& output,const ParameterPath& current,const ParameterPath& opening,
-                           const std::vector<double>& mapping,uint64_t cancel) {
+                           const std::vector<double>& mapping,bool closed,uint64_t cancel) {
     for(size_t i=0;i<output.samples.size();++i) {
-        check_cancel(cancel); const double parameter=remap_parameter(mapping,output.parameters[i]);
-        output.samples[i].position+=parameter_point(current,parameter)-parameter_point(opening,parameter);
+        check_cancel(cancel);
+        output.samples[i].position+=mapped_residual(current,opening,mapping,output.parameters[i],closed);
     }
 }
 static void rebase_controls(double* records,int count,const ParameterPath& current,const ParameterPath& opening,
@@ -101,7 +120,7 @@ uint64_t af_path_rebase(uint64_t current_handle,uint64_t opening_handle,uint64_t
         const auto draft=af::parameter_path(draft_handle);
         const auto mapping=af::correspondence(opening,records,indices,count,draft.path->closed,cancel);
         af::EvaluatedPath output{draft.samples,draft.path->parameters};
-        af::rebase_samples(output,current,opening,mapping,cancel);
+        af::rebase_samples(output,current,opening,mapping,draft.path->closed,cancel);
         std::copy_n(records,count*13,controls); af::rebase_controls(controls,count,current,opening,mapping);
         af::edited_tangents(output.samples,draft.path->closed,cancel);
         return af::retain_path(af::make_path(output,draft.path->closed,cancel));

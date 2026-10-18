@@ -11,18 +11,21 @@ class FiberEdit:
     baseline: str
     candidates: tuple[str, ...]
     rebind: tuple[str, ...] = ()
+    shape: bool = True
 
 
 @dataclass(frozen=True, slots=True)
 class FiberBinding:
     point: str
     target: str
-    attachment: Attachment
+    attachment: Attachment | None = None
     capture_scope: str = "CURRENT_PARENT"
 
     def __post_init__(self) -> None:
-        if not self.point or not self.target or not self.attachment.binding:
-            raise ValueError("Fiber binding requires a point, target and captured attachment.")
+        if not self.point or not self.target:
+            raise ValueError("Fiber binding requires an authored point and anatomical target.")
+        if self.attachment is not None and not self.attachment.binding:
+            raise ValueError("A captured fiber attachment requires its surface binding.")
         if self.capture_scope not in ("CURRENT_PARENT", "ANY_PARENT"):
             raise ValueError("Invalid fiber capture scope.")
 

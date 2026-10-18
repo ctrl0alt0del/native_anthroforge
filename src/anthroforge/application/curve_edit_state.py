@@ -4,6 +4,7 @@ from dataclasses import replace
 from typing import Any, cast
 
 from anthroforge.core.construction import Curve
+from anthroforge.core.curve_shapes import binding_shape
 from anthroforge.core.fibers import Fiber, FiberEdit
 
 from .attachment_candidates import eligible
@@ -17,27 +18,37 @@ def current(session: Any, item: Any) -> Any:
 
 
 def prepare[T](session: Any, before: Any, changed: T) -> T:
-    if (
-        not isinstance(before, Fiber)
-        or not isinstance(changed, Fiber)
-        or not shape_changed(before, changed)
-    ):
+    if not isinstance(before, Fiber) or not isinstance(changed, Fiber):
         return changed
+    bindings_changed = binding_shape(before) != binding_shape(changed)
+    if not shape_changed(before, changed) and not bindings_changed:
+        return changed
+    if not shape_changed(current(session, before), changed) and not bindings_changed:
+        return cast(T, replace(changed, points=before.points))
     return cast(T, prepare_fiber(session, before, changed))
 
 
 def prepare_fiber(session: Any, before: Fiber, changed: Fiber) -> Fiber:
     opening = current(session, before)
     edit = before.edit or baseline(session, before)
-    previous = {p.id: p for p in opening.points}
-    moved = {
-        p.id
-        for p in changed.points
-        if p.id not in previous or p.position != previous[p.id].position
-    }
-    bound = {b.point for b in changed.bindings}
-    edit = replace(edit, rebind=tuple(sorted(set(edit.rebind) | (moved & bound))))
+    targets = set(edit.candidates) | {b.target for b in changed.bindings}
+    edit = replace(
+        edit,
+        candidates=tuple(sorted(targets)),
+        rebind=tuple(sorted(set(edit.rebind) | moved_anchors(opening, changed))),
+        shape=edit.shape or shape_changed(opening, changed),
+    )
     return replace(changed, edit=edit)
+
+
+def moved_anchors(before: Fiber, after: Fiber) -> set[str]:
+    previous = {p.id: p for p in before.points}
+    bound = {b.point for b in after.bindings}
+    return {
+        p.id
+        for p in after.points
+        if p.id in bound and (p.id not in previous or p.position != previous[p.id].position)
+    }
 
 
 def shape_changed(before: Curve, after: Curve) -> bool:
@@ -50,4 +61,4 @@ def shape_changed(before: Curve, after: Curve) -> bool:
 def baseline(session: Any, item: Fiber) -> FiberEdit:
     if item.result.asset not in session.resources.paths:
         raise ValueError("Fiber editing needs its last accepted path.")
-    return FiberEdit(item.result.asset, eligible(session.document, item.id))
+    return FiberEdit(item.result.asset, eligible(session.document, item.id), shape=False)

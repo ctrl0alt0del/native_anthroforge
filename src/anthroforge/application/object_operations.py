@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from anthroforge.core import curve_engines
 from anthroforge.core.construction import Curve, CurvePoint
+from anthroforge.core.curve_shapes import reshaped
 from anthroforge.core.object_registry import Construction
 from anthroforge.core.objects import ConstructionObject
 from anthroforge.native import curve_editing
@@ -142,7 +143,7 @@ def new_curve(name: str, points: list[dict[str, Any]] | None, parent: str, owner
 def edit_curve(session: "Session", curve: str, **options: Any) -> None:
     from .construction_codec import tuples
 
-    item = editable(session, curve)
+    item = curve_edit_state.current(session, editable(session, curve))
     if not isinstance(item, Curve):
         raise ValueError("Select a curve or fiber.")
     if set(options) - {"name", "closed", "resolution"}:
@@ -158,7 +159,7 @@ def updated_curve(item: Curve, options: dict[str, Any]) -> Curve:
     if "resolution" in settings:
         config = curve_engines.decode(item.engine, dict(resolution=settings.pop("resolution")))
         settings["engine_settings"] = config
-    return replace(item, **settings)
+    return reshaped(item, **settings)
 
 
 def edit_point(session: "Session", curve: str, point: str, **options: Any) -> None:

@@ -49,5 +49,6 @@ def decode_curve(kind: str, state: dict[str, Any]) -> Curve:
 
 def decode_binding(data: dict[str, Any]) -> FiberBinding:
     state = dict(data)
-    state["attachment"] = Attachment(**tuples(state["attachment"]))
+    value = state.get("attachment")
+    state["attachment"] = Attachment(**tuples(value)) if value else None
     return FiberBinding(**state)

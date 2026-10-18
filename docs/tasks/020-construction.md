@@ -483,3 +483,24 @@ rejected handoffs leave the solver's direct-reference attempt intact.
 All three native contracts and 11 routing/parity/workflow tests pass. Changed-native
 style passes. Broader anatomical/warm qualification and the remaining 0.2.0 workflow
 remain required; version is still 0.1.9.
+
+## Fiber binding lifecycle
+
+Shared commands now add, reassign/recapture and remove structural bindings. A chosen
+parent with an explicit pending capture is authored state; accepted fields always contain
+captured attachments. Requests, current-shape baselines and Manual behavior round-trip.
+Open endpoint insertion/removal transfers the mandatory parent choice; closed-to-open
+conversion requires both endpoint choices first. Consumer and standalone editors use the
+same shape policy. Workspace association includes explicitly chosen anatomical parents.
+
+New tests exposed native frame changes during binding-only edits and a restriction that
+rejected endpoint topology edits. Attachment resolution now preserves frames for unchanged
+shape/translation; shape correspondence supports endpoint extension/trimming and closure
+changes. No-op point edits return before resolving handles, avoiding floating-point-only
+changes to authored state. Binding-only edits recapture the resolved path without rebuilding it.
+
+28 focused binding/fiber/routing/architecture checks pass; mypy, Ruff, native build and
+three native contracts pass. Changed-native style passes. Full-QML offscreen acceptance
+invokes actual Bind/Remove actions plus fiber creation and gesture undo. This is not
+interactive visual acceptance. Copy-resource remapping, full interior-binding conversion,
+junctions, surfaces, wider parity/performance evidence and release qualification remain.

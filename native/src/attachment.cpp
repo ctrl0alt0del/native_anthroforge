@@ -369,6 +369,17 @@ static void attached_tangents(Samples& samples,bool closed) {
         if(difference.norm()>1e-20) samples[i].tangent=difference.normalized();
     }
 }
+static bool attached_positions(Samples& samples,const double* points,const M4& inverse,uint64_t cancel) {
+    V3 first=V3::Zero(); bool varied=false;
+    for(size_t i=0;i<samples.size();++i) {
+        check_cancel(cancel); const V3 position=point(inverse,V3(points+3*i));
+        const V3 delta=position-samples[i].position;
+        if(i==0) first=delta;
+        varied=varied||(delta-first).squaredNorm()>1e-28;
+        samples[i].position=position;
+    }
+    return varied;
+}
 }
 int af_curve_attachment_capture(int count,const uint64_t* meshes,const double* frames,uint64_t path,
     const double* records,int knots,const double* world,const int* pins,const int* parents,int pin_count,const double* retained,
@@ -399,10 +410,9 @@ uint64_t af_attached_path(uint64_t handle,const double* points,const double* wor
     try {
         const auto source=af::path(handle); const af::M4 inverse=Eigen::Map<const af::M4>(world).inverse();
         af::EvaluatedPath value{af::read_samples(source->samples.data(),int(source->parameters.size())),source->parameters};
-        for(size_t i=0;i<value.samples.size();++i) {
-            af::check_cancel(cancel); value.samples[i].position=af::point(inverse,af::V3(points+3*i));
+        if(af::attached_positions(value.samples,points,inverse,cancel)) {
+            af::attached_tangents(value.samples,source->closed); af::curve_frames(value.samples,source->closed,cancel,true);
         }
-        af::attached_tangents(value.samples,source->closed); af::curve_frames(value.samples,source->closed,cancel,true);
         return af::retain_path(af::make_path(value,source->closed,cancel));
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

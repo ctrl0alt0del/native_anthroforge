@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import Workspace, descendants
+from anthroforge.core.fibers import Fiber
 from anthroforge.core.image_presentation import decode as decode_image
 from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
 
@@ -95,11 +96,18 @@ def associations(document: Document, target: str) -> set[str]:
             continue
         seen.add(key)
         if key in document.registry.construction:
-            anatomy.update(document.registry.construction[key].owners)
+            anatomy.update(object_anatomy(document.registry.construction[key]))
             pending.extend(consumers(document, {key}))
         elif key in document.index.entities or key in document.index.controls:
             anatomy.add(key)
     return anatomy
+
+
+def object_anatomy(item: Any) -> set[str]:
+    related = set(item.owners)
+    if isinstance(item, Fiber):
+        related.update(b.target for b in item.bindings)
+    return related
 
 
 def included(document: Document, workspace: Workspace, target: str) -> bool:

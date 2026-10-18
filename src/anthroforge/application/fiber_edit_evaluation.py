@@ -34,6 +34,8 @@ def evaluate(
 
 
 def edited_geometry(engine: Any, current: Any, opening: Any, item: Fiber, cancel: int) -> Any:
+    if item.edit is not None and not item.edit.shape:
+        return current.path, construction.curve_records(current.authored)
     if item.engine != "ROUTED" and item.engine == opening.engine:
         return path_editing.rebase(current.path, opening, item, cancel)
     # Routed constraints are authored points; their connecting path is solved after rebinding.
@@ -49,7 +51,9 @@ def capture_request(item: Fiber, path: Any, records: Any, world: Any) -> Any:
     pins = [indices[b.point] for b in item.bindings]
     parents = [
         -1
-        if b.point in item.edit.rebind and b.capture_scope == "ANY_PARENT"
+        if b.attachment is not None
+        and b.point in item.edit.rebind
+        and b.capture_scope == "ANY_PARENT"
         else item.edit.candidates.index(b.target)
         for b in item.bindings
     ]
@@ -59,7 +63,10 @@ def capture_request(item: Fiber, path: Any, records: Any, world: Any) -> Any:
 def retained_bindings(item: Fiber) -> list[tuple[float, ...]]:
     assert item.edit is not None
     missing = (-1.0,) * 28
-    return [missing if b.point in item.edit.rebind else b.attachment.binding for b in item.bindings]
+    return [
+        missing if b.attachment is None or b.point in item.edit.rebind else b.attachment.binding
+        for b in item.bindings
+    ]
 
 
 def recapture(

@@ -57,8 +57,9 @@ def run():
         assert engine.rootObjects(), warnings
         create(controller, engine)
         editing(controller)
+        bindings(controller, engine)
         assert not warnings, warnings
-        print("Offscreen desktop fiber creation, Construction entry and staged path passed.")
+        print("Offscreen desktop fiber creation, binding edits, gestures and staged path passed.")
     finally:
         controller.close()
         delete(engine)
@@ -97,6 +98,40 @@ def undo_drag(controller, fiber, opening):
         controller.session.document.object(fiber).result.asset
     ]
     np.testing.assert_allclose(asset.path.array()[0, :3], opening)
+
+
+def bindings(controller, engine):
+    fiber = controller.selection
+    controller.run(
+        "curve.point.insert", dict(curve=fiber, index=1, point=dict(position=[0, 0.2, 1]))
+    )
+    settle(controller)
+    select_interior(controller, fiber)
+    click_binding(controller, engine, "setFiberBinding")
+    assert len(controller.session.document.object(fiber).bindings) == 3
+    click_binding(controller, engine, "removeFiberBinding")
+    assert len(controller.session.document.object(fiber).bindings) == 2
+
+
+def select_interior(controller, fiber):
+    point = controller.session.document.object(fiber).points[1].id
+    row = next(
+        r
+        for r in controller.authoring.componentRows
+        if r["point"] == point and r["part"] == "position"
+    )
+    controller.authoring.selectComponent(row["key"], False)
+    settle(controller)
+
+
+def click_binding(controller, engine, name):
+    from ui_acceptance import find
+
+    button = find(engine.rootObjects()[0], name)
+    assert button.property("enabled") and QMetaObject.invokeMethod(
+        button, "clicked", Qt.DirectConnection
+    )
+    settle(controller)
 
 
 if __name__ == "__main__":

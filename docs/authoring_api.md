@@ -350,7 +350,13 @@ Dense attachment fields are independently owned project resources; source edits 
 change them. Current-shape point edits use the ordinary curve operations. They retain the current dense
 shape, rebind changed anchors and preserve unchanged canonical anchors in the same transaction.
 `fiber.binding.scope(curve, point, scope)` chooses `CURRENT_PARENT` or `ANY_PARENT` for a
-bound authored point. Parent movement resolves its retained binding without choosing a new
+bound authored point. `fiber.binding.set(curve, point, target, scope?)` adds or reassigns a
+binding at the current shape; using its existing target explicitly recaptures it.
+`fiber.binding.remove(curve, point)` removes an optional structural binding. Both open
+endpoints and at least one closed anchor must remain bound. Extend or remove an open
+endpoint to transfer its parent choice to the new endpoint; opening a closed fiber requires
+choosing both endpoint bindings first. Pending capture requests survive Manual-mode saving.
+Parent movement resolves its retained binding without choosing a new
 parent. Entering edit mode is a read-only query. Routed fibers edit authored constraints,
 then resolve their connecting path through the solver. Binding addition/removal, full conversion
 coverage and release qualification are still under implementation; these

@@ -42,16 +42,25 @@ class GeometryEngine(NativeEngine):
         self._curve_signatures()
 
     def _curve_signatures(self) -> None:
-        from . import attachment_weights, curve_editing, curve_queries, drawing, paths, strokes
-        from .attachment_fields import configure as configure_fields
-        from .path_editing import configure as configure_editing
-        from .point_attachments import configure as configure_points
+        from . import curve_editing, curve_queries, drawing, path_editing, paths, routing, strokes
 
-        for module in (attachment_weights, curve_editing, curve_queries, drawing, paths, strokes):
+        for module in (
+            curve_editing,
+            curve_queries,
+            drawing,
+            path_editing,
+            paths,
+            routing,
+            strokes,
+        ):
             module.configure(self)
-        configure_points(self)
-        configure_fields(self)
-        configure_editing(self)
+        self._binding_signatures()
+
+    def _binding_signatures(self) -> None:
+        from . import attachment_fields, attachment_weights, point_attachments
+
+        for module in (attachment_fields, attachment_weights, point_attachments):
+            module.configure(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

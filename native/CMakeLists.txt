@@ -5,7 +5,9 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/mesh_topology.cpp src/curve_frames.cpp src/curve_mapping.cpp src/component_index.cpp
     src/curve_queries.cpp src/influence.cpp src/control_geometry.cpp src/measurement.cpp
     src/path_registry.cpp src/path_presentation.cpp src/image.cpp src/image_placement.cpp
-    src/curve_fit.cpp src/drawing.cpp src/attachment_weights.cpp src/path_editing.cpp)
+    src/curve_fit.cpp src/drawing.cpp src/attachment_weights.cpp src/path_editing.cpp
+    src/routing.cpp src/routing_world.cpp src/routing_reference.cpp src/routing_solve.cpp
+    src/routing_planner.cpp src/routing_candidates.cpp src/routing_surface.cpp src/routing_handoff.cpp)
 
 add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_cubic_refit.c

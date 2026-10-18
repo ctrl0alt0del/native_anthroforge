@@ -12,16 +12,19 @@ def differential_fiber(session):
         "curve.create", points=[dict(position=[x, 0, 0.7]) for x in (0, 0.75, 1.5)]
     )
     session.wait()
-    points = session.document.object(source).points
-    bindings = [
-        dict(point=p.id, target=t)
-        for p, t in zip((points[0], points[-1]), (first, second), strict=True)
-    ]
+    bindings = endpoints(session.document.object(source), (first, second))
     session.command("fiber.create", curve=source, bindings=bindings)
     session.wait()
     session.command("scp.transform", entity=second, values=[1.5, 0, 1, 0, 0, 0, 1, 1, 1])
     session.wait()
     return first, session.document.objects[-1].id
+
+
+def endpoints(curve, parents):
+    return [
+        dict(point=p.id, target=t)
+        for p, t in zip((curve.points[0], curve.points[-1]), parents, strict=True)
+    ]
 
 
 def supports(session):

@@ -400,3 +400,24 @@ not a Fiber-specific exception. The regression and 115 related primitive/parity,
 fiber-editing and architecture checks pass; mypy, Ruff and changed-native style pass.
 Routing migration is next. Full routing, binding lifecycle, junctions, general surfaces
 and the remaining qualification recorded above are still unfinished.
+
+## Native routing migration checkpoint (not yet exposed as a complete engine)
+
+Pinned the production addon's collision/contact/SQP numerical closure with source hashes
+and reproducible extraction. Native adapters capture owned surfaces, transforms, scales,
+reference nodes, hard-pin span sessions, closed global solve state, cancellation between
+trials, path output and diagnostics. Python only packs the call. No Blender runtime or
+second worker pool is introduced. Existing application routing remains explicitly unavailable
+until integration and the complete planner contract qualify.
+
+Ported initial direct/compatibility/projected-surface preparation and exact corner-preserving
+handoff. A cube-detour test first failed because uniform resampling cut planner corners;
+porting the addon's allocation/handoff semantics resolved that difference. Four actual-addon
+fixtures now agree to absolute 1e-10; native cancellation/membership/open/closed checks pass.
+18 focused checks, mypy, Ruff, function limits, native build/contracts and changed-native style
+pass. The complete sparse/dense/expanded/pin-exit planner, warm inputs, failure diagnostics,
+application/desktop routing and representative anatomical qualification remain required.
+Do not claim these four small fixtures establish all routing acceptance.
+
+This checkpoint also fixes the fixture helper's formatting-induced function-length failure.
+Version remains 0.1.9. Full gate is pending this kernel increment; no visible UI was used.

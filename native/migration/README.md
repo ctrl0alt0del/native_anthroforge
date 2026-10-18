@@ -26,3 +26,27 @@ Generic point capture/resolution now shares `attachment.cpp`'s existing surface 
 and the unchanged migration kernel's `af_surface_frame`. Batched input avoids synthetic
 SCPs and per-point Python numerical queries. Bindings retain canonical triangle vertices,
 barycentric coordinates and frame offsets; ordinary resolution never selects a new parent.
+
+## Production routing kernel closure (integration in progress)
+
+`routing/sources.json` pins the production addon's numerical headers and the collision
+portion of `af_fiber_ccd.cpp` by source hashes and exact line ranges. Reproduce with
+`tools/capture_routing_kernels.py ADDON_PATH`. These unchanged reference files retain
+the upstream formatting. Owned adapters in `src/routing*.cpp` follow the function limit.
+Only this numerical closure is compiled: no addon Python, Blender objects or dependency
+graph, muscle/skin code, public legacy ABI, or competing OpenMP pool. Kernel entry points
+are private to the adapter. The application's existing coordinator owns work concurrency.
+
+Native adapters own surface snapshots, transforms, direct-reference allocation, open
+hard-pin spans/global closed paths, production SQP settings, cancellation between trials,
+path correspondence and output preparation. Planner preparation is being ported from
+`core/vcp/v2/planner.py` and its production session helpers. Current extraction covers
+direct/compatibility/projected-surface routes and corner-preserving handoff, not yet the
+complete sparse/dense/expanded and pin-exit recovery chain. Do not label this as complete
+routing parity or expose it as the finished application engine.
+
+`tests/fixtures/routing/addon.json` contains compact actual addon outputs and loaded-source
+hashes. The four current cases cover clear open/closed paths and a cube detour/bound route.
+They match the standalone numerical output to absolute 1e-10. This does not establish
+production anatomical, full planner, GUI or release acceptance. Capture through
+`tools/capture_routing_reference.py ADDON_PATH OUTPUT_PATH` without Blender/desktop input.

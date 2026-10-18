@@ -1,7 +1,50 @@
 # AnthroForge development validation
 
-Current qualification is in [Activity presentation 0.1.5](#activity-presentation-015).
+Current qualification is in [Issue reporting 0.1.6](#issue-reporting-016).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Issue reporting 0.1.6
+
+The standalone issue framework adapts the addon's producer-scoped repository,
+generation/epoch checks, registered detection, read-only presentation and explicit
+verified repairs. The [component map](issues.md) traces the inspected addon sources
+and their standalone owners. Current providers cover SCP/control evaluation,
+missing accepted attachment surfaces, dependency-blocked outputs and failed tasks.
+Fiber/skin geometry detectors await those domain systems; blocked dependencies are
+not advertised as exact cycle paths.
+
+At `069a05d`, the complete Windows development gate passed **512 tests**, Ruff,
+formatting, typing, native CTest, native/PowerShell function checks, numerical
+dependency imports and native loading. Seven existing Qt deprecation warnings
+remain. Tests cover stale tickets, failed/malformed provider isolation, cancelled
+checks and repairs, retry verification, undo/redo, Open/delete, dismissal, Manual
+updates, cycles and retained geometry. Save with every policy remains available
+during read-only diagnostic work. A subprocess detects and repairs an issue without
+importing Qt or Blender.
+
+Actual Qt GUI checks passed filtering, evidence inspection, selecting/framing
+targets, dismiss/restore, explicit recalculation, fresh verification and New.
+The Activity GUI acceptance also passed after sharing the incremental row model.
+The final Issues run had no QML warnings; its rendered captures were inspected.
+
+Eight serial recorded drag trials used Issues closed/open/open/closed for both
+normal and Ctrl-snapped curve editing. F12 toggled inside the gestures; confirmation
+and undo passed. All captures were complete and observed zero issue-model changes
+during the drag intervals. Mean inclusive input dispatch ranged 6.34–6.68 ms normal
+and 6.79–7.19 ms snapped. Recording perturbs timings; these are not unprofiled
+overhead or physical display-latency claims. [Evidence and hashes](tasks/issue-reporting-evidence.json)
+retain per-trial values and the excluded fixture-run explanation.
+
+Direct ownership review, separately from test results: evidence and freshness have
+one repository/reporting owner; detector lifecycle uses the existing coordinator;
+registered repairs invoke existing operations and require new verification. The
+desktop owns labels, navigation and keyed model projection. No anatomy payload,
+undo state, geometry-output reservation or save barrier belongs to diagnostics.
+Project/undo resets invalidate prior epochs; retired jobs release captured documents.
+No second worker pool, Blender dependency or Python numerical geometry solver was added.
+
+Portable qualification and delivery state are tracked in the
+[task handoff](tasks/issue-reporting.md).
 
 ## Activity presentation 0.1.5
 

@@ -45,14 +45,21 @@ failure as retryable evidence, and successful synchronous task rechecks complete
 verification immediately. Malformed duplicate detector identities are isolated per scope.
 A subprocess exercises issue detection/repair with no Qt or Blender imports.
 
+Outage recovery on 2026-10-18: fetched origin and confirmed `069a05d` is pushed;
+main remains at the starting revision. The complete 512-test gate and final GUI
+evidence survived. Packaging stopped during C linking, with no build process left
+running and the previous 0.1.5 executable still installed. Three documentation-only
+edits survived locally and are checkpointed before restarting the cached package build.
+
 ## Verification
 
-The full development gate passed 510 tests (seven existing Qt deprecation warnings),
-native/style/type checks and native runtime/numerics loading. The final lifecycle
-changes above passed 15 targeted tests; rerun the full gate before packaging.
+The final full development gate passed 512 tests (seven existing Qt deprecation warnings),
+native/style/type checks and native runtime/numerics loading at `069a05d`.
+The final lifecycle changes also passed 15 targeted tests. Actual Issues GUI acceptance
+was rerun successfully at that revision, with no QML warnings; captures were inspected.
 `tools/activity_acceptance.py` and `tools/issues_acceptance.py` passed actual GUI checks;
-captures under `build/issues-016/gui` were inspected. Full development and portable
-gates remain pending; this checkpoint is not merge-ready.
+captures under `build/issues-016/gui` were inspected. Portable qualification remains
+pending; this checkpoint is not merge-ready.
 
 `tools/issues_profile_acceptance.py` passed eight serial normal/snapped drag recordings
 with Issues closed/open/open/closed, F12 toggling within each gesture, confirmation and
@@ -66,11 +73,23 @@ variants; the failed fixture run is excluded, not counted as success.
 
 ## Next actions and blockers
 
-1. Run the complete development gate and final lifecycle/model tests.
-2. Build/qualify 0.1.6 portable distribution, including issues JSON workflow and
+1. Build/qualify 0.1.6 portable distribution, including issues JSON workflow and
    actual packaged Issues panel; inspect its screenshot and create source archive.
-3. Review ownership/coupling and document final evidence,
+2. Document final evidence,
    then merge/push only after required checks pass.
+
+## Ownership and coupling review
+
+Direct coordinator-authored review, separate from tests: the immutable issue model and
+repository own evidence; reporting owns producer generation/epoch validation; listening
+owns invalidation and registered detector dispatch; presentation owns read-only queries;
+resolution owns explicit repair state and fresh verification. Domain adapters use existing
+calculation commands and the one task coordinator. The desktop supplies labels, navigation
+and keyed Qt rows, with no detector or geometry solver in drawing. Checks have no authored
+document state, geometry outputs, undo entries or save barrier. Reset/close cancel old
+checks and release captured documents through the existing job lifecycle. Numerical
+geometry remains in C++; no Blender APIs, second worker pool, or persistent diagnostic
+state was introduced. The shared RecordModel replaces duplicated Activity row mechanics.
 
 ## Recovery inputs
 

@@ -1,4 +1,4 @@
-# AnthroForge 0.1.5 quick start
+# AnthroForge 0.1.6 quick start
 
 The Activity panel retains its job rows while status and elapsed time update. It shows
 the latest 40 jobs, newest first; Cancel and Retry continue to act on the named job.

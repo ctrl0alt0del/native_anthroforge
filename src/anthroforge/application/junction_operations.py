@@ -7,7 +7,14 @@ from anthroforge.core.construction import Curve
 from anthroforge.core.junctions import Junction, PointRef, members
 from anthroforge.core.results import Port
 
-from . import curve_edit_state, dependent_tasks, junction_edits, object_operations, object_revisions
+from . import (
+    curve_edit_state,
+    dependent_tasks,
+    junction_bindings,
+    junction_edits,
+    object_operations,
+    object_revisions,
+)
 
 
 def member(session: Any, value: dict[str, str]) -> tuple[Curve, PointRef]:
@@ -23,18 +30,23 @@ def member(session: Any, value: dict[str, str]) -> tuple[Curve, PointRef]:
 def create(session: Any, source: dict[str, str], targets: list[dict[str, str]]) -> str:
     item, ref = member(session, source)
     references = [ref, *(member(session, value)[1] for value in targets)]
+    require_members(session, references)
+    junction = Junction(ref)
+    changes: dict[str, Any] = {}
+    world = junction_edits.world_position(session, item, ref.point)
+    junction_edits.expand_members(session, changes, references, world, junction.id)
+    junction_bindings.joining(session, changes, references, ref)
+    install(session, changes, (*session.document.junctions, junction))
+    return junction.id
+
+
+def require_members(session: Any, references: list[PointRef]) -> None:
     if len(references) < 2 or len({p.curve for p in references}) != len(references):
         raise ValueError("Choose at least two points from distinct curves.")
     if any(
         junction_edits.point(session.document.object(r.curve), r.point).junction for r in references
     ):
         raise ValueError("Detach existing junction memberships before joining these points.")
-    junction = Junction(ref)
-    changes: dict[str, Any] = {}
-    world = junction_edits.world_position(session, item, ref.point)
-    junction_edits.expand_members(session, changes, references, world, junction.id)
-    install(session, changes, (*session.document.junctions, junction))
-    return junction.id
 
 
 def install(session: Any, changes: dict[str, Any], junctions: tuple[Junction, ...]) -> None:

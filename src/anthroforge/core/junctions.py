@@ -50,6 +50,20 @@ def validate(records: tuple[Junction, ...], objects: tuple[Any, ...]) -> None:
             raise ValueError("A junction needs its source and at least one other member.")
         if len({p.curve for p in points}) != len(points):
             raise ValueError("A curve cannot visit the same junction twice.")
+        validate_binding(lookup[key], points, {o.id: o for o in objects})
+
+
+def validate_binding(junction: Junction, points: tuple[PointRef, ...], objects: Any) -> None:
+    from .fibers import Fiber
+
+    bound = {
+        ref
+        for ref in points
+        if isinstance(objects[ref.curve], Fiber)
+        and any(b.point == ref.point for b in objects[ref.curve].bindings)
+    }
+    if bound and junction.source not in bound:
+        raise ValueError("The junction source must own its shared anatomical binding.")
 
 
 def inputs(item: Any, records: tuple[Junction, ...]) -> set[Port]:

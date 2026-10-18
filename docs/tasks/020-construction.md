@@ -644,3 +644,18 @@ without a jump, deletion protection and Manual publication. This is an incomplet
 shared Fiber binding ownership/propagation, conversion anchors, copied-set junction sharing,
 desktop junction controls, branches and the other release requirements remain. Do not treat
 generic acceptance of a Fiber record as qualification of its shared binding behavior.
+
+### Shared fiber bindings
+
+Junction sources now own the shared anatomical binding on their actual Fiber point.
+Joining adopts that binding; explicit assignment/scope edits propagate atomically.
+Follower evaluation uses the source's accepted binding, retains its exact native capture,
+and recaptures its deformation field only when needed. Manual sources keep accepted
+binding provenance until explicit publication. Unbound ordinary points cannot own a
+mandatory Fiber binding; the shared policy reports the required bound source.
+
+23 focused Fiber/junction/architecture tests and configured mypy (168 modules) pass.
+Evidence covers edits from either member, Any-parent and explicit-parent rebinding,
+parent movement without recapture/drift, Manual inputs, mixed Curve/Fiber membership,
+one-action undo and save/reopen. Desktop controls, conversion/copy identities, branches
+and remaining release qualification are still pending; this is not release-ready.

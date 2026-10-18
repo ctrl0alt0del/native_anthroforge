@@ -8,7 +8,7 @@ from anthroforge.core.entities import IDENTITY
 from anthroforge.core.junctions import PointRef, members
 from anthroforge.native import construction, curve_editing
 
-from . import curve_edit_state, curve_sources, object_revisions
+from . import curve_edit_state, curve_sources, junction_bindings, object_revisions
 
 
 def point(item: Curve, identity: str) -> Any:
@@ -44,6 +44,11 @@ def expand(session: Any, changes: dict[str, Any]) -> dict[str, Any]:
         before = session.document.registry.records.get(key)
         if isinstance(before, Curve) and isinstance(item, Curve):
             expand_curve(session, before, item, result, links)
+    junction_bindings.expand(session, changes, result)
+    return prepared(session, result)
+
+
+def prepared(session: Any, result: Any) -> dict[str, Any]:
     return {
         key: revised(session, session.document.object(key), item)
         if key in session.document.registry.records

@@ -9,6 +9,7 @@ from . import (
     attachment_assets,
     curve_sources,
     fiber_edit_evaluation,
+    junction_bindings,
     junction_evaluation,
     path_assets,
     routing_evaluation,
@@ -38,6 +39,7 @@ def evaluate_item(
 def evaluate_fiber(
     engine: Any, document: Any, resources: Any, item: Fiber, cancel: int
 ) -> PathEvaluation:
+    item = junction_bindings.resolve(document, resources, item)
     if item.attachment_asset not in resources.attachments:
         raise ValueError("Fiber has no captured attachment field.")
     asset = resources.attachments[item.attachment_asset]

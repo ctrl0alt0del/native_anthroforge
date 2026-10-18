@@ -5,10 +5,12 @@ from time import perf_counter as monotonic
 
 import numpy as np
 
+from anthroforge.core.presentation import pickable, visible
 from anthroforge.core.results import geometry_asset
 from anthroforge.native import components, scene
 from anthroforge.native.attachments import anchor_points, ordered
 
+from .presentation import geometry_flags
 from .values import qml
 
 
@@ -19,6 +21,7 @@ def record(controller, entity, depth):
     row.update(depth=depth, trs=session.engine.decompose(entity.matrix))
     row["quaternion"] = scene.quaternion(session.engine, entity.matrix)
     row.update(presentation_flags(session.workspace, entity.id))
+    row.update(geometry_flags(session.workspace, row))
     row["anchors"] = markers(session, entity)
     row["opacity"] = 0.08 if row["readonly"] else 1.0
     row.update(geometry_metadata(session, entity))
@@ -51,7 +54,8 @@ def control_record(controller, control):
     row.update(
         trs=session.engine.decompose(matrix), quaternion=scene.quaternion(session.engine, matrix)
     )
-    row.update(presentation_flags(session.workspace, control.id))
+    row.update(control_flags(session.workspace, control))
+    row.update(surface_visible=False, surface_pickable=False)
     row.update(opacity=0.08 if row["readonly"] else 1, affected=affected(session, control.id))
     return qml(row)
 
@@ -82,6 +86,14 @@ def presentation_flags(workspace, entity):
     )
 
 
+def control_flags(workspace, control):
+    flags = presentation_flags(workspace, control.id)
+    category = "cages" if control.kind == "LATTICE" else "hooks"
+    flags["visible"] &= visible(workspace, category)
+    flags["pickable"] &= pickable(workspace, category)
+    return flags
+
+
 def markers(session, entity):
     if not entity.parent or not entity.attachment.binding:
         return []
@@ -110,14 +122,14 @@ def render_rows(rows):
     return [
         dict(row, key=f"{row['id']}:{row['handle']}:{chunk}", chunk=chunk)
         for row in rows
-        if row["visible"]
+        if row["surface_visible"]
         for chunk in range(row["chunks"])
     ]
 
 
 def picking_inputs(controller, rows):
     snapping_inputs(controller, rows)
-    eligible = [row for row in rows if row["pickable"] and row["handle"]]
+    eligible = [row for row in rows if row["surface_pickable"] and row["handle"]]
     controller.pick_ids = [row["id"] for row in eligible]
     controller.pick_handles = np.array([row["handle"] for row in eligible], dtype=np.uint64)
     matrices = [
@@ -129,7 +141,7 @@ def picking_inputs(controller, rows):
 
 
 def snapping_inputs(controller, rows):
-    eligible = [row for row in rows if row["visible"] and row["handle"]]
+    eligible = [row for row in rows if row["surface_visible"] and row["handle"]]
     controller.snap_ids = [row["id"] for row in eligible]
     controller.snap_handles = np.array([row["handle"] for row in eligible], dtype=np.uint64)
     controller.snap_matrices = np.ascontiguousarray(

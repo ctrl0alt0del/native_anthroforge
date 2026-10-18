@@ -1,5 +1,7 @@
 """Component categories stay distinguishable through hover and selection."""
 
+from . import presentation
+
 
 def category(reference):
     part = reference["part"]
@@ -9,9 +11,14 @@ def category(reference):
 def layers(editor):
     result = {name: [] for name in ("points", "handles", "other")}
     for ref, world, _ in editor.rows:
-        result[category(ref)].append(world)
-    result["curves"] = [p for path in editor._curve_lines.values() for p in path]
-    result["links"] = editor._lines[len(result["curves"]) :]
+        if presentation.component(editor, ref):
+            result[category(ref)].append(world)
+    curves = [p for path in editor._curve_lines.values() for p in path]
+    result["curves"] = curves if presentation.allows(editor, "curves") else []
+    category_name = "cages" if editor.state.get("kind") == "LATTICE" else "handles"
+    result["links"] = (
+        editor._lines[len(curves) :] if presentation.allows(editor, category_name) else []
+    )
     return result
 
 
@@ -20,6 +27,7 @@ def highlights(editor):
 
     result = {name: [] for name in ("points", "handles", "other")}
     for index, (ref, world, _) in enumerate(editor.rows):
-        if component_key(ref) in editor.selection or index == editor.hover_index:
+        active = component_key(ref) in editor.selection or index == editor.hover_index
+        if active and presentation.component(editor, ref):
             result[category(ref)].append(world)
     return result

@@ -3,8 +3,11 @@
 import argparse
 import json
 from collections.abc import Sequence
+from pathlib import Path
 
+from anthroforge.application.projects import adopt
 from anthroforge.application.session import Session
+from anthroforge.application.storage import read_package
 from anthroforge.diagnostics import environment_report
 
 
@@ -16,6 +19,7 @@ def parser() -> argparse.ArgumentParser:
     new = commands.add_parser("new", help="Describe a new in-memory empty document")
     new.add_argument("--name", default="Untitled")
     authoring_parsers(commands)
+    inspection_parser(commands)
     return result
 
 
@@ -30,11 +34,23 @@ def authoring_parsers(commands):
     render.add_argument("project")
     render.add_argument("output")
     render.add_argument("--revision", required=True, type=int)
+    render.add_argument("--view", help="Explicit inspection camera/selection JSON")
+
+
+def inspection_parser(commands):
+    report = commands.add_parser("report", help="Export a frozen image/metadata inspection archive")
+    report.add_argument("project")
+    report.add_argument("output")
+    report.add_argument("--revision", required=True, type=int)
+    report.add_argument("--selected", default="")
+    report.add_argument("--workspace", type=int, default=0)
 
 
 def execute(args: argparse.Namespace) -> int:
     from anthroforge import authoring
 
+    if args.command == "report":
+        return inspection_command(args)
     if args.command in ("run", "serve", "inspect", "render"):
         return authoring_command(args, authoring)
     if args.command == "new":
@@ -55,7 +71,23 @@ def authoring_command(args, authoring):
         return 0
     from anthroforge.desktop.capture import capture
 
-    return capture(args.project, args.output, args.revision)
+    return capture(args.project, args.output, args.revision, args.view)
+
+
+def inspection_command(args):
+    session = Session()
+    try:
+        adopt(session, *read_package(Path(args.project), session.engine))
+        if session.document.revision != args.revision:
+            raise ValueError("Requested revision does not match the saved document.")
+        session.command("workspace.select", index=args.workspace)
+        result = session.command(
+            "inspection.export", path=args.output, selected=args.selected, wait=True
+        )
+        print(json.dumps(result))
+        return 0
+    finally:
+        session.close()
 
 
 def main(argv: Sequence[str] | None = None) -> int:

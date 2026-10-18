@@ -9,6 +9,7 @@ from . import (
     evaluation,
     importing,
     inspection,
+    inspection_report,
     operations,
     presentation,
     projects,
@@ -124,6 +125,7 @@ def query_commands(session: "Session") -> dict[str, Any]:
 def file_commands(session: "Session") -> dict[str, Any]:
     return {
         "save": lambda **a: projects.save(session, **a),
+        "inspection.export": lambda **a: inspection_report.export(session, **a),
         "open": lambda **a: projects.open_project(session, **a),
         "workspace.create": lambda **a: presentation.create_workspace(session, **a),
         "workspace.select": lambda **a: presentation.select_workspace(session, **a),

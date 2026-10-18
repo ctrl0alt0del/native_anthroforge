@@ -13,7 +13,7 @@ UiSection {
     ColumnLayout {
         visible: !!panel.item.thickness; Layout.fillWidth: true
         UiCheck { text: "Enabled"; checked: panel.settings.enabled || false; enabled: !panel.topologyLocked; onClicked: panel.set("enabled",checked) }
-        NumericSetting { label: "Thickness · m"; value: panel.settings.thickness || 0; onEdited: value => panel.set("thickness",value) }
+        NumericSetting { length: true; label: "Thickness"; value: panel.settings.thickness || 0; onEdited: value => panel.set("thickness",value) }
         NumericSetting { label: "Offset · −1 to 1"; value: panel.settings.offset || 0; onEdited: value => panel.set("offset",value) }
         UiCheck { text: "Fill rim"; checked: panel.settings.rim || false; enabled: !panel.topologyLocked; onClicked: panel.set("rim",checked) }
         UiCheck { text: "Only rim"; checked: panel.settings.rim_only || false; enabled: !panel.topologyLocked; onClicked: panel.set("rim_only",checked) }

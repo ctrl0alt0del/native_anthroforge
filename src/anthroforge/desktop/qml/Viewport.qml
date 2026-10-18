@@ -268,7 +268,7 @@ Item {
     SelectionOutline {
         id: selectionOutline; objectName: "selectionOutline"; anchors.fill: parent
         sourceCamera: view.camera; orthographic: viewport.orthographic
-        visible: !!workspace.selectedData.asset && !!workspace.selectedData.visible
+        visible: !!workspace.selectedData.asset && !!workspace.selectedData.surface_visible
     }
     AuthoringView {
         anchors.fill: parent; sourceCamera: view.camera
@@ -311,7 +311,7 @@ Item {
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     Canvas {
         id: anchorMarkers; anchors.fill: parent
-        visible: workspace.state.anchors && !!viewport.selected.id
+        visible: workspace.state.anchors && !workspace.state.hidden_categories.includes("anchors") && !!viewport.selected.id
         onPaint: {
             const ctx=getContext("2d"), points=viewport.selected.anchors || [];
             ctx.clearRect(0,0,width,height);

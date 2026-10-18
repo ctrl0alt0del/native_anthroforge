@@ -42,7 +42,10 @@ Recovered the exact original numbered scope; inspected the shipped issue framewo
 and identified existing workspace, rendering and presentation boundaries. Main is
 current with origin. Shared inspection API, precise cycle participants/causes,
 mixed workspace membership and presentation/unit policies are implemented.
-These are application foundations; desktop integration and report export remain in progress.
+Desktop inspector, mixed workspace manager, category filters, unit-aware fields,
+read-only background report archive and CLI are now integrated. The isolated Qt
+renderer consumes a frozen temporary package and declared camera/selection; the
+headless parent stays Qt-free. Final qualification/documentation/package remain.
 
 ## Verification
 
@@ -54,10 +57,18 @@ First checkpoint: 518 tests pass; strict mypy passes. Added native-anchor read-o
 inspection, cycle/downstream distinction, 3,000-output graph, mixed workspace
 round-trip and policy guard coverage. No GUI or release acceptance claimed yet.
 
+Second checkpoint: actual GUI exercised millimetre entry (250 mm → 0.25 m),
+workspace creation, geometry/curve visibility independence and picking exclusions.
+GPU image+JSON export retained its revision during a concurrent rename. Captures
+under ignored `build/workflow-017` were inspected; a workspace combo update-order
+defect found visually was fixed. New export tests cover frozen geometry ownership,
+failure/retry, cancellation, atomic destination preservation and Qt-free orchestration.
+Full release gate, more interaction coverage and portable acceptance still pending.
+
 ## Next actions
 
-1. Integrate inspector, workspace management/category filters and dimensional UI fields.
-2. Implement frozen inspection export using existing offscreen GPU capture and add CLI/UI.
+1. Complete category/control and inspector navigation checks, including reporter error paths.
+2. Run development/profiler/portable qualification; update API/walkthrough and release versions.
 3. Qualify 0.1.7, archive corresponding source, merge/push normally after all checks pass.
 
 ## Recovery inputs

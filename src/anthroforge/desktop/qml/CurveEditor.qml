@@ -6,7 +6,7 @@ Item {
     required property var keyboard
     readonly property var interaction: authoring.curveInteraction
     readonly property bool dragging: drag !== null
-    readonly property bool previewActive: visible && keyboard.held("insertPoint") &&
+    readonly property bool previewActive: visible && !workspace.state.hidden_categories.includes("curves") && !workspace.state.unpickable_categories.includes("curves") && keyboard.held("insertPoint") &&
         !viewport.transforming && !viewport.navigating && viewport.pointerPosition.x >= 0
     property var pending: null
     property var drag: null

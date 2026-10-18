@@ -17,8 +17,8 @@ ColumnLayout {
         Label { text: "Follows"; color: Theme.muted }
         UiCombo { Layout.fillWidth: true; model: [{id:"",name:"Document frame"}].concat(panel.scps); textRole: "name"; valueRole: "id"; currentIndex: indexOfValue(panel.item.follow || ""); onActivated: authoring.edit("control.follow",{control:panel.item.id,entity:currentValue}) }
         Repeater {
-            model: ["Position · m", "Rotation · °", "Scale"]
-            VectorSetting { required property int index; required property string modelData; label: modelData; values: (panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(index*3,index*3+3)
+            model: ["Position", "Rotation · °", "Scale"]
+            VectorSetting { required property int index; required property string modelData; label: modelData; length: index === 0; values: (panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(index*3,index*3+3)
                 onEdited: values => { const trs=(panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(); for(let i=0;i<3;i++) trs[index*3+i]=values[i]; authoring.edit("control.transform",{control:panel.item.id,values:trs}); } }
         }
         Label { text: "Affected SCPs: " + workspace.treeRows.filter(row=>(workspace.selectedData.affected || []).indexOf(row.id)>=0).map(row=>row.name).join(", "); color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }

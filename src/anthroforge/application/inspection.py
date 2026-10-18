@@ -8,12 +8,13 @@ from anthroforge.core.results import geometry_asset
 from . import attachment_inspection as attachments
 from .construction_policy import topology_dependents
 from .dependency_inspection import relationships
+from .inspection_context import InspectionContext
 
 if TYPE_CHECKING:
     from .session import Session
 
 
-def target(session: "Session", entity: str) -> dict[str, Any]:
+def target(session: "Session | InspectionContext", entity: str) -> dict[str, Any]:
     document = session.document
     item = document.index.entities.get(entity) or document.index.controls.get(entity)
     if item is None:
@@ -27,7 +28,7 @@ def target(session: "Session", entity: str) -> dict[str, Any]:
     )
 
 
-def identity(session: "Session", item: Any) -> dict[str, Any]:
+def identity(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
     document = session.document
     return dict(
         id=item.id,
@@ -42,7 +43,7 @@ def identity(session: "Session", item: Any) -> dict[str, Any]:
     )
 
 
-def locks(session: "Session", entity: str) -> list[dict[str, str]]:
+def locks(session: "Session | InspectionContext", entity: str) -> list[dict[str, str]]:
     document = session.document
     if entity not in document.index.entities:
         return []
@@ -58,7 +59,7 @@ def locks(session: "Session", entity: str) -> list[dict[str, str]]:
     ]
 
 
-def geometry(session: "Session", item: Any) -> dict[str, Any]:
+def geometry(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
     key = geometry_asset(item) if item.id in session.document.index.entities else ""
     if not key:
         return dict(available=False)
@@ -85,9 +86,15 @@ def snapshot(session: "Session", entities: list[str] | None = None) -> dict[str,
         selected=list(selected),
         workspace=asdict(session.workspace),
         entities=[target(session, key) for key in selected],
-        issues=session.command("issues.list", limit=200, include_dismissed=True),
+        issues=issue_records(session),
     )
 
 
-def all_targets(session: "Session") -> list[str]:
+def all_targets(session: "Session | InspectionContext") -> list[str]:
     return [*session.document.index.entities, *session.document.index.controls]
+
+
+def issue_records(session: "Session") -> dict[str, Any]:
+    session.issues.listening.discover_changes()
+    view = session.issues.presentation
+    return dict(**view.status(), records=view.filtered({}, "", True))

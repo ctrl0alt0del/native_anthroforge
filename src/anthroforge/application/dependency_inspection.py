@@ -20,6 +20,8 @@ def port_record(document: Document, port: Port) -> dict[str, Any]:
 
 
 def cycle_context(graph: DependencyGraph, port: Port) -> dict[str, Any]:
+    if port not in graph.blocked:
+        return dict(participant=False, components=(), own=frozenset())
     reachable = closure(graph, {port})
     causes = tuple(group for group in graph.cycles if group & reachable)
     own = next((group for group in causes if port in group), frozenset())

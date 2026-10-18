@@ -22,7 +22,7 @@ Item {
     }
     Label {
         x: feedback.projected.x+13; y: feedback.projected.y-24
-        text: feedback.state.snap.id ? "Surface snap · "+(feedback.state.offset>=0?"+":"")+feedback.state.offset.toFixed(4)+" m" : "Click to insert point"
+        text: feedback.state.snap.id ? "Surface snap · "+(feedback.state.offset>=0?"+":"")+(feedback.state.offset/workspace.state.unit_factor).toFixed(4)+" "+workspace.state.display_units : "Click to insert point"
         color: feedback.state.snap.id ? Theme.snapColor : Theme.curvePointColor
         font.pixelSize: 11; style: Text.Outline; styleColor: "#24262b"
     }

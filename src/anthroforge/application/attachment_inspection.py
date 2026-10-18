@@ -8,12 +8,13 @@ from anthroforge.core.results import geometry_asset
 from anthroforge.native.attachments import anchor_points
 
 from .control_frames import display_frame
+from .inspection_context import InspectionContext
 
 if TYPE_CHECKING:
     from .session import Session
 
 
-def frame(session: "Session", item: Any) -> dict[str, Any]:
+def frame(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
     try:
         matrix = item.matrix if isinstance(item, SCP) else display_frame(session, item)
         return dict(matrix=matrix, available=True, error="")
@@ -21,7 +22,7 @@ def frame(session: "Session", item: Any) -> dict[str, Any]:
         return dict(matrix=(), available=False, error=str(error))
 
 
-def describe(session: "Session", item: Any) -> dict[str, Any]:
+def describe(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
     support = getattr(item, "support", "") or getattr(item, "parent", "")
     binding = getattr(item.result, "binding", ()) or item.attachment.binding
     result = dict(settings=asdict(item.attachment), support=support, captured=bool(binding))
@@ -31,6 +32,7 @@ def describe(session: "Session", item: Any) -> dict[str, Any]:
         support
     )
     result["support_frame"] = frame(session, parent) if parent else None
+    result["support_name"] = parent.name if parent else ""
     result["surface"] = surface(session, parent)
     result["anchors"] = anchors(session, item, parent, binding)
     return result
@@ -53,13 +55,13 @@ def decoded(binding: tuple[float, ...]) -> dict[str, Any]:
     )
 
 
-def surface(session: "Session", parent: Any) -> dict[str, Any]:
+def surface(session: "Session | InspectionContext", parent: Any) -> dict[str, Any]:
     key = geometry_asset(parent) if isinstance(parent, SCP) else ""
     return dict(owner=parent.id if parent else "", asset=key, available=bool(key))
 
 
 def anchors(
-    session: "Session", item: Any, parent: Any, binding: tuple[float, ...]
+    session: "Session | InspectionContext", item: Any, parent: Any, binding: tuple[float, ...]
 ) -> dict[str, Any]:
     if not binding or not isinstance(parent, SCP):
         return dict(available=False, reason="No captured SCP surface/origin binding.")
@@ -73,7 +75,7 @@ def anchors(
         return dict(available=False, reason=str(error))
 
 
-def proxy(session: "Session", item: Any, binding: tuple[float, ...]) -> SCP:
+def proxy(session: "Session | InspectionContext", item: Any, binding: tuple[float, ...]) -> SCP:
     if isinstance(item, SCP):
         return replace(item, attachment=replace(item.attachment, binding=binding))
     return SCP(

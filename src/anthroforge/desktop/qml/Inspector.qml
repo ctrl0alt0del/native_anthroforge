@@ -44,7 +44,7 @@ ScrollView {
             UiSection {
                 title: "Transform"; objectName: "transformSection"
                 Repeater {
-                    model: ["Position · m", "Rotation · °", "Scale"]
+                    model: ["Position · "+workspace.state.display_units, "Rotation · °", "Scale"]
                     delegate: ColumnLayout {
                         required property int index
                         required property string modelData
@@ -59,18 +59,19 @@ ScrollView {
                                     id: numericField
                                     required property int index
                                     property int component: groupIndex*3+index
+                                    readonly property real unitFactor: groupIndex===0 ? workspace.state.unit_factor : 1
                                     objectName: "transform" + component
                                     Layout.fillWidth: true; Layout.preferredWidth: 65; Layout.minimumWidth: 50
                                     leftPadding: 23; rightPadding: 4
                                     Accessible.name: ["Position","Rotation","Scale"][groupIndex] + " " + ["X","Y","Z"][index]
                                     onAccepted: inspector.parent.forceActiveFocus()
-                                    Binding { target: numericField; property: "text"; when: !numericField.activeFocus; value: inspector.selected.trs ? Number(inspector.selected.trs[numericField.component]).toFixed(4) : "" }
+                                    Binding { target: numericField; property: "text"; when: !numericField.activeFocus; value: inspector.selected.trs ? (Number(inspector.selected.trs[numericField.component])/numericField.unitFactor).toFixed(4) : "" }
                                     Text { x: 7; anchors.verticalCenter: parent.verticalCenter; text: ["X","Y","Z"][numericField.index]; color: Theme.axes[numericField.index]; font.pixelSize: 11; font.bold: true }
                                     onEditingFinished: {
                                         if (!inspector.selected.trs || text.trim() === "" || !isFinite(Number(text))) return;
                                         const values = inspector.selected.trs.slice();
-                                        if (Math.abs(values[component]-Number(text)) < 0.000001) return;
-                                        values[component] = Number(text);
+                                        if (Math.abs(values[component]-Number(text)*unitFactor) < 1e-9) return;
+                                        values[component] = Number(text)*unitFactor;
                                         workspace.run("scp.transform",{entity:inspector.selected.id,values:values});
                                     }
                                 }
@@ -142,6 +143,7 @@ ScrollView {
             }
         }
         ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
+        DependencyInspector { visible: !!inspector.selected.id }
         Label { text: inspector.selected.error || ""; visible: !!text; color: Theme.danger; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         Item { implicitHeight: 8 }
     }

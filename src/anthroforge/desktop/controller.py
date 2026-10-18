@@ -10,6 +10,7 @@ from anthroforge.profiling.spans import measured
 from . import controller_actions as actions
 from . import project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
+from .issue_panel import IssuePanel
 from .models import RenderModel
 
 
@@ -44,6 +45,7 @@ class Controller(QObject):
         self.profiler = RuntimeProfiler()
         self.session = Session(profiler=self.profiler)
         scene.configure(self.session.engine)
+        self.issue_panel = IssuePanel(self)
 
     def _initialize_state(self):
         self.selection, self.hovered, self.message = "", "", ""
@@ -99,6 +101,10 @@ class Controller(QObject):
     def activityModel(self):
         return self.activity_model
 
+    @Property(QObject, constant=True)
+    def issuePanel(self):
+        return self.issue_panel
+
     @Property("QVariantMap", notify=metricsChanged)
     def metrics(self):
         return self._metrics
@@ -110,6 +116,7 @@ class Controller(QObject):
         names = {row["id"]: row["name"] for row in self.rows}
         self.activity_model.synchronize(self.session.scheduler.jobs, names)
         self.refresh_metrics()
+        self.issue_panel.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()
@@ -159,6 +166,7 @@ class Controller(QObject):
         project_actions.poll(self)
         self.render_model.drain()
         self.refresh_if_needed()
+        self.issue_panel.synchronize()
         self.tick_count += 1
         if self.tick_count % 15 == 0:
             self.notify()

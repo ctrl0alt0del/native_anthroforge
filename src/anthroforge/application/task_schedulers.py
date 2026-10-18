@@ -121,6 +121,17 @@ class ControlAttachmentTaskScheduler(AttachmentTaskScheduler):
         )
 
 
+class CurvePathTaskScheduler(AttachmentTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        # Conservative initial heuristic; observed preparation/compute/publication raises it.
+        cost = 0.1 + workload.candidates * 0.01 + workload.triangles * 0.003
+        bounded = workload.candidates <= 32 and workload.triangles <= 256
+        execution: Literal["inline", "worker"] = (
+            "inline" if interactive and bounded and cost < INLINE_BUDGET_MS else "worker"
+        )
+        return Schedule(execution, cost, reason="Owned native path evaluation")
+
+
 class IssueTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         cost = 0.1 + 0.005 * workload.affected
@@ -141,6 +152,7 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_open": OpenProjectTaskScheduler(),
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
+        "curve_path": CurvePathTaskScheduler(),
         "control_attachments": ControlAttachmentTaskScheduler(),
         "issue_check": IssueTaskScheduler(),
         "inspection_report": InspectionTaskScheduler(),

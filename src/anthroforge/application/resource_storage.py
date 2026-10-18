@@ -9,8 +9,9 @@ import numpy as np
 from anthroforge.native import paths, topology
 from anthroforge.native.mesh import GeometryEngine
 
-from . import image_assets
+from . import image_assets, object_codec
 from .assets import Asset
+from .path_assets import PathAsset
 from .resources import Resources
 
 MESH_BUFFERS = ("vertices", "corners", "offsets", "triangles", "polygons")
@@ -19,7 +20,9 @@ MESH_BUFFERS = ("vertices", "corners", "offsets", "triangles", "polygons")
 def describe(resources: Resources) -> dict[str, Any]:
     return {
         "assets": {key: mesh_metadata(asset) for key, asset in resources.meshes.items()},
-        "paths": {key: {"closed": path.closed} for key, path in resources.paths.items()},
+        "paths": {
+            key: object_codec.encode(asset.authored) for key, asset in resources.paths.items()
+        },
         "images": {key: {"digest": image.digest} for key, image in resources.images.items()},
     }
 
@@ -42,9 +45,9 @@ def write(archive: zipfile.ZipFile, resources: Resources) -> None:
     for key, asset in resources.meshes.items():
         for kind, label in enumerate(MESH_BUFFERS):
             write_array(archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind))
-    for key, path in resources.paths.items():
-        write_array(archive, f"paths/{key}/samples.npy", path.array())
-        write_array(archive, f"paths/{key}/parameters.npy", path.array(1))
+    for key, curve in resources.paths.items():
+        write_array(archive, f"paths/{key}/samples.npy", curve.path.array())
+        write_array(archive, f"paths/{key}/parameters.npy", curve.path.array(1))
     for key, image in resources.images.items():
         archive.writestr(f"images/{key}/source", image.encoded)
 
@@ -54,12 +57,15 @@ def read_mesh(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryE
     return Asset(topology.restore(engine, arrays), **source)
 
 
-def read_path(
-    archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine
-) -> paths.Path:
+def read_path(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> PathAsset:
+    from anthroforge.core.construction import Curve
+
+    authored = object_codec.decode(source)
+    if not isinstance(authored, Curve):
+        raise ValueError("Accepted path input must be a curve or fiber.")
     samples = read_array(archive, f"paths/{key}/samples.npy")
     parameters = read_array(archive, f"paths/{key}/parameters.npy")
-    return paths.restore(engine, samples, parameters, source["closed"])
+    return PathAsset(paths.restore(engine, samples, parameters, authored.closed), authored)
 
 
 def read_image(archive: zipfile.ZipFile, key: str, source: Any) -> image_assets.ImageAsset:

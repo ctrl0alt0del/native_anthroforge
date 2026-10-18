@@ -8,7 +8,7 @@ from anthroforge.core.object_registry import Construction
 from anthroforge.core.objects import ConstructionObject
 from anthroforge.native import curve_editing
 
-from . import construction_tasks, curve_sources, dependencies, object_revisions
+from . import construction_tasks, curve_sources, dependencies, object_revisions, path_tasks
 from .construction_policy import require_topology_edit
 from .operations import require_name
 
@@ -17,17 +17,14 @@ if TYPE_CHECKING:
 
 
 def editable(session: "Session", target: str) -> Construction:
+    from .workspace_policy import included
+
     if session.waiting_save:
         raise ValueError("Editing is blocked while waiting to save.")
     item = session.document.object(target)
     if not isinstance(item, ConstructionObject):
         raise ValueError("This operation requires a construction object.")
-    related = set(item.owners) | curve_sources.consumers(session.document, {target})
-    if (
-        session.workspace.focused
-        and related
-        and not related.intersection(session.workspace.members)
-    ):
+    if not included(session.document, session.workspace, target):
         raise ValueError("This construction object is outside the focused workspace.")
     return item
 
@@ -40,6 +37,7 @@ def install(session: "Session", item: Construction) -> None:
     ports = object_revisions.changed_ports(before, changed)
     session.scheduler.invalidate_ports(ports)
     install_state(session, before, changed)
+    path_tasks.edited(session, ports)
     construction_tasks.edited(session, dependencies.affected(session.document, ports))
 
 
@@ -78,11 +76,19 @@ def create_curve(
     points: list[dict[str, Any]] | None = None,
     parent: str = "",
     owner: str = "",
+    engine: str = "BEZIER",
+    closed: bool = False,
 ) -> str:
+    curve = replace(new_curve(name, points, parent, owner), engine=engine, closed=closed)
+    return install_new_curve(session, curve)
+
+
+def install_new_curve(session: "Session", curve: Curve) -> str:
+    owner = curve.owners[0] if curve.owners else ""
     if owner:
         session.editable(owner)
-    curve = new_curve(name, points, parent, owner)
     session.replace_document(objects=(*session.document.objects, curve))
+    path_tasks.request(session, curve.id)
     return curve.id
 
 

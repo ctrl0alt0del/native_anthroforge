@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 
 from anthroforge.application.primitive_operations import straight_curve
-from anthroforge.core.construction import CurvePoint
-from anthroforge.native import bodies, paths
+from anthroforge.core.construction import CurvePoint, ResolvedPrimitive
+from anthroforge.native import bodies, construction, paths
 from anthroforge.native.mesh import NativeCancellation
 
 
@@ -84,3 +84,25 @@ def test_zero_length_path_does_not_publish_nan_frames(session):
     )
     with pytest.raises(ValueError, match="zero length|degenerate"):
         paths.evaluate(session.engine, curve)
+
+
+@pytest.mark.parametrize("closed", [False, True])
+def test_accepted_path_body_preserves_existing_blender_curve_modifier_samples(session, closed):
+    curve = replace(triangle(), closed=closed)
+    path = paths.evaluate(session.engine, curve)
+    samples = paths.body(path, len(curve.points) - 1 if closed else 0)
+    np.testing.assert_allclose(samples, bodies.path(session.engine, curve, 0), atol=1e-12)
+
+
+@pytest.mark.parametrize("closed", [False, True])
+def test_accepted_path_loft_matches_existing_sampling_ranges_and_transform(session, closed):
+    matrix = session.engine.transform([0.5, 0.2, 0.3, 12, 18, 24, 1, 2, 3])
+    curve = replace(triangle(), closed=closed, matrix=matrix)
+    definition = ResolvedPrimitive(
+        "LOFT", curves=(curve, replace(curve, id="other")), samples=64, start=0.1, span=0.8
+    )
+    path = paths.evaluate(session.engine, curve)
+    samples = paths.sample(path, 64, 0.1, 0.8, matrix)
+    np.testing.assert_allclose(
+        samples, construction.sample_curve(session.engine, curve, definition), atol=1e-12
+    )

@@ -14,6 +14,7 @@ from . import (
     inspection_report,
     object_operations,
     operations,
+    path_tasks,
     presentation,
     projects,
 )
@@ -129,6 +130,7 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
         "object.inspect": lambda **a: object_operations.inspect(session, **a),
+        "curve.evaluate": lambda curve: path_tasks.schedule(session, {curve}, explicit=True),
         "job.cancel": lambda job_id, obsolete=False: session.scheduler.cancel_job(job_id, obsolete),
         "job.retry": session.scheduler.retry,
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),
@@ -157,10 +159,12 @@ def evaluate(session: "Session", entities: list[str] | None = None) -> str:
     targets = (
         set(entities) if entities is not None else {item.id for item in session.document.entities}
     )
+    curves = set(entities) if entities is not None else set(session.document.registry.construction)
+    path_tasks.schedule(session, curves, explicit=True)
     construction_tasks.evaluate(session, entities)
     captures = {
         item.id
         for item in session.document.entities
         if item.status == "edited" or not item.attachment.binding
     }
-    return evaluation.request(session, targets, captures)
+    return evaluation.request(session, targets & session.document.index.entities.keys(), captures)

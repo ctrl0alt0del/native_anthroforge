@@ -23,7 +23,10 @@ def require_topology_edit(document: Document, entity: str) -> None:
 
 
 def mode(document: Document, entity: str) -> str:
-    setting = document.entity(entity).update_mode
+    from anthroforge.core.construction import Control
+
+    item = document.object(entity)
+    setting = "INHERIT" if isinstance(item, Control) else item.update_mode
     return document.update_mode if setting == "INHERIT" else setting
 
 

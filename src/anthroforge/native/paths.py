@@ -17,6 +17,8 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_path_info", [U, INT64, D])
     engine.bind("af_path_buffer", [U, c.c_int], c.c_void_p)
     engine.bind("af_path_release", [U], None)
+    engine.bind("af_path_sample", [U, c.c_int, c.c_double, c.c_double, D, c.c_int, D, U])
+    engine.bind("af_path_body", [U, c.c_int, c.c_int, D, U])
 
 
 class Path:
@@ -46,10 +48,10 @@ class Path:
             self.engine.library.af_path_release(self.handle)
 
 
-def evaluate(engine: GeometryEngine, curve: Curve, cancel: int = 0) -> Path:
+def evaluate(engine: GeometryEngine, curve: Curve, cancel: int = 0, records: Any = None) -> Path:
     if curve.engine not in ("BEZIER", "POLYLINE"):
         raise ValueError("The routed path engine is not available in this development increment.")
-    records = curve_records(curve)
+    records = curve_records(curve) if records is None else doubles(records)
     handle = engine.library.af_path_evaluate(
         pointer(records),
         len(curve.points),
@@ -71,3 +73,29 @@ def restore(engine: GeometryEngine, samples: Any, parameters: Any, closed: bool)
         pointer(samples), pointer(parameters), len(samples), closed
     )
     return Path(engine, handle)
+
+
+def sample(
+    path: Path,
+    count: int,
+    start: float,
+    span: float,
+    matrix: Any,
+    reverse: bool = False,
+    cancel: int = 0,
+) -> Any:
+    output, frame = np.empty((count, 11)), doubles(matrix)
+    operation = path.engine.library.af_path_sample
+    args = (path.handle, count, start, span, pointer(frame), reverse, pointer(output), cancel)
+    path.engine.check(operation(*args))
+    return output
+
+
+def body(path: Path, closed_start: int = 0, reverse: bool = False, cancel: int = 0) -> Any:
+    output = np.empty((path.count, 11))
+    path.engine.check(
+        path.engine.library.af_path_body(
+            path.handle, reverse, closed_start, pointer(output), cancel
+        )
+    )
+    return output

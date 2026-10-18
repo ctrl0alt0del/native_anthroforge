@@ -44,8 +44,10 @@ static void propagate_frames(Samples& samples,bool closed) {
         samples.back().normal=transported(samples[samples.size()-2],samples.back());
     }
 }
-void curve_frames(Samples& samples,bool closed,uint64_t cancel) {
-    check_cancel(cancel); bisectors(samples,closed); propagate_frames(samples,closed);
+void curve_frames(Samples& samples,bool closed,uint64_t cancel,bool rebuild_tangents) {
+    check_cancel(cancel);
+    if(rebuild_tangents) bisectors(samples,closed);
+    propagate_frames(samples,closed);
     for(auto& sample:samples)
         sample.normal=Eigen::AngleAxisd(sample.tilt,sample.tangent)*sample.normal;
     check_cancel(cancel);

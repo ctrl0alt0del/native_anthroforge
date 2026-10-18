@@ -55,3 +55,27 @@ def validate_references(session: "Session", workspace: Workspace, previous: Work
         added = set(getattr(workspace, field)) - set(getattr(previous, field))
         if added - live:
             raise ValueError("Workspace references an unknown SCP or control.")
+
+
+def associations(document: Document, target: str) -> set[str]:
+    from .curve_sources import consumers
+
+    pending, seen, anatomy = [target], set[str](), set[str]()
+    while pending:
+        key = pending.pop()
+        if key in seen:
+            continue
+        seen.add(key)
+        if key in document.registry.construction:
+            anatomy.update(document.registry.construction[key].owners)
+            pending.extend(consumers(document, {key}))
+        elif key in document.index.entities or key in document.index.controls:
+            anatomy.add(key)
+    return anatomy
+
+
+def included(document: Document, workspace: Workspace, target: str) -> bool:
+    if not workspace.focused:
+        return True
+    related = associations(document, target)
+    return not related or bool(related.intersection(workspace.members))

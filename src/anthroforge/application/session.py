@@ -84,7 +84,9 @@ class Session:
         return self.document.workspaces[self.active_workspace]
 
     def priority(self, ids: set[str]) -> int:
-        return 10 if not self.workspace.focused or ids.intersection(self.workspace.members) else 0
+        from .workspace_policy import included
+
+        return 10 if any(included(self.document, self.workspace, key) for key in ids) else 0
 
     def editable(self, entity_id: str) -> SCP:
         if self.waiting_save:
@@ -162,8 +164,10 @@ class Session:
         from . import evaluation
         from .construction_tasks import schedule
         from .control_tasks import resume
+        from .path_tasks import pending
 
         resume(self)
+        pending(self)
         targets = {e.id for e in self.document.entities if e.status in ("edited", "stale")}
         captures = {e.id for e in self.document.entities if e.status == "edited"}
         if targets and self.document.attachments_enabled and self.document.update_mode != "MANUAL":

@@ -14,5 +14,5 @@ std::shared_ptr<Mesh> deform_mesh(const Mesh& source,const Vertices& vertices,ui
 Faces mesh_faces(const Mesh& source);
 Samples read_samples(const double* values,int count);
 void rebuild_mesh(Mesh& mesh,uint64_t cancel);
-void curve_frames(Samples& samples,bool closed,uint64_t cancel);
+void curve_frames(Samples& samples,bool closed,uint64_t cancel,bool rebuild_tangents=true);
 }

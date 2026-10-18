@@ -66,6 +66,6 @@ def project_save(resources: "Resources", document: Document) -> Workload:
     size = sum(
         vertices * 24 + corners * 8 + (faces + 1) * 8 for vertices, faces, corners, _, _ in sizes
     )
-    size += sum(resources.paths[key].bytes for key in used["paths"])
+    size += sum(resources.paths[key].path.bytes for key in used["paths"])
     size += sum(len(resources.images[key].encoded) for key in used["images"])
     return Workload(entities=len(document.entities), bytes=size)

@@ -6,6 +6,7 @@ from typing import Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.issues import Issue, evidence, fingerprint
+from anthroforge.core.object_registry import kind
 from anthroforge.core.results import Port
 
 from ..dependency_inspection import cycle_records
@@ -43,7 +44,7 @@ def finding(document: Document, port: Port) -> Issue:
         BLOCKED,
         **labels(context),
         target=port.owner,
-        kind="SCP" if port.owner in document.index.entities else "CONTROL",
+        kind=kind(document.object(port.owner)),
         stage=port.output,
         source=fingerprint(context),
         local_key=port.owner,

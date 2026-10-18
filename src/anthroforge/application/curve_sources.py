@@ -8,6 +8,7 @@ from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.document import Document
 from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.core.objects import ConstructionObject
+from anthroforge.core.results import Port
 from anthroforge.native.construction import matrix
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.native.scene import entity_frame
@@ -172,14 +173,17 @@ def publish_authored(
     session: "Session", entity: SCP, primitive: Primitive, curves: dict[str, Curve]
 ) -> None:
     from .entity_revisions import authored
+    from .path_tasks import edited
 
     existing = session.document.registry.construction
     objects = tuple(curves.get(o.id, o) for o in session.document.objects)
     objects += tuple(c for key, c in curves.items() if key not in existing)
     changed = authored(entity, replace(entity, primitive=primitive))
     entities = tuple(changed if e.id == entity.id else e for e in session.document.entities)
-    invalidate(session, entity.id, set(curves))
+    updates = {key for key, value in curves.items() if value != existing.get(key)}
+    invalidate(session, entity.id, updates)
     session.replace_document(entities=entities, objects=objects)
+    edited(session, {Port(key, "path") for key in updates})
 
 
 def invalidate(session: "Session", entity: str, curves: set[str]) -> None:

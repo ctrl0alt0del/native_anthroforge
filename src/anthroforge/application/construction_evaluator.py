@@ -3,19 +3,27 @@
 from dataclasses import replace
 from typing import Any
 
-from anthroforge.core.construction import Control, Curve, Deformer, ResolvedPrimitive, cyclic
+from anthroforge.core.construction import (
+    Control,
+    Curve,
+    Deformer,
+    Primitive,
+    ResolvedPrimitive,
+    cyclic,
+)
 from anthroforge.core.document import Document
 from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.core.results import geometry_asset
-from anthroforge.native import bodies, components
+from anthroforge.native import bodies, components, paths
 from anthroforge.native import construction as native
 from anthroforge.native.attachments import capture, propagate
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 from anthroforge.native.scene import entity_frame
 from anthroforge.native.topology import draft, finalize
 
-from .curve_sources import resolve as resolve_primitive
+from . import consumed_paths
 from .membership import resolve
+from .path_assets import PathAsset
 
 
 class Evaluation:
@@ -25,12 +33,14 @@ class Evaluation:
         document: Document,
         meshes: dict[str, Mesh],
         cancel: NativeCancellation,
+        path_assets: dict[str, PathAsset] | None = None,
     ) -> None:
         self.engine, self.document, self.meshes, self.cancel = engine, document, meshes, cancel
         self.frames: dict[str, tuple[float, ...]] = {}
         self.cages: dict[str, Any] = {}
         self.visiting: set[str] = set()
         self.bindings: dict[str, tuple[float, ...]] = {}
+        self.paths = path_assets if path_assets is not None else {}
 
     def control_frame(self, control: Control) -> tuple[float, ...]:
         if control.id in self.frames:
@@ -102,27 +112,29 @@ class Evaluation:
         return native.lattice(*args, cage_points=self.cage(control))
 
     def curve(self, entity: SCP, curve: Curve, definition: ResolvedPrimitive) -> Any:
+        bindings = tuple(b for b in entity.deformers if applies(b, "CURVE", curve.id))
+        asset = consumed_paths.accepted(self.document, self.paths, curve.id)
+        path = self.deformed_path(entity, curve, bindings) if bindings else asset.path
+        assert isinstance(entity.primitive, Primitive)
+        use = next(use for use in entity.primitive.curves if use.id == curve.id)
+        return consumed_paths.samples(path, curve, definition, use.reverse, self.cancel.handle)
+
+    def deformed_path(
+        self, entity: SCP, curve: Curve, bindings: tuple[Deformer, ...]
+    ) -> paths.Path:
         records = native.resolved_curve(self.engine, curve)
         frame = native.matrix(self.engine, entity_frame(self.engine, entity), curve.matrix)
         # Blender indices within each Bézier triple: left handle, point, right handle.
         points = records[:, [3, 4, 5, 0, 1, 2, 6, 7, 8]].reshape((-1, 3))
-        bindings = tuple(
-            resolve(b, curve) if b.target.component == curve.id else b for b in entity.deformers
-        )
+        bindings = tuple(resolve(b, curve) for b in bindings)
         points = self.deform(points, bindings, "CURVE", curve.id, frame)
         packed = points.reshape((-1, 9))
         records[:, :9] = packed[:, [3, 4, 5, 0, 1, 2, 6, 7, 8]]
-        return self.sample_curve(
-            curve, definition, native.resolved_curve(self.engine, curve, records)
-        )
-
-    def sample_curve(self, curve: Curve, definition: ResolvedPrimitive, records: Any) -> Any:
-        if definition.kind == "BODY":
-            return bodies.path(self.engine, curve, self.cancel.handle, records)
-        return native.sample_curve(self.engine, curve, definition, self.cancel.handle, records)
+        records = native.resolved_curve(self.engine, curve, records)
+        return paths.evaluate(self.engine, curve, self.cancel.handle, records)
 
     def construct(self, entity: SCP) -> Mesh:
-        definition = resolve_primitive(self.engine, self.document, entity)
+        definition = consumed_paths.definition(self.engine, self.document, entity, self.paths)
         if definition.kind == "IMPORTED":
             return draft(self.meshes[definition.source], self.cancel.handle)
         samples = {curve.id: self.curve(entity, curve, definition) for curve in definition.curves}

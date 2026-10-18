@@ -161,12 +161,14 @@ def mark_entity(item: SCP, directly_edited: bool) -> SCP:
 def released(session: "Session") -> None:
     from .construction_policy import mode
     from .construction_tasks import schedule
+    from .path_tasks import pending as paths_pending
 
     pending = {
         e.id
         for e in session.document.entities
         if e.result.status == "pending" and mode(session.document, e.id) == "ON_RELEASE"
     }
+    paths_pending(session, released=True)
     schedule(session, pending, released=True)
     release_attachments(session)
 
@@ -246,16 +248,27 @@ def update_mode(session: "Session", mode: str, entity: str = "") -> None:
     if mode not in ("LIVE", "ON_RELEASE", "MANUAL", "INHERIT"):
         raise ValueError("Invalid update mode.")
     if entity:
-        item = session.editable(entity)
-        session.replace_entities({entity: replace(item, update_mode=mode)})
+        set_update_mode(session, entity, mode)
     else:
         session.replace_document(update_mode=mode)
     resume_pending(session)
 
 
+def set_update_mode(session: "Session", entity: str, mode: str) -> None:
+    if entity in session.document.registry.construction:
+        from .object_operations import editable, install
+
+        install(session, replace(editable(session, entity), update_mode=mode))
+    else:
+        item = session.editable(entity)
+        session.replace_entities({entity: replace(item, update_mode=mode)})
+
+
 def resume_pending(session: "Session") -> None:
     from .construction_tasks import schedule
+    from .path_tasks import pending as paths_pending
 
+    paths_pending(session)
     pending = {e.id for e in session.document.entities if e.result.status == "pending"}
     schedule(session, pending)
 

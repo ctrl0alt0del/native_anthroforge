@@ -18,6 +18,17 @@ type Construction = Curve | Surface | ReferenceImage
 type SceneObject = SCP | Control | Construction
 
 
+def kind(item: SceneObject) -> str:
+    return {
+        SCP: "SCP",
+        Control: "CONTROL",
+        Curve: "CURVE",
+        Fiber: "FIBER",
+        Surface: "SURFACE",
+        ReferenceImage: "IMAGE",
+    }[type(item)]
+
+
 @dataclass(frozen=True, slots=True)
 class ObjectRegistry:
     records: Mapping[str, SceneObject]

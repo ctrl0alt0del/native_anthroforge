@@ -8,13 +8,12 @@ import numpy as np
 import pytest
 from PIL import Image
 
-from anthroforge.application import geometry_ownership, image_assets, storage
+from anthroforge.application import geometry_ownership, image_assets, path_assets, storage
 from anthroforge.application.history import History
 from anthroforge.application.primitive_operations import straight_curve
 from anthroforge.core.document import Document
 from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.core.results import EvaluationResult
-from anthroforge.native import paths
 
 
 def image(format="PNG", orientation=1):
@@ -28,7 +27,7 @@ def image(format="PNG", orientation=1):
 
 def populated(session):
     curve = replace(straight_curve(), result=EvaluationResult("path"))
-    session.resources.paths["path"] = paths.evaluate(session.engine, curve)
+    session.resources.paths["path"] = path_assets.evaluate(session.engine, curve)
     session.resources.images["image"] = image()
     references = (ReferenceImage(source="image"), ReferenceImage(source="image"))
     session.replace_document(objects=(curve, *references))
@@ -42,7 +41,7 @@ def test_paths_and_shared_images_round_trip_without_native_handles(session, tmp_
     restored, resources = storage.read_package(target, session.engine)
     assert restored == session.document
     np.testing.assert_array_equal(
-        resources.paths["path"].array(), session.resources.paths["path"].array()
+        resources.paths["path"].path.array(), session.resources.paths["path"].path.array()
     )
     assert resources.images == session.resources.images
     with zipfile.ZipFile(target) as archive:
@@ -58,7 +57,7 @@ def test_resource_snapshot_retains_paths_and_images_after_catalogue_collection(s
     session.history = History(session.document)
     geometry_ownership.collect(session)
     assert not session.resources.paths and not session.resources.images
-    assert np.isfinite(snapshot.paths["path"].array()).all()
+    assert np.isfinite(snapshot.paths["path"].path.array()).all()
     assert len(snapshot.images["image"].rgba) == 32
 
 

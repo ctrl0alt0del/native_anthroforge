@@ -23,6 +23,9 @@ if TYPE_CHECKING:
 
 
 def request(session: "Session", entity: str, interactive: bool = False) -> str:
+    from .path_tasks import prerequisites
+
+    prerequisites(session, entity)
     job = make_job(session, entity)
     job.cancel = NativeCancellation(session.engine)
     job.interactive, job.priority = interactive, session.priority({entity})
@@ -38,7 +41,7 @@ def make_job(session: "Session", entity: str) -> Job:
     job = Job(
         "Evaluate " + session.document.entity(entity).name,
         frozenset((entity,)),
-        lambda document: (document, {k: a.mesh for k, a in session.assets.items()}),
+        lambda document: (document, session.resources.snapshot()),
         partial(compute, session, entity),
         partial(publish, session, entity),
         key="construction:" + entity,
@@ -65,12 +68,15 @@ def workload(session: "Session", entity: str, document: Document) -> Workload:
 
 
 def compute(session: "Session", entity: str, payload: Any, cancel: Any) -> Any:
-    document, meshes = payload
+    document, resources = payload
     if dep.Port(entity, "geometry") in dep.blocked(dep.graph(document)):
         raise ValueError(
             "Cyclic or missing construction dependency; last accepted geometry retained."
         )
-    evaluator = Evaluation(session.engine, document, meshes, cast(NativeCancellation, cancel))
+    meshes = {key: asset.mesh for key, asset in resources.meshes.items()}
+    evaluator = Evaluation(
+        session.engine, document, meshes, cast(NativeCancellation, cancel), resources.paths
+    )
     return document, evaluator.geometry(document.entity(entity))
 
 
@@ -104,8 +110,8 @@ def accepted_result(
 ) -> EvaluationResult:
     pending = tuple(
         e.id
-        for e in source.entities
-        if dep.Port(e.id, "geometry") in inputs and e.id != item.id and e.result.status == "pending"
+        for e in (*source.entities, *source.objects)
+        if any(p.owner == e.id for p in inputs) and e.id != item.id and e.result.status == "pending"
     )
     return EvaluationResult(
         key,
@@ -166,8 +172,12 @@ def edited(session: "Session", targets: set[str]) -> None:
 
 
 def evaluate(session: "Session", entities: list[str] | None = None) -> list[str]:
+    from .path_tasks import prerequisites
+
     targets = set(entities) if entities is not None else {e.id for e in session.document.entities}
+    targets &= session.document.index.entities.keys()
     for entity in tuple(targets):
+        prerequisites(session, entity, explicit=True)
         targets.update(
             dep.reads(session.document, entity) & {e.id for e in session.document.entities}
         )

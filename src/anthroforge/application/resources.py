@@ -6,16 +6,16 @@ from anthroforge.core.construction import Curve
 from anthroforge.core.document import Document
 from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.core.surfaces import Surface
-from anthroforge.native.paths import Path
 
 from .assets import Asset
 from .image_assets import ImageAsset
+from .path_assets import PathAsset
 
 
 @dataclass
 class Resources:
     meshes: dict[str, Asset] = field(default_factory=dict)
-    paths: dict[str, Path] = field(default_factory=dict)
+    paths: dict[str, PathAsset] = field(default_factory=dict)
     images: dict[str, ImageAsset] = field(default_factory=dict)
 
     def snapshot(self) -> "Resources":

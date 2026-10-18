@@ -1,6 +1,6 @@
 """One bounded read-only conversion preview, accepted through ordinary document transactions."""
 
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import asdict, replace
 from functools import partial
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
@@ -10,7 +10,7 @@ from anthroforge.core.curve_dependencies import inputs as curve_inputs
 from anthroforge.core.curve_engines import decode
 from anthroforge.core.fibers import Fiber, FiberEdit
 from anthroforge.core.jobs import Job
-from anthroforge.core.results import Port, ReadRevision
+from anthroforge.core.results import Port
 from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
@@ -25,22 +25,14 @@ from . import (
 )
 from .attachment_candidates import eligible
 from .conversion_geometry import ConversionInput, convert
+from .previews import Preview
+from .previews import completed as completed
+from .previews import current as current
 
 if TYPE_CHECKING:
     from .session import Session
 
-
-@dataclass
-class ConversionPreview:
-    token: str = ""
-    target: str = ""
-    document: str = ""
-    job: str = ""
-    asset: path_assets.PathAsset | None = None
-    reads: tuple[ReadRevision, ...] = ()
-    error: str = ""
-    state: str = "idle"
-    ports: set[Port] = field(default_factory=set)
+ConversionPreview = Preview[path_assets.PathAsset]
 
 
 def preview(
@@ -137,24 +129,10 @@ def preview_ports(document: Any, spec: ConversionSpec) -> set[Port]:
     return dependencies.closure(dependencies.graph(document), inputs)
 
 
-def current(session: "Session", value: ConversionPreview) -> bool:
-    if (
-        str(session.document.id) != value.document
-        or value.target not in session.document.registry.records
-    ):
-        return False
-    return value.reads == construction_policy.revisions(session.document, value.ports)
-
-
 def publish(session: "Session", value: ConversionPreview, asset: path_assets.PathAsset) -> None:
     if session.conversion is not value or not current(session, value):
         raise ValueError("The source changed; request a new conversion preview.")
     value.asset, value.state = asset, "ready"
-
-
-def completed(value: ConversionPreview, job: Job, state: str) -> None:
-    if state != "succeeded":
-        value.asset, value.state, value.error = None, state, job.error
 
 
 def status(session: "Session") -> dict[str, Any]:
@@ -196,7 +174,6 @@ def require_candidate(session: "Session", token: str) -> path_assets.PathAsset:
 
 
 def cancel(session: "Session") -> None:
-    value = session.conversion
-    if value.job:
-        session.scheduler.cancel_job(value.job, obsolete=True)
-    session.conversion = ConversionPreview()
+    from . import previews
+
+    previews.cancel(session, "conversion")

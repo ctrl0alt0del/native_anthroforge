@@ -374,6 +374,12 @@ commands do not certify the complete 0.2.0 workflow.
 
 ## Curve surfaces (0.2.0 candidate)
 
+- `surface.preview(curves, **creation_settings)` evaluates initial correspondence without
+  creating a document object. `surface.preview(target=existing_surface)` previews Realign.
+  `surface.preview.status()` reports token/state/alignment; `surface.preview.accept(token)`
+  installs the complete result in one undo step. `surface.preview.cancel()` releases it.
+  Source edits or parent-frame changes invalidate acceptance. Candidates are excluded from
+  saves and picking. The desktop automatically previews creation from closed loft sources.
 - `surface.create(curves, kind="LOFT", name="Surface", parent="", owner="", **settings)`
   consumes an ordered list of generic curves/fibers and returns an asynchronous job ID.
   `PATCH` requires exactly one closed source; loft sources must agree on closure.

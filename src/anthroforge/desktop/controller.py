@@ -139,8 +139,16 @@ class Controller(QObject):
         return status(self.session)
 
     def conversion_key(self):
-        value = self.session.conversion
-        return value.token, value.state, id(value.asset)
+        return tuple(
+            (v.token, v.state, id(v.asset))
+            for v in (self.session.conversion, self.session.surface_preview)
+        )
+
+    @Property("QVariantMap", notify=changed)
+    def surfacePreview(self):
+        from anthroforge.application.surface_preview import status
+
+        return status(self.session)
 
     @Property(QObject, constant=True)
     def imageModel(self):

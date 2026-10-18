@@ -54,8 +54,7 @@ def create(controller, engine):
 
 
 def inspection(controller, engine, target):
-    action(engine, "surfaceRealign", "clicked")
-    settle(controller)
+    realign(controller, engine)
     assert controller.session.document.object(target).result.status == "ready"
     window = engine.rootObjects()[0]
     button = find(window, "surfaceFlip")
@@ -67,6 +66,14 @@ def inspection(controller, engine, target):
     settle(controller)
     assert not controller.session.document.object(target).flip
     independence(controller, engine, target)
+
+
+def realign(controller, engine):
+    action(engine, "surfaceRealign", "clicked")
+    settle(controller)
+    assert controller.surfacePreview["state"] == "ready"
+    action(engine, "surfacePreviewAccept", "clicked")
+    settle(controller)
 
 
 def independence(controller, engine, target):
@@ -101,12 +108,29 @@ def run():
         target = create(controller, engine)
         inspection(controller, engine, target)
         source_list(controller, engine, target)
+        closed_preview(controller, engine)
         assert not warnings, warnings
         assert not controller.message, controller.message
         print("Offscreen surface menu, inspector, Realign, undo and mesh staging passed.")
     finally:
         controller.close()
         delete(engine)
+
+
+def closed_preview(controller, engine):
+    from surface_preview_scene import sources
+
+    curves = sources(controller)
+    controller.select(curves[0])
+    controller.select(curves[1], True)
+    before = len(controller.session.document.objects)
+    action(engine, "createLoftSurface", "triggered")
+    settle(controller)
+    assert len(controller.session.document.objects) == before
+    assert controller.surfacePreview["state"] == "ready", controller.surfacePreview
+    action(engine, "surfacePreviewAccept", "clicked")
+    settle(controller)
+    assert len(controller.session.document.objects) == before + 1
 
 
 if __name__ == "__main__":

@@ -28,6 +28,7 @@ from . import (
     projects,
     surface_branch_operations,
     surface_operations,
+    surface_preview,
     surface_sources,
 )
 from . import control_operations as controls
@@ -46,6 +47,7 @@ EDITS = {
     "surface.source.remove": surface_sources.remove,
     "surface.order": surface_operations.order,
     "surface.realign": surface_operations.realign,
+    "surface.preview.accept": surface_preview.accept,
     "surface.branch.add": surface_branch_operations.add,
     "surface.branch.remove": surface_branch_operations.remove,
     "fiber.create": fiber_operations.create,
@@ -184,6 +186,9 @@ def query_commands(session: "Session") -> dict[str, Any]:
 
 def construction_queries(session: "Session") -> dict[str, Any]:
     return {
+        "surface.preview": lambda **a: surface_preview.preview(session, **a),
+        "surface.preview.status": lambda: surface_preview.status(session),
+        "surface.preview.cancel": lambda: surface_preview.cancel(session),
         "image.inspect": lambda **a: image_operations.inspect(session, **a),
         "object.inspect": lambda **a: object_operations.inspect(session, **a),
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),

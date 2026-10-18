@@ -760,3 +760,23 @@ exercise actual numeric signals, matching base vertices, locked controls and unl
 This caught Qt transporting integral JavaScript values as doubles; the common desktop command
 adapter now restores exact integers recursively, retaining strict core validation. Configured
 mypy (177 modules) and Ruff pass. A complete gate remains pending after these changes.
+
+### Full sampling gate and surface preview checkpoint
+
+At c6e33d2 the full development gate passes: 822 pytest tests (9 existing Qt warnings),
+3 native CTests, all native style, Python types/style/function limits, PowerShell checks,
+numerical imports and native doctor. Log: `build/check-020-sampling.log`.
+
+Closed-loft creation now has a separate owned mesh/alignment candidate, with Accept/Cancel
+in Construction. Realign uses the same preview flow. A shared typed preview envelope owns
+candidate lifetime and complete read validation for both surface and curve conversions.
+Surface candidates are excluded from saves/history/picking, staged through existing mesh
+publication, tracked in profiler ownership, and committed as one undo step on acceptance.
+Metadata changes remain preserved; source/parent changes and deleted inputs reject acceptance.
+
+22 focused preview/conversion/surface/architecture tests, mypy (179 modules) and Ruff pass.
+Full-QML offscreen creation/realignment/acceptance and invisible D3D11 captures pass; inspected
+`build/020-surface-preview/preview.png` shows the connected green closed-loop loft. Cancellation
+releases preview viewport leases. These are offscreen checks, not interactive acceptance.
+The full gate has not been rerun after preview integration. Authored fiber collision Issues,
+broader anatomical/performance/resource qualification, examples/docs and packaging remain.

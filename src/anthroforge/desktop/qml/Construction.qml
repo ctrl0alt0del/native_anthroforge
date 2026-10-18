@@ -12,6 +12,7 @@ ColumnLayout {
         UiButton { glyph: "plus"; hint: "Create curves or place the 3D cursor"; onClicked: createMenu.open() }
         UiButton { text: "Image…"; hint: "Import a world reference image"; onClicked: imageFile.open() }
     }
+    SurfacePreview {}
     ListView {
         Layout.fillWidth: true; Layout.fillHeight: true; clip: true
         model: workspace.constructionModel

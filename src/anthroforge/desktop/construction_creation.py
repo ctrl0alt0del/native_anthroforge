@@ -11,9 +11,11 @@ def selected_curves(controller):
 def surface(controller, kind):
     from .image_tools import context_owner
 
+    curves = selected_curves(controller)
+    closed = any(controller.session.document.object(key).closed for key in curves)
     return controller.run(
-        "surface.create",
-        dict(curves=selected_curves(controller), kind=kind, owner=context_owner(controller)),
+        "surface.preview" if kind == "LOFT" and closed else "surface.create",
+        dict(curves=curves, kind=kind, owner=context_owner(controller)),
     )
 
 

@@ -159,10 +159,11 @@ def refresh(controller):
 
 def publish(controller):
     rows = [render_record(row) for row in [*controller.rows, *surface_scene.records(controller)]]
+    rows.extend(surface_scene.preview_rows(controller))
     if rows != controller._render_rows:
         controller._render_rows = rows
         controller.render_model.publish(
-            scene_state.render_rows(rows), (a.mesh for a in controller.session.assets.values())
+            scene_state.render_rows(rows), surface_scene.resources(controller)
         )
     controller.construction.publish()
     scene_state.control_picking_inputs(controller)

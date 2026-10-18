@@ -90,6 +90,8 @@ def session_owners(session, output, profiler):
     output["catalogue"].update(bounded(catalogue_resources(session), 4096, profiler))
     if session.conversion.asset is not None:
         output["conversion_preview"].add(session.conversion.asset.path)
+    if session.surface_preview.asset is not None:
+        output["surface_preview"].add(session.surface_preview.asset.mesh)
 
 
 def catalogue_resources(session):

@@ -20,7 +20,9 @@ from .curve_conversion import ConversionPreview
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
 from .history import History
+from .previews import Preview
 from .resources import Resources
+from .surface_preview import Candidate
 
 
 class Session:
@@ -65,6 +67,7 @@ class Session:
 
     def initialize_scheduler(self) -> None:
         self.conversion = ConversionPreview()
+        self.surface_preview: Preview[Candidate] = Preview()
         self.scheduler = TaskCoordinator(lambda: self.document)
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
@@ -217,6 +220,7 @@ class Session:
         self.issues.close()
         self.scheduler.close()
         self.conversion = ConversionPreview()
+        self.surface_preview = Preview()
         if self._engine is not None:
             self._engine.bases.clear()
             self.profiler.native.detach(self._engine)

@@ -66,10 +66,11 @@ def test_profiler_off_does_not_query_memory_or_observe_cache(session, monkeypatc
         raise AssertionError("Disabled profiler queried memory")
 
     monkeypatch.setattr(memory, "snapshot", unexpected)
+    monkeypatch.setattr(memory, "path_snapshot", unexpected)
     entity = create(session, kind="BODY")
     edit_curve(session, entity, 0.2)
     session.profiler.resources.sample(force=True)
-    assert session.engine.mesh_observer is None and session.engine.bases.observer is None
+    assert session.engine.resource_observer is None and session.engine.bases.observer is None
     assert not session.profiler.resources.jobs and session.profiler.buffer is None
 
 
@@ -82,7 +83,7 @@ def test_cache_eviction_reports_its_actual_policy_reason(session, tmp_path):
     session.wait(5)
     data = report(session, tmp_path / "cache.zip")
     assert data["summary.json"]["diagnostics"]["cache_events"]["evict:entry_capacity"]
-    assert session.engine.bases.observer is None and session.engine.mesh_observer is None
+    assert session.engine.bases.observer is None and session.engine.resource_observer is None
 
 
 def test_resource_observation_does_not_retain_meshes(session, tmp_path):
@@ -139,3 +140,29 @@ def test_observed_job_limit_and_job_memory_are_explicit(session, tmp_path):
     data = report(session, tmp_path / "bounded.zip")
     assert not data["manifest.json"]["complete"]
     assert data["manifest.json"]["losses"]["resource_job_limit"] == 1
+
+
+def test_profile_counts_path_and_image_allocations_in_separate_namespaces(session, tmp_path):
+    from tests.test_construction_resources import populated
+
+    populated(session)
+    session.command("profile.start", memory_mib=16)
+    evidence = inventory(session.profiler, session.profiler.resources.owners())
+    assert evidence["by_kind"]["paths"]["owners"]["document"]["bytes"] > 0
+    assert evidence["by_kind"]["images"]["allocations"] == 1
+    assert evidence["unique_bytes"] == sum(
+        row["unique_bytes"] for row in evidence["by_kind"].values()
+    )
+    data = report(session, tmp_path / "construction-memory.zip")
+    assert data["summary.json"]["diagnostics"]["geometry_memory"]["latest"]["by_kind"]["paths"]
+    assert data["manifest.json"]["complete"], data["manifest.json"]["losses"]
+
+
+def test_path_memory_inventory_reports_capacity_without_retaining_buffers(session):
+    key = session.command("curve.create")
+    session.wait(5)
+    native = session.resources.paths[session.document.object(key).result.asset].path
+    rows, count = memory.path_snapshot(session.engine, limit=0)
+    assert not rows and count >= 1
+    session.profiler.resources.remember("off", (native,))
+    assert not session.profiler.resources.jobs

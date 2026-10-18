@@ -43,7 +43,7 @@ def test_paths_and_shared_images_round_trip_without_native_handles(session, tmp_
     np.testing.assert_array_equal(
         resources.paths["path"].path.array(), session.resources.paths["path"].path.array()
     )
-    assert resources.images == session.resources.images
+    assert resources.images["image"].encoded == session.resources.images["image"].encoded
     with zipfile.ZipFile(target) as archive:
         assert sum(name.endswith("/source") for name in archive.namelist()) == 1
         assert b'"handle"' not in archive.read("manifest.json")
@@ -85,4 +85,4 @@ def test_jpeg_exif_orientation_applied_once_in_portable_source():
     original = image("JPEG", orientation=6)
     restored = image_assets.decode(original.encoded)
     assert (original.width, original.height) == (2, 4)
-    assert original == restored
+    assert original.rgba == restored.rgba and original.digest == restored.digest

@@ -6,6 +6,9 @@ namespace af {
 static std::mutex path_mutex;
 static std::unordered_map<uint64_t,std::shared_ptr<Path>> paths;
 static uint64_t next_path=1;
+static uint64_t path_bytes(const Path& path) {
+    return sizeof(Path)+(path.samples.capacity()+path.parameters.capacity())*sizeof(double);
+}
 std::shared_ptr<Path> path(uint64_t handle) {
     std::lock_guard<std::mutex> lock(path_mutex);
     const auto found=paths.find(handle);
@@ -68,7 +71,7 @@ int af_path_info(uint64_t handle,int64_t* counts,double* bounds) {
         if(!counts||!bounds) throw std::runtime_error("Path info requires output buffers.");
         const auto value=af::path(handle);
         counts[0]=int64_t(value->parameters.size()); counts[1]=value->closed;
-        counts[2]=int64_t(sizeof(af::Path)+(value->samples.capacity()+value->parameters.capacity())*sizeof(double));
+        counts[2]=int64_t(af::path_bytes(*value));
         std::copy(value->bounds.begin(),value->bounds.end(),bounds); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
@@ -78,4 +81,16 @@ const double* af_path_buffer(uint64_t handle,int kind) {
         const auto value=af::path(handle);
         return kind?value->parameters.data():value->samples.data();
     } catch(const std::exception& error) { af::set_error(error.what()); return nullptr; }
+}
+int af_path_memory_snapshot(uint64_t* rows,int capacity,uint64_t* total) {
+    if(!total||capacity<0||(!rows&&capacity)) return -1;
+    std::lock_guard<std::mutex> lock(af::path_mutex);
+    *total=af::paths.size(); int count=0;
+    for(const auto& item:af::paths) {
+        if(count==capacity) break;
+        auto* row=rows+count*3;
+        row[0]=item.first; row[1]=reinterpret_cast<uint64_t>(item.second.get());
+        row[2]=af::path_bytes(*item.second); ++count;
+    }
+    return count;
 }

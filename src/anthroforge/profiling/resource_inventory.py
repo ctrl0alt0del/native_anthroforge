@@ -3,11 +3,14 @@
 from dataclasses import fields, is_dataclass
 from itertools import islice
 
+from anthroforge.application.image_assets import ImageAsset
 from anthroforge.native import memory
 from anthroforge.native.mesh import Mesh
+from anthroforge.native.paths import Path
 
 LIMITATIONS = [
-    "Native mesh payload capacity, including estimated full-binary AABB node bytes",
+    "Native mesh/path payload capacities; meshes include estimated full-binary AABB node bytes",
+    "Images include owned encoded source and decoded RGBA bytes reachable from observed owners",
     "Excludes allocator overhead, Python objects, Qt copies and GPU/driver allocations",
     "Ownership totals overlap; add neither owners nor shared alias handles",
     "Pre-recording job payload references may be unattributed; job snapshots are included",
@@ -15,7 +18,7 @@ LIMITATIONS = [
 ]
 
 
-def payload_meshes(value, profiler):
+def payload_resources(value, profiler):
     pending, found, seen = [value], set(), set()
     for _ in range(8192):
         if not pending:
@@ -24,7 +27,7 @@ def payload_meshes(value, profiler):
         if id(item) in seen:
             continue
         seen.add(id(item))
-        if isinstance(item, Mesh):
+        if isinstance(item, (Mesh, Path, ImageAsset)):
             found.add(item)
         else:
             pending.extend(bounded(children(item), 8192 - len(seen) - len(pending), profiler))
@@ -46,12 +49,12 @@ def children(value):
         return (
             getattr(value, field.name)
             for field in fields(value)
-            if field.name in ("mesh", "assets")
+            if field.name in ("mesh", "assets", "path", "paths", "meshes", "images", "resources")
         )
     return ()
 
 
-def session_owners(session, output, profiler):
+def document_owners(session):
     documents = dict(
         document=[session.document],
         checkpoint=[session.scheduler.checkpoint],
@@ -59,10 +62,24 @@ def session_owners(session, output, profiler):
     )
     documents["jobs"] = [job.snapshot for job in session.scheduler.active_jobs if job.snapshot]
     documents["edit"] = [session.history.before] if session.history.before else []
-    for owner, values in documents.items():
-        keys = document_assets(bounded(values, 512, profiler), profiler)
-        output[owner].update(session.assets[key].mesh for key in keys if key in session.assets)
-    output["catalogue"].update(a.mesh for a in bounded(session.assets.values(), 4096, profiler))
+    return documents
+
+
+def session_owners(session, output, profiler):
+    for owner, values in document_owners(session).items():
+        references = (
+            resource
+            for document in bounded(values, 512, profiler)
+            for resource in document_resources(session, document, profiler)
+        )
+        output[owner].update(bounded(references, 4096, profiler))
+    output["catalogue"].update(bounded(catalogue_resources(session), 4096, profiler))
+
+
+def catalogue_resources(session):
+    yield from (a.mesh for a in session.resources.meshes.values())
+    yield from (a.path for a in session.resources.paths.values())
+    yield from session.resources.images.values()
 
 
 def bounded(values, limit, profiler):
@@ -73,27 +90,32 @@ def bounded(values, limit, profiler):
     return result
 
 
-def document_assets(documents, profiler):
-    from anthroforge.core.results import geometry_asset
+def document_resources(session, document, profiler):
+    from anthroforge.application.resources import references
 
-    keys = set()
-    for document in documents:
-        for item in bounded(document.entities, 4096, profiler):
-            keys.add(geometry_asset(item))
-            if item.primitive:
-                keys.add(item.primitive.source)
-        if len(keys) > 4096:
-            return set(bounded(keys, 4096, profiler))
-    return keys - {""}
+    keys = references(
+        bounded(document.entities, 4096, profiler), bounded(document.objects, 4096, profiler)
+    )
+    meshes, paths, images = (
+        session.resources.meshes,
+        session.resources.paths,
+        session.resources.images,
+    )
+    result = [meshes[key].mesh for key in keys["meshes"] if key in meshes]
+    result.extend(paths[key].path for key in keys["paths"] if key in paths)
+    result.extend(images[key] for key in keys["images"] if key in images)
+    return result
 
 
 def inventory(profiler, owners):
+    from .construction_inventory import inventories, merge
+
     rows, total = native_rows(profiler)
     handles = {(row[0], row[1]): row[2] for row in rows}
     allocations = {row[2]: row for row in rows}
     sizes = {identity: sum(row[3:6]) for identity, row in allocations.items()}
     groups = owner_groups(owners, handles)
-    report = memory_totals(rows, sizes, groups, total)
+    report = merge(memory_totals(rows, sizes, groups, total), inventories(profiler, owners))
     report["complete"] &= not any(k.startswith("resource_") for k in profiler.losses)
     return report
 
@@ -122,7 +144,9 @@ def owner_totals(sizes, groups):
 def owner_groups(owners, handles):
     groups = {}
     for name, meshes in owners.items():
-        keys = ((mesh.engine.library._handle, mesh.handle) for mesh in meshes)
+        keys = (
+            (mesh.engine.library._handle, mesh.handle) for mesh in meshes if isinstance(mesh, Mesh)
+        )
         groups[name] = {handles[key] for key in keys if key in handles}
     return groups
 

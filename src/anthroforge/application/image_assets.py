@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from PIL import Image
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, eq=False)
 class ImageAsset:
     encoded: bytes
     rgba: bytes

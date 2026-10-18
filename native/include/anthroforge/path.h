@@ -18,6 +18,7 @@ AF_API int af_path_sample(uint64_t handle, int count, double start, double span,
     const double* matrix, int reverse, double* output, uint64_t cancel);
 AF_API int af_path_body(uint64_t handle, int reverse, int closed_start,
     double* output, uint64_t cancel);
+AF_API int af_path_memory_snapshot(uint64_t* rows, int capacity, uint64_t* total);
 #ifdef __cplusplus
 }
 #endif

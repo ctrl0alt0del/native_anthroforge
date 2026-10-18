@@ -1,9 +1,12 @@
 """Typed resource ownership; snapshots retain allocations independently of live catalogues."""
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 
 from anthroforge.core.construction import Curve
 from anthroforge.core.document import Document
+from anthroforge.core.entities import SCP
+from anthroforge.core.object_registry import Construction
 from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.core.surfaces import Surface
 
@@ -41,13 +44,18 @@ class Resources:
 
 
 def referenced(document: Document) -> dict[str, set[str]]:
+    return references(document.entities, document.objects)
+
+
+def references(entities: Iterable[SCP], objects: Iterable[Construction]) -> dict[str, set[str]]:
     from anthroforge.core.results import geometry_asset
 
-    meshes = {geometry_asset(e) for e in document.entities}
-    meshes.update(e.primitive.source for e in document.entities if e.primitive)
-    meshes.update(o.result.asset for o in document.objects if isinstance(o, Surface))
-    paths = {o.result.asset for o in document.objects if isinstance(o, Curve)}
-    images = {o.source for o in document.objects if isinstance(o, ReferenceImage)}
+    entities, objects = tuple(entities), tuple(objects)
+    meshes = {geometry_asset(e) for e in entities}
+    meshes.update(e.primitive.source for e in entities if e.primitive)
+    meshes.update(o.result.asset for o in objects if isinstance(o, Surface))
+    paths = {o.result.asset for o in objects if isinstance(o, Curve)}
+    images = {o.source for o in objects if isinstance(o, ReferenceImage)}
     return {
         key: values - {""}
         for key, values in dict(meshes=meshes, paths=paths, images=images).items()

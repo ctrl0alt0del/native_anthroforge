@@ -29,6 +29,8 @@ class Path:
         engine.check(engine.library.af_path_info(handle, counts, bounds))
         self.count, self.closed, self.bytes = counts[0], bool(counts[1]), counts[2]
         self.bounds = tuple(bounds)
+        if engine.resource_observer is not None:
+            engine.resource_observer(self)
 
     def array(self, kind: int = 0) -> Any:
         if kind not in (0, 1):

@@ -30,7 +30,7 @@ class GeometryEngine(NativeEngine):
         self._query_signatures()
         self._construction_signatures()
         self.bases = BaseCache()
-        self.mesh_observer: Any = None
+        self.resource_observer: Any = None
 
     def _construction_signatures(self) -> None:
         from . import bodies, components, construction, falloff, scene, topology
@@ -148,8 +148,8 @@ class Mesh:
         bounds = (c.c_double * 6)()
         engine.check(engine.library.af_mesh_bounds(handle, bounds))
         self.bounds = tuple(bounds)
-        if engine.mesh_observer is not None:
-            engine.mesh_observer(self)
+        if engine.resource_observer is not None:
+            engine.resource_observer(self)
 
     def array(self, kind: int) -> Any:
         vertices, faces, corners, triangles, _ = self.counts

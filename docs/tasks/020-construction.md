@@ -39,6 +39,10 @@ report pending upstream state, and reevaluate live consumers after explicit path
 Native sampling reuses accepted paths and preserves existing body/loft sampling behavior.
 Curve jobs use the common cancellation/history/checkpoint contracts and task Issues.
 Generic workspace associations determine curve editability and task priority.
+Profiler memory snapshots now include typed mesh/path/image totals and per-kind ownership,
+with bounded native path enumeration, weak job observations and bounded catalogue/history
+collection. Disabled profiling performs no inventory queries. Image resource identity avoids
+hashing image payloads during observations; reports contain sizes and provenance, not pixels.
 No standalone curve viewport/Construction UI exists yet; ROUTED is not implemented in the
 standalone engine and is explicitly rejected by native path dispatch.
 Images/Fiber/Surface records exist but their production operations/native algorithms/UI
@@ -58,6 +62,8 @@ Coordinated accepted-path increment: `./tools/check.ps1` passed with 596 tests, 
 style/build/contract checks, Ruff, mypy, numerical imports and doctor. Includes exact old/new
 native sampling comparisons for transformed open/closed lofts and body deformation; this is
 not a claim of complete new fiber/drawing/surface Blender parity or interactive acceptance.
+Resource attribution increment: 598 tests pass, Ruff/mypy pass, native build/contract and
+modified native inventory clang-tidy pass. No new full-gate or GUI qualification claimed.
 `./tools/check.ps1` passed on the shared-curve checkpoint: native build/contract, native
 and script style, Ruff, mypy, all 573 tests, numerical imports and doctor. 0.2.0 GUI/package
 qualification has not run. One earlier full run saw the existing global native-allocation
@@ -70,8 +76,8 @@ Use background/offscreen checks and state their limits.
 
 ## Next actions and blockers
 
-1. Extend remaining inspection/Issues/profiler clients to generic objects, including path/image
-   memory attribution; retire control anatomical attachments in favor of ordinary relationships.
+1. Extend remaining inspection/Issues clients to generic objects; retire control anatomical
+   attachments in favor of ordinary relationships. Path/image profiler ownership is integrated.
 2. Add Construction UI and standalone curve editing/creation; curve consumers already have
    shared command operations. Then complete native drawing, embedded reference images,
    Fiber bindings/routing/junctions and generic surfaces in the planned order.

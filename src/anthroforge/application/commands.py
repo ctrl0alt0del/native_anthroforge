@@ -67,6 +67,7 @@ EDITS = {
     "primitive.curve_mode": curve_consumers.transform_mode,
     "primitive.curve_reverse": curve_consumers.reverse,
     "primitive.make_independent": curve_independence.make_independent,
+    "consumer.make_independent": curve_independence.make_independent,
     "scp.empty": operations.empty,
     "scp.rename": operations.rename,
     "scp.color": operations.color,

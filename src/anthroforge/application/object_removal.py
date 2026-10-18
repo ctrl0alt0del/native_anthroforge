@@ -3,15 +3,17 @@
 from dataclasses import replace
 from typing import TYPE_CHECKING
 
-from anthroforge.core.construction import Control, Primitive
+from anthroforge.core.construction import Control
+from anthroforge.core.curve_consumption import uses, with_uses
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import SCP
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.object_registry import Construction, SceneObject
 from anthroforge.core.results import Port
+from anthroforge.core.surfaces import Surface
 from anthroforge.native.construction import matrix
 
-from . import curve_sources
+from . import curve_consumers, curve_sources
 from .object_revisions import authored
 
 if TYPE_CHECKING:
@@ -29,7 +31,7 @@ def install(
     ports = changed_inputs(session, controls, objects)
     session.scheduler.invalidate_ports(ports)
     session.replace_document(entities=entities, controls=controls, objects=objects)
-    changed(session, ports)
+    changed(session, ports, published=False)
 
 
 def changed_inputs(
@@ -60,6 +62,8 @@ def retain_objects(
 def retain_object(
     session: "Session", item: Construction, removed: SceneObject, parent: SceneObject | None
 ) -> Construction:
+    if isinstance(item, Surface):
+        item = rebase_uses(session, item, removed.id)
     owners = tuple(key for key in item.owners if key != removed.id)
     if item.parent != removed.id:
         return replace(item, owners=owners) if owners != item.owners else item
@@ -84,19 +88,14 @@ def retain_frames(session: "Session", entities: tuple[SCP, ...], removed: str) -
     return tuple(rebase_uses(session, item, removed) for item in entities)
 
 
-def rebase_uses(session: "Session", item: SCP, removed: str) -> SCP:
-    primitive = item.primitive
-    if not isinstance(primitive, Primitive):
+def rebase_uses[T: SCP | Surface](session: "Session", item: T, removed: str) -> T:
+    previous = uses(item)
+    if not previous:
         return item
-    uses = tuple(
-        rebase_use(session, use) if use.reference_frame == removed else use
-        for use in primitive.curves
+    sources = tuple(
+        rebase_use(session, use) if use.reference_frame == removed else use for use in previous
     )
-    return (
-        replace(item, primitive=replace(primitive, curves=uses))
-        if uses != primitive.curves
-        else item
-    )
+    return curve_consumers.revised(item, with_uses(item, sources))
 
 
 def rebase_use(session: "Session", use: CurveUse) -> CurveUse:

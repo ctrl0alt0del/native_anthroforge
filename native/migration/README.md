@@ -39,11 +39,11 @@ are private to the adapter. The application's existing coordinator owns work con
 
 Native adapters own surface snapshots, transforms, direct-reference allocation, open
 hard-pin spans/global closed paths, production SQP settings, cancellation between trials,
-path correspondence and output preparation. Planner preparation is being ported from
-`core/vcp/v2/planner.py` and its production session helpers. Current extraction covers
-direct/compatibility/projected-surface routes and corner-preserving handoff, not yet the
-complete sparse/dense/expanded and pin-exit recovery chain. Do not label this as complete
-routing parity or expose it as the finished application engine.
+path correspondence and output preparation. Planner preparation ports
+`core/vcp/v2/planner.py` and its production session helpers, including sparse/dense/expanded,
+pin-exit and warm recovery plus the separate handoff clearance check. A pinned 1050-node
+pin-tree fixture checks its graph and thirteen paths; compact end-to-end cases remain
+separate evidence. Broader anatomical and warm-path qualification is still required.
 
 `tests/fixtures/routing/addon.json` contains compact actual addon outputs and loaded-source
 hashes. The four current cases cover clear open/closed paths and a cube detour/bound route.

@@ -5,6 +5,7 @@ from functools import partial
 from typing import Any
 
 from anthroforge.core.curve_uses import CurveUse
+from anthroforge.core.object_registry import validate_sources
 from anthroforge.core.surfaces import Surface
 
 from . import authored_jobs, curve_consumers, object_creation, object_operations, surface_jobs
@@ -22,6 +23,7 @@ def create(
 ) -> str:
     item = new_surface(session, curves, kind, name, parent, owner)
     item = configured(item, options)
+    validate_sources(item, session.document.registry.records)
     return authored_jobs.begin(session, partial(surface_jobs.enqueue, session, item, False))
 
 

@@ -261,9 +261,9 @@ inputs with newer authored changes. Failed cycles retain previous geometry and f
 unsuccessfully, so they do not block saves indefinitely. Read `jobs` and result status
 after `wait`; successful command dispatch alone does not guarantee successful calculation.
 
-Schema 2 embeds editable definitions, source meshes, bindings and accepted results for
-the selected revision. Version-1 projects migrate on read. Native handles and undo history
-are not serialized. Older application versions reject schema 2.
+The released 0.1.x implementation used schema 2 with version-1 migration. The 0.2.0
+development branch supersedes that behavior: schema 3 only, with clear rejection of
+older formats. Native handles and undo history are never serialized.
 # Reference images (0.2.0 development branch)
 
 Image operations use the same session command API, with no Qt dependency:
@@ -370,3 +370,25 @@ resource owners, routing obstacles and pending edit baselines together. Shared i
 geometry buffers remain retained by their resource owners. Broader anatomical parity and
 release qualification remain in progress; these
 commands do not certify the complete 0.2.0 workflow.
+
+## Curve surfaces (0.2.0 candidate)
+
+- `surface.create(curves, kind="LOFT", name="Surface", parent="", owner="", **settings)`
+  consumes an ordered list of generic curves/fibers and returns an asynchronous job ID.
+  `PATCH` requires exactly one closed source; loft sources must agree on closure.
+- `surface.update(target, **settings)` edits `exact`, `strips`, `patch_resolution`,
+  `close_across`, `flip` or `name`. Exact sampling retains evaluated corners. `strips=0`
+  retains density fitted at creation/Realign; a positive count selects fixed subdivisions.
+- `surface.source(target, curve, **settings)` edits per-consumer `mode`, `reverse`,
+  `start`, `span` and `samples`. Transform-mode switching preserves visible placement.
+- `surface.order(target, curves)` reorders every source exactly once, retaining its
+  correspondence. `surface.realign(target)` asynchronously rebuilds closed direction/start
+  and fitted density in one undo action. Ordinary deformation never realigns silently.
+- `consumer.make_independent(entity, curve)` works for surfaces and primitives. It copies
+  authored points/resources, remaps correspondence identities, and preserves accepted output.
+- Generic object transforms, parenting, update modes, inspection, evaluation and deletion
+  apply. Referenced source deletion is blocked; deleting the surface preserves all sources.
+
+These commands share the desktop Construction menu and inspector policies. Accepted meshes
+remain visible on pending/failed calculation; Issues expose failure and explicit recalculation.
+Branched construction is not yet integrated and is rejected explicitly in this checkpoint.

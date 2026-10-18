@@ -54,11 +54,10 @@ def install_state(session: "Session", before: Construction, changed: Constructio
     from . import consumer_parenting
 
     objects = tuple(changed if o.id == changed.id else o for o in session.document.objects)
-    entities = session.document.entities
+    after = replace(session.document, objects=objects)
     if changed.parent != before.parent:
-        after = replace(session.document, objects=objects)
-        entities = consumer_parenting.entities(session, after, changed.id)
-    session.replace_document(objects=objects, entities=entities)
+        after = consumer_parenting.rebind(session, after, changed.id)
+    session.replace_document(objects=after.objects, entities=after.entities)
 
 
 def rename(session: "Session", target: str, name: str) -> None:

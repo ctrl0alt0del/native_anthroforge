@@ -11,7 +11,7 @@ from anthroforge.core.results import Port
 from anthroforge.core.surfaces import Surface
 from anthroforge.native.mesh import NativeCancellation
 
-from . import authored_jobs, construction_tasks, surface_evaluation
+from . import authored_jobs, construction_tasks, path_tasks, surface_evaluation
 from . import dependencies as dep
 from .assets import Asset
 from .construction_policy import revisions
@@ -27,6 +27,7 @@ def inputs(document: Any, item: Surface, existing: bool) -> set[Port]:
 
 
 def enqueue(session: Any, item: Surface, existing: bool, origin: int) -> str:
+    path_tasks.require_inputs(session, inputs(session.document, item, existing))
     job = make_job(session, item, existing, origin)
     job.cancel = NativeCancellation(session.engine)
     job.retry = partial(enqueue, session, item, existing, origin)

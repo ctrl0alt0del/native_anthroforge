@@ -66,6 +66,15 @@ def inspection(controller, engine, target):
     controller.run("undo", {})
     settle(controller)
     assert not controller.session.document.object(target).flip
+    independence(controller, engine, target)
+
+
+def independence(controller, engine, target):
+    previous = controller.session.document.object(target).curves[0].curve
+    action(engine, "surfaceIndependent0", "clicked")
+    settle(controller)
+    changed = controller.session.document.object(target).curves[0].curve
+    assert changed != previous and previous in controller.session.document.registry.records
 
 
 def run():

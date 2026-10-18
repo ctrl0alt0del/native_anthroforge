@@ -585,3 +585,32 @@ Still pending in this increment: shared Surface consumer reparenting/independenc
 queued prerequisites and broader lifecycle/Issues tests, actual invisible GPU render/pick
 checks, and a full development gate. Junctions/branches, remaining parity/performance and
 release qualification also remain. This checkpoint is not merge-ready; version is 0.1.9.
+
+## Surface references and displayed picking
+
+Primitive and Surface consumers now share source-reference editing, ordinary-frame
+rebasing and independent copy policies. Surface copies remap stable closed correspondence;
+reparenting, origin changes and deletion preserve placement. Tests cover shared parent
+movement exactly once, other consumers retaining the original, and undo after deletion.
+Creation registers path prerequisites before layout admission, rejects incompatible source
+closure immediately, and supports queued creation/undo/redo. Manual accepted inputs retain
+provenance, missing accepted inputs fail boundedly, and generic Issues provide verified
+recalculation for failed/pending surfaces. Accepted geometry survives failure.
+
+Invisible D3D11 rendering exposed missed planar/shared-edge ray hits. The native query
+adapter reuses the cached BVH with explicit parallel-slab handling and ray-space triangle
+edge tests. Both directions on all three axis planes now pass before/after deformation,
+including boundary vertices. No ray perturbation, vendor edit or Python mesh scan is used.
+See `native/migration/CURVE_SURFACES.md` for evidence and algorithm references.
+
+Surface reference/lifecycle tests, 14 native ray regressions, configured mypy, Ruff and
+the architecture rule pass. Full-QML menu, Realign, normals, independence and undo pass
+without warnings. GPU texture captures were inspected: loft and edited loft render with
+selection outlines. Hover/click agreement, old displayed revision during staging, handle
+release and exclusion from anatomical snapping pass (`build/020-surface-scene`). This is
+offscreen evidence only. Full development gate follows this checkpoint.
+
+Remaining: junctions/branches, surface source-list editing, authored fiber collision Issues,
+per-consumer primitive sampling, drawing parity details, broader anatomy/warm routing and
+profiler measurements, resource/history edge cases, examples and full portable release.
+Do not merge or publish 0.2.0 until the complete requested workflow is qualified.

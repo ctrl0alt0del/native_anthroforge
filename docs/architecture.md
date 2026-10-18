@@ -101,14 +101,15 @@ surface is a real cycle. Cyclic/downstream outputs fail boundedly and retain acc
 data. Missing accepted surfaces fail instead of waiting indefinitely.
 
 construction_evaluator.py prepares batched native pipelines from dispatch snapshots.
-Control surface binding capture runs in the worker. Complete read sets are checked
+Anatomical binding capture runs in the worker for SCPs and fibers. Controls use ordinary
+transform following only. Complete read sets are checked
 before result adoption. Live consumers can use a Manual prerequisite's accepted result
 with its revision and pending provenance; publishing that prerequisite triggers its
 consumers. Preview/control movement is not an accepted surface.
 
 Capture-only reads are declared separately from ordering prerequisites. A child's local
 anchor is captured once; subsequent propagation does not depend on new child geometry.
-Treating that capture as a permanent dependency would falsely cycle ordinary Hook/lattice
+Treating that capture as a permanent dependency would falsely cycle anatomical
 deformation. Geometry coordinates include the SCP geometry offset consistently in binding,
 evaluation, component display and picking. Moving an origin rebases its following controls
 to retain world placement and leaves the rendered geometry unchanged.
@@ -383,7 +384,7 @@ causes, expose attachment frames through existing batched native queries, and re
 topology restrictions from their existing application policy. The desktop inspector is
 opt-in and revision-gated; it reuses field-level property projection.
 
-Workspace policies own mixed SCP/control membership and reference validation. Deleted
+Workspace policies own anatomical membership, construction association and reference validation. Deleted
 references remain valid presentation history for undo; new unknown references are
 rejected. Category visibility/pickability are shared policies. Desktop projections apply
 them to displayed geometry and cached native component indexes; pointer movement does
@@ -443,3 +444,19 @@ quads rendered correctly. Dynamic reparenting between Qt View3D scenes also lost
 The maintained implementation uses transformed quads and staged layer models, with tests
 for orientation, occlusion and complete replacement. These are scoped observed results,
 not a claim about every Qt backend. No visible-window acceptance has been performed.
+
+## Curve surface ownership (0.2.0 development)
+
+`core.curve_consumption` defines primitive/surface source references. The shared application
+consumer policies own transforms, independence and reference rebasing across reparenting,
+deletion and origin relocation. Surfaces own correspondence, density and range settings;
+the source remains an independent authored curve or Fiber. Closed correspondence stores
+authored point identity plus a segment fraction, and changes only on explicit Realign.
+
+Creation/Realign uses the existing asynchronous authored-job boundary. Subsequent geometry
+uses `construction_tasks`, with a surface workload strategy and generic geometry result
+publication. Native loft/patch work returns complete finalized meshes. Construction
+projection sends these to the same staged mesh model and displayed-revision picking used
+by SCPs, while excluding them from anatomical snapping/attachment candidates. Issues use
+generic object scopes and the shared evaluation operation. Junction/branch integration
+and full release qualification remain in progress.

@@ -56,7 +56,7 @@ int pick_surface(const Mesh& mesh,const M4& world,const V3& start,const V3& ray,
     const Eigen::RowVector3d local_start=point(inverse,start).transpose();
     const Eigen::RowVector3d local_ray=(inverse.block<3,3>(0,0)*ray).transpose();
     igl::Hit hit;
-    if(!mesh.tree.intersect_ray(mesh.vertices,mesh.triangles,local_start,local_ray,hit)) return 0;
+    if(!intersect_ray(mesh,local_start.transpose(),local_ray.transpose(),hit)) return 0;
     write_hit(mesh,world,start,hit,output); return 1;
 }
 }

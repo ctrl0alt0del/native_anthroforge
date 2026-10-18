@@ -13,9 +13,11 @@ def relocate(session: Any, before: Any, after: Any) -> None:
     objects = tuple(rebase_object(session, o, before, after) for o in session.document.objects)
     controls = tuple(rebase_control(session, c, before, after) for c in session.document.controls)
     document = replace(session.document, entities=entities, objects=objects, controls=controls)
-    entities = consumer_parenting.entities(session, document, before.id)
+    document = consumer_parenting.rebind(session, document, before.id)
     session.scheduler.invalidate({before.id, *(c.id for c in controls if c.follow == before.id)})
-    session.replace_document(entities=entities, objects=objects, controls=controls)
+    session.replace_document(
+        entities=document.entities, objects=document.objects, controls=controls
+    )
 
 
 def local(session: Any, item: Any, before: Any, after: Any) -> tuple[float, ...]:

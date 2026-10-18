@@ -123,7 +123,7 @@ def validate_bindings(item: Curve, records: dict[str, SceneObject]) -> None:
             )
 
 
-def validate_sources(item: Surface, records: dict[str, SceneObject]) -> None:
+def validate_sources(item: Surface, records: Mapping[str, SceneObject]) -> None:
     sources = [records.get(use.curve) for use in item.curves]
     if any(not isinstance(source, Curve) for source in sources):
         raise ValueError("Surface sources must be curves or fibers.")

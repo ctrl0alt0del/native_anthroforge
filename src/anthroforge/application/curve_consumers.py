@@ -1,9 +1,10 @@
 """Live primitive sources and no-jump consumer transform modes."""
 
 from dataclasses import replace
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from anthroforge.core.construction import BodyPiece, Primitive
+from anthroforge.core.curve_consumption import uses, with_uses
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
@@ -84,23 +85,42 @@ def reverse(session: "Session", entity: str, curve: str, enabled: bool) -> None:
     install_use(session, item, replace(use, reverse=enabled))
 
 
-def selected_use(session: "Session", entity: str, curve: str) -> tuple[SCP, CurveUse]:
-    item = session.editable(entity)
-    if not isinstance(item.primitive, Primitive):
-        raise ValueError("Select a constructed primitive.")
-    use = next((u for u in item.primitive.curves if u.curve == curve), None)
-    if use is None:
-        raise ValueError("Primitive does not reference this curve.")
+def selected_use(session: "Session", entity: str, curve: str) -> tuple[SCP | Surface, CurveUse]:
+    from . import object_operations
+
+    item = session.document.object(entity)
+    if isinstance(item, SCP):
+        session.editable(entity)
+    else:
+        object_operations.editable(session, entity)
+    use = next((u for u in uses(item) if u.curve == curve), None)
+    if not isinstance(item, (SCP, Surface)) or use is None:
+        raise ValueError("Consumer does not reference this curve.")
     return item, use
 
 
-def install_use(session: "Session", item: SCP, changed: CurveUse) -> None:
-    assert isinstance(item.primitive, Primitive)
-    uses = tuple(changed if u.curve == changed.curve else u for u in item.primitive.curves)
-    session.replace_entities(
-        {item.id: replace(item, primitive=replace(item.primitive, curves=uses))}
-    )
-    construction_tasks.edited(session, {item.id})
+def install_use(session: "Session", item: SCP | Surface, changed: CurveUse) -> None:
+    sources = tuple(changed if u.curve == changed.curve else u for u in uses(item))
+    install(session, with_uses(item, sources))
+
+
+def install(session: "Session", item: SCP | Surface) -> None:
+    from . import object_operations
+
+    if isinstance(item, Surface):
+        object_operations.install(session, item)
+    else:
+        session.replace_entities({item.id: item})
+        construction_tasks.edited(session, {item.id})
+
+
+def revised[T: SCP | Surface](before: T, after: T) -> T:
+    from . import entity_revisions, object_revisions
+
+    if after == before:
+        return before
+    policy = entity_revisions if isinstance(before, SCP) else object_revisions
+    return cast(T, policy.authored(before, after))
 
 
 def rebound_use(session: "Session", use: CurveUse, mode: str) -> CurveUse:

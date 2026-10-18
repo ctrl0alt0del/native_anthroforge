@@ -137,6 +137,10 @@ def edited(session: "Session", seeds: set[Port]) -> None:
 
 def prerequisites(session: "Session", target: str, explicit: bool = False) -> None:
     ports = dep.ports(session.document, Port(target, "geometry"))
+    require_inputs(session, ports, explicit)
+
+
+def require_inputs(session: "Session", ports: set[Port], explicit: bool = False) -> None:
     active = set().union(*(job.provides for job in session.scheduler.active_jobs))
     curves = {p.owner for p in ports if p.output == "path" and p not in active}
     needed = {

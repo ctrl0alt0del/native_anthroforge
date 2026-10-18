@@ -21,7 +21,7 @@ There is no Blender runtime dependency and no production Python fallback.
 
 The adapter uses the boundary-preserving patch variant (inclusive ear containment),
 also for uniformly sampled inputs. It stores closed correspondence as authored path
-parameters; the application will translate those to stable authored-point identities.
+parameters; the application translates those to stable authored-point identities.
 Automatic direction/start selection belongs only to creation and explicit Realign.
 Automatic transverse density is returned separately for persistence. The addon commonly
 recomputed these during evaluation; retaining them is the confirmed product change.
@@ -38,3 +38,19 @@ Existing-library research included CGAL's official polygon-mesh hole filling API
 (`https://doc.cgal.org/latest/Polygon_mesh_processing/index.html`). Those algorithms
 do not establish equivalence to the required addon patch; the existing kernel was ported
 and checked directly instead of changing the surface construction silently.
+
+## Displayed surface picking
+
+Texture-only D3D11 acceptance exposed two shared query defects: parallel rays on a BVH
+slab boundary produced NaNs in the existing libigl box test, and deformed shared edges
+could be missed by its ray-triangle test. `src/ray_queries.cpp` keeps the existing
+cached libigl tree, handles parallel slabs explicitly, and evaluates triangles with
+shared ray-space edge functions following Woop/Benthin/Wald (2013),
+https://jcgt.org/published/0002/01/05/ and the PBRT triangle discussion:
+https://www.pbr-book.org/4ed/Shapes/Triangle_Meshes . This adapter is independently written;
+vendored libigl is unchanged. It does not scan every triangle or perturb the query ray.
+
+Regression fixtures test both ray directions on all three axis planes, before and after
+deformation, including sampled boundary vertices. The same native entry point serves
+scene picking and surface snapping/projection. Invisible rendering verifies a complete
+old mesh and its picking revision remain active until the replacement is displayed.

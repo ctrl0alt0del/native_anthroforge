@@ -549,3 +549,19 @@ mypy and the 15-line architecture rule pass. The full-QML offscreen Construction
 checks control navigation, the actual ordinary-parent combo and parent-driven transforms.
 No visible window, desktop input or interactive visual acceptance was used. Broader gate,
 junctions, generic surfaces, geometry/performance qualification and release delivery remain.
+
+## General surface native kernel checkpoint
+
+Native loft sampling/alignment and loop-patch construction now port the actual addon
+Python kernels. Six compact captured cases pin source hashes and outputs, including
+irregular closed rows and a concave nonplanar patch. Vertices agree to absolute 1e-10;
+polygon connectivity agrees exactly. Native creation/Realign computes correspondence
+and transverse density separately from ordinary geometry evaluation. Geometry evaluation
+uses supplied correspondence unchanged. The existing primitive loft shares grid topology.
+
+Twelve focused surface/architecture checks pass, including cancellation, range/reversal,
+flip, bounded output and retained closed correspondence. Native build, all three contracts
+and changed-native style pass. Ruff and configured mypy pass. Surface application jobs,
+stable identity serialization, desktop/API creation and editing are not integrated yet.
+This is a recoverable numerical-kernel checkpoint, not a completed surface increment.
+Junction/branch work, remaining parity/performance and release qualification remain.

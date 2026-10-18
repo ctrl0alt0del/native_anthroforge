@@ -12,6 +12,7 @@ using Points = std::vector<V3>;
 std::shared_ptr<Mesh> make_mesh(const Points& points,const Faces& faces,uint64_t cancel,bool complete=true);
 std::shared_ptr<Mesh> deform_mesh(const Mesh& source,const Vertices& vertices,uint64_t cancel,bool complete=true);
 Faces mesh_faces(const Mesh& source);
+Faces grid_faces(int rows,int count,bool closed,bool close_across=false);
 Samples read_samples(const double* values,int count);
 void write_samples(const Samples& samples,double* output);
 std::vector<double> curve_lengths(const Samples& samples);

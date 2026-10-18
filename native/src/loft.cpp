@@ -13,12 +13,12 @@ static Points loft_points(const double* samples,int curves,int count,int strips)
     }
     return points;
 }
-static Faces loft_faces(int rows,int count,bool closed) {
+Faces grid_faces(int rows,int count,bool closed,bool close_across) {
     Faces faces;
-    for(int row=0;row+1<rows;++row)
+    for(int row=0;row<rows-int(!close_across);++row)
         for(int j=0;j<count-(closed?0:1);++j) {
             const int next=(j+1)%count;
-            faces.push_back({row*count+j,(row+1)*count+j,(row+1)*count+next,row*count+next});
+            faces.push_back({row*count+j,((row+1)%rows)*count+j,((row+1)%rows)*count+next,row*count+next});
         }
     return faces;
 }
@@ -34,7 +34,7 @@ static uint64_t loft(const double* samples,int curves,int count,int strips,int c
         if(!samples||curves<2||count<2||strips<1) throw std::runtime_error("Invalid loft inputs.");
         const int rows=(curves-1)*strips+1;
         const auto points=af::loft_points(samples,curves,count,strips);
-        auto faces=af::loft_faces(rows,count,closed!=0);
+        auto faces=af::grid_faces(rows,count,closed!=0);
         if(caps) af::cap_loft(faces,rows,count,closed!=0);
         return af::retain(af::make_mesh(points,faces,cancel,complete));
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }

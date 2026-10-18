@@ -33,10 +33,10 @@ class GeometryEngine(NativeEngine):
         self.resource_observer: Any = None
 
     def _construction_signatures(self) -> None:
-        from . import bodies, components, construction, falloff, scene, topology
+        from . import bodies, components, construction, curve_surfaces, falloff, scene, topology
         from .control_geometry import configure as configure_control_geometry
 
-        for module in (bodies, components, construction, falloff, scene, topology):
+        for module in (bodies, components, construction, curve_surfaces, falloff, scene, topology):
             module.configure(self)
         configure_control_geometry(self)
         self._curve_signatures()

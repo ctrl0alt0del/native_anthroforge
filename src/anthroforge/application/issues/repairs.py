@@ -18,7 +18,9 @@ def editable(session: "Session", issue: Issue) -> bool:
 
     if session.waiting_save or session.history.before is not None:
         return False
-    return bool(issue.target and included(session.document, session.workspace, issue.target))
+    if not issue.target:
+        return not session.workspace.focused
+    return included(session.document, session.workspace, issue.target)
 
 
 def can_evaluate(session: "Session", issue: Issue) -> bool:

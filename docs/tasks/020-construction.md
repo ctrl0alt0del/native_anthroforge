@@ -614,3 +614,10 @@ Remaining: junctions/branches, surface source-list editing, authored fiber colli
 per-consumer primitive sampling, drawing parity details, broader anatomy/warm routing and
 profiler measurements, resource/history edge cases, examples and full portable release.
 Do not merge or publish 0.2.0 until the complete requested workflow is qualified.
+
+The full gate completed native contracts/style, Python types/style and script checks,
+then found one Issue-retry regression: object-generic editability rejected document-wide
+jobs without a target. The shared repair policy now retains the original document-scope
+behavior while using workspace association for object targets. The rerun passes all
+765 pytest tests (9 existing Qt deprecation warnings); numerical imports and doctor pass.
+Logs: `build/check-020-surfaces.log`, `build/pytest-020-surfaces.log`.

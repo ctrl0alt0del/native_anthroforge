@@ -14,7 +14,7 @@ from anthroforge.core.construction import (
 from anthroforge.core.document import Document
 from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.core.results import geometry_asset
-from anthroforge.native import bodies, components, paths
+from anthroforge.native import bodies, components, path_editing, paths
 from anthroforge.native import construction as native
 from anthroforge.native.attachments import capture, propagate
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
@@ -114,13 +114,13 @@ class Evaluation:
     def curve(self, entity: SCP, curve: Curve, definition: ResolvedPrimitive) -> Any:
         bindings = tuple(b for b in entity.deformers if applies(b, "CURVE", curve.id))
         asset = consumed_paths.accepted(self.document, self.paths, curve.id)
-        path = self.deformed_path(entity, curve, bindings) if bindings else asset.path
+        path = self.deformed_path(entity, curve, bindings, asset.path) if bindings else asset.path
         assert isinstance(entity.primitive, Primitive)
         use = next(use for use in entity.primitive.curves if use.id == curve.id)
         return consumed_paths.samples(path, curve, definition, use.reverse, self.cancel.handle)
 
     def deformed_path(
-        self, entity: SCP, curve: Curve, bindings: tuple[Deformer, ...]
+        self, entity: SCP, curve: Curve, bindings: tuple[Deformer, ...], accepted: paths.Path
     ) -> paths.Path:
         records = native.resolved_curve(self.engine, curve)
         frame = native.matrix(self.engine, entity_frame(self.engine, entity), curve.matrix)
@@ -131,7 +131,7 @@ class Evaluation:
         packed = points.reshape((-1, 9))
         records[:, :9] = packed[:, [3, 4, 5, 0, 1, 2, 6, 7, 8]]
         records = native.resolved_curve(self.engine, curve, records)
-        return paths.evaluate(self.engine, curve, self.cancel.handle, records)
+        return path_editing.deform(accepted, curve, records, self.cancel.handle)
 
     def construct(self, entity: SCP) -> Mesh:
         definition = consumed_paths.definition(self.engine, self.document, entity, self.paths)

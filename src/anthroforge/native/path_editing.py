@@ -14,6 +14,17 @@ from .point_attachments import INT
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_path_rebase", [U, U, U, D, INT, c.c_int, D, U], U)
+    engine.bind("af_path_control_deform", [U, U, U, U], U)
+
+
+def deform(current: paths.Path, curve: Curve, records: Any, cancel: int) -> paths.Path:
+    engine = current.engine
+    opening = paths.evaluate(engine, curve, cancel)
+    draft = paths.evaluate(engine, curve, cancel, records)
+    handle = engine.library.af_path_control_deform(
+        current.handle, opening.handle, draft.handle, cancel
+    )
+    return paths.Path(engine, handle)
 
 
 def rebase(

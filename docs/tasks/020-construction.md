@@ -387,3 +387,16 @@ Fiber path work has its own conservative worker scheduling policy, estimating de
 and recapture triangle workload instead of using the cheap ordinary-curve inline threshold.
 Two additional tests cover consumer editing and newly captured support invalidation. The latest
 focused checks and desktop gesture acceptance pass; full development gate follows this checkpoint.
+
+## Fiber consumer deformation qualification
+
+The preceding full gate passed with 694 tests. A new differential-support fixture
+reproduced a consumer defect: adding an unmoved curve Hook changed 960 of 1446 body
+coordinates (maximum displacement component 0.2281). Consumer control deformation
+was rebuilding the authored engine path and discarding accepted dense deformation.
+It now applies the control deformation delta over the accepted path in native work,
+retaining correspondence and unchanged frames. This is a shared curve-consumer rule,
+not a Fiber-specific exception. The regression and 115 related primitive/parity,
+fiber-editing and architecture checks pass; mypy, Ruff and changed-native style pass.
+Routing migration is next. Full routing, binding lifecycle, junctions, general surfaces
+and the remaining qualification recorded above are still unfinished.

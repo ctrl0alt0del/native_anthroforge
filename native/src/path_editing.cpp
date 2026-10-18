@@ -81,6 +81,18 @@ static void edited_tangents(Samples& samples,bool closed,uint64_t cancel) {
     }
     curve_frames(samples,closed,cancel,true);
 }
+static bool deform_samples(EvaluatedPath& output,const ParameterPath& opening,
+                           const ParameterPath& draft,uint64_t cancel) {
+    V3 first=V3::Zero(); bool varied=false;
+    for(size_t i=0;i<output.samples.size();++i) {
+        check_cancel(cancel); const double parameter=output.parameters[i];
+        const V3 delta=parameter_point(draft,parameter)-parameter_point(opening,parameter);
+        if(i==0) first=delta;
+        varied=varied||(delta-first).squaredNorm()>1e-28;
+        output.samples[i].position+=delta;
+    }
+    return varied;
+}
 }
 uint64_t af_path_rebase(uint64_t current_handle,uint64_t opening_handle,uint64_t draft_handle,
     const double* records,const int* indices,int count,double* controls,uint64_t cancel) {
@@ -93,5 +105,18 @@ uint64_t af_path_rebase(uint64_t current_handle,uint64_t opening_handle,uint64_t
         std::copy_n(records,count*13,controls); af::rebase_controls(controls,count,current,opening,mapping);
         af::edited_tangents(output.samples,draft.path->closed,cancel);
         return af::retain_path(af::make_path(output,draft.path->closed,cancel));
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+uint64_t af_path_control_deform(uint64_t current_handle,uint64_t opening_handle,
+                               uint64_t draft_handle,uint64_t cancel) {
+    try {
+        const auto current=af::parameter_path(current_handle),opening=af::parameter_path(opening_handle);
+        const auto draft=af::parameter_path(draft_handle);
+        if(opening.end!=draft.end||opening.path->closed!=draft.path->closed)
+            throw std::runtime_error("Control deformation must preserve path topology.");
+        af::EvaluatedPath output{current.samples,current.path->parameters};
+        if(af::deform_samples(output,opening,draft,cancel))
+            af::edited_tangents(output.samples,current.path->closed,cancel);
+        return af::retain_path(af::make_path(output,current.path->closed,cancel));
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

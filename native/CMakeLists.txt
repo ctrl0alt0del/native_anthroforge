@@ -3,7 +3,8 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/construction_mesh.cpp src/curves.cpp src/loft.cpp src/curve_body.cpp
     src/hooks.cpp src/lattices.cpp src/solidify.cpp src/component_queries.cpp src/curve_deform.cpp
     src/mesh_topology.cpp src/curve_frames.cpp src/curve_mapping.cpp src/component_index.cpp
-    src/curve_queries.cpp src/influence.cpp src/control_geometry.cpp src/measurement.cpp)
+    src/curve_queries.cpp src/influence.cpp src/control_geometry.cpp src/measurement.cpp
+    src/path_registry.cpp)
 target_include_directories(af_native PUBLIC include)
 target_include_directories(af_native SYSTEM PRIVATE vendor)
 target_compile_definitions(af_native PRIVATE NOMINMAX _USE_MATH_DEFINES EIGEN_MPL2_ONLY EIGEN_DONT_PARALLELIZE)

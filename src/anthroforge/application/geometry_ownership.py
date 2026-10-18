@@ -3,16 +3,15 @@
 from typing import TYPE_CHECKING
 
 from anthroforge.core.document import Document
-from anthroforge.core.results import geometry_asset
+
+from .resources import referenced
 
 if TYPE_CHECKING:
     from .session import Session
 
 
 def assets_used(document: Document) -> set[str]:
-    results = {geometry_asset(item) for item in document.entities}
-    sources = {item.primitive.source for item in document.entities if item.primitive}
-    return (results | sources) - {""}
+    return referenced(document)["meshes"]
 
 
 def retained_documents(session: "Session") -> list[Document]:
@@ -25,7 +24,10 @@ def retained_documents(session: "Session") -> list[Document]:
 
 
 def collect(session: "Session") -> None:
-    used = set().union(*(assets_used(d) for d in retained_documents(session)))
-    for key in tuple(session.assets):
-        if key not in used:
-            del session.assets[key]
+    references = [referenced(d) for d in retained_documents(session)]
+    for kind in ("meshes", "paths", "images"):
+        used = set().union(*(keys[kind] for keys in references))
+        catalogue = getattr(session.resources, kind)
+        for key in tuple(catalogue):
+            if key not in used:
+                del catalogue[key]

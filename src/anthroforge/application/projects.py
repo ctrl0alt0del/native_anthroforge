@@ -30,7 +30,7 @@ def save(session: "Session", path: str, blocked_policy: str) -> dict[str, Any]:
 def save_snapshot(session: "Session", target: Path, document: Any) -> dict[str, Any]:
     lock = lock_target(session, target)
     try:
-        atomic_save(target, document, dict(session.assets))
+        atomic_save(target, document, session.resources.snapshot())
     except Exception:
         if lock is not session.file_lock:
             lock.close()
@@ -70,7 +70,7 @@ def open_project(session: "Session", path: str) -> dict[str, Any]:
 def adopt(session: "Session", document: Any, assets: Any) -> None:
     session.issues.close()
     session.scheduler.close()
-    session.document, session.assets = document, assets
+    session.document, session.resources = document, assets
     session.history = History(document)
     session.serial = document.revision
     session.initialize_scheduler()

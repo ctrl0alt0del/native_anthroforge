@@ -8,6 +8,7 @@ import pytest
 
 from anthroforge.application import storage
 from anthroforge.application.changes import ChangeJournal
+from anthroforge.application.resources import Resources
 from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.document import Document
@@ -170,8 +171,8 @@ def test_other_project_schemas_rejected_before_loading_assets(tmp_path, session,
 def test_curve_only_package_round_trips_with_schema_three(tmp_path, session):
     path = tmp_path / "curves.anthroforge"
     document = Document(objects=(curve(engine="POLYLINE"),))
-    storage.atomic_save(path, document, {})
+    storage.atomic_save(path, document, Resources())
     restored, assets = storage.read_package(path, session.engine)
-    assert restored == document and not assets
+    assert restored == document and assets == Resources()
     with zipfile.ZipFile(path) as archive:
         assert json.loads(archive.read("manifest.json"))["version"] == 3

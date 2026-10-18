@@ -33,14 +33,19 @@ class GeometryEngine(NativeEngine):
         self.mesh_observer: Any = None
 
     def _construction_signatures(self) -> None:
-        from . import bodies, components, construction, curve_editing, falloff, scene, topology
+        from . import bodies, components, construction, falloff, scene, topology
         from .control_geometry import configure as configure_control_geometry
-        from .curve_queries import configure as configure_curve_queries
 
-        for module in (bodies, components, construction, curve_editing, falloff, scene, topology):
+        for module in (bodies, components, construction, falloff, scene, topology):
             module.configure(self)
-        configure_curve_queries(self)
         configure_control_geometry(self)
+        self._curve_signatures()
+
+    def _curve_signatures(self) -> None:
+        from . import curve_editing, curve_queries, paths
+
+        for module in (curve_editing, curve_queries, paths):
+            module.configure(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

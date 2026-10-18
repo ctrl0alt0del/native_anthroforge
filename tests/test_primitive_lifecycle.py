@@ -208,7 +208,7 @@ def test_cross_scp_endpoints_stay_connected_and_removal_is_local(session):
 
 
 def write_legacy(path, session):
-    manifest = storage.manifest(session.document, session.assets)
+    manifest = storage.manifest(session.document, session.resources)
     manifest["version"] = 1
     manifest["document"].pop("controls")
     for entity in manifest["document"]["entities"]:
@@ -217,8 +217,10 @@ def write_legacy(path, session):
     with zipfile.ZipFile(path, "w") as archive:
         archive.writestr("manifest.json", json.dumps(manifest))
         for key, asset in session.assets.items():
-            for kind, label in enumerate(storage.BUFFERS[:3]):
-                storage.write_array(archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind))
+            for kind, label in enumerate(storage.resource_storage.MESH_BUFFERS[:3]):
+                storage.resource_storage.write_array(
+                    archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind)
+                )
 
 
 def test_legacy_import_is_rejected_without_replacing_current_document(session, tmp_path):

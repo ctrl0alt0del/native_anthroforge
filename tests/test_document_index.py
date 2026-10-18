@@ -5,6 +5,7 @@ import pytest
 from anthroforge.application import dependencies
 from anthroforge.application.curve_sources import create_records
 from anthroforge.application.primitive_operations import default_primitive
+from anthroforge.application.resources import Resources
 from anthroforge.application.storage import decode_document, manifest
 from anthroforge.core.construction import Control, Deformer, Target
 from anthroforge.core.document import Document
@@ -88,7 +89,7 @@ def test_attachment_modes_and_global_freeze_update_dependency_edges():
 
 def test_indexes_are_derived_and_do_not_enter_project_schema():
     document = hooked_document()
-    data = manifest(document, {})["document"]
+    data = manifest(document, Resources())["document"]
     assert "_index" not in data
     restored = decode_document(data)
     assert restored == document

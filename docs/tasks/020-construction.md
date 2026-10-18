@@ -27,8 +27,14 @@ and existing desktop authoring projections use these references. Generic curve c
 point edits, object rename/transform/reparent/delete/inspect, primitive.from_curves,
 primitive.curve_mode and primitive.make_independent are integrated with shared commands.
 
-No standalone curve viewport/Construction UI or path-result job exists yet. BEZIER is
-the only evaluated engine; POLYLINE/ROUTED remain model contracts, not implemented engines.
+Native owned paths now evaluate BEZIER and exact POLYLINE, preserve closed-path starts,
+omit duplicate endpoints, and retain allocations through read-only array leases. Resources
+have typed mesh/path/image catalogues, retained across history/checkpoints/jobs and snapshots.
+Schema 3 stores path buffers and deduplicated embedded PNG/JPEG sources; Pillow is promoted
+to a runtime dependency and applies EXIF orientation once without Qt. Save/inspection callers
+use complete resource snapshots. Native path/typed-resource tests and style checks pass.
+No standalone curve viewport/Construction UI or path-result job exists yet; ROUTED is not
+implemented in the standalone engine and is explicitly rejected by native path dispatch.
 Images/Fiber/Surface records exist but their production operations/native algorithms/UI
 remain unfinished. Direct control.attach is still present and must be retired as planned.
 No 0.2.0 release qualification or version bump has occurred.
@@ -39,8 +45,12 @@ staged renderer must be extended at their owning boundaries, not duplicated.
 
 Read-only inspection completed; `main` and fetched `origin/main` both at `b539697`.
 Current shared-curve increment: `uv run --no-sync pytest -q`: 573 passed (32 new cases).
-Ruff check/format and mypy pass. The full native/development gate and 0.2.0 GUI/package
-qualification have not run. One earlier full run saw the existing global native-allocation
+Owned path/resource checkpoint: 586 tests passed, Ruff and mypy pass; native build/contract
+and clang-tidy on the modified curve/path implementation pass. Full gate on this increment
+has not yet run; the preceding shared-curve full-gate evidence remains scoped below.
+`./tools/check.ps1` passed on the shared-curve checkpoint: native build/contract, native
+and script style, Ruff, mypy, all 573 tests, numerical imports and doctor. 0.2.0 GUI/package
+qualification has not run. One earlier full run saw the existing global native-allocation
 count test change during collection; targeted and subsequent full run pass. Investigate
 resource ownership if this recurs; do not weaken the allocation assertions.
 An initial suite overlapped source editing and its subprocess saw an intermediate invalid
@@ -50,9 +60,9 @@ Use background/offscreen checks and state their limits.
 
 ## Next actions and blockers
 
-1. Complete the standalone Curve engine/result contract: native owned path buffers,
-   BEZIER/POLYLINE evaluation, engine strategies, resource lifetime/persistence and coordinated
-   path jobs. Extend remaining ports/workspace/Issues/profiler clients to generic objects.
+1. Integrate coordinated path jobs and common accepted path consumption. Native BEZIER/
+   POLYLINE buffers and typed lifetime/persistence exist. Extend remaining ports/workspace/
+   Issues/profiler clients to generic objects, including path/image memory attribution.
 2. Add Construction UI and standalone curve editing/creation; curve consumers already have
    shared command operations. Then complete native drawing, embedded reference images,
    Fiber bindings/routing/junctions and generic surfaces in the planned order.

@@ -42,16 +42,16 @@ def start_save(controller, path, policy):
 
 def save_job(controller, target, snapshot, lock):
     session = controller.session
-    assets = dict(session.assets)
+    resources = session.resources.snapshot()
     job = Job(
         "Save project",
         frozenset(("@file:" + str(target),)),
         lambda _: snapshot,
-        lambda document, cancel: atomic_save(target, document, assets),
+        lambda document, cancel: atomic_save(target, document, resources),
         lambda _: saved(controller, target, lock, snapshot.revision),
         writes=False,
         kind="project_save",
-        workload=lambda _: task_workloads.project_save(assets, snapshot),
+        workload=lambda _: task_workloads.project_save(resources, snapshot),
     )
     job.cleanup = lambda state: cleanup(controller, lock, state)
     return job
@@ -131,7 +131,7 @@ def open_job(controller, target, lock):
 
 def opened(controller, path, lock, result):
     session = controller.session
-    session.document, session.assets = result
+    session.document, session.resources = result
     session.history = History(session.document)
     session.serial = session.document.revision
     session.active_workspace = 0

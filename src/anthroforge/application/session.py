@@ -19,13 +19,14 @@ from .coordinator import TaskCoordinator
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
 from .history import History
+from .resources import Resources
 
 
 class Session:
     def __init__(self, name: str = "Untitled", profiler: RuntimeProfiler | None = None) -> None:
         self.changes, self._document = ChangeJournal(), Document(name=name)
         self.history = History(self.document)
-        self.assets: dict[str, Asset] = {}
+        self.resources = Resources()
         self.initialize_runtime(profiler)
         self._engine: GeometryEngine | None = None
         self.serial = 0
@@ -46,6 +47,10 @@ class Session:
         self.initialize_scheduler()
         self.issues = IssueSystem(self)
         register(self)
+
+    @property
+    def assets(self) -> dict[str, Asset]:
+        return self.resources.meshes
 
     @property
     def document(self) -> Document:

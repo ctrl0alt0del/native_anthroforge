@@ -195,7 +195,9 @@ def test_save_estimate_counts_only_the_snapshot_assets():
     document = Document(entities=(SCP("Root", asset="used"),))
     small = SimpleNamespace(mesh=SimpleNamespace(counts=(8, 6, 24, 12, 1)))
     unused = SimpleNamespace(mesh=SimpleNamespace(counts=(100000, 100000, 300000, 100000, 7)))
-    estimate = project_save({"used": small, "unused": unused}, document)
+    from anthroforge.application.resources import Resources
+
+    estimate = project_save(Resources(meshes={"used": small, "unused": unused}), document)
     assert estimate.entities == 1 and estimate.bytes == 440
 
 

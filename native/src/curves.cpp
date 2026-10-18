@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Handle formulas adapted from Blender 5.0.1 curve.cc, BKE_nurb_handle_calc.
 #include "construction_internal.hpp"
+#include "path_internal.hpp"
 
 namespace af {
 struct Bezier { V3 p,left,right; double radius,tilt; int lm,rm; };
@@ -145,6 +146,39 @@ static Samples body_path(std::vector<Bezier> points,bool closed,int resolution,u
     if(!closed) result.push_back(bezier_sample(points[segments-1],points[segments],1,M4::Identity()));
     curve_frames(result,closed,cancel);
     return result;
+}
+static void append_path_segment(EvaluatedPath& path,const Bezier& a,const Bezier& b,int segment,int steps) {
+    for(int j=0;j<steps;++j) {
+        const double parameter=double(j)/steps;
+        path.samples.push_back(bezier_sample(a,b,parameter,M4::Identity()));
+        path.parameters.push_back(segment+parameter);
+    }
+}
+static void append_path_endpoint(EvaluatedPath& path,const std::vector<Bezier>& points,int segments) {
+    path.samples.push_back(bezier_sample(points[segments-1],points[segments],1,M4::Identity()));
+    path.parameters.push_back(double(segments));
+}
+static EvaluatedPath sample_authored(const std::vector<Bezier>& points,bool closed,int resolution,uint64_t cancel) {
+    EvaluatedPath result;
+    const int segments=int(points.size())-(closed?0:1);
+    for(int i=0;i<segments;++i) {
+        check_cancel(cancel);
+        const auto& a=points[i]; const auto& b=points[(i+1)%points.size()];
+        const int steps=a.rm%4==3&&b.lm%4==3?1:resolution;
+        append_path_segment(result,a,b,i,steps);
+    }
+    if(!closed) append_path_endpoint(result,points,segments);
+    curve_frames(result.samples,closed,cancel);
+    return result;
+}
+EvaluatedPath authored_path(const double* records,int count,int engine,bool closed,int resolution,uint64_t cancel) {
+    if(engine<0||engine>1||resolution<1||resolution>1024||count<(closed?3:2))
+        throw std::runtime_error("Invalid authored path engine, closure or resolution.");
+    if(int64_t(count)*resolution>8000000) throw std::runtime_error("Path sample budget exceeded.");
+    auto points=read_bezier(records,count);
+    if(engine==1) for(auto& p:points) { p.lm=3; p.rm=3; }
+    handles(points,closed);
+    return sample_authored(points,closed,resolution,cancel);
 }
 }
 int af_curve_path(const double* points,int count,int closed,int resolution,double* output,int* output_count,uint64_t cancel) {

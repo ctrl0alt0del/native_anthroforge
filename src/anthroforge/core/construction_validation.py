@@ -2,7 +2,7 @@
 
 from typing import TYPE_CHECKING
 
-from .construction import Control, Deformer, Target
+from .construction import Control, Deformer, Primitive, Target
 from .entities import SCP
 
 if TYPE_CHECKING:
@@ -37,8 +37,10 @@ def primitive_target(item: SCP, reference: Target) -> None:
 def identities(item: SCP | Control) -> list[str]:
     result = [item.id, *(binding.id for binding in item.deformers)]
     if isinstance(item, SCP) and item.primitive:
-        result.extend(c.id for c in item.primitive.curves)
-        result.extend(p.id for c in item.primitive.curves for p in c.points)
+        if not isinstance(item.primitive, Primitive):
+            raise ValueError(
+                "Document stores primitive references, not resolved evaluation inputs."
+            )
         result.extend(p.id for p in item.primitive.pieces)
     return result
 

@@ -3,7 +3,7 @@
 from dataclasses import replace
 from typing import Any
 
-from anthroforge.core.construction import Control, Curve, Deformer, Primitive, cyclic
+from anthroforge.core.construction import Control, Curve, Deformer, ResolvedPrimitive, cyclic
 from anthroforge.core.document import Document
 from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.core.results import geometry_asset
@@ -14,6 +14,7 @@ from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 from anthroforge.native.scene import entity_frame
 from anthroforge.native.topology import draft, finalize
 
+from .curve_sources import resolve as resolve_primitive
 from .membership import resolve
 
 
@@ -100,7 +101,7 @@ class Evaluation:
         args = (self.engine, points, control, binding, frame, target, self.cancel.handle)
         return native.lattice(*args, cage_points=self.cage(control))
 
-    def curve(self, entity: SCP, curve: Curve, definition: Primitive) -> Any:
+    def curve(self, entity: SCP, curve: Curve, definition: ResolvedPrimitive) -> Any:
         records = native.resolved_curve(self.engine, curve)
         frame = native.matrix(self.engine, entity_frame(self.engine, entity), curve.matrix)
         # Blender indices within each Bézier triple: left handle, point, right handle.
@@ -115,15 +116,13 @@ class Evaluation:
             curve, definition, native.resolved_curve(self.engine, curve, records)
         )
 
-    def sample_curve(self, curve: Curve, definition: Primitive, records: Any) -> Any:
+    def sample_curve(self, curve: Curve, definition: ResolvedPrimitive, records: Any) -> Any:
         if definition.kind == "BODY":
             return bodies.path(self.engine, curve, self.cancel.handle, records)
         return native.sample_curve(self.engine, curve, definition, self.cancel.handle, records)
 
     def construct(self, entity: SCP) -> Mesh:
-        definition = entity.primitive
-        if definition is None:
-            raise ValueError("Grouping SCP has no construction.")
+        definition = resolve_primitive(self.engine, self.document, entity)
         if definition.kind == "IMPORTED":
             return draft(self.meshes[definition.source], self.cancel.handle)
         samples = {curve.id: self.curve(entity, curve, definition) for curve in definition.curves}
@@ -133,7 +132,7 @@ class Evaluation:
             )
         return self.body(entity, definition, samples)
 
-    def body(self, entity: SCP, definition: Primitive, samples: dict[str, Any]) -> Mesh:
+    def body(self, entity: SCP, definition: ResolvedPrimitive, samples: dict[str, Any]) -> Mesh:
         pieces = [
             self.body_piece(entity, definition, p, samples[p.curve]) for p in definition.pieces
         ]
@@ -143,7 +142,9 @@ class Evaluation:
             else native.joined(self.engine, pieces, self.cancel.handle)
         )
 
-    def body_piece(self, entity: SCP, definition: Primitive, piece: Any, samples: Any) -> Mesh:
+    def body_piece(
+        self, entity: SCP, definition: ResolvedPrimitive, piece: Any, samples: Any
+    ) -> Mesh:
         curve = next(c for c in definition.curves if c.id == piece.curve)
         closed = cyclic(curve, definition)
         base = bodies.draft_base(self.engine, piece, definition.samples, closed, self.cancel.handle)

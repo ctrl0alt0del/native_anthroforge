@@ -59,6 +59,7 @@ def reusable(document: "Document", previous: ObjectRegistry | None) -> bool:
 
 
 def validate(document: "Document", records: dict[str, SceneObject]) -> None:
+    validate_primitives(document, records)
     for item in document.objects:
         if item.parent and (
             item.parent not in records or isinstance(records[item.parent], ReferenceImage)
@@ -72,6 +73,14 @@ def validate(document: "Document", records: dict[str, SceneObject]) -> None:
             validate_sources(item, records)
     validate_parenting(document.objects)
     validate_point_ids(document)
+
+
+def validate_primitives(document: "Document", records: dict[str, SceneObject]) -> None:
+    for item in document.entities:
+        if item.primitive:
+            for use in item.primitive.curves:
+                if not isinstance(records.get(use.id), Curve):
+                    raise ValueError("Primitive curve source does not exist.")
 
 
 def validate_bindings(item: Fiber, records: dict[str, SceneObject]) -> None:

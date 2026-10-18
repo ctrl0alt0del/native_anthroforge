@@ -3,13 +3,14 @@
 from dataclasses import asdict, replace
 from typing import TYPE_CHECKING, Any
 
-from anthroforge.core.construction import BodyPiece, Curve, CurvePoint, Primitive, Thickness
+from anthroforge.core.construction import BodyPiece, Curve, CurvePoint, ResolvedPrimitive, Thickness
 from anthroforge.core.entities import SCP, Attachment
 from anthroforge.core.results import EvaluationResult
 from anthroforge.native import curve_editing
 
 from . import construction_codec as codec
 from . import construction_tasks as tasks
+from . import curve_sources
 from .construction_policy import require_topology_edit
 from .operations import parent_for, require_name
 from .presentation import include_created
@@ -22,12 +23,12 @@ def straight_curve(y: float = 0.0) -> Curve:
     return Curve((CurvePoint(position=(-0.5, y, 0.0)), CurvePoint(position=(0.5, y, 0.0))))
 
 
-def default_primitive(kind: str, shape: str) -> Primitive:
+def default_primitive(kind: str, shape: str) -> ResolvedPrimitive:
     if kind == "LOFT":
-        return Primitive(kind, curves=(straight_curve(-0.15), straight_curve(0.15)))
+        return ResolvedPrimitive(kind, curves=(straight_curve(-0.15), straight_curve(0.15)))
     if kind == "BODY":
         curve = straight_curve()
-        return Primitive(kind, curves=(curve,), pieces=(BodyPiece(curve.id, shape),))
+        return ResolvedPrimitive(kind, curves=(curve,), pieces=(BodyPiece(curve.id, shape),))
     raise ValueError("Create LOFT or BODY; use import for an imported primitive.")
 
 
@@ -39,15 +40,27 @@ def create(
     shape: str = "CAPSULE",
     definition: dict[str, Any] | None = None,
 ) -> str:
-    primitive = codec.primitive(definition) if definition else default_primitive(kind, shape)
+    primitive = creation_definition(kind, shape, definition)
     entity = new_entity(require_name(name), parent_for(session, parent), primitive)
-    session.replace_document(entities=(*session.document.entities, entity))
+    install_new(session, entity, primitive)
+    return finish_create(session, entity)
+
+
+def finish_create(session: "Session", entity: SCP) -> str:
+    from . import evaluation
+
     include_created(session, {entity.id})
     tasks.request(session, entity.id)
+    if entity.parent:
+        evaluation.request(session, {entity.id}, {entity.id})
     return entity.id
 
 
-def new_entity(name: str, parent: str, primitive: Primitive | None) -> SCP:
+def creation_definition(kind: str, shape: str, data: dict[str, Any] | None) -> ResolvedPrimitive:
+    return codec.resolved_primitive(data) if data else default_primitive(kind, shape)
+
+
+def new_entity(name: str, parent: str, primitive: ResolvedPrimitive | None) -> SCP:
     origin = Attachment(parent_mode="OBJECT_ORIGIN", child_mode="OBJECT_ORIGIN")
     return SCP(
         name,
@@ -58,29 +71,48 @@ def new_entity(name: str, parent: str, primitive: Primitive | None) -> SCP:
     )
 
 
-def definition(session: "Session", entity: str) -> Primitive:
-    primitive = session.editable(entity).primitive
-    if primitive is None:
-        raise ValueError("This SCP has no editable construction.")
-    return primitive
+def install_new(session: "Session", entity: SCP, definition: ResolvedPrimitive) -> None:
+    primitive, curves = curve_sources.create_records(definition, entity.id)
+    session.replace_document(
+        entities=(*session.document.entities, replace(entity, primitive=primitive)),
+        objects=(*session.document.objects, *curves),
+    )
 
 
-def install(session: "Session", entity: str, primitive: Primitive) -> None:
+def definition(session: "Session", entity: str) -> ResolvedPrimitive:
+    return curve_sources.resolve(session.engine, session.document, session.editable(entity))
+
+
+def install(session: "Session", entity: str, primitive: ResolvedPrimitive) -> None:
     item = session.editable(entity)
     if item.primitive and item.primitive.kind != primitive.kind:
         raise ValueError("A construction cannot change primitive family.")
-    if item.primitive and topology_signature(item.primitive) != topology_signature(primitive):
+    if item.primitive and topology_signature(definition(session, entity)) != topology_signature(
+        primitive
+    ):
         require_topology_edit(session.document, entity)
-    session.replace_entities({entity: replace(item, primitive=primitive)})
-    tasks.edited(session, {entity})
+    require_source_topology(session, primitive)
+    targets = curve_sources.install(session, item, primitive)
+    tasks.edited(session, targets)
 
 
-def topology_signature(primitive: Primitive) -> tuple[Any, ...]:
+def topology_signature(primitive: ResolvedPrimitive) -> tuple[Any, ...]:
     from anthroforge.core.construction import cyclic
 
     curves = tuple((c.id, cyclic(c, primitive)) for c in primitive.curves)
     pieces = tuple((p.id, p.shape, p.sides) for p in primitive.pieces)
     return primitive.samples, primitive.strips, primitive.caps, curves, pieces
+
+
+def require_source_topology(session: "Session", primitive: ResolvedPrimitive) -> None:
+    changed = {
+        c.id
+        for c in primitive.curves
+        if c.id in session.document.registry.records
+        and c.closed != curve_sources.source(session.document, c.id).closed
+    }
+    for consumer in curve_sources.consumers(session.document, changed):
+        require_topology_edit(session.document, consumer)
 
 
 def update(session: "Session", entity: str, **options: Any) -> None:
@@ -118,7 +150,9 @@ def point_update(session: "Session", entity: str, curve: str, point: str, **opti
     replace_curve(session, entity, primitive, replace(selected, points=points))
 
 
-def replace_curve(session: "Session", entity: str, primitive: Primitive, changed: Curve) -> None:
+def replace_curve(
+    session: "Session", entity: str, primitive: ResolvedPrimitive, changed: Curve
+) -> None:
     install(
         session,
         entity,
@@ -191,7 +225,7 @@ def curve_remove(session: "Session", entity: str, curve: str) -> None:
     )
 
 
-def require_loft_settings(primitive: Primitive, options: dict[str, Any]) -> None:
+def require_loft_settings(primitive: ResolvedPrimitive, options: dict[str, Any]) -> None:
     if primitive.kind != "LOFT" and set(options) & {"start", "span", "strips", "caps"}:
         raise ValueError("Sampling ranges, strips and caps are loft settings.")
 
@@ -234,7 +268,7 @@ def inspect(session: "Session", entity: str) -> dict[str, Any]:
 
     item = session.document.entity(entity)
     return {
-        "primitive": asdict(item.primitive) if item.primitive else None,
+        "primitive": asdict(definition(session, entity)) if item.primitive else None,
         "deformers": [asdict(d) for d in item.deformers],
         "result": asdict(item.result),
         "topology_dependents": topology_dependents(session.document, entity),

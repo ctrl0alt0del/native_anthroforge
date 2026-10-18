@@ -1,5 +1,30 @@
 # Local authoring API, version 0.1.8
 
+## 0.2.0 development commands
+
+These commands are implemented on the construction development branch. This is not
+a claim that the complete 0.2.0 desktop workflow or release is available.
+
+| Operation | Arguments | Result |
+| --- | --- | --- |
+| `curve.create` | optional `name`, `points` (CurvePoint records), `parent`, anatomical `owner` | Independent Bézier curve ID; no SCP needed. |
+| `curve.edit` | `curve`, optional `name`, `closed`, `resolution` | Shared authored edit; validates all consumers' topology locks. |
+| `curve.point.update` | `curve`, `point`, point/handle/radius/tilt fields | Shared point edit using native handle behavior. |
+| `object.inspect` | `target` | Typed authored construction record and consumer IDs. |
+| `object.rename` | `target`, `name` | Metadata edit without geometry scheduling. |
+| `object.transform` | `target`, nine TRS `values` | Ordinary local transform. |
+| `object.reparent` | `target`, optional `parent` | Preserves world placement and consumer placement. |
+| `object.delete` | `target` | Blocks referenced sources; preserves ordinary children. |
+| `primitive.from_curves` | ordered `curves`, `kind` BODY/LOFT, optional `parent`, `name`, `shape` | SCP ID with live curve references. |
+| `primitive.curve_mode` | `entity`, `curve`, `mode` SHAPE_ONLY/SHAPE_AND_TRANSFORM | Changes transform following without a visible jump. |
+| `primitive.make_independent` | `entity`, `curve` | New curve ID; remaps that consumer and its memberships. |
+
+Primitive inspect retains resolved curve records for editing clients; project storage
+holds references and separate objects. Schema 3 rejects older files. Standalone path
+evaluation, the other engines and their UI remain tracked in the task record below.
+
+## Existing command catalogue
+
 This table describes the existing API baseline. The approved
 [0.2.0 contract](specification_020.md) adds object/curve/fiber/surface/image operation
 families and retires direct control-surface attachment. Actual integration status is

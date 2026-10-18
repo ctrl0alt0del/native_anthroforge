@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from .construction import integer, validate_range
+from .construction_values import integer, validate_range
 from .entities import IDENTITY, validate_matrix
 
 
@@ -16,6 +16,11 @@ class CurveUse:
     mode: str = "SHAPE_AND_TRANSFORM"
     matrix: tuple[float, ...] = IDENTITY
     bind_matrix: tuple[float, ...] = IDENTITY
+    reference_frame: str = ""
+
+    @property
+    def id(self) -> str:
+        return self.curve
 
     def __post_init__(self) -> None:
         if not self.curve or self.mode not in ("SHAPE_AND_TRANSFORM", "SHAPE_ONLY"):

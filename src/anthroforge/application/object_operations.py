@@ -1,0 +1,152 @@
+"""Construction object commands share transactions and native transform boundaries."""
+
+from dataclasses import replace
+from typing import TYPE_CHECKING, Any
+
+from anthroforge.core.construction import Curve, CurvePoint
+from anthroforge.core.object_registry import Construction
+from anthroforge.core.objects import ConstructionObject
+from anthroforge.native import curve_editing
+
+from . import construction_tasks, curve_sources, dependencies, object_revisions
+from .construction_policy import require_topology_edit
+from .operations import require_name
+
+if TYPE_CHECKING:
+    from .session import Session
+
+
+def editable(session: "Session", target: str) -> Construction:
+    if session.waiting_save:
+        raise ValueError("Editing is blocked while waiting to save.")
+    item = session.document.object(target)
+    if not isinstance(item, ConstructionObject):
+        raise ValueError("This operation requires a construction object.")
+    related = set(item.owners) | curve_sources.consumers(session.document, {target})
+    if (
+        session.workspace.focused
+        and related
+        and not related.intersection(session.workspace.members)
+    ):
+        raise ValueError("This construction object is outside the focused workspace.")
+    return item
+
+
+def install(session: "Session", item: Construction) -> None:
+    before = editable(session, item.id)
+    changed = object_revisions.authored(before, item)
+    if changed is before:
+        return
+    ports = object_revisions.changed_ports(before, changed)
+    session.scheduler.invalidate_ports(ports)
+    install_state(session, before, changed)
+    construction_tasks.edited(session, dependencies.affected(session.document, ports))
+
+
+def install_state(session: "Session", before: Construction, changed: Construction) -> None:
+    from . import consumer_parenting
+
+    objects = tuple(changed if o.id == changed.id else o for o in session.document.objects)
+    entities = session.document.entities
+    if changed.parent != before.parent:
+        after = replace(session.document, objects=objects)
+        entities = consumer_parenting.entities(session, after, changed.id)
+    session.replace_document(objects=objects, entities=entities)
+
+
+def rename(session: "Session", target: str, name: str) -> None:
+    install(session, replace(editable(session, target), name=require_name(name)))
+
+
+def transform(session: "Session", target: str, values: list[float]) -> None:
+    install(session, replace(editable(session, target), matrix=session.engine.transform(values)))
+
+
+def reparent(session: "Session", target: str, parent: str = "") -> None:
+    from anthroforge.native.construction import matrix
+
+    item = editable(session, target)
+    absolute = curve_sources.world(session.engine, session.document, target)
+    frame = curve_sources.world(session.engine, session.document, parent)
+    local = matrix(session.engine, frame, absolute, relative=True)
+    install(session, replace(item, parent=parent, matrix=local))
+
+
+def create_curve(
+    session: "Session",
+    name: str = "Curve",
+    points: list[dict[str, Any]] | None = None,
+    parent: str = "",
+    owner: str = "",
+) -> str:
+    if owner:
+        session.editable(owner)
+    curve = new_curve(name, points, parent, owner)
+    session.replace_document(objects=(*session.document.objects, curve))
+    return curve.id
+
+
+def new_curve(name: str, points: list[dict[str, Any]] | None, parent: str, owner: str) -> Curve:
+    from .construction_codec import tuples
+    from .primitive_operations import straight_curve
+
+    authored = (
+        tuple(CurvePoint(**tuples(p)) for p in points)
+        if points is not None
+        else straight_curve().points
+    )
+    return Curve(authored, name=require_name(name), parent=parent, owners=(owner,) if owner else ())
+
+
+def edit_curve(session: "Session", curve: str, **options: Any) -> None:
+    from .construction_codec import tuples
+
+    item = editable(session, curve)
+    if not isinstance(item, Curve):
+        raise ValueError("Select a curve or fiber.")
+    if set(options) - {"name", "closed", "resolution"}:
+        raise ValueError("Unknown curve property; engine conversion is a separate operation.")
+    if set(options) & {"closed", "resolution"}:
+        for consumer in curve_sources.consumers(session.document, {curve}):
+            require_topology_edit(session.document, consumer)
+    install(session, replace(item, **tuples(options)))
+
+
+def edit_point(session: "Session", curve: str, point: str, **options: Any) -> None:
+    from .construction_codec import tuples
+
+    item = editable(session, curve)
+    if not isinstance(item, Curve):
+        raise ValueError("Select a curve or fiber.")
+    index = next((i for i, p in enumerate(item.points) if p.id == point), -1)
+    if index < 0:
+        raise ValueError("Unknown authored curve point.")
+    changed = curve_editing.point(session.engine, item, index, tuples(options))
+    points = tuple(changed if p.id == point else p for p in item.points)
+    install(session, replace(item, points=points))
+
+
+def inspect(session: "Session", target: str) -> dict[str, Any]:
+    from .object_codec import encode
+
+    item = session.document.registry.construction.get(target)
+    if item is None:
+        raise ValueError("Unknown construction object.")
+    return {
+        **encode(item),
+        "consumers": sorted(curve_sources.consumers(session.document, {target})),
+    }
+
+
+def delete(session: "Session", target: str) -> None:
+    from .object_removal import retain_frames, retain_objects
+
+    item = editable(session, target)
+    users = curve_sources.consumers(session.document, {target})
+    if users:
+        raise ValueError("Object is referenced by consumers: " + ", ".join(sorted(users)))
+    parent = session.document.object(item.parent) if item.parent else None
+    objects = tuple(o for o in retain_objects(session, item, parent) if o.id != target)
+    entities = retain_frames(session, session.document.entities, target)
+    session.scheduler.invalidate({target})
+    session.replace_document(objects=objects, entities=entities)

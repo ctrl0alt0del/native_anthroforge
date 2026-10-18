@@ -11,7 +11,7 @@ from anthroforge.native.scene import entity_frame
 from . import construction_codec as codec
 from . import construction_tasks as tasks
 from . import control_operations as controls
-from . import membership
+from . import curve_sources, membership
 from .control_frames import stable_frame
 
 if TYPE_CHECKING:
@@ -30,7 +30,8 @@ def frame(session: "Session", target: Target) -> tuple[float, ...]:
         return stable_frame(session, item)
     if target.stage in ("CURVE", "BASE"):
         curve_id = target_curve(item, target)
-        curve = next(c for c in item.primitive.curves if c.id == curve_id)
+        definition = curve_sources.resolve(session.engine, session.document, item)
+        curve = next(c for c in definition.curves if c.id == curve_id)
         return native.matrix(session.engine, entity_frame(session.engine, item), curve.matrix)
     return entity_frame(session.engine, item)
 
@@ -85,8 +86,8 @@ def assign_members(session: "Session", binding: Deformer, restricted: bool) -> D
         return binding
     binding = replace(binding, restrict=True)
     if binding.target.stage == "CURVE":
-        item = owner(session, binding.target)
-        curve = next(c for c in item.primitive.curves if c.id == binding.target.component)
+        owner(session, binding.target)
+        curve = curve_sources.source(session.document, binding.target.component)
         return membership.assign(binding, curve)
     return binding
 
@@ -94,8 +95,8 @@ def assign_members(session: "Session", binding: Deformer, restricted: bool) -> D
 def assign_weights(session: "Session", binding: Deformer) -> Deformer:
     if binding.target.stage != "CURVE":
         return binding
-    item = owner(session, binding.target)
-    curve = next(c for c in item.primitive.curves if c.id == binding.target.component)
+    owner(session, binding.target)
+    curve = curve_sources.source(session.document, binding.target.component)
     return membership.assign_weights(binding, curve)
 
 
@@ -177,6 +178,6 @@ def members(session: "Session", binding: str) -> list[int]:
     if current.target.stage == "CURVE":
         item = session.document.entity(current.target.owner)
         assert item.primitive is not None
-        curve = next(c for c in item.primitive.curves if c.id == current.target.component)
+        curve = curve_sources.source(session.document, current.target.component)
         current = membership.resolve(current, curve)
     return list(current.indices)

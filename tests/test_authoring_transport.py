@@ -49,5 +49,5 @@ def test_batch_splits_curve_referenced_from_inspection(session):
         entity="$entity", curve="$definition.primitive.curves.0.id", segment=0, parameter=0.5
     )
     response = dispatch(session, dict(operation="curve.split", arguments=arguments), results)
-    curve = session.document.entity(entity).primitive.curves[0]
+    curve = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     assert len(curve.points) == 3 and curve.points[1].id == response["result"]

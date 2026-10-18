@@ -3,6 +3,7 @@
 from dataclasses import replace
 
 from anthroforge.application.control_frames import display_frame
+from anthroforge.application.curve_sources import for_editing
 from anthroforge.native import construction, control_geometry
 from anthroforge.native.scene import entity_frame
 
@@ -35,6 +36,7 @@ def for_editor(editor):
     if control:
         return (cage_lines(session, control) if control.kind == "LATTICE" else []), {}
     entity = next((e for e in session.document.entities if e.id == selected), None)
+    entity = for_editing(session, entity)
     if not editor.editing or not entity or not entity.primitive:
         return [], {}
     paths = {c.id: curve_path(session, entity, c) for c in entity.primitive.curves}

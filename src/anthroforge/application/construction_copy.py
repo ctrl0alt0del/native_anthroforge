@@ -4,11 +4,12 @@ from dataclasses import replace
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from anthroforge.core.construction import Control, Deformer, Primitive
+from anthroforge.core.construction import Control, Curve, Deformer, Primitive
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import EvaluationResult, ReadRevision
 
+from . import curve_copy, curve_sources
 from .membership import remap, remap_weights
 from .presentation import include_created
 
@@ -35,7 +36,11 @@ def identities(document: Document, entities: set[str], controls: set[str]) -> se
             result |= {b.id for b in item.deformers}
             if item.primitive:
                 result |= {c.id for c in item.primitive.curves}
-                result |= {p.id for c in item.primitive.curves for p in c.points}
+                result |= {
+                    p.id
+                    for c in item.primitive.curves
+                    for p in curve_sources.source(document, c.id).points
+                }
                 result |= {p.id for p in item.primitive.pieces}
     result |= {b.id for c in document.controls if c.id in controls for b in c.deformers}
     return result
@@ -61,7 +66,11 @@ def primitive(source: Primitive | None, mapping: dict[str, str]) -> Primitive | 
     if source is None:
         return None
     curves = tuple(
-        replace(c, id=mapping[c.id], points=tuple(replace(p, id=mapping[p.id]) for p in c.points))
+        replace(
+            c,
+            curve=mapping[c.id],
+            reference_frame=mapping.get(c.reference_frame, c.reference_frame),
+        )
         for c in source.curves
     )
     pieces = tuple(replace(p, id=mapping[p.id], curve=mapping[p.curve]) for p in source.pieces)
@@ -82,6 +91,7 @@ def control(source: Control, mapping: dict[str, str]) -> Control:
 
 
 def entity(source: SCP, mapping: dict[str, str], parent: str) -> SCP:
+    assert source.primitive is None or isinstance(source.primitive, Primitive)
     return replace(
         source,
         id=mapping[source.id],
@@ -116,6 +126,15 @@ def duplicate(session: "Session", ids: set[str], parent: str) -> dict[str, str]:
     session.replace_document(
         entities=(*session.document.entities, *copies),
         controls=(*session.document.controls, *shared),
+        objects=(*session.document.objects, *copied_curves(session.document, mapping)),
     )
     include_created(session, {c.id for c in shared})
     return {key: mapping[key] for key in ids}
+
+
+def copied_curves(document: Document, mapping: dict[str, str]) -> tuple[Curve, ...]:
+    return tuple(
+        curve_copy.clone(item, mapping)
+        for item in document.objects
+        if isinstance(item, Curve) and item.id in mapping
+    )

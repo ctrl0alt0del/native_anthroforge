@@ -8,7 +8,7 @@ import pytest
 
 from anthroforge.application.construction_codec import curve as decode_curve
 from anthroforge.application.construction_codec import tuples
-from anthroforge.core.construction import BodyPiece, Control, Deformer, Primitive, Target
+from anthroforge.core.construction import BodyPiece, Control, Deformer, ResolvedPrimitive, Target
 from anthroforge.native import bodies
 from anthroforge.native import construction as native
 from anthroforge.native.mesh import GeometryEngine
@@ -51,7 +51,7 @@ def curve_records(engine, case, definition):
 @pytest.mark.parametrize("case", CURVES, ids=lambda c: c["name"] + str(c["shift"]))
 def test_reference_anatomical_curve_sampling(engine, case):
     definition = curve(case)
-    primitive = Primitive(
+    primitive = ResolvedPrimitive(
         "BODY", curves=(definition,), pieces=(BodyPiece(definition.id),), samples=64
     )
     records = curve_records(engine, case, definition)

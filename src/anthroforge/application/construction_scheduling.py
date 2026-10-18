@@ -74,9 +74,7 @@ def binding_stages(document: Any, item: Any, binding: Any, points: int) -> list[
     if not binding.enabled:
         return []
     if binding.target.stage == "CURVE":
-        points = 3 * len(
-            next(c.points for c in item.primitive.curves if c.id == binding.target.component)
-        )
+        points = 3 * len(document.object(binding.target.component).points)
     result = [StageWorkload(binding.kind, points)]
     control = document.control(binding.control)
     result.extend(

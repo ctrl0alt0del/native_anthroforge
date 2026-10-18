@@ -170,7 +170,7 @@ def world_endpoint(session, entity):
 
 
 def bind_endpoint(session, entity, control):
-    curve = session.document.entity(entity).primitive.curves[0]
+    curve = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     return session.command(
         "deformer.add",
         control=control,

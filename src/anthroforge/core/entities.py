@@ -11,7 +11,7 @@ from .results import EvaluationResult
 from .units import factor
 
 if TYPE_CHECKING:
-    from .construction import Deformer, Primitive, Thickness
+    from .construction import Deformer, Primitive, ResolvedPrimitive, Thickness
 
 IDENTITY = (1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
 
@@ -53,7 +53,7 @@ class SCP:
     error: str = ""
     capture_parent_matrix: tuple[float, ...] = ()
     capture_parent_offset: tuple[float, ...] = (0.0, 0.0, 0.0)
-    primitive: "Primitive | None" = None
+    primitive: "Primitive | ResolvedPrimitive | None" = None
     deformers: tuple["Deformer", ...] = ()
     thickness: "Thickness | None" = None
     result: EvaluationResult = field(default_factory=EvaluationResult)

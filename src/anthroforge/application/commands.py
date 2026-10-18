@@ -6,10 +6,13 @@ from anthroforge.core.units import convert
 
 from . import (
     construction_tasks,
+    curve_consumers,
+    curve_independence,
     evaluation,
     importing,
     inspection,
     inspection_report,
+    object_operations,
     operations,
     presentation,
     projects,
@@ -22,6 +25,16 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "curve.create": object_operations.create_curve,
+    "curve.edit": object_operations.edit_curve,
+    "curve.point.update": object_operations.edit_point,
+    "object.rename": object_operations.rename,
+    "object.transform": object_operations.transform,
+    "object.reparent": object_operations.reparent,
+    "object.delete": object_operations.delete,
+    "primitive.from_curves": curve_consumers.from_curves,
+    "primitive.curve_mode": curve_consumers.transform_mode,
+    "primitive.make_independent": curve_independence.make_independent,
     "scp.empty": operations.empty,
     "scp.rename": operations.rename,
     "scp.color": operations.color,
@@ -115,6 +128,7 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
+        "object.inspect": lambda **a: object_operations.inspect(session, **a),
         "job.cancel": lambda job_id, obsolete=False: session.scheduler.cancel_job(job_id, obsolete),
         "job.retry": session.scheduler.retry,
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),

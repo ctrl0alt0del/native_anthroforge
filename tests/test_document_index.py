@@ -3,6 +3,7 @@ from dataclasses import replace
 import pytest
 
 from anthroforge.application import dependencies
+from anthroforge.application.curve_sources import create_records
 from anthroforge.application.primitive_operations import default_primitive
 from anthroforge.application.storage import decode_document, manifest
 from anthroforge.core.construction import Control, Deformer, Target
@@ -12,20 +13,18 @@ from anthroforge.core.results import Port
 
 
 def body_document():
-    return Document(
-        entities=(SCP("Body", id="body", primitive=default_primitive("BODY", "CAPSULE")),)
-    )
+    primitive, curves = create_records(default_primitive("BODY", "CAPSULE"), "body")
+    return Document(entities=(SCP("Body", id="body", primitive=primitive),), objects=curves)
 
 
 def test_value_edits_share_structure_but_keep_snapshot_values_independent():
     before = body_document()
     item = before.entity("body")
-    curve = item.primitive.curves[0]
+    curve = before.object(item.primitive.curves[0].id)
     point = replace(curve.points[0], position=(0, 1, 0))
     changed = replace(curve, points=(point, *curve.points[1:]))
-    primitive = replace(item.primitive, curves=(changed,))
-    after = replace(before, entities=(replace(item, primitive=primitive),))
-    assert after.entity("body").primitive == primitive
+    after = replace(before, objects=(changed,))
+    assert after.object(curve.id) == changed
     assert before.entity("body") is item
     assert after.index.structure is before.index.structure
     assert replace(after, revision=7).index is after.index
@@ -36,12 +35,11 @@ def test_value_edits_share_structure_but_keep_snapshot_values_independent():
 def test_cached_validation_rejects_changed_global_identities_and_parent_links():
     document = body_document()
     item = document.entity("body")
-    curve = item.primitive.curves[0]
+    curve = document.object(item.primitive.curves[0].id)
     point = replace(curve.points[0], id=item.id)
     curve = replace(curve, points=(point, *curve.points[1:]))
-    primitive = replace(item.primitive, curves=(curve,))
     with pytest.raises(ValueError, match="unique"):
-        replace(document, entities=(replace(item, primitive=primitive),))
+        replace(document, objects=(curve,))
     with pytest.raises(ValueError, match="tree"):
         replace(document, entities=(replace(item, parent="missing"),))
 

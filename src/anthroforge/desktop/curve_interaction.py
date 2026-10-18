@@ -4,6 +4,7 @@ from time import perf_counter
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
+from anthroforge.application.curve_sources import for_editing
 from anthroforge.native import curve_queries, scene
 
 from . import authoring_state
@@ -29,6 +30,7 @@ class CurveInteraction(QObject):
         entity = next(
             (e for e in controller.session.document.entities if e.id == controller.selection), None
         )
+        entity = for_editing(controller.session, entity)
         curves = entity.primitive.curves if entity and entity.primitive else ()
         enabled = editor.editing and editor.category == "CURVE" and curves
         self.query = make_query(controller.session.engine, entity, curves) if enabled else None

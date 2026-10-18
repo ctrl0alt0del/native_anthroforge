@@ -40,7 +40,7 @@ def test_surface_normal_transforms_as_covector(session, scale):
 
 def free_curve(session):
     entity = session.command("primitive.create", kind="BODY")
-    curve = session.document.entity(entity).primitive.curves[0]
+    curve = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     session.command(
         "point.update",
         entity=entity,
@@ -57,7 +57,9 @@ def free_curve(session):
 def transform_editor(session):
     entity = free_curve(session)
     item = session.document.entity(entity)
-    rows = authoring_state.curve_components(session, item, item.primitive.curves[0])
+    rows = authoring_state.curve_components(
+        session, item, session.document.object(item.primitive.curves[0].id)
+    )
     controller = SimpleNamespace(session=session, selection=entity, refresh=lambda: None)
     return SimpleNamespace(
         controller=controller,
@@ -81,7 +83,8 @@ def test_selected_curve_point_transforms_its_handles(session, mode, delta):
     transform = matrix(session.engine, editor.drag_center, delta)
     expected = session.engine.world_point(transform, editor.rows[2][1])
     authoring_actions.apply_delta(editor, delta)
-    point = session.document.entity(editor.controller.selection).primitive.curves[0].points[0]
+    use = session.document.entity(editor.controller.selection).primitive.curves[0]
+    point = session.document.object(use.id).points[0]
     assert point.right == pytest.approx(expected)
     session.command("cancel")
     assert session.document.entities == before.entities

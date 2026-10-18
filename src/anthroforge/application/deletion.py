@@ -10,6 +10,7 @@ from anthroforge.core.results import geometry_asset
 from . import evaluation
 from .control_frames import remove_supports
 from .control_operations import refresh_references
+from .object_removal import retain_frames, retain_objects
 from .operations import make_group
 from .presentation import include_created
 from .session import merge_entity
@@ -57,7 +58,9 @@ def install_removal(
     remaining = promoted_entities(session, item, parent)
     if not item.parent and parent:
         remaining = (parent, *remaining)
-    session.replace_document(entities=remaining, controls=controls)
+    objects = retain_objects(session, item, parent)
+    remaining = retain_frames(session, remaining, item.id)
+    session.replace_document(entities=remaining, controls=controls, objects=objects)
     if not item.parent and parent:
         include_created(session, {parent.id})
 

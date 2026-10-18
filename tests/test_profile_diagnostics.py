@@ -20,7 +20,7 @@ def report(session, path):
 
 
 def edit_curve(session, entity, height):
-    curve = session.document.entity(entity).primitive.curves[0]
+    curve = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     session.command(
         "point.update",
         entity=entity,
@@ -40,7 +40,7 @@ def test_report_explains_revision_changes_and_warm_cache_reuse(session, tmp_path
     assert summary["invalidation_reasons"]["input_output_changed"] > 0
     assert summary["cache_events"]["miss:"] and summary["cache_events"]["hit:"]
     revisions = [e for e in data["trace.json"]["traceEvents"] if e["cat"] == "revision"]
-    assert any("primitive" in c["fields"] for e in revisions for c in e["args"]["changes"])
+    assert any("points" in c["fields"] for e in revisions for c in e["args"]["changes"])
     assert all(e["args"]["parent"] for e in revisions)
     assert data["manifest.json"]["complete"], data["manifest.json"]["losses"]
 

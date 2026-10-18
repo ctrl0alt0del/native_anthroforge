@@ -5,7 +5,14 @@ from typing import Any
 
 import numpy as np
 
-from anthroforge.core.construction import Control, Curve, Deformer, Primitive, Thickness, cyclic
+from anthroforge.core.construction import (
+    Control,
+    Curve,
+    Deformer,
+    ResolvedPrimitive,
+    Thickness,
+    cyclic,
+)
 from anthroforge.core.entities import IDENTITY
 
 from .falloff import table as falloff_table
@@ -87,7 +94,7 @@ def resolved_curve(engine: GeometryEngine, curve: Curve, records: Any = None) ->
 def sample_curve(
     engine: GeometryEngine,
     curve: Curve,
-    definition: Primitive,
+    definition: ResolvedPrimitive,
     cancel: int = 0,
     records: Any = None,
 ) -> Any:
@@ -108,7 +115,7 @@ def owned_mesh(engine: GeometryEngine, handle: int) -> Mesh:
 
 def loft(
     engine: GeometryEngine,
-    definition: Primitive,
+    definition: ResolvedPrimitive,
     samples: list[Any],
     cancel: int,
     *,
@@ -120,7 +127,7 @@ def loft(
     return owned_mesh(engine, operation(*args))
 
 
-def loft_arguments(definition: Primitive, data: Any, cancel: int) -> tuple[Any, ...]:
+def loft_arguments(definition: ResolvedPrimitive, data: Any, cancel: int) -> tuple[Any, ...]:
     closed = all(cyclic(c, definition) for c in definition.curves)
     if any(c.closed for c in definition.curves) and not all(c.closed for c in definition.curves):
         raise ValueError("Loft curves must agree on open or closed topology.")

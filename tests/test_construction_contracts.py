@@ -49,7 +49,7 @@ def test_zero_weight_shell_roundtrips_canonical_triangles(session, tmp_path):
 def test_shape_edits_preserve_triangle_identity(session):
     entity = create(session)
     before = mesh(session, entity).array(3).copy()
-    curve = session.document.entity(entity).primitive.curves[0]
+    curve = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     session.command(
         "point.update",
         entity=entity,
@@ -205,7 +205,7 @@ def test_live_consumer_uses_and_reports_pending_manual_input(session):
 
 
 def lift_first_point(session, entity):
-    curve = session.document.entity(entity).primitive.curves[0]
+    curve = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     session.command(
         "point.update",
         entity=entity,
@@ -242,7 +242,7 @@ def test_geometry_publication_does_not_change_pose_read_revision(session):
 
 
 def weighted_curve_hook(session, entity):
-    curve = session.document.entity(entity).primitive.curves[0]
+    curve = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     control = session.command("control.create", entity=entity)
     binding = session.command(
         "deformer.add",
@@ -261,7 +261,7 @@ def test_curve_insertion_preserves_membership_and_weight_identity(session):
     entity = create(session)
     curve, binding = weighted_curve_hook(session, entity)
     insert_first_point(session, entity, curve.id)
-    current = session.document.entity(entity).primitive.curves[0]
+    current = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     resolved = resolve(locate(session, binding), current)
     assert resolved.indices == (4,)
     assert resolved.weights[4] == 0.7 and sum(resolved.weights) == 0.7

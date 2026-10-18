@@ -16,6 +16,7 @@ from .assets import Asset
 from .construction_evaluator import Evaluation
 from .construction_policy import mode, revisions
 from .construction_scheduling import stages
+from .curve_sources import source as source_curve
 
 if TYPE_CHECKING:
     from .session import Session
@@ -50,7 +51,9 @@ def make_job(session: "Session", entity: str) -> Job:
 def workload(session: "Session", entity: str, document: Document) -> Workload:
     item = document.entity(entity)
     primitive = item.primitive
-    points = sum(len(c.points) for c in primitive.curves) if primitive else 0
+    points = (
+        sum(len(source_curve(document, c.id).points) for c in primitive.curves) if primitive else 0
+    )
     vertices = primitive.samples * max(len(primitive.curves), 1) if primitive else 0
     return Workload(
         entities=len(document.entities),

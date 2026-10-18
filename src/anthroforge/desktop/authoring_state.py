@@ -3,13 +3,14 @@
 from dataclasses import fields
 
 from anthroforge.application.control_frames import display_frame
+from anthroforge.application.curve_sources import for_editing
 from anthroforge.native import bodies, components, construction
 from anthroforge.native.scene import entity_frame
 
 
 def data(editor):
     session, selected = editor.controller.session, editor.controller.selection
-    entity = session.document.index.entities.get(selected)
+    entity = for_editing(session, session.document.index.entities.get(selected))
     control = session.document.index.controls.get(selected)
     item = entity or control
     result = projected_item(item, control is not None)
@@ -103,6 +104,7 @@ def control_components(session, control):
 
 
 def entity_components(session, entity, category):
+    entity = for_editing(session, entity)
     if not entity.primitive:
         return []
     if entity.primitive.kind == "BODY" and category == "BASE":
@@ -135,6 +137,7 @@ def components_for(editor):
 
 
 def base_components(session, entity, piece):
+    entity = for_editing(session, entity)
     curve = next(c for c in entity.primitive.curves if c.id == piece.curve)
     mesh = bodies.base(session.engine, piece, entity.primitive.samples, curve.closed, 0)
     frame = construction.matrix(session.engine, entity_frame(session.engine, entity), curve.matrix)
@@ -163,19 +166,24 @@ def retained_selection(editor):
 
 def cache_key(editor):
     session, selected = editor.controller.session, editor.controller.selection
-    item = session.document.index.entities.get(selected) or session.document.index.controls.get(
-        selected
-    )
+    item = session.document.registry.records.get(selected)
     return (
         selected,
         item.generation if item else -1,
         getattr(item, "pose_revision", 0),
+        source_revisions(session, item),
         display_frame(session, item) if item and not hasattr(item, "primitive") else None,
         editor.editing,
         editor.category,
         session.workspace.hidden_categories,
         session.workspace.unpickable_categories,
     )
+
+
+def source_revisions(session, item):
+    if not getattr(item, "primitive", None):
+        return ()
+    return tuple(session.document.object(c.id).generation for c in item.primitive.curves)
 
 
 def imported_selection(editor):

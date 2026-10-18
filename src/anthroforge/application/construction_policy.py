@@ -34,12 +34,22 @@ def revisions(document: Document, ports: set[Port]) -> tuple[ReadRevision, ...]:
 
 
 def revision(document: Document, port: Port) -> ReadRevision:
+    if port.owner in document.registry.construction:
+        return object_revision(document, port)
     if port.output in ("control", "cage"):
-        item = document.control(port.owner)
-        return ReadRevision(port.owner, port.output, item.generation, 0)
+        control = document.control(port.owner)
+        return ReadRevision(port.owner, port.output, control.generation, 0)
     entity = document.entity(port.owner)
     if port.output == "pose":
         return ReadRevision(port.owner, port.output, 0, entity.pose_revision)
     return ReadRevision(
         port.owner, port.output, entity.construction_revision, entity.result.revision
     )
+
+
+def object_revision(document: Document, port: Port) -> ReadRevision:
+    item = document.registry.construction[port.owner]
+    pose = port.output in ("pose", "local_pose")
+    authored = item.pose_revision if pose else item.construction_revision
+    accepted = 0 if pose else item.result.revision
+    return ReadRevision(port.owner, port.output, authored, accepted)

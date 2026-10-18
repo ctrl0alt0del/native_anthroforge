@@ -115,6 +115,18 @@ def test_closed_fiber_needs_one_binding_not_three():
         replace(closed, bindings=())
 
 
+def test_fiber_copy_remaps_points_and_bindings_atomically():
+    from anthroforge.application.curve_copy import clone, mapping
+
+    root = SCP("Root")
+    original = bound_fiber(curve(), root)
+    copied = clone(original, mapping(original))
+    assert isinstance(copied, Fiber)
+    assert copied.id != original.id
+    assert {b.point for b in copied.bindings} == {p.id for p in copied.points}
+    assert {b.target for b in copied.bindings} == {root.id}
+
+
 def test_fiber_cannot_bind_to_another_curve():
     target = curve()
     fiber = bound_fiber(curve(), target)

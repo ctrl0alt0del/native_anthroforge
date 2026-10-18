@@ -66,6 +66,10 @@ EDITS = {
 
 
 def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    if operation.startswith(("measurement.", "bookmark.")):
+        from .inspection_commands import execute as inspect_command
+
+        return inspect_command(session, operation, arguments)
     if operation.startswith("issues."):
         from .issues.commands import execute as issue_command
 

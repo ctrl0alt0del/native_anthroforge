@@ -38,6 +38,8 @@ def reprioritize(session: "Session") -> None:
 
 
 def update_workspace(session: "Session", index: int | None = None, **settings: Any) -> None:
+    if session.waiting_save and settings.keys() & {"bookmarks", "measurements"}:
+        raise ValueError("Wait until saving finishes before changing inspection annotations.")
     index = session.active_workspace if index is None else index
     if not 0 <= index < len(session.document.workspaces):
         raise ValueError("Unknown workspace.")

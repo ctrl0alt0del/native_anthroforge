@@ -11,7 +11,7 @@ Item {
     property var pending: null
     property var drag: null
     property string signature: ""
-    visible: authoring.visible && authoring.state.editing && authoring.state.category === "CURVE" &&
+    visible: !viewport.measuring && authoring.visible && authoring.state.editing && authoring.state.category === "CURVE" &&
         !!authoring.state.curves?.length && !workspace.selectedData.readonly && !keyboard.blocked
     function refreshPreview() {
         if(!previewActive) { interaction.clearPreview(); signature=""; return; }

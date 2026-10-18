@@ -106,4 +106,6 @@ def presentation(previous, current):
         key=previous["key"],
         handle=previous["handle"],
         chunk=previous["chunk"],
+        geometry_asset=previous.get("geometry_asset", ""),
+        geometry_revision=previous.get("geometry_revision", 0),
     )

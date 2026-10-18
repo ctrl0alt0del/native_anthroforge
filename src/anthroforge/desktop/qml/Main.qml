@@ -282,7 +282,7 @@ ApplicationWindow {
         recordPerformance: () => performance.toggle(),
         confirm: () => viewport.confirmTransform(),
         projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,
-        cancel: () => { viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
+        cancel: () => { workspace.inspectionTools.cancel(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
     })
     function dispatchShortcut(command) {
         const action = shortcutCommands[command];

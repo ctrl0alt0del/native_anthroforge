@@ -88,7 +88,11 @@ def finish(controller, renderer, image, output, warnings, settings=None):
     metadata.update(capture_metadata(renderer, output, health, valid, warnings))
     metadata["inspection_view"] = settings
     Path(output + ".json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
-    print(json.dumps({"captured": valid, "revision": metadata["revision"], "image": output}))
+    print(
+        json.dumps(
+            dict(captured=valid, revision=metadata["revision"], image=output, warnings=warnings)
+        )
+    )
     return 0 if valid else 1
 
 

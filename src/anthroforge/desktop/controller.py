@@ -12,6 +12,7 @@ from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
 from .inspection_export import InspectionExport
 from .inspection_panel import InspectionPanel
+from .inspection_tools import InspectionTools
 from .issue_panel import IssuePanel
 from .models import RenderModel
 
@@ -50,6 +51,7 @@ class Controller(QObject):
         self.issue_panel = IssuePanel(self)
         self.inspection_panel = InspectionPanel(self)
         self.inspection_export = InspectionExport(self)
+        self.inspection_tools = InspectionTools(self)
 
     def _initialize_state(self):
         self.selection, self.hovered, self.message = "", "", ""
@@ -117,6 +119,10 @@ class Controller(QObject):
     def inspectionExport(self):
         return self.inspection_export
 
+    @Property(QObject, constant=True)
+    def inspectionTools(self):
+        return self.inspection_tools
+
     @Property("QVariantMap", notify=metricsChanged)
     def metrics(self):
         return self._metrics
@@ -131,6 +137,7 @@ class Controller(QObject):
         self.issue_panel.synchronize()
         self.inspection_panel.synchronize()
         self.inspection_export.synchronize()
+        self.inspection_tools.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()

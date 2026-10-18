@@ -35,7 +35,7 @@ profile summaries/caches, disabled behavior and shared allocation accounting.
 Run development gate, GUI acceptance, profiler report inspection, relocated portable
 checks, source archive and normal main integration. Push coherent checkpoints.
 
-## Current findings / next action
+## Current implementation and next action
 
 Baseline 0.1.7 is clean except the preserved legacy stub. Existing native surface
 picking, shared workspace camera, runtime recorder and bounded Body base cache are
@@ -43,6 +43,20 @@ available. Coordinator invalidation currently loses its cause. Geometry collecti
 traces document/history/checkpoint/job references; renderer leases need explicit
 observation for accurate shared ownership. Inspect their boundaries, then implement
 measurement/bookmark records and profiler observation without altering scheduling.
+
+First increment implemented: native surface witness/distance queries, typed frozen
+rulers and camera bookmarks persisted per workspace, shared commands, ruler pointer
+workflow and overlays, named view management, report measurements. Display staging
+now retains the matching asset/revision metadata with its old visible handle.
+Stale/deleted source geometry is explicit; rulers retain values, not geometry payloads.
+13 focused/architecture/export tests, strict mypy and native build/CTest passed.
+Real GUI picks, bookmark save/restore and export during edits passed; viewport and
+report images were visually inspected under `build/inspection-018`. No QML warnings.
+Full regression/release checks and recommendation 7 remain pending.
+
+Next implement bounded invalidation/cache/memory observations, tests and profiler
+acceptance. Then finish gesture/visibility regression, documentation, 0.1.8 packaging
+and normal main integration. Do not mark the whole task complete from this increment.
 
 References: Qt 6.12 View3D/pickResult and Perfetto counter tracks documentation were
 researched before implementation. Qt bounding-box picks do not replace our native

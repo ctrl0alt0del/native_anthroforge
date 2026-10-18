@@ -32,6 +32,7 @@ Item {
     property bool restoringCamera: false
     property var preservedCamera: null
     readonly property bool canRestoreView: preservedCamera !== null
+    readonly property bool measuring: workspace.inspectionTools.state.active
     readonly property var selected: authoring.transformData
     readonly property bool modalTransforming: modalTransform.active
     readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming
@@ -70,6 +71,7 @@ Item {
     }
     function rayAt(x, y, select, extend) {
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
+        if(measuring) { workspace.inspectionTools.probe(origin,direction,depthIndex,select); return {}; }
         if(authoring.visible) {
             if(authoring.pick(origin,direction,distance*.012,depthIndex,select,!!extend) || authoring.state.editing) return {};
         }
@@ -95,7 +97,15 @@ Item {
     }
     function cancelTransform() { modalTransform.finish(true); curveEditor.finish(true); gizmo.cancel(); workspace.endTransform(true); }
     function confirmTransform() { if(modalTransforming) modalTransform.finish(false); }
-    function startModalTransform(mode) { modalTransform.begin(mode); }
+    function startModalTransform(mode) { if(!measuring) modalTransform.begin(mode); }
+    function applyBookmark(values, orthographic, name) {
+        if(!canRestoreView) preservedCamera=captureCamera();
+        workspace.rebaseTransform();
+        cameraOrigin.position=Qt.vector3d(values[0],values[2],-values[1]);
+        cameraOrigin.eulerRotation=Qt.vector3d(values[3],values[4],values[5]);
+        distance=values[6]; viewport.orthographic=orthographic; viewName=name;
+        finishCameraChange();
+    }
     function updateTransform() { curveEditor.updateDrag(); gizmo.updateDrag(pointerPosition); modalTransform.update(); }
     function surfaceOffset(steps) {
         const p=selected.trs, local=view.camera.mapPositionFromScene(Qt.vector3d(p[0],p[2],-p[1]));
@@ -167,6 +177,7 @@ Item {
     }
     function refreshOverlays() {
         anchorMarkers.requestPaint();
+        measurementOverlay.requestPaint();
     }
     onOrthographicChanged: cameraSave.restart()
 
@@ -305,12 +316,18 @@ Item {
             viewport.cameraDirty = true;
             cameraSave.restart();
         }
-        onDoubleClicked: workspace.frameSelection()
+        onDoubleClicked: { if(!viewport.measuring) workspace.frameSelection(); }
     }
-    TransformGizmo { id: gizmo; objectName: "transformGizmo"; anchors.fill: parent; viewport: viewport }
-    CurveEditor { id: curveEditor; objectName: "curveEditor"; anchors.fill: parent; viewport: viewport; keyboard: viewport.keyboard }
+    TransformGizmo { id: gizmo; objectName: "transformGizmo"; anchors.fill: parent; viewport: viewport; enabled: !viewport.measuring }
+    CurveEditor { id: curveEditor; objectName: "curveEditor"; anchors.fill: parent; viewport: viewport; keyboard: viewport.keyboard; enabled: !viewport.measuring }
     CurveFeedback { anchors.fill: parent; viewport: viewport }
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
+    MeasurementOverlay { id: measurementOverlay; viewport: viewport }
+    InspectionTools { viewport: viewport; anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.margins: 12; z: 10 }
+    Connections {
+        target: workspace.inspectionTools
+        function onBookmarkRequested(values, orthographic, name) { viewport.applyBookmark(values,orthographic,name); }
+    }
     Canvas {
         id: anchorMarkers; anchors.fill: parent
         visible: workspace.state.anchors && !workspace.state.hidden_categories.includes("anchors") && !!viewport.selected.id

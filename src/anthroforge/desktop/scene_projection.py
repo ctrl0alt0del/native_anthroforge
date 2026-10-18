@@ -159,4 +159,8 @@ def render_record(row):
     names = ("id", "handle", "chunks", "matrix", "geometry_offset", "trs", "quaternion")
     names += ("visible", "pickable", "readonly", "opacity", "color", "asset", "anchors")
     names += ("surface_visible", "surface_pickable")
-    return {name: row[name] for name in names}
+    return dict(
+        {name: row[name] for name in names},
+        geometry_asset=row.get("geometry_asset", ""),
+        geometry_revision=row.get("geometry_revision", 0),
+    )

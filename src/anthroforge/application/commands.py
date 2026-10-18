@@ -26,6 +26,7 @@ from . import (
     path_tasks,
     presentation,
     projects,
+    surface_branch_operations,
     surface_operations,
 )
 from . import control_operations as controls
@@ -41,6 +42,8 @@ EDITS = {
     "surface.source": surface_operations.source,
     "surface.order": surface_operations.order,
     "surface.realign": surface_operations.realign,
+    "surface.branch.add": surface_branch_operations.add,
+    "surface.branch.remove": surface_branch_operations.remove,
     "fiber.create": fiber_operations.create,
     "fiber.binding.scope": fiber_operations.binding_scope,
     "fiber.binding.set": fiber_bindings.assign,

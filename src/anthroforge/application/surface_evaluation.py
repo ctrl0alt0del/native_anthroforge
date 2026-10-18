@@ -46,6 +46,8 @@ def input_row(
 
 
 def layout(engine: Any, document: Any, resources: Any, item: Surface, cancel: int) -> Surface:
+    if item.kind == "BRANCHED":
+        return replace(item, alignment=(), across=())
     values, across = native.layout(
         engine, rows(engine, document, resources, item, True), settings(item), cancel
     )
@@ -67,10 +69,13 @@ def stable_alignment(document: Any, resources: Any, curve: str, values: Any) -> 
 
 
 def evaluate(engine: Any, document: Any, resources: Any, item: Surface, cancel: int) -> Any:
+    from . import surface_branch_evaluation
+
     if item.kind == "BRANCHED":
-        raise ValueError("Branched construction requires an explicit shared-junction layout.")
-    inputs = rows(engine, document, resources, item)
-    counts = item.across or (max(1, item.strips) - 1,) * (len(item.curves) - 1)
-    mesh = native.geometry(engine, inputs, counts, settings(item), cancel)
+        mesh = surface_branch_evaluation.evaluate(engine, document, resources, item, cancel)
+    else:
+        inputs = rows(engine, document, resources, item)
+        counts = item.across or (max(1, item.strips) - 1,) * (len(item.curves) - 1)
+        mesh = native.geometry(engine, inputs, counts, settings(item), cancel)
     previous = resources.meshes.get(item.result.asset)
     return finalize(mesh, previous.mesh if previous else None, cancel)

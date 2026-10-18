@@ -11,6 +11,7 @@ from anthroforge.core.fibers import Fiber, FiberBinding, FiberEdit
 from anthroforge.core.object_registry import Construction
 from anthroforge.core.reference_images import ImageCalibration, ReferenceImage
 from anthroforge.core.results import EvaluationResult
+from anthroforge.core.surface_branches import SurfaceBranch
 from anthroforge.core.surfaces import Surface, SurfaceAlignment
 
 from .construction_codec import result_fields, tuples
@@ -30,6 +31,7 @@ def decode(data: dict[str, Any]) -> Construction:
     if kind == "surface":
         state["curves"] = tuple(CurveUse(**tuples(use)) for use in state["curves"])
         state["alignment"] = tuple(SurfaceAlignment(**row) for row in state.get("alignment", ()))
+        state["branches"] = tuple(SurfaceBranch(**row) for row in state.get("branches", ()))
         return Surface(**state)
     if kind == "reference_image":
         calibration = state.get("calibration")

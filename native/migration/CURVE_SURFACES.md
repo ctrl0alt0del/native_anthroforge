@@ -54,3 +54,20 @@ Regression fixtures test both ray directions on all three axis planes, before an
 deformation, including sampled boundary vertices. The same native entry point serves
 scene picking and surface snapping/projection. Invisible rendering verifies a complete
 old mesh and its picking revision remain active until the replacement is displayed.
+
+## Explicit open branches
+
+`surface_branch_inputs.cpp`, `surface_branch_sampling.cpp` and `surface_branches.cpp`
+port the addon `core/vcp/branched_surface.py` base surface assembly. The compact fixture
+`tests/fixtures/surfaces/branches.json` pins the donor SHA-256 and eight directly captured
+outputs (both outer boundaries, both windings, straight/curved root paths). Native
+positions agree to 1e-10 and face indices agree exactly, including reused main seam IDs.
+No proximity welding, Blender access or Python numerical preparation is involved.
+
+Uniform sampling is an explicit extension: authored junction stations remain included
+in the main grid. Cancellation and bounded source/station/mesh sizes remain enforced.
+Connector width/fullness are used by later muscle inflation, not this base assembly;
+0.2.0 therefore does not expose inert inflation controls. Closed and nested branches
+remain unsupported. CGAL's explicit border-stitching API was reviewed as a comparison
+(https://doc.cgal.org/5.6/Polygon_mesh_processing/group__PMP__combinatorial__repair__grp.html);
+reusing known seam IDs directly preserves the addon construction without a repair pass.

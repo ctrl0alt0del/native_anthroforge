@@ -11,6 +11,15 @@ typedef struct AfSurfaceRow {
     double start,span,origin;
     int reverse,samples,alignment_reverse;
 } AfSurfaceRow;
+/* Each branch consumes distinct rows after the main rows. Roots are authored
+ * point indices on the selected outer main row; child rows start at that root. */
+typedef struct AfSurfaceBranch {
+    int boundary,count;
+    const int* rows;
+    const int* roots;
+} AfSurfaceBranch;
+AF_API uint64_t af_curve_surface_branches(const AfSurfaceRow* rows,int count,int main_count,
+    const AfSurfaceBranch* branches,int branch_count,int exact,int strips,int flip,uint64_t cancel);
 /* Explicit initial/Realign calculation. alignment: origin + reversal per row.
  * across: insert counts for adjacent rows. strips=0 chooses donor density. */
 AF_API int af_curve_surface_layout(const AfSurfaceRow* rows,int count,int exact,int strips,

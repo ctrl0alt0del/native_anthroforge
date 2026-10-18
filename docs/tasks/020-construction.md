@@ -672,3 +672,17 @@ points as explicit constraints. Anatomical assembly copies remap junctions withi
 set (including accepted path metadata and dependency output IDs), without linking originals.
 Single independent copies clear membership. Five focused identity/architecture tests pass;
 configured mypy (169 modules) passes. Full suite and branch construction remain pending.
+
+### Native branch and shared API checkpoint
+
+Native branch assembly now ports the actual addon kernel with explicit shared seam IDs,
+ordered interior roots, outer-boundary constraints, overlap rejection, station/mesh budgets
+and cancellation. Eight pinned donor cases match vertices (1e-10) and faces exactly. Native
+build and clang-tidy pass. Uniform sampling retains required root stations.
+
+Surfaces own typed main/branch source groups. Shared API branch add/remove operations retain
+source curves, propagate ordinary path dependencies, reject unresolved junction removal,
+and round-trip editable branch identities. Application tests cover creation/undo/redo,
+shared edits, deletion and save/reopen. 16 native/workflow/architecture checks and configured
+mypy pass. Desktop branch controls, invisible visual qualification, source-list edits,
+branched-source independence and the previously recorded release work remain pending.

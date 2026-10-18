@@ -6,6 +6,8 @@ from math import isfinite
 from .construction import integer
 from .curve_uses import CurveUse
 from .objects import ConstructionObject
+from .surface_branches import SurfaceBranch
+from .surface_branches import validate as validate_branches
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,6 +32,8 @@ class Surface(ConstructionObject):
     flip: bool = False
     alignment: tuple[SurfaceAlignment, ...] = ()
     across: tuple[int, ...] = ()
+    main: tuple[str, ...] = ()
+    branches: tuple[SurfaceBranch, ...] = ()
 
     def __post_init__(self) -> None:
         ConstructionObject.__post_init__(self)
@@ -41,6 +45,7 @@ class Surface(ConstructionObject):
         if len({use.curve for use in self.curves}) != len(self.curves):
             raise ValueError("A surface cannot consume the same curve twice.")
         validate_layout(self)
+        validate_branches(self)
 
 
 def validate_layout(item: Surface) -> None:

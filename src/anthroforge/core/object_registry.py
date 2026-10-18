@@ -136,6 +136,8 @@ def validate_bindings(item: Curve, records: dict[str, SceneObject]) -> None:
 
 
 def validate_sources(item: Surface, records: Mapping[str, SceneObject]) -> None:
+    from .surface_branches import validate_sources as validate_branches
+
     sources = [records.get(use.curve) for use in item.curves]
     if any(not isinstance(source, Curve) for source in sources):
         raise ValueError("Surface sources must be curves or fibers.")
@@ -144,6 +146,7 @@ def validate_sources(item: Surface, records: Mapping[str, SceneObject]) -> None:
         raise ValueError("Surface sources have incompatible closure.")
     if item.kind == "BRANCHED" and closed != {False}:
         raise ValueError("Branched surfaces require open curves.")
+    validate_branches(item, records)
 
 
 def validate_parenting(objects: tuple[Construction, ...]) -> None:

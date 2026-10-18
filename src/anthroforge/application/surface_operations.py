@@ -51,8 +51,6 @@ def editable(session: Any, target: str) -> Surface:
 def configured(item: Surface, values: dict[str, Any]) -> Surface:
     if set(values) - {"name", "exact", "strips", "patch_resolution", "close_across", "flip"}:
         raise ValueError("Unknown surface setting.")
-    if item.kind == "BRANCHED":
-        raise ValueError("Branched construction requires explicit junction definitions.")
     changed = replace(item, **values)
     if "strips" in values and changed.strips:
         changed = replace(changed, across=(changed.strips - 1,) * (len(changed.curves) - 1))
@@ -84,6 +82,8 @@ def source(session: Any, target: str, curve: str, **values: Any) -> None:
 
 def order(session: Any, target: str, curves: list[str]) -> None:
     item = editable(session, target)
+    if item.branches:
+        raise ValueError("Remove branches before changing the main source order.")
     if len(curves) != len(item.curves) or set(curves) != {u.curve for u in item.curves}:
         raise ValueError("Reordering requires every surface source exactly once.")
     uses = {u.curve: u for u in item.curves}

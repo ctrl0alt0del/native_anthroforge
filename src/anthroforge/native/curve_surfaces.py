@@ -36,6 +36,8 @@ class Settings:
 
 
 def configure(engine: GeometryEngine) -> None:
+    from . import surface_branches
+
     rows = c.POINTER(Row)
     engine.bind("af_curve_surface_layout", [rows, c.c_int, c.c_int, c.c_int, D, INT, U])
     engine.bind(
@@ -43,6 +45,7 @@ def configure(engine: GeometryEngine) -> None:
         [rows, c.c_int, c.c_int, INT, c.c_int, c.c_int, c.c_int, c.c_int, U],
         U,
     )
+    surface_branches.configure(engine)
 
 
 def row(path: Path, frame: Any, use: Any, origin: float = -1, reverse: bool = False) -> Row:

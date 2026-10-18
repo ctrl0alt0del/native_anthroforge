@@ -98,8 +98,9 @@ source path and output JSON path. Use `--disable-autoexec` with background Blend
 Never save either original .blend file. Native source provenance is recorded in
 [BLENDER_PRIMITIVES.md](../native/migration/BLENDER_PRIMITIVES.md).
 
-The companion archive is `dist/AnthroForge-0.1.7-source.zip`. The portable folder stays
+The companion archive is `dist/AnthroForge-0.1.7-source.zip`. The default portable folder is
 `dist/AnthroForge.dist` and the executable's product/file version identifies 0.1.7.
+The qualified 0.1.7 delivery uses `dist/0.1.7/AnthroForge.dist` to preserve the existing app.
 Packaging includes all new QML inspectors, native algorithms, example batches and notices.
 Set `AF_PACKAGE_OUTPUT` to an absolute output directory before `tools/package.ps1`
 when an existing portable app is running. For example, `E:/development/anthroforge/dist/0.1.7`

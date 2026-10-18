@@ -3,7 +3,8 @@
 A standalone SCP and primitive editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the portable folder (`dist/AnthroForge.dist` in the project).
+Open **AnthroForge.exe** in the portable folder. This qualified 0.1.7 build is in
+`dist/0.1.7/AnthroForge.dist`; the default packaging location remains `dist/AnthroForge.dist`.
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.

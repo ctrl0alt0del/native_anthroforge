@@ -187,5 +187,48 @@
         "p95_upper_us": 44375.2457620281
       }
     }
-  ]
+  ],
+  "portable_qualification": {
+    "passed": true,
+    "executable": "E:\\development\\anthroforge\\build\\portable-017\\final\\AnthroForge.dist\\AnthroForge.exe",
+    "environment": "minimal PATH",
+    "doctor": {
+      "application": "0.1.7",
+      "python": "3.12.12",
+      "platform": "Windows-11-10.0.26220-SP0",
+      "native": {
+        "available": true,
+        "abi": 1,
+        "path": "E:\\development\\anthroforge\\build\\portable-017\\final\\AnthroForge.dist\\anthroforge\\_runtime\\bin\\af_native.dll"
+      },
+      "packages": {
+        "PySide6": "6.12.0",
+        "numpy": "1.26.4",
+        "scipy": null,
+        "scikit-image": null,
+        "pyinstantmeshes": null,
+        "pytetwild": null
+      }
+    },
+    "checks": [
+      "import",
+      "attachments",
+      "primitives",
+      "deformers",
+      "deletion",
+      "curve subdivision",
+      "save",
+      "inspect",
+      "render",
+      "GUI",
+      "runtime profiling",
+      "issue reporting and verified repair",
+      "workflow inspection, units, workspace policies and image/JSON report"
+    ],
+    "source_revision": "190d387625a8dd95d48f42c127d4ec9f3c3c1d2a",
+    "tracked_changes": false,
+    "executable_sha256": "c366f3b4f4d094face8146ee6efafb1678c953d2e9daa639fcfba60226fb4b1a",
+    "inspection_archive_sha256": "55fbfd7aa9fb466a27168a0bd19cb06b1ad06ac369d1965f8d3f3e045fff9a70",
+    "visual_review": "Packaged primitives viewport and selected loft report inspected; context transparency, camera, selection and revisions match."
+  }
 }

@@ -43,12 +43,21 @@ files/processes under the existing coordinator, without a second worker pool or 
 barrier. Geometry queries remain native; Python handles domain graphs and orchestration.
 Inspector details are opt-in and revision-gated. Numerical algorithms are unchanged.
 
-Portable executable qualification is in progress; source checks alone do not establish it.
+The final executable was built from clean tracked source at `190d387`, version 0.1.7.0.
+A relocated copy passed the complete portable gate with minimal PATH and developer
+Python/Qt settings removed: import, attachments, primitives/deformers, deletion,
+subdivision, save/reopen, render pixels, GUI, runtime profiling, verified issue repair,
+and mixed workspace/units/image+JSON report export. Packaged viewport and report images
+were visually inspected. The report retained revision 36, its selected loft, mixed
+workspace, millimetres and selection filters; the other geometry remained transparent.
+Executable/report hashes and the exact check list are retained in the compact evidence.
+
 The preliminary relocated report test found Nuitka's `sys.executable` naming an absent
-`python.exe`. A disposable interpreter-name alias made the same image/JSON export pass,
-isolating the launcher path as the cause. The production adapter now uses the compiled
-application's `sys.argv[0]`; it does not ship the alias. Final rebuilt acceptance remains
-required. The running 0.1.6 app is preserved; 0.1.7 is built in `dist/0.1.7/AnthroForge.dist`.
+`python.exe`. A disposable interpreter-name alias isolated that launcher failure; the
+production adapter now uses the actual compiled application's `sys.argv[0]`. The final
+relocated export passed without any alias. The original distribution was preserved;
+the qualified executable is `dist/0.1.7/AnthroForge.dist/AnthroForge.exe`, with companion
+source archive `dist/AnthroForge-0.1.7-source.zip`. Keep the entire portable folder together.
 
 ## Issue reporting 0.1.6
 

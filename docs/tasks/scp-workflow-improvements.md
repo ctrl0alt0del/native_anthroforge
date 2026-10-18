@@ -3,7 +3,7 @@
 - Task branch: `codex/scp-workflow-improvements`
 - Integration branch: `main`
 - Starting revision: `e8565e28328a205f10575f03928737ccd782d0d1`
-- Status: source and GUI qualified; portable qualification in progress
+- Status: complete; implementation, GUI, profiler and portable qualification passed
 - Last updated: 2026-10-18, Europe/Bucharest
 - Active writer: desktop chat, direct work
 
@@ -45,7 +45,8 @@ mixed workspace membership and presentation/unit policies are implemented.
 Desktop inspector, mixed workspace manager, category filters, unit-aware fields,
 read-only background report archive and CLI are now integrated. The isolated Qt
 renderer consumes a frozen temporary package and declared camera/selection; the
-headless parent stays Qt-free. Final qualification/documentation/package remain.
+headless parent stays Qt-free. All five improvements, documentation and release
+qualification are complete. See the final delivery evidence below.
 
 ## Verification
 
@@ -77,15 +78,18 @@ package build was stopped before publication; preserve that process and director
 Final build uses `AF_PACKAGE_OUTPUT=E:/development/anthroforge/dist/0.1.7`, producing
 `dist/0.1.7/AnthroForge.dist`. All production changes are committed before rebuilding.
 
-## Next actions
+## Final delivery
 
-1. Finish the current preliminary package process, then rebuild from current clean HEAD
-   with `AF_PACKAGE_OUTPUT=E:/development/anthroforge/dist/0.1.7`. The preliminary build
-   at cb29a96 predates the launcher fix and is not the release candidate.
-2. Copy the final distribution to an ignored relocation directory and run
-   `tools/check_portable.py <relocated AnthroForge.exe> <isolated working directory>`.
-   The gate now includes workspace/units/inspection CLI and isolated report rendering.
-3. Record results, create `dist/AnthroForge-0.1.7-source.zip`, and merge/push main normally.
+The clean `190d387` build passed the full relocated portable gate under minimal PATH,
+including the image/JSON report with no interpreter alias. Actual packaged viewport
+and report images were inspected. The report contains the declared revision 36,
+selected loft and mixed workspace with millimetre display and category filters.
+`scp-workflow-evidence.json` retains executable/report hashes and the complete check list.
+No implementation or validation steps remain. The task is ready for normal main integration.
+
+Qualified app: `dist/0.1.7/AnthroForge.dist/AnthroForge.exe` (keep the whole directory).
+Companion source: `dist/AnthroForge-0.1.7-source.zip`. The original distribution was
+preserved. Raw logs, images, profiles and relocated copies remain ignored local artifacts.
 
 Final source suite: **525 passed**, including queued-writer reprioritization when
 workspace membership changes (read-only advisory priority is preserved). Latest
@@ -93,8 +97,9 @@ functional fix is 2ff31af: packaged report workers must launch `sys.argv[0]`, si
 Nuitka gives `sys.executable` a nonexistent `python.exe` path. The preliminary relocated
 test failed with WinError 2; a temporary alias made that same report succeed and was
 removed. Source regression verifies the real executable path even when renamed.
-Do not ship an alias or mark the final package accepted before its actual test passes.
-Early diagnostic copy: `build/portable-017/early`; final logs: `build/workflow-017`.
+The final package passes that actual test without an alias.
+Early diagnostic copy: `build/portable-017/early`; final copy: `build/portable-017/final`;
+final logs: `build/workflow-017`.
 
 ## Recovery inputs
 

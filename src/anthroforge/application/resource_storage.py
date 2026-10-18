@@ -68,8 +68,10 @@ def read_path(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryE
     return PathAsset(paths.restore(engine, samples, parameters, authored.closed), authored)
 
 
-def read_image(archive: zipfile.ZipFile, key: str, source: Any) -> image_assets.ImageAsset:
-    image = image_assets.decode(archive.read(f"images/{key}/source"))
+def read_image(
+    archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine
+) -> image_assets.ImageAsset:
+    image = image_assets.decode(archive.read(f"images/{key}/source"), engine)
     if image.digest != source["digest"]:
         raise ValueError("Embedded reference image digest does not match its assignment.")
     return image
@@ -78,5 +80,5 @@ def read_image(archive: zipfile.ZipFile, key: str, source: Any) -> image_assets.
 def read(archive: zipfile.ZipFile, data: Any, engine: GeometryEngine) -> Resources:
     meshes = {key: read_mesh(archive, key, value, engine) for key, value in data["assets"].items()}
     curves = {key: read_path(archive, key, value, engine) for key, value in data["paths"].items()}
-    images = {key: read_image(archive, key, value) for key, value in data["images"].items()}
+    images = {key: read_image(archive, key, value, engine) for key, value in data["images"].items()}
     return Resources(meshes, curves, images)

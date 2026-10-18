@@ -86,6 +86,11 @@ class ImportTaskScheduler(MeasuredTaskScheduler):
         return Schedule(reason="Explicit mesh import; parsing and BVH construction stay background")
 
 
+class ImageTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule(reason="Image decode and texture tile preparation stay background")
+
+
 class OpenProjectTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         return Schedule(reason="Explicit project open; decompression stays background")
@@ -149,6 +154,7 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "generic": MeasuredTaskScheduler(),
         "attachments": AttachmentTaskScheduler(),
         "mesh_import": ImportTaskScheduler(),
+        "image_decode": ImageTaskScheduler(),
         "project_open": OpenProjectTaskScheduler(),
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),

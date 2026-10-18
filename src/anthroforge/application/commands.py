@@ -10,6 +10,7 @@ from . import (
     curve_edit_operations,
     curve_independence,
     evaluation,
+    image_operations,
     importing,
     inspection,
     inspection_report,
@@ -27,6 +28,11 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "image.import": image_operations.import_image,
+    "image.replace": image_operations.replace_source,
+    "image.instance": image_operations.instance,
+    "image.size": image_operations.size,
+    "image.calibrate": image_operations.calibrate,
     "curve.create": object_operations.create_curve,
     "curve.edit": object_operations.edit_curve,
     "curve.point.update": object_operations.edit_point,
@@ -133,6 +139,7 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
+        "image.inspect": lambda **a: image_operations.inspect(session, **a),
         "object.inspect": lambda **a: object_operations.inspect(session, **a),
         "curve.evaluate": lambda curve: path_tasks.schedule(session, {curve}, explicit=True),
         "job.cancel": lambda job_id, obsolete=False: session.scheduler.cancel_job(job_id, obsolete),

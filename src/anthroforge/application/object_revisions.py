@@ -2,6 +2,7 @@
 
 from dataclasses import fields, replace
 
+from anthroforge.core.object_outputs import output
 from anthroforge.core.objects import ConstructionObject
 from anthroforge.core.results import Port
 
@@ -24,9 +25,7 @@ def changed_ports(before: ConstructionObject, after: ConstructionObject) -> set[
     names = {f.name for f in fields(after) if getattr(before, f.name) != getattr(after, f.name)}
     result = {Port(after.id, "local_pose")} if names & POSE else set()
     if names - POSE - METADATA:
-        from anthroforge.core.construction import Curve
-
-        result.add(Port(after.id, "path" if isinstance(after, Curve) else "geometry"))
+        result.add(Port(after.id, output(after)))
     return result
 
 

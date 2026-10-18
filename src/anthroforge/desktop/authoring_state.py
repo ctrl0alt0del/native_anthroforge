@@ -69,9 +69,7 @@ def construction_data(entity, session):
     from anthroforge.application.construction_policy import topology_locks
 
     result = {}
-    result["topology_dependents"] = (
-        topology_locks(session.document, entity.id) if entity else []
-    )
+    result["topology_dependents"] = topology_locks(session.document, entity.id) if entity else []
     result["standalone"] = isinstance(entity, Curve)
     result["curves"] = editor_curves(entity)
     result["controls"] = [

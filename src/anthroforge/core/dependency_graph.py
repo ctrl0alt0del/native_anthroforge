@@ -5,10 +5,11 @@ from collections.abc import Iterator, Mapping, Set
 from dataclasses import dataclass
 from types import MappingProxyType
 
-from .construction import Control, Curve, Deformer
+from .construction import Control, Deformer
 from .cycle_analysis import cycles
 from .entities import SCP
 from .fibers import Fiber
+from .object_outputs import output
 from .objects import ConstructionObject
 from .results import Port
 from .surfaces import Surface
@@ -131,8 +132,7 @@ def object_edges(objects: tuple[ConstructionObject, ...]) -> dict[Port, set[Port
         result[pose] = {Port(item.id, "local_pose")} | (
             {Port(item.parent, "pose")} if item.parent else set()
         )
-        output = Port(item.id, "path" if isinstance(item, Curve) else "geometry")
-        result[output] = construction_inputs(item)
+        result[Port(item.id, output(item))] = construction_inputs(item)
     return result
 
 

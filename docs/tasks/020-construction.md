@@ -43,10 +43,12 @@ Profiler memory snapshots now include typed mesh/path/image totals and per-kind 
 with bounded native path enumeration, weak job observations and bounded catalogue/history
 collection. Disabled profiling performs no inventory queries. Image resource identity avoids
 hashing image payloads during observations; reports contain sizes and provenance, not pixels.
-No standalone curve viewport/Construction UI exists yet; ROUTED is not implemented in the
-standalone engine and is explicitly rejected by native path dispatch.
-Images/Fiber/Surface records exist but their production operations/native algorithms/UI
-remain unfinished. Direct control.attach is still present and must be retired as planned.
+Standalone curves now have Construction navigation, shared editing, staged native display
+and picking (details below). ROUTED is not implemented in the standalone engine and is
+explicitly rejected by native path dispatch. Image API import/replacement/calibration and
+native texture preparation are implemented; image UI/display remains in progress.
+Fiber/Surface production operations/native algorithms/UI remain unfinished.
+Direct control.attach is still present and must be retired as planned.
 No 0.2.0 release qualification or version bump has occurred.
 The current coordinator, attachment kernels, Issues, profiler, transactions and
 staged renderer must be extended at their owning boundaries, not duplicated.
@@ -142,3 +144,20 @@ nonuniformly scaled ordinary parent. Captures were inspected in build/020-path-s
 Qt offscreen QPA could not initialize D3D11, so this render check uses the platform backend with
 an explicitly invisible render-control window. No desktop input or interactive acceptance.
 The controller/QML standalone editor acceptance also passes. Full 0.2.0 remains incomplete.
+
+## Image authoring checkpoint
+
+Extracted the existing mesh-import history/publication behavior into `authored_jobs`; mesh
+and image imports now use that shared contract. Added background PNG/JPEG decoding with
+EXIF orientation, cancellation, independent image instances sharing embedded assets, source
+replacement, physical sizing and native two-landmark calibration. Import completion belongs
+to its initiating undo step even when later edits exist. Completed same-source replacement
+is not restarted by redo. Native image resources own bounded 256-pixel texture tiles; Qt
+adoption is limited to one tile per staged item. Display/interaction integration is next.
+
+Validation: full native build/contracts pass, changed-native clang-tidy passes, Ruff/format
+and mypy pass, and 617 tests pass. Includes image-only documents, aspect/width preservation,
+instance independence, transformed calibration and undo, interrupted import undo/redo,
+embedded persistence without the original source, invalid input, and existing mesh-import
+regressions. The full development gate passed on the preceding path checkpoint (608 tests).
+No image rendering, interactive acceptance, or 0.2.0 packaging acceptance is claimed here.

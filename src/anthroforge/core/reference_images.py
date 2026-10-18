@@ -13,6 +13,10 @@ class ImageCalibration:
     distance: float
 
     def __post_init__(self) -> None:
+        if len(self.first) != 2 or len(self.second) != 2:
+            raise ValueError("Image landmarks use normalized 2D image coordinates.")
+        if any(not 0 <= v <= 1 for v in (*self.first, *self.second)):
+            raise ValueError("Image landmarks must lie within the image.")
         if not all(isfinite(v) for v in (*self.first, *self.second, self.distance)):
             raise ValueError("Image calibration requires finite values.")
         if self.distance <= 0 or self.first == self.second:

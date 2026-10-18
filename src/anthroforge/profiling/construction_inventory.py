@@ -22,12 +22,16 @@ def image_inventory(owners):
     from .resource_inventory import memory_totals
 
     images = {v for values in owners.values() for v in values if isinstance(v, ImageAsset)}
-    sizes = {id(v): len(v.encoded) + len(v.rgba) for v in images}
+    sizes = {id(v): image_bytes(v) for v in images}
     groups = {
         name: {id(v) for v in values if isinstance(v, ImageAsset)}
         for name, values in owners.items()
     }
     return memory_totals(list(images), sizes, groups, len(images))
+
+
+def image_bytes(image):
+    return len(image.encoded) + len(image.rgba) + (image.texture.bytes if image.texture else 0)
 
 
 def path_rows(profiler):

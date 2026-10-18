@@ -1,6 +1,5 @@
 """Curve/handle/cage line preparation performed only when the authored revision changes."""
 
-
 from anthroforge.application.control_frames import display_frame
 from anthroforge.native import construction, control_geometry
 

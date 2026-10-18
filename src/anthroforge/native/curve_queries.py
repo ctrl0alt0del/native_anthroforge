@@ -8,7 +8,7 @@ import numpy as np
 
 from anthroforge.core.construction import Curve, CurvePoint
 
-from . import components, construction, curve_editing
+from . import construction, control_geometry, curve_editing
 from .mesh import D, GeometryEngine, doubles, pointer
 
 
@@ -19,18 +19,8 @@ def configure(engine: GeometryEngine) -> None:
 
 def cubics(engine: GeometryEngine, curve: Curve, frame: Any) -> Any:
     resolved = construction.resolved_curve(engine, curve)
-    count = len(curve.points) - (not curve.closed)
-    controls = [
-        (
-            resolved[i, :3],
-            resolved[i, 6:9],
-            resolved[(i + 1) % len(resolved), 3:6],
-            resolved[(i + 1) % len(resolved), :3],
-        )
-        for i in range(count)
-    ]
     matrix = construction.matrix(engine, frame, curve.matrix)
-    return components.transformed(engine, np.asarray(controls).reshape((-1, 3)), matrix)
+    return control_geometry.cubics(engine, resolved, curve.closed, matrix)
 
 
 class CurveQuery:

@@ -9,6 +9,8 @@ from anthroforge.core.construction import Control, Curve, Deformer, Primitive, T
 from anthroforge.core.entities import IDENTITY
 
 from .falloff import table as falloff_table
+from .influence import configure as configure_influence
+from .influence import weights as influence_weights
 from .mesh import D, GeometryEngine, Mesh, U, doubles, pointer
 
 INT = c.c_int
@@ -38,6 +40,11 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_mesh_join", [c.POINTER(U), INT, U], U)
     engine.bind("af_matrix_relative", [D, D, D])
     engine.bind("af_matrix_product", [D, D, D])
+    configure_deformers(engine)
+
+
+def configure_deformers(engine: GeometryEngine) -> None:
+    configure_influence(engine)
     engine.bind("af_hook", [D, INT, D, D, D, F, F, INT, D, D, INT, U])
     engine.bind("af_lattice_grid", [IP, D])
     engine.bind("af_lattice_resolution", [IP])
@@ -148,19 +155,6 @@ def joined(engine: GeometryEngine, meshes: list[Mesh], cancel: int) -> Mesh:
     return owned_mesh(engine, engine.library.af_mesh_join(handles, len(meshes), cancel))
 
 
-def influence(binding: Deformer, count: int) -> Any:
-    weights = np.ones(count) if not binding.weights else doubles(binding.weights).copy()
-    if len(weights) != count:
-        raise ValueError("Influence weights do not match target points.")
-    if binding.invert and binding.weights:
-        weights = 1 - weights
-    if binding.restrict or binding.indices:
-        mask = np.zeros(count)
-        mask[[i for i in binding.indices if i < count]] = 1
-        weights *= mask
-    return weights
-
-
 def hook(
     engine: GeometryEngine, points: Any, binding: Deformer, owner: Any, target: Any, cancel: int
 ) -> Any:
@@ -169,19 +163,22 @@ def hook(
     transform = doubles(matrix(engine, relative, binding.bind))
     uniform = doubles(binding.bind if binding.uniform else IDENTITY)
     args = (pointer(data), len(data), pointer(transform), pointer(uniform))
-    engine.check(engine.library.af_hook(*args, *hook_arguments(engine, binding, len(data)), cancel))
+    options = hook_arguments(engine, binding, len(data), cancel)
+    engine.check(engine.library.af_hook(*args, *options, cancel))
     return data
 
 
-def hook_arguments(engine: GeometryEngine, binding: Deformer, count: int) -> tuple[Any, ...]:
-    center, weights = doubles(binding.center), influence(binding, count)
+def hook_arguments(
+    engine: GeometryEngine, binding: Deformer, count: int, cancel: int
+) -> tuple[Any, ...]:
+    center, weights = doubles(binding.center), influence_weights(engine, binding, count, cancel)
     custom = falloff_table(engine, binding)
     return (
         pointer(center),
         binding.strength,
         binding.radius,
         FALLOFF.index(binding.falloff),
-        pointer(weights),
+        weights,
         pointer(custom),
         len(custom) // 2,
     )
@@ -233,23 +230,23 @@ def apply_lattice(
     transform: Any,
     cancel: int,
 ) -> Any:
-    options = lattice_arguments(cage, binding, len(data), transform)
+    weights = influence_weights(engine, binding, len(data), cancel)
+    options = lattice_arguments(cage, binding, transform, weights)
     args = (pointer(data), len(data), pointer(controls), *options, cancel)
     engine.check(engine.library.af_lattice(*args))
     return data
 
 
 def lattice_arguments(
-    cage: Control, binding: Deformer, count: int, transform: Any
+    cage: Control, binding: Deformer, transform: Any, weights: Any
 ) -> tuple[Any, ...]:
-    weights = influence(binding, count)
     interpolation = (INT * 3)(*(INTERPOLATION.index(i) for i in cage.interpolation))
     return (
         (INT * 3)(*cage.resolution),
         interpolation,
         pointer(transform),
         binding.strength,
-        pointer(weights),
+        weights,
         cage_weight_pointer(cage),
     )
 

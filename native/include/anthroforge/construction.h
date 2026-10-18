@@ -9,6 +9,8 @@ AF_API int af_curve_sample(const double* points, int count, int closed, int reso
     int samples, double start, double span, const double* matrix, double* output, uint64_t cancel);
 AF_API int af_curve_handles(double* points, int count, int closed);
 /* Cubics: four world-space xyz controls per segment. Output: t, xyz, ray distance. */
+AF_API int af_curve_cubics(const double* resolved, int count, int closed,
+    const double* matrix, double* output);
 AF_API int af_curve_closest(const double* cubics, int count, const double* origin,
     const double* direction, double* output);
 AF_API int af_curve_split(const double* points, int count, int closed, int segment,
@@ -42,6 +44,17 @@ AF_API uint64_t af_mesh_restore(const double* vertices, int64_t count, const int
 AF_API int af_matrix_relative(const double* frame, const double* world, double* output);
 AF_API int af_matrix_product(const double* a, const double* b, double* output);
 AF_API int af_points_transform(const double* points, int count, const double* matrix, double* output);
+/* Output capacity: 2*count xyz values; group partitions independent polylines. */
+AF_API int af_polyline_lines(const double* points, int count, int group, int closed,
+    const double* matrix, double* output);
+/* Output capacity: 6*count xyz values. Returns written point count, -1 on error. */
+AF_API int af_lattice_lines(const double* points, int count, const int* resolution,
+    const double* matrix, double* output);
+/* Null weights mean unit influence. Invert affects explicit weights only.
+ * Restriction with no indices yields zero; out-of-range positive indices are ignored.
+ * Output contains count doubles; cancellation leaves unpublished scratch only. */
+AF_API int af_influence(const double* weights, int count, int invert, const int* indices,
+    int index_count, int restricted, double* output, uint64_t cancel);
 AF_API int af_component_pick(const double* points, int count, const double* origin,
     const double* direction, double radius, int depth);
 AF_API int af_component_hits(const double* points, int count, const double* origin,

@@ -28,12 +28,33 @@ cancellation. Keep constant-size UI calculations and record/identity operations 
 Python. Dense UI projection costs require separate evidence, not a claim that these
 small kernels alone eliminate the previously measured dense-cage latency.
 
+## Implemented checkpoint
+
+Added native influence evaluation (default influence requires no allocated weight
+array), display polyline/cage connectivity and cubic query packing. Grouped selected
+point conversion by target frame while preserving input order and command semantics.
+Native construction/Blender parity tests pass (143); focused preparation, curve-query,
+gesture and architecture tests pass (55). Full gate/GUI/package still pending.
+
+Serial ABBA, 25 unrecorded calls per case per leg, identical rounded output hashes:
+
+| Preparation workload | Before median ms | After median ms |
+| --- | ---: | ---: |
+| 100,000-point default Hook | 0.740–0.749 | 0.588–0.605 |
+| 100,000-point weighted/restricted Hook | 4.099–4.260 | 3.122–3.141 |
+| 1,000-point cage display lines | 0.776–0.788 | 0.545–0.558 |
+| 1,000-point closed curve query packing | 1.614–1.641 | 0.571–0.572 |
+| 1,000 selected points, coordinate conversion | 22.379–22.968 | 1.116–1.165 |
+
+The last experiment intercepts command publication to isolate preparation; it does
+not establish full multi-point gesture speed. Each leg also exports an ordinary
+runtime report; [compact evidence](native-boundary-audit-evidence.json) records timings,
+output checksums and native calls. Source snapshots/reports remain local ignored data.
+
 ## Acceptance and next actions
 
-1. Capture baseline preparation and multi-point dispatch costs; implement owning native APIs.
-2. Test native parity and mixed-frame component editing; compare ordinary runtime reports.
-3. Run development gate, relevant GUI and packaged application checks.
-4. Record the audited boundary and measured limitations, then integrate and push.
+1. Run development gate, relevant GUI and packaged application checks.
+2. Record the audited boundary and measured limitations, then integrate and push.
 
 Preserve unrelated root `__init__.py`. Captures/builds stay in ignored
 `build/native-boundary-audit`; compact evidence will be committed. Prior optimization

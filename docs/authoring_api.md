@@ -39,7 +39,6 @@ serve continues scheduling between requests. Ending the process does not save.
 | units.convert | value; optional source="m", target="m" | Convert length between m/cm/mm; API geometry always uses metres |
 | workspace.remove | index > 0 | Remove named workspace; active removal selects whole document |
 | workspace.preset | name=all/shape/surface/attachments | Apply category show/select preset |
-
 | save | path, blocked_policy | Saved revision/path or pending jobs |
 | open | path | Load the project and queue equivalent SCP startup synchronization |
 | workspace.create | name, members; optional children=false | Create and activate focused workspace |

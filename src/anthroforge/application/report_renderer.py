@@ -10,7 +10,7 @@ from typing import BinaryIO
 
 
 def command(root: Path, revision: int) -> list[str]:
-    packaged = Path(sys.executable).stem.lower() == "anthroforge"
+    packaged = "__compiled__" in globals()  # Nuitka's documented runtime module marker.
     entry = [sys.executable, "--cli"] if packaged else [sys.executable, "-m", "anthroforge"]
     return [
         *entry,

@@ -7,7 +7,7 @@ from threading import Event
 
 import pytest
 
-from anthroforge.application import report_archive
+from anthroforge.application import report_archive, report_renderer
 from anthroforge.application.geometry_ownership import collect
 from tests.test_construction_contracts import create
 
@@ -77,3 +77,10 @@ def test_archive_cancellation_preserves_destination(tmp_path):
         report_archive.archive(path, image, {}, cancel)
     assert path.read_bytes() == b"original"
     assert not list(tmp_path.glob(".afinspection-*"))
+
+
+def test_renderer_command_uses_runtime_kind_instead_of_executable_name(tmp_path, monkeypatch):
+    monkeypatch.setattr(sys, "executable", "renamed application.exe")
+    assert report_renderer.command(tmp_path, 4)[1:3] == ["-m", "anthroforge"]
+    monkeypatch.setattr(report_renderer, "__compiled__", object(), raising=False)
+    assert report_renderer.command(tmp_path, 4)[1:3] == ["--cli", "render"]

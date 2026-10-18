@@ -21,7 +21,7 @@ Canvas {
     onEvidenceChanged: requestPaint()
     onPaint: {
         const ctx=getContext("2d"); ctx.reset(); ctx.lineWidth=2; ctx.font="12px sans-serif";
-        for(const row of evidence.measurements) ruler(ctx,row.start.position,row.end.position,(row.distance*workspace.state.unit_factor).toFixed(3)+" "+workspace.state.display_units,row.stale);
+        for(const row of evidence.measurements) ruler(ctx,row.start.position,row.end.position,viewport.formatLength(row.distance),row.stale);
         ctx.fillStyle="#7bdcff";
         if(evidence.start.position) dot(ctx,evidence.start.position,"A");
         if(evidence.hover.position) dot(ctx,evidence.hover.position,evidence.start.position ? "B" : "A");

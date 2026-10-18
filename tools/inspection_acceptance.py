@@ -78,6 +78,19 @@ def bookmarks(controller, window):
     assert window.grabWindow().save(str(OUTPUT / "ruler-bookmark.png"))
 
 
+def display_units(controller, window):
+    row = controller.session.command("measurement.list")[0]
+    for unit, scale in (("mm", 1000), ("cm", 100), ("m", 1)):
+        controller.run("workspace.update", dict(display_units=unit))
+        QTest.qWait(70)
+        expected = f"{row['distance'] * scale:.3f} {unit}"
+        assert expected in find(window, "measurementDistance").property("text")
+        xyz = ", ".join(f"{value * scale:.3f}" for value in row["start"]["position"])
+        assert xyz in find(window, "measurementCoordinates").property("text")
+    controller.run("workspace.update", dict(display_units="mm"))
+    QTest.qWait(70)
+
+
 def export(controller, entity):
     path = OUTPUT / "measurements.afinspection.zip"
     controller.inspection_export.start(str(path))
@@ -96,6 +109,7 @@ def bookmark_gesture(controller, window):
     identity = select_point(controller, entity)
     before, cursor = position(controller, identity), controller.session.history.cursor
     pointer = begin_modal(controller, window, Qt.Key_G)
+    pointer -= QPoint(250, 0)  # Continue over the viewport, clear of the expanded tools panel.
     QTest.mouseMove(window, pointer + QPoint(20, 15))
     QTest.qWait(60)
     restore_during_gesture(controller, window, identity)
@@ -118,7 +132,7 @@ def editable_body(controller):
 
 def restore_during_gesture(controller, window, identity):
     changed, transaction = position(controller, identity), controller.session.history.before
-    controller.inspection_tools.restoreBookmark(controller.session.workspace.bookmarks[0].id)
+    click(window, "restoreBookmark")
     QTest.qWait(100)
     np.testing.assert_allclose(position(controller, identity), changed, atol=1e-7)
     assert controller.session.history.before is transaction
@@ -141,6 +155,7 @@ def exercise(controller, window):
     entity = fixture(controller)
     pickability(controller)
     ruler(controller, window)
+    display_units(controller, window)
     bookmarks(controller, window)
     export(controller, entity)
     bookmark_gesture(controller, window)

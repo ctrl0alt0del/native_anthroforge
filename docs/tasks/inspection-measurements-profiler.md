@@ -85,6 +85,15 @@ checked after the frame boundary publishes visibility. Updated PNGs were inspect
 Next build from the clean source checkpoint, run the extended relocated portable gate,
 record package evidence, create the source archive and merge/push main normally.
 
+First portable candidate passed its API/packaging gate, but actual PNG inspection caught
+inverted display-unit conversion in the ruler (a 1 m edge labelled 0.001 mm). Stored API
+values were correct. Fixed all new ruler readouts and the overlay through the existing
+metres-per-display-unit contract; shared length formatting prevents label/overlay drift.
+The GUI now asserts XYZ/distance in m/cm/mm and uses the actual bookmark Go button
+during a modal curve move. Two repeated GUI passes and focused tests passed; the new
+exported PNG correctly shows 502.857 mm for the pixel-picked ~0.503 m span. Rebuild the
+portable candidate from this fix and repeat relocation qualification before release.
+
 References: Qt 6.12 View3D/pickResult and Perfetto counter tracks documentation were
 researched before implementation. Qt bounding-box picks do not replace our native
 displayed-geometry picking; trace counters are suitable for byte snapshots.

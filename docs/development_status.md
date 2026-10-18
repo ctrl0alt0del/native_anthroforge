@@ -43,7 +43,11 @@ or extend mesh lifetimes. Native registry totals include live handles beyond the
 session. AABB bytes are estimated; Python/Qt copies, GPU allocations and between-snapshot
 peaks are outside coverage. No new resource queries run while recording is off.
 
-Portable build and relocation qualification are pending at this source checkpoint.
+Visual inspection of the first portable ruler caught inverted mm display conversion;
+API coordinates were already correct. The new GUI regression verifies XYZ/distance
+in m/cm/mm and clicks the actual bookmark Go button during an active edit. Two repeated
+passes and the corrected exported PNG establish the fix. Final portable rebuild and
+relocation qualification are pending at this source checkpoint.
 
 ## Workflow improvements 0.1.7
 

@@ -9,7 +9,7 @@ Rectangle {
     property bool expanded: false
     width: 310; height: expanded ? Math.min(430, viewport.height-100) : 34
     color: Theme.panel; border.color: Theme.border; radius: 4
-    function xyz(point) { return point.map(v=>(v*workspace.state.unit_factor).toFixed(3)).join(", "); }
+    function xyz(point) { return point.map(v=>(v/workspace.state.unit_factor).toFixed(3)).join(", "); }
     function saveBookmark() { viewport.storeCamera(); workspace.run("bookmark.add",{name:bookmarkName.text.trim() || "Inspection view"}); }
     ColumnLayout {
         anchors.fill: parent; anchors.margins: 6; spacing: 6
@@ -29,10 +29,10 @@ Rectangle {
                         required property var modelData
                         Layout.fillWidth: true
                         RowLayout {
-                            Label { Layout.fillWidth: true; color: modelData.stale ? "#ffcc64" : Theme.text; text: modelData.name+": "+(modelData.distance*workspace.state.unit_factor).toFixed(3)+" "+workspace.state.display_units+(modelData.stale ? " · stale" : "") }
+                            Label { objectName: "measurementDistance"; Layout.fillWidth: true; color: modelData.stale ? "#ffcc64" : Theme.text; text: modelData.name+": "+viewport.formatLength(modelData.distance)+(modelData.stale ? " · stale" : "") }
                             UiButton { glyph: "delete"; flatStyle: true; hint: "Remove measurement"; onClicked: workspace.run("measurement.remove",{measurement:modelData.id}) }
                         }
-                        Label { Layout.fillWidth: true; wrapMode: Text.WrapAnywhere; color: Theme.muted; text: "A: "+tools.xyz(modelData.start.position)+"\nB: "+tools.xyz(modelData.end.position)+"\nΔ: "+tools.xyz(modelData.delta)+" "+workspace.state.display_units }
+                        Label { objectName: "measurementCoordinates"; Layout.fillWidth: true; wrapMode: Text.WrapAnywhere; color: Theme.muted; text: "A: "+tools.xyz(modelData.start.position)+"\nB: "+tools.xyz(modelData.end.position)+"\nΔ: "+tools.xyz(modelData.delta)+" "+workspace.state.display_units }
                     }
                 }
                 Label { text: "Named cameras"; color: Theme.text; font.bold: true }
@@ -45,7 +45,7 @@ Rectangle {
                     RowLayout {
                         required property var modelData
                         UiField { id: nameField; Layout.fillWidth: true; text: modelData.name; onEditingFinished: { if(text.trim() && text!==modelData.name) workspace.run("bookmark.rename",{bookmark:modelData.id,name:text}); } }
-                        UiButton { text: "Go"; enabled: !workspace.state.waiting; onClicked: { tools.model.restoreBookmark(modelData.id); viewport.forceActiveFocus(); } }
+                        UiButton { objectName: "restoreBookmark"; text: "Go"; enabled: !workspace.state.waiting; onClicked: { tools.model.restoreBookmark(modelData.id); viewport.forceActiveFocus(); } }
                         UiButton { glyph: "delete"; flatStyle: true; hint: "Remove bookmark"; onClicked: workspace.run("bookmark.remove",{bookmark:modelData.id}) }
                     }
                 }

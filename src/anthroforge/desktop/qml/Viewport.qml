@@ -93,6 +93,7 @@ Item {
     function pointInFront(point) {
         return view.camera.mapPositionFromScene(Qt.vector3d(point[0],point[2],-point[1])).z < -view.camera.clipNear;
     }
+    function formatLength(value) { return (value/workspace.state.unit_factor).toFixed(3)+" "+workspace.state.display_units; }
     function pixelsPerUnit(depth) {
         if(orthographic) return orthoCamera.verticalMagnification;
         const extent=perspectiveCamera.fieldOfViewOrientation===PerspectiveCamera.Horizontal?width:height;

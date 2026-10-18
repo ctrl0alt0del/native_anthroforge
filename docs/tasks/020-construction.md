@@ -447,3 +447,25 @@ Routing is still not application-integrated. Warm inputs, independent handoff va
 diagnostic publication and representative anatomical qualification remain. Binding
 lifecycle, junctions, generic surfaces and the other release work above remain open.
 Do not label this checkpoint a completed 0.2.0 release.
+
+## Routing application integration checkpoint
+
+Routed standalone curves and fibers now evaluate through the shared path pipeline.
+Declared obstacle/support pose and geometry inputs participate in dependency invalidation,
+full revision validation, worker-only scheduling and retained-output failure handling.
+Warm path capture is native; pins are replaced by current authored constraints. Routed
+fiber edits rebind authored constraints before solving rather than treating sampled output
+as editable knots. Conversion previews include new obstacle inputs and fiber capture
+candidates in their read sets. Accepted routing diagnostics round-trip with path resources.
+
+The shared `curve.engine_settings` operation edits the existing engine's settings without
+bypassing previewed engine conversion or consumer topology locks. The desktop inspector
+exposes sampling, clearance, solve budget and explicit obstacles. Offscreen full-QML
+acceptance invokes the actual obstacle checkbox, verifies authored-point selection,
+gesture editing/undo and staged path output. No visible window or desktop input was used.
+
+35 focused routing, conversion, fiber and architecture tests pass; Ruff and configured
+mypy pass. The desktop check passes. Native warm support builds and both native contracts
+pass. Full gate follows this checkpoint. Still required: independent planner handoff
+validation, broader routing/warm parity and representative performance/geometry evidence,
+remaining binding/conversion cases, junctions, surfaces and all final release work.

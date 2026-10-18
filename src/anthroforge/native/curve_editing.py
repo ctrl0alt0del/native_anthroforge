@@ -52,6 +52,13 @@ def unpack(old: CurvePoint, record: Any) -> CurvePoint:
         right=tuple(record[6:9]),
         radius=float(record[9]),
         tilt=float(record[10]),
-        left_mode=HANDLES[int(record[11])],
-        right_mode=HANDLES[int(record[12])],
+        left_mode=handle_mode(record[11]),
+        right_mode=handle_mode(record[12]),
     )
+
+
+def handle_mode(value: Any) -> str:
+    index = int(value)
+    if index != value or not 0 <= index < 2 * len(HANDLES):
+        raise ValueError("Invalid native curve handle mode.")
+    return HANDLES[index % len(HANDLES)]  # Upper range means handles were resolved natively.

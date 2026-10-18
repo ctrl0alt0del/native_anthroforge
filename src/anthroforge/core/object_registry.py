@@ -6,6 +6,7 @@ from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 from .construction import Control, Curve
+from .curve_dependencies import targets as curve_targets
 from .entities import SCP
 from .fibers import Fiber
 from .reference_images import ReferenceImage
@@ -94,7 +95,7 @@ def validate(document: "Document", records: dict[str, SceneObject]) -> None:
             raise ValueError("Transform parent must exist and cannot be a reference image.")
         if set(item.owners) - document.index.entities.keys():
             raise ValueError("Workspace associations require anatomical objects.")
-        if isinstance(item, Fiber):
+        if isinstance(item, Curve):
             validate_bindings(item, records)
         if isinstance(item, Surface):
             validate_sources(item, records)
@@ -110,10 +111,12 @@ def validate_primitives(document: "Document", records: dict[str, SceneObject]) -
                     raise ValueError("Primitive curve source does not exist.")
 
 
-def validate_bindings(item: Fiber, records: dict[str, SceneObject]) -> None:
-    for target in {*item.supports, *(binding.target for binding in item.bindings)}:
+def validate_bindings(item: Curve, records: dict[str, SceneObject]) -> None:
+    for target in curve_targets(item):
         if not isinstance(records.get(target), SCP):
-            raise ValueError("Fiber binding target must be an anatomical surface provider.")
+            raise ValueError(
+                "Curve obstacles and fiber bindings require anatomical surface providers."
+            )
 
 
 def validate_sources(item: Surface, records: dict[str, SceneObject]) -> None:

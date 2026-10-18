@@ -10,7 +10,7 @@ extern "C" {
 typedef struct AfRoutingOptions { int samples,accepted_steps,closed; double radius; } AfRoutingOptions;
 AF_API uint64_t af_route_path(const double* records,int count,const double* world,
     const int* owners,const uint64_t* meshes,const double* matrices,int surfaces,
-    const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t cancel);
+    const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

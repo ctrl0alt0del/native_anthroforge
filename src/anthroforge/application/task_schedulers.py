@@ -162,6 +162,12 @@ class FiberPathTaskScheduler(AttachmentTaskScheduler):
         return Schedule("worker", cost, reason="Dense fiber resolution or edit and recapture")
 
 
+class RoutingTaskScheduler(AttachmentTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 1.0 + workload.candidates * 0.1 + workload.triangles * 0.01
+        return Schedule("worker", cost, reason="Native obstacle routing and constrained solve")
+
+
 class InspectionTaskScheduler(SaveProjectTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         return Schedule(reason="Frozen inspection export; file and GPU work stay background")
@@ -186,6 +192,7 @@ def task_schedulers() -> dict[str, TaskScheduler]:
 def curve_schedulers() -> dict[str, TaskScheduler]:
     return {
         "curve_path": CurvePathTaskScheduler(),
+        "curve_routing": RoutingTaskScheduler(),
         "curve_draw": CurveDrawingTaskScheduler(),
         "fiber_capture": FiberCaptureTaskScheduler(),
         "fiber_path": FiberPathTaskScheduler(),

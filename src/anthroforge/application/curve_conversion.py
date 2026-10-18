@@ -6,13 +6,24 @@ from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from anthroforge.core.curve_conversion import ConversionSpec
+from anthroforge.core.curve_dependencies import inputs as curve_inputs
 from anthroforge.core.curve_engines import decode
+from anthroforge.core.fibers import Fiber, FiberEdit
 from anthroforge.core.jobs import Job
 from anthroforge.core.results import Port, ReadRevision
 from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
-from . import construction_policy, curve_sources, dependencies, object_operations, path_assets
+from . import (
+    construction_policy,
+    curve_edit_state,
+    curve_evaluation,
+    curve_sources,
+    dependencies,
+    object_operations,
+    path_assets,
+)
+from .attachment_candidates import eligible
 from .conversion_geometry import ConversionInput, convert
 
 if TYPE_CHECKING:
@@ -74,7 +85,7 @@ def make_job(session: "Session", value: ConversionPreview, spec: ConversionSpec)
         partial(publish, session, value),
         key="curve_conversion",
         writes=False,
-        kind="curve_path",
+        kind="curve_routing" if spec.settings.kind == "ROUTED" else "curve_path",
         publish_during_edit=True,
     )
     return configure_job(session, value, spec, job)
@@ -84,8 +95,8 @@ def configure_job(
     session: "Session", value: ConversionPreview, spec: ConversionSpec, job: Job
 ) -> Job:
     job.cancel = NativeCancellation(session.engine)
-    job.reads = frozenset({spec.curve})
-    job.observes = frozenset(dependencies.ports(session.document, Port(spec.curve, "path")))
+    job.observes = frozenset(preview_ports(session.document, spec))
+    job.reads = frozenset(port.owner for port in job.observes)
     job.cleanup = partial(completed, value, job)
     job.workload = lambda _: Workload(candidates=spec.samples, triangles=spec.samples * 24)
     return job
@@ -93,17 +104,37 @@ def configure_job(
 
 def capture(
     session: "Session", value: ConversionPreview, spec: ConversionSpec, document: Any
-) -> ConversionInput:
-    value.ports = dependencies.ports(document, Port(spec.curve, "path"))
+) -> Any:
+    value.ports = preview_ports(document, spec)
     value.reads = construction_policy.revisions(document, value.ports)
-    source = curve_sources.source(document, spec.curve)
+    source = curve_edit_state.current(session, curve_sources.source(document, spec.curve))
     value.state = "running"
-    return ConversionInput(source, spec, session.resources.paths.get(source.result.asset))
+    inputs = ConversionInput(source, spec, session.resources.paths.get(source.result.asset))
+    return inputs, document, session.resources.snapshot()
 
 
-def compute(session: "Session", value: ConversionInput, cancel: Any) -> path_assets.PathAsset:
+def compute(session: "Session", payload: Any, cancel: Any) -> path_assets.PathAsset:
+    value, document, resources = payload
     candidate = convert(session.engine, value, cancel.handle)
-    return path_assets.evaluate(session.engine, candidate, cancel.handle)
+    if isinstance(candidate, Fiber):
+        edit = FiberEdit(value.source.result.asset, eligible(document, candidate.id))
+        candidate = replace(candidate, edit=edit)
+    return curve_evaluation.evaluate_item(
+        session.engine, document, resources, candidate, cancel.handle
+    ).asset
+
+
+def preview_ports(document: Any, spec: ConversionSpec) -> set[Port]:
+    original = curve_sources.source(document, spec.curve)
+    candidate = replace(original, engine_settings=spec.settings)
+    inputs = curve_inputs(candidate) | {Port(original.id, "path")}
+    if isinstance(candidate, Fiber):
+        inputs |= {
+            Port(key, role)
+            for key in eligible(document, candidate.id)
+            for role in ("pose", "geometry")
+        }
+    return dependencies.closure(dependencies.graph(document), inputs)
 
 
 def current(session: "Session", value: ConversionPreview) -> bool:

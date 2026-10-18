@@ -4,10 +4,11 @@ from dataclasses import dataclass, replace
 from typing import Any
 from uuid import uuid4
 
+from anthroforge.core.curve_engines import PolylineSettings
 from anthroforge.core.entities import Attachment
 from anthroforge.core.fibers import Fiber, FiberBinding
 from anthroforge.core.results import EvaluationResult
-from anthroforge.native import attachment_fields, curve_editing, path_editing
+from anthroforge.native import attachment_fields, construction, curve_editing, path_editing, paths
 
 from . import attachment_assets
 from .path_assets import PathAsset
@@ -28,8 +29,18 @@ def evaluate(
     opening = resources.paths[item.edit.baseline].authored
     surfaces = attachment_assets.surface_inputs(engine, document, resources.meshes, asset.targets)
     current = attachment_assets.evaluate(engine, opening, asset, surfaces, world, cancel)
-    path, records = path_editing.rebase(current.path, opening, item, cancel)
+    path, records = edited_geometry(engine, current, opening, item, cancel)
     return recapture(engine, item, resources, document, EditGeometry(path, records, world), cancel)
+
+
+def edited_geometry(engine: Any, current: Any, opening: Any, item: Fiber, cancel: int) -> Any:
+    if item.engine != "ROUTED" and item.engine == opening.engine:
+        return path_editing.rebase(current.path, opening, item, cancel)
+    # Routed constraints are authored points; their connecting path is solved after rebinding.
+    settings = PolylineSettings() if item.engine == "ROUTED" else item.engine_settings
+    definition = replace(item, engine_settings=settings)
+    records = construction.resolved_curve(engine, definition)
+    return paths.evaluate(engine, definition, cancel, records), records
 
 
 def capture_request(item: Fiber, path: Any, records: Any, world: Any) -> Any:

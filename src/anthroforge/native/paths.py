@@ -70,7 +70,9 @@ def pick(
 
 def evaluate(engine: GeometryEngine, curve: Curve, cancel: int = 0, records: Any = None) -> Path:
     if curve.engine not in ("BEZIER", "POLYLINE"):
-        raise ValueError("The routed path engine is not available in this development increment.")
+        raise ValueError(
+            "Authored evaluation requires Bézier/polyline; routing needs owned surface inputs."
+        )
     records = curve_records(curve) if records is None else doubles(records)
     handle = engine.library.af_path_evaluate(
         pointer(records),

@@ -13,7 +13,7 @@ from anthroforge.core.results import EvaluationResult, Port
 from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
-from . import curve_evaluation
+from . import curve_evaluation, path_policy
 from . import dependencies as dep
 from .construction_policy import mode, revisions
 from .curve_sources import source
@@ -44,17 +44,15 @@ def make_job(session: "Session", curve: str) -> Job:
         partial(compute, session, curve),
         partial(publish, session, curve),
         key="path:" + curve,
-        kind="fiber_path" if isinstance(source(session.document, curve), Fiber) else "curve_path",
+        kind=path_policy.kind(source(session.document, curve)),
         reads=reads,
     )
 
 
 def workload(session: "Session", curve: str, document: Document) -> Workload:
     item = source(document, curve)
-    if isinstance(item, Fiber):
-        from .fiber_tasks import path_workload
-
-        return path_workload(session, item, document)
+    if isinstance(item, Fiber) or item.engine == "ROUTED":
+        return path_policy.workload(session, item, document)
     return Workload(
         affected=1,
         candidates=len(item.points),

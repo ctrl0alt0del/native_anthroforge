@@ -38,6 +38,7 @@ World capture_world(const uint64_t* handles,const double* matrices,int count,dou
 Reference reference(const Input& input);
 std::vector<int> allocate_edges(const std::vector<double>& lengths,int edges);
 std::vector<Span> spans(const Input& input,World& world,const Reference& reference);
+bool warm_start(const Input& input,const Reference& reference,std::vector<Span>& spans,uint64_t handle);
 void solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double* measures);
 EvaluatedPath result(const Input& input,const Reference& reference,const std::vector<Span>& spans);
 }

@@ -327,8 +327,14 @@ an alias for its typed setting. Curve/Fiber consumers still share the same path 
 
 Only one preview is retained. It does not alter saving, document state or undo; it is not
 serialized. The desktop displays it in green and excludes it from picking. Source edits
-invalidate acceptance. Routing execution is still pending on this development branch;
-requesting it currently reports that limitation rather than substituting an authored engine.
+invalidate acceptance. Routing runs through the native production solver and the existing
+coordinator on this development branch. `curve.engine_settings(curve, **settings)` changes
+the current engine's parameters; engine changes require the conversion workflow above.
+Routing `obstacles` are explicit anatomical surface IDs, with fiber support surfaces also
+included automatically. All surface poses/results are declared inputs. Missing inputs or
+failed solves retain the accepted path and report failure; Manual inputs retain provenance.
+The inspector exposes routing samples, clearance, solve budget and obstacle selection.
+Representative anatomical parity, performance and complete release qualification remain pending.
 
 ### Fiber creation (0.2.0 development branch)
 
@@ -345,6 +351,7 @@ change them. Current-shape point edits use the ordinary curve operations. They r
 shape, rebind changed anchors and preserve unchanged canonical anchors in the same transaction.
 `fiber.binding.scope(curve, point, scope)` chooses `CURRENT_PARENT` or `ANY_PARENT` for a
 bound authored point. Parent movement resolves its retained binding without choosing a new
-parent. Entering edit mode is a read-only query. Binding addition/removal, full conversion
-coverage, routed evaluation and release qualification are still under implementation; these
+parent. Entering edit mode is a read-only query. Routed fibers edit authored constraints,
+then resolve their connecting path through the solver. Binding addition/removal, full conversion
+coverage and release qualification are still under implementation; these
 commands do not certify the complete 0.2.0 workflow.

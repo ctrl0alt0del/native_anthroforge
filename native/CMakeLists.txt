@@ -10,7 +10,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/routing_planner.cpp src/routing_candidates.cpp src/routing_surface.cpp src/routing_handoff.cpp
     src/routing_mesh_surface.cpp src/routing_shells.cpp src/routing_access.cpp src/routing_roadmap.cpp
     src/routing_random.cpp src/routing_pin_tree.cpp src/routing_pin_growth.cpp
-    src/routing_pin_graph.cpp src/routing_pin_recovery.cpp src/routing_search.cpp)
+    src/routing_pin_graph.cpp src/routing_pin_recovery.cpp src/routing_search.cpp src/routing_warm.cpp)
 
 add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_cubic_refit.c

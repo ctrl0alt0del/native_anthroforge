@@ -19,14 +19,15 @@ static Input input(const double* records,int count,const double* world,const int
 }
 uint64_t af_route_path(const double* records,int count,const double* world,const int* owners,
     const uint64_t* meshes,const double* matrices,int surfaces,const AfRoutingOptions* options,
-    int64_t* counters,double* measures,uint64_t cancel) {
+    int64_t* counters,double* measures,uint64_t warm,uint64_t cancel) {
     try {
         if(!counters||!measures) throw std::runtime_error("Routing report storage is required.");
         const auto input=af::routing::input(records,count,world,owners,surfaces,options,cancel);
         auto scene=af::routing::capture_world(meshes,matrices,surfaces,options->radius,cancel);
         const auto reference=af::routing::reference(input);
         auto spans=af::routing::spans(input,scene,reference);
-        af::routing::prepare_routes(input,scene,reference,spans);
+        if(!af::routing::warm_start(input,reference,spans,warm))
+            af::routing::prepare_routes(input,scene,reference,spans);
         af::routing::solve(spans,input,counters,measures);
         return af::retain_path(af::make_path(af::routing::result(input,reference,spans),options->closed,cancel));
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }

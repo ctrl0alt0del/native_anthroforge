@@ -55,7 +55,8 @@ def test_native_allocation_aliases_and_owner_overlap_do_not_double_count(session
     assert alias.handle != mesh(session, entity).handle
     assert after["handles"] == before["handles"] + 1
     assert after["unique_bytes"] == before["unique_bytes"]
-    assert sum(v["bytes"] for v in after["owners"].values()) > after["unique_bytes"]
+    attributed = after["unique_bytes"] - after["unattributed_bytes"]
+    assert sum(v["bytes"] for v in after["owners"].values()) > attributed
     assert after["owners"]["document"]["bytes"] > 0
     report(session, tmp_path / "memory.zip")
 
@@ -124,3 +125,17 @@ def test_stopped_capture_ignores_late_job_resource_observations(session, tmp_pat
     resource.remember("current_worker", (mesh(session, entity),))
     assert "current_worker" in resource.jobs
     report(session, tmp_path / "second.zip")
+
+
+def test_observed_job_limit_and_job_memory_are_explicit(session, tmp_path):
+    entity = create(session, kind="BODY")
+    session.command("profile.start", memory_mib=16)
+    resource = session.profiler.resources
+    for number in range(257):
+        resource.remember(str(number), (mesh(session, entity),))
+    assert len(resource.jobs) == 256
+    evidence = inventory(session.profiler, resource.owners())
+    assert evidence["owners"]["jobs"]["bytes"] > 0
+    data = report(session, tmp_path / "bounded.zip")
+    assert not data["manifest.json"]["complete"]
+    assert data["manifest.json"]["losses"]["resource_job_limit"] == 1

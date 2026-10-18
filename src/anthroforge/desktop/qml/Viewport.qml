@@ -90,6 +90,9 @@ Item {
         const magnification=pixelsPerUnit(-p.z);
         return Qt.point(width/2+p.x*magnification,height/2-p.y*magnification);
     }
+    function pointInFront(point) {
+        return view.camera.mapPositionFromScene(Qt.vector3d(point[0],point[2],-point[1])).z < -view.camera.clipNear;
+    }
     function pixelsPerUnit(depth) {
         if(orthographic) return orthoCamera.verticalMagnification;
         const extent=perspectiveCamera.fieldOfViewOrientation===PerspectiveCamera.Horizontal?width:height;

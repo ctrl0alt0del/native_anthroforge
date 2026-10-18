@@ -1,4 +1,4 @@
-# Local authoring API, version 0.1.7
+# Local authoring API, version 0.1.8
 
 The desktop and JSON clients call application/commands.py. A request has operation,
 arguments (an object) and optionally id. Success responses contain ok, revision and
@@ -94,7 +94,34 @@ creates one transaction. Manual mode needs evaluate. Do not infer calculation co
 from a returned job ID: use wait or inspect jobs. File inspection and revision-matched GPU
 capture also have process-level CLI commands documented in quickstart.md.
 
+## Measurement and camera operations
+
+These operations use the active workspace. Measurements freeze two picked world-space
+surface points; they do not calculate minimum clearance between whole meshes. Distances,
+XYZ and delta coordinates are always metres in the API, regardless of display units.
+
+| Operation | Arguments | Result/meaning |
+| --- | --- | --- |
+| measurement.point | entity, triangle, weights=[a,b,c] | Validated surface witness from accepted geometry: IDs/revision, barycentric coordinates, world position and frame |
+| measurement.add | start, end (witness records); optional name="Distance" | Persist frozen ruler; returns ID |
+| measurement.list | none | Endpoints, delta XYZ, Euclidean distance and stale status |
+| measurement.remove | measurement (ID) | Remove ruler from active workspace |
+| bookmark.add | name | Save current workspace camera/projection; returns ID |
+| bookmark.list | none | Named cameras and IDs |
+| bookmark.restore | bookmark (ID) | Restore exact camera/projection; return bookmark record |
+| bookmark.rename | bookmark, name | Rename saved view |
+| bookmark.remove | bookmark | Remove saved view |
+
+Rulers become stale when their source surface or frame changes or disappears. They retain
+their captured values and do not keep mesh allocations alive. Desktop picks capture the
+displayed revision even while newer geometry is staging. Bookmarks preserve active edit
+transactions; desktop restoration rebases the current gesture without moving geometry.
+All annotations are workspace presentation, persisted outside anatomical undo. Annotation
+changes are rejected while the save-wait edit lock is active. Inspection archives include
+the frozen rulers, stale flags and workspace bookmarks. See the [walkthrough](workflow_inspection.md).
+
 ## Issue reporting operations
+
 
 All operations use the session issue system; numerical headless use initializes no Qt.
 See [component responsibilities and coverage](issues.md) and the executable

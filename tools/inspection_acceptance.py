@@ -49,6 +49,19 @@ def ruler(controller, window):
     assert not controller.inspection_tools.active
 
 
+def pickability(controller):
+    tools = controller.inspection_tools
+    tools.toggle()
+    for setting in ("hidden_categories", "unpickable_categories"):
+        controller.run("workspace.update", {setting: ["geometry"]})
+        tools.probe([0, -3, 0], [0, 1, 0], 0, False)
+        assert not tools.hover
+        controller.run("workspace.update", {setting: []})
+        tools.probe([0, -3, 0], [0, 1, 0], 0, False)
+        assert tools.hover
+    tools.cancel()
+
+
 def bookmarks(controller, window):
     click(window, "bookmarkName").setProperty("text", "Comparison front")
     click(window, "saveBookmark")
@@ -115,16 +128,20 @@ def run():
     engine = create_engine(controller, warnings)
     try:
         assert engine.rootObjects(), warnings
-        window = engine.rootObjects()[0]
-        entity = fixture(controller)
-        ruler(controller, window)
-        bookmarks(controller, window)
-        export(controller, entity)
-        bookmark_gesture(controller, window)
+        exercise(controller, engine.rootObjects()[0])
         assert not warnings, warnings
     finally:
         controller.close()
         delete(engine)
+
+
+def exercise(controller, window):
+    entity = fixture(controller)
+    pickability(controller)
+    ruler(controller, window)
+    bookmarks(controller, window)
+    export(controller, entity)
+    bookmark_gesture(controller, window)
 
 
 if __name__ == "__main__":

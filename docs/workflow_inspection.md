@@ -1,4 +1,4 @@
-# Inspection, workspaces and display units in 0.1.7
+# Inspection, measurements and repeatable views
 
 Select an SCP or control and expand **Relationships & attachments** at the bottom of
 Properties. Each output lists its inputs (**Driven by**) and consumers (**Drives**).
@@ -47,6 +47,30 @@ sampling fractions, radius multipliers, scale and thickness ratios are unchanged
 All geometry, project coordinates and JSON API length arguments remain metres. Import
 source units remain explicit and independent. Changing display units never rescales
 geometry, invalidates calculations or adds an anatomical undo action.
+
+## Measurements and named views (0.1.8)
+
+Open **Measurements & views** at the lower right of the viewport. Press **Ruler**,
+then click two visible, pickable SCP surfaces. They may belong to different SCPs.
+The cursor shows the candidate XYZ; saved rulers show A/B XYZ, delta XYZ and the
+straight-line distance in the workspace's chosen m/cm/mm unit. Alt-click cycles deeper
+surfaces using the same picking policy as selection. Escape exits; another pair of
+clicks creates another ruler. Hidden, unpickable and read-only workspace context cannot
+be picked. Rulers are an inspection mode, unavailable while an anatomical drag is active.
+
+Rulers capture fixed coordinates. Moving, regenerating or deleting a source surface
+marks them **stale** and draws a yellow dashed line; their numbers stay unchanged for
+comparison. Remove a ruler with its delete icon and pick again for a fresh measurement.
+They do not follow deformation and do not measure clearance between entire surfaces.
+Lines whose endpoints are behind the camera are omitted from the overlay; their values
+remain in the panel. Saved projects and inspection exports retain the ruler evidence.
+
+Enter a name and choose **Save view** to bookmark the exact camera and projection.
+**Go** restores it; edit its name or delete it using the adjacent controls. Bookmarks
+belong to the current workspace and persist with the project. Restoring one during an
+active transform preserves that edit and rebases its pointer movement. The existing
+axis-view/4 restoration workflow remains available. Rulers and bookmarks do not add
+an anatomical undo step or trigger geometry calculation.
 
 ## Sharing an inspection report
 

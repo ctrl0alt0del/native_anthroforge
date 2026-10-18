@@ -387,3 +387,23 @@ timer and uses explicit saved-revision inputs; observed camera/selection are ver
 Job retirement releases snapshot assets; temporary files and processes have bounded,
 cancellable owners. Export failure cannot replace a previous report. The headless core
 does not import Qt; JSON-only inspection has no renderer dependency.
+
+## Measurement evidence and recording-only resource observation
+
+Workspace-owned immutable surface witnesses retain source identity, accepted revision,
+frame and captured world coordinates. Native queries resolve barycentric positions and
+Euclidean distances. The desktop shares existing displayed-revision picking and leases;
+staging retains the visible geometry's provenance. Shared application operations own
+annotation validation/persistence, while the viewport owns transient hover and gesture
+rebasing. Frozen reports consume the same query contract. Camera bookmarks and rulers
+remain outside anatomical undo and do not retain native mesh handles.
+
+The runtime profiler observes changes at the ChangeJournal/coordinator boundaries and
+cache policy at the engine-owned base cache. Its resource collector owns only weak
+references, installed while recording. Native registry snapshots return bounded handle,
+allocation-identity and capacity metadata without copying geometry. Owner traversal stays
+on the session thread; job observation is synchronized and bounded. Rendering contributes
+displayed/staged native leases through a weak adapter callback. Alias identities are
+deduplicated before export; raw allocation addresses are not serialized. Owner totals
+overlap and unobserved/transient or non-native allocations are explicitly outside coverage.
+Recording off performs no new inventory queries, traversal or cache event collection.

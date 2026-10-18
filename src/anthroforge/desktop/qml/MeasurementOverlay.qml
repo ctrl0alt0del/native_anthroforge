@@ -6,11 +6,13 @@ Canvas {
     readonly property var evidence: workspace.inspectionTools.state
     anchors.fill: parent
     function dot(ctx, point, label) {
+        if(!viewport.pointInFront(point)) return null;
         const p=viewport.projectPoint(point[0],point[1],point[2]);
         ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fill(); ctx.fillText(label,p.x+7,p.y-7);
         return p;
     }
     function ruler(ctx, first, second, text, stale) {
+        if(!viewport.pointInFront(first) || !viewport.pointInFront(second)) return;
         ctx.strokeStyle=ctx.fillStyle=stale ? "#ffcc64" : "#7bdcff";
         const a=dot(ctx,first,"A"), b=dot(ctx,second,"B");
         ctx.setLineDash(stale ? [5,4] : []); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();

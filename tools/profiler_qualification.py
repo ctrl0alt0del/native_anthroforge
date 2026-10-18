@@ -7,7 +7,7 @@ from types import SimpleNamespace
 
 from activity_benchmark import ModalTrial
 from profiler_system_load import system_load, system_times
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QEventLoop, Qt, QTimer
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from shiboken6 import delete
@@ -66,12 +66,22 @@ def finish_capture(args, controller, trials, load):
         controller.session.command(
             "profile.stop", path=str(args.output.with_suffix(".afprofile.zip"))
         )
-        for _ in range(1200):
-            if controller.session.profiler.done.is_set():
-                break
-            QTest.qWait(25)
+        await_capture(controller)
         assert controller.session.profiler.state == "saved", controller.session.profiler.status()
     save_result(args, controller.session.profiler.status(), trials, load)
+
+
+def await_capture(controller):
+    # A real Qt loop releases the GIL; repeated QTest.qWait can starve Python export.
+    loop, poll, deadline = QEventLoop(), QTimer(), QTimer()
+    poll.timeout.connect(lambda: loop.quit() if controller.session.profiler.done.is_set() else None)
+    deadline.setSingleShot(True)
+    deadline.timeout.connect(loop.quit)
+    poll.start(25)
+    deadline.start(60000)
+    loop.exec()
+    poll.stop()
+    deadline.stop()
 
 
 def save_result(args, state, trials, load):

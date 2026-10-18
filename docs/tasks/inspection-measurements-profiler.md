@@ -62,9 +62,22 @@ The full suite passed (538 tests); a subsequent late-worker/repeated-capture reg
 also passed with focused tests. Actual GUI acceptance now includes bookmark restoration
 during a modal curve move, unchanged geometry at restoration and one undo action.
 
-Next qualify desktop profiler captures and visibility, update documentation/version,
-run the final development gate, 0.1.8 portable packaging and normal main integration.
-Do not mark the whole task complete from this checkpoint.
+Five actual GUI profiler captures now pass (normal/snapped, Activity closed/open,
+cancelled gesture); repeated recording and document replacement also pass. Captures
+expose input-output invalidation, newer-request cancellation, warm base-cache hits and
+document/history/job/displayed ownership. Perfetto imports 31,822 slices and all ten
+memory counter tracks without importer errors. Six serial counterbalanced baseline,
+dormant and recording trials completed under `build/inspection-018/performance-qualified`.
+Idle means were 16.48–16.95 ms/frame, recording 18.36–19.10 ms on the cube/body fixture.
+The benchmark wait now uses a real Qt loop: repeated QTest.qWait had starved Python
+export while the desktop event loop itself remained functional. No production export
+change was needed. Documentation/version and portable acceptance are prepared.
+
+First development gate found one 16-line acceptance function and an overly broad
+owner-overlap test assertion (the process registry can include other sessions' meshes).
+Both were corrected; focused tests pass. Re-run the gate and final GUI, then build and
+check relocated 0.1.8 packaging, source archive and normal main integration. Full task
+completion and portable qualification remain pending at this checkpoint.
 
 References: Qt 6.12 View3D/pickResult and Perfetto counter tracks documentation were
 researched before implementation. Qt bounding-box picks do not replace our native

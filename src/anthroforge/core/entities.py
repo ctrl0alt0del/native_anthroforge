@@ -5,7 +5,9 @@ from math import isfinite
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from .presentation import validate_categories
 from .results import EvaluationResult
+from .units import factor
 
 if TYPE_CHECKING:
     from .construction import Deformer, Primitive, Thickness
@@ -82,8 +84,16 @@ class Workspace:
     handles: bool = True
     anchors: bool = True
     diagnostics: bool = True
+    hidden_categories: tuple[str, ...] = ()
+    unpickable_categories: tuple[str, ...] = ()
+    display_units: str = "m"
 
     def __post_init__(self) -> None:
+        if not self.name.strip():
+            raise ValueError("Workspace name must not be empty.")
+        factor(self.display_units)
+        validate_categories(self.hidden_categories)
+        validate_categories(self.unpickable_categories)
         if len(self.camera) != 7 or not all(map(isfinite, self.camera)) or self.camera[6] <= 0:
             raise ValueError("Invalid workspace camera.")
 

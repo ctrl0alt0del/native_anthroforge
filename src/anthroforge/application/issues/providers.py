@@ -1,7 +1,7 @@
 """Current SCP/control checks; no geometry computation or automatic repairs."""
 
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from threading import Event
 from typing import Any
 
@@ -10,6 +10,7 @@ from anthroforge.core.issues import Issue, evidence, fingerprint
 from anthroforge.core.results import Port, geometry_asset
 
 from ..changes import DocumentChanges
+from . import dependency_reports
 
 
 @dataclass(frozen=True)
@@ -178,40 +179,6 @@ def graph_changes(document: Document, changes: DocumentChanges) -> set[str]:
     )
 
 
-def graph_check(document: Document, scope: str, cancel: Event) -> tuple[Issue, ...]:
-    graph = document.index.structure.dependencies
-    rows = []
-    for port in sorted(graph.blocked, key=lambda p: (p.owner, p.output)):
-        if cancel.is_set():
-            break
-        rows.append(blocked_issue(document, port))
-    return tuple(rows)
-
-
-BLOCKED = Issue(
-    "dependencies.v1",
-    "document",
-    "DEPENDENCY_BLOCKED",
-    "Dependency cycle blocks this output",
-    severity="error",
-    details="This output belongs to a cycle or depends on one. Accepted output is retained.",
-)
-
-
-def blocked_issue(document: Document, port: Port) -> Issue:
-    inputs = sorted((p.owner, p.output) for p in document.index.structure.dependencies[port])
-    return replace(
-        BLOCKED,
-        target=port.owner,
-        kind="SCP" if port.owner in document.index.entities else "CONTROL",
-        stage=port.output,
-        source=fingerprint(inputs),
-        related=tuple(sorted({owner for owner, _ in inputs})),
-        local_key=port.owner,
-        evidence=evidence(inputs=inputs),
-    )
-
-
 def builtins() -> tuple[Provider, ...]:
     return (
         Provider("evaluation.v1", entity_scopes, entity_changes, entity_source, evaluation),
@@ -220,6 +187,6 @@ def builtins() -> tuple[Provider, ...]:
             lambda _: {"document"},
             graph_changes,
             lambda d, _: d.index.structure.dependencies,
-            graph_check,
+            dependency_reports.check,
         ),
     )

@@ -40,7 +40,9 @@ Functions remain at most 15 physical lines. Preserve the legacy untracked `__ini
 
 Recovered the exact original numbered scope; inspected the shipped issue framework
 and identified existing workspace, rendering and presentation boundaries. Main is
-current with origin. No implementation changes yet.
+current with origin. Shared inspection API, precise cycle participants/causes,
+mixed workspace membership and presentation/unit policies are implemented.
+These are application foundations; desktop integration and report export remain in progress.
 
 ## Verification
 
@@ -48,10 +50,14 @@ Baseline is 0.1.6 with 512 tests plus GUI/profiler/portable qualification. New b
 requires focused API tests, actual GUI interactions and snapshot consistency checks,
 the development gate, ownership review, and relocated portable qualification.
 
+First checkpoint: 518 tests pass; strict mypy passes. Added native-anchor read-only
+inspection, cycle/downstream distinction, 3,000-output graph, mixed workspace
+round-trip and policy guard coverage. No GUI or release acceptance claimed yet.
+
 ## Next actions
 
-1. Inspect shared dependency/attachment, workspace, unit and capture implementations.
-2. Implement and checkpoint integrated increments with behavioral validation.
+1. Integrate inspector, workspace management/category filters and dimensional UI fields.
+2. Implement frozen inspection export using existing offscreen GPU capture and add CLI/UI.
 3. Qualify 0.1.7, archive corresponding source, merge/push normally after all checks pass.
 
 ## Recovery inputs

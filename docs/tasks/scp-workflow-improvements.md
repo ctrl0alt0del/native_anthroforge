@@ -72,6 +72,11 @@ see `scp-workflow-evidence.json` and `../development_status.md` for measured lim
 Version/docs are now 0.1.7. The next step is packaging the clean source checkpoint,
 relocated portable checks (including the new report CLI), source archive and integration.
 
+The user's existing `dist/AnthroForge.dist/AnthroForge.exe` is running. The first
+package build was stopped before publication; preserve that process and directory.
+Final build uses `AF_PACKAGE_OUTPUT=E:/development/anthroforge/dist/0.1.7`, producing
+`dist/0.1.7/AnthroForge.dist`. All production changes are committed before rebuilding.
+
 ## Next actions
 
 1. Complete category/control and inspector navigation checks, including reporter error paths.

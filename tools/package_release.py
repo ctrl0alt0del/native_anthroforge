@@ -3,6 +3,7 @@
 import configparser
 import importlib.metadata
 import json
+import os
 import shutil
 import sys
 from pathlib import Path
@@ -14,7 +15,7 @@ from anthroforge.profiling.identity import build_identity
 
 ROOT = Path(__file__).resolve().parents[1]
 STAGE = ROOT / "build" / "package-input"
-DIST = ROOT / "dist" / "AnthroForge.dist"
+DIST = Path(os.environ.get("AF_PACKAGE_OUTPUT", ROOT / "dist")).resolve() / "AnthroForge.dist"
 PACKAGES = ("numpy", "PySide6", "PySide6_Essentials", "PySide6_Addons", "shiboken6", "nuitka")
 
 
@@ -40,7 +41,7 @@ def configure(config):
         title="AnthroForge",
         project_dir=str(STAGE),
         input_file=str(STAGE / "AnthroForge.py"),
-        exec_directory=str(ROOT / "dist"),
+        exec_directory=str(DIST.parent),
     )
     config["qt"]["qml_files"] = ",".join(
         str(p) for p in (STAGE / "anthroforge/desktop/qml").glob("*.qml")
@@ -122,8 +123,6 @@ def copy_native_provenance(target):
 
 
 def copy_qt_notices():
-    import os
-
     sdk = Path(os.environ.get("AF_QT_SDK", ROOT / ".tools/qt/6.12.0/msvc2022_64"))
     if (sdk / "sbom").is_dir():
         shutil.copytree(sdk / "sbom", DIST / "licenses/qt-sbom", dirs_exist_ok=True)

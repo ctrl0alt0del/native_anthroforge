@@ -101,6 +101,9 @@ Never save either original .blend file. Native source provenance is recorded in
 The companion archive is `dist/AnthroForge-0.1.7-source.zip`. The portable folder stays
 `dist/AnthroForge.dist` and the executable's product/file version identifies 0.1.7.
 Packaging includes all new QML inspectors, native algorithms, example batches and notices.
+Set `AF_PACKAGE_OUTPUT` to an absolute output directory before `tools/package.ps1`
+when an existing portable app is running. For example, `E:/development/anthroforge/dist/0.1.7`
+produces `AnthroForge.dist` there without changing the running distribution.
 `uv run --no-sync python tools/primitive_acceptance.py --workshop` runs the complete
 primitives batch, opens its result in the desktop and captures the loft and curved body.
 

@@ -52,11 +52,19 @@ Stale/deleted source geometry is explicit; rulers retain values, not geometry pa
 13 focused/architecture/export tests, strict mypy and native build/CTest passed.
 Real GUI picks, bookmark save/restore and export during edits passed; viewport and
 report images were visually inspected under `build/inspection-018`. No QML warnings.
-Full regression/release checks and recommendation 7 remain pending.
+Recommendation 7 now implemented: shared revision/invalidation/cancellation causes,
+Body base-cache events, native allocation inventory and weak ownership observations
+for document/history/checkpoint/jobs/catalogue/cache and displayed/staged viewport
+leases. Summaries include bounded explanations, deduplicated totals and overlapping
+owner bytes. Observation is recording-only; native AABB capacity is an estimate and
+Python/Qt/GPU allocation sizes remain outside coverage. Observer failures are explicit.
+The full suite passed (538 tests); a subsequent late-worker/repeated-capture regression
+also passed with focused tests. Actual GUI acceptance now includes bookmark restoration
+during a modal curve move, unchanged geometry at restoration and one undo action.
 
-Next implement bounded invalidation/cache/memory observations, tests and profiler
-acceptance. Then finish gesture/visibility regression, documentation, 0.1.8 packaging
-and normal main integration. Do not mark the whole task complete from this increment.
+Next qualify desktop profiler captures and visibility, update documentation/version,
+run the final development gate, 0.1.8 portable packaging and normal main integration.
+Do not mark the whole task complete from this checkpoint.
 
 References: Qt 6.12 View3D/pickResult and Perfetto counter tracks documentation were
 researched before implementation. Qt bounding-box picks do not replace our native

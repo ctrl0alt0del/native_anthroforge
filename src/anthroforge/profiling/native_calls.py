@@ -17,6 +17,7 @@ class NativeCalls:
         engine.profile_bind = lambda name, function: self.bind(engine, name, function)
         if self.profiler.active:
             self.install_engine(engine)
+            self.profiler.resources.attach(engine)
 
     def install_engine(self, engine):
         for name, function in list(vars(engine.library).items()):
@@ -30,6 +31,7 @@ class NativeCalls:
                 del self.originals[key]
         self.engines.discard(engine)
         engine.profile_bind = None
+        engine.mesh_observer = engine.bases.observer = None
 
     def bind(self, engine, name, function):
         key = id(engine.library), name
@@ -49,8 +51,11 @@ class NativeCalls:
     def start(self):
         for engine in self.engines:
             self.install_engine(engine)
+        self.profiler.resources.start()
 
     def stop(self):
         for library, name, function in self.originals.values():
             setattr(library, name, function)
         self.originals.clear()
+        for engine in self.engines:
+            engine.mesh_observer = engine.bases.observer = None

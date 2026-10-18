@@ -1,4 +1,5 @@
 from time import perf_counter as monotonic
+from weakref import WeakMethod
 
 from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
@@ -52,6 +53,18 @@ class Controller(QObject):
         self.inspection_panel = InspectionPanel(self)
         self.inspection_export = InspectionExport(self)
         self.inspection_tools = InspectionTools(self)
+        self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
+
+    def memory_owners(self, owners):
+        model = getattr(self, "render_model", None)
+        if model is not None:
+            staged = [row for row in model.rows if not row["active"]] + model.pending
+            for name, rows in (
+                ("viewport_displayed", model.displayed),
+                ("viewport_staging", staged),
+            ):
+                handles = {row["handle"] for row in rows}
+                owners[name].update(mesh for key, mesh in model.leases.items() if key in handles)
 
     def _initialize_state(self):
         self.selection, self.hovered, self.message = "", "", ""

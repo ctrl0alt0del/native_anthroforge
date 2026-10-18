@@ -4,12 +4,14 @@ import json
 from pathlib import Path
 from zipfile import ZipFile
 
+import numpy as np
 from curve_interaction_acceptance import screen
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QPoint, Qt
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from shiboken6 import delete
 from ui_acceptance import click, find
+from view_gesture_acceptance import begin_modal, check_undo, key, position, select_point
 from workflow_acceptance import settle
 
 from anthroforge.desktop.app import create_engine, open_controller
@@ -74,6 +76,40 @@ def export(controller, entity):
     assert controller.session.command("measurement.list")[0]["stale"]
 
 
+def bookmark_gesture(controller, window):
+    entity = editable_body(controller)
+    identity = select_point(controller, entity)
+    before, cursor = position(controller, identity), controller.session.history.cursor
+    pointer = begin_modal(controller, window, Qt.Key_G)
+    QTest.mouseMove(window, pointer + QPoint(20, 15))
+    QTest.qWait(60)
+    restore_during_gesture(controller, window, identity)
+    QTest.mouseMove(window, pointer + QPoint(35, 30))
+    QTest.qWait(60)
+    key(window, Qt.Key_Return)
+    check_undo(controller, identity, before, cursor)
+
+
+def editable_body(controller):
+    root = controller.session.document.entities[0].id
+    entity = controller.run("primitive.create", dict(kind="BODY", parent=root))
+    settle(controller)
+    controller.select(entity)
+    controller.authoring.setEditing(True)
+    controller.cameraRequested.emit([0, 0, 0, -90, 0, 0, 3], True)
+    QTest.qWait(120)
+    return entity
+
+
+def restore_during_gesture(controller, window, identity):
+    changed, transaction = position(controller, identity), controller.session.history.before
+    controller.inspection_tools.restoreBookmark(controller.session.workspace.bookmarks[0].id)
+    QTest.qWait(100)
+    np.testing.assert_allclose(position(controller, identity), changed, atol=1e-7)
+    assert controller.session.history.before is transaction
+    assert find(window, "modalTransform").property("active")
+
+
 def run():
     controller, warnings = open_controller(None), []
     engine = create_engine(controller, warnings)
@@ -84,6 +120,7 @@ def run():
         ruler(controller, window)
         bookmarks(controller, window)
         export(controller, entity)
+        bookmark_gesture(controller, window)
         assert not warnings, warnings
     finally:
         controller.close()

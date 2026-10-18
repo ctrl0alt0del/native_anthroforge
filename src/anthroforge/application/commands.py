@@ -115,7 +115,7 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
-        "job.cancel": session.scheduler.cancel_job,
+        "job.cancel": lambda job_id, obsolete=False: session.scheduler.cancel_job(job_id, obsolete),
         "job.retry": session.scheduler.retry,
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),
         "control.affected": lambda **a: controls.affected(session, **a),

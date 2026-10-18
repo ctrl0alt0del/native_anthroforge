@@ -23,10 +23,17 @@ def describe(job):
 def event(profiler: Any, job: Any, state: str) -> None:
     if profiler is not None and profiler.active:
         metadata = describe(job)
+        metadata["producer_job"] = getattr(profiler.resources.local, "job", "")
+        metadata["read_ports"] = [
+            asdict(p) for p in sorted(job.observes, key=lambda p: (p.owner, p.output))[:64]
+        ]
+        metadata["read_port_count"] = len(job.observes)
         if job.assessment:
             metadata["workload"] = asdict(job.assessment.workload)
             metadata["delay_ms"] = job.assessment.schedule.delay_ms
         profiler.event("task.lifecycle", state, **metadata)
+        if state in ("succeeded", "failed", "obsolete", "cancelled"):
+            profiler.resources.release(job.id)
 
 
 def timing(job):
@@ -73,7 +80,9 @@ def document_snapshot(session, state):
 def call(profiler: Any, job: Any, stage: str, function: Any, *args: Any) -> Any:
     if profiler is None or not profiler.active:
         return function(*args)
-    return profiler.call("task", stage, function, *args, _metadata=describe(job))
+    return profiler.resources.call(
+        job, stage, lambda: profiler.call("task", stage, function, *args, _metadata=describe(job))
+    )
 
 
 def command_metadata(session: Any, arguments: dict[str, Any]) -> dict[str, Any] | None:

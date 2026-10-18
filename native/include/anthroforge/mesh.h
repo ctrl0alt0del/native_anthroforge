@@ -10,6 +10,8 @@ AF_API uint64_t af_mesh_create(const double* vertices, int64_t count,
 AF_API void af_mesh_release(uint64_t handle);
 AF_API int af_surface_point(uint64_t mesh, const double* matrix, int triangle, const double* weights, double* output);
 AF_API int af_measure_points(const double* first, const double* second, double* output);
+/* Bounded rows: handle, allocation identity, buffers, estimated tree, render, vertices, triangles. */
+AF_API int af_mesh_memory_snapshot(uint64_t* rows, int capacity, uint64_t* total_handles);
 AF_API int af_mesh_sizes(uint64_t handle, int64_t* sizes);
 AF_API const void* af_mesh_buffer(uint64_t handle, int kind);
 AF_API int af_mesh_bounds(uint64_t handle, double* bounds);

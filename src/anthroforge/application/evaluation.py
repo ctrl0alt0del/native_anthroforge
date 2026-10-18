@@ -75,7 +75,7 @@ def absorb_overlaps(
             captures |= set(job.captures)
             if job.queued_since is not None:
                 pending.append(job.queued_since)
-            session.scheduler.cancel_job(job.id, obsolete=True)
+            session.scheduler.cancel_job(job.id, obsolete=True, reason="dependency_changed")
     available = {item.id for item in session.document.entities}
     return targets & available, captures & available, min(pending, default=None)
 

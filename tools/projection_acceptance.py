@@ -4,7 +4,7 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
-from primitive_acceptance import settle
+from primitive_acceptance import settle, source_curve
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
@@ -24,11 +24,11 @@ OUTPUT = Path("build/standalone-optimizations/projection").resolve()
 
 def setup(controller):
     document = document_fixture(512)
-    body = document.entity("body")
+    body = long_body(document.entity("body"))
     points = tuple(CurvePoint(position=(i / 127 - 0.5, 0, 0)) for i in range(128))
-    curve = replace(body.primitive.curves[0], points=points, engine_settings=BezierSettings(4))
-    body = long_body(body, curve)
-    document = replace(document, entities=(*document.entities[:-1], body))
+    source = document.object(body.primitive.curves[0].curve)
+    curve = replace(source, points=points, engine_settings=BezierSettings(4))
+    document = replace(document, entities=(*document.entities[:-1], body), objects=(curve,))
     session = controller.session
     session.document, session.history = document, History(document)
     session.command("evaluate", entities=[body.id])
@@ -39,9 +39,9 @@ def setup(controller):
     return curve
 
 
-def long_body(body, curve):
+def long_body(body):
     attachment = Attachment(parent_mode="OBJECT_ORIGIN", child_mode="OBJECT_ORIGIN")
-    return replace(body, primitive=replace(body.primitive, curves=(curve,)), attachment=attachment)
+    return replace(body, attachment=attachment)
 
 
 def edit(controller, curve, height):
@@ -50,10 +50,7 @@ def edit(controller, curve, height):
         dict(entity="body", curve=curve.id, point=curve.points[64].id, position=[0, 0, height]),
     )
     settle(controller)
-    assert (
-        controller.session.document.entity("body").primitive.curves[0].points[64].position[2]
-        == height
-    )
+    assert source_curve(controller, "body").points[64].position[2] == height
 
 
 def select_middle(controller, curve):
@@ -76,9 +73,7 @@ def exercise(controller, window, curve):
         assert tuple(controller.authoring.selection) == selection and len(controller.rows) == 512
     inspector.setVisible(True)
     controller.run("undo", {})
-    assert (
-        controller.session.document.entity("body").primitive.curves[0].points[64].position[2] == 0.1
-    )
+    assert source_curve(controller, "body").points[64].position[2] == 0.1
     finish(controller, window)
 
 

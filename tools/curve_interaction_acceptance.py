@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 import numpy as np
-from primitive_acceptance import settle
+from primitive_acceptance import settle, source_curve
 from PySide6.QtCore import Q_ARG, Q_RETURN_ARG, QEvent, QMetaObject, QPointF, Qt
 from PySide6.QtGui import QGuiApplication, QQuaternion, QVector3D
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -86,10 +86,10 @@ def insert_points(controller, window, entity):
 def finish_insertions(controller, entity, cursor):
     settle(controller)
     assert not controller.authoring.interaction.preview
-    assert len(controller.session.document.entity(entity).primitive.curves[0].points) == 4
+    assert len(source_curve(controller, entity).points) == 4
     assert controller.session.history.cursor == cursor + 2
     controller.run("undo", {})
-    assert len(controller.session.document.entity(entity).primitive.curves[0].points) == 3
+    assert len(source_curve(controller, entity).points) == 3
     controller.run("redo", {})
     settle(controller)
 
@@ -104,7 +104,7 @@ def point_row(editor, point):
 
 def snap_drag(controller, window, entity, targets, preheld=False):
     editor = controller.authoring
-    point = controller.session.document.entity(entity).primitive.curves[0].points[1].id
+    point = source_curve(controller, entity).points[1].id
     row = point_row(editor, point)
     cursor = controller.session.history.cursor
     start = move(window, row["world"])

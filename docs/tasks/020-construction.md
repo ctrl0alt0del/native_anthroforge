@@ -938,3 +938,20 @@ The first ac19e77 executable finished building but is superseded before release 
 rebuild the candidate with this correction. The portable image test also checks the visibility
 flag in an aligned capture and its disappearance after an oblique camera change. Final gate
 and revised package qualification are pending. No visible window or desktop input was used.
+
+### Revised gate and existing editing regressions
+
+At c999896 the complete gate passes: **871 tests**, 9 existing Qt deprecation warnings,
+3 native CTests, native/script style, Python types/style/function limits, numerical checks
+and doctor (`build/check-020-final.log`). This is the revised portable candidate's runtime
+source. Candidate compilation is in `build/package-020-final.log`.
+
+Existing QA helpers still accessed embedded primitive curves. Updated current acceptance
+fixtures to resolve first-class sources through their consumer references; the historical
+0.1.5 alternative-evaluator experiment is explicitly labelled for its original revision.
+Five additional source offscreen workflows pass: primitive/lattice/hook editing and reopen,
+repeated insertion and snapped dragging, held-modifier camera/transform/offset gestures,
+camera restoration, and a 512-SCP/128-point curve with inspector visible/hidden and undo.
+Logs are `build/020-primitive-regression.log` and `build/020-*-final.log`. These are synthetic
+events on the offscreen platform, not desktop input. QA helper changes pass Ruff and function
+limits separately; no runtime source changed after the complete gate.

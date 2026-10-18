@@ -27,11 +27,16 @@ def screenshot(window, name):
     assert window.grabWindow().save(str(OUTPUT / (name + ".png")))
 
 
+def source_curve(controller, entity, index=0):
+    item = controller.session.document.entity(entity)
+    return controller.session.document.object(item.primitive.curves[index].curve)
+
+
 def create_loft(controller, window):
     controller.authoring.create("LOFT", "")
     settle(controller)
     entity = controller.selection
-    curve = controller.session.document.entity(entity).primitive.curves[0]
+    curve = source_curve(controller, entity)
     controller.authoring.edit(
         "point.update",
         dict(entity=entity, curve=curve.id, point=curve.points[0].id, position=[-0.5, -0.15, 0.2]),

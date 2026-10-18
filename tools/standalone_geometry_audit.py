@@ -1,4 +1,8 @@
-"""Bounded no-deformer Body experiment; not an alternate production evaluator."""
+"""Historical 0.1.5 Body experiment; run at its original revision, before first-class curves.
+
+This preserves the measured alternative, not a current production or acceptance evaluator.
+Current qualification uses construction_profile_qualification.py and the release gate.
+"""
 
 import argparse
 import json

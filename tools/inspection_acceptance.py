@@ -54,9 +54,11 @@ def pickability(controller):
     tools.toggle()
     for setting in ("hidden_categories", "unpickable_categories"):
         controller.run("workspace.update", {setting: ["geometry"]})
+        QTest.qWait(50)
         tools.probe([0, -3, 0], [0, 1, 0], 0, False)
         assert not tools.hover
         controller.run("workspace.update", {setting: []})
+        QTest.qWait(50)
         tools.probe([0, -3, 0], [0, 1, 0], 0, False)
         assert tools.hover
     tools.cancel()

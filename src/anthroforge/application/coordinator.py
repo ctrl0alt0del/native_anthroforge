@@ -343,6 +343,6 @@ class TaskCoordinator:
         self.service_tick = lambda: None
         for job in self.active_jobs:
             if job.active:
-                self.cancel_job(job.id)
+                self.cancel_job(job.id, reason="session_closed")
         self.pool.shutdown(wait=True, cancel_futures=True)
         self.tick()

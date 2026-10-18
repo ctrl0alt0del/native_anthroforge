@@ -1,7 +1,49 @@
 # AnthroForge development validation
 
-Current source qualification is in [Workflow improvements 0.1.7](#workflow-improvements-017).
+Current source qualification is in [Measurements and profiling 0.1.8](#measurements-and-profiling-018).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Measurements and profiling 0.1.8
+
+The final two recommendations add frozen two-surface-point rulers (XYZ, delta and
+straight-line distance), persistent named workspace cameras, and profiler explanations
+for invalidation, Body base-cache activity and native geometry ownership. Shared API
+operations serve UI/headless clients; native queries resolve measurement geometry.
+Rulers explicitly become stale after a source/frame change. Their values and bookmarks
+round-trip with workspace presentation and appear in frozen inspection archives.
+
+`tools/check.ps1` passed: lock, Ruff, strict mypy, C++ build/CTest, native/script style,
+540 tests, numerical checks and native doctor. Existing QQmlPropertyMap deprecation
+warnings remain. Actual GUI acceptance exercised surface picks, hidden/unpickable
+categories, exact camera restoration during a curve move, one undo action, and export
+while geometry changes. Existing axis/restore/gizmo/snap gestures and 0.1.7 workflow
+acceptance also passed without QML warnings. The ruler viewport and exported PNG were
+visually inspected. Evidence is under `build/inspection-018`.
+
+Five desktop profiler reports passed: normal/Ctrl drag with Activity closed/open and
+cancelled drag, plus repeated recordings and document replacement. A snapped report
+contains 159 input-output invalidations, 73 newer-request cancellations and 73 base-cache
+hits. Its peak unique native geometry was 1,091,624 bytes; owners overlap. History,
+jobs and displayed viewport are separately attributed. Perfetto imported 31,822 slices
+and ten memory counter tracks with zero importer errors. Weak ownership, aliased handles,
+recording-off behavior, bounded inventory failures and late worker observations are tested.
+
+Six serial counterbalanced none/dormant/record trials, 100 events per normal and snapped
+drag, measured mean frame intervals of 16.48–16.95 ms idle and 18.36–19.10 ms recording.
+Input means were 4.25–4.50 ms idle and 6.50–6.97 ms recording; system busy fraction was
+9.4–12.1%. These two repetitions per mode do not establish full-body performance or
+zero dormant overhead. Recorded inventory spans were about 0.3 ms or less on this
+fixture. A QTest waiting loop initially starved Python export; replacing only the
+benchmark wait with a real Qt event loop fixed the test. Production export was unchanged.
+
+Ownership/coupling review: annotations are workspace evidence, not anatomy constraints;
+the desktop owns transient pointer state and camera rebasing. The recorder observes shared
+mutation/scheduling/cache boundaries and weak resource references; it does not own scheduling
+or extend mesh lifetimes. Native registry totals include live handles beyond the current
+session. AABB bytes are estimated; Python/Qt copies, GPU allocations and between-snapshot
+peaks are outside coverage. No new resource queries run while recording is off.
+
+Portable build and relocation qualification are pending at this source checkpoint.
 
 ## Workflow improvements 0.1.7
 

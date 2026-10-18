@@ -79,6 +79,12 @@ Both were corrected; focused tests pass. Re-run the gate and final GUI, then bui
 check relocated 0.1.8 packaging, source archive and normal main integration. Full task
 completion and portable qualification remain pending at this checkpoint.
 
+Final source gate now passes (540 tests and all native/numerical/style checks). Actual
+inspection, view-gesture and prior workflow GUI checks pass; ruler category picks are
+checked after the frame boundary publishes visibility. Updated PNGs were inspected.
+Next build from the clean source checkpoint, run the extended relocated portable gate,
+record package evidence, create the source archive and merge/push main normally.
+
 References: Qt 6.12 View3D/pickResult and Perfetto counter tracks documentation were
 researched before implementation. Qt bounding-box picks do not replace our native
 displayed-geometry picking; trace counters are suitable for byte snapshots.

@@ -65,7 +65,7 @@ They do not follow deformation and do not measure clearance between entire surfa
 Lines whose endpoints are behind the camera are omitted from the overlay; their values
 remain in the panel. Saved projects and inspection exports retain the ruler evidence.
 
-Enter a name and choose **Save view** to bookmark the exact camera and projection.
+Enter a name under **Named cameras** and choose **Save** to bookmark the exact camera and projection.
 **Go** restores it; edit its name or delete it using the adjacent controls. Bookmarks
 belong to the current workspace and persist with the project. Restoring one during an
 active transform preserves that edit and rebases its pointer movement. The existing

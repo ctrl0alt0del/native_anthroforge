@@ -19,7 +19,7 @@ def create_workspace(
     ids = policy.members(session.document, members, children)
     workspace = replace(session.workspace, name=name.strip(), members=ids, focused=True)
     session.replace_document(workspaces=(*session.document.workspaces, workspace))
-    session.active_workspace = len(session.document.workspaces) - 1
+    select_workspace(session, len(session.document.workspaces) - 1)
     return session.active_workspace
 
 
@@ -28,6 +28,10 @@ def select_workspace(session: "Session", index: int) -> None:
     if not 0 <= index < len(session.document.workspaces):
         raise ValueError("Unknown workspace.")
     session.active_workspace = index
+    reprioritize(session)
+
+
+def reprioritize(session: "Session") -> None:
     for job in session.scheduler.active_jobs:
         if job.state == "queued" and job.writes:
             job.priority = session.priority(set(job.outputs))
@@ -50,6 +54,8 @@ def install(session: "Session", index: int, changed: Workspace) -> None:
     workspaces = list(session.document.workspaces)
     workspaces[index] = changed
     session.replace_document(workspaces=tuple(workspaces))
+    if index == session.active_workspace:
+        reprioritize(session)
 
 
 def include_created(session: "Session", ids: set[str]) -> None:

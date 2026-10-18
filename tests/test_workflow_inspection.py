@@ -5,6 +5,7 @@ import json
 import pytest
 
 from anthroforge.core.cycle_analysis import cycles
+from anthroforge.core.jobs import Job
 from anthroforge.core.results import Port
 from tests.test_construction_contracts import create, hook
 from tests.test_issue_integration import records
@@ -99,3 +100,26 @@ def test_workspace_preserves_deleted_members_for_undo_without_blocking_settings(
     assert session.workspace.display_units == "mm"
     with pytest.raises(ValueError, match="unknown"):
         session.command("workspace.update", members=["invented"])
+
+
+def test_membership_changes_reprioritize_queued_writers_only(session, assembly):
+    root, child = assembly
+    writer, reader = queued_job(child), queued_job(child, writes=False)
+    session.scheduler.submit(writer)
+    session.scheduler.submit(reader)
+    session.command("workspace.create", name="Root", members=[root])
+    assert writer.priority == 0 and reader.priority == -1
+    session.command("workspace.update", members=[root, child])
+    assert writer.priority == 10 and reader.priority == -1
+
+
+def queued_job(target, writes=True):
+    return Job(
+        "Fixture",
+        frozenset([target]),
+        lambda _: None,
+        lambda *_: None,
+        lambda _: None,
+        writes=writes,
+        priority=10 if writes else -1,
+    )

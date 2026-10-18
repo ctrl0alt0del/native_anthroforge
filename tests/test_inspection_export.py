@@ -81,6 +81,9 @@ def test_archive_cancellation_preserves_destination(tmp_path):
 
 def test_renderer_command_uses_runtime_kind_instead_of_executable_name(tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "executable", "renamed application.exe")
+    executable = str(tmp_path / "relocated application.exe")
+    monkeypatch.setattr(sys, "argv", [executable, "--cli", "report"])
     assert report_renderer.command(tmp_path, 4)[1:3] == ["-m", "anthroforge"]
     monkeypatch.setattr(report_renderer, "__compiled__", object(), raising=False)
     assert report_renderer.command(tmp_path, 4)[1:3] == ["--cli", "render"]
+    assert report_renderer.command(tmp_path, 4)[0] == executable

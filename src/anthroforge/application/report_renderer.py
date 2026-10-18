@@ -10,10 +10,8 @@ from typing import BinaryIO
 
 
 def command(root: Path, revision: int) -> list[str]:
-    packaged = "__compiled__" in globals()  # Nuitka's documented runtime module marker.
-    entry = [sys.executable, "--cli"] if packaged else [sys.executable, "-m", "anthroforge"]
     return [
-        *entry,
+        *launcher(),
         "render",
         str(root / "snapshot.anthroforge"),
         str(root / "image.png"),
@@ -22,6 +20,13 @@ def command(root: Path, revision: int) -> list[str]:
         "--view",
         str(root / "view.json"),
     ]
+
+
+def launcher() -> list[str]:
+    # Nuitka keeps an interpreter-shaped sys.executable; argv[0] names the actual app.
+    if "__compiled__" in globals():
+        return [str(Path(sys.argv[0]).resolve()), "--cli"]
+    return [sys.executable, "-m", "anthroforge"]
 
 
 def render(root: Path, revision: int, cancel: Event) -> None:

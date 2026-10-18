@@ -780,3 +780,20 @@ Full-QML offscreen creation/realignment/acceptance and invisible D3D11 captures 
 releases preview viewport leases. These are offscreen checks, not interactive acceptance.
 The full gate has not been rerun after preview integration. Authored fiber collision Issues,
 broader anatomical/performance/resource qualification, examples/docs and packaging remain.
+
+### Authored-fiber collision and Issues integration checkpoint
+
+Native accepted-path checks now reuse the pinned addon collision kernels in one batched
+world capture, without constructing a routing graph. They detect segment crossings and
+closed-mesh containment, preserve expected bound-knot contacts, and never edit authored
+engines or geometry. The ordinary read-only Issues coordinator captures owned resource
+snapshots, cancels native work and rejects stale findings. GUI Issues lookup, labels and
+navigation now use the shared object registry, including construction object renames.
+
+23 focused collision/lifecycle/Issues/architecture tests pass, including cancellation while
+saving and obstacle edits during a captured check. Native build/3 CTests, focused clang-tidy,
+mypy (181 modules), Ruff and full-QML offscreen selection/frame/rename acceptance pass.
+`build/020-fiber-collisions/collisions.afprofile.zip` attributes the native batched query.
+The check describes accepted sampled centerlines, not continuous-curve or radius clearance.
+No interactive desktop input or visible windows were used. The full gate and broader
+anatomical routing/performance/resource/release qualification remain pending.

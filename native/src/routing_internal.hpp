@@ -35,6 +35,7 @@ struct Span {
     kernel::AfV3SqpJob job{};
 };
 World capture_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel);
+World capture_collision_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel);
 Reference reference(const Input& input);
 std::vector<Span> spans(const Input& input,World& world,const Reference& reference);
 bool warm_start(const Input& input,const Reference& reference,std::vector<Span>& spans,uint64_t handle);

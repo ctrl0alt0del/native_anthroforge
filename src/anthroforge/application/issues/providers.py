@@ -27,6 +27,8 @@ class Provider:
     affected: Callable[[Document, DocumentChanges], set[str]]
     source: Callable[[Document, str], Any]
     check: Callable[[Document, str, Event], tuple[Issue, ...]]
+    capture: Callable[[Document], Any] | None = None
+    cancellation: Callable[[], Event] | None = None
 
 
 def item(document: Document, scope: str) -> Any:

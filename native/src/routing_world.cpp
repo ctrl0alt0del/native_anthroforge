@@ -58,7 +58,7 @@ static void resolve_scales(World& world,double radius) {
     world.floor=std::max(1e-9*world.length,8*double(std::numeric_limits<float>::epsilon())*world.coordinate);
     world.slack=std::max(world.floor,0.01*radius);
 }
-World capture_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel) {
+World capture_collision_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel) {
     if(count<0||count>100000||(count&&(!handles||!matrices))) throw std::runtime_error("Invalid routing surfaces.");
     World world;
     for(int i=0;i<count;++i) {
@@ -67,7 +67,11 @@ World capture_world(const uint64_t* handles,const double* matrices,int count,dou
         add_surface(world,*mesh(handles[i]),matrix,i+1);
     }
     kernel::af_world_commit(world.collision.get());
-    snapshot_geometry(world,cancel); resolve_scales(world,radius);
+    resolve_scales(world,radius);
     return world;
+}
+World capture_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel) {
+    auto world=capture_collision_world(handles,matrices,count,radius,cancel);
+    snapshot_geometry(world,cancel); return world;
 }
 }

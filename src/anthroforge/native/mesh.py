@@ -57,9 +57,9 @@ class GeometryEngine(NativeEngine):
         self._binding_signatures()
 
     def _binding_signatures(self) -> None:
-        from . import attachment_fields, attachment_weights, point_attachments
+        from . import attachment_fields, attachment_weights, path_collisions, point_attachments
 
-        for module in (attachment_fields, attachment_weights, point_attachments):
+        for module in (attachment_fields, attachment_weights, path_collisions, point_attachments):
             module.configure(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:

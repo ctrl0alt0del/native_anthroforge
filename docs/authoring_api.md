@@ -342,6 +342,16 @@ Routing `obstacles` are explicit anatomical surface IDs, with fiber support surf
 included automatically. All surface poses/results are declared inputs. Missing inputs or
 failed solves retain the accepted path and report failure; Manual inputs retain provenance.
 The inspector exposes routing samples, clearance, solve budget and obstacle selection.
+
+Accepted Bézier/polyline fibers are checked by the read-only `fiber_collisions.v1` Issues
+provider. `issues.recheck` and `issues.cancel` use the ordinary advisory coordinator. A
+`FIBER_COLLISION` finding identifies the fiber, intersected SCP, first offending sampled
+segment, accepted path/surface assets and numerical tolerance. Segment crossings and closed
+mesh containment are checked, including the closing edge. Only tiny neighborhoods around
+explicit bound knots permit their expected surface contact. This is a centerline check of
+the accepted sampled path, not a continuous Bézier proof or a physical fiber-radius test.
+It never changes engines, geometry, undo history or save checkpoints. Stale captures cannot
+publish current findings; failed or cancelled checks remain explicitly incomplete.
 Representative anatomical parity, performance and complete release qualification remain pending.
 
 ### Fiber creation (0.2.0 development branch)

@@ -30,6 +30,7 @@ RESOURCE_FIELDS = frozenset(
         "field",
         "attachment",
         "attachments",
+        "context",
     )
 )
 

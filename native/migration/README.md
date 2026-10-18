@@ -50,3 +50,16 @@ hashes. The four current cases cover clear open/closed paths and a cube detour/b
 They match the standalone numerical output to absolute 1e-10. This does not establish
 production anatomical, full planner, GUI or release acceptance. Capture through
 `tools/capture_routing_reference.py ADDON_PATH OUTPUT_PATH` without Blender/desktop input.
+# Accepted authored-fiber collision checks
+
+`path_collisions.cpp` uses the pinned routing collision-world, segment-triangle distance and
+closed-mesh containment kernels for read-only advisory checks. `routing_world.cpp` separates
+collision capture from planner snapshot construction so advisory work does not allocate a
+routing graph. Batches own transformed path samples and reuse one captured collision world;
+cancellation is checked between samples, segments and surfaces. The numerical contact
+tolerance is `max(1e-9, 1e-9 * world diagonal)` metres, with an eight-tolerance arclength
+neighborhood at explicitly bound knots. This is not a clearance-radius calculation.
+`tests/test_path_collisions.py` covers crossings between samples, containment, closing edges,
+attachment contact, transforms and cancellation. Original pinned kernel provenance remains
+in `routing/sources.json`.
+

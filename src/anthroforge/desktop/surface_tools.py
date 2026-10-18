@@ -14,10 +14,16 @@ def choices(controller, target, boundary):
     main = item.main or tuple(u.curve for u in item.curves)
     available = available_sources(session, item)
     source = session.document.registry.records.get(boundary)
+    sources = source_choices(available, session.document.object(main[0]).closed)
     return dict(
         boundaries=[dict(id=k, name=session.document.object(k).name) for k in (main[0], main[-1])],
         candidates=branch_candidates(source, available),
+        sources=sources,
     )
+
+
+def source_choices(available, closed):
+    return [dict(id=o.id, name=o.name) for o in available if o.closed == closed]
 
 
 def available_sources(session, item):

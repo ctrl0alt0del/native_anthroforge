@@ -705,3 +705,29 @@ Next: broader gate; surface source-list edits/closed-layout preview, shared auth
 historical result provenance, per-consumer primitive sampling, authored-fiber collision
 Issues, drawing parity details, representative anatomical routing/profiler workloads and
 release documentation/examples/package qualification. Keep version 0.1.9 until complete.
+
+### Gate and source/history corrections
+
+At c0e3c02 the full development gate passes: 803 pytest tests (9 existing Qt deprecation
+warnings), native contracts/style, PowerShell checks, Python types/style, numerical imports
+and native doctor. Log: `build/check-020-branches.log`.
+
+A discriminating queued-input/history test then reproduced a live-reference publication bug:
+a surface's latest result was inserted into an earlier undo snapshot with older accepted
+source inputs. Surface historical merge now compares the complete read set; earlier snapshots
+retain pending authored construction (or their previous accepted result), and navigation
+reevaluates them normally. A separate offscreen timing case exposed accepted-shape queries
+erasing an unpublished ordinary-curve junction. Queries now retain newer authored state;
+a forced-worker two-junction regression passes.
+
+Surface API now supports source add/remove/replacement, preserves existing source settings
+and closed correspondence, validates minimum/duplicate/closure constraints, and preserves
+removed sources. The inspector shows one source's settings at a time instead of repeating
+all controls. Actual full-QML add/remove, branch controls and previous surface operations pass
+without warnings. 13 focused source/history/junction/architecture tests pass; configured
+mypy (176 modules) and Ruff pass. Full gate has not been rerun after these corrections.
+
+Remaining: closed-loft initial alignment preview, per-consumer primitive sampling, authored
+fiber collision Issues, Blender drawing auto-closure/substep details, representative anatomy/
+warm routing and profiler workloads, resource edge cases, examples/docs and portable release.
+The broader requested release remains incomplete; no version bump or main merge yet.

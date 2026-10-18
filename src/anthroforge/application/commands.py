@@ -28,6 +28,7 @@ from . import (
     projects,
     surface_branch_operations,
     surface_operations,
+    surface_sources,
 )
 from . import control_operations as controls
 from . import deformer_operations as deformers
@@ -40,6 +41,9 @@ EDITS = {
     "surface.create": surface_operations.create,
     "surface.update": surface_operations.update,
     "surface.source": surface_operations.source,
+    "surface.sources": surface_sources.assign,
+    "surface.source.add": surface_sources.add,
+    "surface.source.remove": surface_sources.remove,
     "surface.order": surface_operations.order,
     "surface.realign": surface_operations.realign,
     "surface.branch.add": surface_branch_operations.add,

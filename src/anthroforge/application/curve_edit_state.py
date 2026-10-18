@@ -15,6 +15,8 @@ def current(session: Any, item: Any) -> Any:
         return item
     if not isinstance(item, Fiber) and not any(p.junction for p in item.points):
         return item
+    if not isinstance(item, Fiber) and item.construction_revision != item.result.authored_revision:
+        return item  # Accepted geometry cannot erase unpublished authored identities or points.
     asset = session.resources.paths.get(item.result.asset)
     return replace(item, points=asset.authored.points) if asset else item
 

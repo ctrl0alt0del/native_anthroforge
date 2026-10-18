@@ -4,7 +4,9 @@ import numpy as np
 import pytest
 
 from anthroforge.application.curve_sources import world
-from tests.test_path_lifecycle import curve, path, point
+from anthroforge.application.task_schedulers import CurvePathTaskScheduler
+from anthroforge.core.scheduling import Schedule
+from tests.test_path_lifecycle import blocked_paths, curve, path, point
 from tests.test_shared_curves import move
 
 
@@ -96,3 +98,20 @@ def test_manual_source_retains_accepted_shared_position_until_publication(sessio
     session.wait()
     np.testing.assert_allclose(position(session, a), position(session, b))
     assert not session.document.object(b).result.pending
+
+
+def test_second_junction_does_not_erase_unpublished_membership(session, monkeypatch):
+    a, b, c = curve(session), curve(session), curve(session)
+    monkeypatch.setattr(CurvePathTaskScheduler, "plan", lambda *args: Schedule("worker"))
+    gate = blocked_paths(monkeypatch)
+    first = session.command(
+        "junction.create", source=reference(session, a), targets=[reference(session, b)]
+    )
+    second = session.command(
+        "junction.create", source=reference(session, a, 1), targets=[reference(session, c)]
+    )
+    assert {p.junction for p in session.document.object(a).points} == {first, second}
+    gate.set()
+    session.wait()
+    assert {p.junction for p in session.document.object(a).points} == {first, second}
+    assert not session.scheduler.errors

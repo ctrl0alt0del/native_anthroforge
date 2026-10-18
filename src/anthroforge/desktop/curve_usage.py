@@ -17,6 +17,10 @@ def uses(session, entity):
     item = session.document.registry.records.get(entity.id) if entity else None
     definition = item if isinstance(item, Surface) else getattr(item, "primitive", None)
     return [
-        dict(asdict(use), users=users(session.document, use.curve))
+        dict(
+            asdict(use),
+            name=session.document.object(use.curve).name,
+            users=users(session.document, use.curve),
+        )
         for use in getattr(definition, "curves", ())
     ]

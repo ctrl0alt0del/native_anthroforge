@@ -11,7 +11,7 @@ from anthroforge.core.results import Port
 from anthroforge.core.surfaces import Surface
 from anthroforge.native.mesh import NativeCancellation
 
-from . import authored_jobs, construction_tasks, path_tasks, surface_evaluation
+from . import authored_jobs, construction_tasks, path_tasks, surface_evaluation, surface_history
 from . import dependencies as dep
 from .assets import Asset
 from .construction_policy import revisions
@@ -69,13 +69,7 @@ def publish(session: Any, item: Surface, existing: bool, origin: int, payload: A
     key = str(uuid4())
     result = accepted_result(document, placed, ports, key)
     ready = replace(placed, result=result)
-    authored_jobs.publish(session, origin, partial(merge, item=ready, existing=existing))
+    merge = partial(surface_history.merge, ready=ready, original=item, existing=existing)
+    authored_jobs.publish(session, origin, merge)
     session.assets[key] = Asset(mesh, "generated", "", 1.0, False)
     construction_tasks.propagate_result(session, ready.id)
-
-
-def merge(document: Any, item: Surface, existing: bool) -> Any:
-    if not existing:
-        return authored_jobs.append_object(document, item)
-    objects = tuple(item if o.id == item.id else o for o in document.objects)
-    return replace(document, objects=objects)

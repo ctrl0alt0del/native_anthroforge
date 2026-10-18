@@ -77,6 +77,22 @@ def independence(controller, engine, target):
     assert changed != previous and previous in controller.session.document.registry.records
 
 
+def source_list(controller, engine, target):
+    source = controller.run("curve.create", dict(name="Additional source"))
+    settle(controller)
+    window = engine.rootObjects()[0]
+    combo = find(window, "surfaceNewSource")
+    combo.setProperty("currentIndex", combo.property("count") - 1)
+    action(engine, "surfaceAddSource", "clicked")
+    settle(controller)
+    assert controller.session.document.object(target).curves[-1].curve == source
+    find(window, "surfaceSourceChoice").setProperty("currentIndex", 2)
+    action(engine, "surfaceRemoveSource", "clicked")
+    settle(controller)
+    assert len(controller.session.document.object(target).curves) == 2
+    assert source in controller.session.document.registry.records
+
+
 def run():
     controller, warnings = Controller(), []
     engine = create_engine(controller, warnings)
@@ -84,6 +100,7 @@ def run():
         assert engine.rootObjects(), warnings
         target = create(controller, engine)
         inspection(controller, engine, target)
+        source_list(controller, engine, target)
         assert not warnings, warnings
         assert not controller.message, controller.message
         print("Offscreen surface menu, inspector, Realign, undo and mesh staging passed.")

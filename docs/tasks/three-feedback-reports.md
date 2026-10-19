@@ -3,7 +3,7 @@
 - Task branch: `codex/three-feedback-reports`
 - Integration branch: `main`
 - Starting revision: `35cbccd`
-- Status: validated; ready for integration
+- Status: complete
 - Last updated: 2026-10-19, Europe/Bucharest
 
 ## Outcome and acceptance
@@ -55,7 +55,10 @@ All validation remains background-only; no visible windows or desktop input. Del
 
 ## Next actions and blockers
 
-1. Merge and push validated work; refresh packaged documentation and the canonical source archive.
+Merged into `main` as `ee64f1a` and pushed. The packaged documentation is refreshed;
+the canonical source archive accompanies the existing version's replacement build.
+No outstanding implementation work or known blocker. Actual hands-on Windows interaction
+remains user acceptance, as required by the background-only validation constraint.
 
 ## Recovery inputs
 

@@ -24,6 +24,8 @@ def relaxation(session, target, mode, **settings):
 @pytest.mark.parametrize("mode", ["GEOMETRIC", "STATIC_PBD"])
 def test_shell_relaxes_preserving_exact_backing_and_reuses_rest(session, mode):
     key = shell(session)
+    session.command("tissue.constraint.add", target=key, mask="BOUNDARY")
+    session.wait()
     before = session.document.object(key)
     rest = mesh(session, key)
     result = relaxation(session, key, mode, sagginess=0.5, iterations=12, gravity=(1, 0, -1))
@@ -56,7 +58,7 @@ def test_curve_relaxation_pins_backing_and_endpoints(session, mode):
     before = mesh(session, key)
     for mask in ("BACKING", "ENDPOINTS"):
         session.command("tissue.constraint.add", target=key, mask=mask)
-    item = relaxation(session, key, mode, iterations=12)
+    item = relaxation(session, key, mode, iterations=12, sagginess=0.1)
     assert item.result.status == "ready", session.scheduler.errors
     size = item.parts[0].a.inflation.segments
     after = mesh(session, key)

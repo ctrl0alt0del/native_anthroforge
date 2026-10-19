@@ -116,6 +116,10 @@ stages; combining them adds no new volume-preservation or physical-contact guara
   unrelated valid components continue. No incomplete component can wait indefinitely.
 - `ITERATION_LIMIT` is a usable current result with a warning when the native contract
   allows it; distinguish it from numerical failure and successful convergence.
+- A relaxed candidate introducing transverse self-intersections or collapsed faces is
+  unusable and fails intrinsic acceptance. Large normal rotation alone is not failure.
+  This is a geometry check, not self-contact resolution or a guarantee of collision-free
+  motion between iterations. It preserves reported pre-existing crossings separately.
 - Preserve Live/On Release/Manual, dispatch-time inputs, reservations, safe cancellation,
   stale-result rejection, dependency registration, undo/redo and save checkpoint semantics.
 - Inflation changes reuse accepted source paths; stacking-only changes reuse intrinsic
@@ -149,3 +153,10 @@ construction and assembly replace remaining addon Python numerical loops.
 These architecture changes do not authorize changing the qualified inflation,
 relaxation, attachment or stacking algorithms. Record numerical differences against
 representative fixtures; do not disguise a parity failure as an intended difference.
+
+The raw relaxation kernels retain addon parity. Standalone publication additionally
+rejects newly self-intersecting/collapsed candidates instead of exposing them as usable
+iteration-limit output. The donor Pouch preset can produce such output on strongly
+curved, thick shells; its defaults do not guarantee validity for every source. Explicit
+thickness, relaxation and constraint edits can recover valid output. No silent preset
+change, alternate solver or automatic parameter reduction is applied.

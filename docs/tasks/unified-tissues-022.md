@@ -30,6 +30,21 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Pouch investigation now distinguishes actual crossings from normal rotation: the original
+curved fixture has 1,229 new transverse triangle-pair intersections, versus zero in rest.
+The donor reproduces the invalid output. Two captured raw donor relaxation cases also
+introduce crossings; numerical parity remains intact and is not geometry acceptance.
+Added a reusable native same-connectivity quality query using the pinned BVH/intersection
+kernel. Shared intrinsic publication rejects new crossings/collapses, retains accepted
+geometry and reports an Issue. Large rotations remain allowed; no solver/default changes.
+The API test covers failure retention and explicit recovery (0.08 thickness, 0.2 sagginess)
+on that same curved source. Flat donor-default Pouch remains valid. Two older tests asserted
+only pins/finite positions on crossing candidates; their valid cases now use fixed shell
+boundaries and lower curve sagginess, alongside explicit invalid-output regression coverage.
+32 focused checks, native build/CTest, changed clang-tidy, Ruff and mypy pass. Hidden GPU
+rejection/recovery runs pass; inspected the recovered continuous shell, with its exact
+backing retained. Full gate and remaining release qualification are pending.
+
 Immutable tissue material preparation is now reused through the existing bounded native
 resource cache (64 MiB/64 entries). Keys include accepted material state, side and intrinsic/
 final role; eviction preserves job-owned leases. Session shutdown releases cache ownership.

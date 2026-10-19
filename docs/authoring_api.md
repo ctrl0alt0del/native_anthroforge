@@ -489,6 +489,13 @@ source/preset combinations fail before creation. All presets use the same Tissue
 it never reapplies defaults or changes stacking. Numerical and visual release
 qualification is still in progress; see the [task record](tasks/unified-tissues-022.md).
 
+Intrinsic acceptance checks relaxation for newly introduced transverse self-intersections
+and collapsed faces. Failed candidates retain the last accepted geometry and expose the
+reason in Issues. `ITERATION_LIMIT` alone remains a warning for geometrically usable output.
+Pouch defaults can fail on strongly curved/thick sources; change parameters explicitly.
+The low-level native relaxation adapter remains available for parity qualification, but
+application publication always uses the shared acceptance check.
+
 The in-progress 0.2.2 tissue API includes `tissue.crop(target, changes)`, with `enabled`,
 local `origin`/`normal` and `positive` half-space settings. Cropping acts in base material
 coordinates after intrinsic deformation; its edges are neither attachments nor new

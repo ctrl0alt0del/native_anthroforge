@@ -17,10 +17,27 @@ def membranes(controller, renderer, app):
     controller.run("object.delete", dict(target=original))
     for preset in ("LAYER", "POUCH"):
         target = controller.createConstruction("tissue.create", dict(source=source, preset=preset))
+        if preset == "POUCH":
+            controller.run("tissue.relaxation", dict(target=target, changes=dict(mode="NONE")))
         controller.run("tissue.configure", dict(target=target, changes=dict(reverse=True)))
+        if preset == "POUCH":
+            pouch(controller, renderer, app, target)
         capture(controller, renderer, app, "preset-" + preset.lower())
         controller.run("object.delete", dict(target=target))
         frames(controller, renderer, app)
+
+
+def pouch(controller, renderer, app, target):
+    settle(controller)
+    accepted = controller.session.document.object(target).result.asset
+    controller.run("tissue.relaxation", dict(target=target, changes=dict(mode="STATIC_PBD")))
+    settle(controller)
+    item = controller.session.document.object(target)
+    assert item.result.asset == accepted and "self-intersections" in item.intrinsic_result.error
+    assert frames(controller, renderer, app).save("build/022-tissue/pouch-rejected-gpu.png")
+    controller.run("tissue.inflation", dict(target=target, changes=dict(amount=0.08)))
+    controller.run("tissue.relaxation", dict(target=target, changes=dict(sagginess=0.2)))
+    settle(controller)
 
 
 def paths(controller, renderer, app):

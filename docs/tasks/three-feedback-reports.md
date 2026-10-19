@@ -3,7 +3,7 @@
 - Task branch: `codex/three-feedback-reports`
 - Integration branch: `main`
 - Starting revision: `35cbccd`
-- Status: in progress
+- Status: source validated; portable qualification pending
 - Last updated: 2026-10-19, Europe/Bucharest
 
 ## Outcome and acceptance
@@ -32,15 +32,25 @@ Implemented tabs and image actions, captured import intent, shared world-axis im
 
 Native build and 3 CTests pass. 47 focused tests cover transforms, nearest hits, fallback, offsets, unchanged projection policy, image import/undo and captured parent intent. `uv run --no-sync python tools/feedback_fixes_acceptance.py` passes actual modifier transitions, remapped snapping, Ctrl+Shift continuation, one-step undo/cancel, image picker/parent/alignment and tab actions. Captures at 1440x900 and 1050x680 in `build/three-reports-acceptance` were inspected. QPA offscreen captures validate controls/layout, not Quick3D mesh pixels.
 
-The file-picker harness must target Qt's separate offscreen popup window and click its file delegate; setting the public selectedFile property alone does not select an entry in an open dialog. UI projection tolerance is 1e-6 (observed float error 2.4e-8); native tests retain tighter tolerances. Full gate/package pending.
+The file-picker harness must target Qt's separate offscreen popup window and click its file delegate; setting the public selectedFile property alone does not select an entry in an open dialog. UI projection tolerance is 1e-6 (observed float error 2.4e-8); native tests retain tighter tolerances.
+
+Code `9850849`: `./tools/check.ps1` passes (941 tests, 307 existing-constructor deprecation warnings, 3 native CTests, native analysis, Ruff, mypy on 195 modules, function limits, numerics/doctor). Log: `build/three-reports-gate.log`.
+
+Additional passing background commands:
+
+- `uv run --no-sync python tools/image_scene_acceptance.py`
+- `uv run --no-sync python tools/curve_workflow_acceptance.py`
+- `uv run --no-sync python tools/construction_editor_acceptance.py`
+- Local fixture `uv run --no-sync python build/three_reports_render.py`: actual GPU pixels for X/Y/Z image import under a rotated, nonuniformly scaled parent. Captures `build/three-reports-acceptance/parented-image-*.png` inspected.
+
+Ownership review completed: no Python numerical loop, no new scheduling/publication path, shared image transform policy, captured input intent, native temporary projection, and presentation-only tab selection. Portable qualification pending.
 
 All validation remains background-only; no visible windows or desktop input. Deliver one `dist/0.2.1/AnthroForge.dist` and `dist/AnthroForge-0.2.1-source.zip`. Recheck running processes before replacing the canonical build.
 
 ## Next actions and blockers
 
-1. Run the full gate and existing affected editor/hidden-render regressions.
-2. Build and qualify the canonical portable package, update delivery evidence.
-3. Update current docs, merge and push validated work.
+1. Build and qualify the canonical portable package, update delivery evidence.
+2. Merge and push validated work.
 
 ## Recovery inputs
 

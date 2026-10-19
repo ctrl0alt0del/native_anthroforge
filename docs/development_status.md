@@ -1,7 +1,46 @@
 # AnthroForge development validation
 
-Current source qualification is in [construction objects 0.2.0](#construction-objects-020).
+Current source qualification is in [routing correction 0.2.0](#routing-correction-020).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Routing correction 0.2.0
+
+The user's `solver_test.anthroforge` contained an ordinary routed curve with no obstacle
+surfaces. Conversion now exposes obstacle selection before preview and both routing
+inspectors identify an empty effective obstacle set. Fiber attachment surfaces remain
+automatic. The native adapter resolves numerical contact at unbound surface knots,
+validates warm seeds against solid interiors, and retries an infeasible warm solve once
+with cold planning. Authored points and anatomical bindings retain their meaning.
+See the [task evidence](tasks/solver-routing.md) and [walkthrough](construction_020.md).
+
+Runtime revision `7e146a1` passes the full Windows development gate: **877 pytest cases**,
+3 native CTests, clang-tidy, Ruff/formatting, mypy on 181 modules, function limits,
+PowerShell checks, dependencies and native doctor. The 9 existing Qt deprecation warnings
+remain. Original routing/anatomy parity cases pass unchanged. Six regression cases cover
+the actual scene's surface contacts, saved straight warm path, pin preservation, independent
+centerline intersection queries, rejected inside/near pins, explicit owners and undo/save.
+Source routing-editor and conversion acceptance pass; automatic Fiber obstacle rows are
+checked and disabled. All GUI checks used Qt offscreen or invisible QQuickRenderControl.
+
+The clean `7e146a1` portable executable was relocated to a fresh temporary directory and
+passed `tools/check_portable.py --offscreen` with a minimal PATH. That same executable
+opened a disposable copy of the user's project, enabled its two cubes, evaluated, saved,
+recorded a headless profile and rendered revision 1854. The saved path preserves all three
+authored points and has no centerline intersections with either cube in the independent
+native query. Rendered output was inspected; this is not hands-on desktop acceptance or a
+claim of universal curve-clearance correctness. The original project's SHA-256 is unchanged.
+
+Deliverables are `dist/0.2.0-solver-fix/AnthroForge.dist/AnthroForge.exe`, the corresponding
+`dist/AnthroForge-0.2.0-solver-fix-source.zip`, and the separate local project
+`E:/development/WIP_models/solver_test_routed.anthroforge`. Logs, captures and the profile
+are local-only in `build/solver-routing`; the compact reproducer is committed under
+`tests/fixtures/routing/surface_pins.json`. The original 0.2.0 distribution is preserved.
+
+Ownership review: numerical contact and continuation checks remain in the shared C++
+routing adapter, using existing spatial queries and solver contracts. The two editors
+reuse one obstacle-selection component. Python gains no numerical loop, scheduler or
+fallback. Numerical contact is transient and cannot mutate an authored binding. Existing
+cancellation, accepted-output retention, dependency capture and transaction rules remain.
 
 ## Construction objects 0.2.0
 

@@ -27,6 +27,12 @@ POLYLINE keeps exact segments; ROUTED solves between chosen structural points ar
 explicit obstacle surfaces. Routing conversion requires selecting those authored points.
 Generated routing samples do not become editable knots. Closure requires three points.
 
+Choose **Routing obstacles** before previewing a routed conversion, or in the current
+engine settings afterward. With none selected, an ordinary curve ignores SCP geometry;
+straight segments can therefore be the expected result. Fiber attachment surfaces are
+included automatically. Points placed directly on a selected surface may remain in contact
+without becoming anatomical attachments. Points inside an obstacle must be moved out.
+
 ## Use curves in construction
 
 Select ordered curves for a primitive or **Loft selected curves**. A single closed curve

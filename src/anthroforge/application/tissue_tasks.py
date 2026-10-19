@@ -99,7 +99,7 @@ def schedule_phases(session: Any, item: TissueVCP, explicit: bool, interactive: 
         and (
             explicit
             or getattr(item, phase + "_result").status == "pending"
-            or not getattr(item, phase + "_result").asset
+            or not getattr(item, phase + "_result").revision
         )
     ]
     return [request(session, item.id, phase, interactive) for phase in needed]

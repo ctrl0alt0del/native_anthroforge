@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 
-from anthroforge.native import material, paths, topology
+from anthroforge.native import material, paths, tissue_domain, topology
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.native.routing import Report
 
@@ -51,9 +51,7 @@ def read_array(archive: zipfile.ZipFile, name: str) -> Any:
 
 def write(archive: zipfile.ZipFile, resources: Resources) -> None:
     for key, asset in resources.meshes.items():
-        for kind, label in enumerate(MESH_BUFFERS):
-            write_array(archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind))
-        write_array(archive, f"assets/{key}/material.npy", material.array(asset.mesh))
+        write_mesh(archive, key, asset)
     for key, curve in resources.paths.items():
         write_array(archive, f"paths/{key}/samples.npy", curve.path.array())
         write_array(archive, f"paths/{key}/parameters.npy", curve.path.array(1))
@@ -62,11 +60,25 @@ def write(archive: zipfile.ZipFile, resources: Resources) -> None:
     attachment_storage.write(archive, resources.attachments)
 
 
+def write_mesh(archive: zipfile.ZipFile, key: str, asset: Asset) -> None:
+    for kind, label in enumerate(MESH_BUFFERS):
+        write_array(archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind))
+    write_array(archive, f"assets/{key}/material.npy", material.array(asset.mesh))
+    for label, values in zip(
+        ("tissue", "tissue_weights"), tissue_domain.arrays(asset.mesh), strict=True
+    ):
+        write_array(archive, f"assets/{key}/{label}.npy", values)
+
+
 def read_mesh(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> Asset:
     arrays = [read_array(archive, f"assets/{key}/{label}.npy") for label in MESH_BUFFERS]
     mesh = topology.restore(engine, arrays)
     domain = read_array(archive, f"assets/{key}/material.npy")
-    return Asset(material.restore(mesh, domain), **source)
+    mesh = material.restore(mesh, domain)
+    tissue = [
+        read_array(archive, f"assets/{key}/{kind}.npy") for kind in ("tissue", "tissue_weights")
+    ]
+    return Asset(tissue_domain.restore(mesh, *tissue), **source)
 
 
 def read_path(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> PathAsset:

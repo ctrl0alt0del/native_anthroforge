@@ -2,29 +2,18 @@
 
 from typing import Any, cast
 
-from anthroforge.core.membranes import Membrane
 from anthroforge.core.tissues import TissueVCP
-from anthroforge.native import construction, tissue_inflation, topology
+from anthroforge.native import tissue_inflation, topology
 from anthroforge.native.mesh import Mesh
 
-from .object_frames import Frames
+from . import tissue_sources
+from .tissue_output import TissueOutput
 
 
 def accepted(resources: Any, result: Any, label: str) -> Mesh:
     if not result.asset or result.status in ("failed", "invalid", "cancelled"):
         raise ValueError(label + " has no usable accepted output.")
     return cast(Mesh, resources.meshes[result.asset].mesh)
-
-
-def base(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:
-    source = document.object(item.source)
-    if not isinstance(source, Membrane):
-        raise ValueError("This tissue construction adapter requires a Membrane.")
-    mesh = accepted(resources, source.result, "Membrane")
-    mesh = tissue_inflation.refine(mesh, item.resolution, cancel)
-    frames = Frames(engine, document)
-    frame = construction.matrix(engine, frames.world(item.id), frames.world(source.id), True)
-    return tissue_inflation.source(mesh, frame, cancel)
 
 
 def rest(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:
@@ -53,11 +42,13 @@ def final(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: i
     return mesh
 
 
-EVALUATORS = dict(base=base, rest=rest, intrinsic=intrinsic, final=final)
+EVALUATORS = dict(rest=rest, intrinsic=intrinsic, final=final)
 
 
 def evaluate(
     engine: Any, document: Any, resources: Any, target: str, phase: str, cancel: int
-) -> Mesh:
+) -> TissueOutput:
     item = document.object(target)
-    return EVALUATORS[phase](engine, document, resources, item, cancel)
+    if phase == "base":
+        return tissue_sources.capture(engine, document, resources, item, cancel)
+    return TissueOutput(mesh=EVALUATORS[phase](engine, document, resources, item, cancel))

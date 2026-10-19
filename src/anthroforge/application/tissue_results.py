@@ -9,6 +9,7 @@ from anthroforge.core.tissues import TissueVCP
 
 from .assets import Asset
 from .evaluation_results import accepted_result
+from .tissue_output import TissueOutput
 
 
 def install(session: Any, item: TissueVCP) -> None:
@@ -17,20 +18,35 @@ def install(session: Any, item: TissueVCP) -> None:
     )
 
 
-def publish(session: Any, document: Any, target: str, phase: str, mesh: Any, ports: Any) -> None:
+def publish(
+    session: Any, document: Any, target: str, phase: str, output: TissueOutput, ports: Any
+) -> None:
     current = session.document.object(target)
-    key = str(uuid4())
-    session.assets[key] = Asset(mesh, "generated tissue " + phase, "", 1.0, False)
-    before = replace(
-        current,
-        result=getattr(current, phase + "_result"),
-        construction_revision=getattr(current, phase + "_revision"),
-    )
-    result = accepted_result(document, before, ports, key)
-    changes = {phase + "_result": result}
+    key = register(session, output, phase)
+    result = accept(document, current, phase, ports, key)
+    changes: dict[str, Any] = {phase + "_result": result}
+    if output.base is not None:
+        changes["base_state"] = output.base
     if phase in ("intrinsic", "final"):
         changes["result"] = replace(result, status="unstacked" if phase == "intrinsic" else "ready")
     install(session, replace(current, **changes))
+
+
+def accept(document: Any, item: TissueVCP, phase: str, ports: Any, key: str) -> Any:
+    before = replace(
+        item,
+        result=getattr(item, phase + "_result"),
+        construction_revision=getattr(item, phase + "_revision"),
+    )
+    return accepted_result(document, before, ports, key)
+
+
+def register(session: Any, output: TissueOutput, phase: str) -> str:
+    if output.mesh is None:
+        return output.asset
+    key = str(uuid4())
+    session.assets[key] = Asset(output.mesh, "generated tissue " + phase, "", 1.0, False)
+    return key
 
 
 def fail(session: Any, target: str, phase: str, error: str) -> None:

@@ -21,6 +21,7 @@ METADATA = frozenset(
         "construction_revision",
         "result",
         "base_result",
+        "base_state",
         "rest_result",
         "intrinsic_result",
         "final_result",

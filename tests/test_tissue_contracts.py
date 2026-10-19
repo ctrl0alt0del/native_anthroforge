@@ -102,12 +102,15 @@ def test_final_provider_never_uses_the_display_fallback():
 
 
 def test_tissue_results_are_all_owned_by_document_resources():
+    from anthroforge.core.tissue_base import TissueBaseState
+
     document, tissue = membrane_document()
     states = {
         name: EvaluationResult(asset=name)
         for name in ("base_result", "rest_result", "intrinsic_result", "final_result")
     }
-    changed = replace(document, objects=(*document.objects[:-1], replace(tissue, **states)))
+    tissue = replace(tissue, base_state=TissueBaseState("SURFACE"), **states)
+    changed = replace(document, objects=(*document.objects[:-1], tissue))
     assert referenced(changed)["meshes"] == set(states)
 
 

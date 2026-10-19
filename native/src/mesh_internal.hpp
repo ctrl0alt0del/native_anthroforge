@@ -1,5 +1,6 @@
 #pragma once
 #include "anthroforge/mesh.h"
+#include "tissue_domain.hpp"
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 // Eigen's FromTwoVectors computes full V before reading its SVD nullspace.
@@ -31,6 +32,7 @@ struct Mesh {
     Triangles triangles;
     std::vector<int64_t> corners, offsets, polygons;
     std::vector<int64_t> material;
+    TissueDomain tissue;
     std::vector<std::vector<float>> chunks;
     igl::AABB<Vertices,3> tree;
     double bounds[6]{};

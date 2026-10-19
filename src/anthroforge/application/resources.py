@@ -63,6 +63,7 @@ def references(entities: Iterable[SCP], objects: Iterable[Authored]) -> dict[str
     meshes.update(tissue_meshes(objects))
     paths = {o.result.asset for o in objects if isinstance(o, Curve)}
     paths.update(o.edit.baseline for o in objects if isinstance(o, Fiber) and o.edit)
+    paths.update(tissue_bases(objects, "CURVE"))
     images = {o.source for o in objects if isinstance(o, ReferenceImage)}
     attachments = {o.attachment_asset for o in objects if isinstance(o, Fiber)}
     groups = dict(meshes=meshes, paths=paths, images=images, attachments=attachments)
@@ -70,15 +71,23 @@ def references(entities: Iterable[SCP], objects: Iterable[Authored]) -> dict[str
 
 
 def tissue_meshes(objects: Iterable[Authored]) -> set[str]:
-    return {
+    rows = tuple(objects)
+    return tissue_bases(rows, "SURFACE") | {
         result.asset
-        for item in objects
+        for item in rows
         if isinstance(item, TissueVCP)
         for result in (
             item.result,
-            item.base_result,
             item.rest_result,
             item.intrinsic_result,
             item.final_result,
         )
+    }
+
+
+def tissue_bases(objects: Iterable[Authored], kind: str) -> set[str]:
+    return {
+        item.base_result.asset
+        for item in objects
+        if isinstance(item, TissueVCP) and item.base_state.kind == kind
     }

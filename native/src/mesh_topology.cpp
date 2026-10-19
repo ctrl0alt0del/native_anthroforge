@@ -48,7 +48,7 @@ uint64_t af_mesh_reuse_topology(uint64_t source,uint64_t previous,uint64_t cance
         auto current=af::mesh(source); const auto old=af::mesh(previous);
         if(current->vertices.rows()==old->vertices.rows()&&current->corners==old->corners&&current->offsets==old->offsets) {
             auto updated=af::deform_mesh(*old,current->vertices,cancel);
-            updated->material=current->material; current=std::move(updated);
+            updated->material=current->material; updated->tissue=current->tissue; current=std::move(updated);
         }
         return af::retain(current);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
@@ -69,6 +69,7 @@ uint64_t af_mesh_finalize(uint64_t source,uint64_t previous,uint64_t cancel) {
             return af::retain(mesh);
         auto result=af::deform_mesh(*topology,mesh->vertices,cancel);
         result->material=mesh->material;
+        result->tissue=mesh->tissue;
         return af::retain(result);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }
@@ -77,6 +78,7 @@ uint64_t af_mesh_storage_bytes(uint64_t source) {
         const auto mesh=af::mesh(source);
         if(mesh->prepared) throw std::runtime_error("Storage accounting requires a geometry-only draft.");
         return sizeof(af::Mesh)+mesh->vertices.size()*sizeof(double)+mesh->triangles.size()*sizeof(int)
-            +(mesh->corners.capacity()+mesh->offsets.capacity()+mesh->polygons.capacity()+mesh->material.capacity())*sizeof(int64_t);
+            +(mesh->corners.capacity()+mesh->offsets.capacity()+mesh->polygons.capacity()+mesh->material.capacity())*sizeof(int64_t)
+            +af::tissue_storage(mesh->tissue);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }

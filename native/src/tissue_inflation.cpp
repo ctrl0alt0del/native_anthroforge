@@ -45,7 +45,9 @@ static std::shared_ptr<Mesh> evaluate(const Mesh& source,const AfTissueInflation
     const auto points=inflate_grid(source,grids.front(),settings[0],cancel);
     auto vertices=source.vertices;
     for(size_t i=0;i<points.size();++i) vertices.row(grids.front().indices[i])=points[i];
-    return deform_mesh(source,vertices,cancel,source.prepared);
+    auto result=deform_mesh(source,vertices,cancel,source.prepared);
+    result->tissue=tissue_identity(4,vertices.rows(),int64_t(result->offsets.size())-1);
+    return result;
 }
 }
 uint64_t af_tissue_inflate_grid(uint64_t source,const AfTissueInflation* settings,int count,uint64_t cancel) {

@@ -79,6 +79,12 @@ checks pass. No runtime release or full tissue qualification is implied.
 
 Runtime integration remains incomplete: generalized Fiber roles, intrinsic numerical ports, stacking,
 full GUI and release qualification are still required. No 0.2.2 release is claimed.
+Accepted tissue bases now distinguish an Anchor frame, retained Fiber path and Membrane
+mesh without synthetic point/curve meshes. Native outputs retain validated sparse material
+correspondence, side/part labels and source faces across deformation, finalization,
+memory accounting and schema-4 storage. Twenty base/workflow checks and seven material-map/
+architecture checks pass; configured mypy, ruff, formatting and native build/CTest pass.
+Radial, sweep and normal-shell kernels are the next increment; they are not yet connected.
 Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification

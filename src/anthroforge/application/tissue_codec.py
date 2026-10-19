@@ -6,6 +6,7 @@ from anthroforge.core.entities import Attachment
 from anthroforge.core.points import Anchor, Point
 from anthroforge.core.results import EvaluationResult
 from anthroforge.core.surface_references import SurfaceBinding, SurfaceReference
+from anthroforge.core.tissue_base import TissueBaseState
 from anthroforge.core.tissue_constraints import TissueConstraint, TissueField
 from anthroforge.core.tissue_settings import (
     HeightSmoothing,
@@ -60,6 +61,7 @@ def constraint(data: dict[str, Any]) -> TissueConstraint:
 
 
 def tissue(state: dict[str, Any]) -> TissueVCP:
+    state["base_state"] = TissueBaseState(**tuples(state.get("base_state", {})))
     state["parts"] = tuple(part(row) for row in state.get("parts", (dict(id="main"),)))
     state["relaxation"] = TissueRelaxation(**tuples(state.get("relaxation", {})))
     state["crop"] = TissueCrop(**tuples(state.get("crop", {})))

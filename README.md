@@ -20,8 +20,9 @@ Start construction with [the curves/fibers/images walkthrough](docs/construction
 or [the shared API example](examples/construction.json). Curves use Bézier, exact polyline
 or native routing engines. Fibers add anatomical bindings and use the same curve/surface
 tools. Reference images are embedded, and explicit junctions support branched open lofts.
-Schema 3 projects reject older formats; legacy conversion is deferred. Muscles and soft
-tissues follow in 0.2.1. Editable authored parameters are retained throughout.
+Schema 3 projects reject older formats; legacy conversion is deferred.
+[0.2.1 is planned for curve-workflow improvements](docs/specification_021.md); VCPs,
+including muscles and soft tissues, move to 0.2.2. Editable parameters remain retained.
 
 0.1.9 refined the editor with consistent dark menus, aligned controls and expandable
 inspection details. See [UI polish](docs/ui_polish.md).

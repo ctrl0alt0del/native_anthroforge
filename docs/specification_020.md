@@ -6,6 +6,10 @@ are recorded in [release validation](development_status.md#construction-objects-
 See [delivery plan](implementation_020.md),
 [engineering rules](engineering_guidelines.md), and [task status](tasks/020-construction.md).
 
+Roadmap update, 2026-10-19: [0.2.1 curve-workflow requirements](specification_021.md)
+reserve the next release for improvements; VCPs/muscles/soft tissues move to 0.2.2.
+The original 0.2.1 deferral below is historical, not the current release target.
+
 ## Release and compatibility
 
 0.2.0 delivers standalone curves, reference images, fibers and curve-based surfaces

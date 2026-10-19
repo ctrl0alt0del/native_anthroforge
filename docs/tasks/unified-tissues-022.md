@@ -3,7 +3,7 @@
 - Task branch: `codex/unified-tissues-022`
 - Integration branch: `main`
 - Starting revision: `6f33380660c9421585b0898b068d33b4f5232fd3`
-- Status: in progress; implementation and release qualification incomplete
+- Status: implementation/workflow qualified; canonical 0.2.2 packaging in progress
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: desktop chat, direct work (no delegated writers)
 
@@ -29,6 +29,19 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 - Preserve scheduler/history/save/startup/export semantics and 15-line functions.
 
 ## Current state
+
+Source, all 24 desktop scenarios and temporary portable workflow qualification pass.
+The isolated executable test covers legacy workflows plus four ready tissues, automatic
+stacking, Final-role Anchor binding, schema-4 save/reopen, profiling and hidden rendering.
+The new capture test initially omitted required workspace/editing view fields; fixed in
+the test, then the complete suite passed. Application code did not change. Inspected its
+tissue capture. Final current-source profiling is complete with no reported loss; six
+edit/wait/render intervals span 509–777 ms at 8.5% system busy (not a controlled comparison).
+Version is now 0.2.2 after workflow qualification. Canonical package/source archive and
+post-version regression are still required before merge/release completion. Walkthrough,
+API, capability matrix, source inventory, active schema docs and ownership review agree.
+
+## Checkpoint journal (earlier pending work is superseded by current state)
 
 Full `tools/check.ps1` now passes: native build/3 CTests, all authored native style checks,
 Ruff/format/configured mypy, script checks, **1,287 tests** (732 existing Qt deprecation

@@ -1,7 +1,75 @@
 # AnthroForge development validation
 
-Current source qualification is in [tabs and icon alignment](#tabs-and-icon-alignment-021-follow-up).
+Current source qualification is in [unified tissues](#unified-tissues-022).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Unified tissues (0.2.2)
+
+Source and temporary portable workflow qualification pass; canonical 0.2.2 packaging is running.
+See the [contract](specification_022.md), [walkthrough](tissues_022.md) and
+[task record](tasks/unified-tissues-022.md) for the current checkpoint.
+
+The Windows development gate passes **1,287 tests** (732 existing Qt deprecation
+warnings), three native CTests, native function/style checks, Ruff/format, configured
+mypy, script checks, numerical imports and native doctor. A subsequently added fresh-
+process tissue-example test also passes without importing Qt/Shiboken/Blender.
+
+Pinned production fixtures cover 9 inflation, 6 radial/sweep/shell, 7 relaxation,
+8 branch, 16 envelope, 17 smoothing, 20 crop and 14 stacking cases. Provenance and
+reproduction tools are in `native/migration/README.md`. Typical geometry parity uses
+absolute 1e-10; vector stacking uses 2e-7, with matching expected failures. Separate
+workflow checks cover material roles, current-shape attachments, Manual provenance,
+shared-source independence, exact backing, mixed providers, atomic opposite-side
+groups, cycles, failure retention, cancellation, undo, historical save and resource release.
+
+All 24 full-QML/hidden-GPU qualification tools pass. Inspected captures include the
+focused constraint/stacking inspectors, branched envelopes, crops, mixed relaxed
+shells, inflation previews, control/field overlays, support footprints and recovered
+Pouch output. Hidden QQuickRenderControl captures render real GPU geometry and check
+matching displayed picking; Qt's offscreen full-window checks exercise QML controls
+and layout without a 3D viewport. The skull fixture verifies integration only: its
+source loft crosses skull geometry and is not an anatomically fitted reconstruction.
+No visible test windows, desktop input or hands-on acceptance are claimed.
+
+The raw donor Pouch relaxation can introduce self-intersections on a curved source.
+Standalone intrinsic acceptance now rejects new transverse crossings/collapses,
+preserves accepted geometry and reports an Issue. The original case had 1,229 new
+crossing triangle pairs and matched donor output exactly. Explicit thickness/sag
+edits recover a usable shell. Large normal rotations alone are allowed. This check
+is not general contact resolution, and does not establish collision-free motion.
+
+Profiler reports record preparation, native calls, stage tasks, publication, hidden
+frames, invalidation and overlapping memory owners. Counterbalanced cache trials
+reduced material preparations from 60 to 6 (58.0–58.3 ms to 5.6–5.7 ms); reports
+contain 54 hits, 6 misses/inserts and no reported loss. Overall six-edit means overlap:
+cached 624–638 ms versus uncached 632–644 ms, SD 73–90 ms. No end-to-end gain is
+established. Unique observed native memory peaks were 8.42 MB versus 4.81 MB; cache
+retention trades memory for preparation reuse. System busy fraction was 8.9–10.2%,
+with other load/thermal state uncontrolled. Timings include hidden GPU readback,
+not physical display or input latency. Constrained stacking remains the main cost.
+
+The executable example exposed a separate plan/path publication feedback loop:
+973 jobs in four seconds when later-created Fibers used an existing tissue support.
+Shared propagation now stops at the next evaluator and lets unchanged final geometry
+stop downstream work. The same sequential creation now settles with four ready
+tissues and a final-role Anchor. Authored invalidation remains transitive; failures
+notify the same evaluator frontier. Regression checks preserve source Fiber assets.
+
+A separate [ownership/coupling review](implementation_022.md#ownership-and-coupling-review)
+records provider, strategy, coordinator, preview, native and resource responsibilities.
+
+The temporary packaged candidate passes the complete portable suite from a separate
+working directory with minimal PATH: existing construction/deformers, reports, inspection,
+images, profiles, Issues, and the four-tissue schema-4 example. Native DLLs load from the
+portable folder. Tissue checks verify accepted stack providers, Final-role Anchor binding,
+save/reopen, profiling, hidden GPU image capture and offscreen full-window startup. Its
+initial new capture test omitted the required workspace/editing view fields; correcting
+the test made the full suite pass without changing the application. The packaged tissue
+capture was inspected. Canonical versioned package/source archive verification remains.
+
+A final current-source profile after the publication fix is complete without reported loss.
+Six edit/wait/hidden-render intervals were 509–777 ms; system busy fraction was 8.5%.
+This single qualification capture is not a new controlled performance comparison.
 
 ## Tabs and icon alignment (0.2.1 follow-up)
 

@@ -1,11 +1,11 @@
 # AnthroForge architecture
 
 The [0.2.2 specification](specification_022.md) and [implementation plan](implementation_022.md)
-define the confirmed unified TissueVCP, Point/Anchor and Surface/Membrane extension,
-shared surface providers and schema 4. This work is in progress; the release descriptions
-below remain the qualified 0.2.1 baseline until the new task is completed.
+define the implemented unified TissueVCP, Point/Anchor and Surface/Membrane extension,
+shared surface providers and schema 4. [Validation](development_status.md#unified-tissues-022)
+records current evidence; sections labelled with earlier versions preserve their history.
 
-The in-progress surface-provider boundary now retains bind-time geometry for Anchor
+The surface-provider boundary retains bind-time geometry for Anchor
 attachments. C++ resolves referenced material coordinates against the current accepted
 surface into a geometry-only lease with the captured index layout. The shared attachment
 kernel then resolves its unchanged frame/offset record. Canonical polygons and tissue-side
@@ -47,7 +47,6 @@ using each receiver's settings, while ordinary source/attachment dependencies re
 The coordinator owns all selected output reservations and complete read validation; Manual
 members supply retained accepted output until requested. Complete assembled shells/envelopes
 undergo independent fold, self-intersection, bone and neighbor checks before publication.
-Release qualification remains in progress.
 
 Routing derives obstacle roles from dependency ports and sends the accepted provider
 geometry to the existing native collision world. Empty accepted outputs remain dependencies
@@ -56,15 +55,16 @@ explicit cycles remain errors. Advisory collision queries isolate unavailable pr
 retain other findings and report the incomplete surface check without role substitution.
 
 The [0.2.0 specification](specification_020.md) and
-[implementation plan](implementation_020.md) define the current boundaries:
+[implementation plan](implementation_020.md) introduced the construction boundaries:
 first-class construction objects, referenced curves, Fiber as Curve subclass,
 general surfaces, embedded images and schema 3 without older-schema migration.
+Schema 4 replaces that storage format in 0.2.2; earlier formats are rejected.
 See [implementation status](tasks/020-construction.md) for what is actually integrated.
 Sections labelled with earlier release numbers describe their qualified baseline.
 
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through
-the same core; VCPs, muscles and soft tissues now follow in 0.2.2. The
+the same core; unified tissue VCPs use it in 0.2.2. The
 [0.2.1 contract](specification_021.md) adds the curve-workflow boundaries below.
 
 ## Automatic routing and optional editors (0.2.1)
@@ -604,7 +604,7 @@ publishes geometry or changes scheduling/history; failure/cancellation leaves ed
 context intact. Viewport toolbar containers consume unused pointer events so disabled
 controls cannot accidentally select geometry behind them.
 
-## Publication barriers (0.2.2 task branch)
+## Publication barriers (0.2.2)
 
 Accepted-output notifications traverse aliases to the next registered evaluator, then stop.
 That evaluator's publication controls further propagation. This lets unchanged final tissue

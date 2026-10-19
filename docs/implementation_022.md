@@ -1,6 +1,6 @@
 # AnthroForge 0.2.2 implementation plan
 
-Status: in progress; no release completion claimed. Product authority:
+Status: implementation and workflow qualification complete; canonical packaging in progress. Product authority:
 [specification](specification_022.md). Recovery: [task record](tasks/unified-tissues-022.md).
 Baseline is 0.2.1 at `6f33380`. Apply [engineering guidelines](engineering_guidelines.md).
 

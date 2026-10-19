@@ -1,7 +1,7 @@
 # AnthroForge 0.2.2 — unified tissues
 
-Status: confirmed product contract; implementation in progress. This is not a
-release qualification claim. Follow [engineering guidelines](engineering_guidelines.md),
+Status: implemented product contract; release evidence and limitations are in
+[development validation](development_status.md#unified-tissues-022). Follow [engineering guidelines](engineering_guidelines.md),
 the [implementation plan](implementation_022.md), and [task status](tasks/unified-tissues-022.md).
 
 ## Release contract
@@ -94,8 +94,9 @@ Membranes provide Tissue Base and Final roles. Radial/sweep tissues provide Fina
 their point/path sources are not substitute attachment surfaces. Final is unavailable
 after failed stacking even when current unstacked geometry remains displayed.
 
-Default muscle inflation is Distributed, 0.02 m, with height smoothing Off and
-relaxation None. Muscle creation enables stacking. Closed Bulk, Rim, Layer and Pouch
+Default muscle inflation on a loft is Distributed, 0.02 m, with height smoothing Off and
+relaxation None. Muscle creation on a Membrane enables stacking; point/path construction
+keeps its compatible Radial/Profile mode and cannot stack. Closed Bulk, Rim, Layer and Pouch
 retain their captured donor defaults and disable stacking initially; Custom chooses
 the source-compatible inflation family with relaxation None and stacking disabled.
 Presets are applied only on creation. Per-mode controls and inactive side values survive

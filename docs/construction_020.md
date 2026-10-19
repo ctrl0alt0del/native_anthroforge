@@ -109,8 +109,8 @@ image creates an independent curve, without a continuing image dependency.
 
 ## Save and automate
 
-Schema 3 projects contain editable relationships, accepted results and embedded images.
-Older project schemas are clearly rejected; conversion is outside this release. Opening
+Current schema 4 projects contain editable relationships, accepted results and embedded images.
+Earlier schemas, including the original 0.2.0/0.2.1 schema 3, are rejected; conversion is deferred. Opening
 preserves the existing startup calculation policy rather than rerouting everything.
 Live, On Release, Manual, save checkpoints and undo retain their established behavior.
 Outside-workspace consumers continue at lower priority. Apply/Bake is unavailable.

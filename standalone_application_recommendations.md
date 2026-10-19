@@ -1,15 +1,15 @@
 # AnthroForge standalone application: consolidated recommendations
 
-Updated: 2026-10-19
+Updated: 2026-10-20
 
 The [confirmed 0.2.0 specification](docs/specification_020.md) is authoritative for
-curves, fibers, surfaces, reference images, object relationships and project-format
-compatibility. It replaces the earlier Free/Controlled classification with curve
+curves, fibers, surfaces, reference images and object relationships.
+Current schema 4 compatibility is defined by 0.2.2 below. It replaces the earlier Free/Controlled classification with curve
 engines, requires independent curve-to-fiber copies, and includes all these features
 in 0.2.0. [0.2.1 defines curve-workflow improvements](docs/specification_021.md);
 The [0.2.2 specification](docs/specification_022.md) now defines unified TissueVCP,
 Anchor/Fiber/Membrane sources and surface-only stacking, with
-[implementation and acceptance](docs/implementation_022.md) in progress. Historical source terminology in the
+[implementation and acceptance](docs/implementation_022.md) and [validation evidence](docs/development_status.md#unified-tissues-022). Historical source terminology in the
 evidence/coverage appendix is retained only to identify the original addon behavior.
 
 Status: general product specification confirmed by the user on 2026-10-16 after questions Q1–Q58, with the subsequent 0.1.2 primitive/deformer interview confirmed in Q32. Section 1 and its linked confirmed feature specifications are authoritative where source recommendations differ. Priorities and technology proposals are recommendations unless explicitly identified as agreed. This is not an implementation completion report or a claim of measured standalone performance.
@@ -365,7 +365,7 @@ Carry forward bounded tightening and show displacement, shortening, clearance, a
 
 ### E01 — Investigate a composable volume framework [P2]
 
-The confirmed [0.2.2 contract](docs/specification_022.md) adopts one TissueVCP with composed construction, inflation, relaxation, constraints and stacking capabilities. Anatomical labels do not choose algorithms. Preserve source-relative and explicit target-relative goals without rewriting shared construction; surface-only stacking remains distinct from attachment. This is an implementation requirement, not a claim that the new runtime is already qualified.
+The [0.2.2 contract](docs/specification_022.md) uses one TissueVCP with composed construction, inflation, relaxation, constraints and stacking capabilities. Anatomical labels do not choose algorithms. Source-relative and explicit target-relative goals preserve shared construction; surface-only stacking remains distinct from attachment. [Release validation](docs/development_status.md#unified-tissues-022) records observed evidence and limitations.
 
 ### E02 — Make local profile coordinates stable and extensible [P1]
 

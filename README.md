@@ -1,8 +1,9 @@
-# AnthroForge 0.2.1
+# AnthroForge 0.2.2
 
-Development of [0.2.2 unified tissues](docs/specification_022.md) is in progress;
-see the [implementation plan](docs/implementation_022.md) and [roadmap](docs/roadmap.md).
-The version heading identifies the qualified baseline, not completion of that work.
+[0.2.2 unified tissues](docs/specification_022.md) adds attached Point/Anchor and Membrane
+construction, muscle/soft-tissue inflation, relaxation, constraints, cropping and stacking.
+Start with the [tissue walkthrough](docs/tissues_022.md) or [headless example](examples/tissues.json).
+See [validation and limitations](docs/development_status.md#unified-tissues-022).
 
 Standalone curves, reference images, fibers and curve-based surfaces follow the
 [confirmed specification](docs/specification_020.md) and
@@ -13,7 +14,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.2.2/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included
@@ -24,9 +25,11 @@ Start construction with [the curves/fibers/images walkthrough](docs/construction
 or [the shared API example](examples/construction.json). Curves use Bézier, exact polyline
 or native routing engines. Fibers add anatomical bindings and use the same curve/surface
 tools. Reference images are embedded, and explicit junctions support branched open lofts.
-Schema 3 projects reject older formats; legacy conversion is deferred.
-[0.2.1 improves curve workflows](docs/specification_021.md); VCPs,
-including muscles and soft tissues, move to 0.2.2. Editable parameters remain retained.
+Schema 4 rejects earlier formats, including 0.2.1 projects; legacy conversion is deferred.
+[0.2.1 curve workflows](docs/specification_021.md) remain available. Tissues use shared
+Anchor/Fiber/Membrane construction and retain all editable parameters. Anatomical labels
+choose creation defaults, not different evaluators. General physical contact and dynamics
+are outside this release. Failed calculations retain usable accepted geometry with Issues.
 
 Curve creation and cursor/patch tools sit below the transform gizmos. Place Points finishes
 on plain left-click from the second point; Shift-click continues. Hold Ctrl to snap to

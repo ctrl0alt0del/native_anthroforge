@@ -47,7 +47,8 @@ def profile(executable, cwd, invoke, target):
 
 
 def capture(executable, cwd, invoke, state, target):
-    view = dict(selected=target, camera=[0, 0, 0.65, -20, 25, 0, 2], orthographic=True)
+    view = dict(workspace=0, selected=target, editing=False)
+    view.update(camera=[0, 0, 0.65, -20, 25, 0, 2], orthographic=True)
     (cwd / "tissue-view.json").write_text(json.dumps(view))
     arguments = ("--cli", "render", "tissues.anthroforge", "tissues.png")
     options = ("--revision", str(state["revision"]), "--view", "tissue-view.json")

@@ -1,8 +1,8 @@
 # Building tissues
 
 The [0.2.2 specification](specification_022.md) defines the supported combinations.
-This walkthrough describes the implementation on the 0.2.2 task branch; release
-qualification is tracked in [the task record](tasks/unified-tissues-022.md).
+See [release validation](development_status.md#unified-tissues-022) for measured evidence
+and the limits of background/offscreen inspection.
 
 ## Choose attached construction
 

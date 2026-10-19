@@ -1,6 +1,8 @@
-# AnthroForge 0.2.1 quick start
+# AnthroForge 0.2.2 quick start
 
 Start with [curves, fibers, surfaces and images](construction_020.md).
+Continue with [attached construction and tissues](tissues_022.md).
+Schema 4 projects reject earlier schemas, including 0.2.1 files; no conversion is included.
 The existing primitive, attachment and navigation workflow below remains applicable.
 
 The Activity panel retains its job rows while status and elapsed time update. It shows

@@ -1,12 +1,12 @@
-# Local authoring API, 0.2.1
+# Local authoring API, 0.2.2
 
-The [0.2.2 tissue contract](specification_022.md) is being implemented through this same
-catalogue. Planned operation families and boundaries are in the
-[implementation plan](implementation_022.md); this notice does not advertise unimplemented APIs.
+The [0.2.2 tissue contract](specification_022.md) uses the same catalogue as existing
+construction operations. Ownership and acceptance are in the
+[implementation plan](implementation_022.md) and [release validation](development_status.md#unified-tissues-022).
 
-### Tissue operations on the 0.2.2 task branch
+## Tissue operations
 
-This increment is not a released 0.2.2 build. `tissue.create(source, name?, preset?)`
+`tissue.create(source, name?, preset?)`
 accepts attached construction; `tissue.configure(target, changes)` edits general settings,
 and `tissue.inflation(target, changes, part="main", side="a")` retains mode-specific data.
 `tissue.relaxation(target, changes)` edits None/Geometric/Static PBD settings. Unsupported
@@ -54,14 +54,14 @@ surfaces; existing obstacle/exclusion IDs accept tissues. A base-bound Fiber ret
 explicit binding role. Failed roles are not replaced by displayed intrinsic fallback.
 Accepted empty crops contain no collider; restoring geometry invalidates routes again.
 
-On the 0.2.2 task branch, `curve.point.update` also accepts Boolean `stacking_fixed`
+`curve.point.update` also accepts Boolean `stacking_fixed`
 and `protected_crease` fields. Bound Fiber points are protected automatically. Surface
 evaluation retains these locations in its accepted material data; tissue refinement
 preserves their exact coordinates. Manual surfaces keep their previous pin snapshot
 until evaluated. Protection-only edits do not recapture Fiber attachments or alter shape.
-The curve inspector exposes both flags. The production stacking workflow remains in progress.
+The curve inspector exposes both flags.
 
-The task branch also exposes `tissue.stacking.configure(target, changes)` for search distance,
+`tissue.stacking.configure(target, changes)` controls search distance,
 clearance, smoothing radius/strength, blend distance, preservation and maximum adjustment.
 `tissue.stacking.relationship(target, other, side="a", other_side="a", mode="AUTO",
 cover="SELF", excluded=False, regions?)` saves persistent pair intent. Modes are AUTO,
@@ -76,7 +76,7 @@ editing with ordinary undo. Requested/Explicit relationships provide **Select su
 click covering faces to toggle a non-mutating draft, inspect its green outlines, then Accept or
 Cancel. Empty selection explicitly uses the entire footprint. Optional `topology` on a region
 assignment rejects a stale caller; unknown parts/faces and implicit cover changes are rejected.
-No successful final surface is published from failed stacking. Release qualification is ongoing.
+No successful final surface is published from failed stacking.
 
 ## Construction commands
 
@@ -84,7 +84,7 @@ The desktop and headless clients share these operations, policies and transactio
 See the [construction walkthrough](construction_020.md) and
 [release validation](development_status.md#construction-objects-020).
 
-Attached-point operations added on the 0.2.2 task branch:
+Attached-point operations added in 0.2.2:
 
 | Operation | Arguments | Result |
 | --- | --- | --- |
@@ -116,7 +116,7 @@ See the [tissue walkthrough](tissues_022.md) and [executable example](../example
 | `consumer.sampling` | `entity`, `curve`, `samples` | Consumer-owned override; null inherits primitive density (32 for surfaces). Incoming attachments lock changes. |
 
 Primitive inspect retains resolved curve records for editing clients; project storage
-holds references and separate objects. Schema 3 rejects older files. Standalone path
+holds references and separate objects. Schema 4 rejects earlier schemas, including 3. Standalone path
 evaluation and explicit engine conversion, including native routing, are described below.
 
 ## Existing command catalogue
@@ -355,9 +355,9 @@ inputs with newer authored changes. Failed cycles retain previous geometry and f
 unsuccessfully, so they do not block saves indefinitely. Read `jobs` and result status
 after `wait`; successful command dispatch alone does not guarantee successful calculation.
 
-The released 0.1.x implementation used schema 2 with version-1 migration. Version 0.2.0
-supersedes that behavior: schema 3 only, with clear rejection of
-older formats. Native handles and undo history are never serialized.
+The released 0.1.x implementation used schema 2 with version-1 migration; 0.2.0/0.2.1
+used schema 3. Current 0.2.2 uses **schema 4 only** and clearly rejects all earlier
+formats. Native handles and undo history are never serialized.
 ## Reference images
 
 Image operations use the same session command API, with no Qt dependency:
@@ -386,7 +386,7 @@ Image operations use the same session command API, with no Qt dependency:
   affects both drawing and picking without changing the image's transform.
 
 `wait` includes image jobs. Import/replacement uses the initiating undo step; cancel/failure
-never publishes a partial image. Source bytes are embedded once per unique asset in schema 3.
+never publishes a partial image. Source bytes are embedded once per unique asset in schema 4.
 
 ## First-class drawing
 
@@ -442,8 +442,8 @@ Routing defaults to `obstacle_mode="AUTO"`: every SCP geometry provider is eligi
 minus `excluded_obstacles` and automatic cycle exclusions. Fiber binding/support surfaces
 remain required. Visibility and workspace do not remove obstacles. `MANUAL` uses explicit
 `obstacles`; providing that field without `obstacle_mode` retains manual API intent, including
-an empty list. Older serialized explicit lists decode as Manual. Set AUTO explicitly to
-adopt automatic selection for those projects. Auto cycle exclusions cannot hide explicit cycles.
+an empty list. Set AUTO explicitly to adopt automatic selection. Auto cycle exclusions
+cannot hide explicit cycles. Project schemas earlier than 4 are rejected before decoding.
 All eligible surface poses/results and structural scene membership are declared inputs.
 New/deleted providers invalidate pending work/previews. Missing accepted inputs fail rather
 than becoming empty space. Manual inputs retain accepted geometry and pending provenance;
@@ -496,14 +496,14 @@ resource owners, routing obstacles and pending edit baselines together. Shared i
 geometry buffers remain retained by their resource owners. These are construction operations;
 they do not certify anatomical accuracy or reconstruct muscles.
 
-## Tissue creation and material cropping (0.2.2 in progress)
+## Tissue creation and material cropping
 
 `tissue.create(source, preset)` applies editable defaults for `MUSCLE`, `CUSTOM`,
 `CLOSED_BULK` (Anchor), `RIM` (Fiber), and `LAYER`/`POUCH` (Membrane). Incompatible
 source/preset combinations fail before creation. All presets use the same TissueVCP.
 `tissue.configure(..., changes={"classification": "..."})` changes only its label;
-it never reapplies defaults or changes stacking. Numerical and visual release
-qualification is still in progress; see the [task record](tasks/unified-tissues-022.md).
+it never reapplies defaults or changes stacking. See [release validation](development_status.md#unified-tissues-022)
+for numerical/visual evidence and its limits.
 
 Intrinsic acceptance checks relaxation for newly introduced transverse self-intersections
 and collapsed faces. Failed candidates retain the last accepted geometry and expose the
@@ -512,7 +512,7 @@ Pouch defaults can fail on strongly curved/thick sources; change parameters expl
 The low-level native relaxation adapter remains available for parity qualification, but
 application publication always uses the shared acceptance check.
 
-The in-progress 0.2.2 tissue API includes `tissue.crop(target, changes)`, with `enabled`,
+`tissue.crop(target, changes)` accepts `enabled`,
 local `origin`/`normal` and `positive` half-space settings. Cropping acts in base material
 coordinates after intrinsic deformation; its edges are neither attachments nor new
 zero-inflation boundaries. It currently supports qualified muscle-grid modes. Incoming
@@ -567,15 +567,14 @@ junctions on an outer main boundary. Roots must be ordered, interior and nonover
 closed/nested branches are rejected. `surface.branch.remove(target, branch)` preserves source
 curves. Making a branched consumer independent copies its complete source/junction assembly.
 
-### Planned 0.2.2 branch implementation: part and side operations
+### Tissue part and side operations
 
 `tissue.inflation(target, changes, part="main", side="a")` edits one accepted material
 part and side. Inactive mode settings remain authored. First Section Profile activation
 initializes from the effective amount unless explicit profile settings are supplied.
 `tissue.profile.reset` and `tissue.control.reset` accept the same target/part/side keys.
 `tissue.connector(target, part, width, fullness)` edits one branch connector. All use
-normal shared transactions and topology/capability validation. They are implemented on
-the 0.2.2 task branch; 0.2.2 release qualification is not complete.
+normal shared transactions and topology/capability validation.
 
 `tissue.smoothing(target, changes, part="main", side="a")` configures `mode` (OFF/HEIGHT),
 `radius`, `strength` and `maximum_change` for muscle grid inflation. Unsupported mode

@@ -26,6 +26,19 @@ def inspect(controller, window):
         item = controller.session.document.object(controller.selection)
         assert item.preset == name and item.result.status == "ready", item.result.error
         assert find(window, "tissueClassification").property("text") == "SOFT_TISSUE"
+    independent(controller, window)
+
+
+def independent(controller, window):
+    target = controller.selection
+    original = controller.session.document.object(target).source
+    click(window, "tissueMakeIndependent")
+    settle(controller)
+    item = controller.session.document.object(target)
+    assert item.source != original and item.result.status == "ready"
+    controller.run("undo", {})
+    settle(controller)
+    assert controller.session.document.object(target).source == original
 
 
 if __name__ == "__main__":

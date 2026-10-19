@@ -44,6 +44,7 @@ def required_sources(document: Any, selected: set[str]) -> set[str]:
 def remapped_branch(branch: Any, mapping: dict[str, str]) -> Any:
     return replace(
         branch,
+        id=mapping.get(branch.id, branch.id),
         boundary=mapping.get(branch.boundary, branch.boundary),
         curves=tuple(mapping.get(key, key) for key in branch.curves),
         junctions=tuple(mapping.get(key, key) for key in branch.junctions),

@@ -27,4 +27,9 @@ def pending(document: Any, item: Surface, existing: bool) -> Surface:
         if previous
         else EvaluationResult(status="pending")
     )
-    return replace(item, result=result)
+    return replace(
+        item,
+        result=result,
+        accepted_kind=previous.accepted_kind if previous else "",
+        accepted_parts=previous.accepted_parts if previous else (),
+    )

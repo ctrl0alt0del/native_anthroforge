@@ -428,7 +428,7 @@ resource owners, routing obstacles and pending edit baselines together. Shared i
 geometry buffers remain retained by their resource owners. These are construction operations;
 they do not certify anatomical accuracy or reconstruct muscles.
 
-## Curve surfaces
+## Tissue creation and material cropping (0.2.2 in progress)
 
 `tissue.create(source, preset)` applies editable defaults for `MUSCLE`, `CUSTOM`,
 `CLOSED_BULK` (Anchor), `RIM` (Fiber), and `LAYER`/`POUCH` (Membrane). Incompatible
@@ -444,6 +444,14 @@ zero-inflation boundaries. It currently supports qualified muscle-grid modes. In
 surface attachments lock changes to crop topology. A fully excluded result is valid empty
 geometry, but cannot supply an anatomical attachment surface. See the
 [0.2.2 specification](specification_022.md) for the complete release contract.
+
+`consumer.make_independent(entity=tissue_id)` copies its complete attached construction
+graph once and returns the new source ID. Internal junctions and branch part identities
+are remapped together; external anatomical targets and ordinary parents remain explicit.
+Accepted geometry stays available, including Manual sources with pending authored edits.
+The same command still accepts `entity` and `curve` for primitive/surface consumers.
+
+## Curve surfaces
 
 - `surface.preview(curves, **creation_settings)` evaluates initial correspondence without
   creating a document object. `surface.preview(target=existing_surface)` previews Realign.

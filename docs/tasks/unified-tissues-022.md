@@ -159,6 +159,15 @@ Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification
 
+Tissue Make Independent now uses an owned construction-graph copier: one clone per source,
+copied internal junctions, remapped branch identities/accepted layouts and retained explicit
+external support targets. Anchor/Fiber/Membrane sources, branch settings, Manual accepted
+layouts, source isolation, external parent motion, undo/redo and schema-4 round trips pass
+five new workflow tests. Full-QML Make Independent and one-action undo pass. Existing
+primitive/surface entry points remain supported. The related historical Surface publication
+path now retains the accepted layout belonging to its retained geometry rather than the
+new authored layout. Configured mypy, Ruff and function-length checks pass.
+
 Preset creation now applies the actual donor settings for Closed Bulk/Rim/Layer/Pouch,
 with source-capability filtering in desktop and API. Classification is an editable label;
 changing it preserves all settings. The Layer soft backing default remains recorded while

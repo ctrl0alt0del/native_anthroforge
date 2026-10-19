@@ -4,8 +4,10 @@ from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from anthroforge.core.construction import Curve, Primitive
+from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import SCP
 from anthroforge.core.surfaces import Surface
+from anthroforge.core.tissues import TissueVCP
 
 from . import construction_copy, construction_tasks, curve_consumers, curve_copy, curve_sources
 from .curve_copy_resources import Copies
@@ -14,7 +16,19 @@ if TYPE_CHECKING:
     from .session import Session
 
 
-def make_independent(session: "Session", entity: str, curve: str) -> str:
+def make_independent(session: "Session", entity: str, curve: str = "") -> str:
+    from .tissue_independence import independent
+
+    if isinstance(session.document.registry.records.get(entity), TissueVCP):
+        if curve:
+            raise ValueError(
+                "Tissue independence copies its complete construction graph; omit curve."
+            )
+        return independent(session, entity)
+    return independent_curve(session, entity, curve)
+
+
+def independent_curve(session: "Session", entity: str, curve: str) -> str:
     from .surface_independence import independent
 
     item, _ = curve_consumers.selected_use(session, entity, curve)
@@ -65,8 +79,17 @@ def remapped_surface(item: Surface, identities: dict[str, str]) -> Surface:
 
     return replace(
         item,
-        curves=tuple(replace(u, curve=identities.get(u.curve, u.curve)) for u in item.curves),
+        curves=tuple(remapped_use(u, identities) for u in item.curves),
         alignment=tuple(replace(a, point=identities.get(a.point, a.point)) for a in item.alignment),
         main=tuple(identities.get(key, key) for key in item.main),
         branches=tuple(remapped_branch(b, identities) for b in item.branches),
+        accepted_parts=tuple(identities.get(k, k) for k in item.accepted_parts),
+    )
+
+
+def remapped_use(use: CurveUse, identities: dict[str, str]) -> CurveUse:
+    return replace(
+        use,
+        curve=identities.get(use.curve, use.curve),
+        reference_frame=identities.get(use.reference_frame, use.reference_frame),
     )

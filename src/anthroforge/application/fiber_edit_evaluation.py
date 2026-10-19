@@ -10,7 +10,7 @@ from anthroforge.core.fibers import Fiber, FiberBinding
 from anthroforge.core.results import EvaluationResult
 from anthroforge.native import attachment_fields, construction, curve_editing, path_editing, paths
 
-from . import attachment_assets
+from . import attachment_assets, fiber_retention
 from .path_assets import PathAsset
 
 
@@ -27,7 +27,7 @@ def evaluate(
     assert item.edit is not None
     asset = resources.attachments[item.attachment_asset]
     opening = resources.paths[item.edit.baseline].authored
-    surfaces = attachment_assets.surface_inputs(engine, document, resources.meshes, asset.targets)
+    surfaces = attachment_assets.captured_inputs(engine, document, resources.meshes, asset, cancel)
     current = attachment_assets.evaluate(engine, opening, asset, surfaces, world, cancel)
     path, records = edited_geometry(engine, current, opening, item, cancel)
     return recapture(engine, item, resources, document, EditGeometry(path, records, world), cancel)
@@ -54,19 +54,10 @@ def capture_request(item: Fiber, path: Any, records: Any, world: Any) -> Any:
         if b.attachment is not None
         and b.point in item.edit.rebind
         and b.capture_scope == "ANY_PARENT"
-        else item.edit.candidates.index(b.target)
+        else item.edit.candidates.index(b.reference)
         for b in item.bindings
     ]
-    return attachment_fields.Capture(path, records, world, pins, parents, retained_bindings(item))
-
-
-def retained_bindings(item: Fiber) -> list[tuple[float, ...]]:
-    assert item.edit is not None
-    missing = (-1.0,) * 28
-    return [
-        missing if b.attachment is None or b.point in item.edit.rebind else b.attachment.binding
-        for b in item.bindings
-    ]
+    return attachment_fields.Capture(path, records, world, pins, parents)
 
 
 def recapture(
@@ -79,7 +70,8 @@ def recapture(
     field = attachment_fields.capture(
         engine, surfaces, capture_request(item, path, records, world), cancel
     )
-    asset = attachment_assets.compact(field, targets)
+    captures = attachment_assets.captures(engine, document, resources.meshes, targets)
+    asset = fiber_retention.retain(item, field, captures)
     changed = edited_fiber(item, records, asset)
     return PathAsset(path, changed), changed, asset
 
@@ -109,5 +101,9 @@ def captured(before: FiberBinding, index: int, asset: Any) -> FiberBinding:
     target = asset.targets[asset.field.owners[row, 0]]
     binding = tuple(asset.field.bindings[row, 0])
     return replace(
-        before, target=target, attachment=Attachment(child_mode="OBJECT_ORIGIN", binding=binding)
+        before,
+        target=target.reference.target,
+        role=target.reference.role,
+        material_asset=target.material_asset,
+        attachment=Attachment(child_mode="OBJECT_ORIGIN", binding=binding),
     )

@@ -9,12 +9,20 @@ from anthroforge.core.construction import Curve
 from anthroforge.core.entities import Attachment
 from anthroforge.core.fibers import Fiber, FiberBinding
 from anthroforge.core.jobs import Job
-from anthroforge.core.results import EvaluationResult, Port, geometry_asset
+from anthroforge.core.results import EvaluationResult, Port
 from anthroforge.core.scheduling import Workload
 from anthroforge.native import attachment_fields, construction
 from anthroforge.native.mesh import NativeCancellation
 
-from . import attachment_assets, authored_jobs, curve_copy, curve_sources, dependencies
+from . import (
+    attachment_assets,
+    authored_jobs,
+    curve_copy,
+    curve_sources,
+    dependencies,
+    surface_providers,
+)
+from .attachment_candidates import eligible
 from .construction_policy import revisions
 from .consumed_paths import accepted
 from .evaluation_results import matches
@@ -25,15 +33,17 @@ if TYPE_CHECKING:
     from .session import Session
 
 
-def inputs(document: Any, source: str) -> set[Port]:
-    result = dependencies.ports(document, Port(source, "path")) | {Port(source, "pose")}
-    result.update(
-        Port(item.id, role)
-        for item in document.entities
-        if geometry_asset(item)
-        for role in ("pose", "geometry")
+def capture_targets(document: Any, spec: "FiberCreation") -> tuple[Any, ...]:
+    return tuple(
+        sorted(
+            set(eligible(document, spec.identities[spec.source])) | {b[1] for b in spec.bindings}
+        )
     )
-    return result
+
+
+def inputs(document: Any, spec: "FiberCreation") -> set[Port]:
+    source = dependencies.ports(document, Port(spec.source, "path")) | {Port(spec.source, "pose")}
+    return source | surface_providers.ports(document, capture_targets(document, spec))
 
 
 def enqueue(session: "Session", spec: "FiberCreation", origin: int) -> str:
@@ -41,7 +51,7 @@ def enqueue(session: "Session", spec: "FiberCreation", origin: int) -> str:
     job.cancel = NativeCancellation(session.engine)
     job.restart_on_input_change = True
     job.retry = partial(enqueue, session, spec, origin)
-    job.observes = job.prerequisites = frozenset(inputs(session.document, spec.source))
+    job.observes = job.prerequisites = frozenset(inputs(session.document, spec))
     job.reads = frozenset(port.owner for port in job.observes)
     job.provides = frozenset((Port(spec.identities[spec.source], "path"),))
     job.workload = partial(workload, spec)
@@ -74,9 +84,8 @@ def path_workload(session: "Session", item: Fiber, document: Any) -> Workload:
     rows = len(asset.field.owners) if asset else len(item.points) * item.resolution
     targets = item.edit.candidates if item.edit else ()
     triangles = sum(
-        session.assets[geometry_asset(document.entity(key))].mesh.counts[3]
+        surface_providers.get(session.engine, document, session.assets, key).resource.mesh.counts[3]
         for key in targets
-        if geometry_asset(document.entity(key)) in session.assets
     )
     return Workload(affected=1, candidates=rows, entities=len(targets), triangles=triangles)
 
@@ -84,7 +93,7 @@ def path_workload(session: "Session", item: Fiber, document: Any) -> Workload:
 def capture(session: "Session", spec: "FiberCreation", document: Any, resources: Any) -> Any:
     item = curve_sources.source(document, spec.source)
     original = accepted(document, resources.paths, spec.source)
-    targets = tuple(sorted(e.id for e in document.entities if geometry_asset(e)))
+    targets = capture_targets(document, spec)
     indices = {point.id: index for index, point in enumerate(item.points)}
     pins = [indices[row[0]] for row in spec.bindings]
     parents = [targets.index(row[1]) for row in spec.bindings]
@@ -99,7 +108,8 @@ def compute(session: "Session", spec: "FiberCreation", payload: Any, cancel: Any
     item, original, targets, request = capture(session, spec, document, resources)
     surfaces = attachment_assets.surface_inputs(session.engine, document, resources.meshes, targets)
     field = attachment_fields.capture(session.engine, surfaces, request, cancel.handle)
-    asset = attachment_assets.compact(field, targets)
+    captures = attachment_assets.captures(session.engine, document, resources.meshes, targets)
+    asset = attachment_assets.compact(field, captures)
     copied = independent_curve(item, original.authored, spec)
     fiber = build_fiber(copied, spec, asset)
     return document, fiber, PathAsset(original.path, fiber), asset
@@ -127,17 +137,23 @@ def build_fiber(curve: Curve, spec: "FiberCreation", asset: Any) -> Fiber:
     return Fiber(**state)
 
 
-def captured_binding(point: str, target: str, scope: str, indices: Any, asset: Any) -> FiberBinding:
+def captured_binding(point: str, target: Any, scope: str, indices: Any, asset: Any) -> FiberBinding:
     index = asset.field.path.count + 3 * indices[point]
     binding = tuple(asset.field.bindings[index, 0])
+    capture = asset.targets[asset.field.owners[index, 0]]
     return FiberBinding(
-        point, target, Attachment(child_mode="OBJECT_ORIGIN", binding=binding), scope
+        point,
+        target.target,
+        Attachment(child_mode="OBJECT_ORIGIN", binding=binding),
+        scope,
+        target.role,
+        capture.material_asset,
     )
 
 
 def publish(session: "Session", spec: "FiberCreation", origin: int, payload: Any) -> None:
     source, item, path, attachment = payload
-    ports = inputs(source, spec.source)
+    ports = inputs(source, spec)
     if revisions(source, ports) != revisions(session.document, ports):
         raise ValueError("Fiber capture inputs changed before publication.")
     key = str(uuid4())
@@ -150,7 +166,7 @@ def publish(session: "Session", spec: "FiberCreation", origin: int, payload: Any
 
 
 def merge(document: Any, item: Fiber) -> Any:
-    if any(target not in document.index.entities for target in item.supports):
+    if any(s.reference.target not in document.registry.anatomy for s in item.supports):
         return document
     if not matches(document, item.result):
         item = replace(item, result=EvaluationResult(status="pending"))

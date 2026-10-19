@@ -8,6 +8,7 @@ from anthroforge.core.construction import Curve
 from anthroforge.core.fibers import Fiber
 
 from . import curve_copy
+from .surface_reference_codec import remap_capture
 
 
 @dataclass
@@ -57,7 +58,7 @@ class Copies:
         if not key or key in self.attachments:
             return self.attachments.get(key, "")
         source = self.resources.attachments[key]
-        targets = tuple(self.identities.get(k, k) for k in source.targets)
+        targets = tuple(remap_capture(s, self.identities) for s in source.targets)
         new = self.attachments[key] = str(uuid4())
         self.resources.attachments[new] = replace(source, targets=targets)
         return new

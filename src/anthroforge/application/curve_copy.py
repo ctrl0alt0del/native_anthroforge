@@ -9,6 +9,8 @@ from anthroforge.core.curve_engines import RoutingSettings
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.results import EvaluationResult
 
+from .surface_reference_codec import remap, remap_capture
+
 
 def mapping(curve: Curve) -> dict[str, str]:
     return {key: str(uuid4()) for key in (curve.id, *(p.id for p in curve.points))}
@@ -47,7 +49,7 @@ def binding_changes(curve: Curve, identities: dict[str, str]) -> dict[str, Any]:
     )
     return dict(
         bindings=bindings,
-        supports=tuple(identities.get(k, k) for k in curve.supports),
+        supports=tuple(remap_capture(s, identities) for s in curve.supports),
         edit=copied_edit(curve, identities),
     )
 
@@ -57,7 +59,7 @@ def copied_edit(curve: Fiber, identities: dict[str, str]) -> Any:
         return None
     return replace(
         curve.edit,
-        candidates=tuple(identities.get(k, k) for k in curve.edit.candidates),
+        candidates=tuple(remap(r, identities) for r in curve.edit.candidates),
         rebind=tuple(identities.get(k, k) for k in curve.edit.rebind),
     )
 

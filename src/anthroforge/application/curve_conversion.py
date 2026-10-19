@@ -144,11 +144,9 @@ def preview_ports(document: Any, spec: ConversionSpec) -> set[Port]:
     graph = routing_graph(document, candidate)
     inputs = {Port(original.id, "path")}
     if isinstance(candidate, Fiber):
-        inputs |= {
-            Port(key, role)
-            for key in eligible(document, candidate.id)
-            for role in ("pose", "geometry")
-        }
+        from .surface_providers import ports
+
+        inputs |= ports(document, eligible(document, candidate.id))
     return dependencies.closure(graph, inputs)
 
 

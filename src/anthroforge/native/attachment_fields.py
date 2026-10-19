@@ -21,6 +21,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_attached_path", [U, D, D, U], U)
     engine.bind("af_attached_controls", [D, c.c_int, D, D, D])
     engine.bind("af_attachment_compact", [c.c_int, INT, c.c_int, INT, INT])
+    engine.bind("af_attachment_retain_pins", [U, c.c_int, INT, INT, D, c.c_int, INT, D, D])
 
 
 @dataclass(frozen=True, eq=False)
@@ -82,6 +83,31 @@ def compact(field: Field, surfaces: int) -> tuple[Field, Any]:
     count = field.path.engine.library.af_attachment_compact(*args)
     field.path.engine.check(count < 0)
     return replace(field, owners=output), used[:count]
+
+
+def retain(field: Field, pins: Any, targets: Any, records: Any) -> Field:
+    pins = np.ascontiguousarray(pins, dtype=np.int32)
+    targets = np.ascontiguousarray(targets, dtype=np.int32)
+    records = doubles(records)
+    if targets.shape != pins.shape or records.shape != (len(pins), 28):
+        raise ValueError("Retained anchors require matching pins, owners and binding records.")
+    owners, weights, bindings = field.owners.copy(), field.weights.copy(), field.bindings.copy()
+    engine = field.path.engine
+    inputs = retain_arguments(field, pins, targets, records)
+    output = (owners.ctypes.data_as(INT), pointer(weights), pointer(bindings))
+    engine.check(engine.library.af_attachment_retain_pins(*inputs, *output))
+    return replace(field, owners=owners, weights=weights, bindings=bindings)
+
+
+def retain_arguments(field: Field, pins: Any, targets: Any, records: Any) -> Any:
+    return (
+        field.path.handle,
+        len(field.records),
+        pins.ctypes.data_as(INT),
+        targets.ctypes.data_as(INT),
+        pointer(records),
+        len(pins),
+    )
 
 
 def capture(engine: GeometryEngine, surfaces: Any, spec: Capture, cancel: int = 0) -> Field:

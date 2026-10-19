@@ -361,6 +361,12 @@ static V3 blended_point(const std::vector<Capture>& surfaces,const int* owners,c
     if(std::abs(total-1)>1e-9) throw std::runtime_error("Attachment influences must sum to one.");
     return result;
 }
+static void retain_field_pin(int row,int target,const double* record,int* owners,double* weights,double* bindings) {
+    owners[2*row]=target; owners[2*row+1]=-1;
+    weights[2*row]=1; weights[2*row+1]=0;
+    std::copy_n(record,28,bindings+56*row);
+    std::fill_n(bindings+56*row+28,28,0.0);
+}
 static void attached_tangents(Samples& samples,bool closed) {
     for(size_t i=0;i<samples.size();++i) {
         const size_t next=i+1<samples.size()?i+1:(closed?0:i);
@@ -402,6 +408,20 @@ int af_blended_attachment_resolve(int surfaces,const uint64_t* meshes,const doub
         for(int i=0;i<count;++i) {
             af::check_cancel(cancel);
             af::store_vector(points+3*i,af::blended_point(prepared,owners+2*i,weights+2*i,bindings+56*i));
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_attachment_retain_pins(uint64_t handle,int knots,const int* pins,const int* targets,const double* records,
+    int count,int* owners,double* weights,double* bindings) {
+    try {
+        if(count<1||knots<2||!pins||!targets||!records||!owners||!weights||!bindings)
+            throw std::runtime_error("Invalid retained fiber anchors.");
+        const auto path=af::path(handle); const int nodes=int(path->parameters.size());
+        for(int i=0;i<count;++i) {
+            if(pins[i]<0||pins[i]>=knots||targets[i]<0) throw std::runtime_error("Invalid retained fiber anchor target.");
+            af::retain_field_pin(af::knot_sample(*path,pins[i]),targets[i],records+28*i,owners,weights,bindings);
+            af::retain_field_pin(nodes+3*pins[i],targets[i],records+28*i,owners,weights,bindings);
         }
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }

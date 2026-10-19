@@ -14,10 +14,11 @@ from anthroforge.core.points import Anchor, Point
 from anthroforge.core.reference_images import ImageCalibration, ReferenceImage
 from anthroforge.core.results import EvaluationResult
 from anthroforge.core.surface_branches import SurfaceBranch
+from anthroforge.core.surface_references import SurfaceReference
 from anthroforge.core.surfaces import Surface, SurfaceAlignment
 from anthroforge.core.tissues import TissueVCP
 
-from . import tissue_codec
+from . import surface_reference_codec, tissue_codec
 from .construction_codec import result_fields, tuples
 
 KINDS = {
@@ -70,7 +71,8 @@ def decode_curve(kind: str, state: dict[str, Any]) -> Curve:
     state["points"] = tuple(CurvePoint(**tuples(point)) for point in state["points"])
     if kind == "fiber":
         state["bindings"] = tuple(decode_binding(binding) for binding in state["bindings"])
-        state["edit"] = FiberEdit(**tuples(state["edit"])) if state.get("edit") else None
+        state["edit"] = decode_edit(state.get("edit"))
+        state["supports"] = tuple(surface_reference_codec.capture(row) for row in state["supports"])
         return Fiber(**state)
     return Curve(**state)
 
@@ -80,3 +82,11 @@ def decode_binding(data: dict[str, Any]) -> FiberBinding:
     value = state.get("attachment")
     state["attachment"] = Attachment(**tuples(value)) if value else None
     return FiberBinding(**state)
+
+
+def decode_edit(data: Any) -> FiberEdit | None:
+    if not data:
+        return None
+    state = tuples(data)
+    state["candidates"] = tuple(SurfaceReference(**row) for row in state["candidates"])
+    return FiberEdit(**state)

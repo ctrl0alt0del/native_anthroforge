@@ -30,6 +30,21 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Fiber surface bindings now use explicit surface roles and owned material captures.
+The dense field may retain multiple captures of one provider: fresh edited influences
+use the current real surface while unedited structural pins keep their original capture.
+Native pin adoption does not nearest-rebind retained anchors. Current-shape editing,
+junction sharing, copying, resource reachability and schema-4 storage use this contract.
+Tissue base/final selectors are available in Fiber creation and rebinding. Material
+compaction, unchanged endpoints, mixed capture persistence, final-failure retention
+and explicit base bindings pass three new workflow checks. Existing Fiber desktop
+acceptance and the new full-QML tissue Fiber creation/propagation check pass offscreen.
+Full suite: 1133 functional checks passed; its one failure was a 17-line test helper,
+now split and verified with the architecture checks. Ruff, configured mypy and changed
+native clang-tidy pass. The preceding complete development gate passed 1131 tests.
+Role-aware routing/collision and target-relative constraints remain to integrate;
+production stacking, broader editing and release qualification remain incomplete.
+
 Inspected addon production contracts and current standalone boundaries. The
 registry, anatomical queries and attachment candidate paths still assume SCPs.
 Numerical ports must include remaining Python mesh/field preparation, not just

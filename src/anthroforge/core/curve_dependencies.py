@@ -1,9 +1,11 @@
 """Surface inputs declared by path engines and anatomical binding capabilities."""
 
+from . import anatomical_surfaces
 from .construction import Curve
 from .curve_engines import RoutingSettings
 from .fibers import Fiber
 from .results import Port
+from .surface_references import SurfaceReference
 
 
 def targets(item: Curve) -> set[str]:
@@ -14,10 +16,10 @@ def targets(item: Curve) -> set[str]:
         else set()
     )
     if isinstance(item, Fiber):
-        result.update(item.supports)
+        result.update(s.reference.target for s in item.supports)
         result.update(binding.target for binding in item.bindings)
         if item.edit:
-            result.update(item.edit.candidates)
+            result.update(r.target for r in item.edit.candidates)
     return result
 
 
@@ -28,5 +30,21 @@ def inputs(item: Curve) -> set[Port]:
     return (
         scope
         | {Port(item.id, "pose")}
-        | {Port(target, role) for target in targets(item) for role in ("geometry", "pose")}
+        | {anatomical_surfaces.port(ref) for ref in references(item)}
+        | {Port(ref.target, "pose") for ref in references(item)}
     )
+
+
+def references(item: Curve) -> set[SurfaceReference]:
+    settings = item.engine_settings
+    result = (
+        {SurfaceReference(k) for k in settings.obstacles}
+        if isinstance(settings, RoutingSettings) and settings.obstacle_mode == "MANUAL"
+        else set()
+    )
+    if isinstance(item, Fiber):
+        result.update(s.reference for s in item.supports)
+        result.update(b.reference for b in item.bindings)
+        if item.edit:
+            result.update(item.edit.candidates)
+    return result

@@ -43,7 +43,7 @@ def evaluate_fiber(
     if item.attachment_asset not in resources.attachments:
         raise ValueError("Fiber has no captured attachment field.")
     asset = resources.attachments[item.attachment_asset]
-    surfaces = attachment_assets.surface_inputs(engine, document, resources.meshes, asset.targets)
+    surfaces = attachment_assets.captured_inputs(engine, document, resources.meshes, asset, cancel)
     world = curve_sources.world(engine, document, item.id)
     if item.edit:
         return edited_fiber(engine, document, resources, item, world, cancel)

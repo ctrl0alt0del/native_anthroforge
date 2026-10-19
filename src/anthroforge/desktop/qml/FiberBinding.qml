@@ -8,19 +8,17 @@ ColumnLayout {
     required property var point
     readonly property var binding: (curve.bindings || []).find(b=>b.point===point.id) || null
     readonly property bool isFiber: curve.bindings !== undefined
-    readonly property var surfaces: { const revision=workspace.state.revision; return workspace.anatomicalSurfaces(); }
     readonly property bool mandatory: binding && (!curve.closed ? (point.id===curve.points[0].id || point.id===curve.points[curve.points.length-1].id) : curve.bindings.length===1)
     visible: isFiber; Layout.fillWidth: true; spacing: Theme.gap
     Label { text: "Anatomical binding"; color: Theme.muted }
-    UiCombo {
+    SurfaceSelector {
         id: target; objectName: "fiberBindingTarget"; Layout.fillWidth: true
-        model: panel.surfaces; textRole: "name"; valueRole: "id"
-        currentIndex: panel.binding ? panel.surfaces.findIndex(s=>s.id===panel.binding.target) : 0
-        hint: "Surface for this authored point"
+        target: panel.binding?.target || ""
+        role: panel.binding?.role || ""
     }
     RowLayout {
         Layout.fillWidth: true
-        UiButton { objectName: "setFiberBinding"; text: panel.binding ? "Rebind point" : "Bind point"; Layout.fillWidth: true; enabled: !!target.currentValue; onClicked: workspace.run("fiber.binding.set",{curve:panel.curve.id,point:panel.point.id,target:target.currentValue}) }
+        UiButton { objectName: "setFiberBinding"; text: panel.binding ? "Rebind point" : "Bind point"; Layout.fillWidth: true; enabled: !!target.current.ready; onClicked: workspace.run("fiber.binding.set",{curve:panel.curve.id,point:panel.point.id,target:target.current.id,role:target.current.role}) }
         UiButton { objectName: "removeFiberBinding"; text: "Remove"; visible: !!panel.binding; enabled: !panel.mandatory; hint: panel.mandatory ? "Keep both open endpoints or one closed anchor bound" : "Remove this point's binding"; onClicked: workspace.run("fiber.binding.remove",{curve:panel.curve.id,point:panel.point.id}) }
     }
     UiCombo {

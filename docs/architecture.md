@@ -11,8 +11,10 @@ surface into a geometry-only lease with the captured index layout. The shared at
 kernel then resolves its unchanged frame/offset record. Canonical polygons and tissue-side
 correspondence survive envelope compaction; cropped-away locations fail without nearest
 reassignment. This lease is never a display/picking surface. Captured resource IDs are
-serialized and included in document/history/job ownership. Fiber fields and region
-constraints must adopt the same service as their integration proceeds.
+serialized and included in document/history/job ownership. Fiber fields now use typed
+surface-role/material captures too. Multiple captures can reference the same provider:
+native field assembly retains unedited structural pins on their original capture while
+new influences capture current real geometry. Region constraints still need integration.
 
 The [0.2.0 specification](specification_020.md) and
 [implementation plan](implementation_020.md) define the current boundaries:

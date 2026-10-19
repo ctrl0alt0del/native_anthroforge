@@ -26,6 +26,13 @@ Incompatible topology changes require explicit replacement/removal of the field.
 `tissue.field.remove(target, name)` requires removing its constraint references first.
 Generated tissue transforms remain unavailable. Generic object deletion preserves sources.
 
+Fiber creation binding rows accept an explicit `role`: `SCP_GEOMETRY`, `TISSUE_BASE`,
+or `TISSUE_FINAL`. `fiber.binding.set(curve, point, target, scope?, role?)` uses the same
+provider policy. Omitted roles choose the provider's ordinary surface (SCP geometry or
+tissue final); an explicitly unavailable role is rejected. Captured material geometry
+is retained through deformation and untouched endpoints are not recaptured during edits.
+Desktop selectors show the role and availability. Tissue routing integration is still pending.
+
 ## Construction commands
 
 The desktop and headless clients share these operations, policies and transactions.

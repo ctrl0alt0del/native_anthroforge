@@ -117,7 +117,7 @@ def test_fiber_consumed_by_body_can_still_edit_without_false_dependency_cycle(se
     assert session.document.entity(body).result.asset
     edited_point(session, fiber, 1, [0, 0.4, 1.8])
     assert session.document.entity(body).result.status == "ready"
-    assert body not in session.document.object(fiber).supports
+    assert body not in {s.reference.target for s in session.document.object(fiber).supports}
 
 
 def test_retained_internal_supports_invalidate_after_capture_changes(session):
@@ -125,7 +125,8 @@ def test_retained_internal_supports_invalidate_after_capture_changes(session):
     other = second_surface(session, target)
     fiber = bind(session, target, source)
     changed = edited_point(session, fiber.id, 1, [3, 0.1, 0.7])
-    assert other in changed.supports and all(b.target == target for b in changed.bindings)
+    assert other in {s.reference.target for s in changed.supports}
+    assert all(b.target == target for b in changed.bindings)
     session.command("scp.transform", entity=other, values=[3, 0, 0.3, 0, 0, 0, 1, 1, 1])
     session.wait()
     assert session.document.object(fiber.id).result.revision > changed.result.revision

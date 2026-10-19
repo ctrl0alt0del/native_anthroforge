@@ -9,7 +9,9 @@ def targets(item: object) -> frozenset[str]:
     if isinstance(item, Anchor):
         return frozenset((item.binding.reference.target,))
     if isinstance(item, Fiber):
-        return frozenset((*item.supports, *(b.target for b in item.bindings)))
+        return frozenset(
+            (*(s.reference.target for s in item.supports), *(b.target for b in item.bindings))
+        )
     if isinstance(item, TissueVCP):
         return frozenset(c.reference.target for c in item.constraints if c.reference)
     return frozenset()

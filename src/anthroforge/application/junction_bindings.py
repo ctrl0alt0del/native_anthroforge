@@ -82,7 +82,7 @@ def resolve(document: Any, resources: Any, item: Fiber) -> Fiber:
     if changed.bindings == item.bindings and (item.edit is None or not followers):
         return item
     edit = item.edit or FiberEdit(item.result.asset, eligible(document, item.id), shape=False)
-    targets = set(edit.candidates) | {b.target for b in changed.bindings}
+    targets = set(edit.candidates) | {b.reference for b in changed.bindings}
     edit = replace(
         edit,
         candidates=tuple(sorted(targets)),

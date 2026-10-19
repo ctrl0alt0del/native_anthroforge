@@ -29,4 +29,4 @@ def shape_bindings(
 
 
 def binding_shape(item: Fiber) -> tuple[Any, ...]:
-    return tuple((b.point, b.target, b.attachment) for b in item.bindings)
+    return tuple((b.point, b.reference, b.attachment, b.material_asset) for b in item.bindings)

@@ -6,7 +6,7 @@ from typing import Any
 from anthroforge.core.fibers import Fiber, FiberBinding
 
 from .curve_edit_operations import selected
-from .fiber_operations import validate_targets
+from .fiber_operations import requested_surface, validate_targets
 from .object_operations import install
 
 
@@ -17,13 +17,16 @@ def require_fiber(session: Any, curve: str, point: str) -> Fiber:
     return item
 
 
-def assign(session: Any, curve: str, point: str, target: str, scope: str | None = None) -> None:
+def assign(
+    session: Any, curve: str, point: str, target: str, scope: str | None = None, role: str = ""
+) -> None:
     item = require_fiber(session, curve, point)
     bindings = {b.point: b for b in item.bindings}
     old = bindings.get(point)
     scope = scope if scope is not None else old.capture_scope if old else "CURRENT_PARENT"
-    validate_targets(session, ((point, target, scope),))
-    bindings[point] = FiberBinding(point, target, capture_scope=scope)
+    ref = requested_surface(session, dict(target=target, role=role))
+    validate_targets(session, ((point, ref, scope),))
+    bindings[point] = FiberBinding(point, target, capture_scope=scope, role=ref.role)
     ordered = tuple(bindings[p.id] for p in item.points if p.id in bindings)
     install(session, replace(item, bindings=ordered))
 

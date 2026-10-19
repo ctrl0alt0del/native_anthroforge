@@ -7,9 +7,9 @@ from uuid import uuid4
 
 from anthroforge.core.construction import Curve
 from anthroforge.core.fibers import Fiber
-from anthroforge.core.results import geometry_asset
+from anthroforge.core.surface_references import SurfaceReference
 
-from . import authored_jobs, curve_copy, fiber_tasks
+from . import authored_jobs, curve_copy, fiber_tasks, surface_providers
 from .object_operations import editable
 from .operations import require_name
 
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 class FiberCreation:
     source: str
     identities: dict[str, str]
-    bindings: tuple[tuple[str, str, str], ...]
+    bindings: tuple[tuple[str, SurfaceReference, str], ...]
     name: str
     attachment_asset: str
 
@@ -40,10 +40,7 @@ def create(
 def requested_bindings(
     session: "Session", item: Curve, values: list[dict[str, Any]]
 ) -> tuple[Any, ...]:
-    result = tuple(
-        (str(row["point"]), str(row["target"]), str(row.get("capture_scope", "CURRENT_PARENT")))
-        for row in values
-    )
+    result = tuple(requested_binding(session, row) for row in values)
     keys = [row[0] for row in result]
     if len(keys) != len(set(keys)) or set(keys) - {p.id for p in item.points}:
         raise ValueError("Bindings require distinct authored curve points.")
@@ -54,12 +51,27 @@ def requested_bindings(
     return result
 
 
+def requested_binding(session: "Session", row: dict[str, Any]) -> tuple[str, SurfaceReference, str]:
+    return (
+        str(row["point"]),
+        requested_surface(session, row),
+        str(row.get("capture_scope", "CURRENT_PARENT")),
+    )
+
+
 def validate_targets(session: "Session", result: tuple[Any, ...]) -> None:
     for _, target, scope in result:
-        if not geometry_asset(session.document.entity(target)):
-            raise ValueError("Fiber binding requires an accepted anatomical surface.")
+        surface_providers.get(session.engine, session.document, session.assets, target)
         if scope not in ("CURRENT_PARENT", "ANY_PARENT"):
             raise ValueError("Invalid endpoint capture scope.")
+
+
+def requested_surface(session: "Session", row: dict[str, Any]) -> SurfaceReference:
+    from anthroforge.core.anatomical_surfaces import reference
+
+    return reference(
+        str(row["target"]), session.document.registry.records, str(row.get("role", ""))
+    )
 
 
 def binding_scope(session: "Session", curve: str, point: str, scope: str) -> None:

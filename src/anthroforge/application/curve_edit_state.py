@@ -35,7 +35,7 @@ def prepare[T](session: Any, before: Any, changed: T) -> T:
 def prepare_fiber(session: Any, before: Fiber, changed: Fiber) -> Fiber:
     opening = current(session, before)
     edit = before.edit or baseline(session, before)
-    targets = set(edit.candidates) | {b.target for b in changed.bindings}
+    targets = set(edit.candidates) | {b.reference for b in changed.bindings}
     edit = replace(
         edit,
         candidates=tuple(sorted(targets)),

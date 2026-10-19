@@ -87,7 +87,11 @@ def tissue_meshes(objects: Iterable[Authored]) -> set[str]:
 
 
 def binding_meshes(objects: Iterable[Authored]) -> set[str]:
-    return {o.binding.material_asset for o in objects if isinstance(o, Anchor)}
+    rows = tuple(objects)
+    anchors = {o.binding.material_asset for o in rows if isinstance(o, Anchor)}
+    fields = {s.material_asset for o in rows if isinstance(o, Fiber) for s in o.supports}
+    pins = {b.material_asset for o in rows if isinstance(o, Fiber) for b in o.bindings}
+    return anchors | fields | pins
 
 
 def tissue_bases(objects: Iterable[Authored], kind: str) -> set[str]:

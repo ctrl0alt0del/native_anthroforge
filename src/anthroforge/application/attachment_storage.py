@@ -1,10 +1,12 @@
 """Attachment buffers have explicit archive ownership, independent of evaluated results."""
 
+from dataclasses import asdict
 from typing import Any
 
 from anthroforge.native import attachment_fields, paths
 
 from .attachment_assets import AttachmentAsset
+from .surface_reference_codec import capture
 
 BUFFERS = ("owners", "weights", "bindings", "records")
 
@@ -27,11 +29,11 @@ def read(archive: Any, key: str, metadata: Any, engine: Any) -> AttachmentAsset:
     parameters = read_array(archive, f"attachments/{key}/parameters.npy")
     path = paths.restore(engine, samples, parameters, metadata["closed"])
     field = attachment_fields.Field(values[0], values[1], values[2], values[3], path)
-    return AttachmentAsset(tuple(metadata["targets"]), field)
+    return AttachmentAsset(tuple(capture(row) for row in metadata["targets"]), field)
 
 
 def describe(assets: dict[str, AttachmentAsset]) -> dict[str, Any]:
     return {
-        key: dict(targets=asset.targets, closed=asset.field.path.closed)
+        key: dict(targets=[asdict(s) for s in asset.targets], closed=asset.field.path.closed)
         for key, asset in assets.items()
     }

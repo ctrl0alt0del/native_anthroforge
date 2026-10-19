@@ -27,6 +27,9 @@ AF_API uint64_t af_attached_path(uint64_t path,const double* points,const double
 AF_API int af_attached_controls(const double* records,int count,const double* points,
     const double* world,double* output);
 AF_API int af_attachment_compact(int count,const int* owners,int surfaces,int* output,int* used);
+/* Restore unedited structural pins against their own retained material surface snapshots. */
+AF_API int af_attachment_retain_pins(uint64_t path,int knots,const int* pins,const int* targets,
+    const double* records,int count,int* owners,double* weights,double* bindings);
 #ifdef __cplusplus
 }
 #endif

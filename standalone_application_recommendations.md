@@ -1,12 +1,13 @@
 # AnthroForge standalone application: consolidated recommendations
 
-Updated: 2026-10-18
+Updated: 2026-10-19
 
 The [confirmed 0.2.0 specification](docs/specification_020.md) is authoritative for
 curves, fibers, surfaces, reference images, object relationships and project-format
 compatibility. It replaces the earlier Free/Controlled classification with curve
 engines, requires independent curve-to-fiber copies, and includes all these features
-in 0.2.0. Muscles/soft tissues move to 0.2.1. Historical source terminology in the
+in 0.2.0. [0.2.1 targets curve-workflow improvements](docs/specification_021.md);
+VCPs, muscles and soft tissues move to 0.2.2. Historical source terminology in the
 evidence/coverage appendix is retained only to identify the original addon behavior.
 
 Status: general product specification confirmed by the user on 2026-10-16 after questions Q1–Q58, with the subsequent 0.1.2 primitive/deformer interview confirmed in Q32. Section 1 and its linked confirmed feature specifications are authoritative where source recommendations differ. Priorities and technology proposals are recommendations unless explicitly identified as agreed. This is not an implementation completion report or a claim of measured standalone performance.

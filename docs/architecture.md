@@ -9,7 +9,9 @@ Sections labelled with earlier release numbers describe their qualified baseline
 
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through
-the same core; muscles and soft tissues follow in 0.2.1.
+the same core; VCPs, muscles and soft tissues now follow in 0.2.2. The
+[initial 0.2.1 scope](specification_021.md) records proposed curve-workflow improvements;
+it does not describe implemented architecture changes.
 
 ## Issue reporting (0.1.6)
 

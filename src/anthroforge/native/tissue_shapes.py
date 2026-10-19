@@ -3,9 +3,11 @@
 import ctypes as c
 from typing import Any
 
+import numpy as np
+
 from anthroforge.core.tissue_settings import TissueInflation
 
-from .mesh import D, GeometryEngine, Mesh, U, doubles, pointer
+from .mesh import INT64, D, GeometryEngine, Mesh, U, doubles, pointer
 
 
 class Shape(c.Structure):
@@ -21,6 +23,21 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_tissue_normal_shell", [U, shape, D, c.c_int64, U], U)
     engine.bind("af_tissue_profile_sweep", [D, c.c_int, c.c_int, shape, U], U)
     engine.bind("af_tissue_radial", [D, shape, c.c_int, U], U)
+    engine.bind("af_tissue_field_edit", [D, c.c_int64, INT64, c.c_int64, c.c_double, D])
+
+
+def field_edit(engine: GeometryEngine, count: int, values: Any, indices: Any, weight: float) -> Any:
+    source, selected = doubles(values), np.ascontiguousarray(indices, dtype=np.int64)
+    if source.ndim != 1 or selected.ndim != 1 or len(source) not in (0, count):
+        raise ValueError("Field values and selection must match a flat material domain.")
+    output = np.empty(count, dtype=np.float64)
+    selection = selected.ctypes.data_as(INT64), len(selected), weight, pointer(output)
+    engine.check(
+        engine.library.af_tissue_field_edit(
+            pointer(source) if len(source) else None, count, *selection
+        )
+    )
+    return output
 
 
 def pack(settings: TissueInflation, reverse: bool) -> Shape:

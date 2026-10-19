@@ -66,7 +66,8 @@ def settings(item):
     row["parts"] = [asdict(part) for part in active(item)]
     for name in ("relaxation", "crop", "stack_settings", "stack_plan"):
         row[name] = asdict(getattr(item, name))
-    for name in ("fields", "constraints", "diagnostics", "stack_relationships"):
+    row["fields"] = [dict(name=f.name, domain=f.domain, count=len(f.values)) for f in item.fields]
+    for name in ("constraints", "diagnostics", "stack_relationships"):
         row[name] = [asdict(value) for value in getattr(item, name)]
     return row
 

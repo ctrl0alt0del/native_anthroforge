@@ -21,7 +21,8 @@ Node {
     }
     Repeater3D {
         model: [{kind:"points",color:Theme.curvePointColor}, {kind:"handles",color:Theme.handleColor},
-            {kind:"other",color:Theme.controlColor}]
+            {kind:"other",color:Theme.controlColor}, {kind:"fieldLow",color:"#418ddd"},
+            {kind:"fieldMid",color:"#f0c55c"}, {kind:"fieldHigh",color:"#ee6363"}]
         delegate: Node {
             required property var modelData
             Model {

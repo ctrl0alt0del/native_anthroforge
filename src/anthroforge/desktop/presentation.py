@@ -11,6 +11,8 @@ PARTS = {
     "control": "hooks",
     "vertex": "points",
     "base": "points",
+    "tissue_control": "points",
+    "field": "points",
 }
 
 

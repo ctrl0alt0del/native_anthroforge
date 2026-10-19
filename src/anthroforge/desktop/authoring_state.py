@@ -7,10 +7,13 @@ from anthroforge.application.curve_sources import for_editing
 from anthroforge.core.construction import Curve
 from anthroforge.core.entities import IDENTITY
 from anthroforge.core.objects import ConstructionObject
+from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import bodies, components, construction
 from anthroforge.native.scene import entity_frame
 
-from . import curve_context
+from . import curve_context, tissue_components
+
+READ_ONLY_PARTS = frozenset(("vertex", "base", "field"))
 
 
 def data(editor):
@@ -33,6 +36,8 @@ def data(editor):
 def projected_item(item, control):
     if item is None:
         return {}
+    if isinstance(item, TissueVCP):
+        return tissue_components.projected(item)
     result = {
         field.name: getattr(item, field.name)
         for field in fields(item)
@@ -156,6 +161,8 @@ def components_for(editor):
     if control:
         return control_components(session, control)
     entity = curve_context.owner(editor)
+    if isinstance(entity, TissueVCP) and editor.editing:
+        return tissue_components.records(editor, entity)
     if isinstance(entity, Curve) and editor.editing:
         return curve_components(session, entity, entity)
     return entity_components(session, entity, editor.category) if entity and editor.editing else []
@@ -203,7 +210,7 @@ def cache_key(editor):
         source_revisions(session, item),
         displayed_frame(session, item),
         editor.editing,
-        editor.category,
+        (editor.category, editor.tissue_context),
         session.workspace.hidden_categories,
         session.workspace.unpickable_categories,
     )
@@ -226,9 +233,8 @@ def source_revisions(session, item):
     )
 
 
-def imported_selection(editor):
+def read_only_selection(editor):
     chosen = set(editor.selection)
     return any(
-        ref["part"] in ("vertex", "base") and component_key(ref) in chosen
-        for ref, _, _ in editor.rows
+        ref["part"] in READ_ONLY_PARTS and component_key(ref) in chosen for ref, _, _ in editor.rows
     )

@@ -77,7 +77,14 @@ def branch(controller, window):
     settle(controller)
     part = controller.session.document.object(target).parts[1]
     assert part.id == identity and len(part.b.inflation.control) == 3
-    assert controller.session.document.object(target).both_sides
+    manipulate(controller, window, identity)
+
+
+def manipulate(controller, window, identity):
+    assert controller.session.document.object(controller.selection).both_sides
+    click(window, "tissueControlManipulate")
+    assert controller.authoring.selectedComponent["side"] == "b"
+    assert controller.authoring.selectedComponent["piece"] == identity
 
 
 if __name__ == "__main__":

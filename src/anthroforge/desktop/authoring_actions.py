@@ -129,10 +129,8 @@ def start_transform(editor, mode):
 
 def capture_transform(editor):
     editor.drag_rows = transform_rows(editor)
-    if any(ref["part"] in ("vertex", "base") for ref, _, _ in editor.drag_rows):
-        raise ValueError(
-            "Imported vertices are selectable for Hook membership, not direct editing."
-        )
+    if any(ref["part"] in authoring_state.READ_ONLY_PARTS for ref, _, _ in editor.drag_rows):
+        raise ValueError("These vertices support membership or weights, not coordinate editing.")
     editor.drag_center = editor.transformData.get("trs", [0, 0, 0])[:3]
     editor.drag_control = selected_control_frame(editor)
 
@@ -206,6 +204,8 @@ def drag_control(editor, delta):
 
 
 def point_target(reference):
+    if reference["part"] == "tissue_control":
+        return Target(reference["owner"], "GEOMETRY")
     stage = "LATTICE" if reference["part"] == "lattice" else "CURVE"
     return Target(reference["owner"], stage, reference.get("curve", ""))
 
@@ -227,7 +227,7 @@ def local_positions(editor, points):
 
 
 def target_frame(session, target):
-    if target.owner in session.document.registry.construction:
+    if target.owner in session.document.registry.authored:
         from anthroforge.application.curve_sources import world
 
         return world(session.engine, session.document, target.owner)
@@ -238,8 +238,8 @@ def apply_points(editor, points):
     session, grouped = editor.controller.session, {}
     local = local_positions(editor, points)
     for (reference, _, _), value in zip(editor.drag_rows, local, strict=True):
-        if reference["part"] == "lattice":
-            update_lattice_point(session, reference, value)
+        if reference["part"] in DIRECT_POINTS:
+            DIRECT_POINTS[reference["part"]](session, reference, value)
         else:
             key = (reference["owner"], reference["curve"], reference["point"])
             grouped.setdefault(key, {})[reference["part"]] = value
@@ -258,3 +258,16 @@ def update_lattice_point(session, reference, value):
     session.command(
         "lattice.point", control=reference["owner"], index=reference["index"], position=value
     )
+
+
+def update_tissue_control(session, reference, value):
+    session.command(
+        "tissue.inflation",
+        target=reference["owner"],
+        part=reference["piece"],
+        side=reference["side"],
+        changes=dict(control=value),
+    )
+
+
+DIRECT_POINTS = {"lattice": update_lattice_point, "tissue_control": update_tissue_control}

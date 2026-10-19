@@ -1,5 +1,21 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "tissue_shapes.hpp"
+#include <algorithm>
+#include <cmath>
+
+int af_tissue_field_edit(const double* source,int64_t count,const int64_t* indices,int64_t selected,double weight,double* output) {
+    try {
+        if(count<1||selected<0||!output||!std::isfinite(weight)||weight<0||weight>1||(selected&&!indices))
+            throw std::runtime_error("Invalid tissue field assignment.");
+        if(source) std::copy(source,source+count,output);
+        else std::fill(output,output+count,weight);
+        for(int64_t i=0;i<selected;++i) {
+            if(indices[i]<0||indices[i]>=count) throw std::runtime_error("Field selection is outside its material domain.");
+            output[indices[i]]=weight;
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}
 
 static void valid(const AfTissueShape* settings,uint64_t cancel) {
     af::check_cancel(cancel);

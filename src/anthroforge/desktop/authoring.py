@@ -18,16 +18,21 @@ class Authoring(QObject):
     def __init__(self, controller):
         super().__init__(controller)
         self.controller = controller
+        self.initialize_components()
+        from .curve_interaction import CurveInteraction
+
+        self.interaction = CurveInteraction(self)
+        self._state = PropertyProjection(self)
+
+    def initialize_components(self):
         self.editing, self.selection, self.rows = False, [], []
         self._cache_key, self._points = None, np.empty((0, 3))
         self.drag_rows = []
         self._lines, self.hover_index = [], -1
         self._curve_lines, self.hover_curve = {}, ""
         self.category = "CURVE"
-        from .curve_interaction import CurveInteraction
-
-        self.interaction = CurveInteraction(self)
-        self._state, self._point_rows, self._component_rows = PropertyProjection(self), [], []
+        self.tissue_context = ("main", "a")
+        self._point_rows, self._component_rows = [], []
         self._component_lookup = {}
         self._layers, self._highlights = {}, {}
 
@@ -111,7 +116,7 @@ class Authoring(QObject):
         if not selected:
             return self.controller.selectedData.as_dict() if self.state.get("is_control") else {}
         center = state.selection_center(self, selected)
-        readonly = self.controller.selectedData.get("readonly", False) or state.imported_selection(
+        readonly = self.controller.selectedData.get("readonly", False) or state.read_only_selection(
             self
         )
         return dict(
@@ -157,6 +162,29 @@ class Authoring(QObject):
     def setCategory(self, category):
         self.category, self.selection = category, []
         self.refresh()
+
+    @Slot(str, str)
+    def editTissueControl(self, part, side):
+        from .tissue_components import edit
+
+        edit(self, part, side)
+
+    @Slot(str)
+    def editTissueField(self, name):
+        from .tissue_field_editor import edit
+
+        edit(self, name)
+
+    @Slot(float)
+    def assignTissueWeight(self, value):
+        from .tissue_field_editor import assign
+
+        assign(self, value)
+
+    @Slot(bool)
+    def selectAllComponents(self, selected):
+        self.selection = [row["key"] for row in self.componentRows] if selected else []
+        self.notify()
 
     @Slot(str, bool)
     def members(self, binding, assign):

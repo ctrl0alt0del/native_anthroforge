@@ -30,6 +30,16 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Tissue inflation controls now use existing native component picking and transform gestures;
+side/part selection, cancellation and one-action undo preserve generated geometry's read-only
+policy. Base/Rest fields have searchable creation/removal, native batched weight assignment,
+topology-qualified selection and zero/partial/full viewport colors. Large weight arrays no
+longer enter general inspector projections. Nine focused checks pass, including stale indices,
+invalid weights, persistence and read-only vertex transforms. Full-QML field and branch-control
+entry points pass; hidden GPU captures were inspected. These are background/offscreen checks,
+not interactive desktop acceptance. Native build/CTest and Ruff/mypy pass. Remaining: support
+region drafts/footprints, Pouch quality, cache/performance and complete release qualification.
+
 Inflation preview is implemented through the existing read-only candidate/coordinator
 contract: desktop/headless start/status/accept/cancel, dispatch capture, stale rejection,
 separate native mesh ownership, save isolation and one-action acceptance/undo. GUI parameters
@@ -39,7 +49,7 @@ Full-QML controls pass and their readable capture was inspected. Hidden GPU rend
 a separate green candidate; accepted picking remains unchanged and cancel removes staging.
 The GPU harness first needed to stage the baseline before comparing picks; no production
 picking change was required. Ten focused tests plus Ruff/mypy/function-length checks pass.
-Full regression/gate, field/region viewport editing, inflation control gizmos, Pouch visual
+Full regression/gate, support-region viewport editing, Pouch visual
 qualification, cache/performance and portable release remain pending. Do not merge/release.
 
 Two-sided stacking now uses atomic final groups when whole-tissue order forms a strongly

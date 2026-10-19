@@ -41,7 +41,7 @@ ColumnLayout {
         UiCombo { objectName: "tissueInflationMode"; Layout.fillWidth: true; model: panel.selected.tissue_modes || []; currentIndex: model.indexOf(panel.inflation.mode); onActivated: panel.inflate("mode",currentText) }
         NumericSetting { objectName: "tissueInflationAmount"; label: "Amount"; length: true; value: panel.inflation.amount || 0; onEdited: value => panel.inflate("amount",value) }
         TissueProfile { visible: panel.inflation.mode === "SECTION_PROFILE"; profile: panel.inflation.profile || ({}); onEdited: value=>panel.inflate("profile",value); onResetRequested: inflationDraft.reset("PROFILE") }
-        TissueControl { visible: panel.inflation.mode === "CTRL_POINT"; inflation: panel.inflation; onEdited: (key,value)=>panel.inflate(key,value); onResetRequested: inflationDraft.reset("CONTROL") }
+        TissueControl { visible: panel.inflation.mode === "CTRL_POINT"; inflation: panel.inflation; canManipulate: !inflationDraft.editing; onEdited: (key,value)=>panel.inflate(key,value); onResetRequested: inflationDraft.reset("CONTROL"); onEditRequested: authoring.editTissueControl(panel.part.id,panel.side) }
         NumericSetting { visible: panel.muscleMode; label: "Boundary band · samples"; value: panel.inflation.boundary_band || 0; onEdited: value => panel.inflate("boundary_band",value) }
         NumericSetting { visible: panel.muscleMode; label: "Boundary attenuation"; value: panel.inflation.boundary_strength || 0; onEdited: value => panel.inflate("boundary_strength",value) }
         NumericSetting { visible: panel.muscleMode; label: "Longitudinal taper"; value: panel.inflation.length_taper || 0; onEdited: value => panel.inflate("length_taper",value) }
@@ -66,6 +66,7 @@ ColumnLayout {
     TissueCrop { visible: panel.muscleMode; settings: panel.item.crop || ({}); onEdited: (key,value)=>{const changes={}; changes[key]=value; workspace.run("tissue.crop",{target:panel.selected.id,changes:changes});} }
     TissueRelaxation { item: panel.item; supported: !panel.muscleMode }
     TissueRegions { item: panel.item; masks: panel.selected.tissue_masks || [] }
+    TissueFields { item: panel.item }
     TissueStacking { item: panel.item; visible: panel.selected.tissue_domain === "SURFACE" }
     UiSection {
         title: "Evaluation"

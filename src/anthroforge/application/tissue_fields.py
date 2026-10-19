@@ -16,6 +16,8 @@ def mesh_domain(mesh: Any) -> tuple[int, str]:
 
 
 def domain(resources: Any, item: Any, name: str) -> tuple[int, str]:
+    if name not in ("BASE", "REST"):
+        raise ValueError("Field domain must be Base or Rest.")
     if name == "REST":
         return mesh_domain(resources.meshes[item.rest_result.asset].mesh)
     if item.base_state.kind == "SURFACE":
@@ -24,6 +26,20 @@ def domain(resources: Any, item: Any, name: str) -> tuple[int, str]:
         return 1, "point:1"
     path = resources.paths[item.base_result.asset].path
     return item.resolution, f"path:{item.resolution}:{int(path.closed)}"
+
+
+def positions(session: Any, item: Any, name: str) -> Any:
+    from anthroforge.native import components, paths
+
+    domain(session.resources, item, name)
+    if name == "REST":
+        return session.assets[item.rest_result.asset].mesh.array(0)
+    if item.base_state.kind == "SURFACE":
+        return session.assets[item.base_result.asset].mesh.array(0)
+    if item.base_state.kind == "POINT":
+        return components.transformed(session.engine, [(0, 0, 0)], item.base_state.frame)
+    path = session.resources.paths[item.base_result.asset].path
+    return paths.sample(path, item.resolution, 0, 1, item.base_state.frame)[:, :3]
 
 
 def validate(resources: Any, item: Any, name: str) -> None:

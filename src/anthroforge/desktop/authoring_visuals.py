@@ -5,11 +5,17 @@ from . import presentation
 
 def category(reference):
     part = reference["part"]
+    if part == "field":
+        weight = reference["weight"]
+        return "fieldLow" if weight <= 0 else "fieldHigh" if weight >= 1 else "fieldMid"
     return "points" if part == "position" else "handles" if part in ("left", "right") else "other"
 
 
+LAYERS = ("points", "handles", "other", "fieldLow", "fieldMid", "fieldHigh")
+
+
 def layers(editor):
-    result = {name: [] for name in ("points", "handles", "other")}
+    result = {name: [] for name in LAYERS}
     for ref, world, _ in editor.rows:
         if presentation.component(editor, ref):
             result[category(ref)].append(world)
@@ -31,7 +37,7 @@ def link_category(editor):
 def highlights(editor):
     from .authoring_state import component_key
 
-    result = {name: [] for name in ("points", "handles", "other")}
+    result = {name: [] for name in LAYERS}
     for index, (ref, world, _) in enumerate(editor.rows):
         active = component_key(ref) in editor.selection or index == editor.hover_index
         if active and presentation.component(editor, ref):

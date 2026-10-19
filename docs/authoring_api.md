@@ -1,5 +1,9 @@
 # Local authoring API, 0.2.1
 
+The [0.2.2 tissue contract](specification_022.md) is being implemented through this same
+catalogue. Planned operation families and boundaries are in the
+[implementation plan](implementation_022.md); this notice does not advertise unimplemented APIs.
+
 ## Construction commands
 
 The desktop and headless clients share these operations, policies and transactions.

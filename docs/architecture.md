@@ -1,5 +1,10 @@
 # AnthroForge architecture
 
+The [0.2.2 specification](specification_022.md) and [implementation plan](implementation_022.md)
+define the confirmed unified TissueVCP, Point/Anchor and Surface/Membrane extension,
+shared surface providers and schema 4. This work is in progress; the release descriptions
+below remain the qualified 0.2.1 baseline until the new task is completed.
+
 The [0.2.0 specification](specification_020.md) and
 [implementation plan](implementation_020.md) define the current boundaries:
 first-class construction objects, referenced curves, Fiber as Curve subclass,

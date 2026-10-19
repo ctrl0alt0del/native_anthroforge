@@ -36,11 +36,15 @@ Numerical ports must include remaining Python mesh/field preparation, not just
 the already-native solvers. Existing addon kernels, PIQP 0.6.4 and qualification
 fixtures are migration references; Blender is not a runtime dependency.
 
-No runtime changes yet. Unrelated untracked root `__init__.py` is preserved.
+Specification, migration inventory, implementation plan and active documentation
+links are written. No runtime changes yet. Unrelated untracked root `__init__.py`
+is preserved.
 
 ## Verification
 
-No new tests run yet. Baseline main matched origin/main before branching.
+Baseline `uv run --no-sync pytest -q`: **941 passed**, 307 existing Qt deprecation
+warnings, 31.89 seconds on Windows. `git diff --check` passed for documentation.
+Baseline main matched origin/main before branching.
 Required: development gate, geometry parity, lifecycle, headless, offscreen UI,
 profiler and portable acceptance, followed by ownership/coupling review.
 

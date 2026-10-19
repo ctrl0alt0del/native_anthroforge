@@ -1,5 +1,9 @@
 # AnthroForge 0.2.1
 
+Development of [0.2.2 unified tissues](docs/specification_022.md) is in progress;
+see the [implementation plan](docs/implementation_022.md) and [roadmap](docs/roadmap.md).
+The version heading identifies the qualified baseline, not completion of that work.
+
 Standalone curves, reference images, fibers and curve-based surfaces follow the
 [confirmed specification](docs/specification_020.md) and
 [implementation plan](docs/implementation_020.md). See the

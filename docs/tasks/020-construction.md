@@ -3,7 +3,7 @@
 - Task branch: `codex/020-construction`
 - Integration branch: `main`
 - Starting revision: `b539697`
-- Status: implementation and source qualification complete; final corrected package pending
+- Status: implementation and required background qualification complete; ready for integration
 - Last updated: 2026-10-19, Europe/Bucharest
 - Recovery update: 2026-10-19. Earlier checkpoint sections below are historical;
   the latest checkpoints supersede their incomplete-feature statements.
@@ -51,9 +51,11 @@ current-shape editing, explicit junctions and generic loft/patch/branch surfaces
 with desktop controls and the shared API. Routing includes native warm-span remapping and
 actual skull donor parity. Authored-engine collision checks use the read-only Issues service.
 Direct control.attach is retired; shared controls use ordinary transform relationships.
-Source and offscreen qualification and relocated portable checks have passed. Final visual
-inspection caught a hardcoded 0.1.9 title-bar label; it now reads Qt application metadata.
-The corrected desktop entry point must be rebuilt and checked before release integration.
+Source, native parity, offscreen and relocated portable qualification have passed. Final
+visual inspection caught a hardcoded 0.1.9 title-bar label; it now reads Qt application
+metadata. The corrected b8e57fc executable passed the complete relocated checker, and its
+UI and rendered captures were inspected. The full gate passes 871 tests and 3 native CTests.
+Release artifacts are under dist/0.2.0 with a matching versioned source archive.
 The implementation extends the existing coordinator, attachment kernels, Issues, profiler,
 transactions and staged renderer at their owning boundaries.
 
@@ -82,10 +84,10 @@ Use background/offscreen checks and state their limits.
 
 ## Next actions and blockers
 
-1. Finish rebuilding the b8e57fc executable and run the relocated portable checker.
-2. Refresh packaged documentation, wheel/sdist and the versioned source archive.
-3. Mark validation complete, then merge and push the qualified task branch into main.
-   No interactive acceptance may be claimed while validation is background-only.
+Commit/push the final release record, merge this qualified branch into main, and push main.
+Git ancestry establishes completed integration. No implementation or required background
+validation remains. No interactive desktop acceptance is claimed. Preserve the unrelated
+root `__init__.py` and prior release folders.
 
 Important findings: ordinary parenting and consumer frames need an atomic rebind to avoid
 double transforms after a new shared ancestor is introduced. Local path/local-pose ports
@@ -981,3 +983,19 @@ and script style, types, function limits, numerical imports and doctor. Log:
 `build/check-020-release.log`. Packaging uses its clean staged snapshot; final active docs
 are being refreshed separately. All seven active documentation files have valid local links.
 `origin/main` was refreshed and still equals the starting b539697 baseline.
+
+### Final release qualification
+
+The clean b8e57fc runtime was compiled, relocated to `%TEMP%/anthroforge-020-b8e57fc`,
+and passed all portable checks with minimal PATH, offscreen QML and invisible D3D11
+rendering. Packaged native libraries resolve inside that copy. Final UI inspection shows
+0.2.0 in the header; the corresponding construction loft/image capture is correct.
+Logs: `build/package-020-release.log`, `build/portable-020-release.log`. Executable SHA-256:
+`48b6aec55ebdbb8351d3179e4d0ca6a17d6caa326d5722487d2dead8c8261c2f`.
+
+The active specification, implementation plan, architecture, API and walkthrough now agree.
+`docs/development_status.md` consolidates release evidence, intentional parity differences,
+profiling limits and the separate direct ownership review. Historical checkpoints above
+remain revision-scoped. Final docs do not change runtime source. Distribution, notices,
+examples, wheel/sdist and source archive are refreshed. No visible window, desktop input,
+interactive acceptance or physical-latency claim was introduced during qualification.

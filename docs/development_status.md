@@ -94,7 +94,11 @@ renderable after deleting its external source; JPEG EXIF orientation preserves p
 width and adjusts height correctly. The first run rejected an obsolete QA fixture that
 put a control into anatomical workspace membership; correcting that fixture retained the
 production policy. Final visual inspection found and fixed a hardcoded old header version.
-The corrected b8e57fc executable is undergoing final packaging qualification.
+The corrected **b8e57fc** executable then passed the entire checker again in a fresh
+relocated folder. Its complete QML capture shows 0.2.0, and the corresponding invisible
+loft/image capture was inspected. Final evidence is `build/portable-020-release.log` and
+`%TEMP%/anthroforge-020-b8e57fc/work/portable-check.json`. The packaged native DLL is
+resolved inside that relocated application; no developer native library is used.
 
 The packaged solver also recalculated all four skull fibers at 80 samples, updated their
 loft, saved and reopened it. Its complete Qt-free report records four fresh native route
@@ -103,9 +107,12 @@ load is not a latency guarantee. Evidence: `build/020-packaged-skull.json` and
 `build/portable-020-final.log`; temporary portable inputs/captures are under
 `%TEMP%/anthroforge-020-c999896`. The later header correction does not change those kernels.
 
-Distribution target: `dist/0.2.0/AnthroForge.dist/AnthroForge.exe`; keep the whole folder
-together. Corresponding source: `dist/AnthroForge-0.2.0-source.zip`. Prior release folders
-are preserved. Final documentation may be newer than the compiled source revision.
+Qualified distribution: `dist/0.2.0/AnthroForge.dist/AnthroForge.exe`, SHA-256
+`48b6aec55ebdbb8351d3179e4d0ca6a17d6caa326d5722487d2dead8c8261c2f`.
+Keep the whole folder together. Corresponding source is
+`dist/AnthroForge-0.2.0-source.zip`. The wheel/sdist and archive resource checks pass.
+Prior release folders are preserved. Final documentation is newer than the compiled
+source revision; runtime source has not changed since b8e57fc.
 
 ## UI polish 0.1.9
 

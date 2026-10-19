@@ -410,6 +410,8 @@ they do not certify anatomical accuracy or reconstruct muscles.
 - `surface.create(curves, kind="LOFT", name="Surface", parent="", owner="", **settings)`
   consumes an ordered list of generic curves/fibers and returns an asynchronous job ID.
   `PATCH` requires exactly one closed source; loft sources must agree on closure.
+  The desktop Patch / Surface icon chooses PATCH for one selected curve and LOFT for
+  two or more, using these same operations and validation. Closed lofts retain preview.
 - `surface.update(target, **settings)` edits `exact`, `strips`, `patch_resolution`,
   `close_across`, `flip` or `name`. Exact sampling retains evaluated corners. `strips=0`
   retains density fitted at creation/Realign; a positive count selects fixed subdivisions.

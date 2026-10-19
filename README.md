@@ -9,7 +9,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1-fiber-edits/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1-surfaces-reports/AnthroForge.dist`.
 Earlier distributions remain in their versioned directories.
 The default packaging location remains `dist/AnthroForge.dist`.
 Start with [the walkthrough](docs/quickstart.md) and the included
@@ -28,6 +28,8 @@ Curve creation and cursor/patch tools sit below the transform gizmos. Place Poin
 on plain left-click from the second point; Shift-click continues. New routed curves use
 automatic obstacles. Exclusions and conversion-point subsets use bounded searchable lists;
 all authored points are retained by default. Numerical budgets live under Advanced.
+The Patch / Surface icon creates a patch from one closed curve, or a standalone loft
+from two or more selected curves/fibers. Ctrl-click in Construction to select sources.
 
 0.1.9 refined the editor with consistent dark menus, aligned controls and expandable
 inspection details. See [UI polish](docs/ui_polish.md).
@@ -50,6 +52,8 @@ the window and opens a screenshot editor with red rectangles, arrows and text. A
 description and submit to the version-independent local `AnthroForge/Reports` inbox.
 The [report format and replaceable destination](docs/feedback_reports.md) are independent
 of project files. No network submission is enabled.
+Use **Help → View reports…** to preview existing reports, edit their description text,
+or delete a report after confirmation.
 
 Runtime performance recording: press **Shift+F12**, reproduce a slowdown, then
 press Shift+F12 again and share the `.afprofile.zip` under your local AnthroForge `Profiles`

@@ -33,7 +33,7 @@ CHECKS = (
     "workflow inspection, units, workspace policies and image/JSON report",
     "surface rulers, named cameras and explanatory profile diagnostics",
     "independent fibers, shared lofts and portable embedded reference images",
-    "window feedback capture, annotations and version-independent local reports",
+    "window feedback capture, annotations, inbox preview, text editing and deletion",
 )
 
 

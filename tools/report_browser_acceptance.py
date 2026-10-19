@@ -11,8 +11,7 @@ from dataclasses import replace
 from pathlib import Path
 from uuid import uuid4
 
-from feedback_acceptance import wait_for
-from PySide6.QtCore import QMetaObject, QPointF, Qt
+from PySide6.QtCore import QEventLoop, QMetaObject, QPointF, Qt, QTimer
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from shiboken6 import delete
@@ -27,6 +26,18 @@ from anthroforge.feedback.records import Annotation, Report
 from anthroforge.feedback.storage import LocalReportConsumer
 
 OUTPUT = Path(sys.argv[1] if len(sys.argv) > 1 else "build/report-browser").resolve()
+
+
+def wait_for(predicate):
+    loop, check, deadline = QEventLoop(), QTimer(), QTimer()
+    check.timeout.connect(lambda: loop.quit() if predicate() else None)
+    deadline.timeout.connect(loop.quit)
+    check.start(20)
+    deadline.start(10000)
+    loop.exec()  # Like the application, release the GIL while background archive I/O runs.
+    check.stop()
+    deadline.stop()
+    assert predicate(), "Timed out waiting for report browser"
 
 
 def seed(window):
@@ -108,6 +119,9 @@ class LockedInbox:
     def delete(self, key):
         raise PermissionError("Test: report is locked")
 
+    def update_description(self, key, description):
+        raise PermissionError("Test: report is locked")
+
 
 def failure_and_refresh(window, browser):
     inbox, key = browser.inbox, browser.key
@@ -143,10 +157,38 @@ def exercise(window, controller):
     browser.inbox = seed(window)
     open_browser(window, browser)
     scroll_and_preview(window, browser)
+    edit_description(window, browser)
     delete_report(window, browser)
     failure_and_refresh(window, browser)
     empty_and_close(window, browser)
     assert controller.session.document is before and controller.session.history.cursor == cursor
+
+
+def edit_description(window, browser):
+    previous, key, image = browser.description, browser.key, browser.image
+    click(window, "reportEditText")
+    find(window, "reportDescription").setProperty("text", "Discard this draft")
+    click(window, "reportEditCancel")
+    assert browser.inbox.read(key).description == previous
+    click(window, "reportEditText")
+    find(window, "reportDescription").setProperty("text", "Updated recommendation · Україна")
+    edit_failure(window, browser)
+    click(window, "reportEditSave")
+    wait_for(lambda: not browser.state["busy"])
+    assert browser.description == "Updated recommendation · Україна"
+    assert browser.inbox.read(key).description == browser.description and browser.image == image
+    assert not find(window, "reportBrowserDialog").property("editingDescription")
+
+
+def edit_failure(window, browser):
+    inbox = browser.inbox
+    browser.inbox = LockedInbox(inbox)
+    click(window, "reportEditSave")
+    wait_for(lambda: not browser.state["busy"])
+    assert "locked" in browser.state["error"]
+    assert find(window, "reportBrowserDialog").property("editingDescription")
+    assert find(window, "reportDescription").property("text") == "Updated recommendation · Україна"
+    browser.inbox = inbox
 
 
 def run():

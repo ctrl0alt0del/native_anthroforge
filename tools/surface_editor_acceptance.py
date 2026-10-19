@@ -8,7 +8,7 @@ from PySide6.QtCore import QMetaObject, Qt
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from shiboken6 import delete
-from ui_acceptance import find
+from ui_acceptance import click, find
 
 from anthroforge.core.surfaces import Surface
 from anthroforge.desktop.app import create_engine
@@ -43,7 +43,7 @@ def action(engine, name, signal):
 
 def create(controller, engine):
     keys = sources(controller)
-    action(engine, "createPatchSurface", "clicked")
+    click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
     surface = next(o for o in controller.session.document.objects if isinstance(o, Surface))
     assert controller.selection == surface.id and not controller.authoring.editing
@@ -125,7 +125,7 @@ def closed_preview(controller, engine):
     controller.select(curves[0])
     controller.select(curves[1], True)
     before = len(controller.session.document.objects)
-    action(engine, "createPatchSurface", "clicked")
+    click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
     assert len(controller.session.document.objects) == before
     assert controller.surfacePreview["state"] == "ready", controller.surfacePreview
@@ -142,7 +142,7 @@ def additional_sources(controller, engine):
     settle(controller)
     controller.select(third, True)
     assert "3 selected" in controller.surfaceAction["hint"]
-    action(engine, "createPatchSurface", "clicked")
+    click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
     surface = controller.session.document.object(controller.selection)
     assert [use.curve for use in surface.curves] == [*keys, third]

@@ -15,6 +15,7 @@ from .report_image import load_preview
 
 class ReportBrowser(QObject):
     changed = Signal()
+    descriptionSaved = Signal()
 
     def __init__(self, parent, inbox: ReportInbox):
         super().__init__(parent)
@@ -74,6 +75,11 @@ class ReportBrowser(QObject):
         if key and key == self.key:
             self.start("delete", partial(self.inbox.delete, key))
 
+    @Slot(str)
+    def saveDescription(self, text):
+        if self.key and self.description:
+            self.start("edit", partial(self.inbox.update_description, self.key, text))
+
     def poll(self):
         if self.future is None or not self.future.done():
             return
@@ -92,9 +98,16 @@ class ReportBrowser(QObject):
         elif self.action == "read":
             detail, self._image = result
             self.description, self.location = detail.description, detail.location
-        elif self.action == "delete":
+        else:
+            self.accept_mutation()
+
+    def accept_mutation(self):
+        if self.action == "delete":
             self.model.remove_missing({row["key"] for row in self.model.rows} - {self.key})
             self.select_available()
+        elif self.action == "edit":
+            self.descriptionSaved.emit()
+            self.refresh()
 
     def select_available(self):
         keys = [row["key"] for row in self.model.rows]

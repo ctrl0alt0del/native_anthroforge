@@ -14,10 +14,14 @@ Place five distinct icon buttons below Move, Rotate and Scale in the viewport to
 Add Curve at Cursor, Place Points, Draw Curve, Cursor, and Patch. Provide tooltips and
 visible active-tool state, reuse Ui controls/Theme, and keep relevant tool settings
 accessible. These actions must invoke shared operations and the existing tool lifecycle.
-Patch uses the selected compatible closed curve and existing shared validation.
+The Patch / Surface icon uses selection and existing shared validation: one compatible
+closed curve creates a patch; two or more curves/fibers create a standalone loft surface.
+Closed lofts preserve correspondence preview/acceptance; accepted creation selects the
+surface. Open/closed mixtures are rejected without an authored edit.
 
 Remove the separate **Loft selected curves** menu entry. Selected curves can already
-feed Create Primitive. This removes the redundant user-facing entry; it does not authorize
+feed Create Primitive. The later confirmed follow-up exposes standalone lofts through the
+Patch / Surface icon, without restoring a separate menu entry. It does not authorize
 deleting the generic Surface model or surface construction used by patches and fibers.
 The existing entry creates a standalone construction Surface, while Create Primitive
 creates an SCP. Preserve that distinction in the core even when simplifying entry points.

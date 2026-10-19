@@ -13,7 +13,7 @@ Extend the Patch toolbar action: one closed curve creates a patch; two or more
 selected curves/fibers create a standalone loft surface. Preserve source validation,
 closed-loop correspondence preview and accepted asynchronous creation selection.
 Add Help access to existing feedback reports, description/screenshot preview and
-explicit deletion. Keep the local inbox independent of app versions and replaceable.
+explicit deletion and atomic description editing (user follow-up). Keep the local inbox independent of app versions and replaceable.
 
 ## Decisions and relevant files
 
@@ -38,7 +38,7 @@ input; offscreen checks do not establish interactive acceptance on the user's GP
 ## Next actions and blockers
 
 1. Implement shared surface selection entry and separate feedback inbox/browser.
-2. Exercise creation, preview, report loading, deletion and failure paths.
+2. Finish text edit/cancel/failure/retry, normal/narrow/high-DPI and packaged checks.
 3. Checkpoint, run gate/package checks, update docs, merge and push normally.
 
 ## Recovery inputs

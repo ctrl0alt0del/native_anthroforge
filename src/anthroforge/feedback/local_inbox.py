@@ -44,6 +44,11 @@ class LocalReportInbox:
     def delete(self, key: str) -> None:
         self.path(key).unlink(missing_ok=True)
 
+    def update_description(self, key: str, description: str) -> None:
+        from .report_editing import update_description
+
+        update_description(self.path(key), description)
+
 
 def bounded_read(archive: ZipFile, name: str, limit: int) -> bytes:
     if archive.getinfo(name).file_size > limit:

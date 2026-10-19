@@ -36,7 +36,7 @@ ApplicationWindow {
         else saveDialog.open();
     }
     onClosing: function(close) {
-        if (feedback.state.busy) { close.accepted=false; return; }
+        if (feedback.state.busy || reportBrowser.state.busy || reportsDialog.editingDescription) { close.accepted=false; return; }
         if (workspace.state.dirty && !closingConfirmed) { close.accepted = false; closeDialog.open(); }
     }
     Action { id: newAction; text: "New project"; enabled: !window.modalOpen; onTriggered: { viewport.forceActiveFocus(); workspace.newDocument(); } }
@@ -76,7 +76,7 @@ ApplicationWindow {
                     UiMenu {
                         title: "Help"; objectName: "helpMenu"
                         UiMenuItem { objectName: "reportFeedbackMenu"; text: "Report a bug / recommendation…"; shortcutHint: keyboard.shortcut("reportFeedback"); enabled: !window.modalOpen && !feedback.state.active; onTriggered: feedback.request(window) }
-                        UiMenuItem { objectName: "viewReportsMenu"; text: "View reports�"; enabled: !window.modalOpen; onTriggered: reportsDialog.open() }
+                        UiMenuItem { objectName: "viewReportsMenu"; text: "View reports…"; enabled: !window.modalOpen; onTriggered: reportsDialog.open() }
                         UiMenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() }
                     }
                 }

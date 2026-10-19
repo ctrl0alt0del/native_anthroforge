@@ -525,6 +525,14 @@ submission and explicit failure/retry; it does not enter document scheduling or 
 Desktop capture precedes the modal. One QPainter adapter draws source-pixel annotations
 for both the fitted/zoomed preview and worker-side PNG export.
 
+The separately injected `feedback.inbox.ReportInbox` capability owns listing, reading,
+description edits and deletion; submit-only destinations retain their narrow consumer
+contract. The local adapter uses bounded archive reads and atomic description replacement.
+`desktop.report_browser` runs on-demand I/O/preview decoding on its own worker and exposes
+a keyed model plus a single owned image. It has no idle work and never enters document
+history. Failed edits retain the UI draft; deletion requires explicit confirmation.
+Both desktop adapters use the same version-independent inbox in the composition root.
+
 ## Fiber interaction capabilities
 
 `application.transform_policy` owns direct object-transform eligibility. The object

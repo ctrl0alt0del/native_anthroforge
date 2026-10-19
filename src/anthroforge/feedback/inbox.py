@@ -33,3 +33,7 @@ class ReportInbox(Protocol):
     def delete(self, key: str) -> None:
         """Delete exactly the selected report; a missing report is already deleted."""
         ...
+
+    def update_description(self, key: str, description: str) -> None:
+        """Atomically replace description text; preserve identity, screenshots and metadata."""
+        ...

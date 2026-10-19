@@ -268,9 +268,12 @@ older formats. Native handles and undo history are never serialized.
 
 Image operations use the same session command API, with no Qt dependency:
 
-- `image.import(path, width=1, name="", parent="", owner="", values=None)` returns
+- `image.import(path, width=1, name="", parent="", owner="", values=None, axis="")` returns
   `object_id` and `job_id`. PNG/JPEG decoding and native preparation are asynchronous.
   `values` uses the existing position/rotation/scale convention, in metres/degrees.
+  Optional `axis` X/Y/Z sets world-axis orientation while preserving the initial world
+  position and scale, including beneath a rotated ordinary parent. Omit it to retain
+  the supplied local orientation. Parenting and initial alignment share the import undo step.
 - `image.replace(target, path)` replaces one assignment asynchronously. Position and
   physical width remain; height follows the new aspect ratio; landmark calibration clears.
 - `image.instance(source, name="")` creates an independent placement sharing its image asset.

@@ -1,7 +1,47 @@
 # AnthroForge development validation
 
-Current source qualification is in [surfaces and report management](#surfaces-and-report-management-021-follow-up).
+Current source qualification is in [three feedback reports](#three-feedback-reports-021-follow-up).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Three feedback reports (0.2.1 follow-up)
+
+The redundant top Import Mesh button is removed. Anatomy and Construction now use
+separate full-height tabs. World image import sits beside the viewport projection
+control; Properties imports an image parented to the selected object. Orthographic
+axis views set initial world-axis alignment, including beneath rotated parents.
+Place Points uses the shared snapping modifier (Ctrl by default), independently of
+Shift continuation. Releasing Ctrl restores the configured depth policy.
+
+Code at `9850849` passes the Windows development gate: **941 tests**, three native
+CTests, native analysis, Ruff, mypy on 195 modules, function limits and numerical/native
+doctor. The 307 QQmlPropertyMap deprecation warnings include the 35 new image-controller
+test warnings from the existing deprecated constructor.
+
+Actual offscreen QML checks pass stationary modifier transitions, remapped snapping,
+Ctrl+Shift continuation, finish/cancel/one-step undo, the Qt file picker, captured
+parent intent, image axis alignment and automatic tab selection. Captures at 1440x900
+and 1050x680 were inspected. Existing 120-item curve workflows and Construction editor
+checks pass. Hidden QQuickRenderControl/D3D11 image rendering passes orientation,
+picking and staged replacement; an additional X/Y/Z fixture verifies actual image
+pixels beneath a rotated, nonuniformly scaled parent. No visible windows or desktop
+input were used. Native Windows file-dialog interaction and hands-on acceptance are
+not claimed; file-picker interaction used Qt's offscreen dialog.
+
+Ownership review: temporary snapping belongs to the native stroke projection and
+uses captured displayed geometry, without changing authored points or the configured
+depth policy. QML resolves semantic modifiers through KeyboardManager. Shared image
+creation/alignment owns ordinary-parent and world-transform semantics; the desktop
+captures dialog intent and adopts the accepted object through CreationSelection.
+ObjectBrowser owns navigation, keeping both pane models alive. Existing document,
+scheduler and persistence contracts remain in use.
+
+The clean `37111d6` build passes the full portable suite from a fresh temporary
+relocation with minimal PATH, including hidden rendering and packaged feedback capture,
+preview, text editing and deletion of QA reports. An additional packaged headless case
+passes X/Y/Z parented-image creation and persistence. The release is the single canonical
+`dist/0.2.1/AnthroForge.dist`, with `dist/AnthroForge-0.2.1-source.zip`.
+No additional version-suffixed distribution was created. User report archives were not changed.
+See [task evidence and commands](tasks/three-feedback-reports.md).
 
 ## Surfaces and report management (0.2.1 follow-up)
 

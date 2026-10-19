@@ -2,7 +2,12 @@
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
-from anthroforge.application import curve_sources, image_operations, workspace_policy
+from anthroforge.application import (
+    curve_sources,
+    image_operations,
+    image_placement,
+    workspace_policy,
+)
 from anthroforge.core.reference_images import ReferenceImage
 
 from . import image_scene
@@ -15,6 +20,7 @@ class ImageTools(QObject):
     def __init__(self, controller):
         super().__init__(controller)
         self.controller, self.target, self.points, self.context = controller, "", [], None
+        self.import_request = None
 
     @Property("QVariantMap", notify=changed)
     def state(self):
@@ -31,6 +37,41 @@ class ImageTools(QObject):
         if result:
             self.controller.message = "Image loading in the background."
             self.controller.notify()
+
+    def import_context(self):
+        session = self.controller.session
+        return session, session.document.id, session.active_workspace
+
+    @Slot(str, str, result=bool)
+    def prepareImport(self, parent, axis):
+        self.import_request = None
+        try:
+            owner = context_owner(self.controller)
+            image_placement.require_context(self.controller.session, parent, owner)
+            self.import_request = self.import_context(), dict(parent=parent, owner=owner, axis=axis)
+            return True
+        except ValueError as error:
+            self.controller.message = str(error)
+            self.controller.notify()
+            return False
+
+    @Slot()
+    def cancelImport(self):
+        self.import_request = None
+
+    @Slot(str)
+    def acceptImport(self, path):
+        request, self.import_request = self.import_request, None
+        if request is None:
+            return
+        context, arguments = request
+        if context != self.import_context():
+            self.controller.message = "Image import cancelled: document or workspace changed."
+            self.controller.notify()
+            return
+        self.controller.creation_selection.create(
+            "image.import", dict(arguments, path=local_path(path))
+        )
 
     @Slot()
     def start(self):

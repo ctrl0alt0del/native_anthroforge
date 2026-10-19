@@ -11,6 +11,7 @@ UiScrollView {
     readonly property bool dialogVisible: colorDialog.visible || constructionInspector.dialogVisible
     signal pickAnchor(string mode)
     signal deleteRequested(string entity)
+    signal imageRequested(string parentId)
     clip: true; contentWidth: availableWidth
     function setAttachment(key, value) {
         const options = {entity:selected.id};
@@ -26,6 +27,13 @@ UiScrollView {
             Label { text: "Select an object in the viewport or outliner to edit its properties."; color: Theme.muted; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.fillWidth: true }
         }
         Label { visible: !!inspector.selected.readonly; text: "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+        UiButton {
+            objectName: "addObjectImage"; text: "Add reference image…"; glyph: "image"; Layout.fillWidth: true
+            visible: !!inspector.selected.id && inspector.selected.kind !== "IMAGE"
+            enabled: !inspector.selected.readonly && !workspace.state.waiting && !workspace.state.editing
+            hint: "Import an image parented to this object; align it to the current orthographic axis view"
+            onClicked: inspector.imageRequested(inspector.selected.id)
+        }
         ColumnLayout {
             visible: !!inspector.selected.id && !inspector.selected.is_control && !inspector.selected.is_construction
             enabled: !inspector.selected.readonly && !workspace.state.waiting

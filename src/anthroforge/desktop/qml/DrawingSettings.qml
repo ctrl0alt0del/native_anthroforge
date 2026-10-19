@@ -32,6 +32,7 @@ ColumnLayout {
             UiCheck { enabled: !panel.capturing; text: "Closed curve"; checked: panel.options.closed; onClicked: panel.tool.setting("closed",checked) }
             UiCheck { enabled: !panel.capturing; visible: panel.tool.state.mode==="DRAW" && !panel.options.closed; text: "Close near starting point"; checked: panel.options.auto_close; onClicked: panel.tool.setting("auto_close",checked) }
             Label { text: panel.tool.state.mode==="DRAW" ? "Release to finish · Draw again to create another" : panel.keyboard.modifierName("continuePlacement")+" + click to continue · Click to finish from point 2 · Backspace to remove"; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+            Label { visible: panel.tool.state.mode==="POINTS"; text: "Hold "+panel.keyboard.modifierName("snapSurface")+" to snap to a surface · Combine with "+panel.keyboard.modifierName("continuePlacement")+" to continue"; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
             RowLayout {
                 UiButton { visible: panel.tool.state.mode==="POINTS"; text: "Finish curve"; enabled: panel.tool.state.count>=2; onClicked: panel.tool.finish() }
                 UiButton { text: "Exit tool"; onClicked: panel.tool.cancel() }

@@ -36,6 +36,45 @@ def test_view_plane_probe_does_not_author_or_consume_points(session):
     assert value.count == 4
 
 
+def test_temporary_snap_chooses_nearest_surface_and_restores_view_plane(session):
+    meshes = [island(session, 0, z) for z in (0.5, 1.5)]
+    value = stroke(session, [m.handle for m in meshes], [IDENTITY] * 2)
+    value.append(pointer(), False)
+    value.snapping(True)
+    assert value.probe(pointer())[2] == pytest.approx(1.5)
+    assert value.count == 1
+    value.append(pointer(), False)
+    value.snapping(False)
+    assert value.probe(pointer())[2] == 0
+    value.append(pointer(0.2), False)
+    np.testing.assert_allclose(value.read()[:, 2], [0, 1.5, 0])
+    value.pop()
+    assert value.probe(pointer())[2] == 0
+
+
+def test_temporary_snap_miss_uses_configured_plane_and_does_not_lock_it(session):
+    mesh = island(session, 0, 1.5)
+    value = stroke(session, [mesh.handle], [IDENTITY], surface=True, first=2)
+    value.append(pointer(0.2), False)
+    value.snapping(True)
+    assert value.probe(pointer())[2] == pytest.approx(1.5)
+    assert value.probe(pointer(0.2))[2] == 0
+    value.append(pointer(), False)
+    value.snapping(False)
+    assert value.probe(pointer())[2] == 0
+
+
+def test_temporary_snap_respects_world_transforms_and_relative_offset(session):
+    mesh = island(session, 0, 0)
+    frame = session.engine.transform([0, 0, 1, 0, 0, 0, 1, 2, 3])
+    value = stroke(session, [mesh.handle], [frame], offset=0.1, relative=True)
+    value.snapping(True)
+    assert value.probe(pointer(radius=2))[2] == pytest.approx(1.2)
+    value.append(pointer(radius=2), False)
+    value.pop()
+    assert value.count == 0 and value.probe(pointer(radius=3))[2] == pytest.approx(1.3)
+
+
 def mesh_stroke(session, assembly, **options):
     root, _ = assembly
     mesh = session.assets[session.document.entity(root).asset].mesh

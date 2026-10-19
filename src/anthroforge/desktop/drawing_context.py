@@ -23,7 +23,7 @@ def surface_inputs(tool):
     indices = [
         i
         for i, key in enumerate(controller.snap_ids)
-        if not options["selected_only"] or key in selected
+        if options["depth"] != "SURFACE" or not options["selected_only"] or key in selected
     ]
     handles, frames = controller.snap_handles[indices], controller.snap_matrices[indices]
     tool.leases = tuple(controller.render_model.leases[int(key)] for key in handles)

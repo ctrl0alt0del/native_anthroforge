@@ -34,6 +34,10 @@ The user explicitly confirmed that “starting from 2nd curve” means the secon
 - From the second point onward, plain left-click adds the final point, completes the
   curve and exits Place Points.
 - Shift + left-click adds a point and keeps Place Points active.
+- Hold the shared surface-snapping modifier (Ctrl by default) to preview and place
+  points on the nearest visible SCP surface under the pointer. Combine Ctrl with
+  Shift to snap and continue. Releasing Ctrl restores the configured drawing depth;
+  a missed surface uses that depth's existing fallback. Existing offset settings apply.
 - A completed curve is one undo action; provisional points are not separate commits.
 - Route the continuation modifier through the keyboard/action abstraction, not a
   hardcoded Shift check in QML. Retain existing cancel, last-point removal and camera tools.
@@ -43,6 +47,21 @@ The user explicitly confirmed that “starting from 2nd curve” means the secon
 The final rule is an implementation safeguard for the existing closure contract, not a
 change to the confirmed open-curve interaction. Draw remains a separate tool whose
 release finishes one stroke while leaving it ready for another.
+
+### Object navigation and reference images
+
+Anatomy and Construction occupy separate full-height tabs in the left panel. Both
+retain their navigation state; selecting an object reveals its corresponding tab.
+Remove the duplicate top-toolbar Import Mesh button; keep Create Primitive → Import
+Mesh, File → Import, Ctrl+I and existing context entry points.
+
+The image icon beside Perspective/Orthographic imports a world reference image.
+Properties offers Add reference image for an eligible selected object, setting its
+ordinary transform parent directly. Capture parent, association and view axis before
+opening the file picker. An orthographic X/Y/Z view initializes that world-axis
+orientation, including under a rotated parent. Perspective and oblique views retain
+default placement. Creation, parenting and alignment remain one undo action through
+shared image operations. Images cannot parent other objects.
 
 ## Previous 0.2.0 controls: verified meaning and motivation
 

@@ -1,18 +1,13 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Dialogs
 
 ColumnLayout {
     required property var keyboard
-    readonly property bool dialogVisible: imageFile.visible
     spacing: Theme.gap
-    RowLayout {
-        Label { text: "CONSTRUCTION"; color: Theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
-        UiButton { text: "Image…"; hint: "Import a world reference image"; onClicked: imageFile.open() }
-    }
     SurfacePreview {}
     ListView {
+        objectName: "constructionList"
         Layout.fillWidth: true; Layout.fillHeight: true; clip: true
         model: workspace.constructionModel
         ScrollBar.vertical: ScrollBar {}
@@ -29,5 +24,4 @@ ColumnLayout {
             MouseArea { id: pointer; anchors.fill: parent; hoverEnabled: true; onClicked: mouse => workspace.select(parent.item.id,keyboard.matches("extendSelection",mouse.modifiers)) }
         }
     }
-    FileDialog { id: imageFile; title: "Import reference image"; nameFilters: ["Reference images (*.png *.jpg *.jpeg)"]; onAccepted: workspace.imageTools.importFile(selectedFile.toString(),false) }
 }

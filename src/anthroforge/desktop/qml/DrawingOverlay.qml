@@ -46,13 +46,19 @@ Item {
     }
     CursorMarker { viewport: overlay.viewport }
     MouseArea {
+        id: pointer
+        objectName: "drawingPointer"
         anchors.fill: parent; enabled: overlay.active && !viewport.keyboard.blocked
         acceptedButtons: Qt.LeftButton; hoverEnabled: true
         cursorShape: Qt.CrossCursor
+        function preview() {
+            if(containsMouse && overlay.active) update({x:mouseX,y:mouseY,modifiers:viewport.keyboard.modifiers},false);
+        }
         function update(mouse,press) {
             viewport.pointerPosition=Qt.point(mouse.x,mouse.y);
             const ray=viewport.worldRay(mouse.x,mouse.y), normal=viewport.worldRay(width/2,height/2).direction;
             const values=ray.origin.concat(ray.direction,[mouse.x,mouse.y,overlay.tool.state.options.radius]);
+            overlay.tool.setSnapping(viewport.keyboard.matches("snapSurface",mouse.modifiers));
             if(press) overlay.tool.click(values,normal,viewport.keyboard.matches("continuePlacement",mouse.modifiers));
             else overlay.tool.pointer(values,normal,false);
         }
@@ -60,5 +66,9 @@ Item {
         onPositionChanged: mouse => update(mouse,false)
         onReleased: mouse => { update(mouse,false); overlay.tool.release(); }
         onCanceled: { if(overlay.tool.state.painting) overlay.tool.clearStroke(); }
+        Connections {
+            target: viewport.keyboard
+            function onModifiersChanged() { pointer.preview(); }
+        }
     }
 }

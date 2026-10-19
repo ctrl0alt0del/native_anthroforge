@@ -26,7 +26,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: reportsDialog.visible || feedbackDialog.visible || constructionPane.dialogVisible || reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -93,7 +93,6 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10; spacing: 6
                 UiButton { objectName: "createPrimitive"; text: "Create Primitive"; glyph: "plus"; primary: true; enabled: !workspace.state.waiting; onClicked: createMenu.popup() }
-                UiButton { action: importAction; glyph: "import"; hint: "Import an OBJ, STL or PLY mesh (Ctrl+I)" }
                 UiButton { action: saveAction; glyph: "save"; hint: "Save project (Ctrl+S)" }
                 Rectangle { Layout.leftMargin: 6; Layout.rightMargin: 6; implicitWidth: 1; implicitHeight: 20; color: Theme.border }
                 UiButton { glyph: "undo"; hint: "Undo (Ctrl+Z)"; enabled: undoAction.enabled; onClicked: undoAction.trigger() }
@@ -113,10 +112,9 @@ ApplicationWindow {
         Rectangle {
             SplitView.preferredWidth: 240; SplitView.minimumWidth: 195; SplitView.maximumWidth: 440
             color: Theme.panel
-            SplitView {
-                anchors.fill: parent; anchors.margins: Theme.inset; orientation: Qt.Vertical
-                Outliner { SplitView.fillHeight: true; SplitView.minimumHeight: 150; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
-                Construction { id: constructionPane; keyboard: window.keyboardManager; SplitView.preferredHeight: 240; SplitView.minimumHeight: 120 }
+            ObjectBrowser {
+                anchors.fill: parent; anchors.margins: Theme.inset; keyboard: window.keyboardManager
+                onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity)
             }
         }
         ColumnLayout {
@@ -126,6 +124,7 @@ ApplicationWindow {
                 RowLayout {
                     anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 6; spacing: 6
                     Label { text: "3D VIEWPORT"; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1; Layout.fillWidth: true }
+                    UiButton { objectName: "addWorldImage"; glyph: "image"; flatStyle: true; hint: "Import a world reference image"+(viewport.imageAlignmentAxis ? " · "+viewport.imageAlignmentAxis+" alignment" : ""); enabled: !workspace.state.waiting && !workspace.state.editing; onClicked: imageFile.request("",viewport.imageAlignmentAxis) }
                     UiButton { text: viewport.orthographic ? "Orthographic" : "Perspective"; flatStyle: true; hint: "Toggle perspective / orthographic projection (5)"; onClicked: viewport.orthographic = !viewport.orthographic }
                     UiButton { glyph: "frame"; flatStyle: true; hint: "Frame selected (F)"; onClicked: workspace.frameSelection() }
                     UiButton { text: "Overlays"; flatStyle: true; onClicked: overlays.open() }
@@ -168,7 +167,7 @@ ApplicationWindow {
             ColumnLayout {
                 anchors.fill: parent; spacing: 0
                 Rectangle { Layout.fillWidth: true; implicitHeight: 33; color: Theme.header; Label { anchors.verticalCenter: parent.verticalCenter; x: 12; text: "PROPERTIES"; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1 } }
-                Inspector { id: inspector; objectName: "inspector"; visible: !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity) }
+                Inspector { id: inspector; objectName: "inspector"; visible: !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity); onImageRequested: parentId => imageFile.request(parentId,viewport.imageAlignmentAxis) }
                 UiScrollView {
                     id: drawingSettings; visible: workspace.drawingTools.state.active
                     Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; contentWidth: availableWidth
@@ -198,6 +197,7 @@ ApplicationWindow {
         MenuSeparator {}
         UiMenuItem { text: "Import mesh…"; onTriggered: importFile.open() }
     }
+    ReferenceImageDialog { id: imageFile }
     FileDialog { id: reportDialog; title: "Export inspection report"; fileMode: FileDialog.SaveFile; defaultSuffix: "afinspection.zip"; nameFilters: ["Inspection report (*.afinspection.zip)"]; onAccepted: workspace.inspectionExport.start(selectedFile.toString()) }
     WorkspaceManager { id: workspaceManager; anchors.centerIn: parent }
     Popup {

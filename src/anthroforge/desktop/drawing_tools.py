@@ -33,6 +33,7 @@ class DrawingTools(QObject):
         self.controller, self.mode, self.stroke, self.leases = controller, "", None, ()
         self.painting, self.hover, self.context, self.created = False, [], None, []
         self.options = dict(DEFAULTS)
+        self.snapping = False
 
     @Property("QVariantMap", notify=changed)
     def state(self):
@@ -63,6 +64,7 @@ class DrawingTools(QObject):
     @Slot()
     def cancel(self):
         self.mode = ""
+        self.snapping = False
         self.clear_stroke()
 
     @Slot()
@@ -115,6 +117,10 @@ class DrawingTools(QObject):
         if self.stroke is not None and self.options["depth"] != "IMAGE":
             self.stroke.view(normal)
 
+    @Slot(bool)
+    def setSnapping(self, enabled):
+        self.snapping = enabled
+
     @Slot("QVariantList", "QVariantList", bool)
     def pointer(self, ray, normal, press):
         if not self.mode or self.controller.session.waiting_save:
@@ -134,6 +140,7 @@ class DrawingTools(QObject):
     def update_stroke(self, ray, normal, press):
         if self.stroke is None or (press and self.stroke.count == 0):
             self.stroke = drawing_context.capture(self, normal)
+        self.stroke.snapping(self.snapping and self.mode == "POINTS")
         self.hover = self.stroke.probe(ray)[:3]
         if press or (self.mode == "DRAW" and self.painting):
             start = self.stroke.count

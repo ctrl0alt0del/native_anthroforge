@@ -105,6 +105,7 @@ def selection_navigation(window, controller, root):
     settle(controller)
     assert_tab(window, 1)
     curve = controller.selection
+    controller.authoring.setEditing(False)
     controller.select(root)
     QTest.qWait(80)
     assert_tab(window, 0)
@@ -130,6 +131,17 @@ def control_states(window, root):
     capture(window, "delete-disabled")
     button.setProperty("enabled", True)
     help_state(window)
+
+
+def long_label(window):
+    button = find(window, "addObjectImage")
+    original = button.property("text")
+    button.setProperty("text", "A long label that must elide without consuming its padding " * 3)
+    QTest.qWait(80)
+    assert button.property("leftPadding") == button.property("rightPadding") == 8
+    check_button(button)
+    capture(window, "long-label")
+    button.setProperty("text", original)
 
 
 def help_state(window):
@@ -164,14 +176,19 @@ def run():
     try:
         window, root = engine.rootObjects()[0], setup(controller)
         window.resize(1440, 900)
-        tab_navigation(window, controller, root)
-        control_states(window, root)
-        layouts(window)
+        exercise(window, controller, root)
         assert not warnings, warnings
         print(json.dumps(dict(passed=True, scale=window.devicePixelRatio(), output=str(OUTPUT))))
     finally:
         controller.close()
         delete(engine)
+
+
+def exercise(window, controller, root):
+    tab_navigation(window, controller, root)
+    control_states(window, root)
+    long_label(window)
+    layouts(window)
 
 
 if __name__ == "__main__":

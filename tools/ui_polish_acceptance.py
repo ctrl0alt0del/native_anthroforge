@@ -40,8 +40,7 @@ def capture(window, name):
 
 
 def menu_hover(window, title):
-    click(window, "menuBar" + title)
-    menu = find(window, "menu" + title)
+    menu = open_menu(window, title)
     rows = descendants(menu.property("contentItem"))
     row = next(r for r in rows if r.objectName().startswith("menuItem") and r.isEnabled())
     point = row.mapToScene(QPointF(row.width() / 2, row.height() / 2)).toPoint()
@@ -79,9 +78,7 @@ def disclosure_checks(controller, window):
     assert find(window, "measurementCoordinates").isVisible()
     capture(window, "measurements-details")
     click(window, "inspectionToolsToggle")
-    click(window, "menuBarHelp")
-    QTest.keyClick(window, Qt.Key.Key_Down)
-    QTest.keyClick(window, Qt.Key.Key_Return)
+    menu_action(window, "Help", "Navigation and shortcuts")
     assert find(window, "shortcutHelp").property("visible")
     capture(window, "shortcuts")
     dialog_button(window, "shortcutHelp", "Close")
@@ -99,6 +96,20 @@ def issue_details(controller, window):
     reveal_evidence(window)
     assert evidence.isVisible() and evidence.property("text")
     capture(window, "issues-evidence")
+
+
+def menu_action(window, title, text):
+    menu = open_menu(window, title)
+    rows = descendants(menu.property("contentItem"))
+    row = next(item for item in rows if item.property("text") == text)
+    point = row.mapToScene(QPointF(row.width() / 2, row.height() / 2)).toPoint()
+    QTest.mouseClick(window, Qt.LeftButton, pos=point)
+    QTest.qWait(100)
+
+
+def open_menu(window, title):
+    click(window, "menuBar" + title)
+    return find(window, "helpMenu" if title == "Help" else "menu" + title)
 
 
 def reveal_evidence(window):

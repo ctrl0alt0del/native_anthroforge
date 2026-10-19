@@ -43,14 +43,26 @@ captures were inspected. Evidence: `build/tab-and-icon-alignment/<scale>/`.
 The baseline is `build/tab-and-icon-alignment/before.json` and `before.png`.
 
 Passed previous `tools/feedback_fixes_acceptance.py` (images, Ctrl placement, tabs),
-plus both architecture tests. Pending: full development gate, remaining UI regressions,
-canonical build and relocated portable qualification. All checks are background-only;
-offscreen control captures do not establish 3D rendering or hands-on Windows acceptance.
+plus both architecture tests. `tools/check.ps1` passes: 941 pytest tests (307 existing
+QQmlPropertyMap deprecation warnings), three native CTests, native/style checks,
+Ruff, mypy and native/numerics doctor. Log: `build/tab-and-icon-gate.log`.
+
+The existing UI polish acceptance passes menus, contrast, disclosures, resizing and
+deletion after updating its stale Help-menu lookup/order assumption to the current
+report-enabled menu. Report-browser acceptance passes 120 isolated QA reports,
+preview/edit/delete/failure cases at 150% with a narrow window. Long labels retain
+horizontal padding and elide; compact icons retain their size. Ownership review:
+UiButton owns content layout, themed tabs retain Qt interaction semantics, and
+ObjectBrowser owns navigation only. No domain or input-manager exceptions added.
+
+Pending: canonical build and relocated portable qualification. All checks are
+background-only; offscreen control captures do not establish 3D rendering or
+hands-on Windows acceptance.
 
 ## Next actions and blockers
 
-1. Run full gate and existing UI regression tools.
-2. Build canonical distribution, qualify relocation, merge and push.
+1. Build canonical distribution and qualify a temporary relocation.
+2. Merge and push validated changes; refresh companion source archive.
 
 ## Recovery inputs
 

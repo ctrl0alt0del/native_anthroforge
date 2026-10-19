@@ -12,7 +12,7 @@ Button {
     implicitHeight: Theme.controlHeight
     implicitWidth: Math.max(28, contentItem.implicitWidth + 18)
     // Compact callers keep the same content size; padding yields before content clips.
-    horizontalPadding: Math.min(Theme.gap, Math.max(0, (width - implicitContentWidth) / 2))
+    horizontalPadding: Math.min(Theme.gap, Math.max(0, (width - Math.min(implicitContentWidth, implicitContentHeight)) / 2))
     verticalPadding: Math.min(6, Math.max(0, (height - implicitContentHeight) / 2))
     hoverEnabled: true
     font.pixelSize: 12

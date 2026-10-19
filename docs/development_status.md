@@ -1,7 +1,21 @@
 # AnthroForge development validation
 
-Current source qualification is in [three feedback reports](#three-feedback-reports-021-follow-up).
+Current source qualification is in [tabs and icon alignment](#tabs-and-icon-alignment-021-follow-up).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Tabs and icon alignment (0.2.1 follow-up)
+
+Anatomy/Construction use themed Qt tabs with native keyboard navigation. The shared
+button layout centers compact icons/help text and icon-label groups; long labels
+retain padding and elide. Custom left-aligned section headers remain supported.
+
+The Windows development gate passes **941 tests**, three native CTests and the
+existing static/native checks. Actual offscreen editor checks at 100%, 150% and 200%
+cover normal/narrow layouts, hover/focus/disabled states, help contrast, retained
+pane state and automatic selection-driven tab switching. Inspected captures and
+measured content bounds verify the reported delete/help controls. Existing image,
+Ctrl-placement, UI-polish and report-browser checks pass. User reports remain intact.
+Portable qualification is pending; see the [task record](tasks/tab-and-icon-alignment.md).
 
 ## Three feedback reports (0.2.1 follow-up)
 

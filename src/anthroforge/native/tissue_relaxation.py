@@ -74,19 +74,18 @@ def settings(item: Any) -> Settings:
     return result
 
 
-def regions(item: Any) -> tuple[Any, list[Any]]:
+def regions(item: Any, goals: dict[str, Any] | None = None) -> tuple[Any, list[Any]]:
     rows, buffers = (Region * len(item.constraints))(), []
     fields = {f.name: f for f in item.fields}
     for row, value in zip(rows, item.constraints, strict=True):
         buffers.extend(pack_region(row, value, fields))
+        buffers.extend(pack_goals(row, value, goals or {}))
     return rows, buffers
 
 
 def pack_region(row: Region, value: Any, fields: Any) -> list[Any]:
     row.mask, row.mode = MASKS.get(value.mask, 5), int(value.mode == "SOFT")
     row.strength, row.feather, row.offset = value.strength, value.feather, value.offset
-    if value.reference is not None:
-        raise ValueError("Target-relative constraint bindings must be resolved before evaluation.")
     if row.mask != 5:
         return []
     field = fields[value.mask]
@@ -95,15 +94,33 @@ def pack_region(row: Region, value: Any, fields: Any) -> list[Any]:
     return [buffer]
 
 
+def pack_goals(row: Region, value: Any, goals: dict[str, Any]) -> list[Any]:
+    if value.reference is None:
+        return []
+    if value.id not in goals:
+        raise ValueError("Target-relative constraint bindings must be resolved before evaluation.")
+    buffer = np.ascontiguousarray(goals[value.id], dtype=np.float64)
+    row.goals, row.offset = pointer(buffer), 0
+    return [buffer]
+
+
 def evaluate(
-    mesh: Mesh, source: Source, item: Any, cancel: int = 0
+    mesh: Mesh, source: Source, item: Any, cancel: int = 0, goals: dict[str, Any] | None = None
 ) -> tuple[Mesh, TissueDiagnostic]:
-    config, (rows, _leases), report = settings(item), regions(item), np.zeros(7)
+    validate_goals(mesh, goals)
+    config, (rows, _leases), report = settings(item), regions(item, goals), np.zeros(7)
     handle = mesh.engine.library.af_tissue_relax(
         mesh.handle, c.byref(source), c.byref(config), rows, len(rows), pointer(report), cancel
     )
     output = owned(mesh.engine, handle)
     return output, diagnostic(report)
+
+
+def validate_goals(mesh: Mesh, goals: dict[str, Any] | None) -> None:
+    for values in (goals or {}).values():
+        data = np.asarray(values)
+        if data.shape != (mesh.counts[0], 3) or not np.isfinite(data).all():
+            raise ValueError("Resolved region goals must match every finite rest vertex.")
 
 
 def diagnostic(report: Any) -> TissueDiagnostic:

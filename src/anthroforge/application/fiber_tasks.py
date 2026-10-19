@@ -110,7 +110,7 @@ def compute(session: "Session", spec: "FiberCreation", payload: Any, cancel: Any
     captures = attachment_assets.captures(session.engine, document, resources.meshes, targets)
     asset = attachment_assets.compact(field, captures)
     copied = independent_curve(item, original.authored, spec)
-    fiber = build_fiber(copied, spec, asset)
+    fiber = build_fiber(copied, replace(spec, attachment_asset=str(uuid4())), asset)
     return document, fiber, PathAsset(original.path, fiber), asset
 
 
@@ -159,9 +159,10 @@ def publish(session: "Session", spec: "FiberCreation", origin: int, payload: Any
     item = replace(
         item, result=EvaluationResult(key, 1, item.construction_revision, revisions(source, ports))
     )
-    authored_jobs.publish(session, origin, partial(merge, item=item))
+    proof = authored_jobs.Capture(item.result.inputs, partial(enqueue, session, spec, origin))
+    authored_jobs.publish(session, origin, partial(merge, item=item), proof)
     session.resources.paths[key] = path
-    session.resources.attachments[spec.attachment_asset] = attachment
+    session.resources.attachments[item.attachment_asset] = attachment
 
 
 def merge(document: Any, item: Fiber) -> Any:

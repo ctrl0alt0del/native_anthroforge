@@ -69,4 +69,5 @@ def project_save(resources: "Resources", document: Document) -> Workload:
     size += sum(resources.paths[key].path.bytes for key in used["paths"])
     size += sum(len(resources.images[key].encoded) for key in used["images"])
     size += sum(resources.attachments[key].field.bytes for key in used["attachments"])
+    size += sum(resources.bindings[key].bytes for key in used["bindings"])
     return Workload(entities=len(document.entities), bytes=size)

@@ -14,7 +14,16 @@ reassignment. This lease is never a display/picking surface. Captured resource I
 serialized and included in document/history/job ownership. Fiber fields now use typed
 surface-role/material captures too. Multiple captures can reference the same provider:
 native field assembly retains unedited structural pins on their original capture while
-new influences capture current real geometry. Region constraints still need integration.
+new influences capture current real geometry. Target-relative regions retain an owned
+batch of material bindings against inflated rest vertices. Native resolution applies the
+captured target frame and normal offset in tissue-local coordinates; it does not rewrite
+shared sources. Rest-topology changes require explicit rebind or unlink.
+
+Asynchronous authored capture publication validates its read set against each affected
+history entry. A capture from a later parent pose cannot populate an earlier entry:
+that entry retains the capture request and runs it against its own inputs when revisited.
+Every execution owns separate immutable resources, including history/redo captures.
+This policy is shared by Anchor, Fiber and tissue-region creation/rebinding.
 
 Routing derives obstacle roles from dependency ports and sends the accepted provider
 geometry to the existing native collision world. Empty accepted outputs remain dependencies

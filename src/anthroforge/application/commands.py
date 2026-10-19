@@ -34,6 +34,7 @@ from . import (
     surface_sources,
     tissue_operations,
     tissue_part_operations,
+    tissue_region_capture,
     tissue_strategy_operations,
 )
 from . import control_operations as controls
@@ -53,6 +54,8 @@ EDITS = {
     "tissue.constraint.add": tissue_strategy_operations.constraint_add,
     "tissue.constraint.update": tissue_strategy_operations.constraint_update,
     "tissue.constraint.remove": tissue_strategy_operations.constraint_remove,
+    "tissue.constraint.bind": tissue_region_capture.bind,
+    "tissue.constraint.unlink": tissue_region_capture.unlink,
     "tissue.field.set": tissue_strategy_operations.field_set,
     "tissue.field.remove": tissue_strategy_operations.field_remove,
     "tissue.create": tissue_operations.create,

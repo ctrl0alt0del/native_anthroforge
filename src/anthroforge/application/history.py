@@ -13,6 +13,7 @@ class Entry:
     versions: set[int] = field(default_factory=set)
     replay: Callable[[], Any] | None = None
     restarts: list[Callable[[], Any]] = field(default_factory=list)
+    pending_authored: dict[int, Callable[[], Any]] = field(default_factory=dict)
 
 
 class History:
@@ -71,3 +72,7 @@ class History:
         callbacks, entry.restarts = entry.restarts, []
         for restart in callbacks:
             restart()
+
+    def recover(self) -> None:
+        for callback in tuple(self.entries[self.cursor].pending_authored.values()):
+            callback()

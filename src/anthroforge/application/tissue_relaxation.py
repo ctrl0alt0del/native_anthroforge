@@ -6,7 +6,7 @@ from anthroforge.core.points import Anchor
 from anthroforge.native import construction
 from anthroforge.native import tissue_relaxation as native
 
-from . import surface_providers
+from . import surface_providers, tissue_region_goals
 from .object_frames import Frames
 from .tissue_output import TissueOutput
 
@@ -35,7 +35,8 @@ def host(engine: Any, document: Any, resources: Any, item: Any, value: native.So
 
 def evaluate(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -> TissueOutput:
     mesh = resources.meshes[item.rest_result.asset].mesh
+    goals = tissue_region_goals.resolve(engine, document, resources, item, cancel)
     result, diagnostic = native.evaluate(
-        mesh, source(engine, document, resources, item), item, cancel
+        mesh, source(engine, document, resources, item), item, cancel, goals
     )
     return TissueOutput(mesh=result, diagnostics=(diagnostic,))

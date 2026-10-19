@@ -42,6 +42,15 @@ def validate(tissue: TissueVCP, records: Mapping[str, object]) -> None:
     if tissue.stacking and domain(source) != "SURFACE":
         raise ValueError("Stacking currently requires surface-based tissue participants.")
     validate_surface(tissue, source, records)
+    validate_targets(tissue, records)
+
+
+def validate_targets(tissue: TissueVCP, records: Mapping[str, object]) -> None:
+    from .anatomical_surfaces import reference
+
+    for row in tissue.constraints:
+        if row.reference is not None:
+            reference(row.reference.target, records, row.reference.role)
 
 
 def validate_smoothing(side: object) -> None:

@@ -14,10 +14,14 @@ combinations fail through the same capability policy in desktop and headless cli
 
 `tissue.constraint.add(target, mask="ALL", mode="FIXED", strength?, feather?, offset?)`
 returns a region ID. Use `tissue.constraint.update(target, constraint, changes)` or
-`tissue.constraint.remove(target, constraint)` to edit/remove it. This checkpoint exposes
-source-relative regions; target-region capture remains unfinished. Contradictory exact
-goals fail evaluation and retain accepted geometry. Iteration-limit solves can publish
-usable output with a separate convergence warning.
+`tissue.constraint.remove(target, constraint)` to edit/remove it. Regions are source-relative
+by default. `tissue.constraint.bind(target, constraint, parent, role?)` captures or explicitly
+recaptures target-relative goals against accepted inflated rest geometry; it returns a job
+ID. `tissue.constraint.unlink(target, constraint)` restores source-relative goals. Capture
+and target movement preserve shared sources. Normal offsets follow the captured target
+frame; changed rest topology requires explicit rebind/unlink. Contradictory exact goals
+fail evaluation and retain accepted geometry. Iteration-limit solves can publish usable
+output with a separate convergence warning.
 
 `tissue.field.set(target, name, values, domain="BASE")` stores explicit normalized weights
 against the accepted Base or Rest domain, including all-zero values. `INFLATION` is reserved

@@ -74,7 +74,7 @@ def constraint_remove(session: Any, target: str, constraint: str) -> None:
 
 
 def require_source_constraint(row: TissueConstraint) -> None:
-    if row.reference is not None or row.bindings:
+    if row.reference is not None or row.binding_asset:
         raise ValueError("Use explicit region capture for target-relative constraints.")
 
 

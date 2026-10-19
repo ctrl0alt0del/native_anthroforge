@@ -25,7 +25,7 @@ def retained_documents(session: "Session") -> list[Document]:
 
 def collect(session: "Session") -> None:
     references = [referenced(d) for d in retained_documents(session)]
-    for kind in ("meshes", "paths", "images", "attachments"):
+    for kind in session.resources.__dataclass_fields__:
         used = set().union(*(keys[kind] for keys in references))
         catalogue = getattr(session.resources, kind)
         for key in tuple(catalogue):

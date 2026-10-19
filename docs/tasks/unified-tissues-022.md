@@ -4,7 +4,7 @@
 - Integration branch: `main`
 - Starting revision: `6f33380660c9421585b0898b068d33b4f5232fd3`
 - Status: in progress; implementation and release qualification incomplete
-- Last updated: 2026-10-19, Europe/Bucharest
+- Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: desktop chat, direct work (no delegated writers)
 
 ## Outcome and acceptance
@@ -29,6 +29,22 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 - Preserve scheduler/history/save/startup/export semantics and 15-line functions.
 
 ## Current state
+
+Target-relative region constraints now capture retained material bindings in native work,
+resolve target-frame offsets without changing shared sources, and persist owned binding
+batches in schema 4. Explicit bind/rebind/unlink use the shared commands and focused
+Constraints inspector. Topology mismatches require explicit rebind; exact structural
+backing rejects contradictory moved goals. Nine region workflow checks cover movement,
+topology, compaction, undo, cancellation, persistence and profiler memory ownership.
+Full-QML capture/unlink/undo passes offscreen; its platform does not render the viewport.
+
+Review found and repaired a shared async history defect: late binding captures could be
+installed in earlier parent poses. Historical input mismatches now preserve an unresolved
+request and recapture on navigation. Anchor, Fiber and region captures use this boundary;
+per-execution immutable resources prevent historical recovery from overwriting redo data.
+Cross-parent-edit tests verify actual positions after undo/redo and subsequent movement.
+The pre-history-fix regression passed 1147 tests; the complete post-fix gate is running.
+Production stacking, broader editing and release qualification remain incomplete.
 
 Routing now declares role-aware anatomy dependencies, including automatic tissue-final
 obstacles, optional exclusions/manual membership, and source-consumer cycle exclusions.
@@ -55,8 +71,7 @@ acceptance and the new full-QML tissue Fiber creation/propagation check pass off
 Full suite: 1133 functional checks passed; its one failure was a 17-line test helper,
 now split and verified with the architecture checks. Ruff, configured mypy and changed
 native clang-tidy pass. The preceding complete development gate passed 1131 tests.
-Target-relative constraints remain to integrate;
-production stacking, broader editing and release qualification remain incomplete.
+Production stacking, broader editing and release qualification remain incomplete.
 
 Inspected addon production contracts and current standalone boundaries. The
 registry, anatomical queries and attachment candidate paths still assume SCPs.

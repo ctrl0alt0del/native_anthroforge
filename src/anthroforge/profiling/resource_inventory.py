@@ -6,6 +6,7 @@ from itertools import islice
 from anthroforge.application.image_assets import ImageAsset
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
+from anthroforge.native.binding_batches import BindingBatch
 from anthroforge.native.mesh import Mesh
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
@@ -32,6 +33,7 @@ RESOURCE_FIELDS = frozenset(
         "field",
         "attachment",
         "attachments",
+        "bindings",
         "context",
     )
 )
@@ -46,7 +48,7 @@ def payload_resources(value, profiler):
         if id(item) in seen:
             continue
         seen.add(id(item))
-        if isinstance(item, (Mesh, Path, ImageAsset, Field, RoutingScene)):
+        if isinstance(item, (Mesh, Path, ImageAsset, Field, RoutingScene, BindingBatch)):
             found.update((item, item.path) if isinstance(item, Field) else (item,))
         else:
             pending.extend(bounded(children(item), 8192 - len(seen) - len(pending), profiler))
@@ -103,6 +105,7 @@ def catalogue_resources(session):
     yield from session.resources.images.values()
     yield from (a.field for a in session.resources.attachments.values())
     yield from (a.field.path for a in session.resources.attachments.values())
+    yield from session.resources.bindings.values()
 
 
 def bounded(values, limit, profiler):
@@ -125,6 +128,7 @@ def document_resources(session, document, profiler):
     result.extend(paths[key].path for key in keys["paths"] if key in paths)
     result.extend(images[key] for key in keys["images"] if key in images)
     result.extend(attachment_resources(session, keys["attachments"]))
+    result.extend(resources.bindings[k] for k in keys["bindings"] if k in resources.bindings)
     return result
 
 

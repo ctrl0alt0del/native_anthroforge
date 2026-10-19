@@ -109,7 +109,8 @@ def publish(session: Any, spec: Capture, origin: int, payload: Any) -> None:
     if revisions(document, ports) != revisions(session.document, ports):
         raise ValueError("Anchor capture inputs changed before publication.")
     result = accepted_result(document, item, ports, "")
-    authored_jobs.publish(session, origin, partial(merge, item=replace(item, result=result)))
+    proof = authored_jobs.Capture(result.inputs, partial(enqueue, session, spec, origin))
+    authored_jobs.publish(session, origin, partial(merge, item=replace(item, result=result)), proof)
     from .output_tasks import propagate
 
     propagate(session, {Port(item.id, "binding")})

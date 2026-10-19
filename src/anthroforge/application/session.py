@@ -160,6 +160,7 @@ class Session:
         self.issues.reset()
         if direction > 0:
             self.history.replay()
+        self.history.recover()
         self.resume_calculations()
 
     def remember_restarts(self, restarts: list[Restart]) -> None:

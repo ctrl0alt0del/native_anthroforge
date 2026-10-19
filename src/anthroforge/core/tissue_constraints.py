@@ -32,7 +32,9 @@ class TissueConstraint:
     feather: float = 0.0
     offset: float = 0.0
     reference: SurfaceReference | None = None
-    bindings: tuple[tuple[float, ...], ...] = ()
+    binding_asset: str = ""
+    material_asset: str = ""
+    topology: str = ""
 
     def __post_init__(self) -> None:
         if not self.id or not self.mask or self.mode not in ("FIXED", "SOFT"):
@@ -40,3 +42,10 @@ class TissueConstraint:
         finite_range(self.strength, 0, 1, "Constraint strength")
         finite_range(self.feather, 0, 1, "Constraint feather")
         finite_range(self.offset, -1000, 1000, "Constraint offset")
+        captured = (self.binding_asset, self.material_asset, self.topology)
+        if (self.reference is None and any(captured)) or (
+            self.reference is not None and not all(captured)
+        ):
+            raise ValueError(
+                "A target-relative region requires an explicit complete material capture."
+            )

@@ -282,6 +282,21 @@ int af_point_attachment_resolve(int surface_count,const uint64_t* meshes,const d
 }
 
 #include "path_internal.hpp"
+int af_attachment_goal_points(const double* frames,int count,const double* local_frame,
+    double offset,double* output,uint64_t cancel) {
+    try {
+        if(!frames||!local_frame||!output||count<1||count>262144||!std::isfinite(offset))
+            throw std::runtime_error("Invalid attachment goal frame batch.");
+        const af::M4 local=Eigen::Map<const af::M4>(local_frame);
+        if(!local.allFinite()||!local.fullPivLu().isInvertible()) throw std::runtime_error("Singular goal frame.");
+        const af::M4 inverse=local.inverse();
+        for(int i=0;i<count;++i) {
+            af::check_cancel(cancel); const af::M4 frame=Eigen::Map<const af::M4>(frames+16*i);
+            af::store_vector(output+3*i,af::point(inverse,af::point(frame,af::V3(0,0,offset))));
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 namespace af {
 struct CurveCapture {
     std::shared_ptr<Path> source;

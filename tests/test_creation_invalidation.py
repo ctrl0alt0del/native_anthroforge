@@ -106,8 +106,8 @@ def test_fiber_history_does_not_accept_capture_from_later_parent_pose(session, m
     release.set()
     session.wait(5)
     fiber = next(item for item in session.document.objects if isinstance(item, Fiber))
-    old = session.history.entries[origin].document.object(fiber.id)
-    assert old.result.status == "pending" and not old.result.asset
+    old = session.history.entries[origin].document
+    assert fiber.id not in old.registry.records
     session.command("undo")
     session.wait(5)
     assert session.document.object(fiber.id).result.status == "ready"

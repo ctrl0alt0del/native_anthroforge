@@ -9,7 +9,7 @@ UiSection {
     property string focused: ""
     readonly property var selected: item.constraints?.find(r=>r.id===focused)
     title: "Constraints"; expanded: false
-    hint: "Source-relative regions follow the current source shape. Fixed cores are exact; feathered surroundings are soft. Structural shell backing remains exact."
+    hint: "Fixed cores are exact; feathered surroundings are soft. Structural shell backing remains exact."
     function change(key,value) { const changes={}; changes[key]=value; workspace.run("tissue.constraint.update",{target:item.id,constraint:focused,changes:changes}); }
     RowLayout {
         Layout.fillWidth: true
@@ -35,6 +35,17 @@ UiSection {
         NumericSetting { label: "Soft strength"; value: panel.selected?.strength || 0; onEdited: value=>panel.change("strength",value) }
         NumericSetting { label: "Feather"; value: panel.selected?.feather || 0; onEdited: value=>panel.change("feather",value) }
         NumericSetting { label: "Normal offset"; length: true; value: panel.selected?.offset || 0; onEdited: value=>panel.change("offset",value) }
+        UiSection {
+            title: "Goal target"; expanded: !!panel.selected?.reference
+            hint: "Bind the inflated rest positions to a target. Offsets then follow its surface normals."
+            Label { text: panel.selected?.reference ? "Attached goals" : "Goals follow source"; color: Theme.muted }
+            SurfaceSelector { id: goal; objectName: "tissueRegionTarget"; target: panel.selected?.reference?.target || ""; role: panel.selected?.reference?.role || "" }
+            RowLayout {
+                Layout.fillWidth: true
+                UiButton { objectName: "tissueRegionBind"; text: panel.selected?.reference ? "Rebind" : "Bind target"; enabled: !!goal.current.ready; Layout.fillWidth: true; onClicked: workspace.run("tissue.constraint.bind",{target:panel.item.id,constraint:panel.focused,parent:goal.current.id,role:goal.current.role}) }
+                UiButton { objectName: "tissueRegionUnlink"; text: "Use source"; enabled: !!panel.selected?.reference; onClicked: workspace.run("tissue.constraint.unlink",{target:panel.item.id,constraint:panel.focused}) }
+            }
+        }
         UiButton { objectName: "tissueRegionRemove"; text: "Remove region"; glyph: "delete"; Layout.fillWidth: true; onClicked: { workspace.run("tissue.constraint.remove",{target:panel.item.id,constraint:panel.focused}); panel.focused=""; } }
     }
 }

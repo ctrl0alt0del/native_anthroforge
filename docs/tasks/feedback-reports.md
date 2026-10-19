@@ -54,5 +54,12 @@ cancellation, focus/privacy and New/Open. The synthetic modifier-release test ne
 explicit held mask because enum inversion incorrectly cleared Ctrl; no production input
 policy changed to accommodate that test. Source packaged-probe path also passes.
 
-Remaining: full development gate, narrow layout, relocated packaged qualification,
-source archive and final merge. Local evidence: `build/feedback-*`; no visible UI was used.
+Full Windows development gate passes at `5768250`: 901 tests, native build/three CTests,
+static analysis, types, formatting, function limits and runtime doctor. Narrow 1050×680
+layout and 200% DPI, including zoom/scroll marking, pass and captures were inspected.
+Ownership review is recorded in development_status.md. No visible UI was used.
+
+Remaining: build and relocate `dist/0.2.1-reports/AnthroForge.dist`; run the expanded portable
+suite including feedback capture/paint/submission; produce
+`dist/AnthroForge-0.2.1-reports-source.zip`, finalize docs and merge/push. Preserve the prior
+0.2.1 distribution/source archive. Local evidence: `build/feedback-*`.

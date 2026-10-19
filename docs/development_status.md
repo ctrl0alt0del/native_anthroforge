@@ -1,7 +1,36 @@
 # AnthroForge development validation
 
-Current source qualification is in [curve workflows 0.2.1](#curve-workflows-021).
+Current source qualification is in [feedback reporting](#feedback-reporting-021-followup).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Feedback reporting (0.2.1 follow-up)
+
+Help/F12 captures the application window before a modal editor. Red rectangles, arrows
+and text share one source-pixel painter for preview/export; Fit and 100% scrolling keep
+annotation placement stable. A Qt-independent report/consumer contract and background
+delivery service use an atomic local inbox outside installation/version directories.
+User feedback is separate from anatomical Issues, inspection exports and profiler files.
+Performance recording now uses Shift+F12; earlier sections retain their historical keys.
+
+The full Windows development gate passes at `5768250`: **901 tests**, 3 native CTests,
+native static analysis, Ruff, mypy on 190 modules, function limits and dependency/native
+doctor. The 24 existing QQmlPropertyMap deprecation warnings remain. Offscreen interaction
+passes normal/200% display scaling and 1050×680 layout: F12 while typing or in another
+modal, Help action, original capture fidelity, three annotation tools, undo, zoom/scroll
+coordinates, failed submission/retry, cancellation and unchanged document history.
+Five updated profiler trials pass normal/snapped dragging with Activity closed/open,
+cancellation, focus/privacy and New/Open. Source capture/submission probe passes.
+
+Ownership review: the delivery consumer receives immutable PNG bytes, annotation records
+and frozen context; no Qt/document dependency enters the feedback package. Its receipt
+supports file or service links. Only explicit submission runs a worker, and only pending
+delivery polls completion. UI callbacks publish delivery state; document jobs, history and
+save checkpoints remain owned by existing subsystems. Modal focus retains ordinary editor
+behavior after capture, including cancellation of a pointer drag. No network adapter runs.
+
+Portable build/relocation qualification is pending. Local captures/logs are under
+`build/feedback-*`; validation has used no visible windows or desktop input. Software
+offscreen screenshots do not establish ordinary Windows GPU-window or hands-on acceptance.
 
 ## Curve workflows 0.2.1
 

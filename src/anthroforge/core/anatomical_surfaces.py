@@ -46,6 +46,14 @@ def port(reference: SurfaceReference) -> Port:
     return Port(reference.target, names[reference.role])
 
 
+def usable(result: EvaluationResult) -> bool:
+    return bool(
+        result.asset
+        and not result.error
+        and result.status not in ("failed", "invalid", "cancelled")
+    )
+
+
 def defaults(
     entities: tuple[SCP, ...], objects: tuple[object, ...]
 ) -> tuple[SurfaceReference, ...]:

@@ -54,7 +54,7 @@ def snapshot(
 
 
 def require_ready(ref: SurfaceReference, result: EvaluationResult, key: str, meshes: Any) -> None:
-    if result.status in ("failed", "invalid", "cancelled"):
+    if result.error or result.status in ("failed", "invalid", "cancelled"):
         raise ValueError(f"{ref.role} on {ref.target} failed: {result.error or result.status}")
     if not key or key not in meshes:
         raise ValueError(f"{ref.role} on {ref.target} has no accepted geometry.")

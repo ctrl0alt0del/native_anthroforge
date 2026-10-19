@@ -62,6 +62,10 @@ class Accepted(c.Structure):
     _fields_ = [("id", U), ("points", D), ("count", c.c_int), ("status", c.c_int)]
 
 
+class Surface(c.Structure):
+    _fields_ = [("intrinsic", U), ("final", U), ("frame", c.c_double * 16), ("changed", c.c_int)]
+
+
 class Output(c.Structure):
     _fields_ = [("id", U), ("status", c.c_int), ("vertices", c.c_int64)]
     _fields_ += [(name, c.c_double) for name in ("maximum", "map_ms", "solve_ms", "validation_ms")]
@@ -87,6 +91,7 @@ def configure(engine: Any) -> None:
     engine.bind("af_stack_results", [U, c.POINTER(Output), c.c_int])
     engine.bind("af_stack_orders", [U, c.POINTER(Order), c.c_int])
     engine.bind("af_stack_dependencies", [U, c.POINTER(U), c.c_int])
+    engine.bind("af_stack_validate_surfaces", [U, c.POINTER(Surface), c.c_int, U])
     engine.bind("af_stack_points", [U, U, D, c.c_int, D])
     engine.bind("af_stack_run", RUN_ARGUMENTS)
     engine.bind("af_stack_plan", RUN_ARGUMENTS)

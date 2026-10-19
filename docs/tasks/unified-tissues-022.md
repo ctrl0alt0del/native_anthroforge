@@ -30,6 +30,24 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Full assembled surfaces now undergo native fold/self-intersection, bone and pairwise
+crossing checks after stacking, including shell backing/rims and envelope composition.
+Mixed muscle/normal-shell provider/receiver and geometrically relaxed receiver cases pass;
+hidden GPU captures were inspected with retained backing and no visible tears or folds.
+Picking matches displayed geometry; no visible test windows or interactive acceptance.
+Automatic attachment search skips failed surfaces (including pending retries retaining a
+failure); explicit references still fail. Independent construction remaps support-region
+branch IDs in both owned and external intent. Full suite **1240 passed**, 747 existing Qt
+warnings, 63.93 seconds; Ruff/mypy and changed-native build/CTest/clang checks pass.
+
+Next architectural defect reproduced: two-sided tissues with excluded incompatible
+cross-side pairs have valid acyclic native side dependencies but a cycle in the current
+whole-tissue final graph. Joint native resolution succeeds; individual application jobs fail.
+Probes: `build/022-tissue/probe_stack_sides*.py`. Implement coordinated group publication
+for this case, preserving complete geometry acceptance and genuine attachment cycles.
+Support-region drafts, remaining editing, Pouch visual qualification, performance and
+release evidence remain incomplete. Do not merge/release.
+
 Stacking is connected to shared phase jobs and desktop/headless entry points. A separate
 plan output installs actual provider-final dependencies; candidate observations do not create
 blanket prerequisite edges. Accepted Manual providers, exclusions, schema-4 intent, unchanged

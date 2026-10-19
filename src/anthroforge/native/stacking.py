@@ -39,6 +39,18 @@ class StackSession:
         )
         return results(self)
 
+    def validate_surfaces(self, surfaces: Any, cancel: int = 0) -> None:
+        rows = (abi.Surface * len(surfaces))(*surfaces)
+        self.engine.check(
+            self.engine.library.af_stack_validate_surfaces(self.handle, rows, len(rows), cancel)
+        )
+
+
+def surface(intrinsic: Any, final: Any, frame: Any, changed: bool = True) -> Any:
+    row = abi.Surface(intrinsic=intrinsic.handle, final=final.handle, changed=changed)
+    row.frame[:] = frame
+    return row
+
 
 def accepted_rows(accepted: Any) -> Any:
     arrays = [np.ascontiguousarray(row["points"], dtype=np.float64) for row in accepted.values()]

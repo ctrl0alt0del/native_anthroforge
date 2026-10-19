@@ -16,6 +16,8 @@ def eligible(document: Document, curve: str) -> tuple[SurfaceReference, ...]:
             for ref in surface_providers.references(document)
             if ref.role != "TISSUE_BASE"
             and ref.target not in downstream
-            and anatomical_surfaces.result(document.registry.anatomy[ref.target], ref.role).asset
+            and anatomical_surfaces.usable(
+                anatomical_surfaces.result(document.registry.anatomy[ref.target], ref.role)
+            )
         )
     )

@@ -5,6 +5,7 @@ from typing import Any
 
 import numpy as np
 
+from anthroforge.core.anatomical_surfaces import usable
 from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import components, stacking_abi
 from anthroforge.native.mesh import INT64, pointer
@@ -60,7 +61,7 @@ class StackScene:
         state = item.intrinsic_material
         assert state is not None
         try:
-            if item.intrinsic_result.status in ("failed", "invalid", "cancelled"):
+            if not usable(item.intrinsic_result):
                 raise ValueError(item.intrinsic_result.error or "Intrinsic evaluation failed.")
             for side in sides(state):
                 self.add_side(item.id, state, side, family)

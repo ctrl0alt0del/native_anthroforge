@@ -16,6 +16,7 @@ def independent(session: Any, target: str) -> str:
     )
     changed = remapped(item, mapping)
     object_operations.install(session, changed)
+    remap_regions(session, item.id, mapping)
     return str(changed.source)
 
 
@@ -32,6 +33,23 @@ def remapped(item: Any, mapping: dict[str, str]) -> Any:
 
 
 MATERIALS = ("rest_material", "intrinsic_material", "final_material")
+
+
+def remap_regions(session: Any, target: str, mapping: dict[str, str]) -> None:
+    for item in session.document.objects:
+        rows = getattr(item, "stack_relationships", ())
+        changed = tuple(region_reference(row, item.id, target, mapping) for row in rows)
+        if rows != changed:
+            object_operations.install(session, replace(item, stack_relationships=changed))
+
+
+def region_reference(row: Any, owner: str, target: str, mapping: dict[str, str]) -> Any:
+    cover = owner if row.cover == "SELF" else row.other
+    if cover != target:
+        return row
+    return replace(
+        row, regions=tuple((mapping.get(part, part), face) for part, face in row.regions)
+    )
 
 
 def remapped_material(state: Any, mapping: dict[str, str]) -> Any:

@@ -4,8 +4,9 @@ from typing import Any
 
 import numpy as np
 
+from anthroforge.core.anatomical_surfaces import usable
 from anthroforge.core.tissue_stacking import StackOrder, StackPlan
-from anthroforge.native.stacking import StackSession, dependencies
+from anthroforge.native.stacking import StackSession, dependencies, surface
 from anthroforge.native.tissue_stacking import assemble
 
 from . import tissue_stack_policy as policy
@@ -104,7 +105,7 @@ def frozen_points(domain: Any) -> dict[str, Any]:
 def usable_final(item: Any) -> bool:
     return bool(
         item.final_material is not None
-        and item.final_result.status not in ("failed", "invalid", "cancelled")
+        and usable(item.final_result)
         and item.final_material.own == item.intrinsic_material.own
     )
 
@@ -113,17 +114,23 @@ def evaluate(engine: Any, document: Any, resources: Any, item: Any, cancel: int)
     if item.stack_plan.error:
         raise ValueError(item.stack_plan.error)
     scene, native, _, _ = prepared(engine, document, resources, item, cancel)
-    providers = {
-        scene.identities[b][0] for a, b in dependencies(native) if scene.identities[a][0] == item.id
-    }
-    if providers != set(item.stack_plan.providers):
-        raise ValueError("Stacking order changed; reevaluate its plan before the final surface.")
+    require_order(scene, native, item)
     accepted, _leases = frozen(scene)
     targets = tuple(key for key, row in scene.identities.items() if row[0] == item.id)
     if not targets:
         return TissueOutput(asset=item.intrinsic_result.asset)
     output, _ = native.resolve(accepted, targets, cancel)
-    return assembled(scene, item, output, targets)
+    result = assembled(scene, item, output, targets)
+    native.validate_surfaces(complete_surfaces(scene, item, result.mesh), cancel)
+    return result
+
+
+def require_order(scene: Any, native: StackSession, item: Any) -> None:
+    providers = {
+        scene.identities[b][0] for a, b in dependencies(native) if scene.identities[a][0] == item.id
+    }
+    if providers != set(item.stack_plan.providers):
+        raise ValueError("Stacking order changed; reevaluate its plan before the final surface.")
 
 
 def assembled(scene: Any, item: Any, output: Any, targets: Any) -> TissueOutput:
@@ -139,3 +146,17 @@ def assembled(scene: Any, item: Any, output: Any, targets: Any) -> TissueOutput:
 def output_points(output: Any, target: str, side: str) -> Any:
     row = output.get(scene_inputs.identity(target, side))
     return row["points"] if row else np.empty((0, 3))
+
+
+def complete_surfaces(scene: Any, item: Any, final: Any) -> list[Any]:
+    meshes, state = scene.resources.meshes, item.intrinsic_material
+    rows = [surface(meshes[state.own].mesh, final, state.frame)]
+    for other in scene_inputs.participants(scene.document):
+        if other.id == item.id or not usable_final(other):
+            continue
+        accepted = other.final_material
+        assert accepted is not None
+        rows.append(
+            surface(meshes[accepted.own].mesh, meshes[accepted.final].mesh, accepted.frame, False)
+        )
+    return rows

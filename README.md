@@ -10,8 +10,9 @@ A standalone anatomical construction editor for Windows, built with a shared Pyt
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
 Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1-surfaces-reports/AnthroForge.dist`.
-Earlier distributions remain in their versioned directories.
-The default packaging location remains `dist/AnthroForge.dist`.
+That existing installation predates the single-folder release policy. New builds use
+`dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
+Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.

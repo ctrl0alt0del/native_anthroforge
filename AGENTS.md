@@ -13,6 +13,7 @@
 - In Codex Cloud/Linux, follow [cloud development](docs/cloud_development.md). Run `bash tools/cloud/setup.sh` for first setup; source `tools/cloud/environment.sh` in new shells and run `uv run --no-sync python tools/check_core.py --native-style` for the portable gate. This gate includes the complete pytest suite but does not certify Windows GUI or executable packaging.
 - Existing root __init__.py is an unrelated legacy Blender stub. Preserve it; the standalone package lives in src/anthroforge.
 - Keep local SDKs, environments, outputs, fixtures, and captures in ignored directories. Do not commit large binaries or production anatomy assets.
+- Deliver one portable distribution per version: `dist/<version>/AnthroForge.dist`. Replace that version's previous build; do not create feature/task suffixes such as `-reports` or `-fix`. Use one companion `dist/AnthroForge-<version>-source.zip` as well. Temporary qualification copies belong under `build/` or the OS temporary directory, not additional release folders. If an installed build is running, keep its files intact and wait for it to close before replacement; do not work around file locks with another distribution name.
 
 ## Work continuity across desktop and cloud
 

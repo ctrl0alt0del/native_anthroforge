@@ -15,7 +15,10 @@ from anthroforge.profiling.identity import build_identity
 
 ROOT = Path(__file__).resolve().parents[1]
 STAGE = ROOT / "build" / "package-input"
-DIST = Path(os.environ.get("AF_PACKAGE_OUTPUT", ROOT / "dist")).resolve() / "AnthroForge.dist"
+DIST = (
+    Path(os.environ.get("AF_PACKAGE_OUTPUT", ROOT / "dist" / __version__)).resolve()
+    / "AnthroForge.dist"
+)
 PACKAGES = (
     "numpy",
     "Pillow",

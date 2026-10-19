@@ -49,6 +49,10 @@ integrated. Membranes retain the existing Surface inspector and staged display.
 Tissue phase revisions distinguish base/rest/intrinsic/final invalidation; topology
 locks traverse construction consumers through Membranes to tissue attachments.
 
+Native meshes now retain validated material grids and welded branch vertex identities;
+deformation, finalization, memory accounting and project storage preserve them. This
+supplies exact source correspondence for the upcoming tissue evaluators.
+
 Runtime integration remains incomplete: generalized Fiber roles, intrinsic numerical ports, stacking,
 full GUI and release qualification are still required. No 0.2.2 release is claimed.
 Unrelated untracked root `__init__.py` is preserved.
@@ -69,6 +73,11 @@ not render the 3D viewport; inspected UI capture at `build/022-points/anchor-ins
 Separately `tools/point_scene_acceptance.py` passes GPU texture-only rendering and
 native picking with no visible window; inspected `build/022-points/point-gpu.png`.
 Full tissue geometry parity and release acceptance remain pending.
+Point/UI foundation full suite: **964 passed**. Material correspondence full suite:
+**969 passed**, 335 Qt deprecation warnings, 31.24 seconds. Native build and three CTest
+contracts pass; changed native adapters pass the native function-length check. An
+over-broad explicit mypy invocation included intentionally untyped desktop modules;
+the repository gate uses its configured scopes instead.
 Required: development gate, geometry parity, lifecycle, headless, offscreen UI,
 profiler and portable acceptance, followed by ownership/coupling review.
 

@@ -11,6 +11,9 @@ INT32 = c.POINTER(c.c_int32)
 
 
 def configure(engine: GeometryEngine) -> None:
+    from . import material
+
+    material.configure(engine)
     engine.bind("af_mesh_reuse_topology", [U, U, U], U)
     engine.bind("af_mesh_draft", [U, U], U)
     engine.bind("af_mesh_storage_bytes", [U], U)

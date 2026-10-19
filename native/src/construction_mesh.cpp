@@ -20,6 +20,7 @@ static void copy_topology(const Mesh& source,Mesh& target) {
     target.corners=source.corners;
     target.offsets=source.offsets;
     target.polygons=source.polygons;
+    target.material=source.material;
 }
 std::shared_ptr<Mesh> deform_mesh(const Mesh& source,const Vertices& vertices,uint64_t cancel,bool complete) {
     if(vertices.rows()!=source.vertices.rows()||!vertices.allFinite())

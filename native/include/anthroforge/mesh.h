@@ -14,6 +14,10 @@ AF_API int af_measure_points(const double* first, const double* second, double* 
 AF_API int af_mesh_memory_snapshot(uint64_t* rows, int capacity, uint64_t* total_handles);
 AF_API int af_mesh_sizes(uint64_t handle, int64_t* sizes);
 AF_API const void* af_mesh_buffer(uint64_t handle, int kind);
+/* Immutable material grids: rows, columns, closed-u, closed-v, count, vertex indices. */
+AF_API int64_t af_mesh_material_size(uint64_t source);
+AF_API int af_mesh_material_copy(uint64_t source,int64_t* data,int64_t count);
+AF_API uint64_t af_mesh_with_material(uint64_t source,const int64_t* data,int64_t count,uint64_t cancel);
 AF_API int af_mesh_bounds(uint64_t handle, double* bounds);
 AF_API int af_mesh_chunk(uint64_t handle, int chunk, const float** data, int* count);
 AF_API uint64_t af_cancel_create(void);

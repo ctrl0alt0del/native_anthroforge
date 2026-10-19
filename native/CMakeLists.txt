@@ -1,5 +1,5 @@
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
-    src/mesh_registry.cpp src/transforms.cpp src/spatial.cpp src/ray_queries.cpp src/attachment.cpp
+    src/mesh_registry.cpp src/transforms.cpp src/spatial.cpp src/ray_queries.cpp src/attachment.cpp src/material_domain.cpp
     src/construction_mesh.cpp src/curves.cpp src/loft.cpp src/curve_body.cpp
     src/hooks.cpp src/lattices.cpp src/solidify.cpp src/component_queries.cpp src/curve_deform.cpp
     src/mesh_topology.cpp src/curve_frames.cpp src/curve_mapping.cpp src/component_index.cpp

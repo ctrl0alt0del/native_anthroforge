@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 
-from anthroforge.native import paths, topology
+from anthroforge.native import material, paths, topology
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.native.routing import Report
 
@@ -53,6 +53,7 @@ def write(archive: zipfile.ZipFile, resources: Resources) -> None:
     for key, asset in resources.meshes.items():
         for kind, label in enumerate(MESH_BUFFERS):
             write_array(archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind))
+        write_array(archive, f"assets/{key}/material.npy", material.array(asset.mesh))
     for key, curve in resources.paths.items():
         write_array(archive, f"paths/{key}/samples.npy", curve.path.array())
         write_array(archive, f"paths/{key}/parameters.npy", curve.path.array(1))
@@ -63,7 +64,9 @@ def write(archive: zipfile.ZipFile, resources: Resources) -> None:
 
 def read_mesh(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> Asset:
     arrays = [read_array(archive, f"assets/{key}/{label}.npy") for label in MESH_BUFFERS]
-    return Asset(topology.restore(engine, arrays), **source)
+    mesh = topology.restore(engine, arrays)
+    domain = read_array(archive, f"assets/{key}/material.npy")
+    return Asset(material.restore(mesh, domain), **source)
 
 
 def read_path(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> PathAsset:

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Native port of addon branched_surface.py assembly; explicit shared vertex IDs.
 #include "surface_branch_internal.hpp"
+#include "material_domain.hpp"
 #include <numeric>
 
 namespace af::curve_surface {
@@ -62,14 +63,18 @@ void append_branch(Assembly& assembly,const Rows& rows,const Branch& branch,bool
     const size_t boundary=branch.boundary==0?0:assembly.main.rows-1;
     const auto mapping=append_vertices(assembly,grid,size_t(first-assembly.along.begin()),boundary,along,cancel);
     append_faces(assembly,mapping,grid.rows,grid.columns,(branch.boundary!=0)!=assembly.flip);
+    append_material_grid(assembly.material,mapping,grid.rows,grid.columns);
 }
 static std::shared_ptr<Mesh> build(const Rows& rows,int main_count,const std::vector<Branch>& branches,bool exact,int strips,int samples,bool flip,uint64_t cancel) {
     auto assembly=main_assembly(Rows(rows.begin(),rows.begin()+main_count),branches,exact,strips,samples,cancel);
     assembly.flip=flip;
     std::vector<uint32_t> mapping(assembly.points.size()); std::iota(mapping.begin(),mapping.end(),0);
     append_faces(assembly,mapping,assembly.main.rows,assembly.main.columns,flip);
+    append_material_grid(assembly.material,mapping,assembly.main.rows,assembly.main.columns);
     for(const auto& branch:branches) append_branch(assembly,rows,branch,exact,samples,cancel);
-    return make_mesh(assembly.points,assembly.faces,cancel,false);
+    auto result=make_mesh(assembly.points,assembly.faces,cancel,false);
+    result->material=std::move(assembly.material);
+    return result;
 }
 }
 uint64_t af_curve_surface_branches(const AfSurfaceRow* data,int count,int main_count,const AfSurfaceBranch* connections,int branch_count,int exact,int strips,int flip,uint64_t cancel) {

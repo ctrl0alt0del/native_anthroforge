@@ -46,8 +46,10 @@ uint64_t af_mesh_restore(const double* vertices,int64_t count,const int64_t* cor
 uint64_t af_mesh_reuse_topology(uint64_t source,uint64_t previous,uint64_t cancel) {
     try {
         auto current=af::mesh(source); const auto old=af::mesh(previous);
-        if(current->vertices.rows()==old->vertices.rows()&&current->corners==old->corners&&current->offsets==old->offsets)
-            current=af::deform_mesh(*old,current->vertices,cancel);
+        if(current->vertices.rows()==old->vertices.rows()&&current->corners==old->corners&&current->offsets==old->offsets) {
+            auto updated=af::deform_mesh(*old,current->vertices,cancel);
+            updated->material=current->material; current=std::move(updated);
+        }
         return af::retain(current);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }
@@ -65,7 +67,9 @@ uint64_t af_mesh_finalize(uint64_t source,uint64_t previous,uint64_t cancel) {
             topology=mesh;
         if(mesh->prepared&&mesh->triangles.rows()==topology->triangles.rows()&&mesh->triangles==topology->triangles&&mesh->polygons==topology->polygons)
             return af::retain(mesh);
-        return af::retain(af::deform_mesh(*topology,mesh->vertices,cancel));
+        auto result=af::deform_mesh(*topology,mesh->vertices,cancel);
+        result->material=mesh->material;
+        return af::retain(result);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }
 uint64_t af_mesh_storage_bytes(uint64_t source) {
@@ -73,6 +77,6 @@ uint64_t af_mesh_storage_bytes(uint64_t source) {
         const auto mesh=af::mesh(source);
         if(mesh->prepared) throw std::runtime_error("Storage accounting requires a geometry-only draft.");
         return sizeof(af::Mesh)+mesh->vertices.size()*sizeof(double)+mesh->triangles.size()*sizeof(int)
-            +(mesh->corners.capacity()+mesh->offsets.capacity()+mesh->polygons.capacity())*sizeof(int64_t);
+            +(mesh->corners.capacity()+mesh->offsets.capacity()+mesh->polygons.capacity()+mesh->material.capacity())*sizeof(int64_t);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }

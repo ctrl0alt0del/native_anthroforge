@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "curve_surface_internal.hpp"
+#include "material_domain.hpp"
 
 namespace af::curve_surface {
 static size_t row_count(const Rows& rows,const int* across) {
@@ -27,6 +28,8 @@ std::shared_ptr<Mesh> loft(const Rows& rows,const int* across,bool close_across,
     points.insert(points.end(),rows.back().points.begin(),rows.back().points.end());
     auto faces=grid_faces(int(count),int(columns),rows.front().closed,close_across&&count>2);
     if(flip) for(auto& face:faces) std::reverse(face.begin()+1,face.end());
-    return make_mesh(points,faces,cancel,false);
+    auto result=make_mesh(points,faces,cancel,false);
+    result->material=grid_material(int(count),int(columns),rows.front().closed,close_across&&count>2);
+    return result;
 }
 }

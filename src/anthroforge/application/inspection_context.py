@@ -8,6 +8,7 @@ from anthroforge.core.entities import Workspace
 from anthroforge.native.mesh import GeometryEngine
 
 from .assets import Asset
+from .resources import Resources
 
 if TYPE_CHECKING:
     from .session import Session
@@ -16,13 +17,15 @@ if TYPE_CHECKING:
 @dataclass(frozen=True)
 class InspectionContext:
     document: Document
-    assets: dict[str, Asset]
+    resources: Resources
     engine: GeometryEngine
     workspace: Workspace
 
+    @property
+    def assets(self) -> dict[str, Asset]:
+        return self.resources.meshes
+
 
 def freeze(session: "Session") -> InspectionContext:
-    from .geometry_ownership import assets_used
-
-    assets = {key: session.assets[key] for key in assets_used(session.document)}
-    return InspectionContext(session.document, assets, session.engine, session.workspace)
+    resources = session.resources.selected(session.document)
+    return InspectionContext(session.document, resources, session.engine, session.workspace)

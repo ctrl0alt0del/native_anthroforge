@@ -174,16 +174,18 @@ class Authoring(QObject):
 
     @Slot(str, str)
     def create(self, kind, shape):
+        from .construction_creation import create
+
+        create(self, kind, shape)
+
+    def create_arguments(self, kind, shape):
         args = dict(
             kind=kind,
             shape=shape,
             parent=self.parent_scp(),
             name="Loft" if kind == "LOFT" else shape.title(),
         )
-        entity = self.controller.run("primitive.create", args)
-        if entity:
-            self.controller.select(entity)
-            self.setEditing(True)
+        return args
 
     def parent_scp(self):
         document = self.controller.session.document
@@ -192,7 +194,7 @@ class Authoring(QObject):
         selected = self.state
         return (
             selected.get("follow")
-            or (selected.get("id") if not selected.get("is_control") else "")
+            or (selected.get("id") if selected.get("id") in document.index.entities else "")
             or document.entities[0].id
         )
 
@@ -229,7 +231,15 @@ class Authoring(QObject):
 
     @Slot(str, "QVariantMap")
     def edit(self, operation, arguments):
-        self.controller.run(operation, arguments)
+        from .curve_context import command
+
+        command(self, operation, arguments)
+
+    @Slot(str, str, result="QVariantMap")
+    def junctionOptions(self, curve, point):
+        from .junction_tools import choices
+
+        return choices(self.controller, curve, point)
 
     @Slot(str, str, "QVariant")
     def setting(self, operation, key, value):

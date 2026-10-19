@@ -1,4 +1,35 @@
-# Local authoring API, version 0.1.8
+# Local authoring API, 0.2.0
+
+## Construction commands
+
+The desktop and headless clients share these operations, policies and transactions.
+See the [construction walkthrough](construction_020.md) and
+[release validation](development_status.md#construction-objects-020).
+
+| Operation | Arguments | Result |
+| --- | --- | --- |
+| `curve.create` | optional `name`, `points` (CurvePoint records), `parent`, anatomical `owner`, `engine`, typed `settings`, `closed`, TRS `values` | Independent curve ID; BEZIER default; POLYLINE and ROUTED supported; no SCP needed. |
+| `curve.edit` | `curve`, optional `name`, `closed`, `resolution` | Shared authored edit; validates all consumers' topology locks. |
+| `curve.point.update` | `curve`, `point`, point/handle/radius/tilt fields | Shared point edit using native handle behavior. |
+| `object.inspect` | `target` | Typed authored construction record and consumer IDs. |
+| `object.rename` | `target`, `name` | Metadata edit without geometry scheduling. |
+| `object.transform` | `target`, nine TRS `values` | Ordinary local transform. |
+| `object.reparent` | `target`, optional `parent` | Preserves world placement and consumer placement. |
+| `object.delete` | `target` | Blocks referenced sources; preserves ordinary children. |
+| `primitive.from_curves` | ordered `curves`, `kind` BODY/LOFT, optional `parent`, `name`, `shape` | SCP ID with live curve references. |
+| `primitive.curve_mode` | `entity`, `curve`, `mode` SHAPE_ONLY/SHAPE_AND_TRANSFORM | Changes transform following without a visible jump. |
+| `primitive.make_independent` | `entity`, `curve` | New curve ID; remaps that consumer and its memberships. |
+| `consumer.sampling` | `entity`, `curve`, `samples` | Consumer-owned override; null inherits primitive density (32 for surfaces). Incoming attachments lock changes. |
+
+Primitive inspect retains resolved curve records for editing clients; project storage
+holds references and separate objects. Schema 3 rejects older files. Standalone path
+evaluation and explicit engine conversion, including native routing, are described below.
+
+## Existing command catalogue
+
+The [0.2.0 contract](specification_020.md) adds object/curve/fiber/surface/image operations
+and retires direct control-surface attachment. The commands below are implemented; release
+qualification is tracked in [the implementation record](tasks/020-construction.md).
 
 The desktop and JSON clients call application/commands.py. A request has operation,
 arguments (an object) and optionally id. Success responses contain ok, revision and
@@ -146,8 +177,8 @@ Use `wait` to finish queued checks and repairs, then query again. A check can fi
 successfully while reporting a defect. Failed checks retain earlier evidence with
 `freshness=stale`; an empty filtered page is not a clean certificate. Dismissals and
 check records are session state and reset on opening a document or navigating history.
-Built-in providers are evaluation.v1, dependencies.v1 and the direct lifecycle
-producer tasks.v1. Only asynchronous detectors can be cancelled. Registration ports
+Built-in providers are evaluation.v1, dependencies.v1, fiber_collisions.v1 and the direct
+lifecycle producer tasks.v1. Only asynchronous detectors can be cancelled. Registration ports
 for Python integrations are `session.issues.listening.register(Provider(...))`,
 `session.issues.reporting.report(Issue(...))`, and `session.issues.resolution.register(Solver(...))`.
 
@@ -174,9 +205,8 @@ creating a connected loft, Hook-driven cage, thickness, curved capsule and impor
 | body.update | entity, piece; shape, width, depth, fit, length, position, sides | Body piece settings |
 | thickness.update | entity; optional remove=true, or Simple Solidify settings below | Separate editable thickness after geometry deformers |
 | control.create | optional kind=HOOK/LATTICE, entity, name, values | New shared control ID; follows entity or document; lattice fits entity unless values supplied |
-| control.transform | control, values=[x,y,z,rx,ry,rz,sx,sy,sz] | Local TRS for an SCP-following or control-supported control; world TRS for document-frame or SCP-attached controls, recapturing the latter's surface/origin placement |
-| control.follow | control; optional entity="" | Change follow source preserving world placement; clear local attachment |
-| control.attach | control, support; optional surface=true | Bind to SCP surface/origin or another control |
+| control.transform | control, values=[x,y,z,rx,ry,rz,sx,sy,sz] | Ordinary parent-local TRS, or world TRS without a parent |
+| control.follow | control; optional entity="" | Follow any eligible ordinary transform source, preserving world placement; images cannot be parents |
 | control.update | control; name, interpolation, outside, weights | Shared settings |
 | control.affected | control | Affected SCP IDs, including indirect consumers |
 | control.delete | control | Remove this control and its bindings; return deleted/affected IDs |
@@ -189,6 +219,12 @@ creating a connected loft, Hook-driven cage, thickness, curved capsule and impor
 | deformer.remove | binding | Remove influence, preserve other consumers and authored primitive |
 | hook.reset | binding | Reset binding transform using current target/control frames |
 | hook.recenter | binding, center=[x,y,z] | Set target-local falloff center |
+
+In 0.2.0 `control.attach` is retired and rejected as an unknown operation. Hook and
+lattice controls never have anatomical bindings. They appear in Construction;
+workspace inclusion follows their anatomical associations and deformer consumers,
+while explicit workspace membership accepts anatomy only. Ordinary following does
+not lock topology. Deleting a transform parent preserves its children's world frames.
 
 `target` is `{owner, stage, component}`. Default stage GEOMETRY uses an SCP's generated
 vertices. CURVE requires its owned curve ID; BASE requires a BODY piece ID; LATTICE
@@ -225,6 +261,164 @@ inputs with newer authored changes. Failed cycles retain previous geometry and f
 unsuccessfully, so they do not block saves indefinitely. Read `jobs` and result status
 after `wait`; successful command dispatch alone does not guarantee successful calculation.
 
-Schema 2 embeds editable definitions, source meshes, bindings and accepted results for
-the selected revision. Version-1 projects migrate on read. Native handles and undo history
-are not serialized. Older application versions reject schema 2.
+The released 0.1.x implementation used schema 2 with version-1 migration. Version 0.2.0
+supersedes that behavior: schema 3 only, with clear rejection of
+older formats. Native handles and undo history are never serialized.
+## Reference images
+
+Image operations use the same session command API, with no Qt dependency:
+
+- `image.import(path, width=1, name="", parent="", owner="", values=None)` returns
+  `object_id` and `job_id`. PNG/JPEG decoding and native preparation are asynchronous.
+  `values` uses the existing position/rotation/scale convention, in metres/degrees.
+- `image.replace(target, path)` replaces one assignment asynchronously. Position and
+  physical width remain; height follows the new aspect ratio; landmark calibration clears.
+- `image.instance(source, name="")` creates an independent placement sharing its image asset.
+- `image.size(target, width)` preserves aspect ratio and clears landmark calibration.
+- `image.align(target, axis)` faces world X, Y or Z while retaining position and scale.
+- `image.calibrate(target, first, second, distance)` takes two normalized image UV points
+  (top-left origin, each component in `[0,1]`) and a positive world distance in metres.
+  Native calibration respects the complete parent/world transform and creates one undo step.
+- `image.inspect(target)` returns asset identity, pixel dimensions, format, physical size
+  and calibration status. Generic `object.inspect`, `object.transform`, `object.reparent`,
+  `object.rename` and `object.delete` also apply. Images cannot be transform parents.
+- `image.presentation(target, **settings)` updates the current workspace without anatomical
+  undo or geometry work. Settings: `opacity` (0–1), `depth` (`NORMAL`, `FRONT`, `BACK`),
+  `side` (`BOTH`, `FRONT`, `BACK`), `orthographic`, `perspective`, `only_axis_aligned`,
+  and `pickable`. Axis-only visibility uses Blender's local-Z/view-axis tolerance and
+  affects both drawing and picking without changing the image's transform.
+
+`wait` includes image jobs. Import/replacement uses the initiating undo step; cancel/failure
+never publishes a partial image. Source bytes are embedded once per unique asset in schema 3.
+
+## First-class drawing
+
+`curve.create` creates an editable standalone curve; no SCP is required. Its optional
+placement defaults to the workspace 3D cursor. `curve.draw(points, settings)` accepts
+world-space xyz or xyz/radius samples, fits asynchronously and returns `object_id` and
+`job_id`. A complete accepted curve is published into the initiating undo entry.
+Settings: `method` (`REFIT`, `SPLIT`, `POLYLINE`), `error` in document units,
+`corner_angle` in radians, and `closed`. Fitting remains editable, with no baked-only path.
+
+`drawing.project(rays, plane, surfaces, image, settings, interpolate)` is a Qt-free
+read-only operation. Each ray is `[ox,oy,oz,dx,dy,dz,screen_x,screen_y,radius]`.
+`plane` is `[px,py,pz,nx,ny,nz]`; `surfaces` lists SCPs with accepted geometry.
+Projection settings: `depth` (`VIEW`, `SURFACE`, `IMAGE`), `first_plane` (0 follow,
+1 view, 2 surface, 3 tangent view), `offset`, `relative`. IMAGE depth uses `image`'s
+world plane. Returned xyz/radius samples can be supplied to `curve.draw`; neither
+operation creates an enduring source-image/surface relationship. Surface snapshots use
+accepted results; desktop drawing instead captures the exact displayed revision.
+
+Native projection uses exact triangle queries rather than Blender's depth-buffer pixels.
+The first-hit/fallback/offset policies are adapted from Blender 5.0.1. Fitting uses its
+pinned curve_fit_nd implementation. Cancellation is checked around the atomic fit call;
+obsolete output cannot publish. `tools/drawing_qualification.py` records this interval.
+
+## Curve engine conversion
+
+Authored curves store typed `engine_settings`: Bézier (`kind`, `resolution`), exact
+polyline (`kind`), or routing (`kind`, `samples`, `radius`, `accepted_steps`, `obstacles`).
+There is no public solver generation selector. `curve.create` accepts `engine` and a
+`settings` dictionary; the existing Bézier `curve.edit(resolution=...)` operation remains
+an alias for its typed setting. Curve/Fiber consumers still share the same path contract.
+
+- `curve.conversion.preview(curve, engine, mode="EVALUATED", samples=64, points=[], settings={})`
+  starts a read-only coordinator job. EVALUATED resamples the accepted path into editable
+  vector-handle points; AUTHORED retains authored points. Routing requires AUTHORED plus an
+  explicit point-ID selection including open endpoints and all anatomical bindings.
+  Sampled conversion retains bound point identities and positions, allocating its exact
+  point budget between required anchors in native work. Insufficient budgets fail explicitly.
+- `curve.conversion.status()` returns the token, job, state and candidate point count/settings.
+- `curve.conversion.accept(token)` validates the captured read set and shared topology locks,
+  then commits one undoable edit. It preserves metadata edited after preview and retains
+  accepted geometry while the converted path evaluates.
+- `curve.conversion.cancel()` releases the candidate and cancels pending preview work.
+
+Only one preview is retained. It does not alter saving, document state or undo; it is not
+serialized. The desktop displays it in green and excludes it from picking. Source edits
+invalidate acceptance. Routing runs through the native production solver and the existing
+coordinator. `curve.engine_settings(curve, **settings)` changes
+the current engine's parameters; engine changes require the conversion workflow above.
+Routing `obstacles` are explicit anatomical surface IDs, with fiber support surfaces also
+included automatically. All surface poses/results are declared inputs. Missing inputs or
+failed solves retain the accepted path and report failure; Manual inputs retain provenance.
+The inspector exposes routing samples, clearance, solve budget and obstacle selection.
+
+Accepted Bézier/polyline fibers are checked by the read-only `fiber_collisions.v1` Issues
+provider. `issues.recheck` and `issues.cancel` use the ordinary advisory coordinator. A
+`FIBER_COLLISION` finding identifies the fiber, intersected SCP, first offending sampled
+segment, accepted path/surface assets and numerical tolerance. Segment crossings and closed
+mesh containment are checked, including the closing edge. Only tiny neighborhoods around
+explicit bound knots permit their expected surface contact. This is a centerline check of
+the accepted sampled path, not a continuous Bézier proof or a physical fiber-radius test.
+It never changes engines, geometry, undo history or save checkpoints. Stale captures cannot
+publish current findings; failed or cancelled checks remain explicitly incomplete.
+Pinned actual-addon fixtures cover cold/warm skull routes, attachment deformation and surfaces.
+Recorded shared-fiber profiling includes preparation, publication and resource release; evidence
+and its limits are in [release validation](development_status.md#construction-objects-020).
+
+### Fiber creation
+
+`fiber.create(curve, bindings, name="Fiber")` starts an asynchronous independent copy.
+Each binding is `{point: authored_point_id, target: anatomical_surface_id,
+capture_scope: "CURRENT_PARENT" | "ANY_PARENT"}`. Supply both open endpoints or
+at least one point on a closed curve. It returns the job identifier; completed creation
+appears in the Construction registry as `kind: "fiber"`. The source has no continuing
+reference to its copy. Invalid/incomplete bindings leave an ordinary curve unchanged.
+
+The accepted path follows captured anatomical surfaces through the common coordinator.
+Dense attachment fields are independently owned project resources; source edits cannot
+change them. Current-shape point edits use the ordinary curve operations. They retain the current dense
+shape, rebind changed anchors and preserve unchanged canonical anchors in the same transaction.
+`fiber.binding.scope(curve, point, scope)` chooses `CURRENT_PARENT` or `ANY_PARENT` for a
+bound authored point. `fiber.binding.set(curve, point, target, scope?)` adds or reassigns a
+binding at the current shape; using its existing target explicitly recaptures it.
+`fiber.binding.remove(curve, point)` removes an optional structural binding. Both open
+endpoints and at least one closed anchor must remain bound. Extend or remove an open
+endpoint to transfer its parent choice to the new endpoint; opening a closed fiber requires
+choosing both endpoint bindings first. Pending capture requests survive Manual-mode saving.
+Parent movement resolves its retained binding without choosing a new
+parent. Entering edit mode is a read-only query. Routed fibers edit authored constraints,
+then resolve their connecting path through the solver. Independent copies remap attachment
+resource owners, routing obstacles and pending edit baselines together. Shared immutable
+geometry buffers remain retained by their resource owners. These are construction operations;
+they do not certify anatomical accuracy or reconstruct muscles.
+
+## Curve surfaces
+
+- `surface.preview(curves, **creation_settings)` evaluates initial correspondence without
+  creating a document object. `surface.preview(target=existing_surface)` previews Realign.
+  `surface.preview.status()` reports token/state/alignment; `surface.preview.accept(token)`
+  installs the complete result in one undo step. `surface.preview.cancel()` releases it.
+  Source edits or parent-frame changes invalidate acceptance. Candidates are excluded from
+  saves and picking. The desktop automatically previews creation from closed loft sources.
+- `surface.create(curves, kind="LOFT", name="Surface", parent="", owner="", **settings)`
+  consumes an ordered list of generic curves/fibers and returns an asynchronous job ID.
+  `PATCH` requires exactly one closed source; loft sources must agree on closure.
+- `surface.update(target, **settings)` edits `exact`, `strips`, `patch_resolution`,
+  `close_across`, `flip` or `name`. Exact sampling retains evaluated corners. `strips=0`
+  retains density fitted at creation/Realign; a positive count selects fixed subdivisions.
+- `surface.source(target, curve, **settings)` edits per-consumer `mode`, `reverse`,
+  `start`, `span` and `samples`. Transform-mode switching preserves visible placement.
+- `surface.order(target, curves)` reorders every source exactly once, retaining its
+  correspondence. `surface.realign(target)` asynchronously rebuilds closed direction/start
+  and fitted density in one undo action. Ordinary deformation never realigns silently.
+- `consumer.make_independent(entity, curve)` works for surfaces and primitives. It copies
+  authored points/resources, remaps correspondence identities, and preserves accepted output.
+- Generic object transforms, parenting, update modes, inspection, evaluation and deletion
+  apply. Referenced source deletion is blocked; deleting the surface preserves all sources.
+
+These commands share the desktop Construction menu and inspector policies. Accepted meshes
+remain visible on pending/failed calculation; Issues expose failure and explicit recalculation.
+Primitive loft boundaries share the highest effective requested count; each body piece uses
+its source reference's count. Defaults remain inherited until explicitly overridden.
+
+`surface.sources(target, curves)`, `surface.source.add(target, curve, index?)` and
+`surface.source.remove(target, curve)` manage live sources while preserving existing settings
+and correspondence. Removed sources remain in the document. For branched assemblies, remove
+branches before changing main source order or membership.
+
+`surface.branch.add(target, boundary, curves)` connects open branch curves through explicit
+junctions on an outer main boundary. Roots must be ordered, interior and nonoverlapping;
+closed/nested branches are rejected. `surface.branch.remove(target, branch)` preserves source
+curves. Making a branched consumer independent copies its complete source/junction assembly.

@@ -60,7 +60,7 @@ class IssuePanel(QObject):
             self.label_cursor = -1
         delta = session.changes.since(self.label_cursor)
         self.label_cursor = session.changes.serial
-        values = (*delta.entities.values(), *delta.controls.values())
+        values = (*delta.entities.values(), *delta.controls.values(), *delta.objects.values())
         if delta.reset or any({"name", "@membership"} & value for value in values):
             self.label_revision += 1
         return self.label_revision
@@ -114,8 +114,7 @@ class IssuePanel(QObject):
     def navigate(self, target, frame):
         if not self._state.get("canNavigate"):
             return
-        index = self.controller.session.document.index
-        if target in index.entities or target in index.controls:
+        if target in self.controller.session.document.registry.records:
             self.controller.select(target)
             if frame:
                 self.controller.frameSelection()

@@ -6,6 +6,7 @@ Measured complete-job costs in ConstructionTaskScheduler can only increase the e
 
 from typing import Any, Protocol
 
+from anthroforge.core.primitive_sampling import counts
 from anthroforge.core.scheduling import StageWorkload
 
 
@@ -33,11 +34,17 @@ class ThicknessStagePolicy:
         return 0.1 + workload.points * 0.002 + workload.polygons * 0.003
 
 
+class SurfaceStagePolicy:
+    def estimate(self, workload: StageWorkload) -> float:
+        return 0.2 + workload.points * 0.003 + workload.polygons * 0.004
+
+
 POLICIES: dict[str, StagePolicy] = {
     "construction": PrimitiveStagePolicy(),
     "HOOK": HookStagePolicy(),
     "LATTICE": LatticeStagePolicy(),
     "thickness": ThicknessStagePolicy(),
+    "surface": SurfaceStagePolicy(),
 }
 
 
@@ -48,15 +55,17 @@ def estimate(stages: tuple[StageWorkload, ...]) -> float:
 def mesh_size(session: Any, item: Any) -> tuple[int, int]:
     primitive = item.primitive
     if primitive.kind == "IMPORTED":
-        counts = session.assets[primitive.source].mesh.counts
-        return counts[0], counts[1]
+        dimensions = session.assets[primitive.source].mesh.counts
+        return dimensions[0], dimensions[1]
     if primitive.kind == "BODY":
-        points = primitive.samples * sum(
-            4 if p.shape == "BOX" else p.sides for p in primitive.pieces
+        density = counts(primitive)
+        points = sum(
+            density[p.curve] * (4 if p.shape == "BOX" else p.sides) for p in primitive.pieces
         )
         return points, points + 2 * len(primitive.pieces)
     strips = (len(primitive.curves) - 1) * primitive.strips
-    return primitive.samples * (strips + 1), primitive.samples * strips + 2 * int(primitive.caps)
+    samples = max(counts(primitive).values())
+    return samples * (strips + 1), samples * strips + 2 * int(primitive.caps)
 
 
 def stages(session: Any, document: Any, entity: str) -> tuple[StageWorkload, ...]:
@@ -74,9 +83,7 @@ def binding_stages(document: Any, item: Any, binding: Any, points: int) -> list[
     if not binding.enabled:
         return []
     if binding.target.stage == "CURVE":
-        points = 3 * len(
-            next(c.points for c in item.primitive.curves if c.id == binding.target.component)
-        )
+        points = 3 * len(document.object(binding.target.component).points)
     result = [StageWorkload(binding.kind, points)]
     control = document.control(binding.control)
     result.extend(

@@ -119,13 +119,9 @@ def transform(session: "Session", entity: str, values: list[float]) -> None:
 
 
 def transform_dependents(session: "Session", entity: str) -> None:
-    from .construction_tasks import edited
-    from .control_tasks import edited as controls_edited
-    from .dependencies import Port
-    from .dependencies import affected as graph_affected
+    from .dependent_tasks import changed
 
-    controls_edited(session, {Port(entity, "pose")})
-    edited(session, graph_affected(session.document, {Port(entity, "pose")}))
+    changed(session, {Port(entity, "pose")})
 
 
 def schedule_edit(
@@ -161,12 +157,15 @@ def mark_entity(item: SCP, directly_edited: bool) -> SCP:
 def released(session: "Session") -> None:
     from .construction_policy import mode
     from .construction_tasks import schedule
+    from .geometry_outputs import items
+    from .path_tasks import pending as paths_pending
 
     pending = {
         e.id
-        for e in session.document.entities
+        for e in items(session.document)
         if e.result.status == "pending" and mode(session.document, e.id) == "ON_RELEASE"
     }
+    paths_pending(session, released=True)
     schedule(session, pending, released=True)
     release_attachments(session)
 
@@ -223,12 +222,11 @@ def recapture(session: "Session", entity: str) -> str:
 def move_origin(session: "Session", entity: str) -> None:
     from anthroforge.native.attachments import move_origin as native_origin
 
-    from .control_frames import rebase_followers
+    from .origin_rebasing import relocate
 
     before = session.editable(entity)
     item = native_origin(session.engine, before)
-    session.replace_entities({entity: item})
-    rebase_followers(session, before, item)
+    relocate(session, before, item)
     transform_dependents(session, entity)
     targets = descendants(session.document.entities, entity)
     evaluation.request(session, targets, targets)
@@ -246,17 +244,29 @@ def update_mode(session: "Session", mode: str, entity: str = "") -> None:
     if mode not in ("LIVE", "ON_RELEASE", "MANUAL", "INHERIT"):
         raise ValueError("Invalid update mode.")
     if entity:
-        item = session.editable(entity)
-        session.replace_entities({entity: replace(item, update_mode=mode)})
+        set_update_mode(session, entity, mode)
     else:
         session.replace_document(update_mode=mode)
     resume_pending(session)
 
 
+def set_update_mode(session: "Session", entity: str, mode: str) -> None:
+    if entity in session.document.registry.construction:
+        from .object_operations import editable, install
+
+        install(session, replace(editable(session, entity), update_mode=mode))
+    else:
+        item = session.editable(entity)
+        session.replace_entities({entity: replace(item, update_mode=mode)})
+
+
 def resume_pending(session: "Session") -> None:
     from .construction_tasks import schedule
+    from .geometry_outputs import items
+    from .path_tasks import pending as paths_pending
 
-    pending = {e.id for e in session.document.entities if e.result.status == "pending"}
+    paths_pending(session)
+    pending = {e.id for e in items(session.document) if e.result.status == "pending"}
     schedule(session, pending)
 
 

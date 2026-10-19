@@ -40,7 +40,7 @@ def create_cycle(controller):
     control = session.command("control.create", entity=entity, name="Shared hook")
     session.command("deformer.add", control=control, target={"owner": entity})
     settle(controller)
-    session.command("control.attach", control=control, support=entity)
+    session.command("control.follow", control=control, entity=control)
     settle(controller)
     controller.select(entity)
     controller.frameSelection()

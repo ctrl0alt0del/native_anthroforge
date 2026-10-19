@@ -1,15 +1,28 @@
-# AnthroForge 0.1.9
+# AnthroForge 0.2.0
 
-A standalone SCP and primitive editor for Windows, built with a shared Python
+Standalone curves, reference images, fibers and curve-based surfaces follow the
+[confirmed specification](docs/specification_020.md) and
+[implementation plan](docs/implementation_020.md). See the
+[release validation](docs/development_status.md#construction-objects-020) for source,
+native parity, profiling, offscreen interaction and relocated portable evidence.
+
+A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the portable folder. The 0.1.9 build is in
-`dist/0.1.9/AnthroForge.dist`; the default packaging location remains `dist/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder. The 0.2.0 distribution is
+`dist/0.2.0/AnthroForge.dist`; the default packaging location remains `dist/AnthroForge.dist`.
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.
 
-0.1.9 refines the editor with consistent dark menus, aligned controls and expandable
+Start construction with [the curves/fibers/images walkthrough](docs/construction_020.md)
+or [the shared API example](examples/construction.json). Curves use Bézier, exact polyline
+or native routing engines. Fibers add anatomical bindings and use the same curve/surface
+tools. Reference images are embedded, and explicit junctions support branched open lofts.
+Schema 3 projects reject older formats; legacy conversion is deferred. Muscles and soft
+tissues follow in 0.2.1. Editable authored parameters are retained throughout.
+
+0.1.9 refined the editor with consistent dark menus, aligned controls and expandable
 inspection details. See [UI polish](docs/ui_polish.md).
 
 0.1.8 added [two-point surface rulers with XYZ readouts and named camera bookmarks](docs/workflow_inspection.md#measurements-and-named-views-018).

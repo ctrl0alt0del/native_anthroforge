@@ -67,6 +67,8 @@ class Job:
     reads: frozenset[str] = frozenset()
     publish_during_edit: bool = False
     restart_on_redo: bool = False
+    restart_on_input_change: bool = False
+    restart_requested: bool = False
     prerequisites: frozenset[Port] = frozenset()
     provides: frozenset[Port] = frozenset()
     observes: frozenset[Port] = frozenset()

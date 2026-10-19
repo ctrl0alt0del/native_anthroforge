@@ -9,6 +9,7 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
 
+from anthroforge import __version__
 from anthroforge.desktop import smoke
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.input_state import InputState
@@ -27,6 +28,7 @@ def arguments() -> argparse.Namespace:
 
 
 def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicationEngine:
+    QGuiApplication.setApplicationVersion(__version__)
     engine = QQmlApplicationEngine()
     engine.addImportPath(str(build_directory() / "qml"))
     engine.rootContext().setContextProperty("workspace", controller)

@@ -1,8 +1,15 @@
-# AnthroForge 0.1.6 architecture
+# AnthroForge architecture
+
+The [0.2.0 specification](specification_020.md) and
+[implementation plan](implementation_020.md) define the current boundaries:
+first-class construction objects, referenced curves, Fiber as Curve subclass,
+general surfaces, embedded images and schema 3 without older-schema migration.
+See [implementation status](tasks/020-construction.md) for what is actually integrated.
+Sections labelled with earlier release numbers describe their qualified baseline.
 
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through
-the same core in later releases.
+the same core; muscles and soft tissues follow in 0.2.1.
 
 ## Issue reporting (0.1.6)
 
@@ -14,7 +21,8 @@ checks retain stale evidence. Repairs invoke shared application operations and m
 pass a fresh verification. Document replacement and history navigation invalidate
 check epochs. UI/JSON clients share `issues.*`; geometry diagnostics do not run in draw.
 `RecordModel` supplies stable keyed Qt rows to both Activity and Issues. These
-diagnostics do not certify unimplemented fiber, skin, collision or anatomy checks.
+diagnostics do not certify anatomical correctness or unimplemented skin/volume checks.
+Authored fiber centerline collisions are read-only native checks over accepted geometry.
 
 The [confirmed 0.1.2 specification](primitives_012.md) defines primitive and deformer behavior. Primitive
 construction, deformers, shared controls and per-target bindings have separate
@@ -34,7 +42,7 @@ excluded from UI and APIs.
   safe cancellation, publication and save checkpoints. Jobs acquire their input revision
   at dispatch. Queued writers also block commitment; read-only jobs do not.
 - application/task_schedulers.py supplies dedicated attachment, import, project-open
-  project-save, construction and control-attachment policies. Construction composes
+  project-save, construction and control-pose policies. Construction composes
   separate curve/body/loft, Hook, Lattice and Thickness stage estimates.
   Each assesses cheap metadata before admission and again
   before execution, returning an execution mode, estimated cost and coalescing delay.
@@ -67,9 +75,10 @@ input and constructs Qt presentation records. Scalar UI arithmetic and fixed-siz
 validation remain there. Those are not Blender algorithm fallbacks, but their allocation,
 conversion and notification costs are real: eliminating Python numerical loops does not
 establish a zero-overhead UI. Dense component presentation still materializes point
-records and must be evaluated separately using actual GUI reports. The algorithms for
-fibers, muscles, skin and warm-start fitting are not yet migrated into this release;
-addon Python optimization loops must be ported in full when their features migrate.
+records and must be evaluated separately using actual GUI reports. Curve drawing/fitting,
+Fiber deformation, routing preparation/solving/warm remapping, and surface construction
+now run in C++. Muscles and skin remain later work; their numerical loops must follow
+the same native-only boundary when they migrate.
 
 ## Construction and dependency boundaries
 
@@ -94,20 +103,25 @@ surface is a real cycle. Cyclic/downstream outputs fail boundedly and retain acc
 data. Missing accepted surfaces fail instead of waiting indefinitely.
 
 construction_evaluator.py prepares batched native pipelines from dispatch snapshots.
-Control surface binding capture runs in the worker. Complete read sets are checked
+Anatomical binding capture runs in the worker for SCPs and fibers. Controls use ordinary
+transform following only. Complete read sets are checked
 before result adoption. Live consumers can use a Manual prerequisite's accepted result
 with its revision and pending provenance; publishing that prerequisite triggers its
 consumers. Preview/control movement is not an accepted surface.
 
 Capture-only reads are declared separately from ordering prerequisites. A child's local
 anchor is captured once; subsequent propagation does not depend on new child geometry.
-Treating that capture as a permanent dependency would falsely cycle ordinary Hook/lattice
+Treating that capture as a permanent dependency would falsely cycle anatomical
 deformation. Geometry coordinates include the SCP geometry offset consistently in binding,
 evaluation, component display and picking. Moving an origin rebases its following controls
 to retain world placement and leaves the rendered geometry unchanged.
 World-aligned viewport gizmos convert through control_frames.authored_frame before issuing
 control.transform. Numeric fields continue to expose authored TRS in the documented frame;
-the UI does not duplicate attachment/follow frame rules.
+the UI does not duplicate follow frame rules. In 0.2.0 controls use only ordinary
+transform following. `object_frames.Frames` resolves generic object transforms with
+one cycle guard; geometry offsets remain geometry-space data. Origin relocation
+rebases ordinary children and live consumer placement atomically. Controls live in
+the Construction projection, while the anatomical outliner contains only anatomy.
 
 construction_policy.py and core construction validation own topology, references and
 compatibility. Desktop controls expose those policies. Children and incoming surface
@@ -182,13 +196,14 @@ Named workspaces preserve camera, orthographic mode, hidden/unpickable sets, mem
 independent overlays. Outside entities remain transparent/read-only while their dependencies
 remain present. These presentation changes do not create anatomical undo steps.
 
-Project schema 2 uses ZIP64 containers with JSON metadata and canonical NPY arrays
+Project schema 3 uses ZIP64 containers with JSON metadata and canonical NPY arrays
 (allow_pickle=False). Saving writes a sibling temporary file, flushes it and atomically
 replaces the target. A cooperative file lock prevents two writable application sessions.
-Source and accepted meshes are embedded, with canonical triangulation retained through
-deformation and reload. Native handles never serialize. Schema-1 meshes migrate to
-imported definitions and accepted results; old applications reject schema 2. Loaded SCP attachments receive the addon's
-equivalent startup synchronization; unrelated future solvers are not launched.
+Source/accepted geometry, paths, attachment fields and deduplicated image bytes are embedded.
+Canonical triangulation survives deformation and reload. Native handles never serialize.
+Unsupported older schemas are rejected clearly. The 0.1.x schema-1 migration belongs to
+that historical release, not the current loader. Loaded SCP attachments receive equivalent
+startup synchronization; unrelated solvers are not launched and paths do not blanket-reroute.
 
 ## Measurement and extension
 
@@ -331,7 +346,7 @@ Activity-specific timing instrumentation.
 lookups and a shared `Structure` containing validated authored identities, hierarchy order,
 depths, forward/reverse dependency edges and blocked outputs. Value edits reuse structure;
 reference, membership or attachment-policy changes revalidate it completely. Revision-only
-replacement reuses the entire index. Indexes are runtime data, excluded from schema 2.
+replacement reuses the entire index. Indexes are runtime data, excluded from project files.
 
 The application `ChangeJournal` retains 64 compact field-change descriptions, without
 owning old documents. Desktop consumers have independent cursors; a missed interval or
@@ -372,7 +387,7 @@ causes, expose attachment frames through existing batched native queries, and re
 topology restrictions from their existing application policy. The desktop inspector is
 opt-in and revision-gated; it reuses field-level property projection.
 
-Workspace policies own mixed SCP/control membership and reference validation. Deleted
+Workspace policies own anatomical membership, construction association and reference validation. Deleted
 references remain valid presentation history for undo; new unknown references are
 rejected. Category visibility/pickability are shared policies. Desktop projections apply
 them to displayed geometry and cached native component indexes; pointer movement does
@@ -407,3 +422,69 @@ displayed/staged native leases through a weak adapter callback. Alias identities
 deduplicated before export; raw allocation addresses are not serialized. Owner totals
 overlap and unobserved/transient or non-native allocations are explicitly outside coverage.
 Recording off performs no new inventory queries, traversal or cache event collection.
+
+## Construction image ownership and presentation (0.2.0)
+
+`authored_jobs` owns the common initiating-history-step publication used by mesh and
+image imports. Image jobs decode PNG/JPEG and apply EXIF orientation off-thread, then
+prepare native 256-pixel RGBA tiles. Assignments own physical dimensions and ordinary
+parent-local transforms; assets own source bytes and decoded/native image storage.
+Multiple instances share one asset. History/checkpoints/jobs and viewport leases preserve
+that asset until their last owner releases it. Native plane queries and calibration share
+top-left normalized UV coordinates and full affine frames.
+
+Workspace `ImagePresentation` records own opacity, depth, sides, projection visibility and
+pickability. These changes do not author geometry or trigger calculation. Displayed-content
+records preserve old dimensions and provenance during replacement. The shared staged model
+filters content into Qt render layers; each layer creates only its own tile delegates.
+Native image geometry transforms six vertices per tile, retaining affine shear. Texture
+data is unchanged during transforms. Picking follows displayed content and the current
+viewport projection rather than the delayed saved camera settings.
+
+Texture-only experiments found instanced custom image quads invisible on this D3D11 setup;
+adding normals/index buffers did not resolve it, whereas native-transformed non-instanced
+quads rendered correctly. Dynamic reparenting between Qt View3D scenes also lost display.
+The maintained implementation uses transformed quads and staged layer models, with tests
+for orientation, occlusion and complete replacement. These are scoped observed results,
+not a claim about every Qt backend. No visible-window acceptance has been performed.
+
+## Curve surface ownership (0.2.0)
+
+`core.curve_consumption` defines primitive/surface source references. The shared application
+consumer policies own transforms, independence and reference rebasing across reparenting,
+deletion and origin relocation. Surfaces own correspondence, density and range settings;
+the source remains an independent authored curve or Fiber. Closed correspondence stores
+authored point identity plus a segment fraction, and changes only on explicit Realign.
+
+Creation/Realign uses the existing asynchronous authored-job boundary. Subsequent geometry
+uses `construction_tasks`, with a surface workload strategy and generic geometry result
+publication. Native loft/patch work returns complete finalized meshes. Construction
+projection sends these to the same staged mesh model and displayed-revision picking used
+by SCPs, while excluding them from anatomical snapping/attachment candidates. Issues use
+generic object scopes and the shared evaluation operation. Explicit junctions supply shared
+source identities to branch assembly; no proximity welding or separate Fiber loft exists.
+
+## Curve engines, bindings and construction lifetime (0.2.0)
+
+The object registry provides generic identities and poses without substituting construction
+ownership for ordinary parenting or anatomical attachment. A Fiber subclasses Curve; its
+bindings resolve current shape before the same engine interface evaluates it. No public
+Free/Controlled or solver-generation hierarchy exists. Engine-specific settings are typed;
+conversion owns a read-only preview and a separate undoable acceptance operation.
+
+Junction output ports distinguish canonical source publication from followers' path outputs.
+Atomic authored edits update incident points together; the dependency graph retains accepted
+Manual prerequisites and detects genuine cycles. Surface consumers own correspondence and
+sampling, including persistent closed alignment and per-pair density. Primitive consumers
+use the same source-reference and placement policies.
+
+Authored creation jobs opt into input-invalidation restart through an explicit Job contract.
+The coordinator waits for safe termination, registers replacement work before reporting the
+old job terminal, and captures fresh inputs at dispatch. Explicit cancellation and history
+navigation suppress that restart. Historical result adoption validates the complete read set;
+an older document cannot inherit geometry evaluated against a newer pose.
+
+Resources retain mesh/path/image/attachment allocations across current state, undo/checkpoints,
+workers and displayed/staged leases. Profiler observation is read-only and recording-only.
+Saved-revision rendering drains all staged resource models before capture. Schema 3 persists
+owned editable state and accepted results, never native handles, undo history or preview data.

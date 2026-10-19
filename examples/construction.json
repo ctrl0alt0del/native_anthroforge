@@ -1,0 +1,32 @@
+[
+  {"id":"support","operation":"import","arguments":{"path":"examples/primitives/cube.obj","units":1,"name":"Attachment support"}},
+  {"operation":"wait"},
+  {"id":"a","operation":"curve.create","arguments":{"name":"First source","points":[
+    {"id":"a-start","position":[-0.5,-0.25,0.5]},
+    {"id":"a-middle","position":[0,-0.25,0.8]},
+    {"id":"a-end","position":[0.5,-0.25,0.5]}
+  ]}},
+  {"id":"b","operation":"curve.create","arguments":{"name":"Second source","points":[
+    {"id":"b-start","position":[-0.5,0.25,0.5]},
+    {"id":"b-middle","position":[0,0.25,0.8]},
+    {"id":"b-end","position":[0.5,0.25,0.5]}
+  ]}},
+  {"operation":"wait"},
+  {"operation":"fiber.create","arguments":{"curve":"$a","name":"First fiber","bindings":[
+    {"point":"a-start","target":"$support.entity_id"},
+    {"point":"a-end","target":"$support.entity_id"}
+  ]}},
+  {"operation":"wait"},
+  {"operation":"fiber.create","arguments":{"curve":"$b","name":"Second fiber","bindings":[
+    {"point":"b-start","target":"$support.entity_id"},
+    {"point":"b-end","target":"$support.entity_id"}
+  ]}},
+  {"operation":"wait"},
+  {"id":"fibers","operation":"inspect"},
+  {"operation":"surface.create","arguments":{"curves":["$fibers.objects.2.state.id","$fibers.objects.3.state.id"],"name":"Fiber loft","strips":6}},
+  {"operation":"image.import","arguments":{"path":"examples/reference-grid.png","name":"Reference grid","width":2}},
+  {"operation":"wait"},
+  {"operation":"workspace.update","arguments":{"camera":[0,0,0.4,-35,20,0,3],"orthographic":true}},
+  {"operation":"save","arguments":{"path":"construction.anthroforge","blocked_policy":"wait"}},
+  {"operation":"inspect"}
+]

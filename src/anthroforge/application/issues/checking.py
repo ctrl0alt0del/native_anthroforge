@@ -21,6 +21,7 @@ class Input:
     document: Document
     checks: tuple[Check, ...]
     sources: tuple[Any, ...]
+    context: Any = None
 
 
 @dataclass(frozen=True)
@@ -47,6 +48,9 @@ def make_job(listener: "Listening", provider: Provider, scopes: set[str]) -> Job
 
 
 def configure(job: Job, listener: "Listening", provider: str, scopes: set[str]) -> None:
+    factory = listener.providers[provider].cancellation
+    if factory:
+        job.cancel = factory()
     job.prepare = partial(prepare, listener, listener.providers[provider], scopes, job.id)
     job.reads = frozenset(scopes - {"document"})
     job.workload = lambda _: Workload(affected=len(scopes))
@@ -63,7 +67,8 @@ def prepare(
     selected = sorted(scopes & provider.scopes(document))
     checks = tuple(listener.reporting.begin(provider.name, scope) for scope in selected)
     listener.tickets[job_id] = checks
-    return Input(document, checks, tuple(provider.source(document, s) for s in selected))
+    context = provider.capture(document) if provider.capture else document
+    return Input(document, checks, tuple(provider.source(document, s) for s in selected), context)
 
 
 def compute(
@@ -73,7 +78,8 @@ def compute(
     for check in captured.checks:
         if cancel.is_set():
             break
-        rows.append(check_scope(provider, captured.document, check.scope, cancel))
+        context = captured.document if captured.context is None else captured.context
+        rows.append(check_scope(provider, context, check.scope, cancel))
     return captured, tuple(rows)
 
 

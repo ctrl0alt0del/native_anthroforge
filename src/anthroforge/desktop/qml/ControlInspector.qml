@@ -8,6 +8,7 @@ ColumnLayout {
     readonly property var item: authoring.state
     readonly property var scps: workspace.treeRows.filter(row=>!row.is_control)
     readonly property var reference: authoring.selectedComponent
+    readonly property var parents: { const revision=workspace.state.revision; const selected=workspace.selectedId; return workspace.ordinaryParents(); }
     Layout.fillWidth: true; spacing: 10
     function set(key,value) { authoring.setting("control.update",key,value); }
     UiSection {
@@ -15,7 +16,7 @@ ColumnLayout {
         Label { text: panel.item.kind || ""; color: Theme.accent }
         UiField { Layout.fillWidth: true; text: panel.item.name || ""; onEditingFinished: panel.set("name",text) }
         Label { text: "Follows"; color: Theme.muted }
-        UiCombo { Layout.fillWidth: true; model: [{id:"",name:"Document frame"}].concat(panel.scps); textRole: "name"; valueRole: "id"; currentIndex: indexOfValue(panel.item.follow || ""); onActivated: authoring.edit("control.follow",{control:panel.item.id,entity:currentValue}) }
+        UiCombo { objectName: "controlParent"; Layout.fillWidth: true; model: panel.parents; textRole: "name"; valueRole: "id"; currentIndex: indexOfValue(panel.item.follow || ""); onActivated: authoring.edit("control.follow",{control:panel.item.id,entity:currentValue}) }
         Repeater {
             model: ["Position", "Rotation · °", "Scale"]
             VectorSetting { required property int index; required property string modelData; label: modelData; length: index === 0; values: (panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(index*3,index*3+3)
@@ -24,15 +25,6 @@ ColumnLayout {
         Label { text: "Affected SCPs: " + workspace.treeRows.filter(row=>(workspace.selectedData.affected || []).indexOf(row.id)>=0).map(row=>row.name).join(", "); color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         UiCombo { id: bindTarget; model: panel.scps; textRole: "name"; valueRole: "id"; Layout.fillWidth: true }
         UiButton { text: "Bind to this SCP"; Layout.fillWidth: true; enabled: !!bindTarget.currentValue; onClicked: authoring.edit("deformer.add",{control:panel.item.id,target:{owner:bindTarget.currentValue}}) }
-    }
-    UiSection {
-        title: "Local attachment"
-        UiCombo { id: support; model: workspace.treeRows.filter(row=>row.id!==panel.item.id); textRole: "name"; valueRole: "id"; Layout.fillWidth: true }
-        UiCheck { id: surface; text: "Attach to support surface"; checked: true }
-        RowLayout {
-            UiButton { text: "Attach / recapture"; onClicked: authoring.edit("control.attach",{control:panel.item.id,support:support.currentValue,surface:surface.checked}) }
-            UiButton { text: "Detach"; onClicked: authoring.edit("control.follow",{control:panel.item.id,entity:""}) }
-        }
     }
     UiSection {
         title: "Lattice cage"; hint: "Select cage points in the viewport. Ctrl-click extends selection."; visible: panel.item.kind === "LATTICE"

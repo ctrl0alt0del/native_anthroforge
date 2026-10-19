@@ -8,7 +8,7 @@ from anthroforge.core.entities import SCP
 from anthroforge.core.scheduling import Workload
 
 if TYPE_CHECKING:
-    from .assets import Asset
+    from .resources import Resources
     from .session import Session
 
 
@@ -58,10 +58,15 @@ def source_file(path: Path, document: Document) -> Workload:
         return Workload(entities=len(document.entities))
 
 
-def project_save(assets: dict[str, "Asset"], document: Document) -> Workload:
-    used = {entity.asset for entity in document.entities if entity.asset}
-    sizes = [assets[key].mesh.counts for key in used]
+def project_save(resources: "Resources", document: Document) -> Workload:
+    from .resources import referenced
+
+    used = referenced(document)
+    sizes = [resources.meshes[key].mesh.counts for key in used["meshes"]]
     size = sum(
         vertices * 24 + corners * 8 + (faces + 1) * 8 for vertices, faces, corners, _, _ in sizes
     )
+    size += sum(resources.paths[key].path.bytes for key in used["paths"])
+    size += sum(len(resources.images[key].encoded) for key in used["images"])
+    size += sum(resources.attachments[key].field.bytes for key in used["attachments"])
     return Workload(entities=len(document.entities), bytes=size)

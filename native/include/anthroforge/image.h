@@ -1,0 +1,24 @@
+#pragma once
+#include "mesh.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
+/* RGBA tiles are prepared off-thread. Each GUI adoption copies at most 256 KiB. */
+AF_API uint64_t af_image_create(const unsigned char* rgba, int width, int height, uint64_t cancel);
+AF_API void af_image_release(uint64_t handle);
+/* Width, height, tile count, owned bytes. */
+AF_API int af_image_info(uint64_t handle, uint64_t* info);
+/* Tile pixel x, y, width, height. The owning handle must remain alive while reading. */
+AF_API int af_image_tile(uint64_t handle, int tile, const unsigned char** data, int* info);
+AF_API int af_image_calibration(const double* frame, const double* dimensions,
+    const double* landmarks, double distance, double* output);
+/* Batch plane hits: index, distance, u, v, world xyz, front. UV origin is top left. */
+AF_API int af_images_pick(const double* frames, const double* sizes, const int* sides, int count,
+    const double* origin, const double* direction, double* hits);
+/* Blender 5.0.1 local-Z/view-axis alignment policy; one visibility value per frame. */
+AF_API int af_images_axis_aligned(const double* frames, int count, const double* view_axis, int* visible);
+/* Six local rectangle vertices (xyz, normal, uv) for one prepared image tile. */
+AF_API int af_image_vertices(uint64_t handle, int tile, double width, double height, float* output);
+#ifdef __cplusplus
+}
+#endif

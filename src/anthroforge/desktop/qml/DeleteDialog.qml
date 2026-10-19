@@ -13,17 +13,19 @@ UiDialog {
     property string explanation: ""
     title: "Delete “" + (target?.name || "") + "”?"
     function request(entity) {
-        const row = workspace.treeRows.find(item => item.id === entity);
+        const row = workspace.objectRecord(entity);
         if (!row || row.readonly || workspace.state.waiting) return;
         target = row;
         const children = workspace.treeRows.filter(item => item.parent === entity).length;
-        explanation = row.is_control ? "Remove this shared control and its bindings. Its primitives remain editable." :
+        explanation = row.is_construction ? "Remove this construction object. Referenced curves must be disconnected from their consumers first." : row.is_control ? "Remove this shared control and its bindings. Its primitives remain editable." :
             children ? (row.parent ? "Preserve its children and move them to its parent." : "Replace it with an empty grouping root and preserve all children.") : "Remove this SCP.";
         open();
     }
     Label { width: parent.width; text: dialog.explanation + "\n\nYou can undo this action."; wrapMode: Text.WordWrap; color: Theme.text }
     onAccepted: {
-        const result = workspace.run(target.is_control ? "control.delete" : "scp.delete", target.is_control ? {control:target.id} : {entity:target.id});
+        const operation = target.is_construction ? "object.delete" : target.is_control ? "control.delete" : "scp.delete";
+        const arguments = target.is_construction ? {target:target.id} : target.is_control ? {control:target.id} : {entity:target.id};
+        const result = workspace.run(operation, arguments);
         if (!target.is_control && result) workspace.select(result);
     }
 }

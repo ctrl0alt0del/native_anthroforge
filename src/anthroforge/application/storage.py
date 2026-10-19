@@ -1,6 +1,5 @@
 """Portable revision packages and cooperative single-writer file ownership."""
 
-import io
 import json
 import os
 import sys
@@ -11,21 +10,17 @@ from pathlib import Path
 from typing import Any
 from uuid import UUID
 
-import numpy as np
-
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Attachment, Workspace
-from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
+from anthroforge.core.junctions import decode as decode_junction
 from anthroforge.native.mesh import GeometryEngine
-from anthroforge.native.topology import restore
 
-from .assets import Asset
+from . import object_codec, resource_storage
 from .construction_codec import control, entity_construction
-from .geometry_ownership import assets_used
+from .resources import Resources
 
 FORMAT = "anthroforge-project"
-VERSION = 2
-BUFFERS = ("vertices", "corners", "offsets", "triangles", "polygons")
+VERSION = 3
 
 
 class FileLock:
@@ -58,19 +53,14 @@ class FileLock:
         self.stream.close()
 
 
-def manifest(document: Document, assets: dict[str, Asset]) -> dict[str, Any]:
+def manifest(document: Document, resources: Resources) -> dict[str, Any]:
     state = document_state(document)
-    used = assets_used(document)
-    sources = {
-        key: {
-            "source": assets[key].source,
-            "digest": assets[key].digest,
-            "units": assets[key].units,
-            "y_up": assets[key].y_up,
-        }
-        for key in used
+    return {
+        "format": FORMAT,
+        "version": VERSION,
+        "document": state,
+        **resource_storage.describe(resources.selected(document)),
     }
-    return {"format": FORMAT, "version": VERSION, "document": state, "assets": sources}
 
 
 def document_state(document: Document) -> dict[str, Any]:
@@ -78,40 +68,30 @@ def document_state(document: Document) -> dict[str, Any]:
         f.name: getattr(document, f.name) for f in fields(document) if not f.name.startswith("_")
     }
     state["id"] = str(document.id)
-    for name in ("entities", "controls", "workspaces"):
+    for name in ("entities", "controls", "workspaces", "junctions"):
         state[name] = [asdict(value) for value in state[name]]
+    state["objects"] = [object_codec.encode(value) for value in document.objects]
     return state
 
 
-def write_array(archive: zipfile.ZipFile, name: str, array: Any) -> None:
-    with archive.open(name, "w", force_zip64=True) as stream:
-        np.lib.format.write_array(stream, array, allow_pickle=False)  # type: ignore[no-untyped-call]
-
-
-def write_package(path: Path, document: Document, assets: dict[str, Asset]) -> None:
-    data = manifest(document, assets)
+def write_package(path: Path, document: Document, resources: Resources) -> None:
+    resources = resources.selected(document)
+    data = manifest(document, resources)
     with zipfile.ZipFile(path, "w", allowZip64=True) as archive:
         archive.writestr("manifest.json", json.dumps(data, indent=2, allow_nan=False))
-        for key in data["assets"]:
-            for kind, label in enumerate(BUFFERS):
-                write_array(archive, f"assets/{key}/{label}.npy", assets[key].mesh.array(kind))
+        resource_storage.write(archive, resources)
 
 
-def atomic_save(path: Path, document: Document, assets: dict[str, Asset]) -> None:
+def atomic_save(path: Path, document: Document, resources: Resources) -> None:
     descriptor, temporary = tempfile.mkstemp(prefix=".anthroforge-", suffix=".tmp", dir=path.parent)
     os.close(descriptor)
     try:
-        write_package(Path(temporary), document, assets)
+        write_package(Path(temporary), document, resources)
         with open(temporary, "r+b") as stream:
             os.fsync(stream.fileno())
         os.replace(temporary, path)
     finally:
         Path(temporary).unlink(missing_ok=True)
-
-
-def read_array(archive: zipfile.ZipFile, name: str) -> Any:
-    with archive.open(name) as stream:
-        return np.load(io.BytesIO(stream.read()), allow_pickle=False)
 
 
 def decode_entity(data: dict[str, Any]) -> SCP:
@@ -126,14 +106,9 @@ def decode_entity(data: dict[str, Any]) -> SCP:
 
 
 def decode_workspace(data: dict[str, Any]) -> Workspace:
-    data = dict(data)
-    for key in ("members", "hidden", "unpickable", "camera"):
-        data[key] = tuple(data[key])
-    for key in ("hidden_categories", "unpickable_categories"):
-        data[key] = tuple(data.get(key, ()))
-    data["measurements"] = tuple(map(decode_measurement, data.get("measurements", ())))
-    data["bookmarks"] = tuple(map(decode_bookmark, data.get("bookmarks", ())))
-    return Workspace(**data)
+    from .workspace_policy import settings
+
+    return Workspace(**settings(data))
 
 
 def decode_document(data: dict[str, Any]) -> Document:
@@ -146,32 +121,19 @@ def decode_document(data: dict[str, Any]) -> Document:
     data["entities"] = tuple(decode_entity(item) for item in data["entities"])
     data["workspaces"] = tuple(decode_workspace(item) for item in data["workspaces"])
     data["controls"] = tuple(control(item) for item in data.get("controls", ()))
+    data["objects"] = tuple(object_codec.decode(item) for item in data.get("objects", ()))
+    data["junctions"] = tuple(decode_junction(item) for item in data.get("junctions", ()))
     if not data["workspaces"]:
         raise ValueError("Project has no workspace.")
     return Document(**data)
 
 
-def read_asset(
-    archive: zipfile.ZipFile, key: str, source: dict[str, Any], engine: GeometryEngine, version: int
-) -> Asset:
-    arrays = [
-        read_array(archive, f"assets/{key}/{label}.npy")
-        for label in (BUFFERS if version == 2 else BUFFERS[:3])
-    ]
-    mesh = restore(engine, arrays) if version == 2 else engine.create_mesh(*arrays)
-    return Asset(mesh, source["source"], source["digest"], source["units"], source["y_up"])
-
-
-def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, dict[str, Asset]]:
+def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resources]:
     with zipfile.ZipFile(path) as archive:
         data = json.loads(archive.read("manifest.json"))
-        if data.get("format") != FORMAT or data.get("version") not in (1, VERSION):
+        if data.get("format") != FORMAT or data.get("version") != VERSION:
             raise ValueError("Unsupported AnthroForge project format/version.")
         document = decode_document(data["document"])
-        assets = {
-            key: read_asset(archive, key, source, engine, data["version"])
-            for key, source in data["assets"].items()
-        }
-        if assets_used(document) - assets.keys():
-            raise ValueError("Project is missing a required mesh asset.")
-        return document, assets
+        resources = resource_storage.read(archive, data, engine)
+        resources.require(document)
+        return document, resources

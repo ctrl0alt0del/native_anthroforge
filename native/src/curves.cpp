@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Handle formulas adapted from Blender 5.0.1 curve.cc, BKE_nurb_handle_calc.
 #include "construction_internal.hpp"
+#include "path_internal.hpp"
 
 namespace af {
 struct Bezier { V3 p,left,right; double radius,tilt; int lm,rm; };
@@ -64,14 +65,14 @@ static CurveSample interpolate(const CurveSample& a,const CurveSample& b,double 
     return {(1-t)*a.position+t*b.position,tangent.normalized(),V3::Zero(),
             (1-t)*a.radius+t*b.radius,(1-t)*a.tilt+t*b.tilt};
 }
-static std::vector<double> curve_lengths(const Samples& samples) {
+std::vector<double> curve_lengths(const Samples& samples) {
     std::vector<double> lengths{0};
     for(size_t i=1;i<samples.size();++i)
         lengths.push_back(lengths.back()+(samples[i].position-samples[i-1].position).norm());
     if(lengths.back()<1e-12) throw std::runtime_error("Curve has zero length.");
     return lengths;
 }
-static CurveSample at_distance(const Samples& samples,const std::vector<double>& lengths,double distance) {
+CurveSample at_distance(const Samples& samples,const std::vector<double>& lengths,double distance) {
     auto found=std::lower_bound(lengths.begin()+1,lengths.end(),distance);
     const size_t index=std::min(size_t(found-lengths.begin()),lengths.size()-1);
     const double span=lengths[index]-lengths[index-1];
@@ -107,7 +108,7 @@ static void frames(Samples& samples) {
         previous=sample.tangent;
     }
 }
-static void write_samples(const Samples& samples,double* output) {
+void write_samples(const Samples& samples,double* output) {
     for(size_t i=0;i<samples.size();++i) {
         const auto& p=samples[i]; double* o=output+i*11;
         for(int a=0;a<3;++a) { o[a]=p.position[a]; o[a+3]=p.tangent[a]; o[a+6]=p.normal[a]; }
@@ -146,6 +147,83 @@ static Samples body_path(std::vector<Bezier> points,bool closed,int resolution,u
     curve_frames(result,closed,cancel);
     return result;
 }
+static void append_path_segment(EvaluatedPath& path,const Bezier& a,const Bezier& b,int segment,int steps) {
+    for(int j=0;j<steps;++j) {
+        const double parameter=double(j)/steps;
+        path.samples.push_back(bezier_sample(a,b,parameter,M4::Identity()));
+        path.parameters.push_back(segment+parameter);
+    }
+}
+static void append_path_endpoint(EvaluatedPath& path,const std::vector<Bezier>& points,int segments) {
+    path.samples.push_back(bezier_sample(points[segments-1],points[segments],1,M4::Identity()));
+    path.parameters.push_back(double(segments));
+}
+static EvaluatedPath sample_authored(const std::vector<Bezier>& points,bool closed,int resolution,uint64_t cancel) {
+    EvaluatedPath result;
+    const int segments=int(points.size())-(closed?0:1);
+    for(int i=0;i<segments;++i) {
+        check_cancel(cancel);
+        const auto& a=points[i]; const auto& b=points[(i+1)%points.size()];
+        const int steps=a.rm%4==3&&b.lm%4==3?1:resolution;
+        append_path_segment(result,a,b,i,steps);
+    }
+    if(!closed) append_path_endpoint(result,points,segments);
+    curve_frames(result.samples,closed,cancel,false);
+    return result;
+}
+EvaluatedPath authored_path(const double* records,int count,int engine,bool closed,int resolution,uint64_t cancel) {
+    if(engine<0||engine>1||resolution<1||resolution>1024||count<(closed?3:2))
+        throw std::runtime_error("Invalid authored path engine, closure or resolution.");
+    if(int64_t(count)*resolution>8000000) throw std::runtime_error("Path sample budget exceeded.");
+    auto points=read_bezier(records,count);
+    if(engine==1) for(auto& p:points) { p.lm=3; p.rm=3; }
+    handles(points,closed);
+    return sample_authored(points,closed,resolution,cancel);
+}
+static Samples path_samples(const Path& path,bool reverse,int start) {
+    Samples result=read_samples(path.samples.data(),int(path.parameters.size()));
+    if(path.closed&&start>0) {
+        const auto index=std::lower_bound(path.parameters.begin(),path.parameters.end(),double(start));
+        std::rotate(result.begin(),result.begin()+(index-path.parameters.begin()),result.end());
+    }
+    if(reverse) {
+        std::reverse(result.begin()+(path.closed?1:0),result.end());
+        for(auto& sample:result) sample.tangent=-sample.tangent;
+    }
+    return result;
+}
+static Samples placed_samples(const Path& path,const M4& matrix,bool reverse,uint64_t cancel) {
+    auto result=path_samples(path,reverse,0);
+    for(auto& sample:result) {
+        check_cancel(cancel);
+        sample.position=point(matrix,sample.position);
+        const V3 tangent=matrix.topLeftCorner<3,3>()*sample.tangent;
+        if(tangent.norm()<1e-20) throw std::runtime_error("Singular curve placement.");
+        sample.tangent=tangent.normalized();
+    }
+    if(path.closed) result.push_back(result.front());
+    return result;
+}
+}
+int af_path_sample(uint64_t handle,int count,double start,double span,const double* matrix,int reverse,
+                   double* output,uint64_t cancel) {
+    try {
+        if(!matrix||!output||count<2||count>1000000||!std::isfinite(start)||!std::isfinite(span))
+            throw std::runtime_error("Invalid path sampling request.");
+        const auto path=af::path(handle);
+        const auto source=af::placed_samples(*path,Eigen::Map<const af::M4>(matrix),reverse!=0,cancel);
+        const auto uniform=af::resample(source,count,path->closed);
+        auto result=af::sample_range(uniform,count,start,span,path->closed);
+        af::frames(result); af::write_samples(result,output); af::check_cancel(cancel); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_path_body(uint64_t handle,int reverse,int closed_start,double* output,uint64_t cancel) {
+    try {
+        if(!output) throw std::runtime_error("Path output buffer required.");
+        const auto path=af::path(handle);
+        auto result=af::path_samples(*path,reverse!=0,closed_start);
+        af::curve_frames(result,path->closed,cancel); af::write_samples(result,output); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_curve_path(const double* points,int count,int closed,int resolution,double* output,int* output_count,uint64_t cancel) {
     try {

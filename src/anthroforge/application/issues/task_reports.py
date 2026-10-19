@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.issues import Issue, evidence, fingerprint
 from anthroforge.core.jobs import Job
+from anthroforge.core.object_registry import kind
 
 from .reporting import Reporting
 
@@ -65,11 +66,8 @@ class TaskReports:
             return
         delta = journal.since(self.cursor)
         self.cursor = journal.serial
-        live = (
-            self.session.document.index.entities.keys()
-            | self.session.document.index.controls.keys()
-        )
-        removed = (delta.entities.keys() | delta.controls.keys()) - live
+        live = self.session.document.registry.records.keys()
+        removed = (delta.entities.keys() | delta.controls.keys() | delta.objects.keys()) - live
         for row in tuple(self.reporting.repository.records.values()):
             if row.provider == self.name and row.target in removed:
                 self.reporting.remove(self.name, row.scope)
@@ -99,10 +97,8 @@ def task_issue(session: "Session", scope: str, job: Job) -> Issue:
 
 
 def task_target(session: "Session", job: Job) -> dict[str, Any]:
-    live = session.document.index.entities.keys() | session.document.index.controls.keys()
+    live = session.document.registry.records.keys()
     related = tuple(sorted(job.outputs & live))
     target = related[0] if related else ""
-    kind = (
-        "SCP" if target in session.document.index.entities else "CONTROL" if target else "DOCUMENT"
-    )
-    return dict(target=target, kind=kind, related=related)
+    category = kind(session.document.object(target)) if target else "DOCUMENT"
+    return dict(target=target, kind=category, related=related)

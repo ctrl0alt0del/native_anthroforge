@@ -15,7 +15,7 @@ def port_records(document: Document, ports: set[Port] | frozenset[Port]) -> list
 
 
 def port_record(document: Document, port: Port) -> dict[str, Any]:
-    item = document.index.entities.get(port.owner) or document.index.controls.get(port.owner)
+    item = document.registry.records.get(port.owner)
     return dict(asdict(port), name=item.name if item else "Unavailable object")
 
 

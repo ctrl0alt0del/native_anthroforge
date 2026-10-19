@@ -4,7 +4,7 @@ from anthroforge.application.dependencies import closure
 from anthroforge.core.entities import descendants
 from anthroforge.core.results import Port, geometry_asset
 
-from . import scene_state
+from . import scene_state, surface_scene
 from .property_projection import PropertyProjection
 
 
@@ -40,14 +40,15 @@ def control_targets(document, changes, full):
     }
     seeds = {Port(key, output) for key in owners for output in ("pose", "geometry")}
     seeds.update(Port(key, output) for key in changes.controls for output in ("control", "cage"))
+    seeds.update(Port(key, "pose") for key in changes.objects)
     affected = closure(document.index.structure.dependencies.consumers, seeds)
     return set(changes.controls) | {p.owner for p in affected if p.owner in document.index.controls}
 
 
 def control_relationships_changed(changes):
-    fields = (*changes.entities.values(), *changes.controls.values())
+    fields = (*changes.entities.values(), *changes.controls.values(), *changes.objects.values())
     return "attachments_enabled" in changes.document or any(
-        value & {"deformers", "follow", "support", "attachment"} for value in fields
+        value & {"deformers", "follow", "parent", "attachment"} for value in fields
     )
 
 
@@ -58,7 +59,7 @@ class SceneProjection:
         self.records, self.keys, self.order = {}, {}, []
         self.view, self.selected = PropertyProjection(controller), PropertyProjection(controller)
         self.view.synchronize(dict(rows=[], parents=[]))
-        self.selection = ""
+        self.selection = ()
         self._parent_key, self._parents = None, []
 
     def synchronize(self):
@@ -71,10 +72,16 @@ class SceneProjection:
             session.changes.serial,
             session.workspace,
         )
-        rows = [self.records[key] for key in self.order]
-        self.view.synchronize(dict(rows=rows, parents=self.parents()))
-        self.controller.rows = rows
+        self.publish_records()
+        self.controller.construction.synchronize()
         self.synchronize_selection()
+
+    def publish_records(self):
+        rows = [self.records[key] for key in self.order]
+        self.view.synchronize(
+            dict(rows=[r for r in rows if not r["is_control"]], parents=self.parents())
+        )
+        self.controller.rows = rows
 
     def update_records(self, changes, full, structural):
         session, document = self.controller.session, self.controller.session.document
@@ -122,15 +129,18 @@ class SceneProjection:
 
     def synchronize_selection(self):
         controller = self.controller
-        if controller.selection not in self.records:
-            controller.selection = ""
-        self.selected.synchronize(self.records.get(controller.selection, {}))
-        if self.selection != controller.selection:
-            self.selection = controller.selection
+        records = self.records | controller.construction.records
+        controller.object_selection.retain(records)
+        self.selected.synchronize(records.get(controller.selection, {}))
+        if self.selection != tuple(controller.object_selection.items):
+            self.selection = tuple(controller.object_selection.items)
             controller.selectionChanged.emit()
 
 
 def initialize(controller):
+    from .construction_projection import ConstructionProjection
+
+    controller.construction = ConstructionProjection(controller)
     controller.scene_projection = SceneProjection(controller)
     controller._state = PropertyProjection(controller)
     controller._render_rows = []
@@ -148,10 +158,14 @@ def refresh(controller):
 
 
 def publish(controller):
-    rows = [render_record(row) for row in controller.rows]
+    rows = [render_record(row) for row in [*controller.rows, *surface_scene.records(controller)]]
+    rows.extend(surface_scene.preview_rows(controller))
     if rows != controller._render_rows:
         controller._render_rows = rows
-        controller.render_model.publish(scene_state.render_rows(rows), controller.session.assets)
+        controller.render_model.publish(
+            scene_state.render_rows(rows), surface_scene.resources(controller)
+        )
+    controller.construction.publish()
     scene_state.control_picking_inputs(controller)
 
 

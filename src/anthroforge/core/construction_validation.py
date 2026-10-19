@@ -2,7 +2,7 @@
 
 from typing import TYPE_CHECKING
 
-from .construction import Control, Deformer, Target
+from .construction import Control, Deformer, Primitive, Target
 from .entities import SCP
 
 if TYPE_CHECKING:
@@ -37,8 +37,10 @@ def primitive_target(item: SCP, reference: Target) -> None:
 def identities(item: SCP | Control) -> list[str]:
     result = [item.id, *(binding.id for binding in item.deformers)]
     if isinstance(item, SCP) and item.primitive:
-        result.extend(c.id for c in item.primitive.curves)
-        result.extend(p.id for c in item.primitive.curves for p in c.points)
+        if not isinstance(item.primitive, Primitive):
+            raise ValueError(
+                "Document stores primitive references, not resolved evaluation inputs."
+            )
         result.extend(p.id for p in item.primitive.pieces)
     return result
 
@@ -49,13 +51,21 @@ def binding(item: SCP | Control, value: Deformer, controls: dict[str, Control]) 
     target(item, value.target, value.kind)
 
 
-def control_references(control: Control, entities: set[str], controls: set[str]) -> None:
-    if control.follow and control.follow not in entities:
+def control_references(control: Control, parents: set[str], anatomy: set[str]) -> None:
+    if control.follow and control.follow not in parents:
         raise ValueError("Control transform source does not exist.")
-    if control.support and control.support not in entities | controls:
-        raise ValueError("Control attachment support does not exist.")
-    if control.support and control.follow:
-        raise ValueError("Choose either transform following or attachment support.")
+    if set(control.owners) - anatomy:
+        raise ValueError("Control workspace associations require anatomical objects.")
+
+
+def transform_parents(document: "Document") -> set[str]:
+    from .reference_images import ReferenceImage
+
+    return {
+        o.id
+        for o in (*document.entities, *document.controls, *document.objects)
+        if not isinstance(o, ReferenceImage)
+    }
 
 
 def document(document: "Document") -> None:
@@ -64,9 +74,9 @@ def document(document: "Document") -> None:
     if any(not key for key in keys) or len(keys) != len(set(keys)):
         raise ValueError("Authored identities must be nonempty and unique across the document.")
     controls = {c.id: c for c in document.controls}
-    entities = {e.id for e in document.entities}
+    parents, anatomy = transform_parents(document), {e.id for e in document.entities}
     for control in document.controls:
-        control_references(control, entities, set(controls))
+        control_references(control, parents, anatomy)
     for item in items:
         for value in item.deformers:
             binding(item, value, controls)

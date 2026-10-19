@@ -7,13 +7,14 @@ from typing import TYPE_CHECKING, cast
 from uuid import uuid4
 
 from anthroforge.core.construction import Primitive
+from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.jobs import Job
 from anthroforge.core.results import EvaluationResult
 from anthroforge.native.mesh import NativeCancellation
 
+from . import authored_jobs
 from .assets import Asset, imported
-from .history import Entry
 from .operations import origin_if_empty, parent_for, require_name
 from .presentation import include_created
 from .task_workloads import source_file
@@ -31,11 +32,8 @@ def import_mesh(
     name: str = "",
 ) -> dict[str, str]:
     source, entity = prepare_import(session, path, parent, name)
-    session.replace_document()
-    origin = session.document.revision
-    replay = partial(enqueue, session, source, units, y_up, entity, origin)
-    session.replay_callback = replay
-    return {"entity_id": entity.id, "job_id": replay()}
+    job = authored_jobs.begin(session, partial(enqueue, session, source, units, y_up, entity))
+    return {"entity_id": entity.id, "job_id": job}
 
 
 def prepare_import(session: "Session", path: str, parent: str, name: str) -> tuple[Path, SCP]:
@@ -90,12 +88,7 @@ def import_asset(
 def publish(session: "Session", entity: SCP, origin: int, asset: Asset) -> None:
     validate_parent(session, entity.parent)
     session.assets[entity.asset] = asset
-    found = False
-    for entry in session.history.entries[: session.history.cursor + 1]:
-        found |= origin in entry.versions
-        if found:
-            merge_entry(session, entry, entity)
-    session.document = session.history.entries[session.history.cursor].document
+    authored_jobs.publish(session, origin, partial(merge_entity, entity))
     include_created(session, {entity.id})
     if entity.parent:
         from .evaluation import request
@@ -110,13 +103,9 @@ def validate_parent(session: "Session", parent: str) -> None:
         raise ValueError("Document already has a root; import under an existing SCP.")
 
 
-def merge_entry(session: "Session", entry: Entry, entity: SCP) -> None:
-    if any(item.id == entity.id for item in entry.document.entities):
-        return
-    if entity.parent and not any(item.id == entity.parent for item in entry.document.entities):
-        return
-    session.serial += 1
-    entry.document = replace(
-        entry.document, revision=session.serial, entities=(*entry.document.entities, entity)
-    )
-    entry.versions.add(session.serial)
+def merge_entity(entity: SCP, document: Document) -> Document:
+    if entity.id in document.index.entities:
+        return document
+    if entity.parent and entity.parent not in document.index.entities:
+        return document
+    return replace(document, entities=(*document.entities, entity))

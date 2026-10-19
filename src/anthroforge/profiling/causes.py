@@ -21,10 +21,10 @@ def document(session: Any, before: Any, after: Any) -> None:
 
 
 def mutation_fields(delta):
-    count = len(delta.entities) + len(delta.controls)
+    count = len(delta.entities) + len(delta.controls) + len(delta.objects)
     changes = (
         dict(kind=kind, entity=key, fields=sorted(fields))
-        for kind in ("entities", "controls")
+        for kind in ("entities", "controls", "objects")
         for key, fields in getattr(delta, kind).items()
     )
     return dict(

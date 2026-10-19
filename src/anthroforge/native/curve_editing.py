@@ -23,12 +23,20 @@ def point(engine: GeometryEngine, curve: Curve, index: int, options: dict[str, A
         raise ValueError("Unknown curve-point setting.")
     old = curve.points[index]
     updated = replace(old, **options)
+    if updated == old:
+        return old
+    return evaluated_edit(engine, curve, index, updated, options)
+
+
+def evaluated_edit(
+    engine: GeometryEngine, curve: Curve, index: int, updated: CurvePoint, options: dict[str, Any]
+) -> CurvePoint:
     data, output = curve_records(curve), np.empty(13)
     points = tuple(updated if i == index else p for i, p in enumerate(curve.points))
     replacement = curve_records(replace(curve, points=points))[index]
     fields = sum(1 << bit for bit, name in enumerate(FIELDS) if name in options)
     apply_edit(engine, data, curve.closed, index, replacement, fields, output)
-    return unpack(old, output)
+    return unpack(curve.points[index], output)
 
 
 def apply_edit(
@@ -52,6 +60,13 @@ def unpack(old: CurvePoint, record: Any) -> CurvePoint:
         right=tuple(record[6:9]),
         radius=float(record[9]),
         tilt=float(record[10]),
-        left_mode=HANDLES[int(record[11])],
-        right_mode=HANDLES[int(record[12])],
+        left_mode=handle_mode(record[11]),
+        right_mode=handle_mode(record[12]),
     )
+
+
+def handle_mode(value: Any) -> str:
+    index = int(value)
+    if index != value or not 0 <= index < 2 * len(HANDLES):
+        raise ValueError("Invalid native curve handle mode.")
+    return HANDLES[index % len(HANDLES)]  # Upper range means handles were resolved natively.

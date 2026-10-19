@@ -1,27 +1,33 @@
 """Construction job admission and complete, revision-checked result publication."""
 
-from dataclasses import replace
 from functools import partial
 from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
 
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job
-from anthroforge.core.results import EvaluationResult
+from anthroforge.core.primitive_sampling import counts
 from anthroforge.core.scheduling import Workload
+from anthroforge.core.surfaces import Surface
 from anthroforge.native.mesh import NativeCancellation
 
 from . import dependencies as dep
+from . import geometry_outputs, surface_evaluation
 from .assets import Asset
 from .construction_evaluator import Evaluation
 from .construction_policy import mode, revisions
 from .construction_scheduling import stages
+from .curve_sources import source as source_curve
+from .evaluation_results import accepted_result as accepted_result
 
 if TYPE_CHECKING:
     from .session import Session
 
 
 def request(session: "Session", entity: str, interactive: bool = False) -> str:
+    from .path_tasks import prerequisites
+
+    prerequisites(session, entity)
     job = make_job(session, entity)
     job.cancel = NativeCancellation(session.engine)
     job.interactive, job.priority = interactive, session.priority({entity})
@@ -35,9 +41,9 @@ def request(session: "Session", entity: str, interactive: bool = False) -> str:
 
 def make_job(session: "Session", entity: str) -> Job:
     job = Job(
-        "Evaluate " + session.document.entity(entity).name,
+        "Evaluate " + session.document.object(entity).name,
         frozenset((entity,)),
-        lambda document: (document, {k: a.mesh for k, a in session.assets.items()}),
+        lambda document: (document, session.resources.snapshot()),
         partial(compute, session, entity),
         partial(publish, session, entity),
         key="construction:" + entity,
@@ -48,10 +54,19 @@ def make_job(session: "Session", entity: str) -> Job:
 
 
 def workload(session: "Session", entity: str, document: Document) -> Workload:
+    item = document.object(entity)
+    if isinstance(item, Surface):
+        return surface_workload(session, item, document)
+    return primitive_workload(session, entity, document)
+
+
+def primitive_workload(session: "Session", entity: str, document: Document) -> Workload:
     item = document.entity(entity)
     primitive = item.primitive
-    points = sum(len(c.points) for c in primitive.curves) if primitive else 0
-    vertices = primitive.samples * max(len(primitive.curves), 1) if primitive else 0
+    points = (
+        sum(len(source_curve(document, c.id).points) for c in primitive.curves) if primitive else 0
+    )
+    vertices = sum(counts(primitive).values()) if primitive else 0
     return Workload(
         entities=len(document.entities),
         affected=1,
@@ -62,13 +77,25 @@ def workload(session: "Session", entity: str, document: Document) -> Workload:
 
 
 def compute(session: "Session", entity: str, payload: Any, cancel: Any) -> Any:
-    document, meshes = payload
+    document, resources = payload
     if dep.Port(entity, "geometry") in dep.blocked(dep.graph(document)):
         raise ValueError(
             "Cyclic or missing construction dependency; last accepted geometry retained."
         )
-    evaluator = Evaluation(session.engine, document, meshes, cast(NativeCancellation, cancel))
-    return document, evaluator.geometry(document.entity(entity))
+    return document, compute_geometry(session, document, resources, entity, cancel)
+
+
+def compute_geometry(
+    session: "Session", document: Document, resources: Any, entity: str, cancel: Any
+) -> Any:
+    item = document.object(entity)
+    if isinstance(item, Surface):
+        return surface_evaluation.evaluate(session.engine, document, resources, item, cancel.handle)
+    meshes = {key: asset.mesh for key, asset in resources.meshes.items()}
+    evaluator = Evaluation(
+        session.engine, document, meshes, cast(NativeCancellation, cancel), resources.paths
+    )
+    return evaluator.geometry(document.entity(entity))
 
 
 def publish(session: "Session", entity: str, result: Any) -> None:
@@ -76,73 +103,38 @@ def publish(session: "Session", entity: str, result: Any) -> None:
     inputs = dep.ports(source, dep.Port(entity, "geometry"))
     if revisions(source, inputs) != revisions(session.document, inputs):
         raise ValueError("Construction inputs changed before publication.")
-    item = session.document.entity(entity)
+    item = geometry_outputs.get(session.document, entity)
     key = str(uuid4())
     session.assets[key] = Asset(mesh, "generated", "", 1.0, False)
     accepted = accepted_result(source, item, inputs, key)
-    changed = install_result(item, key, accepted)
-    session.replace_entities({entity: changed}, authored=False)
+    geometry_outputs.install(session, item, accepted)
     propagate_result(session, entity)
 
 
-def install_result(item: Any, key: str, accepted: EvaluationResult) -> Any:
-    return replace(
-        item,
-        asset=key,
-        result=accepted,
-        result_generation=item.result_generation + 1,
-        status="ready",
-        error="",
-    )
-
-
-def accepted_result(
-    source: Document, item: Any, inputs: set[dep.Port], key: str
-) -> EvaluationResult:
-    pending = tuple(
-        e.id
-        for e in source.entities
-        if dep.Port(e.id, "geometry") in inputs and e.id != item.id and e.result.status == "pending"
-    )
-    return EvaluationResult(
-        key,
-        item.result.revision + 1,
-        item.construction_revision,
-        revisions(source, inputs),
-        pending,
-    )
-
-
 def completed(session: "Session", entity: str, job: Job, state: str) -> None:
-    if state == "failed" and any(e.id == entity for e in session.document.entities):
-        item = session.document.entity(entity)
-        result = replace(item.result, status="failed", error=job.error)
-        session.replace_entities(
-            {entity: replace(item, result=result, error=job.error, status="failed")}, authored=False
-        )
+    if state == "failed":
+        geometry_outputs.failed(session, entity, job.error)
 
 
 def propagate_result(session: "Session", entity: str) -> None:
     from anthroforge.core.entities import descendants
 
     from . import evaluation
-    from .control_tasks import edited as controls_edited
+    from .dependent_tasks import changed
 
-    controls_edited(session, {dep.Port(entity, "geometry")})
+    changed(session, {dep.Port(entity, "geometry")})
     targets = descendants(session.document.entities, entity) - {entity}
     live = {key for key in targets if mode(session.document, key) != "MANUAL"}
     if live and session.document.attachments_enabled:
         evaluation.request(session, live)
-    affected = dep.affected(session.document, {dep.Port(entity, "geometry")}) - {entity}
-    schedule(session, affected)
 
 
 def schedule(
     session: "Session", targets: set[str], released: bool = False, explicit: bool = False
 ) -> list[str]:
     scheduled = []
-    for entity in session.document.entities:
-        if entity.id in targets and entity.primitive:
+    for entity in geometry_outputs.items(session.document):
+        if entity.id in targets:
             setting = mode(session.document, entity.id)
             if explicit or setting == "LIVE" or (released and setting == "ON_RELEASE"):
                 scheduled.append(request(session, entity.id, interactive=not released))
@@ -153,19 +145,32 @@ def edited(session: "Session", targets: set[str]) -> None:
     if not targets:
         return
     targets = dep.affected(session.document, {dep.Port(key, "geometry") for key in targets})
-    changed = {
-        e.id: replace(e, result=replace(e.result, status="pending"))
-        for e in session.document.entities
-        if e.id in targets and e.primitive
-    }
-    session.replace_entities(changed, authored=False)
+    geometry_outputs.pending(session, targets)
     schedule(session, targets)
 
 
 def evaluate(session: "Session", entities: list[str] | None = None) -> list[str]:
-    targets = set(entities) if entities is not None else {e.id for e in session.document.entities}
+    from .path_tasks import prerequisites
+
+    eligible = {e.id for e in geometry_outputs.items(session.document)}
+    targets = set(entities) & eligible if entities is not None else eligible
     for entity in tuple(targets):
-        targets.update(
-            dep.reads(session.document, entity) & {e.id for e in session.document.entities}
-        )
+        prerequisites(session, entity, explicit=True)
+        targets.update(dep.reads(session.document, entity) & eligible)
     return schedule(session, targets, explicit=True)
+
+
+def surface_workload(session: "Session", item: Surface, document: Document) -> Workload:
+    from anthroforge.core.scheduling import StageWorkload
+
+    paths = session.resources.paths
+    sources = [source_curve(document, use.curve).result.asset for use in item.curves]
+    points = sum(paths[key].path.count for key in sources if key in paths)
+    rows = len(item.curves) + sum(item.across)
+    polygons = points * rows if item.kind == "LOFT" else points * item.patch_resolution**2
+    return Workload(
+        affected=1,
+        candidates=points,
+        triangles=polygons * 2,
+        stages=(StageWorkload("surface", points, polygons),),
+    )

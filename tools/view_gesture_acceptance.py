@@ -5,7 +5,7 @@ from pathlib import Path
 
 import numpy as np
 from curve_interaction_acceptance import CTRL, LEFT, fixture, move, point_row, screen
-from primitive_acceptance import settle
+from primitive_acceptance import settle, source_curve
 from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
 from PySide6.QtGui import QGuiApplication, QKeyEvent, QQuaternion, QVector3D, QWheelEvent
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -36,7 +36,7 @@ def key(window, code, modifiers=Qt.NoModifier):
 
 def select_point(controller, entity):
     editor = controller.authoring
-    point_id = controller.session.document.entity(entity).primitive.curves[0].points[0].id
+    point_id = source_curve(controller, entity).points[0].id
     row = point_row(editor, point_id)
     editor.selectComponent(row["key"], False)
     return point_id

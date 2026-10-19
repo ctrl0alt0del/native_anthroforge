@@ -8,7 +8,7 @@ UiScrollView {
     property var selected: workspace.selectedData
     readonly property var attachment: selected.attachment || {}
     readonly property var candidates: workspace.sceneChoices.parents
-    readonly property bool dialogVisible: colorDialog.visible
+    readonly property bool dialogVisible: colorDialog.visible || constructionInspector.dialogVisible
     signal pickAnchor(string mode)
     signal deleteRequested(string entity)
     clip: true; contentWidth: availableWidth
@@ -27,7 +27,7 @@ UiScrollView {
         }
         Label { visible: !!inspector.selected.readonly; text: "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         ColumnLayout {
-            visible: !!inspector.selected.id && !inspector.selected.is_control
+            visible: !!inspector.selected.id && !inspector.selected.is_control && !inspector.selected.is_construction
             enabled: !inspector.selected.readonly && !workspace.state.waiting
             Layout.fillWidth: true; spacing: 10
             RowLayout {
@@ -143,6 +143,7 @@ UiScrollView {
             }
         }
         ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
+        ConstructionInspector { id: constructionInspector; visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         DependencyInspector { visible: !!inspector.selected.id }
         Label { text: inspector.selected.error || ""; visible: !!text; color: Theme.danger; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         Item { implicitHeight: 8 }

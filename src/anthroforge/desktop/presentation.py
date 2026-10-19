@@ -24,6 +24,8 @@ def state(controller):
         hidden_categories=view.hidden_categories,
         unpickable_categories=view.unpickable_categories,
         editing=controller.session.history.before is not None,
+        object_count=len(controller.session.document.registry.records),
+        cursor=view.cursor,
     )
 
 

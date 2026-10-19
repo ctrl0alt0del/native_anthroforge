@@ -6,7 +6,7 @@ from PySide6.QtCore import Property, QObject, Signal, Slot
 
 from anthroforge.native import curve_queries, scene
 
-from . import authoring_state
+from . import authoring_state, curve_context
 
 
 class CurveInteraction(QObject):
@@ -26,12 +26,9 @@ class CurveInteraction(QObject):
 
     def rebuild(self):
         editor, controller = self.editor, self.editor.controller
-        entity = next(
-            (e for e in controller.session.document.entities if e.id == controller.selection), None
-        )
-        curves = entity.primitive.curves if entity and entity.primitive else ()
+        entity, curves = curve_context.owner(editor), curve_context.curves(editor)
         enabled = editor.editing and editor.category == "CURVE" and curves
-        self.query = make_query(controller.session.engine, entity, curves) if enabled else None
+        self.query = make_query(controller.session, entity, curves) if enabled else None
         self.context = authoring_state.cache_key(editor)
         self.clearPreview()
 
@@ -181,10 +178,15 @@ def offset_hit(hit, offset):
     return dict(hit, surface=hit["point"], point=position)
 
 
-def make_query(engine, entity, curves):
-    return curve_queries.CurveQuery(engine, curves, scene.entity_frame(engine, entity))
+def make_query(session, entity, curves):
+    return curve_queries.CurveQuery(session.engine, curves, curve_context.frame(session, entity))
 
 
 def insert_point(controller, preview):
     args = {key: preview[key] for key in ("curve", "segment", "parameter")}
-    return controller.session.command("curve.split", entity=controller.selection, **args)
+    operation = (
+        "curve.subdivide" if controller.selectedData.get("is_construction") else "curve.split"
+    )
+    if operation == "curve.split":
+        args["entity"] = controller.selection
+    return controller.session.command(operation, **args)

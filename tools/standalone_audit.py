@@ -10,7 +10,7 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from anthroforge.application import dependencies
+from anthroforge.application import curve_sources, dependencies
 from anthroforge.application.coordinator import TaskCoordinator
 from anthroforge.application.history import History
 from anthroforge.application.primitive_operations import default_primitive
@@ -36,8 +36,9 @@ def measure(call, repeats=9):
 def document_fixture(count, mode="MANUAL"):
     root = SCP("Root", id="root")
     others = tuple(SCP(str(i), id=str(i), parent=root.id) for i in range(count - 2))
-    body = SCP("Body", id="body", parent=root.id, primitive=default_primitive("BODY", "CAPSULE"))
-    return Document(entities=(root, *others, body), update_mode=mode)
+    primitive, curves = curve_sources.create_records(default_primitive("BODY", "CAPSULE"), "body")
+    body = SCP("Body", id="body", parent=root.id, primitive=primitive)
+    return Document(entities=(root, *others, body), objects=curves, update_mode=mode)
 
 
 def document_scaling(count):
@@ -66,7 +67,7 @@ def edit_cost(document):
 
 
 def point_editor(session):
-    curve = session.document.entity("body").primitive.curves[0]
+    curve = session.document.object(session.document.entity("body").primitive.curves[0].curve)
     target = dict(entity="body", curve=curve.id, point=curve.points[0].id)
     count = 0
 

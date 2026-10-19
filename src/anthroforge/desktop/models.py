@@ -35,10 +35,9 @@ class RenderModel(QAbstractListModel):
         return None
 
     @measured("publication", model_profiler)
-    def publish(self, rows, assets=None):
+    def publish(self, rows, resources=()):
         self.wanted = {row["key"]: row for row in rows}
-        if assets:
-            self.leases.update({a.mesh.handle: a.mesh for a in assets.values()})
+        self.leases.update({resource.handle: resource for resource in resources})
         owners = {row["id"] for row in rows}
         keep = {row["key"] for row in self.rows if row["active"] and row["id"] in owners}
         self._remove_missing(keep | self.wanted.keys())
@@ -98,6 +97,12 @@ class RenderModel(QAbstractListModel):
         used = {row["handle"] for row in (*self.rows, *self.pending, *self.displayed)}
         self.leases = {key: value for key, value in self.leases.items() if key in used}
 
+    def memory_owners(self, owners):
+        staged = [row for row in self.rows if not row["active"]] + self.pending
+        for name, rows in (("viewport_displayed", self.displayed), ("viewport_staging", staged)):
+            handles = {row["handle"] for row in rows}
+            owners[name].update(value for key, value in self.leases.items() if key in handles)
+
 
 def presentation(previous, current):
     return dict(
@@ -108,4 +113,7 @@ def presentation(previous, current):
         chunk=previous["chunk"],
         geometry_asset=previous.get("geometry_asset", ""),
         geometry_revision=previous.get("geometry_revision", 0),
+        content=previous.get("content", {})
+        if previous["key"] != current["key"]
+        else current.get("content", {}),
     )

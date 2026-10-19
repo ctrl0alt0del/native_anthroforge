@@ -11,11 +11,14 @@ from anthroforge.profiling.spans import measured
 from . import controller_actions as actions
 from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
+from .drawing_tools import DrawingTools
+from .image_tools import ImageTools
 from .inspection_export import InspectionExport
 from .inspection_panel import InspectionPanel
 from .inspection_tools import InspectionTools
 from .issue_panel import IssuePanel
 from .models import RenderModel
+from .object_selection import ObjectSelection
 
 
 class Controller(QObject):
@@ -33,8 +36,7 @@ class Controller(QObject):
         super().__init__()
         self.initialize_session()
         self.activity_model = ActivityModel(self)
-        self.render_model = RenderModel(self)
-        self.render_model.activated.connect(self.activate_geometry)
+        self.initialize_renderers()
         self._initialize_state()
         scene_projection.initialize(self)
         from .authoring import Authoring
@@ -53,20 +55,51 @@ class Controller(QObject):
         self.inspection_panel = InspectionPanel(self)
         self.inspection_export = InspectionExport(self)
         self.inspection_tools = InspectionTools(self)
+        self.image_tools = ImageTools(self)
+        self.drawing_tools = DrawingTools(self)
         self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
 
     def memory_owners(self, owners):
-        model = getattr(self, "render_model", None)
-        if model is not None:
-            staged = [row for row in model.rows if not row["active"]] + model.pending
-            for name, rows in (
-                ("viewport_displayed", model.displayed),
-                ("viewport_staging", staged),
-            ):
-                handles = {row["handle"] for row in rows}
-                owners[name].update(mesh for key, mesh in model.leases.items() if key in handles)
+        for attribute in ("render_model", "path_model", "image_model"):
+            model = getattr(self, attribute, None)
+            if model is not None:
+                model.memory_owners(owners)
+        owners["drawing_preview"].update(self.drawing_tools.leases)
+        if self.drawing_tools.stroke is not None:
+            owners["drawing_preview"].add(self.drawing_tools.stroke)
+
+    def initialize_renderers(self):
+        from .image_scene import prepare_picking as prepare_images
+        from .path_scene import prepare_picking
+
+        self.render_model, self.path_model = RenderModel(self), RenderModel(self)
+        self.image_model = RenderModel(self)
+        self.initialize_image_layers()
+        self.render_model.activated.connect(self.activate_geometry)
+        self.path_model.activated.connect(self.activate_geometry)
+        self.image_model.activated.connect(self.activate_geometry)
+        prepare_picking(self)
+        prepare_images(self)
+
+    def initialize_image_layers(self):
+        from .render_layer import RenderLayer
+
+        self.image_layers = {
+            key: RenderLayer(self.image_model, key) for key in ("NORMAL", "FRONT", "BACK")
+        }
+        self.viewport_orthographic = False
+        self.viewport_direction = (0, 0, 1)
+
+    @Slot(bool)
+    def setViewportProjection(self, orthographic):
+        self.viewport_orthographic = orthographic
+
+    @Slot(list)
+    def setViewportDirection(self, direction):
+        self.viewport_direction = tuple(direction)
 
     def _initialize_state(self):
+        self.object_selection = ObjectSelection()
         self.selection, self.hovered, self.message = "", "", ""
         self.last_revision, self.last_workspace = -1, -1
         self.rows, self.drag_values, self.pick_ids = [], [], []
@@ -80,6 +113,14 @@ class Controller(QObject):
         self.capture_mode = False
         self.last_frame = monotonic()
 
+    @property
+    def selection(self):
+        return self.object_selection.primary
+
+    @selection.setter
+    def selection(self, value):
+        self.object_selection.choose(value)
+
     @Property(str, notify=changed)
     def documentName(self) -> str:
         return self.session.document.name
@@ -92,9 +133,43 @@ class Controller(QObject):
     def meshModel(self):
         return self.render_model
 
+    @Property(QObject, constant=True)
+    def pathModel(self):
+        return self.path_model
+
+    @Property("QVariantMap", notify=changed)
+    def conversionState(self):
+        from anthroforge.application.curve_conversion import status
+
+        return status(self.session)
+
+    def conversion_key(self):
+        return tuple(
+            (v.token, v.state, id(v.asset))
+            for v in (self.session.conversion, self.session.surface_preview)
+        )
+
+    @Property("QVariantMap", notify=changed)
+    def surfacePreview(self):
+        from anthroforge.application.surface_preview import status
+
+        return status(self.session)
+
+    @Property(QObject, constant=True)
+    def imageModel(self):
+        return self.image_model
+
+    @Slot(str, result=QObject)
+    def imageLayer(self, depth):
+        return self.image_layers[depth]
+
     @Property("QVariantList", notify=treeChanged)
     def treeRows(self):
         return self.scene_projection.view.value("rows")
+
+    @Property(QObject, constant=True)
+    def constructionModel(self):
+        return self.construction.model
 
     @Property(QObject, constant=True)
     def selectedData(self):
@@ -107,6 +182,10 @@ class Controller(QObject):
     @Property(str, notify=selectionChanged)
     def selectedId(self):
         return self.selection
+
+    @Property("QVariantList", notify=selectionChanged)
+    def selectedObjects(self):
+        return self.object_selection.items
 
     @Property(str, notify=changed)
     def hoveredId(self):
@@ -136,6 +215,42 @@ class Controller(QObject):
     def inspectionTools(self):
         return self.inspection_tools
 
+    @Property(QObject, constant=True)
+    def imageTools(self):
+        return self.image_tools
+
+    @Property(QObject, constant=True)
+    def drawingTools(self):
+        return self.drawing_tools
+
+    @Slot(result="QVariantList")
+    def ordinaryParents(self):
+        from .image_tools import parent_choices
+
+        return parent_choices(self)
+
+    @Slot(str)
+    def createSurface(self, kind):
+        from .construction_creation import surface
+
+        surface(self, kind)
+
+    @Slot(str, str, result="QVariantMap")
+    def surfaceOptions(self, target, boundary):
+        from .surface_tools import choices
+
+        return choices(self, target, boundary)
+
+    @Slot(result="QVariantList")
+    def anatomicalSurfaces(self):
+        from anthroforge.core.results import geometry_asset
+
+        return [
+            dict(id=item.id, name=item.name)
+            for item in self.session.document.entities
+            if geometry_asset(item)
+        ]
+
     @Property("QVariantMap", notify=metricsChanged)
     def metrics(self):
         return self._metrics
@@ -151,6 +266,8 @@ class Controller(QObject):
         self.inspection_panel.synchronize()
         self.inspection_export.synchronize()
         self.inspection_tools.synchronize()
+        self.image_tools.synchronize()
+        self.drawing_tools.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()
@@ -166,7 +283,9 @@ class Controller(QObject):
             "dirty": self.session.saved_revision != self.session.document.revision,
             "blocked": self.session.scheduler.blocked,
             "waiting": self.session.waiting_save,
-            "publishing": len(self.render_model.pending),
+            "publishing": sum(
+                len(m.pending) for m in (self.render_model, self.path_model, self.image_model)
+            ),
             "path": str(self.session.path or ""),
         }
 
@@ -200,6 +319,8 @@ class Controller(QObject):
         self.session.scheduler.tick()
         project_actions.poll(self)
         self.render_model.drain()
+        self.path_model.drain()
+        self.image_model.drain()
         self.refresh_if_needed()
         self.issue_panel.synchronize()
         self.tick_count += 1
@@ -212,10 +333,17 @@ class Controller(QObject):
         self.session.scheduler.metrics.observe("frame_interval", now - self.last_frame)
         self.last_frame = now
         self.render_model.presented()
+        self.path_model.presented()
+        self.image_model.presented()
 
     @measured("publication", lambda owner: owner.session.profiler)
     def activate_geometry(self):
+        from .image_scene import prepare_picking as prepare_images
+        from .path_scene import prepare_picking
+
         scene_state.picking_inputs(self, self.render_model.active_rows())
+        prepare_picking(self)
+        prepare_images(self)
         from anthroforge.application.geometry_ownership import collect
 
         collect(self.session)
@@ -227,6 +355,7 @@ class Controller(QObject):
             projection.session is not self.session
             or projection.cursor != self.session.changes.serial
             or self.last_workspace != self.session.active_workspace
+            or getattr(self, "_conversion_key", None) != self.conversion_key()
         ):
             self.refresh()
 
@@ -235,6 +364,7 @@ class Controller(QObject):
         scene_projection.refresh(self)
         self.last_revision = self.session.document.revision
         self.last_workspace = self.session.active_workspace
+        self._conversion_key = self.conversion_key()
         self.notify()
         self.restore_camera()
 
@@ -260,14 +390,19 @@ class Controller(QObject):
         return actions.run(self, operation, arguments)
 
     @Slot(str)
-    def select(self, entity):
-        self.selection = entity
+    @Slot(str, bool)
+    def select(self, entity, extend=False):
+        self.object_selection.choose(entity, extend)
         self.scene_projection.synchronize_selection()
-        self.scene_projection.view.synchronize(
-            dict(rows=self.rows, parents=self.scene_projection.parents())
-        )
+        self.scene_projection.publish_records()
         self.authoring.refresh()
         self.notify()
+
+    @Slot(str, result="QVariantMap")
+    def objectRecord(self, target):
+        return self.scene_projection.records.get(target) or self.construction.records.get(
+            target, {}
+        )
 
     @Slot(str, float, str, bool)
     def importMesh(self, path, units, parent, y_up):
@@ -279,12 +414,13 @@ class Controller(QObject):
             self.message = "Import queued. You can keep navigating and editing."
 
     @Slot("QVariantList", "QVariantList", int, bool, float, result="QVariantMap")
-    def pick(self, origin, direction, depth, select, radius=0.03):
+    @Slot("QVariantList", "QVariantList", int, bool, float, bool, result="QVariantMap")
+    def pick(self, origin, direction, depth, select, radius=0.03, extend=False):
         self.last_hit = scene_state.picked(self, origin, direction, depth, radius)
         previous = self.hovered
         self.hovered = self.last_hit.get("id", "")
         if select:
-            self.select(self.hovered)
+            self.select(self.hovered, extend)
         if select or previous != self.hovered:
             self.notify()
         return self.last_hit
@@ -375,6 +511,7 @@ class Controller(QObject):
 
     def close(self):
         self.timer.stop()
+        self.drawing_tools.cancel()
         self.session.close()
         self.profiler.close()
         for lock in self.temporary_locks:

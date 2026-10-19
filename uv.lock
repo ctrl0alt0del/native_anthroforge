@@ -4,10 +4,11 @@ requires-python = "==3.12.*"
 
 [[package]]
 name = "anthroforge-standalone"
-version = "0.1.9"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
+    { name = "pillow" },
 ]
 
 [package.optional-dependencies]
@@ -48,6 +49,7 @@ qt-sdk = [
 requires-dist = [
     { name = "numpy", specifier = "==1.26.4" },
     { name = "numpy", marker = "extra == 'numerics'", specifier = "==1.26.4" },
+    { name = "pillow", specifier = "==12.3.0" },
     { name = "pyinstantmeshes", marker = "extra == 'numerics'", specifier = "==1.0.0" },
     { name = "pyside6", marker = "extra == 'desktop'", specifier = "==6.12.0" },
     { name = "pytetwild", extras = ["all"], marker = "extra == 'numerics'", specifier = "==0.4.2" },

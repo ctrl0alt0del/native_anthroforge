@@ -1,6 +1,13 @@
 # AnthroForge standalone application: consolidated recommendations
 
-Updated: 2026-10-16
+Updated: 2026-10-18
+
+The [confirmed 0.2.0 specification](docs/specification_020.md) is authoritative for
+curves, fibers, surfaces, reference images, object relationships and project-format
+compatibility. It replaces the earlier Free/Controlled classification with curve
+engines, requires independent curve-to-fiber copies, and includes all these features
+in 0.2.0. Muscles/soft tissues move to 0.2.1. Historical source terminology in the
+evidence/coverage appendix is retained only to identify the original addon behavior.
 
 Status: general product specification confirmed by the user on 2026-10-16 after questions Q1–Q58, with the subsequent 0.1.2 primitive/deformer interview confirmed in Q32. Section 1 and its linked confirmed feature specifications are authoritative where source recommendations differ. Priorities and technology proposals are recommendations unless explicitly identified as agreed. This is not an implementation completion report or a claim of measured standalone performance.
 
@@ -55,7 +62,7 @@ Imported source meshes remain unchanged and support TRS, lattice deformation, an
 
 Resolution and other attachment-mesh topology changes are locked while an SCP has children or incoming surface attachments, including from shared controls. Shape edits preserving that topology remain available; the lock is removed once both conditions are absent. Automatic attachment remapping across resolution/topology changes is excluded through 1.0. Control-dependency cycles may be authored, but evaluation skips cyclic and dependent work, retains previous successful output, and terminates affected jobs unsuccessfully so saving can finish. The SCP hierarchy remains a tree. Dedicated issue/cycle-reporting UI is deferred to a later 0.x release.
 
-Ordinary selection selects an SCP; Edit Primitive exposes its construction controls. Hooks and lattice cages are independently selectable. Multiple deformers may be ordered on the same target. Removing one target's binding preserves the shared control and its other targets. Each affected SCP retains its own effective update mode under the existing task coordinator, including when a deformer is shared. Complete details, reference evidence, and required future validation are in the linked specification; these are confirmed requirements, not implemented capabilities.
+Ordinary selection selects an SCP; Edit Primitive exposes its construction controls. Hooks and lattice cages are independently selectable. Multiple deformers may be ordered on the same target. Removing one target's binding preserves the shared control and its other targets. Each affected SCP retains its own effective update mode under the existing task coordinator, including when a deformer is shared. The 0.1.2 release implemented this baseline; the [0.2.0 contract](docs/specification_020.md) supersedes curve ownership and direct control attachments. Release evidence is recorded separately from these product requirements.
 
 Import creates an independent copy with new entity identities. Remap internal relationships and preserve source document/entity/revision provenance. In a populated document, the user chooses the SCP that parents the imported root; in an empty document, the imported root establishes the tree. Missing non-hierarchy references remain visible and explicitly resolvable; block only operations needing them, and never guess a binding by name. Future transfer of changes from a copy to its source must be explicit, never automatic.
 
@@ -337,9 +344,9 @@ Present attachment of a point, influence of a supporting surface on the interior
 
 Directly inspect and edit endpoints, intermediate touches, loops, shared junctions, and interior influences. Selecting a shared point reveals all incident fibers before an edit affects them. Display deformed paths and fixed anchors together, with anatomical ownership and source/mirror relationships intact.
 
-### D05 — Preserve Free/Controlled and deformation/rerouting semantics [P0]
+### D05 — Preserve authored-shape and routed-engine semantics [P0]
 
-Free fibers preserve authored paths and expose collision problems. Controlled fibers may reroute while retaining structural anchors. Separate moving with anatomy, editing the trajectory, and explicitly running the planner/solver. Compare previous and proposed routes before acceptance where appropriate. A failed Free route must not silently invoke automatic planning.
+Bézier/polyline engines preserve authored paths and expose collision problems. The routed engine may reroute while retaining structural anchors. Fiber is a Curve subclass with anatomical bindings, not a separate Free/Controlled type. Separate moving with anatomy, editing the trajectory, and explicitly running the solver. Compare previous and proposed routes before acceptance where appropriate. Failure must not silently change engines. See the [0.2.0 contract](docs/specification_020.md).
 
 ### D06 — Provide a deliberate skeleton-update workflow [P1]
 

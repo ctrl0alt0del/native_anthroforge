@@ -30,17 +30,37 @@ class GeometryEngine(NativeEngine):
         self._query_signatures()
         self._construction_signatures()
         self.bases = BaseCache()
-        self.mesh_observer: Any = None
+        self.resource_observer: Any = None
 
     def _construction_signatures(self) -> None:
-        from . import bodies, components, construction, curve_editing, falloff, scene, topology
+        from . import bodies, components, construction, curve_surfaces, falloff, scene, topology
         from .control_geometry import configure as configure_control_geometry
-        from .curve_queries import configure as configure_curve_queries
 
-        for module in (bodies, components, construction, curve_editing, falloff, scene, topology):
+        for module in (bodies, components, construction, curve_surfaces, falloff, scene, topology):
             module.configure(self)
-        configure_curve_queries(self)
         configure_control_geometry(self)
+        self._curve_signatures()
+
+    def _curve_signatures(self) -> None:
+        from . import curve_editing, curve_queries, drawing, path_editing, paths, routing, strokes
+
+        for module in (
+            curve_editing,
+            curve_queries,
+            drawing,
+            path_editing,
+            paths,
+            routing,
+            strokes,
+        ):
+            module.configure(self)
+        self._binding_signatures()
+
+    def _binding_signatures(self) -> None:
+        from . import attachment_fields, attachment_weights, path_collisions, point_attachments
+
+        for module in (attachment_fields, attachment_weights, path_collisions, point_attachments):
+            module.configure(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)
@@ -143,8 +163,8 @@ class Mesh:
         bounds = (c.c_double * 6)()
         engine.check(engine.library.af_mesh_bounds(handle, bounds))
         self.bounds = tuple(bounds)
-        if engine.mesh_observer is not None:
-            engine.mesh_observer(self)
+        if engine.resource_observer is not None:
+            engine.resource_observer(self)
 
     def array(self, kind: int) -> Any:
         vertices, faces, corners, triangles, _ = self.counts

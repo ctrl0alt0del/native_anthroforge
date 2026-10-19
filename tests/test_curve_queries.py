@@ -96,7 +96,7 @@ def test_split_command_keeps_attachment_topology_and_one_undo(session):
     added = split_first(session, entity)
     session.command("wait")
     after = session.document.entity(entity)
-    assert after.primitive.curves[0].points[1].id == added
+    assert session.document.object(after.primitive.curves[0].id).points[1].id == added
     np.testing.assert_array_equal(session.assets[after.asset].mesh.array(3), triangles)
     assert session.history.cursor == cursor + 1
     session.command("undo")
@@ -104,7 +104,7 @@ def test_split_command_keeps_attachment_topology_and_one_undo(session):
 
 
 def split_first(session, entity):
-    curve = session.document.entity(entity).primitive.curves[0]
+    curve = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     return session.command("curve.split", entity=entity, curve=curve.id, segment=0, parameter=0.4)
 
 
@@ -117,4 +117,4 @@ def test_split_editable_parameters_roundtrip(session, tmp_path):
     session.command("save", path=path, blocked_policy="wait")
     session.command("open", path=path)
     assert session.document.entity(entity).primitive == before
-    assert before.curves[0].points[1].id == point
+    assert session.document.object(before.curves[0].id).points[1].id == point

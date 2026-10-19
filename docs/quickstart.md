@@ -1,4 +1,7 @@
-# AnthroForge 0.1.9 quick start
+# AnthroForge 0.2.0 quick start
+
+Start with [curves, fibers, surfaces and images](construction_020.md).
+The existing primitive, attachment and navigation workflow below remains applicable.
 
 The Activity panel retains its job rows while status and elapsed time update. It shows
 the latest 40 jobs, newest first; Cancel and Retry continue to act on the named job.

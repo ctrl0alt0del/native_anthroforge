@@ -25,11 +25,11 @@ def test_cycles_exclude_downstream_and_handle_long_chains():
 def test_cycle_inspection_distinguishes_cause_and_consequence(session):
     entity = create(session)
     control = hook(session, entity)
-    session.command("control.attach", control=control, support=entity)
+    session.command("control.follow", control=control, entity=control)
     session.wait(5)
     cyclic = records(session, code="DEPENDENCY_CYCLE")
     blocked = records(session, code="DEPENDENCY_BLOCKED")
-    assert {r["target"] for r in cyclic} == {entity, control}
+    assert {r["target"] for r in cyclic} == {control}
     assert all(r["evidence"]["participant"] for r in cyclic)
     assert blocked and all(not r["evidence"]["participant"] for r in blocked)
     assert all(r["evidence"]["cycles"] for r in blocked)
@@ -56,11 +56,12 @@ def test_control_inspection_has_no_fake_surface(session):
     assert any(r["consumers"] for r in row["relationships"])
 
 
-def test_mixed_workspace_membership_and_settings_roundtrip(session, tmp_path):
+def test_anatomical_workspace_includes_associated_control_and_settings_roundtrip(session, tmp_path):
     entity = create(session)
     control = hook(session, entity)
-    index = session.command("workspace.create", name="Details", members=[entity, control])
-    session.command("workspace.update", name="Control", members=[control], display_units="mm")
+    index = session.command("workspace.create", name="Details", members=[entity])
+    session.command("workspace.update", name="Control", display_units="mm")
+    session.command("control.update", control=control, name="Included control")
     session.command("workspace.preset", name="attachments")
     workspace = session.workspace
     path = str(tmp_path / "views.anthroforge")

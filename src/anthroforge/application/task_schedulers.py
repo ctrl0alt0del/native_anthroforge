@@ -86,6 +86,25 @@ class ImportTaskScheduler(MeasuredTaskScheduler):
         return Schedule(reason="Explicit mesh import; parsing and BVH construction stay background")
 
 
+class ImageTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule(reason="Image decode and texture tile preparation stay background")
+
+
+class CurveDrawingTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + workload.candidates * 0.02
+        return Schedule("worker", cost, reason="Native stroke fitting and path preparation")
+
+
+class SurfaceLayoutTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + workload.candidates**2 * 0.001 + workload.triangles * 0.004
+        return Schedule(
+            "worker", cost, reason="Explicit native surface correspondence and construction"
+        )
+
+
 class OpenProjectTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         return Schedule(reason="Explicit project open; decompression stays background")
@@ -114,11 +133,24 @@ class ConstructionTaskScheduler(MeasuredTaskScheduler):
         return replace(plan, delay_ms=delay)
 
 
-class ControlAttachmentTaskScheduler(AttachmentTaskScheduler):
+class ControlPoseTaskScheduler(AttachmentTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
-        return replace(
-            super().plan(workload, interactive), reason="Native shared-control frame resolution"
+        cost = 0.1 + 0.01 * workload.candidates
+        execution: Literal["inline", "worker"] = (
+            "inline" if interactive and workload.candidates <= 32 else "worker"
         )
+        return Schedule(execution, cost, reason="Ordinary control transform resolution")
+
+
+class CurvePathTaskScheduler(AttachmentTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        # Conservative initial heuristic; observed preparation/compute/publication raises it.
+        cost = 0.1 + workload.candidates * 0.01 + workload.triangles * 0.003
+        bounded = workload.candidates <= 32 and workload.triangles <= 256
+        execution: Literal["inline", "worker"] = (
+            "inline" if interactive and bounded and cost < INLINE_BUDGET_MS else "worker"
+        )
+        return Schedule(execution, cost, reason="Owned native path evaluation")
 
 
 class IssueTaskScheduler(MeasuredTaskScheduler):
@@ -126,6 +158,24 @@ class IssueTaskScheduler(MeasuredTaskScheduler):
         cost = 0.1 + 0.005 * workload.affected
         delay = 0.0 if workload.affected < 64 else min(150.0, max(25.0, cost * 2))
         return Schedule("worker", cost, delay, 150.0, "Read-only advisory checks after editing")
+
+
+class FiberCaptureTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + workload.candidates * max(1, workload.entities) * 0.02
+        return Schedule("worker", cost, reason="Dense anatomical capture and owner blending")
+
+
+class FiberPathTaskScheduler(AttachmentTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.1 + workload.candidates * 0.02 + workload.triangles * 0.002
+        return Schedule("worker", cost, reason="Dense fiber resolution or edit and recapture")
+
+
+class RoutingTaskScheduler(AttachmentTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 1.0 + workload.candidates * 0.1 + workload.triangles * 0.01
+        return Schedule("worker", cost, reason="Native obstacle routing and constrained solve")
 
 
 class InspectionTaskScheduler(SaveProjectTaskScheduler):
@@ -138,10 +188,23 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "generic": MeasuredTaskScheduler(),
         "attachments": AttachmentTaskScheduler(),
         "mesh_import": ImportTaskScheduler(),
+        "image_decode": ImageTaskScheduler(),
         "project_open": OpenProjectTaskScheduler(),
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
-        "control_attachments": ControlAttachmentTaskScheduler(),
+        **curve_schedulers(),
+        "control_pose": ControlPoseTaskScheduler(),
         "issue_check": IssueTaskScheduler(),
         "inspection_report": InspectionTaskScheduler(),
+    }
+
+
+def curve_schedulers() -> dict[str, TaskScheduler]:
+    return {
+        "curve_path": CurvePathTaskScheduler(),
+        "curve_routing": RoutingTaskScheduler(),
+        "curve_draw": CurveDrawingTaskScheduler(),
+        "surface_layout": SurfaceLayoutTaskScheduler(),
+        "fiber_capture": FiberCaptureTaskScheduler(),
+        "fiber_path": FiberPathTaskScheduler(),
     }

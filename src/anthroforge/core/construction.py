@@ -4,7 +4,12 @@ from dataclasses import dataclass, field
 from math import isfinite
 from uuid import uuid4
 
-from .entities import IDENTITY, Attachment, validate_matrix
+from .construction_values import integer as integer
+from .construction_values import validate_range as validate_range
+from .curve_engines import BezierSettings, PathSettings, PolylineSettings, RoutingSettings
+from .curve_uses import CurveUse
+from .entities import IDENTITY, validate_matrix
+from .objects import ConstructionObject
 from .results import ControlResult
 
 
@@ -15,10 +20,6 @@ def identity() -> str:
 def finite(values: tuple[float, ...], count: int) -> None:
     if len(values) != count or not all(map(isfinite, values)):
         raise ValueError(f"Expected {count} finite values.")
-
-
-def integer(value: int, minimum: int, maximum: int) -> bool:
-    return type(value) is int and minimum <= value <= maximum
 
 
 def validate_weights(weights: tuple[float, ...], count: int | None = None) -> None:
@@ -38,6 +39,7 @@ class CurvePoint:
     radius: float = 1.0
     tilt: float = 0.0
     id: str = field(default_factory=identity)
+    junction: str = ""
 
     def __post_init__(self) -> None:
         for value in (self.position, self.left, self.right):
@@ -50,33 +52,41 @@ class CurvePoint:
 
 
 @dataclass(frozen=True, slots=True)
-class Curve:
+class Curve(ConstructionObject):
     points: tuple[CurvePoint, ...]
-    id: str = field(default_factory=identity)
-    name: str = "Curve"
+    name: str = field(default="Curve", kw_only=True)
     closed: bool = False
-    matrix: tuple[float, ...] = IDENTITY
     start: float | None = None
     span: float | None = None
-    resolution: int = 24
+    engine_settings: PathSettings = field(default_factory=BezierSettings)
+
+    @property
+    def engine(self) -> str:
+        return self.engine_settings.kind
+
+    @property
+    def resolution(self) -> int:
+        return (
+            self.engine_settings.resolution
+            if isinstance(self.engine_settings, BezierSettings)
+            else 1
+        )
 
     def __post_init__(self) -> None:
+        ConstructionObject.__post_init__(self)
         if len(self.points) < 2 or len({p.id for p in self.points}) != len(self.points):
             raise ValueError("A curve needs at least two distinct control points.")
-        if not integer(self.resolution, 1, 1024):
-            raise ValueError("Curve resolution must be between 1 and 1024.")
+        if self.closed and len(self.points) < 3:
+            raise ValueError("A closed curve needs at least three authored points.")
+        if not isinstance(
+            self.engine_settings, (BezierSettings, PolylineSettings, RoutingSettings)
+        ):
+            raise ValueError("Curve requires typed path engine settings.")
         validate_matrix(self.matrix)
         validate_range(self.start, self.span)
 
 
-def validate_range(start: float | None, span: float | None) -> None:
-    if start is not None and (not isfinite(start) or not 0 <= start <= 1):
-        raise ValueError("Sampling start must be between zero and one.")
-    if span is not None and (not isfinite(span) or not 0 < span <= 1):
-        raise ValueError("Sampling span must be greater than zero and at most one.")
-
-
-def cyclic(curve: Curve, primitive: "Primitive") -> bool:
+def cyclic(curve: Curve, primitive: "PrimitiveParameters") -> bool:
     return curve.closed and (primitive.span if curve.span is None else curve.span) == 1.0
 
 
@@ -102,10 +112,9 @@ class BodyPiece:
 
 
 @dataclass(frozen=True, slots=True)
-class Primitive:
+class PrimitiveParameters:
     kind: str
     source: str = ""
-    curves: tuple[Curve, ...] = ()
     pieces: tuple[BodyPiece, ...] = ()
     samples: int = 32
     strips: int = 1
@@ -119,21 +128,46 @@ class Primitive:
         if not integer(self.samples, 2, 4096) or not integer(self.strips, 1, 256):
             raise ValueError("Invalid primitive resolution.")
         validate_range(self.start, self.span)
-        if len({c.id for c in self.curves}) != len(self.curves):
-            raise ValueError("Duplicate construction curve.")
-        self.validate_family()
 
-    def validate_family(self) -> None:
-        if self.kind == "BODY" and self.samples < 3:
-            raise ValueError("Body construction needs at least three longitudinal samples.")
-        if self.kind == "IMPORTED" and (not self.source or self.curves or self.pieces):
-            raise ValueError("Imported construction requires only a source mesh.")
-        if self.kind == "LOFT" and (len(self.curves) < 2 or self.pieces):
-            raise ValueError("Loft requires at least two curves and no body pieces.")
-        if self.kind == "BODY" and (
-            not self.pieces or any(p.curve not in {c.id for c in self.curves} for p in self.pieces)
+
+@dataclass(frozen=True, slots=True)
+class Primitive(PrimitiveParameters):
+    curves: tuple[CurveUse, ...] = ()
+
+    def __post_init__(self) -> None:
+        PrimitiveParameters.__post_init__(self)
+        if any(not isinstance(use, CurveUse) for use in self.curves):
+            raise ValueError("Primitive definitions require curve references, not embedded curves.")
+        if self.kind == "BODY" and any(
+            use.samples is not None and use.samples < 3 for use in self.curves
         ):
-            raise ValueError("Every body piece must reference an owned curve.")
+            raise ValueError("Body construction needs at least three longitudinal samples.")
+        validate_family(self)
+
+
+@dataclass(frozen=True, slots=True)
+class ResolvedPrimitive(PrimitiveParameters):
+    """Transient owned evaluation/edit input; never stored in a document."""
+
+    curves: tuple[Curve, ...] = ()
+
+    def __post_init__(self) -> None:
+        PrimitiveParameters.__post_init__(self)
+        validate_family(self)
+
+
+def validate_family(value: Primitive | ResolvedPrimitive) -> None:
+    ids = {c.id for c in value.curves}
+    if len(ids) != len(value.curves):
+        raise ValueError("Duplicate construction curve.")
+    if value.kind == "BODY" and value.samples < 3:
+        raise ValueError("Body construction needs at least three longitudinal samples.")
+    if value.kind == "IMPORTED" and (not value.source or value.curves or value.pieces):
+        raise ValueError("Imported construction requires only a source mesh.")
+    if value.kind == "LOFT" and (len(ids) < 2 or value.pieces):
+        raise ValueError("Loft requires at least two curves and no body pieces.")
+    if value.kind == "BODY" and (not value.pieces or any(p.curve not in ids for p in value.pieces)):
+        raise ValueError("Every body piece must reference a source curve.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -255,6 +289,7 @@ class Control:
     kind: str = "HOOK"
     id: str = field(default_factory=identity)
     follow: str = ""
+    owners: tuple[str, ...] = ()
     matrix: tuple[float, ...] = IDENTITY
     points: tuple[tuple[float, ...], ...] = ()
     resolution: tuple[int, ...] = (2, 2, 2)
@@ -262,8 +297,6 @@ class Control:
     outside: bool = False
     weights: tuple[float, ...] = ()
     deformers: tuple[Deformer, ...] = ()
-    support: str = ""
-    attachment: Attachment = field(default_factory=Attachment)
     generation: int = 0
     result: ControlResult = field(default_factory=ControlResult)
 

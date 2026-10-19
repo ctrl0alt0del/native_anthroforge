@@ -5,7 +5,7 @@ from threading import RLock, local
 from time import perf_counter_ns
 from weakref import WeakKeyDictionary, WeakSet
 
-from .resource_inventory import inventory, payload_meshes, session_owners
+from .resource_inventory import inventory, payload_resources, session_owners
 
 
 class Resources:
@@ -26,13 +26,13 @@ class Resources:
         self.sample(force=True)
 
     def attach(self, engine):
-        engine.mesh_observer = self.created
+        engine.resource_observer = self.created
         engine.bases.observer = self.cache
 
     def stop(self):
         self.sample(force=True)
         for engine in self.profiler.native.engines:
-            engine.mesh_observer = engine.bases.observer = None
+            engine.resource_observer = engine.bases.observer = None
         self.reset(False)
 
     def reset(self, observing):
@@ -84,7 +84,7 @@ class Resources:
             self.local.job = previous
 
     def observe_payload(self, job, value):
-        self.remember(job, payload_meshes(value, self.profiler))
+        self.remember(job, payload_resources(value, self.profiler))
 
     def cache(self, action, **metadata):
         self.profiler.event(
@@ -130,4 +130,6 @@ class Resources:
         )
 
     def costs(self):
-        return dict(inventory_inclusive_ns=self.cost_ns, mesh_observation_ns=self.reference_cost_ns)
+        return dict(
+            inventory_inclusive_ns=self.cost_ns, resource_observation_ns=self.reference_cost_ns
+        )

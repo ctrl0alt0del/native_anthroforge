@@ -16,16 +16,20 @@ from anthroforge.profiling.tasks import operation as profile_operation
 from .assets import Asset
 from .changes import ChangeJournal
 from .coordinator import TaskCoordinator
+from .curve_conversion import ConversionPreview
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
 from .history import History
+from .previews import Preview
+from .resources import Resources
+from .surface_preview import Candidate
 
 
 class Session:
     def __init__(self, name: str = "Untitled", profiler: RuntimeProfiler | None = None) -> None:
         self.changes, self._document = ChangeJournal(), Document(name=name)
         self.history = History(self.document)
-        self.assets: dict[str, Asset] = {}
+        self.resources = Resources()
         self.initialize_runtime(profiler)
         self._engine: GeometryEngine | None = None
         self.serial = 0
@@ -48,6 +52,10 @@ class Session:
         register(self)
 
     @property
+    def assets(self) -> dict[str, Asset]:
+        return self.resources.meshes
+
+    @property
     def document(self) -> Document:
         return self._document
 
@@ -58,6 +66,8 @@ class Session:
         self._document = value
 
     def initialize_scheduler(self) -> None:
+        self.conversion = ConversionPreview()
+        self.surface_preview: Preview[Candidate] = Preview()
         self.scheduler = TaskCoordinator(lambda: self.document)
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
@@ -79,7 +89,9 @@ class Session:
         return self.document.workspaces[self.active_workspace]
 
     def priority(self, ids: set[str]) -> int:
-        return 10 if not self.workspace.focused or ids.intersection(self.workspace.members) else 0
+        from .workspace_policy import included
+
+        return 10 if any(included(self.document, self.workspace, key) for key in ids) else 0
 
     def editable(self, entity_id: str) -> SCP:
         if self.waiting_save:
@@ -157,13 +169,16 @@ class Session:
         from . import evaluation
         from .construction_tasks import schedule
         from .control_tasks import resume
+        from .geometry_outputs import items
+        from .path_tasks import pending
 
         resume(self)
+        pending(self)
         targets = {e.id for e in self.document.entities if e.status in ("edited", "stale")}
         captures = {e.id for e in self.document.entities if e.status == "edited"}
         if targets and self.document.attachments_enabled and self.document.update_mode != "MANUAL":
             evaluation.request(self, targets, captures)
-        schedule(self, {e.id for e in self.document.entities if e.result.status == "pending"})
+        schedule(self, {e.id for e in items(self.document) if e.result.status == "pending"})
 
     def command(self, operation: str, **arguments: Any) -> Any:
         from .commands import execute
@@ -196,15 +211,16 @@ class Session:
             "skin_available": False,
             "entities": [asdict(item) for item in self.document.entities],
             "controls": [asdict(item) for item in self.document.controls],
-            "jobs": [job.describe() for job in self.scheduler.jobs],
-            "save_blocked": self.scheduler.blocked,
-            "checkpoint_revision": self.scheduler.checkpoint.revision,
+            "objects": object_descriptions(self.document),
+            **activity_description(self),
             "workspace": asdict(self.workspace),
         }
 
     def close(self) -> None:
         self.issues.close()
         self.scheduler.close()
+        self.conversion = ConversionPreview()
+        self.surface_preview = Preview()
         if self._engine is not None:
             self._engine.bases.clear()
             self.profiler.native.detach(self._engine)
@@ -216,7 +232,24 @@ class Session:
 
 def changed_ids(previous: Document, current: Document) -> set[str]:
     changed = {e.id for e in previous.entities if e != current.index.entities.get(e.id)}
-    return changed | {c.id for c in previous.controls if c != current.index.controls.get(c.id)}
+    changed |= {c.id for c in previous.controls if c != current.index.controls.get(c.id)}
+    return changed | {
+        o.id for o in previous.objects if o != current.registry.construction.get(o.id)
+    }
+
+
+def object_descriptions(document: Document) -> list[dict[str, Any]]:
+    from .object_codec import encode
+
+    return [encode(item) for item in document.objects]
+
+
+def activity_description(session: Session) -> dict[str, Any]:
+    return {
+        "jobs": [job.describe() for job in session.scheduler.jobs],
+        "save_blocked": session.scheduler.blocked,
+        "checkpoint_revision": session.scheduler.checkpoint.revision,
+    }
 
 
 def merge_entity(previous: SCP, current: SCP) -> SCP:

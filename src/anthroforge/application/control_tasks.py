@@ -12,8 +12,8 @@ from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
 from . import dependencies as dep
-from .construction_evaluator import Evaluation
 from .construction_policy import revisions
+from .object_frames import Frames
 
 if TYPE_CHECKING:
     from .session import Session
@@ -32,7 +32,7 @@ def make_job(session: "Session", control: str) -> Job:
         partial(prepare, session),
         partial(compute, session, control),
         partial(publish, session, control),
-        kind="control_attachments",
+        kind="control_pose",
         key="control:" + control,
         reads=frozenset(reads),
     )
@@ -53,38 +53,29 @@ def request(session: "Session", control: str) -> str:
 
 
 def prepare(session: "Session", document: Document) -> Any:
-    return document, {key: asset.mesh for key, asset in session.assets.items()}
+    return document
 
 
 def workload(session: "Session", control: str, document: Document) -> Workload:
     ids = inputs(document, control)
-    meshes = [session.assets[e.asset].mesh for e in document.entities if e.id in ids and e.asset]
-    return Workload(
-        entities=len(document.entities),
-        affected=1,
-        candidates=len(ids),
-        triangles=sum(m.counts[3] for m in meshes),
-    )
+    return Workload(entities=len(document.registry.records), affected=1, candidates=len(ids))
 
 
 def compute(session: "Session", control: str, payload: Any, cancel: Any) -> Any:
-    document, meshes = payload
+    document = payload
     if dep.Port(control, "control") in dep.blocked(dep.graph(document)):
         raise ValueError("Cyclic or missing control dependency; last accepted frame retained.")
-    evaluator = Evaluation(session.engine, document, meshes, cancel)
-    matrix = evaluator.control_frame(document.control(control))
-    return document, matrix, evaluator.bindings.get(control, ())
+    matrix = Frames(session.engine, document).world(control)
+    return document, matrix
 
 
 def publish(session: "Session", control: str, payload: Any) -> None:
-    document, matrix, binding = payload
+    document, matrix = payload
     read_set = dep.ports(document, dep.Port(control, "control"))
     if revisions(document, read_set) != revisions(session.document, read_set):
         raise ValueError("Control inputs changed before publication.")
     item = session.document.control(control)
-    result = ControlResult(
-        matrix, revisions(document, read_set), item.result.revision + 1, binding=binding
-    )
+    result = ControlResult(matrix, revisions(document, read_set), item.result.revision + 1)
     install_result(session, control, result)
 
 

@@ -53,5 +53,7 @@ M4 geometry_matrix(const double* matrix, const double* offset);
 M3 rotation(const M4& matrix);
 V3 scales(const M4& matrix);
 Hit nearest(const Surface& surface, const V3& point);
+int pick_surface(const Mesh& mesh,const M4& world,const V3& origin,const V3& direction,double* output);
+bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,igl::Hit& hit);
 V3 barycentric(const V3& point, const V3& a, const V3& b, const V3& c);
 }

@@ -9,6 +9,7 @@ from functools import partial
 from pathlib import Path
 
 import numpy as np
+from construction_portable import construction
 from inspection_portable import inspection
 from issues_portable import issues
 from profiler_portable import profiling
@@ -30,6 +31,7 @@ CHECKS = (
     "issue reporting and verified repair",
     "workflow inspection, units, workspace policies and image/JSON report",
     "surface rulers, named cameras and explanatory profile diagnostics",
+    "independent fibers, shared lofts and portable embedded reference images",
 )
 
 
@@ -108,12 +110,25 @@ def run(executable, cwd, background=False):
     shutil.copytree(executable.parent / "examples", cwd / "examples", dirs_exist_ok=True)
     command = partial(invoke, background=background)
     doctor = headless(executable, cwd, command)
-    for check in (primitives, deletion, curve_edits, profiling, issues, workflow, inspection):
+    for check in qualification_steps():
         check(executable, cwd, command)
     desktop(executable, cwd, command, background)
     report = portable_report(executable, doctor, background)
     (cwd / "portable-check.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report))
+
+
+def qualification_steps():
+    return (
+        primitives,
+        deletion,
+        curve_edits,
+        profiling,
+        issues,
+        workflow,
+        inspection,
+        construction,
+    )
 
 
 def deletion(executable, cwd, invoke=invoke):
@@ -158,7 +173,8 @@ def curve_edits(executable, cwd, invoke=invoke):
     batch.write_text(json.dumps(curve_requests()), encoding="utf-8")
     invoke(executable, cwd, "--cli", "run", batch.name)
     state = json.loads(invoke(executable, cwd, "--cli", "inspect", "curve-edits.anthroforge"))
-    points = state["entities"][0]["primitive"]["curves"][0]["points"]
+    curve = state["entities"][0]["primitive"]["curves"][0]["curve"]
+    points = next(o["state"]["points"] for o in state["objects"] if o["state"]["id"] == curve)
     assert len(points) == 3 and points[1]["left_mode"] == "FREE"
     assert abs(points[1]["position"][0]) < 0.01
 

@@ -5,6 +5,7 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from anthroforge.core.issues import Issue
+from anthroforge.core.reference_images import ReferenceImage
 
 from .resolution import TERMINAL, Repair, Solver
 
@@ -13,15 +14,18 @@ if TYPE_CHECKING:
 
 
 def editable(session: "Session", issue: Issue) -> bool:
+    from ..workspace_policy import included
+
     if session.waiting_save or session.history.before is not None:
         return False
-    workspace = session.workspace
-    return not workspace.focused or bool(issue.target and issue.target in workspace.members)
+    if not issue.target:
+        return not session.workspace.focused
+    return included(session.document, session.workspace, issue.target)
 
 
 def can_evaluate(session: "Session", issue: Issue) -> bool:
-    live = session.document.index.entities.keys() | session.document.index.controls.keys()
-    return editable(session, issue) and issue.target in live
+    item = session.document.registry.records.get(issue.target)
+    return editable(session, issue) and item is not None and not isinstance(item, ReferenceImage)
 
 
 def can_retry(session: "Session", issue: Issue) -> bool:

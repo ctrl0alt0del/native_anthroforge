@@ -4,13 +4,14 @@ from dataclasses import replace
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from anthroforge.core.construction import Control, Deformer, Primitive
+from anthroforge.core.construction import Control, Curve, Deformer, Primitive
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import EvaluationResult, ReadRevision
 
+from . import curve_sources, junction_copies
+from .curve_copy_resources import Copies
 from .membership import remap, remap_weights
-from .presentation import include_created
 
 if TYPE_CHECKING:
     from .session import Session
@@ -22,7 +23,7 @@ def copied_controls(document: Document, entities: set[str]) -> set[str]:
     while pending:
         control = document.control(pending.pop())
         references = {b.control for b in control.deformers}
-        references |= {control.support} & {c.id for c in document.controls}
+        references |= {control.follow} & {c.id for c in document.controls}
         pending.extend(references - found)
         found |= references
     return found
@@ -35,7 +36,11 @@ def identities(document: Document, entities: set[str], controls: set[str]) -> se
             result |= {b.id for b in item.deformers}
             if item.primitive:
                 result |= {c.id for c in item.primitive.curves}
-                result |= {p.id for c in item.primitive.curves for p in c.points}
+                result |= {
+                    p.id
+                    for c in item.primitive.curves
+                    for p in curve_sources.source(document, c.id).points
+                }
                 result |= {p.id for p in item.primitive.pieces}
     result |= {b.id for c in document.controls if c.id in controls for b in c.deformers}
     return result
@@ -61,7 +66,11 @@ def primitive(source: Primitive | None, mapping: dict[str, str]) -> Primitive | 
     if source is None:
         return None
     curves = tuple(
-        replace(c, id=mapping[c.id], points=tuple(replace(p, id=mapping[p.id]) for p in c.points))
+        replace(
+            c,
+            curve=mapping[c.id],
+            reference_frame=mapping.get(c.reference_frame, c.reference_frame),
+        )
         for c in source.curves
     )
     pieces = tuple(replace(p, id=mapping[p.id], curve=mapping[p.curve]) for p in source.pieces)
@@ -75,13 +84,14 @@ def control(source: Control, mapping: dict[str, str]) -> Control:
         name=source.name + " copy",
         generation=0,
         follow=mapping.get(source.follow, source.follow),
-        support=mapping.get(source.support, source.support),
+        owners=tuple(mapping.get(k, k) for k in source.owners),
         deformers=tuple(binding(b, mapping) for b in source.deformers),
         result=replace(source.result, inputs=remap_inputs(source.result.inputs, mapping)),
     )
 
 
 def entity(source: SCP, mapping: dict[str, str], parent: str) -> SCP:
+    assert source.primitive is None or isinstance(source.primitive, Primitive)
     return replace(
         source,
         id=mapping[source.id],
@@ -97,7 +107,20 @@ def entity(source: SCP, mapping: dict[str, str], parent: str) -> SCP:
 def remap_inputs(
     inputs: tuple[ReadRevision, ...], mapping: dict[str, str]
 ) -> tuple[ReadRevision, ...]:
-    return tuple(replace(value, owner=mapping.get(value.owner, value.owner)) for value in inputs)
+    return tuple(
+        replace(
+            value,
+            owner=mapping.get(value.owner, value.owner),
+            output=remap_output(value.output, mapping),
+        )
+        for value in inputs
+    )
+
+
+def remap_output(output: str, mapping: dict[str, str]) -> str:
+    if output.startswith("junction:"):
+        return "junction:" + mapping.get(output[9:], output[9:])
+    return output
 
 
 def remap_result(result: EvaluationResult, mapping: dict[str, str]) -> EvaluationResult:
@@ -111,11 +134,23 @@ def remap_result(result: EvaluationResult, mapping: dict[str, str]) -> Evaluatio
 def duplicate(session: "Session", ids: set[str], parent: str) -> dict[str, str]:
     controls = copied_controls(session.document, ids)
     mapping = {key: str(uuid4()) for key in identities(session.document, ids, controls)}
+    mapping = junction_copies.identities(session.document, mapping)
     copies = tuple(entity(e, mapping, parent) for e in session.document.entities if e.id in ids)
     shared = tuple(control(c, mapping) for c in session.document.controls if c.id in controls)
+    junctions = session.document.junctions + junction_copies.records(session.document, mapping)
     session.replace_document(
         entities=(*session.document.entities, *copies),
         controls=(*session.document.controls, *shared),
+        objects=(*session.document.objects, *copied_curves(session, mapping)),
+        junctions=junctions,
     )
-    include_created(session, {c.id for c in shared})
     return {key: mapping[key] for key in ids}
+
+
+def copied_curves(session: "Session", mapping: dict[str, str]) -> tuple[Curve, ...]:
+    copies = Copies(session.resources, mapping)
+    return tuple(
+        copies.record(item)
+        for item in session.document.objects
+        if isinstance(item, Curve) and item.id in mapping
+    )

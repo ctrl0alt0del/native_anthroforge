@@ -24,7 +24,9 @@ def write(path: Path, frozen: Any, metadata: dict[str, Any], cancel: Event) -> s
     with tempfile.TemporaryDirectory(prefix="anthroforge-inspection-") as directory:
         root = Path(directory)
         check(cancel)
-        write_package(root / "snapshot.anthroforge", frozen.source.document, frozen.source.assets)
+        write_package(
+            root / "snapshot.anthroforge", frozen.source.document, frozen.source.resources
+        )
         (root / "view.json").write_text(json.dumps(frozen.view), encoding="utf-8")
         render(root, frozen.source.document.revision, cancel)
         image = json.loads((root / "image.png.json").read_text(encoding="utf-8"))

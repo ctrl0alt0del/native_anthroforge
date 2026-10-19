@@ -9,3 +9,38 @@
 
 These vendored snapshots need no network access during application builds.
 Project function-length rules apply to authored adapters, not unchanged upstream sources.
+
+## Curve fitting
+
+`curve_fit_nd/` is unchanged from Blender tag `v5.0.1`, retrieved 2026-10-18:
+https://github.com/blender/blender/tree/v5.0.1/extern/curve_fit_nd.
+BSD-3-Clause, Copyright 2016 DWANGO Co., Ltd.; complete notices remain in every source.
+Compiled as C separately from the authored C++ adapter. No Blender runtime or object system.
+File SHA-256 values are recorded in `curve_fit_nd/SHA256SUMS`.
+
+The adapter's deduplication, fit flags, split corner detection radii and handle-mode policy
+follow Blender `source/blender/editors/curve/editcurve_paint.cc` at the same tag, GPL-2.0-or-later.
+The application retains its GPL-3.0-or-later distribution license. Fitting is an atomic upstream
+call with cooperative cancellation checks immediately before/after it; no mid-fit cancellation
+or exact display-latency guarantee is claimed.
+
+The stroke adapter also follows that source's one-pixel motion threshold, depth-only
+substep count, screen-to-world tolerance ratio and eight-pixel closure test. Qt logical
+pixels supply the UI scale. Automatic closure is disabled when a stroke changes view;
+world-space tolerance remains available. Exact cached mesh rays replace Blender's raster
+depth buffer, so silhouette/normal differences from raster depth are intentional.
+Target events are projected before intermediate depth substeps, as in the pinned source.
+Misses retain the last successful depth, while a first-point plane locks even when its
+initial ray misses. The regression fixtures distinguish these cases from sequential
+projection and continuously moving fallback planes.
+
+## Reference-image view alignment
+
+`af_images_axis_aligned` adapts Blender 5.0.1
+`BKE_object_empty_image_data_is_visible_in_view3d` in
+https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenkernel/intern/object.cc.
+Original source SHA-256: `618a1ce89ee4077e3d94c27e20259ba468baf8b074ec01bf7d09dccb13f72eb8`.
+Blender Authors, GPL-2.0-or-later. The normalized object local Z axis is projected into
+the view plane; squared residual must be at most 1e-5. The same batched native predicate
+serves picking and the Qt geometry adapter. It intentionally uses local Z even under shear,
+as the source does, rather than silently substituting the transformed polygon normal.

@@ -144,10 +144,12 @@ class TaskCoordinator:
         obsolete: bool = False,
         reason: str = "explicit_cancel",
         replacement: str = "",
+        restart: bool = False,
     ) -> None:
         job = self.registry.by_id[job_id]
         if not job.active:
             return
+        job.restart_requested = restart and job.restart_on_input_change and job.retry is not None
         causes.cancellation(self, job, reason, replacement)
         self._cancel_active(job, obsolete)
 
@@ -156,7 +158,7 @@ class TaskCoordinator:
             self._remember_coalescing(job)
         job.obsolete |= obsolete
         self._request_cancel(job)
-        if job.future is None:
+        if job.future is None and not job.restart_requested:
             self._terminal(job, "obsolete" if job.obsolete else "cancelled")
         else:
             job.state, job.progress = "cancelling", "Stopping at a safe checkpoint"
@@ -179,7 +181,7 @@ class TaskCoordinator:
         causes.invalidated(self, affected, reason)
         for job in self.registry.matching("owner", affected):
             if job.active and (job.outputs | job.reads).intersection(affected):
-                self.cancel_job(job.id, obsolete=True, reason=reason)
+                self.cancel_job(job.id, obsolete=True, reason=reason, restart=True)
 
     def invalidate_ports(self, affected: set[Port], reason: str = "input_output_changed") -> None:
         causes.invalidated(self, affected, reason, ports=True)
@@ -190,7 +192,7 @@ class TaskCoordinator:
             reads = job.observes | job.prerequisites | job.provides
             legacy = not reads and bool((job.outputs | job.reads) & owners)
             if job.active and (bool(reads & affected) or legacy):
-                self.cancel_job(job.id, obsolete=True, reason=reason)
+                self.cancel_job(job.id, obsolete=True, reason=reason, restart=True)
 
     def retry(self, job_id: str) -> Any:
         job = self.registry.by_id[job_id]
@@ -220,7 +222,7 @@ class TaskCoordinator:
         self.sample_resources()
 
     def _finishable(self, job: Job) -> bool:
-        done = job.future is not None and job.future.done()
+        done = job.future.done() if job.future else job.restart_requested
         cancelled = job.cancel is not None and job.cancel.is_set()
         return job.active and done and (cancelled or self.can_publish(job))
 
@@ -316,8 +318,11 @@ class TaskCoordinator:
         try:
             if job.cleanup is not None:
                 job.cleanup(state)
+            if job.restart_requested and state == "obsolete" and job.retry:
+                job.retry()
         except Exception as error:
             job.state, job.error = "failed", str(error)
+            job.obsolete = False
             job.progress = job.error
             self.errors.append(job.error)
 

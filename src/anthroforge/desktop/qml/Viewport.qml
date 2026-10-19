@@ -24,6 +24,8 @@ Item {
     property string toolMode: "Move"
     property string anchorMode: ""
     property bool orthographic: false
+    readonly property vector3d imageViewAxis: Qt.vector3d(view.camera.forward.x, -view.camera.forward.z, view.camera.forward.y)
+    onImageViewAxisChanged: workspace.setViewportDirection([imageViewAxis.x,imageViewAxis.y,imageViewAxis.z])
     property real distance: 4
     property int depthIndex: 0
     property point pointerPosition: Qt.point(-1, -1)
@@ -32,10 +34,11 @@ Item {
     property bool restoringCamera: false
     property var preservedCamera: null
     readonly property bool canRestoreView: preservedCamera !== null
-    readonly property bool measuring: workspace.inspectionTools.state.active
+    readonly property bool drawing: workspace.drawingTools.state.active
+    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active
     readonly property var selected: authoring.transformData
     readonly property bool modalTransforming: modalTransform.active
-    readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming
+    readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming || workspace.drawingTools.state.painting
     readonly property bool snapping: keyboard.held("snapSurface") && authoring.active &&
         (curveEditor.dragging || (gizmo.dragging && toolMode==="Move") || (modalTransforming && modalTransform.gesture.mode==="Move"))
     readonly property bool insertionPreview: curveEditor.previewActive
@@ -70,12 +73,14 @@ Item {
         return {origin:[a.x,-a.z,a.y],direction:[d.x,-d.z,d.y]};
     }
     function rayAt(x, y, select, extend) {
+        if(drawing) return {};
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
+        if(workspace.imageTools.state.active) { workspace.imageTools.probe(origin,direction,select); return {}; }
         if(measuring) { workspace.inspectionTools.probe(origin,direction,depthIndex,select); return {}; }
         if(authoring.visible) {
             if(authoring.pick(origin,direction,distance*.012,depthIndex,select,!!extend) || authoring.state.editing) return {};
         }
-        return workspace.pick(origin, direction, depthIndex, select, distance*.012);
+        return workspace.pick(origin, direction, depthIndex, select, distance*.012, !!extend);
     }
     function screenPoint(axis) {
         if (!selected.id) return Qt.point(-100, -100);
@@ -100,7 +105,7 @@ Item {
         return extent/(2*Math.max(perspectiveCamera.clipNear,depth)*Math.tan(perspectiveCamera.fieldOfView*Math.PI/360));
     }
     function cancelTransform() { modalTransform.finish(true); curveEditor.finish(true); gizmo.cancel(); workspace.endTransform(true); }
-    function confirmTransform() { if(modalTransforming) modalTransform.finish(false); }
+    function confirmTransform() { if(drawing) workspace.drawingTools.finish(); else if(modalTransforming) modalTransform.finish(false); }
     function startModalTransform(mode) { if(!measuring) modalTransform.begin(mode); }
     function applyBookmark(values, orthographic, name) {
         if(!canRestoreView) preservedCamera=captureCamera();
@@ -183,15 +188,19 @@ Item {
         anchorMarkers.requestPaint();
         measurementOverlay.requestPaint();
     }
-    onOrthographicChanged: cameraSave.restart()
+    onOrthographicChanged: { workspace.setViewportProjection(orthographic); cameraSave.restart(); }
 
+    Rectangle { anchors.fill: parent; color: "#24262b" }
+    ImageLayer {
+        id: backImages; anchors.fill: parent; sourceCamera: view.camera; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis
+        depthLayer: "BACK"
+    }
     View3D {
         id: view
         anchors.fill: parent
         camera: viewport.orthographic ? orthoCamera : perspectiveCamera
         environment: SceneEnvironment {
-            backgroundMode: SceneEnvironment.Color
-            clearColor: "#24262b"
+            backgroundMode: SceneEnvironment.Transparent
             antialiasingMode: SceneEnvironment.MSAA
             antialiasingQuality: SceneEnvironment.High
         }
@@ -224,8 +233,11 @@ Item {
             materials: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: "#33363c"; cullMode: Material.NoCulling }
             opacity: .22
         }
+        PathScene {}
         Node {
+            id: worldScene
             eulerRotation.x: -90
+            ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis }
             Repeater3D {
                 id: meshRepeater
                 model: workspace.meshModel
@@ -282,6 +294,10 @@ Item {
             }
         }
     }
+    ImageLayer {
+        id: frontImages; anchors.fill: parent; sourceCamera: view.camera; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis
+        depthLayer: "FRONT"
+    }
     SelectionOutline {
         id: selectionOutline; objectName: "selectionOutline"; anchors.fill: parent
         sourceCamera: view.camera; orthographic: viewport.orthographic
@@ -327,6 +343,8 @@ Item {
     CurveFeedback { anchors.fill: parent; viewport: viewport }
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     MeasurementOverlay { id: measurementOverlay; viewport: viewport }
+    ImageCalibrationOverlay { viewport: viewport }
+    DrawingOverlay { viewport: viewport }
     InspectionTools { viewport: viewport; anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.margins: 12; z: 10 }
     Connections {
         target: workspace.inspectionTools
@@ -372,7 +390,7 @@ Item {
     }
     ColumnLayout {
         anchors.centerIn: parent; width: Math.min(320, parent.width-90); spacing: 14
-        visible: workspace.treeRows.length === 0
+        visible: workspace.state.object_count === 0 && !viewport.drawing
         Image { source: "icons/mesh.svg"; sourceSize: Qt.size(40,40); opacity: .4; Layout.alignment: Qt.AlignHCenter }
         Label { text: "Start your assembly"; color: Theme.text; font.pixelSize: 22; Layout.alignment: Qt.AlignHCenter }
         Label { text: "Import your first primitive, then build its hierarchy and attachments."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; lineHeight: 1.4 }

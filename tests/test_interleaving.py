@@ -93,11 +93,11 @@ def test_import_can_publish_while_modal_wait_blocks_editing(session):
 
 def test_failed_atomic_write_preserves_previous_file(assembly, session, tmp_path, monkeypatch):
     path = tmp_path / "safe.anthroforge"
-    atomic_save(path, session.document, session.assets)
+    atomic_save(path, session.document, session.resources)
     before = path.read_bytes()
     monkeypatch.setattr("anthroforge.application.storage.write_package", corrupt_write)
     with pytest.raises(OSError):
-        atomic_save(path, replace(session.document, name="New"), session.assets)
+        atomic_save(path, replace(session.document, name="New"), session.resources)
     assert path.read_bytes() == before
     FileLock(path).close()
 

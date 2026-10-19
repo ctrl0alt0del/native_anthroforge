@@ -6,8 +6,7 @@ from anthroforge.application.issues.commands import available
 
 
 def target_label(controller, target):
-    index = controller.session.document.index
-    item = index.entities.get(target) or index.controls.get(target)
+    item = controller.session.document.registry.records.get(target)
     return item.name if item else "Document" if not target else "Removed target"
 
 

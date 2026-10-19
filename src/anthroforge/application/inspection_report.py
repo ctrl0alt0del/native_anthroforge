@@ -93,6 +93,6 @@ def create_job(path: Path, frozen: Capture) -> Job:
         publish_during_edit=True,
         kind="inspection_report",
         workload=lambda _: task_workloads.project_save(
-            frozen.source.assets, frozen.source.document
+            frozen.source.resources, frozen.source.document
         ),
     )

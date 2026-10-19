@@ -5,13 +5,14 @@ from math import isfinite
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from .image_presentation import ImagePresentation
 from .inspection_views import CameraBookmark, Measurement
 from .presentation import validate_categories
 from .results import EvaluationResult
 from .units import factor
 
 if TYPE_CHECKING:
-    from .construction import Deformer, Primitive, Thickness
+    from .construction import Deformer, Primitive, ResolvedPrimitive, Thickness
 
 IDENTITY = (1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0)
 
@@ -53,7 +54,7 @@ class SCP:
     error: str = ""
     capture_parent_matrix: tuple[float, ...] = ()
     capture_parent_offset: tuple[float, ...] = (0.0, 0.0, 0.0)
-    primitive: "Primitive | None" = None
+    primitive: "Primitive | ResolvedPrimitive | None" = None
     deformers: tuple["Deformer", ...] = ()
     thickness: "Thickness | None" = None
     result: EvaluationResult = field(default_factory=EvaluationResult)
@@ -90,6 +91,8 @@ class Workspace:
     display_units: str = "m"
     measurements: tuple[Measurement, ...] = ()
     bookmarks: tuple[CameraBookmark, ...] = ()
+    reference_images: tuple[ImagePresentation, ...] = ()
+    cursor: tuple[float, ...] = (0.0, 0.0, 0.0)
 
     def __post_init__(self) -> None:
         if not self.name.strip():
@@ -97,8 +100,12 @@ class Workspace:
         factor(self.display_units)
         validate_categories(self.hidden_categories)
         validate_categories(self.unpickable_categories)
+        if len({v.target for v in self.reference_images}) != len(self.reference_images):
+            raise ValueError("Image appearance must have unique targets.")
         if len(self.camera) != 7 or not all(map(isfinite, self.camera)) or self.camera[6] <= 0:
             raise ValueError("Invalid workspace camera.")
+        if len(self.cursor) != 3 or not all(map(isfinite, self.cursor)):
+            raise ValueError("Cursor needs three finite world coordinates.")
 
 
 def validate_matrix(matrix: tuple[float, ...]) -> None:

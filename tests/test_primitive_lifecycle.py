@@ -49,14 +49,6 @@ def test_captured_child_anchor_does_not_cycle_pose_following_geometry(session):
     assert not session.scheduler.errors
 
 
-def attached_control(session, support):
-    control = session.command("control.create", entity=support)
-    session.command("control.attach", control=control, support=support)
-    session.command("wait", timeout=5)
-    assert session.document.control(control).result.binding
-    return control
-
-
 def world_vertices(session, entity):
     frame = entity_frame(session.engine, session.document.entity(entity))
     return components.transformed(session.engine, mesh(session, entity).array(0), frame)
@@ -80,20 +72,20 @@ def test_origin_relocation_preserves_deformation_and_following_controls(
     assert not session.scheduler.errors
 
 
-def test_surface_binding_survives_save_and_history(session, tmp_path):
+def test_ordinary_control_following_survives_save_and_history(session, tmp_path):
     support = create(session)
-    control = attached_control(session, support)
-    binding = session.document.control(control).result.binding
+    control = session.command("control.create", entity=support)
+    frame = display_frame(session, session.document.control(control))
     path = str(tmp_path / "attached.anthroforge")
     session.command("save", path=path, blocked_policy="wait")
     session.command("open", path=path)
     lift_first_point(session, support)
     session.command("wait", timeout=5)
-    assert session.document.control(control).result.binding == binding
+    np.testing.assert_allclose(display_frame(session, session.document.control(control)), frame)
     session.command("undo")
     session.command("redo")
     session.command("wait", timeout=5)
-    assert session.document.control(control).result.binding == binding
+    np.testing.assert_allclose(display_frame(session, session.document.control(control)), frame)
     assert session.document.control(control).result.status == "ready"
 
 
@@ -170,7 +162,7 @@ def world_endpoint(session, entity):
 
 
 def bind_endpoint(session, entity, control):
-    curve = session.document.entity(entity).primitive.curves[0]
+    curve = session.document.object(session.document.entity(entity).primitive.curves[0].id)
     return session.command(
         "deformer.add",
         control=control,
@@ -208,7 +200,7 @@ def test_cross_scp_endpoints_stay_connected_and_removal_is_local(session):
 
 
 def write_legacy(path, session):
-    manifest = storage.manifest(session.document, session.assets)
+    manifest = storage.manifest(session.document, session.resources)
     manifest["version"] = 1
     manifest["document"].pop("controls")
     for entity in manifest["document"]["entities"]:
@@ -217,22 +209,18 @@ def write_legacy(path, session):
     with zipfile.ZipFile(path, "w") as archive:
         archive.writestr("manifest.json", json.dumps(manifest))
         for key, asset in session.assets.items():
-            for kind, label in enumerate(storage.BUFFERS[:3]):
-                storage.write_array(archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind))
+            for kind, label in enumerate(storage.resource_storage.MESH_BUFFERS[:3]):
+                storage.resource_storage.write_array(
+                    archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind)
+                )
 
 
-def test_version_one_import_migrates_and_keeps_source_after_deformation(session, tmp_path):
-    entity = session.command("import", path="examples/primitives/cube.obj", units=1)["entity_id"]
+def test_legacy_import_is_rejected_without_replacing_current_document(session, tmp_path):
+    session.command("import", path="examples/primitives/cube.obj", units=1)
     session.command("wait", timeout=5)
     path = tmp_path / "legacy.anthroforge"
     write_legacy(path, session)
-    session.command("open", path=str(path))
-    definition = session.document.entity(entity).primitive
-    source = session.assets[definition.source].mesh.array(0).copy()
-    control = hook(session, entity)
-    move_control(session, control, 0.3)
-    session.command("wait", timeout=5)
-    np.testing.assert_array_equal(session.assets[definition.source].mesh.array(0), source)
-    session.command("save", path=str(path), blocked_policy="wait")
-    with zipfile.ZipFile(path) as archive:
-        assert json.loads(archive.read("manifest.json"))["version"] == 2
+    before = session.document
+    with pytest.raises(ValueError, match="Unsupported AnthroForge project"):
+        session.command("open", path=str(path))
+    assert session.document is before

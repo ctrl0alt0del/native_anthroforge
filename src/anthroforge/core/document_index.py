@@ -18,14 +18,15 @@ def reference_signature(item: SCP | Control) -> tuple[Any, ...]:
     bindings = tuple((b.id, b.control, b.kind, b.target, b.enabled) for b in item.deformers)
     ids = tuple(construction_validation.identities(item))
     if isinstance(item, Control):
-        return (ids, bindings, item.kind, item.follow, item.support, item.attachment.parent_mode)
+        return (ids, bindings, item.kind, item.follow)
     primitive = item.primitive
-    targets = (
-        (tuple(c.id for c in primitive.curves), tuple(p.id for p in primitive.pieces))
-        if primitive
-        else None
-    )
+    targets = primitive_references(primitive) if primitive else None
     return (ids, bindings, item.parent, item.attachment.parent_mode, targets)
+
+
+def primitive_references(primitive: Any) -> tuple[Any, ...]:
+    curves = tuple((c.id, c.mode, c.reference_frame) for c in primitive.curves)
+    return curves, tuple(p.id for p in primitive.pieces)
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,6 +37,7 @@ class Structure:
     depths: Mapping[str, int]
     dependencies: dependency_graph.DependencyGraph
     attachments: bool
+    object_links: tuple[Any, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,6 +47,8 @@ class DocumentIndex:
     entities: Mapping[str, SCP]
     controls: Mapping[str, Control]
     structure: Structure
+    source_objects: tuple[Any, ...] = ()
+    source_junctions: tuple[Any, ...] = ()
 
 
 def signatures(document: "Document", previous: DocumentIndex | None) -> dict[str, tuple[Any, ...]]:
@@ -84,19 +88,35 @@ def breadth_first(children: Mapping[str, list[str]]) -> tuple[tuple[str, ...], M
 def validated_structure(document: "Document", signature: dict[str, tuple[Any, ...]]) -> Structure:
     validate_tree(document.entities)
     construction_validation.document(document)
-    order, children, depths = tree_layout(document.entities)
-    graph = dependency_graph.build(
-        document.entities, document.controls, document.attachments_enabled
-    )
+    layout = tree_layout(document.entities)
+    graph = construction_graph(document)
     return Structure(
-        MappingProxyType(signature), order, children, depths, graph, document.attachments_enabled
+        MappingProxyType(signature),
+        *layout,
+        graph,
+        document.attachments_enabled,
+        object_links(document),
+    )
+
+
+def construction_graph(document: "Document") -> dependency_graph.DependencyGraph:
+    return dependency_graph.build(
+        document.entities,
+        document.controls,
+        document.attachments_enabled,
+        document.objects,
+        document.junctions,
     )
 
 
 def structure(document: "Document", previous: DocumentIndex | None) -> Structure:
     signature = signatures(document, previous)
     if previous and previous.structure.attachments == document.attachments_enabled:
-        if signature == previous.structure.signatures and same_order(document, previous):
+        if (
+            signature == previous.structure.signatures
+            and same_order(document, previous)
+            and object_links(document) == previous.structure.object_links
+        ):
             return previous.structure
     return validated_structure(document, signature)
 
@@ -120,14 +140,43 @@ def record_maps(
     return entities, controls
 
 
-def build(document: "Document", previous: DocumentIndex | None) -> DocumentIndex:
-    if (
-        previous
-        and document.entities is previous.source_entities
+def reusable(document: "Document", previous: DocumentIndex) -> bool:
+    return (
+        document.entities is previous.source_entities
         and document.controls is previous.source_controls
-    ):
-        if document.attachments_enabled == previous.structure.attachments:
-            return previous
+        and document.objects is previous.source_objects
+        and document.junctions is previous.source_junctions
+        and document.attachments_enabled == previous.structure.attachments
+    )
+
+
+def build(document: "Document", previous: DocumentIndex | None) -> DocumentIndex:
+    if previous and reusable(document, previous):
+        return previous
     relationships = structure(document, previous)
     entities, controls = record_maps(document, previous)
-    return DocumentIndex(document.entities, document.controls, entities, controls, relationships)
+    return DocumentIndex(
+        document.entities,
+        document.controls,
+        entities,
+        controls,
+        relationships,
+        document.objects,
+        document.junctions,
+    )
+
+
+def object_links(document: "Document") -> tuple[Any, ...]:
+    return tuple(object_link(o, document) for o in document.objects) + document.junctions
+
+
+def object_link(item: Any, document: "Document") -> tuple[Any, ...]:
+    from .dependency_graph import construction_inputs
+
+    return (
+        item.id,
+        type(item).__name__,
+        item.parent,
+        frozenset(construction_inputs(item, document.objects, document.junctions)),
+        tuple(c.curve for c in getattr(item, "curves", ())),
+    )

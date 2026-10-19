@@ -26,7 +26,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: constructionPane.dialogVisible || reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -52,7 +52,7 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 10; spacing: 10
                 Label { text: "ANTHROFORGE"; font.bold: true; font.pixelSize: 12; font.letterSpacing: 1; color: Theme.text }
-                Label { text: "0.1.9"; color: Theme.accent; font.pixelSize: 10 }
+                Label { objectName: "applicationVersion"; text: Application.version; color: Theme.accent; font.pixelSize: 10 }
                 UiMenuBar {
                     background: Item {}
                     UiMenu { title: "File"; UiMenuItem { action: newAction } UiMenuItem { action: openAction } MenuSeparator {} UiMenuItem { action: saveAction } UiMenuItem { action: saveAsAction } MenuSeparator {} UiMenuItem { action: importAction } MenuSeparator {} UiMenuItem { objectName: "exportInspectionMenu"; text: "Export inspection report…"; enabled: !workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered: { viewport.storeCamera(); reportDialog.open(); } } }
@@ -107,7 +107,11 @@ ApplicationWindow {
         Rectangle {
             SplitView.preferredWidth: 240; SplitView.minimumWidth: 195; SplitView.maximumWidth: 440
             color: Theme.panel
-            Outliner { anchors.fill: parent; anchors.margins: Theme.inset; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
+            SplitView {
+                anchors.fill: parent; anchors.margins: Theme.inset; orientation: Qt.Vertical
+                Outliner { SplitView.fillHeight: true; SplitView.minimumHeight: 150; onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity) }
+                Construction { id: constructionPane; keyboard: window.keyboardManager; SplitView.preferredHeight: 240; SplitView.minimumHeight: 120 }
+            }
         }
         ColumnLayout {
             SplitView.fillWidth: true; SplitView.minimumWidth: 300; spacing: 0
@@ -139,7 +143,7 @@ ApplicationWindow {
                     UiButton { objectName: "activityToggle"; flatStyle: true; text: (window.activityOpen ? "▾" : "▸") + "  Activity"; onClicked: { window.activityOpen = !window.activityOpen; if(window.activityOpen) window.issuesOpen = false; } }
                     UiButton { objectName: "issuesToggle"; flatStyle: true; text: (window.issuesOpen ? "▾" : "▸") + "  Issues ("+(workspace.issuePanel.state.count || 0)+")"; hint: workspace.issuePanel.state.summary || "Issue reporting"; onClicked: { window.issuesOpen = !window.issuesOpen; if(window.issuesOpen) window.activityOpen = false; } }
                     Label { text: window.activeJobCount ? window.activeJobCount + " jobs in progress" : window.jobFailed ? "A calculation failed · open Activity" : "Up to date"; color: window.jobFailed ? Theme.danger : window.activeJobCount ? Theme.accent : Theme.muted; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Label { text: workspace.treeRows.length + " objects · "+workspace.state.display_units; color: Theme.muted; font.pixelSize: 11 }
+                    Label { text: workspace.state.object_count + " objects · "+workspace.state.display_units; color: Theme.muted; font.pixelSize: 11 }
                 }
             }
             Rectangle { Layout.fillWidth: true; implicitHeight: window.activityOpen ? 160 : 0; visible: window.activityOpen; color: Theme.panel; Activity { anchors.fill: parent; anchors.margins: 10 } }
@@ -151,7 +155,12 @@ ApplicationWindow {
             ColumnLayout {
                 anchors.fill: parent; spacing: 0
                 Rectangle { Layout.fillWidth: true; implicitHeight: 33; color: Theme.header; Label { anchors.verticalCenter: parent.verticalCenter; x: 12; text: "PROPERTIES"; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1 } }
-                Inspector { id: inspector; objectName: "inspector"; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity) }
+                Inspector { id: inspector; objectName: "inspector"; visible: !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity) }
+                UiScrollView {
+                    id: drawingSettings; visible: workspace.drawingTools.state.active
+                    Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; contentWidth: availableWidth
+                    DrawingSettings { width: drawingSettings.availableWidth }
+                }
             }
         }
     }
@@ -268,7 +277,7 @@ ApplicationWindow {
     KeyboardManager {
         id: keyboard; window: window; blocked: window.modalOpen || workspace.state.waiting; transforming: viewport.transforming; snapping: viewport.snapping
         onRequested: command => window.dispatchShortcut(command)
-        onCanceled: viewport.cancelTransform()
+        onCanceled: { viewport.cancelTransform(); workspace.drawingTools.clearStroke(); }
         onOffsetRequested: steps => viewport.surfaceOffset(steps)
         onOffsetReset: viewport.resetSurfaceOffset()
     }
@@ -283,8 +292,9 @@ ApplicationWindow {
         restoreView: () => viewport.restoreView(),
         recordPerformance: () => performance.toggle(),
         confirm: () => viewport.confirmTransform(),
+        removeLastPoint: () => workspace.drawingTools.removeLast(),
         projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,
-        cancel: () => { workspace.inspectionTools.cancel(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
+        cancel: () => { workspace.inspectionTools.cancel(); workspace.imageTools.cancel(); workspace.drawingTools.cancel(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
     })
     function dispatchShortcut(command) {
         const action = shortcutCommands[command];

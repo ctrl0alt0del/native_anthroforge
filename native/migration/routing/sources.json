@@ -1,0 +1,92 @@
+[
+  {
+    "source": "af_fiber_ccd.cpp",
+    "source_sha256": "f046f61dd1af7b187175f8c91e5656ab249446276fe67c14d4a674cf7c257ae2",
+    "lines": [
+      27,
+      550
+    ],
+    "file": "collision_reference.hpp",
+    "sha256": "6d7d03630d1d26c37c65dfbba895b71e7a051475daa588f52be0405f9d84c5aa"
+  },
+  {
+    "source": "af_roadmap_preparation.hpp",
+    "source_sha256": "2237b32ac52bceffd50625d3603711c4593de279e9eca5ccf7e1e1a71539358a",
+    "lines": [
+      1,
+      79
+    ],
+    "file": "af_roadmap_preparation.hpp",
+    "sha256": "2237b32ac52bceffd50625d3603711c4593de279e9eca5ccf7e1e1a71539358a"
+  },
+  {
+    "source": "af_fiber_planner43.hpp",
+    "source_sha256": "d78819b7af04eb4b70d355fbb2fd9e5515b9be1f0ae443f2609433d930245b09",
+    "lines": [
+      1,
+      536
+    ],
+    "file": "af_fiber_planner43.hpp",
+    "sha256": "d78819b7af04eb4b70d355fbb2fd9e5515b9be1f0ae443f2609433d930245b09"
+  },
+  {
+    "source": "af_fiber_contact3.hpp",
+    "source_sha256": "97f8d6fcad2af3c95c5f0d357b3b01f2d5aa217f8875f61f3b6edaa5a2bd4d2e",
+    "lines": [
+      1,
+      273
+    ],
+    "file": "af_fiber_contact3.hpp",
+    "sha256": "97f8d6fcad2af3c95c5f0d357b3b01f2d5aa217f8875f61f3b6edaa5a2bd4d2e"
+  },
+  {
+    "source": "af_fiber_v3_session.hpp",
+    "source_sha256": "ca3490d5c9cd9ae04a08901e458b1566ee88217585e9aa619b660b52bcc83713",
+    "lines": [
+      1,
+      338
+    ],
+    "file": "af_fiber_v3_session.hpp",
+    "sha256": "ca3490d5c9cd9ae04a08901e458b1566ee88217585e9aa619b660b52bcc83713"
+  },
+  {
+    "source": "af_fiber_v3_batch.hpp",
+    "source_sha256": "44368b1f201930a91773de58775b43eef21d959db212023a0e2c0695ff120647",
+    "lines": [
+      1,
+      44
+    ],
+    "file": "af_fiber_v3_batch.hpp",
+    "sha256": "44368b1f201930a91773de58775b43eef21d959db212023a0e2c0695ff120647"
+  },
+  {
+    "source": "af_fiber_v3_operations.hpp",
+    "source_sha256": "8ecd0b031f9a0928b3df748d4f7531eef58bc350a146567b689664e112422e5d",
+    "lines": [
+      1,
+      91
+    ],
+    "file": "af_fiber_v3_operations.hpp",
+    "sha256": "8ecd0b031f9a0928b3df748d4f7531eef58bc350a146567b689664e112422e5d"
+  },
+  {
+    "source": "af_fiber_v3_coordinator.hpp",
+    "source_sha256": "1f779bf63d78cc516d8f01a8a2e364b5059c751b76f7e405a6c178c2fc29ccb3",
+    "lines": [
+      1,
+      245
+    ],
+    "file": "af_fiber_v3_coordinator.hpp",
+    "sha256": "1f779bf63d78cc516d8f01a8a2e364b5059c751b76f7e405a6c178c2fc29ccb3"
+  },
+  {
+    "source": "af_fiber_v3_native_sqp.hpp",
+    "source_sha256": "6581c16deafe0d011f7e39a25b75236338e0a59a76aa70208ac2683f3434ca19",
+    "lines": [
+      1,
+      826
+    ],
+    "file": "af_fiber_v3_native_sqp.hpp",
+    "sha256": "6581c16deafe0d011f7e39a25b75236338e0a59a76aa70208ac2683f3434ca19"
+  }
+]

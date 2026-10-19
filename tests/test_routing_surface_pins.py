@@ -76,18 +76,24 @@ def test_explicit_binding_contact_is_not_silently_changed(session):
 def scene(session):
     root = session.command("import", path=str(CUBE), units=1)["entity_id"]
     session.wait(10)
-    child = session.command("import", path=str(CUBE), units=1, parent=root)["entity_id"]
-    session.wait(10)
-    values = session.engine.decompose(CASE["surfaces"][1]["matrix"])
-    session.command("scp.transform", entity=child, values=values)
+    child = import_child(session, root)
     curve = session.command(
         "curve.create",
         engine="ROUTED",
+        settings=dict(obstacle_mode="MANUAL"),
         points=[dict(position=p) for p in CASE["points"]],
         values=session.engine.decompose(CASE["matrix"]),
     )
     session.wait(10)
     return root, child, curve
+
+
+def import_child(session, root):
+    child = session.command("import", path=str(CUBE), units=1, parent=root)["entity_id"]
+    session.wait(10)
+    values = session.engine.decompose(CASE["surfaces"][1]["matrix"])
+    session.command("scp.transform", entity=child, values=values)
+    return child
 
 
 def test_enabling_obstacles_on_saved_straight_curve_updates_and_undoes(session, tmp_path):

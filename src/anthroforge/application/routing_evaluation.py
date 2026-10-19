@@ -4,9 +4,9 @@ from dataclasses import replace
 from typing import Any
 
 from anthroforge.core.construction import Curve
-from anthroforge.core.curve_dependencies import targets
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.results import EvaluationResult
+from anthroforge.core.routing_obstacles import targets
 from anthroforge.native import routing
 
 from . import attachment_assets, curve_sources
@@ -37,7 +37,7 @@ def warm_identity(item: Curve) -> tuple[Any, ...]:
 def evaluate(
     engine: Any, document: Any, resources: Any, item: Curve, cancel: int, warm: Any = None
 ) -> PathAsset:
-    surfaces = tuple(sorted(targets(item)))
+    surfaces = targets(document, item)
     handles, matrices = attachment_assets.surface_inputs(
         engine, document, resources.meshes, surfaces
     )

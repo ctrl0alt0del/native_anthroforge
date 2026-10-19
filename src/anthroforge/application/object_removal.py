@@ -72,6 +72,7 @@ def retain_object(
 ) -> Construction:
     if isinstance(item, Surface):
         item = rebase_uses(session, item, removed.id)
+    item = without_obstacle(item, removed.id)
     owners = tuple(key for key in item.owners if key != removed.id)
     if item.parent != removed.id:
         return replace(item, owners=owners) if owners != item.owners else item
@@ -80,6 +81,20 @@ def retain_object(
     local = matrix(session.engine, frame, absolute, relative=True)
     changed = replace(item, owners=owners, parent=parent.id if parent else "", matrix=local)
     return authored(item, changed)
+
+
+def without_obstacle(item: Construction, removed: str) -> Construction:
+    from anthroforge.core.curve_engines import RoutingSettings
+
+    if not isinstance(item, Curve) or not isinstance(item.engine_settings, RoutingSettings):
+        return item
+    config = item.engine_settings
+    settings = replace(
+        config,
+        obstacles=tuple(k for k in config.obstacles if k != removed),
+        excluded_obstacles=tuple(k for k in config.excluded_obstacles if k != removed),
+    )
+    return authored(item, replace(item, engine_settings=settings)) if settings != config else item
 
 
 def parent_frame(session: "Session", parent: SceneObject | None) -> tuple[float, ...]:

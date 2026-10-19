@@ -172,6 +172,7 @@ def object_links(document: "Document") -> tuple[Any, ...]:
 
 def object_link(item: Any, document: "Document") -> tuple[Any, ...]:
     from .dependency_graph import construction_inputs
+    from .routing_obstacles import signature
 
     return (
         item.id,
@@ -179,4 +180,5 @@ def object_link(item: Any, document: "Document") -> tuple[Any, ...]:
         item.parent,
         frozenset(construction_inputs(item, document.objects, document.junctions)),
         tuple(c.curve for c in getattr(item, "curves", ())),
+        signature(item),
     )

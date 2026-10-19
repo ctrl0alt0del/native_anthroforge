@@ -112,6 +112,7 @@ def remap_inputs(
             value,
             owner=mapping.get(value.owner, value.owner),
             output=remap_output(value.output, mapping),
+            membership=tuple(sorted(mapping.get(key, key) for key in value.membership)),
         )
         for value in inputs
     )

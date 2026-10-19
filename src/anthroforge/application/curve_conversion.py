@@ -6,11 +6,11 @@ from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from anthroforge.core.curve_conversion import ConversionSpec
-from anthroforge.core.curve_dependencies import inputs as curve_inputs
 from anthroforge.core.curve_engines import decode
 from anthroforge.core.fibers import Fiber, FiberEdit
 from anthroforge.core.jobs import Job
 from anthroforge.core.results import Port
+from anthroforge.core.routing_obstacles import graph as routing_graph
 from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
@@ -44,8 +44,30 @@ def preview(
     points: list[str] | None = None,
     settings: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    spec = ConversionSpec(curve, decode(engine, settings), mode, samples, tuple(points or ()))
+    spec = conversion_spec(session, curve, engine, mode, samples, points, settings)
     return start_preview(session, spec)
+
+
+def conversion_spec(
+    session: Any,
+    curve: str,
+    engine: str,
+    mode: str,
+    samples: int,
+    points: list[str] | None,
+    settings: Any,
+) -> ConversionSpec:
+    chosen = conversion_points(session, curve, points)
+    if engine == "ROUTED":
+        mode = "AUTHORED"
+        settings = dict(settings or {})
+        settings.setdefault("samples", max(samples, len(chosen)))
+    return ConversionSpec(curve, decode(engine, settings), mode, samples, chosen)
+
+
+def conversion_points(session: Any, curve: str, points: list[str] | None) -> tuple[str, ...]:
+    source = curve_sources.source(session.document, curve)
+    return tuple(p.id for p in source.points) if points is None else tuple(points)
 
 
 def start_preview(session: "Session", spec: ConversionSpec) -> dict[str, Any]:
@@ -119,14 +141,15 @@ def compute(session: "Session", payload: Any, cancel: Any) -> path_assets.PathAs
 def preview_ports(document: Any, spec: ConversionSpec) -> set[Port]:
     original = curve_sources.source(document, spec.curve)
     candidate = replace(original, engine_settings=spec.settings)
-    inputs = curve_inputs(candidate) | {Port(original.id, "path")}
+    graph = routing_graph(document, candidate)
+    inputs = {Port(original.id, "path")}
     if isinstance(candidate, Fiber):
         inputs |= {
             Port(key, role)
             for key in eligible(document, candidate.id)
             for role in ("pose", "geometry")
         }
-    return dependencies.closure(dependencies.graph(document), inputs)
+    return dependencies.closure(graph, inputs)
 
 
 def publish(session: "Session", value: ConversionPreview, asset: path_assets.PathAsset) -> None:

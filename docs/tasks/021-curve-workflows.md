@@ -29,6 +29,21 @@ The addon automatic root-associated SCP policy and cached spatial queries were i
 during specification. Reuse native infrastructure; do not add Python geometry loops.
 Qt ListView reuse and proxy-model APIs were researched before implementation.
 
+## Checkpoint: routing contracts
+
+Implemented AUTO/MANUAL obstacle policy with optional exclusions. Explicit obstacle
+arguments retain manual intent. The graph adds automatic inputs then removes only
+automatically introduced cyclic edges; explicit cycles remain errors. A structural
+scene-membership read detects new/deleted surfaces and preview staleness. Ordinary pose
+and geometry revisions remain dependencies, including distant obstacles moving inward.
+Curve conversion defaults to all authored points; explicit empty selection remains invalid.
+
+Full pytest: 883 passed, 9 existing Qt warnings (build/check-021-initial.log). Mypy passes
+on 154 core/application files. New tests cover scene additions, pose changes, exclusions,
+deletion/undo, persistence, cyclic consumers and preview staleness. Existing contact/warm
+fixture explicitly starts in MANUAL to preserve its original no-obstacle regression case.
+UI, native capture reuse/performance, broader lifecycle cases and release remain unfinished.
+
 ## Recovery
 
 Preserve untracked root `__init__.py` and original

@@ -171,7 +171,42 @@ def exercise(window, controller, key):
     points(window, controller)
     obstacles(window)
     preview(window, controller, key)
+    placement(window, controller)
     report(controller)
+
+
+def placement(window, controller):
+    click(window, "placeCurvePoints")
+    tool = controller.drawing_tools
+    before, cursor = len(controller.session.document.objects), controller.session.history.cursor
+    place_click(window, 0.35, 0.42)
+    assert tool.mode == "POINTS" and tool.state["count"] == 1
+    QTest.keyClick(window, Qt.Key_1)
+    assert tool.mode == "POINTS" and tool.state["count"] == 1
+    place_click(window, 0.50, 0.48, Qt.ShiftModifier)
+    assert tool.mode == "POINTS" and tool.state["count"] == 2
+    place_click(window, 0.65, 0.55)
+    settle(controller)
+    assert not tool.mode and len(controller.session.document.objects) == before + 1
+    assert controller.session.history.cursor == cursor + 1
+    placement_undo(window, controller, before)
+
+
+def place_click(window, x, y, modifiers=Qt.NoModifier):
+    viewport = find(window, "viewport")
+    point = viewport.mapToScene(QPointF(viewport.width() * x, viewport.height() * y))
+    QTest.mouseClick(window, Qt.LeftButton, modifiers, point.toPoint())
+    QGuiApplication.processEvents()
+
+
+def placement_undo(window, controller, count):
+    controller.run("undo", {})
+    settle(controller)
+    assert len(controller.session.document.objects) == count
+    click(window, "placeCurvePoints")
+    place_click(window, 0.3, 0.4)
+    QTest.keyClick(window, Qt.Key_Escape)
+    assert not controller.drawing_tools.mode and len(controller.session.document.objects) == count
 
 
 def close(controller, engine, profiler):

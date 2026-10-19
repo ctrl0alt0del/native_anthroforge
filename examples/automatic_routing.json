@@ -1,0 +1,10 @@
+[
+  {"id":"cube","operation":"import","arguments":{"path":"examples/primitives/cube.obj","units":1}},
+  {"operation":"wait","arguments":{}},
+  {"id":"route","operation":"curve.create","arguments":{
+    "name":"Automatic route","engine":"ROUTED","owner":"$cube.entity_id",
+    "points":[{"position":[-2,0,0]},{"position":[2,0,0]}]
+  }},
+  {"operation":"wait","arguments":{}},
+  {"operation":"save","arguments":{"path":"automatic-routing.anthroforge","blocked_policy":"wait"}}
+]

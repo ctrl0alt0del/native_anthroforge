@@ -1,6 +1,7 @@
 """Leased immutable collision captures, reusable across curves and solve attempts."""
 
 import ctypes as c
+from typing import Any
 
 from .mesh import D, GeometryEngine, U, pointer
 
@@ -24,7 +25,7 @@ class RoutingScene:
             self.engine.library.af_routing_scene_release(self.handle)
 
 
-def capture(engine, packed, radius, cancel):
+def capture(engine: GeometryEngine, packed: Any, radius: float, cancel: int) -> RoutingScene:
     _, _, handles, matrices, _ = packed
     key = handles.tobytes(), matrices.tobytes(), radius
     cached = engine.routing_scenes.get(key)

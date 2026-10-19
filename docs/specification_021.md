@@ -1,7 +1,7 @@
 # AnthroForge 0.2.1 — curve workflow improvements
 
-Status: initial scope, 2026-10-19. Confirmed decisions below are requirements for the next
-release, not implemented behavior. This list remains open for further user feedback.
+Status: implemented release candidate, 2026-10-19. Confirmed behavior below is implemented;
+release qualification is tracked in [development status](development_status.md#curve-workflows-021).
 Muscles, soft tissues and other VCP work move to **0.2.2**. The qualified 0.2.0 runtime
 remains described by [its specification](specification_020.md) and
 [validation record](development_status.md). Follow the [engineering guidelines](engineering_guidelines.md).
@@ -40,7 +40,7 @@ The final rule is an implementation safeguard for the existing closure contract,
 change to the confirmed open-curve interaction. Draw remains a separate tool whose
 release finishes one stroke while leaving it ready for another.
 
-## Current solver controls: verified meaning
+## Previous 0.2.0 controls: verified meaning and motivation
 
 | Current control | Meaning in 0.2.0 |
 | --- | --- |
@@ -79,11 +79,11 @@ also has bounds-based active-collider selection and caches, with spatial indexin
 muscle/VCP implementation remains deferred to 0.2.2. Port the policy through native data
 contracts rather than copying Blender access or Python numerical loops.
 
-This is a shared routing-input policy, not a UI select-all action. Existing native world
-queries already provide spatial acceleration, but routing currently rebuilds collider
-inputs and a flattened world-space snapshot from every selected mesh per solve. Reuse
-that infrastructure and geometry ownership; qualify reusable captures and native spatial
-candidate queries before claiming that 100 obstacles are inexpensive.
+This is a shared routing-input policy, not a UI select-all action. The implementation reuses
+immutable native collision captures through a bounded cache and keeps the existing native
+spatial index. All eligible geometry remains in the capture; no straight-segment-only
+pruning is used. Solves validate against that complete scene. The measured 100-cube fixture
+is dominated by solving, not capture; reuse does not establish a general solve speedup.
 
 Automatic policy must account for eligible geometry across the document, safe exclusion
 of geometry dependent on the path itself, and the distinction between an exclusion and
@@ -100,7 +100,7 @@ dispatch capture, cancellation and stale-publication protection through the coor
 Acceptance needs the user's two-cube case and larger scenes; compare route correctness,
 preparation, native execution and retained memory in profiler reports. Include obstacles
 moving into a route, newly created/deleted geometry, changing workspaces, exclusions,
-consumer cycles and missing/Manual results. No performance improvement is established yet.
+consumer cycles and missing/Manual results. See qualification for measured scope and limits.
 
 ### Conversion points
 
@@ -111,8 +111,7 @@ Never silently use every tessellated/rendered sample or reduce the curve to endp
 
 This changes the earlier requirement for manually checking each structural point. The
 reason for structural points remains valid: the solver must pass through them, so a dense
-drawn curve can constrain its freedom. The user has confirmed the new default; the
-current 0.2.0 application still uses explicit selection until this change is implemented.
+drawn curve can constrain its freedom. Explicit subsets remain available in the optional editor.
 
 ### Lists with 100 or more items
 
@@ -133,20 +132,20 @@ actual offscreen UI with 100+ obstacles and 100+ points, including duplicate obj
 filtering, scrolling, bulk changes, required-point protection, preview and undo. Profile
 model churn and input handling; a screenshot alone does not establish responsiveness.
 
-## Proposed presentation refinements
+## Presentation
 
-Recommend moving numerical budgets into an Advanced section, using clearer labels such
+Numerical budgets appear in an Advanced section, using clearer labels such
 as Path Resolution and Iteration Budget, and showing one contextual obstacle editor.
 Surface clearance remains directly accessible with a short tooltip and explicit units.
 
 ## Delivery boundaries
 
-This document records the initial discussion; it is not a complete implementation plan.
-Before implementation, finalize list presentation and consolidate any additional 0.2.1
-requests. Automatic obstacles and all-authored-points defaults are settled. Preserve the current native engine, shared operations,
+The implemented list uses incremental keyed Qt models, bounded virtualized rows, search,
+filters and explicitly scoped bulk actions. Automatic obstacles and all-authored-points
+defaults are settled. Preserve the current native engine, shared operations,
 transactions, topology restrictions and 15-line function limit. Validation remains
 background/offscreen while the user is using the computer.
 
 Reference: [CGAL AABB-tree documentation](https://doc.cgal.org/latest/AABB_tree/) describes
-spatial intersection/distance queries. It supports the candidate-query approach, not a
-claim that the proposed automatic policy is implemented or qualified in AnthroForge.
+spatial intersection/distance queries. It provides background, not a substitute for
+AnthroForge's own geometry and responsiveness qualification.

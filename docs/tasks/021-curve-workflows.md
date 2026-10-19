@@ -70,6 +70,17 @@ reuse structural graph identity. Measured obstacle binding inclusive total fell 
 Full regression, lifecycle additions, hidden GPU geometry checks, packaging and release
 documentation remain pending. Versions are still 0.2.0 until qualification.
 
+## Release-candidate checkpoint
+
+Full pytest now passes 896 tests. Added Manual pending/missing input, running-capture
+supersession and workspace/visibility tests. The Manual test exposed geometry-only fan-out:
+`dependent_tasks` now marks geometry pending first and fans out to all output families;
+geometry authoring uses that boundary. Publication retains its waiting-job safeguards.
+The original two-cube conversion/fiber-binding UI check passes with Automatic selection.
+Actual QTest mouse/modifier events verify click/Shift-click placement, axis view continuity,
+cancellation and one-action undo. Versions/docs now target 0.2.1; full gate and portable
+qualification still pending. Source and source-package provenance remain unchanged upstream.
+
 ## Recovery
 
 Preserve untracked root `__init__.py` and original

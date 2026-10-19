@@ -12,10 +12,11 @@ CUBE = Path(__file__).resolve().parents[1] / "examples/primitives/cube.obj"
 LINE = [dict(position=(-2, 0, 0)), dict(position=(2, 0, 0))]
 
 
-def curve(session):
+def curve(session, owner=""):
     key = session.command(
         "curve.create",
         engine="ROUTED",
+        owner=owner,
         points=[
             dict(position=(-2, 0, 0)),
             dict(position=(2, 0, 0)),

@@ -1,4 +1,4 @@
-# Runtime performance recording (0.1.8)
+# Runtime performance recording
 
 Press **F12** (also while holding Ctrl/Shift/Alt or dragging) to start recording.
 Reproduce the slowdown and press F12 again. The **Record/Stop** button and View menu
@@ -6,6 +6,13 @@ provide the same action. Recording does not end an edit, change the document or 
 an undo entry. **Show file** opens the report folder after background export finishes.
 New and Open preserve the recording; document identifiers distinguish commands from
 different documents within the same capture.
+
+In 0.2.1, routing reports separate `af_routing_scene_capture` from `af_route_path_in_scene`.
+The `routing_scene` cache records hits/misses/evictions/bypasses, and resource snapshots
+include observed native capture capacities under `by_kind.routing_scenes`. Cache ownership
+and job ownership overlap; do not sum them. The cache has a 64 MiB budget and eight-entry
+limit; key/container overhead is conservatively budgeted, not an exact allocator measure.
+Scene membership invalidation appears as `routing_scene_membership_changed`.
 
 Reports are saved under `%LOCALAPPDATA%/AnthroForge/Profiles` on Windows. Share the
 single `.afprofile.zip`. There is no report viewer in this release. An unsuccessful

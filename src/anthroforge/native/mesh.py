@@ -3,13 +3,16 @@
 import ctypes as c
 from pathlib import Path
 from threading import Event
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from .base_cache import BaseCache
 from .bridge import NativeEngine
 from .resource_cache import ResourceCache
+
+if TYPE_CHECKING:
+    from .routing_scene import RoutingScene
 
 D = c.POINTER(c.c_double)
 INT64 = c.POINTER(c.c_int64)
@@ -31,7 +34,7 @@ class GeometryEngine(NativeEngine):
         self._query_signatures()
         self._construction_signatures()
         self.bases = BaseCache()
-        self.routing_scenes: ResourceCache[Any] = ResourceCache(
+        self.routing_scenes: ResourceCache["RoutingScene"] = ResourceCache(
             64 * 1024 * 1024, 8, "routing_scene"
         )
         self.resource_observer: Any = None

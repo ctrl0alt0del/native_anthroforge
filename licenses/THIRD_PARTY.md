@@ -5,6 +5,11 @@ kernel is preserved in native/migration/attachment_wave_reference.hpp. Its origi
 qualification are recorded in docs/development_status.md. No Blender executable is
 required or bundled.
 
+Release 0.2.1 adds authored immutable-scene ownership/cache adapters around the existing
+routing kernel. No upstream routing numerical source was replaced and no dependency was
+added. Existing source hashes and attribution in `native/migration/routing/sources.json`
+remain applicable; corresponding adapters are included in the 0.2.1 source archive.
+
 Blender 5.0.1 primitive/deformer algorithms are adapted in the native library.
 Their original NaN Holding BV and Blender Authors attribution, source paths and hashes
 are recorded in [primitive provenance](../native/migration/BLENDER_PRIMITIVES.md).

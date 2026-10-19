@@ -1,7 +1,41 @@
 # AnthroForge development validation
 
-Current source qualification is in [routing correction 0.2.0](#routing-correction-020).
+Current source qualification is in [curve workflows 0.2.1](#curve-workflows-021).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Curve workflows 0.2.1
+
+Release candidate: curve toolbar, click/Shift-click placement, automatic obstacle inputs,
+optional searchable exclusions and authored-point subsets, Advanced solver budgets.
+VCP/muscles/soft tissues remain 0.2.2. Schema 3 and the native solver are retained.
+Older explicit obstacle lists retain Manual mode; switch to Automatic to adopt new inputs.
+
+Source regression: **896 tests pass** (24 warnings from the existing QQmlPropertyMap API,
+including 15 in the new gesture tests). Native builds/three CTests and clang-tidy pass.
+New tests cover automatic scene membership, cyclic consumers, new/moved/deleted geometry,
+preview staleness, Manual pending provenance, missing accepted geometry, running-job
+supersession, visibility/workspace independence, capture reuse/eviction/concurrency and
+point-placement history. Full development gate and portable qualification are pending.
+
+Actual QML offscreen tests pass with 120 obstacles/120 authored points: bounded delegates
+(including Qt reuse pool), search, stable numbering, duplicate-name context, required-row
+protection, scoped bulk edits, retained search/scroll, focused-point highlighting, preview,
+accept and undo. Mouse/modifier events verify placement, axis views during placement,
+completion and cancellation. Captures inspected with fonts are under `build/021-curve-workflows`.
+Software offscreen validates controls/layout; it does not establish Quick3D geometry quality.
+
+Recorded 100-cube routing: one 0.60 ms native capture reused across eight solves; mean solve
+72.34 ms versus prior combined capture/solve 72.64 ms. This is capture reuse evidence, not a
+meaningful whole-solve speedup. Full-scene native spatial queries remain authoritative.
+The large-editor report exposed repeated candidate-graph preparation; a structural cache
+reduced the obstacle binding's inclusive total from 127 ms to 64 ms over 38 refreshes in
+serial trials. Inclusive nested timings overlap; no general frame-rate claim is made.
+
+Ownership review: eligibility/cycle policy and required-point rules are shared core contracts;
+fan-out uses the existing coordinator and marks geometry pending before consumers capture
+Manual provenance. The engine owns immutable native collision leases and bounded caches.
+One Qt choice model/view serves both optional lists. Provisional placement and keyboard
+bindings stay in their existing desktop owners; Python gains no numerical solver loop.
 
 ## Routing correction 0.2.0
 

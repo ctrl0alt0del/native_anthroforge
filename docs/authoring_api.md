@@ -1,4 +1,4 @@
-# Local authoring API, 0.2.0
+# Local authoring API, 0.2.1
 
 ## Construction commands
 
@@ -317,15 +317,17 @@ obsolete output cannot publish. `tools/drawing_qualification.py` records this in
 ## Curve engine conversion
 
 Authored curves store typed `engine_settings`: Bézier (`kind`, `resolution`), exact
-polyline (`kind`), or routing (`kind`, `samples`, `radius`, `accepted_steps`, `obstacles`).
+polyline (`kind`), or routing (`kind`, `samples`, `radius`, `accepted_steps`, `obstacle_mode`,
+`obstacles`, `excluded_obstacles`).
 There is no public solver generation selector. `curve.create` accepts `engine` and a
 `settings` dictionary; the existing Bézier `curve.edit(resolution=...)` operation remains
 an alias for its typed setting. Curve/Fiber consumers still share the same path contract.
 
-- `curve.conversion.preview(curve, engine, mode="EVALUATED", samples=64, points=[], settings={})`
+- `curve.conversion.preview(curve, engine, mode="EVALUATED", samples=64, points=None, settings={})`
   starts a read-only coordinator job. EVALUATED resamples the accepted path into editable
-  vector-handle points; AUTHORED retains authored points. Routing requires AUTHORED plus an
-  explicit point-ID selection including open endpoints and all anatomical bindings.
+  vector-handle points; AUTHORED retains authored points. Routing selects AUTHORED and retains
+  all existing authored points when `points` is omitted. An explicit subset must retain open
+  endpoints, anatomical bindings and junctions; an explicit empty list fails.
   Sampled conversion retains bound point identities and positions, allocating its exact
   point budget between required anchors in native work. Insufficient budgets fail explicitly.
 - `curve.conversion.status()` returns the token, job, state and candidate point count/settings.
@@ -339,10 +341,17 @@ serialized. The desktop displays it in green and excludes it from picking. Sourc
 invalidate acceptance. Routing runs through the native production solver and the existing
 coordinator. `curve.engine_settings(curve, **settings)` changes
 the current engine's parameters; engine changes require the conversion workflow above.
-Routing `obstacles` are explicit anatomical surface IDs, with fiber support surfaces also
-included automatically. All surface poses/results are declared inputs. Missing inputs or
-failed solves retain the accepted path and report failure; Manual inputs retain provenance.
-The inspector exposes routing samples, clearance, solve budget and obstacle selection.
+Routing defaults to `obstacle_mode="AUTO"`: every SCP geometry provider is eligible,
+minus `excluded_obstacles` and automatic cycle exclusions. Fiber binding/support surfaces
+remain required. Visibility and workspace do not remove obstacles. `MANUAL` uses explicit
+`obstacles`; providing that field without `obstacle_mode` retains manual API intent, including
+an empty list. Older serialized explicit lists decode as Manual. Set AUTO explicitly to
+adopt automatic selection for those projects. Auto cycle exclusions cannot hide explicit cycles.
+All eligible surface poses/results and structural scene membership are declared inputs.
+New/deleted providers invalidate pending work/previews. Missing accepted inputs fail rather
+than becoming empty space. Manual inputs retain accepted geometry and pending provenance;
+publication triggers consumers at their workspace priority. Failed solves retain accepted paths.
+The inspector keeps clearance accessible and moves resolution/iteration budgets to Advanced.
 
 Accepted Bézier/polyline fibers are checked by the read-only `fiber_collisions.v1` Issues
 provider. `issues.recheck` and `issues.cancel` use the ordinary advisory coordinator. A

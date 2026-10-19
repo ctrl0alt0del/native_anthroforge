@@ -3,7 +3,7 @@
 - Task branch: `codex/tab-and-icon-alignment`
 - Integration branch: `main`
 - Starting revision: `ff3901cd4f64c08544708556c7481e1994210fbb`
-- Status: pending release validation
+- Status: ready to integrate
 - Last updated: 2026-10-19, Europe/Bucharest
 - Active writer: local Codex chat
 
@@ -55,14 +55,30 @@ horizontal padding and elide; compact icons retain their size. Ownership review:
 UiButton owns content layout, themed tabs retain Qt interaction semantics, and
 ObjectBrowser owns navigation only. No domain or input-manager exceptions added.
 
-Pending: canonical build and relocated portable qualification. All checks are
-background-only; offscreen control captures do not establish 3D rendering or
-hands-on Windows acceptance.
+The final source also passes the prior image/Ctrl-placement acceptance, 120-point /
+120-obstacle curve editor checks, and Construction editor/control/image navigation.
+
+`./tools/package.ps1` passes at clean build revision
+`e50ab58b37f0d9f5ea000dbd07cbcd791fc5fd88`. Canonical executable SHA256:
+`9c0bdaebf8e87a072e7fb2966078a9e2ea22e2f0d2d3541642a55b5f182774f4`.
+All 101 QML assets and three native runtime DLLs match the validated source/build.
+
+`uv run --no-sync python tools/check_portable.py <temporary-copy>/AnthroForge.exe
+build/tab-and-icon-portable --offscreen` passes the complete relocated suite with
+minimal PATH, including headless operations, hidden GPU rendering, desktop/profiler,
+and QA-only feedback creation/preview/edit/delete. Its desktop capture was inspected.
+Evidence: `build/tab-and-icon-portable/portable-check.json`, `feedback-probe.json`,
+`build/tab-and-icon-delivery.json`. The temporary path is recorded in
+`build/tab-and-icon-portable-location.txt`. User report members match the original
+triage copies; hashes are in `build/tab-and-icon-alignment/preserved-reports.json`.
+
+All checks were background-only. Offscreen control captures validate layout; hidden
+render checks validate GPU output separately. Hands-on Windows acceptance was not run.
 
 ## Next actions and blockers
 
-1. Build canonical distribution and qualify a temporary relocation.
-2. Merge and push validated changes; refresh companion source archive.
+1. Merge and push validated changes.
+2. Refresh packaged documentation and the canonical companion source archive.
 
 ## Recovery inputs
 

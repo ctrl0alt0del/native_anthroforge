@@ -23,28 +23,35 @@ def targets(item: Curve) -> set[str]:
     return result
 
 
-def inputs(item: Curve) -> set[Port]:
+def inputs(item: Curve, objects: tuple[object, ...] = ()) -> set[Port]:
     if not isinstance(item, Fiber) and not isinstance(item.engine_settings, RoutingSettings):
         return set()
     scope = {Port(item.id, "routing_scope")} if item.engine == "ROUTED" else set()
     return (
         scope
         | {Port(item.id, "pose")}
-        | {anatomical_surfaces.port(ref) for ref in references(item)}
-        | {Port(ref.target, "pose") for ref in references(item)}
+        | {anatomical_surfaces.port(ref) for ref in references(item, objects)}
+        | {Port(ref.target, "pose") for ref in references(item, objects)}
     )
 
 
-def references(item: Curve) -> set[SurfaceReference]:
-    settings = item.engine_settings
-    result = (
-        {SurfaceReference(k) for k in settings.obstacles}
-        if isinstance(settings, RoutingSettings) and settings.obstacle_mode == "MANUAL"
-        else set()
-    )
+def references(item: Curve, objects: tuple[object, ...] = ()) -> set[SurfaceReference]:
+    result = routing_references(item.engine_settings, objects)
     if isinstance(item, Fiber):
         result.update(s.reference for s in item.supports)
         result.update(b.reference for b in item.bindings)
         if item.edit:
             result.update(item.edit.candidates)
     return result
+
+
+def routing_references(settings: object, objects: tuple[object, ...]) -> set[SurfaceReference]:
+    tissues = {r.target for r in anatomical_surfaces.defaults((), objects)}
+    return (
+        {
+            SurfaceReference(k, "TISSUE_FINAL" if k in tissues else "SCP_GEOMETRY")
+            for k in settings.obstacles
+        }
+        if isinstance(settings, RoutingSettings) and settings.obstacle_mode == "MANUAL"
+        else set()
+    )

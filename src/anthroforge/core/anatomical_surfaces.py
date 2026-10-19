@@ -44,3 +44,16 @@ def result(item: SCP | TissueVCP, role: str) -> EvaluationResult:
 def port(reference: SurfaceReference) -> Port:
     names = {"SCP_GEOMETRY": "geometry", "TISSUE_BASE": "base", "TISSUE_FINAL": "final"}
     return Port(reference.target, names[reference.role])
+
+
+def defaults(
+    entities: tuple[SCP, ...], objects: tuple[object, ...]
+) -> tuple[SurfaceReference, ...]:
+    bones = (SurfaceReference(e.id) for e in entities if e.primitive or e.asset)
+    tissues = (SurfaceReference(o.id, "TISSUE_FINAL") for o in objects if isinstance(o, TissueVCP))
+    return (*bones, *tissues)
+
+
+def from_port(value: Port) -> SurfaceReference:
+    roles = {"geometry": "SCP_GEOMETRY", "base": "TISSUE_BASE", "final": "TISSUE_FINAL"}
+    return SurfaceReference(value.owner, roles[value.output])

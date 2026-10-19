@@ -37,7 +37,9 @@ def normalize(document: Any, target: str | SurfaceReference) -> SurfaceReference
     return anatomical_surfaces.reference(target, document.registry.records)
 
 
-def get(engine: Any, document: Any, meshes: Any, target: str | SurfaceReference) -> SurfaceProvider:
+def snapshot(
+    engine: Any, document: Any, meshes: Any, target: str | SurfaceReference
+) -> SurfaceProvider:
     ref = normalize(document, target)
     item = document.object(ref.target)
     result = anatomical_surfaces.result(item, ref.role)
@@ -56,8 +58,14 @@ def require_ready(ref: SurfaceReference, result: EvaluationResult, key: str, mes
         raise ValueError(f"{ref.role} on {ref.target} failed: {result.error or result.status}")
     if not key or key not in meshes:
         raise ValueError(f"{ref.role} on {ref.target} has no accepted geometry.")
-    if not meshes[key].mesh.counts[3]:
+
+
+def get(engine: Any, document: Any, meshes: Any, target: str | SurfaceReference) -> SurfaceProvider:
+    value = snapshot(engine, document, meshes, target)
+    if not value.resource.mesh.counts[3]:
+        ref = value.reference
         raise ValueError(f"{ref.role} on {ref.target} is empty; adjust its construction or crop.")
+    return value
 
 
 def inputs(engine: Any, document: Any, meshes: Any, targets: Any) -> tuple[Any, Any]:
@@ -65,9 +73,25 @@ def inputs(engine: Any, document: Any, meshes: Any, targets: Any) -> tuple[Any, 
     return [p.resource.mesh.handle for p in providers], [p.frame for p in providers]
 
 
+def query_references(
+    engine: Any, document: Any, meshes: Any, targets: Any
+) -> tuple[SurfaceReference, ...]:
+    providers = [snapshot(engine, document, meshes, target) for target in targets]
+    return tuple(p.reference for p in providers if p.resource.mesh.counts[3])
+
+
 def ports(document: Any, targets: Any) -> set[Port]:
     refs = [normalize(document, target) for target in targets]
     return {anatomical_surfaces.port(r) for r in refs} | {Port(r.target, "pose") for r in refs}
+
+
+def triangle_count(document: Any, meshes: Any, ref: SurfaceReference) -> int:
+    item = document.registry.anatomy.get(ref.target)
+    if item is None:
+        return 0
+    result = anatomical_surfaces.result(item, ref.role)
+    key = geometry_asset(item) if isinstance(item, SCP) else result.asset
+    return meshes[key].mesh.counts[3] if key in meshes else 0
 
 
 def binding_mesh(

@@ -30,6 +30,19 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Routing now declares role-aware anatomy dependencies, including automatic tissue-final
+obstacles, optional exclusions/manual membership, and source-consumer cycle exclusions.
+Explicit cycles remain failures. Native routing still receives owned surface batches;
+accepted empty crops contribute no collider while their dependency remains registered.
+Advisory authored-Fiber collision checks report tissue roles, keep unrelated findings
+when a role is unavailable, and expose that incomplete check separately. Desktop obstacle
+lists include tissues through the existing searchable/virtualized choice model.
+Six new workflow cases cover routing, revisions, exclusions, cycles, empty crop/restore
+and unavailable-role isolation. Hidden GPU top-view capture was inspected: the path
+goes around the radial tissue. This is offscreen evidence, not interactive acceptance.
+Full suite now passes **1140 tests**, 615 existing Qt deprecation warnings, 49.64 seconds.
+Ruff, configured mypy, architecture limits, native rebuild and CTest pass.
+
 Fiber surface bindings now use explicit surface roles and owned material captures.
 The dense field may retain multiple captures of one provider: fresh edited influences
 use the current real surface while unedited structural pins keep their original capture.
@@ -42,7 +55,7 @@ acceptance and the new full-QML tissue Fiber creation/propagation check pass off
 Full suite: 1133 functional checks passed; its one failure was a 17-line test helper,
 now split and verified with the architecture checks. Ruff, configured mypy and changed
 native clang-tidy pass. The preceding complete development gate passed 1131 tests.
-Role-aware routing/collision and target-relative constraints remain to integrate;
+Target-relative constraints remain to integrate;
 production stacking, broader editing and release qualification remain incomplete.
 
 Inspected addon production contracts and current standalone boundaries. The

@@ -4,9 +4,10 @@ from typing import Any
 
 from anthroforge.core.curve_engines import RoutingSettings
 from anthroforge.core.fibers import Fiber
-from anthroforge.core.results import geometry_asset
-from anthroforge.core.routing_obstacles import targets
+from anthroforge.core.routing_obstacles import references
 from anthroforge.core.scheduling import Workload
+
+from .surface_providers import triangle_count
 
 
 def kind(item: Any) -> str:
@@ -24,12 +25,8 @@ def workload(session: Any, item: Any, document: Any) -> Workload:
 
 
 def routing_workload(session: Any, item: Any, document: Any) -> Workload:
-    surfaces = targets(document, item)
-    triangles = sum(
-        session.assets[geometry_asset(document.entity(key))].mesh.counts[3]
-        for key in surfaces
-        if geometry_asset(document.entity(key)) in session.assets
-    )
+    surfaces = references(document, item)
+    triangles = sum(triangle_count(document, session.assets, key) for key in surfaces)
     return Workload(
         affected=1,
         entities=len(surfaces),

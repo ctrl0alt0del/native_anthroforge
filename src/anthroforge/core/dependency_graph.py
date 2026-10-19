@@ -108,7 +108,7 @@ def build(
     result.update(tissue_dependencies.edges(objects))
     result.update(junctions.edges(shared))
     result.update(control_edges(controls))
-    signature = routing_obstacles.scene_signature(result, entities)
+    signature = routing_obstacles.scene_signature(result, entities, objects)
     excluded = routing_obstacles.expanded(result, entities, objects)
     return indexed(result, excluded, signature)
 
@@ -160,7 +160,7 @@ def construction_inputs(
     shared: tuple[junctions.Junction, ...] = (),
 ) -> set[Port]:
     if isinstance(item, Curve):
-        return curve_path_inputs(item) | junctions.inputs(item, shared)
+        return curve_path_inputs(item, objects) | junctions.inputs(item, shared)
     if isinstance(item, Surface):
         return set().union(*(curve_inputs(use, objects) for use in item.curves))
     return tissue_dependencies.inputs(item, objects)

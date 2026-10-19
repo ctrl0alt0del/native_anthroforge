@@ -3,14 +3,16 @@
 from dataclasses import asdict, dataclass
 from typing import Any
 
+from anthroforge.core import anatomical_surfaces
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.issues import Issue, evidence, fingerprint
 from anthroforge.core.object_registry import kind
-from anthroforge.core.results import Port, geometry_asset
+from anthroforge.core.results import Port
+from anthroforge.core.surface_references import SurfaceReference
 from anthroforge.native import path_collisions
 from anthroforge.native.mesh import NativeCancellation
 
-from .. import attachment_assets, curve_sources, dependencies, routing_evaluation
+from .. import curve_sources, dependencies, surface_providers
 from ..construction_policy import revisions
 from .providers import Provider
 
@@ -23,6 +25,8 @@ FIELDS = {
     "parent",
     "follow",
     "engine_settings",
+    "final_result",
+    "base_result",
 }
 
 
@@ -34,8 +38,10 @@ def fibers(document: Any) -> list[Fiber]:
     ]
 
 
-def surfaces(document: Any) -> tuple[str, ...]:
-    return tuple(e.id for e in document.entities if geometry_asset(e))
+def surfaces(document: Any) -> tuple[SurfaceReference, ...]:
+    defaults = anatomical_surfaces.defaults(document.entities, document.objects)
+    bound = {b.reference for f in fibers(document) for b in f.bindings}
+    return tuple(sorted(set(defaults) | bound))
 
 
 def scopes(document: Any) -> set[str]:
@@ -50,7 +56,7 @@ def affected(document: Any, changes: Any) -> set[str]:
 def source(document: Any, scope: str) -> Any:
     items = fibers(document)
     seeds = {Port(item.id, "pose") for item in items}
-    seeds.update(Port(key, output) for key in surfaces(document) for output in ("pose", "geometry"))
+    seeds.update(surface_providers.ports(document, surfaces(document)))
     ports = dependencies.closure(dependencies.graph(document), seeds)
     return dict(
         paths=[(item.id, item.result.asset, item.result.status) for item in items],
@@ -78,21 +84,55 @@ def provider(session: Any) -> Provider:
 
 
 def check(context: Any, scope: str, cancel: Any) -> tuple[Issue, ...]:
-    items, targets = fibers(context.document), surfaces(context.document)
-    if not items or not targets:
-        return ()
-    collisions, tolerance = query(context, items, targets, cancel.handle)
+    items = fibers(context.document)
     stamp = fingerprint(source(context.document, scope))
-    return tuple(
-        finding(context, item, targets[i], int(segment), tolerance, stamp)
+    targets, unavailable = available(context, stamp)
+    if not items or not targets:
+        return unavailable
+    collisions, tolerance = query(context, items, targets, cancel.handle)
+    return unavailable + tuple(
+        finding(context, item, (targets[i], int(segment)), tolerance, stamp)
         for item, result in zip(items, collisions, strict=True)
         for i, segment in enumerate(result)
         if segment >= 0
     )
 
 
-def query(context: Context, items: list[Fiber], targets: tuple[str, ...], cancel: int) -> Any:
-    handles, frames = attachment_assets.surface_inputs(
+def available(context: Context, stamp: str) -> tuple[Any, tuple[Issue, ...]]:
+    accepted, issues = [], []
+    for ref in surfaces(context.document):
+        try:
+            provider = surface_providers.snapshot(
+                context.engine, context.document, context.resources.meshes, ref
+            )
+            if provider.resource.mesh.counts[3]:
+                accepted.append(ref)
+        except ValueError as error:
+            issues.append(unavailable_surface(context.document, ref, stamp, str(error)))
+    return tuple(accepted), tuple(issues)
+
+
+def unavailable_surface(document: Any, ref: SurfaceReference, stamp: str, reason: str) -> Issue:
+    item = document.object(ref.target)
+    return Issue(
+        NAME,
+        "document",
+        "COLLISION_SURFACE_UNAVAILABLE",
+        "Collision check unavailable on " + item.name,
+        target=item.id,
+        kind=kind(item),
+        stage="collision",
+        source=stamp,
+        details=reason,
+        local_key=item.id + ":" + ref.role,
+        evidence=evidence(surface_role=ref.role),
+    )
+
+
+def query(
+    context: Context, items: list[Fiber], targets: tuple[SurfaceReference, ...], cancel: int
+) -> Any:
+    handles, frames = surface_providers.inputs(
         context.engine, context.document, context.resources.meshes, targets
     )
     rows = [input_row(context, item, targets) for item in items]
@@ -100,45 +140,52 @@ def query(context: Context, items: list[Fiber], targets: tuple[str, ...], cancel
 
 
 def input_row(
-    context: Context, item: Fiber, targets: tuple[str, ...]
+    context: Context, item: Fiber, targets: tuple[SurfaceReference, ...]
 ) -> path_collisions.CollisionPath:
     asset = context.resources.paths[item.result.asset]
     frame = curve_sources.world(context.engine, context.document, item.id)
-    owners = routing_evaluation.owners(asset.authored, targets)
+    bindings = {
+        b.point: targets.index(b.reference) + 1
+        for b in asset.authored.bindings
+        if b.reference in targets
+    }
+    owners = tuple(bindings.get(p.id, 0) for p in asset.authored.points)
     return path_collisions.row(asset.path, frame, owners)
 
 
 def finding(
-    context: Context, item: Fiber, target: str, segment: int, tolerance: float, stamp: str
+    context: Context, item: Fiber, hit: tuple[SurfaceReference, int], tolerance: float, stamp: str
 ) -> Issue:
-    parent = context.document.entity(target)
+    target, segment = hit
+    parent = context.document.object(target.target)
     return Issue(
         NAME,
         "document",
         "FIBER_COLLISION",
         "Fiber intersects " + parent.name,
         **finding_identity(item, target, stamp),
-        evidence=collision_evidence(item, parent, segment, tolerance),
+        evidence=collision_evidence(item, parent, target.role, segment, tolerance),
     )
 
 
-def finding_identity(item: Fiber, target: str, stamp: str) -> dict[str, Any]:
+def finding_identity(item: Fiber, target: SurfaceReference, stamp: str) -> dict[str, Any]:
     return dict(
         target=item.id,
         kind=kind(item),
         stage="collision",
         source=stamp,
-        related=(target,),
-        local_key=item.id + ":" + target,
+        related=(target.target,),
+        local_key=item.id + ":" + target.target + ":" + target.role,
         details="Accepted path intersects the surface. Authored shape and engine are unchanged.",
     )
 
 
-def collision_evidence(item: Fiber, parent: Any, segment: int, tolerance: float) -> str:
+def collision_evidence(item: Fiber, parent: Any, role: str, segment: int, tolerance: float) -> str:
     return evidence(
         segment=segment,
         tolerance_metres=tolerance,
         path=item.result.asset,
-        surface=geometry_asset(parent),
+        surface=anatomical_surfaces.result(parent, role).asset,
+        surface_role=role,
         pending=item.result.status == "pending",
     )

@@ -84,8 +84,7 @@ def path_workload(session: "Session", item: Fiber, document: Any) -> Workload:
     rows = len(asset.field.owners) if asset else len(item.points) * item.resolution
     targets = item.edit.candidates if item.edit else ()
     triangles = sum(
-        surface_providers.get(session.engine, document, session.assets, key).resource.mesh.counts[3]
-        for key in targets
+        surface_providers.triangle_count(document, session.assets, key) for key in targets
     )
     return Workload(affected=1, candidates=rows, entities=len(targets), triangles=triangles)
 

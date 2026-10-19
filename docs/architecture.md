@@ -16,6 +16,12 @@ surface-role/material captures too. Multiple captures can reference the same pro
 native field assembly retains unedited structural pins on their original capture while
 new influences capture current real geometry. Region constraints still need integration.
 
+Routing derives obstacle roles from dependency ports and sends the accepted provider
+geometry to the existing native collision world. Empty accepted outputs remain dependencies
+but are filtered before collider indexing. Automatic source-consumer cycles are excluded;
+explicit cycles remain errors. Advisory collision queries isolate unavailable providers,
+retain other findings and report the incomplete surface check without role substitution.
+
 The [0.2.0 specification](specification_020.md) and
 [implementation plan](implementation_020.md) define the current boundaries:
 first-class construction objects, referenced curves, Fiber as Curve subclass,

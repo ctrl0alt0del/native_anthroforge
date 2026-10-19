@@ -3,8 +3,9 @@
 from dataclasses import replace
 from typing import Any
 
+from . import anatomical_surfaces
 from .construction import Curve
-from .curve_dependencies import targets as explicit_targets
+from .curve_dependencies import references as explicit_references
 from .curve_engines import RoutingSettings
 from .cycle_analysis import cycles
 from .results import Port
@@ -18,10 +19,10 @@ def automatic(item: Any) -> bool:
     )
 
 
-def candidates(entities: Any, item: Curve) -> set[str]:
+def candidates(entities: Any, objects: Any, item: Curve) -> set[Any]:
     assert isinstance(item.engine_settings, RoutingSettings)
     excluded = set(item.engine_settings.excluded_obstacles)
-    return {e.id for e in entities if (e.primitive or e.asset) and e.id not in excluded}
+    return {r for r in anatomical_surfaces.defaults(entities, objects) if r.target not in excluded}
 
 
 def expanded(edges: Any, entities: Any, objects: Any) -> dict[str, frozenset[str]]:
@@ -32,14 +33,18 @@ def expanded(edges: Any, entities: Any, objects: Any) -> dict[str, frozenset[str
         if isinstance(item, Curve) and item.engine == "ROUTED":
             edges[Port(item.id, "routing_scope")] = set()
         if automatic(item):
-            added[item.id] = candidates(entities, item) - explicit_targets(item)
+            added[item.id] = candidates(entities, objects, item) - explicit_references(
+                item, objects
+            )
             edges[Port(item.id, "path")].update(surface_ports(added[item.id]))
     components = cycles(edges, reverse(edges))
     return remove_cyclic_candidates(edges, added, components)
 
 
 def surface_ports(targets: Any) -> set[Port]:
-    return {Port(key, role) for key in targets for role in ("geometry", "pose")}
+    return {anatomical_surfaces.port(r) for r in targets} | {
+        Port(r.target, "pose") for r in targets
+    }
 
 
 def remove_cyclic_candidates(edges: Any, added: Any, components: Any) -> dict[str, frozenset[str]]:
@@ -47,8 +52,9 @@ def remove_cyclic_candidates(edges: Any, added: Any, components: Any) -> dict[st
     for key, targets in added.items():
         path = Port(key, "path")
         component: frozenset[Port] = next((c for c in components if path in c), frozenset())
-        rejected[key] = frozenset(t for t in targets if surface_ports({t}) & component)
-        edges[path].difference_update(surface_ports(rejected[key]))
+        removed = {t for t in targets if surface_ports({t}) & component}
+        rejected[key] = frozenset(t.target for t in removed)
+        edges[path].difference_update(surface_ports(removed))
     return rejected
 
 
@@ -68,7 +74,7 @@ def signature(item: Any) -> Any:
     settings = item.engine_settings
     return (
         item.parent,
-        explicit_targets(item),
+        tuple(sorted(explicit_references(item))),
         (
             (settings.obstacle_mode, settings.excluded_obstacles)
             if isinstance(settings, RoutingSettings)
@@ -82,14 +88,30 @@ def targets(document: Any, item: Curve) -> tuple[str, ...]:
     return membership(graph(document, item), item.id)
 
 
-def membership(graph: Any, key: str) -> tuple[str, ...]:
+def references(document: Any, item: Curve) -> tuple[Any, ...]:
     return tuple(
-        sorted(p.owner for p in graph.get(Port(key, "path"), ()) if p.output == "geometry")
+        sorted(
+            anatomical_surfaces.from_port(p)
+            for p in graph(document, item).get(Port(item.id, "path"), ())
+            if p.output in ("geometry", "base", "final")
+        )
     )
 
 
-def scene_signature(edges: Any, entities: Any) -> tuple[str, ...]:
-    needed = surface_ports(e.id for e in entities if e.primitive or e.asset)
+def membership(graph: Any, key: str) -> tuple[str, ...]:
+    return tuple(
+        sorted(
+            {
+                p.owner
+                for p in graph.get(Port(key, "path"), ())
+                if p.output in ("geometry", "base", "final")
+            }
+        )
+    )
+
+
+def scene_signature(edges: Any, entities: Any, objects: Any = ()) -> tuple[str, ...]:
+    needed = surface_ports(anatomical_surfaces.defaults(entities, objects))
     pending = list(needed)
     while pending:
         for port in edges.get(pending.pop(), ()):

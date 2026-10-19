@@ -31,7 +31,10 @@ or `TISSUE_FINAL`. `fiber.binding.set(curve, point, target, scope?, role?)` uses
 provider policy. Omitted roles choose the provider's ordinary surface (SCP geometry or
 tissue final); an explicitly unavailable role is rejected. Captured material geometry
 is retained through deformation and untouched endpoints are not recaptured during edits.
-Desktop selectors show the role and availability. Tissue routing integration is still pending.
+Desktop selectors show the role and availability. Automatic routing includes tissue final
+surfaces; existing obstacle/exclusion IDs accept tissues. A base-bound Fiber retains that
+explicit binding role. Failed roles are not replaced by displayed intrinsic fallback.
+Accepted empty crops contain no collider; restoring geometry invalidates routes again.
 
 ## Construction commands
 

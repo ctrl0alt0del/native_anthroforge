@@ -3,7 +3,7 @@
 from collections import OrderedDict
 from dataclasses import replace
 
-from anthroforge.core import routing_obstacles
+from anthroforge.core import anatomical_surfaces, routing_obstacles
 from anthroforge.core.construction import Curve
 from anthroforge.core.curve_constraints import required_points
 from anthroforge.core.curve_dependencies import targets as explicit_targets
@@ -34,7 +34,7 @@ def choice_signature(document, key, settings):
         settings.get("obstacle_mode", "AUTO"),
         tuple(settings.get("obstacles", ())),
         tuple(settings.get("excluded_obstacles", ())),
-        tuple((item.id, item.name, item.parent) for item in document.entities),
+        tuple((item.id, item.name, item.parent) for item in document.registry.anatomy.values()),
     )
 
 
@@ -67,9 +67,10 @@ def obstacle_rows(document, key, settings):
     rejected = graph.routing_excluded.get(key, ())
     required = explicit_targets(replace(candidate, engine_settings=RoutingSettings()))
     return [
-        obstacle_row(document, item, candidate.engine_settings, rejected, required)
-        for item in document.entities
-        if item.primitive or item.asset
+        obstacle_row(
+            document, document.object(ref.target), candidate.engine_settings, rejected, required
+        )
+        for ref in anatomical_surfaces.defaults(document.entities, document.objects)
     ]
 
 
@@ -98,7 +99,7 @@ def choice_row(item, detail, chosen, reason):
 def hierarchy(document, item):
     names, current = [], item
     while current.parent:
-        current = document.entity(current.parent)
+        current = document.object(current.parent)
         names.append(current.name)
     path = " / ".join(reversed(names)) or "Anatomy root"
     return f"{path} · {item.id[:8]}"

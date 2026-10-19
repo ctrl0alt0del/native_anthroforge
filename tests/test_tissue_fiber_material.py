@@ -9,6 +9,7 @@ from anthroforge.core.results import Port
 from tests.test_fiber_creation import path
 from tests.test_fiber_editing import edited_point
 from tests.test_tissue_anchor_material import bound_to_second_side
+from tests.test_tissue_routing import fail_final
 from tests.test_tissue_workflow import roundtrip
 
 
@@ -55,17 +56,19 @@ def validate_saved_captures(session, item, location):
     assert session.document.object(item.id).bindings == item.bindings
 
 
-def test_selected_role_is_explicit_and_final_failure_retains_accepted_path(session):
+def test_selected_role_is_explicit_and_final_failure_retains_accepted_path(session, monkeypatch):
     target, fiber = fiber_on_tissue(session)
     shape = path(session, fiber.id)
     ports = session.document.index.structure.dependencies[Port(fiber.id, "path")]
     assert Port(target, "final") in ports and Port(target, "geometry") not in ports
-    session.command("tissue.configure", target=target, changes=dict(stacking=True))
+    fail_final(monkeypatch, target)
+    session.command("evaluate", entities=[target])
     session.wait()
     item = session.document.object(fiber.id)
-    assert item.result.status == "failed" and "stack" in item.result.error.lower()
+    assert item.result.status == "failed" and "final" in item.result.error.lower()
     np.testing.assert_array_equal(path(session, fiber.id), shape)
-    session.command("tissue.configure", target=target, changes=dict(stacking=False))
+    monkeypatch.undo()
+    session.command("evaluate", entities=[target])
     session.wait()
     assert session.document.object(fiber.id).result.status == "ready"
 

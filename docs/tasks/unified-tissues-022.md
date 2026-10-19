@@ -44,8 +44,12 @@ independent Anchor capture/rebind use shared commands, native binding kernels,
 the existing coordinator and undo history. Parent movement resolves retained
 bindings; deletion protection and workspace association include Anchors.
 
-Runtime integration remains incomplete: Point/Anchor desktop tools, tissue phase
-revision policies, generalized Fiber roles, intrinsic numerical ports, stacking,
+Point/Anchor desktop creation, inspector, native picking and explicit rebind are
+integrated. Membranes retain the existing Surface inspector and staged display.
+Tissue phase revisions distinguish base/rest/intrinsic/final invalidation; topology
+locks traverse construction consumers through Membranes to tissue attachments.
+
+Runtime integration remains incomplete: generalized Fiber roles, intrinsic numerical ports, stacking,
 full GUI and release qualification are still required. No 0.2.2 release is claimed.
 Unrelated untracked root `__init__.py` is preserved.
 
@@ -55,10 +59,16 @@ Baseline `uv run --no-sync pytest -q`: **941 passed**, 307 existing Qt deprecati
 warnings, 31.89 seconds on Windows. `git diff --check` passed for documentation.
 Baseline main matched origin/main before branching.
 Foundation full suite: **951 passed**, 307 existing warnings, 30.18 seconds.
-Subsequent Point/Anchor lifecycle and architecture checks: **8 passed**. These
+Next full suite after attached-point operations/output dispatch: **957 passed**,
+307 existing warnings, 34.41 seconds. Point/Anchor lifecycle checks
 exercise capture, parent motion, explicit rebind, undo/redo, deletion protection
 and persistence. Shared provider and output dispatch changes still require the
-next complete regression run; desktop/geometry parity acceptance is pending.
+next complete regression run. `tools/point_editor_acceptance.py` passes full-QML
+creation, explicit rebind and undo without warnings. Its offscreen platform does
+not render the 3D viewport; inspected UI capture at `build/022-points/anchor-inspector.png`.
+Separately `tools/point_scene_acceptance.py` passes GPU texture-only rendering and
+native picking with no visible window; inspected `build/022-points/point-gpu.png`.
+Full tissue geometry parity and release acceptance remain pending.
 Required: development gate, geometry parity, lifecycle, headless, offscreen UI,
 profiler and portable acceptance, followed by ownership/coupling review.
 

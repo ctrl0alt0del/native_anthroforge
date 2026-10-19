@@ -3,6 +3,7 @@
 from dataclasses import dataclass, field
 from math import isfinite
 
+from .entities import validate_matrix
 from .objects import ConstructionObject
 from .surface_references import SurfaceBinding
 
@@ -29,3 +30,5 @@ class Anchor(Point):
             len(self.resolved_position) != 3 or not all(map(isfinite, self.resolved_position))
         ):
             raise ValueError("Resolved anchor position needs three finite coordinates.")
+        if self.resolved_frame:
+            validate_matrix(self.resolved_frame)

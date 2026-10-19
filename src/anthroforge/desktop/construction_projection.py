@@ -10,25 +10,31 @@ from .construction_metadata import describe
 from .record_model import RecordModel
 from .values import qml
 
+CATEGORIES = {"IMAGE": "images", "SURFACE": "geometry", "MEMBRANE": "geometry"}
+
 
 class ConstructionProjection:
     def __init__(self, controller):
         self.controller, self.records, self.keys = controller, {}, {}
         self.rendered = {}
         self.model = RecordModel(controller, ("item",), "id")
+        from .point_scene import PointScene
+
+        self.points = PointScene(controller)
 
     def synchronize(self):
         session = self.controller.session
         live = set(session.document.registry.construction) | session.document.index.controls.keys()
         self.records = {key: row for key, row in self.records.items() if key in live}
         self.keys = {key: value for key, value in self.keys.items() if key in live}
-        for item in session.document.objects:
+        for item in session.document.registry.construction.values():
             self.update_record(session, item)
         for item in session.document.controls:
             self.records[item.id] = self.controller.scene_projection.records[item.id]
         self.model.synchronize_records(
             [dict(id=key, item=row) for key, row in self.records.items()]
         )
+        self.points.synchronize(self.records)
 
     def update_record(self, session, item):
         frame = curve_sources.world(session.engine, session.document, item.id)
@@ -74,7 +80,7 @@ def result_record(result):
 
 def flags(session, item):
     readonly = not workspace_policy.included(session.document, session.workspace, item.id)
-    category = {"IMAGE": "images", "SURFACE": "geometry"}.get(kind(item), "curves")
+    category = CATEGORIES.get(kind(item), "curves")
     visible = item.id not in session.workspace.hidden and presentation.visible(
         session.workspace, category
     )

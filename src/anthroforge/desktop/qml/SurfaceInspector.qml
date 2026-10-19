@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 ColumnLayout {
     id: panel
-    readonly property var item: workspace.selectedData.kind === "SURFACE" ? authoring.state : ({})
+    readonly property var item: ["SURFACE","MEMBRANE"].includes(workspace.selectedData.kind) ? authoring.state : ({})
     Layout.fillWidth: true; spacing: Theme.gap
     function setting(key,value) { const args={target:item.id}; args[key]=value; workspace.run("surface.update",args); }
     UiSection {

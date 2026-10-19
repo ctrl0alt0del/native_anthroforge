@@ -239,6 +239,20 @@ class Controller(QObject):
 
         surface(self, kind)
 
+    @Slot()
+    def createPoint(self):
+        from .image_tools import context_owner
+
+        target = self.run("construction.point.create", {"owner": context_owner(self)})
+        if target:
+            self.select(target)
+
+    @Slot(result="QVariantList")
+    def surfaceRoles(self):
+        from .surface_choices import rows
+
+        return rows(self)
+
     @Property("QVariantMap", notify=changed)
     def surfaceAction(self):
         from .construction_creation import surface_action

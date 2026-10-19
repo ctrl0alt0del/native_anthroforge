@@ -59,7 +59,7 @@ class ChangeJournal:
             record_changes(before.index.entities, after.index.entities),
             record_changes(before.index.controls, after.index.controls),
             {name for name in names if getattr(before, name) != getattr(after, name)},
-            record_changes(before.registry.construction, after.registry.construction),
+            record_changes(before.registry.authored, after.registry.authored),
         )
         record_order(delta, before, after)
         self.records.append((self.serial, delta))

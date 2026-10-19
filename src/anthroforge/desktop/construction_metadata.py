@@ -9,7 +9,9 @@ from .curve_usage import users
 
 
 def describe(session, item):
-    result = dict(users=users(session.document, item.id))
+    from .point_scene import metadata
+
+    result = dict(users=users(session.document, item.id), **metadata(session, item))
     if isinstance(item, ReferenceImage):
         result.update(
             source=item.source,

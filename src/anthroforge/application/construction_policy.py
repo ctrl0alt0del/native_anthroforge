@@ -3,6 +3,8 @@
 from anthroforge.core import attachment_references
 from anthroforge.core.document import Document
 from anthroforge.core.results import Port, ReadRevision
+from anthroforge.core.tissue_revisions import PHASES
+from anthroforge.core.tissues import TissueVCP
 
 
 def topology_dependents(document: Document, entity: str) -> tuple[str, ...]:
@@ -12,16 +14,12 @@ def topology_dependents(document: Document, entity: str) -> tuple[str, ...]:
 
 def bound_fibers(document: Document, entity: str) -> tuple[str, ...]:
     return tuple(
-        item.id
-        for item in document.objects
-        if entity in attachment_references.targets(item)
+        item.id for item in document.objects if entity in attachment_references.targets(item)
     )
 
 
 def topology_locks(document: Document, target: str) -> list[dict[str, str]]:
-    from .curve_sources import consumers
-
-    owners = consumers(document, {target}) if target in document.registry.construction else {target}
+    owners = downstream(document, target)
     return [
         dict(
             id=key,
@@ -35,11 +33,17 @@ def topology_locks(document: Document, target: str) -> list[dict[str, str]]:
 
 
 def require_topology_edit(document: Document, entity: str) -> None:
-    dependents = topology_dependents(document, entity)
+    dependents = sorted({row["id"] for row in topology_locks(document, entity)})
     if dependents:
         raise ValueError(
             "Topology is locked by children or surface attachments: " + ", ".join(dependents)
         )
+
+
+def downstream(document: Document, target: str) -> set[str]:
+    from .dependencies import closure
+
+    return closure(document.registry.consumers, {target})
 
 
 def mode(document: Document, entity: str) -> str:
@@ -75,7 +79,16 @@ def object_revision(document: Document, port: Port) -> ReadRevision:
         scope = document.index.structure.dependencies.routing_scene
         return ReadRevision(port.owner, port.output, 0, 0, scope)
     item = document.registry.authored[port.owner]
+    if isinstance(item, TissueVCP) and port.output in PHASES:
+        return tissue_revision(item, port)
     pose = port.output in ("pose", "local_pose")
     authored = item.pose_revision if pose else item.construction_revision
     accepted = 0 if pose else item.result.revision
     return ReadRevision(port.owner, port.output, authored, accepted)
+
+
+def tissue_revision(item: TissueVCP, port: Port) -> ReadRevision:
+    result = getattr(item, port.output + "_result")
+    return ReadRevision(
+        item.id, port.output, getattr(item, port.output + "_revision"), result.revision
+    )

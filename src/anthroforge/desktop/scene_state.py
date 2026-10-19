@@ -225,6 +225,7 @@ def pick_scene(controller, origin, direction, depth, radius):
     )
     hits += path_hits(controller, origin, direction, radius)
     hits += image_hits(controller, origin, direction)
+    hits += controller.construction.points.hits(origin, direction, radius)
     hits.sort(key=lambda hit: (hit.get("layer", 0), hit["distance"]))
     return hits[depth % len(hits)] if hits else {}
 

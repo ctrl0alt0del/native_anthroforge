@@ -24,6 +24,10 @@ class TissueVCP(ObjectRecord):
     constraints: tuple[TissueConstraint, ...] = ()
     stacking: bool = False
     group: str = ""
+    base_revision: int = 0
+    rest_revision: int = 0
+    intrinsic_revision: int = 0
+    final_revision: int = 0
     base_result: EvaluationResult = field(default_factory=EvaluationResult)
     rest_result: EvaluationResult = field(default_factory=EvaluationResult)
     intrinsic_result: EvaluationResult = field(default_factory=EvaluationResult)

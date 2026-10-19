@@ -1,7 +1,7 @@
 """Application traversal and job contracts over snapshot-owned dependency indexes."""
 
 from collections import deque
-from collections.abc import Set
+from collections.abc import Mapping, Set
 
 from anthroforge.core import dependency_graph as index
 from anthroforge.core.document import Document
@@ -17,7 +17,7 @@ def reverse(graph: index.Edges) -> index.Edges:
     return graph.consumers if isinstance(graph, index.DependencyGraph) else index.reverse(graph)
 
 
-def closure(graph: index.Edges, seeds: Set[Port]) -> set[Port]:
+def closure[T](graph: Mapping[T, Set[T]], seeds: Set[T]) -> set[T]:
     found, queue = set(seeds), deque(seeds)
     while queue:
         for node in graph.get(queue.popleft(), ()):

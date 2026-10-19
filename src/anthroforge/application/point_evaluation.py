@@ -28,4 +28,8 @@ def resolve(engine: Any, document: Any, meshes: Any, item: Anchor, cancel: int) 
 
 
 def with_frame(item: Anchor, frame: Any) -> Anchor:
-    return replace(item, resolved_position=tuple(frame[[3, 7, 11]]), resolved_frame=tuple(frame))
+    return replace(
+        item,
+        resolved_position=tuple(frame[[3, 7, 11]].tolist()),
+        resolved_frame=tuple(frame.tolist()),
+    )

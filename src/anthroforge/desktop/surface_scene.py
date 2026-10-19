@@ -22,7 +22,11 @@ def metadata(session, item, row):
 
 
 def records(controller):
-    return [row for row in controller.construction.records.values() if row.get("kind") == "SURFACE"]
+    return [
+        r
+        for r in controller.construction.records.values()
+        if r.get("kind") in ("SURFACE", "MEMBRANE")
+    ]
 
 
 def preview_rows(controller):

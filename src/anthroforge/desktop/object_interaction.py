@@ -4,6 +4,7 @@ from itertools import product
 
 from anthroforge.application import curve_sources, object_operations
 from anthroforge.application.transform_policy import require_object_transform
+from anthroforge.core.points import Point
 from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.core.surfaces import Surface
 from anthroforge.native import components
@@ -31,6 +32,10 @@ def transform_command(controller, values):
 
 
 def bounds(session, item):
+    if isinstance(item, Point):
+        from anthroforge.application.point_evaluation import position
+
+        return list(position(session.engine, session.document, item)), 0.1
     frame = curve_sources.world(session.engine, session.document, item.id)
     local = local_bounds(session, item)
     if local is None:

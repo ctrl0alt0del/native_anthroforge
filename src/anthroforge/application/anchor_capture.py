@@ -89,7 +89,7 @@ def compute(session: Any, spec: Capture, payload: Any, cancel: Any) -> Any:
     targets, records = point_attachments.capture(
         session.engine, *surfaces, [world], cancel=cancel.handle
     )
-    attachment = Attachment(child_mode="OBJECT_ORIGIN", binding=tuple(records[0]))
+    attachment = Attachment(child_mode="OBJECT_ORIGIN", binding=tuple(records[0].tolist()))
     bound = copied(item, spec, SurfaceBinding(spec.reference, attachment))
     frame = point_attachments.resolve(session.engine, *surfaces, targets, records, cancel.handle)[0]
     return document, point_evaluation.with_frame(bound, frame)

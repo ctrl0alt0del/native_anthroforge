@@ -64,6 +64,7 @@ std::shared_ptr<Mesh> refine_parts(const Mesh& source,const std::vector<Material
     auto output=main_grid(source,grids,seams,resolution,cancel);
     for(size_t i=1;i<grids.size();++i) branch(output,source,grids,i,seams[i-1],resolution,cancel);
     auto result=make_mesh(output.points,output.faces,cancel,true);
-    result->material=std::move(output.material); result->material_axes=std::move(output.axes); return result;
+    result->material=std::move(output.material); result->material_axes=std::move(output.axes);
+    result->material_pins=source.material_pins; return result;
 }
 }

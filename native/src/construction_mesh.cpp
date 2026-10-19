@@ -22,6 +22,7 @@ static void copy_topology(const Mesh& source,Mesh& target) {
     target.polygons=source.polygons;
     target.material=source.material;
     target.material_axes=source.material_axes;
+    target.material_pins=source.material_pins;
     target.tissue=source.tissue;
 }
 std::shared_ptr<Mesh> deform_mesh(const Mesh& source,const Vertices& vertices,uint64_t cancel,bool complete) {

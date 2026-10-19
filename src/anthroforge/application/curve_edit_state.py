@@ -28,7 +28,7 @@ def prepare[T](session: Any, before: Any, changed: T) -> T:
     if not shape_changed(before, changed) and not bindings_changed:
         return changed
     if not shape_changed(current(session, before), changed) and not bindings_changed:
-        return cast(T, replace(changed, points=before.points))
+        return cast(T, retain_geometry(before, changed))
     return cast(T, prepare_fiber(session, before, changed))
 
 
@@ -56,10 +56,26 @@ def moved_anchors(before: Fiber, after: Fiber) -> set[str]:
 
 
 def shape_changed(before: Curve, after: Curve) -> bool:
-    return any(
-        getattr(before, name) != getattr(after, name)
-        for name in ("points", "engine_settings", "closed")
+    return geometry_points(before) != geometry_points(after) or any(
+        getattr(before, name) != getattr(after, name) for name in ("engine_settings", "closed")
     )
+
+
+def geometry_points(curve: Curve) -> tuple[Any, ...]:
+    return tuple(replace(p, stacking_fixed=False, protected_crease=False) for p in curve.points)
+
+
+def retain_geometry(before: Fiber, changed: Fiber) -> Fiber:
+    metadata = {p.id: p for p in changed.points}
+    points = tuple(
+        replace(
+            p,
+            stacking_fixed=metadata[p.id].stacking_fixed,
+            protected_crease=metadata[p.id].protected_crease,
+        )
+        for p in before.points
+    )
+    return replace(changed, points=points)
 
 
 def baseline(session: Any, item: Fiber) -> FiberEdit:

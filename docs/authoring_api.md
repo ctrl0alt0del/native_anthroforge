@@ -40,6 +40,13 @@ surfaces; existing obstacle/exclusion IDs accept tissues. A base-bound Fiber ret
 explicit binding role. Failed roles are not replaced by displayed intrinsic fallback.
 Accepted empty crops contain no collider; restoring geometry invalidates routes again.
 
+On the 0.2.2 task branch, `curve.point.update` also accepts Boolean `stacking_fixed`
+and `protected_crease` fields. Bound Fiber points are protected automatically. Surface
+evaluation retains these locations in its accepted material data; tissue refinement
+preserves their exact coordinates. Manual surfaces keep their previous pin snapshot
+until evaluated. Protection-only edits do not recapture Fiber attachments or alter shape.
+The curve inspector exposes both flags. The production stacking workflow remains in progress.
+
 ## Construction commands
 
 The desktop and headless clients share these operations, policies and transactions.

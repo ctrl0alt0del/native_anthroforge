@@ -11,7 +11,7 @@ static void memory_row(uint64_t handle,const Mesh& value,uint64_t* row) {
     row[0]=handle; row[1]=reinterpret_cast<uint64_t>(&value);
     row[2]=sizeof(Mesh)+value.vertices.size()*sizeof(double)+value.triangles.size()*sizeof(int)
         +(value.corners.capacity()+value.offsets.capacity()+value.polygons.capacity()+value.material.capacity())*sizeof(int64_t)
-        +value.material_axes.capacity()*sizeof(double)
+        +(value.material_axes.capacity()+value.material_pins.capacity())*sizeof(double)
         +tissue_storage(value.tissue);
     // libigl AABB has one leaf per triangle and two children per internal node; root is in Mesh.
     row[3]=value.prepared?uint64_t(std::max<int64_t>(0,2*value.triangles.rows()-2))*sizeof(value.tree):0;

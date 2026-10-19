@@ -3,6 +3,10 @@ import QtQuick.Controls
 
 CheckBox {
     id: control
+    property string hint: ""
+    ToolTip.text: hint
+    ToolTip.visible: hovered && hint.length > 0
+    ToolTip.delay: 700
     implicitWidth: text ? contentItem.implicitWidth : indicator.width
     implicitHeight: Theme.controlHeight; padding: 0
     spacing: 8

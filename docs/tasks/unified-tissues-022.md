@@ -30,14 +30,25 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Accepted surface results now retain structural material pins from bound Fiber points and
+explicit point protection. Native capture maps authored parameters to exact material rows;
+refinement preserves the coordinates, and stacking uses weighted equations without pinning
+all contributing vertices. Branch/patch provenance, schema-4 ownership, Manual accepted
+inputs, moved-Fiber shape preservation, undo and offscreen inspector controls are covered.
+The inspected UI capture shows both protection controls. Full regression: **1200 passed**,
+615 existing Qt deprecation warnings, 45.09 seconds. Ruff/configured mypy and changed-native
+function checks pass. Offscreen evidence does not render the 3D viewport. Production
+stacking scheduling, full-shell validation and release qualification remain incomplete.
+
 Native tissue stacking preparation now retains full material variables and exact CSR
 correspondence through crops, branches, envelopes and normal shells. Side extraction,
 world-space directions, participating faces, exact region/boundary rows and complete
 mesh assembly run in C++; shell backing remains unchanged. Canonical triangulation is
 retained when connectivity matches. Forty-five focused material/kernel/architecture tests,
 native build/CTest, changed-native function checks, Ruff and configured mypy pass.
-Structural Fiber-to-material pin preparation, full-shell independent validation and the
-coordinated application/desktop stacking workflow are still pending. This checkpoint is
+Structural Fiber-to-material pin preparation was completed in the subsequent checkpoint;
+full-shell independent validation and the coordinated application/desktop stacking workflow
+are still pending. This checkpoint is
 native integration evidence, not production stacking or release acceptance.
 
 The synchronous vector stacking numerical adapter is now compiled against pinned unchanged

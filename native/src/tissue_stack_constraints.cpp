@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "tissue_stacking.hpp"
+#include "material_pins.hpp"
 #include <set>
 
 namespace af::tissue::stacking {
@@ -36,6 +37,10 @@ static Row pin(const AfTissueStackSource& config,int row,int64_t count) {
 }
 void pack_constraints(Prepared& p,const AfTissueStackSource& config,uint64_t cancel) {
     boundary(p,cancel); regions(p,config,cancel);
+    const auto grids=material_grids(*p.base);
+    for(size_t i=0;i<p.base->material_pins.size();i+=material_pin_width) {
+        check_cancel(cancel); append_row(material_equation(*p.base,grids,p.base->material_pins.data()+i),p.constraints,p.constraint_weights);
+    }
     for(int i=0;i<config.pin_count;++i) {
         check_cancel(cancel); append_row(pin(config,i,p.base->vertices.rows()),p.constraints,p.constraint_weights);
     }

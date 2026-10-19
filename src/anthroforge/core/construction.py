@@ -40,6 +40,8 @@ class CurvePoint:
     tilt: float = 0.0
     id: str = field(default_factory=identity)
     junction: str = ""
+    stacking_fixed: bool = False
+    protected_crease: bool = False
 
     def __post_init__(self) -> None:
         for value in (self.position, self.left, self.right):
@@ -49,6 +51,8 @@ class CurvePoint:
             raise ValueError("Unknown Bézier handle mode.")
         if not isfinite(self.radius) or self.radius < 0 or not isfinite(self.tilt):
             raise ValueError("Curve radius must be nonnegative and radius/tilt finite.")
+        if type(self.stacking_fixed) is not bool or type(self.protected_crease) is not bool:
+            raise ValueError("Curve point protection flags must be Boolean.")
 
 
 @dataclass(frozen=True, slots=True)

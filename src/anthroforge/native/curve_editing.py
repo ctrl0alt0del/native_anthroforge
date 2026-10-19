@@ -12,6 +12,7 @@ from .construction import HANDLES, curve_records
 from .mesh import D, GeometryEngine, pointer
 
 FIELDS = ("position", "left", "right", "left_mode", "right_mode", "radius", "tilt")
+PROTECTION = frozenset(("stacking_fixed", "protected_crease"))
 
 
 def configure(engine: GeometryEngine) -> None:
@@ -19,12 +20,16 @@ def configure(engine: GeometryEngine) -> None:
 
 
 def point(engine: GeometryEngine, curve: Curve, index: int, options: dict[str, Any]) -> CurvePoint:
-    if set(options) - set(FIELDS):
+    if set(options) - set(FIELDS) - PROTECTION:
         raise ValueError("Unknown curve-point setting.")
+    if any(type(options[name]) is not bool for name in options.keys() & PROTECTION):
+        raise ValueError("Point protection settings require Boolean values.")
     old = curve.points[index]
     updated = replace(old, **options)
     if updated == old:
         return old
+    if not options.keys() & set(FIELDS):
+        return updated
     return evaluated_edit(engine, curve, index, updated, options)
 
 
@@ -36,7 +41,7 @@ def evaluated_edit(
     replacement = curve_records(replace(curve, points=points))[index]
     fields = sum(1 << bit for bit, name in enumerate(FIELDS) if name in options)
     apply_edit(engine, data, curve.closed, index, replacement, fields, output)
-    return unpack(curve.points[index], output)
+    return unpack(updated, output)
 
 
 def apply_edit(

@@ -9,6 +9,9 @@ from .mesh import INT64, D, GeometryEngine, Mesh, U, pointer
 
 
 def configure(engine: GeometryEngine) -> None:
+    from . import material_pins
+
+    material_pins.configure(engine)
     engine.bind("af_mesh_material_size", [U], c.c_int64)
     engine.bind("af_mesh_material_copy", [U, INT64, c.c_int64])
     engine.bind("af_mesh_with_material", [U, INT64, c.c_int64, D, c.c_int64, U], U)

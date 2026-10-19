@@ -41,6 +41,7 @@ static std::shared_ptr<Mesh> refine(const Mesh& mesh,const MaterialGrid& grid,in
     auto result=make_mesh(points,faces,cancel,true);
     result->material=grid_material(int(rows.size()),int(cols.size()),grid.closed_u,grid.closed_v);
     result->material_axes=rows; result->material_axes.insert(result->material_axes.end(),cols.begin(),cols.end());
+    result->material_pins=mesh.material_pins;
     return result;
 }
 }

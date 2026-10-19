@@ -25,7 +25,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/tissue_relaxation.cpp src/tissue_geometric.cpp src/tissue_static.cpp src/tissue_point_relaxation.cpp
     src/stacking.cpp src/tissue_stacking.cpp src/tissue_stack_material.cpp
     src/tissue_stack_directions.cpp src/tissue_stack_geometry.cpp src/tissue_stack_constraints.cpp
-    src/tissue_stack_assembly.cpp)
+    src/tissue_stack_assembly.cpp src/material_pins.cpp src/material_pin_equations.cpp src/surface_material_pins.cpp)
 
 add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_cubic_refit.c

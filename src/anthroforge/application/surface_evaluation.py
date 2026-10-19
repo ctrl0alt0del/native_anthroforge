@@ -6,9 +6,10 @@ from typing import Any
 
 from anthroforge.core.surfaces import Surface, SurfaceAlignment
 from anthroforge.native import curve_surfaces as native
+from anthroforge.native import material_pins
 from anthroforge.native.topology import finalize
 
-from . import consumed_paths, curve_sources
+from . import consumed_paths, curve_sources, surface_pins
 
 
 def settings(item: Surface) -> native.Settings:
@@ -74,8 +75,14 @@ def evaluate(engine: Any, document: Any, resources: Any, item: Surface, cancel: 
     if item.kind == "BRANCHED":
         mesh = surface_branch_evaluation.evaluate(engine, document, resources, item, cancel)
     else:
-        inputs = rows(engine, document, resources, item)
-        counts = item.across or (max(1, item.strips) - 1,) * (len(item.curves) - 1)
-        mesh = native.geometry(engine, inputs, counts, settings(item), cancel)
+        mesh = ordinary(engine, document, resources, item, cancel)
     previous = resources.meshes.get(item.result.asset)
     return finalize(mesh, previous.mesh if previous else None, cancel)
+
+
+def ordinary(engine: Any, document: Any, resources: Any, item: Surface, cancel: int) -> Any:
+    inputs = rows(engine, document, resources, item)
+    counts = item.across or (max(1, item.strips) - 1,) * (len(item.curves) - 1)
+    mesh = native.geometry(engine, inputs, counts, settings(item), cancel)
+    pins = surface_pins.points(document, resources, [use.curve for use in item.curves])
+    return material_pins.capture(mesh, inputs, pins, item.exact, cancel, across=counts)

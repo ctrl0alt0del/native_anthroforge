@@ -25,6 +25,14 @@ that entry retains the capture request and runs it against its own inputs when r
 Every execution owns separate immutable resources, including history/redo captures.
 This policy is shared by Anchor, Fiber and tissue-region creation/rebinding.
 
+Accepted surface meshes retain structural material pins from their accepted Curve/Fiber
+inputs. Native capture maps authored parameters to material chart coordinates (or exact
+patch barycentric rows); source refinement and ordinary transforms preserve this metadata.
+Stacking preparation resolves it to sparse exact displacement equations, retaining cropped
+hidden variables. It does not pin every contributing vertex. Schema-4 resource storage,
+history/checkpoints and native memory accounting own these records with the mesh. Point
+protection is separate from curve shape, so changing it never silently recaptures bindings.
+
 Routing derives obstacle roles from dependency ports and sends the accepted provider
 geometry to the existing native collision world. Empty accepted outputs remain dependencies
 but are filtered before collider indexing. Automatic source-consumer cycles are excluded;

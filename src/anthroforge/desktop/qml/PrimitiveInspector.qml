@@ -96,6 +96,8 @@ ColumnLayout {
         }
         NumericSetting { label: "Radius"; value: panel.point.radius === undefined ? 1 : panel.point.radius; onEdited: value => panel.pointSetting("radius",value) }
         NumericSetting { label: "Tilt · radians"; value: panel.point.tilt || 0; onEdited: value => panel.pointSetting("tilt",value) }
+        UiCheck { objectName: "pointStackingFixed"; text: "Keep fixed during stacking"; checked: panel.point.stacking_fixed || false; hint: "Retain this material location in surfaces built from this curve"; onClicked: panel.pointSetting("stacking_fixed",checked) }
+        UiCheck { objectName: "pointProtectedCrease"; text: "Protect crease"; checked: panel.point.protected_crease || false; hint: "Retain this structural point during tissue stacking"; onClicked: panel.pointSetting("protected_crease",checked) }
         RowLayout {
             UiButton { text: "Insert point"; onClicked: { const p=(panel.point.position || [0,0,0]).slice(); p[0]+=.1; authoring.edit("point.insert",{entity:panel.item.id,curve:panel.curve.id,index:pointChoice.currentIndex+1,point:{position:p}}); } }
             UiButton { text: "Remove point"; enabled: panel.points.length>(panel.curve.closed?3:2); onClicked: authoring.edit("point.remove",{entity:panel.item.id,curve:panel.curve.id,point:panel.point.id}) }

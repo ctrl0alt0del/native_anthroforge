@@ -3,7 +3,7 @@
 - Task branch: `codex/single-version-dist`
 - Integration branch: `main`
 - Starting revision: `7e1adb1`
-- Status: implementing workflow correction
+- Status: complete; validated workflow correction
 - Date: 2026-10-19, Europe/Bucharest
 
 ## Outcome
@@ -23,6 +23,9 @@ link to the installed latest build and explicitly identifies the historical layo
 
 ## Verification and delivery
 
-Validate the default output and temporary override without packaging or creating output
-folders; run repository checks. This changes delivery configuration, not application
-behavior, so rebuilding the executable is unnecessary. Preserve unrelated __init__.py.
+Validated the default path and temporary override by importing the packaging module;
+neither check created output folders. `tools/check.ps1` passes: 930 tests, three native
+CTests, Ruff/format, mypy, native analysis, function limits and native/numerical checks.
+Log: `build/single-version-dist-gate.log`. Existing Qt deprecation warnings remain.
+This changes delivery configuration, not application behavior, so no executable rebuild
+or new distribution was produced. The unrelated __init__.py remains untouched.

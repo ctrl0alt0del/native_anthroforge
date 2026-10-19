@@ -135,6 +135,18 @@ Seventeen focused branch/tissue/architecture checks pass, with native build/CTes
 configured mypy. New native branch adapters pass clang-tidy; newest envelope/refinement
 files still need that check. Envelope composition is integrated but donor composition
 fixtures and complete part/side desktop controls are next. No full increment acceptance.
+Part/side checkpoint: sixteen additional actual-addon envelope composition fixtures
+pass at 1e-10 with exact connectivity, including disabled sides and branched connectors.
+First profile initialization respects the amount in the same operation; profile/control
+reset and connector commands share validation and transactions. Full-QML offscreen
+checks exercise actual part/side selectors, mode changes and resets without warnings.
+Hidden GPU captures inspect branched envelopes and a zero side; the visible source
+membrane coincides with zero-height output, so source-overlay separation still needs
+release interaction review. These captures do not establish general anatomical quality.
+Full regression: **1058 passed**, 599 existing Qt deprecation warnings, 39.35 seconds.
+Configured mypy and Ruff pass; native envelope/refinement/parameters clang-tidy passes.
+Height smoothing, cropping, target-relative constraints, tissue-role Fiber integration,
+full stacking, complete editing, ownership review and release qualification remain pending.
 Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification

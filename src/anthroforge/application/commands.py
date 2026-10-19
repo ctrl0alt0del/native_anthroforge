@@ -33,6 +33,7 @@ from . import (
     surface_preview,
     surface_sources,
     tissue_operations,
+    tissue_part_operations,
     tissue_strategy_operations,
 )
 from . import control_operations as controls
@@ -43,6 +44,9 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "tissue.connector": tissue_part_operations.connector,
+    "tissue.profile.reset": tissue_part_operations.profile_reset,
+    "tissue.control.reset": tissue_part_operations.control_reset,
     "tissue.relaxation": tissue_strategy_operations.relaxation,
     "tissue.constraint.add": tissue_strategy_operations.constraint_add,
     "tissue.constraint.update": tissue_strategy_operations.constraint_update,

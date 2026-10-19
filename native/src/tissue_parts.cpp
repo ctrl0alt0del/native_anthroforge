@@ -51,16 +51,25 @@ static std::shared_ptr<Mesh> assemble(const Mesh& source,const std::vector<Mater
     result->tissue=tissue_identity(4,vertices.rows(),int64_t(source.offsets.size())-1); labels(result->tissue,grids);
     return result;
 }
-std::shared_ptr<Mesh> inflate_parts(const Mesh& source,const AfTissueInflation* settings,int count,const double* connectors,uint64_t cancel) {
+static bool inactive(const AfTissueInflation* settings,int count) {
+    for(int i=0;i<count;++i) if(settings[i].enabled) {
+        const auto& s=settings[i];
+        const bool nonzero=s.mode==2?std::any_of(s.profile,s.profile+4,[](double d){return d>0;}):s.amount>0;
+        if(nonzero) return false;
+    }
+    return true;
+}
+std::shared_ptr<Mesh> inflate_parts(const Mesh& source,const AfTissueInflation* settings,int count,const double* connectors,bool envelope,uint64_t cancel) {
     const auto grids=material_grids(source);
     if(count<1||grids.size()!=size_t(count)||!settings||!connectors) throw std::runtime_error("Every accepted material part needs settings.");
     const auto seams=connections(grids,connectors); auto values=evaluate_parts(source,grids,settings,cancel);
+    if(envelope&&inactive(settings,count)) return assemble(source,grids,values,cancel);
     share_displacements(source,grids,seams,values);
     connect_parts(grids,seams,values,(settings[0].reverse!=0)!=grid_reversed(source,grids[0]),cancel);
     return assemble(source,grids,values,cancel);
 }
 }
-uint64_t af_tissue_inflate_parts(uint64_t source,const AfTissueInflation* settings,int count,const double* connectors,uint64_t cancel) {
-    try { return af::retain(af::tissue::inflate_parts(*af::mesh(source),settings,count,connectors,cancel)); }
+uint64_t af_tissue_inflate_parts(uint64_t source,const AfTissueInflation* settings,int count,const double* connectors,int envelope,uint64_t cancel) {
+    try { return af::retain(af::tissue::inflate_parts(*af::mesh(source),settings,count,connectors,envelope!=0,cancel)); }
     catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

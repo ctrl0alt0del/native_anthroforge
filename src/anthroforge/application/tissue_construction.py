@@ -24,10 +24,10 @@ def construct(engine: Any, resources: Any, item: Any, cancel: int) -> Mesh:
 
 def muscle(mesh: Mesh, item: Any, cancel: int) -> Mesh:
     parts = active(item)
-    first = tissue_parts.evaluate(mesh, parts, "a", item.reverse, cancel)
+    first = tissue_parts.evaluate(mesh, parts, "a", item.reverse, cancel, item.both_sides)
     if not item.both_sides:
         return first
-    second = tissue_parts.evaluate(mesh, parts, "b", not item.reverse, cancel)
+    second = tissue_parts.evaluate(mesh, parts, "b", not item.reverse, cancel, True)
     return tissue_parts.compose(first, second, item.reverse, cancel)
 
 

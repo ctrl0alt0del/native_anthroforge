@@ -7,6 +7,7 @@ from tests.test_fiber_creation import bind
 from tests.test_junction_workflow import reference
 from tests.test_surface_branches import source_curves
 from tests.test_surface_workflow import surface
+from tests.test_tissue_workflow import assembly as ordinary
 from tests.test_tissue_workflow import mesh, roundtrip
 
 
@@ -78,3 +79,40 @@ def test_two_sides_have_distinct_settings_and_roundtrip(session, tmp_path):
     assert len(before) > session.assets[item.base_result.asset].mesh.counts[0]
     roundtrip(session, tmp_path / "envelope.anthroforge")
     np.testing.assert_array_equal(mesh(session, target), before)
+
+
+def test_profile_initializes_once_and_reset_is_undoable(session):
+    _, _, target = ordinary(session)
+    session.command(
+        "tissue.inflation", target=target, changes=dict(amount=0.08, mode="SECTION_PROFILE")
+    )
+    session.wait()
+    first = session.document.object(target).parts[0].a.inflation.profile
+    assert first.initialized and first.depths == (0.04, 0.08, 0.08, 0.04)
+    session.command(
+        "tissue.inflation", target=target, changes=dict(mode="DISTRIBUTED", amount=0.15)
+    )
+    session.command("tissue.inflation", target=target, changes=dict(mode="SECTION_PROFILE"))
+    assert session.document.object(target).parts[0].a.inflation.profile == first
+    reset_and_undo(session, target, first)
+
+
+def reset_and_undo(session, target, first):
+    session.command("tissue.profile.reset", target=target)
+    session.wait()
+    depths = session.document.object(target).parts[0].a.inflation.profile.depths
+    assert depths == (0.075, 0.15, 0.15, 0.075)
+    session.command("undo")
+    assert session.document.object(target).parts[0].a.inflation.profile == first
+
+
+def test_control_reset_and_connector_changes_use_accepted_part_without_source_mutation(session):
+    source, target, branch = branched_tissue(session)
+    before = session.document.object(source)
+    session.command("tissue.inflation", target=target, part=branch, changes=dict(mode="CTRL_POINT"))
+    session.command("tissue.control.reset", target=target, part=branch)
+    session.command("tissue.connector", target=target, part=branch, width=0.3, fullness=0.02)
+    session.wait()
+    item = session.document.object(target)
+    assert len(item.parts[1].a.inflation.control) == 3 and item.parts[1].connector_width == 0.3
+    assert item.result.status == "ready" and session.document.object(source) == before

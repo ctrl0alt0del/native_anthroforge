@@ -17,5 +17,5 @@ void share_displacements(const Mesh& source,const std::vector<MaterialGrid>& gri
 void connect_parts(const std::vector<MaterialGrid>& grids,const std::vector<Connection>& seams,std::vector<Points>& values,bool flip,uint64_t cancel);
 bool grid_reversed(const Mesh& source,const MaterialGrid& grid);
 Points inflate_prepared_grid(const Mesh& source,const MaterialGrid& grid,const AfTissueInflation& settings,const InflationWeights* weights,uint64_t cancel);
-std::shared_ptr<Mesh> inflate_parts(const Mesh& source,const AfTissueInflation* settings,int count,const double* connectors,uint64_t cancel);
+std::shared_ptr<Mesh> inflate_parts(const Mesh& source,const AfTissueInflation* settings,int count,const double* connectors,bool envelope,uint64_t cancel);
 }

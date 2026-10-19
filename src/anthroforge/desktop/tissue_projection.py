@@ -1,9 +1,10 @@
 """Tissue anatomy records share mesh presentation without becoming Construction entries."""
 
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 from anthroforge.application.object_frames import Frames
 from anthroforge.core import tissue_policy
+from anthroforge.core.tissue_parts import active
 from anthroforge.core.tissues import TissueVCP
 
 from .construction_projection import record as object_record
@@ -44,5 +45,5 @@ def metadata(item):
         source=item.source,
         classification=item.classification,
         color=item.color,
-        tissue_settings=asdict(item),
+        tissue_settings=asdict(replace(item, parts=active(item))),
     )

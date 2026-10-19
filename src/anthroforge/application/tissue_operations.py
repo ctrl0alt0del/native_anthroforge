@@ -49,7 +49,10 @@ def configure(session: Any, target: str, changes: dict[str, Any]) -> None:
     allowed = {"classification", "color", "both_sides", "reverse", "stacking", "resolution"}
     if set(changes) - allowed:
         raise ValueError("Unsupported tissue setting; use the dedicated strategy operation.")
-    if "resolution" in changes and changes["resolution"] != item.resolution:
+    if any(
+        key in changes and changes[key] != getattr(item, key)
+        for key in ("resolution", "both_sides")
+    ):
         from .construction_policy import require_topology_edit
 
         require_topology_edit(session.document, target)
@@ -62,15 +65,22 @@ def inflation(
     session: Any, target: str, changes: dict[str, Any], part: str = "main", side: str = "a"
 ) -> None:
     item = tissue(session, target)
-    active = tissue_parts.active(item)
-    if side not in ("a", "b") or part not in {p.id for p in active}:
-        raise ValueError("Choose an existing tissue part and side.")
-    edited = tuple(update_part(p, side, changes) if p.id == part else p for p in active)
-    parts = tissue_parts.installed(item, edited)
-    updated = replace(item, parts=parts)
+    updated = edited_parts(session, item, part, side, changes)
     tissue_policy.validate(updated, session.document.registry.records)
     require_inflation_topology(session, item, updated)
     object_operations.install(session, updated)
+
+
+def edited_parts(session: Any, item: TissueVCP, part: str, side: str, changes: Any) -> TissueVCP:
+    from .tissue_part_operations import initialize
+
+    active = tissue_parts.active(item)
+    if side not in ("a", "b") or part not in {p.id for p in active}:
+        raise ValueError("Choose an existing tissue part and side.")
+    changes = initialize(session, item, changes, part, side)
+    edited = tuple(update_part(p, side, changes) if p.id == part else p for p in active)
+    parts = tissue_parts.installed(item, edited)
+    return replace(item, parts=parts)
 
 
 def update_part(part: TissuePart, side: str, changes: dict[str, Any]) -> TissuePart:

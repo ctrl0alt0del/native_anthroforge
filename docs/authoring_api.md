@@ -468,3 +468,13 @@ branches before changing main source order or membership.
 junctions on an outer main boundary. Roots must be ordered, interior and nonoverlapping;
 closed/nested branches are rejected. `surface.branch.remove(target, branch)` preserves source
 curves. Making a branched consumer independent copies its complete source/junction assembly.
+
+### Planned 0.2.2 branch implementation: part and side operations
+
+`tissue.inflation(target, changes, part="main", side="a")` edits one accepted material
+part and side. Inactive mode settings remain authored. First Section Profile activation
+initializes from the effective amount unless explicit profile settings are supplied.
+`tissue.profile.reset` and `tissue.control.reset` accept the same target/part/side keys.
+`tissue.connector(target, part, width, fullness)` edits one branch connector. All use
+normal shared transactions and topology/capability validation. They are implemented on
+the 0.2.2 task branch; 0.2.2 release qualification is not complete.

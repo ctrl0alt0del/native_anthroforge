@@ -155,3 +155,13 @@ neighborhood at explicitly bound knots. This is not a clearance-radius calculati
 attachment contact, transforms and cancellation. Original pinned kernel provenance remains
 in `routing/sources.json`.
 
+
+## Two-sided tissue envelope composition
+
+`tests/fixtures/tissue/envelopes.json` contains sixteen outputs of the addon's production
+`_compose_closed_envelope_native`, with donor hashes and source cases. Reproduce with
+`tools/capture_tissue_envelopes.py` in background Blender 5.0.1. Both boundary choices,
+source flips, inactive sides and connectors match to 1e-10 with exact canonical faces.
+The adapter preserves zero-side suppression of branch connector construction and the
+donor's coincident-face compaction. Retained tissue material/side bindings must account
+for that compaction; raw output vertex IDs cannot imply stable material identities.

@@ -28,6 +28,9 @@ METADATA = frozenset(
         "rest_result",
         "intrinsic_result",
         "final_result",
+        "rest_material",
+        "intrinsic_material",
+        "final_material",
         "resolved_position",
         "resolved_frame",
     )

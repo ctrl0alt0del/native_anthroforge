@@ -27,4 +27,20 @@ def remapped(item: Any, mapping: dict[str, str]) -> Any:
         base_state=replace(
             item.base_state, parts=tuple(mapping.get(k, k) for k in item.base_state.parts)
         ),
+        **{name: remapped_material(getattr(item, name), mapping) for name in MATERIALS},
+    )
+
+
+MATERIALS = ("rest_material", "intrinsic_material", "final_material")
+
+
+def remapped_material(state: Any, mapping: dict[str, str]) -> Any:
+    if state is None:
+        return None
+    return replace(
+        state,
+        parts=tuple(replace(p, id=mapping.get(p.id, p.id)) for p in state.parts),
+        base_state=replace(
+            state.base_state, parts=tuple(mapping.get(k, k) for k in state.base_state.parts)
+        ),
     )

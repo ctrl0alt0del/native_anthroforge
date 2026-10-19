@@ -7,6 +7,7 @@ from .results import EvaluationResult
 from .tissue_base import TissueBaseState
 from .tissue_constraints import TissueConstraint, TissueField
 from .tissue_diagnostics import TissueDiagnostic
+from .tissue_material import TissueMaterialState
 from .tissue_settings import TissueCrop, TissuePart, TissueRelaxation
 
 
@@ -36,6 +37,9 @@ class TissueVCP(ObjectRecord):
     rest_result: EvaluationResult = field(default_factory=EvaluationResult)
     intrinsic_result: EvaluationResult = field(default_factory=EvaluationResult)
     final_result: EvaluationResult = field(default_factory=EvaluationResult)
+    rest_material: TissueMaterialState | None = None
+    intrinsic_material: TissueMaterialState | None = None
+    final_material: TissueMaterialState | None = None
 
     def __post_init__(self) -> None:
         ObjectRecord.__post_init__(self)

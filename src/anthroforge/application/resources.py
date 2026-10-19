@@ -18,6 +18,7 @@ from .assets import Asset
 from .attachment_assets import AttachmentAsset
 from .image_assets import ImageAsset
 from .path_assets import PathAsset
+from .tissue_material_resources import retain as retain_materials
 
 
 @dataclass
@@ -72,6 +73,7 @@ def references(entities: Iterable[SCP], objects: Iterable[Authored]) -> dict[str
     groups["bindings"] = {
         r.binding_asset for o in objects if isinstance(o, TissueVCP) for r in o.constraints
     }
+    retain_materials(objects, groups)
     return {key: values - {""} for key, values in groups.items()}
 
 

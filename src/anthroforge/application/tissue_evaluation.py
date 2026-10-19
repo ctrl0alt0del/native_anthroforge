@@ -8,7 +8,13 @@ from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import tissue_crop, topology
 from anthroforge.native.mesh import Mesh
 
-from . import tissue_construction, tissue_fields, tissue_relaxation, tissue_sources
+from . import (
+    tissue_construction,
+    tissue_fields,
+    tissue_materials,
+    tissue_relaxation,
+    tissue_sources,
+)
 from .tissue_output import TissueOutput
 
 
@@ -41,6 +47,7 @@ def uncropped(
 def intrinsic(
     engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int
 ) -> TissueOutput:
+    item = tissue_materials.effective(item)
     output = uncropped(engine, document, resources, item, cancel)
     if not item.crop.enabled:
         return output
@@ -67,6 +74,6 @@ def evaluate(
     item = document.object(target)
     if phase == "base":
         return tissue_sources.capture(engine, document, resources, item, cancel)
-    if phase == "intrinsic":
-        return intrinsic(engine, document, resources, item, cancel)
-    return EVALUATORS[phase](engine, document, resources, item, cancel)
+    evaluator = intrinsic if phase == "intrinsic" else EVALUATORS[phase]
+    output = evaluator(engine, document, resources, item, cancel)
+    return replace(output, material=tissue_materials.capture(engine, document, item, phase))

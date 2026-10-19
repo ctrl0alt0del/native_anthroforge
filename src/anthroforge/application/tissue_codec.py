@@ -63,6 +63,8 @@ def constraint(data: dict[str, Any]) -> TissueConstraint:
 
 
 def tissue(state: dict[str, Any]) -> TissueVCP:
+    from .tissue_material_codec import decode
+
     state["diagnostics"] = tuple(TissueDiagnostic(**row) for row in state.get("diagnostics", ()))
     state["base_state"] = TissueBaseState(**tuples(state.get("base_state", {})))
     state["parts"] = tuple(part(row) for row in state.get("parts", (dict(id="main"),)))
@@ -72,4 +74,6 @@ def tissue(state: dict[str, Any]) -> TissueVCP:
     state["constraints"] = tuple(constraint(row) for row in state.get("constraints", ()))
     for name in ("base_result", "rest_result", "intrinsic_result", "final_result"):
         state[name] = EvaluationResult(**result_fields(state.get(name, {})))
+    for name in ("rest_material", "intrinsic_material", "final_material"):
+        state[name] = decode(state.get(name))
     return TissueVCP(**state)

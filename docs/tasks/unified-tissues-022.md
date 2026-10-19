@@ -30,6 +30,14 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Accepted rest, intrinsic and final results now own immutable material provenance: geometry
+references, parts/sides, fields, constraints, cropping and frame. Manual authored edits do
+not reinterpret retained geometry. Schema-4 storage and resource reachability retain old
+material inputs while newer phases run; Make Independent remaps stable branch identities.
+Intrinsic construction uses its accepted rest settings. Full suite: **1223 passed**,
+1122 Qt deprecation warnings, 45.24 seconds. Ruff/configured mypy/function limits pass.
+This remains foundational work; coordinated production stacking is not yet enabled.
+
 Native stacking now separates candidate/order planning from solving selected targets against
 frozen accepted provider output. This avoids silently recalculating Manual providers. The
 separated path matches all fourteen actual-addon fixtures; missing/failed accepted providers,

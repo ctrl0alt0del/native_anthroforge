@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 
 from . import stacking_abi as abi
-from .mesh import INT64, U, GeometryEngine, pointer
+from .mesh import INT64, GeometryEngine, U, pointer
 
 
 class StackSession:

@@ -9,6 +9,7 @@ from anthroforge.core.tissues import TissueVCP
 
 from .assets import Asset
 from .evaluation_results import accepted_result
+from .tissue_materials import accepted as accepted_material
 from .tissue_output import TissueOutput
 
 
@@ -33,6 +34,7 @@ def publication(
     changes: dict[str, Any] = {phase + "_result": result}
     if output.base is not None:
         changes["base_state"] = output.base
+    changes.update(material_changes(output, phase, result.asset))
     if output.diagnostics is not None:
         changes["diagnostics"] = (
             *[d for d in current.diagnostics if d.stage != phase],
@@ -41,6 +43,12 @@ def publication(
     if phase in ("intrinsic", "final"):
         changes["result"] = replace(result, status="unstacked" if phase == "intrinsic" else "ready")
     return changes
+
+
+def material_changes(output: TissueOutput, phase: str, asset: str) -> dict[str, Any]:
+    if output.material is None:
+        return {}
+    return {phase + "_material": accepted_material(output.material, phase, asset)}
 
 
 def accept(document: Any, item: TissueVCP, phase: str, ports: Any, key: str) -> Any:

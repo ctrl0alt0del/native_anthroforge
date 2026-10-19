@@ -20,6 +20,7 @@ from . import (
 from .construction_policy import require_topology_edit
 from .object_removal import install as install_removal
 from .operations import require_name
+from .transform_policy import require_object_transform
 
 if TYPE_CHECKING:
     from .session import Session
@@ -72,6 +73,7 @@ def transform(session: "Session", target: str, values: list[float], world: bool 
     from anthroforge.native.construction import matrix
 
     item = editable(session, target)
+    require_object_transform(item)
     frame = session.engine.transform(values)
     if world:
         parent = curve_sources.world(session.engine, session.document, item.parent)

@@ -13,7 +13,7 @@ See the [construction walkthrough](construction_020.md) and
 | `curve.point.update` | `curve`, `point`, point/handle/radius/tilt fields | Shared point edit using native handle behavior. |
 | `object.inspect` | `target` | Typed authored construction record and consumer IDs. |
 | `object.rename` | `target`, `name` | Metadata edit without geometry scheduling. |
-| `object.transform` | `target`, nine TRS `values` | Ordinary local transform. |
+| `object.transform` | `target`, nine TRS `values` | Ordinary local transform; rejects whole-fiber transforms. |
 | `object.reparent` | `target`, optional `parent` | Preserves world placement and consumer placement. |
 | `object.delete` | `target` | Blocks referenced sources; preserves ordinary children. |
 | `primitive.from_curves` | ordered `curves`, `kind` BODY/LOFT, optional `parent`, `name`, `shape` | SCP ID with live curve references. |
@@ -374,6 +374,12 @@ capture_scope: "CURRENT_PARENT" | "ANY_PARENT"}`. Supply both open endpoints or
 at least one point on a closed curve. It returns the job identifier; completed creation
 appears in the Construction registry as `kind: "fiber"`. The source has no continuing
 reference to its copy. Invalid/incomplete bindings leave an ordinary curve unchanged.
+
+Direct `object.transform` on a Fiber is rejected before mutation. Use generic curve-point
+operations to shape fibers; their anatomical bindings and ordinary transform parenting
+remain supported. Desktop creation waits for an accepted object, exits component editing
+and selects the result unless the user has moved to a newer editing context. This selection
+intent does not change the headless command's job-ID result or its undo behavior.
 
 The accepted path follows captured anatomical surfaces through the common coordinator.
 Dense attachment fields are independently owned project resources; source edits cannot

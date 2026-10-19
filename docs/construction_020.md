@@ -63,6 +63,12 @@ Both open endpoints need bindings; a closed curve needs at least one chosen bind
 new fiber has new identities and remains independent of its source. A Fiber is a Curve with
 anatomical bindings and can be used by the same primitives and surface tools.
 
+After creation finishes, editing closes and the new fiber is selected. Whole-fiber
+Move/Rotate/Scale, their shortcuts, gizmos and numeric transform fields are disabled.
+Use **Edit Curve** and select points or handles to shape a fiber; their transform tools
+remain available. Fibers continue following their anatomical bindings. A failed or
+canceled creation preserves the source editing context.
+
 Authored-engine editing operates on the current resolved shape. Moving a bound point
 rebinds it in the same undo transaction. Choose Current parent or Any eligible parent;
 ordinary parent movement resolves the retained binding and does not switch parent choices.

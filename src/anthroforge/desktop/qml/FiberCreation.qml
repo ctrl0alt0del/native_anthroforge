@@ -13,7 +13,7 @@ ColumnLayout {
             const row=anchorRows.itemAt(i);
             if(row.bound) bindings.push({point:row.pointId,target:row.targetId});
         }
-        workspace.run("fiber.create",{curve:curve.id,bindings:bindings,name:fiberName.text});
+        workspace.createConstruction("fiber.create",{curve:curve.id,bindings:bindings,name:fiberName.text});
     }
     UiButton { id: expand; text: "Create fiber from curve"; checkable: true; Layout.fillWidth: true; enabled: !!panel.curve.id }
     ColumnLayout {

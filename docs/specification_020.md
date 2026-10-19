@@ -118,6 +118,14 @@ relationship. Open fibers require both endpoint bindings; closed fibers require 
 one chosen binding. Unbound drafts remain ordinary curves. Three geometric loop points
 do not mean three required anatomical attachments.
 
+In the desktop, successful curve-to-fiber creation exits component editing and selects
+the accepted fiber. Pending or failed creation does not select a missing object, and
+completion must not take over a newer selection or workspace. Fibers have no direct
+object translation, rotation or scale: the shared command policy rejects these changes,
+and keyboard, toolbar, numeric fields and gizmos reflect that restriction. Authored
+point/handle transforms, ordinary parenting and attachment-driven deformation remain
+available; this restriction does not make the entire fiber read-only.
+
 Use the shared attachment subsystem and qualified capture/resolve policy for structural
 bindings and interior deformation. Parent movement resolves existing bindings, never
 silently choosing new parents. Authored-engine editing shows the current resolved shape,

@@ -1,6 +1,7 @@
 """Incremental scene metadata, separate from authored definitions and render leases."""
 
 from anthroforge.application.dependencies import closure
+from anthroforge.application.transform_policy import object_reason
 from anthroforge.core.entities import descendants
 from anthroforge.core.results import Port, geometry_asset
 
@@ -131,10 +132,18 @@ class SceneProjection:
         controller = self.controller
         records = self.records | controller.construction.records
         controller.object_selection.retain(records)
-        self.selected.synchronize(records.get(controller.selection, {}))
+        self.selected.synchronize(selection_record(controller, records))
         if self.selection != tuple(controller.object_selection.items):
             self.selection = tuple(controller.object_selection.items)
             controller.selectionChanged.emit()
+
+
+def selection_record(controller, records):
+    row = records.get(controller.selection, {})
+    if not row:
+        return {}
+    reason = object_reason(controller.session.document.object(controller.selection))
+    return dict(row, transformable=not reason, transform_reason=reason)
 
 
 def initialize(controller):

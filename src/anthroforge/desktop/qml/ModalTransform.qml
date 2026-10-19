@@ -8,7 +8,7 @@ Item {
     readonly property bool active: gesture !== null
     visible: active
     function begin(mode) {
-        if(viewport.keyboard.blocked || !viewport.selected.id || viewport.selected.readonly) return;
+        if(viewport.keyboard.blocked || !viewport.transformAvailable) return;
         if(!active && viewport.transforming) return;
         if(active) workspace.rebaseTransform(mode);
         else if(!workspace.beginTransform(mode)) return;

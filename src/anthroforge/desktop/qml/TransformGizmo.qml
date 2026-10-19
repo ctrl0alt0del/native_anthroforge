@@ -10,7 +10,7 @@ Item {
     property var drag: null
     property string signature: ""
     readonly property bool dragging: drag !== null
-    visible: !viewport.measuring && workspace.state.handles && !!viewport.selected.id && !viewport.selected.readonly && !workspace.state.waiting && !viewport.insertionPreview && !viewport.modalTransforming
+    visible: !viewport.measuring && workspace.state.handles && viewport.transformAvailable && !viewport.insertionPreview && !viewport.modalTransforming
     function refresh() {
         if (!visible) return;
         const selected=viewport.selected, q=selected.quaternion || null;

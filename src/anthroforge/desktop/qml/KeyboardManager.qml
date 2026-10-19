@@ -8,6 +8,9 @@ Item {
     property bool blocked: false
     property bool transforming: false
     property bool snapping: false
+    property var capabilities: ({})
+    function capabilityEnabled(binding) { return !binding.capability || capabilities[binding.capability] === true; }
+    function commandEnabled(command) { return bindings.filter(binding=>binding.command===command).every(capabilityEnabled); }
     readonly property bool typing: !!window.activeFocusItem && window.activeFocusItem.selectByMouse !== undefined
     signal requested(string command)
     signal canceled()
@@ -53,9 +56,9 @@ Item {
         {command:"importMesh", key:"Ctrl+I", scope:"document"},
         {command:"undo", key:StandardKey.Undo}, {command:"redo", key:StandardKey.Redo},
         {command:"deleteSelection", key:"Delete"}, {command:"frame", key:"F"},
-        {command:"move", key:"W"}, {command:"rotate", key:"E"},
-        {command:"grab", key:"G", duringTransform:true}, {command:"turn", key:"R", duringTransform:true},
-        {command:"resize", key:"S", duringTransform:true},
+        {command:"move", key:"W", capability:"transform"}, {command:"rotate", key:"E", capability:"transform"},
+        {command:"grab", key:"G", duringTransform:true, capability:"transform"}, {command:"turn", key:"R", duringTransform:true, capability:"transform"},
+        {command:"resize", key:"S", duringTransform:true, capability:"transform"},
         {command:"viewX", key:"1", duringTransform:true, allowModifiers:true},
         {command:"viewY", key:"2", duringTransform:true, allowModifiers:true},
         {command:"viewZ", key:"3", duringTransform:true, allowModifiers:true},
@@ -75,7 +78,7 @@ Item {
             sequences: manager.sequences(modelData)
             context: modelData.allowBlocked ? Qt.ApplicationShortcut : Qt.WindowShortcut
             autoRepeat: false
-            enabled: (!manager.blocked || !!modelData.allowBlocked) && (!manager.typing || modelData.scope === "document" || !!modelData.allowTyping) && (!manager.transforming || !!modelData.duringTransform)
+            enabled: manager.capabilityEnabled(modelData) && (!manager.blocked || !!modelData.allowBlocked) && (!manager.typing || modelData.scope === "document" || !!modelData.allowTyping) && (!manager.transforming || !!modelData.duringTransform)
             onActivated: manager.requested(modelData.command)
         }
     }

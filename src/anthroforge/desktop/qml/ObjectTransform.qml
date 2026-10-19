@@ -5,6 +5,8 @@ import QtQuick.Layouts
 UiSection {
     id: editor
     required property var selected
+    objectName: "objectTransform"
+    enabled: !!selected.transformable && !selected.readonly && !workspace.state.waiting
     title: selected.parent ? "Local transform" : "Transform"
     function setGroup(group,values) {
         const transformed=selected.local_trs.slice();

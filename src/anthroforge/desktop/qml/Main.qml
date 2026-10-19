@@ -133,14 +133,19 @@ ApplicationWindow {
             Item {
                 Layout.fillWidth: true; Layout.fillHeight: true
                 Viewport { id: viewport; objectName: "viewport"; anchors.fill: parent; toolMode: window.activeTool; keyboard: keyboard; onImportRequested: importFile.open() }
-                Column {
-                    anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 10; spacing: 5
-                    Repeater {
-                        model: [{name:"Move",icon:"move",command:"grab"},{name:"Rotate",icon:"rotate",command:"turn"},{name:"Scale",icon:"scale",command:"resize"}]
-                        UiButton { required property var modelData; objectName: "tool"+modelData.name; width: 34; height: 34; glyph: modelData.icon; checkable: true; checked: window.activeTool === modelData.name && !workspace.drawingTools.state.active; hint: modelData.name+" gizmo · "+keyboard.shortcut(modelData.command)+": mouse transform"; onClicked: { workspace.drawingTools.cancel(); window.activeTool = modelData.name; } }
+                Item {
+                    anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 10
+                    width: viewportTools.width; height: viewportTools.height
+                    MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }
+                    Column {
+                        id: viewportTools; spacing: 5
+                        Repeater {
+                            model: [{name:"Move",icon:"move",command:"grab"},{name:"Rotate",icon:"rotate",command:"turn"},{name:"Scale",icon:"scale",command:"resize"}]
+                            UiButton { required property var modelData; objectName: "tool"+modelData.name; width: 34; height: 34; glyph: modelData.icon; enabled: viewport.transformAvailable; checkable: true; checked: enabled && window.activeTool === modelData.name && !workspace.drawingTools.state.active; hint: modelData.name+" gizmo · "+keyboard.shortcut(modelData.command)+": mouse transform"; onClicked: { workspace.drawingTools.cancel(); window.activeTool = modelData.name; } }
+                        }
+                        Rectangle { width: 34; height: 1; color: Theme.border }
+                        CurveToolbar { keyboard: window.keyboardManager }
                     }
-                    Rectangle { width: 34; height: 1; color: Theme.border }
-                    CurveToolbar { keyboard: window.keyboardManager }
                 }
             }
             Rectangle {
@@ -284,6 +289,7 @@ ApplicationWindow {
     DeleteDialog { id: deleteDialog }
     KeyboardManager {
         id: keyboard; window: window; blocked: window.modalOpen || workspace.state.waiting; transforming: viewport.transforming; snapping: viewport.snapping
+        capabilities: ({transform:viewport.transformAvailable})
         onRequested: command => window.dispatchShortcut(command)
         onCanceled: { viewport.cancelTransform(); workspace.drawingTools.clearStroke(); }
         onOffsetRequested: steps => viewport.surfaceOffset(steps)
@@ -306,6 +312,7 @@ ApplicationWindow {
         cancel: () => { workspace.inspectionTools.cancel(); workspace.imageTools.cancel(); workspace.drawingTools.cancel(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
     })
     function dispatchShortcut(command) {
+        if(!keyboard.commandEnabled(command)) return;
         const action = shortcutCommands[command];
         if (action) action();
     }

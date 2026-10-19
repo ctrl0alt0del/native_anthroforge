@@ -44,15 +44,33 @@ deletion/undo, persistence, cyclic consumers and preview staleness. Existing con
 fixture explicitly starts in MANUAL to preserve its original no-obstacle regression case.
 UI, native capture reuse/performance, broader lifecycle cases and release remain unfinished.
 
-## Recovery
-
 Native capture checkpoint: immutable collision worlds now have independent native leases
 and an engine-owned 64 MiB / 8-entry cache through shared bounded resource-cache machinery.
 Profiler observes capture/solve separately, cache actions and retained capture capacities.
 Native contract tests pass; 100-cube profile captures once (0.60 ms) across 8 solves
 (mean 72.34 ms versus prior uncached 72.64 ms). This establishes reuse, not a meaningful
 whole-solve speedup: numerical solving dominates this fixture. Reuse/eviction, concurrent
-solves, cancellation and parity with uncached routing pass. UI work is still pending.
+solves, cancellation and parity with uncached routing pass. Native style gate also passes.
+
+## Checkpoint: interaction implementation
+
+Implemented five viewport icons, semantic continue-placement modifier, plain-click finish,
+closed-draft protection and one-action undo. Added reusable incremental/proxy choice models
+and bounded virtualized/searchable editors, scoped bulk actions, locked required rows,
+hierarchy context, point focus, all-authored defaults, contextual obstacles and Advanced
+budgets. Removed redundant loft menu; generic surface API remains.
+
+Full-QML offscreen 120-point/120-obstacle editor checks pass, including defaults, required
+points, duplicate names, filtering, scroll retention, preview/accept and undo. Captures
+under `build/021-curve-workflows` inspected with real fonts. Software offscreen captures
+validate controls/layout, not Quick3D geometry. Routing editor and targeted gesture/model
+tests pass. Profiling exposed repeated candidate graph construction; descriptions now
+reuse structural graph identity. Measured obstacle binding inclusive total fell from
+127 ms to 64 ms across 38 refreshes in serial runs; not a general responsiveness claim.
+Full regression, lifecycle additions, hidden GPU geometry checks, packaging and release
+documentation remain pending. Versions are still 0.2.0 until qualification.
+
+## Recovery
 
 Preserve untracked root `__init__.py` and original
 `E:/development/WIP_models/solver_test.anthroforge`. Never use visible test windows or

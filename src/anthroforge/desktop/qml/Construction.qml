@@ -9,7 +9,6 @@ ColumnLayout {
     spacing: Theme.gap
     RowLayout {
         Label { text: "CONSTRUCTION"; color: Theme.muted; font.pixelSize: 11; Layout.fillWidth: true }
-        UiButton { glyph: "plus"; hint: "Create curves or place the 3D cursor"; onClicked: createMenu.open() }
         UiButton { text: "Image…"; hint: "Import a world reference image"; onClicked: imageFile.open() }
     }
     SurfacePreview {}
@@ -31,15 +30,4 @@ ColumnLayout {
         }
     }
     FileDialog { id: imageFile; title: "Import reference image"; nameFilters: ["Reference images (*.png *.jpg *.jpeg)"]; onAccepted: workspace.imageTools.importFile(selectedFile.toString(),false) }
-    UiMenu {
-        id: createMenu
-        UiMenuItem { text: "Add Curve at cursor"; onTriggered: workspace.drawingTools.addCurve() }
-        UiMenuItem { text: "Place curve points"; onTriggered: workspace.drawingTools.begin("POINTS") }
-        UiMenuItem { text: "Draw curves"; onTriggered: workspace.drawingTools.begin("DRAW") }
-        MenuSeparator {}
-        UiMenuItem { objectName: "createLoftSurface"; text: "Loft selected curves"; onTriggered: workspace.createSurface("LOFT") }
-        UiMenuItem { objectName: "createPatchSurface"; text: "Patch selected closed curve"; onTriggered: workspace.createSurface("PATCH") }
-        MenuSeparator {}
-        UiMenuItem { text: "3D cursor settings"; onTriggered: workspace.drawingTools.begin("CURSOR") }
-    }
 }

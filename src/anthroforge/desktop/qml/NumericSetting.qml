@@ -5,13 +5,14 @@ import QtQuick.Layouts
 RowLayout {
     id: setting
     property string label: ""
+    property string hint: ""
     property real value: 0
     property int decimals: 4
     property bool length: false
     readonly property real unitFactor: length ? workspace.state.unit_factor : 1
     signal edited(real value)
     Layout.fillWidth: true
-    Label { text: setting.label + (setting.length ? " · " + workspace.state.display_units : ""); color: Theme.muted; Layout.fillWidth: true; elide: Text.ElideRight; ToolTip.visible: labelHover.hovered; ToolTip.text: text; HoverHandler { id: labelHover } }
+    Label { text: setting.label + (setting.length ? " · " + workspace.state.display_units : ""); color: Theme.muted; Layout.fillWidth: true; elide: Text.ElideRight; ToolTip.visible: labelHover.hovered; ToolTip.text: setting.hint || text; HoverHandler { id: labelHover } }
     UiField {
         id: field; Layout.preferredWidth: 100; selectByMouse: true
         Accessible.name: setting.label

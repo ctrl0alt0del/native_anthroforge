@@ -19,6 +19,7 @@ from .inspection_tools import InspectionTools
 from .issue_panel import IssuePanel
 from .models import RenderModel
 from .object_selection import ObjectSelection
+from .routing_choices import RoutingChoices
 
 
 class Controller(QObject):
@@ -57,6 +58,7 @@ class Controller(QObject):
         self.inspection_tools = InspectionTools(self)
         self.image_tools = ImageTools(self)
         self.drawing_tools = DrawingTools(self)
+        self.routing_choices = RoutingChoices()
         self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
 
     def memory_owners(self, owners):
@@ -250,6 +252,22 @@ class Controller(QObject):
             for item in self.session.document.entities
             if geometry_asset(item)
         ]
+
+    @Slot(QObject, result=QObject)
+    def createChoiceModel(self, owner):
+        from .choice_model import ChoiceModel
+
+        return ChoiceModel(owner)
+
+    @Slot(str, result="QVariantList")
+    def conversionPoints(self, key):
+        from .routing_choices import point_rows
+
+        return point_rows(self.session.document, key)
+
+    @Slot(str, "QVariantMap", result="QVariantList")
+    def routingChoices(self, key, settings):
+        return self.routing_choices.rows(self.session.document, key, settings)
 
     @Property("QVariantMap", notify=metricsChanged)
     def metrics(self):

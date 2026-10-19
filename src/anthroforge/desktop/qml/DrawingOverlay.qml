@@ -52,7 +52,9 @@ Item {
         function update(mouse,press) {
             viewport.pointerPosition=Qt.point(mouse.x,mouse.y);
             const ray=viewport.worldRay(mouse.x,mouse.y), normal=viewport.worldRay(width/2,height/2).direction;
-            overlay.tool.pointer(ray.origin.concat(ray.direction,[mouse.x,mouse.y,overlay.tool.state.options.radius]),normal,press);
+            const values=ray.origin.concat(ray.direction,[mouse.x,mouse.y,overlay.tool.state.options.radius]);
+            if(press) overlay.tool.click(values,normal,viewport.keyboard.matches("continuePlacement",mouse.modifiers));
+            else overlay.tool.pointer(values,normal,false);
         }
         onPressed: mouse => { viewport.forceActiveFocus(); update(mouse,true); }
         onPositionChanged: mouse => update(mouse,false)

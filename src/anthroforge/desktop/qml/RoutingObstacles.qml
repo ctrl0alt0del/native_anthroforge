@@ -1,38 +1,45 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "RoutingOptions.js" as RoutingOptions
 
 ColumnLayout {
     id: panel
     required property var curve
-    property var selected: []
-    property string checkboxName: "routingObstacle"
-    readonly property var automatic: [...new Set((curve.supports || []).concat((curve.bindings || []).map(b=>b.target)))]
-    readonly property var effective: [...new Set(selected.concat(automatic))]
-    readonly property var surfaces: { const revision=workspace.state.revision; return workspace.anatomicalSurfaces(); }
-    signal edited(var values)
+    property var settings: ({obstacle_mode:"AUTO", excluded_obstacles:[], obstacles:[]})
+    property string editorName: "routingObstacle"
+    readonly property bool automatic: (settings.obstacle_mode || "AUTO")==="AUTO"
+    readonly property var options: RoutingOptions.copy(settings)
+    readonly property var rows: { const revision=workspace.state.revision; return workspace.routingChoices(curve.id || "",options); }
+    signal edited(var settings)
     Layout.fillWidth: true; spacing: Theme.gap
-    UiButton { id: expand; objectName: panel.checkboxName+"Toggle"; text: "Routing obstacles · "+panel.effective.length; checkable: true; Layout.fillWidth: true }
-    Label {
-        objectName: panel.checkboxName+"Notice"
-        visible: panel.effective.length===0
-        text: "No obstacles selected. The path ignores SCP geometry."
-        color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true
+    function update(values) {
+        const editable=rows.filter(r=>!r.locked).map(r=>r.key);
+        const changes=RoutingOptions.copy(settings);
+        changes[automatic ? "excluded_obstacles" : "obstacles"]=values.filter(key=>editable.includes(key));
+        panel.edited(changes);
     }
-    ColumnLayout {
-        visible: expand.checked; Layout.fillWidth: true
-        Label { text: "Choose surfaces to avoid. Fiber attachment surfaces are automatic."; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-        Repeater {
-            model: panel.surfaces
-            UiCheck {
-                required property var modelData
-                objectName: panel.checkboxName
-                property string targetId: modelData.id
-                readonly property bool automatic: panel.automatic.includes(targetId)
-                text: modelData.name+(automatic ? " · attachment" : "")
-                checked: panel.effective.includes(targetId); enabled: !automatic
-                onClicked: panel.edited(checked ? panel.selected.concat([targetId]) : panel.selected.filter(key=>key!==targetId))
-            }
-        }
+    UiCombo {
+        objectName: panel.editorName+"Mode"; Layout.fillWidth: true
+        model: ["Automatic obstacles","Manual obstacle list"]
+        currentIndex: panel.automatic ? 0 : 1
+        hint: "Automatic considers all SCP surfaces, independent of visibility and workspace. Optional exclusions are below."
+        onActivated: panel.edited(Object.assign({},panel.options,{obstacle_mode:currentIndex===0 ? "AUTO" : "MANUAL"}))
+    }
+    ChoiceEditor {
+        objectName: panel.editorName; rows: panel.rows
+        title: panel.automatic ? "Obstacle exclusions" : "Obstacle selection"
+        chosenLabel: panel.automatic ? "Excluded" : "Included"; otherLabel: panel.automatic ? "Included" : "Excluded"
+        chooseLabel: panel.automatic ? "Exclude shown" : "Include shown"; clearLabel: panel.automatic ? "Restore shown" : "Exclude shown"
+        resetLabel: panel.automatic ? "Restore automatic obstacles" : "Clear manual selection"
+        summary: panel.automatic ? (choices.counts.total-choices.counts.chosen)+" included · "+choices.counts.chosen+" excluded" : choices.counts.chosen+" / "+choices.counts.total+" included"
+        onEdited: values=>panel.update(values)
+        onResetRequested: panel.update([])
+    }
+    Label {
+        objectName: panel.editorName+"Notice"
+        visible: !panel.automatic && !panel.rows.some(r=>r.chosen)
+        text: "No obstacles included. The path ignores SCP geometry."
+        color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true
     }
 }

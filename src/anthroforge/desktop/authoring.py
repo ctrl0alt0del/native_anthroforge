@@ -208,6 +208,21 @@ class Authoring(QObject):
             self.selection.append(key)
         self.notify()
 
+    @Slot(str, str)
+    def focusCurvePoint(self, curve, point):
+        row = next(
+            (
+                r
+                for r in self._component_rows
+                if r.get("curve") == curve
+                and r.get("point") == point
+                and r.get("part") == "position"
+            ),
+            None,
+        )
+        if row is not None:
+            self.selectComponent(row["key"], False)
+
     @Slot("QVariantList", "QVariantList", float, int, bool, bool, result=bool)
     def pick(self, origin, direction, radius, depth, select, extend):
         if (

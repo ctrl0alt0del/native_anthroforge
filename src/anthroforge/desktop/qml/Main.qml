@@ -132,8 +132,10 @@ ApplicationWindow {
                     anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 10; spacing: 5
                     Repeater {
                         model: [{name:"Move",icon:"move",command:"grab"},{name:"Rotate",icon:"rotate",command:"turn"},{name:"Scale",icon:"scale",command:"resize"}]
-                        UiButton { required property var modelData; objectName: "tool"+modelData.name; width: 34; height: 34; glyph: modelData.icon; checkable: true; checked: window.activeTool === modelData.name; hint: modelData.name+" gizmo · "+keyboard.shortcut(modelData.command)+": mouse transform"; onClicked: window.activeTool = modelData.name }
+                        UiButton { required property var modelData; objectName: "tool"+modelData.name; width: 34; height: 34; glyph: modelData.icon; checkable: true; checked: window.activeTool === modelData.name && !workspace.drawingTools.state.active; hint: modelData.name+" gizmo · "+keyboard.shortcut(modelData.command)+": mouse transform"; onClicked: { workspace.drawingTools.cancel(); window.activeTool = modelData.name; } }
                     }
+                    Rectangle { width: 34; height: 1; color: Theme.border }
+                    CurveToolbar { keyboard: window.keyboardManager }
                 }
             }
             Rectangle {
@@ -159,7 +161,7 @@ ApplicationWindow {
                 UiScrollView {
                     id: drawingSettings; visible: workspace.drawingTools.state.active
                     Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; contentWidth: availableWidth
-                    DrawingSettings { width: drawingSettings.availableWidth }
+                    DrawingSettings { width: drawingSettings.availableWidth; keyboard: window.keyboardManager }
                 }
             }
         }

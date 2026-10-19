@@ -42,7 +42,7 @@ def action(engine, name, signal):
 
 def create(controller, engine):
     keys = sources(controller)
-    action(engine, "createLoftSurface", "triggered")
+    controller.createSurface("LOFT")  # Generic surface API remains; redundant menu was retired.
     settle(controller)
     surface = next(o for o in controller.session.document.objects if isinstance(o, Surface))
     controller.select(surface.id)

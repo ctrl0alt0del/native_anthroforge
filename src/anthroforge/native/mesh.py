@@ -34,7 +34,7 @@ class GeometryEngine(NativeEngine):
         self._query_signatures()
         self._construction_signatures()
         self.bases = BaseCache()
-        self.routing_scenes: ResourceCache["RoutingScene"] = ResourceCache(
+        self.routing_scenes: ResourceCache[RoutingScene] = ResourceCache(
             64 * 1024 * 1024, 8, "routing_scene"
         )
         self.resource_observer: Any = None

@@ -34,13 +34,21 @@ static Route remapped(const Route& points,const std::vector<size_t>& pins,const 
     for(int64_t pin:reference.pins) result[pin]=reference.points[pin];
     return result;
 }
-bool warm_start(const Input& input,const Reference& reference,std::vector<Span>& spans,uint64_t handle) {
+static std::vector<Route> routes(const Route& points,const Reference& reference) {
+    std::vector<Route> result;
+    for(size_t i=1;i<reference.pins.size();++i)
+        result.emplace_back(points.begin()+reference.pins[i-1],points.begin()+reference.pins[i]+1);
+    return result;
+}
+bool warm_start(const Input& input,World& world,const Reference& reference,std::vector<Span>& spans,uint64_t handle) {
     if(!handle) return false;
     const auto previous=path(handle);
     if(previous->closed!=bool(input.options.closed)) return false;
     const auto pins=prior_pins(input,*previous);
     if(pins.size()!=reference.pins.size()) return false;
     auto points=remapped(world_points(input,*previous),pins,reference,input.cancel);
+    // SQP can restore clearance, but a seed crossing solid interiors needs a new corridor.
+    if(!valid_handoff(routes(points,reference),input,world,false)) return false;
     if(input.options.closed) spans.front().seed=std::move(points);
     else for(size_t i=0;i<spans.size();++i)
         spans[i].seed.assign(points.begin()+reference.pins[i],points.begin()+reference.pins[i+1]+1);

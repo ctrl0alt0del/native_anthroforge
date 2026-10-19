@@ -18,7 +18,7 @@ struct Input {
     const double* records;
     int count;
     M4 world,inverse;
-    const int* owners;
+    std::vector<int> owners;
     AfRoutingOptions options;
     uint64_t cancel;
 };
@@ -38,7 +38,7 @@ World capture_world(const uint64_t* handles,const double* matrices,int count,dou
 World capture_collision_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel);
 Reference reference(const Input& input);
 std::vector<Span> spans(const Input& input,World& world,const Reference& reference);
-bool warm_start(const Input& input,const Reference& reference,std::vector<Span>& spans,uint64_t handle);
-void solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double* measures);
+bool warm_start(const Input& input,World& world,const Reference& reference,std::vector<Span>& spans,uint64_t handle);
+bool solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double* measures);
 EvaluatedPath result(const Input& input,const Reference& reference,const std::vector<Span>& spans);
 }

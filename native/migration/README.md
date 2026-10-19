@@ -64,6 +64,21 @@ factory-startup Blender and does not save or modify the source. Reproduce with
 `capture_skull_routing_reference.py`. These fixtures establish those cases, not unrestricted
 anatomical route correctness or complete release acceptance.
 
+## Standalone routing contact and continuation corrections
+
+The `solver_test.anthroforge` regression is captured compactly in
+`tests/fixtures/routing/surface_pins.json`, including its source hash and accepted warm
+path. Unbound ordinary curve knots may touch explicitly selected surfaces. Native nearest
+queries classify only contacts within the captured world's numerical floor, independently
+of anatomical bindings; explicit owners remain authoritative. This extends the addon
+adapter to the first-class curve contract without modifying its pinned numerical kernels.
+
+Warm seeds crossing solid interiors are replanned. This check permits recoverable clearance
+deficits and retains localized contact exemptions; the solver still enforces its clearance
+policy. A warm solve reported infeasible receives one cold planning attempt. Existing addon
+cold/warm fixtures remain unchanged and pass. The new user case additionally checks actual
+intersections; numerical parity alone does not establish collision clearance.
+
 ## Accepted authored-fiber collision checks
 
 `path_collisions.cpp` uses the pinned routing collision-world, segment-triangle distance and

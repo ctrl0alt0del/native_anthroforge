@@ -48,10 +48,10 @@ static bool instance_clear(const Handoff& path,const kernel::AfInstance& item,co
     }
     return true;
 }
-bool valid_handoff(const std::vector<Route>& routes,const Input& input,World& world) {
+bool valid_handoff(const std::vector<Route>& routes,const Input& input,World& world,bool clearance) {
     if(routes.empty()) return false;
     auto path=joined(routes,input.options.closed); contacts(path,input);
-    const double threshold=std::max(0.0,input.options.radius-world.slack);
+    const double threshold=clearance?std::max(0.0,input.options.radius-world.slack):0.0;
     for(const auto& item:world.collision->items)
         if(!instance_clear(path,item,input,threshold)) return false;
     return true;

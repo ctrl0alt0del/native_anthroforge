@@ -93,7 +93,7 @@ static void report(const std::vector<kernel::AfV3SqpJob>& jobs,int64_t* counters
         measures[4]=std::max(measures[4],r.elapsed_ms);
     }
 }
-void solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double* measures) {
+bool solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double* measures) {
     std::vector<kernel::AfV3SqpJob> jobs; for(auto& span:spans) jobs.push_back(job(span));
     synchronize_owner_span(jobs); const int cap=input.options.accepted_steps;
     ControllerHandle controller(static_cast<kernel::AfV3SqpCoordinator*>(kernel::af_v3_native_sqp_begin(
@@ -106,6 +106,6 @@ void solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double*
             throw std::runtime_error("Routing controller failed.");
     }
     report(jobs,counters,measures);
-    if(infeasible) throw std::runtime_error("Routing could not find a collision-free path.");
+    return !infeasible;
 }
 }

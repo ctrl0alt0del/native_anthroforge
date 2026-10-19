@@ -6,7 +6,7 @@ from zipfile import ZipFile
 import numpy as np
 from PIL import Image
 
-KINDS = ("curve", "curve", "fiber", "fiber", "surface", "reference_image")
+KINDS = ("curve", "curve", "fiber", "fiber", "membrane", "reference_image")
 
 
 def construction(executable, cwd, invoke):

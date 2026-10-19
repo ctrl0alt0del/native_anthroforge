@@ -603,3 +603,12 @@ workspace, selection, edit-mode and undo-epoch changes invalidate the intent. It
 publishes geometry or changes scheduling/history; failure/cancellation leaves editing
 context intact. Viewport toolbar containers consume unused pointer events so disabled
 controls cannot accidentally select geometry behind them.
+# Publication barriers (0.2.2 task branch)
+
+Accepted-output notifications traverse aliases to the next registered evaluator, then stop.
+That evaluator's publication controls further propagation. This lets unchanged final tissue
+geometry suppress downstream work even when candidate plans change. Authored invalidation
+remains transitive; failure publications notify consumers through the same boundary. Candidate
+observations remain separate from anatomical prerequisites. Tests cover creating supported
+fibers after their tissue support exists, which previously caused a plan/path feedback loop.
+

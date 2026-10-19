@@ -37,7 +37,7 @@ def schedule(session: Any, targets: set[str], explicit: bool = False) -> None:
 
 def propagate(session: Any, seeds: set[Port]) -> None:
     graph = dependencies.graph(session.document)
-    outputs = dependencies.closure(dependencies.reverse(graph), seeds) - seeds
+    outputs = dependencies.frontier(dependencies.reverse(graph), seeds, producers(session.document))
     waiting = set().union(*(j.provides for j in session.scheduler.active_jobs if j.future is None))
     outputs -= waiting
     for role, family in FAMILIES:
@@ -45,3 +45,9 @@ def propagate(session: Any, seeds: set[Port]) -> None:
     targets = {p.owner for p in outputs if p.output == "geometry"}
     geometry_outputs.pending(session, targets)
     construction_tasks.schedule(session, targets)
+
+
+def producers(document: Any) -> set[Port]:
+    roles = set().union(*(role for role, _ in FAMILIES))
+    result = {port for port in dependencies.graph(document) if port.output in roles}
+    return result | {Port(item.id, "geometry") for item in geometry_outputs.items(document)}

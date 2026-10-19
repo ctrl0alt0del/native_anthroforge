@@ -88,9 +88,21 @@ def register(session: Any, output: TissueOutput, phase: str) -> str:
 
 
 def fail(session: Any, target: str, phase: str, error: str) -> None:
+    from anthroforge.core.results import Port
+
+    from .output_tasks import propagate
+
     item = session.document.registry.authored.get(target)
     if not isinstance(item, TissueVCP):
         return
+    previous = getattr(item, phase + "_result")
+    if previous.status == "failed" and previous.error == error:
+        return
+    install(session, failed(item, phase, error))
+    propagate(session, {Port(target, phase)})
+
+
+def failed(item: TissueVCP, phase: str, error: str) -> TissueVCP:
     result = replace(getattr(item, phase + "_result"), status="failed", error=error)
     fallback = (
         phase == "final"
@@ -99,7 +111,7 @@ def fail(session: Any, target: str, phase: str, error: str) -> None:
     )
     source = item.intrinsic_result if fallback else item.result
     display = replace(source, status="unstacked" if fallback else "failed", error=error)
-    install(session, replace(item, **{phase + "_result": result, "result": display}))
+    return replace(item, **{phase + "_result": result, "result": display})
 
 
 def pending(item: TissueVCP, phases: set[str]) -> TissueVCP:

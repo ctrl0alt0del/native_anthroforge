@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "anthroforge/mesh_quality.h"
+#include "stacking_internal.hpp"
 
 namespace af::quality {
 using namespace stacking;

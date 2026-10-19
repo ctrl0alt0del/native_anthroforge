@@ -27,6 +27,21 @@ def closure[T](graph: Mapping[T, Set[T]], seeds: Set[T]) -> set[T]:
     return found
 
 
+def frontier[T](graph: Mapping[T, Set[T]], seeds: Set[T], barriers: Set[T]) -> set[T]:
+    """Stop publication fan-out at outputs that must evaluate before notifying consumers."""
+    found, seen, queue = set(), set(seeds), deque(seeds)
+    while queue:
+        for node in graph.get(queue.popleft(), ()):
+            if node in seen:
+                continue
+            seen.add(node)
+            if node in barriers:
+                found.add(node)
+            else:
+                queue.append(node)
+    return found
+
+
 def blocked(graph: index.Edges) -> frozenset[Port]:
     return (
         graph.blocked

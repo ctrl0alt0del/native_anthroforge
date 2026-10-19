@@ -1,0 +1,432 @@
+[
+  {
+    "operation": "import",
+    "arguments": {
+      "path": "examples/primitives/cube.obj",
+      "units": 1,
+      "name": "Skeletal support"
+    },
+    "id": "support"
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "curve.create",
+    "arguments": {
+      "name": "Layer 1 source 1",
+      "engine": "POLYLINE",
+      "points": [
+        {
+          "id": "curve0_0_0",
+          "position": [
+            -0.4,
+            0.3,
+            0.7
+          ]
+        },
+        {
+          "id": "curve0_0_1",
+          "position": [
+            0,
+            0.3,
+            0.7
+          ]
+        },
+        {
+          "id": "curve0_0_2",
+          "position": [
+            0.4,
+            0.3,
+            0.7
+          ]
+        }
+      ]
+    },
+    "id": "curve0_0"
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "fiber.create",
+    "arguments": {
+      "curve": "$curve0_0",
+      "name": "Layer 1 fiber 1",
+      "bindings": [
+        {
+          "point": "curve0_0_0",
+          "target": "$support.entity_id"
+        },
+        {
+          "point": "curve0_0_2",
+          "target": "$support.entity_id"
+        }
+      ]
+    }
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "curve.create",
+    "arguments": {
+      "name": "Layer 1 source 2",
+      "engine": "POLYLINE",
+      "points": [
+        {
+          "id": "curve0_1_0",
+          "position": [
+            -0.4,
+            -0.3,
+            0.7
+          ]
+        },
+        {
+          "id": "curve0_1_1",
+          "position": [
+            0,
+            -0.3,
+            0.7
+          ]
+        },
+        {
+          "id": "curve0_1_2",
+          "position": [
+            0.4,
+            -0.3,
+            0.7
+          ]
+        }
+      ]
+    },
+    "id": "curve0_1"
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "fiber.create",
+    "arguments": {
+      "curve": "$curve0_1",
+      "name": "Layer 1 fiber 2",
+      "bindings": [
+        {
+          "point": "curve0_1_0",
+          "target": "$support.entity_id"
+        },
+        {
+          "point": "curve0_1_2",
+          "target": "$support.entity_id"
+        }
+      ]
+    }
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "inspect",
+    "arguments": {},
+    "id": "fibers0"
+  },
+  {
+    "operation": "surface.create",
+    "arguments": {
+      "curves": [
+        "$fibers0.objects.1.state.id",
+        "$fibers0.objects.3.state.id"
+      ],
+      "name": "Layer 1 membrane",
+      "strips": 6
+    }
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "inspect",
+    "arguments": {},
+    "id": "base0"
+  },
+  {
+    "operation": "tissue.create",
+    "arguments": {
+      "source": "$base0.objects.4.state.id",
+      "name": "Layer 1",
+      "preset": "MUSCLE"
+    },
+    "id": "tissue0"
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "tissue.configure",
+    "arguments": {
+      "target": "$tissue0",
+      "changes": {
+        "color": "#5b91bc"
+      }
+    }
+  },
+  {
+    "operation": "curve.create",
+    "arguments": {
+      "name": "Layer 2 source 1",
+      "engine": "POLYLINE",
+      "points": [
+        {
+          "id": "curve1_0_0",
+          "position": [
+            -0.4,
+            0.3,
+            0.71
+          ]
+        },
+        {
+          "id": "curve1_0_1",
+          "position": [
+            0,
+            0.3,
+            0.71
+          ]
+        },
+        {
+          "id": "curve1_0_2",
+          "position": [
+            0.4,
+            0.3,
+            0.71
+          ]
+        }
+      ]
+    },
+    "id": "curve1_0"
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "fiber.create",
+    "arguments": {
+      "curve": "$curve1_0",
+      "name": "Layer 2 fiber 1",
+      "bindings": [
+        {
+          "point": "curve1_0_0",
+          "target": "$support.entity_id"
+        },
+        {
+          "point": "curve1_0_2",
+          "target": "$support.entity_id"
+        }
+      ]
+    }
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "curve.create",
+    "arguments": {
+      "name": "Layer 2 source 2",
+      "engine": "POLYLINE",
+      "points": [
+        {
+          "id": "curve1_1_0",
+          "position": [
+            -0.4,
+            -0.3,
+            0.71
+          ]
+        },
+        {
+          "id": "curve1_1_1",
+          "position": [
+            0,
+            -0.3,
+            0.71
+          ]
+        },
+        {
+          "id": "curve1_1_2",
+          "position": [
+            0.4,
+            -0.3,
+            0.71
+          ]
+        }
+      ]
+    },
+    "id": "curve1_1"
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "fiber.create",
+    "arguments": {
+      "curve": "$curve1_1",
+      "name": "Layer 2 fiber 2",
+      "bindings": [
+        {
+          "point": "curve1_1_0",
+          "target": "$support.entity_id"
+        },
+        {
+          "point": "curve1_1_2",
+          "target": "$support.entity_id"
+        }
+      ]
+    }
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "inspect",
+    "arguments": {},
+    "id": "fibers1"
+  },
+  {
+    "operation": "surface.create",
+    "arguments": {
+      "curves": [
+        "$fibers1.objects.7.state.id",
+        "$fibers1.objects.9.state.id"
+      ],
+      "name": "Layer 2 membrane",
+      "strips": 6
+    }
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "inspect",
+    "arguments": {},
+    "id": "base1"
+  },
+  {
+    "operation": "tissue.create",
+    "arguments": {
+      "source": "$base1.objects.10.state.id",
+      "name": "Layer 2",
+      "preset": "MUSCLE"
+    },
+    "id": "tissue1"
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "tissue.configure",
+    "arguments": {
+      "target": "$tissue1",
+      "changes": {
+        "color": "#c98668"
+      }
+    }
+  },
+  {
+    "operation": "tissue.create",
+    "arguments": {
+      "source": "$fibers0.objects.1.state.id",
+      "name": "Fiber rim",
+      "preset": "RIM"
+    },
+    "id": "rim"
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "construction.point.create",
+    "arguments": {
+      "name": "Point above layers",
+      "position": [
+        0,
+        0,
+        0.78
+      ]
+    },
+    "id": "point"
+  },
+  {
+    "operation": "anchor.create",
+    "arguments": {
+      "source": "$point",
+      "parent": "$tissue1",
+      "role": "TISSUE_FINAL",
+      "name": "Anchor on final tissue"
+    },
+    "id": "anchor"
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "tissue.create",
+    "arguments": {
+      "source": "$anchor.object_id",
+      "name": "Anchored bulk",
+      "preset": "CLOSED_BULK"
+    },
+    "id": "bulk"
+  },
+  {
+    "operation": "tissue.inflation",
+    "arguments": {
+      "target": "$bulk",
+      "changes": {
+        "amount": 0.04
+      }
+    }
+  },
+  {
+    "operation": "wait",
+    "arguments": {}
+  },
+  {
+    "operation": "workspace.update",
+    "arguments": {
+      "camera": [
+        0,
+        0,
+        0.65,
+        -20,
+        25,
+        0,
+        2
+      ],
+      "orthographic": true
+    }
+  },
+  {
+    "operation": "save",
+    "arguments": {
+      "path": "tissues.anthroforge",
+      "blocked_policy": "wait"
+    }
+  },
+  {
+    "operation": "inspect",
+    "arguments": {}
+  }
+]

@@ -30,6 +30,20 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+The new executable example exposed a publication feedback loop that the original parallel
+source-creation fixture missed: a second Fiber captures support on an existing Tissue, and
+its consumer becomes a stacking candidate. Publishing the first Tissue's plan previously
+scheduled that Fiber through the final-output barrier even when final geometry was unchanged.
+The reproduction made 973 jobs/1,050 document revisions in four seconds without settling.
+Shared publication traversal now stops at the next computed output, crossing only aliases.
+Authored invalidation remains transitive. Intrinsic/final failures notify the same frontier
+so consumers retain accepted output and fail explicitly. Seventeen dependency, attachment,
+stacking and lifecycle checks pass; the same full JSON example now finishes and saves with
+four ready tissues, retained final-role anchoring and an automatic stack. No numerical solver
+change was needed. The separate full suite before this fix passed **1,285 tests**; it does
+not qualify the newer traversal change. Full gate initially found a missing standalone include
+in the new quality query's clang-tidy check; fixed, isolated check passes, complete rerun pending.
+
 Pouch investigation now distinguishes actual crossings from normal rotation: the original
 curved fixture has 1,229 new transverse triangle-pair intersections, versus zero in rest.
 The donor reproduces the invalid output. Two captured raw donor relaxation cases also

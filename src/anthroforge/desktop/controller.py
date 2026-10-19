@@ -239,6 +239,12 @@ class Controller(QObject):
 
         surface(self, kind)
 
+    @Property("QVariantMap", notify=changed)
+    def surfaceAction(self):
+        from .construction_creation import surface_action
+
+        return surface_action(self)
+
     @Slot(str, str, result="QVariantMap")
     def surfaceOptions(self, target, boundary):
         from .surface_tools import choices
@@ -539,6 +545,7 @@ class Controller(QObject):
         self.timer.stop()
         if hasattr(self, "feedback"):
             self.feedback.close()
+            self.report_browser.close()
         self.drawing_tools.cancel()
         self.session.close()
         self.profiler.close()

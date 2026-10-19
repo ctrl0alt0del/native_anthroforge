@@ -1,4 +1,4 @@
-"""Qualify the packaged capture/editor/delivery path without developer dependencies."""
+"""Qualify packaged capture/delivery plus inbox preview, text editing and deletion."""
 
 import json
 from pathlib import Path
@@ -12,6 +12,7 @@ def feedback(executable, cwd, invoke):
     invoke(executable, cwd, "--feedback-probe", str(output))
     result = json.loads(output.read_text())
     assert result["passed"], result
+    assert result["browser_preview_and_delete"], result
     with ZipFile(Path(result["report"])) as archive:
         report = json.loads(archive.read("report.json"))
         original = QImage.fromData(archive.read("original.png"))

@@ -19,6 +19,15 @@ focus/input behavior; a pointer drag can cancel after its screenshot has been ca
 
 ## Local inbox and portable format
 
+Choose **Help → View reports…** to browse saved reports, newest first. Select a report to
+read its full description and annotated screenshot; Fit/100% and scrollbars support
+inspection. **Edit text** opens its description for editing; **Save text** commits it and
+**Cancel edit** discards the draft. Save failure retains the draft for retry. Editing
+preserves report identity, screenshots, annotations and original context. **Delete report…**
+asks for confirmation before permanently removing that archive. Deletion is not a document
+undo operation. Other reports remain intact; existing reports from earlier builds work.
+Refresh rescans the inbox. Unreadable reports remain listed with an error and can be deleted.
+
 On Windows, reports are stored under `%LOCALAPPDATA%/AnthroForge/Reports`, independent
 of the installed application's version or folder. Other systems use
 `~/.local/share/AnthroForge/Reports` when LOCALAPPDATA is not defined. Each submission
@@ -28,6 +37,7 @@ The archive contains:
 
 - `report.json`: independent schema version 1, report identity, UTC capture time,
   category, description, source image dimensions, annotations and attachment SHA-256s.
+  Description edits add an optional UTC `updated_at` without changing the schema.
 - `description.txt`: the UTF-8 description for straightforward reading.
 - `original.png`: the unmodified application-window screenshot.
 - `annotated.png`: the same screenshot with red marks, at original pixel resolution.
@@ -61,6 +71,17 @@ it atomically without replacing an existing report. Retrying an identical report
 idempotent; conflicting content under the same identity is rejected. The same consumer
 can be used by Qt-free callers. No network adapter is included in this version.
 
+`feedback.inbox.ReportInbox` is a separate read/edit/delete capability: `entries()`,
+`read(key)`, `update_description(key, description)` and `delete(key)`. Keys are opaque to
+the browser. Replacing delivery does not require a service to implement inbox operations;
+an inbox adapter is supplied separately at desktop composition. `LocalReportInbox` shares
+the consumer's version-independent directory, validates scoped filenames, and bounds
+archive metadata/image reads. Description edits stream existing members into a temporary
+archive, flush it, check for concurrent file changes during rewriting, and atomically
+replace the original. Failed writes preserve the original. The browser owns one worker
+request and one decoded preview at a time; no idle polling, project edits or undo effects.
+The list virtualizes rows and retains concise metadata, not every screenshot.
+
 `desktop.feedback_editor` owns capture/draft state and injects the consumer. The shared
 `desktop.feedback_paint` implementation renders both previews and saved annotations,
 using source pixel coordinates. PNG encoding and archive publication happen off the UI
@@ -83,3 +104,9 @@ isolation; run with `QT_SCALE_FACTOR=2` for high-DPI evidence. Use a fresh outpu
 `--feedback-probe` and `tools/feedback_portable.py` qualify the packaged capture/paint/save
 workflow. Offscreen evidence does not claim hands-on validation of an ordinary Windows
 desktop window or Quick3D pixels in a software-platform screenshot.
+
+`tests/test_feedback_inbox.py` covers existing archives, scoped deletion, corrupt formats,
+bounded metadata, description preservation and failed writes. `tools/report_browser_acceptance.py`
+uses 120 isolated reports through actual QML, including selection/scrolling, preview,
+text edit/cancel/failure/retry, delete/cancel/failure, refresh and empty state. The packaged
+feedback probe also previews, edits and deletes a copied QA report; user reports are untouched.

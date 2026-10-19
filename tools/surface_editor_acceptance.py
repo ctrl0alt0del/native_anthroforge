@@ -8,11 +8,12 @@ from PySide6.QtCore import QMetaObject, Qt
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from shiboken6 import delete
-from ui_acceptance import find
+from ui_acceptance import click, find
 
 from anthroforge.core.surfaces import Surface
 from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
+from anthroforge.desktop.qt_profiler import profiler_application
 from anthroforge.desktop.runtime import native_runtime
 
 
@@ -42,10 +43,10 @@ def action(engine, name, signal):
 
 def create(controller, engine):
     keys = sources(controller)
-    controller.createSurface("LOFT")  # Generic surface API remains; redundant menu was retired.
+    click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
     surface = next(o for o in controller.session.document.objects if isinstance(o, Surface))
-    controller.select(surface.id)
+    assert controller.selection == surface.id and not controller.authoring.editing
     settle(controller)
     assert controller.selectedData["kind"] == "SURFACE" and not controller.treeRows
     assert any(row["id"] == surface.id for row in controller.render_model.wanted.values())
@@ -108,10 +109,10 @@ def run():
         target = create(controller, engine)
         inspection(controller, engine, target)
         source_list(controller, engine, target)
+        additional_sources(controller, engine)
         closed_preview(controller, engine)
         assert not warnings, warnings
         assert not controller.message, controller.message
-        print("Offscreen surface creation, inspector, Realign, undo and mesh staging passed.")
     finally:
         controller.close()
         delete(engine)
@@ -124,7 +125,7 @@ def closed_preview(controller, engine):
     controller.select(curves[0])
     controller.select(curves[1], True)
     before = len(controller.session.document.objects)
-    controller.createSurface("LOFT")
+    click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
     assert len(controller.session.document.objects) == before
     assert controller.surfacePreview["state"] == "ready", controller.surfacePreview
@@ -133,8 +134,29 @@ def closed_preview(controller, engine):
     assert len(controller.session.document.objects) == before + 1
 
 
+def additional_sources(controller, engine):
+    keys = sources(controller)
+    third = controller.run(
+        "curve.create", dict(points=[dict(position=[x, 0.6, 0]) for x in (-0.5, 0.5)])
+    )
+    settle(controller)
+    controller.select(third, True)
+    assert "3 selected" in controller.surfaceAction["hint"]
+    click(engine.rootObjects()[0], "createPatchSurface")
+    settle(controller)
+    surface = controller.session.document.object(controller.selection)
+    assert [use.curve for use in surface.curves] == [*keys, third]
+    assert surface.kind == "LOFT" and surface.result.status == "ready"
+    controller.run("undo", {})
+    assert surface.id not in controller.session.document.registry.records
+
+
 if __name__ == "__main__":
     QQuickStyle.setStyle("Basic")
-    app = QGuiApplication([])
     with native_runtime():
-        run()
+        app = profiler_application()
+        try:
+            run()
+            print("Offscreen surface creation, inspector, Realign, undo and mesh staging passed.")
+        finally:
+            delete(app)

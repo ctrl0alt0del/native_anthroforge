@@ -1,7 +1,45 @@
 # AnthroForge development validation
 
-Current source qualification is in [fiber interaction](#fiber-interaction-021-follow-up).
+Current source qualification is in [surfaces and report management](#surfaces-and-report-management-021-follow-up).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Surfaces and report management (0.2.1 follow-up)
+
+The Patch / Surface toolbar action now creates a patch from one closed curve or a
+standalone loft from two or more selected curves/fibers. It reuses source validation,
+closed-loop preview/acceptance and the existing accepted-creation selection lifecycle.
+Help → View reports browses the persistent feedback inbox with screenshot/description
+previews, atomic text editing and confirmed deletion. Failed saves retain the draft;
+malformed reports remain visible for deletion. Report actions never enter document history.
+
+The Windows development gate passes for code at `31f9015`: **930 tests**, three native
+CTests, native analysis, Ruff, mypy on 194 modules, function limits and numerical/native
+doctor. There are 272 QQmlPropertyMap deprecation warnings, including 72 from the new
+surface controller tests; these are the same existing deprecated constructor.
+
+Actual offscreen QML checks cover two/three-curve toolbar clicks, closed preview,
+accepted selection, source editing and undo. Report checks use 120 isolated archives,
+virtualized rows, screenshot preview, Unicode/plain-text descriptions, edit/cancel/
+failure/retry, delete/cancel/failure, corrupt input, refresh and empty state. Normal,
+1050×680 and 200% scale layouts pass; captures were inspected. Existing feedback
+capture/annotation/shortcut checks also pass. Hidden QQuickRenderControl/D3D11 surface
+rendering, displayed-revision picking and retained mesh replacement pass. No visible
+windows or desktop input were used; this does not claim hands-on interactive acceptance.
+
+Ownership review: surface routing stays in the desktop creation adapter and uses shared
+validation/commands. The separate Qt-free inbox capability leaves submit-only consumers
+unchanged. The local inbox owns scoped archive operations; the desktop owns one worker
+request, a keyed list and one decoded preview, with no idle polling. Text edits preserve
+all image members and report identity, atomically replace the archive and retain the
+original on failure. No geometry, scheduler or document model changes were necessary.
+
+The clean `31f9015` build in `dist/0.2.1-surfaces-reports/AnthroForge.dist` passes the full
+portable suite from a fresh relocated directory with minimal PATH. This includes actual
+packaged report preview, saved text changes and confirmed deletion of a QA copy; the
+original report and user inbox remain untouched. Packaged UI assets match source.
+The corresponding archive is `dist/AnthroForge-0.2.1-surfaces-reports-source.zip`.
+Source/offscreen evidence and exact commands are recorded in
+[the task record](tasks/surface-report-browser.md). Previous distributions remain intact.
 
 ## Fiber interaction (0.2.1 follow-up)
 

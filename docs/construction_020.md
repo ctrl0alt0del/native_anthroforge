@@ -42,9 +42,13 @@ without becoming anatomical attachments. Points inside an obstacle must be moved
 
 ## Use curves in construction
 
-Select ordered curves, then **Create Primitive** for a loft or body. The redundant standalone
-loft menu was removed; the generic `surface.create` API still supports lofts and fibers.
-A single closed curve supports the **Patch** icon. Consumers retain live references and own their
+Ctrl-select curves or fibers in the Construction list in the desired order, then click
+the **Patch / Surface** icon below the transform tools. One closed curve creates a patch;
+two or more compatible curves create a standalone loft surface. The tooltip describes
+the current action. All loft sources must be open, or all closed. Accepted creation selects
+the surface and exits curve editing. Closed lofts show a preview to Accept or Cancel.
+**Create Primitive** remains available when the desired result is an SCP loft or body.
+Consumers retain live references and own their
 ordering, sampling, reversal, range and placement. The source inspector lists its users.
 **Shape and transform** follows source shape and pose; **Shape only** retains consumer
 placement. Switching modes preserves the visible result. **Make Independent** gives that

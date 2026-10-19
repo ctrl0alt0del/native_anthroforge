@@ -1,6 +1,9 @@
 """Creation from ordered selected sources uses shared consumer operations."""
 
 from anthroforge.core.construction import Curve
+from anthroforge.core.curve_uses import CurveUse
+from anthroforge.core.object_registry import validate_sources
+from anthroforge.core.surfaces import Surface
 
 
 def selected_curves(controller):
@@ -12,11 +15,29 @@ def surface(controller, kind):
     from .image_tools import context_owner
 
     curves = selected_curves(controller)
+    if kind == "AUTO":
+        kind = "PATCH" if len(curves) == 1 else "LOFT"
     closed = any(controller.session.document.object(key).closed for key in curves)
-    return controller.run(
-        "surface.preview" if kind == "LOFT" and closed else "surface.create",
-        dict(curves=curves, kind=kind, owner=context_owner(controller)),
+    arguments = dict(curves=curves, kind=kind, owner=context_owner(controller))
+    if kind == "LOFT" and closed:
+        return controller.run("surface.preview", arguments)
+    return controller.creation_selection.create("surface.create", arguments)
+
+
+def surface_action(controller):
+    curves = selected_curves(controller)
+    if not curves:
+        return dict(enabled=False, hint="Select one closed curve or two or more curves")
+    kind = "PATCH" if len(curves) == 1 else "LOFT"
+    hint = (
+        "Patch selected closed curve" if kind == "PATCH" else f"Loft {len(curves)} selected curves"
     )
+    try:
+        item = Surface(kind=kind, curves=tuple(CurveUse(key) for key in curves))
+        validate_sources(item, controller.session.document.registry.records)
+        return dict(enabled=True, hint=hint)
+    except ValueError as error:
+        return dict(enabled=False, hint=str(error))
 
 
 def create(editor, kind, shape):

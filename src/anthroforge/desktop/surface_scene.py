@@ -41,6 +41,10 @@ def preview_rows(controller):
 
 def preview_record(session, value):
     item, mesh = value.asset.surface, value.asset.mesh
+    return preview_mesh(session, value, item, mesh)
+
+
+def preview_mesh(session, value, item, mesh):
     return dict(
         id="preview:" + value.token,
         handle=mesh.handle,
@@ -85,3 +89,14 @@ def resources(controller):
     yield from (asset.mesh for asset in controller.session.assets.values())
     if controller.session.surface_preview.asset is not None:
         yield controller.session.surface_preview.asset.mesh
+    if controller.session.tissue_preview.asset is not None:
+        yield controller.session.tissue_preview.asset.mesh
+
+
+def tissue_preview_rows(controller):
+    from anthroforge.application.previews import current
+
+    value = controller.session.tissue_preview
+    if value.state != "ready" or value.asset is None or not current(controller.session, value):
+        return []
+    return [preview_mesh(controller.session, value, value.asset.item, value.asset.mesh)]

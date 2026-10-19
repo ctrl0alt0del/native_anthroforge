@@ -178,6 +178,7 @@ def refresh(controller):
 def publish(controller):
     rows = [render_record(row) for row in [*controller.rows, *surface_scene.records(controller)]]
     rows.extend(surface_scene.preview_rows(controller))
+    rows.extend(surface_scene.tissue_preview_rows(controller))
     if rows != controller._render_rows:
         controller._render_rows = rows
         controller.render_model.publish(

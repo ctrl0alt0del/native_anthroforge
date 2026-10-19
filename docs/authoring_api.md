@@ -12,6 +12,15 @@ and `tissue.inflation(target, changes, part="main", side="a")` retains mode-spec
 `tissue.relaxation(target, changes)` edits None/Geometric/Static PBD settings. Unsupported
 combinations fail through the same capability policy in desktop and headless clients.
 
+`tissue.preview(target, changes, part="main", side="a", reset="")` queues an owned
+inflated-rest candidate without changing the document, undo history, save checkpoint or
+accepted surface. Optional reset is PROFILE or CONTROL. `tissue.preview.status` returns
+its token/state/settings; `tissue.preview.accept(token)` commits parameters in one undo
+action using the shared inflation policy. `tissue.preview.cancel` discards it. Only a current
+successful candidate can be accepted. Desktop **Preview inflation edits** renders a green,
+unpickable candidate while keeping accepted geometry/picking; it shows rest inflation before
+relaxation/crop/stacking. Selecting a different object cancels the desktop preview.
+
 `tissue.constraint.add(target, mask="ALL", mode="FIXED", strength?, feather?, offset?)`
 returns a region ID. Use `tissue.constraint.update(target, constraint, changes)` or
 `tissue.constraint.remove(target, constraint)` to edit/remove it. Regions are source-relative

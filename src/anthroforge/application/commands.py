@@ -34,6 +34,7 @@ from . import (
     surface_sources,
     tissue_operations,
     tissue_part_operations,
+    tissue_preview,
     tissue_region_capture,
     tissue_stack_operations,
     tissue_strategy_operations,
@@ -46,6 +47,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "tissue.preview.accept": tissue_preview.accept,
     "tissue.stacking.configure": tissue_stack_operations.configure,
     "tissue.stacking.relationship": tissue_stack_operations.relationship,
     "tissue.stacking.remove": tissue_stack_operations.remove,
@@ -216,6 +218,7 @@ def query_commands(session: "Session") -> dict[str, Any]:
 
 def construction_queries(session: "Session") -> dict[str, Any]:
     return {
+        **tissue_queries(session),
         "tissue.stacking.inspect": lambda **a: tissue_stack_operations.inspect(session, **a),
         "surface.preview": lambda **a: surface_preview.preview(session, **a),
         "surface.preview.status": lambda: surface_preview.status(session),
@@ -226,6 +229,14 @@ def construction_queries(session: "Session") -> dict[str, Any]:
         "control.affected": lambda **a: controls.affected(session, **a),
         "deformer.members": lambda **a: deformers.members(session, **a),
         "junction.inspect": lambda **a: junction_operations.inspect(session, **a),
+    }
+
+
+def tissue_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "tissue.preview": lambda **a: tissue_preview.preview(session, **a),
+        "tissue.preview.status": lambda: tissue_preview.status(session),
+        "tissue.preview.cancel": lambda: tissue_preview.cancel(session),
     }
 
 

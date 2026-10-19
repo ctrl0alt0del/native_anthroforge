@@ -9,11 +9,11 @@ ColumnLayout {
     property string partId: "main"
     property string side: "a"
     readonly property var part: item.parts?.find(p=>p.id===partId) || item.parts?.[0] || ({})
-    readonly property var inflation: part[side]?.inflation || ({})
+    readonly property var inflation: inflationDraft.values
     readonly property bool muscleMode: ["DISTRIBUTED","CTRL_POINT","SECTION_PROFILE"].includes(inflation.mode)
     Layout.fillWidth: true; spacing: Theme.gap
     function configure(key,value) { const changes={}; changes[key]=value; workspace.run("tissue.configure",{target:selected.id,changes:changes}); }
-    function inflate(key,value) { const changes={}; changes[key]=value; workspace.run("tissue.inflation",{target:selected.id,part:part.id,side:side,changes:changes}); }
+    function inflate(key,value) { inflationDraft.edit(key,value); }
     function connector(width,fullness) { workspace.run("tissue.connector",{target:selected.id,part:part.id,width:width,fullness:fullness}); }
     onItemChanged: if(!item.both_sides) side="a"
     UiField {
@@ -36,11 +36,12 @@ ColumnLayout {
     }
     UiSection {
         title: "Inflation"
+        TissueInflationDraft { id: inflationDraft; target: panel.selected.id || ""; part: panel.part.id || "main"; side: panel.side; inflation: panel.part[panel.side]?.inflation || ({}) }
         UiCheck { text: "Enabled"; checked: panel.inflation.enabled ?? true; onClicked: panel.inflate("enabled",checked) }
         UiCombo { objectName: "tissueInflationMode"; Layout.fillWidth: true; model: panel.selected.tissue_modes || []; currentIndex: model.indexOf(panel.inflation.mode); onActivated: panel.inflate("mode",currentText) }
-        NumericSetting { label: "Amount"; length: true; value: panel.inflation.amount || 0; onEdited: value => panel.inflate("amount",value) }
-        TissueProfile { visible: panel.inflation.mode === "SECTION_PROFILE"; profile: panel.inflation.profile || ({}); onEdited: value=>panel.inflate("profile",value); onResetRequested: workspace.run("tissue.profile.reset",{target:panel.selected.id,part:panel.part.id,side:panel.side}) }
-        TissueControl { visible: panel.inflation.mode === "CTRL_POINT"; inflation: panel.inflation; onEdited: (key,value)=>panel.inflate(key,value); onResetRequested: workspace.run("tissue.control.reset",{target:panel.selected.id,part:panel.part.id,side:panel.side}) }
+        NumericSetting { objectName: "tissueInflationAmount"; label: "Amount"; length: true; value: panel.inflation.amount || 0; onEdited: value => panel.inflate("amount",value) }
+        TissueProfile { visible: panel.inflation.mode === "SECTION_PROFILE"; profile: panel.inflation.profile || ({}); onEdited: value=>panel.inflate("profile",value); onResetRequested: inflationDraft.reset("PROFILE") }
+        TissueControl { visible: panel.inflation.mode === "CTRL_POINT"; inflation: panel.inflation; onEdited: (key,value)=>panel.inflate(key,value); onResetRequested: inflationDraft.reset("CONTROL") }
         NumericSetting { visible: panel.muscleMode; label: "Boundary band · samples"; value: panel.inflation.boundary_band || 0; onEdited: value => panel.inflate("boundary_band",value) }
         NumericSetting { visible: panel.muscleMode; label: "Boundary attenuation"; value: panel.inflation.boundary_strength || 0; onEdited: value => panel.inflate("boundary_strength",value) }
         NumericSetting { visible: panel.muscleMode; label: "Longitudinal taper"; value: panel.inflation.length_taper || 0; onEdited: value => panel.inflate("length_taper",value) }

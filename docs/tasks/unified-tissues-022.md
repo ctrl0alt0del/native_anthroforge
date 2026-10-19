@@ -30,6 +30,18 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Inflation preview is implemented through the existing read-only candidate/coordinator
+contract: desktop/headless start/status/accept/cancel, dispatch capture, stale rejection,
+separate native mesh ownership, save isolation and one-action acceptance/undo. GUI parameters
+stay drafts until accepted; reset/profile initialization and inactive mode preservation are
+tested. The candidate explicitly shows inflated rest before relaxation/crop/stacking.
+Full-QML controls pass and their readable capture was inspected. Hidden GPU rendering shows
+a separate green candidate; accepted picking remains unchanged and cancel removes staging.
+The GPU harness first needed to stage the baseline before comparing picks; no production
+picking change was required. Ten focused tests plus Ruff/mypy/function-length checks pass.
+Full regression/gate, field/region viewport editing, inflation control gizmos, Pouch visual
+qualification, cache/performance and portable release remain pending. Do not merge/release.
+
 Two-sided stacking now uses atomic final groups when whole-tissue order forms a strongly
 connected component. Native evaluation follows actual side dependencies, retaining each
 receiver's own settings; source/attachment prerequisites remain in the graph, so real

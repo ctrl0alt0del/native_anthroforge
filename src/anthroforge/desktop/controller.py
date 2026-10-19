@@ -150,12 +150,22 @@ class Controller(QObject):
     def conversion_key(self):
         return tuple(
             (v.token, v.state, id(v.asset))
-            for v in (self.session.conversion, self.session.surface_preview)
+            for v in (
+                self.session.conversion,
+                self.session.surface_preview,
+                self.session.tissue_preview,
+            )
         )
 
     @Property("QVariantMap", notify=changed)
     def surfacePreview(self):
         from anthroforge.application.surface_preview import status
+
+        return status(self.session)
+
+    @Property("QVariantMap", notify=changed)
+    def tissuePreview(self):
+        from anthroforge.application.tissue_preview import status
 
         return status(self.session)
 
@@ -445,6 +455,13 @@ class Controller(QObject):
     @Slot(str, bool)
     def select(self, entity, extend=False):
         self.object_selection.choose(entity, extend)
+        if (
+            self.session.tissue_preview.target
+            and self.session.tissue_preview.target != self.selection
+        ):
+            from anthroforge.application.tissue_preview import cancel
+
+            cancel(self.session)
         self.scene_projection.synchronize_selection()
         self.scene_projection.publish_records()
         self.authoring.refresh()

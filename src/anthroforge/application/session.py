@@ -23,6 +23,7 @@ from .history import History
 from .previews import Preview
 from .resources import Resources
 from .surface_preview import Candidate
+from .tissue_preview import Candidate as TissueCandidate
 
 
 class Session:
@@ -68,6 +69,7 @@ class Session:
     def initialize_scheduler(self) -> None:
         self.conversion = ConversionPreview()
         self.surface_preview: Preview[Candidate] = Preview()
+        self.tissue_preview: Preview[TissueCandidate] = Preview()
         self.scheduler = TaskCoordinator(lambda: self.document)
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
@@ -228,6 +230,7 @@ class Session:
         self.scheduler.close()
         self.conversion = ConversionPreview()
         self.surface_preview = Preview()
+        self.tissue_preview = Preview()
         if self._engine is not None:
             self._engine.bases.clear()
             self._engine.routing_scenes.clear()

@@ -58,11 +58,15 @@ def profile_reset(session: Any, target: str, part: str = "main", side: str = "a"
 
 def control_reset(session: Any, target: str, part: str = "main", side: str = "a") -> None:
     item = tissue_operations.tissue(session, target)
+    point = control_value(session, item, part)
+    tissue_operations.inflation(session, target, dict(control=point), part, side)
+
+
+def control_value(session: Any, item: Any, part: str) -> Any:
     selected(item, part)
     index = item.base_state.parts.index(part)
     mesh = session.assets[item.base_result.asset].mesh
-    point = native.default_control(mesh, index)
-    tissue_operations.inflation(session, target, dict(control=point), part, side)
+    return native.default_control(mesh, index)
 
 
 def smoothing(session: Any, target: str, changes: Any, part: str = "main", side: str = "a") -> None:

@@ -59,6 +59,10 @@ def inflation(
 ) -> None:
     item = tissue(session, target)
     updated = edited_parts(session, item, part, side, changes)
+    install_inflation(session, item, updated)
+
+
+def install_inflation(session: Any, item: TissueVCP, updated: TissueVCP) -> None:
     tissue_policy.validate(updated, session.document.registry.records)
     require_inflation_topology(session, item, updated)
     object_operations.install(session, updated)

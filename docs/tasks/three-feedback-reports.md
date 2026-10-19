@@ -3,7 +3,7 @@
 - Task branch: `codex/three-feedback-reports`
 - Integration branch: `main`
 - Starting revision: `35cbccd`
-- Status: source validated; portable qualification pending
+- Status: validated; ready for integration
 - Last updated: 2026-10-19, Europe/Bucharest
 
 ## Outcome and acceptance
@@ -43,14 +43,19 @@ Additional passing background commands:
 - `uv run --no-sync python tools/construction_editor_acceptance.py`
 - Local fixture `uv run --no-sync python build/three_reports_render.py`: actual GPU pixels for X/Y/Z image import under a rotated, nonuniformly scaled parent. Captures `build/three-reports-acceptance/parented-image-*.png` inspected.
 
-Ownership review completed: no Python numerical loop, no new scheduling/publication path, shared image transform policy, captured input intent, native temporary projection, and presentation-only tab selection. Portable qualification pending.
+Ownership review completed: no Python numerical loop, no new scheduling/publication path, shared image transform policy, captured input intent, native temporary projection, and presentation-only tab selection.
+
+`./tools/package.ps1` passed at clean build revision `37111d632410f9960a0bebbc4cf219cad2390530`.
+The canonical executable SHA256 is `d3266e5627387d34502defc41fddfb771655f773ea9bddc142fa0b3632a2f6d9`.
+`uv run --no-sync python tools/check_portable.py <temporary-copy>/AnthroForge.exe build/three-reports-portable --offscreen` passed the full portable suite with minimal PATH, including hidden GPU rendering, profiling and QA-only report preview/edit/delete. Evidence: `build/three-reports-portable/portable-check.json` and `feedback-probe.json`; temporary location is in `build/three-reports-portable-location.txt`.
+
+An additional packaged headless scenario imports X/Y/Z-aligned images under a rotated/scaled parent and checks saved relationships and distinct transforms. Inputs and result: `build/three-reports-image-api/commands.json` and `result.json`.
 
 All validation remains background-only; no visible windows or desktop input. Deliver one `dist/0.2.1/AnthroForge.dist` and `dist/AnthroForge-0.2.1-source.zip`. Recheck running processes before replacing the canonical build.
 
 ## Next actions and blockers
 
-1. Build and qualify the canonical portable package, update delivery evidence.
-2. Merge and push validated work.
+1. Merge and push validated work; refresh packaged documentation and the canonical source archive.
 
 ## Recovery inputs
 

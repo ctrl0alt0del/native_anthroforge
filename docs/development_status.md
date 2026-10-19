@@ -35,8 +35,12 @@ captures dialog intent and adopts the accepted object through CreationSelection.
 ObjectBrowser owns navigation, keeping both pane models alive. Existing document,
 scheduler and persistence contracts remain in use.
 
-Portable qualification is pending. The release destination is the single canonical
+The clean `37111d6` build passes the full portable suite from a fresh temporary
+relocation with minimal PATH, including hidden rendering and packaged feedback capture,
+preview, text editing and deletion of QA reports. An additional packaged headless case
+passes X/Y/Z parented-image creation and persistence. The release is the single canonical
 `dist/0.2.1/AnthroForge.dist`, with `dist/AnthroForge-0.2.1-source.zip`.
+No additional version-suffixed distribution was created. User report archives were not changed.
 See [task evidence and commands](tasks/three-feedback-reports.md).
 
 ## Surfaces and report management (0.2.1 follow-up)

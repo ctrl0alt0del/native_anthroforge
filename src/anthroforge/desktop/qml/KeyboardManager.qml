@@ -31,6 +31,12 @@ Item {
         const binding=modifierBindings[action];
         return !blocked && !typing && binding !== undefined && (mask & binding) === binding;
     }
+    function sequences(binding) {
+        if(!binding.allowModifiers) return [binding.key];
+        const parts=binding.key.split("+"); const key=parts.pop();
+        const excluded=binding.excludeModifiers || [];
+        return modifierPrefixes.filter(prefix=>parts.every(part=>prefix.includes(part+"+")) && !excluded.some(part=>prefix.includes(part+"+"))).map(prefix=>prefix+key);
+    }
     onBlockedChanged: { if(blocked) heldInput.clear(); }
     onTypingChanged: { if(typing) heldInput.clear(); }
     Connections {
@@ -54,7 +60,8 @@ Item {
         {command:"viewY", key:"2", duringTransform:true, allowModifiers:true},
         {command:"viewZ", key:"3", duringTransform:true, allowModifiers:true},
         {command:"restoreView", key:"4", duringTransform:true, allowModifiers:true},
-        {command:"recordPerformance", key:"F12", duringTransform:true, allowModifiers:true, allowTyping:true},
+        {command:"reportFeedback", key:"F12", duringTransform:true, allowModifiers:true, excludeModifiers:["Shift"], allowTyping:true},
+        {command:"recordPerformance", key:"Shift+F12", duringTransform:true, allowModifiers:true, allowTyping:true},
         {command:"confirm", key:"Return", duringTransform:true, allowModifiers:true},
         {command:"confirm", key:"Enter", duringTransform:true, allowModifiers:true},
         {command:"removeLastPoint", key:"Backspace", duringTransform:true},
@@ -65,7 +72,7 @@ Item {
         model: manager.bindings
         delegate: Shortcut {
             required property var modelData
-            sequences: modelData.allowModifiers ? manager.modifierPrefixes.map(prefix => prefix+modelData.key) : [modelData.key]
+            sequences: manager.sequences(modelData)
             context: Qt.WindowShortcut
             autoRepeat: false
             enabled: !manager.blocked && (!manager.typing || modelData.scope === "document" || !!modelData.allowTyping) && (!manager.transforming || !!modelData.duringTransform)

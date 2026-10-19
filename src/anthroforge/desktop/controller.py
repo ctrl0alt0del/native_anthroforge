@@ -529,6 +529,8 @@ class Controller(QObject):
 
     def close(self):
         self.timer.stop()
+        if hasattr(self, "feedback"):
+            self.feedback.close()
         self.drawing_tools.cancel()
         self.session.close()
         self.profiler.close()

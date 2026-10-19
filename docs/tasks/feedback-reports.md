@@ -38,4 +38,11 @@ development gate, offscreen GUI/capture checks and relocated portable packaging.
 previous distributions and the unrelated root `__init__.py`. No visible windows or desktop
 input. Deliver a separate `dist/0.2.1-reports/AnthroForge.dist` build and corresponding source.
 
-This commit records the recoverable checkpoint; implementation and validation are pending.
+## Implementation checkpoint
+
+Implemented Qt-independent immutable report/annotation records, a replaceable consumer
+and destination-neutral receipt, atomic local publication, single background submission,
+window capture, one painter for preview/export, and the modal editor. Help/F12 and
+Shift+F12 profiling use the keyboard abstraction. Initial desktop smoke has no QML warnings;
+five consumer/service tests, architecture checks and mypy on 190 modules pass. Full GUI,
+failure/retry, high-DPI evidence, profiler shortcut regression and packaging are pending.

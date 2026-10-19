@@ -59,6 +59,16 @@ def setup_profile_controls(controller, engine):
         controller, getattr(controller, "qt_profiler", None)
     )
     engine.rootContext().setContextProperty("performance", controller.profile_controls)
+    setup_feedback_controls(controller, engine)
+
+
+def setup_feedback_controls(controller, engine):
+    from .feedback_canvas import FeedbackCanvas
+    from .feedback_editor import FeedbackEditor
+
+    assert FeedbackCanvas  # Import registers the QML-painted annotation component.
+    controller.feedback = FeedbackEditor(controller)
+    engine.rootContext().setContextProperty("feedback", controller.feedback)
 
 
 def launch(args: argparse.Namespace, app: QGuiApplication, profiler=None) -> int:

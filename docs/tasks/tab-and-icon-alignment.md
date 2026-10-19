@@ -3,7 +3,7 @@
 - Task branch: `codex/tab-and-icon-alignment`
 - Integration branch: `main`
 - Starting revision: `ff3901cd4f64c08544708556c7481e1994210fbb`
-- Status: ready to integrate
+- Status: complete
 - Last updated: 2026-10-19, Europe/Bucharest
 - Active writer: local Codex chat
 
@@ -77,8 +77,10 @@ render checks validate GPU output separately. Hands-on Windows acceptance was no
 
 ## Next actions and blockers
 
-1. Merge and push validated changes.
-2. Refresh packaged documentation and the canonical companion source archive.
+Merged into `main` as `0d88598` and pushed. The packaged documentation and single
+`dist/AnthroForge-0.2.1-source.zip` accompany the canonical replacement build.
+No outstanding implementation or validation blocker. The unrelated root
+`__init__.py`, previous distributions and user report archives are preserved.
 
 ## Recovery inputs
 

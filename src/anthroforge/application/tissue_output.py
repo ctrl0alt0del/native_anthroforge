@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from anthroforge.core.tissue_base import TissueBaseState
 from anthroforge.core.tissue_diagnostics import TissueDiagnostic
 from anthroforge.core.tissue_material import TissueMaterialState
+from anthroforge.core.tissue_stacking import StackPlan
 from anthroforge.native.mesh import Mesh
 
 
@@ -16,3 +17,4 @@ class TissueOutput:
     warning: str = ""
     diagnostics: tuple[TissueDiagnostic, ...] | None = None
     material: TissueMaterialState | None = None
+    plan: StackPlan | None = None

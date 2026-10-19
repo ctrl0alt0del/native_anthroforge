@@ -15,6 +15,10 @@ from .scheduling import Assessment, Workload
 TERMINAL = frozenset(("succeeded", "failed", "cancelled", "obsolete"))
 
 
+class ObsoleteInputs(Exception):
+    """The owned result is valid for an older read set and must not be published."""
+
+
 def retired(*args: Any) -> Any:
     raise RuntimeError("Completed job execution data has been released.")
 

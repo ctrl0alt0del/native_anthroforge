@@ -86,6 +86,7 @@ def configure(engine: Any) -> None:
     engine.bind("af_stack_sizes", [U, INT64])
     engine.bind("af_stack_results", [U, c.POINTER(Output), c.c_int])
     engine.bind("af_stack_orders", [U, c.POINTER(Order), c.c_int])
+    engine.bind("af_stack_dependencies", [U, c.POINTER(U), c.c_int])
     engine.bind("af_stack_points", [U, U, D, c.c_int, D])
     engine.bind("af_stack_run", RUN_ARGUMENTS)
     engine.bind("af_stack_plan", RUN_ARGUMENTS)

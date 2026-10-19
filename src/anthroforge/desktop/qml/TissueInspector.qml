@@ -65,10 +65,10 @@ ColumnLayout {
     TissueCrop { visible: panel.muscleMode; settings: panel.item.crop || ({}); onEdited: (key,value)=>{const changes={}; changes[key]=value; workspace.run("tissue.crop",{target:panel.selected.id,changes:changes});} }
     TissueRelaxation { item: panel.item; supported: !panel.muscleMode }
     TissueRegions { item: panel.item; masks: panel.selected.tissue_masks || [] }
+    TissueStacking { item: panel.item; visible: panel.selected.tissue_domain === "SURFACE" }
     UiSection {
         title: "Evaluation"
         NumericSetting { label: "Material resolution"; decimals: 0; value: panel.item.resolution || 24; onEdited: value => panel.configure("resolution",Math.round(value)) }
-        UiCheck { visible: panel.selected.tissue_domain === "SURFACE"; text: "Automatic stacking"; checked: panel.item.stacking || false; onClicked: panel.configure("stacking",checked) }
         UiCombo { Layout.fillWidth: true; model: ["INHERIT","LIVE","ON_RELEASE","MANUAL"]; currentIndex: Math.max(0,model.indexOf(panel.item.update_mode)); onActivated: workspace.run("update_mode",{entity:panel.selected.id,mode:currentText}) }
         UiButton { text: "Evaluate tissue"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.selected.id]}) }
     }

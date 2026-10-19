@@ -19,6 +19,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_mesh_draft", [U, U], U)
     engine.bind("af_mesh_storage_bytes", [U], U)
     engine.bind("af_mesh_finalize", [U, U, U], U)
+    engine.bind("af_mesh_same_content", [U, U, U])
     engine.bind(
         "af_mesh_restore", [D, c.c_int64, INT64, INT64, c.c_int64, INT32, INT64, c.c_int64], U
     )
@@ -68,3 +69,9 @@ def finalize(mesh: Mesh, previous: Mesh | None, cancel: int) -> Mesh:
     )
     mesh.engine.check(not handle)
     return Mesh(mesh.engine, handle)
+
+
+def same_content(first: Mesh, second: Mesh, cancel: int = 0) -> bool:
+    value = first.engine.library.af_mesh_same_content(first.handle, second.handle, cancel)
+    first.engine.check(value < 0)
+    return bool(value)

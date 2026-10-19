@@ -19,11 +19,11 @@ def test_classification_changes_do_not_invalidate_intrinsic_or_stack_outputs():
     assert changed.construction_revision == tissue.construction_revision
 
 
-def test_stacking_settings_invalidate_only_final_and_inflation_preserves_base():
+def test_stacking_settings_invalidate_plan_and_inflation_preserves_base():
     _, tissue = membrane_document()
     stacked = object_revisions.authored(tissue, replace(tissue, stacking=True))
-    assert object_revisions.changed_ports(tissue, stacked) == {Port(tissue.id, "final")}
-    assert stacked.final_revision == 1 and stacked.base_revision == stacked.rest_revision == 0
+    assert object_revisions.changed_ports(tissue, stacked) == {Port(tissue.id, "plan")}
+    assert stacked.plan_revision == 1 and stacked.base_revision == stacked.rest_revision == 0
     side = replace(tissue.parts[0].a, inflation=replace(tissue.parts[0].a.inflation, amount=0.1))
     inflated = object_revisions.authored(
         tissue, replace(tissue, parts=(replace(tissue.parts[0], a=side),))

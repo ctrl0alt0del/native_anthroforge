@@ -2,12 +2,13 @@
 
 from .results import Port
 
-PHASES = ("base", "rest", "intrinsic", "final")
+PHASES = ("base", "rest", "intrinsic", "plan", "final")
 SETTINGS = {
     "base": frozenset(("source", "resolution")),
     "rest": frozenset(("parts", "both_sides", "reverse", "fields")),
     "intrinsic": frozenset(("relaxation", "constraints", "crop")),
-    "final": frozenset(("stacking", "stack_settings")),
+    "plan": frozenset(("stacking", "stack_settings", "stack_relationships")),
+    "final": frozenset(),
 }
 
 

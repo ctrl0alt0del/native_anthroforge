@@ -3,7 +3,7 @@
 from functools import partial
 from typing import Any
 
-from anthroforge.core.jobs import Job
+from anthroforge.core.jobs import Job, ObsoleteInputs
 from anthroforge.core.results import Port
 from anthroforge.core.scheduling import Workload
 from anthroforge.core.tissue_revisions import PHASES
@@ -11,7 +11,7 @@ from anthroforge.core.tissues import TissueVCP
 from anthroforge.native.mesh import NativeCancellation
 
 from . import dependencies as dep
-from . import tissue_evaluation, tissue_results
+from . import tissue_evaluation, tissue_results, tissue_stack_observation
 from .construction_policy import mode, revisions
 
 
@@ -24,6 +24,8 @@ def request(session: Any, target: str, phase: str, interactive: bool = False) ->
     job.cleanup = partial(completed, session, target, phase, job)
     job.workload = partial(workload, session, target, phase)
     dep.contract(job, session.document, {Port(target, phase)})
+    job.observes |= frozenset(tissue_stack_observation.ports(session.document, target, phase))
+    job.restart_on_input_change = True
     return str(session.scheduler.submit(job))
 
 
@@ -62,19 +64,35 @@ def compute(session: Any, target: str, phase: str, payload: Any, cancel: Any) ->
 
 
 def publish(session: Any, target: str, phase: str, payload: Any) -> None:
+    document, mesh = payload
+    ports = dep.ports(document, Port(target, phase)) | tissue_stack_observation.ports(
+        document, target, phase
+    )
+    if revisions(document, ports) != revisions(session.document, ports):
+        raise ObsoleteInputs("Tissue inputs changed before publication.")
+    previous = getattr(session.document.object(target), phase + "_result")
+    tissue_results.publish(session, document, target, phase, mesh, ports)
+    published(session, target, phase, previous)
+
+
+def published(session: Any, target: str, phase: str, previous: Any) -> None:
     from .output_tasks import propagate
 
-    document, mesh = payload
-    ports = dep.ports(document, Port(target, phase))
-    if revisions(document, ports) != revisions(session.document, ports):
-        raise ValueError("Tissue inputs changed before publication.")
-    tissue_results.publish(session, document, target, phase, mesh, ports)
-    propagate(session, {Port(target, phase)})
+    if (
+        phase != "final"
+        or previous.asset != session.document.object(target).final_result.asset
+        or previous.error
+    ):
+        propagate(session, {Port(target, phase)})
+    if phase == "plan":
+        request(session, target, "final")
 
 
 def completed(session: Any, target: str, phase: str, job: Job, state: str) -> None:
     if state == "failed":
         tissue_results.fail(session, target, phase, job.error)
+        if phase == "plan":
+            tissue_results.fail(session, target, "final", job.error)
 
 
 def schedule(
@@ -102,6 +120,14 @@ def schedule_phases(session: Any, item: TissueVCP, explicit: bool, interactive: 
             or not getattr(item, phase + "_result").revision
         )
     ]
+    return launch_phases(session, item, needed, active, interactive)
+
+
+def launch_phases(
+    session: Any, item: Any, needed: Any, active: Any, interactive: bool
+) -> list[str]:
+    if "plan" in needed or Port(item.id, "plan") in active or item.plan_result.status == "pending":
+        needed = [phase for phase in needed if phase != "final"]
     return [request(session, item.id, phase, interactive) for phase in needed]
 
 

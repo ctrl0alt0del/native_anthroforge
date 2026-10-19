@@ -253,6 +253,12 @@ class Controller(QObject):
 
         return rows(self)
 
+    @Slot(result="QVariantList")
+    def stackingTissues(self):
+        from .tissue_projection import choices
+
+        return choices(self)
+
     @Property("QVariantMap", notify=changed)
     def surfaceAction(self):
         from .construction_creation import surface_action

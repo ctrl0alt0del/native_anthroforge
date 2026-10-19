@@ -33,6 +33,17 @@ hidden variables. It does not pin every contributing vertex. Schema-4 resource s
 history/checkpoints and native memory accounting own these records with the mesh. Point
 protection is separate from curve shape, so changing it never silently recaptures bindings.
 
+Tissue stacking separates native candidate/order planning from final evaluation. Candidate
+geometry is observed without declaring every nearby tissue a prerequisite; accepted plans
+install only actual provider-final dependencies. Complete read sets are validated at
+publication. A read conflict retires the job as obsolete and retries through the existing
+coordinator, rather than reporting a numerical failure. Frozen provider results retain
+their matching material/settings snapshots, including Manual provenance. Identical final
+geometry reuses its native resource and content revision to prevent publication feedback.
+Explicit/excluded pair intent and selected material regions persist separately from order
+evidence. The focused desktop inspector uses the shared operations. Mixed-shell geometry,
+full-envelope validation and release qualification are still in progress.
+
 Routing derives obstacle roles from dependency ports and sends the accepted provider
 geometry to the existing native collision world. Empty accepted outputs remain dependencies
 but are filtered before collider indexing. Automatic source-consumer cycles are excluded;

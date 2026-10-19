@@ -48,6 +48,20 @@ def tissue_edges(item: TissueVCP, records: Mapping[str, ObjectRecord]) -> dict[P
         Port(item.id, "base"): source_inputs(item, records) | {Port(item.id, "pose")},
         Port(item.id, "rest"): {Port(item.id, "base")},
         Port(item.id, "intrinsic"): {Port(item.id, "rest")} | constraint_inputs(item),
-        Port(item.id, "final"): {Port(item.id, "intrinsic")},
+        Port(item.id, "stack_scope"): set(),
+        Port(item.id, "plan"): {Port(item.id, "intrinsic"), Port(item.id, "stack_scope")},
+        Port(item.id, "final"): final_inputs(item),
         Port(item.id, "geometry"): {Port(item.id, "final")},
     }
+
+
+def final_inputs(item: TissueVCP) -> set[Port]:
+    if not item.stacking:
+        return {Port(item.id, "intrinsic"), Port(item.id, "plan")}
+    return {Port(item.id, "plan")} | {Port(key, "final") for key in item.stack_plan.providers}
+
+
+def signature(item: ObjectRecord) -> tuple[object, ...]:
+    if not isinstance(item, TissueVCP):
+        return ()
+    return item.stacking, item.stack_plan.providers

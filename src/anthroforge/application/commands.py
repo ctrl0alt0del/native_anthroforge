@@ -35,6 +35,7 @@ from . import (
     tissue_operations,
     tissue_part_operations,
     tissue_region_capture,
+    tissue_stack_operations,
     tissue_strategy_operations,
 )
 from . import control_operations as controls
@@ -45,6 +46,9 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "tissue.stacking.configure": tissue_stack_operations.configure,
+    "tissue.stacking.relationship": tissue_stack_operations.relationship,
+    "tissue.stacking.remove": tissue_stack_operations.remove,
     "tissue.smoothing": tissue_part_operations.smoothing,
     "tissue.connector": tissue_part_operations.connector,
     "tissue.profile.reset": tissue_part_operations.profile_reset,
@@ -212,6 +216,7 @@ def query_commands(session: "Session") -> dict[str, Any]:
 
 def construction_queries(session: "Session") -> dict[str, Any]:
     return {
+        "tissue.stacking.inspect": lambda **a: tissue_stack_operations.inspect(session, **a),
         "surface.preview": lambda **a: surface_preview.preview(session, **a),
         "surface.preview.status": lambda: surface_preview.status(session),
         "surface.preview.cancel": lambda: surface_preview.cancel(session),

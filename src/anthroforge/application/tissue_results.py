@@ -24,7 +24,7 @@ def publish(
 ) -> None:
     current = session.document.object(target)
     key = register(session, output, phase)
-    result = accept(document, current, phase, ports, key)
+    result = accept(document, current, phase, ports, key, output)
     install(session, replace(current, **publication(current, phase, result, output)))
 
 
@@ -46,18 +46,37 @@ def publication(
 
 
 def material_changes(output: TissueOutput, phase: str, asset: str) -> dict[str, Any]:
+    if output.plan is not None:
+        return {"stack_plan": output.plan}
     if output.material is None:
         return {}
     return {phase + "_material": accepted_material(output.material, phase, asset)}
 
 
-def accept(document: Any, item: TissueVCP, phase: str, ports: Any, key: str) -> Any:
+def accept(
+    document: Any, item: TissueVCP, phase: str, ports: Any, key: str, output: TissueOutput
+) -> Any:
     before = replace(
         item,
         result=getattr(item, phase + "_result"),
         construction_revision=getattr(item, phase + "_revision"),
     )
-    return accepted_result(document, before, ports, key)
+    result = accepted_result(document, before, ports, key)
+    return replace(result, revision=content_revision(item, phase, key, output))
+
+
+def content_revision(item: TissueVCP, phase: str, key: str, output: TissueOutput) -> int:
+    previous = getattr(item, phase + "_result")
+    same = (
+        output.plan == item.stack_plan
+        if phase == "plan"
+        else phase == "final" and key == previous.asset
+    )
+    return (
+        int(previous.revision)
+        if same and previous.revision and not previous.error
+        else int(previous.revision) + 1
+    )
 
 
 def register(session: Any, output: TissueOutput, phase: str) -> str:
@@ -78,7 +97,8 @@ def fail(session: Any, target: str, phase: str, error: str) -> None:
         and bool(item.intrinsic_result.asset)
         and item.intrinsic_result.status == "ready"
     )
-    display = replace(item.result, status="unstacked" if fallback else "failed", error=error)
+    source = item.intrinsic_result if fallback else item.result
+    display = replace(source, status="unstacked" if fallback else "failed", error=error)
     install(session, replace(item, **{phase + "_result": result, "result": display}))
 
 

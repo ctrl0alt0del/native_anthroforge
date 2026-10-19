@@ -63,8 +63,7 @@ def constraint(data: dict[str, Any]) -> TissueConstraint:
 
 
 def tissue(state: dict[str, Any]) -> TissueVCP:
-    from .tissue_material_codec import decode
-
+    completed_states(state)
     state["diagnostics"] = tuple(TissueDiagnostic(**row) for row in state.get("diagnostics", ()))
     state["base_state"] = TissueBaseState(**tuples(state.get("base_state", {})))
     state["parts"] = tuple(part(row) for row in state.get("parts", (dict(id="main"),)))
@@ -72,8 +71,15 @@ def tissue(state: dict[str, Any]) -> TissueVCP:
     state["crop"] = TissueCrop(**tuples(state.get("crop", {})))
     state["fields"] = tuple(TissueField(**tuples(row)) for row in state.get("fields", ()))
     state["constraints"] = tuple(constraint(row) for row in state.get("constraints", ()))
-    for name in ("base_result", "rest_result", "intrinsic_result", "final_result"):
+    return TissueVCP(**state)
+
+
+def completed_states(state: dict[str, Any]) -> None:
+    from . import tissue_stack_codec
+    from .tissue_material_codec import decode
+
+    for name in ("base_result", "rest_result", "intrinsic_result", "plan_result", "final_result"):
         state[name] = EvaluationResult(**result_fields(state.get(name, {})))
     for name in ("rest_material", "intrinsic_material", "final_material"):
         state[name] = decode(state.get(name))
-    return TissueVCP(**state)
+    tissue_stack_codec.decode(state)

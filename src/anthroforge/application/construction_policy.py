@@ -75,6 +75,10 @@ def revision(document: Document, port: Port) -> ReadRevision:
 
 
 def object_revision(document: Document, port: Port) -> ReadRevision:
+    if port.output == "stack_scope":
+        from .tissue_stack_observation import membership
+
+        return ReadRevision(port.owner, port.output, 0, 0, membership(document))
     if port.output == "routing_scope":
         scope = document.index.structure.dependencies.routing_scene
         return ReadRevision(port.owner, port.output, 0, 0, scope)

@@ -79,6 +79,15 @@ def results(session: StackSession) -> Any:
     return {row.id: result(session, row) for row in output}, tuple(orders)
 
 
+def dependencies(session: StackSession) -> tuple[tuple[int, int], ...]:
+    library, handle = session.engine.library, session.handle
+    size = library.af_stack_dependencies(handle, None, 0)
+    session.engine.check(size < 0)
+    values = (U * (2 * size))()
+    session.engine.check(library.af_stack_dependencies(handle, values, size) < 0)
+    return tuple((values[2 * i], values[2 * i + 1]) for i in range(size))
+
+
 def result(session: StackSession, row: Any) -> dict[str, Any]:
     points, metrics = np.empty((row.vertices, 3)), np.zeros(24)
     session.engine.check(

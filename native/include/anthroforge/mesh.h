@@ -52,6 +52,7 @@ AF_API int af_move_origin(const double* matrix, const double* offset,
     const double* binding, double* updated_matrix, double* updated_offset);
 AF_API int af_anchor_points(uint64_t parent, const double* child_matrix,
     const double* parent_matrix, const double* parent_offset, const double* binding, double* points);
+AF_API int af_mesh_same_content(uint64_t first,uint64_t second,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

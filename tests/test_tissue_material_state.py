@@ -51,9 +51,7 @@ def test_intrinsic_uses_accepted_rest_settings_despite_pending_authored_changes(
         session.engine, session.document, session.resources, target, "intrinsic", 0
     )
     assert output.material.reverse == before.reverse and current.reverse != before.reverse
-    np.testing.assert_array_equal(
-        output.mesh.array(0), session.assets[before.intrinsic_result.asset].mesh.array(0)
-    )
+    assert output.asset == before.intrinsic_result.asset and output.mesh is None
 
 
 def test_material_snapshots_do_not_increment_authored_revisions(session):

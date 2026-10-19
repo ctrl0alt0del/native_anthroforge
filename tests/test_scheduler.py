@@ -6,7 +6,7 @@ import pytest
 
 from anthroforge.application.scheduler import Scheduler
 from anthroforge.core.document import Document
-from anthroforge.core.jobs import Job
+from anthroforge.core.jobs import Job, ObsoleteInputs
 
 
 def controlled(label, output, gate, published):
@@ -25,6 +25,25 @@ def pump(scheduler, predicate):
         scheduler.tick()
         assert monotonic() < deadline
         sleep(0.002)
+
+
+def stale_publication(value):
+    raise ObsoleteInputs("Read set advanced while the worker ran.")
+
+
+def test_publication_read_conflict_restarts_without_reporting_numerical_failure(state_scheduler):
+    _, scheduler, published = state_scheduler
+    gate = Event()
+    gate.set()
+    stale = controlled("stale", "a", gate, [])
+    stale.publish = stale_publication
+    fresh = controlled("fresh", "a", gate, published)
+    stale.retry = lambda: scheduler.submit(fresh)
+    stale.restart_on_input_change = True
+    scheduler.submit(stale)
+    scheduler.wait(3)
+    assert stale.state == "obsolete" and fresh.state == "succeeded"
+    assert published == [0] and not scheduler.errors
 
 
 @pytest.fixture

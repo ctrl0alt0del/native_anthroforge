@@ -47,6 +47,20 @@ preserves their exact coordinates. Manual surfaces keep their previous pin snaps
 until evaluated. Protection-only edits do not recapture Fiber attachments or alter shape.
 The curve inspector exposes both flags. The production stacking workflow remains in progress.
 
+The task branch also exposes `tissue.stacking.configure(target, changes)` for search distance,
+clearance, smoothing radius/strength, blend distance, preservation and maximum adjustment.
+`tissue.stacking.relationship(target, other, side="a", other_side="a", mode="AUTO",
+cover="SELF", excluded=False, regions?)` saves persistent pair intent. Modes are AUTO,
+REQUESTED (must agree with geometry) and EXPLICIT (still independently validated); cover is
+SELF or OTHER. Regions are `[part_identity, material_face]` pairs on the covering tissue,
+captured against its accepted Base topology. Omitted existing region settings are retained.
+`tissue.stacking.remove(target, other, side="a", other_side="a")` restores automatic behavior.
+`tissue.stacking.inspect(target)` returns settings, intent, detected order/providers and final
+status. Both surface participants opt into stacking; disabled inflation sides remain inactive.
+The desktop Stacking disclosure provides searchable tissue pairs, settings and order/exclusion
+editing with ordinary undo. Viewport support-region drafting and full mixed-shell qualification
+remain required before release. No successful final surface is published from failed stacking.
+
 ## Construction commands
 
 The desktop and headless clients share these operations, policies and transactions.

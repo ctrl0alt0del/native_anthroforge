@@ -9,6 +9,7 @@ from .tissue_constraints import TissueConstraint, TissueField
 from .tissue_diagnostics import TissueDiagnostic
 from .tissue_material import TissueMaterialState
 from .tissue_settings import TissueCrop, TissuePart, TissueRelaxation
+from .tissue_stacking import StackPlan, StackRelationship, StackSettings
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,16 +27,21 @@ class TissueVCP(ObjectRecord):
     fields: tuple[TissueField, ...] = ()
     constraints: tuple[TissueConstraint, ...] = ()
     stacking: bool = False
+    stack_settings: StackSettings = field(default_factory=StackSettings)
+    stack_relationships: tuple[StackRelationship, ...] = ()
+    stack_plan: StackPlan = field(default_factory=StackPlan)
     group: str = ""
     base_state: TissueBaseState = field(default_factory=TissueBaseState)
     diagnostics: tuple[TissueDiagnostic, ...] = ()
     base_revision: int = 0
     rest_revision: int = 0
     intrinsic_revision: int = 0
+    plan_revision: int = 0
     final_revision: int = 0
     base_result: EvaluationResult = field(default_factory=EvaluationResult)
     rest_result: EvaluationResult = field(default_factory=EvaluationResult)
     intrinsic_result: EvaluationResult = field(default_factory=EvaluationResult)
+    plan_result: EvaluationResult = field(default_factory=EvaluationResult)
     final_result: EvaluationResult = field(default_factory=EvaluationResult)
     rest_material: TissueMaterialState | None = None
     intrinsic_material: TissueMaterialState | None = None

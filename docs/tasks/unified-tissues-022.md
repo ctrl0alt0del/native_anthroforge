@@ -30,6 +30,22 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Stacking is connected to shared phase jobs and desktop/headless entry points. A separate
+plan output installs actual provider-final dependencies; candidate observations do not create
+blanket prerequisite edges. Accepted Manual providers, exclusions, schema-4 intent, unchanged
+final-resource reuse, native dependency edges, and current-intrinsic failure display are tested.
+The coordinator now handles explicit obsolete-read-set publication conflicts through its
+ordinary retry/cancellation contract. Fixed a real retry loop: pending state must retain a
+previous failure until successful publication, rather than count as recovery. Empty crop and
+disabled inflation sides preserve own output instead of entering the donor's nonempty-domain
+ABI. The full suite before those last edge checks passed **1229 tests**, 747 existing Qt
+deprecation warnings, 53.90 seconds. Focused edge checks pass; final style pass pending.
+Full-QML searchable pair editing/exclusion/undo passes; inspected readable stacking inspector
+capture (`build/022-tissue/stacking-inspector.png`). Offscreen UI evidence does not render 3D.
+Still required: full-shell/envelope independent validation, mixed/relaxed stack shapes,
+support-region viewport drafts, broad lifecycle/cycle qualification, cache/performance review,
+the other remaining editing tools and final release qualification. Do not release/merge yet.
+
 Accepted rest, intrinsic and final results now own immutable material provenance: geometry
 references, parts/sides, fields, constraints, cropping and frame. Manual authored edits do
 not reinterpret retained geometry. Schema-4 storage and resource reachability retain old

@@ -59,6 +59,7 @@ AF_API int af_stack_resolve(uint64_t handle,const AfStackAccepted* accepted,int 
 AF_API int af_stack_sizes(uint64_t handle,int64_t* sizes);
 AF_API int af_stack_results(uint64_t handle,AfStackOutput* rows,int count);
 AF_API int af_stack_orders(uint64_t handle,AfStackOrder* rows,int count);
+AF_API int af_stack_dependencies(uint64_t handle,uint64_t* pairs,int capacity);
 AF_API int af_stack_points(uint64_t handle,uint64_t identity,double* points,int count,double* metrics);
 #ifdef __cplusplus
 }

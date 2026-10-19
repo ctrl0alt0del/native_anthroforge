@@ -46,3 +46,15 @@ int af_stack_points(uint64_t handle,uint64_t identity,double* points,int count,d
         std::copy(result.vector_metrics,result.vector_metrics+24,metrics); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_stack_dependencies(uint64_t handle,uint64_t* pairs,int capacity) {
+    try {
+        const auto graph=af::stacking::layer::plan(af::stacking::required(handle).state);
+        int count=0; for(const auto& row:graph.parents) count+=int(row.second.size());
+        if(!pairs&&capacity==0) return count;
+        if(capacity!=count||(!pairs&&count)) throw std::runtime_error("Invalid stacking dependency capacity.");
+        int i=0; for(const auto& row:graph.parents) for(auto parent:row.second) {
+            pairs[2*i]=row.first; pairs[2*i+1]=parent; ++i;
+        }
+        return count;
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}

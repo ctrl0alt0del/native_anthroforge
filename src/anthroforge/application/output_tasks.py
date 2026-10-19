@@ -16,7 +16,7 @@ from . import (
 FAMILIES = (
     ({"path"}, path_tasks),
     ({"binding"}, anchor_tasks),
-    ({"base", "rest", "intrinsic", "final"}, tissue_tasks),
+    ({"base", "rest", "intrinsic", "plan", "final"}, tissue_tasks),
 )
 
 

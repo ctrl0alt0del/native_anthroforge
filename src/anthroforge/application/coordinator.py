@@ -7,7 +7,7 @@ from time import sleep
 from typing import Any
 
 from anthroforge.core.document import Document
-from anthroforge.core.jobs import Job, Restart
+from anthroforge.core.jobs import Job, ObsoleteInputs, Restart
 from anthroforge.core.metrics import Metrics
 from anthroforge.core.results import Port
 from anthroforge.profiling import causes
@@ -286,6 +286,9 @@ class TaskCoordinator:
             result = job.future.result() if job.future else None
             self._publish(job, result)
             self._terminal(job, "succeeded")
+        except ObsoleteInputs:
+            self.cancel_job(job.id, obsolete=True, reason="read_set_changed", restart=True)
+            self._terminal(job, "obsolete")
         except Exception as error:
             self._failed(job, error)
 

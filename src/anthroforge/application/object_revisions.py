@@ -28,6 +28,8 @@ METADATA = frozenset(
         "rest_result",
         "intrinsic_result",
         "final_result",
+        "plan_result",
+        "stack_plan",
         "rest_material",
         "intrinsic_material",
         "final_material",

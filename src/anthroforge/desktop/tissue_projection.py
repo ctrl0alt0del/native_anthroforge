@@ -1,6 +1,6 @@
 """Tissue anatomy records share mesh presentation without becoming Construction entries."""
 
-from dataclasses import asdict, replace
+from dataclasses import asdict
 
 from anthroforge.application.object_frames import Frames
 from anthroforge.core import tissue_policy
@@ -45,5 +45,35 @@ def metadata(item):
         source=item.source,
         classification=item.classification,
         color=item.color,
-        tissue_settings=asdict(replace(item, parts=active(item))),
+        tissue_settings=settings(item),
     )
+
+
+SCALARS = (
+    "id",
+    "source",
+    "classification",
+    "both_sides",
+    "reverse",
+    "resolution",
+    "stacking",
+    "update_mode",
+)
+
+
+def settings(item):
+    row = {name: getattr(item, name) for name in SCALARS}
+    row["parts"] = [asdict(part) for part in active(item)]
+    for name in ("relaxation", "crop", "stack_settings", "stack_plan"):
+        row[name] = asdict(getattr(item, name))
+    for name in ("fields", "constraints", "diagnostics", "stack_relationships"):
+        row[name] = [asdict(value) for value in getattr(item, name)]
+    return row
+
+
+def choices(controller):
+    return [
+        dict(id=item.id, name=item.name, both_sides=item.both_sides, enabled=item.stacking)
+        for item in controller.session.document.objects
+        if isinstance(item, TissueVCP) and item.base_state.kind == "SURFACE"
+    ]

@@ -171,6 +171,7 @@ def object_links(document: "Document") -> tuple[Any, ...]:
 
 
 def object_link(item: Any, document: "Document") -> tuple[Any, ...]:
+    from . import tissue_dependencies
     from .dependency_graph import construction_inputs
     from .routing_obstacles import signature
 
@@ -181,4 +182,5 @@ def object_link(item: Any, document: "Document") -> tuple[Any, ...]:
         frozenset(construction_inputs(item, document.objects, document.junctions)),
         tuple(c.curve for c in getattr(item, "curves", ())),
         signature(item),
+        tissue_dependencies.signature(item),
     )

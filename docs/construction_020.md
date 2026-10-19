@@ -1,7 +1,7 @@
 # Curves, fibers, surfaces and reference images
 
-The Construction view contains editable curves, fibers, surfaces and images separately from
-the anatomical hierarchy. You can start with curves or images in an empty document. New
+The Construction tab contains editable curves, fibers, surfaces and images separately from
+the anatomical hierarchy in the Anatomy tab. You can start with curves or images in an empty document. New
 objects are associated with the active anatomy context, without automatically becoming
 transform children. Unassigned construction stays accessible.
 
@@ -10,6 +10,9 @@ transform children. Unassigned construction stays accessible.
 Use the viewport icons below Move/Rotate/Scale: **Add Curve at cursor**, **Place Points**,
 **Draw Curve**, **Cursor**, and **Patch**. Hover for tooltips. In Place Points, the first click
 starts a curve; from point two, plain left-click finishes and exits. Shift-click continues.
+Hold Ctrl to snap the preview and new point to the nearest visible SCP surface under
+the pointer; Ctrl+Shift snaps and continues. Releasing Ctrl restores your drawing-depth
+setting. A missed surface uses that setting's normal fallback; existing offsets apply.
 Enter also finishes; Backspace removes the last draft point and Escape cancels.
 Closed placement requires three points; an early finish preserves the draft.
 Draw finishes on mouse release and stays ready for another stroke. Each completed curve
@@ -87,7 +90,11 @@ contract. Lofting does not collision-conform a surface or produce a muscle volum
 
 ## Place and trace reference images
 
-Construction **Image…** imports PNG/JPEG, normalizes EXIF orientation and embeds its source.
+The image icon beside Perspective/Orthographic imports a world reference image.
+**Add reference image…** in the selected object's Properties imports an image with
+that ordinary parent. Orthographic X/Y/Z views automatically set world-axis alignment,
+including under rotated parents; other views use default placement. These actions import
+PNG/JPEG, normalize EXIF orientation and embed the source.
 Use Instance for another placement sharing the asset. Ordinary parenting preserves world
 placement; images cannot be parents. Width, axis alignment, opacity, depth, sides,
 orthographic/perspective visibility and viewport pickability are exposed in the inspector.

@@ -12,6 +12,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 from PySide6.QtCore import Q_ARG, Q_RETURN_ARG, QCoreApplication, QMetaObject, QPointF, Qt, QUrl
+from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from report_browser_acceptance import wait_for
@@ -104,7 +105,7 @@ def remapped_snap(window, controller):
     point = projected(window, 0.2, 0.2)
     QTest.mouseMove(window, point)
     QTest.keyPress(window, Qt.Key_Alt)
-    assert abs(controller.drawing_tools.hover[2] - 0.5) < 1e-9
+    assert abs(controller.drawing_tools.hover[2] - 0.5) < 1e-6
     QTest.mouseClick(window, Qt.LeftButton, Qt.AltModifier | Qt.ShiftModifier, point)
     QTest.keyRelease(window, Qt.Key_Alt)
     QTest.keyClick(window, Qt.Key_Escape)
@@ -112,10 +113,14 @@ def remapped_snap(window, controller):
 
 
 def accept_image(window, controller):
-    path = OUTPUT / "reference.png"
+    path = OUTPUT / "fixtures/reference.png"
+    path.parent.mkdir(exist_ok=True)
     Image.new("RGB", (240, 120), "#5b7496").save(path)
     picker = find(window, "referenceImageDialog")
-    picker.setProperty("selectedFile", QUrl.fromLocalFile(str(path.resolve())))
+    picker.setProperty("currentFolder", QUrl.fromLocalFile(str(path.parent.resolve())))
+    QTest.qWait(100)
+    popup = next(w for w in QGuiApplication.allWindows() if w.title() == picker.property("title"))
+    assert click(popup, "fileDialogDelegate0").property("fileName") == path.name
     assert QMetaObject.invokeMethod(picker, "accept")
     wait_for(lambda: bool(controller.session.document.registry.construction))
     settle(controller)
@@ -182,6 +187,11 @@ def run():
 
 
 def exercise(window, controller):
+    picker = find(window, "referenceImageDialog")
+    enum = picker.metaObject().enumerator(
+        picker.metaObject().indexOfEnumerator("FileDialogOptions")
+    )
+    assert picker.setProperty("options", enum.keyToValue("DontUseNativeDialog")[0])
     root = setup(controller)
     placement(window, controller)
     remapped_snap(window, controller)

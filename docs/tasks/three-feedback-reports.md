@@ -26,18 +26,20 @@ Qt references: [TabBar](https://doc.qt.io/qt-6/qml-qtquick-controls-tabbar.html)
 
 ## Current state
 
-Implemented tabs and image actions, captured import intent, shared world-axis image placement, and temporary native surface projection through the keyboard manager. Native/projection/image tests pass; the actual QML acceptance harness is being completed. Unrelated root `__init__.py` is preserved.
+Implemented tabs and image actions, captured import intent, shared world-axis image placement, and temporary native surface projection through the keyboard manager. Native/projection/image tests and actual QML acceptance pass. Unrelated root `__init__.py` is preserved.
 
 ## Verification
 
-Native build and 3 CTests pass. Focused tests cover transforms, nearest hits, fallback, offsets, unchanged projection policy, image import/undo and captured parent intent. QML harness initially used an overly strict 1e-9 tolerance for float camera projection (observed error 2.4e-8); UI tolerance is now 1e-6, native tests retain tighter tolerances. Full gate/package pending.
+Native build and 3 CTests pass. 47 focused tests cover transforms, nearest hits, fallback, offsets, unchanged projection policy, image import/undo and captured parent intent. `uv run --no-sync python tools/feedback_fixes_acceptance.py` passes actual modifier transitions, remapped snapping, Ctrl+Shift continuation, one-step undo/cancel, image picker/parent/alignment and tab actions. Captures at 1440x900 and 1050x680 in `build/three-reports-acceptance` were inspected. QPA offscreen captures validate controls/layout, not Quick3D mesh pixels.
+
+The file-picker harness must target Qt's separate offscreen popup window and click its file delegate; setting the public selectedFile property alone does not select an entry in an open dialog. UI projection tolerance is 1e-6 (observed float error 2.4e-8); native tests retain tighter tolerances. Full gate/package pending.
 
 All validation remains background-only; no visible windows or desktop input. Deliver one `dist/0.2.1/AnthroForge.dist` and `dist/AnthroForge-0.2.1-source.zip`. Recheck running processes before replacing the canonical build.
 
 ## Next actions and blockers
 
-1. Implement native temporary projection and shared image import intent; integrate tabs and actions.
-2. Verify regressions and interaction, run gate, build and qualify the portable package.
+1. Run the full gate and existing affected editor/hidden-render regressions.
+2. Build and qualify the canonical portable package, update delivery evidence.
 3. Update current docs, merge and push validated work.
 
 ## Recovery inputs

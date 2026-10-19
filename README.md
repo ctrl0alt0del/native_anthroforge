@@ -9,9 +9,8 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1-surfaces-reports/AnthroForge.dist`.
-That existing installation predates the single-folder release policy. New builds use
-`dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1/AnthroForge.dist`.
+Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
@@ -26,11 +25,15 @@ Schema 3 projects reject older formats; legacy conversion is deferred.
 including muscles and soft tissues, move to 0.2.2. Editable parameters remain retained.
 
 Curve creation and cursor/patch tools sit below the transform gizmos. Place Points finishes
-on plain left-click from the second point; Shift-click continues. New routed curves use
+on plain left-click from the second point; Shift-click continues. Hold Ctrl to snap to
+SCP surfaces; Ctrl+Shift snaps and continues. New routed curves use
 automatic obstacles. Exclusions and conversion-point subsets use bounded searchable lists;
 all authored points are retained by default. Numerical budgets live under Advanced.
 The Patch / Surface icon creates a patch from one closed curve, or a standalone loft
 from two or more selected curves/fibers. Ctrl-click in Construction to select sources.
+Anatomy and Construction have separate full-height tabs. Import world reference images
+with the image icon beside the projection control; use Add reference image in Properties
+for an image parented to the selected object. Orthographic axis views set initial alignment.
 
 0.1.9 refined the editor with consistent dark menus, aligned controls and expandable
 inspection details. See [UI polish](docs/ui_polish.md).

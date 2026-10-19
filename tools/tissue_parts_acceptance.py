@@ -47,6 +47,11 @@ def enable_envelope(window):
     click(window, "tissueBothSides")
 
 
+def select_control(controller, window):
+    modes = controller.selectedData["tissue_modes"]
+    activate(window, "tissueInflationMode", modes.index("CTRL_POINT"))
+
+
 def branch(controller, window):
     _, target, identity = branched_tissue(controller.session)
     controller.refresh()
@@ -56,9 +61,7 @@ def branch(controller, window):
     enable_envelope(window)
     settle(controller)
     activate(window, "tissueSide", 1)
-    activate(
-        window, "tissueInflationMode", controller.selectedData["tissue_modes"].index("CTRL_POINT")
-    )
+    select_control(controller, window)
     click(window, "tissueControlReset")
     settle(controller)
     part = controller.session.document.object(target).parts[1]

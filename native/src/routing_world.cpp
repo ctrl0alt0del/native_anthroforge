@@ -46,6 +46,7 @@ static void snapshot_geometry(World& world,uint64_t cancel) {
     if(!triangles.empty()) world.snapshot.reset(kernel::create_snapshot(vertices.data(),triangles.data(),int(triangles.size()/3)));
 }
 static void resolve_scales(World& world,double radius) {
+    world.radius=radius;
     auto bounds=kernel::empty_bounds(); double coordinate=1;
     for(const auto& item:world.collision->items) bounds=kernel::merge_bounds(bounds,item.bounds);
     double squared=0;

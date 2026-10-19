@@ -227,6 +227,7 @@ class Session:
         self.surface_preview = Preview()
         if self._engine is not None:
             self._engine.bases.clear()
+            self._engine.routing_scenes.clear()
             self.profiler.native.detach(self._engine)
         if self.owns_profiler:
             self.profiler.close()

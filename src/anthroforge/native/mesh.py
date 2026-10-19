@@ -9,6 +9,7 @@ import numpy as np
 
 from .base_cache import BaseCache
 from .bridge import NativeEngine
+from .resource_cache import ResourceCache
 
 D = c.POINTER(c.c_double)
 INT64 = c.POINTER(c.c_int64)
@@ -30,6 +31,9 @@ class GeometryEngine(NativeEngine):
         self._query_signatures()
         self._construction_signatures()
         self.bases = BaseCache()
+        self.routing_scenes: ResourceCache[Any] = ResourceCache(
+            64 * 1024 * 1024, 8, "routing_scene"
+        )
         self.resource_observer: Any = None
 
     def _construction_signatures(self) -> None:
@@ -58,9 +62,11 @@ class GeometryEngine(NativeEngine):
 
     def _binding_signatures(self) -> None:
         from . import attachment_fields, attachment_weights, path_collisions, point_attachments
+        from .routing_scene import configure
 
         for module in (attachment_fields, attachment_weights, path_collisions, point_attachments):
             module.configure(self)
+        configure(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

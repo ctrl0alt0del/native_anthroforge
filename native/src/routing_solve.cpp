@@ -42,7 +42,7 @@ static void edge_owners(Span& span,const Input& input,int first) {
         span.targets.push_back(span.reference[pin]);
     }
 }
-static Span prepare_span(const Input& input,World& world,const Reference& reference,int first,int last) {
+static Span prepare_span(const Input& input,const World& world,const Reference& reference,int first,int last) {
     Span span; const int begin=int(reference.pins[first]),end=int(reference.pins[last]);
     span.reference.assign(reference.points.begin()+begin,reference.points.begin()+end+1);
     for(int i=first;i<=last;++i) span.pins.push_back(reference.pins[i]-begin);
@@ -54,7 +54,7 @@ static Span prepare_span(const Input& input,World& world,const Reference& refere
     span.job.config=configuration(world,span,input);
     return span;
 }
-std::vector<Span> spans(const Input& input,World& world,const Reference& reference) {
+std::vector<Span> spans(const Input& input,const World& world,const Reference& reference) {
     std::vector<Span> result;
     if(input.options.closed) result.push_back(prepare_span(input,world,reference,0,input.count));
     else for(int i=0;i<input.count-1;++i) result.push_back(prepare_span(input,world,reference,i,i+1));

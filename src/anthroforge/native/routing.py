@@ -14,6 +14,7 @@ from .construction import curve_records
 from .mesh import INT64, D, GeometryEngine, U, doubles, pointer
 from .paths import Path
 from .point_attachments import INT
+from .routing_scene import capture
 
 
 class Options(c.Structure):
@@ -42,6 +43,9 @@ def configure(engine: GeometryEngine) -> None:
         "af_route_path",
         [D, c.c_int, D, INT, c.POINTER(U), D, c.c_int, c.POINTER(Options), INT64, D, U, U],
         U,
+    )
+    engine.bind(
+        "af_route_path_in_scene", [D, c.c_int, D, INT, U, c.POINTER(Options), INT64, D, U, U], U
     )
 
 
@@ -72,10 +76,11 @@ def invoke(
     warm: Path | None,
     cancel: int,
 ) -> tuple[Path, Report]:
+    scene = capture(engine, packed, options.radius, cancel)
     counters, measures = np.zeros(8, dtype=np.int64), np.zeros(8)
     report_args = (c.byref(options), counters.ctypes.data_as(INT64), pointer(measures))
-    handle = engine.library.af_route_path(
-        *arguments(packed), *report_args, warm.handle if warm else 0, cancel
+    handle = engine.library.af_route_path_in_scene(
+        *arguments(packed)[:4], scene.handle, *report_args, warm.handle if warm else 0, cancel
     )
     return Path(engine, handle), Report(tuple(counters.tolist()), tuple(measures.tolist()))
 

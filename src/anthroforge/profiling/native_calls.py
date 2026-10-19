@@ -31,7 +31,7 @@ class NativeCalls:
                 del self.originals[key]
         self.engines.discard(engine)
         engine.profile_bind = None
-        engine.resource_observer = engine.bases.observer = None
+        engine.resource_observer = engine.bases.observer = engine.routing_scenes.observer = None
 
     def bind(self, engine, name, function):
         key = id(engine.library), name
@@ -58,4 +58,4 @@ class NativeCalls:
             setattr(library, name, function)
         self.originals.clear()
         for engine in self.engines:
-            engine.resource_observer = engine.bases.observer = None
+            engine.resource_observer = engine.bases.observer = engine.routing_scenes.observer = None

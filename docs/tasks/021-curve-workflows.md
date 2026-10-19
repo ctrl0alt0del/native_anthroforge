@@ -46,6 +46,14 @@ UI, native capture reuse/performance, broader lifecycle cases and release remain
 
 ## Recovery
 
+Native capture checkpoint: immutable collision worlds now have independent native leases
+and an engine-owned 64 MiB / 8-entry cache through shared bounded resource-cache machinery.
+Profiler observes capture/solve separately, cache actions and retained capture capacities.
+Native contract tests pass; 100-cube profile captures once (0.60 ms) across 8 solves
+(mean 72.34 ms versus prior uncached 72.64 ms). This establishes reuse, not a meaningful
+whole-solve speedup: numerical solving dominates this fixture. Reuse/eviction, concurrent
+solves, cancellation and parity with uncached routing pass. UI work is still pending.
+
 Preserve untracked root `__init__.py` and original
 `E:/development/WIP_models/solver_test.anthroforge`. Never use visible test windows or
 desktop input. Work directly without delegation. Push coherent checkpoints before long

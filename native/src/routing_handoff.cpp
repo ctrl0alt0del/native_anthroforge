@@ -34,7 +34,7 @@ static Route subdivide(const Route& route,const std::vector<int>& allocation,int
     }
     return result;
 }
-std::vector<Route> handoff(std::vector<Route> routes,const Input& input,World& world) {
+std::vector<Route> handoff(std::vector<Route> routes,const Input& input,const World& world) {
     if(routes.empty()) return {};
     const int budget=input.options.samples-int(!input.options.closed);
     Planning plan{world,input,0,0,{},{},std::max(2.5*input.options.radius,1e-7),input.options.radius-world.slack};

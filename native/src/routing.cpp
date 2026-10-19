@@ -28,13 +28,13 @@ static void resolve_contacts(Input& input,const World& world) {
             input.owners[i]=world.collision->items[nearest.instance].owner;
     }
 }
-static bool replan(const Input& input,World& scene,const Reference& reference,
+static bool replan(const Input& input,const World& scene,const Reference& reference,
                    std::vector<Span>& prepared,int64_t* counters,double* measures) {
     prepared=spans(input,scene,reference);
     prepare_routes(input,scene,reference,prepared);
     return solve(prepared,input,counters,measures);
 }
-static uint64_t evaluate(Input input,World& scene,int64_t* counters,double* measures,uint64_t warm) {
+static uint64_t evaluate(Input input,const World& scene,int64_t* counters,double* measures,uint64_t warm) {
     resolve_contacts(input,scene);
     const auto reference=af::routing::reference(input);
     auto spans=af::routing::spans(input,scene,reference);
@@ -54,5 +54,15 @@ uint64_t af_route_path(const double* records,int count,const double* world,const
         const auto input=af::routing::input(records,count,world,owners,surfaces,options,cancel);
         auto scene=af::routing::capture_world(meshes,matrices,surfaces,options->radius,cancel);
         return af::routing::evaluate(input,scene,counters,measures,warm);
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+uint64_t af_route_path_in_scene(const double* records,int count,const double* world,const int* owners,
+    uint64_t handle,const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel) {
+    try {
+        if(!counters||!measures||!options) throw std::runtime_error("Routing report and options are required.");
+        const auto scene=af::routing::routing_scene(handle);
+        if(scene->radius!=options->radius) throw std::runtime_error("Routing scene clearance changed.");
+        const auto input=af::routing::input(records,count,world,owners,int(scene->collision->items.size()),options,cancel);
+        return af::routing::evaluate(input,*scene,counters,measures,warm);
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

@@ -58,7 +58,7 @@ static Route corridor(const Planning& plan) {
     if(!surface.empty()) return surface;
     return ordinary_roadmap(plan);
 }
-static std::vector<Route> corridors(const Input& input,World& world,const Reference& reference) {
+static std::vector<Route> corridors(const Input& input,const World& world,const Reference& reference) {
     std::vector<Route> routes;
     for(size_t i=1;i<reference.pins.size();++i) {
         Planning plan{world,input,input.owners[i-1],input.owners[i%input.count],
@@ -71,7 +71,7 @@ static std::vector<Route> corridors(const Input& input,World& world,const Refere
     }
     return routes;
 }
-void prepare_routes(const Input& input,World& world,const Reference& reference,std::vector<Span>& spans) {
+void prepare_routes(const Input& input,const World& world,const Reference& reference,std::vector<Span>& spans) {
     const auto routes=handoff(corridors(input,world,reference),input,world);
     if(routes.empty()) return; // Production SQP still attempts feasibility from the direct reference.
     for(size_t i=0;i<routes.size();++i) {

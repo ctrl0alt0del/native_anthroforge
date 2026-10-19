@@ -22,7 +22,7 @@ struct Stroke {
     std::vector<Sample> samples;
     std::vector<Projection> states;
     std::vector<Pointer> pointers;
-    bool rebased=false,same_view=true;
+    bool rebased=false,same_view=true,snapping=false;
 };
 struct StrokeCheckpoint {
     Stroke& stroke;
@@ -85,7 +85,17 @@ static void lock_plane(Projection& state,const V3& point,const V3& normal) {
         if(tangent.norm()>1e-15) state.normal=tangent.normalized();
     }
 }
+static bool snapped(const Stroke& stroke,Projection& state,const Pointer& ray,Sample& sample,bool* depth_found) {
+    V3 point,normal;
+    if(!stroke.snapping||!surface_hit(stroke,ray,point,normal)) return false;
+    point+=normal*state.offset*(state.relative?ray[8]:1);
+    state.previous=point; sample={point.x(),point.y(),point.z(),ray[8]};
+    if(depth_found) *depth_found=true;
+    return true;
+}
 static Sample project(const Stroke& stroke,Projection& state,const Pointer& ray,bool* depth_found=nullptr) {
+    Sample sample;
+    if(snapped(stroke,state,ray,sample,depth_found)) return sample;
     V3 point,normal=state.normal; bool found=!state.surface||state.locked;
     if(state.surface&&!state.locked&&(found=surface_hit(stroke,ray,point,normal))) {
         point+=normal*state.offset*(state.relative?ray[8]:1);
@@ -167,6 +177,10 @@ int af_stroke_probe(uint64_t handle,const double* pointer,double* output) {
         const auto sample=af::project(*value,state,af::pointer_input(pointer));
         std::copy(sample.begin(),sample.end(),output); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_stroke_snapping(uint64_t handle,int enabled) {
+    try { af::stroke(handle)->snapping=enabled!=0; return 0; }
+    catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_stroke_read(uint64_t handle,int start,int capacity,double* output) {
     try {

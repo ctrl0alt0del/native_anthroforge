@@ -26,11 +26,13 @@ Qt references: [TabBar](https://doc.qt.io/qt-6/qml-qtquick-controls-tabbar.html)
 
 ## Current state
 
-Read metadata and annotated screenshots for all three reports; implementation inspection underway. No fixes yet. Unrelated root `__init__.py` is preserved.
+Implemented tabs and image actions, captured import intent, shared world-axis image placement, and temporary native surface projection through the keyboard manager. Native/projection/image tests pass; the actual QML acceptance harness is being completed. Unrelated root `__init__.py` is preserved.
 
 ## Verification
 
-Pending. All validation remains background-only; no visible windows or desktop input. Deliver one `dist/0.2.1/AnthroForge.dist` and `dist/AnthroForge-0.2.1-source.zip`. Recheck running processes before replacing the canonical build.
+Native build and 3 CTests pass. Focused tests cover transforms, nearest hits, fallback, offsets, unchanged projection policy, image import/undo and captured parent intent. QML harness initially used an overly strict 1e-9 tolerance for float camera projection (observed error 2.4e-8); UI tolerance is now 1e-6, native tests retain tighter tolerances. Full gate/package pending.
+
+All validation remains background-only; no visible windows or desktop input. Deliver one `dist/0.2.1/AnthroForge.dist` and `dist/AnthroForge-0.2.1-source.zip`. Recheck running processes before replacing the canonical build.
 
 ## Next actions and blockers
 

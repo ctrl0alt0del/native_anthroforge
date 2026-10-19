@@ -9,8 +9,8 @@ from uuid import uuid4
 from anthroforge.core.reference_images import ImageCalibration, ReferenceImage
 from anthroforge.native import images
 
-from . import authored_jobs, curve_sources, image_tasks, object_operations
-from .object_creation import placement, validate_parent
+from . import authored_jobs, curve_sources, image_placement, image_tasks, object_operations
+from .object_creation import validate_parent
 from .operations import require_name
 
 if TYPE_CHECKING:
@@ -32,9 +32,10 @@ def import_image(
     parent: str = "",
     owner: str = "",
     values: list[float] | None = None,
+    axis: str = "",
 ) -> dict[str, str]:
     source = Path(path).resolve(strict=True)
-    location = placement(session, parent, owner, values)
+    location = image_placement.create(session, parent, owner, values, axis)
     item = new_image(session, source, width, name, location)
     request = partial(image_tasks.enqueue, session, source, item, False)
     return dict(object_id=item.id, job_id=authored_jobs.begin(session, request))
@@ -74,14 +75,9 @@ def size(session: "Session", target: str, width: float) -> None:
 
 
 def align(session: "Session", target: str, axis: str) -> None:
-    selected(session, target)
-    orientations = {"X": (0, 90, 0), "Y": (-90, 0, 0), "Z": (0, 0, 0)}
-    if axis not in orientations:
-        raise ValueError("Image alignment requires X, Y or Z.")
-    frame = curve_sources.world(session.engine, session.document, target)
-    values = list(session.engine.decompose(frame))
-    values[3:6] = orientations[axis]
-    object_operations.transform(session, target, values, world=True)
+    item = selected(session, target)
+    frame = image_placement.aligned(session, item.parent, item.matrix, axis)
+    object_operations.install(session, replace(item, matrix=frame))
 
 
 def calibrate(

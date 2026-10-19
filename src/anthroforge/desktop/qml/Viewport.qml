@@ -25,6 +25,7 @@ Item {
     property string anchorMode: ""
     property bool orthographic: false
     readonly property vector3d imageViewAxis: Qt.vector3d(view.camera.forward.x, -view.camera.forward.z, view.camera.forward.y)
+    readonly property string imageAlignmentAxis: !orthographic ? "" : Math.abs(imageViewAxis.x)>0.999999 ? "X" : Math.abs(imageViewAxis.y)>0.999999 ? "Y" : Math.abs(imageViewAxis.z)>0.999999 ? "Z" : ""
     onImageViewAxisChanged: workspace.setViewportDirection([imageViewAxis.x,imageViewAxis.y,imageViewAxis.z])
     property real distance: 4
     property int depthIndex: 0

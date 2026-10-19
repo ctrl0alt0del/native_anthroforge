@@ -6,6 +6,8 @@ import pytest
 from PIL import Image
 
 from anthroforge.application import image_tasks, storage
+from anthroforge.application.curve_sources import world
+from anthroforge.native.strokes import plane
 
 
 def source(tmp_path, name="reference.png", size=(512, 300)):
@@ -18,6 +20,38 @@ def loaded(session, path, **options):
     result = session.command("image.import", path=path, **options)
     session.command("wait")
     return result["object_id"]
+
+
+@pytest.mark.parametrize("axis, normal", [("X", [1, 0, 0]), ("Y", [0, 1, 0]), ("Z", [0, 0, 1])])
+def test_parented_import_aligns_in_world_space_in_one_undo(session, tmp_path, axis, normal):
+    root = session.command("scp.empty", name="Parent")
+    session.command("scp.transform", entity=root, values=[2, 3, 4, 30, 50, 20, 2, 3, 4])
+    before = session.history.cursor
+    target = loaded(session, source(tmp_path), parent=root, owner=root, axis=axis)
+    item = session.document.object(target)
+    assert item.parent == root and item.owners == (root,)
+    assert plane(session.engine, world(session.engine, session.document, target)) == pytest.approx(
+        [2, 3, 4, *normal], abs=1e-10
+    )
+    assert session.history.cursor == before + 1
+    session.command("undo")
+    assert target not in session.document.registry.records
+    session.command("redo")
+    assert session.document.object(target) == item
+
+
+def test_invalid_import_axis_rejects_before_scheduling(session, tmp_path):
+    before, jobs = session.history.cursor, len(session.scheduler.jobs)
+    with pytest.raises(ValueError, match="requires X, Y or Z"):
+        loaded(session, source(tmp_path), axis="OTHER")
+    assert session.history.cursor == before and len(session.scheduler.jobs) == jobs
+
+
+def test_image_cannot_be_imported_under_readonly_parent(session, assembly, tmp_path):
+    root, child = assembly
+    session.command("workspace.create", name="Child", members=[child])
+    with pytest.raises(ValueError, match="outside the focused workspace"):
+        loaded(session, source(tmp_path), parent=root)
 
 
 def test_image_only_document_and_shared_instance(session, tmp_path):

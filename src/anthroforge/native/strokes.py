@@ -13,6 +13,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_stroke_release", [U], None)
     engine.bind("af_stroke_append", [U, D, c.c_int])
     engine.bind("af_stroke_probe", [U, D, D])
+    engine.bind("af_stroke_snapping", [U, c.c_int])
     engine.bind("af_stroke_read", [U, c.c_int, c.c_int, D])
     engine.bind("af_stroke_pop", [U])
     engine.bind("af_drawing_plane", [D, D])
@@ -96,6 +97,9 @@ class Stroke:
     def pop(self) -> None:
         self.count = self.engine.library.af_stroke_pop(self.handle)
         self.engine.check(self.count < 0)
+
+    def snapping(self, enabled: bool) -> None:
+        self.engine.check(self.engine.library.af_stroke_snapping(self.handle, enabled))
 
     def view(self, normal: Any) -> None:
         data = doubles(normal)

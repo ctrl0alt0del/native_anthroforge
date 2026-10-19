@@ -19,6 +19,7 @@ from shiboken6 import delete
 from ui_acceptance import find
 from ui_polish_acceptance import descendants
 
+from anthroforge.core.fibers import Fiber
 from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.runtime import native_runtime
@@ -68,6 +69,7 @@ def exercise(controller, engine):
     click(find(window, "acceptCurveConversion"))
     settle(controller)
     verify_accepted(controller, window, key, {root, child})
+    verify_automatic(controller, window, key, root)
 
 
 def verify_accepted(controller, window, key, targets):
@@ -89,6 +91,20 @@ def capture(window):
     parent.setProperty("contentY", max(0, offset - 20))
     QTest.qWait(100)
     assert window.grabWindow().save("build/solver-routing/obstacle-editor.png")
+
+
+def verify_automatic(controller, window, source, target):
+    curve = controller.session.document.object(source)
+    bindings = [dict(point=p.id, target=target) for p in (curve.points[0], curve.points[-1])]
+    controller.run("fiber.create", dict(curve=source, bindings=bindings))
+    settle(controller)
+    fiber = next(o for o in controller.session.document.objects if isinstance(o, Fiber))
+    controller.select(fiber.id)
+    settle(controller)
+    rows = [r for r in descendants(window.contentItem()) if r.objectName() == "routingObstacle"]
+    automatic = next(r for r in rows if r.property("targetId") == target)
+    assert automatic.property("checked") and not automatic.property("enabled")
+    assert not find(window, "routingObstacleNotice").property("visible")
 
 
 def run():

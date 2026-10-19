@@ -3,7 +3,7 @@
 - Task branch: `codex/solver-routing`
 - Integration branch: `main`
 - Starting revision: `2e8dc0b`
-- Status: implementation complete; full gate and portable qualification pending
+- Status: implementation, validation and delivery complete; ready for merge to main
 - Last updated: 2026-10-19, Europe/Bucharest
 - Active writer: local desktop chat
 
@@ -55,11 +55,39 @@ pass without QML warnings. Its capture and before/after invisible D3D11 captures
 actual project were inspected. The rerouted saved copy reports no centerline intersections
 with either cube; original SHA-256 is unchanged. No visible window or desktop input used.
 
-## Next actions
+Full development gate at runtime revision `7e146a1`: 877 pytest cases, 3 CTests, native
+clang-tidy, Ruff, format, mypy on 181 modules, function limits, PowerShell/dependencies and
+native doctor pass. Nine preexisting Qt deprecation warnings remain. The final QA-only
+extension verifies automatic Fiber obstacle rows are checked/disabled and hides the empty
+notice; offscreen acceptance and architecture checks pass after that addition.
 
-1. Run the complete development gate and review ownership/coupling.
-2. Build a separate 0.2.0 solver-fix portable folder and qualify the actual saved case.
-3. Deliver the executable and a distinct rerouted project copy, then merge and push.
+The clean packaged executable identifies `7e146a1` and passes the relocated portable suite
+with minimal PATH and offscreen UI. It also reroutes the actual project, saves revision
+1854, records a complete headless profile and renders invisibly. Independent native checks
+on that saved output report `[-1, -1]` (no centerline intersections) at tolerance
+2.7901363351661293e-9; all authored points remain identical. Original file hash remains
+unchanged. This does not claim hands-on interactive acceptance or physical display timing.
+
+## Ownership review and delivery
+
+Native routing owns transient contact classification, warm-seed validation and cold retry.
+It reuses the existing nearest-surface index, localized contact intervals and solver.
+Python remains orchestration; no new scheduler or numerical fallback was introduced.
+Both inspectors reuse RoutingObstacles.qml. Numerical contacts do not become bindings;
+explicit binding owners are preserved. Existing cancellation/publication contracts remain.
+
+The corrected executable is `dist/0.2.0-solver-fix/AnthroForge.dist/AnthroForge.exe`; keep its
+complete folder. Corresponding source is `dist/AnthroForge-0.2.0-solver-fix-source.zip`.
+The user receives `E:/development/WIP_models/solver_test_routed.anthroforge`, separate from
+the original. Previous 0.2.0 artifacts remain untouched. Evidence logs/captures/profile are
+under `build/solver-routing` and are local-only; compact inputs and regression tests are
+in Git. The only unrelated working-tree item is the preserved untracked root `__init__.py`.
+
+## Integration
+
+Latest fetched `origin/main` remains the qualified base `2e8dc0b`. Commit/push final QA and
+documentation, merge this branch normally, push main and verify remote ancestry. Git
+ancestry establishes completion of that integration step without a further runtime change.
 
 ## Recovery inputs
 

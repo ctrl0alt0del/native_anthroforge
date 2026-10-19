@@ -30,6 +30,16 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Native tissue stacking preparation now retains full material variables and exact CSR
+correspondence through crops, branches, envelopes and normal shells. Side extraction,
+world-space directions, participating faces, exact region/boundary rows and complete
+mesh assembly run in C++; shell backing remains unchanged. Canonical triangulation is
+retained when connectivity matches. Forty-five focused material/kernel/architecture tests,
+native build/CTest, changed-native function checks, Ruff and configured mypy pass.
+Structural Fiber-to-material pin preparation, full-shell independent validation and the
+coordinated application/desktop stacking workflow are still pending. This checkpoint is
+native integration evidence, not production stacking or release acceptance.
+
 The synchronous vector stacking numerical adapter is now compiled against pinned unchanged
 addon kernels and the maintained PIQP core. Fourteen actual-DLL reference cases match at
 2e-7 with matching rejection status/messages, covering transport, chains, multiple providers,

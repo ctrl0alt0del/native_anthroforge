@@ -159,6 +159,19 @@ Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification
 
+Retained Anchor bindings now own their bind-time mesh resource. The shared provider
+adapter evaluates only referenced material locations on current tissue output, preserving
+offsets and frame orientation across envelope compaction. Native canonical polygon
+correspondence avoids treating a changed A/B quad diagonal as lost material. Coincident
+envelope sides retain their implicit shared location; radial/sweep outputs retain canonical
+angular/profile identities rather than their coarser source-point map. Cropped-away
+locations fail explicitly without nearest recapture. Resolution returns a job-owned draft
+mesh used only by attachment evaluation, never rendering/picking. Resource reachability
+and schema-4 saves include bind-time references. Nine new native/workflow checks plus
+Anchor regressions and architecture total 17 passing tests; full-QML final-role selection,
+capture and update pass. Changed-native clang-tidy, Ruff and configured mypy pass.
+Fiber dense fields and target-relative regions still need this contract integrated.
+
 Tissue Make Independent now uses an owned construction-graph copier: one clone per source,
 copied internal junctions, remapped branch identities/accepted layouts and retained explicit
 external support targets. Anchor/Fiber/Membrane sources, branch settings, Manual accepted

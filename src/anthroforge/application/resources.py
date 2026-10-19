@@ -8,6 +8,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.object_registry import Authored
+from anthroforge.core.points import Anchor
 from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.core.surfaces import Surface
 from anthroforge.core.tissues import TissueVCP
@@ -60,7 +61,7 @@ def references(entities: Iterable[SCP], objects: Iterable[Authored]) -> dict[str
     meshes = {geometry_asset(e) for e in entities}
     meshes.update(e.primitive.source for e in entities if e.primitive)
     meshes.update(o.result.asset for o in objects if isinstance(o, Surface))
-    meshes.update(tissue_meshes(objects))
+    meshes.update(tissue_meshes(objects) | binding_meshes(objects))
     paths = {o.result.asset for o in objects if isinstance(o, Curve)}
     paths.update(o.edit.baseline for o in objects if isinstance(o, Fiber) and o.edit)
     paths.update(tissue_bases(objects, "CURVE"))
@@ -83,6 +84,10 @@ def tissue_meshes(objects: Iterable[Authored]) -> set[str]:
             item.final_result,
         )
     }
+
+
+def binding_meshes(objects: Iterable[Authored]) -> set[str]:
+    return {o.binding.material_asset for o in objects if isinstance(o, Anchor)}
 
 
 def tissue_bases(objects: Iterable[Authored], kind: str) -> set[str]:

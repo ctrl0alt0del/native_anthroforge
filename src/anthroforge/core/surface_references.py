@@ -22,6 +22,7 @@ class SurfaceBinding:
     reference: SurfaceReference
     attachment: Attachment = field(default_factory=Attachment)
     capture_scope: str = "CURRENT_PARENT"
+    material_asset: str = ""
 
     def __post_init__(self) -> None:
         if self.capture_scope not in ("CURRENT_PARENT", "ANY_PARENT"):

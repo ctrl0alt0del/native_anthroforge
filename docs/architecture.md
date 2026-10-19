@@ -5,6 +5,15 @@ define the confirmed unified TissueVCP, Point/Anchor and Surface/Membrane extens
 shared surface providers and schema 4. This work is in progress; the release descriptions
 below remain the qualified 0.2.1 baseline until the new task is completed.
 
+The in-progress surface-provider boundary now retains bind-time geometry for Anchor
+attachments. C++ resolves referenced material coordinates against the current accepted
+surface into a geometry-only lease with the captured index layout. The shared attachment
+kernel then resolves its unchanged frame/offset record. Canonical polygons and tissue-side
+correspondence survive envelope compaction; cropped-away locations fail without nearest
+reassignment. This lease is never a display/picking surface. Captured resource IDs are
+serialized and included in document/history/job ownership. Fiber fields and region
+constraints must adopt the same service as their integration proceeds.
+
 The [0.2.0 specification](specification_020.md) and
 [implementation plan](implementation_020.md) define the current boundaries:
 first-class construction objects, referenced curves, Fiber as Curve subclass,

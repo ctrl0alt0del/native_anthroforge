@@ -14,6 +14,9 @@ AF_API int af_point_attachment_capture(int surfaces,const uint64_t* meshes,const
     int count,const double* points,const int* forced,int* targets,double* bindings,uint64_t cancel);
 AF_API int af_point_attachment_resolve(int surfaces,const uint64_t* meshes,const double* frames,
     int count,const int* targets,const double* bindings,double* output,uint64_t cancel);
+/* Resolve only referenced bind-time material vertices; never nearest-surface recapture.
+ * Output is a geometry-only lease for attachment evaluation, not display or spatial queries. */
+AF_API uint64_t af_material_binding_surface(uint64_t reference,uint64_t current,int count,const double* bindings,uint64_t cancel);
 /* Dense path nodes followed by knot/left/right controls; two weighted influences per row. */
 AF_API int af_curve_attachment_capture(int surfaces,const uint64_t* meshes,const double* frames,
     uint64_t path,const double* records,int knots,const double* world,const int* pins,

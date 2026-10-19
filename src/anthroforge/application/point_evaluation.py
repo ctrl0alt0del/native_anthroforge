@@ -19,10 +19,14 @@ def position(engine: Any, document: Any, item: Point) -> tuple[float, ...]:
 
 
 def resolve(engine: Any, document: Any, meshes: Any, item: Anchor, cancel: int) -> Anchor:
-    inputs = surface_providers.inputs(engine, document, meshes, (item.binding.reference,))
+    provider = surface_providers.get(engine, document, meshes, item.binding.reference)
     if not item.binding.attachment.binding:
         raise ValueError("Anchor has no retained material binding; explicitly rebind it.")
     records = [item.binding.attachment.binding]
+    mesh = surface_providers.binding_mesh(
+        provider, meshes, item.binding.material_asset, records, cancel
+    )
+    inputs = ([mesh.handle], [provider.frame])
     frame = point_attachments.resolve(engine, *inputs, [0], records, cancel)[0]
     return with_frame(item, frame)
 

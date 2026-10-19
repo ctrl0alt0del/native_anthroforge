@@ -83,16 +83,18 @@ def compute(session: Any, spec: Capture, payload: Any, cancel: Any) -> Any:
     document, resources = payload
     item = document.object(spec.source)
     world = spec.position or point_evaluation.position(session.engine, document, item)
-    surfaces = surface_providers.inputs(
-        session.engine, document, resources.meshes, (spec.reference,)
-    )
-    targets, records = point_attachments.capture(
-        session.engine, *surfaces, [world], cancel=cancel.handle
-    )
+    provider = surface_providers.get(session.engine, document, resources.meshes, spec.reference)
+    binding, frame = capture_binding(session.engine, provider, world, cancel.handle)
+    return document, point_evaluation.with_frame(copied(item, spec, binding), frame)
+
+
+def capture_binding(engine: Any, provider: Any, world: Any, cancel: int) -> Any:
+    surfaces = ([provider.resource.mesh.handle], [provider.frame])
+    targets, records = point_attachments.capture(engine, *surfaces, [world], cancel=cancel)
     attachment = Attachment(child_mode="OBJECT_ORIGIN", binding=tuple(records[0].tolist()))
-    bound = copied(item, spec, SurfaceBinding(spec.reference, attachment))
-    frame = point_attachments.resolve(session.engine, *surfaces, targets, records, cancel.handle)[0]
-    return document, point_evaluation.with_frame(bound, frame)
+    binding = SurfaceBinding(provider.reference, attachment, material_asset=provider.asset_id)
+    frame = point_attachments.resolve(engine, *surfaces, targets, records, cancel)[0]
+    return binding, frame
 
 
 def copied(item: Point, spec: Capture, binding: SurfaceBinding) -> Anchor:

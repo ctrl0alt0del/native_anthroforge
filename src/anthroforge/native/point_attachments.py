@@ -14,6 +14,7 @@ HANDLES = c.POINTER(U)
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_point_attachment_capture", [c.c_int, HANDLES, D, c.c_int, D, INT, INT, D, U])
     engine.bind("af_point_attachment_resolve", [c.c_int, HANDLES, D, c.c_int, INT, D, D, U])
+    engine.bind("af_material_binding_surface", [U, U, c.c_int, D, U], U)
 
 
 def surface_arrays(meshes: Any, frames: Any) -> tuple[Any, Any]:

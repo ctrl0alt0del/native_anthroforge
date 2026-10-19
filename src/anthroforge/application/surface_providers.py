@@ -20,6 +20,7 @@ class SurfaceProvider:
     frame: tuple[float, ...]
     result: EvaluationResult
     port: Port
+    asset_id: str
 
 
 def references(document: Any) -> tuple[SurfaceReference, ...]:
@@ -47,7 +48,7 @@ def get(engine: Any, document: Any, meshes: Any, target: str | SurfaceReference)
         if isinstance(item, SCP)
         else Frames(engine, document).world(item.id)
     )
-    return SurfaceProvider(ref, meshes[key], frame, result, anatomical_surfaces.port(ref))
+    return SurfaceProvider(ref, meshes[key], frame, result, anatomical_surfaces.port(ref), key)
 
 
 def require_ready(ref: SurfaceReference, result: EvaluationResult, key: str, meshes: Any) -> None:
@@ -67,3 +68,19 @@ def inputs(engine: Any, document: Any, meshes: Any, targets: Any) -> tuple[Any, 
 def ports(document: Any, targets: Any) -> set[Port]:
     refs = [normalize(document, target) for target in targets]
     return {anatomical_surfaces.port(r) for r in refs} | {Port(r.target, "pose") for r in refs}
+
+
+def binding_mesh(
+    provider: SurfaceProvider, meshes: Any, reference: str, records: Any, cancel: int
+) -> Any:
+    from anthroforge.native import material_bindings
+
+    if not reference and provider.reference.role != "SCP_GEOMETRY":
+        raise ValueError("Tissue binding has no retained material reference; explicitly rebind.")
+    if not reference or reference == provider.asset_id:
+        return provider.resource.mesh
+    if reference not in meshes:
+        raise ValueError("Missing retained material reference; explicitly rebind the attachment.")
+    return material_bindings.resolve(
+        meshes[reference].mesh, provider.resource.mesh, records, cancel
+    )

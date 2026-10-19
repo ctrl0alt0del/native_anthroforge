@@ -430,6 +430,13 @@ they do not certify anatomical accuracy or reconstruct muscles.
 
 ## Curve surfaces
 
+`tissue.create(source, preset)` applies editable defaults for `MUSCLE`, `CUSTOM`,
+`CLOSED_BULK` (Anchor), `RIM` (Fiber), and `LAYER`/`POUCH` (Membrane). Incompatible
+source/preset combinations fail before creation. All presets use the same TissueVCP.
+`tissue.configure(..., changes={"classification": "..."})` changes only its label;
+it never reapplies defaults or changes stacking. Numerical and visual release
+qualification is still in progress; see the [task record](tasks/unified-tissues-022.md).
+
 The in-progress 0.2.2 tissue API includes `tissue.crop(target, changes)`, with `enabled`,
 local `origin`/`normal` and `positive` half-space settings. Cropping acts in base material
 coordinates after intrinsic deformation; its edges are neither attachments nor new

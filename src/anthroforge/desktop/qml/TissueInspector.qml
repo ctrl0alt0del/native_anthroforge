@@ -22,6 +22,12 @@ ColumnLayout {
         onEditingFinished: if(panel.selected.is_tissue && text !== panel.selected.name) workspace.run("object.rename",{target:panel.selected.id,name:text})
     }
     UiButton { text: "Edit construction source"; glyph: "curve-points"; Layout.fillWidth: true; onClicked: workspace.select(panel.item.source) }
+    UiField {
+        id: classification; objectName: "tissueClassification"; Layout.fillWidth: true
+        Accessible.name: "Tissue classification"; placeholderText: "Classification"
+        Binding { target: classification; property: "text"; when: !classification.activeFocus; value: panel.item.classification || "" }
+        onEditingFinished: if(text !== panel.item.classification) panel.configure("classification",text)
+    }
     RowLayout {
         Layout.fillWidth: true
         UiCombo { objectName: "tissuePart"; visible: model.length>1; Layout.fillWidth: true; textRole: "label"; model: (panel.item.parts || []).map((p,i)=>({id:p.id,label:i ? "Branch "+i : "Main"})); currentIndex: Math.max(0,model.findIndex(p=>p.id===panel.partId)); onActivated: panel.partId=model[currentIndex].id }

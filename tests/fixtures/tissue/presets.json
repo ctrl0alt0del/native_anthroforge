@@ -1,0 +1,243 @@
+{
+  "source": "C:\\Users\\alexe\\AppData\\Roaming\\Blender Foundation\\Blender\\5.0\\scripts\\addons\\anthroforge\\core\\vcp\\soft_tissue_presets.py",
+  "sha256": "dfa26c5bf64651dd625ec7740d0b481183aab7889d5dd7e054a3e608f58c9664",
+  "presets": {
+    "CLOSED_BULK": {
+      "domain": "POINT",
+      "boundary": "CLOSED",
+      "inflation_mode": "RADIAL",
+      "relaxation_mode": "GEOMETRIC",
+      "values": [
+        [
+          "inflation_amount",
+          0.2
+        ],
+        [
+          "minimum_amount",
+          0.0
+        ],
+        [
+          "sagginess",
+          0.035
+        ],
+        [
+          "sag_limit",
+          0.35
+        ],
+        [
+          "shape_retention",
+          0.25
+        ],
+        [
+          "volume_retention",
+          0.9
+        ],
+        [
+          "surface_slack",
+          0.0
+        ],
+        [
+          "iterations",
+          20
+        ],
+        [
+          "constraint_passes",
+          1
+        ]
+      ],
+      "attachments": []
+    },
+    "RIM": {
+      "domain": "CURVE",
+      "boundary": "HOST_SEALED",
+      "inflation_mode": "PROFILE",
+      "relaxation_mode": "GEOMETRIC",
+      "values": [
+        [
+          "base_resolution",
+          33
+        ],
+        [
+          "inflation_amount",
+          0.12
+        ],
+        [
+          "profile_width",
+          0.08
+        ],
+        [
+          "profile_power",
+          0.65
+        ],
+        [
+          "profile_segments",
+          11
+        ],
+        [
+          "endpoint_taper",
+          0.12
+        ],
+        [
+          "sagginess",
+          0.08
+        ],
+        [
+          "sag_limit",
+          0.024
+        ],
+        [
+          "shape_retention",
+          0.72
+        ],
+        [
+          "volume_retention",
+          0.92
+        ],
+        [
+          "surface_slack",
+          0.0
+        ]
+      ],
+      "attachments": [
+        [
+          "BACKING",
+          "FIXED",
+          1.0
+        ],
+        [
+          "ENDPOINTS",
+          "FIXED",
+          1.0
+        ]
+      ]
+    },
+    "LAYER": {
+      "domain": "SURFACE",
+      "boundary": "HOST_SEALED",
+      "inflation_mode": "NORMAL",
+      "relaxation_mode": "GEOMETRIC",
+      "values": [
+        [
+          "inflation_amount",
+          0.28
+        ],
+        [
+          "minimum_amount",
+          0.008
+        ],
+        [
+          "field_power",
+          0.78
+        ],
+        [
+          "sagginess",
+          0.65
+        ],
+        [
+          "sag_limit",
+          0.2
+        ],
+        [
+          "shape_retention",
+          0.48
+        ],
+        [
+          "volume_retention",
+          0.88
+        ],
+        [
+          "surface_slack",
+          0.0
+        ],
+        [
+          "iterations",
+          100
+        ],
+        [
+          "constraint_passes",
+          4
+        ]
+      ],
+      "attachments": [
+        [
+          "BOUNDARY",
+          "FIXED",
+          1.0
+        ],
+        [
+          "BACKING",
+          "SOFT",
+          0.55
+        ]
+      ]
+    },
+    "POUCH": {
+      "domain": "SURFACE",
+      "boundary": "HOST_SEALED",
+      "inflation_mode": "NORMAL",
+      "relaxation_mode": "STATIC_PBD",
+      "values": [
+        [
+          "inflation_amount",
+          0.62
+        ],
+        [
+          "minimum_amount",
+          0.012
+        ],
+        [
+          "field_power",
+          0.58
+        ],
+        [
+          "sagginess",
+          0.58
+        ],
+        [
+          "sag_limit",
+          0.0
+        ],
+        [
+          "shape_retention",
+          0.48
+        ],
+        [
+          "volume_retention",
+          0.88
+        ],
+        [
+          "surface_slack",
+          0.0
+        ],
+        [
+          "iterations",
+          110
+        ],
+        [
+          "constraint_passes",
+          4
+        ]
+      ],
+      "attachments": [
+        [
+          "BOUNDARY",
+          "FIXED",
+          1.0
+        ],
+        [
+          "BACKING",
+          "FIXED",
+          1.0
+        ]
+      ]
+    },
+    "CUSTOM": {
+      "domain": "SURFACE",
+      "boundary": "HOST_SEALED",
+      "inflation_mode": "NORMAL",
+      "relaxation_mode": "NONE",
+      "values": [],
+      "attachments": []
+    }
+  }
+}

@@ -159,6 +159,23 @@ Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification
 
+Preset creation now applies the actual donor settings for Closed Bulk/Rim/Layer/Pouch,
+with source-capability filtering in desktop and API. Classification is an editable label;
+changing it preserves all settings. The Layer soft backing default remains recorded while
+the structural backing stays exact. Captured donor defaults and seven workflow checks pass;
+full-QML Layer/Pouch creation and hidden-GPU rendering execute successfully.
+**Visual qualification is not complete:** the Pouch preset on the curved horizontal
+membrane fixture produces two large lobes and a collapsed middle. The addon's current
+native solver reproduces the result exactly (0 maximum coordinate difference), including
+canonical and donor-fan triangulation. It reports ITERATION_LIMIT, not convergence.
+Rest geometry is smooth before relaxation. An experiment eliminating near-coincident
+refinement stations did not repair the shape and was reverted; do not claim refinement
+as the cause. Diagnostic inputs/captures are in ignored `build/022-tissue/pouch-probe*`.
+Further geometry qualification and handling of unusable warned results remain required.
+
+Complete suite after crop/smoothing: **1110 passed**, 599 existing Qt deprecation warnings,
+40.37 seconds. Preset changes have focused checks but not a subsequent full gate yet.
+
 Material-domain crop is now native and exposed through `tissue.crop` and the focused
 inspector. Twenty actual addon fixtures cover ordinary/profile/branched, oblique,
 empty and two-sided results at 1e-10. Envelope sides must be clipped before composition;

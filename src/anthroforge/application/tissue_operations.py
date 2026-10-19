@@ -3,9 +3,8 @@
 from dataclasses import asdict, replace
 from typing import Any
 
-from anthroforge.core import tissue_parts, tissue_policy
-from anthroforge.core.membranes import Membrane
-from anthroforge.core.tissue_settings import TissueInflation, TissuePart, TissueSide
+from anthroforge.core import tissue_parts, tissue_policy, tissue_presets
+from anthroforge.core.tissue_settings import TissuePart
 from anthroforge.core.tissues import TissueVCP
 
 from . import object_operations, tissue_codec, tissue_tasks
@@ -22,18 +21,12 @@ def create(session: Any, source: str, name: str = "Tissue", preset: str = "MUSCL
 
 
 def definition(source_item: Any, name: str, preset: str) -> TissueVCP:
-    domain = tissue_policy.domain(source_item)
-    mode = {"POINT": "RADIAL", "CURVE": "PROFILE", "SURFACE": "NORMAL"}[domain]
-    if preset == "MUSCLE" and isinstance(source_item, Membrane) and source_item.kind != "PATCH":
-        mode = "DISTRIBUTED"
     return TissueVCP(
         name=require_name(name),
         source=source_item.id,
         preset=preset,
-        classification="MUSCLE" if preset == "MUSCLE" else "SOFT_TISSUE",
-        parts=(TissuePart(a=TissueSide(TissueInflation(mode=mode))),),
-        stacking=preset == "MUSCLE" and domain == "SURFACE",
         owners=source_item.owners,
+        **tissue_presets.settings(source_item, preset),
     )
 
 

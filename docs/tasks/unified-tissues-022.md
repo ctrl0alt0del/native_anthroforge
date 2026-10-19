@@ -37,22 +37,36 @@ the already-native solvers. Existing addon kernels, PIQP 0.6.4 and qualification
 fixtures are migration references; Blender is not a runtime dependency.
 
 Specification, migration inventory, implementation plan and active documentation
-links are written. No runtime changes yet. Unrelated untracked root `__init__.py`
-is preserved.
+links are written. Typed Point/Anchor/Membrane/TissueVCP contracts, schema 4,
+stage-result ownership and role-aware accepted surface providers are implemented.
+All-Fiber surface creation now produces a Membrane. Point creation/editing and
+independent Anchor capture/rebind use shared commands, native binding kernels,
+the existing coordinator and undo history. Parent movement resolves retained
+bindings; deletion protection and workspace association include Anchors.
+
+Runtime integration remains incomplete: Point/Anchor desktop tools, tissue phase
+revision policies, generalized Fiber roles, intrinsic numerical ports, stacking,
+full GUI and release qualification are still required. No 0.2.2 release is claimed.
+Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification
 
 Baseline `uv run --no-sync pytest -q`: **941 passed**, 307 existing Qt deprecation
 warnings, 31.89 seconds on Windows. `git diff --check` passed for documentation.
 Baseline main matched origin/main before branching.
+Foundation full suite: **951 passed**, 307 existing warnings, 30.18 seconds.
+Subsequent Point/Anchor lifecycle and architecture checks: **8 passed**. These
+exercise capture, parent motion, explicit rebind, undo/redo, deletion protection
+and persistence. Shared provider and output dispatch changes still require the
+next complete regression run; desktop/geometry parity acceptance is pending.
 Required: development gate, geometry parity, lifecycle, headless, offscreen UI,
 profiler and portable acceptance, followed by ownership/coupling review.
 
 ## Next actions
 
-1. Write authoritative specification, implementation inventory and documentation links.
-2. Implement typed objects, schema and shared surface-provider foundations with tests.
-3. Integrate intrinsic construction, attachments, stacking and desktop controls.
+1. Finish attached-construction desktop entry points and role-aware consumers.
+2. Integrate intrinsic construction, attachment chains and stacking native kernels.
+3. Complete focused tissue inspectors and editing tools.
 4. Qualify and release, then validated merge/push. Do not merge partial checkpoints.
 
 ## Recovery inputs

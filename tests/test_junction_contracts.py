@@ -73,7 +73,7 @@ def test_independent_curve_copy_drops_junction_relationship():
     assert not Document(objects=(copied,)).junctions
 
 
-def test_junction_identity_and_source_roundtrip_in_schema_three():
+def test_junction_identity_and_source_roundtrip_in_current_schema():
     document, _, _, junction = linked()
     encoded = storage.document_state(document)
     restored = storage.decode_document(encoded)

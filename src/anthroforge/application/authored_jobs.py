@@ -47,5 +47,5 @@ def append_object(document: Document, item: Any) -> Document:
         return document
     if item.parent and item.parent not in document.registry.records:
         return document
-    owners = tuple(owner for owner in item.owners if owner in document.index.entities)
+    owners = tuple(owner for owner in item.owners if owner in document.registry.anatomy)
     return replace(document, objects=(*document.objects, replace(item, owners=owners)))

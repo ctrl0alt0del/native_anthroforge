@@ -6,7 +6,7 @@ from anthroforge.core.results import Port
 
 
 def changed(session: Any, seeds: set[Port], published: bool = True) -> None:
-    from . import construction_tasks, control_tasks, dependencies, path_tasks
+    from . import construction_tasks, control_tasks, dependencies, output_tasks
     from .geometry_outputs import pending
 
     targets = dependencies.affected(session.document, seeds)
@@ -15,5 +15,5 @@ def changed(session: Any, seeds: set[Port], published: bool = True) -> None:
     if targets:
         pending(session, targets)
     control_tasks.edited(session, seeds)
-    path_tasks.edited(session, seeds)
+    output_tasks.edited(session, seeds)
     construction_tasks.schedule(session, targets)

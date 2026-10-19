@@ -3,7 +3,7 @@
 from dataclasses import fields, replace
 
 from anthroforge.core.object_outputs import output
-from anthroforge.core.objects import ConstructionObject
+from anthroforge.core.objects import ObjectRecord
 from anthroforge.core.results import Port
 
 POSE = frozenset(("matrix", "parent"))
@@ -17,11 +17,17 @@ METADATA = frozenset(
         "pose_revision",
         "construction_revision",
         "result",
+        "base_result",
+        "rest_result",
+        "intrinsic_result",
+        "final_result",
+        "resolved_position",
+        "resolved_frame",
     )
 )
 
 
-def changed_ports(before: ConstructionObject, after: ConstructionObject) -> set[Port]:
+def changed_ports(before: ObjectRecord, after: ObjectRecord) -> set[Port]:
     names = {f.name for f in fields(after) if getattr(before, f.name) != getattr(after, f.name)}
     result = {Port(after.id, "local_pose")} if names & POSE else set()
     if names - POSE - METADATA:
@@ -29,7 +35,7 @@ def changed_ports(before: ConstructionObject, after: ConstructionObject) -> set[
     return result
 
 
-def authored[T: ConstructionObject](before: T, after: T) -> T:
+def authored[T: ObjectRecord](before: T, after: T) -> T:
     if after == before:
         return before
     ports = changed_ports(before, after)

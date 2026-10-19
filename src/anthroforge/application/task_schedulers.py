@@ -193,6 +193,7 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
         **curve_schedulers(),
+        **anchor_schedulers(),
         "control_pose": ControlPoseTaskScheduler(),
         "issue_check": IssueTaskScheduler(),
         "inspection_report": InspectionTaskScheduler(),
@@ -207,4 +208,11 @@ def curve_schedulers() -> dict[str, TaskScheduler]:
         "surface_layout": SurfaceLayoutTaskScheduler(),
         "fiber_capture": FiberCaptureTaskScheduler(),
         "fiber_path": FiberPathTaskScheduler(),
+    }
+
+
+def anchor_schedulers() -> dict[str, TaskScheduler]:
+    return {
+        "anchor_capture": FiberCaptureTaskScheduler(),
+        "anchor_binding": AttachmentTaskScheduler(),
     }

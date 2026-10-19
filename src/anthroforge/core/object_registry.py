@@ -11,14 +11,19 @@ from .entities import SCP
 from .fibers import Fiber
 from .junctions import Junction
 from .junctions import validate as validate_junctions
+from .membranes import Membrane
+from .points import Anchor, Point
 from .reference_images import ReferenceImage
 from .surfaces import Surface
+from .tissues import TissueVCP
 
 if TYPE_CHECKING:
     from .document import Document
 
-type Construction = Curve | Surface | ReferenceImage
-type SceneObject = SCP | Control | Construction
+type Construction = Curve | Surface | ReferenceImage | Point
+type Authored = Construction | TissueVCP
+type Anatomy = SCP | TissueVCP
+type SceneObject = SCP | Control | Authored
 
 
 def kind(item: SceneObject) -> str:
@@ -28,6 +33,10 @@ def kind(item: SceneObject) -> str:
         Curve: "CURVE",
         Fiber: "FIBER",
         Surface: "SURFACE",
+        Membrane: "MEMBRANE",
+        Point: "POINT",
+        Anchor: "ANCHOR",
+        TissueVCP: "TISSUE",
         ReferenceImage: "IMAGE",
     }[type(item)]
 
@@ -36,11 +45,13 @@ def kind(item: SceneObject) -> str:
 class ObjectRegistry:
     records: Mapping[str, SceneObject]
     construction: Mapping[str, Construction]
-    source: tuple[Construction, ...]
+    source: tuple[Authored, ...]
     entities: tuple[SCP, ...]
     controls: tuple[Control, ...]
     consumers: Mapping[str, frozenset[str]]
     junctions: tuple[Junction, ...]
+    anatomy: Mapping[str, Anatomy]
+    authored: Mapping[str, Authored]
 
     def get(self, key: str) -> SceneObject:
         if key not in self.records:
@@ -54,12 +65,14 @@ def build(document: "Document", previous: ObjectRegistry | None) -> ObjectRegist
     records = validated_records(document)
     return ObjectRegistry(
         MappingProxyType(records),
-        MappingProxyType({v.id: v for v in document.objects}),
+        MappingProxyType({v.id: v for v in document.objects if not isinstance(v, TissueVCP)}),
         document.objects,
         document.entities,
         document.controls,
         construction_consumers(document),
         document.junctions,
+        MappingProxyType({k: v for k, v in records.items() if isinstance(v, (SCP, TissueVCP))}),
+        MappingProxyType({v.id: v for v in document.objects}),
     )
 
 
@@ -78,6 +91,8 @@ def construction_consumers(document: "Document") -> Mapping[str, frozenset[str]]
         definition = getattr(item, "primitive", None) or item
         for use in getattr(definition, "curves", ()):
             users.setdefault(use.curve, set()).add(item.id)
+        if isinstance(item, TissueVCP):
+            users.setdefault(item.source, set()).add(item.id)
     owners: tuple[SCP | Control, ...] = (*document.entities, *document.controls)
     for owner in owners:
         for binding in owner.deformers:
@@ -100,22 +115,32 @@ def validate(document: "Document", records: dict[str, SceneObject]) -> None:
     validate_primitives(document, records)
     for item in document.objects:
         validate_placement(document, item, records)
-        if isinstance(item, Curve):
-            validate_bindings(item, records)
-        if isinstance(item, Surface):
-            validate_sources(item, records)
+        validate_object(item, records)
     validate_parenting(document.objects)
     validate_point_ids(document)
 
 
+def validate_object(item: Authored, records: dict[str, SceneObject]) -> None:
+    from .tissue_policy import validate as validate_tissue
+
+    if isinstance(item, Curve):
+        validate_bindings(item, records)
+    if isinstance(item, Surface):
+        validate_sources(item, records)
+    if isinstance(item, TissueVCP):
+        validate_tissue(item, records)
+    if isinstance(item, Anchor):
+        validate_anchor(item, records)
+
+
 def validate_placement(
-    document: "Document", item: Construction, records: Mapping[str, SceneObject]
+    document: "Document", item: Authored, records: Mapping[str, SceneObject]
 ) -> None:
     if item.parent and (
         item.parent not in records or isinstance(records[item.parent], ReferenceImage)
     ):
         raise ValueError("Transform parent must exist and cannot be a reference image.")
-    if set(item.owners) - document.index.entities.keys():
+    if any(not isinstance(records.get(key), (SCP, TissueVCP)) for key in item.owners):
         raise ValueError("Workspace associations require anatomical objects.")
 
 
@@ -136,7 +161,7 @@ def validate_bindings(item: Curve, records: dict[str, SceneObject]) -> None:
         else ()
     )
     for target in curve_targets(item) | set(excluded):
-        if not isinstance(records.get(target), SCP):
+        if not isinstance(records.get(target), (SCP, TissueVCP)):
             raise ValueError(
                 "Curve obstacles and fiber bindings require anatomical surface providers."
             )
@@ -146,6 +171,8 @@ def validate_sources(item: Surface, records: Mapping[str, SceneObject]) -> None:
     from .surface_branches import validate_sources as validate_branches
 
     sources = [records.get(use.curve) for use in item.curves]
+    if isinstance(item, Membrane) and any(not isinstance(source, Fiber) for source in sources):
+        raise ValueError("Membrane sources must all be Fibers.")
     if any(not isinstance(source, Curve) for source in sources):
         raise ValueError("Surface sources must be curves or fibers.")
     closed = {source.closed for source in sources if isinstance(source, Curve)}
@@ -156,7 +183,7 @@ def validate_sources(item: Surface, records: Mapping[str, SceneObject]) -> None:
     validate_branches(item, records)
 
 
-def validate_parenting(objects: tuple[Construction, ...]) -> None:
+def validate_parenting(objects: tuple[Authored, ...]) -> None:
     parents, visited = {item.id: item.parent for item in objects}, set()
     for item in objects:
         pending, key = set(), item.id
@@ -178,3 +205,10 @@ def validate_point_ids(document: "Document") -> None:
     keys.extend(p.id for item in document.objects if isinstance(item, Curve) for p in item.points)
     if any(not key for key in keys) or len(set(keys)) != len(keys):
         raise ValueError("Authored identities must be nonempty and unique across the document.")
+
+
+def validate_anchor(item: Anchor, records: Mapping[str, SceneObject]) -> None:
+    from .anatomical_surfaces import reference
+
+    target = item.binding.reference
+    reference(target.target, records, target.role)

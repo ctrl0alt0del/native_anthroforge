@@ -8,36 +8,61 @@ from anthroforge.core.curve_engines import fields as curve_fields
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import Attachment
 from anthroforge.core.fibers import Fiber, FiberBinding, FiberEdit
-from anthroforge.core.object_registry import Construction
+from anthroforge.core.membranes import Membrane
+from anthroforge.core.object_registry import Authored
+from anthroforge.core.points import Anchor, Point
 from anthroforge.core.reference_images import ImageCalibration, ReferenceImage
 from anthroforge.core.results import EvaluationResult
 from anthroforge.core.surface_branches import SurfaceBranch
 from anthroforge.core.surfaces import Surface, SurfaceAlignment
+from anthroforge.core.tissues import TissueVCP
 
+from . import tissue_codec
 from .construction_codec import result_fields, tuples
 
-KINDS = {Curve: "curve", Fiber: "fiber", Surface: "surface", ReferenceImage: "reference_image"}
+KINDS = {
+    Curve: "curve",
+    Fiber: "fiber",
+    Surface: "surface",
+    ReferenceImage: "reference_image",
+    Point: "point",
+    Anchor: "anchor",
+    Membrane: "membrane",
+    TissueVCP: "tissue",
+}
 
 
-def encode(item: Construction) -> dict[str, Any]:
+def encode(item: Authored) -> dict[str, Any]:
     return {"kind": KINDS[type(item)], "state": asdict(item)}
 
 
-def decode(data: dict[str, Any]) -> Construction:
+def decode(data: dict[str, Any]) -> Authored:
     kind, state = data["kind"], tuples(data["state"])
     state["result"] = EvaluationResult(**result_fields(state.get("result", {})))
     if kind in ("curve", "fiber"):
         return decode_curve(kind, state)
-    if kind == "surface":
-        state["curves"] = tuple(CurveUse(**tuples(use)) for use in state["curves"])
-        state["alignment"] = tuple(SurfaceAlignment(**row) for row in state.get("alignment", ()))
-        state["branches"] = tuple(SurfaceBranch(**tuples(row)) for row in state.get("branches", ()))
-        return Surface(**state)
+    if kind in ("surface", "membrane"):
+        return decode_surface(kind, state)
+    if kind in ("point", "anchor"):
+        return tissue_codec.point(kind, state)
+    if kind == "tissue":
+        return tissue_codec.tissue(state)
     if kind == "reference_image":
-        calibration = state.get("calibration")
-        state["calibration"] = ImageCalibration(**tuples(calibration)) if calibration else None
-        return ReferenceImage(**state)
+        return decode_image(state)
     raise ValueError(f"Unsupported construction object kind: {kind}")
+
+
+def decode_surface(kind: str, state: dict[str, Any]) -> Surface:
+    state["curves"] = tuple(CurveUse(**tuples(use)) for use in state["curves"])
+    state["alignment"] = tuple(SurfaceAlignment(**row) for row in state.get("alignment", ()))
+    state["branches"] = tuple(SurfaceBranch(**tuples(row)) for row in state.get("branches", ()))
+    return (Membrane if kind == "membrane" else Surface)(**state)
+
+
+def decode_image(state: dict[str, Any]) -> ReferenceImage:
+    calibration = state.get("calibration")
+    state["calibration"] = ImageCalibration(**tuples(calibration)) if calibration else None
+    return ReferenceImage(**state)
 
 
 def decode_curve(kind: str, state: dict[str, Any]) -> Curve:

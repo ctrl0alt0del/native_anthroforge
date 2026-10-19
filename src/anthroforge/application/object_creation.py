@@ -3,7 +3,7 @@
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.entities import IDENTITY
-from anthroforge.core.objects import ConstructionObject
+from anthroforge.core.objects import ObjectRecord
 from anthroforge.core.reference_images import ReferenceImage
 
 if TYPE_CHECKING:
@@ -25,5 +25,5 @@ def require_parent(session: "Session", parent: str) -> None:
         raise ValueError("Transform parent cannot be a reference image.")
 
 
-def validate_parent(session: "Session", item: ConstructionObject) -> None:
+def validate_parent(session: "Session", item: ObjectRecord) -> None:
     require_parent(session, item.parent)

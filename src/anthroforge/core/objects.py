@@ -8,7 +8,7 @@ from .results import EvaluationResult
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
-class ConstructionObject:
+class ObjectRecord:
     id: str = field(default_factory=lambda: str(uuid4()))
     name: str = "Object"
     matrix: tuple[float, ...] = IDENTITY
@@ -30,3 +30,8 @@ class ConstructionObject:
             raise ValueError("Workspace associations must be unique anatomical identities.")
         if min(self.generation, self.pose_revision, self.construction_revision) < 0:
             raise ValueError("Object revisions must be nonnegative.")
+
+
+@dataclass(frozen=True, slots=True, kw_only=True)
+class ConstructionObject(ObjectRecord):
+    """An authored construction source, distinct from an anatomical entity."""

@@ -174,7 +174,7 @@ class Session:
         from .construction_tasks import schedule
         from .control_tasks import resume
         from .geometry_outputs import items
-        from .path_tasks import pending
+        from .output_tasks import pending
 
         resume(self)
         pending(self)

@@ -7,8 +7,7 @@ from anthroforge.core.construction import Control, Curve
 from anthroforge.core.curve_consumption import uses, with_uses
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import SCP
-from anthroforge.core.fibers import Fiber
-from anthroforge.core.object_registry import Construction, SceneObject
+from anthroforge.core.object_registry import Authored, SceneObject
 from anthroforge.core.results import Port
 from anthroforge.core.surfaces import Surface
 from anthroforge.native.construction import matrix
@@ -20,7 +19,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 
-def require_removable(session: "Session", item: Construction) -> None:
+def require_removable(session: "Session", item: Authored) -> None:
     if isinstance(item, Curve) and any(p.junction for p in item.points):
         raise ValueError("Detach shared junctions before deleting this curve.")
     users = curve_sources.consumers(session.document, {item.id})
@@ -32,7 +31,7 @@ def install(
     session: "Session",
     entities: tuple[SCP, ...],
     controls: tuple[Control, ...],
-    objects: tuple[Construction, ...],
+    objects: tuple[Authored, ...],
 ) -> None:
     from .dependent_tasks import changed
 
@@ -43,12 +42,12 @@ def install(
 
 
 def changed_inputs(
-    session: "Session", controls: tuple[Control, ...], objects: tuple[Construction, ...]
+    session: "Session", controls: tuple[Control, ...], objects: tuple[Authored, ...]
 ) -> set[Port]:
     from .object_revisions import changed_ports
 
     before = session.document.registry.records
-    sources = session.document.registry.construction
+    sources = session.document.registry.authored
     ports = set().union(*(changed_ports(sources[o.id], o) for o in objects))
     ports.update(Port(c.id, "control") for c in controls if c != before[c.id])
     return ports
@@ -56,20 +55,18 @@ def changed_inputs(
 
 def retain_objects(
     session: "Session", removed: SceneObject, parent: SceneObject | None
-) -> tuple[Construction, ...]:
+) -> tuple[Authored, ...]:
+    from anthroforge.core.attachment_references import targets
+
     for item in session.document.objects:
-        if isinstance(item, Fiber) and (
-            removed.id in item.supports or any(b.target == removed.id for b in item.bindings)
-        ):
-            raise ValueError(
-                "Rebind the dependent fiber before deleting its attachment target: " + item.name
-            )
+        if removed.id in targets(item):
+            raise ValueError("Rebind dependent anatomy before deleting its target: " + item.name)
     return tuple(retain_object(session, item, removed, parent) for item in session.document.objects)
 
 
 def retain_object(
-    session: "Session", item: Construction, removed: SceneObject, parent: SceneObject | None
-) -> Construction:
+    session: "Session", item: Authored, removed: SceneObject, parent: SceneObject | None
+) -> Authored:
     if isinstance(item, Surface):
         item = rebase_uses(session, item, removed.id)
     item = without_obstacle(item, removed.id)
@@ -83,7 +80,7 @@ def retain_object(
     return authored(item, changed)
 
 
-def without_obstacle(item: Construction, removed: str) -> Construction:
+def without_obstacle(item: Authored, removed: str) -> Authored:
     from anthroforge.core.curve_engines import RoutingSettings
 
     if not isinstance(item, Curve) or not isinstance(item.engine_settings, RoutingSettings):

@@ -6,8 +6,8 @@ from typing import TYPE_CHECKING, Any
 from anthroforge.core import curve_engines
 from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.core.curve_shapes import reshaped
-from anthroforge.core.object_registry import Construction
-from anthroforge.core.objects import ConstructionObject
+from anthroforge.core.object_registry import Authored
+from anthroforge.core.objects import ObjectRecord
 from anthroforge.native import curve_editing
 
 from . import (
@@ -26,20 +26,20 @@ if TYPE_CHECKING:
     from .session import Session
 
 
-def editable(session: "Session", target: str) -> Construction:
+def editable(session: "Session", target: str) -> Authored:
     from .workspace_policy import included
 
     if session.waiting_save:
         raise ValueError("Editing is blocked while waiting to save.")
     item = session.document.object(target)
-    if not isinstance(item, ConstructionObject):
+    if not isinstance(item, ObjectRecord):
         raise ValueError("This operation requires a construction object.")
     if not included(session.document, session.workspace, target):
         raise ValueError("This construction object is outside the focused workspace.")
     return item
 
 
-def install(session: "Session", item: Construction) -> None:
+def install(session: "Session", item: Authored) -> None:
     from . import junction_operations
 
     before = editable(session, item.id)
@@ -55,7 +55,7 @@ def install(session: "Session", item: Construction) -> None:
     dependent_tasks.changed(session, ports, published=False)
 
 
-def install_state(session: "Session", before: Construction, changed: Construction) -> None:
+def install_state(session: "Session", before: Authored, changed: Authored) -> None:
     from . import consumer_parenting
 
     objects = tuple(changed if o.id == changed.id else o for o in session.document.objects)
@@ -183,7 +183,7 @@ def edit_point(session: "Session", curve: str, point: str, **options: Any) -> No
 def inspect(session: "Session", target: str) -> dict[str, Any]:
     from .object_codec import encode
 
-    item = session.document.registry.construction.get(target)
+    item = session.document.registry.authored.get(target)
     if item is None:
         raise ValueError("Unknown construction object.")
     return {

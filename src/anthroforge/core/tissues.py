@@ -1,0 +1,43 @@
+"""Anatomical tissue composes construction and strategies without anatomical subclasses."""
+
+from dataclasses import dataclass, field
+
+from .objects import ObjectRecord
+from .results import EvaluationResult
+from .tissue_constraints import TissueConstraint, TissueField
+from .tissue_settings import TissueCrop, TissuePart, TissueRelaxation
+
+
+@dataclass(frozen=True, slots=True)
+class TissueVCP(ObjectRecord):
+    source: str = ""
+    classification: str = "MUSCLE"
+    preset: str = "MUSCLE"
+    color: str = "#ad625e"
+    parts: tuple[TissuePart, ...] = (TissuePart(),)
+    both_sides: bool = False
+    reverse: bool = False
+    resolution: int = 24
+    relaxation: TissueRelaxation = field(default_factory=TissueRelaxation)
+    crop: TissueCrop = field(default_factory=TissueCrop)
+    fields: tuple[TissueField, ...] = ()
+    constraints: tuple[TissueConstraint, ...] = ()
+    stacking: bool = False
+    group: str = ""
+    base_result: EvaluationResult = field(default_factory=EvaluationResult)
+    rest_result: EvaluationResult = field(default_factory=EvaluationResult)
+    intrinsic_result: EvaluationResult = field(default_factory=EvaluationResult)
+    final_result: EvaluationResult = field(default_factory=EvaluationResult)
+
+    def __post_init__(self) -> None:
+        ObjectRecord.__post_init__(self)
+        if not self.source or not self.classification.strip():
+            raise ValueError("Tissue needs a construction source and classification.")
+        if not self.parts or self.parts[0].id != "main":
+            raise ValueError("Tissue requires its main part first.")
+        if len({p.id for p in self.parts}) != len(self.parts):
+            raise ValueError("Tissue part identities must be unique.")
+        if len({f.name for f in self.fields}) != len(self.fields):
+            raise ValueError("Tissue fields must have unique names.")
+        if not 3 <= self.resolution <= 256:
+            raise ValueError("Tissue resolution must be between 3 and 256.")

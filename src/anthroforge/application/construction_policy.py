@@ -1,7 +1,7 @@
 """Shared authoring constraints used by desktop and headless operations."""
 
+from anthroforge.core import attachment_references
 from anthroforge.core.document import Document
-from anthroforge.core.fibers import Fiber
 from anthroforge.core.results import Port, ReadRevision
 
 
@@ -14,8 +14,7 @@ def bound_fibers(document: Document, entity: str) -> tuple[str, ...]:
     return tuple(
         item.id
         for item in document.objects
-        if isinstance(item, Fiber)
-        and (entity in item.supports or any(b.target == entity for b in item.bindings))
+        if entity in attachment_references.targets(item)
     )
 
 
@@ -58,7 +57,7 @@ def revisions(document: Document, ports: set[Port]) -> tuple[ReadRevision, ...]:
 
 
 def revision(document: Document, port: Port) -> ReadRevision:
-    if port.owner in document.registry.construction:
+    if port.owner in document.registry.authored:
         return object_revision(document, port)
     if port.owner in document.index.controls:
         control = document.control(port.owner)
@@ -75,7 +74,7 @@ def object_revision(document: Document, port: Port) -> ReadRevision:
     if port.output == "routing_scope":
         scope = document.index.structure.dependencies.routing_scene
         return ReadRevision(port.owner, port.output, 0, 0, scope)
-    item = document.registry.construction[port.owner]
+    item = document.registry.authored[port.owner]
     pose = port.output in ("pose", "local_pose")
     authored = item.pose_revision if pose else item.construction_revision
     accepted = 0 if pose else item.result.revision

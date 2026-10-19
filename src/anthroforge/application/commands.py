@@ -23,7 +23,9 @@ from . import (
     junction_operations,
     object_operations,
     operations,
+    output_tasks,
     path_tasks,
+    point_operations,
     presentation,
     projects,
     surface_branch_operations,
@@ -39,6 +41,10 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "construction.point.create": point_operations.create,
+    "construction.point.update": point_operations.update,
+    "anchor.create": point_operations.anchor,
+    "anchor.rebind": point_operations.rebind,
     "surface.create": surface_operations.create,
     "surface.update": surface_operations.update,
     "surface.source": surface_operations.source,
@@ -226,7 +232,7 @@ def evaluate(session: "Session", entities: list[str] | None = None) -> str:
         set(entities) if entities is not None else {item.id for item in session.document.entities}
     )
     curves = set(entities) if entities is not None else set(session.document.registry.construction)
-    path_tasks.schedule(session, curves, explicit=True)
+    output_tasks.schedule(session, curves, explicit=True)
     construction_tasks.evaluate(session, entities)
     captures = {
         item.id

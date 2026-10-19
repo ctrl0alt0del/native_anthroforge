@@ -21,7 +21,7 @@ class Document:
     update_mode: str = "LIVE"
     workspaces: tuple[Workspace, ...] = (Workspace(),)
     controls: tuple[Control, ...] = ()
-    objects: tuple[object_registry.Construction, ...] = ()
+    objects: tuple[object_registry.Authored, ...] = ()
     junctions: tuple[Junction, ...] = ()
     _index: DocumentIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _registry: object_registry.ObjectRegistry | None = field(

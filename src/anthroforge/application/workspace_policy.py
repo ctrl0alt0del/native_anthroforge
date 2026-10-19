@@ -7,6 +7,7 @@ from anthroforge.core.entities import Workspace, descendants
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.image_presentation import decode as decode_image
 from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
+from anthroforge.core.points import Anchor
 
 if TYPE_CHECKING:
     from .session import Session
@@ -38,7 +39,7 @@ def settings(values: dict[str, Any]) -> dict[str, Any]:
 
 def members(document: Document, values: list[str], children: bool = False) -> tuple[str, ...]:
     selected = set(values)
-    live = document.index.entities.keys()
+    live = document.registry.anatomy.keys()
     if selected - live:
         raise ValueError("Workspace membership requires anatomical SCP/VCP objects.")
     if children:
@@ -80,7 +81,7 @@ def validate_references(session: "Session", workspace: Workspace, previous: Work
     for field in ("members", "hidden", "unpickable"):
         live = set(session.document.registry.records)
         if field == "members":
-            live = set(session.document.index.entities)
+            live = set(session.document.registry.anatomy)
         added = set(getattr(workspace, field)) - set(getattr(previous, field))
         if added - live:
             raise ValueError("Workspace references an unknown or incompatible object.")
@@ -98,7 +99,7 @@ def associations(document: Document, target: str) -> set[str]:
         if key in document.registry.construction or key in document.index.controls:
             anatomy.update(object_anatomy(document.object(key)))
             pending.extend(consumers(document, {key}))
-        elif key in document.index.entities:
+        elif key in document.registry.anatomy:
             anatomy.add(key)
     return anatomy
 
@@ -107,6 +108,8 @@ def object_anatomy(item: Any) -> set[str]:
     related = set(item.owners)
     if isinstance(item, Fiber):
         related.update(b.target for b in item.bindings)
+    if isinstance(item, Anchor):
+        related.add(item.binding.reference.target)
     return related
 
 

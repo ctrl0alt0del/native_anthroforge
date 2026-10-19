@@ -5,13 +5,13 @@ from collections.abc import Iterator, Mapping, Set
 from dataclasses import dataclass, field
 from types import MappingProxyType
 
-from . import junctions, routing_obstacles
+from . import junctions, routing_obstacles, tissue_dependencies
 from .construction import Control, Curve, Deformer
 from .curve_dependencies import inputs as curve_path_inputs
 from .cycle_analysis import cycles
 from .entities import SCP
 from .object_outputs import output
-from .objects import ConstructionObject
+from .objects import ObjectRecord
 from .results import Port
 from .surfaces import Surface
 
@@ -82,7 +82,7 @@ def control_inputs(item: Control) -> set[Port]:
 
 
 def entity_edges(
-    entities: tuple[SCP, ...], enabled: bool, objects: tuple[ConstructionObject, ...] = ()
+    entities: tuple[SCP, ...], enabled: bool, objects: tuple[ObjectRecord, ...] = ()
 ) -> dict[Port, set[Port]]:
     result: dict[Port, set[Port]] = {}
     for entity in entities:
@@ -100,11 +100,12 @@ def build(
     entities: tuple[SCP, ...],
     controls: tuple[Control, ...],
     enabled: bool,
-    objects: tuple[ConstructionObject, ...] = (),
+    objects: tuple[ObjectRecord, ...] = (),
     shared: tuple[junctions.Junction, ...] = (),
 ) -> DependencyGraph:
     result = entity_edges(entities, enabled, objects)
     result.update(object_edges(objects, shared))
+    result.update(tissue_dependencies.edges(objects))
     result.update(junctions.edges(shared))
     result.update(control_edges(controls))
     signature = routing_obstacles.scene_signature(result, entities)
@@ -140,7 +141,7 @@ def indexed(
 
 
 def object_edges(
-    objects: tuple[ConstructionObject, ...], shared: tuple[junctions.Junction, ...] = ()
+    objects: tuple[ObjectRecord, ...], shared: tuple[junctions.Junction, ...] = ()
 ) -> dict[Port, set[Port]]:
     result: dict[Port, set[Port]] = {}
     for item in objects:
@@ -154,18 +155,18 @@ def object_edges(
 
 
 def construction_inputs(
-    item: ConstructionObject,
-    objects: tuple[ConstructionObject, ...],
+    item: ObjectRecord,
+    objects: tuple[ObjectRecord, ...],
     shared: tuple[junctions.Junction, ...] = (),
 ) -> set[Port]:
     if isinstance(item, Curve):
         return curve_path_inputs(item) | junctions.inputs(item, shared)
     if isinstance(item, Surface):
         return set().union(*(curve_inputs(use, objects) for use in item.curves))
-    return set()
+    return tissue_dependencies.inputs(item, objects)
 
 
-def curve_inputs(use: object, objects: tuple[ConstructionObject, ...]) -> set[Port]:
+def curve_inputs(use: object, objects: tuple[ObjectRecord, ...]) -> set[Port]:
     from .curve_uses import CurveUse
 
     assert isinstance(use, CurveUse)

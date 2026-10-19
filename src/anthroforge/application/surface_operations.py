@@ -5,6 +5,8 @@ from functools import partial
 from typing import Any
 
 from anthroforge.core.curve_uses import CurveUse
+from anthroforge.core.fibers import Fiber
+from anthroforge.core.membranes import Membrane
 from anthroforge.core.object_registry import validate_sources
 from anthroforge.core.surfaces import Surface
 
@@ -31,7 +33,10 @@ def new_surface(
     session: Any, curves: list[str], kind: str, name: str, parent: str, owner: str
 ) -> Surface:
     placement = object_creation.placement(session, parent, owner, None)
-    item = Surface(
+    surface_type = (
+        Membrane if all(isinstance(session.document.object(k), Fiber) for k in curves) else Surface
+    )
+    item = surface_type(
         name=require_name(name),
         kind=kind,
         curves=tuple(CurveUse(key) for key in curves),

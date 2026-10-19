@@ -20,7 +20,7 @@ from .construction_codec import control, entity_construction
 from .resources import Resources
 
 FORMAT = "anthroforge-project"
-VERSION = 3
+VERSION = 4
 
 
 class FileLock:

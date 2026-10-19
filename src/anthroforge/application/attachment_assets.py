@@ -5,11 +5,11 @@ from typing import Any
 
 from anthroforge.core.construction import Curve
 from anthroforge.core.document import Document
-from anthroforge.core.results import EvaluationResult, geometry_asset
+from anthroforge.core.results import EvaluationResult
 from anthroforge.native import attachment_fields, curve_editing
 from anthroforge.native.mesh import GeometryEngine
-from anthroforge.native.scene import entity_frame
 
+from . import surface_providers
 from .path_assets import PathAsset
 
 
@@ -20,13 +20,7 @@ class AttachmentAsset:
 
 
 def surface_inputs(engine: GeometryEngine, document: Document, meshes: Any, targets: Any) -> Any:
-    entities = [document.entity(key) for key in targets]
-    if any(not geometry_asset(item) or geometry_asset(item) not in meshes for item in entities):
-        raise ValueError("Required anatomical surface has no accepted geometry.")
-    return (
-        [meshes[geometry_asset(item)].mesh.handle for item in entities],
-        [entity_frame(engine, item) for item in entities],
-    )
+    return surface_providers.inputs(engine, document, meshes, targets)
 
 
 def compact(field: attachment_fields.Field, targets: tuple[str, ...]) -> AttachmentAsset:

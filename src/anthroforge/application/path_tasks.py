@@ -98,17 +98,9 @@ def completed(session: "Session", curve: str, job: Job, state: str) -> None:
 
 
 def propagate(session: "Session", curve: str) -> None:
-    from . import construction_tasks, geometry_outputs
+    from .output_tasks import propagate as publish_outputs
 
-    outputs = dep.closure(dep.reverse(dep.graph(session.document)), {Port(curve, "path")})
-    waiting = set().union(
-        *(job.provides for job in session.scheduler.active_jobs if job.future is None)
-    )
-    paths = {p.owner for p in outputs - waiting if p.output == "path" and p.owner != curve}
-    schedule(session, paths)
-    targets = {p.owner for p in outputs - waiting if p.output == "geometry"}
-    geometry_outputs.pending(session, targets)
-    construction_tasks.schedule(session, targets)
+    publish_outputs(session, {Port(curve, "path")})
 
 
 def schedule(

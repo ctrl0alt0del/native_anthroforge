@@ -16,6 +16,15 @@ from .construction_policy import mode, revisions
 
 
 def request(session: Any, target: str, phase: str, interactive: bool = False) -> str:
+    if phase == "final":
+        from . import tissue_group_tasks
+
+        if tissue_group_tasks.grouped(session.document, target):
+            return str(tissue_group_tasks.request(session, target, interactive))
+    return submit(session, target, phase, interactive)
+
+
+def submit(session: Any, target: str, phase: str, interactive: bool) -> str:
     job = make_job(session, target, phase)
     job.cancel = NativeCancellation(session.engine)
     job.interactive, job.priority = interactive, session.priority({target})

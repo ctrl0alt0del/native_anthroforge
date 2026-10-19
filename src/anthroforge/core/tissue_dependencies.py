@@ -2,6 +2,7 @@
 
 from collections.abc import Mapping
 
+from . import tissue_groups
 from .anatomical_surfaces import port
 from .object_outputs import output
 from .objects import ObjectRecord
@@ -37,9 +38,12 @@ def constraint_inputs(item: TissueVCP) -> set[Port]:
 def edges(objects: tuple[ObjectRecord, ...]) -> dict[Port, set[Port]]:
     records = {o.id: o for o in objects}
     result: dict[Port, set[Port]] = {}
+    groups = tissue_groups.groups(records)
     for item in objects:
         if isinstance(item, TissueVCP):
             result.update(tissue_edges(item, records))
+            if item.id in groups:
+                result[Port(item.id, "final")] = tissue_groups.inputs(records, groups[item.id])
     return result
 
 

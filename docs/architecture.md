@@ -41,8 +41,13 @@ coordinator, rather than reporting a numerical failure. Frozen provider results 
 their matching material/settings snapshots, including Manual provenance. Identical final
 geometry reuses its native resource and content revision to prevent publication feedback.
 Explicit/excluded pair intent and selected material regions persist separately from order
-evidence. The focused desktop inspector uses the shared operations. Mixed-shell geometry,
-full-envelope validation and release qualification are still in progress.
+evidence. The focused desktop inspector uses the shared operations. Whole-tissue strongly
+connected stacking orders use one atomic final bundle: C++ solves the actual side graph
+using each receiver's settings, while ordinary source/attachment dependencies remain intact.
+The coordinator owns all selected output reservations and complete read validation; Manual
+members supply retained accepted output until requested. Complete assembled shells/envelopes
+undergo independent fold, self-intersection, bone and neighbor checks before publication.
+Release qualification remains in progress.
 
 Routing derives obstacle roles from dependency ports and sends the accepted provider
 geometry to the existing native collision world. Empty accepted outputs remain dependencies

@@ -44,4 +44,5 @@ int af_stack_run(uint64_t handle,const AfStackDomain* domains,int count,const Af
 #include "stacking_results.cpp"
 #include "stacking_plan.cpp"
 #include "stacking_resolve.cpp"
+#include "stacking_group.cpp"
 #include "stacking_surface_validation.cpp"

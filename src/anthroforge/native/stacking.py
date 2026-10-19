@@ -52,6 +52,32 @@ def surface(intrinsic: Any, final: Any, frame: Any, changed: bool = True) -> Any
     return row
 
 
+def resolve_group(engine: Any, targets: Any, accepted: Any, cancel: int = 0) -> Any:
+    rows, _leases = accepted_rows(accepted)
+    selected = (abi.Target * len(targets))(
+        *(abi.Target(session.handle, key) for key, session in targets.items())
+    )
+    engine.check(
+        engine.library.af_stack_resolve_group(selected, len(selected), rows, len(rows), cancel)
+    )
+    return {
+        key: result(session, output)
+        for key, session in targets.items()
+        for output in output_rows(session)
+        if output.id == key
+    }
+
+
+def output_rows(session: StackSession) -> Any:
+    size = np.zeros(2, dtype=np.int64)
+    session.engine.check(
+        session.engine.library.af_stack_sizes(session.handle, size.ctypes.data_as(INT64))
+    )
+    rows = (abi.Output * int(size[0]))()
+    session.engine.check(session.engine.library.af_stack_results(session.handle, rows, len(rows)))
+    return rows
+
+
 def accepted_rows(accepted: Any) -> Any:
     arrays = [np.ascontiguousarray(row["points"], dtype=np.float64) for row in accepted.values()]
     for points in arrays:

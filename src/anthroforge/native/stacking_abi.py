@@ -62,6 +62,10 @@ class Accepted(c.Structure):
     _fields_ = [("id", U), ("points", D), ("count", c.c_int), ("status", c.c_int)]
 
 
+class Target(c.Structure):
+    _fields_ = [("session", U), ("id", U)]
+
+
 class Surface(c.Structure):
     _fields_ = [("intrinsic", U), ("final", U), ("frame", c.c_double * 16), ("changed", c.c_int)]
 
@@ -96,6 +100,9 @@ def configure(engine: Any) -> None:
     engine.bind("af_stack_run", RUN_ARGUMENTS)
     engine.bind("af_stack_plan", RUN_ARGUMENTS)
     engine.bind("af_stack_resolve", [U, c.POINTER(Accepted), c.c_int, c.POINTER(U), c.c_int, U])
+    engine.bind(
+        "af_stack_resolve_group", [c.POINTER(Target), c.c_int, c.POINTER(Accepted), c.c_int, U]
+    )
 
 
 RUN_ARGUMENTS = [

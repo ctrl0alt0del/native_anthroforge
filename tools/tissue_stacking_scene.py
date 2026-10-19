@@ -41,20 +41,47 @@ def capture(controller, renderer, app, name, target):
     assert hover["id"] == clicked["id"] == target
 
 
+def envelopes(controller, renderer, app, first, second):
+    for key in (first, second):
+        controller.run("tissue.inflation", dict(target=key, changes=dict(mode="DISTRIBUTED")))
+        controller.run("tissue.relaxation", dict(target=key, changes=dict(mode="NONE")))
+        controller.run("tissue.configure", dict(target=key, changes=dict(both_sides=True)))
+    for a, b in (("a", "b"), ("b", "a")):
+        controller.run(
+            "tissue.stacking.relationship",
+            dict(target=first, other=second, side=a, other_side=b, excluded=True),
+        )
+    capture(controller, renderer, app, "stacked-envelopes", second)
+    capture_below(controller, renderer, app)
+
+
+def capture_below(controller, renderer, app):
+    controller.cameraRequested.emit([0, 0, 0.725, 12, 20, 0, 1.15], True)
+    settle(controller)
+    assert frames(controller, renderer, app).save(
+        "build/022-tissue/stacked-envelopes-below-gpu.png"
+    )
+
+
 def run(app):
     controller, warnings = Controller(), []
     renderer = Offscreen(controller, warnings)
     try:
         first, second = prepare(controller)
-        capture(controller, renderer, app, "stacked-muscles", second)
-        normal(controller.session, second, relaxed=True)
-        capture(controller, renderer, app, "stacked-relaxed-shell", second)
-        normal(controller.session, first)
-        capture(controller, renderer, app, "stacked-shells", second)
+        mixed(controller, renderer, app, first, second)
+        envelopes(controller, renderer, app, first, second)
         assert not warnings, warnings
     finally:
         renderer.close()
         controller.close()
+
+
+def mixed(controller, renderer, app, first, second):
+    capture(controller, renderer, app, "stacked-muscles", second)
+    normal(controller.session, second, relaxed=True)
+    capture(controller, renderer, app, "stacked-relaxed-shell", second)
+    normal(controller.session, first)
+    capture(controller, renderer, app, "stacked-shells", second)
 
 
 if __name__ == "__main__":

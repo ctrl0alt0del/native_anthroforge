@@ -62,7 +62,7 @@ def affected(document: Any, changes: set[str], old: Any, current: Any) -> set[st
 def ports(document: Any, target: str, phase: str) -> set[Port]:
     if phase not in ("plan", "final") or not document.object(target).stacking:
         return set()
-    outputs = ("intrinsic", "final") if phase == "final" else ("intrinsic",)
+    outputs = ("intrinsic", "plan", "final") if phase == "final" else ("intrinsic",)
     values = {
         Port(item.id, output)
         for item in participants(document)

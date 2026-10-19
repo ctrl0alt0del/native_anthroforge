@@ -30,6 +30,21 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Two-sided stacking now uses atomic final groups when whole-tissue order forms a strongly
+connected component. Native evaluation follows actual side dependencies, retaining each
+receiver's own settings; source/attachment prerequisites remain in the graph, so real
+anatomical cycles still fail. The existing coordinator reserves selected outputs, captures
+inputs at dispatch and publishes the complete group once. Manual members retain accepted
+finals until explicitly evaluated. Changed candidate plans are observed before publication.
+Native group parity covers fourteen donor fixtures and per-receiver settings/cancellation.
+Application checks cover opposite sides, Manual, failure fallback, real cycles, round trips,
+superseding a running group and undo/redo. Hidden GPU views above/below the envelope were
+inspected; compatible sides retain continuous envelopes. Full regression: 1259 passing,
+747 existing Qt warnings, with only the new inspection tool's 15-line check failing; that
+tool was split cohesively and the architecture check now passes. Changed native clang-tidy,
+build/CTest and Ruff/mypy pass. Remaining: editing tools, Pouch issue, performance/caches,
+complete gate and release. No interactive acceptance or release completion claimed.
+
 Full assembled surfaces now undergo native fold/self-intersection, bone and pairwise
 crossing checks after stacking, including shell backing/rims and envelope composition.
 Mixed muscle/normal-shell provider/receiver and geometrically relaxed receiver cases pass;
@@ -40,11 +55,10 @@ failure); explicit references still fail. Independent construction remaps suppor
 branch IDs in both owned and external intent. Full suite **1240 passed**, 747 existing Qt
 warnings, 63.93 seconds; Ruff/mypy and changed-native build/CTest/clang checks pass.
 
-Next architectural defect reproduced: two-sided tissues with excluded incompatible
+Previously reproduced (now addressed by the group contract): two-sided tissues with excluded incompatible
 cross-side pairs have valid acyclic native side dependencies but a cycle in the current
 whole-tissue final graph. Joint native resolution succeeds; individual application jobs fail.
-Probes: `build/022-tissue/probe_stack_sides*.py`. Implement coordinated group publication
-for this case, preserving complete geometry acceptance and genuine attachment cycles.
+Probes: `build/022-tissue/probe_stack_sides*.py`.
 Support-region drafts, remaining editing, Pouch visual qualification, performance and
 release evidence remain incomplete. Do not merge/release.
 

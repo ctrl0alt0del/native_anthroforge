@@ -28,9 +28,20 @@ delivery polls completion. UI callbacks publish delivery state; document jobs, h
 save checkpoints remain owned by existing subsystems. Modal focus retains ordinary editor
 behavior after capture, including cancellation of a pointer drag. No network adapter runs.
 
-Portable build/relocation qualification is pending. Local captures/logs are under
-`build/feedback-*`; validation has used no visible windows or desktop input. Software
-offscreen screenshots do not establish ordinary Windows GPU-window or hands-on acceptance.
+The final capture-failure notification correction at `bcd72f7` passes all **901 tests**
+again, Ruff, architecture checks and the full feedback interaction script. The clean
+`bcd72f7` executable in `dist/0.2.1-reports/AnthroForge.dist` passes the complete portable
+suite after relocation under a minimal PATH, including its new feedback capture/editor/
+submission probe. All 94 QML/JS/SVG assets match source. Original and annotated PNGs,
+annotation records and packaged build identity were verified in the emitted ZIP.
+
+Local captures/logs are under `build/feedback-*`; validation used no visible windows or
+desktop input. Offscreen checks validate the feedback workflow; the separate existing
+QQuickRenderControl check validates GPU geometry rendering. A never-shown Windows window
+returned UI pixels but omitted its Quick3D mesh even with staged geometry, so that
+experiment does not establish ordinary Windows window capture of 3D geometry. Hands-on
+desktop capture remains unverified. The prior 0.2.1 distribution and source are preserved;
+the new corresponding source is `dist/AnthroForge-0.2.1-reports-source.zip`.
 
 ## Curve workflows 0.2.1
 

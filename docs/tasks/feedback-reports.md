@@ -3,7 +3,7 @@
 - Task branch: `codex/feedback-reports`
 - Integration branch: `main`
 - Starting revision: `d1cc15d`
-- Status: implementation in progress
+- Status: implementation and qualification complete; ready for validated main integration
 - Last updated: 2026-10-19, Europe/Bucharest
 - Active writer: local desktop chat
 
@@ -30,11 +30,12 @@ Capture the window before showing the editor, not the desktop or other applicati
 Use the existing keyboard manager and Ui controls. Keep every function within 15 lines.
 Keep version 0.2.1 for this follow-up build; VCP 0.2.2 remains a separate milestone.
 
-## Verification and next actions
+## Verification scope
 
-Implement consumer/service, capture/annotation editor, Help/keyboard integration; verify
-failure/retry, annotation alignment, cancel/undo isolation and shortcut behavior. Run the
-development gate, offscreen GUI/capture checks and relocated portable packaging. Preserve
+Consumer/service, capture/annotation editor, Help/keyboard integration, failure/retry,
+annotation alignment, cancel/undo isolation and shortcut behavior are implemented and
+verified. Development gate, offscreen GUI/capture checks and relocated portable packaging
+pass. Preserve
 previous distributions and the unrelated root `__init__.py`. No visible windows or desktop
 input. Deliver a separate `dist/0.2.1-reports/AnthroForge.dist` build and corresponding source.
 
@@ -59,14 +60,30 @@ static analysis, types, formatting, function limits and runtime doctor. Narrow 1
 layout and 200% DPI, including zoom/scroll marking, pass and captures were inspected.
 Ownership review is recorded in development_status.md. No visible UI was used.
 
-Remaining: build and relocate `dist/0.2.1-reports/AnthroForge.dist`; run the expanded portable
-suite including feedback capture/paint/submission; produce
-`dist/AnthroForge-0.2.1-reports-source.zip`, finalize docs and merge/push. Preserve the prior
-0.2.1 distribution/source archive. Local evidence: `build/feedback-*`.
-
 Final failure-path check found that capture errors emitted a notification without updating
 the controller's stable property projection. Reproduced an empty displayed status despite
 the error string, then routed it through `Controller.notify()`. Offscreen acceptance now
 asserts the displayed error and released draft, followed by successful profiling; all
-feedback/architecture tests pass. Rebuild the final package with this correction; the
-first `963eaba` packaging candidate is superseded and must not be delivered.
+901 tests pass again. The first `963eaba` packaging candidate was superseded by clean
+`bcd72f7`, which includes this correction.
+
+## Final delivery evidence
+
+`dist/0.2.1-reports/AnthroForge.dist/AnthroForge.exe` is the final clean `bcd72f7` build.
+The entire distribution was copied to a fresh temporary directory and the complete
+`tools/check_portable.py --offscreen` suite passed with a minimal PATH. Its report probe
+captured the window, opened the editor, painted all three mark types, saved a portable
+ZIP and retained document/history state. Archive contents and all 94 QML/JS/SVG assets
+were verified. See `build/feedback-portable-final/portable-check.json`,
+`build/feedback-regression-final.log` and `build/feedback-package-final.log`.
+
+No visible windows or desktop input were used. The extra never-shown Windows-window
+experiment captured UI but omitted Quick3D mesh pixels; it is not GPU-window acceptance.
+The separate existing hidden QQuickRenderControl geometry check passes. Hands-on
+ordinary-window capture remains unverified. This is a validation limit, not evidence of
+a defect in the ordinary visible-window capture API.
+
+Publish the matching `dist/AnthroForge-0.2.1-reports-source.zip`, merge this validated
+branch into the unchanged integration main and push normally. The final integration
+commit is discoverable through Git ancestry; local build evidence stays ignored. Preserve
+the prior 0.2.1 artifacts and unrelated root `__init__.py`.

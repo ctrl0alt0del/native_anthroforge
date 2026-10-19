@@ -17,8 +17,24 @@ first canonicalized by the donor's float32 property boundary before comparison.
 Tissue base refinement operates on the accepted membrane, retaining original grid
 lines and using native bilinear interpolation; it never mutates or reevaluates a
 Manual source from newer authored curves. This is an explicit standalone extension.
-Branches, two-sided composition, normal/radial/sweep construction, constrained
-smoothing, relaxation, crop and stacking qualification remain in progress.
+Branches, two-sided composition, constrained smoothing, relaxation, crop and stacking
+qualification remain in progress.
+
+`tissue_shape_fields.cpp`, `tissue_normal_shell.cpp` and `tissue_profile_sweep.cpp`
+port the addon's Python numerical preparation into native owned buffers. Source hashes
+and six actual outputs are in `tests/fixtures/tissue/shapes.json`; reproduce with
+`capture_tissue_shapes.py ADDON_PATH OUTPUT_PATH`. Comparisons include canonical polygons
+and vertices at absolute 1e-12. Default boundary distances, area-weighted normals, all-zero
+custom fields, backing/rims, cyclic sweeps and zero endpoint taper are covered.
+Sweeps consume the standalone curve engine's accepted frames (including authored tilt)
+instead of recomputing the addon's global-axis fallback normals. Radial scale is relative
+to the retained Anchor frame. Those placement contracts are intentional extensions.
+
+`tissue/unit_spheres.hpp` contains the four finite Blender 5.0.1 bmesh unit icospheres
+used by the addon at resolution thresholds 24/64/128. Regenerate via background Blender
+and `tools/capture_tissue_spheres.py -- OUTPUT`; the companion JSON pins version/hash.
+Runtime ellipsoid assembly is native and independent of Blender; rounded seed coordinates
+are preserved. No authored geometry is baked or replaced by these unit templates.
 
 attachment_wave_reference.hpp is an unchanged copy of the addon's
 native/fiber_ccd/af_attachment_wave.hpp, captured 2026-10-16.

@@ -84,7 +84,21 @@ mesh without synthetic point/curve meshes. Native outputs retain validated spars
 correspondence, side/part labels and source faces across deformation, finalization,
 memory accounting and schema-4 storage. Twenty base/workflow checks and seven material-map/
 architecture checks pass; configured mypy, ruff, formatting and native build/CTest pass.
-Radial, sweep and normal-shell kernels are the next increment; they are not yet connected.
+Radial, sweep and normal-shell kernels now run through shared tissue stages and the
+capability-driven desktop inspector. Six addon shell/sweep fixtures match at absolute
+1e-12, including cyclic/zero-taper sweeps and authoritative all-zero fields. Four
+Blender 5.0.1 unit icospheres preserve radial subdivision thresholds and rounded seed
+coordinates. Typed-base motion and round-trip tests pass.
+`tools/tissue_shapes_acceptance.py` passes hidden GPU inspection for all three outputs
+and twelve delete/recreate cycles; inspected captures under `build/022-tissue`.
+It exposed and fixed stale tissue scene records after deletion, plus a reproducible
+Qt heap failure when main/outline views shared a Qt geometry across deletion/recreation.
+Per-scene Qt wrappers sharing the same native result pass that sequence. This adds a
+second Qt/GPU geometry copy; measure it in release profiling. Qt supports shared resources
+generally, so do not claim all sharing is unsupported or that an upstream bug is proven.
+Full shape checkpoint: **1009 tests passed**, 599 Qt deprecation warnings, 34.34 seconds.
+Configured mypy, ruff, function-length checks, native CTest and changed-adapter clang-tidy
+checks pass. Full-QML offscreen tissue controls still pass.
 Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification

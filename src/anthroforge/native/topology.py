@@ -11,9 +11,9 @@ INT32 = c.POINTER(c.c_int32)
 
 
 def configure(engine: GeometryEngine) -> None:
-    from . import material, tissue_domain, tissue_inflation
+    from . import material, tissue_domain, tissue_inflation, tissue_shapes
 
-    for module in (material, tissue_domain, tissue_inflation):
+    for module in (material, tissue_domain, tissue_inflation, tissue_shapes):
         module.configure(engine)
     engine.bind("af_mesh_reuse_topology", [U, U, U], U)
     engine.bind("af_mesh_draft", [U, U], U)

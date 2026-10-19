@@ -43,3 +43,18 @@ def test_creation_selects_tissue_and_settings_preserve_source(controller):
     controller.session.wait()
     controller.refresh()
     assert controller.selectedData["status"] == "ready"
+
+
+def test_deleted_tissue_drops_scene_selection_and_undo_restores_record(controller):
+    _, _, target = assembly(controller.session)
+    controller.refresh()
+    controller.select(target)
+    controller.run("object.delete", dict(target=target))
+    controller.refresh()
+    assert target not in controller.scene_projection.records
+    assert not controller.selection
+    controller.run("undo", {})
+    controller.session.wait()
+    controller.refresh()
+    controller.select(target)
+    assert controller.selectedData["is_tissue"]

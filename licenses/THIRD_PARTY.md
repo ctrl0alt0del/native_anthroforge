@@ -27,6 +27,7 @@ both license texts and corresponding adapted sources accompany the release.
 | happly | Snapshot hash in native/vendor/PROVENANCE.md | MIT; included source and license |
 | earcut.hpp | 2.2.4 | ISC; included source and license |
 | curve_fit_nd | Blender 5.0.1, unchanged sources | BSD-3-Clause, DWANGO Co., Ltd.; full notice in native/vendor/curve_fit_nd/curve_fit_nd.h and CURVE-FIT-LICENSE.txt |
+| Radial unit icospheres | Blender 5.0.1 bmesh output | Generated unit templates under native/migration/tissue; capture/version/hash recorded in unit_spheres.json; AnthroForge GPL-3.0-or-later adapter |
 | PCG64 and bounded integer distribution | NumPy 1.26.4 | MIT, Melissa O'Neill, Robert Kern and NumPy Developers; native/vendor/numpy_random/pcg64.h and LICENSE.txt; adapter provenance in native/vendor/numpy_random/PROVENANCE.md |
 | Nuitka | 4.1.1 build/runtime support | Apache-2.0; https://nuitka.net/pages/overview.html |
 

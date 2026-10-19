@@ -67,6 +67,7 @@ def inflation(
     parts = tuple(update_part(p, side, changes) if p.id == part else p for p in item.parts)
     updated = replace(item, parts=parts)
     tissue_policy.validate(updated, session.document.registry.records)
+    require_inflation_topology(session, item, updated)
     object_operations.install(session, updated)
 
 
@@ -75,3 +76,18 @@ def update_part(part: TissuePart, side: str, changes: dict[str, Any]) -> TissueP
     data = asdict(original.inflation)
     data.update(changes)
     return replace(part, **{side: replace(original, inflation=tissue_codec.inflation(data))})
+
+
+def require_inflation_topology(session: Any, before: TissueVCP, after: TissueVCP) -> None:
+    from .construction_policy import require_topology_edit
+
+    def signature(item: TissueVCP) -> tuple[Any, ...]:
+        values = [
+            getattr(p, s).inflation
+            for p in item.parts
+            for s in (("a", "b") if item.both_sides else ("a",))
+        ]
+        return tuple((v.mode == "NORMAL", v.segments if v.mode == "PROFILE" else 0) for v in values)
+
+    if signature(before) != signature(after):
+        require_topology_edit(session.document, before.id)

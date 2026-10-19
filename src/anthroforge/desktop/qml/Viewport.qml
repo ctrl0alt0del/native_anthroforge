@@ -276,7 +276,9 @@ Item {
                             objectName: "mask_" + item.key
                             visible: item.active && (item.id === workspace.selectedId || (!viewport.xray && !item.readonly))
                             position: meshNode.position
-                            geometry: meshNode.geometry
+                            // Each View3D owns its Qt geometry lifetime; both read the same native result.
+                            // Sharing meshNode.geometry crashed after delete/recreate in Qt 6.12.
+                            geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk }
                             materials: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: item.id === workspace.selectedId ? "white" : "black"; cullMode: Material.NoCulling }
                         }
                     }

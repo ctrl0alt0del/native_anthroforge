@@ -68,6 +68,7 @@ class SceneProjection:
         changes = session.changes.since(self.cursor if session is self.session else -1)
         full = changes.reset or self.workspace != session.workspace
         self.update_records(changes, full, structural_changes(changes))
+        self.prune_records()
         tissue_projection.synchronize(self)
         self.session, self.cursor, self.workspace = (
             session,
@@ -84,6 +85,13 @@ class SceneProjection:
             dict(rows=[r for r in rows if not r["is_control"]], parents=self.parents())
         )
         self.controller.rows = rows
+
+    def prune_records(self):
+        document = self.controller.session.document
+        live = set(document.registry.anatomy) | document.index.controls.keys()
+        self.order = [key for key in self.order if key in live]
+        self.records = {key: row for key, row in self.records.items() if key in live}
+        self.keys = {key: value for key, value in self.keys.items() if key in live}
 
     def update_records(self, changes, full, structural):
         session, document = self.controller.session, self.controller.session.document

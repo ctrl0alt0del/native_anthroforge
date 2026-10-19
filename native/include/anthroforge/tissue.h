@@ -7,9 +7,16 @@ struct AfTissueInflation {
     double amount,radius,depth,boundary_strength,boundary_band,boundary_power,taper;
     double control[3],profile[9];
 };
+struct AfTissueShape {
+    int enabled,reverse,segments;
+    double amount,minimum,power,width,endpoint_taper,scale[3];
+};
 #ifdef __cplusplus
 extern "C" {
 #endif
+AF_API uint64_t af_tissue_normal_shell(uint64_t source,const AfTissueShape* settings,const double* weights,int64_t count,uint64_t cancel);
+AF_API uint64_t af_tissue_profile_sweep(const double* samples,int count,int closed,const AfTissueShape* settings,uint64_t cancel);
+AF_API uint64_t af_tissue_radial(const double* frame,const AfTissueShape* settings,int resolution,uint64_t cancel);
 // Operates on accepted material grids, without resampling the source.
 AF_API uint64_t af_tissue_inflate_grid(uint64_t source,const AfTissueInflation* settings,
     int count,uint64_t cancel);

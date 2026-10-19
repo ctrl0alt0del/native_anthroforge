@@ -3,6 +3,7 @@
 from dataclasses import asdict
 
 from anthroforge.application.object_frames import Frames
+from anthroforge.core import tissue_policy
 from anthroforge.core.tissues import TissueVCP
 
 from .construction_projection import record as object_record
@@ -12,7 +13,6 @@ from .values import qml
 def synchronize(projection):
     session = projection.controller.session
     tissues = {o.id: o for o in session.document.objects if isinstance(o, TissueVCP)}
-    projection.order = [k for k in projection.order if k in session.document.registry.records]
     for key, item in tissues.items():
         frame = Frames(session.engine, session.document).world(key)
         cache = (item, frame, session.workspace)
@@ -25,7 +25,17 @@ def synchronize(projection):
 
 def record(session, item, frame):
     row = object_record(session, item, frame)
+    row.update(metadata(item))
+    source = session.document.object(item.source)
     row.update(
+        tissue_modes=sorted(tissue_policy.inflation_modes(source)),
+        tissue_domain=tissue_policy.domain(source),
+    )
+    return qml(row)
+
+
+def metadata(item):
+    return dict(
         is_construction=False,
         is_tissue=True,
         depth=0,
@@ -35,4 +45,3 @@ def record(session, item, frame):
         color=item.color,
         tissue_settings=asdict(item),
     )
-    return qml(row)

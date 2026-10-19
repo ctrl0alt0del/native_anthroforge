@@ -3,10 +3,10 @@
 from typing import Any, cast
 
 from anthroforge.core.tissues import TissueVCP
-from anthroforge.native import tissue_inflation, topology
+from anthroforge.native import topology
 from anthroforge.native.mesh import Mesh
 
-from . import tissue_sources
+from . import tissue_construction, tissue_sources
 from .tissue_output import TissueOutput
 
 
@@ -17,12 +17,12 @@ def accepted(resources: Any, result: Any, label: str) -> Mesh:
 
 
 def rest(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:
-    mesh = accepted(resources, item.base_result, "Tissue base")
+    tissue_sources.require_result(item.base_result)
     if item.both_sides or len(item.parts) != 1:
         raise ValueError("Two-sided and branched tissue adapters are not yet available.")
-    if item.fields or item.parts[0].a.smoothing.mode != "OFF":
+    if item.parts[0].a.smoothing.mode != "OFF":
         raise ValueError("Tissue field/smoothing adapters are not yet available.")
-    return tissue_inflation.evaluate(mesh, item.parts[0].a.inflation, item.reverse, cancel)
+    return tissue_construction.construct(engine, resources, item, cancel)
 
 
 def intrinsic(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:

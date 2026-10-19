@@ -3,7 +3,7 @@
 - Task branch: `codex/unified-tissues-022`
 - Integration branch: `main`
 - Starting revision: `6f33380660c9421585b0898b068d33b4f5232fd3`
-- Status: implementation/workflow qualified; canonical 0.2.2 packaging in progress
+- Status: complete; canonical 0.2.2 package qualified
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: desktop chat, direct work (no delegated writers)
 
@@ -12,7 +12,7 @@
 Implement the user-approved 0.2.2 plan: unified TissueVCP, attached Point/Anchor
 and Surface/Membrane construction, native inflation/relaxation/stacking, shared
 attachments, desktop/headless workflows, schema 4 and a qualified portable release.
-Keep the current 0.2.1 distribution intact until qualification. See the forthcoming
+The previous 0.2.1 distribution is preserved. See the
 [specification](../specification_022.md) and [implementation plan](../implementation_022.md).
 
 ## Confirmed decisions
@@ -30,16 +30,20 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
-Source, all 24 desktop scenarios and temporary portable workflow qualification pass.
-The isolated executable test covers legacy workflows plus four ready tissues, automatic
-stacking, Final-role Anchor binding, schema-4 save/reopen, profiling and hidden rendering.
-The new capture test initially omitted required workspace/editing view fields; fixed in
-the test, then the complete suite passed. Application code did not change. Inspected its
-tissue capture. Final current-source profiling is complete with no reported loss; six
-edit/wait/render intervals span 509–777 ms at 8.5% system busy (not a controlled comparison).
-Version is now 0.2.2 after workflow qualification. Canonical package/source archive and
-post-version regression are still required before merge/release completion. Walkthrough,
-API, capability matrix, source inventory, active schema docs and ownership review agree.
+Completed the approved workflow and documentation. The full development gate passes;
+final post-version regression is **1,288 passed** with 732 existing Qt deprecation warnings.
+All 24 full-QML/hidden-GPU scenarios pass. Both temporary and canonical portable suites
+pass with minimal PATH, including four ready tissues, automatic stacking, explicit Final
+Anchor binding, schema-4 save/reopen, profiles and rendering. No visible desktop input
+or hands-on acceptance is claimed. Geometry/parity, profiler and ownership-review evidence
+and limitations are consolidated in [development status](../development_status.md#unified-tissues-022).
+
+Deliverables: `dist/0.2.2/AnthroForge.dist` and `dist/AnthroForge-0.2.2-source.zip`.
+The executable was built from clean tracked `3b0869c`; following changes are documentation
+sign-off only. QML/native assets and dependency notices match. Version metadata is 0.2.2.0.
+Only the unrelated untracked root `__init__.py` is preserved outside the task. Local build
+logs, captures and profiling reports stay under ignored `build/022-tissue/`; maintained
+fixtures/reproduction tools and the complete code/context are committed for recovery.
 
 ## Checkpoint journal (earlier pending work is superseded by current state)
 
@@ -505,10 +509,8 @@ profiler and portable acceptance, followed by ownership/coupling review.
 
 ## Next actions
 
-1. Finish full development and portable gates; correct any failures.
-2. Finish walkthrough/API and final evidence, including ownership/coupling review.
-3. Qualify canonical 0.2.2 package/source archive, then validated merge/push.
-   Do not merge partial checkpoints or claim interactive desktop acceptance.
+No implementation work remains in this plan. Hands-on testing may produce follow-up
+reports; use the existing F12 feedback workflow. Schema 4 deliberately rejects older files.
 
 ## Recovery inputs
 

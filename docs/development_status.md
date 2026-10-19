@@ -5,7 +5,7 @@ The earlier sections retain the evidence and limitations of their respective rev
 
 ## Unified tissues (0.2.2)
 
-Source and temporary portable workflow qualification pass; canonical 0.2.2 packaging is running.
+Source, desktop/headless workflows and the canonical 0.2.2 portable package are qualified.
 See the [contract](specification_022.md), [walkthrough](tissues_022.md) and
 [task record](tasks/unified-tissues-022.md) for the current checkpoint.
 
@@ -13,6 +13,8 @@ The Windows development gate passes **1,287 tests** (732 existing Qt deprecation
 warnings), three native CTests, native function/style checks, Ruff/format, configured
 mypy, script checks, numerical imports and native doctor. A subsequently added fresh-
 process tissue-example test also passes without importing Qt/Shiboken/Blender.
+The final post-version full regression includes that test: **1,288 passed**, 732 warnings,
+98.04 seconds. No algorithm changes followed the successful native/development gate.
 
 Pinned production fixtures cover 9 inflation, 6 radial/sweep/shell, 7 relaxation,
 8 branch, 16 envelope, 17 smoothing, 20 crop and 14 stacking cases. Provenance and
@@ -65,7 +67,18 @@ portable folder. Tissue checks verify accepted stack providers, Final-role Ancho
 save/reopen, profiling, hidden GPU image capture and offscreen full-window startup. Its
 initial new capture test omitted the required workspace/editing view fields; correcting
 the test made the full suite pass without changing the application. The packaged tissue
-capture was inspected. Canonical versioned package/source archive verification remains.
+capture was inspected.
+
+The canonical `dist/0.2.2/AnthroForge.dist` also passes that complete portable suite,
+reporting application 0.2.2 and loading native DLLs from its own runtime folder. Windows
+product/file versions are 0.2.2.0. All QML assets and the three runtime DLLs match qualified
+source/build bytes; PIQP/LDL notices are present. It was built from clean tracked revision
+`3b0869caace41fee4b92a9382a7653a2c9919b87`; subsequent changes record this qualification
+in documentation only. Executable SHA-256:
+`9d883d5d26d65974d3a20d4ccfda8170a2131eaef5fbbe99e0705a48391bdff3`.
+The companion `dist/AnthroForge-0.2.2-source.zip` contains sources, fixtures, pinned
+dependencies, tests, tools and final documentation, excluding environments/build output.
+Temporary candidates stay under `build/`; there is one canonical 0.2.2 distribution.
 
 A final current-source profile after the publication fix is complete without reported loss.
 Six edit/wait/hidden-render intervals were 509–777 ms; system busy fraction was 8.5%.

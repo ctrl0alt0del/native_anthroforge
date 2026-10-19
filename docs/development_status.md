@@ -1,7 +1,111 @@
 # AnthroForge development validation
 
-Current source qualification is in [UI polish 0.1.9](#ui-polish-019).
+Current source qualification is in [construction objects 0.2.0](#construction-objects-020).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Construction objects 0.2.0
+
+First-class curves, reference images, Fiber as an actual Curve subclass, and shared
+curve/fiber surfaces are integrated in desktop and headless workflows. The anatomical
+hierarchy and Construction view have distinct ownership. Primitive and surface consumers
+retain curve references; engine conversion, attachment rebinding and junction edits use
+shared operations and transactions. Images are embedded and independent of tracing output.
+Schema 3 rejects older projects clearly; legacy conversion is outside this release.
+See the [specification](specification_020.md), [walkthrough](construction_020.md),
+[API](authoring_api.md), and [implementation record](tasks/020-construction.md).
+
+At `b8e57fc`, the complete Windows gate passes **871 tests**, 3 native CTests, native
+clang-tidy, Ruff/formatting, mypy on 181 modules, function limits, PowerShell checks,
+locked dependencies, numerical-import checks and native doctor. The 9 existing
+QQmlPropertyMap deprecation warnings remain. Log: `build/check-020-release.log`.
+The complete construction example also runs without PySide6, Shiboken or Blender imports.
+
+### Geometry, lifecycle and editing evidence
+
+Compact fixtures pin source hashes and actual Blender/addon outputs. Eleven attachment
+owner-weight cases cover hard pins, cyclic spans and quintic transitions. Six warm-route
+cases cover changed anchors and sample counts. Four cold/warm routes use 9,158 vertices
+from the original skull file; outputs agree with fresh addon solves to absolute 1e-10.
+Six base-surface and eight branch fixtures match vertex positions to 1e-10 and exact face
+indices. Closed correspondence persists; only explicit Realign selects it again. Original
+source `.blend` files were read without modification. The compact inputs and regeneration
+tools are committed; the large original files and generated captures remain local.
+
+Blender drawing projection/fallback/depth/offset policies and native curve_fit_nd fitting
+have direct fixture coverage. Exact triangle picking intentionally replaces raster-depth
+sampling; image-plane drawing is an application extension. Fitting cancellation brackets
+the upstream atomic fit call. Uniform branch sampling is an explicit extension retaining
+junction stations. Lofts do not collision-conform their surfaces or create muscle volumes.
+Authored-fiber Issues check accepted sampled centerlines, not continuous curve/radius
+clearance. Provenance and intentional differences are in `native/migration` and
+`native/vendor/PROVENANCE.md`.
+
+Contract tests exercise independent Fiber copying and substitution, shared consumer frames,
+both consumption modes, topology locks, deletion protection, workspace membership, Manual
+provenance, missing inputs/cycles, queued/running cancellation, restart after input edits,
+undo/redo and historical saves. Historical creation validates the complete captured read
+set before publishing accepted output. Resources remain owned through document/history,
+checkpoints, jobs, staging and displayed revisions; no native handles enter project files.
+
+Thirteen integrated source editor/renderer scripts pass across Construction, paths, images,
+Fibers, routing, junctions, surface previews/branches, consumer sampling and collision Issues.
+Existing primitive/lattice/hook editing, insertion/snapping, G/R/S and axis/restore gestures,
+snap offsets, reopen and 512-SCP/128-point projection checks also pass. Image visibility
+covers aligned/oblique views in both projection types and all three depth layers, including
+reflected/scaled/sheared frames and matching picking. Actual inspector buttons are exercised.
+The final title label uses the package version through Qt application metadata.
+
+These checks use synthetic events on Qt's offscreen platform and explicitly invisible
+QQuickRenderControl/D3D11 captures. Actual rendered paths, lofts, branches, images and skull
+context were inspected. Full-QML offscreen captures do not provide the 3D framebuffer;
+separate invisible-renderer captures establish that evidence. No visible windows or desktop
+input were used, and no hands-on desktop or physical display-latency acceptance is claimed.
+
+### Profiling and ownership review
+
+Serial off/on/on/off profiler trials use 32 controller drag updates over the skull fixture
+with four shared loft consumers. Mean work intervals were 15.01/20.20/22.75/19.17 ms and
+p95 18.29/29.06/30.99/21.26 ms. They include synchronous GPU readback, not physical frame
+or input latency. System busy was about 14–17%; thermal/background load was uncontrolled.
+These trials do not establish exact profiler perturbation or a universal speed guarantee.
+Both captured reports are complete, with no model resets. Preparation peaked at 0.035 ms,
+publication at 1.032/0.484 ms, and viewport activation at 1.545/1.698 ms. Settled jobs and
+staging retained zero geometry; New Document plus renderer draining released all observed
+native geometry. Document/history ownership overlaps and must not be summed. Reproduce
+with `tools/construction_profile_qualification.py`; local evidence is in
+`build/020-construction-profile`.
+
+Separate direct ownership/coupling review traced typed registry access, source references,
+Fiber substitution, attachment fields, junction dependency aliases, async creation restart,
+read-set validation and resource reachability. The implementation extends the existing
+coordinator, Issues, command catalogue and staged renderer. Python packs, validates,
+serializes and publishes; native work owns numerical preparation, solving, deformation,
+surface assembly and repeated queries. No competing queue, Blender runtime dependency or
+Python numerical fallback was added. This was coordinator-authored review, not an
+independent agent review.
+
+### Portable distribution
+
+The c999896 build passed the complete relocated checker with minimal PATH and developer
+Python/Qt settings removed. Tests cover existing primitives/deformers, editing, deletion,
+save/reopen, Issues, workspaces, measurements, images, independent fibers, shared lofts,
+complete QML loading and headless/desktop profiler reports. A 64-tile embedded PNG remains
+renderable after deleting its external source; JPEG EXIF orientation preserves physical
+width and adjusts height correctly. The first run rejected an obsolete QA fixture that
+put a control into anatomical workspace membership; correcting that fixture retained the
+production policy. Final visual inspection found and fixed a hardcoded old header version.
+The corrected b8e57fc executable is undergoing final packaging qualification.
+
+The packaged solver also recalculated all four skull fibers at 80 samples, updated their
+loft, saved and reopened it. Its complete Qt-free report records four fresh native route
+calls, with 185.64 ms total inclusive duration; this exploratory result under uncontrolled
+load is not a latency guarantee. Evidence: `build/020-packaged-skull.json` and
+`build/portable-020-final.log`; temporary portable inputs/captures are under
+`%TEMP%/anthroforge-020-c999896`. The later header correction does not change those kernels.
+
+Distribution target: `dist/0.2.0/AnthroForge.dist/AnthroForge.exe`; keep the whole folder
+together. Corresponding source: `dist/AnthroForge-0.2.0-source.zip`. Prior release folders
+are preserved. Final documentation may be newer than the compiled source revision.
 
 ## UI polish 0.1.9
 

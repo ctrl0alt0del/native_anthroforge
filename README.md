@@ -1,15 +1,15 @@
-# AnthroForge 0.2.0 candidate
+# AnthroForge 0.2.0
 
 Standalone curves, reference images, fibers and curve-based surfaces follow the
 [confirmed specification](docs/specification_020.md) and
-[implementation plan](docs/implementation_020.md). Source, native parity and offscreen
-workflows are qualified; portable qualification is in progress in the
-[task record](docs/tasks/020-construction.md).
+[implementation plan](docs/implementation_020.md). See the
+[release validation](docs/development_status.md#construction-objects-020) for source,
+native parity, profiling, offscreen interaction and relocated portable evidence.
 
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder. The 0.2.0 candidate targets
+Open **AnthroForge.exe** in the complete portable folder. The 0.2.0 distribution is
 `dist/0.2.0/AnthroForge.dist`; the default packaging location remains `dist/AnthroForge.dist`.
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder

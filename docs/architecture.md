@@ -423,7 +423,7 @@ deduplicated before export; raw allocation addresses are not serialized. Owner t
 overlap and unobserved/transient or non-native allocations are explicitly outside coverage.
 Recording off performs no new inventory queries, traversal or cache event collection.
 
-## Construction image ownership and presentation (0.2.0 development)
+## Construction image ownership and presentation (0.2.0)
 
 `authored_jobs` owns the common initiating-history-step publication used by mesh and
 image imports. Image jobs decode PNG/JPEG and apply EXIF orientation off-thread, then
@@ -448,7 +448,7 @@ The maintained implementation uses transformed quads and staged layer models, wi
 for orientation, occlusion and complete replacement. These are scoped observed results,
 not a claim about every Qt backend. No visible-window acceptance has been performed.
 
-## Curve surface ownership (0.2.0 development)
+## Curve surface ownership (0.2.0)
 
 `core.curve_consumption` defines primitive/surface source references. The shared application
 consumer policies own transforms, independence and reference rebasing across reparenting,

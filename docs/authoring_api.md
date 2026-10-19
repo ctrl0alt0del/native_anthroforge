@@ -1,9 +1,10 @@
-# Local authoring API, 0.2.0 candidate
+# Local authoring API, 0.2.0
 
-## 0.2.0 development commands
+## Construction commands
 
-These commands are implemented on the construction development branch. This is not
-a claim that the complete 0.2.0 desktop workflow or release is available.
+The desktop and headless clients share these operations, policies and transactions.
+See the [construction walkthrough](construction_020.md) and
+[release validation](development_status.md#construction-objects-020).
 
 | Operation | Arguments | Result |
 | --- | --- | --- |
@@ -260,10 +261,10 @@ inputs with newer authored changes. Failed cycles retain previous geometry and f
 unsuccessfully, so they do not block saves indefinitely. Read `jobs` and result status
 after `wait`; successful command dispatch alone does not guarantee successful calculation.
 
-The released 0.1.x implementation used schema 2 with version-1 migration. The 0.2.0
-development branch supersedes that behavior: schema 3 only, with clear rejection of
+The released 0.1.x implementation used schema 2 with version-1 migration. Version 0.2.0
+supersedes that behavior: schema 3 only, with clear rejection of
 older formats. Native handles and undo history are never serialized.
-# Reference images (0.2.0 development branch)
+## Reference images
 
 Image operations use the same session command API, with no Qt dependency:
 
@@ -289,8 +290,8 @@ Image operations use the same session command API, with no Qt dependency:
 
 `wait` includes image jobs. Import/replacement uses the initiating undo step; cancel/failure
 never publishes a partial image. Source bytes are embedded once per unique asset in schema 3.
-This documents the implemented image increment; it does not mark the entire 0.2.0 release complete.
-## First-class drawing (0.2.0 candidate)
+
+## First-class drawing
 
 `curve.create` creates an editable standalone curve; no SCP is required. Its optional
 placement defaults to the workspace 3D cursor. `curve.draw(points, settings)` accepts
@@ -313,7 +314,7 @@ The first-hit/fallback/offset policies are adapted from Blender 5.0.1. Fitting u
 pinned curve_fit_nd implementation. Cancellation is checked around the atomic fit call;
 obsolete output cannot publish. `tools/drawing_qualification.py` records this interval.
 
-## Curve engine conversion (0.2.0 candidate)
+## Curve engine conversion
 
 Authored curves store typed `engine_settings`: Bézier (`kind`, `resolution`), exact
 polyline (`kind`), or routing (`kind`, `samples`, `radius`, `accepted_steps`, `obstacles`).
@@ -336,7 +337,7 @@ an alias for its typed setting. Curve/Fiber consumers still share the same path 
 Only one preview is retained. It does not alter saving, document state or undo; it is not
 serialized. The desktop displays it in green and excludes it from picking. Source edits
 invalidate acceptance. Routing runs through the native production solver and the existing
-coordinator on this development branch. `curve.engine_settings(curve, **settings)` changes
+coordinator. `curve.engine_settings(curve, **settings)` changes
 the current engine's parameters; engine changes require the conversion workflow above.
 Routing `obstacles` are explicit anatomical surface IDs, with fiber support surfaces also
 included automatically. All surface poses/results are declared inputs. Missing inputs or
@@ -354,9 +355,9 @@ It never changes engines, geometry, undo history or save checkpoints. Stale capt
 publish current findings; failed or cancelled checks remain explicitly incomplete.
 Pinned actual-addon fixtures cover cold/warm skull routes, attachment deformation and surfaces.
 Recorded shared-fiber profiling includes preparation, publication and resource release; evidence
-and its limits are in [the task record](tasks/020-construction.md). Release qualification is separate.
+and its limits are in [release validation](development_status.md#construction-objects-020).
 
-### Fiber creation (0.2.0 development branch)
+### Fiber creation
 
 `fiber.create(curve, bindings, name="Fiber")` starts an asynchronous independent copy.
 Each binding is `{point: authored_point_id, target: anatomical_surface_id,
@@ -383,7 +384,7 @@ resource owners, routing obstacles and pending edit baselines together. Shared i
 geometry buffers remain retained by their resource owners. These are construction operations;
 they do not certify anatomical accuracy or reconstruct muscles.
 
-## Curve surfaces (0.2.0 candidate)
+## Curve surfaces
 
 - `surface.preview(curves, **creation_settings)` evaluates initial correspondence without
   creating a document object. `surface.preview(target=existing_surface)` previews Realign.

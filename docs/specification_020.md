@@ -1,8 +1,9 @@
 # AnthroForge 0.2.0 specification
 
-Status: confirmed product contract, implementation in progress. This document governs
-0.2.0 and supersedes conflicting earlier proposals. It does not claim implementation
-or validation. See [delivery plan](implementation_020.md),
+Status: confirmed and implemented product contract. This document governs
+0.2.0 and supersedes conflicting earlier proposals. Observed evidence and its limits
+are recorded in [release validation](development_status.md#construction-objects-020).
+See [delivery plan](implementation_020.md),
 [engineering rules](engineering_guidelines.md), and [task status](tasks/020-construction.md).
 
 ## Release and compatibility

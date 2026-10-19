@@ -1,9 +1,9 @@
 # AnthroForge 0.2.0 implementation plan
 
-Status: approved plan, implementation in progress. Product authority:
-[specification](specification_020.md). Recovery and observed evidence:
-[task record](tasks/020-construction.md). Baseline: 0.1.9 at `b539697`; its recorded
-541-test qualification is historical until rerun against the changed implementation.
+Status: implemented. Product authority: [specification](specification_020.md).
+See [release validation](development_status.md#construction-objects-020) for observed
+evidence and limitations, and the [task record](tasks/020-construction.md) for recovery.
+Baseline: 0.1.9 at `b539697`; the 0.2.0 gate passes 871 tests alongside native checks.
 
 ## Owners and interfaces
 

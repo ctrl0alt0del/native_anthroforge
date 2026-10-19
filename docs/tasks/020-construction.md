@@ -3,7 +3,7 @@
 - Task branch: `codex/020-construction`
 - Integration branch: `main`
 - Starting revision: `b539697`
-- Status: in progress; not release-ready
+- Status: implementation and source qualification complete; final corrected package pending
 - Last updated: 2026-10-19, Europe/Bucharest
 - Recovery update: 2026-10-19. Earlier checkpoint sections below are historical;
   the latest checkpoints supersede their incomplete-feature statements.
@@ -54,8 +54,8 @@ Direct control.attach is retired; shared controls use ordinary transform relatio
 Source and offscreen qualification and relocated portable checks have passed. Final visual
 inspection caught a hardcoded 0.1.9 title-bar label; it now reads Qt application metadata.
 The corrected desktop entry point must be rebuilt and checked before release integration.
-The current coordinator, attachment kernels, Issues, profiler, transactions and
-staged renderer must be extended at their owning boundaries, not duplicated.
+The implementation extends the existing coordinator, attachment kernels, Issues, profiler,
+transactions and staged renderer at their owning boundaries.
 
 ## Verification
 
@@ -82,11 +82,10 @@ Use background/offscreen checks and state their limits.
 
 ## Next actions and blockers
 
-1. Finish active documentation, API examples and package notices for the complete workflow.
-2. Run the stable integrated offscreen suite, development gate and ownership/coupling review.
-3. Build and qualify the relocated portable executable, headless and invisible rendering,
-   before the versioned release/source archive and validated merge. No interactive acceptance
-   may be claimed while validation is background-only.
+1. Finish rebuilding the b8e57fc executable and run the relocated portable checker.
+2. Refresh packaged documentation, wheel/sdist and the versioned source archive.
+3. Mark validation complete, then merge and push the qualified task branch into main.
+   No interactive acceptance may be claimed while validation is background-only.
 
 Important findings: ordinary parenting and consumer frames need an atomic rebind to avoid
 double transforms after a new shared ancestor is introduced. Local path/local-pose ports
@@ -976,3 +975,9 @@ old version label. Desktop engine creation now publishes the application package
 through Qt's standard application metadata; QML reads that property. The offscreen editor,
 typing, architecture/function-limit checks and Ruff pass. Rebuild and requalify this narrow
 presentation correction, then finalize documentation/source artifacts and merge.
+
+At b8e57fc the full development gate passes again: 871 tests, 3 CTests, complete native
+and script style, types, function limits, numerical imports and doctor. Log:
+`build/check-020-release.log`. Packaging uses its clean staged snapshot; final active docs
+are being refreshed separately. All seven active documentation files have valid local links.
+`origin/main` was refreshed and still equals the starting b539697 baseline.

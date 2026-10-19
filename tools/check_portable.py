@@ -10,6 +10,7 @@ from pathlib import Path
 
 import numpy as np
 from construction_portable import construction
+from feedback_portable import feedback
 from inspection_portable import inspection
 from issues_portable import issues
 from profiler_portable import profiling
@@ -32,6 +33,7 @@ CHECKS = (
     "workflow inspection, units, workspace policies and image/JSON report",
     "surface rulers, named cameras and explanatory profile diagnostics",
     "independent fibers, shared lofts and portable embedded reference images",
+    "window feedback capture, annotations and version-independent local reports",
 )
 
 
@@ -128,6 +130,7 @@ def qualification_steps():
         workflow,
         inspection,
         construction,
+        feedback,
     )
 
 

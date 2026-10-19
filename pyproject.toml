@@ -55,5 +55,5 @@ python_version = "3.12"
 strict = true
 explicit_package_bases = true
 mypy_path = "$MYPY_CONFIG_FILE_DIR/src"
-files = ["src/anthroforge/core", "src/anthroforge/application", "src/anthroforge/native"]
+files = ["src/anthroforge/core", "src/anthroforge/application", "src/anthroforge/native", "src/anthroforge/feedback"]
 

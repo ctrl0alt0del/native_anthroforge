@@ -131,7 +131,7 @@ surface offsets with real wheel/middle-button events. Outputs go to `build/view-
 axis keys/buttons, projection and zoom changes, the menu action, text focus, rebinding,
 workspace changes and camera persistence. Outputs go to `build/camera-restore-review`.
 
-Runtime profiler qualification uses `tools/profiler_acceptance.py` (F12 in four drag
+Runtime profiler qualification uses `tools/profiler_acceptance.py` (Shift+F12 in four drag
 variants) and `tools/profiler_qualification.py --mode none|dormant|record --output ...`.
 Run overhead trials serially, with counterbalanced modes and no simultaneous builds.
 `tools/check_portable.py` checks both packaged headless reports and runtime Qt reports.

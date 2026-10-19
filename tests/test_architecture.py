@@ -26,7 +26,10 @@ def imports(path):
 
 def test_shared_core_has_no_editor_dependency():
     forbidden = ("bpy", "bmesh", "mathutils", "PySide6", "anthroforge.desktop")
-    paths = (ROOT / "src" / "anthroforge" / name for name in ("core", "application", "native"))
+    paths = (
+        ROOT / "src" / "anthroforge" / name
+        for name in ("core", "application", "native", "feedback")
+    )
     violations = [
         f"{path}: {name}"
         for base in paths

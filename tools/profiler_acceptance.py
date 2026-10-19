@@ -1,4 +1,4 @@
-"""Actual F12 recording during normal/snapped curve drags, with hidden/visible Activity."""
+"""Actual Shift+F12 recording during normal/snapped curve drags, with hidden/visible Activity."""
 
 import json
 from pathlib import Path
@@ -33,9 +33,12 @@ class RecordingTrial(DragTrial):
 
     def toggle_recording(self):
         before = self.controller.session.history.before
-        modifiers = Qt.ControlModifier if self.snapping else Qt.NoModifier
+        held = Qt.ControlModifier if self.snapping else Qt.NoModifier
+        modifiers = Qt.ShiftModifier | held
         for kind in (QEvent.KeyPress, QEvent.KeyRelease):
             QGuiApplication.sendEvent(self.window, QKeyEvent(kind, Qt.Key_F12, modifiers))
+        release = QKeyEvent(QEvent.KeyRelease, Qt.Key_Shift, held)
+        QGuiApplication.sendEvent(self.window, release)
         assert find(self.window, "curveEditor").property("dragging")
         assert self.controller.session.history.before is before
         assert self.controller.session.profiler.active == (self.index == 10)
@@ -96,7 +99,7 @@ def trial(controller, window, point, snapping, opened, canceled=False):
     kind = CanceledTrial if canceled else RecordingTrial
     gesture = kind(controller, window, point, snapping, args)
     result = gesture.record()
-    assert result["snap_hits"] == (100 if snapping else 0)
+    assert result["snap_hits"] == (100 if snapping else 0), (snapping, opened, result["snap_hits"])
     gesture.finish()
     await_export(controller)
     path = controller.session.profiler.path
@@ -144,11 +147,11 @@ def focus_recording(controller, window):
     field = find(window, "outlinerSearch")
     field.forceActiveFocus()
     focus = window.activeFocusItem()
-    QTest.keyClick(window, Qt.Key_F12)
+    QTest.keyClick(window, Qt.Key_F12, Qt.ShiftModifier)
     assert controller.session.profiler.active and window.activeFocusItem() is focus
     event = QKeyEvent(QEvent.KeyPress, Qt.Key_X, Qt.NoModifier, "PRIVATE_TEXT_SENTINEL")
     QGuiApplication.sendEvent(window, event)
-    QTest.keyClick(window, Qt.Key_F12)
+    QTest.keyClick(window, Qt.Key_F12, Qt.ShiftModifier)
     assert not controller.session.profiler.active and window.activeFocusItem() is focus
     await_export(controller)
     with ZipFile(controller.session.profiler.path) as archive:
@@ -161,12 +164,12 @@ def document_recording(controller, window):
     path = str(OUTPUT / "document-lifecycle.anthroforge")
     controller.session.command("save", path=path, blocked_policy="wait")
     replace_document(controller, "")
-    QTest.keyClick(window, Qt.Key_F12)
+    QTest.keyClick(window, Qt.Key_F12, Qt.ShiftModifier)
     for target in (path, "", path):
         replace_document(controller, target)
         assert controller.profiler is profiler and profiler.active
         assert controller.session.scheduler.profiler is profiler
-    QTest.keyClick(window, Qt.Key_F12)
+    QTest.keyClick(window, Qt.Key_F12, Qt.ShiftModifier)
     await_export(controller)
     verify_bundle(profiler.path)
 

@@ -26,7 +26,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: constructionPane.dialogVisible || reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: feedbackDialog.visible || constructionPane.dialogVisible || reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -36,6 +36,7 @@ ApplicationWindow {
         else saveDialog.open();
     }
     onClosing: function(close) {
+        if (feedback.state.busy) { close.accepted=false; return; }
         if (workspace.state.dirty && !closingConfirmed) { close.accepted = false; closeDialog.open(); }
     }
     Action { id: newAction; text: "New project"; enabled: !window.modalOpen; onTriggered: { viewport.forceActiveFocus(); workspace.newDocument(); } }
@@ -72,10 +73,14 @@ ApplicationWindow {
                         MenuSeparator {}
                         UiMenuItem { text: performance.state.recording ? "Stop recording" : "Record performance"; shortcutHint: keyboard.shortcut("recordPerformance"); onTriggered: performance.toggle() }
                     }
-                    UiMenu { title: "Help"; UiMenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() } }
+                    UiMenu {
+                        title: "Help"; objectName: "helpMenu"
+                        UiMenuItem { objectName: "reportFeedbackMenu"; text: "Report a bug / recommendation…"; shortcutHint: keyboard.shortcut("reportFeedback"); enabled: !window.modalOpen && !feedback.state.active; onTriggered: feedback.request(window) }
+                        UiMenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() }
+                    }
                 }
                 Item { Layout.fillWidth: true }
-                ProfileStatus { }
+                ProfileStatus { keyboard: window.keyboardManager }
                 Label { text: "Workspace"; color: Theme.muted; font.pixelSize: 11 }
                 UiCombo { Layout.preferredWidth: 175; model: workspace.state.workspaces; currentIndex: workspace.state.workspace; onActivated: workspace.run("workspace.select",{index:currentIndex}) }
                 UiButton { objectName: "manageWorkspace"; text: "Manage…"; enabled: !workspace.state.waiting && !workspace.state.editing; onClicked: workspaceManager.open() }
@@ -200,6 +205,7 @@ ApplicationWindow {
         }
     }
     ShortcutHelp { id: helpDialog; keyboard: window.keyboardManager; anchors.centerIn: parent }
+    FeedbackDialog { id: feedbackDialog; anchors.centerIn: parent }
     UiDialog { id: messageDialog; title: "Last operation"; modal: true; anchors.centerIn: parent; width: Math.min(560, window.width-80); standardButtons: Dialog.Close; Label { width: parent.width; text: workspace.state.message; wrapMode: Text.WrapAnywhere; color: Theme.text } }
     FileDialog { id: importFile; title: "Import primitive mesh"; nameFilters: ["Mesh files (*.obj *.stl *.ply)"]; onAccepted: { window.chosenImport = selectedFile.toString(); importUnits.currentIndex = 0; importOptions.open(); } }
     FileDialog { id: openDialog; title: "Open AnthroForge project"; nameFilters: ["AnthroForge project (*.anthroforge)"]; onAccepted: workspace.requestDocument(selectedFile.toString()) }
@@ -293,6 +299,7 @@ ApplicationWindow {
         viewX: () => viewport.setView("Right"), viewY: () => viewport.setView("Front"), viewZ: () => viewport.setView("Top"),
         restoreView: () => viewport.restoreView(),
         recordPerformance: () => performance.toggle(),
+        reportFeedback: () => feedback.request(window),
         confirm: () => viewport.confirmTransform(),
         removeLastPoint: () => workspace.drawingTools.removeLast(),
         projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,

@@ -24,6 +24,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--project")
     parser.add_argument("--disable-profiling-support", action="store_true")
     parser.add_argument("--profile-probe")
+    parser.add_argument("--feedback-probe")
     return parser.parse_args()
 
 
@@ -59,6 +60,16 @@ def setup_profile_controls(controller, engine):
         controller, getattr(controller, "qt_profiler", None)
     )
     engine.rootContext().setContextProperty("performance", controller.profile_controls)
+    setup_feedback_controls(controller, engine)
+
+
+def setup_feedback_controls(controller, engine):
+    from .feedback_canvas import FeedbackCanvas
+    from .feedback_editor import FeedbackEditor
+
+    assert FeedbackCanvas  # Import registers the QML-painted annotation component.
+    controller.feedback = FeedbackEditor(controller)
+    engine.rootContext().setContextProperty("feedback", controller.feedback)
 
 
 def launch(args: argparse.Namespace, app: QGuiApplication, profiler=None) -> int:
@@ -82,6 +93,10 @@ def schedule_diagnostics(args, app, engine, controller, warnings):
         from .profile_probe import ProfileProbe
 
         ProfileProbe(app, controller, args.profile_probe)
+    if args.feedback_probe:
+        from .feedback_probe import FeedbackProbe
+
+        FeedbackProbe(app, controller, engine, args.feedback_probe)
 
 
 def open_controller(project):

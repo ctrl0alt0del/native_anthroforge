@@ -5,7 +5,7 @@ The existing primitive, attachment and navigation workflow below remains applica
 
 The Activity panel retains its job rows while status and elapsed time update. It shows
 the latest 40 jobs, newest first; Cancel and Retry continue to act on the named job.
-Use F12 performance recording when reporting an editing slowdown.
+Use Shift+F12 performance recording when reporting an editing slowdown.
 
 See [UI polish](ui_polish.md) for compact measurements, expandable evidence and
 shared menu/control styling.
@@ -226,7 +226,7 @@ or anatomical certificate. See [issue reporting](issues.md) for coverage and API
 
 ## Recording a slowdown
 
-Press **F12**, reproduce the problem, then press F12 again. You can toggle recording
+Press **Shift+F12**, reproduce the problem, then press Shift+F12 again. You can toggle recording
 while dragging and while holding Ctrl/Shift/Alt. The top bar shows recording/export
 status and **Show file** after completion. Share that `.afprofile.zip` file.
 Windows reports are under `%LOCALAPPDATA%/AnthroForge/Profiles`. The default capture

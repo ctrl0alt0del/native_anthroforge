@@ -7,17 +7,19 @@ ColumnLayout {
     required property var keyboard
     signal importRequested()
     signal deleteRequested(string entity)
-    property int currentIndex: 0
+    property alias currentIndex: tabs.currentIndex
     readonly property string selected: workspace.selectedId
     spacing: Theme.gap
     onSelectedChanged: Qt.callLater(revealSelection)
     function revealSelection() {
-        if(selected) currentIndex=workspace.selectedData.is_construction || workspace.selectedData.is_control ? 1 : 0;
+        if(selected) tabs.setCurrentIndex(workspace.selectedData.is_construction || workspace.selectedData.is_control ? 1 : 0);
     }
-    RowLayout {
-        Layout.fillWidth: true; spacing: Theme.gap
-        UiButton { objectName: "anatomyTab"; text: "Anatomy"; hint: "SCP / VCP hierarchy"; Layout.fillWidth: true; checked: browser.currentIndex===0; onClicked: browser.currentIndex=0 }
-        UiButton { objectName: "constructionTab"; text: "Construction"; hint: "Curves, fibers, surfaces and reference images"; Layout.fillWidth: true; checked: browser.currentIndex===1; onClicked: browser.currentIndex=1 }
+    UiTabBar {
+        id: tabs
+        objectName: "objectTabs"
+        Layout.fillWidth: true
+        UiTabButton { objectName: "anatomyTab"; text: "Anatomy"; hint: "SCP / VCP hierarchy" }
+        UiTabButton { objectName: "constructionTab"; text: "Construction"; hint: "Curves, fibers, surfaces and reference images" }
     }
     StackLayout {
         Layout.fillWidth: true; Layout.fillHeight: true

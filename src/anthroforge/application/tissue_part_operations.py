@@ -4,7 +4,7 @@ from dataclasses import asdict, replace
 from typing import Any
 
 from anthroforge.core import tissue_parts
-from anthroforge.core.tissue_settings import SectionProfile
+from anthroforge.core.tissue_settings import HeightSmoothing, SectionProfile
 from anthroforge.native import tissue_parts as native
 
 from . import tissue_operations, tissue_strategy_operations
@@ -63,3 +63,17 @@ def control_reset(session: Any, target: str, part: str = "main", side: str = "a"
     mesh = session.assets[item.base_result.asset].mesh
     point = native.default_control(mesh, index)
     tissue_operations.inflation(session, target, dict(control=point), part, side)
+
+
+def smoothing(session: Any, target: str, changes: Any, part: str = "main", side: str = "a") -> None:
+    item = tissue_operations.tissue(session, target)
+    if side not in ("a", "b") or set(changes) - set(HeightSmoothing.__dataclass_fields__):
+        raise ValueError("Choose side A/B and supported height smoothing settings.")
+    current = selected(item, part)
+    previous = getattr(current, side)
+    edited = replace(previous, smoothing=replace(previous.smoothing, **changes))
+    changed = replace(current, **{side: edited})
+    parts = tuple(changed if p.id == part else p for p in tissue_parts.active(item))
+    tissue_strategy_operations.install(
+        session, replace(item, parts=tissue_parts.installed(item, parts))
+    )

@@ -3,32 +3,48 @@
 from typing import Any
 
 from anthroforge.core.tissue_parts import active
-from anthroforge.native import paths, tissue_parts, tissue_shapes
+from anthroforge.native import paths, tissue_parts, tissue_shapes, tissue_smoothing
 from anthroforge.native.mesh import Mesh
 
+from .tissue_output import TissueOutput
 
-def construct(engine: Any, resources: Any, item: Any, cancel: int) -> Mesh:
+
+def construct(engine: Any, resources: Any, item: Any, cancel: int) -> TissueOutput:
     settings = item.parts[0].a.inflation
     if item.base_state.kind == "POINT":
-        return tissue_shapes.radial(
+        mesh = tissue_shapes.radial(
             engine, item.base_state.frame, settings, item.resolution, cancel
         )
+        return TissueOutput(mesh=mesh, diagnostics=())
     if item.base_state.kind == "CURVE":
-        return sweep(engine, resources, item, cancel)
+        return TissueOutput(mesh=sweep(engine, resources, item, cancel), diagnostics=())
     mesh = resources.meshes[item.base_result.asset].mesh
     if settings.mode == "NORMAL":
-        field = next((f.values for f in item.fields if f.name == "INFLATION"), ())
-        return tissue_shapes.normal(mesh, settings, field, item.reverse, cancel)
+        return normal(mesh, item, cancel)
     return muscle(mesh, item, cancel)
 
 
-def muscle(mesh: Mesh, item: Any, cancel: int) -> Mesh:
+def normal(mesh: Mesh, item: Any, cancel: int) -> TissueOutput:
+    field = next((f.values for f in item.fields if f.name == "INFLATION"), ())
+    result = tissue_shapes.normal(mesh, item.parts[0].a.inflation, field, item.reverse, cancel)
+    return TissueOutput(mesh=result, diagnostics=())
+
+
+def muscle(mesh: Mesh, item: Any, cancel: int) -> TissueOutput:
     parts = active(item)
-    first = tissue_parts.evaluate(mesh, parts, "a", item.reverse, cancel, item.both_sides)
+    first, reports = muscle_side(mesh, parts, "a", item.reverse, item.both_sides, cancel)
     if not item.both_sides:
-        return first
-    second = tissue_parts.evaluate(mesh, parts, "b", not item.reverse, cancel, True)
-    return tissue_parts.compose(first, second, item.reverse, cancel)
+        return TissueOutput(mesh=first, diagnostics=reports)
+    second, other = muscle_side(mesh, parts, "b", not item.reverse, True, cancel)
+    result = tissue_parts.compose(first, second, item.reverse, cancel)
+    return TissueOutput(mesh=result, diagnostics=reports + other)
+
+
+def muscle_side(
+    mesh: Mesh, parts: Any, side: str, reverse: bool, envelope: bool, cancel: int
+) -> Any:
+    own = tissue_parts.evaluate(mesh, parts, side, reverse, cancel, envelope)
+    return tissue_smoothing.evaluate(mesh, own, parts, side, cancel)
 
 
 def sweep(engine: Any, resources: Any, item: Any, cancel: int) -> Mesh:

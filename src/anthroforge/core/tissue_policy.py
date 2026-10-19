@@ -38,9 +38,24 @@ def validate(tissue: TissueVCP, records: Mapping[str, object]) -> None:
         for side in (part.a, part.b) if tissue.both_sides else (part.a,):
             if side.inflation.mode not in modes:
                 raise ValueError(f"{side.inflation.mode} is unsupported for this tissue source.")
+            validate_smoothing(side)
     if tissue.stacking and domain(source) != "SURFACE":
         raise ValueError("Stacking currently requires surface-based tissue participants.")
     validate_surface(tissue, source, records)
+
+
+def validate_smoothing(side: object) -> None:
+    from .tissue_settings import TissueSide
+
+    assert isinstance(side, TissueSide)
+    if side.smoothing.mode != "OFF" and side.inflation.mode not in (
+        "CTRL_POINT",
+        "DISTRIBUTED",
+        "SECTION_PROFILE",
+    ):
+        raise ValueError(
+            "Height smoothing requires muscle grid inflation; disable it for this mode."
+        )
 
 
 def validate_surface(tissue: TissueVCP, source: object, records: Mapping[str, object]) -> None:

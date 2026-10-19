@@ -33,10 +33,10 @@ def publication(
     changes: dict[str, Any] = {phase + "_result": result}
     if output.base is not None:
         changes["base_state"] = output.base
-    if output.diagnostic is not None:
+    if output.diagnostics is not None:
         changes["diagnostics"] = (
             *[d for d in current.diagnostics if d.stage != phase],
-            output.diagnostic,
+            *output.diagnostics,
         )
     if phase in ("intrinsic", "final"):
         changes["result"] = replace(result, status="unstacked" if phase == "intrinsic" else "ready")

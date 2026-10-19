@@ -44,3 +44,11 @@ Blender Authors, GPL-2.0-or-later. The normalized object local Z axis is project
 the view plane; squared residual must be at most 1e-5. The same batched native predicate
 serves picking and the Qt geometry adapter. It intentionally uses local Z even under shear,
 as the source does, rather than silently substituting the transformed polygon normal.
+
+## PIQP for constrained tissue fields
+
+PIQP **0.6.4**, unchanged from the addon's maintained native/smoothing/vendor/piqp snapshot.
+Upstream release: https://github.com/PREDICT-EPFL/piqp/releases/tag/v0.6.4 (commit 5d84959).
+Header hashes: `piqp-sha256.json`. BSD-2-Clause in `PIQP-LICENSE`; sparse LDL notice also
+retained in `PIQP-LDL-LICENSE` and its original directory. Existing Eigen/libigl headers
+supply the solver and cotangent/mass operators; no duplicate library or Python solver.

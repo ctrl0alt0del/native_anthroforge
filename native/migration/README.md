@@ -165,3 +165,16 @@ source flips, inactive sides and connectors match to 1e-10 with exact canonical 
 The adapter preserves zero-side suppression of branch connector construction and the
 donor's coincident-face compaction. Retained tissue material/side bindings must account
 for that compaction; raw output vertex IDs cannot imply stable material identities.
+
+## Constrained tissue height smoothing
+
+`smoothing/` pins the addon's maintained native/smoothing core and height adapter unchanged;
+`sources.json` records each source hash. `src/tissue_smoothing.cpp` owns batched native mesh
+capture, canonical triangle/part selection, cancellation checks, result metadata and publication
+buffers. Python sends settings and receives owned output plus per-part/side diagnostics.
+The donor's cotangent biharmonic objective, PIQP settings and independent KKT/face checks remain.
+Cancellation occurs before/after each part's synchronous QP; no mid-factorization cancellation
+is claimed. Off bypasses the native call entirely. No extra worker pool or Blender runtime.
+Seventeen cases captured from the actual addon DLL in `tests/fixtures/tissue/smoothing.json`
+match to absolute 1e-10 with exact material topology. Source DLL/source hashes are in the fixture.
+Reproduce using `tools/capture_tissue_smoothing.py` under background Blender 5.0.1.

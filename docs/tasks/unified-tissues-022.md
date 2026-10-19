@@ -147,6 +147,14 @@ Full regression: **1058 passed**, 599 existing Qt deprecation warnings, 39.35 se
 Configured mypy and Ruff pass; native envelope/refinement/parameters clang-tidy passes.
 Height smoothing, cropping, target-relative constraints, tissue-role Fiber integration,
 full stacking, complete editing, ownership review and release qualification remain pending.
+Height smoothing checkpoint: pinned PIQP 0.6.4 and unchanged addon numerical core;
+batched adapter smooths full independent material sides before envelope composition.
+Seventeen actual-donor cases match within 1e-10. Twenty-two focused native/workflow tests
+pass, including exact zero/boundary pins, Off bypass, cancellation, undo and persistence.
+Settings reuse accepted source paths; per-part/side diagnostics remain distinct from static
+relaxation. Full offscreen UI mode/diagnostic checks pass; inspected readable smoothing
+inspector capture. Cancellation is checked around synchronous per-part QPs, not within
+factorization. Full gate, performance and portable qualification still pending.
 Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification

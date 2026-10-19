@@ -17,11 +17,9 @@ def accepted(resources: Any, result: Any, label: str) -> Mesh:
     return cast(Mesh, resources.meshes[result.asset].mesh)
 
 
-def rest(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:
+def rest(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> TissueOutput:
     tissue_sources.require_result(item.base_result)
     tissue_fields.validate(resources, item, "BASE")
-    if item.parts[0].a.smoothing.mode != "OFF":
-        raise ValueError("Tissue field/smoothing adapters are not yet available.")
     return tissue_construction.construct(engine, resources, item, cancel)
 
 
@@ -37,17 +35,17 @@ def intrinsic(
     previous = resources.meshes.get(item.intrinsic_result.asset)
     return TissueOutput(
         mesh=topology.finalize(mesh, previous.mesh if previous else None, cancel),
-        diagnostic=TissueDiagnostic(),
+        diagnostics=(TissueDiagnostic(),),
     )
 
 
-def final(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:
+def final(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> TissueOutput:
     mesh = accepted(resources, item.intrinsic_result, "Intrinsic tissue")
     if item.stacking:
         raise ValueError(
             "Tissue stacking adapter is not yet available; displaying current intrinsic output."
         )
-    return mesh
+    return TissueOutput(mesh=mesh)
 
 
 EVALUATORS = dict(rest=rest, final=final)
@@ -61,4 +59,4 @@ def evaluate(
         return tissue_sources.capture(engine, document, resources, item, cancel)
     if phase == "intrinsic":
         return intrinsic(engine, document, resources, item, cancel)
-    return TissueOutput(mesh=EVALUATORS[phase](engine, document, resources, item, cancel))
+    return EVALUATORS[phase](engine, document, resources, item, cancel)

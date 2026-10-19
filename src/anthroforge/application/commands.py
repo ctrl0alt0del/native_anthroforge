@@ -44,6 +44,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "tissue.smoothing": tissue_part_operations.smoothing,
     "tissue.connector": tissue_part_operations.connector,
     "tissue.profile.reset": tissue_part_operations.profile_reset,
     "tissue.control.reset": tissue_part_operations.control_reset,

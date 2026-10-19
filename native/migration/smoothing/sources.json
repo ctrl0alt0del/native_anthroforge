@@ -1,0 +1,11 @@
+{
+  "src/assembly.cpp": "844087bfa095acbd57215b7f1de94b71981fa30e396bbad62c14f2a40a53fc7f",
+  "src/certification.cpp": "2acd3ec31d0b48241ef5decaa563277eaa5001e7ee8de34340fce4b5ba00fb61",
+  "src/core.cpp": "9bb96282c7bf0355e267fa612a18f1f0244dd9dd0df6cea45b8426e4be08703f",
+  "src/energy.cpp": "bfe65c660576ec69bfc33d497e9fb36b6afaff825ae4ef2653f7396cde39d61c",
+  "src/height.cpp": "6e8faac24c62801c2eb581b70930aaf1cf2a86f738fd8bbedf011459040d35b3",
+  "src/piqp_solver.cpp": "5200e744f916e66cf4d0f1ed75074eeabd985fabaddb224d80567b6866a95303",
+  "src/session.cpp": "8dc3284ac67b5b5984070a5acbb910e7412aba912bb5d5f04c025baba0c72514",
+  "include/af_smoothing/height.h": "5b9aa594c574ebcbd82f9cf4368265dac5b2ee9582e85c3c1649d1fe619a6ebd",
+  "include/af_smoothing/model.hpp": "d4a803bf3cf146b4c81e7cd750315a69e18b5dd26d5f8dd7dbef34bb61a1b020"
+}

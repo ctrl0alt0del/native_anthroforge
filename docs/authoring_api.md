@@ -478,3 +478,8 @@ initializes from the effective amount unless explicit profile settings are suppl
 `tissue.connector(target, part, width, fullness)` edits one branch connector. All use
 normal shared transactions and topology/capability validation. They are implemented on
 the 0.2.2 task branch; 0.2.2 release qualification is not complete.
+
+`tissue.smoothing(target, changes, part="main", side="a")` configures `mode` (OFF/HEIGHT),
+`radius`, `strength` and `maximum_change` for muscle grid inflation. Unsupported mode
+combinations fail shared validation. Accepted rest diagnostics include part/side, fixed
+sample count, KKT residuals and solver duration; they are separate from relaxation reports.

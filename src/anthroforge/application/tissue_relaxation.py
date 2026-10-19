@@ -38,4 +38,4 @@ def evaluate(engine: Any, document: Any, resources: Any, item: Any, cancel: int)
     result, diagnostic = native.evaluate(
         mesh, source(engine, document, resources, item), item, cancel
     )
-    return TissueOutput(mesh=result, diagnostic=diagnostic)
+    return TissueOutput(mesh=result, diagnostics=(diagnostic,))

@@ -52,6 +52,17 @@ def select_control(controller, window):
     activate(window, "tissueInflationMode", modes.index("CTRL_POINT"))
 
 
+def smoothing(controller, window):
+    exercise(controller, window)
+    click(window, "InflationToggle")
+    click(window, "Height smoothingToggle")
+    activate(window, "tissueSmoothingMode", 1)
+    settle(controller)
+    item = controller.session.document.object(controller.selection)
+    assert item.parts[0].a.smoothing.mode == "HEIGHT"
+    assert item.result.status == "ready" and item.diagnostics[0].pinned > 0
+
+
 def branch(controller, window):
     _, target, identity = branched_tissue(controller.session)
     controller.refresh()
@@ -78,6 +89,7 @@ if __name__ == "__main__":
         try:
             run(profile)
             run(branch)
+            run(smoothing)
             print("Offscreen profile, branch and independent side editing passed.")
         finally:
             delete(app)

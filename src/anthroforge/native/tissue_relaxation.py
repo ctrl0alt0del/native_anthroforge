@@ -109,5 +109,12 @@ def evaluate(
 def diagnostic(report: Any) -> TissueDiagnostic:
     states = ("NOT_APPLICABLE", "CONVERGED", "ITERATION_LIMIT")
     return TissueDiagnostic(
-        "intrinsic", states[int(report[0])], int(report[1]), *map(float, report[2:])
+        stage="intrinsic",
+        status=states[int(report[0])],
+        iterations=int(report[1]),
+        final_change=float(report[2]),
+        max_displacement=float(report[3]),
+        relative_volume_error=float(report[4]),
+        max_fixed_error=float(report[5]),
+        solve_ms=float(report[6]),
     )

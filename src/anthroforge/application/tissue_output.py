@@ -13,4 +13,4 @@ class TissueOutput:
     asset: str = ""
     base: TissueBaseState | None = None
     warning: str = ""
-    diagnostic: TissueDiagnostic | None = None
+    diagnostics: tuple[TissueDiagnostic, ...] | None = None

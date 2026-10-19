@@ -17,6 +17,7 @@ UiSection {
     hint: "Surface tissues opt into stacking. Provider surfaces are evaluated first; final geometry remains distinct from intrinsic inflation."
     function configure(key,value) { const changes={}; changes[key]=value; workspace.run("tissue.stacking.configure",{target:item.id,changes:changes}); }
     function saveIntent() { workspace.run("tissue.stacking.relationship",{target:item.id,other:focused,side:side,other_side:otherSide,mode:orderMode.currentText,cover:coverMode.currentIndex===0?"SELF":"OTHER",excluded:exclude.checked}); }
+    function editRegion() { workspace.tissueRegionTools.begin({other:focused,side:side,other_side:otherSide,mode:orderMode.currentText,cover:coverMode.currentIndex===0?"SELF":"OTHER",excluded:false}); }
     UiCheck { objectName: "tissueStackingEnabled"; text: "Enable stacking"; checked: panel.item.stacking || false; onClicked: workspace.run("tissue.configure",{target:panel.item.id,changes:{stacking:checked}}) }
     UiSection {
         title: "Stacking settings"; expanded: false
@@ -53,6 +54,17 @@ UiSection {
         UiCombo { id: coverMode; Layout.fillWidth: true; visible: orderMode.currentIndex>0; model: ["This tissue covers","Other tissue covers"]; currentIndex: panel.intent?.cover==="OTHER"?1:0 }
         UiCheck { id: exclude; objectName: "tissueStackExclude"; text: "Exclude this pair"; checked: panel.intent?.excluded || false }
         Label { visible: !!panel.intent?.regions?.length; text: "Selected support region · "+(panel.intent?.regions?.length || 0)+" faces"; color: Theme.muted }
+        UiButton { objectName: "tissueStackRegion"; text: "Select support footprint…"; Layout.fillWidth: true; enabled: orderMode.currentIndex>0 && !exclude.checked; hint: "Choose Requested or Explicit order, then select material faces on the covering tissue"; onClicked: panel.editRegion() }
+        ColumnLayout {
+            visible: workspace.tissueRegionTools.state.active; Layout.fillWidth: true
+            Label { text: workspace.tissueRegionTools.state.error || "Click covering faces to toggle them. Green outlines show the draft footprint. "+workspace.tissueRegionTools.state.count+" selected."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
+            UiButton { text: "Use entire footprint"; Layout.fillWidth: true; onClicked: workspace.tissueRegionTools.clear() }
+            RowLayout {
+                Layout.fillWidth: true
+                UiButton { objectName: "tissueStackRegionAccept"; text: "Accept region"; enabled: !workspace.tissueRegionTools.state.error; Layout.fillWidth: true; onClicked: workspace.tissueRegionTools.accept() }
+                UiButton { objectName: "tissueStackRegionCancel"; text: "Cancel"; onClicked: workspace.tissueRegionTools.cancel() }
+            }
+        }
         RowLayout {
             Layout.fillWidth: true
             UiButton { objectName: "tissueStackSave"; text: "Save relationship"; Layout.fillWidth: true; onClicked: panel.saveIntent() }

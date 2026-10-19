@@ -36,10 +36,27 @@ def relationship_data(session: Any, item: Any, provider: Any, settings: Any) -> 
     data.pop("other", None)
     data.update(settings)
     if "regions" in settings:
-        data["regions"] = tuple(tuple(row) for row in settings["regions"])
-        cover = item if data.get("cover", "SELF") == "SELF" else provider
-        data["topology"] = tissue_fields.domain(session.resources, cover, "BASE")[1]
+        capture_regions(session, item, provider, data, settings.get("topology", ""))
+    elif previous and previous.regions and previous.cover != data.get("cover", "SELF"):
+        raise ValueError("Select a new support region when changing the covering tissue.")
     return data
+
+
+def capture_regions(session: Any, item: Any, provider: Any, data: Any, expected: str) -> None:
+    from anthroforge.native import tissue_regions
+
+    cover = item if data.get("cover", "SELF") == "SELF" else provider
+    topology = tissue_fields.domain(session.resources, cover, "BASE")[1]
+    if expected and expected != topology:
+        raise ValueError("Support material topology changed; select the region again.")
+    regions = tuple(tuple(row) for row in data["regions"])
+    parts = {key: i for i, key in enumerate(cover.base_state.parts)}
+    if any(part not in parts for part, _ in regions):
+        raise ValueError("Support selection refers to an unavailable construction part.")
+    side = data.get("side", "a") if cover.id == item.id else data.get("other_side", "a")
+    mesh = session.assets[cover.rest_result.asset].mesh
+    tissue_regions.validate(mesh, [(parts[p], f) for p, f in regions], side)
+    data.update(regions=regions, topology=topology)
 
 
 def pair(row: StackRelationship) -> tuple[str, str, str]:

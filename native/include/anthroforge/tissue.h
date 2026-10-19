@@ -33,6 +33,9 @@ AF_API uint64_t af_tissue_normal_shell(uint64_t source,const AfTissueShape* sett
 AF_API uint64_t af_tissue_profile_sweep(const double* samples,int count,int closed,const AfTissueShape* settings,uint64_t cancel);
 AF_API uint64_t af_tissue_radial(const double* frame,const AfTissueShape* settings,int resolution,uint64_t cancel);
 AF_API int af_tissue_field_edit(const double* source,int64_t count,const int64_t* indices,int64_t selected,double weight,double* output);
+AF_API int af_tissue_region_face(uint64_t source,int64_t polygon,int side,int64_t* region);
+AF_API int af_tissue_regions_check(uint64_t source,const int64_t* regions,int count,int side);
+AF_API int64_t af_tissue_region_lines(uint64_t source,const int64_t* regions,int count,int side,const double* frame,double* output,int64_t capacity);
 AF_API uint64_t af_tissue_crop(uint64_t base,uint64_t own,const double* plane,uint64_t cancel);
 AF_API uint64_t af_tissue_smooth(uint64_t base,uint64_t own,const double* settings,int count,double* reports,uint64_t cancel);
 AF_API uint64_t af_tissue_relax(uint64_t rest,const AfTissueSource* source,const AfTissueRelax* settings,const AfTissueRegion* regions,int count,double* report,uint64_t cancel);

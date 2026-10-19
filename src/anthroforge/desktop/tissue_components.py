@@ -36,6 +36,7 @@ def projected(item):
 
 
 def edit(editor, part, side):
+    editor.controller.cancelViewportTools()
     editor.tissue_context = (part, side)
     editor.category, editor.editing, editor.selection = "TISSUE_CONTROL", True, []
     editor.refresh()

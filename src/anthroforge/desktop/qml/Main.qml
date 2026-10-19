@@ -311,7 +311,7 @@ ApplicationWindow {
         confirm: () => viewport.confirmTransform(),
         removeLastPoint: () => workspace.drawingTools.removeLast(),
         projection: () => viewport.orthographic = !viewport.orthographic, xray: () => viewport.xray = !viewport.xray,
-        cancel: () => { workspace.inspectionTools.cancel(); workspace.imageTools.cancel(); workspace.drawingTools.cancel(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
+        cancel: () => { workspace.cancelViewportTools(); viewport.cancelTransform(); viewport.anchorMode = ""; viewport.forceActiveFocus(); }
     })
     function dispatchShortcut(command) {
         if(!keyboard.commandEnabled(command)) return;

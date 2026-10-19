@@ -82,6 +82,7 @@ class ImageTools(QObject):
         row = next((r for r in self.controller.image_model.active_rows() if r["id"] == target), {})
         if row.get("geometry_asset") != session.document.object(target).source:
             return
+        self.controller.cancelViewportTools(self)
         self.target, self.points, self.context = target, [], self.signature(target)
         self.changed.emit()
 

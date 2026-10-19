@@ -37,6 +37,11 @@ against the accepted Base or Rest domain, including all-zero values. `INFLATION`
 for normal-shell Base thickness weights; other names become custom constraint masks.
 Incompatible topology changes require explicit replacement/removal of the field.
 `tissue.field.remove(target, name)` requires removing its constraint references first.
+`tissue.field.create(target, name, domain="BASE", value=0)` initializes a named field.
+`tissue.field.assign(target, name, indices, value, topology)` assigns selected weights
+through the native adapter and rejects stale material signatures. The desktop Weight fields
+disclosure creates/selects/removes fields and assigns weights to selected material points.
+Point colors distinguish zero, partial and full weight; generated vertex coordinates stay read-only.
 Generated tissue transforms remain unavailable. Generic object deletion preserves sources.
 
 Fiber creation binding rows accept an explicit `role`: `SCP_GEOMETRY`, `TISSUE_BASE`,
@@ -67,8 +72,11 @@ captured against its accepted Base topology. Omitted existing region settings ar
 `tissue.stacking.inspect(target)` returns settings, intent, detected order/providers and final
 status. Both surface participants opt into stacking; disabled inflation sides remain inactive.
 The desktop Stacking disclosure provides searchable tissue pairs, settings and order/exclusion
-editing with ordinary undo. Viewport support-region drafting and full mixed-shell qualification
-remain required before release. No successful final surface is published from failed stacking.
+editing with ordinary undo. Requested/Explicit relationships provide **Select support footprint**:
+click covering faces to toggle a non-mutating draft, inspect its green outlines, then Accept or
+Cancel. Empty selection explicitly uses the entire footprint. Optional `topology` on a region
+assignment rejects a stale caller; unknown parts/faces and implicit cover changes are rejected.
+No successful final surface is published from failed stacking. Release qualification is ongoing.
 
 ## Construction commands
 

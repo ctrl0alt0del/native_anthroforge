@@ -57,8 +57,7 @@ class DrawingTools(QObject):
         self.mode = mode if mode in ("DRAW", "POINTS", "CURSOR") else ""
         self.context = self.signature()
         self.controller.authoring.setEditing(False)
-        self.controller.inspection_tools.cancel()
-        self.controller.image_tools.cancel()
+        self.controller.cancelViewportTools(self)
         self.changed.emit()
 
     @Slot()

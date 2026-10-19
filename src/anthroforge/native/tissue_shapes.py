@@ -19,6 +19,9 @@ class Shape(c.Structure):
 
 
 def configure(engine: GeometryEngine) -> None:
+    from . import tissue_regions
+
+    tissue_regions.configure(engine)
     shape = c.POINTER(Shape)
     engine.bind("af_tissue_normal_shell", [U, shape, D, c.c_int64, U], U)
     engine.bind("af_tissue_profile_sweep", [D, c.c_int, c.c_int, shape, U], U)

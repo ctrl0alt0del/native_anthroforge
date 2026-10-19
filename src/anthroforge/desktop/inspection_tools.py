@@ -50,6 +50,7 @@ class InspectionTools(QObject):
         session = self.controller.session
         if session.history.before is not None or session.waiting_save:
             return
+        self.controller.cancelViewportTools(self)
         self.active = not self.active
         self.start, self.hover = {}, {}
         self.changed.emit()

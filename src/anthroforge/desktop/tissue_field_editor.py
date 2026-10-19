@@ -32,6 +32,7 @@ def reference(item, field, index, weight):
 
 
 def edit(editor, name):
+    editor.controller.cancelViewportTools()
     editor.tissue_context = (name, "")
     editor.category, editor.editing, editor.selection = "TISSUE_FIELD", True, []
     editor.refresh()

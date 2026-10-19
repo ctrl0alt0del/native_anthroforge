@@ -30,6 +30,24 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Support regions now use native material-face lookup and footprint lines on the displayed
+revision. Draft selection/hover/cancel do not mutate documents; acceptance uses the shared
+relationship operation with topology/part/side validation and one-action undo. Changed inputs
+reject the draft. Viewport tool cancellation is coordinated across drawing, calibration,
+measurement and support selection. Full-QML and hidden GPU checks pass; the Qt offscreen
+harness needed explicit render-model staging before picking. The inspected GPU footprint
+matches the selected covering faces. Native build/CTest/changed clang checks, Ruff/mypy and
+eight focused region/architecture checks pass. Full regression: **1278 passed**, 732 existing
+Qt deprecation warnings, 93.57 seconds. No interactive or release acceptance is claimed.
+
+First runtime profiler workload (`build/022-tissue/profile/before-cache.afprofile.zip`)
+records six stacking-parameter edits with hidden GPU frames. Native resolve dominates:
+12 calls/3070 ms; planning 24/618 ms; material preparation 60/62 ms. Aggregate edit/wait/render
+durations include synchronization and readback and are not display/input latency. Bounded
+cross-job material reuse and its ownership attribution remain to implement; it cannot be
+presented as a fix for the dominant native solver cost. Pouch geometry and release checks
+remain pending.
+
 Tissue inflation controls now use existing native component picking and transform gestures;
 side/part selection, cancellation and one-action undo preserve generated geometry's read-only
 policy. Base/Rest fields have searchable creation/removal, native batched weight assignment,

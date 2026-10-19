@@ -21,6 +21,7 @@ from .issue_panel import IssuePanel
 from .models import RenderModel
 from .object_selection import ObjectSelection
 from .routing_choices import RoutingChoices
+from .tissue_region_tools import TissueRegionTools
 
 
 class Controller(QObject):
@@ -61,6 +62,7 @@ class Controller(QObject):
         self.drawing_tools = DrawingTools(self)
         self.creation_selection = CreationSelection(self)
         self.routing_choices = RoutingChoices()
+        self.tissue_region_tools = TissueRegionTools(self)
         self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
 
     def memory_owners(self, owners):
@@ -237,6 +239,22 @@ class Controller(QObject):
     def drawingTools(self):
         return self.drawing_tools
 
+    @Property(QObject, constant=True)
+    def tissueRegionTools(self):
+        return self.tissue_region_tools
+
+    @Slot()
+    def cancelViewportTools(self, keep=None):
+        tools = (
+            self.inspection_tools,
+            self.image_tools,
+            self.drawing_tools,
+            self.tissue_region_tools,
+        )
+        for tool in tools:
+            if tool is not keep:
+                tool.cancel()
+
     @Slot(result="QVariantList")
     def ordinaryParents(self):
         from .image_tools import parent_choices
@@ -324,6 +342,7 @@ class Controller(QObject):
         self.inspection_tools.synchronize()
         self.image_tools.synchronize()
         self.drawing_tools.synchronize()
+        self.tissue_region_tools.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()

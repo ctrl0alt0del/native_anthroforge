@@ -36,7 +36,7 @@ Item {
     property var preservedCamera: null
     readonly property bool canRestoreView: preservedCamera !== null
     readonly property bool drawing: workspace.drawingTools.state.active
-    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active
+    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active || workspace.tissueRegionTools.state.active
     readonly property var selected: authoring.transformData
     readonly property bool transformAvailable: !!selected.id && !!selected.transformable && !selected.readonly && !workspace.state.waiting
     readonly property bool modalTransforming: modalTransform.active
@@ -77,6 +77,7 @@ Item {
     function rayAt(x, y, select, extend) {
         if(drawing) return {};
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
+        if(workspace.tissueRegionTools.state.active) { workspace.tissueRegionTools.probe(origin,direction,select); return {}; }
         if(workspace.imageTools.state.active) { workspace.imageTools.probe(origin,direction,select); return {}; }
         if(measuring) { workspace.inspectionTools.probe(origin,direction,depthIndex,select); return {}; }
         if(authoring.visible) {

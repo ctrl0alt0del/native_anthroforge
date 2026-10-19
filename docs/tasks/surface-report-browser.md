@@ -26,7 +26,7 @@ bounded scrolling report list. See engineering guidelines and feedback_reports.m
 ## Current state
 
 Inspected toolbar, creation lifecycle, surface commands and feedback storage/service.
-No implementation yet. Existing untracked root __init__.py remains untouched.
+Selection-dependent surface creation and the local inbox/browser are implemented. Initial offscreen acceptance covers two/three-curve creation, closed preview, 120 virtualized report rows, preview, delete/cancel/failure, refresh and empty state. Full gate and portable checks remain pending. Existing untracked root __init__.py remains untouched.
 
 ## Verification
 

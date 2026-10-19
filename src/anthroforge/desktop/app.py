@@ -64,12 +64,17 @@ def setup_profile_controls(controller, engine):
 
 
 def setup_feedback_controls(controller, engine):
+    from anthroforge.feedback.local_inbox import LocalReportInbox
+
     from .feedback_canvas import FeedbackCanvas
     from .feedback_editor import FeedbackEditor
+    from .report_browser import ReportBrowser
 
     assert FeedbackCanvas  # Import registers the QML-painted annotation component.
     controller.feedback = FeedbackEditor(controller)
+    controller.report_browser = ReportBrowser(controller, LocalReportInbox())
     engine.rootContext().setContextProperty("feedback", controller.feedback)
+    engine.rootContext().setContextProperty("reportBrowser", controller.report_browser)
 
 
 def launch(args: argparse.Namespace, app: QGuiApplication, profiler=None) -> int:

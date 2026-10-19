@@ -26,7 +26,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: feedbackDialog.visible || constructionPane.dialogVisible || reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: reportsDialog.visible || feedbackDialog.visible || constructionPane.dialogVisible || reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -76,6 +76,7 @@ ApplicationWindow {
                     UiMenu {
                         title: "Help"; objectName: "helpMenu"
                         UiMenuItem { objectName: "reportFeedbackMenu"; text: "Report a bug / recommendationâ€¦"; shortcutHint: keyboard.shortcut("reportFeedback"); enabled: !window.modalOpen && !feedback.state.active; onTriggered: feedback.request(window) }
+                        UiMenuItem { objectName: "viewReportsMenu"; text: "View reports…"; enabled: !window.modalOpen; onTriggered: reportsDialog.open() }
                         UiMenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() }
                     }
                 }
@@ -211,6 +212,7 @@ ApplicationWindow {
     }
     ShortcutHelp { id: helpDialog; keyboard: window.keyboardManager; anchors.centerIn: parent }
     FeedbackDialog { id: feedbackDialog; anchors.centerIn: parent }
+    ReportBrowser { id: reportsDialog; anchors.centerIn: parent }
     UiDialog { id: messageDialog; title: "Last operation"; modal: true; anchors.centerIn: parent; width: Math.min(560, window.width-80); standardButtons: Dialog.Close; Label { width: parent.width; text: workspace.state.message; wrapMode: Text.WrapAnywhere; color: Theme.text } }
     FileDialog { id: importFile; title: "Import primitive mesh"; nameFilters: ["Mesh files (*.obj *.stl *.ply)"]; onAccepted: { window.chosenImport = selectedFile.toString(); importUnits.currentIndex = 0; importOptions.open(); } }
     FileDialog { id: openDialog; title: "Open AnthroForge project"; nameFilters: ["AnthroForge project (*.anthroforge)"]; onAccepted: workspace.requestDocument(selectedFile.toString()) }

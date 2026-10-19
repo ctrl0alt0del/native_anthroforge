@@ -1,7 +1,51 @@
 # AnthroForge development validation
 
-Current source qualification is in [feedback reporting](#feedback-reporting-021-followup).
+Current source qualification is in [fiber interaction](#fiber-interaction-021-follow-up).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Fiber interaction (0.2.1 follow-up)
+
+Whole-fiber translation, rotation and scale are rejected by shared application policy.
+Desktop selection projects this capability separately from read-only state; keyboard,
+toolbar, numeric transform fields and gizmos use it. Fiber point/handle editing remains
+available. Accepted fiber creation exits editing and selects the new object. Its pending
+selection intent survives input-driven job replacement but is discarded on changed
+context, failure, cancellation or history navigation.
+
+The full Windows development gate passes for the implementation at `1d6af1d`: **916
+tests**, 3 native CTests, native static analysis, Ruff, mypy on 191 modules, function
+limits and dependency/native doctor. The existing QQmlPropertyMap deprecation produces
+200 warnings, including 176 from the new controller interaction tests.
+
+Actual offscreen fiber UI tests verify accepted creation selection, disabled numeric/
+toolbar controls, suppressed G/R/S/W/E dispatch, unchanged selection on disabled clicks,
+and component G/R/S with cancellation. Existing component movement/rebinding, conversion,
+ordinary curve/image transforms, primitive editing and view-gesture scripts pass. The
+fiber capture under `build/fiber-transform-policy/` was inspected. Offscreen evidence
+does not claim hands-on Windows input or new geometry-rendering acceptance.
+
+Ownership review: object eligibility belongs to the application policy, component
+eligibility belongs to the existing authoring adapter, and the keyboard manager owns
+generic capability gating. Selection intent is desktop-only and observes existing job
+outputs; it does not create another job lifecycle, document edit or undo step. The
+viewport toolbar owns pointer interception for disabled controls. No fiber-kind checks
+were scattered across QML widgets.
+
+The clean `1d6af1d` executable in `dist/0.2.1-fiber-edits/AnthroForge.dist` passes the
+complete portable suite from a fresh relocated directory with minimal PATH. An additional
+packaged headless check rejects all six local/world translation, rotation and scale
+requests on a fiber and verifies unchanged authored objects. All 94 packaged QML/JS/SVG
+assets match source. The corresponding source archive is
+`dist/AnthroForge-0.2.1-fiber-edits-source.zip`; prior distributions remain intact.
+
+Supplementary reporting and large curve-workflow tests initially passed their assertions
+but exited with Windows `0xC0000409` during teardown. Both harnesses omitted explicit
+destruction of the C++-owned Qt application. Adding the same `finally: delete(app)` used
+by the desktop entry point and profiler harness produces clean exits: reporting at normal
+and 200% scaling, plus 120-point/120-obstacle editors and placement/undo. Production
+shutdown code is unchanged. These harness-only corrections pass Ruff and architecture
+checks; no application rebuild is needed. Logs are under `build/fiber-policy-*`.
+Validation remains background-only.
 
 ## Feedback reporting (0.2.1 follow-up)
 

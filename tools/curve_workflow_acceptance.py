@@ -230,4 +230,7 @@ if __name__ == "__main__":
     QQuickStyle.setStyle("Basic")
     with native_runtime():
         app = profiler_application()
-        run()
+        try:
+            run()
+        finally:
+            delete(app)

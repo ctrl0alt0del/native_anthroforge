@@ -3,7 +3,7 @@
 - Task branch: `codex/fiber-transform-policy`
 - Integration branch: `main`
 - Starting revision: `573405c`
-- Status: implemented; full validation and packaging in progress
+- Status: implementation and delivery validated; integration recorded in Git ancestry
 - Last updated: 2026-10-19, Europe/Bucharest
 - Active writer: local desktop chat
 
@@ -30,8 +30,11 @@ events. Tests cover this without changing the fiber policy or the shared button 
 
 Targeted tests pass, including failure/cancellation, supersession, history, component
 availability and successful creation selection. Full offscreen fiber editing, general
-construction editing and view-gesture scripts pass. Continue the full development gate,
-package/relocation checks and a validated merge/push.
+construction editing and view-gesture scripts pass. Full development gate passes:
+916 tests, 3 native tests, static analysis, Ruff, mypy on 191 modules and function limits.
+The implementation is committed as `1d6af1d`. Its clean portable build passes the complete
+relocated suite and a direct packaged API check of six rejected local/world TRS changes
+with unchanged authored objects. All 94 QML/JS/SVG assets match source.
 Preserve previous releases, user fixtures and unrelated root `__init__.py`.
 
 ## Validation and delivery constraints
@@ -48,3 +51,21 @@ evidence: `build/fiber-transform-policy/fiber-object.png` and `build/fiber-edito
 The capture was inspected; no visible desktop window was used. Deliver a separate
 `dist/0.2.1-fiber-edits/AnthroForge.dist` and matching source archive, preserving the
 feedback-reporting distribution. Build/test outputs remain ignored.
+
+## Final validation and integration
+
+The final executable is `dist/0.2.1-fiber-edits/AnthroForge.dist/AnthroForge.exe`; matching
+source is `dist/AnthroForge-0.2.1-fiber-edits-source.zip`. Portable evidence is
+`build/fiber-policy-portable/portable-check.json` and `fiber-transform-denial-results.json`.
+Full build log: `build/fiber-policy-package.log`. Tests use copies/fixtures only.
+
+Additional feedback and curve-workflow checks exposed teardown crashes after successful
+assertions: their C++-owned Qt applications were not explicitly destroyed. Both harnesses
+now match the desktop/profiler cleanup order. Feedback passes with clean process exits
+at normal/200% scale, and the 120-item curve-workflow/placement suite also exits cleanly.
+These test-only fixes need no executable rebuild; Ruff and function-limit checks pass.
+
+Architecture review is in `docs/development_status.md`: shared transform policy,
+component availability, generic keyboard capability gates, desktop-only selection intent
+and toolbar event ownership. No new numerical algorithms or scheduler semantics.
+Merge the validated branch normally; Git ancestry records the integration revision.

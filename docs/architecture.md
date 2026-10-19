@@ -524,3 +524,19 @@ file or online destinations without changing the editor. The service owns one ba
 submission and explicit failure/retry; it does not enter document scheduling or history.
 Desktop capture precedes the modal. One QPainter adapter draws source-pixel annotations
 for both the fitted/zoomed preview and worker-side PNG export.
+
+## Fiber interaction capabilities
+
+`application.transform_policy` owns direct object-transform eligibility. The object
+command enforces it and desktop selection projects it separately from workspace
+read-only state. Component editing supplies its own transform target. Keyboard bindings
+declare capabilities; toolbar, gizmo, modal transforms and numeric fields consume the
+same eligibility instead of testing object names or kinds in QML.
+
+`desktop.creation_selection` follows a single-output authored creation job through
+publication, including replacement jobs for changed inputs. It consumes the selection
+intent once, exits component editing and selects the accepted output. Document/session,
+workspace, selection, edit-mode and undo-epoch changes invalidate the intent. It never
+publishes geometry or changes scheduling/history; failure/cancellation leaves editing
+context intact. Viewport toolbar containers consume unused pointer events so disabled
+controls cannot accidentally select geometry behind them.

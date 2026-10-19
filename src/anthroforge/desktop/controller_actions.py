@@ -40,6 +40,7 @@ def command_values(value):
 
 
 def start_transform(controller, mode):
+    object_interaction.require_transform(controller)
     controller.drag_mode = mode
     if controller.authoring.active:
         from .authoring_actions import start_transform as start_components

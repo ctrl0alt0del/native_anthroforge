@@ -37,6 +37,7 @@ Item {
     readonly property bool drawing: workspace.drawingTools.state.active
     readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active
     readonly property var selected: authoring.transformData
+    readonly property bool transformAvailable: !!selected.id && !!selected.transformable && !selected.readonly && !workspace.state.waiting
     readonly property bool modalTransforming: modalTransform.active
     readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming || workspace.drawingTools.state.painting
     readonly property bool snapping: keyboard.held("snapSurface") && authoring.active &&

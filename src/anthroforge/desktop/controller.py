@@ -11,6 +11,7 @@ from anthroforge.profiling.spans import measured
 from . import controller_actions as actions
 from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
+from .creation_selection import CreationSelection
 from .drawing_tools import DrawingTools
 from .image_tools import ImageTools
 from .inspection_export import InspectionExport
@@ -58,6 +59,7 @@ class Controller(QObject):
         self.inspection_tools = InspectionTools(self)
         self.image_tools = ImageTools(self)
         self.drawing_tools = DrawingTools(self)
+        self.creation_selection = CreationSelection(self)
         self.routing_choices = RoutingChoices()
         self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
 
@@ -340,6 +342,7 @@ class Controller(QObject):
         self.path_model.drain()
         self.image_model.drain()
         self.refresh_if_needed()
+        self.creation_selection.synchronize()
         self.issue_panel.synchronize()
         self.tick_count += 1
         if self.tick_count % 15 == 0:
@@ -380,6 +383,7 @@ class Controller(QObject):
     @measured("ui", lambda owner: owner.session.profiler)
     def refresh(self):
         scene_projection.refresh(self)
+        self.creation_selection.synchronize()
         self.last_revision = self.session.document.revision
         self.last_workspace = self.session.active_workspace
         self._conversion_key = self.conversion_key()
@@ -406,6 +410,10 @@ class Controller(QObject):
     @Slot(str, "QVariantMap", result="QVariant")
     def run(self, operation, arguments):
         return actions.run(self, operation, arguments)
+
+    @Slot(str, "QVariantMap", result="QVariant")
+    def createConstruction(self, operation, arguments):
+        return self.creation_selection.create(operation, arguments)
 
     @Slot(str)
     @Slot(str, bool)

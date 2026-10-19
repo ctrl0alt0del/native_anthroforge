@@ -9,7 +9,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1-reports/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1-fiber-edits/AnthroForge.dist`.
 Earlier distributions remain in their versioned directories.
 The default packaging location remains `dist/AnthroForge.dist`.
 Start with [the walkthrough](docs/quickstart.md) and the included

@@ -3,12 +3,18 @@
 import os
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
+if os.name == "nt":
+    os.environ.setdefault("QT_QPA_FONTDIR", os.path.join(os.environ["SystemRoot"], "Fonts"))
+
+from pathlib import Path
 
 import numpy as np
 from PySide6.QtCore import QMetaObject, QObject, Qt
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
+from PySide6.QtTest import QTest
 from shiboken6 import delete
+from ui_acceptance import click, find
 
 from anthroforge.core.fibers import Fiber
 from anthroforge.desktop.app import create_engine
@@ -45,9 +51,8 @@ def create(controller, engine):
     assert len(fibers) == 1, controller.message
     assert fibers[0].id != source and controller.constructionModel.rowCount() == 2
     assert any(row["id"] == fibers[0].id for row in controller.path_model.wanted.values())
-    controller.select(fibers[0].id)
-    settle(controller)
-    assert controller.selectedData["kind"] == "FIBER"
+    assert controller.selection == fibers[0].id and not controller.authoring.active
+    assert controller.selectedData["kind"] == "FIBER" and not controller.authoring.selection
 
 
 def run():
@@ -55,15 +60,73 @@ def run():
     engine = create_engine(controller, warnings)
     try:
         assert engine.rootObjects(), warnings
-        create(controller, engine)
-        editing(controller)
-        bindings(controller, engine)
-        conversion(controller, engine)
+        exercise(controller, engine)
         assert not warnings, warnings
         print("Offscreen desktop fiber creation, binding edits, gestures and staged path passed.")
     finally:
         controller.close()
         delete(engine)
+
+
+def exercise(controller, engine):
+    create(controller, engine)
+    object_transform_policy(controller, engine.rootObjects()[0])
+    editing(controller)
+    component_shortcuts(controller, engine.rootObjects()[0])
+    bindings(controller, engine)
+    conversion(controller, engine)
+
+
+def object_transform_policy(controller, window):
+    viewport = find(window, "viewport")
+    before, cursor = controller.session.document, controller.session.history.cursor
+    mode, selection = window.property("activeTool"), controller.selection
+    assert not viewport.property("transformAvailable")
+    assert not find(window, "transformGizmo").isVisible()
+    assert not find(window, "objectTransform").isEnabled()
+    disabled_tools(window)
+    rejected_shortcuts(window, viewport)
+    assert controller.selection == selection
+    assert window.property("activeTool") == mode and controller.session.document == before
+    assert controller.session.history.cursor == cursor and controller.session.history.before is None
+    capture(window)
+
+
+def disabled_tools(window):
+    for name in ("Move", "Rotate", "Scale"):
+        assert not find(window, "tool" + name).isEnabled()
+        click(window, "tool" + name)
+
+
+def capture(window):
+    output = Path("build/fiber-transform-policy/fiber-object.png")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    assert window.grabWindow().save(str(output))
+
+
+def rejected_shortcuts(window, viewport):
+    keyboard, requested = find(window, "keyboardManager"), []
+    keyboard.requested.connect(requested.append)
+    viewport.forceActiveFocus()
+    for key in (Qt.Key_G, Qt.Key_R, Qt.Key_S, Qt.Key_W, Qt.Key_E):
+        QTest.keyClick(window, key)
+        assert not find(window, "modalTransform").property("active")
+    keyboard.requested.disconnect(requested.append)
+    assert not requested
+
+
+def component_shortcuts(controller, window):
+    viewport = find(window, "viewport")
+    assert viewport.property("transformAvailable")
+    assert all(find(window, "tool" + mode).isEnabled() for mode in ("Move", "Rotate", "Scale"))
+    before, cursor = controller.session.document, controller.session.history.cursor
+    for key in (Qt.Key_G, Qt.Key_R, Qt.Key_S):
+        viewport.forceActiveFocus()
+        QTest.keyClick(window, key)
+        assert find(window, "modalTransform").property("active")
+        QTest.keyClick(window, Qt.Key_Escape)
+        assert not find(window, "modalTransform").property("active")
+    assert controller.session.document == before and controller.session.history.cursor == cursor
 
 
 def editing(controller):

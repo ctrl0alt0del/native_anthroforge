@@ -3,6 +3,7 @@
 from itertools import product
 
 from anthroforge.application import curve_sources, object_operations
+from anthroforge.application.transform_policy import require_object_transform
 from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.core.surfaces import Surface
 from anthroforge.native import components
@@ -13,6 +14,14 @@ def editable(controller):
     if selected in session.document.registry.construction:
         return object_operations.editable(session, selected)
     return session.editable(selected)
+
+
+def require_transform(controller):
+    selected = controller.authoring.transformData
+    if not selected or selected.get("readonly"):
+        raise ValueError("Select editable objects or curve components to transform.")
+    if selected["id"] != "components":
+        require_object_transform(controller.session.document.object(selected["id"]))
 
 
 def transform_command(controller, values):

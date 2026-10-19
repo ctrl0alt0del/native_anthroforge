@@ -1,0 +1,46 @@
+"""Adopt one asynchronously created object without stealing a newer editing context."""
+
+
+class CreationSelection:
+    def __init__(self, controller):
+        self.controller, self.pending = controller, None
+
+    def signature(self):
+        controller, session = self.controller, self.controller.session
+        return (
+            session,
+            session.document.id,
+            session.active_workspace,
+            session.scheduler.epoch,
+            tuple(controller.selectedObjects),
+            controller.authoring.editing,
+        )
+
+    def create(self, operation, arguments):
+        context = self.signature()
+        self.pending = None
+        result = self.controller.run(operation, arguments)
+        registry = self.controller.session.scheduler.registry
+        job = registry.by_id.get(result.get("job_id") if isinstance(result, dict) else result)
+        if job is not None and len(job.outputs) == 1:
+            self.pending = context, next(iter(job.outputs))
+            self.synchronize()
+        return result
+
+    def synchronize(self):
+        if self.pending is None:
+            return
+        context, target = self.pending
+        session = self.controller.session
+        if context != self.signature():
+            self.pending = None
+        elif target in session.document.registry.records:
+            if session.history.before is None:
+                self.accept(target)
+        elif not session.scheduler.registry.matching("output", (target,)):
+            self.pending = None
+
+    def accept(self, target):
+        self.pending = None
+        self.controller.authoring.setEditing(False)
+        self.controller.select(target)

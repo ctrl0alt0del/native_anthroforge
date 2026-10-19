@@ -114,7 +114,9 @@ class Authoring(QObject):
         readonly = self.controller.selectedData.get("readonly", False) or state.imported_selection(
             self
         )
-        return dict(id="components", trs=[*center, 0, 0, 0, 1, 1, 1], readonly=readonly)
+        return dict(
+            id="components", trs=[*center, 0, 0, 0, 1, 1, 1], readonly=readonly, transformable=True
+        )
 
     @measured("ui", lambda owner: owner.controller.session.profiler)
     def refresh(self):

@@ -6,7 +6,7 @@ from typing import Any
 import numpy as np
 
 from . import stacking_abi as abi
-from .mesh import INT64, GeometryEngine, pointer
+from .mesh import INT64, U, GeometryEngine, pointer
 
 
 class StackSession:
@@ -23,6 +23,33 @@ class StackSession:
         arguments, _leases = packed(domains, settings, **options)
         self.engine.check(self.engine.library.af_stack_run(self.handle, *arguments))
         return results(self)
+
+    def plan(self, domains: Any, settings: Any, **options: Any) -> Any:
+        arguments, _leases = packed(domains, settings, **options)
+        self.engine.check(self.engine.library.af_stack_plan(self.handle, *arguments))
+        return results(self)
+
+    def resolve(self, accepted: Any, targets: Any, cancel: int = 0) -> Any:
+        rows, _leases = accepted_rows(accepted)
+        selected = (U * len(targets))(*targets)
+        self.engine.check(
+            self.engine.library.af_stack_resolve(
+                self.handle, rows, len(rows), selected, len(selected), cancel
+            )
+        )
+        return results(self)
+
+
+def accepted_rows(accepted: Any) -> Any:
+    arrays = [np.ascontiguousarray(row["points"], dtype=np.float64) for row in accepted.values()]
+    for points in arrays:
+        if points.ndim != 2 or points.shape[1] != 3:
+            raise ValueError("Accepted stacking points must be an N by 3 array.")
+    rows = [
+        abi.Accepted(key, pointer(points), len(points), row["status"])
+        for (key, row), points in zip(accepted.items(), arrays, strict=True)
+    ]
+    return (abi.Accepted * len(rows))(*rows), arrays
 
 
 def packed(

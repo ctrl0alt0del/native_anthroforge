@@ -15,4 +15,6 @@ void configure(Inputs& input,const AfStackSettings& settings);
 void capture_domains(Inputs& input,const AfStackDomain* domains,int count,uint64_t cancel);
 void capture_obstacles(layer::State& state,const AfStackObstacle* inputs,int count,uint64_t cancel);
 void execute(Engine& engine,Inputs input,std::atomic<bool>& cancel);
+void plan(Engine& engine,Inputs input,std::atomic<bool>& cancel);
+void resolve(Engine& engine,const AfStackAccepted* accepted,int count,const uint64_t* targets,int target_count,std::atomic<bool>& cancel);
 }

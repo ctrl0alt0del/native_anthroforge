@@ -24,6 +24,7 @@ struct AfStackPolicy {
     int excluded, invalid, offset, count, mode;
 };
 struct AfStackObstacle { const double* vertices; const int64_t* faces; int count, triangles; };
+struct AfStackAccepted { uint64_t id; const double* points; int count,status; };
 struct AfStackOutput {
     uint64_t id;
     int status;
@@ -49,6 +50,12 @@ AF_API void af_stack_release(uint64_t handle);
 AF_API int af_stack_run(uint64_t handle,const AfStackDomain* domains,int count,const AfStackSettings* settings,
     const AfStackPolicy* policies,int policy_count,const int64_t* regions,int region_count,
     const AfStackObstacle* obstacles,int obstacle_count,uint64_t cancel);
+AF_API int af_stack_plan(uint64_t handle,const AfStackDomain* domains,int count,const AfStackSettings* settings,
+    const AfStackPolicy* policies,int policy_count,const int64_t* regions,int region_count,
+    const AfStackObstacle* obstacles,int obstacle_count,uint64_t cancel);
+// Solve only reserved target outputs. Other final surfaces are immutable accepted inputs.
+AF_API int af_stack_resolve(uint64_t handle,const AfStackAccepted* accepted,int count,
+    const uint64_t* targets,int target_count,uint64_t cancel);
 AF_API int af_stack_sizes(uint64_t handle,int64_t* sizes);
 AF_API int af_stack_results(uint64_t handle,AfStackOutput* rows,int count);
 AF_API int af_stack_orders(uint64_t handle,AfStackOrder* rows,int count);

@@ -7,13 +7,16 @@ static void retain_caches(layer::State& next,layer::State& previous) {
     next.solved_cache=std::move(previous.solved_cache); next.clock=previous.clock;
     next.vector_cache=previous.vector_cache;
 }
-void execute(Engine& engine,Inputs input,std::atomic<bool>& cancel) {
+static void detect(Engine& engine,Inputs& input,std::atomic<bool>& cancel) {
     pair::require(!cancel,"PAIR_CANCELLED"); const auto start=pair::Clock::now();
     retain_caches(input.state,engine.state); pair::synchronize(engine.session,input.work.incoming,input.detection);
     engine.session.published=pair::detect(engine.session,1,cancel,false);
     input.state.input_ms=pair::milliseconds(start);
     layer::include_explicit_pairs(input.state,engine.session,cancel);
     layer::order_pairs(input.state,engine.session,cancel); layer::apply_policies(input.state);
+}
+void execute(Engine& engine,Inputs input,std::atomic<bool>& cancel) {
+    detect(engine,input,cancel);
     layer::stack(input.state,engine.session,cancel); layer::evict_solved(input.state,engine.session);
     pair::require(!cancel,"PAIR_CANCELLED"); engine.state=std::move(input.state);
 }
@@ -39,3 +42,5 @@ int af_stack_run(uint64_t handle,const AfStackDomain* domains,int count,const Af
 #include "stacking_capture.cpp"
 #include "stacking_settings.cpp"
 #include "stacking_results.cpp"
+#include "stacking_plan.cpp"
+#include "stacking_resolve.cpp"

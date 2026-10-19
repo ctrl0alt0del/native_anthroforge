@@ -58,6 +58,10 @@ class Obstacle(c.Structure):
     _fields_ = [("vertices", D), ("faces", INT64), ("count", c.c_int), ("triangles", c.c_int)]
 
 
+class Accepted(c.Structure):
+    _fields_ = [("id", U), ("points", D), ("count", c.c_int), ("status", c.c_int)]
+
+
 class Output(c.Structure):
     _fields_ = [("id", U), ("status", c.c_int), ("vertices", c.c_int64)]
     _fields_ += [(name, c.c_double) for name in ("maximum", "map_ms", "solve_ms", "validation_ms")]
@@ -84,6 +88,8 @@ def configure(engine: Any) -> None:
     engine.bind("af_stack_orders", [U, c.POINTER(Order), c.c_int])
     engine.bind("af_stack_points", [U, U, D, c.c_int, D])
     engine.bind("af_stack_run", RUN_ARGUMENTS)
+    engine.bind("af_stack_plan", RUN_ARGUMENTS)
+    engine.bind("af_stack_resolve", [U, c.POINTER(Accepted), c.c_int, c.POINTER(U), c.c_int, U])
 
 
 RUN_ARGUMENTS = [

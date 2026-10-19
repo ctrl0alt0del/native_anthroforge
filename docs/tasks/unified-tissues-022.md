@@ -30,6 +30,14 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Native stacking now separates candidate/order planning from solving selected targets against
+frozen accepted provider output. This avoids silently recalculating Manual providers. The
+separated path matches all fourteen actual-addon fixtures; missing/failed accepted providers,
+cancellation and provider output preservation are tested. Thirty-six focused checks pass;
+native build/CTest, changed-native function checks, Ruff and configured mypy pass. Application
+dependency integration remains incomplete. Candidate observations must not become blanket
+prerequisites: that would create false cycles in valid tissue attachment chains.
+
 Accepted surface results now retain structural material pins from bound Fiber points and
 explicit point protection. Native capture maps authored parameters to exact material rows;
 refinement preserves the coordinates, and stacking uses weighted equations without pinning

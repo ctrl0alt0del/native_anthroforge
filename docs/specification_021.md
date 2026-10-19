@@ -1,6 +1,6 @@
 # AnthroForge 0.2.1 — curve workflow improvements
 
-Status: implemented release candidate, 2026-10-19. Confirmed behavior below is implemented;
+Status: implemented and qualified, 2026-10-19. Confirmed behavior below is implemented;
 release qualification is tracked in [development status](development_status.md#curve-workflows-021).
 Muscles, soft tissues and other VCP work move to **0.2.2**. The qualified 0.2.0 runtime
 remains described by [its specification](specification_020.md) and

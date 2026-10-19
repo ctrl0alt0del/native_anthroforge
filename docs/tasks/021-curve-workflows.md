@@ -3,7 +3,7 @@
 - Task branch: `codex/021-curve-workflows`
 - Integration branch: `main`
 - Starting revision: `58a28a3`
-- Status: implementation in progress
+- Status: implementation and qualification complete; final integration pending
 - Last updated: 2026-10-19, Europe/Bucharest
 - Active writer: local desktop chat
 
@@ -68,7 +68,7 @@ tests pass. Profiling exposed repeated candidate graph construction; description
 reuse structural graph identity. Measured obstacle binding inclusive total fell from
 127 ms to 64 ms across 38 refreshes in serial runs; not a general responsiveness claim.
 Full regression, lifecycle additions, hidden GPU geometry checks, packaging and release
-documentation remain pending. Versions are still 0.2.0 until qualification.
+documentation were pending at this checkpoint. Versions were still 0.2.0.
 
 ## Release-candidate checkpoint
 
@@ -92,9 +92,26 @@ blocking stop caused collector timeout; those earlier timing comparisons are not
 evidence. The new complete report has no loss and no ChoiceModel resets; 72 description
 binding evaluations average 1.60 ms inclusive, max 13.79 ms. Packaging remains pending.
 
+## Final delivery
+
+Clean runtime `57e1c53` packaged successfully into `dist/0.2.1/AnthroForge.dist` and passed
+the complete relocated portable suite under minimal PATH, offscreen GUI and invisible
+QQuickRenderControl. All QML/JS/icon assets match source. The new packaged automatic-routing
+example passes. A disposable copy of the original two-cube project automatically resolves
+both obstacles, preserves authored points, saves revision 1855 and passes independent
+centerline collision checks. Its complete packaged report records 0.051 ms capture and
+28.98 ms solve, with 9,848 bytes of retained native scene capacity. Both hidden rendered
+angles were inspected; original input SHA-256 remains unchanged. No hands-on desktop
+acceptance is claimed. Ownership/coupling review is in development_status.md.
+
+Delivery artifacts: `dist/0.2.1/AnthroForge.dist` and
+`dist/AnthroForge-0.2.1-source.zip`, including the final qualification documentation.
+Integration next: merge the validated task branch into unchanged main `58a28a3`, push and
+verify ancestry. Git ancestry establishes completion of this final integration step.
+
 ## Recovery constraints
 
 Preserve untracked root `__init__.py` and original
 `E:/development/WIP_models/solver_test.anthroforge`. Never use visible test windows or
 desktop input. Work directly without delegation. Push coherent checkpoints before long
-checks; implementation and validation are not yet complete.
+checks. Implementation and validation are complete; the final delivery steps are above.

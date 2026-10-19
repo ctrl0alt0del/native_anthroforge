@@ -18,7 +18,9 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/surface_branch_inputs.cpp src/surface_branch_sampling.cpp src/surface_branches.cpp
     src/tissue_inflation.cpp src/tissue_validation.cpp src/tissue_refinement.cpp
     src/tissue_domain.cpp src/tissue_domain_api.cpp src/tissue_shapes_api.cpp
-    src/tissue_shape_fields.cpp src/tissue_normal_shell.cpp src/tissue_profile_sweep.cpp src/tissue_radial.cpp)
+    src/tissue_shape_fields.cpp src/tissue_normal_shell.cpp src/tissue_profile_sweep.cpp src/tissue_radial.cpp
+    src/tissue_masks.cpp src/tissue_source_normals.cpp src/tissue_constraints.cpp
+    src/tissue_relaxation.cpp src/tissue_geometric.cpp src/tissue_static.cpp src/tissue_point_relaxation.cpp)
 
 add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_cubic_refit.c

@@ -12,10 +12,13 @@ class TissueField:
     name: str
     values: tuple[float, ...] = ()
     topology: str = ""
+    domain: str = "BASE"
 
     def __post_init__(self) -> None:
         if not self.name:
             raise ValueError("Tissue field needs a name.")
+        if self.domain not in ("BASE", "REST"):
+            raise ValueError("Tissue field domain must be Base or Rest.")
         for value in self.values:
             finite_range(value, 0, 1, "Field weight")
 

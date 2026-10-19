@@ -18,6 +18,15 @@ GRAPH_FIELDS = frozenset(
     {"@membership", "parent", "follow", "deformers", "attachment", "curves"}
     | {"engine_settings", "bindings", "supports", "edit"}
 )
+EVALUATION_FIELDS = {
+    "@membership",
+    "generation",
+    "result",
+    "status",
+    "error",
+    "pose_revision",
+    "diagnostics",
+}
 
 
 @dataclass(frozen=True)
@@ -48,7 +57,7 @@ def entity_source(document: Document, scope: str) -> Any:
         getattr(value, "status", ""),
         getattr(value, "error", ""),
         getattr(value, "pose_revision", 0),
-        getattr(result, "pending", ()),
+        (getattr(result, "pending", ()), getattr(value, "diagnostics", ())),
     )
 
 
@@ -57,9 +66,8 @@ def entity_scopes(document: Document) -> set[str]:
 
 
 def entity_changes(document: Document, changes: DocumentChanges) -> set[str]:
-    relevant = {"@membership", "generation", "result", "status", "error", "pose_revision"}
     rows = {**changes.entities, **changes.controls, **changes.objects}
-    selected = {key for key, fields in rows.items() if fields & relevant}
+    selected = {key for key, fields in rows.items() if fields & EVALUATION_FIELDS}
     graph = document.index.structure.dependencies
     selected.update(
         p.owner for key in tuple(selected) for p in graph.consumers.get(Port(key, "geometry"), ())
@@ -100,7 +108,33 @@ def evaluation(document: Document, scope: str, cancel: Event) -> tuple[Issue, ..
     rows = list(evaluation_state(document, scope, value))
     rows.extend(pending_support(document, scope, value))
     rows.extend(missing_surface(document, scope, value))
+    rows.extend(convergence(document, scope, value))
     return tuple(rows)
+
+
+def convergence(document: Document, scope: str, value: Any) -> tuple[Issue, ...]:
+    return tuple(
+        convergence_issue(document, scope, d)
+        for d in getattr(value, "diagnostics", ())
+        if d.status == "ITERATION_LIMIT"
+    )
+
+
+def convergence_issue(document: Document, scope: str, d: Any) -> Issue:
+    details = "Usable output is published; inspect convergence or increase the iteration budget."
+    metrics = evidence(
+        iterations=d.iterations, final_change=d.final_change, volume_error=d.relative_volume_error
+    )
+    return finding(
+        document,
+        scope,
+        "ITERATION_LIMIT_" + d.stage.upper(),
+        "Tissue iteration limit reached",
+        stage=d.stage,
+        severity="warning",
+        details=details,
+        evidence=metrics,
+    )
 
 
 def evaluation_state(document: Document, scope: str, value: Any) -> tuple[Issue, ...]:

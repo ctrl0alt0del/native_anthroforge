@@ -99,6 +99,15 @@ generally, so do not claim all sharing is unsupported or that an upstream bug is
 Full shape checkpoint: **1009 tests passed**, 599 Qt deprecation warnings, 34.34 seconds.
 Configured mypy, ruff, function-length checks, native CTest and changed-adapter clang-tidy
 checks pass. Full-QML offscreen tissue controls still pass.
+Native relaxation checkpoint adds the pinned production Static PBD kernel and native
+geometric radial/sweep/shell adapters, source-relative Fixed/Soft regions, feathering,
+exact shell backing, custom fields and independent convergence diagnostics. Ten targeted
+relaxation/architecture tests pass, plus three native CTests. This is an intermediate
+checkpoint: donor relaxation fixtures, desktop controls, target-relative capture and
+field topology protection are still pending. No full increment/release acceptance is claimed.
+Generic solver adjacency now uses undirected polygon edges, matching the donor; strict
+winding validation remains at normal-shell source construction. The donor sweep's cap
+winding is preserved by current parity fixtures rather than silently rewritten.
 Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification

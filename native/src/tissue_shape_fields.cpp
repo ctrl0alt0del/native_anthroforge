@@ -9,21 +9,23 @@ V3 unit(const V3& value) {
     if(!value.allFinite()||value.norm()<=1e-12) throw std::runtime_error("Tissue has a degenerate source frame.");
     return value.normalized();
 }
-static void add_edge(Edges& edges,int64_t a,int64_t b) {
+static void add_edge(Edges& edges,int64_t a,int64_t b,bool strict) {
     auto& use=edges[std::minmax(a,b)];
-    if(a==b||use.count>=2||(use.count==1&&use.oriented!=Edge(b,a)))
+    if(strict&&(a==b||use.count>=2||(use.count==1&&use.oriented!=Edge(b,a))))
         throw std::runtime_error("Tissue source requires consistent manifold winding.");
     if(!use.count) use.oriented={a,b};
     ++use.count;
 }
-Edges boundary_topology(const Faces& faces,uint64_t cancel) {
+static Edges edge_topology(const Faces& faces,uint64_t cancel,bool strict) {
     Edges edges;
     for(const auto& face:faces) {
         check_cancel(cancel);
-        for(size_t i=0;i<face.size();++i) add_edge(edges,face[i],face[(i+1)%face.size()]);
+        for(size_t i=0;i<face.size();++i) add_edge(edges,face[i],face[(i+1)%face.size()],strict);
     }
     return edges;
 }
+Edges boundary_topology(const Faces& faces,uint64_t cancel) { return edge_topology(faces,cancel,true); }
+Edges mesh_edges(const Faces& faces,uint64_t cancel) { return edge_topology(faces,cancel,false); }
 static V3 area(const Vertices& points,const std::vector<int64_t>& face) {
     V3 value=V3::Zero(); const V3 origin=points.row(face[0]);
     for(size_t i=0;i<face.size();++i) {
@@ -73,6 +75,12 @@ std::vector<double> boundary_weights(const Mesh& mesh,const Edges& edges,uint64_
     double maximum=0;
     for(double d:distances) if(std::isfinite(d)) maximum=std::max(maximum,d);
     for(double& d:distances) { const double x=maximum>0?d/maximum:0; d=std::isfinite(d)?x*x*(3-2*x):1; }
+    return distances;
+}
+std::vector<double> mask_distances(const Mesh& mesh,const Edges& edges,const std::vector<double>& mask,uint64_t cancel) {
+    std::vector<double> distances(size_t(mesh.vertices.rows()),std::numeric_limits<double>::infinity()); Queue queue;
+    for(size_t i=0;i<mask.size();++i) if(mask[i]>0) { distances[i]=0; queue.emplace(0,int64_t(i)); }
+    walk(queue,adjacency(mesh,edges),distances,cancel);
     return distances;
 }
 void validate_shape(const AfTissueShape& s) {

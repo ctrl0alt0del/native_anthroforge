@@ -24,12 +24,23 @@ def publish(
     current = session.document.object(target)
     key = register(session, output, phase)
     result = accept(document, current, phase, ports, key)
+    install(session, replace(current, **publication(current, phase, result, output)))
+
+
+def publication(
+    current: TissueVCP, phase: str, result: Any, output: TissueOutput
+) -> dict[str, Any]:
     changes: dict[str, Any] = {phase + "_result": result}
     if output.base is not None:
         changes["base_state"] = output.base
+    if output.diagnostic is not None:
+        changes["diagnostics"] = (
+            *[d for d in current.diagnostics if d.stage != phase],
+            output.diagnostic,
+        )
     if phase in ("intrinsic", "final"):
         changes["result"] = replace(result, status="unstacked" if phase == "intrinsic" else "ready")
-    install(session, replace(current, **changes))
+    return changes
 
 
 def accept(document: Any, item: TissueVCP, phase: str, ports: Any, key: str) -> Any:

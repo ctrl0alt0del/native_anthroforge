@@ -11,12 +11,28 @@ struct AfTissueShape {
     int enabled,reverse,segments;
     double amount,minimum,power,width,endpoint_taper,scale[3];
 };
+struct AfTissueSource {
+    uint64_t mesh,path,host;
+    double frame[16],host_frame[16];
+};
+struct AfTissueRelax {
+    int mode,iterations,passes;
+    double gravity[3],sagginess,limit,shape,volume,slack,tolerance,amount,minimum,power;
+};
+struct AfTissueRegion {
+    int mask,mode,domain;
+    double strength,feather,offset;
+    const double* weights;
+    int64_t count;
+    const double* goals;
+};
 #ifdef __cplusplus
 extern "C" {
 #endif
 AF_API uint64_t af_tissue_normal_shell(uint64_t source,const AfTissueShape* settings,const double* weights,int64_t count,uint64_t cancel);
 AF_API uint64_t af_tissue_profile_sweep(const double* samples,int count,int closed,const AfTissueShape* settings,uint64_t cancel);
 AF_API uint64_t af_tissue_radial(const double* frame,const AfTissueShape* settings,int resolution,uint64_t cancel);
+AF_API uint64_t af_tissue_relax(uint64_t rest,const AfTissueSource* source,const AfTissueRelax* settings,const AfTissueRegion* regions,int count,double* report,uint64_t cancel);
 // Operates on accepted material grids, without resampling the source.
 AF_API uint64_t af_tissue_inflate_grid(uint64_t source,const AfTissueInflation* settings,
     int count,uint64_t cancel);

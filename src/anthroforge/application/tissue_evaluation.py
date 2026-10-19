@@ -2,11 +2,12 @@
 
 from typing import Any, cast
 
+from anthroforge.core.tissue_diagnostics import TissueDiagnostic
 from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import topology
 from anthroforge.native.mesh import Mesh
 
-from . import tissue_construction, tissue_sources
+from . import tissue_construction, tissue_relaxation, tissue_sources
 from .tissue_output import TissueOutput
 
 
@@ -25,12 +26,19 @@ def rest(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: in
     return tissue_construction.construct(engine, resources, item, cancel)
 
 
-def intrinsic(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:
+def intrinsic(
+    engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int
+) -> TissueOutput:
     mesh = accepted(resources, item.rest_result, "Inflated rest")
-    if item.relaxation.mode != "NONE" or item.constraints or item.crop.enabled:
-        raise ValueError("Tissue relaxation, constraint and crop adapters are not yet available.")
+    if item.crop.enabled:
+        raise ValueError("Tissue crop adapter is not yet available.")
+    if item.relaxation.mode != "NONE" or item.constraints:
+        return tissue_relaxation.evaluate(engine, document, resources, item, cancel)
     previous = resources.meshes.get(item.intrinsic_result.asset)
-    return topology.finalize(mesh, previous.mesh if previous else None, cancel)
+    return TissueOutput(
+        mesh=topology.finalize(mesh, previous.mesh if previous else None, cancel),
+        diagnostic=TissueDiagnostic(),
+    )
 
 
 def final(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:
@@ -42,7 +50,7 @@ def final(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: i
     return mesh
 
 
-EVALUATORS = dict(rest=rest, intrinsic=intrinsic, final=final)
+EVALUATORS = dict(rest=rest, final=final)
 
 
 def evaluate(
@@ -51,4 +59,6 @@ def evaluate(
     item = document.object(target)
     if phase == "base":
         return tissue_sources.capture(engine, document, resources, item, cancel)
+    if phase == "intrinsic":
+        return intrinsic(engine, document, resources, item, cancel)
     return TissueOutput(mesh=EVALUATORS[phase](engine, document, resources, item, cancel))

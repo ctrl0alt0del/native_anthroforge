@@ -38,5 +38,15 @@
     ],
     "file": "kernel_3.hpp",
     "sha256": "c77317fe08641461bd2129e14edf08d1d2074998224077b88ef8e53ef9be6ff4"
+  },
+  {
+    "source": "af_soft_tissue.hpp",
+    "source_sha256": "4a74c684020ecd50968becd2134f65e4391fabd39f5242f0265df9fc6b2409f1",
+    "bytes": [
+      114,
+      12191
+    ],
+    "file": "kernel_4.hpp",
+    "sha256": "bc0f8af57e77ea6d2ff8a680cf6939e8229bfade7bafcb8622fb444f8c0e1225"
   }
 ]

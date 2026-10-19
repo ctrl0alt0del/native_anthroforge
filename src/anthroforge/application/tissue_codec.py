@@ -8,6 +8,7 @@ from anthroforge.core.results import EvaluationResult
 from anthroforge.core.surface_references import SurfaceBinding, SurfaceReference
 from anthroforge.core.tissue_base import TissueBaseState
 from anthroforge.core.tissue_constraints import TissueConstraint, TissueField
+from anthroforge.core.tissue_diagnostics import TissueDiagnostic
 from anthroforge.core.tissue_settings import (
     HeightSmoothing,
     SectionProfile,
@@ -61,6 +62,7 @@ def constraint(data: dict[str, Any]) -> TissueConstraint:
 
 
 def tissue(state: dict[str, Any]) -> TissueVCP:
+    state["diagnostics"] = tuple(TissueDiagnostic(**row) for row in state.get("diagnostics", ()))
     state["base_state"] = TissueBaseState(**tuples(state.get("base_state", {})))
     state["parts"] = tuple(part(row) for row in state.get("parts", (dict(id="main"),)))
     state["relaxation"] = TissueRelaxation(**tuples(state.get("relaxation", {})))

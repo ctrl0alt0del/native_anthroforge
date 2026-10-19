@@ -33,6 +33,7 @@ from . import (
     surface_preview,
     surface_sources,
     tissue_operations,
+    tissue_strategy_operations,
 )
 from . import control_operations as controls
 from . import deformer_operations as deformers
@@ -42,6 +43,12 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "tissue.relaxation": tissue_strategy_operations.relaxation,
+    "tissue.constraint.add": tissue_strategy_operations.constraint_add,
+    "tissue.constraint.update": tissue_strategy_operations.constraint_update,
+    "tissue.constraint.remove": tissue_strategy_operations.constraint_remove,
+    "tissue.field.set": tissue_strategy_operations.field_set,
+    "tissue.field.remove": tissue_strategy_operations.field_remove,
     "tissue.create": tissue_operations.create,
     "tissue.configure": tissue_operations.configure,
     "tissue.inflation": tissue_operations.inflation,

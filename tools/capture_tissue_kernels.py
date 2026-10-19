@@ -18,6 +18,7 @@ BLOCKS = (
         "static Vec af_env_unit",
         "AF_EXPORT int af_muscle_envelope_version",
     ),
+    ("af_soft_tissue.hpp", "namespace af_tissue", "AF_EXPORT int af_soft_tissue_version"),
 )
 
 

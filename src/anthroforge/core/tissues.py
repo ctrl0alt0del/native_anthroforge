@@ -6,6 +6,7 @@ from .objects import ObjectRecord
 from .results import EvaluationResult
 from .tissue_base import TissueBaseState
 from .tissue_constraints import TissueConstraint, TissueField
+from .tissue_diagnostics import TissueDiagnostic
 from .tissue_settings import TissueCrop, TissuePart, TissueRelaxation
 
 
@@ -26,6 +27,7 @@ class TissueVCP(ObjectRecord):
     stacking: bool = False
     group: str = ""
     base_state: TissueBaseState = field(default_factory=TissueBaseState)
+    diagnostics: tuple[TissueDiagnostic, ...] = ()
     base_revision: int = 0
     rest_revision: int = 0
     intrinsic_revision: int = 0

@@ -22,6 +22,7 @@ METADATA = frozenset(
         "result",
         "base_result",
         "base_state",
+        "diagnostics",
         "rest_result",
         "intrinsic_result",
         "final_result",

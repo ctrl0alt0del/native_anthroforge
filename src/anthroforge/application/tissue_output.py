@@ -3,6 +3,7 @@
 from dataclasses import dataclass
 
 from anthroforge.core.tissue_base import TissueBaseState
+from anthroforge.core.tissue_diagnostics import TissueDiagnostic
 from anthroforge.native.mesh import Mesh
 
 
@@ -12,3 +13,4 @@ class TissueOutput:
     asset: str = ""
     base: TissueBaseState | None = None
     warning: str = ""
+    diagnostic: TissueDiagnostic | None = None

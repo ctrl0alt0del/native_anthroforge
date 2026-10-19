@@ -17,3 +17,5 @@ native/migration/tissue/*.hpp -text
 native/migration/smoothing/** -text
 native/migration/smoothing/sources.json text eol=lf
 native/vendor/piqp/** -text
+native/migration/stacking/** -text
+native/migration/stacking/sources.json text eol=lf

@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1] / "native"
     "folder,manifest",
     [
         ("migration/smoothing", "migration/smoothing/sources.json"),
+        ("migration/stacking", "migration/stacking/sources.json"),
         ("vendor", "vendor/piqp-sha256.json"),
     ],
 )

@@ -189,3 +189,22 @@ triangulation and cut-edge height. Twenty background-Blender fixtures in
 `tests/fixtures/tissue/crops.json` include source hashes and match at 1e-10. Reproduce
 with `tools/capture_tissue_crops.py`. Empty results are prepared owned geometry, distinct
 from incomplete buffers; attachment consumers reject empty surfaces explicitly.
+
+## Vector tissue stacking
+
+`stacking/` pins the addon's production pair detection, base-ray ordering, relationship
+policy, vector transport, localized constrained PIQP solve, and independent validation
+headers. `sources.json` records unchanged file bytes. `src/stacking*.cpp` supplies a
+synchronous owned batch interface and uses the existing native cancellation token.
+No donor asynchronous executor, legacy exported API, Blender object system, OpenMP pool,
+or Python numerical implementation is included. The component uses one translation unit
+because the maintained donor headers define non-inline cache methods.
+
+Fourteen compact fixtures captured from the actual addon DLL cover ordinary and tangential
+transport, chains, multiple providers, zero inflation, exact weighted constraints, hidden
+crop variables, selected regions, explicit/requested/excluded relationships and deliberate
+failures. `tests/fixtures/tissue/stacking.json` pins the DLL hash; reproduction uses
+`tools/capture_tissue_stacking.py`. Positions match at absolute 2e-7; rejection status and
+messages match. Cache reuse/cancellation pass separately. This qualifies the numerical
+batch adapter only: native tissue-domain preparation, application scheduling/publication,
+desktop relationships, broader geometry/performance and release qualification remain open.

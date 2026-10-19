@@ -30,6 +30,15 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+The synchronous vector stacking numerical adapter is now compiled against pinned unchanged
+addon kernels and the maintained PIQP core. Fourteen actual-DLL reference cases match at
+2e-7 with matching rejection status/messages, covering transport, chains, multiple providers,
+exact equations, cropped hidden variables, regions, explicit/requested/excluded relationships
+and bone-contact failure. Cache reuse and cancellation checks pass. Twenty focused native,
+provenance and architecture checks pass; native adapter function-length checks pass. No donor
+executor or competing pool is used. This is an incomplete native checkpoint: production
+tissue-domain preparation and application/desktop integration remain required.
+
 Target-relative region constraints now capture retained material bindings in native work,
 resolve target-frame offsets without changing shared sources, and persist owned binding
 batches in schema 4. Explicit bind/rebind/unlink use the shared commands and focused
@@ -43,7 +52,8 @@ installed in earlier parent poses. Historical input mismatches now preserve an u
 request and recapture on navigation. Anchor, Fiber and region captures use this boundary;
 per-execution immutable resources prevent historical recovery from overwriting redo data.
 Cross-parent-edit tests verify actual positions after undo/redo and subsequent movement.
-The pre-history-fix regression passed 1147 tests; the complete post-fix gate is running.
+The pre-history-fix regression passed 1147 tests; the complete post-fix development gate
+passed **1151 tests**, 615 existing Qt warnings, native checks, typing and function limits.
 Production stacking, broader editing and release qualification remain incomplete.
 
 Routing now declares role-aware anatomy dependencies, including automatic tissue-final

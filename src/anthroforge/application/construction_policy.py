@@ -72,6 +72,9 @@ def revision(document: Document, port: Port) -> ReadRevision:
 
 
 def object_revision(document: Document, port: Port) -> ReadRevision:
+    if port.output == "routing_scope":
+        scope = document.index.structure.dependencies.routing_scene
+        return ReadRevision(port.owner, port.output, 0, 0, scope)
     item = document.registry.construction[port.owner]
     pose = port.output in ("pose", "local_pose")
     authored = item.pose_revision if pose else item.construction_revision

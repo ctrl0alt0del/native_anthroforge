@@ -18,7 +18,11 @@ Item {
     Binding { target: heldInput; property: "buttonCapture"; value: manager.snapping && !manager.blocked && !manager.typing ? manager.pointerBindings.resetSurfaceOffset : 0 }
     property var modifierBindings: ({insertPoint:Qt.ShiftModifier, snapSurface:Qt.ControlModifier,
         extendSelection:Qt.ControlModifier, precision:Qt.ShiftModifier, pan:Qt.ShiftModifier,
-        deeperSelection:Qt.AltModifier})
+        deeperSelection:Qt.AltModifier, continuePlacement:Qt.ShiftModifier})
+    function modifierName(action) {
+        const binding=modifierBindings[action];
+        return [{flag:Qt.ControlModifier,name:"Ctrl"},{flag:Qt.ShiftModifier,name:"Shift"},{flag:Qt.AltModifier,name:"Alt"}].filter(row=>(binding & row.flag)!==0).map(row=>row.name).join("+");
+    }
     readonly property int modifiers: blocked || typing ? 0 : heldInput.modifiers
     readonly property var modifierPrefixes: ["", "Shift+", "Ctrl+", "Alt+", "Ctrl+Shift+", "Ctrl+Alt+", "Alt+Shift+", "Ctrl+Alt+Shift+"]
     function held(action) { return matches(action, modifiers); }

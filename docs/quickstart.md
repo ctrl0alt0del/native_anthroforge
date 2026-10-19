@@ -1,4 +1,4 @@
-# AnthroForge 0.2.0 quick start
+# AnthroForge 0.2.1 quick start
 
 Start with [curves, fibers, surfaces and images](construction_020.md).
 The existing primitive, attachment and navigation workflow below remains applicable.

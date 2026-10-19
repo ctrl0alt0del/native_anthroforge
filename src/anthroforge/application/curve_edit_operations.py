@@ -31,12 +31,18 @@ def configure(session: "Session", curve: str, **settings: Any) -> None:
     item = selected(session, curve)
     if "kind" in settings:
         raise ValueError("Use a previewed conversion to change path engines.")
-    config = replace(item.engine_settings, **settings)
+    config = configured_engine(item, settings)
     config = decode(item.engine, {k: v for k, v in vars_settings(config).items() if k != "kind"})
     if set(settings) & {"resolution", "samples"}:
         for consumer in consumers(session.document, {curve}):
             require_topology_edit(session.document, consumer)
     install(session, replace(item, engine_settings=config))
+
+
+def configured_engine(item: Curve, settings: dict[str, Any]) -> Any:
+    if item.engine == "ROUTED" and "obstacles" in settings:
+        settings.setdefault("obstacle_mode", "MANUAL")
+    return replace(item.engine_settings, **settings)
 
 
 def vars_settings(settings: Any) -> dict[str, Any]:

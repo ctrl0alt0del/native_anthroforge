@@ -128,7 +128,14 @@ def validate_primitives(document: "Document", records: dict[str, SceneObject]) -
 
 
 def validate_bindings(item: Curve, records: dict[str, SceneObject]) -> None:
-    for target in curve_targets(item):
+    from .curve_engines import RoutingSettings
+
+    excluded = (
+        item.engine_settings.excluded_obstacles
+        if isinstance(item.engine_settings, RoutingSettings)
+        else ()
+    )
+    for target in curve_targets(item) | set(excluded):
         if not isinstance(records.get(target), SCP):
             raise ValueError(
                 "Curve obstacles and fiber bindings require anatomical surface providers."

@@ -8,10 +8,12 @@ from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.mesh import Mesh
 from anthroforge.native.paths import Path
+from anthroforge.native.routing_scene import RoutingScene
 
 LIMITATIONS = [
     "Native mesh/path payload capacities; meshes include estimated full-binary AABB node bytes",
     "Images include owned encoded source and decoded RGBA bytes reachable from observed owners",
+    "Routing scene capacities include observed cache/job captures; allocator overhead excluded",
     "Excludes allocator overhead, Python objects, Qt copies and GPU/driver allocations",
     "Ownership totals overlap; add neither owners nor shared alias handles",
     "Pre-recording job payload references may be unattributed; job snapshots are included",
@@ -44,7 +46,7 @@ def payload_resources(value, profiler):
         if id(item) in seen:
             continue
         seen.add(id(item))
-        if isinstance(item, (Mesh, Path, ImageAsset, Field)):
+        if isinstance(item, (Mesh, Path, ImageAsset, Field, RoutingScene)):
             found.update((item, item.path) if isinstance(item, Field) else (item,))
         else:
             pending.extend(bounded(children(item), 8192 - len(seen) - len(pending), profiler))

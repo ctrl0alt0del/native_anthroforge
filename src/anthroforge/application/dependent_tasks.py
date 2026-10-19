@@ -7,10 +7,13 @@ from anthroforge.core.results import Port
 
 def changed(session: Any, seeds: set[Port], published: bool = True) -> None:
     from . import construction_tasks, control_tasks, dependencies, path_tasks
+    from .geometry_outputs import pending
 
-    control_tasks.edited(session, seeds)
-    path_tasks.edited(session, seeds)
     targets = dependencies.affected(session.document, seeds)
     if published:
         targets -= {port.owner for port in seeds if port.output == "geometry"}
-    construction_tasks.edited(session, targets)
+    if targets:
+        pending(session, targets)
+    control_tasks.edited(session, seeds)
+    path_tasks.edited(session, seeds)
+    construction_tasks.schedule(session, targets)

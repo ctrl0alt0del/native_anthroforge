@@ -4,7 +4,6 @@ import os
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
-from PySide6.QtCore import QMetaObject, Qt
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from shiboken6 import delete
@@ -37,12 +36,12 @@ def setup(controller):
 
 def controls(controller, engine, key):
     window = engine.rootObjects()[0]
-    check = find(window, "routingObstacle")
-    check.setProperty("checked", True)
-    assert QMetaObject.invokeMethod(check, "clicked", Qt.DirectConnection)
+    find(window, "routingObstacleToggle").setProperty("checked", True)
     settle(controller)
     item = controller.session.document.object(key)
-    assert item.engine_settings.obstacles and item.result.status == "ready", item.result.error
+    assert item.engine_settings.obstacle_mode == "AUTO" and item.result.status == "ready", (
+        item.result.error
+    )
     assert controller.path_model.wanted
     rows = controller.authoring.componentRows
     assert len(rows) == 2 and all(r["part"] == "position" for r in rows)

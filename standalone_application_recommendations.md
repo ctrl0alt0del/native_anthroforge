@@ -6,7 +6,7 @@ The [confirmed 0.2.0 specification](docs/specification_020.md) is authoritative 
 curves, fibers, surfaces, reference images, object relationships and project-format
 compatibility. It replaces the earlier Free/Controlled classification with curve
 engines, requires independent curve-to-fiber copies, and includes all these features
-in 0.2.0. [0.2.1 targets curve-workflow improvements](docs/specification_021.md);
+in 0.2.0. [0.2.1 defines curve-workflow improvements](docs/specification_021.md);
 VCPs, muscles and soft tissues move to 0.2.2. Historical source terminology in the
 evidence/coverage appendix is retained only to identify the original addon behavior.
 

@@ -101,9 +101,13 @@ class Session:
         return self.document.entity(entity_id)
 
     def replace_document(self, **changes: Any) -> None:
+        from .routing_membership import changed
+
+        before = self.document
         self.serial += 1
         self.document = replace(self.document, revision=self.serial, **changes)
         self.history.observe(self.document)
+        changed(self, before)
 
     def replace_entities(self, changed: dict[str, SCP], authored: bool = True) -> None:
         if authored:
@@ -223,6 +227,7 @@ class Session:
         self.surface_preview = Preview()
         if self._engine is not None:
             self._engine.bases.clear()
+            self._engine.routing_scenes.clear()
             self.profiler.native.detach(self._engine)
         if self.owns_profiler:
             self.profiler.close()

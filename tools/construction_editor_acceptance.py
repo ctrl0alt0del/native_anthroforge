@@ -169,7 +169,7 @@ def drawing_gestures(controller):
     tool.pointer(stroke_pointer(0.5), [0, 0, -1], True)
     tool.finish()
     settle(controller)
-    assert controller.session.history.cursor == before + 1 and tool.mode == "POINTS"
+    assert controller.session.history.cursor == before + 1 and not tool.mode
     repeated_draws(controller)
 
 

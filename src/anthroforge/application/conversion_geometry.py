@@ -4,6 +4,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, replace
 
 from anthroforge.core.construction import Curve, CurvePoint
+from anthroforge.core.curve_constraints import required_points
 from anthroforge.core.curve_conversion import ConversionSpec
 from anthroforge.core.curve_engines import RoutingSettings
 from anthroforge.core.fibers import Fiber
@@ -36,12 +37,10 @@ def authored_points(source: Curve, spec: ConversionSpec) -> tuple[CurvePoint, ..
         return source.points
     if selected - {p.id for p in source.points}:
         raise ValueError("Routing constraints must name authored curve points.")
-    if not source.closed and not {source.points[0].id, source.points[-1].id} <= selected:
-        raise ValueError("An open route must retain both endpoints.")
-    if isinstance(source, Fiber) and not {b.point for b in source.bindings} <= selected:
-        raise ValueError("Retain every anatomically bound point as a routing constraint.")
-    if not {p.id for p in source.points if p.junction} <= selected:
-        raise ValueError("Retain every shared junction point as a routing constraint.")
+    required = required_points(source)
+    if missing := required.keys() - selected:
+        reasons = ", ".join(sorted({required[key] for key in missing}))
+        raise ValueError(f"Retain required routing constraints: {reasons}.")
     return tuple(point for point in source.points if point.id in selected)
 
 

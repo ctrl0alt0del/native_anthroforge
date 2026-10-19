@@ -81,5 +81,5 @@ def migrate_imported(data: dict[str, Any]) -> dict[str, Any]:
 
 def result_fields(data: dict[str, Any]) -> dict[str, Any]:
     state = tuples(data)
-    state["inputs"] = tuple(ReadRevision(**entry) for entry in data.get("inputs", ()))
+    state["inputs"] = tuple(ReadRevision(**tuples(entry)) for entry in data.get("inputs", ()))
     return state

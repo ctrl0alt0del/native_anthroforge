@@ -10,8 +10,31 @@ Sections labelled with earlier release numbers describe their qualified baseline
 The confirmed specification remains authoritative. Imported meshes, lofts and curve-driven
 bodies share the SCP document and evaluation lifecycle. Anatomical features enter through
 the same core; VCPs, muscles and soft tissues now follow in 0.2.2. The
-[initial 0.2.1 scope](specification_021.md) records proposed curve-workflow improvements;
-it does not describe implemented architecture changes.
+[0.2.1 contract](specification_021.md) adds the curve-workflow boundaries below.
+
+## Automatic routing and optional editors (0.2.1)
+
+`core/routing_obstacles.py` owns eligibility and automatic dependency edges. Its SCC pass
+removes only automatically introduced cyclic geometry edges; explicit cycles remain errors.
+The graph captures a structural scene signature, used by a `routing_scope` read revision.
+Scene membership changes invalidate jobs/previews even when a provider was absent from the
+previous capture. Surface pose/geometry reads remain conservative across the complete scene.
+`dependent_tasks` marks geometry pending before fan-out to controls, paths and mesh jobs;
+Manual shape changes therefore remain visible in consumer provenance without changing queues.
+
+Native routing captures immutable collision worlds under independent shared-pointer leases.
+The engine caches them by mesh handles, exact transforms and clearance through `ResourceCache`
+(64 MiB, eight scenes). Solves retain their own leases across eviction, use native BVH queries,
+and validate against the full eligible scene. No straight-segment-only obstacle pruning or
+Python geometry loop is introduced. Capture and solve have separate profiled ABI boundaries;
+cache events and observed native capture capacities join overlapping resource inventories.
+
+`ChoiceModel` composes keyed `RecordModel` rows with a Qt sort/filter proxy. Both optional
+editors use the same bounded virtualized QML component and filtered bulk semantics. Routing
+descriptions cache structural inputs; result publication does not rebuild the candidate graph.
+`core/curve_constraints.py` supplies required-point reasons to both API validation and UI.
+The keyboard manager owns the continue-placement modifier; `DrawingTools` owns provisional
+points, finalization and coherent undo. No document mode or calculation policy lives in QML.
 
 ## Issue reporting (0.1.6)
 

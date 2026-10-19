@@ -15,6 +15,7 @@ class ReadRevision:
     output: str
     authored: int
     accepted: int
+    membership: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

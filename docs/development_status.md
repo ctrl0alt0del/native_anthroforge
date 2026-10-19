@@ -1,7 +1,62 @@
 # AnthroForge development validation
 
-Current source qualification is in [routing correction 0.2.0](#routing-correction-020).
+Current source qualification is in [curve workflows 0.2.1](#curve-workflows-021).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Curve workflows 0.2.1
+
+Released behavior: curve toolbar, click/Shift-click placement, automatic obstacle inputs,
+optional searchable exclusions and authored-point subsets, Advanced solver budgets.
+VCP/muscles/soft tissues remain 0.2.2. Schema 3 and the native solver are retained.
+Older explicit obstacle lists retain Manual mode; switch to Automatic to adopt new inputs.
+
+Full Windows development gate passes: **896 tests** (24 warnings from the existing QQmlPropertyMap API,
+including 15 in the new gesture tests). Native builds/three CTests and clang-tidy pass.
+New tests cover automatic scene membership, cyclic consumers, new/moved/deleted geometry,
+preview staleness, Manual pending provenance, missing accepted geometry, running-job
+supersession, visibility/workspace independence, capture reuse/eviction/concurrency and
+point-placement history. Ruff, mypy, function limits, dependency/native doctor and script
+checks pass. The final QA-only changes also pass function-limit/architecture checks.
+
+Actual QML offscreen tests pass with 120 obstacles/120 authored points: bounded delegates
+(including Qt reuse pool), search, stable numbering, duplicate-name context, required-row
+protection, scoped bulk edits, retained search/scroll, focused-point highlighting, preview,
+accept and undo. Mouse/modifier events verify placement, axis views during placement,
+completion and cancellation. Captures inspected with fonts are under `build/021-curve-workflows`.
+Software offscreen validates controls/layout; it does not establish Quick3D geometry quality.
+Construction/surface editors, existing curve interaction, view gestures and camera restoration
+also pass their offscreen acceptance scripts.
+
+Recorded 100-cube routing: one 0.60 ms native capture reused across eight solves; mean solve
+72.34 ms versus prior combined capture/solve 72.64 ms. This is capture reuse evidence, not a
+meaningful whole-solve speedup. Full-scene native spatial queries remain authoritative.
+The large-editor report exposed repeated candidate-graph preparation; descriptions now reuse
+structural graph identity. The complete final report has no collector loss or ChoiceModel
+resets. Across 72 obstacle-description binding evaluations, inclusive mean is 1.60 ms and
+maximum 13.79 ms. Earlier serial comparisons had an incomplete Qt shutdown and are not used
+as speedup evidence. Inclusive nested timings overlap; no general frame-rate claim is made.
+
+Ownership review: eligibility/cycle policy and required-point rules are shared core contracts;
+fan-out uses the existing coordinator and marks geometry pending before consumers capture
+Manual provenance. The engine owns immutable native collision leases and bounded caches.
+One Qt choice model/view serves both optional lists. Provisional placement and keyboard
+bindings stay in their existing desktop owners; Python gains no numerical solver loop.
+
+The clean `57e1c53` executable in `dist/0.2.1/AnthroForge.dist` was copied to a fresh
+temporary folder and passed the complete portable checks with minimal PATH: shared API,
+persistence, attachments, primitives, fibers/surfaces/images, Issues, inspection, profiling,
+offscreen GUI and invisible QQuickRenderControl rendering. Packaged QML/JS/icons match
+the qualified source. The included `examples/automatic_routing.json` also passes there.
+
+That executable opened a copy of the user's `solver_test.anthroforge`, switched to Automatic,
+detected both cubes, saved revision 1855 and produced a complete profile. All three authored
+points remain unchanged; independent native queries found no centerline intersections with
+either cube. Two hidden rendered angles were inspected. The single recorded native capture
+took 0.051 ms and solve 28.98 ms; the retained native collision capture was 9,848 bytes,
+excluding cache-key and allocator overhead. These are observations, not a universal clearance
+or latency guarantee. The original SHA-256 remains unchanged. Local evidence is under
+`build/021-*` and `%TEMP%/anthroforge-021-57e1c53`; these ignored artifacts are not in Git.
+No visible windows, desktop input or hands-on interactive acceptance were used.
 
 ## Routing correction 0.2.0
 

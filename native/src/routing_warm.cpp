@@ -40,7 +40,7 @@ static std::vector<Route> routes(const Route& points,const Reference& reference)
         result.emplace_back(points.begin()+reference.pins[i-1],points.begin()+reference.pins[i]+1);
     return result;
 }
-bool warm_start(const Input& input,World& world,const Reference& reference,std::vector<Span>& spans,uint64_t handle) {
+bool warm_start(const Input& input,const World& world,const Reference& reference,std::vector<Span>& spans,uint64_t handle) {
     if(!handle) return false;
     const auto previous=path(handle);
     if(previous->closed!=bool(input.options.closed)) return false;

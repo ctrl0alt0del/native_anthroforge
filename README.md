@@ -1,16 +1,16 @@
-# AnthroForge 0.2.0
+# AnthroForge 0.2.1
 
 Standalone curves, reference images, fibers and curve-based surfaces follow the
 [confirmed specification](docs/specification_020.md) and
 [implementation plan](docs/implementation_020.md). See the
-[release validation](docs/development_status.md#routing-correction-020) for source,
+[release validation](docs/development_status.md#curve-workflows-021) for source,
 native parity, profiling, offscreen interaction and relocated portable evidence.
 
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder. The corrected 0.2.0 distribution is
-`dist/0.2.0-solver-fix/AnthroForge.dist`; the earlier release remains in `dist/0.2.0`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1/AnthroForge.dist`.
+Earlier distributions remain in their versioned directories.
 The default packaging location remains `dist/AnthroForge.dist`.
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
@@ -21,8 +21,13 @@ or [the shared API example](examples/construction.json). Curves use Bézier, exa
 or native routing engines. Fibers add anatomical bindings and use the same curve/surface
 tools. Reference images are embedded, and explicit junctions support branched open lofts.
 Schema 3 projects reject older formats; legacy conversion is deferred.
-[0.2.1 is planned for curve-workflow improvements](docs/specification_021.md); VCPs,
+[0.2.1 improves curve workflows](docs/specification_021.md); VCPs,
 including muscles and soft tissues, move to 0.2.2. Editable parameters remain retained.
+
+Curve creation and cursor/patch tools sit below the transform gizmos. Place Points finishes
+on plain left-click from the second point; Shift-click continues. New routed curves use
+automatic obstacles. Exclusions and conversion-point subsets use bounded searchable lists;
+all authored points are retained by default. Numerical budgets live under Advanced.
 
 0.1.9 refined the editor with consistent dark menus, aligned controls and expandable
 inspection details. See [UI polish](docs/ui_polish.md).

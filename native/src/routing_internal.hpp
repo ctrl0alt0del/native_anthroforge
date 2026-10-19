@@ -12,7 +12,7 @@ struct World {
     WorldHandle collision{new kernel::AfWorld(),kernel::af_world_destroy};
     std::unique_ptr<kernel::TriangleSnapshot> snapshot{new kernel::TriangleSnapshot()};
     std::vector<int> owners;
-    double length=1,coordinate=1,floor=1e-9,slack=1e-9;
+    double length=1,coordinate=1,floor=1e-9,slack=1e-9,radius=0;
 };
 struct Input {
     const double* records;
@@ -36,9 +36,10 @@ struct Span {
 };
 World capture_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel);
 World capture_collision_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel);
+std::shared_ptr<const World> routing_scene(uint64_t handle);
 Reference reference(const Input& input);
-std::vector<Span> spans(const Input& input,World& world,const Reference& reference);
-bool warm_start(const Input& input,World& world,const Reference& reference,std::vector<Span>& spans,uint64_t handle);
+std::vector<Span> spans(const Input& input,const World& world,const Reference& reference);
+bool warm_start(const Input& input,const World& world,const Reference& reference,std::vector<Span>& spans,uint64_t handle);
 bool solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double* measures);
 EvaluatedPath result(const Input& input,const Reference& reference,const std::vector<Span>& spans);
 }

@@ -2,10 +2,10 @@
 
 from collections import deque
 from collections.abc import Iterator, Mapping, Set
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from types import MappingProxyType
 
-from . import junctions
+from . import junctions, routing_obstacles
 from .construction import Control, Curve, Deformer
 from .curve_dependencies import inputs as curve_path_inputs
 from .cycle_analysis import cycles
@@ -49,6 +49,8 @@ class DependencyGraph(Mapping[Port, frozenset[Port]]):
     consumers: Mapping[Port, frozenset[Port]]
     blocked: frozenset[Port]
     cycles: tuple[frozenset[Port], ...] = ()
+    routing_excluded: Mapping[str, frozenset[str]] = field(default_factory=dict)
+    routing_scene: tuple[str, ...] = ()
 
     def __getitem__(self, key: Port) -> frozenset[Port]:
         return self.inputs[key]
@@ -105,7 +107,9 @@ def build(
     result.update(object_edges(objects, shared))
     result.update(junctions.edges(shared))
     result.update(control_edges(controls))
-    return indexed(result)
+    signature = routing_obstacles.scene_signature(result, entities)
+    excluded = routing_obstacles.expanded(result, entities, objects)
+    return indexed(result, excluded, signature)
 
 
 def control_edges(controls: tuple[Control, ...]) -> dict[Port, set[Port]]:
@@ -119,10 +123,19 @@ def control_edges(controls: tuple[Control, ...]) -> dict[Port, set[Port]]:
     return result
 
 
-def indexed(result: dict[Port, set[Port]]) -> DependencyGraph:
+def indexed(
+    result: dict[Port, set[Port]],
+    excluded: dict[str, frozenset[str]] | None = None,
+    signature: tuple[str, ...] = (),
+) -> DependencyGraph:
     consumers = reverse(result)
     return DependencyGraph(
-        frozen(result), frozen(consumers), unresolved(result, consumers), cycles(result, consumers)
+        frozen(result),
+        frozen(consumers),
+        unresolved(result, consumers),
+        cycles(result, consumers),
+        MappingProxyType(excluded or {}),
+        signature,
     )
 
 

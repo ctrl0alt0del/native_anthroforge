@@ -65,5 +65,9 @@ def copied_edit(curve: Fiber, identities: dict[str, str]) -> Any:
 def engine_settings(curve: Curve, identities: dict[str, str]) -> Any:
     settings = curve.engine_settings
     if isinstance(settings, RoutingSettings):
-        return replace(settings, obstacles=tuple(identities.get(k, k) for k in settings.obstacles))
+        return replace(
+            settings,
+            obstacles=tuple(identities.get(k, k) for k in settings.obstacles),
+            excluded_obstacles=tuple(identities.get(k, k) for k in settings.excluded_obstacles),
+        )
     return settings

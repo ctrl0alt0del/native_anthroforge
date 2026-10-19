@@ -4,6 +4,7 @@ from anthroforge.application.image_assets import ImageAsset
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.paths import Path
+from anthroforge.native.routing_scene import RoutingScene
 from anthroforge.native.strokes import Stroke
 
 
@@ -13,7 +14,20 @@ def inventories(profiler, owners):
         images=image_inventory(owners),
         strokes=stroke_inventory(owners),
         attachments=attachment_inventory(owners),
+        routing_scenes=routing_scene_inventory(owners),
     )
+
+
+def routing_scene_inventory(owners):
+    from .resource_inventory import memory_totals
+
+    scenes = {v for values in owners.values() for v in values if isinstance(v, RoutingScene)}
+    sizes = {id(v): v.bytes for v in scenes}
+    groups = {
+        name: {id(v) for v in values if isinstance(v, RoutingScene)}
+        for name, values in owners.items()
+    }
+    return memory_totals(list(scenes), sizes, groups, len(scenes))
 
 
 def attachment_inventory(owners):

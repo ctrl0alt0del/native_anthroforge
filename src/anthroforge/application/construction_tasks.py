@@ -142,11 +142,11 @@ def schedule(
 
 
 def edited(session: "Session", targets: set[str]) -> None:
+    from .dependent_tasks import changed
+
     if not targets:
         return
-    targets = dep.affected(session.document, {dep.Port(key, "geometry") for key in targets})
-    geometry_outputs.pending(session, targets)
-    schedule(session, targets)
+    changed(session, {dep.Port(key, "geometry") for key in targets}, published=False)
 
 
 def evaluate(session: "Session", entities: list[str] | None = None) -> list[str]:

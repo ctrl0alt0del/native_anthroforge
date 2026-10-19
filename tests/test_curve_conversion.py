@@ -85,11 +85,20 @@ def test_shared_topology_lock_applies_to_conversion_and_unlocks(session):
     preview(session, key)
 
 
-def test_routing_requires_explicit_authored_constraints_before_any_job(session):
+def test_routing_defaults_to_all_authored_points(session):
+    key = source(session)
+    points = session.document.object(key).points
+    session.command("curve.conversion.preview", curve=key, engine="ROUTED")
+    session.wait(5)
+    assert session.conversion.state == "ready", session.conversion.error
+    assert session.conversion.asset.authored.points == points
+
+
+def test_routing_rejects_an_explicitly_empty_constraint_selection(session):
     key = source(session)
     before = len(session.scheduler.jobs)
     with pytest.raises(ValueError, match="explicitly selected"):
-        session.command("curve.conversion.preview", curve=key, engine="ROUTED")
+        session.command("curve.conversion.preview", curve=key, engine="ROUTED", points=[])
     assert len(session.scheduler.jobs) == before and session.conversion.state == "idle"
 
 

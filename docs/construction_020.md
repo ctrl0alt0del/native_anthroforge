@@ -7,8 +7,11 @@ transform children. Unassigned construction stays accessible.
 
 ## Create and shape a curve
 
-Use Construction **+ → Add Curve at cursor**, **Place curve points**, or **Draw curves**.
-Place Points finishes with Enter; Backspace removes the last draft point and Escape cancels.
+Use the viewport icons below Move/Rotate/Scale: **Add Curve at cursor**, **Place Points**,
+**Draw Curve**, **Cursor**, and **Patch**. Hover for tooltips. In Place Points, the first click
+starts a curve; from point two, plain left-click finishes and exits. Shift-click continues.
+Enter also finishes; Backspace removes the last draft point and Escape cancels.
+Closed placement requires three points; an early finish preserves the draft.
 Draw finishes on mouse release and stays ready for another stroke. Each completed curve
 is one undo action. Cursor settings support numeric coordinates and surface placement.
 
@@ -23,20 +26,25 @@ insertion, Ctrl surface snapping, wheel offset, axis views 1/2/3 and camera rest
 their existing behavior. Entering edit mode never refits or resamples the curve.
 
 **Change path engine** previews a conversion before acceptance. BEZIER exposes handles;
-POLYLINE keeps exact segments; ROUTED solves between chosen structural points around
-explicit obstacle surfaces. Routing conversion requires selecting those authored points.
+POLYLINE keeps exact segments; ROUTED solves between authored structural points around
+automatic SCP obstacles. Routing conversion retains all authored points by default; Edit
+opens an optional searchable subset editor. Endpoints, bindings and junctions are protected.
 Generated routing samples do not become editable knots. Closure requires three points.
 
-Choose **Routing obstacles** before previewing a routed conversion, or in the current
-engine settings afterward. With none selected, an ordinary curve ignores SCP geometry;
-straight segments can therefore be the expected result. Fiber attachment surfaces are
-included automatically. Points placed directly on a selected surface may remain in contact
+**Automatic obstacles** considers all eligible SCP surfaces across the document, independent
+of visibility and workspace. Optional exclusions are searchable; bulk actions affect shown
+rows. Manual mode remains available and a manual empty list warns that SCPs are ignored.
+Older files with explicit obstacle lists retain Manual behavior; switch them to Automatic
+to adopt the new policy. Geometry depending on the routed path is excluded automatically
+and explained separately from an explicit dependency failure. Fiber binding/support surfaces
+remain required. Points placed directly on an included surface may remain in contact
 without becoming anatomical attachments. Points inside an obstacle must be moved out.
 
 ## Use curves in construction
 
-Select ordered curves for a primitive or **Loft selected curves**. A single closed curve
-supports **Patch selected closed curve**. Consumers retain live references and own their
+Select ordered curves, then **Create Primitive** for a loft or body. The redundant standalone
+loft menu was removed; the generic `surface.create` API still supports lofts and fibers.
+A single closed curve supports the **Patch** icon. Consumers retain live references and own their
 ordering, sampling, reversal, range and placement. The source inspector lists its users.
 **Shape and transform** follows source shape and pose; **Shape only** retains consumer
 placement. Switching modes preserves the visible result. **Make Independent** gives that

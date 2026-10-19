@@ -28,11 +28,12 @@ class Resources:
     def attach(self, engine):
         engine.resource_observer = self.created
         engine.bases.observer = self.cache
+        engine.routing_scenes.observer = self.cache
 
     def stop(self):
         self.sample(force=True)
         for engine in self.profiler.native.engines:
-            engine.resource_observer = engine.bases.observer = None
+            engine.resource_observer = engine.bases.observer = engine.routing_scenes.observer = None
         self.reset(False)
 
     def reset(self, observing):
@@ -86,9 +87,9 @@ class Resources:
     def observe_payload(self, job, value):
         self.remember(job, payload_resources(value, self.profiler))
 
-    def cache(self, action, **metadata):
+    def cache(self, action, cache="body_base", **metadata):
         self.profiler.event(
-            "cache", action, cache="body_base", job=getattr(self.local, "job", ""), **metadata
+            "cache", action, cache=cache, job=getattr(self.local, "job", ""), **metadata
         )
 
     def owners(self):
@@ -103,6 +104,7 @@ class Resources:
                 view(result)
         for engine in self.profiler.native.engines:
             result["cache"].update(engine.bases.retained())
+            result["cache"].update(engine.routing_scenes.retained())
         return result
 
     def sample(self, force=False):

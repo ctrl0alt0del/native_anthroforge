@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from PySide6.QtCore import QMetaObject, QPointF, Qt
+from PySide6.QtCore import Q_ARG, QMetaObject, QPointF, Qt
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
@@ -20,6 +20,7 @@ from ui_acceptance import find
 from ui_polish_acceptance import descendants
 
 from anthroforge.core.fibers import Fiber
+from anthroforge.core.routing_obstacles import targets as routing_targets
 from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.runtime import native_runtime
@@ -41,11 +42,9 @@ def select_inputs(window, controller):
     find(window, "conversionObstacleToggle").setProperty("checked", True)
     find(window, "conversionEngine").setProperty("currentIndex", 2)
     QGuiApplication.processEvents()
-    rows = list(descendants(window.contentItem()))
-    for row in rows:
-        if row.objectName() in ("conversionPoint", "conversionObstacle"):
-            row.setProperty("checked", True)
-            click(row)
+    mode = find(window, "conversionObstacleMode")
+    mode.setProperty("currentIndex", 0)
+    assert QMetaObject.invokeMethod(mode, "activated", Qt.DirectConnection, Q_ARG(int, 0))
     assert not find(window, "conversionObstacleNotice").property("visible")
     click(find(window, "previewCurveConversion"))
     settle(controller)
@@ -74,12 +73,13 @@ def exercise(controller, engine):
 
 def verify_accepted(controller, window, key, targets):
     item = controller.session.document.object(key)
-    assert set(item.engine_settings.obstacles) == targets and item.result.status == "ready"
+    assert set(routing_targets(controller.session.document, item)) == targets
+    assert item.engine_settings.obstacle_mode == "AUTO" and item.result.status == "ready"
     assert not find(window, "routingObstacleNotice").property("visible")
     capture(window)
     controller.run("undo", {})
     settle(controller)
-    assert not controller.session.document.object(key).engine_settings.obstacles
+    assert controller.session.document.object(key).engine_settings.obstacle_mode == "MANUAL"
 
 
 def capture(window):
@@ -101,7 +101,16 @@ def verify_automatic(controller, window, source, target):
     fiber = next(o for o in controller.session.document.objects if isinstance(o, Fiber))
     controller.select(fiber.id)
     settle(controller)
-    rows = [r for r in descendants(window.contentItem()) if r.objectName() == "routingObstacle"]
+    binding_row(window, target)
+
+
+def binding_row(window, target):
+    find(window, "curveConversionToggle").setProperty("checked", False)
+    find(window, "routingObstacleToggle").setProperty("checked", True)
+    QGuiApplication.processEvents()
+    rows = [
+        r for r in descendants(window.contentItem()) if r.objectName() == "routingObstacleChoice"
+    ]
     automatic = next(r for r in rows if r.property("targetId") == target)
     assert automatic.property("checked") and not automatic.property("enabled")
     assert not find(window, "routingObstacleNotice").property("visible")

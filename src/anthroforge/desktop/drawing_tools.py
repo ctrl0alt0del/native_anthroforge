@@ -154,17 +154,32 @@ class DrawingTools(QObject):
         if self.mode == "DRAW" and self.painting:
             self.finish()
 
+    @Slot("QVariantList", "QVariantList", bool)
+    def click(self, ray, normal, continue_placement):
+        before = self.stroke.count if self.stroke else 0
+        self.pointer(ray, normal, True)
+        count = self.stroke.count if self.stroke else 0
+        if self.mode == "POINTS" and count > max(1, before) and not continue_placement:
+            self.finish()
+
     @Slot()
     def finish(self):
         if self.stroke is None or self.stroke.count < (3 if self.options["closed"] else 2):
-            self.clear_stroke()
+            self.require_more_points()
             return
         samples = self.stroke.read().tolist()
         args = dict(owner=context_owner(self.controller))
         result = self.submit(samples, args)
         if result:
             self.created.append(result if isinstance(result, str) else result["object_id"])
-        self.clear_stroke()
+            if self.mode == "POINTS":
+                self.mode = ""
+            self.clear_stroke()
+
+    def require_more_points(self):
+        count = "three" if self.options["closed"] else "two"
+        self.controller.message = f"Place at least {count} points."
+        self.controller.notify()
 
     def submit(self, samples, args):
         if self.mode == "POINTS":

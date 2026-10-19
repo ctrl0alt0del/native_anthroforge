@@ -1,7 +1,7 @@
 # Runtime performance recording
 
-Press **F12** (also while holding Ctrl/Shift/Alt or dragging) to start recording.
-Reproduce the slowdown and press F12 again. The **Record/Stop** button and View menu
+Press **Shift+F12** (also while holding Ctrl/Alt or dragging) to start recording.
+Reproduce the slowdown and press Shift+F12 again. The **Record/Stop** button and View menu
 provide the same action. Recording does not end an edit, change the document or add
 an undo entry. **Show file** opens the report folder after background export finishes.
 New and Open preserve the recording; document identifiers distinguish commands from
@@ -148,7 +148,7 @@ with a local socket and profiling-only services. Qt upgrades require qualificati
 Debugger/inspector services are excluded. API availability or development execution
 alone does not establish packaged behavior.
 
-Qualification tools: `tools/profiler_acceptance.py` exercises F12 during real drags;
+Qualification tools: `tools/profiler_acceptance.py` exercises Shift+F12 during real drags;
 `tools/profiler_qualification.py` compares disabled/dormant/recording modes serially.
 Do not run builds or other benchmarks concurrently. `--disable-profiling-support`
 is a desktop diagnostic baseline, not the normal launch mode. The explicit

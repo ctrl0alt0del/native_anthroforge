@@ -60,7 +60,7 @@ Item {
         {command:"viewY", key:"2", duringTransform:true, allowModifiers:true},
         {command:"viewZ", key:"3", duringTransform:true, allowModifiers:true},
         {command:"restoreView", key:"4", duringTransform:true, allowModifiers:true},
-        {command:"reportFeedback", key:"F12", duringTransform:true, allowModifiers:true, excludeModifiers:["Shift"], allowTyping:true},
+        {command:"reportFeedback", key:"F12", duringTransform:true, allowModifiers:true, excludeModifiers:["Shift"], allowTyping:true, allowBlocked:true},
         {command:"recordPerformance", key:"Shift+F12", duringTransform:true, allowModifiers:true, allowTyping:true},
         {command:"confirm", key:"Return", duringTransform:true, allowModifiers:true},
         {command:"confirm", key:"Enter", duringTransform:true, allowModifiers:true},
@@ -73,9 +73,9 @@ Item {
         delegate: Shortcut {
             required property var modelData
             sequences: manager.sequences(modelData)
-            context: Qt.WindowShortcut
+            context: modelData.allowBlocked ? Qt.ApplicationShortcut : Qt.WindowShortcut
             autoRepeat: false
-            enabled: !manager.blocked && (!manager.typing || modelData.scope === "document" || !!modelData.allowTyping) && (!manager.transforming || !!modelData.duringTransform)
+            enabled: (!manager.blocked || !!modelData.allowBlocked) && (!manager.typing || modelData.scope === "document" || !!modelData.allowTyping) && (!manager.transforming || !!modelData.duringTransform)
             onActivated: manager.requested(modelData.command)
         }
     }

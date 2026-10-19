@@ -74,7 +74,7 @@ ApplicationWindow {
                         UiMenuItem { text: performance.state.recording ? "Stop recording" : "Record performance"; shortcutHint: keyboard.shortcut("recordPerformance"); onTriggered: performance.toggle() }
                     }
                     UiMenu {
-                        title: "Help"
+                        title: "Help"; objectName: "helpMenu"
                         UiMenuItem { objectName: "reportFeedbackMenu"; text: "Report a bug / recommendation…"; shortcutHint: keyboard.shortcut("reportFeedback"); enabled: !window.modalOpen && !feedback.state.active; onTriggered: feedback.request(window) }
                         UiMenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() }
                     }

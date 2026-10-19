@@ -64,6 +64,7 @@ class FeedbackEditor(QObject):
             self.ready.emit()
         except Exception as error:
             self.active = False
+            self.image = QImage()
             self.controller.message = "Screenshot failed: " + str(error)
             self.controller.changed.emit()
         finally:
@@ -190,8 +191,9 @@ def capture_context(controller):
     return dict(
         application_version=__version__,
         build=build_identity(),
-        document_id=session.document.id,
+        document_id=str(session.document.id),
         document_revision=session.document.revision,
+        project_path=str(session.path or ""),
         selected_object=controller.selection,
         display="Application window before report editor; may include provisional or pending state",
     )

@@ -513,3 +513,14 @@ Resources retain mesh/path/image/attachment allocations across current state, un
 workers and displayed/staged leases. Profiler observation is read-only and recording-only.
 Saved-revision rendering drains all staged resource models before capture. Schema 3 persists
 owned editable state and accepted results, never native handles, undo history or preview data.
+
+## User feedback reports
+
+The [feedback reporting subsystem](feedback_reports.md) is separate from anatomical Issues,
+inspection exports and profiling. Immutable Qt-independent report records cross a small
+consumer boundary; the local consumer owns atomic, idempotent archive publication in a
+version-independent user inbox. A receipt describes where to reveal the result, allowing
+file or online destinations without changing the editor. The service owns one background
+submission and explicit failure/retry; it does not enter document scheduling or history.
+Desktop capture precedes the modal. One QPainter adapter draws source-pixel annotations
+for both the fitted/zoomed preview and worker-side PNG export.

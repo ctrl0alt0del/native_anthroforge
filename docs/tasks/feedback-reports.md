@@ -44,5 +44,15 @@ Implemented Qt-independent immutable report/annotation records, a replaceable co
 and destination-neutral receipt, atomic local publication, single background submission,
 window capture, one painter for preview/export, and the modal editor. Help/F12 and
 Shift+F12 profiling use the keyboard abstraction. Initial desktop smoke has no QML warnings;
-five consumer/service tests, architecture checks and mypy on 190 modules pass. Full GUI,
-failure/retry, high-DPI evidence, profiler shortcut regression and packaging are pending.
+five consumer/service tests, architecture checks and mypy on 190 modules pass. Full QML
+acceptance now passes normal and 200% DPI: menu/F12, capture before modal, rectangles,
+arrows/text, undo, zoom/scroll alignment, failed save/retry, PNG fidelity, repeated/canceled
+reports and reporting from another modal. The final shortcut uses application scope for
+the explicit reporting binding so Qt popups do not suppress it; it is not an OS hotkey.
+Five Shift+F12 profiler drag trials pass, including Ctrl snapping, Activity open/closed,
+cancellation, focus/privacy and New/Open. The synthetic modifier-release test needed an
+explicit held mask because enum inversion incorrectly cleared Ctrl; no production input
+policy changed to accommodate that test. Source packaged-probe path also passes.
+
+Remaining: full development gate, narrow layout, relocated packaged qualification,
+source archive and final merge. Local evidence: `build/feedback-*`; no visible UI was used.

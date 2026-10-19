@@ -109,7 +109,7 @@ The example creates two sources, two independent fibers, a shared loft and an em
 synthetic reference grid. Its fixed sequence uses `inspect` to obtain the asynchronously
 created fiber IDs. Applications should inspect completed jobs/objects rather than infer IDs.
 See [the API](authoring_api.md) for image operations, conversion, bindings, junctions,
-surface sources and branches. F12 records reports without rebuilding the application.
+surface sources and branches. Shift+F12 records reports without rebuilding the application.
 
 Muscles, soft tissues, mirroring, legacy-project conversion and broader export remain deferred.
 Observed development, parity, profiling and offscreen evidence is tracked in

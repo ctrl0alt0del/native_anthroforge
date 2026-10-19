@@ -9,7 +9,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.2.1-reports/AnthroForge.dist`.
 Earlier distributions remain in their versioned directories.
 The default packaging location remains `dist/AnthroForge.dist`.
 Start with [the walkthrough](docs/quickstart.md) and the included
@@ -45,8 +45,14 @@ Activity updates incrementally: job rows retain their identity, changed fields
 update without rebuilding the list, and the header uses separate status summaries.
 Cancel/Retry, errors, target names, diagnostics and the latest 40 jobs remain available.
 
-Runtime performance recording: press **F12**, reproduce a slowdown, then
-press F12 again and share the `.afprofile.zip` under your local AnthroForge `Profiles`
+Bug/recommendation reporting: **Help → Report a bug / recommendation** or **F12** captures
+the window and opens a screenshot editor with red rectangles, arrows and text. Add a
+description and submit to the version-independent local `AnthroForge/Reports` inbox.
+The [report format and replaceable destination](docs/feedback_reports.md) are independent
+of project files. No network submission is enabled.
+
+Runtime performance recording: press **Shift+F12**, reproduce a slowdown, then
+press Shift+F12 again and share the `.afprofile.zip` under your local AnthroForge `Profiles`
 folder. Recording works during edits; no restart or rebuild is needed. See
 [recording and interpreting reports](docs/profiling.md).
 

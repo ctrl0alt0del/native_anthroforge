@@ -24,6 +24,7 @@ def arguments() -> argparse.Namespace:
     parser.add_argument("--project")
     parser.add_argument("--disable-profiling-support", action="store_true")
     parser.add_argument("--profile-probe")
+    parser.add_argument("--feedback-probe")
     return parser.parse_args()
 
 
@@ -92,6 +93,10 @@ def schedule_diagnostics(args, app, engine, controller, warnings):
         from .profile_probe import ProfileProbe
 
         ProfileProbe(app, controller, args.profile_probe)
+    if args.feedback_probe:
+        from .feedback_probe import FeedbackProbe
+
+        FeedbackProbe(app, controller, engine, args.feedback_probe)
 
 
 def open_controller(project):

@@ -1,5 +1,6 @@
 """Create the corresponding application source archive without SDKs or local outputs."""
 
+import argparse
 import zipfile
 from pathlib import Path
 
@@ -24,7 +25,12 @@ def sources():
 
 
 def main():
-    target = ROOT / f"dist/AnthroForge-{__version__}-source.zip"
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--output", type=Path, default=ROOT / f"dist/AnthroForge-{__version__}-source.zip"
+    )
+    target = parser.parse_args().output
+    target.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sources():
             archive.write(path, "anthroforge/" + path.relative_to(ROOT).as_posix())

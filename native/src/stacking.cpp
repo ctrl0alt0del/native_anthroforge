@@ -7,7 +7,7 @@ static void retain_caches(layer::State& next,layer::State& previous) {
     next.solved_cache=std::move(previous.solved_cache); next.clock=previous.clock;
     next.vector_cache=previous.vector_cache;
 }
-static void detect(Engine& engine,Inputs& input,std::atomic<bool>& cancel) {
+void detect(Engine& engine,Inputs& input,std::atomic<bool>& cancel) {
     pair::require(!cancel,"PAIR_CANCELLED"); const auto start=pair::Clock::now();
     retain_caches(input.state,engine.state); pair::synchronize(engine.session,input.work.incoming,input.detection);
     engine.session.published=pair::detect(engine.session,1,cancel,false);

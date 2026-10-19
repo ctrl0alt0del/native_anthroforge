@@ -17,4 +17,11 @@ void capture_obstacles(layer::State& state,const AfStackObstacle* inputs,int cou
 void execute(Engine& engine,Inputs input,std::atomic<bool>& cancel);
 void plan(Engine& engine,Inputs input,std::atomic<bool>& cancel);
 void resolve(Engine& engine,const AfStackAccepted* accepted,int count,const uint64_t* targets,int target_count,std::atomic<bool>& cancel);
+void detect(Engine& engine,Inputs& input,std::atomic<bool>& cancel);
+std::vector<uint64_t> ready(const layer::Graph& graph,const std::set<uint64_t>& pending,const std::set<uint64_t>& done);
+void cycles(layer::Graph& graph,std::atomic<bool>& cancel);
+void failures(layer::State& state,const layer::Graph& graph);
+std::set<uint64_t> accepted_inputs(layer::State& state,layer::Graph& graph,const AfStackAccepted* rows,int count,const std::set<uint64_t>& targets);
+void neighbors(layer::State& state,const pair::Session& detection,layer::Graph& graph,const std::set<uint64_t>& targets,const std::set<uint64_t>& accepted,std::atomic<bool>& cancel);
+void reset_failed(layer::State& state,const pair::Session& detection,const layer::Graph& graph,const std::set<uint64_t>& targets);
 }

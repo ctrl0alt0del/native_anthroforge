@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Side evaluation retains each receiving tissue's settings and publishes as one group.
+#include "stacking_internal.hpp"
 namespace af::stacking {
 struct Group {
     std::map<uint64_t,Engine*> owners;

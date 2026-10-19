@@ -1,5 +1,6 @@
 """Explicit tissue surface roles and retained Anchor motion through the real QML inspector."""
 
+from PySide6.QtCore import QObject
 from PySide6.QtGui import QFont, QFontDatabase
 from tissue_editor_acceptance import (
     QQuickStyle,
@@ -19,14 +20,19 @@ def inspect(controller, window):
     target = controller.selection
     controller.createConstruction("construction.point.create", dict(position=[0, 0, 0.8]))
     settle(controller)
+    choose_final(controller, window, target)
+    click(window, "createOrRebindAnchor")
+    settle(controller)
+    check_motion(controller, target)
+
+
+def choose_final(controller, window, target):
     rows = controller.surfaceRoles()
     choice = next(
         i for i, row in enumerate(rows) if row["id"] == target and row["role"] == "TISSUE_FINAL"
     )
-    find(window, "surfaceRoleChoice").setProperty("currentIndex", choice)
-    click(window, "createOrRebindAnchor")
-    settle(controller)
-    check_motion(controller, target)
+    selector = find(window, "pointAttachmentSurface")
+    selector.findChild(QObject, "surfaceRoleChoice").setProperty("currentIndex", choice)
 
 
 def check_motion(controller, target):

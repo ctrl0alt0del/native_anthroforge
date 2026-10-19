@@ -66,6 +66,41 @@ Absent normal-inflation fields use the existing open-boundary distance rule or
 closed-surface uniform rule. Explicit fields, including all-zero fields, are
 authoritative. Evaluation does not paint or otherwise mutate shared sources.
 Keep authored controls separate from display tessellation and solver samples.
+
+### Supported combinations
+
+The shared `core/tissue_policy.py` enforces this matrix for UI and API. Labels do not
+expand capabilities. None always bypasses relaxation; Off always bypasses height smoothing.
+
+| Source and inflation | Geometric / Static PBD | Height smoothing / material crop | Two-sided composition | Surface stacking |
+| --- | --- | --- | --- | --- |
+| Anchor, Radial | Both | Neither | No | No |
+| Open or closed Fiber, Profile sweep | Both | Neither | No; sweep owns its cross-section | No |
+| Membrane, Normal shell (loft, closed loft, patch or open branch) | Both | Neither | No; shell owns its backing/rim | Yes |
+| Membrane loft, Control Point / Distributed | No; use height smoothing | Both | Open material axes only | Yes |
+| Ordinary open Membrane loft, Section Profile | No; use height smoothing | Both | Yes | Yes |
+| Branched open Membrane, Control Point / Distributed | No; use height smoothing | Both, per-part smoothing | Yes | Yes |
+
+Section Profile excludes patches, closed axes and branches. Branch construction retains
+explicit junctions and rejects nested/closed branches and overlapping root intervals.
+Stacking requires both participants to opt in and pass material/geometry validation; an
+eligible source is not a promise that every order or requested displacement is feasible.
+Fixed backing is exact. Constraints cannot request a different fixed backing location;
+contradictory goals fail rather than weakening one constraint. Normal-shell INFLATION
+weights use the Base domain; named constraint fields use Base or Rest. Fields retain
+material signatures and must be explicitly replaced if that domain's topology changes.
+
+Membranes provide Tissue Base and Final roles. Radial/sweep tissues provide Final only;
+their point/path sources are not substitute attachment surfaces. Final is unavailable
+after failed stacking even when current unstacked geometry remains displayed.
+
+Default muscle inflation is Distributed, 0.02 m, with height smoothing Off and
+relaxation None. Muscle creation enables stacking. Closed Bulk, Rim, Layer and Pouch
+retain their captured donor defaults and disable stacking initially; Custom chooses
+the source-compatible inflation family with relaxation None and stacking disabled.
+Presets are applied only on creation. Per-mode controls and inactive side values survive
+switches. Preset values and source hashes are pinned in `tests/fixtures/tissue/presets.json`.
+
 Topology locks apply through every affected consumer and incoming attachment.
 Preserve qualified material correspondence; never reinterpret an old index against
 new connectivity. Unsupported changes require removal/rebinding of dependencies.

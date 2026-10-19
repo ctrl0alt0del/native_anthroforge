@@ -51,6 +51,24 @@ Pin source revisions/hashes and compact extracted fixture provenance. Preserve o
 Eigen/libigl and the addon's pinned PIQP 0.6.4 with notices. Keep production native work
 independent of Blender, NumPy iteration, test-only reference code and experiment paths.
 
+### Integrated evidence map
+
+| Boundary | Maintained acceptance entry points |
+| --- | --- |
+| Model/providers/copies | `test_tissue_contracts`, `test_anchor_operations`, `test_tissue_independence`, material binding and target-region tests |
+| Inflation/shape parity | `test_tissue_inflation`, `test_tissue_shapes`, `test_tissue_relaxation_parity`, `test_tissue_presets` |
+| Grids/parts/crops | `test_tissue_branches`, `test_tissue_envelopes`, `test_tissue_smoothing`, `test_tissue_crops` plus corresponding workflow tests |
+| Stacking | `test_tissue_stacking_native`, `test_tissue_mixed_stacking`, `test_tissue_stack_groups`, `test_tissue_stack_workflow`, `test_tissue_stack_material` |
+| Lifecycle/failures | `test_tissue_group_lifecycle`, `test_tissue_relationship_integrity`, `test_publication_frontier`, `test_tissue_relaxation_quality` |
+| Desktop editing | `tools/tissue_*_acceptance.py` full QML harnesses; `tools/tissue_*_scene.py` hidden GPU captures |
+| Profiling/resources | `test_tissue_material_cache`, `test_tissue_provenance`, `tools/tissue_profile_qualification.py` |
+| Executable workflow | `examples/tissues.json`, `tools/tissue_portable.py` through `tools/check_portable.py` |
+
+All test names above refer to `tests/<name>.py`; fixture source hashes and reproduction
+tools are recorded in `native/migration/README.md`. Current qualification results and
+remaining gates belong to the task record, not to this inventory. The skull scene uses
+the existing routing fixture to inspect integration; it is not a reconstruction result.
+
 ## Ordered increments
 
 1. Consolidate specification/inventory and update active documentation links.

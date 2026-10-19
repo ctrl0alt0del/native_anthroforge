@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Included by stacking.cpp: the pinned numerical cache has a single owning translation unit.
+#include "stacking_internal.hpp"
 namespace af::stacking {
-static std::vector<uint64_t> ready(const layer::Graph& graph,const std::set<uint64_t>& pending,const std::set<uint64_t>& done) {
+std::vector<uint64_t> ready(const layer::Graph& graph,const std::set<uint64_t>& pending,const std::set<uint64_t>& done) {
     std::vector<uint64_t> result;
     for(auto id:pending) if(std::all_of(graph.parents.at(id).begin(),graph.parents.at(id).end(),[&](uint64_t p){return done.count(p);}))
         result.push_back(id);
     return result;
 }
-static void cycles(layer::Graph& graph,std::atomic<bool>& cancel) {
+void cycles(layer::Graph& graph,std::atomic<bool>& cancel) {
     std::set<uint64_t> pending,done;
     for(const auto& item:graph.parents) pending.insert(item.first);
     while(!pending.empty()) {
@@ -17,7 +18,7 @@ static void cycles(layer::Graph& graph,std::atomic<bool>& cancel) {
     }
     for(auto id:pending) { graph.blocked.insert(id); graph.reasons[id]="STACK_DEPENDENCY_CYCLE_OR_DESCENDANT"; }
 }
-static void failures(layer::State& state,const layer::Graph& graph) {
+void failures(layer::State& state,const layer::Graph& graph) {
     for(auto id:graph.blocked) {
         auto& output=state.outputs.at(id); if(output.summary.status==3) continue;
         output.summary.status=2;

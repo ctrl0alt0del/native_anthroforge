@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "stacking_internal.hpp"
 namespace af::stacking {
 static void accepted_points(layer::Solved& output,const AfStackAccepted& input) {
     pair::require(input.count==int(output.points.size())&&(!input.count||input.points),"STACK_ACCEPTED_TOPOLOGY_MISMATCH");
@@ -10,7 +11,7 @@ static void accepted_points(layer::Solved& output,const AfStackAccepted& input) 
     }
     output.summary.status=input.status;
 }
-static std::set<uint64_t> accepted_inputs(layer::State& state,layer::Graph& graph,const AfStackAccepted* rows,int count,const std::set<uint64_t>& targets) {
+std::set<uint64_t> accepted_inputs(layer::State& state,layer::Graph& graph,const AfStackAccepted* rows,int count,const std::set<uint64_t>& targets) {
     std::set<uint64_t> accepted;
     for(int i=0;i<count;++i) {
         const auto& row=rows[i]; pair::require(!targets.count(row.id)&&state.outputs.count(row.id)&&accepted.insert(row.id).second,"STACK_ACCEPTED_ID");
@@ -47,7 +48,7 @@ static void contact(layer::State& state,layer::Graph& graph,const layer::Surface
         }
     }
 }
-static void neighbors(layer::State& state,const pair::Session& detection,layer::Graph& graph,const std::set<uint64_t>& targets,const std::set<uint64_t>& accepted,std::atomic<bool>& cancel) {
+void neighbors(layer::State& state,const pair::Session& detection,layer::Graph& graph,const std::set<uint64_t>& targets,const std::set<uint64_t>& accepted,std::atomic<bool>& cancel) {
     const auto surfaces=layer::final_snapshots(state,detection);
     for(auto first=surfaces.begin();first!=surfaces.end();++first) for(auto second=std::next(first);second!=surfaces.end();++second) {
         pair::require(!cancel,"PAIR_CANCELLED"); const auto a=first->first,b=second->first;
@@ -58,7 +59,7 @@ static void neighbors(layer::State& state,const pair::Session& detection,layer::
     }
     layer::propagate(graph);
 }
-static void reset_failed(layer::State& state,const pair::Session& detection,const layer::Graph& graph,const std::set<uint64_t>& targets) {
+void reset_failed(layer::State& state,const pair::Session& detection,const layer::Graph& graph,const std::set<uint64_t>& targets) {
     for(auto id:targets) if(graph.blocked.count(id)) {
         auto& output=state.outputs.at(id); output.points=detection.sides[detection.indices.at(id)].own;
         output.bonus.resize(0); output.summary.maximum=0;

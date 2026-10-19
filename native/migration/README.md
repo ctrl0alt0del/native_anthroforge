@@ -205,6 +205,17 @@ transport, chains, multiple providers, zero inflation, exact weighted constraint
 crop variables, selected regions, explicit/requested/excluded relationships and deliberate
 failures. `tests/fixtures/tissue/stacking.json` pins the DLL hash; reproduction uses
 `tools/capture_tissue_stacking.py`. Positions match at absolute 2e-7; rejection status and
-messages match. Cache reuse/cancellation pass separately. This qualifies the numerical
-batch adapter only: native tissue-domain preparation, application scheduling/publication,
-desktop relationships, broader geometry/performance and release qualification remain open.
+messages match. Cache reuse/cancellation pass separately. Native material preparation,
+provider-first application scheduling, atomic opposite-side groups and desktop relationship
+editing are now integrated. Workflow tests separately cover relaxed shells, exact backing,
+source pins, regions, Manual providers, failure retention and cancellation. Donor parity
+alone does not establish those integration contracts or anatomical correctness.
+
+Shared intrinsic acceptance additionally rejects new transverse self-intersections and
+collapsed faces after relaxation. `mesh_quality.cpp` reuses the pinned BVH/intersection
+kernel without changing raw solver parity. It compares the same canonical connectivity
+against inflated rest, reports baseline crossings separately and permits large normal
+rotations. Coplanar contact and continuous motion are not proven collision-free. Two raw
+donor relaxation fixtures and the curved Pouch diagnostic produce unusable crossing output;
+the application retains accepted geometry and reports failure. Explicit parameter changes
+recover the curved fixture; no automatic solver or preset substitution is performed.

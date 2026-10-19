@@ -19,7 +19,7 @@ from ui_acceptance import find
 def inspect(controller, window):
     exercise(controller, window)
     target = controller.selection
-    controller.run("tissue.inflation", dict(target=target, changes=dict(mode="NORMAL")))
+    configure(controller, target)
     settle(controller)
     click(window, "InflationToggle")
     click(window, "RelaxationToggle")
@@ -29,6 +29,11 @@ def inspect(controller, window):
     settle(controller)
     assert controller.session.document.object(target).relaxation.mode == "STATIC_PBD"
     regions(controller, window)
+
+
+def configure(controller, target):
+    controller.run("tissue.configure", dict(target=target, changes=dict(reverse=True)))
+    controller.run("tissue.inflation", dict(target=target, changes=dict(mode="NORMAL", amount=0.2)))
 
 
 def argument(value):
@@ -49,7 +54,7 @@ def regions(controller, window):
     settle(controller)
     item = controller.session.document.object(controller.selection)
     assert len(item.constraints) == 1 and item.constraints[0].mask == "BOUNDARY"
-    assert item.intrinsic_result.status == "ready"
+    assert item.intrinsic_result.status == "ready", item.intrinsic_result.error
     assert window.grabWindow().save(str(Path("build/022-tissue/regions-inspector.png")))
     click(window, "tissueRegionRemove")
     settle(controller)

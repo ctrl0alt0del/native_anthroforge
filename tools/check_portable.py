@@ -15,6 +15,7 @@ from inspection_portable import inspection
 from issues_portable import issues
 from profiler_portable import profiling
 from PySide6.QtGui import QImage
+from tissue_portable import tissues
 from workflow_portable import workflow
 
 CHECKS = (
@@ -34,6 +35,7 @@ CHECKS = (
     "surface rulers, named cameras and explanatory profile diagnostics",
     "independent fibers, shared lofts and portable embedded reference images",
     "window feedback capture, annotations, inbox preview, text editing and deletion",
+    "schema-4 tissues, attached construction, stacking, native profiling and rendering",
 )
 
 
@@ -130,6 +132,7 @@ def qualification_steps():
         workflow,
         inspection,
         construction,
+        tissues,
         feedback,
     )
 

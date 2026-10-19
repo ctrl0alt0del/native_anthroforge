@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+#include "stacking_internal.hpp"
 #include "tissue_stacking.hpp"
 
 namespace af::stacking {

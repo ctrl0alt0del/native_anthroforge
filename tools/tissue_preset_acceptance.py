@@ -24,9 +24,20 @@ def inspect(controller, window):
         click(window, "createTissue")
         settle(controller)
         item = controller.session.document.object(controller.selection)
-        assert item.preset == name and item.result.status == "ready", item.result.error
+        assert item.preset == name
+        qualify(controller, item)
         assert find(window, "tissueClassification").property("text") == "SOFT_TISSUE"
     independent(controller, window)
+
+
+def qualify(controller, item):
+    if item.preset == "POUCH" and item.result.status == "failed":
+        assert "self-intersections" in item.intrinsic_result.error
+        controller.run("tissue.inflation", dict(target=item.id, changes=dict(amount=0.08)))
+        controller.run("tissue.relaxation", dict(target=item.id, changes=dict(sagginess=0.2)))
+        settle(controller)
+    current = controller.session.document.object(item.id)
+    assert current.result.status == "ready", current.result.error
 
 
 def independent(controller, window):

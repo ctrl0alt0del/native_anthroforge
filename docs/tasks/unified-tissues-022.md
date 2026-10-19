@@ -30,6 +30,25 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+All 24 full-QML/hidden-GPU tissue qualification scripts now pass. Two failures were
+diagnosed: the Anchor test selected a hidden region selector with the same object name,
+so its lookup is now scoped to the actual Point inspector; the relaxation scenario used
+a thin curved shell that the quality guard correctly rejected (3,150 new crossings),
+so its valid-path scenario uses the already-qualified reversed 0.2 m shell. Invalid
+retention/recovery remains covered separately. Pouch creation explicitly verifies the
+donor-default rejection and explicit recovery. Inspected branched envelope, relaxed
+stacked shells and skull-fixture captures. Skull integration is not anatomical fitting.
+
+The complete native style gate exposed missing internal declarations in included stacking
+files. Shared helper declarations now live in the internal header; standalone clang-tidy
+passes for plan/resolve/group/validation and the owning TU, with the same numerical code.
+The full development gate is running again (`build/022-tissue/full-gate.txt`). A temporary
+portable candidate is building under `build/022-tissue/package`, not a second release dist.
+New `tissue_portable.py` exercises the JSON example, schema 4, four ready tissues, final-role
+Anchor, automatic stacking, profiling, hidden GPU rendering and offscreen desktop startup.
+It has not passed the packaged executable yet. Version remains 0.2.1. The capability matrix
+and migration evidence map are consolidated; final walkthrough/release records are pending.
+
 The new executable example exposed a publication feedback loop that the original parallel
 source-creation fixture missed: a second Fiber captures support on an existing Tissue, and
 its consumer becomes a stacking candidate. Publishing the first Tissue's plan previously
@@ -463,10 +482,10 @@ profiler and portable acceptance, followed by ownership/coupling review.
 
 ## Next actions
 
-1. Finish attached-construction desktop entry points and role-aware consumers.
-2. Integrate intrinsic construction, attachment chains and stacking native kernels.
-3. Complete focused tissue inspectors and editing tools.
-4. Qualify and release, then validated merge/push. Do not merge partial checkpoints.
+1. Finish full development and portable gates; correct any failures.
+2. Finish walkthrough/API and final evidence, including ownership/coupling review.
+3. Qualify canonical 0.2.2 package/source archive, then validated merge/push.
+   Do not merge partial checkpoints or claim interactive desktop acceptance.
 
 ## Recovery inputs
 

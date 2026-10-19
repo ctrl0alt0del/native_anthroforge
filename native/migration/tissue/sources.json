@@ -1,0 +1,42 @@
+[
+  {
+    "source": "af_muscle_numeric.hpp",
+    "source_sha256": "bb8dfbc4aa2d91946cc4fe006476bb10092bb4b43c7687da762a56d327c03206",
+    "bytes": [
+      184,
+      833
+    ],
+    "file": "kernel_0.hpp",
+    "sha256": "793c02c910392a7a712aee44cf35eecb8f559fc8eaeedb9552de52ccc4343657"
+  },
+  {
+    "source": "af_muscle_numeric.hpp",
+    "source_sha256": "bb8dfbc4aa2d91946cc4fe006476bb10092bb4b43c7687da762a56d327c03206",
+    "bytes": [
+      919,
+      1132
+    ],
+    "file": "kernel_1.hpp",
+    "sha256": "a9a50f18aacffd9b74897984f50caac75feeec02794b6453859bbb00b25d11a3"
+  },
+  {
+    "source": "af_muscle_numeric.hpp",
+    "source_sha256": "bb8dfbc4aa2d91946cc4fe006476bb10092bb4b43c7687da762a56d327c03206",
+    "bytes": [
+      6276,
+      12445
+    ],
+    "file": "kernel_2.hpp",
+    "sha256": "7df057b6f439a1f602e7982935dcd958cfef2782e56fcac25011313cef17e280"
+  },
+  {
+    "source": "af_muscle_envelope_profile.hpp",
+    "source_sha256": "348f83262c15e9ead662e8424915b6935953b51c1a936d8d7d1f974188c528dd",
+    "bytes": [
+      91,
+      3851
+    ],
+    "file": "kernel_3.hpp",
+    "sha256": "c77317fe08641461bd2129e14edf08d1d2074998224077b88ef8e53ef9be6ff4"
+  }
+]

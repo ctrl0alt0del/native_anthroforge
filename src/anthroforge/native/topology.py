@@ -14,6 +14,9 @@ def configure(engine: GeometryEngine) -> None:
     from . import material
 
     material.configure(engine)
+    from . import tissue_inflation
+
+    tissue_inflation.configure(engine)
     engine.bind("af_mesh_reuse_topology", [U, U, U], U)
     engine.bind("af_mesh_draft", [U, U], U)
     engine.bind("af_mesh_storage_bytes", [U], U)

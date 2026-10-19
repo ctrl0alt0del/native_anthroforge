@@ -212,7 +212,10 @@ def curve_schedulers() -> dict[str, TaskScheduler]:
 
 
 def anchor_schedulers() -> dict[str, TaskScheduler]:
+    from .tissue_scheduling import policies
+
     return {
         "anchor_capture": FiberCaptureTaskScheduler(),
         "anchor_binding": AttachmentTaskScheduler(),
+        **policies(),
     }

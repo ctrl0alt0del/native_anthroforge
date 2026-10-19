@@ -53,6 +53,19 @@ Native meshes now retain validated material grids and welded branch vertex ident
 deformation, finalization, memory accounting and project storage preserve them. This
 supplies exact source correspondence for the upcoming tissue evaluators.
 
+Ordinary loft inflation now uses pinned addon kernels for Distributed, control-point
+falloffs and Section Profile directions. Nine addon-generated fixtures match at 1e-12.
+Native accepted-grid refinement provides interior samples without source mutation.
+Coordinated base/rest/intrinsic/final jobs, phase-aware publications, tissue creation
+and inflation commands work for ordinary one-sided loft tissue with stacking disabled.
+Five workflow/architecture checks pass, including source motion, base reuse, transform
+rejection, deletion/undo and schema-4 stage round trips. Other intrinsic strategies
+and stacking currently fail explicitly; they must be completed before release.
+Desktop tissue interaction is the next integration step, not yet accepted.
+Inflation/stage checkpoint full suite: **983 passed**, 335 Qt warnings, 31.25 seconds.
+Configured mypy, ruff, formatting, three native CTests and changed-adapter clang-tidy
+checks pass. No runtime release or full tissue qualification is implied.
+
 Runtime integration remains incomplete: generalized Fiber roles, intrinsic numerical ports, stacking,
 full GUI and release qualification are still required. No 0.2.2 release is claimed.
 Unrelated untracked root `__init__.py` is preserved.

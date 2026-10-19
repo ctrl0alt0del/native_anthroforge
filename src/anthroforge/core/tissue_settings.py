@@ -80,6 +80,8 @@ class TissueInflation:
 def validate_inflation(item: TissueInflation) -> None:
     if item.mode not in INFLATION_MODES:
         raise ValueError("Unsupported tissue inflation mode.")
+    if item.falloff not in ("GAUSSIAN", "LINEAR", "SMOOTH", "SMOOTHSTEP"):
+        raise ValueError("Unsupported inflation falloff.")
     vector(item.scale, 3, "Radial scale")
     if min(item.scale) <= 0 or not 3 <= item.segments <= 256:
         raise ValueError("Positive radial scales and 3..256 profile segments are required.")

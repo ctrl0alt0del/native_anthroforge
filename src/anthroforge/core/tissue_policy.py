@@ -22,7 +22,9 @@ def inflation_modes(source: object) -> frozenset[str]:
     kind = domain(source)
     if kind != "SURFACE":
         return frozenset(("RADIAL" if kind == "POINT" else "PROFILE",))
-    modes = {"NORMAL", "CTRL_POINT", "DISTRIBUTED"}
+    modes = {"NORMAL"}
+    if isinstance(source, Membrane) and source.kind != "PATCH":
+        modes.update(("CTRL_POINT", "DISTRIBUTED"))
     if isinstance(source, Membrane) and source.kind == "LOFT" and not source.close_across:
         modes.add("SECTION_PROFILE")
     return frozenset(modes)

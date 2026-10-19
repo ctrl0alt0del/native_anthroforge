@@ -1,5 +1,25 @@
 # SCP attachment kernel provenance
 
+## Tissue inflation closure (0.2.2 in progress)
+
+`tissue/sources.json` records byte-exact ranges and SHA-256 hashes from the production
+addon's muscle grid and Section Profile numerical headers. Reproduce with
+`tools/capture_tissue_kernels.py ADDON_PATH`. Only the numerical closure is compiled;
+legacy batch exports, resampling and OpenMP dispatch are excluded. Owned adapters
+use the application's coordinator, cancellation token and immutable mesh resources.
+`tests/fixtures/tissue/inflation.json` contains nine actual addon outputs for
+Distributed, opposite orientation, disabled inflation, three control falloffs and
+three Section Profile directions. `tools/capture_tissue_reference.py` regenerates
+them without Blender. Compact grid comparisons pass at absolute 1e-12.
+
+Standalone settings retain double precision. Reference Section Profile inputs are
+first canonicalized by the donor's float32 property boundary before comparison.
+Tissue base refinement operates on the accepted membrane, retaining original grid
+lines and using native bilinear interpolation; it never mutates or reevaluates a
+Manual source from newer authored curves. This is an explicit standalone extension.
+Branches, two-sided composition, normal/radial/sweep construction, constrained
+smoothing, relaxation, crop and stacking qualification remain in progress.
+
 attachment_wave_reference.hpp is an unchanged copy of the addon's
 native/fiber_ccd/af_attachment_wave.hpp, captured 2026-10-16.
 SHA-256: 5BAF4DD3681EE327BF184639EAA2A8386DA43228004BE55345988E6F17097750.

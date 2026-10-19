@@ -4,9 +4,20 @@ from typing import Any
 
 from anthroforge.core.results import Port
 
-from . import anchor_tasks, construction_tasks, dependencies, geometry_outputs, path_tasks
+from . import (
+    anchor_tasks,
+    construction_tasks,
+    dependencies,
+    geometry_outputs,
+    path_tasks,
+    tissue_tasks,
+)
 
-FAMILIES = (("path", path_tasks), ("binding", anchor_tasks))
+FAMILIES = (
+    ({"path"}, path_tasks),
+    ({"binding"}, anchor_tasks),
+    ({"base", "rest", "intrinsic", "final"}, tissue_tasks),
+)
 
 
 def pending(session: Any, released: bool = False) -> None:
@@ -30,7 +41,7 @@ def propagate(session: Any, seeds: set[Port]) -> None:
     waiting = set().union(*(j.provides for j in session.scheduler.active_jobs if j.future is None))
     outputs -= waiting
     for role, family in FAMILIES:
-        family.schedule(session, {p.owner for p in outputs if p.output == role})
+        family.schedule(session, {p.owner for p in outputs if p.output in role})
     targets = {p.owner for p in outputs if p.output == "geometry"}
     geometry_outputs.pending(session, targets)
     construction_tasks.schedule(session, targets)

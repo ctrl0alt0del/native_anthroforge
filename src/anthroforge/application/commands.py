@@ -32,6 +32,7 @@ from . import (
     surface_operations,
     surface_preview,
     surface_sources,
+    tissue_operations,
 )
 from . import control_operations as controls
 from . import deformer_operations as deformers
@@ -41,6 +42,9 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "tissue.create": tissue_operations.create,
+    "tissue.configure": tissue_operations.configure,
+    "tissue.inflation": tissue_operations.inflation,
     "construction.point.create": point_operations.create,
     "construction.point.update": point_operations.update,
     "anchor.create": point_operations.anchor,
@@ -231,7 +235,7 @@ def evaluate(session: "Session", entities: list[str] | None = None) -> str:
     targets = (
         set(entities) if entities is not None else {item.id for item in session.document.entities}
     )
-    curves = set(entities) if entities is not None else set(session.document.registry.construction)
+    curves = set(entities) if entities is not None else set(session.document.registry.authored)
     output_tasks.schedule(session, curves, explicit=True)
     construction_tasks.evaluate(session, entities)
     captures = {

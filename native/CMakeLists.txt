@@ -15,7 +15,8 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/curve_surface.cpp src/surface_inputs.cpp src/surface_sampling.cpp src/surface_alignment.cpp
     src/surface_loft.cpp src/surface_patch_projection.cpp src/surface_patch_triangulation.cpp
     src/surface_patch_subdivision.cpp src/surface_patch_fairing.cpp
-    src/surface_branch_inputs.cpp src/surface_branch_sampling.cpp src/surface_branches.cpp)
+    src/surface_branch_inputs.cpp src/surface_branch_sampling.cpp src/surface_branches.cpp
+    src/tissue_inflation.cpp src/tissue_validation.cpp src/tissue_refinement.cpp)
 
 add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_cubic_refit.c

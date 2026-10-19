@@ -51,8 +51,9 @@ current-shape editing, explicit junctions and generic loft/patch/branch surfaces
 with desktop controls and the shared API. Routing includes native warm-span remapping and
 actual skull donor parity. Authored-engine collision checks use the read-only Issues service.
 Direct control.attach is retired; shared controls use ordinary transform relationships.
-Source and offscreen qualification has passed; version metadata is now 0.2.0 for portable
-candidate packaging. The release remains unmerged until relocated package checks pass.
+Source and offscreen qualification and relocated portable checks have passed. Final visual
+inspection caught a hardcoded 0.1.9 title-bar label; it now reads Qt application metadata.
+The corrected desktop entry point must be rebuilt and checked before release integration.
 The current coordinator, attachment kernels, Issues, profiler, transactions and
 staged renderer must be extended at their owning boundaries, not duplicated.
 
@@ -955,3 +956,23 @@ camera restoration, and a 512-SCP/128-point curve with inspector visible/hidden 
 Logs are `build/020-primitive-regression.log` and `build/020-*-final.log`. These are synthetic
 events on the offscreen platform, not desktop input. QA helper changes pass Ruff and function
 limits separately; no runtime source changed after the complete gate.
+
+### Relocated package and final presentation correction
+
+The c999896 executable passed all relocated portable checks with a minimal PATH, stripped
+developer environment and the offscreen platform. PNG/JPEG decoding, embedded-image
+rendering, complete desktop QML, schema persistence and headless/desktop profiling passed.
+The first run rejected the old QA fixture's control-as-workspace-member; the fixture now
+uses anatomical membership. Production validation correctly enforced the 0.2.0 contract.
+Evidence: `build/portable-020-final.log` and the temporary `anthroforge-020-c999896/work-final`
+directory. Four packaged skull fibers were recalculated at 80 samples, their loft updated,
+then saved and reopened. The complete Qt-free report contains four fresh native route calls
+(18.56e4 microseconds inclusive total); uncontrolled load prevents a latency guarantee.
+
+Actual packaged skull and loft captures were inspected. Full-QML offscreen UI capture has
+no 3D framebuffer, so invisible QQuickRenderControl captures establish the geometry evidence
+separately. No visible window or desktop input was used. The UI capture exposed a hardcoded
+old version label. Desktop engine creation now publishes the application package version
+through Qt's standard application metadata; QML reads that property. The offscreen editor,
+typing, architecture/function-limit checks and Ruff pass. Rebuild and requalify this narrow
+presentation correction, then finalize documentation/source artifacts and merge.

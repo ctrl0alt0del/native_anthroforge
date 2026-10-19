@@ -52,7 +52,7 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 12; anchors.rightMargin: 10; spacing: 10
                 Label { text: "ANTHROFORGE"; font.bold: true; font.pixelSize: 12; font.letterSpacing: 1; color: Theme.text }
-                Label { text: "0.1.9"; color: Theme.accent; font.pixelSize: 10 }
+                Label { objectName: "applicationVersion"; text: Application.version; color: Theme.accent; font.pixelSize: 10 }
                 UiMenuBar {
                     background: Item {}
                     UiMenu { title: "File"; UiMenuItem { action: newAction } UiMenuItem { action: openAction } MenuSeparator {} UiMenuItem { action: saveAction } UiMenuItem { action: saveAsAction } MenuSeparator {} UiMenuItem { action: importAction } MenuSeparator {} UiMenuItem { objectName: "exportInspectionMenu"; text: "Export inspection report…"; enabled: !workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered: { viewport.storeCamera(); reportDialog.open(); } } }

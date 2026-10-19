@@ -21,9 +21,7 @@ def workflow(executable, cwd, invoke):
 
 def requests(entity, control):
     return [
-        dict(
-            operation="workspace.create", arguments=dict(name="Review", members=[entity, control])
-        ),
+        dict(operation="workspace.create", arguments=dict(name="Review", members=[entity])),
         dict(operation="workspace.update", arguments=dict(display_units="mm")),
         dict(operation="workspace.preset", arguments=dict(name="shape")),
         dict(operation="inspect.target", arguments=dict(entity=control)),

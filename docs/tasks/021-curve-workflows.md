@@ -81,7 +81,18 @@ Actual QTest mouse/modifier events verify click/Shift-click placement, axis view
 cancellation and one-action undo. Versions/docs now target 0.2.1; full gate and portable
 qualification still pending. Source and source-package provenance remain unchanged upstream.
 
-## Recovery
+## Qualification checkpoint
+
+Full Windows development gate passes at `c4dc5be`: 896 tests, three native CTests, native
+style, Ruff/formatting, mypy, function limits, script checks and dependency/native doctor.
+Construction/surface, curve interaction, view gestures and camera restoration acceptance
+all pass offscreen. Surface QA uses the retained generic creation API after menu retirement.
+The large-list QA now stops profiling asynchronously while pumping Qt events. Its previous
+blocking stop caused collector timeout; those earlier timing comparisons are not release
+evidence. The new complete report has no loss and no ChoiceModel resets; 72 description
+binding evaluations average 1.60 ms inclusive, max 13.79 ms. Packaging remains pending.
+
+## Recovery constraints
 
 Preserve untracked root `__init__.py` and original
 `E:/development/WIP_models/solver_test.anthroforge`. Never use visible test windows or

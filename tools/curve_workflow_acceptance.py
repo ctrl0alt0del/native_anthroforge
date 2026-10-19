@@ -146,10 +146,21 @@ def preview(window, controller, key):
 
 def report(controller):
     path = OUTPUT / "large-lists.afprofile.zip"
-    controller.session.command("profile.stop", path=str(path), wait=True)
+    controller.session.command("profile.stop", path=str(path), wait=False)
+    await_export(controller)
     with ZipFile(path) as archive:
+        manifest = json.loads(archive.read("manifest.json"))
+        assert manifest["complete"], manifest
         summary = json.loads(archive.read("summary.json"))
     (OUTPUT / "summary.json").write_text(json.dumps(summary, indent=2))
+
+
+def await_export(controller):
+    for _ in range(400):
+        if controller.session.profiler.done.is_set():
+            break
+        QTest.qWait(25)
+    assert controller.session.profiler.state == "saved", controller.session.profiler.status()
 
 
 def run():

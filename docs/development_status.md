@@ -10,12 +10,13 @@ optional searchable exclusions and authored-point subsets, Advanced solver budge
 VCP/muscles/soft tissues remain 0.2.2. Schema 3 and the native solver are retained.
 Older explicit obstacle lists retain Manual mode; switch to Automatic to adopt new inputs.
 
-Source regression: **896 tests pass** (24 warnings from the existing QQmlPropertyMap API,
+Full Windows development gate passes: **896 tests** (24 warnings from the existing QQmlPropertyMap API,
 including 15 in the new gesture tests). Native builds/three CTests and clang-tidy pass.
 New tests cover automatic scene membership, cyclic consumers, new/moved/deleted geometry,
 preview staleness, Manual pending provenance, missing accepted geometry, running-job
 supersession, visibility/workspace independence, capture reuse/eviction/concurrency and
-point-placement history. Full development gate and portable qualification are pending.
+point-placement history. Ruff, mypy, function limits, dependency/native doctor and script
+checks pass. Portable qualification is pending.
 
 Actual QML offscreen tests pass with 120 obstacles/120 authored points: bounded delegates
 (including Qt reuse pool), search, stable numbering, duplicate-name context, required-row
@@ -23,13 +24,17 @@ protection, scoped bulk edits, retained search/scroll, focused-point highlightin
 accept and undo. Mouse/modifier events verify placement, axis views during placement,
 completion and cancellation. Captures inspected with fonts are under `build/021-curve-workflows`.
 Software offscreen validates controls/layout; it does not establish Quick3D geometry quality.
+Construction/surface editors, existing curve interaction, view gestures and camera restoration
+also pass their offscreen acceptance scripts.
 
 Recorded 100-cube routing: one 0.60 ms native capture reused across eight solves; mean solve
 72.34 ms versus prior combined capture/solve 72.64 ms. This is capture reuse evidence, not a
 meaningful whole-solve speedup. Full-scene native spatial queries remain authoritative.
-The large-editor report exposed repeated candidate-graph preparation; a structural cache
-reduced the obstacle binding's inclusive total from 127 ms to 64 ms over 38 refreshes in
-serial trials. Inclusive nested timings overlap; no general frame-rate claim is made.
+The large-editor report exposed repeated candidate-graph preparation; descriptions now reuse
+structural graph identity. The complete final report has no collector loss or ChoiceModel
+resets. Across 72 obstacle-description binding evaluations, inclusive mean is 1.60 ms and
+maximum 13.79 ms. Earlier serial comparisons had an incomplete Qt shutdown and are not used
+as speedup evidence. Inclusive nested timings overlap; no general frame-rate claim is made.
 
 Ownership review: eligibility/cycle policy and required-point rules are shared core contracts;
 fan-out uses the existing coordinator and marks geometry pending before consumers capture

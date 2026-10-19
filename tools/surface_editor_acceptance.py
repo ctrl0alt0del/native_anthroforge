@@ -111,7 +111,7 @@ def run():
         closed_preview(controller, engine)
         assert not warnings, warnings
         assert not controller.message, controller.message
-        print("Offscreen surface menu, inspector, Realign, undo and mesh staging passed.")
+        print("Offscreen surface creation, inspector, Realign, undo and mesh staging passed.")
     finally:
         controller.close()
         delete(engine)
@@ -124,7 +124,7 @@ def closed_preview(controller, engine):
     controller.select(curves[0])
     controller.select(curves[1], True)
     before = len(controller.session.document.objects)
-    action(engine, "createLoftSurface", "triggered")
+    controller.createSurface("LOFT")
     settle(controller)
     assert len(controller.session.document.objects) == before
     assert controller.surfacePreview["state"] == "ready", controller.surfacePreview

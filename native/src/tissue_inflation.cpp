@@ -29,6 +29,7 @@ static void profile(kernel::AfMuscleOutput& output,const AfTissueInflation& s) {
         throw std::runtime_error("Section Profile has a degenerate material frame.");
 }
 Points inflate_grid(const Mesh& source,const MaterialGrid& grid,const AfTissueInflation& settings,uint64_t cancel) {
+    const kernel::CancelScope scope(cancel);
     validate_inflation(settings,grid);
     auto output=prepared(source,grid,cancel);
     if(settings.mode==2) profile(output,settings);

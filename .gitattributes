@@ -12,4 +12,5 @@
 *.png binary
 native/vendor/curve_fit_nd/** text eol=lf
 native/migration/routing/*.hpp -text
+native/migration/tissue/*.hpp -text
 

@@ -125,6 +125,8 @@ PENDING_STATUS = (
 
 def evaluation_status(value: Any) -> tuple[str, str, str, str] | None:
     result = value.result
+    if result.status == "unstacked" and result.error:
+        return ("STACKING_FAILED", "Showing current unstacked tissue", "error", result.error)
     if result.status == "failed" or getattr(value, "status", "") == "failed":
         return (
             "EVALUATION_FAILED",

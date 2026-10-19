@@ -73,3 +73,17 @@ def roundtrip(session, path):
     session.wait()
     session.command("open", path=str(path))
     session.wait()
+
+
+def test_manual_tissue_keeps_geometry_until_explicit_evaluation(session):
+    _, _, key = assembly(session)
+    before = mesh(session, key)
+    session.command("update_mode", entity=key, mode="MANUAL")
+    session.command("tissue.inflation", target=key, changes=dict(amount=0.12))
+    session.wait()
+    item = session.document.object(key)
+    assert item.result.status == "pending"
+    np.testing.assert_array_equal(session.assets[item.result.asset].mesh.array(0), before)
+    session.command("evaluate", entities=[key])
+    session.wait()
+    assert not np.array_equal(mesh(session, key), before)

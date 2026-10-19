@@ -1,14 +1,17 @@
 """Inflation parity uses actual addon outputs, not a Python production fallback."""
 
 import json
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 from pathlib import Path
+from time import sleep
 
 import numpy as np
 import pytest
 
 from anthroforge.core.tissue_settings import SectionProfile, TissueInflation
 from anthroforge.native import material, tissue_inflation
+from anthroforge.native.mesh import NativeCancellation
 
 FIXTURE = Path(__file__).parent / "fixtures/tissue/inflation.json"
 
@@ -58,3 +61,29 @@ def test_zero_amount_does_not_disable_section_profile(session):
     value = replace(settings(case["settings"]), amount=0)
     output = tissue_inflation.evaluate(source, value)
     np.testing.assert_allclose(output.array(0), np.array(case["output"]).reshape(-1, 3), atol=1e-12)
+
+
+def test_profile_cancels_inside_the_native_kernel(session):
+    case = json.loads(FIXTURE.read_text())["cases"][-2]
+    source = tissue_inflation.refine(grid_mesh(session.engine, case["points"]), 256)
+    cancel = NativeCancellation(session.engine)
+    with ThreadPoolExecutor(1) as executor:
+        task = executor.submit(
+            tissue_inflation.evaluate, source, settings(case["settings"]), False, cancel.handle
+        )
+        sleep(0.02)
+        assert not task.done(), "Fixture must exercise an active native computation."
+        cancel.set()
+        with pytest.raises(ValueError, match="[Cc]ancel"):
+            task.result(timeout=2)
+
+
+def test_pinned_kernel_ranges_retain_source_bytes():
+    import hashlib
+
+    directory = Path(__file__).parents[1] / "native/migration/tissue"
+    for record in json.loads((directory / "sources.json").read_text()):
+        assert (
+            hashlib.sha256((directory / record["file"]).read_bytes()).hexdigest()
+            == record["sha256"]
+        )

@@ -126,7 +126,7 @@ def frame(controller):
 
 
 def frame_bounds(session, item, scales):
-    if item.id in session.document.registry.construction:
+    if item.id in session.document.registry.authored:
         return object_interaction.bounds(session, item)
     key = geometry_asset(item)
     if not key:

@@ -53,7 +53,7 @@ def locks(session: "Session | InspectionContext", entity: str) -> list[dict[str,
 def geometry(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
     from . import construction_inspection
 
-    if item.id in session.document.registry.construction:
+    if item.id in session.document.registry.authored:
         return construction_inspection.geometry(session, item)
     key = geometry_asset(item) if item.id in session.document.index.entities else ""
     if not key:

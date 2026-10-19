@@ -7,12 +7,13 @@ from anthroforge.application.transform_policy import require_object_transform
 from anthroforge.core.points import Point
 from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.core.surfaces import Surface
+from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import components
 
 
 def editable(controller):
     session, selected = controller.session, controller.selection
-    if selected in session.document.registry.construction:
+    if selected in session.document.registry.authored:
         return object_operations.editable(session, selected)
     return session.editable(selected)
 
@@ -26,7 +27,7 @@ def require_transform(controller):
 
 
 def transform_command(controller, values):
-    if controller.selection in controller.session.document.registry.construction:
+    if controller.selection in controller.session.document.registry.authored:
         return "object.transform", dict(target=controller.selection, values=values, world=True)
     return "scp.transform", dict(entity=controller.selection, values=values)
 
@@ -50,7 +51,7 @@ def bounds(session, item):
 def local_bounds(session, item):
     if isinstance(item, ReferenceImage):
         return (-item.width / 2, -item.height / 2, 0, item.width / 2, item.height / 2, 0)
-    if isinstance(item, Surface):
+    if isinstance(item, (Surface, TissueVCP)):
         asset = session.assets.get(item.result.asset)
         return asset.mesh.bounds if asset else None
     resource = session.resources.paths.get(item.result.asset)

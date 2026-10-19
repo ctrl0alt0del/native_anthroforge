@@ -10,7 +10,12 @@ from .construction_metadata import describe
 from .record_model import RecordModel
 from .values import qml
 
-CATEGORIES = {"IMAGE": "images", "SURFACE": "geometry", "MEMBRANE": "geometry"}
+CATEGORIES = {
+    "IMAGE": "images",
+    "SURFACE": "geometry",
+    "MEMBRANE": "geometry",
+    "TISSUE": "geometry",
+}
 
 
 class ConstructionProjection:

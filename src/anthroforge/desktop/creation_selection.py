@@ -20,6 +20,9 @@ class CreationSelection:
         context = self.signature()
         self.pending = None
         result = self.controller.run(operation, arguments)
+        if isinstance(result, str) and result in self.controller.session.document.registry.authored:
+            self.accept(result)
+            return result
         registry = self.controller.session.scheduler.registry
         job = registry.by_id.get(result.get("job_id") if isinstance(result, dict) else result)
         if job is not None and len(job.outputs) == 1:

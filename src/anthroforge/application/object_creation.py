@@ -14,10 +14,21 @@ def placement(
     session: "Session", parent: str, owner: str, values: list[float] | None
 ) -> dict[str, Any]:
     if owner:
-        session.editable(owner)
+        require_owner(session, owner)
     require_parent(session, parent)
     frame = session.engine.transform(values) if values is not None else IDENTITY
     return dict(parent=parent, owners=(owner,) if owner else (), matrix=frame)
+
+
+def require_owner(session: "Session", owner: str) -> None:
+    from .object_operations import editable
+
+    if owner not in session.document.registry.anatomy:
+        raise ValueError("Construction association requires an anatomical SCP or Tissue.")
+    if owner in session.document.registry.authored:
+        editable(session, owner)
+    else:
+        session.editable(owner)
 
 
 def require_parent(session: "Session", parent: str) -> None:

@@ -1,12 +1,13 @@
 """Construction meshes use the existing staged mesh display and picking model."""
 
 from anthroforge.core.surfaces import Surface
+from anthroforge.core.tissues import TissueVCP
 
 from .presentation import geometry_flags
 
 
 def metadata(session, item, row):
-    if not isinstance(item, Surface):
+    if not isinstance(item, (Surface, TissueVCP)):
         return {}
     asset = session.resources.meshes.get(item.result.asset)
     mesh = asset.mesh if asset else None

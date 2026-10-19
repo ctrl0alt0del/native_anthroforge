@@ -251,7 +251,7 @@ def update_mode(session: "Session", mode: str, entity: str = "") -> None:
 
 
 def set_update_mode(session: "Session", entity: str, mode: str) -> None:
-    if entity in session.document.registry.construction:
+    if entity in session.document.registry.authored:
         from .object_operations import editable, install
 
         install(session, replace(editable(session, entity), update_mode=mode))

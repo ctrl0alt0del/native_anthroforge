@@ -20,6 +20,7 @@ ColumnLayout {
     UiCombo { Layout.fillWidth: true; model: panel.parents; textRole: "name"; valueRole: "id"; currentIndex: indexOfValue(panel.selected.parent || ""); hint: "Ordinary transform parent · preserves world placement"; onActivated: workspace.run("object.reparent",{target:panel.selected.id,parent:currentValue}) }
     UiCombo { visible: panel.selected.kind !== "IMAGE"; Layout.fillWidth: true; model: ["INHERIT", "LIVE", "ON_RELEASE", "MANUAL"]; currentIndex: Math.max(0,model.indexOf(panel.selected.update_mode)); onActivated: workspace.run("update_mode",{entity:panel.selected.id,mode:currentText}) }
     UiButton { text: "Delete construction object"; Layout.fillWidth: true; onClicked: workspace.run("object.delete",{target:panel.selected.id}) }
+    UiButton { objectName: "createTissue"; visible: ["ANCHOR","FIBER","MEMBRANE"].includes(panel.selected.kind); text: "Create tissue…"; Layout.fillWidth: true; onClicked: workspace.createConstruction("tissue.create",{source:panel.selected.id}) }
     PrimitiveInspector { visible: panel.selected.kind === "CURVE" || panel.selected.kind === "FIBER" }
     ImageInspector { id: imageInspector; visible: panel.selected.kind === "IMAGE" }
     SurfaceInspector { visible: ["SURFACE","MEMBRANE"].includes(panel.selected.kind) }

@@ -238,9 +238,7 @@ class Session:
 def changed_ids(previous: Document, current: Document) -> set[str]:
     changed = {e.id for e in previous.entities if e != current.index.entities.get(e.id)}
     changed |= {c.id for c in previous.controls if c != current.index.controls.get(c.id)}
-    return changed | {
-        o.id for o in previous.objects if o != current.registry.construction.get(o.id)
-    }
+    return changed | {o.id for o in previous.objects if o != current.registry.authored.get(o.id)}
 
 
 def object_descriptions(document: Document) -> list[dict[str, Any]]:

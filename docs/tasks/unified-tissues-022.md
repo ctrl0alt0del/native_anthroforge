@@ -61,7 +61,18 @@ and inflation commands work for ordinary one-sided loft tissue with stacking dis
 Five workflow/architecture checks pass, including source motion, base reuse, transform
 rejection, deletion/undo and schema-4 stage round trips. Other intrinsic strategies
 and stacking currently fail explicitly; they must be completed before release.
-Desktop tissue interaction is the next integration step, not yet accepted.
+Desktop ordinary-loft tissue creation/selection and inspector are now connected.
+Tissues appear in Anatomy, not Construction; generated transforms are disabled.
+`tools/tissue_editor_acceptance.py` passes full-QML offscreen controls without warnings;
+inspected `build/022-tissue/tissue-inspector.png` (offscreen platform has no 3D view).
+`tools/tissue_scene_acceptance.py` separately renders the inflated tissue via hidden
+GPU texture, with matching hover/click selection; inspected `tissue-gpu.png`.
+No desktop windows or user input were used. These qualify only the current ordinary
+loft increment, not the entire planned tissue UI or geometry workflow.
+Desktop/cancellation checkpoint full suite: **988 passed**, 475 Qt warnings,
+32.28 seconds. Active native Section Profile cancellation finishes within the two-second
+test deadline; pinned source bytes are checked, and Manual tissue evaluation retains its
+previous output until explicit evaluation. Formatting corrected after the gate's first pass.
 Inflation/stage checkpoint full suite: **983 passed**, 335 Qt warnings, 31.25 seconds.
 Configured mypy, ruff, formatting, three native CTests and changed-adapter clang-tidy
 checks pass. No runtime release or full tissue qualification is implied.

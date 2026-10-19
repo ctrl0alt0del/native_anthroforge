@@ -5,7 +5,7 @@ from anthroforge.application.transform_policy import object_reason
 from anthroforge.core.entities import descendants
 from anthroforge.core.results import Port, geometry_asset
 
-from . import scene_state, surface_scene
+from . import scene_state, surface_scene, tissue_projection
 from .property_projection import PropertyProjection
 
 
@@ -68,6 +68,7 @@ class SceneProjection:
         changes = session.changes.since(self.cursor if session is self.session else -1)
         full = changes.reset or self.workspace != session.workspace
         self.update_records(changes, full, structural_changes(changes))
+        tissue_projection.synchronize(self)
         self.session, self.cursor, self.workspace = (
             session,
             session.changes.serial,

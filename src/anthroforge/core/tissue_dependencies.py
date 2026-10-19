@@ -45,7 +45,7 @@ def edges(objects: tuple[ObjectRecord, ...]) -> dict[Port, set[Port]]:
 
 def tissue_edges(item: TissueVCP, records: Mapping[str, ObjectRecord]) -> dict[Port, set[Port]]:
     return {
-        Port(item.id, "base"): source_inputs(item, records),
+        Port(item.id, "base"): source_inputs(item, records) | {Port(item.id, "pose")},
         Port(item.id, "rest"): {Port(item.id, "base")},
         Port(item.id, "intrinsic"): {Port(item.id, "rest")} | constraint_inputs(item),
         Port(item.id, "final"): {Port(item.id, "intrinsic")},

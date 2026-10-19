@@ -7,6 +7,7 @@ from anthroforge.native.binding_batches import BindingBatch
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
 from anthroforge.native.strokes import Stroke
+from anthroforge.native.tissue_stacking import MaterialLease
 
 
 def inventories(profiler, owners):
@@ -16,7 +17,20 @@ def inventories(profiler, owners):
         strokes=stroke_inventory(owners),
         attachments=attachment_inventory(owners),
         routing_scenes=routing_scene_inventory(owners),
+        tissue_materials=tissue_material_inventory(owners),
     )
+
+
+def tissue_material_inventory(owners):
+    from .resource_inventory import memory_totals
+
+    values = {v for group in owners.values() for v in group if isinstance(v, MaterialLease)}
+    sizes = {id(v): v.bytes for v in values}
+    groups = {
+        name: {id(v) for v in group if isinstance(v, MaterialLease)}
+        for name, group in owners.items()
+    }
+    return memory_totals(list(values), sizes, groups, len(values))
 
 
 def routing_scene_inventory(owners):

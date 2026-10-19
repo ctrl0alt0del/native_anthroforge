@@ -25,6 +25,11 @@ class MaterialLease:
             c.byref(source), options.get("cancel", 0)
         )
         self.engine.check(not self.handle)
+        self.resources = (base, rest, own)
+        self.bytes = int(self.engine.library.af_tissue_stack_bytes(self.handle, False))
+        self.retained_bytes = int(self.engine.library.af_tissue_stack_bytes(self.handle, True))
+        if self.engine.resource_observer is not None:
+            self.engine.resource_observer(self)
 
     def __del__(self) -> None:
         if getattr(self, "handle", 0):

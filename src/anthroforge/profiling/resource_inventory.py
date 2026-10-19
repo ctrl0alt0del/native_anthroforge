@@ -10,11 +10,13 @@ from anthroforge.native.binding_batches import BindingBatch
 from anthroforge.native.mesh import Mesh
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
+from anthroforge.native.tissue_stacking import MaterialLease
 
 LIMITATIONS = [
     "Native mesh/path payload capacities; meshes include estimated full-binary AABB node bytes",
     "Images include owned encoded source and decoded RGBA bytes reachable from observed owners",
     "Routing scene capacities include observed cache/job captures; allocator overhead excluded",
+    "Tissue preparation includes owned arrays/visible meshes; source meshes counted separately",
     "Excludes allocator overhead, Python objects, Qt copies and GPU/driver allocations",
     "Ownership totals overlap; add neither owners nor shared alias handles",
     "Pre-recording job payload references may be unattributed; job snapshots are included",
@@ -37,6 +39,7 @@ RESOURCE_FIELDS = frozenset(
         "context",
     )
 )
+RESOURCE_TYPES = (Mesh, Path, ImageAsset, Field, RoutingScene, BindingBatch, MaterialLease)
 
 
 def payload_resources(value, profiler):
@@ -48,8 +51,9 @@ def payload_resources(value, profiler):
         if id(item) in seen:
             continue
         seen.add(id(item))
-        if isinstance(item, (Mesh, Path, ImageAsset, Field, RoutingScene, BindingBatch)):
+        if isinstance(item, RESOURCE_TYPES):
             found.update((item, item.path) if isinstance(item, Field) else (item,))
+            found.update(getattr(item, "resources", ()))
         else:
             pending.extend(bounded(children(item), 8192 - len(seen) - len(pending), profiler))
     return finish_payload(found, pending, profiler)

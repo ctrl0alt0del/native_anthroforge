@@ -57,6 +57,8 @@ def record_measurements(label, elapsed, context):
 
 def run(app, label):
     collector, controller, warnings = QtProfiler(), Controller(), []
+    if "--uncached" in sys.argv:
+        controller.session.engine.tissue_materials.budget = 0
     controller.profiler.collector = collector
     renderer = Offscreen(controller, warnings)
     collector.attach(renderer.window, controller)

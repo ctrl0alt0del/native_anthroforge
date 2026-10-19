@@ -27,13 +27,15 @@ class Resources:
 
     def attach(self, engine):
         engine.resource_observer = self.created
-        engine.bases.observer = self.cache
-        engine.routing_scenes.observer = self.cache
+        for cache in engine.caches():
+            cache.observer = self.cache
 
     def stop(self):
         self.sample(force=True)
         for engine in self.profiler.native.engines:
-            engine.resource_observer = engine.bases.observer = engine.routing_scenes.observer = None
+            engine.resource_observer = None
+            for cache in engine.caches():
+                cache.observer = None
         self.reset(False)
 
     def reset(self, observing):
@@ -103,8 +105,8 @@ class Resources:
             if view is not None:
                 view(result)
         for engine in self.profiler.native.engines:
-            result["cache"].update(engine.bases.retained())
-            result["cache"].update(engine.routing_scenes.retained())
+            for cache in engine.caches():
+                retain_cache(result["cache"], cache)
         return result
 
     def sample(self, force=False):
@@ -135,3 +137,10 @@ class Resources:
         return dict(
             inventory_inclusive_ns=self.cost_ns, resource_observation_ns=self.reference_cost_ns
         )
+
+
+def retain_cache(owner, cache):
+    values = cache.retained()
+    owner.update(values)
+    for value in values:
+        owner.update(getattr(value, "resources", ()))

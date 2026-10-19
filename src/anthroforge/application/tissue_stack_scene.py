@@ -9,6 +9,7 @@ from anthroforge.core.anatomical_surfaces import usable
 from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import components, stacking_abi
 from anthroforge.native.mesh import INT64, pointer
+from anthroforge.native.resource_cache import ResourceCache
 from anthroforge.native.scene import entity_frame
 from anthroforge.native.tissue_stacking import MaterialLease
 
@@ -37,9 +38,16 @@ def sides(state: Any) -> tuple[str, ...]:
 def lease(resources: Any, state: Any, side: str, cancel: int, final: bool = False) -> MaterialLease:
     keys = (state.base, state.rest, state.final if final else state.own)
     meshes = [resources.meshes[key].mesh for key in keys]
-    return MaterialLease(
+    cache: ResourceCache[MaterialLease] = meshes[0].engine.tissue_materials
+    key = state, side, final
+    cached = cache.get(key)
+    if cached is not None:
+        return cached
+    value = MaterialLease(
         meshes[0], meshes[1], meshes[2], state, frame=state.frame, side=side, cancel=cancel
     )
+    metadata_bytes = sum(len(f.values) for f in state.fields) * 8 + 4096
+    return cache.store(key, value, value.retained_bytes + metadata_bytes)
 
 
 class StackScene:

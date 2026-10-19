@@ -33,6 +33,17 @@ uint64_t af_tissue_stack_prepare(const AfTissueStackSource* source,uint64_t canc
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }
 void af_tissue_stack_release(uint64_t handle) { delete reinterpret_cast<af::tissue::stacking::Prepared*>(handle); }
+uint64_t af_tissue_stack_bytes(uint64_t handle,int include_sources) {
+    if(!handle) return 0;
+    const auto& p=*reinterpret_cast<const af::tissue::stacking::Prepared*>(handle);
+    uint64_t bytes=sizeof(p)+af::mesh_storage(*p.visible);
+    for(const auto* matrix:{&p.reference,&p.positions,&p.directions,&p.material}) bytes+=matrix->size()*sizeof(double);
+    for(const auto* values:{&p.selected,&p.faces,&p.parts,&p.sources,&p.material_faces,&p.interpolation,&p.fixed,&p.constraints})
+        bytes+=values->capacity()*sizeof(int64_t);
+    bytes+=(p.weights.capacity()+p.constraint_weights.capacity())*sizeof(double);
+    if(include_sources) for(const auto* mesh:{p.base.get(),p.rest.get(),p.own.get()}) bytes+=af::mesh_storage(*mesh);
+    return bytes;
+}
 int af_tissue_stack_domain(uint64_t handle,AfStackDomain* domain) {
     try {
         if(!handle||!domain) throw std::runtime_error("Missing prepared stacking domain.");

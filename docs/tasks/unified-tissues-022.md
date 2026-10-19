@@ -30,6 +30,24 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Immutable tissue material preparation is now reused through the existing bounded native
+resource cache (64 MiB/64 entries). Keys include accepted material state, side and intrinsic/
+final role; eviction preserves job-owned leases. Session shutdown releases cache ownership.
+Profiler reports attribute private preparation buffers and shared source meshes separately.
+Three cache tests cover reuse, eviction, oversize bypass and observation shutdown; the
+20-test cache/group/diagnostic/architecture selection passes. Native build/CTest, changed
+clang-tidy, Ruff and configured mypy pass.
+
+Serial counterbalanced cached/uncached/uncached/cached GPU workloads show preparation
+calls falling from 60 to 6 and totals from 58.0–58.3 ms to 5.6–5.7 ms. Overall six-edit
+means overlap: cached 624–638 ms/edit versus uncached 632–644, with within-run standard
+deviations 73–90 ms. No end-to-end speedup is established. System busy fraction was
+8.9–10.2%; other processes/thermal state were uncontrolled. Reports are under ignored
+`build/022-tissue/profile/`. Observed unique native bytes peak at 8.42 MB cached versus
+4.81 MB uncached; ownership categories overlap. Native solve remains dominant. These
+measurements include hidden texture readback, not physical display or input latency.
+Pouch qualification and complete release checks remain pending.
+
 Support regions now use native material-face lookup and footprint lines on the displayed
 revision. Draft selection/hover/cancel do not mutate documents; acceptance uses the shared
 relationship operation with topology/part/side validation and one-action undo. Changed inputs
@@ -44,7 +62,7 @@ First runtime profiler workload (`build/022-tissue/profile/before-cache.afprofil
 records six stacking-parameter edits with hidden GPU frames. Native resolve dominates:
 12 calls/3070 ms; planning 24/618 ms; material preparation 60/62 ms. Aggregate edit/wait/render
 durations include synchronization and readback and are not display/input latency. Bounded
-cross-job material reuse and its ownership attribution remain to implement; it cannot be
+cross-job material reuse and its ownership attribution were subsequently implemented; they cannot be
 presented as a fix for the dominant native solver cost. Pouch geometry and release checks
 remain pending.
 

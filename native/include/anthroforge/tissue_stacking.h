@@ -21,6 +21,7 @@ extern "C" {
 #endif
 AF_API uint64_t af_tissue_stack_prepare(const AfTissueStackSource* source,uint64_t cancel);
 AF_API void af_tissue_stack_release(uint64_t handle);
+AF_API uint64_t af_tissue_stack_bytes(uint64_t handle,int include_sources);
 // Returned pointers remain valid for the lifetime of the preparation lease.
 AF_API int af_tissue_stack_domain(uint64_t handle,AfStackDomain* domain);
 AF_API uint64_t af_tissue_stack_apply(uint64_t first,uint64_t second,const double* a,int acount,

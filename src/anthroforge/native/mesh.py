@@ -13,6 +13,7 @@ from .resource_cache import ResourceCache
 
 if TYPE_CHECKING:
     from .routing_scene import RoutingScene
+    from .tissue_stacking import MaterialLease
 
 D = c.POINTER(c.c_double)
 INT64 = c.POINTER(c.c_int64)
@@ -37,7 +38,17 @@ class GeometryEngine(NativeEngine):
         self.routing_scenes: ResourceCache[RoutingScene] = ResourceCache(
             64 * 1024 * 1024, 8, "routing_scene"
         )
+        self.tissue_materials: ResourceCache[MaterialLease] = ResourceCache(
+            64 * 1024 * 1024, 64, "tissue_material"
+        )
         self.resource_observer: Any = None
+
+    def caches(self) -> tuple[Any, ...]:
+        return self.bases, self.routing_scenes, self.tissue_materials
+
+    def clear_caches(self) -> None:
+        for cache in self.caches():
+            cache.clear()
 
     def _construction_signatures(self) -> None:
         from . import bodies, components, construction, curve_surfaces, falloff, scene, topology

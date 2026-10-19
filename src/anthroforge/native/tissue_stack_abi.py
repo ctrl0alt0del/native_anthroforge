@@ -25,5 +25,6 @@ class Source(c.Structure):
 def configure(engine: Any) -> None:
     engine.bind("af_tissue_stack_prepare", [c.POINTER(Source), U], U)
     engine.bind("af_tissue_stack_release", [U], None)
+    engine.bind("af_tissue_stack_bytes", [U, c.c_int], U)
     engine.bind("af_tissue_stack_domain", [U, c.POINTER(Domain)])
     engine.bind("af_tissue_stack_apply", [U, U, D, c.c_int, D, c.c_int, U], U)

@@ -20,6 +20,9 @@ static void memory_row(uint64_t handle,const Mesh& value,uint64_t* row) {
     row[5]=value.vertices.rows(); row[6]=value.triangles.rows();
 }
 void set_error(const std::string& message) { last_error=message; }
+uint64_t mesh_storage(const Mesh& mesh) {
+    uint64_t row[7]{}; memory_row(0,mesh,row); return row[2]+row[3]+row[4];
+}
 std::shared_ptr<Mesh> mesh(uint64_t handle) {
     std::lock_guard<std::mutex> lock(registry_mutex);
     auto found=registry.find(handle);

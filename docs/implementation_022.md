@@ -106,3 +106,36 @@ limits and never claim unperformed interactive acceptance. Solver timings alone 
 establish responsiveness or anatomical correctness. Iteration-limit output remains warned.
 Deliver one `dist/0.2.2/AnthroForge.dist` and `dist/AnthroForge-0.2.2-source.zip` only after
 qualification. Do not replace an in-use distribution or introduce suffixed release folders.
+
+## Ownership and coupling review
+
+Reviewed separately from numerical/test success during qualification:
+
+- `tissue_policy` owns source/strategy eligibility. Desktop choices project it and application
+  operations enforce it; anatomical classification does not appear in native dispatch.
+- The role-aware surface provider owns readiness and immutable geometry leases. Anchor,
+  Fiber, routing and target-region adapters consume it. Captured material references live
+  in the resource graph and schema, rather than in temporary UI or native-global state.
+- Tissue stages and atomic stacking groups use existing coordinator jobs/reservations.
+  Native adapters are synchronous and have no additional executor. Accepted material
+  snapshots prevent Manual providers from combining old geometry with new authored settings.
+- Publication traversal stops at registered evaluators; alias traversal and authored
+  invalidation have separate contracts. This corrected the observed plan/path feedback
+  loop without hiding prerequisites or introducing a tissue-specific scheduler exception.
+- Preparation, deformation, field assignment, material queries and validation are native.
+  Python owns records, validation, batched argument packing, dependency orchestration and
+  publication; it does not iterate a solver or call back from individual native samples.
+- Preview and support-region drafts are presentation/application state. Accept invokes the
+  same commands and creates one transaction; Cancel does not mutate document history.
+- The bounded material cache retains leases rather than serializing native handles.
+  Jobs keep their resources after cache eviction; current state, history, checkpoints and
+  displayed/staged results retain their own reachability. Profiler ownership is overlapping,
+  so category totals must not be summed as unique memory.
+
+Known costs remain explicit: whole-graph orchestration and immutable record copying scale
+with document size, and constrained stacking dominates the measured small assembly. The
+cache reduced preparation work but did not establish an end-to-end responsiveness gain.
+Synchronous upstream QP/fit calls permit cancellation around, not during, factorization.
+These are measured/architectural limits, not promises of physical simulation or real-time
+performance on arbitrary assemblies. Background validation does not certify interactive
+focus handling or subjective usability on the user's desktop.

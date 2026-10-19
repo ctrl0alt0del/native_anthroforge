@@ -30,6 +30,16 @@ Keep the current 0.2.1 distribution intact until qualification. See the forthcom
 
 ## Current state
 
+Full `tools/check.ps1` now passes: native build/3 CTests, all authored native style checks,
+Ruff/format/configured mypy, script checks, **1,287 tests** (732 existing Qt deprecation
+warnings, 94.72 seconds), numerical imports and the native doctor. The new separate fresh-
+process tissue-example test also passes, proving the complete example does not import
+PySide6/Shiboken/Blender; function-length checks pass. It was added after full-suite
+collection. All 24 GUI scripts passed after the two targeted fixes below. The explicit
+capability matrix, walkthrough and ownership/coupling review are written. Cached profiler
+captures are complete with no reported loss, 54 hits/6 misses/6 insertions and explicit
+input/candidate invalidation reasons. Portable compilation/checks remain pending.
+
 All 24 full-QML/hidden-GPU tissue qualification scripts now pass. Two failures were
 diagnosed: the Anchor test selected a hidden region selector with the same object name,
 so its lookup is now scoped to the actual Point inspector; the relaxation scenario used

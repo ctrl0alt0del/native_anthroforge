@@ -84,6 +84,22 @@ The desktop and headless clients share these operations, policies and transactio
 See the [construction walkthrough](construction_020.md) and
 [release validation](development_status.md#construction-objects-020).
 
+Attached-point operations added on the 0.2.2 task branch:
+
+| Operation | Arguments | Result |
+| --- | --- | --- |
+| `construction.point.create` | optional `name`, `position`, `parent`, `owner`, TRS `values` | Point ID; omitted position uses the workspace cursor. |
+| `construction.point.update` | `target`, local `position` | Ordinary Point edit; Anchors require explicit rebind. |
+| `anchor.create` | Point `source`, anatomical `parent`, optional `role`, `name` | Independent Anchor creation with object/job IDs; source unchanged. |
+| `anchor.rebind` | Anchor `target`, anatomical `parent`, optional `role`, world `position` | Capture job ID; omitted position retains the current resolved location. |
+| `surface.create` | exclusively Fiber `curves`, existing surface settings | Creates a Membrane through the shared surface evaluator; mixed sources remain generic. |
+
+`parent` in Anchor capture names the anatomical target, not ordinary transform parenting.
+Explicit roles are `SCP_GEOMETRY`, `TISSUE_BASE` and `TISSUE_FINAL`; unavailable roles fail.
+Generic inspection, naming, deletion and Make Independent retain their existing meanings.
+Primitive `curve.point.*` operations are unrelated to construction-point lifecycle.
+See the [tissue walkthrough](tissues_022.md) and [executable example](../examples/tissues.json).
+
 | Operation | Arguments | Result |
 | --- | --- | --- |
 | `curve.create` | optional `name`, `points` (CurvePoint records), `parent`, anatomical `owner`, `engine`, typed `settings`, `closed`, TRS `values` | Independent curve ID; BEZIER default; POLYLINE and ROUTED supported; no SCP needed. |

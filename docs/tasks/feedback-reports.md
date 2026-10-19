@@ -63,3 +63,10 @@ Remaining: build and relocate `dist/0.2.1-reports/AnthroForge.dist`; run the exp
 suite including feedback capture/paint/submission; produce
 `dist/AnthroForge-0.2.1-reports-source.zip`, finalize docs and merge/push. Preserve the prior
 0.2.1 distribution/source archive. Local evidence: `build/feedback-*`.
+
+Final failure-path check found that capture errors emitted a notification without updating
+the controller's stable property projection. Reproduced an empty displayed status despite
+the error string, then routed it through `Controller.notify()`. Offscreen acceptance now
+asserts the displayed error and released draft, followed by successful profiling; all
+feedback/architecture tests pass. Rebuild the final package with this correction; the
+first `963eaba` packaging candidate is superseded and must not be delivered.

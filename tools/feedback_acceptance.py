@@ -180,6 +180,19 @@ def report_modal(window, controller):
     QTest.qWait(80)
 
 
+def capture_failure(controller):
+    from types import SimpleNamespace
+
+    controller.feedback.capture(SimpleNamespace(grabWindow=lambda: QImage()))
+    assert (
+        controller.state["message"] == controller.message
+        and "Screenshot failed" in controller.message
+    )
+    assert not controller.feedback.active and controller.feedback.image.isNull()
+    controller.message = ""
+    controller.notify()
+
+
 def profiling_shortcut(window, controller):
     from anthroforge.profiling import report
 
@@ -199,6 +212,7 @@ def exercise(window, controller):
     data = verify_archive(controller, key)
     menu_cancel(window, controller)
     report_modal(window, controller)
+    capture_failure(controller)
     profiling_shortcut(window, controller)
     assert controller.session.document is before and controller.session.history.cursor == cursor
     (OUTPUT / "acceptance.json").write_text(json.dumps(data, indent=2))

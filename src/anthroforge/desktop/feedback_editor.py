@@ -66,7 +66,7 @@ class FeedbackEditor(QObject):
             self.active = False
             self.image = QImage()
             self.controller.message = "Screenshot failed: " + str(error)
-            self.controller.changed.emit()
+            self.controller.notify()
         finally:
             self.capturing = False
             self.changed.emit()

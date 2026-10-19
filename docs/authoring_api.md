@@ -4,6 +4,28 @@ The [0.2.2 tissue contract](specification_022.md) is being implemented through t
 catalogue. Planned operation families and boundaries are in the
 [implementation plan](implementation_022.md); this notice does not advertise unimplemented APIs.
 
+### Tissue operations on the 0.2.2 task branch
+
+This increment is not a released 0.2.2 build. `tissue.create(source, name?, preset?)`
+accepts attached construction; `tissue.configure(target, changes)` edits general settings,
+and `tissue.inflation(target, changes, part="main", side="a")` retains mode-specific data.
+`tissue.relaxation(target, changes)` edits None/Geometric/Static PBD settings. Unsupported
+combinations fail through the same capability policy in desktop and headless clients.
+
+`tissue.constraint.add(target, mask="ALL", mode="FIXED", strength?, feather?, offset?)`
+returns a region ID. Use `tissue.constraint.update(target, constraint, changes)` or
+`tissue.constraint.remove(target, constraint)` to edit/remove it. This checkpoint exposes
+source-relative regions; target-region capture remains unfinished. Contradictory exact
+goals fail evaluation and retain accepted geometry. Iteration-limit solves can publish
+usable output with a separate convergence warning.
+
+`tissue.field.set(target, name, values, domain="BASE")` stores explicit normalized weights
+against the accepted Base or Rest domain, including all-zero values. `INFLATION` is reserved
+for normal-shell Base thickness weights; other names become custom constraint masks.
+Incompatible topology changes require explicit replacement/removal of the field.
+`tissue.field.remove(target, name)` requires removing its constraint references first.
+Generated tissue transforms remain unavailable. Generic object deletion preserves sources.
+
 ## Construction commands
 
 The desktop and headless clients share these operations, policies and transactions.

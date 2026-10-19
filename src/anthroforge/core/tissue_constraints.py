@@ -15,7 +15,7 @@ class TissueField:
     domain: str = "BASE"
 
     def __post_init__(self) -> None:
-        if not self.name:
+        if not self.name or self.name in ("ALL", "BACKING", "BOUNDARY", "ENDPOINTS", "SUSPENSION"):
             raise ValueError("Tissue field needs a name.")
         if self.domain not in ("BASE", "REST"):
             raise ValueError("Tissue field domain must be Base or Rest.")

@@ -20,6 +20,25 @@ Manual source from newer authored curves. This is an explicit standalone extensi
 Branches, two-sided composition, constrained smoothing, relaxation, crop and stacking
 qualification remain in progress.
 
+`kernel_4.hpp` pins the production Static PBD closure from `af_soft_tissue.hpp`.
+Native adapters now prepare source goals, named/custom masks, geodesic feathering,
+exact backing and soft tethers; geometric point/sweep/shell work also runs natively.
+`tests/fixtures/tissue/relaxation.json` retains actual addon results captured through
+background Blender 5.0.1 and a second donor solve with double-precision source goals.
+The latter isolates the kernel port from Blender `mathutils` float32 input rounding:
+three static envelope cases match within 1e-10. Legacy-input differences are separately
+bounded by 2e-5 metres (observed maximum about 1.05e-5); four geometric cases agree
+within 2e-7. Regenerate with `capture_tissue_relaxation.py -- ADDON_PATH FIXTURE_DIR`.
+This evidence does not qualify target-relative region bindings or all point relaxation.
+
+Intentional contracts: explicit constraints remain enforced with relaxation None;
+the addon bypassed them in that mode. Static relaxation reuses canonical triangulation
+instead of retriangulating polygons. The addon's sweep cap winding is retained, and
+generic solver adjacency uses undirected edge counts, as the donor does. Strict source
+winding remains a normal-shell construction requirement. No additional volume or contact
+guarantee is implied. Material fields store their domain/connectivity signature and fail
+explicitly after incompatible sampling changes rather than silently reassigning weights.
+
 `tissue_shape_fields.cpp`, `tissue_normal_shell.cpp` and `tissue_profile_sweep.cpp`
 port the addon's Python numerical preparation into native owned buffers. Source hashes
 and six actual outputs are in `tests/fixtures/tissue/shapes.json`; reproduce with

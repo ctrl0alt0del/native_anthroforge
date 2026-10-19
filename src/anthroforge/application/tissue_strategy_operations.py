@@ -7,7 +7,7 @@ from anthroforge.core import tissue_policy
 from anthroforge.core.tissue_constraints import TissueConstraint, TissueField
 from anthroforge.core.tissue_settings import TissueRelaxation
 
-from . import object_operations
+from . import object_operations, tissue_fields
 from .tissue_operations import tissue
 
 
@@ -69,7 +69,10 @@ def field_set(
     session: Any, target: str, name: str, values: list[float], domain: str = "BASE"
 ) -> None:
     item = tissue(session, target)
-    value = TissueField(name, tuple(values), domain=domain)
+    count, signature = tissue_fields.domain(session.resources, item, domain)
+    if len(values) != count:
+        raise ValueError(f"The {domain.lower()} field requires {count} explicit weights.")
+    value = TissueField(name, tuple(values), topology=signature, domain=domain)
     existing = tuple(f for f in item.fields if f.name != name)
     install(session, replace(item, fields=(*existing, value)))
 

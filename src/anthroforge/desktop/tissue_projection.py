@@ -30,6 +30,7 @@ def record(session, item, frame):
     row.update(
         tissue_modes=sorted(tissue_policy.inflation_modes(source)),
         tissue_domain=tissue_policy.domain(source),
+        tissue_masks=tissue_policy.region_masks(item),
     )
     return qml(row)
 

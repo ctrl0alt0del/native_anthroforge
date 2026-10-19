@@ -7,7 +7,7 @@ from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import topology
 from anthroforge.native.mesh import Mesh
 
-from . import tissue_construction, tissue_relaxation, tissue_sources
+from . import tissue_construction, tissue_fields, tissue_relaxation, tissue_sources
 from .tissue_output import TissueOutput
 
 
@@ -19,6 +19,7 @@ def accepted(resources: Any, result: Any, label: str) -> Mesh:
 
 def rest(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:
     tissue_sources.require_result(item.base_result)
+    tissue_fields.validate(resources, item, "BASE")
     if item.both_sides or len(item.parts) != 1:
         raise ValueError("Two-sided and branched tissue adapters are not yet available.")
     if item.parts[0].a.smoothing.mode != "OFF":
@@ -30,6 +31,7 @@ def intrinsic(
     engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int
 ) -> TissueOutput:
     mesh = accepted(resources, item.rest_result, "Inflated rest")
+    tissue_fields.validate(resources, item, "REST")
     if item.crop.enabled:
         raise ValueError("Tissue crop adapter is not yet available.")
     if item.relaxation.mode != "NONE" or item.constraints:

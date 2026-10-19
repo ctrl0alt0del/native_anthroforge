@@ -108,6 +108,21 @@ field topology protection are still pending. No full increment/release acceptanc
 Generic solver adjacency now uses undirected polygon edges, matching the donor; strict
 winding validation remains at normal-shell source construction. The donor sweep's cap
 winding is preserved by current parity fixtures rather than silently rewritten.
+Relaxation qualification adds seven actual addon cases plus separate exact-input static
+comparisons: static kernels match at 1e-10 with double goals; geometric source constraints
+match at 2e-7. Legacy mathutils precision differences remain recorded, bounded at 2e-5 m.
+Fields now retain topology signatures and fail explicitly after incompatible resampling.
+`tissue_relaxation_acceptance.py` exercises full-QML relaxation and region add/remove
+through shared commands, and `tissue_relaxation_scene.py` renders a constrained static
+envelope to a hidden GPU texture. Both pass without QML warnings. Inspected readable
+`regions-inspector.png` and `static-envelope-gpu.png`; no visible windows or real desktop
+input were used. The initial font-less offscreen capture was replaced after adding the
+same explicit Segoe UI setup as the other desktop acceptance tools.
+Target-relative constraints, field painting, complete part/side editors and all remaining
+release requirements are still pending. Native changed-file clang-tidy passes.
+Latest full suite: 1027 passed and one function-length failure in the new GPU acceptance
+tool; that helper was shortened and both architecture checks then passed. Configured
+mypy, Ruff and formatting pass. Do not report this as a completed release gate.
 Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification

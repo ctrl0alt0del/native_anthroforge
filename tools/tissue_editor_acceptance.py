@@ -67,13 +67,13 @@ def exercise(controller, window):
     assert find(window, "tissueName").property("visible")
 
 
-def run():
+def run(scenario=exercise):
     controller, warnings = Controller(), []
     engine = create_engine(controller, warnings)
     try:
         window = engine.rootObjects()[0]
         QTest.qWait(400)
-        exercise(controller, window)
+        scenario(controller, window)
         output = Path("build/022-tissue")
         output.mkdir(parents=True, exist_ok=True)
         assert window.grabWindow().save(str(output / "tissue-inspector.png"))

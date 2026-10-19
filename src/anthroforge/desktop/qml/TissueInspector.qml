@@ -37,6 +37,8 @@ ColumnLayout {
         }
         UiCheck { visible: panel.selected.tissue_domain !== "POINT"; text: "Reverse side"; checked: panel.item.reverse || false; onClicked: panel.configure("reverse",checked) }
     }
+    TissueRelaxation { item: panel.item; supported: !panel.muscleMode }
+    TissueRegions { item: panel.item; masks: panel.selected.tissue_masks || [] }
     UiSection {
         title: "Evaluation"
         NumericSetting { label: "Material resolution"; decimals: 0; value: panel.item.resolution || 24; onEdited: value => panel.configure("resolution",Math.round(value)) }

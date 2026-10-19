@@ -98,3 +98,20 @@ def test_zero_custom_thickness_field_remains_authoritative(session):
     output = mesh(session, key)
     np.testing.assert_array_equal(output[: len(base)], base)
     np.testing.assert_array_equal(output[len(base) :], base)
+
+
+def test_fields_reject_changed_material_sampling_without_remapping(session):
+    key = shell(session)
+    item = session.document.object(key)
+    count = session.assets[item.base_result.asset].mesh.counts[0]
+    session.command("tissue.field.set", target=key, name="INFLATION", values=[0.5] * count)
+    session.wait()
+    before = mesh(session, key)
+    session.command("tissue.configure", target=key, changes=dict(resolution=31))
+    session.wait()
+    item = session.document.object(key)
+    assert item.rest_result.status == "failed" and "topology" in item.rest_result.error
+    np.testing.assert_array_equal(session.assets[item.result.asset].mesh.array(0), before)
+    session.command("tissue.field.remove", target=key, name="INFLATION")
+    session.wait()
+    assert session.document.object(key).result.status == "ready"

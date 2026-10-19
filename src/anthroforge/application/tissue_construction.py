@@ -2,7 +2,8 @@
 
 from typing import Any
 
-from anthroforge.native import paths, tissue_inflation, tissue_shapes
+from anthroforge.core.tissue_parts import active
+from anthroforge.native import paths, tissue_parts, tissue_shapes
 from anthroforge.native.mesh import Mesh
 
 
@@ -18,7 +19,16 @@ def construct(engine: Any, resources: Any, item: Any, cancel: int) -> Mesh:
     if settings.mode == "NORMAL":
         field = next((f.values for f in item.fields if f.name == "INFLATION"), ())
         return tissue_shapes.normal(mesh, settings, field, item.reverse, cancel)
-    return tissue_inflation.evaluate(mesh, settings, item.reverse, cancel)
+    return muscle(mesh, item, cancel)
+
+
+def muscle(mesh: Mesh, item: Any, cancel: int) -> Mesh:
+    parts = active(item)
+    first = tissue_parts.evaluate(mesh, parts, "a", item.reverse, cancel)
+    if not item.both_sides:
+        return first
+    second = tissue_parts.evaluate(mesh, parts, "b", not item.reverse, cancel)
+    return tissue_parts.compose(first, second, item.reverse, cancel)
 
 
 def sweep(engine: Any, resources: Any, item: Any, cancel: int) -> Mesh:

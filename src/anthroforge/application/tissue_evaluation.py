@@ -20,8 +20,6 @@ def accepted(resources: Any, result: Any, label: str) -> Mesh:
 def rest(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> Mesh:
     tissue_sources.require_result(item.base_result)
     tissue_fields.validate(resources, item, "BASE")
-    if item.both_sides or len(item.parts) != 1:
-        raise ValueError("Two-sided and branched tissue adapters are not yet available.")
     if item.parts[0].a.smoothing.mode != "OFF":
         raise ValueError("Tissue field/smoothing adapters are not yet available.")
     return tissue_construction.construct(engine, resources, item, cancel)

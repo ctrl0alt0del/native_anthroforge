@@ -64,6 +64,7 @@ def write_mesh(archive: zipfile.ZipFile, key: str, asset: Asset) -> None:
     for kind, label in enumerate(MESH_BUFFERS):
         write_array(archive, f"assets/{key}/{label}.npy", asset.mesh.array(kind))
     write_array(archive, f"assets/{key}/material.npy", material.array(asset.mesh))
+    write_array(archive, f"assets/{key}/material_axes.npy", material.axes(asset.mesh))
     for label, values in zip(
         ("tissue", "tissue_weights"), tissue_domain.arrays(asset.mesh), strict=True
     ):
@@ -74,7 +75,8 @@ def read_mesh(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryE
     arrays = [read_array(archive, f"assets/{key}/{label}.npy") for label in MESH_BUFFERS]
     mesh = topology.restore(engine, arrays)
     domain = read_array(archive, f"assets/{key}/material.npy")
-    mesh = material.restore(mesh, domain)
+    coordinates = read_array(archive, f"assets/{key}/material_axes.npy")
+    mesh = material.restore(mesh, domain, parameters=coordinates)
     tissue = [
         read_array(archive, f"assets/{key}/{kind}.npy") for kind in ("tissue", "tissue_weights")
     ]

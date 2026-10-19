@@ -32,6 +32,7 @@ struct Mesh {
     Triangles triangles;
     std::vector<int64_t> corners, offsets, polygons;
     std::vector<int64_t> material;
+    std::vector<double> material_axes;
     TissueDomain tissue;
     std::vector<std::vector<float>> chunks;
     igl::AABB<Vertices,3> tree;

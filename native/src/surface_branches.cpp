@@ -21,6 +21,7 @@ Assembly main_assembly(const Rows& rows,const std::vector<Branch>& branches,bool
     auto across=uniform_stations(strips>0?1+(rows.size()-1)*size_t(strips):17);
     across.insert(across.end(),source.begin(),source.end()); across=unique_stations(std::move(across));
     result.main=across_grid(sampled_grid(rows,result.along,cancel),source,across,cancel);
+    result.axes=across; result.axes.insert(result.axes.end(),result.along.begin(),result.along.end());
     result.points=result.main.points; return result;
 }
 static Rows branch_rows(const Rows& rows,const Branch& branch) {
@@ -64,6 +65,9 @@ void append_branch(Assembly& assembly,const Rows& rows,const Branch& branch,bool
     const auto mapping=append_vertices(assembly,grid,size_t(first-assembly.along.begin()),boundary,along,cancel);
     append_faces(assembly,mapping,grid.rows,grid.columns,(branch.boundary!=0)!=assembly.flip);
     append_material_grid(assembly.material,mapping,grid.rows,grid.columns);
+    const auto across=normalized(std::vector<double>(first,last),branch.roots.front(),branch.roots.back());
+    assembly.axes.insert(assembly.axes.end(),across.begin(),across.end());
+    assembly.axes.insert(assembly.axes.end(),along.begin(),along.end());
 }
 static std::shared_ptr<Mesh> build(const Rows& rows,int main_count,const std::vector<Branch>& branches,bool exact,int strips,int samples,bool flip,uint64_t cancel) {
     auto assembly=main_assembly(Rows(rows.begin(),rows.begin()+main_count),branches,exact,strips,samples,cancel);
@@ -74,6 +78,7 @@ static std::shared_ptr<Mesh> build(const Rows& rows,int main_count,const std::ve
     for(const auto& branch:branches) append_branch(assembly,rows,branch,exact,samples,cancel);
     auto result=make_mesh(assembly.points,assembly.faces,cancel,false);
     result->material=std::move(assembly.material);
+    result->material_axes=std::move(assembly.axes);
     return result;
 }
 }

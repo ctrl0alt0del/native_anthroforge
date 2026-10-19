@@ -51,7 +51,8 @@ def side(data: dict[str, Any]) -> TissueSide:
 
 
 def part(data: dict[str, Any]) -> TissuePart:
-    return TissuePart(data["id"], side(data.get("a", {})), side(data.get("b", {})))
+    state = dict(data, a=side(data.get("a", {})), b=side(data.get("b", {})))
+    return TissuePart(**state)
 
 
 def constraint(data: dict[str, Any]) -> TissueConstraint:

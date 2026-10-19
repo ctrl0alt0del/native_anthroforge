@@ -120,10 +120,14 @@ class TissuePart:
     id: str = "main"
     a: TissueSide = field(default_factory=TissueSide)
     b: TissueSide = field(default_factory=TissueSide)
+    connector_width: float = 0.25
+    connector_fullness: float = 0.0
 
     def __post_init__(self) -> None:
         if not self.id:
             raise ValueError("Tissue part identity must not be empty.")
+        finite_range(self.connector_width, 1e-6, 0.499999, "Connector width")
+        finite_range(self.connector_fullness, -1000, 1000, "Connector fullness")
 
 
 @dataclass(frozen=True, slots=True)

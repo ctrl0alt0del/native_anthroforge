@@ -21,7 +21,7 @@ static MaterialGrid read_grid(const std::vector<int64_t>& data,size_t& cursor,in
         throw std::runtime_error("Invalid material grid dimensions.");
     if((p[2]!=0&&p[2]!=1)||(p[3]!=0&&p[3]!=1)||count>int64_t(data.size()-cursor-5))
         throw std::runtime_error("Invalid material grid flags or index count.");
-    MaterialGrid grid{int(rows),int(cols),p[2]!=0,p[3]!=0,{p+5,p+5+count}};
+    MaterialGrid grid{int(rows),int(cols),p[2]!=0,p[3]!=0,{p+5,p+5+count},{},{}};
     for(auto index:grid.indices) if(index<0||index>=vertices)
         throw std::runtime_error("Material grid references a missing vertex.");
     cursor+=size_t(count)+5;
@@ -45,14 +45,16 @@ int af_mesh_material_copy(uint64_t source,int64_t* data,int64_t count) {
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
-uint64_t af_mesh_with_material(uint64_t source,const int64_t* data,int64_t count,uint64_t cancel) {
+uint64_t af_mesh_with_material(uint64_t source,const int64_t* data,int64_t count,const double* axes,int64_t axis_count,uint64_t cancel) {
     try {
         if(count<0||count>16777216||(count&&!data)) throw std::runtime_error("Invalid material storage.");
+        if(axis_count<0||axis_count>16777216||(axis_count&&!axes)) throw std::runtime_error("Invalid material axis storage.");
         const auto mesh=af::mesh(source); std::vector<int64_t> material;
         if(count) material.assign(data,data+count);
         af::material_grids(material,mesh->vertices.rows());
         auto result=af::deform_mesh(*mesh,mesh->vertices,cancel,mesh->prepared);
         result->material=material;
+        result->material_axes.assign(axes,axes+axis_count); af::material_grids(*result);
         return af::retain(result);
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

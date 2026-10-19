@@ -134,13 +134,15 @@ def require_candidate(session: Any, token: str) -> Candidate:
 
 
 def accept(session: Any, token: str) -> str:
+    from .surface_results import accepted
+
     candidate = require_candidate(session, token)
     value, item = session.surface_preview, candidate.surface
     require_topology_edit(session.document, item.id)
     item = accepted_definition(session, item, value.target)
     ports = {p for p in value.ports if p.owner != item.id}
     key = str(uuid4())
-    item = replace(item, result=accepted_result(session.document, item, ports, key))
+    item = accepted(item, accepted_result(session.document, item, ports, key))
     install(session, item, candidate.mesh, key, bool(value.target))
     previews.cancel(session, "surface_preview")
     return item.id

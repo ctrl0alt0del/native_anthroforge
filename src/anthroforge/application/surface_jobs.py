@@ -1,6 +1,5 @@
 """Creation and explicit correspondence rebuild publish in their initiating undo step."""
 
-from dataclasses import replace
 from functools import partial
 from typing import Any
 from uuid import uuid4
@@ -11,7 +10,14 @@ from anthroforge.core.results import Port
 from anthroforge.core.surfaces import Surface
 from anthroforge.native.mesh import NativeCancellation
 
-from . import authored_jobs, construction_tasks, path_tasks, surface_evaluation, surface_history
+from . import (
+    authored_jobs,
+    construction_tasks,
+    path_tasks,
+    surface_evaluation,
+    surface_history,
+    surface_results,
+)
 from . import dependencies as dep
 from .assets import Asset
 from .construction_policy import revisions
@@ -69,7 +75,7 @@ def publish(session: Any, item: Surface, existing: bool, origin: int, payload: A
         raise ValueError("Surface inputs changed before layout publication.")
     key = str(uuid4())
     result = accepted_result(document, placed, ports, key)
-    ready = replace(placed, result=result)
+    ready = surface_results.accepted(placed, result)
     merge = partial(surface_history.merge, ready=ready, original=item, existing=existing)
     authored_jobs.publish(session, origin, merge)
     session.assets[key] = Asset(mesh, "generated", "", 1.0, False)

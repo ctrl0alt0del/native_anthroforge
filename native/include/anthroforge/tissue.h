@@ -36,6 +36,8 @@ AF_API uint64_t af_tissue_relax(uint64_t rest,const AfTissueSource* source,const
 // Operates on accepted material grids, without resampling the source.
 AF_API uint64_t af_tissue_inflate_grid(uint64_t source,const AfTissueInflation* settings,
     int count,uint64_t cancel);
+AF_API uint64_t af_tissue_inflate_parts(uint64_t source,const AfTissueInflation* settings,int count,const double* connectors,uint64_t cancel);
+AF_API uint64_t af_tissue_envelope(uint64_t first,uint64_t second,int reverse,uint64_t cancel);
 AF_API uint64_t af_tissue_source_mesh(uint64_t source,const double* matrix,uint64_t cancel);
 AF_API uint64_t af_tissue_refine_grid(uint64_t source,int resolution,uint64_t cancel);
 AF_API int af_mesh_tissue_sizes(uint64_t source,int64_t* sizes);

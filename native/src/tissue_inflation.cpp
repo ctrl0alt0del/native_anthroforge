@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "tissue_inflation.hpp"
 #include "tissue_kernel.hpp"
+#include "tissue_branches.hpp"
 
 namespace af::tissue {
 static kernel::AfMuscleInput legacy_input(const AfTissueInflation& s,const MaterialGrid& grid) {
@@ -28,16 +29,20 @@ static void profile(kernel::AfMuscleOutput& output,const AfTissueInflation& s) {
     if(kernel::af_env_profile(output.base,output.rows,output.cols,s.profile,s.direction,s.reverse?-1:1,output.inflated))
         throw std::runtime_error("Section Profile has a degenerate material frame.");
 }
-Points inflate_grid(const Mesh& source,const MaterialGrid& grid,const AfTissueInflation& settings,uint64_t cancel) {
+Points inflate_prepared_grid(const Mesh& source,const MaterialGrid& grid,const AfTissueInflation& settings,const InflationWeights* weights,uint64_t cancel) {
     const kernel::CancelScope scope(cancel);
     validate_inflation(settings,grid);
     auto output=prepared(source,grid,cancel);
+    if(weights) { output.boundary_weights=weights->edge; output.length_weights=weights->fade; }
     if(settings.mode==2) profile(output,settings);
     else kernel::af_muscle_inflate(output,legacy_input(settings,grid));
     Points points; points.reserve(output.inflated.size());
     for(auto p:output.inflated) points.emplace_back(p.x,p.y,p.z);
     check_cancel(cancel);
     return points;
+}
+Points inflate_grid(const Mesh& source,const MaterialGrid& grid,const AfTissueInflation& settings,uint64_t cancel) {
+    return inflate_prepared_grid(source,grid,settings,nullptr,cancel);
 }
 static std::shared_ptr<Mesh> evaluate(const Mesh& source,const AfTissueInflation* settings,int count,uint64_t cancel) {
     const auto grids=material_grids(source.material,source.vertices.rows());

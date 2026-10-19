@@ -3,7 +3,7 @@
 from dataclasses import asdict, replace
 from typing import Any
 
-from anthroforge.core import tissue_policy
+from anthroforge.core import tissue_parts, tissue_policy
 from anthroforge.core.membranes import Membrane
 from anthroforge.core.tissue_settings import TissueInflation, TissuePart, TissueSide
 from anthroforge.core.tissues import TissueVCP
@@ -62,9 +62,11 @@ def inflation(
     session: Any, target: str, changes: dict[str, Any], part: str = "main", side: str = "a"
 ) -> None:
     item = tissue(session, target)
-    if side not in ("a", "b") or part not in {p.id for p in item.parts}:
+    active = tissue_parts.active(item)
+    if side not in ("a", "b") or part not in {p.id for p in active}:
         raise ValueError("Choose an existing tissue part and side.")
-    parts = tuple(update_part(p, side, changes) if p.id == part else p for p in item.parts)
+    edited = tuple(update_part(p, side, changes) if p.id == part else p for p in active)
+    parts = tissue_parts.installed(item, edited)
     updated = replace(item, parts=parts)
     tissue_policy.validate(updated, session.document.registry.records)
     require_inflation_topology(session, item, updated)

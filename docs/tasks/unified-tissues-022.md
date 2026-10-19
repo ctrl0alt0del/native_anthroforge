@@ -123,6 +123,18 @@ release requirements are still pending. Native changed-file clang-tidy passes.
 Latest full suite: 1027 passed and one function-length failure in the new GPU acceptance
 tool; that helper was shortened and both architecture checks then passed. Configured
 mypy, Ruff and formatting pass. Do not report this as a completed release gate.
+Multi-part native checkpoint: eight prepared branch fixtures match addon inflation,
+shared displacement averaging and Hermite connectors to 1e-10, for both boundaries,
+flips, control/distributed modes and nonzero fullness. Native material axes persist
+across deformation and storage. Surface accepted kind/part IDs remain separate from
+authored branch edits; tissue bases capture those IDs, including Manual prerequisites.
+Native accepted-grid refinement now preserves welded branch correspondence and adds
+interior samples without mutating sources. A two-root sparse branch otherwise has no
+interior vertex to inflate; the integrated refinement addresses that ordinary case.
+Seventeen focused branch/tissue/architecture checks pass, with native build/CTest and
+configured mypy. New native branch adapters pass clang-tidy; newest envelope/refinement
+files still need that check. Envelope composition is integrated but donor composition
+fixtures and complete part/side desktop controls are next. No full increment acceptance.
 Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification

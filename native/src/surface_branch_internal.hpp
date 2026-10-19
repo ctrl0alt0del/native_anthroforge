@@ -17,6 +17,7 @@ struct Assembly {
     Points points;
     Faces faces;
     std::vector<int64_t> material;
+    std::vector<double> axes;
     bool flip=false;
 };
 std::vector<double> merged_stations(const Rows& rows,bool exact,int minimum,int samples);

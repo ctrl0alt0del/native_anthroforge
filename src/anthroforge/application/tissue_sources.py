@@ -36,7 +36,7 @@ def require_result(result: Any) -> None:
 def membrane(resources: Any, item: Any, source: Any, frame: Any, cancel: int) -> TissueOutput:
     require_result(source.result)
     mesh = resources.meshes[source.result.asset].mesh
-    if source.kind == "LOFT":
+    if source.accepted_kind in ("LOFT", "BRANCHED"):
         mesh = tissue_inflation.refine(mesh, item.resolution, cancel)
     mesh = tissue_inflation.source(mesh, frame, cancel)
-    return TissueOutput(mesh=mesh, base=TissueBaseState("SURFACE"))
+    return TissueOutput(mesh=mesh, base=TissueBaseState("SURFACE", parts=source.accepted_parts))

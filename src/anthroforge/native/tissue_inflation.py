@@ -28,6 +28,9 @@ class Inflation(c.Structure):
 
 
 def configure(engine: GeometryEngine) -> None:
+    from . import tissue_parts
+
+    tissue_parts.configure(engine)
     engine.bind("af_tissue_inflate_grid", [U, c.POINTER(Inflation), c.c_int, U], U)
     engine.bind("af_tissue_source_mesh", [U, D, U], U)
     engine.bind("af_tissue_refine_grid", [U, c.c_int, U], U)

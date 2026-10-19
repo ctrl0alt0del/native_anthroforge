@@ -20,6 +20,14 @@ Manual source from newer authored curves. This is an explicit standalone extensi
 Branches, two-sided composition, constrained smoothing, relaxation, crop and stacking
 qualification remain in progress.
 
+Prepared branch inflation now ports `prepared_inflation.py` and `branch_connector.py`
+into native geodesic fields, per-part kernels, shared seam displacement and Hermite
+assembly. Eight source-hashed donor cases in `tests/fixtures/tissue/branches.json`
+match within 1e-10; regenerate using `capture_tissue_branches.py ADDON_PATH OUTPUT_PATH`.
+Explicit accepted material axes retain nonuniform connector spacing. The standalone
+accepted-grid refinement additionally inserts shared seam/interior samples, preserving
+the accepted piecewise-bilinear surface and original lines without editing its curves.
+
 `kernel_4.hpp` pins the production Static PBD closure from `af_soft_tissue.hpp`.
 Native adapters now prepare source goals, named/custom masks, geodesic feathering,
 exact backing and soft tethers; geometric point/sweep/shell work also runs natively.

@@ -42,6 +42,7 @@ def test_loft_grid_uses_exact_canonical_vertices_and_survives_deformation(sessio
 def test_branch_material_grids_share_explicit_seam_vertex_ids_and_roundtrip(session, tmp_path):
     _, target, _ = branched(session)
     data = material.array(mesh(session, target))
+    axes = material.axes(mesh(session, target))
     parts = grids(data)
     assert len(parts) == 2
     assert len(set(parts[0][1]) & set(parts[1][1])) == parts[1][0][0]
@@ -51,6 +52,18 @@ def test_branch_material_grids_share_explicit_seam_vertex_ids_and_roundtrip(sess
     session.command("open", path=str(location))
     session.wait()
     np.testing.assert_array_equal(material.array(mesh(session, target)), data)
+    np.testing.assert_array_equal(material.axes(mesh(session, target)), axes)
+
+
+def test_branch_parameter_axes_survive_native_deformation(session):
+    _, target, _ = branched(session)
+    original = mesh(session, target)
+    axes = material.axes(original)
+    assert len(axes) == sum(sum(p[0][:2]) for p in grids(material.array(original)))
+    moved = construction.deformed(original, original.array(0) + [0.1, 0, 0.2])
+    np.testing.assert_array_equal(material.axes(moved), axes)
+    with pytest.raises(ValueError, match="material parameter"):
+        material.restore(original, material.array(original), parameters=axes[::-1])
 
 
 @pytest.mark.parametrize("data", [[2], [2, 2, 0, 0, 4, 0], [2, 2, 0, 0, 4, 0, 1, 2, 999999]])

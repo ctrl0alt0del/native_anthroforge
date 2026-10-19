@@ -34,6 +34,8 @@ class Surface(ConstructionObject):
     across: tuple[int, ...] = ()
     main: tuple[str, ...] = ()
     branches: tuple[SurfaceBranch, ...] = ()
+    accepted_kind: str = ""
+    accepted_parts: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         ConstructionObject.__post_init__(self)

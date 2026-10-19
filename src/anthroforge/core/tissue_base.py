@@ -9,6 +9,7 @@ from .entities import IDENTITY, validate_matrix
 class TissueBaseState:
     kind: str = "NONE"
     frame: tuple[float, ...] = IDENTITY
+    parts: tuple[str, ...] = ("main",)
 
     def __post_init__(self) -> None:
         if self.kind not in ("NONE", "POINT", "CURVE", "SURFACE"):

@@ -51,11 +51,19 @@ def validate_surface(tissue: TissueVCP, source: object, records: Mapping[str, ob
     closed = any(isinstance(c := records.get(u.curve), Fiber) and c.closed for u in source.curves)
     if tissue.both_sides and (closed or source.close_across):
         raise ValueError("Two-sided tissue requires open material axes.")
+    validate_surface_modes(tissue, source, closed)
+
+
+def validate_surface_modes(tissue: TissueVCP, source: Membrane, closed: bool) -> None:
     modes = {
         s.inflation.mode
         for p in tissue.parts
         for s in ((p.a, p.b) if tissue.both_sides else (p.a,))
     }
+    if tissue.both_sides and modes & {"NORMAL", "RADIAL", "PROFILE"}:
+        raise ValueError(
+            "Two-sided composition requires muscle grid inflation; normal shells own their backing."
+        )
     if "SECTION_PROFILE" in modes and (closed or source.kind != "LOFT" or source.close_across):
         raise ValueError("Section Profile requires an ordinary open loft.")
 

@@ -6,6 +6,8 @@ from typing import Any
 from anthroforge.core.entities import SCP
 from anthroforge.core.surfaces import Surface
 
+from . import surface_results
+
 
 def items(document: Any) -> tuple[SCP | Surface, ...]:
     return (
@@ -26,7 +28,8 @@ def install(session: Any, item: SCP | Surface, result: Any) -> None:
         session.replace_entities({item.id: anatomical_result(item, result)}, authored=False)
     else:
         objects = tuple(
-            replace(o, result=result) if o.id == item.id else o for o in session.document.objects
+            surface_results.accepted(item, result) if o.id == item.id else o
+            for o in session.document.objects
         )
         session.replace_document(objects=objects)
 

@@ -48,6 +48,7 @@ EDITS = {
     "tissue.connector": tissue_part_operations.connector,
     "tissue.profile.reset": tissue_part_operations.profile_reset,
     "tissue.control.reset": tissue_part_operations.control_reset,
+    "tissue.crop": tissue_strategy_operations.crop,
     "tissue.relaxation": tissue_strategy_operations.relaxation,
     "tissue.constraint.add": tissue_strategy_operations.constraint_add,
     "tissue.constraint.update": tissue_strategy_operations.constraint_update,

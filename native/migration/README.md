@@ -178,3 +178,14 @@ is claimed. Off bypasses the native call entirely. No extra worker pool or Blend
 Seventeen cases captured from the actual addon DLL in `tests/fixtures/tissue/smoothing.json`
 match to absolute 1e-10 with exact material topology. Source DLL/source hashes are in the fixture.
 Reproduce using `tools/capture_tissue_smoothing.py` under background Blender 5.0.1.
+
+## Tissue material-domain cropping
+
+`src/tissue_crop*.cpp` ports the material-domain clip from `core/vcp/muscle_domain_clip.py`
+to owned native meshes. Source coordinates decide plane membership; shared edge
+intersections interpolate both material correspondence and output positions. Two-sided
+outputs clip both full sides before envelope composition, preserving the donor's
+triangulation and cut-edge height. Twenty background-Blender fixtures in
+`tests/fixtures/tissue/crops.json` include source hashes and match at 1e-10. Reproduce
+with `tools/capture_tissue_crops.py`. Empty results are prepared owned geometry, distinct
+from incomplete buffers; attachment consumers reject empty surfaces explicitly.

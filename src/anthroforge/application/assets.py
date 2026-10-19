@@ -16,7 +16,7 @@ class Asset:
     y_up: bool
 
     def __post_init__(self) -> None:
-        if not self.mesh.counts[4]:
+        if not self.mesh.prepared:
             raise ValueError("An asset requires finalized spatial and render geometry.")
 
 

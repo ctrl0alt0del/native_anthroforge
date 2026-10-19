@@ -5,7 +5,7 @@ namespace af {
 Surface::Surface(const Mesh& mesh,const M4& matrix):triangles(&mesh.triangles) {
     if(!mesh.prepared) throw std::runtime_error("Surface queries require a finalized mesh.");
     vertices=(mesh.vertices*matrix.block<3,3>(0,0).transpose()).rowwise()+matrix.block<3,1>(0,3).transpose();
-    tree.init(vertices,*triangles);
+    if(triangles->rows()) tree.init(vertices,*triangles);
 }
 V3 barycentric(const V3& p,const V3& a,const V3& b,const V3& c) {
     const V3 v0=b-a,v1=c-a,v2=p-a;
@@ -16,6 +16,7 @@ V3 barycentric(const V3& p,const V3& a,const V3& b,const V3& c) {
     return {1-v-w,v,w};
 }
 Hit nearest(const Surface& surface,const V3& point) {
+    if(!surface.triangles->rows()) throw std::runtime_error("No usable attachment surface: geometry is empty.");
     Hit hit; Eigen::RowVector3d nearest;
     hit.distance=surface.tree.squared_distance(surface.vertices,*surface.triangles,point.transpose(),hit.triangle,nearest);
     hit.point=nearest.transpose();

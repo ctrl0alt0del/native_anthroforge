@@ -84,6 +84,7 @@ class GeometryEngine(NativeEngine):
         self.bind("af_mesh_create", [D, c.c_int64, INT64, INT64, c.c_int64], U)
         self.bind("af_mesh_release", [U], None)
         self.bind("af_mesh_sizes", [U, INT64])
+        self.bind("af_mesh_prepared", [U])
         self.bind("af_mesh_buffer", [U, c.c_int], c.c_void_p)
         self.bind("af_mesh_bounds", [U, D])
         self.bind("af_cancel_create", [], U)
@@ -152,10 +153,11 @@ class GeometryEngine(NativeEngine):
         return list(output.tolist()) if status else None
 
 
-def validate_arrays(vertices: Any, corners: Any, offsets: Any) -> None:
+def validate_arrays(vertices: Any, corners: Any, offsets: Any, allow_empty: bool = False) -> None:
     if vertices.ndim != 2 or vertices.shape[1] != 3 or not np.isfinite(vertices).all():
         raise ValueError("Invalid vertex array.")
-    if offsets.ndim != 1 or len(offsets) < 2 or offsets[0] != 0:
+    minimum = 1 if allow_empty and len(vertices) == 0 else 2
+    if offsets.ndim != 1 or len(offsets) < minimum or offsets[0] != 0:
         raise ValueError("Invalid polygon offsets.")
     if offsets[-1] != len(corners) or (np.diff(offsets) < 3).any():
         raise ValueError("Polygon offsets do not match corner data.")
@@ -172,6 +174,9 @@ class Mesh:
         bounds = (c.c_double * 6)()
         engine.check(engine.library.af_mesh_bounds(handle, bounds))
         self.bounds = tuple(bounds)
+        state = engine.library.af_mesh_prepared(handle)
+        engine.check(state < 0)
+        self.prepared = bool(state)
         if engine.resource_observer is not None:
             engine.resource_observer(self)
 
@@ -180,7 +185,11 @@ class Mesh:
         shapes = ((vertices, 3), (corners,), (faces + 1,), (triangles, 3), (triangles,))
         types = (c.c_double, c.c_int64, c.c_int64, c.c_int32, c.c_int64)
         address = self.engine.library.af_mesh_buffer(self.handle, kind)
-        value = np.ctypeslib.as_array(c.cast(address, c.POINTER(types[kind])), shapes[kind])
+        value = (
+            np.empty(shapes[kind], dtype=types[kind])
+            if shapes[kind][0] == 0
+            else np.ctypeslib.as_array(c.cast(address, c.POINTER(types[kind])), shapes[kind])
+        )
         value.flags.writeable = False
         return value
 

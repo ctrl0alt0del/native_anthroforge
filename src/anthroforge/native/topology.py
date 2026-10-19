@@ -30,7 +30,7 @@ def restore(engine: GeometryEngine, arrays: list[Any]) -> Mesh:
         np.ascontiguousarray(arrays[i], dtype=np.int64) for i in (1, 2, 4)
     )
     triangles = np.ascontiguousarray(arrays[3], dtype=np.int32)
-    validate_arrays(vertices, corners, offsets)
+    validate_arrays(vertices, corners, offsets, allow_empty=True)
     validate_triangles(triangles, polygons, len(vertices))
     args = (pointer(vertices), len(vertices), corners.ctypes.data_as(INT64))
     tail = (offsets.ctypes.data_as(INT64), len(offsets) - 1, triangles.ctypes.data_as(INT32))
@@ -42,7 +42,7 @@ def restore(engine: GeometryEngine, arrays: list[Any]) -> Mesh:
 
 
 def validate_triangles(triangles: Any, polygons: Any, count: int) -> None:
-    if triangles.ndim != 2 or triangles.shape[1] != 3 or not len(triangles):
+    if triangles.ndim != 2 or triangles.shape[1] != 3 or (count and not len(triangles)):
         raise ValueError("Invalid saved triangles.")
     if polygons.shape != (len(triangles),) or (triangles < 0).any() or (triangles >= count).any():
         raise ValueError("Invalid saved triangle references.")

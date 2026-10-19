@@ -430,6 +430,14 @@ they do not certify anatomical accuracy or reconstruct muscles.
 
 ## Curve surfaces
 
+The in-progress 0.2.2 tissue API includes `tissue.crop(target, changes)`, with `enabled`,
+local `origin`/`normal` and `positive` half-space settings. Cropping acts in base material
+coordinates after intrinsic deformation; its edges are neither attachments nor new
+zero-inflation boundaries. It currently supports qualified muscle-grid modes. Incoming
+surface attachments lock changes to crop topology. A fully excluded result is valid empty
+geometry, but cannot supply an anatomical attachment surface. See the
+[0.2.2 specification](specification_022.md) for the complete release contract.
+
 - `surface.preview(curves, **creation_settings)` evaluates initial correspondence without
   creating a document object. `surface.preview(target=existing_surface)` previews Realign.
   `surface.preview.status()` reports token/state/alignment; `surface.preview.accept(token)`

@@ -14,3 +14,6 @@ native/vendor/curve_fit_nd/** text eol=lf
 native/migration/routing/*.hpp -text
 native/migration/tissue/*.hpp -text
 
+native/migration/smoothing/** -text
+native/migration/smoothing/sources.json text eol=lf
+native/vendor/piqp/** -text

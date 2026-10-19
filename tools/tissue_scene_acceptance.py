@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from PySide6.QtCore import QEvent, QObject
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 
@@ -60,8 +61,14 @@ def frames(controller, renderer, app):
     for _ in range(8):
         assert not renderer.window.isVisible()
         app.processEvents()
+        app.sendPostedEvents(None, QEvent.Type.DeferredDelete)
         image = renderer.frame()
         controller.frame_presented()
+    masks = [o for o in renderer.root.findChildren(QObject) if o.objectName().startswith("mask_")]
+    assert len(masks) == len(controller.render_model.rows), (
+        len(masks),
+        controller.render_model.rows,
+    )
     return image
 
 

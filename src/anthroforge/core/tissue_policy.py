@@ -103,6 +103,8 @@ def region_masks(tissue: TissueVCP) -> tuple[str, ...]:
 
 def validate_strategies(tissue: TissueVCP, source: object) -> None:
     modes = {p.a.inflation.mode for p in tissue.parts}
+    if tissue.crop.enabled and modes - {"CTRL_POINT", "DISTRIBUTED", "SECTION_PROFILE"}:
+        raise ValueError("Material cropping requires muscle grid inflation.")
     if tissue.relaxation.mode != "NONE" and modes - {"RADIAL", "PROFILE", "NORMAL"}:
         raise ValueError(
             "Relaxation requires radial, profile or normal inflation; "

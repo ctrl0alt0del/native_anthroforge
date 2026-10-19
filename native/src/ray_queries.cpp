@@ -58,6 +58,7 @@ bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,igl::Hit& hit
     if(!origin.allFinite()||!ray.allFinite()||ray.squaredNorm()==0)
         throw std::runtime_error("Picking requires a finite nonzero ray.");
     hit.t=std::numeric_limits<float>::infinity();
+    if(!mesh.triangles.rows()) return false;
     return ray_tree(mesh,mesh.tree,pick_ray(origin,ray),hit);
 }
 }

@@ -9,9 +9,10 @@ from .tissue_shapes import owned
 
 
 def configure(engine: GeometryEngine) -> None:
-    from . import tissue_smoothing
+    from . import tissue_crop, tissue_smoothing
 
     tissue_smoothing.configure(engine)
+    tissue_crop.configure(engine)
     engine.bind("af_tissue_inflate_parts", [U, c.POINTER(Inflation), c.c_int, D, c.c_int, U], U)
     engine.bind("af_tissue_envelope", [U, U, c.c_int, U], U)
     engine.bind("af_tissue_profile_reset", [c.c_double, D])

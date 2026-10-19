@@ -53,7 +53,7 @@ static std::vector<int64_t> take(const int64_t*& data,int64_t count) {
 }
 TissueDomain tissue_restore(const int64_t* p,int64_t count,const double* weights,int64_t entries,int64_t vertices,int64_t faces) {
     if(!count&&!entries) return {};
-    if(!p||!weights||count<8||entries<1||entries>8388608) throw std::runtime_error("Invalid tissue domain storage.");
+    if(!p||(entries&&!weights)||count<8||entries<0||entries>8388608) throw std::runtime_error("Invalid tissue domain storage.");
     if(p[0]!=1||p[5]!=vertices||p[6]!=faces||p[7]!=entries||count!=9+2*vertices+2*faces+entries)
         throw std::runtime_error("Tissue domain storage dimensions disagree.");
     TissueDomain d; d.kind=p[1]; d.source_count=p[2]; d.ring_size=p[3]; d.closed=p[4]; p+=8;

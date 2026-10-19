@@ -71,6 +71,10 @@ uint64_t af_mesh_create(const double* vertices,int64_t count,const int64_t* corn
 void af_mesh_release(uint64_t handle) {
     std::lock_guard<std::mutex> lock(af::registry_mutex); af::registry.erase(handle);
 }
+int af_mesh_prepared(uint64_t handle) {
+    try { return af::mesh(handle)->prepared?1:0; }
+    catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}
 int af_mesh_sizes(uint64_t handle,int64_t* sizes) {
     try {
         const auto mesh=af::mesh(handle);

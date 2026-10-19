@@ -5,7 +5,7 @@ from typing import Any
 
 from anthroforge.core import tissue_policy
 from anthroforge.core.tissue_constraints import TissueConstraint, TissueField
-from anthroforge.core.tissue_settings import TissueRelaxation
+from anthroforge.core.tissue_settings import TissueCrop, TissueRelaxation
 
 from . import object_operations, tissue_fields
 from .tissue_operations import tissue
@@ -24,6 +24,19 @@ def relaxation(session: Any, target: str, changes: dict[str, Any]) -> None:
     if "gravity" in changes:
         changes = dict(changes, gravity=tuple(changes["gravity"]))
     install(session, replace(item, relaxation=replace(item.relaxation, **changes)))
+
+
+def crop(session: Any, target: str, changes: dict[str, Any]) -> None:
+    from .construction_policy import require_topology_edit
+
+    item = tissue(session, target)
+    if set(changes) - set(TissueCrop.__dataclass_fields__):
+        raise ValueError("Unknown material crop setting.")
+    changes = {k: tuple(v) if k in ("origin", "normal") else v for k, v in changes.items()}
+    updated = replace(item.crop, **changes)
+    if updated != item.crop:
+        require_topology_edit(session.document, target)
+    install(session, replace(item, crop=updated))
 
 
 def constraint_add(

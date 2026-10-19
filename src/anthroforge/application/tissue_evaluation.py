@@ -1,10 +1,11 @@
 """Owned tissue phase evaluation; each phase consumes explicit accepted prerequisites."""
 
+from dataclasses import replace
 from typing import Any, cast
 
 from anthroforge.core.tissue_diagnostics import TissueDiagnostic
 from anthroforge.core.tissues import TissueVCP
-from anthroforge.native import topology
+from anthroforge.native import tissue_crop, topology
 from anthroforge.native.mesh import Mesh
 
 from . import tissue_construction, tissue_fields, tissue_relaxation, tissue_sources
@@ -23,13 +24,11 @@ def rest(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: in
     return tissue_construction.construct(engine, resources, item, cancel)
 
 
-def intrinsic(
+def uncropped(
     engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int
 ) -> TissueOutput:
     mesh = accepted(resources, item.rest_result, "Inflated rest")
     tissue_fields.validate(resources, item, "REST")
-    if item.crop.enabled:
-        raise ValueError("Tissue crop adapter is not yet available.")
     if item.relaxation.mode != "NONE" or item.constraints:
         return tissue_relaxation.evaluate(engine, document, resources, item, cancel)
     previous = resources.meshes.get(item.intrinsic_result.asset)
@@ -37,6 +36,17 @@ def intrinsic(
         mesh=topology.finalize(mesh, previous.mesh if previous else None, cancel),
         diagnostics=(TissueDiagnostic(),),
     )
+
+
+def intrinsic(
+    engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int
+) -> TissueOutput:
+    output = uncropped(engine, document, resources, item, cancel)
+    if not item.crop.enabled:
+        return output
+    assert output.mesh is not None
+    base = resources.meshes[item.base_result.asset].mesh
+    return replace(output, mesh=tissue_crop.evaluate(base, output.mesh, item.crop, cancel))
 
 
 def final(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> TissueOutput:

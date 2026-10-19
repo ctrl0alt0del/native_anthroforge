@@ -2,6 +2,7 @@
 // Port of af_muscle_envelope_compose.hpp, retaining exact source/part/side provenance.
 #include "tissue_shapes.hpp"
 #include "material_domain.hpp"
+#include "tissue_envelope.hpp"
 #include <numeric>
 
 namespace af::tissue {
@@ -35,10 +36,10 @@ static void faces(Envelope& output,const Mesh& a,const Mesh& b,const std::vector
     const auto polygons=mesh_faces(a);
     for(size_t i=0;i<polygons.size();++i) {
         check_cancel(cancel); const auto part=a.tissue.parts[i]; const auto& face=polygons[i];
-        append(output,face,part,int64_t(i),flip);
+        append(output,face,part,a.tissue.faces[i],flip);
         if(std::all_of(face.begin(),face.end(),[&](int64_t v){return equal(a,b,v);})) continue;
         std::vector<int64_t> second; for(auto v:face) second.push_back(mapping[size_t(v)]);
-        append(output,std::move(second),part,int64_t(i),!flip);
+        append(output,std::move(second),part,a.tissue.faces[i],!flip);
     }
 }
 static Envelope compact(const Envelope& source) {
@@ -51,10 +52,15 @@ static Envelope compact(const Envelope& source) {
     for(auto& face:result.faces) for(auto& index:face) index=mapping[size_t(index)];
     result.parts=source.parts; result.sources=source.sources; return result;
 }
-static TissueDomain correspondence(const Envelope& source,int64_t base_count) {
-    TissueDomain d; d.kind=5; d.source_count=base_count;
-    d.offsets.resize(source.points.size()+1); std::iota(d.offsets.begin(),d.offsets.end(),0);
-    d.weights.resize(source.points.size(),1); d.indices=source.origins; d.sides=source.sides;
+static TissueDomain correspondence(const Envelope& source,const TissueDomain& material) {
+    TissueDomain d; d.kind=5; d.source_count=material.source_count; d.offsets={0};
+    for(auto index:source.origins) {
+        for(auto k=material.offsets[size_t(index)];k<material.offsets[size_t(index+1)];++k) {
+            d.indices.push_back(material.indices[size_t(k)]); d.weights.push_back(material.weights[size_t(k)]);
+        }
+        d.offsets.push_back(int64_t(d.indices.size()));
+    }
+    d.sides=source.sides;
     d.parts=source.parts; d.faces=source.sources; return d;
 }
 static void validate(const Mesh& a,const Mesh& b) {
@@ -63,15 +69,15 @@ static void validate(const Mesh& a,const Mesh& b) {
     for(const auto& grid:material_grids(a)) if(grid.closed_u||grid.closed_v)
         throw std::runtime_error("Two-sided tissue requires open material axes.");
 }
-static std::shared_ptr<Mesh> compose(const Mesh& a,const Mesh& b,bool flip,uint64_t cancel) {
+std::shared_ptr<Mesh> compose_envelope(const Mesh& a,const Mesh& b,bool flip,uint64_t cancel) {
     validate(a,b); Envelope output;
     const auto mapping=vertices(output,a,b,cancel); faces(output,a,b,mapping,flip,cancel);
     const auto reduced=compact(output); auto mesh=make_mesh(reduced.points,reduced.faces,cancel,true);
-    mesh->tissue=correspondence(reduced,a.vertices.rows());
+    mesh->tissue=correspondence(reduced,a.tissue);
     tissue_validate(mesh->tissue,mesh->vertices.rows(),int64_t(mesh->offsets.size())-1); return mesh;
 }
 }
 uint64_t af_tissue_envelope(uint64_t first,uint64_t second,int reverse,uint64_t cancel) {
-    try { return af::retain(af::tissue::compose(*af::mesh(first),*af::mesh(second),reverse!=0,cancel)); }
+    try { return af::retain(af::tissue::compose_envelope(*af::mesh(first),*af::mesh(second),reverse!=0,cancel)); }
     catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

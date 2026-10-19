@@ -159,6 +159,22 @@ Unrelated untracked root `__init__.py` is preserved.
 
 ## Verification
 
+Material-domain crop is now native and exposed through `tissue.crop` and the focused
+inspector. Twenty actual addon fixtures cover ordinary/profile/branched, oblique,
+empty and two-sided results at 1e-10. Envelope sides must be clipped before composition;
+clipping an already composed envelope changed canonical B-side diagonals and was rejected.
+Crop preserves source correspondence and nonzero cut-edge height. Plane changes reuse
+accepted rest geometry; incoming attachments lock crop topology. Empty accepted output
+has an explicit prepared state, persists safely, renders no chunks and is not an available
+attachment surface. Thirty focused crop/workflow/architecture checks, changed-native
+clang-tidy, Ruff and configured mypy pass. Full regression pending for this increment.
+Full-QML crop controls and hidden GPU crop/empty/restore checks pass. Visual inspection
+initially found obsolete outlines in the test: the manual render loop did not deliver
+Qt DeferredDelete events. Servicing those events fixes the test evidence; production
+rendering was not changed. Mask-count assertions now cover removal/replacement.
+The cropped capture was inspected with its independent source Membrane still visible.
+No interactive desktop acceptance or release qualification is claimed.
+
 Baseline `uv run --no-sync pytest -q`: **941 passed**, 307 existing Qt deprecation
 warnings, 31.89 seconds on Windows. `git diff --check` passed for documentation.
 Baseline main matched origin/main before branching.

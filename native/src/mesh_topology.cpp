@@ -13,6 +13,7 @@ static void validate_triangle(const Mesh& source,int index) {
             throw std::runtime_error("Triangle does not belong to its canonical polygon.");
 }
 static void validate_topology(const Mesh& source) {
+    if(source.vertices.rows()==0&&source.triangles.rows()==0&&source.offsets==std::vector<int64_t>{0}) return;
     if(source.vertices.rows()==0||!source.vertices.allFinite()||source.triangles.rows()==0)
         throw std::runtime_error("Invalid saved geometry.");
     for(size_t i=1;i<source.offsets.size();++i) {
@@ -26,7 +27,8 @@ static void validate_topology(const Mesh& source) {
 }
 static std::shared_ptr<Mesh> restore(const double* vertices,int64_t count,const int64_t* corners,
     const int64_t* offsets,int64_t faces,const int32_t* triangles,const int64_t* polygons,int64_t triangle_count) {
-    if(count<1||faces<1||triangle_count<1||offsets[0]!=0||offsets[faces]<0)
+    const bool empty=count==0&&faces==0&&triangle_count==0;
+    if((!empty&&(count<1||faces<1||triangle_count<1))||offsets[0]!=0||offsets[faces]<0)
         throw std::runtime_error("Invalid saved mesh dimensions.");
     auto result=std::make_shared<Mesh>(); result->generated=true;
     result->vertices=Eigen::Map<const Vertices>(vertices,count,3);

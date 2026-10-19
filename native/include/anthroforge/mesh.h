@@ -13,6 +13,7 @@ AF_API int af_measure_points(const double* first, const double* second, double* 
 /* Bounded rows: handle, allocation identity, buffers, estimated tree, render, vertices, triangles. */
 AF_API int af_mesh_memory_snapshot(uint64_t* rows, int capacity, uint64_t* total_handles);
 AF_API int af_mesh_sizes(uint64_t handle, int64_t* sizes);
+AF_API int af_mesh_prepared(uint64_t handle);
 AF_API const void* af_mesh_buffer(uint64_t handle, int kind);
 /* Immutable material grids: rows, columns, closed-u, closed-v, count, vertex indices. */
 AF_API int64_t af_mesh_material_size(uint64_t source);

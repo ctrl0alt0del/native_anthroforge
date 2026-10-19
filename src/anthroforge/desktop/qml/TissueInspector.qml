@@ -55,6 +55,7 @@ ColumnLayout {
         NumericSetting { label: "Fullness"; length: true; value: panel.part.connector_fullness || 0; onEdited: value=>panel.connector(panel.part.connector_width,value) }
     }
     TissueSmoothing { visible: panel.muscleMode; settings: panel.part[panel.side]?.smoothing || ({}); diagnostic: panel.item.diagnostics?.find(d=>d.stage==="rest" && d.part===panel.part.id && d.side===panel.side); onEdited: (key,value)=>{const changes={}; changes[key]=value; workspace.run("tissue.smoothing",{target:panel.selected.id,part:panel.part.id,side:panel.side,changes:changes});} }
+    TissueCrop { visible: panel.muscleMode; settings: panel.item.crop || ({}); onEdited: (key,value)=>{const changes={}; changes[key]=value; workspace.run("tissue.crop",{target:panel.selected.id,changes:changes});} }
     TissueRelaxation { item: panel.item; supported: !panel.muscleMode }
     TissueRegions { item: panel.item; masks: panel.selected.tissue_masks || [] }
     UiSection {

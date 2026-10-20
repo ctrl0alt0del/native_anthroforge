@@ -49,16 +49,22 @@ qualify the single canonical 0.2.2 package and source archive, then merge/push.
 
 ## Current state and next steps
 
-First implementation checkpoint (not release-ready):
+Implementation and interaction qualification (not release-ready):
 - Native nearest-SCP pin capture inside the existing Fiber creation job, with optional
   explicit overrides and dispatch-time provenance. No Python geometry loop.
 - Shared deletion-impact query, direct closed surface creation/Realign, source/member
   navigation, tracing, weight editing, workspace focus/presentation and direct report text.
 - Direct stacking controls and toolbar/menu Tissue creation with searchable source chooser.
 - Fiber options use a virtualized point list rather than one target control per point.
-- 24 focused core/architecture tests pass; mypy and Ruff pass; the existing offscreen
-  tissue creation check passes. Full new interaction coverage, report DPI verification,
-  documentation, development gate and packaging remain incomplete.
+- Focused core checks, direct stacking, fields, surfaces and report text interactions pass.
+- Actual QML verifies automatic and explicit Tissue Final Fiber bindings, source editing,
+  direct Tissue creation and searchable chooser, conditional deletion and workspace focus.
+  A modeless workspace panel preserves keyboard camera shortcuts; the shared selector
+  now restores the active index after model replacement/rename.
+- Report labels, real tabs and icon centering pass at 150%/200% scaling, including
+  1050-logical-pixel width. Existing shared controls already fix the reported defects.
+  Inbox originals remain untouched. Final image-tracing checks, full development gate,
+  durable docs and portable qualification remain incomplete.
 
 Prior ignored audit probe reproduced unapplied stacking checkbox changes, hidden Fiber
 creation, per-point selector clutter, source navigation without editing and Hook member

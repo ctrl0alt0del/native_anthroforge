@@ -1,5 +1,6 @@
 """Exercise the actual field editor with offscreen QML controls."""
 
+from PySide6.QtCore import Q_ARG, QMetaObject, Qt
 from tissue_editor_acceptance import (
     QFont,
     QFontDatabase,
@@ -22,13 +23,27 @@ def fields(controller, window):
     find(window, "tissueFieldName").setProperty("text", "Test pins")
     click(window, "tissueFieldCreate")
     settle(controller)
-    click(window, "tissueFieldEdit")
+    assert controller.authoring.editing
     controller.authoring.selectAllComponents(True)
-    click(window, "tissueFieldAssign")
+    assign(controller, window)
     settle(controller)
     assert set(controller.session.document.object(controller.selection).fields[0].values) == {1}
     assert controller.authoring.transformData.get("readonly") is not False
     remove(controller, window)
+
+
+def assign(controller, window):
+    before = len(controller.session.history.entries)
+    field = find(window, "tissueFieldWeight")
+    assert field.property("enabled")
+    assert QMetaObject.invokeMethod(field, "edited", Qt.DirectConnection, Q_ARG(float, 1.0))
+    settle(controller)
+    assert len(controller.session.history.entries) == before + 1
+    controller.run("undo", {})
+    settle(controller)
+    assert set(controller.session.document.object(controller.selection).fields[0].values) == {0}
+    controller.run("redo", {})
+    settle(controller)
 
 
 def remove(controller, window):

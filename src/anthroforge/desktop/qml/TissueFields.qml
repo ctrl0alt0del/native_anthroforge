@@ -17,7 +17,7 @@ UiSection {
     RowLayout {
         Layout.fillWidth: true
         UiCombo { id: domain; Layout.fillWidth: true; model: ["BASE","REST"]; hint: "Base samples or inflated-rest vertices" }
-        UiButton { objectName: "tissueFieldCreate"; text: "Create"; enabled: !!name.text.trim(); onClicked: { workspace.run("tissue.field.create",{target:panel.item.id,name:name.text.trim(),domain:domain.currentText}); panel.focused=name.text.trim(); } }
+        UiButton { objectName: "tissueFieldCreate"; text: "Create"; enabled: !!name.text.trim(); onClicked: { workspace.run("tissue.field.create",{target:panel.item.id,name:name.text.trim(),domain:domain.currentText}); panel.focused=name.text.trim(); if(panel.chosen) authoring.editTissueField(panel.focused); } }
     }
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Find a field…"; visible: (panel.item.fields?.length || 0)>0 }
     ListView {
@@ -27,6 +27,7 @@ UiSection {
         ScrollBar.vertical: ScrollBar {}
         delegate: UiButton {
             required property var modelData
+            objectName: "tissueField_"+modelData.name
             width: fields.width; height: 32; flatStyle: true; alignLeft: true
             text: modelData.name+" · "+modelData.domain; checkable: true; checked: panel.focused===modelData.name
             onClicked: { panel.focused=modelData.name; authoring.editTissueField(modelData.name); }

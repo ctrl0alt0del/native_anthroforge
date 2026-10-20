@@ -29,7 +29,7 @@ def exercise(controller, window):
     click(window, "StackingToggle")
     click(window, "tissueStackChoice_" + provider)
     toggle(controller, window, target)
-    reveal(find(window, "tissueStackSave"))
+    reveal(find(window, "tissueStackRemove"))
     settle(controller)
     assert window.grabWindow().save(str(Path("build/022-tissue/stacking-inspector.png")))
 
@@ -37,7 +37,7 @@ def exercise(controller, window):
 def toggle(controller, window, target):
     control = find(window, "tissueStackExclude")
     control.setProperty("checked", True)
-    click(window, "tissueStackSave")
+    click(window, "tissueStackExclude")
     settle(controller)
     assert controller.session.document.object(target).stack_relationships[0].excluded
     current(controller.session, target)

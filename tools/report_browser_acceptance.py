@@ -166,18 +166,24 @@ def exercise(window, controller):
 
 def edit_description(window, browser):
     previous, key, image = browser.description, browser.key, browser.image
-    click(window, "reportEditText")
-    find(window, "reportDescription").setProperty("text", "Discard this draft")
+    type_description(window, "Discard this draft")
     click(window, "reportEditCancel")
     assert browser.inbox.read(key).description == previous
-    click(window, "reportEditText")
-    find(window, "reportDescription").setProperty("text", "Updated recommendation · Україна")
+    type_description(window, "Updated recommendation · Україна")
     edit_failure(window, browser)
     click(window, "reportEditSave")
     wait_for(lambda: not browser.state["busy"])
     assert browser.description == "Updated recommendation · Україна"
     assert browser.inbox.read(key).description == browser.description and browser.image == image
     assert not find(window, "reportBrowserDialog").property("editingDescription")
+
+
+def type_description(window, text):
+    field = find(window, "reportDescription")
+    assert not field.property("readOnly")
+    field.forceActiveFocus()
+    field.setProperty("text", text)
+    QTest.qWait(80)
 
 
 def edit_failure(window, browser):

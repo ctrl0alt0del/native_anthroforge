@@ -31,7 +31,6 @@ ColumnLayout {
         title: panel.item.standalone ? "Curve" : "Primitive"
         Label { visible: !panel.item.standalone; text: panel.primitive.kind === "LOFT" ? "Ordered curve loft" : panel.primitive.kind === "BODY" ? "Curve-deformed body" : "Imported mesh"; color: Theme.text }
         CurveEngine { objectName: "standaloneEngine"; visible: !!panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
-        FiberCreation { visible: !!panel.item.standalone && workspace.selectedData.kind==="CURVE"; curve: panel.curve }
         UiButton { objectName: "editPrimitive"; text: panel.item.editing ? "Finish editing" : panel.item.standalone ? "Edit Curve" : "Edit Primitive"; checkable: true; checked: panel.item.editing || false; Layout.fillWidth: true; onClicked: authoring.setEditing(!panel.item.editing) }
         UiCombo { visible: panel.item.editing && panel.primitive.kind === "BODY"; Layout.fillWidth: true; model: ["Curve controls", "Base vertices · Hook assignment"]; currentIndex: panel.item.category === "BASE" ? 1 : 0; onActivated: authoring.setCategory(currentIndex === 1 ? "BASE" : "CURVE") }
         Label { visible: panel.topologyLocked; text: "Topology locked by child or surface attachments"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }

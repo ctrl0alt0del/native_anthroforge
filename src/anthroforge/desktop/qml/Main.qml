@@ -85,7 +85,7 @@ ApplicationWindow {
                 Item { Layout.fillWidth: true }
                 ProfileStatus { keyboard: window.keyboardManager }
                 Label { text: "Workspace"; color: Theme.muted; font.pixelSize: 11 }
-                UiCombo { Layout.preferredWidth: 175; model: workspace.state.workspaces; currentIndex: workspace.state.workspace; onActivated: workspace.run("workspace.select",{index:currentIndex}) }
+                WorkspaceSelector { Layout.preferredWidth: 175 }
                 UiButton { objectName: "manageWorkspace"; text: "Manage…"; enabled: !workspace.state.waiting && !workspace.state.editing; onClicked: workspaceManager.open() }
                 UiButton { objectName: "focusSelection"; text: "Focus"; hint: "Focus selected anatomy and descendants"; enabled: !!workspace.selectedId && !workspace.selectedData.is_construction && !workspace.selectedData.is_control && !workspace.state.waiting; onClicked: workspace.focusSelection() }
             }

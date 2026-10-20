@@ -70,11 +70,11 @@ def inspection(controller, engine, target):
 
 
 def realign(controller, engine):
+    before = len(controller.session.history.entries)
     action(engine, "surfaceRealign", "clicked")
     settle(controller)
-    assert controller.surfacePreview["state"] == "ready"
-    action(engine, "surfacePreviewAccept", "clicked")
-    settle(controller)
+    assert not controller.surfacePreview["token"]
+    assert len(controller.session.history.entries) == before + 1
 
 
 def independence(controller, engine, target):
@@ -110,7 +110,7 @@ def run():
         inspection(controller, engine, target)
         source_list(controller, engine, target)
         additional_sources(controller, engine)
-        closed_preview(controller, engine)
+        closed_creation(controller, engine)
         assert not warnings, warnings
         assert not controller.message, controller.message
     finally:
@@ -118,7 +118,7 @@ def run():
         delete(engine)
 
 
-def closed_preview(controller, engine):
+def closed_creation(controller, engine):
     from surface_preview_scene import sources
 
     curves = sources(controller)
@@ -127,10 +127,7 @@ def closed_preview(controller, engine):
     before = len(controller.session.document.objects)
     click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
-    assert len(controller.session.document.objects) == before
-    assert controller.surfacePreview["state"] == "ready", controller.surfacePreview
-    action(engine, "surfacePreviewAccept", "clicked")
-    settle(controller)
+    assert not controller.surfacePreview["token"]
     assert len(controller.session.document.objects) == before + 1
 
 

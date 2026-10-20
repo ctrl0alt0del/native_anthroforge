@@ -88,9 +88,8 @@ def dense_fiber_options(controller, window):
 
 
 def empty_tissue_picker(window):
-    mouse_click(window, "createTissueToolbar")
-    assert find(window, "tissueCreationDialog").property("visible")
-    QMetaObject.invokeMethod(find(window, "tissueCreationDialog"), "close", Qt.DirectConnection)
+    assert not find(window, "createTissueToolbar").isEnabled()
+    assert not window.property("modalOpen")
 
 
 def tissue_and_source(controller, window):
@@ -111,17 +110,15 @@ def tissue_and_source(controller, window):
 
 def tissue_picker(controller, window):
     scene(controller)
-    membrane = controller.selection
-    controller.select("")
+    generic = controller.run("construction.point.create", dict(position=[0, 0, 0.7]))
+    controller.select(generic)
+    settle(controller)
     mouse_click(window, "createTissueToolbar")
-    dialog = find(window, "tissueCreationDialog")
-    assert dialog.property("visible")
-    dialog.setProperty("source", membrane)
     settle(controller)
-    click(find(window, "createChosenTissue"))
-    settle(controller)
-    assert controller.session.document.object(controller.selection).source == membrane
-    assert not dialog.property("visible")
+    tissue = controller.session.document.object(controller.selection)
+    assert controller.selectedData["is_tissue"] and tissue.source != generic
+    assert controller.session.document.object(tissue.source).binding
+    assert not window.property("modalOpen")
 
 
 def trace_image(controller, window):

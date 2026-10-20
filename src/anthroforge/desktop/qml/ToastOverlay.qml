@@ -12,7 +12,7 @@ Rectangle {
     Label {
         id: message
         anchors.fill: parent; anchors.margins: 12
-        text: ToastBus.text; color: Theme.text; wrapMode: Text.WordWrap
+        text: ToastBus.text; textFormat: Text.PlainText; color: Theme.text; wrapMode: Text.WordWrap
         maximumLineCount: 8; elide: Text.ElideRight
     }
 }

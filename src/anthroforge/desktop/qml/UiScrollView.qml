@@ -5,6 +5,7 @@ ScrollView {
     id: control
     clip: true
     contentWidth: availableWidth
-    rightPadding: effectiveScrollBarWidth > 0 ? effectiveScrollBarWidth + 4 : 0
+    // Reserve the gutter even when content fits; calculation feedback cannot narrow fields.
+    rightPadding: ScrollBar.vertical.implicitWidth + 4
     ScrollBar.vertical.policy: control.contentHeight > control.availableHeight ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
 }

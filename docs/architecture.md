@@ -649,13 +649,29 @@ read-only state. Component editing supplies its own transform target. Keyboard b
 declare capabilities; toolbar, gizmo, modal transforms and numeric fields consume the
 same eligibility instead of testing object names or kinds in QML.
 
-`desktop.creation_selection` follows a single-output authored creation job through
+`desktop.creation_selection` follows a declared primary object of an authored creation job through
 publication, including replacement jobs for changed inputs. It consumes the selection
 intent once, exits component editing and selects the accepted output. Document/session,
 workspace, selection, edit-mode and undo-epoch changes invalidate the intent. It never
 publishes geometry or changes scheduling/history; failure/cancellation leaves editing
 context intact. Viewport toolbar containers consume unused pointer events so disabled
 controls cannot accidentally select geometry behind them.
+
+## Attached construction creation and transient feedback
+
+`core.tissue_creation` separates creation eligibility from the strict evaluator contract:
+Tissue sources remain Anchor/Fiber/Membrane. `application.attached_creation` plans an
+independent required source graph for `membrane.create` and generic `tissue.create`.
+The existing coordinator reserves all new object IDs. Owned worker snapshots use native
+binding capture and surface evaluation; one publication installs the graph and its resources
+into the initiating history action. Downstream tissue jobs are registered before creation
+finishes. `attachment_defaults` owns nearest-SCP policy for Points and Fibers. Internal
+junctions and existing Fiber bindings are retained by shared copy infrastructure.
+
+`UiNotice` is nonvisual feedback, delivered to a bounded `ToastBus` and bottom-right
+`ToastOverlay`. It cannot affect layouts or take input focus. Persistent details remain
+in their existing models; no document, scheduler or undo state belongs to the toast.
+Scroll views reserve a scrollbar gutter and changing detail values elide in stable rows.
 
 ## Publication barriers (0.2.2)
 

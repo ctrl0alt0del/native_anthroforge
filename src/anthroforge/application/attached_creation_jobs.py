@@ -4,7 +4,7 @@ from dataclasses import fields, replace
 from functools import partial
 from typing import Any
 
-from anthroforge.core.jobs import Job
+from anthroforge.core.jobs import Job, ObsoleteInputs
 from anthroforge.core.object_outputs import output
 from anthroforge.core.results import Port
 from anthroforge.core.scheduling import Workload
@@ -81,7 +81,7 @@ def publish(session: Any, spec: Any, origin: int, payload: Any) -> None:
     document, objects, links, resources = payload
     ports = inputs(document, spec)
     if revisions(document, ports) != revisions(session.document, ports):
-        raise ValueError("Attached construction inputs changed before publication.")
+        raise ObsoleteInputs("Attached construction inputs changed before publication.")
     proof = authored_jobs.Capture(
         revisions(document, ports), partial(enqueue, session, spec, origin)
     )

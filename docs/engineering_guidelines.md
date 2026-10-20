@@ -200,6 +200,15 @@ An initial checkpoint may mark evidence pending; the validated merge must descri
 what was actually demonstrated. This is documentation of the existing engineering
 process, not a new approval requirement or an additional runtime subsystem.
 
+## Stable editing layouts
+
+Transient calculation, pending, error and completion feedback must not add/remove editor
+rows or change their width. Use the shared nonmodal bottom-right toast without taking
+focus or pointer input. Keep full details in Activity/Issues or operation details.
+Reserve scrollbar gutters; use stable, elided rows for changing diagnostic values.
+Verify actual field bounds and focus while dragging, not only an idle screenshot.
+Deliberate user mode changes may expose controls; background work must not move them.
+
 ## Design references
 
 The concrete rules above are AnthroForge project decisions. The following sources

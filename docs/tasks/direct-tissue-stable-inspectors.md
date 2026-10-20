@@ -37,15 +37,23 @@ Membrane actions, multi-output creation selection, and layout-independent notice
 Initial API tests pass for Point/Curve/Surface conversion, independent shape preservation,
 single undo, and missing-target rejection. Development gate and GUI not yet qualified.
 
-Pending: mixed fibers/branches/junctions, failures, cancellation,
-undo/redo and persistence; background QML numeric-drag/layout and direct-action checks;
-development gate, canonical portable package and source archive.
+Verified mixed fibers, branched seams/junction copies, failure atomicity, running
+cancellation, undo/redo (including historical captures), superseding inputs/graph changes,
+bone following, independence and persistence. Full pytest passed 1,393 tests before the
+last source-graph regression was added.
+
+Offscreen QML direct actions pass. Actual scrubbing with pending/long error feedback
+kept the numeric field bounds `[1314,187,100,30]` at all three sampled positions,
+retained focus and produced one undo action. Hidden Direct3D automatic tissue geometry
+was saved and visually inspected. No visible desktop interaction was performed.
+
+Pending: complete development gate, canonical portable package and source archive.
 
 ## Next actions and blockers
 
-1. Trace creation/publication contracts and transient inspector feedback.
-2. Implement reusable attached-construction conversion and direct desktop actions.
-3. Qualify layouts, lifecycle, geometry and package; then merge/push normally.
+1. Run the complete development gate and address failures.
+2. Package and qualify the single canonical portable build, update validation records.
+3. Review ownership/coupling, then merge/push normally.
 
 ## Recovery inputs
 

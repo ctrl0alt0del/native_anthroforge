@@ -7,7 +7,11 @@ construction operations. Ownership and acceptance are in the
 ## Tissue operations
 
 `tissue.create(source, name?, preset?)`
-accepts attached construction; `tissue.configure(target, changes)` edits general settings,
+accepts Point/Curve/Surface construction, including attached subclasses. Attached inputs
+are reused and return the Tissue ID. Generic inputs create an independent attached graph
+and return `{object_id, job_id}`; `wait` completes capture and downstream tissue evaluation.
+The whole creation is one undo action; failure/cancellation publishes no partial graph.
+`tissue.configure(target, changes)` edits general settings,
 and `tissue.inflation(target, changes, part="main", side="a")` retains mode-specific data.
 `tissue.relaxation(target, changes)` edits None/Geometric/Static PBD settings. Unsupported
 combinations fail through the same capability policy in desktop and headless clients.
@@ -98,12 +102,16 @@ Attached-point operations added in 0.2.2:
 | --- | --- | --- |
 | `construction.point.create` | optional `name`, `position`, `parent`, `owner`, TRS `values` | Point ID; omitted position uses the workspace cursor. |
 | `construction.point.update` | `target`, local `position` | Ordinary Point edit; Anchors require explicit rebind. |
-| `anchor.create` | Point `source`, anatomical `parent`, optional `role`, `name` | Independent Anchor creation with object/job IDs; source unchanged. |
+| `anchor.create` | Point `source`, optional anatomical `parent`, `role`, `name` | Independent Anchor creation with object/job IDs; source unchanged. Omitted parent chooses nearest ready SCP. |
 | `anchor.rebind` | Anchor `target`, anatomical `parent`, optional `role`, world `position` | Capture job ID; omitted position retains the current resolved location. |
 | `surface.create` | exclusively Fiber `curves`, existing surface settings | Creates a Membrane through the shared surface evaluator; mixed sources remain generic. |
+| `membrane.create` | Surface `source`, optional `name` | Object/job IDs for one independent attached graph; ordinary sources become Fibers, existing Fiber bindings and internal junction sharing are preserved. |
 
 `parent` in Anchor capture names the anatomical target, not ordinary transform parenting.
 Explicit roles are `SCP_GEOMETRY`, `TISSUE_BASE` and `TISSUE_FINAL`; unavailable roles fail.
+Automatic conversion chooses SCP geometry only; use explicit Anchor/Fiber targets when
+Tissue Base/Final bindings are intended. Surface correspondence, exact sampling, branch
+identities and source transforms are remapped without changing the original construction.
 Generic inspection, naming, deletion and Make Independent retain their existing meanings.
 Primitive `curve.point.*` operations are unrelated to construction-point lifecycle.
 See the [tissue walkthrough](tissues_022.md) and [executable example](../examples/tissues.json).

@@ -8,6 +8,7 @@ from anthroforge.core.membranes import Membrane
 from anthroforge.core.points import Anchor
 from anthroforge.core.tissues import TissueVCP
 from tests.test_fiber_creation import path, scene
+from tests.test_surface_workflow import surface, vertices
 
 
 def created(session, operation, **arguments):
@@ -97,3 +98,65 @@ def test_automatic_anchor_creation_uses_same_nearest_default(session):
     source = session.command("construction.point.create", position=[0, 0, 0.7])
     anchor = created(session, "anchor.create", source=source)
     assert anchor.binding.reference.target == target
+
+
+def test_mixed_surface_preserves_existing_fiber_binding_intent(session):
+    _, first = scene(session)
+    session.command("fiber.create", curve=first)
+    session.wait()
+    existing = next(o for o in session.document.objects if isinstance(o, Fiber))
+    second = session.command(
+        "curve.create", points=[dict(position=p) for p in [[-0.4, 0.3, 0.7], [0.4, 0.3, 0.7]]]
+    )
+    session.wait()
+    source = surface(session, [existing.id, second])
+    membrane = created(session, "membrane.create", source=source)
+    copy = session.document.object(membrane.curves[0].curve)
+    assert copy.id != existing.id and copy.supports == existing.supports
+    assert [b.attachment for b in copy.bindings] == [b.attachment for b in existing.bindings]
+    np.testing.assert_array_equal(path(session, copy.id), path(session, existing.id))
+
+
+def test_branch_conversion_preserves_seams_and_copies_junctions_once(session):
+    from tests.test_surface_branches import branched
+
+    scene(session)
+    _, source, _ = branched(session)
+    original, joints = vertices(session, source), session.document.junctions
+    membrane = created(session, "membrane.create", source=source)
+    assert membrane.kind == "BRANCHED"
+    assert len(session.document.junctions) == 2 * len(joints)
+    np.testing.assert_allclose(vertices(session, membrane.id), original, atol=1e-12)
+    assert {b.id for b in membrane.branches}.isdisjoint(
+        session.document.object(source).accepted_parts
+    )
+    assert all(isinstance(session.document.object(u.curve), Fiber) for u in membrane.curves)
+
+
+def test_new_membrane_follows_bone_and_is_independent_of_original_curves(session):
+    target, source, curves = surface_scene(session)
+    membrane = created(session, "membrane.create", source=source.id)
+    initial, original = vertices(session, membrane.id), vertices(session, source.id)
+    session.command("scp.transform", entity=target, values=[0, 0, 0.2, 0, 0, 0, 1, 1, 1])
+    session.wait()
+    np.testing.assert_allclose(vertices(session, membrane.id), initial + [0, 0, 0.2], atol=1e-10)
+    np.testing.assert_array_equal(vertices(session, source.id), original)
+    item = session.document.object(curves[0])
+    session.command(
+        "curve.point.update", curve=item.id, point=item.points[0].id, position=[-0.5, 0, 0.7]
+    )
+    session.wait()
+    np.testing.assert_allclose(vertices(session, membrane.id), initial + [0, 0, 0.2], atol=1e-10)
+
+
+def test_converted_surface_roundtrips_without_recomputation(session, tmp_path):
+    _, source, _ = surface_scene(session)
+    tissue = created(session, "tissue.create", source=source.id)
+    before = session.document.objects
+    location = tmp_path / "automatic.anthroforge"
+    session.command("save", path=str(location), blocked_policy="wait")
+    session.wait()
+    session.command("open", path=str(location))
+    session.wait()
+    assert session.document.objects == before
+    assert session.document.object(tissue.id).result.asset in session.assets

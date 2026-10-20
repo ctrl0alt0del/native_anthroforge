@@ -60,7 +60,7 @@ def start(session: Any, spec: Plan) -> dict[str, str]:
 def plan(session: Any, source: str, name: str, identities: Any = None) -> Plan:
     selected = source_graph_copy.required(session.document, source)
     mapping = source_graph_copy.identities(session.document, selected)
-    mapping.update(identities or {})
+    mapping.update({key: value for key, value in (identities or {}).items() if key in mapping})
     spec = Plan(source, name, frozenset(selected), mapping)
     fibers = tuple(curve_plan(session, spec, key) for key in sorted(selected))
     anchor = point_plan(session, spec)
@@ -97,10 +97,24 @@ def binding_values(document: Any, item: Curve, spec: Plan) -> list[dict[str, Any
     # Bound incident endpoints must share a binding owned by their copied junction source.
     pins = {row["point"] for row in rows}
     for junction in document.junctions:
-        if junction.id in spec.identities and junction.source.curve == item.id:
+        if (
+            junction.id in spec.identities
+            and junction.source.curve == item.id
+            and bound_junction(document, junction.id, spec)
+        ):
             if junction.source.point not in pins:
                 rows.append(dict(point=junction.source.point))
     return rows
+
+
+def bound_junction(document: Any, identity: str, spec: Plan) -> bool:
+    curves = (document.object(key) for key in spec.selected)
+    return any(bound_member(item, identity) for item in curves if isinstance(item, Curve))
+
+
+def bound_member(item: Curve, identity: str) -> bool:
+    pins = {row["point"] for row in original_bindings(item)}
+    return any(point.junction == identity and point.id in pins for point in item.points)
 
 
 def original_bindings(item: Curve) -> list[dict[str, Any]]:

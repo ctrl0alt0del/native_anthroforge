@@ -14,9 +14,12 @@ Apply/Bake is permanently unavailable. Product export remains built-skin-only.
 Schema **4** is the only supported project format; reject all earlier schemas,
 including 0.2.1 schema 3, clearly without partially loading them.
 
-Desktop **Create Tissue** is discoverable on the main toolbar and Create menu. Eligible
-selection creates directly with compatible defaults; otherwise show a searchable source
-and preset chooser. Do not silently convert generic construction into attached sources.
+Desktop **Create Tissue** acts directly on selected Point, Curve or Surface construction
+with compatible defaults; no source-selection modal. Without eligible selection it is
+disabled. Existing Anchor/Fiber/Membrane sources remain shared references. Generic sources
+automatically obtain independent attached copies in the same undo action, using nearest
+ready SCP surfaces for new bindings. Missing supports produce actionable feedback without
+partial creation. This supersedes the earlier explicit-conversion/source-chooser requirement.
 Source navigation enters editing. Selecting a weight field enters component editing;
 committing Weight applies to selected points in one undo action. Stacking order and
 exclusion changes apply immediately; footprint drafts and inflation previews retain
@@ -34,7 +37,10 @@ defaults; relabeling never resets settings, selects an evaluator or toggles stac
 - A Tissue references an Anchor, Fiber or Membrane. Ordinary points, curves and
   surfaces remain valid general construction but are not tissue sources.
 - All-Fiber surface creation returns a Membrane using the common Surface evaluator.
-  Mixed/ordinary-curve inputs produce a generic Surface. Anatomical conversion is explicit.
+  Mixed/ordinary-curve inputs produce a generic Surface. **Create Membrane** independently
+  copies the whole required construction graph, converts ordinary curves to Fibers and
+  preserves existing Fiber binding intent. It uses the same operation as automatic tissue
+  conversion. Copy internal junctions once; preserve source ordering, alignment and settings.
 - Point-to-Anchor copies the authored Point independently and establishes a binding;
   it never changes the source Point. Existing curve-to-Fiber copy semantics remain.
 - Sources are shared live references. Make Independent copies the required construction
@@ -48,6 +54,11 @@ defaults; relabeling never resets settings, selects an evaluator or toggles stac
   and its shared construction. Outside consumers continue at lower priority.
 - Generated Tissue geometry has no direct transform or vertex-edit action. Source
   and parameter edits use the shared operation policies in GUI and headless clients.
+
+Transient calculation, pending and error feedback uses a nonmodal bottom-right toast.
+It cannot add/remove inspector rows, alter widths, steal focus or interrupt numeric drags.
+Diagnostic detail remains in Activity/Issues and operation details. Scroll views reserve
+their scrollbar gutter so changing content height cannot narrow editing controls.
 
 ## Construction, inflation and constraints
 

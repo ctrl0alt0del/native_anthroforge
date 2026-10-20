@@ -71,6 +71,7 @@ evidence for those revisions, not current workflow instructions.
 | A02 | Anchor/point bindings: capture and resolve explicit SCP or Tissue Base/Final material locations, orientation and offsets. Resolve against accepted deformed material without automatic nearest reassignment. | [point attachment adapter](../src/anthroforge/native/point_attachments.py), [material_binding.cpp](../native/src/material_binding.cpp), [surface providers](../src/anthroforge/application/surface_providers.py) | [point attachments](../tests/test_point_attachments.py), [tissue anchor material](../tests/test_tissue_anchor_material.py) |
 | A03 | Fiber attachment fields: dense surface captures, nearest-owner runs, arc-length blending between owners, structural pins and retained material influence. Applies across curve engines. | [attachment_weights.cpp](../native/src/attachment_weights.cpp), [attachment fields](../src/anthroforge/native/attachment_fields.py) | [attachment weights](../tests/test_attachment_weights.py), [attachment fields](../tests/test_attachment_fields.py) |
 | A04 | Fiber resolution/editing: resolve its current attached shape, edit authored controls, rebind edited endpoints using Current/Any eligible parent policy, preserve unedited pins, then evaluate its path engine. | [fiber bindings](../src/anthroforge/application/fiber_bindings.py), [fiber edit evaluation](../src/anthroforge/application/fiber_edit_evaluation.py), [path_editing.cpp](../native/src/path_editing.cpp) | [fiber editing](../tests/test_fiber_editing.py), [tissue fiber material](../tests/test_tissue_fiber_material.py) |
+| A05 | Automatic attached construction: native nearest-SCP capture for new Anchor/Fiber bindings, independent graph copies, preserved existing Fiber bindings, and native Membrane evaluation under one reserved worker job. One atomic publication/undo; Tissue evaluation remains downstream. | [creation plan](../src/anthroforge/application/attached_creation.py), [worker assembly](../src/anthroforge/application/attached_creation_compute.py), [lifecycle](../src/anthroforge/application/attached_creation_jobs.py) | [conversion](../tests/test_attached_creation.py), [lifecycle](../tests/test_attached_creation_lifecycle.py) |
 
 ### Surfaces and membranes
 
@@ -618,3 +619,35 @@ resolved inflation/smoothing defect when assessing the fixture.
   [CGAL mean-value coordinate properties](https://doc.cgal.org/latest/Barycentric_coordinates_2/index.html).
   No new dependency is introduced; the vendored libigl MVC routine is explicitly marked
   broken upstream and is not used.
+
+### CH-014 — Atomic automatic attached construction
+
+- **Inventory:** A02–A05, C07, S01–S04; application orchestration and scheduling.
+- **Observed limitation:** Create Tissue required attached construction or opened a
+  source modal. There was no complete Surface-to-Membrane operation; issuing independent
+  curve conversion commands would create multiple undo steps and partial graphs on failure.
+- **Before:** separate explicit Anchor/Fiber captures and Surface creation; only Fiber
+  creation had the automatic nearest-SCP default. Baseline `6f72018`.
+- **Replacement:** one shared plan copies the required graph, remaps internal sharing once,
+  captures new anatomical bindings natively, copies existing Fiber binding intent, and
+  evaluates the Membrane using its retained correspondence. One coordinator job reserves
+  every new output, captures dispatch-time data, validates reads, and publishes all records
+  and owned resources into the initiating history action. Tissue jobs are registered before
+  creation is terminal. Input changes replan safely; old histories replay their own captures.
+  `anchor.create` also supports the shared nearest-SCP default.
+- **Preserved:** original shapes, ordering, per-consumer transforms, canonical sampling,
+  internal junction sharing, existing external bindings, cancellation, workspace association,
+  one-action undo and complete saves. Numerical algorithms/clearance/collision rules are
+  unchanged. No Python numerical fallback or second scheduler is introduced.
+- **Evidence:** automatic Point/Curve/Surface workflows, mixed Fiber/Curve surfaces,
+  branched seams, retained shape and bindings, bone-following, independence, undo/redo,
+  injected capture failure, running cancellation, superseding edits and schema-4 roundtrip
+  checks pass. Offscreen direct actions select the primary new object and exit editing.
+  The hidden Direct3D render of the automatically converted arch was inspected; no visible
+  window or physical input-latency acceptance is claimed. Full final qualification is
+  recorded in the [task record](tasks/direct-tissue-stable-inspectors.md).
+- **Intentional behavior/limits:** generic sources become independent attached copies.
+  New implicit bindings choose ready SCP geometry, not Tissue Base/Final; explicit binding
+  operations remain available for other targets. Missing supports fail without partial
+  creation. Tissue inflation can still report its normal capability/geometry errors after
+  successful attached-source creation. No general performance improvement is claimed.

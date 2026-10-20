@@ -10,6 +10,12 @@ from anthroforge.native.mesh import NativeCancellation
 from anthroforge.native.strokes import Stroke, plane
 
 
+def assert_outward_depth(actual, expected):
+    # Projection adds a sub-micrometre outward margin at this fixture scale.
+    delta = actual - np.asarray(expected)
+    assert np.all(delta >= 0) and np.max(delta) < 1e-6
+
+
 def pointer(x=0, y=0, radius=1):
     return [x, y, 3, 0, 0, -1, x * 100, y * 100, radius]
 
@@ -47,7 +53,7 @@ def test_temporary_snap_chooses_nearest_surface_and_restores_view_plane(session)
     value.snapping(False)
     assert value.probe(pointer())[2] == 0
     value.append(pointer(0.2), False)
-    np.testing.assert_allclose(value.read()[:, 2], [0, 1.5, 0])
+    assert_outward_depth(value.read()[:, 2], [0, 1.5, 0])
     value.pop()
     assert value.probe(pointer())[2] == 0
 
@@ -91,7 +97,7 @@ def test_blender_projects_target_before_depth_substeps(session):
     value = stroke(session, [m.handle for m in meshes], [IDENTITY] * 2, surface=True)
     value.append(pointer(0), False)
     value.append(pointer(0.12), True)
-    np.testing.assert_allclose(value.read()[:, 2], [0.5, 1.5, 1.5, 1.5, 1.5])
+    assert_outward_depth(value.read()[:, 2], [0.5, 1.5, 1.5, 1.5, 1.5])
 
 
 def test_missed_target_keeps_precomputed_depth_but_next_event_uses_substep_hit(session):
@@ -125,7 +131,7 @@ def test_first_hit_plane_and_radius_relative_offset(session, assembly):
     value = mesh_stroke(session, assembly, first=2, offset=0.1, relative=True)
     value.append(pointer(radius=2), False)
     value.append(pointer(2, radius=4), False)
-    np.testing.assert_allclose(value.read()[:, 2], [0.7, 0.7])
+    assert_outward_depth(value.read()[:, 2], [0.7, 0.7])
 
 
 def test_image_plane_preserves_affine_placement_and_parallel_rays_fail(session):

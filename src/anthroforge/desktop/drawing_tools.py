@@ -2,7 +2,7 @@
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
-from . import drawing_context, scene_state
+from . import drawing_context
 from .image_tools import context_owner
 
 DEFAULTS = dict(
@@ -157,8 +157,10 @@ class DrawingTools(QObject):
             self.painting = self.mode == "DRAW"
 
     def place_cursor(self, ray, press):
-        hits = scene_state.mesh_hits(self.controller, ray[:3], ray[3:6])
-        self.hover = hits[0]["point"] if hits else []
+        from .curve_interaction import surface_hit
+
+        hit = surface_hit(self.controller, ray[:3], ray[3:6], exclude_current=False)
+        self.hover = hit.get("point", [])
         if press and self.hover:
             self.controller.run("workspace.update", dict(cursor=self.hover))
             self.cancel()

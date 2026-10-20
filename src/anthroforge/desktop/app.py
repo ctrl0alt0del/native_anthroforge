@@ -49,6 +49,7 @@ def attach_window(engine, controller, inputs):
     window = engine.rootObjects()[0]
     window.frameSwapped.connect(controller.frame_presented)
     window.installEventFilter(inputs)
+    inputs.canceled.connect(controller.numeric_edits.cancel)
     if getattr(controller, "qt_profiler", None):
         controller.qt_profiler.attach(window, controller)
 
@@ -56,6 +57,7 @@ def attach_window(engine, controller, inputs):
 def setup_profile_controls(controller, engine):
     from .profile_controls import ProfileControls
 
+    engine.rootContext().setContextProperty("numericEdits", controller.numeric_edits)
     controller.profile_controls = ProfileControls(
         controller, getattr(controller, "qt_profiler", None)
     )

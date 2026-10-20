@@ -53,8 +53,8 @@ UiSection {
             }
             UiCheck { text: "Invert weights"; checked: bindingPanel.binding.invert; onClicked: bindingPanel.set("invert",checked) }
             RowLayout {
-                UiField { id: selectedWeight; text: "1"; placeholderText: "Selected weight"; Layout.fillWidth: true }
-                UiButton { text: "Set selected weight"; onClicked: authoring.weights(bindingPanel.binding.id,Number(selectedWeight.text)) }
+                UiNumberField { id: selectedWeight; value: 1; live: false; minimum: 0; maximum: 1; Accessible.name: "Selected weight"; Layout.fillWidth: true; onEdited: number=>value=number }
+                UiButton { text: "Set selected weight"; onClicked: authoring.weights(bindingPanel.binding.id,selectedWeight.value) }
             }
             UiField { Layout.fillWidth: true; placeholderText: "Influence weights, comma separated"; text: bindingPanel.binding.weights.join(", "); onEditingFinished: bindingPanel.set("weights",text.trim()?text.split(",").map(Number):[]) }
             RowLayout {

@@ -30,7 +30,7 @@ ColumnLayout {
     }
     UiSection {
         title: "Appearance"; hint: "Appearance belongs to this workspace and does not change authored image placement."
-        NumericSetting { label: "Opacity"; decimals: 2; value: panel.style.opacity ?? .65; onEdited: value => panel.appearance("opacity",value) }
+        NumericSetting { live: false; label: "Opacity"; minimum: 0; maximum: 1; decimals: 2; value: panel.style.opacity ?? .65; onEdited: value => panel.appearance("opacity",value) }
         UiCombo { Layout.fillWidth: true; model: ["Normal depth","In front","Behind geometry"]; currentIndex: Math.max(0,["NORMAL","FRONT","BACK"].indexOf(panel.style.depth)); onActivated: panel.appearance("depth",["NORMAL","FRONT","BACK"][currentIndex]) }
         UiCombo { Layout.fillWidth: true; model: ["Both sides","Front side","Back side"]; currentIndex: Math.max(0,["BOTH","FRONT","BACK"].indexOf(panel.style.side)); onActivated: panel.appearance("side",["BOTH","FRONT","BACK"][currentIndex]) }
         UiCheck { text: "Orthographic views"; checked: panel.style.orthographic ?? true; onClicked: panel.appearance("orthographic",checked) }

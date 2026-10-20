@@ -8,9 +8,13 @@ Item {
     property bool blocked: false
     property bool transforming: false
     property bool snapping: false
+    property bool numericEditing: false
     property var capabilities: ({})
     function capabilityEnabled(binding) { return !binding.capability || capabilities[binding.capability] === true; }
-    function commandEnabled(command) { return bindings.filter(binding=>binding.command===command).every(capabilityEnabled); }
+    function commandEnabled(command) {
+        if(numericEditing && !["cancel","recordPerformance"].includes(command)) return false;
+        return bindings.filter(binding=>binding.command===command).every(capabilityEnabled);
+    }
     readonly property bool typing: !!window.activeFocusItem && window.activeFocusItem.selectByMouse !== undefined
     signal requested(string command)
     signal canceled()
@@ -69,7 +73,7 @@ Item {
         {command:"confirm", key:"Enter", duringTransform:true, allowModifiers:true},
         {command:"removeLastPoint", key:"Backspace", duringTransform:true},
         {command:"projection", key:"5"}, {command:"xray", key:"Alt+Z"},
-        {command:"cancel", key:"Escape", allowModifiers:true, duringTransform:true}
+        {command:"cancel", key:"Escape", allowModifiers:true, duringTransform:true, allowTyping:true}
     ]
     Instantiator {
         model: manager.bindings
@@ -78,7 +82,7 @@ Item {
             sequences: manager.sequences(modelData)
             context: modelData.allowBlocked ? Qt.ApplicationShortcut : Qt.WindowShortcut
             autoRepeat: false
-            enabled: manager.capabilityEnabled(modelData) && (!manager.blocked || !!modelData.allowBlocked) && (!manager.typing || modelData.scope === "document" || !!modelData.allowTyping) && (!manager.transforming || !!modelData.duringTransform)
+            enabled: manager.commandEnabled(modelData.command) && (!manager.blocked || !!modelData.allowBlocked) && (!manager.typing || modelData.scope === "document" || !!modelData.allowTyping) && (!manager.transforming || !!modelData.duringTransform)
             onActivated: manager.requested(modelData.command)
         }
     }

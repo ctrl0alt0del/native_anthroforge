@@ -24,7 +24,7 @@ Item {
         ColumnLayout {
             id: controls; anchors.fill: parent; anchors.margins: 12
             Label { text: overlay.state.points.length < 2 ? "Pick "+(overlay.state.points.length ? "second" : "first")+" image landmark" : "Distance between landmarks"; color: Theme.text }
-            NumericSetting { visible: overlay.state.points.length === 2; label: "Distance"; length: true; value: overlay.distance; onEdited: value => overlay.distance=value }
+            NumericSetting { live: false; visible: overlay.state.points.length === 2; label: "Distance"; length: true; value: overlay.distance; onEdited: value => overlay.distance=value }
             RowLayout {
                 UiButton { text: "Calibrate"; primary: true; enabled: overlay.state.points.length===2 && overlay.distance>0; onClicked: workspace.imageTools.accept(overlay.distance) }
                 UiButton { text: "Cancel"; onClicked: workspace.imageTools.cancel() }

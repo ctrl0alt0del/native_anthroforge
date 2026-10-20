@@ -1,5 +1,4 @@
 #include "mesh_internal.hpp"
-#include <igl/Hit.h>
 
 namespace af {
 Surface::Surface(const Mesh& mesh,const M4& matrix):triangles(&mesh.triangles) {
@@ -34,7 +33,7 @@ static int closest_corner(const Mesh& mesh,const M4& matrix,int polygon,const V3
     }
     return closest;
 }
-static void write_hit(const Mesh& mesh,const M4& matrix,const V3& origin,const igl::Hit& hit,double* output) {
+static void write_hit(const Mesh& mesh,const M4& matrix,const V3& origin,const RayHit& hit,double* output) {
     const auto triangle=mesh.triangles.row(hit.id);
     const V3 weights(1-hit.u-hit.v,hit.u,hit.v);
     V3 local=V3::Zero();
@@ -56,7 +55,7 @@ int pick_surface(const Mesh& mesh,const M4& world,const V3& start,const V3& ray,
     const M4 inverse=world.inverse();
     const Eigen::RowVector3d local_start=point(inverse,start).transpose();
     const Eigen::RowVector3d local_ray=(inverse.block<3,3>(0,0)*ray).transpose();
-    igl::Hit hit;
+    RayHit hit;
     if(!intersect_ray(mesh,local_start.transpose(),local_ray.transpose(),hit)) return 0;
     write_hit(mesh,world,start,hit,output); return 1;
 }
@@ -90,12 +89,6 @@ int af_scene_pick(int count,const uint64_t* meshes,const double* matrices,
 int af_surface_normal(uint64_t handle,const double* matrix,int triangle,double* output) {
     try {
         const auto mesh=af::mesh(handle); const af::M4 world=Eigen::Map<const af::M4>(matrix);
-        if(triangle<0||triangle>=mesh->triangles.rows()) throw std::runtime_error("Invalid surface triangle.");
-        const auto face=mesh->triangles.row(triangle);
-        const af::V3 a=mesh->vertices.row(face[1])-mesh->vertices.row(face[0]);
-        const af::V3 b=mesh->vertices.row(face[2])-mesh->vertices.row(face[0]);
-        const af::V3 normal=world.block<3,3>(0,0).inverse().transpose()*a.cross(b);
-        if(!normal.allFinite()||normal.norm()<1e-15) throw std::runtime_error("Degenerate surface normal.");
-        Eigen::Map<af::V3> result(output); result=normal.normalized(); return 0;
+        Eigen::Map<af::V3> result(output); result=af::surface_normal(*mesh,world,triangle); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }

@@ -43,6 +43,7 @@ class Offscreen:
         self.engine.addImportPath(str(build_directory() / "qml"))
         self.engine.rootContext().setContextProperty("workspace", controller)
         self.engine.rootContext().setContextProperty("authoring", controller.authoring)
+        self.engine.rootContext().setContextProperty("numericEdits", controller.numeric_edits)
         self.engine.warnings.connect(lambda errors: warnings.extend(e.toString() for e in errors))
 
     def load_view(self):

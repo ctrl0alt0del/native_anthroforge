@@ -81,7 +81,11 @@ and click repeatedly; hold Ctrl during a point drag to snap to other SCP surface
 points and handles have distinct colors. G/R/S starts mouse transforms; 1/2/3 centers X/Y/Z
 views without ending an edit; 4 restores the original camera, including zoom and projection.
 While snapping, the wheel adjusts surface offset and middle-click
-or Ctrl release resets it. It includes editable Bézier lofts and curve-deformed box/cylinder/capsule bodies,
+or Ctrl release resets it. Snapping stays outside the hit face; scrolling inward stops
+at a small numerical safety margin. Numeric fields accept decimal points or commas:
+click to type, or drag horizontally for live adjustment with one undo action; Escape
+cancels a drag. Integer settings retain whole-number input.
+It includes editable Bézier lofts and curve-deformed box/cylinder/capsule bodies,
 shared Hooks and lattice cages, Simple Solidify thickness, and OBJ/STL/PLY imports.
 It retains explicit units, SCP hierarchy and transforms,
 attachments and anchor controls, transactions/undo, background calculation scheduling,

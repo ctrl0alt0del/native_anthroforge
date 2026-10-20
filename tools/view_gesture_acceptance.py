@@ -156,8 +156,8 @@ def wheel(window, pointer, notches, buttons=LEFT):
 
 def assert_offset(controller, point_id, sign):
     hit, offset = controller.authoring.interaction.snap, controller.authoring.interaction.offset
-    assert offset * sign > 0
-    expected = np.array(hit["surface"]) + offset * np.array(hit["normal"])
+    assert offset > 0 if sign > 0 else offset == 0
+    expected = np.array(hit["surface"]) + hit["clearance"] * np.array(hit["normal"])
     np.testing.assert_allclose(position(controller, point_id), expected, atol=1e-7)
 
 
@@ -209,9 +209,7 @@ def reset_offset(controller, window, point_id, pointer):
     interaction = controller.authoring.interaction
     QTest.mouseClick(window, Qt.MiddleButton, CTRL, pointer)
     assert interaction.offset == 0 and controller.session.history.before is not None
-    np.testing.assert_allclose(
-        position(controller, point_id), interaction.snap["surface"], atol=1e-7
-    )
+    np.testing.assert_allclose(position(controller, point_id), interaction.snap["point"], atol=1e-7)
 
 
 def finish_offset(controller, window, point_id, before, cursor, modal):

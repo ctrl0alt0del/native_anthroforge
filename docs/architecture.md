@@ -375,10 +375,21 @@ Only the displayed camera uses existing workspace persistence; the return point 
 Modal rotation uses a native axis-angle adapter around the view direction. Selected curve points
 include their handles during rotation/scale, while translation retains automatic handle behavior.
 
-The transient curve interaction owns the signed snap offset. It reuses the displayed surface hit
-and asks native code for its world normal, with inverse-transpose handling of nonuniform/mirrored
-transforms. Wheel/reset events update the same active transform, not camera zoom or a second edit.
+The transient curve interaction owns the nonnegative snap offset. It reuses the displayed surface hit
+and asks the shared native `surface_snap` helper for outward placement, with inverse-transpose
+handling of nonuniform/mirrored transforms and a scale-aware numerical margin. Native drawing,
+point placement and cursor placement use the same policy. Exact picking and measurement hits
+retain their unshifted coordinates. Wheel/reset events update the same active transform, not camera zoom or a second edit.
 Offset and feedback clear on snapping release and gesture completion/cancellation.
+
+`UiNumberField` owns decimal parsing, integer policy, display formatting and horizontal
+scrubbing; scalar, vector and anatomical-transform controls all use it. Dot and comma
+decimal separators are accepted independently of the OS locale; thousands separators
+are not accepted. `NumericEdits` owns a scrub's existing application transaction, including
+rollback on cancellation, lost window activation, destroyed controls or command failure.
+Domain values update through the same commands as typed edits and commit as one undo step.
+Draft tool settings and workspace-only values use release-only publication, without
+pretending to participate in document undo. KeyboardManager retains shortcut ownership.
 
 `SelectionOutline` renders a depth-tested selection mask with the same cameras, displayed
 mesh resources and active staging flags as the main view. A small screen-space dilation

@@ -52,21 +52,14 @@ static Pointer pointer_input(const double* data) {
         throw std::runtime_error("Pointer ray must be finite and radius nonnegative.");
     return value;
 }
-static V3 surface_normal(const DrawingSurface& surface,int triangle) {
-    const auto& mesh=*surface.mesh; const auto face=mesh.triangles.row(triangle);
-    const V3 a=mesh.vertices.row(face[1])-mesh.vertices.row(face[0]);
-    const V3 b=mesh.vertices.row(face[2])-mesh.vertices.row(face[0]);
-    const V3 normal=surface.frame.block<3,3>(0,0).inverse().transpose()*a.cross(b);
-    if(normal.norm()<1e-15) throw std::runtime_error("Degenerate drawing surface normal.");
-    return normal.normalized();
-}
-static bool surface_hit(const Stroke& stroke,const Pointer& ray,V3& point,V3& normal) {
+static bool surface_hit(const Stroke& stroke,const Pointer& ray,V3& point,V3& normal,double offset) {
     double closest=std::numeric_limits<double>::infinity(); bool found=false;
     for(const auto& surface:stroke.surfaces) {
         double output[10];
         if(!pick_surface(*surface.mesh,surface.frame,ray.head<3>(),ray.segment<3>(3),output)||output[0]>=closest) continue;
-        closest=output[0]; point=Eigen::Map<const V3>(output+4);
-        normal=surface_normal(surface,int(output[2])); found=true;
+        closest=output[0]; found=true;
+        normal=surface_normal(*surface.mesh,surface.frame,int(output[2]));
+        point=surface_snap(*surface.mesh,surface.frame,int(output[2]),Eigen::Map<const V3>(output+4),offset);
     }
     return found;
 }
@@ -87,8 +80,7 @@ static void lock_plane(Projection& state,const V3& point,const V3& normal) {
 }
 static bool snapped(const Stroke& stroke,Projection& state,const Pointer& ray,Sample& sample,bool* depth_found) {
     V3 point,normal;
-    if(!stroke.snapping||!surface_hit(stroke,ray,point,normal)) return false;
-    point+=normal*state.offset*(state.relative?ray[8]:1);
+    if(!stroke.snapping||!surface_hit(stroke,ray,point,normal,state.offset*(state.relative?ray[8]:1))) return false;
     state.previous=point; sample={point.x(),point.y(),point.z(),ray[8]};
     if(depth_found) *depth_found=true;
     return true;
@@ -97,9 +89,8 @@ static Sample project(const Stroke& stroke,Projection& state,const Pointer& ray,
     Sample sample;
     if(snapped(stroke,state,ray,sample,depth_found)) return sample;
     V3 point,normal=state.normal; bool found=!state.surface||state.locked;
-    if(state.surface&&!state.locked&&(found=surface_hit(stroke,ray,point,normal))) {
-        point+=normal*state.offset*(state.relative?ray[8]:1);
-    } else point=plane_hit(ray,state.surface&&!state.locked?state.depth:state.origin,state.normal);
+    if(!(state.surface&&!state.locked&&(found=surface_hit(stroke,ray,point,normal,state.offset*(state.relative?ray[8]:1)))))
+        point=plane_hit(ray,state.surface&&!state.locked?state.depth:state.origin,state.normal);
     if(found) state.depth=point;
     if(state.surface&&state.first&&!state.locked) lock_plane(state,state.depth,normal);
     if(depth_found) *depth_found=found;

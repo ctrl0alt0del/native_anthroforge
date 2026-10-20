@@ -46,6 +46,7 @@ struct Surface {
     Surface(const Mesh& mesh, const M4& matrix);
 };
 struct Hit { int triangle=-1; V3 point=V3::Zero(), weights=V3::Zero(); double distance=0; };
+struct RayHit { int id=-1; double u=0,v=0,t=0; };
 struct Cancellation { std::atomic<bool> cancelled{false}; };
 std::shared_ptr<Mesh> mesh(uint64_t handle);
 uint64_t retain(std::shared_ptr<Mesh> mesh);
@@ -60,6 +61,8 @@ M3 rotation(const M4& matrix);
 V3 scales(const M4& matrix);
 Hit nearest(const Surface& surface, const V3& point);
 int pick_surface(const Mesh& mesh,const M4& world,const V3& origin,const V3& direction,double* output);
-bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,igl::Hit& hit);
+bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,RayHit& hit);
+V3 surface_normal(const Mesh& mesh,const M4& matrix,int triangle);
+V3 surface_snap(const Mesh& mesh,const M4& matrix,int triangle,const V3& position,double offset);
 V3 barycentric(const V3& point, const V3& a, const V3& b, const V3& c);
 }

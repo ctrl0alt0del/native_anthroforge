@@ -3,6 +3,7 @@
 import json
 import zipfile
 from threading import Event
+from time import monotonic
 
 import numpy as np
 import pytest
@@ -118,23 +119,32 @@ def drag_hook(session, control):
 
 
 def blocked_construction(session, monkeypatch):
-    original, gate = construction_tasks.compute, Event()
+    original, gate, started = construction_tasks.compute, Event(), Event()
     session.scheduler.task_schedulers["construction"] = MeasuredTaskScheduler()
 
     def delayed(*args):
+        started.set()
         assert gate.wait(3)
         return original(*args)
 
     monkeypatch.setattr(construction_tasks, "compute", delayed)
-    return gate
+    return gate, started
+
+
+def wait_for_construction(session, started):
+    deadline = monotonic() + 2
+    while not started.is_set() and monotonic() < deadline:
+        session.scheduler.tick()
+        started.wait(0.005)
+    assert started.is_set(), "Construction did not dispatch after its curve prerequisite."
 
 
 def test_running_construction_checkpoint_and_undo_redo(session, tmp_path, monkeypatch):
     entity = create(session)
     before = session.document
-    gate = blocked_construction(session, monkeypatch)
+    gate, started = blocked_construction(session, monkeypatch)
     lift_first_point(session, entity)
-    session.scheduler.tick()
+    wait_for_construction(session, started)
     verify_construction_checkpoint(session, entity, before, tmp_path)
     session.command("undo")
     session.command("redo")

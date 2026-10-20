@@ -202,13 +202,20 @@ snap surface without being edited. Releasing Ctrl restores movement in the origi
 plane; a miss also uses ordinary movement. Snapping places the point without creating a
 persistent attachment. Escape or switching applications cancels an active drag.
 
-While snapping, the mouse wheel changes a signed offset along the hit surface's world
-normal. Positive values follow its authored normal; negative values go into the surface.
+While snapping, the mouse wheel changes an outward offset along the hit surface's world
+normal. Scrolling inward stops at zero user offset, with a small numerical margin keeping
+the point outside the face. The authored face normal defines the outside.
 The marker displays the offset in the workspace display unit. One notch uses the world distance corresponding
 to eight screen pixels at the selection depth; Shift makes the adjustment ten times finer.
 The wheel does not zoom during snapping. **Middle-click or release Ctrl** to reset the
 offset to zero. Middle-click preserves the active edit. The offset carries across snap
 targets within the gesture and resets when the gesture finishes or is canceled.
+
+Numeric fields accept `0.25` or `0,25` regardless of the system locale. Click a value
+to type, or hold and drag horizontally to adjust it. Document values update live and
+the whole drag is one undo action; Escape cancels it. Drawing drafts and workspace
+settings apply on release. Integer settings move in whole-number steps. Click first
+to enter text mode when you need to select or replace digits.
 
 Curves are purple, control points gold, and handle points/links blue. Selected and hovered
 components retain their type colors with larger markers. The help menu lists the defaults;

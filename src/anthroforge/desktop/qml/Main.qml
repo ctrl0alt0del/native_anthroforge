@@ -285,6 +285,7 @@ ApplicationWindow {
     DeleteDialog { id: deleteDialog }
     KeyboardManager {
         id: keyboard; window: window; blocked: window.modalOpen || workspace.state.waiting; transforming: viewport.transforming; snapping: viewport.snapping
+        numericEditing: numericEdits.active
         capabilities: ({transform:viewport.transformAvailable})
         onRequested: command => window.dispatchShortcut(command)
         onCanceled: { viewport.cancelTransform(); workspace.drawingTools.clearStroke(); }
@@ -309,6 +310,7 @@ ApplicationWindow {
     })
     function dispatchShortcut(command) {
         if(!keyboard.commandEnabled(command)) return;
+        if(command==="cancel" && window.activeFocusItem?.cancelEdit) { window.activeFocusItem.cancelEdit(); return; }
         const action = shortcutCommands[command];
         if (action) action();
     }

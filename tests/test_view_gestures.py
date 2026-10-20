@@ -1,4 +1,4 @@
-"""Native contracts needed by view-relative transforms and signed surface offsets."""
+"""Native contracts needed by view-relative transforms and outward surface offsets."""
 
 from types import SimpleNamespace
 
@@ -6,7 +6,6 @@ import numpy as np
 import pytest
 
 from anthroforge.desktop import authoring_actions, authoring_state
-from anthroforge.desktop.curve_interaction import offset_hit
 from anthroforge.native import scene
 
 
@@ -33,9 +32,6 @@ def test_surface_normal_transforms_as_covector(session, scale):
     result = scene.surface_normal(session.engine, mesh.handle, matrix, 0)
     expected = np.linalg.inv(np.array(matrix).reshape(4, 4)[:3, :3]).T @ [-1, 0, 1]
     assert result == pytest.approx(expected / np.linalg.norm(expected))
-    hit = offset_hit(dict(point=[1, 2, 3], normal=result), -0.02)
-    assert hit["point"] == pytest.approx(np.array([1, 2, 3]) - 0.02 * np.array(result))
-    assert hit["surface"] == [1, 2, 3]
 
 
 def free_curve(session):

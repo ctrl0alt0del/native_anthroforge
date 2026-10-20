@@ -3,7 +3,7 @@
 - Task branch: `codex/ui-direct-workflows`
 - Integration branch: `main`
 - Starting revision: `bad422f0193f2f871f05e16a0815da2377f76eb4`
-- Status: in progress
+- Status: complete
 - Updated: 2026-10-20, Europe/Bucharest
 - Writer: local desktop chat; direct work, background validation only
 
@@ -49,7 +49,7 @@ qualify the single canonical 0.2.2 package and source archive, then merge/push.
 
 ## Current state and next steps
 
-Implementation and interaction qualification (not release-ready):
+Implemented and qualified:
 - Native nearest-SCP pin capture inside the existing Fiber creation job, with optional
   explicit overrides and dispatch-time provenance. No Python geometry loop.
 - Shared deletion-impact query, direct closed surface creation/Realign, source/member
@@ -69,25 +69,37 @@ Implementation and interaction qualification (not release-ready):
   points as well as imported vertices. Selection changes neither geometry nor history.
 - Updated specifications, API and walkthroughs. Full Windows gate passed: 1,317 tests
   (87.63 seconds, 829 existing Qt deprecation warnings), native CTests, type/style/function
-  checks and numerical/native doctor. Portable qualification and final delivery remain.
+  checks and numerical/native doctor.
 - The additional packaged command protocol passes in the source launcher: automatic
   endpoints, independent copy, undo/redo, impact inspection and saved ready output.
 - An additional search regression exposed misleading defaults after filtering an explicit
   surface choice. The shared selector now retains authored/draft selection across filtering
   and Qt model replacement. Actual Fiber overrides and Anchor creation/rebind checks pass.
-  This final runtime change is QML-only; compiled Python/native sources are unchanged.
+  This selector fix is QML-only.
 - First portable run passed through tissue rendering and the new API checks, then failed
   because its compiled report probe still expected the removed Edit text button.
   Updated that opt-in probe to focus/edit directly; source packaged-style capture/edit/
-  delete now passes. Rebuilding the executable is required before repeating portable QA.
+  delete passes. Rebuilt and repeated the entire portable suite successfully.
 
 Prior ignored audit probe reproduced unapplied stacking checkbox changes, hidden Fiber
 creation, per-point selector clutter, source navigation without editing and Hook member
 selection doing nothing outside edit mode.
 
-1. Finish full Windows gate and portable qualification.
-2. Record final evidence, install the single canonical package and source archive.
-3. Merge and push validated changes.
+## Final delivery
+
+- Qualified runtime source: `de7d5648c5afcf6b31b4583116ac26de5a1fd1b2`.
+- Full minimal-PATH portable suite passed: headless/native operations, automatic Fiber
+  capture and undo/redo, impact inspection, persistence, hidden GPU rendering, Qt startup,
+  profiling, issues, inspection tools, construction/images, tissues and feedback inbox.
+- Canonical package installed at `dist/0.2.2/AnthroForge.dist` after verifying neither
+  installation was running. Previous installation is retained under the ignored task
+  build directory. One companion `dist/AnthroForge-0.2.2-source.zip` contains source/docs.
+- Executable SHA-256:
+  `b7567e763034fbd5c39c78ecbfea864fbe8130a50db60286a27c3be746f87b2f`.
+- Offscreen full-QML and hidden-GPU captures were inspected. These checks do not establish
+  a performed interactive desktop session or physical input/display latency.
+- Original report archives and unrelated root `__init__.py` remain unchanged.
+- Delivery uses the normal validated merge to `main`, preserving checkpoint history.
 
 ## Ownership review
 

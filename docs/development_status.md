@@ -30,7 +30,11 @@ display-latency measurement is claimed.
 Ownership review separates UI navigation from shared application rules. Native batch
 queries execute inside existing Fiber jobs; no Python geometry loop or new scheduler.
 Optional previews and coherent drafts remain where they protect a multi-step edit.
-Portable qualification and canonical package replacement are pending in this checkpoint.
+The final runtime `de7d5648c5afcf6b31b4583116ac26de5a1fd1b2` passes the complete
+minimal-PATH portable suite, including the updated direct report-edit probe. Hidden GPU
+tissue rendering and the packaged report browser were inspected. The qualified package
+replaces `dist/0.2.2/AnthroForge.dist`, with one companion source archive. Executable SHA-256:
+`b7567e763034fbd5c39c78ecbfea864fbe8130a50db60286a27c3be746f87b2f`.
 
 ## Direct engine selection (0.2.2)
 

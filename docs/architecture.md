@@ -5,6 +5,11 @@ define the implemented unified TissueVCP, Point/Anchor and Surface/Membrane exte
 shared surface providers and schema 4. [Validation](development_status.md#unified-tissues-022)
 records current evidence; sections labelled with earlier versions preserve their history.
 
+The [computation inventory and history](computation_history.md) maps current numerical
+and supporting workloads to their owners/tests and records changes of approach,
+observed causes, replacements, evidence and limitations. Update it with computational
+changes; this architecture document remains the description of current boundaries.
+
 Distributed muscle direction construction belongs to `native/src/tissue_directions.cpp`.
 It uses an owned material mesh and physical mass/stiffness operators; no numerical
 work or callbacks move into Python. The pinned addon kernels remain unchanged.

@@ -3,7 +3,7 @@
 - Task branch: `codex/computation-history`
 - Integration branch: `main`
 - Starting revision: `a93b5149e853eefd71a7875a3885a3a68a1d4a3a`
-- Status: in progress
+- Status: complete; documentation validated
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -16,7 +16,7 @@ Include the recent tissue correction and evidence-backed earlier changes.
 
 ## Decisions and relevant files
 
-- `docs/computation_history.md` will combine stable computation IDs, current source
+- [Computation history](../computation_history.md) combines stable computation IDs, current source
   ownership, validation entry points, and chronological change records.
 - Keep numerical work separate from scheduling, presentation and storage workloads.
   Planned skin/mirroring/dynamics are not implemented computations.
@@ -27,19 +27,36 @@ Include the recent tissue correction and evidence-backed earlier changes.
 
 ## Current state
 
-Read repository rules, architecture, tissue specification and native build inventory.
-Auditing native public interfaces and application task/evaluation paths.
+Completed the inventory of 57 computational families across mesh/primitive/deformer,
+curve, attachment, surface, tissue, stacking, spatial/image and supporting runtime work.
+Each row links current ownership and maintained validation entry points. Registered job
+families are mapped; planned/unimplemented capabilities are explicitly excluded.
+
+Backfilled 10 qualified approach-change records from existing source/task/fixture
+evidence, including the recent inflation, refinement, geometry validation and
+iteration-limit corrections. Records distinguish outcomes, failed alternatives,
+historical revisions and local-only artifacts. The entry template defines future updates.
+
+README and architecture link the register. AGENTS and engineering guidelines require
+updating it with every computational approach change. No runtime files, tests, package
+artifacts or user projects were changed.
 
 ## Verification
 
-Pending source coverage, relative-link/anchor review and `git diff --check`.
-Documentation-only task: no application rebuild or GUI interaction is needed.
+Content reviewed against native public interfaces/build sources, application evaluation
+and scheduler registrations, current specifications, and cited historical task evidence.
+Corrected the stacking-validation ownership link after inspecting the actual call path.
+Verified unique stable IDs (57 computations, CH-001 through CH-010), all 17 referenced
+commit IDs via `git cat-file -e`, and relative files/headings with a local Python link audit.
+The main register and four navigation/rule documents passed all 325 checked relative links;
+the task record adds its validated link to the register. `git diff --check` passes.
+No runtime tests/build or interactive desktop work: this change is documentation only.
 
 ## Next actions and blockers
 
-1. Finish categorized computation and validation inventory.
-2. Write confirmed history and reusable entry requirements; integrate maintenance rules.
-3. Validate links/content, checkpoint and perform the validated merge/push.
+No remaining content blockers. Commit/push this validated documentation and integrate
+against unchanged `main` through the normal merge/push workflow. Git ancestry records
+completion of that step; do not infer remote delivery from this file alone.
 
 ## Recovery inputs
 

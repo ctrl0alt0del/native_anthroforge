@@ -176,6 +176,30 @@ lifecycle guarantees. Its usefulness is supported by the drag comparison and con
 tests recorded in [development status](development_status.md). A new class name alone
 would not establish either architectural improvement or a successful fix.
 
+## 9. Preserve computational rationale and evidence
+
+Maintain [computation inventory and history](computation_history.md) in the same
+change set as every change of computational approach. Read the relevant inventory
+IDs and earlier records before replacing an algorithm or reviving a rejected idea.
+
+This includes algorithm/objective changes, sampling and refinement, constraints and
+tolerances, geometry acceptance, dependency/invalidation rules, scheduling, caching,
+and movement of work between Python, native code, workers and publication. An
+optimization intended to preserve results still needs its reason and evidence recorded.
+
+Update the current inventory and add a change record: observed failure, old approach,
+replacement, why it addresses the cause, preserved contracts/intentional differences,
+baseline and candidate revisions, representative evidence, and remaining costs or
+failures. Use the document's template and stable IDs. Link task details, committed
+fixtures/tests and profiler summaries; identify raw local-only artifacts explicitly.
+Do not infer shape correctness from solver success or whole-app speed from a kernel
+microbenchmark. Preserve rejected/superseded approaches with their reasons and links
+to replacements. Pure formatting/renaming requires no computation entry.
+
+An initial checkpoint may mark evidence pending; the validated merge must describe
+what was actually demonstrated. This is documentation of the existing engineering
+process, not a new approval requirement or an additional runtime subsystem.
+
 ## Design references
 
 The concrete rules above are AnthroForge project decisions. The following sources

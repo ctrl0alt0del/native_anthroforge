@@ -3,7 +3,7 @@
 - Task branch: `codex/pixar-research-reference`
 - Integration branch: `main`
 - Starting revision: `87c24f2`
-- Status: in progress
+- Status: complete; documentation qualified for normal integration
 - Last updated: 2026-10-21, Europe/Bucharest
 - Active writer: desktop chat, direct work
 
@@ -22,9 +22,20 @@ biharmonic height QP is convex; its geometry is not a collision-aware optimizati
 The legacy graphics.pixar.com library URLs redirect to Pixar's technology page;
 that official page links the current library at https://research.pixar.com/.
 
-## Verification and next actions
+## Findings and delivery
 
-Read primary paper and follow-up evidence, distinguish observations from hypotheses,
-save a concise research reference linked from README, validate links/content, then
-commit/push and merge the documentation normally. No builds or GUI checks are needed.
-Preserve the unrelated untracked root `__init__.py`.
+Added [research sources](../research_sources.md) and a README link. Inspected the
+official 2003 and 2018 Pixar PDFs and the 2006 boundary follow-up. The 2022 explicit
+convergence reference is abstract-only and marked accordingly. GIA is not a guarantee
+against local traps: some folded regions receive no separating response, boundary
+intersections need extensions, and repair has no fixed step bound. Its value for
+static constrained tissue remains untested. No application algorithm changed.
+
+## Verification and integration
+
+Primary PDFs downloaded successfully to ignored `build/pixar-research/` for reading;
+the web reader could not fetch them, so local PDF text extraction was used. Reviewed
+claims against paper sections and the current QP assembly/reconstruction. Reviewed
+README/document links and `git diff --check`. No builds, performance experiments or
+GUI checks apply to this documentation-only change. Preserve unrelated `__init__.py`.
+Commit/push this complete documentation and merge normally after checking latest main.

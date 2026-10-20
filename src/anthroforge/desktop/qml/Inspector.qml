@@ -153,7 +153,7 @@ UiScrollView {
         ConstructionInspector { id: constructionInspector; onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         TissueInspector { visible: !!inspector.selected.is_tissue; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         DependencyInspector { visible: !!inspector.selected.id }
-        Label { text: inspector.selected.error || ""; visible: !!text; color: Theme.danger; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+        UiNotice { text: inspector.selected.error || ""; error: true }
         Item { implicitHeight: 8 }
     }
     ColorDialog { id: colorDialog; title: "Object color"; onAccepted: workspace.run("scp.color",{entity:inspector.selected.id,value:selectedColor.toString()}) }

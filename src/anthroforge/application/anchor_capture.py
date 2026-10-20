@@ -15,7 +15,14 @@ from anthroforge.core.surface_references import SurfaceBinding, SurfaceReference
 from anthroforge.native import point_attachments
 from anthroforge.native.mesh import NativeCancellation
 
-from . import authored_jobs, dependencies, object_revisions, point_evaluation, surface_providers
+from . import (
+    attachment_defaults,
+    authored_jobs,
+    dependencies,
+    object_revisions,
+    point_evaluation,
+    surface_providers,
+)
 from .construction_policy import revisions
 from .evaluation_results import accepted_result
 
@@ -27,13 +34,19 @@ if TYPE_CHECKING:
 class Capture:
     source: str
     identity: str
-    reference: SurfaceReference
+    reference: SurfaceReference | None
     name: str
     position: tuple[float, ...] = ()
 
 
 def create(session: Any, item: Point, parent: str, role: str, name: str) -> dict[str, str]:
-    ref = anatomical_surfaces.reference(parent, session.document.registry.records, role)
+    ref = (
+        anatomical_surfaces.reference(parent, session.document.registry.records, role)
+        if parent
+        else None
+    )
+    if ref is None:
+        attachment_defaults.candidates(session.document)
     spec = Capture(item.id, str(uuid4()), ref, name)
     job = authored_jobs.begin(session, partial(enqueue, session, spec))
     return dict(object_id=spec.identity, job_id=job)
@@ -51,8 +64,12 @@ def inputs(document: Any, spec: Capture) -> set[Port]:
 
     source = document.object(spec.source)
     seeds = {Port(spec.source, output(source)), Port(spec.source, "pose")}
-    seeds |= surface_providers.ports(document, (spec.reference,))
+    seeds |= surface_providers.ports(document, targets(document, spec))
     return dependencies.closure(dependencies.graph(document), seeds)
+
+
+def targets(document: Any, spec: Capture) -> tuple[SurfaceReference, ...]:
+    return (spec.reference,) if spec.reference else attachment_defaults.candidates(document)
 
 
 def enqueue(session: "Session", spec: Capture, origin: int) -> str:
@@ -83,7 +100,13 @@ def compute(session: Any, spec: Capture, payload: Any, cancel: Any) -> Any:
     document, resources = payload
     item = document.object(spec.source)
     world = spec.position or point_evaluation.position(session.engine, document, item)
-    provider = surface_providers.get(session.engine, document, resources.meshes, spec.reference)
+    reference = (
+        spec.reference
+        or attachment_defaults.nearest(session.engine, document, resources, [world], cancel.handle)[
+            0
+        ]
+    )
+    provider = surface_providers.get(session.engine, document, resources.meshes, reference)
     binding, frame = capture_binding(session.engine, provider, world, cancel.handle)
     return document, point_evaluation.with_frame(copied(item, spec, binding), frame)
 

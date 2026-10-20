@@ -39,8 +39,8 @@ ColumnLayout {
         NumericSetting { visible: panel.primitive.kind === "LOFT"; label: "Sampling start"; value: panel.primitive.start || 0; onEdited: value => panel.primitiveSetting("start",value) }
         NumericSetting { visible: panel.primitive.kind === "LOFT"; label: "Sampling span"; value: panel.primitive.span || 1; onEdited: value => panel.primitiveSetting("span",value) }
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Cap closed cross-sections"; checked: panel.primitive.caps || false; enabled: !panel.topologyLocked; onClicked: panel.primitiveSetting("caps",checked) }
-        Label { text: panel.item.result && panel.item.result.status === "pending" ? "Pending changes · last accepted geometry shown" : ""; visible: !!text; color: Theme.accent; Layout.fillWidth: true; wrapMode: Text.WordWrap }
-        Label { text: "Using accepted support · upstream changes pending"; visible: !!panel.item.result && (panel.item.result.pending || []).length>0; color: Theme.accent; Layout.fillWidth: true; wrapMode: Text.WordWrap }
+        UiNotice { active: panel.visible; text: panel.item.result?.status === "pending" ? "Pending changes · last accepted geometry shown" : "" }
+        UiNotice { active: panel.visible; text: panel.item.result?.pending?.length>0 ? "Using accepted support · upstream changes pending" : "" }
         UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.item.id]}) }
     }
     UiSection {

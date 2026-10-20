@@ -172,6 +172,16 @@ class FiberPathTaskScheduler(AttachmentTaskScheduler):
         return Schedule("worker", cost, reason="Dense fiber resolution or edit and recapture")
 
 
+class AttachedConstructionTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        capture = FiberCaptureTaskScheduler().plan(workload, interactive)
+        surface = SurfaceLayoutTaskScheduler().plan(workload, interactive)
+        cost = (capture.estimated_ms or 0) + (surface.estimated_ms or 0)
+        return Schedule(
+            "worker", cost, reason="Atomic attachment capture and membrane construction"
+        )
+
+
 class RoutingTaskScheduler(AttachmentTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         cost = 1.0 + workload.candidates * 0.1 + workload.triangles * 0.01
@@ -216,6 +226,7 @@ def anchor_schedulers() -> dict[str, TaskScheduler]:
 
     return {
         "anchor_capture": FiberCaptureTaskScheduler(),
+        "attached_construction": AttachedConstructionTaskScheduler(),
         "anchor_binding": AttachmentTaskScheduler(),
         **policies(),
     }

@@ -28,11 +28,10 @@ UiSection {
         NumericSetting { visible: panel.settings.mode === "STATIC_PBD"; label: "Constraint passes"; decimals: 0; value: panel.settings.constraint_passes || 2; onEdited: value => panel.change("constraint_passes",Math.round(value)) }
         NumericSetting { visible: panel.settings.mode === "STATIC_PBD"; label: "Convergence tolerance"; decimals: 7; value: panel.settings.tolerance || 0.00001; onEdited: value => panel.change("tolerance",value) }
     }
-    Label {
-        objectName: "tissueConvergence"; Layout.fillWidth: true; wrapMode: Text.WordWrap
+    UiNotice {
+        objectName: "tissueConvergence"
         readonly property var diagnostic: panel.item.diagnostics?.find(d=>d.stage==="intrinsic")
-        visible: !!diagnostic && diagnostic.status !== "NOT_APPLICABLE"
-        text: diagnostic ? diagnostic.status.split("_").join(" ") + " · " + diagnostic.iterations + " iterations" : ""
-        color: diagnostic?.status === "ITERATION_LIMIT" ? Theme.accent : Theme.muted
+        active: panel.visible && !!diagnostic && diagnostic.status !== "NOT_APPLICABLE"
+        text: diagnostic ? "Relaxation · " + diagnostic.status.split("_").join(" ") : ""
     }
 }

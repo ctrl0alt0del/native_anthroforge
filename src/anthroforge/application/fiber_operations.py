@@ -75,7 +75,7 @@ def validate_targets(session: "Session", result: tuple[Any, ...]) -> None:
         if target is not None:
             surface_providers.get(session.engine, session.document, session.assets, target)
         else:
-            from .fiber_defaults import candidates
+            from .attachment_defaults import candidates
 
             candidates(session.document)
         if scope not in ("CURRENT_PARENT", "ANY_PARENT"):

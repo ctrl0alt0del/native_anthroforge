@@ -32,7 +32,12 @@ for generic construction. No standalone Surface-to-Membrane command currently ex
 
 ## Verification
 
-Pending: shared API conversion, attachments/branches/junctions, failures, cancellation,
+Implemented shared atomic attached-graph jobs, nearest-SCP defaults, direct Tissue and
+Membrane actions, multi-output creation selection, and layout-independent notices.
+Initial API tests pass for Point/Curve/Surface conversion, independent shape preservation,
+single undo, and missing-target rejection. Development gate and GUI not yet qualified.
+
+Pending: mixed fibers/branches/junctions, failures, cancellation,
 undo/redo and persistence; background QML numeric-drag/layout and direct-action checks;
 development gate, canonical portable package and source archive.
 

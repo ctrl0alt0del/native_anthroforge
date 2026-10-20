@@ -62,7 +62,8 @@ UiSection {
         UiButton { objectName: "tissueStackRegion"; text: "Select support footprint…"; Layout.fillWidth: true; enabled: orderMode.currentIndex>0 && !exclude.checked; hint: "Choose Requested or Explicit order, then select material faces on the covering tissue"; onClicked: panel.editRegion() }
         ColumnLayout {
             visible: workspace.tissueRegionTools.state.active; Layout.fillWidth: true
-            Label { text: workspace.tissueRegionTools.state.error || "Click covering faces to toggle them. Green outlines show the draft footprint. "+workspace.tissueRegionTools.state.count+" selected."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
+            Label { text: "Click covering faces to toggle the draft footprint."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
+            UiNotice { active: panel.visible && workspace.tissueRegionTools.state.active; text: workspace.tissueRegionTools.state.error || ""; error: true }
             UiButton { text: "Use entire footprint"; Layout.fillWidth: true; onClicked: workspace.tissueRegionTools.clear() }
             RowLayout {
                 Layout.fillWidth: true
@@ -74,7 +75,7 @@ UiSection {
             Layout.fillWidth: true
             UiButton { objectName: "tissueStackRemove"; text: "Reset relationship"; glyph: "delete"; hint: "Remove overrides and restore automatic behavior"; enabled: !!panel.intent; onClicked: workspace.run("tissue.stacking.remove",{target:panel.item.id,other:panel.focused,side:panel.side,other_side:panel.otherSide}) }
         }
-        Label { visible: !!panel.evidence; text: panel.evidence?.covering ? (panel.evidence.covering===panel.item.id?"This tissue covers the selected tissue":"The selected tissue covers this tissue") : "No accepted stacking order"; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
+        UiNotice { active: panel.visible && !!panel.evidence; text: panel.evidence?.covering ? (panel.evidence.covering===panel.item.id?"This tissue covers the selected tissue":"The selected tissue covers this tissue") : "No accepted stacking order" }
     }
-    Label { visible: !!panel.item.stack_plan?.error; text: panel.item.stack_plan?.error || ""; color: Theme.accent; Layout.fillWidth: true; wrapMode: Text.WordWrap }
+    UiNotice { active: panel.visible; text: panel.item.stack_plan?.error || ""; error: true }
 }

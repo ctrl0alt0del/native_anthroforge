@@ -656,7 +656,7 @@ resolved inflation/smoothing defect when assessing the fixture.
   successful attached-source creation. No general performance improvement is claimed.
 
 
-### CH-015 — Direct branched placement and surface grouping
+### CH-015 â€” Direct branched placement and surface grouping
 
 - **Date / affected IDs:** 2026-10-20; C04, C05, C07, S04.
 - **Observed gap / baseline:** `99737ca` supports explicit junction editing and native
@@ -669,10 +669,12 @@ resolved inflation/smoothing defect when assessing the fixture.
   authored coordinates; explicit native first-sample seeding; one shared application
   operation authors the new curve and junction. The source remains canonical and existing
   junctions are reused. The common surface operation infers semantic groups from explicit
-  point identities, with a read-only draft for multiple valid groupings. Partitions are generated lazily. Up to six branch curves use exhaustive parent
+  point identities, with a read-only draft for multiple valid groupings. Partitions are
+  generated lazily. Up to six branch curves use exhaustive parent
   assignments; larger graphs use exact identity matching and a minimum-two-roots check.
   With more than six children on two outer boundaries, any valid allocation proves at
-  least two group partitions. Invalid graphs return reasons, not a grouping prompt. Numerical projection remains C++, graph policy remains Python.
+  least two group partitions. Invalid graphs return reasons, not a grouping prompt.
+  Numerical projection remains C++, graph policy remains Python.
 - **Preserved contracts:** source geometry and bindings, point identities, workspace
   editability, subsequent placement/snapping controls, one-action undo, cancellation,
   ordinary scheduling and Manual prerequisites, surface sampling/material correspondence,
@@ -688,7 +690,10 @@ resolved inflation/smoothing defect when assessing the fixture.
   call boundary, excludes index preparation and whole input/frame costs, and is not an
   application responsiveness guarantee. Local artifacts live under
   `build/branched-point-placement/`; qualification status is in the
-  [task record](tasks/branched-point-placement.md).
+  [task record](tasks/branched-point-placement.md). Final runtime `1490635` passes 1,417
+  tests and the relocated portable suite, including branched creation and conversion.
+  The full development/native gate passed before the final application-only matching
+  correction; final Python, offscreen interaction and hidden GPU checks include it.
 - **Rejected during qualification:** a 256-assignment search cap could misclassify an
   exhausted search as ambiguity and suggest duplicate roots. A 30-curve cross-connected
   regression exposed both a missed valid grouping and an invalid graph that prompted.

@@ -3,7 +3,7 @@
 - Task branch: `codex/branched-point-placement`
 - Integration branch: `main`
 - Starting revision: `99737ca`
-- Status: in progress
+- Status: implementation and validation complete; ready for merge
 - Last updated: 2026-10-20
 - Active writer: desktop chat, direct work
 
@@ -31,9 +31,11 @@ Implemented atomic branch-curve creation with existing-junction reuse, cached na
 projected control-point selection and explicit stroke seeding. Alternate toolbar tool
 and provisional marker are wired. Automatic surface grouping uses junction identities;
 ambiguous group membership opens a virtualized editor. Offscreen interaction and actual
-hidden GPU geometry inspections pass. The full gate passed with 1,414 tests and the first relocated portable suite passed.
-A final dense-graph allocation correction is being requalified and repackaged.
-Preserve unrelated root `__init__.py`. Base is synchronized with origin/main.
+hidden GPU geometry inspections pass. The full gate passed with 1,414 tests. Final runtime
+`1490635` includes the exact dense-graph allocation correction and passes 1,417 tests,
+offscreen interaction, hidden GPU geometry and relocated portable qualification.
+The canonical 0.2.2 application is replaced. Preserve unrelated root `__init__.py`.
+Latest fetched origin/main remains the tested base `99737ca`.
 
 ## Verification
 
@@ -50,14 +52,29 @@ Native cached picking microcheck: 10k controls, 500 queries, median 0.0271 ms/p9
 not a whole-app responsiveness measurement. Full development gate and initial portable checks passed at `3d02ab4`.
 Final review reproduced a search-cap defect on 30 cross-connected curves; exact identity
 matching now replaces the cutoff, with three extra regression/oracle tests passing.
-Final Python/UI qualification and updated packaging are pending; native code is unchanged.
+Final lint, formatting (708 files), typing (282 source files) and 1,417 tests pass at
+`1490635`; the 916 warnings are existing Qt deprecations. Native code/bindings are unchanged
+since the full development gate. Final offscreen interaction and hidden Direct3D shape
+checks pass again, including the anchored alternate-tool popup. Relocated packaged checks
+pass with minimal PATH, including automatic branch creation, membrane conversion, undo/redo
+and persistence. No visible-window or physical input-latency acceptance is claimed.
+
+Evidence: `development-gate.log`, `python-final.log`, `package-final.log`,
+`portable-final.log` and captures under `build/branched-point-placement/` (local-only).
+Final canonical and relocated EXE SHA-256:
+`FCE4A9A60555EAA245D9C4EF79D21871008417BCC31B02012E83327DC898782D`.
+Packaged and development native DLL SHA-256:
+`AFCCFAE2B2FABCDC8538277A997178E480FD5ACE83E3FCFC1E314FFD1F9B0093`.
+Ownership review: cached projection/seeding remain native; atomic junction creation and
+identity-based group validation remain shared application policy. Desktop adapters own
+only provisional interaction/drafts. Existing native surface/membrane assembly is reused.
 
 ## Next actions and blockers
 
-1. Finish the running development gate and any discovered failures.
-2. Package the canonical 0.2.2 app, run relocated portable qualification (including new branch
-   and membrane flow), and rebuild the companion source archive.
-3. Record final evidence; merge/push the validated result.
+No implementation or qualification blockers remain. The canonical companion source archive
+was rebuilt and its integrity and required source contents verified. Commit/push this final
+record, then merge and push normally. Git ancestry records
+completion of that integration step; no additional runtime build is needed for this record.
 
 ## Recovery inputs
 

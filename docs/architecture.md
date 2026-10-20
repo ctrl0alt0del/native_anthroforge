@@ -693,6 +693,9 @@ shared application edit, reusing canonical junction ownership and normal path sc
 
 `surface_grouping` resolves semantic source groups from explicit junction identities before
 existing asynchronous surface construction. It never changes numerical loft/branch assembly.
-Group partitions are generated lazily, stop after two valid answers, and bound alternative
-parent assignments; unresolved searches require explicit grouping. `SurfaceCreation` only
+Group partitions are generated lazily and stop after two valid answers. Small parent
+assignments are exhaustive; larger graphs use exact shared-root matching. Since seven or
+more branch curves on at most two outer boundaries force at least four roots on one
+boundary, a valid allocation proves multiple valid partitions. No search cutoff is
+reported as user ambiguity. `SurfaceCreation` only
 presents ambiguous drafts, with virtualized lists and shared validation before publication.

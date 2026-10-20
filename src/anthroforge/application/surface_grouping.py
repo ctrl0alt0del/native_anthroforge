@@ -9,7 +9,7 @@ from anthroforge.core.object_registry import validate_sources
 from anthroforge.core.surface_branches import SurfaceBranch
 from anthroforge.core.surfaces import Surface
 
-from . import curve_sources, surface_branch_operations
+from . import curve_sources, surface_branch_operations, surface_root_matching
 
 
 def connections(records: Any, curves: list[str]) -> dict[str, list[str]]:
@@ -75,12 +75,27 @@ def candidate_plans(records: Any, curves: list[str], incoming: Any) -> Any:
     ]
     if len(main) < 2 or any(not choice for choice in choices):
         return
-    for number, assignment in enumerate(product(*choices)):
-        if number == 256:
-            yield None
-            return
+    for assignment in parent_assignments(records, children, choices):
         grouped = assigned_groups(children, assignment)
         yield from group_plans(records, main, grouped)
+
+
+# With >6 children on <=2 boundaries, one has >=4 roots: both a single
+# group and a split into 2+ roots are valid. One allocation proves ambiguity.
+def parent_assignments(records: Any, children: Any, choices: Any) -> Any:
+    if len(children) <= 6:
+        yield from product(*choices)
+        return
+    options = {
+        child: [
+            (key, surface_branch_operations.shared_root(records[key], records[child]))
+            for key in parents
+        ]
+        for child, parents in zip(children, choices, strict=True)
+    }
+    assigned = surface_root_matching.allocate(options)
+    if assigned is not None:
+        yield [assigned[key][0] for key in children]
 
 
 def assigned_groups(children: Any, assignment: Any) -> dict[str, list[str]]:
@@ -141,6 +156,7 @@ def checked(records: Any, curves: list[str], plan: Any) -> Any:
 
 def infer(session: Any, curves: list[str]) -> dict[str, Any]:
     records = {key: curve_sources.source(session.document, key) for key in curves}
+    validate_sources(Surface(curves=tuple(CurveUse(key) for key in curves)), records)
     incoming = connections(records, curves)
     if not incoming:
         return dict(ambiguous=False, plan=checked(records, curves, dict(main=curves, branches=[])))
@@ -150,8 +166,6 @@ def infer(session: Any, curves: list[str]) -> dict[str, Any]:
 def discover(records: Any, curves: list[str], incoming: Any) -> dict[str, Any]:
     found: list[dict[str, Any]] = []
     for plan in candidate_plans(records, curves, incoming):
-        if plan is None:
-            return dict(ambiguous=True, plan=found[0] if found else suggested(curves, incoming))
         if valid_plan(records, curves, plan):
             found.append(plan)
         if len(found) == 2:
@@ -165,14 +179,6 @@ INVALID_GROUPS = (
     "Connections need two main curves and two distinct interior roots per branch. "
     "Closed, nested and overlapping branches are unsupported."
 )
-
-
-def suggested(curves: list[str], incoming: Any) -> dict[str, Any]:
-    main = [key for key in curves if key not in incoming]
-    groups: dict[str, list[str]] = {}
-    for key, parents in incoming.items():
-        groups.setdefault(parents[0], []).append(key)
-    return dict(main=main, branches=[dict(boundary=k, curves=v) for k, v in groups.items()])
 
 
 def valid_plan(records: Any, curves: list[str], plan: Any) -> bool:

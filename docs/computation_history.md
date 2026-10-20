@@ -669,9 +669,10 @@ resolved inflation/smoothing defect when assessing the fixture.
   authored coordinates; explicit native first-sample seeding; one shared application
   operation authors the new curve and junction. The source remains canonical and existing
   junctions are reused. The common surface operation infers semantic groups from explicit
-  point identities, with a read-only draft for multiple valid groupings. Partitions are
-  generated lazily and alternative parent assignments are bounded; unresolved assignments
-  require a user choice. Numerical projection remains C++, graph policy remains Python.
+  point identities, with a read-only draft for multiple valid groupings. Partitions are generated lazily. Up to six branch curves use exhaustive parent
+  assignments; larger graphs use exact identity matching and a minimum-two-roots check.
+  With more than six children on two outer boundaries, any valid allocation proves at
+  least two group partitions. Invalid graphs return reasons, not a grouping prompt. Numerical projection remains C++, graph policy remains Python.
 - **Preserved contracts:** source geometry and bindings, point identities, workspace
   editability, subsequent placement/snapping controls, one-action undo, cancellation,
   ordinary scheduling and Manual prerequisites, surface sampling/material correspondence,
@@ -688,6 +689,12 @@ resolved inflation/smoothing defect when assessing the fixture.
   application responsiveness guarantee. Local artifacts live under
   `build/branched-point-placement/`; qualification status is in the
   [task record](tasks/branched-point-placement.md).
+- **Rejected during qualification:** a 256-assignment search cap could misclassify an
+  exhausted search as ambiguity and suggest duplicate roots. A 30-curve cross-connected
+  regression exposed both a missed valid grouping and an invalid graph that prompted.
+  Exact unweighted identity matching replaces that cap; 120 small graph cases agree with
+  exhaustive assignment feasibility. This is application relationship policy, not numerical
+  geometry/optimization, and changes no native evaluator.
 - **Limits:** the projected query is a native linear scan of cached controls, not a new
   mesh-query accelerator. Existing open, outer-boundary, nonnested branch constraints
   remain. Generic branches are ordinary curves; attached conversion remains explicit or

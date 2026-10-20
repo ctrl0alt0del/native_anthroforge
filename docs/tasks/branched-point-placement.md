@@ -31,7 +31,8 @@ Implemented atomic branch-curve creation with existing-junction reuse, cached na
 projected control-point selection and explicit stroke seeding. Alternate toolbar tool
 and provisional marker are wired. Automatic surface grouping uses junction identities;
 ambiguous group membership opens a virtualized editor. Offscreen interaction and actual
-hidden GPU geometry inspections pass. Full development gate is running; portable pending.
+hidden GPU geometry inspections pass. The full gate passed with 1,414 tests and the first relocated portable suite passed.
+A final dense-graph allocation correction is being requalified and repackaged.
 Preserve unrelated root `__init__.py`. Base is synchronized with origin/main.
 
 ## Verification
@@ -46,7 +47,10 @@ anchored beside the tool, including synthetic input. `tools/branch_placement_sce
 renders a continuous T-shaped branched surface and its identical converted Membrane via
 hidden Direct3D; images inspected. Reports/shapes/saved fixture are under the evidence path.
 Native cached picking microcheck: 10k controls, 500 queries, median 0.0271 ms/p95 0.039605 ms;
-not a whole-app responsiveness measurement. Development gate/portable still pending.
+not a whole-app responsiveness measurement. Full development gate and initial portable checks passed at `3d02ab4`.
+Final review reproduced a search-cap defect on 30 cross-connected curves; exact identity
+matching now replaces the cutoff, with three extra regression/oracle tests passing.
+Final Python/UI qualification and updated packaging are pending; native code is unchanged.
 
 ## Next actions and blockers
 

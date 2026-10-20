@@ -3,6 +3,9 @@
 [0.2.2 unified tissues](docs/specification_022.md) adds attached Point/Anchor and Membrane
 construction, muscle/soft-tissue inflation, relaxation, constraints, cropping and stacking.
 Start with the [tissue walkthrough](docs/tissues_022.md) or [headless example](examples/tissues.json).
+**Create Tissue** is on the main toolbar and Create menu. Select an Anchor, Fiber or
+Membrane to create directly, or use its searchable source chooser. **Create Fiber** is
+available from an ordinary curve's inspector and binds to nearest SCP surfaces by default.
 See [validation and limitations](docs/development_status.md#unified-tissues-022).
 
 Standalone curves, reference images, fibers and curve-based surfaces follow the

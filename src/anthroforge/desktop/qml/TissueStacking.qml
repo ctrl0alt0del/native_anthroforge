@@ -16,7 +16,12 @@ UiSection {
     title: "Stacking"; expanded: false
     hint: "Surface tissues opt into stacking. Provider surfaces are evaluated first; final geometry remains distinct from intrinsic inflation."
     function configure(key,value) { const changes={}; changes[key]=value; workspace.run("tissue.stacking.configure",{target:item.id,changes:changes}); }
-    function saveIntent() { workspace.run("tissue.stacking.relationship",{target:item.id,other:focused,side:side,other_side:otherSide,mode:orderMode.currentText,cover:coverMode.currentIndex===0?"SELF":"OTHER",excluded:exclude.checked}); }
+    function saveIntent() {
+        workspace.run("tissue.stacking.relationship",{target:item.id,other:focused,side:side,other_side:otherSide,mode:orderMode.currentText,cover:coverMode.currentIndex===0?"SELF":"OTHER",excluded:exclude.checked});
+        orderMode.currentIndex=Qt.binding(()=>Math.max(0,orderMode.model.indexOf(panel.intent?.mode)));
+        coverMode.currentIndex=Qt.binding(()=>panel.intent?.cover==="OTHER"?1:0);
+        exclude.checked=Qt.binding(()=>panel.intent?.excluded || false);
+    }
     function editRegion() { workspace.tissueRegionTools.begin({other:focused,side:side,other_side:otherSide,mode:orderMode.currentText,cover:coverMode.currentIndex===0?"SELF":"OTHER",excluded:false}); }
     UiCheck { objectName: "tissueStackingEnabled"; text: "Enable stacking"; checked: panel.item.stacking || false; onClicked: workspace.run("tissue.configure",{target:panel.item.id,changes:{stacking:checked}}) }
     UiSection {
@@ -50,9 +55,9 @@ UiSection {
             UiCombo { id: ownSide; Layout.fillWidth: true; model: panel.item.both_sides?["a","b"]:["a"]; hint: "This tissue side" }
             UiCombo { id: supportSide; Layout.fillWidth: true; model: panel.other.both_sides?["a","b"]:["a"]; hint: "Other tissue side" }
         }
-        UiCombo { id: orderMode; objectName: "tissueStackOrder"; Layout.fillWidth: true; model: ["AUTO","REQUESTED","EXPLICIT"]; currentIndex: Math.max(0,model.indexOf(panel.intent?.mode)); hint: "Requested order must agree with geometry; explicit order still requires validation." }
-        UiCombo { id: coverMode; Layout.fillWidth: true; visible: orderMode.currentIndex>0; model: ["This tissue covers","Other tissue covers"]; currentIndex: panel.intent?.cover==="OTHER"?1:0 }
-        UiCheck { id: exclude; objectName: "tissueStackExclude"; text: "Exclude this pair"; checked: panel.intent?.excluded || false }
+        UiCombo { id: orderMode; objectName: "tissueStackOrder"; Layout.fillWidth: true; model: ["AUTO","REQUESTED","EXPLICIT"]; currentIndex: Math.max(0,model.indexOf(panel.intent?.mode)); hint: "Requested order must agree with geometry; explicit order still requires validation."; onActivated: panel.saveIntent() }
+        UiCombo { id: coverMode; objectName: "tissueStackCover"; Layout.fillWidth: true; visible: orderMode.currentIndex>0; model: ["This tissue covers","Other tissue covers"]; currentIndex: panel.intent?.cover==="OTHER"?1:0; onActivated: panel.saveIntent() }
+        UiCheck { id: exclude; objectName: "tissueStackExclude"; text: "Exclude this pair"; checked: panel.intent?.excluded || false; onClicked: panel.saveIntent() }
         Label { visible: !!panel.intent?.regions?.length; text: "Selected support region · "+(panel.intent?.regions?.length || 0)+" faces"; color: Theme.muted }
         UiButton { objectName: "tissueStackRegion"; text: "Select support footprint…"; Layout.fillWidth: true; enabled: orderMode.currentIndex>0 && !exclude.checked; hint: "Choose Requested or Explicit order, then select material faces on the covering tissue"; onClicked: panel.editRegion() }
         ColumnLayout {
@@ -67,8 +72,7 @@ UiSection {
         }
         RowLayout {
             Layout.fillWidth: true
-            UiButton { objectName: "tissueStackSave"; text: "Save relationship"; Layout.fillWidth: true; onClicked: panel.saveIntent() }
-            UiButton { objectName: "tissueStackRemove"; glyph: "delete"; hint: "Remove saved relationship"; enabled: !!panel.intent; onClicked: workspace.run("tissue.stacking.remove",{target:panel.item.id,other:panel.focused,side:panel.side,other_side:panel.otherSide}) }
+            UiButton { objectName: "tissueStackRemove"; text: "Reset relationship"; glyph: "delete"; hint: "Remove overrides and restore automatic behavior"; enabled: !!panel.intent; onClicked: workspace.run("tissue.stacking.remove",{target:panel.item.id,other:panel.focused,side:panel.side,other_side:panel.otherSide}) }
         }
         Label { visible: !!panel.evidence; text: panel.evidence?.covering ? (panel.evidence.covering===panel.item.id?"This tissue covers the selected tissue":"The selected tissue covers this tissue") : "No accepted stacking order"; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
     }

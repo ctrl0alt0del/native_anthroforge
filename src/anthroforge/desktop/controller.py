@@ -267,6 +267,24 @@ class Controller(QObject):
 
         surface(self, kind)
 
+    @Slot(str)
+    def editConstruction(self, target):
+        from .construction_navigation import edit
+
+        edit(self, target)
+
+    @Slot()
+    def focusSelection(self):
+        from .construction_navigation import focus
+
+        focus(self)
+
+    @Slot(result="QVariantList")
+    def tissueSources(self):
+        from .construction_navigation import tissue_sources
+
+        return tissue_sources(self)
+
     @Slot()
     def createPoint(self):
         from .image_tools import context_owner

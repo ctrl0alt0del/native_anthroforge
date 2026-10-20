@@ -57,7 +57,7 @@ Ctrl-select curves or fibers in the Construction list in the desired order, then
 the **Patch / Surface** icon below the transform tools. One closed curve creates a patch;
 two or more compatible curves create a standalone loft surface. The tooltip describes
 the current action. All loft sources must be open, or all closed. Accepted creation selects
-the surface and exits curve editing. Closed lofts show a preview to Accept or Cancel.
+the surface and exits curve editing. Open and closed lofts create immediately as one undo action.
 **Create Primitive** remains available when the desired result is an SCP loft or body.
 Consumers retain live references and own their
 ordering, sampling, reversal, range and placement. The source inspector lists its users.
@@ -66,15 +66,20 @@ placement. Switching modes preserves the visible result. **Make Independent** gi
 consumer its own editable copy. Referenced sources cannot be deleted until their uses are
 resolved; deleting a consumer preserves sources.
 
-Closed lofts preview their initial correspondence. **Preview realignment** explicitly
-changes it; ordinary deformation does not silently choose another starting point. Branches
+Closed lofts align automatically at creation. **Realign** explicitly changes correspondence
+as one undo action; ordinary deformation does not silently choose another starting point. Branches
 use explicit shared junctions at interior points of a main boundary. Closed/nested branches
 are unsupported. Branch controls validate these restrictions through the same API as the UI.
 
 ## Create and edit fibers
 
-Select a curve, choose attachment surfaces in **Create independent fiber**, then create it.
-Both open endpoints need bindings; a closed curve needs at least one chosen binding. The
+Select a curve and press **Create Fiber** near the top of its inspector, without entering
+edit mode. Endpoints bind to their nearest ready SCP surfaces; for a closed curve, the
+first point binds by default. Expand **Fiber binding options** only to override targets
+or add interior bindings. Its searchable point list remains bounded for large curves.
+Tissue Base/Final roles are explicit overrides. If no SCP is available, select explicit
+targets or import an SCP first. Both open endpoints need bindings; a closed curve needs
+at least one binding. The
 new fiber has new identities and remains independent of its source. A Fiber is a Curve with
 anatomical bindings and can be used by the same primitives and surface tools.
 
@@ -113,7 +118,8 @@ the authored placement separately.
 **Calibrate distance…** takes two image landmarks and a known distance as one undo action.
 Replace changes the selected assignment, retains position/physical width, adjusts aspect
 ratio and clears its old calibration. Other instances are unaffected. Tracing against the
-image creates an independent curve, without a continuing image dependency.
+image creates an independent curve, without a continuing image dependency. **Trace this image**
+enters Draw mode on that image's plane directly; each released stroke remains one undo action.
 
 ## Save and automate
 
@@ -136,7 +142,8 @@ created fiber IDs. Applications should inspect completed jobs/objects rather tha
 See [the API](authoring_api.md) for image operations, conversion, bindings, junctions,
 surface sources and branches. Shift+F12 records reports without rebuilding the application.
 
-Muscles, soft tissues, mirroring, legacy-project conversion and broader export remain deferred.
+Muscles and soft tissues are available in [0.2.2](tissues_022.md). Mirroring,
+legacy-project conversion and broader export remain deferred.
 Observed development, parity, profiling and offscreen evidence is tracked in
 [the implementation record](tasks/020-construction.md); offscreen checks do not establish
 physical input/display latency or a performed interactive desktop session.

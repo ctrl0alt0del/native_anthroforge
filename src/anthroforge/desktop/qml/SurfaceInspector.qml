@@ -15,7 +15,7 @@ ColumnLayout {
         UiCheck { visible: panel.item.kind === "LOFT"; text: "Connect first and last rows"; checked: panel.item.close_across || false; onClicked: panel.setting("close_across",checked) }
         NumericSetting { visible: panel.item.kind === "LOFT"; label: "Across strips · 0 keeps fitted density"; value: panel.item.strips || 0; decimals: 0; onEdited: value => panel.setting("strips",Math.round(value)) }
         NumericSetting { visible: panel.item.kind === "PATCH"; label: "Patch resolution"; value: panel.item.patch_resolution || 4; decimals: 0; onEdited: value => panel.setting("patch_resolution",Math.round(value)) }
-        UiButton { objectName: "surfaceRealign"; text: "Preview realignment"; hint: "Inspect direction, starting correspondence and fitted row density before accepting"; onClicked: workspace.run("surface.preview",{target:panel.item.id}) }
+        UiButton { objectName: "surfaceRealign"; text: "Realign"; hint: "Recalculate correspondence · Undo restores the previous alignment"; onClicked: workspace.run("surface.realign",{target:panel.item.id}) }
     }
     SurfaceSources { item: panel.item }
     SurfaceBranches { item: panel.item }

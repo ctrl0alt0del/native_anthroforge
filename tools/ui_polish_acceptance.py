@@ -66,7 +66,7 @@ def combo_containment(window):
     capture(window, "workspace-dropdown")
     QTest.keyClick(window, Qt.Key.Key_Escape)
     capture(window, "workspace")
-    dialog_button(window, "workspaceManager", "Close")
+    click(window, "closeWorkspace")
 
 
 def disclosure_checks(controller, window):
@@ -135,10 +135,7 @@ def dialog_deletion(controller, window):
     root = controller.selection
     find(window, "viewport").forceActiveFocus()
     QTest.keyClick(window, Qt.Key.Key_Delete)
-    dialog_button(window, "deleteDialog", "Cancel")
-    assert controller.session.document.entity(root)
-    QTest.keyClick(window, Qt.Key.Key_Delete)
-    dialog_button(window, "deleteDialog", "OK")
+    assert not find(window, "deleteDialog").property("visible")
     assert not controller.session.document.entities
     controller.run("undo", {})
     controller.select(root)

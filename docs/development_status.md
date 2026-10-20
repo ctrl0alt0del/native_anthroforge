@@ -1,7 +1,40 @@
 # AnthroForge development validation
 
-Current source qualification is in [direct engine selection](#direct-engine-selection-022).
+Current source qualification is in [direct UI workflows](#direct-ui-workflows-022).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Direct UI workflows (0.2.2)
+
+See [task status](tasks/ui-direct-workflows.md) for final delivery state. Direct workflows
+now cover Fiber creation with native nearest-SCP defaults, optional explicit role overrides,
+closed-loft creation/Realign, discoverable Tissue creation, source/member navigation,
+image tracing, stacking relationships, tissue weights, workspace focus and report text.
+One shared deletion-impact query gates confirmation; shared deletion restrictions remain.
+
+The Windows development gate passes: **1,317 tests** in 87.63 seconds, 829 existing
+Qt deprecation warnings, three native CTests, style/function limits, Ruff/format, mypy,
+numerical imports and native doctor. Actual offscreen QML checks cover direct creation,
+source editing, mixed field weights, explicit Tissue Final bindings, 120-point virtualization,
+independent image tracing, conditional root/leaf deletion, undo/redo and modeless workspace
+navigation. The report inbox suite covers 120 reports, direct text Save/Discard, failure
+retention and permanent deletion confirmation using synthetic archives.
+Additional QML checks verify that search retains explicit surface choices for Fiber
+overrides and Anchor creation; model replacement cannot misleadingly display a default.
+
+All three current inbox reports concern 0.2.1 layout: truncation, tabs and icon alignment.
+Current shared controls already resolve these; labels, real tabs and icon centers pass
+at 150%/200% display scaling, including 1050 logical pixels wide. Captures were inspected;
+original report files were preserved. No hands-on desktop acceptance or physical input/
+display-latency measurement is claimed.
+
+Ownership review separates UI navigation from shared application rules. Native batch
+queries execute inside existing Fiber jobs; no Python geometry loop or new scheduler.
+Optional previews and coherent drafts remain where they protect a multi-step edit.
+The final runtime `de7d5648c5afcf6b31b4583116ac26de5a1fd1b2` passes the complete
+minimal-PATH portable suite, including the updated direct report-edit probe. Hidden GPU
+tissue rendering and the packaged report browser were inspected. The qualified package
+replaces `dist/0.2.2/AnthroForge.dist`, with one companion source archive. Executable SHA-256:
+`b7567e763034fbd5c39c78ecbfea864fbe8130a50db60286a27c3be746f87b2f`.
 
 ## Direct engine selection (0.2.2)
 

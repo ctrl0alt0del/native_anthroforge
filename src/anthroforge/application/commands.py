@@ -10,6 +10,7 @@ from . import (
     curve_conversion,
     curve_edit_operations,
     curve_independence,
+    deletion_impact,
     drawing_operations,
     drawing_projection,
     evaluation,
@@ -216,6 +217,7 @@ def query_commands(session: "Session") -> dict[str, Any]:
         "job.retry": session.scheduler.retry,
         "inspect.target": lambda **a: inspection.target(session, **a),
         "inspect.snapshot": lambda **a: inspection.snapshot(session, **a),
+        "object.delete.inspect": lambda **a: deletion_impact.inspect(session, **a),
         "units.convert": convert,
     }
 

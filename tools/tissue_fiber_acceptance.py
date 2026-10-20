@@ -1,5 +1,6 @@
 """Exercise role-aware Fiber capture from a tissue through the actual QML controls."""
 
+from PySide6.QtCore import Q_ARG, QMetaObject, Qt
 from PySide6.QtGui import QFont, QFontDatabase
 from tissue_editor_acceptance import (
     QQuickStyle,
@@ -30,6 +31,8 @@ def inspect(controller, window):
 
 
 def choose_surfaces(controller, window, source, target):
+    click(window, "Fiber binding optionsToggle")
+    settle(controller)
     rows = controller.surfaceRoles()
     index = next(
         i for i, row in enumerate(rows) if row["id"] == target and row["role"] == "TISSUE_FINAL"
@@ -37,7 +40,23 @@ def choose_surfaces(controller, window, source, target):
     choices = surface_choices(window, source)
     assert choices
     for choice in choices:
-        choice.setProperty("currentIndex", index)
+        choice.setProperty("currentIndex", index + 1)
+        QMetaObject.invokeMethod(choice, "activated", Qt.DirectConnection, Q_ARG(int, index + 1))
+    search_preserves_choice(controller, choices, target)
+
+
+def search_preserves_choice(controller, choices, target):
+    for choice in choices:
+        chooser = choice.parentItem()
+        search = next(
+            item
+            for item in chooser.childItems()
+            if item.property("placeholderText") == "Search anatomical surfaces"
+        )
+        search.setProperty("text", "No matching surfaces")
+        settle(controller)
+        current = chooser.property("current")
+        assert (current.toVariant() if hasattr(current, "toVariant") else current)["id"] == target
 
 
 def surface_choices(window, source):

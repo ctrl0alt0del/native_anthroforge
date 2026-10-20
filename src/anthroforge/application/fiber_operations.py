@@ -21,18 +21,22 @@ if TYPE_CHECKING:
 class FiberCreation:
     source: str
     identities: dict[str, str]
-    bindings: tuple[tuple[str, SurfaceReference, str], ...]
+    bindings: tuple[tuple[str, SurfaceReference | None, str], ...]
     name: str
     attachment_asset: str
 
 
 def create(
-    session: "Session", curve: str, bindings: list[dict[str, Any]], name: str = "Fiber"
+    session: "Session",
+    curve: str,
+    bindings: list[dict[str, Any]] | None = None,
+    name: str = "Fiber",
 ) -> str:
     item = editable(session, curve)
     if not isinstance(item, Curve):
         raise ValueError("Fiber creation requires a curve source.")
-    anchors = requested_bindings(session, item, bindings)
+    values = default_bindings(item) if bindings is None else bindings
+    anchors = requested_bindings(session, item, values)
     spec = FiberCreation(curve, curve_copy.mapping(item), anchors, require_name(name), str(uuid4()))
     return authored_jobs.begin(session, partial(fiber_tasks.enqueue, session, spec))
 
@@ -51,17 +55,29 @@ def requested_bindings(
     return result
 
 
-def requested_binding(session: "Session", row: dict[str, Any]) -> tuple[str, SurfaceReference, str]:
+def default_bindings(item: Curve) -> list[dict[str, Any]]:
+    points = (item.points[0],) if item.closed else (item.points[0], item.points[-1])
+    return [dict(point=point.id) for point in points]
+
+
+def requested_binding(
+    session: "Session", row: dict[str, Any]
+) -> tuple[str, SurfaceReference | None, str]:
     return (
         str(row["point"]),
-        requested_surface(session, row),
+        requested_surface(session, row) if row.get("target") else None,
         str(row.get("capture_scope", "CURRENT_PARENT")),
     )
 
 
 def validate_targets(session: "Session", result: tuple[Any, ...]) -> None:
     for _, target, scope in result:
-        surface_providers.get(session.engine, session.document, session.assets, target)
+        if target is not None:
+            surface_providers.get(session.engine, session.document, session.assets, target)
+        else:
+            from .fiber_defaults import candidates
+
+            candidates(session.document)
         if scope not in ("CURRENT_PARENT", "ANY_PARENT"):
             raise ValueError("Invalid endpoint capture scope.")
 

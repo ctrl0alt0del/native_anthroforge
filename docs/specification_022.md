@@ -14,6 +14,14 @@ Apply/Bake is permanently unavailable. Product export remains built-skin-only.
 Schema **4** is the only supported project format; reject all earlier schemas,
 including 0.2.1 schema 3, clearly without partially loading them.
 
+Desktop **Create Tissue** is discoverable on the main toolbar and Create menu. Eligible
+selection creates directly with compatible defaults; otherwise show a searchable source
+and preset chooser. Do not silently convert generic construction into attached sources.
+Source navigation enters editing. Selecting a weight field enters component editing;
+committing Weight applies to selected points in one undo action. Stacking order and
+exclusion changes apply immediately; footprint drafts and inflation previews retain
+their deliberate Accept/Cancel lifecycle.
+
 ## Objects and relationships
 
 One concrete `TissueVCP` composes construction, inflation, relaxation, constraints

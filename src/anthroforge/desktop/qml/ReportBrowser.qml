@@ -74,15 +74,15 @@ UiDialog {
                 RowLayout {
                     Layout.fillWidth: true
                     Label { text: "Description"; color: Theme.muted; Layout.fillWidth: true }
-                    UiButton { objectName: "reportEditText"; text: "Edit text"; visible: !dialog.editingDescription; enabled: !!dialog.status.description && !dialog.status.busy; onClicked: { description.text=dialog.status.description; dialog.editingDescription=true; description.forceActiveFocus(); } }
-                    UiButton { objectName: "reportEditCancel"; text: "Cancel edit"; visible: dialog.editingDescription; enabled: !dialog.status.busy; onClicked: dialog.editingDescription=false }
+                    UiButton { objectName: "reportEditCancel"; text: "Discard"; visible: dialog.editingDescription; enabled: !dialog.status.busy; onClicked: dialog.editingDescription=false }
                     UiButton { objectName: "reportEditSave"; text: "Save text"; primary: true; visible: dialog.editingDescription; enabled: !dialog.status.busy && !!description.text.trim(); onClicked: reportBrowser.saveDescription(description.text) }
                 }
                 UiScrollView {
                     Layout.fillWidth: true; Layout.preferredHeight: 130
                     TextArea {
                         id: description; objectName: "reportDescription"; textFormat: TextEdit.PlainText
-                        readOnly: !dialog.editingDescription || dialog.status.busy; selectByMouse: true
+                        readOnly: !dialog.status.key || dialog.status.busy; selectByMouse: true
+                        onTextChanged: if(activeFocus && !dialog.status.busy) dialog.editingDescription=text!==dialog.status.description
                         wrapMode: TextEdit.Wrap; color: Theme.text; selectionColor: Theme.selection; selectedTextColor: Theme.text
                         background: Rectangle { color: Theme.field; border.color: dialog.editingDescription ? Theme.accent : Theme.border; radius: Theme.radius }
                         Binding { target: description; property: "text"; value: dialog.status.description; when: !dialog.editingDescription; restoreMode: Binding.RestoreNone }

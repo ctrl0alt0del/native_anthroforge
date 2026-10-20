@@ -122,6 +122,12 @@ relationship. Open fibers require both endpoint bindings; closed fibers require 
 one chosen binding. Unbound drafts remain ordinary curves. Three geometric loop points
 do not mean three required anatomical attachments.
 
+Desktop Create Fiber is available outside edit mode. Default binding chooses the nearest
+ready SCP surface independently for each open endpoint, or the first point of a closed
+curve. Optional searchable overrides select explicit targets/roles and interior bindings.
+No ready SCP and no explicit target is an actionable error. Automatic capture uses the
+dispatch-time accepted geometry through the shared native attachment service.
+
 In the desktop, successful curve-to-fiber creation exits component editing and selects
 the accepted fiber. Pending or failed creation does not select a missing object, and
 completion must not take over a newer selection or workspace. Fibers have no direct
@@ -155,8 +161,10 @@ branched open lofts. Mixed open/closed loft inputs fail validation. Retain addon
 constraints; closed/nested branch expansion is out of scope.
 
 Branches reference explicit junction/point identities, not near-position welding.
-Closed-loft initial alignment has a preview, then persists per-source direction and start
-correspondence. Realign is explicit; ordinary deformation cannot recalculate correspondence.
+Closed-loft creation aligns and creates immediately in one undo action, then persists
+per-source direction and start correspondence. Realign is an explicit undoable action;
+ordinary deformation cannot recalculate correspondence. Optional API previews remain
+available but are not required desktop steps.
 Share suitable native kernels with SCP lofts without changing qualified connectivity.
 Deleting a surface preserves sources. Invalid input retains accepted output with diagnostics.
 

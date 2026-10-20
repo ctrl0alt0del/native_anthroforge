@@ -41,10 +41,11 @@ class ReportBrowserProbe:
 
     def edit_text(self):
         assert self.browser.description and not self.browser.image.isNull()
-        self.invoke("reportEditText", "clicked")
-        self.window.findChild(QObject, "reportDescription").setProperty(
-            "text", "Portable report text updated."
-        )
+        description = self.window.findChild(QObject, "reportDescription")
+        assert description is not None and not description.property("readOnly")
+        description.forceActiveFocus()
+        description.setProperty("text", "Portable report text updated.")
+        assert self.window.findChild(QObject, "reportEditSave").property("visible")
         self.invoke("reportEditSave", "clicked")
         self.phase = "edited"
 

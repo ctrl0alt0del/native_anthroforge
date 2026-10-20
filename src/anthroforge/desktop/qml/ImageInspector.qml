@@ -15,6 +15,7 @@ ColumnLayout {
     }
     UiSection {
         title: "Reference image"
+        UiButton { objectName: "traceImage"; text: "Trace this image"; glyph: "curve-draw"; Layout.fillWidth: true; onClicked: workspace.drawingTools.traceImage(panel.selected.id) }
         NumericSetting { label: "Width"; length: true; value: panel.selected.dimensions?.[0] || 1; onEdited: value => workspace.run("image.size",{target:panel.selected.id,width:value}) }
         Label { text: "Height: "+((panel.selected.dimensions?.[1] || 1)/workspace.state.unit_factor).toFixed(4)+" "+workspace.state.display_units; color: Theme.muted }
         RowLayout {

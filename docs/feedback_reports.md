@@ -21,8 +21,8 @@ focus/input behavior; a pointer drag can cancel after its screenshot has been ca
 
 Choose **Help → View reports…** to browse saved reports, newest first. Select a report to
 read its full description and annotated screenshot; Fit/100% and scrollbars support
-inspection. **Edit text** opens its description for editing; **Save text** commits it and
-**Cancel edit** discards the draft. Save failure retains the draft for retry. Editing
+inspection. Edit the description directly; **Save text** commits it and
+**Discard** discards the draft. Save failure retains the draft for retry. Editing
 preserves report identity, screenshots, annotations and original context. **Delete report…**
 asks for confirmation before permanently removing that archive. Deletion is not a document
 undo operation. Other reports remain intact; existing reports from earlier builds work.

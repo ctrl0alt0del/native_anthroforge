@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 from anthroforge.core.units import convert
 
 from . import (
+    attached_creation,
     construction_tasks,
     curve_consumers,
     curve_conversion,
@@ -76,6 +77,7 @@ EDITS = {
     "anchor.create": point_operations.anchor,
     "anchor.rebind": point_operations.rebind,
     "surface.create": surface_operations.create,
+    "membrane.create": attached_creation.membrane,
     "surface.update": surface_operations.update,
     "surface.source": surface_operations.source,
     "surface.sources": surface_sources.assign,

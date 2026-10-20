@@ -375,7 +375,7 @@ Item {
         Label { text: viewport.viewName + (viewport.orthographic ? " · Orthographic" : " · Perspective"); color: Theme.muted; font.pixelSize: 11 }
         Label { visible: viewport.snapping; text: "Wheel: surface offset · Middle click: reset · Release snapping modifier: reset"; color: Theme.snapColor; font.pixelSize: 11 }
         Label { visible: !!viewport.anchorMode; text: "Pick a " + (viewport.anchorMode === "FACE_CENTER" ? "face" : "vertex") + " on the selected child · Esc to cancel"; color: Theme.accent; wrapMode: Text.WordWrap; width: parent.width }
-        Label { visible: workspace.state.publishing > 0; text: "Preparing viewport · " + workspace.state.publishing + " chunks pending"; color: Theme.accent }
+        UiNotice { text: workspace.state.publishing > 0 ? "Preparing viewport · previous geometry remains visible" : "" }
         Label {
             visible: workspace.state.diagnostics
             text: Object.entries(workspace.metrics).map(function(pair) {

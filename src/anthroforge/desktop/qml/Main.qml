@@ -26,7 +26,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || tissueCreation.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -46,7 +46,7 @@ ApplicationWindow {
     Action { id: importAction; text: "Import mesh…"; enabled: !window.modalOpen; onTriggered: importFile.open() }
     Action { id: undoAction; text: "Undo"; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("undo",{}) }
     Action { id: redoAction; text: "Redo"; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("redo",{}) }
-    Action { id: tissueAction; text: "Create Tissue"; enabled: !window.modalOpen && !workspace.state.waiting; onTriggered: tissueCreation.request() }
+    Action { id: tissueAction; text: "Create Tissue"; enabled: !window.modalOpen && !workspace.state.waiting && !workspace.selectedData.readonly && !!workspace.selectedData.tissue_presets?.length; onTriggered: workspace.createConstruction("tissue.create",{source:workspace.selectedData.id}) }
     header: ColumnLayout {
         spacing: 0
         Rectangle {
@@ -185,11 +185,13 @@ ApplicationWindow {
             anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10; spacing: 12
             Rectangle { implicitWidth: 6; implicitHeight: 6; radius: 3; color: workspace.state.blocked ? Theme.accent : Theme.success }
             Label { text: workspace.state.message || "Middle/right drag: orbit   ·   Shift-drag: pan   ·   Wheel: zoom"; color: Theme.muted; font.pixelSize: 11; elide: Text.ElideRight; Layout.fillWidth: true }
-            UiButton { visible: !!workspace.state.message; flatStyle: true; text: "Details"; implicitHeight: 22; onClicked: messageDialog.open() }
-            UiButton { text: "Report folder"; visible: !!workspace.inspectionExport.state.path && !workspace.inspectionExport.state.busy; implicitHeight: 22; onClicked: workspace.inspectionExport.showFolder() }
+            UiButton { enabled: !!workspace.state.message; flatStyle: true; text: "Details"; implicitHeight: 22; onClicked: messageDialog.open() }
+            UiButton { text: "Report folder"; enabled: !!workspace.inspectionExport.state.path && !workspace.inspectionExport.state.busy; implicitHeight: 22; onClicked: workspace.inspectionExport.showFolder() }
             Label { text: "Rev " + workspace.state.revision + (workspace.state.dirty ? " · Unsaved" : " · Saved"); color: workspace.state.dirty ? Theme.accent : Theme.muted; font.pixelSize: 11 }
         }
     }
+    UiNotice { text: workspace.state.message || "" }
+    ToastOverlay {}
     UiMenu {
         id: createMenu
         UiMenuItem { text: "Ordered curve loft"; onTriggered: authoring.create("LOFT","CAPSULE") }
@@ -203,7 +205,6 @@ ApplicationWindow {
     ReferenceImageDialog { id: imageFile }
     FileDialog { id: reportDialog; title: "Export inspection report"; fileMode: FileDialog.SaveFile; defaultSuffix: "afinspection.zip"; nameFilters: ["Inspection report (*.afinspection.zip)"]; onAccepted: workspace.inspectionExport.start(selectedFile.toString()) }
     WorkspaceManager { id: workspaceManager }
-    TissueCreationDialog { id: tissueCreation; anchors.centerIn: parent }
     Popup {
         id: overlays; x: Math.max(0,window.width-650); y: 110; padding: 14
         background: Rectangle { color: Theme.panel; border.color: Theme.border; radius: 6 }

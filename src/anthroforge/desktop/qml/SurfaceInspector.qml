@@ -16,6 +16,7 @@ ColumnLayout {
         NumericSetting { visible: panel.item.kind === "LOFT"; label: "Across strips · 0 keeps fitted density"; value: panel.item.strips || 0; decimals: 0; onEdited: value => panel.setting("strips",Math.round(value)) }
         NumericSetting { visible: panel.item.kind === "PATCH"; label: "Patch resolution"; value: panel.item.patch_resolution || 4; decimals: 0; onEdited: value => panel.setting("patch_resolution",Math.round(value)) }
         UiButton { objectName: "surfaceRealign"; text: "Realign"; hint: "Recalculate correspondence · Undo restores the previous alignment"; onClicked: workspace.run("surface.realign",{target:panel.item.id}) }
+        UiButton { objectName: "surfaceCreateMembrane"; visible: workspace.selectedData.kind === "SURFACE"; text: "Create Membrane"; hint: "Create an independent attached surface and its Fibers"; Layout.fillWidth: true; onClicked: workspace.createConstruction("membrane.create",{source:panel.item.id}) }
     }
     SurfaceSources { item: panel.item }
     SurfaceBranches { item: panel.item }

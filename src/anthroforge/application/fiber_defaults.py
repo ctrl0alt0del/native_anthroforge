@@ -3,18 +3,9 @@
 from dataclasses import replace
 from typing import Any
 
-from anthroforge.native import components, point_attachments
+from anthroforge.native import components
 
-from . import attachment_assets, attachment_candidates
-
-
-def candidates(document: Any) -> tuple[Any, ...]:
-    targets = tuple(
-        ref for ref in attachment_candidates.eligible(document, "") if ref.role == "SCP_GEOMETRY"
-    )
-    if not targets:
-        raise ValueError("No ready SCP surfaces. Import an SCP or choose explicit binding targets.")
-    return targets
+from . import attachment_defaults
 
 
 def resolve(
@@ -23,17 +14,15 @@ def resolve(
     automatic = [index for index, row in enumerate(spec.bindings) if row[1] is None]
     if not automatic:
         return spec
-    targets = candidates(document)
     pins = [request.pins[index] for index in automatic]
     positions = components.transformed(engine, request.records[pins, :3], request.world)
-    handles, frames = attachment_assets.surface_inputs(engine, document, resources.meshes, targets)
-    owners, _ = point_attachments.capture(engine, handles, frames, positions, cancel=cancel)
-    return resolved_bindings(spec, automatic, targets, owners)
+    targets = attachment_defaults.nearest(engine, document, resources, positions, cancel)
+    return resolved_bindings(spec, automatic, targets)
 
 
-def resolved_bindings(spec: Any, automatic: Any, targets: Any, owners: Any) -> Any:
+def resolved_bindings(spec: Any, automatic: Any, targets: Any) -> Any:
     bindings = list(spec.bindings)
-    for index, owner in zip(automatic, owners, strict=True):
+    for index, target in zip(automatic, targets, strict=True):
         point, _, scope = bindings[index]
-        bindings[index] = (point, targets[owner], scope)
+        bindings[index] = (point, target, scope)
     return replace(spec, bindings=tuple(bindings))

@@ -4,6 +4,7 @@ from typing import Any
 
 from .membranes import Membrane
 from .tissue_constraints import TissueConstraint
+from .tissue_creation import domain as creation_domain
 from .tissue_policy import domain
 from .tissue_settings import TissueInflation, TissuePart, TissueRelaxation, TissueSide
 
@@ -72,7 +73,7 @@ PRESETS: dict[str, PresetValues] = {
 
 
 def available(source: object) -> list[dict[str, str]]:
-    kind = domain(source)
+    kind = creation_domain(source)
     return [dict(id=key, name=row[0]) for key, row in PRESETS.items() if row[1] in ("", kind)]
 
 

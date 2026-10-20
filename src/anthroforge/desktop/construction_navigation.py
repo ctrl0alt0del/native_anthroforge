@@ -2,9 +2,8 @@
 
 from anthroforge.core import tissue_presets
 from anthroforge.core.construction import Curve
-from anthroforge.core.fibers import Fiber
-from anthroforge.core.membranes import Membrane
-from anthroforge.core.points import Anchor
+from anthroforge.core.points import Point
+from anthroforge.core.surfaces import Surface
 
 
 def edit(controller, target):
@@ -26,6 +25,6 @@ def tissue_sources(controller):
     return [
         dict(id=o.id, name=o.name, presets=tissue_presets.available(o))
         for o in controller.session.document.objects
-        if isinstance(o, (Anchor, Fiber, Membrane))
+        if isinstance(o, (Point, Curve, Surface))
         and not controller.objectRecord(o.id).get("readonly", True)
     ]

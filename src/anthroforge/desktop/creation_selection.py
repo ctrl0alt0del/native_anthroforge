@@ -25,8 +25,9 @@ class CreationSelection:
             return result
         registry = self.controller.session.scheduler.registry
         job = registry.by_id.get(result.get("job_id") if isinstance(result, dict) else result)
-        if job is not None and len(job.outputs) == 1:
-            self.pending = context, next(iter(job.outputs))
+        target = created_target(result, job)
+        if target:
+            self.pending = context, target
             self.synchronize()
         return result
 
@@ -47,3 +48,12 @@ class CreationSelection:
         self.pending = None
         self.controller.authoring.setEditing(False)
         self.controller.select(target)
+
+
+def created_target(result, job):
+    if job is None:
+        return ""
+    target = result.get("object_id", "") if isinstance(result, dict) else ""
+    if target in job.outputs:
+        return target
+    return next(iter(job.outputs)) if len(job.outputs) == 1 else ""

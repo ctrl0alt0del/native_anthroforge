@@ -3,7 +3,7 @@
 from dataclasses import asdict, replace
 from typing import Any
 
-from anthroforge.core import tissue_parts, tissue_policy, tissue_presets
+from anthroforge.core import tissue_creation, tissue_parts, tissue_policy, tissue_presets
 from anthroforge.core.tissue_settings import TissuePart
 from anthroforge.core.tissues import TissueVCP
 
@@ -11,8 +11,14 @@ from . import object_operations, tissue_codec, tissue_tasks
 from .operations import require_name
 
 
-def create(session: Any, source: str, name: str = "Tissue", preset: str = "MUSCLE") -> str:
+def create(
+    session: Any, source: str, name: str = "Tissue", preset: str = "MUSCLE"
+) -> str | dict[str, str]:
     source_item = object_operations.editable(session, source)
+    if not tissue_creation.attached(source_item):
+        from .attached_creation import tissue
+
+        return tissue(session, source, name, preset)
     item = definition(source_item, name, preset)
     tissue_policy.validate(item, session.document.registry.records)
     session.replace_document(objects=(*session.document.objects, item))

@@ -48,12 +48,6 @@ ColumnLayout {
         UiButton { objectName: "tissuePreviewAccept"; visible: panel.editing; text: "Accept"; primary: true; Layout.fillWidth: true; enabled: panel.preview.state==="ready"; onClicked: panel.accept() }
         UiButton { objectName: "tissuePreviewCancel"; visible: panel.editing; text: "Cancel"; Layout.fillWidth: true; onClicked: panel.cancel() }
     }
-    Label {
-        visible: panel.editing; Layout.fillWidth: true; wrapMode: Text.WordWrap
-        text: "Inflated rest preview · " + panel.preview.state
-        color: Theme.accent
-        ToolTip.visible: hovered.hovered; ToolTip.text: "Shows inflation before relaxation, cropping and stacking. The document changes only when accepted."
-        HoverHandler { id: hovered }
-    }
-    Label { visible: panel.editing && !!panel.preview.error; text: panel.preview.error || ""; Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.muted }
+    UiNotice { active: panel.visible && panel.editing; text: "Inflated rest preview · " + panel.preview.state }
+    UiNotice { active: panel.visible && panel.editing; text: panel.preview.error || ""; error: true }
 }

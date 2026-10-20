@@ -37,7 +37,7 @@ def update(session: Any, target: str, position: Any) -> None:
 
 
 def anchor(
-    session: Any, source: str, parent: str, role: str = "", name: str = "Anchor"
+    session: Any, source: str, parent: str = "", role: str = "", name: str = "Anchor"
 ) -> dict[str, str]:
     item = point(session, source)
     return anchor_capture.create(session, item, parent, role, require_name(name))

@@ -4,26 +4,29 @@ The [0.2.2 specification](specification_022.md) defines the supported combinatio
 See [release validation](development_status.md#unified-tissues-022) for measured evidence
 and the limits of background/offscreen inspection.
 
-## Choose attached construction
+## Select construction and create
 
 Tissues share one entity and evaluator pipeline. Muscle and soft-tissue labels provide
 creation defaults; changing a label later keeps the settings you edited.
 
 | Desired base | Construction steps | Starting preset |
 | --- | --- | --- |
-| One attached location | Add a Point, select an anatomical surface role, create an independent Anchor | Closed Bulk |
-| One attached path | Create a curve, bind its endpoints to make an independent Fiber | Rim |
-| A sheet between attached paths | Ctrl-select Fibers in Construction, use Patch / Surface | Muscle or Layer |
-| A closed boundary | Create a closed Fiber with at least one binding, then Patch / Surface | Layer or Pouch |
+| One attached location | Select a Point or Anchor and Create Tissue | Closed Bulk |
+| One attached path | Select a Curve or Fiber and Create Tissue | Rim |
+| A sheet between attached paths | Select curves, use Patch / Surface, then Create Tissue | Muscle or Layer |
+| A closed boundary | Select a closed curve, use Patch / Surface, then Create Tissue | Layer or Pouch |
 
-All-Fiber surfaces become Membranes automatically. A generic Surface containing ordinary
-curves is still useful construction, but is not an attached tissue source. Point and Curve
-conversion copies the source; subsequent edits to the original do not change the copy.
+All-Fiber surfaces become Membranes automatically. Create Tissue converts generic sources
+to independent attached construction: Point → Anchor, Curve → Fiber, Surface → Membrane
+with its required curves converted to Fibers. New bindings use nearest ready SCP surfaces;
+existing Fibers retain their binding intent. Original objects remain unchanged. To create
+only attached construction from a generic Surface, use **Create Membrane** in its inspector.
 
-Select an Anchor, Fiber or Membrane and press **Create Tissue** on the main toolbar or
-Create menu. This creates the default compatible tissue immediately. With no eligible
-selection, the same action opens a searchable source/preset chooser and explains missing
-prerequisites. The source inspector also offers compatible presets.
+Press **Create Tissue** on the main toolbar or Create menu. The selected construction
+supplies the source directly with no modal; the source inspector offers compatible preset
+choices. Conversion and tissue creation form one undo action. Capturing and evaluation
+run in the background; a failed/canceled conversion leaves no partially created graph.
+Already-attached sources are shared live without another copy.
 The new object appears in Anatomy. Its source remains in Construction and is shared live.
 **Edit construction source** enters the source editor; a Membrane's **Edit curve** buttons
 enter its individual Fiber editors. Use **Make Independent** to copy its complete construction

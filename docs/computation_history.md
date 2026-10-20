@@ -464,8 +464,8 @@ resolved inflation/smoothing defect when assessing the fixture.
 
 ### CH-011 — Outward surface snapping and consistent numeric editing
 
-- **2026-10-20; 0.2.2; implementation under qualification.** Q01, C05, C06, R02, R06.
-  Baseline `a816ee3`; candidate is this task branch (see linked task record).
+- **2026-10-20; 0.2.2; Qualified.** Q01, C05, C06, R02, R06.
+  Baseline `a816ee3`; correction/runtime `275ff9d`.
 - **Before/problem:** curve dragging and drawing independently applied signed normal
   offsets; negative offsets deliberately placed points inside. Ray calculations used
   doubles but narrowed barycentric coordinates and distance to `igl::Hit` floats.
@@ -484,7 +484,7 @@ resolved inflation/smoothing defect when assessing the fixture.
   A desktop `NumericEdits` adapter owns the existing begin/commit/cancel transaction.
   Scrubbing publishes ordinary shared operations live and commits one undo action;
   local tool drafts commit their value only on release.
-- **Evidence so far:** 31 targeted native/history tests pass, including nonuniform
+- **Evidence/outcome:** 31 targeted native/history tests pass, including nonuniform
   and mirrored transforms, inside-camera hits, drawing, negative offset clamping,
   preserved measurement coordinates and complete clear routed segments between
   snapped opposite faces. Real QML keyboard/mouse checks pass decimal entry under
@@ -494,7 +494,11 @@ resolved inflation/smoothing defect when assessing the fixture.
   value adapter now converts NumPy scalars to built-in Python values. Real vector
   typing followed immediately by dragging and undo passes; property-projection
   tests exercise float32/float64 without replacing stable curve identities.
-  Full gate and portable evidence remain pending.
+  All 1,344 tests, three native CTests, style/type/numerical checks, real offscreen
+  gesture checks and minimal-PATH portable checks pass. A hidden GPU render of the
+  saved snapped-endpoint fixture shows its route around the cube's exterior.
+  Numeric checks also cover rollback on window deactivation and owner destruction.
+  Offscreen input and texture rendering do not establish visible-window acceptance.
 - **Preserved contracts and limits:** displayed geometry remains the snap source;
   explicit anatomical bindings are unchanged. Face winding defines the exterior,
   including on open meshes; this is not a mesh-normal repair or general inter-object

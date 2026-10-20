@@ -78,6 +78,11 @@ Retain handles, numeric editing, Shift insertion, Ctrl surface snapping and whee
 G/R/S, axis views 1/2/3, camera restore 4 and uninterrupted gestures through the keyboard
 manager. Add a numeric/surface-placeable 3D cursor for creation and drawing depth.
 
+Surface snapping places points on the outward side of the hit face, with a numerical
+safety margin. User offsets cannot move points inside the face. This also applies to
+surface drawing, point placement and cursor placement; exact measurements and retained
+anatomical bindings remain unshifted. Existing authored points are not relocated.
+
 Match applicable Blender 5.0.1 curve drawing behavior: cursor/view depth, surface projection,
 selected-only projection, normal offset, first-hit plane options, misses/fallback,
 fitting error and corner handling. Reference-image plane tracing is an explicit extension.

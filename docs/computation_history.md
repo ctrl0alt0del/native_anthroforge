@@ -77,7 +77,7 @@ evidence for those revisions, not current workflow instructions.
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
 | S01 | Source correspondence: align compatible closed paths initially, persist starting correspondence/direction, apply per-source sampling ranges and transforms; explicit Realign recalculates correspondence. | [surface_alignment.cpp](../native/src/surface_alignment.cpp), [surface_sampling.cpp](../native/src/surface_sampling.cpp) | [native surfaces](../tests/test_native_surfaces.py), [surface sources](../tests/test_surface_sources.py) |
-| S02 | General lofts: construct open/compatible closed surfaces from Curve/Fiber samples with material grids, stable seams and structural material pins. All-Fiber inputs produce a Membrane through the same evaluator. | [surface_loft.cpp](../native/src/surface_loft.cpp), [surface_material_pins.cpp](../native/src/surface_material_pins.cpp) | [surface workflow](../tests/test_surface_workflow.py), [material pins](../tests/test_material_pins.py) |
+| S02 | General lofts: construct open/compatible closed surfaces from Curve/Fiber samples with material grids, stable seams and structural material pins. All-Fiber inputs produce a Membrane through the same evaluator. Exact-mode sampling can change connectivity; retained downstream attachments are not yet safe across adaptive sample changes (CH-013). | [surface_loft.cpp](../native/src/surface_loft.cpp), [surface_material_pins.cpp](../native/src/surface_material_pins.cpp) | [surface workflow](../tests/test_surface_workflow.py), [material pins](../tests/test_material_pins.py) |
 | S03 | Closed-curve patches: project and triangulate a boundary, subdivide, fair interior samples while retaining boundary constraints, and retain material correspondence. | [surface_patch_projection.cpp](../native/src/surface_patch_projection.cpp), [surface_patch_fairing.cpp](../native/src/surface_patch_fairing.cpp) | [native surfaces](../tests/test_native_surfaces.py) |
 | S04 | Branched open lofts: explicit junction-based branch sampling, connector assembly and welded seams. Reject unsupported nested/closed branches and overlapping root intervals. | [surface_branches.cpp](../native/src/surface_branches.cpp), [surface_branch_sampling.cpp](../native/src/surface_branch_sampling.cpp) | [native surface branches](../tests/test_native_surface_branches.py), [surface branches](../tests/test_surface_branches.py) |
 
@@ -543,7 +543,8 @@ resolved inflation/smoothing defect when assessing the fixture.
   confirm clear segments. Hidden GPU renders show the route around both cubes;
   the packaged capture has no warnings. No visible-window acceptance is claimed.
 - **Preserved contracts/limits:** generated points remain solver variables, not new
-  authored constraints. Consumers retain their own mesh density. Native cancellation
+  authored constraints. SCP consumers retain their own mesh density; exact standalone
+  surfaces require the additional material work identified in CH-013. Native cancellation
   and the one-million-point bound remain enforced. This fixes sampling and validation;
   it does not establish complete pathfinding for arbitrary geometry or move interior pins.
 - [Task/evidence](tasks/solver-fail1.md), [fixture](../tests/fixtures/routing/solver_fail1.json),
@@ -551,3 +552,28 @@ resolved inflation/smoothing defect when assessing the fixture.
   [lifecycle tests](../tests/test_routing_layout_workflow.py).
   Design reference: [OMPL path interpolation](https://ompl.kavrakilab.org/classompl_1_1geometric_1_1PathGeometric.html)
   retains existing path vertices when adding samples. No new dependency was introduced.
+
+### CH-013 — Adaptive Fiber sampling and exact-surface correspondence investigation
+
+- **2026-10-20; experiment only; production repair pending.** C06, S01, S02, A02, A03.
+  Baseline/runtime `4be30b4`; no application computation change in this checkpoint.
+- **Observed:** actual routed Fibers preserve bindings while growing 3 → 4 → 3.
+  Exact loft station unions change mesh connectivity; downstream Tissue Base attachment
+  resolution rejects old indices. Near-coincident station duplicates also cause degenerate
+  tissue frames. The previous BODY-consumer check did not establish exact-surface safety.
+- **Compared:** exact-corner geometry with a stable normalized material-coordinate probe,
+  versus fixed consumer sampling on identical accepted paths. Numerical preparation is an
+  isolated C++ experiment, not a Python production alternative. The user requested visual
+  comparison before choosing the production repair.
+- **Evidence:** exact probe preserves corners and has clear boundary segments. Fixed 32
+  matches current uniform surface geometry but deviates 5.984 mm at the bend and crosses
+  the cube on both boundaries. Fixed 8 deviates 24.707 mm and also crosses. These are corner
+  deviations, not penetration depths. Real uniform-surface Base/Final bindings survive
+  motion, undo/redo and reopening. Exact material-coordinate transport returns to its
+  original location, but production attachment frames, roles and persistence are not yet
+  implemented for changing exact topology.
+- **Limits:** this is an open-loft comparison. No complete exact-mode repair, general
+  surface collision guarantee, branch/patch/field qualification or release is claimed.
+  Installed application and native library remain unchanged.
+- [Task and measurements](tasks/routed-fiber-surface-stability.md),
+  [reproducible experiment](../tools/experiments/routed_sampling/README.md).

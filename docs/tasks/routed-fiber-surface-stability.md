@@ -3,7 +3,7 @@
 - Task branch: `codex/routed-fiber-surface-stability`
 - Integration branch: `main`
 - Starting revision: `4be30b49e484957a62c548beffcb4d07f7a30021`
-- Status: investigation and regression qualification
+- Status: requested visual comparison complete; production repair awaiting review
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -15,28 +15,75 @@ sample growth and shrinkage, source movement, persistence and undo/redo. Preserv
 controls, endpoint bindings, consumer material correspondence and topology restrictions.
 Fix demonstrated defects at their owning boundary; do not weaken collision validation.
 
-## Current state
+## Decisions and current state
 
-The preceding routing correction passes the curve/native bound-owner tests and a BODY
-consumer test. It has not yet qualified complete Fiber-to-surface attachment chains.
-Fibers use the same routing evaluator, with binding resolution supplying current inputs.
-Surface exact sampling unions source stations; inspect its persistence/material behavior
-before assuming changing route density is transparent to attached consumers.
+The user first selected exact corners with stable material correspondence, then explicitly
+requested testing both alternatives with visual results before proceeding. No production
+repair or canonical package replacement has been performed in this task.
+
+Fibers use the corrected routing evaluator with resolved binding inputs. Actual two-endpoint
+Fibers with preferred samples 3 grow 3 → 4 → 3 as an independent cube enters/leaves the path.
+Their points, retained endpoint bindings and capture assets stay unchanged.
+
+Default exact lofts union all evaluated path stations, which changes connectivity even
+when path counts stay equal. Retained tissue Base bindings correctly reject old vertex
+indices: `Anatomical surface topology changed; explicitly rebind.` The exact station
+union also retains almost-identical floating-point stations, producing degenerate tissue
+frames. `tools/experiments/routed_sampling/exact_limit.py` reproduces both observations.
+
+The isolated C++ experiment compares:
+
+1. Exact stations with a `1e-12` normalized-length merge and a material-coordinate probe
+   at along/across 0.33/0.5. This preserves geometry corners; it is not an integrated
+   Base/Final attachment implementation.
+2. Fixed 32-station consumer sampling, matching actual application vertices to `1e-12` m.
+   A second fixed-8 run checks sensitivity.
+
+Both consume the very same accepted routed Fiber buffers. Three matched phases and
+scientific figures are generated from those buffers, not illustrative geometry.
 
 ## Verification
 
-No new qualification result yet. Existing 1,358-test baseline passed before this task.
-Official OMPL interpolation and Blender Surface Deform references were consulted;
-repository material contracts and actual native results determine acceptance here.
+The experiment's real uniform-surface tissue Base and Final Anchors retain their bindings
+through grow/shrink, undo/redo and project reopening; no scheduler errors occur.
+Both exact/fixed material probes return to their starting positions. The exact probe
+only qualifies coordinate transport on this open loft, not frame/offset/role transport,
+arbitrary branches, patches, fields, crops, or final production integration.
+
+When the obstacle enters:
+
+| Variant | Surface columns | Corner-to-boundary deviation | Full boundary-segment check |
+| --- | ---: | ---: | --- |
+| Exact prototype | 6 | 0 m | Both boundaries clear |
+| Fixed 32 | 32 | 0.005983517833 m | Both cross obstacle at segment 10 |
+| Fixed 8 | 8 | 0.024706827625 m | Both cross obstacle at segment 2 |
+
+Deviation is not penetration depth. The boundary test does not establish whole-surface
+collision safety. Before and after obstacle entry, all variants' boundaries are clear.
+The production exact-consumer Base attachment failure remains reproduced, not repaired.
+
+16 routing/layout/workflow/architecture checks pass. Experiment Python style and function
+limits pass; the isolated C++ helper compiles with the existing native toolchain. No
+production C++ or Python files changed, so no new application build or full release gate
+is claimed. Canonical executable SHA-256 remains
+`20fadb07aec7d14fd2a71ae3b5994ec7bbece79c3b3e96ed6d2611906bb0090b`.
+Official OMPL interpolation and Blender Surface Deform sources were consulted;
+repository contracts and actual native results establish these findings.
 
 ## Next actions
 
-1. Trace Fiber binding resolution, surface sampling and downstream attachment identity.
-2. Add integrated adaptive-count regressions and inspect rendered output.
-3. Correct demonstrated defects, run relevant checks and deliver through normal merge/push.
+1. Present comparison/close-up/timeline to the user and receive the implementation direction.
+2. Integrate the selected production repair, including material frames, retained references
+   and affected surface types. Keep real topology-edit restrictions.
+3. Qualify actual Fiber → Membrane → Tissue → attachment chains and package/merge only
+   after the selected repair is complete.
 
 ## Recovery inputs
 
 The compact `tests/fixtures/routing/solver_fail1.json` reproduces the prior failure.
 Keep local evidence under ignored `build/routed-fiber-surface-stability/`.
 Preserve unrelated root `__init__.py`; all validation stays background-only.
+The maintained [experiment instructions](../../tools/experiments/routed_sampling/README.md)
+recreate data and images. Local `compare/comparison.json`, `.npz` buffers, three saved
+projects, `comparison.png`, `corner-closeup.png` and `timeline.png` are generated artifacts
+and are not pushed. `exact-limit.log` contains the current exact-mode rejection.

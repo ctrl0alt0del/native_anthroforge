@@ -1,7 +1,33 @@
 # AnthroForge development validation
 
-Current source qualification is in [unified tissues](#unified-tissues-022).
+Current source qualification is in [snapped curve routing](#snapped-curve-routing-022).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Snapped curve routing (0.2.2)
+
+Runtime `64fe0ef` corrects graph-search validation of segments between pins on the same
+surface and clarifies active versus unapplied curve-engine conversions. See the
+[task record](tasks/snapped-solver-routing.md). The full Windows development gate passes:
+**1,294 tests**, 732 existing Qt deprecation warnings, three native CTests, native style,
+Ruff/format, mypy, script checks, numerical imports and native doctor.
+
+Exact user geometry, bound/unbound contacts at three resolutions, cold/warm solves and
+whole-segment collision checks pass. One preserved addon reference (`bound-box`) intersects
+its owner near the pins; correcting it intentionally differs from its coordinates.
+Other donor and skull numerical parity remains exact.
+
+Three background full-QML routing tools pass, including unapplied previews, explicit
+application, source/fiber selection, cancellation and undo/redo. The portable minimal-PATH
+suite passes; the packaged executable separately converts, saves, reopens and renders the
+user's actual project with no segment intersections. Original SHA-256 is unchanged.
+Offscreen controls and hidden GPU captures were inspected; hands-on interaction and
+physical display responsiveness were not measured.
+
+The canonical `dist/0.2.2/AnthroForge.dist` is replaced after the running application closed.
+The executable SHA-256 is
+`38cb503e260af33988317f0d9b32df3dba77f9ab67ab7c13cbbc3a9613ac29d6`.
+The separate corrected project is
+`E:/development/WIP_models/solver_doesnt_work_routed.anthroforge`.
 
 ## Unified tissues (0.2.2)
 

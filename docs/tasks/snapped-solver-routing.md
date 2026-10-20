@@ -3,7 +3,7 @@
 - Task branch: `codex/snapped-solver-routing`
 - Integration branch: `main`
 - Starting revision: `248cc66f62684c7218253335777aaf75f2e20949`
-- Status: fixes implemented; full gate and packaged delivery pending
+- Status: qualified and delivered; integration recorded in Git ancestry
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat
 
@@ -42,7 +42,7 @@ silently change the path engine. Conversion is explicit, previewed and undoable;
 preserves its copied engine. Check conversion on these exact coordinates before drawing
 conclusions about native solver correctness or the UI.
 
-## Verification and next actions
+## Verification and delivery
 
 28 focused routing/architecture tests pass, including exact user pins, bound/unbound
 contacts at 32/64/128 samples, warm continuation and independent whole-segment checks.
@@ -55,10 +55,33 @@ selection/preview without document edits, explicit application, curve/fiber inde
 undo/redo, selector synchronization and cancellation without QML warnings. Captures inspected;
 this offscreen platform does not render the 3D scene. Separate hidden-GPU captures cover shape.
 
-1. Run the full development gate and existing routing GUI checks.
-2. Package and qualify in an ignored build directory while the user's installed app runs.
-3. Deliver the corrected separate project and replace the canonical build after it closes.
-4. Update evidence, merge and push the validated task.
+At runtime `64fe0ef`, `tools/check.ps1` passes: 1,294 pytest cases (732 existing Qt
+deprecation warnings), three CTests, native function/style, Ruff/format, mypy, script
+checks, numerical imports and native doctor. Existing solver/routing editor acceptance
+tools also pass. Full portable qualification passes with minimal PATH and offscreen UI.
+
+The clean packaged executable separately converts both original objects, saves revision
+312, and reopens with ROUTED/ready results. Whole-segment checks return [-1] for both,
+at tolerance 1.7320508075688772e-9. Its hidden-GPU capture was inspected. Original SHA-256
+still matches the compact fixture. No visible windows, desktop input or hands-on
+acceptance is claimed; frame times in capture screenshots are not performance evidence.
+
+Installed the qualified package at `dist/0.2.2/AnthroForge.dist` after the user's running
+application closed. No extra versioned distribution was created. Its executable hash is
+`38cb503e260af33988317f0d9b32df3dba77f9ab67ab7c13cbbc3a9613ac29d6`;
+native doctor passes from that final location. Corresponding source uses the existing
+`dist/AnthroForge-0.2.2-source.zip` path. The separate user deliverable is
+`E:/development/WIP_models/solver_doesnt_work_routed.anthroforge`.
+
+Ownership review: the native graph search now invokes the already-established edge policy,
+removing duplicate weaker logic. QML only presents active/target/preview states; shared
+conversion transactions remain unchanged. No native fallback, new scheduler or silent
+engine switch was added. Numerical failures remain failures. The original unsafe donor
+fixture is retained as counterevidence, not rewritten to manufacture parity.
+
+The final documentation checkpoint records qualification after the runtime build.
+Follow the ordinary validated merge/push workflow; Git ancestry identifies integration.
+Untracked root `__init__.py` remains unrelated and preserved.
 
 ## Recovery inputs
 

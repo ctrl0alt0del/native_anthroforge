@@ -72,6 +72,10 @@ Implementation and interaction qualification (not release-ready):
   checks and numerical/native doctor. Portable qualification and final delivery remain.
 - The additional packaged command protocol passes in the source launcher: automatic
   endpoints, independent copy, undo/redo, impact inspection and saved ready output.
+- An additional search regression exposed misleading defaults after filtering an explicit
+  surface choice. The shared selector now retains authored/draft selection across filtering
+  and Qt model replacement. Actual Fiber overrides and Anchor creation/rebind checks pass.
+  This final runtime change is QML-only; compiled Python/native sources are unchanged.
 
 Prior ignored audit probe reproduced unapplied stacking checkbox changes, hidden Fiber
 creation, per-point selector clutter, source navigation without editing and Hook member

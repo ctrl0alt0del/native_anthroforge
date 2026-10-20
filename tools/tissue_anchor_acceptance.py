@@ -1,6 +1,6 @@
 """Explicit tissue surface roles and retained Anchor motion through the real QML inspector."""
 
-from PySide6.QtCore import QObject
+from PySide6.QtCore import Q_ARG, QMetaObject, QObject, Qt
 from PySide6.QtGui import QFont, QFontDatabase
 from tissue_editor_acceptance import (
     QQuickStyle,
@@ -11,6 +11,7 @@ from tissue_editor_acceptance import (
     run,
     settle,
 )
+from tissue_fiber_acceptance import search_preserves_choice
 from tissue_relaxation_acceptance import click
 from ui_acceptance import find
 
@@ -32,7 +33,10 @@ def choose_final(controller, window, target):
         i for i, row in enumerate(rows) if row["id"] == target and row["role"] == "TISSUE_FINAL"
     )
     selector = find(window, "pointAttachmentSurface")
-    selector.findChild(QObject, "surfaceRoleChoice").setProperty("currentIndex", choice)
+    combo = selector.findChild(QObject, "surfaceRoleChoice")
+    combo.setProperty("currentIndex", choice)
+    QMetaObject.invokeMethod(combo, "activated", Qt.DirectConnection, Q_ARG(int, choice))
+    search_preserves_choice(controller, [combo], target)
 
 
 def check_motion(controller, target):

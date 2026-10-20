@@ -42,6 +42,21 @@ def choose_surfaces(controller, window, source, target):
     for choice in choices:
         choice.setProperty("currentIndex", index + 1)
         QMetaObject.invokeMethod(choice, "activated", Qt.DirectConnection, Q_ARG(int, index + 1))
+    search_preserves_choice(controller, choices, target)
+
+
+def search_preserves_choice(controller, choices, target):
+    for choice in choices:
+        chooser = choice.parentItem()
+        search = next(
+            item
+            for item in chooser.childItems()
+            if item.property("placeholderText") == "Search anatomical surfaces"
+        )
+        search.setProperty("text", "No matching surfaces")
+        settle(controller)
+        current = chooser.property("current")
+        assert (current.toVariant() if hasattr(current, "toVariant") else current)["id"] == target
 
 
 def surface_choices(window, source):

@@ -18,6 +18,8 @@ source editing, mixed field weights, explicit Tissue Final bindings, 120-point v
 independent image tracing, conditional root/leaf deletion, undo/redo and modeless workspace
 navigation. The report inbox suite covers 120 reports, direct text Save/Discard, failure
 retention and permanent deletion confirmation using synthetic archives.
+Additional QML checks verify that search retains explicit surface choices for Fiber
+overrides and Anchor creation; model replacement cannot misleadingly display a default.
 
 All three current inbox reports concern 0.2.1 layout: truncation, tabs and icon alignment.
 Current shared controls already resolve these; labels, real tabs and icon centers pass

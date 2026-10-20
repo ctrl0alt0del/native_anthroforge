@@ -1,7 +1,38 @@
 # AnthroForge development validation
 
-Current source qualification is in [snapped curve routing](#snapped-curve-routing-022).
+Current source qualification is in [direct engine selection](#direct-engine-selection-022).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Direct engine selection (0.2.2)
+
+Runtime `e2aef15` replaces mandatory conversion controls with a directly editable Path engine.
+Changing it retains authored control points, uses the current resolved Fiber shape and creates
+one undo action through the shared `curve.engine` command. See the
+[task record](tasks/direct-curve-engine.md) and updated [UX rules](engineering_guidelines.md).
+
+The full Windows development gate passes: **1,304 tests** in 86.70 seconds, 732 existing
+Qt deprecation warnings, three native CTests, native/script style and function limits,
+Ruff/format, mypy, numerical imports and native doctor. Focused coverage includes shared
+topology locks, Manual results, failures, superseding work, undo/redo, bindings and junctions.
+
+Background full-QML checks cover the actual user project, immediate selection outside
+edit mode, both Curve/Fiber sources, primitive source editing, undo synchronization,
+failed-command reset and topology locking/unlocking. Existing obstacle, Fiber editing,
+placement and 120-point/120-obstacle interactions pass. The stress trace exceeded bounded
+capture capacity (177,813 evicted events, 143,291 Qt drops); it is explicitly incomplete,
+not complete timing or responsiveness evidence. No interactive desktop session is claimed.
+
+The minimal-PATH portable suite passes. The executable separately switches both objects
+in a copy of the user project, undoes an engine change, saves/reopens and renders revision
+312. Authored point identities/positions remain, and neither route intersects the cube.
+Offscreen inspector images and the hidden GPU result were visually inspected. The original
+project SHA-256 remains `cef5cf265dc2f40da28ce632fd6b37da0a047499dd3b267dddf92bc13c894e52`.
+
+The canonical `dist/0.2.2/AnthroForge.dist` contains this qualified executable; its SHA-256 is
+`cfbe450eedeeacc1fe9e4ebc82407ab9ab1736869934189582328080affdf121`.
+No native algorithm was changed. Ownership review confirms the desktop only selects an
+engine; shared policies own validation, ordinary transactions own undo, and existing
+path jobs own evaluation/publication. Optional API resampling previews remain separate.
 
 ## Snapped curve routing (0.2.2)
 

@@ -3,7 +3,7 @@
 - Task branch: `codex/direct-curve-engine`
 - Integration branch: `main`
 - Starting revision: `b2d3be74fb0ef5b719e9605d0bfc840becfd1870`
-- Status: implementation in progress
+- Status: implemented and qualified; final integration pending
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat
 
@@ -43,13 +43,30 @@ The optional existing headless preview API can remain separate from the direct U
   Fiber editing QML checks passed. Offscreen capture verifies layout, not 3D rendering.
 - The 120-point/120-obstacle workflow passed interaction assertions but its full stress
   profiler recording evicted events and overflowed the Qt queue. The tool now explicitly
-  reports this bounded-capture loss; no complete timing totals are claimed. Rerun pending.
+  reports this bounded-capture loss; no complete timing totals are claimed. Rerun passed:
+  177,813 evicted events and 143,291 Qt drops are explicit in the incomplete capture.
 
-## Verification and next actions
+## Final qualification and delivery
 
-1. Run the development gate, rerun the updated stress check and inspect hidden GPU output.
-2. Qualify the packaged executable, including the same direct command and updated QML.
-3. Replace only the canonical 0.2.2 distribution after it closes, archive source and merge/push.
+- Full Windows gate: 1,304 pytest cases passed (732 existing Qt deprecation warnings,
+  86.70 seconds); three native CTests, style/function limits, Ruff/format, mypy, numerical
+  imports and doctor passed. The first native link attempt overlapped a dev-DLL GUI check
+  and was denied by Windows; serializing that shared resource resolved it.
+- Clean tracked runtime source: `e2aef15db8a2a6b60374822025953e44755b88ab`.
+  Minimal-PATH portable suite passed. A separate packaged command test switches both
+  objects in the actual project copy, checks undo, saves/reopens, verifies retained
+  point IDs/positions and zero curve/cube segment intersections, and renders revision 312.
+- Inspected offscreen control screenshots and the packaged hidden-GPU image. No OS input,
+  visible windows or hands-on acceptance was performed. Original fixture SHA-256 unchanged.
+- Qualified package installed at the sole canonical `dist/0.2.2/AnthroForge.dist`, after
+  verifying both installations were closed. Prior installation retained under this task's
+  ignored build directory. Executable SHA-256:
+  `cfbe450eedeeacc1fe9e4ebc82407ab9ab1736869934189582328080affdf121`.
+- Separate ownership review: the UI performs no conversion orchestration/numerical work;
+  shared validation and ordinary edits/coordinator own policies and lifecycle. No new
+  scheduler, preview workaround or duplicated Fiber path implementation was added.
+- Remaining final delivery: commit/push this qualification record, merge/push main,
+  refresh shipped documentation and the single companion source archive, verify bytes.
 
 ## Recovery inputs
 

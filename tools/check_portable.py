@@ -68,7 +68,7 @@ def invoke(executable, cwd, *arguments, background=False):
         text=True,
         timeout=90,
     )
-    assert result.returncode == 0, result.stdout + result.stderr
+    assert result.returncode == 0, f"Exit {result.returncode}: {result.stdout}{result.stderr}"
     return result.stdout
 
 

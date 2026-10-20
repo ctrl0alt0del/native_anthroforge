@@ -76,6 +76,10 @@ Implementation and interaction qualification (not release-ready):
   surface choice. The shared selector now retains authored/draft selection across filtering
   and Qt model replacement. Actual Fiber overrides and Anchor creation/rebind checks pass.
   This final runtime change is QML-only; compiled Python/native sources are unchanged.
+- First portable run passed through tissue rendering and the new API checks, then failed
+  because its compiled report probe still expected the removed Edit text button.
+  Updated that opt-in probe to focus/edit directly; source packaged-style capture/edit/
+  delete now passes. Rebuilding the executable is required before repeating portable QA.
 
 Prior ignored audit probe reproduced unapplied stacking checkbox changes, hidden Fiber
 creation, per-point selector clutter, source navigation without editing and Hook member

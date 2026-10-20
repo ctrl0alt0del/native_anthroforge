@@ -47,7 +47,7 @@ class CurveInteraction(QObject):
 
     @Slot(float)
     def adjustOffset(self, amount):
-        self.offset += amount
+        self.offset = max(0.0, self.offset + amount)
         self.changed.emit()
 
     @Slot()
@@ -123,8 +123,7 @@ class CurveInteraction(QObject):
         if not enabled:
             self.resetOffset()
         anchor = snap_anchor(editor) if enabled else None
-        self.snap = surface_hit(editor.controller, origin, direction) if anchor else {}
-        self.snap = offset_hit(self.snap, self.offset)
+        self.snap = surface_hit(editor.controller, origin, direction, self.offset) if anchor else {}
         self.changed.emit()
         if not self.snap:
             return values
@@ -143,8 +142,7 @@ def snap_anchor(editor):
     )
 
 
-def surface_hit(controller, origin, direction):
-
+def surface_hit(controller, origin, direction, offset=0.0, exclude_current=True):
     started = perf_counter()
     hits = scene.pick(
         controller.session.engine,
@@ -154,28 +152,35 @@ def surface_hit(controller, origin, direction):
         direction,
     )
     controller.session.scheduler.metrics.observe("surface_snap", perf_counter() - started)
-    hit = next((h for h in hits if controller.snap_ids[int(h[0])] != controller.selection), None)
-    return surface_record(controller, hit) if hit is not None else {}
+    hit = eligible_hit(controller, hits, exclude_current)
+    return surface_record(controller, hit, offset) if hit is not None else {}
 
 
-def surface_record(controller, hit):
+def eligible_hit(controller, hits, exclude_current):
+    return next(
+        (
+            h
+            for h in hits
+            if not exclude_current or controller.snap_ids[int(h[0])] != controller.selection
+        ),
+        None,
+    )
+
+
+def surface_record(controller, hit, offset=0.0):
     from .scene_state import hit_record
 
     index = int(hit[0])
-    normal = scene.surface_normal(
+    record = hit_record(controller.snap_ids, hit)
+    snapped = scene.surface_snap(
         controller.session.engine,
         int(controller.snap_handles[index]),
         controller.snap_matrices[index],
         int(hit[3]),
+        record["point"],
+        offset,
     )
-    return dict(hit_record(controller.snap_ids, hit), normal=normal)
-
-
-def offset_hit(hit, offset):
-    if not hit:
-        return {}
-    position = [p + offset * n for p, n in zip(hit["point"], hit["normal"], strict=True)]
-    return dict(hit, surface=hit["point"], point=position)
+    return dict(record, surface=record["point"], **snapped)
 
 
 def make_query(session, entity, curves):

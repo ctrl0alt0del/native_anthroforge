@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Port of af_soft_tissue_point.hpp, reusing owned native BVH queries.
 #include "tissue_relaxation.hpp"
-#include <igl/Hit.h>
 
 namespace af::tissue {
 using Neighbors=std::vector<std::vector<int64_t>>;
@@ -45,7 +44,7 @@ static void viscosity(Vertices& points,const Neighbors& neighbors,double shape,u
 static V3 clamp(const PointContext& context,const V3& p) {
     const V3 local=point(context.inverse,p),control=point(context.inverse,context.center),direction=control-local;
     if(direction.norm()<=1e-10) return p;
-    igl::Hit hit;
+    RayHit hit;
     if(intersect_ray(context.host,local,direction,hit)&&hit.t<1) return point(context.frame,local+direction*hit.t);
     return p;
 }

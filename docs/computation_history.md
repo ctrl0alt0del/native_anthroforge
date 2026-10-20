@@ -116,7 +116,7 @@ Presence in this inventory does not make every mode available on every source.
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
-| Q01 | Interactive picking/snapping: ray/surface intersections and normals, cached component queries for points/handles/lattices/imported vertices, path picking, snap offsets and displayed-revision agreement. | [ray_queries.cpp](../native/src/ray_queries.cpp), [component_index.cpp](../native/src/component_index.cpp), [path_presentation.cpp](../native/src/path_presentation.cpp) | [component picking](../tests/test_component_picking.py), [surface picking](../tests/test_surface_picking.py), [held input](../tests/test_held_input.py) |
+| Q01 | Interactive picking/snapping: double-precision ray/surface hits, native outward snap margins and nonnegative user offsets, cached component queries, path picking and displayed-revision agreement. Exact measurement hits are not offset. | [ray_queries.cpp](../native/src/ray_queries.cpp), [surface_snap.cpp](../native/src/surface_snap.cpp), [component_index.cpp](../native/src/component_index.cpp), [path_presentation.cpp](../native/src/path_presentation.cpp) | [surface snapping](../tests/test_surface_snapping.py), [component picking](../tests/test_component_picking.py), [surface picking](../tests/test_surface_picking.py), [held input](../tests/test_held_input.py) |
 | Q02 | Deformation quality: compare canonical meshes for new transverse crossings and collapsed faces, distinguishing coincident boundary contact; large normal rotation is informational. Shared by inflation/smoothing/relaxation. | [mesh_quality.cpp](../native/src/mesh_quality.cpp) | [mesh quality](../tests/test_mesh_quality.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
 | Q03 | Advisory path collision: check accepted authored-engine Fiber centerline segments against eligible surfaces, with attachment-contact handling and incomplete-provider reporting. Does not silently reroute the curve. | [path_collisions.cpp](../native/src/path_collisions.cpp), [fiber collision Issues](../src/anthroforge/application/issues/fiber_collisions.py) | [path collisions](../tests/test_path_collisions.py), [fiber collision Issues](../tests/test_fiber_collision_issues.py) |
 | Q04 | Measurements: resolve retained barycentric surface witnesses to world XYZ and compute straight-line distance. Camera framing/axis-view/restore calculations preserve gesture continuity. | [measurement.cpp](../native/src/measurement.cpp), [desktop view tools](../src/anthroforge/desktop) | [measurements](../tests/test_measurements.py), [view framing](../tests/test_view_framing.py), [view gestures](../tests/test_view_gestures.py) |
@@ -461,3 +461,44 @@ cube still fails; isolating the tissue succeeds. Its independently attached Fibe
 and the tissue work. Moving that point or excluding the cube is a change of authored
 intent, not a numerical tolerance fix. Neither was done. Keep this distinct from the
 resolved inflation/smoothing defect when assessing the fixture.
+
+### CH-011 — Outward surface snapping and consistent numeric editing
+
+- **2026-10-20; 0.2.2; implementation under qualification.** Q01, C05, C06, R02, R06.
+  Baseline `a816ee3`; candidate is this task branch (see linked task record).
+- **Before/problem:** curve dragging and drawing independently applied signed normal
+  offsets; negative offsets deliberately placed points inside. Ray calculations used
+  doubles but narrowed barycentric coordinates and distance to `igl::Hit` floats.
+  Number fields formatted/parsing with dot notation used a system-locale validator:
+  the actual `uk_UA` configuration rejects `0.` and `0.25`; comma input passed the
+  validator but failed JavaScript `Number`.
+- **After/why:** keep ray hits double precision. A native placement helper uses the
+  transformed face normal and nonnegative user offset plus two float epsilons times
+  the maximum of one metre, coordinate magnitude and transformed bounds extent.
+  Round displacement outward with `nextafter`. The small safety margin survives the
+  curve adapters' float precision and remains below the routing contact floor.
+  Curve edits, Place Points, surface drawing and cursor placement use this policy.
+  Exact picking, retained bindings and measurements remain unshifted.
+- **Numeric ownership:** one `UiNumberField` accepts dot or comma decimals without
+  locale-dependent grouping, with separate integer policy and displayed-unit steps.
+  A desktop `NumericEdits` adapter owns the existing begin/commit/cancel transaction.
+  Scrubbing publishes ordinary shared operations live and commits one undo action;
+  local tool drafts commit their value only on release.
+- **Evidence so far:** 31 targeted native/history tests pass, including nonuniform
+  and mirrored transforms, inside-camera hits, drawing, negative offset clamping,
+  preserved measurement coordinates and complete clear routed segments between
+  snapped opposite faces. Real QML keyboard/mouse checks pass decimal entry under
+  Ukrainian/Romanian/English locales, integer dragging, undo and Escape cancellation.
+  Full gate and portable evidence remain pending.
+- **Preserved contracts and limits:** displayed geometry remains the snap source;
+  explicit anatomical bindings are unchanged. Face winding defines the exterior,
+  including on open meshes; this is not a mesh-normal repair or general inter-object
+  collision solver. Ordinary curves do not acquire attachments by snapping. Existing
+  deeply interior authored points are not rewritten. The routing solver still checks
+  whole paths; outward endpoint placement alone is not proof of clear segments.
+- [Task/evidence](tasks/outward-snap-numeric-fields.md),
+  [native regression](../tests/test_surface_snapping.py),
+  [numeric history](../tests/test_numeric_edits.py),
+  [real input acceptance](../tools/numeric_input_acceptance.py).
+  Design references: [Qt locale validation](https://doc.qt.io/qt-6/qml-qtquick-doublevalidator.html),
+  [PBRT rounding error](https://pbr-book.org/4ed/Shapes/Managing_Rounding_Error).

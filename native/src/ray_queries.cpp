@@ -27,7 +27,7 @@ static bool ray_box(const Eigen::AlignedBox3d& box,const V3& origin,const V3& ra
     }
     return far>0;
 }
-static bool triangle_hit(const V3& a,const V3& b,const V3& c,int face,igl::Hit& best) {
+static bool triangle_hit(const V3& a,const V3& b,const V3& c,int face,RayHit& best) {
     // Ray-space edge functions share identical endpoint arithmetic across adjacent faces.
     // Woop/Benthin/Wald (2013), https://jcgt.org/published/0002/01/05/.
     const V3 edge(b.x()*c.y()-b.y()*c.x(),c.x()*a.y()-c.y()*a.x(),a.x()*b.y()-a.y()*b.x());
@@ -36,10 +36,10 @@ static bool triangle_hit(const V3& a,const V3& b,const V3& c,int face,igl::Hit& 
     if(det==0) return false;
     const double t=edge.dot(V3(a.z(),b.z(),c.z()))/det;
     if(t<=0||t>=best.t) return false;
-    best={face,-1,float(edge.y()/det),float(edge.z()/det),float(t)};
+    best={face,edge.y()/det,edge.z()/det,t};
     return true;
 }
-static bool leaf_hit(const Mesh& mesh,int face,const PickRay& ray,igl::Hit& best) {
+static bool leaf_hit(const Mesh& mesh,int face,const PickRay& ray,RayHit& best) {
     const auto triangle=mesh.triangles.row(face);
     const V3 a=projected(mesh.vertices.row(triangle[0]),ray);
     const V3 b=projected(mesh.vertices.row(triangle[1]),ray);
@@ -47,17 +47,17 @@ static bool leaf_hit(const Mesh& mesh,int face,const PickRay& ray,igl::Hit& best
     return triangle_hit(a,b,c,face,best);
 }
 static bool ray_tree(const Mesh& mesh,const igl::AABB<Vertices,3>& tree,
-                     const PickRay& ray,igl::Hit& best) {
+                     const PickRay& ray,RayHit& best) {
     if(!ray_box(tree.m_box,ray.origin,ray.direction,best.t)) return false;
     if(tree.is_leaf()) return leaf_hit(mesh,tree.m_primitive,ray,best);
     const bool left=ray_tree(mesh,*tree.m_left,ray,best);
     const bool right=ray_tree(mesh,*tree.m_right,ray,best);
     return left||right;
 }
-bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,igl::Hit& hit) {
+bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,RayHit& hit) {
     if(!origin.allFinite()||!ray.allFinite()||ray.squaredNorm()==0)
         throw std::runtime_error("Picking requires a finite nonzero ray.");
-    hit.t=std::numeric_limits<float>::infinity();
+    hit.t=std::numeric_limits<double>::infinity();
     if(!mesh.triangles.rows()) return false;
     return ray_tree(mesh,mesh.tree,pick_ray(origin,ray),hit);
 }

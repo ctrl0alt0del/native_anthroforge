@@ -27,12 +27,23 @@ development gate and qualify one canonical 0.2.2 package.
 
 ## Current state
 
-Investigation only. No runtime changes yet. Official Qt validator/drag-handler docs
-and PBRT rounding-error treatment reviewed as implementation references.
+Implemented native double-precision picking and shared outward placement for curve
+editing, drawing/point placement and cursor placement. Negative snap offsets stop at
+the surface safety margin. Implemented shared scalar/vector/transform number fields:
+dot/comma decimal entry, live horizontal scrubbing, one undo and cancellation.
+
+Ukrainian locale rejection reproduced with Qt's validator. Targeted native/history
+checks pass (31 tests); real offscreen QML decimal, integer dragging, undo and Escape
+checks pass. Full gate and portable qualification still pending.
 
 ## Verification
 
-Pending. No claimed fix or GUI acceptance yet.
+- `pytest tests/test_surface_snapping.py tests/test_numeric_edits.py tests/test_view_gestures.py tests/test_snapped_routing.py -q`: 31 pass.
+- `QT_QPA_PLATFORM=offscreen python tools/numeric_input_acceptance.py`: passes real
+  key/mouse events on production QML. This does not establish visible-window/GPU acceptance.
+- Native rebuild and 3 CTests pass. Formatting/function checks being completed.
+- No original project was changed; an existing deeply interior authored point remains
+  a separate authoring condition, not something an outward snapping policy repairs.
 
 ## Next actions and blockers
 

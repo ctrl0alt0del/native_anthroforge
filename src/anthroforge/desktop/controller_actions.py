@@ -23,6 +23,9 @@ def run(controller, operation, arguments):
         controller.refresh()
         return result
     except Exception as error:
+        numeric = getattr(controller, "numeric_edits", None)
+        if numeric is not None:
+            numeric.cancel()
         controller.message = str(error)
         controller.notify()
         return None

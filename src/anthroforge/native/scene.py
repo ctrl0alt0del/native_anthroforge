@@ -13,6 +13,10 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_quaternion", [double_pointer, double_pointer])
     engine.bind("af_axis_rotation", [double_pointer, c.c_double, double_pointer])
     engine.bind("af_surface_normal", [c.c_uint64, double_pointer, c.c_int, double_pointer])
+    engine.bind(
+        "af_surface_snap",
+        [c.c_uint64, double_pointer, c.c_int, double_pointer, c.c_double, double_pointer],
+    )
     engine.bind("af_geometry_matrix", [double_pointer, double_pointer, double_pointer])
     engine.bind("af_scene_bounds", [c.c_int, c.POINTER(c.c_uint64), double_pointer, double_pointer])
     configure_picking(engine)
@@ -51,6 +55,18 @@ def surface_normal(engine: GeometryEngine, handle: int, matrix: Any, triangle: i
         engine.library.af_surface_normal(handle, pointer(frame), triangle, pointer(output))
     )
     return list(output.tolist())
+
+
+def surface_snap(engine, handle, matrix, triangle, position, offset=0.0):
+    frame, start, output = doubles(matrix), doubles(position), np.empty(7)
+    if frame.size != 16 or start.size != 3:
+        raise ValueError("Surface snapping needs a transform and a world point.")
+    engine.check(
+        engine.library.af_surface_snap(
+            handle, pointer(frame), triangle, pointer(start), offset, pointer(output)
+        )
+    )
+    return dict(point=output[:3].tolist(), normal=output[3:6].tolist(), clearance=float(output[6]))
 
 
 def geometry_matrix(engine: GeometryEngine, matrix: Any, offset: Any) -> Any:

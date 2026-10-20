@@ -63,7 +63,7 @@ UiScrollView {
                             spacing: 4
                             Repeater {
                                 model: 3
-                                delegate: UiField {
+                                delegate: UiNumberField {
                                     id: numericField
                                     required property int index
                                     property int component: groupIndex*3+index
@@ -72,14 +72,13 @@ UiScrollView {
                                     Layout.fillWidth: true; Layout.preferredWidth: 65; Layout.minimumWidth: 50
                                     leftPadding: 23; rightPadding: 4
                                     Accessible.name: ["Position","Rotation","Scale"][groupIndex] + " " + ["X","Y","Z"][index]
-                                    onAccepted: inspector.parent.forceActiveFocus()
-                                    Binding { target: numericField; property: "text"; when: !numericField.activeFocus; value: inspector.selected.trs ? (Number(inspector.selected.trs[numericField.component])/numericField.unitFactor).toFixed(4) : "" }
+                                    value: inspector.selected.trs ? Number(inspector.selected.trs[component])/unitFactor : 0
+                                    step: groupIndex===0 ? .001/unitFactor : groupIndex===1 ? 1 : .01
                                     Text { x: 7; anchors.verticalCenter: parent.verticalCenter; text: ["X","Y","Z"][numericField.index]; color: Theme.axes[numericField.index]; font.pixelSize: 11; font.bold: true }
-                                    onEditingFinished: {
-                                        if (!inspector.selected.trs || text.trim() === "" || !isFinite(Number(text))) return;
+                                    onEdited: number => {
+                                        if (!inspector.selected.trs) return;
                                         const values = inspector.selected.trs.slice();
-                                        if (Math.abs(values[component]-Number(text)*unitFactor) < 1e-9) return;
-                                        values[component] = Number(text)*unitFactor;
+                                        values[component] = number*unitFactor;
                                         workspace.run("scp.transform",{entity:inspector.selected.id,values:values});
                                     }
                                 }

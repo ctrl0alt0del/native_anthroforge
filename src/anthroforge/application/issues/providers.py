@@ -121,10 +121,6 @@ def convergence(document: Document, scope: str, value: Any) -> tuple[Issue, ...]
 
 
 def convergence_issue(document: Document, scope: str, d: Any) -> Issue:
-    details = "Usable output is published; inspect convergence or increase the iteration budget."
-    metrics = evidence(
-        iterations=d.iterations, final_change=d.final_change, volume_error=d.relative_volume_error
-    )
     return finding(
         document,
         scope,
@@ -132,8 +128,30 @@ def convergence_issue(document: Document, scope: str, d: Any) -> Issue:
         "Tissue iteration limit reached",
         stage=d.stage,
         severity="warning",
-        details=details,
-        evidence=metrics,
+        details=convergence_details(d),
+        evidence=convergence_evidence(d),
+    )
+
+
+def convergence_details(d: Any) -> str:
+    if d.stage == "rest":
+        return (
+            "Height smoothing reached its solver iteration limit. Published output passed "
+            "independent optimality, constraint and geometry checks; settings were preserved."
+        )
+    return "Usable output is published; inspect convergence or increase the iteration budget."
+
+
+def convergence_evidence(d: Any) -> Any:
+    if d.stage == "rest":
+        return evidence(
+            iterations=d.iterations,
+            violation=d.violation,
+            stationarity=d.stationarity,
+            complementarity_relative=d.complementarity_relative,
+        )
+    return evidence(
+        iterations=d.iterations, final_change=d.final_change, volume_error=d.relative_volume_error
     )
 
 

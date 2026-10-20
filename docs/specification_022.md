@@ -198,6 +198,29 @@ These architecture changes do not authorize changing the qualified inflation,
 relaxation, attachment or stacking algorithms. Record numerical differences against
 representative fixtures; do not disguise a parity failure as an intended difference.
 
+The October 20 repair is a separately authorized numerical correction to Distributed
+inflation. Its direction field uses area-weighted normals and screened surface
+diffusion over the authored inflation distance, followed by normalization. The
+authored amount, boundary weights and taper set displacement lengths; the inherited
+local stability reduction is removed because it introduced abrupt height dips.
+Fixed boundaries and all authored settings remain intact. Control Point and Section
+Profile formulas retain donor parity. Original donor fixtures remain preserved;
+Distributed/branch/envelope correction snapshots are explicitly labelled separately.
+
+Material refinement subdivides existing intervals only where the requested density
+requires it. It retains every original grid line, avoids introducing nearly coincident
+lines, and never edits the source. Height smoothing retains the donor QP, hard pins
+and change bounds. Complete-mesh validation tests new transverse intersections and
+collapsed faces rather than treating a normal rotation beyond 90 degrees as a fold.
+Coincident front/back boundary contact is not a transverse intersection. These
+checks do not guarantee that arbitrary inflation settings are geometrically feasible;
+invalid generated geometry remains a failed result without reducing user parameters.
+For height smoothing, reaching PIQP's stricter iteration limit is not by itself
+proof that the application tolerance was missed. Such a result can publish only
+after independent KKT certification at the existing `2e-7` tolerance, exact pins,
+and geometry validation. Diagnostics retain `ITERATION_LIMIT` and report measured
+residuals; other solver failures and uncertified iterates remain failures.
+
 The raw relaxation kernels retain addon parity. Standalone publication additionally
 rejects newly self-intersecting/collapsed candidates instead of exposing them as usable
 iteration-limit output. The donor Pouch preset can produce such output on strongly

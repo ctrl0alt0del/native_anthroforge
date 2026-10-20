@@ -11,6 +11,9 @@ from anthroforge.core.tissue_settings import TissuePart, TissueSide
 from anthroforge.native import material, tissue_parts, topology
 
 CASES = json.loads((Path(__file__).parent / "fixtures/tissue/branches.json").read_text())["cases"]
+CORRECTED = json.loads(
+    (Path(__file__).parent / "fixtures/tissue/distributed_correction.json").read_text()
+)["branches"]
 
 
 def inputs(session, row):
@@ -42,9 +45,9 @@ def base_mesh(session, row):
 
 
 @pytest.mark.parametrize("row", CASES, ids=lambda r: r["name"])
-def test_prepared_branch_inflation_matches_donor_and_keeps_canonical_topology(session, row):
+def test_prepared_branch_correction_keeps_canonical_topology(session, row):
     source, parts = inputs(session, row)
     result = tissue_parts.evaluate(source, parts, "a", False)
-    np.testing.assert_allclose(result.array(0), row["output"], atol=1e-10, rtol=0)
+    np.testing.assert_allclose(result.array(0), CORRECTED[row["name"]], atol=1e-10, rtol=0)
     np.testing.assert_array_equal(result.array(1), source.array(1))
     np.testing.assert_array_equal(result.array(3), source.array(3))

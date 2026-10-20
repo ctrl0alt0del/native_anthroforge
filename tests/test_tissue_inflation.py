@@ -14,6 +14,7 @@ from anthroforge.native import material, tissue_inflation
 from anthroforge.native.mesh import NativeCancellation
 
 FIXTURE = Path(__file__).parent / "fixtures/tissue/inflation.json"
+CORRECTED = json.loads((FIXTURE.parent / "distributed_correction.json").read_text())["inflation"]
 
 
 def settings(data):
@@ -35,10 +36,11 @@ def grid_mesh(engine, points):
 
 
 @pytest.mark.parametrize("case", json.loads(FIXTURE.read_text())["cases"], ids=lambda x: x["name"])
-def test_native_inflation_matches_addon(session, case):
+def test_inflation_parity_or_documented_distributed_correction(session, case):
     source = grid_mesh(session.engine, case["points"])
     output = tissue_inflation.evaluate(source, settings(case["settings"]), case["reverse"])
-    np.testing.assert_allclose(output.array(0), np.array(case["output"]).reshape(-1, 3), atol=1e-12)
+    expected = CORRECTED.get(case["name"], case["output"])
+    np.testing.assert_allclose(output.array(0), np.array(expected).reshape(-1, 3), atol=1e-12)
     np.testing.assert_array_equal(source.array(0), np.array(case["points"]).reshape(-1, 3))
     np.testing.assert_array_equal(output.array(3), source.array(3))
     np.testing.assert_array_equal(material.array(output), material.array(source))

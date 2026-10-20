@@ -58,9 +58,13 @@ publication have separate modules. Original numerical kernels and resource owner
 are reused. Desktop only projects shared eligibility and selection intent. Toast state
 belongs to presentation and does not touch document, history or scheduler state.
 
-Canonical packaging is running from `7267773`; pending portable acceptance and final
-source archive. Build logs and hidden-render evidence are local-only under the evidence
-directory. The portable script has passed against the development CLI.
+The canonical `7267773` package passed the complete relocated/minimal-PATH portable
+suite, including Point/Curve/Surface automatic creation and standalone Membrane creation.
+Final API review then added a validation guard: omitted automatic Anchor parents cannot
+silently substitute SCP geometry for a requested Tissue surface role. All 21 focused
+conversion/lifecycle/architecture tests, lint, formatting and typing pass with that guard.
+Repackaging and final Python regression qualification are pending for this last guard.
+Build logs and hidden-render evidence are local-only under the evidence directory.
 
 ## Next actions and blockers
 

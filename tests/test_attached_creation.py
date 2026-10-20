@@ -100,6 +100,16 @@ def test_automatic_anchor_creation_uses_same_nearest_default(session):
     assert anchor.binding.reference.target == target
 
 
+@pytest.mark.parametrize("role", ["TISSUE_BASE", "TISSUE_FINAL", "UNKNOWN"])
+def test_automatic_anchor_does_not_substitute_a_requested_surface_role(session, role):
+    scene(session)
+    source = session.command("construction.point.create", position=[0, 0, 0.7])
+    before, cursor = session.document, session.history.cursor
+    with pytest.raises(ValueError, match="explicit parent"):
+        session.command("anchor.create", source=source, role=role)
+    assert session.document == before and session.history.cursor == cursor
+
+
 def test_mixed_surface_preserves_existing_fiber_binding_intent(session):
     _, first = scene(session)
     session.command("fiber.create", curve=first)

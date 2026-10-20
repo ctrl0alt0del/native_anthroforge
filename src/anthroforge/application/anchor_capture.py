@@ -40,6 +40,8 @@ class Capture:
 
 
 def create(session: Any, item: Point, parent: str, role: str, name: str) -> dict[str, str]:
+    if not parent and role not in ("", "SCP_GEOMETRY"):
+        raise ValueError("Choose an explicit parent for a Tissue surface role.")
     ref = (
         anatomical_surfaces.reference(parent, session.document.registry.records, role)
         if parent

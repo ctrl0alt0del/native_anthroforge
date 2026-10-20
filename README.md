@@ -120,6 +120,8 @@ See [development commands](docs/development.md), [implementation contract](docs/
 Follow the [engineering guidelines](docs/engineering_guidelines.md) for fixes, features and design review.
 The [computation inventory and history](docs/computation_history.md) lists implemented
 calculations, their owners/tests, and why computational approaches changed.
+The [research reading list](docs/research_sources.md) bookmarks Pixar's research library
+and distinguishes candidate methods from qualified application algorithms.
 The [confirmed specification](standalone_application_recommendations.md) remains authoritative;
 the [stack analysis](standalone_technology_stack_analysis.md) records the technology decisions.
 

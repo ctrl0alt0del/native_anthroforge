@@ -58,6 +58,12 @@ Closure requires at least three authored points and joins last to first without 
 a duplicate endpoint. Loops are ordinary closed curves; there is no loop subclass or
 special loop-anchor model. Geometric routing points are not anatomical bindings.
 
+Routing sample count is a preferred evaluated density. Native evaluation may add samples
+to retain required obstacle-avoiding bends and authored knots, without rewriting the
+authored setting. Geometry, fixed-knot indices and correspondence share the same layout.
+Clearance and iteration limits remain explicit. Growth retains the native resource bound;
+an exhausted bound reports a failure instead of dropping bends or weakening validation.
+
 Bézier points retain handles, handle modes, radius and tilt. Polyline points remain exact.
 Routed editing changes authored routing points, never generated solver samples. Merely
 selecting a curve or entering edit mode cannot fit/resample/change it. Updated user decision,

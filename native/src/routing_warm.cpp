@@ -49,6 +49,7 @@ bool warm_start(const Input& input,const World& world,const Reference& reference
     auto points=remapped(world_points(input,*previous),pins,reference,input.cancel);
     // SQP can restore clearance, but a seed crossing solid interiors needs a new corridor.
     if(!valid_handoff(routes(points,reference),input,world,false)) return false;
+    spans=af::routing::spans(input,world,reference);
     if(input.options.closed) spans.front().seed=std::move(points);
     else for(size_t i=0;i<spans.size();++i)
         spans[i].seed.assign(points.begin()+reference.pins[i],points.begin()+reference.pins[i+1]+1);

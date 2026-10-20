@@ -38,6 +38,7 @@ World capture_world(const uint64_t* handles,const double* matrices,int count,dou
 World capture_collision_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel);
 std::shared_ptr<const World> routing_scene(uint64_t handle);
 Reference reference(const Input& input);
+Reference reference(const Input& input,const std::vector<int>& counts);
 std::vector<Span> spans(const Input& input,const World& world,const Reference& reference);
 bool warm_start(const Input& input,const World& world,const Reference& reference,std::vector<Span>& spans,uint64_t handle);
 bool solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double* measures);

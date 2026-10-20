@@ -6,7 +6,7 @@ static Input input(const double* records,int count,const double* world,const int
                    int surfaces,const AfRoutingOptions* options,uint64_t cancel) {
     if(!records||!world||!owners||!options||count<2||count>100000)
         throw std::runtime_error("Invalid routing input.");
-    if(options->samples<count||options->samples>1000000||options->accepted_steps<1||options->accepted_steps>4096||
+    if(options->samples<2||options->samples>1000000||options->accepted_steps<1||options->accepted_steps>4096||
        (options->closed&&count<3)||!std::isfinite(options->radius)||options->radius<0)
         throw std::runtime_error("Invalid routing settings.");
     for(int i=0;i<count;++i) if(owners[i]<0||owners[i]>surfaces) throw std::runtime_error("Invalid routing owner.");
@@ -28,18 +28,17 @@ static void resolve_contacts(Input& input,const World& world) {
             input.owners[i]=world.collision->items[nearest.instance].owner;
     }
 }
-static bool replan(const Input& input,const World& scene,const Reference& reference,
+static bool replan(const Input& input,const World& scene,Reference& reference,
                    std::vector<Span>& prepared,int64_t* counters,double* measures) {
-    prepared=spans(input,scene,reference);
-    prepare_routes(input,scene,reference,prepared);
+    prepared=prepare_routes(input,scene,reference);
     return solve(prepared,input,counters,measures);
 }
 static uint64_t evaluate(Input input,const World& scene,int64_t* counters,double* measures,uint64_t warm) {
     resolve_contacts(input,scene);
-    const auto reference=af::routing::reference(input);
-    auto spans=af::routing::spans(input,scene,reference);
+    auto reference=af::routing::reference(input);
+    std::vector<Span> spans;
     const bool continuation=warm_start(input,scene,reference,spans,warm);
-    if(!continuation) prepare_routes(input,scene,reference,spans);
+    if(!continuation) spans=prepare_routes(input,scene,reference);
     if(!solve(spans,input,counters,measures)&&
        (!continuation||!replan(input,scene,reference,spans,counters,measures)))
         throw std::runtime_error("Routing could not find a collision-free path.");

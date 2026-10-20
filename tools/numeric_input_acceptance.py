@@ -4,8 +4,8 @@ import json
 from pathlib import Path
 
 from primitive_acceptance import settle
-from PySide6.QtCore import QLocale, QPoint, QPointF, Qt
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtCore import QEvent, QLocale, QPoint, QPointF, Qt
+from PySide6.QtGui import QFont, QFontDatabase, QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from ui_acceptance import find as find_any
@@ -57,10 +57,16 @@ def drag(window, field, pixels, cancel=False):
     for step in range(1, 5):
         QTest.mouseMove(window, start + QPoint(round(pixels * step / 4), 0), 20)
         QTest.qWait(20)
-    if cancel:
-        QTest.keyClick(window, Qt.Key_Escape)
+    interrupt(window, cancel)
     QTest.mouseRelease(window, Qt.LeftButton, pos=start + QPoint(pixels, 0))
     QTest.qWait(40)
+
+
+def interrupt(window, cancel):
+    if cancel == "deactivate":
+        QGuiApplication.sendEvent(window, QEvent(QEvent.WindowDeactivate))
+    elif cancel:
+        QTest.keyClick(window, Qt.Key_Escape)
 
 
 def transform_checks(controller, window):
@@ -82,6 +88,8 @@ def transform_drag_checks(controller, window, target, field):
     controller.run("undo", {})
     assert controller.session.document.entity(target).matrix == before.entity(target).matrix
     drag(window, field, -35, cancel=True)
+    assert controller.session.document.entity(target).matrix == before.entity(target).matrix
+    drag(window, field, 35, cancel="deactivate")
     assert controller.session.document.entity(target).matrix == before.entity(target).matrix
 
 
@@ -106,9 +114,27 @@ def verify(controller, window):
     QTest.qWait(200)
     transform_checks(controller, window)
     primitive_checks(controller, window)
+    vector_checks(controller, window)
     assert not controller.session.history.before
     assert window.grabWindow().save(str(OUTPUT / "numeric-fields.png"))
     return acceptance_flags()
+
+
+def vector_checks(controller, window):
+    source = controller.session.document.entity(controller.selection).primitive.curves[0].curve
+    controller.select(source)
+    controller.authoring.setEditing(True)
+    settle(controller)
+    type_value(window, "vectorPoint position0", "-.125")
+    curve = controller.session.document.object(source)
+    assert curve.points[0].position[0] == -0.125
+    field = find(window, "vectorPoint position0")
+    before, cursor = controller.session.document, controller.session.history.cursor
+    drag(window, field, 25)
+    assert controller.session.history.cursor == cursor + 1
+    assert abs(controller.session.document.object(source).points[0].position[0] + 0.1) < 1e-7
+    controller.run("undo", {})
+    assert controller.session.document.object(source).points == before.object(source).points
 
 
 def acceptance_flags():
@@ -118,8 +144,10 @@ def acceptance_flags():
         locales=["uk_UA", "ro_RO", "en_US"],
         drag=True,
         integer_drag=True,
+        vector_edit=True,
         one_undo=True,
         escape_cancel=True,
+        deactivation_cancel=True,
     )
 
 
@@ -142,5 +170,7 @@ if __name__ == "__main__":
     QQuickStyle.setStyle("Basic")
     QLocale.setDefault(QLocale("uk_UA"))
     app = QGuiApplication([])
+    QFontDatabase.addApplicationFont("C:/Windows/Fonts/segoeui.ttf")
+    app.setFont(QFont("Segoe UI"))
     with native_runtime():
         run()

@@ -19,6 +19,7 @@ from .inspection_panel import InspectionPanel
 from .inspection_tools import InspectionTools
 from .issue_panel import IssuePanel
 from .models import RenderModel
+from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
 from .routing_choices import RoutingChoices
 from .tissue_region_tools import TissueRegionTools
@@ -54,6 +55,11 @@ class Controller(QObject):
         self.profiler = RuntimeProfiler()
         self.session = Session(profiler=self.profiler)
         scene.configure(self.session.engine)
+        self.initialize_tools()
+        self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
+
+    def initialize_tools(self):
+        self.numeric_edits = NumericEdits(self)
         self.issue_panel = IssuePanel(self)
         self.inspection_panel = InspectionPanel(self)
         self.inspection_export = InspectionExport(self)
@@ -63,7 +69,6 @@ class Controller(QObject):
         self.creation_selection = CreationSelection(self)
         self.routing_choices = RoutingChoices()
         self.tissue_region_tools = TissueRegionTools(self)
-        self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
 
     def memory_owners(self, owners):
         for attribute in ("render_model", "path_model", "image_model"):
@@ -617,6 +622,7 @@ class Controller(QObject):
 
     def close(self):
         self.timer.stop()
+        self.numeric_edits.cancel()
         if hasattr(self, "feedback"):
             self.feedback.close()
             self.report_browser.close()

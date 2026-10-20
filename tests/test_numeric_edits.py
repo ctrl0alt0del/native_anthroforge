@@ -43,3 +43,17 @@ def test_scrub_cancel_restores_values_and_rejects_nested_transactions(session):
     session.command("begin")
     assert not service.begin(owner)
     session.command("cancel")
+
+
+def test_only_current_scrub_owner_can_cancel_when_destroyed(session):
+    from shiboken6 import delete
+
+    session.command("scp.empty", name="Numeric test")
+    service, first, second = NumericEdits(Controller(session)), QObject(), QObject()
+    assert service.begin(first)
+    service.commit(first)
+    assert service.begin(second)
+    delete(first)
+    assert service.active
+    delete(second)
+    assert not service.active and session.history.before is None

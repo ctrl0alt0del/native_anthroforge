@@ -489,6 +489,11 @@ resolved inflation/smoothing defect when assessing the fixture.
   preserved measurement coordinates and complete clear routed segments between
   snapped opposite faces. Real QML keyboard/mouse checks pass decimal entry under
   Ukrainian/Romanian/English locales, integer dragging, undo and Escape cancellation.
+  Vector editing also exposed NumPy scalars crossing into Qt as nonnumeric variants:
+  the model received the edit but displayed values became -1/empty. The shared Qt
+  value adapter now converts NumPy scalars to built-in Python values. Real vector
+  typing followed immediately by dragging and undo passes; property-projection
+  tests exercise float32/float64 without replacing stable curve identities.
   Full gate and portable evidence remain pending.
 - **Preserved contracts and limits:** displayed geometry remains the snap source;
   explicit anatomical bindings are unchanged. Face winding defines the exterior,

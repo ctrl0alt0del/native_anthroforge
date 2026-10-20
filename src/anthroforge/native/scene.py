@@ -57,16 +57,28 @@ def surface_normal(engine: GeometryEngine, handle: int, matrix: Any, triangle: i
     return list(output.tolist())
 
 
-def surface_snap(engine, handle, matrix, triangle, position, offset=0.0):
-    frame, start, output = doubles(matrix), doubles(position), np.empty(7)
-    if frame.size != 16 or start.size != 3:
-        raise ValueError("Surface snapping needs a transform and a world point.")
+def surface_snap(
+    engine: GeometryEngine,
+    handle: int,
+    matrix: Any,
+    triangle: int,
+    position: Any,
+    offset: float = 0.0,
+) -> dict[str, Any]:
+    frame, start, output = snap_buffers(matrix, position)
     engine.check(
         engine.library.af_surface_snap(
             handle, pointer(frame), triangle, pointer(start), offset, pointer(output)
         )
     )
     return dict(point=output[:3].tolist(), normal=output[3:6].tolist(), clearance=float(output[6]))
+
+
+def snap_buffers(matrix: Any, position: Any) -> tuple[Any, Any, Any]:
+    frame, start = doubles(matrix), doubles(position)
+    if frame.size != 16 or start.size != 3:
+        raise ValueError("Surface snapping needs a transform and a world point.")
+    return frame, start, np.empty(7)
 
 
 def geometry_matrix(engine: GeometryEngine, matrix: Any, offset: Any) -> Any:

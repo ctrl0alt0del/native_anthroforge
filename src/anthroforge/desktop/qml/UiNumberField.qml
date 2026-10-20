@@ -8,7 +8,8 @@ UiField {
     property int decimals: 4
     property bool mixed: false
     property bool live: true
-    property real step: decimals === 0 ? 1 : Math.max(0.01, Math.abs(value)/100)
+    property real fallbackStep: 0.01
+    property real step: decimals === 0 ? 1 : Math.max(Math.pow(10,-decimals), value ? Math.pow(10,Math.floor(Math.log10(Math.abs(value)))-2) : fallbackStep)
     property real minimum: -Infinity
     property real maximum: Infinity
     property bool textEditing: false

@@ -34,7 +34,11 @@ dot/comma decimal entry, live horizontal scrubbing, one undo and cancellation.
 
 Ukrainian locale rejection reproduced with Qt's validator. Targeted native/history
 checks pass (31 tests); real offscreen QML decimal, integer dragging, undo and Escape
-checks pass. Full gate and portable qualification still pending.
+checks pass. Full gate and portable qualification still pending. Added real scalar/vector/integer
+key+drag coverage, canceled drags on window deactivation and control destruction,
+and integer lattice steps. Fixed NumPy scalar conversion at the Qt boundary after
+real vector testing exposed displayed -1/empty values despite correct authored edits.
+GPU texture-only capture shows the snapped route around the cube's exterior.
 
 ## Verification
 
@@ -47,9 +51,9 @@ checks pass. Full gate and portable qualification still pending.
 
 ## Next actions and blockers
 
-1. Reproduce locale rejection and inspect shared numeric/transaction ownership.
-2. Implement native outward snap placement and reusable numeric dragging.
-3. Validate, update computation history, package, merge and push.
+1. Finish the full gate (running; style/native passed, pytest in progress).
+2. Build and qualify a staged portable package, then replace the canonical 0.2.2 build.
+3. Final evidence/documentation review, normal merge and push.
 
 ## Recovery inputs
 

@@ -11,7 +11,7 @@ RowLayout {
     property bool length: false
     property bool mixed: false
     property bool live: true
-    property real step: decimals === 0 ? 1 : Math.max(length ? 0.001 : 0.01, Math.abs(value)/100)
+    property real step: NaN
     property real minimum: -Infinity
     property real maximum: Infinity
     readonly property real unitFactor: length ? workspace.state.unit_factor : 1
@@ -23,7 +23,9 @@ RowLayout {
         objectName: setting.objectName ? setting.objectName+"Value" : "numeric"+setting.label
         Accessible.name: setting.label
         value: setting.value/setting.unitFactor; decimals: setting.decimals
-        mixed: setting.mixed; live: setting.live; step: setting.step/setting.unitFactor
+        mixed: setting.mixed; live: setting.live
+        fallbackStep: setting.length ? 0.001/setting.unitFactor : 0.01
+        Binding { target: field; property: "step"; when: isFinite(setting.step); value: setting.step/setting.unitFactor }
         minimum: setting.minimum/setting.unitFactor; maximum: setting.maximum/setting.unitFactor
         onEdited: value => setting.edited(value*setting.unitFactor)
     }

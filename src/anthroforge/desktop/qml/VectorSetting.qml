@@ -8,6 +8,7 @@ ColumnLayout {
     property var values: [0,0,0]
     property bool length: false
     property bool live: true
+    property int decimals: 4
     property real step: length ? 0.001 : 0.01
     readonly property real unitFactor: length ? workspace.state.unit_factor : 1
     signal edited(var values)
@@ -20,7 +21,8 @@ ColumnLayout {
                 id: field; required property int index
                 objectName: "vector"+setting.label+index
                 Layout.fillWidth: true; Layout.preferredWidth: 75; leftPadding: 20
-                value: Number(setting.values[index] || 0)/setting.unitFactor
+                value: Number(setting.values[field.index] || 0)/setting.unitFactor
+                decimals: setting.decimals
                 live: setting.live; step: setting.step/setting.unitFactor
                 Accessible.name: setting.label+" "+["X","Y","Z"][index]
                 Text { x: 5; anchors.verticalCenter: parent.verticalCenter; text: ["X","Y","Z"][field.index]; color: Theme.axes[field.index] }

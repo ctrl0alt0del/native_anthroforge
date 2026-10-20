@@ -27,12 +27,18 @@ Reuse existing surface/membrane evaluation and its open, nonnested branch restri
 
 ## Current state
 
-Inspected existing placement, junction, surface operations and inspector UI. Implementation
-pending. Preserve unrelated root `__init__.py`. Base is synchronized with origin/main.
+Implemented atomic branch-curve creation with existing-junction reuse, cached native
+projected control-point selection and explicit stroke seeding. Alternate toolbar tool
+and provisional marker are wired. Automatic surface grouping uses junction identities;
+ambiguous group membership opens a virtualized editor. Implementation is not yet qualified.
+Preserve unrelated root `__init__.py`. Base is synchronized with origin/main.
 
 ## Verification
 
 Baseline: 23 related point-placement, surface-branch and attached-conversion tests passed.
+Current increment: 14 branch-creation, projected-placement, automatic grouping and
+architecture tests pass; native rebuild and three CTests pass. The automatic branch
+geometry matches the existing fixture numerically. Actual GUI/shape inspection pending.
 Required: targeted API/lifecycle tests, offscreen gestures/menu/preview/ambiguity checks,
 actual branched surface and membrane visual inspection, development gate and portable build.
 

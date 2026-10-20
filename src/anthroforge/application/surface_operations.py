@@ -10,7 +10,14 @@ from anthroforge.core.membranes import Membrane
 from anthroforge.core.object_registry import validate_sources
 from anthroforge.core.surfaces import Surface
 
-from . import authored_jobs, curve_consumers, object_creation, object_operations, surface_jobs
+from . import (
+    authored_jobs,
+    curve_consumers,
+    object_creation,
+    object_operations,
+    surface_grouping,
+    surface_jobs,
+)
 from .operations import require_name
 
 
@@ -23,10 +30,38 @@ def create(
     owner: str = "",
     **options: Any,
 ) -> str:
+    item = definition(session, curves, kind, name, parent, owner, options)
+    return authored_jobs.begin(session, partial(surface_jobs.enqueue, session, item, False))
+
+
+def definition(
+    session: Any, curves: Any, kind: str, name: str, parent: str, owner: str, options: Any
+) -> Surface:
+    grouping = options.pop("grouping", None)
+    if kind == "AUTO":
+        kind, grouping = automatic(session, curves, grouping)
     item = new_surface(session, curves, kind, name, parent, owner)
+    if grouping is not None:
+        records = session.document.registry.records
+        item = surface_grouping.apply(
+            item, surface_grouping.checked(records, curves, grouping), records
+        )
     item = configured(item, options)
     validate_sources(item, session.document.registry.records)
-    return authored_jobs.begin(session, partial(surface_jobs.enqueue, session, item, False))
+    return item
+
+
+def automatic(session: Any, curves: list[str], grouping: Any) -> tuple[str, Any]:
+    if len(curves) == 1:
+        return "PATCH", None
+    if grouping is not None:
+        return "LOFT", grouping
+    result = surface_grouping.infer(session, curves)
+    if result["ambiguous"]:
+        raise ValueError(
+            "Ambiguous branch groups: inspect surface.grouping and provide grouping explicitly."
+        )
+    return "LOFT", result["plan"]
 
 
 def new_surface(

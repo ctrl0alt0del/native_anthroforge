@@ -74,6 +74,10 @@ Item {
         const d=camera.mapDirectionToScene(local);
         return {origin:[a.x,-a.z,a.y],direction:[d.x,-d.z,d.y]};
     }
+    function cameraPosition() {
+        const p=view.camera.mapPositionToScene(Qt.vector3d(0,0,0));
+        return [p.x,-p.z,p.y];
+    }
     function rayAt(x, y, select, extend) {
         if(drawing) return {};
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;

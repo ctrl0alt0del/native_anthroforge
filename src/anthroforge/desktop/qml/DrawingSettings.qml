@@ -13,11 +13,11 @@ ColumnLayout {
         title: "Create curve"
         UiButton { text: "Add Curve at cursor"; Layout.fillWidth: true; onClicked: workspace.drawingTools.addCurve() }
         RowLayout {
-            UiButton { text: "Place Points"; Layout.fillWidth: true; checked: panel.tool.state.mode==="POINTS"; onClicked: panel.tool.begin("POINTS") }
+            UiButton { text: panel.tool.state.placement_mode==="BRANCH" ? "Branched Points" : "Place Points"; Layout.fillWidth: true; checked: ["POINTS","BRANCH"].includes(panel.tool.state.mode); onClicked: panel.tool.begin(panel.tool.state.placement_mode) }
             UiButton { text: "Draw"; Layout.fillWidth: true; checked: panel.tool.state.mode==="DRAW"; onClicked: panel.tool.begin("DRAW") }
         }
         ColumnLayout {
-            visible: panel.tool.state.mode==="DRAW" || panel.tool.state.mode==="POINTS"; Layout.fillWidth: true
+            visible: panel.tool.state.mode==="DRAW" || ["POINTS","BRANCH"].includes(panel.tool.state.mode); Layout.fillWidth: true
             UiCombo { Layout.fillWidth: true; enabled: !panel.capturing; model: ["VIEW","SURFACE","IMAGE"]; currentIndex: model.indexOf(panel.options.depth); onActivated: panel.tool.setting("depth",currentText) }
             Label { text: panel.options.depth==="VIEW" ? "View plane through the 3D cursor" : panel.options.depth==="SURFACE" ? "Project onto visible geometry" : "Trace in the selected image's plane"; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
             UiCheck { visible: panel.options.depth==="SURFACE"; enabled: !panel.capturing; text: "Selected geometry only"; checked: panel.options.selected_only; onClicked: panel.tool.setting("selected_only",checked) }
@@ -32,9 +32,9 @@ ColumnLayout {
             UiCheck { enabled: !panel.capturing; text: "Closed curve"; checked: panel.options.closed; onClicked: panel.tool.setting("closed",checked) }
             UiCheck { enabled: !panel.capturing; visible: panel.tool.state.mode==="DRAW" && !panel.options.closed; text: "Close near starting point"; checked: panel.options.auto_close; onClicked: panel.tool.setting("auto_close",checked) }
             Label { text: panel.tool.state.mode==="DRAW" ? "Release to finish · Draw again to create another" : panel.keyboard.modifierName("continuePlacement")+" + click to continue · Click to finish from point 2 · Backspace to remove"; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-            Label { visible: panel.tool.state.mode==="POINTS"; text: "Hold "+panel.keyboard.modifierName("snapSurface")+" to snap to a surface · Combine with "+panel.keyboard.modifierName("continuePlacement")+" to continue"; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+            Label { visible: ["POINTS","BRANCH"].includes(panel.tool.state.mode); text: "Hold "+panel.keyboard.modifierName("snapSurface")+" to snap to a surface · Combine with "+panel.keyboard.modifierName("continuePlacement")+" to continue"; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
             RowLayout {
-                UiButton { visible: panel.tool.state.mode==="POINTS"; text: "Finish curve"; enabled: panel.tool.state.count>=2; onClicked: panel.tool.finish() }
+                UiButton { visible: ["POINTS","BRANCH"].includes(panel.tool.state.mode); text: "Finish curve"; enabled: panel.tool.state.count>=2; onClicked: panel.tool.finish() }
                 UiButton { text: "Exit tool"; onClicked: panel.tool.cancel() }
             }
         }

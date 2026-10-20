@@ -113,3 +113,25 @@ int af_component_index_pick(uint64_t handle,const double* origin,const double* d
     if(!handle||ray.squaredNorm()<1e-20||radius<0) return -1;
     return af::pick(*reinterpret_cast<af::ComponentIndex*>(handle),{af::V3(origin),ray.normalized(),radius},depth);
 }
+static int closest_point(const af::ComponentIndex& index,const af::V3& origin,const af::V3& ray,const af::V3& normal,bool perspective) {
+    std::pair<double,int> best{INFINITY,-1}; double nearest=INFINITY;
+    const af::V3 cursor=ray/normal.dot(ray);
+    for(int i=0;i<index.vertices.rows();++i) {
+        const af::V3 delta=index.vertices.row(i).transpose()-origin; const double depth=delta.dot(normal);
+        if(depth<=1e-12) continue;
+        const af::V3 projected=perspective?af::V3(delta/depth-cursor):af::V3(delta-depth*normal);
+        const double distance=projected.squaredNorm();
+        if(distance<best.first||(distance==best.first&&depth<nearest)) {
+            best={distance,index.labels[i]}; nearest=depth;
+        }
+    }
+    return best.second;
+}
+int af_component_index_closest(uint64_t handle,const double* origin,const double* direction,const double* normal,int perspective) {
+    if(!handle||!origin||!direction||!normal) return -1;
+    const auto& index=*reinterpret_cast<af::ComponentIndex*>(handle);
+    const af::V3 start(origin),ray(direction),axis=af::V3(normal).normalized();
+    if(index.vertices.rows()!=int(index.labels.size())||!start.allFinite()||!ray.allFinite()
+        ||!axis.allFinite()||axis.dot(ray)<=1e-12) return -1;
+    return closest_point(index,start,ray,axis,perspective!=0);
+}

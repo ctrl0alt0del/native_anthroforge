@@ -16,9 +16,20 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_component_index_create", [D, c.c_int, c.c_int, c.POINTER(c.c_int)], U)
     engine.bind("af_component_index_release", [U], None)
     engine.bind("af_component_index_pick", [U, D, D, c.c_double, c.c_int])
+    engine.bind("af_component_index_closest", [U, D, D, D, c.c_int])
 
 
 class PickIndex:
+    def closest(self, origin: Any, direction: Any, normal: Any, perspective: bool) -> int:
+        values = [doubles(value) for value in (origin, direction, normal)]
+        if any(value.shape != (3,) for value in values):
+            raise ValueError("Point projection requires three-dimensional rays and a view normal.")
+        return int(
+            self.engine.library.af_component_index_closest(
+                self.handle, *(pointer(value) for value in values), perspective
+            )
+        )
+
     def __init__(
         self, engine: GeometryEngine, points: Any, segments: bool = False, labels: Any = None
     ) -> None:

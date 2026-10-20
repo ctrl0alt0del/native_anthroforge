@@ -18,6 +18,7 @@ AF_API uint64_t af_stroke_create(int count,const uint64_t* meshes,const double* 
     const double* plane,const double* settings);
 AF_API void af_stroke_release(uint64_t handle);
 AF_API int af_stroke_append(uint64_t handle,const double* pointer,int interpolate);
+AF_API int af_stroke_seed(uint64_t handle, const double* pointer, const double* position);
 AF_API int af_stroke_probe(uint64_t handle,const double* pointer,double* output);
 /* Temporary nearest-surface override; preserves the stroke's configured depth plane. */
 AF_API int af_stroke_snapping(uint64_t handle,int enabled);

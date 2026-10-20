@@ -61,6 +61,8 @@ AF_API int af_component_hits(const double* points, int count, const double* orig
     const double* direction, double radius, double* output);
 AF_API uint64_t af_component_index_create(const double* points, int count, int segments, const int* labels);
 AF_API void af_component_index_release(uint64_t handle);
+AF_API int af_component_index_closest(uint64_t handle, const double* origin,
+    const double* direction, const double* normal, int perspective);
 AF_API int af_component_index_pick(uint64_t handle, const double* origin,
     const double* direction, double radius, int depth);
 AF_API int af_hook(double* points, int count, const double* matrix, const double* uniform,

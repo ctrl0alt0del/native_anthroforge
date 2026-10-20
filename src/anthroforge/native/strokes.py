@@ -12,6 +12,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_stroke_create", [c.c_int, c.POINTER(U), D, D, D], U)
     engine.bind("af_stroke_release", [U], None)
     engine.bind("af_stroke_append", [U, D, c.c_int])
+    engine.bind("af_stroke_seed", [U, D, D])
     engine.bind("af_stroke_probe", [U, D, D])
     engine.bind("af_stroke_snapping", [U, c.c_int])
     engine.bind("af_stroke_read", [U, c.c_int, c.c_int, D])
@@ -32,6 +33,14 @@ def plane(engine: GeometryEngine, frame: Any) -> list[float]:
 
 
 class Stroke:
+    def seed(self, ray: Any, position: Any) -> None:
+        data, point = pointer_input(ray), doubles(position)
+        if point.shape != (3,):
+            raise ValueError("Stroke seed requires a three-dimensional point.")
+        count = self.engine.library.af_stroke_seed(self.handle, pointer(data), pointer(point))
+        self.engine.check(count < 0)
+        self.count = count
+
     def __init__(self, engine: GeometryEngine, meshes: Any, frames: Any, plane: Any, options: Any):
         handles = np.ascontiguousarray(meshes, dtype=np.uint64)
         frames, plane, options = doubles(frames), doubles(plane), doubles(options)

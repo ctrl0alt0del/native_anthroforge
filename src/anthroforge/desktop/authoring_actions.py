@@ -82,11 +82,11 @@ def reference_target(reference):
 def binding_members(editor, binding, assign):
     session = editor.controller.session
     target = deformer_operations.locate(session, binding).target
+    if not assign:
+        enter_members(editor, target)
     rows = [r for r in editor.rows if reference_target(r[0]) == (target.stage, target.component)]
     if assign:
-        selected = [
-            r[0]["index"] for r in rows if authoring_state.component_key(r[0]) in editor.selection
-        ]
+        selected = selected_indices(editor, rows)
         editor.controller.run("deformer.update", dict(binding=binding, indices=selected))
     else:
         indices = member_indices(session, binding, rows)
@@ -94,6 +94,17 @@ def binding_members(editor, binding, assign):
             authoring_state.component_key(r[0]) for r in rows if r[0]["index"] in indices
         ]
         editor.notify()
+
+
+def selected_indices(editor, rows):
+    return [r[0]["index"] for r in rows if authoring_state.component_key(r[0]) in editor.selection]
+
+
+def enter_members(editor, target):
+    editor.controller.cancelViewportTools()
+    editor.controller.select(target.owner)
+    editor.category = target.stage
+    editor.setEditing(True)
 
 
 def member_indices(session, binding, rows):

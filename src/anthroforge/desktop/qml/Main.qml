@@ -26,7 +26,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || workspaceManager.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || focusDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || tissueCreation.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -46,6 +46,7 @@ ApplicationWindow {
     Action { id: importAction; text: "Import mesh…"; enabled: !window.modalOpen; onTriggered: importFile.open() }
     Action { id: undoAction; text: "Undo"; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("undo",{}) }
     Action { id: redoAction; text: "Redo"; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("redo",{}) }
+    Action { id: tissueAction; text: "Create Tissue"; enabled: !window.modalOpen && !workspace.state.waiting; onTriggered: tissueCreation.request() }
     header: ColumnLayout {
         spacing: 0
         Rectangle {
@@ -57,7 +58,8 @@ ApplicationWindow {
                 UiMenuBar {
                     background: Item {}
                     UiMenu { title: "File"; UiMenuItem { action: newAction } UiMenuItem { action: openAction } MenuSeparator {} UiMenuItem { action: saveAction } UiMenuItem { action: saveAsAction } MenuSeparator {} UiMenuItem { action: importAction } MenuSeparator {} UiMenuItem { objectName: "exportInspectionMenu"; text: "Export inspection report…"; enabled: !workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered: { viewport.storeCamera(); reportDialog.open(); } } }
-                    UiMenu { title: "Edit"; UiMenuItem { action: undoAction } UiMenuItem { action: redoAction } MenuSeparator {} UiMenuItem { text: "Delete selected…"; shortcutHint: keyboard.shortcut("deleteSelection"); enabled: !!workspace.selectedId && !workspace.selectedData.readonly; onTriggered: deleteDialog.request(workspace.selectedId) } }
+                    UiMenu { title: "Edit"; UiMenuItem { action: undoAction } UiMenuItem { action: redoAction } MenuSeparator {} UiMenuItem { text: "Delete selected"; shortcutHint: keyboard.shortcut("deleteSelection"); enabled: !!workspace.selectedId && !workspace.selectedData.readonly; onTriggered: deleteDialog.request(workspace.selectedId) } }
+                    UiMenu { title: "Create"; UiMenuItem { action: tissueAction } }
                     UiMenu {
                         title: "View"
                         UiMenuItem { text: "Frame selected"; shortcutHint: "F"; onTriggered: workspace.frameSelection() }
@@ -85,7 +87,7 @@ ApplicationWindow {
                 Label { text: "Workspace"; color: Theme.muted; font.pixelSize: 11 }
                 UiCombo { Layout.preferredWidth: 175; model: workspace.state.workspaces; currentIndex: workspace.state.workspace; onActivated: workspace.run("workspace.select",{index:currentIndex}) }
                 UiButton { objectName: "manageWorkspace"; text: "Manage…"; enabled: !workspace.state.waiting && !workspace.state.editing; onClicked: workspaceManager.open() }
-                UiButton { text: "Focus…"; hint: "Create a workspace from the selected SCP"; enabled: !!workspace.selectedId && !workspace.state.waiting; onClicked: focusDialog.open() }
+                UiButton { objectName: "focusSelection"; text: "Focus"; hint: "Focus selected anatomy and descendants"; enabled: !!workspace.selectedId && !workspace.selectedData.is_construction && !workspace.selectedData.is_control && !workspace.state.waiting; onClicked: workspace.focusSelection() }
             }
         }
         Rectangle {
@@ -93,6 +95,7 @@ ApplicationWindow {
             RowLayout {
                 anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10; spacing: 6
                 UiButton { objectName: "createPrimitive"; text: "Create Primitive"; glyph: "plus"; primary: true; enabled: !workspace.state.waiting; onClicked: createMenu.popup() }
+                UiButton { objectName: "createTissueToolbar"; action: tissueAction; glyph: "plus" }
                 UiButton { action: saveAction; glyph: "save"; hint: "Save project (Ctrl+S)" }
                 Rectangle { Layout.leftMargin: 6; Layout.rightMargin: 6; implicitWidth: 1; implicitHeight: 20; color: Theme.border }
                 UiButton { glyph: "undo"; hint: "Undo (Ctrl+Z)"; enabled: undoAction.enabled; onClicked: undoAction.trigger() }
@@ -199,7 +202,8 @@ ApplicationWindow {
     }
     ReferenceImageDialog { id: imageFile }
     FileDialog { id: reportDialog; title: "Export inspection report"; fileMode: FileDialog.SaveFile; defaultSuffix: "afinspection.zip"; nameFilters: ["Inspection report (*.afinspection.zip)"]; onAccepted: workspace.inspectionExport.start(selectedFile.toString()) }
-    WorkspaceManager { id: workspaceManager; anchors.centerIn: parent }
+    WorkspaceManager { id: workspaceManager }
+    TissueCreationDialog { id: tissueCreation; anchors.centerIn: parent }
     Popup {
         id: overlays; x: Math.max(0,window.width-650); y: 110; padding: 14
         background: Rectangle { color: Theme.panel; border.color: Theme.border; radius: 6 }
@@ -237,16 +241,6 @@ ApplicationWindow {
                 }
             }
         }
-    }
-    UiDialog {
-        id: focusDialog; title: "Create focused workspace"; modal: true; anchors.centerIn: parent
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        ColumnLayout {
-            UiField { id: focusName; placeholderText: "Workspace name"; text: workspace.selectedData.name || "Focused workspace" }
-            UiCheck { id: includeChildren; text: "Include descendants"; checked: true }
-            Label { text: "Other SCPs remain transparent and read-only."; color: Theme.muted }
-        }
-        onAccepted: workspace.run("workspace.create",{name:focusName.text,members:[workspace.selectedId],children:includeChildren.checked})
     }
     UiDialog {
         id: saveChoice; title: "Calculations are still running"; modal: true; anchors.centerIn: parent; closePolicy: Popup.NoAutoClose

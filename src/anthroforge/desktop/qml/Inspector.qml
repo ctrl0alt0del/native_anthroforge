@@ -151,7 +151,7 @@ UiScrollView {
             }
         }
         ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
-        ConstructionInspector { id: constructionInspector; visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
+        ConstructionInspector { id: constructionInspector; onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         TissueInspector { visible: !!inspector.selected.is_tissue; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         DependencyInspector { visible: !!inspector.selected.id }
         Label { text: inspector.selected.error || ""; visible: !!text; color: Theme.danger; wrapMode: Text.WordWrap; Layout.fillWidth: true }

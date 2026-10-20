@@ -21,7 +21,7 @@ ColumnLayout {
         Binding { target: nameField; property: "text"; when: !nameField.activeFocus; value: panel.selected.name || "" }
         onEditingFinished: if(panel.selected.is_tissue && text !== panel.selected.name) workspace.run("object.rename",{target:panel.selected.id,name:text})
     }
-    UiButton { text: "Edit construction source"; glyph: "curve-points"; Layout.fillWidth: true; onClicked: workspace.select(panel.item.source) }
+    UiButton { objectName: "editTissueSource"; text: "Edit construction source"; glyph: "curve-points"; Layout.fillWidth: true; onClicked: workspace.editConstruction(panel.item.source) }
     UiButton { objectName: "tissueMakeIndependent"; text: "Make construction independent"; Layout.fillWidth: true; onClicked: workspace.run("consumer.make_independent",{entity:panel.selected.id}) }
     UiField {
         id: classification; objectName: "tissueClassification"; Layout.fillWidth: true

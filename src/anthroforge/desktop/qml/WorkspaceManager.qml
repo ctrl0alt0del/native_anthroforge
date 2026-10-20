@@ -5,7 +5,9 @@ import QtQuick.Layouts
 UiDialog {
     id: manager
     objectName: "workspaceManager"
-    title: "Workspace & presentation"; modal: true; width: 500; height: Math.min(620, parent.height-40)
+    title: "Workspace & presentation"; modal: false; width: 500; height: Math.min(620, parent.height-40)
+    x: Math.max(0,parent.width-width-12); y: 60
+    closePolicy: Popup.CloseOnEscape
     standardButtons: Dialog.Close
     function toggle(field,key,checked) {
         const values=workspace.state[field].filter(v=>v!==key);
@@ -21,8 +23,7 @@ UiDialog {
                 UiButton { text: "Remove"; enabled: workspace.state.workspace>0; onClicked: workspace.run("workspace.remove",{index:workspace.state.workspace}) }
             }
             RowLayout {
-                UiField { id: viewName; objectName: "workspaceName"; Layout.fillWidth: true; placeholderText: "Workspace name"; Binding { target: viewName; property: "text"; when: !viewName.activeFocus; value: workspace.state.workspaces[workspace.state.workspace] || "" } }
-                UiButton { text: "Rename"; enabled: viewName.text.trim().length>0; onClicked: workspace.run("workspace.update",{name:viewName.text.trim()}) }
+                UiField { id: viewName; objectName: "workspaceName"; Layout.fillWidth: true; placeholderText: "Workspace name"; Binding { target: viewName; property: "text"; when: !viewName.activeFocus; value: workspace.state.workspaces[workspace.state.workspace] || "" } onEditingFinished: if(text.trim() && text.trim()!==workspace.state.workspaces[workspace.state.workspace]) workspace.run("workspace.update",{name:text.trim()}) }
             }
             RowLayout {
                 Label { text: "Display units"; color: Theme.muted; Layout.fillWidth: true }
@@ -55,7 +56,7 @@ UiDialog {
             UiSection {
                 title: "Workspace members"; expanded: false; hint: "Objects outside a focused workspace stay transparent and read-only."
                 Label { text: workspace.state.focused ? "Choose editable objects" : "Whole document · all objects included"; color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true }
-                UiButton { text: "Create workspace from selected"; enabled: !!workspace.selectedId; onClicked: workspace.run("workspace.create",{name:"Focused workspace",members:[workspace.selectedId]}) }
+                UiButton { text: "Focus selection"; enabled: !!workspace.selectedId && !workspace.selectedData.is_construction && !workspace.selectedData.is_control; onClicked: workspace.focusSelection() }
                 Repeater {
                     model: workspace.treeRows
                     UiCheck { required property var modelData; text: modelData.name+(modelData.is_control ? " · control" : " · SCP"); enabled: workspace.state.focused; checked: !workspace.state.focused || workspace.state.members.includes(modelData.id); onClicked: manager.toggle("members",modelData.id,checked) }

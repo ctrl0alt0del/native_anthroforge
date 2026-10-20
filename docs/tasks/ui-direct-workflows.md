@@ -49,13 +49,24 @@ qualify the single canonical 0.2.2 package and source archive, then merge/push.
 
 ## Current state and next steps
 
-Initial checkpoint: review complete; implementation not started.
+First implementation checkpoint (not release-ready):
+- Native nearest-SCP pin capture inside the existing Fiber creation job, with optional
+  explicit overrides and dispatch-time provenance. No Python geometry loop.
+- Shared deletion-impact query, direct closed surface creation/Realign, source/member
+  navigation, tracing, weight editing, workspace focus/presentation and direct report text.
+- Direct stacking controls and toolbar/menu Tissue creation with searchable source chooser.
+- Fiber options use a virtualized point list rather than one target control per point.
+- 24 focused core/architecture tests pass; mypy and Ruff pass; the existing offscreen
+  tissue creation check passes. Full new interaction coverage, report DPI verification,
+  documentation, development gate and packaging remain incomplete.
+
 Prior ignored audit probe reproduced unapplied stacking checkbox changes, hidden Fiber
 creation, per-point selector clutter, source navigation without editing and Hook member
 selection doing nothing outside edit mode.
 
-1. Inspect report captures and implement shared creation/deletion policies.
-2. Integrate all direct UI workflows and regression/acceptance checks.
+1. Finish interaction regression checks, including dense bindings, rejected settings,
+   direct report text, conditional deletion, weights and nonmodal workspace navigation.
+2. Compare current reports at representative DPI; fix any remaining layout defects.
 3. Validate, package, update durable documentation, merge and push.
 
 ## Recovery

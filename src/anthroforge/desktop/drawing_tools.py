@@ -83,6 +83,14 @@ class DrawingTools(QObject):
             self.controller.select(result)
             self.controller.authoring.setEditing(True)
 
+    @Slot(str)
+    def traceImage(self, target):
+        if self.controller.session.history.before is not None:
+            return
+        self.cancel()
+        self.options = dict(self.options, depth="IMAGE", image=target)
+        self.begin("DRAW")
+
     def signature(self):
         session = self.controller.session
         return session.document.id, session.active_workspace

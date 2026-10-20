@@ -17,10 +17,7 @@ def surface(controller, kind):
     curves = selected_curves(controller)
     if kind == "AUTO":
         kind = "PATCH" if len(curves) == 1 else "LOFT"
-    closed = any(controller.session.document.object(key).closed for key in curves)
     arguments = dict(curves=curves, kind=kind, owner=context_owner(controller))
-    if kind == "LOFT" and closed:
-        return controller.run("surface.preview", arguments)
     return controller.creation_selection.create("surface.create", arguments)
 
 

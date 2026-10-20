@@ -20,6 +20,7 @@ from . import (
     curve_copy,
     curve_sources,
     dependencies,
+    fiber_defaults,
     surface_providers,
 )
 from .attachment_candidates import eligible
@@ -36,7 +37,8 @@ if TYPE_CHECKING:
 def capture_targets(document: Any, spec: "FiberCreation") -> tuple[Any, ...]:
     return tuple(
         sorted(
-            set(eligible(document, spec.identities[spec.source])) | {b[1] for b in spec.bindings}
+            set(eligible(document, spec.identities[spec.source]))
+            | {b[1] for b in spec.bindings if b[1] is not None}
         )
     )
 
@@ -95,7 +97,7 @@ def capture(session: "Session", spec: "FiberCreation", document: Any, resources:
     targets = capture_targets(document, spec)
     indices = {point.id: index for index, point in enumerate(item.points)}
     pins = [indices[row[0]] for row in spec.bindings]
-    parents = [targets.index(row[1]) for row in spec.bindings]
+    parents = [targets.index(row[1]) if row[1] is not None else -1 for row in spec.bindings]
     world = curve_sources.world(session.engine, document, item.id)
     records = construction.resolved_curve(session.engine, original.authored)
     request = attachment_fields.Capture(original.path, records, world, pins, parents)
@@ -105,6 +107,8 @@ def capture(session: "Session", spec: "FiberCreation", document: Any, resources:
 def compute(session: "Session", spec: "FiberCreation", payload: Any, cancel: Any) -> Any:
     document, resources = payload
     item, original, targets, request = capture(session, spec, document, resources)
+    spec = fiber_defaults.resolve(session.engine, spec, document, resources, request, cancel.handle)
+    request = replace(request, parents=[targets.index(row[1]) for row in spec.bindings])
     surfaces = attachment_assets.surface_inputs(session.engine, document, resources.meshes, targets)
     field = attachment_fields.capture(session.engine, surfaces, request, cancel.handle)
     captures = attachment_assets.captures(session.engine, document, resources.meshes, targets)

@@ -23,7 +23,7 @@ UiSection {
     UiCombo { id: choice; objectName:"surfaceSourceChoice"; Layout.fillWidth:true; model:panel.uses; textRole:"name"; hint:"Source to inspect" }
     RowLayout {
         Layout.fillWidth: true
-        UiButton { Layout.fillWidth:true; text:"Select curve"; enabled:!!panel.use.curve; onClicked:workspace.select(panel.use.curve) }
+        UiButton { objectName:"editSurfaceSource"; Layout.fillWidth:true; text:"Edit curve"; enabled:!!panel.use.curve; onClicked:workspace.editConstruction(panel.use.curve) }
         UiButton { text:"↑"; enabled:!panel.branched && choice.currentIndex>0; onClicked:panel.move(-1) }
         UiButton { text:"↓"; enabled:!panel.branched && choice.currentIndex+1<panel.uses.length; onClicked:panel.move(1) }
         UiButton { objectName:"surfaceRemoveSource"; text:"Remove"; enabled:!panel.branched && panel.item.kind!=="PATCH" && panel.uses.length>2; onClicked:workspace.run("surface.source.remove",{target:panel.item.id,curve:panel.use.curve}) }

@@ -56,12 +56,16 @@ def changed_inputs(
 def retain_objects(
     session: "Session", removed: SceneObject, parent: SceneObject | None
 ) -> tuple[Authored, ...]:
+    require_unbound(session, removed.id)
+    return tuple(retain_object(session, item, removed, parent) for item in session.document.objects)
+
+
+def require_unbound(session: "Session", target: str) -> None:
     from anthroforge.core.attachment_references import targets
 
     for item in session.document.objects:
-        if removed.id in targets(item):
+        if target in targets(item):
             raise ValueError("Rebind dependent anatomy before deleting its target: " + item.name)
-    return tuple(retain_object(session, item, removed, parent) for item in session.document.objects)
 
 
 def retain_object(

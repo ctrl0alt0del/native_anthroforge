@@ -27,6 +27,7 @@
 ## Design quality for fixes and features
 
 - Read and apply [engineering guidelines](docs/engineering_guidelines.md) before implementation or design review. These are project working rules; the confirmed product specification remains authoritative.
+- Minimize the steps users need to achieve an outcome. Prefer direct controls and coherent undo; do not add prerequisite buttons, preview/accept gates or confirmation steps without a concrete user need. If the intended UI/UX is unclear, ask the user before choosing the interaction.
 - Own architectural diagnosis. Before choosing a fix, identify the cause, responsible layer, affected callers and invariants. Determine whether the defect is local or exposes a missing responsibility, contract or extension point. Do not wait for the user to request this analysis.
 - Fix shared causes at their owning boundary. When behavior varies by task or feature, separate that policy from shared lifecycle and safety mechanisms. Integrate the affected callers; adding an unused abstraction does not complete the work.
 - Apply SOLID through cohesive responsibilities, narrow contracts, substitutable implementations and explicit dependencies. Prefer composition. Justify each new abstraction with a current requirement, observed variation or necessary isolation boundary.

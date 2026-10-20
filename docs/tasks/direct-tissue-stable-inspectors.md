@@ -47,13 +47,25 @@ kept the numeric field bounds `[1314,187,100,30]` at all three sampled positions
 retained focus and produced one undo action. Hidden Direct3D automatic tissue geometry
 was saved and visually inspected. No visible desktop interaction was performed.
 
-Pending: complete development gate, canonical portable package and source archive.
+Runtime checkpoint: `7267773` (pushed). The complete `tools/check.ps1` gate passes:
+1,394 pytest tests, 3 native CTests, typing, native/Python/PowerShell function/style
+checks, numerical boundary/import checks and doctor. The 886 Qt deprecation warnings
+are reported, not suppressed. A 1050px-wide UI layout check also passes.
+
+Ownership/coupling review (coordinator-authored): conversion policy is separate from the
+strict Tissue source contract; graph planning, native worker computation and atomic
+publication have separate modules. Original numerical kernels and resource ownership
+are reused. Desktop only projects shared eligibility and selection intent. Toast state
+belongs to presentation and does not touch document, history or scheduler state.
+
+Canonical packaging is running from `7267773`; pending portable acceptance and final
+source archive. Build logs and hidden-render evidence are local-only under the evidence
+directory. The portable script has passed against the development CLI.
 
 ## Next actions and blockers
 
-1. Run the complete development gate and address failures.
-2. Package and qualify the single canonical portable build, update validation records.
-3. Review ownership/coupling, then merge/push normally.
+1. Finish/qualify the single canonical portable build and update validation records.
+2. Generate the source archive, then merge/push normally.
 
 ## Recovery inputs
 

@@ -3,7 +3,7 @@
 - Task branch: `codex/muscle-height-smoothing`
 - Integration branch: `main`
 - Starting revision: `dda3af44d2899bd27da95eb20c75ca15d743260e`
-- Status: diagnosis established; geometric behavior decision pending; no production fix
+- Status: correction authorized; addon reproduction complete; numerical experiments in progress
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -73,9 +73,8 @@ inflation as a complete workaround.
 
 ## Verification and next actions
 
-1. Clarify whether correction may change generated inflation directions/shape while
-   retaining authored settings and attachment constraints. The user asked to choose
-   the repair path once the cause is known.
+1. The user approved changing generated directions/shape while preserving authored
+   settings and attachment constraints, and requested addon reproduction.
 2. Qualify the chosen numerical correction against this actual fixture, including
    refinement sensitivity and QP stability. Merely changing failure messages is insufficient.
 3. Add representative regression coverage; validate GUI, persistence and packaging.
@@ -103,3 +102,34 @@ The original SHA256 was checked again after the experiments and is unchanged.
 
 The containing Git commit identifies this checkpoint; inspect remote reachability
 before treating work as recoverable from another machine.
+
+## Addon reproduction and current experiments
+
+Blender 5.0.1 was run in background against the current addon. Exact source (4,816
+vertices) and refined (8,424 vertices) grids produce **bit-identical unsmoothed
+positions** to standalone. Both fail Height smoothing with the same collapse/reverse
+message. A normal addon scene built from the saved cube and two boundary Fiber
+paths also fails: smoothing Off publishes 4,644 vertices; Height marks both proxies
+INVALID and empties them. The different count in that scene comes from normal
+addon loft preparation; it is not the exact-grid comparison.
+
+`addon-off.blend` and `addon-height.blend` were saved with `StaticScene.save_debug_copy`,
+reopened, and rendered in background. Both Fibers remain visible in ordinary Curve
+display; the cube retains its native SCP color. The Off render visibly shows the
+distorted envelope, while Height has no displayed muscle. Temporary rendering
+changes were not saved. No addon source files were edited.
+
+Evidence is local under the task build directory: `addon_reproduction.json`,
+`addon-reopened.json`, both `.blend` files and `addon-*-render.png`. The initially
+nonfinite source comparison was a diagnostic borrowed-array lifetime mistake;
+owned array copies corrected it and both exact comparisons are now zero.
+
+An isolated C++ experiment filters area-weighted displacement directions with
+the mesh mass matrix and cotangent diffusion operator, leaving lengths unchanged.
+For the actual refined 1 m case, tested radii 0.02, 0.1, 0.3 and 1 m remove detected
+crossings. The unconstrained diagnostic view of each height-QP candidate also has
+zero detected crossings/collapses, despite normal rotations that the old validator
+rejects. This is **not yet a production correction**: direction scale, shape quality,
+refinement sensitivity, independent intersection checks and regression qualification
+remain unresolved. The old local stability heuristic also introduces sharp height
+changes around the bend; its effect is being isolated rather than silently retained.

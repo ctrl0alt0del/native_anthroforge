@@ -3,7 +3,7 @@
 - Task branch: `codex/solver-fail1`
 - Integration branch: `main`
 - Starting revision: `9cc6c7cd64ae3a0090bf3f715f434378653d441f`
-- Status: correction implemented; release qualification in progress
+- Status: implementation, validation and canonical package complete; final merge/push pending
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -68,16 +68,45 @@ undo/redo, adaptive result persistence, consumer connectivity and attachment loc
 24-point request solves, direct engine selection/undo/redo work, and requesting four
 samples produces 13 accepted points with all authored points unchanged and clear segments.
 Saved local corrected project: `build/solver-fail1/corrected.anthroforge`.
-No canonical package replacement has been performed yet.
+The complete development gate passes: 1,358 Python tests, three native CTests,
+native/Python/PowerShell style and function limits, types and numerical imports.
+Logs: `development-gate.log`, `routing-tests.log`, `workflow-tests.log`.
+Hidden GPU renders in `route-oblique.png`, `route-top.png` and `route-front.png`
+were generated; oblique inspection shows the route following the cube exteriors.
+The real QML inspector and editing interactions passed offscreen; no visible-window
+or interactive user-session acceptance is claimed.
+
+The packaged executable passes the minimal-PATH portable suite and reproduces the
+original project through normal project opening, recalculation, engine switching,
+adaptive settings and saving. Reopening its saved results independently verifies
+all segments and unchanged authored points: preferred 4 produces 13 points; original
+24 produces 24. Packaged scene capture has no warnings and was visually inspected.
+Evidence: `portable/portable-check.json`, `packaged-repro.jsonl`,
+`packaged-route-check.json`, `packaged-route.png` and its JSON sidecar.
+Ready-to-open corrected copy: `build/solver-fail1/packaged-repaired.anthroforge`.
+Original source SHA-256 remains unchanged.
+
+Canonical package replaced at `dist/0.2.2/AnthroForge.dist`, runtime
+`3a030925a1689d2a157b13c5a07aeebc715ace58`, executable SHA-256
+`20fadb07aec7d14fd2a71ae3b5994ec7bbece79c3b3e96ed6d2611906bb0090b`.
+Development and packaged native DLL hashes match. The companion source archive is
+`dist/AnthroForge-0.2.2-source.zip`. Local build evidence and binary projects are
+not pushed; the compact numerical fixture and acceptance tool are in Git.
+
+Coordinator-authored ownership review: the native handoff owns cold-route sample
+allocation; reference correspondence and solver seeds consume the same layout.
+Warm validation uses the existing collision service, preserving clearance restoration.
+No Python numerical fallback, new worker pool or competing cache was introduced.
+Authored definitions, consumer sampling/topology and task/publication ownership remain
+unchanged. Existing cancellation and the native output bound still apply.
 Official libigl winding-number/signed-distance and CGAL path documentation consulted
 before investigation. Existing native route diagnostics and regressions are the first
 tools to use; no algorithm replacement is selected.
 
 ## Next actions
 
-1. Run the complete development gate and original-project GUI/shape qualification.
-2. Qualify one canonical portable package; record final evidence and computation history.
-3. Normal validated merge/push, preserving original file and unrelated changes.
+Normal validated merge/push, preserving original file and unrelated changes.
+Git ancestry establishes final integration; no runtime work remains.
 
 ## Recovery inputs
 

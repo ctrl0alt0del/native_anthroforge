@@ -514,8 +514,8 @@ resolved inflation/smoothing defect when assessing the fixture.
 
 ### CH-012 — Preserve route layout through solver preparation
 
-- **2026-10-20; 0.2.2; implementation under qualification.** C06, Q03.
-  Baseline `9cc6c7c`; task `codex/solver-fail1`.
+- **2026-10-20; 0.2.2; Qualified.** C06, Q03.
+  Baseline `9cc6c7c`; correction/runtime `3a03092`.
 - **Before/problem:** `solver_fail1.anthroforge`, four surface pins on two cubes,
   failed at 24 samples. The planner's 24-point handoff passed collision checks, but
   a second uniform resampling changed per-span counts from 8/10/8 to 7/13/6, cutting
@@ -531,11 +531,17 @@ resolved inflation/smoothing defect when assessing the fixture.
   `max(1e-9, 1e-9 * world_length)` centerline tolerance and checks interval endpoint
   containment. Full clearance and recoverable warm feasibility remain distinct;
   invalid warm seeds use the existing cold replan.
-- **Evidence so far:** exact original settings now solve; complete native segment
+- **Evidence/outcome:** exact original settings now solve; complete native segment
   checks pass. 41 routing/layout regressions pass, including all existing addon/skull
   parity cases, bound/unbound pins, cold/warm paths, closed-loop growth and the captured
   rejected seed. API undo/redo, roundtrip, consumer connectivity and topology locks pass.
-  Full development/GUI/package qualification remains pending.
+  All 1,358 tests, three native CTests and the complete development gate pass.
+  Real QML checks cover direct engine selection, undo/redo and a preference of four
+  growing to 13 samples while retaining authored points. Minimal-PATH portable
+  qualification passes; the executable opens, recalculates and saves the original
+  case at 24 samples and the adaptive case at 13. Independent reopened-result checks
+  confirm clear segments. Hidden GPU renders show the route around both cubes;
+  the packaged capture has no warnings. No visible-window acceptance is claimed.
 - **Preserved contracts/limits:** generated points remain solver variables, not new
   authored constraints. Consumers retain their own mesh density. Native cancellation
   and the one-million-point bound remain enforced. This fixes sampling and validation;

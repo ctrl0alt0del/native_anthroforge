@@ -97,6 +97,21 @@ def membrane_action(controller, window):
     assert window.grabWindow().save(str(OUTPUT / "direct-tissue.png"))
 
 
+def generic_surface_action(controller, window):
+    _, surface, _ = surface_scene(controller.session)
+    controller.refresh()
+    controller.select(surface.id)
+    settle(controller)
+    cursor = controller.session.history.cursor
+    mouse_click(window, "createTissueToolbar")
+    settle(controller)
+    tissue = controller.session.document.object(controller.selection)
+    membrane = controller.session.document.object(tissue.source)
+    assert controller.selectedData["is_tissue"] and membrane.id != surface.id
+    assert all(controller.objectRecord(u.curve)["kind"] == "FIBER" for u in membrane.curves)
+    assert controller.session.history.cursor == cursor + 1 and not window.property("modalOpen")
+
+
 def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     QQuickStyle.setStyle("Basic")
@@ -105,8 +120,8 @@ def main():
         QFontDatabase.addApplicationFont("C:/Windows/Fonts/segoeui.ttf")
         app.setFont(QFont("Segoe UI"))
         try:
-            run(scenario)
-            run(membrane_action)
+            for check in (scenario, membrane_action, generic_surface_action):
+                run(check)
             print("Stable numeric layout, focus, undo and direct construction actions passed.")
         finally:
             delete(app)

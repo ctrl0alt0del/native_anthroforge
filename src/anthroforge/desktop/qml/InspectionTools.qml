@@ -29,8 +29,8 @@ Rectangle {
             id: scroll; visible: tools.expanded; Layout.fillWidth: true; Layout.fillHeight: true; clip: true; contentWidth: availableWidth
             ColumnLayout {
                 id: content; width: scroll.availableWidth; spacing: Theme.gap
-                Label { visible: tools.model.state.active; Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.accent; text: "Pick "+(tools.model.state.start.entity ? "second" : "first")+" surface point · Esc to finish" }
-                Label { Layout.fillWidth: true; wrapMode: Text.WrapAnywhere; color: Theme.muted; visible: !!tools.model.state.hover.entity; text: tools.model.state.hover.position ? "XYZ: "+tools.xyz(tools.model.state.hover.position)+" "+workspace.state.display_units : "" }
+                Label { visible: tools.model.state.active; Layout.fillWidth: true; elide: Text.ElideRight; color: Theme.accent; text: "Pick "+(tools.model.state.start.entity ? "second" : "first")+" surface point · Esc to finish" }
+                UiDetail { visible: tools.model.state.active; label: "XYZ"; value: tools.model.state.hover.entity && tools.model.state.hover.position ? tools.xyz(tools.model.state.hover.position)+" "+workspace.state.display_units : "Point at a surface" }
                 UiSection {
                     title: "Measurements"; hint: "Pick two surface points with Ruler. Alt-click reaches deeper surfaces. Expand a measurement for XYZ coordinates. Rulers keep fixed coordinates; changed surfaces are marked stale."
                     Label { visible: !tools.model.state.measurements.length; text: "No measurements yet"; color: Theme.muted }

@@ -9,6 +9,7 @@ from functools import partial
 from pathlib import Path
 
 import numpy as np
+from attached_creation_portable import automatic_construction
 from construction_portable import construction
 from direct_workflow_portable import direct_workflows
 from feedback_portable import feedback
@@ -38,6 +39,7 @@ CHECKS = (
     "window feedback capture, annotations, inbox preview, text editing and deletion",
     "schema-4 tissues, attached construction, stacking, native profiling and rendering",
     "automatic Fiber endpoints, independent copies, undo/redo and shared deletion impact",
+    "direct tissue creation with automatic attached construction",
 )
 
 
@@ -135,6 +137,7 @@ def qualification_steps():
         inspection,
         construction,
         direct_workflows,
+        automatic_construction,
         tissues,
         feedback,
     )

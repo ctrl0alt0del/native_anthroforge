@@ -71,3 +71,10 @@ Connector width/fullness are used by later muscle inflation, not this base assem
 remain unsupported. CGAL's explicit border-stitching API was reviewed as a comparison
 (https://doc.cgal.org/5.6/Polygon_mesh_processing/group__PMP__combinatorial__repair__grp.html);
 reusing known seam IDs directly preserves the addon construction without a repair pass.
+
+The adaptive-routing repair coalesces station differences below `1e-12` of normalized
+length. Two curved boundary-1 donor fixtures therefore lose two duplicate vertices and
+their zero-width strips. Original donor captures remain unchanged; tests verify their
+canonical nondegenerate geometry and shared seam connectivity. Ordinary exact lofts
+retain the union's normalized axes for material attachments. Patch harmonic material
+coordinates are additional metadata and do not change the captured patch geometry.

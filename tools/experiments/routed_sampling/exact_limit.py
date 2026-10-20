@@ -1,4 +1,4 @@
-"""Reproduce the current exact-consumer failure independently of the transport prototype."""
+"""Regression for the former exact-consumer failure, using actual shared API bindings."""
 
 import json
 
@@ -15,8 +15,8 @@ def check(session):
     before = session.document.object(anchor)
     scene.move(session, objects["supports"][-1], [0, 0, 0])
     after = session.document.object(anchor)
-    assert before.result.status == "ready" and after.result.status == "failed"
-    assert "topology changed" in after.result.error and before.binding == after.binding
+    assert before.result.status == after.result.status == "ready", after.result.error
+    assert before.binding == after.binding
     return dict(
         error=after.result.error, binding_preserved=True, source_errors=session.scheduler.errors
     )

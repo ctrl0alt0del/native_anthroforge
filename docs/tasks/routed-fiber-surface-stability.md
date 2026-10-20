@@ -24,11 +24,23 @@ binding location and frame through material charts, independently of sample indi
 Geometry payloads/native handles are not embedded in that metadata. Captured bindings
 remain unchanged. Canonical package replacement remains pending.
 
-The first integrated checkpoint passes native compilation, all three CTests and 14 targeted
-material/Fiber/Anchor tests, including actual exact-surface growth/shrink, saving/reopening
-and undo/redo. Patch material coordinates, broader chart/offset/crop/branch qualification,
-resource/performance review, full gate and packaging remain unfinished. No release
-acceptance is claimed. The original experiment results below describe the pre-fix baseline.
+Native compilation/three CTests and targeted tests now cover actual Base/Final Anchors,
+downstream Fibers, saved captures, undo/redo, nonzero offsets with nonuniform transforms,
+closed seams, branches and patches. Patch coordinates use native harmonic disk mapping;
+normal-shell/crop/envelope outputs retain owned source coordinate bases. Old metadata-free
+captures and indexed authored weight fields keep explicit existing topology restrictions.
+
+`tools/routed_material_acceptance.py` completed hidden Direct3D texture renders and a runtime
+profile; all three images were visually inspected. Accepted route counts are 3/4/3 and
+surface vertices 9/18/9. Both anchors return to their original locations with unchanged
+records. The local report recorded 30 native material-frame calls: mean 0.372 ms, max
+3.365 ms with profiling enabled; this small scene is not a general responsiveness benchmark.
+
+The first full pytest run had 1,358 passes and two donor parity failures caused by removal
+of zero-width strips. Tests now preserve the source donor fixtures and explicitly verify
+their canonical nondegenerate geometry. The full development gate is running; canonical
+package replacement and final acceptance remain pending. No release acceptance is claimed.
+The original experiment results below describe the pre-fix baseline.
 
 Fibers use the corrected routing evaluator with resolved binding inputs. Actual two-endpoint
 Fibers with preferred samples 3 grow 3 → 4 → 3 as an independent cube enters/leaves the path.
@@ -81,9 +93,8 @@ repository contracts and actual native results establish these findings.
 
 ## Next actions
 
-1. Complete patch material coordinates and qualification of periodic/branched charts,
-   offsets, crops, downstream Fibers and constraints. Keep topology-edit restrictions.
-2. Run full gate and inspect actual geometry, profiler/resource behavior and packaging.
+1. Complete remaining crop/target-region and resource qualification; review coupling.
+2. Finish the full gate, rebuild/check the canonical package and verify latest native edits.
 3. Qualify actual Fiber → Membrane → Tissue → attachment chains and package/merge only
    after the selected repair is complete.
 

@@ -2,26 +2,33 @@
 #include "material_chart.hpp"
 
 namespace af::material {
-static void append(Atlas& atlas,Chart chart) {
+static void append(Atlas& atlas,Chart chart,uint64_t cancel) {
     const auto id=int(atlas.charts.size());
-    for(const auto& [vertex,position]:chart.points) atlas.membership.at(size_t(vertex)).push_back(id);
+    for(const auto& [vertex,position]:chart.points) {
+        check_cancel(cancel); atlas.membership.at(size_t(vertex)).push_back(id);
+    }
     atlas.charts.push_back(std::move(chart));
 }
-static Chart grid_chart(const MaterialGrid& grid) {
+static Chart grid_chart(const MaterialGrid& grid,uint64_t cancel) {
     Chart chart; chart.closed_u=grid.closed_u; chart.closed_v=grid.closed_v;
-    for(int i=0;i<grid.rows;++i) for(int j=0;j<grid.columns;++j)
+    for(int i=0;i<grid.rows;++i) for(int j=0;j<grid.columns;++j) {
+        check_cancel(cancel);
         chart.points.emplace(grid.indices[size_t(i*grid.columns+j)],V3(grid.across[size_t(i)],grid.along[size_t(j)],0));
+    }
     return chart;
 }
-Atlas atlas(const MaterialBasis& basis) {
+Atlas atlas(const MaterialBasis& basis,uint64_t cancel) {
     validate_basis(basis); Atlas result; result.membership.resize(size_t(basis.count));
     if(basis.grids.empty()) {
         Chart chart;
-        for(int64_t i=0;i<basis.count;++i) chart.points.emplace(i,V3(basis.parameters[2*i],basis.parameters[2*i+1],0));
-        append(result,std::move(chart));
+        for(int64_t i=0;i<basis.count;++i) {
+            check_cancel(cancel); chart.points.emplace(i,V3(basis.parameters[2*i],basis.parameters[2*i+1],0));
+        }
+        disk_boundary(chart);
+        append(result,std::move(chart),cancel);
     } else {
         Mesh view; view.vertices.resize(basis.count,3); view.material=basis.grids; view.material_axes=basis.parameters;
-        for(const auto& grid:material_grids(view)) append(result,grid_chart(grid));
+        for(const auto& grid:material_grids(view)) append(result,grid_chart(grid,cancel),cancel);
     }
     return result;
 }

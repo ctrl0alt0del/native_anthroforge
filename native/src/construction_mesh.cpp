@@ -15,16 +15,19 @@ Faces mesh_faces(const Mesh& source) {
         result.emplace_back(source.corners.begin()+source.offsets[i-1],source.corners.begin()+source.offsets[i]);
     return result;
 }
-static void copy_topology(const Mesh& source,Mesh& target) {
-    target.triangles=source.triangles;
-    target.corners=source.corners;
-    target.offsets=source.offsets;
-    target.polygons=source.polygons;
+void copy_material(const Mesh& source,Mesh& target) {
     target.material=source.material;
     target.material_axes=source.material_axes;
     target.material_pins=source.material_pins;
     target.tissue=source.tissue;
     target.basis=source.basis;
+}
+static void copy_topology(const Mesh& source,Mesh& target) {
+    target.triangles=source.triangles;
+    target.corners=source.corners;
+    target.offsets=source.offsets;
+    target.polygons=source.polygons;
+    copy_material(source,target);
 }
 std::shared_ptr<Mesh> deform_mesh(const Mesh& source,const Vertices& vertices,uint64_t cancel,bool complete) {
     if(vertices.rows()!=source.vertices.rows()||!vertices.allFinite())

@@ -8,11 +8,12 @@ static Eigen::Matrix<double,3,2> edges(const M3& points) {
     Eigen::Matrix<double,3,2> result;
     result.col(0)=points.row(1)-points.row(0); result.col(1)=points.row(2)-points.row(0); return result;
 }
-M4 frame(const Mesh& current,const Location& location,const V3& direction,const M4& world,const double* record) {
+M4 frame(const Mesh& current,const Location& location,const Tangents& directions,const M4& world,const double* record) {
     M3 points; for(int i=0;i<3;++i) points.row(i)=point(world,current.vertices.row(current.triangles(location.triangle,i)));
     const auto parameters=edges(location.coordinates),geometry=edges(points);
-    const Eigen::Vector2d coefficients=(parameters.transpose()*parameters).fullPivLu().solve(parameters.transpose()*direction);
-    V3 normal=geometry.col(0).cross(geometry.col(1)),tangent=geometry*coefficients;
+    const Eigen::Matrix2d coefficients=(parameters.transpose()*parameters).fullPivLu().solve(parameters.transpose()*directions);
+    const Tangents transported=geometry*coefficients;
+    V3 normal=transported.col(0).cross(transported.col(1)),tangent=transported.col(0);
     if(normal.norm()<1e-12||tangent.norm()<1e-12) throw std::runtime_error("Retained material attachment frame is degenerate.");
     normal.normalize(); tangent.normalize(); const V3 bitangent=normal.cross(tangent).normalized();
     M4 result=M4::Identity(); result.block<3,1>(0,0)=bitangent.cross(normal);
@@ -33,16 +34,17 @@ static Eigen::Vector3i indices(const Mesh& mesh,const double* record) {
 }
 static M4 resolve(const Mesh& before,const Mesh& after,const Atlas& a,const Atlas& b,const Indices& index,const M4& world,const double* record,uint64_t cancel) {
     const auto source=coordinates(before,a,indices(before,record));
-    V3 query=source.coordinates.transpose()*V3(record+3);
+    const auto position=transported(a.charts[size_t(source.chart)],b.charts.at(size_t(source.chart)),source.coordinates,V3(record+3));
+    V3 query=position.point;
     auto location=locate(index,b,source.chart,query,cancel);
     if(location.triangle<0&&after.tissue.kind==5&&query.z()<0) {
         query.z()=1; location=locate(index,b,source.chart,query,cancel);
     }
     if(location.triangle<0) throw std::runtime_error("Retained tissue material location is outside the current surface; restore the crop or explicitly rebind.");
-    return frame(after,location,source.coordinates.row(1)-source.coordinates.row(0),world,record);
+    return frame(after,location,position.tangents,world,record);
 }
 static void resolve_batch(const Mesh& before,const Mesh& after,const M4& world,int count,const double* records,double* frames,uint64_t cancel) {
-    const auto a=atlas(material_basis(before)),b=atlas(material_basis(after));
+    const auto a=atlas(material_basis(before),cancel),b=atlas(material_basis(after),cancel);
     if(a.charts.size()!=b.charts.size()||before.tissue.kind!=after.tissue.kind) throw std::runtime_error("Anatomical material domain changed; explicitly rebind.");
     for(size_t i=0;i<a.charts.size();++i)
         if(a.charts[i].closed_u!=b.charts[i].closed_u||a.charts[i].closed_v!=b.charts[i].closed_v)
@@ -54,11 +56,12 @@ static void resolve_batch(const Mesh& before,const Mesh& after,const M4& world,i
     }
 }
 static int retained_frames(uint64_t reference,uint64_t current,const double* world,int count,const double* records,double* frames,uint64_t cancel) {
-    const uint64_t handle=af_material_binding_surface(reference,current,count,records,cancel);
+    const uint64_t handle=reference==current?current:af_material_binding_surface(reference,current,count,records,cancel);
     if(!handle) return 1;
     const std::vector<int> owners(size_t(count),0);
     const int status=af_point_attachment_resolve(1,&handle,world,count,owners.data(),records,frames,cancel);
-    af_mesh_release(handle); return status;
+    if(handle!=current) af_mesh_release(handle);
+    return status;
 }
 }
 int af_material_binding_frames(uint64_t reference,uint64_t current,const double* world,int count,const double* records,double* frames,uint64_t cancel) {

@@ -1,7 +1,8 @@
 # Routed surface sampling comparison
 
-This is an isolated numerical experiment, **not a production attachment repair**.
-It leaves the native application library and canonical distribution unchanged.
+This preserves the isolated comparison used to choose the repair. The experiment helper
+does not implement production attachments. Production qualification now lives in
+`tools/routed_material_acceptance.py` and the adaptive-material/routed-surface tests.
 
 The real API creates two routed Fibers with preferred density 3 between two cube
 supports. A third cube enters/leaves their route. Both paths grow 3 → 4 → 3.
@@ -26,8 +27,8 @@ branched or cropped material-domain behavior.
 
 The exact prototype uses normalized arc-length material coordinates; it demonstrates
 sampling-independent locations, not a universal definition of tissue material motion.
-Production work still needs a stable part/correspondence contract, role-aware transport,
-resource persistence, and full deformation/attachment qualification.
+Production material charts now provide part correspondence, role-aware frame transport
+and owned persistence; the isolated marker here remains a coordinate probe.
 
 ## Run on Windows
 
@@ -48,10 +49,12 @@ dependency. The `.npz` files contain actual evaluated paths and experiment surfa
 JSON reports include collisions, sample counts, corner error and transport probe
 positions. PNG figures use matched cameras/scales and are not application screenshots.
 
-`exact_limit.py` independently demonstrates the current production failure:
-exact surface connectivity changes and a retained Base attachment correctly refuses
-to reuse old indices. Near-coincident exact stations also produce degenerate tissue
-frames. These remain unresolved until the production repair is selected and integrated.
+`exact_limit.py` is the regression for the former production failure: it now requires
+the retained Base attachment to survive the exact-surface connectivity change. The
+comparison figures remain explicitly labeled as experiment data. Run
+`python tools/routed_material_acceptance.py` for real Base/Final attachments, a downstream
+Fiber, saved projects, hidden GPU views and a runtime profile. On Windows this texture
+renderer uses the Windows Qt platform without showing a native window.
 
 The prior [OMPL interpolation reference](https://ompl.kavrakilab.org/classompl_1_1geometric_1_1PathGeometric.html)
 informed the route-corner contract; the experiment's actual native outputs determine

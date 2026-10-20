@@ -9,6 +9,7 @@ import pytest
 from anthroforge.native import surface_branches as branches
 from anthroforge.native.curve_surfaces import Settings
 from anthroforge.native.mesh import NativeCancellation
+from tests.surface_donor_canonical import canonical
 from tests.test_native_surfaces import faces, row
 
 FIXTURE = json.loads((Path(__file__).parent / "fixtures/surfaces/branches.json").read_text())
@@ -24,8 +25,11 @@ def inputs(engine, case):
 def test_native_branches_match_actual_donor_vertices_and_shared_indices(session, case):
     rows, branch = inputs(session.engine, case)
     mesh = branches.geometry(session.engine, rows, 2, [branch], Settings(flip=case["flip"]))
-    np.testing.assert_allclose(mesh.array(0), case["vertices"], atol=1e-10)
-    assert faces(mesh) == case["faces"]
+    expected, polygons = canonical(case)
+    removed = 2 if case["boundary"] == 1 and "curvedTrue" in case["name"] else 0
+    assert len(case["vertices"]) - len(expected) == removed
+    np.testing.assert_allclose(mesh.array(0), expected, atol=1e-10)
+    assert faces(mesh) == polygons
 
 
 def test_branches_validate_order_overlap_closure_and_cancellation(session):

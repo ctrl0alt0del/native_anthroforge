@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from tests.test_tissue_workflow import roundtrip
 from tests import routed_surface_scene as scene
+from tests.test_tissue_workflow import roundtrip
 
 
 def attached_exact_surface(session):

@@ -50,9 +50,7 @@ uint64_t af_mesh_reuse_topology(uint64_t source,uint64_t previous,uint64_t cance
         auto current=af::mesh(source); const auto old=af::mesh(previous);
         if(current->vertices.rows()==old->vertices.rows()&&current->corners==old->corners&&current->offsets==old->offsets) {
             auto updated=af::deform_mesh(*old,current->vertices,cancel);
-            updated->material=current->material; updated->material_axes=current->material_axes;
-            updated->material_pins=current->material_pins;
-            updated->tissue=current->tissue; updated->basis=current->basis; current=std::move(updated);
+            af::copy_material(*current,*updated); current=std::move(updated);
         }
         return af::retain(current);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
@@ -72,11 +70,7 @@ uint64_t af_mesh_finalize(uint64_t source,uint64_t previous,uint64_t cancel) {
         if(mesh->prepared&&mesh->triangles.rows()==topology->triangles.rows()&&mesh->triangles==topology->triangles&&mesh->polygons==topology->polygons)
             return af::retain(mesh);
         auto result=af::deform_mesh(*topology,mesh->vertices,cancel);
-        result->material=mesh->material;
-        result->material_axes=mesh->material_axes;
-        result->material_pins=mesh->material_pins;
-        result->tissue=mesh->tissue;
-        result->basis=mesh->basis;
+        af::copy_material(*mesh,*result);
         return af::retain(result);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }

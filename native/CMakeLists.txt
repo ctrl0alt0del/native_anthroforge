@@ -14,7 +14,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/routing_pin_graph.cpp src/routing_pin_recovery.cpp src/routing_search.cpp src/routing_warm.cpp
     src/curve_surface.cpp src/surface_inputs.cpp src/surface_sampling.cpp src/surface_alignment.cpp
     src/surface_loft.cpp src/surface_patch_projection.cpp src/surface_patch_triangulation.cpp
-    src/surface_patch_subdivision.cpp src/surface_patch_fairing.cpp
+    src/surface_patch_subdivision.cpp src/surface_patch_fairing.cpp src/surface_patch_coordinates.cpp
     src/surface_branch_inputs.cpp src/surface_branch_sampling.cpp src/surface_branches.cpp
     src/tissue_inflation.cpp src/tissue_directions.cpp src/tissue_validation.cpp src/tissue_refinement.cpp src/tissue_branch_refinement.cpp
     src/tissue_prepared_fields.cpp src/tissue_branch_connections.cpp src/tissue_branch_connector.cpp src/tissue_parts.cpp src/tissue_envelope.cpp src/tissue_parameters.cpp src/tissue_crop_envelope.cpp src/tissue_crop.cpp src/tissue_crop_inputs.cpp src/tissue_smoothing.cpp src/smoothing_core.cpp
@@ -22,7 +22,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/tissue_shape_fields.cpp src/tissue_normal_shell.cpp src/tissue_profile_sweep.cpp src/tissue_radial.cpp
     src/tissue_masks.cpp src/tissue_source_normals.cpp src/tissue_constraints.cpp
     src/material_binding.cpp src/material_binding_index.cpp src/material_binding_query.cpp
-    src/material_basis.cpp src/material_chart.cpp src/material_chart_query.cpp src/material_binding_frames.cpp
+    src/material_basis.cpp src/material_chart.cpp src/material_chart_query.cpp src/material_binding_frames.cpp src/material_disk.cpp
     src/tissue_relaxation.cpp src/tissue_geometric.cpp src/tissue_static.cpp src/tissue_point_relaxation.cpp
     src/stacking.cpp src/tissue_stacking.cpp src/tissue_stack_material.cpp
     src/tissue_stack_directions.cpp src/tissue_stack_geometry.cpp src/tissue_stack_constraints.cpp

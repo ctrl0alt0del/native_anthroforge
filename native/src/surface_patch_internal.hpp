@@ -12,6 +12,7 @@ struct Patch {
     Points points;
     Faces faces;
     std::vector<PatchKey> keys;
+    Polygon coordinates;
     std::map<PatchKey,int> indices;
 };
 Polygon project(const Points& points,uint64_t cancel);
@@ -20,4 +21,5 @@ std::vector<Triangle> triangulate(Points& points,const Polygon& projected,uint64
 Patch subdivide(const Points& points,const std::vector<Triangle>& triangles,int level,uint64_t cancel);
 void fair(Patch& patch,int boundary_count,uint64_t cancel);
 void boundary_last(Patch& patch,int count);
+void patch_coordinates(Patch& patch,const Row& row,int resolution,uint64_t cancel);
 }

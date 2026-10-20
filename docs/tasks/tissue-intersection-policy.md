@@ -34,9 +34,26 @@ Skin construction remains deferred.
   tissue and base-role targets can be open sheets. Their intended cleanup requires
   a concrete product decision; no silent cap, thickness or replacement is authorized.
 
+## Implemented checkpoint
+
+Native tissue acceptance now permits crossings while preserving finite-coordinate,
+identity and new-collapse checks. Inflation, parts, smoothing and direct/native
+relaxation share this policy; strict diagnostic validation remains unchanged.
+The production formulas and smoothing solver are untouched. README, specification,
+architecture, migration notes and computation history CH-016 record the decision.
+Attachment query cleanup and stacking changes are not implemented yet.
+
 ## Verification
 
-No implementation changes or qualification yet. Read-only source and fixture inspection.
+- Windows native build and all three CTest targets pass.
+- 29 targeted pytest cases pass (intersection policy, relaxation acceptance,
+  mesh-quality diagnostics, native inflation and earlier inflation regressions).
+- The actual user file, adopted in memory and recomputed at amounts 0.2 then 0.599,
+  now reports ready base/rest/intrinsic/final results. Original file unchanged.
+- Base and single-sided output each have 168 open boundary edges; clarification
+  requested about a temporary base-backed volume for confirmed cleanup. No answer yet.
+- Full development gate, visual and portable qualification are pending. Not merge-ready.
+
 Research: [libigl Boolean arrangements](https://libigl.github.io/tutorial/#boolean-operations-on-meshes)
 and [CGAL Polygon Mesh Processing](https://doc.cgal.org/latest/Polygon_mesh_processing/index.html).
 Splitting intersections alone (`RESOLVE`) does not remove buried faces.

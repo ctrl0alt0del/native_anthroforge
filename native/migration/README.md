@@ -223,11 +223,9 @@ editing are now integrated. Workflow tests separately cover relaxed shells, exac
 source pins, regions, Manual providers, failure retention and cancellation. Donor parity
 alone does not establish those integration contracts or anatomical correctness.
 
-Shared intrinsic acceptance additionally rejects new transverse self-intersections and
-collapsed faces after relaxation. `mesh_quality.cpp` reuses the pinned BVH/intersection
-kernel without changing raw solver parity. It compares the same canonical connectivity
-against inflated rest, reports baseline crossings separately and permits large normal
-rotations. Coplanar contact and continuous motion are not proven collision-free. Two raw
-donor relaxation fixtures and the curved Pouch diagnostic produce unusable crossing output;
-the application retains accepted geometry and reports failure. Explicit parameter changes
-recover the curved fixture; no automatic solver or preset substitution is performed.
+The October 21 intersection policy (computation history CH-016) permits tissue
+self-intersections without changing raw solver parity. Native acceptance still rejects
+nonfinite output and new collapsed faces. The separate diagnostic API compares canonical
+connectivity for crossings, reports baseline crossings separately and permits large normal
+rotations. This supersedes the earlier intrinsic rejection of crossed Pouch output;
+it adds no self-contact resolution or automatic solver/preset substitution.

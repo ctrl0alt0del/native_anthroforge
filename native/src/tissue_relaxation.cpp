@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "tissue_relaxation.hpp"
+#include "mesh_quality.hpp"
 #include <chrono>
 
 namespace af::tissue {
@@ -33,6 +34,7 @@ uint64_t af_tissue_relax(uint64_t rest,const AfTissueSource* source,const AfTiss
         const auto input=af::mesh(rest); af::tissue::validate(*input,source,settings,regions,count,report);
         std::fill(report,report+7,0); af::check_cancel(cancel);
         auto output=af::tissue::evaluate(*input,*source,*settings,regions,count,report,cancel);
+        af::quality::validate_tissue(*input,*output,cancel);
         report[6]=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-start).count();
         return af::retain(output);
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }

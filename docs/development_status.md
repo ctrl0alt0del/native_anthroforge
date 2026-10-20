@@ -229,11 +229,13 @@ source loft crosses skull geometry and is not an anatomically fitted reconstruct
 No visible test windows, desktop input or hands-on acceptance are claimed.
 
 The raw donor Pouch relaxation can introduce self-intersections on a curved source.
-Standalone intrinsic acceptance now rejects new transverse crossings/collapses,
-preserves accepted geometry and reports an Issue. The original case had 1,229 new
-crossing triangle pairs and matched donor output exactly. Explicit thickness/sag
-edits recover a usable shell. Large normal rotations alone are allowed. This check
-is not general contact resolution, and does not establish collision-free motion.
+The original case had 1,229 new crossing triangle pairs and matched donor output
+exactly. The initial release rejected them. The October 21 product decision supersedes
+that rejection: tissue crossings are allowed without changing the solver, while finite
+output and new-collapse checks remain. [CH-016](computation_history.md#ch-016--permit-tissue-self-intersections-without-repairing-inflation)
+and the [active task](tasks/tissue-intersection-policy.md) separate current source
+validation from pending downstream and packaged qualification. This policy does not
+establish collision-free geometry or motion.
 
 Profiler reports record preparation, native calls, stage tasks, publication, hidden
 frames, invalidation and overlapping memory owners. Counterbalanced cache trials

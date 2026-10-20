@@ -60,6 +60,14 @@ static void inspect(const Mesh& before,const Mesh& after,int64_t* counts,uint64_
     counts[0]=int64_t(old.size());
     for(auto crossing:next) if(!old.count(crossing)) ++counts[1];
 }
+void validate_tissue(const Mesh& before,const Mesh& after,uint64_t cancel) {
+    pair::require(before.vertices.rows()==after.vertices.rows()&&before.corners==after.corners&&before.offsets==after.offsets,
+        "Deformation quality requires identical vertex and polygon identities.");
+    pair::require(after.vertices.allFinite(),"NUMERICAL_FAILURE: tissue deformation produced nonfinite coordinates.");
+    int64_t counts[4]{}; faces(before,after,counts,cancel);
+    if(counts[2]) throw std::runtime_error("Unusable deformation: "+std::to_string(counts[2])+
+        " collapsed faces. Adjust thickness, relaxation or constraints; no geometry was accepted.");
+}
 void validate(const Mesh& before,const Mesh& after,uint64_t cancel) {
     int64_t counts[4]{}; inspect(before,after,counts,cancel);
     if(counts[1]||counts[2]) throw std::runtime_error(

@@ -3,7 +3,7 @@
 from typing import Any
 
 from anthroforge.core.points import Anchor
-from anthroforge.native import construction, mesh_quality
+from anthroforge.native import construction
 from anthroforge.native import tissue_relaxation as native
 
 from . import surface_providers, tissue_region_goals
@@ -39,5 +39,4 @@ def evaluate(engine: Any, document: Any, resources: Any, item: Any, cancel: int)
     result, diagnostic = native.evaluate(
         mesh, source(engine, document, resources, item), item, cancel, goals
     )
-    mesh_quality.validate(mesh, result, cancel)
     return TissueOutput(mesh=result, diagnostics=(diagnostic,))

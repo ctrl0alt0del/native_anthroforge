@@ -6,6 +6,15 @@ the [implementation plan](implementation_022.md), and [task status](tasks/unifie
 
 ## Release contract
 
+**Intersection policy (2026-10-21): self-intersections within one TissueVCP are
+intentionally allowed.** Inflation and height smoothing keep their existing numerical
+behavior; they do not untangle, Boolean-repair or replace the evaluated tissue.
+This is a revisitable product decision, not evidence that every downstream operation
+is insensitive to intersections. Investigate concrete downstream bugs before revising
+it. Separate tissues remain separate. Skin handling will be decided with skinning.
+Implementation and downstream-query qualification are tracked in
+[the active task](tasks/tissue-intersection-policy.md).
+
 Deliver production tissue construction, anatomical attachments, inflation,
 relaxation, branches, cropping and stacking in desktop and Qt-free headless clients.
 Mirroring, Draft Skin, Blender-project conversion, anatomical reconstruction or
@@ -171,10 +180,11 @@ stages; combining them adds no new volume-preservation or physical-contact guara
   unrelated valid components continue. No incomplete component can wait indefinitely.
 - `ITERATION_LIMIT` is a usable current result with a warning when the native contract
   allows it; distinguish it from numerical failure and successful convergence.
-- A relaxed candidate introducing transverse self-intersections or collapsed faces is
-  unusable and fails intrinsic acceptance. Large normal rotation alone is not failure.
-  This is a geometry check, not self-contact resolution or a guarantee of collision-free
-  motion between iterations. It preserves reported pre-existing crossings separately.
+- Tissue inflation, height smoothing and relaxation may introduce self-intersections.
+  Nonfinite output and newly collapsed faces remain failures. Large normal rotation
+  alone is not failure. Explicit geometry diagnostics can still count crossings, but
+  those counts do not reject intrinsic tissue output. This supersedes the earlier
+  rejection of transverse crossings; it adds no self-contact or repair computation.
 - Preserve Live/On Release/Manual, dispatch-time inputs, reservations, safe cancellation,
   stale-result rejection, dependency registration, undo/redo and save checkpoint semantics.
 - Inflation changes reuse accepted source paths; stacking-only changes reuse intrinsic

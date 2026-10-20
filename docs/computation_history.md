@@ -118,7 +118,7 @@ Presence in this inventory does not make every mode available on every source.
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
 | Q01 | Interactive picking/snapping: double-precision ray/surface hits, native outward snap margins and nonnegative user offsets, cached component queries, path picking and displayed-revision agreement. Exact measurement hits are not offset. | [ray_queries.cpp](../native/src/ray_queries.cpp), [surface_snap.cpp](../native/src/surface_snap.cpp), [component_index.cpp](../native/src/component_index.cpp), [path_presentation.cpp](../native/src/path_presentation.cpp) | [surface snapping](../tests/test_surface_snapping.py), [component picking](../tests/test_component_picking.py), [surface picking](../tests/test_surface_picking.py), [held input](../tests/test_held_input.py) |
-| Q02 | Deformation quality: compare canonical meshes for new transverse crossings and collapsed faces, distinguishing coincident boundary contact; large normal rotation is informational. Shared by inflation/smoothing/relaxation. | [mesh_quality.cpp](../native/src/mesh_quality.cpp) | [mesh quality](../tests/test_mesh_quality.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
+| Q02 | Tissue acceptance permits self-intersections; checks finite coordinates, canonical identity and new collapsed faces. Explicit diagnostics retain transverse-crossing counts and strict validation; large normal rotation is informational. Inflation/smoothing/relaxation use native tissue acceptance (CH-016). | [mesh_quality.cpp](../native/src/mesh_quality.cpp) | [mesh quality](../tests/test_mesh_quality.py), [intersection policy](../tests/test_tissue_intersection_policy.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
 | Q03 | Advisory path collision: check accepted authored-engine Fiber centerline segments against eligible surfaces, with attachment-contact handling and incomplete-provider reporting. Does not silently reroute the curve. | [path_collisions.cpp](../native/src/path_collisions.cpp), [fiber collision Issues](../src/anthroforge/application/issues/fiber_collisions.py) | [path collisions](../tests/test_path_collisions.py), [fiber collision Issues](../tests/test_fiber_collision_issues.py) |
 | Q04 | Measurements: resolve retained barycentric surface witnesses to world XYZ and compute straight-line distance. Camera framing/axis-view/restore calculations preserve gesture continuity. | [measurement.cpp](../native/src/measurement.cpp), [desktop view tools](../src/anthroforge/desktop) | [measurements](../tests/test_measurements.py), [view framing](../tests/test_view_framing.py), [view gestures](../tests/test_view_gestures.py) |
 | I01 | Image decoding/preparation: PNG/JPEG decode, EXIF orientation, asset sharing and native RGBA tile preparation, executed as background creation work. | [image assets](../src/anthroforge/application/image_assets.py), [image.cpp](../native/src/image.cpp) | [reference images](../tests/test_reference_images.py) |
@@ -399,6 +399,9 @@ trials and trace retention limits. Raw comparisons are under local
   No sampling control or Manual-source semantics were removed.
 
 ### CH-009 — Validate actual geometry rather than normal rotation
+
+Tissue crossing-rejection policy superseded by CH-016; the diagnostic classifier
+and collapsed-face protection remain. Evidence below describes the historical policy.
 
 - **2026-10-20; 0.2.2; Qualified.** Q02, T03, T11, T13.
   Baseline `dda3af4`; correction `3a13625`.
@@ -704,3 +707,33 @@ resolved inflation/smoothing defect when assessing the fixture.
   mesh-query accelerator. Existing open, outer-boundary, nonnested branch constraints
   remain. Generic branches are ordinary curves; attached conversion remains explicit or
   part of Create Tissue. No physical desktop-input or visible-window acceptance is claimed.
+
+### CH-016 — Permit tissue self-intersections without repairing inflation
+
+- **2026-10-21; 0.2.2; Implemented, integration qualification pending.** Q02,
+  T03, T11 and T13. Baseline `6918888`; work on `codex/tissue-intersection-policy`.
+- **Before/problem:** `tissue_create.anthroforge` at Control Point amount 0.599,
+  depth zero, fails before smoothing with 106 newly detected crossings and no collapsed
+  faces. The user explicitly accepts these intersections and wants the existing
+  inflation/smoothing mathematics retained. This is a product-policy change, not a
+  claim that the crossed surface has been repaired.
+- **After/why:** the shared native tissue acceptance function checks canonical
+  connectivity, finite coordinates and new collapsed faces. Crossing counts remain
+  available through the explicit diagnostic API but do not reject inflation,
+  smoothing or relaxation. Relaxation invokes this policy in native evaluation so
+  headless/direct callers and the application agree. No field, solver, tolerance,
+  control-point radius, direction, topology or smoothing constraints change.
+- **Evidence:** 29 targeted tests pass, including unchanged addon inflation witnesses,
+  smoothing bounds/fixed vertices, crossed Pouch relaxation with exact backing,
+  previous valid inflation regressions, cancellation and strict diagnostic checks.
+  In-memory evaluation of the unchanged user project at 0.2 then 0.599 now publishes
+  ready base/rest/intrinsic/final outputs. No project file was overwritten.
+- **Limits:** attachment Boolean cleanup and ambiguous stacking queries are separate
+  downstream work, not completed by this acceptance change. Open-sheet Boolean
+  semantics need clarification: the test's base and single-sided tissue each have
+  168 boundary edges. No silent capping or solid interpretation has been selected.
+  Skin handling remains deferred; no claim of downstream intersection immunity.
+- [Regression fixture](../tests/fixtures/tissue/control_point_crossings.json),
+  [tests](../tests/test_tissue_intersection_policy.py),
+  [active task](tasks/tissue-intersection-policy.md). Raw local evidence is in
+  `build/tissue-create-diagnosis/` and `build/tissue-intersection-policy/`.

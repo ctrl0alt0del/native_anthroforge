@@ -15,8 +15,12 @@ It uses an owned material mesh and physical mass/stiffness operators; no numeric
 work or callbacks move into Python. The pinned addon kernels remain unchanged.
 `smoothing_core.cpp` adapts their field preparation and QP for standalone publication,
 while the shared `mesh_quality` boundary owns complete-mesh deformation acceptance.
-Inflation, smoothing and relaxation use that boundary. Its plane-side predicate
-separates transverse crossings from coincident shell boundary contact. Refinement
+Inflation, smoothing and relaxation use its tissue acceptance policy: finite output
+and no new collapsed faces, with self-intersections allowed. Its separate diagnostic
+plane-side predicate still distinguishes transverse crossings from coincident shell
+boundary contact; strict diagnostic validation remains available without governing
+tissue publication. Relaxation acceptance is native so direct and application callers
+share the same rule. Refinement
 subdivides existing material intervals instead of overlaying a second uniform grid.
 Document settings, topology correspondence, scheduling and publication contracts remain
 unchanged; the [repair record](tasks/muscle-height-smoothing.md) tracks qualification.

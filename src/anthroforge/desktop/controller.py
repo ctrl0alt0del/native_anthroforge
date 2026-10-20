@@ -22,6 +22,7 @@ from .models import RenderModel
 from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
 from .routing_choices import RoutingChoices
+from .surface_creation import SurfaceCreation
 from .tissue_region_tools import TissueRegionTools
 
 
@@ -69,6 +70,7 @@ class Controller(QObject):
         self.creation_selection = CreationSelection(self)
         self.routing_choices = RoutingChoices()
         self.tissue_region_tools = TissueRegionTools(self)
+        self.surface_creation = SurfaceCreation(self)
 
     def memory_owners(self, owners):
         for attribute in ("render_model", "path_model", "image_model"):
@@ -88,6 +90,7 @@ class Controller(QObject):
         self.initialize_image_layers()
         self.render_model.activated.connect(self.activate_geometry)
         self.path_model.activated.connect(self.activate_geometry)
+        self.path_model.activated.connect(self.drawing_tools.branch.invalidate)
         self.image_model.activated.connect(self.activate_geometry)
         prepare_picking(self)
         prepare_images(self)
@@ -271,6 +274,10 @@ class Controller(QObject):
         from .construction_creation import surface
 
         surface(self, kind)
+
+    @Property(QObject, constant=True)
+    def surfaceCreation(self):
+        return self.surface_creation
 
     @Slot(str)
     def editConstruction(self, target):

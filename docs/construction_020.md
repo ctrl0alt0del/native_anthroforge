@@ -18,6 +18,21 @@ Closed placement requires three points; an early finish preserves the draft.
 Draw finishes on mouse release and stays ready for another stroke. Each completed curve
 is one undo action. Cursor settings support numeric coordinates and surface placement.
 
+**Right-click Place Points → Place Branched Points** to start a connected curve. A marker
+previews the closest visible, pickable control point on any curve or Fiber in the workspace.
+Click to choose that root, then place the remaining points normally. The completed curve
+shares a junction with its source; one Undo removes the complete creation. Backspace can
+remove the provisional root so you can choose another. Escape leaves the source untouched.
+
+Select the main curves and their connected branch curves, then click **Surface**. Unique
+branch groups are detected automatically. If the connections permit several groupings,
+assign curves to Main loft / Branch 1 / Branch 2 in the dialog and create once. A surface
+branch needs at least two curves rooted at distinct interior control points of an outer
+main curve; one connected curve alone does not define a branch surface. Closed/nested
+branches and overlapping root intervals remain unsupported. All-Fiber selections produce
+a Membrane; converting a generic branched Surface to a Membrane also copies its curves to
+Fibers with their shared junctions preserved.
+
 Drawing depth can use the view plane through the cursor, visible SCP surfaces, or the
 selected reference image plane. Surface options include selection filtering, first-point
 planes, normal offsets and radius-relative offsets. Choose REFIT, SPLIT or exact POLYLINE.

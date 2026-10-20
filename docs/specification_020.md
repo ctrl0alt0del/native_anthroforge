@@ -121,6 +121,18 @@ Topology locks traverse every consumer with incoming anatomical bindings, includ
 Report locking consumers and unlock when bindings are removed. No topology remapping is
 introduced. Deformation resolves stable authored membership to native indices at dispatch.
 
+### Branched point placement
+
+Right-click the Place Points toolbar button to choose Place Points or Place Branched
+Points. The button remembers the chosen variant. Branched placement previews the nearest
+authored control point in screen space across visible, pickable curves/Fibers in the
+current workspace, independent of selection; points behind the camera are excluded.
+First click records a provisional root reference. Subsequent clicks retain normal
+placement, Shift continuation, Ctrl snapping, Backspace and cancellation behavior.
+The view-depth plane starts at the root; explicit reference-image depth remains intact.
+Completion creates one ordinary Curve and creates or reuses the root junction in one
+undo action. The original curve is not moved; no document edits occur on cancellation.
+
 ## Fibers and shared junctions
 
 Fiber is an actual subclass of Curve, adds anatomical binding capabilities and honors the
@@ -172,6 +184,14 @@ branched open lofts. Mixed open/closed loft inputs fail validation. Retain addon
 constraints; closed/nested branch expansion is out of scope.
 
 Branches reference explicit junction/point identities, not near-position welding.
+The Surface action resolves branch groups from selected curves' junctions. Unique valid
+groups create immediately. Multiple valid groups open a virtualized source/group editor;
+confirmation creates once and cancellation makes no edits. Main curves retain selection
+order and branch curves follow root order, with endpoint direction resolved automatically.
+Each branch requires at least two distinct interior roots on an outer main curve. Invalid
+connected assemblies report why they cannot be built, rather than silently creating a loft.
+All-Fiber inputs create a Membrane. Ordinary/mixed inputs create a Surface and retain the
+existing explicit or Create Tissue conversion to attached construction.
 Closed-loft creation aligns and creates immediately in one undo action, then persists
 per-source direction and start correspondence. Realign is an explicit undoable action;
 ordinary deformation cannot recalculate correspondence. Optional API previews remain

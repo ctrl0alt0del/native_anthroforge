@@ -38,11 +38,13 @@ Item {
         }
     }
     Rectangle {
+        objectName: "placementPreview"
         readonly property var point: overlay.tool.state.hover
         readonly property point projected: { const camera=viewport.cameraState, distance=viewport.distance; return point.length ? viewport.projectPoint(point[0],point[1],point[2]) : Qt.point(-100,-100); }
         visible: overlay.active && point.length===3
-        x: projected.x-4; y: projected.y-4; width: 8; height: 8; radius: 4
-        color: Theme.curveColor; border.color: Theme.text
+        x: projected.x-width/2; y: projected.y-height/2
+        width: overlay.tool.state.branched && overlay.tool.state.count===0 ? 14 : 8; height: width; radius: width/2
+        color: Theme.curveColor; border.color: Theme.text; border.width: 2
     }
     CursorMarker { viewport: overlay.viewport }
     MouseArea {
@@ -58,6 +60,7 @@ Item {
             viewport.pointerPosition=Qt.point(mouse.x,mouse.y);
             const ray=viewport.worldRay(mouse.x,mouse.y), normal=viewport.worldRay(width/2,height/2).direction;
             const values=ray.origin.concat(ray.direction,[mouse.x,mouse.y,overlay.tool.state.options.radius]);
+            overlay.tool.setProjection(viewport.cameraPosition(),!viewport.orthographic);
             overlay.tool.setSnapping(viewport.keyboard.matches("snapSurface",mouse.modifiers));
             if(press) overlay.tool.click(values,normal,viewport.keyboard.matches("continuePlacement",mouse.modifiers));
             else overlay.tool.pointer(values,normal,false);
@@ -66,6 +69,7 @@ Item {
         onPositionChanged: mouse => update(mouse,false)
         onReleased: mouse => { update(mouse,false); overlay.tool.release(); }
         onCanceled: { if(overlay.tool.state.painting) overlay.tool.clearStroke(); }
+        Connections { target: viewport; function onCameraStateChanged() { pointer.preview(); } function onDistanceChanged() { pointer.preview(); } }
         Connections {
             target: viewport.keyboard
             function onModifiersChanged() { pointer.preview(); }

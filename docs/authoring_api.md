@@ -607,6 +607,25 @@ junctions on an outer main boundary. Roots must be ordered, interior and nonover
 closed/nested branches are rejected. `surface.branch.remove(target, branch)` preserves source
 curves. Making a branched consumer independent copies its complete source/junction assembly.
 
+### Direct branched construction
+
+`curve.branch.create(source={curve, point}, points=[{position, ...}, ...],
+name="Branch curve", owner="", engine="BEZIER", closed=false)` creates an ordinary curve
+with world-space authored points. Its first position is resolved from the chosen existing
+authored control, and its junction is created/reused atomically. The source must be editable
+in the active workspace; native source frames and accepted Fiber inputs remain authoritative.
+The operation preserves the source shape and forms one undo action. Cancellation before
+submission is presentation-only. Regular `curve.create` behavior is unchanged.
+
+`surface.grouping(curves=[...])` inspects two or more ordered curves without mutation,
+returning `ambiguous`, named `curves`, and a suggested `plan` with `main` and `branches`.
+Each branch is `{boundary: curve_id, curves: [...]}`. `surface.create(kind="AUTO", curves=[...])`
+creates a patch for one closed curve, an ordinary loft for unconnected compatible curves,
+or an inferred branched loft. Ambiguous connections require the explicit `grouping=plan`
+argument; no provisional surface is published. A caller may edit the suggested grouping;
+the complete selected source set and existing branch restrictions are revalidated.
+All-Fiber source sets produce a Membrane through the same operation and evaluator.
+
 ### Tissue part and side operations
 
 `tissue.inflation(target, changes, part="main", side="a")` edits one accepted material

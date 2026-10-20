@@ -2,7 +2,7 @@
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
-from . import drawing_context
+from . import branch_placement, drawing_context
 from .image_tools import context_owner
 
 DEFAULTS = dict(
@@ -34,6 +34,8 @@ class DrawingTools(QObject):
         self.painting, self.hover, self.context, self.created = False, [], None, []
         self.options = dict(DEFAULTS)
         self.snapping = False
+        self.branch = branch_placement.BranchPlacement(controller)
+        self.placement_mode = "POINTS"
 
     @Property("QVariantMap", notify=changed)
     def state(self):
@@ -44,6 +46,8 @@ class DrawingTools(QObject):
             count=self.stroke.count if self.stroke else 0,
             hover=self.hover,
             options=self.options,
+            branched=self.mode == "BRANCH",
+            placement_mode=self.placement_mode,
         )
 
     @Slot(str)
@@ -54,7 +58,9 @@ class DrawingTools(QObject):
         ):
             return
         self.cancel()
-        self.mode = mode if mode in ("DRAW", "POINTS", "CURSOR") else ""
+        self.mode = mode if mode in ("DRAW", "POINTS", "BRANCH", "CURSOR") else ""
+        if self.mode in ("POINTS", "BRANCH"):
+            self.placement_mode = self.mode
         self.context = self.signature()
         self.controller.authoring.setEditing(False)
         self.controller.cancelViewportTools(self)
@@ -72,6 +78,7 @@ class DrawingTools(QObject):
 
     def clear_stroke(self):
         self.stroke, self.leases, self.hover, self.painting = None, (), [], False
+        self.branch.reset()
         self.resetPreview.emit()
         self.changed.emit()
 
@@ -128,6 +135,10 @@ class DrawingTools(QObject):
     def setSnapping(self, enabled):
         self.snapping = enabled
 
+    @Slot("QVariantList", bool)
+    def setProjection(self, origin, perspective):
+        self.branch.camera, self.branch.perspective = origin, perspective
+
     @Slot("QVariantList", "QVariantList", bool)
     def pointer(self, ray, normal, press):
         if not self.mode or self.controller.session.waiting_save:
@@ -145,9 +156,11 @@ class DrawingTools(QObject):
         self.changed.emit()
 
     def update_stroke(self, ray, normal, press):
+        if self.mode == "BRANCH" and not self.branch.source:
+            return branch_placement.update(self, ray, normal, press)
         if self.stroke is None or (press and self.stroke.count == 0):
             self.stroke = drawing_context.capture(self, normal)
-        self.stroke.snapping(self.snapping and self.mode == "POINTS")
+        self.stroke.snapping(self.snapping and self.mode in ("POINTS", "BRANCH"))
         self.hover = self.stroke.probe(ray)[:3]
         if press or (self.mode == "DRAW" and self.painting):
             start = self.stroke.count
@@ -175,7 +188,7 @@ class DrawingTools(QObject):
         before = self.stroke.count if self.stroke else 0
         self.pointer(ray, normal, True)
         count = self.stroke.count if self.stroke else 0
-        if self.mode == "POINTS" and count > max(1, before) and not continue_placement:
+        if self.mode in ("POINTS", "BRANCH") and count > max(1, before) and not continue_placement:
             self.finish()
 
     @Slot()
@@ -188,7 +201,7 @@ class DrawingTools(QObject):
         result = self.submit(samples, args)
         if result:
             self.created.append(result if isinstance(result, str) else result["object_id"])
-            if self.mode == "POINTS":
+            if self.mode in ("POINTS", "BRANCH"):
                 self.mode = ""
             self.clear_stroke()
 
@@ -198,7 +211,7 @@ class DrawingTools(QObject):
         self.controller.notify()
 
     def submit(self, samples, args):
-        if self.mode == "POINTS":
+        if self.mode in ("POINTS", "BRANCH"):
             args.update(
                 points=drawing_context.point_records(samples), closed=self.options["closed"]
             )
@@ -206,15 +219,23 @@ class DrawingTools(QObject):
                 values=[0, 0, 0, 0, 0, 0, 1, 1, 1],
                 engine="POLYLINE" if self.options["method"] == "POLYLINE" else "BEZIER",
             )
-            return self.controller.run("curve.create", args)
+            return self.submit_points(args)
         settings = drawing_context.finish_settings(self)
         return self.controller.run("curve.draw", dict(args, points=samples, settings=settings))
 
     @Slot()
     def removeLast(self):
-        if self.mode != "POINTS" or self.stroke is None:
+        if self.mode not in ("POINTS", "BRANCH") or self.stroke is None:
             return
         self.stroke.pop()
+        if not self.stroke.count:
+            self.branch.source = {}
         self.resetPreview.emit()
         self.pointsAdded.emit(self.stroke.read().tolist())
         self.changed.emit()
+
+    def submit_points(self, args):
+        if self.mode == "BRANCH":
+            args.pop("values", None)
+            return self.controller.run("curve.branch.create", dict(args, source=self.branch.source))
+        return self.controller.run("curve.create", args)

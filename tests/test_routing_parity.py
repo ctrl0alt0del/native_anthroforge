@@ -39,9 +39,15 @@ def collider_meshes(session, case):
     ]
 
 
-@pytest.mark.parametrize("case", CASES, ids=lambda c: c["name"])
+@pytest.mark.parametrize(
+    "case", [case for case in CASES if case["name"] != "bound-box"], ids=lambda c: c["name"]
+)
 def test_production_routing_parity(session, case):
     meshes, spec = inputs(session, case)
     path, report = routing.evaluate(session.engine, spec)
     np.testing.assert_allclose(path.array()[:, :3], case["result"], atol=1e-10, rtol=0)
     assert report.counters[7] == (1 if case["closed"] else len(case["points"]) - 1)
+
+
+# The donor's bound-box output crosses its owner surface at both pins. It is retained
+# unchanged as counterevidence in test_snapped_routing, not accepted as desired geometry.

@@ -129,6 +129,18 @@ anatomical route correctness or complete release acceptance.
 
 ## Standalone routing contact and continuation corrections
 
+The October 20 snapped-cube regression exposed inconsistent edge validation:
+`routing_search.cpp` called the donor's owner-exempt surface test directly, bypassing
+the standalone planner's solid-interior chord rejection. Search now calls the same
+`clear` policy as shortcutting and anchor filtering. No donor kernel was changed.
+
+`tests/fixtures/routing/snapped_cube.json` records the exact saved points, cube topology,
+transform and source hash. Segment checks cover bound/unbound pins, three resolutions
+and warm continuation. The donor's existing `bound-box` result also cuts its owner at
+the first/last segments; its fixture remains unchanged as evidence of an intentional
+correction. `test_snapped_routing.py` proves that reference intersects and the new result
+does not. Other donor and skull numerical parity checks remain exact.
+
 The `solver_test.anthroforge` regression is captured compactly in
 `tests/fixtures/routing/surface_pins.json`, including its source hash and accepted warm
 path. Unbound ordinary curve knots may touch explicitly selected surfaces. Native nearest

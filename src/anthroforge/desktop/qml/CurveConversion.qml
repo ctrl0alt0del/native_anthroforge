@@ -19,15 +19,17 @@ ColumnLayout {
     readonly property bool running: ours && ["queued","running"].includes(preview.state)
     readonly property bool expanded: expand.checked
     readonly property var authoredPoints: curve.points || []
+    readonly property string activeEngine: curve.engine || ""
     readonly property var pointRows: { const revision=workspace.state.revision; return workspace.conversionPoints(curve.id || "").map(r=>Object.assign({},r,{chosen:r.locked || chosen.includes(r.key)})); }
     Layout.fillWidth: true; spacing: Theme.gap
     onCurveChanged: synchronizeSource()
     onAuthoredPointsChanged: synchronizeSource()
+    onActiveEngineChanged: synchronizeEngine()
     Component.onCompleted: synchronizeSource()
     function synchronizeEngine() {
         if(!engine) return;
-        if(sourceId!==(curve.id || "") || sourceEngine!==(curve.engine || "")) {
-            sourceEngine=curve.engine || "";
+        if(sourceId!==(curve.id || "") || sourceEngine!==activeEngine) {
+            sourceEngine=activeEngine;
             engine.currentIndex=Math.max(0,engine.model.indexOf(sourceEngine));
         }
     }

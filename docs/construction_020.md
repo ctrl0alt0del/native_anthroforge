@@ -28,6 +28,12 @@ Select the curve and enter editing to move authored points and handles. G/R/S, S
 insertion, Ctrl surface snapping, wheel offset, axis views 1/2/3 and camera restore 4 retain
 their existing behavior. Entering edit mode never refits or resamples the curve.
 
+The inspector shows **Active engine**. To enable routing, enter **Edit Curve**, open
+**Change path engine**, choose **ROUTED**, click **Preview conversion**, then **Use ROUTED**.
+The dropdown selects a conversion target; neither selecting it nor previewing changes the
+active engine. The preview is explicitly marked as not applied. Snapping points or creating
+a Fiber does not switch engines; a new Fiber preserves its source curve's engine.
+
 **Change path engine** previews a conversion before acceptance. BEZIER exposes handles;
 POLYLINE keeps exact segments; ROUTED solves between authored structural points around
 automatic SCP obstacles. Routing conversion retains all authored points by default; Edit

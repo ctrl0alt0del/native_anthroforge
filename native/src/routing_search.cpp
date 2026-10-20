@@ -53,13 +53,6 @@ static std::vector<int> astar(const Planning& plan,const SearchGraph& graph) {
     }
     return {};
 }
-static bool test_edge(const Planning& plan,Vec a,Vec b,int first,int last) {
-    const Vec points[]{a,b}; const int64_t edge[]{0,1}; int allowed=0,blocker=-1; double minimum=0;
-    kernel::AfBatchResult result{};
-    kernel::af_world_validate_edges(plan.world.collision.get(),reinterpret_cast<const double*>(points),
-        edge,&first,&last,1,plan.span,plan.threshold,&allowed,&blocker,&minimum,&result);
-    return allowed!=0;
-}
 static bool validate(const Planning& plan,const Route& points,SearchGraph& graph,const std::vector<int>& path) {
     bool valid=true;
     for(size_t i=1;i<path.size();++i) {
@@ -67,7 +60,7 @@ static bool validate(const Planning& plan,const Route& points,SearchGraph& graph
         const auto& row=graph.rows[a];
         const auto edge=std::find_if(row.begin(),row.end(),[b](const Link& link){return link.next==b;});
         auto& proof=graph.proofs[edge->proof];
-        if(!proof) proof=test_edge(plan,points[a],points[b],a==0?plan.first:a==1?plan.last:0,
+        if(!proof) proof=clear(plan,points[a],points[b],a==0?plan.first:a==1?plan.last:0,
                                   b==0?plan.first:b==1?plan.last:0)?1:-1;
         valid=valid&&proof>0;
     }

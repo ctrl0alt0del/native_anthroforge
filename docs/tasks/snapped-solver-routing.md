@@ -3,7 +3,7 @@
 - Task branch: `codex/snapped-solver-routing`
 - Integration branch: `main`
 - Starting revision: `248cc66f62684c7218253335777aaf75f2e20949`
-- Status: investigation in progress
+- Status: fixes implemented; full gate and packaged delivery pending
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat
 
@@ -22,13 +22,16 @@ accepted routing conversion; it does not establish why the user's workflow left 
 
 The user confirmed selecting ROUTED without Preview/Accept. The UI change now labels
 the active engine, the conversion target and unapplied preview separately; its selector
-synchronizes to the selected object's actual engine. Desktop qualification remains pending.
+synchronizes to the selected object's actual engine, including undo/redo and selection
+changes. Background full-QML qualification on the original project passes.
 
 Explicit conversion revealed a separate numerical defect on these exact inputs: no sampled
 point is interior, but the first/last segments cross the cube near the pins. The independent
 path collision checker reports segment 0. Native trace shows the planner initially accepts
 the direct chord, its subdivided handoff fails, and SQP's owner-contact exemption permits
-an invalid result. The exact cause of the direct-chord acceptance is under investigation.
+an invalid result. The cause was the graph search's separate edge checker: it bypassed
+the planner's solid-interior owner-chord rejection. It now calls the existing shared
+`clear` policy. No new solver, Python geometry loop or migrated kernel change is needed.
 
 Rejected experiment: removing adjacent-edge expansion from owner_span made conversion
 fail and changed four existing parity cases. Those changes were reverted. Do not treat
@@ -41,10 +44,21 @@ conclusions about native solver correctness or the UI.
 
 ## Verification and next actions
 
-1. Diagnose direct-chord acceptance and restore a valid corridor for the exact saved scene.
-2. Remove temporary native diagnostics; add complete segment regression coverage.
-3. Qualify conversion controls, API, GUI and packaged workflow.
-4. Record evidence, checkpoint and integrate only completed work.
+28 focused routing/architecture tests pass, including exact user pins, bound/unbound
+contacts at 32/64/128 samples, warm continuation and independent whole-segment checks.
+The original donor bound-box output fails that check; its corrected output passes.
+This intentional geometry correction is documented in native/migration/README.md.
+All other donor/skull cases remain numerically identical. Temporary diagnostics removed.
+
+Full-QML `tools/snapped_routing_acceptance.py` passes on the original project, exercising
+selection/preview without document edits, explicit application, curve/fiber independence,
+undo/redo, selector synchronization and cancellation without QML warnings. Captures inspected;
+this offscreen platform does not render the 3D scene. Separate hidden-GPU captures cover shape.
+
+1. Run the full development gate and existing routing GUI checks.
+2. Package and qualify in an ignored build directory while the user's installed app runs.
+3. Deliver the corrected separate project and replace the canonical build after it closes.
+4. Update evidence, merge and push the validated task.
 
 ## Recovery inputs
 

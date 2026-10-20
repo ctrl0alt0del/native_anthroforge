@@ -4,10 +4,16 @@
 
 namespace af::tissue {
 std::vector<double> refine_axis(const std::vector<double>& source,int resolution,bool closed) {
-    std::vector<double> values=source;
-    for(int i=0;i<resolution;++i) values.push_back(double(i)/(resolution-int(!closed)));
-    std::sort(values.begin(),values.end());
-    values.erase(std::unique(values.begin(),values.end(),[](double a,double b){return std::abs(a-b)<1e-12;}),values.end());
+    auto knots=source; std::sort(knots.begin(),knots.end());
+    knots.erase(std::unique(knots.begin(),knots.end(),[](double a,double b){return std::abs(a-b)<1e-12;}),knots.end());
+    std::vector<double> values;
+    for(size_t i=0;i<knots.size();++i) {
+        values.push_back(knots[i]);
+        if(i+1==knots.size()&&!closed) break;
+        const double end=i+1==knots.size()?1:knots[i+1],length=end-knots[i];
+        const int pieces=std::max(1,int(std::ceil(length*(resolution-int(!closed))-1e-12)));
+        for(int j=1;j<pieces;++j) values.push_back(knots[i]+length*j/pieces);
+    }
     return values;
 }
 struct Coordinate { int first,second; double factor; };

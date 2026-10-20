@@ -3,6 +3,8 @@
 #include "anthroforge/tissue.h"
 #include "af_smoothing/height.h"
 #include "material_domain.hpp"
+#include "tissue_height.hpp"
+#include "mesh_quality.hpp"
 
 namespace af::tissue {
 static void compatible(const Mesh& base,const Mesh& own,int count) {
@@ -23,11 +25,9 @@ static void metrics(const AF_HeightReport& r,double* out) {
 }
 static Vertices smooth_part(const Mesh& base,const Vertices& own,const std::vector<int64_t>& faces,
                            const std::vector<int64_t>& labels,int part,const double* settings,double* report) {
-    Vertices output(own.rows(),3); AF_HeightReport result{};
-    const int code=af_height_smooth(base.vertices.data(),own.data(),int(own.rows()),faces.data(),
-        int(labels.size()),3,labels.data(),part,settings[0],settings[1],settings[2],output.data(),&result);
+    AF_HeightReport result{};
+    auto output=smooth_heights(base.vertices,own,faces,labels,part,settings,result);
     metrics(result,report);
-    if(code) throw std::runtime_error(std::string("Height smoothing: ")+result.message);
     return output;
 }
 static std::shared_ptr<Mesh> smooth(const Mesh& base,const Mesh& own,const double* settings,int count,double* reports,uint64_t cancel) {
@@ -42,7 +42,9 @@ static std::shared_ptr<Mesh> smooth(const Mesh& base,const Mesh& own,const doubl
         vertices=smooth_part(base,vertices,faces,labels,part,s+1,report);
         check_cancel(cancel);
     }
-    return deform_mesh(own,vertices,cancel,true);
+    auto result=deform_mesh(own,vertices,cancel,true);
+    quality::validate(own,*result,cancel);
+    return result;
 }
 }
 uint64_t af_tissue_smooth(uint64_t base,uint64_t own,const double* settings,int count,double* reports,uint64_t cancel) {

@@ -3,7 +3,7 @@
 - Task branch: `codex/muscle-height-smoothing`
 - Integration branch: `main`
 - Starting revision: `dda3af44d2899bd27da95eb20c75ca15d743260e`
-- Status: correction authorized; addon reproduction complete; numerical experiments in progress
+- Status: native correction implemented; focused checks pass; release qualification pending
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -80,8 +80,8 @@ inflation as a complete workaround.
 3. Add representative regression coverage; validate GUI, persistence and packaging.
 4. Run the development gate, checkpoint/push, then validated merge/push.
 
-No production code, release package, or original project has changed. Full development
-and package gates are not run: this is a diagnostic checkpoint, not a delivered fix.
+Production changes now exist on the task branch; no release package or original
+project has changed. Full development and package gates remain pending.
 The original SHA256 was checked again after the experiments and is unchanged.
 
 ## Recovery inputs
@@ -133,3 +133,34 @@ rejects. This is **not yet a production correction**: direction scale, shape qua
 refinement sensitivity, independent intersection checks and regression qualification
 remain unresolved. The old local stability heuristic also introduces sharp height
 changes around the bend; its effect is being isolated rather than silently retained.
+
+## Implemented candidate (not released)
+
+- Distributed inflation now computes area-weighted normals and solves screened
+  diffusion with physical distance equal to the authored inflation amount. It
+  normalizes directions and applies the unchanged amount/edge/taper controls.
+  The old local stability height reduction is removed. Donor files remain unchanged.
+- Refinement subdivides existing intervals only when required by the requested
+  material density. In the reported case it preserves the 56x86 source instead
+  of introducing the ill-conditioned 78x108 overlay.
+- Height smoothing reuses pinned field/QP preparation and diagnostics, then applies
+  shared complete-mesh validation. Normal rotation alone no longer rejects a result.
+- Inflation uses the same geometry validation before publication.
+- Refinement exposed a false crossing in an existing Static PBD shell fixture.
+  Native pair 24/1127 touches at one fixed point; independent libigl reports zero
+  intersection length. A strict plane-side test now removes these false transverse
+  classifications. The PBD kernel and numerical settings were not changed.
+
+67 focused tests pass, including the saved bend at 0.02, 0.1 and 1 m, smoothing
+bounds/pins, source retention, denser refinement, rigid/scale equivariance, planar
+height, real-crossing rejection, coincident contact, relaxation, and corrected
+envelope snapshots. Original donor fixtures are preserved; revised Distributed
+snapshots are clearly identified as standalone regression evidence, not donor parity.
+
+The actual project reevaluates through the shared Session API with Base, Rest,
+Intrinsic and Final ready, no detected crossings/collapses. A texture-only GPU
+capture was inspected at `candidate-gpu.png`; the sharp inherited height depression
+is removed. The retained 1 m inflation and 0.1 boundary-band setting still produce
+a tall, steep-sided envelope; no parameters were altered to make it look smaller.
+Full gate, independent final intersection check, edit/save/undo inspection, and
+portable qualification remain outstanding. Do not merge or call this released yet.

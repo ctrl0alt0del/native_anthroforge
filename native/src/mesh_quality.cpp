@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "anthroforge/mesh_quality.h"
+#include "mesh_quality.hpp"
 #include "stacking_internal.hpp"
 
 namespace af::quality {
@@ -24,16 +25,46 @@ static void faces(const Mesh& before,const Mesh& after,int64_t* counts,uint64_t 
         else if(first.dot(second)<=0) ++counts[3];
     }
 }
+static bool straddles(const Mesh& mesh,const Triangles& triangles,int plane,int face) {
+    const auto a=triangles.row(plane),b=triangles.row(face);
+    const V3 origin=mesh.vertices.row(a[0]),u=V3(mesh.vertices.row(a[1]))-origin,v=V3(mesh.vertices.row(a[2]))-origin;
+    const V3 normal=u.cross(v).normalized();
+    double lower=INFINITY,upper=-INFINITY,scale=origin.cwiseAbs().maxCoeff();
+    for(int i=0;i<3;++i) {
+        const V3 point=mesh.vertices.row(b[i]);
+        const double distance=normal.dot(point-origin);
+        lower=std::min(lower,distance); upper=std::max(upper,distance);
+        scale=std::max(scale,point.cwiseAbs().maxCoeff());
+    }
+    const double tolerance=64*std::numeric_limits<double>::epsilon()*std::max(scale,1.);
+    return lower < -tolerance&&upper > tolerance;
+}
+static std::set<std::pair<int,int>> crossings(const Mesh& mesh,const Triangles& triangles,uint64_t token,std::atomic<bool>& cancel) {
+    const auto side=snapshot(mesh,triangles,token);
+    auto result=layer::intersections(side,side,true,cancel);
+    for(auto it=result.begin();it!=result.end();) {
+        check_cancel(token);
+        if(!straddles(mesh,triangles,it->first,it->second)||!straddles(mesh,triangles,it->second,it->first))
+            it=result.erase(it);
+        else ++it;
+    }
+    return result;
+}
 static void inspect(const Mesh& before,const Mesh& after,int64_t* counts,uint64_t token) {
     pair::require(before.vertices.rows()==after.vertices.rows()&&before.corners==after.corners&&before.offsets==after.offsets,
         "Deformation quality requires identical vertex and polygon identities.");
     std::fill(counts,counts+4,0); faces(before,after,counts,token);
     if(!before.triangles.rows()) return;
-    auto first=snapshot(before,before.triangles,token),second=snapshot(after,before.triangles,token);
     std::atomic<bool> idle{false}; auto& cancel=token?reinterpret_cast<Cancellation*>(token)->cancelled:idle;
-    const auto old=layer::intersections(first,first,true,cancel),next=layer::intersections(second,second,true,cancel);
+    const auto old=crossings(before,before.triangles,token,cancel),next=crossings(after,before.triangles,token,cancel);
     counts[0]=int64_t(old.size());
     for(auto crossing:next) if(!old.count(crossing)) ++counts[1];
+}
+void validate(const Mesh& before,const Mesh& after,uint64_t cancel) {
+    int64_t counts[4]{}; inspect(before,after,counts,cancel);
+    if(counts[1]||counts[2]) throw std::runtime_error(
+        "Unusable deformation: "+std::to_string(counts[1])+" new self-intersections and "+
+        std::to_string(counts[2])+" collapsed faces. Adjust thickness, relaxation or constraints; no geometry was accepted.");
 }
 }
 int af_mesh_deformation_quality(uint64_t rest,uint64_t result,int64_t* counts,uint64_t cancel) {
@@ -44,10 +75,9 @@ int af_mesh_deformation_quality(uint64_t rest,uint64_t result,int64_t* counts,ui
 }
 int af_mesh_validate_deformation(uint64_t rest,uint64_t result,uint64_t cancel) {
     try {
-        int64_t counts[4]{}; af::quality::inspect(*af::mesh(rest),*af::mesh(result),counts,cancel);
-        if(counts[1]||counts[2]) throw std::runtime_error(
-            "Unusable deformation: "+std::to_string(counts[1])+" new self-intersections and "+
-            std::to_string(counts[2])+" collapsed faces. Adjust thickness, relaxation or constraints; no geometry was accepted.");
+        af::quality::validate(*af::mesh(rest),*af::mesh(result),cancel);
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+
+

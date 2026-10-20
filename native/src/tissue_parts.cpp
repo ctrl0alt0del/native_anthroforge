@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "tissue_branches.hpp"
+#include "mesh_quality.hpp"
 #include <unordered_map>
 
 namespace af::tissue {
@@ -66,7 +67,9 @@ std::shared_ptr<Mesh> inflate_parts(const Mesh& source,const AfTissueInflation* 
     if(envelope&&inactive(settings,count)) return assemble(source,grids,values,cancel);
     share_displacements(source,grids,seams,values);
     connect_parts(grids,seams,values,(settings[0].reverse!=0)!=grid_reversed(source,grids[0]),cancel);
-    return assemble(source,grids,values,cancel);
+    auto result=assemble(source,grids,values,cancel);
+    quality::validate(source,*result,cancel);
+    return result;
 }
 }
 uint64_t af_tissue_inflate_parts(uint64_t source,const AfTissueInflation* settings,int count,const double* connectors,int envelope,uint64_t cancel) {

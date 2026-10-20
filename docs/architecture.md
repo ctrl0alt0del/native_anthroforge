@@ -5,6 +5,17 @@ define the implemented unified TissueVCP, Point/Anchor and Surface/Membrane exte
 shared surface providers and schema 4. [Validation](development_status.md#unified-tissues-022)
 records current evidence; sections labelled with earlier versions preserve their history.
 
+Distributed muscle direction construction belongs to `native/src/tissue_directions.cpp`.
+It uses an owned material mesh and physical mass/stiffness operators; no numerical
+work or callbacks move into Python. The pinned addon kernels remain unchanged.
+`smoothing_core.cpp` adapts their field preparation and QP for standalone publication,
+while the shared `mesh_quality` boundary owns complete-mesh deformation acceptance.
+Inflation, smoothing and relaxation use that boundary. Its plane-side predicate
+separates transverse crossings from coincident shell boundary contact. Refinement
+subdivides existing material intervals instead of overlaying a second uniform grid.
+Document settings, topology correspondence, scheduling and publication contracts remain
+unchanged; the [repair record](tasks/muscle-height-smoothing.md) tracks qualification.
+
 The surface-provider boundary retains bind-time geometry for Anchor
 attachments. C++ resolves referenced material coordinates against the current accepted
 surface into a geometry-only lease with the captured index layout. The shared attachment

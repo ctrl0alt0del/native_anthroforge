@@ -1,5 +1,9 @@
 """Deformation acceptance distinguishes large bending from lost surface validity."""
 
+import json
+from pathlib import Path
+
+import numpy as np
 import pytest
 
 from anthroforge.native import construction, mesh_quality
@@ -43,3 +47,15 @@ def test_new_collapse_fails_and_changed_topology_is_rejected(session):
     other = session.engine.create_mesh(rest.array(0)[:3], [0, 1, 2], [0, 3])
     with pytest.raises(ValueError, match="identities"):
         mesh_quality.deformation(rest, other)
+
+
+def test_coincident_shell_boundary_contact_is_not_a_new_crossing(session):
+    path = Path(__file__).parent / "fixtures/tissue/boundary_contact.json"
+    values = json.loads(path.read_text())
+    rest = session.engine.create_mesh(values["base"], list(range(6)), [0, 3, 6])
+    output = construction.deformed(rest, values["output"])
+    # Front/back vertices have distinct identities but meet only at a fixed point.
+    np.testing.assert_array_equal(output.array(0)[0], output.array(0)[3])
+    result = mesh_quality.deformation(rest, output)
+    assert result.baseline_crossings == result.new_crossings == result.new_collapses == 0
+    mesh_quality.validate(rest, output)

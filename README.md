@@ -109,6 +109,8 @@ checkpoints and resuming the same work after a power outage.
 See [development commands](docs/development.md), [implementation contract](docs/implementation_01.md),
 [observed validation](docs/development_status.md), and [architecture](docs/architecture.md).
 Follow the [engineering guidelines](docs/engineering_guidelines.md) for fixes, features and design review.
+The [computation inventory and history](docs/computation_history.md) lists implemented
+calculations, their owners/tests, and why computational approaches changed.
 The [confirmed specification](standalone_application_recommendations.md) remains authoritative;
 the [stack analysis](standalone_technology_stack_analysis.md) records the technology decisions.
 

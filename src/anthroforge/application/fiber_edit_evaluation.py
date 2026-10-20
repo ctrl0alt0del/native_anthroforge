@@ -27,8 +27,8 @@ def evaluate(
     assert item.edit is not None
     asset = resources.attachments[item.attachment_asset]
     opening = resources.paths[item.edit.baseline].authored
-    surfaces = attachment_assets.captured_inputs(engine, document, resources.meshes, asset, cancel)
-    current = attachment_assets.evaluate(engine, opening, asset, surfaces, world, cancel)
+    positions = attachment_assets.resolved_points(engine, document, resources.meshes, asset, cancel)
+    current = attachment_assets.evaluate(engine, opening, asset, positions, world, cancel)
     path, records = edited_geometry(engine, current, opening, item, cancel)
     return recapture(engine, item, resources, document, EditGeometry(path, records, world), cancel)
 

@@ -50,6 +50,7 @@ static std::shared_ptr<Mesh> assemble(const Mesh& source,const std::vector<Mater
     }
     auto result=deform_mesh(source,vertices,cancel,true);
     result->tissue=tissue_identity(4,vertices.rows(),int64_t(source.offsets.size())-1); labels(result->tissue,grids);
+    result->basis=material_basis(source);
     return result;
 }
 static bool inactive(const AfTissueInflation* settings,int count) {

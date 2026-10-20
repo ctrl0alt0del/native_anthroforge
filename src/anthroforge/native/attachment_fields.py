@@ -22,6 +22,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_attached_controls", [D, c.c_int, D, D, D])
     engine.bind("af_attachment_compact", [c.c_int, INT, c.c_int, INT, INT])
     engine.bind("af_attachment_retain_pins", [U, c.c_int, INT, INT, D, c.c_int, INT, D, D])
+    engine.bind("af_attachment_blend_frames", [c.c_int, D, D, D, U])
 
 
 @dataclass(frozen=True, eq=False)
@@ -173,7 +174,28 @@ def resolved_points(engine: GeometryEngine, surfaces: Any, field: Field, cancel:
 def resolve(
     engine: GeometryEngine, surfaces: Any, field: Field, world: Any, cancel: int = 0
 ) -> tuple[paths.Path, Any]:
-    positions, frame = resolved_points(engine, surfaces, field, cancel), doubles(world)
+    return from_positions(
+        engine, resolved_points(engine, surfaces, field, cancel), field, world, cancel
+    )
+
+
+def blend_frames(engine: GeometryEngine, field: Field, frames: Any, cancel: int) -> Any:
+    frames = doubles(frames)
+    if frames.shape != (*field.owners.shape, 16):
+        raise ValueError("Attachment frames must cover both influences of each field node.")
+    output = np.empty((len(field.owners), 3))
+    engine.check(
+        engine.library.af_attachment_blend_frames(
+            len(output), pointer(frames), pointer(field.weights), pointer(output), cancel
+        )
+    )
+    return output
+
+
+def from_positions(
+    engine: GeometryEngine, positions: Any, field: Field, world: Any, cancel: int = 0
+) -> tuple[paths.Path, Any]:
+    positions, frame = doubles(positions), doubles(world)
     handle = engine.library.af_attached_path(
         field.path.handle, pointer(positions), pointer(frame), cancel
     )

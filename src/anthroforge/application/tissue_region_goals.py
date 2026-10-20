@@ -2,8 +2,6 @@
 
 from typing import Any, cast
 
-import numpy as np
-
 from anthroforge.native import binding_batches, components, point_attachments
 from anthroforge.native.binding_batches import BindingBatch
 
@@ -39,12 +37,8 @@ def goals(
 ) -> Any:
     batch = required_batch(resources, row, domain)
     provider = surface_providers.get(engine, document, resources.meshes, row.reference)
-    mesh = surface_providers.binding_mesh(
+    frames = surface_providers.binding_frames(
         provider, resources.meshes, row.material_asset, batch.records, cancel
-    )
-    owners = np.zeros(len(batch.records), dtype=np.int32)
-    frames = point_attachments.resolve(
-        engine, [mesh.handle], [provider.frame], owners, batch.records, cancel
     )
     return binding_batches.positions(engine, frames, frame, row.offset, cancel)
 

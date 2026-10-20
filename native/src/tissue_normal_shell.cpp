@@ -41,6 +41,7 @@ std::shared_ptr<Mesh> normal_shell(const Mesh& mesh,const AfTissueShape& setting
     const auto polygons=shell_faces(faces,edges,mesh.vertices.rows());
     auto result=make_mesh(points,polygons,cancel,true);
     result->tissue=tissue_identity(3,mesh.vertices.rows(),int64_t(polygons.size()),2);
+    result->basis=material_basis(mesh);
     for(size_t i=0;i<polygons.size();++i) result->tissue.faces[i]=i<2*faces.size()?int64_t(i%faces.size()):-1;
     tissue_validate(result->tissue,result->vertices.rows(),int64_t(polygons.size()));
     return result;

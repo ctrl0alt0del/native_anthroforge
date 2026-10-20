@@ -3,7 +3,7 @@
 - Task branch: `codex/routed-fiber-surface-stability`
 - Integration branch: `main`
 - Starting revision: `4be30b49e484957a62c548beffcb4d07f7a30021`
-- Status: requested visual comparison complete; production repair awaiting review
+- Status: exact corners approved; shared material-frame implementation in progress
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -17,9 +17,18 @@ Fix demonstrated defects at their owning boundary; do not weaken collision valid
 
 ## Decisions and current state
 
-The user first selected exact corners with stable material correspondence, then explicitly
-requested testing both alternatives with visual results before proceeding. No production
-repair or canonical package replacement has been performed in this task.
+After reviewing the requested comparison, the user confirmed “preserve exact corners.”
+Production work now retains normalized surface stations and self-contained source material
+coordinates on accepted tissue results. Shared attachment resolution transports each
+binding location and frame through material charts, independently of sample indices.
+Geometry payloads/native handles are not embedded in that metadata. Captured bindings
+remain unchanged. Canonical package replacement remains pending.
+
+The first integrated checkpoint passes native compilation, all three CTests and 14 targeted
+material/Fiber/Anchor tests, including actual exact-surface growth/shrink, saving/reopening
+and undo/redo. Patch material coordinates, broader chart/offset/crop/branch qualification,
+resource/performance review, full gate and packaging remain unfinished. No release
+acceptance is claimed. The original experiment results below describe the pre-fix baseline.
 
 Fibers use the corrected routing evaluator with resolved binding inputs. Actual two-endpoint
 Fibers with preferred samples 3 grow 3 → 4 → 3 as an independent cube enters/leaves the path.
@@ -72,9 +81,9 @@ repository contracts and actual native results establish these findings.
 
 ## Next actions
 
-1. Present comparison/close-up/timeline to the user and receive the implementation direction.
-2. Integrate the selected production repair, including material frames, retained references
-   and affected surface types. Keep real topology-edit restrictions.
+1. Complete patch material coordinates and qualification of periodic/branched charts,
+   offsets, crops, downstream Fibers and constraints. Keep topology-edit restrictions.
+2. Run full gate and inspect actual geometry, profiler/resource behavior and packaging.
 3. Qualify actual Fiber → Membrane → Tissue → attachment chains and package/merge only
    after the selected repair is complete.
 

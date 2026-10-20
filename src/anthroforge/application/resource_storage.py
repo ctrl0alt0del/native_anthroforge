@@ -7,7 +7,14 @@ from typing import Any
 
 import numpy as np
 
-from anthroforge.native import material, material_pins, paths, tissue_domain, topology
+from anthroforge.native import (
+    material,
+    material_basis,
+    material_pins,
+    paths,
+    tissue_domain,
+    topology,
+)
 from anthroforge.native.binding_batches import BindingBatch
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.native.routing import Report
@@ -74,6 +81,14 @@ def write_mesh(archive: zipfile.ZipFile, key: str, asset: Asset) -> None:
         ("tissue", "tissue_weights"), tissue_domain.arrays(asset.mesh), strict=True
     ):
         write_array(archive, f"assets/{key}/{label}.npy", values)
+    write_basis(archive, key, asset)
+
+
+def write_basis(archive: zipfile.ZipFile, key: str, asset: Asset) -> None:
+    for label, values in zip(
+        ("basis", "basis_parameters"), material_basis.arrays(asset.mesh), strict=True
+    ):
+        write_array(archive, f"assets/{key}/{label}.npy", values)
 
 
 def read_mesh(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> Asset:
@@ -86,7 +101,16 @@ def read_mesh(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryE
     tissue = [
         read_array(archive, f"assets/{key}/{kind}.npy") for kind in ("tissue", "tissue_weights")
     ]
-    return Asset(tissue_domain.restore(mesh, *tissue), **source)
+    return Asset(read_basis(archive, key, tissue_domain.restore(mesh, *tissue)), **source)
+
+
+def read_basis(archive: zipfile.ZipFile, key: str, mesh: Any) -> Any:
+    if f"assets/{key}/basis.npy" not in archive.namelist():
+        return mesh
+    rows = [
+        read_array(archive, f"assets/{key}/{kind}.npy") for kind in ("basis", "basis_parameters")
+    ]
+    return material_basis.restore(mesh, *rows)
 
 
 def read_path(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> PathAsset:

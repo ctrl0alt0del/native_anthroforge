@@ -5,7 +5,7 @@
 namespace af::curve_surface {
 std::vector<double> unique_stations(std::vector<double> values) {
     std::sort(values.begin(),values.end());
-    values.erase(std::unique(values.begin(),values.end()),values.end());
+    values.erase(std::unique(values.begin(),values.end(),[](double a,double b){return std::abs(a-b)<1e-12;}),values.end());
     if(values.size()>max_stations) throw std::runtime_error("Branch station budget exceeded.");
     return values;
 }

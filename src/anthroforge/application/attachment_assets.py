@@ -3,6 +3,8 @@
 from dataclasses import dataclass, replace
 from typing import Any
 
+import numpy as np
+
 from anthroforge.core.construction import Curve
 from anthroforge.core.document import Document
 from anthroforge.core.results import EvaluationResult
@@ -31,48 +33,34 @@ def compact(
     return AttachmentAsset(tuple(targets[index] for index in used), changed)
 
 
-@dataclass(frozen=True)
-class ResolvedSurfaces:
-    meshes: tuple[Any, ...]
-    frames: tuple[Any, ...]
-
-    def __iter__(self) -> Any:
-        return iter(([mesh.handle for mesh in self.meshes], self.frames))
-
-
 def captures(engine: Any, document: Any, meshes: Any, targets: Any) -> tuple[CapturedSurface, ...]:
     providers = [surface_providers.get(engine, document, meshes, ref) for ref in targets]
     return tuple(CapturedSurface(p.reference, p.asset_id) for p in providers)
 
 
-def captured_inputs(
+def resolved_points(
     engine: Any, document: Any, meshes: Any, asset: AttachmentAsset, cancel: int
-) -> ResolvedSurfaces:
-    providers = [
-        surface_providers.get(engine, document, meshes, s.reference) for s in asset.targets
-    ]
-    resolved = tuple(
-        surface_providers.binding_mesh(
-            p, meshes, s.material_asset, owner_records(asset.field, i), cancel
+) -> Any:
+    field = asset.field
+    frames = np.zeros((*field.owners.shape, 16))
+    for index, surface in enumerate(asset.targets):
+        provider = surface_providers.get(engine, document, meshes, surface.reference)
+        mask = (field.owners == index) & (field.weights > 0)
+        frames[mask] = surface_providers.binding_frames(
+            provider, meshes, surface.material_asset, field.bindings[mask], cancel
         )
-        for i, (p, s) in enumerate(zip(providers, asset.targets, strict=True))
-    )
-    return ResolvedSurfaces(resolved, tuple(p.frame for p in providers))
-
-
-def owner_records(field: attachment_fields.Field, index: int) -> Any:
-    return field.bindings[(field.owners == index) & (field.weights > 0)]
+    return attachment_fields.blend_frames(engine, field, frames, cancel)
 
 
 def evaluate(
     engine: GeometryEngine,
     item: Curve,
     asset: AttachmentAsset,
-    surfaces: Any,
+    positions: Any,
     world: Any,
     cancel: int,
 ) -> PathAsset:
-    path, records = attachment_fields.resolve(engine, surfaces, asset.field, world, cancel)
+    path, records = attachment_fields.from_positions(engine, positions, asset.field, world, cancel)
     points = tuple(
         curve_editing.unpack(old, row) for old, row in zip(item.points, records, strict=True)
     )

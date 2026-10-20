@@ -51,7 +51,8 @@ std::shared_ptr<Mesh> crop_material(const Mesh& base,const Mesh& own,const doubl
     if(own.tissue.kind==5) return crop_envelope(base,own,plane,cancel);
     auto state=crop_inputs(base,own,plane,cancel);
     for(int i=0;i<own.triangles.rows();++i) { check_cancel(cancel); emit(state,own,i); }
-    return crop_output(state,own.tissue,cancel);
+    auto result=crop_output(state,own.tissue,cancel); result->basis=material_basis(own);
+    return result;
 }
 }
 uint64_t af_tissue_crop(uint64_t base,uint64_t own,const double* plane,uint64_t cancel) {

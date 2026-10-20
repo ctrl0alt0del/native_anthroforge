@@ -10,7 +10,7 @@ static bool same_geometry(const Mesh& a,const Mesh& b,uint64_t cancel) {
 }
 static bool same_material(const Mesh& a,const Mesh& b) {
     return a.material==b.material&&a.material_axes==b.material_axes&&a.material_pins==b.material_pins
-        &&tissue_records(a.tissue)==tissue_records(b.tissue)&&a.tissue.weights==b.tissue.weights;
+        &&tissue_records(a.tissue)==tissue_records(b.tissue)&&a.tissue.weights==b.tissue.weights&&same_basis(a.basis,b.basis);
 }
 }
 int af_mesh_same_content(uint64_t first,uint64_t second,uint64_t cancel) {

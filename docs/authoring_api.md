@@ -54,6 +54,14 @@ surfaces; existing obstacle/exclusion IDs accept tissues. A base-bound Fiber ret
 explicit binding role. Failed roles are not replaced by displayed intrinsic fallback.
 Accepted empty crops contain no collider; restoring geometry invalidates routes again.
 
+Adaptive exact surfaces retain material coordinates independently of their evaluated
+vertex counts. Anchor frames, dense Fiber influences and tissue target-region goals
+resolve on the current Base/Final surface without changing captured bindings. Offsets
+and orientation are transported in the same native query. This is automatic evaluation,
+not a new authoring command. Authored topology restrictions and cropped-away material
+errors remain enforced. Indexed weight fields/face selections still use their explicit
+topology qualification.
+
 `curve.point.update` also accepts Boolean `stacking_fixed`
 and `protected_crease` fields. Bound Fiber points are protected automatically. Surface
 evaluation retains these locations in its accepted material data; tissue refinement

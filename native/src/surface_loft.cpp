@@ -19,6 +19,12 @@ static void append_rows(Points& points,const Row& a,const Row& b,int count,uint6
         }
     }
 }
+static void material_axes(Mesh& mesh,const Rows& rows,int count,bool closed) {
+    if(rows.front().material_stations.empty()) return;
+    for(int i=0;i<count;++i) mesh.material_axes.push_back(double(i)/(count-int(!closed)));
+    const auto& along=rows.front().material_stations;
+    mesh.material_axes.insert(mesh.material_axes.end(),along.begin(),along.end());
+}
 std::shared_ptr<Mesh> loft(const Rows& rows,const int* across,bool close_across,bool flip,uint64_t cancel) {
     if(rows.size()<2||!across) throw std::runtime_error("Loft requires at least two source curves.");
     const size_t count=row_count(rows,across),columns=rows.front().points.size();
@@ -30,6 +36,7 @@ std::shared_ptr<Mesh> loft(const Rows& rows,const int* across,bool close_across,
     if(flip) for(auto& face:faces) std::reverse(face.begin()+1,face.end());
     auto result=make_mesh(points,faces,cancel,false);
     result->material=grid_material(int(count),int(columns),rows.front().closed,close_across&&count>2);
+    material_axes(*result,rows,int(count),close_across&&count>2);
     return result;
 }
 }

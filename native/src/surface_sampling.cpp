@@ -30,17 +30,14 @@ static std::vector<double> union_stations(const Rows& rows) {
         if(row.closed) values.pop_back();
         ordered.insert(ordered.end(),values.begin(),values.end());
     }
-    std::sort(ordered.begin(),ordered.end());
-    ordered.erase(std::unique(ordered.begin(),ordered.end()),ordered.end());
-    if(ordered.size()>max_stations) throw std::runtime_error("Surface station budget exceeded.");
-    return ordered;
+    return unique_stations(std::move(ordered));
 }
 Rows common_stations(const Rows& rows,uint64_t cancel) {
     const auto target=union_stations(rows);
     budget(rows.size()*target.size(),2*(rows.size()-1)*target.size());
     Rows result;
     for(const auto& row:rows) {
-        Row prepared; prepared.closed=row.closed;
+        Row prepared; prepared.closed=row.closed; prepared.material_stations=target;
         const auto positions=stations(row);
         for(const double factor:target) {
             check_cancel(cancel); prepared.points.push_back(sample(row,positions,factor));

@@ -94,17 +94,16 @@ def triangle_count(document: Any, meshes: Any, ref: SurfaceReference) -> int:
     return meshes[key].mesh.counts[3] if key in meshes else 0
 
 
-def binding_mesh(
+def binding_frames(
     provider: SurfaceProvider, meshes: Any, reference: str, records: Any, cancel: int
 ) -> Any:
     from anthroforge.native import material_bindings
 
     if not reference and provider.reference.role != "SCP_GEOMETRY":
         raise ValueError("Tissue binding has no retained material reference; explicitly rebind.")
-    if not reference or reference == provider.asset_id:
-        return provider.resource.mesh
+    reference = reference or provider.asset_id
     if reference not in meshes:
         raise ValueError("Missing retained material reference; explicitly rebind the attachment.")
-    return material_bindings.resolve(
-        meshes[reference].mesh, provider.resource.mesh, records, cancel
+    return material_bindings.frames(
+        meshes[reference].mesh, provider.resource.mesh, provider.frame, records, cancel
     )

@@ -43,6 +43,7 @@ std::shared_ptr<Mesh> crop_envelope(const Mesh& base,const Mesh& own,const doubl
     const auto first=first_side(base,own,cancel),second=second_side(first,own,cancel);
     auto a=deform_mesh(base,first,cancel,false),b=deform_mesh(base,second,cancel,false);
     a->tissue=b->tissue=domain(base,own);
+    a->basis=b->basis=material_basis(base);
     a=crop_material(base,*a,plane,cancel); b=crop_material(base,*b,plane,cancel);
     return compose_envelope(*a,*b,reversed(base,own),cancel);
 }

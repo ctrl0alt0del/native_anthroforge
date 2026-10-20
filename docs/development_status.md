@@ -1,7 +1,39 @@
 # AnthroForge development validation
 
-Current source qualification is in [bent tissue inflation](#bent-tissue-inflation-022).
+Current qualification is in [adaptive exact surfaces](#adaptive-exact-surfaces-022).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Adaptive exact surfaces (0.2.2)
+
+Runtime `c30211d7b3102083e4d840649be5dcaed1764445` preserves evaluated routed corners
+through exact lofts/Membranes and retains material attachment locations, orientations
+and offsets across adaptive sampling. Anchors, dense Fiber influence fields and tissue
+target-region goals use the same native resolver. Captures and authored points stay unchanged.
+See [CH-013](computation_history.md#ch-013--exact-corners-with-sampling-independent-attachment-correspondence)
+and the [task record](tasks/routed-fiber-surface-stability.md), including the rejected patch
+mapping and its measured drift.
+
+The complete development gate passes **1,378 tests**, three native CTests, typing,
+function/style checks, native numerical boundaries and doctor (841 existing Qt warnings).
+Coverage includes actual adaptive Fiber chains, Base/Final roles, undo/redo, reopening,
+offsets/transforms, closed seams, branches, concave patches, rims, crops, side collapse,
+cancellation and source-resource disposal. Unchanged patch resampling has at most
+`4.58e-16` m measured drift in the local scientific view.
+
+The canonical package passes the full minimal-PATH portable suite plus a packaged exact
+workflow: route samples 3/4/3 and membrane vertices 9/18/9, with all outputs ready and
+unchanged binding records. Development and packaged hidden Direct3D captures were inspected.
+The complete runtime profile records 30 material-frame calls, mean 0.409 ms/max 2.099 ms,
+and no unattributed geometry bytes. These small-scene profiled measurements do not establish
+general application responsiveness. No visible desktop interaction or physical latency
+acceptance is claimed.
+
+One `dist/0.2.2/AnthroForge.dist` and `dist/AnthroForge-0.2.2-source.zip` are delivered.
+Executable SHA-256: `bdfc5adb250403cb36fe9d2c51dec1405bd09bd47860de6c7f9b40940d31dd40`.
+The packaged native DLL matches the qualified development DLL. Coordinator ownership review
+keeps correspondence, frame queries and cancellation native; Python only orchestrates batches.
+Authored topology restrictions, unavailable cropped material and captures lacking required
+source coordinates remain explicit failures, rather than silent nearest-surface reassignment.
 
 ## Bent tissue inflation (0.2.2)
 

@@ -74,6 +74,7 @@ std::shared_ptr<Mesh> compose_envelope(const Mesh& a,const Mesh& b,bool flip,uin
     const auto mapping=vertices(output,a,b,cancel); faces(output,a,b,mapping,flip,cancel);
     const auto reduced=compact(output); auto mesh=make_mesh(reduced.points,reduced.faces,cancel,true);
     mesh->tissue=correspondence(reduced,a.tissue);
+    mesh->basis=material_basis(a);
     tissue_validate(mesh->tissue,mesh->vertices.rows(),int64_t(mesh->offsets.size())-1); return mesh;
 }
 }

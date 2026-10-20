@@ -4,7 +4,6 @@ from dataclasses import replace
 from typing import Any
 
 from anthroforge.core.points import Anchor, Point
-from anthroforge.native import point_attachments
 
 from . import surface_providers
 from .object_frames import Frames
@@ -23,12 +22,10 @@ def resolve(engine: Any, document: Any, meshes: Any, item: Anchor, cancel: int) 
     if not item.binding.attachment.binding:
         raise ValueError("Anchor has no retained material binding; explicitly rebind it.")
     records = [item.binding.attachment.binding]
-    mesh = surface_providers.binding_mesh(
+    frames = surface_providers.binding_frames(
         provider, meshes, item.binding.material_asset, records, cancel
     )
-    inputs = ([mesh.handle], [provider.frame])
-    frame = point_attachments.resolve(engine, *inputs, [0], records, cancel)[0]
-    return with_frame(item, frame)
+    return with_frame(item, frames[0])
 
 
 def with_frame(item: Anchor, frame: Any) -> Anchor:

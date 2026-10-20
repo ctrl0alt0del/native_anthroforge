@@ -600,6 +600,28 @@ workers and displayed/staged leases. Profiler observation is read-only and recor
 Saved-revision rendering drains all staged resource models before capture. Schema 3 persists
 owned editable state and accepted results, never native handles, undo history or preview data.
 
+## Adaptive surface material correspondence
+
+Exact surfaces retain normalized longitudinal stations independently of vertex indices.
+Accepted tissue results own their source coordinate basis, including part charts, periodic
+axes and patch projected positions/perimeter coordinates. This metadata survives deformation,
+crops, envelope composition, snapshots and serialization and is included in memory accounting.
+It contains no live source handles.
+
+`surface_providers.binding_frames` is the shared boundary for Anchors, Fiber influence
+fields and tissue target-region goals. Native material queries resolve captured locations
+on current triangles and transport the captured frame/offset without recapturing them.
+Ordinary unchanged-domain captures use the existing canonical mapping. Sampling changes
+use material-space acceleration, cancellation and explicit coverage validation; missing
+material remains a failure. Authored topology policies remain separate from this numerical
+correspondence. Indexed authored fields and selected-face masks retain their existing
+topology restrictions.
+
+Patch transport uses signed mean-value coordinates on matched perimeter stations, including
+both boundaries' corners. It preserves linear precision when only sampling changes; it does
+not remesh or move the patch itself. At shared rim/sheet edges the native spatial lookup
+selects the material plane compatible with the retained frame.
+
 ## User feedback reports
 
 The [feedback reporting subsystem](feedback_reports.md) is separate from anatomical Issues,

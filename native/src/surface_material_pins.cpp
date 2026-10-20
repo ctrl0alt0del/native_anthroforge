@@ -10,7 +10,6 @@ struct PinLayout {
     cs::Rows rows;
     std::vector<cs::Branch> branches;
     std::vector<MaterialGrid> grids;
-    std::vector<double> stations;
     std::unique_ptr<Surface> patch;
 };
 static double directed(double first,double second,const cs::Row& row) {
@@ -33,22 +32,8 @@ static PinLayout layout(const Mesh& mesh,const AfSurfacePins& inputs,uint64_t ca
     PinLayout result; result.rows=cs::inputs(inputs.rows,inputs.count,true,cancel);
     result.grids=material_grids(mesh);
     if(inputs.branch_count) result.branches=cs::branch_inputs(result.rows,inputs.main_count,inputs.branches,inputs.branch_count);
-    else if(!result.grids.empty()&&inputs.exact) {
-        for(const auto& row:result.rows) {
-            auto values=cs::stations(row); if(row.closed) values.pop_back();
-            result.stations.insert(result.stations.end(),values.begin(),values.end());
-        }
-        result.stations=cs::unique_stations(std::move(result.stations));
-    }
     if(result.grids.empty()) result.patch=std::make_unique<Surface>(mesh,M4::Identity());
     return result;
-}
-static double column(const std::vector<double>& stations,double factor,bool closed) {
-    const auto end=std::upper_bound(stations.begin(),stations.end(),factor);
-    const size_t a=size_t(std::max(std::ptrdiff_t(0),end-stations.begin()-1)),b=a+1;
-    const double last=b<stations.size()?stations[b]:1;
-    const double t=last>stations[a]?(factor-stations[a])/(last-stations[a]):0;
-    return (double(a)+t)/double(stations.size()-size_t(!closed));
 }
 static std::array<double,11> grid_pin(const PinLayout& layout,const AfSurfacePins& inputs,int row,PinPosition position) {
     std::array<double,11> pin{}; pin[2]=position.length;
@@ -63,7 +48,7 @@ static std::array<double,11> grid_pin(const PinLayout& layout,const AfSurfacePin
     if(!inputs.across) throw std::runtime_error("Structural loft pins need accepted row density.");
     int index=0; for(int i=0;i<row;++i) index+=inputs.across[i]+1;
     pin[1]=double(index)/(layout.grids[0].rows-int(!layout.grids[0].closed_v));
-    pin[2]=inputs.exact?column(layout.stations,position.length,layout.rows[0].closed):position.length;
+    pin[2]=position.length;
     return pin;
 }
 static std::array<double,11> patch_pin(const PinLayout& layout,int row,PinPosition position) {

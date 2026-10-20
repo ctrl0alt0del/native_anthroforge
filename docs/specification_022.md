@@ -15,6 +15,22 @@ it. Separate tissues remain separate. Skin handling will be decided with skinnin
 Implementation and downstream-query qualification are tracked in
 [the active task](tasks/tissue-intersection-policy.md).
 
+The confirmed downstream contract is **pending implementation and qualification**:
+
+- Shared surface queries distinguish Preview and Confirmed Placement. Preview uses
+  the original accepted target; confirmed placement uses a Boolean-cleaned query copy.
+  Curve-to-Fiber, Point-to-Anchor and explicit attachment capture use confirmed mode.
+  Cleanup never replaces the target, and hit provenance must map back to the original
+  material binding. Existing bindings resolve their retained location rather than
+  choosing a new nearest point on each update.
+- Open-sheet targets need an agreed definition of the region to clean. Do not silently
+  cap, thicken, reject or substitute them. A query-only closure against the tissue base
+  is under discussion; it is not yet the product behavior.
+- Where intersections create ambiguous stacking support, select the farthest support
+  along the base-surface normal. Keep this distinct from nearest material-chart distance
+  and from any repair to the generated tissue. Separate tissues are not Boolean-unioned.
+- Skin handling is deferred until skinning implementation.
+
 Deliver production tissue construction, anatomical attachments, inflation,
 relaxation, branches, cropping and stacking in desktop and Qt-free headless clients.
 Mirroring, Draft Skin, Blender-project conversion, anatomical reconstruction or

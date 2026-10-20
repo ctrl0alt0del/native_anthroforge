@@ -728,6 +728,8 @@ resolved inflation/smoothing defect when assessing the fixture.
   previous valid inflation regressions, cancellation and strict diagnostic checks.
   In-memory evaluation of the unchanged user project at 0.2 then 0.599 now publishes
   ready base/rest/intrinsic/final outputs. No project file was overwritten.
+  Full suite at `e922aeb`: 1,421 tests pass; Mypy, focused Ruff and changed-native
+  clang-tidy checks pass.
 - **Limits:** attachment Boolean cleanup and ambiguous stacking queries are separate
   downstream work, not completed by this acceptance change. Open-sheet Boolean
   semantics need clarification: the test's base and single-sided tissue each have

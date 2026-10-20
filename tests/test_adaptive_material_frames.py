@@ -107,3 +107,19 @@ def test_branched_material_charts_survive_added_source_station(session):
         for source in (original, rows)
     ]
     assert np.isfinite(material_bindings.frames(before, after, IDENTITY, all_records(before))).all()
+
+
+def test_tissue_material_basis_owns_coordinates_without_retaining_source_handle(session):
+    import gc
+
+    from anthroforge.native import material_basis, memory
+
+    source = loft(session.engine, [0, 0.5, 1])
+    handle = source.handle
+    own = tissue_shapes.normal(source, TissueInflation(amount=0.1, minimum=0.1))
+    records, coordinates = material_basis.arrays(own)
+    del source
+    gc.collect()
+    handles = {row[0] for row in memory.snapshot(session.engine)[0]}
+    assert handle not in handles
+    assert len(records) and len(coordinates) and np.isfinite(coordinates).all()

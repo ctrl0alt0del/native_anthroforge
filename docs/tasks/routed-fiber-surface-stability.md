@@ -38,8 +38,10 @@ records. The local report recorded 30 native material-frame calls: mean 0.372 ms
 
 The first full pytest run had 1,358 passes and two donor parity failures caused by removal
 of zero-width strips. Tests now preserve the source donor fixtures and explicitly verify
-their canonical nondegenerate geometry. The full development gate is running; canonical
-package replacement and final acceptance remain pending. No release acceptance is claimed.
+their canonical nondegenerate geometry. The final development gate passes 1,371 tests,
+three native CTests, type/style/function/numerical checks and doctor. Additional targeted
+checks cover target-region goals and source-handle disposal. Canonical package replacement
+and portable acceptance remain pending. No release acceptance is claimed.
 The original experiment results below describe the pre-fix baseline.
 
 Fibers use the corrected routing evaluator with resolved binding inputs. Actual two-endpoint
@@ -93,10 +95,21 @@ repository contracts and actual native results establish these findings.
 
 ## Next actions
 
-1. Complete remaining crop/target-region and resource qualification; review coupling.
-2. Finish the full gate, rebuild/check the canonical package and verify latest native edits.
+1. Rebuild/check the canonical package and source archive.
+2. Recheck latest runtime captures/portable exact projects, then validated merge/push.
 3. Qualify actual Fiber → Membrane → Tissue → attachment chains and package/merge only
    after the selected repair is complete.
+
+## Ownership review
+
+Coordinator-authored review: surface construction owns exact stations and parameter charts;
+native material queries own location/frame transport, cancellation and coverage validation.
+The shared provider boundary serves all three attachment callers. Python only packs batches
+and publishes results. Accepted meshes own plain coordinate buffers; native handles are not
+serialized or retained in those buffers. Existing task scheduling, authored transactions,
+history and revision reservations are unchanged. No competing worker pool or numerical
+Python fallback was introduced. Canonical same-domain resolution is retained deliberately
+for prior attachment semantics rather than duplicated in individual consumers.
 
 ## Recovery inputs
 

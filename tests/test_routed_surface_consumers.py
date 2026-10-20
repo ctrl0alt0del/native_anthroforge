@@ -50,3 +50,31 @@ def assert_fiber(session, before):
     assert current.result.status == "ready", current.result.error
     assert current.bindings == before.bindings
     assert current.attachment_asset == before.attachment_asset
+
+
+def constrained_child(session, target):
+    from tests.test_tissue_target_regions import bind_region
+
+    anchor = scene.attachment(session, target, "TISSUE_BASE")
+    child = session.command("tissue.create", source=anchor, preset="CUSTOM")
+    session.wait()
+    region = session.command("tissue.constraint.add", target=child, mask="ALL")
+    session.wait()
+    binding = bind_region(session, child, region, target, "TISSUE_FINAL")
+    return child, binding
+
+
+def test_target_region_uses_same_adaptive_material_service_without_rebinding(session):
+    obstacle, target = target_tissue(session)
+    child, binding = constrained_child(session, target)
+    original = session.document.object(child).intrinsic_result.asset
+    for z in (0, 3):
+        scene.move(session, obstacle, [0, 0, z])
+        item = session.document.object(child)
+        assert item.intrinsic_result.status == "ready", item.intrinsic_result.error
+        assert binding in item.constraints
+    np.testing.assert_allclose(
+        session.assets[item.intrinsic_result.asset].mesh.array(0),
+        session.assets[original].mesh.array(0),
+        atol=1e-8,
+    )

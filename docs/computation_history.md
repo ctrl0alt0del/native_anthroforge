@@ -589,8 +589,10 @@ resolved inflation/smoothing defect when assessing the fixture.
   downstream Fibers survive growth/shrink, undo/redo and reopening with unchanged bindings.
   Native checks cover frames/offsets under nonuniform transforms, closed seams, branches and
   adaptive patches. Hidden GPU captures show the actual surface retaining both obstacle
-  bends and returning to its original shape. The first full test run had 1,358 passes and
-  the two intentional donor differences above; final gate/package checks remain pending.
+  bends and returning to its original shape. The full development gate passes 1,371 tests,
+  three CTests and native/Python style/type/numerical checks. Additional targeted tests verify
+  target-relative goals and disposal of source handles while coordinate metadata remains
+  owned. Portable-package qualification remains pending.
 - **Preserved limits:** this does not guarantee collision-free interiors of arbitrary lofts.
   Authored topology locks, unsupported domains and cropped-away material remain explicit
   failures. Indexed custom tissue weight fields/selected face masks retain their existing

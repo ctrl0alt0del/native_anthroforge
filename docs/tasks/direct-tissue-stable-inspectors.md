@@ -3,7 +3,7 @@
 - Task branch: `codex/direct-tissue-stable-inspectors`
 - Integration branch: `main`
 - Starting revision: `6f72018aae47e85a281fb9a45311c1d8615d41f3`
-- Status: in progress
+- Status: complete
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -34,8 +34,9 @@ for generic construction. No standalone Surface-to-Membrane command currently ex
 
 Implemented shared atomic attached-graph jobs, nearest-SCP defaults, direct Tissue and
 Membrane actions, multi-output creation selection, and layout-independent notices.
-Initial API tests pass for Point/Curve/Surface conversion, independent shape preservation,
-single undo, and missing-target rejection. Development gate and GUI not yet qualified.
+API tests pass for Point/Curve/Surface conversion, independent shape preservation,
+single undo, and missing-target rejection. Development, offscreen GUI and portable
+qualification are complete.
 
 Verified mixed fibers, branched seams/junction copies, failure atomicity, running
 cancellation, undo/redo (including historical captures), superseding inputs/graph changes,
@@ -47,7 +48,7 @@ kept the numeric field bounds `[1314,187,100,30]` at all three sampled positions
 retained focus and produced one undo action. Hidden Direct3D automatic tissue geometry
 was saved and visually inspected. No visible desktop interaction was performed.
 
-Runtime checkpoint: `7267773` (pushed). The complete `tools/check.ps1` gate passes:
+Initial runtime checkpoint: `7267773` (pushed). The complete `tools/check.ps1` gate passes:
 1,394 pytest tests, 3 native CTests, typing, native/Python/PowerShell function/style
 checks, numerical boundary/import checks and doctor. The 886 Qt deprecation warnings
 are reported, not suppressed. A 1050px-wide UI layout check also passes.
@@ -58,18 +59,21 @@ publication have separate modules. Original numerical kernels and resource owner
 are reused. Desktop only projects shared eligibility and selection intent. Toast state
 belongs to presentation and does not touch document, history or scheduler state.
 
-The canonical `7267773` package passed the complete relocated/minimal-PATH portable
-suite, including Point/Curve/Surface automatic creation and standalone Membrane creation.
-Final API review then added a validation guard: omitted automatic Anchor parents cannot
-silently substitute SCP geometry for a requested Tissue surface role. All 21 focused
-conversion/lifecycle/architecture tests, lint, formatting and typing pass with that guard.
-Repackaging and final Python regression qualification are pending for this last guard.
-Build logs and hidden-render evidence are local-only under the evidence directory.
+Final runtime: `be7e506f0dd6c5cc99d4611e3204eb66f38142f9` (pushed). Final API review added
+a validation guard: omitted automatic Anchor parents cannot silently substitute SCP
+geometry for a requested Tissue surface role. The final source passes 1,397 pytest
+tests, lint, formatting and typing. Its rebuilt canonical package passes the complete
+relocated/minimal-PATH suite, including Point/Curve/Surface automatic creation and
+standalone Membrane conversion. Copied and canonical executable hashes match:
+`5ba07cb4c8b1a6b21bb238debe77e72e66313e20fbd3c22ca587b72499884f2b`.
+Native DLL hashes also match development. Build logs and hidden-render evidence are
+local-only under the evidence directory; no foreground/manual acceptance is claimed.
 
 ## Next actions and blockers
 
-1. Finish/qualify the single canonical portable build and update validation records.
-2. Generate the source archive, then merge/push normally.
+No implementation blockers remain. The canonical release and companion source archive
+contain the validated runtime and updated documentation. Preserve checkpoint history
+when merging/pushing this task into main.
 
 ## Recovery inputs
 

@@ -1,7 +1,41 @@
 # AnthroForge development validation
 
-Current qualification is in [adaptive exact surfaces](#adaptive-exact-surfaces-022).
+Current qualification is in [direct tissue creation and stable inspectors](#direct-tissue-creation-and-stable-inspectors-022).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Direct tissue creation and stable inspectors (0.2.2)
+
+Runtime `be7e506f0dd6c5cc99d4611e3204eb66f38142f9` creates tissues directly from selected
+construction. Generic Point/Curve/Surface inputs obtain independent attached construction;
+Surface-to-Membrane also works separately and converts ordinary source curves to Fibers.
+Existing Fiber binding intent and internal junction sharing are preserved. The graph is
+published atomically with one undo action; originals remain unchanged.
+
+Transient pending/error/diagnostic feedback uses a bottom-right toast. Offscreen numeric
+dragging retained focus and the exact field rectangle `[1314,187,100,30]` through pending,
+long error and resumed-pending states. Undo restored the original value. Fixed scrollbar
+gutters and elided diagnostic values prevent horizontal narrowing. Direct toolbar creation,
+standalone Membrane creation and the 1050px-wide UI layout check pass.
+
+The complete development gate passed 1,394 tests and three native CTests, plus typing,
+style/function limits, numerical boundaries/imports and doctor. A final explicit-role
+validation guard added three tests: the final source passes **1,397 tests**, lint,
+formatting and typing. The 886 Qt deprecation warnings remain visible in the logs.
+Conversion checks cover branches, mixed sources, bone following, source independence,
+cancel/failure atomicity, superseding graph edits, historical undo/redo and persistence.
+
+The final canonical executable passes the complete relocated/minimal-PATH portable suite,
+including automatic Point/Curve/Surface tissue creation and standalone Membrane conversion.
+Hidden Direct3D geometry was inspected; offscreen interaction is qualified. No visible
+desktop interaction or physical input-latency claim is made. Coordinator ownership review
+keeps numerical work native and separates planning, worker computation and publication;
+desktop adapters use the shared API and retain no separate conversion policy.
+
+Delivered: one `dist/0.2.2/AnthroForge.dist` and `dist/AnthroForge-0.2.2-source.zip`.
+Executable SHA-256: `5ba07cb4c8b1a6b21bb238debe77e72e66313e20fbd3c22ca587b72499884f2b`.
+The packaged native DLL matches the qualified development DLL.
+See [task evidence](tasks/direct-tissue-stable-inspectors.md) and
+[CH-014](computation_history.md#ch-014--atomic-automatic-attached-construction).
 
 ## Adaptive exact surfaces (0.2.2)
 

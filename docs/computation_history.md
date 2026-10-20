@@ -645,7 +645,10 @@ resolved inflation/smoothing defect when assessing the fixture.
   checks pass. Offscreen direct actions select the primary new object and exit editing.
   The hidden Direct3D render of the automatically converted arch was inspected; no visible
   window or physical input-latency acceptance is claimed. Full final qualification is
-  recorded in the [task record](tasks/direct-tissue-stable-inspectors.md).
+  recorded in the [task record](tasks/direct-tissue-stable-inspectors.md). Final runtime
+  `be7e506` passes 1,397 tests and relocated portable checks. The complete native/development
+  gate passed before the final explicit-role input-validation guard; final Python lint,
+  typing and regression checks include that guard.
 - **Intentional behavior/limits:** generic sources become independent attached copies.
   New implicit bindings choose ready SCP geometry, not Tissue Base/Final; explicit binding
   operations remain available for other targets. Missing supports fail without partial

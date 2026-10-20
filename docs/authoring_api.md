@@ -460,7 +460,14 @@ All eligible surface poses/results and structural scene membership are declared 
 New/deleted providers invalidate pending work/previews. Missing accepted inputs fail rather
 than becoming empty space. Manual inputs retain accepted geometry and pending provenance;
 publication triggers consumers at their workspace priority. Failed solves retain accepted paths.
-The inspector keeps clearance accessible and moves resolution/iteration budgets to Advanced.
+The inspector keeps clearance accessible and moves sampling/iteration settings to Advanced.
+Routing `samples` is a preferred total: the evaluated path may contain more points to
+retain obstacle-avoiding bends and authored knots. The authored setting stays unchanged.
+`object.inspect` reports the accepted geometry's actual `samples`; consumers retain
+their own sampling settings and topology locks. Solver preparation preserves the same
+validated layout for geometry, fixed knots and reference parameters. Growth is bounded
+by the existing one-million-point native limit. Clearance and iteration caps do not
+adjust automatically.
 
 Accepted Bézier/polyline fibers are checked by the read-only `fiber_collisions.v1` Issues
 provider. `issues.recheck` and `issues.cancel` use the ordinary advisory coordinator. A

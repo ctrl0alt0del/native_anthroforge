@@ -71,13 +71,25 @@ static std::vector<Route> corridors(const Input& input,const World& world,const 
     }
     return routes;
 }
-void prepare_routes(const Input& input,const World& world,const Reference& reference,std::vector<Span>& spans) {
-    const auto routes=handoff(corridors(input,world,reference),input,world);
-    if(routes.empty()) return; // Production SQP still attempts feasibility from the direct reference.
+static std::vector<int> route_counts(const std::vector<Route>& routes) {
+    std::vector<int> counts;
+    for(const auto& route:routes) counts.push_back(int(route.size())-1);
+    return counts;
+}
+static void install_routes(const Input& input,const Reference& reference,
+                           const std::vector<Route>& routes,std::vector<Span>& spans) {
     for(size_t i=0;i<routes.size();++i) {
-        auto points=resample(routes[i],int(reference.pins[i+1]-reference.pins[i])+1);
-        if(!input.options.closed) spans[i].seed=std::move(points);
-        else std::copy(points.begin(),points.end(),spans.front().seed.begin()+reference.pins[i]);
+        check_cancel(input.cancel);
+        if(!input.options.closed) spans[i].seed=routes[i];
+        else std::copy(routes[i].begin(),routes[i].end(),spans.front().seed.begin()+reference.pins[i]);
     }
+}
+std::vector<Span> prepare_routes(const Input& input,const World& world,Reference& reference) {
+    const auto routes=handoff(corridors(input,world,reference),input,world);
+    if(!routes.empty()) reference=af::routing::reference(input,route_counts(routes));
+    auto prepared=spans(input,world,reference);
+    // Geometry, fixed knots and reference parameters share the validated layout.
+    install_routes(input,reference,routes,prepared);
+    return prepared;
 }
 }

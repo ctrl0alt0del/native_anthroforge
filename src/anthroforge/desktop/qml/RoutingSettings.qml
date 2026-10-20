@@ -22,7 +22,7 @@ ColumnLayout {
     UiButton { id: advanced; objectName: "routingAdvanced"; text: checked ? "▾  Advanced" : "▸  Advanced"; checkable: true; flatStyle: true }
     ColumnLayout {
         visible: advanced.checked; Layout.fillWidth: true
-        NumericSetting { objectName: "routingSamples"; label: "Path resolution"; decimals: 0; value: panel.settings.samples || 64; enabled: !panel.topologyLocked; hint: "Number of evaluated samples, not editable points. More detail costs computation and does not guarantee a valid route."; onEdited: value=>panel.updateSetting("samples",Math.round(value)) }
+        NumericSetting { objectName: "routingSamples"; label: "Preferred samples"; decimals: 0; value: panel.settings.samples || 64; enabled: !panel.topologyLocked; hint: "Preferred evaluated point count. Routing adds samples when needed to preserve obstacle-avoiding bends and authored points. Your setting stays unchanged."; onEdited: value=>panel.updateSetting("samples",Math.round(value)) }
         NumericSetting { label: "Iteration budget"; decimals: 0; value: panel.settings.accepted_steps || 24; hint: "Maximum accepted optimization updates. Rejected trials may also run; this is not a time limit."; onEdited: value=>panel.updateSetting("accepted_steps",Math.round(value)) }
     }
 }

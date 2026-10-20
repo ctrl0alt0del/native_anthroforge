@@ -60,7 +60,7 @@ evidence for those revisions, not current workflow instructions.
 | C03 | Path frames and consumer sampling: arc-length/range sampling, direction and start correspondence, anchored sampling, frame transport and body placement. Solver samples remain separate from authored controls. | [curve_frames.cpp](../native/src/curve_frames.cpp), [path_resampling.cpp](../native/src/path_resampling.cpp) | [anchored sampling](../tests/test_anchored_sampling.py), [consumer sampling](../tests/test_consumer_sampling.py) |
 | C04 | Drawing/fitting: pointer-stroke depth, surface projection/fallback, offsets, image-plane drawing, corner detection and native cubic fitting. A completed stroke authors one curve. | [drawing.cpp](../native/src/drawing.cpp), [curve_fit.cpp](../native/src/curve_fit.cpp), [drawing tasks](../src/anthroforge/application/drawing_tasks.py) | [drawing parity](../tests/test_drawing_parity.py), [strokes](../tests/test_strokes.py) |
 | C05 | Curve editing math: closest location to the pointer, cubic subdivision/insertion, handle updates, selected-control transforms and current-path rebasing/deformation. | [curve_queries.cpp](../native/src/curve_queries.cpp), [path_editing.cpp](../native/src/path_editing.cpp) | [curve queries](../tests/test_curve_queries.py), [standalone editing](../tests/test_standalone_editing.py) |
-| C06 | Routed path solving: capture eligible obstacles, classify pin contacts, plan feasible corridors/roadmaps, validate warm starts, solve constrained SQP with collision/clearance checks and report termination. Open/cyclic paths share the engine. | [routing.cpp](../native/src/routing.cpp), [routing_planner.cpp](../native/src/routing_planner.cpp), [routing_solve.cpp](../native/src/routing_solve.cpp) | [routing parity](../tests/test_routing_parity.py), [surface pins](../tests/test_routing_surface_pins.py), [snapped routing](../tests/test_snapped_routing.py) |
+| C06 | Routed path solving: capture obstacles, classify contacts, plan corridors, retain required bends with adaptive sampling, validate warm starts, solve constrained SQP with collision/clearance checks and report termination. Open/cyclic paths share the engine. Geometry and correspondence use one prepared layout. | [routing.cpp](../native/src/routing.cpp), [routing_planner.cpp](../native/src/routing_planner.cpp), [routing_handoff.cpp](../native/src/routing_handoff.cpp), [routing_solve.cpp](../native/src/routing_solve.cpp) | [routing parity](../tests/test_routing_parity.py), [surface pins](../tests/test_routing_surface_pins.py), [snapped routing](../tests/test_snapped_routing.py), [adaptive layout](../tests/test_routing_layout.py) |
 | C07 | Explicit junction resolution: canonical shared-point identity, incident-curve updates, transforms and atomic propagation. Proximity alone never creates a junction. | [junction evaluation](../src/anthroforge/application/junction_evaluation.py), [junction edits](../src/anthroforge/application/junction_edits.py) | [junction workflow](../tests/test_junction_workflow.py), [fiber junctions](../tests/test_fiber_junctions.py) |
 
 ### Attachments and attached construction
@@ -511,3 +511,37 @@ resolved inflation/smoothing defect when assessing the fixture.
   [real input acceptance](../tools/numeric_input_acceptance.py).
   Design references: [Qt locale validation](https://doc.qt.io/qt-6/qml-qtquick-doublevalidator.html),
   [PBRT rounding error](https://pbr-book.org/4ed/Shapes/Managing_Rounding_Error).
+
+### CH-012 — Preserve route layout through solver preparation
+
+- **2026-10-20; 0.2.2; implementation under qualification.** C06, Q03.
+  Baseline `9cc6c7c`; task `codex/solver-fail1`.
+- **Before/problem:** `solver_fail1.anthroforge`, four surface pins on two cubes,
+  failed at 24 samples. The planner's 24-point handoff passed collision checks, but
+  a second uniform resampling changed per-span counts from 8/10/8 to 7/13/6, cutting
+  corners and crossing both cubes. Independent segment checks identified crossings
+  at segments 3 and 20. Increasing density hid the defect at 128 samples.
+- **After/why:** prepare reference parameters and fixed-knot indices from the
+  validated corridor allocation; pass its exact vertices into SQP. Remove the
+  second resampling. The user's confirmed preference allows evaluated sampling to
+  exceed the requested count when retaining required bends/knots needs more points.
+  No authored preferences, points, clearance or iteration budget are rewritten.
+- **Related continuation defect:** a zero distance threshold accepted zero-distance
+  crossings in warm remaps. Handoff validation now uses the existing positive
+  `max(1e-9, 1e-9 * world_length)` centerline tolerance and checks interval endpoint
+  containment. Full clearance and recoverable warm feasibility remain distinct;
+  invalid warm seeds use the existing cold replan.
+- **Evidence so far:** exact original settings now solve; complete native segment
+  checks pass. 41 routing/layout regressions pass, including all existing addon/skull
+  parity cases, bound/unbound pins, cold/warm paths, closed-loop growth and the captured
+  rejected seed. API undo/redo, roundtrip, consumer connectivity and topology locks pass.
+  Full development/GUI/package qualification remains pending.
+- **Preserved contracts/limits:** generated points remain solver variables, not new
+  authored constraints. Consumers retain their own mesh density. Native cancellation
+  and the one-million-point bound remain enforced. This fixes sampling and validation;
+  it does not establish complete pathfinding for arbitrary geometry or move interior pins.
+- [Task/evidence](tasks/solver-fail1.md), [fixture](../tests/fixtures/routing/solver_fail1.json),
+  [layout tests](../tests/test_routing_layout.py),
+  [lifecycle tests](../tests/test_routing_layout_workflow.py).
+  Design reference: [OMPL path interpolation](https://ompl.kavrakilab.org/classompl_1_1geometric_1_1PathGeometric.html)
+  retains existing path vertices when adding samples. No new dependency was introduced.

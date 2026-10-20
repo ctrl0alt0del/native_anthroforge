@@ -6,6 +6,7 @@ extern "C" {
 /* All inputs are owned by the caller for this synchronous worker invocation.
  * Records: 13 doubles per authored knot. Owners: zero for unbound or surface index+1.
  * Meshes/matrices: accepted surface handles and complete world transforms.
+ * Samples: preferred total; may grow to retain required obstacle-avoiding bends.
  * Report: eight counters and eight measures, described by the Python adapter. */
 typedef struct AfRoutingOptions { int samples,accepted_steps,closed; double radius; } AfRoutingOptions;
 AF_API uint64_t af_route_path(const double* records,int count,const double* world,

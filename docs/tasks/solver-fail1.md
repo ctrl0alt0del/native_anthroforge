@@ -3,7 +3,7 @@
 - Task branch: `codex/solver-fail1`
 - Integration branch: `main`
 - Starting revision: `9cc6c7cd64ae3a0090bf3f715f434378653d441f`
-- Status: diagnosed; user requested approach discussion before implementation
+- Status: correction implemented; release qualification in progress
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -40,29 +40,44 @@ this fixture does not need more samples simply to represent a clear path.
 Isolated spans solve; whole-curve 16/24/32/64-sample probes fail, while 128 succeeds.
 Those probes diagnose sampling sensitivity and are not a proposed settings workaround.
 
-Proposed owning-boundary correction, **not implemented or approved yet**: one
-authoritative corner-preserving route allocation feeding both solver geometry and
-reference/pin correspondence. Solver preparation must not discard validated bends.
-Keep authored controls, sample budget and collision tolerances. Insufficient budgets
-in other scenes need explicit semantics; a generic algorithm replacement is not justified.
+User decision: sampling settings may adjust automatically. The authored sample setting
+is now a preferred total; native preparation can exceed it to preserve required bends
+and authored knots. It does not rewrite the authored setting, clearance or iteration cap.
+The existing one-million-point native safety bound remains enforced.
+
+Implemented one corner-preserving cold route allocation feeding solver geometry and
+reference/pin correspondence. Removed the subsequent uniform resampling. Existing
+valid warm-remap behavior is retained, with one cold replan when continuation fails.
+Low-budget continuation tests exposed a second defect: zero-threshold clearance accepted
+zero-distance segment crossings. Handoff checks now use the established positive
+segment-check tolerance and include contained endpoints after contact-interval clipping.
+The full clearance check remains separate from warm centerline feasibility.
 
 ## Verification
 
 Inspection through the shared CLI succeeds; document revision 208. Native route
 reproduction and direct whole-segment checks establish the failure above.
 Local evidence: `probe.log`, `traced-probe.log`, `fixture.json`, `handoff-check.json`.
-Temporary C++ tracing was removed; the baseline native library was rebuilt.
-No production correction or canonical package replacement was performed.
+Temporary C++ tracing was removed. Corrected native build and three CTests pass.
+41 targeted routing/layout tests pass, including existing addon/skull numerical parity,
+warm continuation, growth from preferred counts 3/4, exact pins, closed loops and the
+unchanged rejection of the captured faulty baseline seed.
+Two application regressions plus architecture checks pass: direct conversion,
+undo/redo, adaptive result persistence, consumer connectivity and attachment locks.
+`tools/adaptive_routing_acceptance.py` passes against the supplied project: the original
+24-point request solves, direct engine selection/undo/redo work, and requesting four
+samples produces 13 accepted points with all authored points unchanged and clear segments.
+Saved local corrected project: `build/solver-fail1/corrected.anthroforge`.
+No canonical package replacement has been performed yet.
 Official libigl winding-number/signed-distance and CGAL path documentation consulted
 before investigation. Existing native route diagnostics and regressions are the first
 tools to use; no algorithm replacement is selected.
 
 ## Next actions
 
-1. Discuss the sampling ownership and insufficient-budget policy with the user.
-   The user explicitly chose “Discuss the approach first”; wait for their decision.
-2. Once agreed, fix the owning boundary; log any computation change and qualify source,
-   native, background GUI and one canonical portable package before normal integration.
+1. Run the complete development gate and original-project GUI/shape qualification.
+2. Qualify one canonical portable package; record final evidence and computation history.
+3. Normal validated merge/push, preserving original file and unrelated changes.
 
 ## Recovery inputs
 

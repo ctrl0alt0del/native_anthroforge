@@ -32,8 +32,7 @@ static bool edge_clear(const kernel::AfInstance& item,Vec a,Vec b,const Interval
     const Vec delta=kernel::sub(b,a);
     for(const auto& [low,high]:intervals) {
         const Vec start=kernel::add(a,kernel::mul(delta,low)),end=kernel::add(a,kernel::mul(delta,high));
-        kernel::AfBatchResult result{0,0,0,0,INFINITY};
-        if(!kernel::af_instance_clear(item,start,end,0,0,0,threshold,result)) return false;
+        if(!kernel::af_instance_validation_row(item,start,end,0,0,0,threshold).clear) return false;
     }
     return true;
 }
@@ -51,7 +50,8 @@ static bool instance_clear(const Handoff& path,const kernel::AfInstance& item,co
 bool valid_handoff(const std::vector<Route>& routes,const Input& input,const World& world,bool clearance) {
     if(routes.empty()) return false;
     auto path=joined(routes,input.options.closed); contacts(path,input);
-    const double threshold=clearance?std::max(0.0,input.options.radius-world.slack):0.0;
+    const double tolerance=std::max(1e-9,1e-9*world.length);
+    const double threshold=clearance?std::max(tolerance,input.options.radius-world.slack):tolerance;
     for(const auto& item:world.collision->items)
         if(!instance_clear(path,item,input,threshold)) return false;
     return true;

@@ -42,6 +42,11 @@ automatic obstacles. Recalculation follows Live/On Release/Manual settings and k
 accepted geometry visible while pending. Topology locks also apply to engine changes.
 Generated routing samples never become editable knots. Closure requires three points.
 
+Under **Advanced**, **Preferred samples** controls evaluated path density. Routing adds
+points when necessary to retain bends around obstacles or your authored points; it keeps
+the entered preference unchanged. Clearance and iteration budget remain your explicit
+settings. Adding points does not change the curve's editable controls.
+
 **Automatic obstacles** considers all eligible SCP surfaces across the document, independent
 of visibility and workspace. Optional exclusions are searchable; bulk actions affect shown
 rows. Manual mode remains available and a manual empty list warns that SCPs are ignored.

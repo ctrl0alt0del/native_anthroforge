@@ -17,7 +17,12 @@ static std::vector<double> span_lengths(const std::vector<Vec>& points) {
 }
 Reference reference(const Input& input) {
     const auto points=anchors(input);
-    const auto counts=allocate_edges(span_lengths(points),input.options.samples-int(!input.options.closed));
+    const int samples=std::max(input.options.samples,input.count);
+    const auto counts=allocate_edges(span_lengths(points),samples-int(!input.options.closed));
+    return reference(input,counts);
+}
+Reference reference(const Input& input,const std::vector<int>& counts) {
+    const auto points=anchors(input);
     Reference result{{points.front()},{0},{0}};
     for(int i=0;i<int(counts.size());++i) {
         const Vec delta=kernel::sub(points[i+1],points[i]);

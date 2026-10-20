@@ -3,7 +3,7 @@
 - Task branch: `codex/muscle-height-smoothing`
 - Integration branch: `main`
 - Starting revision: `dda3af44d2899bd27da95eb20c75ca15d743260e`
-- Status: native correction implemented; focused checks pass; release qualification pending
+- Status: complete; qualified canonical package delivered
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -28,7 +28,7 @@ The user requires diagnosis before choosing a fix, strict preservation of settin
 and explanation of genuine limitations. Do not silently reduce inflation/smoothing,
 change authored geometry, or introduce an adaptive fallback.
 
-## Established diagnosis
+## Established diagnosis (original implementation)
 
 An isolated C++ diagnostic reproduces the same QP candidate before the existing
 normal-dot rejection. It does not change the application or original project.
@@ -58,7 +58,7 @@ The migrated Distributed kernel is byte-identical to the original addon's
 `native/fiber_ccd/af_muscle_numeric.hpp` source range and recorded source hash.
 Its locally derived normal displacements and local stability heuristic do not
 guarantee an embedded surface. The current refinement/evaluation composition
-amplifies the defect. No alternative algorithm has yet been qualified.
+amplifies the defect. The correction qualified later is described below.
 
 Strict retention of the exact existing displacement field cannot also remove its
 intersections. This is not evidence that the user's numeric settings or intended
@@ -71,7 +71,7 @@ Turning on the existing `robust_linear_solve` option was tested only in the isol
 probe and worsened convergence; it is not an accepted fix. Do not recommend reducing
 inflation as a complete workaround.
 
-## Verification and next actions
+## Agreed repair scope
 
 1. The user approved changing generated directions/shape while preserving authored
    settings and attachment constraints, and requested addon reproduction.
@@ -80,9 +80,8 @@ inflation as a complete workaround.
 3. Add representative regression coverage; validate GUI, persistence and packaging.
 4. Run the development gate, checkpoint/push, then validated merge/push.
 
-Production changes now exist on the task branch; no release package or original
-project has changed. Full development and package gates remain pending.
-The original SHA256 was checked again after the experiments and is unchanged.
+These steps are complete; see final qualification below. The original project
+SHA256 was checked again after qualification and is unchanged.
 
 ## Recovery inputs
 
@@ -104,7 +103,7 @@ The original SHA256 was checked again after the experiments and is unchanged.
 The containing Git commit identifies this checkpoint; inspect remote reachability
 before treating work as recoverable from another machine.
 
-## Addon reproduction and current experiments
+## Addon reproduction and initial experiments
 
 Blender 5.0.1 was run in background against the current addon. Exact source (4,816
 vertices) and refined (8,424 vertices) grids produce **bit-identical unsmoothed
@@ -130,12 +129,12 @@ the mesh mass matrix and cotangent diffusion operator, leaving lengths unchanged
 For the actual refined 1 m case, tested radii 0.02, 0.1, 0.3 and 1 m remove detected
 crossings. The unconstrained diagnostic view of each height-QP candidate also has
 zero detected crossings/collapses, despite normal rotations that the old validator
-rejects. This is **not yet a production correction**: direction scale, shape quality,
-refinement sensitivity, independent intersection checks and regression qualification
-remain unresolved. The old local stability heuristic also introduces sharp height
-changes around the bend; its effect is being isolated rather than silently retained.
+rejects. At this checkpoint, direction scale, shape quality, refinement sensitivity,
+independent intersection checks and regression qualification remained unresolved.
+The old local stability heuristic also introduced sharp height changes around the
+bend. Subsequent implementation and qualification below supersede this experiment.
 
-## Implemented candidate (not released)
+## Implemented correction
 
 - Distributed inflation now computes area-weighted normals and solves screened
   diffusion with physical distance equal to the authored inflation amount. It
@@ -163,8 +162,8 @@ Intrinsic and Final ready, no detected crossings/collapses. A texture-only GPU
 capture was inspected at `candidate-gpu.png`; the sharp inherited height depression
 is removed. The retained 1 m inflation and 0.1 boundary-band setting still produce
 a tall, steep-sided envelope; no parameters were altered to make it look smaller.
-Full gate, independent final intersection check, edit/save/undo inspection, and
-portable qualification remain outstanding. Do not merge or call this released yet.
+Full gate, independent final intersection check, edit/save/undo inspection and
+portable qualification were completed afterward; see final evidence below.
 
 ## Saved-base and solver qualification
 
@@ -192,5 +191,45 @@ and publishes an accurate `ITERATION_LIMIT` warning with residual evidence.
 No tolerance, authored setting, iteration budget or objective was relaxed.
 
 32 focused tests pass after this change, including a compact reconstruction of
-the saved old grid. New full gate and portable qualification remain pending.
-The offscreen/headless evidence does not establish interactive desktop latency.
+the saved old grid. The offscreen/headless evidence does not establish interactive
+desktop latency.
+
+## Final qualification
+
+- Final Windows development gate: **1,325 tests passed**, 829 existing Qt deprecation
+  warnings, three native CTests, native/script function limits, style, typing,
+  numerical audit and doctor. Log: `development-gate-final.log`.
+- Runtime `3b69cc9cfc8257c442684be05dfb95f6d1ba825f` passes the complete minimal-PATH
+  portable suite. The actual user project also passes through that executable,
+  both explicit reevaluation and settings-only reuse of the original retained base.
+  Evidence: `portable-qa/portable-check.json`, `packaged-qualification.json`.
+- The corrected project has ready Base, Rest, Intrinsic and Final tissue outputs.
+  Superseding edits, undo/redo, save/reopen and exact retained geometry pass.
+  `packaged-fixed.anthroforge` and `packaged-fixed.png` are local review artifacts.
+  Independent libigl inspection reports zero proper nonadjacent noncoplanar
+  crossings in the final 4,816-vertex, 9,350-triangle mesh.
+- All GUI checks stayed background/offscreen. The actual packaged GPU result and
+  addon render were inspected. No hands-on desktop or physical-latency acceptance
+  is claimed. Addon source files and the original project remain untouched.
+- Headless profiling measured new-base preparation around 5.85 ms, native inflation
+  32.9–35.6 ms and smoothing 282.8–461.5 ms. The old retained grid at 0.02 m can still
+  take about 8.8 seconds and publishes a certified iteration-limit warning.
+  These observations are fixture-specific, not responsiveness guarantees.
+- Ownership review: native direction construction, material refinement and complete
+  mesh validation own the correction; Python only exposes diagnostics. Pinned donor
+  kernels remain unchanged. No UI exception, silent height reduction, tolerance
+  relaxation, alternate scheduler or Python optimizer was added.
+
+The remaining failed ordinary Curve `bc859526-c885-4d9b-abd9-a4b6b61d3d61` is a
+separate, valid rejection: its second fixed point is **inside the cube**, 0.08012986 m
+from the closest surface (independent winding number 1). Isolating the cube still
+fails; isolating the tissue succeeds. Its Fiber is an independent copy with working
+bindings, so this ordinary Curve does not prevent tissue evaluation. Evidence:
+`remaining-curve.json`. Moving that authored point or excluding the cube is a user
+intent decision; neither was done. Strict preservation of that interior point and
+avoidance of the cube cannot both hold.
+
+Delivered one canonical `dist/0.2.2/AnthroForge.dist` and one companion
+`dist/AnthroForge-0.2.2-source.zip`. Previous binaries are retained only under the
+ignored task build directory. Qualified executable SHA-256:
+`28586b9fff2f2c8213df5555d6948be93c423841b95ae94af6a96bb63270cf69`.

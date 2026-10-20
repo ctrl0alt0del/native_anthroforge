@@ -1,7 +1,46 @@
 # AnthroForge development validation
 
-Current source qualification is in [direct UI workflows](#direct-ui-workflows-022).
+Current source qualification is in [bent tissue inflation](#bent-tissue-inflation-022).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Bent tissue inflation (0.2.2)
+
+See the [repair record](tasks/muscle-height-smoothing.md). The user's saved bent
+Membrane reproduced invalid Distributed inflation in both standalone and Blender
+5.0.1. The exact addon/standalone unsmoothed positions matched; both failed Height
+smoothing. The correction uses physically scaled native direction diffusion,
+subdivides existing material intervals without creating near-coincident grid lines,
+and validates complete geometry instead of rejecting normal rotation alone.
+The original settings, attachment constraints and donor source files are preserved.
+
+The final Windows gate passes **1,325 tests**, three native CTests, style/function
+limits, typing, numerical imports and doctor. There are 829 existing Qt deprecation
+warnings. Regression coverage includes the actual bend, refinement, strict height
+bounds/pins, genuine crossings, coincident shell contact, and retained historical
+grids. An iteration-limited height result is accepted only after independent
+optimality/constraint certification and geometry validation, with an honest warning.
+
+Runtime `3b69cc9cfc8257c442684be05dfb95f6d1ba825f` passes the complete minimal-PATH
+portable suite and the user's actual project through the packaged executable.
+Tissue Base/Rest/Intrinsic/Final are ready; editing, superseding changes, undo/redo
+and exact geometry after save/reopen pass. Independent libigl inspection finds
+zero proper nonadjacent noncoplanar crossings in its final 4,816 vertices.
+Background QML editing, hidden GPU scene/picking and actual packaged rendering
+were inspected. No hands-on desktop or input/display-latency acceptance is claimed.
+
+One independent original Curve still correctly fails: a fixed point lies inside
+the cube. Its independent attached Fiber and the tissue work. Neither the original
+project nor those unrelated authored points were changed. The retained 1 m amount
+still produces a tall envelope; this is not an automatic anatomical shape fit.
+The old saved grid can take about 8.8 seconds to reach its certified iteration limit;
+the newly prepared grid measured 0.28–0.46 seconds for smoothing in headless trials.
+
+Ownership review keeps numerical work and geometry acceptance in native components,
+with Python limited to orchestration and diagnostic publication. No tolerance or
+authored parameter was silently weakened. The qualified executable SHA-256 is
+`28586b9fff2f2c8213df5555d6948be93c423841b95ae94af6a96bb63270cf69`.
+It replaces the canonical `dist/0.2.2/AnthroForge.dist`, with one corresponding
+`dist/AnthroForge-0.2.2-source.zip`.
 
 ## Direct UI workflows (0.2.2)
 

@@ -4,10 +4,12 @@ from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.construction import Curve, CurvePoint
+from anthroforge.core.curve_engines import decode
 from anthroforge.core.curve_shapes import reshaped
 from anthroforge.native import curve_queries
 
 from .construction_codec import tuples
+from .construction_policy import require_topology_edit
 from .curve_edit_state import current
 from .object_operations import editable, install
 
@@ -23,20 +25,23 @@ def selected(session: "Session", curve: str) -> Curve:
 
 
 def configure(session: "Session", curve: str, **settings: Any) -> None:
-    from anthroforge.core.curve_engines import decode
-
-    from .construction_policy import require_topology_edit
-    from .curve_sources import consumers
-
     item = selected(session, curve)
     if "kind" in settings:
-        raise ValueError("Use a previewed conversion to change path engines.")
+        raise ValueError("Use curve.engine to change path engines.")
     config = configured_engine(item, settings)
     config = decode(item.engine, {k: v for k, v in vars_settings(config).items() if k != "kind"})
     if set(settings) & {"resolution", "samples"}:
-        for consumer in consumers(session.document, {curve}):
-            require_topology_edit(session.document, consumer)
+        require_topology_edit(session.document, curve)
     install(session, replace(item, engine_settings=config))
+
+
+def change_engine(session: "Session", curve: str, engine: str) -> None:
+    item = selected(session, curve)
+    if item.engine == engine:
+        return
+    require_topology_edit(session.document, curve)
+    settings = {"samples": max(64, len(item.points))} if engine == "ROUTED" else {}
+    install(session, replace(item, engine_settings=decode(engine, settings)))
 
 
 def configured_engine(item: Curve, settings: dict[str, Any]) -> Any:

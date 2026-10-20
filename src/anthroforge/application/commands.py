@@ -100,6 +100,7 @@ EDITS = {
     "curve.conversion.accept": curve_conversion.accept,
     "curve.edit": object_operations.edit_curve,
     "curve.engine_settings": curve_edit_operations.configure,
+    "curve.engine": curve_edit_operations.change_engine,
     "curve.point.update": object_operations.edit_point,
     "curve.point.insert": curve_edit_operations.insert,
     "curve.point.remove": curve_edit_operations.remove,

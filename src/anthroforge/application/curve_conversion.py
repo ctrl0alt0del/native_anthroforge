@@ -86,8 +86,7 @@ def require_editable(session: "Session", curve: str) -> None:
     curve_sources.source(session.document, curve)
     if session.history.before is not None:
         raise ValueError("Finish the current edit before changing the curve engine.")
-    for consumer in curve_sources.consumers(session.document, {curve}):
-        construction_policy.require_topology_edit(session.document, consumer)
+    construction_policy.require_topology_edit(session.document, curve)
 
 
 def make_job(session: "Session", value: ConversionPreview, spec: ConversionSpec) -> Job:
@@ -175,8 +174,7 @@ def status(session: "Session") -> dict[str, Any]:
 def accept(session: "Session", token: str) -> None:
     candidate = require_candidate(session, token).authored
     source = curve_sources.source(session.document, candidate.id)
-    for consumer in curve_sources.consumers(session.document, {candidate.id}):
-        construction_policy.require_topology_edit(session.document, consumer)
+    construction_policy.require_topology_edit(session.document, candidate.id)
     changed = replace(source, points=candidate.points, engine_settings=candidate.engine_settings)
     object_operations.install(session, changed)
     cancel(session)

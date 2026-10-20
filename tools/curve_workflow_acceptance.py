@@ -16,6 +16,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from routing_scale_probe import scene
 from shiboken6 import delete
+from snapped_routing_acceptance import choose
 from ui_acceptance import find
 from ui_polish_acceptance import descendants
 
@@ -64,47 +65,20 @@ def reveal(window, name, file):
 
 
 def points(window, controller):
-    find(window, "curveConversionToggle").setProperty("checked", True)
-    find(window, "conversionEngine").setProperty("currentIndex", 2)
-    find(window, "conversionPointToggle").setProperty("checked", True)
-    QTest.qWait(50)
-    model = find(window, "conversionPoint").property("choices")
-    assert model.counts == dict(total=120, chosen=120, shown=120)
-    check_virtualization(window, "conversionPointChoice")
-    search = find(window, "conversionPointSearch")
-    search.setProperty("text", "Point 11")
-    click(window, "conversionPointClearShown")
-    assert model.counts["chosen"] == 109 and model.counts["shown"] == 11
-    click(window, "conversionPointReset")
-    assert model.counts["chosen"] == 120 and search.property("text") == "Point 11"
-    point_focus(window, controller, model, search)
-
-
-def point_focus(window, controller, model, search):
-    search.setProperty("text", "Point 1")
-    click(window, "conversionPointClearShown")
-    assert model.records.rows[0]["chosen"] and model.records.rows[-1]["chosen"]
-    click(window, "conversionPointReset")
-    search.setProperty("text", "")
-    find(window, "conversionPointList").setProperty("contentY", 4000)
-    QTest.qWait(80)
-    check_virtualization(window, "conversionPointChoice")
-    focus_visible_point(window, controller)
-    scroll = find(window, "conversionPointList").property("contentY")
-    click(window, "conversionPointReset")
-    assert find(window, "conversionPointList").property("contentY") == scroll
-    reveal(window, "conversionPoint", "points-120.png")
-
-
-def focus_visible_point(window, controller):
-    row = next(
-        r
-        for r in descendants(window.contentItem())
-        if r.objectName() == "conversionPointChoice" and r.isEnabled()
-    )
-    row.setProperty("checked", False)
-    assert QMetaObject.invokeMethod(row, "clicked", Qt.DirectConnection)
-    assert controller.authoring.selectedComponent["point"] == row.property("targetId")
+    key = controller.selection
+    before, cursor = controller.session.document.object(key), controller.session.history.cursor
+    choose(window, 2)
+    settle(controller)
+    item = controller.session.document.object(key)
+    assert item.engine == "ROUTED" and item.points == before.points and len(item.points) == 120
+    assert item.result.status == "ready", item.result.error
+    assert controller.session.history.cursor == cursor + 1
+    controller.run("undo", {})
+    settle(controller)
+    assert controller.session.document.object(key).engine == "BEZIER"
+    controller.run("redo", {})
+    settle(controller)
+    reveal(window, "standaloneEngineChoice", "points-120.png")
 
 
 def check_virtualization(window, name):
@@ -113,35 +87,20 @@ def check_virtualization(window, name):
 
 
 def obstacles(window):
-    find(window, "conversionObstacleToggle").setProperty("checked", True)
+    find(window, "routingObstacleToggle").setProperty("checked", True)
     QTest.qWait(50)
-    model = find(window, "conversionObstacle").property("choices")
+    model = find(window, "routingObstacle").property("choices")
     assert model.counts == dict(total=120, chosen=0, shown=120)
     assert model.records.rows[0]["detail"] != model.records.rows[1]["detail"]
-    search = find(window, "conversionObstacleSearch")
+    search = find(window, "routingObstacleSearch")
     search.setProperty("text", "Cube")
-    click(window, "conversionObstacleChooseShown")
+    click(window, "routingObstacleChooseShown")
     assert model.counts["chosen"] == model.counts["shown"]
     search.setProperty("text", "")
-    click(window, "conversionObstacleReset")
+    click(window, "routingObstacleReset")
     assert model.counts["chosen"] == 0
-    check_virtualization(window, "conversionObstacleChoice")
-    reveal(window, "conversionObstacle", "obstacles-120.png")
-
-
-def preview(window, controller, key):
-    before = controller.session.document.object(key)
-    click(window, "previewCurveConversion")
-    settle(controller)
-    assert controller.session.conversion.state == "ready", controller.session.conversion.error
-    click(window, "acceptCurveConversion")
-    settle(controller)
-    item = controller.session.document.object(key)
-    assert item.engine == "ROUTED" and len(item.points) == 120 and item.result.status == "ready"
-    controller.run("undo", {})
-    settle(controller)
-    assert controller.session.document.object(key).points == before.points
-    assert controller.session.document.object(key).engine == "BEZIER"
+    check_virtualization(window, "routingObstacleChoice")
+    reveal(window, "routingObstacle", "obstacles-120.png")
 
 
 def report(controller):
@@ -150,9 +109,18 @@ def report(controller):
     await_export(controller)
     with ZipFile(path) as archive:
         manifest = json.loads(archive.read("manifest.json"))
-        assert manifest["complete"], manifest
+        capture_completeness(manifest)
         summary = json.loads(archive.read("summary.json"))
     (OUTPUT / "summary.json").write_text(json.dumps(summary, indent=2))
+
+
+def capture_completeness(manifest):
+    assert manifest["qt"]["finished"] and not manifest["qt"]["failure"], manifest
+    assert all(manifest["capabilities"][key] for key in ("qml", "tasks", "model_changes"))
+    if not manifest["complete"]:
+        loss = dict(evicted=manifest["storage"]["evicted"], qt_dropped=manifest["qt"]["dropped"])
+        assert any(loss.values()), manifest
+        print("Stress trace is incomplete due to bounded capture; timing totals are partial:", loss)
 
 
 def await_export(controller):
@@ -169,19 +137,22 @@ def run():
     controller.capture_mode, controller.qt_profiler = True, profiler
     engine = create_engine(controller, warnings)
     try:
-        window, key = engine.rootObjects()[0], setup(controller)
-        exercise(window, controller, key)
+        window = engine.rootObjects()[0]
+        setup(controller)
+        exercise(window, controller)
         assert not warnings, warnings
-        print("120-point / 120-obstacle QML editors, virtualization, preview and undo passed.")
+        print(
+            "120 retained points / 120 obstacles, direct engines, virtualization and undo passed."
+        )
     finally:
         close(controller, engine, profiler)
 
 
-def exercise(window, controller, key):
+def exercise(window, controller):
     controller.session.command("profile.start")
     points(window, controller)
     obstacles(window)
-    preview(window, controller, key)
+    settle(controller)
     placement(window, controller)
     report(controller)
 

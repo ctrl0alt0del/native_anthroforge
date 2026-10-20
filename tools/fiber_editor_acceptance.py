@@ -199,13 +199,11 @@ def click_binding(controller, engine, name):
 
 
 def conversion(controller, engine):
-    from ui_acceptance import find
+    from snapped_routing_acceptance import choose
 
     click_binding(controller, engine, "setFiberBinding")
-    find(engine.rootObjects()[0], "conversionEngine").setProperty("currentIndex", 1)
-    click_binding(controller, engine, "previewCurveConversion")
-    assert controller.session.conversion.state == "ready", controller.session.conversion.error
-    click_binding(controller, engine, "acceptCurveConversion")
+    choose(engine.rootObjects()[0], 1)
+    settle(controller)
     item = controller.session.document.object(controller.selection)
     assert item.engine == "POLYLINE" and len(item.bindings) == 3
     assert item.result.status == "ready", item.result.error

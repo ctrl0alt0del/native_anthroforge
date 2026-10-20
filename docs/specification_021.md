@@ -8,6 +8,13 @@ remains described by [its specification](specification_020.md) and
 
 ## Confirmed changes
 
+Updated engine interaction, 2026-10-20: a visible **Path engine** selector applies the chosen
+engine immediately as one undo action, preserving all existing authored control points.
+There is no Change path engine button or required Preview/Accept step. The old conversion
+point subset editor described below records 0.2.1 behavior; direct selection supersedes it.
+Explicit subset/resampling previews remain available through the optional headless API.
+Obstacle exclusions retain their searchable, virtualized editor.
+
 ### Viewport tools
 
 Place five distinct icon buttons below Move, Rotate and Scale in the viewport toolbar:
@@ -81,7 +88,7 @@ the current curve's settings. Showing them together obscures that distinction.
 
 Implementation evidence: `core/curve_engines.py`, `core/curve_conversion.py`,
 `application/conversion_geometry.py`, `core/curve_dependencies.py`,
-`desktop/qml/CurveConversion.qml`, `desktop/qml/RoutingSettings.qml`, and native
+`desktop/qml/CurveEngine.qml`, `desktop/qml/RoutingSettings.qml`, and native
 `routing_reference.cpp`, `routing_world.cpp`, `routing_solve.cpp`.
 
 ## Confirmed routing defaults and scale requirements
@@ -125,7 +132,7 @@ preparation, native execution and retained memory in profiler reports. Include o
 moving into a route, newly created/deleted geometry, changing workspaces, exclusions,
 consumer cycles and missing/Manual results. See qualification for measured scope and limits.
 
-### Conversion points
+### Conversion points (historical 0.2.1 interaction)
 
 Retain all existing authored points by default when switching to routing. Choosing a
 subset is optional; all authored points remain accessible in that editor. Preview shows
@@ -137,6 +144,10 @@ reason for structural points remains valid: the solver must pass through them, s
 drawn curve can constrain its freedom. Explicit subsets remain available in the optional editor.
 
 ### Lists with 100 or more items
+
+For current direct engine selection, all points are preserved without a selection list.
+The requirements below still apply to obstacle exclusions; point-subset UI requirements
+describe the superseded 0.2.1 preview interaction.
 
 Both obstacle exclusions and optional point selection must remain comfortable with at
 least 100 items. The ordinary inspector shows a compact summary and an optional Edit

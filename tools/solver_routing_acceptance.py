@@ -1,4 +1,4 @@
-"""Actual routing conversion controls; entirely offscreen, with the user's compact fixture."""
+"""Actual routing settings; entirely offscreen, with the user's compact fixture."""
 
 import os
 import sys
@@ -38,22 +38,13 @@ def click(item):
 
 
 def select_inputs(window, controller):
-    find(window, "curveConversionToggle").setProperty("checked", True)
-    find(window, "conversionObstacleToggle").setProperty("checked", True)
-    find(window, "conversionEngine").setProperty("currentIndex", 2)
+    find(window, "routingObstacleToggle").setProperty("checked", True)
     QGuiApplication.processEvents()
-    mode = find(window, "conversionObstacleMode")
+    mode = find(window, "routingObstacleMode")
     mode.setProperty("currentIndex", 0)
     assert QMetaObject.invokeMethod(mode, "activated", Qt.DirectConnection, Q_ARG(int, 0))
-    assert not find(window, "conversionObstacleNotice").property("visible")
-    click(find(window, "previewCurveConversion"))
     settle(controller)
-    require_preview(controller)
-
-
-def require_preview(controller):
-    value = controller.session.conversion
-    assert value.state == "ready", (value.state, value.error, controller.message)
+    assert not find(window, "routingObstacleNotice").property("visible")
 
 
 def exercise(controller, engine):
@@ -65,8 +56,6 @@ def exercise(controller, engine):
     window = engine.rootObjects()[0]
     assert find(window, "routingObstacleNotice").property("visible")
     select_inputs(window, controller)
-    click(find(window, "acceptCurveConversion"))
-    settle(controller)
     verify_accepted(controller, window, key, {root, child})
     verify_automatic(controller, window, key, root)
 
@@ -83,7 +72,7 @@ def verify_accepted(controller, window, key, targets):
 
 
 def capture(window):
-    target = find(window, "curveConversion")
+    target = find(window, "routingObstacle")
     parent = target.parentItem()
     while parent.metaObject().indexOfProperty("contentY") < 0:
         parent = parent.parentItem()
@@ -105,7 +94,6 @@ def verify_automatic(controller, window, source, target):
 
 
 def binding_row(window, target):
-    find(window, "curveConversionToggle").setProperty("checked", False)
     find(window, "routingObstacleToggle").setProperty("checked", True)
     QGuiApplication.processEvents()
     rows = [
@@ -122,7 +110,7 @@ def run():
     try:
         exercise(controller, engine)
         assert not warnings, warnings
-        print("Offscreen obstacle notice, conversion selection, surface contacts and undo passed.")
+        print("Offscreen obstacle notice, automatic selection, surface contacts and undo passed.")
     finally:
         controller.close()
         delete(engine)

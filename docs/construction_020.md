@@ -28,17 +28,19 @@ Select the curve and enter editing to move authored points and handles. G/R/S, S
 insertion, Ctrl surface snapping, wheel offset, axis views 1/2/3 and camera restore 4 retain
 their existing behavior. Entering edit mode never refits or resamples the curve.
 
-The inspector shows **Active engine**. To enable routing, enter **Edit Curve**, open
-**Change path engine**, choose **ROUTED**, click **Preview conversion**, then **Use ROUTED**.
-The dropdown selects a conversion target; neither selecting it nor previewing changes the
-active engine. The preview is explicitly marked as not applied. Snapping points or creating
-a Fiber does not switch engines; a new Fiber preserves its source curve's engine.
+Select a curve or Fiber and choose its **Path engine** directly in the inspector.
+The selection applies immediately as one undo action; no edit mode, separate button,
+preview or acceptance is required. All existing authored points, identities and handles
+remain; the chosen engine defines the path. Switching back from ROUTED does not turn its
+solved samples into new points. Fiber changes use the current resolved authored shape.
+Snapping points or creating a Fiber does not switch engines; a new Fiber preserves its
+source curve's engine.
 
-**Change path engine** previews a conversion before acceptance. BEZIER exposes handles;
+BEZIER exposes handles;
 POLYLINE keeps exact segments; ROUTED solves between authored structural points around
-automatic SCP obstacles. Routing conversion retains all authored points by default; Edit
-opens an optional searchable subset editor. Endpoints, bindings and junctions are protected.
-Generated routing samples do not become editable knots. Closure requires three points.
+automatic obstacles. Recalculation follows Live/On Release/Manual settings and keeps the
+accepted geometry visible while pending. Topology locks also apply to engine changes.
+Generated routing samples never become editable knots. Closure requires three points.
 
 **Automatic obstacles** considers all eligible SCP surfaces across the document, independent
 of visibility and workspace. Optional exclusions are searchable; bulk actions affect shown

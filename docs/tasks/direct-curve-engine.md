@@ -27,16 +27,33 @@ resolved authored points for Fiber edits. Preserve topology/workspace restrictio
 pending Manual results, obsolete-job rejection, failure retention and single-action undo.
 The optional existing headless preview API can remain separate from the direct UI.
 
+## Implemented checkpoint
+
+- `curve.engine` installs a typed engine through ordinary transactions, shared topology
+  policy, invalidation and path scheduling; same-engine selection is a no-op. Keeps existing
+  points and uses resolved authored Fiber state. No preview job is involved.
+- `CurveEngine.qml` is directly visible for a standalone Curve/Fiber, also available for
+  a primitive's selected source while editing. Removed the old conversion gate. User
+  activation alone writes; undo/refresh/rejected edits restore the authoritative selection.
+- Updated API, specifications, architecture, walkthrough and existing QML qualification tools.
+- 24 focused tests passed (engine, optional conversion, Fiber conversion and architecture).
+  Ruff/mypy passed. Offscreen actual saved project passed: Curve/Fiber routing clearance,
+  retained points, one-action undo/redo, direct selection without edit mode, primitive
+  source selection, shared topology lock/rejection/reset/unlock. Existing obstacle and
+  Fiber editing QML checks passed. Offscreen capture verifies layout, not 3D rendering.
+- The 120-point/120-obstacle workflow passed interaction assertions but its full stress
+  profiler recording evicted events and overflowed the Qt queue. The tool now explicitly
+  reports this bounded-capture loss; no complete timing totals are claimed. Rerun pending.
+
 ## Verification and next actions
 
-1. Add the direct shared engine operation and tests for state, undo, async work and policies.
-2. Replace conversion controls with a direct selector and qualify background QML behavior.
-3. Align active documentation, run the development gate and packaged checks.
-4. Replace only the canonical 0.2.2 distribution after it closes, archive source and merge/push.
+1. Run the development gate, rerun the updated stress check and inspect hidden GPU output.
+2. Qualify the packaged executable, including the same direct command and updated QML.
+3. Replace only the canonical 0.2.2 distribution after it closes, archive source and merge/push.
 
 ## Recovery inputs
 
 User fixture: `E:/development/WIP_models/solver_doesnt_work.anthroforge` (read only).
 Temporary evidence: `build/direct-curve-engine`. Preserve unrelated root `__init__.py`.
 Relevant files: application/curve_edit_operations.py, application/commands.py,
-desktop/qml/PrimitiveInspector.qml and CurveConversion.qml.
+desktop/qml/PrimitiveInspector.qml and CurveEngine.qml.

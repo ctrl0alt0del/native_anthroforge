@@ -549,8 +549,12 @@ source identities to branch assembly; no proximity welding or separate Fiber lof
 The object registry provides generic identities and poses without substituting construction
 ownership for ordinary parenting or anatomical attachment. A Fiber subclasses Curve; its
 bindings resolve current shape before the same engine interface evaluates it. No public
-Free/Controlled or solver-generation hierarchy exists. Engine-specific settings are typed;
-conversion owns a read-only preview and a separate undoable acceptance operation.
+Free/Controlled or solver-generation hierarchy exists. Engine-specific settings are typed.
+`curve.engine` preserves resolved authored points and installs the selected engine through
+the common edit/revision/dependency pipeline, with one undo action. The desktop selector
+dispatches only on user activation; state refreshes and undo do not author edits. Existing
+coordinator policies own evaluation, cancellation and failure retention. Optional resampling
+conversion has a separate read-only preview/acceptance API; ordinary selection does not use it.
 
 Junction output ports distinguish canonical source publication from followers' path outputs.
 Atomic authored edits update incident points together; the dependency graph retains accepted

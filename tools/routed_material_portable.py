@@ -66,8 +66,22 @@ def verify(executable, folder, initial):
             assert row["state"]["result"]["status"] == "ready", row
         counts = saved_counts(folder / (name + ".anthroforge"), state)
         assert counts == dict(surface_vertices=vertices, routed_samples=[samples, samples]), counts
+        capture(executable, folder, name, state)
         evidence.append(dict(phase=name, **counts))
     return evidence
+
+
+def capture(executable, folder, name, state):
+    target = next(o["state"]["id"] for o in state["objects"] if o["state"].get("exact") is True)
+    view = dict(workspace=0, selected=target, editing=False)
+    view.update(camera=[0, 0, 0.3, -20, 25, 0, 4.0], orthographic=True)
+    (folder / "view.json").write_text(json.dumps(view))
+    arguments = ("--cli", "render", name + ".anthroforge", name + ".png")
+    options = ("--revision", str(state["revision"]), "--view", "view.json")
+    invoke(executable, folder, *arguments, *options)
+    metadata = json.loads((folder / (name + ".png.json")).read_text())
+    assert metadata["captured"] and not metadata["window_visible"]
+    assert not metadata["warnings"]
 
 
 def run(executable, project, folder):

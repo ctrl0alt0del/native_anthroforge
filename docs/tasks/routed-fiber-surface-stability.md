@@ -3,7 +3,7 @@
 - Task branch: `codex/routed-fiber-surface-stability`
 - Integration branch: `main`
 - Starting revision: `4be30b49e484957a62c548beffcb4d07f7a30021`
-- Status: exact corners approved; shared material-frame implementation in progress
+- Status: complete; canonical package and source qualified
 - Last updated: 2026-10-20, Europe/Bucharest
 - Active writer: local desktop chat, direct work
 
@@ -22,8 +22,8 @@ Production work now retains normalized surface stations and self-contained sourc
 coordinates on accepted tissue results. Shared attachment resolution transports each
 binding location and frame through material charts, independently of sample indices.
 Geometry payloads/native handles are not embedded in that metadata. Captured bindings
-remain unchanged. A candidate canonical package was rebuilt from `9427d13`, but additional
-patch qualification found a defect before acceptance. That build is not qualified.
+remain unchanged. Runtime `c30211d` replaces the rejected harmonic-disk candidate
+`9427d13`; its full development gate and refreshed hidden-render checks pass.
 
 Native compilation/three CTests and targeted tests now cover actual Base/Final Anchors,
 downstream Fibers, saved captures, undo/redo, nonzero offsets with nonuniform transforms,
@@ -32,22 +32,40 @@ mean-value boundary transport; harmonic disk mapping was rejected for 0.1173 m d
 unchanged geometry after adding one collinear sample. Rim queries now choose compatible
 material planes at shared sheet/rim edges. Six new square/concave, edge/corner, shell,
 resolution and rigid-transform checks pass, alongside routed consumer regressions.
-normal-shell/crop/envelope outputs retain owned source coordinate bases. Old metadata-free
+Normal-shell/crop/envelope outputs retain owned source coordinate bases. Old metadata-free
 captures and indexed authored weight fields keep explicit existing topology restrictions.
 
 `tools/routed_material_acceptance.py` completed hidden Direct3D texture renders and a runtime
 profile; all three images were visually inspected. Accepted route counts are 3/4/3 and
 surface vertices 9/18/9. Both anchors return to their original locations with unchanged
-records. The local report recorded 30 native material-frame calls: mean 0.372 ms, max
-3.365 ms with profiling enabled; this small scene is not a general responsiveness benchmark.
+records. The final local report recorded 30 native material-frame calls: mean 0.409 ms,
+max 2.099 ms with profiling enabled; this small scene is not a general responsiveness
+benchmark. The capture is complete, with no lost events and no unattributed geometry
+bytes. Its observed peak is 8,818,848 geometry bytes; overlapping owner totals are not summed.
 
 The first full pytest run had 1,358 passes and two donor parity failures caused by removal
 of zero-width strips. Tests now preserve the source donor fixtures and explicitly verify
-their canonical nondegenerate geometry. The final development gate passes 1,371 tests,
+their canonical nondegenerate geometry. The final development gate passes 1,378 tests,
 three native CTests, type/style/function/numerical checks and doctor. Additional targeted
-checks cover target-region goals and source-handle disposal. Canonical package replacement
-and portable acceptance remain pending. No release acceptance is claimed.
-The original experiment results below describe the pre-fix baseline.
+checks cover target-region goals and source-handle disposal. The canonical package passes
+the complete minimal-PATH portable suite and `tools/routed_material_portable.py`: reopened
+exact projects shrink/grow to 9/18 surface vertices and 3/4 samples per routed Fiber.
+All results are ready, captures are unchanged, and packaged hidden GPU images were inspected.
+No visible-window, hands-on editing or physical input/display-latency acceptance is claimed.
+
+Deliverables are the single `dist/0.2.2/AnthroForge.dist` and companion
+`dist/AnthroForge-0.2.2-source.zip`. Packaged runtime is
+`c30211d7b3102083e4d840649be5dcaed1764445`; executable SHA-256 is
+`bdfc5adb250403cb36fe9d2c51dec1405bd09bd47860de6c7f9b40940d31dd40`.
+Its native DLL exactly matches the qualified development DLL:
+`0aec658faaf9c3f7322e3f4b47ab40b886a74037310c66d7309256ff0afd4cb4`.
+The scientific native-patch view was also inspected. Extra collinear sampling plus a
+resolution change produces at most `4.58e-16` m drift; a new boundary bend moves retained
+locations with the patch. Data/image are local `patch-material.json`/`.png` in the build folder.
+
+## Historical baseline and comparison (`18dfeba`)
+
+The following results describe the pre-fix baseline.
 
 Fibers use the corrected routing evaluator with resolved binding inputs. Actual two-endpoint
 Fibers with preferred samples 3 grow 3 → 4 → 3 as an independent cube enters/leaves the path.
@@ -70,7 +88,7 @@ The isolated C++ experiment compares:
 Both consume the very same accepted routed Fiber buffers. Three matched phases and
 scientific figures are generated from those buffers, not illustrative geometry.
 
-## Verification
+### Original comparison verification
 
 The experiment's real uniform-surface tissue Base and Final Anchors retain their bindings
 through grow/shrink, undo/redo and project reopening; no scheduler errors occur.
@@ -88,7 +106,7 @@ When the obstacle enters:
 
 Deviation is not penetration depth. The boundary test does not establish whole-surface
 collision safety. Before and after obstacle entry, all variants' boundaries are clear.
-The production exact-consumer Base attachment failure remains reproduced, not repaired.
+At that comparison revision, the production exact-consumer Base failure remained unrepaired.
 
 16 routing/layout/workflow/architecture checks pass. Experiment Python style and function
 limits pass; the isolated C++ helper compiles with the existing native toolchain. No
@@ -98,12 +116,12 @@ is claimed. Canonical executable SHA-256 remains
 Official OMPL interpolation and Blender Surface Deform sources were consulted;
 repository contracts and actual native results establish these findings.
 
-## Next actions
+## Completion
 
-1. Re-run development gate after patch replacement, then rebuild/check the canonical package and source archive.
-2. Recheck latest runtime captures/portable exact projects, then validated merge/push.
-3. Qualify actual Fiber → Membrane → Tissue → attachment chains and package/merge only
-   after the selected repair is complete.
+The approved exact-corner route is integrated through the shared material service.
+No implementation or acceptance work remains. Indexed authored fields and old captures
+without the required coordinates retain their explicit restrictions; this repair does
+not guess correspondence or promise collision-free interiors for arbitrary lofts.
 
 ## Ownership review
 
@@ -124,4 +142,5 @@ Preserve unrelated root `__init__.py`; all validation stays background-only.
 The maintained [experiment instructions](../../tools/experiments/routed_sampling/README.md)
 recreate data and images. Local `compare/comparison.json`, `.npz` buffers, three saved
 projects, `comparison.png`, `corner-closeup.png` and `timeline.png` are generated artifacts
-and are not pushed. `exact-limit.log` contains the current exact-mode rejection.
+and are not pushed. `exact-limit.log` retains the historical exact-mode rejection;
+the maintained script now requires that same attachment to become ready.

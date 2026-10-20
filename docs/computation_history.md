@@ -555,7 +555,7 @@ resolved inflation/smoothing defect when assessing the fixture.
 
 ### CH-013 — Exact corners with sampling-independent attachment correspondence
 
-- **2026-10-20; implementation under qualification.** C06, S01–S04, A02–A04.
+- **2026-10-20; implemented and qualified.** C06, S01–S04, A02–A04.
   Baseline `4be30b4`; comparison `18dfeba`; first implementation checkpoint `2868c05`.
 - **Observed:** actual routed Fibers preserve bindings while growing 3 → 4 → 3.
   Exact loft station unions change mesh connectivity; downstream Tissue Base attachment
@@ -598,10 +598,15 @@ resolved inflation/smoothing defect when assessing the fixture.
   adaptive patches. Additional regression checks explicitly compare every captured position
   and frame across square/concave-patch resampling, resolutions 2/4/7, corners/edges, shell
   rims, rigid motion, scale and metadata restoration. Hidden GPU captures show the surface retaining both obstacle
-  bends and returning to its original shape. The full development gate passes 1,371 tests,
+  bends and returning to its original shape. Runtime `c30211d` passes the full gate: 1,378 tests,
   three CTests and native/Python style/type/numerical checks. Additional targeted tests verify
   target-relative goals and disposal of source handles while coordinate metadata remains
-  owned. Portable-package qualification remains pending.
+  owned. Unchanged-patch position drift measures at most `4.58e-16` m in the local view.
+  A complete profile records 30 material-frame calls averaging 0.409 ms (max 2.099 ms),
+  with no lost events or unattributed geometry bytes. This is a small profiled workload,
+  not a general responsiveness benchmark. The canonical Windows package passes the complete
+  minimal-PATH suite and exact-surface grow/shrink/save/reopen checks with unchanged captures.
+  Its hidden GPU renders were inspected. Visible-window/manual editing is not claimed.
 - **Preserved limits:** this does not guarantee collision-free interiors of arbitrary lofts.
   Authored topology locks, unsupported domains and cropped-away material remain explicit
   failures. Indexed custom tissue weight fields/selected face masks retain their existing

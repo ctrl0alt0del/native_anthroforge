@@ -604,8 +604,8 @@ owned editable state and accepted results, never native handles, undo history or
 
 Exact surfaces retain normalized longitudinal stations independently of vertex indices.
 Accepted tissue results own their source coordinate basis, including part charts, periodic
-axes and patch projected positions/perimeter coordinates. This metadata survives deformation, crops, envelope
-composition, snapshots and serialization and is included in geometry memory accounting.
+axes and patch projected positions/perimeter coordinates. This metadata survives deformation,
+crops, envelope composition, snapshots and serialization and is included in memory accounting.
 It contains no live source handles.
 
 `surface_providers.binding_frames` is the shared boundary for Anchors, Fiber influence
@@ -616,6 +616,11 @@ use material-space acceleration, cancellation and explicit coverage validation; 
 material remains a failure. Authored topology policies remain separate from this numerical
 correspondence. Indexed authored fields and selected-face masks retain their existing
 topology restrictions.
+
+Patch transport uses signed mean-value coordinates on matched perimeter stations, including
+both boundaries' corners. It preserves linear precision when only sampling changes; it does
+not remesh or move the patch itself. At shared rim/sheet edges the native spatial lookup
+selects the material plane compatible with the retained frame.
 
 ## User feedback reports
 

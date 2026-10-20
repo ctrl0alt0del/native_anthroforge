@@ -16,9 +16,11 @@ is always an explicit authoring operation.
 
 ## Workspaces and presentation
 
-Use **Manage…** beside the workspace selector. A named workspace can contain any mix
-of SCPs and controls. Create one from the selection, then tick its members; rename or
-remove it there. Removing the active workspace returns to the whole document. Other
+**Focus** immediately creates a named workspace from selected anatomy and its descendants.
+Use **Manage…** beside the workspace selector to rename it inline or adjust membership
+and presentation. This panel is nonmodal: viewport navigation remains available while
+it is open. A named workspace can contain any mix of SCPs and controls.
+Removing the active workspace returns to the whole document. Other
 objects remain transparent and read-only, with their dependencies still evaluated.
 Membership changes wait until the active edit/save finishes. An empty named workspace
 is valid. Deleted object references are retained for undo; they are not shown as live

@@ -110,6 +110,7 @@ See the [tissue walkthrough](tissues_022.md) and [executable example](../example
 | `object.transform` | `target`, nine TRS `values` | Ordinary local transform; rejects whole-fiber transforms. |
 | `object.reparent` | `target`, optional `parent` | Preserves world placement and consumer placement. |
 | `object.delete` | `target` | Blocks referenced sources; preserves ordinary children. |
+| `object.delete.inspect` | `target` | Read-only shared validation and impact query; returns command/arguments and affected object IDs/names. Desktop asks for confirmation only when other objects are affected. Actual deletion revalidates current state. |
 | `primitive.from_curves` | ordered `curves`, `kind` BODY/LOFT, optional `parent`, `name`, `shape` | SCP ID with live curve references. |
 | `primitive.curve_mode` | `entity`, `curve`, `mode` SHAPE_ONLY/SHAPE_AND_TRANSFORM | Changes transform following without a visible jump. |
 | `primitive.make_independent` | `entity`, `curve` | New curve ID; remaps that consumer and its memberships. |
@@ -476,7 +477,11 @@ and its limits are in [release validation](development_status.md#construction-ob
 
 ### Fiber creation
 
-`fiber.create(curve, bindings, name="Fiber")` starts an asynchronous independent copy.
+`fiber.create(curve, bindings=None, name="Fiber")` starts an asynchronous independent copy.
+Omitting bindings uses both open endpoints, or the first closed-curve point, with native
+nearest-ready-SCP capture. Explicit binding rows may omit `target` to use the same
+automatic choice for that point; explicit Tissue Base/Final overrides remain supported.
+Automatic candidates and coordinates are captured at dispatch, not when queued.
 Each binding is `{point: authored_point_id, target: anatomical_surface_id,
 capture_scope: "CURRENT_PARENT" | "ANY_PARENT"}`. Supply both open endpoints or
 at least one point on a closed curve. It returns the job identifier; completed creation
@@ -544,12 +549,13 @@ The same command still accepts `entity` and `curve` for primitive/surface consum
   `surface.preview.status()` reports token/state/alignment; `surface.preview.accept(token)`
   installs the complete result in one undo step. `surface.preview.cancel()` releases it.
   Source edits or parent-frame changes invalidate acceptance. Candidates are excluded from
-  saves and picking. The desktop automatically previews creation from closed loft sources.
+  saves and picking. This is optional API functionality, not a required desktop step.
 - `surface.create(curves, kind="LOFT", name="Surface", parent="", owner="", **settings)`
   consumes an ordered list of generic curves/fibers and returns an asynchronous job ID.
   `PATCH` requires exactly one closed source; loft sources must agree on closure.
   The desktop Patch / Surface icon chooses PATCH for one selected curve and LOFT for
-  two or more, using these same operations and validation. Closed lofts retain preview.
+  two or more, using these same operations and validation. Closed lofts create directly
+  in one undo action; Realign is available afterward.
 - `surface.update(target, **settings)` edits `exact`, `strips`, `patch_resolution`,
   `close_across`, `flip` or `name`. Exact sampling retains evaluated corners. `strips=0`
   retains density fitted at creation/Realign; a positive count selects fixed subdivisions.

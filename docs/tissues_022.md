@@ -20,9 +20,13 @@ All-Fiber surfaces become Membranes automatically. A generic Surface containing 
 curves is still useful construction, but is not an attached tissue source. Point and Curve
 conversion copies the source; subsequent edits to the original do not change the copy.
 
-Select the Anchor, Fiber or Membrane, choose a compatible preset and press **Create tissue**.
+Select an Anchor, Fiber or Membrane and press **Create Tissue** on the main toolbar or
+Create menu. This creates the default compatible tissue immediately. With no eligible
+selection, the same action opens a searchable source/preset chooser and explains missing
+prerequisites. The source inspector also offers compatible presets.
 The new object appears in Anatomy. Its source remains in Construction and is shared live.
-Use source navigation to edit it, or **Make Independent** to copy its complete construction
+**Edit construction source** enters the source editor; a Membrane's **Edit curve** buttons
+enter its individual Fiber editors. Use **Make Independent** to copy its complete construction
 graph. Copies preserve internal junction sharing and explicit external attachment targets.
 Deleting the tissue preserves its sources. Referenced sources cannot be deleted first.
 
@@ -47,8 +51,9 @@ general physical contact. The capability matrix explains combinations that are r
 
 For Normal shells, **Weight fields** can define Base-domain `INFLATION` weights. Explicit
 zeros remain zero; an absent field uses the boundary-derived defaults. Named Base/Rest
-fields are also available as constraint masks. Choose **Select field points**, Ctrl-click
-to extend selection and assign a weight. Blue means zero, gold partial and red full weight.
+fields are also available as constraint masks. Choosing a field enters point editing.
+Ctrl-click to extend selection, then commit **Weight** to update selected points in one undo
+action. Mixed values are indicated explicitly. Blue means zero, gold partial and red full weight.
 Coordinates remain read-only. Remove/change referencing constraints before deleting a field.
 
 **Constraints** supports Fixed/Soft masks, feathering, strength and offsets. Source-relative
@@ -68,7 +73,8 @@ Incoming bindings lock incompatible topology edits with a reason naming the depe
 Stacking is a separate relationship. Both participants must use surface construction and
 enable stacking. Muscle presets enable it initially; other presets do not. Automatic
 candidate detection determines order. In **Stacking**, search for another tissue, choose
-the sides and optionally save Requested/Explicit order or exclude that pair. Requested
+the sides and choose Requested/Explicit order or exclude that pair. Each change applies
+immediately with Undo; **Reset relationship** removes the override. Requested
 order must agree with geometry; Explicit order still undergoes independent validation.
 
 For a local influence, choose **Select support footprint…** after setting an order. Click

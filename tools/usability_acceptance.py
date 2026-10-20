@@ -253,7 +253,7 @@ def verify(controller, window):
 
 def run():
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    controller, warnings = open_controller("build/coordinator-portable/assembly.anthroforge"), []
+    controller, warnings = fixture(), []
     controller.capture_mode = True
     engine = create_engine(controller, warnings)
     prepare_view(controller, True)
@@ -264,6 +264,20 @@ def run():
         write_report(controller, warnings, result)
     finally:
         controller.close()
+
+
+def fixture():
+    controller = open_controller(None)
+    path = str(Path("examples/primitives/cube.obj").resolve())
+    root = controller.run("import", dict(path=path, units=1.0))["entity_id"]
+    settle(controller)
+    child = controller.run("import", dict(path=path, units=1.0, parent=root))["entity_id"]
+    settle(controller)
+    controller.run("scp.transform", dict(entity=child, values=[1, 0, 0, 0, 0, 0, 0.2, 0.2, 0.2]))
+    controller.run("scp.transform", dict(entity=root, values=[0, 0, 0, 0, 0, 25, 1, 1, 1]))
+    settle(controller)
+    controller.select(root)
+    return controller
 
 
 def write_report(controller, warnings, result):

@@ -63,17 +63,34 @@ Implementation and interaction qualification (not release-ready):
   now restores the active index after model replacement/rename.
 - Report labels, real tabs and icon centering pass at 150%/200% scaling, including
   1050-logical-pixel width. Existing shared controls already fix the reported defects.
-  Inbox originals remain untouched. Final image-tracing checks, full development gate,
-  durable docs and portable qualification remain incomplete.
+  Inbox originals remain untouched. Image-plane tracing and its independent one-action
+  undo now pass. Field re-entry/mixed selection and root/leaf keyboard/tree deletion pass.
+- Shared Hook member navigation passes for curve controls, base vertices and lattice
+  points as well as imported vertices. Selection changes neither geometry nor history.
+- Updated specifications, API and walkthroughs. Full Windows gate passed: 1,317 tests
+  (87.63 seconds, 829 existing Qt deprecation warnings), native CTests, type/style/function
+  checks and numerical/native doctor. Portable qualification and final delivery remain.
+- The additional packaged command protocol passes in the source launcher: automatic
+  endpoints, independent copy, undo/redo, impact inspection and saved ready output.
 
 Prior ignored audit probe reproduced unapplied stacking checkbox changes, hidden Fiber
 creation, per-point selector clutter, source navigation without editing and Hook member
 selection doing nothing outside edit mode.
 
-1. Finish interaction regression checks, including dense bindings, rejected settings,
-   direct report text, conditional deletion, weights and nonmodal workspace navigation.
-2. Compare current reports at representative DPI; fix any remaining layout defects.
-3. Validate, package, update durable documentation, merge and push.
+1. Finish full Windows gate and portable qualification.
+2. Record final evidence, install the single canonical package and source archive.
+3. Merge and push validated changes.
+
+## Ownership review
+
+Automatic target choice belongs to shared Fiber creation, using native batched queries
+inside the existing cancellable worker and complete captured read set. Explicit target
+semantics, independent copy and publication/undo ownership are unchanged. Deletion-impact
+inspection reuses shared editability/reference/binding checks; actual deletion revalidates.
+Desktop navigation and selection compose existing application operations. QML writes
+only on explicit interaction and restores accepted choices after failed edits or undo.
+No new scheduler, numerical Python implementation, document preview layer or report
+storage format was introduced. Report drafts remain separate from document undo.
 
 ## Recovery
 

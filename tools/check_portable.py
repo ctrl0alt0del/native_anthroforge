@@ -10,6 +10,7 @@ from pathlib import Path
 
 import numpy as np
 from construction_portable import construction
+from direct_workflow_portable import direct_workflows
 from feedback_portable import feedback
 from inspection_portable import inspection
 from issues_portable import issues
@@ -36,6 +37,7 @@ CHECKS = (
     "independent fibers, shared lofts and portable embedded reference images",
     "window feedback capture, annotations, inbox preview, text editing and deletion",
     "schema-4 tissues, attached construction, stacking, native profiling and rendering",
+    "automatic Fiber endpoints, independent copies, undo/redo and shared deletion impact",
 )
 
 
@@ -132,6 +134,7 @@ def qualification_steps():
         workflow,
         inspection,
         construction,
+        direct_workflows,
         tissues,
         feedback,
     )

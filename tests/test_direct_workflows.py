@@ -97,3 +97,26 @@ def test_delete_impact_counts_ordinary_parenting_and_workspace_ownership(session
     session.wait()
     affected = session.command("object.delete.inspect", target=root)["affected"]
     assert {child, associated}.issubset({row["id"] for row in affected})
+
+
+def test_delete_impact_names_shared_control_consumers(session):
+    root, other, _ = two_surfaces(session)
+    hook = session.command("control.create", kind="HOOK", entity=root)
+    for target in (root, other):
+        session.command("deformer.add", control=hook, target=dict(owner=target))
+    session.wait()
+    plan = session.command("object.delete.inspect", target=hook)
+    assert plan["operation"] == "control.delete"
+    assert {root, other} <= {row["id"] for row in plan["affected"]}
+    session.command(plan["operation"], **plan["arguments"])
+    assert all(not session.document.entity(key).deformers for key in (root, other))
+    session.command("undo")
+    assert session.document.control(hook)
+
+
+def test_delete_impact_does_not_allow_referenced_source_deletion(session):
+    _, curve = scene(session, closed=True)
+    session.command("surface.create", curves=[curve], kind="PATCH")
+    session.wait()
+    with pytest.raises(ValueError, match="referenc|consumer|source"):
+        session.command("object.delete.inspect", target=curve)

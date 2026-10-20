@@ -29,6 +29,7 @@ def fields(controller, window):
     settle(controller)
     assert set(controller.session.document.object(controller.selection).fields[0].values) == {1}
     assert controller.authoring.transformData.get("readonly") is not False
+    mixed(controller, window)
     remove(controller, window)
 
 
@@ -50,6 +51,23 @@ def remove(controller, window):
     click(window, "tissueFieldRemove")
     settle(controller)
     assert not controller.session.document.object(controller.selection).fields
+
+
+def mixed(controller, window):
+    controller.authoring.setEditing(False)
+    click(window, "tissueField_Test pins")
+    assert controller.authoring.editing
+    editor = controller.authoring
+    editor.selectComponent(editor.componentRows[0]["key"], False)
+    control = find(window, "tissueFieldWeight")
+    QMetaObject.invokeMethod(control, "edited", Qt.DirectConnection, Q_ARG(float, 0.5))
+    settle(controller)
+    editor.selectAllComponents(True)
+    settle(controller)
+    assert control.property("mixed")
+    QMetaObject.invokeMethod(control, "edited", Qt.DirectConnection, Q_ARG(float, 0.75))
+    settle(controller)
+    assert set(controller.session.document.object(controller.selection).fields[0].values) == {0.75}
 
 
 if __name__ == "__main__":

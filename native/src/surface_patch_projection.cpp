@@ -44,13 +44,17 @@ static void check_intersections(const Polygon& points,uint64_t cancel) {
         }
     }
 }
-Polygon project(const Points& points,uint64_t cancel) {
+Projection projection(const Points& points) {
     if(points.size()<3) throw std::runtime_error("Patch needs three boundary samples.");
     const V3 origin=center(points),normal=best_fit(points,origin);
     Eigen::Index axis=0; normal.cwiseAbs().minCoeff(&axis);
     const V3 first=normal.cross(V3::Unit(axis)).normalized(),second=normal.cross(first);
+    return {origin,first,second};
+}
+Polygon project(const Points& points,uint64_t cancel) {
+    const auto frame=projection(points);
     Polygon result;
-    for(const auto& p:points) result.emplace_back((p-origin).dot(first),(p-origin).dot(second));
+    for(const auto& p:points) result.emplace_back((p-frame.origin).dot(frame.first),(p-frame.origin).dot(frame.second));
     check_intersections(result,cancel); return result;
 }
 }

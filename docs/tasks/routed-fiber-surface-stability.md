@@ -22,11 +22,16 @@ Production work now retains normalized surface stations and self-contained sourc
 coordinates on accepted tissue results. Shared attachment resolution transports each
 binding location and frame through material charts, independently of sample indices.
 Geometry payloads/native handles are not embedded in that metadata. Captured bindings
-remain unchanged. Canonical package replacement remains pending.
+remain unchanged. A candidate canonical package was rebuilt from `9427d13`, but additional
+patch qualification found a defect before acceptance. That build is not qualified.
 
 Native compilation/three CTests and targeted tests now cover actual Base/Final Anchors,
 downstream Fibers, saved captures, undo/redo, nonzero offsets with nonuniform transforms,
-closed seams, branches and patches. Patch coordinates use native harmonic disk mapping;
+closed seams, branches and patches. Patch coordinates now use projected positions and
+mean-value boundary transport; harmonic disk mapping was rejected for 0.1173 m drift on
+unchanged geometry after adding one collinear sample. Rim queries now choose compatible
+material planes at shared sheet/rim edges. Six new square/concave, edge/corner, shell,
+resolution and rigid-transform checks pass, alongside routed consumer regressions.
 normal-shell/crop/envelope outputs retain owned source coordinate bases. Old metadata-free
 captures and indexed authored weight fields keep explicit existing topology restrictions.
 
@@ -95,7 +100,7 @@ repository contracts and actual native results establish these findings.
 
 ## Next actions
 
-1. Rebuild/check the canonical package and source archive.
+1. Re-run development gate after patch replacement, then rebuild/check the canonical package and source archive.
 2. Recheck latest runtime captures/portable exact projects, then validated merge/push.
 3. Qualify actual Fiber → Membrane → Tissue → attachment chains and package/merge only
    after the selected repair is complete.

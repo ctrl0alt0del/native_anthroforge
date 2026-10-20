@@ -22,8 +22,8 @@ void validate_basis(const MaterialBasis& basis) {
     if(!basis.grids.empty()) {
         Mesh view; view.vertices.resize(basis.count,3); view.material=basis.grids; view.material_axes=basis.parameters;
         material_grids(view);
-    } else if(basis.parameters.size()!=size_t(basis.count)*2)
-        throw std::runtime_error("Material disk coordinates do not match their source.");
+    } else if(basis.parameters.size()!=size_t(basis.count)*3)
+        throw std::runtime_error("Material patch coordinates do not match their source.");
     for(double value:basis.parameters) if(!std::isfinite(value)) throw std::runtime_error("Nonfinite material coordinate.");
 }
 }

@@ -604,7 +604,7 @@ owned editable state and accepted results, never native handles, undo history or
 
 Exact surfaces retain normalized longitudinal stations independently of vertex indices.
 Accepted tissue results own their source coordinate basis, including part charts, periodic
-axes and patch disk coordinates. This metadata survives deformation, crops, envelope
+axes and patch projected positions/perimeter coordinates. This metadata survives deformation, crops, envelope
 composition, snapshots and serialization and is included in geometry memory accounting.
 It contains no live source handles.
 

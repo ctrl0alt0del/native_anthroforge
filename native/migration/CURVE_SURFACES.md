@@ -76,5 +76,8 @@ The adaptive-routing repair coalesces station differences below `1e-12` of norma
 length. Two curved boundary-1 donor fixtures therefore lose two duplicate vertices and
 their zero-width strips. Original donor captures remain unchanged; tests verify their
 canonical nondegenerate geometry and shared seam connectivity. Ordinary exact lofts
-retain the union's normalized axes for material attachments. Patch harmonic material
-coordinates are additional metadata and do not change the captured patch geometry.
+retain the union's normalized axes for material attachments. Patch projected positions
+and boundary arclength are additional metadata and do not change donor patch geometry.
+Mean-value boundary transport preserves linear precision under boundary resampling.
+The first harmonic-disk attempt was rejected for attachment drift on unchanged geometry;
+see CH-013 and `tests/test_patch_material_resampling.py`.

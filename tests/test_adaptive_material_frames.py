@@ -92,21 +92,32 @@ def test_closed_seam_resampling_keeps_frames_on_both_sides_of_wrap(session):
     )
 
 
-def test_branched_material_charts_survive_added_source_station(session):
-    from anthroforge.native import surface_branches
+def branch_resampling_inputs(engine):
     from tests.test_native_surface_branches import FIXTURE, inputs
 
     case = FIXTURE["cases"][0]
-    original, branch = inputs(session.engine, case)
+    original, branch = inputs(engine, case)
     changed = dict(case, rows=list(case["rows"]))
     points = changed["rows"][2]
     changed["rows"][2] = [points[0], ((np.array(points[0]) + points[1]) / 2).tolist(), *points[1:]]
-    rows, branch = inputs(session.engine, changed)
+    rows, branch = inputs(engine, changed)
+    return original, rows, branch
+
+
+def test_branched_material_charts_survive_added_source_station(session):
+    from anthroforge.native import surface_branches
+
+    original, rows, branch = branch_resampling_inputs(session.engine)
     before, after = [
         surface_branches.geometry(session.engine, source, 2, [branch], curve_surfaces.Settings())
         for source in (original, rows)
     ]
-    assert np.isfinite(material_bindings.frames(before, after, IDENTITY, all_records(before))).all()
+    captured = all_records(before)
+    np.testing.assert_allclose(
+        material_bindings.frames(before, after, IDENTITY, captured),
+        frames(before, captured),
+        atol=1e-10,
+    )
 
 
 def test_tissue_material_basis_owns_coordinates_without_retaining_source_handle(session):

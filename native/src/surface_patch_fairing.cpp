@@ -31,7 +31,7 @@ void fair(Patch& patch,int boundary_count,uint64_t cancel) {
     for(int i=0;i<4;++i) patch.points=fair_pass(patch,neighbors,boundary_count,cancel);
 }
 void boundary_last(Patch& patch,int count) {
-    std::vector<int> order; Points points; Polygon coordinates; std::vector<int> remap(patch.points.size());
+    std::vector<int> order; Points points,coordinates; std::vector<int> remap(patch.points.size());
     for(size_t i=0;i<patch.points.size();++i)
         if(patch.keys[i][0]!=0||patch.keys[i][1]>=count) order.push_back(int(i));
     for(int i=0;i<count;++i) order.push_back(patch.indices.at({0,i,0,0,0}));
@@ -45,7 +45,7 @@ void boundary_last(Patch& patch,int count) {
 static std::shared_ptr<Mesh> patch_mesh(const Patch& patch,uint64_t cancel) {
     auto mesh=make_mesh(patch.points,patch.faces,cancel,false);
     mesh->basis.count=int64_t(patch.points.size());
-    for(const auto& p:patch.coordinates) mesh->basis.parameters.insert(mesh->basis.parameters.end(),{p.x(),p.y()});
+    for(const auto& p:patch.coordinates) mesh->basis.parameters.insert(mesh->basis.parameters.end(),{p.x(),p.y(),p.z()});
     return mesh;
 }
 std::shared_ptr<Mesh> patch(const Row& row,int resolution,bool flip,uint64_t cancel) {
@@ -53,8 +53,8 @@ std::shared_ptr<Mesh> patch(const Row& row,int resolution,bool flip,uint64_t can
     auto points=row.points; const auto projected=project(points,cancel);
     const auto triangles=triangulate(points,projected,cancel);
     auto result=subdivide(points,triangles,resolution,cancel);
-    patch_coordinates(result,row,resolution,cancel);
-    fair(result,int(row.points.size()),cancel); boundary_last(result,int(row.points.size()));
+    fair(result,int(row.points.size()),cancel); patch_coordinates(result,row,resolution,cancel);
+    boundary_last(result,int(row.points.size()));
     if(flip) for(auto& face:result.faces) std::reverse(face.begin(),face.end());
     return patch_mesh(result,cancel);
 }

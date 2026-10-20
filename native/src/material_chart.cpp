@@ -17,16 +17,22 @@ static Chart grid_chart(const MaterialGrid& grid,uint64_t cancel) {
     }
     return chart;
 }
+static Chart patch_chart(const MaterialBasis& basis,uint64_t cancel) {
+    Chart chart;
+    for(int64_t i=0;i<basis.count;++i) {
+        check_cancel(cancel); const V3 value(basis.parameters.data()+3*i);
+        chart.points.emplace(i,V3(value.x(),value.y(),0));
+        if(value.z()!=-1&&(value.z()<0||value.z()>=1)) throw std::runtime_error("Invalid patch perimeter parameter.");
+        if(value.z()>=0&&!chart.boundary.emplace(value.z(),value.head<2>()).second)
+            throw std::runtime_error("Duplicate patch perimeter parameter.");
+    }
+    if(chart.boundary.size()<3) throw std::runtime_error("Material patch has no closed boundary.");
+    return chart;
+}
 Atlas atlas(const MaterialBasis& basis,uint64_t cancel) {
     validate_basis(basis); Atlas result; result.membership.resize(size_t(basis.count));
-    if(basis.grids.empty()) {
-        Chart chart;
-        for(int64_t i=0;i<basis.count;++i) {
-            check_cancel(cancel); chart.points.emplace(i,V3(basis.parameters[2*i],basis.parameters[2*i+1],0));
-        }
-        disk_boundary(chart);
-        append(result,std::move(chart),cancel);
-    } else {
+    if(basis.grids.empty()) append(result,patch_chart(basis,cancel),cancel);
+    else {
         Mesh view; view.vertices.resize(basis.count,3); view.material=basis.grids; view.material_axes=basis.parameters;
         for(const auto& grid:material_grids(view)) append(result,grid_chart(grid,cancel),cancel);
     }

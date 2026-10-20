@@ -12,9 +12,11 @@ struct Patch {
     Points points;
     Faces faces;
     std::vector<PatchKey> keys;
-    Polygon coordinates;
+    Points coordinates;
     std::map<PatchKey,int> indices;
 };
+struct Projection { V3 origin,first,second; };
+Projection projection(const Points& points);
 Polygon project(const Points& points,uint64_t cancel);
 double orient(const V2& a,const V2& b,const V2& c);
 std::vector<Triangle> triangulate(Points& points,const Polygon& projected,uint64_t cancel);

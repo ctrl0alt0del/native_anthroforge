@@ -576,11 +576,18 @@ resolved inflation/smoothing defect when assessing the fixture.
   tangent, normal and offset. It never nearest-recaptures or rewrites the saved binding.
   Anchors, dense Fiber fields and target-relative tissue constraints use the same service.
   Unchanged parameter domains retain the existing canonical correspondence implementation.
-- **Patch extension:** positive uniform harmonic coordinates parameterize patches onto a
-  convex disk without changing their geometry. A radial map between sampled disk boundaries,
-  including its analytic derivative, keeps boundary locations meaningful as sampling changes.
-  All numerical work stays native. Coordinate buffers participate in persistence, equivalence
-  and resource accounting without retaining live source handles.
+- **Rejected patch attempt (`9427d13`):** harmonic disk coordinates plus radial boundary
+  transport passed finiteness checks but moved an attachment by 0.1173 m when a collinear
+  boundary sample was inserted into an unchanged one-metre square. Interior coordinates
+  depended on triangulation. Finiteness was insufficient evidence; that approach is removed.
+- **Patch replacement:** store projected material positions and normalized boundary arclength.
+  Signed mean-value coordinates transport positions using the union of both boundaries'
+  stations, including new corners. Linear precision preserves unchanged planar geometry
+  despite remeshing. Interior derivatives are analytic; exact edge interpolation uses
+  symmetric derivative limits with a `1e-5` normalized-coordinate step. Current material
+  triangles supply the actual 3D frame. Boundary queries select compatible material planes
+  so a rim attachment cannot resolve onto a sheet face solely because they share an edge.
+  All work remains native, cancellable and bounded. Metadata owns no live source handles.
 - **Intentional donor difference:** two curved branch fixtures contain two duplicate vertices
   and zero-width strips from floating-point station unions. Tests retain the original donor
   data and compare against its canonical removal of those duplicates; other geometry/seam
@@ -588,7 +595,9 @@ resolved inflation/smoothing defect when assessing the fixture.
 - **Evidence so far:** real routed Fibers, exact Membranes, Tissue Base/Final Anchors and
   downstream Fibers survive growth/shrink, undo/redo and reopening with unchanged bindings.
   Native checks cover frames/offsets under nonuniform transforms, closed seams, branches and
-  adaptive patches. Hidden GPU captures show the actual surface retaining both obstacle
+  adaptive patches. Additional regression checks explicitly compare every captured position
+  and frame across square/concave-patch resampling, resolutions 2/4/7, corners/edges, shell
+  rims, rigid motion, scale and metadata restoration. Hidden GPU captures show the surface retaining both obstacle
   bends and returning to its original shape. The full development gate passes 1,371 tests,
   three CTests and native/Python style/type/numerical checks. Additional targeted tests verify
   target-relative goals and disposal of source handles while coordinate metadata remains
@@ -601,4 +610,6 @@ resolved inflation/smoothing defect when assessing the fixture.
 - [Task and measurements](tasks/routed-fiber-surface-stability.md),
   [reproducible experiment](../tools/experiments/routed_sampling/README.md).
   Design references: [libigl parameterization](https://libigl.github.io/libigl/tutorial/),
-  [CGAL parameterization](https://doc.cgal.org/latest/Surface_mesh_parameterization/index.html).
+  [CGAL mean-value coordinate properties](https://doc.cgal.org/latest/Barycentric_coordinates_2/index.html).
+  No new dependency is introduced; the vendored libigl MVC routine is explicitly marked
+  broken upstream and is not used.

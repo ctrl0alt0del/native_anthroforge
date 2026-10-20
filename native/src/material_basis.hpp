@@ -5,7 +5,8 @@
 
 namespace af {
 // Owned source coordinates, never source geometry or a live handle. Grid indices
-// refer to source vertices; an ungridded disk uses two coordinates per source vertex.
+// refer to source vertices; a patch stores projected UV and boundary arclength
+// per source vertex (-1 marks interior vertices).
 struct MaterialBasis {
     int64_t count=0;
     std::vector<int64_t> grids;

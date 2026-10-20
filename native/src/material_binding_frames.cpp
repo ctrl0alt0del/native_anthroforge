@@ -32,13 +32,13 @@ static Eigen::Vector3i indices(const Mesh& mesh,const double* record) {
     if(weights.minCoeff()<-1e-6||std::abs(weights.sum()-1)>1e-6) throw std::runtime_error("Invalid retained material weights.");
     return result;
 }
-static M4 resolve(const Mesh& before,const Mesh& after,const Atlas& a,const Atlas& b,const Indices& index,const M4& world,const double* record,uint64_t cancel) {
+static M4 resolve(const Mesh& before,const Mesh& after,const Atlas& a,const Atlas& b,const Indices& index,const std::vector<Cage>& maps,const M4& world,const double* record,uint64_t cancel) {
     const auto source=coordinates(before,a,indices(before,record));
-    const auto position=transported(a.charts[size_t(source.chart)],b.charts.at(size_t(source.chart)),source.coordinates,V3(record+3));
+    const auto position=transported(maps.at(size_t(source.chart)),source.coordinates,V3(record+3),cancel);
     V3 query=position.point;
-    auto location=locate(index,b,source.chart,query,cancel);
+    auto location=locate(index,b,source.chart,query,position.tangents,cancel);
     if(location.triangle<0&&after.tissue.kind==5&&query.z()<0) {
-        query.z()=1; location=locate(index,b,source.chart,query,cancel);
+        query.z()=1; location=locate(index,b,source.chart,query,position.tangents,cancel);
     }
     if(location.triangle<0) throw std::runtime_error("Retained tissue material location is outside the current surface; restore the crop or explicitly rebind.");
     return frame(after,location,position.tangents,world,record);
@@ -49,10 +49,10 @@ static void resolve_batch(const Mesh& before,const Mesh& after,const M4& world,i
     for(size_t i=0;i<a.charts.size();++i)
         if(a.charts[i].closed_u!=b.charts[i].closed_u||a.charts[i].closed_v!=b.charts[i].closed_v)
             throw std::runtime_error("Material closure changed; explicitly rebind.");
-    const auto index=indexed(after,b,cancel);
+    const auto index=indexed(after,b,cancel); const auto maps=cages(a,b,cancel);
     for(int i=0;i<count;++i) {
         check_cancel(cancel); Eigen::Map<M4> output(frames+16*i);
-        output=resolve(before,after,a,b,index,world,records+28*i,cancel);
+        output=resolve(before,after,a,b,index,maps,world,records+28*i,cancel);
     }
 }
 static int retained_frames(uint64_t reference,uint64_t current,const double* world,int count,const double* records,double* frames,uint64_t cancel) {

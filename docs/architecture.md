@@ -682,3 +682,17 @@ remains transitive; failure publications notify consumers through the same bound
 observations remain separate from anatomical prerequisites. Tests cover creating supported
 fibers after their tissue support exists, which previously caused a plan/path feedback loop.
 
+## Branched construction interaction
+
+`DrawingTools` owns the provisional placement lifecycle. `BranchPlacement` captures
+authored controls from displayed path resources and caches owned coordinates in the native
+component index. Perspective/orthographic closest-point projection is native; no Python
+per-control scan runs on pointer motion. The first click seeds an owned native stroke.
+`curve.branch.create` validates and publishes the new curve plus explicit junction as one
+shared application edit, reusing canonical junction ownership and normal path scheduling.
+
+`surface_grouping` resolves semantic source groups from explicit junction identities before
+existing asynchronous surface construction. It never changes numerical loft/branch assembly.
+Group partitions are generated lazily, stop after two valid answers, and bound alternative
+parent assignments; unresolved searches require explicit grouping. `SurfaceCreation` only
+presents ambiguous drafts, with virtualized lists and shared validation before publication.

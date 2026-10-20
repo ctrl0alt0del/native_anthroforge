@@ -74,3 +74,20 @@ def test_parented_source_root_uses_world_coordinates(session):
     child = branch(session, source)
     session.wait()
     np.testing.assert_allclose(session.document.object(child).points[0].position, [3, 6, 5])
+
+
+def test_branch_follows_resolved_fiber_root_without_changing_its_binding(session):
+    from tests.test_fiber_creation import bind, scene
+
+    bone, original = scene(session)
+    fiber = bind(session, bone, original)
+    child = branch(session, fiber.id, 0)
+    session.wait()
+    before = session.resources.paths[session.document.object(child).result.asset].authored
+    session.command("scp.transform", entity=bone, values=[0, 0, 1, 0, 0, 0, 1, 1, 1])
+    session.wait()
+    after = session.resources.paths[session.document.object(child).result.asset].authored
+    np.testing.assert_allclose(
+        after.points[0].position, np.array(before.points[0].position) + [0, 0, 1]
+    )
+    assert session.document.object(fiber.id).bindings == fiber.bindings

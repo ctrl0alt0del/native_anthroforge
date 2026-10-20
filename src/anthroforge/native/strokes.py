@@ -12,7 +12,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_stroke_create", [c.c_int, c.POINTER(U), D, D, D], U)
     engine.bind("af_stroke_release", [U], None)
     engine.bind("af_stroke_append", [U, D, c.c_int])
-    engine.bind("af_stroke_seed", [U, D, D])
+    engine.bind("af_stroke_seed", [U, D, D, c.c_int])
     engine.bind("af_stroke_probe", [U, D, D])
     engine.bind("af_stroke_snapping", [U, c.c_int])
     engine.bind("af_stroke_read", [U, c.c_int, c.c_int, D])
@@ -33,13 +33,15 @@ def plane(engine: GeometryEngine, frame: Any) -> list[float]:
 
 
 class Stroke:
-    def seed(self, ray: Any, position: Any) -> None:
+    def seed(self, ray: Any, position: Any, retain_plane: bool = False) -> None:
         data, point = pointer_input(ray), doubles(position)
         if point.shape != (3,):
             raise ValueError("Stroke seed requires a three-dimensional point.")
-        count = self.engine.library.af_stroke_seed(self.handle, pointer(data), pointer(point))
+        count = self.engine.library.af_stroke_seed(
+            self.handle, pointer(data), pointer(point), retain_plane
+        )
         self.engine.check(count < 0)
-        self.count = count
+        self.count = int(count)
 
     def __init__(self, engine: GeometryEngine, meshes: Any, frames: Any, plane: Any, options: Any):
         handles = np.ascontiguousarray(meshes, dtype=np.uint64)
@@ -47,7 +49,7 @@ class Stroke:
         if frames.size != len(handles) * 16 or plane.size != 6 or options.size != 4:
             raise ValueError("Stroke needs mesh frames, a depth plane and projection settings.")
         self.engine, self.count = engine, 0
-        self.handle = engine.library.af_stroke_create(
+        self.handle: int = engine.library.af_stroke_create(
             len(handles),
             handles.ctypes.data_as(c.POINTER(U)),
             pointer(frames),

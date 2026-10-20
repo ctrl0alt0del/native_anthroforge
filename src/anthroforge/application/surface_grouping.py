@@ -148,7 +148,7 @@ def infer(session: Any, curves: list[str]) -> dict[str, Any]:
 
 
 def discover(records: Any, curves: list[str], incoming: Any) -> dict[str, Any]:
-    found = []
+    found: list[dict[str, Any]] = []
     for plan in candidate_plans(records, curves, incoming):
         if plan is None:
             return dict(ambiguous=True, plan=found[0] if found else suggested(curves, incoming))

@@ -58,10 +58,10 @@ evidence for those revisions, not current workflow instructions.
 | C01 | BÃ©zier path evaluation: handle modes, cubic sampling, open/closed paths and authored radius/tilt. | [curves.cpp](../native/src/curves.cpp), [path registry](../native/src/path_registry.cpp) | [curve parity](../tests/test_curve_parity.py), [curve engines](../tests/test_curve_engine.py) |
 | C02 | Exact polyline evaluation: straight segments through authored points, including ordinary closure without a duplicated authored endpoint. | [path registry](../native/src/path_registry.cpp) | [native paths](../tests/test_native_paths.py) |
 | C03 | Path frames and consumer sampling: arc-length/range sampling, direction and start correspondence, anchored sampling, frame transport and body placement. Solver samples remain separate from authored controls. | [curve_frames.cpp](../native/src/curve_frames.cpp), [path_resampling.cpp](../native/src/path_resampling.cpp) | [anchored sampling](../tests/test_anchored_sampling.py), [consumer sampling](../tests/test_consumer_sampling.py) |
-| C04 | Drawing/fitting: pointer-stroke depth, surface projection/fallback, offsets, image-plane drawing, corner detection and native cubic fitting. A completed stroke authors one curve. | [drawing.cpp](../native/src/drawing.cpp), [curve_fit.cpp](../native/src/curve_fit.cpp), [drawing tasks](../src/anthroforge/application/drawing_tasks.py) | [drawing parity](../tests/test_drawing_parity.py), [strokes](../tests/test_strokes.py) |
+| C04 | Drawing/fitting: pointer-stroke depth, surface projection/fallback, offsets, image-plane drawing, corner detection and native cubic fitting. Branch placement can explicitly seed an existing control position (CH-015). A completed stroke authors one curve. | [drawing.cpp](../native/src/drawing.cpp), [curve_fit.cpp](../native/src/curve_fit.cpp), [drawing tasks](../src/anthroforge/application/drawing_tasks.py) | [drawing parity](../tests/test_drawing_parity.py), [strokes](../tests/test_strokes.py), [branch placement](../tests/test_branch_placement.py) |
 | C05 | Curve editing math: closest location to the pointer, cubic subdivision/insertion, handle updates, selected-control transforms and current-path rebasing/deformation. | [curve_queries.cpp](../native/src/curve_queries.cpp), [path_editing.cpp](../native/src/path_editing.cpp) | [curve queries](../tests/test_curve_queries.py), [standalone editing](../tests/test_standalone_editing.py) |
 | C06 | Routed path solving: capture obstacles, classify contacts, plan corridors, retain required bends with adaptive sampling, validate warm starts, solve constrained SQP with collision/clearance checks and report termination. Open/cyclic paths share the engine. Geometry and correspondence use one prepared layout. | [routing.cpp](../native/src/routing.cpp), [routing_planner.cpp](../native/src/routing_planner.cpp), [routing_handoff.cpp](../native/src/routing_handoff.cpp), [routing_solve.cpp](../native/src/routing_solve.cpp) | [routing parity](../tests/test_routing_parity.py), [surface pins](../tests/test_routing_surface_pins.py), [snapped routing](../tests/test_snapped_routing.py), [adaptive layout](../tests/test_routing_layout.py) |
-| C07 | Explicit junction resolution: canonical shared-point identity, incident-curve updates, transforms and atomic propagation. Proximity alone never creates a junction. | [junction evaluation](../src/anthroforge/application/junction_evaluation.py), [junction edits](../src/anthroforge/application/junction_edits.py) | [junction workflow](../tests/test_junction_workflow.py), [fiber junctions](../tests/test_fiber_junctions.py) |
+| C07 | Explicit junction resolution: canonical shared-point identity, incident-curve updates, transforms and atomic propagation. Branched placement creates/reuses a junction in the new curve's single transaction (CH-015). Proximity alone never creates a junction. | [junction evaluation](../src/anthroforge/application/junction_evaluation.py), [junction edits](../src/anthroforge/application/junction_edits.py), [branch creation](../src/anthroforge/application/curve_branch_creation.py) | [junction workflow](../tests/test_junction_workflow.py), [fiber junctions](../tests/test_fiber_junctions.py), [branch creation](../tests/test_branch_creation.py) |
 
 ### Attachments and attached construction
 
@@ -80,7 +80,7 @@ evidence for those revisions, not current workflow instructions.
 | S01 | Source correspondence: align compatible closed paths initially, persist starting correspondence/direction, apply per-source sampling ranges and transforms; explicit Realign recalculates correspondence. | [surface_alignment.cpp](../native/src/surface_alignment.cpp), [surface_sampling.cpp](../native/src/surface_sampling.cpp) | [native surfaces](../tests/test_native_surfaces.py), [surface sources](../tests/test_surface_sources.py) |
 | S02 | General lofts: preserve evaluated corners with normalized material axes, coalescing numerically coincident stations. Shared attachment frames use material charts across adaptive sample changes (CH-013). All-Fiber inputs produce a Membrane through the same evaluator. | [surface_loft.cpp](../native/src/surface_loft.cpp), [material_binding_frames.cpp](../native/src/material_binding_frames.cpp) | [surface workflow](../tests/test_surface_workflow.py), [adaptive material](../tests/test_adaptive_material_frames.py), [routed surface lifecycle](../tests/test_routed_surface_material.py) |
 | S03 | Closed-curve patches: project and triangulate a boundary, subdivide, fair interior samples while retaining boundary constraints, and retain material correspondence. | [surface_patch_projection.cpp](../native/src/surface_patch_projection.cpp), [surface_patch_fairing.cpp](../native/src/surface_patch_fairing.cpp) | [native surfaces](../tests/test_native_surfaces.py) |
-| S04 | Branched open lofts: explicit junction-based branch sampling, connector assembly and welded seams. Reject unsupported nested/closed branches and overlapping root intervals. | [surface_branches.cpp](../native/src/surface_branches.cpp), [surface_branch_sampling.cpp](../native/src/surface_branch_sampling.cpp) | [native surface branches](../tests/test_native_surface_branches.py), [surface branches](../tests/test_surface_branches.py) |
+| S04 | Branched open lofts: infer semantic source groups from explicit junctions before unchanged native branch sampling, connector assembly and welded seams (CH-015). Ask for ambiguous groups; reject unsupported nested/closed branches and overlapping root intervals. | [grouping](../src/anthroforge/application/surface_grouping.py), [surface_branches.cpp](../native/src/surface_branches.cpp), [surface_branch_sampling.cpp](../native/src/surface_branch_sampling.cpp) | [native surface branches](../tests/test_native_surface_branches.py), [surface grouping](../tests/test_surface_grouping.py), [surface branches](../tests/test_surface_branches.py) |
 
 ### Tissue construction, inflation and relaxation
 
@@ -654,3 +654,41 @@ resolved inflation/smoothing defect when assessing the fixture.
   operations remain available for other targets. Missing supports fail without partial
   creation. Tissue inflation can still report its normal capability/geometry errors after
   successful attached-source creation. No general performance improvement is claimed.
+
+
+### CH-015 — Direct branched placement and surface grouping
+
+- **Date / affected IDs:** 2026-10-20; C04, C05, C07, S04.
+- **Observed gap / baseline:** `99737ca` supports explicit junction editing and native
+  branched surfaces, but placement cannot start at an existing control with a junction.
+  Surface creation needs manual branch assignment even when connections determine it.
+- **Previous approach:** create independent curves, join points through inspector selectors,
+  create a main loft, then add each branch. Regular component picking selects a near-ray
+  hit within a radius, which is different from the requested nearest projected control.
+- **Replacement / ownership:** native projected-distance selection over cached displayed
+  authored coordinates; explicit native first-sample seeding; one shared application
+  operation authors the new curve and junction. The source remains canonical and existing
+  junctions are reused. The common surface operation infers semantic groups from explicit
+  point identities, with a read-only draft for multiple valid groupings. Partitions are
+  generated lazily and alternative parent assignments are bounded; unresolved assignments
+  require a user choice. Numerical projection remains C++, graph policy remains Python.
+- **Preserved contracts:** source geometry and bindings, point identities, workspace
+  editability, subsequent placement/snapping controls, one-action undo, cancellation,
+  ordinary scheduling and Manual prerequisites, surface sampling/material correspondence,
+  native assembly and all-Fiber Membrane substitution. No proximity-based automatic welding.
+- **Evidence:** 33 focused creation, placement, grouping, conversion and architecture checks
+  pass. Actual offscreen QML right-click/menu, root preview, Shift continuation, completion,
+  undo and explicit ambiguous grouping pass. Hidden Direct3D surface and converted Membrane
+  images were inspected: continuous T-shaped branch seam and unchanged shape; vertices
+  match the existing branch fixture and conversion result within 1e-10 / 1e-12 respectively.
+  A 102-curve selection resolves ambiguity without enumerating all partitions. A cached
+  10,000-control projection microcheck over 500 queries measured median 0.0271 ms and
+  p95 0.039605 ms while native-style checks were running. This includes the Python/native
+  call boundary, excludes index preparation and whole input/frame costs, and is not an
+  application responsiveness guarantee. Local artifacts live under
+  `build/branched-point-placement/`; qualification status is in the
+  [task record](tasks/branched-point-placement.md).
+- **Limits:** the projected query is a native linear scan of cached controls, not a new
+  mesh-query accelerator. Existing open, outer-boundary, nonnested branch constraints
+  remain. Generic branches are ordinary curves; attached conversion remains explicit or
+  part of Create Tissue. No physical desktop-input or visible-window acceptance is claimed.

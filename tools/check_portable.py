@@ -10,6 +10,7 @@ from pathlib import Path
 
 import numpy as np
 from attached_creation_portable import automatic_construction
+from branch_placement_portable import branches
 from construction_portable import construction
 from direct_workflow_portable import direct_workflows
 from feedback_portable import feedback
@@ -40,6 +41,7 @@ CHECKS = (
     "schema-4 tissues, attached construction, stacking, native profiling and rendering",
     "automatic Fiber endpoints, independent copies, undo/redo and shared deletion impact",
     "direct tissue creation with automatic attached construction",
+    "branched point creation, automatic surface grouping and membrane conversion",
 )
 
 
@@ -135,12 +137,14 @@ def qualification_steps():
         issues,
         workflow,
         inspection,
-        construction,
-        direct_workflows,
-        automatic_construction,
+        *construction_steps(),
         tissues,
         feedback,
     )
+
+
+def construction_steps():
+    return construction, direct_workflows, automatic_construction, branches
 
 
 def deletion(executable, cwd, invoke=invoke):

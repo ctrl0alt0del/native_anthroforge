@@ -51,7 +51,7 @@ def install(session: Any, source: Any, curve: Any, junction: Junction, existing:
     session.replace_document(objects=objects, junctions=junctions)
     dependent_tasks.changed(session, ports, published=False)
     path_tasks.request(session, curve.id)
-    return curve.id
+    return str(curve.id)
 
 
 def tagged_source(session: Any, source: Any, junction: Junction) -> dict[str, Any]:

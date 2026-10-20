@@ -161,13 +161,14 @@ int af_stroke_append(uint64_t handle,const double* pointer,int interpolate) {
     try { return af::append_pointer(*af::stroke(handle),af::pointer_input(pointer),interpolate); }
     catch(const std::exception& error) { af::set_error(error.what()); return -1; }
 }
-int af_stroke_seed(uint64_t handle,const double* pointer,const double* position) {
+int af_stroke_seed(uint64_t handle,const double* pointer,const double* position,int retain_plane) {
     try {
         const auto value=af::stroke(handle); const auto ray=af::pointer_input(pointer);
         if(!position||!value->samples.empty()) throw std::runtime_error("Seed requires an empty stroke and a position.");
         const af::V3 point(position);
         if(!point.allFinite()) throw std::runtime_error("Seed position must be finite.");
-        auto state=value->projection; state.origin=state.previous=state.depth=point;
+        auto state=value->projection; state.previous=state.depth=point;
+        if(!retain_plane) state.origin=point;
         af::append_projected(*value,ray,{point.x(),point.y(),point.z(),ray[8]},state);
         return int(value->samples.size());
     } catch(const std::exception& error) { af::set_error(error.what()); return -1; }

@@ -52,11 +52,13 @@ def control_points(controller, row):
 
 def update(tool, ray, normal, press):
     reference, tool.hover = tool.branch.closest(ray, normal)
+    if press and not reference:
+        raise ValueError("Show a pickable curve in this workspace to place a branch root.")
     if not press or not reference:
         return
     from . import drawing_context
 
     tool.stroke = drawing_context.capture(tool, normal)
-    tool.stroke.seed(ray, tool.hover)
+    tool.stroke.seed(ray, tool.hover, retain_plane=tool.options["depth"] == "IMAGE")
     tool.branch.source = reference
     tool.pointsAdded.emit(tool.stroke.read().tolist())

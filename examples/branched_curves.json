@@ -1,0 +1,13 @@
+[
+  {"id":"bone","operation":"import","arguments":{"path":"examples/primitives/cube.obj","units":1}},
+  {"operation":"wait"},
+  {"id":"main","operation":"curve.create","arguments":{"name":"Main boundary","engine":"POLYLINE","points":[{"id":"root0","position":[0,0,0]},{"id":"root1","position":[0.2,0,0]},{"id":"root2","position":[0.7,0,0]},{"id":"root3","position":[1,0,0]}]}},
+  {"id":"opposite","operation":"curve.create","arguments":{"name":"Opposite boundary","engine":"POLYLINE","points":[{"position":[0,0.3,0]},{"position":[0.2,0.3,0]},{"position":[0.7,0.3,0]},{"position":[1,0.3,0]}]}},
+  {"id":"left","operation":"curve.branch.create","arguments":{"name":"Branch left","engine":"POLYLINE","source":{"curve":"$main","point":"root1"},"points":[{"position":[0.2,0,0]},{"position":[0.2,-0.15,0.1]},{"position":[0.2,-0.35,0.1]}]}},
+  {"id":"right","operation":"curve.branch.create","arguments":{"name":"Branch right","engine":"POLYLINE","source":{"curve":"$main","point":"root2"},"points":[{"position":[0.7,0,0]},{"position":[0.7,-0.15,0.1]},{"position":[0.7,-0.35,0.1]}]}},
+  {"operation":"wait"},
+  {"operation":"surface.create","arguments":{"name":"Automatic branch","kind":"AUTO","curves":["$main","$opposite","$left","$right"]}},
+  {"operation":"wait"},
+  {"operation":"save","arguments":{"path":"branched.anthroforge","blocked_policy":"wait"}},
+  {"operation":"wait"}
+]

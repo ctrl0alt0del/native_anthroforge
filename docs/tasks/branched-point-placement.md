@@ -30,23 +30,30 @@ Reuse existing surface/membrane evaluation and its open, nonnested branch restri
 Implemented atomic branch-curve creation with existing-junction reuse, cached native
 projected control-point selection and explicit stroke seeding. Alternate toolbar tool
 and provisional marker are wired. Automatic surface grouping uses junction identities;
-ambiguous group membership opens a virtualized editor. Implementation is not yet qualified.
+ambiguous group membership opens a virtualized editor. Offscreen interaction and actual
+hidden GPU geometry inspections pass. Full development gate is running; portable pending.
 Preserve unrelated root `__init__.py`. Base is synchronized with origin/main.
 
 ## Verification
 
 Baseline: 23 related point-placement, surface-branch and attached-conversion tests passed.
-Current increment: 14 branch-creation, projected-placement, automatic grouping and
-architecture tests pass; native rebuild and three CTests pass. The automatic branch
-geometry matches the existing fixture numerically. Actual GUI/shape inspection pending.
-Required: targeted API/lifecycle tests, offscreen gestures/menu/preview/ambiguity checks,
-actual branched surface and membrane visual inspection, development gate and portable build.
+Current increment: 33 focused tests pass, including existing-junction reuse, Fiber-root
+following, transforms, hidden/behind-camera candidates, cancellation/undo, ambiguous drafts,
+stale draft rejection, 102-curve inference and attached conversion. Three native CTests pass.
+`tools/branch_placement_acceptance.py` verifies actual right-click menu, preview, click/Shift
+gestures, one undo and explicit group selection in offscreen QML. Menu positioning is
+anchored beside the tool, including synthetic input. `tools/branch_placement_scene.py`
+renders a continuous T-shaped branched surface and its identical converted Membrane via
+hidden Direct3D; images inspected. Reports/shapes/saved fixture are under the evidence path.
+Native cached picking microcheck: 10k controls, 500 queries, median 0.0271 ms/p95 0.039605 ms;
+not a whole-app responsiveness measurement. Development gate/portable still pending.
 
 ## Next actions and blockers
 
-1. Implement shared atomic branch curve creation and native control-point picking.
-2. Integrate alternate tool, first-point preview and automatic/ambiguous surface grouping.
-3. Validate, update durable documentation, package canonical 0.2.2 and merge/push.
+1. Finish the running development gate and any discovered failures.
+2. Package the canonical 0.2.2 app, run relocated portable qualification (including new branch
+   and membrane flow), and rebuild the companion source archive.
+3. Record final evidence; merge/push the validated result.
 
 ## Recovery inputs
 

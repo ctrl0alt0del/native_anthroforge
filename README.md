@@ -43,6 +43,10 @@ preserving existing authored points, with no preview/accept steps. Obstacle excl
 bounded searchable lists. Numerical budgets live under Advanced.
 The Patch / Surface icon creates a patch from one closed curve, or a standalone loft
 from two or more selected curves/fibers. Ctrl-click in Construction to select sources.
+Right-click **Place Points → Place Branched Points** to start a curve at an existing control
+point with a shared junction. **Surface** detects selected branch groups automatically,
+asking only when the grouping is ambiguous. See the [construction walkthrough](docs/construction_020.md)
+and [headless branch example](examples/branched_curves.json).
 Anatomy and Construction have separate full-height tabs. Import world reference images
 with the image icon beside the projection control; use Add reference image in Properties
 for an image parented to the selected object. Orthographic axis views set initial alignment.

@@ -11,6 +11,7 @@ ColumnLayout {
     spacing: Theme.gap
     UiSection {
         title: "Create curve"
+        Label { visible: panel.tool.state.branched; text: "First point joins the nearest visible curve control point."; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         UiButton { text: "Add Curve at cursor"; Layout.fillWidth: true; onClicked: workspace.drawingTools.addCurve() }
         RowLayout {
             UiButton { text: panel.tool.state.placement_mode==="BRANCH" ? "Branched Points" : "Place Points"; Layout.fillWidth: true; checked: ["POINTS","BRANCH"].includes(panel.tool.state.mode); onClicked: panel.tool.begin(panel.tool.state.placement_mode) }

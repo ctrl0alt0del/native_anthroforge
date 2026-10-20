@@ -90,9 +90,10 @@ The original SHA256 was checked again after the experiments and is unchanged.
 - SHA256: `adff36f1c75943ae808369edb26f989d0423d392a70399d0ac2267c590b6a3f7`
 - Untouched local copy/evidence: `build/muscle-height-smoothing/`
 - Local scripts: `probe_case.py`, `inspect_shapes.py`, `intersection_view.py`;
-  isolated C++ probe under `probe/`. The probe currently has the unsuccessful robust
-  solve experiment enabled; restore default `afs::Options{}` to reproduce the
-  original candidate. `candidate.npz` retains the actual default-solver candidate.
+  isolated C++ probe under `probe/`. The probe currently uses the independently
+  certified iteration-limit adapter; `scaled.hpp`, `reduced.hpp` and `factor.hpp`
+  retain rejected diagnostic experiments. `candidate.npz` still retains the actual
+  original default-solver candidate before the normal-dot rejection.
 - Local evidence: `diagnosis.json`, `exact_intersections.json`,
   `intersection_lengths.json`, `sections.png`, `confirmed-crossing.png`.
   The intersection image is a diagnostic geometry plot, not a desktop acceptance capture.
@@ -164,3 +165,32 @@ is removed. The retained 1 m inflation and 0.1 boundary-band setting still produ
 a tall, steep-sided envelope; no parameters were altered to make it look smaller.
 Full gate, independent final intersection check, edit/save/undo inspection, and
 portable qualification remain outstanding. Do not merge or call this released yet.
+
+## Saved-base and solver qualification
+
+The first complete development gate passed (1,324 tests, native contract/style,
+script style, typing, numerical audit and doctor). Background editor acceptance,
+GPU scene/picking acceptance and the actual project GPU capture also passed.
+The saved project supports superseding edits, undo/redo and exact geometry after
+save/reopen. Independent libigl exact-predicate inspection of its final 4,816-vertex
+mesh found zero nonadjacent noncoplanar crossings.
+
+An additional necessary case was found before packaging: a settings-only edit
+can legitimately reuse the old saved 78x108 base. At 0.02 m its QP reaches the
+250-iteration budget. Rescaling variables and eliminating fixed variables did not
+resolve that stop; augmented curvature-variable experiments were not qualified
+over the full amount range and are not production code.
+
+Direct independent KKT checking established that the original iterate already
+meets the existing application tolerance: relative stationarity about `5.07e-9`,
+primal residual about `1.12e-26`, relative complementarity about `8.17e-14`.
+The migrated Session rejected it before running that check. The standalone height
+adapter now certifies **only maximum-iteration** candidates before allowing the
+ordinary exact-pin/second-certification/geometry path. It preserves the solver's
+terminal status in a diagnostic-aware ABI, keeps the old 12-value ABI compatible,
+and publishes an accurate `ITERATION_LIMIT` warning with residual evidence.
+No tolerance, authored setting, iteration budget or objective was relaxed.
+
+32 focused tests pass after this change, including a compact reconstruction of
+the saved old grid. New full gate and portable qualification remain pending.
+The offscreen/headless evidence does not establish interactive desktop latency.

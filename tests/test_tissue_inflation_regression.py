@@ -41,9 +41,31 @@ def settings(amount):
     return (TissuePart("main", TissueSide(inflation, HeightSmoothing("HEIGHT", 0.2, 0.8, 0.05))),)
 
 
+def legacy_base(engine):
+    first, last = np.asarray(CASE["legacy_boundaries"])
+    t = np.asarray(CASE["legacy_across"])[:, None, None]
+    base = grid_mesh(engine, (1 - t) * first + t * last)
+    parameters = CASE["legacy_across"] + CASE["legacy_along"]
+    return material.restore(base, material.array(base), parameters=parameters)
+
+
 def valid(before, after):
     quality = mesh_quality.deformation(before, after)
     assert quality.baseline_crossings == quality.new_crossings == quality.new_collapses == 0
+
+
+def test_retained_old_base_accepts_only_independently_certified_limit_result(session):
+    base, parts = legacy_base(session.engine), settings(0.02)
+    own = tissue_parts.evaluate(base, parts, "a", True)
+    output, reports = tissue_smoothing.evaluate(base, own, parts, "a")
+    valid(base, output)
+    report = reports[0]
+    assert report.status in ("CONVERGED", "ITERATION_LIMIT")
+    if report.iterations == 250:
+        assert report.status == "ITERATION_LIMIT"
+    assert report.violation <= 2e-7 and report.stationarity <= 2e-7
+    assert report.complementarity_relative <= 2e-7 and report.max_displacement <= 0.05 + 2e-7
+    np.testing.assert_array_equal(output.array(3), base.array(3))
 
 
 @pytest.mark.parametrize("amount", [0.02, 0.1, 1.0])

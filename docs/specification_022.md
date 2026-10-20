@@ -215,6 +215,11 @@ collapsed faces rather than treating a normal rotation beyond 90 degrees as a fo
 Coincident front/back boundary contact is not a transverse intersection. These
 checks do not guarantee that arbitrary inflation settings are geometrically feasible;
 invalid generated geometry remains a failed result without reducing user parameters.
+For height smoothing, reaching PIQP's stricter iteration limit is not by itself
+proof that the application tolerance was missed. Such a result can publish only
+after independent KKT certification at the existing `2e-7` tolerance, exact pins,
+and geometry validation. Diagnostics retain `ITERATION_LIMIT` and report measured
+residuals; other solver failures and uncertified iterates remain failures.
 
 The raw relaxation kernels retain addon parity. Standalone publication additionally
 rejects newly self-intersecting/collapsed candidates instead of exposing them as usable

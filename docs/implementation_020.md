@@ -56,7 +56,7 @@ Use narrow adapters for Blender 5.0.1 drawing and addon kernels; preserve proven
 | Transforms | Shared consumers with different/shared parents, both modes, no double transforms, no jump on switching/reparenting. |
 | References | Source deletion protection, consumer deletion preserving sources, complete topology-lock reasons and unlocking. |
 | Geometry | Compact provenance-backed fixtures for authored/routed paths, attachment deformation, closed paths, lofts, patches and branches; inspect actual shapes. |
-| Editing | Drawing, insertion, snapping/offsets, conversion preview, unchanged selection, current-shape edits, rebind, cancel, one-action undo. |
+| Editing | Drawing, insertion, snapping/offsets, direct engine selection preserving authored points (2026-10-20 decision), optional API conversion preview, unchanged selection, current-shape edits, rebind, cancel, one-action undo. |
 | Lifecycle | Queued/running jobs, reservations, superseding changes, cycles/missing inputs, Manual provenance, historical saves, undo/redo and disposal. |
 | Storage | Full editable round trips, old-schema rejection, embedded asset portability, calibration/replacement undo, Qt-free headless import. |
 | Workspace | Shared construction inclusion, unassigned access, outside low-priority updates, valid running work survives workspace switch. |

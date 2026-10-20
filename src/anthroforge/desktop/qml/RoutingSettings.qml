@@ -6,9 +6,8 @@ ColumnLayout {
     id: panel
     required property var curve
     property bool topologyLocked: false
-    property bool converting: false
     readonly property var settings: curve.engine_settings || {}
-    visible: curve.engine === "ROUTED" && !converting
+    visible: curve.engine === "ROUTED"
     Layout.fillWidth: true; spacing: Theme.gap
     function updateSetting(key,value) {
         const args={curve:curve.id}; args[key]=value;

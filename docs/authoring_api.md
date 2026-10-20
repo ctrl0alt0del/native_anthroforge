@@ -411,7 +411,7 @@ The first-hit/fallback/offset policies are adapted from Blender 5.0.1. Fitting u
 pinned curve_fit_nd implementation. Cancellation is checked around the atomic fit call;
 obsolete output cannot publish. `tools/drawing_qualification.py` records this interval.
 
-## Curve engine conversion
+## Curve engines and optional conversion
 
 Authored curves store typed `engine_settings`: Bézier (`kind`, `resolution`), exact
 polyline (`kind`), or routing (`kind`, `samples`, `radius`, `accepted_steps`, `obstacle_mode`,
@@ -419,6 +419,17 @@ polyline (`kind`), or routing (`kind`, `samples`, `radius`, `accepted_steps`, `o
 There is no public solver generation selector. `curve.create` accepts `engine` and a
 `settings` dictionary; the existing Bézier `curve.edit(resolution=...)` operation remains
 an alias for its typed setting. Curve/Fiber consumers still share the same path contract.
+
+`curve.engine(curve, engine)` directly selects BEZIER, POLYLINE or ROUTED as one undoable
+edit. It retains all authored points, handles and identities; Fiber edits use their current
+resolved authored points and preserve bindings. The chosen engine defines the new path,
+without resampling accepted output. Selecting the current engine is a no-op. A different
+engine starts with its typed defaults (routing samples are at least the authored point
+count), respects shared topology/workspace policies and follows ordinary task/update modes.
+The authored selection changes immediately; pending or failed evaluation retains accepted
+geometry. This is the desktop Path engine selector's command.
+
+The separate optional preview API supports explicit resampling or point-subset conversion:
 
 - `curve.conversion.preview(curve, engine, mode="EVALUATED", samples=64, points=None, settings={})`
   starts a read-only coordinator job. EVALUATED resamples the accepted path into editable
@@ -437,7 +448,7 @@ Only one preview is retained. It does not alter saving, document state or undo; 
 serialized. The desktop displays it in green and excludes it from picking. Source edits
 invalidate acceptance. Routing runs through the native production solver and the existing
 coordinator. `curve.engine_settings(curve, **settings)` changes
-the current engine's parameters; engine changes require the conversion workflow above.
+the current engine's parameters; use `curve.engine` for ordinary engine changes.
 Routing defaults to `obstacle_mode="AUTO"`: every SCP geometry provider is eligible,
 minus `excluded_obstacles` and automatic cycle exclusions. Fiber binding/support surfaces
 remain required. Visibility and workspace do not remove obstacles. `MANUAL` uses explicit

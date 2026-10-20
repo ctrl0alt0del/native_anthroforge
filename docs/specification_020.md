@@ -60,10 +60,14 @@ special loop-anchor model. Geometric routing points are not anatomical bindings.
 
 Bézier points retain handles, handle modes, radius and tilt. Polyline points remain exact.
 Routed editing changes authored routing points, never generated solver samples. Merely
-selecting a curve or entering edit mode cannot fit/resample/change it. Engine conversion
-is explicit, previewed and undoable. Conversion to ROUTED requires explicit structural
-point selection, not treating every tessellated vertex as a routing constraint. Approximate
-conversion exposes accuracy and does not promise shape preservation.
+selecting a curve or entering edit mode cannot fit/resample/change it. Updated user decision,
+2026-10-20: selecting the Path engine applies it directly with one undo action, retaining
+all existing authored control points and allowing the engine to define the path. No separate
+Change path engine button or preview/accept gate is required. This replaces the original
+mandatory preview and structural-point selection workflow. Never promote sampled output
+into authored points during this action. Fibers use their current resolved authored points.
+Optional headless conversion previews can explicitly resample or select a structural subset;
+they are a separate operation and do not define ordinary engine selection.
 
 Provide Add Curve (two-point Bézier by default), Place Points and Draw. Place Points:
 Enter completes, Backspace removes the last draft point, Escape cancels the draft or

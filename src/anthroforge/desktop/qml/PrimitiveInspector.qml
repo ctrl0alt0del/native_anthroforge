@@ -29,7 +29,8 @@ ColumnLayout {
     Connections { target: authoring; function onChanged() { panel.syncSelection(); } }
     UiSection {
         title: panel.item.standalone ? "Curve" : "Primitive"
-        Label { objectName: "activeCurveEngine"; text: panel.item.standalone ? "Active engine · "+(panel.curve.engine || "Curve") : panel.primitive.kind === "LOFT" ? "Ordered curve loft" : panel.primitive.kind === "BODY" ? "Curve-deformed body" : "Imported mesh"; color: Theme.text }
+        Label { visible: !panel.item.standalone; text: panel.primitive.kind === "LOFT" ? "Ordered curve loft" : panel.primitive.kind === "BODY" ? "Curve-deformed body" : "Imported mesh"; color: Theme.text }
+        CurveEngine { objectName: "standaloneEngine"; visible: !!panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
         UiButton { objectName: "editPrimitive"; text: panel.item.editing ? "Finish editing" : panel.item.standalone ? "Edit Curve" : "Edit Primitive"; checkable: true; checked: panel.item.editing || false; Layout.fillWidth: true; onClicked: authoring.setEditing(!panel.item.editing) }
         UiCombo { visible: panel.item.editing && panel.primitive.kind === "BODY"; Layout.fillWidth: true; model: ["Curve controls", "Base vertices · Hook assignment"]; currentIndex: panel.item.category === "BASE" ? 1 : 0; onActivated: authoring.setCategory(currentIndex === 1 ? "BASE" : "CURVE") }
         Label { visible: panel.topologyLocked; text: "Topology locked by child or surface attachments"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
@@ -73,8 +74,8 @@ ColumnLayout {
         }
         UiCheck { text: "Closed curve"; checked: panel.curve.closed || false; enabled: !panel.topologyLocked; onClicked: panel.curveSetting("closed",checked) }
         NumericSetting { visible: panel.curve.engine === "BEZIER"; label: "Curve evaluation resolution"; value: panel.curve.resolution || 24; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.curveSetting("resolution",Math.round(value)) }
-        CurveConversion { id: conversion; curve: panel.curve; enabled: !panel.topologyLocked }
-        RoutingSettings { curve: panel.curve; topologyLocked: panel.topologyLocked; converting: conversion.expanded }
+        CurveEngine { objectName: "primitiveEngine"; visible: !panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
+        RoutingSettings { curve: panel.curve; topologyLocked: panel.topologyLocked }
         FiberCreation { curve: panel.curve }
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Override sampling range"; checked: panel.curve.start !== null && panel.curve.start !== undefined; onClicked: { panel.curveSetting("start",checked?0:null); panel.curveSetting("span",checked?1:null); } }
         NumericSetting { visible: panel.primitive.kind === "LOFT" && panel.curve.start !== null; label: "Curve start"; value: panel.curve.start || 0; onEdited: value => panel.curveSetting("start",value) }

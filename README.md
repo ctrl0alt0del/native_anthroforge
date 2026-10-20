@@ -34,8 +34,9 @@ are outside this release. Failed calculations retain usable accepted geometry wi
 Curve creation and cursor/patch tools sit below the transform gizmos. Place Points finishes
 on plain left-click from the second point; Shift-click continues. Hold Ctrl to snap to
 SCP surfaces; Ctrl+Shift snaps and continues. New routed curves use
-automatic obstacles. Exclusions and conversion-point subsets use bounded searchable lists;
-all authored points are retained by default. Numerical budgets live under Advanced.
+automatic obstacles. Select **Path engine** directly in the inspector: one undoable change,
+preserving existing authored points, with no preview/accept steps. Obstacle exclusions use
+bounded searchable lists. Numerical budgets live under Advanced.
 The Patch / Surface icon creates a patch from one closed curve, or a standalone loft
 from two or more selected curves/fibers. Ctrl-click in Construction to select sources.
 Anatomy and Construction have separate full-height tabs. Import world reference images

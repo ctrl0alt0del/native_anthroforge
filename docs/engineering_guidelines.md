@@ -106,6 +106,15 @@ details. Check hover/focus contrast, scrolling and narrow layouts with actual QM
 inspect captures as well as assertions. Background-only requests prohibit visible
 test windows and desktop input; off-screen checks must state their rendering limits.
 
+Minimize the steps needed to achieve the user's outcome. A direct setting should normally
+apply when selected and produce one coherent undo action. Do not expose implementation
+stages as extra buttons, mandatory previews, acceptance gates or confirmations without a
+concrete product need. Background computation, validation and failure reporting belong
+behind the interaction. Keep optional advanced settings optional. If the intended UI/UX
+is unclear, ask the user before choosing or adding steps; do not invent a workflow.
+Evaluate the complete interaction, including discoverability and repeated use, rather
+than reducing click counts by hiding required controls or weakening shared validation.
+
 The UI and headless adapters invoke the same document operations. Authored anatomy,
 accepted calculation results, provisional previews and per-view presentation have
 distinct ownership. Workers receive owned inputs rather than live UI objects.

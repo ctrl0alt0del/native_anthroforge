@@ -3,7 +3,7 @@
 - Task branch: `codex/vcp-visual-tools`
 - Integration branch: `main`
 - Starting revision: `f6a4b68df3ae5a4f577dce3500d567405dab77bc`
-- Status: in progress
+- Status: complete and qualified
 - Last updated: 2026-10-21, Europe/Bucharest
 - Active writer: current desktop chat; direct work, no delegation
 
@@ -62,22 +62,22 @@ Unrelated root `__init__.py` is preserved.
 
 ## Verification
 
-Baseline main passed 1,557 tests, native/style checks and portable/offscreen qualification
-for recommendations 1–3. New behavior requires focused native/API/lifecycle tests, actual
-offscreen editing/render review, profiler evidence, full gate and packaged verification.
-Focused stacking/API/view/lifecycle/architecture checks: 14 passed. Native build and
-all five CTest checks passed. Actual GUI captures and full gate remain pending.
+Baseline main passed 1,557 tests. The completed development gate passes **1,598 tests**,
+all five native CTests, 307 typed modules, lint/format, numerical/runtime checks and
+native/script/Python function limits. The 1,601 warnings are existing Qt deprecations
+exercised by the expanded UI coverage. Log: `build/vcp-visual-gate.log`.
 
 Constraint inspection now shows production goal/result vectors and residuals, distinguishing
 accepted source-relative goals from current target-relative goals. No constraint mathematics
 changed. QTest exercised painting release/undo/cancel and section/route controls. Hidden GPU
-captures and report exports succeeded for all four tools. Full pytest: 1,592 passed; all five
-native CTests and native function-length checks passed before final presentation adjustments.
+captures and report exports succeeded for all four tools. Actual QML clicks reveal the
+brush, section and route inspectors; layout captures were inspected. Ordinary offscreen
+QML does not render the 3D viewport, so geometry was separately inspected through hidden
+D3D11 render control. No physical desktop or interactive user acceptance is claimed.
 
 A real 8,192-point footprint exposed a QML reference-sequence stall. Geometry is now copied
 once per change through ViewSnapshot and excluded from small status property maps. The same
-hidden scene completes with profiling on and off. This performance correction still needs
-its regression test and final profiler rerun. Those now pass, including copied snapshot,
+hidden scene completes with profiling on and off. Regression/profile checks pass for copied snapshot,
 live/frozen route selection, failure/capture limits and camera-save continuity. Final profiles
 are under build/vcp-visual-tools; CH-024–026 records timings and limitations. Contacts and
 stacking displacement were visually inspected. Camera persistence exposed broad revision
@@ -87,20 +87,28 @@ read-only coordinator; paint commits use authored-field commands; cached inputs 
 displayed stages/picking share leases; diagnostic traces are bounded and never publish paths.
 No competing scheduler or Python numerical fallback was added.
 
-## Next actions and blockers
+## Delivery
 
-1. Finish saved-view review, snapshot/replay regressions and packaged qualification commands.
-2. Rerun profiler scenes and complete ownership/coupling review.
-3. Update recommendations/computation records and run the development gate.
-4. Package the canonical 0.2.3 build, qualify relocation, then merge validated work.
+Canonical runtime: `61044a4898d541fe79ba265ccaaccfc15a7c1168` in
+`dist/0.2.3/AnthroForge.dist`, with one `dist/AnthroForge-0.2.3-source.zip`.
+The full relocated minimal-PATH suite passed, including native painting/undo, stacking,
+sections and both routed Fiber backends with frozen image/JSON export. Packaged section,
+stacking and paint-view captures were inspected. Qt-free numerical isolation also passed.
+No blockers or required feature work remain. Final documentation is merged with the
+validated task branch under the normal continuity workflow.
 
 ## Recovery inputs
 
 Use E:/development/anthroforge and tools/common.ps1. Keep generated evidence under
 ignored build/vcp-visual-tools; preserve production projects and avoid desktop takeover.
-Native painting build: build/vcp-visual-paint-native.log (all five CTests passed).
-Hidden GPU: tools/vcp_visual_scene.py, build/vcp-visual-tools/paint-preview.png and
-paint.afinspection.zip. Full QML pointer-input acceptance and profiler trials remain pending.
-Section build: build/vcp-visual-section-native.log (all five CTests passed). Actual captures:
-build/vcp-visual-tools/section-tissue.png and section-scene.png. Shader compilation exercised
-on hidden D3D11. Portable and complete UI qualification are still required.
+Hidden GPU: `tools/vcp_visual_scene.py` for painting-sections, stacking and routing. Captures,
+three profiles and frozen reports are under `build/vcp-visual-tools`. The dense first support
+overlay has a measured 53 ms paint cost; limits are recorded in CH-024–026.
+QML controls: `tools/vcp_visual_acceptance.py`, `build/vcp-final-interaction.log`.
+New portable commands already pass in the source runtime, including both routed Fiber
+backends: `build/vcp-portable-dev.log`, `build/vcp-portable-route-dev.log`.
+Final package: `build/vcp-visual-package-final.log`. Earlier package log predates the correction
+that only solver trial records carry a solver termination label.
+Portable evidence: `build/vcp-visual-portable.log` and
+`build/vcp-visual-portable/check/portable-check.json`. Numerical isolation:
+`build/vcp-headless-isolation.log`. Delivery hash is in `docs/development_status.md`.

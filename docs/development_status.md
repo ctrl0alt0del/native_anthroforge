@@ -1,7 +1,41 @@
 # AnthroForge development validation
 
-Current qualification is in [tissue inspection](#tissue-inspection-023).
+Current qualification is in [VCP visual tools](#vcp-visual-tools-023).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## VCP visual tools (0.2.3)
+
+Runtime `61044a4898d541fe79ba265ccaaccfc15a7c1168` completes recommendations 4–7:
+evaluated stacking support/displacement, native field brushes and constraint goal witnesses,
+view-local cross-sections, and optional routed curve/Fiber planner/solver/contact diagnostics.
+Existing inflation, stacking and routing mathematics are unchanged.
+
+- Development gate: **1,598 tests passed**, five native CTests, 307 typed modules,
+  lint/format, native/script function limits and numerical/runtime checks. The 1,601
+  warnings are the existing Qt property-map deprecation category.
+- Actual offscreen QML clicks/drags exercise brush commit, undo and Escape, section controls
+  and the route action. Inspector layouts were inspected. Separate hidden D3D11 captures
+  show field colors, stacking footprints/displacement, cutaways, route steps and contacts.
+  Frozen reports preserve their chosen evidence. Physical desktop acceptance is not claimed.
+- The relocated executable passes the full minimal-PATH portable suite, including native
+  brush commit/undo, support inspection, section replay and both Custom/PIQP Fiber traces.
+  Numerical inspection operations were also verified in a process without Qt/Blender imports.
+- Native profile timings on small fixtures: paint preparation 2.599 ms, strokes 0.166/0.314 ms,
+  section 0.164 ms, support footprint 8.837 ms, cold route diagnosis 11.622 ms. The dense
+  support overlay's first Canvas paint cost 53.076 ms. These instrumented durations are not
+  interactive display-latency/FPS claims. Profiles retain cache and geometry-owner evidence.
+- Separate ownership review confirms native numerical work, shared read-only scheduling,
+  immutable scene signatures, owned cache/render resources and authored field commits.
+  Camera saves preserve diagnostics and strokes. Large QML overlays use copied snapshots;
+  an 8,192-point regression prevents the observed reference-sequence stall.
+
+Deliverables: `dist/0.2.3/AnthroForge.dist` and `dist/AnthroForge-0.2.3-source.zip`.
+Executable SHA-256: `3F41756300202E09B23E3625397BC1AF3D67A31749DC2703BAA20F71E70EB30D`.
+See [workflow](tissues_022.md#visual-tools-023), [API](authoring_api.md#stacking-painting-sections-and-route-evidence),
+[task record](tasks/vcp-visual-tools.md) and computation records CH-024–026.
+Local evidence is under `build/vcp-visual-tools` and `build/vcp-visual-portable`.
+Sections remain uncapped display cuts; support polygons and route records are bounded with
+explicit truncation. No tissue repair, physical-contact guarantee or source mutation is implied.
 
 ## Tissue inspection (0.2.3)
 

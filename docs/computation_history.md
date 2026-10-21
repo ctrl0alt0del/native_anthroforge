@@ -988,7 +988,7 @@ for artifact identity, UI checks and evidence limits.
 
 ### CH-024 — Explain stacking support and paint material fields through native queries
 
-- **2026-10-21; T09, K01, Q05; 0.2.3, task branch in progress.** Existing field point
+- **2026-10-21; T09, K01, Q05; 0.2.3.** Existing field point
   assignment and stacking configuration did not provide brush strokes or show evaluated
   support. Native support extraction now uses the production material masks, verifies the
   accepted plan and displays its intrinsic frame. Geometric ordering and active support
@@ -1005,16 +1005,16 @@ for artifact identity, UI checks and evidence limits.
   releasing commits through the shared field command as one undo action. Interrupted or
   obsolete strokes cannot commit. Existing material lookup now exposes its interpolation
   coefficients to painting, retaining the same correspondence rules for attachments.
-- **Evidence so far:** native visibility, external occlusion, event-rate independence,
+- **Evidence:** native visibility, external occlusion, event-rate independence,
   single-sample radial fields, Base/Rest commit/undo, cancellation, stale inputs and staged
   desktop colors pass focused tests. Existing material-binding/fiber tests also pass.
   Hidden GPU paint preview and frozen inspection export ran successfully; the generated
-  color surface was visually inspected. Full interaction/performance/release qualification
-  and recommendations 6–7 are still pending; this is an intermediate checkpoint.
+  color surface was visually inspected. QML stroke/undo/cancellation, profile and full-gate
+  results are included in the qualification follow-up below.
 
 ### CH-025 — Section displayed geometry without changing topology
 
-- **2026-10-21; Q01, Q05, supporting presentation; 0.2.3, in progress.** A world plane
+- **2026-10-21; Q01, Q05, supporting presentation; 0.2.3.** A world plane
   now cuts the selected tissue and compared stages, optionally surrounding geometry.
   Native triangle-plane queries produce bounded contour segments. Coplanar patches emit
   boundary edges without their internal triangulation. Reports count coplanar faces and
@@ -1028,15 +1028,15 @@ for artifact identity, UI checks and evidence limits.
   work in the shared inspection scheduler. Stale contours disappear until the current
   plane/revision is ready. Scoped masks are cached for repeated pointer queries. Stage
   comparison uses one world plane, not separately fitted per-stage planes.
-- **Evidence so far:** transformed/coplanar/outside-plane native cases, picking the visible
+- **Evidence:** transformed/coplanar/outside-plane native cases, picking the visible
   far surface, scope changes, comparison stages, read-only history and frozen report
   settings pass focused tests. Hidden GPU tissue-only and whole-scene cutaways were
-  inspected. Full pointer/UI/profiler/portable qualification remains pending. This is a
-  geometric section view, not a boolean union or tissue repair.
+  inspected. QML controls, camera persistence and frozen replay also pass. This is a geometric
+  section view, not a boolean union or tissue repair.
 
 ### CH-026 — Optional route snapshots and material constraint-goal witnesses
 
-- **2026-10-21; C06, A04, T09, Q05, R10; 0.2.3, qualification in progress.** Ordinary
+- **2026-10-21; C06, A04, T09, Q05, R10; 0.2.3.** Ordinary
   routing previously exposed aggregate counters only. Explicit read-only diagnostic jobs
   now capture bounded world-space reference/planner/seed/trial/final paths and native contact
   witnesses from the same Custom/PIQP execution. Normal solves allocate no trace. Complete
@@ -1051,11 +1051,11 @@ for artifact identity, UI checks and evidence limits.
   It reports world goals, displayed results and distances. Current target-relative goals
   are explicitly distinguished from historical accepted output; no force decomposition is
   implied. The formula and tissue constraint application are unchanged.
-- **Evidence so far:** Custom/PIQP trace versus normal final coordinates/counters, moved
+- **Evidence:** Custom/PIQP trace versus normal final coordinates/counters, moved
   Fiber bindings, failure retention, cancellation, capture limits, source offsets and Manual
   target/result divergence pass focused tests. Actual offscreen QML brush strokes, undo,
-  Escape, section controls and route action passed. Hidden GPU/profile/portable acceptance
-  and the complete development gate remain required before delivery.
+  Escape, section controls and route action passed. Hidden GPU/profile and complete-gate
+  results are recorded below; packaged qualification is recorded with the delivery evidence.
 
 ### CH-024–026 qualification follow-up
 

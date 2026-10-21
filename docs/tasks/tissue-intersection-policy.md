@@ -79,9 +79,10 @@ added base/side faces are tagged unselectable. No document geometry is replaced.
   reconstructed position error is 1.03e-12 metres; minimum computed barycentric
   weight is -1.64e-11 from floating-point reconstruction near edges. These are
   per-face correspondences, not unique source identities for intersection vertices.
-- A focused question is pending: should confirmed snapping exclude all faces inside
-  sealed cavities? Recommended exterior-cell extraction matches outside-accessible
-  placement; this is not yet selected as production behavior.
+- Confirmed: exclude sealed-cavity faces. Use exterior-cell extraction for confirmed
+  placement; preserve the original target and original material coordinates.
+- Follow-up scope: implement farthest-normal ambiguity handling in stacking and inspect
+  desktop ellipses, correcting unnecessary truncation without destabilizing layouts.
 - Native C++17 qualification compiled successfully with CGAL 6.1.1 and Boost 1.89.0
   under ignored `.tools/boolean`, serial libigl work and Boost exact arithmetic.
   On this fixture: positive union 2,442 selectable fragments / 0.682 seconds;
@@ -120,3 +121,16 @@ User fixture: `E:/development/WIP_models/tissue_create.anthroforge` (read-only).
 Ignored earlier diagnostics: `build/tissue-create-diagnosis/`; original SHA256
 `3cc32677bf56f1f14fafd36dc36572a77d8c0b3ab69e8076f8740dc84a322d28`.
 Unrelated untracked root `__init__.py` must remain untouched. Background-only checks.
+
+## Production query checkpoint (in progress)
+
+Native CGAL/Boost adapter, source-preserving query mesh, bounded cache, shared
+Fiber/Anchor/constraint captures and asynchronous final curve-snap command are now
+implemented. 32 targeted attachment/query/architecture tests passed before the SCP
+capture extension; the three new authored snapping lifecycle tests and function
+limits also pass. Mypy passes (286 files). Original result geometry is unchanged.
+
+Remaining: integrate drawing/point/cursor confirmation and displayed tissue targets,
+qualify SCP recapture scheduling, implement normal-ray stacking ambiguity, audit UI
+ellipses, run full development/visual/package gates and update dependency distribution.
+This is an incomplete recovery checkpoint, not a release or merge candidate.

@@ -1,5 +1,6 @@
 // Captures owned SCP inputs and applies the addon's unchanged attachment kernel.
 #include "mesh_internal.hpp"
+#include "surface_query.hpp"
 #include "anthroforge/attachments.h"
 #include <chrono>
 #include <cstring>
@@ -37,9 +38,9 @@ static constexpr int af_requested_workers=1;
 
 namespace af {
 struct Capture {
-    std::shared_ptr<Mesh> child,parent;
+    std::shared_ptr<Mesh> child,parent,query_mesh;
     M4 child_world,parent_world,child_geometry,parent_geometry;
-    std::shared_ptr<Surface> surface;
+    std::shared_ptr<Surface> surface,query_surface;
     int parent_mode,child_mode,locked,flow,index=-1;
     V3 anchor=V3::Zero(); Hit hit;
     double* output;
@@ -57,10 +58,14 @@ static V3 child_candidate(const Capture& capture,int index) {
     for(auto i=first;i<last;++i) local+=capture.child->vertices.row(capture.child->corners[i]).transpose();
     return point(capture.child_geometry,local/double(last-first));
 }
+static Hit capture_nearest(const Capture& capture,const V3& point) {
+    const auto hit=nearest(*capture.query_surface,point);
+    return query::material_hit(*capture.query_mesh,*capture.surface,hit);
+}
 static void consider(Capture& capture,int index,double& best) {
     const V3 anchor=child_candidate(capture,index);
     Hit hit;
-    if(capture.surface) hit=nearest(*capture.surface,anchor);
+    if(capture.surface) hit=capture_nearest(capture,anchor);
     else { hit.point=capture.parent_world.block<3,1>(0,3); hit.distance=(anchor-hit.point).squaredNorm(); }
     if(hit.distance>=best) return;
     best=hit.distance; capture.hit=hit; capture.anchor=anchor; capture.index=index;
@@ -105,7 +110,7 @@ static M3 capture_flow(Capture& capture,const M3& stable) {
     tangent=tangent.norm()>1e-6?V3(tangent.normalized()):V3(stable.col(0));
     const double size=(capture.surface->vertices.colwise().maxCoeff()-capture.surface->vertices.colwise().minCoeff()).maxCoeff();
     for(double factor:{0.02,0.05,0.1}) {
-        const Hit probe=nearest(*capture.surface,capture.hit.point+tangent*size*factor);
+        const Hit probe=capture_nearest(capture,capture.hit.point+tangent*size*factor);
         if((probe.point-capture.hit.point).norm()<=1e-6) continue;
         store_hit(capture.output+6,*capture.parent,probe);
         V3 delta=probe.point-capture.hit.point; delta-=normal*delta.dot(normal);
@@ -130,7 +135,10 @@ static void write_capture(Capture& capture) {
 static void initialize_surface(Capture& capture) {
     if(!capture.parent_mode) return;
     if(!capture.parent) throw std::runtime_error("Parent has no geometry; use Object Origin.");
+    capture.query_mesh=capture.parent; capture.parent=query::original(capture.parent);
     capture.surface=std::make_shared<Surface>(*capture.parent,capture.parent_geometry);
+    capture.query_surface=capture.query_mesh==capture.parent?capture.surface:
+        std::make_shared<Surface>(*capture.query_mesh,capture.parent_geometry);
 }
 static AfAttachmentScpOp operation(const double* binding,const M4& child,int mode,int follows,int flow) {
     AfAttachmentScpOp op{}; op.parent=0; op.child=1; op.surface=mode?0:-1;
@@ -213,6 +221,7 @@ static Capture point_surface(uint64_t handle,const double* frame,bool prepare) {
     value.parent_geometry=value.parent_world; value.parent_mode=1; value.child_mode=2;
     value.child_world=M4::Identity(); value.flow=0; value.locked=-1;
     if(prepare) initialize_surface(value);
+    else value.parent=query::original(value.parent);
     return value;
 }
 static std::vector<Capture> point_surfaces(int count,const uint64_t* meshes,const double* frames,bool prepare,uint64_t cancel) {

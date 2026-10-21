@@ -740,3 +740,27 @@ resolved inflation/smoothing defect when assessing the fixture.
   [tests](../tests/test_tissue_intersection_policy.py),
   [active task](tasks/tissue-intersection-policy.md). Raw local evidence is in
   `build/tissue-create-diagnosis/` and `build/tissue-intersection-policy/`.
+
+### CH-017 — Transient exterior queries for confirmed placement
+
+- **2026-10-21; 0.2.2; implementation in progress.** Shared snapping/attachment
+  boundary now distinguishes original-mesh preview from confirmed exterior queries.
+- **Before:** nearest raw triangle could bind to a buried fold or sealed cavity.
+- **After:** CGAL exact intersection arrangement through the pinned libigl adapter,
+  followed by ambient-cell extraction, source-face filtering and per-face material
+  mapping. Temporary closure uses the base belonging to the accepted final result,
+  including Manual provenance. Added closure faces cannot be selected. Reversed
+  exposed lobes survive; sealed cavities do not. Originals remain unchanged.
+- **Ownership:** one native query service, bounded 64 MiB/64-entry owned cache tracked
+  by existing profiler resource collection; attachments capture original triangle and
+  barycentric coordinates. Resolution uses the original material surface. Confirmed
+  curve edits run as coordinator jobs in the initiating undo step; expensive query
+  preparation is never an interactive inline attachment recapture.
+- **Evidence:** Windows native build and five query tests pass: nested sealed cavity,
+  overlapping shells, open zero-volume sheet, actual compact crossed-tissue fixture,
+  cancellation and cache leases. Three authored-placement tests pass for one-action
+  undo/redo, cancelled gesture and unrelated later edits. Mypy and function limits
+  pass. Broader interaction, staging, stacking and release checks remain pending.
+- **Limits:** exact remeshing observes cancellation between native stages, not within
+  the CGAL call. This does not repair displayed geometry or establish safe skinning.
+  Drawing/creation entry points are still being integrated at this checkpoint.

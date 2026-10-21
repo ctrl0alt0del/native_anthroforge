@@ -37,6 +37,9 @@ struct Mesh {
     std::vector<double> material_pins;
     TissueDomain tissue;
     MaterialBasis basis;
+    // Transient query copies retain their original surface; never document assets.
+    std::shared_ptr<Mesh> query_source;
+    std::vector<int64_t> query_faces;
     std::vector<std::vector<float>> chunks;
     igl::AABB<Vertices,3> tree;
     double bounds[6]{};

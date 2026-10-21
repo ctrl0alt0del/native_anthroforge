@@ -133,6 +133,7 @@ def selected_weights(editor, binding, value):
 
 
 def start_transform(editor, mode):
+    editor.interaction.clearSnap()
     editor.drag_mode = mode
     capture_transform(editor)
     editor.controller.session.begin()

@@ -31,6 +31,7 @@ from . import (
     point_operations,
     presentation,
     projects,
+    snap_tasks,
     surface_branch_operations,
     surface_grouping,
     surface_operations,
@@ -52,6 +53,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "surface.snap.curves": snap_tasks.confirm,
     "tissue.preview.accept": tissue_preview.accept,
     "tissue.stacking.configure": tissue_stack_operations.configure,
     "tissue.stacking.relationship": tissue_stack_operations.relationship,

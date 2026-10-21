@@ -22,6 +22,7 @@ from . import (
     object_revisions,
     point_evaluation,
     surface_providers,
+    surface_queries,
 )
 from .construction_policy import revisions
 from .evaluation_results import accepted_result
@@ -108,13 +109,24 @@ def compute(session: Any, spec: Capture, payload: Any, cancel: Any) -> Any:
             0
         ]
     )
-    provider = surface_providers.get(session.engine, document, resources.meshes, reference)
-    binding, frame = capture_binding(session.engine, provider, world, cancel.handle)
+    binding, frame = bind_point(
+        session.engine, document, resources.meshes, reference, world, cancel.handle
+    )
     return document, point_evaluation.with_frame(copied(item, spec, binding), frame)
 
 
-def capture_binding(engine: Any, provider: Any, world: Any, cancel: int) -> Any:
-    surfaces = ([provider.resource.mesh.handle], [provider.frame])
+def bind_point(
+    engine: Any, document: Any, meshes: Any, reference: Any, world: Any, cancel: int
+) -> Any:
+    provider = surface_providers.get(engine, document, meshes, reference)
+    query = surface_queries.prepare(
+        document, meshes, provider, surface_queries.Mode.CONFIRMED, cancel
+    )
+    return capture_binding(engine, provider, world, cancel, query)
+
+
+def capture_binding(engine: Any, provider: Any, world: Any, cancel: int, query: Any) -> Any:
+    surfaces = ([query.mesh.handle], [provider.frame])
     targets, records = point_attachments.capture(engine, *surfaces, [world], cancel=cancel)
     attachment = Attachment(child_mode="OBJECT_ORIGIN", binding=tuple(records[0].tolist()))
     binding = SurfaceBinding(provider.reference, attachment, material_asset=provider.asset_id)

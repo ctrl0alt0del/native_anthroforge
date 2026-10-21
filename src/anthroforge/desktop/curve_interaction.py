@@ -19,6 +19,7 @@ class CurveInteraction(QObject):
         self.offset = 0.0
         self.query = None
         self.context = None
+        self.confirmation = None
 
     @Property("QVariantMap", notify=changed)
     def state(self):
@@ -40,6 +41,7 @@ class CurveInteraction(QObject):
 
     @Slot()
     def clearSnap(self):
+        self.confirmation = None
         if self.snap or self.offset:
             self.snap = {}
             self.offset = 0.0
@@ -124,6 +126,7 @@ class CurveInteraction(QObject):
             self.resetOffset()
         anchor = snap_anchor(editor) if enabled else None
         self.snap = surface_hit(editor.controller, origin, direction, self.offset) if anchor else {}
+        self.remember(origin, direction)
         self.changed.emit()
         if not self.snap:
             return values
@@ -131,6 +134,24 @@ class CurveInteraction(QObject):
             *(value - base for value, base in zip(self.snap["point"], anchor, strict=True)),
             *values[3:],
         ]
+
+    def remember(self, origin, direction):
+        self.confirmation = None
+        if self.snap:
+            self.confirmation = dict(
+                origin=origin, direction=direction, preview=self.snap["point"], offset=self.offset
+            )
+
+    def confirm(self):
+        if self.confirmation is None:
+            return
+        editor, controller = self.editor, self.editor.controller
+        refs = [r for r, _, _ in editor.drag_rows if r.get("curve")]
+        targets = [key for key in controller.snap_ids if key != controller.selection]
+        controller.session.command(
+            "surface.snap.curves", components=refs, targets=targets, **self.confirmation
+        )
+        self.confirmation = None
 
 
 def snap_anchor(editor):

@@ -118,15 +118,18 @@ def capture_all(
     cancel: Event,
 ) -> list[SCP]:
     lookup = {item.id: item for item in entities}
+    token = getattr(cancel, "handle", 0)
     for index, item in enumerate(entities):
         if cancel.is_set():
             return entities
         if item.id in recaptures and item.parent:
-            entities[index] = capture_safely(engine, item, lookup[item.parent], meshes)
+            entities[index] = capture_safely(engine, item, lookup[item.parent], meshes, token)
     return entities
 
 
-def capture_safely(engine: GeometryEngine, item: SCP, parent: SCP, meshes: dict[str, Mesh]) -> SCP:
+def capture_safely(
+    engine: GeometryEngine, item: SCP, parent: SCP, meshes: dict[str, Mesh], cancel: int = 0
+) -> SCP:
     try:
         if item.capture_parent_matrix:
             parent = replace(
@@ -134,7 +137,7 @@ def capture_safely(engine: GeometryEngine, item: SCP, parent: SCP, meshes: dict[
                 matrix=item.capture_parent_matrix,
                 geometry_offset=item.capture_parent_offset,
             )
-        captured = capture(engine, item, parent, meshes)
+        captured = capture(engine, item, parent, meshes, cancel)
         return replace(captured, status="ready", error="", capture_parent_matrix=())
     except ValueError as error:
         return replace(item, status="failed", error=str(error))

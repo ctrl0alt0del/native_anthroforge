@@ -4,6 +4,8 @@
 extern "C" {
 #endif
 AF_API const char* af_last_error(void);
+/* Query-only owned mesh: mode 0 preview, 1 exterior confirmed. Base closes open tissue. */
+AF_API uint64_t af_surface_query(uint64_t mesh,uint64_t base,int mode,uint64_t cancel);
 AF_API uint64_t af_mesh_import(const char* path, double units, int y_up, uint64_t cancel);
 AF_API uint64_t af_mesh_create(const double* vertices, int64_t count,
     const int64_t* corners, const int64_t* offsets, int64_t faces);

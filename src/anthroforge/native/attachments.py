@@ -11,24 +11,34 @@ import numpy as np
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import geometry_asset
 
+from . import surface_queries
 from .mesh import GeometryEngine, Mesh, doubles, pointer
 
 CHILD_MODES = {"FACE_CENTER": 0, "VERTEX_NEAREST": 1, "OBJECT_ORIGIN": 2}
 
 
-def capture(engine: GeometryEngine, child: SCP, parent: SCP, meshes: dict[str, Mesh]) -> SCP:
-    settings = child.attachment
+def capture(
+    engine: GeometryEngine, child: SCP, parent: SCP, meshes: dict[str, Mesh], cancel: int = 0
+) -> SCP:
     arrays = [
         doubles(v)
         for v in (child.matrix, parent.matrix, child.geometry_offset, parent.geometry_offset)
     ]
     output = np.empty(28)
-    handles = (handle(child, meshes), handle(parent, meshes))
+    query = capture_surface(parent, meshes, child.attachment.parent_mode, cancel)
+    handles = (handle(child, meshes), query.mesh.handle if query else handle(parent, meshes))
     status = engine.library.af_capture(
         *handles, *(pointer(a) for a in arrays), *capture_options(child), pointer(output)
     )
     engine.check(status)
-    return replace(child, attachment=replace(settings, binding=tuple(output.tolist())))
+    return replace(child, attachment=replace(child.attachment, binding=tuple(output.tolist())))
+
+
+def capture_surface(parent: SCP, meshes: dict[str, Mesh], mode: str, cancel: int) -> Any:
+    key = geometry_asset(parent)
+    if key and mode == "SURFACE_NEAREST":
+        return surface_queries.prepare(meshes[key], None, surface_queries.Mode.CONFIRMED, cancel)
+    return None
 
 
 def anchor_points(engine: GeometryEngine, child: SCP, parent: SCP, mesh: int) -> list[float]:

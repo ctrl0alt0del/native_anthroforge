@@ -78,6 +78,11 @@ def transform_delta(controller, values):
 
 def end_transform(controller, cancel=False):
     if controller.session.history.before is not None:
+        if not cancel:
+            try:
+                controller.authoring.interaction.confirm()
+            except ValueError as error:
+                controller.message = str(error)
         run(controller, "cancel" if cancel else "commit", {})
     controller.drag_values = []
 

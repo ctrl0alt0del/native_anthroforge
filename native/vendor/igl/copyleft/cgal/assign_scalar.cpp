@@ -152,7 +152,7 @@ IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   } while (d < float(interval.second));
 }
 
-#ifndef WIN32
+#if defined(CGAL_USE_GMPXX) && !defined(WIN32)
 
 IGL_INLINE void igl::copyleft::cgal::assign_scalar(
   const CGAL::Simple_cartesian<mpq_class>::FT & cgal,

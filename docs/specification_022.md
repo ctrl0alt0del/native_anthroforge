@@ -23,6 +23,9 @@ The confirmed downstream contract is **pending implementation and qualification*
   Cleanup never replaces the target, and hit provenance must map back to the original
   material binding. Existing bindings resolve their retained location rather than
   choosing a new nearest point on each update.
+  Only fragments bordering exterior-connected space are valid: surfaces inside sealed
+  cavities are excluded, including reversed-orientation folds that ordinary signed
+  union can misclassify. This query cleanup never repairs the displayed tissue.
 - For open single-sided tissue, use a temporary closure against its material base for
   the Boolean calculation. The cleaned mesh exists only in memory for confirmed
   queries. Added backing and closure faces are not selectable attachment surfaces.

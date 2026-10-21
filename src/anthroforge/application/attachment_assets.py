@@ -12,7 +12,7 @@ from anthroforge.core.surface_references import CapturedSurface
 from anthroforge.native import attachment_fields, curve_editing
 from anthroforge.native.mesh import GeometryEngine
 
-from . import surface_providers
+from . import surface_providers, surface_queries
 from .path_assets import PathAsset
 
 
@@ -22,8 +22,10 @@ class AttachmentAsset:
     field: attachment_fields.Field
 
 
-def surface_inputs(engine: GeometryEngine, document: Document, meshes: Any, targets: Any) -> Any:
-    return surface_providers.inputs(engine, document, meshes, targets)
+def surface_inputs(
+    engine: GeometryEngine, document: Document, meshes: Any, targets: Any, cancel: int = 0
+) -> Any:
+    return surface_queries.inputs(engine, document, meshes, targets, cancel)
 
 
 def compact(

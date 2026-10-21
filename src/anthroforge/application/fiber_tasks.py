@@ -109,7 +109,9 @@ def compute(session: "Session", spec: "FiberCreation", payload: Any, cancel: Any
     item, original, targets, request = capture(session, spec, document, resources)
     spec = fiber_defaults.resolve(session.engine, spec, document, resources, request, cancel.handle)
     request = replace(request, parents=[targets.index(row[1]) for row in spec.bindings])
-    surfaces = attachment_assets.surface_inputs(session.engine, document, resources.meshes, targets)
+    surfaces = attachment_assets.surface_inputs(
+        session.engine, document, resources.meshes, targets, cancel.handle
+    )
     field = attachment_fields.capture(session.engine, surfaces, request, cancel.handle)
     captures = attachment_assets.captures(session.engine, document, resources.meshes, targets)
     asset = attachment_assets.compact(field, captures)

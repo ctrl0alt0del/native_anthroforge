@@ -1,6 +1,8 @@
 """Exercise Boolean placement and original-material attachment capture in a clean executable."""
 
 import json
+from pathlib import Path
+from zipfile import ZipFile
 
 from construction_portable import request
 
@@ -20,9 +22,9 @@ def cavity(cwd):
     (cwd / "placement-cavity.obj").write_text("\n".join(output) + "\n")
 
 
-def commands():
+def commands(target="placement-cavity.obj"):
     return [
-        dict(id="bone", **request("import", path="placement-cavity.obj", units=1)),
+        dict(id="bone", **request("import", path=target, units=1)),
         request("wait"),
         placed_curve(),
         request("wait"),
@@ -50,14 +52,38 @@ def placed_curve():
 
 def exterior_placement(executable, cwd, invoke):
     cavity(cwd)
+    for target in ("placement-cavity.obj", "examples/primitives/cube.obj"):
+        qualify_placement(executable, cwd, invoke, target)
+
+
+def recorded_commands(target):
+    return [
+        request("profile.start"),
+        *commands(target),
+        request("profile.stop", path=Path(target).stem + ".afprofile.zip", wait=True),
+    ]
+
+
+def qualify_placement(executable, cwd, invoke, target):
     script = cwd / "exterior-placement.json"
-    script.write_text(json.dumps(commands()))
+    script.write_text(json.dumps(recorded_commands(target)))
     output = invoke(executable, cwd, "--cli", "run", script.name)
     assert all(json.loads(line)["ok"] for line in output.splitlines()), output
     state = json.loads(
         invoke(executable, cwd, "--cli", "inspect", "exterior-placement.anthroforge")
     )
     verify(state)
+    verify_profile(cwd / (Path(target).stem + ".afprofile.zip"))
+
+
+def verify_profile(path):
+    with ZipFile(path) as archive:
+        events = json.loads(archive.read("trace.json"))["traceEvents"]
+    assert any(e["cat"] == "native" and e["name"] == "af_surface_query" for e in events)
+    queries = [e for e in events if e["cat"] == "cache" and e["args"]["cache"] == "surface_query"]
+    inserts = [e["args"] for e in queries if e["name"] == "insert"]
+    assert inserts and all(0 < e["bytes"] <= e["retained_bytes"] <= e["budget"] for e in inserts)
+    assert any(e["name"] == "hit" for e in queries)
 
 
 def verify(state):

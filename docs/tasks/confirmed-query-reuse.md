@@ -44,6 +44,14 @@ draft-only storage function on prepared meshes, silently returning zero. A scope
 native accounting operation now includes prepared allocations and counts aliases once.
 Byte eviction, oversized bypass and retained leases are covered by regressions.
 
+Serial complete-query comparison against the packaged `98ca740` runtime: six alternating
+rounds, three uncached trials per case/backend/round, nine cases. All oriented triangle
+geometry hashes match across every baseline/current run. Clean actual base improves
+14.895 to 8.697 ms median, radial tissue 6.014 to 4.307 ms. Dirty tissue timings overlap
+normal variation; cavity qualification adds about 1.17 ms before full cleanup. Original
+allocations are reused in all six eligible cases. See
+[measured evidence](confirmed-query-reuse-evidence.json); no UI-latency claim.
+
 ## Remaining work
 
 1. Compare actual query geometry and native timing against the previous packaged build.

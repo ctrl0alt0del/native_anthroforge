@@ -60,7 +60,7 @@ evidence for those revisions, not current workflow instructions.
 | C03 | Path frames and consumer sampling: arc-length/range sampling, direction and start correspondence, anchored sampling, frame transport and body placement. Solver samples remain separate from authored controls. | [curve_frames.cpp](../native/src/curve_frames.cpp), [path_resampling.cpp](../native/src/path_resampling.cpp) | [anchored sampling](../tests/test_anchored_sampling.py), [consumer sampling](../tests/test_consumer_sampling.py) |
 | C04 | Drawing/fitting: pointer-stroke depth, surface projection/fallback, offsets, image-plane drawing, corner detection and native cubic fitting. Branch placement can explicitly seed an existing control position (CH-015). A completed stroke authors one curve. | [drawing.cpp](../native/src/drawing.cpp), [curve_fit.cpp](../native/src/curve_fit.cpp), [drawing tasks](../src/anthroforge/application/drawing_tasks.py) | [drawing parity](../tests/test_drawing_parity.py), [strokes](../tests/test_strokes.py), [branch placement](../tests/test_branch_placement.py) |
 | C05 | Curve editing math: closest location to the pointer, cubic subdivision/insertion, handle updates, selected-control transforms and current-path rebasing/deformation. | [curve_queries.cpp](../native/src/curve_queries.cpp), [path_editing.cpp](../native/src/path_editing.cpp) | [curve queries](../tests/test_curve_queries.py), [standalone editing](../tests/test_standalone_editing.py) |
-| C06 | Routed path solving: capture obstacles, classify contacts, plan corridors, retain required bends with adaptive sampling, validate warm starts, solve constrained SQP with collision/clearance checks and report termination. Open/cyclic paths share the engine. Geometry and correspondence use one prepared layout. | [routing.cpp](../native/src/routing.cpp), [routing_planner.cpp](../native/src/routing_planner.cpp), [routing_handoff.cpp](../native/src/routing_handoff.cpp), [routing_solve.cpp](../native/src/routing_solve.cpp) | [routing parity](../tests/test_routing_parity.py), [surface pins](../tests/test_routing_surface_pins.py), [snapped routing](../tests/test_snapped_routing.py), [adaptive layout](../tests/test_routing_layout.py) |
+| C06 | Routed path solving: capture obstacles, classify contacts, plan corridors, retain required bends with adaptive sampling, validate warm starts, solve constrained SQP with collision/clearance checks and report termination. Open/cyclic paths share the engine. Geometry and correspondence use one prepared layout. Production inner solver remains banded/active-set; the isolated PIQP comparison is CH-019. | [routing.cpp](../native/src/routing.cpp), [routing_planner.cpp](../native/src/routing_planner.cpp), [routing_handoff.cpp](../native/src/routing_handoff.cpp), [routing_solve.cpp](../native/src/routing_solve.cpp) | [routing parity](../tests/test_routing_parity.py), [surface pins](../tests/test_routing_surface_pins.py), [snapped routing](../tests/test_snapped_routing.py), [adaptive layout](../tests/test_routing_layout.py) |
 | C07 | Explicit junction resolution: canonical shared-point identity, incident-curve updates, transforms and atomic propagation. Branched placement creates/reuses a junction in the new curve's single transaction (CH-015). Proximity alone never creates a junction. | [junction evaluation](../src/anthroforge/application/junction_evaluation.py), [junction edits](../src/anthroforge/application/junction_edits.py), [branch creation](../src/anthroforge/application/curve_branch_creation.py) | [junction workflow](../tests/test_junction_workflow.py), [fiber junctions](../tests/test_fiber_junctions.py), [branch creation](../tests/test_branch_creation.py) |
 
 ### Attachments and attached construction
@@ -817,3 +817,33 @@ The user source file is unchanged. The native query is visible separately in the
 profiler (about 0.693 seconds in one local run, not an input-latency measurement).
 Bundled CGAL/Boost headers compile offline. See the [current validation record](development_status.md#tissue-queries-stacking-and-readable-controls-022)
 for artifact identity, UI checks and evidence limits.
+
+### CH-019 — Isolated PIQP routing-backend comparison; production unchanged
+
+- **2026-10-21; C06; experiment, not adopted.** The user asked whether PIQP improves
+  routing performance. The current native banded/active-set candidate solver was
+  compared with sparse and dense PIQP 0.6.4, using identical quadratic objectives,
+  linearized contacts and pins. Numerical assembly and iteration remain in C++.
+- **Preserved:** original planner, exact pins, trust limiter, CCD, sampling,
+  acceptance and final validation. Generated benchmark adapters live outside app
+  imports. Neither production source nor project inputs were changed.
+- **Evidence:** 22 input variants, 1,584 serial complete-route trials, matched inner
+  subproblems, another tolerance block, baseline instrumentation-cost comparisons,
+  existing runtime-profiler captures and inspected route overlays. Sparse PIQP is
+  slower on small problems and most cold anatomical cases, but reduces the heavy
+  256-sample attached warm route from 379.37 to 72.76 ms. Identical warm QPs take
+  373.82 versus 53.78 ms, with tighter constraint residuals. Dense PIQP is slower.
+  These local native-route timings do not establish UI latency or a backend policy.
+- **Counterevidence:** one historical skull input fails independent clearance for
+  every backend; its first fixed point is about 5.50e-8 inside the cranium. Using
+  existing outward snap in a diagnostic copy makes every backend pass. Original
+  inputs remain unchanged. The current bounded active-set loop can return unequal
+  active/dual list sizes at its cap; such diagnostic stationarity is unavailable.
+  This result-consistency risk is recorded, not repaired under a speed comparison.
+- **Decision:** retain production routing. Sparse PIQP merits a separately qualified
+  adaptive-backend experiment for heavy contact systems; no universal replacement
+  or safe sample-count threshold is established. Full development gate: 1,442 tests
+  and all three native tests pass. No new packaged backend is claimed.
+- **Reproduction and limits:** [comparison record](tasks/routing-piqp-benchmark.md),
+  [machine-readable evidence](tasks/routing-piqp-evidence.json),
+  [isolated tools](../tools/routing_qp_benchmark/README.md).

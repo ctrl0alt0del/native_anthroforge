@@ -40,7 +40,10 @@ def quality(engine, path, spec, case):
     row = path_collisions.row(path, spec.world, owners)
     hits, tolerance = path_collisions.check(engine, [row], spec.handles, spec.matrices)
     return dict(
-        clear=bool(np.all(hits < 0)), collision_tolerance=tolerance, **path_quality(path, spec)
+        clear=bool(np.all(hits < 0)),
+        collision_tolerance=tolerance,
+        collision_segments=hits.tolist(),
+        **path_quality(path, spec),
     )
 
 

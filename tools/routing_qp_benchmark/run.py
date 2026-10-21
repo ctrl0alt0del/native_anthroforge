@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import math
 import platform
 import subprocess
 from dataclasses import replace
@@ -24,6 +25,7 @@ def arguments():
     parser.add_argument("--backends", default="0,1,2")
     parser.add_argument("--tolerance", type=float, default=1e-9)
     parser.add_argument("--audit", action="store_true")
+    parser.add_argument("--audit-input", choices=("cold", "warm"), default="cold")
     return parser.parse_args()
 
 
@@ -40,8 +42,12 @@ def checked(engine, spec, case):
     if path is not None:
         quality = harness.quality(engine, path, spec, case)
         result["quality"] = {k: v for k, v in quality.items() if k not in ("points", "parameters")}
-        assert quality["clear"] and quality["finite"] and quality["monotonic"], case["name"]
-        assert quality["pin_error"] < 1e-12, case["name"]
+        result["qualified"] = bool(
+            quality["clear"]
+            and quality["finite"]
+            and quality["monotonic"]
+            and quality["pin_error"] < 1e-12
+        )
     return path, result
 
 
@@ -70,18 +76,28 @@ def audit(engine, spec, case, args):
     return dict(result, records=harness.records(engine))
 
 
+def case_report(case, meshes, baseline):
+    return dict(
+        name=case["name"],
+        samples=case["samples"],
+        surfaces=len(meshes),
+        baseline=baseline,
+        triangles=sum(len(s["triangles"]) for s in case["surfaces"]),
+    )
+
+
 def run_case(engine, case, args):
     meshes, spec = cases.inputs(engine, case)
     harness.configure(engine, 0)
     path, baseline = checked(engine, spec, case)
     assert path is not None, baseline
     load = system_times()
-    result = dict(name=case["name"], samples=case["samples"], surfaces=len(meshes))
-    result["triangles"] = sum(len(s["triangles"]) for s in case["surfaces"])
+    result = case_report(case, meshes, baseline)
     result["trials"] = timings(engine, spec, path, case, args)
     result["load"] = system_load(load)
     if args.audit:
-        result["audit"] = audit(engine, spec, case, args)
+        value = spec if args.audit_input == "cold" else replace(spec, warm=path)
+        result["audit"] = audit(engine, value, case, args)
     engine.clear_caches()
     return result
 
@@ -111,14 +127,23 @@ def metadata(args):
         rounds=args.rounds,
         backends=args.backends,
         audit=args.audit,
+        audit_input=args.audit_input,
         warm="Same accepted baseline path; no authored edit; scene cache prepared before timing",
         timing="Whole native routing including preparation, scene capture, planning and validation",
     )
 
 
+def json_values(value):
+    if isinstance(value, dict):
+        return {key: json_values(item) for key, item in value.items()}
+    if isinstance(value, (tuple, list)):
+        return [json_values(item) for item in value]
+    return None if isinstance(value, float) and not math.isfinite(value) else value
+
+
 def save(path, report):
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(report, indent=2))
+    path.write_text(json.dumps(json_values(report), indent=2, allow_nan=False))
 
 
 def main():

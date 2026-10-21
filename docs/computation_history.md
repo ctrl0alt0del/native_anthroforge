@@ -79,7 +79,7 @@ Additional active authoring/inspection work for T09, K01 and Q05 is recorded in 
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
-| S01 | Source correspondence: align compatible closed paths initially, persist starting correspondence/direction, apply per-source sampling ranges and transforms; explicit Realign recalculates correspondence. | [surface_alignment.cpp](../native/src/surface_alignment.cpp), [surface_sampling.cpp](../native/src/surface_sampling.cpp) | [native surfaces](../tests/test_native_surfaces.py), [surface sources](../tests/test_surface_sources.py) |
+| S01 | Source correspondence: optional identity-qualified material stations preserve authored open loft correspondence (CH-031); align compatible closed paths initially, persist starting correspondence/direction, apply per-source sampling ranges and transforms; explicit Realign recalculates correspondence. | [surface_alignment.cpp](../native/src/surface_alignment.cpp), [surface_sampling.cpp](../native/src/surface_sampling.cpp) | [native surfaces](../tests/test_native_surfaces.py), [surface sources](../tests/test_surface_sources.py) |
 | S02 | General lofts: preserve evaluated corners with normalized material axes, coalescing numerically coincident stations. Shared attachment frames use material charts across adaptive sample changes (CH-013). All-Fiber inputs produce a Membrane through the same evaluator. | [surface_loft.cpp](../native/src/surface_loft.cpp), [material_binding_frames.cpp](../native/src/material_binding_frames.cpp) | [surface workflow](../tests/test_surface_workflow.py), [adaptive material](../tests/test_adaptive_material_frames.py), [routed surface lifecycle](../tests/test_routed_surface_material.py) |
 | S03 | Closed-curve patches: project and triangulate a boundary, subdivide, fair interior samples while retaining boundary constraints, and retain material correspondence. | [surface_patch_projection.cpp](../native/src/surface_patch_projection.cpp), [surface_patch_fairing.cpp](../native/src/surface_patch_fairing.cpp) | [native surfaces](../tests/test_native_surfaces.py) |
 | S04 | Branched open lofts: infer semantic source groups from explicit junctions before unchanged native branch sampling, connector assembly and welded seams (CH-015). Ask for ambiguous groups; reject unsupported nested/closed branches and overlapping root intervals. | [grouping](../src/anthroforge/application/surface_grouping.py), [surface_branches.cpp](../native/src/surface_branches.cpp), [surface_branch_sampling.cpp](../native/src/surface_branch_sampling.cpp) | [native surface branches](../tests/test_native_surface_branches.py), [surface grouping](../tests/test_surface_grouping.py), [surface branches](../tests/test_surface_branches.py) |
@@ -1179,3 +1179,31 @@ avoid constructing wrappers for unrelated assets per Shrinkwrap call. The deskto
 adapter recursively converts identity-free typed settings while retaining identity-bearing
 incremental records; actual visible-field tests caught and fixed missing parameter values.
 See the task and development validation records for final gate/package evidence and limits.
+
+
+### CH-031 — Preserve authored open-loft material correspondence (2026-10-22)
+
+- Affects S01/S02, tissue input preparation; defaults and inflation kernels unchanged.
+- Evidence: four randomly selected canonical addon muscles were reconstructed with exact
+  saved Free paths on the migrated skeleton. Reassigning correspondence by arclength
+  increased mesh density and changed cross-sections. TFL inflation differed by 0.315
+  scene units; merely preserving curve positions did not preserve its material loft.
+- Change: optional per-source stations belong to SurfaceAlignment and reference stable
+  authored point IDs. C++ maps evaluated path parameters to these retained stations,
+  preserves evaluated corners and normalizes the accepted material domain. Duplication
+  remaps identities, persistence retains definitions, missing points fail explicitly,
+  and Realign deliberately resets correspondence. Existing surfaces remain unchanged.
+- The one-off migration preserves donor transverse density and selects resolution 3,
+  which adds no evaluated refinement to these already denser donor grids. No mesh
+  substitute, Python numerical fallback or special-case muscle evaluator is used.
+- Observed bilateral parity: FCR, sartorius, pronator teres and TFL inflation meshes
+  match within 6.4e-7 scene units, with original vertex counts. Two-sided inflation and
+  the material-domain crop are retained. External captures and comparisons are in the
+  run linked by [task context](tasks/four-muscle-migration.md).
+- Tests: native mapping/reversal, incompatible sampling, edit stability, copy, save,
+  reopen, explicit Realign/undo and stale identities. The Windows development gate,
+  final 1655-test suite, five native CTests and portable checks pass. The installed
+  executable recalculates all 38 migrated construction/tissue targets and renders
+  the saved project without a visible window. This is not interactive acceptance.
+- Scope: explicit stations require complete open ordinary loft inputs and exact
+  sampling. They do not silently apply to closed paths, ranges, or branched layouts.

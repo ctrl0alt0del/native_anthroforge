@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from anthroforge.core.construction import Curve, Primitive
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import SCP
-from anthroforge.core.surfaces import Surface
+from anthroforge.core.surfaces import Surface, SurfaceAlignment
 from anthroforge.core.tissues import TissueVCP
 
 from . import construction_copy, construction_tasks, curve_consumers, curve_copy, curve_sources
@@ -80,10 +80,18 @@ def remapped_surface(item: Surface, identities: dict[str, str]) -> Surface:
     return replace(
         item,
         curves=tuple(remapped_use(u, identities) for u in item.curves),
-        alignment=tuple(replace(a, point=identities.get(a.point, a.point)) for a in item.alignment),
+        alignment=tuple(remapped_alignment(a, identities) for a in item.alignment),
         main=tuple(identities.get(key, key) for key in item.main),
         branches=tuple(remapped_branch(b, identities) for b in item.branches),
         accepted_parts=tuple(identities.get(k, k) for k in item.accepted_parts),
+    )
+
+
+def remapped_alignment(value: SurfaceAlignment, identities: dict[str, str]) -> SurfaceAlignment:
+    return replace(
+        value,
+        point=identities.get(value.point, value.point),
+        stations=tuple((identities.get(key, key), position) for key, position in value.stations),
     )
 
 

@@ -14,7 +14,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.core.primitive_sampling import count
 from anthroforge.core.results import geometry_asset
-from anthroforge.native import bodies, components, path_editing, paths
+from anthroforge.native import bodies, components, path_editing, paths, shrinkwrap
 from anthroforge.native import construction as native
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 from anthroforge.native.scene import entity_frame
@@ -69,12 +69,25 @@ class Evaluation:
         return points
 
     def apply_binding(self, points: Any, binding: Deformer, frame: Any) -> Any:
+        if binding.shrinkwrap:
+            return self.wrap(points, binding, frame)
         control = self.document.control(binding.control)
         target = self.control_frame(control)
         if binding.kind == "HOOK":
             return native.hook(self.engine, points, binding, frame, target, self.cancel.handle)
         args = (self.engine, points, control, binding, frame, target, self.cancel.handle)
         return native.lattice(*args, cage_points=self.cage(control))
+
+    def wrap(self, points: Any, binding: Deformer, frame: Any) -> Any:
+        from .assets import Asset
+        from .surface_providers import get
+
+        assert binding.shrinkwrap is not None
+        assets = {
+            key: Asset(mesh, "generated", "", 1.0, False) for key, mesh in self.meshes.items()
+        }
+        provider = get(self.engine, self.document, assets, binding.shrinkwrap.surface)
+        return shrinkwrap.deform(self.engine, points, binding, frame, provider, self.cancel.handle)
 
     def curve(self, entity: SCP, curve: Curve, definition: ResolvedPrimitive) -> Any:
         bindings = tuple(b for b in entity.deformers if applies(b, "CURVE", curve.id))

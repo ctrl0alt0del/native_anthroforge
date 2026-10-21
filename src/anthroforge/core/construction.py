@@ -11,6 +11,7 @@ from .curve_uses import CurveUse
 from .entities import IDENTITY, validate_matrix
 from .objects import ConstructionObject
 from .results import ControlResult
+from .shrinkwrap import Shrinkwrap
 
 
 def identity() -> str:
@@ -207,12 +208,17 @@ class Deformer:
     custom: tuple[float, ...] = (0.0, 0.0, 1.0, 1.0)
     custom_handles: tuple[str, ...] = ()
     custom_extrapolate: bool = True
+    shrinkwrap: Shrinkwrap | None = None
 
     def __post_init__(self) -> None:
         validate_matrix(self.bind)
         finite(self.center, 3)
-        if self.kind not in ("HOOK", "LATTICE") or not 0 <= self.strength <= 1:
+        if self.kind not in ("HOOK", "LATTICE", "SHRINKWRAP") or not 0 <= self.strength <= 1:
             raise ValueError("Invalid deformer kind or strength.")
+        if (self.kind == "SHRINKWRAP") != (self.shrinkwrap is not None):
+            raise ValueError("Shrinkwrap requires its own typed settings.")
+        if self.shrinkwrap and self.control:
+            raise ValueError("Shrinkwrap uses a surface, not a shared control.")
         validate_membership(self)
         validate_falloff(self.falloff, self.custom)
         validate_custom_handles(self.custom, self.custom_handles)

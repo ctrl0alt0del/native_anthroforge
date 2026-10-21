@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any
 
 from . import construction_validation, dependency_graph
 from .construction import Control
+from .deformer_references import signature as binding_signature
 from .entities import SCP, validate_tree
 
 if TYPE_CHECKING:
@@ -15,7 +16,7 @@ if TYPE_CHECKING:
 
 
 def reference_signature(item: SCP | Control) -> tuple[Any, ...]:
-    bindings = tuple((b.id, b.control, b.kind, b.target, b.enabled) for b in item.deformers)
+    bindings = tuple(binding_signature(b) for b in item.deformers)
     ids = tuple(construction_validation.identities(item))
     if isinstance(item, Control):
         return (ids, bindings, item.kind, item.follow)

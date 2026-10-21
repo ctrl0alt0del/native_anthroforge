@@ -34,6 +34,11 @@ class ThicknessStagePolicy:
         return 0.1 + workload.points * 0.002 + workload.polygons * 0.003
 
 
+class ShrinkwrapStagePolicy:
+    def estimate(self, workload: StageWorkload) -> float:
+        return 0.1 + workload.points * 0.01
+
+
 class SurfaceStagePolicy:
     def estimate(self, workload: StageWorkload) -> float:
         return 0.2 + workload.points * 0.003 + workload.polygons * 0.004
@@ -45,6 +50,7 @@ POLICIES: dict[str, StagePolicy] = {
     "LATTICE": LatticeStagePolicy(),
     "thickness": ThicknessStagePolicy(),
     "surface": SurfaceStagePolicy(),
+    "SHRINKWRAP": ShrinkwrapStagePolicy(),
 }
 
 
@@ -85,6 +91,8 @@ def binding_stages(document: Any, item: Any, binding: Any, points: int) -> list[
     if binding.target.stage == "CURVE":
         points = 3 * len(document.object(binding.target.component).points)
     result = [StageWorkload(binding.kind, points)]
+    if not binding.control:
+        return result
     control = document.control(binding.control)
     result.extend(
         StageWorkload(b.kind, len(control.points)) for b in control.deformers if b.enabled

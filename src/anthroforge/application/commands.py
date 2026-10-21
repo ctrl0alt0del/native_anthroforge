@@ -31,6 +31,7 @@ from . import (
     point_operations,
     presentation,
     projects,
+    shrinkwrap_operations,
     snap_tasks,
     surface_branch_operations,
     surface_grouping,
@@ -54,6 +55,8 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "shrinkwrap.add": shrinkwrap_operations.add,
+    "shrinkwrap.update": shrinkwrap_operations.update,
     "surface.snap.curves": snap_tasks.confirm,
     "surface.snap.points": snap_tasks.confirm_samples,
     "tissue.preview.accept": tissue_preview.accept,

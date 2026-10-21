@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from .construction import Control, Curve
 from .curve_dependencies import targets as curve_targets
+from .deformer_references import sources as deformer_sources
 from .entities import SCP
 from .fibers import Fiber
 from .junctions import Junction
@@ -96,7 +97,8 @@ def construction_consumers(document: "Document") -> Mapping[str, frozenset[str]]
     owners: tuple[SCP | Control, ...] = (*document.entities, *document.controls)
     for owner in owners:
         for binding in owner.deformers:
-            users.setdefault(binding.control, set()).add(owner.id)
+            for source in deformer_sources(binding):
+                users.setdefault(source, set()).add(owner.id)
     return MappingProxyType({key: frozenset(value) for key, value in users.items()})
 
 
@@ -111,6 +113,7 @@ def reusable(document: "Document", previous: ObjectRegistry | None) -> bool:
 
 
 def validate(document: "Document", records: dict[str, SceneObject]) -> None:
+    validate_deformers(document, records)
     validate_junctions(document.junctions, document.objects)
     validate_primitives(document, records)
     for item in document.objects:
@@ -118,6 +121,16 @@ def validate(document: "Document", records: dict[str, SceneObject]) -> None:
         validate_object(item, records)
     validate_parenting(document.objects)
     validate_point_ids(document)
+
+
+def validate_deformers(document: "Document", records: dict[str, SceneObject]) -> None:
+    from .anatomical_surfaces import reference
+
+    for owner in document.entities:
+        for binding in owner.deformers:
+            if binding.shrinkwrap:
+                surface = binding.shrinkwrap.surface
+                reference(surface.target, records, surface.role)
 
 
 def validate_object(item: Authored, records: dict[str, SceneObject]) -> None:

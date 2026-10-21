@@ -8,6 +8,10 @@ extern "C" {
 AF_API int af_curve_sample(const double* points, int count, int closed, int resolution,
     int samples, double start, double span, const double* matrix, double* output, uint64_t cancel);
 AF_API int af_curve_handles(double* points, int count, int closed);
+/* Nearest-surface search and offset use target-local units, matching Blender.
+ * Modes: On Surface, Inside, Outside, Outside Surface. Weights may be null. */
+AF_API int af_shrinkwrap(double* points, int count, uint64_t target, const double* matrix,
+    double offset, int mode, double strength, const double* weights, uint64_t cancel);
 /* Cubics: four world-space xyz controls per segment. Output: t, xyz, ray distance. */
 AF_API int af_curve_cubics(const double* resolved, int count, int closed,
     const double* matrix, double* output);

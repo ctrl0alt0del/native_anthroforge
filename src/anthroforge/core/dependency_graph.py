@@ -5,7 +5,7 @@ from collections.abc import Iterator, Mapping, Set
 from dataclasses import dataclass, field
 from types import MappingProxyType
 
-from . import junctions, routing_obstacles, tissue_dependencies
+from . import deformer_references, junctions, routing_obstacles, tissue_dependencies
 from .construction import Control, Curve, Deformer
 from .curve_dependencies import inputs as curve_path_inputs
 from .cycle_analysis import cycles
@@ -63,9 +63,7 @@ class DependencyGraph(Mapping[Port, frozenset[Port]]):
 
 
 def binding_inputs(bindings: tuple[Deformer, ...]) -> set[Port]:
-    return {
-        Port(b.control, "cage" if b.kind == "LATTICE" else "control") for b in bindings if b.enabled
-    }
+    return set().union(*(deformer_references.inputs(b) for b in bindings))
 
 
 def parent_inputs(item: SCP, enabled: bool) -> set[Port]:

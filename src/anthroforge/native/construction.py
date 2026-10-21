@@ -51,6 +51,9 @@ def configure(engine: GeometryEngine) -> None:
 
 
 def configure_deformers(engine: GeometryEngine) -> None:
+    from .shrinkwrap import configure as configure_shrinkwrap
+
+    configure_shrinkwrap(engine)
     configure_influence(engine)
     engine.bind("af_hook", [D, INT, D, D, D, F, F, INT, D, D, INT, U])
     engine.bind("af_lattice_grid", [IP, D])

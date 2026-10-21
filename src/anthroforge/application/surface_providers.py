@@ -32,6 +32,8 @@ def references(document: Any) -> tuple[SurfaceReference, ...]:
 
 
 def normalize(document: Any, target: str | SurfaceReference) -> SurfaceReference:
+    if isinstance(target, dict):
+        target = SurfaceReference(**target)
     if isinstance(target, SurfaceReference):
         return anatomical_surfaces.reference(target.target, document.registry.records, target.role)
     return anatomical_surfaces.reference(target, document.registry.records)

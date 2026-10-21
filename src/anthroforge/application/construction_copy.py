@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from anthroforge.core.construction import Control, Curve, Deformer, Primitive
+from anthroforge.core.deformer_references import remapped
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import EvaluationResult, ReadRevision
@@ -18,7 +19,9 @@ if TYPE_CHECKING:
 
 
 def copied_controls(document: Document, entities: set[str]) -> set[str]:
-    found = {b.control for e in document.entities if e.id in entities for b in e.deformers}
+    found = {
+        b.control for e in document.entities if e.id in entities for b in e.deformers if b.control
+    }
     pending = list(found)
     while pending:
         control = document.control(pending.pop())
@@ -59,6 +62,7 @@ def binding(source: Deformer, mapping: dict[str, str]) -> Deformer:
         target=target,
         members=remap(source.members, mapping),
         weighted_members=remap_weights(source, mapping),
+        shrinkwrap=remapped(source, mapping),
     )
 
 

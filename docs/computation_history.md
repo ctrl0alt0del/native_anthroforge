@@ -40,6 +40,24 @@ evidence for those revisions, not current workflow instructions.
 
 Additional active authoring/inspection work for T09, K01 and Q05 is recorded in CH-024/025.
 
+G09: Nearest-surface Shrinkwrap uses accepted role-aware target geometry, target-local
+nearest search/offset, weighted displacement and the existing construction coordinator.
+Owner: `native/src/shrinkwrap.cpp`; tests: `test_shrinkwrap.py`, `test_shrinkwrap_parity.py`.
+See CH-027; the one-file editable migration remains in progress.
+
+### CH-027 — Editable target-driven Shrinkwrap (2026-10-21)
+
+Previously the application supported only Hook and Lattice deformation; importing
+the already wrapped scapula would lose its live rib relationship. The user rejected
+that approach. The native nearest-surface adapter now consumes accepted target geometry
+through explicit surface roles. Target pose and geometry are separate declared inputs;
+existing revision guards, scheduling, undo, resource snapshots and failure retention
+remain authoritative. Copies remap internal targets and retain external references.
+Source formulas and provenance are in `native/migration/BLENDER_PRIMITIVES.md`.
+Evidence: 24 Blender 5.0.1 weighted/transform/offset reference cases and focused
+application lifecycle checks passed. Actual scapula reconstruction, desktop rendering
+and full release validation are still pending; these tests do not establish shape acceptance.
+
 ### Meshes, primitives and deformers
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |

@@ -46,7 +46,9 @@ def identities(item: SCP | Control) -> list[str]:
 
 
 def binding(item: SCP | Control, value: Deformer, controls: dict[str, Control]) -> None:
-    if value.control not in controls or controls[value.control].kind != value.kind:
+    if not value.shrinkwrap and (
+        value.control not in controls or controls[value.control].kind != value.kind
+    ):
         raise ValueError("Binding requires a shared control of the matching kind.")
     target(item, value.target, value.kind)
 

@@ -16,6 +16,8 @@ from anthroforge.core.construction import (
 from anthroforge.core.curve_engines import fields as curve_fields
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.results import ControlResult, EvaluationResult, ReadRevision
+from anthroforge.core.shrinkwrap import Shrinkwrap
+from anthroforge.core.surface_references import SurfaceReference
 
 
 def tuples(data: dict[str, Any]) -> dict[str, Any]:
@@ -52,6 +54,10 @@ def resolved_primitive(data: dict[str, Any]) -> ResolvedPrimitive:
 def deformer(data: dict[str, Any]) -> Deformer:
     state = tuples(data)
     state["target"] = Target(**state["target"])
+    if state.get("shrinkwrap"):
+        settings = dict(state["shrinkwrap"])
+        settings["surface"] = SurfaceReference(**settings["surface"])
+        state["shrinkwrap"] = Shrinkwrap(**settings)
     return Deformer(**state)
 
 

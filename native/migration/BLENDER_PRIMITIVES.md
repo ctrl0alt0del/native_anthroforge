@@ -34,3 +34,13 @@ The scene fixtures embed source paths and SHA-256 identifiers. Synthetic fixture
 record their Blender version/build. Comparison tolerances and exercised options are
 explicit in test_primitive_parity.py, test_curve_parity.py and test_anatomy_primitives.py.
 Passing those cases qualifies the stated coverage, not every possible Blender scene.
+
+Nearest-surface Shrinkwrap uses Blender 5.0.1
+`source/blender/blenkernel/intern/shrinkwrap.cc` (`shrinkwrap_snap_with_side` and
+nearest-surface coordinate/weight semantics), adapted to owned libigl mesh trees.
+Source: https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenkernel/intern/shrinkwrap.cc
+Blender Authors, GPL-2.0-or-later; adaptation GPL-3.0-or-later.
+`tools/capture_shrinkwrap.py` and `blender501_shrinkwrap.json` pin 24 weighted,
+nonuniform-transform and signed-offset cases across four nearest-surface snap modes.
+Ray projection, target-normal projection and smooth-normal Above Surface are not
+claimed by this nearest-surface adapter.

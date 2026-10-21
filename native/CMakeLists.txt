@@ -7,7 +7,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/surface_query.cpp src/surface_query_closure.cpp src/surface_query_reuse.cpp
     src/mesh_registry.cpp src/transforms.cpp src/spatial.cpp src/ray_queries.cpp src/surface_snap.cpp src/attachment.cpp src/material_domain.cpp src/material_axes.cpp
     src/construction_mesh.cpp src/curves.cpp src/loft.cpp src/curve_body.cpp
-    src/hooks.cpp src/lattices.cpp src/solidify.cpp src/component_queries.cpp src/curve_deform.cpp
+    src/hooks.cpp src/lattices.cpp src/shrinkwrap.cpp src/solidify.cpp src/component_queries.cpp src/curve_deform.cpp
     src/mesh_topology.cpp src/mesh_equivalence.cpp src/curve_frames.cpp src/curve_mapping.cpp src/component_index.cpp
     src/curve_queries.cpp src/influence.cpp src/control_geometry.cpp src/measurement.cpp
     src/path_registry.cpp src/path_presentation.cpp src/image.cpp src/image_placement.cpp

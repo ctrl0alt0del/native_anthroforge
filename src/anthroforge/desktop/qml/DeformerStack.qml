@@ -11,13 +11,19 @@ UiSection {
         UiButton { text: "Add Hook"; onClicked: authoring.addDeformer("HOOK"); Layout.fillWidth: true }
         UiButton { text: "Add Lattice"; visible: !panel.item.is_control; onClicked: authoring.addDeformer("LATTICE"); Layout.fillWidth: true }
     }
+    UiSection {
+        title: "Add Shrinkwrap"; expanded: false; visible: !panel.item.is_control
+        SurfaceSelector {
+            onActivated: surface => authoring.edit("shrinkwrap.add", {target:{owner:panel.item.id},surface:{target:surface.id,role:surface.role}})
+        }
+    }
     Repeater {
         model: panel.item.deformers || []
         ColumnLayout {
             id: bindingPanel
             required property var modelData
             readonly property var binding: modelData
-            readonly property string controlName: (authoring.state.controls.find(c=>c.id===binding.control) || {}).name || "Missing control"
+            readonly property string controlName: binding.shrinkwrap ? "Target surface" : (authoring.state.controls.find(c=>c.id===binding.control) || {}).name || "Missing control"
             Layout.fillWidth: true; spacing: 5
             function set(key,value) { const args={binding:binding.id}; args[key]=value; authoring.edit("deformer.update",args); }
             function reorder(delta) {
@@ -30,10 +36,11 @@ UiSection {
             Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Theme.border }
             RowLayout {
                 UiCheck { text: bindingPanel.binding.kind; checked: bindingPanel.binding.enabled; onClicked: bindingPanel.set("enabled",checked) }
-                UiButton { text: bindingPanel.controlName; flatStyle: true; Layout.fillWidth: true; onClicked: workspace.select(bindingPanel.binding.control) }
+                UiButton { text: bindingPanel.controlName; flatStyle: true; Layout.fillWidth: true; onClicked: workspace.select(bindingPanel.binding.shrinkwrap?.surface.target || bindingPanel.binding.control) }
             }
             Label { text: bindingPanel.binding.target.stage + (bindingPanel.binding.target.component ? " · defining curve/piece" : ""); color: Theme.muted; font.pixelSize: 10 }
             NumericSetting { label: "Strength"; value: bindingPanel.binding.strength; onEdited: value => bindingPanel.set("strength",value) }
+            ShrinkwrapSettings { binding: bindingPanel.binding; visible: !!bindingPanel.binding.shrinkwrap }
             ColumnLayout {
                 visible: bindingPanel.binding.kind === "HOOK"; Layout.fillWidth: true
                 UiCombo { Layout.fillWidth: true; model: ["NONE","CURVE","SMOOTH","SPHERE","ROOT","SHARP","LINEAR","CONSTANT","INVERSE_SQUARE"]; currentIndex: model.indexOf(bindingPanel.binding.falloff); onActivated: bindingPanel.set("falloff",currentText) }

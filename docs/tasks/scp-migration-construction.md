@@ -34,13 +34,18 @@ Inspected core primitive/deformer records, evaluation and application operations
 Existing deformer model assumes every deformer has a Hook/Lattice control; Shrinkwrap
 needs an explicit geometry target relationship and dispatch-time accepted target data.
 Existing BODY is curve-driven; parameter-driven segment construction needs its own
-typed definition and evaluator. No production implementation changes yet.
+typed definition and evaluator. Native nearest-surface Shrinkwrap now builds and
+matches 24 Blender fixtures. Typed target roles, relationships, copy/persistence,
+deletion protection, shared commands and inspector are integrated. Desktop rendering
+qualification, broader lifecycle checks, segment construction and migration remain.
 
 ## Verification
 
 Source atlas review saved and browser-verified in prior stage. Source SHA256:
 `fb199c4f466cb06380e3596d7f83e715dd72abf71b154d703818d4df75832acd`.
-Implementation, parity, migration, development gate and package checks not yet run.
+Native build/CTest: 5 passed. Focused Shrinkwrap, primitive and lifecycle tests:
+53 passed; fixture generator length corrected for architecture recheck.
+Full development gate, UI/package and migration not yet run.
 
 ## Next actions and blockers
 

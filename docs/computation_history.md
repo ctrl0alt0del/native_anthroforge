@@ -904,8 +904,15 @@ for artifact identity, UI checks and evidence limits.
   prepared meshes and recorded zero bytes. Scoped native accounting now includes full
   prepared storage and deduplicates aliases. Budget eviction releases only cache ownership;
   live query leases remain valid. The existing draft API contract is unchanged.
-- **Evidence so far:** 63 targeted tests and five native contracts pass. Cases cover
+- **Evidence:** the full development gate passes 1,514 tests and five native contracts. Cases cover
   original allocation reuse, cavities without crossings, reversed orientation, duplicate
   seam vertices, temporary closure, changed geometry/backing, material bindings, byte
-  eviction, oversized entries and cancellation. Full gate, timing/shape comparison and
-  packaged validation remain pending in [the task record](tasks/confirmed-query-reuse.md).
+  eviction, oversized entries and cancellation. Six serial counterbalanced rounds over
+  nine cases preserve every oriented triangle geometry hash against the previous runtime.
+  Complete preparation improves 14.895 to 8.697 ms on the actual clean base and 6.014 to
+  4.307 ms on radial tissue; small nested cavities add about 1.17 ms before cleanup.
+  Dirty outputs still require cleanup; no general UI-latency improvement is claimed.
+  Actual shapes inspected. The relocated packaged application passes clean/cavity
+  placement, material capture, profiling, persistence and offscreen/hidden-render tests.
+  [Release evidence](development_status.md#confirmed-query-reuse-023) records limits and
+  [the task record](tasks/confirmed-query-reuse.md) links reproducible measurements.

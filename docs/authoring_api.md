@@ -645,6 +645,10 @@ Preview picking reads the original accepted surface. Confirmed surface placement
 an in-memory exterior query mesh; buried and sealed-cavity faces and temporary closure
 are not selectable. Attachments retain original source triangle/material coordinates.
 Existing deformation resolves those coordinates without automatic nearest-surface rebinding.
+Confirmed queries retain the original mesh when native qualification proves that its
+topology, exposure, orientation and material correspondence already satisfy these rules.
+Otherwise the existing Boolean cleanup runs. This is automatic and lazy for the requested
+source/backing revision; no command, project setting or authored geometry changes.
 
 `drawing.project` accepts `mode="PREVIEW"` (default) or `"CONFIRMED"` and role-aware
 surface references. This explicit numerical query is synchronous. Desktop gestures use

@@ -3,7 +3,7 @@
 - Task branch: `codex/confirmed-query-reuse`
 - Integration branch: `main`
 - Starting revision: `c8751c3`
-- Status: in progress
+- Status: complete and qualified for integration
 - Last updated: 2026-10-21, Europe/Bucharest
 - Active writer: desktop chat, direct work
 
@@ -52,12 +52,22 @@ normal variation; cavity qualification adds about 1.17 ms before full cleanup. O
 allocations are reused in all six eligible cases. See
 [measured evidence](confirmed-query-reuse-evidence.json); no UI-latency claim.
 
-## Remaining work
+## Final qualification and delivery
 
-1. Compare actual query geometry and native timing against the previous packaged build.
-2. Run the development/portable gates and independent ownership review.
-3. Finalize release artifacts,
-   update computation history and release evidence, checkpoint/push and integrate.
+The full development gate passes **1,514 tests**, five native contracts, typing,
+lint/format, function limits and numerical/runtime checks. The canonical 0.2.3 executable
+at `cf02502` passes the full relocated portable suite. Added clean/cavity placement
+profiles each contain one query call and four cache hits, with correct nonzero memory
+accounting. Actual source/query geometry was visually inspected. Offscreen GUI and hidden
+GPU rendering pass; no interactive desktop acceptance is claimed.
+
+Ownership/coupling was reviewed directly, separately from test success. No application
+caller, document revision, worker pool or presentation rule owns the geometric decision.
+Final artifact identity and limitations appear in
+[development validation](../development_status.md#confirmed-query-reuse-023).
+Deliver one canonical distribution and source archive; integrate through the normal
+validated merge/push workflow. Full logs/captures remain local under
+`build/confirmed-query-reuse*`; compact measurement evidence is committed.
 
 Prior experiment is local-only under `build/boolean-prefilter-probe`; actual source is
 `E:/development/WIP_models/tissue_create.anthroforge`, unchanged. Other production files

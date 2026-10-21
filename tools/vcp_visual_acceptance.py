@@ -7,7 +7,8 @@ os.environ["QT_QPA_PLATFORM"] = "offscreen"
 from pathlib import Path
 
 from curve_interaction_acceptance import screen
-from PySide6.QtCore import QMetaObject, Qt
+from numeric_input_acceptance import reveal
+from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QFont, QFontDatabase
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
@@ -23,11 +24,26 @@ OUTPUT = Path("build/vcp-visual-tools")
 LEFT = Qt.MouseButton.LeftButton
 
 
+def click(window, name):
+    reveal(window, name)
+    item = find(window, name)
+    position = item.mapToScene(QPointF(item.width() / 2, item.height() / 2)).toPoint()
+    QTest.mouseClick(window, LEFT, pos=position)
+    QTest.qWait(100)
+
+
+def choose_field(controller, window):
+    click(window, "Weight fieldsToggle")
+    click(window, "tissueField_paint")
+    click(window, "tissueFieldPaint")
+    assert controller.tissue_painting.name == "paint"
+
+
 def paint(controller, window):
     target = scene(controller)
     controller.run("tissue.field.create", dict(target=target, name="paint", domain="REST"))
     settle(controller)
-    controller.tissue_painting.begin("paint")
+    choose_field(controller, window)
     controller.cameraRequested.emit([0, 0, 0.65, -90, 0, 0, 1.4], True)
     QTest.qWait(300)
     before = controller.session.document
@@ -67,9 +83,9 @@ def cancel_stroke(controller, window):
 
 
 def section(controller, window):
-    checkbox = find(window, "sectionEnabled")
-    checkbox.setProperty("checked", True)
-    assert QMetaObject.invokeMethod(checkbox, "toggled", Qt.DirectConnection)
+    click(window, "Inspect tissueToggle")
+    click(window, "Cross-sectionToggle")
+    click(window, "sectionEnabled")
     QTest.qWait(250)
     settle(controller)
     assert controller.section_tools.enabled and controller.section_tools.reports, (
@@ -90,8 +106,7 @@ def route(controller, window):
     controller.select(key)
     controller.authoring.setEditing(True)
     QTest.qWait(150)
-    button = find(window, "inspectRoute")
-    assert QMetaObject.invokeMethod(button, "clicked", Qt.DirectConnection)
+    click(window, "inspectRoute")
     settle(controller)
     tool = controller.route_inspection
     assert tool.report.get("success") and tool.paths, tool.state

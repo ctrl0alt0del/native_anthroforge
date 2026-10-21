@@ -55,3 +55,13 @@ def test_section_export_retains_settings_and_accepted_contour_evidence(controlle
     assert evidence["report"]["surfaces"] == tool.reports
     tool.cancel()
     assert evidence["settings"]["enabled"]
+
+
+def test_camera_save_retains_contours_without_rescheduling(controller):
+    _, tool = section(controller)
+    before = tool.reports
+    jobs = len(controller.session.scheduler.jobs)
+    controller.saveCamera([0, 0, 0, -35, -25, 0, 2.3], True)
+    publish(controller)
+    assert tool.reports == before and not tool.timer.isActive()
+    assert len(controller.session.scheduler.jobs) == jobs

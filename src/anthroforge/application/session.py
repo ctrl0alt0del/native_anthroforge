@@ -77,6 +77,9 @@ class Session:
         self._document = value
 
     def initialize_scheduler(self) -> None:
+        from .tissue_inspection import Inspection
+
+        self.tissue_inspection = Inspection()
         self.conversion = ConversionPreview()
         self.surface_preview: Preview[Candidate] = Preview()
         self.tissue_preview: Preview[TissueCandidate] = Preview()

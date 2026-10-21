@@ -64,16 +64,19 @@ def draw(app, controller, renderer, settings=None):
 
 
 def inspection_view(controller, settings):
+    from .tissue_inspection_capture import restore
+
     session = controller.session
     session.active_workspace = settings["workspace"]
     controller.refresh()
     controller.cameraRequested.emit(settings["camera"], settings["orthographic"])
     controller.select(settings["selected"])
     controller.authoring.setEditing(settings["editing"])
+    restore(controller, settings.get("tissue"))
 
 
 def stage_geometry(app, controller, renderer):
-    models = (controller.render_model, controller.path_model, controller.image_model)
+    models = controller.geometry_models()
     while any(model.pending for model in models):
         for model in models:
             model.drain()

@@ -122,6 +122,7 @@ Presence in this inventory does not make every mode available on every source.
 | Q02 | Tissue acceptance permits self-intersections; checks finite coordinates, canonical identity and new collapsed faces. Explicit diagnostics retain transverse-crossing counts and strict validation; large normal rotation is informational. Inflation/smoothing/relaxation use native tissue acceptance (CH-016). | [mesh_quality.cpp](../native/src/mesh_quality.cpp) | [mesh quality](../tests/test_mesh_quality.py), [intersection policy](../tests/test_tissue_intersection_policy.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
 | Q03 | Advisory path collision: check accepted authored-engine Fiber centerline segments against eligible surfaces, with attachment-contact handling and incomplete-provider reporting. Does not silently reroute the curve. | [path_collisions.cpp](../native/src/path_collisions.cpp), [fiber collision Issues](../src/anthroforge/application/issues/fiber_collisions.py) | [path collisions](../tests/test_path_collisions.py), [fiber collision Issues](../tests/test_fiber_collision_issues.py) |
 | Q04 | Measurements: resolve retained barycentric surface witnesses to world XYZ and compute straight-line distance. Camera framing/axis-view/restore calculations preserve gesture continuity. | [measurement.cpp](../native/src/measurement.cpp), [desktop view tools](../src/anthroforge/desktop) | [measurements](../tests/test_measurements.py), [view framing](../tests/test_view_framing.py), [view gestures](../tests/test_view_gestures.py) |
+| Q05 | Read-only tissue stage comparison, point/region explanation and explicit advisory spatial checks. Native material sampling produces displacement buffers and constraint contributions; bounded BVH queries return locatable triangles. No repair or acceptance change (CH-023). | [inspection mapping](../native/src/inspection_mapping.cpp), [point inspection](../native/src/inspection_point.cpp), [findings](../native/src/inspection_findings.cpp) | [inspection geometry](../tests/test_tissue_inspection_geometry.py), [lifecycle](../tests/test_tissue_inspection_lifecycle.py), [displayed revisions](../tests/test_tissue_inspection_view.py) |
 | I01 | Image decoding/preparation: PNG/JPEG decode, EXIF orientation, asset sharing and native RGBA tile preparation, executed as background creation work. | [image assets](../src/anthroforge/application/image_assets.py), [image.cpp](../native/src/image.cpp) | [reference images](../tests/test_reference_images.py) |
 | I02 | Image placement/presentation: world/local frames, world-preserving reparenting, two-point physical calibration, aspect-preserving replacement, plane picking, side/axis visibility and affine tile geometry. | [image_placement.cpp](../native/src/image_placement.cpp), [Qt image geometry](../native/qt/image_geometry.cpp) | [image presentation](../tests/test_image_presentation.py), [image tools](../tests/test_image_tools.py) |
 
@@ -944,3 +945,41 @@ for artifact identity, UI checks and evidence limits.
   The relocated runtime `2287808` passes the full portable suite, including the new authoring
   commands and saved settings. No interactive desktop acceptance or new performance gain
   is claimed. [The task record](tasks/tissue-authoring-controls.md) records reproduction.
+
+### CH-023 — Inspect accepted tissue stages and spatial findings without changing evaluation
+
+- **2026-10-21; Q05, supporting presentation/inspection; 0.2.3.** Stage geometry and
+  material provenance already existed, but the desktop lacked stage comparison, clicked
+  constraint explanation and locatable detailed geometry findings. This adds read-only
+  presentation/diagnostics rather than a new inflation, repair or acceptance algorithm.
+- **Approach:** native canonical/sparse material correspondence samples the selected
+  reference at target vertices, transforms displacements into world metres, and prepares
+  bounded colored render chunks. It does not fit nearest points, mutate sampling or alter
+  topology. Incompatible accepted bases fail explicitly; reverse base matching is rejected
+  because a base location can have multiple inflated sides. Statistics are vertex-weighted,
+  not area/volume integrals. Native point queries sample source flags and the actual
+  constrained-region core/feather functions; zero-height evidence uses accepted rest, not
+  a relaxed or stacked position. Explanations are not a causal solver-force decomposition.
+- **Geometry checks:** reuse qualified BVH/transverse predicates, with strict plane
+  straddling to exclude contact. Degenerate faces use relative area tolerance `1e-12`;
+  plane straddling uses 64 machine epsilons times coordinate scale. Shared-vertex self
+  pairs, coplanar/touching cases, containment and penetration depth are outside this check.
+  At 512 findings, scanning stops and reports truncation. Original topology and triangle
+  IDs are retained. Self-intersections remain permitted under CH-016.
+- **Execution/lifetime:** manual Issue jobs and read-only inspection jobs use existing
+  dispatch capture, cancellation and stale publication rejection. Geometry changes mark
+  detailed findings stale without rerunning them. Display buffers own their source meshes,
+  stay outside project state, and switch with picking at frame boundaries. Profiler memory
+  inventory includes these owners. Frozen report replay preserves the selected stage view.
+- **Evidence:** real Control Point crossing fixture, cropped one/two-sided correspondence,
+  exact backing/region weights, transformed crossings, cancellation, retained revisions,
+  resource disposal and buffer-type replacement are exercised by dedicated tests. Actual
+  hidden GPU captures were inspected for overlay, displacement, point markers and occluded
+  face witnesses; that inspection found and corrected the framing-contract mismatch and
+  added labeled x-ray guides. [Task evidence](tasks/tissue-inspection.md) records final gates,
+  package qualification and limitations. No new physical-contact guarantee is claimed.
+- **Idle projection:** profiler review found repeated native matrix preparation on unchanged
+  inspection ticks. Desktop projection now refreshes only when the document, settings, jobs
+  or Issues revision changes; an explicit 100-tick test verifies no repeated preparation.
+  In the scripted recorded workload matrix calls fell from 862 to 244. This is removal of
+  redundant preparation, not a claimed general frame-rate improvement.

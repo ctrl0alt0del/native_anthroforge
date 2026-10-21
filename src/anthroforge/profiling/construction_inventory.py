@@ -4,6 +4,7 @@ from anthroforge.application.image_assets import ImageAsset
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.binding_batches import BindingBatch
+from anthroforge.native.inspection import Comparison
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
 from anthroforge.native.strokes import Stroke
@@ -18,7 +19,19 @@ def inventories(profiler, owners):
         attachments=attachment_inventory(owners),
         routing_scenes=routing_scene_inventory(owners),
         tissue_materials=tissue_material_inventory(owners),
+        tissue_comparisons=comparison_inventory(owners),
     )
+
+
+def comparison_inventory(owners):
+    from .resource_inventory import memory_totals
+
+    values = {v for group in owners.values() for v in group if isinstance(v, Comparison)}
+    sizes = {id(v): v.bytes for v in values}
+    groups = {
+        name: {id(v) for v in group if isinstance(v, Comparison)} for name, group in owners.items()
+    }
+    return memory_totals(list(values), sizes, groups, len(values))
 
 
 def tissue_material_inventory(owners):

@@ -23,6 +23,7 @@ ColumnLayout {
     }
     UiButton { objectName: "editTissueSource"; text: "Edit construction source"; glyph: "curve-points"; Layout.fillWidth: true; onClicked: workspace.editConstruction(panel.item.source) }
     UiButton { objectName: "tissueMakeIndependent"; text: "Make construction independent"; Layout.fillWidth: true; onClicked: workspace.run("consumer.make_independent",{entity:panel.selected.id}) }
+    TissueInspection {}
     UiField {
         id: classification; objectName: "tissueClassification"; Layout.fillWidth: true
         Accessible.name: "Tissue classification"; placeholderText: "Classification"

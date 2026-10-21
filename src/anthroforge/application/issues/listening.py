@@ -28,7 +28,8 @@ class Listening:
         if provider.name in self.providers:
             raise ValueError("Duplicate issue provider.")
         self.providers[provider.name] = provider
-        self.recheck(provider.name)
+        if provider.automatic:
+            self.recheck(provider.name)
 
     def unregister(self, name: str) -> None:
         self.require(name)
@@ -52,7 +53,7 @@ class Listening:
     def recheck(self, provider: str | None = None) -> None:
         selected = (self.require(provider),) if provider else tuple(self.providers.values())
         for value in selected:
-            self.discover(value, None)
+            self.discover(value, None, requested=True)
 
     def synchronize(self) -> None:
         if self.closed:
@@ -76,24 +77,40 @@ class Listening:
         for provider in self.providers.values():
             self.discover(provider, delta)
 
-    def discover(self, provider: Provider, delta: DocumentChanges | None) -> None:
+    def discover(
+        self, provider: Provider, delta: DocumentChanges | None, requested: bool = False
+    ) -> None:
         try:
-            self.update_scopes(provider, delta)
+            self.update_scopes(provider, delta, requested)
             if (provider.name, "@provider") in self.reporting.repository.states:
                 self.reporting.remove(provider.name, "@provider")
         except Exception as error:
             ticket = self.reporting.begin(provider.name, "@provider")
             self.reporting.fail(ticket, str(error) or type(error).__name__)
 
-    def update_scopes(self, provider: Provider, delta: DocumentChanges | None) -> None:
+    def update_scopes(
+        self, provider: Provider, delta: DocumentChanges | None, requested: bool = False
+    ) -> None:
         live = provider.scopes(self.session.document)
         scopes = (
             live
             if delta is None or delta.reset
             else provider.affected(self.session.document, delta)
         )
-        self.invalidate(provider.name, scopes & live)
+        if requested:
+            self.invalidate(provider.name, scopes & live)
+        else:
+            self.mark_changed(provider, scopes & live)
         self.remove_absent(provider.name, live)
+
+    def mark_changed(self, provider: Provider, scopes: set[str]) -> None:
+        if provider.automatic:
+            self.invalidate(provider.name, scopes)
+            return
+        known = self.reporting.repository.states
+        for scope in scopes:
+            if (provider.name, scope) in known:
+                self.reporting.invalidate(provider.name, scope)
 
     def remove_absent(self, name: str, live: set[str]) -> None:
         self.pending.setdefault(name, set()).intersection_update(live)
@@ -117,4 +134,6 @@ class Listening:
         self.tickets.clear()
         self.cursor = -1
         self.closed = False
-        self.recheck()
+        for provider in self.providers.values():
+            if provider.automatic:
+                self.recheck(provider.name)

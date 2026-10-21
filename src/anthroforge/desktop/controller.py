@@ -23,6 +23,7 @@ from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
 from .routing_choices import RoutingChoices
 from .surface_creation import SurfaceCreation
+from .tissue_inspection_tools import TissueInspectionTools
 from .tissue_region_tools import TissueRegionTools
 
 
@@ -70,16 +71,18 @@ class Controller(QObject):
         self.creation_selection = CreationSelection(self)
         self.routing_choices = RoutingChoices()
         self.tissue_region_tools = TissueRegionTools(self)
+        self.tissue_inspection = TissueInspectionTools(self)
         self.surface_creation = SurfaceCreation(self)
 
     def memory_owners(self, owners):
-        for attribute in ("render_model", "path_model", "image_model"):
-            model = getattr(self, attribute, None)
-            if model is not None:
-                model.memory_owners(owners)
+        for model in self.geometry_models():
+            model.memory_owners(owners)
         owners["drawing_preview"].update(self.drawing_tools.leases)
         if self.drawing_tools.stroke is not None:
             owners["drawing_preview"].add(self.drawing_tools.stroke)
+
+    def geometry_models(self):
+        return self.render_model, self.path_model, self.image_model, self.tissue_inspection.model
 
     def initialize_renderers(self):
         from .image_scene import prepare_picking as prepare_images
@@ -253,6 +256,10 @@ class Controller(QObject):
     def tissueRegionTools(self):
         return self.tissue_region_tools
 
+    @Property(QObject, constant=True)
+    def tissueInspection(self):
+        return self.tissue_inspection
+
     @Slot()
     def cancelViewportTools(self, keep=None):
         tools = (
@@ -260,6 +267,7 @@ class Controller(QObject):
             self.image_tools,
             self.drawing_tools,
             self.tissue_region_tools,
+            self.tissue_inspection,
         )
         for tool in tools:
             if tool is not keep:
@@ -375,6 +383,7 @@ class Controller(QObject):
         self.image_tools.synchronize()
         self.drawing_tools.synchronize()
         self.tissue_region_tools.synchronize()
+        self.tissue_inspection.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()
@@ -390,9 +399,7 @@ class Controller(QObject):
             "dirty": self.session.saved_revision != self.session.document.revision,
             "blocked": self.session.scheduler.blocked,
             "waiting": self.session.waiting_save,
-            "publishing": sum(
-                len(m.pending) for m in (self.render_model, self.path_model, self.image_model)
-            ),
+            "publishing": sum(len(m.pending) for m in self.geometry_models()),
             "path": str(self.session.path or ""),
         }
 
@@ -425,9 +432,9 @@ class Controller(QObject):
     def process_tick(self):
         self.session.scheduler.tick()
         project_actions.poll(self)
-        self.render_model.drain()
-        self.path_model.drain()
-        self.image_model.drain()
+        for model in self.geometry_models():
+            model.drain()
+        self.tissue_inspection.synchronize()
         self.refresh_if_needed()
         self.creation_selection.synchronize()
         self.issue_panel.synchronize()
@@ -440,9 +447,8 @@ class Controller(QObject):
         now = monotonic()
         self.session.scheduler.metrics.observe("frame_interval", now - self.last_frame)
         self.last_frame = now
-        self.render_model.presented()
-        self.path_model.presented()
-        self.image_model.presented()
+        for model in self.geometry_models():
+            model.presented()
 
     @measured("publication", lambda owner: owner.session.profiler)
     def activate_geometry(self):
@@ -636,6 +642,7 @@ class Controller(QObject):
             self.feedback.close()
             self.report_browser.close()
         self.drawing_tools.cancel()
+        self.tissue_inspection.clear()
         self.session.close()
         self.profiler.close()
         for lock in self.temporary_locks:

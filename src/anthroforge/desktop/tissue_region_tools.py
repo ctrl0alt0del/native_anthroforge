@@ -101,7 +101,9 @@ class TissueRegionTools(QObject):
         row = self.controller.pick_rows.get(self.cover)
         if not row or not row.get("surface_pickable"):
             return None
-        mesh = self.controller.render_model.leases.get(row["handle"])
+        from .scene_state import displayed_mesh
+
+        mesh = displayed_mesh(self.controller, row)
         frame = scene.geometry_matrix(
             self.controller.session.engine, row["matrix"], row["geometry_offset"]
         )

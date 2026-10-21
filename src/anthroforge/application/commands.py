@@ -171,20 +171,31 @@ EDITS = {
 
 
 def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
-    if operation.startswith(("measurement.", "bookmark.")):
-        from .inspection_commands import execute as inspect_command
-
-        return inspect_command(session, operation, arguments)
-    if operation.startswith("issues."):
-        from .issues.commands import execute as issue_command
-
-        return issue_command(session, operation, arguments)
+    handler = query_handler(operation)
+    if handler:
+        return handler(session, operation, arguments)
     if operation in EDITS:
         return edit(session, operation, arguments)
     direct = direct_commands(session)
     if operation not in direct:
         raise ValueError(f"Unknown operation: {operation}")
     return direct[operation](**arguments)
+
+
+def query_handler(operation: str) -> Any:
+    if operation.startswith("tissue.inspect."):
+        from .tissue_inspection import execute as tissue_inspect
+
+        return tissue_inspect
+    if operation.startswith(("measurement.", "bookmark.")):
+        from .inspection_commands import execute as inspect_command
+
+        return inspect_command
+    if operation.startswith("issues."):
+        from .issues.commands import execute as issue_command
+
+        return issue_command
+    return None
 
 
 def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:

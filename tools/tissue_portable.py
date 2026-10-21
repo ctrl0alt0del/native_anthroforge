@@ -5,6 +5,7 @@ from zipfile import ZipFile
 
 from profiler_portable import validate
 from tissue_authoring_portable import qualify
+from tissue_inspection_portable import qualify as inspect_tissue
 
 
 def tissues(executable, cwd, invoke):
@@ -15,6 +16,7 @@ def tissues(executable, cwd, invoke):
     profile(executable, cwd, invoke, items["Layer 1"]["id"])
     capture(executable, cwd, invoke, state, items["Layer 2"]["id"])
     qualify(executable, cwd, invoke, items)
+    inspect_tissue(executable, cwd, invoke, items["Layer 1"]["id"])
 
 
 def verify(state, cwd):

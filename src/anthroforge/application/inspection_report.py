@@ -1,5 +1,6 @@
 """Frozen report jobs own their geometry; exports never alter document/save state."""
 
+import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from time import monotonic, sleep
@@ -22,11 +23,16 @@ class Capture:
     provisional: bool
 
 
-def capture(session: "Session", selected: str, editing: bool) -> Capture:
+def capture(session: "Session", selected: str, editing: bool, tissue: Any = None) -> Capture:
+    from .tissue_inspection_capture import capture as tissue_view
+
     if selected and selected not in inspection.all_targets(session):
         raise ValueError("Unknown inspection selection.")
     view = dict(workspace=session.active_workspace, selected=selected, editing=editing)
     view.update(camera=list(session.workspace.camera), orthographic=session.workspace.orthographic)
+    if tissue:
+        view["tissue"] = tissue_view(session, selected, tissue)
+    view = json.loads(json.dumps(view, allow_nan=False))
     return Capture(
         freeze(session), view, inspection.issue_records(session), session.history.before is not None
     )
@@ -50,11 +56,20 @@ def metadata(frozen: Capture) -> dict[str, Any]:
 
 
 def export(
-    session: "Session", path: str, selected: str = "", editing: bool = False, wait: bool = False
+    session: "Session",
+    path: str,
+    selected: str = "",
+    editing: bool = False,
+    wait: bool = False,
+    tissue: Any = None,
 ) -> dict[str, Any]:
     target = Path(path).resolve()
     validate(session, target)
-    frozen = capture(session, selected, editing)
+    frozen = capture(session, selected, editing, tissue)
+    return submit_export(session, target, frozen, wait)
+
+
+def submit_export(session: "Session", target: Path, frozen: Capture, wait: bool) -> dict[str, Any]:
     job = create_job(target, frozen)
     session.scheduler.submit(job)
     if wait:

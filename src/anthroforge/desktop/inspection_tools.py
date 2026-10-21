@@ -72,7 +72,7 @@ class InspectionTools(QObject):
 
     def witness(self, hit):
         row = self.controller.pick_rows[hit["id"]]
-        mesh = self.controller.render_model.leases[row["handle"]]
+        mesh = scene_state.displayed_mesh(self.controller, row)
         engine = self.controller.session.engine
         frame = scene.geometry_matrix(engine, row["matrix"], row["geometry_offset"])
         source = dict(

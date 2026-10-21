@@ -59,10 +59,17 @@ canonical 0.2.3 package qualification. Preserve unrelated root __init__.py.
 `tools/tissue_inspection_scene.py` uses a hidden QQuickRenderControl window, verifies
 native buffer switching, point guides, advisory crossings and matched report replay.
 Captures and `.afinspection.zip`/`.afprofile.zip` are under `build/tissue-inspection`.
-One recorded small workload measured comparison 0.183 ms, point query 0.616 ms and
-geometry scan 3.940 ms at native boundaries. These include profiler perturbation and
+The latest small workload measured comparison 0.219 ms, point query 0.613 ms and
+geometry scan 4.618 ms at native boundaries. These include profiler perturbation and
 do not establish application latency or large-assembly performance. No physical
 display/interactive desktop acceptance was performed.
+
+Profiler review exposed repeated idle stage preparation. Revision/job/Issue-driven
+projection now reuses the unchanged view; a test verifies 100 idle synchronization
+calls perform no additional preparation. Native matrix calls in the recorded scripted
+workload decreased from 862 to 244; this is call-count evidence, not a frame-time claim.
+Switching stages also clears point evidence from the previous stage. Inspection buffers
+and retained input meshes appear in profiler ownership without double-counting allocations.
 
 ## Recovery inputs
 

@@ -21,6 +21,7 @@ class TissueInspectionTools(QObject):
         self.target, self.stage, self.reference, self.mode = "", "", "", "Overlay"
         self.armed, self.lines, self.finding = False, [], ""
         self.context, self.key, self.rows, self.point, self.summary = None, None, [], {}, {}
+        self.refresh_stamp, self.point_status = None, dict(state="idle")
         self.model.activated.connect(self.activated)
 
     @Property(QObject, constant=True)
@@ -44,8 +45,12 @@ class TissueInspectionTools(QObject):
         )
 
     def evidence_state(self):
-        status = inspection.status(self.controller.session, "point")
-        return dict(point=self.point, lines=self.lines, comparison=self.summary, pointStatus=status)
+        return dict(
+            point=self.point,
+            lines=self.lines,
+            comparison=self.summary,
+            pointStatus=self.point_status,
+        )
 
     def activated(self):
         self.controller.activate_geometry()
@@ -62,9 +67,32 @@ class TissueInspectionTools(QObject):
             return
         if self.editing_geometry() and self.stage:
             self.clear()
+        self.refresh_inspection()
+
+    def refresh_inspection(self):
+        stamp = self.inspection_stamp()
+        if stamp == self.refresh_stamp:
+            return
+        self.refresh_stamp = stamp
         self.refresh_comparison()
         self.refresh_projection()
         self.refresh_evidence()
+
+    def inspection_stamp(self):
+        session = self.controller.session
+        values = tuple(
+            (k, v.job, v.state, id(v.asset), v.error)
+            for k, v in session.tissue_inspection.values.items()
+        )
+        return (
+            id(session.document),
+            self.stage,
+            self.reference,
+            self.mode,
+            self.context,
+            session.issues.repository.revision,
+            values,
+        )
 
     def selection_context(self, item):
         session = self.controller.session
@@ -107,8 +135,9 @@ class TissueInspectionTools(QObject):
             status["report"] if status["state"] == "ready" and value.target == self.target else {}
         )
         summary = inspection.status(session, "comparison")
-        if point != self.point or summary != self.summary:
+        if point != self.point or summary != self.summary or status != self.point_status:
             self.point, self.summary = point, summary
+            self.point_status = status
             if not self.finding:
                 self.lines = value.asset["lines"] if point else []
             self.changed.emit()
@@ -119,8 +148,7 @@ class TissueInspectionTools(QObject):
         self.attempt(self.set_view, stage, reference, mode)
 
     def set_view(self, stage, reference, mode):
-        if self.editing_geometry():
-            raise ValueError("Finish component editing before comparing tissue stages.")
+        self.prepare_view(stage)
         self.stage, self.reference, self.mode = stage, reference, mode
         self.finding, self.lines = "", []
         self.cancel()
@@ -130,6 +158,12 @@ class TissueInspectionTools(QObject):
             inspection.cancel(self.controller.session, "comparison")
         self.key = None
         self.synchronize()
+
+    def prepare_view(self, stage):
+        if self.editing_geometry():
+            raise ValueError("Finish component editing before comparing tissue stages.")
+        if stage != self.stage:
+            inspection.cancel(self.controller.session, "point")
 
     def start_comparison(self):
         inspection.start(
@@ -196,6 +230,7 @@ class TissueInspectionTools(QObject):
         inspection.cancel(self.controller.session)
         self.stage, self.reference, self.finding = "", "", ""
         self.armed, self.lines, self.point, self.key = False, [], {}, None
+        self.refresh_stamp, self.point_status = None, dict(state="idle")
         self.model.publish([])
 
     def show_finding(self, identity):

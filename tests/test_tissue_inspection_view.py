@@ -71,3 +71,29 @@ def test_component_edit_protects_inspection_navigation(controller):
     with pytest.raises(ValueError, match="Finish"):
         tool.arm()
     controller.session.cancel()
+
+
+def test_idle_inspection_does_not_repeat_native_stage_preparation(controller, monkeypatch):
+    _, tool = setup(controller)
+    tool.set_view("rest", "base", "Overlay")
+    publish(controller)
+    calls = []
+    original = tool.refresh_projection
+    monkeypatch.setattr(tool, "refresh_projection", lambda: (calls.append(1), original()))
+    for _ in range(100):
+        tool.synchronize()
+        assert tool.state["stage"] == "rest"
+    assert not calls
+
+
+def test_changing_stage_clears_points_from_the_previous_surface(controller):
+    _, tool = setup(controller)
+    tool.set_view("rest", "", "Overlay")
+    publish(controller)
+    tool.pick([0.5, 0.2, 5], [0, 0, -1])
+    controller.session.wait()
+    tool.synchronize()
+    assert tool.point
+    tool.set_view("base", "", "Overlay")
+    publish(controller)
+    assert not tool.point and not tool.lines

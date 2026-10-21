@@ -4,6 +4,7 @@ from dataclasses import asdict, replace
 from typing import Any
 
 from anthroforge.core.fibers import Fiber
+from anthroforge.core.points import Anchor
 from anthroforge.core.surfaces import Surface
 from anthroforge.native import inspection as native
 
@@ -136,11 +137,26 @@ def sources(context: Any, item: Any) -> list[dict[str, Any]]:
     source = context.document.object(item.source)
     keys = [s.curve for s in source.curves] if isinstance(source, Surface) else [source.id]
     records = [context.document.object(key) for key in keys]
-    return [
+    return [source_record(context, o) for o in records]
+
+
+def source_record(context: Any, source: Any) -> dict[str, Any]:
+    bindings = source_bindings(source)
+    refs = dict.fromkeys(binding.reference for binding in bindings)
+    supports = [
         dict(
-            id=o.id,
-            name=o.name,
-            bindings=[asdict(b) for b in o.bindings] if isinstance(o, Fiber) else [],
+            target=r.target,
+            role=r.role,
+            name=getattr(context.document.registry.records.get(r.target), "name", r.target),
         )
-        for o in records
+        for r in refs
     ]
+    return dict(
+        id=source.id, name=source.name, bindings=[asdict(b) for b in bindings], supports=supports
+    )
+
+
+def source_bindings(source: Any) -> Any:
+    if isinstance(source, Fiber):
+        return source.bindings
+    return (source.binding,) if isinstance(source, Anchor) else ()

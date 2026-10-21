@@ -5,6 +5,7 @@ from pathlib import Path
 
 from construction_profile_qualification import shutdown, wait_export
 from PySide6.QtQuickControls2 import QQuickStyle
+from shiboken6 import delete
 from tissue_scene_acceptance import scene
 
 from anthroforge.desktop.controller import Controller
@@ -105,5 +106,8 @@ if __name__ == "__main__":
     QQuickStyle.setStyle("Basic")
     with native_runtime():
         app = profiler_application()
-        run(app)
+        try:
+            run(app)
+        finally:
+            delete(app)
     print("Hidden tissue stage buffers, point glyphs, geometry findings and frozen report passed.")

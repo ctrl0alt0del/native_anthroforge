@@ -978,3 +978,8 @@ for artifact identity, UI checks and evidence limits.
   face witnesses; that inspection found and corrected the framing-contract mismatch and
   added labeled x-ray guides. [Task evidence](tasks/tissue-inspection.md) records final gates,
   package qualification and limitations. No new physical-contact guarantee is claimed.
+- **Idle projection:** profiler review found repeated native matrix preparation on unchanged
+  inspection ticks. Desktop projection now refreshes only when the document, settings, jobs
+  or Issues revision changes; an explicit 100-tick test verifies no repeated preparation.
+  In the scripted recorded workload matrix calls fell from 862 to 244. This is removal of
+  redundant preparation, not a claimed general frame-rate improvement.

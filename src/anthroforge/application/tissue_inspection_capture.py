@@ -16,7 +16,7 @@ def capture(session: Any, selected: str, settings: Any) -> dict[str, Any]:
         stage=stage,
         reference=reference,
         mode=mode,
-        point=point(session, selected),
+        point=point(session, selected, stage),
         finding=finding(session, selected, settings),
     )
 
@@ -32,10 +32,14 @@ def validate(session: Any, selected: str, stage: str, reference: str, mode: str)
         stages.compatible(item, reference, stage)
 
 
-def point(session: Any, selected: str) -> dict[str, Any]:
+def point(session: Any, selected: str, stage: str) -> dict[str, Any]:
     value = inspection.status(session, "point")
     if value["state"] == "ready" and value["target"] == selected:
-        return dict(value["report"])
+        report = value["report"]
+        if stage == report["stage"] or (
+            not stage and report["asset"] == stages.tissue(session, selected).result.asset
+        ):
+            return dict(report)
     return {}
 
 

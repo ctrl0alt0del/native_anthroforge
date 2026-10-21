@@ -23,7 +23,7 @@ UiSection {
         title: "Current construction sources"; expanded: false
         Repeater {
             model: panel.report.sources || []
-            UiButton { required property var modelData; text: modelData.name; Layout.fillWidth: true; onClicked: workspace.select(modelData.id) }
+            UiButton { required property var modelData; text: modelData.name; Layout.fillWidth: true; hint: "Anatomical supports: "+(modelData.supports || []).map(s=>s.name+" ("+s.role+")").join(", "); onClicked: workspace.select(modelData.id) }
         }
     }
 }

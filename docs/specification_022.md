@@ -23,9 +23,10 @@ The confirmed downstream contract is **pending implementation and qualification*
   Cleanup never replaces the target, and hit provenance must map back to the original
   material binding. Existing bindings resolve their retained location rather than
   choosing a new nearest point on each update.
-- Open-sheet targets need an agreed definition of the region to clean. Do not silently
-  cap, thicken, reject or substitute them. A query-only closure against the tissue base
-  is under discussion; it is not yet the product behavior.
+- For open single-sided tissue, use a temporary closure against its material base for
+  the Boolean calculation. The cleaned mesh exists only in memory for confirmed
+  queries. Added backing and closure faces are not selectable attachment surfaces.
+  This does not authorize arbitrary thickness or caps for unrelated open meshes.
 - Where intersections create ambiguous stacking support, select the farthest support
   along the base-surface normal. Keep this distinct from nearest material-chart distance
   and from any repair to the generated tissue. Separate tissues are not Boolean-unioned.

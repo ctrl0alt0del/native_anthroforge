@@ -30,9 +30,10 @@ Skin construction remains deferred.
 - Point/Anchor and Curve/Fiber conversion already share native nearest-surface
   capture, but that capture and interactive snapping currently query raw triangles.
 - Stacking material correspondence currently picks minimum absolute chart distance.
-- Standard solid Boolean union needs an inside/outside definition. Single-sided
-  tissue and base-role targets can be open sheets. Their intended cleanup requires
-  a concrete product decision; no silent cap, thickness or replacement is authorized.
+- Confirmed decision: build an actual Boolean-cleaned mesh, retain it only in memory
+  for query validation, and never replace the original tissue. Temporary closure
+  against the material base is authorized; added backing/closure faces are not
+  attachment targets. Preserve original triangle and barycentric provenance.
 
 ## Implemented checkpoint
 
@@ -54,9 +55,46 @@ Attachment query cleanup and stacking changes are not implemented yet.
   external/header diagnostics are reported.
 - The actual user file, adopted in memory and recomputed at amounts 0.2 then 0.599,
   now reports ready base/rest/intrinsic/final results. Original file unchanged.
-- Base and single-sided output each have 168 open boundary edges; clarification
-  requested about a temporary base-backed volume for confirmed cleanup. No answer yet.
+- Base and single-sided output each have 168 open boundary edges. The user approved
+  temporary base-backed closure; qualification against this actual fixture is next.
 - Full development gate, visual and portable qualification are pending. Not merge-ready.
+
+### Temporary query qualification (2026-10-21)
+
+Read-only experiment on the actual source, using the installed compiled libigl/CGAL
+diagnostic wheel. Both raw and height-smoothed outputs close against the original
+material base with zero boundary edges. Original triangles keep their source IDs;
+added base/side faces are tagged unselectable. No document geometry is replaced.
+
+- Ordinary positive-winding union takes about 0.7 seconds here but drops a visible
+  reversed-orientation lobe. A closed input alone does **not** establish suitable
+  placement semantics. This variant is not accepted as the production solution.
+- Exterior-cell extraction retains 5,127 selectable fragments and preserves the
+  exposed lobe. Nonzero winding is another candidate; it can retain sealed-cavity
+  boundaries, whereas exterior-cell extraction excludes them. This policy distinction
+  is not evidence that this fixture has a meaningful sealed cavity. Initial diagnostic
+  emulation using two unions generated extra fragments; use the direct native custom
+  winding operation for qualification, not the double-rounded two-union emulation.
+- Every selectable output corner maps to its original source triangle. Maximum
+  reconstructed position error is 1.03e-12 metres; minimum computed barycentric
+  weight is -1.64e-11 from floating-point reconstruction near edges. These are
+  per-face correspondences, not unique source identities for intersection vertices.
+- A focused question is pending: should confirmed snapping exclude all faces inside
+  sealed cavities? Recommended exterior-cell extraction matches outside-accessible
+  placement; this is not yet selected as production behavior.
+- Native C++17 qualification compiled successfully with CGAL 6.1.1 and Boost 1.89.0
+  under ignored `.tools/boolean`, serial libigl work and Boost exact arithmetic.
+  On this fixture: positive union 2,442 selectable fragments / 0.682 seconds;
+  direct nonzero winding 5,125 / 0.658 seconds; exterior cell 5,127 / 0.646 seconds.
+  These are single diagnostic timings, not application responsiveness measurements.
+  Production dependency configuration and query integration are not implemented.
+
+Local diagnostics: `build/tissue-intersection-policy/boolean_trial.py`,
+`inspect_proxy.py`, `provenance_check.py`, `native/`, `query-winding.png`,
+`provenance.json`. CGAL archive SHA256
+`52506935f70e247ed2777e3c65f20e86f79208c2a2d0e180ae7475daf11c96ef`;
+Boost archive SHA256
+`85a33fa22621b4f314f8e85e1a5e2a9363d22e4f4992925d4bb3bc631b5a0c7a`.
 
 Stacking inspection: its `Side.direction` is the inflation displacement/limiting
 direction, not necessarily the geometric base normal (especially Control Point mode).
@@ -71,7 +109,7 @@ Splitting intersections alone (`RESOLVE`) does not remove buried faces.
 
 ## Next actions
 
-1. Settle open-sheet confirmed-query semantics using actual source topology evidence.
+1. Qualify temporary closure and Boolean provenance on the actual failing tissue.
 2. Implement scoped acceptance and query/stacking policies with material provenance.
 3. Test the real fixture, shared attachment callers, stacking ambiguity and lifecycle;
    run development and packaged/offscreen checks before integration.

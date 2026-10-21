@@ -731,9 +731,10 @@ resolved inflation/smoothing defect when assessing the fixture.
   Full suite at `e922aeb`: 1,421 tests pass; Mypy, focused Ruff and changed-native
   clang-tidy checks pass.
 - **Limits:** attachment Boolean cleanup and ambiguous stacking queries are separate
-  downstream work, not completed by this acceptance change. Open-sheet Boolean
-  semantics need clarification: the test's base and single-sided tissue each have
-  168 boundary edges. No silent capping or solid interpretation has been selected.
+  downstream work, not completed by this acceptance change. The user approved a
+  temporary base-backed closure for open tissue and an in-memory Boolean query mesh;
+  the test's base and single-sided tissue each have 168 boundary edges. The original
+  tissue and material bindings remain authoritative; added closure is not selectable.
   Skin handling remains deferred; no claim of downstream intersection immunity.
 - [Regression fixture](../tests/fixtures/tissue/control_point_crossings.json),
   [tests](../tests/test_tissue_intersection_policy.py),

@@ -36,6 +36,21 @@ void witness(const Mesh& mesh,int triangle,const V3& bary) {
     if(triangle<0||triangle>=mesh.triangles.rows()||!bary.allFinite()||bary.minCoeff()<-1e-8||std::abs(bary.sum()-1)>1e-8)
         throw std::runtime_error("Invalid inspection surface witness.");
 }
+V3 mapped_sample(const Mesh& reference,const Mesh& target,const Vertices& values,bool source,int triangle,const V3& bary,uint64_t cancel) {
+    witness(target,triangle,bary); check_cancel(cancel);
+    if(!source&&canonical(reference,target)) return sample(target,values,triangle,bary);
+    if(source) {
+        const auto field=field_mesh(reference,values); V3 result=V3::Zero();
+        for(int j=0;j<3;++j) result+=source_point(target,field,target.triangles(triangle,j))*bary[j];
+        return result;
+    }
+    const auto field=field_mesh(reference,values); const auto index=binding::index(field,cancel); V3 result=V3::Zero();
+    for(int j=0;j<3;++j) {
+        const auto id=target.triangles(triangle,j); check_cancel(cancel);
+        result+=binding::material_point(index,binding::weights(target.tissue,id),target.tissue.sides[size_t(id)],cancel)*bary[j];
+    }
+    return result;
+}
 V3 sample(const Mesh& mesh,const Vertices& values,int triangle,const V3& bary) {
     witness(mesh,triangle,bary); V3 result=V3::Zero();
     for(int j=0;j<3;++j) result+=values.row(mesh.triangles(triangle,j)).transpose()*bary[j];

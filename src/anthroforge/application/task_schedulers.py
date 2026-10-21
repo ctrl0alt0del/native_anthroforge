@@ -202,7 +202,9 @@ class InspectionTaskScheduler(SaveProjectTaskScheduler):
 class TissueInspectionTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         cost = 0.2 + workload.triangles * 0.004
-        return Schedule("worker", cost, reason="Read-only material comparison and constraint inspection")
+        return Schedule(
+            "worker", cost, reason="Read-only material comparison and constraint inspection"
+        )
 
 
 def task_schedulers() -> dict[str, TaskScheduler]:
@@ -217,10 +219,16 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         **curve_schedulers(),
         **anchor_schedulers(),
         "control_pose": ControlPoseTaskScheduler(),
-        "issue_check": IssueTaskScheduler(),
-        "inspection_report": InspectionTaskScheduler(),
-        "tissue_inspection": TissueInspectionTaskScheduler(),
+        **inspection_schedulers(),
     }
+
+
+def inspection_schedulers() -> dict[str, TaskScheduler]:
+    return dict(
+        issue_check=IssueTaskScheduler(),
+        inspection_report=InspectionTaskScheduler(),
+        tissue_inspection=TissueInspectionTaskScheduler(),
+    )
 
 
 def curve_schedulers() -> dict[str, TaskScheduler]:

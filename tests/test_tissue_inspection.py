@@ -46,7 +46,9 @@ def test_geometry_checks_are_manual_and_advisory(session):
 
 def test_point_explanation_uses_accepted_stage(session):
     _, _, key = assembly(session)
-    session.command("tissue.inspect.point", target=key, stage="final", triangle=0, weights=[0.2, 0.3, 0.5])
+    session.command(
+        "tissue.inspect.point", target=key, stage="final", triangle=0, weights=[0.2, 0.3, 0.5]
+    )
     session.wait()
     value = session.command("tissue.inspect.status", kind="point")
     assert value["state"] == "ready", value

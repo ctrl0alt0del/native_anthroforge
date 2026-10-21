@@ -1,0 +1,73 @@
+"""Displayed revisions, typed native leases and frozen inspection evidence."""
+
+import pytest
+
+from anthroforge.application import inspection_report
+from anthroforge.desktop import tissue_inspection_scene as scene
+from tests.test_tissue_interaction import controller as controller
+from tests.test_tissue_workflow import assembly
+
+
+def setup(controller):
+    _, _, target = assembly(controller.session)
+    controller.refresh()
+    controller.select(target)
+    publish(controller)
+    return target, controller.tissue_inspection
+
+
+def publish(controller):
+    for _ in range(8):
+        controller.process_tick()
+        controller.frame_presented()
+
+
+def test_switching_buffer_types_retains_old_render_contract_until_frame_boundary(controller):
+    _, tool = setup(controller)
+    tool.set_view("rest", "base", "Overlay")
+    publish(controller)
+    old = scene.primary(tool)
+    tool.set_view("rest", "base", "Displacement")
+    controller.session.wait()
+    tool.synchronize()
+    retained = scene.primary(tool)
+    assert retained["kind"] == "MESH" and retained["handle"] == old["handle"]
+    publish(controller)
+    current = scene.primary(tool)
+    assert current["kind"] == "HEAT" and current["mesh_handle"] == old["handle"]
+    assert scene.mesh(tool, dict(current, handle=current["mesh_handle"])) is not None
+
+
+def test_stage_inspection_picking_and_cancel_do_not_edit_anatomy(controller):
+    target, tool = setup(controller)
+    before, history = controller.session.document, controller.session.history.cursor
+    tool.set_view("rest", "", "Overlay")
+    publish(controller)
+    row = controller.pick_rows[target]
+    assert row["geometry_asset"] == before.object(target).rest_result.asset
+    tool.arm()
+    tool.pick([0.5, 0.2, 5], [0, 0, -1])
+    controller.session.wait()
+    tool.synchronize()
+    assert tool.point and tool.lines
+    tool.cancel()
+    assert controller.session.document is before and controller.session.history.cursor == history
+
+
+def test_export_freezes_stage_settings_without_reusing_live_ui_state(controller):
+    target, tool = setup(controller)
+    tool.set_view("rest", "base", "Overlay")
+    options = controller.inspection_export.options("build/inspect.afinspection.zip")
+    frozen = inspection_report.capture(controller.session, target, False, options["tissue"])
+    tool.set_view("intrinsic", "", "Overlay")
+    assert frozen.view["tissue"]["stage"] == "rest"
+    assert frozen.view["tissue"]["reference"] == "base"
+    assert frozen.source.document is controller.session.document
+
+
+def test_component_edit_protects_inspection_navigation(controller):
+    _, tool = setup(controller)
+    controller.session.begin()
+    with pytest.raises(ValueError, match="Finish"):
+        tool.arm()
+    controller.session.cancel()

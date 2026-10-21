@@ -36,7 +36,7 @@ Item {
     property var preservedCamera: null
     readonly property bool canRestoreView: preservedCamera !== null
     readonly property bool drawing: workspace.drawingTools.state.active
-    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active || workspace.tissueRegionTools.state.active
+    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active || workspace.tissueRegionTools.state.active || workspace.tissueInspection.state.active
     readonly property var selected: authoring.transformData
     readonly property bool transformAvailable: !!selected.id && !!selected.transformable && !selected.readonly && !workspace.state.waiting
     readonly property bool modalTransforming: modalTransform.active
@@ -81,6 +81,7 @@ Item {
     function rayAt(x, y, select, extend) {
         if(drawing) return {};
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
+        if(workspace.tissueInspection.state.active) { workspace.tissueInspection.probe(origin,direction,select); return {}; }
         if(workspace.tissueRegionTools.state.active) { workspace.tissueRegionTools.probe(origin,direction,select); return {}; }
         if(workspace.imageTools.state.active) { workspace.imageTools.probe(origin,direction,select); return {}; }
         if(measuring) { workspace.inspectionTools.probe(origin,direction,depthIndex,select); return {}; }
@@ -244,6 +245,7 @@ Item {
         Node {
             id: worldScene
             eulerRotation.x: -90
+            TissueInspectionScene { distance: viewport.distance }
             PointScene { markerScale: viewport.gizmoSize * 0.0012 }
             ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis }
             Repeater3D {
@@ -258,7 +260,7 @@ Item {
                     Model {
                         id: meshNode
                         objectName: "surface_" + item.id + "_" + item.chunk
-                        visible: item.active
+                        visible: item.active && item.id !== workspace.tissueInspection.state.hiddenOwner
                         position: Qt.vector3d(item.geometry_offset[0], item.geometry_offset[1], item.geometry_offset[2])
                         geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk }
                         opacity: item.readonly ? .08 : authoring.state.editing && item.id === workspace.selectedId && ["LOFT","BODY"].indexOf(authoring.state.primitive?.kind) >= 0 ? .35 : !viewport.xray ? 1 : item.id === workspace.selectedId ? .65 : item.id === workspace.hoveredId ? .5 : .3
@@ -279,7 +281,7 @@ Item {
                         scale: Qt.vector3d(item.trs[6],item.trs[7],item.trs[8])
                         Model {
                             objectName: "mask_" + item.key
-                            visible: item.active && (item.id === workspace.selectedId || (!viewport.xray && !item.readonly))
+                            visible: item.active && item.id !== workspace.tissueInspection.state.hiddenOwner && (item.id === workspace.selectedId || (!viewport.xray && !item.readonly))
                             position: meshNode.position
                             // Each View3D owns its Qt geometry lifetime; both read the same native result.
                             // Sharing meshNode.geometry crashed after delete/recreate in Qt 6.12.

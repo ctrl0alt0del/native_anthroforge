@@ -22,7 +22,7 @@ class InspectionExport(QObject):
         owner = self.controller
         result = owner.run(
             "inspection.export",
-            dict(path=local_path(path), selected=owner.selection, editing=owner.authoring.editing),
+            self.options(path),
         )
         if result:
             self.job = next(j for j in owner.session.scheduler.jobs if j.id == result["job"])
@@ -31,6 +31,18 @@ class InspectionExport(QObject):
                 "Exporting frozen revision " + str(result["revision"]),
             )
             self.changed.emit()
+
+    def options(self, path):
+        owner, tool = self.controller, self.controller.tissue_inspection
+        tissue = dict(
+            stage=tool.stage, reference=tool.reference, mode=tool.mode, finding=tool.finding
+        )
+        return dict(
+            path=local_path(path),
+            selected=owner.selection,
+            editing=owner.authoring.editing,
+            tissue=tissue if tool.target else None,
+        )
 
     def synchronize(self):
         if self.job is None or self.job.active:

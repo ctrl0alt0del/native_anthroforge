@@ -77,7 +77,9 @@ class Listening:
         for provider in self.providers.values():
             self.discover(provider, delta)
 
-    def discover(self, provider: Provider, delta: DocumentChanges | None, requested: bool = False) -> None:
+    def discover(
+        self, provider: Provider, delta: DocumentChanges | None, requested: bool = False
+    ) -> None:
         try:
             self.update_scopes(provider, delta, requested)
             if (provider.name, "@provider") in self.reporting.repository.states:
@@ -86,7 +88,9 @@ class Listening:
             ticket = self.reporting.begin(provider.name, "@provider")
             self.reporting.fail(ticket, str(error) or type(error).__name__)
 
-    def update_scopes(self, provider: Provider, delta: DocumentChanges | None, requested: bool = False) -> None:
+    def update_scopes(
+        self, provider: Provider, delta: DocumentChanges | None, requested: bool = False
+    ) -> None:
         live = provider.scopes(self.session.document)
         scopes = (
             live

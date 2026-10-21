@@ -7,6 +7,7 @@ from anthroforge.application.image_assets import ImageAsset
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.binding_batches import BindingBatch
+from anthroforge.native.inspection import Comparison
 from anthroforge.native.mesh import Mesh
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
@@ -39,7 +40,16 @@ RESOURCE_FIELDS = frozenset(
         "context",
     )
 )
-RESOURCE_TYPES = (Mesh, Path, ImageAsset, Field, RoutingScene, BindingBatch, MaterialLease)
+RESOURCE_TYPES = (
+    Mesh,
+    Path,
+    ImageAsset,
+    Field,
+    RoutingScene,
+    BindingBatch,
+    MaterialLease,
+    Comparison,
+)
 
 
 def payload_resources(value, profiler):
@@ -97,12 +107,27 @@ def session_owners(session, output, profiler):
         )
         output[owner].update(bounded(references, 4096, profiler))
     output["catalogue"].update(bounded(catalogue_resources(session), 4096, profiler))
-    if session.conversion.asset is not None:
-        output["conversion_preview"].add(session.conversion.asset.path)
-    if session.surface_preview.asset is not None:
-        output["surface_preview"].add(session.surface_preview.asset.mesh)
-    if session.tissue_preview.asset is not None:
-        output["tissue_preview"].add(session.tissue_preview.asset.mesh)
+    preview_owners(session, output)
+    inspection_owners(session, output, profiler)
+
+
+def preview_owners(session, output):
+    for name, attribute in (
+        ("conversion", "path"),
+        ("surface_preview", "mesh"),
+        ("tissue_preview", "mesh"),
+    ):
+        preview = getattr(session, name)
+        if preview.asset is not None:
+            output["conversion_preview" if name == "conversion" else name].add(
+                getattr(preview.asset, attribute)
+            )
+
+
+def inspection_owners(session, output, profiler):
+    for value in session.tissue_inspection.values.values():
+        if value.asset:
+            output["tissue_inspection"].update(payload_resources(value.asset, profiler))
 
 
 def catalogue_resources(session):

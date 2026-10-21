@@ -13,7 +13,8 @@ AF_API int af_inspection_chunk(uint64_t handle,int chunk,const float** data,int*
 AF_API uint64_t af_inspection_bytes(uint64_t handle);
 // Point row (20): position, source position, delta, normal (3 each), part/face/side/boundary,
 // material boundary/seam/zero-height/structural-backing barycentric fractions.
-AF_API int af_inspection_point(uint64_t target,uint64_t base,int triangle,const double* bary,double* row);
+AF_API int af_inspection_point(uint64_t target,uint64_t base,uint64_t rest,int triangle,const double* bary,double* row,uint64_t cancel);
+AF_API int af_inspection_point_lines(uint64_t target,const double* frame,const double* row,double* lines);
 // One row per region: core weight, feathered weight, fixed fraction, effective strength.
 AF_API int af_inspection_regions(uint64_t target,uint64_t rest,uint64_t base,int triangle,const double* bary,
     const AfTissueRelax* settings,const AfTissueRegion* regions,int count,double* rows,uint64_t cancel);

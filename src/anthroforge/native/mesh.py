@@ -58,14 +58,19 @@ class GeometryEngine(NativeEngine):
             cache.clear()
 
     def _construction_signatures(self) -> None:
-        from . import bodies, components, construction, curve_surfaces, falloff, inspection, scene, topology
+        from . import bodies, components, construction, curve_surfaces, falloff, scene, topology
         from .control_geometry import configure as configure_control_geometry
 
         for module in (bodies, components, construction, curve_surfaces, falloff, scene, topology):
             module.configure(self)
         configure_control_geometry(self)
-        inspection.configure(self)
         self._curve_signatures()
+        self._inspection_signatures()
+
+    def _inspection_signatures(self) -> None:
+        from .inspection import configure
+
+        configure(self)
 
     def _curve_signatures(self) -> None:
         from . import curve_editing, curve_queries, drawing, path_editing, paths, routing, strokes

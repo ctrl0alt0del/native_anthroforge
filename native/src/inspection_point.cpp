@@ -14,16 +14,22 @@ static Vertices source_flags(const Mesh& base) {
     for(size_t i=0;i<owners.size();++i) if(owners[i].size()>1) flags(int64_t(i),1)=1;
     return flags;
 }
-static void point_flags(const Mesh& mesh,const Mesh* base,int triangle,const V3& bary,double* out) {
+static double zero_height(const Mesh& mesh,const Mesh& rest,const Mesh& base,int triangle,const V3& bary,uint64_t cancel) {
+    Vertices field=Vertices::Zero(rest.vertices.rows(),3);
+    for(int64_t i=0;i<field.rows();++i) {
+        check_cancel(cancel); field(i,0)=(V3(rest.vertices.row(i))-source_point(rest,base,i)).norm()==0?1.:0.;
+    }
+    return mapped_sample(rest,mesh,field,false,triangle,bary,cancel).x();
+}
+static void point_flags(const Mesh& mesh,const Mesh* base,const Mesh* rest,int triangle,const V3& bary,double* out,uint64_t cancel) {
     std::fill(out,out+4,0.); const auto& d=mesh.tissue;
     if(!d.kind) return;
     if(base) {
-        const auto flags=mapped(*base,mesh,source_flags(*base),true,0);
-        const V3 p=sample(mesh,flags,triangle,bary); out[0]=p.x(); out[1]=p.y();
+        const V3 p=mapped_sample(*base,mesh,source_flags(*base),true,triangle,bary,cancel); out[0]=p.x(); out[1]=p.y();
+        if(rest) out[2]=zero_height(mesh,*rest,*base,triangle,bary,cancel);
     }
     for(int j=0;j<3;++j) {
         const auto id=mesh.triangles(triangle,j);
-        if(base&&(V3(mesh.vertices.row(id))-source_point(mesh,*base,id)).norm()==0) out[2]+=bary[j];
         if(d.kind==3&&d.sides[size_t(id)]==2) out[3]+=bary[j];
     }
 }
@@ -50,15 +56,27 @@ static V3 region_sample(const Mesh& target,const Mesh& rest,const Mesh* base,con
     const auto core=tissue::region_mask(rest,base,settings,region,cancel);
     const auto weights=tissue::feather(rest,core,region.feather,cancel); Vertices field(rest.vertices.rows(),3);
     for(int64_t i=0;i<field.rows();++i) field.row(i)=V3(core[size_t(i)],weights[size_t(i)],region.mode==0&&core[size_t(i)]>0?1:0);
-    return sample(target,mapped(rest,target,field,false,cancel),triangle,bary);
+    return mapped_sample(rest,target,field,false,triangle,bary,cancel);
 }
 }
-int af_inspection_point(uint64_t target,uint64_t base,int triangle,const double* bary,double* row) {
+int af_inspection_point(uint64_t target,uint64_t base,uint64_t rest,int triangle,const double* bary,double* row,uint64_t cancel) {
     try {
         const auto mesh=af::mesh(target),source=base?af::mesh(base):nullptr;
+        const auto inflated=rest?af::mesh(rest):nullptr; af::check_cancel(cancel);
         af::inspection::witness(*mesh,triangle,af::V3(bary));
         af::inspection::point_row(*mesh,source.get(),triangle,af::V3(bary),row);
-        af::inspection::point_flags(*mesh,source.get(),triangle,af::V3(bary),row+16); return 0;
+        af::inspection::point_flags(*mesh,source.get(),inflated.get(),triangle,af::V3(bary),row+16,cancel); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_inspection_point_lines(uint64_t target,const double* frame,const double* row,double* lines) {
+    try {
+        const auto mesh=af::mesh(target); const af::M4 m(frame); const af::V3 p=af::point(m,af::V3(row));
+        const double size=std::max(1e-6,(mesh->vertices.colwise().maxCoeff()-mesh->vertices.colwise().minCoeff()).norm()*.015);
+        for(int i=0;i<6;++i) { const af::V3 v=p+af::V3::Unit(i/2)*size*(i%2?1:-1); std::copy(v.data(),v.data()+3,lines+3*i); }
+        const af::V3 base=af::point(m,af::V3(row+3)),normal=p+m.topLeftCorner<3,3>().inverse().transpose()*af::V3(row+9)*size*4;
+        const std::array<af::V3,4> vector{base,p,p,normal}; int i=18;
+        for(const auto& v:vector) { std::copy(v.data(),v.data()+3,lines+i); i+=3; }
+        return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_inspection_regions(uint64_t target,uint64_t rest,uint64_t base,int triangle,const double* bary,

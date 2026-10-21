@@ -100,6 +100,12 @@ class IssuePanel(QObject):
     def selectIssue(self, identity):
         self.selected = identity
         self.refresh()
+        if self._state.get("canNavigate") and self._detail.get("evidence", {}).get("witness"):
+            self.controller.tissue_inspection.show_finding(identity)
+
+    @Slot()
+    def showGeometry(self):
+        self.controller.tissue_inspection.show_finding(self.selected)
 
     @Slot(str, "QVariantMap")
     def run(self, operation, arguments):

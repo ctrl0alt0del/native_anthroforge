@@ -26,7 +26,11 @@ class IssueSystem:
         self.listening = Listening(session, self.reporting)
         self.tasks = TaskReports(session, self.reporting)
         self.resolution = Resolution(self.repository, self.recheck)
-        for provider in (*providers.builtins(), fiber_collisions.provider(session), tissue_geometry.provider(session)):
+        for provider in (
+            *providers.builtins(),
+            fiber_collisions.provider(session),
+            tissue_geometry.provider(session),
+        ):
             self.listening.register(provider)
         self.attach(session.scheduler)
 

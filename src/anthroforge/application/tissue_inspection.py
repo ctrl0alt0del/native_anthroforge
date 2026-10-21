@@ -32,19 +32,40 @@ def start(session: Any, kind: str, target: str, **options: Any) -> dict[str, Any
 
 
 def make_job(session: Any, value: Any, kind: str, options: Any) -> Job:
-    job = Job("Inspect tissue " + kind, frozenset(), partial(capture, session, value, options),
-              partial(compute, kind, options), partial(publish, session, value, kind),
-              key="tissue_inspection:" + kind, kind="tissue_inspection", writes=False,
-              priority=-5, publish_during_edit=True)
+    job = inspection_job(session, value, kind, options)
     job.cancel = NativeCancellation(session.engine)
     job.cleanup = partial(completed, value, job)
-    job.workload = lambda _: Workload(triangles=stages.mesh(session, value.target, options["stage"]).counts[3])
+    job.workload = lambda _: Workload(
+        triangles=stages.mesh(session, value.target, options["stage"]).counts[3]
+    )
+    return job
+
+
+def inspection_job(session: Any, value: Any, kind: str, options: Any) -> Job:
+    job = Job(
+        "Inspect tissue " + kind,
+        frozenset(),
+        partial(capture, session, value, options),
+        partial(compute, kind, options),
+        partial(publish, session, value, kind),
+        key="tissue_inspection:" + kind,
+        kind="tissue_inspection",
+        writes=False,
+        priority=-5,
+        publish_during_edit=True,
+    )
     return job
 
 
 def capture(session: Any, value: Any, options: Any, document: Any) -> Any:
     value.state = "running"
     context = freeze(session)
+    expected = options.get("expected_asset")
+    if (
+        expected
+        and stages.result(stages.tissue(context, value.target), options["stage"]).asset != expected
+    ):
+        raise ValueError("The displayed inspection surface changed. Pick the current stage again.")
     return context, value.target, signature(context, value.target, options)
 
 
@@ -68,15 +89,36 @@ def comparison(context: Any, target: str, options: Any, cancel: int) -> dict[str
     reference, stage = options.get("reference", "rest"), options["stage"]
     stages.compatible(stages.tissue(context, target), reference, stage)
     first, second = stages.mesh(context, target, reference), stages.mesh(context, target, stage)
-    output = native.Comparison(first, second, reference == "base", cancel, stages.frame(context, stages.tissue(context, target), stage))
-    return dict(resource=output, report=dict(reference=reference, stage=stage,
-                minimum=output.stats[0], maximum=output.stats[1], mean=output.stats[2], rms=output.stats[3],
-                samples=output.samples, units="metres", method="material correspondence; vertex-weighted statistics"))
+    output = native.Comparison(
+        first,
+        second,
+        reference == "base" and stage != "base",
+        cancel,
+        stages.frame(context, stages.tissue(context, target), stage),
+    )
+    return dict(resource=output, report=comparison_report(output, reference, stage))
+
+
+def comparison_report(output: Any, reference: str, stage: str) -> dict[str, Any]:
+    return dict(
+        reference=reference,
+        stage=stage,
+        minimum=output.stats[0],
+        maximum=output.stats[1],
+        mean=output.stats[2],
+        rms=output.stats[3],
+        samples=output.samples,
+        units="metres",
+        method="material correspondence; vertex-weighted statistics",
+    )
 
 
 def publish(session: Any, value: Any, kind: str, payload: Any) -> None:
     context, target, options, stamp, result = payload
-    if session.tissue_inspection.values.get(kind) is not value or signature(session, target, options) != stamp:
+    if (
+        session.tissue_inspection.values.get(kind) is not value
+        or signature(session, target, options) != stamp
+    ):
         raise ValueError("Tissue inspection inputs changed; inspect the accepted stages again.")
     value.asset = dict(result, stamp=stamp, options=options, target=target)
     value.state = "ready"
@@ -89,8 +131,13 @@ def status(session: Any, kind: str) -> dict[str, Any]:
     state = value.state
     if value.asset and not current(session, value.asset):
         state = "stale"
-    return dict(state=state, job=value.job, target=value.target, error=value.error,
-                report=value.asset.get("report", {}) if value.asset else {})
+    return dict(
+        state=state,
+        job=value.job,
+        target=value.target,
+        error=value.error,
+        report=value.asset.get("report", {}) if value.asset else {},
+    )
 
 
 def current(session: Any, asset: Any) -> bool:
@@ -111,12 +158,14 @@ def cancel(session: Any, kind: str = "") -> None:
 def execute(session: Any, operation: str, arguments: dict[str, Any]) -> Any:
     from .issues import tissue_geometry
 
-    commands = {"tissue.inspect.stages": partial(stages.describe, session),
-                "tissue.inspect.compare": partial(start, session, "comparison"),
-                "tissue.inspect.point": partial(start, session, "point"),
-                "tissue.inspect.status": partial(status, session),
-                "tissue.inspect.cancel": partial(cancel, session),
-                "tissue.inspect.check": partial(tissue_geometry.request, session)}
+    commands: dict[str, Any] = {
+        "tissue.inspect.stages": partial(stages.describe, session),
+        "tissue.inspect.compare": partial(start, session, "comparison"),
+        "tissue.inspect.point": partial(start, session, "point"),
+        "tissue.inspect.status": partial(status, session),
+        "tissue.inspect.cancel": partial(cancel, session),
+        "tissue.inspect.check": partial(tissue_geometry.request, session),
+    }
     if operation not in commands:
         raise ValueError("Unknown tissue inspection operation.")
     return commands[operation](**arguments)

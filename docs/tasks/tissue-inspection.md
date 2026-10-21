@@ -29,10 +29,14 @@ docs/engineering_guidelines.md, standalone_application_recommendations.md E03/E0
 ## Current state
 
 Native material comparison/colored buffers, point/region lookup and bounded advisory
-crossing checks are implemented. Shared APIs and a manual Issue provider are integrated.
-13 focused API/issue lifecycle tests and five existing native contracts pass. Desktop
-integration, wider numerical/lifecycle tests, style/type checks, documentation and
-packaging remain incomplete. This checkpoint is not a delivered application.
+crossing checks are integrated with the shared API and desktop inspectors. Stage buffers
+use frame-boundary activation with retained buffer types and matching picking. Point
+inspection explains accepted constraints and draws surface/displacement witnesses.
+Findings locate triangles and become stale without automatic reruns. Frozen report views
+and profiler ownership include inspection resources. 26 focused tests pass, including
+real crossing fixtures, cropped material mapping, exact backing and publication lifetime.
+Existing offscreen editor acceptance passes. Dedicated GPU inspection, wider lifecycle
+tests, full development gate, documentation and packaging remain incomplete.
 
 ## Verification
 
@@ -43,9 +47,9 @@ canonical 0.2.3 package qualification. Preserve unrelated root __init__.py.
 
 ## Next actions and blockers
 
-1. Integrate revision-qualified stage and point inspection with native comparison.
-2. Add on-demand geometry checks, issue witnesses and viewport navigation.
-3. Validate, document, package one canonical build, checkpoint and merge.
+1. Complete dedicated hidden GPU inspection and report replay acceptance.
+2. Complete lifecycle/resource tests, full development gate and computation history.
+3. Package one canonical build, checkpoint and validated merge.
 
 ## Recovery inputs
 

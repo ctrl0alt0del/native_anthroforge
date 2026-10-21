@@ -19,6 +19,7 @@ UiScrollView {
             UiButton { objectName: "issueRecheck"; text: "Recheck provider"; visible: !!panel.issue.id; onClicked: panel.service.run("issues.recheck",{provider:panel.issue.provider}) }
             UiButton { objectName: "issueDismiss"; text: panel.issue.dismissed ? "Restore" : "Dismiss"; visible: !!panel.issue.exists; onClicked: panel.service.run("issues.dismiss",{identity:panel.issue.id,dismissed:!panel.issue.dismissed}) }
         }
+        UiButton { objectName: "issueShowGeometry"; text: "Show geometry"; visible: !!panel.issue.evidence?.witness; enabled: panel.issue.freshness==="current"; onClicked: panel.service.showGeometry() }
         Repeater {
             model: panel.issue.fixes || []
             UiButton { required property var modelData; objectName: "issueFix-"+modelData.name; text: modelData.label; enabled: !panel.issue.repairActive; onClicked: panel.service.run("issues.fix",{identity:panel.issue.id,name:modelData.name}) }

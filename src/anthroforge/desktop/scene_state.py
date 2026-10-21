@@ -142,6 +142,9 @@ def render_rows(rows):
 
 def picking_inputs(controller, rows):
     snapping_inputs(controller, rows)
+    from .tissue_inspection_scene import picked_rows
+
+    rows = picked_rows(controller.tissue_inspection, rows)
     eligible = [row for row in rows if row["surface_pickable"] and row["handle"]]
     controller.pick_rows = {row["id"]: row for row in eligible}
     controller.pick_ids = [row["id"] for row in eligible]
@@ -152,6 +155,14 @@ def picking_inputs(controller, rows):
     ]
     controller.pick_matrices = np.ascontiguousarray(matrices, dtype=np.float64)
     control_picking_inputs(controller)
+
+
+def displayed_mesh(controller, row):
+    from .tissue_inspection_scene import mesh
+
+    return controller.render_model.leases.get(row["handle"]) or mesh(
+        controller.tissue_inspection, row
+    )
 
 
 def snapping_inputs(controller, rows):

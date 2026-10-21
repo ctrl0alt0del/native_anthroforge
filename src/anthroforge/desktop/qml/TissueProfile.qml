@@ -5,12 +5,30 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     required property var profile
+    property bool previewing: false
+    property var scaleBasis: null
+    readonly property real depth: Math.max(0,...(profile.depths || []))
     signal edited(var profile)
     signal resetRequested()
     Layout.fillWidth: true; spacing: Theme.gap
     function change(key,value) { const next=Object.assign({},profile); next[key]=value; edited(next); }
     function station(key,index,value) { const values=Array.from(profile[key]); values[index]=value; change(key,values); }
+    function scale(value) {
+        const basis=scaleBasis || profile;
+        const maximum=Math.max(...basis.depths);
+        if(maximum<=0) return;
+        const next=workspace.run("tissue.profile.scaled",{profile:basis,factor:value/maximum});
+        if(next) edited(next);
+    }
     UiCombo { objectName: "tissueProfileDirection"; Layout.fillWidth: true; model: ["LOCAL","SMOOTH","SECTION"]; currentIndex: Math.max(0,model.indexOf(panel.profile.direction)); onActivated: panel.change("direction",currentText) }
+    NumericSetting {
+        objectName: "tissueProfileDepth"; label: "Overall depth"; length: true
+        minimum: 0; maximum: 10; value: panel.depth; live: !panel.previewing
+        enabled: panel.depth>0 || panel.scaleBasis!==null
+        hint: "Scale all four station depths proportionally. For an all-zero profile, set a station depth or reset first."
+        onScrubbingChanged: panel.scaleBasis=scrubbing ? workspace.run("tissue.profile.scaled",{profile:panel.profile,factor:1}) : null
+        onEdited: value=>panel.scale(value)
+    }
     Repeater {
         model: 4
         ColumnLayout {

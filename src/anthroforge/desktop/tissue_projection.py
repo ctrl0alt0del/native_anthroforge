@@ -57,6 +57,7 @@ SCALARS = (
     "reverse",
     "resolution",
     "stacking",
+    "group",
     "update_mode",
 )
 

@@ -8,6 +8,8 @@ from anthroforge.core.results import geometry_asset
 from anthroforge.native import scene
 
 from . import object_interaction
+from .property_projection import PropertyProjection
+from .values import qml
 
 
 def local_path(value):
@@ -21,7 +23,7 @@ def run(controller, operation, arguments):
         if operation in ("scp.empty", "scp.duplicate", "scp.wrap_root"):
             controller.selection = result
         controller.refresh()
-        return result
+        return qml(result)
     except Exception as error:
         numeric = getattr(controller, "numeric_edits", None)
         if numeric is not None:
@@ -32,7 +34,9 @@ def run(controller, operation, arguments):
 
 
 def command_values(value):
-    """JavaScript has one numeric type; restore exact integers at the Qt transport boundary."""
+    """Snapshot projected records and restore exact integers at the Qt transport boundary."""
+    if isinstance(value, PropertyProjection):
+        return command_values(value.as_dict())
     if isinstance(value, dict):
         return {key: command_values(item) for key, item in value.items()}
     if isinstance(value, list):

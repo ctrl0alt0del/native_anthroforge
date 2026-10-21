@@ -9,7 +9,7 @@ from .tissue_constraints import TissueConstraint, TissueField
 from .tissue_diagnostics import TissueDiagnostic
 from .tissue_material import TissueMaterialState
 from .tissue_settings import TissueCrop, TissuePart, TissueRelaxation
-from .tissue_stacking import StackPlan, StackRelationship, StackSettings
+from .tissue_stacking import StackPlan, StackRelationship, StackSettings, validate_group
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,6 +49,7 @@ class TissueVCP(ObjectRecord):
 
     def __post_init__(self) -> None:
         ObjectRecord.__post_init__(self)
+        validate_group(self.group)
         if not self.source or not self.classification.strip():
             raise ValueError("Tissue needs a construction source and classification.")
         if not self.parts or self.parts[0].id != "main":

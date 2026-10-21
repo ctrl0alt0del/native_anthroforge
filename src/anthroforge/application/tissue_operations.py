@@ -10,6 +10,10 @@ from anthroforge.core.tissues import TissueVCP
 from . import object_operations, tissue_codec, tissue_tasks
 from .operations import require_name
 
+CONFIGURATION = frozenset(
+    ("classification", "color", "both_sides", "reverse", "stacking", "resolution", "group")
+)
+
 
 def create(
     session: Any, source: str, name: str = "Tissue", preset: str = "MUSCLE"
@@ -45,8 +49,7 @@ def tissue(session: Any, target: str) -> TissueVCP:
 
 def configure(session: Any, target: str, changes: dict[str, Any]) -> None:
     item = tissue(session, target)
-    allowed = {"classification", "color", "both_sides", "reverse", "stacking", "resolution"}
-    if set(changes) - allowed:
+    if set(changes) - CONFIGURATION:
         raise ValueError("Unsupported tissue setting; use the dedicated strategy operation.")
     if any(
         key in changes and changes[key] != getattr(item, key)

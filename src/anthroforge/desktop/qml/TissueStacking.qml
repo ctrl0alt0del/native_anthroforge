@@ -26,8 +26,17 @@ UiSection {
     UiCheck { objectName: "tissueStackingEnabled"; text: "Enable stacking"; checked: panel.item.stacking || false; onClicked: workspace.run("tissue.configure",{target:panel.item.id,changes:{stacking:checked}}) }
     UiSection {
         title: "Stacking settings"; expanded: false
+        Label { text: "Automatic stacking group"; color: Theme.muted }
+        UiField {
+            id: group; objectName: "tissueStackGroup"; Layout.fillWidth: true; maximumLength: 256
+            placeholderText: "Independent (no group)"; Accessible.name: "Automatic stacking group"
+            Binding { target: group; property: "text"; when: !group.activeFocus; value: panel.item.group || "" }
+            onEditingFinished: if(text.trim() !== (panel.item.group || "")) workspace.run("tissue.configure",{target:panel.item.id,changes:{group:text.trim()}})
+            ToolTip.visible: hovered; ToolTip.text: "Equal group names skip automatic comparisons. Explicit pair assignments remain available."
+        }
         NumericSetting { objectName: "tissueStackClearance"; label: "Clearance"; length: true; value: panel.item.stack_settings?.clearance || 0; onEdited: value=>panel.configure("clearance",value) }
         NumericSetting { label: "Search distance"; length: true; value: panel.item.stack_settings?.search || 0; onEdited: value=>panel.configure("search",value) }
+        NumericSetting { objectName: "tissueStackAllowance"; label: "Discovery allowance"; length: true; minimum: 0; maximum: 1000; value: panel.item.stack_settings?.displacement ?? 0.5; hint: "Additional reach for pair discovery; does not limit stacked displacement"; onEdited: value=>panel.configure("displacement",value) }
         NumericSetting { label: "Smoothing radius"; length: true; value: panel.item.stack_settings?.radius || 0; onEdited: value=>panel.configure("radius",value) }
         NumericSetting { label: "Smoothing strength"; value: panel.item.stack_settings?.strength || 0; onEdited: value=>panel.configure("strength",value) }
         NumericSetting { label: "Blend distance"; length: true; value: panel.item.stack_settings?.blend || 0; onEdited: value=>panel.configure("blend",value) }

@@ -61,7 +61,9 @@ EDITS = {
     "tissue.stacking.remove": tissue_stack_operations.remove,
     "tissue.smoothing": tissue_part_operations.smoothing,
     "tissue.connector": tissue_part_operations.connector,
+    "tissue.side.copy": tissue_part_operations.copy_side,
     "tissue.profile.reset": tissue_part_operations.profile_reset,
+    "tissue.profile.scale": tissue_part_operations.profile_scale,
     "tissue.control.reset": tissue_part_operations.control_reset,
     "tissue.crop": tissue_strategy_operations.crop,
     "tissue.relaxation": tissue_strategy_operations.relaxation,
@@ -251,6 +253,7 @@ def construction_queries(session: "Session") -> dict[str, Any]:
 
 def tissue_queries(session: "Session") -> dict[str, Any]:
     return {
+        "tissue.profile.scaled": lambda **a: tissue_part_operations.scaled_profile(session, **a),
         "tissue.preview": lambda **a: tissue_preview.preview(session, **a),
         "tissue.preview.status": lambda: tissue_preview.status(session),
         "tissue.preview.cancel": lambda: tissue_preview.cancel(session),

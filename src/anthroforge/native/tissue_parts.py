@@ -16,6 +16,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_tissue_inflate_parts", [U, c.POINTER(Inflation), c.c_int, D, c.c_int, U], U)
     engine.bind("af_tissue_envelope", [U, U, c.c_int, U], U)
     engine.bind("af_tissue_profile_reset", [c.c_double, D])
+    engine.bind("af_tissue_profile_scale", [D, c.c_double, D])
     engine.bind("af_tissue_control_default", [U, c.c_int, D])
 
 
@@ -44,4 +45,12 @@ def reset_profile(engine: GeometryEngine, depth: float) -> tuple[float, ...]:
 def default_control(mesh: Mesh, part: int) -> tuple[float, ...]:
     output = (c.c_double * 3)()
     mesh.engine.check(mesh.engine.library.af_tissue_control_default(mesh.handle, part, output))
+    return tuple(output)
+
+
+def scale_profile(engine: GeometryEngine, depths: Any, factor: float) -> tuple[float, ...]:
+    if len(depths) != 4:
+        raise ValueError("Profile scaling requires four station depths.")
+    source, output = (c.c_double * 4)(*depths), (c.c_double * 4)()
+    engine.check(engine.library.af_tissue_profile_scale(source, factor, output))
     return tuple(output)

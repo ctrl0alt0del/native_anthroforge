@@ -8,6 +8,7 @@ from anthroforge.core.tissue_settings import HeightSmoothing, SectionProfile
 from anthroforge.native import tissue_parts as native
 
 from . import tissue_operations, tissue_strategy_operations
+from .construction_codec import tuples
 
 
 def selected(item: Any, part: str) -> Any:
@@ -15,6 +16,30 @@ def selected(item: Any, part: str) -> Any:
     if value is None:
         raise ValueError("Choose an accepted material part.")
     return value
+
+
+def copy_side(
+    session: Any,
+    target: str,
+    source: str,
+    destination: str,
+    part: str = "main",
+    all_parts: bool = False,
+) -> None:
+    item = tissue_operations.tissue(session, target)
+    parts = copied_sides(item, source, destination, part, all_parts)
+    updated = replace(item, parts=tissue_parts.installed(item, parts))
+    tissue_operations.install_inflation(session, item, updated)
+
+
+def copied_sides(item: Any, source: str, destination: str, part: str, all_parts: bool) -> Any:
+    if {source, destination} != {"a", "b"} or type(all_parts) is not bool:
+        raise ValueError("Copy requires opposite sides A/B and a Boolean all_parts flag.")
+    selected(item, part)
+    return tuple(
+        replace(p, **{destination: getattr(p, source)}) if all_parts or p.id == part else p
+        for p in tissue_parts.active(item)
+    )
 
 
 def connector(session: Any, target: str, part: str, width: float, fullness: float) -> None:
@@ -54,6 +79,23 @@ def profile_reset(session: Any, target: str, part: str = "main", side: str = "a"
     tissue_operations.inflation(
         session, target, dict(profile=profile_value(session, depth)), part, side
     )
+
+
+def profile_scale(
+    session: Any, target: str, factor: float, part: str = "main", side: str = "a"
+) -> None:
+    item = tissue_operations.tissue(session, target)
+    if side not in ("a", "b"):
+        raise ValueError("Choose side A or B.")
+    previous = getattr(selected(item, part), side).inflation.profile
+    profile = scaled_profile(session, asdict(previous), factor)
+    tissue_operations.inflation(session, target, dict(profile=profile), part, side)
+
+
+def scaled_profile(session: Any, profile: dict[str, Any], factor: float) -> dict[str, Any]:
+    previous = SectionProfile(**tuples(profile))
+    depths = native.scale_profile(session.engine, previous.depths, factor)
+    return asdict(replace(previous, depths=depths, initialized=True))
 
 
 def control_reset(session: Any, target: str, part: str = "main", side: str = "a") -> None:

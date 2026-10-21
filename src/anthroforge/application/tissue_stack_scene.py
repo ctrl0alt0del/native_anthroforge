@@ -35,6 +35,14 @@ def sides(state: Any) -> tuple[str, ...]:
     return ("a", "b") if state.both_sides else ("a",)
 
 
+def families(document: Any) -> list[tuple[TissueVCP, int]]:
+    labels: dict[tuple[bool, str], int] = {}
+    return [
+        (item, labels.setdefault((bool(item.group), item.group or item.id), len(labels) + 1))
+        for item in participants(document)
+    ]
+
+
 def lease(resources: Any, state: Any, side: str, cancel: int, final: bool = False) -> MaterialLease:
     keys = (state.base, state.rest, state.final if final else state.own)
     meshes = [resources.meshes[key].mesh for key in keys]
@@ -62,7 +70,7 @@ class StackScene:
         self.domains: dict[int, Any] = {}
         self.identities: dict[int, tuple[str, str]] = {}
         self.failures: dict[str, str] = {}
-        for family, item in enumerate(participants(document), 1):
+        for item, family in families(document):
             self.add(item, family)
 
     def add(self, item: TissueVCP, family: int) -> None:
@@ -83,7 +91,8 @@ class StackScene:
         if key in self.identities:
             raise ValueError("Stacking side identity collision.")
         self.leases[owner, side] = value
-        domain = value.domain(key, family=family)
+        allowance = self.document.object(owner).stack_settings.displacement
+        domain = value.domain(key, family=family, allowance=allowance)
         if domain.triangles:
             self.identities[key], self.domains[key] = (owner, side), domain
 

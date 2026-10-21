@@ -4,6 +4,7 @@ import json
 from zipfile import ZipFile
 
 from profiler_portable import validate
+from tissue_authoring_portable import qualify
 
 
 def tissues(executable, cwd, invoke):
@@ -13,6 +14,7 @@ def tissues(executable, cwd, invoke):
     items = verify(state, cwd)
     profile(executable, cwd, invoke, items["Layer 1"]["id"])
     capture(executable, cwd, invoke, state, items["Layer 2"]["id"])
+    qualify(executable, cwd, invoke, items)
 
 
 def verify(state, cwd):

@@ -42,6 +42,15 @@ Section Profile has four station depths/peaks, roundness and direction; it requi
 ordinary open loft. Reversing the side or enabling both sides is explicit. Branch connector
 width/fullness and each part's supported inflation settings remain independent.
 
+**Boundary power** shapes the boundary attenuation transition in the muscle inflation
+modes. In Section Profile, type or drag **Overall depth** to set the largest station
+depth and scale all four depths proportionally. Peaks, roundness and direction remain
+unchanged. One drag is one undo action, including a drag through zero and back. An
+all-zero committed profile has no proportions: set a station depth or Reset first.
+With Two-sided envelope enabled, **Copy A → B** and **Copy B → A** copy inflation and
+height-smoothing settings for the selected part; **Copy across all parts** includes every
+current branch. These actions preserve construction, branch connectors and part identities.
+
 **Preview inflation edits** shows a green candidate without replacing accepted geometry.
 It previews inflated rest before relaxation, cropping or stacking. Accept commits one undo
 action; Cancel discards it. Direct transforms or vertex editing of generated tissue are
@@ -79,6 +88,13 @@ candidate detection determines order. In **Stacking**, search for another tissue
 the sides and choose Requested/Explicit order or exclude that pair. Each change applies
 immediately with Undo; **Reset relationship** removes the override. Requested
 order must agree with geometry; Explicit order still undergoes independent validation.
+
+Under **Stacking settings**, assign the same **Automatic stacking group** name to tissues
+that should not automatically stack against each other. Empty names keep each tissue
+independent. Explicit pair overrides remain available within a group. **Discovery allowance**
+extends candidate search along the inflation directions (default 0.5 m); it is separate
+from Maximum adjustment, which limits constrained smoothing. Group and allowance edits
+refresh affected stack plans while reusing existing intrinsic inflation results.
 
 For a local influence, choose **Select support footprint…** after setting an order. Click
 covering faces to toggle a green draft; Accept or Cancel completes the gesture. An empty

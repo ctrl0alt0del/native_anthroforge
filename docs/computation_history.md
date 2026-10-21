@@ -92,7 +92,7 @@ Presence in this inventory does not make every mode available on every source.
 | T01 | Base preparation: capture accepted Anchor frame, Fiber path or Membrane geometry; refine material grids/branches without editing sources. Subdivide existing intervals, retaining source grid lines and correspondence. | [tissue sources](../src/anthroforge/application/tissue_sources.py), [tissue_refinement.cpp](../native/src/tissue_refinement.cpp), [tissue_branch_refinement.cpp](../native/src/tissue_branch_refinement.cpp) | [tissue workflow](../tests/test_tissue_workflow.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
 | T02 | Control Point inflation: displaced control, falloff, boundary attenuation, longitudinal taper, direction and enable/disable over supported material grids. | [tissue_inflation.cpp](../native/src/tissue_inflation.cpp), [pinned tissue kernels](../native/migration/tissue/sources.json) | [tissue inflation](../tests/test_tissue_inflation.py) |
 | T03 | Distributed inflation: area-weighted source normals, physical mass/cotangent screened diffusion of directions, normalization and authored amount/edge/taper application. The old local height-reduction heuristic is removed. | [tissue_directions.cpp](../native/src/tissue_directions.cpp), [tissue_inflation.cpp](../native/src/tissue_inflation.cpp) | [inflation regression](../tests/test_tissue_inflation_regression.py) |
-| T04 | Section Profile: four station depths/peaks, roundness, initialization and Local/Smooth/Section directions, restricted to ordinary open lofts. | [tissue_inflation.cpp](../native/src/tissue_inflation.cpp), [tissue_parameters.cpp](../native/src/tissue_parameters.cpp) | [tissue inflation](../tests/test_tissue_inflation.py), [tissue controls](../tests/test_tissue_controls.py) |
+| T04 | Section Profile: four station depths/peaks, native proportional depth scaling (CH-022), roundness, initialization and Local/Smooth/Section directions, restricted to ordinary open lofts. | [tissue_inflation.cpp](../native/src/tissue_inflation.cpp), [tissue_parameters.cpp](../native/src/tissue_parameters.cpp) | [tissue inflation](../tests/test_tissue_inflation.py), [profile scaling](../tests/test_tissue_profile_scaling.py) |
 | T05 | Parts/sides and envelope assembly: per-part inflation, branch geodesic fields, seam displacements, Hermite connectors, reversal and independent two-sided composition. | [tissue_parts.cpp](../native/src/tissue_parts.cpp), [tissue_branch_connector.cpp](../native/src/tissue_branch_connector.cpp), [tissue_envelope.cpp](../native/src/tissue_envelope.cpp) | [tissue branches](../tests/test_tissue_branches.py), [envelopes](../tests/test_tissue_envelopes.py) |
 | T06 | Anchor-based radial tissue: sphere/ellipsoid construction in the resolved source frame. | [tissue_radial.cpp](../native/src/tissue_radial.cpp) | [tissue shapes](../tests/test_tissue_shapes.py) |
 | T07 | Fiber-based tissue: open/cyclic profile sweep, width/depth/power, resolution, taper, backing and cap construction. | [tissue_profile_sweep.cpp](../native/src/tissue_profile_sweep.cpp) | [tissue shapes](../tests/test_tissue_shapes.py) |
@@ -108,7 +108,7 @@ Presence in this inventory does not make every mode available on every source.
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
-| K01 | Candidate/support planning: detect surface relationships and support regions, derive automatic order, apply explicit order/exclusions, and retain provenance. Only accepted providers become final prerequisites. | [stacking.cpp](../native/src/stacking.cpp), [stack evaluation](../src/anthroforge/application/tissue_stack_evaluation.py) | [stacking phases](../tests/test_stacking_phases.py), [stack workflow](../tests/test_tissue_stack_workflow.py) |
+| K01 | Candidate/support planning: detect surface relationships/support regions with authored group and discovery allowance (CH-022), derive automatic order, apply explicit order/exclusions and retain provenance. Policy changes invalidate observed plans without rebuilding intrinsic geometry. Only accepted providers become final prerequisites. | [stacking.cpp](../native/src/stacking.cpp), [stack evaluation](../src/anthroforge/application/tissue_stack_evaluation.py) | [stacking phases](../tests/test_stacking_phases.py), [authoring controls](../tests/test_tissue_authoring_controls.py) |
 | K02 | Vector stacking: material correspondence and direction transport, selected support regions, multiple providers and provider-first chains without redundant ancestor displacement. | [tissue_stacking.cpp](../native/src/tissue_stacking.cpp), [tissue_stack_directions.cpp](../native/src/tissue_stack_directions.cpp) | [native stacking](../tests/test_tissue_stacking_native.py), [mixed stacking](../tests/test_tissue_mixed_stacking.py) |
 | K03 | Constrained stacking smoothing: sparse exact material-pin/backing equations, localized displacement smoothing and assembled side/group output. Whole-tissue groups retain the actual side dependency graph. | [tissue_stack_constraints.cpp](../native/src/tissue_stack_constraints.cpp), [material_pin_equations.cpp](../native/src/material_pin_equations.cpp), [stack groups](../src/anthroforge/application/tissue_group_tasks.py) | [stack material](../tests/test_tissue_stack_material.py), [stack groups](../tests/test_tissue_stack_groups.py) |
 | K04 | Final stacking validation: inspect complete assembled output for folds, self-intersections and bone/neighbor conflicts. Failed stacking displays current intrinsic geometry but does not publish a successful Final prerequisite. | [stacking_surface_validation.cpp](../native/src/stacking_surface_validation.cpp), [tissue_stack_assembly.cpp](../native/src/tissue_stack_assembly.cpp) | [complete geometry](../tests/test_stacking_complete_geometry.py), [group lifecycle](../tests/test_tissue_group_lifecycle.py) |
@@ -916,3 +916,31 @@ for artifact identity, UI checks and evidence limits.
   placement, material capture, profiling, persistence and offscreen/hidden-render tests.
   [Release evidence](development_status.md#confirmed-query-reuse-023) records limits and
   [the task record](tasks/confirmed-query-reuse.md) links reproducible measurements.
+
+### CH-022 — Expose tissue authoring policies and proportional profile scaling
+
+- **2026-10-21; T04, T05, K01; 0.2.3.** The addon audit identified missing authoring controls:
+  boundary attenuation power, automatic stack families/discovery allowance, full side
+  copying and proportional station depths. Existing evaluators already support Boundary
+  Power and stack family/allowance; no inflation or stacking objective is replaced.
+- **Old/new:** unique families and hardcoded 0.5 discovery allowance become authored
+  per-tissue policies passed into the existing native stack domain. Matching named groups
+  suppress automatic pairs; explicit overrides remain eligible, matching the donor.
+  Membership read signatures and candidate invalidation now include these policies so
+  stale jobs cannot publish old plans. Intrinsic geometry remains reusable.
+- **Profile:** a native batched parameter adapter scales four depths by a finite
+  nonnegative factor, validating all outputs before writing. Desktop Overall depth sets
+  the maximum using the same adapter; a frozen gesture baseline preserves proportions
+  through zero and back. Peaks/roundness/direction remain unchanged. After committing an
+  all-zero profile, a station edit/reset establishes proportions again.
+- **Ownership:** side copying remains a shared validated application edit (entire
+  inflation/smoothing record, current part/all current parts); source/connector identities
+  and inactive historical settings remain untouched. Qt transport snapshots projections
+  and converts return arrays without moving numerical work into UI/Python loops.
+- **Evidence:** the full development gate passes 1,534 tests and all five native contracts.
+  Actual offscreen inspector typing, drag, cancel, undo, copy and preview checks pass.
+  Hidden geometry renders inspect proportional raised profiles, copied envelopes and
+  grouped stacking; picking agrees. The source CLI batch round-trips new settings.
+  The relocated runtime `2287808` passes the full portable suite, including the new authoring
+  commands and saved settings. No interactive desktop acceptance or new performance gain
+  is claimed. [The task record](tasks/tissue-authoring-controls.md) records reproduction.

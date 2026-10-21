@@ -48,6 +48,7 @@ AF_API uint64_t af_tissue_inflate_grid(uint64_t source,const AfTissueInflation* 
 AF_API uint64_t af_tissue_inflate_parts(uint64_t source,const AfTissueInflation* settings,int count,const double* connectors,int envelope,uint64_t cancel);
 AF_API uint64_t af_tissue_envelope(uint64_t first,uint64_t second,int reverse,uint64_t cancel);
 AF_API int af_tissue_profile_reset(double depth,double* profile);
+AF_API int af_tissue_profile_scale(const double* depths,double factor,double* output);
 AF_API int af_tissue_control_default(uint64_t source,int part,double* point);
 AF_API uint64_t af_tissue_source_mesh(uint64_t source,const double* matrix,uint64_t cancel);
 AF_API uint64_t af_tissue_refine_grid(uint64_t source,int resolution,uint64_t cancel);

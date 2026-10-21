@@ -204,5 +204,10 @@ publication. Generic ray validation belongs to `placement_inputs`; cursor placem
 does not depend on the curve command's component validation. That final responsibility
 cleanup passes lint, typing and 13 placement/lifecycle/architecture tests.
 
+The final ownership pass also supplies accepted triangle counts to the dedicated
+surface-query scheduler, using metadata only. Its existing triangle-based estimate
+now sees the actual workload for both curve and cursor placement; all such work
+remains on coordinator workers. The cube lifecycle case verifies 12 input triangles.
+
 Portable builds remain canonical under `dist/0.2.2/AnthroForge.dist`; the final executable
 qualification and source archive refresh remain pending. No new release directory exists.

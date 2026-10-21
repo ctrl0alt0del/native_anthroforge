@@ -23,8 +23,8 @@ def test_confirmation_publishes_once_and_undo_restores_gesture(session):
     job = confirm(session, target, curve)
     session.wait()
     task = session.scheduler.registry.by_id[job]
-    assert task.state == "succeeded", task.error
-    assert not task.obsolete
+    assert task.state == "succeeded" and not task.obsolete, task.error
+    assert task.assessment.workload.triangles == 12
     assert_location(session, curve)
     assert session.history.cursor == cursor + 1
     session.navigate(-1)

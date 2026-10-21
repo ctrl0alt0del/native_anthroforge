@@ -6,7 +6,7 @@ from typing import Any, cast
 from anthroforge.core.jobs import Job, ObsoleteInputs
 from anthroforge.native.mesh import NativeCancellation
 
-from . import placement_inputs, presentation, snap_edits, surface_providers
+from . import placement_inputs, presentation, snap_edits, surface_providers, task_workloads
 from .construction_policy import revisions
 
 
@@ -14,6 +14,7 @@ def request(session: Any, origin: Any, direction: Any, targets: Any) -> str:
     data = placement_inputs.ray(targets, origin, direction)
     workspace = workspace_key(session)
     job = make_job(session, data, workspace)
+    job.workload = partial(task_workloads.surface_query, session, data["targets"], 1)
     job.cancel = NativeCancellation(session.engine)
     job.observes = job.prerequisites = frozenset(surface_providers.ports(session.document, targets))
     return cast(str, session.scheduler.submit(job))

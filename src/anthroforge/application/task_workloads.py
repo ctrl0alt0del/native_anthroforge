@@ -1,7 +1,7 @@
 """Planning reads entity/asset counts only; it never traverses mesh samples."""
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
@@ -10,6 +10,14 @@ from anthroforge.core.scheduling import Workload
 if TYPE_CHECKING:
     from .resources import Resources
     from .session import Session
+
+
+def surface_query(session: "Session", targets: Any, affected: int, document: Document) -> Workload:
+    from . import surface_providers
+
+    refs = (surface_providers.normalize(document, target) for target in targets)
+    triangles = sum(surface_providers.triangle_count(document, session.assets, ref) for ref in refs)
+    return Workload(affected=affected, candidates=len(targets), triangles=triangles)
 
 
 def attachments(

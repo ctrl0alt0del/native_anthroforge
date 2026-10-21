@@ -7,7 +7,6 @@ from anthroforge.core.construction import Curve
 from anthroforge.core.jobs import Job
 from anthroforge.core.junctions import members
 from anthroforge.core.results import Port
-from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
 from . import (
@@ -20,6 +19,7 @@ from . import (
     placement_inputs,
     snap_edits,
     surface_providers,
+    task_workloads,
 )
 from .evaluation_results import accepted_result
 
@@ -118,7 +118,9 @@ def enqueue(session: Any, request: Any, origin: int) -> str:
     job.observes = frozenset(inputs(session.document, request))
     job.prerequisites = frozenset(surface_providers.ports(session.document, request["targets"]))
     job.reads = frozenset(p.owner for p in job.observes)
-    job.workload = lambda _: Workload(affected=len(job.outputs), candidates=len(request["targets"]))
+    job.workload = partial(
+        task_workloads.surface_query, session, request["targets"], len(job.outputs)
+    )
     return cast(str, session.scheduler.submit(job))
 
 

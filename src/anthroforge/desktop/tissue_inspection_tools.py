@@ -75,7 +75,9 @@ class TissueInspectionTools(QObject):
         )
 
     def editing_geometry(self):
-        return self.controller.authoring.editing or bool(self.controller.tissue_region_tools.options)
+        return self.controller.authoring.editing or bool(
+            self.controller.tissue_region_tools.options
+        )
 
     def refresh_comparison(self):
         session = self.controller.session

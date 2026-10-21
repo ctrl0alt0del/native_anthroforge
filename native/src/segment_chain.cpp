@@ -55,6 +55,19 @@ static void topology(Faces& faces,const Segment& segment,int offset) {
     local.push_back(first); local.push_back(last);
     for(auto& face:local) { for(auto& index:face) index+=offset; faces.push_back(std::move(face)); }
 }
+static void provenance(Mesh& result,const Mesh& source,const Eigen::VectorXi& origins,uint64_t cancel) {
+    auto& material=result.triangle_material; material.source_count=source.triangles.rows();
+    for(int i=0;i<result.triangles.rows();++i) {
+        check_cancel(cancel); const auto original=source.triangles.row(origins[i]);
+        material.origins.push_back(origins[i]);
+        for(int j=0;j<3;++j) {
+            const auto point=result.vertices.row(result.triangles(i,j));
+            const V3 weights=barycentric(point,source.vertices.row(original[0]),source.vertices.row(original[1]),source.vertices.row(original[2]));
+            material.coordinates.insert(material.coordinates.end(),weights.data(),weights.data()+3);
+        }
+    }
+    validate_triangle_material(material,result.triangles.rows());
+}
 static std::shared_ptr<Mesh> united(const Mesh& source,uint64_t cancel) {
     auto flag=cancel?&reinterpret_cast<Cancellation*>(cancel)->cancelled:nullptr;
     const auto output=boolean::exterior(source.vertices,source.triangles,flag);
@@ -63,7 +76,8 @@ static std::shared_ptr<Mesh> united(const Mesh& source,uint64_t cancel) {
     for(int i=0;i<output.faces.rows();++i) {
         const auto face=output.faces.row(i); faces.push_back({face[0],face[1],face[2]});
     }
-    return make_mesh(points,faces,cancel,false);
+    auto result=make_mesh(points,faces,cancel,false);
+    provenance(*result,source,output.origins,cancel); return result;
 }
 static void append(Points& points,Faces& faces,const Segment& part,const V3& start,
                    const V3& direction,const std::vector<double>& table,bool unite,uint64_t cancel) {

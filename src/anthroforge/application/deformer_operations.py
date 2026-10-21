@@ -27,6 +27,8 @@ RELATION_FIELDS = frozenset(
         "members",
         "weighted_members",
         "shrinkwrap",
+        "subdivision",
+        "displacement",
     )
 )
 
@@ -58,6 +60,9 @@ def target_curve(item: SCP, target: Target) -> str:
 
 def install(session: "Session", target: Target, bindings: tuple[Deformer, ...]) -> None:
     item = owner(session, target)
+    from .geometry_modifiers import validate_change
+
+    validate_change(session.document, item, bindings)
     if target.stage == "LATTICE":
         controls.install(session, replace(item, deformers=bindings))
     else:

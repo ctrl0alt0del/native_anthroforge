@@ -26,6 +26,7 @@ class Attachment:
     face_lock: int = -1
     vertex_lock: int = -1
     binding: tuple[float, ...] = ()
+    material_asset: str = ""
 
     def __post_init__(self) -> None:
         if self.parent_mode not in ("SURFACE_NEAREST", "OBJECT_ORIGIN"):

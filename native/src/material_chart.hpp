@@ -39,3 +39,6 @@ std::vector<Cage> cages(const Atlas& before,const Atlas& after,uint64_t cancel);
 Mapping mean_value(const Cage& cage,const V2& query,uint64_t cancel);
 Coordinate transported(const Cage& cage,const M3& triangle,const V3& weights,uint64_t cancel);
 }
+namespace af::triangle_material {
+void frames(const Mesh& before,const Mesh& after,const M4& world,int count,const double* records,double* output,uint64_t cancel);
+}

@@ -31,7 +31,13 @@ def capture(
         *handles, *(pointer(a) for a in arrays), *capture_options(child), pointer(output)
     )
     engine.check(status)
-    return replace(child, attachment=replace(child.attachment, binding=tuple(output.tolist())))
+    return captured(child, parent, output)
+
+
+def captured(child: SCP, parent: SCP, output: Any) -> SCP:
+    key = geometry_asset(parent) if child.attachment.parent_mode == "SURFACE_NEAREST" else ""
+    binding = replace(child.attachment, binding=tuple(output.tolist()), material_asset=key)
+    return replace(child, attachment=binding)
 
 
 def capture_surface(parent: SCP, meshes: dict[str, Mesh], mode: str, cancel: int) -> Any:
@@ -41,11 +47,15 @@ def capture_surface(parent: SCP, meshes: dict[str, Mesh], mode: str, cancel: int
     return None
 
 
-def anchor_points(engine: GeometryEngine, child: SCP, parent: SCP, mesh: int) -> list[float]:
+def anchor_points(
+    engine: GeometryEngine, child: SCP, parent: SCP, mesh: int, reference_handle: int = 0
+) -> list[float]:
     values = (child.matrix, parent.matrix, parent.geometry_offset, child.attachment.binding)
     arrays, output = [doubles(value) for value in values], np.empty(6)
     engine.check(
-        engine.library.af_anchor_points(mesh, *(pointer(a) for a in arrays), pointer(output))
+        engine.library.af_anchor_points(
+            mesh, *(pointer(a) for a in arrays), pointer(output), reference_handle
+        )
     )
     return list(output.tolist())
 
@@ -89,7 +99,13 @@ def packed(entities: list[SCP], meshes: dict[str, Mesh], active: set[str]) -> di
         "matrices": doubles([e.matrix for e in entities]),
         "offsets": doubles([e.geometry_offset for e in entities]),
         "bindings": doubles([e.attachment.binding or (0.0,) * 28 for e in entities]),
+        "references": np.array([reference(e, meshes) for e in entities], dtype=np.uint64),
     }
+
+
+def reference(entity: SCP, meshes: dict[str, Mesh]) -> int:
+    key = entity.attachment.material_asset
+    return meshes[key].handle if key else 0
 
 
 def packed_flags(entities: list[SCP], active: set[str]) -> dict[str, Any]:
@@ -135,6 +151,7 @@ def apply_batch(engine: GeometryEngine, data: dict[str, Any], count: int, cancel
         *(pointer(data[key]) for key in ("matrices", "offsets", "bindings")),
         *(int_pointer(data[key]) for key in integers),
         getattr(cancel, "handle", 0),
+        data["references"].ctypes.data_as(c.POINTER(c.c_uint64)),
     )
     engine.check(status)
 

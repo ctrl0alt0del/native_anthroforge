@@ -57,6 +57,8 @@ POLICIES: dict[str, StagePolicy] = {
     "surface": SurfaceStagePolicy(),
     "SHRINKWRAP": ShrinkwrapStagePolicy(),
     "UNION": UnionStagePolicy(),
+    "SUBDIVISION": PrimitiveStagePolicy(),
+    "DISPLACE": HookStagePolicy(),
 }
 
 
@@ -68,7 +70,8 @@ def parametric_size(primitive: Any) -> tuple[int, int]:
     if primitive.kind == "BODY":
         density = counts(primitive)
         points = sum(
-            density[p.curve] * (4 if p.shape == "BOX" else p.sides) for p in primitive.pieces
+            density[p.curve] * (4 if p.shape == "BOX" else p.sides) * 4**p.subdivision
+            for p in primitive.pieces
         )
         return points, points + 2 * len(primitive.pieces)
     strips = (len(primitive.curves) - 1) * primitive.strips
@@ -94,6 +97,8 @@ def stages(session: Any, document: Any, entity: str) -> tuple[StageWorkload, ...
     if item.primitive.chain and item.primitive.chain.unite:
         result.append(StageWorkload("UNION", points, faces))
     for binding in item.deformers:
+        if binding.enabled and binding.subdivision:
+            points, faces = 4**binding.subdivision * points, 4**binding.subdivision * faces
         result.extend(binding_stages(document, item, binding, points))
     if item.thickness and item.thickness.enabled:
         result.append(StageWorkload("thickness", points, faces))

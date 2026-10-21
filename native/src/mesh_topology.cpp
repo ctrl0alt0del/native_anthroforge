@@ -80,6 +80,7 @@ uint64_t af_mesh_storage_bytes(uint64_t source) {
         if(mesh->prepared) throw std::runtime_error("Storage accounting requires a geometry-only draft.");
         return sizeof(af::Mesh)+mesh->vertices.size()*sizeof(double)+mesh->triangles.size()*sizeof(int)
             +(mesh->corners.capacity()+mesh->offsets.capacity()+mesh->polygons.capacity()+mesh->material.capacity())*sizeof(int64_t)
-            +(mesh->material_axes.capacity()+mesh->material_pins.capacity())*sizeof(double)+af::tissue_storage(mesh->tissue)+af::basis_storage(mesh->basis);
+            +(mesh->material_axes.capacity()+mesh->material_pins.capacity())*sizeof(double)+af::tissue_storage(mesh->tissue)+af::basis_storage(mesh->basis)
+            +af::triangle_material_storage(mesh->triangle_material);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }

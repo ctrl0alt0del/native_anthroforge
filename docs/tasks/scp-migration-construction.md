@@ -42,6 +42,10 @@ typed parameters, native geometry, shared commands and a focused inspector. Raw
 Index and Big_Toe reference vertices match within 3e-6, including the zero-length
 segment. Exact union is integrated; stable material bindings across its changing
 triangulation are the next integration requirement before migration acceptance.
+Those bindings are now implemented using persisted per-triangle material coordinates;
+fibers/anchors and SCP children retain their capture resource and do not recapture.
+Simple subdivision and constant local displacement are explicit ordered modifiers;
+Body pieces also expose pre-bend subdivision for the approved shaped bases.
 
 ## Verification
 
@@ -53,6 +57,10 @@ Full development gate, UI/package and migration not yet run.
 Latest focused Shrinkwrap/Segment Chain/architecture run: 36 passed. An exploratory
 whole-tree mypy invocation exceeded the configured typed scope and reported existing
 dynamic-module errors; use the repository's configured `mypy` command in the gate.
+Configured mypy passed. Full pytest at the material-binding checkpoint: 1,635 passed.
+Current geometry-stage/segment/shrinkwrap/architecture subset: 18 passed, including
+Simple subdivision against Blender and provenance through refinement. The latest
+retained-anchor overlay adapter still needs its fresh native build and check.
 
 ## Next actions and blockers
 

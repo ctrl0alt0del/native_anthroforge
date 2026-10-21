@@ -17,6 +17,11 @@ UiSection {
             onActivated: surface => authoring.edit("shrinkwrap.add", {target:{owner:panel.item.id},surface:{target:surface.id,role:surface.role}})
         }
     }
+    RowLayout {
+        visible: !panel.item.is_control
+        UiButton { text:"Add Subdivision"; onClicked:authoring.edit("modifier.add",{entity:panel.item.id,kind:"SUBDIVISION"}) }
+        UiButton { text:"Add Displacement"; onClicked:authoring.edit("modifier.add",{entity:panel.item.id,kind:"DISPLACE"}) }
+    }
     Repeater {
         model: panel.item.deformers || []
         ColumnLayout {
@@ -36,11 +41,13 @@ UiSection {
             Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Theme.border }
             RowLayout {
                 UiCheck { text: bindingPanel.binding.kind; checked: bindingPanel.binding.enabled; onClicked: bindingPanel.set("enabled",checked) }
-                UiButton { text: bindingPanel.controlName; flatStyle: true; Layout.fillWidth: true; onClicked: workspace.select(bindingPanel.binding.shrinkwrap?.surface.target || bindingPanel.binding.control) }
+                UiButton { visible:!!bindingPanel.binding.control || !!bindingPanel.binding.shrinkwrap; text: bindingPanel.controlName; flatStyle: true; Layout.fillWidth: true; onClicked: workspace.select(bindingPanel.binding.shrinkwrap?.surface.target || bindingPanel.binding.control) }
             }
             Label { text: bindingPanel.binding.target.stage + (bindingPanel.binding.target.component ? " · defining curve/piece" : ""); color: Theme.muted; font.pixelSize: 10 }
-            NumericSetting { label: "Strength"; value: bindingPanel.binding.strength; onEdited: value => bindingPanel.set("strength",value) }
+            NumericSetting { visible:bindingPanel.binding.kind!=="SUBDIVISION"; label: "Strength"; value: bindingPanel.binding.strength; onEdited: value => bindingPanel.set("strength",value) }
             ShrinkwrapSettings { binding: bindingPanel.binding; visible: !!bindingPanel.binding.shrinkwrap }
+            NumericSetting { visible:bindingPanel.binding.kind==="SUBDIVISION"; label:"Simple subdivision levels"; decimals:0; minimum:0; maximum:5; value:bindingPanel.binding.subdivision || 0; onEdited:value=>authoring.edit("modifier.update",{binding:bindingPanel.binding.id,levels:Math.round(value)}) }
+            VectorSetting { visible:bindingPanel.binding.kind==="DISPLACE"; length:true; label:"Local displacement"; values:bindingPanel.binding.displacement || [0,0,0]; onEdited:values=>authoring.edit("modifier.update",{binding:bindingPanel.binding.id,offset:values}) }
             ColumnLayout {
                 visible: bindingPanel.binding.kind === "HOOK"; Layout.fillWidth: true
                 UiCombo { Layout.fillWidth: true; model: ["NONE","CURVE","SMOOTH","SPHERE","ROOT","SHARP","LINEAR","CONSTANT","INVERSE_SQUARE"]; currentIndex: model.indexOf(bindingPanel.binding.falloff); onActivated: bindingPanel.set("falloff",currentText) }
@@ -58,12 +65,13 @@ UiSection {
                     UiButton { text: "Reset"; onClicked: authoring.edit("hook.reset",{binding:bindingPanel.binding.id}) }
                 }
             }
-            UiCheck { text: "Invert weights"; checked: bindingPanel.binding.invert; onClicked: bindingPanel.set("invert",checked) }
+            UiCheck { visible:bindingPanel.binding.kind!=="SUBDIVISION"; text: "Invert weights"; checked: bindingPanel.binding.invert; onClicked: bindingPanel.set("invert",checked) }
             RowLayout {
+                visible:bindingPanel.binding.kind!=="SUBDIVISION"
                 UiNumberField { id: selectedWeight; value: 1; live: false; minimum: 0; maximum: 1; Accessible.name: "Selected weight"; Layout.fillWidth: true; onEdited: number=>value=number }
                 UiButton { text: "Set selected weight"; onClicked: authoring.weights(bindingPanel.binding.id,selectedWeight.value) }
             }
-            UiField { Layout.fillWidth: true; placeholderText: "Influence weights, comma separated"; text: bindingPanel.binding.weights.join(", "); onEditingFinished: bindingPanel.set("weights",text.trim()?text.split(",").map(Number):[]) }
+            UiField { visible:bindingPanel.binding.kind!=="SUBDIVISION"; Layout.fillWidth: true; placeholderText: "Influence weights, comma separated"; text: bindingPanel.binding.weights.join(", "); onEditingFinished: bindingPanel.set("weights",text.trim()?text.split(",").map(Number):[]) }
             RowLayout {
                 UiButton { text: "Up"; onClicked: bindingPanel.reorder(-1) }
                 UiButton { text: "Down"; onClicked: bindingPanel.reorder(1) }

@@ -105,7 +105,7 @@ def topology_signature(primitive: ResolvedPrimitive) -> tuple[Any, ...]:
     from anthroforge.core.construction import cyclic
 
     curves = tuple((c.id, cyclic(c, primitive)) for c in primitive.curves)
-    pieces = tuple((p.id, p.shape, p.sides) for p in primitive.pieces)
+    pieces = tuple((p.id, p.shape, p.sides, p.subdivision) for p in primitive.pieces)
     return (
         primitive.samples,
         primitive.strips,

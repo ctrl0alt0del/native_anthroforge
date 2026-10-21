@@ -14,7 +14,15 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.core.primitive_sampling import count
 from anthroforge.core.results import geometry_asset
-from anthroforge.native import bodies, components, path_editing, paths, segment_chain, shrinkwrap
+from anthroforge.native import (
+    bodies,
+    components,
+    geometry_modifiers,
+    path_editing,
+    paths,
+    segment_chain,
+    shrinkwrap,
+)
 from anthroforge.native import construction as native
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 from anthroforge.native.scene import entity_frame
@@ -69,6 +77,8 @@ class Evaluation:
         return points
 
     def apply_binding(self, points: Any, binding: Deformer, frame: Any) -> Any:
+        if binding.displacement is not None:
+            return geometry_modifiers.displace(self.engine, points, binding, self.cancel.handle)
         if binding.shrinkwrap:
             return self.wrap(points, binding, frame)
         control = self.document.control(binding.control)
@@ -140,7 +150,7 @@ class Evaluation:
         curve = next(c for c in definition.curves if c.id == piece.curve)
         closed = cyclic(curve, definition)
         samples_count = count(entity.primitive, piece.curve)
-        base = bodies.draft_base(self.engine, piece, samples_count, closed, self.cancel.handle)
+        base = self.body_base(piece, samples_count, closed)
         frame = native.matrix(self.engine, entity_frame(self.engine, entity), curve.matrix)
         original = base.array(0)
         points = self.deform(original, entity.deformers, "BASE", piece.id, frame)
@@ -148,6 +158,10 @@ class Evaluation:
             base = native.deformed(base, points, self.cancel.handle)
         bent = bodies.bend(base, samples, piece, closed, self.cancel.handle)
         return self.transform_mesh(bent, curve.matrix)
+
+    def body_base(self, piece: Any, samples: int, closed: bool) -> Mesh:
+        base = bodies.draft_base(self.engine, piece, samples, closed, self.cancel.handle)
+        return geometry_modifiers.subdivide(base, piece.subdivision, self.cancel.handle)
 
     def transform_mesh(self, mesh: Mesh, matrix: tuple[float, ...]) -> Mesh:
         if matrix == IDENTITY:
@@ -157,15 +171,18 @@ class Evaluation:
 
     def geometry(self, entity: SCP) -> Mesh:
         mesh = self.construct(entity)
-        original = mesh.array(0)
-        points = self.deform(
-            original, entity.deformers, "GEOMETRY", "", entity_frame(self.engine, entity)
-        )
-        if points is not original:
-            mesh = native.deformed(mesh, points, self.cancel.handle)
+        for binding in entity.deformers:
+            if applies(binding, "GEOMETRY", ""):
+                mesh = self.mesh_binding(mesh, binding, entity_frame(self.engine, entity))
         if entity.thickness and entity.thickness.enabled:
             mesh = native.solidify(mesh, entity.thickness, self.cancel.handle)
         return finalize(mesh, self.meshes.get(geometry_asset(entity)), self.cancel.handle)
+
+    def mesh_binding(self, mesh: Mesh, binding: Deformer, frame: Any) -> Mesh:
+        if binding.subdivision is not None:
+            return geometry_modifiers.subdivide(mesh, binding.subdivision, self.cancel.handle)
+        points = self.apply_binding(mesh.array(0), binding, frame)
+        return native.deformed(mesh, points, self.cancel.handle)
 
 
 def applies(binding: Deformer, stage: str, component: str) -> bool:

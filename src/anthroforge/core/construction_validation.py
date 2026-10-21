@@ -12,6 +12,8 @@ if TYPE_CHECKING:
 def target(item: SCP | Control, reference: Target, kind: str) -> None:
     if reference.owner != item.id:
         raise ValueError("Binding must belong to its target owner.")
+    if kind in ("SUBDIVISION", "DISPLACE") and reference.stage != "GEOMETRY":
+        raise ValueError("This modifier requires generated geometry.")
     if isinstance(item, Control):
         if item.kind != "LATTICE" or kind != "HOOK" or reference.stage != "LATTICE":
             raise ValueError("Lattice points support Hook bindings.")
@@ -46,7 +48,7 @@ def identities(item: SCP | Control) -> list[str]:
 
 
 def binding(item: SCP | Control, value: Deformer, controls: dict[str, Control]) -> None:
-    if not value.shrinkwrap and (
+    if value.kind in ("HOOK", "LATTICE") and (
         value.control not in controls or controls[value.control].kind != value.kind
     ):
         raise ValueError("Binding requires a shared control of the matching kind.")

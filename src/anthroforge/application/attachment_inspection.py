@@ -84,7 +84,10 @@ def anchors(
     try:
         key = geometry_asset(parent)
         handle = session.assets[key].mesh.handle if key else 0
-        points = anchor_points(session.engine, item, parent, handle)
+        reference = session.assets.get(item.attachment.material_asset)
+        points = anchor_points(
+            session.engine, item, parent, handle, reference.mesh.handle if reference else 0
+        )
         return dict(available=True, owner_world_metres=points[:3], support_world_metres=points[3:])
     except ValueError as error:
         return dict(available=False, reason=str(error))

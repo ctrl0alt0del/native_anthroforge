@@ -20,6 +20,9 @@ AF_API int af_attachment_goal_points(const double* frames,int count,const double
  * Output is a geometry-only lease for attachment evaluation, not display or spatial queries. */
 AF_API uint64_t af_material_binding_surface(uint64_t reference,uint64_t current,int count,const double* bindings,uint64_t cancel);
 AF_API int af_mesh_basis_sizes(uint64_t source,int64_t* sizes);
+AF_API int af_mesh_triangle_material_sizes(uint64_t source,int64_t* sizes);
+AF_API int af_mesh_triangle_material_copy(uint64_t source,int64_t* records,int64_t count,double* coordinates,int64_t size);
+AF_API uint64_t af_mesh_triangle_material_restore(uint64_t source,const int64_t* records,int64_t count,const double* coordinates,int64_t size,uint64_t cancel);
 AF_API int af_mesh_basis_copy(uint64_t source,int64_t* records,int64_t count,double* parameters,int64_t size);
 AF_API uint64_t af_mesh_basis_restore(uint64_t source,const int64_t* records,int64_t count,const double* parameters,int64_t size,uint64_t cancel);
 AF_API int af_material_binding_frames(uint64_t reference,uint64_t current,const double* world,int count,const double* records,double* frames,uint64_t cancel);

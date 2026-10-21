@@ -3,6 +3,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+AF_API uint64_t af_simple_subdivision(uint64_t source,int levels,uint64_t cancel);
+AF_API int af_displace(const double* points,int count,const double* offset,const double* weights,int invert,double strength,double* output,uint64_t cancel);
 /* Bézier records: position, left, right, radius, tilt, left/right mode (13 doubles).
  * Samples: position, tangent, normal, radius, tilt (11 doubles). */
 AF_API int af_curve_sample(const double* points, int count, int closed, int resolution,

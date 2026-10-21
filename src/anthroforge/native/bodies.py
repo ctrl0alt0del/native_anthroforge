@@ -12,6 +12,9 @@ from .mesh import D, GeometryEngine, Mesh, U, doubles, pointer
 
 
 def configure(engine: GeometryEngine) -> None:
+    from .geometry_modifiers import configure as configure_modifiers
+
+    configure_modifiers(engine)
     from .segment_chain import configure as configure_chain
 
     configure_chain(engine)

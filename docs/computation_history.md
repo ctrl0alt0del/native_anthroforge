@@ -60,6 +60,35 @@ and full release validation are still pending; these tests do not establish shap
 
 ### Meshes, primitives and deformers
 
+### CH-028 — Segment construction and Boolean material identity (2026-10-21)
+
+The previous body primitive could not express the approved node-group controls.
+Segment Chain now constructs circular, capped segments natively from lengths, radii,
+bends, spread and an AUTO radius profile. Adjacent-pair bending reproduces the source;
+cumulative bending is explicit. Exact exterior union uses the existing CGAL adapter.
+G10 is owned by `native/src/segment_chain.cpp`; `test_segment_chain.py` compares
+Blender Index/Big_Toe raw output, including zero-length profile behavior.
+
+Union triangle numbers change with parameters. New per-triangle provenance stores
+original triangle identity and barycentric coordinates at each output corner,
+avoiding ambiguous shared-vertex identity at seams. Attachment frames follow that
+material location; a location newly covered by the union fails explicitly rather
+than silently selecting another face. SCP bindings now retain their capture resource
+alongside Fiber/Anchor bindings. Provenance survives deformation, refinement, shell
+construction, saving and normal resource ownership. Numerical work remains native.
+Evidence: changed-triangulation, child attachment, round-trip and deformation tests
+pass; full checkpoint suite 1,635 passed. Final migration geometry acceptance pending.
+
+### CH-029 — Explicit subdivision and local displacement (2026-10-21)
+
+The scapula requires Simple subdivision before Shrinkwrap and local-Z displacement
+afterward. Baking either into the source would hide approved editable stages.
+G11 uses native linear face/edge subdivision and weighted constant local displacement
+in the ordered modifier stack, followed by existing thickness. Body bases can also
+be refined before their BASE lattice. Topology edits use shared attachment locks;
+estimates account for refinement growth. Compact Blender subdivision coordinates,
+ordered stage persistence and topology locking pass. Source scapula parity pending.
+
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
 | G01 | Mesh import: parse OBJ/STL/PLY, convert units/axes and construct owned canonical mesh data. | [mesh_io.cpp](../native/src/mesh_io.cpp) | [import formats](../tests/test_import_formats.py) |

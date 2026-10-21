@@ -113,6 +113,7 @@ ColumnLayout {
         NumericSetting { length: true; label: "Fixed length"; value: panel.piece.length || 1; enabled: !panel.piece.fit; onEdited: value => panel.pieceSetting("length",value) }
         NumericSetting { length: true; label: "Position along curve"; value: panel.piece.position || 0; onEdited: value => panel.pieceSetting("position",value) }
         NumericSetting { label: "Radial sides"; value: panel.piece.sides || 16; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.pieceSetting("sides",Math.round(value)) }
+        NumericSetting { label:"Base subdivision"; value:panel.piece.subdivision || 0; decimals:0; minimum:0; maximum:5; enabled:!panel.topologyLocked; onEdited:value=>panel.pieceSetting("subdivision",Math.round(value)) }
     }
     SegmentChainInspector { visible: panel.primitive.kind === "SEGMENT_CHAIN"; item: panel.item; topologyLocked: panel.topologyLocked }
     DeformerStack { visible: !panel.item.standalone; item: panel.item }

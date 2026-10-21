@@ -39,7 +39,7 @@ def replacement_parent(session: "Session", item: SCP, has_children: bool) -> SCP
 
 def promoted(item: SCP, parent: SCP) -> SCP:
     mode = item.attachment.parent_mode if geometry_asset(parent) else "OBJECT_ORIGIN"
-    settings = replace(item.attachment, parent_mode=mode, binding=())
+    settings = replace(item.attachment, parent_mode=mode, binding=(), material_asset="")
     return replace(
         item,
         parent=parent.id,

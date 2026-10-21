@@ -24,6 +24,8 @@ def inputs(binding: Any) -> set[Port]:
     if binding.shrinkwrap:
         surface = binding.shrinkwrap.surface
         return {port(surface), Port(surface.target, "pose")}
+    if not binding.control:
+        return set()
     return {Port(binding.control, "cage" if binding.kind == "LATTICE" else "control")}
 
 

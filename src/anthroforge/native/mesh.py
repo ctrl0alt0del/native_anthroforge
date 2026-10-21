@@ -139,10 +139,11 @@ class GeometryEngine(NativeEngine):
         self.bind("af_pick", [U, D, D, D, D])
         self.bind("af_capture", [U, U, D, D, D, D, c.c_int, c.c_int, c.c_int, c.c_int, D])
         self.bind("af_move_origin", [D, D, D, D, D])
-        self.bind("af_anchor_points", [U, D, D, D, D, D])
+        self.bind("af_anchor_points", [U, D, D, D, D, D, U])
         ints = c.POINTER(c.c_int)
         self.bind(
-            "af_propagate", [c.c_int, c.POINTER(U), ints, D, D, D, ints, ints, ints, ints, ints, U]
+            "af_propagate",
+            [c.c_int, c.POINTER(U), ints, D, D, D, ints, ints, ints, ints, ints, U, c.POINTER(U)],
         )
 
     def check(self, status: int) -> None:

@@ -68,6 +68,9 @@ int af_material_binding_frames(uint64_t reference,uint64_t current,const double*
     try {
         if(count<1||count>1000000||!world||!records||!frames) throw std::runtime_error("Invalid material frame buffers.");
         const auto a=af::mesh(reference),b=af::mesh(current);
+        if(a->triangle_material.source_count||b->triangle_material.source_count) {
+            af::triangle_material::frames(*a,*b,Eigen::Map<const af::M4>(world),count,records,frames,cancel); return 0;
+        }
         const auto first=af::material_basis(*a),second=af::material_basis(*b);
         if(!first.count||!second.count||af::same_basis(first,second))
             return af::material::retained_frames(reference,current,world,count,records,frames,cancel);

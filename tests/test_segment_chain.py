@@ -62,3 +62,29 @@ def test_union_returns_closed_nonempty_geometry():
     faces = mesh.array(3)
     edges = np.sort(np.concatenate((faces[:, [0, 1]], faces[:, [1, 2]], faces[:, [2, 0]])), axis=1)
     assert np.all(np.unique(edges, axis=0, return_counts=True)[1] == 2)
+
+
+def test_segment_sides_and_caps_have_consistent_outward_winding():
+    mesh = construct(GeometryEngine(), SegmentChain((Segment(),), unite=False), 0)
+    faces = mesh.array(3)
+    edges = np.concatenate((faces[:, [0, 1]], faces[:, [1, 2]], faces[:, [2, 0]]))
+    assert len(np.unique(edges, axis=0)) == len(edges)
+    points = mesh.array(0)[faces]
+    volume = np.einsum("ij,ij->i", points[:, 0], np.cross(points[:, 1], points[:, 2])).sum() / 6
+    assert volume > 0
+
+
+def test_union_preserves_every_segment_extent_and_disabled_zero_radius():
+    settings = SegmentChain((Segment(), Segment(0, 0), Segment(bend=0.4)))
+    output = construct(GeometryEngine(), settings, 0)
+    reference = construct(
+        output.engine,
+        replace(settings, unite=False, segments=(settings.segments[0], settings.segments[2])),
+        0,
+    )
+    np.testing.assert_allclose(
+        output.array(0).min(axis=0), reference.array(0).min(axis=0), atol=1e-7
+    )
+    np.testing.assert_allclose(
+        output.array(0).max(axis=0), reference.array(0).max(axis=0), atol=1e-7
+    )

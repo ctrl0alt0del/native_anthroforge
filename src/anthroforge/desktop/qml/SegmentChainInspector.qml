@@ -23,7 +23,7 @@ UiSection {
     UiCombo { Layout.fillWidth:true; model:["Adjacent bend pairs","Cumulative bends"]; currentIndex:panel.chain.bend_mode==="CUMULATIVE"?1:0; onActivated:panel.configure("bend_mode",currentIndex===1?"CUMULATIVE":"ADJACENT") }
     UiCombo { id:segmentChoice; objectName:"segmentChoice"; Layout.fillWidth:true; model:panel.segments.map((s,i)=>"Segment "+(i+1)) }
     NumericSetting { objectName:"segmentLength"; label:"Length"; length:true; minimum:0; value:panel.segment.length || 0; onEdited:value=>panel.setSegment("length",value) }
-    NumericSetting { objectName:"segmentRadius"; label:"Radius"; length:true; minimum:0.000001; value:panel.segment.radius || .05; onEdited:value=>panel.setSegment("radius",value) }
+    NumericSetting { objectName:"segmentRadius"; label:"Radius"; length:true; minimum:panel.segment.length>0?0.000001:0; value:panel.segment.radius ?? .05; onEdited:value=>panel.setSegment("radius",value) }
     NumericSetting { objectName:"segmentBend"; label:"Bend · degrees"; value:(panel.segment.bend || 0)*180/Math.PI; onEdited:value=>panel.setSegment("bend",value*Math.PI/180) }
     UiSection {
         title:"Construction settings"; expanded:false

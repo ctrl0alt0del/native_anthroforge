@@ -77,7 +77,13 @@ than silently selecting another face. SCP bindings now retain their capture reso
 alongside Fiber/Anchor bindings. Provenance survives deformation, refinement, shell
 construction, saving and normal resource ownership. Numerical work remains native.
 Evidence: changed-triangulation, child attachment, round-trip and deformation tests
-pass; full checkpoint suite 1,635 passed. Final migration geometry acceptance pending.
+pass; full checkpoint suite 1,635 passed. Full source migration comparison then
+exposed reversed segment side winding relative to the caps, which made exterior
+classification discard whole segments. Side winding now follows Blender's
+Curve-to-Mesh topology. Directed-edge and positive-volume tests cover the defect;
+all ten source final digit surfaces agree within approximately 2e-6 scene units.
+Zero radius is permitted only for a disabled zero-length segment. Final whole-file
+visual and attachment acceptance is still pending.
 
 ### CH-029 — Explicit subdivision and local displacement (2026-10-21)
 
@@ -88,6 +94,10 @@ in the ordered modifier stack, followed by existing thickness. Body bases can al
 be refined before their BASE lattice. Topology edits use shared attachment locks;
 estimates account for refinement growth. Compact Blender subdivision coordinates,
 ordered stage persistence and topology locking pass. Source scapula parity pending.
+The migration also exposed an independent BODY closure error: fixed-length pieces
+on closed guides inherited closed body topology. Only whole-guide fitted bodies
+close now; a fixed-length piece retains its caps while its path distance can wrap.
+The regression checks its spherical (rather than toroidal) mesh topology.
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |

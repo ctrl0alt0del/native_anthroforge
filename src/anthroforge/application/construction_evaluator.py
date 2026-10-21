@@ -150,7 +150,7 @@ class Evaluation:
         curve = next(c for c in definition.curves if c.id == piece.curve)
         closed = cyclic(curve, definition)
         samples_count = count(entity.primitive, piece.curve)
-        base = self.body_base(piece, samples_count, closed)
+        base = self.body_base(piece, samples_count, closed and piece.fit)
         frame = native.matrix(self.engine, entity_frame(self.engine, entity), curve.matrix)
         original = base.array(0)
         points = self.deform(original, entity.deformers, "BASE", piece.id, frame)

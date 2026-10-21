@@ -17,8 +17,8 @@ class Segment:
     def __post_init__(self) -> None:
         if not all(map(isfinite, (self.length, self.radius, self.bend))):
             raise ValueError("Segment dimensions and angles must be finite.")
-        if self.length < 0 or self.radius <= 0:
-            raise ValueError("Segment length is nonnegative and radius must be positive.")
+        if self.length < 0 or self.radius < 0 or (self.length > 0 and self.radius == 0):
+            raise ValueError("Dimensions are nonnegative; a nonempty segment needs positive radius.")
         if not integer(self.samples, 2, 256) or not integer(self.sides, 3, 128):
             raise ValueError("Segment resolution exceeds supported bounds.")
 

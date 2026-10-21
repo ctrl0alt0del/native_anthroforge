@@ -64,6 +64,22 @@ retained-anchor overlay adapter still needs its fresh native build and check.
 
 ## Next actions and blockers
 
+Migration work is now under the adjacent external `scp_migration_v001` folder.
+The reproducible builder creates all 59 entries (33 originals and 26 independent
+counterparts), with no imported-final fallback. `candidate.anthroforge` is **not
+accepted/delivered**: initial construction is complete, but anatomy bindings,
+visual refinement and interactive/package qualification remain.
+Per-stage Blender capture and two-way native nearest-surface comparisons exposed
+reversed Segment Chain side winding; corrected to agree with caps. All ten final
+digit shapes now agree within ~2e-6 scene units, including Thumb's disabled
+zero-length/zero-radius segment. Fixed-length bodies on cyclic guides retain caps.
+Rib source GN double placement is explicit in consumer/control frames; connected
+loft seams differ intentionally. Scapula follows the live rib result. Ilium uses
+the shared pelvic guide plus a dense editable BASE cage; its current maximum
+surface discrepancy is ~0.0334 (diagonal ~4.77), not yet shape acceptance.
+The new comparison renders required correcting camera mode/fit; only inspect
+re-rendered full-frame views. External artifacts must be retained across recovery.
+
 1. Extend typed definitions and owning reference/dependency/persistence boundaries.
 2. Native kernels plus compact Blender 5.0.1 parity fixtures and shared UI/API controls.
 3. One-off migration and per-SCP numerical/visual comparison; resolve actual mismatches.

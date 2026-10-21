@@ -7,7 +7,8 @@ namespace af::chain {
 struct Segment { double length,radius,bend; int samples,sides; };
 static Segment segment(const double* values) {
     Segment result{values[0],values[1],values[2],int(values[3]),int(values[4])};
-    if(!Eigen::Map<const Eigen::Matrix<double,5,1>>(values).allFinite()||result.length<0||result.radius<=0)
+    if(!Eigen::Map<const Eigen::Matrix<double,5,1>>(values).allFinite()||result.length<0||result.radius<0||
+       (result.length>0&&result.radius==0))
         throw std::runtime_error("Invalid segment dimensions.");
     if(result.samples<2||result.samples>256||result.sides<3||result.sides>128)
         throw std::runtime_error("Invalid segment resolution.");
@@ -47,6 +48,7 @@ static void rings(Points& points,const Segment& segment,const V3& start,const V3
 }
 static void topology(Faces& faces,const Segment& segment,int offset) {
     auto local=grid_faces(segment.samples,segment.sides,true);
+    for(auto& face:local) std::reverse(face.begin(),face.end());
     std::vector<int64_t> first,last;
     for(int i=0;i<segment.sides;++i) {
         first.push_back(segment.sides-1-i);

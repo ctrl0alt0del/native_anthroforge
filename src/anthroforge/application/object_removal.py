@@ -66,6 +66,9 @@ def require_unbound(session: "Session", target: str) -> None:
     for item in session.document.objects:
         if target in targets(item):
             raise ValueError("Rebind dependent anatomy before deleting its target: " + item.name)
+    for entity in session.document.entities:
+        if any(b.shrinkwrap and b.shrinkwrap.surface.target == target for b in entity.deformers):
+            raise ValueError("Remove or retarget dependent Shrinkwrap first: " + entity.name)
 
 
 def retain_object(

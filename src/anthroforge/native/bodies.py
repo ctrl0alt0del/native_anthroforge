@@ -12,6 +12,12 @@ from .mesh import D, GeometryEngine, Mesh, U, doubles, pointer
 
 
 def configure(engine: GeometryEngine) -> None:
+    from .geometry_modifiers import configure as configure_modifiers
+
+    configure_modifiers(engine)
+    from .segment_chain import configure as configure_chain
+
+    configure_chain(engine)
     engine.bind("af_curve_path", [D, c.c_int, c.c_int, c.c_int, D, c.POINTER(c.c_int), U])
     base_args = [c.c_int, c.c_int, c.c_int, c.c_double, c.c_double, c.c_double, c.c_int, U]
     engine.bind("af_body_base", base_args, U)

@@ -18,6 +18,7 @@ from . import (
     evaluation,
     fiber_bindings,
     fiber_operations,
+    geometry_modifiers,
     image_operations,
     image_presentation,
     importing,
@@ -31,6 +32,8 @@ from . import (
     point_operations,
     presentation,
     projects,
+    segment_operations,
+    shrinkwrap_operations,
     snap_tasks,
     surface_branch_operations,
     surface_grouping,
@@ -54,6 +57,13 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "chain.configure": segment_operations.configure,
+    "chain.segment": segment_operations.segment,
+    "chain.resize": segment_operations.resize,
+    "shrinkwrap.add": shrinkwrap_operations.add,
+    "modifier.add": geometry_modifiers.add,
+    "modifier.update": geometry_modifiers.update,
+    "shrinkwrap.update": shrinkwrap_operations.update,
     "surface.snap.curves": snap_tasks.confirm,
     "surface.snap.points": snap_tasks.confirm_samples,
     "tissue.preview.accept": tissue_preview.accept,

@@ -154,7 +154,7 @@ class Authoring(QObject):
 
     @Slot(bool)
     def setEditing(self, enabled):
-        self.editing = enabled
+        self.editing = enabled and state.component_editing(state.curve_context.owner(self))
         self.selection = []
         self.refresh()
 
@@ -213,7 +213,7 @@ class Authoring(QObject):
             kind=kind,
             shape=shape,
             parent=self.parent_scp(),
-            name="Loft" if kind == "LOFT" else shape.title(),
+            name={"LOFT": "Loft", "SEGMENT_CHAIN": "Segment chain"}.get(kind, shape.title()),
         )
         return args
 

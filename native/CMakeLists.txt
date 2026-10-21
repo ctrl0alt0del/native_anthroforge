@@ -6,8 +6,8 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/inspection_goals.cpp
     src/surface_query.cpp src/surface_query_closure.cpp src/surface_query_reuse.cpp
     src/mesh_registry.cpp src/transforms.cpp src/spatial.cpp src/ray_queries.cpp src/surface_snap.cpp src/attachment.cpp src/material_domain.cpp src/material_axes.cpp
-    src/construction_mesh.cpp src/curves.cpp src/loft.cpp src/curve_body.cpp
-    src/hooks.cpp src/lattices.cpp src/solidify.cpp src/component_queries.cpp src/curve_deform.cpp
+    src/construction_mesh.cpp src/curves.cpp src/loft.cpp src/curve_body.cpp src/segment_chain.cpp
+    src/hooks.cpp src/lattices.cpp src/shrinkwrap.cpp src/simple_subdivision.cpp src/solidify.cpp src/component_queries.cpp src/curve_deform.cpp
     src/mesh_topology.cpp src/mesh_equivalence.cpp src/curve_frames.cpp src/curve_mapping.cpp src/component_index.cpp
     src/curve_queries.cpp src/influence.cpp src/control_geometry.cpp src/measurement.cpp
     src/path_registry.cpp src/path_presentation.cpp src/image.cpp src/image_placement.cpp
@@ -30,7 +30,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/tissue_masks.cpp src/tissue_source_normals.cpp src/tissue_constraints.cpp
     src/material_binding.cpp src/material_binding_index.cpp src/material_binding_query.cpp
     src/material_basis.cpp src/material_chart.cpp src/material_chart_query.cpp src/material_binding_frames.cpp
-    src/material_cage.cpp src/material_mean_value.cpp
+    src/material_cage.cpp src/material_mean_value.cpp src/triangle_material.cpp src/triangle_material_frames.cpp
     src/tissue_relaxation.cpp src/tissue_geometric.cpp src/tissue_static.cpp src/tissue_point_relaxation.cpp
     src/stacking.cpp src/stacking_normal_support.cpp src/tissue_stacking.cpp src/tissue_stack_material.cpp
     src/tissue_stack_directions.cpp src/tissue_stack_geometry.cpp src/tissue_stack_constraints.cpp

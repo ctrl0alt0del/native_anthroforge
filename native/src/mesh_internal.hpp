@@ -2,6 +2,7 @@
 #include "anthroforge/mesh.h"
 #include "tissue_domain.hpp"
 #include "material_basis.hpp"
+#include "triangle_material.hpp"
 #if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic push
 // Eigen's FromTwoVectors computes full V before reading its SVD nullspace.
@@ -37,6 +38,7 @@ struct Mesh {
     std::vector<double> material_pins;
     TissueDomain tissue;
     MaterialBasis basis;
+    TriangleMaterial triangle_material;
     // Transient query copies retain their original surface; never document assets.
     std::shared_ptr<Mesh> query_source;
     std::vector<int64_t> query_faces;

@@ -1,0 +1,10 @@
+[
+  {"id":"chain","operation":"primitive.create","arguments":{"kind":"SEGMENT_CHAIN","name":"Articulated chain"}},
+  {"operation":"chain.segment","arguments":{"entity":"$chain","index":1,"length":0.4,"bend":0.5}},
+  {"operation":"wait","arguments":{}},
+  {"id":"plate","operation":"primitive.create","arguments":{"kind":"LOFT","name":"Wrapped plate","parent":"$chain"}},
+  {"id":"refine","operation":"modifier.add","arguments":{"entity":"$plate","kind":"SUBDIVISION","levels":2}},
+  {"id":"wrap","operation":"shrinkwrap.add","arguments":{"target":{"owner":"$plate"},"surface":"$chain","offset":0.01}},
+  {"operation":"wait","arguments":{}},
+  {"operation":"save","arguments":{"path":"segment-chain.anthroforge","blocked_policy":"wait"}}
+]

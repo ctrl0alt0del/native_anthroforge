@@ -21,6 +21,7 @@ void copy_material(const Mesh& source,Mesh& target) {
     target.material_pins=source.material_pins;
     target.tissue=source.tissue;
     target.basis=source.basis;
+    target.triangle_material=source.triangle_material;
 }
 static void copy_topology(const Mesh& source,Mesh& target) {
     target.triangles=source.triangles;

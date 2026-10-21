@@ -34,3 +34,32 @@ The scene fixtures embed source paths and SHA-256 identifiers. Synthetic fixture
 record their Blender version/build. Comparison tolerances and exercised options are
 explicit in test_primitive_parity.py, test_curve_parity.py and test_anatomy_primitives.py.
 Passing those cases qualifies the stated coverage, not every possible Blender scene.
+
+Nearest-surface Shrinkwrap uses Blender 5.0.1
+`source/blender/blenkernel/intern/shrinkwrap.cc` (`shrinkwrap_snap_with_side` and
+nearest-surface coordinate/weight semantics), adapted to owned libigl mesh trees.
+Source: https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenkernel/intern/shrinkwrap.cc
+Blender Authors, GPL-2.0-or-later; adaptation GPL-3.0-or-later.
+`tools/capture_shrinkwrap.py` and `blender501_shrinkwrap.json` pin 24 weighted,
+nonuniform-transform and signed-offset cases across four nearest-surface snap modes.
+Ray projection, target-normal projection and smooth-normal Above Surface are not
+claimed by this nearest-surface adapter.
+# Segment Chain
+
+The generic parameter-driven primitive reproduces the saved FingerNodes geometry
+graphs from Blender 5.0.1: straight path resampling, Z-up Curve-to-Mesh frames,
+filled circular profiles, and AUTO CurveMapping radius profiles. Adjacent-pair
+bending preserves the source graph; cumulative bending is an explicit option.
+Zero-length source segments retain per-sample radius scaling before union.
+Union uses the existing native exact exterior-arrangement implementation.
+`tools/capture_segment_chain.py` records node output without saving the source file;
+the compact Index/Big_Toe fixtures retain its hash and source parameters.
+
+
+Segment Chain side/cap winding follows Blender 5.0.1
+[Curve-to-Mesh](https://github.com/blender/blender/blob/v5.0.1/source/blender/blenkernel/intern/curve_to_mesh_convert.cc).
+Linear subdivision uses face averages and edge midpoints. Quad Simple subdivision is
+reference-tested; higher-level nonplanar n-gon OpenSubdiv behavior is not equivalent
+and is not claimed as such. The migrated scapula/base stages use quads. Constant local
+vector displacement reproduces the source's no-texture local-axis stage, not Blender's
+complete texture displacement feature set. No OpenSubdiv library was added.

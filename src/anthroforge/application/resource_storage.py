@@ -14,6 +14,7 @@ from anthroforge.native import (
     paths,
     tissue_domain,
     topology,
+    triangle_material,
 )
 from anthroforge.native.binding_batches import BindingBatch
 from anthroforge.native.mesh import GeometryEngine
@@ -89,6 +90,12 @@ def write_basis(archive: zipfile.ZipFile, key: str, asset: Asset) -> None:
         ("basis", "basis_parameters"), material_basis.arrays(asset.mesh), strict=True
     ):
         write_array(archive, f"assets/{key}/{label}.npy", values)
+    for label, values in zip(
+        ("triangle_material", "triangle_coordinates"),
+        triangle_material.arrays(asset.mesh),
+        strict=True,
+    ):
+        write_array(archive, f"assets/{key}/{label}.npy", values)
 
 
 def read_mesh(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> Asset:
@@ -110,7 +117,17 @@ def read_basis(archive: zipfile.ZipFile, key: str, mesh: Any) -> Any:
     rows = [
         read_array(archive, f"assets/{key}/{kind}.npy") for kind in ("basis", "basis_parameters")
     ]
-    return material_basis.restore(mesh, *rows)
+    return read_triangle_material(archive, key, material_basis.restore(mesh, *rows))
+
+
+def read_triangle_material(archive: zipfile.ZipFile, key: str, mesh: Any) -> Any:
+    if f"assets/{key}/triangle_material.npy" not in archive.namelist():
+        return mesh
+    rows = [
+        read_array(archive, f"assets/{key}/{kind}.npy")
+        for kind in ("triangle_material", "triangle_coordinates")
+    ]
+    return triangle_material.restore(mesh, *rows)
 
 
 def read_path(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> PathAsset:

@@ -10,6 +10,8 @@ static bool same_geometry(const Mesh& a,const Mesh& b,uint64_t cancel) {
 }
 static bool same_material(const Mesh& a,const Mesh& b) {
     return a.material==b.material&&a.material_axes==b.material_axes&&a.material_pins==b.material_pins
+        &&a.triangle_material.source_count==b.triangle_material.source_count
+        &&a.triangle_material.origins==b.triangle_material.origins&&a.triangle_material.coordinates==b.triangle_material.coordinates
         &&tissue_records(a.tissue)==tissue_records(b.tissue)&&a.tissue.weights==b.tissue.weights&&same_basis(a.basis,b.basis);
 }
 }

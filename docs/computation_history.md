@@ -1083,3 +1083,99 @@ for artifact identity, UI checks and evidence limits.
   scene; copied snapshot activation peaked at 33.498 ms. This is bounded but can cause a
   visible hitch on dense support diagrams. No general frame-rate claim is made. Subsequent
   optimization should target overlay projection/transport, not the stacking solver.
+
+### CH-027 — Editable target-driven Shrinkwrap (2026-10-21)
+
+Previously the application supported only Hook and Lattice deformation; importing
+the already wrapped scapula would lose its live rib relationship. The user rejected
+that approach. The native nearest-surface adapter now consumes accepted target geometry
+through explicit surface roles. Target pose and geometry are separate declared inputs;
+existing revision guards, scheduling, undo, resource snapshots and failure retention
+remain authoritative. Copies remap internal targets and retain external references.
+Source formulas and provenance are in `native/migration/BLENDER_PRIMITIVES.md`.
+Evidence: 24 Blender 5.0.1 weighted/transform/offset reference cases and focused
+application lifecycle checks passed. Both scapulae now use the raw source plate and
+live rib target in the delivered assembly. Their local deviations are documented below;
+source and native shapes were inspected separately from API success.
+
+### CH-028 — Segment construction and Boolean material identity (2026-10-21)
+
+The previous body primitive could not express the approved node-group controls.
+Segment Chain now constructs circular, capped segments natively from lengths, radii,
+bends, spread and an AUTO radius profile. Adjacent-pair bending reproduces the source;
+cumulative bending is explicit. Exact exterior union uses the existing CGAL adapter.
+G10 is owned by `native/src/segment_chain.cpp`; `test_segment_chain.py` compares
+Blender Index/Big_Toe raw output, including zero-length profile behavior.
+
+Union triangle numbers change with parameters. New per-triangle provenance stores
+original triangle identity and barycentric coordinates at each output corner,
+avoiding ambiguous shared-vertex identity at seams. Attachment frames follow that
+material location; a location newly covered by the union fails explicitly rather
+than silently selecting another face. SCP bindings now retain their capture resource
+alongside Fiber/Anchor bindings. Provenance survives deformation, refinement, shell
+construction, saving and normal resource ownership. Numerical work remains native.
+Evidence: changed-triangulation, child attachment, round-trip and deformation tests
+pass; full checkpoint suite 1,635 passed. Full source migration comparison then
+exposed reversed segment side winding relative to the caps, which made exterior
+classification discard whole segments. Side winding now follows Blender's
+Curve-to-Mesh topology. Directed-edge and positive-volume tests cover the defect;
+all ten source final digit surfaces agree within approximately 2e-6 scene units.
+Zero radius is permitted only for a disabled zero-length segment. Full-file visual
+comparison, retained attachments, independent counterpart edits and undo now pass.
+
+### CH-029 — Explicit subdivision and local displacement (2026-10-21)
+
+The scapula requires Simple subdivision before Shrinkwrap and local-Z displacement
+afterward. Baking either into the source would hide approved editable stages.
+G11 uses native linear face/edge subdivision and weighted constant local displacement
+in the ordered modifier stack, followed by existing thickness. Body bases can also
+be refined before their BASE lattice. Topology edits use shared attachment locks;
+estimates account for refinement growth. Compact Blender subdivision coordinates,
+ordered stage persistence and topology locking pass. The migrated scapulae preserve
+the stage sequence; their target differs intentionally at connected rib seams. Native
+subdivision is qualified against Blender Simple for the migration's quad stages, not
+higher-level nonplanar n-gons. Ilium instead fits its editable cage against captured
+Blender pre-bend cap surfaces; earlier coarse/native-n-gon fits were rejected.
+The migration also exposed an independent BODY closure error: fixed-length pieces
+on closed guides inherited closed body topology. Only whole-guide fitted bodies
+close now; a fixed-length piece retains its caps while its path distance can wrap.
+The regression checks its spherical (rather than toroidal) mesh topology.
+
+
+### CH-030 — Dependency-safe pose batches (2026-10-21)
+
+Whole-document evaluation of the 59-SCP migration stalled with 52 queued jobs.
+The output graph was acyclic, but a single pose batch waited for geometry whose
+controls required a pose from that same batch. Attachment admission now partitions
+outputs at intervening non-pose dependency stages, retaining batching of direct
+pose chains. The coordinator still owns reservations, dispatch capture, cancellation
+and publication; no dependency is ignored. Existing cycle failures remain explicit.
+Regression coverage includes simple batch retention, pose/geometry chains and real
+cycles. The migrated file now completes full evaluation, shared-hook edits,
+independent opposite-side chain edits, undo and save/reopen. Maximum placement
+change during binding establishment was 3.4e-7 scene units.
+
+Generated Segment Chain vertex membership changes under its exact union and disabled
+segments. Indexed/weighted final-geometry bindings are rejected at document validation;
+whole-target deformers and Hook-weighted lattice cages remain available. Material
+attachments continue using triangle provenance. This does not enable direct mesh editing.
+
+
+Migration qualification for CH-027-030: all 59 entries (33 originals, 26 independent
+counterparts) complete evaluation. Approved mesh imports and raw pre-deformation sources
+are explicit; no rejected native construction falls back to a final mesh. The 20 native
+digit chains agree with source surface samples within approximately 2e-6 scene units.
+Ilium maximum/mean/p95 deviation is 0.01143/0.000394/0.002249 (source diagonal 4.77),
+with the broad rim/underside retained. Rounded spine and connected rib seams are approved
+construction differences. Ribs max/mean deviation is 0.12168/0.01210; live scapula target
+response max/mean is 0.09459/0.01854. These are two-way vertex-to-surface measurements,
+not continuous Hausdorff bounds. The comparison page contains original and opposite-side
+front/side images. Startup attachment reevaluation changes geometry by less than 1e-12.
+
+Separate ownership review: typed definitions and relationship policies remain in core;
+commands share validation/transactions; native C++ owns geometry, union and material
+queries; the existing coordinator owns execution and publication. Lazy worker mesh views
+avoid constructing wrappers for unrelated assets per Shrinkwrap call. The desktop value
+adapter recursively converts identity-free typed settings while retaining identity-bearing
+incremental records; actual visible-field tests caught and fixed missing parameter values.
+See the task and development validation records for final gate/package evidence and limits.

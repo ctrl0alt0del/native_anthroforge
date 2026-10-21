@@ -56,6 +56,19 @@ def test_reordering_and_removing_records_preserves_retained_identity():
     assert app
 
 
+def test_unidentified_typed_value_records_reach_qml_as_owned_values():
+    from anthroforge.core.segment_chain import Segment, SegmentChain
+
+    app = QCoreApplication.instance() or QCoreApplication([])
+    projection = PropertyProjection()
+    projection.synchronize(dict(chain=SegmentChain((Segment(length=0.7),))))
+    segments = projection.value("chain").value("segments")
+    assert segments[0]["length"] == 0.7
+    projection.synchronize(dict(chain=SegmentChain((Segment(length=0.9),))))
+    assert projection.value("chain").value("segments")[0]["length"] == 0.9
+    assert segments[0]["length"] == 0.7 and app
+
+
 def test_command_projection_is_owned_snapshot_with_nested_values():
     from anthroforge.desktop.controller_actions import command_values
 

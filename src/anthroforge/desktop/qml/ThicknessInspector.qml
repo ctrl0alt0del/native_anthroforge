@@ -25,7 +25,7 @@ UiSection {
         UiCheck { text: "Angle clamp"; checked: panel.settings.angle_clamp || false; onClicked: panel.set("angle_clamp",checked) }
         NumericSetting { label: "Minimum weighted thickness"; value: panel.settings.minimum || 0; onEdited: value => panel.set("minimum",value) }
         UiCheck { text: "Invert weights"; checked: panel.settings.invert || false; onClicked: panel.set("invert",checked) }
-        UiField { Layout.fillWidth: true; placeholderText: "Vertex weights, comma separated"; text: (panel.settings.weights || []).join(", "); onEditingFinished: panel.set("weights",text.trim()?text.split(",").map(Number):[]) }
+        UiField { visible:panel.item.stable_geometry_members !== false; Layout.fillWidth: true; placeholderText: "Vertex weights, comma separated"; text: (panel.settings.weights || []).join(", "); onEditingFinished: panel.set("weights",text.trim()?text.split(",").map(Number):[]) }
         UiButton { text: "Remove thickness"; enabled: !panel.topologyLocked; Layout.fillWidth: true; onClicked: authoring.edit("thickness.update",{entity:panel.item.id,remove:true}) }
     }
 }

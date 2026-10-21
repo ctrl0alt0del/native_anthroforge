@@ -11,6 +11,8 @@ from .curve_uses import CurveUse
 from .entities import IDENTITY, validate_matrix
 from .objects import ConstructionObject
 from .results import ControlResult
+from .segment_chain import SegmentChain
+from .shrinkwrap import Shrinkwrap
 
 
 def identity() -> str:
@@ -105,6 +107,7 @@ class BodyPiece:
     length: float = 1.0
     position: float = 0.0
     sides: int = 16
+    subdivision: int = 0
 
     def __post_init__(self) -> None:
         if self.shape not in ("BOX", "CYLINDER", "CAPSULE"):
@@ -113,6 +116,12 @@ class BodyPiece:
             raise ValueError("Body dimensions must be positive and finite.")
         if not isfinite(self.position) or not integer(self.sides, 3, 256):
             raise ValueError("Invalid body position or radial resolution.")
+        if not integer(self.subdivision, 0, 5):
+            raise ValueError("Body base subdivision must be between zero and five.")
+
+
+def body_closed(piece: BodyPiece, curve: Curve, primitive: "PrimitiveParameters") -> bool:
+    return piece.fit and cyclic(curve, primitive)
 
 
 @dataclass(frozen=True, slots=True)
@@ -125,10 +134,13 @@ class PrimitiveParameters:
     start: float = 0.0
     span: float = 1.0
     caps: bool = False
+    chain: SegmentChain | None = None
 
     def __post_init__(self) -> None:
-        if self.kind not in ("IMPORTED", "LOFT", "BODY"):
+        if self.kind not in ("IMPORTED", "LOFT", "BODY", "SEGMENT_CHAIN"):
             raise ValueError("Unknown primitive family.")
+        if (self.kind == "SEGMENT_CHAIN") != isinstance(self.chain, SegmentChain):
+            raise ValueError("Segment Chain requires its own typed parameters.")
         if not integer(self.samples, 2, 4096) or not integer(self.strips, 1, 256):
             raise ValueError("Invalid primitive resolution.")
         validate_range(self.start, self.span)
@@ -172,6 +184,8 @@ def validate_family(value: Primitive | ResolvedPrimitive) -> None:
         raise ValueError("Loft requires at least two curves and no body pieces.")
     if value.kind == "BODY" and (not value.pieces or any(p.curve not in ids for p in value.pieces)):
         raise ValueError("Every body piece must reference a source curve.")
+    if value.kind == "SEGMENT_CHAIN" and (value.curves or value.pieces or value.source):
+        raise ValueError("Segment Chain is parameter-driven and has no curve or mesh source.")
 
 
 @dataclass(frozen=True, slots=True)
@@ -207,17 +221,45 @@ class Deformer:
     custom: tuple[float, ...] = (0.0, 0.0, 1.0, 1.0)
     custom_handles: tuple[str, ...] = ()
     custom_extrapolate: bool = True
+    shrinkwrap: Shrinkwrap | None = None
+    subdivision: int | None = None
+    displacement: tuple[float, ...] | None = None
 
     def __post_init__(self) -> None:
         validate_matrix(self.bind)
         finite(self.center, 3)
-        if self.kind not in ("HOOK", "LATTICE") or not 0 <= self.strength <= 1:
+        if not 0 <= self.strength <= 1:
             raise ValueError("Invalid deformer kind or strength.")
+        validate_deformer_settings(self)
         validate_membership(self)
         validate_falloff(self.falloff, self.custom)
         validate_custom_handles(self.custom, self.custom_handles)
         if not isfinite(self.radius) or self.radius < 0:
             raise ValueError("Hook radius must be finite and nonnegative.")
+
+
+def validate_deformer_settings(value: Deformer) -> None:
+    settings = {
+        "SHRINKWRAP": value.shrinkwrap,
+        "SUBDIVISION": value.subdivision,
+        "DISPLACE": value.displacement,
+    }
+    if value.kind not in (*settings, "HOOK", "LATTICE"):
+        raise ValueError("Unknown construction modifier.")
+    if any((value.kind == kind) != (setting is not None) for kind, setting in settings.items()):
+        raise ValueError("Construction modifier requires its own settings.")
+    if value.kind in settings and value.control:
+        raise ValueError("This modifier has no shared control.")
+    validate_geometry_modifier(value)
+
+
+def validate_geometry_modifier(value: Deformer) -> None:
+    if value.subdivision is not None and not integer(value.subdivision, 0, 5):
+        raise ValueError("Simple subdivision supports zero to five levels.")
+    if value.displacement is not None:
+        finite(value.displacement, 3)
+    if value.kind == "SUBDIVISION" and (value.weights or value.strength != 1 or value.invert):
+        raise ValueError("Subdivision has no point weights or strength.")
 
 
 def validate_membership(binding: Deformer) -> None:

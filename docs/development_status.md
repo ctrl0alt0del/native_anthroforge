@@ -1,7 +1,50 @@
 # AnthroForge development validation
 
-Current qualification is in [VCP visual tools](#vcp-visual-tools-023).
+Current qualification is in [editable SCP migration](#editable-scp-migration-023).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Editable SCP migration (0.2.3)
+
+Runtime `4812965f341b3815e17958a7dc5f7dca12a9ea78` adds nearest-surface Shrinkwrap,
+the generic parameter-driven Segment Chain, ordered Simple subdivision/local displacement,
+and retained material bindings through segment union. Shared policies cover dependencies,
+deletion, topology locks, copying, persistence and UI/headless operations.
+
+- Full development gate: **1,647 tests passed**, five native CTests, 319 typed modules,
+  lint/format, native/script function limits and numerical/runtime checks. The 1,603
+  warnings are the existing Qt property-map deprecation category.
+- Compact Blender 5.0.1 fixtures cover 24 Shrinkwrap cases, source segment construction
+  and Simple subdivision. Source comparison caught and fixed reversed segment winding;
+  union material tests cover changing triangulation, retained attachments and persistence.
+- Actual offscreen QML controls verify creation, visible segment settings and Shrinkwrap
+  offset edits with no QML warnings. Hidden Windows GPU captures show the full migrated
+  assembly and new primitive example. Physical desktop interaction is not claimed.
+- The canonical executable passes the full minimal-PATH portable suite, including the
+  new Segment Chain/Shrinkwrap example. The actual 59-SCP assembly also opens, edits,
+  undoes, evaluates, saves, reopens and renders through packaged commands. Numerical
+  headless inspection is separately verified without Qt or Blender imports.
+- Migration comprises 33 originals plus 26 independent counterparts, 31 controls and
+  11 curves. Approved imports are explicit; editable constructions have no final-mesh
+  fallback. Anatomical bindings, shared Hook propagation and independent edits pass.
+  Normal startup recalculation preserves surfaces within 1e-12 scene units.
+- Source/native front and side shapes were inspected. All 20 digit instances agree
+  within 2.13e-6 in two-way vertex-to-surface samples. Rounded spine and connected rib
+  seams differ intentionally; live scapulae follow those changed ribs. Ilium retains
+  its broad rim/underside with maximum .01143 and mean .000394 deviation (diagonal 4.77).
+  These measurements are not continuous Hausdorff bounds. Native Simple subdivision
+  is qualified for the migration's quad stages, not arbitrary nonplanar n-gon parity.
+- Separate ownership review confirms native geometry/provenance, explicit surface
+  dependencies, shared validation/transactions, bounded resource ownership and the
+  existing task coordinator. Pose partitioning fixes artificial batch wait cycles;
+  identity-free QML value conversion fixes visible typed settings without replacing
+  incremental entity models. No competing worker pool or Python numerical fallback.
+
+Deliverables remain `dist/0.2.3/AnthroForge.dist` and `dist/AnthroForge-0.2.3-source.zip`.
+Executable SHA-256: `B57E56BE0BFEC365B6DEC12D0D5CF9291CF88A580C5605F9D753730E10E2384A`.
+The migrated file and per-SCP comparison page are external, adjacent to the unchanged
+source `.blend`; paths, hashes and local-only evidence are in the
+[task record](tasks/scp-migration-construction.md). See also CH-027-030 in
+[computation history](computation_history.md) and the [API](authoring_api.md).
 
 ## VCP visual tools (0.2.3)
 

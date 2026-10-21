@@ -17,6 +17,21 @@ from .control_frames import stable_frame
 if TYPE_CHECKING:
     from .session import Session
 
+RELATION_FIELDS = frozenset(
+    (
+        "id",
+        "target",
+        "control",
+        "kind",
+        "bind",
+        "members",
+        "weighted_members",
+        "shrinkwrap",
+        "subdivision",
+        "displacement",
+    )
+)
+
 
 def owner(session: "Session", target: Target) -> Any:
     if target.stage == "LATTICE":
@@ -45,6 +60,9 @@ def target_curve(item: SCP, target: Target) -> str:
 
 def install(session: "Session", target: Target, bindings: tuple[Deformer, ...]) -> None:
     item = owner(session, target)
+    from .geometry_modifiers import validate_change
+
+    validate_change(session.document, item, bindings)
     if target.stage == "LATTICE":
         controls.install(session, replace(item, deformers=bindings))
     else:
@@ -117,7 +135,7 @@ def locate(session: "Session", binding: str) -> Deformer:
 
 def update(session: "Session", binding: str, **options: Any) -> None:
     current = locate(session, binding)
-    if set(options) & {"id", "target", "control", "kind", "bind", "members", "weighted_members"}:
+    if set(options) & RELATION_FIELDS:
         raise ValueError("Use binding operations to change identity, target or bind transform.")
     changed = replace(current, **codec.tuples(options))
     if "indices" in options:
@@ -155,13 +173,10 @@ def order(session: "Session", target: dict[str, Any], bindings: list[str]) -> No
 
 def reset(session: "Session", binding: str) -> None:
     current = locate(session, binding)
-    control = session.document.control(current.control)
-    bind = native.matrix(
-        session.engine,
-        stable_frame(session, control),
-        frame(session, current.target),
-        relative=True,
-    )
+    if current.kind != "HOOK":
+        raise ValueError("Reset binding transforms applies only to Hooks.")
+    world = stable_frame(session, session.document.control(current.control))
+    bind = native.matrix(session.engine, world, frame(session, current.target), relative=True)
     bindings = tuple(
         replace(b, bind=bind) if b.id == binding else b
         for b in owner(session, current.target).deformers

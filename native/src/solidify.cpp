@@ -147,6 +147,21 @@ static Faces shell_faces(const ShellData& data,const double* s,const std::vector
     }
     return faces;
 }
+static void shell_material(const Mesh& source,Mesh& output) {
+    const auto& before=source.triangle_material;
+    if(!before.source_count) return;
+    auto& after=output.triangle_material; after=before;
+    if(output.triangles.rows()==source.triangles.rows()) return;
+    if(output.triangles.rows()!=2*source.triangles.rows()) throw std::runtime_error("Unsupported provenance for shell rim topology.");
+    after.source_count*=2;
+    for(size_t i=0;i<before.origins.size();++i) {
+        after.origins.push_back(before.origins[i]+before.source_count);
+        for(int j:{0,2,1}) {
+            const auto* row=before.coordinates.data()+9*i+3*j;
+            after.coordinates.insert(after.coordinates.end(),row,row+3);
+        }
+    }
+}
 static std::shared_ptr<Mesh> solidify(const Mesh& mesh,const double* s,const double* weights,uint64_t cancel) {
     auto data=shell_data(mesh);
     check_cancel(cancel);
@@ -154,7 +169,8 @@ static std::shared_ptr<Mesh> solidify(const Mesh& mesh,const double* s,const dou
     if(s[4]) even_correction(data,mesh);
     if(s[8]) clamp_angles(data,mesh,s[4]!=0);
     const auto mapping=shell_mapping(data,int(mesh.vertices.rows()),!(s[2]&&s[3]));
-    return make_mesh(shell_points(mesh,data,s,weights,mapping),shell_faces(data,s,mapping),cancel,mesh.prepared);
+    auto result=make_mesh(shell_points(mesh,data,s,weights,mapping),shell_faces(data,s,mapping),cancel,mesh.prepared);
+    shell_material(mesh,*result); return result;
 }
 }
 uint64_t af_solidify(uint64_t source,const double* settings,const double* weights,uint64_t cancel) {

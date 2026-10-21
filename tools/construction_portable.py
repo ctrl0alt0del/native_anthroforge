@@ -5,11 +5,13 @@ from zipfile import ZipFile
 
 import numpy as np
 from PIL import Image
+from segment_chain_portable import segment_chain
 
 KINDS = ("curve", "curve", "fiber", "fiber", "membrane", "reference_image")
 
 
 def construction(executable, cwd, invoke):
+    segment_chain(executable, cwd, invoke)
     invoke(executable, cwd, "--cli", "run", "examples/construction.json")
     state = json.loads(invoke(executable, cwd, "--cli", "inspect", "construction.anthroforge"))
     objects = verify_objects(state)

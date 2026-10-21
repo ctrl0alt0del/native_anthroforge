@@ -3,11 +3,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+AF_API uint64_t af_simple_subdivision(uint64_t source,int levels,uint64_t cancel);
+AF_API int af_displace(const double* points,int count,const double* offset,const double* weights,int invert,double strength,double* output,uint64_t cancel);
 /* Bézier records: position, left, right, radius, tilt, left/right mode (13 doubles).
  * Samples: position, tangent, normal, radius, tilt (11 doubles). */
 AF_API int af_curve_sample(const double* points, int count, int closed, int resolution,
     int samples, double start, double span, const double* matrix, double* output, uint64_t cancel);
 AF_API int af_curve_handles(double* points, int count, int closed);
+/* Segment records: length, radius, bend radians, longitudinal samples, radial sides.
+ * Spread rotates +Y about Z; bends rotate about X. Output is an owned draft mesh. */
+AF_API uint64_t af_segment_chain(const double* segments, int count, double spread, int cumulative,
+    const double* profile, int profile_count, int unite, uint64_t cancel);
+/* Nearest-surface search and offset use target-local units, matching Blender.
+ * Modes: On Surface, Inside, Outside, Outside Surface. Weights may be null. */
+AF_API int af_shrinkwrap(double* points, int count, uint64_t target, const double* matrix,
+    double offset, int mode, double strength, const double* weights, uint64_t cancel);
 /* Cubics: four world-space xyz controls per segment. Output: t, xyz, ray distance. */
 AF_API int af_curve_cubics(const double* resolved, int count, int closed,
     const double* matrix, double* output);

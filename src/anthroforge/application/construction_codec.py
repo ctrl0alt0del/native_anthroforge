@@ -16,6 +16,9 @@ from anthroforge.core.construction import (
 from anthroforge.core.curve_engines import fields as curve_fields
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.results import ControlResult, EvaluationResult, ReadRevision
+from anthroforge.core.segment_chain import Segment, SegmentChain
+from anthroforge.core.shrinkwrap import Shrinkwrap
+from anthroforge.core.surface_references import SurfaceReference
 
 
 def tuples(data: dict[str, Any]) -> dict[str, Any]:
@@ -39,6 +42,7 @@ def primitive(data: dict[str, Any] | None) -> Primitive | None:
     state = tuples(data)
     state["curves"] = tuple(CurveUse(**tuples(c)) for c in state.get("curves", ()))
     state["pieces"] = tuple(BodyPiece(**p) for p in state.get("pieces", ()))
+    state["chain"] = segment_chain(state.get("chain"))
     return Primitive(**state)
 
 
@@ -46,12 +50,25 @@ def resolved_primitive(data: dict[str, Any]) -> ResolvedPrimitive:
     state = tuples(data)
     state["curves"] = tuple(curve(c) for c in state.get("curves", ()))
     state["pieces"] = tuple(BodyPiece(**p) for p in state.get("pieces", ()))
+    state["chain"] = segment_chain(state.get("chain"))
     return ResolvedPrimitive(**state)
+
+
+def segment_chain(data: dict[str, Any] | None) -> SegmentChain | None:
+    if data is None:
+        return None
+    state = tuples(data)
+    state["segments"] = tuple(Segment(**p) for p in state.get("segments", ()))
+    return SegmentChain(**state)
 
 
 def deformer(data: dict[str, Any]) -> Deformer:
     state = tuples(data)
     state["target"] = Target(**state["target"])
+    if state.get("shrinkwrap"):
+        settings = dict(state["shrinkwrap"])
+        settings["surface"] = SurfaceReference(**settings["surface"])
+        state["shrinkwrap"] = Shrinkwrap(**settings)
     return Deformer(**state)
 
 

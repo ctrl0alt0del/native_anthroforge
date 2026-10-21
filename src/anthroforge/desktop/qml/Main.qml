@@ -208,6 +208,7 @@ ApplicationWindow {
         UiMenuItem { text: "Curve-deformed box"; onTriggered: authoring.create("BODY","BOX") }
         UiMenuItem { text: "Curve-deformed cylinder"; onTriggered: authoring.create("BODY","CYLINDER") }
         UiMenuItem { text: "Curve-deformed capsule"; onTriggered: authoring.create("BODY","CAPSULE") }
+        UiMenuItem { text: "Segment chain"; onTriggered: authoring.create("SEGMENT_CHAIN","CAPSULE") }
         MenuSeparator {}
         UiMenuItem { text: "Import mesh…"; onTriggered: importFile.open() }
     }

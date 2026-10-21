@@ -4,7 +4,8 @@ from dataclasses import fields
 
 from anthroforge.application.control_frames import display_frame
 from anthroforge.application.curve_sources import for_editing
-from anthroforge.core.construction import Curve
+from anthroforge.core.construction import Curve, body_closed
+from anthroforge.core.construction_capabilities import component_editing, stable_geometry_members
 from anthroforge.core.entities import IDENTITY
 from anthroforge.core.objects import ConstructionObject
 from anthroforge.core.tissues import TissueVCP
@@ -75,7 +76,7 @@ def construction_data(entity, session):
 
     from .curve_usage import uses
 
-    result = {}
+    result = editing_capabilities(entity)
     result["topology_dependents"] = topology_locks(session.document, entity.id) if entity else []
     result["standalone"] = isinstance(entity, Curve)
     result["curves"] = editor_curves(entity)
@@ -84,6 +85,13 @@ def construction_data(entity, session):
         dict(id=c.id, name=c.name, kind=c.kind) for c in session.document.controls
     ]
     return result
+
+
+def editing_capabilities(item):
+    return dict(
+        component_editing=component_editing(item),
+        stable_geometry_members=stable_geometry_members(item),
+    )
 
 
 def editor_curves(item):
@@ -174,7 +182,16 @@ def base_components(session, entity, piece):
     density = count(session.document.entity(entity.id).primitive, piece.curve)
     entity = for_editing(session, entity)
     curve = next(c for c in entity.primitive.curves if c.id == piece.curve)
-    mesh = bodies.base(session.engine, piece, density, curve.closed, 0)
+    mesh = bodies.base(
+        session.engine, piece, density, body_closed(piece, curve, entity.primitive), 0
+    )
+    return base_records(session, entity, curve, piece, mesh)
+
+
+def base_records(session, entity, curve, piece, mesh):
+    from anthroforge.native.geometry_modifiers import subdivide
+
+    mesh = subdivide(mesh, piece.subdivision)
     frame = construction.matrix(session.engine, entity_frame(session.engine, entity), curve.matrix)
     world = components.transformed(session.engine, mesh.array(0), frame).tolist()
     return [

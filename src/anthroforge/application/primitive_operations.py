@@ -7,6 +7,8 @@ from anthroforge.core.construction import BodyPiece, Curve, CurvePoint, Resolved
 from anthroforge.core.curve_shapes import reshaped
 from anthroforge.core.entities import SCP, Attachment
 from anthroforge.core.results import EvaluationResult
+from anthroforge.core.segment_chain import SegmentChain
+from anthroforge.core.segment_chain import topology as chain_topology
 from anthroforge.native import curve_editing
 
 from . import construction_codec as codec
@@ -25,6 +27,8 @@ def straight_curve(y: float = 0.0) -> Curve:
 
 
 def default_primitive(kind: str, shape: str) -> ResolvedPrimitive:
+    if kind == "SEGMENT_CHAIN":
+        return ResolvedPrimitive(kind, chain=SegmentChain())
     if kind == "LOFT":
         return ResolvedPrimitive(kind, curves=(straight_curve(-0.15), straight_curve(0.15)))
     if kind == "BODY":
@@ -101,8 +105,24 @@ def topology_signature(primitive: ResolvedPrimitive) -> tuple[Any, ...]:
     from anthroforge.core.construction import cyclic
 
     curves = tuple((c.id, cyclic(c, primitive)) for c in primitive.curves)
-    pieces = tuple((p.id, p.shape, p.sides) for p in primitive.pieces)
-    return primitive.samples, primitive.strips, primitive.caps, curves, pieces
+    return (
+        primitive.samples,
+        primitive.strips,
+        primitive.caps,
+        curves,
+        body_topology(primitive),
+        chain_topology(primitive.chain),
+    )
+
+
+def body_topology(primitive: ResolvedPrimitive) -> tuple[Any, ...]:
+    from anthroforge.core.construction import body_closed
+
+    curves = {c.id: c for c in primitive.curves}
+    return tuple(
+        (p.id, p.shape, p.sides, p.subdivision, body_closed(p, curves[p.curve], primitive))
+        for p in primitive.pieces
+    )
 
 
 def require_source_topology(session: "Session", primitive: ResolvedPrimitive) -> None:
@@ -258,10 +278,13 @@ def piece_update(session: "Session", entity: str, piece: str, **options: Any) ->
 
 
 def thickness(session: "Session", entity: str, remove: bool = False, **options: Any) -> None:
+    from anthroforge.core.construction_validation import thickness_membership
+
     item = session.editable(entity)
     if item.thickness is None or remove or set(options) & {"enabled", "rim", "rim_only", "flip"}:
         require_topology_edit(session.document, entity)
     changed = None if remove else replace(item.thickness or Thickness(), **codec.tuples(options))
+    thickness_membership(item, changed)
     session.replace_entities({entity: replace(item, thickness=changed)})
     tasks.edited(session, {entity})
 

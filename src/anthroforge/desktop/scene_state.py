@@ -114,7 +114,10 @@ def markers(session, entity):
     key = geometry_asset(parent)
     handle = session.assets[key].mesh.handle if key else 0
     try:
-        return anchor_points(session.engine, entity, parent, handle)
+        reference = session.assets.get(entity.attachment.material_asset)
+        return anchor_points(
+            session.engine, entity, parent, handle, reference.mesh.handle if reference else 0
+        )
     except ValueError:
         return []
 

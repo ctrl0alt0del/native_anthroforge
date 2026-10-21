@@ -168,6 +168,45 @@ static bool apply_one(const Mesh* parent,const AfAttachmentSurface& surface,cons
     if(ok) std::copy(matrices+16,matrices+32,child_world);
     return ok;
 }
+static M4 retained_frame(uint64_t reference,uint64_t current,const M4& world,const double* record,bool flow,uint64_t cancel) {
+    double input[28]; std::copy_n(record,28,input); std::fill_n(input+15,3,0.0); M4 frame;
+    if(af_material_binding_frames(reference,current,world.data(),1,input,frame.data(),cancel)) throw std::runtime_error(af_last_error());
+    if(flow&&record[6]>=0) {
+        std::copy_n(record+6,6,input); M4 secondary;
+        if(af_material_binding_frames(reference,current,world.data(),1,input,secondary.data(),cancel)) throw std::runtime_error(af_last_error());
+        const V3 normal=frame.block<3,1>(0,2),delta=secondary.block<3,1>(0,3)-frame.block<3,1>(0,3);
+        const V3 tangent=delta-normal*delta.dot(normal);
+        if(tangent.norm()>1e-12) frame.block<3,3>(0,0)=basis(tangent,normal);
+    }
+    return frame;
+}
+static bool apply_retained(uint64_t reference,uint64_t current,const AfAttachmentScpOp& original,
+                           const M4& parent,const double* offset,const double* record,double* child,uint64_t cancel) {
+    try {
+        const M4 world=geometry_matrix(parent.data(),offset);
+        const M4 frame=retained_frame(reference,current,world,record,original.mode!=0,cancel);
+        auto op=original; op.surface=-1;
+        return apply_one(nullptr,AfAttachmentSurface{},op,frame,child);
+    } catch(const std::exception&) { check_cancel(cancel); return false; }
+}
+static bool propagate_one(uint64_t current,uint64_t reference,const double* binding,int mode,int follow,int flow,
+                          const double* parent,const double* offset,double* child,uint64_t cancel) {
+    const auto mesh=current?af::mesh(current):nullptr;
+    if(mode&&!mesh) return false;
+    const auto op=operation(binding,Eigen::Map<const M4>(child),mode,follow,flow);
+    const M4 frame=Eigen::Map<const M4>(parent);
+    if(mode&&reference&&(mesh->triangle_material.source_count||af::mesh(reference)->triangle_material.source_count))
+        return apply_retained(reference,current,op,frame,offset,binding,child,cancel);
+    return apply_one(mesh.get(),parent_surface(mesh,offset),op,frame,child);
+}
+static V3 anchor_target(uint64_t current,uint64_t reference,const double* world,const double* offset,const double* record) {
+    const M4 parent=Eigen::Map<const M4>(world);
+    if(record[0]<0) return parent.block<3,1>(0,3);
+    const auto mesh=af::mesh(current);
+    if(reference&&(mesh->triangle_material.source_count||af::mesh(reference)->triangle_material.source_count))
+        return retained_frame(reference,current,geometry_matrix(world,offset),record,false,0).block<3,1>(0,3);
+    return point(parent,binding_point(*mesh,record)+V3(offset));
+}
 }
 int af_capture(uint64_t child,uint64_t parent,const double* cw,const double* pw,const double* co,
                const double* po,int parent_mode,int child_mode,int locked,int flow,double* binding) {
@@ -182,31 +221,23 @@ int af_capture(uint64_t child,uint64_t parent,const double* cw,const double* pw,
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_anchor_points(uint64_t parent,const double* cw,const double* pw,const double* po,
-                     const double* binding,double* output) {
+                     const double* binding,double* output,uint64_t reference) {
     try {
-        af::V3 target=af::V3::Zero();
-        if(binding[0]>=0) {
-            auto mesh=af::mesh(parent);
-            target=af::binding_point(*mesh,binding);
-            target+=Eigen::Map<const af::V3>(po);
-        }
+        const af::V3 target=af::anchor_target(parent,reference,pw,po,binding);
         af::store_vector(output,af::point(Eigen::Map<const af::M4>(cw),Eigen::Map<const af::V3>(binding+18)));
-        af::store_vector(output+3,af::point(Eigen::Map<const af::M4>(pw),target));
+        af::store_vector(output+3,target);
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_propagate(int count,const uint64_t* meshes,const int* parents,double* matrices,const double* offsets,
-    const double* bindings,const int* modes,const int* follows,const int* flows,const int* active,int* status,uint64_t cancel) {
+    const double* bindings,const int* modes,const int* follows,const int* flows,const int* active,int* status,uint64_t cancel,const uint64_t* references) {
     try {
         for(int i=0;i<count;++i) {
             af::check_cancel(cancel); const int p=parents[i];
             if(p<0||!active[i]) continue;
             if(p>=i||status[p]) { status[i]=1; continue; }
-            auto mesh=meshes[p]?af::mesh(meshes[p]):nullptr;
-            auto op=af::operation(bindings+28*i,Eigen::Map<const af::M4>(matrices+16*i),modes[i],follows[i],flows[i]);
-            if(modes[i]&&!mesh) { status[i]=1; continue; }
-            const auto surface=af::parent_surface(mesh,offsets+3*p);
-            status[i]=!af::apply_one(mesh.get(),surface,op,Eigen::Map<const af::M4>(matrices+16*p),matrices+16*i);
+            status[i]=!af::propagate_one(meshes[p],references?references[i]:0,bindings+28*i,modes[i],follows[i],flows[i],
+                matrices+16*p,offsets+3*p,matrices+16*i,cancel);
         }
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }

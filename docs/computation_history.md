@@ -39,6 +39,8 @@ evidence for those revisions, not current workflow instructions.
 ## Current computation inventory
 
 Additional active authoring/inspection work for T09, K01 and Q05 is recorded in CH-024/025.
+Nearest attachment queries (A01–A03) exclude numerically unusable triangles from their
+transient spatial index while preserving original material indices; see CH-032.
 
 ### Meshes, primitives and deformers
 
@@ -1207,3 +1209,27 @@ See the task and development validation records for final gate/package evidence 
   the saved project without a visible window. This is not interactive acceptance.
 - Scope: explicit stations require complete open ordinary loft inputs and exact
   sampling. They do not silently apply to closed paths, ranges, or branched layouts.
+
+### CH-032 — Query usable triangles without changing authored geometry (2026-10-22)
+
+- Affects A01–A03 and shared nearest-surface consumers.
+- Observed failure: remaining-muscle migration encountered Boolean exterior slivers
+  with squared cross-product area 3.97168e-35. Nearest-point selection could return
+  such a triangle, then barycentric capture rejected it. This depended on the target
+  and queried point; rebuilding alone did not reliably resolve the failure.
+- Before: Surface indexed every triangle and rejected the selected triangle later.
+  Now: the transient world-space query index includes only triangles satisfying the
+  existing 1e-30 squared-area resolution threshold and maps hits to original face IDs.
+  Empty usable sets fail explicitly. No document mesh, topology, binding identity or
+  Boolean exterior policy is changed.
+- Barycentric coordinates use oriented cross products instead of subtracting nearly
+  equal Gram products, avoiding cancellation for thin but resolvable triangles.
+  Libigl nearest queries still determine the nearest position; this change does not
+  claim exact interior projection for arbitrarily ill-conditioned triangles.
+- Targeted evidence: 15 point/field/exterior-query tests pass, including sliver
+  exclusion, original-index retention, offset resolution and an all-degenerate target.
+  Five native CTests pass. Previously failing migrated scalenus/iliocostalis units
+  now reproduce their saved source inflation within 2.3e-7 scene units.
+- Ownership: filtering and numerical coordinates belong to the shared C++ spatial
+  query; Python migration retains ordinary application capture and transactions.
+  Full migration, combined development gate and portable qualification are pending.

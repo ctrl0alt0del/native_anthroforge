@@ -36,3 +36,9 @@
   The user's requested project has not yet been replaced.
 - Lower trapezius matches source within 1.61e-7 scene units. Three initial script
   setup errors were corrected and archived; remaining cases are not yet qualified.
+- CH-032 fixes an observed shared capture failure on Boolean slivers. Targeted
+  point/field/query tests and native CTests pass; the cumulative migration continues.
+  See logs/migration-v5.log and per-unit comparison records, not older failed runs.
+- Material station domains starting below zero are normalized during one-off input
+  conversion; section correspondence is retained. Branches and tissue-supported
+  fibers remain under investigation, and the final artifact is not yet installed.

@@ -59,3 +59,28 @@ def test_capture_and_resolution_cancel_or_reject_missing_surface(session, cube):
         binding.capture(*args, [[0, 0, 1]], cancel=cancel.handle)
     with pytest.raises(ValueError, match="cancel"):
         binding.resolve(*args, targets, records, cancel.handle)
+
+
+def test_capture_ignores_unusable_sliver_and_retains_original_triangle_ids(session):
+    vertices = [[0, 0, 0], [1, 0, 0], [0, 1e-18, 0], [0, 0, -0.1], [1, 0, -0.1], [0, 1, -0.1]]
+    mesh = session.engine.create_mesh(vertices, [0, 1, 2, 3, 4, 5], [0, 3, 6])
+    targets, records = binding.capture(session.engine, [mesh.handle], [IDENTITY], [[0.25, 0, 0]])
+    np.testing.assert_array_equal(records[0, :3], [3, 4, 5])
+    output = binding.resolve(session.engine, [mesh.handle], [IDENTITY], targets, records)
+    np.testing.assert_allclose(output[0, [3, 7, 11]], [0.25, 0, 0], atol=1e-12)
+    np.testing.assert_array_equal(mesh.array(0), vertices)
+
+
+def test_capture_keeps_resolvable_thin_triangle_without_gram_cancellation(session):
+    mesh = session.engine.create_mesh([[0, 0, 0], [1, 0, 0], [1, 1e-10, 0]], [0, 1, 2], [0, 3])
+    point = [[0.75, 2.5e-11, 0.1]]
+    targets, records = binding.capture(session.engine, [mesh.handle], [IDENTITY], point)
+    assert np.isfinite(records).all() and np.sum(records[0, 3:6]) == pytest.approx(1)
+    output = binding.resolve(session.engine, [mesh.handle], [IDENTITY], targets, records)
+    np.testing.assert_allclose(output[:, [3, 7, 11]], point, atol=1e-12)
+
+
+def test_capture_rejects_surface_with_no_resolvable_triangle(session):
+    mesh = session.engine.create_mesh([[0, 0, 0], [1, 0, 0], [0, 1e-18, 0]], [0, 1, 2], [0, 3])
+    with pytest.raises(ValueError, match="empty or degenerate"):
+        binding.capture(session.engine, [mesh.handle], [IDENTITY], [[0.2, 0, 0]])

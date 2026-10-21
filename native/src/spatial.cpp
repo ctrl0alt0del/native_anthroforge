@@ -2,25 +2,34 @@
 #include "anthroforge/sections.h"
 
 namespace af {
+static double triangle_area_squared(const Vertices& vertices,const Eigen::Vector3i& face) {
+    const V3 a=vertices.row(face[1])-vertices.row(face[0]),b=vertices.row(face[2])-vertices.row(face[0]);
+    return a.cross(b).squaredNorm();
+}
 Surface::Surface(const Mesh& mesh,const M4& matrix):triangles(&mesh.triangles) {
     if(!mesh.prepared) throw std::runtime_error("Surface queries require a finalized mesh.");
     vertices=(mesh.vertices*matrix.block<3,3>(0,0).transpose()).rowwise()+matrix.block<3,1>(0,3).transpose();
-    if(triangles->rows()) tree.init(vertices,*triangles);
+    for(int i=0;i<triangles->rows();++i)
+        if(triangle_area_squared(vertices,triangles->row(i))>=1e-30) query_ids.push_back(i);
+    query_triangles.resize(query_ids.size(),3);
+    for(size_t i=0;i<query_ids.size();++i) query_triangles.row(i)=triangles->row(query_ids[i]);
+    if(query_triangles.rows()) tree.init(vertices,query_triangles);
 }
 V3 barycentric(const V3& p,const V3& a,const V3& b,const V3& c) {
     const V3 v0=b-a,v1=c-a,v2=p-a;
-    const double d00=v0.dot(v0),d01=v0.dot(v1),d11=v1.dot(v1),den=d00*d11-d01*d01;
-    if(std::abs(den)<1e-30) throw std::runtime_error("Degenerate attachment triangle.");
-    const double v=(d11*v2.dot(v0)-d01*v2.dot(v1))/den;
-    const double w=(d00*v2.dot(v1)-d01*v2.dot(v0))/den;
+    const V3 normal=v0.cross(v1); const double den=normal.squaredNorm();
+    if(den<1e-30) throw std::runtime_error("Degenerate attachment triangle.");
+    const double v=v2.cross(v1).dot(normal)/den;
+    const double w=v0.cross(v2).dot(normal)/den;
     return {1-v-w,v,w};
 }
 Hit nearest(const Surface& surface,const V3& point) {
-    if(!surface.triangles->rows()) throw std::runtime_error("No usable attachment surface: geometry is empty.");
+    if(!surface.query_triangles.rows()) throw std::runtime_error("No usable attachment surface: geometry is empty or degenerate.");
     Hit hit; Eigen::RowVector3d nearest;
-    hit.distance=surface.tree.squared_distance(surface.vertices,*surface.triangles,point.transpose(),hit.triangle,nearest);
+    hit.distance=surface.tree.squared_distance(surface.vertices,surface.query_triangles,point.transpose(),hit.triangle,nearest);
     hit.point=nearest.transpose();
     if(hit.triangle<0) throw std::runtime_error("No usable attachment surface.");
+    hit.triangle=surface.query_ids.at(size_t(hit.triangle));
     const auto tri=surface.triangles->row(hit.triangle);
     hit.weights=barycentric(hit.point,surface.vertices.row(tri[0]),surface.vertices.row(tri[1]),surface.vertices.row(tri[2]));
     return hit;

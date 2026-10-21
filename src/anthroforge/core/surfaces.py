@@ -15,10 +15,25 @@ class SurfaceAlignment:
     point: str = ""
     factor: float = 0.0
     reverse: bool = False
+    stations: tuple[tuple[str, float], ...] = ()
 
     def __post_init__(self) -> None:
         if not isfinite(self.factor) or not 0 <= self.factor < 1:
             raise ValueError("Surface correspondence requires a finite segment fraction.")
+        validate_stations(self.stations)
+
+
+def validate_stations(values: tuple[tuple[str, float], ...]) -> None:
+    if not values:
+        return
+    keys = [key for key, _ in values]
+    positions = [value for _, value in values]
+    if not 2 <= len(values) <= 4096 or len(set(keys)) != len(keys) or not all(keys):
+        raise ValueError("Material correspondence requires distinct curve point identities.")
+    if not all(map(isfinite, positions)) or positions[0] != 0:
+        raise ValueError("Material stations must be finite and start at zero.")
+    if any(a >= b for a, b in zip(positions, positions[1:], strict=False)):
+        raise ValueError("Material stations must be strictly increasing.")
 
 
 @dataclass(frozen=True, slots=True)

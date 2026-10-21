@@ -1,7 +1,7 @@
 # Four random addon muscles on the migrated skeleton
 
 - Branch: `codex/four-muscle-migration`; integration: `main`.
-- Base: `a8022a4`; status: inventory complete, extraction in progress.
+- Base: `a8022a4`; status: source-side parity qualified, mirrors/lifecycle/release in progress.
 - Request: inventory existing workflow muscles, select four randomly and reproduce
   editable fibers, membranes and tissue inflation in a copy of the migrated skeleton.
 - Preserve original Blender files, migrated skeleton and catalogue acceptance states.
@@ -31,3 +31,16 @@ contracts. Qualify source/mirror shapes, persistence, edit propagation and undo.
 any observed app defects at their owning boundary before changing production code.
 Maintain computational history for algorithm changes and the reconstruction skill for
 verified lessons. Source approval remains separate from migration acceptance.
+
+Observed gap: addon explicit material stations were absent at the standalone surface
+boundary. Arclength reassignment increased FCR from 325 to 6494 vertices and changed
+TFL inflation by 0.315 scene units. Optional, identity-qualified material correspondence
+now belongs to SurfaceAlignment; native sampling maps authored parameters to stations.
+`surface.correspondence` uses normal policies/jobs; Realign explicitly resets it.
+Resolution 3 preserves donor grids without adding refinement (the donor has more rows).
+All four source-side inflation outputs match within 6.4e-7 scene units with identical
+vertex counts. This establishes shape parity, not final migration acceptance yet.
+26 focused tests and five native CTests pass. Complete gate/portable/UI checks pending.
+One-off scripts: `tmp/extract.py`, `tmp/transfer.py`, `tmp/compare.py`; captures and
+baseline/current comparisons are in the external run. `muscles_trial_v001.anthroforge`
+is an intermediate only. Mirror capture/build and lifecycle qualification remain active.

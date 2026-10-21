@@ -14,6 +14,7 @@ struct Row {
 };
 using Rows=std::vector<Row>;
 void budget(size_t vertices,size_t triangles);
+void apply_correspondence(Row& row,const AfSurfaceRow& input,bool exact);
 std::vector<double> stations(const Row& row);
 std::vector<double> unique_stations(std::vector<double> values);
 V3 sample(const Row& row,const std::vector<double>& positions,double factor);

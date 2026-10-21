@@ -10,6 +10,9 @@ typedef struct AfSurfaceRow {
     double matrix[16];
     double start,span,origin;
     int reverse,samples,alignment_reverse;
+    int station_count;
+    const double* station_parameters;
+    const double* station_values;
 } AfSurfaceRow;
 /* Each branch consumes distinct rows after the main rows. Roots are authored
  * point indices on the selected outer main row; child rows start at that root. */

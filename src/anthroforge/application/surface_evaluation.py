@@ -43,7 +43,14 @@ def input_row(
     if value.point and value.point not in indices:
         raise ValueError("Surface correspondence point was removed; explicitly Realign.")
     origin = indices[value.point] + value.factor if value.point else -1
-    return native.row(source.path, frame, use, origin, value.reverse)
+    row = native.row(source.path, frame, use, origin, value.reverse)
+    return correspondence(row, value, indices)
+
+
+def correspondence(row: native.Row, value: SurfaceAlignment, indices: dict[str, int]) -> native.Row:
+    if any(key not in indices for key, _ in value.stations):
+        raise ValueError("Material correspondence point was removed; explicitly Realign.")
+    return native.correspondence(row, [(indices[key], station) for key, station in value.stations])
 
 
 def layout(engine: Any, document: Any, resources: Any, item: Surface, cancel: int) -> Surface:

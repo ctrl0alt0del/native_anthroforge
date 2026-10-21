@@ -8,6 +8,7 @@ void budget(size_t vertices,size_t triangles) {
         throw std::runtime_error("Surface output exceeds bounded vertex/triangle budget.");
 }
 std::vector<double> stations(const Row& row) {
+    if(!row.material_stations.empty()) return row.material_stations;
     std::vector<double> result{0};
     for(size_t i=1;i<row.points.size()+size_t(row.closed);++i)
         result.push_back(result.back()+(row.points[i%row.points.size()]-row.points[i-1]).norm());
@@ -25,8 +26,11 @@ V3 sample(const Row& row,const std::vector<double>& positions,double factor) {
 }
 static std::vector<double> union_stations(const Rows& rows) {
     std::vector<double> ordered;
+    const double end=stations(rows.front()).back();
     for(const auto& row:rows) {
         auto values=stations(row);
+        if(std::abs(values.back()-end)>1e-10)
+            throw std::runtime_error("Surface material correspondence extents must match.");
         if(row.closed) values.pop_back();
         ordered.insert(ordered.end(),values.begin(),values.end());
     }

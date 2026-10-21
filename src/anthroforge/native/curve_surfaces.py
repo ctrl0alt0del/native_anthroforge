@@ -22,6 +22,9 @@ class Row(c.Structure):
         ("reverse", c.c_int),
         ("samples", c.c_int),
         ("alignment_reverse", c.c_int),
+        ("station_count", c.c_int),
+        ("station_parameters", D),
+        ("station_values", D),
     ]
 
 
@@ -63,6 +66,17 @@ def row(path: Path, frame: Any, use: Any, origin: float = -1, reverse: bool = Fa
     )
     result._path_owner = path
     return result
+
+
+def correspondence(row: Row, values: Any) -> Row:
+    if not values:
+        return row
+    parameters = np.ascontiguousarray([p for p, _ in values], dtype=np.float64)
+    stations = np.ascontiguousarray([s for _, s in values], dtype=np.float64)
+    row.station_count = len(values)
+    row.station_parameters, row.station_values = pointer(parameters), pointer(stations)
+    row._station_owner = (parameters, stations)
+    return row
 
 
 def layout(

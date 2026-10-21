@@ -110,6 +110,7 @@ Rows inputs(const AfSurfaceRow* data,int count,bool exact,uint64_t cancel) {
         auto row=range(oriented(authored_row(data[i]),data[i].reverse!=0),data[i].start,data[i].span);
         if(row.closed) row=oriented(rotate(row,data[i].origin),data[i].alignment_reverse!=0);
         if(!exact) row=uniform(row,std::max(samples,row.closed?3:2));
+        apply_correspondence(row,data[i],exact);
         if(!result.empty()&&row.closed!=result.front().closed) throw std::runtime_error("Incompatible surface ranges/closure.");
         result.push_back(std::move(row));
     }

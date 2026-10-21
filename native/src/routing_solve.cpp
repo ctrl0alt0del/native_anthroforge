@@ -1,4 +1,5 @@
 #include "routing_internal.hpp"
+#include "routing_trace.hpp"
 
 namespace af::routing {
 static double median(std::vector<double> values) {
@@ -94,19 +95,25 @@ static void report(const std::vector<kernel::AfV3SqpJob>& jobs,int64_t* counters
         measures[4]=std::max(measures[4],r.elapsed_ms);
     }
 }
+static bool advance(kernel::AfV3SqpCoordinator* controller,const Input& input) {
+    int done=0,accepted=0,infeasible=0;
+    while(!done) {
+        check_cancel(input.cancel);
+        if(kernel::af_v3_native_sqp_step(controller,1,&done,&accepted,&infeasible))
+            throw std::runtime_error("Routing controller failed.");
+        trace_step(input.trace,*controller);
+    }
+    return !infeasible;
+}
 bool solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double* measures) {
     std::vector<kernel::AfV3SqpJob> jobs; for(auto& span:spans) jobs.push_back(job(span));
     synchronize_owner_span(jobs); const int cap=input.options.accepted_steps;
     ControllerHandle controller(static_cast<kernel::AfV3SqpCoordinator*>(kernel::af_v3_native_sqp_begin(
         jobs.data(),int(jobs.size()),cap,std::max(32,8*cap))),kernel::af_v3_native_sqp_destroy);
     if(!controller) throw std::runtime_error("Routing controller creation failed.");
-    int done=0,accepted=0,infeasible=0;
-    while(!done) {
-        check_cancel(input.cancel);
-        if(kernel::af_v3_native_sqp_step(controller.get(),1,&done,&accepted,&infeasible))
-            throw std::runtime_error("Routing controller failed.");
-    }
+    trace_begin(input.trace,spans);
+    const bool valid=advance(controller.get(),input);
     report(jobs,counters,measures);
-    return !infeasible;
+    return valid;
 }
 }

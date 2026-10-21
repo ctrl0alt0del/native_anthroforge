@@ -1,4 +1,5 @@
 #include "routing_planner.hpp"
+#include "routing_trace.hpp"
 
 namespace af::routing {
 static bool owner_inside(const Planning& plan,Vec point,int owner) {
@@ -85,7 +86,9 @@ static void install_routes(const Input& input,const Reference& reference,
     }
 }
 std::vector<Span> prepare_routes(const Input& input,const World& world,Reference& reference) {
-    const auto routes=handoff(corridors(input,world,reference),input,world);
+    const auto planned=corridors(input,world,reference);
+    for(size_t i=0;i<planned.size();++i) trace_path(input.trace,1,int(i),planned[i]);
+    const auto routes=handoff(planned,input,world);
     if(!routes.empty()) reference=af::routing::reference(input,route_counts(routes));
     auto prepared=spans(input,world,reference);
     // Geometry, fixed knots and reference parameters share the validated layout.

@@ -185,7 +185,7 @@ def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> An
 
 
 def query_handler(operation: str) -> Any:
-    if operation.startswith("tissue.inspect."):
+    if operation.startswith(("tissue.inspect.", "curve.inspect.")):
         from .tissue_inspection import execute as tissue_inspect
 
         return tissue_inspect

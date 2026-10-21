@@ -34,18 +34,22 @@ class InspectionExport(QObject):
 
     def options(self, path):
         owner, tool = self.controller, self.controller.tissue_inspection
-        tissue = dict(
+        return dict(
+            path=local_path(path),
+            selected=owner.selection,
+            editing=owner.authoring.editing,
+            tissue=self.tissue_options() if tool.target else None,
+            route=owner.route_inspection.state if owner.route_inspection.visible else None,
+        )
+
+    def tissue_options(self):
+        owner, tool = self.controller, self.controller.tissue_inspection
+        return dict(
             stage=tool.stage,
             reference=tool.reference,
             mode=tool.mode,
             finding=tool.finding,
             section=owner.section_tools.state,
-        )
-        return dict(
-            path=local_path(path),
-            selected=owner.selection,
-            editing=owner.authoring.editing,
-            tissue=tissue if tool.target else None,
         )
 
     def synchronize(self):

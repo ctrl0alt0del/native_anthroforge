@@ -247,6 +247,7 @@ Item {
             id: worldScene
             eulerRotation.x: -90
             TissueInspectionScene { distance: viewport.distance }
+            RouteInspectionScene { distance: viewport.distance }
             PointScene { markerScale: viewport.gizmoSize * 0.0012 }
             ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis }
             Repeater3D {

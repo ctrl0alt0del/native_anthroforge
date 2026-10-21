@@ -14,20 +14,26 @@ class Query:
 
 
 def definition(kind: str) -> Query:
+    queries = definitions()
+    if kind not in queries:
+        raise ValueError("Unknown inspection query kind.")
+    return queries[kind]
+
+
+def definitions() -> dict[str, Query]:
+    from . import route_inspection as route
     from . import stacking_inspection as stacking
     from . import tissue_inspection as tissue
     from . import tissue_painting as painting
     from . import tissue_sections as sections
 
-    queries = dict(
+    return dict(
         tissue_queries(),
         stacking=Query(stacking.validate, stacking.signature, stacking.compute, stacking.workload),
         paint=Query(painting.validate, painting.signature, painting.compute, tissue.workload),
         section=Query(sections.validate, sections.signature, sections.compute, sections.workload),
+        route=Query(route.validate, route.signature, route.compute, route.workload),
     )
-    if kind not in queries:
-        raise ValueError("Unknown inspection query kind.")
-    return queries[kind]
 
 
 def tissue_queries() -> dict[str, Query]:

@@ -73,6 +73,7 @@ def inspection_view(controller, settings):
     controller.select(settings["selected"])
     controller.authoring.setEditing(settings["editing"])
     restore(controller, settings.get("tissue"))
+    controller.route_inspection.restore(settings.get("route"))
 
 
 def stage_geometry(app, controller, renderer):

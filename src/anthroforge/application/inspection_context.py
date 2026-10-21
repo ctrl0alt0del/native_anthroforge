@@ -20,6 +20,7 @@ class InspectionContext:
     resources: Resources
     engine: GeometryEngine
     workspace: Workspace
+    routing_backend: str = "CUSTOM"
 
     @property
     def assets(self) -> dict[str, Asset]:
@@ -28,4 +29,10 @@ class InspectionContext:
 
 def freeze(session: "Session") -> InspectionContext:
     resources = session.resources.selected(session.document)
-    return InspectionContext(session.document, resources, session.engine, session.workspace)
+    return InspectionContext(
+        session.document,
+        resources,
+        session.engine,
+        session.workspace,
+        session.preferences.value.routing_backend,
+    )

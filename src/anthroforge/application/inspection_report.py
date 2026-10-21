@@ -23,19 +23,28 @@ class Capture:
     provisional: bool
 
 
-def capture(session: "Session", selected: str, editing: bool, tissue: Any = None) -> Capture:
-    from .tissue_inspection_capture import capture as tissue_view
-
+def capture(
+    session: "Session", selected: str, editing: bool, tissue: Any = None, route: Any = None
+) -> Capture:
     if selected and selected not in inspection.all_targets(session):
         raise ValueError("Unknown inspection selection.")
     view = dict(workspace=session.active_workspace, selected=selected, editing=editing)
     view.update(camera=list(session.workspace.camera), orthographic=session.workspace.orthographic)
-    if tissue:
-        view["tissue"] = tissue_view(session, selected, tissue)
+    capture_views(session, view, tissue, route)
     view = json.loads(json.dumps(view, allow_nan=False))
     return Capture(
         freeze(session), view, inspection.issue_records(session), session.history.before is not None
     )
+
+
+def capture_views(session: Any, view: Any, tissue: Any, route: Any) -> None:
+    from .route_inspection import capture as route_view
+    from .tissue_inspection_capture import capture as tissue_view
+
+    if tissue:
+        view["tissue"] = tissue_view(session, view["selected"], tissue)
+    if route:
+        view["route"] = route_view(session, view["selected"], route)
 
 
 def metadata(frozen: Capture) -> dict[str, Any]:
@@ -62,10 +71,11 @@ def export(
     editing: bool = False,
     wait: bool = False,
     tissue: Any = None,
+    route: Any = None,
 ) -> dict[str, Any]:
     target = Path(path).resolve()
     validate(session, target)
-    frozen = capture(session, selected, editing, tissue)
+    frozen = capture(session, selected, editing, tissue, route)
     return submit_export(session, target, frozen, wait)
 
 

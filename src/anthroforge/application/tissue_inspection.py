@@ -43,7 +43,7 @@ def make_job(session: Any, value: Any, kind: str, options: Any) -> Job:
 
 def inspection_job(session: Any, value: Any, kind: str, options: Any) -> Job:
     job = Job(
-        "Inspect tissue " + kind,
+        "Inspect " + kind,
         frozenset(),
         partial(capture, session, value, kind, options),
         partial(compute, kind, options),
@@ -126,7 +126,7 @@ def publish(session: Any, value: Any, kind: str, payload: Any) -> None:
         session.tissue_inspection.values.get(kind) is not value
         or definition(kind).signature(session, target, options) != stamp
     ):
-        raise ValueError("Tissue inspection inputs changed; inspect the accepted stages again.")
+        raise ValueError("Inspection inputs changed; run the inspection again.")
     value.asset = dict(result, stamp=stamp, options=options, target=target, kind=kind)
     value.state = "ready"
 
@@ -164,7 +164,7 @@ def cancel(session: Any, kind: str = "") -> None:
 
 
 def execute(session: Any, operation: str, arguments: dict[str, Any]) -> Any:
-    commands = operations(session)
+    commands = dict(operations(session), **route_operations(session))
     if operation not in commands:
         raise ValueError("Unknown tissue inspection operation.")
     return commands[operation](**arguments)
@@ -183,4 +183,12 @@ def operations(session: Any) -> dict[str, Any]:
         "tissue.inspect.status": partial(status, session),
         "tissue.inspect.cancel": partial(cancel, session),
         "tissue.inspect.check": partial(tissue_geometry.request, session),
+    }
+
+
+def route_operations(session: Any) -> dict[str, Any]:
+    return {
+        "curve.inspect.route": partial(start, session, "route"),
+        "curve.inspect.status": partial(status, session, "route"),
+        "curve.inspect.cancel": partial(cancel, session, "route"),
     }

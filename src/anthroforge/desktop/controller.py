@@ -21,6 +21,7 @@ from .issue_panel import IssuePanel
 from .models import RenderModel
 from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
+from .route_inspection_tools import RouteInspectionTools
 from .routing_choices import RoutingChoices
 from .section_tools import SectionTools
 from .surface_creation import SurfaceCreation
@@ -72,11 +73,15 @@ class Controller(QObject):
         self.drawing_tools = DrawingTools(self)
         self.creation_selection = CreationSelection(self)
         self.routing_choices = RoutingChoices()
+        self.initialize_tissue_tools()
+        self.surface_creation = SurfaceCreation(self)
+
+    def initialize_tissue_tools(self):
         self.tissue_region_tools = TissueRegionTools(self)
         self.tissue_inspection = TissueInspectionTools(self)
         self.tissue_painting = TissuePaintingTools(self)
         self.section_tools = SectionTools(self)
-        self.surface_creation = SurfaceCreation(self)
+        self.route_inspection = RouteInspectionTools(self)
 
     def memory_owners(self, owners):
         for model in self.geometry_models():
@@ -274,6 +279,10 @@ class Controller(QObject):
     def sectionTools(self):
         return self.section_tools
 
+    @Property(QObject, constant=True)
+    def routeInspection(self):
+        return self.route_inspection
+
     @Slot()
     def cancelViewportTools(self, keep=None):
         tools = (
@@ -404,6 +413,7 @@ class Controller(QObject):
         self.tissue_painting.synchronize()
         self.tissue_inspection.synchronize()
         self.section_tools.synchronize()
+        self.route_inspection.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()
@@ -458,6 +468,7 @@ class Controller(QObject):
         self.tissue_inspection.synchronize()
         self.refresh_if_needed()
         self.section_tools.synchronize()
+        self.route_inspection.synchronize()
         self.creation_selection.synchronize()
         self.issue_panel.synchronize()
         self.tick_count += 1

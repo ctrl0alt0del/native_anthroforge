@@ -14,6 +14,7 @@ struct World {
     std::vector<int> owners;
     double length=1,coordinate=1,floor=1e-9,slack=1e-9,radius=0;
 };
+struct Trace;
 struct Input {
     const double* records;
     int count;
@@ -22,6 +23,7 @@ struct Input {
     AfRoutingOptions options;
     uint64_t cancel;
     int backend=AF_ROUTING_CUSTOM;
+    Trace* trace=nullptr;
 };
 struct Reference {
     std::vector<Vec> points;

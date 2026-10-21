@@ -1,4 +1,6 @@
 #include "routing_planner.hpp"
+#include "routing_trace.hpp"
+#include "anthroforge/routing_trace.h"
 #include <Eigen/LU>
 
 namespace af::routing {
@@ -33,19 +35,44 @@ static bool replan(const Input& input,const World& scene,Reference& reference,
     prepared=prepare_routes(input,scene,reference);
     return solve(prepared,input,counters,measures);
 }
+static uint64_t output(const Input& input,const Reference& reference,const std::vector<Span>& spans) {
+    if(input.trace) for(size_t i=0;i<spans.size();++i) trace_path(input.trace,4,int(i),spans[i].output);
+    return retain_path(make_path(result(input,reference,spans),input.options.closed,input.cancel));
+}
 static uint64_t evaluate(Input input,const World& scene,int64_t* counters,double* measures,uint64_t warm) {
     if(input.backend!=AF_ROUTING_CUSTOM&&input.backend!=AF_ROUTING_PIQP)
         throw std::runtime_error("Unknown routing backend.");
     resolve_contacts(input,scene);
     auto reference=af::routing::reference(input);
+    trace_path(input.trace,0,0,reference.points);
     std::vector<Span> spans;
     const bool continuation=warm_start(input,scene,reference,spans,warm);
+    if(input.trace) input.trace->warm=continuation;
     if(!continuation) spans=prepare_routes(input,scene,reference);
     if(!solve(spans,input,counters,measures)&&
        (!continuation||!replan(input,scene,reference,spans,counters,measures)))
         throw std::runtime_error("Routing could not find a collision-free path.");
-    return retain_path(make_path(result(input,reference,spans),input.options.closed,input.cancel));
+    return output(input,reference,spans);
 }
+static void diagnose(Input& input,const World& scene,Trace& trace,uint64_t warm) {
+    input.trace=&trace;
+    try {
+        const auto path=evaluate(input,scene,trace.counters.data(),trace.measures.data(),warm);
+        af_path_release(path); trace.success=true;
+    } catch(const std::exception& error) { check_cancel(input.cancel); trace.error=error.what(); }
+}
+}
+uint64_t af_route_inspect(const double* records,int count,const double* world,const int* owners,
+    uint64_t handle,const AfRoutingOptions* options,uint64_t warm,uint64_t cancel,int backend) {
+    try {
+        if(!options) throw std::runtime_error("Routing options are required.");
+        const auto scene=af::routing::routing_scene(handle);
+        if(scene->radius!=options->radius) throw std::runtime_error("Routing scene clearance changed.");
+        auto input=af::routing::input(records,count,world,owners,int(scene->collision->items.size()),options,cancel);
+        input.backend=backend; auto trace=std::make_shared<af::routing::Trace>();
+        af::routing::diagnose(input,*scene,*trace,warm); af::check_cancel(cancel);
+        return af::routing::retain_trace(std::move(trace));
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }
 uint64_t af_route_path_with_backend(const double* records,int count,const double* world,const int* owners,
     const uint64_t* meshes,const double* matrices,int surfaces,const AfRoutingOptions* options,

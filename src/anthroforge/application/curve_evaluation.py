@@ -23,6 +23,14 @@ class PathEvaluation:
     attachment: attachment_assets.AttachmentAsset | None = None
 
 
+@dataclass(frozen=True)
+class ResolvedCurve:
+    authored: Any
+    path: Any = None
+    edited: Fiber | None = None
+    attachment: attachment_assets.AttachmentAsset | None = None
+
+
 def evaluate(
     engine: Any, document: Any, resources: Any, target: str, cancel: int, backend: str = "CUSTOM"
 ) -> Any:
@@ -33,14 +41,26 @@ def evaluate(
 def evaluate_item(
     engine: Any, document: Any, resources: Any, item: Any, cancel: int, backend: str = "CUSTOM"
 ) -> PathEvaluation:
-    if not isinstance(item, Fiber):
-        return PathEvaluation(engine_path(engine, document, resources, item, cancel, backend))
-    return evaluate_fiber(engine, document, resources, item, cancel, backend)
+    value = resolve(engine, document, resources, item, cancel)
+    path = engine_path(engine, document, resources, value, cancel, backend)
+    return PathEvaluation(path, value.edited, value.attachment)
 
 
-def evaluate_fiber(
-    engine: Any, document: Any, resources: Any, item: Fiber, cancel: int, backend: str
-) -> PathEvaluation:
+def resolve(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -> ResolvedCurve:
+    value = (
+        resolve_fiber(engine, document, resources, item, cancel)
+        if isinstance(item, Fiber)
+        else ResolvedCurve(item)
+    )
+    item, path = junction_evaluation.resolved(
+        engine, document, resources, value.authored, cancel, value.path
+    )
+    return replace(value, authored=item, path=path)
+
+
+def resolve_fiber(
+    engine: Any, document: Any, resources: Any, item: Fiber, cancel: int
+) -> ResolvedCurve:
     item = junction_bindings.resolve(document, resources, item)
     if item.attachment_asset not in resources.attachments:
         raise ValueError("Fiber has no captured attachment field.")
@@ -48,41 +68,24 @@ def evaluate_fiber(
     positions = attachment_assets.resolved_points(engine, document, resources.meshes, asset, cancel)
     world = curve_sources.world(engine, document, item.id)
     if item.edit:
-        return edited_fiber(engine, document, resources, item, world, cancel, backend)
+        return edited_fiber(engine, document, resources, item, world, cancel)
     resolved = attachment_assets.evaluate(engine, item, asset, positions, world, cancel)
-    return PathEvaluation(
-        engine_path(engine, document, resources, resolved.authored, cancel, backend, resolved)
-    )
+    return ResolvedCurve(resolved.authored, resolved)
 
 
 def edited_fiber(
-    engine: Any, document: Any, resources: Any, item: Fiber, world: Any, cancel: int, backend: str
-) -> PathEvaluation:
+    engine: Any, document: Any, resources: Any, item: Fiber, world: Any, cancel: int
+) -> ResolvedCurve:
     path, changed, captured = fiber_edit_evaluation.evaluate(
         engine, item, resources, document, world, cancel
     )
-    path = engine_path(engine, document, resources, changed, cancel, backend, path)
-    return PathEvaluation(path, changed, captured)
+    return ResolvedCurve(changed, path, changed, captured)
 
 
 def engine_path(
-    engine: Any,
-    document: Any,
-    resources: Any,
-    item: Any,
-    cancel: int,
-    backend: str,
-    resolved: Any = None,
+    engine: Any, document: Any, resources: Any, value: ResolvedCurve, cancel: int, backend: str
 ) -> Any:
-    item, resolved = junction_evaluation.resolved(
-        engine, document, resources, item, cancel, resolved
-    )
-    return resolved_engine_path(engine, document, resources, item, cancel, backend, resolved)
-
-
-def resolved_engine_path(
-    engine: Any, document: Any, resources: Any, item: Any, cancel: int, backend: str, resolved: Any
-) -> Any:
+    item, resolved = value.authored, value.path
     if item.engine == "ROUTED":
         return routing_evaluation.evaluate(
             engine, document, resources, item, cancel, resolved, backend

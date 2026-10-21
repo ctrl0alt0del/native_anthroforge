@@ -19,6 +19,7 @@ ColumnLayout {
         onEdited: value=>panel.updateSetting("radius",value)
     }
     RoutingObstacles { curve: panel.curve; settings: panel.settings; onEdited: values=>workspace.run("curve.engine_settings",{curve:panel.curve.id,obstacle_mode:values.obstacle_mode,obstacles:values.obstacles || [],excluded_obstacles:values.excluded_obstacles || []}) }
+    RouteInspection { }
     UiButton { id: advanced; objectName: "routingAdvanced"; text: checked ? "▾  Advanced" : "▸  Advanced"; checkable: true; flatStyle: true }
     ColumnLayout {
         visible: advanced.checked; Layout.fillWidth: true

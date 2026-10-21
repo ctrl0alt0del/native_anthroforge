@@ -51,7 +51,13 @@ Visible-only/Paint Through, external occlusion, rate independence, Base/Rest und
 inputs, cancellation and staged colors have focused tests. Hidden GPU preview/export passed;
 the colored tissue capture was inspected. Sections now have native contours, shader cutaways,
 matching original-triangle picking, comparison stages, controls and frozen report settings.
-Native/API/view tests and hidden GPU section captures passed. Route diagnostics remain pending.
+Native/API/view tests and hidden GPU section captures passed. Optional bounded native route
+capture now records planner/seed/trial/final paths, contacts and termination, with shared
+Fiber/junction input resolution and read-only jobs. Desktop step selection and frozen export
+are integrated; route-specific GUI/failure/limit qualification remains pending. Both solver
+backends match normal output in focused tests, including moved Fiber attachments (25 tests).
+Working route default is an explicit separate diagnostic run, starting at the planner;
+users can retain the normal warm-start policy. This does not publish geometry.
 Unrelated root `__init__.py` is preserved.
 
 ## Verification

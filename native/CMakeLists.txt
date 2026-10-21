@@ -13,7 +13,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/curve_fit.cpp src/drawing.cpp src/placement.cpp src/attachment_weights.cpp src/path_editing.cpp
     src/routing.cpp src/routing_world.cpp src/routing_scene.cpp src/routing_reference.cpp src/routing_solve.cpp
     src/routing_planner.cpp src/routing_candidates.cpp src/routing_surface.cpp src/routing_handoff.cpp
-    src/routing_piqp.cpp src/routing_qp_problem.cpp
+    src/routing_piqp.cpp src/routing_qp_problem.cpp src/routing_trace.cpp
     src/routing_mesh_surface.cpp src/routing_shells.cpp src/routing_access.cpp src/routing_roadmap.cpp
     src/routing_random.cpp src/routing_pin_tree.cpp src/routing_pin_growth.cpp
     src/path_contacts.cpp src/path_collisions.cpp src/routing_clearance.cpp src/sampling_allocation.cpp src/path_resampling.cpp

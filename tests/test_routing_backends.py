@@ -1,5 +1,6 @@
 """Same routing safety contract for both QP strategies, including bound and closed curves."""
 
+import ctypes as c
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
 
@@ -7,7 +8,8 @@ import numpy as np
 import pytest
 
 from anthroforge.native import path_collisions, routing
-from anthroforge.native.mesh import NativeCancellation
+from anthroforge.native.mesh import NativeCancellation, pointer
+from anthroforge.native.paths import Path
 from tests.routing_backend_cases import all_cases, inputs
 
 CASES = all_cases()
@@ -67,3 +69,22 @@ def test_cancellation_and_unknown_backend_are_explicit(session, backend):
         routing.evaluate(session.engine, replace(spec, backend=backend), cancel.handle)
     with pytest.raises(ValueError, match="CUSTOM or PIQP"):
         routing.evaluate(session.engine, replace(spec, backend="OTHER"))
+
+
+def legacy_route(engine, spec):
+    options = routing.Options(
+        spec.curve.engine_settings.samples, 24, spec.curve.closed, spec.curve.engine_settings.radius
+    )
+    counters, measures = np.zeros(8, dtype=np.int64), np.zeros(8)
+    args = routing.arguments(routing.arrays(spec))
+    handle = engine.library.af_route_path(
+        *args, c.byref(options), counters.ctypes.data_as(routing.INT64), pointer(measures), 0, 0
+    )
+    return Path(engine, handle)
+
+
+def test_original_abi_keeps_custom_default_without_extended_options(session):
+    meshes, spec = inputs(session.engine, CASES[2])
+    expected, _ = routing.evaluate(session.engine, spec)
+    old = legacy_route(session.engine, spec)
+    np.testing.assert_array_equal(old.array(), expected.array())

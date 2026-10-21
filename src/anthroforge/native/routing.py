@@ -20,7 +20,6 @@ from .routing_scene import capture
 class Options(c.Structure):
     _fields_ = [(name, c.c_int) for name in ("samples", "accepted_steps", "closed")]
     _fields_ += [("radius", c.c_double)]
-    _fields_ += [("backend", c.c_int)]
 
 
 @dataclass(frozen=True)
@@ -50,6 +49,8 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind(
         "af_route_path_in_scene", [D, c.c_int, D, INT, U, c.POINTER(Options), INT64, D, U, U], U
     )
+    for name in ("af_route_path", "af_route_path_in_scene"):
+        engine.bind(name + "_with_backend", [*getattr(engine.library, name).argtypes, c.c_int], U)
 
 
 def arrays(inputs: Inputs) -> tuple[Any, ...]:
@@ -73,9 +74,8 @@ def evaluate(engine: GeometryEngine, inputs: Inputs, cancel: int = 0) -> tuple[P
         settings.accepted_steps,
         inputs.curve.closed,
         settings.radius,
-        int(inputs.backend == "PIQP"),
     )
-    return invoke(engine, arrays(inputs), options, inputs.warm, cancel)
+    return invoke(engine, arrays(inputs), options, inputs.warm, cancel, inputs.backend)
 
 
 def invoke(
@@ -84,20 +84,18 @@ def invoke(
     options: Options,
     warm: Path | None,
     cancel: int,
+    backend: str = "CUSTOM",
 ) -> tuple[Path, Report]:
     scene = capture(engine, packed, options.radius, cancel)
     counters, measures = np.zeros(8, dtype=np.int64), np.zeros(8)
     report_args = (c.byref(options), counters.ctypes.data_as(INT64), pointer(measures))
-    handle = engine.library.af_route_path_in_scene(
-        *arguments(packed)[:4], scene.handle, *report_args, warm.handle if warm else 0, cancel
-    )
-    return Path(engine, handle), read_report(counters, measures, options)
+    args = (*arguments(packed)[:4], scene.handle, *report_args, warm.handle if warm else 0, cancel)
+    handle = engine.library.af_route_path_in_scene_with_backend(*args, int(backend == "PIQP"))
+    return Path(engine, handle), read_report(counters, measures, backend)
 
 
-def read_report(counters: Any, measures: Any, options: Options) -> Report:
-    return Report(
-        tuple(counters.tolist()), tuple(measures.tolist()), "PIQP" if options.backend else "CUSTOM"
-    )
+def read_report(counters: Any, measures: Any, backend: str) -> Report:
+    return Report(tuple(counters.tolist()), tuple(measures.tolist()), backend)
 
 
 def arguments(packed: tuple[Any, ...]) -> tuple[Any, ...]:

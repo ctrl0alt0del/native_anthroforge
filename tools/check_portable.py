@@ -17,6 +17,7 @@ from exterior_placement_portable import exterior_placement
 from feedback_portable import feedback
 from inspection_portable import inspection
 from issues_portable import issues
+from preferences_portable import preferences
 from profiler_portable import profiling
 from PySide6.QtGui import QImage
 from tissue_portable import tissues
@@ -44,6 +45,7 @@ CHECKS = (
     "direct tissue creation with automatic attached construction",
     "branched point creation, automatic surface grouping and membrane conversion",
     "exterior-only placement, sealed-cavity exclusion and original-material Fiber/Anchor capture",
+    "persistent preferences, Custom/PIQP routed curves and fibers, saved/report provenance",
 )
 
 
@@ -66,10 +68,12 @@ def platform_environment(env, background):
 
 
 def invoke(executable, cwd, *arguments, background=False):
+    environment = clean_environment(background)
+    environment["ANTHROFORGE_PREFERENCES_PATH"] = str(cwd / "preferences.json")
     result = subprocess.run(
         [str(executable), *arguments],
         cwd=cwd,
-        env=clean_environment(background),
+        env=environment,
         capture_output=True,
         text=True,
         timeout=90,
@@ -143,6 +147,7 @@ def qualification_steps():
         tissues,
         exterior_placement,
         feedback,
+        preferences,
     )
 
 

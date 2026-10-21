@@ -11,6 +11,19 @@ def test_headless_core_does_not_import_qt_or_blender():
     assert json.loads(result.stdout)["entity_count"] == 0
 
 
+def test_piqp_preferences_and_evaluation_do_not_import_qt():
+    code = (
+        "import sys; from anthroforge.application.session import Session; "
+        "s=Session(); s.command('preferences.set',routing_backend='PIQP'); "
+        "key=s.command('curve.create',engine='ROUTED'); s.wait(); "
+        "p=s.resources.paths[s.document.object(key).result.asset]; "
+        "assert p.diagnostics.backend=='PIQP'; s.close(); "
+        "assert not any(n.startswith(('PySide6','shiboken6','bpy')) for n in sys.modules)"
+    )
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr
+
+
 def test_cli_has_native_runtime():
     command = [sys.executable, "-m", "anthroforge", "doctor", "--require-native"]
     result = subprocess.run(command, capture_output=True, text=True)

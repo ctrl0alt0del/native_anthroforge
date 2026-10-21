@@ -1,4 +1,10 @@
-# AnthroForge 0.2.2
+# AnthroForge 0.2.3
+
+**Edit → Preferences… → ROUTED solver** selects Custom (default) or sparse PIQP for
+curves and Fibers. The choice saves automatically across projects and launches. It
+applies to future calculations; current results and running jobs stay unchanged.
+Use Recalculate when you want existing routes updated. See the
+[0.2.3 contract](docs/specification_023.md) and [API](docs/authoring_api.md#application-preferences-023).
 
 [0.2.2 unified tissues](docs/specification_022.md) adds attached Point/Anchor and Membrane
 construction, muscle/soft-tissue inflation, relaxation, constraints, cropping and stacking.
@@ -23,7 +29,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.2.2/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.2.3/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included

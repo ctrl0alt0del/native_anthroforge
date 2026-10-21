@@ -22,14 +22,13 @@ portable distribution and companion source archive. Background-only validation.
   backend switch, fallback, Python numerical loop, or separate worker pool.
 - Preserve routing planning, exact pins, corner retention, collision acceptance,
   cancellation, dependent surfaces and attachments. Document computation changes.
-- Asked whether changing the preference applies on future evaluations or schedules
-  existing routes immediately; answer pending. Independent foundation work can proceed.
+- User confirmed future calculations only; preserve existing results and running work.
 
 ## Current state
 
 Native per-invocation backend, sparse adapter, preference storage and desktop editor
-implemented. Custom remains default. Future-dispatch semantics implemented provisionally
-while the optional question is pending. Both ordinary path jobs and conversion previews
+implemented. Custom remains default; future-dispatch semantics confirmed. Both ordinary
+path jobs and conversion previews
 capture preferences at dispatch. Reports retain backend provenance. Shared reference
 fixtures moved into a test helper used by the benchmark and production qualification.
 
@@ -42,14 +41,26 @@ removes a possible out-of-bounds downstream read; no acceptance checks weakened.
 50 focused tests passed: both backends on 18 compact cold/warm fixtures, independent
 clearance/pins/layout, concurrent calls, cancellation, preference persistence, running
 and queued dispatch, Manual mode, saved backend provenance, and function limits.
-Initial native build/three contracts and mypy passed. New native cap regression,
-dependent material tests, offscreen UI, full gate and portable release remain pending.
+Development gate passed: 1,494 tests, four native contracts including the active-set cap,
+mypy, native/script style, lint/format and numerics. Subsequent explicit ABI-preserving
+entry points and additional preview/failure/ABI checks pass 53 focused tests, mypy/style.
+Eleven material/architecture checks and actual offscreen Preferences UI pass. No native
+desktop input was used. Final full-suite check and portable release remain pending.
+
+Production comparison: 22 inputs, six alternating AB/BA trials per cold/warm/backend
+(528 routes), full-route timings including setup. The heavy 256-sample attached warm
+case is 325.55 ms Custom / 61.51 ms PIQP; actual four-point/24-sample cold fixture is
+9.21 / 11.82 ms. These are local timings, not UI latency. 21/22 inputs pass independent
+clearance for both backends; the same historical skull pin slightly inside Cranium
+remains the known counterexample. All pins/finite/correspondence checks pass. Overlaid
+actual route geometry was inspected. Local evidence: `build/preferences-023/backends.json`
+and `routes.png`; optional skull input is not committed. No user projects modified.
 
 ## Next actions
 
-1. Implement native per-job backend contract and sparse PIQP adapter.
-2. Add persisted application preferences and desktop editor; integrate dispatch capture.
-3. Validate, document, package 0.2.3, merge and push under continuity workflow.
+1. Complete final gate and package 0.2.3.
+2. Qualify relocated package, headless reports and offscreen Preferences.
+3. Finalize documentation/source archive, merge and push.
 
 ## Recovery inputs
 

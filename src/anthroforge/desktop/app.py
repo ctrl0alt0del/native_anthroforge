@@ -19,7 +19,7 @@ from anthroforge.desktop.runtime import build_directory, native_runtime
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="anthroforge-desktop")
     parser.add_argument("--smoke-test", action="store_true")
-    parser.add_argument("--smoke-panel", choices=("activity", "issues"), default="")
+    parser.add_argument("--smoke-panel", choices=("activity", "issues", "preferences"), default="")
     parser.add_argument("--screenshot")
     parser.add_argument("--project")
     parser.add_argument("--disable-profiling-support", action="store_true")

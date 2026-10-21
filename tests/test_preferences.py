@@ -115,3 +115,37 @@ def test_preference_file_contains_only_settings(session):
     result = session.command("preferences.set", routing_backend="PIQP")
     data = json.loads(Path(result["path"]).read_text())
     assert data == {"schema": 1, "values": {"routing_backend": "PIQP"}}
+
+
+def test_conversion_preview_uses_selected_backend_without_committing(session):
+    cube(session)
+    key = session.command("curve.create", points=[dict(position=[x, 0, 0]) for x in (-2, 2)])
+    session.wait()
+    original = session.document
+    session.command("preferences.set", routing_backend="PIQP")
+    session.command("curve.conversion.preview", curve=key, engine="ROUTED")
+    session.wait()
+    assert session.conversion.state == "ready", session.conversion.error
+    assert session.conversion.asset.diagnostics.backend == "PIQP"
+    assert session.document is original
+
+
+def test_backend_failure_retains_accepted_geometry_without_fallback(session, monkeypatch):
+    from anthroforge.native import routing
+
+    key = curve(session)
+    before = ready(session, key).result.asset
+    session.command("preferences.set", routing_backend="PIQP")
+    monkeypatch.setattr(routing, "evaluate", fail_backend)
+    session.command("curve.evaluate", curve=key)
+    session.wait()
+    result = session.document.object(key).result
+    assert result.asset == before and result.status == "failed"
+    assert (
+        "PIQP" in result.error and session.resources.paths[before].diagnostics.backend == "CUSTOM"
+    )
+
+
+def fail_backend(engine, inputs, cancel=0):
+    assert inputs.backend == "PIQP"
+    raise ValueError("PIQP routing subproblem failed (status -8).")

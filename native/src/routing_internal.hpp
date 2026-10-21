@@ -21,6 +21,7 @@ struct Input {
     std::vector<int> owners;
     AfRoutingOptions options;
     uint64_t cancel;
+    int backend=AF_ROUTING_CUSTOM;
 };
 struct Reference {
     std::vector<Vec> points;

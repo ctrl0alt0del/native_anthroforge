@@ -57,9 +57,22 @@
   Shapes agree. This preserves source anatomical review status, not new approval.
 - Development gate passes: 1660 pytest cases, five native CTests, Python/native
   style, typing, numerical-boundary audit and doctor. Logs: build/all-muscle-gate.log.
-- Canonical 0.2.3 package rebuilt; background portable suite is running.
+- Canonical 0.2.3 package rebuilt; the complete background portable suite passes.
 - Resume the single writer `tmp/migrate_stream.py`, which retains native caches,
   saves every accepted unit, and drops only this disposable script's undo history.
   `STOP` in the run requests a graceful stop between units. Do not run two writers.
   At this checkpoint 52 authored units were accepted; read live migration-state.json
   for the current count. Final artifact/assembly qualification remains unfinished.
+
+## Full-assembly checkpoint
+
+- All eleven external intercostal spaces now match their source. The writer is
+  finishing hand/foot instances and the already qualified deltoid branch case.
+- A read-only preservation check on the cumulative project confirms all 139
+  original objects retain authored settings and geometry. Derived asset IDs change
+  during normal opening/recalculation; pose drift is below the numerical tolerance.
+- Source/base/path comparisons pass on the first 59 units. Source/result image
+  pairs for 72 units were inspected directly by the coordinator; no shape mismatch
+  was observed. Final all-unit comparisons and packaged assembly views remain.
+- Run `tmp/qualify_all.py` after the writer finishes, then preservation and packaged
+  checks. The original user file remains untouched until these checks complete.

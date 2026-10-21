@@ -1233,7 +1233,8 @@ See the task and development validation records for final gate/package evidence 
   now reproduce their saved source inflation within 2.3e-7 scene units.
 - Ownership: filtering and numerical coordinates belong to the shared C++ spatial
   query; Python migration retains ordinary application capture and transactions.
-  Full migration, combined development gate and portable qualification are pending.
+  The combined 1660-test development gate and canonical portable suite pass;
+  full assembled migration qualification is still pending.
 
 ### CH-033 — Retain correspondence through branch evaluation (2026-10-22)
 
@@ -1252,5 +1253,5 @@ See the task and development validation records for final gate/package evidence 
   deformation, exact seam counts, save/reopen/recompute, and invalid-density rejection.
   Branch addition cannot silently discard an existing ordinary-loft material mapping.
 - Scope remains complete open curves with exact evaluated-corner preservation.
-  Final assembled migration, visual inspection and full development/package gates
-  remain pending; the numerical comparison is not anatomical reapproval.
+  The full 1660-test development gate and canonical portable suite pass. Final
+  assembled migration qualification remains pending; this is not anatomical reapproval.

@@ -107,7 +107,7 @@ def record(row: Any, points: Any, contacts: Any) -> dict[str, Any]:
         attempt=attempt,
         trial=trial,
         accepted=accepted,
-        termination=TERMINATIONS.get(termination, str(termination)),
+        termination=TERMINATIONS.get(termination, str(termination)) if stage == 3 else "",
         points=points[begin : begin + count].tolist(),
         contacts=contacts[first : first + length].tolist(),
     )

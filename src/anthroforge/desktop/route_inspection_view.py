@@ -38,13 +38,17 @@ def details(tool):
         return ""
     outcome = "Usable route" if report["success"] else report["error"]
     mode = "warm continuation" if report["warm"] else "planner run"
-    note = str(len(row.get("contacts", []))) + " contact witnesses · " + viewport_limit(row)
+    note = " · ".join(filter(None, [contact_count(row), viewport_limit(row)]))
     return "\n".join(
         filter(
             None,
             [report["backend"] + " · " + mode + " · " + outcome, row.get("termination", ""), note],
         )
     )
+
+
+def contact_count(row):
+    return str(len(row.get("contacts", []))) + " contact witnesses"
 
 
 def viewport_limit(row):

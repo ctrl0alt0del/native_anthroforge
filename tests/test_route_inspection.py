@@ -26,6 +26,7 @@ def test_native_trace_preserves_production_result(session, backend):
     trace = routing_trace.inspect(session.engine, inputs)
     assert trace["success"] and trace["counters"] == list(report.counters)
     assert {r["stage"] for r in trace["records"]} == set(routing_trace.STAGES)
+    assert all(not r["termination"] for r in trace["records"] if r["stage"] != "Solver trial")
     ends = [r["points"] for r in trace["records"] if r["stage"] == "Final"]
     points = np.asarray(ends[0][:-1] + ends[1])
     np.testing.assert_array_equal(points, path.array()[:, :3])

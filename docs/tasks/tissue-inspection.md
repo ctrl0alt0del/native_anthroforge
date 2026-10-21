@@ -3,7 +3,7 @@
 - Task branch: `codex/tissue-inspection`
 - Integration branch: `main`
 - Starting revision: `118a13499a8515f9a92940b80a8daecd8c14c1d4`
-- Status: in progress
+- Status: complete; qualified for main
 - Last updated: 2026-10-21, Europe/Bucharest
 - Active writer: desktop chat, direct work
 
@@ -37,27 +37,32 @@ and profiler ownership include inspection resources. 26 focused tests pass, incl
 real crossing fixtures, cropped material mapping, exact backing and publication lifetime.
 Dedicated offscreen UI and hidden GPU inspection pass, including frozen report replay.
 Actual images were reviewed; frame-box conversion and occluded witness visibility were
-corrected. All 1,553 behavior tests in the initial full gate passed; its architecture and
-capture harness failures have been corrected and verified separately. Final gate and
-portable qualification remain pending. Documentation/computation history is updated.
+corrected. The final full gate passes all 1,557 tests. The relocated canonical package
+passes the complete portable suite, including frozen comparison/point report replay.
+Documentation, computation history and the separate ownership review are complete.
 
 ## Verification
 
-Passed build-native.ps1 and 13 tests in test_tissue_inspection.py/test_issue_lifecycle.py.
-Required: extended native/API contracts, stale/cancel/resource lifecycle, tissue
-shape fixtures, offscreen UI/render capture inspection, full development gate and
-canonical 0.2.3 package qualification. Preserve unrelated root __init__.py.
+`tools/check.ps1` passes: 1,557 tests, five native contracts, typing of 296 modules,
+lint/format, native/script function limits, numerical checks and native runtime doctor.
+The initial architecture/capture-harness failures were corrected before this final run.
+Offscreen controls, hidden GPU scene checks and the entire minimal-PATH portable suite
+pass. The unrelated root `__init__.py` is preserved.
 
-## Next actions and blockers
+## Delivery
 
-1. Run final full gate; qualify one canonical 0.2.3 executable and source archive.
-2. Record final evidence, review ownership/coupling and merge the validated task.
+One canonical `dist/0.2.3/AnthroForge.dist` and companion
+`dist/AnthroForge-0.2.3-source.zip`; runtime source is
+`0561d8718986573a37fd31d1d7a10c737bcd4971`, with subsequent documentation-only commits.
+Executable SHA-256: `A0FEF1175EF61FD906D5150474396F4569092C7E460C0FEBDDCFAA194E16AF3D`.
+No unfinished implementation remains. Interactive physical desktop acceptance was not
+performed; all GUI evidence was obtained in the background.
 
 The interruption stopped the final gate during pytest and the package during Nuitka.
 Both were restarted from pushed checkpoint `0561d8718986573a37fd31d1d7a10c737bcd4971`.
 The resumed offscreen control test and hidden GPU/report replay both pass. Inspector
 text/layout and the crossing-face guides were visually reviewed with Windows fonts
-available to the offscreen platform. The previous executable is not the final candidate.
+available to the offscreen platform. The restarted build replaces the previous executable.
 
 ## Ownership review
 

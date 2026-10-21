@@ -1,7 +1,42 @@
 # AnthroForge development validation
 
-Current qualification is in [tissue authoring controls](#tissue-authoring-controls-023).
+Current qualification is in [tissue inspection](#tissue-inspection-023).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Tissue inspection (0.2.3)
+
+Runtime `0561d8718986573a37fd31d1d7a10c737bcd4971` adds accepted tissue stage overlays,
+material displacement colors, point-level constraint explanations and explicit advisory
+geometry checks. Select a tissue and expand **Inspect tissue**. **Check geometry** runs
+only on request; findings become stale when their geometry changes. Selecting a finding
+locates its faces with labeled x-ray guides. Inflation and acceptance rules are unchanged.
+
+- Full development gate: **1,557 tests passed**, five native contracts, typing of 296
+  modules, lint/format, native/script function limits and numerical/runtime checks.
+  The 1,146 Qt deprecation warnings remain non-fatal; this task adds inspector coverage.
+- Offscreen QML controls and hidden GPU rendering pass. Actual inspector layout, stage
+  overlays, displacement colors, point guides and occluded crossing-face guides were
+  visually inspected. Tests cover retained revisions, cancellation, Manual results,
+  topology correspondence, stale evidence, edit guards and complete buffer replacement.
+- The relocated canonical Windows executable passes the entire minimal-PATH portable
+  suite, including comparison/point/check commands and frozen image/JSON report replay.
+  API and desktop inspection preserve document revisions and undo state. No interactive
+  physical desktop acceptance is claimed.
+- Native timings from the small scripted profile were comparison 0.219 ms, point query
+  0.613 ms and geometry scan 4.618 ms. They include profiler perturbation and are not
+  frame/input latency or large-assembly performance guarantees. Cached view projection
+  reduced native matrix calls from 862 to 244 in the scripted workload; 100 unchanged
+  synchronization calls perform no additional inspection preparation.
+- Separate direct ownership review verified native numerical ownership, shared read-only
+  scheduling, requested Issue-provider policy and matched render/picking resource leases.
+  No additional worker pool or numerical Python fallback was added. See the
+  [task record](tasks/tissue-inspection.md) and [computation record CH-023](computation_history.md).
+
+Deliverables remain `dist/0.2.3/AnthroForge.dist` and `dist/AnthroForge-0.2.3-source.zip`.
+Executable SHA-256: `A0FEF1175EF61FD906D5150474396F4569092C7E460C0FEBDDCFAA194E16AF3D`.
+Local evidence is under `build/tissue-inspection*`. Checks exclude coplanar contact,
+shared-vertex self pairs, containment and penetration depth; they do not certify a clean
+solid. Constraint explanations describe accepted inputs, not causal force decomposition.
 
 ## Tissue authoring controls (0.2.3)
 

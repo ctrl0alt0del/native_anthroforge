@@ -154,3 +154,30 @@ in the companion source archive, with bundled offline CMake discovery. Qualifica
 
 Remaining: UI ellipsis reproduction/fixes, complete gate and actual-shape/offscreen evidence,
 dependency archive/configuration and canonical portable packaging. Not merge-ready.
+
+## UI and geometry qualification
+
+- Full pytest at the placement/stacking checkpoint: **1,438 passed**. Full native
+  clang-tidy completed successfully. The combined development gate is running.
+- A 280px property panel reproduced truncation of "Across strips · 0 keeps fitted
+  density". Shared numeric labels now wrap; check labels and detail values can wrap;
+  popup choices and menus size to content, with full text available for clipped selected
+  names. Immediate Edit/Delete/footprint actions no longer carry a misleading ellipsis.
+- Narrow surface and curve inspectors, long popup choices and Help menu pass offscreen
+  at normal and 200% scale. Screenshots were inspected. Numeric dragging keeps its field
+  bounds/focus through temporary diagnostics, and one-action Undo passes.
+- Expanding tissue relationship details exposed an SCP-only attachment-inspection
+  dispatch bug. The shared inspector now dispatches only SCPs to the SCP binding decoder;
+  tissue relationships stay construction-based. Regression test passes.
+- Actual source recomputation at 0.2 then 0.599 has ready base/rest/intrinsic/final.
+  Production query: 3,240 original triangles, 5,127 selectable exterior fragments,
+  0.698 seconds in one local run (not a responsiveness benchmark). Inspected the original
+  and query surfaces and the folded-provider stacking cross-section. Original file SHA256
+  remains unchanged. Local images are `production-query.png` and `stacking-normal.png`.
+- Production held-key/mouse offscreen checks pass: snapping target switching, Ctrl release,
+  insertion, undo, focus rules and both projection modes. Hidden texture-rendered drawing
+  passes with no visible window. No physical desktop interaction acceptance is claimed.
+
+Remaining: full gate completion, offline bundled dependency build and canonical package
+qualification. Added a clean-CLI cavity fixture testing surface confirmation, Fiber and
+Anchor original-material capture; it passes from source and awaits the portable executable.

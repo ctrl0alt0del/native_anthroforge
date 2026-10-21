@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.construction import Control
 from anthroforge.core.entities import SCP
-from anthroforge.core.objects import ConstructionObject
 from anthroforge.core.results import geometry_asset
 from anthroforge.native.attachments import anchor_points
 
@@ -33,7 +32,7 @@ def frame(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
 def describe(session: "Session | InspectionContext", item: Any) -> dict[str, Any]:
     if isinstance(item, Control):
         return ordinary(session, item)
-    if isinstance(item, ConstructionObject):
+    if not isinstance(item, SCP):
         from .construction_inspection import attachment
 
         return attachment(session, item)

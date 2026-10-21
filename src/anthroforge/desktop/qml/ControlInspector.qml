@@ -44,5 +44,5 @@ ColumnLayout {
         UiField { Layout.fillWidth: true; placeholderText: "Cage weights, comma separated"; text: (panel.item.weights || []).join(", "); onEditingFinished: panel.set("weights",text.trim()?text.split(",").map(Number):[]) }
     }
     DeformerStack { item: panel.item; visible: panel.item.kind === "LATTICE" }
-    UiButton { text: "Delete shared control…"; Layout.fillWidth: true; onClicked: panel.deleteRequested(panel.item.id) }
+    UiButton { text: "Delete shared control"; Layout.fillWidth: true; onClicked: panel.deleteRequested(panel.item.id) }
 }

@@ -146,7 +146,7 @@ UiScrollView {
             RowLayout {
                 Layout.fillWidth: true
                 UiButton { text: "Duplicate"; Layout.fillWidth: true; hint: "Create an independent copy"; onClicked: workspace.run("scp.duplicate",{entity:inspector.selected.id}) }
-                UiButton { text: "Delete…"; hint: "Delete this SCP, preserving children"; onClicked: inspector.deleteRequested(inspector.selected.id) }
+                UiButton { text: "Delete"; hint: "Delete this SCP, preserving children"; onClicked: inspector.deleteRequested(inspector.selected.id) }
             }
         }
         ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }

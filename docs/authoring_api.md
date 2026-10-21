@@ -639,7 +639,7 @@ normal shared transactions and topology/capability validation.
 `radius`, `strength` and `maximum_change` for muscle grid inflation. Unsupported mode
 combinations fail shared validation. Accepted rest diagnostics include part/side, fixed
 sample count, KKT residuals and solver duration; they are separate from relaxation reports.
-# Surface placement modes
+## Surface placement modes
 
 Preview picking reads the original accepted surface. Confirmed surface placement uses
 an in-memory exterior query mesh; buried and sealed-cavity faces and temporary closure

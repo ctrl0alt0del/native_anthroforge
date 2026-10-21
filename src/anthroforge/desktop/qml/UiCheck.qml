@@ -8,7 +8,7 @@ CheckBox {
     ToolTip.visible: hovered && hint.length > 0
     ToolTip.delay: 700
     implicitWidth: text ? contentItem.implicitWidth : indicator.width
-    implicitHeight: Theme.controlHeight; padding: 0
+    implicitHeight: Math.max(Theme.controlHeight, contentItem.implicitHeight); padding: 0
     spacing: 8
     font.pixelSize: 12
     indicator: Rectangle {
@@ -17,5 +17,5 @@ CheckBox {
         border.color: control.checked || control.activeFocus ? Theme.accent : Theme.border
         Text { anchors.centerIn: parent; text: "✓"; visible: control.checked; color: Theme.accent; font.pixelSize: 12 }
     }
-    contentItem: Text { leftPadding: control.text ? 24 : 0; text: control.text; font: control.font; color: control.enabled ? Theme.text : Theme.muted; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
+    contentItem: Text { leftPadding: control.text ? 24 : 0; text: control.text; font: control.font; color: control.enabled ? Theme.text : Theme.muted; verticalAlignment: Text.AlignVCenter; wrapMode: Text.Wrap }
 }

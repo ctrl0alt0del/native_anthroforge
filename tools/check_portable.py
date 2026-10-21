@@ -13,6 +13,7 @@ from attached_creation_portable import automatic_construction
 from branch_placement_portable import branches
 from construction_portable import construction
 from direct_workflow_portable import direct_workflows
+from exterior_placement_portable import exterior_placement
 from feedback_portable import feedback
 from inspection_portable import inspection
 from issues_portable import issues
@@ -42,6 +43,7 @@ CHECKS = (
     "automatic Fiber endpoints, independent copies, undo/redo and shared deletion impact",
     "direct tissue creation with automatic attached construction",
     "branched point creation, automatic surface grouping and membrane conversion",
+    "exterior-only placement, sealed-cavity exclusion and original-material Fiber/Anchor capture",
 )
 
 
@@ -139,6 +141,7 @@ def qualification_steps():
         inspection,
         *construction_steps(),
         tissues,
+        exterior_placement,
         feedback,
     )
 

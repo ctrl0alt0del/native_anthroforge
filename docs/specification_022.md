@@ -15,7 +15,7 @@ it. Separate tissues remain separate. Skin handling will be decided with skinnin
 Implementation and downstream-query qualification are tracked in
 [the active task](tasks/tissue-intersection-policy.md).
 
-The confirmed downstream contract is **pending implementation and qualification**:
+The downstream contract is implemented; delivery evidence is recorded in the active task:
 
 - Shared surface queries distinguish Preview and Confirmed Placement. Preview uses
   the original accepted target; confirmed placement uses a Boolean-cleaned query copy.
@@ -24,8 +24,8 @@ The confirmed downstream contract is **pending implementation and qualification*
   material binding. Existing bindings resolve their retained location rather than
   choosing a new nearest point on each update.
   Only fragments bordering exterior-connected space are valid: surfaces inside sealed
-  cavities are excluded, including reversed-orientation folds that ordinary signed
-  union can misclassify. This query cleanup never repairs the displayed tissue.
+  cavities are excluded. Exposed reversed-orientation folds, which ordinary signed
+  union can misclassify, remain selectable. This never repairs the displayed tissue.
 - For open single-sided tissue, use a temporary closure against its material base for
   the Boolean calculation. The cleaned mesh exists only in memory for confirmed
   queries. Added backing and closure faces are not selectable attachment surfaces.
@@ -251,11 +251,10 @@ Distributed/branch/envelope correction snapshots are explicitly labelled separat
 Material refinement subdivides existing intervals only where the requested density
 requires it. It retains every original grid line, avoids introducing nearly coincident
 lines, and never edits the source. Height smoothing retains the donor QP, hard pins
-and change bounds. Complete-mesh validation tests new transverse intersections and
-collapsed faces rather than treating a normal rotation beyond 90 degrees as a fold.
-Coincident front/back boundary contact is not a transverse intersection. These
-checks do not guarantee that arbitrary inflation settings are geometrically feasible;
-invalid generated geometry remains a failed result without reducing user parameters.
+and change bounds. Complete-mesh intrinsic validation rejects nonfinite output and
+new collapsed faces; self-intersections are explicitly permitted by the October 21
+policy above. Crossing diagnostics remain available independently. This supersedes
+the earlier crossed-surface rejection and does not reduce user parameters.
 For height smoothing, reaching PIQP's stricter iteration limit is not by itself
 proof that the application tolerance was missed. Such a result can publish only
 after independent KKT certification at the existing `2e-7` tolerance, exact pins,

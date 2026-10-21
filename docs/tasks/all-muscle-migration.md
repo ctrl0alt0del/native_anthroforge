@@ -42,3 +42,24 @@
 - Material station domains starting below zero are normalized during one-off input
   conversion; section correspondence is retained. Branches and tissue-supported
   fibers remain under investigation, and the final artifact is not yet installed.
+
+## Qualified intermediate behavior
+
+- Resolved inventory: 96 authored TissueVCP units across 87 catalogue entries.
+  Multi-head/section families account for the difference; no new mirrored units.
+- CH-033 forwards authored correspondence through the existing branch pipeline.
+  Biceps and deltoid retain native branches/junctions and match within 2.7e-7
+  scene units. Source composite normal direction is explicit input, not inferred.
+- FDS radial-to-main-belly binding uses TISSUE_FINAL and matches within 4.9e-7.
+  FCU uses its supplied settings in one creation transaction, avoiding evaluation
+  of unrelated temporary defaults; its source output matches within 4.4e-7.
+- Coordinator visually inspected source/app comparison sheets 00–02 under views/.
+  Shapes agree. This preserves source anatomical review status, not new approval.
+- Development gate passes: 1660 pytest cases, five native CTests, Python/native
+  style, typing, numerical-boundary audit and doctor. Logs: build/all-muscle-gate.log.
+- Canonical 0.2.3 package rebuilt; background portable suite is running.
+- Resume the single writer `tmp/migrate_stream.py`, which retains native caches,
+  saves every accepted unit, and drops only this disposable script's undo history.
+  `STOP` in the run requests a graceful stop between units. Do not run two writers.
+  At this checkpoint 52 authored units were accepted; read live migration-state.json
+  for the current count. Final artifact/assembly qualification remains unfinished.

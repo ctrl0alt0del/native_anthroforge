@@ -45,7 +45,12 @@ to QML lists; actual profile dragging exposed these transport gaps. Unrelated ro
 tests pass; expanded coverage is running. Native build and all five native contracts pass.
 Actual offscreen QML checks pass all four controls, numeric type/drag, side copy, undo/cancel,
 profile drag through zero, preview isolation and cancellation. Inspector captures inspected.
-Pending full development gate, hidden geometry inspection and canonical portable qualification.
+Hidden native rendering also passes: stacked/independent groups, proportional raised profiles,
+copied envelopes and hover/click agreement. Actual captures inspected. The source CLI passes
+the new portable authoring batch and round trip. Its first draft attempted to enable the
+second side on an attachment-locked example; the shared policy correctly rejected it, so
+portable coverage copies inactive side settings and the independent GUI fixture covers
+envelope creation. Full development gate is running; canonical portable qualification pending.
 Initial test fixture incorrectly used a smoothing `enabled` field; corrected to radius.
 
 ## Next actions and blockers

@@ -7,7 +7,8 @@ from anthroforge.core import tissue_parts
 from anthroforge.core.tissue_settings import HeightSmoothing, SectionProfile
 from anthroforge.native import tissue_parts as native
 
-from . import tissue_codec, tissue_operations, tissue_strategy_operations
+from . import tissue_operations, tissue_strategy_operations
+from .construction_codec import tuples
 
 
 def selected(item: Any, part: str) -> Any:
@@ -92,7 +93,7 @@ def profile_scale(
 
 
 def scaled_profile(session: Any, profile: dict[str, Any], factor: float) -> dict[str, Any]:
-    previous = SectionProfile(**tissue_codec.tuples(profile))
+    previous = SectionProfile(**tuples(profile))
     depths = native.scale_profile(session.engine, previous.depths, factor)
     return asdict(replace(previous, depths=depths, initialized=True))
 

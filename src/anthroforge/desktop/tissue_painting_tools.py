@@ -50,12 +50,10 @@ class TissuePaintingTools(QObject):
         field(session, controller.selection, dict(name=name))
         controller.authoring.setEditing(False)
         controller.cancelViewportTools(self)
+        controller.section_tools.cancel()
         self.prepare_view()
-        self.name, self.target, self.workspace = (
-            name,
-            controller.selection,
-            session.active_workspace,
-        )
+        self.name, self.target = name, controller.selection
+        self.workspace = session.active_workspace
         self.options = {}
         self.changed.emit()
 

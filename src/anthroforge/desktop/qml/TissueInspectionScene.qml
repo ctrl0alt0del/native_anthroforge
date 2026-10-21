@@ -11,6 +11,7 @@ Node {
             id: stageNode
             required property var item
             readonly property var geometryData: item.content
+            readonly property bool clipped: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && (workspace.sectionTools.state.wholeScene || item.owner===workspace.sectionTools.state.target)
             position: Qt.vector3d(stageNode.geometryData.trs[0],stageNode.geometryData.trs[1],stageNode.geometryData.trs[2])
             rotation: Qt.quaternion(stageNode.geometryData.quaternion[0],stageNode.geometryData.quaternion[1],stageNode.geometryData.quaternion[2],stageNode.geometryData.quaternion[3])
             scale: Qt.vector3d(stageNode.geometryData.trs[6],stageNode.geometryData.trs[7],stageNode.geometryData.trs[8])
@@ -20,14 +21,18 @@ Node {
                 visible: item.active && stageNode.geometryData.kind==="MESH"
                 geometry: MeshGeometry { assetId: stageNode.geometryData.kind==="MESH" ? item.handle : 0; chunk: item.chunk }
                 opacity: item.reference ? .3 : workspace.tissueInspection.state.reference && workspace.tissueInspection.state.mode==="Overlay" ? .7 : 1
-                materials: PrincipledMaterial { baseColor: item.color; roughness: .65; cullMode: Material.NoCulling }
+                property Material original: PrincipledMaterial { baseColor: item.color; roughness: .65; cullMode: Material.NoCulling }
+                property Material cut: SectionMaterial { tint: item.color }
+                materials: stageNode.clipped ? cut : original
             }
             Model {
                 id: heat
                 objectName: "inspectionHeat_"+item.chunk
                 visible: item.active && stageNode.geometryData.kind==="HEAT"
                 geometry: InspectionGeometry { assetId: stageNode.geometryData.kind==="HEAT" ? item.handle : 0; chunk: item.chunk }
-                materials: PrincipledMaterial { baseColor: "white"; vertexColorsEnabled: true; roughness: .8; cullMode: Material.NoCulling }
+                property Material original: PrincipledMaterial { baseColor: "white"; vertexColorsEnabled: true; roughness: .8; cullMode: Material.NoCulling }
+                property Material cut: SectionMaterial { vertexColor: true }
+                materials: stageNode.clipped ? cut : original
             }
             Model {
                 id: path
@@ -47,6 +52,14 @@ Node {
         objectName: "stackingFootprint"
         geometry: ControlGeometry { points: workspace.tissueInspection.state.footprint || []; segments: true; stroke: root.distance*.001 }
         materials: DefaultMaterial { diffuseColor: "#76e6cc"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
+    }
+    Repeater3D {
+        model: workspace.sectionTools.state.contours
+        delegate: Model {
+            required property var modelData
+            geometry: ControlGeometry { points: modelData.lines; segments: true; stroke: root.distance*.0015 }
+            materials: DefaultMaterial { diffuseColor: modelData.stage===workspace.tissueInspection.state.stage ? "#ffbbce" : "#78d9b5"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
+        }
     }
     Model {
         objectName: "tissueInspectionWitness"

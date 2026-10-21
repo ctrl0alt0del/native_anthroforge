@@ -36,6 +36,7 @@ UiSection {
     UiButton { objectName: "tissueExplainPoint"; enabled: panel.hasMesh; text: panel.state.active ? "Finish point inspection" : "Explain a surface point"; checkable: true; checked: panel.state.active; Layout.fillWidth: true; onClicked: panel.tools.explain() }
     UiButton { objectName: "tissueCheckGeometry"; enabled: panel.hasMesh; text: "Check geometry"; Layout.fillWidth: true; hint: "Advisory checks on this stage against itself and other accepted anatomy. Does not modify geometry."; onClicked: panel.tools.check() }
     TissuePointExplanation { report: panel.state.point || ({}) }
+    TissueSections {}
     UiSection {
         id: measurements
         title: "Comparison measurements"; expanded: false

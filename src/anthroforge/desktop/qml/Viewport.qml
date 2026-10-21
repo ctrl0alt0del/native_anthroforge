@@ -265,7 +265,7 @@ Item {
                         position: Qt.vector3d(item.geometry_offset[0], item.geometry_offset[1], item.geometry_offset[2])
                         geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk }
                         opacity: item.readonly ? .08 : authoring.state.editing && item.id === workspace.selectedId && ["LOFT","BODY"].indexOf(authoring.state.primitive?.kind) >= 0 ? .35 : !viewport.xray ? 1 : item.id === workspace.selectedId ? .65 : item.id === workspace.hoveredId ? .5 : .3
-                        materials: PrincipledMaterial {
+                        property Material normalMaterial: PrincipledMaterial {
                             baseColor: item.color
                             alphaMode: PrincipledMaterial.Opaque
                             roughness: .65
@@ -274,6 +274,8 @@ Item {
                             emissiveFactor: item.id === workspace.selectedId ? Qt.vector3d(.015,.015,.015) :
                                             item.id === workspace.hoveredId ? Qt.vector3d(.035,.035,.035) : Qt.vector3d(0,0,0)
                         }
+                        property Material clippedMaterial: SectionMaterial { tint: item.color }
+                        materials: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && workspace.sectionTools.state.wholeScene ? clippedMaterial : normalMaterial
                     }
                     Node {
                         parent: selectionOutline.sceneRoot
@@ -287,7 +289,9 @@ Item {
                             // Each View3D owns its Qt geometry lifetime; both read the same native result.
                             // Sharing meshNode.geometry crashed after delete/recreate in Qt 6.12.
                             geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk }
-                            materials: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: item.id === workspace.selectedId ? "white" : "black"; cullMode: Material.NoCulling }
+                            property Material normalMaterial: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: item.id === workspace.selectedId ? "white" : "black"; cullMode: Material.NoCulling }
+                            property Material clippedMaterial: SectionMaterial { tint: item.id === workspace.selectedId ? "white" : "black"; unlit: true }
+                            materials: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && workspace.sectionTools.state.wholeScene ? clippedMaterial : normalMaterial
                         }
                     }
                     ResourceLoader { geometries: [meshNode.geometry] }

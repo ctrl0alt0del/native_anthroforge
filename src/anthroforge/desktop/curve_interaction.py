@@ -172,12 +172,15 @@ def snap_row(editor):
 
 def surface_hit(controller, origin, direction, offset=0.0, exclude_current=True):
     started = perf_counter()
-    hits = scene.pick(
-        controller.session.engine,
-        controller.snap_handles,
-        controller.snap_matrices,
+    from .section_queries import pick_scene
+
+    hits = pick_scene(
+        controller,
         origin,
         direction,
+        controller.snap_ids,
+        controller.snap_handles,
+        controller.snap_matrices,
     )
     controller.session.scheduler.metrics.observe("surface_snap", perf_counter() - started)
     hit = eligible_hit(controller, hits, exclude_current)

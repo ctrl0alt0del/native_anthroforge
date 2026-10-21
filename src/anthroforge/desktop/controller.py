@@ -22,6 +22,7 @@ from .models import RenderModel
 from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
 from .routing_choices import RoutingChoices
+from .section_tools import SectionTools
 from .surface_creation import SurfaceCreation
 from .tissue_inspection_tools import TissueInspectionTools
 from .tissue_painting_tools import TissuePaintingTools
@@ -74,6 +75,7 @@ class Controller(QObject):
         self.tissue_region_tools = TissueRegionTools(self)
         self.tissue_inspection = TissueInspectionTools(self)
         self.tissue_painting = TissuePaintingTools(self)
+        self.section_tools = SectionTools(self)
         self.surface_creation = SurfaceCreation(self)
 
     def memory_owners(self, owners):
@@ -268,6 +270,10 @@ class Controller(QObject):
     def tissuePainting(self):
         return self.tissue_painting
 
+    @Property(QObject, constant=True)
+    def sectionTools(self):
+        return self.section_tools
+
     @Slot()
     def cancelViewportTools(self, keep=None):
         tools = (
@@ -397,6 +403,7 @@ class Controller(QObject):
         self.tissue_region_tools.synchronize()
         self.tissue_painting.synchronize()
         self.tissue_inspection.synchronize()
+        self.section_tools.synchronize()
 
     def refresh_metrics(self):
         metrics = self.session.scheduler.metrics.report()
@@ -450,6 +457,7 @@ class Controller(QObject):
         self.tissue_painting.synchronize()
         self.tissue_inspection.synchronize()
         self.refresh_if_needed()
+        self.section_tools.synchronize()
         self.creation_selection.synchronize()
         self.issue_panel.synchronize()
         self.tick_count += 1

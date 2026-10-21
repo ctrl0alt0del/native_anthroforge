@@ -221,7 +221,9 @@ class TissueInspectionTools(QObject):
         asset = stages.result(stages.tissue(session, self.target), stage).asset
         if not row or row["geometry_asset"] != asset:
             raise ValueError("Waiting for the selected stage to be displayed.")
-        hit = session.engine.pick(mesh, row["matrix"], origin, direction)
+        from .section_queries import pick
+
+        hit = pick(self.controller, self.target, mesh, row["matrix"], origin, direction)
         if hit:
             self.inspect_hit(stage, hit, asset)
 

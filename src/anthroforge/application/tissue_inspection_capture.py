@@ -16,11 +16,33 @@ def capture(session: Any, selected: str, settings: Any) -> dict[str, Any]:
         stage=stage,
         reference=reference,
         mode=mode,
+        **evidence(session, selected, stage, settings),
+    )
+
+
+def evidence(session: Any, selected: str, stage: str, settings: Any) -> dict[str, Any]:
+    return dict(
         point=point(session, selected, stage),
         finding=finding(session, selected, settings),
         stacking=stacking(session, selected, stage),
         paint=paint(session, selected, stage),
+        section=section(session, selected, settings.get("section", {})),
     )
+
+
+def section(session: Any, selected: str, settings: Any) -> dict[str, Any]:
+    from math import isfinite
+
+    if not settings.get("enabled"):
+        return {}
+    if settings.get("target") != selected or settings.get("axis") not in (0, 1, 2):
+        raise ValueError("Section target and axis must match the inspected tissue.")
+    if not isfinite(settings["position"]):
+        raise ValueError("Section position must be finite.")
+    fields = ("enabled", "target", "axis", "position", "flip", "cut", "wholeScene")
+    state = inspection.status(session, "section")
+    report = state.get("report", {}) if state["state"] == "ready" else {}
+    return dict(settings={key: settings[key] for key in fields}, report=report)
 
 
 def stacking(session: Any, selected: str, stage: str) -> dict[str, Any]:

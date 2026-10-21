@@ -28,6 +28,8 @@ remain native. Self-intersections remain allowed. Background-only GUI qualificat
 User confirmed visible-surface painting by default, with optional Paint Through.
 Questions pending: selected-tissue versus scene section default; separate route diagnostic
 run versus capture during regular recalculation. Continue independent stacking work meanwhile.
+Working section default is selected tissue plus its comparison stages, with an explicit
+surrounding-geometry toggle. This is an implementation assumption, not a confirmed answer.
 Reuse tissue inspection jobs, accepted material data, stage comparisons, Issues, staged
 render leases and frozen report export. Reuse transactions and keyboard routing for painting.
 One canonical 0.2.3 distribution and source archive; no release-version change requested.
@@ -47,7 +49,9 @@ Weight painting now has native visibility/material sampling, bounded projection 
 worker previews, direct desktop brush controls and one shared commit per released stroke.
 Visible-only/Paint Through, external occlusion, rate independence, Base/Rest undo, stale
 inputs, cancellation and staged colors have focused tests. Hidden GPU preview/export passed;
-the colored tissue capture was inspected. Cross-sections and route diagnostics remain pending.
+the colored tissue capture was inspected. Sections now have native contours, shader cutaways,
+matching original-triangle picking, comparison stages, controls and frozen report settings.
+Native/API/view tests and hidden GPU section captures passed. Route diagnostics remain pending.
 Unrelated root `__init__.py` is preserved.
 
 ## Verification
@@ -72,3 +76,6 @@ ignored build/vcp-visual-tools; preserve production projects and avoid desktop t
 Native painting build: build/vcp-visual-paint-native.log (all five CTests passed).
 Hidden GPU: tools/vcp_visual_scene.py, build/vcp-visual-tools/paint-preview.png and
 paint.afinspection.zip. Full QML pointer-input acceptance and profiler trials remain pending.
+Section build: build/vcp-visual-section-native.log (all five CTests passed). Actual captures:
+build/vcp-visual-tools/section-tissue.png and section-scene.png. Shader compilation exercised
+on hidden D3D11. Portable and complete UI qualification are still required.

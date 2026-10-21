@@ -1,4 +1,5 @@
 #include "mesh_internal.hpp"
+#include "anthroforge/sections.h"
 
 namespace af {
 Surface::Surface(const Mesh& mesh,const M4& matrix):triangles(&mesh.triangles) {
@@ -59,6 +60,27 @@ int pick_surface(const Mesh& mesh,const M4& world,const V3& start,const V3& ray,
     if(!intersect_ray(mesh,local_start.transpose(),local_ray.transpose(),hit)) return 0;
     write_hit(mesh,world,start,hit,output); return 1;
 }
+static int pick_clipped(const Mesh& mesh,const M4& world,const Eigen::Vector4d& plane,const V3& start,const V3& ray,double* output) {
+    if(plane.head<3>().squaredNorm()==0) return pick_surface(mesh,world,start,ray,output);
+    const M4 inverse=world.inverse(); RayHit hit;
+    const V3 local_start=point(inverse,start),local_ray=inverse.block<3,3>(0,0)*ray;
+    const Eigen::Vector4d local_plane=world.transpose()*plane;
+    if(!intersect_ray_clipped(mesh,local_start,local_ray,local_plane,hit)) return 0;
+    write_hit(mesh,world,start,hit,output); return 1;
+}
+}
+int af_scene_pick_clipped(int count,const uint64_t* meshes,const double* matrices,
+    const double* planes,const double* origin,const double* direction,double* hits) {
+    try {
+        int found=0;
+        for(int i=0;i<count;++i) {
+            const auto geometry=af::mesh(meshes[i]);
+            const int result=af::pick_clipped(*geometry,af::M4(matrices+16*i),Eigen::Vector4d(planes+4*i),
+                af::V3(origin),af::V3(direction),hits+11*found+1);
+            if(result) { hits[11*found]=i; ++found; }
+        }
+        return found;
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
 }
 int af_scene_bounds(int count,const uint64_t* meshes,const double* matrices,double* output) {
     try {

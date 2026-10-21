@@ -11,6 +11,7 @@ def restore(controller, settings):
     tool.set_view(settings["stage"], settings["reference"], settings["mode"])
     restore_stacking(controller, settings.get("stacking"))
     restore_paint(controller, settings.get("paint"))
+    restore_section(controller, settings.get("section"))
     controller.session.wait()
     restore_point(controller, settings.get("point"))
     tool.synchronize()
@@ -59,3 +60,19 @@ def restore_paint(controller, settings):
     controller.session.command("tissue.inspect.paint", target=controller.selection, **options)
     controller.session.wait()
     brush.retain_preview()
+
+
+def restore_section(controller, snapshot):
+    if not snapshot:
+        return
+    settings, tool = snapshot["settings"], controller.section_tools
+    for key in ("enabled", "target", "axis", "position", "flip", "cut"):
+        setattr(tool, key, settings[key])
+    tool.whole_scene = settings["wholeScene"]
+    tool.reports = snapshot.get("report", {}).get("surfaces", [])
+    tool.context = (
+        id(controller.session.document),
+        id(controller.tissue_inspection.model.displayed),
+        tool.plane,
+    )
+    tool.changed.emit()

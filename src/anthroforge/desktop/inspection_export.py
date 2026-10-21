@@ -35,7 +35,11 @@ class InspectionExport(QObject):
     def options(self, path):
         owner, tool = self.controller, self.controller.tissue_inspection
         tissue = dict(
-            stage=tool.stage, reference=tool.reference, mode=tool.mode, finding=tool.finding
+            stage=tool.stage,
+            reference=tool.reference,
+            mode=tool.mode,
+            finding=tool.finding,
+            section=owner.section_tools.state,
         )
         return dict(
             path=local_path(path),

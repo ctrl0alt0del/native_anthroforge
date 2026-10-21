@@ -7,7 +7,7 @@ from typing import Any
 import numpy as np
 
 from .inspection import Comparison
-from .mesh import D, U, Mesh, doubles, pointer
+from .mesh import D, Mesh, U, doubles, pointer
 from .resource_cache import ResourceCache
 from .surface_queries import retained_bytes
 

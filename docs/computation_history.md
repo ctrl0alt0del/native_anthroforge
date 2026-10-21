@@ -38,7 +38,7 @@ evidence for those revisions, not current workflow instructions.
 
 ## Current computation inventory
 
-Additional active authoring/inspection work for T09, K01 and Q05 is recorded in CH-024.
+Additional active authoring/inspection work for T09, K01 and Q05 is recorded in CH-024/025.
 
 ### Meshes, primitives and deformers
 
@@ -1011,3 +1011,25 @@ for artifact identity, UI checks and evidence limits.
   Hidden GPU paint preview and frozen inspection export ran successfully; the generated
   color surface was visually inspected. Full interaction/performance/release qualification
   and recommendations 6–7 are still pending; this is an intermediate checkpoint.
+
+### CH-025 — Section displayed geometry without changing topology
+
+- **2026-10-21; Q01, Q05, supporting presentation; 0.2.3, in progress.** A world plane
+  now cuts the selected tissue and compared stages, optionally surrounding geometry.
+  Native triangle-plane queries produce bounded contour segments. Coplanar patches emit
+  boundary edges without their internal triangulation. Reports count coplanar faces and
+  flag truncation; no remesh, cap or replacement anatomical surface is generated.
+- **Picking/rendering contract:** Qt CustomMaterial discards the hidden half-space;
+  native BVH ray traversal rejects hidden candidates and continues to the next visible
+  intersection. Returned triangle IDs and barycentric locations remain those of the
+  original accepted mesh. Measurement and tissue-point inspection share this boundary.
+  Ordinary queries use the existing unclipped path. Authoring geometry remains complete.
+- **Execution:** plane movement updates presentation immediately and coalesces contour
+  work in the shared inspection scheduler. Stale contours disappear until the current
+  plane/revision is ready. Scoped masks are cached for repeated pointer queries. Stage
+  comparison uses one world plane, not separately fitted per-stage planes.
+- **Evidence so far:** transformed/coplanar/outside-plane native cases, picking the visible
+  far surface, scope changes, comparison stages, read-only history and frozen report
+  settings pass focused tests. Hidden GPU tissue-only and whole-scene cutaways were
+  inspected. Full pointer/UI/profiler/portable qualification remains pending. This is a
+  geometric section view, not a boolean union or tissue repair.

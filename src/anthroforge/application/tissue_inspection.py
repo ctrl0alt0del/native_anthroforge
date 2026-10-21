@@ -179,6 +179,7 @@ def operations(session: Any) -> dict[str, Any]:
         "tissue.inspect.point": partial(start, session, "point"),
         "tissue.inspect.stacking": partial(start, session, "stacking"),
         "tissue.inspect.paint": partial(start, session, "paint"),
+        "tissue.inspect.section": partial(start, session, "section"),
         "tissue.inspect.status": partial(status, session),
         "tissue.inspect.cancel": partial(cancel, session),
         "tissue.inspect.check": partial(tissue_geometry.request, session),

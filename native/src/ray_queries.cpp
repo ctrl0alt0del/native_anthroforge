@@ -46,12 +46,19 @@ static bool leaf_hit(const Mesh& mesh,int face,const PickRay& ray,RayHit& best) 
     const V3 c=projected(mesh.vertices.row(triangle[2]),ray);
     return triangle_hit(a,b,c,face,best);
 }
+static bool accepted_leaf(const Mesh& mesh,int face,const PickRay& ray,RayHit& best,const Eigen::Vector4d* plane) {
+    RayHit candidate=best;
+    if(!leaf_hit(mesh,face,ray,candidate)) return false;
+    const V3 location=ray.origin+ray.direction*candidate.t;
+    if(plane&&plane->head<3>().dot(location)+(*plane)[3]<0) return false;
+    best=candidate; return true;
+}
 static bool ray_tree(const Mesh& mesh,const igl::AABB<Vertices,3>& tree,
-                     const PickRay& ray,RayHit& best) {
+                     const PickRay& ray,RayHit& best,const Eigen::Vector4d* plane=nullptr) {
     if(!ray_box(tree.m_box,ray.origin,ray.direction,best.t)) return false;
-    if(tree.is_leaf()) return leaf_hit(mesh,tree.m_primitive,ray,best);
-    const bool left=ray_tree(mesh,*tree.m_left,ray,best);
-    const bool right=ray_tree(mesh,*tree.m_right,ray,best);
+    if(tree.is_leaf()) return accepted_leaf(mesh,tree.m_primitive,ray,best,plane);
+    const bool left=ray_tree(mesh,*tree.m_left,ray,best,plane);
+    const bool right=ray_tree(mesh,*tree.m_right,ray,best,plane);
     return left||right;
 }
 bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,RayHit& hit) {
@@ -60,6 +67,12 @@ bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,RayHit& hit) 
     hit.t=std::numeric_limits<double>::infinity();
     if(!mesh.triangles.rows()) return false;
     return ray_tree(mesh,mesh.tree,pick_ray(origin,ray),hit);
+}
+bool intersect_ray_clipped(const Mesh& mesh,const V3& origin,const V3& ray,const Eigen::Vector4d& plane,RayHit& hit) {
+    if(!origin.allFinite()||!ray.allFinite()||ray.squaredNorm()==0||!plane.allFinite())
+        throw std::runtime_error("Clipped picking requires finite input.");
+    hit.t=std::numeric_limits<double>::infinity();
+    return mesh.triangles.rows()&&ray_tree(mesh,mesh.tree,pick_ray(origin,ray),hit,&plane);
 }
 static void ray_span(const Mesh& mesh,const igl::AABB<Vertices,3>& tree,const PickRay& ray,RayHit& first,RayHit& last) {
     if(!ray_box(tree.m_box,ray.origin,ray.direction,INFINITY)) return;

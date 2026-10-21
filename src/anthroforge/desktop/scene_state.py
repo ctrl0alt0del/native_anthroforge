@@ -218,13 +218,9 @@ def picked(controller, origin, direction, depth, radius):
 def mesh_hits(controller, origin, direction):
     if not controller.pick_ids:
         return []
-    hits = scene.pick(
-        controller.session.engine,
-        controller.pick_handles,
-        controller.pick_matrices,
-        origin,
-        direction,
-    )
+    from .section_queries import pick_scene
+
+    hits = pick_scene(controller, origin, direction)
     return [hit_record(controller.pick_ids, hit) for hit in hits]
 
 

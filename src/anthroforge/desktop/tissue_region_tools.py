@@ -9,6 +9,8 @@ from anthroforge.application.tissue_operations import tissue
 from anthroforge.core.tissue_stacking import StackRelationship
 from anthroforge.native import scene, tissue_regions
 
+from .section_queries import pick
+
 
 class TissueRegionTools(QObject):
     changed = Signal()
@@ -119,7 +121,7 @@ class TissueRegionTools(QObject):
         if not self.options or self.error or displayed is None:
             return
         mesh, frame = displayed
-        hit = mesh.engine.pick(mesh, frame, origin, direction)
+        hit = pick(self.controller, self.cover, mesh, frame, origin, direction)
         face = tissue_regions.face(mesh, int(hit[1]), self.side) if hit else None
         parts = self.controller.session.document.object(self.cover).base_state.parts
         hovered = (parts[face[0]], face[1]) if face else None

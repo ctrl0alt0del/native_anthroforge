@@ -52,6 +52,23 @@ def finish(controller, renderer, app):
     frames(controller, renderer, app, "paint-committed")
     controller.session.wait()
     assert any(controller.session.document.object(tool.target).fields[0].values)
+    section(controller, renderer, app)
+
+
+def section(controller, renderer, app):
+    controller.tissue_painting.cancel()
+    tool = controller.section_tools
+    tool.enable(True)
+    tool.timer.stop()
+    tool.submit()
+    controller.session.wait()
+    frames(controller, renderer, app, "section-tissue")
+    assert tool.reports and tool.reports[0]["lines"], tool.error
+    tool.setting("whole_scene", True)
+    tool.timer.stop()
+    frames(controller, renderer, app, "section-scene")
+    options = controller.inspection_export.options(str(OUTPUT / "section.afinspection.zip"))
+    controller.session.command("inspection.export", **options, wait=True)
 
 
 def run(app):

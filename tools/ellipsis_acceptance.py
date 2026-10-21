@@ -87,6 +87,8 @@ def surface(controller, window):
 
 
 def inspect(controller, window):
+    for name in ("viewX", "viewY", "viewZ", "restoreView", "measureSurface", "xrayToggle"):
+        label_check(window, find(window, name).property("text"))
     surface(controller, window)
     label_check(window, "Curve evaluation resolution")
     screenshot(window, "curve-labels")
@@ -100,6 +102,12 @@ def inspect(controller, window):
     screenshot(window, "help-menu")
 
 
+def fonts(app):
+    for family in ("Segoe UI", "Arial", "Tahoma"):
+        app.setFont(QFont(family))
+        run(inspect)
+
+
 def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     QQuickStyle.setStyle("Basic")
@@ -108,7 +116,7 @@ def main():
         QFontDatabase.addApplicationFont("C:/Windows/Fonts/segoeui.ttf")
         app.setFont(QFont("Segoe UI"))
         try:
-            run(inspect)
+            fonts(app)
             print("Narrow surface/curve labels, source choices and Help menu passed.")
         finally:
             delete(app)

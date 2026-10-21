@@ -3,7 +3,7 @@
 - Task branch: `codex/tissue-intersection-policy`
 - Integration branch: `main`
 - Starting revision: `6918888`
-- Status: investigation and implementation in progress
+- Status: implemented; final portable qualification in progress
 - Last updated: 2026-10-21, Europe/Bucharest
 - Active writer: desktop chat, direct work
 
@@ -20,7 +20,10 @@ resolution; temporary cleanup must not mutate the displayed target or shared sou
 Resolve ambiguous stacking support at the farthest surface along the base normal.
 Skin construction remains deferred.
 
-## Current findings
+The sections below record successive checkpoints. Earlier pending statements describe
+their checkpoint only; the latest qualification is at the end of this record.
+
+## Initial findings
 
 - `tissue_create.anthroforge` CTRL_POINT inflation is rejected by shared deformation
   validation before smoothing. Prior diagnosis reproduced 106 new transverse
@@ -108,7 +111,7 @@ Research: [libigl Boolean arrangements](https://libigl.github.io/tutorial/#boole
 and [CGAL Polygon Mesh Processing](https://doc.cgal.org/latest/Polygon_mesh_processing/index.html).
 Splitting intersections alone (`RESOLVE`) does not remove buried faces.
 
-## Next actions
+## Initial delivery sequence (subsequently implemented)
 
 1. Qualify temporary closure and Boolean provenance on the actual failing tissue.
 2. Implement scoped acceptance and query/stacking policies with material provenance.
@@ -221,3 +224,12 @@ was retained correctly; this was not data loss. Query closure now requests a bac
 mesh only for accepted SURFACE construction. Radial and swept shells use their native
 generated geometry. The mixed radial/sweep save/reopen conversion regression and all
 20 attached-construction/query tests pass. Final executable qualification is rerunning.
+
+All 1,442 tests pass at `a859147`, with lint, format and typing checks. That executable
+passes every relocated portable workflow, including the previously failing mixed-tissue
+conversion and sealed-cavity placement. Its hidden render exposed another real UI defect:
+natural button text widths of 16.234/27.297 pixels became 16/27-pixel layout allocations,
+eliding the short X/Ruler labels. Shared button content now rounds its natural text width
+up before layout. Hidden GPU checks cover platform-default, Segoe UI, Arial and Tahoma
+without showing a window; ordinary inspector checks cover the latter three fonts too.
+This QML-only correction receives refreshed packaging and visual qualification next.

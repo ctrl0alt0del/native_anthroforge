@@ -710,7 +710,7 @@ resolved inflation/smoothing defect when assessing the fixture.
 
 ### CH-016 — Permit tissue self-intersections without repairing inflation
 
-- **2026-10-21; 0.2.2; Implemented, integration qualification pending.** Q02,
+- **2026-10-21; 0.2.2; implemented.** Q02,
   T03, T11 and T13. Baseline `6918888`; work on `codex/tissue-intersection-policy`.
 - **Before/problem:** `tissue_create.anthroforge` at Control Point amount 0.599,
   depth zero, fails before smoothing with 106 newly detected crossings and no collapsed
@@ -731,7 +731,7 @@ resolved inflation/smoothing defect when assessing the fixture.
   Full suite at `e922aeb`: 1,421 tests pass; Mypy, focused Ruff and changed-native
   clang-tidy checks pass.
 - **Limits:** attachment Boolean cleanup and ambiguous stacking queries are separate
-  downstream work, not completed by this acceptance change. The user approved a
+  downstream changes, recorded in CH-017/018 below. The user approved a
   temporary base-backed closure for open tissue and an in-memory Boolean query mesh;
   the test's base and single-sided tissue each have 168 boundary edges. The original
   tissue and material bindings remain authoritative; added closure is not selectable.
@@ -743,7 +743,7 @@ resolved inflation/smoothing defect when assessing the fixture.
 
 ### CH-017 — Transient exterior queries for confirmed placement
 
-- **2026-10-21; 0.2.2; implementation in progress.** Shared snapping/attachment
+- **2026-10-21; 0.2.2; implemented.** Shared snapping/attachment
   boundary now distinguishes original-mesh preview from confirmed exterior queries.
 - **Before:** nearest raw triangle could bind to a buried fold or sealed cavity.
 - **After:** CGAL exact intersection arrangement through the pinned libigl adapter,
@@ -760,14 +760,14 @@ resolved inflation/smoothing defect when assessing the fixture.
   overlapping shells, open zero-volume sheet, actual compact crossed-tissue fixture,
   cancellation and cache leases. Three authored-placement tests pass for one-action
   undo/redo, cancelled gesture and unrelated later edits. Mypy and function limits
-  pass. Broader interaction, staging, stacking and release checks remain pending.
+  pass. Subsequent interaction and release evidence appears below.
 - **Limits:** exact remeshing observes cancellation between native stages, not within
   the CGAL call. This does not repair displayed geometry or establish safe skinning.
-  Drawing/creation entry points are still being integrated at this checkpoint.
+  Drawing/creation use the same confirmed query service, as detailed below.
 
 ### CH-018 — Geometric-normal support for ambiguous stacking
 
-- **2026-10-21; 0.2.2; integrated, release checks pending.** The old inverse
+- **2026-10-21; 0.2.2; implemented.** The old inverse
   chart query selected minimum absolute distance along the provider's inflation
   field. Control Point inflation can point sideways, so changing that minimum to
   a maximum would not implement the confirmed geometric-normal rule.
@@ -782,7 +782,8 @@ resolved inflation/smoothing defect when assessing the fixture.
   points, including a tangential inflation direction. Updated-provider/cache tests
   pass. Exact-constraint and inequality residuals remain below 2e-7 in this case.
   This fixture tests multi-valued support; it does not establish arbitrary physical
-  contact or anatomical correctness. Visual and complete release checks remain pending.
+  contact or anatomical correctness. The actual folded-provider cross-section was
+  inspected; complete release evidence appears below.
 - **Provenance:** original donor hashes remain in `upstream_sources.json`; the
   maintained `sources.json` includes the three changed headers and new adapter.
 
@@ -799,4 +800,10 @@ the selected anchor component identity; dispatch resolves its current world posi
 before applying the exterior correction. This preserves multiselection offsets and
 does not add a second undo step. Both new regression cases and the production offscreen
 curve-gesture suite pass. Full development gate at `010a948`: 1,439 tests; the subsequent
-application-only anchor correction is receiving final full-suite/package qualification.
+application-only corrections receive separate final full-suite/package qualification.
+
+The portable mixed-tissue case exposed incorrect resource typing in the query adapter:
+a CURVE material base is a retained path, not a missing mesh. Only SURFACE construction
+supplies the accepted backing mesh for temporary closure. Radial/swept generated shells
+remain queryable without that mesh. The save/reopen/conversion regression passes alongside
+the sealed-cavity and original-material tests; no resource or geometry is substituted.

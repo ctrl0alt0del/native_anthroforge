@@ -40,7 +40,7 @@ ColumnLayout {
         UiCheck { text: "Enabled"; checked: panel.inflation.enabled ?? true; onClicked: panel.inflate("enabled",checked) }
         UiCombo { objectName: "tissueInflationMode"; Layout.fillWidth: true; model: panel.selected.tissue_modes || []; currentIndex: model.indexOf(panel.inflation.mode); onActivated: panel.inflate("mode",currentText) }
         NumericSetting { objectName: "tissueInflationAmount"; label: "Amount"; length: true; value: panel.inflation.amount || 0; onEdited: value => panel.inflate("amount",value) }
-        TissueProfile { visible: panel.inflation.mode === "SECTION_PROFILE"; profile: panel.inflation.profile || ({}); onEdited: value=>panel.inflate("profile",value); onResetRequested: inflationDraft.reset("PROFILE") }
+        TissueProfile { visible: panel.inflation.mode === "SECTION_PROFILE"; profile: panel.inflation.profile || ({}); previewing: inflationDraft.editing; onEdited: value=>panel.inflate("profile",value); onResetRequested: inflationDraft.reset("PROFILE") }
         TissueControl { visible: panel.inflation.mode === "CTRL_POINT"; inflation: panel.inflation; canManipulate: !inflationDraft.editing; onEdited: (key,value)=>panel.inflate(key,value); onResetRequested: inflationDraft.reset("CONTROL"); onEditRequested: authoring.editTissueControl(panel.part.id,panel.side) }
         NumericSetting { visible: panel.muscleMode; label: "Boundary band · samples"; value: panel.inflation.boundary_band || 0; onEdited: value => panel.inflate("boundary_band",value) }
         NumericSetting { visible: panel.muscleMode; label: "Boundary attenuation"; value: panel.inflation.boundary_strength || 0; onEdited: value => panel.inflate("boundary_strength",value) }
@@ -57,7 +57,7 @@ ColumnLayout {
         }
         UiCheck { visible: panel.selected.tissue_domain !== "POINT"; text: "Reverse side"; checked: panel.item.reverse || false; onClicked: panel.configure("reverse",checked) }
         UiCheck { objectName: "tissueBothSides"; visible: panel.muscleMode; text: "Two-sided envelope"; checked: panel.item.both_sides || false; onClicked: panel.configure("both_sides",checked) }
-        TissueSideCopy { visible: panel.muscleMode && panel.item.both_sides; enabled: !inflationDraft.editing; target: panel.selected.id; part: panel.part.id || "main"; multipleParts: (panel.item.parts || []).length>1 }
+        TissueSideCopy { visible: panel.muscleMode && panel.item.both_sides; enabled: !inflationDraft.editing; target: panel.selected.id || ""; part: panel.part.id || "main"; multipleParts: (panel.item.parts || []).length>1 }
     }
     UiSection {
         visible: panel.part.id !== "main"; title: "Branch connector"; expanded: false

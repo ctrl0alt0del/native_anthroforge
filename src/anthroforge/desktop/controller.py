@@ -177,7 +177,9 @@ class Controller(QObject):
     def tissuePreview(self):
         from anthroforge.application.tissue_preview import status
 
-        return status(self.session)
+        from .values import qml
+
+        return qml(status(self.session))
 
     @Property(QObject, constant=True)
     def imageModel(self):

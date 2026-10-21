@@ -75,6 +75,12 @@ The curve inspector exposes both flags.
 
 `tissue.stacking.configure(target, changes)` controls search distance,
 clearance, smoothing radius/strength, blend distance, preservation and maximum adjustment.
+`displacement` is the native discovery allowance in metres (default 0.5, range 0..1000),
+not a displacement clamp. `tissue.configure(target, changes={"group": "name"})` assigns
+an automatic stacking group; matching nonempty names suppress automatic comparisons.
+Names are trimmed, case-sensitive and at most 256 characters; empty means independent.
+Explicit pair overrides are still eligible. Policy changes invalidate affected plans/read
+sets while retaining accepted intrinsic geometry. `tissue.stacking.inspect` includes group.
 `tissue.stacking.relationship(target, other, side="a", other_side="a", mode="AUTO",
 cover="SELF", excluded=False, regions?)` saves persistent pair intent. Modes are AUTO,
 REQUESTED (must agree with geometry) and EXPLICIT (still independently validated); cover is
@@ -632,6 +638,16 @@ All-Fiber source sets produce a Membrane through the same operation and evaluato
 part and side. Inactive mode settings remain authored. First Section Profile activation
 initializes from the effective amount unless explicit profile settings are supplied.
 `tissue.profile.reset` and `tissue.control.reset` accept the same target/part/side keys.
+`tissue.side.copy(target, source, destination, part="main", all_parts=False)` copies the
+entire inflation and height-smoothing side between opposite `a`/`b` sides. The selected
+part must be accepted; all_parts includes current parts, preserves inactive historical
+parts and does not alter connectors or construction. Shared topology/capability policies
+apply. `tissue.profile.scale(target, factor, part="main", side="a")` proportionally scales
+four depths through the native parameter adapter; factor is finite/nonnegative and all
+results must remain within 0..10 m. Other profile settings are preserved. Both commands
+use ordinary edit transactions and undo. `tissue.profile.scaled(profile, factor)` is a
+read-only parameter transformation for previews; it returns owned profile values without
+changing the document. The desktop Overall depth control uses this same transformation.
 `tissue.connector(target, part, width, fullness)` edits one branch connector. All use
 normal shared transactions and topology/capability validation.
 

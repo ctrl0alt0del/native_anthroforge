@@ -7,7 +7,7 @@ from anthroforge.core import tissue_parts
 from anthroforge.core.tissue_settings import HeightSmoothing, SectionProfile
 from anthroforge.native import tissue_parts as native
 
-from . import tissue_operations, tissue_strategy_operations
+from . import tissue_codec, tissue_operations, tissue_strategy_operations
 
 
 def selected(item: Any, part: str) -> Any:
@@ -78,6 +78,23 @@ def profile_reset(session: Any, target: str, part: str = "main", side: str = "a"
     tissue_operations.inflation(
         session, target, dict(profile=profile_value(session, depth)), part, side
     )
+
+
+def profile_scale(
+    session: Any, target: str, factor: float, part: str = "main", side: str = "a"
+) -> None:
+    item = tissue_operations.tissue(session, target)
+    if side not in ("a", "b"):
+        raise ValueError("Choose side A or B.")
+    previous = getattr(selected(item, part), side).inflation.profile
+    profile = scaled_profile(session, asdict(previous), factor)
+    tissue_operations.inflation(session, target, dict(profile=profile), part, side)
+
+
+def scaled_profile(session: Any, profile: dict[str, Any], factor: float) -> dict[str, Any]:
+    previous = SectionProfile(**tissue_codec.tuples(profile))
+    depths = native.scale_profile(session.engine, previous.depths, factor)
+    return asdict(replace(previous, depths=depths, initialized=True))
 
 
 def control_reset(session: Any, target: str, part: str = "main", side: str = "a") -> None:

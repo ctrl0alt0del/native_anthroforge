@@ -54,3 +54,15 @@ def test_reordering_and_removing_records_preserves_retained_identity():
     assert projection.value("rows") == [b]
     assert projection.updateValue("rows", []) == [b]
     assert app
+
+
+def test_command_projection_is_owned_snapshot_with_nested_values():
+    from anthroforge.desktop.controller_actions import command_values
+
+    app = QCoreApplication.instance() or QCoreApplication([])
+    projection = PropertyProjection()
+    projection.synchronize(dict(profile=dict(depths=[0.01, 0.02], segments=4.0)))
+    result = command_values(dict(value=projection.value("profile")))
+    projection.synchronize(dict(profile=dict(depths=[0.03, 0.04], segments=6.0)))
+    assert result == dict(value=dict(depths=[0.01, 0.02], segments=4))
+    assert type(result["value"]["segments"]) is int and app

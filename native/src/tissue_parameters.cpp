@@ -9,6 +9,18 @@ int af_tissue_profile_reset(double depth,double* profile) {
         profile[8]=1; return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_tissue_profile_scale(const double* depths,double factor,double* output) {
+    try {
+        if(!depths||!output||!std::isfinite(factor)||factor<0) throw std::runtime_error("Profile scale must be finite and nonnegative.");
+        double scaled[4];
+        for(int i=0;i<4;++i) {
+            scaled[i]=depths[i]*factor;
+            if(!std::isfinite(depths[i])||depths[i]<0||depths[i]>10||!std::isfinite(scaled[i])||scaled[i]>10)
+                throw std::runtime_error("Scaled profile depths must be 0..10 metres.");
+        }
+        std::copy(scaled,scaled+4,output); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 int af_tissue_control_default(uint64_t source,int part,double* point) {
     try {
         const auto mesh=af::mesh(source); const auto grids=af::material_grids(*mesh);

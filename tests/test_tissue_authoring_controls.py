@@ -22,13 +22,14 @@ def prepared_sides(session):
     return source, target, branch
 
 
-def test_copy_selected_side_preserves_sources_and_other_parts(session):
+@pytest.mark.parametrize("direction", [("a", "b"), ("b", "a")])
+def test_copy_selected_side_preserves_sources_and_other_parts(session, direction):
     source, target, branch = prepared_sides(session)
     original, before = session.document.object(source), sides(session, target)
-    session.command("tissue.side.copy", target=target, part=branch, source="a", destination="b")
+    copy_direction(session, target, branch, direction)
     session.wait()
     after = sides(session, target)
-    assert after[0] == before[0] and after[1].a == before[1].a == after[1].b
+    assert after[0] == before[0] and after[1].a == getattr(before[1], direction[0]) == after[1].b
     assert after[1].connector_width == before[1].connector_width
     assert after[1].connector_fullness == before[1].connector_fullness
     assert session.document.object(source) == original
@@ -36,6 +37,13 @@ def test_copy_selected_side_preserves_sources_and_other_parts(session):
     assert sides(session, target) == before
     session.command("redo")
     assert sides(session, target) == after
+
+
+def copy_direction(session, target, branch, direction):
+    source, destination = direction
+    session.command(
+        "tissue.side.copy", target=target, part=branch, source=source, destination=destination
+    )
 
 
 def test_copy_all_sides_preserves_independent_branch_values_and_roundtrips(session, tmp_path):

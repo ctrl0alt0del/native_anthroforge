@@ -102,7 +102,7 @@ without silently choosing another algorithm.
 | Construction/feature | Required behavior |
 | --- | --- |
 | Surface muscle modes | Control Point and Distributed, falloff, boundary attenuation, longitudinal taper, direction, enable/disable and control initialization. |
-| Section Profile | Four depths/peaks, roundness, Local/Smooth/Section directions, initialization/reset, saved inactive settings; ordinary open lofts only. |
+| Section Profile | Four depths/peaks, proportional Overall depth scaling, roundness, Local/Smooth/Section directions, initialization/reset, saved inactive settings; ordinary open lofts only. |
 | Parts and sides | Independent supported settings per branch and side; stable identities, reversal, two-sided envelope composition. |
 | Height smoothing | Native constrained heights, exact boundaries/seams/zero-height creases, bounded change, Off bypass and separate diagnostics. |
 | Branches | Existing open branch topology, explicit junctions, welded seams, connector width/fullness and per-part inflation. No nested/closed branches or overlapping root intervals. |
@@ -185,6 +185,14 @@ provider-first chains, localized constrained smoothing and independent validatio
 Do not sum redundant provider/ancestor displacement. Retain intent separately from
 transient evidence; stale evidence never activates a relationship. Preserve current
 known rejection cases and exact constraints, including interpolated bindings.
+
+Explicit automatic stacking group names suppress within-group automatic detection;
+explicit pair overrides remain available. Empty groups keep tissues independent.
+Discovery displacement allowance is configurable separately from the smoothing
+maximum adjustment. Both policies participate in plan invalidation and dispatch read
+validation without rebuilding intrinsic inflation. Side-copy operations include the
+full inflation and height-smoothing settings of the chosen part or all current parts,
+preserving construction, connectors and inactive historical parts in one undo action.
 
 Muscle creation defaults retain automatic stacking. Other tissue presets begin with
 stacking disabled; compatible stacking can be enabled explicitly. Regional influence

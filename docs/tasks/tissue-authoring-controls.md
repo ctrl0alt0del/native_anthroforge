@@ -22,7 +22,7 @@ Manual provenance, stable editing layouts and existing topology/relationship rul
 - Stack family means explicit suppression of within-family pairs, separate from atomic
   dependency evaluation groups. Default empty family keeps independent tissues separate.
 - Existing addon discovery allowance defaults to 0.5; this is not a displacement clamp.
-- Profile scaling interaction is pending the user's answer (maximum depth versus factor).
+- User confirmed Overall depth: type/drag maximum depth and scale all four stations.
 - Copy side settings includes inflation/profile/control and height smoothing settings.
 - Other audit findings are outside this task; do not restore retired addon workflows.
 
@@ -32,21 +32,27 @@ Boundary Power, copy-side controls and stacking group/discovery allowance are im
 Group and allowance participate in dispatch read validation and targeted plan invalidation;
 changes reuse intrinsic geometry. Explicit pairs may override group suppression as in the
 addon. Shared copy-side operation copies inflation and smoothing, preserves inactive parts,
-and uses existing capability/topology checks. Profile scaling remains pending implementation
-and the user's UI choice. Unrelated root `__init__.py` preserved.
+and uses existing capability/topology checks. Native profile scaling and Overall depth are
+implemented, preserving ratios through zero within one drag. A committed all-zero profile
+needs a station edit/reset before proportional scaling. Preview uses the same adapter.
+Qt command input/output boundaries now snapshot projected records and convert tuple arrays
+to QML lists; actual profile dragging exposed these transport gaps. Unrelated root
+`__init__.py` preserved.
 
 ## Verification
 
-23 focused authoring, stacking lifecycle/group and architecture tests pass. Initial tests
-used a nonexistent smoothing `enabled` field; corrected to its supported radius setting.
-Pending proportional profile tests, native discovery bounds evidence, actual offscreen QML
-editing/visual inspection, development gate, and canonical portable-package qualification.
+23 initial authoring/stacking tests, eight profile/architecture tests and seven projection
+tests pass; expanded coverage is running. Native build and all five native contracts pass.
+Actual offscreen QML checks pass all four controls, numeric type/drag, side copy, undo/cancel,
+profile drag through zero, preview isolation and cancellation. Inspector captures inspected.
+Pending full development gate, hidden geometry inspection and canonical portable qualification.
+Initial test fixture incorrectly used a smoothing `enabled` field; corrected to radius.
 
 ## Next actions and blockers
 
-1. Trace stack grouping/allowance through dispatch, observation and persistence; add shared operations.
-2. Add the four focused controls and tests; resolve profile interaction with the user.
-3. Document computational intent; qualify, package, checkpoint/push and merge normally.
+1. Finish expanded tests and ownership review; document computational intent/evidence.
+2. Run the gate and hidden geometry checks, package once and qualify relocated execution.
+3. Record actual evidence, source archive, checkpoint/push and merge normally.
 
 ## Recovery inputs
 

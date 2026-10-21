@@ -43,3 +43,18 @@ def test_repeated_solve_reuses_cache_and_preserves_last_result_on_cancel(session
 def assert_same_output(before, after):
     for key in before:
         np.testing.assert_array_equal(before[key]["points"], after[key]["points"])
+
+
+def test_discovery_allowance_reaches_separated_candidate_without_moving_inputs(session):
+    case = CASES[0]
+    packed = [domain(row) for row in case["domains"]]
+    for key in ("base", "own"):
+        packed[1][1][0][key][:, 2] += 0.5
+    packed[1][1][1]["vertices"][:, 2] += 0.5
+    native = StackSession(session.engine)
+    for row, _ in packed:
+        row.allowance = 0
+    assert not native.plan([r[0] for r in packed], settings(case["settings"]))[1]
+    for row, _ in packed:
+        row.allowance = 0.5
+    assert native.plan([r[0] for r in packed], settings(case["settings"]))[1]

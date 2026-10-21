@@ -44,6 +44,11 @@ Node {
         }
     }
     Model {
+        objectName: "stackingFootprint"
+        geometry: ControlGeometry { points: workspace.tissueInspection.state.footprint || []; segments: true; stroke: root.distance*.001 }
+        materials: DefaultMaterial { diffuseColor: "#76e6cc"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
+    }
+    Model {
         objectName: "tissueInspectionWitness"
         geometry: ControlGeometry { objectName: "tissueInspectionLines"; points: workspace.tissueInspection.state.lines || []; segments: true; stroke: root.distance*.0015 }
         materials: DefaultMaterial { diffuseColor: "#ffe571"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }

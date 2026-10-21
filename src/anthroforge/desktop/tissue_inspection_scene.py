@@ -4,8 +4,8 @@ from anthroforge.application import tissue_inspection_stages as stages
 from anthroforge.native import scene
 
 
-def stage_rows(tool, stage, reference=False):
-    session, target = tool.controller.session, tool.target
+def stage_rows(tool, stage, reference=False, target=""):
+    session, target = tool.controller.session, target or tool.target
     item = stages.tissue(session, target)
     row = stages.row(session, item, stage)
     if not row["available"]:
@@ -85,7 +85,11 @@ def rows(tool):
         resources.extend(leases)
     if tool.reference and tool.mode == "Displacement":
         output, resources = heat_rows(tool, output, resources)
-    return output, resources
+    from . import stacking_inspection_view
+
+    stacking_inspection_view.decorate(tool, output)
+    extra, leases = stacking_inspection_view.rows(tool)
+    return output + extra, resources + leases
 
 
 def heat_rows(tool, output, resources):
@@ -122,13 +126,23 @@ def primary(tool):
 
 
 def picked_rows(tool, rows):
-    row = primary(tool)
-    if row is None:
-        return rows
-    result = [r for r in rows if r["id"] != row["owner"]]
-    if row["mesh_handle"]:
-        result.append(dict(row, id=row["owner"], handle=row["mesh_handle"]))
+    active = [
+        dict(r, **r["content"])
+        for r in tool.model.active_rows()
+        if not r["reference"] or r.get("related")
+    ]
+    owners = {row["owner"] for row in active}
+    result = [r for r in rows if r["id"] not in owners]
+    seen = set()
+    for row in active:
+        if row["mesh_handle"] and row["owner"] not in seen:
+            result.append(dict(row, id=row["owner"], handle=row["mesh_handle"]))
+            seen.add(row["owner"])
     return result
+
+
+def hidden_owners(tool):
+    return sorted({r["owner"] for r in tool.model.active_rows()})
 
 
 def mesh(tool, row):

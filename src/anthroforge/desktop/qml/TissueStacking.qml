@@ -44,6 +44,7 @@ UiSection {
         NumericSetting { label: "Maximum adjustment"; length: true; value: panel.item.stack_settings?.adjustment || 0; onEdited: value=>panel.configure("adjustment",value) }
     }
     UiField { id: search; objectName: "tissueStackSearch"; Layout.fillWidth: true; placeholderText: "Find a tissue…" }
+    UiButton { text: "Show received displacement"; Layout.fillWidth: true; enabled: !!panel.item.final_result?.asset; hint: "Compare the accepted final surface with its intrinsic inflation"; onClicked: workspace.tissueInspection.configure("final","intrinsic","Displacement") }
     ListView {
         id: list; objectName: "tissueStackList"; Layout.fillWidth: true
         Layout.preferredHeight: Math.min(160,count*32); clip: true; reuseItems: true
@@ -59,6 +60,8 @@ UiSection {
     Label { visible: panel.candidates.length===0; text: "Create another surface tissue to define a relationship."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
     ColumnLayout {
         visible: !!panel.other.id; Layout.fillWidth: true; spacing: Theme.gap
+        UiButton { objectName: "showStackingEffect"; text: "Show stacking effect"; Layout.fillWidth: true; enabled: !!panel.evidence; onClicked: workspace.tissueInspection.showStacking(panel.focused,panel.side,panel.otherSide) }
+        StackingExplanation { evidence: workspace.tissueInspection.state.stacking || ({}); target: panel.item.id }
         RowLayout {
             Layout.fillWidth: true
             UiCombo { id: ownSide; Layout.fillWidth: true; model: panel.item.both_sides?["a","b"]:["a"]; hint: "This tissue side" }

@@ -66,6 +66,9 @@ AF_API int af_stack_orders(uint64_t handle,AfStackOrder* rows,int count);
 AF_API int af_stack_dependencies(uint64_t handle,uint64_t* pairs,int capacity);
 AF_API int af_stack_validate_surfaces(uint64_t handle,const AfStackSurface* surfaces,int count,uint64_t cancel);
 AF_API int af_stack_points(uint64_t handle,uint64_t identity,double* points,int count,double* metrics);
+// Diagnostic material support polygons on the receiver's intrinsic surface; no solve.
+AF_API int af_stack_footprint(uint64_t handle,uint64_t cover,uint64_t provider,
+    double* lines,int capacity,int64_t* summary,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

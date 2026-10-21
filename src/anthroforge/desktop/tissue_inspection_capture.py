@@ -9,15 +9,29 @@ def restore(controller, settings):
     tool = controller.tissue_inspection
     tool.synchronize()
     tool.set_view(settings["stage"], settings["reference"], settings["mode"])
+    restore_stacking(controller, settings.get("stacking"))
     controller.session.wait()
     restore_point(controller, settings.get("point"))
     tool.synchronize()
-    finding = settings.get("finding")
+    restore_finding(controller, settings.get("finding"))
+
+
+def restore_finding(controller, finding):
     if finding:
+        tool = controller.tissue_inspection
         tool.lines = tissue_finding_view.lines(
             controller.session, finding, finding["evidence"]["witness"]
         )
         tool.changed.emit()
+
+
+def restore_stacking(controller, settings):
+    if not settings:
+        return
+    options = settings["options"]
+    controller.tissue_inspection.showStacking(
+        options["other"], options.get("side", "a"), options.get("other_side", "a")
+    )
 
 
 def restore_point(controller, point):

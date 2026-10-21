@@ -48,3 +48,4 @@ int af_stack_run(uint64_t handle,const AfStackDomain* domains,int count,const Af
 #include "stacking_surface_validation.cpp"
 #include "mesh_quality.cpp"
 #include "inspection_findings.cpp"
+#include "stacking_inspection.cpp"

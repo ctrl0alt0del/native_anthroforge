@@ -11,6 +11,7 @@ from anthroforge.native.mesh import NativeCancellation
 
 from . import tissue_inspection_stages as stages
 from .inspection_context import freeze
+from .inspection_queries import definition
 from .previews import Preview, completed
 
 
@@ -21,11 +22,12 @@ class Inspection:
 
 def start(session: Any, kind: str, target: str, **options: Any) -> dict[str, Any]:
     stage = options.get("stage", "final")
-    stages.mesh(session, target, stage)
+    options = dict(options, stage=stage)
+    definition(kind).validate(session, target, options)
     cancel(session, kind)
     value = Preview[Any](target=target, document=str(session.document.id), state="queued")
     session.tissue_inspection.values[kind] = value
-    job = make_job(session, value, kind, dict(options, stage=stage))
+    job = make_job(session, value, kind, options)
     value.job = job.id
     session.scheduler.submit(job)
     return status(session, kind)
@@ -35,9 +37,7 @@ def make_job(session: Any, value: Any, kind: str, options: Any) -> Job:
     job = inspection_job(session, value, kind, options)
     job.cancel = NativeCancellation(session.engine)
     job.cleanup = partial(completed, value, job)
-    job.workload = lambda _: Workload(
-        triangles=stages.mesh(session, value.target, options["stage"]).counts[3]
-    )
+    job.workload = lambda _: definition(kind).workload(session, value.target, options)
     return job
 
 
@@ -45,7 +45,7 @@ def inspection_job(session: Any, value: Any, kind: str, options: Any) -> Job:
     job = Job(
         "Inspect tissue " + kind,
         frozenset(),
-        partial(capture, session, value, options),
+        partial(capture, session, value, kind, options),
         partial(compute, kind, options),
         partial(publish, session, value, kind),
         key="tissue_inspection:" + kind,
@@ -57,31 +57,38 @@ def inspection_job(session: Any, value: Any, kind: str, options: Any) -> Job:
     return job
 
 
-def capture(session: Any, value: Any, options: Any, document: Any) -> Any:
+def capture(session: Any, value: Any, kind: str, options: Any, document: Any) -> Any:
     value.state = "running"
     context = freeze(session)
+    return context, value.target, definition(kind).signature(context, value.target, options)
+
+
+def validate(context: Any, target: str, options: Any) -> None:
+    stages.mesh(context, target, options["stage"])
+
+
+def workload(context: Any, target: str, options: Any) -> Workload:
+    return Workload(triangles=stages.mesh(context, target, options["stage"]).counts[3])
+
+
+def expected_asset(context: Any, target: str, options: Any) -> None:
     expected = options.get("expected_asset")
     if (
         expected
-        and stages.result(stages.tissue(context, value.target), options["stage"]).asset != expected
+        and stages.result(stages.tissue(context, target), options["stage"]).asset != expected
     ):
         raise ValueError("The displayed inspection surface changed. Pick the current stage again.")
-    return context, value.target, signature(context, value.target, options)
 
 
 def signature(context: Any, target: str, options: Any) -> Any:
+    expected_asset(context, target, options)
     selected = {options["stage"], options.get("reference", options["stage"])}
     return tuple(stages.signature(context, target, stage) for stage in sorted(selected))
 
 
 def compute(kind: str, options: Any, captured: Any, cancellation: Any) -> Any:
     context, target, stamp = captured
-    if kind == "comparison":
-        result = comparison(context, target, options, cancellation.handle)
-    else:
-        from .tissue_point_inspection import explain
-
-        result = explain(context, target, options, cancellation.handle)
+    result = definition(kind).compute(context, target, options, cancellation.handle)
     return context, target, options, stamp, result
 
 
@@ -117,10 +124,10 @@ def publish(session: Any, value: Any, kind: str, payload: Any) -> None:
     context, target, options, stamp, result = payload
     if (
         session.tissue_inspection.values.get(kind) is not value
-        or signature(session, target, options) != stamp
+        or definition(kind).signature(session, target, options) != stamp
     ):
         raise ValueError("Tissue inspection inputs changed; inspect the accepted stages again.")
-    value.asset = dict(result, stamp=stamp, options=options, target=target)
+    value.asset = dict(result, stamp=stamp, options=options, target=target, kind=kind)
     value.state = "ready"
 
 
@@ -142,7 +149,8 @@ def status(session: Any, kind: str) -> dict[str, Any]:
 
 def current(session: Any, asset: Any) -> bool:
     try:
-        return bool(signature(session, asset["target"], asset["options"]) == asset["stamp"])
+        query = definition(asset.get("kind", "comparison"))
+        return bool(query.signature(session, asset["target"], asset["options"]) == asset["stamp"])
     except (ValueError, KeyError):
         return False
 
@@ -162,6 +170,7 @@ def execute(session: Any, operation: str, arguments: dict[str, Any]) -> Any:
         "tissue.inspect.stages": partial(stages.describe, session),
         "tissue.inspect.compare": partial(start, session, "comparison"),
         "tissue.inspect.point": partial(start, session, "point"),
+        "tissue.inspect.stacking": partial(start, session, "stacking"),
         "tissue.inspect.status": partial(status, session),
         "tissue.inspect.cancel": partial(cancel, session),
         "tissue.inspect.check": partial(tissue_geometry.request, session),

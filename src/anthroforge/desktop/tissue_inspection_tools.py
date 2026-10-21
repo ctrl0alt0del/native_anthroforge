@@ -6,6 +6,7 @@ from anthroforge.application import tissue_inspection as inspection
 from anthroforge.application import tissue_inspection_stages as stages
 from anthroforge.core.tissues import TissueVCP
 
+from . import stacking_inspection_view as stacking
 from . import tissue_inspection_scene as scene
 from .models import RenderModel
 from .values import qml
@@ -22,6 +23,7 @@ class TissueInspectionTools(QObject):
         self.armed, self.lines, self.finding = False, [], ""
         self.context, self.key, self.rows, self.point, self.summary = None, None, [], {}, {}
         self.refresh_stamp, self.point_status = None, dict(state="idle")
+        self.stacking_status = dict(state="idle")
         self.model.activated.connect(self.activated)
 
     @Property(QObject, constant=True)
@@ -40,6 +42,7 @@ class TissueInspectionTools(QObject):
                 mode=self.mode,
                 active=self.armed,
                 hiddenOwner=row["owner"] if row else "",
+                hiddenOwners=scene.hidden_owners(self),
                 stages=self.rows,
             )
         )
@@ -50,6 +53,8 @@ class TissueInspectionTools(QObject):
             lines=self.lines,
             comparison=self.summary,
             pointStatus=self.point_status,
+            stacking=self.stacking_status,
+            footprint=stacking.lines(self),
         )
 
     def activated(self):
@@ -75,8 +80,24 @@ class TissueInspectionTools(QObject):
             return
         self.refresh_stamp = stamp
         self.refresh_comparison()
+        self.refresh_stacking()
         self.refresh_projection()
         self.refresh_evidence()
+
+    def refresh_stacking(self):
+        value = stacking.status(self)
+        if value != self.stacking_status:
+            self.stacking_status = value
+            self.changed.emit()
+
+    @Slot(str, str, str)
+    def showStacking(self, other, side, other_side):
+        self.attempt(stacking.show, self, other, side, other_side)
+
+    @Slot()
+    def hideStacking(self):
+        inspection.cancel(self.controller.session, "stacking")
+        self.synchronize()
 
     def inspection_stamp(self):
         session = self.controller.session
@@ -119,7 +140,7 @@ class TissueInspectionTools(QObject):
         session = self.controller.session
         rows = stages.describe(session, self.target)["stages"]
         settings = self.stage, self.reference, self.mode
-        key = rows, settings, inspection.status(session, "comparison")
+        key = rows, settings, inspection.status(session, "comparison"), self.stacking_status
         if key == self.key:
             return
         self.key, self.rows = key, rows
@@ -232,6 +253,7 @@ class TissueInspectionTools(QObject):
         self.armed, self.lines, self.point, self.key = False, [], {}, None
         self.refresh_stamp, self.point_status = None, dict(state="idle")
         self.model.publish([])
+        self.stacking_status = dict(state="idle")
 
     def show_finding(self, identity):
         from .tissue_finding_view import show

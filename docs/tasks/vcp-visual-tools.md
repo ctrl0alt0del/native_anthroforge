@@ -39,8 +39,11 @@ Research informs adapter choices, not a claim of geometry qualification.
 
 ## Current state
 
-Recovered exact scope; read current repository rules, engineering guidelines and existing
-stacking/inspection/field editor boundaries. Implementation not started.
+Implemented read-only native production support-mask queries, accepted-plan validation,
+provider/receiver display, intrinsic footprints, displacement comparison, matching staged
+picking and frozen report evidence. Reused the inspection scheduler through query policies.
+Excluded relationships report geometric order separately from active support.
+Recommendations 5–7 remain in progress; no release/package qualification claimed yet.
 Unrelated root `__init__.py` is preserved.
 
 ## Verification
@@ -48,6 +51,8 @@ Unrelated root `__init__.py` is preserved.
 Baseline main passed 1,557 tests, native/style checks and portable/offscreen qualification
 for recommendations 1–3. New behavior requires focused native/API/lifecycle tests, actual
 offscreen editing/render review, profiler evidence, full gate and packaged verification.
+Focused stacking/API/view/lifecycle/architecture checks: 14 passed. Native build and
+all five CTest checks passed. Actual GUI captures and full gate remain pending.
 
 ## Next actions and blockers
 

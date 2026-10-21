@@ -1196,11 +1196,14 @@ See the task and development validation records for final gate/package evidence 
 - The one-off migration preserves donor transverse density and selects resolution 3,
   which adds no evaluated refinement to these already denser donor grids. No mesh
   substitute, Python numerical fallback or special-case muscle evaluator is used.
-- Observed source-side parity: FCR, sartorius, pronator teres and TFL inflation meshes
+- Observed bilateral parity: FCR, sartorius, pronator teres and TFL inflation meshes
   match within 6.4e-7 scene units, with original vertex counts. Two-sided inflation and
   the material-domain crop are retained. External captures and comparisons are in the
   run linked by [task context](tasks/four-muscle-migration.md).
 - Tests: native mapping/reversal, incompatible sampling, edit stability, copy, save,
-  reopen, explicit Realign/undo and stale identities. Full delivery remains in progress.
+  reopen, explicit Realign/undo and stale identities. The Windows development gate,
+  final 1655-test suite, five native CTests and portable checks pass. The installed
+  executable recalculates all 38 migrated construction/tissue targets and renders
+  the saved project without a visible window. This is not interactive acceptance.
 - Scope: explicit stations require complete open ordinary loft inputs and exact
   sampling. They do not silently apply to closed paths, ranges, or branched layouts.

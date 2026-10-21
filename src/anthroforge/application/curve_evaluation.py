@@ -23,21 +23,23 @@ class PathEvaluation:
     attachment: attachment_assets.AttachmentAsset | None = None
 
 
-def evaluate(engine: Any, document: Any, resources: Any, target: str, cancel: int) -> Any:
+def evaluate(
+    engine: Any, document: Any, resources: Any, target: str, cancel: int, backend: str = "CUSTOM"
+) -> Any:
     item = curve_sources.source(document, target)
-    return evaluate_item(engine, document, resources, item, cancel)
+    return evaluate_item(engine, document, resources, item, cancel, backend)
 
 
 def evaluate_item(
-    engine: Any, document: Any, resources: Any, item: Any, cancel: int
+    engine: Any, document: Any, resources: Any, item: Any, cancel: int, backend: str = "CUSTOM"
 ) -> PathEvaluation:
     if not isinstance(item, Fiber):
-        return PathEvaluation(engine_path(engine, document, resources, item, cancel))
-    return evaluate_fiber(engine, document, resources, item, cancel)
+        return PathEvaluation(engine_path(engine, document, resources, item, cancel, backend))
+    return evaluate_fiber(engine, document, resources, item, cancel, backend)
 
 
 def evaluate_fiber(
-    engine: Any, document: Any, resources: Any, item: Fiber, cancel: int
+    engine: Any, document: Any, resources: Any, item: Fiber, cancel: int, backend: str
 ) -> PathEvaluation:
     item = junction_bindings.resolve(document, resources, item)
     if item.attachment_asset not in resources.attachments:
@@ -46,31 +48,45 @@ def evaluate_fiber(
     positions = attachment_assets.resolved_points(engine, document, resources.meshes, asset, cancel)
     world = curve_sources.world(engine, document, item.id)
     if item.edit:
-        return edited_fiber(engine, document, resources, item, world, cancel)
+        return edited_fiber(engine, document, resources, item, world, cancel, backend)
     resolved = attachment_assets.evaluate(engine, item, asset, positions, world, cancel)
     return PathEvaluation(
-        engine_path(engine, document, resources, resolved.authored, cancel, resolved)
+        engine_path(engine, document, resources, resolved.authored, cancel, backend, resolved)
     )
 
 
 def edited_fiber(
-    engine: Any, document: Any, resources: Any, item: Fiber, world: Any, cancel: int
+    engine: Any, document: Any, resources: Any, item: Fiber, world: Any, cancel: int, backend: str
 ) -> PathEvaluation:
     path, changed, captured = fiber_edit_evaluation.evaluate(
         engine, item, resources, document, world, cancel
     )
-    path = engine_path(engine, document, resources, changed, cancel, path)
+    path = engine_path(engine, document, resources, changed, cancel, backend, path)
     return PathEvaluation(path, changed, captured)
 
 
 def engine_path(
-    engine: Any, document: Any, resources: Any, item: Any, cancel: int, resolved: Any = None
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Any,
+    cancel: int,
+    backend: str,
+    resolved: Any = None,
 ) -> Any:
     item, resolved = junction_evaluation.resolved(
         engine, document, resources, item, cancel, resolved
     )
+    return resolved_engine_path(engine, document, resources, item, cancel, backend, resolved)
+
+
+def resolved_engine_path(
+    engine: Any, document: Any, resources: Any, item: Any, cancel: int, backend: str, resolved: Any
+) -> Any:
     if item.engine == "ROUTED":
-        return routing_evaluation.evaluate(engine, document, resources, item, cancel, resolved)
+        return routing_evaluation.evaluate(
+            engine, document, resources, item, cancel, resolved, backend
+        )
     return resolved or path_assets.evaluate(engine, item, cancel)
 
 

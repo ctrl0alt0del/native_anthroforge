@@ -27,13 +27,23 @@ portable distribution and companion source archive. Background-only validation.
 
 ## Current state
 
-Inspected repository rules, current routing boundaries and benchmark adapters. No
-implementation changes yet. Preserve unrelated untracked root `__init__.py`.
+Native per-invocation backend, sparse adapter, preference storage and desktop editor
+implemented. Custom remains default. Future-dispatch semantics implemented provisionally
+while the optional question is pending. Both ordinary path jobs and conversion previews
+capture preferences at dispatch. Reports retain backend provenance. Shared reference
+fixtures moved into a test helper used by the benchmark and production qualification.
+
+Also corrected the measured Custom active-set cap mismatch: do not change the active
+list after the final candidate solve. This preserves matching multipliers/candidate and
+removes a possible out-of-bounds downstream read; no acceptance checks weakened.
 
 ## Verification
 
-Pending: native backend parity/lifecycle, preference persistence/API isolation,
-offscreen interaction and screenshots, development gate, packaged qualification.
+50 focused tests passed: both backends on 18 compact cold/warm fixtures, independent
+clearance/pins/layout, concurrent calls, cancellation, preference persistence, running
+and queued dispatch, Manual mode, saved backend provenance, and function limits.
+Initial native build/three contracts and mypy passed. New native cap regression,
+dependent material tests, offscreen UI, full gate and portable release remain pending.
 
 ## Next actions
 

@@ -121,10 +121,17 @@ def read_path(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryE
         raise ValueError("Accepted path input must be a curve or fiber.")
     samples = read_array(archive, f"paths/{key}/samples.npy")
     parameters = read_array(archive, f"paths/{key}/parameters.npy")
-    report = source["diagnostics"]
-    diagnostics = Report(tuple(report["counters"]), tuple(report["measures"])) if report else None
+    diagnostics = read_routing_report(source["diagnostics"])
     return PathAsset(
         paths.restore(engine, samples, parameters, authored.closed), authored, diagnostics
+    )
+
+
+def read_routing_report(report: Any) -> Report | None:
+    if report is None:
+        return None
+    return Report(
+        tuple(report["counters"]), tuple(report["measures"]), report.get("backend", "CUSTOM")
     )
 
 

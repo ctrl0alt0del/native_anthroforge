@@ -14,7 +14,12 @@ PATCHES = (
         "struct AfV3SqpState {\n    std::shared_ptr<afbench::Context> qp_lab;",
     ),
     ("static bool af_v3_sqp_candidate(", "static bool af_v3_sqp_candidate_current("),
-    ("state.trust_boundary=af_v3_sqp_trust(state,state.candidate);return true;", "return true;"),
+    (
+        "multipliers=af_v3_sqp_active_set(state,responses,active,state.candidate);\n"
+        "    state.trust_boundary=af_v3_sqp_trust(state,state.candidate);return true;",
+        "multipliers=af_v3_sqp_active_set(state,responses,active,state.candidate);\n"
+        "    return true;",
+    ),
     (
         "static double af_v3_sqp_spacing_energy(",
         '#include "candidate.hpp"\n\nstatic double af_v3_sqp_spacing_energy(',

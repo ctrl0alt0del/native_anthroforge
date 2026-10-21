@@ -40,7 +40,7 @@ def make_job(session: "Session", curve: str) -> Job:
     return Job(
         "Evaluate " + source(session.document, curve).name,
         frozenset((curve,)),
-        lambda document: (document, session.resources.snapshot()),
+        lambda document: (document, session.resources.snapshot(), session.preferences.value),
         partial(compute, session, curve),
         partial(publish, session, curve),
         key="path:" + curve,
@@ -61,12 +61,25 @@ def workload(session: "Session", curve: str, document: Document) -> Workload:
 
 
 def compute(session: "Session", curve: str, payload: Any, cancel: Any) -> Any:
-    document, resources = payload
+    document, resources, preferences = payload
+    require_inputs_available(document, curve)
+    return document, session.profiler.call(
+        "path",
+        "evaluate",
+        curve_evaluation.evaluate,
+        session.engine,
+        document,
+        resources,
+        curve,
+        cancel.handle,
+        preferences.routing_backend,
+        _metadata={"target": curve, "routing_backend": preferences.routing_backend},
+    )
+
+
+def require_inputs_available(document: Document, curve: str) -> None:
     if Port(curve, "path") in dep.blocked(dep.graph(document)):
         raise ValueError("Cyclic or missing curve dependency; last accepted path retained.")
-    return document, curve_evaluation.evaluate(
-        session.engine, document, resources, curve, cancel.handle
-    )
 
 
 def publish(session: "Session", curve: str, payload: Any) -> None:

@@ -7,7 +7,8 @@ static Input input(const double* records,int count,const double* world,const int
     if(!records||!world||!owners||!options||count<2||count>100000)
         throw std::runtime_error("Invalid routing input.");
     if(options->samples<2||options->samples>1000000||options->accepted_steps<1||options->accepted_steps>4096||
-       (options->closed&&count<3)||!std::isfinite(options->radius)||options->radius<0)
+       (options->closed&&count<3)||!std::isfinite(options->radius)||options->radius<0||
+       (options->backend!=AF_ROUTING_CUSTOM&&options->backend!=AF_ROUTING_PIQP))
         throw std::runtime_error("Invalid routing settings.");
     for(int i=0;i<count;++i) if(owners[i]<0||owners[i]>surfaces) throw std::runtime_error("Invalid routing owner.");
     if(!std::all_of(records,records+13*count,[](double value){return std::isfinite(value);}))

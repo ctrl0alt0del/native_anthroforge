@@ -20,6 +20,7 @@ from .routing_scene import capture
 class Options(c.Structure):
     _fields_ = [(name, c.c_int) for name in ("samples", "accepted_steps", "closed")]
     _fields_ += [("radius", c.c_double)]
+    _fields_ += [("backend", c.c_int)]
 
 
 @dataclass(frozen=True)
@@ -30,12 +31,14 @@ class Inputs:
     world: tuple[float, ...] = IDENTITY
     owners: tuple[int, ...] = ()
     warm: Path | None = None
+    backend: str = "CUSTOM"
 
 
 @dataclass(frozen=True)
 class Report:
     counters: tuple[int, ...]
     measures: tuple[float, ...]
+    backend: str = "CUSTOM"
 
 
 def configure(engine: GeometryEngine) -> None:
@@ -63,8 +66,14 @@ def evaluate(engine: GeometryEngine, inputs: Inputs, cancel: int = 0) -> tuple[P
     settings = inputs.curve.engine_settings
     if not isinstance(settings, RoutingSettings):
         raise ValueError("Routing requires the routed curve engine.")
+    if inputs.backend not in ("CUSTOM", "PIQP"):
+        raise ValueError("ROUTED solver must be CUSTOM or PIQP.")
     options = Options(
-        settings.samples, settings.accepted_steps, inputs.curve.closed, settings.radius
+        settings.samples,
+        settings.accepted_steps,
+        inputs.curve.closed,
+        settings.radius,
+        int(inputs.backend == "PIQP"),
     )
     return invoke(engine, arrays(inputs), options, inputs.warm, cancel)
 
@@ -82,7 +91,13 @@ def invoke(
     handle = engine.library.af_route_path_in_scene(
         *arguments(packed)[:4], scene.handle, *report_args, warm.handle if warm else 0, cancel
     )
-    return Path(engine, handle), Report(tuple(counters.tolist()), tuple(measures.tolist()))
+    return Path(engine, handle), read_report(counters, measures, options)
+
+
+def read_report(counters: Any, measures: Any, options: Options) -> Report:
+    return Report(
+        tuple(counters.tolist()), tuple(measures.tolist()), "PIQP" if options.backend else "CUSTOM"
+    )
 
 
 def arguments(packed: tuple[Any, ...]) -> tuple[Any, ...]:

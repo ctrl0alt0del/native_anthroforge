@@ -35,12 +35,20 @@ def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicatio
     engine.rootContext().setContextProperty("workspace", controller)
     engine.rootContext().setContextProperty("authoring", controller.authoring)
     setup_profile_controls(controller, engine)
+    setup_preferences(controller, engine)
     inputs = InputState(engine)
     engine.rootContext().setContextProperty("heldInput", inputs)
     engine.warnings.connect(lambda errors: warnings.extend(error.toString() for error in errors))
     engine.load(QUrl.fromLocalFile(str(Path(__file__).parent / "qml" / "Main.qml")))
     attach_window(engine, controller, inputs)
     return engine
+
+
+def setup_preferences(controller, engine):
+    from .preference_controls import PreferenceControls
+
+    controller.preference_controls = PreferenceControls(controller)
+    engine.rootContext().setContextProperty("preferences", controller.preference_controls)
 
 
 def attach_window(engine, controller, inputs):

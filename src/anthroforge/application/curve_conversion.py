@@ -123,17 +123,17 @@ def capture(
     source = curve_edit_state.current(session, curve_sources.source(document, spec.curve))
     value.state = "running"
     inputs = ConversionInput(source, spec, session.resources.paths.get(source.result.asset))
-    return inputs, document, session.resources.snapshot()
+    return inputs, document, session.resources.snapshot(), session.preferences.value
 
 
 def compute(session: "Session", payload: Any, cancel: Any) -> path_assets.PathAsset:
-    value, document, resources = payload
+    value, document, resources, preferences = payload
     candidate = convert(session.engine, value, cancel.handle)
     if isinstance(candidate, Fiber):
         edit = FiberEdit(value.source.result.asset, eligible(document, candidate.id))
         candidate = replace(candidate, edit=edit)
     return curve_evaluation.evaluate_item(
-        session.engine, document, resources, candidate, cancel.handle
+        session.engine, document, resources, candidate, cancel.handle, preferences.routing_backend
     ).asset
 
 

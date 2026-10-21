@@ -52,6 +52,7 @@ static Span prepare_span(const Input& input,const World& world,const Reference& 
     if(!span.session) throw std::runtime_error("Routing session preparation failed.");
     span.session->snapshot=world.snapshot.get(); span.session->face_owners=world.owners;
     span.job.config=configuration(world,span,input);
+    if(input.options.backend==AF_ROUTING_PIQP) configure_piqp(span.job,input.cancel);
     return span;
 }
 std::vector<Span> spans(const Input& input,const World& world,const Reference& reference) {

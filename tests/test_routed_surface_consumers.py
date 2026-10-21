@@ -31,7 +31,11 @@ def fiber_on_target(session, target, role):
 
 
 @pytest.mark.parametrize("role", ["TISSUE_BASE", "TISSUE_FINAL"])
-def test_downstream_fiber_retains_dense_material_capture_during_routing(session, tmp_path, role):
+@pytest.mark.parametrize("backend", ["CUSTOM", "PIQP"])
+def test_downstream_fiber_retains_dense_material_capture_during_routing(
+    session, tmp_path, role, backend
+):
+    session.command("preferences.set", routing_backend=backend)
     obstacle, target = target_tissue(session)
     fiber = fiber_on_target(session, target, role)
     initial = path(session, fiber.id).copy()

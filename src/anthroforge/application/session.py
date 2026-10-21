@@ -20,6 +20,7 @@ from .curve_conversion import ConversionPreview
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
 from .history import History
+from .preferences import PreferenceStore, load_user_preferences
 from .previews import Preview
 from .resources import Resources
 from .surface_preview import Candidate
@@ -27,12 +28,21 @@ from .tissue_preview import Candidate as TissueCandidate
 
 
 class Session:
-    def __init__(self, name: str = "Untitled", profiler: RuntimeProfiler | None = None) -> None:
+    def __init__(
+        self,
+        name: str = "Untitled",
+        profiler: RuntimeProfiler | None = None,
+        preferences: PreferenceStore | None = None,
+    ) -> None:
         self.changes, self._document = ChangeJournal(), Document(name=name)
         self.history = History(self.document)
         self.resources = Resources()
+        self.preferences = preferences if preferences is not None else load_user_preferences()
         self.initialize_runtime(profiler)
         self._engine: GeometryEngine | None = None
+        self.initialize_file_state()
+
+    def initialize_file_state(self) -> None:
         self.serial = 0
         self.path: Path | None = None
         self.file_lock: Any = None

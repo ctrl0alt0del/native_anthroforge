@@ -7,6 +7,11 @@ from anthroforge.application.session import Session
 CUBE = Path(__file__).resolve().parents[1] / "examples/primitives/cube.obj"
 
 
+@pytest.fixture(autouse=True)
+def isolated_preferences(tmp_path, monkeypatch):
+    monkeypatch.setenv("ANTHROFORGE_PREFERENCES_PATH", str(tmp_path / "preferences.json"))
+
+
 @pytest.fixture
 def session():
     value = Session("Fixture")

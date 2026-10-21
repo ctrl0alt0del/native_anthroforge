@@ -790,3 +790,26 @@ saves do not invalidate route evidence, section contours or a pending paint stro
 edits still invalidate the conservative read set. Large overlay arrays cross the Qt boundary
 through `ViewSnapshot` on change. Small status properties exclude geometry; this avoids QML
 reference-sequence getters copying thousands of points repeatedly during bindings/rendering.
+
+## Target-driven deformation and parameter-driven segment construction
+
+`core/segment_chain.py` owns anatomy-neutral parameters; `native/segment_chain.cpp`
+constructs capped profiles and uses the existing exact exterior union. Per-triangle
+source identities and corner barycentrics preserve material locations when union
+triangulation changes. Attachment captures own their reference resource through normal
+history/checkpoint/job leases. A newly covered material location produces an explicit
+failure; this is not nearest-face reassignment. Unstable generated vertex memberships
+are rejected by shared construction validation; cage controls remain independent.
+
+Shrinkwrap bindings reference surface roles rather than dummy controls. Reference
+queries, deletion/copy policies and the dependency graph consume those relationships;
+workers use dispatch-time owned target geometry and target-local frames. Numeric work
+runs in the existing native library; no Blender runtime or new worker pool is introduced.
+Linear subdivision and vector displacement use the same ordered stage contract.
+
+Attachment admission partitions multi-pose batches at intervening non-pose outputs.
+Direct pose chains remain batched; pose/control/geometry/child-pose chains can publish
+between batches without creating a job-level cycle. The coordinator still enforces all
+read sets, output reservations, safe cancellation, undo and save checkpoint semantics.
+The desktop value adapter converts identity-free typed parameter records to owned QML
+values; identity-bearing records retain existing incremental projections.

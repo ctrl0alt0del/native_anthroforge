@@ -328,3 +328,14 @@ porting; this specification does not claim those components have already been ex
 | Q25–Q28: multiple ordered deformers, permanent no-bake rule, per-target removal and update modes | Sections 1 and 3–4 |
 | Q29–Q31: radius/tilt, connected loft seams, imported hook selection/weights | Section 2 and acceptance/evidence |
 | Q32: consolidated specification confirmed | This document's confirmed status |
+
+## Current 0.2.3 construction additions
+
+Segment Chain is a fourth, anatomy-neutral primitive family. The inspector directly
+exposes segment length/radius/bend, spread and radius profile; its parameters remain
+editable and do not require an empty component-edit mode. Shared deformation supports
+nearest-surface Shrinkwrap with explicit surface roles, linear subdivision, and local
+vector displacement. The supported semantics and limits are in the
+[authoring API](authoring_api.md#editable-shrinkwrap-and-segment-chain) and CH-027–030
+of the [computation history](computation_history.md). These additions preserve the
+existing shared-control, topology-lock, undo and permanent no-bake contracts.

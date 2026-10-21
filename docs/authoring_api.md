@@ -785,3 +785,38 @@ rerouting. Tissue exports also preserve current stacking/paint evidence and opti
 Camera persistence does not invalidate these geometry diagnostics. Authored/accepted scene
 changes invalidate their conservative input signatures. API callers supply visible occluders
 for visible-only painting; the desktop captures them from the displayed scene automatically.
+
+## Editable Shrinkwrap and Segment Chain
+
+`primitive.create(kind="SEGMENT_CHAIN", name?, parent?)` creates a parameter-driven
+SCP without a hidden curve or imported source. `chain.segment(entity, index, length?,
+radius?, bend?, samples?, sides?)` edits one segment; `chain.resize(entity, count)`
+sets 1–32 segments. `chain.configure(entity, spread?, bend_mode?, profile?, unite?)`
+edits shared settings. Angles use radians in the API and degrees in the inspector.
+`ADJACENT` uses each bend plus its predecessor; `CUMULATIVE` sums preceding bends.
+Zero length disables a segment; radius zero is permitted only for a disabled segment.
+The AUTO radius profile is flattened position/scale pairs, spanning 0–1.
+
+`shrinkwrap.add(target, surface, offset=0, mode="ON_SURFACE")` returns a binding ID.
+`target` uses the common owner/stage/component reference; `surface` is an SCP ID or
+an explicit `{target, role}` surface reference, including available tissue roles.
+`shrinkwrap.update(binding, surface?, offset?, mode?)` retains common lifecycle,
+ordering, enabled/strength/weight settings and deletion protection. Nearest-surface
+modes are `ON_SURFACE`, `INSIDE`, `OUTSIDE`, `OUTSIDE_SURFACE`. Offsets are in target-local
+units, matching the qualified Blender behavior. Project/nearest-vertex/target-normal
+projection are not implemented by this adapter; it never substitutes them silently.
+
+`modifier.add(entity, kind="SUBDIVISION", levels=1)` adds linear subdivision (0–5).
+`modifier.add(entity, kind="DISPLACE", offset=[x,y,z])` adds local vector displacement.
+Use `modifier.update(binding, levels? / offset?)`, normal deformer ordering/removal,
+and `body.update(..., subdivision=...)` for pre-bend base refinement.
+Quad Simple subdivision matches the Blender fixtures; higher-level nonplanar n-gon
+Simple evaluation is not claimed equivalent. All stages remain editable, never baked.
+
+Changing union connectivity retains material attachment provenance. A location covered
+by a new union fails explicitly instead of rebinding. Indexed/weighted geometry
+membership on Segment Chain is unavailable; use whole-target deformation or a lattice
+with stable cage-point memberships. `evaluate` splits attachment work across intervening
+geometry dependencies so complete assemblies do not wait on their own batched poses.
+The returned ID identifies the final submitted pose batch; use `wait` to await all work.
+See `examples/segment_chain.json` for a portable shared-API workflow.

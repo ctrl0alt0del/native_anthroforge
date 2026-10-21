@@ -66,6 +66,15 @@ def test_unstable_membership_rejected_but_whole_target_deformation_allowed(sessi
     assert not session.scheduler.errors
 
 
+def test_chain_thickness_cannot_use_unstable_vertex_weights(session):
+    entity = session.command("primitive.create", kind="SEGMENT_CHAIN")
+    session.wait()
+    before = session.document
+    with pytest.raises(ValueError, match="changing vertex membership"):
+        session.command("thickness.update", entity=entity, weights=[0, 1])
+    assert session.document == before
+
+
 def test_union_returns_closed_nonempty_geometry():
     engine = GeometryEngine()
     source = source_settings(REFERENCE["cases"][0])

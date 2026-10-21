@@ -2,7 +2,7 @@
 
 from typing import TYPE_CHECKING
 
-from .construction import Control, Deformer, Primitive, Target
+from .construction import Control, Deformer, Primitive, Target, Thickness
 from .construction_capabilities import stable_geometry_members
 from .entities import SCP
 
@@ -79,6 +79,18 @@ def transform_parents(document: "Document") -> set[str]:
     }
 
 
+def thickness_membership(item: SCP, thickness: Thickness | None) -> None:
+    if not stable_geometry_members(item) and thickness and thickness.weights:
+        raise ValueError("Segment Chain has changing vertex membership; use uniform thickness.")
+
+
+def item_membership(item: SCP | Control, controls: dict[str, Control]) -> None:
+    if isinstance(item, SCP):
+        thickness_membership(item, item.thickness)
+    for value in item.deformers:
+        binding(item, value, controls)
+
+
 def document(document: "Document") -> None:
     items: tuple[SCP | Control, ...] = (*document.entities, *document.controls)
     keys = [key for item in items for key in identities(item)]
@@ -89,5 +101,4 @@ def document(document: "Document") -> None:
     for control in document.controls:
         control_references(control, parents, anatomy)
     for item in items:
-        for value in item.deformers:
-            binding(item, value, controls)
+        item_membership(item, controls)

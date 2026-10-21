@@ -55,3 +55,11 @@ Union uses the existing native exact exterior-arrangement implementation.
 `tools/capture_segment_chain.py` records node output without saving the source file;
 the compact Index/Big_Toe fixtures retain its hash and source parameters.
 
+
+Segment Chain side/cap winding follows Blender 5.0.1
+[Curve-to-Mesh](https://github.com/blender/blender/blob/v5.0.1/source/blender/blenkernel/intern/curve_to_mesh_convert.cc).
+Linear subdivision uses face averages and edge midpoints. Quad Simple subdivision is
+reference-tested; higher-level nonplanar n-gon OpenSubdiv behavior is not equivalent
+and is not claimed as such. The migrated scapula/base stages use quads. Constant local
+vector displacement reproduces the source's no-texture local-axis stage, not Blender's
+complete texture displacement feature set. No OpenSubdiv library was added.

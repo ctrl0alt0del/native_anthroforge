@@ -278,10 +278,13 @@ def piece_update(session: "Session", entity: str, piece: str, **options: Any) ->
 
 
 def thickness(session: "Session", entity: str, remove: bool = False, **options: Any) -> None:
+    from anthroforge.core.construction_validation import thickness_membership
+
     item = session.editable(entity)
     if item.thickness is None or remove or set(options) & {"enabled", "rim", "rim_only", "flip"}:
         require_topology_edit(session.document, entity)
     changed = None if remove else replace(item.thickness or Thickness(), **codec.tuples(options))
+    thickness_membership(item, changed)
     session.replace_entities({entity: replace(item, thickness=changed)})
     tasks.edited(session, {entity})
 

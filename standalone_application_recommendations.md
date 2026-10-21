@@ -790,3 +790,15 @@ S3 is the corrected 18-item source supplied after the initial consolidation. The
 | S6.19 | H01, H04 |
 | S6.20 | H05, H06 |
 | S6.21 | I01, I02, I03 |
+
+## Tissue inspection delivery (0.2.3)
+
+Implemented portions of E03/E04/F05/F11/G01: accepted base/rest/intrinsic/final stage
+selection, comparison overlays and material-displacement coloring; clicked material/region
+explanations with source navigation; explicit advisory geometry checks with revision-tagged
+triangle witnesses and viewport focus. Inspection image/JSON reports preserve the selected
+stage and current evidence. Detailed geometry checks are **on demand**, as confirmed by
+the user. No self-intersection repair or automatic rejection was added. Containment,
+penetration depth and a general geometric validity certificate are outside these checks.
+See [the shared API and workflow](docs/authoring_api.md#read-only-tissue-inspection-023)
+and [verification record](docs/tasks/tissue-inspection.md).

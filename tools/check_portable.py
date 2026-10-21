@@ -46,6 +46,7 @@ CHECKS = (
     "branched point creation, automatic surface grouping and membrane conversion",
     "exterior-only placement, sealed-cavity exclusion and original-material Fiber/Anchor capture",
     "persistent preferences, Custom/PIQP routed curves and fibers, saved/report provenance",
+    "accepted tissue stages, displacement, point explanations and advisory geometry reports",
 )
 
 

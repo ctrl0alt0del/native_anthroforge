@@ -60,7 +60,7 @@ class TissueInspectionTools(QObject):
             self.context, self.target = context, context[2]
         if not self.target:
             return
-        if controller.authoring.editing and self.stage:
+        if self.editing_geometry() and self.stage:
             self.clear()
         self.refresh_comparison()
         self.refresh_projection()
@@ -73,6 +73,9 @@ class TissueInspectionTools(QObject):
             session.active_workspace,
             item.id if isinstance(item, TissueVCP) else "",
         )
+
+    def editing_geometry(self):
+        return self.controller.authoring.editing or bool(self.controller.tissue_region_tools.options)
 
     def refresh_comparison(self):
         session = self.controller.session
@@ -114,7 +117,7 @@ class TissueInspectionTools(QObject):
         self.attempt(self.set_view, stage, reference, mode)
 
     def set_view(self, stage, reference, mode):
-        if self.controller.authoring.editing:
+        if self.editing_geometry():
             raise ValueError("Finish component editing before comparing tissue stages.")
         self.stage, self.reference, self.mode = stage, reference, mode
         self.finding, self.lines = "", []

@@ -45,7 +45,7 @@ Node {
     }
     Model {
         objectName: "tissueInspectionWitness"
-        geometry: ControlGeometry { points: workspace.tissueInspection.state.lines || []; segments: true; stroke: root.distance*.0015 }
+        geometry: ControlGeometry { objectName: "tissueInspectionLines"; points: workspace.tissueInspection.state.lines || []; segments: true; stroke: root.distance*.0015 }
         materials: DefaultMaterial { diffuseColor: "#ffe571"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
     }
 }

@@ -693,3 +693,49 @@ routed Fibers and conversion previews. Running jobs and accepted results remain 
 Use `ANTHROFORGE_PREFERENCES_PATH` for isolated automation, or inject
 `Session(preferences=PreferenceStore())` for an in-memory embedded session. The CLI
 loads the same user preferences as desktop without Qt. See [the contract](specification_023.md).
+
+## Read-only tissue inspection (0.2.3)
+
+Desktop: select a tissue and open **Inspect tissue**. Choose the displayed accepted stage,
+an optional reference, and **Overlay** or **Displacement**. **Explain a surface point**
+arms one-click inspection; **Check geometry** runs detailed advisory checks on demand.
+Selecting a spatial finding frames and outlines its triangles. Dashed yellow x-ray guides
+remain visible through occluders. These actions do not edit anatomy or create undo entries.
+
+| Operation | Arguments and result |
+| --- | --- |
+| `tissue.inspect.stages` | `target`; available base/rest/intrinsic/final resources, accepted result provenance and frames. Point/curve bases retain their native presentation. |
+| `tissue.inspect.compare` | `target`, `stage`, `reference`; starts a read-only background comparison. Surface stages must share material correspondence. |
+| `tissue.inspect.point` | `target`, `stage`, `triangle`, `weights` (three barycentric weights); optional `expected_asset` rejects a stale displayed pick. Starts background point/constraint inspection. |
+| `tissue.inspect.status` | `kind: "comparison" \| "point"`; lifecycle state, job, error and report. |
+| `tissue.inspect.cancel` | Optional `kind`; cancels inspection and releases its retained result. |
+| `tissue.inspect.check` | `target`, optional `stage="final"`; enqueues `tissue_geometry.v1` for this stage only. Read results with `issues.query`. |
+
+Comparison statistics are vertex-weighted world-space displacement magnitudes in metres,
+using canonical identities or retained material coordinates, never nearest-surface matching.
+Blue → yellow → red spans zero to the report maximum; it is not an absolute shared color scale.
+When comparing against a base, display the inflated stage and select the base as reference:
+one base sample can have several inflated sides, so reverse matching would be ambiguous.
+Different accepted construction revisions fail explicitly. Desktop displacement refreshes
+after new accepted geometry; headless clients explicitly request another comparison.
+
+Point reports include local position, material source position, delta, normal, part/side,
+source boundary/seam contributions, retained zero-height rest samples, structural backing,
+and native evaluated region core/feather/strength/target-reference information. Constraints
+come from the settings of the accepted stage, not pending authored edits. This explains
+constraint inputs, not an inverse decomposition of solver forces. Source navigation describes
+current construction relationships; it is not historical evidence of each source's influence.
+
+Geometry checks detect degenerate triangles and transverse self/other-surface crossings,
+with original triangle IDs, assets, accepted/document revisions, world frames and bounds.
+Self pairs sharing a vertex and touching/coplanar contact are excluded. Containment and
+penetration depth are not measured. Checks stop at 512 findings and report truncation.
+**Self-intersections remain allowed.** Checks never repair or replace accepted geometry.
+Changed inputs mark evidence stale; no expensive automatic rerun occurs. "No findings"
+applies only to the stated checks/revision, not to a general collision-free certificate.
+
+`inspection.export` additionally accepts `tissue={stage,reference,mode,finding?}` with a
+selected tissue. It freezes the stage view, a current point explanation and optional current
+Issue identity, then renders that exact document snapshot in the isolated renderer. The
+`.afinspection.zip` includes matching `image.png` and `inspection.json`. Native handles and
+comparison buffers are temporary presentation resources, excluded from project files.

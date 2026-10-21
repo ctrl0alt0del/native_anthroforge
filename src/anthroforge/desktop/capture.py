@@ -76,12 +76,7 @@ def inspection_view(controller, settings):
 
 
 def stage_geometry(app, controller, renderer):
-    models = (
-        controller.render_model,
-        controller.path_model,
-        controller.image_model,
-        controller.tissue_inspection.model,
-    )
+    models = controller.geometry_models()
     while any(model.pending for model in models):
         for model in models:
             model.drain()

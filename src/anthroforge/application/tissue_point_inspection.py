@@ -32,7 +32,7 @@ def sample(context: Any, item: Any, options: Any, cancel: int) -> Any:
     base = context.resources.meshes.get(state.base) if state else None
     rest = context.resources.meshes.get(state.rest) if state else None
     query = options["triangle"], options["weights"]
-    inputs = dict(
+    inputs: dict[str, Any] = dict(
         rest=rest.mesh if rest else None, cancel=cancel, frame=stages.frame(context, item, stage)
     )
     return native.point(mesh, base.mesh if base else None, *query, **inputs)

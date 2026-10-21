@@ -355,6 +355,7 @@ Item {
     CurveFeedback { anchors.fill: parent; viewport: viewport }
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     MeasurementOverlay { id: measurementOverlay; viewport: viewport }
+    TissueInspectionOverlay { viewport: viewport }
     ImageCalibrationOverlay { viewport: viewport }
     DrawingOverlay { viewport: viewport }
     InspectionTools { viewport: viewport; anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.margins: 12; z: 10 }

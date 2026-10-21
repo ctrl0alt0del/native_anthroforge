@@ -733,3 +733,32 @@ more branch curves on at most two outer boundaries force at least four roots on 
 boundary, a valid allocation proves multiple valid partitions. No search cutoff is
 reported as user ambiguity. `SurfaceCreation` only
 presents ambiguous drafts, with virtualized lists and shared validation before publication.
+
+### Read-only tissue inspection
+
+`application.tissue_inspection_stages` owns accepted-stage availability, provenance and
+compatibility. `tissue_inspection` schedules owned, cancellable read-only comparison/point
+jobs through the existing coordinator and validates their complete accepted read signatures
+before publication. Authored pending status alone does not invalidate accepted geometry.
+`native/inspection_*` owns material sampling, displacement buffers, region feather evaluation
+and bounded spatial queries. Numerical results do not enter the authored document or undo.
+
+The generic Issues provider contract now declares whether a detector is automatic. The
+tissue geometry provider is manual: document changes invalidate existing evidence, never
+schedule a scan. Explicit requests capture owned geometry, poses and neighbors at dispatch.
+Results remain advisory. Existing inflation, smoothing, relaxation and stacking acceptance
+are unchanged. The findings implementation shares the stacking translation unit because
+qualified donor headers contain non-inline definitions; its exported query contract stays
+separate from stacking evaluation and no competing worker pool is introduced.
+
+The desktop owns stage presentation and native leases. `RenderModel`'s immutable staged
+content carries buffer type, displayed stage, frame and mesh picking handle together, so a
+mesh handle can never temporarily be interpreted as a colored-buffer pointer. Complete
+replacements activate at the same frame boundary used by ordinary anatomy. Bounded x-ray
+guides are a presentation overlay, not an edit to anatomy visibility. Native comparisons
+retain their source/target meshes; profiler inventory attributes both buffers and leases.
+
+Frozen inspection export validates stage/finding selection in the application layer and
+normalizes the view to its JSON transport contract. The isolated renderer reconstructs the
+comparison from the captured revision and includes matching point/finding evidence. The
+desktop collector and report renderer do not become dependencies of headless geometry APIs.

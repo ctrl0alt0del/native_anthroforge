@@ -4,10 +4,11 @@ import QtQuick.Layouts
 
 UiSection {
     id: panel
-    title: "Inspect tissue"; expanded: false
+    objectName: "tissueInspectionPanel"; title: "Inspect tissue"; expanded: false
     readonly property var tools: workspace.tissueInspection
     readonly property var state: tools.state
     readonly property var options: [{stage:"",label:"Current result"}].concat((state.stages || []).filter(s=>s.available))
+    readonly property bool hasMesh: !state.stage || (state.stages || []).some(s=>s.stage===state.stage && s.available && s.kind==="MESH")
     function change(stage,reference,mode) { tools.configure(stage,reference,mode); }
     UiCombo {
         objectName: "tissueInspectStage"; Layout.fillWidth: true; textRole: "label"; model: panel.options
@@ -32,8 +33,8 @@ UiSection {
     UiNotice { active: panel.visible; text: panel.state.pointStatus?.error || ""; error: true }
     UiNotice { active: panel.visible; text: panel.state.comparison?.state==="running" || panel.state.comparison?.state==="queued" ? "Preparing displacement comparison…" : "" }
     UiNotice { active: panel.visible; text: panel.state.pointStatus?.state==="stale" ? "Point evidence is out of date. Pick the current surface again." : "" }
-    UiButton { objectName: "tissueExplainPoint"; text: panel.state.active ? "Finish point inspection" : "Explain a surface point"; checkable: true; checked: panel.state.active; Layout.fillWidth: true; onClicked: panel.tools.explain() }
-    UiButton { objectName: "tissueCheckGeometry"; text: "Check geometry"; Layout.fillWidth: true; hint: "Advisory checks on this stage against itself and other accepted anatomy. Does not modify geometry."; onClicked: panel.tools.check() }
+    UiButton { objectName: "tissueExplainPoint"; enabled: panel.hasMesh; text: panel.state.active ? "Finish point inspection" : "Explain a surface point"; checkable: true; checked: panel.state.active; Layout.fillWidth: true; onClicked: panel.tools.explain() }
+    UiButton { objectName: "tissueCheckGeometry"; enabled: panel.hasMesh; text: "Check geometry"; Layout.fillWidth: true; hint: "Advisory checks on this stage against itself and other accepted anatomy. Does not modify geometry."; onClicked: panel.tools.check() }
     TissuePointExplanation { report: panel.state.point || ({}) }
     UiSection {
         id: measurements

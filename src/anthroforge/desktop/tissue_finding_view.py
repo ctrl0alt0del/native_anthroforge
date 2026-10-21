@@ -1,5 +1,7 @@
 """A spatial issue can only highlight the original, still-current accepted surface."""
 
+from math import dist
+
 from anthroforge.application import tissue_inspection_stages as stages
 from anthroforge.native import inspection as native
 
@@ -25,7 +27,13 @@ def locate(tool, identity, row, witness):
     tool.lines = lines(tool.controller.session, row, witness)
     tool.finding = identity
     tool.changed.emit()
-    tool.controller.frameRequested.emit(witness["bounds"])
+    tool.controller.frameRequested.emit(camera_frame(witness["bounds"]))
+
+
+def camera_frame(bounds):
+    low, high = bounds[:3], bounds[3:]
+    center = [(a + b) / 2 for a, b in zip(low, high, strict=True)]
+    return [*center, max(0.02, dist(low, high) * 1.25)]
 
 
 def lines(session, row, witness):

@@ -101,7 +101,10 @@ class RenderModel(QAbstractListModel):
         staged = [row for row in self.rows if not row["active"]] + self.pending
         for name, rows in (("viewport_displayed", self.displayed), ("viewport_staging", staged)):
             handles = {row["handle"] for row in rows}
-            owners[name].update(value for key, value in self.leases.items() if key in handles)
+            for key, value in self.leases.items():
+                if key in handles:
+                    owners[name].add(value)
+                    owners[name].update(getattr(value, "resources", ()))
 
 
 def presentation(previous, current):

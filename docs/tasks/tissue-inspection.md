@@ -35,8 +35,11 @@ inspection explains accepted constraints and draws surface/displacement witnesse
 Findings locate triangles and become stale without automatic reruns. Frozen report views
 and profiler ownership include inspection resources. 26 focused tests pass, including
 real crossing fixtures, cropped material mapping, exact backing and publication lifetime.
-Existing offscreen editor acceptance passes. Dedicated GPU inspection, wider lifecycle
-tests, full development gate, documentation and packaging remain incomplete.
+Dedicated offscreen UI and hidden GPU inspection pass, including frozen report replay.
+Actual images were reviewed; frame-box conversion and occluded witness visibility were
+corrected. All 1,553 behavior tests in the initial full gate passed; its architecture and
+capture harness failures have been corrected and verified separately. Final gate and
+portable qualification remain pending. Documentation/computation history is updated.
 
 ## Verification
 
@@ -47,9 +50,19 @@ canonical 0.2.3 package qualification. Preserve unrelated root __init__.py.
 
 ## Next actions and blockers
 
-1. Complete dedicated hidden GPU inspection and report replay acceptance.
-2. Complete lifecycle/resource tests, full development gate and computation history.
-3. Package one canonical build, checkpoint and validated merge.
+1. Run final full gate; qualify one canonical 0.2.3 executable and source archive.
+2. Record final evidence, review ownership/coupling and merge the validated task.
+
+## Current evidence
+
+`tools/tissue_inspection_ui.py` exercises direct controls with the offscreen platform.
+`tools/tissue_inspection_scene.py` uses a hidden QQuickRenderControl window, verifies
+native buffer switching, point guides, advisory crossings and matched report replay.
+Captures and `.afinspection.zip`/`.afprofile.zip` are under `build/tissue-inspection`.
+One recorded small workload measured comparison 0.183 ms, point query 0.616 ms and
+geometry scan 3.940 ms at native boundaries. These include profiler perturbation and
+do not establish application latency or large-assembly performance. No physical
+display/interactive desktop acceptance was performed.
 
 ## Recovery inputs
 

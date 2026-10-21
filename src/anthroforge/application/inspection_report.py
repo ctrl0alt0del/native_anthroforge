@@ -1,5 +1,6 @@
 """Frozen report jobs own their geometry; exports never alter document/save state."""
 
+import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from time import monotonic, sleep
@@ -31,6 +32,7 @@ def capture(session: "Session", selected: str, editing: bool, tissue: Any = None
     view.update(camera=list(session.workspace.camera), orthographic=session.workspace.orthographic)
     if tissue:
         view["tissue"] = tissue_view(session, selected, tissue)
+    view = json.loads(json.dumps(view, allow_nan=False))
     return Capture(
         freeze(session), view, inspection.issue_records(session), session.history.before is not None
     )

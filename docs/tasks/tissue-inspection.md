@@ -28,13 +28,16 @@ docs/engineering_guidelines.md, standalone_application_recommendations.md E03/E0
 
 ## Current state
 
-Inspected current contracts and official Qt custom geometry/libigl geometry-query APIs.
-Accepted tissue stages and material provenance exist; point explanation and spatial
-tissue findings are missing. Beginning native/application and presentation integration.
+Native material comparison/colored buffers, point/region lookup and bounded advisory
+crossing checks are implemented. Shared APIs and a manual Issue provider are integrated.
+13 focused API/issue lifecycle tests and five existing native contracts pass. Desktop
+integration, wider numerical/lifecycle tests, style/type checks, documentation and
+packaging remain incomplete. This checkpoint is not a delivered application.
 
 ## Verification
 
-Not yet run. Required: native/API contracts, stale/cancel/resource lifecycle, tissue
+Passed build-native.ps1 and 13 tests in test_tissue_inspection.py/test_issue_lifecycle.py.
+Required: extended native/API contracts, stale/cancel/resource lifecycle, tissue
 shape fixtures, offscreen UI/render capture inspection, full development gate and
 canonical 0.2.3 package qualification. Preserve unrelated root __init__.py.
 

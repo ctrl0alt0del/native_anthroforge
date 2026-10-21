@@ -38,6 +38,7 @@ class Provider:
     check: Callable[[Document, str, Event], tuple[Issue, ...]]
     capture: Callable[[Document], Any] | None = None
     cancellation: Callable[[], Event] | None = None
+    automatic: bool = True
 
 
 def item(document: Document, scope: str) -> Any:

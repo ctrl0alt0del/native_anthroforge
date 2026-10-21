@@ -199,6 +199,12 @@ class InspectionTaskScheduler(SaveProjectTaskScheduler):
         return Schedule(reason="Frozen inspection export; file and GPU work stay background")
 
 
+class TissueInspectionTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + workload.triangles * 0.004
+        return Schedule("worker", cost, reason="Read-only material comparison and constraint inspection")
+
+
 def task_schedulers() -> dict[str, TaskScheduler]:
     return {
         "generic": MeasuredTaskScheduler(),
@@ -213,6 +219,7 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "control_pose": ControlPoseTaskScheduler(),
         "issue_check": IssueTaskScheduler(),
         "inspection_report": InspectionTaskScheduler(),
+        "tissue_inspection": TissueInspectionTaskScheduler(),
     }
 
 

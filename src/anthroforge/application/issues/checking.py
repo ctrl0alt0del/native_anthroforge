@@ -105,7 +105,7 @@ def publish(listener: "Listening", provider: Provider, payload: Any) -> None:
             else:
                 listener.reporting.complete(check, result.rows)
         elif check.scope in provider.scopes(document):
-            listener.invalidate(provider.name, {check.scope})
+            listener.mark_changed(provider, {check.scope})
 
 
 def finished(listener: "Listening", provider: str, job: Job, state: str) -> None:

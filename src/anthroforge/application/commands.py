@@ -171,6 +171,10 @@ EDITS = {
 
 
 def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    if operation.startswith("tissue.inspect."):
+        from .tissue_inspection import execute as tissue_inspect
+
+        return tissue_inspect(session, operation, arguments)
     if operation.startswith(("measurement.", "bookmark.")):
         from .inspection_commands import execute as inspect_command
 

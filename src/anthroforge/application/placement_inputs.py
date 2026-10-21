@@ -4,10 +4,25 @@ from typing import Any
 
 import numpy as np
 
+from anthroforge.core.construction import finite
 from anthroforge.native import strokes
 from anthroforge.native.mesh import doubles
 
 from . import surface_queries
+
+
+def ray(targets: Any, origin: Any, direction: Any, offset: float = 0) -> Any:
+    finite(tuple(origin), 3)
+    finite(tuple(direction), 3)
+    finite((offset,), 1)
+    if not any(direction) or not targets:
+        raise ValueError("Confirmed placement needs targets and a nonzero ray.")
+    return dict(
+        targets=tuple(targets),
+        origin=tuple(origin),
+        direction=tuple(direction),
+        offset=float(offset),
+    )
 
 
 def validated(value: Any, count: int) -> Any:

@@ -6,15 +6,12 @@ from typing import Any, cast
 from anthroforge.core.jobs import Job, ObsoleteInputs
 from anthroforge.native.mesh import NativeCancellation
 
-from . import presentation, snap_edits, surface_providers
+from . import placement_inputs, presentation, snap_edits, surface_providers
 from .construction_policy import revisions
 
 
 def request(session: Any, origin: Any, direction: Any, targets: Any) -> str:
-    from .snap_tasks import validate_request
-
-    validate_request(True, targets, origin, direction, 0)
-    data = dict(origin=tuple(origin), direction=tuple(direction), targets=tuple(targets), offset=0)
+    data = placement_inputs.ray(targets, origin, direction)
     workspace = workspace_key(session)
     job = make_job(session, data, workspace)
     job.cancel = NativeCancellation(session.engine)

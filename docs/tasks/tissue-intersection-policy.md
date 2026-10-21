@@ -196,3 +196,13 @@ intent now carries the actual anchor component identity and resolves its current
 position at dispatch. Six snap lifecycle tests and the production offscreen gesture
 suite pass after this correction. Final full Python suite and rebuilt portable checks
 are next; native code has not changed since the passing complete gate.
+
+Final full suite after the anchor correction: **1,441 passed**, with existing Qt
+deprecation warnings only. Ownership review retained one query service/cache and one
+coordinator, native numerical kernels, original material ownership, and shared history
+publication. Generic ray validation belongs to `placement_inputs`; cursor placement
+does not depend on the curve command's component validation. That final responsibility
+cleanup passes lint, typing and 13 placement/lifecycle/architecture tests.
+
+Portable builds remain canonical under `dist/0.2.2/AnthroForge.dist`; the final executable
+qualification and source archive refresh remain pending. No new release directory exists.

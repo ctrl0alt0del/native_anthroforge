@@ -3,7 +3,7 @@
 from functools import partial
 from typing import Any, cast
 
-from anthroforge.core.construction import Curve, finite
+from anthroforge.core.construction import Curve
 from anthroforge.core.jobs import Job
 from anthroforge.core.junctions import members
 from anthroforge.core.results import Port
@@ -17,6 +17,7 @@ from . import (
     junction_edits,
     object_operations,
     object_revisions,
+    placement_inputs,
     snap_edits,
     surface_providers,
 )
@@ -75,15 +76,13 @@ def validate_components(session: Any, refs: Any) -> None:
 def request_data(
     components: Any, targets: Any, origin: Any, direction: Any, offset: float, anchor: Any
 ) -> Any:
-    validate_request(components, targets, origin, direction, offset)
+    if not components:
+        raise ValueError("Confirmed curve placement needs selected components.")
     refs = tuple(dict(curve=r["curve"], point=r["point"], part=r["part"]) for r in components)
     return dict(
         components=refs,
-        targets=tuple(targets),
-        origin=tuple(origin),
-        direction=tuple(direction),
+        **placement_inputs.ray(targets, origin, direction, offset),
         anchor=anchor_reference(anchor, refs),
-        offset=float(offset),
     )
 
 
@@ -92,16 +91,6 @@ def anchor_reference(anchor: Any, refs: Any) -> Any:
     if selected not in refs:
         raise ValueError("The snap anchor must be one of the selected curve components.")
     return selected
-
-
-def validate_request(
-    components: Any, targets: Any, origin: Any, direction: Any, offset: float
-) -> None:
-    for vector in (origin, direction):
-        finite(tuple(vector), 3)
-    finite((offset,), 1)
-    if not any(direction) or not components or not targets:
-        raise ValueError("Confirmed placement needs components, targets and a nonzero ray.")
 
 
 def owners(document: Any, request: Any) -> set[str]:

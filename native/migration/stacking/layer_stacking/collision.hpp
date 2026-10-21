@@ -49,7 +49,7 @@ static void baseline_diagnostics(const Side& side,const State& state,Output& out
 }
 static void validate_collisions(const Side& side,const std::vector<Vec>& points,const State& state,std::atomic<bool>& cancel) {
     auto own=surface_copy(side,side.own),final=surface_copy(side,points);
-    no_new_crossings(own,final,own,final,true,cancel);
+    // Self-crossings within one tissue are allowed; other-tissue and bone checks remain.
     for(const auto& bone:state.obstacles){bone_samples(side,points,bone,cancel);no_new_crossings(own,final,bone,bone,false,cancel);}
 }
 }

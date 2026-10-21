@@ -34,6 +34,7 @@ class DrawingTools(QObject):
         self.painting, self.hover, self.context, self.created = False, [], None, []
         self.options = dict(DEFAULTS)
         self.snapping = False
+        self.targets = ()
         self.branch = branch_placement.BranchPlacement(controller)
         self.placement_mode = "POINTS"
 
@@ -175,7 +176,10 @@ class DrawingTools(QObject):
         hit = surface_hit(self.controller, ray[:3], ray[3:6], exclude_current=False)
         self.hover = hit.get("point", [])
         if press and self.hover:
-            self.controller.run("workspace.update", dict(cursor=self.hover))
+            self.controller.run(
+                "cursor.place.surface",
+                dict(origin=ray[:3], direction=ray[3:6], targets=self.controller.snap_ids),
+            )
             self.cancel()
 
     @Slot()
@@ -211,6 +215,7 @@ class DrawingTools(QObject):
         self.controller.notify()
 
     def submit(self, samples, args):
+        args["projection"] = drawing_context.placement(self)
         if self.mode in ("POINTS", "BRANCH"):
             args.update(
                 points=drawing_context.point_records(samples), closed=self.options["closed"]

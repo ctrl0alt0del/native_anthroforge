@@ -49,6 +49,9 @@ static void query_charts(const TriangleSnapshot& index,const std::vector<Chart>&
     if(n.left>=0){query_charts(index,charts,n.left,point,out);query_charts(index,charts,n.right,point,out);return;}
     for(int j=n.begin;j<n.end;++j)consider(charts[index.faces[j].index],point,out);
 }
+}
+#include "normal_support.hpp"
+namespace af_stack_vector {
 static std::vector<Match> correspondence(const Side& under,const Side& cover,double* stats,int workers,std::atomic<bool>& cancel) {
     double start=afs::now_ms(),reach=extent(under,cover)*4;std::vector<Chart> charts;
     for(int i=0;i<int(under.faces.size()/3);++i){require(!cancel,"PAIR_CANCELLED");charts.push_back(chart(under,i,reach));}
@@ -56,16 +59,19 @@ static std::vector<Match> correspondence(const Side& under,const Side& cover,dou
     #pragma omp parallel for num_threads(std::max(1,std::min({4,workers,af_parallel_workers(int(cover.base.size()))}))) if(!omp_in_parallel())
     for(int i=0;i<int(cover.base.size());++i)if(!cancel&&!index.nodes.empty())query_charts(index,charts,0,eigen(cover.base[i]),result[i]);
     require(!cancel,"PAIR_CANCELLED");
+    normal_ambiguities(under,cover,result,cancel);
     for(auto& m:result){
         if(m.face<0)continue;++stats[0];stats[1]+=m.hits>1;stats[2]=std::max(stats[2],std::max(0.,-m.distance));stats[3]=std::max(stats[3],m.residual);}
     stats[4]=afs::now_ms()-start;return result;
 }
 struct Correspondence { std::vector<Match> values;double stats[5]{}; };
 static std::shared_ptr<Correspondence> cached_correspondence(const Side& under,const Side& cover,const State& state,std::atomic<bool>& cancel,bool& reused) {
-    std::string key="vector-charts-v1";append_signature(key,under.base);append_signature(key,under.own);
+    std::string key="vector-charts-normal-support-v2";append_signature(key,under.base);append_signature(key,under.own);
     append_signature(key,under.direction);append_signature(key,under.faces);append_signature(key,cover.base);
+    append_signature(key,cover.faces);
     CacheKey id{1,cover.id,under.id};auto result=state.vector_cache->find<Correspondence>(id,key);reused=bool(result);if(result)return result;
-    require(under.faces.size()/3*sizeof(Chart)+cover.base.size()*sizeof(Match)<=state.bases.settings.result_bytes,"STACK_VECTOR_CHART_BUDGET");
+    const auto memory=under.faces.size()/3*(sizeof(Chart)+160)+under.base.size()*24+cover.base.size()*(sizeof(Match)+128);
+    require(memory<=state.bases.settings.result_bytes,"STACK_VECTOR_CHART_BUDGET");
     result=std::make_shared<Correspondence>();result->values=correspondence(under,cover,result->stats,state.bases.settings.workers,cancel);
     state.vector_cache->put(id,std::move(key),result,sizeof(Correspondence)+result->values.capacity()*sizeof(Match),state.bases.settings.cache_bytes);return result;
 }

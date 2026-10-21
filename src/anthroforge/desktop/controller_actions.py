@@ -43,6 +43,7 @@ def command_values(value):
 
 
 def start_transform(controller, mode):
+    controller.authoring.interaction.clearSnap()
     object_interaction.require_transform(controller)
     controller.drag_mode = mode
     if controller.authoring.active:
@@ -90,6 +91,8 @@ def end_transform(controller, cancel=False):
 def rebase_transform(controller, mode=""):
     if controller.session.history.before is None:
         return
+    if mode:
+        controller.authoring.interaction.clearSnap()
     if controller.authoring.active:
         from .authoring_actions import capture_transform
 

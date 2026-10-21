@@ -26,8 +26,13 @@ def surface_inputs(tool):
         if options["depth"] != "SURFACE" or not options["selected_only"] or key in selected
     ]
     handles, frames = controller.snap_handles[indices], controller.snap_matrices[indices]
+    tool.targets = tuple(controller.snap_ids[i] for i in indices)
     tool.leases = tuple(controller.render_model.leases[int(key)] for key in handles)
     return handles, frames
+
+
+def placement(tool):
+    return dict(targets=tool.targets, queries=tool.stroke.placements().tolist())
 
 
 def depth_plane(tool, normal):

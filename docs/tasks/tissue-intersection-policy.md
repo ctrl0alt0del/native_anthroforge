@@ -134,3 +134,23 @@ Remaining: integrate drawing/point/cursor confirmation and displayed tissue targ
 qualify SCP recapture scheduling, implement normal-ray stacking ambiguity, audit UI
 ellipses, run full development/visual/package gates and update dependency distribution.
 This is an incomplete recovery checkpoint, not a release or merge candidate.
+
+## Drawing and stacking checkpoint
+
+Implemented confirmed drawing, discrete point creation, branched point continuation,
+cursor placement and displayed tissue snapping. Placement intent stays native/owned;
+fitting and exterior query work run in existing coordinator workers. A later point edit
+supersedes the old request, while Undo restores the pending placement in its own step.
+The shared headless projection API now accepts PREVIEW/CONFIRMED modes and role-aware
+surfaces. Preview remains its default.
+
+Stacking now selects the farthest distinct positive hit along geometric base normals
+when support is ambiguous. Ordinary donor vector transport and exact constraints remain.
+All 14 donor cases and three new ambiguity/cache cases pass. Native build/3 CTests pass.
+Original donor hashes were preserved; maintained source checksums record intentional changes.
+
+Dependency distribution now includes pinned CGAL/Boost notices and corresponding headers
+in the companion source archive, with bundled offline CMake discovery. Qualification pending.
+
+Remaining: UI ellipsis reproduction/fixes, complete gate and actual-shape/offscreen evidence,
+dependency archive/configuration and canonical portable packaging. Not merge-ready.

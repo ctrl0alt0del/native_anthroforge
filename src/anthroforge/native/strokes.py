@@ -16,12 +16,42 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_stroke_probe", [U, D, D])
     engine.bind("af_stroke_snapping", [U, c.c_int])
     engine.bind("af_stroke_read", [U, c.c_int, c.c_int, D])
+    configure_placement(engine)
     engine.bind("af_stroke_pop", [U])
     engine.bind("af_drawing_plane", [D, D])
     engine.bind("af_stroke_view", [U, D])
     engine.bind("af_stroke_batch", [U, c.c_int, D, c.c_int, U])
     engine.bind("af_stroke_bytes", [U], U)
     engine.bind("af_stroke_settings", [U, c.c_double, c.c_double, D])
+
+
+def configure_placement(engine: GeometryEngine) -> None:
+    engine.bind("af_stroke_placements", [U, c.c_int, D])
+    engine.bind("af_confirm_samples", [c.c_int, c.POINTER(U), D, c.c_int, D, D, D, U])
+
+
+def confirmed(
+    engine: GeometryEngine, meshes: Any, frames: Any, points: Any, queries: Any, cancel: int = 0
+) -> Any:
+    handles, matrices, source, placements = placement_buffers(meshes, frames, points, queries)
+    output = np.empty_like(source)
+    args = (len(handles), handles.ctypes.data_as(c.POINTER(U)), pointer(matrices), len(source))
+    engine.check(
+        engine.library.af_confirm_samples(
+            *args, pointer(source), pointer(placements), pointer(output), cancel
+        )
+    )
+    return output
+
+
+def placement_buffers(meshes: Any, frames: Any, points: Any, queries: Any) -> Any:
+    handles = np.ascontiguousarray(meshes, dtype=np.uint64)
+    matrices, source, placements = doubles(frames), doubles(points), doubles(queries)
+    if source.ndim != 2 or source.shape[1] != 4 or placements.shape != (len(source), 8):
+        raise ValueError("Confirmed placement requires xyz/radius samples and eight-value queries.")
+    if matrices.size != len(handles) * 16:
+        raise ValueError("Confirmed placement needs a frame for each surface.")
+    return handles, matrices, source, placements
 
 
 def plane(engine: GeometryEngine, frame: Any) -> list[float]:
@@ -33,6 +63,13 @@ def plane(engine: GeometryEngine, frame: Any) -> list[float]:
 
 
 class Stroke:
+    def placements(self) -> Any:
+        result = np.empty((self.count, 8))
+        self.engine.check(
+            self.engine.library.af_stroke_placements(self.handle, self.count, pointer(result))
+        )
+        return result
+
     def seed(self, ray: Any, position: Any, retain_plane: bool = False) -> None:
         data, point = pointer_input(ray), doubles(position)
         if point.shape != (3,):

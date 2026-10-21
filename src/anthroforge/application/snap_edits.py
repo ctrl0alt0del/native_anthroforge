@@ -72,6 +72,8 @@ def apply_points(engine: Any, item: Curve, options: Any) -> Curve:
 
 
 def evaluate(context: Context, request: Any, cancel: int) -> dict[str, Any]:
+    if "samples" in request:
+        return sample_changes(context, request, cancel)
     location = destination(context, request, cancel)
     delta = [v - p for v, p in zip(location, request["preview"], strict=True)]
     changes = {}
@@ -81,6 +83,27 @@ def evaluate(context: Context, request: Any, cancel: int) -> dict[str, Any]:
         changed = shifted(context, item, refs, delta)
         changes[key] = curve_edit_state.prepare(context, item, changed)
     return junction_edits.expand(context, changes)
+
+
+def sample_changes(context: Context, request: Any, cancel: int) -> dict[str, Any]:
+    key = request["components"][0]["curve"]
+    item = curve_edit_state.current(context, context.document.object(key))
+    local = projected_positions(context, request, item, cancel)
+    changes = {p.id: dict(position=tuple(v)) for p, v in zip(item.points, local, strict=True)}
+    changed = curve_edit_state.prepare(context, item, apply_points(context.engine, item, changes))
+    return junction_edits.expand(context, {item.id: changed})
+
+
+def projected_positions(context: Context, request: Any, item: Curve, cancel: int) -> Any:
+    from .placement_inputs import confirmed
+
+    world = curve_sources.world(context.engine, context.document, item.id)
+    positions = components.transformed(context.engine, [p.position for p in item.points], world)
+    samples = [[*p, knot.radius] for p, knot in zip(positions, item.points, strict=True)]
+    intent = dict(targets=request["targets"], queries=request["samples"])
+    output = confirmed(context.engine, context.document, context.resources, samples, intent, cancel)
+    inverse = construction.matrix(context.engine, world, np.eye(4).ravel(), relative=True)
+    return components.transformed(context.engine, output[:, :3], inverse)
 
 
 def merge(document: Any, changes: Any) -> Any:

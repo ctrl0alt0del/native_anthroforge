@@ -34,7 +34,34 @@ def confirm(
 ) -> str:
     request = request_data(components, targets, origin, direction, preview, offset)
     validate_components(session, request["components"])
+    return begin(session, request)
+
+
+def confirm_samples(session: Any, curve: str, projection: Any) -> str:
+    item = object_operations.editable(session, curve)
+    if not isinstance(item, Curve):
+        raise ValueError("Sample placement requires a curve.")
+    from .placement_inputs import validated
+
+    data = validated(projection, len(item.points))
+    if data is None:
+        return ""
+    refs = tuple(dict(curve=curve, point=p.id, part="position") for p in item.points)
+    request = dict(components=refs, targets=data["targets"], samples=data["queries"])
+    return begin(session, request)
+
+
+def begin(session: Any, request: Any) -> str:
+    request = dict(request, authored=authored_inputs(session.document, request))
     return authored_jobs.begin(session, partial(enqueue, session, request))
+
+
+def authored_inputs(document: Any, request: Any) -> tuple[Any, ...]:
+    return tuple(
+        (key, document.object(key).construction_revision, document.object(key).pose_revision)
+        for key in sorted(owners(document, request))
+        if key in document.registry.records
+    )
 
 
 def validate_components(session: Any, refs: Any) -> None:
@@ -86,6 +113,8 @@ def inputs(document: Any, request: Any) -> set[Port]:
 
 
 def enqueue(session: Any, request: Any, origin: int) -> str:
+    if authored_inputs(session.document, request) != request["authored"]:
+        return remember_pending(session, request, origin)
     job = make_job(session, request, origin)
     job.publish = partial(publish, session, request, origin, source=job.id)
     job.cancel = NativeCancellation(session.engine)
@@ -96,6 +125,14 @@ def enqueue(session: Any, request: Any, origin: int) -> str:
     job.reads = frozenset(p.owner for p in job.observes)
     job.workload = lambda _: Workload(affected=len(job.outputs), candidates=len(request["targets"]))
     return cast(str, session.scheduler.submit(job))
+
+
+def remember_pending(session: Any, request: Any, origin: int) -> str:
+    replay = partial(enqueue, session, request, origin)
+    for entry in authored_jobs.affected(session, origin):
+        if authored_inputs(entry.document, request) == request["authored"]:
+            entry.pending_authored[origin] = replay
+    return ""
 
 
 def make_job(session: Any, request: Any, origin: int) -> Job:

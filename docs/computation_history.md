@@ -764,3 +764,30 @@ resolved inflation/smoothing defect when assessing the fixture.
 - **Limits:** exact remeshing observes cancellation between native stages, not within
   the CGAL call. This does not repair displayed geometry or establish safe skinning.
   Drawing/creation entry points are still being integrated at this checkpoint.
+
+### CH-018 — Geometric-normal support for ambiguous stacking
+
+- **2026-10-21; 0.2.2; integrated, release checks pending.** The old inverse
+  chart query selected minimum absolute distance along the provider's inflation
+  field. Control Point inflation can point sideways, so changing that minimum to
+  a maximum would not implement the confirmed geometric-normal rule.
+- **After:** native area-weighted receiver base normals and the shared watertight
+  ray/BVH query identify distinct positive provider hits. Multiple hits select the
+  farthest support; coincident triangle-edge hits do not imply ambiguity. Ordinary
+  single-hit vector transport, localized PIQP smoothing and exact constraints stay
+  intact. Caches include base topology and new policy versions. Same-tissue crossing
+  rejection is removed; other-tissue, bone, finite-coordinate and fold checks remain.
+- **Evidence:** all 14 donor stacking cases and existing group/complete-geometry
+  tests pass. A folded two-level provider chooses its outer roof at all nine receiver
+  points, including a tangential inflation direction. Updated-provider/cache tests
+  pass. Exact-constraint and inequality residuals remain below 2e-7 in this case.
+  This fixture tests multi-valued support; it does not establish arbitrary physical
+  contact or anatomical correctness. Visual and complete release checks remain pending.
+- **Provenance:** original donor hashes remain in `upstream_sources.json`; the
+  maintained `sources.json` includes the three changed headers and new adapter.
+
+CH-017 integration update: completed drawing/placed-point gestures and cursor surface
+placement now use the shared confirmed query in coordinator workers. Raw preview stays
+interactive. Per-sample native intent preserves unsnapped/plane samples. New snapped
+edits supersede obsolete requests; undoing a later edit recovers the original pending
+placement. Four authored-snap lifecycle and five creation/placement tests pass.

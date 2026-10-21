@@ -6,8 +6,9 @@
 #include <Eigen/SparseQR>
 #include <map>
 #include <set>
+#include "stacking_normal_support.hpp"
 
-// Unchanged qualified numerical headers; no legacy executor or worker pool is included.
+// Qualified donor kernels plus documented standalone policies; no legacy worker pool.
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-pragmas"

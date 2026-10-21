@@ -54,6 +54,7 @@ if TYPE_CHECKING:
 
 EDITS = {
     "surface.snap.curves": snap_tasks.confirm,
+    "surface.snap.points": snap_tasks.confirm_samples,
     "tissue.preview.accept": tissue_preview.accept,
     "tissue.stacking.configure": tissue_stack_operations.configure,
     "tissue.stacking.relationship": tissue_stack_operations.relationship,
@@ -255,7 +256,10 @@ def tissue_queries(session: "Session") -> dict[str, Any]:
 
 
 def drawing_commands(session: "Session") -> dict[str, Any]:
+    from . import cursor_placement
+
     return {
+        "cursor.place.surface": lambda **a: cursor_placement.request(session, **a),
         "curve.conversion.preview": lambda **a: curve_conversion.preview(session, **a),
         "curve.conversion.status": lambda: curve_conversion.status(session),
         "curve.conversion.cancel": lambda: curve_conversion.cancel(session),

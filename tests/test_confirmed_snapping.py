@@ -59,3 +59,15 @@ def test_confirmation_preserves_unrelated_later_edits(session):
     item = session.document.object(curve)
     assert item.name == "Renamed during placement"
     np.testing.assert_allclose(item.points[1].position, [0, 0.25, 0.51], atol=1e-6)
+
+
+def test_later_point_edit_supersedes_pending_placement(session):
+    target, curve = scene(session)
+    confirm(session, target, curve)
+    point = session.document.object(curve).points[1]
+    session.command("curve.point.update", curve=curve, point=point.id, position=[2, 3, 4])
+    session.wait()
+    assert session.document.object(curve).points[1].position == (2, 3, 4)
+    session.navigate(-1)
+    session.wait()
+    assert_location(session, curve)

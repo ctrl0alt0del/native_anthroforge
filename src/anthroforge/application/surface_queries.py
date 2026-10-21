@@ -40,7 +40,14 @@ def prepare(
     return native.prepare(provider.resource.mesh, backing, mode, cancel)
 
 
-def inputs(engine: Any, document: Any, meshes: Any, targets: Any, cancel: int) -> Inputs:
+def inputs(
+    engine: Any,
+    document: Any,
+    meshes: Any,
+    targets: Any,
+    cancel: int,
+    mode: native.Mode = native.Mode.CONFIRMED,
+) -> Inputs:
     providers = [surface_providers.get(engine, document, meshes, ref) for ref in targets]
-    queries = tuple(prepare(document, meshes, p, native.Mode.CONFIRMED, cancel) for p in providers)
+    queries = tuple(prepare(document, meshes, p, mode, cancel) for p in providers)
     return Inputs(queries, tuple(p.frame for p in providers))

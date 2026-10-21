@@ -4,6 +4,8 @@ import argparse
 import zipfile
 from pathlib import Path
 
+from boolean_dependencies import archive_headers
+
 from anthroforge import __version__
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +36,7 @@ def main():
     with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sources():
             archive.write(path, "anthroforge/" + path.relative_to(ROOT).as_posix())
+        archive_headers(archive)
     print(target)
 
 

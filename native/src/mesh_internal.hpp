@@ -67,6 +67,7 @@ V3 scales(const M4& matrix);
 Hit nearest(const Surface& surface, const V3& point);
 int pick_surface(const Mesh& mesh,const M4& world,const V3& origin,const V3& direction,double* output);
 bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,RayHit& hit);
+bool intersect_ray_span(const Mesh& mesh,const V3& origin,const V3& ray,RayHit& first,RayHit& last);
 V3 surface_normal(const Mesh& mesh,const M4& matrix,int triangle);
 V3 surface_snap(const Mesh& mesh,const M4& matrix,int triangle,const V3& position,double offset);
 V3 barycentric(const V3& point, const V3& a, const V3& b, const V3& c);

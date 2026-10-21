@@ -19,10 +19,19 @@ def create(
     owner: str = "",
     engine: str = "BEZIER",
     closed: bool = False,
+    projection: Any = None,
 ) -> str:
     item, ref = junction_operations.member(session, source)
     curve = definition(session, name, points, owner, engine, closed)
-    return connected(session, item, ref, curve)
+    return placed(session, item, ref, curve, projection)
+
+
+def placed(session: Any, item: Any, ref: Any, curve: Any, projection: Any) -> str:
+    from .snap_tasks import confirm_samples
+
+    result = connected(session, item, ref, curve)
+    confirm_samples(session, result, projection)
+    return result
 
 
 def definition(session: Any, name: str, points: Any, owner: str, engine: str, closed: bool) -> Any:

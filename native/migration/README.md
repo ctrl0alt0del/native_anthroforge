@@ -206,7 +206,8 @@ from incomplete buffers; attachment consumers reject empty surfaces explicitly.
 
 `stacking/` pins the addon's production pair detection, base-ray ordering, relationship
 policy, vector transport, localized constrained PIQP solve, and independent validation
-headers. `sources.json` records unchanged file bytes. `src/stacking*.cpp` supplies a
+headers. `upstream_sources.json` retains the original donor hashes; `sources.json`
+records the current maintained files. `src/stacking*.cpp` supplies a
 synchronous owned batch interface and uses the existing native cancellation token.
 No donor asynchronous executor, legacy exported API, Blender object system, OpenMP pool,
 or Python numerical implementation is included. The component uses one translation unit
@@ -222,6 +223,14 @@ provider-first application scheduling, atomic opposite-side groups and desktop r
 editing are now integrated. Workflow tests separately cover relaxed shells, exact backing,
 source pins, regions, Manual providers, failure retention and cancellation. Donor parity
 alone does not establish those integration contracts or anatomical correctness.
+
+October 21 standalone changes (CH-018): ambiguous supports use the farthest distinct
+positive geometric-base-normal hit. The new `vector_stacking/normal_support.hpp`
+adapter calls the application's native BVH query; unambiguous vector transport and
+exact constraints remain unchanged. Correspondence and solve cache keys were revised.
+`layer_stacking/collision.hpp` permits crossings within a tissue; other-tissue and
+bone validation remain. These are intentional product differences, not donor parity
+claims. Original hashes remain available for auditing each changed header.
 
 The October 21 intersection policy (computation history CH-016) permits tissue
 self-intersections without changing raw solver parity. Native acceptance still rejects

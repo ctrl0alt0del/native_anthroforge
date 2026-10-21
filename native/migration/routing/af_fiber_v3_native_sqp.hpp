@@ -17,11 +17,15 @@ struct AfV3SqpResult {
     double energy,fixed_residual,stationarity,regularization,trust_radius,maximum_violation,elapsed_ms;
 };
 
+struct AfV3SqpState;
 struct AfV3SqpJob {
     void* session;const double* points;const double* reference;int count;
     const int64_t* pins;const double* targets;int pin_count;AfV3SqpConfig config;
     double* output,*safe_history,*ratio_history,*violation_history;
     int* decision_history,*limiting_edges,*limiting_faces;AfV3SqpResult result;
+    // Standalone extension: an owned per-job QP strategy; empty selects the donor solver.
+    bool (*candidate_solver)(AfV3SqpState&,std::vector<int>&,std::vector<double>&)=nullptr;
+    std::shared_ptr<void> candidate_context;
 };
 
 struct AfV3SqpContact {
@@ -363,7 +367,8 @@ static std::vector<double> af_v3_sqp_active_set(AfV3SqpState& state,const std::v
                                                std::vector<int>& active,std::vector<Vec>& solved) {
     std::vector<double> multipliers;int limit=std::min(16,std::max(4,2*int(state.contacts.size())+1));
     for(int iteration=0;iteration<limit;++iteration){multipliers=af_v3_sqp_equalities(state,responses,active,solved);
-        int change=af_v3_sqp_active_change(state,active,multipliers,solved);if(!change)break;af_v3_sqp_apply_change(active,change);}return multipliers;
+        int change=af_v3_sqp_active_change(state,active,multipliers,solved);
+        if(!change||iteration+1==limit)break;af_v3_sqp_apply_change(active,change);}return multipliers;
 }
 
 static void af_v3_sqp_restore_pins(AfV3SqpState& state,std::vector<Vec>& points) {
@@ -378,6 +383,10 @@ static bool af_v3_sqp_trust(AfV3SqpState& state,std::vector<Vec>& candidate) {
 }
 
 static bool af_v3_sqp_candidate(AfV3SqpState& state,std::vector<int>& active,std::vector<double>& multipliers) {
+    if(state.job->candidate_solver) {
+        if(!state.job->candidate_solver(state,active,multipliers))return false;
+        state.trust_boundary=af_v3_sqp_trust(state,state.candidate);return true;
+    }
     std::vector<double> diagonal,lower1;std::vector<Vec> rhs;af_v3_sqp_bands(state,diagonal,lower1,rhs);
     if(!af_v3_sqp_factor(state,diagonal,lower1,rhs))return false;af_v3_solve_into(*state.native,state.native->rhs,state.native->base);
     auto responses=af_v3_sqp_responses(state);active=af_v3_sqp_initial_active(state);

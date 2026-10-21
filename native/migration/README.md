@@ -92,13 +92,19 @@ barycentric coordinates and frame offsets; ordinary resolution never selects a n
 
 ## Production routing kernel closure
 
-`routing/sources.json` pins the production addon's numerical headers and the collision
+`routing/upstream_sources.json` pins the original addon's numerical headers and the collision
 portion of `af_fiber_ccd.cpp` by source hashes and exact line ranges. Reproduce with
-`tools/capture_routing_kernels.py ADDON_PATH`. These unchanged reference files retain
+`tools/capture_routing_kernels.py ADDON_PATH`. These reference files retain
 the upstream formatting. Owned adapters in `src/routing*.cpp` follow the function limit.
 Only this numerical closure is compiled: no addon Python, Blender objects or dependency
 graph, muscle/skin code, public legacy ABI, or competing OpenMP pool. Kernel entry points
 are private to the adapter. The application's existing coordinator owns work concurrency.
+
+0.2.3 maintains a narrow extension to `af_fiber_v3_native_sqp.hpp`: per-job candidate
+strategy/context, shared trust limiting, and iteration-cap consistency (never change
+active membership after the last solved candidate). `routing/sources.json` records
+maintained hashes, separately from originals. `routing_qp_problem.cpp` adapts the
+benchmark's QP assembly and `routing_piqp.cpp` uses sparse PIQP 0.6.4. See CH-020.
 
 Native adapters own surface snapshots, transforms, direct-reference allocation, open
 hard-pin spans/global closed paths, production SQP settings, cancellation between trials,

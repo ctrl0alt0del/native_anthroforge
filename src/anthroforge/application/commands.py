@@ -218,6 +218,8 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
+        "preferences.get": session.preferences.describe,
+        "preferences.set": session.preferences.update,
         **drawing_commands(session),
         **construction_queries(session),
         "image.presentation": lambda **a: image_presentation.update(session, **a),

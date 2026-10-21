@@ -38,16 +38,26 @@ def warm_identity(item: Curve) -> tuple[Any, ...]:
 
 
 def evaluate(
-    engine: Any, document: Any, resources: Any, item: Curve, cancel: int, warm: Any = None
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Curve,
+    cancel: int,
+    warm: Any = None,
+    backend: str = "CUSTOM",
 ) -> PathAsset:
+    inputs = replace(capture(engine, document, resources, item, warm), backend=backend)
+    path, report = routing.evaluate(engine, inputs, cancel)
+    return PathAsset(path, replace(item, result=EvaluationResult()), report)
+
+
+def capture(engine: Any, document: Any, resources: Any, item: Curve, warm: Any) -> routing.Inputs:
     surfaces = surface_providers.query_references(
         engine, document, resources.meshes, references(document, item)
     )
     handles, matrices = surface_providers.inputs(engine, document, resources.meshes, surfaces)
     frame = curve_sources.world(engine, document, item.id)
     warm = warm_path(item, warm or resources.paths.get(item.result.asset))
-    inputs = routing.Inputs(
+    return routing.Inputs(
         item, tuple(handles), tuple(matrices), frame, owners(item, surfaces), warm
     )
-    path, report = routing.evaluate(engine, inputs, cancel)
-    return PathAsset(path, replace(item, result=EvaluationResult()), report)

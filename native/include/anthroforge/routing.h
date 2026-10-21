@@ -8,6 +8,7 @@ extern "C" {
  * Meshes/matrices: accepted surface handles and complete world transforms.
  * Samples: preferred total; may grow to retain required obstacle-avoiding bends.
  * Report: eight counters and eight measures, described by the Python adapter. */
+enum AfRoutingBackend { AF_ROUTING_CUSTOM=0, AF_ROUTING_PIQP=1 };
 typedef struct AfRoutingOptions { int samples,accepted_steps,closed; double radius; } AfRoutingOptions;
 AF_API uint64_t af_route_path(const double* records,int count,const double* world,
     const int* owners,const uint64_t* meshes,const double* matrices,int surfaces,
@@ -21,6 +22,13 @@ AF_API uint64_t af_routing_scene_bytes(uint64_t scene);
 AF_API uint64_t af_route_path_in_scene(const double* records,int count,const double* world,
     const int* owners,uint64_t scene,const AfRoutingOptions* options,
     int64_t* counters,double* measures,uint64_t warm,uint64_t cancel);
+/* Explicit per-invocation strategy; original entry points retain Custom behavior. */
+AF_API uint64_t af_route_path_with_backend(const double* records,int count,const double* world,
+    const int* owners,const uint64_t* meshes,const double* matrices,int surfaces,
+    const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel,int backend);
+AF_API uint64_t af_route_path_in_scene_with_backend(const double* records,int count,const double* world,
+    const int* owners,uint64_t scene,const AfRoutingOptions* options,
+    int64_t* counters,double* measures,uint64_t warm,uint64_t cancel,int backend);
 #ifdef __cplusplus
 }
 #endif

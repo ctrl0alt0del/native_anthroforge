@@ -1,6 +1,7 @@
 """Real routed fibers retain exact surfaces and anatomical material bindings."""
 
 import numpy as np
+import pytest
 
 from tests import routed_surface_scene as scene
 from tests.test_tissue_workflow import roundtrip
@@ -23,7 +24,9 @@ def assert_bindings_ready(session, captured):
         assert np.isfinite(after.resolved_frame).all()
 
 
-def test_exact_fiber_surface_bindings_survive_growth_shrink_and_reopen(session, tmp_path):
+@pytest.mark.parametrize("backend", ["CUSTOM", "PIQP"])
+def test_exact_fiber_surface_bindings_survive_growth_shrink_and_reopen(session, tmp_path, backend):
+    session.command("preferences.set", routing_backend=backend)
     objects = attached_exact_surface(session)
     scene.move(session, objects["supports"][-1], [0, 0, 0])
     assert_bindings_ready(session, objects["attached"])
@@ -36,7 +39,9 @@ def test_exact_fiber_surface_bindings_survive_growth_shrink_and_reopen(session, 
     assert not session.scheduler.errors
 
 
-def test_exact_fiber_surface_bindings_survive_undo_redo(session):
+@pytest.mark.parametrize("backend", ["CUSTOM", "PIQP"])
+def test_exact_fiber_surface_bindings_survive_undo_redo(session, backend):
+    session.command("preferences.set", routing_backend=backend)
     objects = attached_exact_surface(session)
     scene.move(session, objects["supports"][-1], [0, 0, 0])
     assert_bindings_ready(session, objects["attached"])

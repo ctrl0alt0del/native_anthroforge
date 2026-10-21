@@ -34,6 +34,8 @@ static bool replan(const Input& input,const World& scene,Reference& reference,
     return solve(prepared,input,counters,measures);
 }
 static uint64_t evaluate(Input input,const World& scene,int64_t* counters,double* measures,uint64_t warm) {
+    if(input.backend!=AF_ROUTING_CUSTOM&&input.backend!=AF_ROUTING_PIQP)
+        throw std::runtime_error("Unknown routing backend.");
     resolve_contacts(input,scene);
     auto reference=af::routing::reference(input);
     std::vector<Span> spans;
@@ -45,23 +47,35 @@ static uint64_t evaluate(Input input,const World& scene,int64_t* counters,double
     return retain_path(make_path(result(input,reference,spans),input.options.closed,input.cancel));
 }
 }
-uint64_t af_route_path(const double* records,int count,const double* world,const int* owners,
+uint64_t af_route_path_with_backend(const double* records,int count,const double* world,const int* owners,
     const uint64_t* meshes,const double* matrices,int surfaces,const AfRoutingOptions* options,
-    int64_t* counters,double* measures,uint64_t warm,uint64_t cancel) {
+    int64_t* counters,double* measures,uint64_t warm,uint64_t cancel,int backend) {
     try {
         if(!counters||!measures) throw std::runtime_error("Routing report storage is required.");
-        const auto input=af::routing::input(records,count,world,owners,surfaces,options,cancel);
+        auto input=af::routing::input(records,count,world,owners,surfaces,options,cancel); input.backend=backend;
         auto scene=af::routing::capture_world(meshes,matrices,surfaces,options->radius,cancel);
         return af::routing::evaluate(input,scene,counters,measures,warm);
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }
-uint64_t af_route_path_in_scene(const double* records,int count,const double* world,const int* owners,
-    uint64_t handle,const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel) {
+uint64_t af_route_path_in_scene_with_backend(const double* records,int count,const double* world,const int* owners,
+    uint64_t handle,const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel,int backend) {
     try {
         if(!counters||!measures||!options) throw std::runtime_error("Routing report and options are required.");
         const auto scene=af::routing::routing_scene(handle);
         if(scene->radius!=options->radius) throw std::runtime_error("Routing scene clearance changed.");
-        const auto input=af::routing::input(records,count,world,owners,int(scene->collision->items.size()),options,cancel);
+        auto input=af::routing::input(records,count,world,owners,int(scene->collision->items.size()),options,cancel);
+        input.backend=backend;
         return af::routing::evaluate(input,*scene,counters,measures,warm);
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+uint64_t af_route_path(const double* records,int count,const double* world,const int* owners,
+    const uint64_t* meshes,const double* matrices,int surfaces,const AfRoutingOptions* options,
+    int64_t* counters,double* measures,uint64_t warm,uint64_t cancel) {
+    return af_route_path_with_backend(records,count,world,owners,meshes,matrices,surfaces,
+        options,counters,measures,warm,cancel,AF_ROUTING_CUSTOM);
+}
+uint64_t af_route_path_in_scene(const double* records,int count,const double* world,const int* owners,
+    uint64_t handle,const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel) {
+    return af_route_path_in_scene_with_backend(records,count,world,owners,handle,options,
+        counters,measures,warm,cancel,AF_ROUTING_CUSTOM);
 }

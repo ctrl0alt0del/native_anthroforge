@@ -10,6 +10,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/curve_fit.cpp src/drawing.cpp src/placement.cpp src/attachment_weights.cpp src/path_editing.cpp
     src/routing.cpp src/routing_world.cpp src/routing_scene.cpp src/routing_reference.cpp src/routing_solve.cpp
     src/routing_planner.cpp src/routing_candidates.cpp src/routing_surface.cpp src/routing_handoff.cpp
+    src/routing_piqp.cpp src/routing_qp_problem.cpp
     src/routing_mesh_surface.cpp src/routing_shells.cpp src/routing_access.cpp src/routing_roadmap.cpp
     src/routing_random.cpp src/routing_pin_tree.cpp src/routing_pin_growth.cpp
     src/path_contacts.cpp src/path_collisions.cpp src/routing_clearance.cpp src/sampling_allocation.cpp src/path_resampling.cpp
@@ -49,6 +50,10 @@ else()
     target_compile_options(af_native PRIVATE -Wall -Wextra -Werror)
 endif()
 if(BUILD_TESTING)
+    add_executable(af_routing_qp_tests tests/routing_qp_test.cpp)
+    target_include_directories(af_routing_qp_tests PRIVATE src)
+    target_compile_definitions(af_routing_qp_tests PRIVATE NOMINMAX)
+    add_test(NAME native_routing_active_set COMMAND af_routing_qp_tests)
     add_executable(af_native_tests tests/api_test.cpp)
     target_link_libraries(af_native_tests PRIVATE af_native)
     add_test(NAME native_contract COMMAND af_native_tests)

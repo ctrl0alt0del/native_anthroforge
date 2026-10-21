@@ -19,7 +19,7 @@ from anthroforge.desktop.runtime import build_directory, native_runtime
 def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="anthroforge-desktop")
     parser.add_argument("--smoke-test", action="store_true")
-    parser.add_argument("--smoke-panel", choices=("activity", "issues"), default="")
+    parser.add_argument("--smoke-panel", choices=("activity", "issues", "preferences"), default="")
     parser.add_argument("--screenshot")
     parser.add_argument("--project")
     parser.add_argument("--disable-profiling-support", action="store_true")
@@ -35,12 +35,20 @@ def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicatio
     engine.rootContext().setContextProperty("workspace", controller)
     engine.rootContext().setContextProperty("authoring", controller.authoring)
     setup_profile_controls(controller, engine)
+    setup_preferences(controller, engine)
     inputs = InputState(engine)
     engine.rootContext().setContextProperty("heldInput", inputs)
     engine.warnings.connect(lambda errors: warnings.extend(error.toString() for error in errors))
     engine.load(QUrl.fromLocalFile(str(Path(__file__).parent / "qml" / "Main.qml")))
     attach_window(engine, controller, inputs)
     return engine
+
+
+def setup_preferences(controller, engine):
+    from .preference_controls import PreferenceControls
+
+    controller.preference_controls = PreferenceControls(controller)
+    engine.rootContext().setContextProperty("preferences", controller.preference_controls)
 
 
 def attach_window(engine, controller, inputs):

@@ -60,7 +60,7 @@ evidence for those revisions, not current workflow instructions.
 | C03 | Path frames and consumer sampling: arc-length/range sampling, direction and start correspondence, anchored sampling, frame transport and body placement. Solver samples remain separate from authored controls. | [curve_frames.cpp](../native/src/curve_frames.cpp), [path_resampling.cpp](../native/src/path_resampling.cpp) | [anchored sampling](../tests/test_anchored_sampling.py), [consumer sampling](../tests/test_consumer_sampling.py) |
 | C04 | Drawing/fitting: pointer-stroke depth, surface projection/fallback, offsets, image-plane drawing, corner detection and native cubic fitting. Branch placement can explicitly seed an existing control position (CH-015). A completed stroke authors one curve. | [drawing.cpp](../native/src/drawing.cpp), [curve_fit.cpp](../native/src/curve_fit.cpp), [drawing tasks](../src/anthroforge/application/drawing_tasks.py) | [drawing parity](../tests/test_drawing_parity.py), [strokes](../tests/test_strokes.py), [branch placement](../tests/test_branch_placement.py) |
 | C05 | Curve editing math: closest location to the pointer, cubic subdivision/insertion, handle updates, selected-control transforms and current-path rebasing/deformation. | [curve_queries.cpp](../native/src/curve_queries.cpp), [path_editing.cpp](../native/src/path_editing.cpp) | [curve queries](../tests/test_curve_queries.py), [standalone editing](../tests/test_standalone_editing.py) |
-| C06 | Routed path solving: capture obstacles, classify contacts, plan corridors, retain required bends with adaptive sampling, validate warm starts, solve constrained SQP with collision/clearance checks and report termination. Open/cyclic paths share the engine. Geometry and correspondence use one prepared layout. Production inner solver remains banded/active-set; the isolated PIQP comparison is CH-019. | [routing.cpp](../native/src/routing.cpp), [routing_planner.cpp](../native/src/routing_planner.cpp), [routing_handoff.cpp](../native/src/routing_handoff.cpp), [routing_solve.cpp](../native/src/routing_solve.cpp) | [routing parity](../tests/test_routing_parity.py), [surface pins](../tests/test_routing_surface_pins.py), [snapped routing](../tests/test_snapped_routing.py), [adaptive layout](../tests/test_routing_layout.py) |
+| C06 | Routed path solving: capture obstacles, classify contacts, plan corridors, retain required bends with adaptive sampling, validate warm starts, solve constrained SQP with collision/clearance checks and report termination. Open/cyclic paths share the engine. Geometry and correspondence use one prepared layout. Application preferences choose the Custom banded/active-set or sparse PIQP inner solver (CH-020); the earlier isolated comparison is CH-019. | [routing.cpp](../native/src/routing.cpp), [routing_planner.cpp](../native/src/routing_planner.cpp), [routing_handoff.cpp](../native/src/routing_handoff.cpp), [routing_solve.cpp](../native/src/routing_solve.cpp) | [routing parity](../tests/test_routing_parity.py), [surface pins](../tests/test_routing_surface_pins.py), [snapped routing](../tests/test_snapped_routing.py), [adaptive layout](../tests/test_routing_layout.py) |
 | C07 | Explicit junction resolution: canonical shared-point identity, incident-curve updates, transforms and atomic propagation. Branched placement creates/reuses a junction in the new curve's single transaction (CH-015). Proximity alone never creates a junction. | [junction evaluation](../src/anthroforge/application/junction_evaluation.py), [junction edits](../src/anthroforge/application/junction_edits.py), [branch creation](../src/anthroforge/application/curve_branch_creation.py) | [junction workflow](../tests/test_junction_workflow.py), [fiber junctions](../tests/test_fiber_junctions.py), [branch creation](../tests/test_branch_creation.py) |
 
 ### Attachments and attached construction
@@ -847,3 +847,40 @@ for artifact identity, UI checks and evidence limits.
 - **Reproduction and limits:** [comparison record](tasks/routing-piqp-benchmark.md),
   [machine-readable evidence](tasks/routing-piqp-evidence.json),
   [isolated tools](../tools/routing_qp_benchmark/README.md).
+
+
+### CH-020 — User-selectable ROUTED QP backend and consistent capped active sets
+
+- **2026-10-21; C06; 0.2.3.** The CH-019 benchmark found workload-dependent sparse
+  PIQP gains. The user requests an explicit application preference, retaining Custom
+  as default and applying changes only to future calculations.
+- **Old/new:** fixed Custom candidate solver becomes an owned per-job strategy.
+  Sparse PIQP uses identical objective/pin/contact assembly, 1e-9 absolute/relative
+  and duality-gap tolerances, max 250 inner iterations. Reuse setup only for matching
+  dimensions/sparsity. Selection is captured at dispatch, including preview jobs;
+  no ambient global state or silent fallback. Saved diagnostics and profile spans
+  retain backend identity. Preferences do not modify projects or schedule work.
+- **Required correction:** the Custom loop changed active membership after the last
+  capped solve, then returned multipliers belonging to the preceding membership.
+  CH-019 measured 34/94 mismatched calls in the heavy warm case. Stop before that final
+  membership edit so candidate/active/dual agree; a native cap regression exercises
+  this exact condition. This is a consistency fix, not a replacement objective.
+- **Preserved:** planner, pins, trust limiting, CCD, outer acceptance, retained corners,
+  material bindings, cancellation, result lifetime and failed-result retention. Earlier
+  historical points slightly inside surfaces are not moved or excused by this change.
+- **Evidence:** final development gate passes 1,498 tests and four native contracts,
+  including both backends on 18 compact cold/warm fixtures, independent clearance/pins,
+  concurrent invocation, dispatch capture, original ABI and failure retention. Material
+  attachment workflows pass under both backends. Actual Preferences QML inspected
+  offscreen; selection preserves results and explicit evaluation uses PIQP for Fibers.
+- **Performance:** 528 serial production routes over 22 inputs show workload-dependent
+  gains: heavy 256-sample warm Fiber medians 325.55 ms Custom / 61.51 ms PIQP; the actual
+  24-sample cold fixture is 9.21 / 11.82 ms. Shapes inspected; 21/22 inputs clear for both.
+  The known historical skull pin slightly inside Cranium remains unchanged. These are
+  route timings, not UI latency or a universal PIQP advantage. CH-019 numbers describe
+  its pinned original Custom implementation, before the consistency correction.
+- **Qualification:** the canonical 0.2.3 executable passes the complete relocated
+  portable suite, saved/profile provenance, Qt-free headless checks and offscreen UI /
+  hidden-render acceptance. No interactive desktop acceptance is claimed. See
+  [the task record](tasks/preferences-routing-023.md) and
+  [release evidence](development_status.md#preferences-and-routed-backends-023).

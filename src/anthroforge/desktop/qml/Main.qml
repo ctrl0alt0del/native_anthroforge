@@ -26,7 +26,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: surfaceGrouping.visible || reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: preferencesDialog.visible || surfaceGrouping.visible || reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -58,7 +58,15 @@ ApplicationWindow {
                 UiMenuBar {
                     background: Item {}
                     UiMenu { title: "File"; UiMenuItem { action: newAction } UiMenuItem { action: openAction } MenuSeparator {} UiMenuItem { action: saveAction } UiMenuItem { action: saveAsAction } MenuSeparator {} UiMenuItem { action: importAction } MenuSeparator {} UiMenuItem { objectName: "exportInspectionMenu"; text: "Export inspection report…"; enabled: !workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered: { viewport.storeCamera(); reportDialog.open(); } } }
-                    UiMenu { title: "Edit"; UiMenuItem { action: undoAction } UiMenuItem { action: redoAction } MenuSeparator {} UiMenuItem { text: "Delete selected"; shortcutHint: keyboard.shortcut("deleteSelection"); enabled: !!workspace.selectedId && !workspace.selectedData.readonly; onTriggered: deleteDialog.request(workspace.selectedId) } }
+                    UiMenu {
+                        title: "Edit"
+                        UiMenuItem { action: undoAction }
+                        UiMenuItem { action: redoAction }
+                        MenuSeparator {}
+                        UiMenuItem { text: "Delete selected"; shortcutHint: keyboard.shortcut("deleteSelection"); enabled: !!workspace.selectedId && !workspace.selectedData.readonly; onTriggered: deleteDialog.request(workspace.selectedId) }
+                        MenuSeparator {}
+                        UiMenuItem { objectName: "preferencesMenu"; text: "Preferences…"; enabled: !window.modalOpen && !workspace.state.editing; onTriggered: preferencesDialog.open() }
+                    }
                     UiMenu { title: "Create"; UiMenuItem { action: tissueAction } }
                     UiMenu {
                         title: "View"
@@ -284,6 +292,7 @@ ApplicationWindow {
         function onCloseReady() { window.closingConfirmed = true; window.close(); }
     }
     DeleteDialog { id: deleteDialog }
+    PreferencesDialog { id: preferencesDialog }
     SurfaceGroupingDialog { id: surfaceGrouping }
     KeyboardManager {
         id: keyboard; window: window; blocked: window.modalOpen || workspace.state.waiting; transforming: viewport.transforming; snapping: viewport.snapping

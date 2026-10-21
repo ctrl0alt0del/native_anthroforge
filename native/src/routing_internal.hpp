@@ -21,6 +21,7 @@ struct Input {
     std::vector<int> owners;
     AfRoutingOptions options;
     uint64_t cancel;
+    int backend=AF_ROUTING_CUSTOM;
 };
 struct Reference {
     std::vector<Vec> points;
@@ -42,5 +43,6 @@ Reference reference(const Input& input,const std::vector<int>& counts);
 std::vector<Span> spans(const Input& input,const World& world,const Reference& reference);
 bool warm_start(const Input& input,const World& world,const Reference& reference,std::vector<Span>& spans,uint64_t handle);
 bool solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double* measures);
+void configure_piqp(kernel::AfV3SqpJob& job,uint64_t cancel);
 EvaluatedPath result(const Input& input,const Reference& reference,const std::vector<Span>& spans);
 }

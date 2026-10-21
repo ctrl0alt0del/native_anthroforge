@@ -53,6 +53,7 @@ lockfile, tests, build scripts and unchanged vendored headers. The portable runt
 contains Windows redistributable runtime DLLs selected by Nuitka. These components
 retain their original licenses; the application license does not replace them.
 
-PIQP 0.6.4 (PREDICT-EPFL, BSD-2-Clause) supplies the native constrained tissue field solver.
+PIQP 0.6.4 (PREDICT-EPFL, BSD-2-Clause) supplies native constrained tissue field solves
+and the optional sparse ROUTED quadratic-subproblem backend.
 See `PIQP-LICENSE`, `PIQP-LDL-LICENSE` and native/vendor/PROVENANCE.md. Complete pinned
 headers, addon numerical adapters and their provenance ship in the companion source archive.

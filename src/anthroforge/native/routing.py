@@ -30,12 +30,14 @@ class Inputs:
     world: tuple[float, ...] = IDENTITY
     owners: tuple[int, ...] = ()
     warm: Path | None = None
+    backend: str = "CUSTOM"
 
 
 @dataclass(frozen=True)
 class Report:
     counters: tuple[int, ...]
     measures: tuple[float, ...]
+    backend: str = "CUSTOM"
 
 
 def configure(engine: GeometryEngine) -> None:
@@ -47,6 +49,8 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind(
         "af_route_path_in_scene", [D, c.c_int, D, INT, U, c.POINTER(Options), INT64, D, U, U], U
     )
+    for name in ("af_route_path", "af_route_path_in_scene"):
+        engine.bind(name + "_with_backend", [*getattr(engine.library, name).argtypes, c.c_int], U)
 
 
 def arrays(inputs: Inputs) -> tuple[Any, ...]:
@@ -63,10 +67,15 @@ def evaluate(engine: GeometryEngine, inputs: Inputs, cancel: int = 0) -> tuple[P
     settings = inputs.curve.engine_settings
     if not isinstance(settings, RoutingSettings):
         raise ValueError("Routing requires the routed curve engine.")
+    if inputs.backend not in ("CUSTOM", "PIQP"):
+        raise ValueError("ROUTED solver must be CUSTOM or PIQP.")
     options = Options(
-        settings.samples, settings.accepted_steps, inputs.curve.closed, settings.radius
+        settings.samples,
+        settings.accepted_steps,
+        inputs.curve.closed,
+        settings.radius,
     )
-    return invoke(engine, arrays(inputs), options, inputs.warm, cancel)
+    return invoke(engine, arrays(inputs), options, inputs.warm, cancel, inputs.backend)
 
 
 def invoke(
@@ -75,14 +84,18 @@ def invoke(
     options: Options,
     warm: Path | None,
     cancel: int,
+    backend: str = "CUSTOM",
 ) -> tuple[Path, Report]:
     scene = capture(engine, packed, options.radius, cancel)
     counters, measures = np.zeros(8, dtype=np.int64), np.zeros(8)
     report_args = (c.byref(options), counters.ctypes.data_as(INT64), pointer(measures))
-    handle = engine.library.af_route_path_in_scene(
-        *arguments(packed)[:4], scene.handle, *report_args, warm.handle if warm else 0, cancel
-    )
-    return Path(engine, handle), Report(tuple(counters.tolist()), tuple(measures.tolist()))
+    args = (*arguments(packed)[:4], scene.handle, *report_args, warm.handle if warm else 0, cancel)
+    handle = engine.library.af_route_path_in_scene_with_backend(*args, int(backend == "PIQP"))
+    return Path(engine, handle), read_report(counters, measures, backend)
+
+
+def read_report(counters: Any, measures: Any, backend: str) -> Report:
+    return Report(tuple(counters.tolist()), tuple(measures.tolist()), backend)
 
 
 def arguments(packed: tuple[Any, ...]) -> tuple[Any, ...]:

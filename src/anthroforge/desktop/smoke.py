@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from PySide6.QtCore import QTimer
+from PySide6.QtCore import QMetaObject, QObject, QTimer
 
 
 def save_frame(frame, screenshot: str | None) -> bool:
@@ -38,6 +38,10 @@ def schedule(
 
 
 def show_panel(window, controller, panel):
+    if panel == "preferences":
+        dialog = window.findChild(QObject, "preferencesDialog")
+        assert dialog is not None and QMetaObject.invokeMethod(dialog, "open")
+        return
     window.setProperty(panel + "Open", True)
     if panel == "issues" and controller.issue_panel.model.rows:
         controller.issue_panel.selectIssue(controller.issue_panel.model.rows[0]["issueId"])

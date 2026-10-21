@@ -1,5 +1,13 @@
 # AnthroForge architecture
 
+[0.2.3 preferences](specification_023.md) live in application-owned `PreferenceStore`,
+separate from project/history state. Desktop and headless commands share atomic
+persistence. Path jobs and conversion previews capture immutable preferences at dispatch
+and pass the backend through the native ABI. Each native SQP job owns its candidate
+strategy/context; sparse PIQP preparation/solving belongs to `routing_qp_problem.cpp`
+and `routing_piqp.cpp`. Outer routing remains shared. Accepted path diagnostics retain
+backend provenance; old schema-4 results without this field identify Custom.
+
 The [0.2.2 specification](specification_022.md) and [implementation plan](implementation_022.md)
 define the implemented unified TissueVCP, Point/Anchor and Surface/Membrane extension,
 shared surface providers and schema 4. [Validation](development_status.md#unified-tissues-022)

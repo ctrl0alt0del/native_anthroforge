@@ -653,3 +653,23 @@ coordinator jobs instead: `surface.snap.curves`, `surface.snap.points`, and
 owned `projection={targets, queries}` intent; each query row is ray origin XYZ, direction
 XYZ, offset, and hit flag. Unsnapped samples remain unchanged. Completed confirmation is
 part of the initiating undo step; a newer authored curve edit supersedes pending placement.
+
+## Application preferences (0.2.3)
+
+`preferences.get` returns `routing_backend`, `path`, and any loading `error`.
+`preferences.set` accepts `routing_backend: "CUSTOM" | "PIQP"` and returns updated state
+after persistence. These are runtime operations: no document revision, undo entry,
+recalculation or checkpoint change. The choice applies at future dispatch, including
+routed Fibers and conversion previews. Running jobs and accepted results remain unchanged.
+`evaluate` explicitly requests fresh calculations.
+
+```json
+[
+  {"operation":"preferences.get"},
+  {"operation":"preferences.set","arguments":{"routing_backend":"PIQP"}}
+]
+```
+
+Use `ANTHROFORGE_PREFERENCES_PATH` for isolated automation, or inject
+`Session(preferences=PreferenceStore())` for an in-memory embedded session. The CLI
+loads the same user preferences as desktop without Qt. See [the contract](specification_023.md).

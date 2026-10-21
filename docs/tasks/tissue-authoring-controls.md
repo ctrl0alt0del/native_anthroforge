@@ -3,7 +3,7 @@
 - Task branch: `codex/tissue-authoring-controls`
 - Integration branch: `main`
 - Starting revision: `4c4b7bb06d7636eb8af9ff8c454f0fa555f93323`
-- Status: in progress
+- Status: implementation and qualification complete; ready for normal merge
 - Last updated: 2026-10-21, Europe/Bucharest
 - Active writer: current desktop chat, direct work
 
@@ -41,8 +41,9 @@ to QML lists; actual profile dragging exposed these transport gaps. Unrelated ro
 
 ## Verification
 
-23 initial authoring/stacking tests, eight profile/architecture tests and seven projection
-tests pass; expanded coverage is running. Native build and all five native contracts pass.
+The full development gate passes 1,534 tests, five native contracts, lint/format, typing,
+native/script function limits and numerical/runtime checks. The expanded focused authoring,
+profile and native stacking subset passes 34 tests.
 Actual offscreen QML checks pass all four controls, numeric type/drag, side copy, undo/cancel,
 profile drag through zero, preview isolation and cancellation. Inspector captures inspected.
 Hidden native rendering also passes: stacked/independent groups, proportional raised profiles,
@@ -50,14 +51,25 @@ copied envelopes and hover/click agreement. Actual captures inspected. The sourc
 the new portable authoring batch and round trip. Its first draft attempted to enable the
 second side on an attachment-locked example; the shared policy correctly rejected it, so
 portable coverage copies inactive side settings and the independent GUI fixture covers
-envelope creation. Full development gate is running; canonical portable qualification pending.
+envelope creation. The canonical 0.2.3 package is built from `2287808` with clean tracked
+source. The full relocated minimal-PATH portable suite passes, including the new authoring
+operations and saved parameters. No interactive desktop acceptance is claimed.
 Initial test fixture incorrectly used a smoothing `enabled` field; corrected to radius.
+
+## Ownership review
+
+Coordinator review, separately from tests: core records own group/allowance validation;
+application policies own copying, topology guards, group mapping and plan read signatures;
+the existing native stacker owns eligibility/search and the native parameter adapter owns
+depth scaling. QML owns only gesture baseline and presentation. Command transport snapshots
+owned values at the desktop boundary. No second scheduler, numerical Python fallback,
+per-feature undo mechanism or new geometry cache was introduced. No blocker found.
 
 ## Next actions and blockers
 
-1. Finish expanded tests and ownership review; document computational intent/evidence.
-2. Run the gate and hidden geometry checks, package once and qualify relocated execution.
-3. Record actual evidence, source archive, checkpoint/push and merge normally.
+Refresh packaged documentation and the single source archive, push this completion record,
+then merge/push normally into `main`. Runtime build identity remains `2287808`; subsequent
+changes are documentation only. Git ancestry records final integration.
 
 ## Recovery inputs
 

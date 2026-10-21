@@ -1,4 +1,4 @@
-# Local authoring API, 0.2.2
+# Local authoring API, 0.2.3
 
 The [0.2.2 tissue contract](specification_022.md) uses the same catalogue as existing
 construction operations. Ownership and acceptance are in the

@@ -937,6 +937,10 @@ for artifact identity, UI checks and evidence limits.
   inflation/smoothing record, current part/all current parts); source/connector identities
   and inactive historical settings remain untouched. Qt transport snapshots projections
   and converts return arrays without moving numerical work into UI/Python loops.
-- **Evidence:** focused operation/lifecycle tests and all five native contracts pass;
-  actual offscreen inspector typing, drag, cancel, undo, copy and preview checks pass.
-  Full release qualification is pending in [the task record](tasks/tissue-authoring-controls.md).
+- **Evidence:** the full development gate passes 1,534 tests and all five native contracts.
+  Actual offscreen inspector typing, drag, cancel, undo, copy and preview checks pass.
+  Hidden geometry renders inspect proportional raised profiles, copied envelopes and
+  grouped stacking; picking agrees. The source CLI batch round-trips new settings.
+  The relocated runtime `2287808` passes the full portable suite, including the new authoring
+  commands and saved settings. No interactive desktop acceptance or new performance gain
+  is claimed. [The task record](tasks/tissue-authoring-controls.md) records reproduction.

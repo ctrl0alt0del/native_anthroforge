@@ -1,7 +1,36 @@
 # AnthroForge development validation
 
-Current qualification is in [confirmed query reuse](#confirmed-query-reuse-023).
+Current qualification is in [tissue authoring controls](#tissue-authoring-controls-023).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Tissue authoring controls (0.2.3)
+
+Runtime `228780842371479e52ea607ee4e9a5ef64e55033` adds Boundary Power in the inspector,
+automatic stacking groups/discovery allowance, complete side copying for current/all
+parts and proportional Section Profile Overall depth. Existing numerical evaluators,
+attachment locks, Manual behavior and undo policies remain in use.
+
+- Full development gate: **1,534 tests passed**, five native contracts, typing of 290
+  modules, lint/format, native/script function limits and numerical/runtime checks.
+  The 918 Qt deprecation warnings are the existing category, exercised by additional tests.
+- Focused coverage: 34 authoring/profile/native-stacking tests, plus shared projection
+  transport checks. Groups remove automatic pairs, explicit overrides remain available,
+  clearing groups restores order, and policy edits retain intrinsic geometry. The native
+  allowance test reaches a separated candidate without changing its input geometry.
+- Actual QML offscreen: decimal typing, numeric drag, one-action undo, cancellation,
+  full side copy, group/allowance entry, proportional depth through zero and back, and
+  isolated preview/cancel. Inspector layouts and hidden rendered shapes were inspected.
+  Raised profile before/after, copied envelope and grouped layers retain matching picking.
+- The relocated canonical Windows executable passes the full minimal-PATH portable suite,
+  including new commands, parameter persistence, existing attachments, routing, profiling,
+  offscreen GUI and hidden GPU rendering. No interactive desktop acceptance is claimed.
+- Ownership/coupling was reviewed directly, separately from test results. Native kernels
+  own numerical work; shared application policies own edits/read validation; the UI owns
+  gesture state. No new scheduler, cache or numerical Python fallback was added.
+
+Deliverables remain one `dist/0.2.3/AnthroForge.dist` and companion source archive.
+Reproduction and limitations are in [the task record](tasks/tissue-authoring-controls.md);
+local logs and captures are under `build/tissue-authoring-controls*` and `build/022-tissue`.
 
 ## Confirmed query reuse (0.2.3)
 

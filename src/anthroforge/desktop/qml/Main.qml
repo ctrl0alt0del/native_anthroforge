@@ -300,7 +300,7 @@ ApplicationWindow {
         numericEditing: numericEdits.active
         capabilities: ({transform:viewport.transformAvailable})
         onRequested: command => window.dispatchShortcut(command)
-        onCanceled: { viewport.cancelTransform(); workspace.drawingTools.clearStroke(); }
+        onCanceled: { viewport.cancelTransform(); workspace.drawingTools.clearStroke(); workspace.tissuePainting.cancelStroke(); }
         onOffsetRequested: steps => viewport.surfaceOffset(steps)
         onOffsetReset: viewport.resetSurfaceOffset()
     }

@@ -36,11 +36,11 @@ Item {
     property var preservedCamera: null
     readonly property bool canRestoreView: preservedCamera !== null
     readonly property bool drawing: workspace.drawingTools.state.active
-    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active || workspace.tissueRegionTools.state.active || workspace.tissueInspection.state.active
+    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active || workspace.tissueRegionTools.state.active || workspace.tissueInspection.state.active || workspace.tissuePainting.state.active
     readonly property var selected: authoring.transformData
     readonly property bool transformAvailable: !!selected.id && !!selected.transformable && !selected.readonly && !workspace.state.waiting
     readonly property bool modalTransforming: modalTransform.active
-    readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming || workspace.drawingTools.state.painting
+    readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming || workspace.drawingTools.state.painting || workspace.tissuePainting.state.dragging
     readonly property bool snapping: keyboard.held("snapSurface") && authoring.active &&
         (curveEditor.dragging || (gizmo.dragging && toolMode==="Move") || (modalTransforming && modalTransform.gesture.mode==="Move"))
     readonly property bool insertionPreview: curveEditor.previewActive
@@ -78,8 +78,9 @@ Item {
         const p=view.camera.mapPositionToScene(Qt.vector3d(0,0,0));
         return [p.x,-p.z,p.y];
     }
+    function cameraDirection(x,y,z) { return view.camera.mapDirectionToScene(Qt.vector3d(x,y,z)); }
     function rayAt(x, y, select, extend) {
-        if(drawing) return {};
+        if(drawing || workspace.tissuePainting.state.active) return {};
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
         if(workspace.tissueInspection.state.active) { workspace.tissueInspection.probe(origin,direction,select); return {}; }
         if(workspace.tissueRegionTools.state.active) { workspace.tissueRegionTools.probe(origin,direction,select); return {}; }
@@ -358,6 +359,7 @@ Item {
     TissueInspectionOverlay { viewport: viewport }
     ImageCalibrationOverlay { viewport: viewport }
     DrawingOverlay { viewport: viewport }
+    TissuePaintingOverlay { viewport: viewport }
     InspectionTools { viewport: viewport; anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.margins: 12; z: 10 }
     Connections {
         target: workspace.inspectionTools

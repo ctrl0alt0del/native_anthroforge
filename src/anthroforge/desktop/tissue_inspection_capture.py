@@ -10,6 +10,7 @@ def restore(controller, settings):
     tool.synchronize()
     tool.set_view(settings["stage"], settings["reference"], settings["mode"])
     restore_stacking(controller, settings.get("stacking"))
+    restore_paint(controller, settings.get("paint"))
     controller.session.wait()
     restore_point(controller, settings.get("point"))
     tool.synchronize()
@@ -46,3 +47,15 @@ def restore_point(controller, point):
         expected_asset=point["asset"],
     )
     controller.session.wait()
+
+
+def restore_paint(controller, settings):
+    if not settings:
+        return
+    options = settings["options"]
+    brush = controller.tissue_painting
+    brush.begin(options["name"])
+    controller.tissue_inspection.set_view(options["stage"], "", "Overlay")
+    controller.session.command("tissue.inspect.paint", target=controller.selection, **options)
+    controller.session.wait()
+    brush.retain_preview()

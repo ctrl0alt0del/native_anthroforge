@@ -35,6 +35,7 @@ UiSection {
     }
     ColumnLayout {
         Layout.fillWidth: true; visible: !!panel.chosen; spacing: Theme.gap
+        TissuePaintingSettings { fieldName: panel.focused }
         UiButton { objectName: "tissueFieldEdit"; visible: !panel.editing; text: "Edit field"; Layout.fillWidth: true; onClicked: authoring.editTissueField(panel.focused) }
         Label { visible: panel.editing; text: "Ctrl-click to extend selection. Blue = 0, gold = partial, red = 1."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
         RowLayout {

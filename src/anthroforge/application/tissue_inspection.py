@@ -164,17 +164,22 @@ def cancel(session: Any, kind: str = "") -> None:
 
 
 def execute(session: Any, operation: str, arguments: dict[str, Any]) -> Any:
+    commands = operations(session)
+    if operation not in commands:
+        raise ValueError("Unknown tissue inspection operation.")
+    return commands[operation](**arguments)
+
+
+def operations(session: Any) -> dict[str, Any]:
     from .issues import tissue_geometry
 
-    commands: dict[str, Any] = {
+    return {
         "tissue.inspect.stages": partial(stages.describe, session),
         "tissue.inspect.compare": partial(start, session, "comparison"),
         "tissue.inspect.point": partial(start, session, "point"),
         "tissue.inspect.stacking": partial(start, session, "stacking"),
+        "tissue.inspect.paint": partial(start, session, "paint"),
         "tissue.inspect.status": partial(status, session),
         "tissue.inspect.cancel": partial(cancel, session),
         "tissue.inspect.check": partial(tissue_geometry.request, session),
     }
-    if operation not in commands:
-        raise ValueError("Unknown tissue inspection operation.")
-    return commands[operation](**arguments)

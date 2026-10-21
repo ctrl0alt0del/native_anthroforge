@@ -19,6 +19,7 @@ def capture(session: Any, selected: str, settings: Any) -> dict[str, Any]:
         point=point(session, selected, stage),
         finding=finding(session, selected, settings),
         stacking=stacking(session, selected, stage),
+        paint=paint(session, selected, stage),
     )
 
 
@@ -28,6 +29,16 @@ def stacking(session: Any, selected: str, stage: str) -> dict[str, Any]:
         return {}
     asset = session.tissue_inspection.values["stacking"].asset
     return dict(options=asset["options"], report=value["report"])
+
+
+def paint(session: Any, selected: str, stage: str) -> dict[str, Any]:
+    value = inspection.status(session, "paint")
+    if value["state"] != "ready" or value["target"] != selected:
+        return {}
+    asset = session.tissue_inspection.values["paint"].asset
+    if asset["options"]["stage"] != stage:
+        return {}
+    return dict(options=asset["options"], report=value["report"], authored=False)
 
 
 def validate(session: Any, selected: str, stage: str, reference: str, mode: str) -> None:

@@ -15,10 +15,13 @@ class Query:
 
 def definition(kind: str) -> Query:
     from . import stacking_inspection as stacking
+    from . import tissue_inspection as tissue
+    from . import tissue_painting as painting
 
     queries = dict(
         tissue_queries(),
         stacking=Query(stacking.validate, stacking.signature, stacking.compute, stacking.workload),
+        paint=Query(painting.validate, painting.signature, painting.compute, tissue.workload),
     )
     if kind not in queries:
         raise ValueError("Unknown inspection query kind.")

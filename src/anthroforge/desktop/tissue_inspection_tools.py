@@ -140,7 +140,8 @@ class TissueInspectionTools(QObject):
         session = self.controller.session
         rows = stages.describe(session, self.target)["stages"]
         settings = self.stage, self.reference, self.mode
-        key = rows, settings, inspection.status(session, "comparison"), self.stacking_status
+        queries = tuple(inspection.status(session, kind) for kind in ("comparison", "paint"))
+        key = rows, settings, queries, self.stacking_status
         if key == self.key:
             return
         self.key, self.rows = key, rows

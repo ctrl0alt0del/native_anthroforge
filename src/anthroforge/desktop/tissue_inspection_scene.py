@@ -85,8 +85,13 @@ def rows(tool):
         resources.extend(leases)
     if tool.reference and tool.mode == "Displacement":
         output, resources = heat_rows(tool, output, resources)
-    from . import stacking_inspection_view
+    return additional_views(tool, output, resources)
 
+
+def additional_views(tool, output, resources):
+    from . import stacking_inspection_view, tissue_painting_view
+
+    output, resources = tissue_painting_view.rows(tool, output, resources)
     stacking_inspection_view.decorate(tool, output)
     extra, leases = stacking_inspection_view.rows(tool)
     return output + extra, resources + leases

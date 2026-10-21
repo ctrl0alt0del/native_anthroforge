@@ -24,6 +24,7 @@ from .object_selection import ObjectSelection
 from .routing_choices import RoutingChoices
 from .surface_creation import SurfaceCreation
 from .tissue_inspection_tools import TissueInspectionTools
+from .tissue_painting_tools import TissuePaintingTools
 from .tissue_region_tools import TissueRegionTools
 
 
@@ -72,6 +73,7 @@ class Controller(QObject):
         self.routing_choices = RoutingChoices()
         self.tissue_region_tools = TissueRegionTools(self)
         self.tissue_inspection = TissueInspectionTools(self)
+        self.tissue_painting = TissuePaintingTools(self)
         self.surface_creation = SurfaceCreation(self)
 
     def memory_owners(self, owners):
@@ -80,6 +82,8 @@ class Controller(QObject):
         owners["drawing_preview"].update(self.drawing_tools.leases)
         if self.drawing_tools.stroke is not None:
             owners["drawing_preview"].add(self.drawing_tools.stroke)
+        if self.tissue_painting.preview:
+            owners["drawing_preview"].add(self.tissue_painting.preview["resource"])
 
     def geometry_models(self):
         return self.render_model, self.path_model, self.image_model, self.tissue_inspection.model
@@ -260,6 +264,10 @@ class Controller(QObject):
     def tissueInspection(self):
         return self.tissue_inspection
 
+    @Property(QObject, constant=True)
+    def tissuePainting(self):
+        return self.tissue_painting
+
     @Slot()
     def cancelViewportTools(self, keep=None):
         tools = (
@@ -268,6 +276,7 @@ class Controller(QObject):
             self.drawing_tools,
             self.tissue_region_tools,
             self.tissue_inspection,
+            self.tissue_painting,
         )
         for tool in tools:
             if tool is not keep:
@@ -379,10 +388,14 @@ class Controller(QObject):
         self.issue_panel.synchronize()
         self.inspection_panel.synchronize()
         self.inspection_export.synchronize()
+        self.refresh_viewport_tools()
+
+    def refresh_viewport_tools(self):
         self.inspection_tools.synchronize()
         self.image_tools.synchronize()
         self.drawing_tools.synchronize()
         self.tissue_region_tools.synchronize()
+        self.tissue_painting.synchronize()
         self.tissue_inspection.synchronize()
 
     def refresh_metrics(self):
@@ -434,6 +447,7 @@ class Controller(QObject):
         project_actions.poll(self)
         for model in self.geometry_models():
             model.drain()
+        self.tissue_painting.synchronize()
         self.tissue_inspection.synchronize()
         self.refresh_if_needed()
         self.creation_selection.synchronize()

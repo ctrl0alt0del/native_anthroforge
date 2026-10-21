@@ -38,6 +38,8 @@ evidence for those revisions, not current workflow instructions.
 
 ## Current computation inventory
 
+Additional active authoring/inspection work for T09, K01 and Q05 is recorded in CH-024.
+
 ### Meshes, primitives and deformers
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
@@ -983,3 +985,29 @@ for artifact identity, UI checks and evidence limits.
   or Issues revision changes; an explicit 100-tick test verifies no repeated preparation.
   In the scripted recorded workload matrix calls fell from 862 to 244. This is removal of
   redundant preparation, not a claimed general frame-rate improvement.
+
+### CH-024 — Explain stacking support and paint material fields through native queries
+
+- **2026-10-21; T09, K01, Q05; 0.2.3, task branch in progress.** Existing field point
+  assignment and stacking configuration did not provide brush strokes or show evaluated
+  support. Native support extraction now uses the production material masks, verifies the
+  accepted plan and displays its intrinsic frame. Geometric ordering and active support
+  are reported separately: excluded pairs can still have an ordering record.
+- **Painting:** native screen projection and mesh BVH occlusion are cached by immutable
+  geometry, transforms, field correspondence and camera. The cache is bounded to four
+  entries/64 MiB, with existing profiler cache/ownership tracking. A stroke uses distance
+  to the screen polyline, smoothstep/power falloff and maximum per-domain coverage against
+  its starting weights. Event frequency therefore does not accumulate additional strength.
+  Visible-only is the default; Paint Through bypasses occlusion. Base samples can influence
+  multiple tissue sides; Rest samples retain their own material correspondence.
+- **Ownership:** numerical work and colored buffers stay native. The existing read-only
+  inspection scheduler captures/revalidates inputs. Preview does not mutate anatomy;
+  releasing commits through the shared field command as one undo action. Interrupted or
+  obsolete strokes cannot commit. Existing material lookup now exposes its interpolation
+  coefficients to painting, retaining the same correspondence rules for attachments.
+- **Evidence so far:** native visibility, external occlusion, event-rate independence,
+  single-sample radial fields, Base/Rest commit/undo, cancellation, stale inputs and staged
+  desktop colors pass focused tests. Existing material-binding/fiber tests also pass.
+  Hidden GPU paint preview and frozen inspection export ran successfully; the generated
+  color surface was visually inspected. Full interaction/performance/release qualification
+  and recommendations 6–7 are still pending; this is an intermediate checkpoint.

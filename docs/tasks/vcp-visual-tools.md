@@ -43,7 +43,11 @@ Implemented read-only native production support-mask queries, accepted-plan vali
 provider/receiver display, intrinsic footprints, displacement comparison, matching staged
 picking and frozen report evidence. Reused the inspection scheduler through query policies.
 Excluded relationships report geometric order separately from active support.
-Recommendations 5–7 remain in progress; no release/package qualification claimed yet.
+Weight painting now has native visibility/material sampling, bounded projection caches,
+worker previews, direct desktop brush controls and one shared commit per released stroke.
+Visible-only/Paint Through, external occlusion, rate independence, Base/Rest undo, stale
+inputs, cancellation and staged colors have focused tests. Hidden GPU preview/export passed;
+the colored tissue capture was inspected. Cross-sections and route diagnostics remain pending.
 Unrelated root `__init__.py` is preserved.
 
 ## Verification
@@ -65,3 +69,6 @@ all five CTest checks passed. Actual GUI captures and full gate remain pending.
 
 Use E:/development/anthroforge and tools/common.ps1. Keep generated evidence under
 ignored build/vcp-visual-tools; preserve production projects and avoid desktop takeover.
+Native painting build: build/vcp-visual-paint-native.log (all five CTests passed).
+Hidden GPU: tools/vcp_visual_scene.py, build/vcp-visual-tools/paint-preview.png and
+paint.afinspection.zip. Full QML pointer-input acceptance and profiler trials remain pending.

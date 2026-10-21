@@ -49,9 +49,18 @@ class GeometryEngine(NativeEngine):
         self.surface_queries: ResourceCache[Query] = ResourceCache(
             64 * 1024 * 1024, 64, "surface_query"
         )
+        self.paint_surfaces: ResourceCache[Any] = ResourceCache(
+            64 * 1024 * 1024, 4, "paint_surface"
+        )
 
     def caches(self) -> tuple[Any, ...]:
-        return self.bases, self.routing_scenes, self.tissue_materials, self.surface_queries
+        return (
+            self.bases,
+            self.routing_scenes,
+            self.tissue_materials,
+            self.surface_queries,
+            self.paint_surfaces,
+        )
 
     def clear_caches(self) -> None:
         for cache in self.caches():
@@ -68,9 +77,10 @@ class GeometryEngine(NativeEngine):
         self._inspection_signatures()
 
     def _inspection_signatures(self) -> None:
-        from .inspection import configure
+        from . import inspection, painting
 
-        configure(self)
+        inspection.configure(self)
+        painting.configure(self)
 
     def _curve_signatures(self) -> None:
         from . import curve_editing, curve_queries, drawing, path_editing, paths, routing, strokes

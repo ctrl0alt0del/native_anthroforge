@@ -54,18 +54,24 @@ static std::vector<int> candidates(const Index& index,const Weights& query) {
     std::sort(result.begin(),result.end()); result.erase(std::unique(result.begin(),result.end()),result.end());
     return result;
 }
-V3 material_point(const Index& index,const Weights& query,int64_t side,uint64_t cancel,bool inside) {
+Weights material_coordinates(const Index& index,const Weights& query,int64_t side,uint64_t cancel,bool inside) {
     const auto& mesh=index.current; side=side?side:1;
     const auto known=direct(index,query,side);
-    if(known>=0) return mesh.vertices.row(known);
+    if(known>=0) return {{known,1}};
     for(int face:candidates(index,query)) {
         check_cancel(cancel); V4 bary;
         if(!matching_side(mesh,face,side)||!barycentric(coefficients(mesh,face),query,bary,inside,corners(mesh,face))) continue;
-        V3 value=V3::Zero();
-        for(int j=0;j<corners(mesh,face);++j) value+=mesh.vertices.row(vertex(mesh,face,j)).transpose()*bary[j];
+        Weights value;
+        for(int j=0;j<corners(mesh,face);++j) value[vertex(mesh,face,j)]=bary[j];
         return value;
     }
-    if(side==2&&mesh.tissue.kind==5) return material_point(index,query,1,cancel,inside);
+    if(side==2&&mesh.tissue.kind==5) return material_coordinates(index,query,1,cancel,inside);
     throw std::runtime_error("Retained tissue material location is outside the current surface; restore the crop or explicitly rebind.");
+}
+V3 material_point(const Index& index,const Weights& query,int64_t side,uint64_t cancel,bool inside) {
+    V3 value=V3::Zero();
+    for(const auto& [vertex,weight]:material_coordinates(index,query,side,cancel,inside))
+        value+=index.current.vertices.row(vertex).transpose()*weight;
+    return value;
 }
 }

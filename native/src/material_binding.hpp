@@ -12,5 +12,6 @@ struct Index {
 };
 Weights weights(const TissueDomain& domain,int64_t vertex);
 Index index(const Mesh& current,uint64_t cancel);
+Weights material_coordinates(const Index& index,const Weights& location,int64_t side,uint64_t cancel,bool inside=true);
 V3 material_point(const Index& index,const Weights& location,int64_t side,uint64_t cancel,bool inside=true);
 }

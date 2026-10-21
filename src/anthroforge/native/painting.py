@@ -90,6 +90,7 @@ def create(value: Inputs, cancel: int) -> int:
 def prepare(inputs: Inputs, cancel: int = 0) -> Prepared:
     if (
         len(inputs.frame) != 16
+        or len(inputs.frames) != len(inputs.others)
         or len(inputs.view) != 14
         or any(len(f) != 16 for f in inputs.frames)
     ):

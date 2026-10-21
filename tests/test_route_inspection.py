@@ -5,6 +5,7 @@ import pytest
 
 from anthroforge.native import routing, routing_trace
 from anthroforge.native.mesh import NativeCancellation
+from tests.conftest import CUBE
 from tests.test_fiber_creation import bind, scene
 from tests.test_native_routing import curve
 from tests.test_routing_workflow import accepted, convert, create
@@ -64,3 +65,24 @@ def test_native_trace_cancellation_is_not_reported_as_solver_failure(session):
         routing_trace.inspect(
             session.engine, routing.Inputs(curve([(0, 0, 0), (1, 0, 0)])), cancel.handle
         )
+
+
+def test_failed_planner_keeps_reference_evidence_and_accepted_result(session):
+    bone = session.command("import", path=str(CUBE), units=1)["entity_id"]
+    session.wait()
+    key = create(session, (bone,))
+    old = session.document.object(key)
+    session.command("curve.point.update", curve=key, point=old.points[0].id, position=[0, 0, 0])
+    session.wait()
+    report = inspect(session, key, cold=True)
+    assert not report["success"] and "intersects" in report["error"]
+    assert report["records"][0]["stage"] == "Reference"
+    assert session.document.object(key).result.asset == old.result.asset
+
+
+def test_bounded_capture_reports_omitted_records_without_changing_solve(session):
+    inputs = routing.Inputs(curve([(i, i % 2, 0) for i in range(140)]))
+    report = routing_trace.inspect(session.engine, inputs)
+    assert report["success"] and report["omitted"] > 0
+    assert len(report["records"]) <= report["limits"]["records"]
+    assert sum(len(row["points"]) for row in report["records"]) <= report["limits"]["points"]

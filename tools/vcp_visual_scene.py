@@ -1,8 +1,9 @@
 """Hidden GPU qualification of stacking witnesses and native field color buffers."""
 
+import sys
 from pathlib import Path
 
-from construction_profile_qualification import shutdown
+from construction_profile_qualification import shutdown, wait_export
 from PySide6.QtQuickControls2 import QQuickStyle
 from shiboken6 import delete
 from tissue_scene_acceptance import scene
@@ -72,15 +73,41 @@ def section(controller, renderer, app):
 
 
 def run(app):
+    from vcp_visual_stages import route, stacking
+
+    cases = {"painting-sections": paint, "stacking": stacking, "routing": route}
+    name = sys.argv[1] if len(sys.argv) > 1 else "painting-sections"
+    run_case(app, name, cases[name])
+
+
+def run_case(app, name, scenario):
     OUTPUT.mkdir(parents=True, exist_ok=True)
     collector, controller, warnings = QtProfiler(), Controller(), []
     controller.timer.stop()
     renderer = Offscreen(controller, warnings)
+    controller.profiler.collector = collector
+    collector.attach(renderer.window, controller)
     try:
-        paint(controller, renderer, app)
+        frames(controller, renderer, app, "startup")
+        exercise_case(controller, renderer, app, name, scenario)
         assert not warnings, warnings
     finally:
         shutdown(renderer, controller, collector)
+
+
+def exercise_case(controller, renderer, app, name, scenario):
+    recording = "--no-profile" not in sys.argv
+    if recording:
+        controller.session.command("profile.start")
+    scenario(controller, renderer, app)
+    if recording:
+        export_profile(controller, app, name)
+
+
+def export_profile(controller, app, name):
+    controller.session.command("profile.stop", path=str(OUTPUT / (name + ".afprofile.zip")))
+    result = wait_export(controller, app)
+    assert result["state"] == "saved", result
 
 
 if __name__ == "__main__":

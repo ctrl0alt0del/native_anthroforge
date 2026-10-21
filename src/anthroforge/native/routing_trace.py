@@ -64,7 +64,9 @@ def read(engine: Any, handle: int, backend: str) -> dict[str, Any]:
     return decoded(lib, handle, info, counters, measures, backend)
 
 
-def decoded(lib: Any, handle: int, info: Any, counters: Any, measures: Any, backend: str) -> Any:
+def decoded(
+    lib: Any, handle: int, info: Any, counters: Any, measures: Any, backend: str
+) -> dict[str, Any]:
     result = metadata(info, backend)
     result.update(
         counters=counters.tolist(),

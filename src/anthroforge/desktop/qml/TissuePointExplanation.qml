@@ -16,9 +16,11 @@ UiSection {
     }
     Repeater {
         model: panel.report.constraints || []
-        Label { required property var modelData; Layout.fillWidth: true; text: modelData.mask+" · "+modelData.mode+" · influence "+modelData.influence.toFixed(3)+(modelData.fixed_fraction>0 ? " · exact core" : "")+(modelData.target ? " · target-relative" : " · source-relative"); color: Theme.text; wrapMode: Text.WordWrap }
+        Label { required property var modelData; Layout.fillWidth: true; text: modelData.mask+" · "+modelData.mode+" · influence "+modelData.influence.toFixed(3)+(modelData.fixed_fraction>0 ? " · exact core" : "")+(modelData.target ? " · target-relative" : " · source-relative")+(modelData.goal ? "\nGoal XYZ · m: "+panel.vector(modelData.goal)+"\nResult → goal · m: "+modelData.residual.toPrecision(5) : ""); color: Theme.text; wrapMode: Text.WrapAnywhere }
     }
     Label { visible: !!panel.report.asset && !(panel.report.constraints || []).length; Layout.fillWidth: true; text: "No authored region constraint influences this point in the inspected stage."; color: Theme.muted; wrapMode: Text.WordWrap }
+    Label { visible: !!panel.report.goal_note; Layout.fillWidth: true; text: panel.report.goal_note || ""; color: Theme.muted; wrapMode: Text.WordWrap }
+    UiNotice { text: panel.report.goal_error || ""; error: true }
     UiSection {
         title: "Current construction sources"; expanded: false
         Repeater {

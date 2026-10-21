@@ -707,7 +707,7 @@ remain visible through occluders. These actions do not edit anatomy or create un
 | `tissue.inspect.stages` | `target`; available base/rest/intrinsic/final resources, accepted result provenance and frames. Point/curve bases retain their native presentation. |
 | `tissue.inspect.compare` | `target`, `stage`, `reference`; starts a read-only background comparison. Surface stages must share material correspondence. |
 | `tissue.inspect.point` | `target`, `stage`, `triangle`, `weights` (three barycentric weights); optional `expected_asset` rejects a stale displayed pick. Starts background point/constraint inspection. |
-| `tissue.inspect.status` | `kind: "comparison" \| "point"`; lifecycle state, job, error and report. |
+| `tissue.inspect.status` | `kind: "comparison" \| "point" \| "stacking" \| "paint" \| "section"`; lifecycle state, job, error and report. |
 | `tissue.inspect.cancel` | Optional `kind`; cancels inspection and releases its retained result. |
 | `tissue.inspect.check` | `target`, optional `stage="final"`; enqueues `tissue_geometry.v1` for this stage only. Read results with `issues.query`. |
 
@@ -739,3 +739,46 @@ selected tissue. It freezes the stage view, a current point explanation and opti
 Issue identity, then renders that exact document snapshot in the isolated renderer. The
 `.afinspection.zip` includes matching `image.png` and `inspection.json`. Native handles and
 comparison buffers are temporary presentation resources, excluded from project files.
+
+### Stacking, painting, sections and route evidence
+
+| Operation | Arguments and result |
+| --- | --- |
+| `tissue.inspect.stacking` | `target`, `other`, optional `side="a"`, `other_side="a"`; production support polygons/lines, active support, accepted order, assets and frames. Rejects pending plans. |
+| `tissue.inspect.paint` | `target`, `name`, `stage`, `view`, `samples`, `brush`; optional displayed `expected_asset` and `obstacles=[{asset,frame}]`. Returns a read-only colored field preview and full field values. |
+| `tissue.field.paint.commit` | `job`; commits a current completed paint preview as one undo action. Stale/cancelled tokens are rejected. |
+| `tissue.inspect.section` | `target`, `stage`, optional `reference`, world `plane=[nx,ny,nz,d]`; optionally explicit displayed `surfaces=[{owner,stage,asset,frame}]`. Returns bounded contours and truncation/coplanar counts. |
+| `curve.inspect.route` | `target`, optional `cold=false`; separate diagnostic calculation with current dispatched preferences. Does not publish geometry. `cold=true` bypasses warm continuation to include planning. |
+| `curve.inspect.status` | No arguments; state/job/error/report for the route diagnostic. A completed diagnostic can describe a failed route: inspect `report.success` and `report.error`. |
+| `curve.inspect.cancel` | Cancels/releases route diagnostics. |
+
+Paint `view` is camera origin/right/up/forward (XYZ each), pixels per unit at depth one,
+and perspective flag. Samples are a screen-space XY polyline centered on the viewport,
+Y upward. `brush=[radius_px,weight,strength,falloff_power,paint_through]`; weights/strength
+are 0–1. The default desktop brush affects visible samples; Paint Through is explicit.
+Base fields map through thickness; Rest fields retain their own material domain. Stroke
+coverage is based on the entire polyline and starting weights, not pointer event count.
+
+Constraint point reports additionally contain world-space `goal`, `actual`, `residual`,
+and `goal_basis` for influencing regions. Source-relative goals use accepted rest data;
+target-relative goals resolve the retained binding against **current accepted targets**.
+They are not historical solver-force evidence. Unavailable goals report `goal_error`.
+
+Section planes keep `n·p+d >= 0`; no anatomical geometry is capped or replaced. Desktop
+section scope defaults to the selected tissue and comparison stages, with an explicit
+surrounding-geometry switch. Picking skips discarded intersections and returns original
+triangle IDs/material locations from the same displayed mesh.
+
+Route records identify Reference, Planner, Solver seed, Solver trial and Final, plus span,
+attempt, trial, accepted iteration count and termination. Coordinates are world metres.
+Contacts contain edge/collider/face/feature/contained/limiting/factor/gap, path XYZ,
+surface XYZ and normal XYZ. Limits are 128 complete path records, 131072 points and 4096
+contacts. `omitted` reports overflow; a final record may be unavailable when the limit is
+reached. The desktop displays at most 8192 points/512 contacts per selected record and
+labels that additional viewport limit. A missing planner stage during warm continuation
+is expected. Diagnostic capture is not performed during ordinary solves.
+
+`inspection.export` accepts `route={index,showContacts}` for a selected routed curve/Fiber;
+the frozen report includes the captured trace and restores its selected step without
+rerouting. Tissue exports also preserve current stacking/paint evidence and optional
+`tissue.section={enabled,target,axis,position,flip,cut,wholeScene}` presentation.

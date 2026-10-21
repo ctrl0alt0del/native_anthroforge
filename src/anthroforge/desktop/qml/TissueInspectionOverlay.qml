@@ -3,7 +3,8 @@ import QtQuick
 Canvas {
     id: overlay
     required property var viewport
-    readonly property var lines: (workspace.tissueInspection.state.lines || []).concat(workspace.tissueInspection.state.footprint || [])
+    ViewSnapshot { id: evidence; source: workspace.tissueInspection }
+    readonly property var lines: (evidence.data.lines || []).concat(evidence.data.footprint || [])
     anchors.fill: parent
     visible: lines.length > 0
     function segment(ctx, a, b) {

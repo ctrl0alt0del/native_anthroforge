@@ -50,12 +50,14 @@ class TissueInspectionTools(QObject):
     def evidence_state(self):
         return dict(
             point=self.point,
-            lines=self.lines,
             comparison=self.summary,
             pointStatus=self.point_status,
-            stacking=self.stacking_status,
-            footprint=stacking.lines(self),
+            stacking=stacking.summary(self),
         )
+
+    @Slot(result="QVariantMap")
+    def snapshot(self):
+        return dict(self.state, lines=self.lines, footprint=stacking.lines(self))
 
     def activated(self):
         self.controller.activate_geometry()

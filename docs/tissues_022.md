@@ -136,3 +136,23 @@ for individual commands. The example demonstrates construction, not anatomical f
 For performance investigation, press Shift+F12 before the interaction and again afterward.
 Share the `.afprofile.zip`; it includes task stages, invalidation reasons, native calls,
 cache activity and retained-resource ownership. F12 remains bug/recommendation reporting.
+
+## Visual tools (0.2.3)
+
+- **Stacking → Show stacking effect** displays the selected pair's evaluated provider and
+  receiver, with the production support footprint. **Show received displacement** compares
+  final output with intrinsic output. This is separate from editing relationship intent.
+- Under a tissue weight field, **Paint field** enables a radius/falloff brush. Blue is zero,
+  gold is 0.5 and red is one. Drag and release for one undo action; Escape cancels the stroke.
+  The default affects visible surface samples. **Paint Through** explicitly includes hidden
+  samples. Base-domain weights can affect both tissue sides through shared material samples.
+  **Explain constraints at a point** also shows goal/result witnesses and residual distance.
+- **Inspect tissue → Cross-section** enables a movable X/Y/Z plane. It cuts the selected
+  tissue and its displayed comparison stage; **Cut surrounding geometry** broadens the
+  view. **Flip visible side** reverses the cut. Contours remain available without cutaway.
+  These views never edit or cap the tissue.
+- For a routed curve or Fiber, **Inspect route** runs a separate diagnosis. Step through
+  planner paths, solver seeds/trials and final paths; optionally show contact witnesses.
+  **Start from planner** is enabled initially. Disable it to inspect normal warm continuation.
+  Failed calculations retain their diagnostic evidence and the previous accepted geometry.
+  **Export inspection report** freezes the selected view, geometry and machine-readable data.

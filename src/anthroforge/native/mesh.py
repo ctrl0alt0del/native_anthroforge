@@ -77,9 +77,10 @@ class GeometryEngine(NativeEngine):
         self._inspection_signatures()
 
     def _inspection_signatures(self) -> None:
-        from . import inspection, painting, routing_trace, sections
+        from . import inspection, inspection_goals, painting, routing_trace, sections
 
         inspection.configure(self)
+        inspection_goals.configure(self)
         painting.configure(self)
         sections.configure(self)
         routing_trace.configure(self)

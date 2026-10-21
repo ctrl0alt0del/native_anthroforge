@@ -43,5 +43,5 @@ def tissue_queries() -> dict[str, Query]:
     common = tissue.validate, tissue.signature
     return {
         "comparison": Query(*common, tissue.comparison, tissue.workload),
-        "point": Query(*common, point.explain, tissue.workload),
+        "point": Query(tissue.validate, point.signature, point.explain, tissue.workload),
     }

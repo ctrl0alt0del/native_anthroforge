@@ -13,13 +13,16 @@ static void assign(Constraints& c,size_t index,const V3& goal,bool exact,double 
     if(exact) fixed(c,index,goal);
     else c.tethers.insert(c.tethers.end(),{double(index),goal.x(),goal.y(),goal.z(),0,strength});
 }
+V3 region_goal(const Mesh& rest,const Vertices& normals,const AfTissueRegion& region,int64_t index) {
+    const V3 anchor=region.goals?V3(region.goals+3*index):V3(rest.vertices.row(index));
+    return anchor+region.offset*V3(normals.row(index));
+}
 static void region_goals(const Mesh& rest,Constraints& c,const AfTissueRegion& region,const WeightField& mask,uint64_t cancel) {
     const auto weights=feather(rest,mask,region.feather,cancel);
     for(size_t i=0;i<weights.size();++i) {
         check_cancel(cancel); if(weights[i]<=1e-8) continue;
-        const V3 anchor=region.goals?V3(region.goals+3*i):V3(rest.vertices.row(i));
-        const V3 normal=c.normals.row(i); const bool exact=region.mode==0&&mask[i]>0;
-        assign(c,i,anchor+region.offset*normal,exact,region.strength*(exact?1:weights[i]));
+        const bool exact=region.mode==0&&mask[i]>0;
+        assign(c,i,region_goal(rest,c.normals,region,int64_t(i)),exact,region.strength*(exact?1:weights[i]));
     }
 }
 static void validate(const AfTissueRegion& r) {

@@ -762,3 +762,25 @@ Frozen inspection export validates stage/finding selection in the application la
 normalizes the view to its JSON transport contract. The isolated renderer reconstructs the
 comparison from the captured revision and includes matching point/finding evidence. The
 desktop collector and report renderer do not become dependencies of headless geometry APIs.
+
+### Visual inspection and material painting
+
+Inspection query strategies own validation, read signatures, workload estimates and native
+execution. The existing read-only job service owns snapshots, cancellation and publication;
+route diagnostics use this service alongside tissue comparisons. Native route capture is
+optional and bounded inside the production planner/solver. `curve_evaluation.resolve`
+shares Fiber attachment/junction resolution between evaluation and inspection, preventing
+a diagnostic path from silently ignoring bindings. Solver preferences are frozen at dispatch.
+
+Painting caches native projection/visibility with owned mesh leases in the shared bounded
+resource cache. Native material coefficients transfer brush coverage to field domains.
+Desktop stroke state owns pointer samples and retains its last complete colored preview
+while replacements are prepared. Only the shared paint commit operation edits the document.
+The view cancels an obsolete stroke instead of committing it against changed anatomy.
+
+Section contours are native queries; cutaways are view-local shader presentation. Native
+clipped BVH traversal skips discarded candidates while preserving original geometry and
+material identity. Section scope and plane masks are cached for repeated pointer queries.
+Neither sections nor diagnostic paths participate in anatomical attachments/dependencies.
+Goal inspection shares the production region-goal formula; reports distinguish accepted
+source goals from retained bindings resolved against current target geometry.

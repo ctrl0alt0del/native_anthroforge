@@ -61,7 +61,7 @@ UiSection {
     ColumnLayout {
         visible: !!panel.other.id; Layout.fillWidth: true; spacing: Theme.gap
         UiButton { objectName: "showStackingEffect"; text: "Show stacking effect"; Layout.fillWidth: true; enabled: !!panel.evidence; onClicked: workspace.tissueInspection.showStacking(panel.focused,panel.side,panel.otherSide) }
-        StackingExplanation { evidence: workspace.tissueInspection.state.stacking || ({}); target: panel.item.id }
+        StackingExplanation { evidence: workspace.tissueInspection.state.stacking || ({}); target: panel.item.id || "" }
         RowLayout {
             Layout.fillWidth: true
             UiCombo { id: ownSide; Layout.fillWidth: true; model: panel.item.both_sides?["a","b"]:["a"]; hint: "This tissue side" }

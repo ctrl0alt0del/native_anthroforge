@@ -5,13 +5,15 @@ import AnthroForge.Native 1.0
 Node {
     id: root
     required property real distance
+    ViewSnapshot { id: evidence; source: workspace.tissueInspection }
+    ViewSnapshot { id: section; source: workspace.sectionTools }
     Repeater3D {
         model: workspace.tissueInspection.geometry
         delegate: Node {
             id: stageNode
             required property var item
             readonly property var geometryData: item.content
-            readonly property bool clipped: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && (workspace.sectionTools.state.wholeScene || item.owner===workspace.sectionTools.state.target)
+            readonly property bool clipped: section.data.enabled && section.data.cut && (section.data.wholeScene || item.owner===section.data.target)
             position: Qt.vector3d(stageNode.geometryData.trs[0],stageNode.geometryData.trs[1],stageNode.geometryData.trs[2])
             rotation: Qt.quaternion(stageNode.geometryData.quaternion[0],stageNode.geometryData.quaternion[1],stageNode.geometryData.quaternion[2],stageNode.geometryData.quaternion[3])
             scale: Qt.vector3d(stageNode.geometryData.trs[6],stageNode.geometryData.trs[7],stageNode.geometryData.trs[8])
@@ -20,7 +22,7 @@ Node {
                 objectName: "inspectionSurface_"+stageNode.geometryData.stage+"_"+item.chunk
                 visible: item.active && stageNode.geometryData.kind==="MESH"
                 geometry: MeshGeometry { assetId: stageNode.geometryData.kind==="MESH" ? item.handle : 0; chunk: item.chunk }
-                opacity: item.reference ? .3 : workspace.tissueInspection.state.reference && workspace.tissueInspection.state.mode==="Overlay" ? .7 : 1
+                opacity: item.reference ? .3 : evidence.data.reference && evidence.data.mode==="Overlay" ? .7 : 1
                 property Material original: PrincipledMaterial { baseColor: item.color; roughness: .65; cullMode: Material.NoCulling }
                 property Material cut: SectionMaterial { tint: item.color }
                 materials: stageNode.clipped ? cut : original
@@ -50,20 +52,20 @@ Node {
     }
     Model {
         objectName: "stackingFootprint"
-        geometry: ControlGeometry { points: workspace.tissueInspection.state.footprint || []; segments: true; stroke: root.distance*.001 }
+        geometry: ControlGeometry { points: evidence.data.footprint || []; segments: true; stroke: root.distance*.001 }
         materials: DefaultMaterial { diffuseColor: "#76e6cc"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
     }
     Repeater3D {
-        model: workspace.sectionTools.state.contours
+        model: section.data.contours || []
         delegate: Model {
             required property var modelData
             geometry: ControlGeometry { points: modelData.lines; segments: true; stroke: root.distance*.0015 }
-            materials: DefaultMaterial { diffuseColor: modelData.stage===workspace.tissueInspection.state.stage ? "#ffbbce" : "#78d9b5"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
+            materials: DefaultMaterial { diffuseColor: modelData.stage===evidence.data.stage ? "#ffbbce" : "#78d9b5"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
         }
     }
     Model {
         objectName: "tissueInspectionWitness"
-        geometry: ControlGeometry { objectName: "tissueInspectionLines"; points: workspace.tissueInspection.state.lines || []; segments: true; stroke: root.distance*.0015 }
+        geometry: ControlGeometry { objectName: "tissueInspectionLines"; points: evidence.data.lines || []; segments: true; stroke: root.distance*.0015 }
         materials: DefaultMaterial { diffuseColor: "#ffe571"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
     }
 }

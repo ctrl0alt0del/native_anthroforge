@@ -13,6 +13,12 @@ def report(tool):
     return state["report"] if state["state"] == "ready" else {}
 
 
+def summary(tool):
+    state = tool.stacking_status
+    report = {key: value for key, value in state.get("report", {}).items() if key != "lines"}
+    return dict(state, report=report)
+
+
 def show(tool, other, side, other_side):
     tool.set_view("intrinsic", "", "Overlay")
     inspection.start(

@@ -24,8 +24,6 @@ class RouteInspectionTools(QObject):
             visible=self.visible,
             index=self.index,
             labels=self.labels,
-            paths=self.paths,
-            contacts=self.contacts,
             showContacts=self.show_contacts,
             details=view.details(self),
             omitted=self.report.get("omitted", 0),
@@ -39,6 +37,10 @@ class RouteInspectionTools(QObject):
         if result:
             self.visible, self.report = True, {}
             self.synchronize()
+
+    @Slot(result="QVariantMap")
+    def snapshot(self):
+        return dict(self.state, paths=self.paths, contacts=self.contacts)
 
     def synchronize(self):
         session = self.controller.session
@@ -55,6 +57,7 @@ class RouteInspectionTools(QObject):
             value.job if value else "",
             value.state if value else "",
             id(value.asset) if value else 0,
+            session.preferences.value.routing_backend,
         )
         if stamp == self.stamp:
             return

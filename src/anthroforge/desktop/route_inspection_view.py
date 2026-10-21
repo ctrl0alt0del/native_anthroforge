@@ -1,5 +1,8 @@
 """Presentation packing for bounded diagnostic records, no path computation."""
 
+from anthroforge.core.entities import IDENTITY
+from anthroforge.native.control_geometry import polylines
+
 COLORS = {
     "Reference": "#fa86cb",
     "Planner": "#73b5fa",
@@ -23,7 +26,8 @@ def lines(tool):
     row = selected(tool)
     if not row:
         return [], []
-    paths = [dict(points=row["points"][:8192], color=COLORS[row["stage"]])]
+    points = polylines(tool.controller.session.engine, row["points"][:8192], IDENTITY).tolist()
+    paths = [dict(points=points, color=COLORS[row["stage"]])]
     contacts = [p for c in row["contacts"][:512] for p in (c[8:11], c[11:14])]
     return paths, contacts if tool.show_contacts else []
 

@@ -20,14 +20,14 @@ def setup(controller):
 def test_stacking_evidence_displays_receiver_and_provider_with_matching_picks(controller):
     provider, receiver, tool = setup(controller)
     assert tool.stacking_status["state"] == "ready", tool.stacking_status
-    assert tool.state["footprint"]
+    assert tool.snapshot()["footprint"]
     assert set(tool.state["hiddenOwners"]) == {provider, receiver}
     for key in (provider, receiver):
         item = controller.session.document.object(key)
         assert controller.pick_rows[key]["geometry_asset"] == item.intrinsic_result.asset
     tool.hideStacking()
     publish(controller)
-    assert not tool.state["footprint"] and provider not in tool.state["hiddenOwners"]
+    assert not tool.snapshot()["footprint"] and provider not in tool.state["hiddenOwners"]
 
 
 def test_frozen_stacking_report_keeps_order_and_material_footprint(controller):

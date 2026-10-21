@@ -1033,3 +1033,26 @@ for artifact identity, UI checks and evidence limits.
   settings pass focused tests. Hidden GPU tissue-only and whole-scene cutaways were
   inspected. Full pointer/UI/profiler/portable qualification remains pending. This is a
   geometric section view, not a boolean union or tissue repair.
+
+### CH-026 — Optional route snapshots and material constraint-goal witnesses
+
+- **2026-10-21; C03, A04, T09, Q05, R10; 0.2.3, qualification in progress.** Ordinary
+  routing previously exposed aggregate counters only. Explicit read-only diagnostic jobs
+  now capture bounded world-space reference/planner/seed/trial/final paths and native contact
+  witnesses from the same Custom/PIQP execution. Normal solves allocate no trace. Complete
+  path records are omitted when budgets are exhausted; truncation is explicit. Cancellation
+  remains cancellation, while a completed failed solve retains evidence with `success=false`.
+- **Shared inputs:** Fiber attachment and junction resolution was extracted into the common
+  curve input boundary, used by both ordinary evaluation and diagnostics. Preferences and
+  geometry are captured at dispatch; current-read validation rejects superseded evidence.
+  A diagnostic never adopts Fiber edit bindings, publishes path geometry or changes undo.
+- **Goal witnesses:** native inspection reuses the production source-relative region-goal
+  formula and retained target binding resolver, then interpolates through material identity.
+  It reports world goals, displayed results and distances. Current target-relative goals
+  are explicitly distinguished from historical accepted output; no force decomposition is
+  implied. The formula and tissue constraint application are unchanged.
+- **Evidence so far:** Custom/PIQP trace versus normal final coordinates/counters, moved
+  Fiber bindings, failure retention, cancellation, capture limits, source offsets and Manual
+  target/result divergence pass focused tests. Actual offscreen QML brush strokes, undo,
+  Escape, section controls and route action passed. Hidden GPU/profile/portable acceptance
+  and the complete development gate remain required before delivery.

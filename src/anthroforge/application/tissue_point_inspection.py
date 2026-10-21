@@ -8,7 +8,14 @@ from anthroforge.core.points import Anchor
 from anthroforge.core.surfaces import Surface
 from anthroforge.native import inspection as native
 
+from . import tissue_goal_inspection
 from . import tissue_inspection_stages as stages
+
+
+def signature(context: Any, target: str, options: Any) -> Any:
+    from .tissue_inspection import signature as stages_signature
+
+    return context.document.revision, stages_signature(context, target, options)
 
 
 def explain(context: Any, target: str, options: Any, cancel: int) -> dict[str, Any]:
@@ -22,9 +29,10 @@ def explain(context: Any, target: str, options: Any, cancel: int) -> dict[str, A
     rows = constraint_rows(context, mesh, base, config, state, triangle, bary, cancel)
     report = point_report(context, item, options, row, config, state)
     report.update(constraints=rows, frame=frame)
-    return dict(
+    payload = dict(
         report=report, lines=native.face_lines(mesh, frame, triangle) + row["glyph"], mesh=mesh
     )
+    return tissue_goal_inspection.enrich(context, config, state, options, payload, cancel)
 
 
 def sample(context: Any, item: Any, options: Any, cancel: int) -> Any:

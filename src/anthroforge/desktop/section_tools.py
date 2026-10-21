@@ -42,12 +42,15 @@ class SectionTools(QObject):
             cut=self.cut,
             wholeScene=self.whole_scene,
             plane=self.plane,
-            contours=self.reports,
             error=self.error,
         )
 
     def applies(self, owner):
         return self.enabled and self.cut and (self.whole_scene or owner == self.target)
+
+    @Slot(result="QVariantMap")
+    def snapshot(self):
+        return dict(self.state, contours=self.reports)
 
     def planes(self, owners):
         for previous, planes in self.pick_cache:

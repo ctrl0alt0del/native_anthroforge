@@ -26,8 +26,8 @@ remain native. Self-intersections remain allowed. Background-only GUI qualificat
 ## Decisions and relevant files
 
 User confirmed visible-surface painting by default, with optional Paint Through.
-Questions pending: selected-tissue versus scene section default; separate route diagnostic
-run versus capture during regular recalculation. Continue independent stacking work meanwhile.
+Optional UX questions remain unanswered: selected-tissue versus scene section default;
+separate route diagnostic run versus capture during regular recalculation.
 Working section default is selected tissue plus its comparison stages, with an explicit
 surrounding-geometry toggle. This is an implementation assumption, not a confirmed answer.
 Reuse tissue inspection jobs, accepted material data, stage comparisons, Issues, staged
@@ -54,7 +54,7 @@ matching original-triangle picking, comparison stages, controls and frozen repor
 Native/API/view tests and hidden GPU section captures passed. Optional bounded native route
 capture now records planner/seed/trial/final paths, contacts and termination, with shared
 Fiber/junction input resolution and read-only jobs. Desktop step selection and frozen export
-are integrated; route-specific GUI/failure/limit qualification remains pending. Both solver
+are integrated; route-specific hidden GPU, failure and storage-limit checks passed. Both solver
 backends match normal output in focused tests, including moved Fiber attachments (25 tests).
 Working route default is an explicit separate diagnostic run, starting at the planner;
 users can retain the normal warm-start policy. This does not publish geometry.
@@ -68,12 +68,23 @@ offscreen editing/render review, profiler evidence, full gate and packaged verif
 Focused stacking/API/view/lifecycle/architecture checks: 14 passed. Native build and
 all five CTest checks passed. Actual GUI captures and full gate remain pending.
 
+Constraint inspection now shows production goal/result vectors and residuals, distinguishing
+accepted source-relative goals from current target-relative goals. No constraint mathematics
+changed. QTest exercised painting release/undo/cancel and section/route controls. Hidden GPU
+captures and report exports succeeded for all four tools. Full pytest: 1,592 passed; all five
+native CTests and native function-length checks passed before final presentation adjustments.
+
+A real 8,192-point footprint exposed a QML reference-sequence stall. Geometry is now copied
+once per change through ViewSnapshot and excluded from small status property maps. The same
+hidden scene completes with profiling on and off. This performance correction still needs
+its regression test and final profiler rerun.
+
 ## Next actions and blockers
 
-1. Implement evaluated stacking inspection with explicit input provenance and native footprints.
-2. Integrate native field painting and shared stroke transactions through desktop/headless.
-3. Implement section views and optional native route diagnostic collection after UX answers.
-4. Qualify, document computation changes, package, checkpoint and merge validated work.
+1. Finish saved-view review, snapshot/replay regressions and packaged qualification commands.
+2. Rerun profiler scenes and complete ownership/coupling review.
+3. Update recommendations/computation records and run the development gate.
+4. Package the canonical 0.2.3 build, qualify relocation, then merge validated work.
 
 ## Recovery inputs
 

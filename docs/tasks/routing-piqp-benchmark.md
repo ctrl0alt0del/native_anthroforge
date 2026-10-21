@@ -3,7 +3,7 @@
 - Branch: `codex/routing-piqp-benchmark`; integration: `main`.
 - Production baseline: `c5a163f`; experimental adapter checkpoint: `ae0d1e9`.
 - Date: 2026-10-21. Direct work, background/headless only.
-- Status: measurements and full development gate complete; final delivery being recorded.
+- Status: complete; measurements, full gate and clean reproduction passed. Benchmark-only delivery.
 - Scope: comparison experiment. **Production routing and the packaged app are unchanged.**
 
 ## Result and recommendation
@@ -133,6 +133,9 @@ the JSON and `tools/routing_qp_benchmark/counterexample.py`.
 Experimental DLL builds with warnings as errors; native function-size check passes.
 Python lint, formatting and function-limit checks pass. Full development gate passes:
 1,442 Python tests, all three native tests, mypy, native/script style and native doctor.
+The maintained lab build script was rerun after the gate's production rebuild; all 22
+baseline identity comparisons pass again. The exact timed DLL is retained locally as
+`build/routing-piqp/measured-af_routing_lab.dll`, matching the evidence SHA-256.
 Ownership review: the lab stays outside application
 imports, retains owned native inputs/results, and cannot select PIQP in the normal app.
 Preserve the unrelated root `__init__.py` and all source projects.

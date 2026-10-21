@@ -29,6 +29,9 @@ previews use the captured backend. **Recalculate** explicitly evaluates existing
 objects when desired. Opening a project or changing preferences does not reroute.
 Curves and Fibers share this contract. Live/On Release/Manual behavior, undo/redo,
 save checkpoints, dependent surfaces and retained material bindings remain unchanged.
+Creating a Fiber can reuse its source's accepted path, as before; copying/binding an
+accepted path does not itself run the routing solver. Its next path evaluation uses
+the selected backend.
 
 Native calls own their selection and solver state; concurrent jobs can use different
 backends safely. No global/thread-local selector, silent fallback, competing worker pool,

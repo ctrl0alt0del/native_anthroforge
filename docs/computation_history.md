@@ -849,7 +849,7 @@ for artifact identity, UI checks and evidence limits.
   [isolated tools](../tools/routing_qp_benchmark/README.md).
 
 
-### CH-020 — User-selectable ROUTED QP backend and consistent capped active sets
+### CH-020 â€” User-selectable ROUTED QP backend and consistent capped active sets
 
 - **2026-10-21; C06; 0.2.3.** The CH-019 benchmark found workload-dependent sparse
   PIQP gains. The user requests an explicit application preference, retaining Custom
@@ -868,11 +868,19 @@ for artifact identity, UI checks and evidence limits.
 - **Preserved:** planner, pins, trust limiting, CCD, outer acceptance, retained corners,
   material bindings, cancellation, result lifetime and failed-result retention. Earlier
   historical points slightly inside surfaces are not moved or excused by this change.
-- **Evidence so far:** 50 focused tests pass, including both backends on 18 compact
-  cold/warm fixtures, independent clearance/pins, concurrent invocation, preferences
-  and dispatch capture. Eleven additional architecture/material workflow checks pass.
-  Native cap regression passes. Actual Preferences QML inspected offscreen; direct
-  selection preserves results and explicit Recalculate uses PIQP for Fibers.
-- **Qualification:** full gate, production timing/shape evidence and portable release
-  remain pending in [the task record](tasks/preferences-routing-023.md). Prior benchmark
-  numbers describe its pinned original Custom implementation, not this consistency fix.
+- **Evidence:** final development gate passes 1,498 tests and four native contracts,
+  including both backends on 18 compact cold/warm fixtures, independent clearance/pins,
+  concurrent invocation, dispatch capture, original ABI and failure retention. Material
+  attachment workflows pass under both backends. Actual Preferences QML inspected
+  offscreen; selection preserves results and explicit evaluation uses PIQP for Fibers.
+- **Performance:** 528 serial production routes over 22 inputs show workload-dependent
+  gains: heavy 256-sample warm Fiber medians 325.55 ms Custom / 61.51 ms PIQP; the actual
+  24-sample cold fixture is 9.21 / 11.82 ms. Shapes inspected; 21/22 inputs clear for both.
+  The known historical skull pin slightly inside Cranium remains unchanged. These are
+  route timings, not UI latency or a universal PIQP advantage. CH-019 numbers describe
+  its pinned original Custom implementation, before the consistency correction.
+- **Qualification:** the canonical 0.2.3 executable passes the complete relocated
+  portable suite, saved/profile provenance, Qt-free headless checks and offscreen UI /
+  hidden-render acceptance. No interactive desktop acceptance is claimed. See
+  [the task record](tasks/preferences-routing-023.md) and
+  [release evidence](development_status.md#preferences-and-routed-backends-023).

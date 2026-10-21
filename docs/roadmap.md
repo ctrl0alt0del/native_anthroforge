@@ -1,6 +1,6 @@
 # AnthroForge release roadmap
 
-- **0.2.3 — release qualification:** Preferences and per-job Custom/sparse PIQP
+- **0.2.3 — qualified:** Preferences and per-job Custom/sparse PIQP
   ROUTED choice, future calculations only. [Contract](specification_023.md),
   [delivery evidence](tasks/preferences-routing-023.md). Schema 4 remains unchanged.
 

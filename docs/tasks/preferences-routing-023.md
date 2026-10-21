@@ -3,7 +3,7 @@
 - Task branch: `codex/preferences-routing-023`
 - Integration branch: `main`
 - Starting revision: `e703c68`
-- Status: in progress
+- Status: implementation and release qualification complete; ready for integration
 - Last updated: 2026-10-21
 - Active writer: desktop chat, direct work
 
@@ -38,14 +38,19 @@ removes a possible out-of-bounds downstream read; no acceptance checks weakened.
 
 ## Verification
 
-50 focused tests passed: both backends on 18 compact cold/warm fixtures, independent
-clearance/pins/layout, concurrent calls, cancellation, preference persistence, running
-and queued dispatch, Manual mode, saved backend provenance, and function limits.
-Development gate passed: 1,494 tests, four native contracts including the active-set cap,
-mypy, native/script style, lint/format and numerics. Subsequent explicit ABI-preserving
-entry points and additional preview/failure/ABI checks pass 53 focused tests, mypy/style.
-Eleven material/architecture checks and actual offscreen Preferences UI pass. No native
-desktop input was used. Final full-suite check and portable release remain pending.
+Final development gate passed: **1,498 tests**, four native contracts including the
+active-set cap, mypy, native/script style, lint/format and numerics. Coverage includes both
+backends on 18 compact cold/warm fixtures, independent clearance/pins/layout, concurrent
+calls, cancellation, preference persistence, running and queued dispatch, Manual mode,
+saved backend provenance, original ABI, preview/failure retention and Qt-free headless use.
+Material/attachment workflows and actual offscreen Preferences interaction pass.
+
+Runtime `98ca740` is packaged in the canonical `dist/0.2.3/AnthroForge.dist`. The complete
+relocated portable suite passes with minimal PATH, including persistence, both backends,
+Fiber evaluation, saved/report provenance and hidden GPU rendering. Actual packaged
+Preferences screenshot inspected. No native desktop input was used; interactive
+acceptance is not claimed. Fiber creation retains its accepted source path; the portable
+probe explicitly evaluates afterward to verify the newly selected backend.
 
 Production comparison: 22 inputs, six alternating AB/BA trials per cold/warm/backend
 (528 routes), full-route timings including setup. The heavy 256-sample attached warm
@@ -56,11 +61,13 @@ remains the known counterexample. All pins/finite/correspondence checks pass. Ov
 actual route geometry was inspected. Local evidence: `build/preferences-023/backends.json`
 and `routes.png`; optional skull input is not committed. No user projects modified.
 
-## Next actions
+## Delivery
 
-1. Complete final gate and package 0.2.3.
-2. Qualify relocated package, headless reports and offscreen Preferences.
-3. Finalize documentation/source archive, merge and push.
+One canonical application and `dist/AnthroForge-0.2.3-source.zip`; validation and artifact
+identities are in [development status](../development_status.md#preferences-and-routed-backends-023).
+Compact [measurement evidence](preferences-routing-evidence.json) is committed. Full logs,
+captures and packaged outputs remain local under `build/` and `dist/`. Final integration
+uses the repository's normal merge/push workflow; no runtime changes followed qualification.
 
 ## Recovery inputs
 

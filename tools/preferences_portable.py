@@ -25,6 +25,14 @@ def construction(backend):
         dict(id="curve", **request("curve.create", engine="ROUTED", points=points)),
         request("wait"),
         request("fiber.create", curve="$curve"),
+        *finish_evaluation(backend),
+    ]
+
+
+def finish_evaluation(backend):
+    return [
+        request("wait"),
+        request("evaluate"),
         request("wait"),
         request("save", path=backend + ".anthroforge", blocked_policy="wait"),
         request("profile.stop", path=backend + ".afprofile.zip", wait=True),

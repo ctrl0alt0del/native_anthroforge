@@ -1,7 +1,47 @@
 # AnthroForge development validation
 
-Current qualification is in [tissue queries, stacking and readable controls](#tissue-queries-stacking-and-readable-controls-022).
+Current qualification is in [preferences and ROUTED backends](#preferences-and-routed-backends-023).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Preferences and ROUTED backends (0.2.3)
+
+Runtime `98ca740bbd36eb9c375eb3717e8cdb59c9c4bef5` adds **Edit → Preferences…** with
+persisted Custom / sparse PIQP selection. Dispatch captures the choice; current results
+and running calculations stay intact. Curves, Fibers and conversion previews share it.
+Schema 4 remains unchanged. The original native entry points retain Custom behavior.
+
+- Development gate: **1,498 tests passed**, four native contracts, mypy (290 files),
+  lint/format, native/script function limits, numerical imports and runtime doctor.
+  Existing 916 Qt deprecation warnings are unchanged.
+- Both strategies pass 18 compact cold/warm routing inputs with independent clearance,
+  exact pins, finite coordinates and correspondence; concurrent backend calls, cancelled
+  work, dispatch changes, failure retention, old ABI and Qt-free headless tests pass.
+- Routed fiber membranes, downstream tissue Base/Final attachments, adaptive corners,
+  reopening and Undo/Redo pass under both backends. Preference changes preserve Manual
+  output until explicit evaluation. Invalid writes preserve the previous setting.
+- Actual QML menu/selector tested and visually inspected offscreen. A relocated Windows
+  executable passes the complete portable suite with minimal PATH, including preference
+  persistence, both routed backends, saved provenance, profiler traces and Preferences
+  smoke capture. Hidden GPU render checks pass; no interactive desktop acceptance is claimed.
+- Six serial AB/BA rounds over 22 inputs, cold/warm and both backends (528 calls), confirm
+  workload-dependent timing. Heavy 256-sample fiber warm medians: **325.55 ms Custom /
+  61.51 ms PIQP**; actual 24-sample four-point cold fixture: **9.21 / 11.82 ms**.
+  Numerical route overlays inspected. These are full-route timings, not UI latency.
+  The historical slightly-inside skull pin remains an independent-clearance failure for
+  both strategies (21/22 inputs clear); no geometry acceptance was weakened to hide it.
+
+Canonical executable: `dist/0.2.3/AnthroForge.dist/AnthroForge.exe`, SHA-256
+`cfb294105fa730e35728cd8d8cea0a58a43290738c87aff1751b3edcf40dbd09`.
+Native DLL SHA-256: `566412ae410217e1dee5461051bd46c41b0b5b5fe17ffa6a6d127bcbd130146b`.
+Companion source: `dist/AnthroForge-0.2.3-source.zip`.
+[Contract](specification_023.md), [task](tasks/preferences-routing-023.md),
+[committed measurement evidence](tasks/preferences-routing-evidence.json).
+Local logs/screenshots: `build/preferences-*`; these are not remote artifacts.
+
+Ownership review: preference persistence is Qt-independent and outside history;
+all actual path evaluators receive captured inputs; native jobs own strategy contexts;
+sparse assembly and solving remain C++; cancellation/publication use the coordinator.
+No automatic threshold, silent fallback, competing executor or per-curve preference exists.
 
 ## Tissue queries, stacking and readable controls (0.2.2)
 

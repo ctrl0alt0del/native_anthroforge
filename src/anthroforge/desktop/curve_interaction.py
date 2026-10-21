@@ -138,9 +138,7 @@ class CurveInteraction(QObject):
     def remember(self, origin, direction):
         self.confirmation = None
         if self.snap:
-            self.confirmation = dict(
-                origin=origin, direction=direction, preview=self.snap["point"], offset=self.offset
-            )
+            self.confirmation = dict(origin=origin, direction=direction, offset=self.offset)
 
     def confirm(self):
         if self.confirmation is None:
@@ -149,17 +147,26 @@ class CurveInteraction(QObject):
         refs = [r for r, _, _ in editor.drag_rows if r.get("curve")]
         targets = [key for key in controller.snap_ids if key != controller.selection]
         controller.session.command(
-            "surface.snap.curves", components=refs, targets=targets, **self.confirmation
+            "surface.snap.curves",
+            components=refs,
+            targets=targets,
+            anchor=snap_row(editor)[0],
+            **self.confirmation,
         )
         self.confirmation = None
 
 
 def snap_anchor(editor):
+    row = snap_row(editor)
+    return row[1] if row else None
+
+
+def snap_row(editor):
     rows = [(ref, world) for ref, world, _ in editor.drag_rows if ref["part"] == "position"]
     preferred = getattr(editor, "drag_anchor", "")
     return next(
-        (world for ref, world in rows if authoring_state.component_key(ref) == preferred),
-        rows[0][1] if rows else None,
+        (row for row in rows if authoring_state.component_key(row[0]) == preferred),
+        rows[0] if rows else None,
     )
 
 

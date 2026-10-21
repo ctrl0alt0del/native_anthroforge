@@ -75,7 +75,7 @@ def evaluate(context: Context, request: Any, cancel: int) -> dict[str, Any]:
     if "samples" in request:
         return sample_changes(context, request, cancel)
     location = destination(context, request, cancel)
-    delta = [v - p for v, p in zip(location, request["preview"], strict=True)]
+    delta = [v - p for v, p in zip(location, anchor_position(context, request), strict=True)]
     changes = {}
     for key in {ref["curve"] for ref in request["components"]}:
         item = curve_edit_state.current(context, context.document.object(key))
@@ -83,6 +83,14 @@ def evaluate(context: Context, request: Any, cancel: int) -> dict[str, Any]:
         changed = shifted(context, item, refs, delta)
         changes[key] = curve_edit_state.prepare(context, item, changed)
     return junction_edits.expand(context, changes)
+
+
+def anchor_position(context: Context, request: Any) -> Any:
+    ref = request["anchor"]
+    item = curve_edit_state.current(context, context.document.object(ref["curve"]))
+    point = junction_edits.point(item, ref["point"])
+    world = curve_sources.world(context.engine, context.document, item.id)
+    return components.transformed(context.engine, [getattr(point, ref["part"])], world)[0]
 
 
 def sample_changes(context: Context, request: Any, cancel: int) -> dict[str, Any]:

@@ -13,7 +13,7 @@ from .construction_policy import revisions
 def request(session: Any, origin: Any, direction: Any, targets: Any) -> str:
     from .snap_tasks import validate_request
 
-    validate_request(True, targets, origin, direction, origin, 0)
+    validate_request(True, targets, origin, direction, 0)
     data = dict(origin=tuple(origin), direction=tuple(direction), targets=tuple(targets), offset=0)
     workspace = workspace_key(session)
     job = make_job(session, data, workspace)

@@ -791,3 +791,12 @@ placement now use the shared confirmed query in coordinator workers. Raw preview
 interactive. Per-sample native intent preserves unsnapped/plane samples. New snapped
 edits supersede obsolete requests; undoing a later edit recovers the original pending
 placement. Four authored-snap lifecycle and five creation/placement tests pass.
+
+Final lifecycle qualification also covers target motion and ordinary transform-parent
+motion during confirmation. The latter exposed double-applied movement when a saved
+preview-world coordinate was reused after a parent update. Confirmed intent now carries
+the selected anchor component identity; dispatch resolves its current world position
+before applying the exterior correction. This preserves multiselection offsets and
+does not add a second undo step. Both new regression cases and the production offscreen
+curve-gesture suite pass. Full development gate at `010a948`: 1,439 tests; the subsequent
+application-only anchor correction is receiving final full-suite/package qualification.

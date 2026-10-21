@@ -181,3 +181,18 @@ dependency archive/configuration and canonical portable packaging. Not merge-rea
 Remaining: full gate completion, offline bundled dependency build and canonical package
 qualification. Added a clean-CLI cavity fixture testing surface confirmation, Fiber and
 Anchor original-material capture; it passes from source and awaits the portable executable.
+
+## Final runtime checkpoint
+
+The complete development gate passed at `010a948`: 1,439 tests, native CTests, all native
+style checks, Python lint/format/typing, PowerShell limits, numerical imports and doctor.
+Bundled source rebuilt `af_boolean` offline with FetchContent downloads disabled.
+The real source also produced `production.afprofile.zip`; native Boolean work appears
+separately in the existing trace without new feature-specific instrumentation.
+
+Two additional lifecycle tests check target motion/Undo and transform-parent motion.
+The latter exposed double movement from reusing a stale preview coordinate. Confirmed
+intent now carries the actual anchor component identity and resolves its current world
+position at dispatch. Six snap lifecycle tests and the production offscreen gesture
+suite pass after this correction. Final full Python suite and rebuilt portable checks
+are next; native code has not changed since the passing complete gate.

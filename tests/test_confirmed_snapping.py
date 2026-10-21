@@ -13,7 +13,6 @@ def confirm(session, target, curve):
         targets=[target],
         origin=[0, 0.25, 2],
         direction=[0, 0, -1],
-        preview=list(point.position),
         offset=0.01,
     )
 
@@ -71,3 +70,28 @@ def test_later_point_edit_supersedes_pending_placement(session):
     session.navigate(-1)
     session.wait()
     assert_location(session, curve)
+
+
+def test_changed_target_restarts_capture_and_undo_recovers_previous_target(session):
+    target, curve = scene(session)
+    confirm(session, target, curve)
+    session.command("scp.transform", entity=target, values=[0, 0, 0.2, 0, 0, 0, 1, 1, 1])
+    session.wait()
+    np.testing.assert_allclose(
+        session.document.object(curve).points[1].position, [0, 0.25, 0.71], atol=1e-6
+    )
+    session.navigate(-1)
+    session.wait()
+    assert_location(session, curve)
+
+
+def test_moving_transform_parent_does_not_double_apply_snap_displacement(session):
+    target, curve = scene(session)
+    session.command("object.reparent", target=curve, parent=target)
+    session.wait()
+    confirm(session, target, curve)
+    session.command("scp.transform", entity=target, values=[0, 0, 0.2, 0, 0, 0, 1, 1, 1])
+    session.wait()
+    np.testing.assert_allclose(
+        session.document.object(curve).points[1].position, [0, 0.25, 0.51], atol=1e-6
+    )

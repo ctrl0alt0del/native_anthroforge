@@ -44,3 +44,17 @@ vertex counts. This establishes shape parity, not final migration acceptance yet
 One-off scripts: `tmp/extract.py`, `tmp/transfer.py`, `tmp/compare.py`; captures and
 baseline/current comparisons are in the external run. `muscles_trial_v001.anthroforge`
 is an intermediate only. Mirror capture/build and lifecycle qualification remain active.
+
+
+Checkpoint: bilateral output has 8 editable tissues, 8 membranes and 22 Fibers.
+All eight inflation surfaces match within 6.4e-7 scene units. Bone edits (SCP13,
+SCP12 and its mirror), eight inflation edits and eight Fiber edits propagate; all
+undos restore geometry. Final copy `skeleton_four_muscles_v001.anthroforge` saved
+revision 2001; startup reaches 2314 without shape changes (max 1.34e-13).
+Original Blender and standalone skeleton SHA-256 hashes remain unchanged.
+`qualification.json`, `comparison.json`, `views/` and `muscle_inventory.html` hold
+actual evidence. Background D3D11 viewport capture is valid with no warnings;
+source/native comparisons have been visually inspected. No interactive claim.
+Full Windows gate: 1653 tests and five native CTests pass, native/script style and
+mypy pass. Additional correspondence/branch/history/source checks: 20 pass.
+Portable packaging/qualification and attachment proximity audit remain in progress.

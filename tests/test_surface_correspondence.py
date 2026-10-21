@@ -104,3 +104,21 @@ def test_invalid_material_station_identity_and_order():
         SurfaceAlignment(stations=(("a", 0), ("b", 0)))
     with pytest.raises(ValueError, match="distinct"):
         SurfaceAlignment(stations=(("a", 0), ("a", 1)))
+
+
+def test_branch_addition_never_discards_authored_mapping(session):
+    from anthroforge.application.surface_branch_operations import appended
+
+    target, _ = setup(session)
+    with pytest.raises(ValueError, match="Realign"):
+        appended(session.document.object(target), None, ())
+
+
+def test_incomplete_mapping_rejects_before_authored_changes(session):
+    target, curves = setup(session)
+    before = session.document
+    values = mapping(session, curves)
+    values[curves[0]] = []
+    with pytest.raises(ValueError, match="endpoints"):
+        session.command("surface.correspondence", target=target, mapping=values, across=[1])
+    assert session.document == before

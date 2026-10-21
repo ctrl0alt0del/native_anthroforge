@@ -26,6 +26,8 @@ def add(session: Any, target: str, boundary: str, curves: list[str]) -> str:
 
 
 def appended(item: Any, branch: SurfaceBranch, uses: tuple[Any, ...]) -> Any:
+    if any(a.stations for a in item.alignment):
+        raise ValueError("Realign the authored material loft before adding a branch.")
     return replace(
         item,
         kind="BRANCHED",

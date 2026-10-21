@@ -81,3 +81,15 @@ and boundary arclength are additional metadata and do not change donor patch geo
 Mean-value boundary transport preserves linear precision under boundary resampling.
 The first harmonic-disk attempt was rejected for attachment drift on unchanged geometry;
 see CH-013 and `tests/test_patch_material_resampling.py`.
+
+
+## Authored open-loft material stations (2026-10-22)
+
+The four-muscle migration exposed the missing `free_surface_stations.py` contract.
+Source SHA-256: `1fa69bbc77bd1abded957a8632174780a941174b0d655fe4b0ffa494c569e363`.
+`surface_correspondence.cpp` maps retained authored-point parameters to material
+stations in C++; normalized accepted axes continue to serve material bindings and
+structural pins. The correspondence belongs to the consumer and is explicitly reset
+by Realign. No numerical Python loop is introduced. Default arclength behavior stays
+unchanged. See CH-031, `tests/test_surface_correspondence.py` and the immutable
+selection/source captures in the external four-muscle migration run.

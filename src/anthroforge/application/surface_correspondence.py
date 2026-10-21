@@ -33,14 +33,12 @@ def aligned(session: Any, use: Any, values: list[Any]) -> SurfaceAlignment:
 def require_points(curve: Any, value: SurfaceAlignment) -> None:
     keys = [point.id for point in curve.points]
     selected = [key for key, _ in value.stations]
-    if (
-        not selected
-        or selected[0] != keys[0]
-        or selected[-1] != keys[-1]
-        or not set(selected).issubset(keys)
-    ):
+    endpoints = selected and selected[0] == keys[0] and selected[-1] == keys[-1]
+    if not endpoints or not set(selected).issubset(keys):
         raise ValueError(
             "Material correspondence must include the source endpoints and existing points."
         )
-    if [keys.index(key) for key in selected] != sorted(keys.index(key) for key in selected):
+    lookup = {key: index for index, key in enumerate(keys)}
+    indices = [lookup[key] for key in selected]
+    if indices != sorted(indices):
         raise ValueError("Material correspondence points must follow source order.")

@@ -22,7 +22,14 @@ def configure(engine: GeometryEngine) -> None:
     import ctypes as c
 
     engine.bind("af_surface_query", [U, U, c.c_int, U], U)
-    engine.bind("af_mesh_storage_bytes", [U], U)
+    engine.bind("af_mesh_retained_bytes", [c.POINTER(U), c.c_int], U)
+
+
+def retained_bytes(engine: GeometryEngine, resources: tuple[Mesh, ...]) -> int:
+    handles = (U * len(resources))(*(mesh.handle for mesh in resources))
+    size = int(engine.library.af_mesh_retained_bytes(handles, len(resources)))
+    engine.check(size == 0)
+    return size
 
 
 def prepare(source: Mesh, base: Mesh | None, mode: Mode, cancel: int = 0) -> Query:
@@ -35,6 +42,6 @@ def prepare(source: Mesh, base: Mesh | None, mode: Mode, cancel: int = 0) -> Que
     engine.check(not handle)
     mesh = Mesh(engine, handle)
     resources = (mesh, source, base) if base else (mesh, source)
-    size = sum(int(engine.library.af_mesh_storage_bytes(m.handle)) for m in resources)
+    size = retained_bytes(engine, resources)
     result = Query(mesh, resources, size)
     return engine.surface_queries.store(key, result, size)

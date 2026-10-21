@@ -30,12 +30,25 @@ Native Boolean code owns geometric eligibility; the shared surface-query adapter
 source/closure correspondence and retaining the original resource. Python retains its
 existing bounded cache and application callers. Any unproven case uses full cleanup.
 
-## Verification and remaining work
+## Current implementation and verification
 
-1. Implement qualification and source reuse, with explicit unsupported/repair reasons.
-2. Test clean/open/closed/temporarily closed surfaces, nesting, crossings, orientation,
-   duplicates/degeneracy, provenance, invalidation, cache and cancellation.
-3. Compare actual query geometry and native timing, run the development/portable gates,
+Shared native qualification and original-mesh reuse are implemented. Conservative
+topology checks route duplicate/degenerate/nonmanifold inputs to the existing builder;
+exact predicates and exterior-cell classification protect crossing/cavity/orientation
+semantics. Source/closure correspondence must cover every original face unchanged.
+The current 63 targeted tests and five native contracts pass, including actual compact
+crossed tissue, Fiber/Anchor material binding and authored-snapping lifecycle cases.
+
+Found and corrected a related existing cache bug: query accounting called the
+draft-only storage function on prepared meshes, silently returning zero. A scoped
+native accounting operation now includes prepared allocations and counts aliases once.
+Byte eviction, oversized bypass and retained leases are covered by regressions.
+
+## Remaining work
+
+1. Compare actual query geometry and native timing against the previous packaged build.
+2. Run the development/portable gates and independent ownership review.
+3. Finalize release artifacts,
    update computation history and release evidence, checkpoint/push and integrate.
 
 Prior experiment is local-only under `build/boolean-prefilter-probe`; actual source is

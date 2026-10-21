@@ -18,7 +18,11 @@ Implementation and downstream-query qualification are tracked in
 The downstream contract is implemented; delivery evidence is recorded in the active task:
 
 - Shared surface queries distinguish Preview and Confirmed Placement. Preview uses
-  the original accepted target; confirmed placement uses a Boolean-cleaned query copy.
+  the original accepted target. Confirmed placement qualifies geometry against the
+  complete exterior-placement contract and retains the original mesh when it already
+  satisfies that contract; otherwise it uses a Boolean-cleaned query copy. Qualification
+  includes topology, intersections, hidden/cavity faces, orientation and original-face
+  correspondence. Absence of intersections alone never establishes eligibility.
   Curve-to-Fiber, Point-to-Anchor and explicit attachment capture use confirmed mode.
   Cleanup never replaces the target, and hit provenance must map back to the original
   material binding. Existing bindings resolve their retained location rather than

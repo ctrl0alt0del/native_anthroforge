@@ -1,6 +1,7 @@
 #include "mesh_internal.hpp"
 #include <mutex>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace af {
 static std::mutex registry_mutex;
@@ -39,6 +40,17 @@ void check_cancel(uint64_t token) {
 }
 }
 const char* af_last_error() { return af::last_error.c_str(); }
+uint64_t af_mesh_retained_bytes(const uint64_t* handles,int count) {
+    try {
+        if(count<0||(count&&!handles)) throw std::runtime_error("Invalid retained mesh handles.");
+        uint64_t total=0; std::unordered_set<const af::Mesh*> seen;
+        for(int i=0;i<count;++i) {
+            const auto value=af::mesh(handles[i]);
+            if(seen.insert(value.get()).second) total+=af::mesh_storage(*value);
+        }
+        return total;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
 int af_mesh_memory_snapshot(uint64_t* rows,int capacity,uint64_t* total_handles) {
     if(capacity<0||!total_handles||(capacity>0&&!rows)) return -1;
     std::lock_guard<std::mutex> lock(af::registry_mutex);

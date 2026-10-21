@@ -4,6 +4,22 @@
 - Baseline: `c5a163f`; status: investigation and benchmark implementation.
 - Writer: current desktop chat, direct work. Background/headless only.
 
+## Checkpoint: isolated adapter qualified
+
+The experimental DLL compiles and loads through the existing GeometryEngine. The
+current backend produces bit-identical samples/parameters and matching counters on
+18 compact cases plus four captured anatomical skull fibers. Sparse/dense PIQP also
+produce collision-clear, exactly pinned complete routes in the pilot. Preliminary
+timings suggest sparse PIQP loses on small problems but wins on the 256-sample snapped
+cube; dense PIQP scales poorly. These are pilot observations, not final timings.
+
+The adapter constructs the same objective/contact/pin equations in C++, retains PIQP
+contexts where dimensions/pattern allow updates, and includes that setup in cost.
+Matched inner-QP diagnostics are separate from uninstrumented complete-route timing.
+Existing current-solver active-set caps can leave active/multiplier lists of unequal
+size; diagnostic stationarity is explicitly unavailable then (no out-of-bounds read
+introduced by the benchmark). No production repair or backend change is included.
+
 ## Request and boundaries
 
 Compare the current routing inner solver with PIQP for performance. Keep the route

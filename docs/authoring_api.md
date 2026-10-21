@@ -825,10 +825,12 @@ See `examples/segment_chain.json` for a portable shared-API workflow.
 ### Retained material correspondence for authored open lofts
 
 `surface.correspondence(target, mapping, across)` installs explicit correspondence
-for an ordinary open Surface or Membrane. `mapping` maps each source curve ID to
+for an open ordinary or branched Surface or Membrane. `mapping` maps each source curve ID to
 ordered `[point_id, station]` pairs, including both endpoints. Stations are finite,
 strictly increasing and start at zero; their final value is normalized by the native
-adapter. `across` supplies one retained insertion count per adjacent curve pair.
+adapter. For ordinary lofts, `across` supplies one retained insertion count per
+adjacent curve pair. For branches use `across=[]`: connector sampling retains its
+existing shared-seam rules, while main and branch curves use their authored stations.
 This operation is useful when reproducing an authored material loft whose sections
 must not move with changing curve arclength. It uses normal topology locks, undo,
 dependency evaluation and resource ownership. It does not import a Blender file.
@@ -836,6 +838,8 @@ dependency evaluation and resource ownership. It does not import a Blender file.
 Stable point IDs survive deformation, persistence and Make Independent. Native
 sampling interpolates additional evaluated points without dropping corners. Removing
 a referenced station fails explicitly and retains the previous result. **Realign**
-resets this explicit mapping. Closed curves, partial source ranges, uniform sampling
-and branched layouts require resetting correspondence first; there is no silent
+resets this explicit mapping. Closed curves, partial source ranges and uniform sampling
+require resetting correspondence first; there is no silent
 replacement with another interpretation. Default loft authoring is unchanged.
+Adding a branch to an already mapped ordinary loft still requires explicit Realign;
+configure the complete assembly's correspondence after establishing its junctions.

@@ -1209,6 +1209,7 @@ See the task and development validation records for final gate/package evidence 
   the saved project without a visible window. This is not interactive acceptance.
 - Scope: explicit stations require complete open ordinary loft inputs and exact
   sampling. They do not silently apply to closed paths, ranges, or branched layouts.
+  CH-033 subsequently extends explicit stations to complete open branched layouts.
 
 ### CH-032 — Query usable triangles without changing authored geometry (2026-10-22)
 
@@ -1233,3 +1234,23 @@ See the task and development validation records for final gate/package evidence 
 - Ownership: filtering and numerical coordinates belong to the shared C++ spatial
   query; Python migration retains ordinary application capture and transactions.
   Full migration, combined development gate and portable qualification are pending.
+
+### CH-033 — Retain correspondence through branch evaluation (2026-10-22)
+
+- Affects S01/S02 and branched tissue base preparation.
+- Observed: the saved deltoid's explicit material stations were absent from the
+  standalone branch adapter. Arclength reconstruction yielded 6646 vertices instead
+  of 859 and a 0.7468 scene-unit maximum two-way vertex-to-surface discrepancy.
+- The shared correspondence operation now accepts all curves of an open branch
+  assembly with empty transverse-density overrides. The branch adapter forwards
+  each consumer's retained alignment to the existing native path/branch pipeline.
+  Native assembly, shared seam identity, connector and inflation algorithms stay unchanged.
+- The one-off transfer additionally retains the source composite surface's normal
+  direction; ignoring that authored setting inverted deltoid inflation. With both
+  correct inputs the 859-vertex output matches within 2.63e-7 scene units.
+- 26 correspondence/branch/native parity tests pass, including shared sections after
+  deformation, exact seam counts, save/reopen/recompute, and invalid-density rejection.
+  Branch addition cannot silently discard an existing ordinary-loft material mapping.
+- Scope remains complete open curves with exact evaluated-corner preservation.
+  Final assembled migration, visual inspection and full development/package gates
+  remain pending; the numerical comparison is not anatomical reapproval.

@@ -7,6 +7,7 @@ from anthroforge.core.scheduling import Workload
 from anthroforge.native import sections
 
 from . import tissue_inspection_stages as stages
+from .inspection_context import scene_signature
 
 
 def inputs(context: Any, target: str, options: Any) -> list[Any]:
@@ -45,7 +46,7 @@ def validate_surface(context: Any, row: Any) -> None:
 
 def signature(context: Any, target: str, options: Any) -> Any:
     validate(context, target, options)
-    return str(context.document.id), context.document.revision, inputs(context, target, options)
+    return scene_signature(context.document), inputs(context, target, options)
 
 
 def workload(context: Any, target: str, options: Any) -> Workload:

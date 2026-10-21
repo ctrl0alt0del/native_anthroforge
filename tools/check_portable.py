@@ -47,6 +47,7 @@ CHECKS = (
     "exterior-only placement, sealed-cavity exclusion and original-material Fiber/Anchor capture",
     "persistent preferences, Custom/PIQP routed curves and fibers, saved/report provenance",
     "accepted tissue stages, displacement, point explanations and advisory geometry reports",
+    "stacking footprints, material brush commit/undo, section cutaways and routed Fiber evidence",
 )
 
 

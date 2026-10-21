@@ -802,3 +802,16 @@ the user. No self-intersection repair or automatic rejection was added. Containm
 penetration depth and a general geometric validity certificate are outside these checks.
 See [the shared API and workflow](docs/authoring_api.md#read-only-tissue-inspection-023)
 and [verification record](docs/tasks/tissue-inspection.md).
+
+## Remaining VCP visual tools (0.2.3)
+
+Implemented the next portions of E03/E05/F07/F09/F11: evaluated provider/receiver support
+footprints and stacking displacement; native field brushes with visible-only default,
+optional Paint Through and one undo per stroke; constraint goal/result witnesses; movable
+section planes with synchronized comparison cutaways and matching picking; optional routed
+curve/Fiber planner/solver/contact evidence. Frozen inspection reports retain the chosen
+view and diagnostic data. These extend the existing evaluators without changing inflation,
+stacking or routing mathematics. Sections are uncapped display cuts, and diagnostic capture
+is bounded. See [workflow](docs/tissues_022.md#visual-tools-023),
+[API](docs/authoring_api.md#stacking-painting-sections-and-route-evidence) and
+[qualification](docs/tasks/vcp-visual-tools.md).

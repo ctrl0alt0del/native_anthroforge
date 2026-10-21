@@ -5,6 +5,7 @@ from math import isfinite
 from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
 from anthroforge.application import tissue_inspection as inspection
+from anthroforge.application.inspection_context import scene_signature
 from anthroforge.native import scene
 
 from . import section_queries
@@ -123,7 +124,7 @@ class SectionTools(QObject):
         if self.controller.selection != self.target or self.controller.authoring.editing:
             return self.cancel()
         context = (
-            id(self.controller.session.document),
+            scene_signature(self.controller.session.document),
             id(self.controller.tissue_inspection.model.displayed),
             self.plane,
         )

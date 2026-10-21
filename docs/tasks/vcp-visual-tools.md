@@ -77,7 +77,15 @@ native CTests and native function-length checks passed before final presentation
 A real 8,192-point footprint exposed a QML reference-sequence stall. Geometry is now copied
 once per change through ViewSnapshot and excluded from small status property maps. The same
 hidden scene completes with profiling on and off. This performance correction still needs
-its regression test and final profiler rerun.
+its regression test and final profiler rerun. Those now pass, including copied snapshot,
+live/frozen route selection, failure/capture limits and camera-save continuity. Final profiles
+are under build/vcp-visual-tools; CH-024–026 records timings and limitations. Contacts and
+stacking displacement were visually inspected. Camera persistence exposed broad revision
+invalidation; signatures now exclude presentation while retaining scene/backend validation.
+Separate ownership review: numerical work remains native; all new queries share the existing
+read-only coordinator; paint commits use authored-field commands; cached inputs own meshes;
+displayed stages/picking share leases; diagnostic traces are bounded and never publish paths.
+No competing scheduler or Python numerical fallback was added.
 
 ## Next actions and blockers
 

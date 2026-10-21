@@ -3,6 +3,7 @@
 from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
 from anthroforge.application import tissue_inspection as inspection
+from anthroforge.application.inspection_context import scene_signature
 from anthroforge.application.tissue_painting import field
 
 from . import tissue_painting_view as view
@@ -98,7 +99,7 @@ class TissuePaintingTools(QObject):
         if press:
             self.cancelStroke()
             self.options = view.capture(self, camera)
-            self.document, self.dragging = self.controller.session.document, True
+            self.document, self.dragging = scene_signature(self.controller.session.document), True
         if self.dragging:
             self.append(position)
         elif not self.options or self.options["view"] != camera:
@@ -147,7 +148,7 @@ class TissuePaintingTools(QObject):
         self.retain_preview()
         if self.controller.selection != self.target or session.active_workspace != self.workspace:
             self.cancel()
-        elif self.document is not None and session.document is not self.document:
+        elif self.document is not None and scene_signature(session.document) != self.document:
             self.cancelStroke()
             self.options = {}
         elif self.commit_job:

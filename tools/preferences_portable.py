@@ -4,6 +4,7 @@ import json
 from zipfile import ZipFile
 
 from construction_portable import request
+from vcp_visual_portable import route
 
 
 def execute(executable, cwd, invoke, name, commands):
@@ -43,6 +44,7 @@ def preferences(executable, cwd, invoke):
     for backend in ("CUSTOM", "PIQP"):
         execute(executable, cwd, invoke, "preferences-" + backend, construction(backend))
         verify(cwd, backend)
+        route(executable, cwd, invoke, backend)
     rows = execute(executable, cwd, invoke, "preferences-reopen", [request("preferences.get")])
     assert rows[0]["result"]["routing_backend"] == "PIQP"
     desktop_preferences(executable, cwd, invoke)

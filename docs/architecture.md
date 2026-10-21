@@ -784,3 +784,9 @@ material identity. Section scope and plane masks are cached for repeated pointer
 Neither sections nor diagnostic paths participate in anatomical attachments/dependencies.
 Goal inspection shares the production region-goal formula; reports distinguish accepted
 source goals from retained bindings resolved against current target geometry.
+
+Inspection signatures distinguish the immutable scene from presentation metadata. Camera
+saves do not invalidate route evidence, section contours or a pending paint stroke; scene
+edits still invalidate the conservative read set. Large overlay arrays cross the Qt boundary
+through `ViewSnapshot` on change. Small status properties exclude geometry; this avoids QML
+reference-sequence getters copying thousands of points repeatedly during bindings/rendering.

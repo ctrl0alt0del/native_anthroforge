@@ -65,3 +65,16 @@ def test_pending_paint_replacement_keeps_previous_colors(controller):
     controller.notify()
     assert primary(controller.tissue_inspection)["handle"] == previous
     tool.cancel()
+
+
+def test_camera_metadata_save_does_not_cancel_active_stroke(controller):
+    target, tool = brush(controller)
+    preview(controller, tool)
+    controller.saveCamera([0, 0, 0, -35, -25, 0, 2.3], True)
+    tool.synchronize()
+    assert tool.dragging and tool.preview
+    tool.release()
+    controller.session.wait()
+    publish(controller)
+    controller.session.wait()
+    assert any(controller.session.document.object(target).fields[0].values)

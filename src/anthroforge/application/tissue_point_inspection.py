@@ -10,12 +10,13 @@ from anthroforge.native import inspection as native
 
 from . import tissue_goal_inspection
 from . import tissue_inspection_stages as stages
+from .inspection_context import scene_signature
 
 
 def signature(context: Any, target: str, options: Any) -> Any:
     from .tissue_inspection import signature as stages_signature
 
-    return context.document.revision, stages_signature(context, target, options)
+    return scene_signature(context.document), stages_signature(context, target, options)
 
 
 def explain(context: Any, target: str, options: Any, cancel: int) -> dict[str, Any]:

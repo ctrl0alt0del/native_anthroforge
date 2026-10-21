@@ -745,7 +745,7 @@ comparison buffers are temporary presentation resources, excluded from project f
 | Operation | Arguments and result |
 | --- | --- |
 | `tissue.inspect.stacking` | `target`, `other`, optional `side="a"`, `other_side="a"`; production support polygons/lines, active support, accepted order, assets and frames. Rejects pending plans. |
-| `tissue.inspect.paint` | `target`, `name`, `stage`, `view`, `samples`, `brush`; optional displayed `expected_asset` and `obstacles=[{asset,frame}]`. Returns a read-only colored field preview and full field values. |
+| `tissue.inspect.paint` | `target`, `name`, `stage`, `view`, `samples`, `brush`; optional displayed `expected_asset` and `obstacles=[{asset,frame}]`. Starts a read-only colored field preview; its completed job token can commit the computed field. |
 | `tissue.field.paint.commit` | `job`; commits a current completed paint preview as one undo action. Stale/cancelled tokens are rejected. |
 | `tissue.inspect.section` | `target`, `stage`, optional `reference`, world `plane=[nx,ny,nz,d]`; optionally explicit displayed `surfaces=[{owner,stage,asset,frame}]`. Returns bounded contours and truncation/coplanar counts. |
 | `curve.inspect.route` | `target`, optional `cold=false`; separate diagnostic calculation with current dispatched preferences. Does not publish geometry. `cold=true` bypasses warm continuation to include planning. |
@@ -782,3 +782,6 @@ is expected. Diagnostic capture is not performed during ordinary solves.
 the frozen report includes the captured trace and restores its selected step without
 rerouting. Tissue exports also preserve current stacking/paint evidence and optional
 `tissue.section={enabled,target,axis,position,flip,cut,wholeScene}` presentation.
+Camera persistence does not invalidate these geometry diagnostics. Authored/accepted scene
+changes invalidate their conservative input signatures. API callers supply visible occluders
+for visible-only painting; the desktop captures them from the displayed scene automatically.

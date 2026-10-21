@@ -3,6 +3,7 @@
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
 from anthroforge.application import tissue_inspection as inspection
+from anthroforge.application.inspection_context import scene_signature
 
 from . import route_inspection_view as view
 
@@ -44,7 +45,7 @@ class RouteInspectionTools(QObject):
 
     def synchronize(self):
         session = self.controller.session
-        if self.frozen_context == (id(session.document), self.controller.selection):
+        if self.frozen_context == (scene_signature(session.document), self.controller.selection):
             return
         self.update_status(session)
 
@@ -67,9 +68,12 @@ class RouteInspectionTools(QObject):
     def read_status(self, session):
         status = inspection.status(session, "route")
         self.status = {k: v for k, v in status.items() if k != "report"}
-        self.report = status.get("report", {}) if status["state"] == "ready" else {}
+        report = status.get("report", {}) if status["state"] == "ready" else {}
+        changed = report is not self.report
+        self.report = report
         self.labels = [view.label(row) for row in self.report.get("records", [])]
-        self.index = max(0, len(self.labels) - 1)
+        if changed:
+            self.index = max(0, len(self.labels) - 1)
         self.refresh()
 
     def refresh(self):
@@ -101,5 +105,6 @@ class RouteInspectionTools(QObject):
         self.status = dict(state="ready", target=self.report["target"])
         self.labels = [view.label(row) for row in self.report.get("records", [])]
         self.index, self.show_contacts = snapshot["index"], snapshot["contacts"]
-        self.frozen_context = (id(self.controller.session.document), self.controller.selection)
+        document = self.controller.session.document
+        self.frozen_context = (scene_signature(document), self.controller.selection)
         self.refresh()

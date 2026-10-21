@@ -18,4 +18,9 @@ Node {
         geometry: ControlGeometry { points: evidence.data.contacts || []; segments: true; stroke: distance*.002 }
         materials: DefaultMaterial { diffuseColor: "#ff7969"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
     }
+    Model {
+        objectName: "routeContactPoints"
+        geometry: ControlGeometry { points: evidence.data.contacts || []; radius: distance*.004 }
+        materials: DefaultMaterial { diffuseColor: "#ff7969"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
+    }
 }

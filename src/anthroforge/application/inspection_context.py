@@ -14,6 +14,18 @@ if TYPE_CHECKING:
     from .session import Session
 
 
+def scene_signature(document: Document) -> tuple[object, ...]:
+    """Conservative geometry read set; camera/workspace/name edits are not geometry inputs."""
+    return (
+        document.id,
+        document.entities,
+        document.controls,
+        document.objects,
+        document.junctions,
+        document.attachments_enabled,
+    )
+
+
 @dataclass(frozen=True)
 class InspectionContext:
     document: Document

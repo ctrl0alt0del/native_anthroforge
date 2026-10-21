@@ -1036,7 +1036,7 @@ for artifact identity, UI checks and evidence limits.
 
 ### CH-026 — Optional route snapshots and material constraint-goal witnesses
 
-- **2026-10-21; C03, A04, T09, Q05, R10; 0.2.3, qualification in progress.** Ordinary
+- **2026-10-21; C06, A04, T09, Q05, R10; 0.2.3, qualification in progress.** Ordinary
   routing previously exposed aggregate counters only. Explicit read-only diagnostic jobs
   now capture bounded world-space reference/planner/seed/trial/final paths and native contact
   witnesses from the same Custom/PIQP execution. Normal solves allocate no trace. Complete
@@ -1056,3 +1056,26 @@ for artifact identity, UI checks and evidence limits.
   target/result divergence pass focused tests. Actual offscreen QML brush strokes, undo,
   Escape, section controls and route action passed. Hidden GPU/profile/portable acceptance
   and the complete development gate remain required before delivery.
+
+### CH-024–026 qualification follow-up
+
+- Actual offscreen QML and hidden D3D11 tests cover painting release/cancel/undo, stacking
+  footprints/displacement, section scopes, routed contacts, failed planning and frozen replay.
+  Routes around the cube and the retained failing-route output were inspected. Contact
+  markers make near-zero-length contact witnesses visible without exaggerating their gaps.
+- An 8,192-point footprint stalled QML activation because geometry crossed reference-sequence
+  getters repeatedly. `ViewSnapshot` now copies geometry once per change; status maps contain
+  metadata only. A regression walks all points and 100 unchanged reads without another Python
+  snapshot call. Both recording-on/off hidden scenes now complete. This fixes presentation
+  transport, not stacking mathematics. Footprints show clipped support polygons, not a merged
+  outer silhouette; dense triangulation and output truncation are explicit limitations.
+- Camera saves exposed overly broad document-revision invalidation. Inspection and brush
+  signatures now compare immutable scene records while excluding workspace/camera metadata.
+  Scene edits and changed backend preferences still invalidate affected evidence. Regression
+  tests preserve live/frozen route steps and active paint across camera saves.
+- Scripted profiler captures: native paint preparation 2.599 ms (one call), two strokes
+  0.166/0.314 ms using the same preparation; section contours 0.164 ms; support footprint
+  8.837 ms; successful cold route diagnosis 11.622 ms. These are inclusive instrumented wall
+  durations on small fixtures. Hidden GPU readback runs do not emit real window presentation
+  intervals, so no display-latency/FPS guarantee follows. Full gate and relocated executable
+  results are recorded in the task/development validation documents.

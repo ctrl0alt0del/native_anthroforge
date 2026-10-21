@@ -25,6 +25,7 @@ def frames(controller, renderer, app, name):
         controller.frame_presented()
         assert not renderer.window.isVisible()
     assert image.save(str(OUTPUT / (name + ".png")))
+    renderer.root.storeCamera()
 
 
 def paint(controller, renderer, app):
@@ -118,4 +119,4 @@ if __name__ == "__main__":
             run(app)
         finally:
             delete(app)
-    print("Hidden painting colors, commit and frozen inspection report passed.")
+    print("Hidden visual tools and frozen inspection report passed.")

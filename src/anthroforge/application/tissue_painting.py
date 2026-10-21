@@ -7,6 +7,7 @@ from anthroforge.native import painting
 from . import tissue_fields, tissue_strategy_operations
 from . import tissue_inspection as inspection
 from . import tissue_inspection_stages as stages
+from .inspection_context import scene_signature
 
 
 def field(context: Any, target: str, options: Any) -> Any:
@@ -39,8 +40,7 @@ def signature(context: Any, target: str, options: Any) -> Any:
     validate(context, target, options)
     inspection.expected_asset(context, target, options)
     return (
-        str(context.document.id),
-        context.document.revision,
+        scene_signature(context.document),
         target,
         stages.signature(context, target, options["stage"]),
         field(context, target, options),

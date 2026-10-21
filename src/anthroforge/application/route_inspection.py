@@ -10,6 +10,7 @@ from anthroforge.core.scheduling import Workload
 from anthroforge.native import routing_trace
 
 from . import curve_evaluation, curve_sources, routing_evaluation, surface_providers
+from .inspection_context import scene_signature
 
 
 def validate(context: Any, target: str, options: Any) -> None:
@@ -28,7 +29,7 @@ def backend(context: Any) -> str:
 
 def signature(context: Any, target: str, options: Any) -> Any:
     validate(context, target, options)
-    return str(context.document.id), context.document.revision, backend(context)
+    return scene_signature(context.document), backend(context)
 
 
 def workload(context: Any, target: str, options: Any) -> Workload:

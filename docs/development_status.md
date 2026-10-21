@@ -1,7 +1,42 @@
 # AnthroForge development validation
 
-Current qualification is in [direct tissue creation and stable inspectors](#direct-tissue-creation-and-stable-inspectors-022).
+Current qualification is in [tissue queries, stacking and readable controls](#tissue-queries-stacking-and-readable-controls-022).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Tissue queries, stacking and readable controls (0.2.2)
+
+Runtime source `7438a627c5cfd83358466356284a892367f22fb1` permits self-intersections
+within one tissue without changing inflation/smoothing formulas. Confirmed placement
+uses a transient exterior query, excludes sealed cavities and temporary closure, and
+captures original material coordinates. Preview retains the original accepted mesh.
+Ambiguous stacking selects the farthest distinct positive hit along the geometric base
+normal. Shared controls wrap labels/choices and reserve whole-pixel natural text widths.
+
+The complete development gate passed at `010a948`, including 1,439 tests, three native
+CTests, native style checks and Python/PowerShell boundary checks. Subsequent application
+corrections pass **1,442 tests**, lint, formatting and typing; native code is unchanged.
+The final QML-only button correction additionally passes hidden GPU checks with four font
+configurations, normal/200% scale, and narrow inspector/popup/menu checks with three fonts.
+Curve gestures, drawing, undo, temporary inspector feedback and headless workflows pass.
+
+The user's unchanged `tissue_create.anthroforge` recomputes successfully at 0.2 and 0.599.
+Its 3,240 original triangles yield 5,127 selectable exterior fragments. Actual query and
+stacking shapes were inspected. A single profiled local query took about 0.693 seconds;
+this measures native work, not application input latency. CGAL remeshing observes
+cancellation between stages, not during its internal exact-intersection call.
+
+The final relocated executable at `7438a62` passes all minimal-PATH workflows, including mixed
+radial/swept tissue conversion after save/reopen, exterior placement, original-material
+Fiber/Anchor capture, stacking and hidden GPU rendering. The final packaged render was
+inspected, including complete X/Ruler labels. Bundled CGAL/Boost headers rebuilt the
+Boolean adapter with FetchContent downloads disabled. No Linux or physical desktop-input
+acceptance is claimed. See [task evidence](tasks/tissue-intersection-policy.md) and
+[CH-016–018](computation_history.md#ch-016--permit-tissue-self-intersections-without-repairing-inflation).
+
+Delivered: one `dist/0.2.2/AnthroForge.dist` and companion source archive.
+Executable SHA-256: `b8c6be0b1f9ffdb9e2eb9e8fdbce9539dffb006f951605edea6a85cae224a3fb`.
+The packaged native DLL matches the qualified development DLL. Source fixture SHA-256
+remains `3cc32677bf56f1f14fafd36dc36572a77d8c0b3ab69e8076f8740dc84a322d28`.
 
 ## Direct tissue creation and stable inspectors (0.2.2)
 

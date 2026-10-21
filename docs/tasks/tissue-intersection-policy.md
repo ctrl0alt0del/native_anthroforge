@@ -3,7 +3,7 @@
 - Task branch: `codex/tissue-intersection-policy`
 - Integration branch: `main`
 - Starting revision: `6918888`
-- Status: implemented; final portable qualification in progress
+- Status: complete and qualified
 - Last updated: 2026-10-21, Europe/Bucharest
 - Active writer: desktop chat, direct work
 
@@ -233,3 +233,25 @@ eliding the short X/Ruler labels. Shared button content now rounds its natural t
 up before layout. Hidden GPU checks cover platform-default, Segoe UI, Arial and Tahoma
 without showing a window; ordinary inspector checks cover the latter three fonts too.
 This QML-only correction receives refreshed packaging and visual qualification next.
+
+## Final qualification and delivery
+
+Runtime `7438a627c5cfd83358466356284a892367f22fb1` passes every relocated/minimal-PATH
+portable check, including automatic attached construction, exterior-only placement,
+sealed-cavity exclusion, original-material Fiber/Anchor capture, tissue stacking,
+profiling, persistence, GUI smoke checks and hidden GPU rendering. Inspected the final
+packaged tissue render; short X/Ruler labels now fit. Final numerical/application suite:
+1,442 passed. The QML-only follow-up passes architecture limits and the four-font hidden
+renderer plus three-font inspector checks at normal and 200% scale.
+
+The complete native/development gate, actual crossed-tissue and folded-provider evidence,
+offline bundled-header build and ownership review are recorded above. No runtime work
+remains. Final documentation/source delivery follows the normal validated merge workflow.
+One canonical `dist/0.2.2/AnthroForge.dist` is replaced in place, with one companion
+`dist/AnthroForge-0.2.2-source.zip`; qualification copies remain under ignored `build/`.
+See [current validation](../development_status.md#tissue-queries-stacking-and-readable-controls-022).
+
+Limits: validation is Windows/offscreen/hidden-render only; no physical desktop interaction
+or Linux acceptance is claimed. Exact CGAL remeshing cancels between stages. Inflation
+self-intersections remain intentional, and skin handling remains deferred. The original
+user project is unchanged; the unrelated root `__init__.py` remains untouched.

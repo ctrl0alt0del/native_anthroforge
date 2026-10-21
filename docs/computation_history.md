@@ -807,3 +807,13 @@ a CURVE material base is a retained path, not a missing mesh. Only SURFACE const
 supplies the accepted backing mesh for temporary closure. Radial/swept generated shells
 remain queryable without that mesh. The save/reopen/conversion regression passes alongside
 the sealed-cavity and original-material tests; no resource or geometry is substituted.
+
+CH-016–018 final qualification: runtime `7438a62` passes the complete relocated Windows
+portable suite with minimal PATH, including cavity-safe confirmed placement, mixed-tissue
+conversion after reopening, retained material bindings, stacking and hidden rendering.
+Final application/numerical suite: 1,442 passed; full native/development gate passed at
+`010a948`, with unchanged native code afterward. Actual query/stacking shapes were inspected.
+The user source file is unchanged. The native query is visible separately in the existing
+profiler (about 0.693 seconds in one local run, not an input-latency measurement).
+Bundled CGAL/Boost headers compile offline. See the [current validation record](development_status.md#tissue-queries-stacking-and-readable-controls-022)
+for artifact identity, UI checks and evidence limits.

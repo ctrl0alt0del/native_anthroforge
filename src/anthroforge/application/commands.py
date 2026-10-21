@@ -61,6 +61,7 @@ EDITS = {
     "tissue.stacking.remove": tissue_stack_operations.remove,
     "tissue.smoothing": tissue_part_operations.smoothing,
     "tissue.connector": tissue_part_operations.connector,
+    "tissue.side.copy": tissue_part_operations.copy_side,
     "tissue.profile.reset": tissue_part_operations.profile_reset,
     "tissue.control.reset": tissue_part_operations.control_reset,
     "tissue.crop": tissue_strategy_operations.crop,

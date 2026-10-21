@@ -28,13 +28,19 @@ Manual provenance, stable editing layouts and existing topology/relationship rul
 
 ## Current state
 
-Read current specification, engineering guidelines, addon side tools and standalone
-evaluation boundaries. No implementation edits yet. Unrelated root `__init__.py` preserved.
+Boundary Power, copy-side controls and stacking group/discovery allowance are implemented.
+Group and allowance participate in dispatch read validation and targeted plan invalidation;
+changes reuse intrinsic geometry. Explicit pairs may override group suppression as in the
+addon. Shared copy-side operation copies inflation and smoothing, preserves inactive parts,
+and uses existing capability/topology checks. Profile scaling remains pending implementation
+and the user's UI choice. Unrelated root `__init__.py` preserved.
 
 ## Verification
 
-Pending shared-operation/lifecycle tests, native checks, actual offscreen QML editing and
-visual inspection, development gate, and canonical portable-package qualification.
+23 focused authoring, stacking lifecycle/group and architecture tests pass. Initial tests
+used a nonexistent smoothing `enabled` field; corrected to its supported radius setting.
+Pending proportional profile tests, native discovery bounds evidence, actual offscreen QML
+editing/visual inspection, development gate, and canonical portable-package qualification.
 
 ## Next actions and blockers
 

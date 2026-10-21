@@ -7,7 +7,7 @@ SETTINGS = {
     "base": frozenset(("source", "resolution")),
     "rest": frozenset(("parts", "both_sides", "reverse", "fields")),
     "intrinsic": frozenset(("relaxation", "constraints", "crop")),
-    "plan": frozenset(("stacking", "stack_settings", "stack_relationships")),
+    "plan": frozenset(("stacking", "stack_settings", "stack_relationships", "group")),
     "final": frozenset(),
 }
 

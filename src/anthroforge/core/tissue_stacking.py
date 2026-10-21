@@ -14,11 +14,25 @@ class StackSettings:
     blend: float = 1.0
     preservation: float = 100.0
     adjustment: float = 4.0
+    displacement: float = 0.5
 
     def __post_init__(self) -> None:
-        for name in ("search", "clearance", "radius", "strength", "blend", "adjustment"):
+        for name in (
+            "search",
+            "clearance",
+            "radius",
+            "strength",
+            "blend",
+            "adjustment",
+            "displacement",
+        ):
             finite_range(getattr(self, name), 0, 1000, "Stacking " + name)
         finite_range(self.preservation, 1, 1000000, "Stacking preservation")
+
+
+def validate_group(value: str) -> None:
+    if not isinstance(value, str) or len(value) > 256 or value != value.strip():
+        raise ValueError("Stacking group must be a trimmed name of at most 256 characters.")
 
 
 @dataclass(frozen=True, slots=True)

@@ -44,6 +44,7 @@ ColumnLayout {
         TissueControl { visible: panel.inflation.mode === "CTRL_POINT"; inflation: panel.inflation; canManipulate: !inflationDraft.editing; onEdited: (key,value)=>panel.inflate(key,value); onResetRequested: inflationDraft.reset("CONTROL"); onEditRequested: authoring.editTissueControl(panel.part.id,panel.side) }
         NumericSetting { visible: panel.muscleMode; label: "Boundary band · samples"; value: panel.inflation.boundary_band || 0; onEdited: value => panel.inflate("boundary_band",value) }
         NumericSetting { visible: panel.muscleMode; label: "Boundary attenuation"; value: panel.inflation.boundary_strength || 0; onEdited: value => panel.inflate("boundary_strength",value) }
+        NumericSetting { objectName: "tissueBoundaryPower"; visible: panel.muscleMode; label: "Boundary power"; minimum: 0.0001; maximum: 1000; value: panel.inflation.boundary_power ?? 1; hint: "Shape the inflation transition away from the boundary"; onEdited: value => panel.inflate("boundary_power",value) }
         NumericSetting { visible: panel.muscleMode; label: "Longitudinal taper"; value: panel.inflation.length_taper || 0; onEdited: value => panel.inflate("length_taper",value) }
         NumericSetting { visible: panel.inflation.mode === "NORMAL"; label: "Minimum thickness"; length: true; value: panel.inflation.minimum || 0; onEdited: value => panel.inflate("minimum",value) }
         NumericSetting { visible: ["NORMAL","PROFILE"].includes(panel.inflation.mode); label: "Profile power"; value: panel.inflation.power ?? 1; onEdited: value => panel.inflate("power",value) }
@@ -56,6 +57,7 @@ ColumnLayout {
         }
         UiCheck { visible: panel.selected.tissue_domain !== "POINT"; text: "Reverse side"; checked: panel.item.reverse || false; onClicked: panel.configure("reverse",checked) }
         UiCheck { objectName: "tissueBothSides"; visible: panel.muscleMode; text: "Two-sided envelope"; checked: panel.item.both_sides || false; onClicked: panel.configure("both_sides",checked) }
+        TissueSideCopy { visible: panel.muscleMode && panel.item.both_sides; enabled: !inflationDraft.editing; target: panel.selected.id; part: panel.part.id || "main"; multipleParts: (panel.item.parts || []).length>1 }
     }
     UiSection {
         visible: panel.part.id !== "main"; title: "Branch connector"; expanded: false

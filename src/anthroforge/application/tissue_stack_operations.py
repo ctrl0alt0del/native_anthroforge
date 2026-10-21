@@ -90,6 +90,7 @@ def inspect(session: Any, target: str) -> dict[str, Any]:
     if not isinstance(item, TissueVCP):
         raise ValueError("Select a tissue to inspect stacking.")
     return dict(
+        group=item.group,
         settings=asdict(item.stack_settings),
         intent=[asdict(r) for r in item.stack_relationships],
         plan=asdict(item.stack_plan),

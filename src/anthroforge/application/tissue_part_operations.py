@@ -17,6 +17,30 @@ def selected(item: Any, part: str) -> Any:
     return value
 
 
+def copy_side(
+    session: Any,
+    target: str,
+    source: str,
+    destination: str,
+    part: str = "main",
+    all_parts: bool = False,
+) -> None:
+    item = tissue_operations.tissue(session, target)
+    parts = copied_sides(item, source, destination, part, all_parts)
+    updated = replace(item, parts=tissue_parts.installed(item, parts))
+    tissue_operations.install_inflation(session, item, updated)
+
+
+def copied_sides(item: Any, source: str, destination: str, part: str, all_parts: bool) -> Any:
+    if {source, destination} != {"a", "b"} or type(all_parts) is not bool:
+        raise ValueError("Copy requires opposite sides A/B and a Boolean all_parts flag.")
+    selected(item, part)
+    return tuple(
+        replace(p, **{destination: getattr(p, source)}) if all_parts or p.id == part else p
+        for p in tissue_parts.active(item)
+    )
+
+
 def connector(session: Any, target: str, part: str, width: float, fullness: float) -> None:
     item = tissue_operations.tissue(session, target)
     if part == "main":

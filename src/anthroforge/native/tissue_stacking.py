@@ -35,8 +35,15 @@ class MaterialLease:
         if getattr(self, "handle", 0):
             self.engine.library.af_tissue_stack_release(self.handle)
 
-    def domain(self, identity: int, family: int = 0, root: int = 0, enabled: bool = True) -> Domain:
-        result = Domain(id=identity, family=family, root=root, enabled=enabled, allowance=0.5)
+    def domain(
+        self,
+        identity: int,
+        family: int = 0,
+        root: int = 0,
+        enabled: bool = True,
+        allowance: float = 0.5,
+    ) -> Domain:
+        result = Domain(id=identity, family=family, root=root, enabled=enabled, allowance=allowance)
         self.engine.check(self.engine.library.af_tissue_stack_domain(self.handle, c.byref(result)))
         return result
 

@@ -1,5 +1,6 @@
 """Candidate observations invalidate plans without creating anatomical prerequisites."""
 
+import json
 from typing import Any
 
 from anthroforge.core.results import Port
@@ -9,17 +10,30 @@ from .tissue_stack_scene import participants
 
 
 def membership(document: Any) -> tuple[str, ...]:
-    return tuple(sorted(item.id for item in participants(document)))
+    return tuple(
+        sorted(
+            json.dumps((item.id, item.group, item.stack_settings.displacement))
+            for item in participants(document)
+        )
+    )
 
 
 def signature(item: TissueVCP) -> tuple[Any, ...]:
     return (
-        item.stacking,
-        item.intrinsic_material,
+        planning_inputs(item),
         item.final_result.asset,
-        item.intrinsic_result.error,
         item.final_result.error,
         item.stack_relationships,
+    )
+
+
+def planning_inputs(item: TissueVCP) -> tuple[Any, ...]:
+    return (
+        item.stacking,
+        item.intrinsic_material,
+        item.intrinsic_result.error,
+        item.group,
+        item.stack_settings.displacement,
     )
 
 
@@ -49,12 +63,7 @@ def invalidate(session: Any, targets: set[str]) -> None:
 def affected(document: Any, changes: set[str], old: Any, current: Any) -> set[str]:
     targets = {o.id for o in document.objects if isinstance(o, TissueVCP) and o.stacking}
     for key in changes:
-        if (
-            key in old
-            and key in current
-            and old[key][:2] == current[key][:2]
-            and old[key][3] == current[key][3]
-        ):
+        if key in old and key in current and old[key][0] == current[key][0]:
             targets.discard(key)
     return targets
 

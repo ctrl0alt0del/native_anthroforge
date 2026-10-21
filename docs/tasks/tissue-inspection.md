@@ -53,6 +53,25 @@ canonical 0.2.3 package qualification. Preserve unrelated root __init__.py.
 1. Run final full gate; qualify one canonical 0.2.3 executable and source archive.
 2. Record final evidence, review ownership/coupling and merge the validated task.
 
+The interruption stopped the final gate during pytest and the package during Nuitka.
+Both were restarted from pushed checkpoint `0561d8718986573a37fd31d1d7a10c737bcd4971`.
+The resumed offscreen control test and hidden GPU/report replay both pass. Inspector
+text/layout and the crossing-face guides were visually reviewed with Windows fonts
+available to the offscreen platform. The previous executable is not the final candidate.
+
+## Ownership review
+
+Direct review, separate from test results: numerical comparison, material interpolation,
+region influence and triangle checks live in native code. Shared application operations
+own frozen inputs and revision checks; the existing coordinator owns cancellation and
+read-only job lifetime. The existing Issues provider contract now distinguishes requested
+checks from automatic checks. Desktop adapters own view state and replay, never anatomy.
+Staged rows retain their buffer type, frame and picking resource together; the shared
+geometry-model list includes inspection during draining, activation and resource accounting.
+No extra worker pool, document revision stream or numerical Python fallback was introduced.
+The native findings adapter shares the existing stacking translation unit because its
+internal geometry helpers are not separately linkable; the exported query stays narrow.
+
 ## Current evidence
 
 `tools/tissue_inspection_ui.py` exercises direct controls with the offscreen platform.

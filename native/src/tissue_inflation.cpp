@@ -65,7 +65,7 @@ static std::shared_ptr<Mesh> evaluate(const Mesh& source,const AfTissueInflation
     auto vertices=source.vertices;
     for(size_t i=0;i<points.size();++i) vertices.row(grids.front().indices[i])=points[i];
     auto result=deform_mesh(source,vertices,cancel,source.prepared);
-    quality::validate(source,*result,cancel);
+    quality::validate_tissue(source,*result,cancel);
     result->tissue=tissue_identity(4,vertices.rows(),int64_t(result->offsets.size())-1);
     result->basis=material_basis(source);
     return result;

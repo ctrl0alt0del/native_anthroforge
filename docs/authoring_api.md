@@ -544,12 +544,12 @@ source/preset combinations fail before creation. All presets use the same Tissue
 it never reapplies defaults or changes stacking. See [release validation](development_status.md#unified-tissues-022)
 for numerical/visual evidence and its limits.
 
-Intrinsic acceptance checks relaxation for newly introduced transverse self-intersections
-and collapsed faces. Failed candidates retain the last accepted geometry and expose the
-reason in Issues. `ITERATION_LIMIT` alone remains a warning for geometrically usable output.
-Pouch defaults can fail on strongly curved/thick sources; change parameters explicitly.
-The low-level native relaxation adapter remains available for parity qualification, but
-application publication always uses the shared acceptance check.
+Tissue acceptance checks finite coordinates, canonical connectivity and newly collapsed
+faces. Self-intersections within one tissue are explicitly permitted; inflation and
+smoothing formulas are unchanged. Failed candidates retain the last accepted geometry
+and expose the reason in Issues. `ITERATION_LIMIT` alone remains a warning for usable
+output. The low-level native relaxation adapter and application share this acceptance
+policy. Strict crossing diagnostics remain available separately.
 
 `tissue.crop(target, changes)` accepts `enabled`,
 local `origin`/`normal` and `positive` half-space settings. Cropping acts in base material
@@ -639,3 +639,17 @@ normal shared transactions and topology/capability validation.
 `radius`, `strength` and `maximum_change` for muscle grid inflation. Unsupported mode
 combinations fail shared validation. Accepted rest diagnostics include part/side, fixed
 sample count, KKT residuals and solver duration; they are separate from relaxation reports.
+## Surface placement modes
+
+Preview picking reads the original accepted surface. Confirmed surface placement uses
+an in-memory exterior query mesh; buried and sealed-cavity faces and temporary closure
+are not selectable. Attachments retain original source triangle/material coordinates.
+Existing deformation resolves those coordinates without automatic nearest-surface rebinding.
+
+`drawing.project` accepts `mode="PREVIEW"` (default) or `"CONFIRMED"` and role-aware
+surface references. This explicit numerical query is synchronous. Desktop gestures use
+coordinator jobs instead: `surface.snap.curves`, `surface.snap.points`, and
+`cursor.place.surface`. `curve.create`, `curve.branch.create`, and `curve.draw` may carry
+owned `projection={targets, queries}` intent; each query row is ray origin XYZ, direction
+XYZ, offset, and hit flag. Unsnapped samples remain unchanged. Completed confirmation is
+part of the initiating undo step; a newer authored curve edit supersedes pending placement.

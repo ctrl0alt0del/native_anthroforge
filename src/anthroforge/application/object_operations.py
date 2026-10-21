@@ -101,11 +101,26 @@ def create_curve(
     closed: bool = False,
     values: list[float] | None = None,
     settings: dict[str, Any] | None = None,
+    projection: Any = None,
 ) -> str:
-    config = curve_engines.decode(engine, settings)
-    curve = replace(new_curve(name, points, parent, owner), engine_settings=config, closed=closed)
+    curve = definition(name, points, parent, owner, engine, settings, closed)
     curve = replace(curve, matrix=creation_frame(session, parent, values))
-    return install_new_curve(session, curve)
+    return install_placed_curve(session, curve, projection)
+
+
+def definition(
+    name: str, points: Any, parent: str, owner: str, engine: str, settings: Any, closed: bool
+) -> Curve:
+    config = curve_engines.decode(engine, settings)
+    return replace(new_curve(name, points, parent, owner), engine_settings=config, closed=closed)
+
+
+def install_placed_curve(session: "Session", curve: Curve, projection: Any) -> str:
+    from .snap_tasks import confirm_samples
+
+    result = install_new_curve(session, curve)
+    confirm_samples(session, result, projection)
+    return result
 
 
 def creation_frame(

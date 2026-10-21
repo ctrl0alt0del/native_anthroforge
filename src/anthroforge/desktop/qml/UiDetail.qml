@@ -10,8 +10,6 @@ RowLayout {
     Layout.fillWidth: true; spacing: Theme.gap
     Label { text: detail.label; color: Theme.muted; Layout.preferredWidth: detail.labelWidth; wrapMode: Text.WordWrap }
     Label {
-        text: detail.value; color: Theme.text; Layout.fillWidth: true; elide: Text.ElideRight
-        ToolTip.visible: hovered.hovered && truncated; ToolTip.text: text
-        HoverHandler { id: hovered }
+        text: detail.value; color: Theme.text; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.Wrap
     }
 }

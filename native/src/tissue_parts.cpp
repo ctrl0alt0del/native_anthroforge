@@ -69,7 +69,7 @@ std::shared_ptr<Mesh> inflate_parts(const Mesh& source,const AfTissueInflation* 
     share_displacements(source,grids,seams,values);
     connect_parts(grids,seams,values,(settings[0].reverse!=0)!=grid_reversed(source,grids[0]),cancel);
     auto result=assemble(source,grids,values,cancel);
-    quality::validate(source,*result,cancel);
+    quality::validate_tissue(source,*result,cancel);
     return result;
 }
 }

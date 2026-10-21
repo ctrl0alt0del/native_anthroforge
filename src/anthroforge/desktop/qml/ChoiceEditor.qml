@@ -27,7 +27,7 @@ ColumnLayout {
             Label { text: panel.title; color: Theme.text }
             Label { text: panel.summary; color: Theme.muted; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
         }
-        UiButton { id: expand; objectName: panel.objectName+"Toggle"; text: checked ? "Close" : "Edit…"; checkable: true }
+        UiButton { id: expand; objectName: panel.objectName+"Toggle"; text: checked ? "Close" : "Edit"; checkable: true }
     }
     ColumnLayout {
         visible: expand.checked; Layout.fillWidth: true; spacing: Theme.gap

@@ -155,10 +155,7 @@ def picking_inputs(controller, rows):
 
 
 def snapping_inputs(controller, rows):
-    anatomy = controller.session.document.index.entities
-    eligible = [
-        row for row in rows if row["id"] in anatomy and row["surface_visible"] and row["handle"]
-    ]
+    eligible = snapping_rows(controller.session.document, rows)
     controller.snap_ids = [row["id"] for row in eligible]
     controller.snap_handles = np.array([row["handle"] for row in eligible], dtype=np.uint64)
     controller.snap_matrices = np.ascontiguousarray(
@@ -167,6 +164,27 @@ def snapping_inputs(controller, rows):
             for row in eligible
         ],
         dtype=np.float64,
+    )
+
+
+def snapping_rows(document, rows):
+    anatomy = document.registry.anatomy
+    return [
+        row
+        for row in rows
+        if row["id"] in anatomy
+        and row["surface_visible"]
+        and row["handle"]
+        and ready_surface(anatomy[row["id"]], row)
+    ]
+
+
+def ready_surface(item, row):
+    from anthroforge.core.anatomical_surfaces import usable
+    from anthroforge.core.tissues import TissueVCP
+
+    return not isinstance(item, TissueVCP) or (
+        usable(item.final_result) and row["geometry_asset"] == item.final_result.asset
     )
 
 

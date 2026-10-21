@@ -1,11 +1,13 @@
+add_subdirectory(boolean)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
+    src/surface_query.cpp src/surface_query_closure.cpp
     src/mesh_registry.cpp src/transforms.cpp src/spatial.cpp src/ray_queries.cpp src/surface_snap.cpp src/attachment.cpp src/material_domain.cpp src/material_axes.cpp
     src/construction_mesh.cpp src/curves.cpp src/loft.cpp src/curve_body.cpp
     src/hooks.cpp src/lattices.cpp src/solidify.cpp src/component_queries.cpp src/curve_deform.cpp
     src/mesh_topology.cpp src/mesh_equivalence.cpp src/curve_frames.cpp src/curve_mapping.cpp src/component_index.cpp
     src/curve_queries.cpp src/influence.cpp src/control_geometry.cpp src/measurement.cpp
     src/path_registry.cpp src/path_presentation.cpp src/image.cpp src/image_placement.cpp
-    src/curve_fit.cpp src/drawing.cpp src/attachment_weights.cpp src/path_editing.cpp
+    src/curve_fit.cpp src/drawing.cpp src/placement.cpp src/attachment_weights.cpp src/path_editing.cpp
     src/routing.cpp src/routing_world.cpp src/routing_scene.cpp src/routing_reference.cpp src/routing_solve.cpp
     src/routing_planner.cpp src/routing_candidates.cpp src/routing_surface.cpp src/routing_handoff.cpp
     src/routing_mesh_surface.cpp src/routing_shells.cpp src/routing_access.cpp src/routing_roadmap.cpp
@@ -25,7 +27,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/material_basis.cpp src/material_chart.cpp src/material_chart_query.cpp src/material_binding_frames.cpp
     src/material_cage.cpp src/material_mean_value.cpp
     src/tissue_relaxation.cpp src/tissue_geometric.cpp src/tissue_static.cpp src/tissue_point_relaxation.cpp
-    src/stacking.cpp src/tissue_stacking.cpp src/tissue_stack_material.cpp
+    src/stacking.cpp src/stacking_normal_support.cpp src/tissue_stacking.cpp src/tissue_stack_material.cpp
     src/tissue_stack_directions.cpp src/tissue_stack_geometry.cpp src/tissue_stack_constraints.cpp
     src/tissue_stack_assembly.cpp src/material_pins.cpp src/material_pin_equations.cpp src/surface_material_pins.cpp)
 
@@ -34,7 +36,7 @@ add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_corners_detect.c
     vendor/curve_fit_nd/intern/generic_heap.c)
 set_target_properties(af_curve_fit PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(af_native PRIVATE af_curve_fit)
+target_link_libraries(af_native PRIVATE af_curve_fit af_boolean)
 target_include_directories(af_native PUBLIC include)
 target_include_directories(af_native PRIVATE migration/smoothing/include)
 target_include_directories(af_native SYSTEM PRIVATE vendor)

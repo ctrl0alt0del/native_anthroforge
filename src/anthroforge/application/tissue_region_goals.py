@@ -5,7 +5,7 @@ from typing import Any, cast
 from anthroforge.native import binding_batches, components, point_attachments
 from anthroforge.native.binding_batches import BindingBatch
 
-from . import surface_providers, tissue_fields
+from . import surface_providers, surface_queries, tissue_fields
 from .object_frames import Frames
 
 
@@ -16,9 +16,9 @@ def capture(
     frame = Frames(engine, document).world(item.id)
     positions = components.transformed(engine, mesh.array(0), frame)
     provider = surface_providers.get(engine, document, resources.meshes, reference)
-    _, records = point_attachments.capture(
-        engine, [provider.resource.mesh.handle], [provider.frame], positions, cancel=cancel
-    )
+    surfaces = surface_queries.inputs(engine, document, resources.meshes, [reference], cancel)
+    handles, frames = surfaces
+    _, records = point_attachments.capture(engine, handles, frames, positions, cancel=cancel)
     _, signature = tissue_fields.mesh_domain(mesh)
     return BindingBatch(records), provider.asset_id, signature
 

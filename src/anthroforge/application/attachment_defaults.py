@@ -18,6 +18,7 @@ def candidates(document: Any) -> tuple[Any, ...]:
 
 def nearest(engine: Any, document: Any, resources: Any, positions: Any, cancel: int) -> Any:
     targets = candidates(document)
-    handles, frames = attachment_assets.surface_inputs(engine, document, resources.meshes, targets)
+    surfaces = attachment_assets.surface_inputs(engine, document, resources.meshes, targets, cancel)
+    handles, frames = surfaces
     owners, _ = point_attachments.capture(engine, handles, frames, positions, cancel=cancel)
     return tuple(targets[index] for index in owners)

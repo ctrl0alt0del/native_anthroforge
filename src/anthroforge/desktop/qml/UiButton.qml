@@ -21,7 +21,8 @@ Button {
     ToolTip.text: hint
     ToolTip.delay: 500
     contentItem: Item {
-        implicitWidth: (icon.visible ? 16 : 0) + (label.visible ? label.implicitWidth : 0) + (icon.visible && label.visible ? 6 : 0)
+        // Layout rounds child widths to pixels; reserve the full text advance first.
+        implicitWidth: (icon.visible ? 16 : 0) + (label.visible ? Math.ceil(label.implicitWidth) : 0) + (icon.visible && label.visible ? 6 : 0)
         implicitHeight: Math.max(icon.visible ? 16 : 0, label.visible ? label.implicitHeight : 0)
         RowLayout {
             width: Math.min(parent.width, parent.implicitWidth); height: parent.height

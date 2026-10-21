@@ -18,7 +18,7 @@ static void base_signature(std::string& key,const Side& side) {
 }
 static std::string solve_signature(const Side& side,const State& state,const Material& material) {
     std::string key;base_signature(key,side);signature_vector(key,side.own);
-    key+="vector-localized-v1";signature_array(key,&state.vector_settings.blend,1);signature_array(key,&state.vector_settings.preservation,1);signature_array(key,&state.vector_settings.adjustment,1);
+    key+="vector-localized-normal-support-v2";signature_array(key,&state.vector_settings.blend,1);signature_array(key,&state.vector_settings.preservation,1);signature_array(key,&state.vector_settings.adjustment,1);
     double settings[]={state.settings.clearance,state.settings.maximum,state.settings.radius,state.settings.strength,state.bases.settings.area,state.bases.settings.epsilon};signature_array(key,settings,6);
     af_stack_vector::material_signature(key,material);
     policy_signature(key,state,side.id);

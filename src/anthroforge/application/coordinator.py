@@ -183,7 +183,9 @@ class TaskCoordinator:
             if job.active and (job.outputs | job.reads).intersection(affected):
                 self.cancel_job(job.id, obsolete=True, reason=reason, restart=True)
 
-    def invalidate_ports(self, affected: set[Port], reason: str = "input_output_changed") -> None:
+    def invalidate_ports(
+        self, affected: set[Port], reason: str = "input_output_changed", source: str = ""
+    ) -> None:
         causes.invalidated(self, affected, reason, ports=True)
         owners = {port.owner for port in affected}
         for job in self.registry.matching("port", affected) + self.registry.matching(
@@ -191,7 +193,7 @@ class TaskCoordinator:
         ):
             reads = job.observes | job.prerequisites | job.provides
             legacy = not reads and bool((job.outputs | job.reads) & owners)
-            if job.active and (bool(reads & affected) or legacy):
+            if job.id != source and job.active and (bool(reads & affected) or legacy):
                 self.cancel_job(job.id, obsolete=True, reason=reason, restart=True)
 
     def retry(self, job_id: str) -> Any:

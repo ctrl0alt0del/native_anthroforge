@@ -66,7 +66,7 @@ def recapture(
     assert item.edit is not None
     path, records, world = geometry.path, geometry.records, geometry.world
     targets = item.edit.candidates
-    surfaces = attachment_assets.surface_inputs(engine, document, resources.meshes, targets)
+    surfaces = attachment_assets.surface_inputs(engine, document, resources.meshes, targets, cancel)
     field = attachment_fields.capture(
         engine, surfaces, capture_request(item, path, records, world), cancel
     )

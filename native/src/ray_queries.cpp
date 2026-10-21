@@ -61,4 +61,21 @@ bool intersect_ray(const Mesh& mesh,const V3& origin,const V3& ray,RayHit& hit) 
     if(!mesh.triangles.rows()) return false;
     return ray_tree(mesh,mesh.tree,pick_ray(origin,ray),hit);
 }
+static void ray_span(const Mesh& mesh,const igl::AABB<Vertices,3>& tree,const PickRay& ray,RayHit& first,RayHit& last) {
+    if(!ray_box(tree.m_box,ray.origin,ray.direction,INFINITY)) return;
+    if(!tree.is_leaf()) {
+        ray_span(mesh,*tree.m_left,ray,first,last); ray_span(mesh,*tree.m_right,ray,first,last); return;
+    }
+    RayHit hit; hit.t=INFINITY;
+    if(!leaf_hit(mesh,tree.m_primitive,ray,hit)) return;
+    if(hit.t<first.t) first=hit;
+    if(hit.t>last.t) last=hit;
+}
+bool intersect_ray_span(const Mesh& mesh,const V3& origin,const V3& ray,RayHit& first,RayHit& last) {
+    if(!origin.allFinite()||!ray.allFinite()||ray.squaredNorm()==0)
+        throw std::runtime_error("Support query requires a finite nonzero ray.");
+    first.t=INFINITY; last.t=-INFINITY;
+    if(mesh.triangles.rows()) ray_span(mesh,mesh.tree,pick_ray(origin,ray),first,last);
+    return first.id>=0;
+}
 }

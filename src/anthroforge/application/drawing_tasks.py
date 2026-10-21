@@ -1,6 +1,6 @@
 """Background fitting publishes a complete first-class curve and accepted native path."""
 
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from functools import partial
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
@@ -15,10 +15,26 @@ from anthroforge.core.scheduling import Workload
 from anthroforge.native import curve_editing, drawing
 from anthroforge.native.mesh import NativeCancellation, doubles
 
-from . import authored_jobs, path_assets
+from . import authored_jobs, dependencies, path_assets, placement_inputs, surface_providers
+from .construction_policy import revisions
 
 if TYPE_CHECKING:
     from .session import Session
+
+
+@dataclass(frozen=True)
+class Request:
+    metadata: dict[str, Any]
+    samples: Any
+    options: FitSettings
+    projection: Any = None
+
+
+def inputs(document: Document, request: Request) -> set[Port]:
+    targets = request.projection["targets"] if request.projection else ()
+    return dependencies.closure(
+        dependencies.graph(document), surface_providers.ports(document, targets)
+    )
 
 
 def stroke_samples(points: list[list[float]]) -> Any:
@@ -29,55 +45,63 @@ def stroke_samples(points: list[list[float]]) -> Any:
     return samples
 
 
-def enqueue(
-    session: "Session", metadata: dict[str, Any], samples: Any, options: FitSettings, origin: int
-) -> str:
-    if metadata["id"] in session.document.registry.records:
+def enqueue(session: "Session", request: Request, origin: int) -> str:
+    if request.metadata["id"] in session.document.registry.records:
         return ""
-    job = create_job(session, metadata, samples, options, origin)
+    job = create_job(session, request, origin)
     job.cancel = NativeCancellation(session.engine)
-    job.retry = partial(enqueue, session, metadata, samples, options, origin)
-    job.workload = lambda _: Workload(affected=1, candidates=len(samples), bytes=samples.nbytes)
-    job.provides = frozenset((Port(metadata["id"], "path"),))
+    job.retry = partial(enqueue, session, request, origin)
+    job.workload = lambda _: Workload(
+        affected=1, candidates=len(request.samples), bytes=request.samples.nbytes
+    )
+    job.provides = frozenset((Port(request.metadata["id"], "path"),))
+    job.observes = job.prerequisites = frozenset(inputs(session.document, request))
+    job.restart_on_input_change = True
     return session.scheduler.submit(job)
 
 
-def create_job(
-    session: "Session", metadata: dict[str, Any], samples: Any, options: FitSettings, origin: int
-) -> Job:
+def create_job(session: "Session", request: Request, origin: int) -> Job:
     return Job(
-        "Fit " + metadata["name"],
-        frozenset((metadata["id"],)),
-        lambda document: document,
-        partial(compute, session, metadata, samples, options),
-        partial(publish, session, origin),
+        "Fit " + request.metadata["name"],
+        frozenset((request.metadata["id"],)),
+        lambda document: (document, session.resources.snapshot()),
+        partial(compute, session.engine, request),
+        partial(publish, session, request, origin),
         kind="curve_draw",
-        key="draw:" + metadata["id"],
+        key="draw:" + request.metadata["id"],
     )
 
 
-def compute(
-    session: "Session",
-    metadata: dict[str, Any],
-    samples: Any,
-    options: FitSettings,
-    document: Document,
-    cancel: Any,
-) -> Any:
-    records = drawing.fit(session.engine, samples, options, cancel.handle)
+def compute(engine: Any, request: Request, payload: Any, cancel: Any) -> Any:
+    document, resources = payload
+    samples = placement_inputs.confirmed(
+        engine, document, resources, request.samples, request.projection, cancel.handle
+    )
+    item = fitted(engine, request, samples, cancel.handle)
+    return document, item, path_assets.evaluate(engine, item, cancel.handle)
+
+
+def fitted(engine: Any, request: Request, samples: Any, cancel: int) -> Curve:
+    records = drawing.fit(engine, samples, request.options, cancel)
     points = tuple(curve_editing.unpack(CurvePoint(), row) for row in records)
-    engine = "POLYLINE" if options.method == "POLYLINE" else "BEZIER"
-    item = Curve(points, closed=options.closed, engine_settings=decode(engine), **metadata)
-    return item, path_assets.evaluate(session.engine, item, cancel.handle)
+    name = "POLYLINE" if request.options.method == "POLYLINE" else "BEZIER"
+    return Curve(
+        points, closed=request.options.closed, engine_settings=decode(name), **request.metadata
+    )
 
 
-def publish(session: "Session", origin: int, payload: Any) -> None:
+def publish(session: "Session", request: Request, origin: int, payload: Any) -> None:
     from .object_creation import validate_parent
 
-    item, asset = payload
+    document, item, asset = payload
     validate_parent(session, item)
     key = str(uuid4())
     result = EvaluationResult(key, 1, item.construction_revision)
     changed = replace(item, result=result)
-    authored_jobs.publish(session, origin, partial(authored_jobs.append_object, item=changed))
+    capture = authored_jobs.Capture(
+        revisions(document, inputs(document, request)), partial(enqueue, session, request, origin)
+    )
+    authored_jobs.publish(
+        session, origin, partial(authored_jobs.append_object, item=changed), capture
+    )
     session.resources.paths[key] = asset

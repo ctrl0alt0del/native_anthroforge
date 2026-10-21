@@ -118,7 +118,7 @@ Presence in this inventory does not make every mode available on every source.
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
 | Q01 | Interactive picking/snapping: double-precision ray/surface hits, native outward snap margins and nonnegative user offsets, cached component queries, path picking and displayed-revision agreement. Exact measurement hits are not offset. | [ray_queries.cpp](../native/src/ray_queries.cpp), [surface_snap.cpp](../native/src/surface_snap.cpp), [component_index.cpp](../native/src/component_index.cpp), [path_presentation.cpp](../native/src/path_presentation.cpp) | [surface snapping](../tests/test_surface_snapping.py), [component picking](../tests/test_component_picking.py), [surface picking](../tests/test_surface_picking.py), [held input](../tests/test_held_input.py) |
-| Q02 | Deformation quality: compare canonical meshes for new transverse crossings and collapsed faces, distinguishing coincident boundary contact; large normal rotation is informational. Shared by inflation/smoothing/relaxation. | [mesh_quality.cpp](../native/src/mesh_quality.cpp) | [mesh quality](../tests/test_mesh_quality.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
+| Q02 | Tissue acceptance permits self-intersections; checks finite coordinates, canonical identity and new collapsed faces. Explicit diagnostics retain transverse-crossing counts and strict validation; large normal rotation is informational. Inflation/smoothing/relaxation use native tissue acceptance (CH-016). | [mesh_quality.cpp](../native/src/mesh_quality.cpp) | [mesh quality](../tests/test_mesh_quality.py), [intersection policy](../tests/test_tissue_intersection_policy.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
 | Q03 | Advisory path collision: check accepted authored-engine Fiber centerline segments against eligible surfaces, with attachment-contact handling and incomplete-provider reporting. Does not silently reroute the curve. | [path_collisions.cpp](../native/src/path_collisions.cpp), [fiber collision Issues](../src/anthroforge/application/issues/fiber_collisions.py) | [path collisions](../tests/test_path_collisions.py), [fiber collision Issues](../tests/test_fiber_collision_issues.py) |
 | Q04 | Measurements: resolve retained barycentric surface witnesses to world XYZ and compute straight-line distance. Camera framing/axis-view/restore calculations preserve gesture continuity. | [measurement.cpp](../native/src/measurement.cpp), [desktop view tools](../src/anthroforge/desktop) | [measurements](../tests/test_measurements.py), [view framing](../tests/test_view_framing.py), [view gestures](../tests/test_view_gestures.py) |
 | I01 | Image decoding/preparation: PNG/JPEG decode, EXIF orientation, asset sharing and native RGBA tile preparation, executed as background creation work. | [image assets](../src/anthroforge/application/image_assets.py), [image.cpp](../native/src/image.cpp) | [reference images](../tests/test_reference_images.py) |
@@ -399,6 +399,9 @@ trials and trace retention limits. Raw comparisons are under local
   No sampling control or Manual-source semantics were removed.
 
 ### CH-009 — Validate actual geometry rather than normal rotation
+
+Tissue crossing-rejection policy superseded by CH-016; the diagnostic classifier
+and collapsed-face protection remain. Evidence below describes the historical policy.
 
 - **2026-10-20; 0.2.2; Qualified.** Q02, T03, T11, T13.
   Baseline `dda3af4`; correction `3a13625`.
@@ -704,3 +707,113 @@ resolved inflation/smoothing defect when assessing the fixture.
   mesh-query accelerator. Existing open, outer-boundary, nonnested branch constraints
   remain. Generic branches are ordinary curves; attached conversion remains explicit or
   part of Create Tissue. No physical desktop-input or visible-window acceptance is claimed.
+
+### CH-016 — Permit tissue self-intersections without repairing inflation
+
+- **2026-10-21; 0.2.2; implemented.** Q02,
+  T03, T11 and T13. Baseline `6918888`; work on `codex/tissue-intersection-policy`.
+- **Before/problem:** `tissue_create.anthroforge` at Control Point amount 0.599,
+  depth zero, fails before smoothing with 106 newly detected crossings and no collapsed
+  faces. The user explicitly accepts these intersections and wants the existing
+  inflation/smoothing mathematics retained. This is a product-policy change, not a
+  claim that the crossed surface has been repaired.
+- **After/why:** the shared native tissue acceptance function checks canonical
+  connectivity, finite coordinates and new collapsed faces. Crossing counts remain
+  available through the explicit diagnostic API but do not reject inflation,
+  smoothing or relaxation. Relaxation invokes this policy in native evaluation so
+  headless/direct callers and the application agree. No field, solver, tolerance,
+  control-point radius, direction, topology or smoothing constraints change.
+- **Evidence:** 29 targeted tests pass, including unchanged addon inflation witnesses,
+  smoothing bounds/fixed vertices, crossed Pouch relaxation with exact backing,
+  previous valid inflation regressions, cancellation and strict diagnostic checks.
+  In-memory evaluation of the unchanged user project at 0.2 then 0.599 now publishes
+  ready base/rest/intrinsic/final outputs. No project file was overwritten.
+  Full suite at `e922aeb`: 1,421 tests pass; Mypy, focused Ruff and changed-native
+  clang-tidy checks pass.
+- **Limits:** attachment Boolean cleanup and ambiguous stacking queries are separate
+  downstream changes, recorded in CH-017/018 below. The user approved a
+  temporary base-backed closure for open tissue and an in-memory Boolean query mesh;
+  the test's base and single-sided tissue each have 168 boundary edges. The original
+  tissue and material bindings remain authoritative; added closure is not selectable.
+  Skin handling remains deferred; no claim of downstream intersection immunity.
+- [Regression fixture](../tests/fixtures/tissue/control_point_crossings.json),
+  [tests](../tests/test_tissue_intersection_policy.py),
+  [active task](tasks/tissue-intersection-policy.md). Raw local evidence is in
+  `build/tissue-create-diagnosis/` and `build/tissue-intersection-policy/`.
+
+### CH-017 — Transient exterior queries for confirmed placement
+
+- **2026-10-21; 0.2.2; implemented.** Shared snapping/attachment
+  boundary now distinguishes original-mesh preview from confirmed exterior queries.
+- **Before:** nearest raw triangle could bind to a buried fold or sealed cavity.
+- **After:** CGAL exact intersection arrangement through the pinned libigl adapter,
+  followed by ambient-cell extraction, source-face filtering and per-face material
+  mapping. Temporary closure uses the base belonging to the accepted final result,
+  including Manual provenance. Added closure faces cannot be selected. Reversed
+  exposed lobes survive; sealed cavities do not. Originals remain unchanged.
+- **Ownership:** one native query service, bounded 64 MiB/64-entry owned cache tracked
+  by existing profiler resource collection; attachments capture original triangle and
+  barycentric coordinates. Resolution uses the original material surface. Confirmed
+  curve edits run as coordinator jobs in the initiating undo step; expensive query
+  preparation is never an interactive inline attachment recapture.
+- **Evidence:** Windows native build and five query tests pass: nested sealed cavity,
+  overlapping shells, open zero-volume sheet, actual compact crossed-tissue fixture,
+  cancellation and cache leases. Three authored-placement tests pass for one-action
+  undo/redo, cancelled gesture and unrelated later edits. Mypy and function limits
+  pass. Subsequent interaction and release evidence appears below.
+- **Limits:** exact remeshing observes cancellation between native stages, not within
+  the CGAL call. This does not repair displayed geometry or establish safe skinning.
+  Drawing/creation use the same confirmed query service, as detailed below.
+
+### CH-018 — Geometric-normal support for ambiguous stacking
+
+- **2026-10-21; 0.2.2; implemented.** The old inverse
+  chart query selected minimum absolute distance along the provider's inflation
+  field. Control Point inflation can point sideways, so changing that minimum to
+  a maximum would not implement the confirmed geometric-normal rule.
+- **After:** native area-weighted receiver base normals and the shared watertight
+  ray/BVH query identify distinct positive provider hits. Multiple hits select the
+  farthest support; coincident triangle-edge hits do not imply ambiguity. Ordinary
+  single-hit vector transport, localized PIQP smoothing and exact constraints stay
+  intact. Caches include base topology and new policy versions. Same-tissue crossing
+  rejection is removed; other-tissue, bone, finite-coordinate and fold checks remain.
+- **Evidence:** all 14 donor stacking cases and existing group/complete-geometry
+  tests pass. A folded two-level provider chooses its outer roof at all nine receiver
+  points, including a tangential inflation direction. Updated-provider/cache tests
+  pass. Exact-constraint and inequality residuals remain below 2e-7 in this case.
+  This fixture tests multi-valued support; it does not establish arbitrary physical
+  contact or anatomical correctness. The actual folded-provider cross-section was
+  inspected; complete release evidence appears below.
+- **Provenance:** original donor hashes remain in `upstream_sources.json`; the
+  maintained `sources.json` includes the three changed headers and new adapter.
+
+CH-017 integration update: completed drawing/placed-point gestures and cursor surface
+placement now use the shared confirmed query in coordinator workers. Raw preview stays
+interactive. Per-sample native intent preserves unsnapped/plane samples. New snapped
+edits supersede obsolete requests; undoing a later edit recovers the original pending
+placement. Four authored-snap lifecycle and five creation/placement tests pass.
+
+Final lifecycle qualification also covers target motion and ordinary transform-parent
+motion during confirmation. The latter exposed double-applied movement when a saved
+preview-world coordinate was reused after a parent update. Confirmed intent now carries
+the selected anchor component identity; dispatch resolves its current world position
+before applying the exterior correction. This preserves multiselection offsets and
+does not add a second undo step. Both new regression cases and the production offscreen
+curve-gesture suite pass. Full development gate at `010a948`: 1,439 tests; the subsequent
+application-only corrections receive separate final full-suite/package qualification.
+
+The portable mixed-tissue case exposed incorrect resource typing in the query adapter:
+a CURVE material base is a retained path, not a missing mesh. Only SURFACE construction
+supplies the accepted backing mesh for temporary closure. Radial/swept generated shells
+remain queryable without that mesh. The save/reopen/conversion regression passes alongside
+the sealed-cavity and original-material tests; no resource or geometry is substituted.
+
+CH-016–018 final qualification: runtime `7438a62` passes the complete relocated Windows
+portable suite with minimal PATH, including cavity-safe confirmed placement, mixed-tissue
+conversion after reopening, retained material bindings, stacking and hidden rendering.
+Final application/numerical suite: 1,442 passed; full native/development gate passed at
+`010a948`, with unchanged native code afterward. Actual query/stacking shapes were inspected.
+The user source file is unchanged. The native query is visible separately in the existing
+profiler (about 0.693 seconds in one local run, not an input-latency measurement).
+Bundled CGAL/Boost headers compile offline. See the [current validation record](development_status.md#tissue-queries-stacking-and-readable-controls-022)
+for artifact identity, UI checks and evidence limits.

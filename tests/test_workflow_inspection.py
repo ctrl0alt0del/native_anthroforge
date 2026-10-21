@@ -56,6 +56,18 @@ def test_control_inspection_has_no_fake_surface(session):
     assert any(r["consumers"] for r in row["relationships"])
 
 
+def test_tissue_relationship_inspection_uses_construction_without_scp_binding(session):
+    from tests.test_tissue_workflow import assembly
+
+    _, source, tissue = assembly(session)
+    before = session.document
+    row = session.command("inspect.target", entity=tissue)
+    assert row["geometry"]["available"]
+    assert not row["attachment"]["bindings"]
+    assert any(source == p["owner"] for r in row["relationships"] for p in r["inputs"])
+    assert session.document is before
+
+
 def test_anatomical_workspace_includes_associated_control_and_settings_roundtrip(session, tmp_path):
     entity = create(session)
     control = hook(session, entity)

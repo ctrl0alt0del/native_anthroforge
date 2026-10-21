@@ -17,7 +17,7 @@ RowLayout {
     readonly property real unitFactor: length ? workspace.state.unit_factor : 1
     signal edited(real value)
     Layout.fillWidth: true
-    Label { text: setting.label + (setting.length ? " · " + workspace.state.display_units : ""); color: Theme.muted; Layout.fillWidth: true; elide: Text.ElideRight; ToolTip.visible: labelHover.hovered; ToolTip.text: setting.hint || text; HoverHandler { id: labelHover } }
+    Label { text: setting.label + (setting.length ? " · " + workspace.state.display_units : ""); color: Theme.muted; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.Wrap; ToolTip.visible: labelHover.hovered && !!setting.hint; ToolTip.text: setting.hint; HoverHandler { id: labelHover } }
     UiNumberField {
         id: field; Layout.preferredWidth: 100; selectByMouse: true
         objectName: setting.objectName ? setting.objectName+"Value" : "numeric"+setting.label

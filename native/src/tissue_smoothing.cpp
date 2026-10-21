@@ -44,7 +44,7 @@ static std::shared_ptr<Mesh> smooth(const Mesh& base,const Mesh& own,const doubl
         check_cancel(cancel);
     }
     auto result=deform_mesh(own,vertices,cancel,true);
-    quality::validate(own,*result,cancel);
+    quality::validate_tissue(own,*result,cancel);
     return result;
 }
 }

@@ -9,6 +9,11 @@ independent attached copies automatically; source objects remain unchanged. **Cr
 available from an ordinary curve's inspector and binds to nearest SCP surfaces by default.
 See [validation and limitations](docs/development_status.md#unified-tissues-022).
 
+Tissue self-intersections are intentionally permitted without changing inflation or
+height smoothing. This policy may be revisited for demonstrated downstream defects;
+see [the intersection contract](docs/specification_022.md#release-contract) and
+[downstream integration status](docs/tasks/tissue-intersection-policy.md).
+
 Standalone curves, reference images, fibers and curve-based surfaces follow the
 [confirmed specification](docs/specification_020.md) and
 [implementation plan](docs/implementation_020.md). See the

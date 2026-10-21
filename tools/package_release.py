@@ -9,6 +9,7 @@ import sys
 from pathlib import Path
 
 import PySide6
+from boolean_dependencies import copy_notices
 
 from anthroforge import __version__
 from anthroforge.profiling.identity import build_identity
@@ -120,12 +121,14 @@ def licenses():
     shutil.copy2(ROOT / "native/vendor/MPL-2.0.txt", target / "MPL-2.0.txt")
     shutil.copytree(ROOT / "licenses", target, dirs_exist_ok=True)
     copy_native_provenance(target)
+    copy_notices(target)
     shutil.copy2(Path(sys.base_prefix) / "LICENSE.txt", target / "CPython-LICENSE.txt")
     for package in PACKAGES:
         package_notices(package, target)
 
 
 def copy_native_provenance(target):
+    copy_relative(ROOT / "native/boolean/PROVENANCE.md", ROOT, DIST)
     for path in (ROOT / "native/migration").rglob("*"):
         if path.is_file() and path.suffix in (".md", ".json"):
             copy_relative(path, ROOT, DIST)

@@ -13,6 +13,7 @@ from .resource_cache import ResourceCache
 
 if TYPE_CHECKING:
     from .routing_scene import RoutingScene
+    from .surface_queries import Query
     from .tissue_stacking import MaterialLease
 
 D = c.POINTER(c.c_double)
@@ -34,6 +35,10 @@ class GeometryEngine(NativeEngine):
         self._mesh_signatures()
         self._query_signatures()
         self._construction_signatures()
+        self._resource_caches()
+        self.resource_observer: Any = None
+
+    def _resource_caches(self) -> None:
         self.bases = BaseCache()
         self.routing_scenes: ResourceCache[RoutingScene] = ResourceCache(
             64 * 1024 * 1024, 8, "routing_scene"
@@ -41,10 +46,12 @@ class GeometryEngine(NativeEngine):
         self.tissue_materials: ResourceCache[MaterialLease] = ResourceCache(
             64 * 1024 * 1024, 64, "tissue_material"
         )
-        self.resource_observer: Any = None
+        self.surface_queries: ResourceCache[Query] = ResourceCache(
+            64 * 1024 * 1024, 64, "surface_query"
+        )
 
     def caches(self) -> tuple[Any, ...]:
-        return self.bases, self.routing_scenes, self.tissue_materials
+        return self.bases, self.routing_scenes, self.tissue_materials, self.surface_queries
 
     def clear_caches(self) -> None:
         for cache in self.caches():
@@ -78,11 +85,13 @@ class GeometryEngine(NativeEngine):
         from . import attachment_fields, attachment_weights, path_collisions, point_attachments
         from .mesh_quality import configure as configure_quality
         from .routing_scene import configure
+        from .surface_queries import configure as configure_queries
 
         for module in (attachment_fields, attachment_weights, path_collisions, point_attachments):
             module.configure(self)
         configure(self)
         configure_quality(self)
+        configure_queries(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

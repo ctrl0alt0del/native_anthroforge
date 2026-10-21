@@ -6,7 +6,7 @@ from anthroforge.core.drawing import ProjectionSettings
 from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.native import strokes
 
-from . import curve_sources
+from . import curve_sources, surface_queries
 
 if TYPE_CHECKING:
     from .session import Session
@@ -20,24 +20,28 @@ def project(
     image: str = "",
     settings: dict[str, Any] | None = None,
     interpolate: bool = True,
+    mode: str = "PREVIEW",
 ) -> list[list[float]]:
     options = ProjectionSettings(**(settings or {}))
-    handles, frames = surface_inputs(session, surfaces or [])
     depth = depth_plane(session, options, plane, image)
+    return projected(session, rays, surfaces or [], options, depth, interpolate, mode)
+
+
+def projected(
+    session: Any, rays: Any, targets: Any, options: Any, depth: Any, interpolate: bool, mode: str
+) -> list[list[float]]:
+    inputs = surface_queries.inputs(
+        session.engine,
+        session.document,
+        session.assets,
+        targets,
+        0,
+        surface_queries.Mode[mode.upper()],
+    )
+    handles, frames = inputs
     stroke = strokes.Stroke(session.engine, handles, frames, depth, options.packed())
     stroke.batch(rays, interpolate)
     return list(stroke.read().tolist())
-
-
-def surface_inputs(session: "Session", targets: list[str]) -> tuple[list[int], list[Any]]:
-    meshes, frames = [], []
-    for key in dict.fromkeys(targets):
-        item = session.document.entity(key)
-        if not item.asset or item.asset not in session.assets:
-            raise ValueError("Drawing surface needs accepted geometry.")
-        meshes.append(session.assets[item.asset].mesh.handle)
-        frames.append(curve_sources.world(session.engine, session.document, key))
-    return meshes, frames
 
 
 def depth_plane(

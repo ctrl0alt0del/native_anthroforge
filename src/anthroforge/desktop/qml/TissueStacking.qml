@@ -59,7 +59,7 @@ UiSection {
         UiCombo { id: coverMode; objectName: "tissueStackCover"; Layout.fillWidth: true; visible: orderMode.currentIndex>0; model: ["This tissue covers","Other tissue covers"]; currentIndex: panel.intent?.cover==="OTHER"?1:0; onActivated: panel.saveIntent() }
         UiCheck { id: exclude; objectName: "tissueStackExclude"; text: "Exclude this pair"; checked: panel.intent?.excluded || false; onClicked: panel.saveIntent() }
         Label { visible: !!panel.intent?.regions?.length; text: "Selected support region · "+(panel.intent?.regions?.length || 0)+" faces"; color: Theme.muted }
-        UiButton { objectName: "tissueStackRegion"; text: "Select support footprint…"; Layout.fillWidth: true; enabled: orderMode.currentIndex>0 && !exclude.checked; hint: "Choose Requested or Explicit order, then select material faces on the covering tissue"; onClicked: panel.editRegion() }
+        UiButton { objectName: "tissueStackRegion"; text: "Select support footprint"; Layout.fillWidth: true; enabled: orderMode.currentIndex>0 && !exclude.checked; hint: "Choose Requested or Explicit order, then select material faces on the covering tissue"; onClicked: panel.editRegion() }
         ColumnLayout {
             visible: workspace.tissueRegionTools.state.active; Layout.fillWidth: true
             Label { text: "Click covering faces to toggle the draft footprint."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }

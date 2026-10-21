@@ -24,6 +24,8 @@ both license texts and corresponding adapted sources accompany the release.
 | PySide6/Shiboken | 6.12.0 | LGPL-3.0 / GPL alternatives recorded in wheel metadata; https://download.qt.io/official_releases/QtForPython/ |
 | Qt | 6.12.0 | GPL/LGPL and component-specific notices; https://doc.qt.io/qt-6/licensing.html |
 | Eigen/libigl | Vendored addon snapshots | MPL-2.0 and original header notices; source is included under native/vendor |
+| CGAL | 6.1.1 | GPL-3.0-or-later/LGPL-3.0-or-later per-header notices; exact arrangement adapter under native/boolean; pinned source and hashes in its CMakeLists.txt |
+| Boost | 1.89.0 | Boost Software License 1.0; header-only exact arithmetic, pinned source and hashes in native/boolean/CMakeLists.txt |
 | happly | Snapshot hash in native/vendor/PROVENANCE.md | MIT; included source and license |
 | earcut.hpp | 2.2.4 | ISC; included source and license |
 | curve_fit_nd | Blender 5.0.1, unchanged sources | BSD-3-Clause, DWANGO Co., Ltd.; full notice in native/vendor/curve_fit_nd/curve_fit_nd.h and CURVE-FIT-LICENSE.txt |

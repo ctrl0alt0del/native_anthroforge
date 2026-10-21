@@ -6,6 +6,35 @@ the [implementation plan](implementation_022.md), and [task status](tasks/unifie
 
 ## Release contract
 
+**Intersection policy (2026-10-21): self-intersections within one TissueVCP are
+intentionally allowed.** Inflation and height smoothing keep their existing numerical
+behavior; they do not untangle, Boolean-repair or replace the evaluated tissue.
+This is a revisitable product decision, not evidence that every downstream operation
+is insensitive to intersections. Investigate concrete downstream bugs before revising
+it. Separate tissues remain separate. Skin handling will be decided with skinning.
+Implementation and downstream-query qualification are tracked in
+[the active task](tasks/tissue-intersection-policy.md).
+
+The downstream contract is implemented; delivery evidence is recorded in the active task:
+
+- Shared surface queries distinguish Preview and Confirmed Placement. Preview uses
+  the original accepted target; confirmed placement uses a Boolean-cleaned query copy.
+  Curve-to-Fiber, Point-to-Anchor and explicit attachment capture use confirmed mode.
+  Cleanup never replaces the target, and hit provenance must map back to the original
+  material binding. Existing bindings resolve their retained location rather than
+  choosing a new nearest point on each update.
+  Only fragments bordering exterior-connected space are valid: surfaces inside sealed
+  cavities are excluded. Exposed reversed-orientation folds, which ordinary signed
+  union can misclassify, remain selectable. This never repairs the displayed tissue.
+- For open single-sided tissue, use a temporary closure against its material base for
+  the Boolean calculation. The cleaned mesh exists only in memory for confirmed
+  queries. Added backing and closure faces are not selectable attachment surfaces.
+  This does not authorize arbitrary thickness or caps for unrelated open meshes.
+- Where intersections create ambiguous stacking support, select the farthest support
+  along the base-surface normal. Keep this distinct from nearest material-chart distance
+  and from any repair to the generated tissue. Separate tissues are not Boolean-unioned.
+- Skin handling is deferred until skinning implementation.
+
 Deliver production tissue construction, anatomical attachments, inflation,
 relaxation, branches, cropping and stacking in desktop and Qt-free headless clients.
 Mirroring, Draft Skin, Blender-project conversion, anatomical reconstruction or
@@ -171,10 +200,11 @@ stages; combining them adds no new volume-preservation or physical-contact guara
   unrelated valid components continue. No incomplete component can wait indefinitely.
 - `ITERATION_LIMIT` is a usable current result with a warning when the native contract
   allows it; distinguish it from numerical failure and successful convergence.
-- A relaxed candidate introducing transverse self-intersections or collapsed faces is
-  unusable and fails intrinsic acceptance. Large normal rotation alone is not failure.
-  This is a geometry check, not self-contact resolution or a guarantee of collision-free
-  motion between iterations. It preserves reported pre-existing crossings separately.
+- Tissue inflation, height smoothing and relaxation may introduce self-intersections.
+  Nonfinite output and newly collapsed faces remain failures. Large normal rotation
+  alone is not failure. Explicit geometry diagnostics can still count crossings, but
+  those counts do not reject intrinsic tissue output. This supersedes the earlier
+  rejection of transverse crossings; it adds no self-contact or repair computation.
 - Preserve Live/On Release/Manual, dispatch-time inputs, reservations, safe cancellation,
   stale-result rejection, dependency registration, undo/redo and save checkpoint semantics.
 - Inflation changes reuse accepted source paths; stacking-only changes reuse intrinsic
@@ -221,11 +251,10 @@ Distributed/branch/envelope correction snapshots are explicitly labelled separat
 Material refinement subdivides existing intervals only where the requested density
 requires it. It retains every original grid line, avoids introducing nearly coincident
 lines, and never edits the source. Height smoothing retains the donor QP, hard pins
-and change bounds. Complete-mesh validation tests new transverse intersections and
-collapsed faces rather than treating a normal rotation beyond 90 degrees as a fold.
-Coincident front/back boundary contact is not a transverse intersection. These
-checks do not guarantee that arbitrary inflation settings are geometrically feasible;
-invalid generated geometry remains a failed result without reducing user parameters.
+and change bounds. Complete-mesh intrinsic validation rejects nonfinite output and
+new collapsed faces; self-intersections are explicitly permitted by the October 21
+policy above. Crossing diagnostics remain available independently. This supersedes
+the earlier crossed-surface rejection and does not reduce user parameters.
 For height smoothing, reaching PIQP's stricter iteration limit is not by itself
 proof that the application tolerance was missed. Such a result can publish only
 after independent KKT certification at the existing `2e-7` tolerance, exact pins,

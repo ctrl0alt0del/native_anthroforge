@@ -23,6 +23,11 @@ AF_API int af_stroke_probe(uint64_t handle,const double* pointer,double* output)
 /* Temporary nearest-surface override; preserves the stroke's configured depth plane. */
 AF_API int af_stroke_snapping(uint64_t handle,int enabled);
 AF_API int af_stroke_read(uint64_t handle,int start,int capacity,double* output);
+/* Per-sample confirmed placement intent: ray origin/direction, offset, surface-hit flag. */
+AF_API int af_stroke_placements(uint64_t handle,int count,double* output);
+/* Reproject only surface-hit samples through prepared query meshes; other samples are copied. */
+AF_API int af_confirm_samples(int count,const uint64_t* meshes,const double* matrices,
+    int samples,const double* points,const double* placements,double* output,uint64_t cancel);
 AF_API int af_stroke_pop(uint64_t handle);
 AF_API int af_drawing_plane(const double* frame,double* output);
 AF_API int af_stroke_view(uint64_t handle,const double* normal);

@@ -9,8 +9,14 @@ ComboBox {
     leftPadding: 9; rightPadding: 24
     hoverEnabled: true
     Accessible.name: hint || displayText
-    ToolTip.visible: hovered && !!hint
-    ToolTip.text: hint; ToolTip.delay: 500
+    ToolTip.visible: hovered && (!!hint || contentItem.truncated)
+    ToolTip.text: contentItem.truncated ? displayText + (hint ? "\n" + hint : "") : hint; ToolTip.delay: 500
+    FontMetrics { id: metrics; font: control.font }
+    function choiceWidth() {
+        let result=control.width;
+        for(let i=0;i<control.count;++i) result=Math.max(result,metrics.advanceWidth(control.textAt(i))+2*Theme.gap+8);
+        return Math.min(result,Math.max(control.width,Overlay.overlay.width-2*Theme.gap));
+    }
     contentItem: Text { text: control.displayText; color: control.enabled ? Theme.text : Theme.muted; font: control.font; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
     indicator: Image {
         source: "icons/chevron-down.svg"
@@ -22,16 +28,17 @@ ComboBox {
     delegate: ItemDelegate {
         required property int index
         width: ListView.view ? ListView.view.width : control.availableWidth
-        height: Theme.controlHeight; leftPadding: Theme.gap; rightPadding: Theme.gap
+        height: Math.max(Theme.controlHeight,implicitContentHeight+8); leftPadding: Theme.gap; rightPadding: Theme.gap
         text: control.textAt(index)
         font.pixelSize: 12
         highlighted: control.highlightedIndex === index
-        contentItem: Text { text: parent.text; font: parent.font; color: Theme.text; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
+        contentItem: Text { text: parent.text; font: parent.font; color: Theme.text; verticalAlignment: Text.AlignVCenter; wrapMode: Text.Wrap }
         background: Rectangle { radius: Theme.radius; color: parent.highlighted || parent.hovered ? Theme.hover : Theme.panel }
     }
     popup: Popup {
         objectName: "comboPopup"
-        y: control.height + 3; width: control.width
+        y: control.height + 3; width: control.width; margins: Theme.gap
+        onAboutToShow: width=control.choiceWidth()
         implicitHeight: Math.min(contentItem.implicitHeight + 8, 330); padding: 4
         background: Rectangle { color: Theme.panel; border.color: Theme.border; radius: 4 }
         contentItem: ListView { clip: true; implicitHeight: contentHeight; model: control.popup.visible ? control.delegateModel : null; currentIndex: control.highlightedIndex; ScrollIndicator.vertical: ScrollIndicator {} }

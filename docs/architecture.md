@@ -15,8 +15,12 @@ It uses an owned material mesh and physical mass/stiffness operators; no numeric
 work or callbacks move into Python. The pinned addon kernels remain unchanged.
 `smoothing_core.cpp` adapts their field preparation and QP for standalone publication,
 while the shared `mesh_quality` boundary owns complete-mesh deformation acceptance.
-Inflation, smoothing and relaxation use that boundary. Its plane-side predicate
-separates transverse crossings from coincident shell boundary contact. Refinement
+Inflation, smoothing and relaxation use its tissue acceptance policy: finite output
+and no new collapsed faces, with self-intersections allowed. Its separate diagnostic
+plane-side predicate still distinguishes transverse crossings from coincident shell
+boundary contact; strict diagnostic validation remains available without governing
+tissue publication. Relaxation acceptance is native so direct and application callers
+share the same rule. Refinement
 subdivides existing material intervals instead of overlaying a second uniform grid.
 Document settings, topology correspondence, scheduling and publication contracts remain
 unchanged; the [repair record](tasks/muscle-height-smoothing.md) tracks qualification.
@@ -62,7 +66,23 @@ connected stacking orders use one atomic final bundle: C++ solves the actual sid
 using each receiver's settings, while ordinary source/attachment dependencies remain intact.
 The coordinator owns all selected output reservations and complete read validation; Manual
 members supply retained accepted output until requested. Complete assembled shells/envelopes
-undergo independent fold, self-intersection, bone and neighbor checks before publication.
+undergo independent fold, bone and neighbor checks before publication. Crossings within
+one tissue are permitted by the October 21 policy; distinct tissues remain separate.
+
+Confirmed placement owns a transient exterior query through `application/surface_queries`
+and the native CGAL/libigl adapter. Exact intersection arrangement and ambient-cell
+extraction exclude buried/sealed-cavity fragments; accepted material bases temporarily
+close open tissue, with added closure excluded from selection. Original triangle
+provenance is retained for attachment capture and subsequent deformation. The native
+cache owns its resources within 64 MiB/64 entries; document/history contain originals.
+Preview remains raw and responsive. Completed curve/point/drawing gestures run query
+preparation in coordinator workers and merge into their initiating undo step. Newer
+authored edits supersede pending placement; Undo can recover the earlier request.
+
+Ambiguous stacking uses a separate native BVH query along geometric base normals,
+choosing the farthest distinct positive hit. It changes support correspondence only
+where multiple hits exist; vector transport, localized constrained solving, exact
+attachments and unambiguous donor behavior remain. Cache versions include this policy.
 
 Routing derives obstacle roles from dependency ports and sends the accepted provider
 geometry to the existing native collision world. Empty accepted outputs remain dependencies

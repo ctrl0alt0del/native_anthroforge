@@ -84,6 +84,19 @@ def test_surface_conversion_is_independent_and_keeps_geometry(session, operation
     assert session.document.objects == originals
 
 
+def test_surface_conversion_with_radial_and_swept_targets_after_reopen(session, tmp_path):
+    _, source, curves = surface_scene(session)
+    created(session, "tissue.create", source=curves[0], preset="RIM")
+    point = session.command("construction.point.create", position=[0, 0, 0.8])
+    created(session, "tissue.create", source=point, preset="CLOSED_BULK")
+    path = tmp_path / "mixed-targets.anthroforge"
+    session.command("save", path=str(path), blocked_policy="wait")
+    session.command("open", path=str(path))
+    item = created(session, "membrane.create", source=source.id)
+    assert isinstance(item, Membrane) and item.result.status == "ready"
+    assert all(isinstance(session.document.object(u.curve), Fiber) for u in item.curves)
+
+
 def test_missing_scp_rejects_without_partial_construction(session):
     source = session.command("curve.create")
     session.wait()

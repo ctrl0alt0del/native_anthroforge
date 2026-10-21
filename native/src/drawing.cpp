@@ -8,10 +8,11 @@
 namespace af {
 using Pointer=Eigen::Matrix<double,9,1>;
 using Sample=std::array<double,4>;
+using Placement=std::array<double,8>;
 struct DrawingSurface { std::shared_ptr<Mesh> mesh; M4 frame; };
 struct Projection {
     V3 origin,normal,previous,depth;
-    bool surface=false,locked=false;
+    bool surface=false,locked=false,hit=false;
     int first=0;
     double offset=0;
     bool relative=false;
@@ -22,6 +23,7 @@ struct Stroke {
     std::vector<Sample> samples;
     std::vector<Projection> states;
     std::vector<Pointer> pointers;
+    std::vector<Placement> placements;
     bool rebased=false,same_view=true,snapping=false;
 };
 struct StrokeCheckpoint {
@@ -33,7 +35,7 @@ struct StrokeCheckpoint {
         projection(value.projection),rebased(value.rebased) {}
     ~StrokeCheckpoint() {
         if(committed) return;
-        stroke.samples.resize(count); stroke.states.resize(count); stroke.pointers.resize(count);
+        stroke.samples.resize(count); stroke.states.resize(count); stroke.pointers.resize(count); stroke.placements.resize(count);
         stroke.projection=projection; stroke.rebased=rebased;
     }
 };
@@ -82,14 +84,16 @@ static bool snapped(const Stroke& stroke,Projection& state,const Pointer& ray,Sa
     V3 point,normal;
     if(!stroke.snapping||!surface_hit(stroke,ray,point,normal,state.offset*(state.relative?ray[8]:1))) return false;
     state.previous=point; sample={point.x(),point.y(),point.z(),ray[8]};
+    state.hit=true;
     if(depth_found) *depth_found=true;
     return true;
 }
 static Sample project(const Stroke& stroke,Projection& state,const Pointer& ray,bool* depth_found=nullptr) {
-    Sample sample;
+    Sample sample; state.hit=false;
     if(snapped(stroke,state,ray,sample,depth_found)) return sample;
     V3 point,normal=state.normal; bool found=!state.surface||state.locked;
-    if(!(state.surface&&!state.locked&&(found=surface_hit(stroke,ray,point,normal,state.offset*(state.relative?ray[8]:1)))))
+    state.hit=state.surface&&!state.locked&&(found=surface_hit(stroke,ray,point,normal,state.offset*(state.relative?ray[8]:1)));
+    if(!state.hit)
         point=plane_hit(ray,state.surface&&!state.locked?state.depth:state.origin,state.normal);
     if(found) state.depth=point;
     if(state.surface&&state.first&&!state.locked) lock_plane(state,state.depth,normal);
@@ -112,6 +116,7 @@ static void append_projected(Stroke& stroke,const Pointer& ray,const Sample& sam
     if(stroke.samples.size()>=100000) throw std::runtime_error("Stroke sample limit reached.");
     stroke.states.push_back(stroke.projection); stroke.samples.push_back(sample);
     stroke.pointers.push_back(ray); stroke.projection=state;
+    stroke.placements.push_back({ray[0],ray[1],ray[2],ray[3],ray[4],ray[5],state.offset*(state.relative?ray[8]:1),double(state.hit)});
 }
 static void append_segment(Stroke& stroke,const Pointer& previous,const Pointer& ray,int steps) {
     auto target_state=stroke.projection; bool found=false;
@@ -167,7 +172,7 @@ int af_stroke_seed(uint64_t handle,const double* pointer,const double* position,
         if(!position||!value->samples.empty()) throw std::runtime_error("Seed requires an empty stroke and a position.");
         const af::V3 point(position);
         if(!point.allFinite()) throw std::runtime_error("Seed position must be finite.");
-        auto state=value->projection; state.previous=state.depth=point;
+        auto state=value->projection; state.previous=state.depth=point; state.hit=false;
         if(!retain_plane) state.origin=point;
         af::append_projected(*value,ray,{point.x(),point.y(),point.z(),ray[8]},state);
         return int(value->samples.size());
@@ -199,6 +204,7 @@ int af_stroke_pop(uint64_t handle) {
         auto value=af::stroke(handle);
         if(!value->samples.empty()) {
             value->projection=value->states.back(); value->states.pop_back(); value->samples.pop_back(); value->pointers.pop_back();
+            value->placements.pop_back();
         }
         return int(value->samples.size());
     } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
@@ -241,8 +247,17 @@ uint64_t af_stroke_bytes(uint64_t handle) {
         return sizeof(af::Stroke)+value->samples.capacity()*sizeof(af::Sample)
             +value->states.capacity()*sizeof(af::Projection)
             +value->pointers.capacity()*sizeof(af::Pointer)
+            +value->placements.capacity()*sizeof(af::Placement)
             +value->surfaces.capacity()*sizeof(af::DrawingSurface);
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+int af_stroke_placements(uint64_t handle,int count,double* output) {
+    try {
+        const auto value=af::stroke(handle);
+        if(count!=int(value->placements.size())||(count&&!output)) throw std::runtime_error("Invalid placement buffer.");
+        for(int i=0;i<count;++i) std::copy(value->placements[i].begin(),value->placements[i].end(),output+i*8);
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_stroke_settings(uint64_t handle,double pixels,double close_radius,double* output) {
     try {

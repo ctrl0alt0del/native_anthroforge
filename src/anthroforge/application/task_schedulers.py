@@ -52,7 +52,7 @@ class AttachmentTaskScheduler(MeasuredTaskScheduler):
             workload.entities <= 64 and workload.candidates <= 64 and workload.triangles <= 256
         )
         mode: Literal["inline", "worker"] = "worker"
-        if interactive and bounded and cost <= INLINE_BUDGET_MS:
+        if interactive and bounded and cost <= INLINE_BUDGET_MS and not workload.recaptures:
             mode = "inline"
         reason = (
             "Bounded native attachment update" if mode == "inline" else "Background attachments"
@@ -166,6 +166,12 @@ class FiberCaptureTaskScheduler(MeasuredTaskScheduler):
         return Schedule("worker", cost, reason="Dense anatomical capture and owner blending")
 
 
+class SurfaceQueryTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.5 + workload.triangles * 0.2 + workload.candidates * 0.01
+        return Schedule("worker", cost, reason="Exterior query preparation and confirmed placement")
+
+
 class FiberPathTaskScheduler(AttachmentTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         cost = 0.1 + workload.candidates * 0.02 + workload.triangles * 0.002
@@ -217,6 +223,7 @@ def curve_schedulers() -> dict[str, TaskScheduler]:
         "curve_draw": CurveDrawingTaskScheduler(),
         "surface_layout": SurfaceLayoutTaskScheduler(),
         "fiber_capture": FiberCaptureTaskScheduler(),
+        "surface_snap": SurfaceQueryTaskScheduler(),
         "fiber_path": FiberPathTaskScheduler(),
     }
 

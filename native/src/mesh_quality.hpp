@@ -4,4 +4,5 @@
 
 namespace af::quality {
 void validate(const Mesh& before,const Mesh& after,uint64_t cancel);
+void validate_tissue(const Mesh& before,const Mesh& after,uint64_t cancel);
 }

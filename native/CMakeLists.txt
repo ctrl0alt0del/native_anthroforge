@@ -1,6 +1,6 @@
 add_subdirectory(boolean)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
-    src/surface_query.cpp src/surface_query_closure.cpp
+    src/surface_query.cpp src/surface_query_closure.cpp src/surface_query_reuse.cpp
     src/mesh_registry.cpp src/transforms.cpp src/spatial.cpp src/ray_queries.cpp src/surface_snap.cpp src/attachment.cpp src/material_domain.cpp src/material_axes.cpp
     src/construction_mesh.cpp src/curves.cpp src/loft.cpp src/curve_body.cpp
     src/hooks.cpp src/lattices.cpp src/solidify.cpp src/component_queries.cpp src/curve_deform.cpp
@@ -50,6 +50,10 @@ else()
     target_compile_options(af_native PRIVATE -Wall -Wextra -Werror)
 endif()
 if(BUILD_TESTING)
+    add_executable(af_query_qualification_tests tests/surface_query_qualification_test.cpp)
+    target_include_directories(af_query_qualification_tests SYSTEM PRIVATE vendor)
+    target_link_libraries(af_query_qualification_tests PRIVATE af_boolean)
+    add_test(NAME native_surface_qualification COMMAND af_query_qualification_tests)
     add_executable(af_routing_qp_tests tests/routing_qp_test.cpp)
     target_include_directories(af_routing_qp_tests PRIVATE src)
     target_compile_definitions(af_routing_qp_tests PRIVATE NOMINMAX)

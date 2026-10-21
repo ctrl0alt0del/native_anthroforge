@@ -1,7 +1,48 @@
 # AnthroForge development validation
 
-Current qualification is in [preferences and ROUTED backends](#preferences-and-routed-backends-023).
+Current qualification is in [confirmed query reuse](#confirmed-query-reuse-023).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Confirmed query reuse (0.2.3)
+
+Runtime `cf02502adfb84320b1a63915b1287c26bb761aae` retains original mesh allocations and
+acceleration structures only after complete native exterior-placement qualification.
+Other inputs retain the existing Boolean cleanup. No authored geometry, bindings,
+inflation formula, document schema or interactive preview policy changes.
+
+- Development gate: **1,514 tests passed**, five native contracts, typing (290 files),
+  lint/format, native/script function limits and numerical/runtime checks. The 916
+  existing Qt deprecation warnings remain. Targeted tests include source/backing cache
+  identity, temporary closure, reversed surfaces, cavities, duplicate/degenerate inputs,
+  material attachments, cancellation, eviction, oversized entries and shared ownership.
+- Six serial counterbalanced rounds, three uncached calls per case/backend/round, nine
+  cases: all oriented triangle geometry hashes agree with the previous packaged runtime.
+  Clean actual base medians improve **14.895 → 8.697 ms**; radial tissue **6.014 → 4.307 ms**.
+  Intersecting tissue retains full cleanup; its timing difference is within observed
+  variation. Small nested-cavity qualification adds about **1.17 ms** before cleanup.
+  These are complete query-preparation timings, not application/frame/input latency.
+- Actual source/query shapes were visually inspected. The original `tissue_create`
+  project is unchanged; numerical evidence includes its source SHA-256.
+- The relocated Windows executable passes the complete minimal-PATH portable suite,
+  including clean and cavity snapping, Fiber/Anchor captures, persistence, profiling,
+  offscreen GUI and hidden GPU rendering. Each placement report records one native
+  query plus four cache hits; retained bytes are 3,800 (cube) and 11,200 (cavity).
+  No interactive desktop acceptance is claimed.
+
+Ownership review, performed directly and separately from test results: geometry
+qualification belongs to the native Boolean layer, source/closure correspondence to
+the shared query adapter, and lifetime/budgeting to the existing resource cache. All
+attachment callers inherit the same policy. The accounting correction preserves the
+draft-size API while adding scoped prepared-resource sizing with alias deduplication.
+There is no new scheduler, mutable mesh flag, document state or Python geometry loop.
+
+Canonical executable: `dist/0.2.3/AnthroForge.dist/AnthroForge.exe`, SHA-256
+`92adc0aa6014effc37d52f57fa701630f5127077a2602051d1a7717fb0cb8ace`.
+Native DLL SHA-256: `e9fbbed70284aa1be0b0c9e029ddcc4f7899d407afa8e25484de445c48c173da`.
+Companion source: `dist/AnthroForge-0.2.3-source.zip`.
+[Task](tasks/confirmed-query-reuse.md), [measurement evidence](tasks/confirmed-query-reuse-evidence.json),
+[computation rationale](computation_history.md#ch-021--qualify-original-geometry-before-confirmed-query-cleanup).
+Full local logs, geometry image and portable profiles are under `build/confirmed-query-reuse*`.
 
 ## Preferences and ROUTED backends (0.2.3)
 

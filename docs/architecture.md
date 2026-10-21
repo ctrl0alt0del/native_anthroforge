@@ -78,11 +78,17 @@ undergo independent fold, bone and neighbor checks before publication. Crossings
 one tissue are permitted by the October 21 policy; distinct tissues remain separate.
 
 Confirmed placement owns a transient exterior query through `application/surface_queries`
-and the native CGAL/libigl adapter. Exact intersection arrangement and ambient-cell
+and the native CGAL/libigl adapter. Native qualification checks unique/nondegenerate
+topology, intersections, ambient-cell exposure, orientation and complete original-face
+correspondence against the same temporarily closed input. Eligible queries retain the
+original immutable mesh and its acceleration structure; other inputs use full cleanup.
+Exact intersection arrangement and ambient-cell
 extraction exclude buried/sealed-cavity fragments; accepted material bases temporarily
 close open tissue, with added closure excluded from selection. Original triangle
 provenance is retained for attachment capture and subsequent deformation. The native
 cache owns its resources within 64 MiB/64 entries; document/history contain originals.
+Scoped native storage accounting includes prepared buffers/tree/render storage and
+deduplicates shared allocations within a query. Live leases survive cache eviction.
 Preview remains raw and responsive. Completed curve/point/drawing gestures run query
 preparation in coordinator workers and merge into their initiating undo step. Newer
 authored edits supersede pending placement; Undo can recover the earlier request.

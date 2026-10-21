@@ -118,6 +118,7 @@ Presence in this inventory does not make every mode available on every source.
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
 | Q01 | Interactive picking/snapping: double-precision ray/surface hits, native outward snap margins and nonnegative user offsets, cached component queries, path picking and displayed-revision agreement. Exact measurement hits are not offset. | [ray_queries.cpp](../native/src/ray_queries.cpp), [surface_snap.cpp](../native/src/surface_snap.cpp), [component_index.cpp](../native/src/component_index.cpp), [path_presentation.cpp](../native/src/path_presentation.cpp) | [surface snapping](../tests/test_surface_snapping.py), [component picking](../tests/test_component_picking.py), [surface picking](../tests/test_surface_picking.py), [held input](../tests/test_held_input.py) |
+| Q02 | Confirmed placement: qualify topology, intersections, exterior exposure, orientation and original-face correspondence; retain qualified source geometry/BVH, otherwise build a transient Boolean exterior. Shared allocation-aware bounded cache; preview and material resolution remain separate (CH-021). | [qualification.cpp](../native/boolean/qualification.cpp), [surface_query_reuse.cpp](../native/src/surface_query_reuse.cpp) | [query reuse](../tests/test_surface_query_reuse.py), [exterior semantics](../tests/test_surface_query_modes.py) |
 | Q02 | Tissue acceptance permits self-intersections; checks finite coordinates, canonical identity and new collapsed faces. Explicit diagnostics retain transverse-crossing counts and strict validation; large normal rotation is informational. Inflation/smoothing/relaxation use native tissue acceptance (CH-016). | [mesh_quality.cpp](../native/src/mesh_quality.cpp) | [mesh quality](../tests/test_mesh_quality.py), [intersection policy](../tests/test_tissue_intersection_policy.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
 | Q03 | Advisory path collision: check accepted authored-engine Fiber centerline segments against eligible surfaces, with attachment-contact handling and incomplete-provider reporting. Does not silently reroute the curve. | [path_collisions.cpp](../native/src/path_collisions.cpp), [fiber collision Issues](../src/anthroforge/application/issues/fiber_collisions.py) | [path collisions](../tests/test_path_collisions.py), [fiber collision Issues](../tests/test_fiber_collision_issues.py) |
 | Q04 | Measurements: resolve retained barycentric surface witnesses to world XYZ and compute straight-line distance. Camera framing/axis-view/restore calculations preserve gesture continuity. | [measurement.cpp](../native/src/measurement.cpp), [desktop view tools](../src/anthroforge/desktop) | [measurements](../tests/test_measurements.py), [view framing](../tests/test_view_framing.py), [view gestures](../tests/test_view_gestures.py) |
@@ -884,3 +885,34 @@ for artifact identity, UI checks and evidence limits.
   hidden-render acceptance. No interactive desktop acceptance is claimed. See
   [the task record](tasks/preferences-routing-023.md) and
   [release evidence](development_status.md#preferences-and-routed-backends-023).
+
+### CH-021 — Qualify original geometry before confirmed-query cleanup
+
+- **2026-10-21; Q02, G02; 0.2.3.** Every uncached confirmed query previously performed
+  exact intersection remeshing, exterior classification and preparation of a new mesh.
+  The user requests reuse when the original already satisfies every cleanup requirement.
+- **Change:** native qualification checks unique/nondegenerate/manifold input, exact
+  intersection predicates, exterior-connected cell exposure and selectable-face
+  orientation. The query adapter verifies complete unchanged source correspondence,
+  including temporary closure. Qualified queries retain the original allocation/BVH;
+  unqualified inputs use the unchanged exact Boolean builder. No intersection-only
+  shortcut, tissue mutation, Python geometry loop or new scheduler exists.
+- **Preserved:** sealed-cavity exclusion, exposed reversed lobes, nonselectable temporary
+  closure, original material bindings, preview behavior, safe cancellation and cached
+  revision identity. Mesh/backing changes cannot reuse a previous qualification.
+- **Accounting correction:** the old query cache called a draft-only size function on
+  prepared meshes and recorded zero bytes. Scoped native accounting now includes full
+  prepared storage and deduplicates aliases. Budget eviction releases only cache ownership;
+  live query leases remain valid. The existing draft API contract is unchanged.
+- **Evidence:** the full development gate passes 1,514 tests and five native contracts. Cases cover
+  original allocation reuse, cavities without crossings, reversed orientation, duplicate
+  seam vertices, temporary closure, changed geometry/backing, material bindings, byte
+  eviction, oversized entries and cancellation. Six serial counterbalanced rounds over
+  nine cases preserve every oriented triangle geometry hash against the previous runtime.
+  Complete preparation improves 14.895 to 8.697 ms on the actual clean base and 6.014 to
+  4.307 ms on radial tissue; small nested cavities add about 1.17 ms before cleanup.
+  Dirty outputs still require cleanup; no general UI-latency improvement is claimed.
+  Actual shapes inspected. The relocated packaged application passes clean/cavity
+  placement, material capture, profiling, persistence and offscreen/hidden-render tests.
+  [Release evidence](development_status.md#confirmed-query-reuse-023) records limits and
+  [the task record](tasks/confirmed-query-reuse.md) links reproducible measurements.

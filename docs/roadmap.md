@@ -3,6 +3,7 @@
 - **0.2.3 — qualified:** Preferences and per-job Custom/sparse PIQP
   ROUTED choice, future calculations only. [Contract](specification_023.md),
   [delivery evidence](tasks/preferences-routing-023.md). Schema 4 remains unchanged.
+  Confirmed placement also [reuses qualified original geometry](tasks/confirmed-query-reuse.md).
 
 - **0.2.0 / 0.2.1 — qualified baseline:** curves, fibers, surfaces, images and editing
   improvements. See [0.2.0](specification_020.md), [0.2.1](specification_021.md) and

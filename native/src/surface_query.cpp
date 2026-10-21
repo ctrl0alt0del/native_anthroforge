@@ -24,6 +24,7 @@ std::shared_ptr<Mesh> confirmed(const std::shared_ptr<Mesh>& source,const Mesh* 
     if(source->query_source) throw std::runtime_error("A query copy cannot be used as original geometry.");
     if(!source->prepared) throw std::runtime_error("Confirmed placement requires accepted prepared geometry.");
     const auto input=close(*source,base,cancel);
+    if(reusable(input,*source,cancel)) return source;
     const auto output=boolean::exterior(input.vertices,input.faces,cancel?&reinterpret_cast<Cancellation*>(cancel)->cancelled:nullptr);
     auto result=selectable(output,input,cancel); result->query_source=source;
     return result;

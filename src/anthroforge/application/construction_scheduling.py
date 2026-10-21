@@ -39,6 +39,11 @@ class ShrinkwrapStagePolicy:
         return 0.1 + workload.points * 0.01
 
 
+class UnionStagePolicy:
+    def estimate(self, workload: StageWorkload) -> float:
+        return 5.0 + workload.polygons * 0.05
+
+
 class SurfaceStagePolicy:
     def estimate(self, workload: StageWorkload) -> float:
         return 0.2 + workload.points * 0.003 + workload.polygons * 0.004
@@ -51,6 +56,7 @@ POLICIES: dict[str, StagePolicy] = {
     "thickness": ThicknessStagePolicy(),
     "surface": SurfaceStagePolicy(),
     "SHRINKWRAP": ShrinkwrapStagePolicy(),
+    "UNION": UnionStagePolicy(),
 }
 
 
@@ -58,11 +64,7 @@ def estimate(stages: tuple[StageWorkload, ...]) -> float:
     return sum(POLICIES[stage.kind].estimate(stage) for stage in stages)
 
 
-def mesh_size(session: Any, item: Any) -> tuple[int, int]:
-    primitive = item.primitive
-    if primitive.kind == "IMPORTED":
-        dimensions = session.assets[primitive.source].mesh.counts
-        return dimensions[0], dimensions[1]
+def parametric_size(primitive: Any) -> tuple[int, int]:
     if primitive.kind == "BODY":
         density = counts(primitive)
         points = sum(
@@ -74,10 +76,23 @@ def mesh_size(session: Any, item: Any) -> tuple[int, int]:
     return samples * (strips + 1), samples * strips + 2 * int(primitive.caps)
 
 
+def mesh_size(session: Any, item: Any) -> tuple[int, int]:
+    primitive = item.primitive
+    if primitive.chain:
+        points = sum(s.samples * s.sides for s in primitive.chain.segments)
+        return points, points + 2 * len(primitive.chain.segments)
+    if primitive.kind == "IMPORTED":
+        dimensions = session.assets[primitive.source].mesh.counts
+        return dimensions[0], dimensions[1]
+    return parametric_size(primitive)
+
+
 def stages(session: Any, document: Any, entity: str) -> tuple[StageWorkload, ...]:
     item = document.entity(entity)
     points, faces = mesh_size(session, item)
     result = [StageWorkload("construction", points, faces)]
+    if item.primitive.chain and item.primitive.chain.unite:
+        result.append(StageWorkload("UNION", points, faces))
     for binding in item.deformers:
         result.extend(binding_stages(document, item, binding, points))
     if item.thickness and item.thickness.enabled:

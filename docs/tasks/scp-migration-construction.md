@@ -37,7 +37,11 @@ Existing BODY is curve-driven; parameter-driven segment construction needs its o
 typed definition and evaluator. Native nearest-surface Shrinkwrap now builds and
 matches 24 Blender fixtures. Typed target roles, relationships, copy/persistence,
 deletion protection, shared commands and inspector are integrated. Desktop rendering
-qualification, broader lifecycle checks, segment construction and migration remain.
+qualification, broader lifecycle checks and migration remain. Segment Chain now has
+typed parameters, native geometry, shared commands and a focused inspector. Raw
+Index and Big_Toe reference vertices match within 3e-6, including the zero-length
+segment. Exact union is integrated; stable material bindings across its changing
+triangulation are the next integration requirement before migration acceptance.
 
 ## Verification
 
@@ -46,6 +50,9 @@ Source atlas review saved and browser-verified in prior stage. Source SHA256:
 Native build/CTest: 5 passed. Focused Shrinkwrap, primitive and lifecycle tests:
 53 passed; fixture generator length corrected for architecture recheck.
 Full development gate, UI/package and migration not yet run.
+Latest focused Shrinkwrap/Segment Chain/architecture run: 36 passed. An exploratory
+whole-tree mypy invocation exceeded the configured typed scope and reported existing
+dynamic-module errors; use the repository's configured `mypy` command in the gate.
 
 ## Next actions and blockers
 

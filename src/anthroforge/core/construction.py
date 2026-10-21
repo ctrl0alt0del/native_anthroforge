@@ -11,6 +11,7 @@ from .curve_uses import CurveUse
 from .entities import IDENTITY, validate_matrix
 from .objects import ConstructionObject
 from .results import ControlResult
+from .segment_chain import SegmentChain
 from .shrinkwrap import Shrinkwrap
 
 
@@ -126,10 +127,13 @@ class PrimitiveParameters:
     start: float = 0.0
     span: float = 1.0
     caps: bool = False
+    chain: SegmentChain | None = None
 
     def __post_init__(self) -> None:
-        if self.kind not in ("IMPORTED", "LOFT", "BODY"):
+        if self.kind not in ("IMPORTED", "LOFT", "BODY", "SEGMENT_CHAIN"):
             raise ValueError("Unknown primitive family.")
+        if (self.kind == "SEGMENT_CHAIN") != isinstance(self.chain, SegmentChain):
+            raise ValueError("Segment Chain requires its own typed parameters.")
         if not integer(self.samples, 2, 4096) or not integer(self.strips, 1, 256):
             raise ValueError("Invalid primitive resolution.")
         validate_range(self.start, self.span)
@@ -173,6 +177,8 @@ def validate_family(value: Primitive | ResolvedPrimitive) -> None:
         raise ValueError("Loft requires at least two curves and no body pieces.")
     if value.kind == "BODY" and (not value.pieces or any(p.curve not in ids for p in value.pieces)):
         raise ValueError("Every body piece must reference a source curve.")
+    if value.kind == "SEGMENT_CHAIN" and (value.curves or value.pieces or value.source):
+        raise ValueError("Segment Chain is parameter-driven and has no curve or mesh source.")
 
 
 @dataclass(frozen=True, slots=True)

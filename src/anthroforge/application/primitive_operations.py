@@ -7,6 +7,8 @@ from anthroforge.core.construction import BodyPiece, Curve, CurvePoint, Resolved
 from anthroforge.core.curve_shapes import reshaped
 from anthroforge.core.entities import SCP, Attachment
 from anthroforge.core.results import EvaluationResult
+from anthroforge.core.segment_chain import SegmentChain
+from anthroforge.core.segment_chain import topology as chain_topology
 from anthroforge.native import curve_editing
 
 from . import construction_codec as codec
@@ -25,6 +27,8 @@ def straight_curve(y: float = 0.0) -> Curve:
 
 
 def default_primitive(kind: str, shape: str) -> ResolvedPrimitive:
+    if kind == "SEGMENT_CHAIN":
+        return ResolvedPrimitive(kind, chain=SegmentChain())
     if kind == "LOFT":
         return ResolvedPrimitive(kind, curves=(straight_curve(-0.15), straight_curve(0.15)))
     if kind == "BODY":
@@ -102,7 +106,14 @@ def topology_signature(primitive: ResolvedPrimitive) -> tuple[Any, ...]:
 
     curves = tuple((c.id, cyclic(c, primitive)) for c in primitive.curves)
     pieces = tuple((p.id, p.shape, p.sides) for p in primitive.pieces)
-    return primitive.samples, primitive.strips, primitive.caps, curves, pieces
+    return (
+        primitive.samples,
+        primitive.strips,
+        primitive.caps,
+        curves,
+        pieces,
+        chain_topology(primitive.chain),
+    )
 
 
 def require_source_topology(session: "Session", primitive: ResolvedPrimitive) -> None:

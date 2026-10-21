@@ -14,7 +14,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.core.primitive_sampling import count
 from anthroforge.core.results import geometry_asset
-from anthroforge.native import bodies, components, path_editing, paths, shrinkwrap
+from anthroforge.native import bodies, components, path_editing, paths, segment_chain, shrinkwrap
 from anthroforge.native import construction as native
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 from anthroforge.native.scene import entity_frame
@@ -115,6 +115,8 @@ class Evaluation:
         definition = consumed_paths.definition(self.engine, self.document, entity, self.paths)
         if definition.kind == "IMPORTED":
             return draft(self.meshes[definition.source], self.cancel.handle)
+        if definition.chain:
+            return segment_chain.construct(self.engine, definition.chain, self.cancel.handle)
         samples = {curve.id: self.curve(entity, curve, definition) for curve in definition.curves}
         if definition.kind == "LOFT":
             return native.loft(

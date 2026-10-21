@@ -31,7 +31,7 @@ def surface_action(controller):
 
 def create(editor, kind, shape):
     controller, args = editor.controller, editor.create_arguments(kind, shape)
-    curves = selected_curves(controller)
+    curves = selected_curves(controller) if kind in ("BODY", "LOFT") else []
     operation = "primitive.from_curves" if curves else "primitive.create"
     if curves:
         args["curves"] = curves

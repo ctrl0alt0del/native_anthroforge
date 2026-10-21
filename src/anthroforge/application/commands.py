@@ -31,6 +31,7 @@ from . import (
     point_operations,
     presentation,
     projects,
+    segment_operations,
     shrinkwrap_operations,
     snap_tasks,
     surface_branch_operations,
@@ -55,6 +56,9 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "chain.configure": segment_operations.configure,
+    "chain.segment": segment_operations.segment,
+    "chain.resize": segment_operations.resize,
     "shrinkwrap.add": shrinkwrap_operations.add,
     "shrinkwrap.update": shrinkwrap_operations.update,
     "surface.snap.curves": snap_tasks.confirm,

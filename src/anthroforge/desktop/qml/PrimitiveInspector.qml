@@ -29,12 +29,12 @@ ColumnLayout {
     Connections { target: authoring; function onChanged() { panel.syncSelection(); } }
     UiSection {
         title: panel.item.standalone ? "Curve" : "Primitive"
-        Label { visible: !panel.item.standalone; text: panel.primitive.kind === "LOFT" ? "Ordered curve loft" : panel.primitive.kind === "BODY" ? "Curve-deformed body" : "Imported mesh"; color: Theme.text }
+        Label { visible: !panel.item.standalone; text: ({LOFT:"Ordered curve loft",BODY:"Curve-deformed body",SEGMENT_CHAIN:"Segment chain",IMPORTED:"Imported mesh"})[panel.primitive.kind] || ""; color: Theme.text }
         CurveEngine { objectName: "standaloneEngine"; visible: !!panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
         UiButton { objectName: "editPrimitive"; text: panel.item.editing ? "Finish editing" : panel.item.standalone ? "Edit Curve" : "Edit Primitive"; checkable: true; checked: panel.item.editing || false; Layout.fillWidth: true; onClicked: authoring.setEditing(!panel.item.editing) }
         UiCombo { visible: panel.item.editing && panel.primitive.kind === "BODY"; Layout.fillWidth: true; model: ["Curve controls", "Base vertices · Hook assignment"]; currentIndex: panel.item.category === "BASE" ? 1 : 0; onActivated: authoring.setCategory(currentIndex === 1 ? "BASE" : "CURVE") }
         Label { visible: panel.topologyLocked; text: "Topology locked by child or surface attachments"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-        NumericSetting { objectName: "primitiveSamples"; visible: !panel.item.standalone && panel.primitive.kind !== "IMPORTED"; label: "Samples"; value: panel.primitive.samples || 32; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.primitiveSetting("samples",Math.round(value)) }
+        NumericSetting { objectName: "primitiveSamples"; visible: !panel.item.standalone && ["BODY","LOFT"].includes(panel.primitive.kind); label: "Samples"; value: panel.primitive.samples || 32; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.primitiveSetting("samples",Math.round(value)) }
         NumericSetting { visible: panel.primitive.kind === "LOFT"; label: "Across each strip"; value: panel.primitive.strips || 1; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.primitiveSetting("strips",Math.round(value)) }
         NumericSetting { visible: panel.primitive.kind === "LOFT"; label: "Sampling start"; value: panel.primitive.start || 0; onEdited: value => panel.primitiveSetting("start",value) }
         NumericSetting { visible: panel.primitive.kind === "LOFT"; label: "Sampling span"; value: panel.primitive.span || 1; onEdited: value => panel.primitiveSetting("span",value) }
@@ -114,6 +114,7 @@ ColumnLayout {
         NumericSetting { length: true; label: "Position along curve"; value: panel.piece.position || 0; onEdited: value => panel.pieceSetting("position",value) }
         NumericSetting { label: "Radial sides"; value: panel.piece.sides || 16; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.pieceSetting("sides",Math.round(value)) }
     }
+    SegmentChainInspector { visible: panel.primitive.kind === "SEGMENT_CHAIN"; item: panel.item; topologyLocked: panel.topologyLocked }
     DeformerStack { visible: !panel.item.standalone; item: panel.item }
     ThicknessInspector { visible: !panel.item.standalone; item: panel.item; topologyLocked: panel.topologyLocked }
 }

@@ -44,3 +44,14 @@ Blender Authors, GPL-2.0-or-later; adaptation GPL-3.0-or-later.
 nonuniform-transform and signed-offset cases across four nearest-surface snap modes.
 Ray projection, target-normal projection and smooth-normal Above Surface are not
 claimed by this nearest-surface adapter.
+# Segment Chain
+
+The generic parameter-driven primitive reproduces the saved FingerNodes geometry
+graphs from Blender 5.0.1: straight path resampling, Z-up Curve-to-Mesh frames,
+filled circular profiles, and AUTO CurveMapping radius profiles. Adjacent-pair
+bending preserves the source graph; cumulative bending is an explicit option.
+Zero-length source segments retain per-sample radius scaling before union.
+Union uses the existing native exact exterior-arrangement implementation.
+`tools/capture_segment_chain.py` records node output without saving the source file;
+the compact Index/Big_Toe fixtures retain its hash and source parameters.
+

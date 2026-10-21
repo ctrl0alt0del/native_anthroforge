@@ -26,7 +26,7 @@ def base(document: Any, meshes: Any, provider: Any) -> Any:
     material = document.object(provider.reference.target).final_material
     if material is None or material.final != provider.asset_id:
         raise ValueError("Confirmed tissue placement needs accepted final material provenance.")
-    if not material.base:
+    if material.base_state.kind != "SURFACE" or not material.base:
         return None
     if material.base not in meshes:
         raise ValueError("Confirmed tissue placement is missing its retained material base.")

@@ -211,3 +211,13 @@ remains on coordinator workers. The cube lifecycle case verifies 12 input triang
 
 Portable builds remain canonical under `dist/0.2.2/AnthroForge.dist`; the final executable
 qualification and source archive refresh remain pending. No new release directory exists.
+
+## Portable regression correction
+
+The relocated executable exposed a real adapter error when creating a Membrane in
+a reopened scene containing a curve-based tissue. Its accepted material base is a
+path resource, but the query adapter incorrectly looked it up as a mesh. The resource
+was retained correctly; this was not data loss. Query closure now requests a backing
+mesh only for accepted SURFACE construction. Radial and swept shells use their native
+generated geometry. The mixed radial/sweep save/reopen conversion regression and all
+20 attached-construction/query tests pass. Final executable qualification is rerunning.

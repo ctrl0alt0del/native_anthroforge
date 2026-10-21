@@ -12,7 +12,7 @@ from anthroforge.core.results import Port
 from anthroforge.native.attachments import capture, ordered, propagate
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 
-from . import dependencies, task_workloads
+from . import dependencies, evaluation_batches, task_workloads
 
 if TYPE_CHECKING:
     from .session import Session
@@ -27,9 +27,24 @@ def request(
 ) -> str:
     captures = captures_for(session.document, targets, recapture)
     targets, captures, pending = absorb_overlaps(session, targets, captures)
+    queued = min((p for p in (queued_since, pending) if p is not None), default=None)
+    jobs = [
+        submit_batch(session, group, captures & group, interactive, queued)
+        for group in evaluation_batches.groups(session.document, targets)
+    ]
+    return jobs[-1]
+
+
+def submit_batch(
+    session: "Session",
+    targets: set[str],
+    captures: set[str],
+    interactive: bool,
+    queued_since: float | None,
+) -> str:
     job = create_job(session, targets, captures)
     job.interactive = interactive
-    job.queued_since = min((p for p in (queued_since, pending) if p is not None), default=None)
+    job.queued_since = queued_since
     return session.scheduler.submit(job)
 
 

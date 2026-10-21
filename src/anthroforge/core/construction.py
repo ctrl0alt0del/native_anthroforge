@@ -120,6 +120,10 @@ class BodyPiece:
             raise ValueError("Body base subdivision must be between zero and five.")
 
 
+def body_closed(piece: BodyPiece, curve: Curve, primitive: "PrimitiveParameters") -> bool:
+    return piece.fit and cyclic(curve, primitive)
+
+
 @dataclass(frozen=True, slots=True)
 class PrimitiveParameters:
     kind: str

@@ -76,7 +76,7 @@ zero-length/zero-radius segment. Fixed-length bodies on cyclic guides retain cap
 Rib source GN double placement is explicit in consumer/control frames; connected
 loft seams differ intentionally. Scapula follows the live rib result. Ilium uses
 the shared pelvic guide plus a dense editable BASE cage; its current maximum
-surface discrepancy is ~0.0334 (diagonal ~4.77), not yet shape acceptance.
+surface discrepancy is ~0.01143 (diagonal ~4.77), not yet shape acceptance.
 The new comparison renders required correcting camera mode/fit; only inspect
 re-rendered full-frame views. External artifacts must be retained across recovery.
 
@@ -94,3 +94,18 @@ contains revised approved proposals and original review. Keep large anatomy asse
 outside Git. Preserve source file and unrelated root `__init__.py`.
 Blender: `C:/Program Files/Blender Foundation/Blender 5.0/blender.exe`.
 Python: `.venv/Scripts/python.exe`; build: `tools/build-native.ps1`.
+
+## Attachment qualification checkpoint
+
+All 59 entries now complete explicit evaluation with attachments enabled. A genuine
+scheduler defect was found: batching all poses introduced an artificial wait cycle
+through pose-following controls and parent geometry. Dependency-aware batch partitioning
+fixes it without ignoring inputs. Tests cover direct chains, mixed stage dependencies
+and actual cycles. Shared Hook editing, independent digit edits, undo and exact
+save/reopen passed. Placement changes while capturing bindings stay below 3.4e-7.
+The full gate first reported 1640 passing tests and one function-length failure;
+that function has been refactored. Fresh gate/UI/package validation remains pending.
+Latest Ilium cage uses actual captured Blender cap surfaces (native batch projection),
+with max 0.01143, mean 0.000394, p95 0.002249 scene-unit deviation. Earlier coarse
+and native n-gon-subdivision-derived cage fits were rejected. Native linear subdivision
+is qualified for this task's quad stages, not higher-level nonplanar n-gon Blender parity.

@@ -8,6 +8,7 @@ from anthroforge.core.construction import (
     Deformer,
     Primitive,
     ResolvedPrimitive,
+    body_closed,
     cyclic,
 )
 from anthroforge.core.document import Document
@@ -89,13 +90,11 @@ class Evaluation:
         return native.lattice(*args, cage_points=self.cage(control))
 
     def wrap(self, points: Any, binding: Deformer, frame: Any) -> Any:
-        from .assets import Asset
+        from .assets import MeshAssetView
         from .surface_providers import get
 
         assert binding.shrinkwrap is not None
-        assets = {
-            key: Asset(mesh, "generated", "", 1.0, False) for key, mesh in self.meshes.items()
-        }
+        assets = MeshAssetView(self.meshes)
         provider = get(self.engine, self.document, assets, binding.shrinkwrap.surface)
         return shrinkwrap.deform(self.engine, points, binding, frame, provider, self.cancel.handle)
 
@@ -150,7 +149,7 @@ class Evaluation:
         curve = next(c for c in definition.curves if c.id == piece.curve)
         closed = cyclic(curve, definition)
         samples_count = count(entity.primitive, piece.curve)
-        base = self.body_base(piece, samples_count, closed and piece.fit)
+        base = self.body_base(piece, samples_count, body_closed(piece, curve, definition))
         frame = native.matrix(self.engine, entity_frame(self.engine, entity), curve.matrix)
         original = base.array(0)
         points = self.deform(original, entity.deformers, "BASE", piece.id, frame)

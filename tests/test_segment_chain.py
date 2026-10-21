@@ -54,6 +54,18 @@ def test_parameter_edits_persist_and_undo(session, tmp_path):
     assert session.document.entity(entity).primitive.chain.segments[1].bend == 0.6
 
 
+def test_unstable_membership_rejected_but_whole_target_deformation_allowed(session):
+    entity = session.command("primitive.create", kind="SEGMENT_CHAIN")
+    session.wait()
+    control = session.command("control.create", entity=entity)
+    with pytest.raises(ValueError, match="changing geometry membership"):
+        session.command("deformer.add", control=control, target={"owner": entity}, indices=[0])
+    session.command("deformer.add", control=control, target={"owner": entity})
+    session.command("chain.segment", entity=entity, index=0, bend=0.2)
+    session.wait(timeout=5)
+    assert not session.scheduler.errors
+
+
 def test_union_returns_closed_nonempty_geometry():
     engine = GeometryEngine()
     source = source_settings(REFERENCE["cases"][0])

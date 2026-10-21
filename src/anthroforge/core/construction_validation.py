@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING
 
 from .construction import Control, Deformer, Primitive, Target
+from .construction_capabilities import stable_geometry_members
 from .entities import SCP
 
 if TYPE_CHECKING:
@@ -53,6 +54,12 @@ def binding(item: SCP | Control, value: Deformer, controls: dict[str, Control]) 
     ):
         raise ValueError("Binding requires a shared control of the matching kind.")
     target(item, value.target, value.kind)
+    if value.target.stage == "GEOMETRY" and not stable_geometry_members(item):
+        if value.indices or value.members or value.weights or value.weighted_members:
+            raise ValueError(
+                "Segment Chain has changing geometry membership; use whole-target "
+                "deformation or assign weights to a lattice cage instead."
+            )
 
 
 def control_references(control: Control, parents: set[str], anatomy: set[str]) -> None:

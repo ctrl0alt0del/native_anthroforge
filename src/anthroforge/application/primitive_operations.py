@@ -105,14 +105,23 @@ def topology_signature(primitive: ResolvedPrimitive) -> tuple[Any, ...]:
     from anthroforge.core.construction import cyclic
 
     curves = tuple((c.id, cyclic(c, primitive)) for c in primitive.curves)
-    pieces = tuple((p.id, p.shape, p.sides, p.subdivision) for p in primitive.pieces)
     return (
         primitive.samples,
         primitive.strips,
         primitive.caps,
         curves,
-        pieces,
+        body_topology(primitive),
         chain_topology(primitive.chain),
+    )
+
+
+def body_topology(primitive: ResolvedPrimitive) -> tuple[Any, ...]:
+    from anthroforge.core.construction import body_closed
+
+    curves = {c.id: c for c in primitive.curves}
+    return tuple(
+        (p.id, p.shape, p.sides, p.subdivision, body_closed(p, curves[p.curve], primitive))
+        for p in primitive.pieces
     )
 
 

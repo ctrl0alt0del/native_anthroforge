@@ -63,10 +63,7 @@ static int retained_frames(uint64_t reference,uint64_t current,const double* wor
     if(handle!=current) af_mesh_release(handle);
     return status;
 }
-}
-int af_material_binding_frames(uint64_t reference,uint64_t current,const double* world,int count,const double* records,double* frames,uint64_t cancel) {
-    try {
-        if(count<1||count>1000000||!world||!records||!frames) throw std::runtime_error("Invalid material frame buffers.");
+static int dispatch(uint64_t reference,uint64_t current,const double* world,int count,const double* records,double* frames,uint64_t cancel) {
         const auto a=af::mesh(reference),b=af::mesh(current);
         if(a->triangle_material.source_count||b->triangle_material.source_count) {
             af::triangle_material::frames(*a,*b,Eigen::Map<const af::M4>(world),count,records,frames,cancel); return 0;
@@ -77,6 +74,12 @@ int af_material_binding_frames(uint64_t reference,uint64_t current,const double*
         const af::M4 matrix=Eigen::Map<const af::M4>(world);
         if(!matrix.allFinite()||!matrix.fullPivLu().isInvertible()) throw std::runtime_error("Invalid attachment frame.");
         af::material::resolve_batch(*a,*b,matrix,count,records,frames,cancel); return 0;
+}
+}
+int af_material_binding_frames(uint64_t reference,uint64_t current,const double* world,int count,const double* records,double* frames,uint64_t cancel) {
+    try {
+        if(count<1||count>1000000||!world||!records||!frames) throw std::runtime_error("Invalid material frame buffers.");
+        return af::material::dispatch(reference,current,world,count,records,frames,cancel);
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_attachment_blend_frames(int count,const double* frames,const double* weights,double* points,uint64_t cancel) {

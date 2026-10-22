@@ -1,14 +1,14 @@
 # All available authored addon muscles on the migrated skeleton
 
 - Branch: `codex/all-muscle-migration`; integration `main`; base `b642ce5`.
-- Status: 96 authored units constructed and saved; full source/edit/persistence checks
-  pass. Final installed assembly recomputation/viewport inspection is running.
+- Status: complete. The qualified assembly is installed at the requested existing
+  project path; full source/edit/persistence/packaged checks pass.
 - Request: migrate accepted and awaiting-review builds into the same project as the
   prior four families. Latest correction excludes new mirrored copies. Four existing
   mirrored tissues are preserved. No rejected/unstarted/held cases were constructed.
 - Run: `E:/development/WIP_models/muscle_reconstruction_workflow/runs/2026-10-21-standalone-all-muscle-transfer-958f7969/`.
 - Destination remains the prior run's `skeleton_four_muscles_v001.anthroforge`.
-  The original is untouched; immutable recovery copy: `inputs/four-muscles-before.anthroforge`.
+  Original recovery copy: `inputs/four-muscles-before.anthroforge`.
 - Qualified candidate: `candidates/skeleton_all_authored_muscles_v001.anthroforge`.
   `qualification.json` records revision 51435, source hashes, edits and reopen.
 - Direct coordinator work; background/offscreen only; no agents or source .blend edits.
@@ -69,16 +69,20 @@ separate responsibilities, with existing coordinator publication and resource ow
   `build/all-muscle-final-portable.log` passes the full hidden/offscreen suite.
   Later commits change docs/test setup only. No interactive desktop acceptance claimed.
 
-## Remaining delivery steps
+## Delivery
 
-1. Finish `tmp/qualify_packaged.py` (log `logs/final-packaged.log`), then run
-   `tmp/compare_packaged.py`; inspect actual `views/assembly-*.png` renders.
-2. Run `tmp/final_review.py`, freeze immutable practical lesson revision 2 and usage,
-   update the muscle skill and run manifest without upgrading donor approval.
-3. Update this record and CH-032–036 final evidence; commit/push and validated merge
-   to latest main. Refresh the single source archive.
-4. Run `tmp/deliver.py` only after all checks. It locks/hash-checks the original and
-   atomically replaces the requested path, preserving the backup and immutable candidate.
+- Installed executable recalculates 518 objects through 11385 recorded jobs, with
+  no failed jobs. `checks/packaged-comparisons.json` passes all 96 source comparisons.
+  All three actual `views/assembly-*.png` viewports were inspected offscreen.
+- `review.json` freezes coordinator evidence and limits. Practical lesson
+  `standalone-muscle-material-correspondence-20261022` r2 and the muscle skill are
+  updated. Matching final context/usage receipts are stored under `knowledge/`.
+- `tmp/deliver.py` locked and hash-checked the original before atomic replacement.
+  `delivery.json` records the installed hash and recovery path. The final document
+  contains 59 SCPs, 100 tissues, 100 membranes and 337 fibers, including the four
+  pre-existing mirrored tissues. There are no new mirrored copies.
+- Production fixes and task context follow normal checkpoint/push/validated merge
+  to main. One canonical 0.2.3 distribution and companion source archive remain.
 
 All scripts/captures/candidates are in the external run, not production. Preserve
 unrelated root `__init__.py`. Do not run competing writers or overwrite source files.

@@ -1233,8 +1233,8 @@ See the task and development validation records for final gate/package evidence 
   now reproduce their saved source inflation within 2.3e-7 scene units.
 - Ownership: filtering and numerical coordinates belong to the shared C++ spatial
   query; Python migration retains ordinary application capture and transactions.
-  The combined 1660-test development gate and canonical portable suite pass;
-  full assembled migration qualification is still pending.
+  The final 1669-test gate and canonical portable suite pass; complete assembly
+  qualification is recorded below under CH-036.
 
 ### CH-033 — Retain correspondence through branch evaluation (2026-10-22)
 
@@ -1253,8 +1253,8 @@ See the task and development validation records for final gate/package evidence 
   deformation, exact seam counts, save/reopen/recompute, and invalid-density rejection.
   Branch addition cannot silently discard an existing ordinary-loft material mapping.
 - Scope remains complete open curves with exact evaluated-corner preservation.
-  The full 1660-test development gate and canonical portable suite pass. Final
-  assembled migration qualification remains pending; this is not anatomical reapproval.
+  The final 1669-test gate, canonical portable suite and complete assembled
+  qualification pass (CH-036); this is not anatomical reapproval.
 
 ### CH-034 — Valid initial diagonals for generated quads (2026-10-22)
 
@@ -1277,7 +1277,7 @@ See the task and development validation records for final gate/package evidence 
   The 39 focused geometry/correspondence/branch tests and native CTests pass.
 - This migration regenerates its affected pre-delivery result caches through the
   normal coordinator, keeping authored definitions. Full assembly and package
-  qualification with the repaired tessellation remain pending.
+  qualification with the repaired tessellation pass (CH-036).
 - The first integrated audit then exposed a second ownership boundary: single-side
   inflation inherited its base's connectivity even before its own first publication.
   Intrinsic finalization now selects initial triangulation for the completed tissue
@@ -1310,7 +1310,7 @@ See the task and development validation records for final gate/package evidence 
   centroids in both directions. Evidence: `roundoff-and-material-crop-experiment.json`
   in the all-muscle migration run. Synthetic collapsed-pole and nonplanar material
   quad regressions pass, alongside existing addon inflation/crop fixtures. Full
-  assembly, lifecycle and packaged qualification remain pending.
+  assembly, lifecycle and packaged qualification pass (CH-036).
 
 ### CH-036 — Declared Fiber deformation supports (2026-10-22)
 
@@ -1334,5 +1334,19 @@ See the task and development validation records for final gate/package evidence 
   paths and native capture algorithm. Source per-node weights are not copied
   verbatim. Existing user projects are not silently recaptured on load.
 - Focused creation/editing tests pass, including nearby unrelated tissue, explicit
-  tissue support, mixed explicit parents, and Any-parent rebinding. Full assembly
-  edit/undo and packaged qualification are running; final evidence follows.
+  tissue support, mixed explicit parents, and Any-parent rebinding. The production
+  publication-frontier fixture now binds its tissue explicitly, retaining coverage
+  of tissue-to-Fiber-to-Membrane dependencies without relying on implicit support.
+- Combined acceptance for CH-032–036: **1669 tests**, five native CTests, style,
+  typing, numerical-boundary audit, doctor and the canonical portable suite pass.
+  All 96 authored units match donor surfaces within 9.56e-7 scene units, including
+  bidirectional triangle-centroid checks. Three bone and five Fiber edits pass;
+  undo is exact and normal reopen drifts at most 1.76e-12. The installed executable
+  recalculates 518 objects with no failed jobs and again passes all source comparisons.
+  Actual 96 source/app pairs and three installed viewport views were inspected.
+- Evidence is frozen in `review.json`, `qualification.json`, and `checks/` under
+  `E:/development/WIP_models/muscle_reconstruction_workflow/runs/2026-10-21-standalone-all-muscle-transfer-958f7969`.
+  Original 139 authored objects and 74 source files remain preserved. Six generated
+  bone face lists reorder without changing oriented triangles or vertices. Donor
+  approval, construction proxies, and whole-body packing limits remain unchanged;
+  offscreen evidence is not interactive desktop acceptance.

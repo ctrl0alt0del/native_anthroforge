@@ -35,6 +35,9 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
   Reuse the existing value-returning `relationship_key` and update maintained source
   provenance. [CH-045](../computation_history.md#ch-045--owned-stacking-relationship-lookup-keys-2026-10-22)
   records the ownership correction; ordering policies and numerical methods remain.
+- Windows subsequently reached `curve_fit.cpp` and reported MSVC C4244 on the
+  intentional double-to-float range constructor. Use an explicit conversion into
+  the same float buffer, preserving the donor fitting precision and validation.
 - Follow [cloud development](../cloud_development.md) and
   [engineering guidelines](../engineering_guidelines.md).
 

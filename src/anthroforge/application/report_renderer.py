@@ -1,12 +1,16 @@
 """Isolated optional desktop renderer; the headless process never imports Qt."""
 
-import os
 import subprocess
 import sys
 from pathlib import Path
 from threading import Event
 from time import monotonic
 from typing import BinaryIO
+
+if sys.platform == "win32":
+    CREATION_FLAGS = subprocess.CREATE_NO_WINDOW
+else:
+    CREATION_FLAGS = 0
 
 
 def command(root: Path, revision: int) -> list[str]:
@@ -30,10 +34,9 @@ def launcher() -> list[str]:
 
 
 def render(root: Path, revision: int, cancel: Event) -> None:
-    flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
     with (root / "renderer.log").open("w+b") as log:
         with subprocess.Popen(
-            command(root, revision), stdout=log, stderr=log, creationflags=flags
+            command(root, revision), stdout=log, stderr=log, creationflags=CREATION_FLAGS
         ) as process:
             try:
                 wait(process, cancel)

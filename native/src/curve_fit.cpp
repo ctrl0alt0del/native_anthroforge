@@ -27,7 +27,8 @@ static void validate_fit(const double* points,int count,const FitSettings& s) {
 static std::vector<float> stroke_points(const double* points,int count,const FitSettings& s) {
     validate_fit(points,count,s); std::vector<float> values;
     for(int i=0;i<count;++i) {
-        check_cancel(s.cancel); std::vector<float> next(points+i*s.dimensions,points+(i+1)*s.dimensions);
+        check_cancel(s.cancel); std::vector<float> next(size_t(s.dimensions));
+        std::transform(points+i*s.dimensions,points+(i+1)*s.dimensions,next.begin(),[](double value){return float(value);});
         if(!std::all_of(next.begin(),next.end(),[](float v){return std::isfinite(v);}) ||
             (s.dimensions==4&&next[3]<0)) throw std::runtime_error("Stroke values must be finite; radius nonnegative.");
         if(values.empty()||!std::equal(next.begin(),next.end(),values.end()-s.dimensions))

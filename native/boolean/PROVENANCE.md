@@ -12,6 +12,16 @@ Both packages' original header notices apply. No competing worker pool is enable
 The libigl `assign_scalar` GMPXX overload guards additionally require CGAL_USE_GMPXX
 so the no-GMP configuration works on non-Windows platforms too.
 
+Compiler compatibility corrections (2026-10-22): vendored libigl CGAL headers use
+`AABB_traits_3` and `AABB_triangle_primitive_3` and their corresponding headers.
+CGAL 6.1.1 defines the old names as aliases of these exact types; geometry behavior
+is unchanged. See [CGAL's migration notes](https://www.cgal.org/2024/09/27/cgal60/).
+Three unreachable `return false` statements after unconditional throws or a fully
+returning/throwing switch were removed from `closest_facet.cpp` and
+`extract_cells_single_component.cpp`. Exception and orientation semantics are
+unchanged. These corrections retain GCC/MSVC warnings-as-errors; no warning
+suppression or numerical algorithm change is introduced.
+
 Cancellation is checked between arrangement stages and during output construction.
 A running exact intersection-remeshing call completes before observing cancellation.
 The query mesh is transient, cached with bounded retained-resource accounting, and

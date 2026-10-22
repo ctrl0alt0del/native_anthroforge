@@ -35,7 +35,8 @@ int af_stack_orders(uint64_t handle,AfStackOrder* rows,int count) {
     try {
         const auto& orders=af::stacking::required(handle).state.effective;
         if(count!=int(orders.size())||(!rows&&count)) throw std::runtime_error("Invalid stacking order capacity.");
-        for(int i=0;i<count;++i) rows[i]=af::stacking::order(orders[size_t(i)].summary); return 0;
+        for(int i=0;i<count;++i) rows[i]=af::stacking::order(orders[size_t(i)].summary);
+        return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_stack_points(uint64_t handle,uint64_t identity,double* points,int count,double* metrics) {

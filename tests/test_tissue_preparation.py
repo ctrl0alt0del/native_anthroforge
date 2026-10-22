@@ -52,7 +52,8 @@ def test_changed_geometry_clearing_and_budget_do_not_reuse_stale_preparation(ses
     original = tissue_parts.evaluate(base, parts, "a", False)
     moved = construction.deformed(base, base.array(0) + (0.01, 0.02, 0.03))
     output = tissue_parts.evaluate(moved, parts, "a", False)
-    np.testing.assert_array_equal(output.array(0), unprepared(moved, parts).array(0))
+    expected = unprepared(moved, parts)
+    np.testing.assert_array_equal(output.array(0), expected.array(0))
     assert not np.array_equal(output.array(0), original.array(0))
     cache = session.engine.tissue_preparations
     assert len(cache.retained()) == 2 and cache.bytes > 0
@@ -69,11 +70,11 @@ def test_cancelled_capture_and_concurrent_reads_preserve_input(session):
     with pytest.raises(ValueError, match="[Cc]ancel"):
         tissue_parts.evaluate(base, parts, "a", False, token.handle)
     assert not session.engine.tissue_preparations.retained()
-    expected = unprepared(base, parts).array(0).copy()
+    expected = unprepared(base, parts)
     with ThreadPoolExecutor(2) as pool:
         jobs = [pool.submit(tissue_parts.evaluate, base, parts, "a", False) for _ in range(4)]
         for job in jobs:
-            np.testing.assert_array_equal(job.result().array(0), expected)
+            np.testing.assert_array_equal(job.result().array(0), expected.array(0))
 
 
 def test_native_context_rejects_incompatible_mode(session):

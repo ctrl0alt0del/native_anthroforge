@@ -251,6 +251,7 @@ class Mesh:
             engine.resource_observer(self)
 
     def array(self, kind: int) -> Any:
+        """Return a read-only borrowed view; keep this geometry alive while using it."""
         vertices, faces, corners, triangles, _ = self.counts
         shapes = ((vertices, 3), (corners,), (faces + 1,), (triangles, 3), (triangles,))
         types = (c.c_double, c.c_int64, c.c_int64, c.c_int32, c.c_int64)

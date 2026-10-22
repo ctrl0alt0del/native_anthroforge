@@ -63,8 +63,8 @@ namespace igl
         const Eigen::PlainObjectBase<DerivedV> & V,
         const Eigen::PlainObjectBase<DerivedF> & F,
         CGAL::AABB_tree<
-          CGAL::AABB_traits<Kernel, 
-            CGAL::AABB_triangle_primitive<Kernel, 
+          CGAL::AABB_traits_3<Kernel,
+            CGAL::AABB_triangle_primitive_3<Kernel,
               typename std::vector<CGAL::Triangle_3<Kernel> >::iterator
             >
           >
@@ -89,8 +89,8 @@ namespace igl
       IGL_INLINE void point_mesh_squared_distance(
         const Eigen::PlainObjectBase<DerivedP> & P,
         const CGAL::AABB_tree<
-          CGAL::AABB_traits<Kernel, 
-            CGAL::AABB_triangle_primitive<Kernel, 
+          CGAL::AABB_traits_3<Kernel,
+            CGAL::AABB_triangle_primitive_3<Kernel,
               typename std::vector<CGAL::Triangle_3<Kernel> >::iterator
             >
           >

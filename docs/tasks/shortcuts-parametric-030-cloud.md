@@ -27,8 +27,11 @@ Follow the [confirmed specification](../specification_030.md) and
 
 ## Current state
 
-The cloud branch starts at the exact pushed desktop pause checkpoint. No desktop
-branch changes are made. The first work is checking the pending lattice-reference
+The cloud branch starts at the exact pushed desktop pause checkpoint. Main's
+validated CI fixes are reconciled here; the only merge conflict was overlapping
+computation-history additions. Both are retained, with the desktop expression
+record reassigned CH-049 to preserve main's published CH-045. No desktop branch
+changes are made. The first work is checking the pending lattice-reference
 guard and qualifying the new catalogue, policy UI, generated-curve placeholders,
 formula/path dependencies and structural reference handling.
 

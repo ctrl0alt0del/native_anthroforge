@@ -46,6 +46,12 @@ class GeometryEngine(NativeEngine):
         self.tissue_materials: ResourceCache[MaterialLease] = ResourceCache(
             64 * 1024 * 1024, 64, "tissue_material"
         )
+        self._query_caches()
+
+    def _query_caches(self) -> None:
+        self.collision_checks: ResourceCache[Any] = ResourceCache(
+            128 * 1024 * 1024, 1, "collision_pairs"
+        )
         self.surface_queries: ResourceCache[Query] = ResourceCache(
             64 * 1024 * 1024, 64, "surface_query"
         )
@@ -60,6 +66,7 @@ class GeometryEngine(NativeEngine):
             self.tissue_materials,
             self.surface_queries,
             self.paint_surfaces,
+            self.collision_checks,
         )
 
     def clear_caches(self) -> None:

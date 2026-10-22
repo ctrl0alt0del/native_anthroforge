@@ -40,6 +40,9 @@ Step 1 implemented and measured (CH-039): 10 targeted tests pass, dispatch 47–
 versus 632–650 ms; hidden repeated-edit settling 1.21 s versus 3.56–3.66 s.
 Step 2 implemented and measured (CH-040): 26 focused checks pass; recorded ribs
 4.65 s versus 7.50 s, off 4.21–4.32 s versus 4.54–4.62 s. No profiler resource loss.
-Next: step 3 incremental Fiber collisions and retained native scene capture. Preserve baseline native DLL
+Step 3 implemented (CH-041): native context reuses colliders and pair evidence,
+30 focused checks plus failed-capture recovery; profile-edit settle 221–324 ms.
+Ribs timing needs counterbalanced recheck; do not claim its improvement.
+Next: step 4 exclusive stacking context leases, native obstacle handles, metadata-only plans. Preserve baseline native DLL
 at build/vcp-performance-024-release/baseline-af_native.dll; baseline-replay/ now freezes 11 snapshots of 1,456 arrays before
 numerical changes. Remaining steps and release qualification are pending.

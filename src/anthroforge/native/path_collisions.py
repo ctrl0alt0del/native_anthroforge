@@ -19,6 +19,13 @@ def configure(engine: GeometryEngine) -> None:
         "af_path_collisions",
         [c.POINTER(CollisionPath), c.c_int, c.POINTER(U), D, c.c_int, INT, D, U],
     )
+    engine.bind("af_collision_cache_create", [], U)
+    engine.bind("af_collision_cache_release", [U], None)
+    engine.bind("af_collision_cache_bytes", [U], U)
+    engine.bind(
+        "af_path_collisions_cached",
+        [U, c.POINTER(CollisionPath), c.c_int, c.POINTER(U), D, c.c_int, INT, D, c.POINTER(U), U],
+    )
 
 
 def row(path: Any, world: Any, owners: Any) -> CollisionPath:
@@ -38,7 +45,48 @@ def check(
     meshes, frames = np.asarray(handles, dtype=np.uint64), doubles(frames)
     if frames.size != len(meshes) * 16 or len(rows) * len(meshes) > 1000000:
         raise ValueError("Invalid collision surface frames or excessive pair count.")
-    return invoke(engine, rows, meshes, frames, cancel)
+    return cached(engine, rows, meshes, frames, cancel)
+
+
+class CollisionCache:
+    def __init__(self, engine: GeometryEngine) -> None:
+        self.engine, self.handle = engine, engine.library.af_collision_cache_create()
+        engine.check(not self.handle)
+
+    @property
+    def bytes(self) -> int:
+        return int(self.engine.library.af_collision_cache_bytes(self.handle))
+
+    def __del__(self) -> None:
+        if getattr(self, "handle", 0):
+            self.engine.library.af_collision_cache_release(self.handle)
+
+
+def cached(engine: GeometryEngine, rows: Any, meshes: Any, frames: Any, cancel: int) -> Any:
+    cache = engine.collision_checks.get(())
+    if cache is None:
+        cache = engine.collision_checks.store((), CollisionCache(engine), 0)
+    result, tolerance, stats = invoke_cached(engine, cache, frames, rows, meshes, cancel)
+    engine.collision_checks.reweigh((), cache, cache.bytes)
+    engine.collision_checks.observe("pairs", (), reason=f"hit={stats[0]},miss={stats[1]}")
+    return result, tolerance
+
+
+def invoke_cached(engine: Any, cache: Any, frames: Any, rows: Any, meshes: Any, cancel: int) -> Any:
+    output, tolerance = np.empty((len(rows), len(meshes)), dtype=np.int32), np.empty(1)
+    stats = np.zeros(2, dtype=np.uint64)
+    inputs = cache.handle, (CollisionPath * len(rows))(*rows), len(rows)
+    outputs = (
+        meshes.ctypes.data_as(c.POINTER(U)),
+        pointer(frames),
+        len(meshes),
+        output.ctypes.data_as(INT),
+        pointer(tolerance),
+        stats.ctypes.data_as(c.POINTER(U)),
+        cancel,
+    )
+    engine.check(engine.library.af_path_collisions_cached(*inputs, *outputs))
+    return output, float(tolerance[0]), stats
 
 
 def invoke(engine: GeometryEngine, rows: Any, meshes: Any, frames: Any, cancel: int) -> Any:

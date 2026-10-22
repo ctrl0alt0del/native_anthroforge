@@ -1445,3 +1445,29 @@ See the task and development validation records for final gate/package evidence 
 - Evidence: `build/vcp-performance-024-release/step2/`; baseline native geometry replay
   frozen in `baseline-replay/` before numerical changes (11 snapshots, 1,456 arrays each).
   Original fixtures remain untouched. Full combined release checks remain pending.
+
+### CH-041 — Incremental native advisory collision evidence (2026-10-22)
+
+- Each check previously copied all collider geometry, rebuilt BVHs/closure metadata,
+  and tested every path/surface pair. A first pair-cache experiment exposed the next
+  cost: the 71 MB collision scene exceeded the existing 64 MiB routing cache; two
+  captures alone took 425 ms. Increasing that cache was not the implemented solution.
+- The advisory checker now owns an exclusive native context. It transfers unchanged
+  colliders into changed scenes, updates transforms/bounds exactly, and caches pair
+  results by immutable path handle, complete frame/contact membership, surface handle,
+  surface frame/index and the original global metric tolerance. Path bounds reject
+  only provably disjoint surfaces. Numerical contact/collision kernels are unchanged.
+- Only current rows/surfaces are retained; evidence metadata is capped at 32 MiB and
+  complete retained context at 128 MiB. Jobs retain leases across cache eviction;
+  failed/cancelled partial scene captures release ownership safely. Existing issue
+  fingerprints, eligibility, unavailable surfaces and stale-publication guards remain.
+- Native CTests and 30 focused collision/profiler/architecture checks pass, with an
+  additional failed-capture recovery check. Warm reuse, miss-to-hit motion, changed
+  contacts, reordered/removed surfaces, changed tolerance and cancellation match a
+  fresh full query. Modified native files pass clang-tidy.
+- On the assembly, recorded collision calls after a profile edit total about 26 ms
+  versus the original 849 ms. Recorder-off profile settling is 221–324 ms versus
+  1,023–1,043 ms. Broad ribs-edit end-to-end trials are noisy and slower in this run;
+  no improvement is claimed there pending serial counterbalanced qualification.
+  Local evidence: `build/vcp-performance-024-release/step3-retained/`. Full geometry
+  replay and combined release checks remain pending.

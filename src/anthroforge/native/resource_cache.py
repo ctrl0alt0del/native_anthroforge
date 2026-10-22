@@ -52,6 +52,14 @@ class ResourceCache[T]:
             self.bytes = 0
             self.observe("clear", (), size, "lifecycle")
 
+    def reweigh(self, key: tuple[Any, ...], value: T, size: int) -> None:
+        with self.lock:
+            if key not in self.items or self.items[key][0] is not value:
+                return
+            self.bytes += size - self.items[key][1]
+            self.items[key] = (value, size)
+            self.trim()
+
     def observe(self, action: str, key: tuple[Any, ...], size: int = 0, reason: str = "") -> None:
         if self.observer is not None:
             self.observer(

@@ -17,7 +17,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/routing_piqp.cpp src/routing_qp_problem.cpp src/routing_trace.cpp
     src/routing_mesh_surface.cpp src/routing_shells.cpp src/routing_access.cpp src/routing_roadmap.cpp
     src/routing_random.cpp src/routing_pin_tree.cpp src/routing_pin_growth.cpp
-    src/path_contacts.cpp src/path_collisions.cpp src/routing_clearance.cpp src/sampling_allocation.cpp src/path_resampling.cpp
+    src/path_contacts.cpp src/path_collisions.cpp src/path_collision_cache.cpp src/routing_clearance.cpp src/sampling_allocation.cpp src/path_resampling.cpp
     src/routing_pin_graph.cpp src/routing_pin_recovery.cpp src/routing_search.cpp src/routing_warm.cpp
     src/curve_surface.cpp src/surface_inputs.cpp src/surface_sampling.cpp src/surface_alignment.cpp src/surface_correspondence.cpp
     src/surface_loft.cpp src/surface_patch_projection.cpp src/surface_patch_triangulation.cpp

@@ -10,6 +10,7 @@ from anthroforge.native.attachment_fields import Field
 from anthroforge.native.binding_batches import BindingBatch
 from anthroforge.native.inspection import Comparison
 from anthroforge.native.mesh import Mesh
+from anthroforge.native.path_collisions import CollisionCache
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
 from anthroforge.native.tissue_stacking import MaterialLease
@@ -50,6 +51,7 @@ RESOURCE_TYPES = (
     BindingBatch,
     MaterialLease,
     Comparison,
+    CollisionCache,
 )
 
 

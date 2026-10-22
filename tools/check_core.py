@@ -48,7 +48,9 @@ def native_checks(style):
     if style:
         commands = json.loads((ROOT / "build/core/compile_commands.json").read_text())
         for path in sorted({entry["file"] for entry in commands}):
-            run("clang-tidy", path, "-p", "build/core", "--quiet")
+            # Upstream sources retain their own style; match check-native-style.ps1.
+            if not Path(path).resolve().is_relative_to(ROOT / "native/vendor"):
+                run("clang-tidy", path, "-p", "build/core", "--quiet")
 
 
 def workflow_checks():

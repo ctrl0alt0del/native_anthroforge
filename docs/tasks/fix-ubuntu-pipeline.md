@@ -25,6 +25,9 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
   Update the deprecated aliases to identical current CGAL types and remove only
   unreachable returns. Preserve warnings-as-errors and all numerical algorithms.
   [Vendor provenance](../../native/boolean/PROVENANCE.md) records the patches.
+- `tools/check_core.py` must exclude `native/vendor` translation units from the
+  authored function-size check, matching `tools/check-native-style.ps1` and the
+  documented vendor exemption. Native compilation and all tests still include them.
 - Follow [cloud development](../cloud_development.md) and
   [engineering guidelines](../engineering_guidelines.md).
 
@@ -51,6 +54,9 @@ The selected flags and subprocess lifecycle retain their existing behavior.
   passed Ubuntu mypy and reproduced the subsequent CGAL `-Werror=cpp` build failure.
   The local gate reproduced the same build failure.
 - Native compatibility corrections and full portable/remote gates pending validation.
+- Targeted clang-tidy on vendored `curve_fit_cubic.c` reproduced 20 function-size
+  errors. This source is unchanged upstream code; the portable style check now
+  applies the existing authored-code policy consistently.
 
 ## Next actions and blockers
 

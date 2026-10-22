@@ -1,6 +1,7 @@
 # VCP performance optimization — 0.2.4
 
-- Status: implementation and release qualification complete; validated merge/push pending.
+- Status: complete; implementation and release qualification merged and pushed to `main`.
+- Release merge: `76013d8`; canonical portable package and companion source archive verified.
 - Branch: `codex/vcp-performance-024`; integration: `main`.
 - Baseline: `52690bd` (0.2.3, completed performance analysis).
 - Scope: implement the six recommendations in [the analysis](../vcp_performance_024.md)
@@ -62,8 +63,11 @@ inspected. Remaining frame stalls are documented in docs/performance_024.md.
 Version 0.2.4 canonical package built and full relocated offscreen/minimal-PATH suite
 passed. Packaged real-assembly edit/undo/save/reopen/render passes, with 619 authored
 definitions and 1,587 arrays unchanged; report complete/no losses. Source remains Qt-free
-headlessly. Next: commit final evidence, validated merge/push, finish source archive.
+headlessly. Validated release merged and pushed as `76013d8`. Canonical deliverables:
+`dist/0.2.4/AnthroForge.dist/AnthroForge.exe` and
+`dist/AnthroForge-0.2.4-source.zip`; archive integrity and source contents verified.
 Preserve baseline native DLL
 at build/vcp-performance-024-release/baseline-af_native.dll; baseline-replay/ now freezes 11 snapshots of 1,456 arrays before
 numerical changes. Full evidence and limits: docs/performance_024.md. No remaining
-implementation or qualification failures; packaging/merge bookkeeping only.
+implementation or qualification work. Final documentation is synchronized into the
+canonical package and companion archive; no additional distribution was created.

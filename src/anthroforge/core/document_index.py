@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 
-from . import construction_validation, dependency_graph
+from . import construction_validation, dependency_graph, snapshot_definitions
 from .construction import Control
 from .deformer_references import signature as binding_signature
 from .entities import SCP, validate_tree
@@ -86,7 +86,9 @@ def breadth_first(children: Mapping[str, list[str]]) -> tuple[tuple[str, ...], M
     return tuple(order), MappingProxyType(depths)
 
 
-def validated_structure(document: "Document", signature: dict[str, tuple[Any, ...]]) -> Structure:
+def validated_structure(
+    document: "Document", signature: dict[str, tuple[Any, ...]], links: tuple[Any, ...]
+) -> Structure:
     validate_tree(document.entities)
     construction_validation.document(document)
     layout = tree_layout(document.entities)
@@ -96,7 +98,7 @@ def validated_structure(document: "Document", signature: dict[str, tuple[Any, ..
         *layout,
         graph,
         document.attachments_enabled,
-        object_links(document),
+        links,
     )
 
 
@@ -112,14 +114,15 @@ def construction_graph(document: "Document") -> dependency_graph.DependencyGraph
 
 def structure(document: "Document", previous: DocumentIndex | None) -> Structure:
     signature = signatures(document, previous)
+    links = object_links(document, previous)
     if previous and previous.structure.attachments == document.attachments_enabled:
         if (
             signature == previous.structure.signatures
             and same_order(document, previous)
-            and object_links(document) == previous.structure.object_links
+            and links == previous.structure.object_links
         ):
             return previous.structure
-    return validated_structure(document, signature)
+    return validated_structure(document, signature, links)
 
 
 def same_order(document: "Document", previous: DocumentIndex) -> bool:
@@ -167,8 +170,35 @@ def build(document: "Document", previous: DocumentIndex | None) -> DocumentIndex
     )
 
 
-def object_links(document: "Document") -> tuple[Any, ...]:
-    return tuple(object_link(o, document) for o in document.objects) + document.junctions
+def object_links(document: "Document", previous: DocumentIndex | None = None) -> tuple[Any, ...]:
+    cached = cached_links(document, previous)
+    return (
+        tuple(
+            cached[o.id][1]
+            if o.id in cached and snapshot_definitions.same(cached[o.id][0], o)
+            else object_link(o, document)
+            for o in document.objects
+        )
+        + document.junctions
+    )
+
+
+def link_context(objects: tuple[Any, ...]) -> tuple[Any, ...]:
+    # Other records affect source roles, parent-frame walks and junction dependencies.
+    return tuple((o.id, type(o), o.parent) for o in objects)
+
+
+def cached_links(document: "Document", previous: DocumentIndex | None) -> dict[str, Any]:
+    if not previous or document.junctions != previous.source_junctions:
+        return {}
+    if link_context(document.objects) != link_context(previous.source_objects):
+        return {}
+    return {
+        item.id: (item, link)
+        for item, link in zip(
+            previous.source_objects, previous.structure.object_links, strict=False
+        )
+    }
 
 
 def object_link(item: Any, document: "Document") -> tuple[Any, ...]:

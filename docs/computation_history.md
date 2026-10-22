@@ -1350,3 +1350,20 @@ See the task and development validation records for final gate/package evidence 
   bone face lists reorder without changing oriented triangles or vertices. Donor
   approval, construction proxies, and whole-body packing limits remain unchanged;
   offscreen evidence is not interactive desktop acceptance.
+
+### CH-037 — Reuse validated snapshot relationships during publication (2026-10-22)
+
+- Large-assembly opening spent about 141 of 149 seconds in result publication.
+  Every pending/result change reconstructed relationships and revalidated the entire
+  document; non-routed paths also enumerated every tissue surface unnecessarily.
+- Snapshot indexes now reuse per-record links when definitions and the cross-record
+  parent/type/junction context are unchanged. Registry maps still own current records;
+  only validation and consumer relationships are reused for known evaluated fields.
+  Unknown/new authored fields invalidate validation by default. Stack plans remain
+  relationship inputs. Constructors continue validating every changed record.
+- Manual routing discovers anatomical providers only when requested. Tissue pending
+  states publish together, with no publication when already pending. Algorithms,
+  geometry tolerances, input revision checks and attachment capture remain unchanged.
+- Initial evidence: 26 focused tests cover value/result edits, immutable old snapshots,
+  parent frame walks, provider changes, invalid references and batched pending states.
+  Full assembly timing, behavior and packaged evidence are pending on the task branch.

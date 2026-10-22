@@ -143,12 +143,7 @@ def launch_phases(
 def edited(session: Any, seeds: set[Port]) -> None:
     ports = dep.closure(dep.reverse(dep.graph(session.document)), seeds)
     targets = {p.owner for p in ports if p.output in PHASES}
-    for key in targets:
-        item = session.document.object(key)
-        if isinstance(item, TissueVCP):
-            tissue_results.install(
-                session, tissue_results.pending(item, {p.output for p in ports if p.owner == key})
-            )
+    tissue_results.mark_pending(session, ports)
     schedule(session, targets)
 
 

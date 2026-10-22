@@ -121,3 +121,16 @@ def pending(item: TissueVCP, phases: set[str]) -> TissueVCP:
         if phase in phases
     }
     return replace(item, result=replace(item.result, status="pending"), **changes)
+
+
+def mark_pending(session: Any, ports: Any) -> None:
+    phases: dict[str, set[str]] = {}
+    for port in ports:
+        if port.output in PHASES:
+            phases.setdefault(port.owner, set()).add(port.output)
+    objects = tuple(
+        pending(o, phases[o.id]) if isinstance(o, TissueVCP) and o.id in phases else o
+        for o in session.document.objects
+    )
+    if objects != session.document.objects:
+        session.replace_document(objects=objects)

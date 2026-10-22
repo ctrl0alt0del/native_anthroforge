@@ -38,9 +38,13 @@ without evidence. The unrelated untracked root `__init__.py` must remain untouch
 
 ## Current state
 
-Baseline inspection is complete. Implementation and new regression tests are pending.
-No production behavior has changed. Existing package is canonical 0.2.3; no version
-bump requested. Required runtime/package checks and source archive refresh remain pending.
+First increment implemented: cached per-record dependency links, conservative reuse
+of registry validation for evaluated-only changes, guarded manual-routing discovery,
+and batched tissue pending publication. 26 focused contract tests, architecture/function
+limits and mypy pass. Full fixture timing and behavior replay are in progress against
+a frozen baseline source copy in diagnostics/open-optimization-20261022.
+Existing package is canonical 0.2.3; no version bump requested. Startup provenance,
+coalescing, asynchronous launch, full gates/package checks and archive refresh remain pending.
 
 ## Verification and next steps
 

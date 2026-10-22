@@ -11,6 +11,7 @@ class ResourceCache[T]:
         self.items: OrderedDict[tuple[Any, ...], tuple[T, int]] = OrderedDict()
         self.lock = Lock()
         self.observer: Any = None
+        self.epoch = 0
 
     def get(self, key: tuple[Any, ...]) -> T | None:
         with self.lock:
@@ -50,7 +51,29 @@ class ResourceCache[T]:
             size = self.bytes
             self.items.clear()
             self.bytes = 0
+            self.epoch += 1
             self.observe("clear", (), size, "lifecycle")
+
+    def take(self, key: tuple[Any, ...]) -> tuple[T | None, int]:
+        with self.lock:
+            item = self.items.pop(key, None)
+            if item is not None:
+                self.bytes -= item[1]
+            self.observe("lease" if item else "miss", key)
+            return item[0] if item else None, self.epoch
+
+    def restore(self, key: tuple[Any, ...], value: T, size: int, epoch: int) -> None:
+        with self.lock:
+            if epoch == self.epoch and key not in self.items:
+                self.admit(key, value, size)
+
+    def reweigh(self, key: tuple[Any, ...], value: T, size: int) -> None:
+        with self.lock:
+            if key not in self.items or self.items[key][0] is not value:
+                return
+            self.bytes += size - self.items[key][1]
+            self.items[key] = (value, size)
+            self.trim()
 
     def observe(self, action: str, key: tuple[Any, ...], size: int = 0, reason: str = "") -> None:
         if self.observer is not None:

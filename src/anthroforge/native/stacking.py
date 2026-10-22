@@ -14,6 +14,12 @@ class StackSession:
         abi.configure(engine)
         self.engine, self.handle = engine, engine.library.af_stack_create()
         engine.check(not self.handle)
+        if engine.resource_observer is not None:
+            engine.resource_observer(self)
+
+    @property
+    def bytes(self) -> int:
+        return int(self.engine.library.af_stack_bytes(self.handle))
 
     def __del__(self) -> None:
         if getattr(self, "handle", 0):
@@ -24,10 +30,10 @@ class StackSession:
         self.engine.check(self.engine.library.af_stack_run(self.handle, *arguments))
         return results(self)
 
-    def plan(self, domains: Any, settings: Any, **options: Any) -> Any:
+    def plan(self, domains: Any, settings: Any, metadata_only: bool = False, **options: Any) -> Any:
         arguments, _leases = packed(domains, settings, **options)
         self.engine.check(self.engine.library.af_stack_plan(self.handle, *arguments))
-        return results(self)
+        return results(self, metadata_only)
 
     def resolve(self, accepted: Any, targets: Any, cancel: int = 0) -> Any:
         rows, _leases = accepted_rows(accepted)
@@ -107,14 +113,19 @@ def packed(
     return args, faces
 
 
-def results(session: StackSession) -> Any:
+def results(session: StackSession, metadata_only: bool = False) -> Any:
     engine, handle = session.engine, session.handle
     sizes = np.zeros(2, dtype=np.int64)
     engine.check(engine.library.af_stack_sizes(handle, sizes.ctypes.data_as(INT64)))
     output, orders = (abi.Output * int(sizes[0]))(), (abi.Order * int(sizes[1]))()
     engine.check(engine.library.af_stack_results(handle, output, len(output)))
     engine.check(engine.library.af_stack_orders(handle, orders, len(orders)))
-    return {row.id: result(session, row) for row in output}, tuple(orders)
+    return {
+        row.id: dict(status=row.status, message=row.message.decode())
+        if metadata_only
+        else result(session, row)
+        for row in output
+    }, tuple(orders)
 
 
 def dependencies(session: StackSession) -> tuple[tuple[int, int], ...]:

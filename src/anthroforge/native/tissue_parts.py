@@ -5,14 +5,16 @@ from typing import Any
 
 from .mesh import D, GeometryEngine, Mesh, U, doubles, pointer
 from .tissue_inflation import Inflation, pack
+from .tissue_preparation import acquire
 from .tissue_shapes import owned
 
 
 def configure(engine: GeometryEngine) -> None:
-    from . import tissue_crop, tissue_smoothing
+    from . import tissue_crop, tissue_preparation, tissue_smoothing
 
     tissue_smoothing.configure(engine)
     tissue_crop.configure(engine)
+    tissue_preparation.configure(engine)
     engine.bind("af_tissue_inflate_parts", [U, c.POINTER(Inflation), c.c_int, D, c.c_int, U], U)
     engine.bind("af_tissue_envelope", [U, U, c.c_int, U], U)
     engine.bind("af_tissue_profile_reset", [c.c_double, D])
@@ -21,14 +23,25 @@ def configure(engine: GeometryEngine) -> None:
 
 
 def evaluate(
-    mesh: Mesh, parts: Any, side: str, reverse: bool, cancel: int = 0, envelope: bool = False
+    mesh: Mesh,
+    parts: Any,
+    side: str,
+    reverse: bool,
+    cancel: int = 0,
+    envelope: bool = False,
+    complete: bool = True,
 ) -> Mesh:
-    settings = (Inflation * len(parts))(*(pack(getattr(p, side).inflation, reverse) for p in parts))
-    connectors = doubles([(p.connector_width, p.connector_fullness) for p in parts])
-    handle = mesh.engine.library.af_tissue_inflate_parts(
-        mesh.handle, settings, len(parts), pointer(connectors), envelope, cancel
+    settings, connectors = packed(parts, side, reverse)
+    prepared = acquire(mesh, settings, cancel)
+    handle = mesh.engine.library.af_tissue_inflate_prepared(
+        prepared.handle, settings, len(parts), pointer(connectors), envelope, cancel, complete
     )
     return owned(mesh.engine, handle)
+
+
+def packed(parts: Any, side: str, reverse: bool) -> tuple[Any, Any]:
+    settings = (Inflation * len(parts))(*(pack(getattr(p, side).inflation, reverse) for p in parts))
+    return settings, doubles([(p.connector_width, p.connector_fullness) for p in parts])
 
 
 def compose(first: Mesh, second: Mesh, reverse: bool, cancel: int = 0) -> Mesh:

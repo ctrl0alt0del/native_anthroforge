@@ -23,7 +23,10 @@ struct AfStackPolicy {
     uint64_t first, second, cover;
     int excluded, invalid, offset, count, mode;
 };
-struct AfStackObstacle { const double* vertices; const int64_t* faces; int count, triangles; };
+struct AfStackObstacle {
+    const double* vertices; const int64_t* faces; int count, triangles;
+    uint64_t mesh; double frame[16];
+};
 struct AfStackAccepted { uint64_t id; const double* points; int count,status; };
 struct AfStackTarget { uint64_t session,id; };
 struct AfStackSurface { uint64_t intrinsic,final; double frame[16]; int changed; };
@@ -49,6 +52,8 @@ extern "C" {
 #endif
 AF_API uint64_t af_stack_create();
 AF_API void af_stack_release(uint64_t handle);
+// Conservative retained payload bound, including the opaque vector-cache allowance.
+AF_API uint64_t af_stack_bytes(uint64_t handle);
 AF_API int af_stack_run(uint64_t handle,const AfStackDomain* domains,int count,const AfStackSettings* settings,
     const AfStackPolicy* policies,int policy_count,const int64_t* regions,int region_count,
     const AfStackObstacle* obstacles,int obstacle_count,uint64_t cancel);

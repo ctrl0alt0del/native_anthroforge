@@ -1,5 +1,6 @@
 """Native order planning and selected final evaluation consume owned accepted material."""
 
+from contextlib import contextmanager
 from typing import Any
 
 import numpy as np
@@ -7,6 +8,7 @@ import numpy as np
 from anthroforge.core.anatomical_surfaces import usable
 from anthroforge.core.tissue_stacking import StackOrder, StackPlan
 from anthroforge.native.stacking import StackSession, dependencies, surface
+from anthroforge.native.stacking_leases import acquire
 from anthroforge.native.tissue_stacking import assemble
 
 from . import tissue_stack_policy as policy
@@ -14,7 +16,7 @@ from . import tissue_stack_scene as scene_inputs
 from .tissue_output import TissueOutput
 
 
-def prepared(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -> Any:
+def captured(document: Any, resources: Any, item: Any, cancel: int) -> Any:
     scene = scene_inputs.StackScene(document, resources, item.id, cancel)
     if item.id in scene.failures:
         raise ValueError(scene.failures[item.id])
@@ -22,9 +24,15 @@ def prepared(engine: Any, document: Any, resources: Any, item: Any, cancel: int)
         raise ValueError(
             "Stacking requires accepted surface material; evaluate intrinsic tissue first."
         )
-    native = StackSession(engine)
-    output, orders = detect(scene, native, item)
-    return scene, native, output, orders
+    return scene
+
+
+@contextmanager
+def prepared(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -> Any:
+    scene = captured(document, resources, item, cancel)
+    with acquire(engine, item.id) as native:
+        output, orders = detect(scene, native, item)
+        yield scene, native, output, orders
 
 
 def detect(scene: Any, native: StackSession, item: Any) -> Any:
@@ -37,6 +45,7 @@ def detect(scene: Any, native: StackSession, item: Any) -> Any:
         regions=regions,
         obstacles=bones,
         cancel=scene.cancel,
+        metadata_only=True,
     )
     return output, orders
 
@@ -44,11 +53,13 @@ def detect(scene: Any, native: StackSession, item: Any) -> Any:
 def plan(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -> TissueOutput:
     if not item.stacking:
         return TissueOutput(plan=StackPlan())
-    scene, native, output, orders = prepared(engine, document, resources, item, cancel)
-    providers = {
-        scene.identities[b][0] for a, b in dependencies(native) if scene.identities[a][0] == item.id
-    }
-    return TissueOutput(plan=description(scene, providers, output, orders))
+    with prepared(engine, document, resources, item, cancel) as (scene, native, output, orders):
+        providers = {
+            scene.identities[b][0]
+            for a, b in dependencies(native)
+            if scene.identities[a][0] == item.id
+        }
+        return TissueOutput(plan=description(scene, providers, output, orders))
 
 
 def description(scene: Any, providers: Any, output: Any, orders: Any) -> StackPlan:
@@ -113,7 +124,11 @@ def usable_final(item: Any) -> bool:
 def evaluate(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -> TissueOutput:
     if item.stack_plan.error:
         raise ValueError(item.stack_plan.error)
-    scene, native, _, _ = prepared(engine, document, resources, item, cancel)
+    with prepared(engine, document, resources, item, cancel) as (scene, native, _, _):
+        return resolve(scene, native, item, cancel)
+
+
+def resolve(scene: Any, native: StackSession, item: Any, cancel: int) -> TissueOutput:
     require_order(scene, native, item)
     accepted, _leases = frozen(scene)
     targets = tuple(key for key, row in scene.identities.items() if row[0] == item.id)

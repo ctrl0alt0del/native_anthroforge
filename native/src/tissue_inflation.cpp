@@ -4,6 +4,7 @@
 #include "tissue_branches.hpp"
 #include "tissue_directions.hpp"
 #include "tissue_profile.hpp"
+#include "tissue_preparation.hpp"
 #include "mesh_quality.hpp"
 
 namespace af::tissue {
@@ -27,9 +28,12 @@ static kernel::AfMuscleOutput prepared(const Mesh& source,const MaterialGrid& gr
     }
     return result;
 }
-static void profile(kernel::AfMuscleOutput& output,const AfTissueInflation& s) {
+static void profile(kernel::AfMuscleOutput& output,const AfTissueInflation& s,const PreparedGrid* prepared) {
     if(!s.enabled) { output.inflated=output.base; return; }
-    if(section_profile(output.base,output.rows,output.cols,s.profile,s.direction,s.reverse?-1:1,output.inflated))
+    const int status=prepared?section_profile_prepared(output.base,output.rows,output.cols,s.profile,s.reverse?-1:1,
+        prepared->normals,prepared->areas,prepared->limit,output.inflated)
+        :section_profile(output.base,output.rows,output.cols,s.profile,s.direction,s.reverse?-1:1,output.inflated);
+    if(status)
         throw std::runtime_error("Section Profile has a degenerate material frame.");
 }
 static void distributed(kernel::AfMuscleOutput& out,const kernel::AfMuscleInput& input,const Vertices& directions) {
@@ -42,14 +46,21 @@ static void distributed(kernel::AfMuscleOutput& out,const kernel::AfMuscleInput&
         out.inflated[index]=kernel::add(out.base[index],kernel::mul({direction.x(),direction.y(),direction.z()},input.inflation_flip?-height:height));
     }
 }
-Points inflate_prepared_grid(const Mesh& source,const MaterialGrid& grid,const AfTissueInflation& settings,const InflationWeights* weights,uint64_t cancel) {
+static kernel::AfMuscleOutput prepared_output(const Mesh& source,const MaterialGrid& grid,const PreparedGrid* data,uint64_t cancel) {
+    if(!data) return prepared(source,grid,cancel);
+    kernel::AfMuscleOutput out; out.rows=grid.rows; out.cols=grid.columns; out.base=data->base; return out;
+}
+static Vertices directions(const Mesh& source,const MaterialGrid& grid,const PreparedGrid* data,double distance,uint64_t cancel) {
+    return data?solve_directions(*data->diffusion,distance,cancel):inflation_directions(source,grid,distance,cancel);
+}
+Points inflate_prepared_grid(const Mesh& source,const MaterialGrid& grid,const AfTissueInflation& settings,const InflationWeights* weights,uint64_t cancel,const PreparedGrid* data) {
     const kernel::CancelScope scope(cancel);
     validate_inflation(settings,grid);
-    auto output=prepared(source,grid,cancel);
+    auto output=prepared_output(source,grid,data,cancel);
     if(weights) { output.boundary_weights=weights->edge; output.length_weights=weights->fade; }
-    if(settings.mode==2) profile(output,settings);
+    if(settings.mode==2) profile(output,settings,data);
     else if(settings.mode==1&&settings.enabled&&settings.amount>0)
-        distributed(output,legacy_input(settings,grid),inflation_directions(source,grid,settings.amount,cancel));
+        distributed(output,legacy_input(settings,grid),directions(source,grid,data,settings.amount,cancel));
     else kernel::af_muscle_inflate(output,legacy_input(settings,grid));
     Points points; points.reserve(output.inflated.size());
     for(auto p:output.inflated) points.emplace_back(p.x,p.y,p.z);

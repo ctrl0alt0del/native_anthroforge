@@ -21,7 +21,7 @@ static uint64_t snapshot_bytes(const kernel::TriangleSnapshot& value) {
         +(value.faces.capacity()+value.indexed_faces.capacity())*sizeof(kernel::Bounds)
         +value.nodes.capacity()*sizeof(kernel::BvhNode);
 }
-static uint64_t scene_bytes(const World& value) {
+uint64_t world_bytes(const World& value) {
     const auto& world=*value.collision;
     uint64_t total=sizeof(value)+sizeof(world)+snapshot_bytes(*value.snapshot)
         +value.owners.capacity()*sizeof(int)+world.items.capacity()*sizeof(kernel::AfInstance)
@@ -43,6 +43,6 @@ void af_routing_scene_release(uint64_t handle) {
     af::routing::scenes.erase(handle);
 }
 uint64_t af_routing_scene_bytes(uint64_t handle) {
-    try { return af::routing::scene_bytes(*af::routing::routing_scene(handle)); }
+    try { return af::routing::world_bytes(*af::routing::routing_scene(handle)); }
     catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

@@ -75,4 +75,27 @@ World capture_world(const uint64_t* handles,const double* matrices,int count,dou
     auto world=capture_collision_world(handles,matrices,count,radius,cancel);
     snapshot_geometry(world,cancel); return world;
 }
+static void reuse_surface(World& world,kernel::AfInstance& old,const Mesh& mesh,const M4& matrix,int owner) {
+    if(!matrix.allFinite()||!matrix.fullPivLu().isInvertible()) throw std::runtime_error("Invalid collision transform.");
+    const M4 inverse=matrix.inverse(); auto item=old; item.owner=item.collider=owner;
+    if(std::memcmp(item.matrix,matrix.data(),16*sizeof(double))!=0)
+        item.bounds=transformed_bounds(mesh,matrix);
+    std::copy(matrix.data(),matrix.data()+16,item.matrix);
+    std::copy(inverse.data(),inverse.data()+16,item.inverse);
+    world.collision->items.push_back(item); old.mesh=nullptr;
+}
+World reuse_collision_world(World previous,const std::vector<uint64_t>& old,const uint64_t* handles,
+    const double* matrices,int count,uint64_t cancel) {
+    World world;
+    for(int i=0;i<count;++i) {
+        check_cancel(cancel); const M4 matrix=Eigen::Map<const M4>(matrices+16*i);
+        if(size_t(i)<old.size()&&old[i]==handles[i])
+            reuse_surface(world,previous.collision->items[i],*mesh(handles[i]),matrix,i+1);
+        else {
+            if(!matrix.allFinite()) throw std::runtime_error("Invalid collision transform.");
+            add_surface(world,*mesh(handles[i]),matrix,i+1);
+        }
+    }
+    kernel::af_world_commit(world.collision.get()); resolve_scales(world,0); return world;
+}
 }

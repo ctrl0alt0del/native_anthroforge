@@ -1,5 +1,6 @@
 """One owned native side graph, per-receiver policies, complete shell acceptance."""
 
+from contextlib import ExitStack
 from dataclasses import replace
 from typing import Any
 
@@ -11,7 +12,7 @@ from . import tissue_stack_scene as inputs
 
 
 def prepared(
-    engine: Any, document: Any, resources: Any, targets: Any, cancel: int
+    engine: Any, document: Any, resources: Any, targets: Any, cancel: int, leases: Any
 ) -> dict[str, Any]:
     result = {}
     for key in targets:
@@ -19,7 +20,8 @@ def prepared(
         tissue_evaluation.accepted(resources, item.intrinsic_result, "Intrinsic tissue")
         if item.stack_plan.error:
             raise ValueError(item.stack_plan.error)
-        scene, native, _, _ = stacks.prepared(engine, document, resources, item, cancel)
+        capture = stacks.prepared(engine, document, resources, item, cancel)
+        scene, native, _, _ = leases.enter_context(capture)
         stacks.require_order(scene, native, item)
         result[key] = scene, native
     return result
@@ -39,7 +41,14 @@ def frozen(scene: Any, targets: Any) -> Any:
 
 
 def evaluate(engine: Any, document: Any, resources: Any, targets: Any, cancel: int) -> Any:
-    scenes = prepared(engine, document, resources, targets, cancel)
+    with ExitStack() as leases:
+        scenes = prepared(engine, document, resources, targets, cancel, leases)
+        return resolve(engine, document, resources, targets, cancel, scenes)
+
+
+def resolve(
+    engine: Any, document: Any, resources: Any, targets: Any, cancel: int, scenes: Any
+) -> Any:
     scene, native = next(iter(scenes.values()))
     accepted, _leases = frozen(scene, targets)
     owners = {

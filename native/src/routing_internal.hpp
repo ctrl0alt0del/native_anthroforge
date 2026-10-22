@@ -40,6 +40,9 @@ struct Span {
 World capture_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel);
 World capture_collision_world(const uint64_t* handles,const double* matrices,int count,double radius,uint64_t cancel);
 std::shared_ptr<const World> routing_scene(uint64_t handle);
+uint64_t world_bytes(const World& world);
+World reuse_collision_world(World previous,const std::vector<uint64_t>& old,const uint64_t* handles,
+    const double* matrices,int count,uint64_t cancel);
 Reference reference(const Input& input);
 Reference reference(const Input& input,const std::vector<int>& counts);
 std::vector<Span> spans(const Input& input,const World& world,const Reference& reference);

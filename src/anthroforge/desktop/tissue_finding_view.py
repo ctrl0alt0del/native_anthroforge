@@ -26,7 +26,7 @@ def locate(tool, identity, row, witness):
     tool.set_view(row["stage"], "", "Overlay")
     tool.lines = lines(tool.controller.session, row, witness)
     tool.finding = identity
-    tool.changed.emit()
+    tool.notify()
     tool.controller.frameRequested.emit(camera_frame(witness["bounds"]))
 
 

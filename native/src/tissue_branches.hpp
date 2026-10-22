@@ -4,6 +4,8 @@
 #include "tissue_shapes.hpp"
 
 namespace af::tissue {
+struct PreparedGrid;
+struct InflationPreparation;
 struct InflationWeights { std::vector<double> edge,fade; };
 struct Connection {
     int boundary=0;
@@ -16,6 +18,6 @@ std::vector<Connection> connections(const std::vector<MaterialGrid>& grids,const
 void share_displacements(const Mesh& source,const std::vector<MaterialGrid>& grids,const std::vector<Connection>& seams,std::vector<Points>& values);
 void connect_parts(const std::vector<MaterialGrid>& grids,const std::vector<Connection>& seams,std::vector<Points>& values,bool flip,uint64_t cancel);
 bool grid_reversed(const Mesh& source,const MaterialGrid& grid);
-Points inflate_prepared_grid(const Mesh& source,const MaterialGrid& grid,const AfTissueInflation& settings,const InflationWeights* weights,uint64_t cancel);
-std::shared_ptr<Mesh> inflate_parts(const Mesh& source,const AfTissueInflation* settings,int count,const double* connectors,bool envelope,uint64_t cancel);
+Points inflate_prepared_grid(const Mesh& source,const MaterialGrid& grid,const AfTissueInflation& settings,const InflationWeights* weights,uint64_t cancel,const PreparedGrid* prepared=nullptr);
+std::shared_ptr<Mesh> inflate_parts(const Mesh& source,const AfTissueInflation* settings,int count,const double* connectors,bool envelope,uint64_t cancel,const InflationPreparation* prepared=nullptr,bool complete=true);
 }

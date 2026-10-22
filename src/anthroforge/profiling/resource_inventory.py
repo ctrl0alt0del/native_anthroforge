@@ -4,13 +4,17 @@ from dataclasses import fields, is_dataclass
 from itertools import islice
 
 from anthroforge.application.image_assets import ImageAsset
+from anthroforge.application.resources import Resources as ResourceCatalogue
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.binding_batches import BindingBatch
 from anthroforge.native.inspection import Comparison
 from anthroforge.native.mesh import Mesh
+from anthroforge.native.path_collisions import CollisionCache
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
+from anthroforge.native.stacking import StackSession
+from anthroforge.native.tissue_preparation import Preparation
 from anthroforge.native.tissue_stacking import MaterialLease
 
 LIMITATIONS = [
@@ -20,6 +24,7 @@ LIMITATIONS = [
     "Tissue preparation includes owned arrays/visible meshes; source meshes counted separately",
     "Excludes allocator overhead, Python objects, Qt copies and GPU/driver allocations",
     "Ownership totals overlap; add neither owners nor shared alias handles",
+    "Stacking session storage is a conservative bound including opaque vector-cache allowance",
     "Pre-recording job payload references may be unattributed; job snapshots are included",
     "Snapshots are event-driven at most once per second, plus recording boundaries",
 ]
@@ -49,10 +54,13 @@ RESOURCE_TYPES = (
     BindingBatch,
     MaterialLease,
     Comparison,
+    CollisionCache,
+    StackSession,
+    Preparation,
 )
 
 
-def payload_resources(value, profiler):
+def payload_resources(value, profiler, group=None):
     pending, found, seen = [value], set(), set()
     for _ in range(8192):
         if not pending:
@@ -61,12 +69,27 @@ def payload_resources(value, profiler):
         if id(item) in seen:
             continue
         seen.add(id(item))
-        if isinstance(item, RESOURCE_TYPES):
-            found.update((item, item.path) if isinstance(item, Field) else (item,))
-            found.update(getattr(item, "resources", ()))
-        else:
-            pending.extend(bounded(children(item), 8192 - len(seen) - len(pending), profiler))
+        remaining = 8192 - len(seen) - len(pending)
+        pending.extend(bounded(observe_item(item, found, group), remaining, profiler))
     return finish_payload(found, pending, profiler)
+
+
+def observe_item(item, found, group):
+    if isinstance(item, ResourceCatalogue) and group is not None:
+        group(item)
+    elif isinstance(item, RESOURCE_TYPES):
+        found.update(native_resources(item))
+    else:
+        return children(item)
+    return ()
+
+
+def native_resources(item):
+    return (
+        item,
+        *((item.path,) if isinstance(item, Field) else ()),
+        *getattr(item, "resources", ()),
+    )
 
 
 def finish_payload(found, pending, profiler):
@@ -76,6 +99,8 @@ def finish_payload(found, pending, profiler):
 
 
 def children(value):
+    if isinstance(value, ResourceCatalogue):
+        return owned_resources(value)
     if isinstance(value, dict):
         return value.values()
     if isinstance(value, (list, tuple)):
@@ -105,7 +130,7 @@ def session_owners(session, output, profiler):
             for document in bounded(values, 512, profiler)
             for resource in document_resources(session, document, profiler)
         )
-        output[owner].update(bounded(references, 4096, profiler))
+        output[owner].update(bounded_unique(references, 4096, profiler))
     output["catalogue"].update(bounded(catalogue_resources(session), 4096, profiler))
     preview_owners(session, output)
     inspection_owners(session, output, profiler)
@@ -131,12 +156,28 @@ def inspection_owners(session, output, profiler):
 
 
 def catalogue_resources(session):
-    yield from (a.mesh for a in session.resources.meshes.values())
-    yield from (a.path for a in session.resources.paths.values())
-    yield from session.resources.images.values()
-    yield from (a.field for a in session.resources.attachments.values())
-    yield from (a.field.path for a in session.resources.attachments.values())
-    yield from session.resources.bindings.values()
+    return owned_resources(session.resources)
+
+
+def owned_resources(resources):
+    yield from (a.mesh for a in resources.meshes.values())
+    yield from (a.path for a in resources.paths.values())
+    yield from resources.images.values()
+    yield from (a.field for a in resources.attachments.values())
+    yield from (a.field.path for a in resources.attachments.values())
+    yield from resources.bindings.values()
+
+
+def bounded_unique(values, limit, profiler):
+    found = set()
+    for value in values:
+        if value in found:
+            continue
+        if len(found) >= limit:
+            profiler.losses["resource_inventory_truncated"] += 1
+            break
+        found.add(value)
+    return found
 
 
 def bounded(values, limit, profiler):

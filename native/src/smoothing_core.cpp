@@ -3,13 +3,14 @@
 #include "../migration/smoothing/src/core.cpp"
 #include "../migration/smoothing/src/height.cpp"
 #include "tissue_height.hpp"
+#include "height_box_solver.hpp"
 #include <piqp/results.hpp>
 
 // Reuse the pinned material/field/QP implementation. Geometry acceptance belongs
 // to the complete canonical mesh, not a per-triangle normal-dot comparison.
 namespace af::tissue {
 class CertifiedHeights final : public afs::QpSolver {
-    std::unique_ptr<afs::QpSolver> solver_=afs::make_piqp();
+    std::unique_ptr<afs::QpSolver> solver_=make_box_heights();
 public:
     afs::Solution solve(const afs::Quadratic& p,const afs::Options& options,afs::Diagnostics& report) override {
         auto solution=solver_->solve(p,options,report);

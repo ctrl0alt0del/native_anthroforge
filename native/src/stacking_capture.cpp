@@ -38,16 +38,33 @@ void capture_domains(Inputs& input,const AfStackDomain* domains,int count,uint64
         input.work.incoming.push_back(std::move(side));
     }
 }
+static pair::Side buffer_obstacle(const AfStackObstacle& in,uint64_t cancel) {
+    pair::Side side;
+    pair::require(in.vertices&&in.faces&&in.count>=3&&in.triangles>0,"STACK_OBSTACLE_INPUT");
+    for(int j=0;j<in.count;++j) {
+        check_cancel(cancel); const auto p=kernel::load3(in.vertices+3*j);
+        pair::require(pair::finite(p),"STACK_OBSTACLE_COORDINATES"); side.base.push_back(p);
+    }
+    side.own=side.base; side.faces.assign(in.faces,in.faces+3*size_t(in.triangles));
+    for(auto f:side.faces) pair::require(f>=0&&f<in.count,"STACK_OBSTACLE_INDEX");
+    return side;
+}
+static pair::Side mesh_obstacle(const AfStackObstacle& in,uint64_t cancel) {
+    pair::Side side; const auto source=mesh(in.mesh); const M4 matrix=Eigen::Map<const M4>(in.frame);
+    pair::require(source->vertices.rows()>=3&&source->triangles.rows()>0&&matrix.allFinite(),"STACK_OBSTACLE_INPUT");
+    for(int i=0;i<source->vertices.rows();++i) {
+        check_cancel(cancel); const V3 p=point(matrix,source->vertices.row(i));
+        pair::require(p.allFinite(),"STACK_OBSTACLE_COORDINATES"); side.base.push_back({p.x(),p.y(),p.z()});
+    }
+    side.own=side.base;
+    side.faces.assign(source->triangles.data(),source->triangles.data()+source->triangles.size());
+    return side;
+}
 void capture_obstacles(layer::State& state,const AfStackObstacle* inputs,int count,uint64_t cancel) {
     pair::require(count>=0&&count<=100000&&(!count||inputs),"STACK_OBSTACLES");
     for(int i=0;i<count;++i) {
-        check_cancel(cancel); const auto& in=inputs[i]; pair::Side side;
-        pair::require(in.vertices&&in.faces&&in.count>=3&&in.triangles>0,"STACK_OBSTACLE_INPUT");
-        for(int j=0;j<in.count;++j) {
-            const auto p=kernel::load3(in.vertices+3*j); pair::require(pair::finite(p),"STACK_OBSTACLE_COORDINATES"); side.base.push_back(p);
-        }
-        side.own=side.base; side.faces.assign(in.faces,in.faces+3*size_t(in.triangles));
-        for(auto f:side.faces) pair::require(f>=0&&f<in.count,"STACK_OBSTACLE_INDEX");
+        check_cancel(cancel); const auto& in=inputs[i];
+        auto side=in.mesh?mesh_obstacle(in,cancel):buffer_obstacle(in,cancel);
         pair::prepare_snapshot(side,nullptr); const auto edges=layer::edge_counts(side);
         side.enabled=std::all_of(edges.begin(),edges.end(),[](const auto& edge){return edge.second==2;});
         state.obstacles.push_back(std::move(side));

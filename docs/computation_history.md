@@ -41,6 +41,12 @@ evidence for those revisions, not current workflow instructions.
 Additional active authoring/inspection work for T09, K01 and Q05 is recorded in CH-024/025.
 Nearest attachment queries (A01–A03) exclude numerically unusable triangles from their
 transient spatial index while preserving original material indices; see CH-032.
+0.2.4 changes are recorded in CH-039–044: prepared inspection presentation and result
+provenance; incremental native collision evidence (Q03); exclusive stacking leases (K01);
+fixed-variable elimination/direct box bounds with original KKT checks (T11); immutable
+material frames/operators and per-column profile coefficients (T02–T04); draft internal
+envelope sides with fully prepared publication (G02/T05); bounded profiler ownership.
+The numerical objectives, topology, retained bindings and acceptance rules stay unchanged.
 
 ### Meshes, primitives and deformers
 
@@ -1407,3 +1413,138 @@ See the task and development validation records for final gate/package evidence 
   headless opening/settling trials and offscreen presentation checks, not interactive
   latency measurements. Original project bytes remain untouched. Evidence lives in
   `diagnostics/open-optimization-20261022/` under the CH-032–036 run directory above.
+
+### CH-039 — Prepared tissue inspection presentation (2026-10-22)
+
+- The viewport read a recursively converted full inspection report for every mesh's
+  visibility binding. Repeated edits dispatched in 632–650 ms; repeated hidden
+  viewport settling took 3.56–3.66 s in the 96-tissue assembly.
+- Tissue inspection now owns a persistent PropertyProjection with per-field change
+  notifications. Reports are prepared on state changes; property reads do no report
+  conversion. Snapshot serialization remains explicit. Deselection clears rows.
+- Ten targeted inspection/stacking/view tests pass, including repeated property reads
+  and clearing selection. Serial off/on/on/off hidden viewport trials dispatch in
+  46.7/57.9/55.1/47.8 ms and settle in 1.208/1.332/1.334/1.218 s. No QML warnings;
+  actual captured geometry/selection remains visible. Native algorithms and bindings
+  are unchanged. Frame intervals still reach 185 ms: this is not smooth-frame acceptance.
+- Local evidence: `build/vcp-performance-024-release/step1/`, including two profiler
+  captures, viewport images, trial load observations and timings. Full release checks
+  remain pending; offscreen evidence is not interactive acceptance.
+
+### CH-040 — Result metadata and recording-only resource observation (2026-10-22)
+
+- Pending provenance now indexes the declared owner set once, retaining document order,
+  all revision inputs and self exclusion. Known local TissueVCP strategy changes reuse
+  validated relationships, but still run tissue capability validation against current
+  sources. Other records, new fields, source/constraint/relationship changes invalidate
+  reuse. Dataclass field discovery is bounded and cached by type.
+- Profiler job capture records weak resource-catalogue groups instead of repeatedly
+  expanding shared catalogues. Inventory expands live groups at observation boundaries;
+  duplicate references no longer exhaust unique-resource limits. Group/job/native limits
+  and real truncation remain explicit. No observation is added when recording is off.
+- 26 metadata/publication/profiler/architecture tests pass; typing/style pass. Recorded
+  ribs-edit resource observation falls from 2,110.9 to 34.7 ms across the same 1,230
+  boundary calls, with zero losses versus 360 reference-limit losses. Recorded total
+  falls from 7.497 to 4.654 s; three recorder-off trials take 4.234/4.324/4.208 s versus
+  4.539/4.570/4.617 s. Single-profile settling remains about 1.02 s, dominated by
+  advisory collision queries. Fiber results show no established improvement yet.
+- Evidence: `build/vcp-performance-024-release/step2/`; baseline native geometry replay
+  frozen in `baseline-replay/` before numerical changes (11 snapshots, 1,456 arrays each).
+  Original fixtures remain untouched. Full combined release checks remain pending.
+
+### CH-041 — Incremental native advisory collision evidence (2026-10-22)
+
+- Each check previously copied all collider geometry, rebuilt BVHs/closure metadata,
+  and tested every path/surface pair. A first pair-cache experiment exposed the next
+  cost: the 71 MB collision scene exceeded the existing 64 MiB routing cache; two
+  captures alone took 425 ms. Increasing that cache was not the implemented solution.
+- The advisory checker now owns an exclusive native context. It transfers unchanged
+  colliders into changed scenes, updates transforms/bounds exactly, and caches pair
+  results by immutable path handle, complete frame/contact membership, surface handle,
+  surface frame/index and the original global metric tolerance. Path bounds reject
+  only provably disjoint surfaces. Numerical contact/collision kernels are unchanged.
+- Only current rows/surfaces are retained; evidence metadata is capped at 32 MiB and
+  complete retained context at 128 MiB. Jobs retain leases across cache eviction;
+  failed/cancelled partial scene captures release ownership safely. Existing issue
+  fingerprints, eligibility, unavailable surfaces and stale-publication guards remain.
+- Native CTests and 30 focused collision/profiler/architecture checks pass, with an
+  additional failed-capture recovery check. Warm reuse, miss-to-hit motion, changed
+  contacts, reordered/removed surfaces, changed tolerance and cancellation match a
+  fresh full query. Modified native files pass clang-tidy.
+- On the assembly, recorded collision calls after a profile edit total about 26 ms
+  versus the original 849 ms. Recorder-off profile settling is 221–324 ms versus
+  1,023–1,043 ms. Broad ribs-edit end-to-end trials are noisy and slower in this run;
+  no improvement is claimed there pending serial counterbalanced qualification.
+  Local evidence: `build/vcp-performance-024-release/step3-retained/`. Full geometry
+  replay and combined release checks remain pending.
+
+### CH-042 — Exclusive retained stacking sessions and batched obstacle handles (2026-10-22)
+
+- Planning/final jobs created and discarded numerical sessions, losing qualified native
+  detection/material/solve caches. Sessions now use exclusive multi-call leases keyed
+  by receiver. Concurrent leases never share mutable sessions; failures discard them,
+  and cache clears invalidate outstanding returns. Group solving and support inspection
+  keep leases until every native call is complete. Full inputs are still recaptured
+  and qualified by the existing native signatures on every plan.
+- Production planning requests only status/order metadata; the low-level full-result
+  path remains available for numerical tests. Bone obstacles cross as mesh handles and
+  frames, with transform/copy/preparation in C++; legacy array inputs remain a parity
+  oracle. Geometry, settings, providers, constraints and final surface validation remain.
+- Idle sessions are bounded to four and a conservative 512 MiB retained budget. Native
+  accounting includes owned buffers and the configured allowance for the opaque donor
+  vector cache. Profiler reports label this category as an upper bound, not exact RSS.
+- 63 existing stacking/inspection/group/geometry checks pass, plus lease exclusivity,
+  failed lease disposal, lifecycle clearing, metadata-only reads and transformed obstacle
+  parity. Typing/style, native CTests and changed-native clang-tidy pass.
+- Serial fresh/warm/warm/fresh 625-vertex fixture trials preserve every output vertex
+  exactly. Planning: fresh 18.1–21.4 ms, warm 0.98–1.75 ms. Final: fresh 196.5–241.7 ms,
+  warm 5.08–6.07 ms. These are unchanged-input reuse measurements, not claimed gains
+  for changed providers. Prior changed-receiver evidence was smaller (CH-040 task analysis).
+  Local timings/profile: `build/vcp-performance-024-release/step4/`. Combined release
+  qualification and changed-input replay remain pending.
+
+### CH-043 — Reduced height QP with native variable bounds (2026-10-22)
+
+- The original height problem encoded fixed samples as equalities and free sample
+  limits as identity inequality rows. A narrow native adapter now eliminates fixed
+  variables, adjusts the linear term, and supplies PIQP's direct variable bounds.
+  Expanded primal/dual results still pass the original full-problem certification;
+  the objective, tolerances, pinning, displacement limits and cancellation stay intact.
+- Serial old/new/new/old trials repeated twice in one process on the 13,845-vertex
+  assembly base measured 1,768–1,819 ms original versus 1,561–1,601 ms reduced.
+  Both used 24 iterations. Maximum vertex difference was 3.94e-13 m; topology was
+  exact, stationarity remained ~6.3e-10 and constraint violation ~1.4e-16.
+  System busy fractions ranged 17–23%; this is a kernel measurement, not UI latency.
+- All 24 smoothing/workflow/architecture checks, five native CTests and modified
+  native clang-tidy checks pass. Other inflation/relaxation fixture arrays are exact.
+  Local evidence: `build/vcp-performance-024-release/height-comparison.json` and
+  `kernel-baseline/`, `kernel-reduced/`. Solver state reuse was not needed for this
+  gain; no claim is made for warm-start or symbolic caching in height smoothing.
+- References: [PIQP variable bounds](https://predict-epfl.github.io/piqp/interfaces/python/getting_started).
+
+### CH-044 — Immutable tissue preparation and internal envelope drafts (2026-10-22)
+
+- Inflation repeatedly reconstructed material vectors/frames, Section Profile's
+  longitudinal coefficients, and Distributed mass/cotangent matrices. Engine-owned
+  immutable preparation now retains the geometry-dependent data by accepted native
+  base identity and relevant mode/direction. A 64 MiB/64-entry LRU charges source
+  retention as well as owned buffers; jobs keep leases through eviction/clearing.
+  Profiler inventories count preparation buffers separately from their source meshes.
+- Longitudinal coefficients are computed once per column. Ordinary unbranched
+  inflation skips unused exterior-boundary assembly. Distributed solves retain the
+  same operators/formula but refactor for every changed distance; no stale numerical
+  factorization is reused. Concurrent calls have independent solver state.
+- Internal two-sided envelope inputs use existing draft meshes and preserve that
+  capability through smoothing. The composed accepted result is still fully prepared.
+  Single-side results and all publicly accepted stages remain display/query ready;
+  no general lazy-mesh framework or changes to attachment availability were introduced.
+- On the same 13,845-vertex base, serial old/new/new/old changed-settings trials show
+  exact vertices and triangles. Median original/candidate native durations: Section
+  Profile 30.3/23.0 ms; Distributed 67.0/39.9 ms; Control Point 24.0/19.8 ms. Background
+  load is uncontrolled; ranges and per-trial load are in local
+  `build/vcp-performance-024-release/preparation-comparison.json`. These are kernel
+  measurements, not whole-app latency. Full combined qualification remains pending.
+- Focused parity/lifecycle checks cover branches, all inflation modes, source changes,
+  cancellation, concurrent reads, cache limits, incompatible-context rejection, and
+  exact composed draft/full equivalence. Modified native clang-tidy and typing pass.
+- Reference: [libigl preparation and solve](https://libigl.github.io/tutorial/).

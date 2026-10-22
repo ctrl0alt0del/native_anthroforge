@@ -7,4 +7,6 @@ std::vector<kernel::Vec> section_directions(const std::vector<kernel::Vec>& base
     int mode,std::vector<double>& areas);
 int section_profile(const std::vector<kernel::Vec>& base,int rows,int columns,const double* settings,
     int mode,int sign,std::vector<kernel::Vec>& output);
+int section_profile_prepared(const std::vector<kernel::Vec>& base,int rows,int columns,const double* settings,
+    int sign,const std::vector<kernel::Vec>& normals,const std::vector<double>& areas,double limit,std::vector<kernel::Vec>& output);
 }

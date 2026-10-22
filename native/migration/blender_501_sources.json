@@ -82,6 +82,16 @@
       "file": "rna_lattice.cc",
       "sha256": "14d230df45a84c7b585d7eacf318ab45d93420d3fd6814e5215967529e24cd6b",
       "attribution": "SPDX-FileCopyrightText: 2023 Blender Authors"
+    },
+    {
+      "file": "mesh_tessellate.cc",
+      "sha256": "08ba0476e384e6e414e63a48d9a5370dd894baa0be60b34c28412aadc86cb063",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
+    },
+    {
+      "file": "math_geom.cc",
+      "sha256": "5d9fc42a2a47bec5cada241d8ce81a5ee63e82742f3d4aa575667be3ea7627de",
+      "attribution": "SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved."
     }
   ]
 }

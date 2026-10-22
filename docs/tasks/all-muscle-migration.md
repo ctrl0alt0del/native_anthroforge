@@ -76,3 +76,16 @@
   was observed. Final all-unit comparisons and packaged assembly views remain.
 - Run `tmp/qualify_all.py` after the writer finishes, then preservation and packaged
   checks. The original user file remains untouched until these checks complete.
+
+## Tessellation finding during final qualification
+
+- All 96 authored units are constructed. Adding triangle-centroid comparisons
+  exposed incorrect fixed diagonals in 13 source/base or envelope comparisons.
+  Earlier vertex-only numbers are not complete surface-parity evidence.
+- CH-034 fixes initial generated-quad tessellation in its native owner using the
+  qualified Blender 5.0.1 rule. A native picking/connectivity regression passes.
+- `tmp/regenerate_quads.py` rebuilds only affected candidate result caches through
+  the coordinator. It preserves definitions; subsequent deformation still retains
+  connectivity. `candidates/before-quad-repair.anthroforge` preserves the prior state.
+- Rerun the complete assembly comparisons, edit/undo/reopen checks, development gate
+  and canonical package before delivery. Original user file remains untouched.

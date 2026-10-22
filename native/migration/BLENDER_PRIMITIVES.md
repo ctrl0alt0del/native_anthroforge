@@ -23,6 +23,13 @@ files. See the repository LICENSE and licenses/GPL-2.0.txt.
 The adjacent `blender_501_sources.json` pins the SHA-256 and original attribution of
 the inspected upstream files. These are algorithm sources, not runtime dependencies.
 Body base construction and connected loft topology are AnthroForge implementations.
+Generated quads use Blender 5.0.1 `mesh_tessellate.cc` and
+`math_geom.cc:is_quad_flip_v3_first_third_fast` to choose their initial diagonal
+when the fixed split would overlap. Their source hashes are pinned alongside the
+other references. NaN Holding BV / Blender Authors, GPL-2.0-or-later.
+Subsequent deformation retains the accepted triangulation; this is not adaptive
+retessellation while editing. Concave-quad picking and connectivity reuse are
+covered by `test_geometry_preparation.py`.
 Connected adjacent loft seams deliberately differ from the reference Geometry Nodes
 graph, which emitted disconnected strips. Complex Solidify, Blender animation and
 shape-key systems are outside this release.

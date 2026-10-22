@@ -47,7 +47,7 @@ transient spatial index while preserving original material indices; see CH-032.
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
 | G01 | Mesh import: parse OBJ/STL/PLY, convert units/axes and construct owned canonical mesh data. | [mesh_io.cpp](../native/src/mesh_io.cpp) | [import formats](../tests/test_import_formats.py) |
-| G02 | Mesh preparation: polygon triangulation, topology reuse, joins/deformed copies, bounds, normals, spatial acceleration and render chunks. Geometry-only intermediates finalize once; deformation preserves compatible accepted connectivity. | [mesh_build.cpp](../native/src/mesh_build.cpp), [mesh_topology.cpp](../native/src/mesh_topology.cpp) | [geometry preparation](../tests/test_geometry_preparation.py) |
+| G02 | Mesh preparation: polygon triangulation, topology reuse, joins/deformed copies, bounds, normals, spatial acceleration and render chunks. Generated quads choose a non-overlapping initial diagonal. Geometry-only intermediates finalize once; deformation preserves compatible accepted connectivity. | [mesh_build.cpp](../native/src/mesh_build.cpp), [mesh_topology.cpp](../native/src/mesh_topology.cpp) | [geometry preparation](../tests/test_geometry_preparation.py) |
 | G03 | Coordinate/frame calculations: TRS, matrix products/inverses, parent-relative placement, batched point transforms, quaternion/axis rotation and transformed bounds. Shared by anatomy, controls, consumers and tools. | [transforms.cpp](../native/src/transforms.cpp), [object frames](../src/anthroforge/application/object_frames.py) | [transform deltas](../tests/test_transform_delta.py), [shared curves](../tests/test_shared_curves.py) |
 | G04 | SCP loft primitives: sample ordered curve pairs, produce shared strips, caps and canonical polygons using consumer ranges, placement and density. | [loft.cpp](../native/src/loft.cpp), [construction adapter](../src/anthroforge/native/construction.py) | [primitive parity](../tests/test_primitive_parity.py) |
 | G05 | Curve-deformed bodies: box/cylinder/capsule bases, whole-curve fit or fixed-length placement, radius/tilt-aware deformation and multiple-piece assembly. Cache reusable undeformed bases. | [curve_body.cpp](../native/src/curve_body.cpp), [curve_deform.cpp](../native/src/curve_deform.cpp) | [primitives](../tests/test_primitives.py), [geometry preparation](../tests/test_geometry_preparation.py) |
@@ -1255,3 +1255,26 @@ See the task and development validation records for final gate/package evidence 
 - Scope remains complete open curves with exact evaluated-corner preservation.
   The full 1660-test development gate and canonical portable suite pass. Final
   assembled migration qualification remains pending; this is not anatomical reapproval.
+
+### CH-034 — Valid initial diagonals for generated quads (2026-10-22)
+
+- Affects G02 and generated surface/tissue mesh preparation. The final migration
+  audit added triangle-centroid samples to its two-way vertex-to-surface comparison.
+  Matching vertices had hidden 15 incorrect deltoid quad splits (maximum surface
+  discrepancy .0289393) and three biceps splits (.000588219). Smaller cases occurred
+  in eleven other base/envelope pairs, including two previously migrated families.
+- Before: every generated quad used diagonal 0–2, including concave/folded quads
+  where those triangles overlap. Initial construction now uses Blender 5.0.1's
+  `is_quad_flip_v3_first_third_fast` rule and switches such quads to diagonal 1–3.
+  Source paths, hashes and attribution are recorded in the primitive provenance.
+- Ownership stays in native mesh preparation. Polygon corners, authored vertices,
+  material identities and inflation equations are unchanged. Deformation and
+  finalization continue to reuse compatible accepted triangulation; they do not
+  retessellate moving geometry. Existing files are not silently rewritten on load.
+- A bounded donor-case experiment using that rule reduced deltoid/biceps sampled
+  discrepancies to 2.63e-7/2.39e-7. A native regression checks concave coverage,
+  picking outside the polygon and preserved connectivity after later deformation.
+  The 39 focused geometry/correspondence/branch tests and native CTests pass.
+- This migration regenerates its affected pre-delivery result caches through the
+  normal coordinator, keeping authored definitions. Full assembly and package
+  qualification with the repaired tessellation remain pending.

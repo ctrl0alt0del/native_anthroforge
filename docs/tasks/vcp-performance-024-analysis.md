@@ -30,8 +30,18 @@ hypotheses, existing capabilities, risks and acceptance experiments separated.
 - [Qt Quick performance guidance](https://doc.qt.io/qt-6.12/qtquick-performance.html)
 - [Python profiling limitations](https://docs.python.org/3.12/library/profile.html)
 
+## Measured checkpoint
+
+Assembly and native measurements are complete; see [analysis](../vcp_performance_024.md).
+Confirmed: repeated document-wide collision checks dominate all-jobs settling after
+small tissue edits; Python pending-owner discovery does nested metadata traversal;
+native stacking contexts are discarded; height smoothing spends ~1.5 s inside PIQP.
+Disposable experiments verified exact provenance equality and stacking geometry
+equality. Changed-provider stacking does not show the large unchanged-cache speedup.
+The large recorded bone edit also exposes profiler-owned work and reference truncation.
+
 ## Next steps
 
-1. Measure actual assembly edits and native tissue fixtures.
-2. Inspect hot ownership boundaries and migrated kernels; test bounded alternatives.
-3. Record prioritized findings and unmeasured limits; validate documentation and push.
+1. Finish background viewport attribution with normal change-triggered refresh.
+2. Finalize recommended order and limits; review links and evidence.
+3. Commit/push the complete analysis and merge documentation normally. No release build.

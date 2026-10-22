@@ -46,6 +46,20 @@ a frozen baseline source copy in diagnostics/open-optimization-20261022.
 Existing package is canonical 0.2.3; no version bump requested. Startup provenance,
 coalescing, asynchronous launch, full gates/package checks and archive refresh remain pending.
 
+Second checkpoint: exact attachment receipts now persist with accepted poses; missing
+receipts receive normal evaluation, while matching inputs preserve exact matrices.
+Five regression cases cover reopen, tiny edits, undo, missing provenance, recapture,
+settings/geometry changes and parent failure. Renewable dispatch-only jobs coalesce
+while queued and refresh dependency contracts before admission; explicit cancellation
+and undo still cancel. The desktop launch now uses the existing asynchronous open path.
+Full pytest is running; full fixture replay/GUI/package gates are still pending.
+
+Measured first increment: 12.55 s versus 148.95 s, with the same 956 successful jobs
+and 2,968 obsolete jobs. With request coalescing, obsolete jobs fall to 34 (956 successful);
+instrumented total 15.21 s, including a slower read. Contract renewal initially added
+avoidable per-poll work (24.74 s); it now caches unchanged graph/observation contracts.
+These single diagnostic trials are preliminary; serial delivery measurements remain.
+
 ## Verification and next steps
 
 1. Add structural/result-change contract tests; implement incremental reuse and remove

@@ -819,3 +819,21 @@ between batches without creating a job-level cycle. The coordinator still enforc
 read sets, output reservations, safe cancellation, undo and save checkpoint semantics.
 The desktop value adapter converts identity-free typed parameter records to owned QML
 values; identity-bearing records retain existing incremental projections.
+
+## Opening and publication cost
+
+Document snapshots own current record maps and reuse validated relationships. Per-record
+links are cached only with a matching parent/type/junction context. Known evaluated-only
+fields may reuse registry validation; new authored fields conservatively invalidate it.
+Stack provider plans remain graph inputs. Pending tissue results publish in one batch.
+
+Accepted SCP attachment receipts prove exact input identity across save/reopen without
+changing the native attachment algorithm or introducing a distance tolerance. Absent or
+changed receipts evaluate normally. They contain values/resource identities, never handles.
+
+Fixed-output calculations may opt into renewable pending contracts: uncaptured requests
+coalesce under one coordinator identity/deadline, with dependency-index renewal before
+dispatch. Captured jobs retain safe cancellation and publication read validation. Explicit
+cancel, undo, attachment recapture and payload-owning operations keep their existing rules.
+Desktop command-line project opening uses the same background read/adoption path as File
+Open; the window no longer waits for startup computations before it can be created.

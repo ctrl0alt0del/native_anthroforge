@@ -40,6 +40,17 @@ class Attachment:
 
 
 @dataclass(frozen=True, slots=True)
+class AttachmentReceipt:
+    parent: str
+    parent_matrix: tuple[float, ...]
+    parent_offset: tuple[float, ...]
+    parent_asset: str
+    child_matrix: tuple[float, ...]
+    child_offset: tuple[float, ...]
+    settings: Attachment
+
+
+@dataclass(frozen=True, slots=True)
 class SCP:
     name: str
     id: str = field(default_factory=lambda: str(uuid4()))
@@ -62,6 +73,7 @@ class SCP:
     result_generation: int = 0
     pose_revision: int = 0
     construction_revision: int = 0
+    pose_receipt: AttachmentReceipt | None = None
 
     def __post_init__(self) -> None:
         if not self.id or not self.name.strip():

@@ -14,6 +14,7 @@ EVALUATED = frozenset(
         "pose_revision",
         "construction_revision",
         "result_generation",
+        "pose_receipt",
         "result",
         "status",
         "error",

@@ -32,8 +32,8 @@ def submit(session: Any, target: str, phase: str, interactive: bool) -> str:
     job.retry = partial(request, session, target, phase)
     job.cleanup = partial(completed, session, target, phase, job)
     job.workload = partial(workload, session, target, phase)
-    dep.contract(job, session.document, {Port(target, phase)})
-    job.observes |= frozenset(tissue_stack_observation.ports(session.document, target, phase))
+    observations = partial(tissue_stack_observation.ports, target=target, phase=phase)
+    dep.renewable_contract(job, session.document, {Port(target, phase)}, observations)
     job.restart_on_input_change = True
     return str(session.scheduler.submit(job))
 

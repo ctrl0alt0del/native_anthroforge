@@ -13,6 +13,7 @@ from anthroforge.core.results import Port
 from anthroforge.profiling import causes
 from anthroforge.profiling import tasks as trace
 
+from . import task_coalescing
 from .job_registry import JobRegistry
 from .task_execution import InlineBudget, completed_future, execute
 from .task_schedulers import task_schedulers
@@ -57,6 +58,9 @@ class TaskCoordinator:
         return any(job.writes for job in self.registry.active.values())
 
     def submit(self, job: Job) -> str:
+        return task_coalescing.reuse(self, job) or self._submit(job)
+
+    def _submit(self, job: Job) -> str:
         if job.kind not in self.task_schedulers:
             raise ValueError("No task scheduler registered for " + job.kind)
         if not self.blocked:
@@ -181,7 +185,7 @@ class TaskCoordinator:
         causes.invalidated(self, affected, reason)
         for job in self.registry.matching("owner", affected):
             if job.active and (job.outputs | job.reads).intersection(affected):
-                self.cancel_job(job.id, obsolete=True, reason=reason, restart=True)
+                self._invalidate_input(job, reason)
 
     def invalidate_ports(
         self, affected: set[Port], reason: str = "input_output_changed", source: str = ""
@@ -194,7 +198,13 @@ class TaskCoordinator:
             reads = job.observes | job.prerequisites | job.provides
             legacy = not reads and bool((job.outputs | job.reads) & owners)
             if job.id != source and job.active and (bool(reads & affected) or legacy):
-                self.cancel_job(job.id, obsolete=True, reason=reason, restart=True)
+                self._invalidate_input(job, reason)
+
+    def _invalidate_input(self, job: Job, reason: str) -> None:
+        if task_coalescing.renewable(job):
+            trace.event(self.profiler, job, "inputs_pending")
+            return
+        self.cancel_job(job.id, obsolete=True, reason=reason, restart=True)
 
     def retry(self, job_id: str) -> Any:
         job = self.registry.by_id[job_id]
@@ -242,7 +252,23 @@ class TaskCoordinator:
                 reserved.update(job.outputs)
 
     def _ready(self, job: Job, reserved: set[str]) -> bool:
-        return not (job.outputs & reserved or self.clock() < job.ready_at or self._waiting(job))
+        return self._refresh_pending(job) and not (
+            job.outputs & reserved or self.clock() < job.ready_at or self._waiting(job)
+        )
+
+    def _refresh_pending(self, job: Job) -> bool:
+        try:
+            if (
+                job.renew_inputs is not None
+                and job.inputs_key is not None
+                and (job.accepted_inputs_key != job.inputs_key(self.current()))
+            ):
+                refresh = job.renew_inputs
+                self.registry.update(job, lambda: refresh(job, self.current()))
+            return True
+        except Exception as error:
+            self._failed(job, error)
+            return False
 
     def queued(self) -> list[Job]:
         return sorted(

@@ -4,7 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QTimer, QUrl
+from PySide6.QtCore import QUrl
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -117,19 +117,17 @@ def schedule_diagnostics(args, app, engine, controller, warnings):
 def open_controller(project):
     controller = Controller()
     if project:
-        controller.session.command("open", path=project)
-        controller.session.command("wait")
-        controller.refresh()
+        from .project_actions import queue_document
+
+        controller.initial_project = True
+        queue_document(controller, project)
     return controller
 
 
 def prepare_view(controller, project):
-    controller.camera_workspace = None
-    controller.restore_camera()
-    if project and controller.session.document.entities:
-        controller.select(controller.session.document.entities[0].id)
-        if controller.session.workspace.camera == (0.0, 0.0, 0.0, -20.0, 25.0, 0.0, 4.0):
-            QTimer.singleShot(100, controller.frameSelection)
+    from .project_view import prepare
+
+    prepare(controller, project)
 
 
 def main() -> int:

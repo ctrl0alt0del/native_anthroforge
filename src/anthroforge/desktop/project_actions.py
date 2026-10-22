@@ -9,6 +9,7 @@ from anthroforge.application.storage import atomic_save, read_package
 from anthroforge.core.jobs import Job
 
 from .controller_actions import local_path, new_document
+from .project_view import adopted
 
 
 def save(controller, path, policy):
@@ -141,3 +142,4 @@ def opened(controller, path, lock, result):
     projects.synchronize_loaded(session)
     controller.selection, controller.last_revision = "", -1
     controller.refresh()
+    adopted(controller)

@@ -1,7 +1,8 @@
 """Application traversal and job contracts over snapshot-owned dependency indexes."""
 
 from collections import deque
-from collections.abc import Mapping, Set
+from collections.abc import Callable, Mapping, Set
+from functools import partial
 
 from anthroforge.core import dependency_graph as index
 from anthroforge.core.document import Document
@@ -69,3 +70,34 @@ def contract(job: Job, document: Document, outputs: set[Port]) -> None:
     inputs = closure(dependencies, outputs) - outputs
     job.observes = frozenset(inputs)
     job.prerequisites = frozenset() if outputs & blocked(dependencies) else frozenset(inputs)
+
+
+def renewable_contract(
+    job: Job,
+    document: Document,
+    outputs: set[Port],
+    observations: Callable[[Document], set[Port]] | None = None,
+) -> None:
+    # Opt-in: this request has no captured payload; all inputs come from dispatch state.
+    job.inputs_key = partial(contract_key, observations=observations)
+    job.renew_inputs = partial(renew, outputs=frozenset(outputs), observations=observations)
+    job.renew_inputs(job, document)
+
+
+def renew(
+    job: Job,
+    document: Document,
+    outputs: frozenset[Port],
+    observations: Callable[[Document], set[Port]] | None,
+) -> None:
+    contract(job, document, set(outputs))
+    if observations:
+        job.observes |= frozenset(observations(document))
+    job.reads = frozenset(port.owner for port in job.observes)
+    job.accepted_inputs_key = contract_key(document, observations)
+
+
+def contract_key(
+    document: Document, observations: Callable[[Document], set[Port]] | None
+) -> tuple[object, frozenset[Port]]:
+    return graph(document), frozenset(observations(document)) if observations else frozenset()

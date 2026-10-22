@@ -27,7 +27,7 @@ def request(session: "Session", target: str, interactive: bool = False) -> str:
     job.retry = partial(request, session, target)
     job.cleanup = partial(completed, session, target, job)
     job.workload = lambda document: Workload(affected=1, candidates=1, entities=1)
-    dep.contract(job, session.document, {Port(target, "binding")})
+    dep.renewable_contract(job, session.document, {Port(target, "binding")})
     return session.scheduler.submit(job)
 
 

@@ -1367,3 +1367,24 @@ See the task and development validation records for final gate/package evidence 
 - Initial evidence: 26 focused tests cover value/result edits, immutable old snapshots,
   parent frame walks, provider changes, invalid references and batched pending states.
   Full assembly timing, behavior and packaged evidence are pending on the task branch.
+
+### CH-038 — Exact pose provenance and renewable pending work (2026-10-22)
+
+- Startup recomputation changed 55 bone matrices by at most 6.573e-14. These exact
+  differences caused a large downstream wave despite no authoring edit. Accepted
+  SCP poses now store exact parent pose/offset/geometry, child pose/offset and binding
+  settings. Matching receipts retain the accepted pose; any changed input, recapture,
+  failure or absent receipt follows normal native evaluation. There is no coordinate
+  epsilon, binding reassignment or geometry-kernel change. Older schema-4 files with
+  no receipt still perform their normal first startup evaluation.
+- Previously repeated requests superseded uncaptured queued jobs, creating thousands
+  of obsolete records. Fixed-output evaluators now explicitly declare renewable input
+  contracts. Their pending requests share a job/deadline and refresh dependency indexes
+  before admission. Once inputs are captured, cancellation/read checks are unchanged.
+  Attachment recapture and payload-owning operations do not opt in. Observation sets
+  and dependency graphs form the contract cache key; no input values are cached.
+- Focused tests cover exact reopen, tiny parent motion, undo, missing receipts,
+  explicit recapture, changed geometry/settings, parent failure, pending input changes,
+  refreshed relationship indexes, cancellation and output reservations. The assembly
+  now has 34 obsolete rather than 2,968 obsolete requests, with 956 successes in both.
+  Full geometry/edit and release evidence remains pending at this checkpoint.

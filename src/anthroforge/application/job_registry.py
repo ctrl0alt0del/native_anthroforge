@@ -1,6 +1,6 @@
 """Coordinator-owned active indexes; completed history never participates in scheduling."""
 
-from collections.abc import Hashable, Iterable
+from collections.abc import Callable, Hashable, Iterable
 
 from anthroforge.core.jobs import Job
 
@@ -21,14 +21,21 @@ class JobRegistry:
         self.history.append(job)
         if job.active:
             self.active[job.id] = job
-            for index, keys in memberships(job).items():
-                for key in keys:
-                    self.indexes[index].setdefault(key, set()).add(job.id)
+            self.index(job)
         else:
             job.retire()
 
     def finish(self, job: Job) -> None:
         self.active.pop(job.id, None)
+        self.unindex(job)
+        job.retire()
+
+    def index(self, job: Job) -> None:
+        for index, keys in memberships(job).items():
+            for key in keys:
+                self.indexes[index].setdefault(key, set()).add(job.id)
+
+    def unindex(self, job: Job) -> None:
         for index, keys in memberships(job).items():
             for key in keys:
                 ids = self.indexes[index].get(key)
@@ -36,7 +43,13 @@ class JobRegistry:
                     ids.discard(job.id)
                     if not ids:
                         del self.indexes[index][key]
-        job.retire()
+
+    def update(self, job: Job, operation: Callable[[], None]) -> None:
+        self.unindex(job)
+        try:
+            operation()
+        finally:
+            self.index(job)
 
     def matching(self, index: str, keys: Iterable[Hashable]) -> list[Job]:
         lookup = self.indexes[index]

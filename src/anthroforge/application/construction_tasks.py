@@ -35,7 +35,7 @@ def request(session: "Session", entity: str, interactive: bool = False) -> str:
     job.retry = partial(request, session, entity)
     job.workload = partial(workload, session, entity)
     job.cleanup = partial(completed, session, entity, job)
-    dep.contract(job, session.document, {dep.Port(entity, "geometry")})
+    dep.renewable_contract(job, session.document, {dep.Port(entity, "geometry")})
     return session.scheduler.submit(job)
 
 

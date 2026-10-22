@@ -48,7 +48,7 @@ def request(session: "Session", control: str) -> str:
         partial(finished, session, control, job),
     )
     job.workload = partial(workload, session, control)
-    dep.contract(job, session.document, {dep.Port(control, "control")})
+    dep.renewable_contract(job, session.document, {dep.Port(control, "control")})
     return session.scheduler.submit(job)
 
 

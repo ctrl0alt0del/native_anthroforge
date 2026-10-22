@@ -76,6 +76,9 @@ class Job:
     prerequisites: frozenset[Port] = frozenset()
     provides: frozenset[Port] = frozenset()
     observes: frozenset[Port] = frozenset()
+    renew_inputs: Callable[["Job", Document], None] | None = None
+    inputs_key: Callable[[Document], Any] | None = None
+    accepted_inputs_key: Any = None
 
     @property
     def active(self) -> bool:
@@ -89,6 +92,7 @@ class Job:
         if self.snapshot is not None:
             self.dispatch_revision = self.snapshot.revision
         self.snapshot = self.future = self.cleanup = self.cancel = None
+        self.renew_inputs = self.inputs_key = self.accepted_inputs_key = None
         self.prepare = self.execute = self.publish = self.workload = retired
         self.prerequisites = self.provides = self.observes = frozenset()
         self.reads = self.captures = frozenset()

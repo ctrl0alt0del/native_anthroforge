@@ -89,3 +89,10 @@
   connectivity. `candidates/before-quad-repair.anthroforge` preserves the prior state.
 - Rerun the complete assembly comparisons, edit/undo/reopen checks, development gate
   and canonical package before delivery. Original user file remains untouched.
+- The first regenerated audit isolated inherited base triangulation in single-side
+  inflation. The shared intrinsic publication boundary now initializes its own
+  surface after relaxation/crop, then retains accepted connectivity. The raw native
+  deformation API is unchanged. Focused material/lifecycle and crop tests pass.
+- `tmp/regenerate_quads.py` now reads a second preserved intermediate
+  `candidates/before-surface-finalization.anthroforge`; do not overwrite either
+  intermediate. Log: `logs/surface-finalization-regeneration.log`.

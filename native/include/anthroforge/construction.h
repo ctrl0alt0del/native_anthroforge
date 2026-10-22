@@ -44,6 +44,8 @@ AF_API uint64_t af_mesh_reuse_topology(uint64_t source, uint64_t previous, uint6
 AF_API uint64_t af_mesh_draft(uint64_t source, uint64_t cancel);
 AF_API uint64_t af_mesh_storage_bytes(uint64_t source);
 AF_API uint64_t af_mesh_finalize(uint64_t source, uint64_t previous, uint64_t cancel);
+/* New derived surfaces select initial tessellation; compatible accepted topology is retained. */
+AF_API uint64_t af_mesh_finalize_surface(uint64_t source, uint64_t previous, uint64_t cancel);
 AF_API uint64_t af_loft_geometry(const double* samples, int curves, int count, int strips,
     int closed, int caps, uint64_t cancel);
 AF_API uint64_t af_body_base_geometry(int count, int shape, int sides, double width, double depth,

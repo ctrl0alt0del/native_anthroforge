@@ -1278,3 +1278,11 @@ See the task and development validation records for final gate/package evidence 
 - This migration regenerates its affected pre-delivery result caches through the
   normal coordinator, keeping authored definitions. Full assembly and package
   qualification with the repaired tessellation remain pending.
+- The first integrated audit then exposed a second ownership boundary: single-side
+  inflation inherited its base's connectivity even before its own first publication.
+  Intrinsic finalization now selects initial triangulation for the completed tissue
+  surface after relaxation/crop; later results reuse compatible accepted topology.
+  The native operation retains vertex/polygon material domains and refuses to discard
+  incompatible retained triangle provenance. It does not change the deformation API.
+  A regression reproduces the base-to-inflated concavity and checks first coverage,
+  source immutability and later connectivity retention. Crop checks also pass.

@@ -55,9 +55,10 @@ UiSection {
             UiField { Layout.fillWidth: true; text: modelData.label || ""; placeholderText: "Display label (optional)"; onEditingFinished: panel.variable(modelData.id,{label:text}) }
             RowLayout {
                 Layout.fillWidth: true
-                UiCombo { model: ["REAL","INTEGER"]; currentIndex: model.indexOf(modelData.numeric_type); Layout.fillWidth: true; onActivated: panel.variable(modelData.id,{numeric_type:currentText}) }
+                UiCombo { objectName: "parametricVariableType"+modelData.id; model: ["REAL","INTEGER"]; currentIndex: model.indexOf(modelData.numeric_type); Layout.fillWidth: true; onActivated: { const changes={numeric_type:currentText}; if(currentText==="INTEGER" && Number.isInteger(modelData.value)) changes.value=modelData.value; panel.variable(modelData.id,changes); } }
                 UiCombo { model: ["SCALAR","LENGTH","ANGLE"]; currentIndex: model.indexOf(modelData.dimension); Layout.fillWidth: true; onActivated: panel.variable(modelData.id,{dimension:currentText}) }
-                UiNumberField { propertyReference: ({target:panel.curve.id,path:["engine_settings","variables","@"+modelData.id,"value"]}); Layout.preferredWidth: 95; value: modelData.value; decimals: modelData.numeric_type === "INTEGER" ? 0 : 4; onEdited: value => panel.variable(modelData.id,{value:value}) }
+                UiQuantityField { id: variableValue; objectName: "parametricVariable"+modelData.id; propertyReference: ({target:panel.curve.id,path:["engine_settings","variables","@"+modelData.id,"value"]}); Layout.preferredWidth: 95; canonicalValue: modelData.value; numericType: modelData.numeric_type; dimension: modelData.dimension; onCanonicalEdited: value => panel.variable(modelData.id,{value:value}) }
+                Label { text: variableValue.unitLabel; color: Theme.muted; Layout.preferredWidth: 20 }
             }
         }
     }

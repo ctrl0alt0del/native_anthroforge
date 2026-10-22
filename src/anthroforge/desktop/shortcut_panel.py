@@ -4,6 +4,8 @@ from PySide6.QtCore import Property, QObject, Signal, Slot
 
 from anthroforge.application import property_operations, shortcut_operations
 from anthroforge.application.shortcut_ownership import property_owners
+from anthroforge.core.numeric_properties import decode_reference
+from anthroforge.core.shortcuts import implicit_identity
 
 from .record_model import RecordModel
 from .shortcut_editor import ShortcutEditor
@@ -25,6 +27,7 @@ FIELDS = (
 
 class ShortcutPanel(QObject):
     changed = Signal()
+    revealRequested = Signal()
 
     def __init__(self, controller):
         super().__init__(controller)
@@ -113,20 +116,17 @@ class ShortcutPanel(QObject):
 
     @Slot("QVariantMap", int, result="QVariantMap")
     def propertyState(self, reference, revision):
-        from anthroforge.core.numeric_properties import decode_reference
-        from anthroforge.core.shortcuts import implicit_identity
-
         try:
-            session = self.controller.session
-            value = property_operations.get(session, reference)
-            key = implicit_identity(decode_reference(reference))
-            return dict(
-                writable=value["writable"] and not value["driven_by"],
-                reason=value["reason"] or ("Driven by a formula" if value["driven_by"] else ""),
-                exposed=any(s.id == key and s.exposed for s in session.document.shortcuts),
-            )
+            return property_state(self.controller.session, reference)
         except (ValueError, KeyError):
             return dict(writable=False, reason="Property is unavailable", exposed=False)
+
+    @Slot("QVariantMap")
+    def openDriver(self, reference):
+        key = self.propertyState(reference, 0).get("driver", "")
+        if key:
+            self.editor.select(key)
+            self.revealRequested.emit()
 
     @Slot()
     def createDriver(self):
@@ -194,6 +194,26 @@ def discover_for_panel(panel, search):
         if key == selection or owner and owner in property_owners(session.document, key)
     ]
     return [row for key in targets for row in property_operations.discover(session, key, search)]
+
+
+def property_state(session, reference):
+    value = property_operations.get(session, reference)
+    key = implicit_identity(decode_reference(reference))
+    driver = controlling_driver(session.document, value["driven_by"])
+    return dict(
+        writable=value["writable"] and driver is None,
+        reason=value["reason"] or ("Driven by " + driver.label if driver else ""),
+        exposed=any(s.id == key and s.exposed for s in session.document.shortcuts),
+        driver=driver.id if driver else "",
+        formula=value["driven_by"],
+    )
+
+
+def controlling_driver(document, formula):
+    return next(
+        (d for d in document.driving_shortcuts if any(f.id == formula for f in d.formulas)),
+        None,
+    )
 
 
 def missing_row(value, reason):

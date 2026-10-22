@@ -89,6 +89,7 @@ UiField {
     TapHandler { acceptedButtons: Qt.RightButton; enabled: !!field.propertyReference?.target; onTapped: propertyMenu.popup() }
     UiMenu {
         id: propertyMenu
+        UiMenuItem { text: "Go to driving shortcut"; visible: !!field.propertyState.driver; onTriggered: workspace.shortcutPanel.openDriver(field.propertyReference) }
         UiMenuItem { text: field.propertyState.exposed ? "Hide shortcut" : "Expose as shortcut"; onTriggered: workspace.shortcutPanel.expose(field.propertyReference,"",!field.propertyState.exposed) }
     }
     ToolTip.visible: hovered && !scrubbing && !textEditing

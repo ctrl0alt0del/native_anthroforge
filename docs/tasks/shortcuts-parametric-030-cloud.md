@@ -41,9 +41,13 @@ references, policies, ordering and accepted values. Explicit external inputs rem
 external, and copied outputs are limited to copied construction. Independence rewrites
 consumer-member addresses atomically with the copied graph, including branched tissues.
 [CH-050](../computation_history.md#ch-050--copy-formula-controls-with-their-construction-graph-2026-10-22)
-records ownership and evidence. UI qualification is next; inspection found integer
-values arrive from QML as floats and need explicit transport handling, plus missing
-navigation from driven fields to their controlling shortcut.
+records ownership and evidence. Driven fields now offer navigation to their controlling
+shortcut, including hidden drivers. Driver, shortcut and Parametric-variable controls
+share canonical/display-unit conversion. Switching a whole-valued Parametric variable
+to Integer preserves its value. Existing Qt command transport already accepts integral
+QML numbers and rejects fractions for integer fields; regression evidence corrected the
+initial transport hypothesis. Mixed CP1252/UTF-8 bytes in Shortcuts.qml are normalized
+to valid UTF-8. Runtime/schema and numerical evaluation contracts are unchanged.
 
 ## Verification
 
@@ -59,14 +63,20 @@ navigation from driven fields to their controlling shortcut.
   reference remapping also failed before implementation. The corrected copy/shared
   construction/tissue/Fiber/architecture group passes 35 cases, including pending
   Manual intent and branched tissue controls. Mypy passes 363 source files.
+- Editor/control/architecture group: 10 passed. Tests cover scoped policy edits,
+  fractional-input rejection and hidden-driver navigation. The new
+  `tools/shortcuts_editor_acceptance.py` loads production QML and property projections
+  offscreen, exercises mm/degrees edits, Parametric variable type changes and locked
+  generated-point count fields, and reports no QML warnings. Both editor/list captures
+  are generated under ignored `build/shortcuts-editor-review/`; editor capture inspected.
+  This software-rendered harness excludes the native viewport and full Main window.
 
 ## Next actions and blockers
 
-1. Complete integer UI transport and navigation from driven fields.
-2. Qualify policy editor, catalogue coverage and remaining paused interactions.
-3. Complete missing implementation/contracts from the pause, then run the full
-   portable gate, applicable offscreen checks and GitHub core jobs.
-4. Push coherent implementation and evidence checkpoints on this cloud branch.
+1. Run the full portable gate with native style and inspect GitHub core jobs.
+2. Continue catalogue/ordinary-field coverage and remaining release acceptance from
+   the desktop handoff; this checkpoint does not complete 0.3 release qualification.
+3. Push coherent implementation and evidence checkpoints on this cloud branch.
 
 ## Recovery inputs
 

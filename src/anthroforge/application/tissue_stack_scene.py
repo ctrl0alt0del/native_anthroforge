@@ -3,12 +3,9 @@
 from hashlib import blake2b
 from typing import Any
 
-import numpy as np
-
 from anthroforge.core.anatomical_surfaces import usable
 from anthroforge.core.tissues import TissueVCP
-from anthroforge.native import components, stacking_abi
-from anthroforge.native.mesh import INT64, pointer
+from anthroforge.native import stacking_abi
 from anthroforge.native.resource_cache import ResourceCache
 from anthroforge.native.scene import entity_frame
 from anthroforge.native.tissue_stacking import MaterialLease
@@ -120,9 +117,6 @@ def obstacles(engine: Any, document: Any, resources: Any) -> tuple[list[Any], li
 
 
 def obstacle(engine: Any, item: Any, mesh: Any) -> tuple[Any, Any]:
-    vertices = components.transformed(engine, mesh.array(0), entity_frame(engine, item))
-    faces = np.ascontiguousarray(mesh.array(3), dtype=np.int64)
-    row = stacking_abi.Obstacle(
-        pointer(vertices), faces.ctypes.data_as(INT64), len(vertices), len(faces)
-    )
-    return row, (vertices, faces)
+    row = stacking_abi.Obstacle(mesh=mesh.handle)
+    row.frame[:] = entity_frame(engine, item)
+    return row, (mesh,)

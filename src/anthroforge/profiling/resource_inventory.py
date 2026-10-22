@@ -13,6 +13,7 @@ from anthroforge.native.mesh import Mesh
 from anthroforge.native.path_collisions import CollisionCache
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
+from anthroforge.native.stacking import StackSession
 from anthroforge.native.tissue_stacking import MaterialLease
 
 LIMITATIONS = [
@@ -22,6 +23,7 @@ LIMITATIONS = [
     "Tissue preparation includes owned arrays/visible meshes; source meshes counted separately",
     "Excludes allocator overhead, Python objects, Qt copies and GPU/driver allocations",
     "Ownership totals overlap; add neither owners nor shared alias handles",
+    "Stacking session storage is a conservative bound including opaque vector-cache allowance",
     "Pre-recording job payload references may be unattributed; job snapshots are included",
     "Snapshots are event-driven at most once per second, plus recording boundaries",
 ]
@@ -52,6 +54,7 @@ RESOURCE_TYPES = (
     MaterialLease,
     Comparison,
     CollisionCache,
+    StackSession,
 )
 
 

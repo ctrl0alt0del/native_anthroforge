@@ -49,6 +49,9 @@ class GeometryEngine(NativeEngine):
         self._query_caches()
 
     def _query_caches(self) -> None:
+        self.stack_sessions: ResourceCache[Any] = ResourceCache(
+            512 * 1024 * 1024, 4, "stack_sessions"
+        )
         self.collision_checks: ResourceCache[Any] = ResourceCache(
             128 * 1024 * 1024, 1, "collision_pairs"
         )
@@ -67,6 +70,7 @@ class GeometryEngine(NativeEngine):
             self.surface_queries,
             self.paint_surfaces,
             self.collision_checks,
+            self.stack_sessions,
         )
 
     def clear_caches(self) -> None:

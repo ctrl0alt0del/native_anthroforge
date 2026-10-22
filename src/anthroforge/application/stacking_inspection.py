@@ -1,5 +1,6 @@
 """Read-only support evidence for an accepted order, separate from authored overrides."""
 
+from contextlib import contextmanager
 from dataclasses import asdict
 from typing import Any
 
@@ -62,12 +63,12 @@ def workload(context: Any, target: str, options: Any) -> Workload:
 
 def compute(context: Any, target: str, options: Any, cancel: int) -> dict[str, Any]:
     item = tissue(context, target)
-    captured, native = prepare(context, item, cancel)
-    order = selected_order(item, options)
-    report = describe(context, item, order)
-    report["active"] = active(native, order)
-    report.update(footprint(captured, native, order, cancel))
-    return dict(report=report, lines=report["lines"])
+    with prepare(context, item, cancel) as (captured, native):
+        order = selected_order(item, options)
+        report = describe(context, item, order)
+        report["active"] = active(native, order)
+        report.update(footprint(captured, native, order, cancel))
+        return dict(report=report, lines=report["lines"])
 
 
 def active(native: Any, order: Any) -> bool:
@@ -81,11 +82,17 @@ def active(native: Any, order: Any) -> bool:
     return pair in dependencies(native)
 
 
+@contextmanager
 def prepare(context: Any, item: Any, cancel: int) -> Any:
     accepted(item)
-    captured, native, output, orders = evaluation.prepared(
+    with evaluation.prepared(
         context.engine, context.document, context.resources, item, cancel
-    )
+    ) as values:
+        verify_plan(item, *values)
+        yield values[:2]
+
+
+def verify_plan(item: Any, captured: Any, native: Any, output: Any, orders: Any) -> None:
     providers = {
         captured.identities[b][0]
         for a, b in dependencies(native)
@@ -93,7 +100,6 @@ def prepare(context: Any, item: Any, cancel: int) -> Any:
     }
     if evaluation.description(captured, providers, output, orders) != item.stack_plan:
         raise ValueError("The accepted stacking plan differs from current inputs. Reevaluate it.")
-    return captured, native
 
 
 def selected_order(item: Any, options: Any) -> Any:

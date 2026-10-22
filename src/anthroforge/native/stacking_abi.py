@@ -56,6 +56,7 @@ class Policy(c.Structure):
 
 class Obstacle(c.Structure):
     _fields_ = [("vertices", D), ("faces", INT64), ("count", c.c_int), ("triangles", c.c_int)]
+    _fields_ += [("mesh", U), ("frame", c.c_double * 16)]
 
 
 class Accepted(c.Structure):
@@ -89,8 +90,7 @@ class Order(c.Structure):
 
 
 def configure(engine: Any) -> None:
-    engine.bind("af_stack_create", [], U)
-    engine.bind("af_stack_release", [U], None)
+    configure_lifecycle(engine)
     engine.bind("af_stack_sizes", [U, INT64])
     engine.bind("af_stack_results", [U, c.POINTER(Output), c.c_int])
     engine.bind("af_stack_orders", [U, c.POINTER(Order), c.c_int])
@@ -103,6 +103,12 @@ def configure(engine: Any) -> None:
     engine.bind(
         "af_stack_resolve_group", [c.POINTER(Target), c.c_int, c.POINTER(Accepted), c.c_int, U]
     )
+
+
+def configure_lifecycle(engine: Any) -> None:
+    engine.bind("af_stack_create", [], U)
+    engine.bind("af_stack_release", [U], None)
+    engine.bind("af_stack_bytes", [U], U)
 
 
 RUN_ARGUMENTS = [

@@ -43,6 +43,9 @@ Step 2 implemented and measured (CH-040): 26 focused checks pass; recorded ribs
 Step 3 implemented (CH-041): native context reuses colliders and pair evidence,
 30 focused checks plus failed-capture recovery; profile-edit settle 221–324 ms.
 Ribs timing needs counterbalanced recheck; do not claim its improvement.
-Next: step 4 exclusive stacking context leases, native obstacle handles, metadata-only plans. Preserve baseline native DLL
+Step 4 implemented (CH-042): exclusive pooled contexts, native obstacle handles,
+metadata plans; existing 63 tests and new ownership/parity checks pass. Warm unchanged
+plan ~1–2 ms and final ~5–6 ms; changed-input benefits still need measurement.
+Next: step 5 reduced height QP experiment, with original objective/KKT certification. Preserve baseline native DLL
 at build/vcp-performance-024-release/baseline-af_native.dll; baseline-replay/ now freezes 11 snapshots of 1,456 arrays before
 numerical changes. Remaining steps and release qualification are pending.

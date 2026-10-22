@@ -1471,3 +1471,28 @@ See the task and development validation records for final gate/package evidence 
   no improvement is claimed there pending serial counterbalanced qualification.
   Local evidence: `build/vcp-performance-024-release/step3-retained/`. Full geometry
   replay and combined release checks remain pending.
+
+### CH-042 — Exclusive retained stacking sessions and batched obstacle handles (2026-10-22)
+
+- Planning/final jobs created and discarded numerical sessions, losing qualified native
+  detection/material/solve caches. Sessions now use exclusive multi-call leases keyed
+  by receiver. Concurrent leases never share mutable sessions; failures discard them,
+  and cache clears invalidate outstanding returns. Group solving and support inspection
+  keep leases until every native call is complete. Full inputs are still recaptured
+  and qualified by the existing native signatures on every plan.
+- Production planning requests only status/order metadata; the low-level full-result
+  path remains available for numerical tests. Bone obstacles cross as mesh handles and
+  frames, with transform/copy/preparation in C++; legacy array inputs remain a parity
+  oracle. Geometry, settings, providers, constraints and final surface validation remain.
+- Idle sessions are bounded to four and a conservative 512 MiB retained budget. Native
+  accounting includes owned buffers and the configured allowance for the opaque donor
+  vector cache. Profiler reports label this category as an upper bound, not exact RSS.
+- 63 existing stacking/inspection/group/geometry checks pass, plus lease exclusivity,
+  failed lease disposal, lifecycle clearing, metadata-only reads and transformed obstacle
+  parity. Typing/style, native CTests and changed-native clang-tidy pass.
+- Serial fresh/warm/warm/fresh 625-vertex fixture trials preserve every output vertex
+  exactly. Planning: fresh 18.1–21.4 ms, warm 0.98–1.75 ms. Final: fresh 196.5–241.7 ms,
+  warm 5.08–6.07 ms. These are unchanged-input reuse measurements, not claimed gains
+  for changed providers. Prior changed-receiver evidence was smaller (CH-040 task analysis).
+  Local timings/profile: `build/vcp-performance-024-release/step4/`. Combined release
+  qualification and changed-input replay remain pending.

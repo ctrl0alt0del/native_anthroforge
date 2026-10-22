@@ -1559,6 +1559,8 @@ See the task and development validation records for final gate/package evidence 
   numerical methods remain unchanged; undefined lifetime behavior is removed.
 - The maintained stacking source digest is updated, and the upstream digest stays
   available. The full compiler pass identified this defect without disabling
-  warnings-as-errors. Native rebuild, stacking contract tests and full Linux gate
-  are pending at this checkpoint; no performance or geometry improvement is claimed.
+  warnings-as-errors. At `70f4e62`, the Linux gate passes all 1722 pytest cases,
+  five native CTests, 162 authored clang-tidy inputs, the headless workshop and
+  Python package validation. The 57 focused stacking/provenance/drawing checks
+  also pass. No performance or geometry improvement is claimed.
 - See [the pipeline repair task](tasks/fix-ubuntu-pipeline.md) for final validation.

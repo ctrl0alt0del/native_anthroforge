@@ -3,7 +3,7 @@
 - Task branch: `codex/fix-ubuntu-pipeline`
 - Integration branch: `main`
 - Starting revision: `c74b28085c31f894f6ce343265d999da526a6feb`
-- Status: in progress
+- Status: Ubuntu validated; final Windows CI pending
 - Last updated: 2026-10-22 UTC
 - Active writer: Codex Cloud, Ubuntu pipeline repair
 
@@ -42,6 +42,8 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
   (C4189) and bounded `1/-1` conversion to `int8_t` (C4244). Complete the wrappers'
   scoped MSVC allowances for imported routing/stacking code and unused tissue
   entry points. Authored-code warnings-as-errors and pinned donor bytes stay intact.
+  The complete MSVC build also identified C4267 in the donor's Eigen triplet index
+  conversion; its allowance is scoped to the imported stacking headers.
 - The full Linux suite exposed two tests comparing borrowed NumPy buffers from
   already-destroyed temporary geometry. Retain their reference mesh owners throughout
   comparison and document `Geometry.array`'s existing borrowed-view lifetime.
@@ -56,11 +58,11 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
 
 ## Current state
 
-Fetched and inspected current `origin/main`; clean checkout. Failure logs retrieved.
-Local setup reproduced the identical mypy failure. The renderer now selects its
-creation flags under a module-level `sys.platform == "win32"` branch, which
-[mypy explicitly supports](https://mypy.readthedocs.io/en/stable/common_issues.html#python-version-and-system-platform-checks).
-The selected flags and subprocess lifecycle retain their existing behavior.
+Ubuntu CI passes at `127b3a8`, including setup and repeatable refresh. The complete
+local gate passes at `70f4e62`. The latest follow-up adds only an MSVC diagnostic
+allowance around imported stacking code; final Windows CI and integration remain.
+All implementation increments are on the task branch. No schema, solver tolerance,
+GUI feature or package version changes are included.
 
 ## Verification
 
@@ -76,30 +78,40 @@ The selected flags and subprocess lifecycle retain their existing behavior.
 - [Run 39864610919](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39864610919)
   passed Ubuntu mypy and reproduced the subsequent CGAL `-Werror=cpp` build failure.
   The local gate reproduced the same build failure.
-- Native compatibility corrections and full portable/remote gates pending validation.
+- Native compatibility corrections are validated by the complete local gate.
 - Targeted clang-tidy on vendored `curve_fit_cubic.c` reproduced 20 function-size
   errors. This source is unchanged upstream code; the portable style check now
   applies the existing authored-code policy consistently.
 - A mocked compile database confirmed the style check retains authored files,
   deduplicates entries and excludes only the actual vendor directory.
 - `cmake --build --preset portable-core -- -k 0` collected every GCC compilation
-  failure in one pass; compatibility fixes are now rebuilding. Targeted clang-tidy
+  failure in one pass; the corrected native build passes. Targeted clang-tidy
   on the reformatted subdivision adapter passed.
 - Full native compilation, all five CTests and all 162 authored clang-tidy inputs
   passed. All 57 targeted stacking/provenance/drawing tests passed.
 - First full pytest run: 1720 passed, two failed from temporary mesh lifetimes in
-  `tests/test_tissue_preparation.py`; ownership corrections are pending revalidation.
+  `tests/test_tissue_preparation.py`. Corrected tests plus architecture: 16 passed.
+- `uv run --no-sync python tools/check_core.py --native-style` at `70f4e62`: passed
+  all 1722 pytest cases (zero skips), five CTests, 162 authored clang-tidy inputs,
+  Ruff/mypy, headless save/reopen workshop, wheel/source builds and wheel resources.
+- `bash tools/cloud/refresh.sh`, fresh-shell doctor and Ninja `-k 0`: passed.
+- Ubuntu [run 39867241612](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39867241612)
+  passed at `127b3a8`. Follow-up [run 39867569502](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39867569502)
+  tests `70f4e62`; Windows completed all compilation and found only the donor
+  Eigen triplet conversion warning addressed by the latest scoped allowance.
+- Windows interactive GUI and portable executable qualification were not run;
+  this task concerns compiler/check compatibility, not GUI behavior or release packaging.
 
 ## Next actions and blockers
 
-1. Run the full portable gate and verify Ubuntu CI on the pushed correction.
-2. Resolve any subsequent Ubuntu failures exposed after type checking.
-3. Reconcile latest main, integrate the validated repair, and verify remote ancestry.
+1. Verify final Ubuntu/Windows CI after the MSVC-only diagnostic correction.
+2. Reconcile latest main, integrate the validated repair, and verify remote ancestry.
 
 ## Recovery inputs
 
 Use `bash tools/cloud/setup.sh` and source `tools/cloud/environment.sh` in new
-shells. Existing ignored environment/build outputs are available but predate main.
+shells. Generated evidence is in `build/core/qualification/{passed.json,pytest.xml}`
+and `build/core/ubuntu-pipeline-qualified.log`; these local outputs are ignored.
 Network shell commands require the supported additional network permission.
 The cloud host blocks `archives.boost.io`. Local validation uses the official
 [Boost 1.89.0 no-docs release archive](https://github.com/boostorg/boost/releases/download/boost-1.89.0/boost-1.89.0-b2-nodocs.tar.xz),

@@ -20,8 +20,11 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
   not narrow platform-specific stubs. The renderer owns subprocess launch policy.
 - Preserve Windows console suppression, non-Windows zero creation flags, renderer
   isolation, cancellation, logging and cleanup. No numerical approach changes.
-- The same run has an independent Windows MSVC C4702 failure in vendored libigl
-  Boolean headers. Track separately unless Ubuntu validation exposes a shared cause.
+- After type checking, Ubuntu exposed deprecated CGAL headers in vendored libigl.
+  That same integration also contains the dead returns causing Windows MSVC C4702.
+  Update the deprecated aliases to identical current CGAL types and remove only
+  unreachable returns. Preserve warnings-as-errors and all numerical algorithms.
+  [Vendor provenance](../../native/boolean/PROVENANCE.md) records the patches.
 - Follow [cloud development](../cloud_development.md) and
   [engineering guidelines](../engineering_guidelines.md).
 
@@ -43,7 +46,11 @@ The selected flags and subprocess lifecycle retain their existing behavior.
 - After the correction, `uv run --no-sync python -m mypy` and the same command
   with `--platform win32`: both passed, 327 source files each.
 - Targeted Ruff lint/format and `git diff --check`: passed.
-- Full portable gate and remote Ubuntu validation pending.
+- Real Linux renderer subprocess success, failure logging and cancellation passed.
+- [Run 39864610919](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39864610919)
+  passed Ubuntu mypy and reproduced the subsequent CGAL `-Werror=cpp` build failure.
+  The local gate reproduced the same build failure.
+- Native compatibility corrections and full portable/remote gates pending validation.
 
 ## Next actions and blockers
 
@@ -56,3 +63,9 @@ The selected flags and subprocess lifecycle retain their existing behavior.
 Use `bash tools/cloud/setup.sh` and source `tools/cloud/environment.sh` in new
 shells. Existing ignored environment/build outputs are available but predate main.
 Network shell commands require the supported additional network permission.
+The cloud host blocks `archives.boost.io`. Local validation uses the official
+[Boost 1.89.0 no-docs release archive](https://github.com/boostorg/boost/releases/download/boost-1.89.0/boost-1.89.0-b2-nodocs.tar.xz),
+SHA256 `875cc413afa6b86922b6df3b2ad23dec4511c8a741753e57c1129e7fa753d700`,
+extracted into ignored `.tools/boost-1.89.0` and selected with
+`cmake --preset portable-core -DFETCHCONTENT_SOURCE_DIR_AF_QUERY_BOOST="$PWD/.tools/boost-1.89.0"`.
+Repository dependency URLs/digests remain unchanged; CI tests the configured archives.

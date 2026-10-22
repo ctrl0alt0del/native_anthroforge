@@ -76,7 +76,6 @@ IGL_INLINE int igl::copyleft::cgal::extract_cells_single_component(
     if ((size_t)F(fid, 1) == d && (size_t)F(fid, 2) == s) return true;
     if ((size_t)F(fid, 2) == d && (size_t)F(fid, 0) == s) return true;
     throw "Invalid face!";
-    return false;
   };
 
   const size_t num_unique_edges = uE.rows();

@@ -2,6 +2,8 @@
 
 - Eigen and libigl: copied unchanged from the addon's native/deformation/vendor
   on 2026-10-16; original MPL notices are retained. Only used headers compile.
+  Subsequent libigl CGAL compatibility patches are documented in
+  [the Boolean adapter provenance](../boolean/PROVENANCE.md).
 - happly.h: nmwsharp/happly upstream source, retrieved 2026-10-16, MIT.
   SHA-256: 05A2BC71E9F3A48B2B996D06C5516254132D0F26F52B3FD845AFF2492BF51F82.
 - mapbox/earcut.hpp: v2.2.4, ISC.

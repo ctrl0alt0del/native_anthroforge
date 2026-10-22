@@ -1496,3 +1496,22 @@ See the task and development validation records for final gate/package evidence 
   for changed providers. Prior changed-receiver evidence was smaller (CH-040 task analysis).
   Local timings/profile: `build/vcp-performance-024-release/step4/`. Combined release
   qualification and changed-input replay remain pending.
+
+### CH-043 — Reduced height QP with native variable bounds (2026-10-22)
+
+- The original height problem encoded fixed samples as equalities and free sample
+  limits as identity inequality rows. A narrow native adapter now eliminates fixed
+  variables, adjusts the linear term, and supplies PIQP's direct variable bounds.
+  Expanded primal/dual results still pass the original full-problem certification;
+  the objective, tolerances, pinning, displacement limits and cancellation stay intact.
+- Serial old/new/new/old trials repeated twice in one process on the 13,845-vertex
+  assembly base measured 1,768–1,819 ms original versus 1,561–1,601 ms reduced.
+  Both used 24 iterations. Maximum vertex difference was 3.94e-13 m; topology was
+  exact, stationarity remained ~6.3e-10 and constraint violation ~1.4e-16.
+  System busy fractions ranged 17–23%; this is a kernel measurement, not UI latency.
+- All 24 smoothing/workflow/architecture checks, five native CTests and modified
+  native clang-tidy checks pass. Other inflation/relaxation fixture arrays are exact.
+  Local evidence: `build/vcp-performance-024-release/height-comparison.json` and
+  `kernel-baseline/`, `kernel-reduced/`. Solver state reuse was not needed for this
+  gain; no claim is made for warm-start or symbolic caching in height smoothing.
+- References: [PIQP variable bounds](https://predict-epfl.github.io/piqp/interfaces/python/getting_started).

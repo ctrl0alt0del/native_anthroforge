@@ -46,6 +46,8 @@ Ribs timing needs counterbalanced recheck; do not claim its improvement.
 Step 4 implemented (CH-042): exclusive pooled contexts, native obstacle handles,
 metadata plans; existing 63 tests and new ownership/parity checks pass. Warm unchanged
 plan ~1–2 ms and final ~5–6 ms; changed-input benefits still need measurement.
-Next: step 5 reduced height QP experiment, with original objective/KKT certification. Preserve baseline native DLL
+Step 5 qualified (CH-043): reduced fixed-variable/box formulation is 1.56–1.60 s
+versus 1.77–1.82 s in alternating trials; original certification remains, max delta
+3.94e-13 m, 24 focused checks pass. Next: step 6 measured native preparation. Preserve baseline native DLL
 at build/vcp-performance-024-release/baseline-af_native.dll; baseline-replay/ now freezes 11 snapshots of 1,456 arrays before
 numerical changes. Remaining steps and release qualification are pending.

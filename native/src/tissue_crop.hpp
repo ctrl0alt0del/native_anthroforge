@@ -13,5 +13,6 @@ struct CropState {
     Faces faces;
 };
 CropState crop_inputs(const Mesh& base,const Mesh& own,const double* plane,uint64_t cancel);
+Faces crop_triangles(const CropState& state,const Mesh& own,size_t face);
 std::shared_ptr<Mesh> crop_output(const CropState& state,const TissueDomain& source,uint64_t cancel);
 }

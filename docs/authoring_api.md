@@ -511,6 +511,11 @@ Omitting bindings uses both open endpoints, or the first closed-curve point, wit
 nearest-ready-SCP capture. Explicit binding rows may omit `target` to use the same
 automatic choice for that point; explicit Tissue Base/Final overrides remain supported.
 Automatic candidates and coordinates are captured at dispatch, not when queued.
+Dense deformation support is a separate policy from choosing an endpoint: skeletal
+fibers capture eligible SCP surfaces, while explicitly tissue-backed fibers use only
+their selected parents (including selected SCPs). Nearby unrelated tissues do not
+become implicit deformation parents. Current-shape editing uses this same policy;
+`ANY_PARENT` still permits explicitly edited endpoints to choose an eligible tissue.
 Each binding is `{point: authored_point_id, target: anatomical_surface_id,
 capture_scope: "CURRENT_PARENT" | "ANY_PARENT"}`. Supply both open endpoints or
 at least one point on a closed curve. It returns the job identifier; completed creation
@@ -825,10 +830,12 @@ See `examples/segment_chain.json` for a portable shared-API workflow.
 ### Retained material correspondence for authored open lofts
 
 `surface.correspondence(target, mapping, across)` installs explicit correspondence
-for an ordinary open Surface or Membrane. `mapping` maps each source curve ID to
+for an open ordinary or branched Surface or Membrane. `mapping` maps each source curve ID to
 ordered `[point_id, station]` pairs, including both endpoints. Stations are finite,
 strictly increasing and start at zero; their final value is normalized by the native
-adapter. `across` supplies one retained insertion count per adjacent curve pair.
+adapter. For ordinary lofts, `across` supplies one retained insertion count per
+adjacent curve pair. For branches use `across=[]`: connector sampling retains its
+existing shared-seam rules, while main and branch curves use their authored stations.
 This operation is useful when reproducing an authored material loft whose sections
 must not move with changing curve arclength. It uses normal topology locks, undo,
 dependency evaluation and resource ownership. It does not import a Blender file.
@@ -836,6 +843,8 @@ dependency evaluation and resource ownership. It does not import a Blender file.
 Stable point IDs survive deformation, persistence and Make Independent. Native
 sampling interpolates additional evaluated points without dropping corners. Removing
 a referenced station fails explicitly and retains the previous result. **Realign**
-resets this explicit mapping. Closed curves, partial source ranges, uniform sampling
-and branched layouts require resetting correspondence first; there is no silent
+resets this explicit mapping. Closed curves, partial source ranges and uniform sampling
+require resetting correspondence first; there is no silent
 replacement with another interpretation. Default loft authoring is unchanged.
+Adding a branch to an already mapped ordinary loft still requires explicit Realign;
+configure the complete assembly's correspondence after establishing its junctions.

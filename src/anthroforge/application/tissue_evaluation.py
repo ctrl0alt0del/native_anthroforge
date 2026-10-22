@@ -38,11 +38,7 @@ def uncropped(
     tissue_fields.validate(resources, item, "REST")
     if item.relaxation.mode != "NONE" or item.constraints:
         return tissue_relaxation.evaluate(engine, document, resources, item, cancel)
-    previous = resources.meshes.get(item.intrinsic_result.asset)
-    return TissueOutput(
-        mesh=topology.finalize(mesh, previous.mesh if previous else None, cancel),
-        diagnostics=(TissueDiagnostic(),),
-    )
+    return TissueOutput(mesh=mesh, diagnostics=(TissueDiagnostic(),))
 
 
 def intrinsic(
@@ -50,11 +46,18 @@ def intrinsic(
 ) -> TissueOutput:
     item = tissue_materials.effective(item)
     output = uncropped(engine, document, resources, item, cancel)
-    if not item.crop.enabled:
-        return output
     assert output.mesh is not None
-    base = resources.meshes[item.base_result.asset].mesh
-    return replace(output, mesh=tissue_crop.evaluate(base, output.mesh, item.crop, cancel))
+    if item.crop.enabled:
+        base = resources.meshes[item.base_result.asset].mesh
+        output = replace(output, mesh=tissue_crop.evaluate(base, output.mesh, item.crop, cancel))
+    return finalize_surface(resources, item, output, cancel)
+
+
+def finalize_surface(resources: Any, item: Any, output: TissueOutput, cancel: int) -> TissueOutput:
+    assert output.mesh is not None
+    previous = resources.meshes.get(item.intrinsic_result.asset)
+    mesh = topology.finalize_surface(output.mesh, previous.mesh if previous else None, cancel)
+    return replace(output, mesh=mesh)
 
 
 def final(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> TissueOutput:

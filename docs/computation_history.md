@@ -39,13 +39,15 @@ evidence for those revisions, not current workflow instructions.
 ## Current computation inventory
 
 Additional active authoring/inspection work for T09, K01 and Q05 is recorded in CH-024/025.
+Nearest attachment queries (A01–A03) exclude numerically unusable triangles from their
+transient spatial index while preserving original material indices; see CH-032.
 
 ### Meshes, primitives and deformers
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
 | G01 | Mesh import: parse OBJ/STL/PLY, convert units/axes and construct owned canonical mesh data. | [mesh_io.cpp](../native/src/mesh_io.cpp) | [import formats](../tests/test_import_formats.py) |
-| G02 | Mesh preparation: polygon triangulation, topology reuse, joins/deformed copies, bounds, normals, spatial acceleration and render chunks. Geometry-only intermediates finalize once; deformation preserves compatible accepted connectivity. | [mesh_build.cpp](../native/src/mesh_build.cpp), [mesh_topology.cpp](../native/src/mesh_topology.cpp) | [geometry preparation](../tests/test_geometry_preparation.py) |
+| G02 | Mesh preparation: polygon triangulation, topology reuse, joins/deformed copies, bounds, normals, spatial acceleration and render chunks. Generated quads choose a non-overlapping initial diagonal. Geometry-only intermediates finalize once; deformation preserves compatible accepted connectivity. | [mesh_build.cpp](../native/src/mesh_build.cpp), [mesh_topology.cpp](../native/src/mesh_topology.cpp) | [geometry preparation](../tests/test_geometry_preparation.py) |
 | G03 | Coordinate/frame calculations: TRS, matrix products/inverses, parent-relative placement, batched point transforms, quaternion/axis rotation and transformed bounds. Shared by anatomy, controls, consumers and tools. | [transforms.cpp](../native/src/transforms.cpp), [object frames](../src/anthroforge/application/object_frames.py) | [transform deltas](../tests/test_transform_delta.py), [shared curves](../tests/test_shared_curves.py) |
 | G04 | SCP loft primitives: sample ordered curve pairs, produce shared strips, caps and canonical polygons using consumer ranges, placement and density. | [loft.cpp](../native/src/loft.cpp), [construction adapter](../src/anthroforge/native/construction.py) | [primitive parity](../tests/test_primitive_parity.py) |
 | G05 | Curve-deformed bodies: box/cylinder/capsule bases, whole-curve fit or fixed-length placement, radius/tilt-aware deformation and multiple-piece assembly. Cache reusable undeformed bases. | [curve_body.cpp](../native/src/curve_body.cpp), [curve_deform.cpp](../native/src/curve_deform.cpp) | [primitives](../tests/test_primitives.py), [geometry preparation](../tests/test_geometry_preparation.py) |
@@ -71,7 +73,7 @@ Additional active authoring/inspection work for T09, K01 and Q05 is recorded in 
 | --- | --- | --- | --- |
 | A01 | SCP attachments: nearest/ray capture, retained surface/frame/offset records and batched parent-to-child transform propagation. | [attachment.cpp](../native/src/attachment.cpp), [attachment adapter](../src/anthroforge/native/attachments.py) | [addon parity](../tests/test_addon_parity.py), [assembly](../tests/test_assembly.py) |
 | A02 | Anchor/point bindings: capture and resolve explicit SCP or Tissue Base/Final material locations, orientation and offsets. Resolve against accepted deformed material without automatic nearest reassignment. | [point attachment adapter](../src/anthroforge/native/point_attachments.py), [material_binding.cpp](../native/src/material_binding.cpp), [surface providers](../src/anthroforge/application/surface_providers.py) | [point attachments](../tests/test_point_attachments.py), [tissue anchor material](../tests/test_tissue_anchor_material.py) |
-| A03 | Fiber attachment fields: dense surface captures, nearest-owner runs, arc-length blending between owners, structural pins and retained material influence. Applies across curve engines. | [attachment_weights.cpp](../native/src/attachment_weights.cpp), [attachment fields](../src/anthroforge/native/attachment_fields.py) | [attachment weights](../tests/test_attachment_weights.py), [attachment fields](../tests/test_attachment_fields.py) |
+| A03 | Fiber attachment fields: dense surface captures, nearest-owner runs, arc-length blending between owners, structural pins and retained material influence. Automatic skeletal supports exclude unrelated tissues; explicitly tissue-backed fields use selected parents (CH-036). Applies across curve engines. | [attachment_weights.cpp](../native/src/attachment_weights.cpp), [attachment fields](../src/anthroforge/native/attachment_fields.py), [support policy](../src/anthroforge/application/fiber_supports.py) | [attachment weights](../tests/test_attachment_weights.py), [attachment fields](../tests/test_attachment_fields.py), [support policy](../tests/test_fiber_support_policy.py) |
 | A04 | Fiber resolution/editing: resolve its current attached shape, edit authored controls, rebind edited endpoints using Current/Any eligible parent policy, preserve unedited pins, then evaluate its path engine. | [fiber bindings](../src/anthroforge/application/fiber_bindings.py), [fiber edit evaluation](../src/anthroforge/application/fiber_edit_evaluation.py), [path_editing.cpp](../native/src/path_editing.cpp) | [fiber editing](../tests/test_fiber_editing.py), [tissue fiber material](../tests/test_tissue_fiber_material.py) |
 | A05 | Automatic attached construction: native nearest-SCP capture for new Anchor/Fiber bindings, independent graph copies, preserved existing Fiber bindings, and native Membrane evaluation under one reserved worker job. One atomic publication/undo; Tissue evaluation remains downstream. | [creation plan](../src/anthroforge/application/attached_creation.py), [worker assembly](../src/anthroforge/application/attached_creation_compute.py), [lifecycle](../src/anthroforge/application/attached_creation_jobs.py) | [conversion](../tests/test_attached_creation.py), [lifecycle](../tests/test_attached_creation_lifecycle.py) |
 
@@ -1207,3 +1209,144 @@ See the task and development validation records for final gate/package evidence 
   the saved project without a visible window. This is not interactive acceptance.
 - Scope: explicit stations require complete open ordinary loft inputs and exact
   sampling. They do not silently apply to closed paths, ranges, or branched layouts.
+  CH-033 subsequently extends explicit stations to complete open branched layouts.
+
+### CH-032 — Query usable triangles without changing authored geometry (2026-10-22)
+
+- Affects A01–A03 and shared nearest-surface consumers.
+- Observed failure: remaining-muscle migration encountered Boolean exterior slivers
+  with squared cross-product area 3.97168e-35. Nearest-point selection could return
+  such a triangle, then barycentric capture rejected it. This depended on the target
+  and queried point; rebuilding alone did not reliably resolve the failure.
+- Before: Surface indexed every triangle and rejected the selected triangle later.
+  Now: the transient world-space query index includes only triangles satisfying the
+  existing 1e-30 squared-area resolution threshold and maps hits to original face IDs.
+  Empty usable sets fail explicitly. No document mesh, topology, binding identity or
+  Boolean exterior policy is changed.
+- Barycentric coordinates use oriented cross products instead of subtracting nearly
+  equal Gram products, avoiding cancellation for thin but resolvable triangles.
+  Libigl nearest queries still determine the nearest position; this change does not
+  claim exact interior projection for arbitrarily ill-conditioned triangles.
+- Targeted evidence: 15 point/field/exterior-query tests pass, including sliver
+  exclusion, original-index retention, offset resolution and an all-degenerate target.
+  Five native CTests pass. Previously failing migrated scalenus/iliocostalis units
+  now reproduce their saved source inflation within 2.3e-7 scene units.
+- Ownership: filtering and numerical coordinates belong to the shared C++ spatial
+  query; Python migration retains ordinary application capture and transactions.
+  The final 1669-test gate and canonical portable suite pass; complete assembly
+  qualification is recorded below under CH-036.
+
+### CH-033 — Retain correspondence through branch evaluation (2026-10-22)
+
+- Affects S01/S02 and branched tissue base preparation.
+- Observed: the saved deltoid's explicit material stations were absent from the
+  standalone branch adapter. Arclength reconstruction yielded 6646 vertices instead
+  of 859 and a 0.7468 scene-unit maximum two-way vertex-to-surface discrepancy.
+- The shared correspondence operation now accepts all curves of an open branch
+  assembly with empty transverse-density overrides. The branch adapter forwards
+  each consumer's retained alignment to the existing native path/branch pipeline.
+  Native assembly, shared seam identity, connector and inflation algorithms stay unchanged.
+- The one-off transfer additionally retains the source composite surface's normal
+  direction; ignoring that authored setting inverted deltoid inflation. With both
+  correct inputs the 859-vertex output matches within 2.63e-7 scene units.
+- 26 correspondence/branch/native parity tests pass, including shared sections after
+  deformation, exact seam counts, save/reopen/recompute, and invalid-density rejection.
+  Branch addition cannot silently discard an existing ordinary-loft material mapping.
+- Scope remains complete open curves with exact evaluated-corner preservation.
+  The final 1669-test gate, canonical portable suite and complete assembled
+  qualification pass (CH-036); this is not anatomical reapproval.
+
+### CH-034 — Valid initial diagonals for generated quads (2026-10-22)
+
+- Affects G02 and generated surface/tissue mesh preparation. The final migration
+  audit added triangle-centroid samples to its two-way vertex-to-surface comparison.
+  Matching vertices had hidden 15 incorrect deltoid quad splits (maximum surface
+  discrepancy .0289393) and three biceps splits (.000588219). Smaller cases occurred
+  in eleven other base/envelope pairs, including two previously migrated families.
+- Before: every generated quad used diagonal 0–2, including concave/folded quads
+  where those triangles overlap. Initial construction now uses Blender 5.0.1's
+  `is_quad_flip_v3_first_third_fast` rule and switches such quads to diagonal 1–3.
+  Source paths, hashes and attribution are recorded in the primitive provenance.
+- Ownership stays in native mesh preparation. Polygon corners, authored vertices,
+  material identities and inflation equations are unchanged. Deformation and
+  finalization continue to reuse compatible accepted triangulation; they do not
+  retessellate moving geometry. Existing files are not silently rewritten on load.
+- A bounded donor-case experiment using that rule reduced deltoid/biceps sampled
+  discrepancies to 2.63e-7/2.39e-7. A native regression checks concave coverage,
+  picking outside the polygon and preserved connectivity after later deformation.
+  The 39 focused geometry/correspondence/branch tests and native CTests pass.
+- This migration regenerates its affected pre-delivery result caches through the
+  normal coordinator, keeping authored definitions. Full assembly and package
+  qualification with the repaired tessellation pass (CH-036).
+- The first integrated audit then exposed a second ownership boundary: single-side
+  inflation inherited its base's connectivity even before its own first publication.
+  Intrinsic finalization now selects initial triangulation for the completed tissue
+  surface after relaxation/crop; later results reuse compatible accepted topology.
+  The native operation retains vertex/polygon material domains and refuses to discard
+  incompatible retained triangle provenance. It does not change the deformation API.
+  A regression reproduces the base-to-inflated concavity and checks first coverage,
+  source immutability and later connectivity retention. Crop checks also pass.
+
+### CH-035 — Stable Section Profile poles and material crop triangulation (2026-10-22)
+
+- Affects tissue Section Profile directions, stacking direction queries, and material
+  cropping. Final migration recomputation exposed round-off-sensitive collapsed poles:
+  FCU base changes around 2e-14 changed inflation by .003; the radial FDS pole could
+  reverse one entire row of normals and change its envelope by .0194 scene units.
+- The qualified profile adapter now applies the existing scale-relative frame-area
+  validity threshold before normalization and orientation propagation. Degenerate
+  boundary frames contribute zero to smoothing/section averaging, as exact collapsed
+  source coordinates did. Positive-height degenerate interior samples still fail.
+  Inflation and stacking share the corrected direction function. Pinned addon source
+  bytes remain unchanged; profile depths, shape formula and smoothing modes are retained.
+- Display quad tessellation and material-domain triangulation are distinct policies.
+  Native cropping previously reused display triangles. The adductor magnus base's
+  changed display diagonal introduced a .00203 output discrepancy despite unchanged
+  vertices. Cropping now ports the addon's dominant-plane projection, convex fans,
+  concave ear clipping and nonplanar-quad fallback. Wholly excluded faces are skipped
+  before triangulation; material interpolation and source-face identities remain.
+- Recomputing the actual FCU, both FDS bellies and adductor magnus with these changes
+  matches saved donor surfaces within 4.86e-7 scene units, using vertices and triangle
+  centroids in both directions. Evidence: `roundoff-and-material-crop-experiment.json`
+  in the all-muscle migration run. Synthetic collapsed-pole and nonplanar material
+  quad regressions pass, alongside existing addon inflation/crop fixtures. Full
+  assembly, lifecycle and packaged qualification pass (CH-036).
+
+### CH-036 — Declared Fiber deformation supports (2026-10-22)
+
+- Affects A03–A05. Full-assembly bone editing exposed three failed Fiber fields.
+  Their explicit endpoint bindings were correct, but dense capture had silently
+  used unrelated tissues already present in the document. Subsequent cropping of
+  those tissues invalidated material locations absent from the Blender sources.
+  Endpoint/crop tolerances were investigated and rejected as the cause.
+- Previously creation and editing captured dense influences from all selectable
+  anatomical surfaces. The shared application support policy now separates
+  endpoint selection from dense deformation candidates. Skeletal fibers use SCP
+  candidates; fibers explicitly attached to tissue use their selected parents,
+  including an explicitly selected SCP. Any-parent endpoint selection still works.
+- This restores the production addon's distinction in
+  `core/vcp/fiber_node_attachment.py` and `core/vcp/attachment_surface.py`.
+  Native field capture, blending, retained pins and material resolution are unchanged.
+  Creation and current-shape editing use the same policy; no numerical Python loop
+  or per-feature dependency exception is introduced.
+- The migration recaptures 315 new Fiber fields against each donor's recorded
+  support set. It preserves the original 139 objects, structural bindings, current
+  paths and native capture algorithm. Source per-node weights are not copied
+  verbatim. Existing user projects are not silently recaptured on load.
+- Focused creation/editing tests pass, including nearby unrelated tissue, explicit
+  tissue support, mixed explicit parents, and Any-parent rebinding. The production
+  publication-frontier fixture now binds its tissue explicitly, retaining coverage
+  of tissue-to-Fiber-to-Membrane dependencies without relying on implicit support.
+- Combined acceptance for CH-032–036: **1669 tests**, five native CTests, style,
+  typing, numerical-boundary audit, doctor and the canonical portable suite pass.
+  All 96 authored units match donor surfaces within 9.56e-7 scene units, including
+  bidirectional triangle-centroid checks. Three bone and five Fiber edits pass;
+  undo is exact and normal reopen drifts at most 1.76e-12. The installed executable
+  recalculates 518 objects with no failed jobs and again passes all source comparisons.
+  Actual 96 source/app pairs and three installed viewport views were inspected.
+- Evidence is frozen in `review.json`, `qualification.json`, and `checks/` under
+  `E:/development/WIP_models/muscle_reconstruction_workflow/runs/2026-10-21-standalone-all-muscle-transfer-958f7969`.
+  Original 139 authored objects and 74 source files remain preserved. Six generated
+  bone face lists reorder without changing oriented triangles or vertices. Donor
+  approval, construction proxies, and whole-body packing limits remain unchanged;
+  offscreen evidence is not interactive desktop acceptance.

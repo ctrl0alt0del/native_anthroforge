@@ -2,6 +2,7 @@
 // Limiting fields port core/muscle_pairs/field.py and pair_detection/field.hpp.
 #include "tissue_stacking.hpp"
 #include "tissue_branches.hpp"
+#include "tissue_profile.hpp"
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunused-function"
@@ -19,7 +20,7 @@ static std::vector<kernel::Vec> points(const Mesh& mesh,const MaterialGrid& grid
 }
 static std::vector<kernel::Vec> profile(const std::vector<kernel::Vec>& base,const MaterialGrid& grid,const AfTissueInflation& s,int sign) {
     std::vector<double> areas;
-    auto result=kernel::af_env_directions(kernel::af_env_frames(base,grid.rows,grid.columns,areas),areas,grid.rows,grid.columns,s.direction);
+    auto result=section_directions(base,grid.rows,grid.columns,s.direction,areas);
     for(auto& value:result) value=kernel::mul(kernel::af_env_unit(value),sign);
     return result;
 }

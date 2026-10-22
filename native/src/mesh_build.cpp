@@ -4,6 +4,16 @@
 #include <set>
 
 namespace af {
+// Blender 5.0.1 mesh_tessellate.cc / is_quad_flip_v3_first_third_fast,
+// NaN Holding BV / Blender Authors, GPL-2.0-or-later; initial connectivity only.
+static std::vector<uint32_t> quad_triangles(const Mesh& mesh,const std::vector<int64_t>& face) {
+    const V3 origin=mesh.vertices.row(face[0]);
+    const V3 a=mesh.vertices.row(face[1])-origin.transpose();
+    const V3 b=mesh.vertices.row(face[2])-origin.transpose();
+    const V3 c=mesh.vertices.row(face[3])-origin.transpose();
+    if(a.cross(b).dot(c.cross(b))>0) return {0,1,3,1,2,3};
+    return {0,1,2,0,2,3};
+}
 static V3 polygon_normal(const Mesh& mesh,const std::vector<int64_t>& face) {
     V3 normal=V3::Zero();
     const V3 anchor=mesh.vertices.row(face[0]);
@@ -24,7 +34,7 @@ static void validate_face(const Mesh& mesh,const std::vector<int64_t>& face) {
 }
 static std::vector<uint32_t> triangulate(const Mesh& mesh,const std::vector<int64_t>& face) {
     if(mesh.generated&&face.size()==3) return {0,1,2};
-    if(mesh.generated&&face.size()==4) return {0,1,2,0,2,3};
+    if(mesh.generated&&face.size()==4) return quad_triangles(mesh,face);
     const V3 normal=polygon_normal(mesh,face);
     if(face.size()==3) return {0,1,2};
     Eigen::Index dropped; normal.cwiseAbs().maxCoeff(&dropped);

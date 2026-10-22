@@ -84,3 +84,16 @@ uint64_t af_mesh_storage_bytes(uint64_t source) {
             +af::triangle_material_storage(mesh->triangle_material);
     } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
 }
+uint64_t af_mesh_finalize_surface(uint64_t source,uint64_t previous,uint64_t cancel) {
+    try {
+        const auto mesh=af::mesh(source),old=previous?af::mesh(previous):nullptr;
+        if(old&&mesh->vertices.rows()==old->vertices.rows()&&mesh->corners==old->corners&&mesh->offsets==old->offsets)
+            return af_mesh_finalize(source,previous,cancel);
+        af::Points points; points.reserve(size_t(mesh->vertices.rows()));
+        for(int i=0;i<mesh->vertices.rows();++i) points.push_back(mesh->vertices.row(i));
+        auto result=af::make_mesh(points,af::mesh_faces(*mesh),cancel,true);
+        if(mesh->triangle_material.source_count&&result->triangles!=mesh->triangles)
+            throw std::runtime_error("Initial tessellation cannot replace retained triangle provenance.");
+        af::copy_material(*mesh,*result); return af::retain(result);
+    } catch(const std::exception& e) { af::set_error(e.what()); return 0; }
+}

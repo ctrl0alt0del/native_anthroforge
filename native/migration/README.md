@@ -208,6 +208,18 @@ triangulation and cut-edge height. Twenty background-Blender fixtures in
 with `tools/capture_tissue_crops.py`. Empty results are prepared owned geometry, distinct
 from incomplete buffers; attachment consumers reject empty surfaces explicitly.
 
+The October 22 assembly qualification additionally ports the donor's dominant-plane
+polygon projection, convex fan, concave ear clipping and nonplanar-quad fallback.
+These material triangles are intentionally independent of display quad tessellation.
+Wholly excluded polygons are rejected before triangulation. See CH-035 for the
+adductor magnus fixture and the native nonplanar-quad regression.
+
+Section Profile's adapter in `src/tissue_profile.cpp` retains the pinned profile
+formula but rejects sub-threshold raw normals before normalization. Collapsed boundary
+poles therefore contribute zero instead of amplified floating-point noise. Inflation
+and stacking direction queries share this policy; positive-height degenerate interior
+frames still fail. Pinned kernel bytes stay available for provenance and parity tests.
+
 ## Vector tissue stacking
 
 `stacking/` pins the addon's production pair detection, base-ray ordering, relationship

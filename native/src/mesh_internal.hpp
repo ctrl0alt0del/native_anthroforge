@@ -49,6 +49,8 @@ struct Mesh {
 struct Surface {
     Vertices vertices;
     const Triangles* triangles;
+    Triangles query_triangles;
+    std::vector<int> query_ids;
     igl::AABB<Vertices,3> tree;
     Surface(const Mesh& mesh, const M4& matrix);
 };

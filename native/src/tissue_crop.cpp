@@ -38,8 +38,8 @@ static bool nondegenerate(const CropState& s,const std::vector<int64_t>& face) {
     const double scale=std::max(a.cwiseAbs().maxCoeff(),b.cwiseAbs().maxCoeff());
     return a.cross(b).norm()>std::numeric_limits<double>::epsilon()*scale*scale*32;
 }
-static void emit(CropState& s,const Mesh& own,int triangle) {
-    const auto polygon=clip(s,own.triangles.row(triangle)); const auto face=size_t(own.polygons[size_t(triangle)]);
+static void emit(CropState& s,const Mesh& own,size_t face,const std::vector<int64_t>& triangle) {
+    const auto polygon=clip(s,Eigen::Vector3i(int(triangle[0]),int(triangle[1]),int(triangle[2])));
     for(size_t i=1;i+1<polygon.size();++i) {
         std::vector<int64_t> ids{polygon[0],polygon[i],polygon[i+1]};
         if(!nondegenerate(s,ids)) continue;
@@ -50,7 +50,10 @@ static void emit(CropState& s,const Mesh& own,int triangle) {
 std::shared_ptr<Mesh> crop_material(const Mesh& base,const Mesh& own,const double* plane,uint64_t cancel) {
     if(own.tissue.kind==5) return crop_envelope(base,own,plane,cancel);
     auto state=crop_inputs(base,own,plane,cancel);
-    for(int i=0;i<own.triangles.rows();++i) { check_cancel(cancel); emit(state,own,i); }
+    for(size_t face=0;face+1<own.offsets.size();++face) {
+        check_cancel(cancel);
+        for(const auto& triangle:crop_triangles(state,own,face)) emit(state,own,face,triangle);
+    }
     auto result=crop_output(state,own.tissue,cancel); result->basis=material_basis(own);
     return result;
 }

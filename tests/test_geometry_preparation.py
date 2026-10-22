@@ -111,6 +111,18 @@ def test_asset_boundary_rejects_unfinished_geometry(engine):
     assert Asset(ready, "generated", "", 1.0, False).mesh is ready
 
 
+def test_generated_concave_quad_uses_valid_initial_diagonal(engine):
+    points = [[0, 0, 0], [1, 0.25, 0], [2, 0, 0], [1, 2, 0]]
+    source = engine.create_mesh(points, [0, 1, 2, 3], [0, 4])
+    mesh = native.joined(engine, [source], 0)
+    np.testing.assert_array_equal(mesh.array(3), [[0, 1, 3], [1, 2, 3]])
+    assert engine.pick(mesh, IDENTITY, [0.5, 0.05, 1], [0, 0, -1]) is None
+    assert engine.pick(mesh, IDENTITY, [1, 1, 1], [0, 0, -1]) is not None
+    moved = native.deformed(mesh, [[0, 0, 0], [1, -1, 0], [2, 0, 0], [1, 2, 0]])
+    np.testing.assert_array_equal(moved.array(3), mesh.array(3))
+    np.testing.assert_array_equal(topology.finalize(moved, mesh, 0).array(3), mesh.array(3))
+
+
 @pytest.mark.parametrize(
     "field,value", [("shape", "BOX"), ("sides", 12), ("width", 0.2), ("depth", 0.3), ("length", 2)]
 )

@@ -15,6 +15,9 @@ Their original NaN Holding BV and Blender Authors attribution, source paths and 
 are recorded in [primitive provenance](../native/migration/BLENDER_PRIMITIVES.md).
 Upstream GPL-2.0-or-later algorithms are distributed here under GPL-3.0-or-later;
 both license texts and corresponding adapted sources accompany the release.
+Initial generated-quad tessellation also adapts Blender 5.0.1's degenerate-diagonal
+test in `mesh_tessellate.cc` / `math_geom.cc`, attributed to NaN Holding BV and
+Blender Authors under GPL-2.0-or-later; the adaptation is GPL-3.0-or-later.
 
 | Component | Version/source | License and source |
 | --- | --- | --- |

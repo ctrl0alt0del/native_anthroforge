@@ -1,4 +1,4 @@
-"""Import explicit open-loft correspondence through the normal edit/evaluation lifecycle."""
+"""Author explicit open-loft correspondence through the normal evaluation lifecycle."""
 
 from dataclasses import replace
 from typing import Any
@@ -12,13 +12,20 @@ from .construction_policy import require_topology_edit
 def configure(session: Any, target: str, mapping: dict[str, list[Any]], across: list[int]) -> None:
     item = surface_operations.editable(session, target)
     require_topology_edit(session.document, target)
-    if item.kind != "LOFT" or set(mapping) != {use.curve for use in item.curves}:
-        raise ValueError("Material correspondence requires every source of an ordinary open loft.")
-    if len(across) != len(item.curves) - 1:
-        raise ValueError("Material correspondence requires one density per adjacent source pair.")
+    require_layout(item, mapping, across)
     alignment = tuple(aligned(session, use, mapping[use.curve]) for use in item.curves)
     item = replace(item, exact=True, alignment=alignment, across=tuple(across))
     object_operations.install(session, item)
+
+
+def require_layout(item: Any, mapping: Any, across: Any) -> None:
+    if item.kind not in ("LOFT", "BRANCHED") or set(mapping) != {u.curve for u in item.curves}:
+        raise ValueError("Material correspondence requires every source of an open loft.")
+    if item.kind == "BRANCHED":
+        if across:
+            raise ValueError("Branched correspondence uses connector sampling; leave across empty.")
+    elif len(across) != len(item.curves) - 1:
+        raise ValueError("Material correspondence requires one density per adjacent source pair.")
 
 
 def aligned(session: Any, use: Any, values: list[Any]) -> SurfaceAlignment:

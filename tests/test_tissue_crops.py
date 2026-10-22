@@ -7,11 +7,19 @@ import numpy as np
 import pytest
 
 from anthroforge.application.assets import Asset
-from anthroforge.core.tissue_settings import TissueCrop
-from anthroforge.native import construction, tissue_crop, tissue_domain, tissue_parts, topology
+from anthroforge.core.tissue_settings import TissueCrop, TissueInflation
+from anthroforge.native import (
+    construction,
+    tissue_crop,
+    tissue_domain,
+    tissue_inflation,
+    tissue_parts,
+    topology,
+)
 from tests.test_tissue_branches import CASES as BRANCHES
 from tests.test_tissue_branches import inputs as branch_inputs
 from tests.test_tissue_envelopes import CASES as ENVELOPES
+from tests.test_tissue_inflation import grid_mesh
 from tests.test_tissue_smoothing import CASES as SOURCES
 from tests.test_tissue_smoothing import inputs
 
@@ -88,3 +96,14 @@ def test_empty_output_is_finalized_and_safe_for_picking_and_drafts(session):
     assert Asset(empty, "crop", "", 1, False).mesh is empty
     with pytest.raises(ValueError, match="finalized"):
         Asset(topology.draft(empty, 0), "draft", "", 1, False)
+
+
+def test_crop_uses_material_projection_instead_of_display_quad_diagonal(session):
+    base = grid_mesh(session.engine, [[[0, 0, 0], [0, 1, 3]], [[1, 0, 3], [1, 1, 0]]])
+    base = topology.finalize_surface(base, None, 0)
+    own = tissue_inflation.evaluate(base, TissueInflation(enabled=False))
+    np.testing.assert_array_equal(base.array(3), [[0, 2, 1], [2, 3, 1]])
+    crop = TissueCrop(enabled=True, origin=(0, 0, -1), normal=(0, 0, 1))
+    output = tissue_crop.evaluate(base, own, crop)
+    np.testing.assert_array_equal(output.array(3), [[0, 2, 3], [0, 3, 1]])
+    np.testing.assert_array_equal(material_positions(base, output), base.array(0))

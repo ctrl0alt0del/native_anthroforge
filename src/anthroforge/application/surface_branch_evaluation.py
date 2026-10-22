@@ -12,8 +12,10 @@ from . import consumed_paths, surface_evaluation, surface_pins
 def evaluate(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -> Any:
     order = (*item.main, *(key for branch in item.branches for key in branch.curves))
     uses = {u.curve: u for u in item.curves}
+    values = item.alignment or tuple(SurfaceAlignment() for _ in item.curves)
+    alignment = {u.curve: v for u, v in zip(item.curves, values, strict=True)}
     rows = [
-        surface_evaluation.input_row(engine, document, resources, uses[key], SurfaceAlignment())
+        surface_evaluation.input_row(engine, document, resources, uses[key], alignment[key])
         for key in order
     ]
     branches = [connection(document, resources, branch, order) for branch in item.branches]

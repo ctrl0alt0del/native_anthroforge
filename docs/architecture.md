@@ -267,6 +267,12 @@ collected rather than retained indefinitely in the asset catalogue.
 
 ## Attachments and history
 
+`fiber_supports.py` owns dense deformation candidate policy for Fiber creation and
+current-shape editing. Endpoint selection remains separate: skeletal fibers can
+use nearby eligible SCPs; explicitly tissue-backed fields use selected parents.
+Unrelated tissue proximity does not introduce an anatomical dependency. Native
+capture/blending remains batched and retained material bindings remain authoritative.
+
 Capture records a 28-double binding with parent triangle/weights, optional flow sample,
 stable tangent hint, parent-frame offset and child-frame anchor/orientation. Direct child
 edits retain the parent capture frame so an intervening queued parent edit cannot erase

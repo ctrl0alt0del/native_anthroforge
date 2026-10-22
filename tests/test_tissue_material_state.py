@@ -5,6 +5,11 @@ from dataclasses import replace
 import numpy as np
 
 from anthroforge.application import geometry_ownership, tissue_evaluation, tissue_tasks
+from anthroforge.application.assets import Asset
+from anthroforge.core.results import EvaluationResult
+from anthroforge.core.tissue_material import TissueMaterialState
+from anthroforge.core.tissues import TissueVCP
+from anthroforge.native import construction as native
 from anthroforge.native.tissue_stacking import MaterialLease, assemble
 from tests.stacking_material_fixtures import arrays
 from tests.test_tissue_workflow import assembly, roundtrip
@@ -61,3 +66,34 @@ def test_material_snapshots_do_not_increment_authored_revisions(session):
     item = session.document.object(target)
     edited = replace(item, final_material=replace(item.final_material, final="replacement"))
     assert changed_ports(item, edited) == set()
+
+
+def concave_rest(session):
+    mesh = session.engine.create_mesh(
+        [[0, 0, 0], [1, -1, 0], [2, 0, 0], [1, 2, 0]], range(4), [0, 4]
+    )
+    mesh = native.joined(session.engine, [mesh], 0)
+    rest = native.deformed(mesh, [[0, 0, 0], [1, 0.25, 0], [2, 0, 0], [1, 2, 0]])
+    session.assets["rest"] = Asset(rest, "generated", "", 1.0, False)
+    item = TissueVCP(
+        name="Initial tissue", source="source", rest_result=EvaluationResult(asset="rest")
+    )
+    return replace(item, rest_material=TissueMaterialState(base="rest")), rest
+
+
+def evaluate_intrinsic(session, item):
+    return tissue_evaluation.intrinsic(session.engine, session.document, session.resources, item, 0)
+
+
+def test_first_intrinsic_tessellates_its_own_shape_and_later_edits_retain_it(session):
+    item, rest = concave_rest(session)
+    output = evaluate_intrinsic(session, item)
+    np.testing.assert_array_equal(output.mesh.array(3), [[0, 1, 3], [1, 2, 3]])
+    np.testing.assert_array_equal(rest.array(3), [[0, 1, 2], [0, 2, 3]])
+    session.assets["accepted"] = Asset(output.mesh, "generated", "", 1.0, False)
+    moved = native.deformed(rest, [[0, 0, 0], [1, -1, 0], [2, 0, 0], [1, 2, 0]])
+    session.assets["rest"] = Asset(moved, "generated", "", 1.0, False)
+    item = replace(item, intrinsic_result=EvaluationResult(asset="accepted"))
+    updated = evaluate_intrinsic(session, item)
+    np.testing.assert_array_equal(updated.mesh.array(3), output.mesh.array(3))
+    np.testing.assert_array_equal(updated.mesh.array(0), moved.array(0))

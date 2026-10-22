@@ -122,3 +122,42 @@ def test_incomplete_mapping_rejects_before_authored_changes(session):
     with pytest.raises(ValueError, match="endpoints"):
         session.command("surface.correspondence", target=target, mapping=values, across=[1])
     assert session.document == before
+
+
+def branch_mapping(session, keys):
+    values = ((0, 1 / 3, 2 / 3, 1), (0, 1 / 3, 2 / 3, 1), (0, 0.5, 1), (0, 0.5, 1))
+    return {
+        key: [(p.id, v) for p, v in zip(session.document.object(key).points, row, strict=True)]
+        for key, row in zip(keys, values, strict=True)
+    }
+
+
+def test_branch_correspondence_keeps_sections_shared_seams_and_persistence(session, tmp_path):
+    from tests.test_surface_branches import branched
+
+    keys, target, _ = branched(session)
+    session.command(
+        "surface.correspondence", target=target, mapping=branch_mapping(session, keys), across=[]
+    )
+    session.wait()
+    assert len(vertices(session, target)) == 100
+    point = session.document.object(keys[1]).points[1].id
+    session.command("curve.point.update", curve=keys[1], point=point, position=[0.4, 0.4, 0])
+    session.wait()
+    np.testing.assert_allclose(vertices(session, target)[8 * 4 + 1], [0.3, 0.2, 0], atol=1e-12)
+    verify_roundtrip(session, target, tmp_path)
+
+
+def test_branch_correspondence_rejects_unsupported_density_without_mutation(session):
+    from tests.test_surface_branches import branched
+
+    keys, target, _ = branched(session)
+    before = session.document
+    with pytest.raises(ValueError, match="leave across empty"):
+        session.command(
+            "surface.correspondence",
+            target=target,
+            mapping=branch_mapping(session, keys),
+            across=[1, 1, 1],
+        )
+    assert session.document == before

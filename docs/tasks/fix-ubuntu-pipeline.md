@@ -46,6 +46,11 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
   already-destroyed temporary geometry. Retain their reference mesh owners throughout
   comparison and document `Geometry.array`'s existing borrowed-view lifetime.
   Exact array equality and all runtime geometry/cache behavior remain unchanged.
+- MSVC C4146 rejects unsigned unary negation in the PCG bounded sampler. Express
+  the same modulo-2^32 arithmetic as unsigned subtraction from zero, preserving
+  the existing NumPy-compatible random sequence. The shared Ninja build now
+  collects all compiler errors (`-k 0`) before failing, so later diagnostics remain
+  visible in one CI run; successful build/test behavior is unchanged.
 - Follow [cloud development](../cloud_development.md) and
   [engineering guidelines](../engineering_guidelines.md).
 

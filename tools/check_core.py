@@ -43,7 +43,7 @@ def static_checks():
 
 def native_checks(style):
     run("cmake", "--preset", "portable-core")
-    run("cmake", "--build", "--preset", "portable-core")
+    run("cmake", "--build", "--preset", "portable-core", "--", "-k", "0")
     run("ctest", "--preset", "portable-core")
     if style:
         commands = json.loads((ROOT / "build/core/compile_commands.json").read_text())

@@ -11,7 +11,7 @@ from typing import Any
 from uuid import UUID
 
 from anthroforge.core.document import Document
-from anthroforge.core.entities import SCP, Attachment, Workspace
+from anthroforge.core.entities import SCP, Attachment, AttachmentReceipt, Workspace
 from anthroforge.core.junctions import decode as decode_junction
 from anthroforge.native.mesh import GeometryEngine
 
@@ -102,7 +102,19 @@ def decode_entity(data: dict[str, Any]) -> SCP:
     data["geometry_offset"] = tuple(data["geometry_offset"])
     data["capture_parent_matrix"] = tuple(data.get("capture_parent_matrix", ()))
     data["capture_parent_offset"] = tuple(data.get("capture_parent_offset", (0.0, 0.0, 0.0)))
+    data["pose_receipt"] = decode_pose_receipt(data.get("pose_receipt"))
     return SCP(**data, attachment=Attachment(**attachment))
+
+
+def decode_pose_receipt(value: Any) -> AttachmentReceipt | None:
+    if value is None:
+        return None
+    data = dict(value)
+    for key in ("parent_matrix", "parent_offset", "child_matrix", "child_offset"):
+        data[key] = tuple(data[key])
+    settings = dict(data["settings"])
+    settings["binding"] = tuple(settings["binding"])
+    return AttachmentReceipt(**{**data, "settings": Attachment(**settings)})
 
 
 def decode_workspace(data: dict[str, Any]) -> Workspace:

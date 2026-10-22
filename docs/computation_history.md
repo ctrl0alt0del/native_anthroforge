@@ -1350,3 +1350,60 @@ See the task and development validation records for final gate/package evidence 
   bone face lists reorder without changing oriented triangles or vertices. Donor
   approval, construction proxies, and whole-body packing limits remain unchanged;
   offscreen evidence is not interactive desktop acceptance.
+
+### CH-037 — Reuse validated snapshot relationships during publication (2026-10-22)
+
+- Large-assembly opening spent about 141 of 149 seconds in result publication.
+  Every pending/result change reconstructed relationships and revalidated the entire
+  document; non-routed paths also enumerated every tissue surface unnecessarily.
+- Snapshot indexes now reuse per-record links when definitions and the cross-record
+  parent/type/junction context are unchanged. Registry maps still own current records;
+  only validation and consumer relationships are reused for known evaluated fields.
+  Unknown/new authored fields invalidate validation by default. Stack plans remain
+  relationship inputs. Constructors continue validating every changed record.
+- Manual routing discovers anatomical providers only when requested. Tissue pending
+  states publish together, with no publication when already pending. Geometry pending
+  publication likewise batches SCPs/surfaces and skips empty or unchanged sets. Algorithms,
+  geometry tolerances, input revision checks and attachment capture remain unchanged.
+- Initial evidence: 26 focused tests cover value/result edits, immutable old snapshots,
+  parent frame walks, provider changes, invalid references and batched pending states.
+  The first assembly trial fell from 148.95 s to 12.55 s before further scheduling work.
+  Frozen baseline versus optimized replay is bit-for-bit equal across 11 snapshots of
+  1,456 geometry/path/transform arrays (opening, three bone edits, two fiber edits, undo).
+  Final packaged output also matches all 1,456 arrays exactly; see CH-038 for delivery.
+
+### CH-038 — Exact pose provenance and renewable pending work (2026-10-22)
+
+- Startup recomputation changed 55 bone matrices by at most 6.573e-14. These exact
+  differences caused a large downstream wave despite no authoring edit. Accepted
+  SCP poses now store evaluator version, exact parent pose/offset/geometry, child pose/offset and binding
+  settings. Matching receipts retain the accepted pose; any changed input, recapture,
+  failure or absent receipt follows normal native evaluation. There is no coordinate
+  epsilon, binding reassignment or geometry-kernel change. Older schema-4 files with
+  no receipt still perform their normal first startup evaluation.
+- Previously repeated requests superseded uncaptured queued jobs, creating thousands
+  of obsolete records. Fixed-output evaluators now explicitly declare renewable input
+  contracts. Their pending requests share a job/deadline and refresh dependency indexes
+  before admission. Once inputs are captured, cancellation/read checks are unchanged.
+  Attachment recapture, payload-owning operations and final tissue jobs do not opt in.
+  A changed stack plan may require a coupled evaluator with different reservations;
+  ownership review found that renewing a single final job could bypass this selection.
+  A failing queued-final regression established the loss of restart behavior; restoring
+  its original static contract passes the regression and preserves group selection.
+  Observation sets
+  and dependency graphs form the contract cache key; no input values are cached.
+- Focused tests cover exact reopen, tiny parent motion, undo, missing receipts,
+  explicit recapture, changed geometry/settings, parent failure, pending input changes,
+  refreshed relationship indexes, cancellation and output reservations. The assembly
+  now has 34 obsolete rather than 2,968 obsolete requests, with 956 successes in both.
+  Full fixture geometry/edit replay is exact (CH-037). Development gate passes with
+  five native CTests; final Python checks pass 1,687 tests. Hidden GPU and offscreen
+  UI opening/edit/undo/save checks and the canonical 0.2.3 portable suite pass.
+- Final serial packaged trials: 17.423, 16.507 and 16.730 s without recording;
+  recorder-on opening falls from 155.280 to 26.383 s. Recorded publication time falls
+  from 136.672 to 5.485 s. Saved receipt reopen takes 7.842 s with no revision change.
+  Profile timing events are retained; bounded resource-reference observations truncate
+  in both captures. Background system load is recorded, not controlled. These are
+  headless opening/settling trials and offscreen presentation checks, not interactive
+  latency measurements. Original project bytes remain untouched. Evidence lives in
+  `diagnostics/open-optimization-20261022/` under the CH-032–036 run directory above.

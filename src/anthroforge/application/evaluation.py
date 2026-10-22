@@ -174,7 +174,8 @@ def publish(
     source, entities = result
     validate_inputs(session, source, targets, captures)
     changed = {item.id: merge_result(session, item) for item in entities if item.id in targets}
-    session.replace_entities(changed, authored=False)
+    if any(item != session.document.entity(key) for key, item in changed.items()):
+        session.replace_entities(changed, authored=False)
     publish_pose_dependents(session, source, changed)
     failed = [item for item in changed.values() if item.status == "failed"]
     if failed:
@@ -195,9 +196,8 @@ def publish_pose_dependents(session: "Session", source: Document, changed: dict[
 
 def merge_result(session: "Session", item: SCP) -> SCP:
     current = session.document.entity(item.id)
-    return replace(
+    result = replace(
         current,
-        result_generation=current.result_generation + 1,
         matrix=item.matrix,
         geometry_offset=item.geometry_offset,
         attachment=item.attachment,
@@ -205,7 +205,9 @@ def merge_result(session: "Session", item: SCP) -> SCP:
         error=item.error,
         capture_parent_matrix=item.capture_parent_matrix,
         capture_parent_offset=item.capture_parent_offset,
+        pose_receipt=item.pose_receipt,
     )
+    return replace(result, result_generation=current.result_generation + int(result != current))
 
 
 def validate_inputs(

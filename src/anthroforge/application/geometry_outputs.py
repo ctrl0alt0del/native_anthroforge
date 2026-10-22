@@ -46,20 +46,23 @@ def anatomical_result(item: SCP, result: Any) -> SCP:
 
 
 def pending(session: Any, targets: set[str]) -> None:
-    entities = {
-        e.id: replace(e, result=replace(e.result, status="pending"))
-        for e in session.document.entities
-        if e.id in targets and e.primitive
-    }
-    objects = tuple(
-        replace(o, result=replace(o.result, status="pending"))
-        if o.id in targets and isinstance(o, Surface)
-        else o
-        for o in session.document.objects
-    )
-    session.replace_entities(entities, authored=False)
-    if objects != session.document.objects:
-        session.replace_document(objects=objects)
+    if not targets:
+        return
+    changes = {}
+    for field in ("entities", "objects"):
+        before = getattr(session.document, field)
+        after = tuple(pending_record(item, targets) for item in before)
+        if after != before:
+            changes[field] = after
+    if changes:
+        session.replace_document(**changes)
+
+
+def pending_record(item: Any, targets: set[str]) -> Any:
+    eligible = isinstance(item, Surface) or isinstance(item, SCP) and item.primitive is not None
+    if eligible and item.id in targets and item.result.status != "pending":
+        return replace(item, result=replace(item.result, status="pending"))
+    return item
 
 
 def failed(session: Any, target: str, error: str) -> None:

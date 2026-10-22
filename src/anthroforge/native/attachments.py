@@ -8,6 +8,7 @@ from typing import Any
 
 import numpy as np
 
+from anthroforge.core import attachment_provenance
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import geometry_asset
 
@@ -37,7 +38,7 @@ def capture(
 def captured(child: SCP, parent: SCP, output: Any) -> SCP:
     key = geometry_asset(parent) if child.attachment.parent_mode == "SURFACE_NEAREST" else ""
     binding = replace(child.attachment, binding=tuple(output.tolist()), material_asset=key)
-    return replace(child, attachment=binding)
+    return replace(child, attachment=binding, pose_receipt=None)
 
 
 def capture_surface(parent: SCP, meshes: dict[str, Mesh], mode: str, cancel: int) -> Any:
@@ -132,10 +133,15 @@ def propagate(
     active: set[str],
     cancel: Event,
 ) -> list[SCP]:
-    if not entities or cancel.is_set():
+    active = attachment_provenance.required(entities, active)
+    if not active or cancel.is_set():
         return entities
     data = packed(entities, meshes, active)
     apply_batch(engine, data, len(entities), cancel)
+    return attachment_provenance.accepted(unpacked(entities, data, active), active)
+
+
+def unpacked(entities: list[SCP], data: dict[str, Any], active: set[str]) -> list[SCP]:
     return [
         evaluated(item, data["matrices"][i], data["status"][i]) if item.id in active else item
         for i, item in enumerate(entities)

@@ -46,12 +46,10 @@ def references(item: Curve, objects: tuple[object, ...] = ()) -> set[SurfaceRefe
 
 
 def routing_references(settings: object, objects: tuple[object, ...]) -> set[SurfaceReference]:
+    if not isinstance(settings, RoutingSettings) or settings.obstacle_mode != "MANUAL":
+        return set()
     tissues = {r.target for r in anatomical_surfaces.defaults((), objects)}
-    return (
-        {
-            SurfaceReference(k, "TISSUE_FINAL" if k in tissues else "SCP_GEOMETRY")
-            for k in settings.obstacles
-        }
-        if isinstance(settings, RoutingSettings) and settings.obstacle_mode == "MANUAL"
-        else set()
-    )
+    return {
+        SurfaceReference(k, "TISSUE_FINAL" if k in tissues else "SCP_GEOMETRY")
+        for k in settings.obstacles
+    }

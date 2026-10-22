@@ -237,6 +237,14 @@ wait drains document-writing calculations; checkpoint saves the historical commi
 pending reports that saving is blocked without writing. Read-only background work does
 not block commitment. A failed calculation is terminal and its failed state can be saved.
 
+Opening still queues SCP startup synchronization. Accepted attachment poses now carry
+exact input receipts (including evaluator version); matching inputs retain the saved pose
+without floating-point drift or downstream invalidation. Missing/changed receipts use the
+normal native evaluation. Schema-4 projects without receipts remain readable. Receipts are
+derived output, not authoring parameters; use the attachment operations for rebinding.
+Queued fixed-output requests may share a job ID until input capture. Explicit cancellation,
+undo, read validation and checkpoint rules remain unchanged.
+
 Use begin/update/commit for a drag-like sequence. A single editing command implicitly
 creates one transaction. Manual mode needs evaluate. Do not infer calculation completion
 from a returned job ID: use wait or inspect jobs. File inspection and revision-matched GPU

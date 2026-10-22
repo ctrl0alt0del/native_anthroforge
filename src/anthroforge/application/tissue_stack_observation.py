@@ -53,10 +53,7 @@ def invalidate(session: Any, targets: set[str]) -> None:
 
     ports = {Port(key, phase) for key in targets for phase in ("plan", "final")}
     session.scheduler.invalidate_ports(ports, reason="stacking_candidate_output_changed")
-    for key in targets:
-        tissue_results.install(
-            session, tissue_results.pending(session.document.object(key), {"plan", "final"})
-        )
+    tissue_results.mark_pending(session, ports)
     tissue_tasks.schedule(session, targets, released=session.history.before is None)
 
 

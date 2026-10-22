@@ -53,8 +53,11 @@ inspected; this is not full interactive or geometry acceptance. Docs-only conten
 checks apply; no full development gate or rebuild. Ignored local probes all satisfy
 the 15-line function limit. Preserve the unrelated untracked root `__init__.py`.
 
-## Next steps
+## Completion and next work
 
-1. Finish the normal documentation integration/push.
-2. Implement proposed optimizations only in a subsequent authorized task, updating
-   computation history and qualifying actual geometry/attachments with performance.
+Content/link checks and production diff isolation passed. Measured analysis checkpoints
+are pushed on the task branch; integrate this documentation into main through the
+normal merge workflow. No implementation remains within this analysis request.
+
+Implement proposed optimizations only in a subsequent authorized task, updating
+computation history and qualifying actual geometry/attachments with performance.

@@ -1,16 +1,17 @@
 # All available authored addon muscles on the migrated skeleton
 
 - Branch: `codex/all-muscle-migration`; integration `main`; base `b642ce5`.
-- Status: complete. The qualified assembly is installed at the requested existing
-  project path; full source/edit/persistence/packaged checks pass.
+- Status: complete. Authored-only v002 is installed at the existing project path;
+  preservation, normal reopen, all 96 source comparisons and packaged views pass.
 - Request: migrate accepted and awaiting-review builds into the same project as the
-  prior four families. Latest correction excludes new mirrored copies. Four existing
-  mirrored tissues are preserved. No rejected/unstarted/held cases were constructed.
+  prior four families. Latest correction also removes the four existing mirrored
+  tissues; mirrored skeleton SCPs remain. No rejected/unstarted/held cases were constructed.
 - Run: `E:/development/WIP_models/muscle_reconstruction_workflow/runs/2026-10-21-standalone-all-muscle-transfer-958f7969/`.
 - Destination remains the prior run's `skeleton_four_muscles_v001.anthroforge`.
   Original recovery copy: `inputs/four-muscles-before.anthroforge`.
-- Qualified candidate: `candidates/skeleton_all_authored_muscles_v001.anthroforge`.
-  `qualification.json` records revision 51435, source hashes, edits and reopen.
+- Qualified candidate: `candidates/skeleton_all_authored_muscles_v002.anthroforge`.
+  The original v001 and `qualification.json` retain the complete migration evidence;
+  `checks/mirror-removal.json` qualifies the authored-only revision 51454.
 - Direct coordinator work; background/offscreen only; no agents or source .blend edits.
 
 ## Result and preserved scope
@@ -69,7 +70,7 @@ separate responsibilities, with existing coordinator publication and resource ow
   `build/all-muscle-final-portable.log` passes the full hidden/offscreen suite.
   Later commits change docs/test setup only. No interactive desktop acceptance claimed.
 
-## Delivery
+## Original v001 delivery (superseded by the authored-only follow-up)
 
 - Installed executable recalculates 518 objects through 11385 recorded jobs, with
   no failed jobs. `checks/packaged-comparisons.json` passes all 96 source comparisons.
@@ -90,13 +91,39 @@ unrelated root `__init__.py`. Do not run competing writers or overwrite source f
 ## Authored-only follow-up (2026-10-22)
 
 The user's delayed clarification explicitly authorizes removing the four mirrored
-muscles retained in v001. Remove only their four tissues, four membranes and eleven
-fibers through the existing deletion API. Preserve all SCPs, including mirrored bones,
-and every authored muscle. No production changes are needed.
+muscles retained in v001. The existing deletion API removed their four tissues, four
+membranes and eleven fibers. All SCPs, including mirrored bones, and every authored
+muscle remain. No production code changed.
 
 `tmp/remove_existing_mirrors.py` works from `inputs/before-mirror-removal.anthroforge`
 and creates `candidates/skeleton_all_authored_muscles_v002.anthroforge`. It verifies
 all remaining authored records/geometry, one-action undo grouping, normal reopening
 and the existing 96-source comparisons. The requested delivery path remains unchanged;
-replace it only after these checks and an offscreen render. Prior v001 evidence is
-immutable historical evidence; final follow-up results belong in `checks/mirror-removal.json`.
+replacement followed these checks and offscreen inspection. Prior v001 evidence is
+immutable historical evidence; final follow-up results are in `checks/mirror-removal.json`.
+
+Deletion follows consumer-before-provider order: mirrored TFL and Pronator construction
+references other removed mirrored tissues. No retained object refers to the removed
+graph. The result has 59 SCPs, 96 tissues, 96 membranes and 326 fibers. All 619 retained
+records pass authored-data comparison; all 96 source geometry comparisons pass after
+normal opening. Retained mesh position drift is at most 1.757e-12 scene units; path
+position/radius/tilt drift is at most 1.557e-13. Path material parameters also pass.
+
+The initial diagnostic compared all 11 sampled-path columns and found regenerated
+tangent/normal differences on 21 fibers. These are explicitly recorded separately:
+they are not positional changes, and all actual consumer meshes remain within the
+strict 1e-8 preservation tolerance. Full derived-frame identity is not claimed.
+The exact cause of frame variation is not established by this data-only task.
+
+`tmp/qualify_mirror_candidate.py` qualifies the saved candidate without resaving it.
+`tmp/install_authored_only.py` renders the canonical executable offscreen, then requires
+a separately invoked, locked/hash-checked atomic installation. The recovery copy is
+`inputs/before-mirror-removal.anthroforge`. No full development gate or runtime rebuild
+is necessary for this document-only edit; previous release checks remain historical.
+
+Front/back packaged renders were inspected by the coordinator; no windows were
+shown. `checks/mirror-removal-views.json` records that evidence and its limits.
+`delivery-authored-only.json` records atomic replacement of the original destination
+with SHA256 `2bcd72212488a5ea5ca4a19f2d5d2900a9ff9a814560156203f42e3721bf07b6`.
+The run manifest, muscle skill and practical lesson r3 reflect the authored-only
+delivery. Existing approval statuses and all earlier scope limits remain unchanged.

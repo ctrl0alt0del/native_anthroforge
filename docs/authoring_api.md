@@ -511,6 +511,11 @@ Omitting bindings uses both open endpoints, or the first closed-curve point, wit
 nearest-ready-SCP capture. Explicit binding rows may omit `target` to use the same
 automatic choice for that point; explicit Tissue Base/Final overrides remain supported.
 Automatic candidates and coordinates are captured at dispatch, not when queued.
+Dense deformation support is a separate policy from choosing an endpoint: skeletal
+fibers capture eligible SCP surfaces, while explicitly tissue-backed fibers use only
+their selected parents (including selected SCPs). Nearby unrelated tissues do not
+become implicit deformation parents. Current-shape editing uses this same policy;
+`ANY_PARENT` still permits explicitly edited endpoints to choose an eligible tissue.
 Each binding is `{point: authored_point_id, target: anatomical_surface_id,
 capture_scope: "CURRENT_PARENT" | "ANY_PARENT"}`. Supply both open endpoints or
 at least one point on a closed curve. It returns the job identifier; completed creation

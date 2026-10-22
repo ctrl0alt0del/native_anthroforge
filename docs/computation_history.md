@@ -118,7 +118,7 @@ Presence in this inventory does not make every mode available on every source.
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
-| K01 | Candidate/support planning: detect surface relationships/support regions with authored group and discovery allowance (CH-022), derive automatic order, apply explicit order/exclusions and retain provenance. Policy changes invalidate observed plans without rebuilding intrinsic geometry. Only accepted providers become final prerequisites. | [stacking.cpp](../native/src/stacking.cpp), [stack evaluation](../src/anthroforge/application/tissue_stack_evaluation.py) | [stacking phases](../tests/test_stacking_phases.py), [authoring controls](../tests/test_tissue_authoring_controls.py) |
+| K01 | Candidate/support planning: detect surface relationships/support regions with authored group and discovery allowance (CH-022), derive automatic order, apply explicit order/exclusions and retain provenance. Relationship lookup keys own their sorted IDs (CH-045). Policy changes invalidate observed plans without rebuilding intrinsic geometry. Only accepted providers become final prerequisites. | [stacking.cpp](../native/src/stacking.cpp), [stack evaluation](../src/anthroforge/application/tissue_stack_evaluation.py) | [stacking phases](../tests/test_stacking_phases.py), [authoring controls](../tests/test_tissue_authoring_controls.py) |
 | K02 | Vector stacking: material correspondence and direction transport, selected support regions, multiple providers and provider-first chains without redundant ancestor displacement. | [tissue_stacking.cpp](../native/src/tissue_stacking.cpp), [tissue_stack_directions.cpp](../native/src/tissue_stack_directions.cpp) | [native stacking](../tests/test_tissue_stacking_native.py), [mixed stacking](../tests/test_tissue_mixed_stacking.py) |
 | K03 | Constrained stacking smoothing: sparse exact material-pin/backing equations, localized displacement smoothing and assembled side/group output. Whole-tissue groups retain the actual side dependency graph. | [tissue_stack_constraints.cpp](../native/src/tissue_stack_constraints.cpp), [material_pin_equations.cpp](../native/src/material_pin_equations.cpp), [stack groups](../src/anthroforge/application/tissue_group_tasks.py) | [stack material](../tests/test_tissue_stack_material.py), [stack groups](../tests/test_tissue_stack_groups.py) |
 | K04 | Final stacking validation: inspect complete assembled output for folds, self-intersections and bone/neighbor conflicts. Failed stacking displays current intrinsic geometry but does not publish a successful Final prerequisite. | [stacking_surface_validation.cpp](../native/src/stacking_surface_validation.cpp), [tissue_stack_assembly.cpp](../native/src/tissue_stack_assembly.cpp) | [complete geometry](../tests/test_stacking_complete_geometry.py), [group lifecycle](../tests/test_tissue_group_lifecycle.py) |
@@ -1548,3 +1548,17 @@ See the task and development validation records for final gate/package evidence 
   cancellation, concurrent reads, cache limits, incompatible-context rejection, and
   exact composed draft/full equivalence. Modified native clang-tidy and typing pass.
 - Reference: [libigl preparation and solve](https://libigl.github.io/tutorial/).
+
+### CH-045 — Owned stacking relationship lookup keys (2026-10-22)
+
+- Ubuntu qualification of `ee98cc9` exposed GCC's dangling-reference error in
+  `order_pairs`: two-argument `std::minmax` retained references to temporary
+  `uint64_t` casts, then used them for policy and exclusion lookup after destruction.
+- Use the existing `relationship_key` helper, returning an owned sorted pair.
+  K01's identity normalization, explicit ordering, exclusions, cache policy and
+  numerical methods remain unchanged; undefined lifetime behavior is removed.
+- The maintained stacking source digest is updated, and the upstream digest stays
+  available. The full compiler pass identified this defect without disabling
+  warnings-as-errors. Native rebuild, stacking contract tests and full Linux gate
+  are pending at this checkpoint; no performance or geometry improvement is claimed.
+- See [the pipeline repair task](tasks/fix-ubuntu-pipeline.md) for final validation.

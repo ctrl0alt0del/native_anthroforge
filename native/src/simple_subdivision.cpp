@@ -44,7 +44,8 @@ int af_displace(const double* points,int count,const double* offset,const double
         if(count<0||!offset||!std::isfinite(strength)||(count&&(!points||!output))) throw std::runtime_error("Invalid displacement buffers.");
         const af::V3 delta(offset); if(!delta.allFinite()) throw std::runtime_error("Nonfinite displacement.");
         for(int i=0;i<count;++i) {
-            if(i%1024==0) af::check_cancel(cancel); const double weight=weights?(invert?1-weights[i]:weights[i]):1;
+            if(i%1024==0) af::check_cancel(cancel);
+            const double weight=weights?(invert?1-weights[i]:weights[i]):1;
             Eigen::Map<af::V3> point(output+3*i); point=af::V3(points+3*i)+strength*weight*delta;
             if(!point.allFinite()) throw std::runtime_error("Nonfinite displaced point.");
         }

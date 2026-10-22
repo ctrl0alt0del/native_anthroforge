@@ -28,6 +28,13 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
 - `tools/check_core.py` must exclude `native/vendor` translation units from the
   authored function-size check, matching `tools/check-native-style.ps1` and the
   documented vendor exemption. Native compilation and all tests still include them.
+- The complete GCC pass exposed misleading indentation in `simple_subdivision.cpp`
+  and `stacking_results.cpp`, and a missing GCC counterpart to the tissue wrapper's
+  existing scoped unused-function allowance. Correct these at their owning boundaries.
+- Stacking's `order_pairs` held `std::minmax` references to temporary ID casts.
+  Reuse the existing value-returning `relationship_key` and update maintained source
+  provenance. [CH-045](../computation_history.md#ch-045--owned-stacking-relationship-lookup-keys-2026-10-22)
+  records the ownership correction; ordering policies and numerical methods remain.
 - Follow [cloud development](../cloud_development.md) and
   [engineering guidelines](../engineering_guidelines.md).
 
@@ -57,6 +64,11 @@ The selected flags and subprocess lifecycle retain their existing behavior.
 - Targeted clang-tidy on vendored `curve_fit_cubic.c` reproduced 20 function-size
   errors. This source is unchanged upstream code; the portable style check now
   applies the existing authored-code policy consistently.
+- A mocked compile database confirmed the style check retains authored files,
+  deduplicates entries and excludes only the actual vendor directory.
+- `cmake --build --preset portable-core -- -k 0` collected every GCC compilation
+  failure in one pass; compatibility fixes are now rebuilding. Targeted clang-tidy
+  on the reformatted subdivision adapter passed.
 
 ## Next actions and blockers
 

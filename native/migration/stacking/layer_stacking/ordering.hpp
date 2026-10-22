@@ -83,7 +83,7 @@ static void order_pairs(State& state,Session& detection,std::atomic<bool>& cance
     synchronize(state.bases,incoming,detection.settings);state.orders.clear();state.order_peak=state.order_computed=state.order_reused=0;
     require(detection.published.pairs.size()*sizeof(Evidence)<=detection.settings.result_bytes,"LAYER_RESULT_BUDGET");
     state.orders.reserve(detection.published.pairs.size());
-    for(const auto& pair:detection.published.pairs){auto key=std::minmax(uint64_t(pair.first),uint64_t(pair.second));live.emplace(pair.first,pair.second);
+    for(const auto& pair:detection.published.pairs){auto key=relationship_key(uint64_t(pair.first),uint64_t(pair.second));live.emplace(pair.first,pair.second);
         bool explicit_pair=state.policies.count(key)&&state.policies.at(key).mode==2;
         Evidence value;if((!pair.count&&!explicit_pair)||state.exclusions.count(key)){value.summary.first=pair.first;value.summary.second=pair.second;value.summary.status=int(state.exclusions.count(key)?OrderStatus::excluded:OrderStatus::no_upward);}
         else value=cached_order(state,pair.first,pair.second,cancelled);

@@ -3,7 +3,7 @@
 - Task branch: `codex/shortcuts-parametric-030-cloud`
 - Parent feature branch: `codex/shortcuts-parametric-030`
 - Starting revision: `e7d464e3a4cf401249b6c96be2eb8eb5387b7fb6`
-- Status: implementation in progress; cloud baseline pending
+- Status: implementation in progress; focused cloud baseline passes
 - Last updated: 2026-10-22 UTC
 - Active writer: Codex Cloud, direct work
 
@@ -31,19 +31,29 @@ The cloud branch starts at the exact pushed desktop pause checkpoint. Main's
 validated CI fixes are reconciled here; the only merge conflict was overlapping
 computation-history additions. Both are retained, with the desktop expression
 record reassigned CH-049 to preserve main's published CH-045. No desktop branch
-changes are made. The first work is checking the pending lattice-reference
-guard and qualifying the new catalogue, policy UI, generated-curve placeholders,
-formula/path dependencies and structural reference handling.
+changes are made. Formatting leftovers in the lattice-reference guard and resource
+accounting are corrected; the guard also complies with the function-size limit.
+New public-operation tests cover lattice input-reference locks (including disabled
+formulas), escaped property ports, variable renaming/removal, generated-coordinate
+feedback with an independent valid formula, and failure-placeholder lifetime/recovery.
+Copy review found that shared geometry copies omit shortcut/formula state. The next
+implementation is coherent copying/remapping at those existing copy boundaries.
 
 ## Verification
 
-Baseline has not yet been run on this branch. Earlier desktop counts and limits
-are preserved in the desktop handoff; they are not evidence for new cloud changes.
+- Linux native build and all five CTests pass after reconciliation.
+- Ruff lint and formatting pass; mypy passes all 361 source files.
+- `pytest tests/test_expressions.py tests/test_shortcut*.py tests/test_driving*.py
+  tests/test_parametric*.py tests/test_architecture.py -q`: 109 passed.
+- The initial focused run found one pre-existing 16-line function in the paused
+  guard; the corrected run passes. Local logs are ignored under `build/core/`.
+- Full portable gate, native style and release qualification remain pending.
+  Earlier desktop results retain their original scope in the desktop handoff.
 
 ## Next actions and blockers
 
-1. Merge the validated main changes into this cloud branch and inspect the result.
-2. Check the pending guard, rebuild native code, and run focused 0.3 tests.
+1. Complete shared shortcut/formula copy and reference remapping contracts.
+2. Qualify policy editor, catalogue coverage and remaining paused interactions.
 3. Complete missing implementation/contracts from the pause, then run the full
    portable gate, applicable offscreen checks and GitHub core jobs.
 4. Push coherent implementation and evidence checkpoints on this cloud branch.

@@ -49,10 +49,8 @@ def require_references(session: Any, before: Any, after: Any) -> None:
 def require_reference(session: Any, before: Any, after: Any, ref: PropertyRef, label: str) -> None:
     from .property_operations import read
 
-    previous, current = (
-        before.registry.records.get(ref.target),
-        after.registry.records.get(ref.target),
-    )
+    previous = before.registry.records.get(ref.target)
+    current = after.registry.records.get(ref.target)
     if previous is None or previous is current:
         return
     require_address(previous, current, ref)
@@ -67,9 +65,15 @@ def require_reference(session: Any, before: Any, after: Any, ref: PropertyRef, l
 def require_address(previous: Any, current: Any, ref: PropertyRef) -> None:
     from anthroforge.core.construction import Control
 
-    if (isinstance(previous, Control) and isinstance(current, Control)
-            and previous.resolution != current.resolution and ref.path[0] in ("points", "weights")):
-        raise ValueError("Resolve formula references to cage points/weights before resizing the lattice.")
+    if (
+        isinstance(previous, Control)
+        and isinstance(current, Control)
+        and previous.resolution != current.resolution
+        and ref.path[0] in ("points", "weights")
+    ):
+        raise ValueError(
+            "Resolve formula references to cage points/weights before resizing the lattice."
+        )
 
 
 def missing_reference(label: str) -> None:

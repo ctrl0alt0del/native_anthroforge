@@ -39,7 +39,7 @@ def editable(session: "Session", target: str) -> Authored:
     return item
 
 
-def install(session: "Session", item: Authored) -> None:
+def install(session: "Session", item: Authored, **related: Any) -> None:
     from . import junction_operations
 
     before = editable(session, item.id)
@@ -51,18 +51,19 @@ def install(session: "Session", item: Authored) -> None:
         return
     ports = object_revisions.changed_ports(before, changed)
     session.scheduler.invalidate_ports(ports)
-    install_state(session, before, changed)
+    install_state(session, before, changed, **related)
     dependent_tasks.changed(session, ports, published=False)
 
 
-def install_state(session: "Session", before: Authored, changed: Authored) -> None:
+def install_state(session: "Session", before: Authored, changed: Authored, **related: Any) -> None:
     from . import consumer_parenting
 
-    objects = tuple(changed if o.id == changed.id else o for o in session.document.objects)
-    after = replace(session.document, objects=objects)
+    existing = related.pop("objects", session.document.objects)
+    objects = tuple(changed if o.id == changed.id else o for o in existing)
+    after = replace(session.document, objects=objects, **related)
     if changed.parent != before.parent:
         after = consumer_parenting.rebind(session, after, changed.id)
-    session.replace_document(objects=after.objects, entities=after.entities)
+    session.replace_document(objects=after.objects, entities=after.entities, **related)
 
 
 def rename(session: "Session", target: str, name: str) -> None:

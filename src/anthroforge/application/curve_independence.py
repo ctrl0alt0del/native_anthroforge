@@ -9,7 +9,14 @@ from anthroforge.core.entities import SCP
 from anthroforge.core.surfaces import Surface, SurfaceAlignment
 from anthroforge.core.tissues import TissueVCP
 
-from . import construction_copy, construction_tasks, curve_consumers, curve_copy, curve_sources
+from . import (
+    construction_copy,
+    construction_tasks,
+    curve_consumers,
+    curve_copy,
+    curve_sources,
+    shortcut_copies,
+)
 from .curve_copy_resources import Copies
 
 if TYPE_CHECKING:
@@ -45,16 +52,17 @@ def independent_curve(session: "Session", entity: str, curve: str) -> str:
 
 
 def install(
-    session: "Session", item: SCP | Surface, copied: Curve, identities: dict[str, str]
+    session: "Session", item: SCP | Surface, copied: Curve, mapping: dict[str, str]
 ) -> None:
-    changed = curve_consumers.revised(item, remapped(item, identities))
+    changed = curve_consumers.revised(item, remapped(item, mapping))
     session.scheduler.invalidate({item.id})
-    if isinstance(changed, SCP):
-        entities = tuple(changed if e.id == item.id else e for e in session.document.entities)
-        session.replace_document(entities=entities, objects=(*session.document.objects, copied))
-    else:
-        objects = tuple(changed if o.id == item.id else o for o in session.document.objects)
-        session.replace_document(objects=(*objects, copied))
+    state = shortcut_copies.state(session.document, mapping, frozenset({item.id}))
+    collection = "entities" if isinstance(changed, SCP) else "objects"
+    state[collection] = tuple(
+        changed if o.id == item.id else o for o in getattr(session.document, collection)
+    )
+    state["objects"] = (*state.get("objects", session.document.objects), copied)
+    session.replace_document(**state)
 
 
 def remapped(item: SCP | Surface, identities: dict[str, str]) -> SCP | Surface:

@@ -28,14 +28,21 @@ def validate_writers(document: Any) -> None:
 
 def require_changes(session: Any, before: Any, after: Any) -> None:
     require_references(session, before, after)
-    for driver in before.driving_shortcuts:
-        for formula in driver.formulas:
-            if not formula.enabled or formula.id in session.formula_write_authority:
-                continue
+    for label, formula in retained_writers(before, after):
+        if formula.id not in session.formula_write_authority:
             if changed(session, before, after, formula.target):
                 raise ValueError(
-                    f"This property is driven by {driver.label}; disable its formula to edit it."
+                    f"This property is driven by {label}; disable its formula to edit it."
                 )
+
+
+def retained_writers(before: Any, after: Any) -> Iterator[tuple[str, Any]]:
+    previous = {f.id: f for d in before.driving_shortcuts for f in d.formulas if f.enabled}
+    for driver in after.driving_shortcuts:
+        for formula in driver.formulas:
+            old = previous.get(formula.id)
+            if formula.enabled and old is not None and formula.target == old.target:
+                yield driver.label, formula
 
 
 def require_references(session: Any, before: Any, after: Any) -> None:

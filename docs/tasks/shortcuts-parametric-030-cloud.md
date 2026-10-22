@@ -36,8 +36,14 @@ accounting are corrected; the guard also complies with the function-size limit.
 New public-operation tests cover lattice input-reference locks (including disabled
 formulas), escaped property ports, variable renaming/removal, generated-coordinate
 feedback with an independent valid formula, and failure-placeholder lifetime/recovery.
-Copy review found that shared geometry copies omit shortcut/formula state. The next
-implementation is coherent copying/remapping at those existing copy boundaries.
+Shared geometry copies now retain shortcut/formula state, remapping internal controls,
+references, policies, ordering and accepted values. Explicit external inputs remain
+external, and copied outputs are limited to copied construction. Independence rewrites
+consumer-member addresses atomically with the copied graph, including branched tissues.
+[CH-050](../computation_history.md#ch-050--copy-formula-controls-with-their-construction-graph-2026-10-22)
+records ownership and evidence. UI qualification is next; inspection found integer
+values arrive from QML as floats and need explicit transport handling, plus missing
+navigation from driven fields to their controlling shortcut.
 
 ## Verification
 
@@ -49,10 +55,14 @@ implementation is coherent copying/remapping at those existing copy boundaries.
   guard; the corrected run passes. Local logs are ignored under `build/core/`.
 - Full portable gate, native style and release qualification remain pending.
   Earlier desktop results retain their original scope in the desktop handoff.
+- Copy baseline: four regressions failed because controls were absent; consumer
+  reference remapping also failed before implementation. The corrected copy/shared
+  construction/tissue/Fiber/architecture group passes 35 cases, including pending
+  Manual intent and branched tissue controls. Mypy passes 363 source files.
 
 ## Next actions and blockers
 
-1. Complete shared shortcut/formula copy and reference remapping contracts.
+1. Complete integer UI transport and navigation from driven fields.
 2. Qualify policy editor, catalogue coverage and remaining paused interactions.
 3. Complete missing implementation/contracts from the pause, then run the full
    portable gate, applicable offscreen checks and GitHub core jobs.

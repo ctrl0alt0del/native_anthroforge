@@ -160,7 +160,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 
 | ID | Computation | Owner | Evidence |
 | --- | --- | --- | --- |
-| E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py) |
+| E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. Construction copies preserve/remap formula graphs and accepted values through existing lifecycle operations (CH-050). | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py), [copy state](../src/anthroforge/application/shortcut_copies.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py), [copy lifecycle](../tests/test_shortcut_copy.py) |
 
 The inventory covers all public native interface families in
 [native/include/anthroforge](../native/include/anthroforge), compiled geometry sources
@@ -1665,3 +1665,25 @@ CH-049 because the integrated pipeline repair already published CH-045.
   Python package validation. The 57 focused stacking/provenance/drawing checks
   also pass. No performance or geometry improvement is claimed.
 - See [the pipeline repair task](tasks/fix-ubuntu-pipeline.md) for final validation.
+
+### CH-050 — Copy formula controls with their construction graph (2026-10-22)
+
+- Cloud continuation of `e7d464e` found that geometry copies omitted shortcut and
+  driver records. Four public-operation regressions demonstrated the missing copied
+  controls. A fifth showed consumer formulas retaining invalid old curve-use addresses.
+- Shared copy operations now clone exposed/hidden wrappers, relevant driver outputs,
+  internal property/virtual-input references, descendant policies, ordering and accepted
+  formula values. Explicit external inputs remain external; copied drivers never acquire
+  outputs outside the copied construction. New object/member/formula identities are
+  allocated once. Read-provenance property ports remap their escaped member identities.
+- Independence also rewrites references to internal members of the existing consumer.
+  Tissue construction and related formula state install together through the normal
+  authored object boundary, preserving revisions, invalidation and dependent scheduling.
+  Guards reserve retained active writers; removed or retargeted writers release their
+  former component. Ordinary edits to active driven fields remain rejected.
+- Evidence: 35 focused copy, shared-curve, tissue-independence, Fiber and architecture
+  cases pass. They include chains, external inputs, output scope, Parametric variable
+  identities, branch-part references, policy/order, undo/redo and pending Manual values.
+  Ruff/mypy pass. Native expression/geometry algorithms and solver tolerances are unchanged;
+  full combined qualification remains pending. No release or performance gain is claimed.
+- Reference: [Python dataclass replacement](https://docs.python.org/3.12/library/dataclasses.html#dataclasses.replace).

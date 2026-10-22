@@ -3,19 +3,21 @@
 from dataclasses import replace
 from typing import Any
 
-from . import object_operations, source_graph_copy
+from . import object_operations, shortcut_copies, source_graph_copy
 from .tissue_operations import tissue
 
 
 def independent(session: Any, target: str) -> str:
     item = tissue(session, target)
     objects, mapping, junctions = source_graph_copy.clone(session, item.source)
-    session.replace_document(
+    changed = remapped(item, mapping)
+    object_operations.install(
+        session,
+        changed,
         objects=(*session.document.objects, *objects),
         junctions=(*session.document.junctions, *junctions),
+        **shortcut_copies.state(session.document, mapping, frozenset({item.id})),
     )
-    changed = remapped(item, mapping)
-    object_operations.install(session, changed)
     remap_regions(session, item.id, mapping)
     return str(changed.source)
 

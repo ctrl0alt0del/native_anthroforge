@@ -38,6 +38,10 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
 - Windows subsequently reached `curve_fit.cpp` and reported MSVC C4244 on the
   intentional double-to-float range constructor. Use an explicit conversion into
   the same float buffer, preserving the donor fitting precision and validation.
+- Later MSVC failures in imported routing headers were unused OpenMP workers
+  (C4189) and bounded `1/-1` conversion to `int8_t` (C4244). Complete the wrappers'
+  scoped MSVC allowances for imported routing/stacking code and unused tissue
+  entry points. Authored-code warnings-as-errors and pinned donor bytes stay intact.
 - Follow [cloud development](../cloud_development.md) and
   [engineering guidelines](../engineering_guidelines.md).
 

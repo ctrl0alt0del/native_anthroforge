@@ -110,3 +110,18 @@
   checks and fresh actual-geometry renders. Original user file is still untouched.
 - Previous gate at 753bac6 passed 1662 tests and five native CTests. The latest native
   repairs require the final gate/package again; focused inflation/crop checks pass.
+
+## Dense support correction
+
+- All 96 normal-open surface comparisons pass (maximum sampled tissue difference
+  9.56e-7 scene units). Bone editing then exposed unintended tissue influence in
+  three dense Fiber fields; explicit endpoint bindings were correct.
+- CH-036 moves dense candidate policy to one application owner shared by creation
+  and editing. Skeletal fields do not acquire nearby tissue relationships. Explicit
+  tissue-backed fields use selected parents. Native field algorithms are unchanged.
+- `tmp/repair_supports.py` recaptured 315 new fibers against donor-recorded target
+  sets, excluding every original object. `checks/source-support-recapture.json`
+  records allowed/used supports; original and intermediate projects are preserved.
+- `tmp/qualify_all.py` is now rerunning complete comparisons and bone/fiber edits,
+  undo, save and reopen. `build/all-muscle-final-gate.log` is the current gate log.
+  No user delivery replacement has occurred. Continue final package/visual checks.

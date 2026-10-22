@@ -21,6 +21,7 @@ from . import (
     curve_sources,
     dependencies,
     fiber_defaults,
+    fiber_supports,
     surface_providers,
 )
 from .attachment_candidates import eligible
@@ -37,7 +38,11 @@ if TYPE_CHECKING:
 def capture_targets(document: Any, spec: "FiberCreation") -> tuple[Any, ...]:
     return tuple(
         sorted(
-            set(eligible(document, spec.identities[spec.source]))
+            {
+                ref
+                for ref in eligible(document, spec.identities[spec.source])
+                if ref.role == "SCP_GEOMETRY"
+            }
             | {b[1] for b in spec.bindings if b[1] is not None}
         )
     )
@@ -109,11 +114,9 @@ def compute(session: "Session", spec: "FiberCreation", payload: Any, cancel: Any
     item, original, targets, request = capture(session, spec, document, resources)
     spec = fiber_defaults.resolve(session.engine, spec, document, resources, request, cancel.handle)
     request = replace(request, parents=[targets.index(row[1]) for row in spec.bindings])
-    surfaces = attachment_assets.surface_inputs(
-        session.engine, document, resources.meshes, targets, cancel.handle
+    field, captures = fiber_supports.capture(
+        session.engine, document, resources, targets, request, cancel.handle
     )
-    field = attachment_fields.capture(session.engine, surfaces, request, cancel.handle)
-    captures = attachment_assets.captures(session.engine, document, resources.meshes, targets)
     asset = attachment_assets.compact(field, captures)
     copied = independent_curve(item, original.authored, spec)
     fiber = build_fiber(copied, replace(spec, attachment_asset=str(uuid4())), asset)

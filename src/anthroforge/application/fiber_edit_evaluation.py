@@ -10,7 +10,7 @@ from anthroforge.core.fibers import Fiber, FiberBinding
 from anthroforge.core.results import EvaluationResult
 from anthroforge.native import attachment_fields, construction, curve_editing, path_editing, paths
 
-from . import attachment_assets, fiber_retention
+from . import attachment_assets, fiber_retention, fiber_supports
 from .path_assets import PathAsset
 
 
@@ -66,11 +66,9 @@ def recapture(
     assert item.edit is not None
     path, records, world = geometry.path, geometry.records, geometry.world
     targets = item.edit.candidates
-    surfaces = attachment_assets.surface_inputs(engine, document, resources.meshes, targets, cancel)
-    field = attachment_fields.capture(
-        engine, surfaces, capture_request(item, path, records, world), cancel
+    field, captures = fiber_supports.capture(
+        engine, document, resources, targets, capture_request(item, path, records, world), cancel
     )
-    captures = attachment_assets.captures(engine, document, resources.meshes, targets)
     asset = fiber_retention.retain(item, field, captures)
     changed = edited_fiber(item, records, asset)
     return PathAsset(path, changed), changed, asset

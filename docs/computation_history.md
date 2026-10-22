@@ -73,7 +73,7 @@ transient spatial index while preserving original material indices; see CH-032.
 | --- | --- | --- | --- |
 | A01 | SCP attachments: nearest/ray capture, retained surface/frame/offset records and batched parent-to-child transform propagation. | [attachment.cpp](../native/src/attachment.cpp), [attachment adapter](../src/anthroforge/native/attachments.py) | [addon parity](../tests/test_addon_parity.py), [assembly](../tests/test_assembly.py) |
 | A02 | Anchor/point bindings: capture and resolve explicit SCP or Tissue Base/Final material locations, orientation and offsets. Resolve against accepted deformed material without automatic nearest reassignment. | [point attachment adapter](../src/anthroforge/native/point_attachments.py), [material_binding.cpp](../native/src/material_binding.cpp), [surface providers](../src/anthroforge/application/surface_providers.py) | [point attachments](../tests/test_point_attachments.py), [tissue anchor material](../tests/test_tissue_anchor_material.py) |
-| A03 | Fiber attachment fields: dense surface captures, nearest-owner runs, arc-length blending between owners, structural pins and retained material influence. Applies across curve engines. | [attachment_weights.cpp](../native/src/attachment_weights.cpp), [attachment fields](../src/anthroforge/native/attachment_fields.py) | [attachment weights](../tests/test_attachment_weights.py), [attachment fields](../tests/test_attachment_fields.py) |
+| A03 | Fiber attachment fields: dense surface captures, nearest-owner runs, arc-length blending between owners, structural pins and retained material influence. Automatic skeletal supports exclude unrelated tissues; explicitly tissue-backed fields use selected parents (CH-036). Applies across curve engines. | [attachment_weights.cpp](../native/src/attachment_weights.cpp), [attachment fields](../src/anthroforge/native/attachment_fields.py), [support policy](../src/anthroforge/application/fiber_supports.py) | [attachment weights](../tests/test_attachment_weights.py), [attachment fields](../tests/test_attachment_fields.py), [support policy](../tests/test_fiber_support_policy.py) |
 | A04 | Fiber resolution/editing: resolve its current attached shape, edit authored controls, rebind edited endpoints using Current/Any eligible parent policy, preserve unedited pins, then evaluate its path engine. | [fiber bindings](../src/anthroforge/application/fiber_bindings.py), [fiber edit evaluation](../src/anthroforge/application/fiber_edit_evaluation.py), [path_editing.cpp](../native/src/path_editing.cpp) | [fiber editing](../tests/test_fiber_editing.py), [tissue fiber material](../tests/test_tissue_fiber_material.py) |
 | A05 | Automatic attached construction: native nearest-SCP capture for new Anchor/Fiber bindings, independent graph copies, preserved existing Fiber bindings, and native Membrane evaluation under one reserved worker job. One atomic publication/undo; Tissue evaluation remains downstream. | [creation plan](../src/anthroforge/application/attached_creation.py), [worker assembly](../src/anthroforge/application/attached_creation_compute.py), [lifecycle](../src/anthroforge/application/attached_creation_jobs.py) | [conversion](../tests/test_attached_creation.py), [lifecycle](../tests/test_attached_creation_lifecycle.py) |
 
@@ -1311,3 +1311,28 @@ See the task and development validation records for final gate/package evidence 
   in the all-muscle migration run. Synthetic collapsed-pole and nonplanar material
   quad regressions pass, alongside existing addon inflation/crop fixtures. Full
   assembly, lifecycle and packaged qualification remain pending.
+
+### CH-036 — Declared Fiber deformation supports (2026-10-22)
+
+- Affects A03–A05. Full-assembly bone editing exposed three failed Fiber fields.
+  Their explicit endpoint bindings were correct, but dense capture had silently
+  used unrelated tissues already present in the document. Subsequent cropping of
+  those tissues invalidated material locations absent from the Blender sources.
+  Endpoint/crop tolerances were investigated and rejected as the cause.
+- Previously creation and editing captured dense influences from all selectable
+  anatomical surfaces. The shared application support policy now separates
+  endpoint selection from dense deformation candidates. Skeletal fibers use SCP
+  candidates; fibers explicitly attached to tissue use their selected parents,
+  including an explicitly selected SCP. Any-parent endpoint selection still works.
+- This restores the production addon's distinction in
+  `core/vcp/fiber_node_attachment.py` and `core/vcp/attachment_surface.py`.
+  Native field capture, blending, retained pins and material resolution are unchanged.
+  Creation and current-shape editing use the same policy; no numerical Python loop
+  or per-feature dependency exception is introduced.
+- The migration recaptures 315 new Fiber fields against each donor's recorded
+  support set. It preserves the original 139 objects, structural bindings, current
+  paths and native capture algorithm. Source per-node weights are not copied
+  verbatim. Existing user projects are not silently recaptured on load.
+- Focused creation/editing tests pass, including nearby unrelated tissue, explicit
+  tissue support, mixed explicit parents, and Any-parent rebinding. Full assembly
+  edit/undo and packaged qualification are running; final evidence follows.

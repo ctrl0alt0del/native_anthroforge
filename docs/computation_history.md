@@ -1407,3 +1407,20 @@ See the task and development validation records for final gate/package evidence 
   headless opening/settling trials and offscreen presentation checks, not interactive
   latency measurements. Original project bytes remain untouched. Evidence lives in
   `diagnostics/open-optimization-20261022/` under the CH-032–036 run directory above.
+
+### CH-039 — Prepared tissue inspection presentation (2026-10-22)
+
+- The viewport read a recursively converted full inspection report for every mesh's
+  visibility binding. Repeated edits dispatched in 632–650 ms; repeated hidden
+  viewport settling took 3.56–3.66 s in the 96-tissue assembly.
+- Tissue inspection now owns a persistent PropertyProjection with per-field change
+  notifications. Reports are prepared on state changes; property reads do no report
+  conversion. Snapshot serialization remains explicit. Deselection clears rows.
+- Ten targeted inspection/stacking/view tests pass, including repeated property reads
+  and clearing selection. Serial off/on/on/off hidden viewport trials dispatch in
+  46.7/57.9/55.1/47.8 ms and settle in 1.208/1.332/1.334/1.218 s. No QML warnings;
+  actual captured geometry/selection remains visible. Native algorithms and bindings
+  are unchanged. Frame intervals still reach 185 ms: this is not smooth-frame acceptance.
+- Local evidence: `build/vcp-performance-024-release/step1/`, including two profiler
+  captures, viewport images, trial load observations and timings. Full release checks
+  remain pending; offscreen evidence is not interactive acceptance.

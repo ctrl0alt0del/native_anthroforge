@@ -36,5 +36,8 @@ success alone is insufficient. Keep profiler overhead separate from recorder-off
 
 ## Recovery
 
-Initial record only. Next: implement step 1 with existing PropertyProjection, preserve
-inspection snapshots/staged visibility, add targeted regression checks and measure.
+Step 1 implemented and measured (CH-039): 10 targeted tests pass, dispatch 47–48 ms
+versus 632–650 ms; hidden repeated-edit settling 1.21 s versus 3.56–3.66 s.
+Next: step 2 provenance/validation/resource observation. Preserve baseline native DLL
+at build/vcp-performance-024-release/baseline-af_native.dll; freeze edit replay before
+numerical changes. Remaining steps and release qualification are pending.

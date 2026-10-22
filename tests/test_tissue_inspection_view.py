@@ -97,3 +97,27 @@ def test_changing_stage_clears_points_from_the_previous_surface(controller):
     tool.set_view("base", "", "Overlay")
     publish(controller)
     assert not tool.point and not tool.lines
+
+
+def test_visibility_reads_use_prepared_properties_without_rebuilding_reports(
+    controller, monkeypatch
+):
+    target, tool = setup(controller)
+    tool.set_view("rest", "base", "Overlay")
+    publish(controller)
+    projection = tool.state
+    monkeypatch.setattr(tool, "state_values", lambda: pytest.fail("Rebuilt a report on read"))
+    for _ in range(1000):
+        assert tool.state is projection
+        assert projection.value("hiddenOwners") == [target]
+    assert tool.snapshot()["stages"] and tool.snapshot()["hiddenOwners"] == [target]
+
+
+def test_selection_clear_discards_prepared_inspection_state(controller):
+    _, tool = setup(controller)
+    tool.set_view("rest", "base", "Overlay")
+    publish(controller)
+    controller.select("")
+    publish(controller)
+    state = tool.snapshot()
+    assert state["target"] == "" and state["stages"] == [] and state["hiddenOwners"] == []

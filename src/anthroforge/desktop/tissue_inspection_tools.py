@@ -9,7 +9,7 @@ from anthroforge.core.tissues import TissueVCP
 from . import stacking_inspection_view as stacking
 from . import tissue_inspection_scene as scene
 from .models import RenderModel
-from .values import qml
+from .property_projection import PropertyProjection
 
 
 class TissueInspectionTools(QObject):
@@ -24,27 +24,34 @@ class TissueInspectionTools(QObject):
         self.context, self.key, self.rows, self.point, self.summary = None, None, [], {}, {}
         self.refresh_stamp, self.point_status = None, dict(state="idle")
         self.stacking_status = dict(state="idle")
+        self._state = PropertyProjection(self)
         self.model.activated.connect(self.activated)
+        self.notify()
 
     @Property(QObject, constant=True)
     def geometry(self):
         return self.model
 
-    @Property("QVariantMap", notify=changed)
+    @Property(QObject, constant=True)
     def state(self):
+        return self._state
+
+    def notify(self):
+        self._state.synchronize(self.state_values())
+        self.changed.emit()
+
+    def state_values(self):
         row = scene.primary(self)
-        return qml(
-            dict(
-                self.evidence_state(),
-                target=self.target,
-                stage=self.stage,
-                reference=self.reference,
-                mode=self.mode,
-                active=self.armed,
-                hiddenOwner=row["owner"] if row else "",
-                hiddenOwners=scene.hidden_owners(self),
-                stages=self.rows,
-            )
+        return dict(
+            self.evidence_state(),
+            target=self.target,
+            stage=self.stage,
+            reference=self.reference,
+            mode=self.mode,
+            active=self.armed,
+            hiddenOwner=row["owner"] if row else "",
+            hiddenOwners=scene.hidden_owners(self),
+            stages=self.rows,
         )
 
     def evidence_state(self):
@@ -57,24 +64,27 @@ class TissueInspectionTools(QObject):
 
     @Slot(result="QVariantMap")
     def snapshot(self):
-        return dict(self.state, lines=self.lines, footprint=stacking.lines(self))
+        return dict(self._state.as_dict(), lines=self.lines, footprint=stacking.lines(self))
 
     def activated(self):
         self.controller.activate_geometry()
-        self.changed.emit()
+        self.notify()
 
     def synchronize(self):
         controller, session = self.controller, self.controller.session
         item = session.document.registry.records.get(controller.selection)
-        context = self.selection_context(item)
-        if context != self.context:
-            self.clear()
-            self.context, self.target = context, context[2]
+        self.update_context(self.selection_context(item))
         if not self.target:
             return
         if self.editing_geometry() and self.stage:
             self.clear()
         self.refresh_inspection()
+
+    def update_context(self, context):
+        if context != self.context:
+            self.clear()
+            self.context, self.target = context, context[2]
+            self.notify()
 
     def refresh_inspection(self):
         stamp = self.inspection_stamp()
@@ -90,7 +100,7 @@ class TissueInspectionTools(QObject):
         value = stacking.status(self)
         if value != self.stacking_status:
             self.stacking_status = value
-            self.changed.emit()
+            self.notify()
 
     @Slot(str, str, str)
     def showStacking(self, other, side, other_side):
@@ -149,7 +159,7 @@ class TissueInspectionTools(QObject):
         self.key, self.rows = key, rows
         values, leases = scene.rows(self)
         self.model.publish(values, leases)
-        self.changed.emit()
+        self.notify()
 
     def refresh_evidence(self):
         session = self.controller.session
@@ -164,7 +174,7 @@ class TissueInspectionTools(QObject):
             self.point_status = status
             if not self.finding:
                 self.lines = value.asset["lines"] if point else []
-            self.changed.emit()
+            self.notify()
         self.validate_finding()
 
     @Slot(str, str, str)
@@ -208,7 +218,7 @@ class TissueInspectionTools(QObject):
         self.controller.cancelViewportTools(self)
         self.armed = not self.armed
         self.finding, self.lines = "", []
-        self.changed.emit()
+        self.notify()
 
     @Slot("QVariantList", "QVariantList", bool)
     def probe(self, origin, direction, confirm):
@@ -250,7 +260,7 @@ class TissueInspectionTools(QObject):
     @Slot()
     def cancel(self):
         self.armed = False
-        self.changed.emit()
+        self.notify()
 
     def clear(self):
         inspection.cancel(self.controller.session)
@@ -259,6 +269,7 @@ class TissueInspectionTools(QObject):
         self.refresh_stamp, self.point_status = None, dict(state="idle")
         self.model.publish([])
         self.stacking_status = dict(state="idle")
+        self.rows, self.summary = [], {}
 
     def show_finding(self, identity):
         from .tissue_finding_view import show
@@ -272,7 +283,7 @@ class TissueInspectionTools(QObject):
         record = session.issues.repository.records.get(self.finding)
         if not record or session.issues.presentation.serialize(record)["freshness"] != "current":
             self.finding, self.lines = "", []
-            self.changed.emit()
+            self.notify()
 
     def attempt(self, action, *args):
         try:

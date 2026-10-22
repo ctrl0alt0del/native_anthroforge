@@ -1,5 +1,32 @@
 # AnthroForge architecture
 
+The 0.2.4 VCP performance work preserves document, numerical and attachment contracts.
+`TissueInspectionTools.state` exposes prepared field-level presentation through the
+existing projection layer. Accepted-result provenance indexes pending owners once;
+typed local TissueVCP strategy edits reuse relationship validation while still running
+the full tissue capability policy. Other record/reference changes invalidate that reuse.
+
+Native advisory collision checking owns an exclusive retained context with immutable
+collider snapshots and revision-qualified pair evidence. It is bounded to 128 MiB;
+changed geometry, transforms, contacts, ordering and metric tolerance invalidate the
+affected evidence. Stacking uses exclusive multi-call leases across planning, solving,
+group validation and inspection. Idle sessions are bounded to four/512 MiB and cannot
+return across a lifecycle clear. Native signatures still qualify every captured input.
+
+`tissue_preparation` owns immutable accepted-base vectors, Section Profile frames and
+Distributed mass/cotangent operators. Its engine LRU charges source retention as well
+as preparation (64 MiB/64 entries). Per-call solvers remain independent; changed
+Distributed distance refactors the numerical matrix. Internal envelope sides use
+existing draft meshes; accepted composed stages retain complete rendering/query data.
+Height smoothing eliminates pinned variables and uses PIQP box bounds, then expands
+primal/dual results for the original full-problem optimality certification.
+
+Profiler resource observation remembers weak immutable catalogue groups rather than
+expanding every shared payload repeatedly. Inventory expansion stays bounded and runs
+only while recording. Cache ownership and hits/misses remain visible in reports;
+opaque stacking cache storage is explicitly labelled as a conservative upper bound.
+See computation records CH-039 through CH-044 for measurements and limits.
+
 [0.2.3 preferences](specification_023.md) live in application-owned `PreferenceStore`,
 separate from project/history state. Desktop and headless commands share atomic
 persistence. Path jobs and conversion previews capture immutable preferences at dispatch

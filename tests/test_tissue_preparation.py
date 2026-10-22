@@ -101,3 +101,17 @@ def test_draft_envelope_sides_match_complete_published_geometry(session):
     assert result.prepared
     np.testing.assert_array_equal(result.array(0), expected.array(0))
     np.testing.assert_array_equal(result.array(3), expected.array(3))
+
+
+def test_clear_during_capture_does_not_retain_old_document(session, monkeypatch):
+    base, parts = prepared_input(session)
+    native = session.engine.library.af_tissue_preparation_create
+
+    def capture(*args):
+        handle = native(*args)
+        session.engine.clear_caches()
+        return handle
+
+    monkeypatch.setattr(session.engine.library, "af_tissue_preparation_create", capture)
+    result = tissue_parts.evaluate(base, parts, "a", False)
+    assert result.prepared and not session.engine.tissue_preparations.retained()

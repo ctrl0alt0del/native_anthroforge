@@ -8,6 +8,7 @@ from anthroforge.native.mesh import INT64, pointer
 from anthroforge.native.stacking import StackSession
 from anthroforge.native.stacking_leases import acquire
 from tests.stacking_fixtures import domain, settings
+from tests.test_tissue_stack_workflow import assembly as tissue_assembly
 from tests.test_tissue_stacking_native import CASES, assert_same_output
 
 
@@ -78,3 +79,21 @@ def test_handle_obstacles_preserve_transformed_geometry_and_output(session, asse
         (r["status"], r["message"]) for r in outputs[1].values()
     ]
     assert leases
+
+
+@pytest.mark.parametrize("change", ["provider", "receiver"])
+def test_changed_stacking_inputs_match_fresh_native_sessions(session, change):
+    from anthroforge.application.tissue_stack_evaluation import evaluate
+
+    _, first, second = tissue_assembly(session)
+    target = first if change == "provider" else second
+    for amount in (0.021, 0.024, 0.019):
+        session.command("tissue.inflation", target=target, changes=dict(amount=amount))
+        session.wait(30)
+        item = session.document.object(second)
+        assert item.final_result.status == "ready"
+        accepted = session.assets[item.final_result.asset].mesh
+        session.engine.stack_sessions.clear()
+        fresh = evaluate(session.engine, session.document, session.resources.snapshot(), item, 0)
+        np.testing.assert_array_equal(accepted.array(0), fresh.mesh.array(0))
+        np.testing.assert_array_equal(accepted.array(3), fresh.mesh.array(3))

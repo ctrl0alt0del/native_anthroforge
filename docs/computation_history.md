@@ -41,6 +41,12 @@ evidence for those revisions, not current workflow instructions.
 Additional active authoring/inspection work for T09, K01 and Q05 is recorded in CH-024/025.
 Nearest attachment queries (A01–A03) exclude numerically unusable triangles from their
 transient spatial index while preserving original material indices; see CH-032.
+0.2.4 changes are recorded in CH-039–044: prepared inspection presentation and result
+provenance; incremental native collision evidence (Q01); exclusive stacking leases (K01);
+fixed-variable elimination/direct box bounds with original KKT checks (T11); immutable
+material frames/operators and per-column profile coefficients (T02–T04); draft internal
+envelope sides with fully prepared publication (G02/T05); bounded profiler ownership.
+The numerical objectives, topology, retained bindings and acceptance rules stay unchanged.
 
 ### Meshes, primitives and deformers
 

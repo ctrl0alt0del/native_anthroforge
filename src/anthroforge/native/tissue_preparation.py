@@ -43,9 +43,11 @@ def mode(settings: Any) -> tuple[int, int]:
 
 def acquire(base: Mesh, settings: Any, cancel: int) -> Preparation:
     cache = base.engine.tissue_preparations
+    epoch = cache.epoch
     key = (base.handle, tuple(mode(value) for value in settings))
     found = cache.get(key)
     if found is not None:
         return found
     value = Preparation(base, settings, cancel)
-    return cache.store(key, value, value.retained_bytes)
+    cache.restore(key, value, value.retained_bytes, epoch)
+    return value

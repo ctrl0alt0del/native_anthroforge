@@ -51,9 +51,12 @@ versus 1.77–1.82 s in alternating trials; original certification remains, max 
 3.94e-13 m, 24 focused checks pass.
 Step 6 implemented (CH-044): immutable frames/operators, per-column coefficients and
 internal draft envelope sides. Exact changed-settings parity; median profile 30.3→23.0 ms,
-Distributed 67.0→39.9 ms. Focused checks pass. Full development gate running at
-build/vcp-performance-024-release/development-gate.log. Next: combined assembly replay,
-serial baseline/candidate timings, profiler and hidden viewport, release package.
+Distributed 67.0→39.9 ms. Focused checks pass. All 11 combined assembly replay snapshots
+(1,456 arrays each) match baseline exactly; bone/Fiber motion and undo included.
+Changed-provider/receiver stacking matches fresh sessions. Preparation clears cannot
+retain a capture from a discarded document. Full development gate running at
+build/vcp-performance-024-release/development-gate.log. Next: serial baseline/candidate
+timings, profiler and hidden viewport, release package. Do not benchmark during builds.
 Preserve baseline native DLL
 at build/vcp-performance-024-release/baseline-af_native.dll; baseline-replay/ now freezes 11 snapshots of 1,456 arrays before
 numerical changes. Remaining steps and release qualification are pending.

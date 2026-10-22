@@ -24,6 +24,7 @@ class FiberCreation:
     bindings: tuple[tuple[str, SurfaceReference | None, str], ...]
     name: str
     attachment_asset: str
+    endpoints: tuple[str, ...] = ()
 
 
 def create(
@@ -37,8 +38,13 @@ def create(
         raise ValueError("Fiber creation requires a curve source.")
     values = default_bindings(item) if bindings is None else bindings
     anchors = requested_bindings(session, item, values)
-    spec = FiberCreation(curve, curve_copy.mapping(item), anchors, require_name(name), str(uuid4()))
+    spec = creation(item, curve_copy.mapping(item), anchors, require_name(name))
     return authored_jobs.begin(session, partial(fiber_tasks.enqueue, session, spec))
+
+
+def creation(item: Curve, identities: Any, bindings: Any, name: str) -> FiberCreation:
+    endpoints = () if item.closed else (item.points[0].id, item.points[-1].id)
+    return FiberCreation(item.id, identities, bindings, name, str(uuid4()), endpoints)
 
 
 def requested_bindings(

@@ -37,6 +37,9 @@ def prepare(session: Any, target: str, updates: Any) -> tuple[Any, Any]:
 
 
 def validate(session: Any, before: Any, after: Any) -> None:
+    from .parametric_policy import require_change
+
+    require_change(session.document, before, after)
     if isinstance(before, SCP):
         validate_scp(session, before, after)
     if isinstance(before, TissueVCP):

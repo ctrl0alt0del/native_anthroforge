@@ -113,15 +113,26 @@ def curve_components(session, entity, curve):
     local = records[:, [3, 4, 5, 0, 1, 2, 6, 7, 8]].reshape((-1, 3))
     frame = curve_context.frame(session, entity, curve)
     world = components.transformed(session.engine, local, frame)
-    refs = [
-        dict(owner=entity.id, curve=curve.id, point=p.id, part=part, index=i * 3 + j)
-        for i, p in enumerate(curve.points)
-        for j, part in enumerate(("left", "position", "right"))
-    ]
+    refs = curve_refs(entity, curve)
     rows = list(zip(refs, world.tolist(), local.tolist(), strict=True))
     return (
         rows if curve.engine == "BEZIER" else [row for row in rows if row[0]["part"] == "position"]
     )
+
+
+def curve_refs(entity, curve):
+    return [
+        dict(
+            owner=entity.id,
+            curve=curve.id,
+            point=p.id,
+            part=part,
+            index=i * 3 + j,
+            readonly=curve.engine == "PARAMETRIC",
+        )
+        for i, p in enumerate(curve.points)
+        for j, part in enumerate(("left", "position", "right"))
+    ]
 
 
 def control_components(session, control):
@@ -253,5 +264,6 @@ def source_revisions(session, item):
 def read_only_selection(editor):
     chosen = set(editor.selection)
     return any(
-        ref["part"] in READ_ONLY_PARTS and component_key(ref) in chosen for ref, _, _ in editor.rows
+        (ref["part"] in READ_ONLY_PARTS or ref.get("readonly")) and component_key(ref) in chosen
+        for ref, _, _ in editor.rows
     )

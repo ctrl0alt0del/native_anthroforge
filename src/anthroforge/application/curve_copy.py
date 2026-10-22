@@ -7,13 +7,18 @@ from uuid import uuid4
 from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.core.curve_engines import RoutingSettings
 from anthroforge.core.fibers import Fiber
+from anthroforge.core.parametric import ParametricSettings
 from anthroforge.core.results import EvaluationResult
 
 from .surface_reference_codec import remap, remap_capture
 
 
 def mapping(curve: Curve) -> dict[str, str]:
-    return {key: str(uuid4()) for key in (curve.id, *(p.id for p in curve.points))}
+    definitions = (curve.engine_settings, curve.parametric_definition)
+    variables = [
+        v.id for s in definitions if isinstance(s, ParametricSettings) for v in s.variables
+    ]
+    return {key: str(uuid4()) for key in (curve.id, *(p.id for p in curve.points), *variables)}
 
 
 def clone(curve: Curve, identities: dict[str, str]) -> Curve:
@@ -29,7 +34,22 @@ def clone(curve: Curve, identities: dict[str, str]) -> Curve:
         construction_revision=0,
         result=EvaluationResult(),
         engine_settings=engine_settings(curve, identities),
-        **binding_changes(curve, identities),
+        **extra_changes(curve, identities),
+    )
+
+
+def extra_changes(curve: Curve, identities: dict[str, str]) -> dict[str, Any]:
+    return dict(
+        binding_changes(curve, identities),
+        parametric_definition=parametric_settings(curve.parametric_definition, identities),
+    )
+
+
+def parametric_settings(settings: Any, identities: dict[str, str]) -> Any:
+    if not isinstance(settings, ParametricSettings):
+        return settings
+    return replace(
+        settings, variables=tuple(replace(v, id=identities[v.id]) for v in settings.variables)
     )
 
 
@@ -72,4 +92,4 @@ def engine_settings(curve: Curve, identities: dict[str, str]) -> Any:
             obstacles=tuple(identities.get(k, k) for k in settings.obstacles),
             excluded_obstacles=tuple(identities.get(k, k) for k in settings.excluded_obstacles),
         )
-    return settings
+    return parametric_settings(settings, identities)

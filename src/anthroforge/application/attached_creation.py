@@ -89,7 +89,7 @@ def curve_plan(session: Any, spec: Plan, key: str) -> fiber_operations.FiberCrea
         return None
     bindings = fiber_operations.requested_bindings(session, item, values)
     name = spec.name if key == spec.source else item.name + " fiber"
-    return fiber_operations.FiberCreation(key, spec.identities, bindings, name, "")
+    return fiber_operations.creation(item, spec.identities, bindings, name)
 
 
 def binding_values(document: Any, item: Curve, spec: Plan) -> list[dict[str, Any]]:

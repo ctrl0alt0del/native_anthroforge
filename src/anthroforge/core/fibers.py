@@ -51,6 +51,8 @@ class Fiber(Curve):
 
     def __post_init__(self) -> None:
         Curve.__post_init__(self)
+        if self.engine == "PARAMETRIC":
+            raise ValueError("Fibers use an independent Bézier copy of a Parametric path in 0.3.")
         keys = [binding.point for binding in self.bindings]
         if len(keys) != len(set(keys)) or set(keys) - {point.id for point in self.points}:
             raise ValueError("Fiber bindings require unique authored point identities.")

@@ -11,6 +11,7 @@ from . import (
     fiber_edit_evaluation,
     junction_bindings,
     junction_evaluation,
+    parametric_evaluation,
     path_assets,
     routing_evaluation,
 )
@@ -47,6 +48,8 @@ def evaluate_item(
 
 
 def resolve(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -> ResolvedCurve:
+    if item.engine == "PARAMETRIC":
+        return resolve_parametric(engine, document, resources, item, cancel)
     value = (
         resolve_fiber(engine, document, resources, item, cancel)
         if isinstance(item, Fiber)
@@ -56,6 +59,16 @@ def resolve(engine: Any, document: Any, resources: Any, item: Any, cancel: int) 
         engine, document, resources, value.authored, cancel, value.path
     )
     return replace(value, authored=item, path=path)
+
+
+def resolve_parametric(
+    engine: Any, document: Any, resources: Any, item: Any, cancel: int
+) -> ResolvedCurve:
+    from .parametric_junctions import validate
+
+    asset = parametric_evaluation.evaluate(engine, item, cancel)
+    validate(engine, document, resources, asset.authored)
+    return ResolvedCurve(asset.authored, asset)
 
 
 def resolve_fiber(
@@ -94,6 +107,8 @@ def engine_path(
 
 
 def adopt(session: Any, item: Any, value: PathEvaluation) -> Any:
+    if item.engine == "PARAMETRIC":
+        return replace(item, points=value.asset.authored.points)
     if value.edited is None or value.attachment is None:
         return item
     session.resources.attachments[value.edited.attachment_asset] = value.attachment

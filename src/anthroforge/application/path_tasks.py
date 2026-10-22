@@ -51,7 +51,7 @@ def make_job(session: "Session", curve: str) -> Job:
 
 def workload(session: "Session", curve: str, document: Document) -> Workload:
     item = source(document, curve)
-    if isinstance(item, Fiber) or item.engine == "ROUTED":
+    if isinstance(item, Fiber) or item.engine in ("ROUTED", "PARAMETRIC"):
         return path_policy.workload(session, item, document)
     return Workload(
         affected=1,

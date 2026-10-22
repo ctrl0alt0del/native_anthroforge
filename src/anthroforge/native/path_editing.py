@@ -1,11 +1,13 @@
 """Owned current-shape edits retain deformation residuals in native path correspondence."""
 
 import ctypes as c
+from dataclasses import replace
 from typing import Any
 
 import numpy as np
 
 from anthroforge.core.construction import Curve
+from anthroforge.core.curve_engines import PolylineSettings
 
 from . import construction, paths
 from .mesh import D, GeometryEngine, U, pointer
@@ -19,12 +21,22 @@ def configure(engine: GeometryEngine) -> None:
 
 def deform(current: paths.Path, curve: Curve, records: Any, cancel: int) -> paths.Path:
     engine = current.engine
+    curve = control_curve(curve)
     opening = paths.evaluate(engine, curve, cancel)
     draft = paths.evaluate(engine, curve, cancel, records)
     handle = engine.library.af_path_control_deform(
         current.handle, opening.handle, draft.handle, cancel
     )
     return paths.Path(engine, handle)
+
+
+def control_curve(curve: Curve) -> Curve:
+    # This is a snapshot of already generated points, not an equation evaluation.
+    return (
+        replace(curve, engine_settings=PolylineSettings())
+        if curve.engine == "PARAMETRIC"
+        else curve
+    )
 
 
 def rebase(

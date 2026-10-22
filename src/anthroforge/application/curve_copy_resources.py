@@ -19,7 +19,7 @@ class Copies:
     attachments: dict[str, str] = field(default_factory=dict)
 
     def definition(self, item: Curve) -> Curve:
-        for key in (item.id, *(p.id for p in item.points)):
+        for key in curve_copy.mapping(item):
             if key not in self.identities:
                 self.identities[key] = str(uuid4())
         copied = curve_copy.clone(item, self.identities)

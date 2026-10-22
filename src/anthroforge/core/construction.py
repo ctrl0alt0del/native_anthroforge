@@ -10,6 +10,7 @@ from .curve_engines import BezierSettings, PathSettings, PolylineSettings, Routi
 from .curve_uses import CurveUse
 from .entities import IDENTITY, validate_matrix
 from .objects import ConstructionObject
+from .parametric import ParametricSettings
 from .results import ControlResult
 from .segment_chain import SegmentChain
 from .shrinkwrap import Shrinkwrap
@@ -65,6 +66,7 @@ class Curve(ConstructionObject):
     start: float | None = None
     span: float | None = None
     engine_settings: PathSettings = field(default_factory=BezierSettings)
+    parametric_definition: ParametricSettings | None = None
 
     @property
     def engine(self) -> str:
@@ -82,10 +84,13 @@ class Curve(ConstructionObject):
         ConstructionObject.__post_init__(self)
         if len(self.points) < 2 or len({p.id for p in self.points}) != len(self.points):
             raise ValueError("A curve needs at least two distinct control points.")
-        if self.closed and len(self.points) < 3:
+        config = self.engine_settings
+        count = config.resolution if isinstance(config, ParametricSettings) else len(self.points)
+        if self.closed and count < 3:
             raise ValueError("A closed curve needs at least three authored points.")
         if not isinstance(
-            self.engine_settings, (BezierSettings, PolylineSettings, RoutingSettings)
+            self.engine_settings,
+            (BezierSettings, PolylineSettings, RoutingSettings, ParametricSettings),
         ):
             raise ValueError("Curve requires typed path engine settings.")
         validate_matrix(self.matrix)

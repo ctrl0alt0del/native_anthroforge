@@ -20,6 +20,8 @@ def configure(engine: GeometryEngine) -> None:
 
 
 def point(engine: GeometryEngine, curve: Curve, index: int, options: dict[str, Any]) -> CurvePoint:
+    if curve.engine == "PARAMETRIC":
+        return parametric_point(curve, index, options)
     if set(options) - set(FIELDS) - PROTECTION:
         raise ValueError("Unknown curve-point setting.")
     if any(type(options[name]) is not bool for name in options.keys() & PROTECTION):
@@ -31,6 +33,14 @@ def point(engine: GeometryEngine, curve: Curve, index: int, options: dict[str, A
     if not options.keys() & set(FIELDS):
         return updated
     return evaluated_edit(engine, curve, index, updated, options)
+
+
+def parametric_point(curve: Curve, index: int, options: dict[str, Any]) -> CurvePoint:
+    if options.keys() - {"radius", "tilt", *PROTECTION}:
+        raise ValueError(
+            "Parametric point positions and handles are controlled by XYZ expressions."
+        )
+    return replace(curve.points[index], **options)
 
 
 def evaluated_edit(

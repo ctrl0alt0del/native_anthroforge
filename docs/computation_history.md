@@ -1622,3 +1622,20 @@ See the task and development validation records for final gate/package evidence 
   follow overrides and saved Manual intent. Addon fixture parity, remaining lifecycle,
   profiler and desktop policy acceptance are not yet established. No inflation or smoothing
   algorithm, attachment reassignment policy, or 0.2.4 startup evaluator version changed.
+
+### CH-048 — Native Parametric path generation and accepted conversion (2026-10-23)
+
+- The curve engine boundary now accepts typed XYZ definitions and variables. One batched
+  native call uses the existing restricted expression compiler and uniformly samples t;
+  open curves include both limits, closed curves omit the duplicate interval-end sample.
+  Generated points retain stable identities and metadata by index. Formula failures keep
+  accepted output, and ordinary coordinate editing cannot overwrite generated positions.
+- Consumer control deformation operates on accepted generated controls without evaluating
+  equations again. Direct switching retains inactive definitions; Parametric-to-Fiber uses
+  exact accepted samples as independent VECTOR-handle Bezier controls. Binding endpoint
+  intent resolves against the dispatch snapshot when queued resolution changes occur.
+- Formula-owned junctions drive followers, reject contradictory positions and lock resolution.
+  Independent copies remap variable identities. Initial tests cover equations, variables,
+  closure, switching, retained failures, shared bodies, junctions, exact Fiber copies and
+  attachment movement. Broader lifecycle, deformation, GUI, profiler and release checks
+  remain pending; this checkpoint is not a qualified 0.3 release.

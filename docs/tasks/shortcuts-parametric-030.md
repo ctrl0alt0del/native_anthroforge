@@ -82,6 +82,17 @@ Validation stays background-only; no interactive desktop acceptance is implied.
 
 ## Next actions
 
+Parametric checkpoint: XYZ/interval expressions and typed variables now evaluate in a
+single native path call. Uniform sampling, direct engine switching/restoration, generated
+coordinate restrictions, shared primitive consumption, exact independent Fiber copying,
+junction followers/locks and dispatch-time endpoint intent have focused tests. The
+equation/variable inspector is implemented, but its full offscreen interaction remains
+unqualified. The initial capture selected before refreshing and was empty; the corrected
+capture shows the selected curve. Inspect the equations and actual geometry separately.
+The full pre-Parametric suite passed 1,806 tests. Runtime version remains 0.2.4.
+Next: finish placeholders, deformation/lifecycle qualification, policy UI, full property
+catalogue/context exposure, copying/reference handling, profiler and release acceptance.
+
 Attachment-policy checkpoint (2026-10-23): native owner capture/backsolve and coordinated
 temporary edit contexts now work through shared shortcut operations. Six integrated cases
 cover wrapper-only behavior, translation-only owner retention after geometry changes,

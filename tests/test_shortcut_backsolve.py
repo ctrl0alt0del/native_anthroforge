@@ -4,7 +4,7 @@ from dataclasses import replace
 
 import numpy as np
 
-from anthroforge.core.entities import Attachment, SCP
+from anthroforge.core.entities import SCP, Attachment
 from anthroforge.native import attachments, shortcut_attachments
 from tests.conftest import CUBE
 

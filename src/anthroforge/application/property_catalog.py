@@ -62,13 +62,20 @@ def roots(item: Any) -> tuple[str, ...]:
 
 
 def descriptors(item: Any) -> Iterator[numeric.NumericDescriptor]:
+    from .parametric_policy import readonly
     from .property_transforms import descriptors as transforms
 
     yield from transforms(item)
     for name in roots(item):
         if hasattr(item, name):
             for value in walk_field(item.id, item, name, ()):
-                yield replace(value, label=property_label(item, value.reference.path))
+                reason = readonly(item, value.reference.path)
+                yield replace(
+                    value,
+                    label=property_label(item, value.reference.path),
+                    writable=value.writable and not reason,
+                    reason=reason or value.reason,
+                )
 
 
 def property_label(item: Any, path: tuple[str, ...]) -> str:
@@ -95,6 +102,8 @@ def member_label(items: Any, child: Any) -> str:
 
 
 def dimension(owner: Any, name: str) -> str:
+    if type(owner).__name__ == "Variable" and name == "value":
+        return str(owner.dimension)
     return DIMENSIONS.get(type(owner).__name__, {}).get(name, "SCALAR")
 
 
@@ -138,6 +147,8 @@ def annotations(kind: type) -> dict[str, Any]:
 
 
 def numeric_kind(item: Any, name: str) -> str:
+    if type(item).__name__ == "Variable" and name == "value":
+        return str(item.numeric_type)
     annotation = annotations(type(item)).get(name)
     return "INTEGER" if int in (annotation, *get_args(annotation)) else "REAL"
 

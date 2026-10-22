@@ -20,6 +20,7 @@ from . import (
     curve_copy,
     curve_sources,
     dependencies,
+    fiber_capture_intent,
     fiber_defaults,
     fiber_supports,
     surface_providers,
@@ -100,7 +101,7 @@ def capture(session: "Session", spec: "FiberCreation", document: Any, resources:
     item = curve_sources.source(document, spec.source)
     original = accepted(document, resources.paths, spec.source)
     targets = capture_targets(document, spec)
-    indices = {point.id: index for index, point in enumerate(item.points)}
+    indices = {point.id: index for index, point in enumerate(original.authored.points)}
     pins = [indices[row[0]] for row in spec.bindings]
     parents = [targets.index(row[1]) if row[1] is not None else -1 for row in spec.bindings]
     world = curve_sources.world(session.engine, document, item.id)
@@ -111,6 +112,7 @@ def capture(session: "Session", spec: "FiberCreation", document: Any, resources:
 
 def compute(session: "Session", spec: "FiberCreation", payload: Any, cancel: Any) -> Any:
     document, resources = payload
+    spec = fiber_capture_intent.resolve(document, resources, spec)
     item, original, targets, request = capture(session, spec, document, resources)
     spec = fiber_defaults.resolve(session.engine, spec, document, resources, request, cancel.handle)
     request = replace(request, parents=[targets.index(row[1]) for row in spec.bindings])
@@ -125,6 +127,10 @@ def compute(session: "Session", spec: "FiberCreation", payload: Any, cancel: Any
 
 def independent_curve(item: Curve, accepted: Curve, spec: "FiberCreation") -> Curve:
     current = replace(item, points=accepted.points)
+    if accepted.engine == "PARAMETRIC":
+        from .parametric_operations import authored_copy
+
+        current = authored_copy(current)
     copied = curve_copy.clone(current, spec.identities)
     return Curve(**{field.name: getattr(copied, field.name) for field in fields(Curve)})
 

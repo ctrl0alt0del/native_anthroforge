@@ -43,6 +43,7 @@ ColumnLayout {
         UiNotice { active: panel.visible; text: panel.item.result?.pending?.length>0 ? "Using accepted support · upstream changes pending" : "" }
         UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.item.id]}) }
     }
+    ParametricInspector { curve: panel.curve; visible: panel.item.standalone && panel.curve.engine === "PARAMETRIC"; topologyLocked: panel.topologyLocked }
     UiSection {
         title: "Curves"; visible: panel.item.editing && panel.curves.length > 0
         UiCombo { id: curveChoice; objectName: "curveChoice"; Layout.fillWidth: true; model: panel.curves; textRole: "name" }
@@ -76,6 +77,7 @@ ColumnLayout {
         NumericSetting { visible: panel.curve.engine === "BEZIER"; label: "Curve evaluation resolution"; value: panel.curve.resolution || 24; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.curveSetting("resolution",Math.round(value)) }
         CurveEngine { objectName: "primitiveEngine"; visible: !panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
         RoutingSettings { curve: panel.curve; topologyLocked: panel.topologyLocked }
+        ParametricInspector { curve: panel.curve; visible: !panel.item.standalone && panel.curve.engine === "PARAMETRIC"; topologyLocked: panel.topologyLocked }
         FiberCreation { visible: !panel.item.standalone; curve: panel.curve }
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Override sampling range"; checked: panel.curve.start !== null && panel.curve.start !== undefined; onClicked: { panel.curveSetting("start",checked?0:null); panel.curveSetting("span",checked?1:null); } }
         NumericSetting { visible: panel.primitive.kind === "LOFT" && panel.curve.start !== null; label: "Curve start"; value: panel.curve.start || 0; onEdited: value => panel.curveSetting("start",value) }
@@ -84,7 +86,7 @@ ColumnLayout {
         FiberBinding { curve: panel.curve; point: panel.point }
         CurveJunction { curve: panel.curve; point: panel.point }
         UiCombo { id: pointChoice; objectName: "pointChoice"; Layout.fillWidth: true; model: panel.points.map((p,i)=>"Point "+(i+1)); onActivated: { const rows=authoring.componentRows.filter(r=>r.point===panel.point.id && r.part==="position"); if(rows.length) authoring.selectComponent(rows[0].key,false); } }
-        VectorSetting { length: true; label: "Point position"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
+        VectorSetting { enabled: panel.curve.engine !== "PARAMETRIC"; length: true; label: "Point position"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
         Repeater {
             model: ["left","right"]
             ColumnLayout {
@@ -100,6 +102,7 @@ ColumnLayout {
         UiCheck { objectName: "pointStackingFixed"; text: "Keep fixed during stacking"; checked: panel.point.stacking_fixed || false; hint: "Retain this material location in surfaces built from this curve"; onClicked: panel.pointSetting("stacking_fixed",checked) }
         UiCheck { objectName: "pointProtectedCrease"; text: "Protect crease"; checked: panel.point.protected_crease || false; hint: "Retain this structural point during tissue stacking"; onClicked: panel.pointSetting("protected_crease",checked) }
         RowLayout {
+            enabled: panel.curve.engine !== "PARAMETRIC"
             UiButton { text: "Insert point"; onClicked: { const p=(panel.point.position || [0,0,0]).slice(); p[0]+=.1; authoring.edit("point.insert",{entity:panel.item.id,curve:panel.curve.id,index:pointChoice.currentIndex+1,point:{position:p}}); } }
             UiButton { text: "Remove point"; enabled: panel.points.length>(panel.curve.closed?3:2); onClicked: authoring.edit("point.remove",{entity:panel.item.id,curve:panel.curve.id,point:panel.point.id}) }
         }

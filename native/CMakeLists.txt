@@ -39,7 +39,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
 
 target_sources(af_native PRIVATE src/expression_lexer.cpp src/expression_types.cpp
     src/expression_parser.cpp src/expression_values.cpp src/expression_evaluation.cpp src/expression_api.cpp
-    src/shortcut_attachments.cpp)
+    src/shortcut_attachments.cpp src/parametric.cpp)
 
 add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_cubic_refit.c

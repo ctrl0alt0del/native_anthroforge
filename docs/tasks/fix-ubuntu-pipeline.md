@@ -3,7 +3,7 @@
 - Task branch: `codex/fix-ubuntu-pipeline`
 - Integration branch: `main`
 - Starting revision: `c74b28085c31f894f6ce343265d999da526a6feb`
-- Status: Ubuntu validated; final Windows CI pending
+- Status: implementation and validation complete; ready for integration
 - Last updated: 2026-10-22 UTC
 - Active writer: Codex Cloud, Ubuntu pipeline repair
 
@@ -58,11 +58,12 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
 
 ## Current state
 
-Ubuntu CI passes at `127b3a8`, including setup and repeatable refresh. The complete
-local gate passes at `70f4e62`. The latest follow-up adds only an MSVC diagnostic
-allowance around imported stacking code; final Windows CI and integration remain.
-All implementation increments are on the task branch. No schema, solver tolerance,
-GUI feature or package version changes are included.
+Both Ubuntu and Windows CI pass at `c4edc98`, with all 1722 tests on each platform.
+Ubuntu also passes native style checks, setup and repeatable refresh. The complete
+local gate passed at `70f4e62`, followed by a native rebuild and targeted checks
+after the MSVC-only diagnostic allowance. All implementation increments are on
+the task branch, ready for a normal merge into the unchanged `main` at `c74b280`.
+No schema, solver tolerance, GUI feature or package version changes are included.
 
 ## Verification
 
@@ -97,15 +98,22 @@ GUI feature or package version changes are included.
 - `bash tools/cloud/refresh.sh`, fresh-shell doctor and Ninja `-k 0`: passed.
 - Ubuntu [run 39867241612](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39867241612)
   passed at `127b3a8`. Follow-up [run 39867569502](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39867569502)
-  tests `70f4e62`; Windows completed all compilation and found only the donor
+  also passed Ubuntu at `70f4e62`; Windows completed all compilation and found only the donor
   Eigen triplet conversion warning addressed by the latest scoped allowance.
+- After the final MSVC-only allowance, the native rebuild, all five CTests and
+  29 stacking/provenance tests passed locally at `c4edc98`.
+- Final [run 39868831213](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39868831213)
+  passed on Ubuntu and Windows at `c4edc98`. Each platform passed all 1722 tests,
+  five CTests, Ruff/mypy, the headless workshop and wheel/source builds. Ubuntu
+  also passed native style checks, setup and repeatable refresh.
 - Windows interactive GUI and portable executable qualification were not run;
   this task concerns compiler/check compatibility, not GUI behavior or release packaging.
 
 ## Next actions and blockers
 
-1. Verify final Ubuntu/Windows CI after the MSVC-only diagnostic correction.
-2. Reconcile latest main, integrate the validated repair, and verify remote ancestry.
+Implementation and required checks are complete. Merge the task branch normally
+into `main`, push it, and verify the remote tip contains the validated repair.
+No blockers remain; Git ancestry records integration after the merge.
 
 ## Recovery inputs
 

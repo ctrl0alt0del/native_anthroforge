@@ -48,6 +48,8 @@ to Integer preserves its value. Existing Qt command transport already accepts in
 QML numbers and rejects fractions for integer fields; regression evidence corrected the
 initial transport hypothesis. Mixed CP1252/UTF-8 bytes in Shortcuts.qml are normalized
 to valid UTF-8. Runtime/schema and numerical evaluation contracts are unchanged.
+The [development walkthrough](../shortcuts_030.md) documents current command signatures
+and links the runnable `examples/shortcuts_parametric.json` circle/driver example.
 
 ## Verification
 
@@ -68,8 +70,11 @@ to valid UTF-8. Runtime/schema and numerical evaluation contracts are unchanged.
   `tools/shortcuts_editor_acceptance.py` loads production QML and property projections
   offscreen, exercises mm/degrees edits, Parametric variable type changes and locked
   generated-point count fields, and reports no QML warnings. Both editor/list captures
-  are generated under ignored `build/shortcuts-editor-review/`; editor capture inspected.
+  are generated under ignored `build/shortcuts-editor-review/`; both captures inspected.
   This software-rendered harness excludes the native viewport and full Main window.
+- The headless example completed all 15 operations. Its radius changed from 0.03 to
+  0.05 metres, the formula reached `ready`, and the saved project reopened with the
+  accepted 64-point closed path and no Qt imports. Log: `build/core/cloud-030-example.jsonl`.
 
 ## Next actions and blockers
 

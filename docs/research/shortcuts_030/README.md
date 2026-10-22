@@ -1,6 +1,8 @@
 # Evidence and reproduction
 
-- [Findings and proposed boundaries](../../shortcuts_030_research.md)
+- [Findings and historical proposals](../../shortcuts_030_research.md)
+- [Confirmed 0.3 specification](../../specification_030.md)
+- [Implementation plan](../../implementation_030.md) — confirmed, not implemented
 - [All shortcuts and exact driver formulas](inventory.md)
 - [Machine-readable inventory](inventory.json)
 

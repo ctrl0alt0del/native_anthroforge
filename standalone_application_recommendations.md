@@ -1,11 +1,20 @@
 # AnthroForge standalone application: consolidated recommendations
 
-Updated: 2026-10-20
+Updated: 2026-10-22
+
+The [0.3 specification](docs/specification_030.md) and
+[implementation plan](docs/implementation_030.md) are **confirmed, not implemented**.
+They define separate property/shortcut wrappers, inferred driving-shortcut ownership,
+addon attachment-edit policies and the Parametric engine. Planned schema 5 must read
+existing 0.2.4/schema-4 projects without changing accepted geometry or attachments.
+The released app remains 0.2.4/schema 4; historical compatibility rules below describe
+their own releases. Blender shortcut/project migration remains a separate task.
 
 The [confirmed 0.2.0 specification](docs/specification_020.md) is authoritative for
 curves, fibers, surfaces, reference images and object relationships.
-Current schema 4 compatibility is defined by 0.2.2 below. It replaces the earlier Free/Controlled classification with curve
-engines, requires independent curve-to-fiber copies, and includes all these features
+Released schema 4 compatibility is defined by 0.2.2 below. The 0.2.0 contract replaces
+the earlier Free/Controlled classification with curve engines, requires independent
+curve-to-fiber copies, and includes all these features
 in 0.2.0. [0.2.1 defines curve-workflow improvements](docs/specification_021.md);
 The [0.2.2 specification](docs/specification_022.md) now defines unified TissueVCP,
 Anchor/Fiber/Membrane sources and surface-only stacking, with

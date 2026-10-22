@@ -1,5 +1,15 @@
 # AnthroForge release roadmap
 
+- **0.3 / 0.3.0 — confirmed, not implemented:** numerical-property shortcut wrappers,
+  explicit controls, driving formulas with inferred ownership and addon attachment-edit
+  policies, and the Parametric curve engine. [Contract](specification_030.md),
+  [implementation plan](implementation_030.md). Planned schema 5 includes a reader for
+  existing 0.2.4/schema-4 projects; source Blender shortcut migration is separate.
+
+- **0.2.4 — qualified baseline:** VCP preparation, collision/stacking reuse and height
+  smoothing performance work, preserving geometry/attachments and schema 4.
+  [Measurements and validation](performance_024.md).
+
 - **0.2.3 — qualified:** Preferences and per-job Custom/sparse PIQP
   ROUTED choice, future calculations only. [Contract](specification_023.md),
   [delivery evidence](tasks/preferences-routing-023.md). Schema 4 remains unchanged.

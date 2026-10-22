@@ -18,7 +18,7 @@ def test_creating_support_before_next_fibers_settles_without_rebuilding_sources(
     bone = session.command("import", path=str(CUBE), units=1.0)["entity_id"]
     session.wait(10)
     first = layer(session, surface(session, [fiber(session, bone, y, 0.7) for y in (0.3, -0.3)]))
-    sources = [fiber(session, bone, y, 0.71) for y in (0.3, -0.3)]
+    sources = [fiber(session, first, y, 0.71) for y in (0.3, -0.3)]
     assert any(s.reference.target == first for s in session.document.object(sources[0]).supports)
     before = [session.document.object(key).result.asset for key in sources]
     membrane = surface(session, sources, strips=6)

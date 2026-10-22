@@ -32,10 +32,21 @@ def submit(session: Any, target: str, phase: str, interactive: bool) -> str:
     job.retry = partial(request, session, target, phase)
     job.cleanup = partial(completed, session, target, phase, job)
     job.workload = partial(workload, session, target, phase)
-    observations = partial(tissue_stack_observation.ports, target=target, phase=phase)
-    dep.renewable_contract(job, session.document, {Port(target, phase)}, observations)
+    configure_inputs(job, session.document, target, phase)
     job.restart_on_input_change = True
     return str(session.scheduler.submit(job))
+
+
+def configure_inputs(job: Job, document: Any, target: str, phase: str) -> None:
+    outputs = {Port(target, phase)}
+    observations = partial(tissue_stack_observation.ports, target=target, phase=phase)
+    if phase != "final":
+        dep.renewable_contract(job, document, outputs, observations)
+        return
+    # A new stack plan may require a group evaluator with different output reservations.
+    dep.contract(job, document, outputs)
+    job.observes |= frozenset(observations(document))
+    job.reads |= frozenset(port.owner for port in job.observes)
 
 
 def make_job(session: Any, target: str, phase: str) -> Job:

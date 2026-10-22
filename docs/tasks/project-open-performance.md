@@ -54,6 +54,15 @@ window/input was used. GPU readback timings do not establish interactive frame r
 Canonical 0.2.3 rebuild, portable qualification, final save/reopen timings and source
 archive refresh remain pending. Original project files remain untouched.
 
+Final source trials: original opening 16.247 s; save/fresh reopen 9.436 s, including
+0.775 s startup synchronization and no document revision change. All 1,456 arrays are
+bit-for-bit identical to baseline. Recorder-on opening takes 26.327 s. Evidence:
+`diagnostics/open-optimization-20261022/final/` beside the baseline directory.
+Final pytest passed 1,686 tests. Ownership review then identified that queued tissue-final
+jobs must retain restart contracts because plans can change the required group/output
+reservations; a new failing regression now passes with static final contracts. This
+narrow correction requires the final package rebuild and final Python checks below.
+
 Measured first increment: 12.55 s versus 148.95 s, with the same 956 successful jobs
 and 2,968 obsolete jobs. With request coalescing, obsolete jobs fall to 34 (956 successful);
 instrumented total 15.21 s, including a slower read. Contract renewal initially added

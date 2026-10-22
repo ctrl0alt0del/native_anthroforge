@@ -835,5 +835,7 @@ Fixed-output calculations may opt into renewable pending contracts: uncaptured r
 coalesce under one coordinator identity/deadline, with dependency-index renewal before
 dispatch. Captured jobs retain safe cancellation and publication read validation. Explicit
 cancel, undo, attachment recapture and payload-owning operations keep their existing rules.
+Final tissue jobs also retain restart contracts: a changed stack plan can switch from
+one output to a coupled group, which requires selecting a new evaluator and reservations.
 Desktop command-line project opening uses the same background read/adoption path as File
 Open; the window no longer waits for startup computations before it can be created.

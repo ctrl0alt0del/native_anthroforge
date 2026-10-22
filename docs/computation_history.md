@@ -1385,7 +1385,12 @@ See the task and development validation records for final gate/package evidence 
   of obsolete records. Fixed-output evaluators now explicitly declare renewable input
   contracts. Their pending requests share a job/deadline and refresh dependency indexes
   before admission. Once inputs are captured, cancellation/read checks are unchanged.
-  Attachment recapture and payload-owning operations do not opt in. Observation sets
+  Attachment recapture, payload-owning operations and final tissue jobs do not opt in.
+  A changed stack plan may require a coupled evaluator with different reservations;
+  ownership review found that renewing a single final job could bypass this selection.
+  A failing queued-final regression established the loss of restart behavior; restoring
+  its original static contract passes the regression and preserves group selection.
+  Observation sets
   and dependency graphs form the contract cache key; no input values are cached.
 - Focused tests cover exact reopen, tiny parent motion, undo, missing receipts,
   explicit recapture, changed geometry/settings, parent failure, pending input changes,

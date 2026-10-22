@@ -2,9 +2,9 @@
 
 from threading import Event
 
-from anthroforge.application import tissue_group_evaluation, tissue_group_tasks
+from anthroforge.application import tissue_group_evaluation, tissue_group_tasks, tissue_tasks
 from tests.test_tissue_stack_groups import envelopes
-from tests.test_tissue_stack_workflow import current
+from tests.test_tissue_stack_workflow import assembly, current
 
 
 def pause_group(monkeypatch):
@@ -53,4 +53,18 @@ def verify_navigation(session, first, second):
     session.command("redo")
     session.wait(30)
     assert abs(current(session, first)[:, 2].min() - low) < 1e-8
+    current(session, second)
+
+
+def test_pending_single_final_restarts_when_planning_can_change_its_group(session):
+    _, first, second = assembly(session)
+    session.scheduler.can_publish = lambda job: False
+    key = tissue_tasks.request(session, first, "final")
+    pending = session.scheduler.registry.by_id[key]
+    assert pending.future is None
+    session.command("tissue.inflation", target=first, changes=dict(amount=0.04))
+    assert pending.obsolete
+    session.scheduler.can_publish = session.can_publish
+    session.wait(30)
+    current(session, first)
     current(session, second)

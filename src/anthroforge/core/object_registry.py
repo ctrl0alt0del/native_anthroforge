@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from . import snapshot_definitions
+from . import registry_validation
 from .construction import Control, Curve
 from .curve_dependencies import targets as curve_targets
 from .deformer_references import sources as deformer_sources
@@ -88,7 +88,7 @@ def validated_records(
     if (
         previous
         and document.junctions == previous.junctions
-        and snapshot_definitions.records_match(items, previous.records)
+        and registry_validation.reusable(records, previous.records)
     ):
         return records, previous.consumers
     validate(document, records)

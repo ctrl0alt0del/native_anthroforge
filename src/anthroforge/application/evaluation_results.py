@@ -16,10 +16,11 @@ def matches(source: Document, result: EvaluationResult) -> bool:
 
 
 def accepted_result(source: Document, item: Any, inputs: set[Port], key: str) -> EvaluationResult:
+    owners = {port.owner for port in inputs}
     pending = tuple(
         e.id
         for e in (*source.entities, *source.objects)
-        if any(p.owner == e.id for p in inputs) and e.id != item.id and e.result.status == "pending"
+        if e.id in owners and e.id != item.id and e.result.status == "pending"
     )
     return EvaluationResult(
         key,

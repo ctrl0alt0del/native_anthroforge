@@ -1424,3 +1424,24 @@ See the task and development validation records for final gate/package evidence 
 - Local evidence: `build/vcp-performance-024-release/step1/`, including two profiler
   captures, viewport images, trial load observations and timings. Full release checks
   remain pending; offscreen evidence is not interactive acceptance.
+
+### CH-040 — Result metadata and recording-only resource observation (2026-10-22)
+
+- Pending provenance now indexes the declared owner set once, retaining document order,
+  all revision inputs and self exclusion. Known local TissueVCP strategy changes reuse
+  validated relationships, but still run tissue capability validation against current
+  sources. Other records, new fields, source/constraint/relationship changes invalidate
+  reuse. Dataclass field discovery is bounded and cached by type.
+- Profiler job capture records weak resource-catalogue groups instead of repeatedly
+  expanding shared catalogues. Inventory expands live groups at observation boundaries;
+  duplicate references no longer exhaust unique-resource limits. Group/job/native limits
+  and real truncation remain explicit. No observation is added when recording is off.
+- 26 metadata/publication/profiler/architecture tests pass; typing/style pass. Recorded
+  ribs-edit resource observation falls from 2,110.9 to 34.7 ms across the same 1,230
+  boundary calls, with zero losses versus 360 reference-limit losses. Recorded total
+  falls from 7.497 to 4.654 s; three recorder-off trials take 4.234/4.324/4.208 s versus
+  4.539/4.570/4.617 s. Single-profile settling remains about 1.02 s, dominated by
+  advisory collision queries. Fiber results show no established improvement yet.
+- Evidence: `build/vcp-performance-024-release/step2/`; baseline native geometry replay
+  frozen in `baseline-replay/` before numerical changes (11 snapshots, 1,456 arrays each).
+  Original fixtures remain untouched. Full combined release checks remain pending.

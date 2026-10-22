@@ -6,7 +6,8 @@ Stack plans are included because their providers change dependency edges.
 """
 
 from dataclasses import fields
-from typing import Any
+from functools import lru_cache
+from typing import Any, cast
 
 EVALUATED = frozenset(
     {
@@ -41,6 +42,7 @@ EVALUATED = frozenset(
 )
 
 
+@lru_cache(maxsize=128)
 def definition_fields(kind: type[Any]) -> tuple[str, ...]:
     return tuple(field.name for field in fields(kind) if field.name not in EVALUATED)
 
@@ -49,7 +51,8 @@ def same(before: Any, after: Any) -> bool:
     if before is after:
         return True
     return type(before) is type(after) and all(
-        getattr(before, name) == getattr(after, name) for name in definition_fields(type(after))
+        getattr(before, name) == getattr(after, name)
+        for name in definition_fields(cast(Any, type(after)))
     )
 
 

@@ -1,10 +1,12 @@
 """Recording-only observation of weak resource references and owner-thread snapshots."""
 
 from collections import defaultdict
+from functools import partial
 from threading import RLock, local
 from time import perf_counter_ns
 from weakref import WeakKeyDictionary, WeakSet
 
+from .resource_groups import ResourceGroups
 from .resource_inventory import inventory, payload_resources, session_owners
 
 
@@ -16,6 +18,7 @@ class Resources:
         self.lock = RLock()
         self.reference_cost_ns = 0
         self.observing = False
+        self.groups = ResourceGroups(profiler)
 
     def start(self):
         self.reset(True)
@@ -42,6 +45,7 @@ class Resources:
         with self.lock:
             self.observing = observing
             self.jobs.clear()
+            self.groups.clear()
 
     def created(self, mesh):
         job = getattr(self.local, "job", "")
@@ -64,6 +68,8 @@ class Resources:
         owned = self.jobs.setdefault(job, WeakSet())
         count = sum(len(value) for value in self.jobs.values())
         for mesh in meshes:
+            if mesh in owned:
+                continue
             if count >= 4096:
                 self.profiler.losses["resource_reference_limit"] += 1
                 break
@@ -73,6 +79,7 @@ class Resources:
     def release(self, job):
         with self.lock:
             self.jobs.pop(job, None)
+            self.groups.release(job)
 
     def call(self, job, stage, function):
         previous, self.local.job = getattr(self.local, "job", ""), job.id
@@ -87,7 +94,13 @@ class Resources:
             self.local.job = previous
 
     def observe_payload(self, job, value):
-        self.remember(job, payload_resources(value, self.profiler))
+        group = partial(self.remember_group, job)
+        self.remember(job, payload_resources(value, self.profiler, group))
+
+    def remember_group(self, job, value):
+        with self.lock:
+            if self.observing:
+                self.groups.remember(job, value)
 
     def cache(self, action, cache="body_base", **metadata):
         self.profiler.event(
@@ -100,6 +113,7 @@ class Resources:
             session_owners(session, result, self.profiler)
         with self.lock:
             result["jobs"].update(mesh for values in self.jobs.values() for mesh in values)
+            self.groups.collect(result["jobs"])
         for reference in self.views.values():
             view = reference()
             if view is not None:

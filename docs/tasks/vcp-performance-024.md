@@ -41,8 +41,7 @@ versus 632–650 ms; hidden repeated-edit settling 1.21 s versus 3.56–3.66 s.
 Step 2 implemented and measured (CH-040): 26 focused checks pass; recorded ribs
 4.65 s versus 7.50 s, off 4.21–4.32 s versus 4.54–4.62 s. No profiler resource loss.
 Step 3 implemented (CH-041): native context reuses colliders and pair evidence,
-30 focused checks plus failed-capture recovery; profile-edit settle 221–324 ms.
-Ribs timing needs counterbalanced recheck; do not claim its improvement.
+30 focused checks plus failed-capture recovery. Combined timings below supersede early trials.
 Step 4 implemented (CH-042): exclusive pooled contexts, native obstacle handles,
 metadata plans; existing 63 tests and new ownership/parity checks pass. Warm unchanged
 plan ~1–2 ms and final ~5–6 ms; changed-input benefits still need measurement.
@@ -54,9 +53,14 @@ internal draft envelope sides. Exact changed-settings parity; median profile 30.
 Distributed 67.0→39.9 ms. Focused checks pass. All 11 combined assembly replay snapshots
 (1,456 arrays each) match baseline exactly; bone/Fiber motion and undo included.
 Changed-provider/receiver stacking matches fresh sessions. Preparation clears cannot
-retain a capture from a discarded document. Full development gate running at
-build/vcp-performance-024-release/development-gate.log. Next: serial baseline/candidate
-timings, profiler and hidden viewport, release package. Do not benchmark during builds.
+retain a capture from a discarded document. Full development gate passed 1,722 tests,
+five CTests, typing/style and numerical checks. Final pytest rerun includes three new
+checks. Alternating whole-app medians old/new: profile 1.36/0.36 s, burst 1.58/0.41 s,
+Fiber 2.08/1.36 s, Ribs 6.45/4.70 s. Four headless reports complete with no losses.
+Hidden viewport: 43–48 ms dispatch, 0.96–1.09 s settle off; no QML warnings, images
+inspected. Remaining frame stalls are documented in docs/performance_024.md.
+Version bumped to 0.2.4; next: canonical package build, offscreen portable checks,
+final evidence/docs/archive, validated merge/push. Do not benchmark during builds.
 Preserve baseline native DLL
 at build/vcp-performance-024-release/baseline-af_native.dll; baseline-replay/ now freezes 11 snapshots of 1,456 arrays before
 numerical changes. Remaining steps and release qualification are pending.

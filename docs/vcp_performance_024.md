@@ -1,5 +1,8 @@
 # VCP performance analysis for 0.2.4
 
+This document preserves the pre-implementation investigation. The implemented changes
+and subsequent qualification are recorded in [0.2.4 performance](performance_024.md).
+
 Analysis date: 2026-10-22. Production baseline: `ae9eaab52f8ebc96488a53a57cbe06255bb8aca3`,
 application 0.2.3, Python 3.12.12, Windows 11, 24 logical CPUs. This is an investigation
 and proposed optimization scope, **not an implemented 0.2.4 release**. No production

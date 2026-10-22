@@ -1,4 +1,9 @@
-# AnthroForge 0.2.3
+# AnthroForge 0.2.4
+
+0.2.4 improves tissue editing and evaluation performance: prepared inspection UI,
+incremental collision checks, retained stacking preparation, a smaller height-smoothing
+QP, and reusable native tissue frames/operators. Geometry, attachments and schema 4
+remain unchanged. See [measurements and validation](docs/performance_024.md).
 
 **Edit → Preferences… → ROUTED solver** selects Custom (default) or sparse PIQP for
 curves and Fibers. The choice saves automatically across projects and launches. It
@@ -29,7 +34,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.2.3/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.2.4/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included

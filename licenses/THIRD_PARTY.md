@@ -1,5 +1,11 @@
 # Runtime and source notices
 
+Release 0.2.4 adds AnthroForge-authored bounded preparation/cache adapters and a
+fixed-variable/box-bound height formulation around the existing PIQP solver.
+Pinned Blender/addon numerical sources and third-party versions remain unchanged;
+their original attribution and hashes remain applicable. The new GPL-3.0-or-later
+adapters are included in the 0.2.4 companion source archive.
+
 AnthroForge authored sources are GPL-3.0-or-later; see LICENSE. The Blender attachment
 kernel is preserved in native/migration/attachment_wave_reference.hpp. Its origin and
 qualification are recorded in docs/development_status.md. No Blender executable is

@@ -1,4 +1,10 @@
-# Local authoring API, 0.2.3
+# Local authoring API, 0.2.4
+
+0.2.4 preserves application operations and schema 4. Existing profile reports now
+include `tissue_preparations`, `collision_pairs` and `stacking_sessions` resource
+categories and cache events. Stacking storage is a conservative upper bound because
+the pinned solver owns an opaque cache. Preparation uses accepted geometry; no
+authoring command changes are needed. See [performance qualification](performance_024.md).
 
 The [0.2.2 tissue contract](specification_022.md) uses the same catalogue as existing
 construction operations. Ownership and acceptance are in the

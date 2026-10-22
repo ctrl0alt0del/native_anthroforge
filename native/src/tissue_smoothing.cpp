@@ -43,7 +43,7 @@ static std::shared_ptr<Mesh> smooth(const Mesh& base,const Mesh& own,const doubl
         vertices=smooth_part(base,vertices,faces,labels,part,s+1,report);
         check_cancel(cancel);
     }
-    auto result=deform_mesh(own,vertices,cancel,true);
+    auto result=deform_mesh(own,vertices,cancel,own.prepared);
     quality::validate_tissue(own,*result,cancel);
     return result;
 }

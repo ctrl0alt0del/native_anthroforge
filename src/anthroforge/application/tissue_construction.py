@@ -43,7 +43,7 @@ def muscle(mesh: Mesh, item: Any, cancel: int) -> TissueOutput:
 def muscle_side(
     mesh: Mesh, parts: Any, side: str, reverse: bool, envelope: bool, cancel: int
 ) -> Any:
-    own = tissue_parts.evaluate(mesh, parts, side, reverse, cancel, envelope)
+    own = tissue_parts.evaluate(mesh, parts, side, reverse, cancel, envelope, complete=not envelope)
     return tissue_smoothing.evaluate(mesh, own, parts, side, cancel)
 
 

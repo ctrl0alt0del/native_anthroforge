@@ -46,6 +46,11 @@ AF_API uint64_t af_tissue_relax(uint64_t rest,const AfTissueSource* source,const
 AF_API uint64_t af_tissue_inflate_grid(uint64_t source,const AfTissueInflation* settings,
     int count,uint64_t cancel);
 AF_API uint64_t af_tissue_inflate_parts(uint64_t source,const AfTissueInflation* settings,int count,const double* connectors,int envelope,uint64_t cancel);
+// Immutable accepted-base preparation; concurrent calls own independent solver state.
+AF_API uint64_t af_tissue_preparation_create(uint64_t source,const AfTissueInflation* settings,int count,uint64_t cancel);
+AF_API void af_tissue_preparation_release(uint64_t handle);
+AF_API uint64_t af_tissue_preparation_bytes(uint64_t handle,int retained);
+AF_API uint64_t af_tissue_inflate_prepared(uint64_t handle,const AfTissueInflation* settings,int count,const double* connectors,int envelope,uint64_t cancel,int complete);
 AF_API uint64_t af_tissue_envelope(uint64_t first,uint64_t second,int reverse,uint64_t cancel);
 AF_API int af_tissue_profile_reset(double depth,double* profile);
 AF_API int af_tissue_profile_scale(const double* depths,double factor,double* output);

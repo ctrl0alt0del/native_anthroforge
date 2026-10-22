@@ -1515,3 +1515,30 @@ See the task and development validation records for final gate/package evidence 
   `kernel-baseline/`, `kernel-reduced/`. Solver state reuse was not needed for this
   gain; no claim is made for warm-start or symbolic caching in height smoothing.
 - References: [PIQP variable bounds](https://predict-epfl.github.io/piqp/interfaces/python/getting_started).
+
+### CH-044 — Immutable tissue preparation and internal envelope drafts (2026-10-22)
+
+- Inflation repeatedly reconstructed material vectors/frames, Section Profile's
+  longitudinal coefficients, and Distributed mass/cotangent matrices. Engine-owned
+  immutable preparation now retains the geometry-dependent data by accepted native
+  base identity and relevant mode/direction. A 64 MiB/64-entry LRU charges source
+  retention as well as owned buffers; jobs keep leases through eviction/clearing.
+  Profiler inventories count preparation buffers separately from their source meshes.
+- Longitudinal coefficients are computed once per column. Ordinary unbranched
+  inflation skips unused exterior-boundary assembly. Distributed solves retain the
+  same operators/formula but refactor for every changed distance; no stale numerical
+  factorization is reused. Concurrent calls have independent solver state.
+- Internal two-sided envelope inputs use existing draft meshes and preserve that
+  capability through smoothing. The composed accepted result is still fully prepared.
+  Single-side results and all publicly accepted stages remain display/query ready;
+  no general lazy-mesh framework or changes to attachment availability were introduced.
+- On the same 13,845-vertex base, serial old/new/new/old changed-settings trials show
+  exact vertices and triangles. Median original/candidate native durations: Section
+  Profile 30.3/23.0 ms; Distributed 67.0/39.9 ms; Control Point 24.0/19.8 ms. Background
+  load is uncontrolled; ranges and per-trial load are in local
+  `build/vcp-performance-024-release/preparation-comparison.json`. These are kernel
+  measurements, not whole-app latency. Full combined qualification remains pending.
+- Focused parity/lifecycle checks cover branches, all inflation modes, source changes,
+  cancellation, concurrent reads, cache limits, incompatible-context rejection, and
+  exact composed draft/full equivalence. Modified native clang-tidy and typing pass.
+- Reference: [libigl preparation and solve](https://libigl.github.io/tutorial/).

@@ -48,6 +48,12 @@ metadata plans; existing 63 tests and new ownership/parity checks pass. Warm unc
 plan ~1–2 ms and final ~5–6 ms; changed-input benefits still need measurement.
 Step 5 qualified (CH-043): reduced fixed-variable/box formulation is 1.56–1.60 s
 versus 1.77–1.82 s in alternating trials; original certification remains, max delta
-3.94e-13 m, 24 focused checks pass. Next: step 6 measured native preparation. Preserve baseline native DLL
+3.94e-13 m, 24 focused checks pass.
+Step 6 implemented (CH-044): immutable frames/operators, per-column coefficients and
+internal draft envelope sides. Exact changed-settings parity; median profile 30.3→23.0 ms,
+Distributed 67.0→39.9 ms. Focused checks pass. Full development gate running at
+build/vcp-performance-024-release/development-gate.log. Next: combined assembly replay,
+serial baseline/candidate timings, profiler and hidden viewport, release package.
+Preserve baseline native DLL
 at build/vcp-performance-024-release/baseline-af_native.dll; baseline-replay/ now freezes 11 snapshots of 1,456 arrays before
 numerical changes. Remaining steps and release qualification are pending.

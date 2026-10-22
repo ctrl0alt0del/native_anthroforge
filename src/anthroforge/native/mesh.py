@@ -14,6 +14,7 @@ from .resource_cache import ResourceCache
 if TYPE_CHECKING:
     from .routing_scene import RoutingScene
     from .surface_queries import Query
+    from .tissue_preparation import Preparation
     from .tissue_stacking import MaterialLease
 
 D = c.POINTER(c.c_double)
@@ -47,6 +48,9 @@ class GeometryEngine(NativeEngine):
             64 * 1024 * 1024, 64, "tissue_material"
         )
         self._query_caches()
+        self.tissue_preparations: ResourceCache[Preparation] = ResourceCache(
+            64 * 1024 * 1024, 64, "tissue_preparation"
+        )
 
     def _query_caches(self) -> None:
         self.stack_sessions: ResourceCache[Any] = ResourceCache(
@@ -71,6 +75,7 @@ class GeometryEngine(NativeEngine):
             self.paint_surfaces,
             self.collision_checks,
             self.stack_sessions,
+            self.tissue_preparations,
         )
 
     def clear_caches(self) -> None:

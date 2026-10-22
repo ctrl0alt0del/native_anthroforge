@@ -14,6 +14,7 @@ from anthroforge.native.path_collisions import CollisionCache
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
 from anthroforge.native.stacking import StackSession
+from anthroforge.native.tissue_preparation import Preparation
 from anthroforge.native.tissue_stacking import MaterialLease
 
 LIMITATIONS = [
@@ -55,6 +56,7 @@ RESOURCE_TYPES = (
     Comparison,
     CollisionCache,
     StackSession,
+    Preparation,
 )
 
 

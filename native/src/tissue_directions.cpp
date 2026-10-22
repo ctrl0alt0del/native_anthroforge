@@ -24,20 +24,26 @@ static Vertices unit_normals(const Mesh& mesh,uint64_t cancel) {
     for(int i=0;i<normals.rows();++i) normals.row(i).normalize();
     return normals;
 }
-static Vertices diffuse(const Mesh& mesh,const Vertices& normals,double distance,uint64_t cancel) {
-    Sparse stiffness,mass;
-    igl::cotmatrix(mesh.vertices,mesh.triangles,stiffness);
-    igl::massmatrix(mesh.vertices,mesh.triangles,igl::MASSMATRIX_TYPE_BARYCENTRIC,mass);
+DirectionOperators prepare_directions(const Mesh& source,const MaterialGrid& grid,uint64_t cancel) {
+    const auto mesh=direction_domain(source,grid,cancel); DirectionOperators out;
+    out.normals=unit_normals(*mesh,cancel);
+    igl::cotmatrix(mesh->vertices,mesh->triangles,out.stiffness);
+    igl::massmatrix(mesh->vertices,mesh->triangles,igl::MASSMATRIX_TYPE_BARYCENTRIC,out.mass);
+    check_cancel(cancel); return out;
+}
+static Vertices diffuse(const DirectionOperators& data,double distance,uint64_t cancel) {
     check_cancel(cancel);
-    Eigen::SimplicialLDLT<Sparse> solver(mass-distance*distance*stiffness);
+    Eigen::SimplicialLDLT<Sparse> solver(data.mass-distance*distance*data.stiffness);
     if(solver.info()!=Eigen::Success) throw std::runtime_error("Inflation direction system is singular.");
-    Vertices result=solver.solve(mass*normals);
+    Vertices result=solver.solve(data.mass*data.normals);
     if(solver.info()!=Eigen::Success||!result.allFinite()) throw std::runtime_error("Inflation direction solve failed.");
     check_cancel(cancel); return result;
 }
 Vertices inflation_directions(const Mesh& source,const MaterialGrid& grid,double distance,uint64_t cancel) {
-    const auto domain=direction_domain(source,grid,cancel);
-    auto result=diffuse(*domain,unit_normals(*domain,cancel),distance,cancel);
+    return solve_directions(prepare_directions(source,grid,cancel),distance,cancel);
+}
+Vertices solve_directions(const DirectionOperators& prepared,double distance,uint64_t cancel) {
+    auto result=diffuse(prepared,distance,cancel);
     for(int i=0;i<result.rows();++i) {
         check_cancel(cancel);
         if(result.row(i).norm()<1e-12) throw std::runtime_error("Inflation direction is undefined on this material surface.");

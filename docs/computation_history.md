@@ -151,10 +151,16 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
 | R07 | Issues checks: evaluate structural/readiness/attachment/dependency diagnostics and optional native collision checks, retain scoped stale evidence, and verify requested repairs. Read-only checks use the common coordinator. | [Issue system](../src/anthroforge/application/issues/system.py), [providers](../src/anthroforge/application/issues/providers.py) | [Issue lifecycle](../tests/test_issue_lifecycle.py), [Issue integration](../tests/test_issue_integration.py) |
 | R08 | Runtime profiling: opt-in Qt/native/application events, monotonic alignment, bounded rings/queues, summaries, model churn, invalidation causes, cache/resource attribution and background trace archive export. | [profiling](../src/anthroforge/profiling), [Qt collector](../native/profiling) | [profiling](../tests/test_profiling.py), [profile diagnostics](../tests/test_profile_diagnostics.py) |
-| R09 | Project persistence: schema-4 validation, encode/decode editable records and accepted resources, compression/decompression, atomic saving and background opening. Never serialize native handles or undo history. | [storage](../src/anthroforge/application/storage.py), [resource storage](../src/anthroforge/application/resource_storage.py) | [headless](../tests/test_headless.py), [tissue headless](../tests/test_tissue_headless.py) |
+| R09 | Project persistence: schema-5 writing with schema-4 reading on the 0.3 development branch; encode/decode editable records and accepted resources, atomic saving and background opening. Never serialize native handles or undo history. | [storage](../src/anthroforge/application/storage.py), [resource storage](../src/anthroforge/application/resource_storage.py) | [headless](../tests/test_headless.py), [shortcut foundations](../tests/test_shortcut_foundations.py) |
 | R10 | Inspection/feedback reports: freeze a revision/presentation, hidden GPU capture and archive creation; screenshot annotations, PNG encoding, report preview decoding, atomic text updates and deletion are a separate reporting service. | [inspection report](../src/anthroforge/application/inspection_report.py), [feedback painting](../src/anthroforge/desktop/feedback_paint.py), [feedback storage](../src/anthroforge/feedback/storage.py) | [inspection export](../tests/test_inspection_export.py), [feedback](../tests/test_feedback.py), [feedback inbox](../tests/test_feedback_inbox.py) |
 
 ### Coverage and exclusions
+
+0.3 development adds the following responsibility; full application integration is pending.
+
+| ID | Computation | Owner | Evidence |
+| --- | --- | --- | --- |
+| E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py) |
 
 The inventory covers all public native interface families in
 [native/include/anthroforge](../native/include/anthroforge), compiled geometry sources
@@ -1548,3 +1554,25 @@ See the task and development validation records for final gate/package evidence 
   cancellation, concurrent reads, cache limits, incompatible-context rejection, and
   exact composed draft/full equivalence. Modified native clang-tidy and typing pass.
 - Reference: [libigl preparation and solve](https://libigl.github.io/tutorial/).
+
+### CH-045 — Typed numerical addressing and restricted native expressions (2026-10-22)
+
+- E01 is a new standalone computation, not a replacement for any existing anatomy
+  algorithm. Qualified parser-default probes found mixed integer/real and exactness
+  mismatches. The selected implementation uses a bounded native precedence parser,
+  dimensional/type checking and one typed postfix evaluator. Third-party adaptation
+  was not claimed impossible; it would require a second typed semantic layer. See
+  [the experiment and rationale](research/shortcuts_030/expression_qualification.md).
+- Authored properties remain lower-level than shortcut wrappers. Stable object/member
+  addresses survive renaming and ordering. Grouped candidate reconstruction validates
+  coupled fields together. Native point-handle and cage-resizing operations are reused;
+  this does not introduce Python numerical algorithms. Shared mutation guards prevent
+  ordinary edits from overwriting active formula components.
+- Compiled handles stay outside documents. R09 adds schema-5 storage for definitions
+  and accepted formula records while initializing these fields empty when reading 4.
+  Neither source project files nor existing curve engines are changed on opening.
+- Evidence at this checkpoint: 49 native expression cases and 10 foundation tests
+  passed; earlier combined foundation/construction/interleaving run had 38 passes.
+  Native Release compilation and scoped native function-size checks passed. Desktop
+  shortcut exposure loaded without QML warnings in offscreen captures. Full driver,
+  attachment-policy, Parametric, profiler and portable-release acceptance remain pending.

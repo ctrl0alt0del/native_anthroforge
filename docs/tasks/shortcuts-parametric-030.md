@@ -41,6 +41,15 @@ accepted finite path as an independent Bezier curve. Older 0.2.4 projects must l
 
 ## Verification
 
+The restricted native expression service is implemented and has 49 passing contract
+cases (59 together with shortcut foundations). Candidate probes and the selection
+rationale are in [expression qualification](../research/shortcuts_030/expression_qualification.md).
+No parser dependency was pinned: one small typed native compiler/evaluator preserves
+integer/real/unit semantics without a second floating interpreter. Program caches use
+the existing engine ResourceCache; native binding calls retain profiler coverage.
+Latest native dimensional bounds/input validation edits were rebuilt successfully;
+the combined 59-case run passed. Full integration is pending.
+
 Initial main and origin/main matched after fetch. `uv run --no-sync pytest
 tests/test_shortcut_foundations.py tests/test_construction_objects.py
 tests/test_interleaving.py -q`: 38 passed. Mypy and Ruff checks pass for current source.
@@ -52,11 +61,11 @@ Validation stays background-only; no interactive desktop acceptance is implied.
 
 ## Next actions
 
-1. Implement/qualify the restricted typed native expression boundary. Local compiled
-   probes of muparser 2.3.5 and ExprTk demonstrate that their default evaluators do
-   not implement the required mixed integer/real semantics (muparser integer 5/2=2;
-   both floating backends lose 9007199254740993-9007199254740992). Extra conditional
-   grammar is also enabled by default. No candidate is pinned or claimed qualified.
+1. Integrate driving operations, graph
+   cycles/dependents, coherent coupled candidates, and scheduling/publication through
+   the existing coordinator. There is no public driver lifecycle or scheduled formula
+   evaluation yet. Replace the explicit nondefault-policy checkpoint rejection in
+   shortcut_operations.editable_wrapper when edit contexts are implemented.
 2. Finish catalogue coverage, property context actions, structural copy/reference
    handling, and full shortcut edit policies, then complete each increment in the
    implementation plan. Record checkpoints and actual evidence here.

@@ -12,6 +12,7 @@ from .bridge import NativeEngine
 from .resource_cache import ResourceCache
 
 if TYPE_CHECKING:
+    from .expressions import Program
     from .routing_scene import RoutingScene
     from .surface_queries import Query
     from .tissue_preparation import Preparation
@@ -41,6 +42,9 @@ class GeometryEngine(NativeEngine):
 
     def _resource_caches(self) -> None:
         self.bases = BaseCache()
+        self.expressions: ResourceCache[Program] = ResourceCache(
+            8 * 1024 * 1024, 128, "expressions"
+        )
         self.routing_scenes: ResourceCache[RoutingScene] = ResourceCache(
             64 * 1024 * 1024, 8, "routing_scene"
         )
@@ -76,6 +80,7 @@ class GeometryEngine(NativeEngine):
             self.collision_checks,
             self.stack_sessions,
             self.tissue_preparations,
+            self.expressions,
         )
 
     def clear_caches(self) -> None:
@@ -93,8 +98,9 @@ class GeometryEngine(NativeEngine):
         self._inspection_signatures()
 
     def _inspection_signatures(self) -> None:
-        from . import inspection, inspection_goals, painting, routing_trace, sections
+        from . import expressions, inspection, inspection_goals, painting, routing_trace, sections
 
+        expressions.configure(self)
         inspection.configure(self)
         inspection_goals.configure(self)
         painting.configure(self)

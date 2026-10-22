@@ -63,6 +63,7 @@ EDITS = {
     "property.set": property_operations.set_value,
     "shortcut.expose": shortcut_operations.expose,
     "shortcut.configure": shortcut_operations.configure,
+    "shortcut.set": shortcut_operations.set_value,
     "shortcut.reorder": shortcut_operations.reorder,
     "chain.configure": segment_operations.configure,
     "chain.segment": segment_operations.segment,

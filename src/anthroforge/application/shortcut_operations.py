@@ -5,7 +5,7 @@ from typing import Any
 
 from anthroforge.core.entities import descendants
 from anthroforge.core.numeric_properties import decode_reference
-from anthroforge.core.shortcuts import Shortcut
+from anthroforge.core.shortcuts import AttachmentPolicy, Shortcut
 
 from . import property_catalog, shortcut_codec, shortcut_ownership
 
@@ -26,6 +26,33 @@ def configure(session: Any, reference: dict[str, Any], policy: dict[str, Any]) -
     value = replace(wrapper(session, reference), policy=shortcut_codec.policy(policy))
     validate_policy(session.document, value)
     install(session, value)
+
+
+def set_value(
+    session: Any,
+    reference: dict[str, Any],
+    value: Any,
+    uniform: bool = False,
+    component: int | None = None,
+) -> None:
+    from .property_operations import set_value as property_set
+
+    selected = editable_wrapper(session, reference)
+    target = (
+        asdict(replace(selected.reference, component=component))
+        if component is not None
+        else reference
+    )
+    property_set(session, target, value, uniform)
+
+
+def editable_wrapper(session: Any, reference: dict[str, Any]) -> Shortcut:
+    selected = wrapper(session, reference)
+    if selected.policy != AttachmentPolicy():
+        raise ValueError(
+            "Shortcut attachment policies are pending implementation in this checkpoint."
+        )
+    return selected
 
 
 def validate_policy(document: Any, shortcut: Any) -> None:

@@ -2,7 +2,7 @@
 
 from collections.abc import Iterator
 from dataclasses import fields, is_dataclass, replace
-from typing import Any
+from typing import Any, get_args
 
 from anthroforge.core import numeric_properties as numeric
 from anthroforge.core.construction import Control, Curve
@@ -50,6 +50,7 @@ DIMENSIONS = {
     "TissueRelaxation": {"sag_limit": "LENGTH", "tolerance": "LENGTH"},
     "TissueCrop": {"origin": "LENGTH"},
 }
+ANNOTATIONS: dict[type, dict[str, Any]] = {}
 
 
 def roots(item: Any) -> tuple[str, ...]:
@@ -60,23 +61,27 @@ def roots(item: Any) -> tuple[str, ...]:
 
 
 def descriptors(item: Any) -> Iterator[numeric.NumericDescriptor]:
+    from .property_transforms import descriptors as transforms
+
+    yield from transforms(item)
     for name in roots(item):
         if hasattr(item, name):
-            yield from walk(item.id, getattr(item, name), (name,), dimension(item, name))
+            yield from walk_field(item.id, item, name, ())
 
 
 def dimension(owner: Any, name: str) -> str:
     return DIMENSIONS.get(type(owner).__name__, {}).get(name, "SCALAR")
 
 
-def walk(target: str, value: Any, path: tuple[str, ...], unit: str) -> Iterator[Any]:
+def walk(
+    target: str, value: Any, path: tuple[str, ...], unit: str, kind: str = "REAL"
+) -> Iterator[Any]:
     if type(value) in (int, float) or numeric_vector(value):
-        yield descriptor(target, path, value, unit)
+        yield descriptor(target, path, value, unit, kind)
     elif is_dataclass(value):
         for field in fields(value):
             if field.name not in EXCLUDED:
-                child = getattr(value, field.name)
-                yield from walk(target, child, (*path, field.name), dimension(value, field.name))
+                yield from walk_field(target, value, field.name, path)
     elif isinstance(value, tuple):
         for child in value:
             if hasattr(child, "id"):
@@ -88,13 +93,33 @@ def numeric_vector(value: Any) -> bool:
 
 
 def descriptor(
-    target: str, path: tuple[str, ...], value: Any, unit: str
+    target: str, path: tuple[str, ...], value: Any, unit: str, kind: str
 ) -> numeric.NumericDescriptor:
     values = value if isinstance(value, tuple) else (value,)
-    kind = "INTEGER" if all(type(v) is int for v in values) else "REAL"
     label = " / ".join(p.replace("_", " ").title() for p in path if not p.startswith("@"))
     return numeric.NumericDescriptor(
         numeric.PropertyRef(target, path), label, kind, unit, len(values)
+    )
+
+
+def annotations(kind: type) -> dict[str, Any]:
+    if kind not in ANNOTATIONS:
+        ANNOTATIONS[kind] = {field.name: field.type for field in fields(kind)}
+    return ANNOTATIONS[kind]
+
+
+def numeric_kind(item: Any, name: str) -> str:
+    annotation = annotations(type(item)).get(name)
+    return "INTEGER" if int in (annotation, *get_args(annotation)) else "REAL"
+
+
+def walk_field(target: str, owner: Any, name: str, path: tuple[str, ...]) -> Iterator[Any]:
+    yield from walk(
+        target,
+        getattr(owner, name),
+        (*path, name),
+        dimension(owner, name),
+        numeric_kind(owner, name),
     )
 
 

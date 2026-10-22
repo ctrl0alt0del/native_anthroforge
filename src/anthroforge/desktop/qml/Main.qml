@@ -178,8 +178,17 @@ ApplicationWindow {
             color: Theme.panel
             ColumnLayout {
                 anchors.fill: parent; spacing: 0
-                Rectangle { Layout.fillWidth: true; implicitHeight: 33; color: Theme.header; Label { anchors.verticalCenter: parent.verticalCenter; x: 12; text: "PROPERTIES"; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1 } }
-                Inspector { id: inspector; objectName: "inspector"; visible: !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity); onImageRequested: parentId => imageFile.request(parentId,viewport.imageAlignmentAxis) }
+                Rectangle {
+                    id: inspectorHeader; objectName: "inspectorHeader"; property bool shortcuts: false
+                    Layout.fillWidth: true; implicitHeight: 33; color: Theme.header
+                    RowLayout {
+                        anchors.fill: parent; anchors.leftMargin: 8; anchors.rightMargin: 8
+                        Label { text: inspectorHeader.shortcuts ? "SHORTCUTS" : "PROPERTIES"; Layout.fillWidth: true; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1 }
+                        UiButton { text: inspectorHeader.shortcuts ? "Properties" : "Shortcuts"; flatStyle: true; onClicked: inspectorHeader.shortcuts=!inspectorHeader.shortcuts }
+                    }
+                }
+                Shortcuts { objectName: "shortcutPanel"; visible: inspectorHeader.shortcuts && !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset }
+                Inspector { id: inspector; objectName: "inspector"; visible: !inspectorHeader.shortcuts && !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity); onImageRequested: parentId => imageFile.request(parentId,viewport.imageAlignmentAxis) }
                 UiScrollView {
                     id: drawingSettings; visible: workspace.drawingTools.state.active
                     Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; contentWidth: availableWidth

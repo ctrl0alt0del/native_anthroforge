@@ -83,3 +83,54 @@ def test_shortcuts_roundtrip_and_old_document_initializes_empty():
         state.pop(field)
     assert storage.decode_document(state).shortcuts == ()
     assert asdict(document.shortcuts[0])["reference"]["component"] == 0
+
+
+def test_active_formula_blocks_ordinary_commands_and_wrapper_edits(session):
+    curve = session.command("curve.create")
+    session.wait()
+    ref = numeric.PropertyRef(curve, ("engine_settings", "resolution"))
+    driver = DrivingShortcut(formulas=(DrivingFormula(ref, "12"),))
+    session.replace_document(driving_shortcuts=(driver,))
+    for operation, args in (
+        ("curve.engine_settings", dict(curve=curve, resolution=10)),
+        ("property.set", dict(reference=asdict(ref), value=10)),
+        ("shortcut.set", dict(reference=asdict(ref), value=10)),
+    ):
+        with pytest.raises(ValueError, match="driven"):
+            session.command(operation, **args)
+    assert session.document.object(curve).resolution == 24
+
+
+def test_transform_properties_have_canonical_units_and_one_undo(session):
+    from math import pi
+
+    curve = session.command("curve.create")
+    session.wait()
+    ref = dict(target=curve, path=["transform", "rotation"], component=2)
+    previous = session.history.cursor
+    session.command("property.set", reference=ref, value=pi / 2)
+    assert session.command("property.get", reference=ref)["value"] == pytest.approx(pi / 2)
+    assert session.history.cursor == previous + 1
+    session.command("undo")
+    assert session.command("property.get", reference=ref)["value"] == 0
+
+
+def test_real_point_fields_remain_real_when_authored_with_integer_literals(session):
+    curve = session.command(
+        "curve.create", points=[dict(position=[0, 0, 0]), dict(position=[1, 0, 0])]
+    )
+    point = session.document.object(curve).points[0]
+    reference = dict(target=curve, path=["points", "@" + point.id, "position"], component=0)
+    assert session.command("property.get", reference=reference)["numeric_type"] == "REAL"
+    session.command("property.set", reference=reference, value=0.125)
+    assert session.document.object(curve).points[0].position[0] == 0.125
+
+
+def test_property_cage_resize_uses_native_resampling(session):
+    control = session.command("control.create", kind="LATTICE")
+    reference = dict(target=control, path=["resolution"], component=0)
+    session.command("property.set", reference=reference, value=3)
+    assert session.document.control(control).resolution == (3, 2, 2)
+    assert len(session.document.control(control).points) == 12
+    session.command("undo")
+    assert session.document.control(control).resolution == (2, 2, 2)

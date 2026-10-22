@@ -47,6 +47,7 @@ class Session:
         self.path: Path | None = None
         self.file_lock: Any = None
         self.saved_revision = 0
+        self.formula_write_authority: frozenset[str] = frozenset()
         self.active_workspace = 0
         self.waiting_save = False
         self.replay_callback: Any = None
@@ -116,12 +117,15 @@ class Session:
         return self.document.entity(entity_id)
 
     def replace_document(self, **changes: Any) -> None:
+        from .property_guards import require_changes
         from .routing_membership import changed
         from .tissue_stack_observation import changed as stack_changed
 
         before = self.document
         self.serial += 1
-        self.document = replace(self.document, revision=self.serial, **changes)
+        updated = replace(self.document, revision=self.serial, **changes)
+        require_changes(self, before, updated)
+        self.document = updated
         self.history.observe(self.document)
         changed(self, before)
         stack_changed(self, before)

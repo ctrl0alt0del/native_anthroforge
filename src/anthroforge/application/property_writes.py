@@ -3,7 +3,6 @@
 from dataclasses import replace
 from typing import Any
 
-from anthroforge.core import numeric_properties as numeric
 from anthroforge.core.construction import Control, Curve
 from anthroforge.core.entities import SCP
 from anthroforge.core.surfaces import Surface
@@ -25,8 +24,15 @@ def editable(session: Any, target: str) -> Any:
 
 
 def prepare(session: Any, target: str, updates: Any) -> tuple[Any, Any]:
+    from .property_geometry import changed as geometry_changed
+    from .property_transforms import changed as transform_changed
+
     before = editable(session, target)
-    after = numeric.batch(before, updates)
+    transforms = tuple(v for v in updates if v[0].path[0] == "transform")
+    fields = tuple(v for v in updates if v not in transforms)
+    after = geometry_changed(session, before, fields)
+    if transforms:
+        after = transform_changed(session, after, transforms)
     validate(session, before, after)
     return before, after
 
@@ -47,7 +53,7 @@ def topology_changed(before: Any, after: Any) -> bool:
             getattr(before.engine_settings, n, None) != getattr(after.engine_settings, n, None)
             for n in ("resolution", "samples")
         )
-    if isinstance(before, (TissueVCP, Control)):
+    if isinstance(before, TissueVCP):
         return bool(before.resolution != after.resolution)
     if isinstance(before, Surface):
         return (before.strips, before.patch_resolution) != (after.strips, after.patch_resolution)
@@ -76,3 +82,14 @@ def install_scp(session: Any, before: SCP, after: SCP) -> None:
         after = replace(after, primitive=session.document.entity(before.id).primitive)
     session.replace_entities({after.id: after})
     construction_tasks.edited(session, {after.id})
+    if before.matrix != after.matrix:
+        schedule_pose(session, after.id)
+
+
+def schedule_pose(session: Any, target: str) -> None:
+    from anthroforge.core.entities import descendants
+
+    from .operations import schedule_edit, transform_dependents
+
+    schedule_edit(session, target, descendants(session.document.entities, target), None)
+    transform_dependents(session, target)

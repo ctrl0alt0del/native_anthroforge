@@ -225,6 +225,7 @@ def object_link(item: Any, document: "Document") -> tuple[Any, ...]:
     return (
         item.id,
         type(item).__name__,
+        getattr(item, "engine", ""),
         item.parent,
         frozenset(construction_inputs(item, document.objects, document.junctions)),
         tuple(c.curve for c in getattr(item, "curves", ())),

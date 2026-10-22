@@ -18,6 +18,8 @@ def describe(session, item):
     result = dict(users=users(session.document, item.id), **metadata(session, item))
     if isinstance(item, (Point, Curve, Surface)):
         result["tissue_presets"] = tissue_presets.available(item)
+    if isinstance(item, Curve):
+        result["engine"] = item.engine
     if isinstance(item, ReferenceImage):
         result.update(
             source=item.source,

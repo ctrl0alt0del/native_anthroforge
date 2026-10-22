@@ -21,10 +21,7 @@ def imported(session):
 @pytest.mark.parametrize("closed", [False, True])
 def test_fiber_copy_is_exact_independent_and_follows_attachment(session, closed):
     target = imported(session)
-    key = session.command(
-        "curve.create", engine="PARAMETRIC", closed=closed, settings=circle_settings()
-    )
-    session.wait()
+    key = parametric_circle(session, closed)
     before = path(session, key)
     fiber = bind(session, target, key)
     assert fiber.engine == "BEZIER" and fiber.closed == closed
@@ -32,8 +29,18 @@ def test_fiber_copy_is_exact_independent_and_follows_attachment(session, closed)
     np.testing.assert_array_equal(path(session, fiber.id), before)
     session.command("scp.transform", entity=target, values=[0, 0, 1, 0, 0, 0, 1, 1, 1])
     session.wait()
-    np.testing.assert_allclose(path(session, fiber.id)[:, :3], before[:, :3] + [0, 0, 1], atol=1e-12)
+    np.testing.assert_allclose(
+        path(session, fiber.id)[:, :3], before[:, :3] + [0, 0, 1], atol=1e-12
+    )
     np.testing.assert_array_equal(path(session, key), before)
+
+
+def parametric_circle(session, closed):
+    key = session.command(
+        "curve.create", engine="PARAMETRIC", closed=closed, settings=circle_settings()
+    )
+    session.wait()
+    return key
 
 
 def test_fiber_capture_uses_dispatched_resolution_and_endpoint_intent(session):

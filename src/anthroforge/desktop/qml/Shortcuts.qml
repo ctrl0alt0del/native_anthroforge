@@ -73,28 +73,19 @@ ColumnLayout {
                     UiMenuItem { text: "Hide from shortcuts"; onTriggered: panel.adapter.hide(row.key) }
                 }
             }
-            Label { visible: panel.allObjects; text: row.ownerLabel; color: Theme.muted; font.pixelSize: 10; wrapMode: Text.Wrap; Layout.fillWidth: true }
-            GridLayout {
-                columns: Math.min(3, row.values.length); Layout.fillWidth: true
-                Repeater {
-                    model: row.values
-                    delegate: UiNumberField {
-                        required property int index
-                        required property real modelData
-                        value: modelData; decimals: row.numericType === "INTEGER" ? 0 : 4
-                        enabled: row.writable; Layout.fillWidth: true; Layout.minimumWidth: 50
-                        onEdited: value => {
-                            panel.adapter.editValue(row.key,row.values.length>1 ? index : -1,value,false);
-                        }
-                        ToolTip.text: row.reason || (row.dimension === "LENGTH" ? "Metres" : row.dimension === "ANGLE" ? "Radians" : "Drag or type a value")
-                    }
-                }
+            Label { visible: panel.allObjects; text: row.ownerLabel + (row.dimension === "LENGTH" ? " · "+workspace.state.display_units : row.dimension === "ANGLE" ? " · °" : ""); color: Theme.muted; font.pixelSize: 10; wrapMode: Text.Wrap; Layout.fillWidth: true }
+            ShortcutValues {
+                values: row.values; reference: row.reference; numericType: row.numericType
+                dimension: row.dimension; writable: row.writable
+                onEdited: (component,value) => panel.adapter.editValue(row.key,component,value,false)
             }
             UiNumberField {
-                visible: row.values.length>1; value: row.values.length ? row.values[0] : 0
+                visible: row.values.length>1; value: row.values.length ? row.values[0]/factor : 0
+                property real factor: row.dimension === "LENGTH" ? workspace.state.unit_factor : row.dimension === "ANGLE" ? Math.PI/180 : 1
+                propertyReference: row.reference
                 enabled: row.writable; Layout.fillWidth: true
                 ToolTip.text: "Uniform: set all components to the same value"
-                onEdited: value => panel.adapter.editValue(row.key,-1,value,true)
+                onEdited: value => panel.adapter.editValue(row.key,-1,value*factor,true)
             }
         }
         Label { anchors.centerIn: parent; width: parent.width-16; visible: list.count===0; text: "Expose the properties you use for anatomical editing."; wrapMode: Text.Wrap; horizontalAlignment: Text.AlignHCenter; color: Theme.muted }

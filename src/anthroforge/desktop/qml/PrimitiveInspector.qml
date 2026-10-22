@@ -34,10 +34,10 @@ ColumnLayout {
         UiButton { objectName: "editPrimitive"; visible: panel.item.component_editing !== false; text: panel.item.editing ? "Finish editing" : panel.item.standalone ? "Edit Curve" : "Edit Primitive"; checkable: true; checked: panel.item.editing || false; Layout.fillWidth: true; onClicked: authoring.setEditing(!panel.item.editing) }
         UiCombo { visible: panel.item.editing && panel.primitive.kind === "BODY"; Layout.fillWidth: true; model: ["Curve controls", "Base vertices · Hook assignment"]; currentIndex: panel.item.category === "BASE" ? 1 : 0; onActivated: authoring.setCategory(currentIndex === 1 ? "BASE" : "CURVE") }
         Label { visible: panel.topologyLocked; text: "Topology locked by child or surface attachments"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-        NumericSetting { objectName: "primitiveSamples"; visible: !panel.item.standalone && ["BODY","LOFT"].includes(panel.primitive.kind); label: "Samples"; value: panel.primitive.samples || 32; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.primitiveSetting("samples",Math.round(value)) }
-        NumericSetting { visible: panel.primitive.kind === "LOFT"; label: "Across each strip"; value: panel.primitive.strips || 1; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.primitiveSetting("strips",Math.round(value)) }
-        NumericSetting { visible: panel.primitive.kind === "LOFT"; label: "Sampling start"; value: panel.primitive.start || 0; onEdited: value => panel.primitiveSetting("start",value) }
-        NumericSetting { visible: panel.primitive.kind === "LOFT"; label: "Sampling span"; value: panel.primitive.span || 1; onEdited: value => panel.primitiveSetting("span",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","samples"]}); objectName: "primitiveSamples"; visible: !panel.item.standalone && ["BODY","LOFT"].includes(panel.primitive.kind); label: "Samples"; value: panel.primitive.samples || 32; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.primitiveSetting("samples",Math.round(value)) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","strips"]}); visible: panel.primitive.kind === "LOFT"; label: "Across each strip"; value: panel.primitive.strips || 1; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.primitiveSetting("strips",Math.round(value)) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","start"]}); visible: panel.primitive.kind === "LOFT"; label: "Sampling start"; value: panel.primitive.start || 0; onEdited: value => panel.primitiveSetting("start",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","span"]}); visible: panel.primitive.kind === "LOFT"; label: "Sampling span"; value: panel.primitive.span || 1; onEdited: value => panel.primitiveSetting("span",value) }
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Cap closed cross-sections"; checked: panel.primitive.caps || false; enabled: !panel.topologyLocked; onClicked: panel.primitiveSetting("caps",checked) }
         UiNotice { active: panel.visible; text: panel.item.result?.status === "pending" ? "Pending changes · last accepted geometry shown" : "" }
         UiNotice { active: panel.visible; text: panel.item.result?.pending?.length>0 ? "Using accepted support · upstream changes pending" : "" }
@@ -74,19 +74,19 @@ ColumnLayout {
             }
         }
         UiCheck { text: "Closed curve"; checked: panel.curve.closed || false; enabled: !panel.topologyLocked; onClicked: panel.curveSetting("closed",checked) }
-        NumericSetting { visible: panel.curve.engine === "BEZIER"; label: "Curve evaluation resolution"; value: panel.curve.resolution || 24; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.curveSetting("resolution",Math.round(value)) }
+        NumericSetting { propertyReference: ({target:panel.curve.id,path:["engine_settings","resolution"]}); visible: panel.curve.engine === "BEZIER"; label: "Curve evaluation resolution"; value: panel.curve.resolution || 24; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.curveSetting("resolution",Math.round(value)) }
         CurveEngine { objectName: "primitiveEngine"; visible: !panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
         RoutingSettings { curve: panel.curve; topologyLocked: panel.topologyLocked }
         ParametricInspector { curve: panel.curve; visible: !panel.item.standalone && panel.curve.engine === "PARAMETRIC"; topologyLocked: panel.topologyLocked }
         FiberCreation { visible: !panel.item.standalone; curve: panel.curve }
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Override sampling range"; checked: panel.curve.start !== null && panel.curve.start !== undefined; onClicked: { panel.curveSetting("start",checked?0:null); panel.curveSetting("span",checked?1:null); } }
-        NumericSetting { visible: panel.primitive.kind === "LOFT" && panel.curve.start !== null; label: "Curve start"; value: panel.curve.start || 0; onEdited: value => panel.curveSetting("start",value) }
-        NumericSetting { visible: panel.primitive.kind === "LOFT" && panel.curve.span !== null; label: "Curve span"; value: panel.curve.span || 1; onEdited: value => panel.curveSetting("span",value) }
+        NumericSetting { propertyReference: ({target:panel.curve.id,path:["start"]}); visible: panel.primitive.kind === "LOFT" && panel.curve.start !== null; label: "Curve start"; value: panel.curve.start || 0; onEdited: value => panel.curveSetting("start",value) }
+        NumericSetting { propertyReference: ({target:panel.curve.id,path:["span"]}); visible: panel.primitive.kind === "LOFT" && panel.curve.span !== null; label: "Curve span"; value: panel.curve.span || 1; onEdited: value => panel.curveSetting("span",value) }
         Label { text: "Control point"; color: Theme.muted }
         FiberBinding { curve: panel.curve; point: panel.point }
         CurveJunction { curve: panel.curve; point: panel.point }
         UiCombo { id: pointChoice; objectName: "pointChoice"; Layout.fillWidth: true; model: panel.points.map((p,i)=>"Point "+(i+1)); onActivated: { const rows=authoring.componentRows.filter(r=>r.point===panel.point.id && r.part==="position"); if(rows.length) authoring.selectComponent(rows[0].key,false); } }
-        VectorSetting { enabled: panel.curve.engine !== "PARAMETRIC"; length: true; label: "Point position"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
+        VectorSetting { propertyReference: ({target:panel.curve.id,path:["points","@"+panel.point.id,"position"]}); enabled: panel.curve.engine !== "PARAMETRIC"; length: true; label: "Point position"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
         Repeater {
             model: ["left","right"]
             ColumnLayout {
@@ -94,11 +94,11 @@ ColumnLayout {
                 visible: panel.curve.engine === "BEZIER"
                 Layout.fillWidth: true
                 UiCombo { Layout.fillWidth: true; model: ["AUTO","ALIGNED","FREE","VECTOR"]; currentIndex: Math.max(0,model.indexOf(panel.point[modelData+"_mode"])); onActivated: panel.pointSetting(modelData+"_mode",currentText) }
-                VectorSetting { length: true; label: modelData === "left" ? "Left handle" : "Right handle"; values: panel.point[modelData] || [0,0,0]; enabled: panel.point[modelData+"_mode"] === "FREE" || panel.point[modelData+"_mode"] === "ALIGNED"; onEdited: values => panel.pointSetting(modelData,values) }
+                VectorSetting { propertyReference: ({target:panel.curve.id,path:["points","@"+panel.point.id,modelData]}); length: true; label: modelData === "left" ? "Left handle" : "Right handle"; values: panel.point[modelData] || [0,0,0]; enabled: panel.point[modelData+"_mode"] === "FREE" || panel.point[modelData+"_mode"] === "ALIGNED"; onEdited: values => panel.pointSetting(modelData,values) }
             }
         }
-        NumericSetting { label: "Radius"; value: panel.point.radius === undefined ? 1 : panel.point.radius; onEdited: value => panel.pointSetting("radius",value) }
-        NumericSetting { label: "Tilt · radians"; value: panel.point.tilt || 0; onEdited: value => panel.pointSetting("tilt",value) }
+        NumericSetting { propertyReference: ({target:panel.curve.id,path:["points","@"+panel.point.id,"radius"]}); label: "Radius"; value: panel.point.radius === undefined ? 1 : panel.point.radius; onEdited: value => panel.pointSetting("radius",value) }
+        NumericSetting { propertyReference: ({target:panel.curve.id,path:["points","@"+panel.point.id,"tilt"]}); label: "Tilt · radians"; value: panel.point.tilt || 0; onEdited: value => panel.pointSetting("tilt",value) }
         UiCheck { objectName: "pointStackingFixed"; text: "Keep fixed during stacking"; checked: panel.point.stacking_fixed || false; hint: "Retain this material location in surfaces built from this curve"; onClicked: panel.pointSetting("stacking_fixed",checked) }
         UiCheck { objectName: "pointProtectedCrease"; text: "Protect crease"; checked: panel.point.protected_crease || false; hint: "Retain this structural point during tissue stacking"; onClicked: panel.pointSetting("protected_crease",checked) }
         RowLayout {
@@ -110,13 +110,13 @@ ColumnLayout {
     UiSection {
         title: "Body piece"; visible: panel.item.editing && !!panel.piece.id
         UiCombo { Layout.fillWidth: true; model: ["BOX","CYLINDER","CAPSULE"]; currentIndex: Math.max(0,model.indexOf(panel.piece.shape)); enabled: !panel.topologyLocked; onActivated: panel.pieceSetting("shape",currentText) }
-        NumericSetting { length: true; label: "Width"; value: panel.piece.width || .1; onEdited: value => panel.pieceSetting("width",value) }
-        NumericSetting { length: true; label: "Depth"; value: panel.piece.depth || .1; onEdited: value => panel.pieceSetting("depth",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","pieces","@"+panel.piece.id,"width"]}); length: true; label: "Width"; value: panel.piece.width || .1; onEdited: value => panel.pieceSetting("width",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","pieces","@"+panel.piece.id,"depth"]}); length: true; label: "Depth"; value: panel.piece.depth || .1; onEdited: value => panel.pieceSetting("depth",value) }
         UiCheck { text: "Fit entire curve"; checked: panel.piece.fit === undefined || panel.piece.fit; onClicked: panel.pieceSetting("fit",checked) }
-        NumericSetting { length: true; label: "Fixed length"; value: panel.piece.length || 1; enabled: !panel.piece.fit; onEdited: value => panel.pieceSetting("length",value) }
-        NumericSetting { length: true; label: "Position along curve"; value: panel.piece.position || 0; onEdited: value => panel.pieceSetting("position",value) }
-        NumericSetting { label: "Radial sides"; value: panel.piece.sides || 16; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.pieceSetting("sides",Math.round(value)) }
-        NumericSetting { label:"Base subdivision"; value:panel.piece.subdivision || 0; decimals:0; minimum:0; maximum:5; enabled:!panel.topologyLocked; onEdited:value=>panel.pieceSetting("subdivision",Math.round(value)) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","pieces","@"+panel.piece.id,"length"]}); length: true; label: "Fixed length"; value: panel.piece.length || 1; enabled: !panel.piece.fit; onEdited: value => panel.pieceSetting("length",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","pieces","@"+panel.piece.id,"position"]}); length: true; label: "Position along curve"; value: panel.piece.position || 0; onEdited: value => panel.pieceSetting("position",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","pieces","@"+panel.piece.id,"sides"]}); label: "Radial sides"; value: panel.piece.sides || 16; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.pieceSetting("sides",Math.round(value)) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","pieces","@"+panel.piece.id,"subdivision"]}); label:"Base subdivision"; value:panel.piece.subdivision || 0; decimals:0; minimum:0; maximum:5; enabled:!panel.topologyLocked; onEdited:value=>panel.pieceSetting("subdivision",Math.round(value)) }
     }
     SegmentChainInspector { visible: panel.primitive.kind === "SEGMENT_CHAIN"; item: panel.item; topologyLocked: panel.topologyLocked }
     DeformerStack { visible: !panel.item.standalone; item: panel.item }

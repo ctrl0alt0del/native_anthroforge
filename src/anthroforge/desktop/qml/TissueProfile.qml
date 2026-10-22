@@ -4,6 +4,8 @@ import QtQuick.Layouts
 
 ColumnLayout {
     id: panel
+    property var propertyBase: ({})
+    function propertyRef(name,component) { return propertyBase.target ? {target:propertyBase.target,path:propertyBase.path.concat([name]),component:component===undefined?null:component} : ({}); }
     required property var profile
     property bool previewing: false
     property var scaleBasis: null
@@ -34,10 +36,10 @@ ColumnLayout {
         ColumnLayout {
             required property int index
             Layout.fillWidth: true; spacing: Theme.gap
-            NumericSetting { label: "Station "+(index+1)+" · depth"; length: true; value: panel.profile.depths?.[index] || 0; onEdited: value=>panel.station("depths",index,value) }
-            NumericSetting { label: "Station "+(index+1)+" · peak"; value: panel.profile.peaks?.[index] ?? 0.5; onEdited: value=>panel.station("peaks",index,value) }
+            NumericSetting { propertyReference: panel.propertyRef("depths",index); label: "Station "+(index+1)+" · depth"; length: true; value: panel.profile.depths?.[index] || 0; onEdited: value=>panel.station("depths",index,value) }
+            NumericSetting { propertyReference: panel.propertyRef("peaks",index); label: "Station "+(index+1)+" · peak"; value: panel.profile.peaks?.[index] ?? 0.5; onEdited: value=>panel.station("peaks",index,value) }
         }
     }
-    NumericSetting { label: "Roundness"; value: panel.profile.roundness ?? 1; onEdited: value=>panel.change("roundness",value) }
+    NumericSetting { propertyReference: panel.propertyRef("roundness"); label: "Roundness"; value: panel.profile.roundness ?? 1; onEdited: value=>panel.change("roundness",value) }
     UiButton { objectName: "tissueProfileReset"; text: "Reset profile from amount"; Layout.fillWidth: true; onClicked: panel.resetRequested() }
 }

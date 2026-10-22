@@ -32,9 +32,9 @@ UiSection {
     ColumnLayout {
         visible: !!panel.selected; Layout.fillWidth: true; spacing: Theme.gap
         UiCombo { objectName: "tissueRegionMode"; Layout.fillWidth: true; model: ["FIXED","SOFT"]; currentIndex: model.indexOf(panel.selected?.mode); onActivated: panel.change("mode",currentText) }
-        NumericSetting { label: "Soft strength"; value: panel.selected?.strength || 0; onEdited: value=>panel.change("strength",value) }
-        NumericSetting { label: "Feather"; value: panel.selected?.feather || 0; onEdited: value=>panel.change("feather",value) }
-        NumericSetting { label: "Normal offset"; length: true; value: panel.selected?.offset || 0; onEdited: value=>panel.change("offset",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["constraints","@"+(panel.selected?.id || ""),"strength"]}); label: "Soft strength"; value: panel.selected?.strength || 0; onEdited: value=>panel.change("strength",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["constraints","@"+(panel.selected?.id || ""),"feather"]}); label: "Feather"; value: panel.selected?.feather || 0; onEdited: value=>panel.change("feather",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["constraints","@"+(panel.selected?.id || ""),"offset"]}); label: "Normal offset"; length: true; value: panel.selected?.offset || 0; onEdited: value=>panel.change("offset",value) }
         UiSection {
             title: "Goal target"; expanded: !!panel.selected?.reference
             hint: "Bind the inflated rest positions to a target. Offsets then follow its surface normals."

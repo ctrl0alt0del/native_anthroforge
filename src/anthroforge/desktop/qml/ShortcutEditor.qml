@@ -44,6 +44,8 @@ ColumnLayout {
         Label { text: "Formulas"; color: Theme.text; Layout.fillWidth: true }
         UiButton { text: "Add target"; onClicked: { editor.targetFormula=""; editor.purpose="TARGET"; editor.adapter.discover("","TARGET"); } }
     }
+    ShortcutPolicies { Layout.fillWidth: true; adapter: editor.adapter.policies }
+    UiButton { visible: editor.details.kind === "DRIVER"; text: "Delete driver"; hint: "Remove this driver and its formulas; retain current target values"; onClicked: editor.adapter.removeDriver() }
     ColumnLayout {
         visible: !!editor.purpose; Layout.fillWidth: true
         RowLayout {

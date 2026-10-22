@@ -21,5 +21,5 @@ ColumnLayout {
         currentIndex: modes.indexOf(panel.settings.mode)
         onActivated: panel.set("mode",modes[currentIndex])
     }
-    NumericSetting { objectName:"shrinkwrapOffset"; label: "Offset · target local"; length: true; value: panel.settings.offset || 0; onEdited: value=>panel.set("offset",value) }
+    NumericSetting { propertyReference: ({target:authoring.state.id,path:["deformers","@"+panel.binding.id,"shrinkwrap","offset"]}); objectName:"shrinkwrapOffset"; label: "Offset · target local"; length: true; value: panel.settings.offset || 0; onEdited: value=>panel.set("offset",value) }
 }

@@ -54,13 +54,24 @@ def decode_reference(value: PropertyRef | dict[str, Any]) -> PropertyRef:
 
 def member(value: Any, token: str) -> Any:
     if isinstance(value, tuple):
-        matches = [v for v in value if getattr(v, "id", None) == token.removeprefix("@")]
+        if token.startswith("#") and token[1:].isdigit() and int(token[1:]) < len(value):
+            return value[int(token[1:])]
+        matches = [v for v in value if member_identity(v) == token.removeprefix("@")]
         if not token.startswith("@") or len(matches) != 1:
             raise ValueError("Collection properties require an existing stable member identity.")
         return matches[0]
     if token.startswith("_") or not hasattr(value, token):
         raise ValueError(f"Unknown numerical property member: {token}")
     return getattr(value, token)
+
+
+def member_identity(value: Any) -> str | None:
+    return getattr(value, "id", None) or getattr(value, "name", None)
+
+
+def member_token(value: Any, index: int) -> str:
+    identity = member_identity(value)
+    return "@" + identity if identity else "#" + str(index)
 
 
 def read_path(value: Any, path: tuple[str, ...]) -> Any:
@@ -75,7 +86,7 @@ def replace_path(value: Any, path: tuple[str, ...], replacement: Any) -> Any:
     child = member(value, path[0])
     updated = replace_path(child, path[1:], replacement)
     if isinstance(value, tuple):
-        return tuple(updated if v is child else v for v in value)
+        return tuple(updated if member_token(v, i) == path[0] else v for i, v in enumerate(value))
     return replace(value, **{path[0]: updated})
 
 
@@ -135,5 +146,5 @@ def rebuild(value: Any, paths: dict[tuple[str, ...], Any]) -> Any:
         groups.setdefault(path[0], {})[path[1:]] = replacement
     changed = {token: rebuild(member(value, token), items) for token, items in groups.items()}
     if isinstance(value, tuple):
-        return tuple(changed.get("@" + v.id, v) for v in value)
+        return tuple(changed.get(member_token(v, i), v) for i, v in enumerate(value))
     return replace(value, **changed)

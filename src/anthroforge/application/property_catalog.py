@@ -16,11 +16,19 @@ from anthroforge.core.tissues import TissueVCP
 ROOTS = {
     SCP: ("geometry_offset", "primitive", "deformers", "thickness"),
     Curve: ("points", "engine_settings", "start", "span"),
-    Control: ("resolution", "weights", "deformers"),
+    Control: ("resolution", "points", "weights", "deformers"),
     Point: ("position",),
     Surface: ("curves", "strips", "patch_resolution", "branches"),
     ReferenceImage: ("width",),
-    TissueVCP: ("parts", "resolution", "relaxation", "crop", "constraints", "stack_settings"),
+    TissueVCP: (
+        "parts",
+        "resolution",
+        "relaxation",
+        "crop",
+        "fields",
+        "constraints",
+        "stack_settings",
+    ),
 }
 EXCLUDED = frozenset(("bind", "matrix", "indices", "members", "stations", "result", "revision"))
 DIMENSIONS = {
@@ -40,13 +48,20 @@ DIMENSIONS = {
             "width",
             "falloff_radius",
             "direction_depth",
-            "boundary_band",
-            "length_taper",
             "control",
         ),
         "LENGTH",
     ),
     "SectionProfile": {"depths": "LENGTH"},
+    "Segment": {"length": "LENGTH", "radius": "LENGTH", "bend": "ANGLE"},
+    "SegmentChain": {"spread": "ANGLE"},
+    "Control": {"points": "LENGTH"},
+    "TissuePart": {"connector_fullness": "LENGTH"},
+    "TissueConstraint": {"offset": "LENGTH"},
+    "Shrinkwrap": {"offset": "LENGTH"},
+    "StackSettings": dict.fromkeys(
+        ("search", "clearance", "radius", "blend", "adjustment", "displacement"), "LENGTH"
+    ),
     "HeightSmoothing": dict.fromkeys(("radius", "maximum_change"), "LENGTH"),
     "TissueRelaxation": {"sag_limit": "LENGTH", "tolerance": "LENGTH"},
     "TissueCrop": {"origin": "LENGTH"},
@@ -82,7 +97,9 @@ def property_label(item: Any, path: tuple[str, ...]) -> str:
     labels = []
     for token in path:
         child = numeric.member(item, token)
-        if token.startswith("@"):
+        if token.startswith("#"):
+            labels.append("Item " + str(int(token[1:]) + 1))
+        elif token.startswith("@"):
             labels.append(member_label(item, child))
         else:
             labels.append(token.replace("_", " ").title())
@@ -91,6 +108,8 @@ def property_label(item: Any, path: tuple[str, ...]) -> str:
 
 
 def member_label(items: Any, child: Any) -> str:
+    if getattr(child, "label", ""):
+        return str(child.label)
     if getattr(child, "name", ""):
         return str(child.name)
     if len(child.id) < 16:
@@ -117,9 +136,9 @@ def walk(
             if field.name not in EXCLUDED:
                 yield from walk_field(target, value, field.name, path)
     elif isinstance(value, tuple):
-        for child in value:
-            if hasattr(child, "id"):
-                yield from walk(target, child, (*path, "@" + child.id), "SCALAR")
+        for index, child in enumerate(value):
+            token = numeric.member_token(child, index)
+            yield from walk(target, child, (*path, token), unit, kind)
 
 
 def numeric_vector(value: Any) -> bool:

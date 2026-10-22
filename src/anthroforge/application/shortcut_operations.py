@@ -91,9 +91,18 @@ def listing(session: Any, selected: str = "", search: str = "") -> list[dict[str
     for value in values:
         owners = shortcut_ownership.owners(session.document, value)
         if value.exposed and (not selected or owners == {selected}):
-            if search.casefold() in value.label.casefold():
+            if search.casefold() in search_label(session.document, value).casefold():
                 result.append(dict(asdict(value), id=value.id, owners=sorted(owners)))
     return result
+
+
+def search_label(document: Any, value: Any) -> str:
+    if value.label or not isinstance(value, Shortcut):
+        return str(value.label)
+    try:
+        return str(property_catalog.resolve(document, value.reference).label)
+    except ValueError:
+        return "Missing property"
 
 
 def reorder(session: Any, identities: list[str]) -> None:

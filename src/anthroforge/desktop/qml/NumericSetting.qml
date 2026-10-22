@@ -7,6 +7,7 @@ RowLayout {
     property string label: ""
     property string hint: ""
     property real value: 0
+    property var propertyReference: ({})
     property int decimals: 4
     property bool length: false
     property bool mixed: false
@@ -21,6 +22,7 @@ RowLayout {
     Label { text: setting.label + (setting.length ? " · " + workspace.state.display_units : ""); color: Theme.muted; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.Wrap; ToolTip.visible: labelHover.hovered && !!setting.hint; ToolTip.text: setting.hint; HoverHandler { id: labelHover } }
     UiNumberField {
         id: field; Layout.preferredWidth: 100; selectByMouse: true
+        propertyReference: setting.propertyReference
         objectName: setting.objectName ? setting.objectName+"Value" : "numeric"+setting.label
         Accessible.name: setting.label
         value: setting.value/setting.unitFactor; decimals: setting.decimals

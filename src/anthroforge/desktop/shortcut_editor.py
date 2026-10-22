@@ -8,6 +8,7 @@ from anthroforge.application import driving_operations, property_operations, sho
 from anthroforge.core.shortcuts import Shortcut
 
 from .record_model import RecordModel
+from .shortcut_policy_editor import ShortcutPolicyEditor
 from .values import qml
 
 
@@ -17,6 +18,7 @@ class ShortcutEditor(QObject):
     def __init__(self, panel):
         super().__init__(panel)
         self.panel, self.key, self.state = panel, "", {}
+        self.policy_editor = ShortcutPolicyEditor(self)
         self.choices = RecordModel(self, ("key", "label", "reference", "driver"), "key")
         self.rows = RecordModel(
             self,
@@ -36,6 +38,10 @@ class ShortcutEditor(QObject):
     def formulas(self):
         return self.rows
 
+    @Property(QObject, constant=True)
+    def policies(self):
+        return self.policy_editor
+
     @Slot(str)
     def select(self, key):
         self.key = key
@@ -54,6 +60,7 @@ class ShortcutEditor(QObject):
         self.rows.synchronize_records(
             self.formula_rows(value) if updated.get("kind") == "DRIVER" else []
         )
+        self.policy_editor.synchronize()
 
     def formula_rows(self, value):
         session = self.panel.controller.session
@@ -128,6 +135,12 @@ class ShortcutEditor(QObject):
     @Slot(float)
     def setValue(self, value):
         self.panel.controller.run("driver.value", dict(driver=self.key, value=value))
+
+    @Slot()
+    def removeDriver(self):
+        self.panel.controller.run("driver.remove", dict(driver=self.key))
+        if self.selected() is None:
+            self.select("")
 
 
 def typed_changes(current, field, value):

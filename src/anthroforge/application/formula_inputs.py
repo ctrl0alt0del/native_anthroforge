@@ -6,7 +6,7 @@ from typing import Any
 from anthroforge.core import numeric_properties as numeric
 from anthroforge.core.entities import Workspace
 from anthroforge.core.expressions import Symbol
-from anthroforge.core.formula_dependencies import property_port
+from anthroforge.core.formula_dependencies import property_port, property_reference
 from anthroforge.core.results import Port, ReadRevision
 
 from . import property_catalog, property_operations
@@ -30,14 +30,11 @@ def formulas(document: Any) -> dict[str, Any]:
 
 def property_revision(document: Any, port: Port) -> ReadRevision:
     item = document.registry.records.get(port.owner)
-    path, component = port.output.removeprefix("property:").rsplit(":", 1)
-    reference = numeric.PropertyRef(
-        port.owner, tuple(path.split("/")), None if component == "*" else int(component)
-    )
+    reference = property_reference(port)
     try:
         value = (
             item.matrix
-            if path.startswith(("transform/", "world_transform/"))
+            if reference.path[0] in ("transform", "world_transform")
             else numeric.read(item, reference)
         )
     except (ValueError, AttributeError):

@@ -12,6 +12,7 @@ UiSection {
     readonly property bool joined: (curve.points || []).some(p => !!p.junction)
     title: "Parametric equations"
     visible: curve.engine === "PARAMETRIC"
+    UiNotice { active: panel.visible; text: panel.curve.result?.status === "failed" && !panel.curve.result?.asset ? "Invalid Parametric curve · straight-line placeholder only; consumers require an accepted path" : "" }
     function configure(changes) { workspace.run("curve.parametric.configure",{curve:curve.id,changes:changes}); }
     function setting(name,value) { const changes={}; changes[name]=value; configure(changes); }
     function variable(id,changes) { workspace.run("curve.parametric.variable.update",{curve:curve.id,variable:id,changes:changes}); }
@@ -25,13 +26,13 @@ UiSection {
         }
     }
     Label { text: "XYZ produce metres · t is dimensionless · m and rad are unit constants"; color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; font.pixelSize: 10 }
-    NumericSetting { objectName: "parametricResolution"; label: "Generated points"; decimals: 0; minimum: panel.curve.closed ? 3 : 2; maximum: 1000000; value: panel.config.resolution || 64; enabled: !panel.topologyLocked && !panel.joined; hint: panel.joined ? "Resolution is locked while this curve has a junction" : panel.topologyLocked ? "Resolution is locked by incoming attachments" : "Uniform parameter sampling; closed curves omit a duplicate seam endpoint"; onEdited: value => panel.setting("resolution",Math.round(value)) }
+    NumericSetting { propertyReference: ({target:panel.curve.id,path:["engine_settings","resolution"]}); objectName: "parametricResolution"; label: "Generated points"; decimals: 0; minimum: panel.curve.closed ? 3 : 2; maximum: 1000000; value: panel.config.resolution || 64; enabled: !panel.topologyLocked && !panel.joined; hint: panel.joined ? "Resolution is locked while this curve has a junction" : panel.topologyLocked ? "Resolution is locked by incoming attachments" : "Uniform parameter sampling; closed curves omit a duplicate seam endpoint"; onEdited: value => panel.setting("resolution",Math.round(value)) }
     Repeater {
         model: ["start","end"]
         ColumnLayout {
             required property string modelData
             Layout.fillWidth: true
-            NumericSetting { label: modelData === "start" ? "t start" : "t end"; value: panel.interval[modelData] || 0; enabled: !panel.interval[modelData+"_expression"]; hint: enabled ? "" : "Controlled by the interval expression below"; onEdited: value => { const change={}; change[modelData]=value; panel.configure({interval:change}); } }
+            NumericSetting { propertyReference: ({target:panel.curve.id,path:["engine_settings","interval",modelData]}); label: modelData === "start" ? "t start" : "t end"; value: panel.interval[modelData] || 0; enabled: !panel.interval[modelData+"_expression"]; hint: enabled ? "" : "Controlled by the interval expression below"; onEdited: value => { const change={}; change[modelData]=value; panel.configure({interval:change}); } }
             UiField { Layout.fillWidth: true; placeholderText: "Optional "+modelData+" expression"; text: panel.interval[modelData+"_expression"] || ""; onEditingFinished: { const change={}; change[modelData+"_expression"]=text; panel.configure({interval:change}); } }
         }
     }
@@ -56,7 +57,7 @@ UiSection {
                 Layout.fillWidth: true
                 UiCombo { model: ["REAL","INTEGER"]; currentIndex: model.indexOf(modelData.numeric_type); Layout.fillWidth: true; onActivated: panel.variable(modelData.id,{numeric_type:currentText}) }
                 UiCombo { model: ["SCALAR","LENGTH","ANGLE"]; currentIndex: model.indexOf(modelData.dimension); Layout.fillWidth: true; onActivated: panel.variable(modelData.id,{dimension:currentText}) }
-                UiNumberField { Layout.preferredWidth: 95; value: modelData.value; decimals: modelData.numeric_type === "INTEGER" ? 0 : 4; onEdited: value => panel.variable(modelData.id,{value:value}) }
+                UiNumberField { propertyReference: ({target:panel.curve.id,path:["engine_settings","variables","@"+modelData.id,"value"]}); Layout.preferredWidth: 95; value: modelData.value; decimals: modelData.numeric_type === "INTEGER" ? 0 : 4; onEdited: value => panel.variable(modelData.id,{value:value}) }
             }
         }
     }

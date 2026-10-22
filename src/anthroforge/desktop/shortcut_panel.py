@@ -99,7 +99,7 @@ class ShortcutPanel(QObject):
         from anthroforge.core.shortcuts import implicit_identity
 
         session = self.controller.session
-        values = property_operations.discover(session, self.controller.selection, search)
+        values = discover_for_panel(self, search)
         exposed = {v.id for v in session.document.shortcuts if v.exposed}
         rows = [self.row(implicit_identity(decode_reference(v["reference"])), v) for v in values]
         self.catalog.synchronize_records([dict(v, exposed=v["key"] in exposed) for v in rows])
@@ -110,6 +110,23 @@ class ShortcutPanel(QObject):
             "shortcut.expose", dict(reference=reference, label=label, exposed=exposed)
         )
         self.discover("")
+
+    @Slot("QVariantMap", int, result="QVariantMap")
+    def propertyState(self, reference, revision):
+        from anthroforge.core.numeric_properties import decode_reference
+        from anthroforge.core.shortcuts import implicit_identity
+
+        try:
+            session = self.controller.session
+            value = property_operations.get(session, reference)
+            key = implicit_identity(decode_reference(reference))
+            return dict(
+                writable=value["writable"] and not value["driven_by"],
+                reason=value["reason"] or ("Driven by a formula" if value["driven_by"] else ""),
+                exposed=any(s.id == key and s.exposed for s in session.document.shortcuts),
+            )
+        except (ValueError, KeyError):
+            return dict(writable=False, reason="Property is unavailable", exposed=False)
 
     @Slot()
     def createDriver(self):
@@ -159,10 +176,24 @@ def numeric_row(value):
         values=values,
         numericType=value["numeric_type"],
         dimension=value["dimension"],
-        writable=value["writable"] and not value["driven_by"],
+        writable=value["writable"],
         reason=value["reason"] or ("Driven by a formula" if value["driven_by"] else ""),
         kind="PROPERTY",
     )
+
+
+def discover_for_panel(panel, search):
+    session = panel.controller.session
+    selection = panel.controller.selection
+    if panel.all:
+        return property_operations.discover(session, search=search)
+    owner = panel.selected_owner()
+    targets = [
+        key
+        for key in session.document.registry.records
+        if key == selection or owner and owner in property_owners(session.document, key)
+    ]
+    return [row for key in targets for row in property_operations.discover(session, key, search)]
 
 
 def missing_row(value, reason):

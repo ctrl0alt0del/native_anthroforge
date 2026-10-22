@@ -1639,3 +1639,10 @@ See the task and development validation records for final gate/package evidence 
   closure, switching, retained failures, shared bodies, junctions, exact Fiber copies and
   attachment movement. Broader lifecycle, deformation, GUI, profiler and release checks
   remain pending; this checkpoint is not a qualified 0.3 release.
+
+- Paused follow-up: generated Parametric coordinate inputs now depend on the accepted path
+  output so formula/path feedback enters normal cycle detection. Property-port tokens escape
+  names, and indexed cage references prohibit resolution changes while used by formulas.
+  Expanded property units distinguish dimensionless boundary samples/taper from lengths.
+  Desktop failure placeholders lease separate native geometry and never enter accepted
+  resource catalogues. These latest changes still require targeted qualification after resume.

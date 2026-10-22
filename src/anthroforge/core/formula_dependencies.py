@@ -1,8 +1,9 @@
 """Formula/component ports participate in the application's existing output graph."""
 
 from typing import Any
+from urllib.parse import quote, unquote
 
-from .construction import Control
+from .construction import Control, Curve
 from .entities import SCP
 from .numeric_properties import PropertyRef, overlaps
 from .object_outputs import output
@@ -13,7 +14,17 @@ from .tissues import TissueVCP
 
 def property_port(reference: PropertyRef) -> Port:
     suffix = "*" if reference.component is None else str(reference.component)
-    return Port(reference.target, "property:" + "/".join(reference.path) + ":" + suffix)
+    path = "/".join(quote(p, safe="@#_") for p in reference.path)
+    return Port(reference.target, "property:" + path + ":" + suffix)
+
+
+def property_reference(port: Port) -> PropertyRef:
+    path, component = port.output.removeprefix("property:").rsplit(":", 1)
+    return PropertyRef(
+        port.owner,
+        tuple(unquote(p) for p in path.split("/")),
+        None if component == "*" else int(component),
+    )
 
 
 def signature(drivers: tuple[DrivingShortcut, ...]) -> tuple[Any, ...]:
@@ -50,6 +61,9 @@ def add_property(edges: Any, reference: PropertyRef, formulas: Any, records: Any
     writers = {Port(f.id, "formula") for _, f in formulas if overlaps(reference, f.target)}
     if reference.path[0] == "world_transform":
         writers.add(Port(reference.target, "pose"))
+    item = records.get(reference.target)
+    if isinstance(item, Curve) and item.engine == "PARAMETRIC" and reference.path[0] == "points":
+        writers.add(Port(reference.target, "path"))
     if reference.target not in records:
         writers.add(Port(reference.target, "missing_property"))
     edges[property_port(reference)] = writers

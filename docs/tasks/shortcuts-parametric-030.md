@@ -3,7 +3,7 @@
 - Task branch: `codex/shortcuts-parametric-030`
 - Integration branch: `main`
 - Starting revision: `c74b28085c31f894f6ce343265d999da526a6feb`
-- Status: in progress; runtime implementation not yet complete
+- Status: paused at user request before power outage; runtime implementation not yet complete
 - Last updated: 2026-10-23, Europe/Bucharest
 - Active writer: local Codex implementation chat (direct work)
 
@@ -16,6 +16,33 @@ headless operations, schema-4 reading/schema-5 writing, and qualified 0.3.0 rele
 Preserve existing geometry, attachments, scheduling, undo and resource ownership.
 
 ## Current state
+
+Paused by user on 2026-10-23. Resume this branch, not a fresh branch. Latest completed
+Parametric checkpoint before this pause is `08bb678`; the pause checkpoint contains
+additional in-progress UI/catalogue changes. Do not merge or release this checkpoint.
+
+Pause checkpoint changes: searchable owner/descendant attachment policy editor, driver
+removal, right-click numerical-property exposure, driven-component read-only fields,
+virtualized shortcut value editing, display-unit conversion, expanded segment/cage/field
+property discovery, escaped property-port names, Parametric generated-point dependency
+edges, and display-only invalid-curve placeholders. Inspector references were added across
+primitive, tissue, control, routing and Parametric controls. Named fields and positional
+array members now have property addresses. Formula references to lattice points/weights
+block resolution changes to prevent their addresses silently changing meaning.
+
+Verification at pause: 36 focused Parametric/Fiber/shared-curve/junction cases passed;
+21 shortcut/formula/desktop-adapter cases passed. Driver and Parametric QML probes loaded
+without warnings after fixes. Ruff/mypy passed before the final lattice-reference guard;
+that final guard still needs formatting/checks. Full gate, native style, broader lifecycle,
+actual addon parity, profiler and portable qualification remain pending. The initial empty
+UI probe was corrected; geometry and full editor interaction still require proper offscreen
+render qualification. No interactive acceptance or completed release is claimed.
+
+Immediate resume tasks: format/check the pending guard and run focused tests; add coverage
+for new catalogue addresses, policy editor, placeholders and formula/path cycles. Review
+positional address and copy/remapping behavior. Finish ordinary field exposure/read-only
+coverage and UI units, then remaining specification qualification and packaging. Runtime
+version stays 0.2.4. Preserve unrelated root `__init__.py`. Work remains background-only.
 
 Runtime remains 0.2.4; this branch is incomplete and must not be merged yet.
 Initial property/wrapper records, stable numerical references, inferred ownership,

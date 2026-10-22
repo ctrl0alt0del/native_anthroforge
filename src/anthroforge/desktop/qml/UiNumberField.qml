@@ -5,6 +5,9 @@ import QtQuick.Controls
 UiField {
     id: field
     property real value: 0
+    property var propertyReference: ({})
+    readonly property var propertyState: propertyReference?.target ? workspace.shortcutPanel.propertyState(propertyReference,workspace.state.revision) : ({})
+    readonly property bool propertyLocked: !!propertyReference?.target && propertyState.writable === false
     property int decimals: 4
     property bool mixed: false
     property bool live: true
@@ -19,7 +22,7 @@ UiField {
     property real draft: value
     signal edited(real value)
     activeFocusOnPress: false
-    readOnly: !textEditing
+    readOnly: !textEditing || propertyLocked
     placeholderText: mixed ? "Mixed" : ""
     validator: RegularExpressionValidator {
         regularExpression: field.decimals === 0 ? /^[+-]?\d+$/ : /^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)$/
@@ -27,7 +30,7 @@ UiField {
     Binding { target: field; property: "text"; when: !field.textEditing && !field.scrubbing; value: field.mixed ? "" : field.value.toFixed(field.decimals) }
     function bounded(value) { return Math.max(minimum,Math.min(maximum,value)); }
     function publish(value) { if(isFinite(value) && (mixed || value !== field.value)) edited(value); }
-    function beginText() { textEditing=true; forceActiveFocus(); selectAll(); }
+    function beginText() { if(propertyLocked) return; textEditing=true; forceActiveFocus(); selectAll(); }
     function commitText() {
         if(!textEditing) return;
         const parsed=Number(text.replace(",","."));
@@ -40,6 +43,7 @@ UiField {
         scrubbing=false; textEditing=false; focus=false;
     }
     function beginScrub() {
+        if(propertyLocked) return false;
         if(live && !numericEdits.begin(field)) return false;
         startValue=value; draft=value; dragStep=step;
         scrubbing=true; forceActiveFocus(); return true;
@@ -63,7 +67,7 @@ UiField {
     }
     MouseArea {
         anchors.fill: parent
-        enabled: !field.textEditing
+        enabled: !field.textEditing && !field.propertyLocked
         acceptedButtons: Qt.LeftButton
         cursorShape: Qt.SizeHorCursor
         preventStealing: true
@@ -82,6 +86,11 @@ UiField {
         onReleased: { if(moved) field.finishScrub(); else field.beginText(); }
         onCanceled: field.cancelEdit()
     }
+    TapHandler { acceptedButtons: Qt.RightButton; enabled: !!field.propertyReference?.target; onTapped: propertyMenu.popup() }
+    UiMenu {
+        id: propertyMenu
+        UiMenuItem { text: field.propertyState.exposed ? "Hide shortcut" : "Expose as shortcut"; onTriggered: workspace.shortcutPanel.expose(field.propertyReference,"",!field.propertyState.exposed) }
+    }
     ToolTip.visible: hovered && !scrubbing && !textEditing
-    ToolTip.text: "Drag left/right to adjust · Click to type"
+    ToolTip.text: propertyState.reason || "Drag left/right to adjust · Click to type" + (propertyReference?.target ? " · Right-click for shortcut" : "")
 }

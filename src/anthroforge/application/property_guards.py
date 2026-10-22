@@ -55,12 +55,21 @@ def require_reference(session: Any, before: Any, after: Any, ref: PropertyRef, l
     )
     if previous is None or previous is current:
         return
+    require_address(previous, current, ref)
     try:
         if current is None:
             raise ValueError("Removed object.")
         read(session, ref, current)
     except (ValueError, AttributeError):
         missing_reference(label)
+
+
+def require_address(previous: Any, current: Any, ref: PropertyRef) -> None:
+    from anthroforge.core.construction import Control
+
+    if (isinstance(previous, Control) and isinstance(current, Control)
+            and previous.resolution != current.resolution and ref.path[0] in ("points", "weights")):
+        raise ValueError("Resolve formula references to cage points/weights before resizing the lattice.")
 
 
 def missing_reference(label: str) -> None:

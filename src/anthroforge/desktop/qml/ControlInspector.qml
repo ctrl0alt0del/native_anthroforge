@@ -19,7 +19,7 @@ ColumnLayout {
         UiCombo { objectName: "controlParent"; Layout.fillWidth: true; model: panel.parents; textRole: "name"; valueRole: "id"; currentIndex: indexOfValue(panel.item.follow || ""); onActivated: authoring.edit("control.follow",{control:panel.item.id,entity:currentValue}) }
         Repeater {
             model: ["Position", "Rotation · °", "Scale"]
-            VectorSetting { required property int index; required property string modelData; label: modelData; length: index === 0; values: (panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(index*3,index*3+3)
+            VectorSetting { propertyReference: ({target:panel.item.id,path:["transform",["position","rotation","scale"][index]]}); required property int index; required property string modelData; label: modelData; length: index === 0; values: (panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(index*3,index*3+3)
                 onEdited: values => { const trs=(panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(); for(let i=0;i<3;i++) trs[index*3+i]=values[i]; authoring.edit("control.transform",{control:panel.item.id,values:trs}); } }
         }
         Label { text: "Affected SCPs: " + workspace.treeRows.filter(row=>(workspace.selectedData.affected || []).indexOf(row.id)>=0).map(row=>row.name).join(", "); color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
@@ -28,7 +28,7 @@ ColumnLayout {
     }
     UiSection {
         title: "Lattice cage"; hint: "Select cage points in the viewport. Ctrl-click extends selection."; visible: panel.item.kind === "LATTICE"
-        VectorSetting { label: "Resolution · U / V / W"; decimals: 0; step: 1; values: panel.item.resolution || [2,2,2]; onEdited: values => authoring.edit("lattice.resize",{control:panel.item.id,resolution:values.map(Math.round)}) }
+        VectorSetting { propertyReference: ({target:panel.item.id,path:["resolution"]}); label: "Resolution · U / V / W"; decimals: 0; step: 1; values: panel.item.resolution || [2,2,2]; onEdited: values => authoring.edit("lattice.resize",{control:panel.item.id,resolution:values.map(Math.round)}) }
         Repeater {
             model: 3
             RowLayout {
@@ -40,7 +40,7 @@ ColumnLayout {
         }
         UiCheck { text: "Outside points only"; checked: panel.item.outside || false; onClicked: panel.set("outside",checked) }
         NumericSetting { live: false; label: "Select point index"; value: panel.reference.index || 0; decimals: 0; onEdited: value => { const row=authoring.componentRows.find(r=>r.index===Math.round(value)); if(row) authoring.selectComponent(row.key,false); } }
-        VectorSetting { label: "Selected point · cage coordinates"; values: panel.reference.local || [0,0,0]; enabled: panel.reference.index !== undefined; onEdited: values => authoring.edit("lattice.point",{control:panel.item.id,index:panel.reference.index,position:values}) }
+        VectorSetting { propertyReference: ({target:panel.item.id,path:["points","#"+panel.reference.index]}); label: "Selected point · cage coordinates"; values: panel.reference.local || [0,0,0]; enabled: panel.reference.index !== undefined; onEdited: values => authoring.edit("lattice.point",{control:panel.item.id,index:panel.reference.index,position:values}) }
         UiField { Layout.fillWidth: true; placeholderText: "Cage weights, comma separated"; text: (panel.item.weights || []).join(", "); onEditingFinished: panel.set("weights",text.trim()?text.split(",").map(Number):[]) }
     }
     DeformerStack { item: panel.item; visible: panel.item.kind === "LATTICE" }

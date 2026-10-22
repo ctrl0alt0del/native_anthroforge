@@ -1,5 +1,10 @@
 # AnthroForge 0.2.4
 
+The [0.3 shortcut/Parametric specification](docs/specification_030.md) and
+[implementation plan](docs/implementation_030.md) are **confirmed, not implemented**.
+They include loading existing 0.2.4 projects into the planned schema 5. The released
+application and package version remain 0.2.4; source Blender migration is separate.
+
 0.2.4 improves tissue editing and evaluation performance: prepared inspection UI,
 incremental collision checks, retained stacking preparation, a smaller height-smoothing
 QP, and reusable native tissue frames/operators. Geometry, attachments and schema 4

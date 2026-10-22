@@ -24,6 +24,8 @@
   links and 15-line functions. No application behavior changed or app rebuild performed.
 - Local raw evidence: ignored `build/shortcuts-030/`; committed inventory is sufficient
   to inspect all shortcuts/drivers without local Blender files.
-- Next product step: settle the listed 0.3 interaction/attachment/units decisions and
-  produce its confirmed specification. Implementation and parser benchmarking are not
-  claimed complete or authorized by this investigation alone.
+- Follow-on decisions are consolidated in the [confirmed specification](../specification_030.md)
+  and [implementation plan](../implementation_030.md); see the
+  [documentation delivery task](shortcuts-030-specification.md). Research-stage proposals
+  are superseded where those documents differ. Runtime implementation and parser
+  benchmarking remain unperformed; this completed research record is not release evidence.

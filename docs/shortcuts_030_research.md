@@ -1,18 +1,22 @@
 # 0.3 preparation: anatomical shortcuts and formula curves
 
 Research completed 2026-10-22 against standalone `e448291` and addon
-`fae36aba1b208676cf21d7c4a78a20d5b1f68c66`. This is evidence and a design recommendation,
-not an implemented feature or a fully approved 0.3 specification. No production code,
-application version, project schema or source `.blend` file was changed.
+`fae36aba1b208676cf21d7c4a78a20d5b1f68c66`. Source observations remain evidence; the later
+[confirmed 0.3 specification](specification_030.md) and
+[implementation plan](implementation_030.md) now supersede the design proposals and open
+questions below. **Confirmed, not implemented:** neither research nor consolidation
+changes production code, application version, project schema or source `.blend` files.
 
-## Confirmed direction
+## Confirmed direction after the interview
 
-- SCP/VCP numerical properties are implicit shortcuts; explicit shortcuts expose the
-  user's chosen controls in the UI. Exposure does not create a second independent value.
+- Eligible SCP/VCP numerical properties have separate implicit shortcut wrappers;
+  properties themselves are lower-level data/operations. Explicit shortcuts expose the
+  user's chosen wrappers without a second independent value. Ordinary property editing
+  does not activate wrapper attachment policies.
 - Driving shortcuts introduce a virtual editable value and formulas targeting other
   shortcuts, whether exposed or implicit.
 - Add a general curve engine evaluating `x(t, variables)`, `y(t, variables)` and
-  `z(t, variables)`. Its editable variable list is dynamic; variables are implicit shortcuts.
+  `z(t, variables)`. Its editable variable list is dynamic; variables have implicit wrappers.
 - Formula-driven curves are not a menu of fixed circle/ellipse/helix types. Such shapes
   can be examples/templates of the same engine.
 
@@ -145,7 +149,14 @@ These are documentation comparisons, not tested integrations or performance rank
 The cited FreeCAD documentation mirror is archived; it is evidence of the expression
 design, not a claim about the newest release interface.
 
-## Proposed standalone ownership
+## Historical ownership proposals — superseded by the specification
+
+The following captures the research-stage proposal, not current product authority.
+In particular, an explicit shortcut is now a separate wrapper rather than merely a
+catalogue presentation reference; attachment policies do not live on raw properties.
+The specification defines partial/grouped failures, inferred ownership, integer/real
+types, no conditionals, generated-point resolution locks, direct engine restoration and
+independent Bézier Fiber conversion. Use the implementation plan for current boundaries.
 
 **One numerical-property catalogue.** Give properties stable identities, type/unit/range,
 component information, getter and semantic editing operation. Use stable entity/part/
@@ -240,7 +251,12 @@ memory, concurrent ownership and invalid-expression diagnostics before selection
 Dimensional validation is an application responsibility; neither candidate here is
 being proposed as a complete CAD unit system.
 
-## Decisions to settle before implementation
+## Research questions resolved by the confirmed specification
+
+This is the historical question set that motivated the interview, not an outstanding
+product backlog. The [final contract](specification_030.md) resolves these topics and
+records superseded alternatives. Parser qualification and the required evidence below
+remain implementation tasks, not claims made by the inventory.
 
 1. **Editing a driven target:** expose its formula/controlling value, or allow an
    explicit override that disables the relationship? Avoid silently accepting a value

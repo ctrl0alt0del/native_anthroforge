@@ -1,5 +1,21 @@
 # Local authoring API, 0.2.4
 
+## Planned 0.3 operations — not available in 0.2.4
+
+The [confirmed specification](specification_030.md) and
+[planned shared interfaces](implementation_030.md#shared-api-additions) add property
+discovery, shortcut exposure/configuration/editing, driving-formula lifecycle and policy
+inspection, plus parametric definitions/variables. Exact signatures will be documented
+with their implementation. This section does not advertise callable commands today.
+
+Ordinary property operations remain below wrappers; wrapper edits alone activate their
+attachment policies. Both respect shared driven-property/type/topology restrictions.
+No manual shortcut-owner or backsolve-target parameter is planned. Existing curve-engine,
+Fiber, junction, evaluation and transaction operations will be extended, not replaced.
+Schema 5 will read existing 0.2.4/schema-4 projects with their accepted state intact.
+
+## Current operations
+
 0.2.4 preserves application operations and schema 4. Existing profile reports now
 include `tissue_preparations`, `collision_pairs` and `stacking_sessions` resource
 categories and cache events. Stacking storage is a conservative upper bound because

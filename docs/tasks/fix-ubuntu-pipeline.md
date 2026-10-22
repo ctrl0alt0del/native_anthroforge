@@ -42,6 +42,10 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
   (C4189) and bounded `1/-1` conversion to `int8_t` (C4244). Complete the wrappers'
   scoped MSVC allowances for imported routing/stacking code and unused tissue
   entry points. Authored-code warnings-as-errors and pinned donor bytes stay intact.
+- The full Linux suite exposed two tests comparing borrowed NumPy buffers from
+  already-destroyed temporary geometry. Retain their reference mesh owners throughout
+  comparison and document `Geometry.array`'s existing borrowed-view lifetime.
+  Exact array equality and all runtime geometry/cache behavior remain unchanged.
 - Follow [cloud development](../cloud_development.md) and
   [engineering guidelines](../engineering_guidelines.md).
 
@@ -76,6 +80,10 @@ The selected flags and subprocess lifecycle retain their existing behavior.
 - `cmake --build --preset portable-core -- -k 0` collected every GCC compilation
   failure in one pass; compatibility fixes are now rebuilding. Targeted clang-tidy
   on the reformatted subdivision adapter passed.
+- Full native compilation, all five CTests and all 162 authored clang-tidy inputs
+  passed. All 57 targeted stacking/provenance/drawing tests passed.
+- First full pytest run: 1720 passed, two failed from temporary mesh lifetimes in
+  `tests/test_tissue_preparation.py`; ownership corrections are pending revalidation.
 
 ## Next actions and blockers
 

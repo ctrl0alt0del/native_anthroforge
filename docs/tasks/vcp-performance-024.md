@@ -1,6 +1,6 @@
 # VCP performance optimization — 0.2.4
 
-- Status: implementing, not release-ready.
+- Status: implementation and release qualification complete; validated merge/push pending.
 - Branch: `codex/vcp-performance-024`; integration: `main`.
 - Baseline: `52690bd` (0.2.3, completed performance analysis).
 - Scope: implement the six recommendations in [the analysis](../vcp_performance_024.md)
@@ -54,13 +54,16 @@ Distributed 67.0→39.9 ms. Focused checks pass. All 11 combined assembly replay
 (1,456 arrays each) match baseline exactly; bone/Fiber motion and undo included.
 Changed-provider/receiver stacking matches fresh sessions. Preparation clears cannot
 retain a capture from a discarded document. Full development gate passed 1,722 tests,
-five CTests, typing/style and numerical checks. Final pytest rerun includes three new
-checks. Alternating whole-app medians old/new: profile 1.36/0.36 s, burst 1.58/0.41 s,
+five CTests, typing/style and numerical checks. Final source rerun also passes 1,722.
+Alternating whole-app medians old/new: profile 1.36/0.36 s, burst 1.58/0.41 s,
 Fiber 2.08/1.36 s, Ribs 6.45/4.70 s. Four headless reports complete with no losses.
 Hidden viewport: 43–48 ms dispatch, 0.96–1.09 s settle off; no QML warnings, images
 inspected. Remaining frame stalls are documented in docs/performance_024.md.
-Version bumped to 0.2.4; next: canonical package build, offscreen portable checks,
-final evidence/docs/archive, validated merge/push. Do not benchmark during builds.
+Version 0.2.4 canonical package built and full relocated offscreen/minimal-PATH suite
+passed. Packaged real-assembly edit/undo/save/reopen/render passes, with 619 authored
+definitions and 1,587 arrays unchanged; report complete/no losses. Source remains Qt-free
+headlessly. Next: commit final evidence, validated merge/push, finish source archive.
 Preserve baseline native DLL
 at build/vcp-performance-024-release/baseline-af_native.dll; baseline-replay/ now freezes 11 snapshots of 1,456 arrays before
-numerical changes. Remaining steps and release qualification are pending.
+numerical changes. Full evidence and limits: docs/performance_024.md. No remaining
+implementation or qualification failures; packaging/merge bookkeeping only.

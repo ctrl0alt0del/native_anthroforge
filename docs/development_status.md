@@ -1,7 +1,28 @@
 # AnthroForge development validation
 
-Current qualification is in [editable SCP migration](#editable-scp-migration-023).
+Current qualification is in [VCP performance](#vcp-performance-024).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## VCP performance (0.2.4)
+
+The six ordered optimizations and their measurements are recorded in
+[0.2.4 performance qualification](performance_024.md), with computational rationale
+in CH-039–044. The full development gate and final rerun pass **1,722 tests**, five
+native CTests, typing/style/function limits and numerical/runtime checks.
+
+Eleven real assembly checkpoints (1,456 arrays each) match baseline exactly. Changed
+provider/receiver stacking matches fresh sessions; reduced height smoothing retains
+the original objective and certification, with maximum observed delta 3.94e-13 m.
+Alternating recorder-off medians: profile edit 1.36→0.36 s, source Fiber edit
+2.08→1.36 s, broad Ribs update 6.45→4.70 s. These are all-jobs-settled timings.
+
+The canonical `dist/0.2.4/AnthroForge.dist` passes the full relocated minimal-PATH suite.
+The actual assembly passes packaged open/edit/undo/save/reopen/render, with 619 authored
+definitions and 1,587 checked arrays unchanged. Profiling is complete and native
+headless operation remains Qt-free. Hidden production QML images were inspected;
+no QML warnings occurred. Frame stalls remain on broad updates; physical desktop
+interaction/display latency is not claimed. The companion source archive is
+`dist/AnthroForge-0.2.4-source.zip`.
 
 ## Editable SCP migration (0.2.3)
 

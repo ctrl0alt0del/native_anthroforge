@@ -1,7 +1,7 @@
 # VCP performance qualification — 0.2.4
 
 Implementation follows the six recommendations in [the original analysis](vcp_performance_024.md).
-Source qualification is complete; portable release qualification is in progress.
+Source and portable release qualification are complete.
 Detailed computational rationale is in CH-039–044 of [the history](computation_history.md).
 
 ## Implemented boundaries
@@ -81,20 +81,46 @@ latency. No visible windows or desktop input were used.
 
 - Eleven assembly checkpoints, 1,456 arrays each, match the frozen baseline exactly:
   opening, Humerus/Ribs/Tibia moves, two source Fiber edits, and their undo results.
+  This replay uses `skeleton_all_authored_muscles_v002.anthroforge` from the migration's
+  candidates directory, SHA256 `2bcd72212488a5ea5ca4a19f2d5d2900a9ff9a814560156203f42e3721bf07b6`;
+  the timing workload uses its qualified saved copy named in the original analysis.
 - Golden native fixtures cover inflation families, branches, relaxation, smoothing,
   material domains, attachments and exact draft/full envelope composition. Height
   smoothing stays within existing tolerances; the other kernel outputs are exact.
 - Tests cover cache eviction/clearing, source changes, cancellation, concurrent reads,
   exclusive stacking sessions, failed leases, changed provider/receiver inputs, and
   full versus incremental collision findings. Original bindings are never recaptured.
-- The development gate passed 1,722 tests, five native CTests, typing, style/function
-  limits and numerical/runtime checks. Three subsequently added lifecycle/parity tests
-  also pass; the final test count will be recorded after release validation.
+- The development gate and final source rerun each passed 1,722 tests, including the
+  added lifecycle/parity cases. Five native CTests, typing, style/function limits and
+  numerical/runtime checks pass.
 - Separate ownership review: caches are engine-owned and bounded; running jobs retain
   their leases. Mutable stacking/collision work has exclusive access, immutable tissue
   preparation supports concurrent reads, and contexts cannot return across lifecycle
   clears. Render staging and displayed picking revisions remain unchanged. Profiler
   resource categories preserve source deduplication and label conservative bounds.
+
+## Delivered package
+
+The canonical `dist/0.2.4/AnthroForge.dist` passed the full relocated minimal-PATH
+portable suite: construction, tissue inflation/stacking, attachments, persistence,
+inspection, painting, routing, feedback, preferences, runtime profiling and hidden
+rendering. Its native library resolves inside the relocated package, without the
+development SDK or optional SciPy dependencies. The suite's UI platform was offscreen;
+it does not establish physical desktop interaction acceptance.
+
+The real assembly also passes packaged open/edit/undo/save/reopen/render. All 619
+authored object definitions and transforms remain unchanged after undo; 1,587 saved
+geometry/path arrays match the input exactly. The packaged 0.2.4 profile is complete,
+has no collector losses, and contains the new native preparation/evaluation calls.
+Packaged tissue and assembly images were inspected. The original input hash remains
+unchanged. Application sources staged for the executable match the release sources
+exactly; its build revision is `9a69b48` (the dirty flag records documentation edits
+during staging, not uncommitted production changes).
+
+One companion archive is `dist/AnthroForge-0.2.4-source.zip`, including the new adapters,
+tests, documentation and existing dependency attribution. No second release folder
+or alternate executable distribution was created for this version. Qualification
+copies live under ignored `build/` only.
 
 Local-only evidence: `build/vcp-performance-024-release/`, including geometry replay,
 counterbalanced timings, `.afprofile.zip` reports, hidden captures and build logs.

@@ -1286,3 +1286,28 @@ See the task and development validation records for final gate/package evidence 
   incompatible retained triangle provenance. It does not change the deformation API.
   A regression reproduces the base-to-inflated concavity and checks first coverage,
   source immutability and later connectivity retention. Crop checks also pass.
+
+### CH-035 — Stable Section Profile poles and material crop triangulation (2026-10-22)
+
+- Affects tissue Section Profile directions, stacking direction queries, and material
+  cropping. Final migration recomputation exposed round-off-sensitive collapsed poles:
+  FCU base changes around 2e-14 changed inflation by .003; the radial FDS pole could
+  reverse one entire row of normals and change its envelope by .0194 scene units.
+- The qualified profile adapter now applies the existing scale-relative frame-area
+  validity threshold before normalization and orientation propagation. Degenerate
+  boundary frames contribute zero to smoothing/section averaging, as exact collapsed
+  source coordinates did. Positive-height degenerate interior samples still fail.
+  Inflation and stacking share the corrected direction function. Pinned addon source
+  bytes remain unchanged; profile depths, shape formula and smoothing modes are retained.
+- Display quad tessellation and material-domain triangulation are distinct policies.
+  Native cropping previously reused display triangles. The adductor magnus base's
+  changed display diagonal introduced a .00203 output discrepancy despite unchanged
+  vertices. Cropping now ports the addon's dominant-plane projection, convex fans,
+  concave ear clipping and nonplanar-quad fallback. Wholly excluded faces are skipped
+  before triangulation; material interpolation and source-face identities remain.
+- Recomputing the actual FCU, both FDS bellies and adductor magnus with these changes
+  matches saved donor surfaces within 4.86e-7 scene units, using vertices and triangle
+  centroids in both directions. Evidence: `roundoff-and-material-crop-experiment.json`
+  in the all-muscle migration run. Synthetic collapsed-pole and nonplanar material
+  quad regressions pass, alongside existing addon inflation/crop fixtures. Full
+  assembly, lifecycle and packaged qualification remain pending.

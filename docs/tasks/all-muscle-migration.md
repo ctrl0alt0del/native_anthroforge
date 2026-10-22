@@ -96,3 +96,17 @@
 - `tmp/regenerate_quads.py` now reads a second preserved intermediate
   `candidates/before-surface-finalization.anthroforge`; do not overwrite either
   intermediate. Log: `logs/surface-finalization-regeneration.log`.
+
+## Recalculation stability checkpoint
+
+- Full surface audit found three remaining differences. CH-035 diagnoses collapsed
+  profile poles (FCU/FDS) and display-vs-material triangulation (adductor magnus).
+  Native repairs reproduce all four affected outputs within 4.86e-7 scene units.
+- The profile direction policy is shared with stacking; crop topology remains owned
+  by material clipping. No mesh substitutes or altered authored settings are used.
+- `tmp/regenerate_quads.py` now consumes `checks/post-quad-audit.json`, preserves
+  `candidates/before-profile-and-crop-repair.anthroforge`, and rebuilds three tissue
+  result sets. Next run `tmp/qualify_all.py`, then preservation, attachment, packaged
+  checks and fresh actual-geometry renders. Original user file is still untouched.
+- Previous gate at 753bac6 passed 1662 tests and five native CTests. The latest native
+  repairs require the final gate/package again; focused inflation/crop checks pass.

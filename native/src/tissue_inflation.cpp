@@ -3,6 +3,7 @@
 #include "tissue_kernel.hpp"
 #include "tissue_branches.hpp"
 #include "tissue_directions.hpp"
+#include "tissue_profile.hpp"
 #include "mesh_quality.hpp"
 
 namespace af::tissue {
@@ -28,7 +29,7 @@ static kernel::AfMuscleOutput prepared(const Mesh& source,const MaterialGrid& gr
 }
 static void profile(kernel::AfMuscleOutput& output,const AfTissueInflation& s) {
     if(!s.enabled) { output.inflated=output.base; return; }
-    if(kernel::af_env_profile(output.base,output.rows,output.cols,s.profile,s.direction,s.reverse?-1:1,output.inflated))
+    if(section_profile(output.base,output.rows,output.cols,s.profile,s.direction,s.reverse?-1:1,output.inflated))
         throw std::runtime_error("Section Profile has a degenerate material frame.");
 }
 static void distributed(kernel::AfMuscleOutput& out,const kernel::AfMuscleInput& input,const Vertices& directions) {

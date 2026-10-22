@@ -86,3 +86,17 @@ separate responsibilities, with existing coordinator publication and resource ow
 
 All scripts/captures/candidates are in the external run, not production. Preserve
 unrelated root `__init__.py`. Do not run competing writers or overwrite source files.
+
+## Authored-only follow-up (2026-10-22)
+
+The user's delayed clarification explicitly authorizes removing the four mirrored
+muscles retained in v001. Remove only their four tissues, four membranes and eleven
+fibers through the existing deletion API. Preserve all SCPs, including mirrored bones,
+and every authored muscle. No production changes are needed.
+
+`tmp/remove_existing_mirrors.py` works from `inputs/before-mirror-removal.anthroforge`
+and creates `candidates/skeleton_all_authored_muscles_v002.anthroforge`. It verifies
+all remaining authored records/geometry, one-action undo grouping, normal reopening
+and the existing 96-source comparisons. The requested delivery path remains unchanged;
+replace it only after these checks and an offscreen render. Prior v001 evidence is
+immutable historical evidence; final follow-up results belong in `checks/mirror-removal.json`.

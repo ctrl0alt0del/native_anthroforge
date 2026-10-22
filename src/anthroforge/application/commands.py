@@ -15,6 +15,7 @@ from . import (
     deletion_impact,
     drawing_operations,
     drawing_projection,
+    driving_operations,
     evaluation,
     fiber_bindings,
     fiber_operations,
@@ -60,6 +61,13 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "driver.create": driving_operations.create,
+    "driver.configure": driving_operations.configure,
+    "driver.value": driving_operations.set_value,
+    "driver.remove": driving_operations.remove,
+    "driver.formula.add": driving_operations.add_formula,
+    "driver.formula.update": driving_operations.update_formula,
+    "driver.formula.remove": driving_operations.remove_formula,
     "property.set": property_operations.set_value,
     "shortcut.expose": shortcut_operations.expose,
     "shortcut.configure": shortcut_operations.configure,
@@ -268,6 +276,7 @@ def query_commands(session: "Session") -> dict[str, Any]:
     return {
         "preferences.get": session.preferences.describe,
         "preferences.set": session.preferences.update,
+        "driver.inspect": lambda **a: driving_operations.inspect(session, **a),
         **drawing_commands(session),
         **construction_queries(session),
         "image.presentation": lambda **a: image_presentation.update(session, **a),

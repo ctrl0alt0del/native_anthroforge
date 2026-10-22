@@ -1576,3 +1576,23 @@ See the task and development validation records for final gate/package evidence 
   Native Release compilation and scoped native function-size checks passed. Desktop
   shortcut exposure loaded without QML warnings in offscreen captures. Full driver,
   attachment-policy, Parametric, profiler and portable-release acceptance remain pending.
+
+### CH-046 — Formula output dependencies and coordinated publication (2026-10-23)
+
+- E01 now uses distinct property, virtual-input, and formula output ports in the existing
+  dependency graph. Geometry consumers observe their driven inputs; reading an unrelated
+  authored component does not introduce a spurious geometry dependency. Actual cycles
+  retain accepted values for the affected component and its dependents.
+- One task-specific admission policy submits batched native expression evaluations to
+  the existing coordinator. Owned dispatch snapshots, object writer reservations,
+  cancellable execution, complete read validation and accepted-result provenance use
+  existing lifecycle mechanisms. Property candidate validation runs before publication;
+  independent valid outputs survive failures in other branches.
+- A Live consumer may read a Manual formula's accepted property, with pending provenance.
+  Publication registers dependent work before becoming terminal. The coordinator now
+  distinguishes its currently publishing job from other jobs invalidated by installation,
+  so publication cannot cancel its own output transaction.
+- Eight new public-API cases and 96 expression/foundation/scheduling/Issues regression
+  cases passed. The Manual handoff test initially failed and verified its correction.
+  Full coupled-field, policy, GUI, profiler and release qualification remain pending;
+  no performance improvement or finished 0.3 workflow is claimed by this checkpoint.

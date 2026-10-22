@@ -16,7 +16,14 @@ def port_records(document: Document, ports: set[Port] | frozenset[Port]) -> list
 
 def port_record(document: Document, port: Port) -> dict[str, Any]:
     item = document.registry.records.get(port.owner)
-    return dict(asdict(port), name=item.name if item else "Unavailable object")
+    return dict(asdict(port), name=item.name if item else formula_label(document, port.owner))
+
+
+def formula_label(document: Document, owner: str) -> str:
+    for driver in document.driving_shortcuts:
+        if driver.id == owner or any(f.id == owner for f in driver.formulas):
+            return driver.label
+    return "Unavailable object"
 
 
 def cycle_context(graph: DependencyGraph, port: Port) -> dict[str, Any]:

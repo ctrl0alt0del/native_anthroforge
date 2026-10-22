@@ -44,7 +44,9 @@ def finding(document: Document, port: Port) -> Issue:
         BLOCKED,
         **labels(context),
         target=port.owner,
-        kind=kind(document.object(port.owner)),
+        kind=kind(document.object(port.owner))
+        if port.owner in document.registry.records
+        else "FORMULA",
         stage=port.output,
         source=fingerprint(context),
         local_key=port.owner,

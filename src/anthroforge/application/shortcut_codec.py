@@ -3,6 +3,7 @@
 from typing import Any
 
 from anthroforge.core.numeric_properties import decode_reference
+from anthroforge.core.results import ReadRevision
 from anthroforge.core.shortcuts import (
     AttachmentPolicy,
     DescendantOverride,
@@ -48,7 +49,14 @@ def driver(value: dict[str, Any]) -> DrivingShortcut:
 
 
 def result(value: dict[str, Any]) -> FormulaResult:
-    data = dict(value, inputs=tuple(tuple(v) for v in value.get("inputs", ())))
+    data = dict(
+        value,
+        inputs=tuple(
+            ReadRevision(**dict(v, membership=tuple(v.get("membership", ()))))
+            for v in value.get("inputs", ())
+        ),
+    )
+    data["pending"] = tuple(value.get("pending", ()))
     if isinstance(data.get("value"), list):
         data["value"] = tuple(data["value"])
     return FormulaResult(**data)

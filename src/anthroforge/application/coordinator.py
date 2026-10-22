@@ -44,6 +44,7 @@ class TaskCoordinator:
         self.task_schedulers = task_schedulers()
         self.inline_budget = InlineBudget(clock)
         self.coalescing: dict[str, tuple[float, float]] = {}
+        self.publishing = ""
 
     @property
     def jobs(self) -> list[Job]:
@@ -84,15 +85,16 @@ class TaskCoordinator:
         if previous and self.clock() <= previous[1]:
             job.queued_since = previous[0]
         for existing in self.registry.matching("key", (job.key,)):
-            if job.key and existing.key == job.key and existing.active:
-                if existing.queued_since is not None:
-                    job.queued_since = min(
-                        job.queued_since if job.queued_since is not None else self.clock(),
-                        existing.queued_since,
-                    )
-                self.cancel_job(
-                    existing.id, obsolete=True, reason="newer_request", replacement=job.id
-                )
+            if job.key and existing.active and existing.id != self.publishing:
+                self._supersede_previous(existing, job)
+
+    def _supersede_previous(self, existing: Job, job: Job) -> None:
+        if existing.queued_since is not None:
+            job.queued_since = min(
+                job.queued_since if job.queued_since is not None else self.clock(),
+                existing.queued_since,
+            )
+        self.cancel_job(existing.id, obsolete=True, reason="newer_request", replacement=job.id)
 
     def pending_since(self, outputs: set[str], kind: str) -> float | None:
         pending = (
@@ -201,6 +203,8 @@ class TaskCoordinator:
                 self._invalidate_input(job, reason)
 
     def _invalidate_input(self, job: Job, reason: str) -> None:
+        if job.id == self.publishing:
+            return
         if task_coalescing.renewable(job):
             trace.event(self.profiler, job, "inputs_pending")
             return
@@ -327,10 +331,12 @@ class TaskCoordinator:
 
     def _publish(self, job: Job, result: Any) -> None:
         job.state, job.progress = "publishing", "Publishing complete result"
+        previous, self.publishing = self.publishing, job.id
         started = monotonic()
         try:
             trace.call(self.profiler, job, "publish", job.publish, result)
         finally:
+            self.publishing = previous
             job.publish_ms = (monotonic() - started) * 1000
             self.metrics.observe("publication", job.publish_ms / 1000)
 

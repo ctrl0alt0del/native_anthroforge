@@ -61,6 +61,15 @@ def revisions(document: Document, ports: set[Port]) -> tuple[ReadRevision, ...]:
 
 
 def revision(document: Document, port: Port) -> ReadRevision:
+    from .formula_inputs import revision as formula_revision
+
+    special = formula_revision(document, port) if document.driving_shortcuts else None
+    if special is not None:
+        return special
+    return object_port_revision(document, port)
+
+
+def object_port_revision(document: Document, port: Port) -> ReadRevision:
     if port.owner in document.registry.authored:
         return object_revision(document, port)
     if port.owner in document.index.controls:

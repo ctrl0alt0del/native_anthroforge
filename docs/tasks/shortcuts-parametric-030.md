@@ -26,8 +26,8 @@ curve point changes use native handle editing and cage resizing reuses native in
 Common authored mutation guards reserve active formula components. A first incremental
 shortcut panel exposes properties and edits wrappers with default policies. Nondefault
 attachment policies explicitly remain unavailable in this incomplete checkpoint.
-This is not a usable 0.3 release: complete catalogue coverage/context exposure, formulas,
-driver scheduling/policies and parametric evaluation still need integration.
+This is not a usable 0.3 release: complete catalogue coverage/context exposure, driver UI,
+attachment policies and parametric evaluation still need integration and qualification.
 The unrelated untracked root `__init__.py` remains untouched.
 
 ## Decisions and relevant files
@@ -40,6 +40,16 @@ locks parametric resolution. Parametric-to-Fiber conversion preserves the exact
 accepted finite path as an independent Bezier curve. Older 0.2.4 projects must load.
 
 ## Verification
+
+Driving lifecycle operations and a batched formula job now use the existing coordinator.
+Property/formula ports distinguish numerical inputs from geometry dependencies. Eight new
+public-API cases cover chains, cycles/dependents, independent failure, types/units, uniform
+vectors, undo/redo, Manual provenance, and captured cancellation. The combined expression,
+foundation, scheduling/interleaving and Issues run passed 104 cases. Manual publication
+initially missed downstream reevaluation; the test exposed it and publication now registers
+dependent work before the parent job terminates. Further coupled-field, lifetime, offscreen
+editor and full-suite checks remain required. No driver editing UI or attachment policies
+have been qualified yet.
 
 The restricted native expression service is implemented and has 49 passing contract
 cases (59 together with shortcut foundations). Candidate probes and the selection
@@ -61,11 +71,11 @@ Validation stays background-only; no interactive desktop acceptance is implied.
 
 ## Next actions
 
-1. Integrate driving operations, graph
-   cycles/dependents, coherent coupled candidates, and scheduling/publication through
-   the existing coordinator. There is no public driver lifecycle or scheduled formula
-   evaluation yet. Replace the explicit nondefault-policy checkpoint rejection in
-   shortcut_operations.editable_wrapper when edit contexts are implemented.
+1. Complete driver validation/qualification and desktop editing. Public `driver.*` operations,
+   formula output dependencies, failure retention, and scheduling now exist. Audit coupled
+   validation and pending result publication, then implement initiating attachment contexts.
+   Replace the explicit nondefault-policy checkpoint rejection in
+   shortcut_operations.editable_wrapper when those edit contexts are implemented.
 2. Finish catalogue coverage, property context actions, structural copy/reference
    handling, and full shortcut edit policies, then complete each increment in the
    implementation plan. Record checkpoints and actual evidence here.

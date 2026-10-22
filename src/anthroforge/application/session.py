@@ -48,6 +48,7 @@ class Session:
         self.file_lock: Any = None
         self.saved_revision = 0
         self.formula_write_authority: frozenset[str] = frozenset()
+        self.formula_observing = False
         self.active_workspace = 0
         self.waiting_save = False
         self.replay_callback: Any = None
@@ -118,8 +119,6 @@ class Session:
 
     def replace_document(self, **changes: Any) -> None:
         from .property_guards import require_changes
-        from .routing_membership import changed
-        from .tissue_stack_observation import changed as stack_changed
 
         before = self.document
         self.serial += 1
@@ -127,8 +126,14 @@ class Session:
         require_changes(self, before, updated)
         self.document = updated
         self.history.observe(self.document)
-        changed(self, before)
-        stack_changed(self, before)
+        self.observe_replacement(before)
+
+    def observe_replacement(self, before: Document) -> None:
+        from . import formula_observation, routing_membership, tissue_stack_observation
+
+        routing_membership.changed(self, before)
+        tissue_stack_observation.changed(self, before)
+        formula_observation.changed(self, before)
 
     def replace_entities(self, changed: dict[str, SCP], authored: bool = True) -> None:
         if authored:

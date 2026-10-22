@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from uuid import NAMESPACE_URL, uuid4, uuid5
 
 from .numeric_properties import PropertyRef, validate_number
+from .results import ReadRevision
 
 
 @dataclass(frozen=True, slots=True)
@@ -76,8 +77,8 @@ class DrivingFormula:
     id: str = field(default_factory=lambda: str(uuid4()))
 
     def __post_init__(self) -> None:
-        if not self.expression.strip() or len(self.expression) > 8192:
-            raise ValueError("A formula must contain 1–8192 characters.")
+        if len(self.expression) > 8192:
+            raise ValueError("A formula supports at most 8192 characters.")
         names = [item.name for item in self.inputs]
         if len(set(names)) != len(names) or "value" in names:
             raise ValueError("Formula input names must be unique; value is reserved.")
@@ -93,6 +94,7 @@ class DrivingShortcut:
     exposed: bool = True
     policy: AttachmentPolicy = field(default_factory=AttachmentPolicy)
     id: str = field(default_factory=lambda: str(uuid4()))
+    generation: int = 0
 
     def __post_init__(self) -> None:
         if self.numeric_type not in ("INTEGER", "REAL"):
@@ -109,4 +111,5 @@ class FormulaResult:
     status: str = "pending"
     error: str = ""
     revision: int = 0
-    inputs: tuple[tuple[str, int], ...] = ()
+    inputs: tuple[ReadRevision, ...] = ()
+    pending: tuple[str, ...] = ()

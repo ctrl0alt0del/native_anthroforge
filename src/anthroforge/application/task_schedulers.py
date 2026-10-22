@@ -160,6 +160,12 @@ class IssueTaskScheduler(MeasuredTaskScheduler):
         return Schedule("worker", cost, delay, 150.0, "Read-only advisory checks after editing")
 
 
+class FormulaTaskScheduler(AttachmentTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + 0.02 * workload.affected + 0.0005 * workload.candidates
+        return Schedule("worker", cost, reason="Typed expressions and coherent property validation")
+
+
 class FiberCaptureTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         cost = 0.2 + workload.candidates * max(1, workload.entities) * 0.02
@@ -216,6 +222,7 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_open": OpenProjectTaskScheduler(),
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
+        "formulas": FormulaTaskScheduler(),
         **curve_schedulers(),
         **anchor_schedulers(),
         "control_pose": ControlPoseTaskScheduler(),

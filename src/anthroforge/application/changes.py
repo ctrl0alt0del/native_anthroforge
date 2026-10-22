@@ -7,6 +7,17 @@ from typing import Any
 
 from anthroforge.core.document import Document
 
+DOCUMENT_FIELDS = (
+    "name",
+    "workspaces",
+    "attachments_enabled",
+    "update_mode",
+    "junctions",
+    "shortcuts",
+    "driving_shortcuts",
+    "formula_results",
+)
+
 
 @dataclass
 class DocumentChanges:
@@ -53,12 +64,11 @@ class ChangeJournal:
         if before is after:
             return
         self.serial += 1
-        names = ("name", "workspaces", "attachments_enabled", "update_mode", "junctions")
         delta = DocumentChanges(
             before.id != after.id,
             record_changes(before.index.entities, after.index.entities),
             record_changes(before.index.controls, after.index.controls),
-            {name for name in names if getattr(before, name) != getattr(after, name)},
+            {name for name in DOCUMENT_FIELDS if getattr(before, name) != getattr(after, name)},
             record_changes(before.registry.authored, after.registry.authored),
         )
         record_order(delta, before, after)

@@ -10,9 +10,10 @@ from .construction_policy import revisions
 
 def matches(source: Document, result: EvaluationResult) -> bool:
     ports = {Port(value.owner, value.output) for value in result.inputs}
-    return all(port.owner in source.registry.records for port in ports) and (
-        revisions(source, ports) == result.inputs
-    )
+    try:
+        return revisions(source, ports) == result.inputs
+    except ValueError:
+        return False
 
 
 def accepted_result(source: Document, item: Any, inputs: set[Port], key: str) -> EvaluationResult:

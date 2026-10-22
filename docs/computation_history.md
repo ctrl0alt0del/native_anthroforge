@@ -1596,3 +1596,9 @@ See the task and development validation records for final gate/package evidence 
   cases passed. The Manual handoff test initially failed and verified its correction.
   Full coupled-field, policy, GUI, profiler and release qualification remain pending;
   no performance improvement or finished 0.3 workflow is claimed by this checkpoint.
+- Follow-up evidence adds coherent valid/invalid tissue-limit publication, independent
+  settings on the same tissue, complete result provenance round trips, and target-reference
+  removal protection. SCP property writes now install one coherent candidate rather than
+  passing through an intermediate primitive publication. The existing geometry algorithms
+  remain unchanged. Native point-result scalar boxing preserves numerical values and
+  makes the numerical-property catalogue stable after a native edit.

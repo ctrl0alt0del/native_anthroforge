@@ -4,7 +4,7 @@
 - Integration branch: `main`
 - Starting revision: `c74b28085c31f894f6ce343265d999da526a6feb`
 - Status: in progress; runtime implementation not yet complete
-- Last updated: 2026-10-22, Europe/Bucharest
+- Last updated: 2026-10-23, Europe/Bucharest
 - Active writer: local Codex implementation chat (direct work)
 
 ## Outcome and acceptance
@@ -26,8 +26,10 @@ curve point changes use native handle editing and cage resizing reuses native in
 Common authored mutation guards reserve active formula components. A first incremental
 shortcut panel exposes properties and edits wrappers with default policies. Nondefault
 attachment policies explicitly remain unavailable in this incomplete checkpoint.
-This is not a usable 0.3 release: complete catalogue coverage/context exposure, driver UI,
-attachment policies and parametric evaluation still need integration and qualification.
+The driver editor now provides native-backed values, type/quantity selection, formulas,
+searchable targets/inputs, enable/remove, labels, hide and shared ordering. This is not
+a usable 0.3 release: complete catalogue/context exposure, attachment policies and
+parametric evaluation still need integration and qualification.
 The unrelated untracked root `__init__.py` remains untouched.
 
 ## Decisions and relevant files
@@ -40,6 +42,15 @@ locks parametric resolution. Parametric-to-Fiber conversion preserves the exact
 accepted finite path as an independent Bezier curve. Older 0.2.4 projects must load.
 
 ## Verification
+
+The full current pytest run completed with 1,796 passes and one obsolete schema-4-only
+assertion in `test_tissue_contracts`; that assertion now checks schema 5 plus reading 4.
+Five added candidate/persistence tests and three desktop adapter tests pass. Actual
+offscreen driver-editor rendering loaded without QML warnings and was inspected in
+`build/driver-editor.png`. The probe exposed native-returned point scalars disappearing
+from discovery; native scalar boxing and descriptor recognition were corrected, with a
+regression case. Property pickers now avoid evaluating every world transform for metadata.
+This does not establish interactive acceptance or final release qualification.
 
 Driving lifecycle operations and a batched formula job now use the existing coordinator.
 Property/formula ports distinguish numerical inputs from geometry dependencies. Eight new
@@ -81,6 +92,14 @@ Validation stays background-only; no interactive desktop acceptance is implied.
    implementation plan. Record checkpoints and actual evidence here.
 3. Run full qualification, update versions only after success, build the canonical
    distribution/source archive, and merge the validated branch.
+
+Attachment-policy integration is the next active stage. Reinspection of addon
+`core/shortcuts/owner_backsolve.py`, `session_state.py` and `app/use_cases/shortcut_edit.py`
+confirms translation-only retained child anchors; original authored attachment runtime
+is restored after each update, and only anchor/strategy changes need temporary recapture.
+The standalone context must follow queued work, explicit gestures, cancellation and history
+without the addon's one-second cache expiry. Pending Manual edits and historical saves
+must retain any needed preparation intent/resources; do not add a global settings override.
 
 ## Recovery inputs
 

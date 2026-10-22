@@ -1,6 +1,5 @@
 """Semantic candidate installation; numeric addressing never bypasses object policies."""
 
-from dataclasses import replace
 from typing import Any
 
 from anthroforge.core.construction import Control, Curve
@@ -38,6 +37,8 @@ def prepare(session: Any, target: str, updates: Any) -> tuple[Any, Any]:
 
 
 def validate(session: Any, before: Any, after: Any) -> None:
+    if isinstance(before, SCP):
+        validate_scp(session, before, after)
     if isinstance(before, TissueVCP):
         from anthroforge.core.tissue_policy import validate as tissue_validate
 
@@ -72,18 +73,31 @@ def install(session: Any, before: Any, after: Any) -> None:
 
 
 def install_scp(session: Any, before: SCP, after: SCP) -> None:
-    from . import construction_tasks, curve_sources, geometry_modifiers
+    from . import construction_tasks
+
+    session.replace_entities({after.id: after})
+    if (before.primitive, before.deformers, before.thickness) != (
+        after.primitive,
+        after.deformers,
+        after.thickness,
+    ):
+        construction_tasks.edited(session, {after.id})
+    if (before.matrix, before.geometry_offset) != (after.matrix, after.geometry_offset):
+        schedule_pose(session, after.id)
+
+
+def validate_scp(session: Any, before: SCP, after: SCP) -> None:
+    from . import curve_sources, geometry_modifiers
 
     geometry_modifiers.validate_change(session.document, before, after.deformers)
     if before.primitive != after.primitive:
-        primitive_operations.install(
-            session, before.id, curve_sources.resolve(session.engine, session.document, after)
-        )
-        after = replace(after, primitive=session.document.entity(before.id).primitive)
-    session.replace_entities({after.id: after})
-    construction_tasks.edited(session, {after.id})
-    if before.matrix != after.matrix:
-        schedule_pose(session, after.id)
+        previous = curve_sources.resolve(session.engine, session.document, before)
+        candidate = curve_sources.resolve(session.engine, session.document, after)
+        if primitive_operations.topology_signature(
+            previous
+        ) != primitive_operations.topology_signature(candidate):
+            require_topology_edit(session.document, before.id)
+        primitive_operations.require_source_topology(session, candidate)
 
 
 def schedule_pose(session: Any, target: str) -> None:

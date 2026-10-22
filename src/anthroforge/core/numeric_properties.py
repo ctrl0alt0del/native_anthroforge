@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass, replace
 from math import isfinite
+from numbers import Integral, Real
 from typing import Any
 
 
@@ -81,10 +82,16 @@ def replace_path(value: Any, path: tuple[str, ...], replacement: Any) -> Any:
 def read(value: Any, reference: PropertyRef) -> Any:
     result = read_path(value, reference.path)
     if reference.component is None:
-        return result
+        return tuple(scalar(v) for v in result) if isinstance(result, tuple) else scalar(result)
     if not isinstance(result, tuple) or reference.component >= len(result):
         raise ValueError("Numerical property component is unavailable.")
-    return result[reference.component]
+    return scalar(result[reference.component])
+
+
+def scalar(value: Any) -> Any:
+    if isinstance(value, Integral) and not isinstance(value, bool):
+        return int(value)
+    return float(value) if isinstance(value, Real) and not isinstance(value, bool) else value
 
 
 def changed(value: Any, reference: PropertyRef, replacement: Any) -> Any:

@@ -34,7 +34,7 @@ def install(session: Any, value: DrivingShortcut) -> None:
     before = selected(session, value.id)
     for target in shortcut_ownership.targets(session.document, value):
         editable(session, target)
-    changed = replace(value, generation=before.generation + 1)
+    changed = replace(value, generation=before.generation + int(evaluation_changed(before, value)))
     drivers = tuple(changed if d.id == value.id else d for d in session.document.driving_shortcuts)
     candidate = replace(session.document, driving_shortcuts=drivers)
     validate_writers(candidate)
@@ -43,11 +43,16 @@ def install(session: Any, value: DrivingShortcut) -> None:
 
 
 def configure(session: Any, driver: str, changes: dict[str, Any]) -> None:
-    if set(changes) - {"label", "numeric_type", "dimension", "exposed", "policy"}:
+    if set(changes) - {"label", "numeric_type", "dimension", "value", "exposed", "policy"}:
         raise ValueError("Unknown driver setting; use driver.value or formula operations.")
     if "policy" in changes:
         changes = dict(changes, policy=shortcut_codec.policy(changes["policy"]))
     install(session, replace(selected(session, driver), **changes))
+
+
+def evaluation_changed(before: DrivingShortcut, after: DrivingShortcut) -> bool:
+    names = ("value", "numeric_type", "dimension", "formulas")
+    return any(getattr(before, name) != getattr(after, name) for name in names)
 
 
 def set_value(session: Any, driver: str, value: int | float) -> None:

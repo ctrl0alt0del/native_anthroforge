@@ -3,6 +3,7 @@
 from typing import Any
 
 from .construction import Control
+from .entities import SCP
 from .numeric_properties import PropertyRef, overlaps
 from .object_outputs import output
 from .results import Port
@@ -58,11 +59,16 @@ def effects(item: Any, reference: PropertyRef) -> set[Port]:
     if item is None:
         return set()
     field = reference.path[0]
-    if field == "transform":
-        return {Port(item.id, "control" if isinstance(item, Control) else "pose")}
+    if field in ("transform", "geometry_offset"):
+        return {Port(item.id, pose_role(item))}
     if isinstance(item, TissueVCP):
-        role = {"resolution": "base", "relaxation": "intrinsic", "stack_settings": "plan"}.get(
-            field, "rest"
-        )
-        return {Port(item.id, role)}
+        from .tissue_revisions import ports
+
+        return ports(item.id, {field})
     return {Port(item.id, "cage" if isinstance(item, Control) else output(item))}
+
+
+def pose_role(item: Any) -> str:
+    if isinstance(item, Control):
+        return "control"
+    return "pose" if isinstance(item, SCP) else "local_pose"

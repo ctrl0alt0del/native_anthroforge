@@ -8,26 +8,30 @@ from anthroforge.core import numeric_properties as numeric
 from . import property_catalog
 
 
-def discover(session: Any, target: str = "", search: str = "") -> list[dict[str, Any]]:
+def discover(
+    session: Any, target: str = "", search: str = "", values: bool = True
+) -> list[dict[str, Any]]:
     items = (
         (session.document.object(target),) if target else session.document.registry.records.values()
     )
     return [
-        describe(session, descriptor)
+        describe(session, descriptor, values)
         for item in items
         for descriptor in property_catalog.descriptors(item)
         if search.casefold() in (item.name + " " + descriptor.label).casefold()
     ]
 
 
-def describe(session: Any, descriptor: numeric.NumericDescriptor) -> dict[str, Any]:
+def describe(
+    session: Any, descriptor: numeric.NumericDescriptor, values: bool = True
+) -> dict[str, Any]:
     from .property_guards import driven
     from .shortcut_ownership import property_owners
 
     reference = descriptor.reference
     return dict(
         asdict(descriptor),
-        value=read(session, reference),
+        value=read(session, reference) if values else None,
         owners=sorted(property_owners(session.document, reference.target)),
         driven_by=driven(session.document, reference),
     )

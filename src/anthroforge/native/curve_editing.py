@@ -60,9 +60,9 @@ def apply_edit(
 def unpack(old: CurvePoint, record: Any) -> CurvePoint:
     return replace(
         old,
-        position=tuple(record[:3]),
-        left=tuple(record[3:6]),
-        right=tuple(record[6:9]),
+        position=tuple(map(float, record[:3])),
+        left=tuple(map(float, record[3:6])),
+        right=tuple(map(float, record[6:9])),
         radius=float(record[9]),
         tilt=float(record[10]),
         left_mode=handle_mode(record[11]),

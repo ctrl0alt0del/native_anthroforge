@@ -88,7 +88,7 @@ def inspect(session: Any, reference: dict[str, Any]) -> dict[str, Any]:
 
 
 def listing(session: Any, selected: str = "", search: str = "") -> list[dict[str, Any]]:
-    values = (*session.document.shortcuts, *session.document.driving_shortcuts)
+    values = ordered(session.document)
     result = []
     for value in values:
         owners = shortcut_ownership.owners(session.document, value)
@@ -99,7 +99,14 @@ def listing(session: Any, selected: str = "", search: str = "") -> list[dict[str
 
 
 def reorder(session: Any, identities: list[str]) -> None:
-    values = {v.id: v for v in session.document.shortcuts}
+    values = {v.id: v for v in ordered(session.document)}
     if len(identities) != len(values) or set(identities) != values.keys():
-        raise ValueError("Reordering must include each existing property wrapper once.")
-    session.replace_document(shortcuts=tuple(values[key] for key in identities))
+        raise ValueError("Reordering must include each existing shortcut once.")
+    session.replace_document(shortcut_order=tuple(identities))
+
+
+def ordered(document: Any) -> tuple[Any, ...]:
+    values = {v.id: v for v in (*document.shortcuts, *document.driving_shortcuts)}
+    order = [key for key in document.shortcut_order if key in values]
+    order.extend(key for key in values if key not in order)
+    return tuple(values[key] for key in order)

@@ -6,6 +6,7 @@ from anthroforge.application import property_operations, shortcut_operations
 from anthroforge.application.shortcut_ownership import property_owners
 
 from .record_model import RecordModel
+from .shortcut_editor import ShortcutEditor
 from .values import qml
 
 FIELDS = (
@@ -18,6 +19,7 @@ FIELDS = (
     "writable",
     "reason",
     "ownerLabel",
+    "kind",
 )
 
 
@@ -31,6 +33,11 @@ class ShortcutPanel(QObject):
         self.signature = None
         self.model = RecordModel(self, FIELDS, "key")
         self.catalog = RecordModel(self, (*FIELDS, "exposed"), "key")
+        self.editor = ShortcutEditor(self)
+
+    @Property(QObject, constant=True)
+    def editing(self):
+        return self.editor
 
     @Property(QObject, constant=True)
     def rows(self):
@@ -61,8 +68,11 @@ class ShortcutPanel(QObject):
         self.signature = signature
         selected = "" if self.all else self.selected_owner()
         values = shortcut_operations.listing(session, selected, self.search)
-        rows = [self.shortcut_row(v) for v in values if "reference" in v]
+        rows = [
+            self.shortcut_row(v) if "reference" in v else driver_row(session, v) for v in values
+        ]
         self.model.synchronize_records(rows if self.all or selected else [])
+        self.editor.synchronize()
 
     def shortcut_row(self, value):
         try:
@@ -101,6 +111,46 @@ class ShortcutPanel(QObject):
         )
         self.discover("")
 
+    @Slot()
+    def createDriver(self):
+        key = self.controller.run("driver.create", {})
+        if key:
+            self.editor.select(key)
+
+    @Slot(str)
+    def hide(self, key):
+        value = next(
+            v for v in shortcut_operations.ordered(self.controller.session.document) if v.id == key
+        )
+        if hasattr(value, "reference"):
+            self.expose(qml(value.reference), value.label, False)
+        else:
+            self.controller.run("driver.configure", dict(driver=key, changes=dict(exposed=False)))
+
+    @Slot(str, int)
+    def move(self, key, direction):
+        order = [v.id for v in shortcut_operations.ordered(self.controller.session.document)]
+        index = order.index(key)
+        destination = max(0, min(len(order) - 1, index + direction))
+        order.insert(destination, order.pop(index))
+        self.controller.run("shortcut.reorder", dict(identities=order))
+
+    @Slot(str, int, float, bool)
+    def editValue(self, key, component, value, uniform):
+        current = next(
+            v for v in shortcut_operations.ordered(self.controller.session.document) if v.id == key
+        )
+        if hasattr(current, "reference"):
+            args = dict(
+                reference=qml(current.reference),
+                value=value,
+                uniform=uniform,
+                component=component if component >= 0 else None,
+            )
+            self.controller.run("shortcut.set", args)
+        else:
+            self.controller.run("driver.value", dict(driver=key, value=value))
+
 
 def numeric_row(value):
     values = value["value"] if isinstance(value["value"], (tuple, list)) else [value["value"]]
@@ -111,6 +161,7 @@ def numeric_row(value):
         dimension=value["dimension"],
         writable=value["writable"] and not value["driven_by"],
         reason=value["reason"] or ("Driven by a formula" if value["driven_by"] else ""),
+        kind="PROPERTY",
     )
 
 
@@ -125,4 +176,21 @@ def missing_row(value, reason):
         writable=False,
         reason=reason,
         ownerLabel="Missing property",
+        kind="PROPERTY",
+    )
+
+
+def driver_row(session, value):
+    owners = ", ".join(session.document.object(v).name for v in value["owners"])
+    return dict(
+        key=value["id"],
+        label=value["label"],
+        reference={},
+        values=[value["value"]],
+        numericType=value["numeric_type"],
+        dimension=value["dimension"],
+        writable=True,
+        reason="Virtual driver value",
+        ownerLabel=owners or "Unassigned",
+        kind="DRIVER",
     )

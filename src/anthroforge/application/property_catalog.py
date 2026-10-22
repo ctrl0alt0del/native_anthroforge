@@ -2,6 +2,7 @@
 
 from collections.abc import Iterator
 from dataclasses import fields, is_dataclass, replace
+from numbers import Real
 from typing import Any, get_args
 
 from anthroforge.core import numeric_properties as numeric
@@ -66,7 +67,31 @@ def descriptors(item: Any) -> Iterator[numeric.NumericDescriptor]:
     yield from transforms(item)
     for name in roots(item):
         if hasattr(item, name):
-            yield from walk_field(item.id, item, name, ())
+            for value in walk_field(item.id, item, name, ()):
+                yield replace(value, label=property_label(item, value.reference.path))
+
+
+def property_label(item: Any, path: tuple[str, ...]) -> str:
+    labels = []
+    for token in path:
+        child = numeric.member(item, token)
+        if token.startswith("@"):
+            labels.append(member_label(item, child))
+        else:
+            labels.append(token.replace("_", " ").title())
+        item = child
+    return " / ".join(labels)
+
+
+def member_label(items: Any, child: Any) -> str:
+    if getattr(child, "name", ""):
+        return str(child.name)
+    if len(child.id) < 16:
+        return str(child.id).replace("_", " ").title()
+    prefix = {"CurvePoint": "Point", "BodyPiece": "Piece", "CurveUse": "Source"}.get(
+        type(child).__name__, "Item"
+    )
+    return prefix + " " + str(next(i + 1 for i, value in enumerate(items) if value is child))
 
 
 def dimension(owner: Any, name: str) -> str:
@@ -76,7 +101,7 @@ def dimension(owner: Any, name: str) -> str:
 def walk(
     target: str, value: Any, path: tuple[str, ...], unit: str, kind: str = "REAL"
 ) -> Iterator[Any]:
-    if type(value) in (int, float) or numeric_vector(value):
+    if isinstance(value, Real) and not isinstance(value, bool) or numeric_vector(value):
         yield descriptor(target, path, value, unit, kind)
     elif is_dataclass(value):
         for field in fields(value):
@@ -89,7 +114,11 @@ def walk(
 
 
 def numeric_vector(value: Any) -> bool:
-    return isinstance(value, tuple) and bool(value) and all(type(v) in (int, float) for v in value)
+    return (
+        isinstance(value, tuple)
+        and bool(value)
+        and all(isinstance(v, Real) and not isinstance(v, bool) for v in value)
+    )
 
 
 def descriptor(

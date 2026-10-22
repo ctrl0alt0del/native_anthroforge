@@ -67,4 +67,5 @@ def document_fields(value: dict[str, Any]) -> dict[str, Any]:
         "shortcuts": tuple(shortcut(v) for v in value.get("shortcuts", ())),
         "driving_shortcuts": tuple(driver(v) for v in value.get("driving_shortcuts", ())),
         "formula_results": tuple(result(v) for v in value.get("formula_results", ())),
+        "shortcut_order": tuple(value.get("shortcut_order", ())),
     }

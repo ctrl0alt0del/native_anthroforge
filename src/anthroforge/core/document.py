@@ -27,6 +27,7 @@ class Document:
     shortcuts: tuple[Shortcut, ...] = ()
     driving_shortcuts: tuple[DrivingShortcut, ...] = ()
     formula_results: tuple[FormulaResult, ...] = ()
+    shortcut_order: tuple[str, ...] = ()
     _index: DocumentIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _registry: object_registry.ObjectRegistry | None = field(
         default=None, repr=False, compare=False, kw_only=True

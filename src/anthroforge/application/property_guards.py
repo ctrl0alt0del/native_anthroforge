@@ -27,6 +27,7 @@ def validate_writers(document: Any) -> None:
 
 
 def require_changes(session: Any, before: Any, after: Any) -> None:
+    require_references(session, before, after)
     for driver in before.driving_shortcuts:
         for formula in driver.formulas:
             if not formula.enabled or formula.id in session.formula_write_authority:
@@ -35,6 +36,37 @@ def require_changes(session: Any, before: Any, after: Any) -> None:
                 raise ValueError(
                     f"This property is driven by {driver.label}; disable its formula to edit it."
                 )
+
+
+def require_references(session: Any, before: Any, after: Any) -> None:
+    for driver in after.driving_shortcuts:
+        for formula in driver.formulas:
+            references = (formula.target, *(i.property for i in formula.inputs if i.property))
+            for ref in references:
+                require_reference(session, before, after, ref, driver.label)
+
+
+def require_reference(session: Any, before: Any, after: Any, ref: PropertyRef, label: str) -> None:
+    from .property_operations import read
+
+    previous, current = (
+        before.registry.records.get(ref.target),
+        after.registry.records.get(ref.target),
+    )
+    if previous is None or previous is current:
+        return
+    try:
+        if current is None:
+            raise ValueError("Removed object.")
+        read(session, ref, current)
+    except (ValueError, AttributeError):
+        missing_reference(label)
+
+
+def missing_reference(label: str) -> None:
+    raise ValueError(
+        "Resolve driving shortcut references before removing this property: " + label
+    ) from None
 
 
 def changed(session: Any, before: Any, after: Any, reference: PropertyRef) -> bool:

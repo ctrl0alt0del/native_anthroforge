@@ -7,6 +7,7 @@ ColumnLayout {
     property var adapter: workspace.shortcutPanel
     property bool allObjects: false
     property bool choosing: false
+    property bool editing: !!adapter.editing.details.id
     spacing: Theme.inset
     function refresh() { adapter.configure(visible, allObjects, search.text); }
     onVisibleChanged: refresh()
@@ -17,13 +18,17 @@ ColumnLayout {
         UiButton { text: "Selected SCP/VCP"; Layout.fillWidth: true; checked: !panel.allObjects; onClicked: panel.allObjects=false }
         UiButton { text: "All"; Layout.fillWidth: true; checked: panel.allObjects; onClicked: panel.allObjects=true }
     }
-    UiField { id: search; Layout.fillWidth: true; placeholderText: "Search shortcuts"; onTextChanged: panel.refresh() }
-    UiButton {
-        text: panel.choosing ? "Close property list" : "Expose property"; Layout.fillWidth: true
-        onClicked: { panel.choosing=!panel.choosing; if(panel.choosing) panel.adapter.discover(""); }
+    UiField { id: search; visible: !panel.editing; Layout.fillWidth: true; placeholderText: "Search shortcuts"; onTextChanged: panel.refresh() }
+    RowLayout {
+        visible: !panel.editing; Layout.fillWidth: true
+        UiButton {
+            text: panel.choosing ? "Close list" : "Expose property"; Layout.fillWidth: true
+            onClicked: { panel.choosing=!panel.choosing; if(panel.choosing) panel.adapter.discover(""); }
+        }
+        UiButton { text: "New driver"; Layout.fillWidth: true; onClicked: { panel.allObjects=true; panel.adapter.createDriver(); } }
     }
     ColumnLayout {
-        visible: panel.choosing; Layout.fillWidth: true; spacing: 4
+        visible: panel.choosing && !panel.editing; Layout.fillWidth: true; spacing: 4
         UiField { Layout.fillWidth: true; placeholderText: "Find a numerical property"; onTextChanged: panel.adapter.discover(text) }
         ListView {
             Layout.fillWidth: true; Layout.preferredHeight: 210; clip: true
@@ -40,10 +45,13 @@ ColumnLayout {
     }
     ListView {
         id: list; objectName: "shortcutList"; Layout.fillWidth: true; Layout.fillHeight: true
+        visible: !panel.editing
         clip: true; spacing: 12; model: panel.adapter.rows
         ScrollBar.vertical: ScrollBar {}
         delegate: ColumnLayout {
             id: row
+            required property string key
+            required property string kind
             required property string label
             required property var reference
             required property var values
@@ -56,7 +64,14 @@ ColumnLayout {
             RowLayout {
                 Layout.fillWidth: true
                 Label { text: row.label; Layout.fillWidth: true; wrapMode: Text.Wrap; color: Theme.text }
-                UiButton { text: "×"; flatStyle: true; hint: "Hide shortcut; formulas stay active"; onClicked: panel.adapter.expose(row.reference, row.label, false) }
+                UiButton { text: "⋮"; flatStyle: true; hint: "Shortcut options"; onClicked: options.open() }
+                UiMenu {
+                    id: options
+                    UiMenuItem { text: "Edit shortcut"; onTriggered: panel.adapter.editing.select(row.key) }
+                    UiMenuItem { text: "Move up"; onTriggered: panel.adapter.move(row.key,-1) }
+                    UiMenuItem { text: "Move down"; onTriggered: panel.adapter.move(row.key,1) }
+                    UiMenuItem { text: "Hide from shortcuts"; onTriggered: panel.adapter.hide(row.key) }
+                }
             }
             Label { visible: panel.allObjects; text: row.ownerLabel; color: Theme.muted; font.pixelSize: 10; wrapMode: Text.Wrap; Layout.fillWidth: true }
             GridLayout {
@@ -69,13 +84,20 @@ ColumnLayout {
                         value: modelData; decimals: row.numericType === "INTEGER" ? 0 : 4
                         enabled: row.writable; Layout.fillWidth: true; Layout.minimumWidth: 50
                         onEdited: value => {
-                            workspace.run("shortcut.set",{reference:row.reference,value:value,component:row.values.length>1 ? index : null});
+                            panel.adapter.editValue(row.key,row.values.length>1 ? index : -1,value,false);
                         }
                         ToolTip.text: row.reason || (row.dimension === "LENGTH" ? "Metres" : row.dimension === "ANGLE" ? "Radians" : "Drag or type a value")
                     }
                 }
             }
+            UiNumberField {
+                visible: row.values.length>1; value: row.values.length ? row.values[0] : 0
+                enabled: row.writable; Layout.fillWidth: true
+                ToolTip.text: "Uniform: set all components to the same value"
+                onEdited: value => panel.adapter.editValue(row.key,-1,value,true)
+            }
         }
         Label { anchors.centerIn: parent; width: parent.width-16; visible: list.count===0; text: "Expose the properties you use for anatomical editing."; wrapMode: Text.Wrap; horizontalAlignment: Text.AlignHCenter; color: Theme.muted }
     }
+    ShortcutEditor { visible: panel.editing; adapter: panel.adapter.editing; Layout.fillWidth: true; Layout.fillHeight: true }
 }

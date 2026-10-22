@@ -17,9 +17,14 @@ Preserve existing geometry, attachments, scheduling, undo and resource ownership
 
 ## Current state
 
-Confirmed documents are on main. Runtime remains 0.2.4. Initial repository inspection
-found only the unrelated untracked root `__init__.py`; leave it untouched.
-No production implementation or qualification has been completed for this task yet.
+Runtime remains 0.2.4; this branch is incomplete and must not be merged yet.
+Initial property/wrapper records, stable numerical references, inferred ownership,
+discovery/exposure/configuration API, and coherent nested candidate writes exist.
+Schema 5 writes these records; schema 4 remains readable with empty shortcut state.
+Six foundation contract tests pass. This is scaffolding, not a usable 0.3 release:
+desktop exposure, complete semantic property adapters, write guards, expressions,
+driver scheduling/policies and parametric evaluation still need integration.
+The unrelated untracked root `__init__.py` remains untouched.
 
 ## Decisions and relevant files
 
@@ -32,14 +37,17 @@ accepted finite path as an independent Bezier curve. Older 0.2.4 projects must l
 
 ## Verification
 
-Initial main and origin/main matched after fetch. Required runtime tests, profiler,
+Initial main and origin/main matched after fetch. `uv run --no-sync pytest
+tests/test_shortcut_foundations.py -q`: 6 passed. `uv run --no-sync mypy` and
+Ruff checks pass for current source. Required full runtime tests, profiler,
 native/parity, offscreen GUI and portable packaging have not yet been run.
 Validation stays background-only; no interactive desktop acceptance is implied.
 
 ## Next actions
 
-1. Inspect document/operation/native integration boundaries and implement property
-   references, wrappers and common write restrictions with contract tests.
+1. Complete semantic property adapters (including transforms, cage resizing and
+   current-shape curve point edits), common driven write restrictions and desktop
+   exposure. Avoid treating generic dataclass replacement as a numerical editor.
 2. Qualify expression candidates, then complete each integrated increment in the
    implementation plan. Record checkpoints and actual evidence here.
 3. Run full qualification, update versions only after success, build the canonical

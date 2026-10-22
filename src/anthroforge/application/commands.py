@@ -32,7 +32,9 @@ from . import (
     point_operations,
     presentation,
     projects,
+    property_operations,
     segment_operations,
+    shortcut_operations,
     shrinkwrap_operations,
     snap_tasks,
     surface_branch_operations,
@@ -58,6 +60,10 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "property.set": property_operations.set_value,
+    "shortcut.expose": shortcut_operations.expose,
+    "shortcut.configure": shortcut_operations.configure,
+    "shortcut.reorder": shortcut_operations.reorder,
     "chain.configure": segment_operations.configure,
     "chain.segment": segment_operations.segment,
     "chain.resize": segment_operations.resize,
@@ -185,6 +191,8 @@ EDITS = {
 
 
 def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    if operation.startswith(("property.", "shortcut.")) and operation not in EDITS:
+        return shortcut_queries(session, operation, arguments)
     handler = query_handler(operation)
     if handler:
         return handler(session, operation, arguments)
@@ -210,6 +218,18 @@ def query_handler(operation: str) -> Any:
 
         return issue_command
     return None
+
+
+def shortcut_queries(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    queries: dict[str, Any] = {
+        "property.discover": property_operations.discover,
+        "property.get": property_operations.get,
+        "shortcut.inspect": shortcut_operations.inspect,
+        "shortcut.list": shortcut_operations.listing,
+    }
+    if operation not in queries:
+        raise ValueError(f"Unknown shortcut/property operation: {operation}")
+    return queries[operation](session, **arguments)
 
 
 def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:

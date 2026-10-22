@@ -28,19 +28,27 @@ checks, and validate the complete cloud gate plus setup/refresh in GitHub Action
 ## Current state
 
 Fetched and inspected current `origin/main`; clean checkout. Failure logs retrieved.
-Implementation and local reproduction pending.
+Local setup reproduced the identical mypy failure. The renderer now selects its
+creation flags under a module-level `sys.platform == "win32"` branch, which
+[mypy explicitly supports](https://mypy.readthedocs.io/en/stable/common_issues.html#python-version-and-system-platform-checks).
+The selected flags and subprocess lifecycle retain their existing behavior.
 
 ## Verification
 
 - GitHub Ubuntu job `120050219101`: dependency setup, host checks and Ruff passed;
   mypy failed before native build/tests.
 - GitHub Windows job `120050219815`: mypy passed; native build failed.
-- Local checks have not yet run.
+- Local `bash tools/cloud/setup.sh`: reproduced the original mypy error after
+  successful dependency refresh, host checks, ShellCheck and Ruff.
+- After the correction, `uv run --no-sync python -m mypy` and the same command
+  with `--platform win32`: both passed, 327 source files each.
+- Targeted Ruff lint/format and `git diff --check`: passed.
+- Full portable gate and remote Ubuntu validation pending.
 
 ## Next actions and blockers
 
-1. Confirm mypy's supported platform guards and reproduce the Ubuntu error locally.
-2. Correct the guard, run the full portable gate, push and verify Ubuntu CI.
+1. Run the full portable gate and verify Ubuntu CI on the pushed correction.
+2. Resolve any subsequent Ubuntu failures exposed after type checking.
 3. Reconcile latest main, integrate the validated repair, and verify remote ancestry.
 
 ## Recovery inputs

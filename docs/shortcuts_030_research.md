@@ -121,6 +121,10 @@ three-output formulas; equivalence must be qualified, not assumed.
   not just arithmetic evaluation.
 - **World/local distinction:** the two TRANSFORMS variables above are evaluated world
   channels; ordinary `scale[n]` property reads are local channels.
+- **Units are not implied by names:** Ribs/Pubis Arc Radius and Sternum Height have
+  Blender subtype NONE and feed scale channels. Pubis/Ilium angles have subtype ANGLE.
+  Migrating a value called Radius into a physical-length variable requires checking
+  the original guide dimensions and frames; copying its number as meters is not justified.
 
 The addon resolver, value writer, shortcut edit use case, override sessions and owner
 back-solve are separate components (`core/shortcuts/*`, `app/use_cases/shortcut_edit.py`).

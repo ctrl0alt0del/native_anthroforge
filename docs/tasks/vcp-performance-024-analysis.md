@@ -1,6 +1,6 @@
 # VCP performance analysis for 0.2.4
 
-- Status: investigating; no production behavior changes authorized or made
+- Status: analysis complete; no production behavior changes made
 - Branch: `codex/vcp-performance-024-analysis`
 - Baseline: `ae9eaab52f8ebc96488a53a57cbe06255bb8aca3` (qualified opening optimizations)
 - Scope: measure VCP editing, numerical kernels, Python/native transfers, dependency
@@ -40,8 +40,21 @@ Disposable experiments verified exact provenance equality and stacking geometry
 equality. Changed-provider stacking does not show the large unchanged-cache speedup.
 The large recorded bone edit also exposes profiler-owned work and reference truncation.
 
+## Desktop conclusion and validation
+
+Normal-refresh hidden viewport traces and Python attribution found full inspection
+report conversion on thousands of mesh visibility reads. An isolated narrow-property
+prototype kept four edits at 1.22–1.29 s, versus up to 3.56–3.66 s in the original
+repeated-edit path. Conversion-only caching was insufficient. See the analysis for
+measurement limits, corrected/excluded harness errors, and proposed order.
+
+No production code/version/package or source fixture was changed. Images were
+inspected; this is not full interactive or geometry acceptance. Docs-only content/link
+checks apply; no full development gate or rebuild. Ignored local probes all satisfy
+the 15-line function limit. Preserve the unrelated untracked root `__init__.py`.
+
 ## Next steps
 
-1. Finish background viewport attribution with normal change-triggered refresh.
-2. Finalize recommended order and limits; review links and evidence.
-3. Commit/push the complete analysis and merge documentation normally. No release build.
+1. Finish the normal documentation integration/push.
+2. Implement proposed optimizations only in a subsequent authorized task, updating
+   computation history and qualifying actual geometry/attachments with performance.

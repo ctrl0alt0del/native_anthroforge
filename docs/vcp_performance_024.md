@@ -8,7 +8,7 @@ code, numerical contracts, source projects or portable package were changed.
 ## Main finding
 
 The expensive tissue mathematics already runs in C++. The clearest remaining costs
-are repeated scene-wide work, Python metadata traversal, native preparation that is
+are repeated UI report conversion, scene-wide work, Python metadata traversal, native preparation that is
 discarded between calls, and one genuinely expensive native height-smoothing solve.
 Moving all application orchestration into C++ would not address these causes by itself.
 
@@ -22,6 +22,7 @@ native and two-layer stacking fixtures were used to exercise the missing paths.
 The original `skeleton_four_muscles_v001.anthroforge` was not modified. The assembly
 input was the already-qualified save from the opening investigation:
 `E:/development/WIP_models/muscle_reconstruction_workflow/runs/2026-10-21-standalone-all-muscle-transfer-958f7969/diagnostics/open-optimization-20261022/packaged-final/saved.anthroforge`.
+Input SHA256: `1d5767657d5eca8f590d413f813c777e1efd3b4aa8943361c933c82364f73abf`.
 Probes open a disposable copy. The single-tissue target is Rectus abdominis.L section1,
 `0204fc95-39fc-4102-8fa6-94f0231ab007`, with 13,845 base vertices and 27,136 triangles.
 
@@ -226,16 +227,98 @@ exclude Python/Qt/driver overhead and inherit the recording's ownership limitati
 
 ## Desktop evidence
 
-Hidden viewport measurements and source review are being finalized. They must use
-normal change-triggered refresh, not a benchmark that forces full refresh each frame.
-Offscreen texture readback is not physical display latency, and a viewport-only test
-does not qualify the complete inspector or a real pointer gesture.
+### F. Separate viewport visibility from detailed inspection reports
+
+The hidden viewport exposed a larger UI problem than the inflation kernel. In
+[TissueInspectionTools.state](../src/anthroforge/desktop/tissue_inspection_tools.py),
+each property read recursively converts the entire inspection report, including
+stage input provenance. Both anatomy and outline delegates in
+[Viewport.qml](../src/anthroforge/desktop/qml/Viewport.qml) read that property simply
+to obtain `hiddenOwners`. One main-thread diagnostic observed **6,158 state reads
+and 5.45 million recursive conversion calls** during a single depth edit.
+
+Two Qt/native recordings completed with no collector losses. They identified
+visibility bindings at Viewport.qml lines 265/288, change propagation and presentation
+as significant costs. Subsequent cProfile attribution located repeated conversion;
+its exaggerated wall times are not used as speed claims. Normal change-triggered
+controller refresh was used; an initial forced-refresh probe was discarded.
+
+The original recorder-off desktop probe ranged from 1.29 s initially to 3.66 s after
+repeated edits; a separate original-path run reached 3.56 s. Synchronous command cost
+rose to 632–650 ms. A temporary Python conversion cache reduced the warmed cost
+partially, to roughly 2.5 s, but still sent the full report through QVariant for each
+visibility read. It is not a sufficient proposed fix.
+
+A second disposable experiment added a narrow `hiddenOwners` property and changed
+the two bindings in a **separate copy of QML**, leaving production sources untouched.
+Four consecutive edits took **1.22–1.29 s**, with **49–54 ms commands**. The visibility
+value equaled the original property; hidden before/after images were inspected and
+the tissue remained displayed with the same shape and selection. No numerical code
+changed. This supports the presentation-boundary change; it does not establish full
+inspection-mode, attachment or interactive acceptance for a production implementation.
+
+Use the existing field-level projection infrastructure to publish prepared inspection
+state, with dedicated cheap visibility properties and notifications only when those
+values change. Preserve preview/displayed revision matching and all stage-comparison
+modes. Merely moving the recursive converter into C++ retains the repeated conversion
+and binding fan-out. Qt's [performance guidance](https://doc.qt.io/qt-6.12/qtquick-performance.html)
+supports reducing binding reevaluation and expensive work in properties; our fixture,
+not that general guidance, establishes this particular failure.
+
+There is additional preparation to reduce: Construction projection still computes
+world frames for all construction objects before checking cached records, and tissue
+projection creates a fresh Frames resolver per tissue. One properly triggered
+recording showed five Controller.refresh calls totaling 259 ms. Use the existing
+change journal and shared frame resolution before proposing a larger native scene API.
+
+All viewport tests used a hidden 1280×960 D3D11 texture. Commands, normal ticks,
+publication, QML and synchronous texture readback are included. They do **not** measure
+physical display latency or qualify the full inspector/pointer gesture. Some frame
+steps still exceeded 100 ms in the candidate; no smooth-framerate target is claimed.
+System-wide busy fractions during these trials were approximately 10–19%, including
+the probe itself; background applications and thermal state were uncontrolled.
+
+## Recommended delivery order
+
+| Order | Work | Main owner | Reason to prioritize |
+| --- | --- | --- | --- |
+| 1 | Narrow tissue inspection presentation and change notifications (F) | Desktop projections/QML | Directly reproduced editing stalls; a focused prototype removed much of the repeated-edit cost. |
+| 2 | Indexed result provenance, typed validation reuse and cheaper profiler resource observation (B) | Core/application metadata and profiling | Exact isolated comparison demonstrates wasted Python traversal; improves trustworthy measurement of larger updates. |
+| 3 | Incremental collision findings with reusable native scene captures (A) | Issues application policy plus native queries | Roughly 0.85 s of repeated collision work follows a 28 ms inflation edit. Preserve findings rather than disabling checks. |
+| 4 | Stacking context lifetime, handle-based obstacles and metadata-only planning (C) | Coordinator-owned native leases/adapters | Existing caches are discarded; reuse demonstrably helps unchanged work, while changed inputs require separate optimization. |
+| 5 | Height-smoothing QP formulation experiment (D) | Native smoothing/PIQP | ~1.5 s solve is a real numerical bottleneck when enabled. Qualify reduced/bound formulation before choosing it. |
+| 6 | Reuse material preparation and avoid unnecessary intermediate mesh preparation (E) | Native tissue and geometry services | Source-backed opportunity; measure sub-costs before committing to broad kernel changes. |
+
+Items 1–4 are the strongest practical 0.2.4 optimization scope. Item 5 should be a
+bounded parity/performance experiment first; item 6 should follow measured residual
+costs. Do not add these individual savings together: workers, UI and diagnostics overlap.
+
+## Python versus C++ decision
+
+| Responsibility reviewed | Current execution | Appropriate action |
+| --- | --- | --- |
+| Base refinement, inflation families, crop/envelope assembly | C++ | Reuse accepted material preparation; keep formulas and topology contracts. |
+| Height smoothing, Static PBD and Geometric relaxation | C++ | Profile native stages; qualify formulation improvements where measured. |
+| Fiber attachment field/retained bindings and path queries | C++ numerical work, Python capture/publication | Preserve dense skeletal-support semantics; batch/reuse owned queries rather than narrowing supports silently. |
+| Stacking detection/transport/constrained solve/validation | C++ | Fix session lifetime and Python/native data round trips. |
+| Stage dependencies, revisions, metadata, Issues and scheduling | Python application policy | Improve algorithms and reuse immutable state; no numerical fallback was found here. |
+| Inspector properties, model projection and Qt notification | Python/Qt/QML | Publish narrow prepared values; avoid repeated report serialization. |
+
+The targeted source audit found no Python tissue optimizer, iterative relaxation
+loop or per-vertex inflation fallback. Python graph walks, relationship matching,
+settings packing and serialization still exist intentionally. The clearest native
+boundary improvement is keeping stacking obstacle preparation/results native, not
+porting document transactions or UI policy wholesale.
 
 ## Reproduction and delivery limits
 
 Local-only raw evidence and disposable scripts are in `build/vcp-performance-024/`:
 `assembly_probe.py`, `kernel_probe.py`, `focused_probe.py`, `viewport_probe.py`, JSON
 measurements, cProfile captures, runtime `.afprofile.zip` recordings and hidden images.
+Additional probes isolate viewport Python attribution, the insufficient conversion-only
+cache and the successful narrow-property experiment. Temporary harness errors (a
+borrowed mesh view outliving its owner, forced refresh, and a Qt subclass notify-signal
+prototype) were corrected/excluded; none changed production code or support timings.
 Source assets and large reports are intentionally not committed. This document keeps
 the measured conclusions recoverable through Git.
 
@@ -243,3 +326,6 @@ No computation-history change entry is needed: this analysis changed no producti
 algorithm, cache or execution boundary. Implementing any recommendation must update
 [the computation inventory/history](computation_history.md), qualify actual geometry
 and attachment behavior, and pass the applicable development/desktop/package gates.
+For this documentation-only delivery, links/content, recorded evidence and production
+diff isolation were reviewed. The full development gate and portable rebuild were not
+run: there is no production implementation to qualify yet.

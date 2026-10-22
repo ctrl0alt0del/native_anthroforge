@@ -2,8 +2,10 @@
 
 from typing import Any
 
+from anthroforge.core.entities import Attachment
 from anthroforge.core.numeric_properties import decode_reference
 from anthroforge.core.results import ReadRevision
+from anthroforge.core.shortcut_edits import OverrideBinding, OwnerAnchor, ShortcutEdit
 from anthroforge.core.shortcuts import (
     AttachmentPolicy,
     DescendantOverride,
@@ -68,4 +70,30 @@ def document_fields(value: dict[str, Any]) -> dict[str, Any]:
         "driving_shortcuts": tuple(driver(v) for v in value.get("driving_shortcuts", ())),
         "formula_results": tuple(result(v) for v in value.get("formula_results", ())),
         "shortcut_order": tuple(value.get("shortcut_order", ())),
+        "shortcut_edits": tuple(edit_context(v) for v in value.get("shortcut_edits", ())),
     }
+
+
+def edit_context(value: dict[str, Any]) -> ShortcutEdit:
+    from .storage import decode_entity
+
+    data = dict(value, policy=policy(value["policy"]), targets=tuple(value["targets"]))
+    data["opening"] = tuple(decode_entity(v) for v in value.get("opening", ()))
+    data["bindings"] = tuple(override_binding(v) for v in value.get("bindings", ()))
+    data["anchor"] = owner_anchor(value.get("anchor"))
+    return ShortcutEdit(**data)
+
+
+def owner_anchor(value: dict[str, Any] | None) -> OwnerAnchor | None:
+    if value is None:
+        return None
+    return OwnerAnchor(
+        **dict(value, fallback=tuple(value["fallback"]), parent_local=tuple(value["parent_local"]))
+    )
+
+
+def override_binding(value: dict[str, Any]) -> OverrideBinding:
+    attachment = value["attachment"]
+    return OverrideBinding(
+        value["target"], Attachment(**dict(attachment, binding=tuple(attachment["binding"])))
+    )

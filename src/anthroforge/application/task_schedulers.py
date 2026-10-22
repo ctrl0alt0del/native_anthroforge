@@ -222,12 +222,22 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_open": OpenProjectTaskScheduler(),
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
-        "formulas": FormulaTaskScheduler(),
+        **shortcut_schedulers(),
         **curve_schedulers(),
         **anchor_schedulers(),
         "control_pose": ControlPoseTaskScheduler(),
         **inspection_schedulers(),
     }
+
+
+def shortcut_schedulers() -> dict[str, TaskScheduler]:
+    return {"formulas": FormulaTaskScheduler(), "shortcut_capture": ShortcutCaptureTaskScheduler()}
+
+
+class ShortcutCaptureTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.1 + workload.recaptures * 0.05 + workload.triangles * 0.002
+        return Schedule("worker", cost, reason="Owned pre-edit attachment capture and owner anchor")
 
 
 def inspection_schedulers() -> dict[str, TaskScheduler]:

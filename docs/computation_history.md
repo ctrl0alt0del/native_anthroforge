@@ -1602,3 +1602,23 @@ See the task and development validation records for final gate/package evidence 
   passing through an intermediate primitive publication. The existing geometry algorithms
   remain unchanged. Native point-result scalar boxing preserves numerical values and
   makes the numerical-property catalogue stable after a native edit.
+
+### CH-047 — Shortcut-scoped attachment preparation and retained owner anchors (2026-10-23)
+
+- The addon temporarily captures descendant bindings before changing a shortcut, restores
+  its authored attachment runtime afterward, and caches overrides using a one-second timeout.
+  Standalone now retains an explicit initiating edit context through gestures, queued work,
+  Manual intent, history and saving. Ordinary property edits do not activate wrapper policies.
+- Native owner backsolve reuses the retained child anchor index/local fallback and its
+  parent-local location, translating by the resulting delta (addon threshold 1e-7). It does
+  not invert formulas, rotate the owner or choose a new closest attachment. Existing capture
+  and batch attachment propagation kernels evaluate temporary descendant settings.
+- Separate shortcut-pose publication avoids making an owner's geometry wait for the
+  backsolve that needs that geometry. Object writer reservations, input revisions and
+  dependent registration remain with the existing coordinator. Accepted receipts retain
+  effective override provenance; authored attachment settings and bindings remain intact.
+- Six integrated edit tests and three native anchor cases pass; the combined focused suite
+  has 40 passes. Tests include geometry publication, paused gestures/cancel, ordinary edits,
+  follow overrides and saved Manual intent. Addon fixture parity, remaining lifecycle,
+  profiler and desktop policy acceptance are not yet established. No inflation or smoothing
+  algorithm, attachment reassignment policy, or 0.2.4 startup evaluator version changed.

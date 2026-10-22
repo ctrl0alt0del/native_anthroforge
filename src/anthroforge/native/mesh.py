@@ -126,6 +126,7 @@ class GeometryEngine(NativeEngine):
         from . import attachment_fields, attachment_weights, path_collisions, point_attachments
         from .mesh_quality import configure as configure_quality
         from .routing_scene import configure
+        from .shortcut_attachments import configure as configure_shortcuts
         from .surface_queries import configure as configure_queries
 
         for module in (attachment_fields, attachment_weights, path_collisions, point_attachments):
@@ -133,6 +134,7 @@ class GeometryEngine(NativeEngine):
         configure(self)
         configure_quality(self)
         configure_queries(self)
+        configure_shortcuts(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

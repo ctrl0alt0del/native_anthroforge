@@ -121,8 +121,10 @@ def propagate_result(session: "Session", entity: str) -> None:
 
     from . import evaluation
     from .dependent_tasks import changed
+    from .shortcut_attachment_evaluation import request
 
     changed(session, {dep.Port(entity, "geometry")})
+    request(session, {c.id for c in session.document.shortcut_edits if c.owner == entity})
     targets = descendants(session.document.entities, entity) - {entity}
     live = {key for key in targets if mode(session.document, key) != "MANUAL"}
     if live and session.document.attachments_enabled:

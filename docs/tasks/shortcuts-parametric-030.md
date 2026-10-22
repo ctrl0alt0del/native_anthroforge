@@ -82,6 +82,16 @@ Validation stays background-only; no interactive desktop acceptance is implied.
 
 ## Next actions
 
+Attachment-policy checkpoint (2026-10-23): native owner capture/backsolve and coordinated
+temporary edit contexts now work through shared shortcut operations. Six integrated cases
+cover wrapper-only behavior, translation-only owner retention after geometry changes,
+Follow Rotation overrides, drag pauses/cancel, and Manual edits saved/reopened before
+explicit evaluation. Authored attachment settings/bindings are restored; accepted pose
+receipts retain effective-binding provenance without forcing startup recomputation.
+40 focused regression cases, Ruff and mypy passed. Native fixture parity, broader lifecycle
+cases, policy UI, full regressions and native style checks remain pending. Context records
+are portable pending intent, not native handles. Parametric implementation is still pending.
+
 1. Complete driver validation/qualification and desktop editing. Public `driver.*` operations,
    formula output dependencies, failure retention, and scheduling now exist. Audit coupled
    validation and pending result publication, then implement initiating attachment contexts.

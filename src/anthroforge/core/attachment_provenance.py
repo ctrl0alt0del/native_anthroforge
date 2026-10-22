@@ -32,10 +32,15 @@ def required(entities: list[SCP], requested: set[str]) -> set[str]:
             item.parent in changed
             or item.status != "ready"
             or parent.status != "ready"
-            or item.pose_receipt != receipt(item, parent)
+            or item.pose_receipt != observed_receipt(item, parent)
         ):
             changed.add(item.id)
     return changed
+
+
+def observed_receipt(child: SCP, parent: SCP) -> AttachmentReceipt:
+    effective = child.pose_receipt.effective if child.pose_receipt else None
+    return replace(receipt(child, parent), effective=effective)
 
 
 def accepted(entities: list[SCP], evaluated: set[str]) -> list[SCP]:

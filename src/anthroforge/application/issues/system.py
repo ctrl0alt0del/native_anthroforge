@@ -39,7 +39,7 @@ class IssueSystem:
             self.listening.register(provider)
 
     def attach(self, scheduler: "TaskCoordinator") -> None:
-        scheduler.service_tick = self.synchronize
+        scheduler.service_tick = self.session.synchronize_services
         scheduler.lifecycle = self.tasks.event
 
     def synchronize(self) -> None:

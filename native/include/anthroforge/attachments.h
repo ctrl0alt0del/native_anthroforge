@@ -37,6 +37,13 @@ AF_API uint64_t af_attached_path(uint64_t path,const double* points,const double
 AF_API int af_attached_controls(const double* records,int count,const double* points,
     const double* world,double* output);
 AF_API int af_attachment_compact(int count,const int* owners,int surfaces,int* output,int* used);
+/* Shortcut owner preservation retains an existing child anchor, never a nearest reassignment.
+ * Mode: 0 face centre, 1 vertex, 2 object origin. Invalidated geometry indices use the
+ * retained local fallback, matching the qualified addon owner-backsolve contract. */
+AF_API int af_shortcut_owner_anchor(uint64_t child,const double* world,const double* parent,
+    const double* offset,int mode,int index,const double* fallback,double* parent_local);
+AF_API int af_shortcut_owner_backsolve(uint64_t child,const double* world,const double* parent,
+    const double* offset,int mode,int index,const double* fallback,const double* parent_local,double* output);
 /* Restore unedited structural pins against their own retained material surface snapshots. */
 AF_API int af_attachment_retain_pins(uint64_t path,int knots,const int* pins,const int* targets,
     const double* records,int count,int* owners,double* weights,double* bindings);

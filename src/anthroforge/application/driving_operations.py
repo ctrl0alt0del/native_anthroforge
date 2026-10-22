@@ -56,7 +56,12 @@ def evaluation_changed(before: DrivingShortcut, after: DrivingShortcut) -> bool:
 
 
 def set_value(session: Any, driver: str, value: int | float) -> None:
-    install(session, replace(selected(session, driver), value=value))
+    original = selected(session, driver)
+    changed = replace(original, value=value)
+    if changed == original:
+        return
+    session.shortcut_edits.begin(original)
+    install(session, changed)
 
 
 def remove(session: Any, driver: str) -> None:

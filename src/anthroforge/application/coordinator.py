@@ -45,6 +45,9 @@ class TaskCoordinator:
         self.inline_budget = InlineBudget(clock)
         self.coalescing: dict[str, tuple[float, float]] = {}
         self.publishing = ""
+        self.publication_contexts: tuple[str, ...] = ()
+        self.annotate: Callable[[Job, Document], None] = lambda job, document: None
+        self.before_dispatch: Callable[[Job, Document], None] = lambda job, document: None
 
     @property
     def jobs(self) -> list[Job]:
@@ -59,6 +62,7 @@ class TaskCoordinator:
         return any(job.writes for job in self.registry.active.values())
 
     def submit(self, job: Job) -> str:
+        self.annotate(job, self.current())
         return task_coalescing.reuse(self, job) or self._submit(job)
 
     def _submit(self, job: Job) -> str:
@@ -268,11 +272,15 @@ class TaskCoordinator:
                 and (job.accepted_inputs_key != job.inputs_key(self.current()))
             ):
                 refresh = job.renew_inputs
-                self.registry.update(job, lambda: refresh(job, self.current()))
+                self.registry.update(job, lambda: self._renew(job, refresh))
             return True
         except Exception as error:
             self._failed(job, error)
             return False
+
+    def _renew(self, job: Job, refresh: Callable[[Job, Document], None]) -> None:
+        refresh(job, self.current())
+        self.annotate(job, self.current())
 
     def queued(self) -> list[Job]:
         return sorted(
@@ -286,6 +294,7 @@ class TaskCoordinator:
         job.state, job.progress = "preparing", "Preparing owned input"
         try:
             self._assess(job)
+            self.before_dispatch(job, job.snapshot)
             payload = trace.call(self.profiler, job, "prepare", job.prepare, job.snapshot)
             job.prepare_ms = (monotonic() - job.started) * 1000
             self.metrics.observe("prepare", job.prepare_ms / 1000)
@@ -332,11 +341,13 @@ class TaskCoordinator:
     def _publish(self, job: Job, result: Any) -> None:
         job.state, job.progress = "publishing", "Publishing complete result"
         previous, self.publishing = self.publishing, job.id
+        contexts, self.publication_contexts = self.publication_contexts, job.edit_contexts
         started = monotonic()
         try:
             trace.call(self.profiler, job, "publish", job.publish, result)
         finally:
             self.publishing = previous
+            self.publication_contexts = contexts
             job.publish_ms = (monotonic() - started) * 1000
             self.metrics.observe("publication", job.publish_ms / 1000)
 

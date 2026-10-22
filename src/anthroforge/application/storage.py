@@ -30,6 +30,7 @@ STATE_RECORDS = (
     "shortcuts",
     "driving_shortcuts",
     "formula_results",
+    "shortcut_edits",
 )
 
 
@@ -124,7 +125,13 @@ def decode_pose_receipt(value: Any) -> AttachmentReceipt | None:
         data[key] = tuple(data[key])
     settings = dict(data["settings"])
     settings["binding"] = tuple(settings["binding"])
+    if data.get("effective") is not None:
+        data["effective"] = decoded_attachment(data["effective"])
     return AttachmentReceipt(**{**data, "settings": Attachment(**settings)})
+
+
+def decoded_attachment(value: dict[str, Any]) -> Attachment:
+    return Attachment(**dict(value, binding=tuple(value.get("binding", ()))))
 
 
 def decode_workspace(data: dict[str, Any]) -> Workspace:

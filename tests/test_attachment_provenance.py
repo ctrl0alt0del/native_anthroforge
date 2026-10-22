@@ -68,3 +68,9 @@ def test_new_parent_geometry_and_explicit_recapture_are_evaluated(session, assem
         evaluation.request(session, {child}, {child})
         session.wait(10)
     assert native.call_count >= 1
+
+
+def test_receipt_from_other_evaluator_requires_revalidation(session, assembly):
+    parent, child = (session.document.entity(key) for key in assembly)
+    old = replace(child, pose_receipt=replace(child.pose_receipt, evaluator_version=0))
+    assert attachment_provenance.required([parent, old], {child.id}) == {child.id}

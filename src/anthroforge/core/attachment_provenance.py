@@ -5,6 +5,8 @@ from dataclasses import replace
 from .entities import SCP, AttachmentReceipt
 from .results import geometry_asset
 
+EVALUATOR_VERSION = 1  # Advance when attachment evaluation semantics change.
+
 
 def receipt(child: SCP, parent: SCP) -> AttachmentReceipt:
     surface = child.attachment.parent_mode == "SURFACE_NEAREST"
@@ -16,6 +18,7 @@ def receipt(child: SCP, parent: SCP) -> AttachmentReceipt:
         child.matrix,
         child.geometry_offset,
         child.attachment,
+        EVALUATOR_VERSION,
     )
 
 

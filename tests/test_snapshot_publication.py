@@ -5,8 +5,9 @@ from unittest.mock import patch
 
 import pytest
 
-from anthroforge.application import tissue_results
+from anthroforge.application import geometry_outputs, tissue_results
 from anthroforge.core import document_index, object_registry
+from anthroforge.core.construction import Primitive
 from anthroforge.core.results import EvaluationResult, Port
 from anthroforge.core.tissue_stacking import StackPlan
 from tests.test_tissue_contracts import membrane_document
@@ -72,3 +73,17 @@ def test_pending_tissues_publish_once_and_repeat_is_a_noop(session):
         tissue_results.mark_pending(session, ports)
     assert publish.call_count == 1
     assert all(session.document.object(p.owner).rest_result.status == "pending" for p in ports)
+
+
+def test_geometry_pending_batches_anatomy_and_surface_and_ignores_empty_changes(session):
+    document, tissue = membrane_document()
+    bone = replace(document.entities[0], primitive=Primitive("IMPORTED", source="fixture"))
+    session.document = replace(document, entities=(bone,))
+    targets = {bone.id, tissue.source}
+    with patch.object(session, "replace_document", wraps=session.replace_document) as publish:
+        geometry_outputs.pending(session, set())
+        geometry_outputs.pending(session, targets)
+        geometry_outputs.pending(session, targets)
+    assert publish.call_count == 1
+    assert all(session.document.object(key).result.status == "pending" for key in targets)
+    assert session.document.entity(bone.id).pose_revision == bone.pose_revision

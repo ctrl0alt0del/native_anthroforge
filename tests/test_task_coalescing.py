@@ -73,3 +73,15 @@ def test_changed_output_reservation_is_not_merged(coordinated):
     next_job.outputs = frozenset(("child", "other"))
     assert coordinator.submit(next_job) != first.id
     assert first.state == "obsolete" and next_job.outputs == {"child", "other"}
+
+
+def test_coalesced_request_releases_payload_and_adopts_current_workspace_priority(coordinated):
+    coordinator, _, state, published = coordinated
+    first = renewable(published, state[0])
+    first.priority = 10
+    coordinator.submit(first)
+    request = renewable(published, state[0])
+    assert coordinator.submit(request) == first.id
+    assert first.priority == 0
+    assert request.cancel is None and request.cleanup is None and request.renew_inputs is None
+    assert request.id not in coordinator.registry.by_id

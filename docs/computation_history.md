@@ -1362,17 +1362,21 @@ See the task and development validation records for final gate/package evidence 
   Unknown/new authored fields invalidate validation by default. Stack plans remain
   relationship inputs. Constructors continue validating every changed record.
 - Manual routing discovers anatomical providers only when requested. Tissue pending
-  states publish together, with no publication when already pending. Algorithms,
+  states publish together, with no publication when already pending. Geometry pending
+  publication likewise batches SCPs/surfaces and skips empty or unchanged sets. Algorithms,
   geometry tolerances, input revision checks and attachment capture remain unchanged.
 - Initial evidence: 26 focused tests cover value/result edits, immutable old snapshots,
   parent frame walks, provider changes, invalid references and batched pending states.
-  Full assembly timing, behavior and packaged evidence are pending on the task branch.
+  The first assembly trial fell from 148.95 s to 12.55 s before further scheduling work.
+  Frozen baseline versus optimized replay is bit-for-bit equal across 11 snapshots of
+  1,456 geometry/path/transform arrays (opening, three bone edits, two fiber edits, undo).
+  Portable evidence remains pending on the task branch.
 
 ### CH-038 — Exact pose provenance and renewable pending work (2026-10-22)
 
 - Startup recomputation changed 55 bone matrices by at most 6.573e-14. These exact
   differences caused a large downstream wave despite no authoring edit. Accepted
-  SCP poses now store exact parent pose/offset/geometry, child pose/offset and binding
+  SCP poses now store evaluator version, exact parent pose/offset/geometry, child pose/offset and binding
   settings. Matching receipts retain the accepted pose; any changed input, recapture,
   failure or absent receipt follows normal native evaluation. There is no coordinate
   epsilon, binding reassignment or geometry-kernel change. Older schema-4 files with
@@ -1387,4 +1391,7 @@ See the task and development validation records for final gate/package evidence 
   explicit recapture, changed geometry/settings, parent failure, pending input changes,
   refreshed relationship indexes, cancellation and output reservations. The assembly
   now has 34 obsolete rather than 2,968 obsolete requests, with 956 successes in both.
-  Full geometry/edit and release evidence remains pending at this checkpoint.
+  Full fixture geometry/edit replay is exact (CH-037). Development gate passes with
+  1,685 tests and five native CTests; one subsequent pending-publication regression
+  remains in final Python checks. Hidden GPU and offscreen UI opening/edit/undo/save
+  checks pass. Portable release evidence remains pending at this checkpoint.

@@ -38,21 +38,21 @@ without evidence. The unrelated untracked root `__init__.py` must remain untouch
 
 ## Current state
 
-First increment implemented: cached per-record dependency links, conservative reuse
-of registry validation for evaluated-only changes, guarded manual-routing discovery,
-and batched tissue pending publication. 26 focused contract tests, architecture/function
-limits and mypy pass. Full fixture timing and behavior replay are in progress against
-a frozen baseline source copy in diagnostics/open-optimization-20261022.
-Existing package is canonical 0.2.3; no version bump requested. Startup provenance,
-coalescing, asynchronous launch, full gates/package checks and archive refresh remain pending.
+All four implementation areas are integrated. Exact receipts carry an evaluator version;
+pending contracts cache unchanged graph/observation sets, release superseded request
+payloads, and adopt current workspace priority. Geometry and tissue pending states publish
+in batches; empty/already-pending geometry requests create no document revision.
 
-Second checkpoint: exact attachment receipts now persist with accepted poses; missing
-receipts receive normal evaluation, while matching inputs preserve exact matrices.
-Five regression cases cover reopen, tiny edits, undo, missing provenance, recapture,
-settings/geometry changes and parent failure. Renewable dispatch-only jobs coalesce
-while queued and refresh dependency contracts before admission; explicit cancellation
-and undo still cancel. The desktop launch now uses the existing asynchronous open path.
-Full pytest is running; full fixture replay/GUI/package gates are still pending.
+The full development gate passed (1,685 tests, five native CTests, styles, typing,
+numerical audit and doctor). One later pending-publication regression is added; final
+Python regression checks remain before delivery. Actual fixture replay against frozen
+baseline source is bit-for-bit equal across 1,456 arrays per snapshot: open, three bone
+edits, two fiber edits and all undos (11 snapshots). The hidden GPU viewport shows the
+assembly while jobs remain active; offscreen GUI drag/undo/save/reopen passes. No visible
+window/input was used. GPU readback timings do not establish interactive frame rates.
+
+Canonical 0.2.3 rebuild, portable qualification, final save/reopen timings and source
+archive refresh remain pending. Original project files remain untouched.
 
 Measured first increment: 12.55 s versus 148.95 s, with the same 956 successful jobs
 and 2,968 obsolete jobs. With request coalescing, obsolete jobs fall to 34 (956 successful);
@@ -62,13 +62,9 @@ These single diagnostic trials are preliminary; serial delivery measurements rem
 
 ## Verification and next steps
 
-1. Add structural/result-change contract tests; implement incremental reuse and remove
-   irrelevant manual-routing surface enumeration. Measure this increment on the fixture.
-2. Implement stable unchanged-input attachment synchronization and coordinated invalidation.
-3. Keep the desktop startup path asynchronous; verify staged geometry and responsiveness.
-4. Run development/native gates, saved-geometry and attachment/edit/undo comparisons,
-   recorded opening benchmarks and offscreen packaged checks. Review ownership separately.
-5. Update architecture/computation history and qualify one canonical distribution; merge/push.
+1. Finish recorded open/save/reopen checks with exact geometry comparison.
+2. Rebuild the canonical 0.2.3 distribution, run portable and fixture opening checks.
+3. Record final evidence, refresh source archive, validated merge and push.
 
 Recovery uses the normal Windows `.venv`, native build and packaging tools. All models,
 captures and temporary experiments stay outside Git. Checkpoints describe incomplete work

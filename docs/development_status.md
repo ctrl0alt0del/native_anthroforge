@@ -5,6 +5,19 @@ The earlier sections retain the evidence and limitations of their respective rev
 
 ## Shortcuts and Parametric curves (0.3.0)
 
+### Humerus shortcut attachment correction
+
+The [retained-binding correction](tasks/shortcut-owner-binding.md) passes the full
+Windows gate with **2,007 tests and five native CTests**. Humerus length changes now
+resolve the existing shoulder attachment, matching the addon; direct transforms and
+explicit rebinding retain their capture behavior. Actual 96-muscle editing/history
+preserves all stored SCP/Fiber bindings. The canonical package passes the complete
+portable suite, exact source/package geometry and attachment equivalence, saved-project
+reopening and hidden rendering. Fixed-camera Blender/app shape comparisons were inspected.
+Evidence is offscreen/background only. Earlier qualification below remains historical.
+
+### Initial 0.3 release qualification
+
 The [0.3 contract](specification_030.md) is implemented in the desktop and headless core.
 The full Windows development gate passes **1,945 tests**, no expected failures, all five
 native CTests, style/function limits, configured typing, numerics and Qt-free doctor.

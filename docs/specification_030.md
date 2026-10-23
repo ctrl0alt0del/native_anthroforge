@@ -107,6 +107,12 @@ including deeper descendants. Do not expand this scope to every SCP reached thro
 formula targets. By default scope is the inferred owning SCP. An explicit scope must
 be one of the shortcut's controlled SCPs, including indirect targets/shared construction.
 Backsolve concerns that SCP's own attachment; descendant settings concern its children.
+Shortcut-driven SCP transform changes resolve the existing anatomical binding rather
+than recapturing it from the newly edited pose. This applies with Backsolve off as well:
+retaining a binding and opting into translation-only backsolve are distinct operations.
+Ordinary property/transform edits and explicit rebinding retain their existing capture
+behavior. The initiating edit context carries retained bindings through queued formulas,
+Manual/On Release evaluation, gestures, undo and saved pending work (CH-067).
 Without an eligible automatic or explicit scope, SCP policies are unavailable.
 The skeleton's Pubis Arc Angle controls Pubis construction and Sacrum width, yet retains
 an explicit Pubis scope for its Ilium override. Do not enable direct transforms on VCPs.

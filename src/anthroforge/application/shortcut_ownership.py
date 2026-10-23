@@ -22,8 +22,12 @@ def property_owners(document: Any, target: str) -> set[str]:
 
 
 def targets(document: Any, shortcut: Shortcut | DrivingShortcut) -> set[str]:
+    return {reference.target for reference in references(document, shortcut)}
+
+
+def references(document: Any, shortcut: Shortcut | DrivingShortcut) -> set[PropertyRef]:
     if isinstance(shortcut, Shortcut):
-        return {shortcut.reference.target}
+        return {shortcut.reference}
     pending, seen, result = [shortcut.id], set[str](), set[PropertyRef]()
     drivers = {v.id: v for v in document.driving_shortcuts}
     while pending:
@@ -33,7 +37,7 @@ def targets(document: Any, shortcut: Shortcut | DrivingShortcut) -> set[str]:
         seen.add(key)
         result.update(f.target for f in drivers[key].formulas if f.enabled)
         pending.extend(d.id for d in drivers.values() if consumes(d, key, result))
-    return {reference.target for reference in result}
+    return result
 
 
 def consumes(driver: DrivingShortcut, source: str, properties: set[PropertyRef]) -> bool:

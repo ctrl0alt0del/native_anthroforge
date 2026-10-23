@@ -9,6 +9,8 @@ from .shortcuts import AttachmentPolicy
 
 @dataclass(frozen=True, slots=True)
 class OverrideBinding:
+    """Effective edit binding: retained authored attachment or a temporary override."""
+
     target: str
     attachment: Attachment
 
@@ -35,5 +37,7 @@ class ShortcutEdit:
     error: str = ""
 
     def __post_init__(self) -> None:
-        if not self.owner or not self.shortcut or self.status not in ("pending", "ready", "failed"):
+        if not self.shortcut or self.status not in ("pending", "ready", "failed"):
             raise ValueError("Invalid pending shortcut edit context.")
+        if not self.owner and (self.policy.backsolve or self.policy.descendants):
+            raise ValueError("Shortcut attachment overrides require an owning SCP or scope.")

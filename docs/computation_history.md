@@ -84,7 +84,7 @@ native algorithms and retained material-binding semantics. Final evidence is bel
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
-| A01 | SCP attachments: nearest/ray capture, retained surface/frame/offset records and batched parent-to-child transform propagation. | [attachment.cpp](../native/src/attachment.cpp), [attachment adapter](../src/anthroforge/native/attachments.py) | [addon parity](../tests/test_addon_parity.py), [assembly](../tests/test_assembly.py) |
+| A01 | SCP attachments: nearest/ray capture, retained surface/frame/offset records and batched parent-to-child transform propagation. Shortcut transform edits retain existing bindings; ordinary direct transforms still recapture (CH-067). | [attachment.cpp](../native/src/attachment.cpp), [attachment adapter](../src/anthroforge/native/attachments.py), [shortcut capture](../src/anthroforge/application/shortcut_capture.py) | [addon parity](../tests/test_addon_parity.py), [assembly](../tests/test_assembly.py), [shortcut retention](../tests/test_shortcut_retained_bindings.py) |
 | A02 | Anchor/point bindings: capture and resolve explicit SCP or Tissue Base/Final material locations, orientation and offsets. Resolve against accepted deformed material without rewriting bindings; union-covered locations follow their own construction exterior (CH-065). | [point attachment adapter](../src/anthroforge/native/point_attachments.py), [material_binding.cpp](../native/src/material_binding.cpp), [surface providers](../src/anthroforge/application/surface_providers.py) | [point attachments](../tests/test_point_attachments.py), [tissue anchor material](../tests/test_tissue_anchor_material.py) |
 | A03 | Fiber attachment fields: dense surface captures, nearest-owner runs, arc-length blending between owners, structural pins and retained material influence. Automatic skeletal supports exclude unrelated tissues; explicitly tissue-backed fields use selected parents (CH-036). Applies across curve engines. | [attachment_weights.cpp](../native/src/attachment_weights.cpp), [attachment fields](../src/anthroforge/native/attachment_fields.py), [support policy](../src/anthroforge/application/fiber_supports.py) | [attachment weights](../tests/test_attachment_weights.py), [attachment fields](../tests/test_attachment_fields.py), [support policy](../tests/test_fiber_support_policy.py) |
 | A04 | Fiber resolution/editing: resolve its current attached shape, edit authored controls, rebind edited endpoints using Current/Any eligible parent policy, preserve unedited pins, then evaluate its path engine. | [fiber bindings](../src/anthroforge/application/fiber_bindings.py), [fiber edit evaluation](../src/anthroforge/application/fiber_edit_evaluation.py), [path_editing.cpp](../native/src/path_editing.cpp) | [fiber editing](../tests/test_fiber_editing.py), [tissue fiber material](../tests/test_tissue_fiber_material.py) |
@@ -2108,3 +2108,39 @@ average. This is a read-only formula input; no new write channel is introduced.
   oversized metadata and explicitly report incomplete capture; headless traces have no
   losses. [The task record](tasks/task-priority-propagation.md) gives provenance, cost,
   comparison limits, ownership review and reproducible tools. Source project is unchanged.
+
+### CH-067 — Retain bindings for shortcut-driven transforms (2026-10-24)
+
+- **Observed / old approach (A01/R03):** Humerus length +5% captured a new binding
+  after scaling, moving the shoulder anchor by .14825748 world units. The addon
+  explicitly supplies an empty recapture set. A retained-binding counterfactual
+  reproduces the addon pose, and the user approved the addon result after visual review.
+- **Change:** the existing shortcut edit context snapshots effective bindings for SCP
+  transform targets before mutation. Both wrappers and transitive driving shortcuts
+  use this shared boundary. Ordinary retention is immediately ready; only optional
+  backsolve/descendant override preparation needs a calculation. Temporary overrides
+  take precedence over retained defaults. Multi-owner drivers retain each controlled
+  binding without inventing an SCP-specific policy scope. No new scheduler, schema,
+  native solver, geometry algorithm or implicit backsolve option.
+- **Preserved:** direct property/transform capture, explicit rebind, original authored
+  attachment settings, optional backsolve/overrides, update modes, queued input capture,
+  cancellation, history, checkpoints, Manual saves, and geometry resource ownership.
+  Non-transform shortcuts do not acquire new attachment evaluation behavior.
+- **Evidence:** 22 focused regressions pass, including default retention, paused drags,
+  all update modes, Manual round trips, undo/redo, ordinary-edit supersession and
+  multi-owner drivers. The actual 96-muscle assembly passes +5% Humerus edit and
+  undo/redo with every SCP/Fiber binding unchanged and zero restored tissue vertex
+  error. Shoulder anchor movement is 4.44e-16. Humerus response differs from Blender
+  by at most 6.55e-7 in source world units; absolute surface distance is 5.78e-6,
+  including the pre-existing baseline discrepancy. Radius absolute distance is 1.02e-5
+  and Ulna 1.34e-5. Cropped tissue behavior still intentionally differs from the addon
+  under CH-065; unrelated Thumb/Ribs causes are not repaired or claimed here.
+- **Qualification:** full Windows gate passes 2,007 tests and five CTests. The canonical
+  package passes the full portable suite and actual-assembly edit/undo/redo/reopen;
+  all 625 geometry/pose/path and 914 attachment fingerprints match corrected source
+  exactly. Four focused rendered comparisons and the packaged native render were
+  inspected. Hidden desktop opens without QML warnings. This is background-only
+  evidence, not physical interactive acceptance. Baseline source `4d24d6e`, runtime
+  correction `6d9bae8`; reproducible qualification is
+  `tools/qualify_shortcut_owner_binding.py`. Local evidence and final qualification
+  are tracked in [the task record](tasks/shortcut-owner-binding.md).

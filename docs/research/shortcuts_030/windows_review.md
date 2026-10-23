@@ -111,9 +111,12 @@ This is a coordinator-authored code review, separate from test counts:
   and pending discovery retain explicit loss reporting. Signal-name metadata is
   immutable and reused during discovery rather than allocated per visited method.
 
-Open finding: generated point IDs currently follow sample index. A resolution change
-can therefore move an existing Hook to another parameter location. The regression is
-explicitly expected to fail while the user chooses locking versus parameter-preserving
-remapping. It must be resolved and qualified before main/release; the expected failure
-is not release acceptance. The existing consumer-attachment and junction locks remain
-enforced and independently tested.
+Resolved finding: generated point IDs follow sample index, so changing resolution could
+move an endpoint Hook to an interior parameter location. The user confirmed locking
+resolution while generated-point membership, weights or formula references exist. The
+shared Parametric policy now enforces this across writes and engine restoration; property
+inspection supplies the same reason to desktop fields. Disabled references retain the
+lock. Removing references unlocks, and Undo restores it. Whole-curve deformation remains
+resizable. The expected-failure marker was removed. The focused 26-case run covers these
+paths plus existing junction/attachment locks and architecture constraints. Production-QML
+editing confirms the locked field ignores text-edit activation and unlocks after removal.

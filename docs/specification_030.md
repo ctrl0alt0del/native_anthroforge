@@ -2,7 +2,7 @@
 
 **Status: confirmed; implementation and qualification in progress on the feature branch.**
 This is the authoritative 0.3 product contract. See the [local review](tasks/shortcuts-parametric-030.md)
-for completed checks and the unresolved generated-point membership decision.
+for completed checks and final release qualification.
 The [implementation plan](implementation_030.md) defines delivery and evidence; the
 [engineering guidelines](engineering_guidelines.md) govern implementation. The current
 released application remains 0.2.4. This document does not claim runtime qualification.
@@ -193,6 +193,14 @@ Hooks and applicable lattice deformation act after formula evaluation, keeping t
 definition editable. Stable membership and weights must not be reinterpreted silently
 when sampling changes. Consumers retain their own sampling, ranges, direction and
 placement; primitives and surfaces accept the common curve output.
+
+Resolution is locked while a curve has point-specific deformer membership or weights,
+or a formula input/target references one of its generated points. Disabled bindings and
+formulas retain their references and therefore retain the lock. Remove or retarget the
+references (or clear weights) to unlock; whole-curve deformers without point assignments
+do not lock resolution. Explain the reason through the shared property inspector and
+tooltip. Enforce the same policy for direct API/property/shortcut edits, formula outputs
+and restoration of a stored Parametric definition with a different point count.
 
 ## 8. Junctions, engine switching and Fibers
 

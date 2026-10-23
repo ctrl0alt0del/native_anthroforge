@@ -25,9 +25,11 @@ def discover(
 def describe(
     session: Any, descriptor: numeric.NumericDescriptor, values: bool = True
 ) -> dict[str, Any]:
+    from .parametric_policy import descriptor as constrained
     from .property_guards import driven
     from .shortcut_ownership import property_owners
 
+    descriptor = constrained(session.document, descriptor)
     reference = descriptor.reference
     return dict(
         asdict(descriptor),

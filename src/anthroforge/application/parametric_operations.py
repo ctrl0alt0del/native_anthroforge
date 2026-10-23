@@ -9,7 +9,7 @@ from anthroforge.core.parametric import ParametricSettings, Variable
 from anthroforge.core.parametric import decode as decode_parametric
 from anthroforge.core.parametric_symbols import reconcile
 
-from . import object_operations, parametric_policy
+from . import object_operations
 
 
 def current(session: Any, curve: str) -> tuple[Curve, ParametricSettings]:
@@ -82,8 +82,6 @@ def switch(session: Any, item: Curve, engine: str) -> Curve:
 
 def restore_definition(session: Any, item: Curve) -> Curve:
     config = item.parametric_definition or ParametricSettings()
-    if any(p.junction for p in item.points) and len(item.points) != config.resolution:
-        parametric_policy.require_resolution(session.document, item)
     return replace(item, engine_settings=config)
 
 

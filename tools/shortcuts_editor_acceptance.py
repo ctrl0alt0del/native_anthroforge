@@ -142,12 +142,42 @@ def exercise(controller, engine, curve, driver, warnings):
     driver_units(controller, window, driver)
     variable_units(controller, engine, window, curve)
     field_navigation(controller, window, curve, driver)
+    resolution_membership(controller, window, curve, driver)
     QTest.qWait(100)
     assert window.grabWindow().save(str(OUTPUT / "editors.png"))
     controller.shortcut_panel.editor.select("")
     QTest.qWait(100)
     assert window.grabWindow().save(str(OUTPUT / "shortcut-list.png"))
     assert not warnings, warnings
+
+
+def restricted_binding(controller, curve):
+    session = controller.session
+    body = session.command("primitive.from_curves", curves=[curve], kind="BODY")
+    settle(controller)
+    control = session.command("control.create", entity=body)
+    return session.command(
+        "deformer.add",
+        control=control,
+        target=dict(owner=body, stage="CURVE", component=curve),
+        indices=[0, 1, 2],
+    )
+
+
+def resolution_membership(controller, window, curve, driver):
+    controller.session.command("driver.remove", driver=driver)
+    binding = restricted_binding(controller, curve)
+    settle(controller)
+    field, setting = find(window, "parametricResolutionValue"), find(window, "parametricResolution")
+    assert field.property("propertyLocked") and "membership" in setting.property("hint")
+    assert QMetaObject.invokeMethod(field, "beginText") and not field.property("textEditing")
+    assert window.grabWindow().save(str(OUTPUT / "resolution-locked.png"))
+    controller.session.command("deformer.remove", binding=binding)
+    settle(controller)
+    assert not field.property("propertyLocked")
+    edit(field, "12")
+    settle(controller)
+    assert controller.session.document.object(curve).engine_settings.resolution == 12
 
 
 def main():

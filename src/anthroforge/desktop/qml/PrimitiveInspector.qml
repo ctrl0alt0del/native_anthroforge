@@ -43,7 +43,7 @@ ColumnLayout {
         UiNotice { active: panel.visible; text: panel.item.result?.pending?.length>0 ? "Using accepted support · upstream changes pending" : "" }
         UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.item.id]}) }
     }
-    ParametricInspector { curve: panel.curve; visible: panel.item.standalone && panel.curve.engine === "PARAMETRIC"; topologyLocked: panel.topologyLocked }
+    ParametricInspector { curve: panel.curve; visible: panel.item.standalone && panel.curve.engine === "PARAMETRIC" }
     UiSection {
         title: "Curves"; visible: panel.item.editing && panel.curves.length > 0
         UiCombo { id: curveChoice; objectName: "curveChoice"; Layout.fillWidth: true; model: panel.curves; textRole: "name" }
@@ -77,7 +77,7 @@ ColumnLayout {
         NumericSetting { propertyReference: ({target:panel.curve.id,path:["engine_settings","resolution"]}); visible: panel.curve.engine === "BEZIER"; label: "Curve evaluation resolution"; value: panel.curve.resolution || 24; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.curveSetting("resolution",Math.round(value)) }
         CurveEngine { objectName: "primitiveEngine"; visible: !panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
         RoutingSettings { curve: panel.curve; topologyLocked: panel.topologyLocked }
-        ParametricInspector { curve: panel.curve; visible: !panel.item.standalone && panel.curve.engine === "PARAMETRIC"; topologyLocked: panel.topologyLocked }
+        ParametricInspector { curve: panel.curve; visible: !panel.item.standalone && panel.curve.engine === "PARAMETRIC" }
         FiberCreation { visible: !panel.item.standalone; curve: panel.curve }
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Override sampling range"; checked: panel.curve.start !== null && panel.curve.start !== undefined; onClicked: { panel.curveSetting("start",checked?0:null); panel.curveSetting("span",checked?1:null); } }
         NumericSetting { propertyReference: ({target:panel.curve.id,path:["start"]}); visible: panel.primitive.kind === "LOFT" && panel.curve.start !== null; label: "Curve start"; value: panel.curve.start || 0; onEdited: value => panel.curveSetting("start",value) }

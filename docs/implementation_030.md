@@ -234,7 +234,9 @@ the restricted native typed compiler after candidate comparison; no parser depen
 was added. Formula evaluation, generated-point interaction and schema-4 reading exist
 on the feature branch. [Windows review](research/shortcuts_030/windows_review.md) records
 actual source-addon parity, UI and old-executable compatibility evidence. Release
-qualification remains unfinished, including the generated-point reference policy.
+qualification remains in progress. The confirmed generated-point reference lock is
+implemented through shared Parametric validation and property inspection, with direct,
+formula, restoration, Undo and offscreen editor regressions.
 Fixed sampling does not prove analytic continuity, and exact finite-path conversion does
 not promise an exact unsampled analytic curve.
 

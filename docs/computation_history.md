@@ -1827,3 +1827,27 @@ CH-049 because the integrated pipeline repair already published CH-045.
   signal beneath a non-model parent, as well as existing UI/task/native events. This
   establishes discovery/completeness on the failing workload, not a general speedup;
   start/collection overhead remains explicitly measured.
+
+### CH-058 — Preserve generated-point reference meaning on resolution edits (2026-10-23)
+
+- Observed at `bf7ced4`: increasing a Parametric curve from 5 to 9 points reused an
+  endpoint identity for an interior sample, silently retargeting a restricted Hook.
+  Native sampling itself was correct; retaining index identities across a topology
+  change violated authored membership intent. The user selected locking over remapping.
+- The existing shared Parametric policy now blocks resolution changes while curve-point
+  deformer membership/weights or formula input/target references exist. Disabled
+  definitions retain intent and the lock. Whole-curve deformers remain supported without
+  a lock; removing the point references unlocks. Engine restoration cannot bypass this
+  rule. Property inspection supplies the same reason to the desktop tooltip and shortcut
+  fields. Existing junction and incoming-attachment locks remain intact.
+- Native equations, sampling and deformation are unchanged. Blocked formula outputs retain
+  settings, points and bitwise-identical accepted path samples while reporting failure.
+  No automatic remapping or implicit clearing of authored references is introduced.
+- Evidence: the formerly expected-failure endpoint Hook regression passes; 26 focused
+  tests cover direct/property/wrapper edits, disabled membership, Hook/lattice weights,
+  formula targets and inputs, formula failure/recovery, Undo, restoration and existing
+  consumer locks. The production-QML editor refuses edits while locked and permits them
+  after reference removal. Full gate and final release checks follow this checkpoint.
+- Reference: Blender's [Hook modifier](https://docs.blender.org/manual/en/latest/modeling/modifiers/deform/hooks.html)
+  likewise stores point indices; this supports identifying the membership hazard, not an
+  upstream remapping guarantee. Parameter-preserving remapping remains outside 0.3.

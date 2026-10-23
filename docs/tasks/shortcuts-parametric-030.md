@@ -45,15 +45,15 @@ additional release distribution. The stable full Windows gate at `57873c1` passe
 and script style, Ruff/mypy, numerics and Qt-free headless doctor. Documentation-only
 follow-up checked 92 local links with no missing targets. No code changed after that gate.
 
-**Pending product decision:** generated point identities follow sample index. Increasing
-resolution can silently move an endpoint Hook to an interior parameter location. The user
-has been asked whether to lock resolution while generated-point membership, weights or
-formula references exist, or to define parameter-preserving remapping. No dependent repair
-has been chosen before the answer. A strict expected-failure regression records the defect;
-it is not release acceptance. Existing junction and consumer-attachment locks still pass.
+The user confirmed resolution locking for generated-point membership, weights and formula
+references. The shared policy now enforces it through API/property/shortcut/formula writes
+and engine restoration; property inspection supplies the UI reason. Disabled references
+also lock. The regression is now an ordinary passing test, with additional removal/Undo,
+weighted Hook/lattice, formula input/target, recovery and restoration cases. The focused
+26-case run and production-QML editor check pass; the screenshot was inspected. No native
+sampling or deformation arithmetic changed. The final full gate is next.
 
-Next: resolve that choice through the shared policies, remove the expected failure and
-qualify affected UI/API/formula paths. Then finish version/release updates, build the single
+Next: complete the final full gate, finish version/release updates, build the single
 canonical `dist/0.3.0/AnthroForge.dist` plus source archive, and merge/push the fully validated
 feature into main. Runtime/package version remains 0.2.4 until qualification. Preserve the
 unrelated root `__init__.py`; all checks remain background-only.

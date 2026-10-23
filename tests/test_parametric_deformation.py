@@ -38,7 +38,6 @@ def test_hook_changes_consumer_after_formulas_without_double_deformation_on_swit
     np.testing.assert_allclose(mesh(session, body).array(0), changed, atol=1e-12)
 
 
-@pytest.mark.xfail(strict=True, reason="Resolution/membership policy awaits the user's decision")
 def test_sampling_change_cannot_silently_retarget_restricted_generated_controls(session):
     curve, body, _, _ = body_and_hook(session, restricted=True)
     before = session.document.object(curve)

@@ -3,7 +3,7 @@
 - Task branch: `codex/task-priority-propagation`
 - Integration branch: `main`
 - Starting revision: `e7ba40b`
-- Status: source verified; full gate and portable qualification in progress
+- Status: complete; validated delivery (Git ancestry records integration)
 - Active writer: desktop /root
 - Last updated: 2026-10-23
 
@@ -33,10 +33,11 @@ declared job prerequisites, not OS locks; its fixture establishes effectiveness.
 Coordinator policy and lifecycle integration implemented. Thirteen deterministic regressions
 cover transitive donation, withdrawal, cycles, workspace scope, follow-ups, same-cause
 FIFO, replacement/retry, Manual inputs and exclusive writers; 30 existing scheduler
-regressions pass. Architecture/function-limit checks and five native CTests pass.
-Full gate and portable qualification remain pending. Runtime source is `b7704f7`.
-Canonical `dist/0.3.0/AnthroForge.dist` rebuilt successfully; full portable and actual
-assembly checks are running. Logs are `build/task-priority-{gate,package,portable,packaged-assembly}.log`.
+regressions pass. Full Windows development gate passes **1,996 tests**, five native
+CTests, style/function limits, typing, numerical checks and Qt-free doctor. Runtime
+source is `b7704f7`. The canonical `dist/0.3.0/AnthroForge.dist` passes the complete
+minimal-PATH portable suite and the actual Ribs=3/history/reopen comparison.
+Logs are `build/task-priority-{gate,package,portable,packaged-assembly}.log`.
 
 The first experiment propagated urgency but still used replacement creation time to
 break ties; it retained the delay (2.07 s). The coherent correction also uses the
@@ -46,11 +47,25 @@ within 13.6 ms of observed readiness, with one control-pose job intervening rath
 recorded below. Raw artifacts include the rejected first attempt; it is not the delivered
 implementation. Preserve unrelated root `__init__.py`.
 
-## Next actions
+## Delivery and review
 
-1. Finish full development gate and canonical portable build/checks.
-2. Exercise the actual Ribs edit in the packaged app and inspect hidden saved rendering.
-3. Finalize documentation/source archive, then validated merge/push.
+No implementation or qualification work remains. Deliver the canonical distribution
+and `dist/AnthroForge-0.3.0-source.zip`; integrate through the normal validated merge.
+Git ancestry and remote tips establish integration, rather than a predicted hash here.
+
+Coordinator-authored ownership/coupling review: one policy owns transient urgency/rank,
+the existing registry owns indexes, and the coordinator retains lifecycle authority.
+No feature caller, native kernel, schema or attachment policy changed. Generic jobs in
+the regressions establish that no SCP identity/task-kind whitelist is required. Temporary
+context is restored on exit; only small immutable rank records remain in history.
+The policy introduces no native-resource owner, persistent cache or competing executor.
+
+The packaged assembly reopens in the desktop with 59 SCPs, no QML warnings, and passes
+edit/undo/redo/save/reopen equivalence. The offscreen window capture verifies UI/model
+loading; that platform's empty 3D area is not viewport pixel evidence. Separate hidden
+`QQuickRenderControl` renders were inspected. Baseline/candidate anatomy pixels agree;
+70 differing overlay pixels include the frame timing text. No physical mouse/keyboard
+interaction or display-latency acceptance is claimed. Original source SHA256 is unchanged.
 
 ## Recovery inputs
 

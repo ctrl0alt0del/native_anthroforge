@@ -2095,10 +2095,16 @@ average. This is a read-only formula input; no new write channel is introduced.
   whitelist or global anatomy-before-tissue barrier is used. A first edge-building
   implementation repeatedly scanned large prerequisite closures; indexed reverse lookup
   reduced its measured ranking cost. The profiler records rank, donor and policy duration.
-- **Evidence so far:** 12 deterministic policy regressions plus existing scheduler tests
-  pass. All 625 geometry/path/pose fingerprints on the actual assembly match the baseline.
-  Desktop QML/model observations change Ulna's displayed update from 77.92 s to 3.50 s
-  in a serial application-profiler comparison; no failed jobs or QML warnings. These
-  are offscreen model timings, not physical display latency or a universal speedup.
-  Complete final gate, attachment payload/history and package evidence is tracked in
-  [the task record](tasks/task-priority-propagation.md); qualification is still pending.
+- **Evidence:** 13 new policy regressions pass; full Windows gate passes 1,996 tests
+  and five CTests. All 625 geometry/path/pose fingerprints, 914 attachment/reference/field
+  fingerprints and 1,347 saved native resource bundles match the baseline exactly.
+  Actual edit/undo/redo/save/reopen passes in source and the canonical portable executable.
+  Final headless ready wait is 13.6 ms versus 1.56–2.08 s baseline. Final desktop model
+  Ulna update is 5.17 s versus 77.92 s with application profiling, and 4.14 s with recording
+  off; no failed jobs or QML warnings. Two control-pose jobs and UI refresh still account
+  for a roughly 0.65 s desktop ready wait. This is offscreen evidence, not physical
+  display latency or a universal speedup. Native rendered shapes were inspected and
+  agree with baseline; the full portable suite passes. The desktop traces reject some
+  oversized metadata and explicitly report incomplete capture; headless traces have no
+  losses. [The task record](tasks/task-priority-propagation.md) gives provenance, cost,
+  comparison limits, ownership review and reproducible tools. Source project is unchanged.

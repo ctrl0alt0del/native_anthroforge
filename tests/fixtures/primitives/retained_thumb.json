@@ -1,0 +1,50 @@
+{
+  "source": "E:\\development\\WIP_models\\shortcut_migration_030_20261023\\skeleton_96_muscles_shortcuts_v001.anthroforge",
+  "sha256": "308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac",
+  "entity": "SCP_17",
+  "chain": {
+    "segments": [
+      {
+        "length": 0.5199999809265137,
+        "radius": 0.07000002264976501,
+        "bend": 0,
+        "samples": 10,
+        "sides": 12
+      },
+      {
+        "length": 0.0,
+        "radius": 0.0,
+        "bend": 0.0,
+        "samples": 10,
+        "sides": 11
+      },
+      {
+        "length": 0.3400000333786011,
+        "radius": 0.06000000238418579,
+        "bend": 0.4399999976158142,
+        "samples": 10,
+        "sides": 12
+      },
+      {
+        "length": 0.2900001108646393,
+        "radius": 0.040000006556510925,
+        "bend": 0.26999998092651367,
+        "samples": 10,
+        "sides": 12
+      }
+    ],
+    "spread": -0.06928957253694534,
+    "bend_mode": "ADJACENT",
+    "profile": [
+      0.0,
+      1.0,
+      0.4622356593608856,
+      0.75862056016922,
+      0.9395768642425537,
+      0.7327585220336914,
+      1.0,
+      0.8491378426551819
+    ],
+    "unite": true
+  }
+}

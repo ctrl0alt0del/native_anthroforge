@@ -19,6 +19,8 @@ void refine_triangle_material(const Mesh& source,Mesh& output,const std::vector<
     std::vector<int> triangles(source.offsets.size()-1,-1);
     for(int i=0;i<source.triangles.rows();++i) triangles[size_t(source.polygons[size_t(i)])]=i;
     output.triangle_material.source_count=source.triangle_material.source_count;
+    output.triangle_material.layer_size=source.triangle_material.layer_size;
+    output.triangle_material.source_positions=source.triangle_material.source_positions;
     for(int i=0;i<output.triangles.rows();++i) {
         check_cancel(cancel); const auto parent=parents.at(size_t(output.polygons[size_t(i)]));
         refined_triangle(source,output,triangles.at(size_t(parent)),i);
@@ -26,9 +28,10 @@ void refine_triangle_material(const Mesh& source,Mesh& output,const std::vector<
     validate_triangle_material(output.triangle_material,output.triangles.rows());
 }
 uint64_t triangle_material_storage(const TriangleMaterial& m) {
-    return m.origins.capacity()*sizeof(int64_t)+m.coordinates.capacity()*sizeof(double);
+    return m.origins.capacity()*sizeof(int64_t)+(m.coordinates.capacity()+m.source_positions.capacity())*sizeof(double);
 }
 void validate_triangle_material(const TriangleMaterial& m,int64_t triangles) {
+    validate_triangle_source(m);
     if(m.source_count<0||m.source_count>10000000) throw std::runtime_error("Invalid source triangle count.");
     if(!m.source_count&&m.origins.empty()&&m.coordinates.empty()) return;
     if(int64_t(m.origins.size())!=triangles||m.coordinates.size()!=m.origins.size()*9)
@@ -61,7 +64,7 @@ uint64_t af_mesh_triangle_material_restore(uint64_t source,const int64_t* record
     try {
         if(count<1||count>10000001||size!=9*(count-1)||!records||(size&&!coordinates)) throw std::runtime_error("Invalid triangle material storage.");
         const auto m=af::mesh(source);
-        af::TriangleMaterial p{records[0],{records+1,records+count},{coordinates,coordinates+size}};
+        af::TriangleMaterial p{records[0],{records+1,records+count},{coordinates,coordinates+size},0,{}};
         af::validate_triangle_material(p,m->triangles.rows());
         auto result=af::deform_mesh(*m,m->vertices,cancel,m->prepared);
         result->triangle_material=std::move(p); return af::retain(result);

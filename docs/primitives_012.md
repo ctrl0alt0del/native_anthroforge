@@ -339,3 +339,10 @@ vector displacement. The supported semantics and limits are in the
 [authoring API](authoring_api.md#editable-shrinkwrap-and-segment-chain) and CH-027–030
 of the [computation history](computation_history.md). These additions preserve the
 existing shared-control, topology-lock, undo and permanent no-bake contracts.
+
+For Boolean-united construction, retained attachments follow the same object's exterior
+when growth buries their original patch. Exterior selection occurs in the Boolean
+construction chart, followed by downstream deformation. Stored material identity,
+weights and offsets are retained; exposing the patch again restores its material
+location. This does not authorize rebinding to another object or changing source topology.
+See CH-065 for the approved correction and qualification.

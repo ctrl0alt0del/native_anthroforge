@@ -32,6 +32,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/material_binding.cpp src/material_binding_index.cpp src/material_binding_query.cpp
     src/material_basis.cpp src/material_chart.cpp src/material_chart_query.cpp src/material_binding_frames.cpp
     src/material_cage.cpp src/material_mean_value.cpp src/triangle_material.cpp src/triangle_material_frames.cpp
+    src/triangle_material_source.cpp src/triangle_material_exterior.cpp
     src/tissue_relaxation.cpp src/tissue_geometric.cpp src/tissue_static.cpp src/tissue_point_relaxation.cpp
     src/stacking.cpp src/stacking_normal_support.cpp src/tissue_stacking.cpp src/tissue_stack_material.cpp
     src/tissue_stack_directions.cpp src/tissue_stack_geometry.cpp src/tissue_stack_constraints.cpp

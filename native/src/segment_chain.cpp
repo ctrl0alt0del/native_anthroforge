@@ -57,8 +57,15 @@ static void topology(Faces& faces,const Segment& segment,int offset) {
     local.push_back(first); local.push_back(last);
     for(auto& face:local) { for(auto& index:face) index+=offset; faces.push_back(std::move(face)); }
 }
+static void source_chart(TriangleMaterial& material,const Mesh& source) {
+    material.source_count=source.triangles.rows(); material.layer_size=material.source_count;
+    for(int i=0;i<source.triangles.rows();++i) for(int j=0;j<3;++j) {
+        const V3 p=source.vertices.row(source.triangles(i,j));
+        material.source_positions.insert(material.source_positions.end(),p.data(),p.data()+3);
+    }
+}
 static void provenance(Mesh& result,const Mesh& source,const Eigen::VectorXi& origins,uint64_t cancel) {
-    auto& material=result.triangle_material; material.source_count=source.triangles.rows();
+    auto& material=result.triangle_material; source_chart(material,source);
     for(int i=0;i<result.triangles.rows();++i) {
         check_cancel(cancel); const auto original=source.triangles.row(origins[i]);
         material.origins.push_back(origins[i]);

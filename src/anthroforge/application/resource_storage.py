@@ -86,6 +86,7 @@ def write_mesh(archive: zipfile.ZipFile, key: str, asset: Asset) -> None:
 
 
 def write_basis(archive: zipfile.ZipFile, key: str, asset: Asset) -> None:
+    write_array(archive, f"assets/{key}/triangle_source.npy", triangle_material.source(asset.mesh))
     for label, values in zip(
         ("basis", "basis_parameters"), material_basis.arrays(asset.mesh), strict=True
     ):
@@ -127,7 +128,11 @@ def read_triangle_material(archive: zipfile.ZipFile, key: str, mesh: Any) -> Any
         read_array(archive, f"assets/{key}/{kind}.npy")
         for kind in ("triangle_material", "triangle_coordinates")
     ]
-    return triangle_material.restore(mesh, *rows)
+    mesh = triangle_material.restore(mesh, *rows)
+    name = f"assets/{key}/triangle_source.npy"
+    if name in archive.namelist():
+        mesh = triangle_material.restore_source(mesh, read_array(archive, name))
+    return mesh
 
 
 def read_path(archive: zipfile.ZipFile, key: str, source: Any, engine: GeometryEngine) -> PathAsset:

@@ -69,3 +69,16 @@ per-record diagnosis directories. `tools/diagnose_retained_attachments.py` is th
 maintained read-only reproducer. Fourteen crop/material regression tests pass.
 Native exterior following, actual-project qualification, visual inspection, full gate,
 packaging and merge remain unfinished.
+
+## Implementation checkpoint
+
+Native exterior following is implemented with a persistent untrimmed construction
+chart, layer-isolated spatial queries, and unchanged binding records. First combined
+gate: 1,980 tests/five CTests pass, including native function limits. Real first edits
+all complete without the original attachment errors. During history validation, the
+profiler revealed a separate discarded Ulna pose job: formula invalidation cancelled
+it while queued, then an unchanged formula result did not replace it. This is now
+reproduced by `test_pose_formula_refresh.py` and corrected through the existing
+renewable-job/restart contracts. Humerus edit/reverse now restores tissue vertices
+within 1.8e-12, including through save/reopen; pending final combined verification,
+shape inspection and canonical packaging.

@@ -12,6 +12,7 @@ static bool same_material(const Mesh& a,const Mesh& b) {
     return a.material==b.material&&a.material_axes==b.material_axes&&a.material_pins==b.material_pins
         &&a.triangle_material.source_count==b.triangle_material.source_count
         &&a.triangle_material.origins==b.triangle_material.origins&&a.triangle_material.coordinates==b.triangle_material.coordinates
+        &&a.triangle_material.layer_size==b.triangle_material.layer_size&&a.triangle_material.source_positions==b.triangle_material.source_positions
         &&tissue_records(a.tissue)==tissue_records(b.tissue)&&a.tissue.weights==b.tissue.weights&&same_basis(a.basis,b.basis);
 }
 }

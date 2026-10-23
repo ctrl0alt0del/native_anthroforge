@@ -163,6 +163,7 @@ class GeometryEngine(NativeEngine):
     def _query_signatures(self) -> None:
         self.bind("af_transform", [D, D])
         self.bind("af_decompose", [D, D])
+        self.bind("af_transform_channels", [D, D, D])
         self.bind("af_point", [D, D, D])
         self.bind("af_pick", [U, D, D, D, D])
         self.bind("af_capture", [U, U, D, D, D, D, c.c_int, c.c_int, c.c_int, c.c_int, D])
@@ -194,6 +195,15 @@ class GeometryEngine(NativeEngine):
         source, local, output = doubles(matrix), doubles(point), np.empty(3)
         self.check(self.library.af_point(pointer(source), pointer(local), pointer(output)))
         return list(output.tolist())
+
+    def transform_channels(self, matrix: Any, values: Any) -> tuple[float, ...]:
+        source, channels, output = doubles(matrix), doubles(values), np.empty(16)
+        if source.size != 16 or channels.size != 9:
+            raise ValueError("Transform editing requires a matrix and nine channels.")
+        self.check(
+            self.library.af_transform_channels(pointer(source), pointer(channels), pointer(output))
+        )
+        return tuple(output.tolist())
 
     def import_mesh(self, path: Path, units: float, y_up: bool, cancel: int = 0) -> "Mesh":
         handle = self.library.af_mesh_import(str(path).encode("utf-8"), units, int(y_up), cancel)

@@ -42,6 +42,35 @@ int af_decompose(const double* matrix,double* trs) {
         angles=af::V3(zyx.z(),zyx.y(),zyx.x())*(180./3.141592653589793); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+namespace af {
+static M3 channel_rotation(const double* angles) {
+    const double radians=3.141592653589793/180.;
+    return (Eigen::AngleAxisd(angles[2]*radians,V3::UnitZ())*
+            Eigen::AngleAxisd(angles[1]*radians,V3::UnitY())*
+            Eigen::AngleAxisd(angles[0]*radians,V3::UnitX())).toRotationMatrix();
+}
+static M3 changed_basis(const M4& matrix,const double* before,const double* after) {
+    M3 result=matrix.block<3,3>(0,0);
+    if(Eigen::Map<const V3>(before+3)!=Eigen::Map<const V3>(after+3))
+        result=channel_rotation(after+3)*channel_rotation(before+3).transpose()*result;
+    for(int axis=0;axis<3;++axis)
+        if(before[6+axis]!=after[6+axis]) result.col(axis)*=after[6+axis]/before[6+axis];
+    return result;
+}
+}
+int af_transform_channels(const double* matrix,const double* trs,double* output) {
+    try {
+        af::M4 validated;
+        double before[9];
+        if(af_transform(trs,validated.data())||af_decompose(matrix,before)) return 1;
+        const af::M4 original=Eigen::Map<const af::M4>(matrix);
+        if(!original.allFinite()) throw std::runtime_error("Transform must be finite.");
+        Eigen::Map<af::M4> result(output); result=original;
+        result.block<3,3>(0,0)=af::changed_basis(original,before,trs);
+        result.block<3,1>(0,3)=Eigen::Map<const af::V3>(trs);
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 int af_point(const double* matrix,const double* point,double* output) {
     Eigen::Map<af::V3> result(output);
     result=af::point(Eigen::Map<const af::M4>(matrix),Eigen::Map<const af::V3>(point));

@@ -32,4 +32,23 @@ Inspect the actual donor definitions and current target records. Map all control
 units, local/world frames, uniform vectors and attachment policies. Qualify baseline
 geometry/attachment preservation, representative edits and restoration, reopening,
 and hidden rendered views. Record explicit differences and unresolved items rather
-than claiming migration from successful API calls alone. No checks passed yet.
+than claiming migration from successful API calls alone.
+
+## Current checkpoint
+
+- External run: `E:/development/WIP_models/shortcut_migration_030_20261023/`.
+  It contains the immutable input copy, read-only donor extraction, probe script
+  and captures. Original/donor inventories agree except small transform values;
+  the current assembly remains the placement authority.
+- `tools/skeleton_shortcut_migration.py` exposes all 80 saved digit controls through
+  shared operations. `digits-checkpoint.anthroforge` is an incomplete checkpoint,
+  not delivery. All non-shortcut document fields compare exactly unchanged.
+- Required user choice pending: preserve existing Bezier guides and drive their
+  controls, or extend Parametric to preserve Bezier construction. The current
+  Parametric output is polyline; matching all 48 path positions still changes
+  frames and the closed-body start. Probe observed actual pelvic shape changes.
+- A separate real defect blocks safe Hook drivers: numeric channel edits rebuild
+  a pure TRS matrix, discarding existing shear. Writing the same scale value to
+  `hook:femur_knee_hook` changed a matrix component by 5.8497. Native partial-channel
+  editing now preserves the affine basis, with exact no-op handling at the shared
+  property boundary. Build/tests underway; not yet release-qualified or packaged.

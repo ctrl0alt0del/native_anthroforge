@@ -44,6 +44,13 @@ def read(session: Any, reference: PropertyRef, item: Any = None) -> Any:
 
 def changed(session: Any, item: Any, updates: Any) -> Any:
     require_object_transform(item)
+    updates = tuple((ref, value) for ref, value in updates if read(session, ref, item) != value)
+    if not updates:
+        return item
+    return replace(item, matrix=edited_matrix(session, item, updates))
+
+
+def edited_matrix(session: Any, item: Any, updates: Any) -> tuple[float, ...]:
     values = list(session.engine.decompose(item.matrix))
     for reference, replacement in updates:
         if reference.path[0] != "transform":
@@ -53,4 +60,4 @@ def changed(session: Any, item: Any, updates: Any) -> Any:
         replacements = replacement if reference.component is None else (replacement,)
         for component, value in zip(components, replacements, strict=True):
             values[index + component] = degrees(value) if index == 3 else value
-    return replace(item, matrix=session.engine.transform(values))
+    return session.engine.transform_channels(item.matrix, values)

@@ -31,6 +31,7 @@ AF_API void af_cancel_request(uint64_t token);
 AF_API void af_cancel_release(uint64_t token);
 AF_API int af_transform(const double* trs, double* matrix);
 AF_API int af_decompose(const double* matrix, double* trs);
+AF_API int af_transform_channels(const double* matrix, const double* trs, double* output);
 AF_API int af_point(const double* matrix, const double* point, double* output);
 AF_API int af_quaternion(const double* matrix, double* quaternion);
 /* Unit axis and degrees to world XYZ Euler angles (degrees). */

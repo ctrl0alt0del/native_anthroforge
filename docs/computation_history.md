@@ -1855,3 +1855,22 @@ CH-049 because the integrated pipeline repair already published CH-045.
 - Reference: Blender's [Hook modifier](https://docs.blender.org/manual/en/latest/modeling/modifiers/deform/hooks.html)
   likewise stores point indices; this supports identifying the membership hazard, not an
   upstream remapping guarantee. Parameter-preserving remapping remains outside 0.3.
+
+### CH-059 — Preserve affine frames during numerical channel edits (2026-10-23)
+
+- G03 / shortcut property writes: migration inspection found that writing a current
+  scale value back reconstructed a pure TRS matrix, discarding shear. On the actual
+  migrated femur-knee Hook, the maximum matrix-component change was 5.8497012475.
+  This would alter deformation despite an unchanged driving value.
+- Shared property writes now return the original record for unchanged canonical
+  values. Native partial-channel editing retains the existing basis: translation
+  replaces translation only, scale changes multiply the existing basis columns,
+  and rotation edits apply a rigid delta while retaining the remaining affine shape.
+  Matrix creation still uses ordinary TRS. No migration-specific object checks,
+  Python numerical implementation or change to stored attachment bindings is added.
+- This uses the existing Eigen affine composition conventions; see its
+  [geometry documentation](https://eigen.tuxfamily.org/dox/group__TutorialGeometry.html).
+  Evidence so far: 17 focused property/shortcut tests and five native CTests pass.
+  Tests include unchanged fields, translation, scale, oblique rotation, undo and
+  formula publication. Full gate, actual migration edits and portable qualification
+  remain pending; this checkpoint is not a qualified runtime delivery.

@@ -1684,6 +1684,10 @@ CH-049 because the integrated pipeline repair already published CH-045.
 - Evidence: 35 focused copy, shared-curve, tissue-independence, Fiber and architecture
   cases pass. They include chains, external inputs, output scope, Parametric variable
   identities, branch-part references, policy/order, undo/redo and pending Manual values.
-  Ruff/mypy pass. Native expression/geometry algorithms and solver tolerances are unchanged;
-  full combined qualification remains pending. No release or performance gain is claimed.
+  Ruff/mypy pass. At cloud checkpoint `d89c8bd`, combined portable validation passes
+  1,845 pytest cases, five CTests, 170 owned native style inputs, headless workshop
+  and wheel checks (packaging resumed after sandbox network denial). Both GitHub core
+  platforms pass copy checkpoint `5ce4ca8`. Native expression/geometry algorithms and
+  solver tolerances are unchanged. Full desktop release qualification remains pending;
+  no release or performance gain is claimed.
 - Reference: [Python dataclass replacement](https://docs.python.org/3.12/library/dataclasses.html#dataclasses.replace).

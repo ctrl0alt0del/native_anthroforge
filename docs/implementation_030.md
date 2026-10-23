@@ -1,6 +1,9 @@
 # AnthroForge 0.3 — Shortcuts and parametric curves implementation plan
 
-**Status: confirmed, not implemented.** Product authority is
+**Status: implementation in progress; no 0.3 release qualification yet.** Current
+implementation and evidence are tracked in the [cloud continuation](tasks/shortcuts-parametric-030-cloud.md).
+The plan below retains the original baseline diagnosis and required acceptance.
+Product authority is
 [specification_030.md](specification_030.md); apply the
 [engineering guidelines](engineering_guidelines.md). The inspected baseline is 0.2.4
 at `4029809`, including the completed shortcut research. The
@@ -62,8 +65,8 @@ to reproduce. Source observations are not dynamic parity or application performa
 
 ### Shared API additions
 
-Extend the existing catalogue with these operation families. They are planned interfaces,
-not currently callable commands; freeze exact signatures alongside implementation/tests.
+Extend the existing catalogue with these operation families. Implemented signatures and
+a runnable example are documented in the [development walkthrough](shortcuts_030.md).
 
 | Family | Required operations and result information |
 | --- | --- |

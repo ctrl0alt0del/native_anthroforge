@@ -3,8 +3,8 @@
 - Task branch: `codex/shortcuts-parametric-030-cloud`
 - Parent feature branch: `codex/shortcuts-parametric-030`
 - Starting revision: `e7d464e3a4cf401249b6c96be2eb8eb5387b7fb6`
-- Status: implementation in progress; focused cloud baseline passes
-- Last updated: 2026-10-22 UTC
+- Status: implementation in progress; portable validation stages pass
+- Last updated: 2026-10-23 UTC
 - Active writer: Codex Cloud, direct work
 
 ## Outcome and acceptance
@@ -54,13 +54,25 @@ and links the runnable `examples/shortcuts_parametric.json` circle/driver exampl
 ## Verification
 
 - Linux native build and all five CTests pass after reconciliation.
-- Ruff lint and formatting pass; mypy passes all 361 source files.
+- Ruff lint and formatting pass; mypy passes all 363 source files.
 - `pytest tests/test_expressions.py tests/test_shortcut*.py tests/test_driving*.py
   tests/test_parametric*.py tests/test_architecture.py -q`: 109 passed.
 - The initial focused run found one pre-existing 16-line function in the paused
   guard; the corrected run passes. Local logs are ignored under `build/core/`.
-- Full portable gate, native style and release qualification remain pending.
-  Earlier desktop results retain their original scope in the desktop handoff.
+- Full portable validation at `d89c8bd`: 1,845 pytest cases, five CTests, all 170
+  owned native clang-tidy inputs, headless doctor/workshop and Python package/wheel
+  checks pass. The initial `check_core.py --native-style` process completed through
+  the workshop, then its `uv build` dependency fetch hit sandbox network denial.
+  The remaining `uv build` and `tools/check_wheel.py` steps passed with network
+  access; only then was the success report recorded. Logs are
+  `build/core/cloud-030-full-gate.log`, `build/core/cloud-030-packaging-resume.log`
+  and `build/core/qualification/passed.json`. No source change was needed for the retry.
+- [GitHub run 39873326293](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39873326293)
+  passed Ubuntu and Windows on copy checkpoint `5ce4ca8`. Editor checkpoint `52eb50b`
+  and documentation/example checkpoint `d89c8bd` were still running remotely at
+  00:02 UTC on 2026-10-23. Later documentation-only checkpoints do not change runtime code.
+  Windows desktop/portable release qualification remains pending; earlier desktop
+  results retain their original scope in the desktop handoff.
 - Copy baseline: four regressions failed because controls were absent; consumer
   reference remapping also failed before implementation. The corrected copy/shared
   construction/tissue/Fiber/architecture group passes 35 cases, including pending
@@ -78,10 +90,15 @@ and links the runnable `examples/shortcuts_parametric.json` circle/driver exampl
 
 ## Next actions and blockers
 
-1. Run the full portable gate with native style and inspect GitHub core jobs.
-2. Continue catalogue/ordinary-field coverage and remaining release acceptance from
-   the desktop handoff; this checkpoint does not complete 0.3 release qualification.
-3. Push coherent implementation and evidence checkpoints on this cloud branch.
+1. Inspect the remaining GitHub runs for `52eb50b` and descendants; investigate actual
+   failures before making further changes. Local portable runtime validation is complete.
+2. Continue catalogue/ordinary-field coverage, full-window interaction and native
+   viewport qualification from the desktop handoff. Review indexed/named collection
+   reference semantics against the stable-identity contract before release.
+3. Complete representative 0.3 profiler evidence, original-addon parity, Windows GUI
+   and portable executable acceptance. This checkpoint does not complete 0.3 release
+   qualification; do not merge or bump the version on the basis of core tests alone.
+4. Keep follow-ups and recovery on this cloud branch, pushing coherent checkpoints.
 
 ## Recovery inputs
 

@@ -30,8 +30,18 @@ declared job prerequisites, not OS locks; its fixture establishes effectiveness.
 
 ## Current state and verification
 
-Implementation and validation pending. Existing main has 1,983 tests / five native
-CTests passing. Preserve unrelated untracked root `__init__.py`.
+Coordinator policy and lifecycle integration implemented. Ten deterministic regressions
+cover transitive donation, withdrawal, cycles, workspace scope, follow-ups, same-cause
+FIFO, replacement/retry and exclusive writers; 30 existing scheduler regressions pass.
+Architecture/function-limit checks pass. Full qualification remains pending.
+
+The first experiment propagated urgency but still used replacement creation time to
+break ties; it retained the delay (2.07 s). The coherent correction also uses the
+preserved logical queue age. Two actual-assembly runs now dispatch Ulna within 20–41 ms
+of observed readiness, with one/two control-pose jobs intervening rather than 176 tissue,
+Fiber and construction jobs. Final geometry and attachment comparisons, desktop evidence,
+gate and packaging remain to be completed. Raw artifacts include this rejected attempt;
+do not describe it as qualified. Preserve unrelated root `__init__.py`.
 
 ## Next actions
 

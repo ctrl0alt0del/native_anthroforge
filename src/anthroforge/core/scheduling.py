@@ -5,6 +5,24 @@ from typing import Literal
 
 
 @dataclass(frozen=True)
+class RequestUrgency:
+    interactive: bool
+    since: float
+
+
+@dataclass(frozen=True)
+class QueueDemand:
+    priority: int
+    since: float
+    queued: float
+    source: str
+
+    @property
+    def key(self) -> tuple[int, float, float]:
+        return -self.priority, self.since, self.queued
+
+
+@dataclass(frozen=True)
 class StageWorkload:
     kind: str
     points: int = 0

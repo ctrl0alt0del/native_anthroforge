@@ -9,6 +9,7 @@ from pathlib import Path
 from time import perf_counter
 
 from qualify_retained_attachment_edits import load
+from ribs_ulna_equivalence import attachments
 
 from anthroforge.application import dependencies
 from anthroforge.application.session import Session
@@ -67,6 +68,7 @@ def record(session, output, poses, started, evidence):
     write(output / "jobs.json", [job_record(job) for job in session.scheduler.jobs])
     write(output / "queue.json", evidence)
     write(output / "geometry.json", geometry(session))
+    write(output / "attachments.json", attachments(session))
     print(json.dumps(dict(seconds=elapsed, errors=session.scheduler.errors)), flush=True)
 
 
@@ -105,6 +107,7 @@ def run(source, output):
     output.mkdir(parents=True, exist_ok=True)
     with closing(Session()) as session:
         load(session, source)
+        write(output / "attachments-before.json", attachments(session))
         capture(session, output)
 
 

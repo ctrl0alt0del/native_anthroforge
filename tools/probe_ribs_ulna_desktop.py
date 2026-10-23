@@ -9,6 +9,7 @@ from construction_profile_qualification import wait_export
 from probe_ribs_ulna_latency import geometry, job_record, lineage, observe, write
 from PySide6.QtQuickControls2 import QQuickStyle
 from qualify_retained_attachment_edits import load
+from ribs_ulna_equivalence import attachments
 from ribs_ulna_queue_probe import monitor, prioritize
 from shiboken6 import delete
 
@@ -62,6 +63,7 @@ def finish(controller, app, output, rows, poses, views, started):
     write(output / "poses.json", poses)
     write(output / "views.json", views)
     write(output / "geometry.json", geometry(controller.session))
+    write(output / "attachments.json", attachments(controller.session))
     write(output / "jobs.json", [job_record(j) for j in controller.session.scheduler.jobs])
     print(dict(seconds=elapsed, errors=controller.session.scheduler.errors), flush=True)
 

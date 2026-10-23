@@ -39,7 +39,8 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #elif defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable:4068 4100 4505)
+// Imported kernels keep unused OpenMP workers and bounded integer narrowing.
+#pragma warning(disable:4068 4100 4189 4244 4505)
 #endif
 #ifdef _OPENMP
 #error Routing concurrency belongs to the application task coordinator.

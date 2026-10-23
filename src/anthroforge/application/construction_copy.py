@@ -10,7 +10,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import EvaluationResult, ReadRevision
 
-from . import curve_sources, junction_copies
+from . import curve_sources, junction_copies, shortcut_copies
 from .curve_copy_resources import Copies
 from .membership import remap, remap_weights
 
@@ -115,14 +115,20 @@ def remap_inputs(
         replace(
             value,
             owner=mapping.get(value.owner, value.owner),
-            output=remap_output(value.output, mapping),
+            output=remap_output(value.output, mapping, value.owner),
             membership=tuple(sorted(mapping.get(key, key) for key in value.membership)),
         )
         for value in inputs
     )
 
 
-def remap_output(output: str, mapping: dict[str, str]) -> str:
+def remap_output(output: str, mapping: dict[str, str], owner: str = "") -> str:
+    from anthroforge.core.formula_dependencies import property_port, property_reference
+    from anthroforge.core.results import Port
+
+    if output.startswith("property:"):
+        reference = property_reference(Port(owner, output))
+        return property_port(shortcut_copies.reference(reference, mapping)).output
     if output.startswith("junction:"):
         return "junction:" + mapping.get(output[9:], output[9:])
     return output
@@ -148,6 +154,7 @@ def duplicate(session: "Session", ids: set[str], parent: str) -> dict[str, str]:
         controls=(*session.document.controls, *shared),
         objects=(*session.document.objects, *copied_curves(session, mapping)),
         junctions=junctions,
+        **shortcut_copies.state(session.document, mapping),
     )
     return {key: mapping[key] for key in ids}
 

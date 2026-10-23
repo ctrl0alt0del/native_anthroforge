@@ -9,6 +9,7 @@ from anthroforge.native import scene
 
 from . import object_interaction
 from .property_projection import PropertyProjection
+from .quantity_values import INTEGER_FIELDS, decode
 from .values import qml
 
 
@@ -38,6 +39,8 @@ def command_values(value):
     if isinstance(value, PropertyProjection):
         return command_values(value.as_dict())
     if isinstance(value, dict):
+        if value.keys() == INTEGER_FIELDS:
+            return decode(value)
         return {key: command_values(item) for key, item in value.items()}
     if isinstance(value, list):
         return [command_values(item) for item in value]

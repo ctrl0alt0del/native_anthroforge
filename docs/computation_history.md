@@ -118,7 +118,7 @@ Presence in this inventory does not make every mode available on every source.
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
-| K01 | Candidate/support planning: detect surface relationships/support regions with authored group and discovery allowance (CH-022), derive automatic order, apply explicit order/exclusions and retain provenance. Policy changes invalidate observed plans without rebuilding intrinsic geometry. Only accepted providers become final prerequisites. | [stacking.cpp](../native/src/stacking.cpp), [stack evaluation](../src/anthroforge/application/tissue_stack_evaluation.py) | [stacking phases](../tests/test_stacking_phases.py), [authoring controls](../tests/test_tissue_authoring_controls.py) |
+| K01 | Candidate/support planning: detect surface relationships/support regions with authored group and discovery allowance (CH-022), derive automatic order, apply explicit order/exclusions and retain provenance. Relationship lookup keys own their sorted IDs (CH-045). Policy changes invalidate observed plans without rebuilding intrinsic geometry. Only accepted providers become final prerequisites. | [stacking.cpp](../native/src/stacking.cpp), [stack evaluation](../src/anthroforge/application/tissue_stack_evaluation.py) | [stacking phases](../tests/test_stacking_phases.py), [authoring controls](../tests/test_tissue_authoring_controls.py) |
 | K02 | Vector stacking: material correspondence and direction transport, selected support regions, multiple providers and provider-first chains without redundant ancestor displacement. | [tissue_stacking.cpp](../native/src/tissue_stacking.cpp), [tissue_stack_directions.cpp](../native/src/tissue_stack_directions.cpp) | [native stacking](../tests/test_tissue_stacking_native.py), [mixed stacking](../tests/test_tissue_mixed_stacking.py) |
 | K03 | Constrained stacking smoothing: sparse exact material-pin/backing equations, localized displacement smoothing and assembled side/group output. Whole-tissue groups retain the actual side dependency graph. | [tissue_stack_constraints.cpp](../native/src/tissue_stack_constraints.cpp), [material_pin_equations.cpp](../native/src/material_pin_equations.cpp), [stack groups](../src/anthroforge/application/tissue_group_tasks.py) | [stack material](../tests/test_tissue_stack_material.py), [stack groups](../tests/test_tissue_stack_groups.py) |
 | K04 | Final stacking validation: inspect complete assembled output for folds, self-intersections and bone/neighbor conflicts. Failed stacking displays current intrinsic geometry but does not publish a successful Final prerequisite. | [stacking_surface_validation.cpp](../native/src/stacking_surface_validation.cpp), [tissue_stack_assembly.cpp](../native/src/tissue_stack_assembly.cpp) | [complete geometry](../tests/test_stacking_complete_geometry.py), [group lifecycle](../tests/test_tissue_group_lifecycle.py) |
@@ -148,7 +148,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | R03 | Transactions/history/checkpoints: derive changes, commit/cancel edits, maintain undo/redo restart recipes, choose saveable revisions and validate historical asynchronous captures. | [history](../src/anthroforge/application/history.py), [changes](../src/anthroforge/application/changes.py), [authored jobs](../src/anthroforge/application/authored_jobs.py) | [interleaving](../tests/test_interleaving.py), [capture history](../tests/test_capture_history.py) |
 | R04 | Cache/resource work: keys, immutable leases, hit/miss/eviction, content equivalence and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes and tissue material preparation. | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py) |
 | R05 | Viewport publication/rendering: stage complete native mesh/path/image buffers, switch displayed geometry and picking together, generate controls, perform Qt Quick 3D shading, opacity/depth and selection-outline passes. | [Qt geometry adapters](../native/qt), [outline shader](../native/qt/shaders/outline.frag), [desktop](../src/anthroforge/desktop) | [viewport publication](../tests/test_viewport_publication.py), [capture staging](../tests/test_capture_staging.py), [path presentation](../tests/test_path_presentation.py) |
-| R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
+| R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. Typed integer controls retain exact text through Qt and convert display units before shared command validation (CH-051). | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [quantity transport](../src/anthroforge/desktop/quantity_values.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [integer quantities](../tests/test_integer_quantity_controls.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
 | R07 | Issues checks: evaluate structural/readiness/attachment/dependency diagnostics and optional native collision checks, retain scoped stale evidence, and verify requested repairs. Read-only checks use the common coordinator. | [Issue system](../src/anthroforge/application/issues/system.py), [providers](../src/anthroforge/application/issues/providers.py) | [Issue lifecycle](../tests/test_issue_lifecycle.py), [Issue integration](../tests/test_issue_integration.py) |
 | R08 | Runtime profiling: opt-in Qt/native/application events, monotonic alignment, bounded rings/queues, summaries, model churn, invalidation causes, cache/resource attribution and background trace archive export. | [profiling](../src/anthroforge/profiling), [Qt collector](../native/profiling) | [profiling](../tests/test_profiling.py), [profile diagnostics](../tests/test_profile_diagnostics.py) |
 | R09 | Project persistence: schema-5 writing with schema-4 reading on the 0.3 development branch; encode/decode editable records and accepted resources, atomic saving and background opening. Never serialize native handles or undo history. | [storage](../src/anthroforge/application/storage.py), [resource storage](../src/anthroforge/application/resource_storage.py) | [headless](../tests/test_headless.py), [shortcut foundations](../tests/test_shortcut_foundations.py) |
@@ -160,7 +160,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 
 | ID | Computation | Owner | Evidence |
 | --- | --- | --- | --- |
-| E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py) |
+| E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. Construction copies preserve/remap formula graphs and accepted values (CH-050). Addressed property lookup traverses only the requested path, sharing discovery metadata and policy (CH-052). | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py), [copy state](../src/anthroforge/application/shortcut_copies.py), [property catalogue](../src/anthroforge/application/property_catalog.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py), [copy lifecycle](../tests/test_shortcut_copy.py), [profiling](research/shortcuts_030/performance_qualification.md) |
 
 The inventory covers all public native interface families in
 [native/include/anthroforge](../native/include/anthroforge), compiled geometry sources
@@ -1555,7 +1555,10 @@ See the task and development validation records for final gate/package evidence 
   exact composed draft/full equivalence. Modified native clang-tidy and typing pass.
 - Reference: [libigl preparation and solve](https://libigl.github.io/tutorial/).
 
-### CH-045 — Typed numerical addressing and restricted native expressions (2026-10-22)
+### CH-049 — Typed numerical addressing and restricted native expressions (2026-10-22)
+
+This record was CH-045 on the desktop feature branch. Cloud reconciliation assigns
+CH-049 because the integrated pipeline repair already published CH-045.
 
 - E01 is a new standalone computation, not a replacement for any existing anatomy
   algorithm. Qualified parser-default probes found mixed integer/real and exactness
@@ -1646,3 +1649,119 @@ See the task and development validation records for final gate/package evidence 
   Expanded property units distinguish dimensionless boundary samples/taper from lengths.
   Desktop failure placeholders lease separate native geometry and never enter accepted
   resource catalogues. These latest changes still require targeted qualification after resume.
+
+### CH-045 — Owned stacking relationship lookup keys (2026-10-22)
+
+- Ubuntu qualification of `ee98cc9` exposed GCC's dangling-reference error in
+  `order_pairs`: two-argument `std::minmax` retained references to temporary
+  `uint64_t` casts, then used them for policy and exclusion lookup after destruction.
+- Use the existing `relationship_key` helper, returning an owned sorted pair.
+  K01's identity normalization, explicit ordering, exclusions, cache policy and
+  numerical methods remain unchanged; undefined lifetime behavior is removed.
+- The maintained stacking source digest is updated, and the upstream digest stays
+  available. The full compiler pass identified this defect without disabling
+  warnings-as-errors. At `70f4e62`, the Linux gate passes all 1722 pytest cases,
+  five native CTests, 162 authored clang-tidy inputs, the headless workshop and
+  Python package validation. The 57 focused stacking/provenance/drawing checks
+  also pass. No performance or geometry improvement is claimed.
+- See [the pipeline repair task](tasks/fix-ubuntu-pipeline.md) for final validation.
+
+### CH-050 — Copy formula controls with their construction graph (2026-10-22)
+
+- Cloud continuation of `e7d464e` found that geometry copies omitted shortcut and
+  driver records. Four public-operation regressions demonstrated the missing copied
+  controls. A fifth showed consumer formulas retaining invalid old curve-use addresses.
+- Shared copy operations now clone exposed/hidden wrappers, relevant driver outputs,
+  internal property/virtual-input references, descendant policies, ordering and accepted
+  formula values. Explicit external inputs remain external; copied drivers never acquire
+  outputs outside the copied construction. New object/member/formula identities are
+  allocated once. Read-provenance property ports remap their escaped member identities.
+- Independence also rewrites references to internal members of the existing consumer.
+  Tissue construction and related formula state install together through the normal
+  authored object boundary, preserving revisions, invalidation and dependent scheduling.
+  Guards reserve retained active writers; removed or retargeted writers release their
+  former component. Ordinary edits to active driven fields remain rejected.
+- Evidence: 35 focused copy, shared-curve, tissue-independence, Fiber and architecture
+  cases pass. They include chains, external inputs, output scope, Parametric variable
+  identities, branch-part references, policy/order, undo/redo and pending Manual values.
+  Ruff/mypy pass. At cloud checkpoint `d89c8bd`, combined portable validation passes
+  1,845 pytest cases, five CTests, 170 owned native style inputs, headless workshop
+  and wheel checks (packaging resumed after sandbox network denial). Both GitHub core
+  platforms pass copy checkpoint `5ce4ca8`. Native expression/geometry algorithms and
+  solver tolerances are unchanged. Full desktop release qualification remains pending;
+  no release or performance gain is claimed.
+- Reference: [Python dataclass replacement](https://docs.python.org/3.12/library/dataclasses.html#dataclasses.replace).
+
+### CH-051 — Preserve typed integers across desktop controls (2026-10-23)
+
+- At `115ffb3`, an actual QML probe displayed authored `9007199254740993` as
+  `9007199254740992`. The native evaluator already preserved int64; the shared
+  numeric widget and Qt real-valued signals rounded input above JavaScript's
+  exact-integer range. Re-selecting Integer on a Parametric variable could also
+  overwrite its exact value with the rounded projection.
+- Integer driver/list/variable values now travel as text. Shared numeric controls
+  keep the existing gesture lifecycle and real-valued signal; an exact-text path
+  performs integer offsets and sends a typed display-quantity payload. The desktop
+  command adapter converts that payload to an ordinary Python integer before the
+  same application command runs. Transport payloads never enter saved documents.
+- UI-only Decimal conversion preserves int64 precision through metre/centimetre/
+  millimetre display factors and the existing degree convention. Integer angles
+  recognize the four-decimal display of a whole canonical radian value; arbitrary
+  fractional canonical inputs remain errors. The common numerical validator now
+  rejects authored integers outside the native signed-64-bit range, including
+  headless driver and variable creation. Native expression evaluation is unchanged.
+- Evidence: the 36-case integer/editor/scrub/architecture group and configured
+  Ruff/mypy checks pass. The production-QML harness exercises exact driver, list
+  and variable text, native formula outputs, repeated type selection, live scrub
+  and one undo action. The ordinary unit/editor harness still passes. The expanded
+  Parametric value row displays the full integer in the inspected offscreen capture.
+  Combined portable validation at `57c93ec` passes 1,880 pytest cases, five native
+  CTests, 170 owned native style inputs, headless workflow and wheel checks. Both
+  GitHub core platforms passed integer checkpoint `b42a7f1`. No Windows desktop
+  release claim is made.
+
+### CH-052 — Resolve addressed properties without enumerating the catalogue (2026-10-23)
+
+- Profiling the headless 0.3 workload at `b42a7f1` showed that resolving one
+  Parametric variable walked and labelled all preceding generated point properties.
+  One public read on a 256-point curve made 1,170,890 profiled calls, taking about
+  250 ms. Point labels repeatedly searched the point collection.
+- The owning property catalogue now traverses only the requested semantic path.
+  Discovery and direct lookup share dimension/type metadata, descriptor construction,
+  labels and Parametric read-only policy. Transform lookup retains its existing
+  provider. Excluded state and noncanonical collection aliases remain ineligible.
+  No additional cache, document lifetime or native numerical algorithm is introduced.
+- The same public probe now makes 585 calls in about 1 ms. The synthetic 12-curve,
+  256-point, one-Body workload's unrecorded edit median was 787.49 ms before and
+  142.74 ms after. Shared-worker load and a single before/after sequence limit the
+  comparison; this is not evidence of overall desktop responsiveness.
+- Evidence: 111 focused property, shortcut, driver, Parametric, integer and architecture
+  cases pass; configured Ruff/mypy pass. Descriptor equivalence covers five kinds
+  of construction, named fields and component addresses. Both production-QML
+  acceptance tools pass. The first concurrent full gate caught an intermediate
+  function-length violation; after correction, the full settled-code gate at
+  `57c93ec` passes all 1,880 pytest cases, five native CTests, 170 owned native style
+  inputs, headless workflow and wheel checks. The committed profiling tool also
+  passes its numerical checks on that revision.
+- [Profiling evidence](research/shortcuts_030/performance_qualification.md) records
+  reproducible compilation, packing, native evaluation and application workloads,
+  numerical checks, bounded expression-cache occupancy and recorder limits. Raw
+  artifacts are ignored/local only. Original-addon parity and Windows release
+  qualification remain pending.
+
+### CH-053 — Preserve Parametric symbol identity during authoring edits (2026-10-23)
+
+- Review reproduced renaming a radius variable leaving XYZ equations with an unknown
+  old symbol; evaluation failed and retained stale geometry. The earlier lifecycle
+  test manually changed equations afterward, so it did not verify the direct UI action.
+- The Parametric authoring boundary now rewrites unchanged XYZ and interval expression
+  identifiers by stable variable identity, atomically with variable edits. Simultaneous
+  renames use one mapping, preventing cascaded substitution. Explicitly supplied changed
+  equations retain their supplied meaning. Removal rejects surviving expression references.
+  Core symbol validation rejects the native language's reserved names before mutation.
+- This is equation-text/reference maintenance, not a Python numerical evaluator. Native
+  compilation, uniform sampling, deformation and accepted-result failure semantics are
+  unchanged. The existing transaction supplies coherent undo/cancel behavior.
+- Evidence: 34 lifecycle/architecture cases pass, including exact geometry preservation,
+  one-action undo, interval expressions, overlapping names, simultaneous swaps, explicit
+  replacement and native/core reserved-name agreement. Full release checks remain pending.

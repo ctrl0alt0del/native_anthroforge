@@ -4,7 +4,10 @@ from PySide6.QtCore import Property, QObject, Signal, Slot
 
 from anthroforge.application import property_operations, shortcut_operations
 from anthroforge.application.shortcut_ownership import property_owners
+from anthroforge.core.numeric_properties import decode_reference
+from anthroforge.core.shortcuts import implicit_identity
 
+from .quantity_values import QuantityValues, texts
 from .record_model import RecordModel
 from .shortcut_editor import ShortcutEditor
 from .values import qml
@@ -25,6 +28,7 @@ FIELDS = (
 
 class ShortcutPanel(QObject):
     changed = Signal()
+    revealRequested = Signal()
 
     def __init__(self, controller):
         super().__init__(controller)
@@ -34,6 +38,11 @@ class ShortcutPanel(QObject):
         self.model = RecordModel(self, FIELDS, "key")
         self.catalog = RecordModel(self, (*FIELDS, "exposed"), "key")
         self.editor = ShortcutEditor(self)
+        self.quantities = QuantityValues(self)
+
+    @Property(QObject, constant=True)
+    def quantityValues(self):
+        return self.quantities
 
     @Property(QObject, constant=True)
     def editing(self):
@@ -113,20 +122,24 @@ class ShortcutPanel(QObject):
 
     @Slot("QVariantMap", int, result="QVariantMap")
     def propertyState(self, reference, revision):
-        from anthroforge.core.numeric_properties import decode_reference
-        from anthroforge.core.shortcuts import implicit_identity
-
         try:
-            session = self.controller.session
-            value = property_operations.get(session, reference)
-            key = implicit_identity(decode_reference(reference))
-            return dict(
-                writable=value["writable"] and not value["driven_by"],
-                reason=value["reason"] or ("Driven by a formula" if value["driven_by"] else ""),
-                exposed=any(s.id == key and s.exposed for s in session.document.shortcuts),
-            )
+            return property_state(self.controller.session, reference)
         except (ValueError, KeyError):
             return dict(writable=False, reason="Property is unavailable", exposed=False)
+
+    @Slot("QVariantMap")
+    def openDriver(self, reference):
+        key = self.propertyState(reference, 0).get("driver", "")
+        if key:
+            self.editor.select(key)
+            self.revealRequested.emit()
+
+    @Slot("QVariantMap", int, result=str)
+    def propertyText(self, reference, revision):
+        try:
+            return str(property_operations.get(self.controller.session, reference)["value"])
+        except (ValueError, KeyError):
+            return ""
 
     @Slot()
     def createDriver(self):
@@ -152,7 +165,7 @@ class ShortcutPanel(QObject):
         order.insert(destination, order.pop(index))
         self.controller.run("shortcut.reorder", dict(identities=order))
 
-    @Slot(str, int, float, bool)
+    @Slot(str, int, "QVariant", bool)
     def editValue(self, key, component, value, uniform):
         current = next(
             v for v in shortcut_operations.ordered(self.controller.session.document) if v.id == key
@@ -173,7 +186,7 @@ def numeric_row(value):
     values = value["value"] if isinstance(value["value"], (tuple, list)) else [value["value"]]
     return dict(
         reference=value["reference"],
-        values=values,
+        values=texts(values, value["numeric_type"]),
         numericType=value["numeric_type"],
         dimension=value["dimension"],
         writable=value["writable"],
@@ -194,6 +207,26 @@ def discover_for_panel(panel, search):
         if key == selection or owner and owner in property_owners(session.document, key)
     ]
     return [row for key in targets for row in property_operations.discover(session, key, search)]
+
+
+def property_state(session, reference):
+    value = property_operations.get(session, reference)
+    key = implicit_identity(decode_reference(reference))
+    driver = controlling_driver(session.document, value["driven_by"])
+    return dict(
+        writable=value["writable"] and driver is None,
+        reason=value["reason"] or ("Driven by " + driver.label if driver else ""),
+        exposed=any(s.id == key and s.exposed for s in session.document.shortcuts),
+        driver=driver.id if driver else "",
+        formula=value["driven_by"],
+    )
+
+
+def controlling_driver(document, formula):
+    return next(
+        (d for d in document.driving_shortcuts if any(f.id == formula for f in d.formulas)),
+        None,
+    )
 
 
 def missing_row(value, reason):
@@ -217,7 +250,7 @@ def driver_row(session, value):
         key=value["id"],
         label=value["label"],
         reference={},
-        values=[value["value"]],
+        values=texts([value["value"]], value["numeric_type"]),
         numericType=value["numeric_type"],
         dimension=value["dimension"],
         writable=True,

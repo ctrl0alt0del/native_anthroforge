@@ -32,11 +32,12 @@ ColumnLayout {
     }
     RowLayout {
         visible: editor.details.kind === "DRIVER"; Layout.fillWidth: true
-        Label { text: "Value"; color: Theme.text }
-        UiNumberField {
-            Layout.fillWidth: true; value: editor.details.value || 0
-            decimals: editor.details.numeric_type === "INTEGER" ? 0 : 4
-            onEdited: value => editor.adapter.setValue(value)
+        Label { text: "Value" + (driverValue.unitLabel ? " · "+driverValue.unitLabel : ""); color: Theme.text }
+        UiQuantityField {
+            id: driverValue; objectName: "driverValue"
+            Layout.fillWidth: true; canonicalValue: editor.details.valueText || "0"
+            numericType: editor.details.numeric_type || "REAL"; dimension: editor.details.dimension || "SCALAR"
+            onCanonicalEdited: value => editor.adapter.setValue(value)
         }
     }
     RowLayout {

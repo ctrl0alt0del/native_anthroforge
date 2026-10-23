@@ -73,19 +73,21 @@ ColumnLayout {
                     UiMenuItem { text: "Hide from shortcuts"; onTriggered: panel.adapter.hide(row.key) }
                 }
             }
-            Label { visible: panel.allObjects; text: row.ownerLabel + (row.dimension === "LENGTH" ? " · "+workspace.state.display_units : row.dimension === "ANGLE" ? " · °" : ""); color: Theme.muted; font.pixelSize: 10; wrapMode: Text.Wrap; Layout.fillWidth: true }
+            Label { visible: panel.allObjects; text: row.ownerLabel + (uniformValue.unitLabel ? " Â· "+uniformValue.unitLabel : ""); color: Theme.muted; font.pixelSize: 10; wrapMode: Text.Wrap; Layout.fillWidth: true }
             ShortcutValues {
+                shortcutKey: row.key
                 values: row.values; reference: row.reference; numericType: row.numericType
                 dimension: row.dimension; writable: row.writable
                 onEdited: (component,value) => panel.adapter.editValue(row.key,component,value,false)
             }
-            UiNumberField {
-                visible: row.values.length>1; value: row.values.length ? row.values[0]/factor : 0
-                property real factor: row.dimension === "LENGTH" ? workspace.state.unit_factor : row.dimension === "ANGLE" ? Math.PI/180 : 1
+            UiQuantityField {
+                id: uniformValue
+                visible: row.values.length>1; canonicalValue: row.values.length ? row.values[0] : 0
+                numericType: row.numericType; dimension: row.dimension
                 propertyReference: row.reference
                 enabled: row.writable; Layout.fillWidth: true
                 ToolTip.text: "Uniform: set all components to the same value"
-                onEdited: value => panel.adapter.editValue(row.key,-1,value*factor,true)
+                onCanonicalEdited: value => panel.adapter.editValue(row.key,-1,value,true)
             }
         }
         Label { anchors.centerIn: parent; width: parent.width-16; visible: list.count===0; text: "Expose the properties you use for anatomical editing."; wrapMode: Text.Wrap; horizontalAlignment: Text.AlignHCenter; color: Theme.muted }

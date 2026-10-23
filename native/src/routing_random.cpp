@@ -34,7 +34,7 @@ double Random::uniform(double distance) {
 uint32_t Random::index(uint32_t count) {
     if(count<=1) return 0;
     // NumPy distributions.c buffered_bounded_lemire_uint32, MIT licensed.
-    const uint32_t threshold=uint32_t(-count)%count;
+    const uint32_t threshold=(uint32_t(0)-count)%count;
     uint64_t product=uint64_t(next32())*count;
     while(uint32_t(product)<threshold) product=uint64_t(next32())*count;
     return uint32_t(product>>32);

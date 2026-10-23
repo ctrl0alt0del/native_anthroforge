@@ -29,7 +29,8 @@
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #elif defined(_MSC_VER)
 #pragma warning(push)
-#pragma warning(disable:4068 4100 4505)
+// Match the routing wrapper's allowances for the imported donor code only.
+#pragma warning(disable:4068 4100 4189 4244 4267 4505)
 #endif
 namespace af::stacking::kernel {
 using namespace af::routing::kernel;

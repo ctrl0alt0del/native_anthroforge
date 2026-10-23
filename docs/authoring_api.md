@@ -1,18 +1,17 @@
 # Local authoring API, 0.2.4
 
-## Planned 0.3 operations — not available in 0.2.4
+## Unreleased 0.3 operations on the feature branch
 
-The [confirmed specification](specification_030.md) and
-[planned shared interfaces](implementation_030.md#shared-api-additions) add property
-discovery, shortcut exposure/configuration/editing, driving-formula lifecycle and policy
-inspection, plus parametric definitions/variables. Exact signatures will be documented
-with their implementation. This section does not advertise callable commands today.
+The [development walkthrough and operation signatures](shortcuts_030.md) describe
+implemented property discovery, shortcut exposure/configuration/editing, driving-formula
+lifecycle and policies, and Parametric definitions/variables. These operations are on
+the 0.3 feature branch; they are unavailable in the released 0.2.4 distribution.
 
 Ordinary property operations remain below wrappers; wrapper edits alone activate their
 attachment policies. Both respect shared driven-property/type/topology restrictions.
-No manual shortcut-owner or backsolve-target parameter is planned. Existing curve-engine,
-Fiber, junction, evaluation and transaction operations will be extended, not replaced.
-Schema 5 will read existing 0.2.4/schema-4 projects with their accepted state intact.
+There is no manual shortcut-owner or backsolve-target parameter. Existing curve-engine,
+Fiber, junction, evaluation and transaction operations share the same command catalogue.
+The feature branch writes schema 5 and reads existing 0.2.4/schema-4 projects.
 
 ## Current operations
 

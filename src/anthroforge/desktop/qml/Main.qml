@@ -180,6 +180,7 @@ ApplicationWindow {
                 anchors.fill: parent; spacing: 0
                 Rectangle {
                     id: inspectorHeader; objectName: "inspectorHeader"; property bool shortcuts: false
+                    Connections { target: workspace.shortcutPanel; function onRevealRequested() { inspectorHeader.shortcuts=true; } }
                     Layout.fillWidth: true; implicitHeight: 33; color: Theme.header
                     RowLayout {
                         anchors.fill: parent; anchors.leftMargin: 8; anchors.rightMargin: 8

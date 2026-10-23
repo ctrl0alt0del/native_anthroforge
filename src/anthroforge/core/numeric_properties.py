@@ -40,6 +40,8 @@ class NumericDescriptor:
 
 
 def validate_number(value: Any, kind: str) -> None:
+    if kind == "INTEGER" and type(value) is int and not -(1 << 63) <= value < (1 << 63):
+        raise ValueError("Integer input exceeds the signed 64-bit range.")
     if type(value) not in (int, float) or not isfinite(value):
         raise ValueError("A numerical value must be finite; Boolean is not a number.")
     if kind == "INTEGER" and type(value) is not int:

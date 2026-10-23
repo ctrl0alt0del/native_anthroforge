@@ -231,6 +231,12 @@ No donor asynchronous executor, legacy exported API, Blender object system, Open
 or Python numerical implementation is included. The component uses one translation unit
 because the maintained donor headers define non-inline cache methods.
 
+October 22 compiler qualification (CH-045) replaces `order_pairs`' dangling
+`std::minmax` references to temporary ID casts with the existing value-returning
+`relationship_key` helper. Sorted IDs, policy/exclusion semantics and numerical
+methods are unchanged. `sources.json` records the corrected bytes; original hashes
+remain in `upstream_sources.json`.
+
 Fourteen compact fixtures captured from the actual addon DLL cover ordinary and tangential
 transport, chains, multiple providers, zero inflation, exact weighted constraints, hidden
 crop variables, selected regions, explicit/requested/excluded relationships and deliberate

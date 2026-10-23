@@ -1,9 +1,10 @@
 # AnthroForge 0.2.4
 
-The [0.3 shortcut/Parametric specification](docs/specification_030.md) and
-[implementation plan](docs/implementation_030.md) are **confirmed, not implemented**.
-They include loading existing 0.2.4 projects into the planned schema 5. The released
-application and package version remain 0.2.4; source Blender migration is separate.
+The [0.3 shortcut/Parametric specification](docs/specification_030.md) is being
+implemented on this feature branch. See the [development walkthrough](docs/shortcuts_030.md)
+and [cloud task record](docs/tasks/shortcuts-parametric-030-cloud.md) for implemented
+behavior and pending qualification. This branch writes schema 5 and reads schema 4.
+The released application and package version remain 0.2.4; no 0.3 release is claimed.
 
 0.2.4 improves tissue editing and evaluation performance: prepared inspection UI,
 incremental collision checks, retained stacking preparation, a smaller height-smoothing

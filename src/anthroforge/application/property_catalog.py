@@ -77,20 +77,25 @@ def roots(item: Any) -> tuple[str, ...]:
 
 
 def descriptors(item: Any) -> Iterator[numeric.NumericDescriptor]:
-    from .parametric_policy import readonly
     from .property_transforms import descriptors as transforms
 
     yield from transforms(item)
     for name in roots(item):
         if hasattr(item, name):
             for value in walk_field(item.id, item, name, ()):
-                reason = readonly(item, value.reference.path)
-                yield replace(
-                    value,
-                    label=property_label(item, value.reference.path),
-                    writable=value.writable and not reason,
-                    reason=reason or value.reason,
-                )
+                yield described(item, value)
+
+
+def described(item: Any, value: numeric.NumericDescriptor) -> numeric.NumericDescriptor:
+    from .parametric_policy import readonly
+
+    reason = readonly(item, value.reference.path)
+    return replace(
+        value,
+        label=property_label(item, value.reference.path),
+        writable=value.writable and not reason,
+        reason=reason or value.reason,
+    )
 
 
 def property_label(item: Any, path: tuple[str, ...]) -> str:
@@ -183,10 +188,55 @@ def walk_field(target: str, owner: Any, name: str, path: tuple[str, ...]) -> Ite
 
 
 def resolve(document: Any, reference: numeric.PropertyRef) -> numeric.NumericDescriptor:
+    from .property_transforms import descriptors as transforms
+
     item = document.object(reference.target)
-    for candidate in descriptors(item):
-        if candidate.reference.path == reference.path:
-            if reference.component is not None and reference.component >= candidate.components:
-                raise ValueError("Numerical property component is unavailable.")
-            return replace(candidate, reference=reference)
+    if reference.path[0] in ("transform", "world_transform"):
+        candidates = (v for v in transforms(item) if v.reference.path == reference.path)
+        value = next(candidates, None)
+    elif reference.path[0] in roots(item):
+        value = described(item, addressed(item, reference, reference.path))
+    else:
+        value = None
+    return selected_descriptor(value, reference)
+
+
+def selected_descriptor(
+    value: numeric.NumericDescriptor | None, reference: numeric.PropertyRef
+) -> numeric.NumericDescriptor:
+    if value is not None:
+        if reference.component is not None and reference.component >= value.components:
+            raise ValueError("Numerical property component is unavailable.")
+        return replace(value, reference=reference)
     raise ValueError("This is not an eligible numerical property.")
+
+
+def addressed(
+    value: Any,
+    ref: numeric.PropertyRef,
+    path: tuple[str, ...],
+    unit: str = "SCALAR",
+    kind: str = "REAL",
+) -> numeric.NumericDescriptor:
+    if not path:
+        if isinstance(value, Real) and not isinstance(value, bool) or numeric_vector(value):
+            return descriptor(ref.target, ref.path, value, unit, kind)
+    elif is_dataclass(value) and path[0] not in EXCLUDED and path[0] in annotations(type(value)):
+        return addressed_field(value, ref, path)
+    elif isinstance(value, tuple) and not numeric_vector(value):
+        return addressed(addressed_member(value, path[0]), ref, path[1:], unit, kind)
+    raise ValueError("This is not an eligible numerical property.")
+
+
+def addressed_field(
+    value: Any, ref: numeric.PropertyRef, path: tuple[str, ...]
+) -> numeric.NumericDescriptor:
+    unit, kind = dimension(value, path[0]), numeric_kind(value, path[0])
+    return addressed(getattr(value, path[0]), ref, path[1:], unit, kind)
+
+
+def addressed_member(values: tuple[Any, ...], token: str) -> Any:
+    value = numeric.member(values, token)
+    if token.startswith("#") and token != numeric.member_token(value, int(token[1:])):
+        raise ValueError("Collection properties require their stable member identity.")
+    return value

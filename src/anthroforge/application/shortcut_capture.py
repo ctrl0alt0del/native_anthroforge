@@ -18,6 +18,7 @@ def snapshot(item: SCP) -> SCP:
         matrix=item.matrix,
         geometry_offset=item.geometry_offset,
         attachment=item.attachment,
+        primitive=item.primitive,
     )
 
 

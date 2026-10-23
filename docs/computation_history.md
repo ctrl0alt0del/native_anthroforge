@@ -1765,3 +1765,32 @@ CH-049 because the integrated pipeline repair already published CH-045.
 - Evidence: 34 lifecycle/architecture cases pass, including exact geometry preservation,
   one-action undo, interval expressions, overlapping names, simultaneous swaps, explicit
   replacement and native/core reserved-name agreement. Full release checks remain pending.
+
+### CH-054 — Exact signed-minimum literals and located Parametric failures (2026-10-23)
+
+- Review found that parsing the positive token before unary negation rejected the
+  valid signed 64-bit minimum. Native prefix parsing now consumes signed literals
+  directly when no exponent binds first. Power precedence, exact integer arithmetic,
+  overflow rejection and the language's type/unit checks remain intact.
+- Parametric runtime failures now identify XYZ expression, sample index and exact
+  parameter value; compilation failures identify their equation/interval. The sampling
+  algorithm, failure retention and cancellation contracts are unchanged. Diagnostics
+  add work only on failure, not per-sample Python callbacks.
+- Evidence: 68 expression/Parametric/architecture cases pass, including minimum and
+  overflowing integers, exponent precedence and a singularity at Y sample 1, t=0.5.
+
+### CH-055 — Resolve Auto attachment strategy from surface capability (2026-10-23)
+
+- Addon inspection and real Pubis capture confirmed Auto uses Deformation Flow for
+  curve-deformed geometry. Standalone treated every Auto binding as Stable Surface.
+- Shared core capability policy now recognizes curve-deformed Body construction.
+  Capture and batched propagation use the same policy; temporary shortcut capture
+  retains the immutable construction needed to make the same decision. No new
+  solver, nearest-surface recapture, or per-sample callback is introduced.
+- Existing Auto bindings lacking a secondary flow sample still use the native stable
+  fallback, preserving loaded poses and startup policy. Imported/other construction
+  remains Stable in Auto; explicit Deformation Flow remains available.
+- Actual Pubis/Ilium source poses match native propagation within 1.94485e-5 for
+  explicit and Auto flow, under the existing 3e-5 tolerance. Cheekbone backsolve matches
+  within 7.89165e-8. Synthetic tests verify capture capability, legacy fallback and
+  unchanged retained bindings. See [scope and provenance](research/shortcuts_030/windows_review.md).

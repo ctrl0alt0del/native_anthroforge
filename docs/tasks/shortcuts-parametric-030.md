@@ -36,6 +36,17 @@ interaction/shape inspection, source-addon attachment parity, representative sch
 compatibility, profiler evidence, full Windows gate and portable release qualification.
 Runtime remains 0.2.4. Preserve unrelated root `__init__.py`; background-only checks.
 
+Further local review: texture-only D3D11 captures show generated curves and dependent
+Body geometry; changing radius updates the body and Undo restores bitwise-identical
+vertices. The renderer asserts its window remains invisible. Real source-file capture
+now qualifies the Pubis-to-Ilium descendant override (including Auto) and Cheekbone
+owner backsolve against Blender 5.0.1. Source hashes remain unchanged. Details and
+limits are in [Windows review evidence](../research/shortcuts_030/windows_review.md).
+Native review also fixes signed-minimum integer literals and actionable Parametric
+sample diagnostics. Escape cancellation cannot restart a reorder while the button
+remains held. Auto strategy now honors curve-deformed Body capability while retaining
+stable fallback for legacy bindings. These checks do not yet establish a release.
+
 Cloud review integrated and pushed to the original feature branch as `6f7a048`.
 The Windows development gate at that checkpoint passed: 1,912 pytest cases, all
 five CTests, native/script style, Ruff/mypy, numerics and headless doctor. Subsequent

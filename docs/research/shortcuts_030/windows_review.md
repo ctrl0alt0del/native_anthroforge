@@ -1,0 +1,50 @@
+# Windows review of the Cloud 0.3 continuation
+
+Work in progress on `codex/shortcuts-parametric-030`; no release claim.
+
+## Real addon attachment references
+
+`tools/capture_shortcut_parity.py` opens the original sources in Blender 5.0.1
+background/factory/disabled-autoexec mode, registers only SCP properties, reads
+evaluated geometry, and calls the addon's capture/apply kernels. It does not save
+either source. Explicit property storage avoids unrelated live update handlers.
+
+- `skeleton_comb_base.blend`: SHA256
+  `1049c9cef5d0e94735e20e1f3e313cdb845a67c6554ccf3a98e81da98b813ff2`.
+  Pubis Arc Angle changes by -0.35 rad. The recorded Ilium override uses Surface
+  Nearest, Face Center, Follow Rotation, Deformation Flow. A second capture uses Auto.
+- `skull_muscles.blend`: SHA256
+  `4855042f259135c569c3e89b50df5d0441e6794bef5e774aebf924fd8372287e`.
+  Cheekbone SuperHook AF Local X changes by 0.08 source units, then retained owner
+  anchor backsolve applies translation.
+
+`tools/check_shortcut_parity.py` compares native evaluation on the captured meshes,
+poses and retained material bindings. Maximum absolute matrix-component differences:
+Pubis explicit and Auto **1.94485e-5**; Cheekbone **7.89165e-8**; tolerance **3e-5**.
+This verifies numerical application of real retained attachments. It is not a full
+Blender-project migration or a claim that every native capture chooses the identical
+nearest triangle. Existing synthetic capture parity and application wrapper lifecycle
+tests cover those separate boundaries. Original files are preserved.
+
+The source investigation found Auto previously resolved to Stable in standalone,
+regardless of a Body's curve deformation. Shared capability policy now selects flow
+for Body construction and Stable for other providers; explicit strategies remain
+available. Existing bindings without a secondary flow sample retain their fallback.
+
+## Desktop evidence
+
+- `tools/shortcuts_reorder_acceptance.py`: production-QML mouse reorder, one-action
+  undo, Escape cancellation including continued pointer motion before release.
+- `tools/shortcuts_workflow_acceptance.py`: full Main-window shortcut scrubbing,
+  cancel/undo, downstream Parametric and Body work, and a runtime profiler capture.
+  Offscreen software window captures do not establish native 3D rendering.
+- `tools/shortcuts_scene_acceptance.py`: native D3D11 texture renderer, invisible
+  QQuick window, initial Body, variable edit, exact vertex Undo, and generated-point
+  edit presentation. Captures inspected in `build/shortcuts-scene-review/`.
+
+The scene harness drains deferred Qt deletion between frames, matching a running
+event loop. An earlier harness without that step showed obsolete outline objects;
+that was a harness artifact, not evidence for a production renderer change.
+
+No interactive desktop acceptance is claimed. Raw captures and source geometry are
+ignored/local artifacts; the maintained tools reproduce the checks.

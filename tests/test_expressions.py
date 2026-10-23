@@ -31,6 +31,11 @@ from anthroforge.native.mesh import NativeCancellation
         ("abs(-3)", 3, 0),
         ("sqrt(4)", 2.0, 1),
         ("2**3", 8, 0),
+        ("-9223372036854775808", -(2**63), 0),
+        ("-9223372036854775808 + 1", -(2**63) + 1, 0),
+        ("(-9223372036854775808)^1", -(2**63), 0),
+        ("- 2^2", -4, 0),
+        ("-2*3", -6, 0),
     ],
 )
 def test_typed_arithmetic(session, source, expected, kind):
@@ -90,6 +95,9 @@ def test_units_and_expected_output_type(session):
         "round(1e30)",
         "clamp(1,3,2)",
         "1%0",
+        "9223372036854775808",
+        "-9223372036854775809",
+        "--9223372036854775808",
     ],
 )
 def test_nonfinite_and_integer_overflow_fail(session, source):

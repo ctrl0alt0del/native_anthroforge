@@ -30,6 +30,7 @@ def drag(window, source, target, cancel=False):
         QTest.mouseMove(window, start + (end - start) * (step / 8), 12)
     if cancel:
         QTest.keyClick(window, Qt.Key_Escape)
+        QTest.mouseMove(window, end + QPointF(0, 16).toPoint(), 20)
     QTest.mouseRelease(window, Qt.LeftButton, pos=end)
     QTest.qWait(80)
 

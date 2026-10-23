@@ -28,10 +28,17 @@ def evaluate(engine: GeometryEngine, curve: Any, cancel: int = 0) -> tuple[Path,
     )
     values = {"t": 0.0, **{v.name: v.value for v in settings.variables}}
     programs = tuple(
-        expressions.compile(engine, getattr(settings, axis), symbols, cancel) for axis in "xyz"
+        equation(engine, getattr(settings, axis), symbols, axis.upper(), cancel) for axis in "xyz"
     )
     start, end = interval(engine, settings, cancel)
     return sample(engine, curve, programs, values, (start, end), cancel)
+
+
+def equation(engine: GeometryEngine, source: str, symbols: Any, label: str, cancel: int) -> Any:
+    try:
+        return expressions.compile(engine, source, symbols, cancel)
+    except ValueError as error:
+        raise ValueError(f"Parametric {label} expression '{source}': {error}") from error
 
 
 def interval(
@@ -51,7 +58,7 @@ def endpoint(
     expression = getattr(interval, name + "_expression")
     if not expression:
         return float(getattr(interval, name))
-    program = expressions.compile(engine, expression, symbols, cancel)
+    program = equation(engine, expression, symbols, "interval " + name, cancel)
     program.output.require("REAL", "SCALAR")
     return float(program.evaluate(values, cancel))
 

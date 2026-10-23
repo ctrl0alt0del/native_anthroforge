@@ -22,6 +22,7 @@ Item {
     }
     function finish(commit) {
         const selected=target, below=after;
+        pointer.gesture=false;
         moving=false; target=""; view.dropKey=""; focus=false;
         if(commit && selected && selected!==key) placed(selected,below);
     }
@@ -41,8 +42,9 @@ Item {
         id: pointer; anchors.fill: parent; hoverEnabled: true; preventStealing: true
         acceptedButtons: Qt.LeftButton; cursorShape: Qt.SizeVerCursor
         property real startY: 0
-        onPressed: mouse => { startY=mouse.y; handle.target=""; }
-        onPositionChanged: mouse => { if(pressed) handle.track(mouse); }
+        property bool gesture: false
+        onPressed: mouse => { gesture=true; startY=mouse.y; handle.target=""; }
+        onPositionChanged: mouse => { if(pressed && gesture) handle.track(mouse); }
         onReleased: handle.finish(true)
         onCanceled: handle.finish(false)
     }

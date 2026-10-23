@@ -25,6 +25,7 @@ class Parser {
     Node constant(Value input);
     Node identifier(const Token& token,int depth);
     Node function(const Token& token,int depth);
+    Node negative(int depth);
     Node prefix(int depth);
     Node expression(int precedence,int depth);
     Node append(Op op,const std::vector<Node>& args);
@@ -75,13 +76,19 @@ Node Parser::identifier(const Token& token,int depth) {
     }
     throw std::runtime_error("Unknown expression input: "+token.text);
 }
+Node Parser::negative(int depth) {
+    const auto& token=tokens[cursor];
+    const bool number=!token.text.empty()&&(token.text[0]=='.'||std::isdigit(static_cast<unsigned char>(token.text[0])));
+    if(number&&tokens[cursor+1].text!="^"&&tokens[cursor+1].text!="**") {
+        ++cursor; return constant(literal({"-"+token.text,token.position}));
+    }
+    return append(Op::Negate,{expression(4,depth+1)});
+}
 Node Parser::prefix(int depth) {
     if(depth>64) throw std::runtime_error("Expression nesting exceeds 64 levels.");
     const Token token=tokens[cursor++];
-    if(token.text=="+"||token.text=="-") {
-        const Node node=expression(4,depth+1);
-        return token.text=="-"?append(Op::Negate,{node}):node;
-    }
+    if(token.text=="-") return negative(depth);
+    if(token.text=="+") return expression(4,depth+1);
     if(token.text=="(") { const Node node=expression(0,depth+1); expect(")"); return node; }
     if(token.text.empty()) throw std::runtime_error("Unexpected end of expression.");
     if(token.text[0]=='.'||(token.text[0]>='0'&&token.text[0]<='9')) return constant(literal(token));

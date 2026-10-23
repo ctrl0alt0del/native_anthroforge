@@ -2,6 +2,8 @@
 #include "expression_internal.hpp"
 #include "path_internal.hpp"
 #include <array>
+#include <iomanip>
+#include <sstream>
 
 namespace af {
 namespace ex=expression;
@@ -39,11 +41,21 @@ static std::vector<ex::Value> inputs(const Equations& programs,int count,const i
     for(int i=0;i<count;++i) result.push_back(ex::checked({programs[0]->symbols[i].type,integers[i],reals[i]}));
     return result;
 }
+static double coordinate(const ex::Program& program,const std::vector<ex::Value>& values,
+                         int axis,int index,double t,uint64_t cancel) {
+    try { return ex::real(ex::evaluate(program,values.data(),cancel)); }
+    catch(const std::exception& error) {
+        std::ostringstream context;
+        context<<"Parametric "<<"XYZ"[axis]<<" expression '"<<program.source<<"', sample "<<index
+               <<", t="<<std::setprecision(17)<<t<<": "<<error.what();
+        throw std::runtime_error(context.str());
+    }
+}
 static void point_record(const Equations& programs,std::vector<ex::Value>& values,
                          const double* metadata,int previous,int index,double t,double* output,uint64_t cancel) {
     values[0].real=t;
     for(int axis=0;axis<3;++axis) {
-        const double value=ex::real(ex::evaluate(*programs[axis],values.data(),cancel));
+        const double value=coordinate(*programs[axis],values,axis,index,t,cancel);
         output[axis]=output[axis+3]=output[axis+6]=value;
     }
     output[9]=index<previous?metadata[index*13+9]:1;

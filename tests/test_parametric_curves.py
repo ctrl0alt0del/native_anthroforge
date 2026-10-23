@@ -107,3 +107,27 @@ def test_interval_expressions_and_integer_variables(session):
     np.testing.assert_allclose(positions(session, key)[:, 0], [0, 1, 2, 3, 4])
     ref = dict(target=key, path=["engine_settings", "interval", "end"])
     assert not session.command("property.get", reference=ref)["writable"]
+
+
+def test_runtime_failure_identifies_axis_expression_and_sample(session):
+    from dataclasses import replace
+
+    from anthroforge.native.parametric import evaluate
+
+    key = create(session, resolution=3)
+    curve = session.document.object(key)
+    settings = replace(curve.engine_settings, y="m/(t-0.5)")
+    with pytest.raises(ValueError, match=r"Y expression 'm/\(t-0.5\)', sample 1, t=0.5"):
+        evaluate(session.engine, replace(curve, engine_settings=settings))
+
+
+def test_compile_failure_identifies_axis(session):
+    from dataclasses import replace
+
+    from anthroforge.native.parametric import evaluate
+
+    key = create(session)
+    curve = session.document.object(key)
+    settings = replace(curve.engine_settings, z="unknown*m")
+    with pytest.raises(ValueError, match="Z expression 'unknown\\*m'"):
+        evaluate(session.engine, replace(curve, engine_settings=settings))

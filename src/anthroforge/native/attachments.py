@@ -9,6 +9,7 @@ from typing import Any
 import numpy as np
 
 from anthroforge.core import attachment_provenance
+from anthroforge.core.attachment_strategy import uses_deformation_flow
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import geometry_asset
 
@@ -29,7 +30,7 @@ def capture(
     query = capture_surface(parent, meshes, child.attachment.parent_mode, cancel)
     handles = (handle(child, meshes), query.mesh.handle if query else handle(parent, meshes))
     status = engine.library.af_capture(
-        *handles, *(pointer(a) for a in arrays), *capture_options(child), pointer(output)
+        *handles, *(pointer(a) for a in arrays), *capture_options(child, parent), pointer(output)
     )
     engine.check(status)
     return captured(child, parent, output)
@@ -61,14 +62,14 @@ def anchor_points(
     return list(output.tolist())
 
 
-def capture_options(child: SCP) -> tuple[Any, ...]:
+def capture_options(child: SCP, parent: SCP) -> tuple[Any, ...]:
     settings = child.attachment
     locked = settings.vertex_lock if settings.child_mode == "VERTEX_NEAREST" else settings.face_lock
     return (
         settings.parent_mode == "SURFACE_NEAREST",
         CHILD_MODES[settings.child_mode],
         locked,
-        settings.strategy == "DEFORMATION_FLOW",
+        uses_deformation_flow(child, parent),
     )
 
 
@@ -110,10 +111,11 @@ def reference(entity: SCP, meshes: dict[str, Mesh]) -> int:
 
 
 def packed_flags(entities: list[SCP], active: set[str]) -> dict[str, Any]:
+    parents = {item.id: item for item in entities}
     return {
         "modes": flags(entities, lambda e: e.attachment.parent_mode == "SURFACE_NEAREST"),
         "follows": flags(entities, lambda e: e.attachment.follow_rotation),
-        "flows": flags(entities, lambda e: e.attachment.strategy == "DEFORMATION_FLOW"),
+        "flows": flags(entities, lambda e: uses_deformation_flow(e, parents.get(e.parent))),
         "active": flags(
             entities,
             lambda e: e.id in active and bool(e.attachment.binding) and e.status != "failed",

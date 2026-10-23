@@ -2,7 +2,7 @@
 
 - Branch: `codex/skeleton-shortcuts-migration`; integration: `main`.
 - Base: `2d34278e504c8b6a7f1e1823ba4328e82f022366`.
-- Status: migration complete; final runtime/artifact checks passed; integration pending.
+- Status: complete; artifact and canonical runtime qualified for main integration.
 - Updated: 2026-10-23, Europe/Bucharest. Direct desktop work, background only.
 
 ## Outcome
@@ -83,10 +83,13 @@ or per-sample production callback is introduced, and material bindings are not s
 rewritten. The rejected dense point-formula experiment remains explicitly identified in
 the evidence. The smoke readiness change affects diagnostics, not user loading policy.
 
-### Integration remaining
+### Delivery
 
-Final documentation/source archive refresh and normal task-branch/main merge/push.
-Preserve the unrelated untracked root `__init__.py`.
+The canonical portable folder and companion `dist/AnthroForge-0.3.0-source.zip` include
+the qualified runtime, current documentation and reproducible migration tools. Large
+anatomy files and local captures remain in the external folder, not Git. Final fetch
+found no newer main changes requiring reconciliation. Integration uses a normal merge
+and push preserving all task checkpoints. The unrelated root `__init__.py` is untouched.
 
 ## Inputs and decisions
 
@@ -285,3 +288,13 @@ before asynchronous Open finished. Smoke now waits for document, tasks and stagi
 reports entity count, and fails after a bounded deadline. New readiness tests pass.
 Final repackage, loaded-desktop qualification, documentation/source archive and merge
 remain pending. Do not claim the old empty/loading screenshot as a loaded-GUI pass.
+
+## Completed final qualification (supersedes the preceding checkpoint)
+
+The rebuilt canonical executable passes the complete portable suite and the actual
+assembly's control-edit/undo/save workflow. Final source regression: 1,972 passing tests.
+Loaded desktop smoke reports 59 SCPs and no warnings; the new screenshot was inspected.
+The separate packaged native render of final revision 57463 was also inspected and is
+complete. The repeated saved round-trip comparison reports zero differences for all
+625 records / 1,325 resources. Documentation links and changed-file whitespace checks
+pass. Delivery, evidence, existing limits and ownership review are summarized above.

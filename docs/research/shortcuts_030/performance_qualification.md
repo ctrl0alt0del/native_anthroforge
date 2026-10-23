@@ -112,3 +112,8 @@ display latency or GPU execution. Native 3D rendering was inspected separately.
 An earlier capture and the first portable probe reported incomplete model coverage:
 the observer counted every QObject against its model-watch budget. CH-057 documents
 the diagnosis and repair; those incomplete reports are not the acceptance evidence.
+
+The subsequent discovery review made the signal-name table immutable/reused rather
+than allocating it for each inspected method. A repeat full-window capture
+(`20261023-091312-025576be.afprofile.zip`) remains complete and records 75.4 ms activation.
+Concurrent build/test load and the single trial prevent a controlled speedup claim.

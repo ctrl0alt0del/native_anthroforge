@@ -41,7 +41,7 @@ CHECKS = (
     "surface rulers, named cameras and explanatory profile diagnostics",
     "independent fibers, shared lofts and portable embedded reference images",
     "window feedback capture, annotations, inbox preview, text editing and deletion",
-    "schema-4 tissues, attached construction, stacking, native profiling and rendering",
+    "schema-5 tissues, attached construction, stacking, native profiling and rendering",
     "automatic Fiber endpoints, independent copies, undo/redo and shared deletion impact",
     "direct tissue creation with automatic attached construction",
     "branched point creation, automatic surface grouping and membrane conversion",

@@ -1,9 +1,10 @@
 # AnthroForge release roadmap
 
-- **0.3 / 0.3.0 — confirmed, not implemented:** numerical-property shortcut wrappers,
+- **0.3 / 0.3.0 — feature branch, qualification in progress:** numerical-property shortcut wrappers,
   explicit controls, driving formulas with inferred ownership and addon attachment-edit
   policies, and the Parametric curve engine. [Contract](specification_030.md),
-  [implementation plan](implementation_030.md). Planned schema 5 includes a reader for
+  [implementation plan](implementation_030.md), [review state](tasks/shortcuts-parametric-030.md).
+  Schema 5 includes a reader for
   existing 0.2.4/schema-4 projects; source Blender shortcut migration is separate.
 
 - **0.2.4 — qualified baseline:** VCP preparation, collision/stacking reuse and height

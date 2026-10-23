@@ -1,11 +1,12 @@
 # AnthroForge standalone application: consolidated recommendations
 
-Updated: 2026-10-22
+Updated: 2026-10-23
 
 The [0.3 specification](docs/specification_030.md) and
-[implementation plan](docs/implementation_030.md) are **confirmed, not implemented**.
+[implementation plan](docs/implementation_030.md) are **confirmed; feature-branch implementation
+is undergoing qualification**. See the [local review](docs/tasks/shortcuts-parametric-030.md).
 They define separate property/shortcut wrappers, inferred driving-shortcut ownership,
-addon attachment-edit policies and the Parametric engine. Planned schema 5 must read
+addon attachment-edit policies and the Parametric engine. Schema 5 reads
 existing 0.2.4/schema-4 projects without changing accepted geometry or attachments.
 The released app remains 0.2.4/schema 4; historical compatibility rules below describe
 their own releases. Blender shortcut/project migration remains a separate task.

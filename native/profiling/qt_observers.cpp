@@ -20,7 +20,7 @@ void ModelObserver::addRoot(QObject* root) {
 }
 
 static bool modelSignal(const QMetaMethod& method) {
-    const QList<QByteArray> names={"modelChanged","modelReset","rowsInserted","rowsRemoved","dataChanged"};
+    static const QList<QByteArray> names={"modelChanged","modelReset","rowsInserted","rowsRemoved","dataChanged"};
     return method.methodType()==QMetaMethod::Signal && names.contains(method.name());
 }
 

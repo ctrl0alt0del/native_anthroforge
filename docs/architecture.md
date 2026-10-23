@@ -1,9 +1,9 @@
 # AnthroForge architecture
 
-## Planned 0.3 boundaries — not implemented
+## 0.3 feature-branch boundaries — qualification in progress
 
 The [confirmed shortcut/Parametric contract](specification_030.md) and
-[implementation plan](implementation_030.md) govern this planned extension. Lower-level
+[implementation plan](implementation_030.md) govern this extension. Lower-level
 numerical properties remain independent of shortcut wrappers. A property catalogue maps
 stable references to existing semantic edit operations; wrappers own exposure and optional
 attachment-edit policy. Direct property editing does not activate wrapper policy, while
@@ -11,17 +11,19 @@ shared validation still protects driven, read-only and topology-locked targets.
 
 Driving ownership is inferred from controlled properties, chains and shared construction.
 Only the initiating wrapper contributes temporary attachment policies. The current graph
-and coordinator will own formula outputs, coupled validation, accepted-value provenance
-and gesture contexts; no second scheduler or recursive user-edit publication is planned.
+and coordinator own formula outputs, coupled validation, accepted-value provenance
+and gesture contexts; no second scheduler or recursive user-edit publication is introduced.
 Native compiled expressions are shared by drivers and Parametric sampling, with numerical
 types/units and the language restricted by AnthroForge rather than library defaults.
 
-Curve authoring must become engine-specific: formula definitions and generated points
+Curve authoring is engine-specific: formula definitions and generated points
 cannot be treated as independent authored Bézier controls. Stored definitions, generated
 identities, post-formula deformation, resolution locks at junctions and exact independent
-Fiber conversion are distinct responsibilities. Planned schema 5 includes schema-4 loading
+Fiber conversion are distinct responsibilities. Schema 5 includes schema-4 loading
 for 0.2.4 projects without blanket recomputation. These boundaries and APIs are not present
-in the released 0.2.4 build; parser and runtime qualification remain delivery work.
+in the released 0.2.4 build. Native expression qualification and actual old-executable
+compatibility checks are recorded in the [implementation review](research/shortcuts_030/windows_review.md).
+Release acceptance and generated-point membership policy remain unfinished.
 
 ## Current architecture
 

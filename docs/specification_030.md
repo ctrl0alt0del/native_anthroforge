@@ -1,6 +1,8 @@
 # AnthroForge 0.3 — Shortcuts and parametric curves
 
-**Status: confirmed, not implemented.** This is the authoritative 0.3 product contract.
+**Status: confirmed; implementation and qualification in progress on the feature branch.**
+This is the authoritative 0.3 product contract. See the [local review](tasks/shortcuts-parametric-030.md)
+for completed checks and the unresolved generated-point membership decision.
 The [implementation plan](implementation_030.md) defines delivery and evidence; the
 [engineering guidelines](engineering_guidelines.md) govern implementation. The current
 released application remains 0.2.4. This document does not claim runtime qualification.

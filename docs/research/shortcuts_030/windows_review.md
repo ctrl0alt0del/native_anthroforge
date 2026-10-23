@@ -64,3 +64,36 @@ hashes, including geometry, bindings, poses, correspondence and revision provena
 The original project was never opened for writing. This is actual old-executable
 compatibility evidence, not a manifest-version rewrite. Logs/copies are local in
 `build/shortcuts-compatibility/`.
+
+The real 0.2.4 executable rejects the resulting schema-5 file with exit code 1 and
+`Unsupported AnthroForge project format/version.`
+
+## Ownership and coupling review
+
+This is a coordinator-authored code review, separate from test counts:
+
+- Core property descriptors preserve identity, numerical type/dimensions and scalar
+  versus vector shape. They do not invoke editing policies or import Qt/Blender.
+  Application adapters reuse semantic object operations and validation; driven and
+  topology restrictions are shared by the UI and headless path.
+- Drivers and Parametric use the same bounded native expression service. Python
+  owns dependency ordering, owned-input packing and publication; there is no Python
+  expression interpreter, iterative numerical fallback or competing worker pool.
+- Temporary attachment contexts capture before a wrapper edit, retain immutable
+  inputs through asynchronous work and restore authored settings. Ordinary properties
+  do not activate wrapper policy. Auto strategy is resolved once through shared core
+  capability policy in both native capture and propagation preparation.
+- Desktop models, numerical edit ownership and drag ordering are presentation
+  adapters over shared operations. QObject destruction/cancel paths are exercised;
+  context menus do not become an alternative command or validation implementation.
+- The Qt model collector is isolated from documents and calculation scheduling.
+  Its scoped event filter exists only during recording; bounded signal connections
+  and pending discovery retain explicit loss reporting. Signal-name metadata is
+  immutable and reused during discovery rather than allocated per visited method.
+
+Open finding: generated point IDs currently follow sample index. A resolution change
+can therefore move an existing Hook to another parameter location. The regression is
+explicitly expected to fail while the user chooses locking versus parameter-preserving
+remapping. It must be resolved and qualified before main/release; the expected failure
+is not release acceptance. The existing consumer-attachment and junction locks remain
+enforced and independently tested.

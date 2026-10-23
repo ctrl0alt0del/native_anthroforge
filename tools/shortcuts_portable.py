@@ -22,11 +22,22 @@ def shortcuts(executable, cwd, invoke):
 
 
 def consumer_requests():
+    body = dict(id="body", **request("primitive.from_curves", curves=["$circle"], kind="BODY"))
+    inspect = dict(id="body_spec", **request("primitive.inspect", entity="$body"))
+    dimensions = dict(
+        entity="$body", piece="$body_spec.primitive.pieces.0.id", width=0.01, depth=0.01
+    )
     return [
-        dict(operation="primitive.from_curves", arguments=dict(curves=["$circle"], kind="BODY")),
-        dict(operation="wait"),
-        dict(operation="save", arguments=dict(path="shortcuts.anthroforge", blocked_policy="wait")),
+        body,
+        inspect,
+        request("body.update", **dimensions),
+        request("wait"),
+        request("save", path="shortcuts.anthroforge", blocked_policy="wait"),
     ]
+
+
+def request(operation, **arguments):
+    return dict(operation=operation, arguments=arguments)
 
 
 def geometry(path):
@@ -41,9 +52,18 @@ def geometry(path):
         assert state["document"]["entities"][0]["result"]["asset"]
 
 
+def inspection_view(state):
+    return dict(
+        camera=[0, 0, 0, 70, 0, 0, 0.25],
+        orthographic=True,
+        workspace=0,
+        selected=state["entities"][0]["id"],
+        editing=False,
+    )
+
+
 def render(executable, cwd, invoke, state):
-    view = dict(camera=[0, 0, 0, 70, 0, 0, 0.25], orthographic=True, workspace=0)
-    (cwd / "shortcuts-view.json").write_text(json.dumps(view))
+    (cwd / "shortcuts-view.json").write_text(json.dumps(inspection_view(state)))
     capture = ("--cli", "render", "shortcuts.anthroforge", "shortcuts.png")
     invoke(
         executable,

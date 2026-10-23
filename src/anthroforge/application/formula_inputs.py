@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from anthroforge.core import numeric_properties as numeric
+from anthroforge.core.document import Document
 from anthroforge.core.entities import Workspace
 from anthroforge.core.expressions import Symbol
 from anthroforge.core.formula_dependencies import property_port, property_reference
@@ -25,7 +26,7 @@ class Captured:
         return self.document.entity(target)
 
 
-def formulas(document: Any) -> Mapping[str, Any]:
+def formulas(document: Document) -> Mapping[str, Any]:
     return document.formula_index.formulas
 
 

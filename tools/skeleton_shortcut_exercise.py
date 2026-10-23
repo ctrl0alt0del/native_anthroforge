@@ -33,12 +33,18 @@ def delta(session, before):
 
 def edit(session, mapping):
     value = mapping["value"]
-    value = value * 1.05 if value else 0.05
+    value = [v * 1.05 for v in value] if isinstance(value, list) else changed_value(value)
     if "driver" in mapping:
+        if session.document.formula_index.drivers[mapping["driver"]].dimension == "ANGLE":
+            value = mapping["value"] + 0.05
         session.command("driver.value", driver=mapping["driver"], value=value)
     else:
         session.command("shortcut.set", reference=mapping["reference"], value=value)
     return value
+
+
+def changed_value(value):
+    return value * 1.05 if abs(value) > 0.1 else value + 0.05
 
 
 def exercise(session, folder, mappings, number):
@@ -48,11 +54,22 @@ def exercise(session, folder, mappings, number):
     value = edit(session, mappings[key])
     submitted = perf_counter() - started
     settled(session)
+    require_ready(session)
     elapsed, changes = perf_counter() - started, delta(session, before)
     session.command("profile.stop", path=str(folder / f"edit-{number}.afprofile.zip"), wait=True)
     record_edit(folder, number, key, value, submitted, elapsed, changes, session.scheduler.errors)
     session.command("save", path=str(folder / f"edit-{number}.anthroforge"), blocked_policy="wait")
     restore(session, before)
+
+
+def require_ready(session):
+    assert not session.scheduler.errors, session.scheduler.errors
+    failures = [
+        (r.formula, r.status, r.error)
+        for r in session.document.formula_results
+        if r.status != "ready"
+    ]
+    assert not failures, failures
 
 
 def record_edit(folder, number, key, value, submitted, elapsed, changes, errors):

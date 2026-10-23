@@ -3,10 +3,12 @@
 from dataclasses import asdict, replace
 
 import numpy as np
+import pytest
 
 from anthroforge.application import storage
 from anthroforge.core.parametric import Interval, ParametricSettings
 from anthroforge.native import parametric, paths
+from tests.conftest import CUBE
 from tests.test_fiber_creation import bind, path
 from tests.test_parametric_consumers import imported
 from tests.test_primitives import mesh
@@ -87,3 +89,17 @@ def test_fiber_preserves_bezier_path_and_sampling_then_follows_parent(session):
         path(session, fiber.id)[:, :3], before[:, :3] + [0, 0, 1], atol=1e-12
     )
     np.testing.assert_array_equal(path(session, key), before)
+
+
+def test_bezier_segment_sampling_reports_incoming_attachment_lock(session):
+    key = parabola(session)
+    convert(session, key)
+    body = session.command("primitive.from_curves", curves=[key], kind="BODY")
+    session.wait(5)
+    session.command("import", path=str(CUBE), units=0.1, parent=body)
+    session.wait(5)
+    ref = dict(target=key, path=["engine_settings", "bezier_resolution"])
+    state = session.command("property.get", reference=ref)
+    assert not state["writable"] and "Topology is locked" in state["reason"]
+    with pytest.raises(ValueError, match="Topology is locked"):
+        session.command("curve.parametric.configure", curve=key, changes=dict(bezier_resolution=9))

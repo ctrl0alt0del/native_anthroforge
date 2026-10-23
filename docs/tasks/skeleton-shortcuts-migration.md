@@ -164,3 +164,20 @@ readable screenshots. New sampling lock presentation needs final focused coverag
 Next: compare compact mapping, representative edits and source semantics; inspect
 actual shapes; finalize source-order controls and final copied project; combined gate,
 canonical portable/source build; validated merge/push. No final file delivered yet.
+
+## Actual override edit correction
+
+Compact baseline passed (original 619 records / 1,325 resources, max mesh drift
+3.397e-12; only six declared controls and three Hook bindings added). Ilium-angle
+edited outputs match the coordinate-formula reference within 1.954e-13. The compact
+mapping is selected; no geometry fallback. Source Blender change captures are in
+`blender-edits/` and the source SHA remains unchanged.
+
+Testing Pubis Arc Angle exposed a wait cycle caused by pose batching ignoring its
+temporary Surface Nearest override. `wait-diagnostic.json` records an acyclic port
+graph but cyclic batch wait. CH-064 extends the existing policy adapter into batch
+planning. The small failing regression now passes and actual control 10 settles.
+Remaining representative edits run in `build/skeleton-shortcuts-edits-second.log`.
+The previous full gate had 1,968 passing tests and one temporary-tool function-length
+failure; that failure is fixed. Rerun the final gate after all changes. Portable build
+and final saved delivery remain pending. Root `__init__.py` untouched.

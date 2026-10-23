@@ -6,13 +6,14 @@ from graphlib import TopologicalSorter
 from anthroforge.core.document import Document
 from anthroforge.core.results import Port
 
-from . import dependencies
+from . import shortcut_attachment_evaluation as policies
 
 
 def groups(document: Document, targets: set[str]) -> list[set[str]]:
-    graph = dependencies.graph(document)
-    outputs = {Port(key, "pose") for key in targets}
-    valid = {key: value for key, value in graph.items() if key not in graph.blocked}
+    valid, outputs = (
+        policies.planning_graph(document, targets),
+        policies.output_ports(document, targets),
+    )
     levels: dict[Port, int] = {}
     for port in TopologicalSorter(valid).static_order():
         levels[port] = max(

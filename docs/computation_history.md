@@ -1973,3 +1973,19 @@ average. This is a read-only formula input; no new write channel is introduced.
   native Hook-on-lattice evaluation requires only 25 pelvic formulas and completed
   the same edit in 1.18 seconds. Complete shape/relationship comparison is underway;
   this is one controlled workload, not a general application performance claim.
+
+### CH-064 — Include temporary attachment policies in pose batching (2026-10-23)
+
+- The migrated Pubis Arc Angle stalled despite an acyclic authored graph. Its
+  temporary Ilium Surface Nearest override needed new Pubis geometry, but the pose
+  batch also reserved Pubis/Sacrum poses needed by that geometry's following controls.
+  Permanent attachment settings alone did not describe this temporary read.
+- Pose batch planning now obtains effective output roles and additional geometry
+  prerequisites from the existing shortcut attachment policy adapter. The same
+  adapter supplies job contracts. Owner-backsolve retains its separate shortcut-pose
+  output; authored bindings and the core permanent dependency graph remain unchanged.
+- A four-SCP regression reproduces the timeout before the change and completes after
+  it, preserving the authored binding and retained effective Surface Nearest receipt.
+  Nine focused shortcut/attachment tests pass. The real assembly's Pubis Arc Angle
+  now settles in 5.36 seconds with no scheduler errors; representative edit/undo and
+  final combined qualification are still underway.

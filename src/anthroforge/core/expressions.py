@@ -4,6 +4,10 @@ from dataclasses import dataclass
 
 DIMENSIONS = {"SCALAR": (0, 0), "LENGTH": (1, 0), "ANGLE": (0, 1)}
 KINDS = {"INTEGER": 0, "REAL": 1}
+RESERVED = frozenset(
+    "pi e m rad sin cos tan asin acos atan atan2 sqrt abs exp log log10 "
+    "floor ceil round min max clamp pow".split()
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -15,6 +19,8 @@ class Symbol:
     def __post_init__(self) -> None:
         if not self.name.isascii() or not self.name.isidentifier() or self.name.startswith("_"):
             raise ValueError("Expression inputs require public ASCII identifiers.")
+        if self.name in RESERVED:
+            raise ValueError("Expression input name is reserved.")
         if self.numeric_type not in KINDS or self.dimension not in DIMENSIONS:
             raise ValueError("Invalid expression input type or physical quantity.")
 

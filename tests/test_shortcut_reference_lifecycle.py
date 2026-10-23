@@ -80,5 +80,5 @@ def test_variable_rename_retains_property_identity_and_referenced_removal_is_rej
     driver(session, other, "round(x/m)+8", inputs=[dict(name="x", property=ref)])
     rename_radius(session, target, variable)
     assert session.command("property.get", reference=ref)["value"] == 0.3
-    with pytest.raises(ValueError, match="Resolve driving shortcut"):
+    with pytest.raises(ValueError, match="Resolve .*references"):
         session.command("curve.parametric.variable.remove", curve=target, variable=variable)

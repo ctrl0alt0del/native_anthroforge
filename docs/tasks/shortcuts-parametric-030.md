@@ -3,7 +3,7 @@
 - Task branch: `codex/shortcuts-parametric-030`
 - Integration branch: `main`
 - Starting revision: `c74b28085c31f894f6ce343265d999da526a6feb`
-- Status: paused at user request before power outage; runtime implementation not yet complete
+- Status: resumed; reviewing Cloud continuation and completing release qualification
 - Last updated: 2026-10-23, Europe/Bucharest
 - Active writer: local Codex implementation chat (direct work)
 
@@ -16,6 +16,27 @@ headless operations, schema-4 reading/schema-5 writing, and qualified 0.3.0 rele
 Preserve existing geometry, attachments, scheduling, undo and resource ownership.
 
 ## Current state
+
+Desktop resumed at the user's explicit request to review and merge Cloud, finish
+0.3, and merge the qualified result into main. Cloud continuation is
+`origin/codex/shortcuts-parametric-030-cloud` at `cf7234b`; it includes main's
+pipeline fixes through `0de6a11`. Review uses `codex/shortcuts-030-cloud-review`
+before integration into the original feature branch. No release/main merge yet.
+
+Windows native rebuild passes. The focused combined shortcut/driver/Parametric/UI
+adapter suite passes 116 cases. Review exposed a variable-rename defect: the old
+Cloud test manually rewrote XYZ equations after renaming, hiding the broken UI
+workflow. Shared operations now preserve symbol references in XYZ/interval text,
+reject removal of still-used symbols and reserved names, and retain native numerical
+evaluation. Added tests cover rename/undo, simultaneous swaps, explicit equation
+replacement, stable property references and native reserved-name agreement.
+
+Remaining: complete specification audit, drag reordering, full native-window
+interaction/shape inspection, source-addon attachment parity, representative schema-4
+compatibility, profiler evidence, full Windows gate and portable release qualification.
+Runtime remains 0.2.4. Preserve unrelated root `__init__.py`; background-only checks.
+
+## Historical pause and implementation checkpoints
 
 Paused by user on 2026-10-23. Resume this branch, not a fresh branch. Latest completed
 Parametric checkpoint before this pause is `08bb678`; the pause checkpoint contains

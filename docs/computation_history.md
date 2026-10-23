@@ -1748,3 +1748,20 @@ CH-049 because the integrated pipeline repair already published CH-045.
   numerical checks, bounded expression-cache occupancy and recorder limits. Raw
   artifacts are ignored/local only. Original-addon parity and Windows release
   qualification remain pending.
+
+### CH-053 — Preserve Parametric symbol identity during authoring edits (2026-10-23)
+
+- Review reproduced renaming a radius variable leaving XYZ equations with an unknown
+  old symbol; evaluation failed and retained stale geometry. The earlier lifecycle
+  test manually changed equations afterward, so it did not verify the direct UI action.
+- The Parametric authoring boundary now rewrites unchanged XYZ and interval expression
+  identifiers by stable variable identity, atomically with variable edits. Simultaneous
+  renames use one mapping, preventing cascaded substitution. Explicitly supplied changed
+  equations retain their supplied meaning. Removal rejects surviving expression references.
+  Core symbol validation rejects the native language's reserved names before mutation.
+- This is equation-text/reference maintenance, not a Python numerical evaluator. Native
+  compilation, uniform sampling, deformation and accepted-result failure semantics are
+  unchanged. The existing transaction supplies coherent undo/cancel behavior.
+- Evidence: 34 lifecycle/architecture cases pass, including exact geometry preservation,
+  one-action undo, interval expressions, overlapping names, simultaneous swaps, explicit
+  replacement and native/core reserved-name agreement. Full release checks remain pending.

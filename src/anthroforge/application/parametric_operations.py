@@ -7,6 +7,7 @@ from anthroforge.core.construction import Curve
 from anthroforge.core.curve_engines import BezierSettings, decode
 from anthroforge.core.parametric import ParametricSettings, Variable
 from anthroforge.core.parametric import decode as decode_parametric
+from anthroforge.core.parametric_symbols import reconcile
 
 from . import object_operations, parametric_policy
 
@@ -29,7 +30,7 @@ def configure(session: Any, curve: str, changes: dict[str, Any]) -> None:
     values = dict(asdict(config), **changes)
     if "interval" in changes:
         values["interval"] = dict(asdict(config.interval), **changes["interval"])
-    config = decode_parametric(values)
+    config = reconcile(config, decode_parametric(values))
     object_operations.install(session, replace(item, engine_settings=config))
 
 
@@ -46,20 +47,20 @@ def update_variable(session: Any, curve: str, variable: str, changes: dict[str, 
     variables = config.variables
     if variable not in {v.id for v in variables} or "id" in changes:
         raise ValueError("Choose an existing variable; its identity cannot be changed.")
-    config = replace(
+    updated = replace(
         config,
         variables=tuple(replace(v, **changes) if v.id == variable else v for v in variables),
     )
-    object_operations.install(session, replace(item, engine_settings=config))
+    object_operations.install(session, replace(item, engine_settings=reconcile(config, updated)))
 
 
 def remove_variable(session: Any, curve: str, variable: str) -> None:
     item, config = current(session, curve)
-    config = replace(
+    updated = replace(
         config,
         variables=tuple(v for v in config.variables if v.id != variable),
     )
-    object_operations.install(session, replace(item, engine_settings=config))
+    object_operations.install(session, replace(item, engine_settings=reconcile(config, updated)))
 
 
 def switch(session: Any, item: Curve, engine: str) -> Curve:

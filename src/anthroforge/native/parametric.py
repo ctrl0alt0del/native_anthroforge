@@ -17,7 +17,7 @@ from .paths import Path
 def configure(engine: GeometryEngine) -> None:
     inputs = [c.POINTER(U), c.c_int, INT64, D, D, c.c_int]
     domain = [c.c_int, c.c_int, c.c_double, c.c_double]
-    engine.bind("af_parametric_path", [*inputs, *domain, D, U], U)
+    engine.bind("af_parametric_interpolated_path", [*inputs, *domain, c.c_int, c.c_int, D, U], U)
 
 
 def evaluate(engine: GeometryEngine, curve: Any, cancel: int = 0) -> tuple[Path, Any]:
@@ -73,5 +73,12 @@ def sample(
     output = np.empty((count, 13))
     inputs = (handles, len(programs[0].symbols), integers.ctypes.data_as(INT64), pointer(reals))
     domain = (pointer(metadata), len(curve.points), count, curve.closed, *interval)
-    handle = engine.library.af_parametric_path(*inputs, *domain, pointer(output), cancel)
+    interpolation = interpolation_options(curve.engine_settings)
+    handle = engine.library.af_parametric_interpolated_path(
+        *inputs, *domain, *interpolation, pointer(output), cancel
+    )
     return Path(engine, handle), output
+
+
+def interpolation_options(config: ParametricSettings) -> tuple[int, int]:
+    return int(config.interpolation == "POLYLINE"), config.bezier_resolution

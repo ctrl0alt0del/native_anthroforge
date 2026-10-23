@@ -1,6 +1,7 @@
 """Numeric channel editing retains the affine frames used by migrated cages/hooks."""
 
 from dataclasses import replace
+from math import ulp
 
 import pytest
 
@@ -68,3 +69,21 @@ def test_driving_formula_with_same_value_does_not_deform_control(session):
     session.command("driver.value", driver=driver, value=4.0)
     session.wait()
     assert session.engine.world_point(session.document.control(key).matrix, (1, 1, 1)) == [8, 7, 9]
+
+
+def test_roundoff_in_transform_formula_is_not_an_authored_edit(session):
+    key = control(session)
+    ref = reference(key, "scale")
+    before = session.document.control(key)
+    session.command("property.set", reference=ref, value=2.0 + 2 * ulp(2.0))
+    assert session.document.control(key) == before
+    session.command("property.set", reference=ref, value=2.0 + 32 * ulp(2.0))
+    assert session.document.control(key).matrix != before.matrix
+
+
+def test_small_transform_values_are_not_compared_with_absolute_tolerance(session):
+    key = control(session)
+    ref = reference(key, "position")
+    session.command("property.set", reference=ref, value=1e-14)
+    session.command("property.set", reference=ref, value=2e-14)
+    assert session.command("property.get", reference=ref)["value"] == 2e-14

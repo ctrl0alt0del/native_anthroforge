@@ -26,6 +26,8 @@ UiSection {
         }
     }
     Label { text: "XYZ produce metres · t is dimensionless · m and rad are unit constants"; color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; font.pixelSize: 10 }
+    UiCombo { objectName: "parametricInterpolation"; Layout.fillWidth: true; model: ["POLYLINE","BEZIER"]; currentIndex: model.indexOf(panel.config.interpolation || "POLYLINE"); onActivated: panel.setting("interpolation",currentText) }
+    NumericSetting { visible: panel.config.interpolation === "BEZIER"; label: "Bézier samples per segment"; decimals: 0; minimum: 1; maximum: 1024; value: panel.config.bezier_resolution || 24; onEdited: value => panel.setting("bezier_resolution",Math.round(value)) }
     NumericSetting { propertyReference: panel.resolutionReference; objectName: "parametricResolution"; label: "Generated points"; decimals: 0; minimum: panel.curve.closed ? 3 : 2; maximum: 1000000; value: panel.config.resolution || 64; hint: panel.resolutionState.reason || "Uniform parameter sampling; closed curves omit a duplicate seam endpoint"; onEdited: value => panel.setting("resolution",Math.round(value)) }
     Repeater {
         model: ["start","end"]

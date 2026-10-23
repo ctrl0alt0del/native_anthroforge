@@ -1891,3 +1891,31 @@ CH-049 because the integrated pipeline repair already published CH-045.
   reevaluation and inflation edits. 42 focused stage, crop, inflation and workflow
   tests pass. The full real-assembly comparison and combined gate are pending;
   do not infer that the observed cropped-output difference is resolved yet.
+
+
+### CH-061 - Parametric Bezier construction and scoped shortcut attachment edits
+
+Status: implementation/qualification in progress on `codex/skeleton-shortcuts-migration`.
+Source: approved skeleton shortcut migration, 2026-10-23. The user authorized both
+extensions after observing pelvic shape changes with sampled polyline conversion.
+
+Previous: Parametric always generated vector/polyline knots. Exact sampled positions
+did not preserve Bezier tangents, four-knot identities or body seam start. New:
+optional Bezier interpolation retains handle modes and offsets while XYZ controls
+knot positions. Native authored-path evaluation performs handle resolution and
+per-segment sampling; no Python numerical loop. Default remains Polyline. Generated
+count and segment resolution are distinct. Existing membership and attachment
+topology restrictions remain enforced. Focused exact-path/body tests pass; actual
+assembly and GUI qualification pending.
+
+Explicit attachment scope is separate from inferred ownership. A controlled SCP
+may anchor a multi-owner driver's temporary policy; presentation remains All.
+Context capture, descendant restrictions, undo and copying use the existing service.
+No formula inversion or permanent attachment rewrite is introduced.
+
+CH-059 follow-up: one-ULP Radius world-scale noise caused a no-op Ulna driver to
+recapture its binding. Shared channel comparison ignores at most eight ULPs, never
+an absolute geometry tolerance. Tiny real values and edits above the limit are
+tested. The 96-control assembly comparison passes with identical connectivity and
+attachment arrays; maximum mesh-coordinate difference 3.746e-12. Existing accepted
+path-frame differences are recorded separately and are not claimed identical.

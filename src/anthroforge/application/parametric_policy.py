@@ -19,6 +19,22 @@ def require_change(document: Document, before: Any, after: Any) -> None:
             )
     if after.engine == "PARAMETRIC" and point_count(before) != point_count(after):
         require_resolution(document, before)
+    require_sampling_change(document, before, after)
+
+
+def require_sampling_change(document: Document, before: Curve, after: Curve) -> None:
+    if before.engine == after.engine == "PARAMETRIC" and sampling_signature(
+        before
+    ) != sampling_signature(after):
+        from .construction_policy import require_topology_edit
+
+        require_topology_edit(document, before.id)
+
+
+def sampling_signature(item: Curve) -> tuple[Any, ...]:
+    config = item.engine_settings
+    interpolation = config.interpolation if isinstance(config, ParametricSettings) else item.engine
+    return interpolation, point_count(item), item.closed, item.resolution
 
 
 def point_count(item: Curve) -> int:

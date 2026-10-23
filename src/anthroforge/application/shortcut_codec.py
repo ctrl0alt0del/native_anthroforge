@@ -21,6 +21,7 @@ def policy(value: dict[str, Any]) -> AttachmentPolicy:
     return AttachmentPolicy(
         value.get("backsolve", False),
         tuple(DescendantOverride(**v) for v in value.get("descendants", ())),
+        value.get("scope", ""),
     )
 
 

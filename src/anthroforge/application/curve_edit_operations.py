@@ -35,18 +35,33 @@ def configure(session: "Session", curve: str, **settings: Any) -> None:
     install(session, replace(item, engine_settings=config))
 
 
-def change_engine(session: "Session", curve: str, engine: str) -> None:
+def change_engine(
+    session: "Session", curve: str, engine: str, settings: dict[str, Any] | None = None
+) -> None:
     from .parametric_operations import switch
 
     item = selected(session, curve)
-    if item.engine == engine:
+    if item.engine == engine and settings is None:
         return
+    if settings is not None:
+        return configured_switch(session, item, engine, settings)
     require_topology_edit(session.document, curve)
     if "PARAMETRIC" in (item.engine, engine):
         install(session, switch(session, item, engine))
         return
     settings = {"samples": max(64, len(item.points))} if engine == "ROUTED" else {}
     install(session, replace(item, engine_settings=decode(engine, settings)))
+
+
+def configured_switch(
+    session: "Session", item: Curve, engine: str, settings: dict[str, Any]
+) -> None:
+    from .parametric_policy import sampling_signature
+
+    changed = replace(item, engine_settings=decode(engine, settings))
+    if sampling_signature(item) != sampling_signature(changed):
+        require_topology_edit(session.document, item.id)
+    install(session, changed)
 
 
 def configured_engine(item: Curve, settings: dict[str, Any]) -> Any:

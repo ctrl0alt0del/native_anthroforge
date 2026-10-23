@@ -9,7 +9,14 @@ UiSection {
     expanded: false
     Label {
         Layout.fillWidth: true; wrapMode: Text.Wrap; color: Theme.muted; font.pixelSize: 11
-        text: panel.adapter.ownerName ? "Owning SCP: "+panel.adapter.ownerName : "Attachment policies require one inferred owning SCP."
+        text: panel.adapter.ownerName ? "Attachment scope: "+panel.adapter.ownerName : "Choose an attachment scope for a control spanning several SCPs."
+    }
+    UiCombo {
+        objectName: "shortcutAttachmentScope"; Layout.fillWidth: true
+        visible: panel.adapter.scopeOptions.length > 2 || !!panel.adapter.scopeIdentity
+        model: panel.adapter.scopeOptions; textRole: "label"
+        currentIndex: Math.max(0,model.findIndex(v=>v.id===panel.adapter.scopeIdentity))
+        onActivated: panel.adapter.setScope(model[currentIndex].id)
     }
     UiCheck {
         visible: !!panel.adapter.ownerName; text: "Preserve owner attachment location"

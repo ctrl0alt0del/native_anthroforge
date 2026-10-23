@@ -69,13 +69,10 @@ def switch(session: Any, item: Curve, engine: str) -> Curve:
     asset = session.resources.paths.get(item.result.asset)
     if asset is None or asset.authored.engine != "PARAMETRIC":
         raise ValueError("Switching away requires an accepted Parametric path.")
-    converted = decode(
-        engine, {"samples": max(64, len(asset.authored.points))} if engine == "ROUTED" else {}
-    )
     return replace(
         item,
         points=asset.authored.points,
-        engine_settings=converted,
+        engine_settings=converted_settings(item, engine, len(asset.authored.points)),
         parametric_definition=settings(item),
     )
 
@@ -85,5 +82,13 @@ def restore_definition(session: Any, item: Curve) -> Curve:
     return replace(item, engine_settings=config)
 
 
+def converted_settings(item: Curve, engine: str, count: int) -> Any:
+    if engine == "BEZIER" and settings(item).interpolation == "BEZIER":
+        return BezierSettings(settings(item).bezier_resolution)
+    return decode(engine, {"samples": max(64, count)} if engine == "ROUTED" else {})
+
+
 def authored_copy(item: Curve) -> Curve:
-    return replace(item, engine_settings=BezierSettings(resolution=1), parametric_definition=None)
+    return replace(
+        item, engine_settings=BezierSettings(resolution=item.resolution), parametric_definition=None
+    )

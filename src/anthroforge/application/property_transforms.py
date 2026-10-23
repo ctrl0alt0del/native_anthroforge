@@ -2,7 +2,7 @@
 
 from collections.abc import Iterator
 from dataclasses import replace
-from math import degrees, radians
+from math import degrees, radians, ulp
 from typing import Any
 
 from anthroforge.core.numeric_properties import NumericDescriptor, PropertyRef
@@ -44,10 +44,19 @@ def read(session: Any, reference: PropertyRef, item: Any = None) -> Any:
 
 def changed(session: Any, item: Any, updates: Any) -> Any:
     require_object_transform(item)
-    updates = tuple((ref, value) for ref, value in updates if read(session, ref, item) != value)
+    updates = tuple(
+        (ref, value) for ref, value in updates if not equivalent(read(session, ref, item), value)
+    )
     if not updates:
         return item
     return replace(item, matrix=edited_matrix(session, item, updates))
+
+
+def equivalent(before: Any, after: Any) -> bool:
+    """Ignore decomposition roundoff, without an absolute geometric tolerance."""
+    if isinstance(before, tuple):
+        return all(equivalent(a, b) for a, b in zip(before, after, strict=True))
+    return bool(abs(before - after) <= 8 * max(ulp(before), ulp(after)))
 
 
 def edited_matrix(session: Any, item: Any, updates: Any) -> tuple[float, ...]:

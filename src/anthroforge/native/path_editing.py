@@ -7,7 +7,8 @@ from typing import Any
 import numpy as np
 
 from anthroforge.core.construction import Curve
-from anthroforge.core.curve_engines import PolylineSettings
+from anthroforge.core.curve_engines import BezierSettings, PolylineSettings
+from anthroforge.core.parametric import ParametricSettings
 
 from . import construction, paths
 from .mesh import D, GeometryEngine, U, pointer
@@ -32,11 +33,15 @@ def deform(current: paths.Path, curve: Curve, records: Any, cancel: int) -> path
 
 def control_curve(curve: Curve) -> Curve:
     # This is a snapshot of already generated points, not an equation evaluation.
-    return (
-        replace(curve, engine_settings=PolylineSettings())
-        if curve.engine == "PARAMETRIC"
-        else curve
+    config = curve.engine_settings
+    if not isinstance(config, ParametricSettings):
+        return curve
+    settings = (
+        BezierSettings(config.bezier_resolution)
+        if config.interpolation == "BEZIER"
+        else PolylineSettings()
     )
+    return replace(curve, engine_settings=settings)
 
 
 def rebase(

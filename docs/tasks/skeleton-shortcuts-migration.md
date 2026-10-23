@@ -74,3 +74,23 @@ with vertex drift below 5e-14; one cropped result changed counts. CH-060 adds co
 topology retention at base/rest stages; 42 focused tests pass. The new real-assembly
 rerun and combined gate remain pending. Preserve failure evidence; do not relax the
 geometry/attachment acceptance checks or install these intermediates as delivery.
+
+## Approved extensions and recovery state, 2026-10-23
+
+The user chose Parametric with preserved Bezier construction, and an explicit
+attachment scope for multi-SCP controls. These supersede the pending alternatives
+above. Inferred ownership remains unchanged. Implementation adds interpolation and
+per-segment sampling, retaining knot IDs, handle modes and offsets, plus a separate
+validated policy scope. Desktop/API, persistence and copying share these records.
+
+The 96-control checkpoint passes the complete local comparison: 619 records,
+1,324 resources, identical mesh connectivity and retained attachment payloads;
+maximum coordinate drift 3.746e-12. Path frame differences are separately reported
+(up to 0.302), without surface geometry changes. This remains an intermediate.
+Nine source controls remain to integrate. Actual-guide, complete migration,
+GUI/portable qualification and final packaging remain pending.
+
+A one-ULP driver decomposition change previously triggered attachment recapture.
+Transform channel no-op comparison now uses eight ULPs, without an absolute
+geometric tolerance. Tiny real edits remain active. Focused tests pass.
+Prior combined gate: 1,954 tests/five CTests; latest extensions: 21 tests passed.

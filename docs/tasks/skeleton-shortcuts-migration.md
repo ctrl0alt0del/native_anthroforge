@@ -181,3 +181,31 @@ Remaining representative edits run in `build/skeleton-shortcuts-edits-second.log
 The previous full gate had 1,968 passing tests and one temporary-tool function-length
 failure; that failure is fixed. Rerun the final gate after all changes. Portable build
 and final saved delivery remain pending. Root `__init__.py` untouched.
+
+## Final candidate and runtime checks
+
+`skeleton_96_muscles_shortcuts_v001.anthroforge` exists in the external migration
+folder: 59 SCPs, 96 tissues, 326 fibers, 37 controls, 105 exposed source controls and
+66 formulas. Controls are ordered as in the donor. All formulas/tissue results are
+ready; no active temporary edit context is saved. Original assembly/Blender hashes
+remain unchanged. Final preservation check passes at max mesh drift 3.397e-12 with
+exact retained bindings/connectivity. Packaged edit/undo/save round trip compares
+all 625 records and 1,325 resources with zero geometry/path/pose drift.
+
+The Windows gate passes 1,970 tests and five CTests. The full portable suite passed.
+Production interpolation/scope QML passed offscreen after correcting its global
+authoring-adapter reference. Native hidden capture of the complete assembly and
+Blender/native pelvis comparisons were visually inspected. Source-shape differences
+remain at the prior skeleton approximation level; see `source-native-shapes.json`.
+
+Actual Humerus/Radius length +5% and Thumb metacarpal thickness +5% encounter retained
+material attachment errors. Independent edits in immutable input reproduce the same
+affected fibers and errors exactly (`failure-15/16/21.json`). These are preserved
+pre-existing crop/union limitations, not silently rebound or relabeled as migration
+success. Other tested controls and full-resource undo complete.
+
+Large-project GUI smoke exposed a validation defect: the two-second capture ran
+before asynchronous Open finished. Smoke now waits for document, tasks and staging,
+reports entity count, and fails after a bounded deadline. New readiness tests pass.
+Final repackage, loaded-desktop qualification, documentation/source archive and merge
+remain pending. Do not claim the old empty/loading screenshot as a loaded-GUI pass.

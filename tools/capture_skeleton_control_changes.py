@@ -22,11 +22,23 @@ def capture(folder, label):
         mesh = item.to_mesh()
         try:
             mesh.calc_loop_triangles()
-            vertices = np.asarray([list(item.matrix_world @ v.co) for v in mesh.vertices])
-            triangles = np.asarray([tuple(t.vertices) for t in mesh.loop_triangles])
-            np.savez(folder / (label + "-" + name + ".npz"), vertices=vertices, triangles=triangles)
+            save_mesh(folder / (label + "-" + name + ".npz"), name, item, mesh)
         finally:
             item.to_mesh_clear()
+
+
+def save_mesh(path, name, item, mesh):
+    root = next(o for o in bpy.data.objects if o.af_scp_system.scps)
+    scp = next(
+        s
+        for s in root.af_scp_system.scps
+        if s.geometry_object_ref and s.geometry_object_ref.name == name
+    )
+    frame = scp.transform_object_ref.matrix_world.inverted() @ item.matrix_world
+    local = np.asarray([list(frame @ v.co) for v in mesh.vertices])
+    vertices = np.asarray([list(item.matrix_world @ v.co) for v in mesh.vertices])
+    triangles = np.asarray([tuple(t.vertices) for t in mesh.loop_triangles])
+    np.savez(path, vertices=vertices, triangles=triangles, local=local)
 
 
 def assign(row, value):

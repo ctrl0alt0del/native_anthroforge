@@ -10,14 +10,24 @@ import numpy as np
 from skeleton_shortcut_guides import settled
 
 from anthroforge.application.session import Session
+from anthroforge.core.entities import IDENTITY
+from anthroforge.core.results import geometry_asset
 
 
 def geometry(session):
-    return {
-        e.id: (e.matrix, session.assets[e.result.asset or e.asset].mesh.array(0).copy())
-        for e in session.document.entities
-        if e.result.asset or e.asset
-    }
+    result = {}
+    for item in session.document.registry.records.values():
+        if not hasattr(getattr(item, "result", None), "asset"):
+            continue
+        asset = geometry_asset(item)
+        if asset in session.assets:
+            points = session.assets[asset].mesh.array(0)
+        elif asset in session.resources.paths:
+            points = session.resources.paths[asset].path.array()[:, :3]
+        else:
+            continue
+        result[item.id] = (getattr(item, "matrix", IDENTITY), points.copy())
+    return result
 
 
 def delta(session, before):
@@ -25,10 +35,15 @@ def delta(session, before):
     return {
         key: dict(
             matrix=float(np.max(np.abs(np.asarray(old[0]) - current[key][0]))),
-            vertices=float(np.max(np.abs(old[1] - current[key][1]))),
+            vertices=point_delta(old[1], current[key][1]),
+            count=abs(len(old[1]) - len(current[key][1])),
         )
         for key, old in before.items()
     }
+
+
+def point_delta(before, after):
+    return float(np.max(np.abs(before - after))) if before.shape == after.shape else 0.0
 
 
 def edit(session, mapping):
@@ -49,7 +64,7 @@ def changed_value(value):
 
 def exercise(session, folder, mappings, number):
     key = "SHORTCUT_" + str(number)
-    before, started = geometry(session), perf_counter()
+    before, started, first_job = geometry(session), perf_counter(), len(session.scheduler.jobs)
     session.command("profile.start")
     value = edit(session, mappings[key])
     submitted = perf_counter() - started
@@ -57,13 +72,14 @@ def exercise(session, folder, mappings, number):
     require_ready(session)
     elapsed, changes = perf_counter() - started, delta(session, before)
     session.command("profile.stop", path=str(folder / f"edit-{number}.afprofile.zip"), wait=True)
-    record_edit(folder, number, key, value, submitted, elapsed, changes, session.scheduler.errors)
+    record_edit(
+        folder, number, key, value, submitted, elapsed, changes, failures(session, first_job)
+    )
     session.command("save", path=str(folder / f"edit-{number}.anthroforge"), blocked_policy="wait")
     restore(session, before)
 
 
 def require_ready(session):
-    assert not session.scheduler.errors, session.scheduler.errors
     failures = [
         (r.formula, r.status, r.error)
         for r in session.document.formula_results
@@ -72,13 +88,21 @@ def require_ready(session):
     assert not failures, failures
 
 
+def failures(session, first_job):
+    return [
+        dict(label=j.label, outputs=sorted(j.outputs), error=j.error)
+        for j in session.scheduler.jobs[first_job:]
+        if j.state == "failed"
+    ]
+
+
 def record_edit(folder, number, key, value, submitted, elapsed, changes, errors):
     record = dict(
         shortcut=key,
         value=value,
         submit_seconds=submitted,
         settle_seconds=elapsed,
-        changes=changes,
+        changes={key: row for key, row in changes.items() if max(row.values()) > 1e-9},
         errors=errors,
     )
     (folder / f"edit-{number}.json").write_text(json.dumps(record, indent=2), encoding="utf-8")
@@ -90,7 +114,6 @@ def restore(session, before):
     settled(session)
     differences = delta(session, before)
     assert max(max(row.values()) for row in differences.values()) < 1e-8, differences
-    assert not session.scheduler.errors, session.scheduler.errors
 
 
 def run(folder, numbers, compact=False):

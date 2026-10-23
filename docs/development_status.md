@@ -50,11 +50,28 @@ and policy controls passed offscreen inspection. Large-project smoke waits for a
 document/task/staging completion and verifies 59 SCPs, rather than accepting a loading
 screen. These checks do not claim physical interactive acceptance.
 
-Humerus/Radius length and Thumb thickness edits reproduce existing retained-material
+At migration qualification, Humerus/Radius length and Thumb thickness edits reproduced existing retained-material
 attachment failures in the original assembly (cropped or union-covered locations).
 Bindings remain intact; migration does not silently rebind them. These limits and the
 affected fibers are recorded with paired original/candidate evidence. All 96 tissue
-results and formulas are ready at the delivered baseline.
+results and formulas were ready at the delivered baseline. The correction below
+supersedes those edit limitations.
+
+### Retained attachments during skeletal edits
+
+[Attachment correction evidence](tasks/retained-attachment-errors.md) qualifies Humerus/
+Radius length and Thumb thickness changes in the same 96-muscle project. Crops now
+preserve the accepted material cut during deformation; explicit plane edits redefine it.
+Union-covered bindings follow the same object's exterior while retaining their original
+material reference. A separate queued-pose invalidation defect is also corrected.
+
+The full Windows gate passes **1,983 tests** and five native CTests. Real +5% edits,
+undo/redo, save/reopen and reversal preserve stored binding records and restore tissue
+vertices within 1.8e-12. Saved FDS/Thumb shapes were visually inspected from two angles.
+The canonical 0.3.0 executable passes the full portable suite and actual-assembly
+edit/history/reopen checks for all three controls, with profiler captures and hidden
+native rendering. GUI evidence is background-only; no physical interaction is claimed.
+The original assembly remains unchanged and does not require manual rebinding.
 
 ## VCP performance (0.2.4)
 

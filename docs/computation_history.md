@@ -2025,7 +2025,7 @@ average. This is a read-only formula input; no new write channel is introduced.
   paired evidence and the delivered artifact. Offscreen evidence is not physical
   interactive acceptance.
 
-### CH-065 — Retain crop material and follow buried union anchors (2026-10-23)
+### CH-065 â€” Retain crop material and follow buried union anchors (2026-10-23)
 
 - **Observed:** Humerus/Radius length edits moved live FDS material across a fixed
   spatial crop plane. Actual active endpoint/field locations were removed. Thumb
@@ -2049,10 +2049,18 @@ average. This is a read-only formula input; no new write channel is introduced.
   Native handles are not serialized. New optional chart data round-trips as owned
   mesh provenance and participates in equivalence and memory accounting. Visible
   material uses the existing exact resolver; source-topology changes still reject.
-- **Evidence so far:** native Thumb tests cover +5%, +72%, and +200% growth, return to
+- **Evidence:** native Thumb tests cover +5%, +72%, and +200% growth, return to
   the original shape, affine downstream deformation, offsets and cancellation. Crop
-  tests cover deformation, explicit plane edits, undo and reopening. The first combined
-  Windows gate passed 1,980 tests and five CTests. Final qualification is pending.
+  tests cover deformation, adaptive sampling, explicit plane edits, undo and reopening.
+  Final Windows gate passes 1,983 tests and five CTests. Original 96-muscle assembly
+  controls 15/16/21 pass actual +5% edits, undo/redo, save/reopen and reversal without
+  changing stored Fiber references. Maximum restored tissue vertex error is 1.8e-12.
+  Two-angle saved-shape comparisons were inspected, including FDS cuts and the seven
+  affected Thumb Fibers. The canonical executable passes the full portable suite and
+  those three actual-assembly control checks, with profiler reports and hidden native
+  rendering. This is background-only evidence, not physical interactive acceptance.
+  Reproduction tools and local artifact paths are in the
+  [task record](tasks/retained-attachment-errors.md).
 - **Additional diagnosed scheduling defect:** profiler evidence showed the Ulna's
   queued pose job discarded on `formula_input_changed`. Its formula recomputed the
   same value and did not replace the job; redo later performed that missing update.

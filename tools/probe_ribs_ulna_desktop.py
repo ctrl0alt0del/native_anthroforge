@@ -77,7 +77,7 @@ def capture(controller, app, output):
     if "--priority-probe" in sys.argv:
         prioritize(session.scheduler)
     if "--unrecorded" not in sys.argv:
-        session.command("profile.start")
+        session.command("profile.start", seconds=240, memory_mib=512)
     controller.shortcut_panel.editValue(driver.id, -1, 3.0, False)
     settle(controller, app)
     finish(controller, app, output, rows, poses, views, started)

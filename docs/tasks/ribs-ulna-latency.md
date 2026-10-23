@@ -1,8 +1,8 @@
 # Ribs Top Radius / late Ulna update
 
 - Branch: `codex/ribs-ulna-latency`; baseline `8dba5e0` on `main`.
-- Status: queue priority inversion reproduced; desktop overhead comparisons in progress,
-  2026-10-23. Direct work, background only.
+- Status: investigation complete; priority inversion established. Production correction
+  not implemented in this investigation. 2026-10-23. Direct work, background only.
 - Request: set Ribs Top Radius to 3 in the migrated 96-muscle assembly and use the
   profiler to distinguish necessary dependency ordering from unnecessary delay.
 - Source: `E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge`.
@@ -73,8 +73,59 @@ ring evicts the initial command and most events; the report is explicitly incomp
 Collector drain inclusive time is about 98 s, decode inclusive time about 44 s, and event
 recording about 45 s. These overlap and must **not** be summed or subtracted as exact
 overhead. Its queue observations verify the same ordering, but its wall times are not
-normal application performance. Compare full desktop with the Qt collector absent and
-recording off before making a desktop latency claim.
+normal application performance. Subsequent desktop comparisons are recorded below.
+
+## Desktop comparison and presentation
+
+The production QML controller and shortcut adapter were exercised in the offscreen
+platform, with no desktop input or visible native window. These are process/model
+timings, not physical display latency. The row-change observer records the render
+model's accepted displayed matrices; the first observation initializes all rows and
+is excluded when identifying the actual Radius/Ulna movement.
+
+| Desktop run | Radius pose accepted | Ulna pose accepted | Ulna runnable wait | Whole workload |
+| --- | ---: | ---: | ---: | ---: |
+| Full QML collector | 54.86 s | 96.68 s | 40.69 s | 139.64 s |
+| Application/task/native profiler only | 32.08 s | 55.22 s | 22.55 s | 80.04 s |
+| Recording off, same queue observer | 32.92 s | 53.40 s | 19.88 s | 74.00 s |
+| Diagnostic priority, application profiler | 13.27 s | 13.85 s | No sustained wait observed | 85.59 s |
+
+The no-recording run's viewport model reflects Radius at 33.25 s and Ulna at 53.61 s.
+The diagnostic priority run reflects them at 13.55 s and 14.10 s; its Ulna dispatch
+starts 6.3 ms after the required formula finishes. No dependency was bypassed.
+All desktop and monitored headless final geometry/path/pose fingerprints are identical.
+All runs finish without job errors and the desktop reports no QML warnings.
+
+The desktop priority intervention improves **when Ulna updates**, not demonstrated
+overall throughput: its total duration is higher than the application-only baseline.
+UI refresh/notification is independently expensive here. In the retained application-only
+report, `Controller.refresh` has about 50.5 s inclusive time and `Controller.notify`
+41.9 s; they overlap. These aggregates identify a separate follow-up measurement target,
+not an established diagnosis of a particular binding or proposed UI rewrite.
+
+The two 128 MiB application-only desktop traces also evicted their initial command
+(roughly 40k–57k events); larger individual metadata events were rejected. Therefore
+desktop timing and priority conclusions use the separately captured lifecycle/queue
+and model observations, including recording-off evidence. Five headless profiler
+reports are complete with no losses. The desktop probe now requests 240 s/512 MiB for
+future runs; that setting was not retroactively applied to the above measurements.
+
+## Recommended correction and delivery scope
+
+Fix urgency at the shared coordinator/job contract boundary. Preserve the initiating
+edit's urgency and age across follow-up/replacement jobs, and account for urgent
+consumers when ranking their eligible prerequisites. Retain workspace priority,
+exclusive writers, coalescing, cancellation, stale-result checks and fairness for
+long-running downstream work. Qualify the policy on this exact case and other
+pose/formula/control/path chains. A permanent hardcoded `SCP_15` priority or unconditional
+global "all bones before all tissues" barrier is not justified by this experiment.
+
+Separate follow-up: qualify lower-overhead Qt collection/retention on large assemblies;
+the existing report correctly marks data loss but its cost materially perturbs this case.
+
+This delivery contains diagnostics and evidence only. Ruff/format and the two
+architecture checks pass; every function meets the 15-line limit. The existing application
+and canonical package remain unchanged; no application rebuild is required.
 
 Local outputs: `build/ribs-ulna-latency/`; reproducible tools are
 `tools/probe_ribs_ulna_latency.py`, `tools/probe_ribs_ulna_desktop.py`,

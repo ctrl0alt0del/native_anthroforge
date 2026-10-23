@@ -47,6 +47,8 @@ class Session:
         self.path: Path | None = None
         self.file_lock: Any = None
         self.saved_revision = 0
+        self.formula_write_authority: frozenset[str] = frozenset()
+        self.formula_observing = False
         self.active_workspace = 0
         self.waiting_save = False
         self.replay_callback: Any = None
@@ -86,8 +88,20 @@ class Session:
         self.scheduler = TaskCoordinator(lambda: self.document)
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
+        self.attach_shortcut_contexts()
         if hasattr(self, "issues"):
             self.issues.reset()
+
+    def attach_shortcut_contexts(self) -> None:
+        from .shortcut_contexts import Contexts
+
+        self.shortcut_edits = Contexts(self)
+        self.scheduler.annotate = self.shortcut_edits.annotate
+        self.scheduler.before_dispatch = self.shortcut_edits.require
+
+    def synchronize_services(self) -> None:
+        self.issues.synchronize()
+        self.shortcut_edits.synchronize()
 
     @property
     def engine(self) -> GeometryEngine:
@@ -116,15 +130,24 @@ class Session:
         return self.document.entity(entity_id)
 
     def replace_document(self, **changes: Any) -> None:
-        from .routing_membership import changed
-        from .tissue_stack_observation import changed as stack_changed
+        from .property_guards import require_changes
+        from .shortcut_contexts import superseded
 
         before = self.document
         self.serial += 1
-        self.document = replace(self.document, revision=self.serial, **changes)
+        updated = replace(self.document, revision=self.serial, **changes)
+        updated = replace(updated, shortcut_edits=superseded(self, before, updated))
+        require_changes(self, before, updated)
+        self.document = updated
         self.history.observe(self.document)
-        changed(self, before)
-        stack_changed(self, before)
+        self.observe_replacement(before)
+
+    def observe_replacement(self, before: Document) -> None:
+        from . import formula_observation, routing_membership, tissue_stack_observation
+
+        routing_membership.changed(self, before)
+        tissue_stack_observation.changed(self, before)
+        formula_observation.changed(self, before)
 
     def replace_entities(self, changed: dict[str, SCP], authored: bool = True) -> None:
         if authored:
@@ -148,6 +171,7 @@ class Session:
         if self.waiting_save:
             raise ValueError("Editing is blocked while waiting to save.")
         self.history.begin(self.document)
+        self.shortcut_edits.active = ""
 
     @measured("transaction", lambda session: session.profiler)
     def commit(self) -> None:
@@ -156,9 +180,11 @@ class Session:
         from .operations import released
 
         released(self)
+        self.shortcut_edits.active = ""
 
     @measured("transaction", lambda session: session.profiler)
     def cancel(self) -> None:
+        self.shortcut_edits.active = ""
         self.document = replace(self.history.cancel(), workspaces=self.document.workspaces)
         self.scheduler.restore(self.history.surviving())
         self.replay_callback = None
@@ -188,12 +214,13 @@ class Session:
                     break
 
     def resume_calculations(self) -> None:
-        from . import evaluation
+        from . import evaluation, shortcut_contexts
         from .construction_tasks import schedule
         from .control_tasks import resume
         from .geometry_outputs import items
         from .output_tasks import pending
 
+        shortcut_contexts.resume(self)
         resume(self)
         pending(self)
         targets = {e.id for e in self.document.entities if e.status in ("edited", "stale")}

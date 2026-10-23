@@ -158,7 +158,7 @@ def test_construction_changes_are_incremental_and_distinct_from_anatomy():
     assert not delta.entities and not delta.controls
 
 
-@pytest.mark.parametrize("version", [1, 2, 3, 5])
+@pytest.mark.parametrize("version", [1, 2, 3, 6])
 def test_other_project_schemas_rejected_before_loading_assets(tmp_path, session, version):
     path = tmp_path / "unsupported.anthroforge"
     with zipfile.ZipFile(path, "w") as archive:

@@ -8,6 +8,8 @@ from .construction import Control
 from .document_index import DocumentIndex, build
 from .entities import SCP, Workspace
 from .junctions import Junction
+from .shortcut_edits import ShortcutEdit
+from .shortcuts import DrivingShortcut, FormulaResult, Shortcut
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,6 +25,11 @@ class Document:
     controls: tuple[Control, ...] = ()
     objects: tuple[object_registry.Authored, ...] = ()
     junctions: tuple[Junction, ...] = ()
+    shortcuts: tuple[Shortcut, ...] = ()
+    driving_shortcuts: tuple[DrivingShortcut, ...] = ()
+    formula_results: tuple[FormulaResult, ...] = ()
+    shortcut_order: tuple[str, ...] = ()
+    shortcut_edits: tuple[ShortcutEdit, ...] = ()
     _index: DocumentIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _registry: object_registry.ObjectRegistry | None = field(
         default=None, repr=False, compare=False, kw_only=True

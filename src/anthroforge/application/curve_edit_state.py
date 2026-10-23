@@ -22,6 +22,9 @@ def current(session: Any, item: Any) -> Any:
 
 
 def prepare[T](session: Any, before: Any, changed: T) -> T:
+    from .parametric_policy import require_change
+
+    require_change(session.document, before, changed)
     if not isinstance(before, Fiber) or not isinstance(changed, Fiber):
         return changed
     bindings_changed = binding_shape(before) != binding_shape(changed)

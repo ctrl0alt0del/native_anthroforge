@@ -11,12 +11,16 @@ from .surface_providers import triangle_count
 
 
 def kind(item: Any) -> str:
+    if item.engine == "PARAMETRIC":
+        return "curve_parametric"
     if isinstance(item.engine_settings, RoutingSettings):
         return "curve_routing"
     return "fiber_path" if isinstance(item, Fiber) else "curve_path"
 
 
 def workload(session: Any, item: Any, document: Any) -> Workload:
+    if item.engine == "PARAMETRIC":
+        return Workload(affected=3, candidates=item.engine_settings.resolution)
     if not isinstance(item.engine_settings, RoutingSettings):
         from .fiber_tasks import path_workload
 

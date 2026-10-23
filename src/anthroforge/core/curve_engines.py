@@ -5,6 +5,7 @@ from math import isfinite
 from typing import Any, Literal
 
 from .construction_values import integer
+from .parametric import ParametricSettings
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,10 +45,14 @@ class RoutingSettings:
                 raise ValueError("Routing obstacles must be unique object identities.")
 
 
-type PathSettings = BezierSettings | PolylineSettings | RoutingSettings
+type PathSettings = BezierSettings | PolylineSettings | RoutingSettings | ParametricSettings
 
 
 def decode(kind: str = "BEZIER", values: dict[str, Any] | None = None) -> PathSettings:
+    if kind == "PARAMETRIC":
+        from .parametric import decode as parametric
+
+        return parametric(values or {})
     constructors = dict(BEZIER=BezierSettings, POLYLINE=PolylineSettings, ROUTED=RoutingSettings)
     if kind not in constructors:
         raise ValueError("Unknown curve path engine.")
@@ -75,4 +80,6 @@ def fields(data: dict[str, Any]) -> dict[str, Any]:
     if "resolution" in state:
         settings = dict(settings, resolution=state.pop("resolution"))
     state["engine_settings"] = decode(kind, settings)
+    if state.get("parametric_definition"):
+        state["parametric_definition"] = decode("PARAMETRIC", state["parametric_definition"])
     return state

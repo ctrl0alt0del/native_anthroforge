@@ -12,7 +12,7 @@ from anthroforge.core.results import Port
 from anthroforge.native.attachments import capture, ordered, propagate
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 
-from . import dependencies, evaluation_batches, task_workloads
+from . import dependencies, evaluation_batches, shortcut_attachment_evaluation, task_workloads
 
 if TYPE_CHECKING:
     from .session import Session
@@ -65,6 +65,7 @@ def configure_job(session: "Session", job: Job, targets: set[str], captures: set
     job.reads = frozenset(input_ids(session.document, targets))
     dependencies.contract(job, session.document, {Port(key, "pose") for key in targets})
     job.observes |= frozenset(capture_reads(session.document, captures))
+    shortcut_attachment_evaluation.contract(job, session.document, targets)
 
 
 def create_job(session: "Session", targets: set[str], captures: set[str]) -> Job:
@@ -104,11 +105,38 @@ def compute(
 ) -> tuple[Document, list[SCP]]:
     document, meshes = payload
     blocked = cyclic_targets(document, targets)
-    entities = ordered(document.entities)
-    entities = capture_all(engine, entities, meshes, recaptures - blocked, cancel)
-    if document.attachments_enabled:
-        entities = propagate(engine, entities, meshes, targets - blocked, cancel)
+    entities = compute_poses(engine, payload, targets - blocked, recaptures - blocked, cancel)
     return document, cycle_failures(entities, blocked)
+
+
+def compute_poses(
+    engine: GeometryEngine,
+    payload: tuple[Document, dict[str, Mesh]],
+    targets: set[str],
+    recaptures: set[str],
+    cancel: Event,
+) -> list[SCP]:
+    document, meshes = payload
+    entities, owners = shortcut_attachment_evaluation.prepare(
+        engine, document, ordered(document.entities), meshes, targets
+    )
+    protected = shortcut_attachment_evaluation.protected(document, targets) | owners
+    entities = capture_all(engine, entities, meshes, recaptures - protected, cancel)
+    return propagate_and_restore(engine, payload, entities, targets, owners, cancel)
+
+
+def propagate_and_restore(
+    engine: GeometryEngine,
+    payload: tuple[Document, dict[str, Mesh]],
+    entities: list[SCP],
+    targets: set[str],
+    owners: set[str],
+    cancel: Event,
+) -> list[SCP]:
+    document, meshes = payload
+    if document.attachments_enabled:
+        entities = propagate(engine, entities, meshes, targets - owners, cancel)
+    return shortcut_attachment_evaluation.restore(document, entities, targets)
 
 
 def cyclic_targets(document: Document, targets: set[str]) -> set[str]:
@@ -217,6 +245,7 @@ def validate_inputs(
 
     ports = dependencies.closure(dependencies.graph(source), {Port(key, "pose") for key in targets})
     ports |= capture_reads(source, captures)
+    ports |= shortcut_attachment_evaluation.extra_reads(source, targets)
     if revisions(source, ports) != revisions(session.document, ports):
         raise ValueError("Attachment inputs changed before publication.")
 

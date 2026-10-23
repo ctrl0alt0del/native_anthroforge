@@ -240,7 +240,8 @@ def graph_changes(document: Document, changes: DocumentChanges) -> set[str]:
     rows = (*changes.entities.values(), *changes.controls.values(), *changes.objects.values())
     return (
         {"document"}
-        if "attachments_enabled" in changes.document or any(GRAPH_FIELDS & v for v in rows)
+        if {"attachments_enabled", "driving_shortcuts"} & changes.document
+        or any(GRAPH_FIELDS & v for v in rows)
         else set()
     )
 

@@ -34,14 +34,14 @@ UiSection {
             onEditingFinished: if(text.trim() !== (panel.item.group || "")) workspace.run("tissue.configure",{target:panel.item.id,changes:{group:text.trim()}})
             ToolTip.visible: hovered; ToolTip.text: "Equal group names skip automatic comparisons. Explicit pair assignments remain available."
         }
-        NumericSetting { objectName: "tissueStackClearance"; label: "Clearance"; length: true; value: panel.item.stack_settings?.clearance || 0; onEdited: value=>panel.configure("clearance",value) }
-        NumericSetting { label: "Search distance"; length: true; value: panel.item.stack_settings?.search || 0; onEdited: value=>panel.configure("search",value) }
-        NumericSetting { objectName: "tissueStackAllowance"; label: "Discovery allowance"; length: true; minimum: 0; maximum: 1000; value: panel.item.stack_settings?.displacement ?? 0.5; hint: "Additional reach for pair discovery; does not limit stacked displacement"; onEdited: value=>panel.configure("displacement",value) }
-        NumericSetting { label: "Smoothing radius"; length: true; value: panel.item.stack_settings?.radius || 0; onEdited: value=>panel.configure("radius",value) }
-        NumericSetting { label: "Smoothing strength"; value: panel.item.stack_settings?.strength || 0; onEdited: value=>panel.configure("strength",value) }
-        NumericSetting { label: "Blend distance"; length: true; value: panel.item.stack_settings?.blend || 0; onEdited: value=>panel.configure("blend",value) }
-        NumericSetting { label: "Shape preservation"; value: panel.item.stack_settings?.preservation || 100; onEdited: value=>panel.configure("preservation",value) }
-        NumericSetting { label: "Maximum adjustment"; length: true; value: panel.item.stack_settings?.adjustment || 0; onEdited: value=>panel.configure("adjustment",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","clearance"]}); objectName: "tissueStackClearance"; label: "Clearance"; length: true; value: panel.item.stack_settings?.clearance || 0; onEdited: value=>panel.configure("clearance",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","search"]}); label: "Search distance"; length: true; value: panel.item.stack_settings?.search || 0; onEdited: value=>panel.configure("search",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","displacement"]}); objectName: "tissueStackAllowance"; label: "Discovery allowance"; length: true; minimum: 0; maximum: 1000; value: panel.item.stack_settings?.displacement ?? 0.5; hint: "Additional reach for pair discovery; does not limit stacked displacement"; onEdited: value=>panel.configure("displacement",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","radius"]}); label: "Smoothing radius"; length: true; value: panel.item.stack_settings?.radius || 0; onEdited: value=>panel.configure("radius",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","strength"]}); label: "Smoothing strength"; value: panel.item.stack_settings?.strength || 0; onEdited: value=>panel.configure("strength",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","blend"]}); label: "Blend distance"; length: true; value: panel.item.stack_settings?.blend || 0; onEdited: value=>panel.configure("blend",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","preservation"]}); label: "Shape preservation"; value: panel.item.stack_settings?.preservation || 100; onEdited: value=>panel.configure("preservation",value) }
+        NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","adjustment"]}); label: "Maximum adjustment"; length: true; value: panel.item.stack_settings?.adjustment || 0; onEdited: value=>panel.configure("adjustment",value) }
     }
     UiField { id: search; objectName: "tissueStackSearch"; Layout.fillWidth: true; placeholderText: "Find a tissue…" }
     UiButton { text: "Show received displacement"; Layout.fillWidth: true; enabled: !!panel.item.final_result?.asset; hint: "Compare the accepted final surface with its intrinsic inflation"; onClicked: workspace.tissueInspection.configure("final","intrinsic","Displacement") }

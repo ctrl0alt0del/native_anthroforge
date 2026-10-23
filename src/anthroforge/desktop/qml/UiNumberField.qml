@@ -4,7 +4,12 @@ import QtQuick.Controls
 // One numeric editor for scalar/vector/transform fields. Model values stay authoritative.
 UiField {
     id: field
-    property real value: 0
+    property var value: 0
+    property bool exactText: false
+    property var exactOffset: null
+    property var propertyReference: ({})
+    readonly property var propertyState: propertyReference?.target ? workspace.shortcutPanel.propertyState(propertyReference,workspace.state.revision) : ({})
+    readonly property bool propertyLocked: !!propertyReference?.target && propertyState.writable === false
     property int decimals: 4
     property bool mixed: false
     property bool live: true
@@ -14,23 +19,29 @@ UiField {
     property real maximum: Infinity
     property bool textEditing: false
     property bool scrubbing: false
-    property real startValue: 0
+    property var startValue: 0
     property real dragStep: 0
-    property real draft: value
+    property var draft: value
     signal edited(real value)
+    signal exactEdited(string value)
     activeFocusOnPress: false
-    readOnly: !textEditing
+    readOnly: !textEditing || propertyLocked
     placeholderText: mixed ? "Mixed" : ""
     validator: RegularExpressionValidator {
         regularExpression: field.decimals === 0 ? /^[+-]?\d+$/ : /^[+-]?(?:\d+(?:[.,]\d*)?|[.,]\d+)$/
     }
-    Binding { target: field; property: "text"; when: !field.textEditing && !field.scrubbing; value: field.mixed ? "" : field.value.toFixed(field.decimals) }
-    function bounded(value) { return Math.max(minimum,Math.min(maximum,value)); }
-    function publish(value) { if(isFinite(value) && (mixed || value !== field.value)) edited(value); }
-    function beginText() { textEditing=true; forceActiveFocus(); selectAll(); }
+    Binding { target: field; property: "text"; when: !field.textEditing && !field.scrubbing; value: field.mixed ? "" : field.formatted(field.value) }
+    function formatted(value) { return exactText || value === "" ? String(value) : Number(value).toFixed(decimals); }
+    function bounded(value) { return exactText ? value : Math.max(minimum,Math.min(maximum,value)); }
+    function publish(value) {
+        if(!isFinite(value) || (!mixed && value === field.value)) return;
+        if(exactText) exactEdited(String(value)); else edited(value);
+    }
+    function beginText() { if(propertyLocked) return; textEditing=true; forceActiveFocus(); selectAll(); }
     function commitText() {
         if(!textEditing) return;
-        const parsed=Number(text.replace(",","."));
+        const cleaned=text.trim().replace(",",".");
+        const parsed=exactText ? cleaned : Number(cleaned);
         const valid=text.trim() && acceptableInput;
         textEditing=false; focus=false;
         if(valid) publish(bounded(parsed));
@@ -40,13 +51,14 @@ UiField {
         scrubbing=false; textEditing=false; focus=false;
     }
     function beginScrub() {
+        if(propertyLocked) return false;
         if(live && !numericEdits.begin(field)) return false;
         startValue=value; draft=value; dragStep=step;
         scrubbing=true; forceActiveFocus(); return true;
     }
     function updateScrub(distance) {
-        draft=bounded(Number((startValue+Math.round(distance)*dragStep).toFixed(decimals)));
-        text=draft.toFixed(decimals);
+        draft=exactText ? exactOffset(startValue,Math.round(distance)) : bounded(Number((startValue+Math.round(distance)*dragStep).toFixed(decimals)));
+        text=formatted(draft);
         if(live) publish(draft);
     }
     function finishScrub() {
@@ -63,7 +75,7 @@ UiField {
     }
     MouseArea {
         anchors.fill: parent
-        enabled: !field.textEditing
+        enabled: !field.textEditing && !field.propertyLocked
         acceptedButtons: Qt.LeftButton
         cursorShape: Qt.SizeHorCursor
         preventStealing: true
@@ -82,6 +94,12 @@ UiField {
         onReleased: { if(moved) field.finishScrub(); else field.beginText(); }
         onCanceled: field.cancelEdit()
     }
+    TapHandler { acceptedButtons: Qt.RightButton; enabled: !!field.propertyReference?.target; onTapped: propertyMenu.popup() }
+    UiMenu {
+        id: propertyMenu
+        UiMenuItem { text: "Go to driving shortcut"; visible: !!field.propertyState.driver; onTriggered: workspace.shortcutPanel.openDriver(field.propertyReference) }
+        UiMenuItem { text: field.propertyState.exposed ? "Hide shortcut" : "Expose as shortcut"; onTriggered: workspace.shortcutPanel.expose(field.propertyReference,"",!field.propertyState.exposed) }
+    }
     ToolTip.visible: hovered && !scrubbing && !textEditing
-    ToolTip.text: "Drag left/right to adjust · Click to type"
+    ToolTip.text: propertyState.reason || "Drag left/right to adjust · Click to type" + (propertyReference?.target ? " · Right-click for shortcut" : "")
 }

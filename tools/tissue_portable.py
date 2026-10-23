@@ -1,4 +1,4 @@
-"""Schema-4 tissue workflow through the relocated executable, without developer imports."""
+"""Tissue workflow through the relocated executable, with current-format persistence."""
 
 import json
 from zipfile import ZipFile
@@ -31,7 +31,7 @@ def verify(state, cwd):
     ref = items["Anchor on final tissue"]["binding"]["reference"]
     assert ref == dict(target=second["id"], role="TISSUE_FINAL")
     with ZipFile(cwd / "tissues.anthroforge") as archive:
-        assert json.loads(archive.read("manifest.json"))["version"] == 4
+        assert json.loads(archive.read("manifest.json"))["version"] == 5
     return items
 
 

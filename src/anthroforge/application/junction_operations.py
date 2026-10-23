@@ -28,9 +28,13 @@ def member(session: Any, value: dict[str, str]) -> tuple[Curve, PointRef]:
 
 
 def create(session: Any, source: dict[str, str], targets: list[dict[str, str]]) -> str:
+    from .parametric_junctions import source as select_source
+
     item, ref = member(session, source)
     references = [ref, *(member(session, value)[1] for value in targets)]
     require_members(session, references)
+    ref = select_source(session, references)
+    item = session.document.object(ref.curve)
     junction = Junction(ref)
     changes: dict[str, Any] = {}
     world = junction_edits.world_position(session, item, ref.point)

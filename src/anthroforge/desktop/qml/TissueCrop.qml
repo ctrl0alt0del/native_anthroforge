@@ -4,6 +4,8 @@ import QtQuick.Layouts
 
 UiSection {
     id: panel
+    property var propertyBase: ({})
+    function propertyRef(name,component) { return propertyBase.target ? {target:propertyBase.target,path:propertyBase.path.concat([name]),component:component===undefined?null:component} : ({}); }
     required property var settings
     signal edited(string key,var value)
     title: "Material crop"; expanded: false
@@ -16,8 +18,8 @@ UiSection {
             required property int index
             required property string modelData
             Layout.fillWidth: true; spacing: Theme.gap
-            NumericSetting { label: "Origin "+modelData; length: true; value: panel.settings.origin?.[index] || 0; onEdited: value=>panel.coordinate("origin",index,value) }
-            NumericSetting { label: "Normal "+modelData; value: panel.settings.normal?.[index] || 0; onEdited: value=>panel.coordinate("normal",index,value) }
+            NumericSetting { propertyReference: panel.propertyRef("origin",index); label: "Origin "+modelData; length: true; value: panel.settings.origin?.[index] || 0; onEdited: value=>panel.coordinate("origin",index,value) }
+            NumericSetting { propertyReference: panel.propertyRef("normal",index); label: "Normal "+modelData; value: panel.settings.normal?.[index] || 0; onEdited: value=>panel.coordinate("normal",index,value) }
         }
     }
 }

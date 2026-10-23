@@ -160,6 +160,12 @@ class IssueTaskScheduler(MeasuredTaskScheduler):
         return Schedule("worker", cost, delay, 150.0, "Read-only advisory checks after editing")
 
 
+class FormulaTaskScheduler(AttachmentTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + 0.02 * workload.affected + 0.0005 * workload.candidates
+        return Schedule("worker", cost, reason="Typed expressions and coherent property validation")
+
+
 class FiberCaptureTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         cost = 0.2 + workload.candidates * max(1, workload.entities) * 0.02
@@ -216,11 +222,22 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_open": OpenProjectTaskScheduler(),
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
+        **shortcut_schedulers(),
         **curve_schedulers(),
         **anchor_schedulers(),
         "control_pose": ControlPoseTaskScheduler(),
         **inspection_schedulers(),
     }
+
+
+def shortcut_schedulers() -> dict[str, TaskScheduler]:
+    return {"formulas": FormulaTaskScheduler(), "shortcut_capture": ShortcutCaptureTaskScheduler()}
+
+
+class ShortcutCaptureTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.1 + workload.recaptures * 0.05 + workload.triangles * 0.002
+        return Schedule("worker", cost, reason="Owned pre-edit attachment capture and owner anchor")
 
 
 def inspection_schedulers() -> dict[str, TaskScheduler]:
@@ -234,6 +251,7 @@ def inspection_schedulers() -> dict[str, TaskScheduler]:
 def curve_schedulers() -> dict[str, TaskScheduler]:
     return {
         "curve_path": CurvePathTaskScheduler(),
+        "curve_parametric": ParametricTaskScheduler(),
         "curve_routing": RoutingTaskScheduler(),
         "curve_draw": CurveDrawingTaskScheduler(),
         "surface_layout": SurfaceLayoutTaskScheduler(),
@@ -241,6 +259,12 @@ def curve_schedulers() -> dict[str, TaskScheduler]:
         "surface_snap": SurfaceQueryTaskScheduler(),
         "fiber_path": FiberPathTaskScheduler(),
     }
+
+
+class ParametricTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.1 + workload.candidates * 0.004
+        return Schedule("worker", cost, reason="Native typed XYZ sampling and path frames")
 
 
 def anchor_schedulers() -> dict[str, TaskScheduler]:

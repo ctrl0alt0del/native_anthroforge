@@ -36,10 +36,15 @@ def configure(session: "Session", curve: str, **settings: Any) -> None:
 
 
 def change_engine(session: "Session", curve: str, engine: str) -> None:
+    from .parametric_operations import switch
+
     item = selected(session, curve)
     if item.engine == engine:
         return
     require_topology_edit(session.document, curve)
+    if "PARAMETRIC" in (item.engine, engine):
+        install(session, switch(session, item, engine))
+        return
     settings = {"samples": max(64, len(item.points))} if engine == "ROUTED" else {}
     install(session, replace(item, engine_settings=decode(engine, settings)))
 

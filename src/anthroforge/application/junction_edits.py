@@ -24,6 +24,8 @@ def world_position(session: Any, item: Curve, identity: str) -> Any:
 
 
 def positioned(session: Any, item: Curve, ref: PointRef, world: Any, junction: str) -> Curve:
+    if item.engine == "PARAMETRIC":
+        return parametric_membership(session, item, ref, world, junction)
     frame = curve_sources.world(session.engine, session.document, item.id)
     inverse = construction.matrix(session.engine, frame, IDENTITY, relative=True)
     position = session.engine.world_point(inverse, world)
@@ -33,6 +35,20 @@ def positioned(session: Any, item: Curve, ref: PointRef, world: Any, junction: s
         replace(changed, junction=junction) if p.id == ref.point else p for p in item.points
     )
     return replace(item, points=points)
+
+
+def parametric_membership(
+    session: Any, item: Curve, ref: PointRef, world: Any, junction: str
+) -> Curve:
+    from .parametric_junctions import require_position
+
+    require_position(session, item, point(item, ref.point), world)
+    return replace(
+        item,
+        points=tuple(
+            replace(p, junction=junction) if p.id == ref.point else p for p in item.points
+        ),
+    )
 
 
 def expand(session: Any, changes: dict[str, Any]) -> dict[str, Any]:

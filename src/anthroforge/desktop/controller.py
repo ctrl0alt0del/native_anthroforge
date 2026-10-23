@@ -24,6 +24,7 @@ from .object_selection import ObjectSelection
 from .route_inspection_tools import RouteInspectionTools
 from .routing_choices import RoutingChoices
 from .section_tools import SectionTools
+from .shortcut_panel import ShortcutPanel
 from .surface_creation import SurfaceCreation
 from .tissue_inspection_tools import TissueInspectionTools
 from .tissue_painting_tools import TissuePaintingTools
@@ -77,6 +78,7 @@ class Controller(QObject):
         self.surface_creation = SurfaceCreation(self)
 
     def initialize_tissue_tools(self):
+        self.shortcut_panel = ShortcutPanel(self)
         self.tissue_region_tools = TissueRegionTools(self)
         self.tissue_inspection = TissueInspectionTools(self)
         self.tissue_painting = TissuePaintingTools(self)
@@ -214,6 +216,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def selectedData(self):
         return self.scene_projection.selected
+
+    @Property(QObject, constant=True)
+    def shortcutPanel(self):
+        return self.shortcut_panel
 
     @Property(QObject, constant=True)
     def sceneChoices(self):
@@ -406,6 +412,7 @@ class Controller(QObject):
         self.refresh_viewport_tools()
 
     def refresh_viewport_tools(self):
+        self.shortcut_panel.synchronize()
         self.inspection_tools.synchronize()
         self.image_tools.synchronize()
         self.drawing_tools.synchronize()

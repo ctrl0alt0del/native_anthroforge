@@ -15,6 +15,7 @@ from . import (
     deletion_impact,
     drawing_operations,
     drawing_projection,
+    driving_operations,
     evaluation,
     fiber_bindings,
     fiber_operations,
@@ -28,11 +29,14 @@ from . import (
     object_operations,
     operations,
     output_tasks,
+    parametric_operations,
     path_tasks,
     point_operations,
     presentation,
     projects,
+    property_operations,
     segment_operations,
+    shortcut_operations,
     shrinkwrap_operations,
     snap_tasks,
     surface_branch_operations,
@@ -58,6 +62,22 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "driver.create": driving_operations.create,
+    "driver.configure": driving_operations.configure,
+    "driver.value": driving_operations.set_value,
+    "driver.remove": driving_operations.remove,
+    "driver.formula.add": driving_operations.add_formula,
+    "driver.formula.update": driving_operations.update_formula,
+    "driver.formula.remove": driving_operations.remove_formula,
+    "property.set": property_operations.set_value,
+    "shortcut.expose": shortcut_operations.expose,
+    "shortcut.configure": shortcut_operations.configure,
+    "shortcut.set": shortcut_operations.set_value,
+    "shortcut.reorder": shortcut_operations.reorder,
+    "curve.parametric.configure": parametric_operations.configure,
+    "curve.parametric.variable.add": parametric_operations.add_variable,
+    "curve.parametric.variable.update": parametric_operations.update_variable,
+    "curve.parametric.variable.remove": parametric_operations.remove_variable,
     "chain.configure": segment_operations.configure,
     "chain.segment": segment_operations.segment,
     "chain.resize": segment_operations.resize,
@@ -185,6 +205,8 @@ EDITS = {
 
 
 def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    if operation.startswith(("property.", "shortcut.")) and operation not in EDITS:
+        return shortcut_queries(session, operation, arguments)
     handler = query_handler(operation)
     if handler:
         return handler(session, operation, arguments)
@@ -210,6 +232,18 @@ def query_handler(operation: str) -> Any:
 
         return issue_command
     return None
+
+
+def shortcut_queries(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    queries: dict[str, Any] = {
+        "property.discover": property_operations.discover,
+        "property.get": property_operations.get,
+        "shortcut.inspect": shortcut_operations.inspect,
+        "shortcut.list": shortcut_operations.listing,
+    }
+    if operation not in queries:
+        raise ValueError(f"Unknown shortcut/property operation: {operation}")
+    return queries[operation](session, **arguments)
 
 
 def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
@@ -247,6 +281,7 @@ def query_commands(session: "Session") -> dict[str, Any]:
     return {
         "preferences.get": session.preferences.describe,
         "preferences.set": session.preferences.update,
+        "driver.inspect": lambda **a: driving_operations.inspect(session, **a),
         **drawing_commands(session),
         **construction_queries(session),
         "image.presentation": lambda **a: image_presentation.update(session, **a),

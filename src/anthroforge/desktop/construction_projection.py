@@ -23,9 +23,11 @@ class ConstructionProjection:
         self.controller, self.records, self.keys = controller, {}, {}
         self.rendered = {}
         self.model = RecordModel(controller, ("item",), "id")
+        from .path_placeholders import PathPlaceholders
         from .point_scene import PointScene
 
         self.points = PointScene(controller)
+        self.placeholders = PathPlaceholders()
 
     def synchronize(self):
         session = self.controller.session
@@ -54,8 +56,10 @@ class ConstructionProjection:
         resources = self.controller.session.resources
         self.publish_kind(
             "path",
-            path_scene.rows(self.controller) + path_scene.preview_rows(self.controller),
-            path_scene.resources(self.controller),
+            path_scene.rows(self.controller)
+            + path_scene.preview_rows(self.controller)
+            + self.placeholders.rows(self.controller),
+            (*path_scene.resources(self.controller), *self.placeholders.resources()),
         )
         self.publish_kind("image", image_scene.rows(self.controller), resources.images.values())
 

@@ -58,7 +58,15 @@ class Resources:
 
 
 def referenced(document: Document) -> dict[str, set[str]]:
-    return references(document.entities, document.objects)
+    opening = tuple(item for context in document.shortcut_edits for item in context.opening)
+    result = references((*document.entities, *opening), document.objects)
+    result["meshes"].update(
+        b.attachment.material_asset
+        for context in document.shortcut_edits
+        for b in context.bindings
+        if b.attachment.material_asset
+    )
+    return result
 
 
 def references(entities: Iterable[SCP], objects: Iterable[Authored]) -> dict[str, set[str]]:
@@ -83,6 +91,11 @@ def mesh_references(entities: Iterable[SCP], objects: Iterable[Authored]) -> set
     meshes = {geometry_asset(e) for e in entities}
     meshes.update(e.primitive.source for e in entities if e.primitive)
     meshes.update(e.attachment.material_asset for e in entities)
+    meshes.update(
+        e.pose_receipt.effective.material_asset
+        for e in entities
+        if e.pose_receipt and e.pose_receipt.effective
+    )
     meshes.update(o.result.asset for o in objects if isinstance(o, Surface))
     return meshes | tissue_meshes(objects) | binding_meshes(objects)
 

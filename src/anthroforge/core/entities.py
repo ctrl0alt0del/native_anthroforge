@@ -49,6 +49,7 @@ class AttachmentReceipt:
     child_offset: tuple[float, ...]
     settings: Attachment
     evaluator_version: int = 0
+    effective: Attachment | None = None
 
 
 @dataclass(frozen=True, slots=True)

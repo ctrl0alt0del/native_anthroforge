@@ -9,7 +9,7 @@ Repeater3D {
         Model {
             id: path
             objectName: "path_" + item.id + "_" + item.chunk
-            visible: item.active && item.visible && !(authoring.state.editing && workspace.selectedId === item.id)
+            visible: item.active && item.visible && (item.placeholder || !(authoring.state.editing && workspace.selectedId === item.id))
             geometry: PathGeometry { assetId: item.handle; chunk: item.chunk }
             // Instances own the complete application-Z-up to Qt-Y-up frame.
             // Keeping this outside the rotated anatomy node avoids an ambiguous instance root.
@@ -19,7 +19,7 @@ Repeater3D {
             opacity: item.readonly ? .12 : 1
             materials: DefaultMaterial {
                 lighting: DefaultMaterial.NoLighting
-                diffuseColor: item.preview ? Theme.success : workspace.selectedObjects.includes(item.id) ? Theme.accent : workspace.hoveredId === item.id ? Theme.curveHoverColor : Theme.curveColor
+                diffuseColor: item.placeholder ? Theme.danger : item.preview ? Theme.success : workspace.selectedObjects.includes(item.id) ? Theme.accent : workspace.hoveredId === item.id ? Theme.curveHoverColor : Theme.curveColor
                 lineWidth: 2
             }
         }

@@ -8,12 +8,14 @@ from . import (
     anchor_tasks,
     construction_tasks,
     dependencies,
+    formula_tasks,
     geometry_outputs,
     path_tasks,
     tissue_tasks,
 )
 
 FAMILIES = (
+    ({"formula"}, formula_tasks),
     ({"path"}, path_tasks),
     ({"binding"}, anchor_tasks),
     ({"base", "rest", "intrinsic", "plan", "final"}, tissue_tasks),

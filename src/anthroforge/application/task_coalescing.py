@@ -16,7 +16,15 @@ def renewable(job: Job) -> bool:
 
 
 def compatible(before: Job, after: Job) -> bool:
-    fields = ("kind", "outputs", "provides", "writes", "publish_during_edit", "restart_on_redo")
+    fields = (
+        "kind",
+        "outputs",
+        "provides",
+        "writes",
+        "publish_during_edit",
+        "restart_on_redo",
+        "edit_contexts",
+    )
     return (
         renewable(before)
         and renewable(after)

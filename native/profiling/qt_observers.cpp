@@ -1,5 +1,6 @@
 #include "qt_observers.h"
 #include <QChildEvent>
+#include <QCoreApplication>
 #include <QMetaMethod>
 #include <QQmlContext>
 #include <QQmlEngine>
@@ -8,34 +9,61 @@
 namespace { QPointer<ModelObserver> observer; }
 
 ModelObserver::ModelObserver(QObject* root,ProfileReceiver* sink): QObject(root),receiver(sink) {
-    watch(root);
+    QCoreApplication::instance()->installEventFilter(this);
+    addRoot(root);
+}
+
+void ModelObserver::addRoot(QObject* root) {
+    if (!root || roots.contains(root)) return;
+    if (roots.size()>=16) { ++receiver->modelWatchSkipped; return; }
+    roots.append(root); watch(root);
+}
+
+static bool modelSignal(const QMetaMethod& method) {
+    static const QList<QByteArray> names={"modelChanged","modelReset","rowsInserted","rowsRemoved","dataChanged"};
+    return method.methodType()==QMetaMethod::Signal && names.contains(method.name());
+}
+
+static bool observable(QObject* object) {
+    if (object->objectName()=="keyboardManager") return true;
+    const auto* meta=object->metaObject();
+    for (int i=0;i<meta->methodCount();++i) if (modelSignal(meta->method(i))) return true;
+    return false;
 }
 
 void ModelObserver::watch(QObject* object) {
     if (watched.contains(object) || object==this) return;
-    if (watched.size()>=16384) { ++receiver->modelWatchSkipped; return; }
-    watched.insert(object);
-    object->installEventFilter(this);
-    connect(object,&QObject::destroyed,this,[this,object] { watched.remove(object); });
-    connectSignals(object);
-    if (object->objectName()=="keyboardManager")
-        connect(object,SIGNAL(requested(QString)),this,SLOT(action(QString)),Qt::DirectConnection);
+    if (observable(object)) {
+        if (watched.size()>=16384) { ++receiver->modelWatchSkipped; return; }
+        watched.insert(object);
+        connect(object,&QObject::destroyed,this,[this,object] { watched.remove(object); });
+        connectSignals(object);
+        if (object->objectName()=="keyboardManager")
+            connect(object,SIGNAL(requested(QString)),this,SLOT(action(QString)),Qt::DirectConnection);
+    }
     for (auto* child:object->children()) watch(child);
 }
 
 void ModelObserver::connectSignals(QObject* object) {
     const auto* meta=object->metaObject();
     const auto slot=metaObject()->method(metaObject()->indexOfSlot("changed()"));
-    const QList<QByteArray> names={"modelChanged","modelReset","rowsInserted","rowsRemoved","dataChanged"};
     for (int i=0;i<meta->methodCount();++i) {
         const auto method=meta->method(i);
-        if (method.methodType()==QMetaMethod::Signal && names.contains(method.name()))
+        if (modelSignal(method))
             QObject::connect(object,method,this,slot,Qt::DirectConnection);
     }
 }
 
-bool ModelObserver::eventFilter(QObject*,QEvent* event) {
-    if (event->type()==QEvent::ChildAdded) {
+bool ModelObserver::contains(QObject* object) const {
+    for (auto* item=object;item;item=item->parent()) {
+        if (item==this) return false;
+        if (roots.contains(item)) return true;
+    }
+    return false;
+}
+
+bool ModelObserver::eventFilter(QObject* object,QEvent* event) {
+    if (event->type()==QEvent::ChildAdded && contains(object)) {
         if (pending>=4096) { ++receiver->modelWatchSkipped; return false; }
         ++pending;
         QPointer<QObject> child=static_cast<QChildEvent*>(event)->child();
@@ -65,4 +93,4 @@ void observeModels(QObject* root,ProfileReceiver* receiver) {
 
 void stopObservingModels() { delete observer; }
 
-void observeModelRoot(QObject* root) { if (observer && root) observer->watch(root); }
+void observeModelRoot(QObject* root) { if (observer && root) observer->addRoot(root); }

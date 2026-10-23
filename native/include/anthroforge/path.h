@@ -11,6 +11,11 @@ AF_API uint64_t af_path_evaluate(const double* records, int count, int engine,
     int closed, int resolution, uint64_t cancel);
 AF_API uint64_t af_path_restore(const double* samples, const double* parameters,
     int count, int closed);
+/* XYZ programs share typed inputs beginning with dimensionless t. Closed sampling
+ * excludes the interval end; output contains exactly count points and no seam copy. */
+AF_API uint64_t af_parametric_path(const uint64_t* handles,int variables,
+    const int64_t* integers,const double* reals,const double* metadata,int previous,
+    int count,int closed,double start,double end,double* records,uint64_t cancel);
 AF_API void af_path_release(uint64_t handle);
 AF_API int af_path_info(uint64_t handle, int64_t* counts, double* bounds);
 AF_API const double* af_path_buffer(uint64_t handle, int kind);

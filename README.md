@@ -1,9 +1,14 @@
-# AnthroForge 0.2.4
+# AnthroForge 0.3.0
 
-The [0.3 shortcut/Parametric specification](docs/specification_030.md) and
-[implementation plan](docs/implementation_030.md) are **confirmed, not implemented**.
-They include loading existing 0.2.4 projects into the planned schema 5. The released
-application and package version remain 0.2.4; source Blender migration is separate.
+0.3 adds numerical-property shortcuts, typed driving formulas, attachment-edit policies
+and general XYZ Parametric curves. See the [walkthrough](docs/shortcuts_030.md),
+[specification](docs/specification_030.md) and [qualification](docs/research/shortcuts_030/windows_review.md).
+Projects save in schema 5; existing 0.2.4/schema-4 projects remain readable with their
+accepted geometry and attachments preserved. Blender shortcut migration is separate.
+
+The Windows gate passes 1,945 tests and all five native tests. The packaged executable
+passes the full minimal-PATH portable suite and the generated-point resolution-lock check.
+See [delivery evidence and limits](docs/development_status.md#shortcuts-and-parametric-curves-030).
 
 0.2.4 improves tissue editing and evaluation performance: prepared inspection UI,
 incremental collision checks, retained stacking preparation, a smaller height-smoothing

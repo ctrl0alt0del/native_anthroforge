@@ -215,7 +215,12 @@ def surface_record(controller, hit, offset=0.0):
 
 
 def make_query(session, entity, curves):
-    return curve_queries.CurveQuery(session.engine, curves, curve_context.frame(session, entity))
+    editable = tuple(c for c in curves if c.engine != "PARAMETRIC")
+    return (
+        curve_queries.CurveQuery(session.engine, editable, curve_context.frame(session, entity))
+        if editable
+        else None
+    )
 
 
 def insert_point(controller, preview):

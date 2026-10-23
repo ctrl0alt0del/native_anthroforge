@@ -79,7 +79,9 @@ def adopt(session: "Session", document: Any, assets: Any) -> None:
 
 def synchronize_loaded(session: "Session") -> None:
     from .evaluation import request
+    from .shortcut_contexts import resume
 
+    resume(session)
     targets = {item.id for item in session.document.entities if item.parent}
     captures = {
         item.id

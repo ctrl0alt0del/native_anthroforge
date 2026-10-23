@@ -148,13 +148,21 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | R03 | Transactions/history/checkpoints: derive changes, commit/cancel edits, maintain undo/redo restart recipes, choose saveable revisions and validate historical asynchronous captures. | [history](../src/anthroforge/application/history.py), [changes](../src/anthroforge/application/changes.py), [authored jobs](../src/anthroforge/application/authored_jobs.py) | [interleaving](../tests/test_interleaving.py), [capture history](../tests/test_capture_history.py) |
 | R04 | Cache/resource work: keys, immutable leases, hit/miss/eviction, content equivalence and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes and tissue material preparation. | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py) |
 | R05 | Viewport publication/rendering: stage complete native mesh/path/image buffers, switch displayed geometry and picking together, generate controls, perform Qt Quick 3D shading, opacity/depth and selection-outline passes. | [Qt geometry adapters](../native/qt), [outline shader](../native/qt/shaders/outline.frag), [desktop](../src/anthroforge/desktop) | [viewport publication](../tests/test_viewport_publication.py), [capture staging](../tests/test_capture_staging.py), [path presentation](../tests/test_path_presentation.py) |
-| R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
+| R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. Typed integer controls retain exact text through Qt and convert display units before shared command validation (CH-051). | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [quantity transport](../src/anthroforge/desktop/quantity_values.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [integer quantities](../tests/test_integer_quantity_controls.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
 | R07 | Issues checks: evaluate structural/readiness/attachment/dependency diagnostics and optional native collision checks, retain scoped stale evidence, and verify requested repairs. Read-only checks use the common coordinator. | [Issue system](../src/anthroforge/application/issues/system.py), [providers](../src/anthroforge/application/issues/providers.py) | [Issue lifecycle](../tests/test_issue_lifecycle.py), [Issue integration](../tests/test_issue_integration.py) |
 | R08 | Runtime profiling: opt-in Qt/native/application events, monotonic alignment, bounded rings/queues, summaries, model churn, invalidation causes, cache/resource attribution and background trace archive export. | [profiling](../src/anthroforge/profiling), [Qt collector](../native/profiling) | [profiling](../tests/test_profiling.py), [profile diagnostics](../tests/test_profile_diagnostics.py) |
-| R09 | Project persistence: schema-4 validation, encode/decode editable records and accepted resources, compression/decompression, atomic saving and background opening. Never serialize native handles or undo history. | [storage](../src/anthroforge/application/storage.py), [resource storage](../src/anthroforge/application/resource_storage.py) | [headless](../tests/test_headless.py), [tissue headless](../tests/test_tissue_headless.py) |
+| R09 | Project persistence: schema-5 writing with schema-4 reading on the 0.3 development branch; encode/decode editable records and accepted resources, atomic saving and background opening. Never serialize native handles or undo history. | [storage](../src/anthroforge/application/storage.py), [resource storage](../src/anthroforge/application/resource_storage.py) | [headless](../tests/test_headless.py), [shortcut foundations](../tests/test_shortcut_foundations.py) |
 | R10 | Inspection/feedback reports: freeze a revision/presentation, hidden GPU capture and archive creation; screenshot annotations, PNG encoding, report preview decoding, atomic text updates and deletion are a separate reporting service. | [inspection report](../src/anthroforge/application/inspection_report.py), [feedback painting](../src/anthroforge/desktop/feedback_paint.py), [feedback storage](../src/anthroforge/feedback/storage.py) | [inspection export](../tests/test_inspection_export.py), [feedback](../tests/test_feedback.py), [feedback inbox](../tests/test_feedback_inbox.py) |
 
 ### Coverage and exclusions
+
+0.3 adds the following responsibilities; release qualification is recorded in the
+[Windows review](research/shortcuts_030/windows_review.md).
+
+| ID | Computation | Owner | Evidence |
+| --- | --- | --- | --- |
+| E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. Construction copies preserve/remap formula graphs and accepted values (CH-050). Addressed property lookup traverses only the requested path, sharing discovery metadata and policy (CH-052). | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py), [copy state](../src/anthroforge/application/shortcut_copies.py), [property catalogue](../src/anthroforge/application/property_catalog.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py), [copy lifecycle](../tests/test_shortcut_copy.py), [profiling](research/shortcuts_030/performance_qualification.md) |
+| E02 | Native uniform Parametric XYZ sampling, generated controls and exact accepted-path Fiber conversion (CH-048). Shared policy locks resolution when junctions, attachments or generated-point references require stable membership (CH-058). | [native sampling](../native/src/parametric.cpp), [adapter](../src/anthroforge/native/parametric.py), [reference policy](../src/anthroforge/application/parametric_policy.py) | [curves](../tests/test_parametric_curves.py), [consumers](../tests/test_parametric_consumers.py), [resolution](../tests/test_parametric_resolution_policy.py) |
 
 The inventory covers all public native interface families in
 [native/include/anthroforge](../native/include/anthroforge), compiled geometry sources
@@ -1549,6 +1557,101 @@ See the task and development validation records for final gate/package evidence 
   exact composed draft/full equivalence. Modified native clang-tidy and typing pass.
 - Reference: [libigl preparation and solve](https://libigl.github.io/tutorial/).
 
+### CH-049 — Typed numerical addressing and restricted native expressions (2026-10-22)
+
+This record was CH-045 on the desktop feature branch. Cloud reconciliation assigns
+CH-049 because the integrated pipeline repair already published CH-045.
+
+- E01 is a new standalone computation, not a replacement for any existing anatomy
+  algorithm. Qualified parser-default probes found mixed integer/real and exactness
+  mismatches. The selected implementation uses a bounded native precedence parser,
+  dimensional/type checking and one typed postfix evaluator. Third-party adaptation
+  was not claimed impossible; it would require a second typed semantic layer. See
+  [the experiment and rationale](research/shortcuts_030/expression_qualification.md).
+- Authored properties remain lower-level than shortcut wrappers. Stable object/member
+  addresses survive renaming and ordering. Grouped candidate reconstruction validates
+  coupled fields together. Native point-handle and cage-resizing operations are reused;
+  this does not introduce Python numerical algorithms. Shared mutation guards prevent
+  ordinary edits from overwriting active formula components.
+- Compiled handles stay outside documents. R09 adds schema-5 storage for definitions
+  and accepted formula records while initializing these fields empty when reading 4.
+  Neither source project files nor existing curve engines are changed on opening.
+- Evidence at this checkpoint: 49 native expression cases and 10 foundation tests
+  passed; earlier combined foundation/construction/interleaving run had 38 passes.
+  Native Release compilation and scoped native function-size checks passed. Desktop
+  shortcut exposure loaded without QML warnings in offscreen captures. Full driver,
+  attachment-policy, Parametric, profiler and portable-release acceptance remain pending.
+
+### CH-046 — Formula output dependencies and coordinated publication (2026-10-23)
+
+- E01 now uses distinct property, virtual-input, and formula output ports in the existing
+  dependency graph. Geometry consumers observe their driven inputs; reading an unrelated
+  authored component does not introduce a spurious geometry dependency. Actual cycles
+  retain accepted values for the affected component and its dependents.
+- One task-specific admission policy submits batched native expression evaluations to
+  the existing coordinator. Owned dispatch snapshots, object writer reservations,
+  cancellable execution, complete read validation and accepted-result provenance use
+  existing lifecycle mechanisms. Property candidate validation runs before publication;
+  independent valid outputs survive failures in other branches.
+- A Live consumer may read a Manual formula's accepted property, with pending provenance.
+  Publication registers dependent work before becoming terminal. The coordinator now
+  distinguishes its currently publishing job from other jobs invalidated by installation,
+  so publication cannot cancel its own output transaction.
+- Eight new public-API cases and 96 expression/foundation/scheduling/Issues regression
+  cases passed. The Manual handoff test initially failed and verified its correction.
+  Full coupled-field, policy, GUI, profiler and release qualification remain pending;
+  no performance improvement or finished 0.3 workflow is claimed by this checkpoint.
+- Follow-up evidence adds coherent valid/invalid tissue-limit publication, independent
+  settings on the same tissue, complete result provenance round trips, and target-reference
+  removal protection. SCP property writes now install one coherent candidate rather than
+  passing through an intermediate primitive publication. The existing geometry algorithms
+  remain unchanged. Native point-result scalar boxing preserves numerical values and
+  makes the numerical-property catalogue stable after a native edit.
+
+### CH-047 — Shortcut-scoped attachment preparation and retained owner anchors (2026-10-23)
+
+- The addon temporarily captures descendant bindings before changing a shortcut, restores
+  its authored attachment runtime afterward, and caches overrides using a one-second timeout.
+  Standalone now retains an explicit initiating edit context through gestures, queued work,
+  Manual intent, history and saving. Ordinary property edits do not activate wrapper policies.
+- Native owner backsolve reuses the retained child anchor index/local fallback and its
+  parent-local location, translating by the resulting delta (addon threshold 1e-7). It does
+  not invert formulas, rotate the owner or choose a new closest attachment. Existing capture
+  and batch attachment propagation kernels evaluate temporary descendant settings.
+- Separate shortcut-pose publication avoids making an owner's geometry wait for the
+  backsolve that needs that geometry. Object writer reservations, input revisions and
+  dependent registration remain with the existing coordinator. Accepted receipts retain
+  effective override provenance; authored attachment settings and bindings remain intact.
+- Six integrated edit tests and three native anchor cases pass; the combined focused suite
+  has 40 passes. Tests include geometry publication, paused gestures/cancel, ordinary edits,
+  follow overrides and saved Manual intent. Addon fixture parity, remaining lifecycle,
+  profiler and desktop policy acceptance are not yet established. No inflation or smoothing
+  algorithm, attachment reassignment policy, or 0.2.4 startup evaluator version changed.
+
+### CH-048 — Native Parametric path generation and accepted conversion (2026-10-23)
+
+- The curve engine boundary now accepts typed XYZ definitions and variables. One batched
+  native call uses the existing restricted expression compiler and uniformly samples t;
+  open curves include both limits, closed curves omit the duplicate interval-end sample.
+  Generated points retain stable identities and metadata by index. Formula failures keep
+  accepted output, and ordinary coordinate editing cannot overwrite generated positions.
+- Consumer control deformation operates on accepted generated controls without evaluating
+  equations again. Direct switching retains inactive definitions; Parametric-to-Fiber uses
+  exact accepted samples as independent VECTOR-handle Bezier controls. Binding endpoint
+  intent resolves against the dispatch snapshot when queued resolution changes occur.
+- Formula-owned junctions drive followers, reject contradictory positions and lock resolution.
+  Independent copies remap variable identities. Initial tests cover equations, variables,
+  closure, switching, retained failures, shared bodies, junctions, exact Fiber copies and
+  attachment movement. Broader lifecycle, deformation, GUI, profiler and release checks
+  remain pending; this checkpoint is not a qualified 0.3 release.
+
+- Paused follow-up: generated Parametric coordinate inputs now depend on the accepted path
+  output so formula/path feedback enters normal cycle detection. Property-port tokens escape
+  names, and indexed cage references prohibit resolution changes while used by formulas.
+  Expanded property units distinguish dimensionless boundary samples/taper from lengths.
+  Desktop failure placeholders lease separate native geometry and never enter accepted
+  resource catalogues. These latest changes still require targeted qualification after resume.
+
 ### CH-045 — Owned stacking relationship lookup keys (2026-10-22)
 
 - Ubuntu qualification of `ee98cc9` exposed GCC's dangling-reference error in
@@ -1564,3 +1667,191 @@ See the task and development validation records for final gate/package evidence 
   Python package validation. The 57 focused stacking/provenance/drawing checks
   also pass. No performance or geometry improvement is claimed.
 - See [the pipeline repair task](tasks/fix-ubuntu-pipeline.md) for final validation.
+
+### CH-050 — Copy formula controls with their construction graph (2026-10-22)
+
+- Cloud continuation of `e7d464e` found that geometry copies omitted shortcut and
+  driver records. Four public-operation regressions demonstrated the missing copied
+  controls. A fifth showed consumer formulas retaining invalid old curve-use addresses.
+- Shared copy operations now clone exposed/hidden wrappers, relevant driver outputs,
+  internal property/virtual-input references, descendant policies, ordering and accepted
+  formula values. Explicit external inputs remain external; copied drivers never acquire
+  outputs outside the copied construction. New object/member/formula identities are
+  allocated once. Read-provenance property ports remap their escaped member identities.
+- Independence also rewrites references to internal members of the existing consumer.
+  Tissue construction and related formula state install together through the normal
+  authored object boundary, preserving revisions, invalidation and dependent scheduling.
+  Guards reserve retained active writers; removed or retargeted writers release their
+  former component. Ordinary edits to active driven fields remain rejected.
+- Evidence: 35 focused copy, shared-curve, tissue-independence, Fiber and architecture
+  cases pass. They include chains, external inputs, output scope, Parametric variable
+  identities, branch-part references, policy/order, undo/redo and pending Manual values.
+  Ruff/mypy pass. At cloud checkpoint `d89c8bd`, combined portable validation passes
+  1,845 pytest cases, five CTests, 170 owned native style inputs, headless workshop
+  and wheel checks (packaging resumed after sandbox network denial). Both GitHub core
+  platforms pass copy checkpoint `5ce4ca8`. Native expression/geometry algorithms and
+  solver tolerances are unchanged. Full desktop release qualification remains pending;
+  no release or performance gain is claimed.
+- Reference: [Python dataclass replacement](https://docs.python.org/3.12/library/dataclasses.html#dataclasses.replace).
+
+### CH-051 — Preserve typed integers across desktop controls (2026-10-23)
+
+- At `115ffb3`, an actual QML probe displayed authored `9007199254740993` as
+  `9007199254740992`. The native evaluator already preserved int64; the shared
+  numeric widget and Qt real-valued signals rounded input above JavaScript's
+  exact-integer range. Re-selecting Integer on a Parametric variable could also
+  overwrite its exact value with the rounded projection.
+- Integer driver/list/variable values now travel as text. Shared numeric controls
+  keep the existing gesture lifecycle and real-valued signal; an exact-text path
+  performs integer offsets and sends a typed display-quantity payload. The desktop
+  command adapter converts that payload to an ordinary Python integer before the
+  same application command runs. Transport payloads never enter saved documents.
+- UI-only Decimal conversion preserves int64 precision through metre/centimetre/
+  millimetre display factors and the existing degree convention. Integer angles
+  recognize the four-decimal display of a whole canonical radian value; arbitrary
+  fractional canonical inputs remain errors. The common numerical validator now
+  rejects authored integers outside the native signed-64-bit range, including
+  headless driver and variable creation. Native expression evaluation is unchanged.
+- Evidence: the 36-case integer/editor/scrub/architecture group and configured
+  Ruff/mypy checks pass. The production-QML harness exercises exact driver, list
+  and variable text, native formula outputs, repeated type selection, live scrub
+  and one undo action. The ordinary unit/editor harness still passes. The expanded
+  Parametric value row displays the full integer in the inspected offscreen capture.
+  Combined portable validation at `57c93ec` passes 1,880 pytest cases, five native
+  CTests, 170 owned native style inputs, headless workflow and wheel checks. Both
+  GitHub core platforms passed integer checkpoint `b42a7f1`. No Windows desktop
+  release claim is made.
+
+### CH-052 — Resolve addressed properties without enumerating the catalogue (2026-10-23)
+
+- Profiling the headless 0.3 workload at `b42a7f1` showed that resolving one
+  Parametric variable walked and labelled all preceding generated point properties.
+  One public read on a 256-point curve made 1,170,890 profiled calls, taking about
+  250 ms. Point labels repeatedly searched the point collection.
+- The owning property catalogue now traverses only the requested semantic path.
+  Discovery and direct lookup share dimension/type metadata, descriptor construction,
+  labels and Parametric read-only policy. Transform lookup retains its existing
+  provider. Excluded state and noncanonical collection aliases remain ineligible.
+  No additional cache, document lifetime or native numerical algorithm is introduced.
+- The same public probe now makes 585 calls in about 1 ms. The synthetic 12-curve,
+  256-point, one-Body workload's unrecorded edit median was 787.49 ms before and
+  142.74 ms after. Shared-worker load and a single before/after sequence limit the
+  comparison; this is not evidence of overall desktop responsiveness.
+- Evidence: 111 focused property, shortcut, driver, Parametric, integer and architecture
+  cases pass; configured Ruff/mypy pass. Descriptor equivalence covers five kinds
+  of construction, named fields and component addresses. Both production-QML
+  acceptance tools pass. The first concurrent full gate caught an intermediate
+  function-length violation; after correction, the full settled-code gate at
+  `57c93ec` passes all 1,880 pytest cases, five native CTests, 170 owned native style
+  inputs, headless workflow and wheel checks. The committed profiling tool also
+  passes its numerical checks on that revision.
+- [Profiling evidence](research/shortcuts_030/performance_qualification.md) records
+  reproducible compilation, packing, native evaluation and application workloads,
+  numerical checks, bounded expression-cache occupancy and recorder limits. Raw
+  artifacts are ignored/local only. Original-addon parity and Windows release
+  qualification remain pending.
+
+### CH-053 — Preserve Parametric symbol identity during authoring edits (2026-10-23)
+
+- Review reproduced renaming a radius variable leaving XYZ equations with an unknown
+  old symbol; evaluation failed and retained stale geometry. The earlier lifecycle
+  test manually changed equations afterward, so it did not verify the direct UI action.
+- The Parametric authoring boundary now rewrites unchanged XYZ and interval expression
+  identifiers by stable variable identity, atomically with variable edits. Simultaneous
+  renames use one mapping, preventing cascaded substitution. Explicitly supplied changed
+  equations retain their supplied meaning. Removal rejects surviving expression references.
+  Core symbol validation rejects the native language's reserved names before mutation.
+- This is equation-text/reference maintenance, not a Python numerical evaluator. Native
+  compilation, uniform sampling, deformation and accepted-result failure semantics are
+  unchanged. The existing transaction supplies coherent undo/cancel behavior.
+- Evidence: 34 lifecycle/architecture cases pass, including exact geometry preservation,
+  one-action undo, interval expressions, overlapping names, simultaneous swaps, explicit
+  replacement and native/core reserved-name agreement. Full release checks remain pending.
+
+### CH-054 — Exact signed-minimum literals and located Parametric failures (2026-10-23)
+
+- Review found that parsing the positive token before unary negation rejected the
+  valid signed 64-bit minimum. Native prefix parsing now consumes signed literals
+  directly when no exponent binds first. Power precedence, exact integer arithmetic,
+  overflow rejection and the language's type/unit checks remain intact.
+- Parametric runtime failures now identify XYZ expression, sample index and exact
+  parameter value; compilation failures identify their equation/interval. The sampling
+  algorithm, failure retention and cancellation contracts are unchanged. Diagnostics
+  add work only on failure, not per-sample Python callbacks.
+- Evidence: 68 expression/Parametric/architecture cases pass, including minimum and
+  overflowing integers, exponent precedence and a singularity at Y sample 1, t=0.5.
+
+### CH-055 — Resolve Auto attachment strategy from surface capability (2026-10-23)
+
+- Addon inspection and real Pubis capture confirmed Auto uses Deformation Flow for
+  curve-deformed geometry. Standalone treated every Auto binding as Stable Surface.
+- Shared core capability policy now recognizes curve-deformed Body construction.
+  Capture and batched propagation use the same policy; temporary shortcut capture
+  retains the immutable construction needed to make the same decision. No new
+  solver, nearest-surface recapture, or per-sample callback is introduced.
+- Existing Auto bindings lacking a secondary flow sample still use the native stable
+  fallback, preserving loaded poses and startup policy. Imported/other construction
+  remains Stable in Auto; explicit Deformation Flow remains available.
+- Actual Pubis/Ilium source poses match native propagation within 1.94485e-5 for
+  explicit and Auto flow, under the existing 3e-5 tolerance. Cheekbone backsolve matches
+  within 7.89165e-8. Synthetic tests verify capture capability, legacy fallback and
+  unchanged retained bindings. See [scope and provenance](research/shortcuts_030/windows_review.md).
+
+### CH-056 — Preserve one-element numerical collections (2026-10-23)
+
+- A 1×1×1 lattice's single weight failed through property/shortcut/formula writes:
+  component count alone coerced its tuple into a scalar. Descriptors now retain
+  vector shape independently of count. Scalar and component edits remain scalar;
+  whole collection writes retain their tuple. Formula input selection requires a
+  component for vectors, including one-element vectors, through UI and API.
+- Evidence: a public creation/resize/weight-edit regression failed before the fix;
+  direct, wrapper, Uniform and native formula writes now preserve `(weight,)`.
+  This changes candidate packing/validation, not native deformation arithmetic.
+
+### CH-057 — Bound profiler connections by observed model objects (2026-10-23)
+
+- Packaged qualification marked desktop reports incomplete. The full window has
+  17,938 QObjects and exceeded the observer's 16,384-object cap, even though most
+  objects have no model-related signals. The failure was retained and investigated;
+  the report completeness assertion was not weakened.
+- Model discovery now uses one application event filter, scoped to registered roots,
+  while recording. Only model-signal/keyboard objects retain signal connections.
+  New children are still observed after construction through a bounded queued callback.
+  The 16,384 observed-object and 4,096 pending-child limits remain; registered roots
+  are bounded to 16. Observer-owned objects are excluded. Stopping destroys the
+  observer/filter; disabled recording introduces no observer traversal or polling.
+- Qt's [application filters](https://doc.qt.io/qt-6/qcoreapplication.html#notify) cover
+  main-thread events; [ChildAdded](https://doc.qt.io/qt-6/qchildevent.html) occurs before
+  full construction. Native recording support remains GUI-thread scoped, with no
+  Python callbacks for native model observation. Broader thread coverage is not claimed.
+- The full-window workflow report now reports complete=true, zero dropped events and
+  zero skipped model watches. It includes a deliberately created late model's reset
+  signal beneath a non-model parent, as well as existing UI/task/native events. This
+  establishes discovery/completeness on the failing workload, not a general speedup;
+  start/collection overhead remains explicitly measured.
+
+### CH-058 — Preserve generated-point reference meaning on resolution edits (2026-10-23)
+
+- Observed at `bf7ced4`: increasing a Parametric curve from 5 to 9 points reused an
+  endpoint identity for an interior sample, silently retargeting a restricted Hook.
+  Native sampling itself was correct; retaining index identities across a topology
+  change violated authored membership intent. The user selected locking over remapping.
+- The existing shared Parametric policy now blocks resolution changes while curve-point
+  deformer membership/weights or formula input/target references exist. Disabled
+  definitions retain intent and the lock. Whole-curve deformers remain supported without
+  a lock; removing the point references unlocks. Engine restoration cannot bypass this
+  rule. Property inspection supplies the same reason to the desktop tooltip and shortcut
+  fields. Existing junction and incoming-attachment locks remain intact.
+- Native equations, sampling and deformation are unchanged. Blocked formula outputs retain
+  settings, points and bitwise-identical accepted path samples while reporting failure.
+  No automatic remapping or implicit clearing of authored references is introduced.
+- Evidence: the formerly expected-failure endpoint Hook regression passes; 26 focused
+  tests cover direct/property/wrapper edits, disabled membership, Hook/lattice weights,
+  formula targets and inputs, formula failure/recovery, Undo, restoration and existing
+  consumer locks. The production-QML editor refuses edits while locked and permits them
+  after reference removal. Final qualification passes 1,945 tests with no expected failures,
+  five CTests and the complete 0.3.0 portable suite. The shipped executable independently
+  rejects locked API/property/shortcut edits, retains the old count and unlocks on removal.
+- Reference: Blender's [Hook modifier](https://docs.blender.org/manual/en/latest/modeling/modifiers/deform/hooks.html)
+  likewise stores point indices; this supports identifying the membership hazard, not an
+  upstream remapping guarantee. Parameter-preserving remapping remains outside 0.3.

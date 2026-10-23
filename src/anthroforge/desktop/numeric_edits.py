@@ -23,7 +23,7 @@ class NumericEdits(QObject):
             return False
         session.begin()
         self.owner = owner
-        owner.destroyed.connect(self.cancel)
+        owner.destroyed.connect(self.owner_destroyed)
         self.changed.emit()
         return True
 
@@ -37,11 +37,16 @@ class NumericEdits(QObject):
         if self.active:
             self.finish(True)
 
-    def finish(self, canceled):
+    @Slot()
+    def owner_destroyed(self):
+        if self.active:
+            self.finish(True, disconnect=False)
+
+    def finish(self, canceled, disconnect=True):
         owner = self.owner
         self.owner = None
-        if isValid(owner):
-            owner.destroyed.disconnect(self.cancel)
+        if disconnect and isValid(owner):
+            owner.destroyed.disconnect(self.owner_destroyed)
         self.controller.run("cancel" if canceled else "commit", {})
         self.finished.emit(canceled)
         self.changed.emit()

@@ -1,6 +1,10 @@
 # AnthroForge 0.3 — Shortcuts and parametric curves implementation plan
 
-**Status: confirmed, not implemented.** Product authority is
+**Status: implemented and qualified in 0.3.0.** Current
+implementation and evidence are tracked in the [local review](tasks/shortcuts-parametric-030.md)
+and historical [cloud continuation](tasks/shortcuts-parametric-030-cloud.md).
+The plan below retains the original baseline diagnosis and required acceptance.
+Product authority is
 [specification_030.md](specification_030.md); apply the
 [engineering guidelines](engineering_guidelines.md). The inspected baseline is 0.2.4
 at `4029809`, including the completed shortcut research. The
@@ -62,8 +66,8 @@ to reproduce. Source observations are not dynamic parity or application performa
 
 ### Shared API additions
 
-Extend the existing catalogue with these operation families. They are planned interfaces,
-not currently callable commands; freeze exact signatures alongside implementation/tests.
+Extend the existing catalogue with these operation families. Implemented signatures and
+a runnable example are documented in the [development walkthrough](shortcuts_030.md).
 
 | Family | Required operations and result information |
 | --- | --- |
@@ -225,12 +229,18 @@ Reuse existing creation-scale, numerical-control, lifecycle and presentation con
 do not introduce adaptive sampling, inverse parameter fitting or new approximation gates
 under the guise of implementation defaults.
 
-The parser dependency and its performance are unqualified. Backend qualification is an
-explicit delivery task, not an unresolved product-language choice. This plan does not
-claim formula evaluation, generated-point interaction or schema-4 migration exists today.
+The [expression qualification](research/shortcuts_030/expression_qualification.md) selected
+the restricted native typed compiler after candidate comparison; no parser dependency
+was added. Formula evaluation, generated-point interaction and schema-4 reading exist
+on the feature branch. [Windows review](research/shortcuts_030/windows_review.md) records
+actual source-addon parity, UI and old-executable compatibility evidence. Release
+packaging passes the full portable suite. The confirmed generated-point reference lock is
+implemented through shared Parametric validation and property inspection, with direct,
+formula, restoration, Undo and offscreen editor regressions.
 Fixed sampling does not prove analytic continuity, and exact finite-path conversion does
 not promise an exact unsampled analytic curve.
 
 Validate in the background while the user uses the computer. Offscreen checks establish
 only their observed render/interaction scope, not unperformed interactive acceptance.
-No application rebuild is warranted for this specification-consolidation change itself.
+The original documentation-consolidation task did not require an application rebuild;
+the subsequent runtime implementation follows the full delivery gate above.

@@ -2,9 +2,10 @@
 
 - [Findings and historical proposals](../../shortcuts_030_research.md)
 - [Confirmed 0.3 specification](../../specification_030.md)
-- [Implementation plan](../../implementation_030.md) — confirmed, not implemented
+- [Implementation plan](../../implementation_030.md) — release acceptance pending
 - [All shortcuts and exact driver formulas](inventory.md)
 - [Machine-readable inventory](inventory.json)
+- [Headless expression and driver profiling](performance_qualification.md)
 
 The files are definition evidence, not a migration or geometry acceptance result.
 The inventories are available in Git; the source `.blend` files remain local assets.

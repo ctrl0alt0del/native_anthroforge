@@ -6,6 +6,7 @@ ColumnLayout {
     id: setting
     property string label: "Position"
     property var values: [0,0,0]
+    property var propertyReference: ({})
     property bool length: false
     property bool live: true
     property int decimals: 4
@@ -19,6 +20,7 @@ ColumnLayout {
             model: 3
             UiNumberField {
                 id: field; required property int index
+                propertyReference: setting.propertyReference.target ? Object.assign({},setting.propertyReference,{component:index}) : ({})
                 objectName: "vector"+setting.label+index
                 Layout.fillWidth: true; Layout.preferredWidth: 75; leftPadding: 20
                 value: Number(setting.values[field.index] || 0)/setting.unitFactor

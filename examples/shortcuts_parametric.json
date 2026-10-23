@@ -1,0 +1,17 @@
+[
+  {"operation":"workspace.update","arguments":{"display_units":"mm"}},
+  {"id":"circle","operation":"curve.create","arguments":{"name":"Parametric circle","engine":"PARAMETRIC","closed":true,"settings":{"x":"r*cos(t)","y":"r*sin(t)","z":"0*m","resolution":64,"interval":{"end_expression":"2*pi"},"variables":[{"id":"radius","name":"r","label":"Radius","dimension":"LENGTH","value":0.03}]}}},
+  {"operation":"wait"},
+  {"id":"radius_property","operation":"property.get","arguments":{"reference":{"target":"$circle","path":["engine_settings","variables","@radius","value"]}}},
+  {"operation":"shortcut.expose","arguments":{"reference":"$radius_property.reference","label":"Circle radius"}},
+  {"id":"radius_driver","operation":"driver.create","arguments":{"label":"Radius control","dimension":"LENGTH","value":0.03}},
+  {"id":"radius_formula","operation":"driver.formula.add","arguments":{"driver":"$radius_driver","target":"$radius_property.reference","expression":"value"}},
+  {"operation":"wait"},
+  {"operation":"driver.value","arguments":{"driver":"$radius_driver","value":0.05}},
+  {"operation":"wait"},
+  {"id":"radius_result","operation":"property.get","arguments":{"reference":"$radius_property.reference"}},
+  {"id":"driver_result","operation":"driver.inspect","arguments":{"driver":"$radius_driver"}},
+  {"operation":"shortcut.list"},
+  {"operation":"save","arguments":{"path":"build/shortcuts-parametric.anthroforge","blocked_policy":"wait"}},
+  {"operation":"wait"}
+]

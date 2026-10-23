@@ -3,7 +3,7 @@
 from dataclasses import replace
 from typing import Any
 
-from . import curve_copy, curve_independence, curve_sources, junction_copies
+from . import curve_copy, curve_independence, curve_sources, junction_copies, shortcut_copies
 from .curve_copy_resources import Copies
 from .object_revisions import authored
 
@@ -17,7 +17,11 @@ def independent(session: Any, item: Any, curve: str) -> str:
     objects = tuple(changed if o.id == item.id else o for o in session.document.objects)
     junctions = session.document.junctions + junction_copies.records(session.document, mapping)
     session.scheduler.invalidate({item.id})
-    session.replace_document(objects=(*objects, *copies), junctions=junctions)
+    session.replace_document(
+        objects=(*objects, *copies),
+        junctions=junctions,
+        **shortcut_copies.state(session.document, mapping, frozenset({item.id})),
+    )
     return str(mapping[curve])
 
 

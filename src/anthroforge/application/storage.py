@@ -15,12 +15,23 @@ from anthroforge.core.entities import SCP, Attachment, AttachmentReceipt, Worksp
 from anthroforge.core.junctions import decode as decode_junction
 from anthroforge.native.mesh import GeometryEngine
 
-from . import object_codec, resource_storage
+from . import object_codec, resource_storage, shortcut_codec
 from .construction_codec import control, entity_construction
 from .resources import Resources
 
 FORMAT = "anthroforge-project"
-VERSION = 4
+VERSION = 5
+READ_VERSIONS = (4, 5)
+STATE_RECORDS = (
+    "entities",
+    "controls",
+    "workspaces",
+    "junctions",
+    "shortcuts",
+    "driving_shortcuts",
+    "formula_results",
+    "shortcut_edits",
+)
 
 
 class FileLock:
@@ -68,7 +79,7 @@ def document_state(document: Document) -> dict[str, Any]:
         f.name: getattr(document, f.name) for f in fields(document) if not f.name.startswith("_")
     }
     state["id"] = str(document.id)
-    for name in ("entities", "controls", "workspaces", "junctions"):
+    for name in STATE_RECORDS:
         state[name] = [asdict(value) for value in state[name]]
     state["objects"] = [object_codec.encode(value) for value in document.objects]
     return state
@@ -114,7 +125,13 @@ def decode_pose_receipt(value: Any) -> AttachmentReceipt | None:
         data[key] = tuple(data[key])
     settings = dict(data["settings"])
     settings["binding"] = tuple(settings["binding"])
+    if data.get("effective") is not None:
+        data["effective"] = decoded_attachment(data["effective"])
     return AttachmentReceipt(**{**data, "settings": Attachment(**settings)})
+
+
+def decoded_attachment(value: dict[str, Any]) -> Attachment:
+    return Attachment(**dict(value, binding=tuple(value.get("binding", ()))))
 
 
 def decode_workspace(data: dict[str, Any]) -> Workspace:
@@ -137,13 +154,13 @@ def decode_document(data: dict[str, Any]) -> Document:
     data["junctions"] = tuple(decode_junction(item) for item in data.get("junctions", ()))
     if not data["workspaces"]:
         raise ValueError("Project has no workspace.")
-    return Document(**data)
+    return Document(**(data | shortcut_codec.document_fields(data)))
 
 
 def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resources]:
     with zipfile.ZipFile(path) as archive:
         data = json.loads(archive.read("manifest.json"))
-        if data.get("format") != FORMAT or data.get("version") != VERSION:
+        if data.get("format") != FORMAT or data.get("version") not in READ_VERSIONS:
             raise ValueError("Unsupported AnthroForge project format/version.")
         document = decode_document(data["document"])
         resources = resource_storage.read(archive, data, engine)

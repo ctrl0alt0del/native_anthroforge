@@ -127,12 +127,16 @@ def lattice_point(session: "Session", control: str, index: int, position: list[f
 
 def lattice_resize(session: "Session", control: str, resolution: list[int]) -> None:
     item = editable(session, control)
+    install(session, resize_candidate(session, item, resolution))
+
+
+def resize_candidate(session: "Session", item: Control, resolution: list[int]) -> Control:
     dimensions = native.lattice_resolution(session.engine, resolution)
     points = native.lattice_grid(session.engine, dimensions)
     linear = replace(item, interpolation=("LINEAR",) * 3, weights=())
-    binding = Deformer("LATTICE", control, Target(control, "LATTICE"))
+    binding = Deformer("LATTICE", item.id, Target(item.id, "LATTICE"))
     resized = native.lattice(session.engine, points, linear, binding, IDENTITY, IDENTITY, 0)
-    install(session, resized_cage(item, resized, dimensions))
+    return resized_cage(item, resized, dimensions)
 
 
 def resized_cage(item: Control, points: Any, dimensions: tuple[int, ...]) -> Control:

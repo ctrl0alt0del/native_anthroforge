@@ -79,6 +79,7 @@ class Job:
     renew_inputs: Callable[["Job", Document], None] | None = None
     inputs_key: Callable[[Document], Any] | None = None
     accepted_inputs_key: Any = None
+    edit_contexts: tuple[str, ...] = ()
 
     @property
     def active(self) -> bool:

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 
-from . import construction_validation, dependency_graph, snapshot_definitions
+from . import construction_validation, dependency_graph, formula_dependencies, snapshot_definitions
 from .construction import Control
 from .deformer_references import signature as binding_signature
 from .entities import SCP, validate_tree
@@ -50,6 +50,7 @@ class DocumentIndex:
     structure: Structure
     source_objects: tuple[Any, ...] = ()
     source_junctions: tuple[Any, ...] = ()
+    source_drivers: tuple[Any, ...] = ()
 
 
 def signatures(document: "Document", previous: DocumentIndex | None) -> dict[str, tuple[Any, ...]]:
@@ -103,13 +104,25 @@ def validated_structure(
 
 
 def construction_graph(document: "Document") -> dependency_graph.DependencyGraph:
-    return dependency_graph.build(
+    graph = dependency_graph.build(
         document.entities,
         document.controls,
         document.attachments_enabled,
         document.objects,
         document.junctions,
     )
+    return with_formulas(document, graph)
+
+
+def with_formulas(
+    document: "Document", graph: dependency_graph.DependencyGraph
+) -> dependency_graph.DependencyGraph:
+    if not document.driving_shortcuts:
+        return graph
+    edges = {port: set(inputs) for port, inputs in graph.items()}
+    records = {v.id: v for v in (*document.entities, *document.controls, *document.objects)}
+    formula_dependencies.extend(edges, document.driving_shortcuts, records)
+    return dependency_graph.indexed(edges, dict(graph.routing_excluded), graph.routing_scene)
 
 
 def structure(document: "Document", previous: DocumentIndex | None) -> Structure:
@@ -150,6 +163,7 @@ def reusable(document: "Document", previous: DocumentIndex) -> bool:
         and document.controls is previous.source_controls
         and document.objects is previous.source_objects
         and document.junctions is previous.source_junctions
+        and document.driving_shortcuts is previous.source_drivers
         and document.attachments_enabled == previous.structure.attachments
     )
 
@@ -167,6 +181,7 @@ def build(document: "Document", previous: DocumentIndex | None) -> DocumentIndex
         relationships,
         document.objects,
         document.junctions,
+        document.driving_shortcuts,
     )
 
 
@@ -180,6 +195,7 @@ def object_links(document: "Document", previous: DocumentIndex | None = None) ->
             for o in document.objects
         )
         + document.junctions
+        + formula_dependencies.signature(document.driving_shortcuts)
     )
 
 
@@ -209,6 +225,7 @@ def object_link(item: Any, document: "Document") -> tuple[Any, ...]:
     return (
         item.id,
         type(item).__name__,
+        getattr(item, "engine", ""),
         item.parent,
         frozenset(construction_inputs(item, document.objects, document.junctions)),
         tuple(c.curve for c in getattr(item, "curves", ())),

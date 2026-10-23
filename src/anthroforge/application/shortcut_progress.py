@@ -50,7 +50,7 @@ def outcome(session: Any, record: Any, rows: Any, jobs: Any) -> str:
 
 
 def waiting(session: Any, pending: Any) -> str:
-    if any(r["update_mode"] == "MANUAL" or r["pending"] for r in pending):
+    if any(r["update_mode"] == "MANUAL" for r in pending):
         return "waiting_manual"
     if (
         pending

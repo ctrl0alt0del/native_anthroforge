@@ -33,7 +33,14 @@ def definitions() -> dict[str, Query]:
         paint=Query(painting.validate, painting.signature, painting.compute, tissue.workload),
         section=Query(sections.validate, sections.signature, sections.compute, sections.workload),
         route=Query(route.validate, route.signature, route.compute, route.workload),
+        shortcut=shortcut_query(),
     )
+
+
+def shortcut_query() -> Query:
+    from . import shortcut_anchor_query as shortcut
+
+    return Query(shortcut.validate, shortcut.signature, shortcut.compute, shortcut.workload)
 
 
 def tissue_queries() -> dict[str, Query]:

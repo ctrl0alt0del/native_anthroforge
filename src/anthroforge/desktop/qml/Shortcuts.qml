@@ -62,6 +62,7 @@ ColumnLayout {
             required property bool writable
             required property string reason
             required property string ownerLabel
+            required property string statusText
             width: ListView.view.width; spacing: 4
             RowLayout {
                 Layout.fillWidth: true
@@ -71,9 +72,11 @@ ColumnLayout {
                 }
                 Label { text: row.label; Layout.fillWidth: true; wrapMode: Text.Wrap; color: Theme.text }
                 UiButton { glyph: "more"; flatStyle: true; hint: "Shortcut options"; onClicked: options.open() }
+                UiButton { objectName: "shortcutStatus_"+row.key; text: row.statusText ? (row.statusText==="Complete" ? "✓" : "◷") : "ⓘ"; hint: row.statusText || "Inspect shortcut"; flatStyle: true; Layout.preferredWidth: 30; onClicked: { panel.adapter.editing.select(row.key); panel.adapter.editing.inspectionView.activate(true); } }
                 UiMenu {
                     id: options
                     UiMenuItem { text: "Edit shortcut"; onTriggered: panel.adapter.editing.select(row.key) }
+                    UiMenuItem { text: "Inspect shortcut"; onTriggered: { panel.adapter.editing.select(row.key); panel.adapter.editing.inspectionView.activate(true); } }
                     UiMenuItem { text: "Move up"; onTriggered: panel.adapter.move(row.key,-1) }
                     UiMenuItem { text: "Move down"; onTriggered: panel.adapter.move(row.key,1) }
                     UiMenuItem { text: "Hide from shortcuts"; onTriggered: panel.adapter.hide(row.key) }

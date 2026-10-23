@@ -2,13 +2,17 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
-ColumnLayout {
+ScrollView {
     id: editor
     required property var adapter
     property var details: adapter.details
     property string purpose: ""
     property string inputFormula: ""
     property string targetFormula: ""
+    clip: true
+    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+    ColumnLayout {
+    width: editor.availableWidth
     spacing: Theme.inset
     RowLayout {
         Layout.fillWidth: true
@@ -46,6 +50,8 @@ ColumnLayout {
         UiButton { text: "Add target"; onClicked: { editor.targetFormula=""; editor.purpose="TARGET"; editor.adapter.discover("","TARGET"); } }
     }
     ShortcutPolicies { Layout.fillWidth: true; adapter: editor.adapter.policies }
+    ShortcutPropertyValue { visible: editor.details.kind === "PROPERTY"; adapter: editor.adapter; details: editor.details; Layout.fillWidth: true }
+    ShortcutInspection { objectName: "shortcutInspection"; Layout.fillWidth: true; adapter: editor.adapter.inspectionView }
     UiButton { visible: editor.details.kind === "DRIVER"; text: "Delete driver"; hint: "Remove this driver and its formulas; retain current target values"; onClicked: editor.adapter.removeDriver() }
     ColumnLayout {
         visible: !!editor.purpose; Layout.fillWidth: true
@@ -74,7 +80,7 @@ ColumnLayout {
         }
     }
     ListView {
-        objectName: "drivingFormulaList"; Layout.fillWidth: true; Layout.fillHeight: true
+        objectName: "drivingFormulaList"; Layout.fillWidth: true; Layout.preferredHeight: 300
         visible: editor.details.kind === "DRIVER"; model: editor.adapter.formulas
         clip: true; spacing: Theme.inset; ScrollBar.vertical: ScrollBar {}
         delegate: ColumnLayout {
@@ -119,5 +125,6 @@ ColumnLayout {
                 }
             }
         }
+    }
     }
 }

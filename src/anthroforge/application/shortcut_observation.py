@@ -29,6 +29,8 @@ class Observation:
         self.active = ""
         self.serial = 0
         self.pruned: tuple[Any, ...] = ()
+        self.graph: Any = None
+        self.progress: dict[str, Any] = {}
 
     def begin(self, shortcut: Any) -> None:
         from .shortcut_effects import affected
@@ -53,7 +55,9 @@ class Observation:
         if self.active:
             causes.add(self.active)
         for record in self.latest.values():
-            if record.outcome == "updating" and any(p.owner in job.outputs for p in record.ports):
+            if record.outcome in ("waiting_manual", "waiting_release") and any(
+                p.owner in job.outputs for p in record.ports
+            ):
                 causes.add(record.id)
         job.causes = tuple(sorted(causes & self.records.keys()))
 
@@ -78,6 +82,7 @@ class Observation:
         for record in self.records.values():
             record.outcome = "superseded"
         self.formulas.clear()
+        self.progress.clear()
         self.serial += 1
         self.prune()
 
@@ -86,11 +91,25 @@ class Observation:
             id(self.session.document.shortcuts),
             id(self.session.document.driving_shortcuts),
             self.serial,
+            self.session.document.revision,
+            self.active,
         )
         if stamp == self.pruned:
             return
         self.pruned = stamp
         self.collect()
+        self.settle()
+
+    def settle(self) -> None:
+        from .shortcut_progress import inspect
+
+        for key, record in self.latest.items():
+            if record.outcome in ("complete", "cancelled", "superseded"):
+                continue
+            value = inspect(self.session, key)
+            self.progress[key] = value
+            if record.id != self.active:
+                record.outcome = value["state"]
 
     def collect(self) -> None:
         shortcuts = {
@@ -103,6 +122,14 @@ class Observation:
         self.effects = {k: v for k, v in self.effects.items() if k in shortcuts}
         ids = self.session.document.formula_index.formulas
         self.formulas = {k: v for k, v in self.formulas.items() if k in ids}
+        self.limit_history()
+
+    def limit_history(self) -> None:
+        # Active jobs retain causal identity; completed history is a bounded recent window.
+        self.latest = dict(list(self.latest.items())[-64:])
+        self.progress = {k: v for k, v in self.progress.items() if k in self.latest}
+        self.formulas = dict(list(self.formulas.items())[-1024:])
+        self.effects = dict(list(self.effects.items())[-8:])
 
 
 def observe(record: EditEvidence, job: Any, phase: str) -> None:

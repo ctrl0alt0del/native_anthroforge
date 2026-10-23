@@ -9,23 +9,25 @@
 
 ## Current state
 
-Shared inspection APIs and runtime observation are implemented. Formula evaluation
-retains compact input evidence without changing arithmetic. Causal annotations observe
-submission/coalescing/publication independently of attachment contexts. UI/overlays,
-bounded evidence refinements and full lifecycle/performance qualification remain.
-Detailed design: `docs/specification_031.md` and `docs/implementation_031.md` (to create).
+Shared inspection APIs, runtime observation, editor sections, stable status, and optional
+mesh/path/anchor overlays are implemented. Formula input evidence is distinct from current
+values. Inspection observes submission/coalescing/publication independently of attachment
+contexts. Recent edit/effect/formula caches have entry limits. Qualification remains in progress.
+Detailed design: `docs/specification_031.md` and `docs/implementation_031.md`.
 
 ## Verification
 
-25 focused tests pass (inspection, formula and retained-binding suites); new application
-modules pass strict typing. Pending UI integration, broader contract/native tests, production geometry preservation,
-profiling, offscreen UI/render acceptance, development gate and portable release.
+Shared inspection/lifecycle tests pass, including Manual/On Release pauses, cancellation,
+and no attribution of later direct edits to a finished shortcut. Existing offscreen shortcut
+editor acceptance passes; strict typing passes. Native build is running (log under build/).
+Pending detailed UI/overlay acceptance, broader contracts, production geometry preservation,
+profiling, full development gate and portable release. This checkpoint is not release-ready.
 
 ## Next actions
 
-1. Implement read-only inspection contracts and bounded runtime causal observation.
-2. Integrate shortcut editor, stable status and revision-qualified effects overlays.
-3. Qualify against current fixtures and package one canonical 0.3.1 release.
+1. Finish explanatory UI details and verify fixed layouts/overlay revision agreement.
+2. Broaden causal lifecycle coverage and qualify performance on production assembly.
+3. Run complete gates, package canonical 0.3.1, validated merge/push.
 
 ## Recovery
 

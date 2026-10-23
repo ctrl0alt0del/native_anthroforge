@@ -4,6 +4,7 @@ from dataclasses import asdict
 from typing import Any
 
 from anthroforge.core.formula_dependencies import property_port
+from anthroforge.core.numeric_properties import overlaps
 from anthroforge.core.results import Port
 from anthroforge.core.shortcuts import Shortcut
 
@@ -26,7 +27,7 @@ def inspect(session: Any, shortcut: str) -> dict[str, Any]:
         matches = [
             d
             for d in session.document.driving_shortcuts
-            if any(f.target == value.reference for f in d.formulas)
+            if any(overlaps(f.target, value.reference) for f in d.formulas)
         ]
     else:
         matches = [value]

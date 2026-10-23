@@ -43,10 +43,14 @@ def ports(document: Any, value: Any) -> frozenset[Port]:
 def affected(session: Any, value: Any) -> frozenset[Port]:
     service = session.shortcut_observation
     graph = dependencies.graph(session.document)
-    stamp = (graph, value)
+    if service.graph is not graph:
+        service.effects.clear()
+        service.graph = graph
+    stamp = value
     previous = service.effects.get(value.id)
     if previous is None or previous[0] != stamp:
         service.effects[value.id] = (stamp, ports(session.document, value))
+        service.effects = dict(list(service.effects.items())[-8:])
     return frozenset(service.effects[value.id][1])
 
 

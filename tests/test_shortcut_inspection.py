@@ -78,3 +78,46 @@ def test_effects_validate_pages_and_deleted_identity(session):
         session.command("shortcut.effects", shortcut="missing")
     row = session.command("shortcut.effects", shortcut=key, limit=1)
     assert len(row["rows"]) == 1 and row["total"] > 1
+
+
+@pytest.mark.parametrize("mode", ["MANUAL", "ON_RELEASE", "LIVE"])
+def test_readiness_survives_edit_pause_and_evaluation(session, assembly, mode):
+    _, child = assembly
+    ref = reference(child, ("transform", "scale"), 0)
+    key = session.command("shortcut.expose", reference=ref)
+    session.command("update_mode", entity=child, mode=mode)
+    session.begin()
+    session.command("shortcut.set", reference=ref, value=2)
+    session.wait(5)
+    expected = dict(MANUAL="waiting_manual", ON_RELEASE="waiting_release", LIVE="complete")
+    assert session.command("shortcut.progress", shortcut=key)["state"] == expected[mode]
+    session.commit()
+    session.command("evaluate", entities=[child])
+    session.wait(5)
+    assert session.command("shortcut.progress", shortcut=key)["state"] == "complete"
+
+
+def test_later_direct_edit_is_not_attributed_to_completed_shortcut(session):
+    target = curve(session)
+    key = session.command("shortcut.expose", reference=reference(target))
+    session.command("shortcut.set", reference=reference(target), value=12)
+    session.wait(5)
+    serial = session.shortcut_observation.serial
+    session.command("property.set", reference=reference(target), value=16)
+    session.wait(5)
+    assert session.shortcut_observation.serial == serial
+
+
+def test_cancelled_gesture_and_new_edit_have_distinct_observations(session, assembly):
+    _, child = assembly
+    ref = reference(child, ("transform", "scale"), 0)
+    key = session.command("shortcut.expose", reference=ref)
+    session.begin()
+    session.command("shortcut.set", reference=ref, value=2)
+    first = session.command("shortcut.progress", shortcut=key)["edit"]
+    session.cancel()
+    session.wait(5)
+    assert session.command("shortcut.progress", shortcut=key)["state"] == "cancelled"
+    session.command("shortcut.set", reference=ref, value=3)
+    session.wait(5)
+    assert session.command("shortcut.progress", shortcut=key)["edit"] != first

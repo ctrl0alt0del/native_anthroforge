@@ -23,6 +23,7 @@ Item {
     property string viewName: "User view"
     property string toolMode: "Move"
     property string anchorMode: ""
+    ViewSnapshot { id: shortcutEffects; source: workspace.shortcutPanel.editing.inspectionView }
     property bool orthographic: false
     readonly property vector3d imageViewAxis: Qt.vector3d(view.camera.forward.x, -view.camera.forward.z, view.camera.forward.y)
     readonly property string imageAlignmentAxis: !orthographic ? "" : Math.abs(imageViewAxis.x)>0.999999 ? "X" : Math.abs(imageViewAxis.y)>0.999999 ? "Y" : Math.abs(imageViewAxis.z)>0.999999 ? "Z" : ""
@@ -242,12 +243,17 @@ Item {
             materials: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: "#33363c"; cullMode: Material.NoCulling }
             opacity: .22
         }
-        PathScene {}
+        PathScene { effects: shortcutEffects.data }
         Node {
             id: worldScene
             eulerRotation.x: -90
             TissueInspectionScene { distance: viewport.distance }
             RouteInspectionScene { distance: viewport.distance }
+            Model {
+                objectName: "shortcutAnchorEffects"
+                geometry: ControlGeometry { points: shortcutEffects.data.lines || []; segments: true; stroke: viewport.distance*.0015 }
+                materials: DefaultMaterial { diffuseColor: "#76e6ac"; lighting: DefaultMaterial.NoLighting }
+            }
             PointScene { markerScale: viewport.gizmoSize * 0.0012 }
             ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis }
             Repeater3D {
@@ -296,6 +302,19 @@ Item {
                         }
                     }
                     ResourceLoader { geometries: [meshNode.geometry] }
+                    Node {
+                        parent: shortcutOutline.sceneRoot
+                        position: Qt.vector3d(item.trs[0],item.trs[1],item.trs[2])
+                        rotation: Qt.quaternion(item.quaternion[0],item.quaternion[1],item.quaternion[2],item.quaternion[3])
+                        scale: Qt.vector3d(item.trs[6],item.trs[7],item.trs[8])
+                        Model {
+                            objectName: "shortcutMask_"+item.key
+                            visible: !!shortcutEffects.data.shown && item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id)
+                            position: meshNode.position
+                            geometry: MeshGeometry { assetId: shortcutEffects.data.shown ? item.handle : 0; chunk: item.chunk }
+                            materials: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: shortcutEffects.data.colors?.[item.id] || "black"; cullMode: Material.NoCulling }
+                        }
+                    }
                 }
             }
             Repeater3D {
@@ -324,6 +343,11 @@ Item {
     AuthoringView {
         anchors.fill: parent; sourceCamera: view.camera
         orthographic: viewport.orthographic; distance: viewport.distance
+    }
+    SelectionOutline {
+        id: shortcutOutline; objectName: "shortcutEffectsOutline"; anchors.fill: parent
+        sourceCamera: view.camera; orthographic: viewport.orthographic; useMaskColors: 1
+        visible: !!shortcutEffects.data.shown
     }
     MouseArea {
         id: navigation

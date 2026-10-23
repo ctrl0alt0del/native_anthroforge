@@ -8,7 +8,7 @@ import bpy
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from shortcut_parity_blender_runtime import drain, muscle_objects, register
+from shortcut_parity_blender_runtime import drain, muscle_objects, register, scene_audit
 from shortcut_parity_plan import read, write
 
 
@@ -63,10 +63,20 @@ def tissues(root, rows, arrays):
         objects = muscle_objects(root, row["blender"])
         assert len(objects) <= 1, (row["blender"], [o.name for o in objects])
         obj = objects[0] if objects else None
-        records.append(
-            mesh_record(obj, row["tissue"], row["unit"]["source_name"], "TissueVCP", arrays)
-        )
+        record = mesh_record(obj, row["tissue"], row["unit"]["source_name"], "TissueVCP", arrays)
+        record.update(tissue_settings(root, row, arrays))
+        records.append(record)
     return records
+
+
+def tissue_settings(root, row, arrays):
+    from anthroforge.core.importing.rna import scalar_dict
+
+    base = muscle_objects(root, row["blender"], "BASE")
+    if base:
+        mesh_data(base[0], row["tissue"] + "__base", arrays)
+    muscle = next(m for m in root.af_vcp_system.muscles if m.id == row["blender"])
+    return dict(settings=scalar_dict(muscle))
 
 
 def fiber_map(plan):
@@ -127,6 +137,7 @@ def metadata(root, records, runtime):
         scene_scale=bpy.context.scene.unit_settings.scale_length,
         unit_contract=unit_contract_payload(root),
         blender=bpy.app.version_string,
+        scene_audit=scene_audit(root),
     )
 
 
@@ -159,10 +170,24 @@ def main(addon, output, name):
     root, plan = bpy.data.objects["AF_ROOT"], read(output / "plan.json")
     runtime = drain()
     if name != "baseline":
-        runtime = edit(root, next(c for c in plan["cases"] if c["id"] == name))
+        runtime = edit(
+            root, next(c for c in plan["cases"] if c["id"] == name.removesuffix("-refresh"))
+        )
+    if name.endswith("-refresh"):
+        runtime["explicit_refresh"] = refresh(root)
     rows = read(output / "blender-assembly.json")["rows"]
     capture(root, plan, rows, output / "blender" / name, runtime)
     print("CAPTURED", name, runtime, flush=True)
+
+
+def refresh(root):
+    from anthroforge.app.runtime_api import sync_scene
+    from anthroforge.core.deps.dirty_hints import DirtyHints
+
+    hints = DirtyHints(full=False)
+    hints["FIBER"] = {f.id for f in root.af_vcp_system.fibers}
+    sync_scene(root=root, scene=bpy.context.scene, dirty_hints=hints, source="manual")
+    return drain()
 
 
 if __name__ == "__main__":

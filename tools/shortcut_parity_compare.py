@@ -7,6 +7,7 @@ import numpy as np
 from shortcut_parity_metrics import endpoints, response, statistics, surface
 from shortcut_parity_plan import read, write
 
+from anthroforge.native.components import transformed
 from anthroforge.native.mesh import GeometryEngine
 
 
@@ -54,7 +55,7 @@ def path_comparison(key, a, b, initial):
 
 def compare_object(engine, key, a, b, initial):
     record = a[0]["lookup"][key]
-    result = dict(id=key, name=record["name"], kind=record["kind"], mirror=key.endswith("_mirror"))
+    result = identity(record, b[0]["lookup"][key])
     suffix = "__path" if record["kind"] == "Fiber" else "__vertices"
     if any(key + suffix not in d[1] for d in (*initial, a, b)):
         return dict(result, unavailable=True, reason="Missing baseline or current geometry")
@@ -63,7 +64,41 @@ def compare_object(engine, key, a, b, initial):
         if suffix == "__path"
         else mesh_comparison(engine, key, a, b, initial)
     )
-    return dict(result, **metric)
+    return dict(result, **metric, **stage_comparison(engine, key, a, b, record["kind"]))
+
+
+def identity(app, blender):
+    return dict(
+        id=app["id"],
+        name=app["name"],
+        kind=app["kind"],
+        mirror=app["id"].endswith("_mirror"),
+        addon_status=blender.get("status", ""),
+        addon_error=blender.get("error", ""),
+        app_status=app["status"],
+        source_crop=blender.get("settings", {}).get("output_domain_mode", ""),
+    )
+
+
+def stage_comparison(engine, key, a, b, kind):
+    if kind == "SCP":
+        left, right = geometry(a, key), geometry(b, key)
+        relative = physical_frame(a, key) @ np.linalg.inv(physical_frame(b, key))
+        aligned = transformed(engine, right[0], relative.ravel())
+        return dict(pose_aligned_distance=surface(engine, left, (aligned, right[1])))
+    if kind == "TissueVCP" and all(key + "__base__vertices" in d[1] for d in (a, b)):
+        if b[0]["lookup"][key].get("settings", {}).get("output_domain_mode") == "PLANE":
+            return dict(base_comparison_skipped="Addon cropped base versus app uncropped base")
+        return dict(
+            base_distance=surface(engine, geometry(a, key + "__base"), geometry(b, key + "__base"))
+        )
+    return {}
+
+
+def physical_frame(data, key):
+    frame = np.asarray(data[0]["lookup"][key]["frame"]).reshape(4, 4).copy()
+    frame[:3] *= length_scale(data[0])
+    return frame
 
 
 def compare_case(engine, output, name, initial):

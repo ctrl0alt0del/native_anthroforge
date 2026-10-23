@@ -6,7 +6,7 @@ from pathlib import Path
 import bpy
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from shortcut_parity_blender_runtime import clear_construction, drain, register, save
+from shortcut_parity_blender_runtime import authored_only, clear_construction, drain, register, save
 from shortcut_parity_plan import read, write
 
 
@@ -43,6 +43,7 @@ def main(addon, source, output):
     clear_construction(root)
     plan = read(output / "plan.json")
     rows, warnings = assemble(root, plan, output)
+    authored_only(root)
     state = drain()
     write(output / "blender-assembly.json", dict(rows=rows, warnings=warnings, runtime=state))
     assert state["complete"], state

@@ -49,3 +49,30 @@ completed but its combined FDS radial source is missing (two invalid bindings).
 Investigate the original donor independently; do not silently call this parity.
 Other baseline differences include intentional skeleton construction approximations.
 Blender edited captures and final analytical interpretation remain in progress.
+
+## Investigated differences (qualification still running)
+
+- Humerus +5%: same deformed local surface (pose-aligned distance 1.44e-12),
+  but a 0.148258 world discrepancy propagates down the arm. The app recaptures
+  the edited owner's attachment; addon shortcut sync explicitly applies the owner
+  using its retained binding. A read-only native counterfactual retaining the
+  original app binding reproduces the addon matrix within 1.81e-6. No production
+  behavior has been changed.
+- Radius +5%: authored bone responses are close (about 1e-5). Addon Anconeus
+  Fibers remain at their baseline positions although Ulna moved. Explicit addon
+  VCP refresh reduces that example's app/addon path discrepancy from .0940225
+  to .0003350. This is evidence of stale addon output, not app geometry parity.
+- The original FDS donor is valid when opened, but its radial bindings fail after
+  Ribs/Humerus/Radius edits. Its separate five-case captures under `fds-donor/`
+  distinguish that original limitation from the combined import's baseline failure.
+- Cropped outputs intentionally differ after CH-065's approved material-cut
+  preservation. The comparator must not compare the addon's cropped BASE mesh
+  directly with the app's uncropped base stage; it records that semantic exclusion.
+- The first assembly inherited automatic VCP mirrors. The comparison copy now
+  uses existing explicit authored-only symmetry on Fibers; 190 source base/final
+  meshes stayed byte-identical. Both skeletal sides remain. All four cases are
+  being recaptured on that corrected assembly.
+
+Known-answer native metric checks pass: reversed triangle order, parallel surface
+offset, vertex permutation, topology-change refusal, endpoint displacement and
+centimetre-to-metre normalization. Ruff and the 15-line function check pass.

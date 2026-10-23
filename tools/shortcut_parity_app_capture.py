@@ -24,8 +24,12 @@ def mesh_data(session, item, frame, arrays):
     if not key:
         return dict(empty=True)
     mesh = session.assets[key].mesh
-    arrays[item.id + "__vertices"] = transformed(session.engine, mesh.array(0), frame)
-    arrays[item.id + "__triangles"] = mesh.array(3).copy()
+    return store_mesh(session, item.id, mesh, frame, arrays)
+
+
+def store_mesh(session, key, mesh, frame, arrays):
+    arrays[key + "__vertices"] = transformed(session.engine, mesh.array(0), frame)
+    arrays[key + "__triangles"] = mesh.array(3).copy()
     return dict(vertices=len(mesh.array(0)), triangles=len(mesh.array(3)))
 
 
@@ -51,8 +55,20 @@ def record(session, item, frames, arrays):
     if isinstance(item, SCP):
         data.update(pose=list(item.matrix), attachment=asdict(item.attachment), parent=item.parent)
     if isinstance(item, TissueVCP):
-        data["intrinsic_status"] = asdict(item.intrinsic_result)
+        data.update(tissue_stages(session, item, frame, arrays))
     return data
+
+
+def tissue_stages(session, item, frame, arrays):
+    for label in ("base", "rest", "intrinsic"):
+        result = getattr(item, label + "_result")
+        if result.asset:
+            store_mesh(
+                session, item.id + "__" + label, session.assets[result.asset].mesh, frame, arrays
+            )
+    return dict(
+        intrinsic_status=asdict(item.intrinsic_result), parts=[asdict(p) for p in item.parts]
+    )
 
 
 def capture(session, destination, elapsed):

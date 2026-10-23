@@ -37,6 +37,14 @@ def save(root, path):
     StaticScene(root, bpy.context.scene).save_debug_copy(str(path))
 
 
+def authored_only(root):
+    from anthroforge.core.visualization.vcp_mirror_runtime import sync_vcp_mirrors
+
+    for fiber in root.af_vcp_system.fibers:
+        fiber["af_authoring_symmetry"] = "explicit"
+    sync_vcp_mirrors(root=root, scene=bpy.context.scene)
+
+
 def clear_construction(root):
     from anthroforge.core.vcp.prop_update_guard import suppress_vcp_prop_updates
 
@@ -60,3 +68,17 @@ def muscle_objects(root, key, role="INFL"):
         and o.get("af_muscle_surface") == role
         and not o.name.endswith("_MIR")
     ]
+
+
+def scene_audit(root):
+    objects = tuple(bpy.context.scene.objects)
+    fibers = [o for o in objects if o.get("af_fiber_proxy") and not o.get("af_fiber_mirror_proxy")]
+    return dict(
+        source_fiber_proxies=len(fibers),
+        hidden_source_fibers=sum(o.hide_get() for o in fibers),
+        wire_source_fibers=sum(o.display_type == "WIRE" for o in fibers),
+        mirrored_fiber_proxies=sum(bool(o.get("af_fiber_mirror_proxy")) for o in objects),
+        mirrored_muscle_proxies=sum(bool(o.get("af_muscle_mirror_proxy")) for o in objects),
+        scp_records=len(root.af_scp_system.scps),
+        native_muscle_records=len(root.af_vcp_system.muscles),
+    )

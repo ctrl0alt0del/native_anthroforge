@@ -1715,8 +1715,10 @@ CH-049 because the integrated pipeline repair already published CH-045.
   and variable text, native formula outputs, repeated type selection, live scrub
   and one undo action. The ordinary unit/editor harness still passes. The expanded
   Parametric value row displays the full integer in the inspected offscreen capture.
-  Full combined validation of this checkpoint is pending; no performance or
-  Windows desktop release claim is made.
+  Combined portable validation at `57c93ec` passes 1,880 pytest cases, five native
+  CTests, 170 owned native style inputs, headless workflow and wheel checks. Both
+  GitHub core platforms passed integer checkpoint `b42a7f1`. No Windows desktop
+  release claim is made.
 
 ### CH-052 — Resolve addressed properties without enumerating the catalogue (2026-10-23)
 
@@ -1737,7 +1739,10 @@ CH-049 because the integrated pipeline repair already published CH-045.
   cases pass; configured Ruff/mypy pass. Descriptor equivalence covers five kinds
   of construction, named fields and component addresses. Both production-QML
   acceptance tools pass. The first concurrent full gate caught an intermediate
-  function-length violation; it is fixed and a settled-code rerun remains pending.
+  function-length violation; after correction, the full settled-code gate at
+  `57c93ec` passes all 1,880 pytest cases, five native CTests, 170 owned native style
+  inputs, headless workflow and wheel checks. The committed profiling tool also
+  passes its numerical checks on that revision.
 - [Profiling evidence](research/shortcuts_030/performance_qualification.md) records
   reproducible compilation, packing, native evaluation and application workloads,
   numerical checks, bounded expression-cache occupancy and recorder limits. Raw

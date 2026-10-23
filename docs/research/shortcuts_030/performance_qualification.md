@@ -2,7 +2,8 @@
 
 This is synthetic Linux evidence from 2026-10-23, not desktop responsiveness or
 release acceptance. Baseline: `b42a7f1`. Candidate: the direct property lookup
-change recorded in CH-052. Native expression and geometry algorithms are unchanged.
+change committed as `57c93ec` and recorded in CH-052. Native expression and geometry
+algorithms are unchanged.
 
 ## Workload and reproduction
 
@@ -16,8 +17,12 @@ uv run --no-sync python tools/shortcuts_profile.py
 The tool records revision, platform, Python version and every timing sample in
 ignored `build/shortcuts-profile/measurements.json`. The existing runtime profiler
 writes `driver-paths.afprofile.zip` beside it. Baseline copies in this workspace
-are `baseline.json` and `driver-paths-baseline.afprofile.zip`; raw artifacts are
-local only. Linux 6.18.55 x86-64, glibc 2.41 and Python 3.12.12 were used.
+are `baseline.json` and `driver-paths-baseline.afprofile.zip`; the first candidate
+samples reported below are retained as `direct-lookup-first.json` and
+`driver-paths-direct-lookup-first.afprofile.zip`. A repeat at committed `57c93ec`
+also passed all numerical checks with no reported event losses; its outputs use
+the default filenames. Raw artifacts are local only. Linux 6.18.55 x86-64,
+glibc 2.41 and Python 3.12.12 were used.
 
 - Compilation: 25 independent cold compilations and 25 cached lookups of the same
   expression and typed symbols; the cached lookup must return the same owned program.

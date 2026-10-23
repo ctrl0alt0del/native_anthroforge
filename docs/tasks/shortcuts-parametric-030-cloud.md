@@ -3,7 +3,7 @@
 - Task branch: `codex/shortcuts-parametric-030-cloud`
 - Parent feature branch: `codex/shortcuts-parametric-030`
 - Starting revision: `e7d464e3a4cf401249b6c96be2eb8eb5387b7fb6`
-- Status: implementation in progress; portable validation stages pass
+- Status: implementation in progress; full portable gate passes at `57c93ec`
 - Last updated: 2026-10-23 UTC
 - Active writer: Codex Cloud, direct work
 
@@ -107,18 +107,30 @@ is introduced.
   pass offscreen with no QML warnings. `integer-editors.png` was inspected after
   making the variable value row wide enough for the full number. Logs are ignored
   `build/core/cloud-030-integer-focused.log`, `cloud-030-int64-qml.log` and
-  `cloud-030-integer-qml.log`. Full validation of these latest changes is pending.
+  `cloud-030-integer-qml.log`. Additional production-QML probes pass integer scrub
+  cancellation, canonical length/angle increments and int64 overflow rejection
+  without history changes. Full combined validation is recorded below.
 - Direct lookup continuation: 111 focused cases pass, including descriptor equivalence
   and invalid address tests. Ruff/mypy and both QML harnesses pass. The initial full
   gate passed native build, five CTests and 170 native style inputs, then reported
   1,867 pytest passes and one function-length failure in an intermediate resolver
-  draft. The corrected architecture/address group passes all 14 cases. A combined
-  rerun on settled code is pending; packaging was not reached in the initial run.
-- Integer checkpoint `b42a7f1` is pushed. Its GitHub run `39879394309` is still active.
+  draft. The corrected architecture/address group passes all 14 cases. Packaging
+  was not reached in the initial run; the complete rerun below supersedes it.
+- Full `tools/check_core.py --native-style` passes at pushed `57c93ec`: 1,880 pytest
+  cases, five CTests, all 170 owned native style inputs, headless doctor/workshop,
+  source package and wheel resource checks. The run completed without interruption.
+  Local evidence: `build/core/cloud-030-property-full-gate.log` and
+  `build/core/qualification/passed.json`. The profiler also reran at that committed
+  revision, verified numerical outputs and reported no event losses.
+- [GitHub run 39879394309](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39879394309)
+  passes Ubuntu and Windows at integer checkpoint `b42a7f1`.
+  [Run 39881077028](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39881077028)
+  passes Ubuntu for property lookup checkpoint `57c93ec`; Windows is still active
+  at this handoff.
 
 ## Next actions and blockers
 
-1. Finish combined portable validation and inspect the latest GitHub jobs.
+1. Inspect the remaining Windows GitHub job; local combined validation and Ubuntu CI pass.
 2. Continue catalogue/ordinary-field coverage, full-window interaction and native
    viewport qualification from the desktop handoff. Review indexed/named collection
    reference semantics against the stable-identity contract before release.

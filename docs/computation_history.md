@@ -2126,7 +2126,7 @@ average. This is a read-only formula input; no new write channel is introduced.
   attachment settings, optional backsolve/overrides, update modes, queued input capture,
   cancellation, history, checkpoints, Manual saves, and geometry resource ownership.
   Non-transform shortcuts do not acquire new attachment evaluation behavior.
-- **Evidence:** 20 focused regressions pass, including default retention, paused drags,
+- **Evidence:** 22 focused regressions pass, including default retention, paused drags,
   all update modes, Manual round trips, undo/redo, ordinary-edit supersession and
   multi-owner drivers. The actual 96-muscle assembly passes +5% Humerus edit and
   undo/redo with every SCP/Fiber binding unchanged and zero restored tissue vertex
@@ -2135,7 +2135,12 @@ average. This is a read-only formula input; no new write channel is introduced.
   including the pre-existing baseline discrepancy. Radius absolute distance is 1.02e-5
   and Ulna 1.34e-5. Cropped tissue behavior still intentionally differs from the addon
   under CH-065; unrelated Thumb/Ribs causes are not repaired or claimed here.
-- **Qualification pending:** full development gate, packaged/offscreen and rendered
-  shape review. Baseline source `4d24d6e`; reproducible qualification is
+- **Qualification:** full Windows gate passes 2,007 tests and five CTests. The canonical
+  package passes the full portable suite and actual-assembly edit/undo/redo/reopen;
+  all 625 geometry/pose/path and 914 attachment fingerprints match corrected source
+  exactly. Four focused rendered comparisons and the packaged native render were
+  inspected. Hidden desktop opens without QML warnings. This is background-only
+  evidence, not physical interactive acceptance. Baseline source `4d24d6e`, runtime
+  correction `6d9bae8`; reproducible qualification is
   `tools/qualify_shortcut_owner_binding.py`. Local evidence and final qualification
   are tracked in [the task record](tasks/shortcut-owner-binding.md).

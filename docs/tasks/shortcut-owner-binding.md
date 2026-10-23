@@ -2,7 +2,7 @@
 
 - Branch: `codex/shortcut-owner-binding`
 - Integration: `main`; starting revision `4d24d6e`
-- Status: implemented; full development gate running, integration pending
+- Status: implementation and qualification complete; validated integration follows
 - Active writer: desktop; background validation only
 - Runtime implementation: `6d9bae8`
 
@@ -50,8 +50,9 @@ New evidence: `E:/development/WIP_models/shortcut_owner_binding_20261024/`.
 
 22 focused regressions cover all update modes, paused/rapid drags, cancellation,
 undo/redo, Manual save/reopen, direct-edit/explicit-recapture supersession, multi-owner
-drivers, existing override/backsolve behavior and formula/geometry barriers. Ruff,
-mypy and 15-line function checks pass. Full `tools/check.ps1` is still running.
+drivers, existing override/backsolve behavior and formula/geometry barriers. Full
+`tools/check.ps1` passes 2,007 tests, all five native CTests, Ruff, mypy, Python/native/
+PowerShell style and function limits, numerical dependencies and Qt-free doctor.
 
 The canonical `dist/0.3.0/AnthroForge.dist` passes the full minimal-PATH portable suite.
 Actual packaged Humerus edit, undo/redo and save/reopen preserve all 625 geometry/pose/path
@@ -76,6 +77,7 @@ ownership, input validation and result restoration reuse the existing attachment
 No feature-name checks, SCP identity exceptions, competing queues or native algorithm
 changes. Policy ownership remains distinct from a default retained transform binding.
 
-Finish the full development gate, update its actual result here and CH-067, refresh
-packaged documentation/source archive, then validated merge/push. Preserve unrelated
-root `__init__.py`. No subagents or visible desktop control.
+No implementation or qualification remains. Deliver the canonical 0.3.0 distribution
+and companion source archive through the normal validated merge/push. Git ancestry
+establishes integration rather than a predicted hash here. Preserve unrelated root
+`__init__.py`. No subagents or visible desktop control were used.

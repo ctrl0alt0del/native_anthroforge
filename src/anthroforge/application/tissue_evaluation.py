@@ -49,9 +49,14 @@ def intrinsic(
     output = uncropped(engine, document, resources, item, cancel)
     assert output.mesh is not None
     if item.crop.enabled:
-        base = resources.meshes[tissue_materials.crop_base(item)].mesh
-        output = replace(output, mesh=tissue_crop.evaluate(base, output.mesh, item.crop, cancel))
+        output = replace(output, mesh=cropped(resources, item, output.mesh, cancel))
     return finalize_surface(resources, item, output, cancel)
+
+
+def cropped(resources: Any, item: TissueVCP, mesh: Mesh, cancel: int) -> Mesh:
+    reference = resources.meshes[tissue_materials.crop_base(item)].mesh
+    base = resources.meshes[item.base_result.asset].mesh
+    return tissue_crop.retained(reference, base, mesh, item.crop, cancel)
 
 
 def finalize_surface(

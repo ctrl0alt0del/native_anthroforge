@@ -82,3 +82,10 @@ reproduced by `test_pose_formula_refresh.py` and corrected through the existing
 renewable-job/restart contracts. Humerus edit/reverse now restores tissue vertices
 within 1.8e-12, including through save/reopen; pending final combined verification,
 shape inspection and canonical packaging.
+
+Final contract review also covered adaptive source sampling: keeping only old vertex
+indices would reject a changed sample count. `tissue_crop_reference.cpp` now uses
+the existing material-chart transport to sample the retained crop reference at current
+material locations. A regression changes sampling and deforms the base; the cut follows
+the original material boundary. Unsupported material topology/closure changes reject
+with an explicit redefine-cut message. Eighteen focused material/pose tests pass.

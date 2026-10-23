@@ -3,6 +3,7 @@
 from dataclasses import replace
 
 import numpy as np
+import pytest
 
 from anthroforge.application import geometry_ownership, tissue_materials
 from tests.test_tissue_workflow import assembly, mesh, roundtrip
@@ -57,3 +58,18 @@ def test_older_accepted_cut_uses_its_own_base_not_new_rest(session):
     legacy = replace(current, intrinsic_material=replace(before, crop_base=""))
     assert legacy.rest_material.base != before.base
     assert tissue_materials.crop_base(legacy) == before.base
+
+
+def test_retained_material_cut_survives_changed_source_sampling(session):
+    from anthroforge.core.tissue_settings import TissueCrop, TissuePart
+    from anthroforge.native import construction, tissue_crop, tissue_parts
+    from tests.test_adaptive_material_frames import loft
+
+    reference = loft(session.engine, [0, 0.5, 1])
+    base = loft(session.engine, [0, 0.2, 0.5, 0.8, 1])
+    base = construction.deformed(base, base.array(0) + [0.3, 0, 0])
+    own = tissue_parts.evaluate(base, (TissuePart(),), "a", False)
+    crop = TissueCrop(True, (0.4, 0, 0))
+    output = tissue_crop.retained(reference, base, own, crop)
+    assert output.counts[0] and output.array(0)[:, 0].min() == pytest.approx(0.7)
+    assert output.array(0)[:, 0].max() == pytest.approx(1.3)

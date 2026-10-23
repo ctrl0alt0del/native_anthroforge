@@ -26,7 +26,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/tissue_inflation.cpp src/tissue_profile.cpp src/tissue_directions.cpp src/tissue_validation.cpp src/tissue_refinement.cpp src/tissue_branch_refinement.cpp
     src/tissue_preparation.cpp src/tissue_preparation_api.cpp
     src/tissue_prepared_fields.cpp src/tissue_branch_connections.cpp src/tissue_branch_connector.cpp src/tissue_parts.cpp src/tissue_envelope.cpp src/tissue_parameters.cpp src/tissue_crop_envelope.cpp src/tissue_crop.cpp src/tissue_crop_inputs.cpp src/tissue_smoothing.cpp src/smoothing_core.cpp src/height_box_solver.cpp
-    src/tissue_crop_triangles.cpp src/tissue_domain.cpp src/tissue_domain_api.cpp src/tissue_regions.cpp src/tissue_shapes_api.cpp
+    src/tissue_crop_triangles.cpp src/tissue_crop_reference.cpp src/tissue_domain.cpp src/tissue_domain_api.cpp src/tissue_regions.cpp src/tissue_shapes_api.cpp
     src/tissue_shape_fields.cpp src/tissue_normal_shell.cpp src/tissue_profile_sweep.cpp src/tissue_radial.cpp
     src/tissue_masks.cpp src/tissue_source_normals.cpp src/tissue_constraints.cpp
     src/material_binding.cpp src/material_binding_index.cpp src/material_binding_query.cpp

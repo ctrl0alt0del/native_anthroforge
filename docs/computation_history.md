@@ -2035,7 +2035,10 @@ average. This is a read-only formula input; no new write channel is introduced.
   is explicitly edited. A buried Boolean anchor follows the same object's exterior
   while retaining its original stored reference. No other object is a candidate.
 - **Change:** accepted tissue provenance owns `crop_base`; current output is clipped
-  using that retained base. Existing accepted states use their own saved base. Native
+  using that retained base. When source sampling changes, the shared native material
+  charts transport new samples into the retained base before clipping; no numerical
+  Python loop or resolution lock is introduced. Existing accepted states use their
+  own saved base. Native
   Boolean provenance also retains untrimmed source triangle positions and shell-layer
   identity. If the exact material point is covered, a lazily built per-batch chart BVH
   selects the nearest exposed point in construction coordinates. Its current triangle

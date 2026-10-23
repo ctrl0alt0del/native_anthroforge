@@ -1,6 +1,5 @@
 """Canonical attachment evidence for the actual assembly, outside timed recording."""
 
-from dataclasses import fields
 from hashlib import sha256
 
 ATTRIBUTES = (
@@ -22,8 +21,8 @@ def attachments(session):
             result[item.id] = sha256(repr(values).encode()).hexdigest()
     for key, asset in session.resources.selected(session.document).attachments.items():
         digest = sha256(repr(asset.targets).encode())
-        for attribute in fields(asset.field):
-            value = getattr(asset.field, attribute.name)
-            digest.update(value.tobytes() if hasattr(value, "tobytes") else repr(value).encode())
+        for attribute in ("owners", "weights", "bindings", "records"):
+            digest.update(getattr(asset.field, attribute).tobytes())
+        digest.update(asset.field.path.array().tobytes())
         result["field:" + key] = digest.hexdigest()
     return result

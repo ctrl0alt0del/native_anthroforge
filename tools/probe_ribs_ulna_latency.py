@@ -108,7 +108,31 @@ def run(source, output):
     with closing(Session()) as session:
         load(session, source)
         write(output / "attachments-before.json", attachments(session))
+        write(output / "geometry-before.json", geometry(session))
         capture(session, output)
+        if "--history" in sys.argv:
+            check_history(session, output)
+
+
+def check_history(session, output):
+    expected = attachments(session)
+    for operation, filename in (("undo", "geometry-before.json"), ("redo", "geometry.json")):
+        session.command(operation)
+        session.wait(180)
+        assert geometry(session) == json.loads((output / filename).read_text())
+        assert attachments(session) == expected
+    reopen_saved(session, output)
+    assert geometry(session) == json.loads((output / "geometry.json").read_text())
+    assert attachments(session) == expected and not session.scheduler.errors
+    write(output / "history.json", dict(undo=True, redo=True, reopened=True, unchanged=True))
+
+
+def reopen_saved(session, output):
+    path = output / "roundtrip.anthroforge"
+    session.command("save", path=str(path), blocked_policy="wait")
+    session.wait(180)
+    session.command("open", path=str(path))
+    session.wait(180)
 
 
 if __name__ == "__main__":

@@ -6,12 +6,16 @@ from typing import Literal
 
 @dataclass(frozen=True)
 class RequestUrgency:
+    """Causal edit intent; does not enable inline execution or alter debounce."""
+
     interactive: bool
     since: float
 
 
 @dataclass(frozen=True)
 class QueueDemand:
+    """Transient rank, causal age, logical queue age, and donating request identity."""
+
     priority: int
     since: float
     queued: float

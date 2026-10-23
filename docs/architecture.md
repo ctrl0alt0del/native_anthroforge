@@ -596,6 +596,18 @@ can finish cleanup while transaction publication is blocked. Cleanup registers d
 work before retirement, preserving continuous save blocking. History remains inspectable;
 the Activity panel's 40-row limit does not truncate application history.
 
+`TaskPriorities` owns queue rank independently of per-task execution/delay hints.
+Publication and automatic retry carry causal interactive urgency and original request
+age; replacements and coalescing retain their first pending queue age too. Destination
+workspace priority remains its own. Active consumers temporarily donate their full rank
+to transitive prerequisite jobs. Ranking is recomputed from active port indexes, so
+finished/cancelled consumers cannot leave stale boosts. A borrowed boost is not inherited
+by unrelated work created during publication. Equal rank uses causal age, original queue
+age and creation order, avoiding replacement starvation. Jobs still pass existing readiness,
+exclusive-writer, dispatch capture and publication checks; workers are not preempted.
+There are no anatomy IDs, task-kind exceptions or global anatomy-before-tissue barriers.
+The profiler records requested/effective demand and its donor, plus prioritization cost.
+
 ## Workflow inspection and presentation
 
 The dependency structure caches strongly connected components alongside reverse edges

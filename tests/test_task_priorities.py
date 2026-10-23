@@ -168,3 +168,33 @@ def test_changed_prerequisites_withdraw_old_donation(queue):
     coordinator.registry.update(consumer, lambda: needs(consumer, new))
     assert labels(coordinator)[0] == "new"
     assert old.queue_demand.priority == 0
+
+
+def test_temporary_donation_is_not_inherited_by_unrelated_publication_work(queue):
+    coordinator, _ = queue
+    base, consumer, child = task("base"), task("consumer", 10, True), task("child")
+    needs(consumer, base)
+    base.publish = lambda result: coordinator.submit(child)
+    submit(queue, base, consumer)
+    coordinator.wait(2)
+    assert base.queue_demand.priority == 110
+    assert not child.urgency.interactive and child.queue_demand.priority == 0
+
+
+def test_older_equal_priority_request_keeps_fifo_amid_new_requests(queue):
+    coordinator, _ = queue
+    old = task("old", 10, True)
+    submit(queue, old)
+    for index in range(20):
+        submit(queue, task(str(index), 10, True))
+    coordinator.tick()
+    assert old.started and all(not job.started for job in coordinator.queued())
+
+
+def test_observation_of_accepted_manual_input_is_not_a_wait_or_priority_donation(queue):
+    coordinator, _ = queue
+    base, other, consumer = task("base"), task("other", 50), task("consumer", 100)
+    consumer.observes = base.provides
+    submit(queue, base, other, consumer)
+    assert labels(coordinator) == ["consumer", "other", "base"]
+    assert base.queue_demand.priority == 0

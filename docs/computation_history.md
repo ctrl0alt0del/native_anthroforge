@@ -151,7 +151,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
 | R01 | Dependency/index computation: hierarchy/registry lookup, reference/topology restrictions, output-port graphs, reverse invalidation, SCC cycles, automatic obstacle eligibility and publication-frontier traversal. Reuse immutable structure on value-only edits. | [document index](../src/anthroforge/core/document_index.py), [routing obstacles](../src/anthroforge/core/routing_obstacles.py), [dependent tasks](../src/anthroforge/application/dependent_tasks.py) | [document index](../tests/test_document_index.py), [publication frontier](../tests/test_publication_frontier.py) |
-| R02 | Task assessment/coordination: workload estimates plus measured history, coalescing/delays, shared inline budget, worker admission, reservations, dispatch-time capture, cancellation and stale-result checks. | [coordinator](../src/anthroforge/application/coordinator.py), [task schedulers](../src/anthroforge/application/task_schedulers.py), [tissue scheduling](../src/anthroforge/application/tissue_scheduling.py) | [task coordination](../tests/test_task_coordination.py), [active jobs](../tests/test_active_jobs.py) |
+| R02 | Task assessment/coordination: workload estimates plus measured history, coalescing/delays, causal urgency/age and transitive prerequisite rank, shared inline budget, worker admission, reservations, dispatch-time capture, cancellation and stale-result checks. | [coordinator](../src/anthroforge/application/coordinator.py), [priority policy](../src/anthroforge/application/task_priorities.py), [task schedulers](../src/anthroforge/application/task_schedulers.py), [tissue scheduling](../src/anthroforge/application/tissue_scheduling.py) | [task coordination](../tests/test_task_coordination.py), [priority inheritance](../tests/test_task_priorities.py), [active jobs](../tests/test_active_jobs.py) |
 | R03 | Transactions/history/checkpoints: derive changes, commit/cancel edits, maintain undo/redo restart recipes, choose saveable revisions and validate historical asynchronous captures. | [history](../src/anthroforge/application/history.py), [changes](../src/anthroforge/application/changes.py), [authored jobs](../src/anthroforge/application/authored_jobs.py) | [interleaving](../tests/test_interleaving.py), [capture history](../tests/test_capture_history.py) |
 | R04 | Cache/resource work: keys, immutable leases, hit/miss/eviction, content equivalence and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes and tissue material preparation. | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py) |
 | R05 | Viewport publication/rendering: stage complete native mesh/path/image buffers, switch displayed geometry and picking together, generate controls, perform Qt Quick 3D shading, opacity/depth and selection-outline passes. | [Qt geometry adapters](../native/qt), [outline shader](../native/qt/shaders/outline.frag), [desktop](../src/anthroforge/desktop) | [viewport publication](../tests/test_viewport_publication.py), [capture staging](../tests/test_capture_staging.py), [path presentation](../tests/test_path_presentation.py) |
@@ -2071,3 +2071,34 @@ average. This is a read-only formula input; no new write channel is introduced.
   +71%, despite being described as +5%. A fresh exact +5% edit reproduces the seven
   original failures. Historical raw reports are preserved; the task record corrects
   the label. No geometry-acceptance claim is based solely on absence of exceptions.
+
+### CH-066 — Causal urgency and prerequisite priority inheritance (2026-10-23)
+
+- **Observed / old approach (R02):** following Ribs Top Radius = 3, Ulna's pose job
+  was eligible but ranked below Live consumers. The old queue used each job's local
+  interactive flag and new instance creation time. It lost urgency through publication
+  and retry, and replacement age through FIFO tie breaking. Two headless baseline
+  observations measured about 1.55 seconds of unnecessary ready-queue delay.
+- **Change:** the coordinator owns causal request urgency separately from execution
+  hints. Follow-ups and automatic retries retain the request age/urgency; replacements
+  and coalescing also retain logical queue age. Active consumers temporarily donate
+  their rank through declared prerequisites. Sorted demand traversal visits each active
+  node once, including cycles. Edges use the existing output-port index; no scans of
+  every document prerequisite and no second scheduler or numerical Python algorithm.
+  Removed consumers withdraw their boost. Destination workspace priority remains local;
+  a borrowed boost does not spread to unrelated publication work.
+- **Preserved:** geometry kernels, read contracts, explicit update modes, reservations,
+  nonpreemptive workers, dispatch capture, inline/debounce budgets, cancellation, stale
+  publication checks, transaction/checkpoint ownership and attachment semantics.
+- **Rejected refinement:** urgency alone with new-instance FIFO retained the long wait.
+  Correcting logical queue age addresses that remaining cause; no permanent pose/formula
+  whitelist or global anatomy-before-tissue barrier is used. A first edge-building
+  implementation repeatedly scanned large prerequisite closures; indexed reverse lookup
+  reduced its measured ranking cost. The profiler records rank, donor and policy duration.
+- **Evidence so far:** 12 deterministic policy regressions plus existing scheduler tests
+  pass. All 625 geometry/path/pose fingerprints on the actual assembly match the baseline.
+  Desktop QML/model observations change Ulna's displayed update from 77.92 s to 3.50 s
+  in a serial application-profiler comparison; no failed jobs or QML warnings. These
+  are offscreen model timings, not physical display latency or a universal speedup.
+  Complete final gate, attachment payload/history and package evidence is tracked in
+  [the task record](tasks/task-priority-propagation.md); qualification is still pending.

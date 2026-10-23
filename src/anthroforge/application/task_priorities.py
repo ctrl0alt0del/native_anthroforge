@@ -31,10 +31,14 @@ def live(job: Job) -> bool:
     return job.active and not job.obsolete and not (job.cancel and job.cancel.is_set())
 
 
-def providers(registry: JobRegistry, job: Job, active: dict[str, Job]) -> set[str]:
-    index = registry.indexes["provides"]
-    ids = set().union(*(index.get(port, ()) for port in job.prerequisites))
-    return (ids & active.keys()) - {job.id}
+def prerequisites(registry: JobRegistry, active: dict[str, Job]) -> dict[str, set[str]]:
+    edges: dict[str, set[str]] = {key: set() for key in active}
+    for provider in active.values():
+        for port in provider.provides:
+            for key in registry.indexes["port"].get(port, ()):
+                if key in active and key != provider.id and port in active[key].prerequisites:
+                    edges[key].add(provider.id)
+    return edges
 
 
 def donate(root: Job, edges: dict[str, set[str]], ranks: dict[str, QueueDemand]) -> None:
@@ -64,8 +68,9 @@ class TaskPriorities:
             self.source = previous
 
     def ordered(self, registry: JobRegistry) -> list[Job]:
+        # Highest demand visits each active node once, including cyclic components.
         active = {key: job for key, job in registry.active.items() if live(job)}
-        edges = {key: providers(registry, job, active) for key, job in active.items()}
+        edges = prerequisites(registry, active)
         ranks: dict[str, QueueDemand] = {}
         for job in sorted(active.values(), key=lambda item: demand(item).key):
             donate(job, edges, ranks)

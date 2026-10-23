@@ -30,9 +30,9 @@ declared job prerequisites, not OS locks; its fixture establishes effectiveness.
 
 ## Current state and verification
 
-Coordinator policy and lifecycle integration implemented. Ten deterministic regressions
+Coordinator policy and lifecycle integration implemented. Thirteen deterministic regressions
 cover transitive donation, withdrawal, cycles, workspace scope, follow-ups, same-cause
-FIFO, replacement/retry and exclusive writers; 30 existing scheduler regressions pass.
+FIFO, replacement/retry, Manual inputs and exclusive writers; 30 existing scheduler regressions pass.
 Architecture/function-limit checks pass. Full qualification remains pending.
 
 The first experiment propagated urgency but still used replacement creation time to
@@ -57,3 +57,17 @@ Baseline reports: ignored `build/ribs-ulna-latency/`. Reproduction tools are
 `tools/probe_ribs_ulna_latency.py` and `tools/probe_ribs_ulna_desktop.py`;
 do not use their diagnostic `--priority-probe` for production verification.
 New evidence belongs under `build/task-priority-propagation/`.
+
+## Qualification checkpoint
+
+- Final source (`bb78102` plus indexed priority edges) and baseline `e7ba40b` both
+  pass actual-assembly edit/undo/redo/save/reopen. All 625 geometry/path/pose hashes
+  and all 914 attachment/reference/field-content hashes agree exactly; attachment
+  hashes also agree before/after the edit. Native path data is hashed, not handle addresses.
+- Indexed reverse lookup reduces measured priority policy cost from 1.77 s cumulative
+  to 0.57 s in the headless workload. The scheduler skips ranking when workers are full.
+- Serial offscreen QML app-only profiling before this cost refinement: Radius displayed
+  at 46.04 s baseline vs 2.49 s candidate; Ulna 77.92 s vs 3.50 s. All final shapes match.
+  Reports retain the entire time interval (512 MiB) but reject 63/66 oversized metadata
+  events; they are explicitly incomplete. Lifecycle/model sidecars preserve observations.
+- Final-cost desktop verification, recording-off checks, full gate and package pending.

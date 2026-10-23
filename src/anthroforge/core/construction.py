@@ -74,6 +74,12 @@ class Curve(ConstructionObject):
 
     @property
     def resolution(self) -> int:
+        if isinstance(self.engine_settings, ParametricSettings):
+            return (
+                self.engine_settings.bezier_resolution
+                if self.engine_settings.interpolation == "BEZIER"
+                else 1
+            )
         return (
             self.engine_settings.resolution
             if isinstance(self.engine_settings, BezierSettings)

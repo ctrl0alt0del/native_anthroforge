@@ -28,7 +28,8 @@ def accepted(resources: Any, result: Any, label: str) -> Mesh:
 def rest(engine: Any, document: Any, resources: Any, item: TissueVCP, cancel: int) -> TissueOutput:
     tissue_sources.require_result(item.base_result)
     tissue_fields.validate(resources, item, "BASE")
-    return tissue_construction.construct(engine, resources, item, cancel)
+    output = tissue_construction.construct(engine, resources, item, cancel)
+    return finalize_surface(resources, item, output, cancel, "rest")
 
 
 def uncropped(
@@ -53,9 +54,11 @@ def intrinsic(
     return finalize_surface(resources, item, output, cancel)
 
 
-def finalize_surface(resources: Any, item: Any, output: TissueOutput, cancel: int) -> TissueOutput:
+def finalize_surface(
+    resources: Any, item: Any, output: TissueOutput, cancel: int, phase: str = "intrinsic"
+) -> TissueOutput:
     assert output.mesh is not None
-    previous = resources.meshes.get(item.intrinsic_result.asset)
+    previous = resources.meshes.get(getattr(item, phase + "_result").asset)
     mesh = topology.finalize_surface(output.mesh, previous.mesh if previous else None, cancel)
     return replace(output, mesh=mesh)
 

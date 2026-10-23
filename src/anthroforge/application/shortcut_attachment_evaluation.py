@@ -37,10 +37,24 @@ def contract(job: Any, document: Any, targets: set[str]) -> None:
     additional = extra_reads(document, targets)
     job.observes |= frozenset(additional)
     job.prerequisites |= frozenset(additional)
+    job.provides = frozenset(output_ports(document, targets))
+
+
+def output_ports(document: Any, targets: set[str]) -> set[Port]:
     owners = {c.owner for c in contexts(document, targets) if c.policy.backsolve}
-    job.provides = frozenset(
-        Port(p.owner, "shortcut_pose") if p.owner in owners else p for p in job.provides
-    )
+    return {Port(key, "shortcut_pose" if key in owners else "pose") for key in targets}
+
+
+def planning_graph(document: Any, targets: set[str]) -> dict[Port, set[Port]]:
+    from . import dependencies
+
+    original = dependencies.graph(document)
+    graph = {key: set(value) for key, value in original.items() if key not in original.blocked}
+    for port in output_ports(document, targets):
+        base = Port(port.owner, "pose")
+        if base in graph:
+            graph[port] = graph[base] | extra_reads(document, {port.owner})
+    return graph
 
 
 def prepare(

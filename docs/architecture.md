@@ -2,6 +2,19 @@
 
 ## 0.3 shortcut and Parametric boundaries
 
+Migration extensions retain Bézier knot metadata under native Parametric evaluation;
+interpolation and segment sampling belong to the engine definition. The application
+validates compatible topology before atomically switching definitions. Attachment
+policy scope is a separate validated reference from inferred shortcut ownership.
+
+`formula_batches` partitions expression work where it crosses an evaluated pose/path/
+geometry output; a formula worker cannot calculate those intermediate outputs itself.
+Coherent property groups stay together. The existing coordinator schedules each batch,
+captures dispatch state and rejects stale publications. No second executor is introduced.
+Immutable document snapshots retain formula lookup indexes across result-only publication.
+Effective shortcut policy reads also participate in pose batch planning, so temporary
+Surface Nearest overrides cannot create artificial waits inside a joint pose batch.
+
 The [confirmed shortcut/Parametric contract](specification_030.md) and
 [implementation plan](implementation_030.md) govern this extension. Lower-level
 numerical properties remain independent of shortcut wrappers. A property catalogue maps

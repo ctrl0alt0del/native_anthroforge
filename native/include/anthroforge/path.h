@@ -16,6 +16,11 @@ AF_API uint64_t af_path_restore(const double* samples, const double* parameters,
 AF_API uint64_t af_parametric_path(const uint64_t* handles,int variables,
     const int64_t* integers,const double* reals,const double* metadata,int previous,
     int count,int closed,double start,double end,double* records,uint64_t cancel);
+/* Interpolation 0 retains Bezier handle metadata; 1 connects generated knots directly. */
+AF_API uint64_t af_parametric_interpolated_path(const uint64_t* handles,int variables,
+    const int64_t* integers,const double* reals,const double* metadata,int previous,
+    int count,int closed,double start,double end,int interpolation,int resolution,
+    double* records,uint64_t cancel);
 AF_API void af_path_release(uint64_t handle);
 AF_API int af_path_info(uint64_t handle, int64_t* counts, double* bounds);
 AF_API const double* af_path_buffer(uint64_t handle, int kind);

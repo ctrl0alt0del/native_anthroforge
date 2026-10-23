@@ -19,6 +19,22 @@ def require_change(document: Document, before: Any, after: Any) -> None:
             )
     if after.engine == "PARAMETRIC" and point_count(before) != point_count(after):
         require_resolution(document, before)
+    require_sampling_change(document, before, after)
+
+
+def require_sampling_change(document: Document, before: Curve, after: Curve) -> None:
+    if before.engine == after.engine == "PARAMETRIC" and sampling_signature(
+        before
+    ) != sampling_signature(after):
+        from .construction_policy import require_topology_edit
+
+        require_topology_edit(document, before.id)
+
+
+def sampling_signature(item: Curve) -> tuple[Any, ...]:
+    config = item.engine_settings
+    interpolation = config.interpolation if isinstance(config, ParametricSettings) else item.engine
+    return interpolation, point_count(item), item.closed, item.resolution
 
 
 def point_count(item: Curve) -> int:
@@ -39,14 +55,18 @@ def require_resolution(document: Document, item: Curve) -> None:
 
 
 def resolution_reason(document: Document, item: Curve) -> str:
-    from .construction_policy import topology_locks
-
     if any(p.junction for p in item.points):
         return "Resolution is locked while the curve has a junction; detach it to resize."
     reason = membership_reason(document, item.id) or formula_reason(document, item.id)
     if reason:
         return reason
-    locks = topology_locks(document, item.id)
+    return sampling_reason(document, item.id)
+
+
+def sampling_reason(document: Document, target: str) -> str:
+    from .construction_policy import topology_locks
+
+    locks = topology_locks(document, target)
     return "Topology is locked: " + "; ".join(r["reason"] for r in locks) if locks else ""
 
 
@@ -81,12 +101,17 @@ def formula_reason(document: Document, curve: str) -> str:
 
 
 def descriptor(document: Document, value: NumericDescriptor) -> NumericDescriptor:
-    if value.reference.path != ("engine_settings", "resolution"):
+    path = value.reference.path
+    if path not in (("engine_settings", "resolution"), ("engine_settings", "bezier_resolution")):
         return value
     item = document.object(value.reference.target)
     if not isinstance(item, Curve) or item.engine != "PARAMETRIC":
         return value
-    reason = resolution_reason(document, item)
+    reason = (
+        resolution_reason(document, item)
+        if path[-1] == "resolution"
+        else sampling_reason(document, item.id)
+    )
     return replace(value, writable=value.writable and not reason, reason=reason or value.reason)
 
 

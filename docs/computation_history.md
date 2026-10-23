@@ -48,6 +48,13 @@ material frames/operators and per-column profile coefficients (T02–T04); draft
 envelope sides with fully prepared publication (G02/T05); bounded profiler ownership.
 The numerical objectives, topology, retained bindings and acceptance rules stay unchanged.
 
+The skeleton-controls migration qualifies CH-059–064: affine channel preservation (G03),
+compatible base/rest tessellation (G02/T02–T05), Bézier Parametric interpolation (E02),
+temporary attachment scope (A01/R03), evaluated-output formula batch boundaries (R02),
+snapshot formula indexes and scale-specific prerequisites (R01/E01), and effective-policy
+reads during pose batching (A01/R02). These changes retain the existing coordinator,
+native algorithms and retained material-binding semantics. Final evidence is below.
+
 ### Meshes, primitives and deformers
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
@@ -162,7 +169,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | ID | Computation | Owner | Evidence |
 | --- | --- | --- | --- |
 | E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. Construction copies preserve/remap formula graphs and accepted values (CH-050). Addressed property lookup traverses only the requested path, sharing discovery metadata and policy (CH-052). | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py), [copy state](../src/anthroforge/application/shortcut_copies.py), [property catalogue](../src/anthroforge/application/property_catalog.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py), [copy lifecycle](../tests/test_shortcut_copy.py), [profiling](research/shortcuts_030/performance_qualification.md) |
-| E02 | Native uniform Parametric XYZ sampling, generated controls and exact accepted-path Fiber conversion (CH-048). Shared policy locks resolution when junctions, attachments or generated-point references require stable membership (CH-058). | [native sampling](../native/src/parametric.cpp), [adapter](../src/anthroforge/native/parametric.py), [reference policy](../src/anthroforge/application/parametric_policy.py) | [curves](../tests/test_parametric_curves.py), [consumers](../tests/test_parametric_consumers.py), [resolution](../tests/test_parametric_resolution_policy.py) |
+| E02 | Native uniform Parametric XYZ sampling, generated controls and exact accepted-path Fiber conversion (CH-048). Optional Bézier interpolation preserves knot handle construction and separately controls segment sampling (CH-061). Shared policy locks resolution when junctions, attachments or generated-point references require stable membership (CH-058). | [native sampling](../native/src/parametric.cpp), [adapter](../src/anthroforge/native/parametric.py), [reference policy](../src/anthroforge/application/parametric_policy.py) | [curves](../tests/test_parametric_curves.py), [consumers](../tests/test_parametric_consumers.py), [resolution](../tests/test_parametric_resolution_policy.py) |
 
 The inventory covers all public native interface families in
 [native/include/anthroforge](../native/include/anthroforge), compiled geometry sources
@@ -1855,3 +1862,165 @@ CH-049 because the integrated pipeline repair already published CH-045.
 - Reference: Blender's [Hook modifier](https://docs.blender.org/manual/en/latest/modeling/modifiers/deform/hooks.html)
   likewise stores point indices; this supports identifying the membership hazard, not an
   upstream remapping guarantee. Parameter-preserving remapping remains outside 0.3.
+
+### CH-059 — Preserve affine frames during numerical channel edits (2026-10-23)
+
+- G03 / shortcut property writes: migration inspection found that writing a current
+  scale value back reconstructed a pure TRS matrix, discarding shear. On the actual
+  migrated femur-knee Hook, the maximum matrix-component change was 5.8497012475.
+  This would alter deformation despite an unchanged driving value.
+- Shared property writes now return the original record for unchanged canonical
+  values. Native partial-channel editing retains the existing basis: translation
+  replaces translation only, scale changes multiply the existing basis columns,
+  and rotation edits apply a rigid delta while retaining the remaining affine shape.
+  Matrix creation still uses ordinary TRS. No migration-specific object checks,
+  Python numerical implementation or change to stored attachment bindings is added.
+- This uses the existing Eigen affine composition conventions; see its
+  [geometry documentation](https://eigen.tuxfamily.org/dox/group__TutorialGeometry.html).
+  Evidence so far: 17 focused property/shortcut tests and five native CTests pass.
+  Tests include unchanged fields, translation, scale, oblique rotation, undo and
+  formula publication. Full gate, actual migration edits and portable qualification
+  remain pending; this checkpoint is not a qualified runtime delivery.
+
+### CH-060 — Retain tissue base/rest tessellation before downstream work (2026-10-23)
+
+- Skeleton driver migration caused ordinary dependency reevaluation with unchanged
+  settings. Flexor carpi ulnaris base/rest and an FDS radial rest surface changed
+  four triangle rows each at vertex drift below 5e-14. The latter's cropped output
+  changed counts. Intrinsic publication already preserved compatible topology, but
+  base refinement and rest assembly had no equivalent stage boundary.
+- Base and rest now use the existing native surface finalizer with their own last
+  accepted mesh. Compatible vertex count and canonical polygon connectivity retain
+  accepted triangles before inflation, relaxation and cropping consume the stage.
+  Incompatible topology takes the existing initial tessellation path. Numerical
+  inflation, refinement, relaxation and crop formulas are unchanged.
+- Two regressions exercise retained alternative diagonals through coordinated source
+  reevaluation and inflation edits. 42 focused stage, crop, inflation and workflow
+  tests pass. The full real-assembly comparison and combined gate are pending;
+  do not infer that the observed cropped-output difference is resolved yet.
+
+
+### CH-061 - Parametric Bezier construction and scoped shortcut attachment edits
+
+Status: qualified; the final CH-059–064 evidence below supersedes checkpoint-pending notes.
+Source: approved skeleton shortcut migration, 2026-10-23. The user authorized both
+extensions after observing pelvic shape changes with sampled polyline conversion.
+
+Previous: Parametric always generated vector/polyline knots. Exact sampled positions
+did not preserve Bezier tangents, four-knot identities or body seam start. New:
+optional Bezier interpolation retains handle modes and offsets while XYZ controls
+knot positions. Native authored-path evaluation performs handle resolution and
+per-segment sampling; no Python numerical loop. Default remains Polyline. Generated
+count and segment resolution are distinct. Existing membership and attachment
+topology restrictions remain enforced. Focused exact-path/body tests pass; actual
+assembly and GUI qualification pending.
+
+Explicit attachment scope is separate from inferred ownership. A controlled SCP
+may anchor a multi-owner driver's temporary policy; presentation remains All.
+Context capture, descendant restrictions, undo and copying use the existing service.
+No formula inversion or permanent attachment rewrite is introduced.
+
+CH-059 follow-up: one-ULP Radius world-scale noise caused a no-op Ulna driver to
+recapture its binding. Shared channel comparison ignores at most eight ULPs, never
+an absolute geometry tolerance. Tiny real values and edits above the limit are
+tested. The 96-control assembly comparison passes with identical connectivity and
+attachment arrays; maximum mesh-coordinate difference 3.746e-12. Existing accepted
+path-frame differences are recorded separately and are not claimed identical.
+
+
+CH-061 qualification update: actual six-guide conversion passed against the
+96-control checkpoint (619 records, 1,325 resources; max mesh-coordinate drift
+1.041e-12). Geometry connectivity and retained binding arrays are unchanged.
+Path frames still differ on some reevaluated fiber samples, separately recorded.
+The same eight-ULP equivalence now guards driven transform fields during ordinary
+attachment pose publication. Native world volume scale is the signed cube root
+of the affine determinant, following Blender 5.0.1 SCALE_AVG, not arithmetic axis
+average. This is a read-only formula input; no new write channel is introduced.
+
+### CH-062 — Separate formula batches at evaluated-output barriers (2026-10-23)
+
+- Observed: adding rib/pelvic radius drivers left the assembly queued for over
+  600 seconds. A two-driver regression reproduced the stall with an acyclic
+  property graph: one batch provided the parent transform while awaiting the
+  child's attachment pose, whose queued calculation awaited that same batch.
+- The formula scheduling adapter now partitions expressions at intervening pose,
+  path and geometry outputs. Direct expression chains can remain batched; coupled
+  candidate groups remain coherent. Batch replacement preserves pending members,
+  and the existing coordinator still owns reservations, capture, cancellation,
+  publication and Manual semantics. Incoherent groups requiring mutually dependent
+  evaluated outputs fail explicitly rather than waiting indefinitely.
+- Evidence: the new regression failed before this change and passes afterward;
+  explicit Manual evaluation across the barrier also finishes. 23 focused formula
+  and attachment tests pass. The real assembly's radius stage now finishes, with
+  identical connectivity/binding payloads and max mesh drift 3.397e-12 against its
+  immutable input. Complete pelvic controls and combined gate remain pending.
+- Reference: Python's [dependency-ready scheduling contract](https://docs.python.org/3/library/graphlib.html)
+  supports waiting for prerequisite completion; the implementation uses the
+  application's existing port graph and coordinator rather than a new scheduler.
+
+### CH-063 — Snapshot formula lookup and scale-specific prerequisites (2026-10-23)
+
+- A 1,740-output pelvic experiment spent repeated Python work reconstructing formula
+  maps and scanning accepted results. A ten-second sampling capture observed these
+  paths in 57 of 200 samples. Immutable document snapshots now own read-only formula
+  indexes, reusing authored maps across result-only publication. This changes lookup,
+  not expression values, scheduling ownership or serialization. Snapshot/undo and
+  accepted-result reuse tests pass.
+- The source Sacrum-width driver exposed a false cycle through its attached child's
+  full pose. SCP attachment propagation retains the child's own affine volume scale;
+  that read therefore depends on its scale writers, while ordinary parented objects
+  continue depending on composed pose. Both the legitimate child-volume-to-parent
+  case and actual cyclic scale formulas are covered by regression tests.
+- Full 105-control migration now preserves all 619 original records and 1,325
+  referenced resources: maximum mesh drift 3.397e-12, unchanged connectivity and
+  retained binding arrays. Path-frame changes are separately recorded, not claimed
+  identical. These results precede final delivery qualification.
+- The point-formula experiment is not the chosen migration design: its Ilium edit
+  required 13.20 seconds including publication. A compact mapping using existing
+  native Hook-on-lattice evaluation requires only 25 pelvic formulas and completed
+  the same edit in 1.18 seconds. Complete shape/relationship comparison is underway;
+  this is one controlled workload, not a general application performance claim.
+
+### CH-064 — Include temporary attachment policies in pose batching (2026-10-23)
+
+- The migrated Pubis Arc Angle stalled despite an acyclic authored graph. Its
+  temporary Ilium Surface Nearest override needed new Pubis geometry, but the pose
+  batch also reserved Pubis/Sacrum poses needed by that geometry's following controls.
+  Permanent attachment settings alone did not describe this temporary read.
+- Pose batch planning now obtains effective output roles and additional geometry
+  prerequisites from the existing shortcut attachment policy adapter. The same
+  adapter supplies job contracts. Owner-backsolve retains its separate shortcut-pose
+  output; authored bindings and the core permanent dependency graph remain unchanged.
+- A four-SCP regression reproduces the timeout before the change and completes after
+  it, preserving the authored binding and retained effective Surface Nearest receipt.
+  Nine focused shortcut/attachment tests pass. The real assembly's Pubis Arc Angle
+  now settles in 5.36 seconds with no scheduler errors; representative edit/undo and
+  final combined qualification are still underway.
+
+### CH-059–064 final migration qualification
+
+- The delivered copy has 105 exposed controls, 66 formulas and all 96 authored muscles.
+  All baseline results are ready. Original 619 records and 1,325 resources retain exact
+  canonical connectivity and attachment payloads; maximum mesh drift is 3.397e-12.
+  Only declared guide/consumer changes, six control additions and three Hook bindings
+  are allowed. Some reevaluated path frames differ and are recorded separately; they
+  are not claimed identical to the original. Source files remain unchanged.
+- Compact Hook-on-lattice pelvic mapping matches the dense coordinate-formula
+  experiment within 1.954e-13 for the same Ilium edit (587 compared resources).
+  Observed end-to-end edit time falls from 13.20 to 1.18 seconds in that controlled
+  trial. Blender/native edited shapes were visually inspected and measured, retaining
+  the existing skeleton approximation. This is not a general speedup or exact Blender
+  mesh-parity claim. Native inflation and relaxation algorithms are unchanged.
+- Actual packaged edit/undo/save compares all 625 output records and 1,325 resources
+  with zero mesh, path, pose or frame drift. Source QML controls and hidden assembly
+  renders were inspected. Final desktop smoke now requires completed document loading,
+  jobs and staging; the former fixed-delay loading screenshot is not acceptance evidence.
+- The Windows gate passes 1,970 tests, five CTests, style/function limits, typing,
+  numerics and Qt-free doctor; the final regression run passes 1,972 tests after the
+  two smoke-readiness regressions. The canonical executable passes portable checks.
+- Original/candidate Humerus and Radius length edits and Thumb thickness edits produce
+  identical retained-material attachment failures at cropped or union-covered tissue
+  locations. These pre-existing limits are preserved, not repaired through silent
+  nearest reassignment. The [task record](tasks/skeleton-shortcuts-migration.md) identifies
+  paired evidence and the delivered artifact. Offscreen evidence is not physical
+  interactive acceptance.

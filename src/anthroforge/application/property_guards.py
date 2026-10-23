@@ -91,12 +91,14 @@ def missing_reference(label: str) -> None:
 
 def changed(session: Any, before: Any, after: Any, reference: PropertyRef) -> bool:
     from .property_operations import read
+    from .property_transforms import equivalent
 
     previous = before.registry.records.get(reference.target)
     current = after.registry.records.get(reference.target)
     if previous is None or current is None or previous is current:
         return False
-    return bool(read(session, reference, previous) != read(session, reference, current))
+    old, new = read(session, reference, previous), read(session, reference, current)
+    return not equivalent(old, new) if reference.path[0] == "transform" else bool(old != new)
 
 
 @contextmanager

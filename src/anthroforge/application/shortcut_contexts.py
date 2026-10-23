@@ -83,7 +83,7 @@ def lookup(document: Any, key: str) -> ShortcutEdit | None:
 
 
 def definition(document: Any, shortcut: Any) -> ShortcutEdit:
-    owner = shortcut_ownership.scp_owner(document, shortcut)
+    owner = shortcut_ownership.attachment_scope(document, shortcut)
     controlled = shortcut_ownership.targets(document, shortcut)
     graph = dependencies.graph(document)
     seeds = {p for p in graph if p.owner in controlled}

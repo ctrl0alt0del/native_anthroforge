@@ -47,10 +47,16 @@ class ParametricSettings:
     interval: Interval = field(default_factory=Interval)
     resolution: int = 64
     variables: tuple[Variable, ...] = ()
+    interpolation: str = "POLYLINE"
+    bezier_resolution: int = 24
     kind: Literal["PARAMETRIC"] = field(default="PARAMETRIC", init=False)
 
     def __post_init__(self) -> None:
         require_expressions((self.x, self.y, self.z))
+        if self.interpolation not in ("POLYLINE", "BEZIER"):
+            raise ValueError("Choose polyline or Bézier Parametric interpolation.")
+        if not integer(self.bezier_resolution, 1, 1024):
+            raise ValueError("Bézier resolution must be between 1 and 1024.")
         if not integer(self.resolution, 2, 1000000):
             raise ValueError("Parametric resolution must be between 2 and 1000000 points.")
         names, ids = [v.name for v in self.variables], [v.id for v in self.variables]

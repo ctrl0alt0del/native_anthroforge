@@ -10,6 +10,7 @@ UiSection {
     readonly property var variables: config.variables || []
     readonly property var resolutionReference: ({target:curve.id,path:["engine_settings","resolution"]})
     readonly property var resolutionState: workspace.shortcutPanel.propertyState(resolutionReference,workspace.state.revision)
+    readonly property string samplingReason: authoring.samplingLockReason(curve.id || "",workspace.state.revision)
     title: "Parametric equations"
     visible: curve.engine === "PARAMETRIC"
     UiNotice { active: panel.visible; text: panel.curve.result?.status === "failed" && !panel.curve.result?.asset ? "Invalid Parametric curve · straight-line placeholder only; consumers require an accepted path" : "" }
@@ -26,6 +27,8 @@ UiSection {
         }
     }
     Label { text: "XYZ produce metres · t is dimensionless · m and rad are unit constants"; color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; font.pixelSize: 10 }
+    UiCombo { objectName: "parametricInterpolation"; Layout.fillWidth: true; model: ["POLYLINE","BEZIER"]; currentIndex: model.indexOf(panel.config.interpolation || "POLYLINE"); enabled: !panel.samplingReason; hint: panel.samplingReason; onActivated: panel.setting("interpolation",currentText) }
+    NumericSetting { objectName: "parametricBezierResolution"; propertyReference: ({target:panel.curve.id,path:["engine_settings","bezier_resolution"]}); visible: panel.config.interpolation === "BEZIER"; label: "Bézier samples per segment"; decimals: 0; minimum: 1; maximum: 1024; hint: panel.samplingReason; value: panel.config.bezier_resolution || 24; onEdited: value => panel.setting("bezier_resolution",Math.round(value)) }
     NumericSetting { propertyReference: panel.resolutionReference; objectName: "parametricResolution"; label: "Generated points"; decimals: 0; minimum: panel.curve.closed ? 3 : 2; maximum: 1000000; value: panel.config.resolution || 64; hint: panel.resolutionState.reason || "Uniform parameter sampling; closed curves omit a duplicate seam endpoint"; onEdited: value => panel.setting("resolution",Math.round(value)) }
     Repeater {
         model: ["start","end"]

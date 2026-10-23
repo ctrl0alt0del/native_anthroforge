@@ -2,7 +2,7 @@
 
 from collections.abc import Iterator
 from dataclasses import replace
-from math import degrees, radians
+from math import degrees, radians, ulp
 from typing import Any
 
 from anthroforge.core.numeric_properties import NumericDescriptor, PropertyRef
@@ -14,20 +14,36 @@ GROUPS = {"position": (0, "LENGTH"), "rotation": (3, "ANGLE"), "scale": (6, "SCA
 
 
 def descriptors(item: Any) -> Iterator[NumericDescriptor]:
-    reason = object_reason(item)
+    yield volume_descriptor(item)
     for scope in ("transform", "world_transform"):
-        for group, (_, dimension) in GROUPS.items():
-            writable = scope == "transform" and not reason
-            yield NumericDescriptor(
-                PropertyRef(item.id, (scope, group)),
-                scope.replace("_", " ").title() + " " + group,
-                "REAL",
-                dimension,
-                3,
-                writable,
-                reason if scope == "transform" else "Evaluated input only",
-                vector=True,
-            )
+        for group in GROUPS:
+            yield channel_descriptor(item, scope, group)
+
+
+def volume_descriptor(item: Any) -> NumericDescriptor:
+    return NumericDescriptor(
+        PropertyRef(item.id, ("world_transform", "volume_scale")),
+        "World volume scale",
+        "REAL",
+        "SCALAR",
+        1,
+        False,
+        "Evaluated input only",
+    )
+
+
+def channel_descriptor(item: Any, scope: str, group: str) -> NumericDescriptor:
+    reason = object_reason(item)
+    return NumericDescriptor(
+        PropertyRef(item.id, (scope, group)),
+        scope.replace("_", " ").title() + " " + group,
+        "REAL",
+        GROUPS[group][1],
+        3,
+        scope == "transform" and not reason,
+        reason if scope == "transform" else "Evaluated input only",
+        vector=True,
+    )
 
 
 def read(session: Any, reference: PropertyRef, item: Any = None) -> Any:
@@ -35,6 +51,8 @@ def read(session: Any, reference: PropertyRef, item: Any = None) -> Any:
     matrix = item.matrix
     if reference.path[0] == "world_transform":
         matrix = Frames(session.engine, session.document).world(item.id)
+    if reference.path[1] == "volume_scale":
+        return session.engine.volume_scale(matrix)
     index, _ = GROUPS[reference.path[1]]
     values = tuple(session.engine.decompose(matrix)[index : index + 3])
     if index == 3:
@@ -44,6 +62,22 @@ def read(session: Any, reference: PropertyRef, item: Any = None) -> Any:
 
 def changed(session: Any, item: Any, updates: Any) -> Any:
     require_object_transform(item)
+    updates = tuple(
+        (ref, value) for ref, value in updates if not equivalent(read(session, ref, item), value)
+    )
+    if not updates:
+        return item
+    return replace(item, matrix=edited_matrix(session, item, updates))
+
+
+def equivalent(before: Any, after: Any) -> bool:
+    """Ignore decomposition roundoff, without an absolute geometric tolerance."""
+    if isinstance(before, tuple):
+        return all(equivalent(a, b) for a, b in zip(before, after, strict=True))
+    return bool(abs(before - after) <= 8 * max(ulp(before), ulp(after)))
+
+
+def edited_matrix(session: Any, item: Any, updates: Any) -> tuple[float, ...]:
     values = list(session.engine.decompose(item.matrix))
     for reference, replacement in updates:
         if reference.path[0] != "transform":
@@ -53,4 +87,4 @@ def changed(session: Any, item: Any, updates: Any) -> Any:
         replacements = replacement if reference.component is None else (replacement,)
         for component, value in zip(components, replacements, strict=True):
             values[index + component] = degrees(value) if index == 3 else value
-    return replace(item, matrix=session.engine.transform(values))
+    return tuple(session.engine.transform_channels(item.matrix, values))

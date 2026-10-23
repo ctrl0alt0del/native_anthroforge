@@ -74,7 +74,7 @@ a runnable example are documented in the [development walkthrough](shortcuts_030
 | Property discovery | Search/describe eligible properties and components, units, read/write capability, anatomy ownership and restriction reasons. |
 | Shortcut lifecycle | Expose/hide, inspect/configure labels/order/vector mode, and edit a wrapper value with its policy context. Hiding does not remove a formula. |
 | Driving formulas | Create/configure virtual controls, named inputs and output rows; enable/disable/remove relationships; inspect writers, dependencies, accepted values and failures. |
-| Attachment policies | Inspect/configure eligible owner backsolve and descendant overrides; expose inferred ownership and unavailable-policy reasons. No manual owner/backsolve-target selector. |
+| Attachment policies | Inspect/configure eligible backsolve and descendant overrides; inferred ownership remains automatic. October 23 extension: a separate validated scope chooses a controlled SCP for multi-owner policies. |
 | Parametric authoring | Configure XYZ/range/resolution, create/edit/remove variables through reference validation, inspect stored definitions and generated-point state. |
 | Existing operations | Extend curve engine/configuration, Fiber creation, junctions, evaluation, duplication/deletion, transactions and project load/save rather than adding parallel lifecycles. |
 
@@ -196,7 +196,7 @@ intermediate checkpoints are recoverable work, not completed release claims.
 | Area | Required evidence |
 | --- | --- |
 | Properties/wrappers | Same value through ordinary property and wrapper; only wrapper activates its policies; exposure/hiding preserves formulas; generated/locked/driven fields remain protected through UI and API. |
-| Ownership | One SCP, one VCP, multi-object chains, shared construction, unassigned controls and ownership changes. Ordinary child motion does not create extra owners. No manual owner/backsolve selector. |
+| Ownership | One SCP, one VCP, multi-object chains, shared construction, unassigned controls and ownership changes. Ordinary child motion does not create extra owners. Explicit attachment scope does not override UI ownership. |
 | Writers/vectors | Component and whole-vector conflicts; Uniform sets equal components; explicit proportional formulas; disabling/removing preserves current values and restores editability. |
 | Types/units | Integer/real literals and promotion, division, round/floor/ceil, dimensional validity, local/world read inputs, invalid names/references, nonfinite values and target ranges. |
 | Failures | Cycles with dependent formulas, independent successful outputs, coupled invalid groups, missing inputs, recovery, retained provenance and deterministic results independent of output order. |
@@ -244,3 +244,20 @@ Validate in the background while the user uses the computer. Offscreen checks es
 only their observed render/interaction scope, not unperformed interactive acceptance.
 The original documentation-consolidation task did not require an application rebuild;
 the subsequent runtime implementation follows the full delivery gate above.
+
+## Subsequent skeleton migration qualification
+
+The [separate migration task](tasks/skeleton-shortcuts-migration.md) implements the
+approved Bézier interpolation and explicit attachment-policy scope extensions. Native
+geometry, typed core definitions, application dependency/policy adapters and existing
+desktop editors retain their respective ownership. Formula batches now respect
+evaluated-output barriers and temporary attachment reads; immutable snapshot indexes
+remove repeated formula-map reconstruction. See CH-059–064 in the
+[computation history](computation_history.md) for observed defects and corrected contracts.
+
+All 105 source controls are represented in a copied 96-muscle assembly. Qualification
+includes baseline connectivity/binding preservation, source/native edited shapes,
+profiled compact pelvic controls, full-resource undo, actual packaged edit/save/reopen,
+the Windows gate and the final 1,972-test regression run. Existing source crop/union
+attachment limitations are explicitly reproduced and retained. This one-file migration
+does not qualify a general Blender importer or unperformed interactive acceptance.

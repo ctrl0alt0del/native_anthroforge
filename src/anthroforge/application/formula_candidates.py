@@ -7,9 +7,9 @@ from anthroforge.core.numeric_properties import read_path
 from . import formula_inputs, property_writes
 
 
-def group(context: Any, reference: Any) -> tuple[Any, ...]:
+def group(document: Any, reference: Any) -> tuple[Any, ...]:
     parent = (
-        read_path(context.document.object(reference.target), reference.path[:-1])
+        read_path(document.object(reference.target), reference.path[:-1])
         if reference.path[0] != "transform"
         else None
     )
@@ -24,7 +24,7 @@ def grouped(context: Any, outputs: dict[str, Any]) -> dict[Any, list[Any]]:
     groups: dict[Any, list[Any]] = {}
     for key, value in outputs.items():
         reference = records[key][1].target
-        groups.setdefault(group(context, reference), []).append((key, reference, value))
+        groups.setdefault(group(context.document, reference), []).append((key, reference, value))
     return groups
 
 

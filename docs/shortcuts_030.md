@@ -32,6 +32,13 @@ membership/weights and formula references to generated points lock point count.
 Hover the label or field for the reason. Removing those references unlocks it;
 disabling a binding or formula retains its references and therefore retains its lock.
 
+Interpolation defaults to Polyline. Choose Bézier to retain the construction's handle
+modes and offsets while the XYZ equations position its generated knots. Point count
+and samples per Bézier segment are separate settings. Existing topology restrictions
+also protect segment sampling; the inspector explains why a setting is locked.
+Switching engines retains the stored Parametric definition, and equivalent sampling
+does not change existing consumers' topology.
+
 ## References, values and policies
 
 `property.discover` returns references; retain those references rather than building
@@ -45,8 +52,11 @@ Removing a variable that is still used reports which references must be resolved
 Each exposed property wrapper has its own label and attachment policy. Direct
 `property.set` uses ordinary edit semantics; `shortcut.set` activates only the
 initiating wrapper's policy. A driver's value edit similarly activates its policy.
-Ownership is inferred from construction consumers. Backsolve and descendant
-overrides require one inferred owning SCP; policy configuration does not move anatomy.
+Ownership is inferred from construction consumers. Backsolve and descendant overrides
+use that SCP by default. A multi-owner control may explicitly choose one controlled SCP
+as its attachment-policy scope; it still belongs under All. This scope is validated
+against the control's targets and does not change ownership. Policy configuration does
+not move anatomy or replace authored attachment settings.
 
 Expressions distinguish integers and reals: `12` is integer, `12.0` is real and
 division returns real. Use `round`, `floor` or `ceil` explicitly for integer outputs.
@@ -96,10 +106,12 @@ Property inputs select a scalar or a vector component. `value` names the current
 driver's input. There is one active writer per target component. Invalid or cyclic
 formulas retain accepted target values; independent valid formulas can still run.
 
-A policy contains `backsolve` and a `descendants` array. Each descendant entry has
+A policy contains `backsolve`, optional `scope`, and a `descendants` array. Each descendant entry has
 `target` and optional `parent_anchor`, `child_anchor`, `follow_rotation`, `strategy`.
 Omitted options use `KEEP`; rotation overrides are `ENABLED`/`DISABLED`. The policy
-editor lists the eligible owner and descendants without editing their authored settings.
+editor lists the eligible scope and descendants without editing their authored settings.
+For example, Pubis Arc Angle also drives Sacrum width but can explicitly scope its
+temporary Ilium override to Pubis. Only the initiating control's policy applies.
 
 Use existing `curve.create`/`curve.engine` with `engine: "PARAMETRIC"`. Leaving the
 engine retains its inactive definition; returning restores it. Parametric-to-Fiber

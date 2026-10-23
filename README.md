@@ -6,8 +6,10 @@ and general XYZ Parametric curves. See the [walkthrough](docs/shortcuts_030.md),
 Projects save in schema 5; existing 0.2.4/schema-4 projects remain readable with their
 accepted geometry and attachments preserved. Blender shortcut migration is separate.
 
-The Windows gate passes 1,945 tests and all five native tests. The packaged executable
-passes the full minimal-PATH portable suite and the generated-point resolution-lock check.
+The Windows gate and final regression run pass 1,972 tests and all five native tests.
+The packaged executable passes the full minimal-PATH portable suite and the
+generated-point resolution-lock check. The subsequent one-file skeleton migration adds
+retained Bézier construction and an explicit attachment-policy scope for multi-SCP controls.
 See [delivery evidence and limits](docs/development_status.md#shortcuts-and-parametric-curves-030).
 
 0.2.4 improves tissue editing and evaluation performance: prepared inspection UI,
@@ -44,7 +46,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.2.4/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.3.0/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included

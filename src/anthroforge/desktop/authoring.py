@@ -40,6 +40,12 @@ class Authoring(QObject):
     def state(self):
         return self._state
 
+    @Slot(str, int, result=str)
+    def samplingLockReason(self, target, revision):
+        from anthroforge.application.parametric_policy import sampling_reason
+
+        return sampling_reason(self.controller.session.document, target) if target else ""
+
     @Property(QObject, constant=True)
     def curveInteraction(self):
         return self.interaction

@@ -59,6 +59,7 @@ def reference(value: PropertyRef, mapping: dict[str, str]) -> PropertyRef:
 def policy(value: Any, mapping: dict[str, str]) -> Any:
     return replace(
         value,
+        scope=mapping.get(value.scope, value.scope),
         descendants=tuple(
             replace(p, target=mapping.get(p.target, p.target)) for p in value.descendants
         ),

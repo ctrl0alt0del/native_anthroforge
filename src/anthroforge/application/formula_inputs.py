@@ -1,9 +1,11 @@
 """Captured formula read sets and synthetic output revisions."""
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
 
 from anthroforge.core import numeric_properties as numeric
+from anthroforge.core.document import Document
 from anthroforge.core.entities import Workspace
 from anthroforge.core.expressions import Symbol
 from anthroforge.core.formula_dependencies import property_port, property_reference
@@ -24,8 +26,8 @@ class Captured:
         return self.document.entity(target)
 
 
-def formulas(document: Any) -> dict[str, Any]:
-    return {f.id: (d, f) for d in document.driving_shortcuts for f in d.formulas if f.enabled}
+def formulas(document: Document) -> Mapping[str, Any]:
+    return document.formula_index.formulas
 
 
 def property_revision(document: Any, port: Port) -> ReadRevision:
@@ -45,14 +47,16 @@ def property_revision(document: Any, port: Port) -> ReadRevision:
 def revision(document: Any, port: Port) -> ReadRevision | None:
     if port.output.startswith("property:"):
         return property_revision(document, port)
-    for driver in document.driving_shortcuts:
-        if port.owner == driver.id:
-            return ReadRevision(driver.id, port.output, driver.generation, 0)
-        if any(f.id == port.owner for f in driver.formulas):
-            result = next((r for r in document.formula_results if r.formula == port.owner), None)
-            return ReadRevision(
-                port.owner, port.output, driver.generation, result.revision if result else 0
-            )
+    index = document.formula_index
+    driver = index.drivers.get(port.owner)
+    if driver is not None:
+        return ReadRevision(driver.id, port.output, driver.generation, 0)
+    record = index.formulas.get(port.owner)
+    if record is not None:
+        result = index.results.get(port.owner)
+        return ReadRevision(
+            port.owner, port.output, record[0].generation, result.revision if result else 0
+        )
     return None
 
 

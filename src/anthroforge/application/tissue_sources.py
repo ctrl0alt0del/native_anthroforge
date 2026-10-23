@@ -6,7 +6,7 @@ from anthroforge.core.fibers import Fiber
 from anthroforge.core.membranes import Membrane
 from anthroforge.core.points import Anchor
 from anthroforge.core.tissue_base import TissueBaseState
-from anthroforge.native import construction, tissue_inflation
+from anthroforge.native import construction, tissue_inflation, topology
 
 from .consumed_paths import accepted as accepted_path
 from .object_frames import Frames
@@ -39,4 +39,6 @@ def membrane(resources: Any, item: Any, source: Any, frame: Any, cancel: int) ->
     if source.accepted_kind in ("LOFT", "BRANCHED"):
         mesh = tissue_inflation.refine(mesh, item.resolution, cancel)
     mesh = tissue_inflation.source(mesh, frame, cancel)
+    previous = resources.meshes.get(item.base_result.asset)
+    mesh = topology.finalize_surface(mesh, previous.mesh if previous else None, cancel)
     return TissueOutput(mesh=mesh, base=TissueBaseState("SURFACE", parts=source.accepted_parts))

@@ -55,12 +55,19 @@ def editable_wrapper(session: Any, reference: dict[str, Any]) -> Shortcut:
 
 def validate_policy(document: Any, shortcut: Any) -> None:
     policy = shortcut.policy
-    owner = shortcut_ownership.scp_owner(document, shortcut)
+    owner = shortcut_ownership.attachment_scope(document, shortcut)
+    if policy.scope and (
+        owner not in document.index.entities
+        or owner not in shortcut_ownership.owners(document, shortcut)
+    ):
+        raise ValueError("Choose an attachment scope among the shortcut's controlled SCPs.")
     if not owner and (policy.backsolve or policy.descendants):
-        raise ValueError("Attachment policies require one inferred owning SCP.")
+        raise ValueError(
+            "Attachment policies require one inferred owning SCP or an explicit scope."
+        )
     allowed = descendants(document.entities, owner) - {owner} if owner else set()
     if any(v.target not in allowed for v in policy.descendants):
-        raise ValueError("Attachment overrides apply only to descendants of the owning SCP.")
+        raise ValueError("Attachment overrides apply only to descendants of the attachment scope.")
 
 
 def install(session: Any, shortcut: Shortcut) -> None:

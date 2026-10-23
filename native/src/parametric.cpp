@@ -75,15 +75,36 @@ static void sample_equations(const Equations& programs,std::vector<ex::Value>& v
         point_record(programs,values,metadata,previous,i,t,records+13*i,cancel);
     }
 }
+static void bezier_metadata(const double* metadata,int previous,int count,double* records) {
+    for(int i=0;i<count;++i) {
+        double* point=records+13*i;
+        point[11]=point[12]=0;
+        if(i>=previous) continue;
+        const double* old=metadata+13*i;
+        for(int axis=0;axis<3;++axis) {
+            point[3+axis]=old[3+axis]+(point[axis]-old[axis]);
+            point[6+axis]=old[6+axis]+(point[axis]-old[axis]);
+        }
+        point[11]=old[11]; point[12]=old[12];
+    }
 }
-uint64_t af_parametric_path(const uint64_t* handles,int variables,const int64_t* integers,const double* reals,
+}
+uint64_t af_parametric_interpolated_path(const uint64_t* handles,int variables,const int64_t* integers,const double* reals,
                             const double* metadata,int previous,int count,int closed,double start,double end,
-                            double* records,uint64_t cancel) {
+                            int interpolation,int resolution,double* records,uint64_t cancel) {
     try {
         const auto programs=af::equations(handles);
         auto values=af::inputs(programs,variables,integers,reals);
         af::sample_equations(programs,values,metadata,previous,count,closed!=0,start,end,records,cancel);
-        const auto samples=af::authored_path(records,count,1,closed!=0,1,cancel);
+        if(interpolation!=0&&interpolation!=1) throw std::runtime_error("Unknown Parametric interpolation.");
+        if(interpolation==0) af::bezier_metadata(metadata,previous,count,records);
+        const auto samples=af::authored_path(records,count,interpolation,closed!=0,resolution,cancel);
         return af::retain_path(af::make_path(samples,closed!=0,cancel));
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+uint64_t af_parametric_path(const uint64_t* handles,int variables,const int64_t* integers,const double* reals,
+                            const double* metadata,int previous,int count,int closed,double start,double end,
+                            double* records,uint64_t cancel) {
+    return af_parametric_interpolated_path(handles,variables,integers,reals,metadata,previous,count,
+                                          closed,start,end,1,1,records,cancel);
 }

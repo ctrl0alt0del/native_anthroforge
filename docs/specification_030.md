@@ -5,8 +5,14 @@ This is the authoritative 0.3 product contract. See the [local review](tasks/sho
 for completed checks and final release qualification.
 The [implementation plan](implementation_030.md) defines delivery and evidence; the
 [engineering guidelines](engineering_guidelines.md) govern implementation. The current
-released runtime is 0.3.0. The Windows gate passes 1,945 tests; delivery evidence
-is recorded in the linked review.
+released runtime is 0.3.0. The original release passed 1,945 tests; subsequent
+qualification is recorded in [development status](development_status.md).
+
+The October 23 migration extensions below (retained Bézier construction and explicit
+attachment-policy scope) are approved and implemented. Their real-assembly preservation,
+edited-shape, lifecycle and packaged checks are recorded in
+[the migration record](tasks/skeleton-shortcuts-migration.md). They extend the original
+release contract without changing the project schema or release number.
 
 The [research](shortcuts_030_research.md) and [source inventory](research/shortcuts_030/inventory.md)
 record observed Blender behavior. Where earlier proposals differ, this specification
@@ -74,9 +80,11 @@ multiple SCPs/VCPs have no single owning SCP. Ordinary attachment propagation do
 count as another controlled property: changing a femur dimension does not acquire
 ownership of all children that subsequently move.
 
-There is no manual Owning SCP or independent Backsolve SCP selector. Revalidate ownership
-and policy eligibility when references change; stale configuration must not apply outside
-the inferred scope. Single-VCP controls remain available in the selected VCP's UI, but
+There is no manual Owning SCP selector. A separate attachment-policy scope may choose
+one controlled SCP for multi-owner controls; it does not change inferred ownership or
+Selected/All grouping. Revalidate ownership and policy eligibility when references
+change; stale configuration must not apply outside the permitted scope.
+Single-VCP controls remain available in the selected VCP's UI, but
 this does not grant them SCP-specific attachment policies. Unassigned construction and
 controls without a unique anatomical owner remain accessible under All.
 
@@ -94,11 +102,14 @@ of its formulas, or a global attachment mode.
 | Follow Rotation override | Keep, Enabled, Disabled. Disabling rotation does not disable translation following. | Keep |
 | Rotation strategy override | Keep, Auto, Stable Surface, Deformation Flow. | Keep |
 
-Descendant overrides apply to explicitly configured descendants of the owning SCP,
+Descendant overrides apply to explicitly configured descendants of the policy-scope SCP,
 including deeper descendants. Do not expand this scope to every SCP reached through
-formula targets. Backsolve concerns the owner's own attachment; descendant settings
-concern how those children follow. A shortcut without an owning SCP cannot use these
-SCP-specific policies. Do not enable direct transforms on generated VCP geometry.
+formula targets. By default scope is the inferred owning SCP. An explicit scope must
+be one of the shortcut's controlled SCPs, including indirect targets/shared construction.
+Backsolve concerns that SCP's own attachment; descendant settings concern its children.
+Without an eligible automatic or explicit scope, SCP policies are unavailable.
+The skeleton's Pubis Arc Angle controls Pubis construction and Sacrum width, yet retains
+an explicit Pubis scope for its Ilium override. Do not enable direct transforms on VCPs.
 
 Keep uses authored attachment settings. Changing policy configuration does not itself
 move anatomy; it governs subsequent shortcut edits. Auto/Stable Surface/Deformation Flow
@@ -185,6 +196,14 @@ Bézier handles or allow sample dragging to rewrite equations silently. Provide 
 and formulas for shaping while this engine is active. Radius/tilt expressions are deferred;
 preserve the ordinary curve contract for supported non-formula attributes.
 
+Interpolation is Polyline by default, with optional Bézier construction. Bézier retains
+existing knot identities, handle modes and handle offsets translated with each generated
+knot; newly generated knots use automatic handles. A separate samples-per-segment value
+controls Bézier evaluation. This preserves existing Bézier guide construction and frames
+without substituting a dense polyline. Generated point count remains the meaning of
+resolution. Existing consumer/attachment topology locks also protect interpolation or
+segment-sampling changes that would alter attachment meaning.
+
 Open/closed curves remain one connected path. Closed curves need not have coincident
 formula endpoints: a straight closing segment is permitted. Preserve the common curve
 contract against a duplicate seam endpoint. Do not add a periodicity/matching-endpoint
@@ -221,8 +240,9 @@ Engine selection applies directly as one undo action:
 - Switching to Parametric restores its stored formulas, variables and settings. With no
   stored definition, use a valid straight-line formula and display that straight line.
 - Switching away uses current generated points as authored controls, not an unrelated
-  older authored point set. Bézier can represent the sampled segments with straight
-  handles; Polyline connects them; ROUTED uses them as routing control points.
+  older authored point set. Bézier retains the Parametric Bézier handle construction and
+  segment resolution, or straight handles for Polyline interpolation; Polyline connects
+  generated knots; ROUTED uses them as routing control points.
 - Keep the parametric definition for a later return. Existing topology restrictions still
   apply. Do not add Preview/Accept gates, bake deformation or apply a deformer twice.
 
@@ -296,7 +316,8 @@ manifest-version rewrite.
 | Superseded proposal | Confirmed 0.3 rule |
 | --- | --- |
 | A property itself is a shortcut; normal fields always apply shortcut policies | Properties remain below separate wrappers; only wrapper edits activate their policies. |
-| Manually choose a virtual shortcut's owner or backsolve target | Infer one owning SCP from controlled properties; multi-owner controls have none. |
+| Manually choose a virtual shortcut's owner | Infer one owning SCP from controlled properties; multi-owner controls have none. An independent, validated attachment-policy scope preserves multi-owner addon behavior. |
+| Parametric can only connect generated points as straight segments | Optional retained Bézier construction preserves knots, handle metadata and per-segment sampling; Polyline remains default. |
 | Accumulate target-wrapper policies or expand to all formula-target descendants | Only the initiating wrapper's policies, scoped as in the addon. |
 | Reject cyclic definitions or the entire multi-output edit | Retain cyclic/failed dependent values; apply unrelated valid outputs; reject jointly conflicting groups together. |
 | Resolution counts intervals/parameter-unit steps or retains extra junction samples | Uniform generated-point count; junctions and generated-point references lock resolution. |

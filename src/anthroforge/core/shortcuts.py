@@ -30,10 +30,13 @@ class DescendantOverride:
 class AttachmentPolicy:
     backsolve: bool = False
     descendants: tuple[DescendantOverride, ...] = ()
+    scope: str = ""
 
     def __post_init__(self) -> None:
         if type(self.backsolve) is not bool:
             raise ValueError("Backsolve must be Boolean.")
+        if not isinstance(self.scope, str):
+            raise ValueError("Attachment scope must be an SCP identity.")
         if len({v.target for v in self.descendants}) != len(self.descendants):
             raise ValueError("A descendant can have only one shortcut override.")
 

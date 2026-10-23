@@ -57,3 +57,8 @@ def scp_owner(document: Any, shortcut: Shortcut | DrivingShortcut) -> str:
     return (
         next(iter(values)) if len(values) == 1 and values <= document.index.entities.keys() else ""
     )
+
+
+def attachment_scope(document: Any, shortcut: Shortcut | DrivingShortcut) -> str:
+    """Explicit policy scope does not alter inferred ownership or UI grouping."""
+    return shortcut.policy.scope or scp_owner(document, shortcut)

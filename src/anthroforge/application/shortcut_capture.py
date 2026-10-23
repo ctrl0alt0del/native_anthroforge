@@ -9,6 +9,21 @@ from anthroforge.core.shortcut_edits import OverrideBinding, OwnerAnchor, Shortc
 from anthroforge.native import attachments, shortcut_attachments
 
 
+def retained_bindings(document: Any, shortcut: Any) -> tuple[OverrideBinding, ...]:
+    from .shortcut_ownership import references
+
+    targets = {
+        ref.target
+        for ref in references(document, shortcut)
+        if ref.path[0] in ("transform", "geometry_offset")
+    }
+    return tuple(
+        OverrideBinding(item.id, item.attachment)
+        for key in sorted(targets & document.index.entities.keys())
+        if (item := document.entity(key)).parent and item.attachment.binding
+    )
+
+
 def snapshot(item: SCP) -> SCP:
     return SCP(
         item.name,
@@ -44,15 +59,21 @@ def effective(attachment: Any, override: Any) -> Any:
 
 
 def compute(engine: Any, context: ShortcutEdit, meshes: Any, cancel: Any) -> ShortcutEdit:
-    records, bindings = {item.id: item for item in context.opening}, []
+    records = {item.id: item for item in context.opening}
+    bindings = {binding.target: binding for binding in context.bindings}
     for override in context.policy.descendants:
         if cancel.is_set():
             raise ValueError("Shortcut attachment capture cancelled.")
-        bindings.append(capture_override(engine, records, override, meshes, cancel.handle))
+        binding = capture_override(engine, records, override, meshes, cancel.handle)
+        bindings[binding.target] = binding
     anchor = capture_owner(engine, records, context, meshes)
-    return replace(
-        context, opening=(), bindings=tuple(bindings), anchor=anchor, status="ready", error=""
-    )
+    return prepared(context, tuple(bindings.values()), anchor)
+
+
+def prepared(
+    context: ShortcutEdit, bindings: tuple[OverrideBinding, ...], anchor: OwnerAnchor | None
+) -> ShortcutEdit:
+    return replace(context, opening=(), bindings=bindings, anchor=anchor, status="ready", error="")
 
 
 def capture_override(

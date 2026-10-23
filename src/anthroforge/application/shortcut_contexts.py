@@ -22,15 +22,15 @@ class Contexts:
         return (self.active,) if self.active else ()
 
     def begin(self, shortcut: Any) -> None:
-        if shortcut.policy == AttachmentPolicy():
-            return
         from .shortcut_operations import validate_policy
 
         validate_policy(self.session.document, shortcut)
         existing = lookup(self.session.document, self.active)
         if existing is not None and existing.shortcut == shortcut.id:
             return
-        self.activate(definition(self.session.document, shortcut))
+        bindings = shortcut_capture.retained_bindings(self.session.document, shortcut)
+        if bindings or shortcut.policy != AttachmentPolicy():
+            self.activate(definition(self.session.document, shortcut, bindings))
 
     def activate(self, context: ShortcutEdit) -> None:
         self.active = context.id
@@ -42,7 +42,8 @@ class Contexts:
         self.session.replace_document(shortcut_edits=(*retained, context))
         from .shortcut_capture_tasks import request
 
-        request(self.session, context.id)
+        if context.status == "pending":
+            request(self.session, context.id)
 
     def annotate(self, job: Any, document: Any) -> None:
         if not job.writes or not job.publish_during_edit or not document.shortcut_edits:
@@ -82,20 +83,27 @@ def lookup(document: Any, key: str) -> ShortcutEdit | None:
     return next((v for v in document.shortcut_edits if v.id == key), None)
 
 
-def definition(document: Any, shortcut: Any) -> ShortcutEdit:
+def definition(document: Any, shortcut: Any, bindings: tuple[Any, ...] = ()) -> ShortcutEdit:
     owner = shortcut_ownership.attachment_scope(document, shortcut)
+    capture = shortcut.policy.backsolve or bool(shortcut.policy.descendants)
+    return ShortcutEdit(
+        shortcut.id,
+        owner,
+        shortcut.policy,
+        affected_targets(document, shortcut, owner),
+        shortcut_capture.source_entities(document, owner, shortcut.policy) if capture else (),
+        bindings=bindings,
+        status="pending" if capture else "ready",
+    )
+
+
+def affected_targets(document: Any, shortcut: Any, owner: str) -> tuple[str, ...]:
     controlled = shortcut_ownership.targets(document, shortcut)
     graph = dependencies.graph(document)
     seeds = {p for p in graph if p.owner in controlled}
     affected = {p.owner for p in dependencies.closure(graph.consumers, seeds)}
     affected |= descendants(document.entities, owner)
-    return ShortcutEdit(
-        shortcut.id,
-        owner,
-        shortcut.policy,
-        tuple(sorted(affected | controlled)),
-        shortcut_capture.source_entities(document, owner, shortcut.policy),
-    )
+    return tuple(sorted(affected | controlled))
 
 
 def waiting(document: Any, context: ShortcutEdit) -> bool:

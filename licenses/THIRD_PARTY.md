@@ -1,5 +1,12 @@
 # Runtime and source notices
 
+Release 0.3.0 adds AnthroForge-authored typed native expression compilation/evaluation,
+Parametric sampling, and shortcut/attachment orchestration under GPL-3.0-or-later.
+No muparser or ExprTk production dependency or copied implementation is bundled; their
+qualification is recorded in `docs/research/shortcuts_030/expression_qualification.md`.
+Existing Blender/addon adaptations, dependency versions and provenance remain in force.
+The companion source archive includes the new native and application implementation.
+
 Release 0.2.4 adds AnthroForge-authored bounded preparation/cache adapters and a
 fixed-variable/box-bound height formulation around the existing PIQP solver.
 Pinned Blender/addon numerical sources and third-party versions remain unchanged;

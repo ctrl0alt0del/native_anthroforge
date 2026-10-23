@@ -53,10 +53,15 @@ weighted Hook/lattice, formula input/target, recovery and restoration cases. The
 26-case run and production-QML editor check pass; the screenshot was inspected. No native
 sampling or deformation arithmetic changed. The final full gate is next.
 
-Next: complete the final full gate, finish version/release updates, build the single
-canonical `dist/0.3.0/AnthroForge.dist` plus source archive, and merge/push the fully validated
-feature into main. Runtime/package version remains 0.2.4 until qualification. Preserve the
-unrelated root `__init__.py`; all checks remain background-only.
+Final code qualification completed through `9540326`: **1,945 tests passed**, no
+expected failures, all five CTests, native/script style, configured typing, numerics and
+headless doctor. The gate began at `1615e4f`; the empty-membership correction landed
+before its pytest phase and also passed focused checks/typing separately. Runtime and
+build versions now advance to 0.3.0 for final packaging. No main merge yet.
+
+Next: build and qualify the single canonical `dist/0.3.0/AnthroForge.dist`, generate
+`dist/AnthroForge-0.3.0-source.zip`, record final evidence and merge/push the validated
+feature into main. Preserve unrelated root `__init__.py`; all checks stay background-only.
 
 ## Historical pause and implementation checkpoints
 

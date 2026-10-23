@@ -93,12 +93,12 @@ class Comparison:
                 self.value(value, after[key], f"{address}/{key}")
 
 
-def compare(source, candidate, output, normalize=lambda key, before, after: before):
+def compare(source, candidate, output, normalize=lambda key, before, after: before, extras=()):
     engine = GeometryEngine()
     before, resources = read_package(source, engine)
     after, current = read_package(candidate, engine)
     check = Comparison(resources, current)
-    check_records(check, before, after, normalize)
+    check_records(check, before, after, normalize, extras)
     result = dict(
         records=len(before.registry.records), resources=len(check.resources), **check.maxima
     )
@@ -106,8 +106,8 @@ def compare(source, candidate, output, normalize=lambda key, before, after: befo
     print(json.dumps(result), flush=True)
 
 
-def check_records(check, before, after, normalize):
-    assert before.registry.records.keys() == after.registry.records.keys()
+def check_records(check, before, after, normalize, extras=()):
+    assert set(before.registry.records) | set(extras) == set(after.registry.records)
     for key, item in before.registry.records.items():
         current_item = asdict(after.object(key))
         check.value(normalize(key, asdict(item), current_item), current_item, key)

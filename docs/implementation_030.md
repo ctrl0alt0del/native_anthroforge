@@ -74,7 +74,7 @@ a runnable example are documented in the [development walkthrough](shortcuts_030
 | Property discovery | Search/describe eligible properties and components, units, read/write capability, anatomy ownership and restriction reasons. |
 | Shortcut lifecycle | Expose/hide, inspect/configure labels/order/vector mode, and edit a wrapper value with its policy context. Hiding does not remove a formula. |
 | Driving formulas | Create/configure virtual controls, named inputs and output rows; enable/disable/remove relationships; inspect writers, dependencies, accepted values and failures. |
-| Attachment policies | Inspect/configure eligible owner backsolve and descendant overrides; expose inferred ownership and unavailable-policy reasons. No manual owner/backsolve-target selector. |
+| Attachment policies | Inspect/configure eligible backsolve and descendant overrides; inferred ownership remains automatic. October 23 extension: a separate validated scope chooses a controlled SCP for multi-owner policies. |
 | Parametric authoring | Configure XYZ/range/resolution, create/edit/remove variables through reference validation, inspect stored definitions and generated-point state. |
 | Existing operations | Extend curve engine/configuration, Fiber creation, junctions, evaluation, duplication/deletion, transactions and project load/save rather than adding parallel lifecycles. |
 
@@ -196,7 +196,7 @@ intermediate checkpoints are recoverable work, not completed release claims.
 | Area | Required evidence |
 | --- | --- |
 | Properties/wrappers | Same value through ordinary property and wrapper; only wrapper activates its policies; exposure/hiding preserves formulas; generated/locked/driven fields remain protected through UI and API. |
-| Ownership | One SCP, one VCP, multi-object chains, shared construction, unassigned controls and ownership changes. Ordinary child motion does not create extra owners. No manual owner/backsolve selector. |
+| Ownership | One SCP, one VCP, multi-object chains, shared construction, unassigned controls and ownership changes. Ordinary child motion does not create extra owners. Explicit attachment scope does not override UI ownership. |
 | Writers/vectors | Component and whole-vector conflicts; Uniform sets equal components; explicit proportional formulas; disabling/removing preserves current values and restores editability. |
 | Types/units | Integer/real literals and promotion, division, round/floor/ceil, dimensional validity, local/world read inputs, invalid names/references, nonfinite values and target ranges. |
 | Failures | Cycles with dependent formulas, independent successful outputs, coupled invalid groups, missing inputs, recovery, retained provenance and deterministic results independent of output order. |

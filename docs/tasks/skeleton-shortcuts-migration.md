@@ -141,3 +141,26 @@ curve-consumption frame/mode changes are allowed by the migration comparison too
 `pelvic_stage` is now running from that checkpoint. No final delivery or main merge.
 Pending: qualify full mapping and parameter edits, actual shapes, extension docs,
 full gate and canonical portable build. Preserve unrelated root `__init__.py`.
+
+## Complete controls and compact pelvic mapping under qualification
+
+All 105 source controls are wired in `pelvic-checkpoint.anthroforge`; exact retained
+bindings/connectivity and baseline meshes passed (`pelvic-preservation.json`). The
+Ilium-angle edit and undo work, but 1,740 point-coordinate formulas made this control
+take 13.20 seconds to settle. Snapshot indexing and a scale-specific dependency
+correction are covered by CH-063 and regressions. The 1,964-test/five-CTest gate passed
+before the latest small changes; final combined checks remain required.
+
+The existing Hook-on-lattice contract supports a more compact migration. The new
+`skeleton_shortcut_pelvic_hooks.py` adds a fixed affine frame and driven Hook for each
+of Pubis/Ischium/Ilium, retaining the original cages and shared guide. The experiment
+reduces the pelvic section to 25 formulas. `compact-checkpoint.anthroforge` is still
+an intermediate. Same Ilium edit settled in 1.18 seconds, undo passed. Full equivalence
+and baseline checks are running. Outputs/profiles remain in the external migration
+folder, `compact-edits/`; the old point-formula results are retained as evidence.
+
+Production QML interpolation/scope controls passed offscreen inspection, including
+readable screenshots. New sampling lock presentation needs final focused coverage.
+Next: compare compact mapping, representative edits and source semantics; inspect
+actual shapes; finalize source-order controls and final copied project; combined gate,
+canonical portable/source build; validated merge/push. No final file delivered yet.

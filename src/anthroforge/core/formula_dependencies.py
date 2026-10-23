@@ -59,14 +59,23 @@ def add_formula(edges: Any, driver: Any, formula: Any, records: Any) -> None:
 
 def add_property(edges: Any, reference: PropertyRef, formulas: Any, records: Any) -> None:
     writers = {Port(f.id, "formula") for _, f in formulas if overlaps(reference, f.target)}
-    if reference.path[0] == "world_transform":
-        writers.add(Port(reference.target, "pose"))
     item = records.get(reference.target)
+    if reference.path[0] == "world_transform":
+        writers |= world_inputs(reference, item, formulas)
     if isinstance(item, Curve) and item.engine == "PARAMETRIC" and reference.path[0] == "points":
         writers.add(Port(reference.target, "path"))
     if reference.target not in records:
         writers.add(Port(reference.target, "missing_property"))
     edges[property_port(reference)] = writers
+
+
+def world_inputs(reference: PropertyRef, item: Any, formulas: Any) -> set[Port]:
+    # Anatomical attachment propagation preserves an SCP's own scale; its parent
+    # contributes location/orientation, not volume. Ordinary parents still compose.
+    if isinstance(item, SCP) and reference.path[1] == "volume_scale":
+        scale = PropertyRef(item.id, ("transform", "scale"))
+        return {Port(f.id, "formula") for _, f in formulas if overlaps(scale, f.target)}
+    return {Port(reference.target, "pose")}
 
 
 def effects(item: Any, reference: PropertyRef) -> set[Port]:

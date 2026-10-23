@@ -1950,3 +1950,26 @@ average. This is a read-only formula input; no new write channel is introduced.
 - Reference: Python's [dependency-ready scheduling contract](https://docs.python.org/3/library/graphlib.html)
   supports waiting for prerequisite completion; the implementation uses the
   application's existing port graph and coordinator rather than a new scheduler.
+
+### CH-063 — Snapshot formula lookup and scale-specific prerequisites (2026-10-23)
+
+- A 1,740-output pelvic experiment spent repeated Python work reconstructing formula
+  maps and scanning accepted results. A ten-second sampling capture observed these
+  paths in 57 of 200 samples. Immutable document snapshots now own read-only formula
+  indexes, reusing authored maps across result-only publication. This changes lookup,
+  not expression values, scheduling ownership or serialization. Snapshot/undo and
+  accepted-result reuse tests pass.
+- The source Sacrum-width driver exposed a false cycle through its attached child's
+  full pose. SCP attachment propagation retains the child's own affine volume scale;
+  that read therefore depends on its scale writers, while ordinary parented objects
+  continue depending on composed pose. Both the legitimate child-volume-to-parent
+  case and actual cyclic scale formulas are covered by regression tests.
+- Full 105-control migration now preserves all 619 original records and 1,325
+  referenced resources: maximum mesh drift 3.397e-12, unchanged connectivity and
+  retained binding arrays. Path-frame changes are separately recorded, not claimed
+  identical. These results precede final delivery qualification.
+- The point-formula experiment is not the chosen migration design: its Ilium edit
+  required 13.20 seconds including publication. A compact mapping using existing
+  native Hook-on-lattice evaluation requires only 25 pelvic formulas and completed
+  the same edit in 1.18 seconds. Complete shape/relationship comparison is underway;
+  this is one controlled workload, not a general application performance claim.

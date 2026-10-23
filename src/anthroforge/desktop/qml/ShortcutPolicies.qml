@@ -4,12 +4,13 @@ import QtQuick.Layouts
 
 UiSection {
     id: panel
+    objectName: "shortcutPolicies"
     required property var adapter
     title: "Attachment policy"
     expanded: false
     Label {
         Layout.fillWidth: true; wrapMode: Text.Wrap; color: Theme.muted; font.pixelSize: 11
-        text: panel.adapter.ownerName ? "Attachment scope: "+panel.adapter.ownerName : "Choose an attachment scope for a control spanning several SCPs."
+        text: panel.adapter.ownerName ? "Attachment scope: "+panel.adapter.ownerName : (panel.adapter.scopeOptions.length > 2 ? "Choose an attachment scope for a control spanning several SCPs." : "Attachment policies require a controlled SCP.")
     }
     UiCombo {
         objectName: "shortcutAttachmentScope"; Layout.fillWidth: true

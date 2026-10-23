@@ -55,14 +55,18 @@ def require_resolution(document: Document, item: Curve) -> None:
 
 
 def resolution_reason(document: Document, item: Curve) -> str:
-    from .construction_policy import topology_locks
-
     if any(p.junction for p in item.points):
         return "Resolution is locked while the curve has a junction; detach it to resize."
     reason = membership_reason(document, item.id) or formula_reason(document, item.id)
     if reason:
         return reason
-    locks = topology_locks(document, item.id)
+    return sampling_reason(document, item.id)
+
+
+def sampling_reason(document: Document, target: str) -> str:
+    from .construction_policy import topology_locks
+
+    locks = topology_locks(document, target)
     return "Topology is locked: " + "; ".join(r["reason"] for r in locks) if locks else ""
 
 
@@ -97,12 +101,17 @@ def formula_reason(document: Document, curve: str) -> str:
 
 
 def descriptor(document: Document, value: NumericDescriptor) -> NumericDescriptor:
-    if value.reference.path != ("engine_settings", "resolution"):
+    path = value.reference.path
+    if path not in (("engine_settings", "resolution"), ("engine_settings", "bezier_resolution")):
         return value
     item = document.object(value.reference.target)
     if not isinstance(item, Curve) or item.engine != "PARAMETRIC":
         return value
-    reason = resolution_reason(document, item)
+    reason = (
+        resolution_reason(document, item)
+        if path[-1] == "resolution"
+        else sampling_reason(document, item.id)
+    )
     return replace(value, writable=value.writable and not reason, reason=reason or value.reason)
 
 

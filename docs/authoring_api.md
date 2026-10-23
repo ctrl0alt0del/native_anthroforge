@@ -2,6 +2,20 @@
 
 ## Shortcuts and Parametric curves (0.3.0)
 
+October 23 migration extensions (final packaging qualification tracked in the task record):
+`curve.engine` accepts optional typed `settings` together with the engine switch in one
+transaction. Parametric settings add `interpolation: "POLYLINE" | "BEZIER"` and
+`bezier_resolution` (samples per segment, 1–1024). `resolution` still counts generated
+knots. Retained Bézier modes/handle offsets preserve imported authored construction.
+`curve.parametric.configure` edits these settings through the same topology policies.
+
+Shortcut/driver `policy.scope` optionally identifies a controlled SCP for attachment
+policies. Empty selects inferred ownership; explicit scope does not change All/Selected
+grouping. `driver.configure(..., changes={"policy": {...}})` and `shortcut.configure`
+share validation, copying, persistence and gesture contexts. Read-only
+`world_transform.volume_scale` is the signed cube root of the affine determinant,
+matching Blender's SCALE_AVG driver input even with shear/reflection.
+
 The [walkthrough and operation signatures](shortcuts_030.md) describe
 implemented property discovery, shortcut exposure/configuration/editing, driving-formula
 lifecycle and policies, and Parametric definitions/variables. Desktop and headless clients

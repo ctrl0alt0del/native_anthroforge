@@ -45,15 +45,18 @@ def outcome(key, changed, candidate, expected, original):
     )
 
 
-def main(output):
+def main(output, name="SHORTCUT_15"):
     plan = read(output / "plan.json")
-    case = next(c for c in plan["cases"] if c["id"] == "SHORTCUT_15")
+    case = next(c for c in plan["cases"] if c["id"] == name)
     with closing(Session()) as session:
         load(session, Path(plan["standalone"]))
         result = probe(session, case, output)
-        write(output / "owner-binding-counterfactual.json", result)
+        filename = (
+            "owner-binding-counterfactual" if name == "SHORTCUT_15" else name + "-owner-probe"
+        )
+        write(output / (filename + ".json"), result)
         print(result)
 
 
 if __name__ == "__main__":
-    main(Path(sys.argv[1]))
+    main(Path(sys.argv[1]), *sys.argv[2:])

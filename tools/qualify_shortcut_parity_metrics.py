@@ -1,7 +1,7 @@
 """Known-answer checks for the analytical report, including metre/centimetre input."""
 
 import numpy as np
-from shortcut_parity_compare import geometry, physical_frame
+from shortcut_parity_compare import geometry, mesh_response, physical_frame
 from shortcut_parity_metrics import endpoints, response, surface
 
 from anthroforge.core.entities import IDENTITY
@@ -40,10 +40,18 @@ def deformation(points):
     np.testing.assert_allclose(error, [0.125, 0.125])
 
 
+def exclusions(points):
+    duplicated = points[[0, 0, 2]]
+    assert not response(duplicated, duplicated, points, points)["available"]
+    a, b = (points, np.asarray([[0, 1, 2]])), (points, np.asarray([[0, 2, 1]]))
+    assert not mesh_response(a, b, a, a)["available"]
+
+
 if __name__ == "__main__":
     vertices = np.asarray([[0.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
     native = GeometryEngine()
     units(native, vertices)
     distances(native, vertices)
     deformation(vertices)
+    exclusions(vertices)
     print("Parity metric known-answer checks passed")

@@ -33,13 +33,24 @@ def mesh_comparison(engine, key, a, b, initial):
     oa, ob = geometry(initial[0], key), geometry(initial[1], key)
     return dict(
         surface_distance=surface(engine, va, vb),
-        response=response(oa[0], va[0], ob[0], vb[0]),
+        response=mesh_response(oa, va, ob, vb),
         app_vertices=len(va[0]),
         blender_vertices=len(vb[0]),
+        changed=dict(app=changed(oa[0], va[0]), blender=changed(ob[0], vb[0])),
         centroid_response_error=float(
             np.linalg.norm((va[0].mean(0) - oa[0].mean(0)) - (vb[0].mean(0) - ob[0].mean(0)))
         ),
     )
+
+
+def changed(before, after):
+    return before.shape != after.shape or not np.allclose(before, after, atol=1e-7, rtol=0)
+
+
+def mesh_response(oa, va, ob, vb):
+    if not np.array_equal(oa[1], va[1]) or not np.array_equal(ob[1], vb[1]):
+        return dict(available=False, reason="Triangle connectivity changed")
+    return response(oa[0], va[0], ob[0], vb[0])
 
 
 def path_comparison(key, a, b, initial):
@@ -64,7 +75,7 @@ def compare_object(engine, key, a, b, initial):
         if suffix == "__path"
         else mesh_comparison(engine, key, a, b, initial)
     )
-    return dict(result, **metric, **stage_comparison(engine, key, a, b, record["kind"]))
+    return dict(result, **metric, **stage_comparison(engine, key, a, b, initial, record["kind"]))
 
 
 def identity(app, blender):
@@ -80,12 +91,9 @@ def identity(app, blender):
     )
 
 
-def stage_comparison(engine, key, a, b, kind):
+def stage_comparison(engine, key, a, b, initial, kind):
     if kind == "SCP":
-        left, right = geometry(a, key), geometry(b, key)
-        relative = physical_frame(a, key) @ np.linalg.inv(physical_frame(b, key))
-        aligned = transformed(engine, right[0], relative.ravel())
-        return dict(pose_aligned_distance=surface(engine, left, (aligned, right[1])))
+        return scp_shape(engine, key, a, b, initial)
     if kind == "TissueVCP" and all(key + "__base__vertices" in d[1] for d in (a, b)):
         if b[0]["lookup"][key].get("settings", {}).get("output_domain_mode") == "PLANE":
             return dict(base_comparison_skipped="Addon cropped base versus app uncropped base")
@@ -93,6 +101,20 @@ def stage_comparison(engine, key, a, b, kind):
             base_distance=surface(engine, geometry(a, key + "__base"), geometry(b, key + "__base"))
         )
     return {}
+
+
+def scp_shape(engine, key, a, b, initial):
+    baseline = aligned_distance(engine, key, *initial)
+    if baseline["max"] > 1e-5:
+        return dict(pose_comparison_skipped="Baseline local geometry differs", baseline=baseline)
+    return dict(pose_aligned_distance=aligned_distance(engine, key, a, b))
+
+
+def aligned_distance(engine, key, a, b):
+    left, right = geometry(a, key), geometry(b, key)
+    relative = physical_frame(a, key) @ np.linalg.inv(physical_frame(b, key))
+    aligned = transformed(engine, right[0], relative.ravel())
+    return surface(engine, left, (aligned, right[1]))
 
 
 def physical_frame(data, key):

@@ -54,6 +54,8 @@ def response(original_a, current_a, original_b, current_b):
     if original_a.shape != current_a.shape or original_b.shape != current_b.shape:
         return dict(available=False, reason="Topology/sample-count changed")
     distances, indices = cKDTree(original_b).query(original_a)
+    if len(original_a) != len(original_b) or len(np.unique(indices)) != len(indices):
+        return dict(available=False, reason="Baseline correspondence is not one-to-one")
     if distances.max() > 1e-5:
         return dict(
             available=False,

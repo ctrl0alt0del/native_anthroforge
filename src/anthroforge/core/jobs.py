@@ -80,6 +80,7 @@ class Job:
     inputs_key: Callable[[Document], Any] | None = None
     accepted_inputs_key: Any = None
     edit_contexts: tuple[str, ...] = ()
+    causes: tuple[str, ...] = ()
     urgency: RequestUrgency | None = None
     queue_demand: QueueDemand | None = None
 

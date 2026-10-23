@@ -40,6 +40,7 @@ class TaskCoordinator:
     def _initialize_scheduling(self, clock: Callable[[], float]) -> None:
         self.service_tick: Callable[[], None] = lambda: None
         self.lifecycle: Callable[[Job, str], None] = lambda job, phase: None
+        self.observer: Callable[[Job, str], None] = lambda job, phase: None
         self.profiler: Any = None
         self.metrics = Metrics()
         self.task_schedulers = task_schedulers()
@@ -65,6 +66,7 @@ class TaskCoordinator:
 
     def submit(self, job: Job) -> str:
         self.annotate(job, self.current())
+        self.observer(job, "requested")
         self.priorities.capture(job, self.clock())
         return task_coalescing.reuse(self, job) or self._submit(job)
 
@@ -78,6 +80,7 @@ class TaskCoordinator:
         job.queued_since = self.clock() if job.queued_since is None else job.queued_since
         self.registry.add(job)
         self.lifecycle(job, "submitted")
+        self.observer(job, "submitted")
         trace.event(self.profiler, job, "queued")
         self._admit(job)
         self._checkpoint()
@@ -373,6 +376,7 @@ class TaskCoordinator:
         self.task_schedulers[job.kind].observe(job)
         trace.event(self.profiler, job, job.state)
         self.lifecycle(job, "terminal")
+        self.observer(job, "terminal")
         self.registry.finish(job)
 
     def _cleanup(self, job: Job, state: str) -> None:

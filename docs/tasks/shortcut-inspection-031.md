@@ -9,13 +9,16 @@
 
 ## Current state
 
-Initial repository and owning-boundary review complete. No runtime changes yet.
-Use shared dependency graph and coordinator; observation cannot control scheduling.
+Shared inspection APIs and runtime observation are implemented. Formula evaluation
+retains compact input evidence without changing arithmetic. Causal annotations observe
+submission/coalescing/publication independently of attachment contexts. UI/overlays,
+bounded evidence refinements and full lifecycle/performance qualification remain.
 Detailed design: `docs/specification_031.md` and `docs/implementation_031.md` (to create).
 
 ## Verification
 
-Pending implementation, contract/native tests, production geometry preservation,
+25 focused tests pass (inspection, formula and retained-binding suites); new application
+modules pass strict typing. Pending UI integration, broader contract/native tests, production geometry preservation,
 profiling, offscreen UI/render acceptance, development gate and portable release.
 
 ## Next actions

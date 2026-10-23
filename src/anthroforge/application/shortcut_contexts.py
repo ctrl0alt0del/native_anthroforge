@@ -25,6 +25,7 @@ class Contexts:
         from .shortcut_operations import validate_policy
 
         validate_policy(self.session.document, shortcut)
+        self.session.shortcut_observation.begin(shortcut)
         existing = lookup(self.session.document, self.active)
         if existing is not None and existing.shortcut == shortcut.id:
             return

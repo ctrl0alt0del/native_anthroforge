@@ -16,6 +16,7 @@ class Evaluation:
     values: dict[str, Any] = field(default_factory=dict)
     failures: dict[str, str] = field(default_factory=dict)
     candidates: list[Any] = field(default_factory=list)
+    evidence: dict[str, dict[str, Any]] = field(default_factory=dict)
 
 
 def evaluate(context: Any, ids: set[str], cancel: Any) -> Evaluation:
@@ -51,9 +52,9 @@ def compute(result: Evaluation, driver: Any, formula: Any, cancel: Any) -> None:
         require_inputs(result, formula)
         symbols = formula_inputs.symbols(context, driver, formula)
         program = expressions.compile(context.engine, formula.expression, symbols, cancel.handle)
-        value = program.evaluate(
-            formula_inputs.values(context, driver, formula, result.values), cancel.handle
-        )
+        inputs = formula_inputs.values(context, driver, formula, result.values)
+        result.evidence[formula.id] = inputs
+        value = program.evaluate(inputs, cancel.handle)
         result.values[formula.id] = formula_inputs.target_value(context, formula, program, value)
     except (ValueError, RuntimeError, StopIteration, OverflowError) as error:
         result.failures[formula.id] = str(error) or "Missing formula input."

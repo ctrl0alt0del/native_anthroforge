@@ -166,6 +166,9 @@ def install_results(session: Any, evaluation: Any) -> None:
         old = records.get(key, FormulaResult(key))
         records[key] = accepted_result(evaluation, key, old)
     session.replace_document(formula_results=tuple(records.values()))
+    from .shortcut_formula_inspection import retain
+
+    retain(session, evaluation, records)
 
 
 def accepted_result(evaluation: Any, key: str, old: FormulaResult) -> FormulaResult:

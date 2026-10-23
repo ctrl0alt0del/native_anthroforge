@@ -1874,3 +1874,20 @@ CH-049 because the integrated pipeline repair already published CH-045.
   Tests include unchanged fields, translation, scale, oblique rotation, undo and
   formula publication. Full gate, actual migration edits and portable qualification
   remain pending; this checkpoint is not a qualified runtime delivery.
+
+### CH-060 — Retain tissue base/rest tessellation before downstream work (2026-10-23)
+
+- Skeleton driver migration caused ordinary dependency reevaluation with unchanged
+  settings. Flexor carpi ulnaris base/rest and an FDS radial rest surface changed
+  four triangle rows each at vertex drift below 5e-14. The latter's cropped output
+  changed counts. Intrinsic publication already preserved compatible topology, but
+  base refinement and rest assembly had no equivalent stage boundary.
+- Base and rest now use the existing native surface finalizer with their own last
+  accepted mesh. Compatible vertex count and canonical polygon connectivity retain
+  accepted triangles before inflation, relaxation and cropping consume the stage.
+  Incompatible topology takes the existing initial tessellation path. Numerical
+  inflation, refinement, relaxation and crop formulas are unchanged.
+- Two regressions exercise retained alternative diagonals through coordinated source
+  reevaluation and inflation edits. 42 focused stage, crop, inflation and workflow
+  tests pass. The full real-assembly comparison and combined gate are pending;
+  do not infer that the observed cropped-output difference is resolved yet.

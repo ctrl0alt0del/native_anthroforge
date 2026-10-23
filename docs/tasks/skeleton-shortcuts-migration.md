@@ -52,3 +52,25 @@ than claiming migration from successful API calls alone.
   `hook:femur_knee_hook` changed a matrix component by 5.8497. Native partial-channel
   editing now preserves the affine basis, with exact no-op handling at the shared
   property boundary. Build/tests underway; not yet release-qualified or packaged.
+
+## Expanded checkpoint (not delivery)
+
+The mapping now covers 96/105 exposed controls, plus hidden Hip Joint local Y/Z and
+paired-bone dependencies. Tools are `skeleton_shortcut_migration.py`,
+`skeleton_shortcut_controls.py`, `skeleton_shortcut_hooks.py`,
+`capture_skeleton_shortcut_frames.py` and `check_skeleton_shortcut_preservation.py`.
+Local outputs are `controls-checkpoint.anthroforge` and `hooks-checkpoint.anthroforge`.
+They are unqualified intermediates. Source frames are captured in `donor-frames.json`.
+
+Two required product choices remain pending in the chat:
+1. Keep the original Bezier guides or extend Parametric to preserve Bezier construction.
+2. Preserve Pubis Arc Angle's Ilium override through an explicit policy scope for a
+   multi-SCP driver, or retain the confirmed 0.3 rule and omit that override. The
+   source angle also controls Sacrum width, which prevents single-SCP ownership.
+
+CH-059's combined Windows gate passed 1,952 tests and five CTests. Subsequent actual
+assembly checks observed tessellation changes in two tissue families on recalculation,
+with vertex drift below 5e-14; one cropped result changed counts. CH-060 adds compatible
+topology retention at base/rest stages; 42 focused tests pass. The new real-assembly
+rerun and combined gate remain pending. Preserve failure evidence; do not relax the
+geometry/attachment acceptance checks or install these intermediates as delivery.

@@ -60,4 +60,4 @@ def edited_matrix(session: Any, item: Any, updates: Any) -> tuple[float, ...]:
         replacements = replacement if reference.component is None else (replacement,)
         for component, value in zip(components, replacements, strict=True):
             values[index + component] = degrees(value) if index == 3 else value
-    return session.engine.transform_channels(item.matrix, values)
+    return tuple(session.engine.transform_channels(item.matrix, values))

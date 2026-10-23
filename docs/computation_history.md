@@ -48,6 +48,13 @@ material frames/operators and per-column profile coefficients (T02–T04); draft
 envelope sides with fully prepared publication (G02/T05); bounded profiler ownership.
 The numerical objectives, topology, retained bindings and acceptance rules stay unchanged.
 
+The skeleton-controls migration qualifies CH-059–064: affine channel preservation (G03),
+compatible base/rest tessellation (G02/T02–T05), Bézier Parametric interpolation (E02),
+temporary attachment scope (A01/R03), evaluated-output formula batch boundaries (R02),
+snapshot formula indexes and scale-specific prerequisites (R01/E01), and effective-policy
+reads during pose batching (A01/R02). These changes retain the existing coordinator,
+native algorithms and retained material-binding semantics. Final evidence is below.
+
 ### Meshes, primitives and deformers
 
 | ID | Computation and current approach | Owning implementation | Validation entry point |
@@ -162,7 +169,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | ID | Computation | Owner | Evidence |
 | --- | --- | --- | --- |
 | E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. Construction copies preserve/remap formula graphs and accepted values (CH-050). Addressed property lookup traverses only the requested path, sharing discovery metadata and policy (CH-052). | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py), [copy state](../src/anthroforge/application/shortcut_copies.py), [property catalogue](../src/anthroforge/application/property_catalog.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py), [copy lifecycle](../tests/test_shortcut_copy.py), [profiling](research/shortcuts_030/performance_qualification.md) |
-| E02 | Native uniform Parametric XYZ sampling, generated controls and exact accepted-path Fiber conversion (CH-048). Shared policy locks resolution when junctions, attachments or generated-point references require stable membership (CH-058). | [native sampling](../native/src/parametric.cpp), [adapter](../src/anthroforge/native/parametric.py), [reference policy](../src/anthroforge/application/parametric_policy.py) | [curves](../tests/test_parametric_curves.py), [consumers](../tests/test_parametric_consumers.py), [resolution](../tests/test_parametric_resolution_policy.py) |
+| E02 | Native uniform Parametric XYZ sampling, generated controls and exact accepted-path Fiber conversion (CH-048). Optional Bézier interpolation preserves knot handle construction and separately controls segment sampling (CH-061). Shared policy locks resolution when junctions, attachments or generated-point references require stable membership (CH-058). | [native sampling](../native/src/parametric.cpp), [adapter](../src/anthroforge/native/parametric.py), [reference policy](../src/anthroforge/application/parametric_policy.py) | [curves](../tests/test_parametric_curves.py), [consumers](../tests/test_parametric_consumers.py), [resolution](../tests/test_parametric_resolution_policy.py) |
 
 The inventory covers all public native interface families in
 [native/include/anthroforge](../native/include/anthroforge), compiled geometry sources
@@ -1895,7 +1902,7 @@ CH-049 because the integrated pipeline repair already published CH-045.
 
 ### CH-061 - Parametric Bezier construction and scoped shortcut attachment edits
 
-Status: implementation/qualification in progress on `codex/skeleton-shortcuts-migration`.
+Status: qualified; the final CH-059–064 evidence below supersedes checkpoint-pending notes.
 Source: approved skeleton shortcut migration, 2026-10-23. The user authorized both
 extensions after observing pelvic shape changes with sampled polyline conversion.
 
@@ -1989,3 +1996,31 @@ average. This is a read-only formula input; no new write channel is introduced.
   Nine focused shortcut/attachment tests pass. The real assembly's Pubis Arc Angle
   now settles in 5.36 seconds with no scheduler errors; representative edit/undo and
   final combined qualification are still underway.
+
+### CH-059–064 final migration qualification
+
+- The delivered copy has 105 exposed controls, 66 formulas and all 96 authored muscles.
+  All baseline results are ready. Original 619 records and 1,325 resources retain exact
+  canonical connectivity and attachment payloads; maximum mesh drift is 3.397e-12.
+  Only declared guide/consumer changes, six control additions and three Hook bindings
+  are allowed. Some reevaluated path frames differ and are recorded separately; they
+  are not claimed identical to the original. Source files remain unchanged.
+- Compact Hook-on-lattice pelvic mapping matches the dense coordinate-formula
+  experiment within 1.954e-13 for the same Ilium edit (587 compared resources).
+  Observed end-to-end edit time falls from 13.20 to 1.18 seconds in that controlled
+  trial. Blender/native edited shapes were visually inspected and measured, retaining
+  the existing skeleton approximation. This is not a general speedup or exact Blender
+  mesh-parity claim. Native inflation and relaxation algorithms are unchanged.
+- Actual packaged edit/undo/save compares all 625 output records and 1,325 resources
+  with zero mesh, path, pose or frame drift. Source QML controls and hidden assembly
+  renders were inspected. Final desktop smoke now requires completed document loading,
+  jobs and staging; the former fixed-delay loading screenshot is not acceptance evidence.
+- The Windows gate passes 1,970 tests, five CTests, style/function limits, typing,
+  numerics and Qt-free doctor; the final regression run passes 1,972 tests after the
+  two smoke-readiness regressions. The canonical executable passes portable checks.
+- Original/candidate Humerus and Radius length edits and Thumb thickness edits produce
+  identical retained-material attachment failures at cropped or union-covered tissue
+  locations. These pre-existing limits are preserved, not repaired through silent
+  nearest reassignment. The [task record](tasks/skeleton-shortcuts-migration.md) identifies
+  paired evidence and the delivered artifact. Offscreen evidence is not physical
+  interactive acceptance.

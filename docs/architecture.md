@@ -11,6 +11,9 @@ policy scope is a separate validated reference from inferred shortcut ownership.
 geometry output; a formula worker cannot calculate those intermediate outputs itself.
 Coherent property groups stay together. The existing coordinator schedules each batch,
 captures dispatch state and rejects stale publications. No second executor is introduced.
+Immutable document snapshots retain formula lookup indexes across result-only publication.
+Effective shortcut policy reads also participate in pose batch planning, so temporary
+Surface Nearest overrides cannot create artificial waits inside a joint pose batch.
 
 The [confirmed shortcut/Parametric contract](specification_030.md) and
 [implementation plan](implementation_030.md) govern this extension. Lower-level

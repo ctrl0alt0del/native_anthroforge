@@ -2,7 +2,8 @@
 
 ## Shortcuts and Parametric curves (0.3.0)
 
-October 23 migration extensions (final packaging qualification tracked in the task record):
+October 23 migration extensions are qualified in the
+[migration record](tasks/skeleton-shortcuts-migration.md):
 `curve.engine` accepts optional typed `settings` together with the engine switch in one
 transaction. Parametric settings add `interpolation: "POLYLINE" | "BEZIER"` and
 `bezier_resolution` (samples per segment, 1–1024). `resolution` still counts generated

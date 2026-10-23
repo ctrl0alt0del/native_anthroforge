@@ -2,7 +2,7 @@
 
 - Branch: `codex/skeleton-shortcuts-migration`; integration: `main`.
 - Base: `2d34278e504c8b6a7f1e1823ba4328e82f022366`.
-- Status: inspecting source and mapping; no migrated deliverable yet.
+- Status: migration complete; final runtime/artifact checks passed; integration pending.
 - Updated: 2026-10-23, Europe/Bucharest. Direct desktop work, background only.
 
 ## Outcome
@@ -11,6 +11,82 @@ Migrate the Blender skeleton's shortcuts and drivers using the qualified 0.3
 wrappers, formulas and Parametric engine. The user selected the assembly with all
 96 authored muscles. Produce a new versioned copy; preserve geometry, retained
 attachments, source files and independent opposite-side construction.
+
+## Delivered copy and qualification
+
+The final copy is
+[`skeleton_96_muscles_shortcuts_v001.anthroforge`](E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge).
+Use the rebuilt canonical `dist/0.3.0/AnthroForge.dist/AnthroForge.exe`. The original
+assembly and Blender sources are unchanged. This is a one-file migration, not a general
+Blender-project importer. The checkpoint sections below are historical progress records;
+their pending questions/work are superseded by this delivery summary.
+
+- 59 SCPs, 96 authored muscles, 326 Fibers, 105 source-ordered exposed controls,
+  66 formulas and 37 controls. All baseline tissue/formula results are ready.
+- Six four-knot guides retain Bézier construction under Parametric evaluation.
+  Six added Hook/frame controls and three Hook-on-lattice bindings reproduce compact
+  pelvic controls. No mesh-import fallback or mirrored muscle was added.
+- Pubis Arc Angle retains its temporary Ilium policy through explicit Pubis scope,
+  while still being a multi-owner shortcut under All. Saved authored bindings are intact.
+- Original/candidate comparison: 619 original records and 1,325 resources, exact mesh
+  connectivity and binding payloads, maximum mesh drift 3.397e-12. Accepted path-frame
+  differences are separately reported, not claimed identical. Packaged Ilium edit,
+  undo and save compare all 625 output records and resources with zero drift in mesh,
+  paths, frames and poses.
+- The full Windows gate passes 1,970 tests and five CTests. After two additional smoke
+  readiness tests, the final regression run passes 1,972 tests. Style/function limits,
+  typing, numerics, Qt-free headless and the complete minimal-PATH portable suite pass.
+  Actual packaged desktop opening verifies all 59 SCPs and no QML/scheduler warnings.
+- Offscreen loaded UI and production interpolation/policy editors were inspected.
+  Software offscreen UI does not render the 3D viewport; separate hidden native GPU
+  captures verify geometry. Blender/native edited pelvis views were visually compared;
+  the existing skeleton approximation remains, rather than exact Blender vertex parity.
+  No physical interactive acceptance or GPU execution timing is claimed.
+
+### Evidence and existing attachment limits
+
+External evidence is under `E:/development/WIP_models/shortcut_migration_030_20261023/`:
+`delivery.json`, `delivery-preservation.json`, `source-native-shapes.png/.json`,
+`delivery-front.png/.json`, `compact-edits/`, `blender-edits/` and `failure-15.json`, `failure-16.json`,
+`failure-21.json`. The latter compare the same edits in immutable input and candidate:
+Humerus/Radius length +5% produces the same FDS radial cropped-material failures;
+Thumb metacarpal thickness +5% produces the same seven union-covered fiber bindings.
+These are preserved pre-existing limitations, not silently rebound or classified as
+successful edits. Other tested controls settle successfully and full-resource undo passes.
+
+The final saved revision 57463 was rendered by the packaged executable with no visible
+window and no warnings: 254 chunks, 2,012,808 vertices, finite geometry. The resulting
+`delivery-front.png` was visually inspected, confirming the complete authored-side
+musculature and preserved opposite-side skeleton context.
+
+Local build evidence: `build/skeleton-shortcuts-qualified-gate.log`,
+`build/skeleton-shortcuts-final-pytest.log`, `build/skeleton-shortcuts-portable/portable-check.json`,
+`build/skeleton-shortcuts-real-portable/desktop.json` and
+`build/skeleton-shortcuts-real-portable/roundtrip-preservation.json`.
+The source-equivalence checks also cover compact Hook versus dense coordinate-formula
+Ilium edits (maximum mesh drift 1.954e-13). Their observed 13.20→1.18-second edit time
+is one controlled workload, not a broad performance guarantee.
+
+### Ownership and coupling review
+
+The coordinator directly reviewed the changes separately from test results. C++ owns
+affine channel edits, Bézier interpolation, path/frame sampling and deformation. Typed
+core records own interpolation settings, explicit policy references and immutable formula
+indexes. The application owns validation, temporary edit contexts and dependency-aware
+batching; the existing coordinator retains reservations, capture, cancellation and
+publication. UI editors call shared operations and expose shared lock reasons.
+
+One-off migration orchestration remains in `tools/skeleton_shortcut_*`; pelvic mapping
+uses existing Hook-on-lattice evaluation rather than a new production skeleton evaluator.
+No native handles are serialized, no competing worker pool is added, no Python optimizer
+or per-sample production callback is introduced, and material bindings are not silently
+rewritten. The rejected dense point-formula experiment remains explicitly identified in
+the evidence. The smoke readiness change affects diagnostics, not user loading policy.
+
+### Integration remaining
+
+Final documentation/source archive refresh and normal task-branch/main merge/push.
+Preserve the unrelated untracked root `__init__.py`.
 
 ## Inputs and decisions
 
@@ -26,7 +102,7 @@ attachments, source files and independent opposite-side construction.
   Use shared application operations. Runtime changes require demonstrated defects.
 - Preserve unrelated root `__init__.py`.
 
-## Next steps and acceptance
+## Initial steps and acceptance (historical)
 
 Inspect the actual donor definitions and current target records. Map all controls,
 units, local/world frames, uniform vectors and attachment policies. Qualify baseline
@@ -34,7 +110,7 @@ geometry/attachment preservation, representative edits and restoration, reopenin
 and hidden rendered views. Record explicit differences and unresolved items rather
 than claiming migration from successful API calls alone.
 
-## Current checkpoint
+## Initial checkpoint (historical)
 
 - External run: `E:/development/WIP_models/shortcut_migration_030_20261023/`.
   It contains the immutable input copy, read-only donor extraction, probe script

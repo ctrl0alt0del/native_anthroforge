@@ -5,14 +5,14 @@ This is the authoritative 0.3 product contract. See the [local review](tasks/sho
 for completed checks and final release qualification.
 The [implementation plan](implementation_030.md) defines delivery and evidence; the
 [engineering guidelines](engineering_guidelines.md) govern implementation. The current
-released runtime is 0.3.0. The Windows gate passes 1,945 tests; delivery evidence
-is recorded in the linked review.
+released runtime is 0.3.0. The original release passed 1,945 tests; subsequent
+qualification is recorded in [development status](development_status.md).
 
 The October 23 migration extensions below (retained Bézier construction and explicit
-attachment-policy scope) are approved and implemented on the migration branch;
-their final portable qualification is tracked in
-[the migration record](tasks/skeleton-shortcuts-migration.md). They are not covered
-by the original release's test count above.
+attachment-policy scope) are approved and implemented. Their real-assembly preservation,
+edited-shape, lifecycle and packaged checks are recorded in
+[the migration record](tasks/skeleton-shortcuts-migration.md). They extend the original
+release contract without changing the project schema or release number.
 
 The [research](shortcuts_030_research.md) and [source inventory](research/shortcuts_030/inventory.md)
 record observed Blender behavior. Where earlier proposals differ, this specification

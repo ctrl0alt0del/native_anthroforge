@@ -244,3 +244,20 @@ Validate in the background while the user uses the computer. Offscreen checks es
 only their observed render/interaction scope, not unperformed interactive acceptance.
 The original documentation-consolidation task did not require an application rebuild;
 the subsequent runtime implementation follows the full delivery gate above.
+
+## Subsequent skeleton migration qualification
+
+The [separate migration task](tasks/skeleton-shortcuts-migration.md) implements the
+approved Bézier interpolation and explicit attachment-policy scope extensions. Native
+geometry, typed core definitions, application dependency/policy adapters and existing
+desktop editors retain their respective ownership. Formula batches now respect
+evaluated-output barriers and temporary attachment reads; immutable snapshot indexes
+remove repeated formula-map reconstruction. See CH-059–064 in the
+[computation history](computation_history.md) for observed defects and corrected contracts.
+
+All 105 source controls are represented in a copied 96-muscle assembly. Qualification
+includes baseline connectivity/binding preservation, source/native edited shapes,
+profiled compact pelvic controls, full-resource undo, actual packaged edit/save/reopen,
+the Windows gate and the final 1,972-test regression run. Existing source crop/union
+attachment limitations are explicitly reproduced and retained. This one-file migration
+does not qualify a general Blender importer or unperformed interactive acceptance.

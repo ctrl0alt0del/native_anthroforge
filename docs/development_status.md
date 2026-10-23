@@ -23,8 +23,38 @@ weights, formula references and junctions lock resolution rather than silently r
 
 All GUI checks were background/offscreen or invisible native texture captures. No physical
 interactive acceptance, GPU execution timing or input-to-display latency is claimed.
-Source Blender shortcut migration, direct Parametric Fibers and conditional expressions
-remain outside this release. See the [walkthrough and API](shortcuts_030.md).
+Direct Parametric Fibers and conditional expressions remain outside this release.
+See the [walkthrough and API](shortcuts_030.md). The following separate migration task
+extends the qualified runtime without introducing a general Blender importer.
+
+### Skeleton controls and approved migration extensions
+
+The [migration record](tasks/skeleton-shortcuts-migration.md) qualifies the copied
+96-muscle assembly with all **105 source shortcuts**, 66 formulas and six retained
+Bézier Parametric guides. Explicit attachment-policy scope preserves the multi-owner
+Pubis control's Ilium override; inferred UI ownership remains unchanged.
+
+The Windows gate passes 1,970 tests and five CTests; the final regression run passes
+**1,972 tests** after two additional desktop-readiness tests. The final canonical build
+passes the complete portable suite and actual-assembly edit/undo/save/open checks.
+The initial migration retains exact connectivity and attachment payloads, with maximum
+mesh drift 3.397e-12. Packaged edit/undo/save preserves all 625 records' geometry, paths
+and poses exactly. Six additional controls and three Hook bindings implement pelvic
+deformation through existing native primitives, replacing the rejected dense formula
+experiment. Source files remain unchanged.
+
+Native hidden assembly captures and Blender/native edited pelvis comparisons were
+visually inspected. Source/native differences remain at the prior skeleton migration's
+approximation level; this is not exact Blender mesh parity. Production QML interpolation
+and policy controls passed offscreen inspection. Large-project smoke waits for actual
+document/task/staging completion and verifies 59 SCPs, rather than accepting a loading
+screen. These checks do not claim physical interactive acceptance.
+
+Humerus/Radius length and Thumb thickness edits reproduce existing retained-material
+attachment failures in the original assembly (cropped or union-covered locations).
+Bindings remain intact; migration does not silently rebind them. These limits and the
+affected fibers are recorded with paired original/candidate evidence. All 96 tissue
+results and formulas are ready at the delivered baseline.
 
 ## VCP performance (0.2.4)
 

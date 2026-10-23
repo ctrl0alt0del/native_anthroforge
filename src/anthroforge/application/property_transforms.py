@@ -26,6 +26,7 @@ def descriptors(item: Any) -> Iterator[NumericDescriptor]:
                 3,
                 writable,
                 reason if scope == "transform" else "Evaluated input only",
+                vector=True,
             )
 
 

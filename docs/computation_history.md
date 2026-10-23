@@ -1794,3 +1794,36 @@ CH-049 because the integrated pipeline repair already published CH-045.
   explicit and Auto flow, under the existing 3e-5 tolerance. Cheekbone backsolve matches
   within 7.89165e-8. Synthetic tests verify capture capability, legacy fallback and
   unchanged retained bindings. See [scope and provenance](research/shortcuts_030/windows_review.md).
+
+### CH-056 — Preserve one-element numerical collections (2026-10-23)
+
+- A 1×1×1 lattice's single weight failed through property/shortcut/formula writes:
+  component count alone coerced its tuple into a scalar. Descriptors now retain
+  vector shape independently of count. Scalar and component edits remain scalar;
+  whole collection writes retain their tuple. Formula input selection requires a
+  component for vectors, including one-element vectors, through UI and API.
+- Evidence: a public creation/resize/weight-edit regression failed before the fix;
+  direct, wrapper, Uniform and native formula writes now preserve `(weight,)`.
+  This changes candidate packing/validation, not native deformation arithmetic.
+
+### CH-057 — Bound profiler connections by observed model objects (2026-10-23)
+
+- Packaged qualification marked desktop reports incomplete. The full window has
+  17,938 QObjects and exceeded the observer's 16,384-object cap, even though most
+  objects have no model-related signals. The failure was retained and investigated;
+  the report completeness assertion was not weakened.
+- Model discovery now uses one application event filter, scoped to registered roots,
+  while recording. Only model-signal/keyboard objects retain signal connections.
+  New children are still observed after construction through a bounded queued callback.
+  The 16,384 observed-object and 4,096 pending-child limits remain; registered roots
+  are bounded to 16. Observer-owned objects are excluded. Stopping destroys the
+  observer/filter; disabled recording introduces no observer traversal or polling.
+- Qt's [application filters](https://doc.qt.io/qt-6/qcoreapplication.html#notify) cover
+  main-thread events; [ChildAdded](https://doc.qt.io/qt-6/qchildevent.html) occurs before
+  full construction. Native recording support remains GUI-thread scoped, with no
+  Python callbacks for native model observation. Broader thread coverage is not claimed.
+- The full-window workflow report now reports complete=true, zero dropped events and
+  zero skipped model watches. It includes a deliberately created late model's reset
+  signal beneath a non-model parent, as well as existing UI/task/native events. This
+  establishes discovery/completeness on the failing workload, not a general speedup;
+  start/collection overhead remains explicitly measured.

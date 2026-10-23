@@ -8,6 +8,7 @@ class ModelObserver final : public QObject {
 public:
     ModelObserver(QObject* root,ProfileReceiver* receiver);
     void watch(QObject* object);
+    void addRoot(QObject* root);
     bool eventFilter(QObject* watched,QEvent* event) override;
 private slots:
     void changed();
@@ -15,8 +16,10 @@ private slots:
 private:
     ProfileReceiver* receiver;
     QSet<QObject*> watched;
+    QList<QPointer<QObject>> roots;
     int pending=0;
     void connectSignals(QObject* object);
+    bool contains(QObject* object) const;
 };
 
 void observeModels(QObject* root,ProfileReceiver* receiver);

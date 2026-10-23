@@ -105,3 +105,16 @@ def test_independent_copy_remaps_variable_identities_in_active_and_stored_defini
     assert (
         copy.parametric_definition.variables[0].id != source.parametric_definition.variables[0].id
     )
+
+
+def test_entering_parametric_cannot_bypass_consumer_attachment_topology_lock(session):
+    key = session.command("curve.create")
+    session.wait()
+    body = session.command("primitive.from_curves", curves=[key], kind="BODY")
+    session.wait()
+    session.command("import", path=str(CUBE), units=0.1, parent=body)
+    session.wait()
+    before = session.document.object(key)
+    with pytest.raises(ValueError, match="Topology is locked"):
+        session.command("curve.engine", curve=key, engine="PARAMETRIC")
+    assert session.document.object(key) == before

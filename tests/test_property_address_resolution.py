@@ -73,3 +73,37 @@ def test_parametric_coordinates_and_expression_intervals_remain_readonly(session
     for path in (("points", "@" + point, "position"), ("engine_settings", "interval", "end")):
         value = property_catalog.resolve(session.document, PropertyRef(key, path))
         assert not value.writable and "controlled" in value.reason
+
+
+def single_weight(session):
+    key = session.command("control.create", kind="LATTICE")
+    session.command(
+        "property.set", reference=dict(target=key, path=["resolution"]), value=[1, 1, 1]
+    )
+    session.command("control.update", control=key, weights=[0.5])
+    return key, dict(target=key, path=["weights"])
+
+
+def test_one_element_weight_vector_retains_collection_shape(session):
+    key, ref = single_weight(session)
+    session.command("property.set", reference=ref, value=[0.75])
+    assert session.document.control(key).weights == (0.75,)
+    session.command("shortcut.set", reference=ref, value=0.25, uniform=True)
+    assert session.document.control(key).weights == (0.25,)
+
+
+def test_formula_can_drive_single_weight_without_scalarizing_it(session):
+    key, ref = single_weight(session)
+    driver = session.command("driver.create", value=0.7)
+    session.command("driver.formula.add", driver=driver, target=ref, expression="value")
+    session.wait(5)
+    assert not session.scheduler.errors
+    assert session.document.control(key).weights == (0.7,)
+    with pytest.raises(ValueError, match="component"):
+        session.command(
+            "driver.formula.add",
+            driver=driver,
+            target=ref,
+            expression="x",
+            inputs=[dict(name="x", property=ref)],
+        )

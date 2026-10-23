@@ -171,7 +171,7 @@ def property_choices(session, value):
     count = value["components"]
     owner = session.document.object(reference["target"]).name
     for component in range(count):
-        ref = dict(reference, component=component if count > 1 else None)
+        ref = dict(reference, component=component if value.get("vector", count > 1) else None)
         label = owner + " / " + component_label(dict(value, reference=ref))
         rows.append(dict(key=repr(ref), label=label, reference=ref, driver=""))
     return rows

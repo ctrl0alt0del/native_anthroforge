@@ -84,3 +84,31 @@ The recorder reports its existing observation and memory-accounting limitations;
 it cannot measure GPU execution or physical input-to-display latency. Full-window
 gestures, original-addon geometry/attachment parity, Windows Qt/native viewport
 and portable executable acceptance remain required before a 0.3 release.
+
+## Windows full-window recording (local review, 2026-10-23)
+
+The maintained `tools/shortcuts_workflow_acceptance.py` runs the full production Main
+window offscreen: a 48-point XYZ arc/helix, radius driver, dependent Body, mouse
+scrubs, commit, Undo and cancellation. The report also verifies late model discovery.
+`20261023-090341-ab4635bc.afprofile.zip` retained all 42,546 received events (19.0 MB),
+with no ring eviction, loss or skipped model watches; `complete=true`. 3,800 boundary
+events were filtered outside the recording interval. Raw reports remain ignored.
+
+| Recorded boundary | Calls | Mean | Maximum |
+| --- | ---: | ---: | ---: |
+| Input dispatch | 13 | 8.55 ms | 19.72 ms |
+| driver.value command | 6 | 0.635 ms | 0.775 ms |
+| Controller refresh | 18 | 12.28 ms | 18.87 ms |
+| Native expression evaluate | 6 | 23.1 µs | 25.2 µs |
+| Native Parametric path | 6 | 83.7 µs | 87.8 µs |
+
+Inclusive times overlap and are not additive. This is a small integration workload,
+not a production-assembly responsiveness guarantee or before/after speedup claim.
+Profiler-owned costs include 240.7 ms activation, 182.7 ms recording bookkeeping and
+817.3 ms inclusive drain time; these overlap other collector work and cannot simply
+be subtracted. Software offscreen window presentation does not measure physical
+display latency or GPU execution. Native 3D rendering was inspected separately.
+
+An earlier capture and the first portable probe reported incomplete model coverage:
+the observer counted every QObject against its model-watch budget. CH-057 documents
+the diagnosis and repair; those incomplete reports are not the acceptance evidence.

@@ -67,6 +67,15 @@ increase. Asked whether to lock resolution while point membership/weights/formul
 references exist, or design parameter-preserving remapping. No dependent repair has
 been chosen while awaiting the answer. Independent release qualification continues.
 
+Latest local qualification: 1,924 broad tests passed excluding the unresolved
+generated-control membership regression; subsequent focused tests also cover one-element
+numeric collections and engine-switch topology locks. Real 0.2.4 executable/assembly
+compatibility passes both unchanged loading and continued Clavicle editing. A temporary
+portable build lives under `build/shortcuts-portable-review/`, not an extra release dist.
+Its first probe exposed incomplete profiler model coverage at the old QObject budget;
+CH-057 fixes discovery at its shared native boundary and a full-window report now proves
+complete coverage, including dynamically created models. Rebuild/portable rerun pending.
+
 ## Historical pause and implementation checkpoints
 
 Paused by user on 2026-10-23. Resume this branch, not a fresh branch. Latest completed

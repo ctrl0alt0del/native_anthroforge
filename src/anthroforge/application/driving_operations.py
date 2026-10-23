@@ -135,7 +135,7 @@ def validate_formula(session: Any, formula: DrivingFormula) -> None:
     for entry in formula.inputs:
         if entry.property is not None:
             descriptor = property_catalog.resolve(session.document, entry.property)
-            if descriptor.components != 1 and entry.property.component is None:
+            if descriptor.vector and entry.property.component is None:
                 raise ValueError("Choose a numerical vector component for this formula input.")
         else:
             selected(session, entry.driver)

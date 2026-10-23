@@ -20,6 +20,7 @@ from issues_portable import issues
 from preferences_portable import preferences
 from profiler_portable import profiling
 from PySide6.QtGui import QImage
+from shortcuts_portable import shortcuts
 from tissue_portable import tissues
 from workflow_portable import workflow
 
@@ -48,6 +49,7 @@ CHECKS = (
     "persistent preferences, Custom/PIQP routed curves and fibers, saved/report provenance",
     "accepted tissue stages, displacement, point explanations and advisory geometry reports",
     "stacking footprints, material brush commit/undo, section cutaways and routed Fiber evidence",
+    "shortcut formulas, typed Parametric paths, schema-5 results and native consumer rendering",
 )
 
 
@@ -154,7 +156,7 @@ def qualification_steps():
 
 
 def construction_steps():
-    return construction, direct_workflows, automatic_construction, branches
+    return construction, direct_workflows, automatic_construction, branches, shortcuts
 
 
 def deletion(executable, cwd, invoke=invoke):

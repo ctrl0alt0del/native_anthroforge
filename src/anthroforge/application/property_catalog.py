@@ -160,7 +160,12 @@ def descriptor(
     values = value if isinstance(value, tuple) else (value,)
     label = " / ".join(p.replace("_", " ").title() for p in path if not p.startswith("@"))
     return numeric.NumericDescriptor(
-        numeric.PropertyRef(target, path), label, kind, unit, len(values)
+        numeric.PropertyRef(target, path),
+        label,
+        kind,
+        unit,
+        len(values),
+        vector=isinstance(value, tuple),
     )
 
 

@@ -48,3 +48,19 @@ that was a harness artifact, not evidence for a production renderer change.
 
 No interactive desktop acceptance is claimed. Raw captures and source geometry are
 ignored/local artifacts; the maintained tools reproduce the checks.
+
+## Existing assembly compatibility
+
+`tools/shortcuts_compatibility.py` used the released 0.2.4 executable and a copy of
+`2026-10-21-standalone-all-muscle-transfer-958f7969/candidates/current.anthroforge`
+under the muscle workflow runs directory: 59 SCPs and 548 construction/tissue objects.
+The old executable opened/saved a schema-4 baseline with its existing startup behavior.
+The reviewed application then opened that baseline without changing any document
+record, and saved schema 5 with identical hashes for every stored resource buffer.
+
+Both versions then translated Clavicle (`SCP_6`) by 3 mm. Complete saved document
+states match after replacing nondeterministic resource IDs with their buffer-content
+hashes, including geometry, bindings, poses, correspondence and revision provenance.
+The original project was never opened for writing. This is actual old-executable
+compatibility evidence, not a manifest-version rewrite. Logs/copies are local in
+`build/shortcuts-compatibility/`.

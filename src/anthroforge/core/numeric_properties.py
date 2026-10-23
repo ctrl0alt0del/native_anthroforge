@@ -28,6 +28,7 @@ class NumericDescriptor:
     components: int = 1
     writable: bool = True
     reason: str = ""
+    vector: bool = False
 
     def validate(self, value: Any) -> int | float | tuple[int | float, ...]:
         values = tuple(value) if isinstance(value, (list, tuple)) else (value,)
@@ -36,7 +37,9 @@ class NumericDescriptor:
             raise ValueError(f"{self.label} requires {count} numerical components.")
         for item in values:
             validate_number(item, self.numeric_type)
-        return values if count > 1 else values[0]
+        return (
+            values if count > 1 or self.vector and self.reference.component is None else values[0]
+        )
 
 
 def validate_number(value: Any, kind: str) -> None:

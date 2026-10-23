@@ -6,8 +6,9 @@ os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
 import json
 from pathlib import Path
+from zipfile import ZipFile
 
-from PySide6.QtCore import QPoint, QPointF, Qt
+from PySide6.QtCore import QObject, QPoint, QPointF, Qt, Signal
 from PySide6.QtGui import QFont, QFontDatabase
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
@@ -20,6 +21,32 @@ from anthroforge.desktop.qt_profiler import QtProfiler, profiler_application
 from anthroforge.desktop.runtime import native_runtime
 
 OUTPUT = Path("build/shortcuts-workflow-review").resolve()
+
+
+class LateModel(QObject):
+    modelReset = Signal()
+
+
+def late_model(window):
+    parent = QObject(window)
+    model = LateModel(parent)
+    model.setObjectName("lateProfileModel")
+    QTest.qWait(20)
+    model.modelReset.emit()
+    parent.deleteLater()
+
+
+def verify_profile(controller):
+    for _ in range(100):
+        if controller.profiler.done.wait(0.02):
+            break
+        QTest.qWait(20)
+    assert controller.profiler.state == "saved", controller.profiler.status()
+    with ZipFile(controller.profiler.path) as archive:
+        manifest = json.loads(archive.read("manifest.json"))
+        events = json.loads(archive.read("trace.json"))["traceEvents"]
+    assert manifest["complete"] and manifest["qt"]["model_watch_skipped"] == 0
+    assert any(e.get("args", {}).get("object") == "lateProfileModel" for e in events)
 
 
 def settle(controller):
@@ -111,6 +138,7 @@ def exercise(controller, window):
     curve, body, driver = fixture(controller)
     show_shortcuts(controller, window)
     controller.profile_controls.toggle()
+    late_model(window)
     gesture_checks(controller, window, curve, driver)
     controller.profile_controls.toggle()
     controller.select(curve)
@@ -120,6 +148,7 @@ def exercise(controller, window):
     reveal_equations(window)
     assert window.grabWindow().save(str(OUTPUT / "parametric.png"))
     assert controller.session.document.entity(body).result.status == "ready"
+    verify_profile(controller)
 
 
 def reveal_equations(window):

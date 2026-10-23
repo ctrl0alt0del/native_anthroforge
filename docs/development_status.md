@@ -73,6 +73,12 @@ edit/history/reopen checks for all three controls, with profiler captures and hi
 native rendering. GUI evidence is background-only; no physical interaction is claimed.
 The original assembly remains unchanged and does not require manual rebinding.
 
+The follow-up [Ribs Top Radius latency investigation](tasks/ribs-ulna-latency.md)
+reproduces a remaining priority inversion: Ulna's eligible pose waits behind boosted
+Live consumer jobs. Diagnostic prioritization removes that gap with identical final
+geometry. The scheduling correction is not yet implemented; full-QML profiler overhead
+and separate UI refresh costs are recorded with their measurement limits.
+
 ## VCP performance (0.2.4)
 
 The six ordered optimizations and their measurements are recorded in

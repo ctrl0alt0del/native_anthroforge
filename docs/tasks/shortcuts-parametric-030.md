@@ -36,6 +36,26 @@ interaction/shape inspection, source-addon attachment parity, representative sch
 compatibility, profiler evidence, full Windows gate and portable release qualification.
 Runtime remains 0.2.4. Preserve unrelated root `__init__.py`; background-only checks.
 
+Cloud review integrated and pushed to the original feature branch as `6f7a048`.
+The Windows development gate at that checkpoint passed: 1,912 pytest cases, all
+five CTests, native/script style, Ruff/mypy, numerics and headless doctor. Subsequent
+desktop qualification exposed live shortcut value arrays destroying their numeric
+delegates mid-scrub. Values now keep delegates by component index; the shared numeric
+transaction owner handles QObject destruction without disconnecting a dying signal.
+The full production Main-window offscreen mouse harness now passes drag/undo/cancel
+while recording QML/native/task profiling. The platform's window captures omit native
+3D geometry; texture-only D3D rendering is still required for shape acceptance.
+
+Drag reorder is implemented with a preview marker, bounded edge scrolling, stable-key
+commit and Escape cancellation. The dedicated production-QML mouse harness passes
+one-action undo/cancel. SVG grip/options icons avoid missing font glyphs.
+
+Pending user choice: Parametric resolution currently reuses generated point identities
+by index; a restricted endpoint Hook can silently become an interior Hook after an
+increase. Asked whether to lock resolution while point membership/weights/formula
+references exist, or design parameter-preserving remapping. No dependent repair has
+been chosen while awaiting the answer. Independent release qualification continues.
+
 ## Historical pause and implementation checkpoints
 
 Paused by user on 2026-10-23. Resume this branch, not a fresh branch. Latest completed

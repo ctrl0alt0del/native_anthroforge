@@ -165,6 +165,17 @@ class ShortcutPanel(QObject):
         order.insert(destination, order.pop(index))
         self.controller.run("shortcut.reorder", dict(identities=order))
 
+    @Slot(str, str, bool)
+    def place(self, key, target, after):
+        order = [v.id for v in shortcut_operations.ordered(self.controller.session.document)]
+        if key == target or key not in order or target not in order:
+            return
+        original = list(order)
+        order.remove(key)
+        order.insert(order.index(target) + int(after), key)
+        if order != original:
+            self.controller.run("shortcut.reorder", dict(identities=order))
+
     @Slot(str, int, "QVariant", bool)
     def editValue(self, key, component, value, uniform):
         current = next(

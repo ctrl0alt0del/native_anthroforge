@@ -45,6 +45,8 @@ ColumnLayout {
     }
     ListView {
         id: list; objectName: "shortcutList"; Layout.fillWidth: true; Layout.fillHeight: true
+        property string dropKey: ""
+        property bool dropAfter: false
         visible: !panel.editing
         clip: true; spacing: 12; model: panel.adapter.rows
         ScrollBar.vertical: ScrollBar {}
@@ -63,8 +65,12 @@ ColumnLayout {
             width: ListView.view.width; spacing: 4
             RowLayout {
                 Layout.fillWidth: true
+                UiListReorderHandle {
+                    objectName: "reorderShortcut"+row.key; view: list; key: row.key
+                    onPlaced: (target,after) => panel.adapter.place(row.key,target,after)
+                }
                 Label { text: row.label; Layout.fillWidth: true; wrapMode: Text.Wrap; color: Theme.text }
-                UiButton { text: "⋮"; flatStyle: true; hint: "Shortcut options"; onClicked: options.open() }
+                UiButton { glyph: "more"; flatStyle: true; hint: "Shortcut options"; onClicked: options.open() }
                 UiMenu {
                     id: options
                     UiMenuItem { text: "Edit shortcut"; onTriggered: panel.adapter.editing.select(row.key) }
@@ -88,6 +94,11 @@ ColumnLayout {
                 enabled: row.writable; Layout.fillWidth: true
                 ToolTip.text: "Uniform: set all components to the same value"
                 onCanonicalEdited: value => panel.adapter.editValue(row.key,-1,value,true)
+            }
+            Rectangle {
+                parent: row; width: row.width; height: 2; color: Theme.accent; z: 2
+                y: list.dropAfter ? row.height : -3
+                visible: list.dropKey===row.key
             }
         }
         Label { anchors.centerIn: parent; width: parent.width-16; visible: list.count===0; text: "Expose the properties you use for anatomical editing."; wrapMode: Text.Wrap; horizontalAlignment: Text.AlignHCenter; color: Theme.muted }

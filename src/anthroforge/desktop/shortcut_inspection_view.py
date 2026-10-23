@@ -175,15 +175,26 @@ def effect_row(row):
 
 
 def badge(panel, key):
-    from .shortcut_effects_scene import publishing
-
     session = panel.controller.session
     if key not in session.shortcut_observation.latest:
         return ""
     cached = session.shortcut_observation.progress.get(key)
-    state = (cached or shortcut_progress.inspect(session, key))["state"]
+    record = session.shortcut_observation.latest[key]
+    state = record.outcome
+    if state not in ("cancelled", "superseded"):
+        state = (
+            "updating"
+            if record.jobs
+            else (cached or shortcut_progress.inspect(session, key))["state"]
+        )
+    return display_label(panel.controller, key, state)
+
+
+def display_label(controller, key, state):
+    from .shortcut_effects_scene import publishing
+
     return (
         "Preparing display"
-        if state == "complete" and publishing(panel.controller, key)
+        if state == "complete" and publishing(controller, key)
         else LABELS[state]
     )

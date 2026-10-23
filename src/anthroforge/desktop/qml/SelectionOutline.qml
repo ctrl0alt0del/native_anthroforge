@@ -6,6 +6,7 @@ Item {
     required property var sourceCamera
     property bool orthographic: false
     property real useMaskColors: 0
+    property Component content
     property alias sceneRoot: maskRoot
     View3D {
         id: maskView; anchors.fill: parent
@@ -15,7 +16,10 @@ Item {
             antialiasingMode: SceneEnvironment.MSAA; antialiasingQuality: SceneEnvironment.High
         }
         PresentationCamera { id: rig; sourceCamera: outline.sourceCamera; orthographic: outline.orthographic }
-        Node { id: maskRoot; eulerRotation.x: -90 }
+        Node {
+            id: maskRoot; eulerRotation.x: -90
+            Loader3D { active: outline.visible; sourceComponent: outline.content }
+        }
     }
     ShaderEffectSource {
         id: maskTexture; sourceItem: maskView; hideSource: true; live: outline.visible

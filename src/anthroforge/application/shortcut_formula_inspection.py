@@ -14,10 +14,12 @@ from .dependency_inspection import cycle_records
 
 def retain(session: Any, evaluation: Any, results: Any) -> None:
     for key in evaluation.selected:
+        _, formula = evaluation.context.document.formula_index.formulas[key]
         session.shortcut_observation.formulas[key] = dict(
             revision=results[key].revision,
             document_revision=evaluation.context.document.revision,
             values=evaluation.evidence.get(key, {}),
+            expression=formula.expression,
         )
 
 
@@ -44,15 +46,34 @@ def row(session: Any, driver: Any, formula: Any) -> dict[str, Any]:
     return dict(
         id=formula.id,
         driver=driver.id,
-        expression=formula.expression,
-        enabled=formula.enabled,
         target=describe_property(session, formula.target),
         result=asdict(result) if result else None,
         inputs=inputs(session, driver, formula, evidence),
         captured_revision=evidence.get("document_revision"),
+        evaluated_expression=evidence.get("expression"),
+        **formula_context(session, formula),
+    )
+
+
+def formula_context(session: Any, formula: Any) -> dict[str, Any]:
+    return dict(
+        expression=formula.expression,
+        enabled=formula.enabled,
         dependencies=sorted(formula_inputs.dependencies(session.document, formula)),
+        causes=causes(session, formula),
         **cycle_records(session.document, Port(formula.id, "formula")),
     )
+
+
+def causes(session: Any, formula: Any) -> list[dict[str, Any]]:
+    from .dependency_inspection import port_record
+
+    ports = dependencies.ports(session.document, Port(formula.id, "formula"))
+    return [
+        dict(port_record(session.document, p), **shortcut_effects.readiness(session.document, p))
+        for p in sorted(ports, key=lambda p: (p.owner, p.output))
+        if p.owner != formula.id and p.output == "formula"
+    ]
 
 
 def retained(session: Any, key: str, result: Any) -> dict[str, Any]:

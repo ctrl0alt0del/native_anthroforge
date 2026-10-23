@@ -5,6 +5,7 @@ from typing import Any
 from uuid import uuid4
 
 from anthroforge.core.results import Port
+from anthroforge.profiling.spans import measured
 
 
 @dataclass
@@ -33,18 +34,24 @@ class Observation:
         self.progress: dict[str, Any] = {}
 
     def begin(self, shortcut: Any) -> None:
-        from .shortcut_effects import affected
-
         current = self.records.get(self.active)
         if current is None or current.shortcut != shortcut.id:
-            current = EditEvidence(
-                shortcut.id, self.session.document.revision, affected(self.session, shortcut)
-            )
-            self.records[current.id] = self.latest[shortcut.id] = current
-            self.active = current.id
+            current = self.create(shortcut)
         current.outcome = "updating"
         current.failures.clear()
+        self.progress.pop(shortcut.id, None)
         self.serial += 1
+
+    def create(self, shortcut: Any) -> EditEvidence:
+        from .shortcut_effects import affected
+
+        current = EditEvidence(
+            shortcut.id, self.session.document.revision, affected(self.session, shortcut)
+        )
+        self.latest.pop(shortcut.id, None)
+        self.records[current.id] = self.latest[shortcut.id] = current
+        self.active = current.id
+        return current
 
     def requested(self, job: Any) -> None:
         if not job.writes:
@@ -100,11 +107,12 @@ class Observation:
         self.collect()
         self.settle()
 
+    @measured("inspection", lambda owner: owner.session.profiler)
     def settle(self) -> None:
         from .shortcut_progress import inspect
 
         for key, record in self.latest.items():
-            if record.outcome in ("complete", "cancelled", "superseded"):
+            if record.jobs or record.outcome in ("complete", "cancelled", "superseded"):
                 continue
             value = inspect(self.session, key)
             self.progress[key] = value

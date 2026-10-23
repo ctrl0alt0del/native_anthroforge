@@ -9,22 +9,24 @@ def snapshot(view):
     direct = {r.target for r in shortcut_effects.direct(shortcut)}
     affected = {p.owner for p in shortcut_effects.affected(session, shortcut)}
     colors = {key: "#ffc46b" if key in direct else "#67cee8" for key in affected}
-    return dict(colors=colors, lines=anchor_lines(view), shown=True)
+    return dict(
+        colors=colors,
+        lines=anchor_lines(view, "authored_anchors"),
+        effective_lines=anchor_lines(view, "effective_anchors"),
+        shown=True,
+    )
 
 
-def anchor_lines(view):
+def anchor_lines(view, field):
     status = tissue_inspection.status(view.controller.session, "shortcut")
     if status.get("state") != "ready":
         return []
     result = []
     for row in status.get("report", {}).get("rows", []):
         if displayed(view.controller, row["target"]):
-            for field in ("authored_anchors", "effective_anchors"):
-                anchors = row.get(field)
-                if anchors and anchors.get("available"):
-                    result.extend(
-                        (*anchors["owner_world_metres"], *anchors["support_world_metres"])
-                    )
+            anchors = row.get(field)
+            if anchors and anchors.get("available"):
+                result.extend((anchors["owner_world_metres"], anchors["support_world_metres"]))
     return result
 
 
@@ -39,6 +41,8 @@ def displayed(controller, key):
 
 
 def matching_display(rows, item):
+    if not item.result.asset and not getattr(item, "asset", ""):
+        return True
     return any(
         r["id"] == item.id
         and tuple(r["matrix"]) == item.matrix

@@ -3,16 +3,32 @@
 from typing import Any
 
 from . import shortcut_effects as effects
+from .construction_policy import mode
+from .dependency_inspection import port_record
 
 
 def inspect(session: Any, shortcut: str) -> dict[str, Any]:
     value = effects.selected(session, shortcut)
     record = session.shortcut_observation.latest.get(shortcut)
     ports = effects.affected(session, value)
-    rows = [effects.row(session, p, set(), set()) for p in ports if meaningful(p.output)]
+    rows = status_rows(session, ports)
     jobs = [j.describe() for j in session.scheduler.active_jobs if record and record.id in j.causes]
     state = outcome(session, record, rows, jobs)
     return report(session, shortcut, record, rows, jobs, state)
+
+
+def status_rows(session: Any, ports: Any) -> list[dict[str, Any]]:
+    document = session.document
+    return [
+        dict(
+            port_record(document, p),
+            **effects.readiness(document, p),
+            blocked=p in document.index.structure.dependencies.blocked,
+            update_mode=mode(document, p.owner) if p.owner in document.registry.records else "LIVE",
+        )
+        for p in sorted(ports, key=lambda p: (p.owner, p.output))
+        if meaningful(p.output)
+    ]
 
 
 def report(

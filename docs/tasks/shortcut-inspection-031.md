@@ -20,8 +20,20 @@ Detailed design: `docs/specification_031.md` and `docs/implementation_031.md`.
 Shared inspection/lifecycle tests pass, including Manual/On Release pauses, cancellation,
 and no attribution of later direct edits to a finished shortcut. Existing offscreen shortcut
 editor acceptance passes; strict typing passes. Native build is running (log under build/).
-Pending detailed UI/overlay acceptance, broader contracts, production geometry preservation,
-profiling, full development gate and portable release. This checkpoint is not release-ready.
+Full pytest at the prior checkpoint: 2018 passed. Added four UI/lifecycle regressions pass.
+Offscreen editor checks preserve numeric-field bounds during edits; texture-only D3D11
+captures show cyan downstream outlines. Mask geometry now belongs to its own lazy-loaded
+scene; cross-scene reparenting produced an empty mask and was replaced. Anchor endpoints
+use the native control geometry's nested XYZ contract. No interactive acceptance claimed.
+
+Production Ribs Top Radius=3 comparison against main 00e7339: exact geometry and attachment
+fingerprints before/after. Counterbalanced serial timings currently baseline 7.475/7.644 s,
+first candidate 10.190 s, refined candidate 7.914 s (profiling enabled in all). Avoiding
+full readiness scans while related jobs remain active reduced observed status work to
+13.36 ms aggregate over 397 observations. Four inspection operations together median
+8.32 ms; raw reports/fingerprints under build/shortcut-inspection-profile. Further trials,
+full development gate and portable release remain. Historical pending provenance is now
+distinct from current pending work; Ribs completion reports complete without changing results.
 
 ## Next actions
 

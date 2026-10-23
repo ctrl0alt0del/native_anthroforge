@@ -254,6 +254,18 @@ Item {
                 geometry: ControlGeometry { points: shortcutEffects.data.lines || []; segments: true; stroke: viewport.distance*.0015 }
                 materials: DefaultMaterial { diffuseColor: "#76e6ac"; lighting: DefaultMaterial.NoLighting }
             }
+            Model {
+                geometry: ControlGeometry { points: shortcutEffects.data.lines || []; radius: viewport.distance*.004 }
+                materials: DefaultMaterial { diffuseColor: "#76e6ac"; lighting: DefaultMaterial.NoLighting }
+            }
+            Model {
+                geometry: ControlGeometry { points: shortcutEffects.data.effective_lines || []; segments: true; stroke: viewport.distance*.0018 }
+                materials: DefaultMaterial { diffuseColor: "#e99afa"; lighting: DefaultMaterial.NoLighting }
+            }
+            Model {
+                geometry: ControlGeometry { points: shortcutEffects.data.effective_lines || []; radius: viewport.distance*.005 }
+                materials: DefaultMaterial { diffuseColor: "#e99afa"; lighting: DefaultMaterial.NoLighting }
+            }
             PointScene { markerScale: viewport.gizmoSize * 0.0012 }
             ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis }
             Repeater3D {
@@ -302,19 +314,6 @@ Item {
                         }
                     }
                     ResourceLoader { geometries: [meshNode.geometry] }
-                    Node {
-                        parent: shortcutOutline.sceneRoot
-                        position: Qt.vector3d(item.trs[0],item.trs[1],item.trs[2])
-                        rotation: Qt.quaternion(item.quaternion[0],item.quaternion[1],item.quaternion[2],item.quaternion[3])
-                        scale: Qt.vector3d(item.trs[6],item.trs[7],item.trs[8])
-                        Model {
-                            objectName: "shortcutMask_"+item.key
-                            visible: !!shortcutEffects.data.shown && item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id)
-                            position: meshNode.position
-                            geometry: MeshGeometry { assetId: shortcutEffects.data.shown ? item.handle : 0; chunk: item.chunk }
-                            materials: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: shortcutEffects.data.colors?.[item.id] || "black"; cullMode: Material.NoCulling }
-                        }
-                    }
                 }
             }
             Repeater3D {
@@ -348,6 +347,7 @@ Item {
         id: shortcutOutline; objectName: "shortcutEffectsOutline"; anchors.fill: parent
         sourceCamera: view.camera; orthographic: viewport.orthographic; useMaskColors: 1
         visible: !!shortcutEffects.data.shown
+        content: Component { ShortcutEffectMeshes { effects: shortcutEffects.data } }
     }
     MouseArea {
         id: navigation

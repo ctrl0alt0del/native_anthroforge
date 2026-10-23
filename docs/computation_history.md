@@ -156,11 +156,13 @@ explaining performance; a fast native kernel does not imply a responsive applica
 
 ### Coverage and exclusions
 
-0.3 development adds the following responsibility; full application integration is pending.
+0.3 adds the following responsibilities; release qualification is recorded in the
+[Windows review](research/shortcuts_030/windows_review.md).
 
 | ID | Computation | Owner | Evidence |
 | --- | --- | --- | --- |
 | E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. Construction copies preserve/remap formula graphs and accepted values (CH-050). Addressed property lookup traverses only the requested path, sharing discovery metadata and policy (CH-052). | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py), [copy state](../src/anthroforge/application/shortcut_copies.py), [property catalogue](../src/anthroforge/application/property_catalog.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py), [copy lifecycle](../tests/test_shortcut_copy.py), [profiling](research/shortcuts_030/performance_qualification.md) |
+| E02 | Native uniform Parametric XYZ sampling, generated controls and exact accepted-path Fiber conversion (CH-048). Shared policy locks resolution when junctions, attachments or generated-point references require stable membership (CH-058). | [native sampling](../native/src/parametric.cpp), [adapter](../src/anthroforge/native/parametric.py), [reference policy](../src/anthroforge/application/parametric_policy.py) | [curves](../tests/test_parametric_curves.py), [consumers](../tests/test_parametric_consumers.py), [resolution](../tests/test_parametric_resolution_policy.py) |
 
 The inventory covers all public native interface families in
 [native/include/anthroforge](../native/include/anthroforge), compiled geometry sources

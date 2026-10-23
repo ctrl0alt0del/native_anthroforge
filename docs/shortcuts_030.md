@@ -29,7 +29,10 @@ read-only while its formula is enabled. Right-click an ordinary driven numeric
 field and choose **Go to driving shortcut** to open its controller. Exposing or
 hiding a shortcut changes its presentation; it does not disable a formula.
 The Parametric inspector edits XYZ equations, the interval, point count and typed
-variables. Generated coordinates are read-only. Any junction locks point count.
+variables. Generated coordinates are read-only. Junctions, point-specific deformer
+membership/weights and formula references to generated points lock point count.
+Hover the label or field for the reason. Removing those references unlocks it;
+disabling a binding or formula retains its references and therefore retains its lock.
 
 ## References, values and policies
 
@@ -37,8 +40,9 @@ variables. Generated coordinates are read-only. Any junction locks point count.
 paths from labels. A reference contains `target`, a `path` array and an optional
 zero-based `component`. Stable members use `@<identity>`. The example supplies the
 variable identity `radius` explicitly; ordinary creation generates identities.
-Renaming a variable retains its property reference, but expressions use its current
-symbol name and must be edited accordingly.
+Renaming a variable retains its property reference and updates its symbol in unchanged
+XYZ/interval expressions. Explicitly edited expressions retain the text you supplied.
+Removing a variable that is still used reports which references must be resolved.
 
 Each exposed property wrapper has its own label and attachment policy. Direct
 `property.set` uses ordinary edit semantics; `shortcut.set` activates only the

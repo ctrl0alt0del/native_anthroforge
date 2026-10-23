@@ -18,12 +18,14 @@ types/units and the language restricted by AnthroForge rather than library defau
 
 Curve authoring is engine-specific: formula definitions and generated points
 cannot be treated as independent authored Bézier controls. Stored definitions, generated
-identities, post-formula deformation, resolution locks at junctions and exact independent
+identities, post-formula deformation, resolution locks for junctions and generated-point references, and exact independent
 Fiber conversion are distinct responsibilities. Schema 5 includes schema-4 loading
 for 0.2.4 projects without blanket recomputation. These boundaries and APIs are not present
 in the released 0.2.4 build. Native expression qualification and actual old-executable
 compatibility checks are recorded in the [implementation review](research/shortcuts_030/windows_review.md).
-Release acceptance and generated-point membership policy remain unfinished.
+Generated-point resolution policy is shared by direct, wrapper, formula and engine-switch
+writes; property inspection presents the same reason in desktop editors. Final release
+packaging is still pending.
 
 ## Current architecture
 

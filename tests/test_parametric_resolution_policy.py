@@ -120,6 +120,16 @@ def test_property_inspection_explains_lock_without_locking_unrelated_curve(sessi
     assert not session.command("property.get", reference=reference(curve))["writable"]
 
 
+def test_clearing_restricted_membership_unlocks_without_enabling_whole_curve_deformation(session):
+    curve, body, _, binding = body_and_hook(session, restricted=True)
+    session.command("deformer.update", binding=binding, indices=[])
+    resize(session, curve, 9)
+    session.wait(5)
+    saved = next(b for b in session.document.entity(body).deformers if b.id == binding)
+    assert saved.restrict and not saved.members and not saved.indices
+    assert len(session.document.object(curve).points) == 9
+
+
 def test_restoring_definition_cannot_bypass_point_membership_lock(session):
     curve, _, _, _ = body_and_hook(session, restricted=True)
     session.command("curve.engine", curve=curve, engine="BEZIER")

@@ -64,13 +64,7 @@ def membership_reason(document: Document, curve: str) -> str:
 
 
 def point_membership(binding: Deformer) -> bool:
-    return bool(
-        binding.restrict
-        or binding.indices
-        or binding.members
-        or binding.weights
-        or binding.weighted_members
-    )
+    return bool(binding.indices or binding.members or binding.weights or binding.weighted_members)
 
 
 def formula_reason(document: Document, curve: str) -> str:

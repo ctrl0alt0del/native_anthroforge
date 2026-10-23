@@ -3,7 +3,7 @@
 - Task branch: `codex/task-priority-propagation`
 - Integration branch: `main`
 - Starting revision: `e7ba40b`
-- Status: in progress
+- Status: source verified; full gate and portable qualification in progress
 - Active writer: desktop /root
 - Last updated: 2026-10-23
 
@@ -32,22 +32,25 @@ declared job prerequisites, not OS locks; its fixture establishes effectiveness.
 
 Coordinator policy and lifecycle integration implemented. Thirteen deterministic regressions
 cover transitive donation, withdrawal, cycles, workspace scope, follow-ups, same-cause
-FIFO, replacement/retry, Manual inputs and exclusive writers; 30 existing scheduler regressions pass.
-Architecture/function-limit checks pass. Full qualification remains pending.
+FIFO, replacement/retry, Manual inputs and exclusive writers; 30 existing scheduler
+regressions pass. Architecture/function-limit checks and five native CTests pass.
+Full gate and portable qualification remain pending. Runtime source is `b7704f7`.
+Canonical `dist/0.3.0/AnthroForge.dist` rebuilt successfully; full portable and actual
+assembly checks are running. Logs are `build/task-priority-{gate,package,portable,packaged-assembly}.log`.
 
 The first experiment propagated urgency but still used replacement creation time to
 break ties; it retained the delay (2.07 s). The coherent correction also uses the
-preserved logical queue age. Two actual-assembly runs now dispatch Ulna within 20–41 ms
-of observed readiness, with one/two control-pose jobs intervening rather than 176 tissue,
-Fiber and construction jobs. Final geometry and attachment comparisons, desktop evidence,
-gate and packaging remain to be completed. Raw artifacts include this rejected attempt;
-do not describe it as qualified. Preserve unrelated root `__init__.py`.
+preserved logical queue age. The final actual-assembly headless run dispatches Ulna
+within 13.6 ms of observed readiness, with one control-pose job intervening rather than
+179 tissue/Fiber/construction jobs. Final geometry, attachment and desktop evidence is
+recorded below. Raw artifacts include the rejected first attempt; it is not the delivered
+implementation. Preserve unrelated root `__init__.py`.
 
 ## Next actions
 
-1. Implement shared rank policy and lifecycle integration; deterministic regression tests.
-2. Run headless and offscreen desktop fixture comparisons with profiler evidence.
-3. Development gate, canonical portable build/checks, documentation, validated merge/push.
+1. Finish full development gate and canonical portable build/checks.
+2. Exercise the actual Ribs edit in the packaged app and inspect hidden saved rendering.
+3. Finalize documentation/source archive, then validated merge/push.
 
 ## Recovery inputs
 
@@ -60,14 +63,45 @@ New evidence belongs under `build/task-priority-propagation/`.
 
 ## Qualification checkpoint
 
-- Final source (`bb78102` plus indexed priority edges) and baseline `e7ba40b` both
+- Final source `b7704f7` and baseline `e7ba40b` both
   pass actual-assembly edit/undo/redo/save/reopen. All 625 geometry/path/pose hashes
   and all 914 attachment/reference/field-content hashes agree exactly; attachment
-  hashes also agree before/after the edit. Native path data is hashed, not handle addresses.
+  hashes also agree before/after the edit. All 1,347 saved mesh/path/attachment resource
+  buffer bundles also match, including tissue stages and material provenance. Native
+  path data is hashed, not handle addresses. Original source remains unchanged.
 - Indexed reverse lookup reduces measured priority policy cost from 1.77 s cumulative
   to 0.57 s in the headless workload. The scheduler skips ranking when workers are full.
-- Serial offscreen QML app-only profiling before this cost refinement: Radius displayed
-  at 46.04 s baseline vs 2.49 s candidate; Ulna 77.92 s vs 3.50 s. All final shapes match.
-  Reports retain the entire time interval (512 MiB) but reject 63/66 oversized metadata
-  events; they are explicitly incomplete. Lifecycle/model sidecars preserve observations.
-- Final-cost desktop verification, recording-off checks, full gate and package pending.
+- Final desktop comparison is below. Reports retain the entire interval (512 MiB) but
+  reject 63 baseline/74 final oversized metadata events; they are explicitly incomplete.
+  Task/model sidecars preserve the observations. Headless traces have no evictions or
+  oversized losses. Full Qt/QML collection is excluded due to its previously measured
+  perturbation; shared UI/task/native boundaries remain recorded.
+
+| Trial | Radius accepted | Ulna accepted | Ulna ready queue wait | Ulna viewport model |
+| --- | ---: | ---: | ---: | ---: |
+| Baseline headless 1 | 3.577 s | 5.199 s | 1,565 ms | n/a |
+| Baseline headless 2 | 5.219 s | 7.373 s | 2,083 ms | n/a |
+| Final headless | 1.225 s | 1.312 s | 13.6 ms | n/a |
+| Baseline desktop, application profiler | 45.715 s | 77.613 s | 31,228 ms | 77.919 s |
+| Final desktop, application profiler | 3.379 s | 4.803 s | 670 ms | 5.174 s |
+| Final desktop, recording off | 2.342 s | 3.683 s | 647 ms | 4.137 s |
+
+Headless trials interleave baseline/candidate order on the same PC; all profiling trials
+are serial with no concurrent build. Background user processes/load were not controlled,
+and timings vary: this demonstrates removal of the queue inversion, not a universal
+throughput factor. The remaining desktop gap includes two earlier control-pose jobs and
+expensive UI refresh between ticks. Workers are not preempted. Ulna still correctly
+depends on Radius's pose and its formula. This fix does not claim to repair UI refresh.
+Accepted timings use command start; viewport-model and recording-off timings use the
+probe start immediately before command/profiler activation. Offscreen evidence does not
+establish physical display latency or human interactive acceptance.
+
+Final headless policy cost: 469 calls, 565 ms cumulative, 6.13 ms maximum. Final desktop:
+314 calls, 477 ms cumulative, 5.51 ms maximum. These instrumented costs include observer
+effects and must not be subtracted as an exact overhead tax. All desktop final hashes
+match baseline, and there are no job errors or QML warnings.
+
+Raw final inputs: `baseline-2/`, `final-headless/`, `desktop-baseline/`, `desktop-final/`,
+`desktop-unrecorded/` under the evidence directory above. `resource-equivalence.json`
+records saved buffer equality. `tools/check_ribs_ulna_portable.py` qualifies the same
+control plus history/reopen in the packaged executable.

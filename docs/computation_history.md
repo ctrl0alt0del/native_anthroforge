@@ -160,7 +160,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 
 | ID | Computation | Owner | Evidence |
 | --- | --- | --- | --- |
-| E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. Construction copies preserve/remap formula graphs and accepted values through existing lifecycle operations (CH-050). | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py), [copy state](../src/anthroforge/application/shortcut_copies.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py), [copy lifecycle](../tests/test_shortcut_copy.py) |
+| E01 | Restricted expression compilation, integer/real and unit checking, immutable postfix evaluation, owned batched frames and bounded compiled-program caching. Construction copies preserve/remap formula graphs and accepted values (CH-050). Addressed property lookup traverses only the requested path, sharing discovery metadata and policy (CH-052). | [native expressions](../native/src/expression_parser.cpp), [adapter](../src/anthroforge/native/expressions.py), [copy state](../src/anthroforge/application/shortcut_copies.py), [property catalogue](../src/anthroforge/application/property_catalog.py) | [qualification](research/shortcuts_030/expression_qualification.md), [contracts](../tests/test_expressions.py), [copy lifecycle](../tests/test_shortcut_copy.py), [profiling](research/shortcuts_030/performance_qualification.md) |
 
 The inventory covers all public native interface families in
 [native/include/anthroforge](../native/include/anthroforge), compiled geometry sources
@@ -1717,3 +1717,29 @@ CH-049 because the integrated pipeline repair already published CH-045.
   Parametric value row displays the full integer in the inspected offscreen capture.
   Full combined validation of this checkpoint is pending; no performance or
   Windows desktop release claim is made.
+
+### CH-052 — Resolve addressed properties without enumerating the catalogue (2026-10-23)
+
+- Profiling the headless 0.3 workload at `b42a7f1` showed that resolving one
+  Parametric variable walked and labelled all preceding generated point properties.
+  One public read on a 256-point curve made 1,170,890 profiled calls, taking about
+  250 ms. Point labels repeatedly searched the point collection.
+- The owning property catalogue now traverses only the requested semantic path.
+  Discovery and direct lookup share dimension/type metadata, descriptor construction,
+  labels and Parametric read-only policy. Transform lookup retains its existing
+  provider. Excluded state and noncanonical collection aliases remain ineligible.
+  No additional cache, document lifetime or native numerical algorithm is introduced.
+- The same public probe now makes 585 calls in about 1 ms. The synthetic 12-curve,
+  256-point, one-Body workload's unrecorded edit median was 787.49 ms before and
+  142.74 ms after. Shared-worker load and a single before/after sequence limit the
+  comparison; this is not evidence of overall desktop responsiveness.
+- Evidence: 111 focused property, shortcut, driver, Parametric, integer and architecture
+  cases pass; configured Ruff/mypy pass. Descriptor equivalence covers five kinds
+  of construction, named fields and component addresses. Both production-QML
+  acceptance tools pass. The first concurrent full gate caught an intermediate
+  function-length violation; it is fixed and a settled-code rerun remains pending.
+- [Profiling evidence](research/shortcuts_030/performance_qualification.md) records
+  reproducible compilation, packing, native evaluation and application workloads,
+  numerical checks, bounded expression-cache occupancy and recorder limits. Raw
+  artifacts are ignored/local only. Original-addon parity and Windows release
+  qualification remain pending.

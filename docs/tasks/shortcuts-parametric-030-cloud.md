@@ -59,6 +59,14 @@ core validator rejects authored values beyond native int64, including headless c
 Parametric values have a full-width row so long integers remain readable. See
 [CH-051](../computation_history.md#ch-051--preserve-typed-integers-across-desktop-controls-2026-10-23).
 
+Profiling then exposed full-catalogue traversal for every addressed property read.
+The shared resolver now follows only the requested path while retaining discovery
+metadata, eligible roots, units/types, component validation and read-only reasons.
+The [headless profiling record](../research/shortcuts_030/performance_qualification.md)
+includes reproducible native boundary and multi-output driver workloads, numerical
+checks, measurements and their limits; see CH-052. No new cache or geometry algorithm
+is introduced.
+
 ## Verification
 
 - Linux native build and all five CTests pass after reconciliation.
@@ -100,14 +108,22 @@ Parametric values have a full-width row so long integers remain readable. See
   making the variable value row wide enough for the full number. Logs are ignored
   `build/core/cloud-030-integer-focused.log`, `cloud-030-int64-qml.log` and
   `cloud-030-integer-qml.log`. Full validation of these latest changes is pending.
+- Direct lookup continuation: 111 focused cases pass, including descriptor equivalence
+  and invalid address tests. Ruff/mypy and both QML harnesses pass. The initial full
+  gate passed native build, five CTests and 170 native style inputs, then reported
+  1,867 pytest passes and one function-length failure in an intermediate resolver
+  draft. The corrected architecture/address group passes all 14 cases. A combined
+  rerun on settled code is pending; packaging was not reached in the initial run.
+- Integer checkpoint `b42a7f1` is pushed. Its GitHub run `39879394309` is still active.
 
 ## Next actions and blockers
 
-1. Run the portable gate on the integer continuation and inspect its GitHub jobs.
+1. Finish combined portable validation and inspect the latest GitHub jobs.
 2. Continue catalogue/ordinary-field coverage, full-window interaction and native
    viewport qualification from the desktop handoff. Review indexed/named collection
    reference semantics against the stable-identity contract before release.
-3. Complete representative 0.3 profiler evidence, original-addon parity, Windows GUI
+3. Extend the synthetic headless evidence with full-interaction profiling,
+   original-addon parity, Windows GUI
    and portable executable acceptance. This checkpoint does not complete 0.3 release
    qualification; do not merge or bump the version on the basis of core tests alone.
 4. Keep follow-ups and recovery on this cloud branch, pushing coherent checkpoints.

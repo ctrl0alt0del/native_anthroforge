@@ -1,0 +1,81 @@
+# 0.3 headless expression and driver profiling
+
+This is synthetic Linux evidence from 2026-10-23, not desktop responsiveness or
+release acceptance. Baseline: `b42a7f1`. Candidate: the direct property lookup
+change recorded in CH-052. Native expression and geometry algorithms are unchanged.
+
+## Workload and reproduction
+
+From the repository root, after building the native library:
+
+```bash
+source tools/cloud/environment.sh
+uv run --no-sync python tools/shortcuts_profile.py
+```
+
+The tool records revision, platform, Python version and every timing sample in
+ignored `build/shortcuts-profile/measurements.json`. The existing runtime profiler
+writes `driver-paths.afprofile.zip` beside it. Baseline copies in this workspace
+are `baseline.json` and `driver-paths-baseline.afprofile.zip`; raw artifacts are
+local only. Linux 6.18.55 x86-64, glibc 2.41 and Python 3.12.12 were used.
+
+- Compilation: 25 independent cold compilations and 25 cached lookups of the same
+  expression and typed symbols; the cached lookup must return the same owned program.
+- Evaluation: 25 batches each of 1, 256 and 4,096 frames. Python frame packing,
+  prepacked native ABI evaluation and total adapter calls are timed separately.
+  Borrowed buffers remain owned throughout. Results match NumPy and the full adapter.
+- Application: one length driver controls radius variables on 12 closed Parametric
+  circles, each with 256 samples, plus one dependent Body. Twelve sequential edits
+  wait for accepted work. Both an unrecorded session and a separately recorded
+  session run. Formula readiness, all sampled radii, closure and accepted Body
+  output are checked. No Qt module may be imported.
+
+## Observations
+
+A public `property.get` of one radius variable previously enumerated and labelled
+all earlier properties, including generated curve points. cProfile reported
+1,170,890 calls and approximately 250 ms for that single 256-point-curve lookup.
+The candidate follows the requested path, reusing the discovery metadata and
+read-only policy. The same probe reports 585 calls and approximately 1 ms, including
+first-use import work. The candidate profile is `property-get-after.pstats`.
+This removes unrelated catalogue traversal; full catalogue discovery is unchanged.
+
+| Twelve-edit application workload | Baseline median | Candidate median |
+| --- | ---: | ---: |
+| Unrecorded command through accepted completion | 787.49 ms | 142.74 ms |
+| Separately recorded command through accepted completion | 822.47 ms | 152.45 ms |
+
+These are single before/after runs on a shared worker while native style analysis
+was active, not a counterbalanced benchmark or a general speedup guarantee. Both
+runs retain four compiled programs totalling 10,049 bytes, within the existing
+128-entry/8 MiB limits. Both recorded sessions contain 168 Parametric path calls
+and 156 expression evaluation calls, with no reported event losses. Setup creates
+and supersedes jobs; total task counts can differ by scheduling interleaving.
+
+Candidate microbenchmark medians in milliseconds:
+
+| Frames | Packing | Native evaluation | Complete adapter |
+| ---: | ---: | ---: | ---: |
+| 1 | 0.00142 | 0.00117 | 0.00889 |
+| 256 | 0.14494 | 0.03021 | 0.18470 |
+| 4,096 | 2.52051 | 0.50235 | 3.13566 |
+
+Cold compilation was 0.00992 ms; cached lookup was 0.00078 ms. Timings are measured
+in separate loops, so their medians are not additive. They identify boundary costs;
+they do not establish that the expression kernel is the application's bottleneck.
+Recorded prepare/execute/publish totals and native boundaries remain available in
+the archive. Nested inclusive durations must not be summed as wall-clock time.
+
+## Contracts and remaining evidence
+
+The direct resolver preserves eligible roots, excluded state, dimensions, integer
+types, component bounds, transform semantics, labels and Parametric read-only
+reasons. It rejects noncanonical positional aliases that discovery never exposed.
+Descriptor equivalence is tested across Bezier, Parametric, lattice, segment-chain
+and named tissue-field construction, alongside existing public property/formula tests.
+No cache or additional retained document state is introduced.
+
+The recorder reports its existing observation and memory-accounting limitations;
+it cannot measure GPU execution or physical input-to-display latency. Full-window
+gestures, original-addon geometry/attachment parity, Windows Qt/native viewport
+and portable executable acceptance remain required before a 0.3 release.

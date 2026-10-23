@@ -23,9 +23,22 @@ def capture(engine: Any, document: Any, item: TissueVCP, phase: str) -> TissueMa
         return replace(
             item.rest_material,
             frame=Frames(engine, document).world(item.id),
+            crop_base=crop_base(item),
             **{key: getattr(item, key) for key in INTRINSIC_FIELDS},
         )
     return item.intrinsic_material if phase == "final" else None
+
+
+def crop_base(item: TissueVCP) -> str:
+    """The accepted cut follows material; changing the plane defines a new cut."""
+    if not item.crop.enabled:
+        return ""
+    previous = item.intrinsic_material
+    if previous is not None and previous.crop == item.crop:
+        return previous.crop_base or previous.base
+    if item.rest_material is None:
+        raise ValueError("Missing accepted rest provenance; evaluate inflated rest first.")
+    return item.rest_material.base
 
 
 def accepted(state: TissueMaterialState, phase: str, asset: str) -> TissueMaterialState:

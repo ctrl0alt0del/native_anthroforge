@@ -20,6 +20,7 @@ class TissueMaterialState:
     both_sides: bool = False
     reverse: bool = False
     crop: TissueCrop = field(default_factory=TissueCrop)
+    crop_base: str = ""
     relaxation: TissueRelaxation = field(default_factory=TissueRelaxation)
     fields: tuple[TissueField, ...] = ()
     constraints: tuple[TissueConstraint, ...] = ()

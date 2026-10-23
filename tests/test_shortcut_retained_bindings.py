@@ -111,3 +111,27 @@ def test_multi_owner_driver_keeps_bindings_without_inventing_policy_scope(sessio
     for original, anchor in zip(originals, anchors, strict=True):
         assert_retained(session, original, anchor)
     assert not session.document.shortcut_edits
+
+
+def test_explicit_recapture_supersedes_manual_retention(session, assembly):
+    _, child = assembly
+    original = session.document.entity(child).attachment
+    session.command("update_mode", entity=child, mode="MANUAL")
+    edit(session, child, 2.0)
+    session.command("scp.recapture", entity=child)
+    session.wait(5)
+    assert not session.scheduler.errors
+    assert session.document.entity(child).attachment != original
+    assert not session.document.shortcut_edits
+
+
+def test_undo_pending_shortcut_redo_restarts_retained_evaluation(session, assembly):
+    _, child = assembly
+    original, anchor = session.document.entity(child), retained_anchor(session, child)
+    session.command("update_mode", entity=child, mode="MANUAL")
+    edit(session, child, 2.0)
+    session.command("undo")
+    assert session.document.entity(child).matrix == original.matrix
+    session.command("redo")
+    session.command("evaluate", entities=[child])
+    assert_retained(session, original, anchor)

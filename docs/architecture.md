@@ -22,6 +22,14 @@ stable references to existing semantic edit operations; wrappers own exposure an
 attachment-edit policy. Direct property editing does not activate wrapper policy, while
 shared validation still protects driven, read-only and topology-locked targets.
 
+Shortcut edit contexts also retain existing bindings for controlled SCP transform
+properties before writes. Attachment evaluation composes temporary overrides over
+those bindings, then resolves them without recapture. Default retention is ready
+immediately and uses no extra preparation job. Context ownership already spans delayed
+formula publication, update modes, history and persistence; direct property edits and
+explicit rebinding supersede it. Retention does not imply optional owner backsolve or
+assign a policy scope to multi-owner drivers (CH-067).
+
 Driving ownership is inferred from controlled properties, chains and shared construction.
 Only the initiating wrapper contributes temporary attachment policies. The current graph
 and coordinator own formula outputs, coupled validation, accepted-value provenance

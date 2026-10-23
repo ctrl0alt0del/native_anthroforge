@@ -42,6 +42,14 @@ int af_decompose(const double* matrix,double* trs) {
         angles=af::V3(zyx.z(),zyx.y(),zyx.x())*(180./3.141592653589793); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_volume_scale(const double* matrix,double* output) {
+    try {
+        const af::M4 value=Eigen::Map<const af::M4>(matrix);
+        if(!value.allFinite()) throw std::runtime_error("Transform must be finite.");
+        *output=std::cbrt(value.block<3,3>(0,0).determinant());
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 namespace af {
 static M3 channel_rotation(const double* angles) {
     const double radians=3.141592653589793/180.;

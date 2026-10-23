@@ -1919,3 +1919,13 @@ an absolute geometry tolerance. Tiny real values and edits above the limit are
 tested. The 96-control assembly comparison passes with identical connectivity and
 attachment arrays; maximum mesh-coordinate difference 3.746e-12. Existing accepted
 path-frame differences are recorded separately and are not claimed identical.
+
+
+CH-061 qualification update: actual six-guide conversion passed against the
+96-control checkpoint (619 records, 1,325 resources; max mesh-coordinate drift
+1.041e-12). Geometry connectivity and retained binding arrays are unchanged.
+Path frames still differ on some reevaluated fiber samples, separately recorded.
+The same eight-ULP equivalence now guards driven transform fields during ordinary
+attachment pose publication. Native world volume scale is the signed cube root
+of the affine determinant, following Blender 5.0.1 SCALE_AVG, not arithmetic axis
+average. This is a read-only formula input; no new write channel is introduced.

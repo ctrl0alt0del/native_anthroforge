@@ -163,6 +163,7 @@ class GeometryEngine(NativeEngine):
     def _query_signatures(self) -> None:
         self.bind("af_transform", [D, D])
         self.bind("af_decompose", [D, D])
+        self.bind("af_volume_scale", [D, D])
         self.bind("af_transform_channels", [D, D, D])
         self.bind("af_point", [D, D, D])
         self.bind("af_pick", [U, D, D, D, D])
@@ -195,6 +196,11 @@ class GeometryEngine(NativeEngine):
         source, local, output = doubles(matrix), doubles(point), np.empty(3)
         self.check(self.library.af_point(pointer(source), pointer(local), pointer(output)))
         return list(output.tolist())
+
+    def volume_scale(self, matrix: Any) -> float:
+        source, output = doubles(matrix), np.empty(1)
+        self.check(self.library.af_volume_scale(pointer(source), pointer(output)))
+        return float(output[0])
 
     def transform_channels(self, matrix: Any, values: Any) -> tuple[float, ...]:
         source, channels, output = doubles(matrix), doubles(values), np.empty(16)

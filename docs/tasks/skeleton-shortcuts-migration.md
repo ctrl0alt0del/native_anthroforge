@@ -94,3 +94,35 @@ A one-ULP driver decomposition change previously triggered attachment recapture.
 Transform channel no-op comparison now uses eight ULPs, without an absolute
 geometric tolerance. Tiny real edits remain active. Focused tests pass.
 Prior combined gate: 1,954 tests/five CTests; latest extensions: 21 tests passed.
+
+
+## Guide conversion and remaining parameter wiring
+
+`tools/skeleton_shortcut_guides.py` converts six actual guides using four generated
+Bezier knots at the original per-segment resolution. The shared `curve.engine`
+operation accepts optional typed settings atomically; equivalent sampling keeps
+existing topology locks intact. Actual 96-muscle guide comparison passed: identical
+mesh topology and retained bindings, max mesh drift 1.041e-12 against the 96-control
+checkpoint. Raw artifact: `guides-checkpoint.anthroforge`, still not delivery.
+
+Additional shared correction: read-only formula guards use the same transform
+roundoff equivalence as numeric edits, so normal attachment pose evaluation cannot
+fail because of a one-ULP scale decomposition change. A read-only world
+`volume_scale` input reproduces Blender's signed cube root of determinant (5.0.1
+`fcurve_driver.cc` SCALE_AVG), including shear/reflections; native tests pass.
+
+Remaining scripts are radius/shape wiring, unqualified: `skeleton_shortcut_radius.py`,
+`skeleton_shortcut_formulae.py`, `skeleton_shortcut_pelvis.py`, and
+`skeleton_shortcut_pelvic_stage.py`. Radius stage currently runs with a 600-second
+bound and a profiler capture; the prior 120-second bound expired. Do not interpret
+successful submission as geometry acceptance. The radius stage creates remaining
+virtual inputs; pelvic stage connects the pre-bend cage formulas and Ilium override.
+Mirrored counterpart parameters remain independent: no new mirrored muscle objects
+and no shared driver outputs for mirrored bone controls. The early radius checkpoint
+may contain mirror-guide outputs; pelvic-stage cleanup removes those explicitly.
+
+Next: complete and qualify radius/pelvic stages; compare retained state and all
+geometry (allow only declared guide engine/consumer-mode changes); qualify actual
+control edits and restoration against donor semantics; inspect hidden rendered views.
+Then complete documentation, combined gate, canonical portable package/source archive,
+and validated main merge. No final project has been delivered.

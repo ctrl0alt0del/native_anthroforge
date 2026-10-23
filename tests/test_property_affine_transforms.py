@@ -87,3 +87,15 @@ def test_small_transform_values_are_not_compared_with_absolute_tolerance(session
     session.command("property.set", reference=ref, value=1e-14)
     session.command("property.set", reference=ref, value=2e-14)
     assert session.command("property.get", reference=ref)["value"] == 2e-14
+
+
+def test_volume_scale_retains_shear_and_reflection_sign(session):
+    from math import cbrt
+
+    key = control(session)
+    ref = dict(target=key, path=["world_transform", "volume_scale"])
+    result = session.command("property.get", reference=ref)
+    assert not result["writable"]
+    assert result["value"] == pytest.approx(cbrt(24))
+    session.command("property.set", reference=reference(key, "scale"), value=-2.0)
+    assert session.command("property.get", reference=ref)["value"] == pytest.approx(-cbrt(24))

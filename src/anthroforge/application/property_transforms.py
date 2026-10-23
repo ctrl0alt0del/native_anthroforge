@@ -14,20 +14,36 @@ GROUPS = {"position": (0, "LENGTH"), "rotation": (3, "ANGLE"), "scale": (6, "SCA
 
 
 def descriptors(item: Any) -> Iterator[NumericDescriptor]:
-    reason = object_reason(item)
+    yield volume_descriptor(item)
     for scope in ("transform", "world_transform"):
-        for group, (_, dimension) in GROUPS.items():
-            writable = scope == "transform" and not reason
-            yield NumericDescriptor(
-                PropertyRef(item.id, (scope, group)),
-                scope.replace("_", " ").title() + " " + group,
-                "REAL",
-                dimension,
-                3,
-                writable,
-                reason if scope == "transform" else "Evaluated input only",
-                vector=True,
-            )
+        for group in GROUPS:
+            yield channel_descriptor(item, scope, group)
+
+
+def volume_descriptor(item: Any) -> NumericDescriptor:
+    return NumericDescriptor(
+        PropertyRef(item.id, ("world_transform", "volume_scale")),
+        "World volume scale",
+        "REAL",
+        "SCALAR",
+        1,
+        False,
+        "Evaluated input only",
+    )
+
+
+def channel_descriptor(item: Any, scope: str, group: str) -> NumericDescriptor:
+    reason = object_reason(item)
+    return NumericDescriptor(
+        PropertyRef(item.id, (scope, group)),
+        scope.replace("_", " ").title() + " " + group,
+        "REAL",
+        GROUPS[group][1],
+        3,
+        scope == "transform" and not reason,
+        reason if scope == "transform" else "Evaluated input only",
+        vector=True,
+    )
 
 
 def read(session: Any, reference: PropertyRef, item: Any = None) -> Any:
@@ -35,6 +51,8 @@ def read(session: Any, reference: PropertyRef, item: Any = None) -> Any:
     matrix = item.matrix
     if reference.path[0] == "world_transform":
         matrix = Frames(session.engine, session.document).world(item.id)
+    if reference.path[1] == "volume_scale":
+        return session.engine.volume_scale(matrix)
     index, _ = GROUPS[reference.path[1]]
     values = tuple(session.engine.decompose(matrix)[index : index + 3])
     if index == 3:

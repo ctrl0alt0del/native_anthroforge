@@ -105,8 +105,10 @@ The surface-provider boundary retains bind-time geometry for Anchor
 attachments. C++ resolves referenced material coordinates against the current accepted
 surface into a geometry-only lease with the captured index layout. The shared attachment
 kernel then resolves its unchanged frame/offset record. Canonical polygons and tissue-side
-correspondence survive envelope compaction; cropped-away locations fail without nearest
-reassignment. This lease is never a display/picking surface. Captured resource IDs are
+correspondence survive envelope compaction. Accepted crop provenance retains the base
+that defined the material cut, so anatomical deformation does not clip away bindings.
+Explicit plane edits redefine the cut; material removed by an explicit topology edit
+still fails without reassignment. This lease is never a display/picking surface. Captured resource IDs are
 serialized and included in document/history/job ownership. Fiber fields now use typed
 surface-role/material captures too. Multiple captures can reference the same provider:
 native field assembly retains unedited structural pins on their original capture while
@@ -871,8 +873,14 @@ reference-sequence getters copying thousands of points repeatedly during binding
 constructs capped profiles and uses the existing exact exterior union. Per-triangle
 source identities and corner barycentrics preserve material locations when union
 triangulation changes. Attachment captures own their reference resource through normal
-history/checkpoint/job leases. A newly covered material location produces an explicit
-failure; this is not nearest-face reassignment. Unstable generated vertex memberships
+history/checkpoint/job leases. A newly covered material location follows the same
+union's nearest exterior in its retained construction chart, then the selected triangle
+carries that location through downstream deformation. The original reference and
+offset remain unchanged, so an exposed-again patch resolves to its original material.
+The native chart retains untrimmed source triangle positions; shell layers are isolated,
+and the chart participates in persistence, equivalence and resource accounting.
+Legacy accepted surfaces remain readable; a new construction evaluation supplies the
+chart without blanket startup recomputation. Unstable generated vertex memberships
 are rejected by shared construction validation; cage controls remain independent.
 
 Shrinkwrap bindings reference surface roles rather than dummy controls. Reference

@@ -106,7 +106,7 @@ without silently choosing another algorithm.
 | Parts and sides | Independent supported settings per branch and side; stable identities, reversal, two-sided envelope composition. |
 | Height smoothing | Native constrained heights, exact boundaries/seams/zero-height creases, bounded change, Off bypass and separate diagnostics. |
 | Branches | Existing open branch topology, explicit junctions, welded seams, connector width/fullness and per-part inflation. No nested/closed branches or overlapping root intervals. |
-| Crop | Material-domain plane clipping with corresponding base/output interpolation. Crop borders are not attachments or new zero-height rims. |
+| Crop | Material-domain plane clipping with corresponding base/output interpolation. The accepted cut follows the same material during deformation; explicit crop-plane edits redefine it. Crop borders are not attachments or new zero-height rims. |
 | Anchor base | Radial sphere/ellipsoid with existing geometric/static relaxation capabilities. |
 | Fiber base | Open/cyclic profile sweep, width/depth/power, resolution, endpoint taper, backing and existing relaxation. |
 | Membrane base | Weighted normal inflation, minimum/maximum thickness, power, backing/rim and evaluated refinement without source mutation. |

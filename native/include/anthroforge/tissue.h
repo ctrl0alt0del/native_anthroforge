@@ -37,6 +37,7 @@ AF_API int af_tissue_region_face(uint64_t source,int64_t polygon,int side,int64_
 AF_API int af_tissue_regions_check(uint64_t source,const int64_t* regions,int count,int side);
 AF_API int64_t af_tissue_region_lines(uint64_t source,const int64_t* regions,int count,int side,const double* frame,double* output,int64_t capacity);
 AF_API uint64_t af_tissue_crop(uint64_t base,uint64_t own,const double* plane,uint64_t cancel);
+AF_API uint64_t af_tissue_crop_retained(uint64_t reference,uint64_t base,uint64_t own,const double* plane,uint64_t cancel);
 AF_API uint64_t af_tissue_smooth(uint64_t base,uint64_t own,const double* settings,int count,double* reports,uint64_t cancel);
 // Thirteen values per part: the twelve legacy metrics, then 0=converged or
 // 1=iteration limit with independently certified KKT residuals. Geometry is validated.

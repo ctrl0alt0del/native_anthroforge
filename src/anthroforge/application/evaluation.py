@@ -3,7 +3,7 @@
 from dataclasses import replace
 from functools import partial
 from threading import Event
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, descendants
@@ -61,11 +61,28 @@ def configure_job(session: "Session", job: Job, targets: set[str], captures: set
     job.retry = lambda: request(session, targets, captures)
     job.kind = "attachments"
     job.workload = partial(task_workloads.attachments, session, targets, captures)
-    job.publish_during_edit = job.restart_on_redo = True
-    job.reads = frozenset(input_ids(session.document, targets))
-    dependencies.contract(job, session.document, {Port(key, "pose") for key in targets})
-    job.observes |= frozenset(capture_reads(session.document, captures))
-    shortcut_attachment_evaluation.contract(job, session.document, targets)
+    job.publish_during_edit = job.restart_on_redo = job.restart_on_input_change = True
+    job.inputs_key = partial(contract_key, targets=targets, captures=captures)
+    job.renew_inputs = partial(renew_contract, targets=targets, captures=captures)
+    job.renew_inputs(job, session.document)
+
+
+def contract_key(document: Document, targets: set[str], captures: set[str]) -> tuple[Any, ...]:
+    policies = shortcut_attachment_evaluation
+    return (
+        dependencies.graph(document),
+        frozenset(capture_reads(document, captures)),
+        frozenset(policies.extra_reads(document, targets)),
+        frozenset(policies.output_ports(document, targets)),
+    )
+
+
+def renew_contract(job: Job, document: Document, targets: set[str], captures: set[str]) -> None:
+    dependencies.contract(job, document, {Port(key, "pose") for key in targets})
+    job.observes |= frozenset(capture_reads(document, captures))
+    shortcut_attachment_evaluation.contract(job, document, targets)
+    job.reads = frozenset(input_ids(document, targets))
+    job.accepted_inputs_key = contract_key(document, targets, captures)
 
 
 def create_job(session: "Session", targets: set[str], captures: set[str]) -> Job:

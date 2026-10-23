@@ -154,6 +154,7 @@ static void shell_material(const Mesh& source,Mesh& output) {
     if(output.triangles.rows()==source.triangles.rows()) return;
     if(output.triangles.rows()!=2*source.triangles.rows()) throw std::runtime_error("Unsupported provenance for shell rim topology.");
     after.source_count*=2;
+    after.source_positions.insert(after.source_positions.end(),before.source_positions.begin(),before.source_positions.end());
     for(size_t i=0;i<before.origins.size();++i) {
         after.origins.push_back(before.origins[i]+before.source_count);
         for(int j:{0,2,1}) {

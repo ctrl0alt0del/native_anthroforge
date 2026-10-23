@@ -85,7 +85,7 @@ native algorithms and retained material-binding semantics. Final evidence is bel
 | ID | Computation and current approach | Owning implementation | Validation entry point |
 | --- | --- | --- | --- |
 | A01 | SCP attachments: nearest/ray capture, retained surface/frame/offset records and batched parent-to-child transform propagation. | [attachment.cpp](../native/src/attachment.cpp), [attachment adapter](../src/anthroforge/native/attachments.py) | [addon parity](../tests/test_addon_parity.py), [assembly](../tests/test_assembly.py) |
-| A02 | Anchor/point bindings: capture and resolve explicit SCP or Tissue Base/Final material locations, orientation and offsets. Resolve against accepted deformed material without automatic nearest reassignment. | [point attachment adapter](../src/anthroforge/native/point_attachments.py), [material_binding.cpp](../native/src/material_binding.cpp), [surface providers](../src/anthroforge/application/surface_providers.py) | [point attachments](../tests/test_point_attachments.py), [tissue anchor material](../tests/test_tissue_anchor_material.py) |
+| A02 | Anchor/point bindings: capture and resolve explicit SCP or Tissue Base/Final material locations, orientation and offsets. Resolve against accepted deformed material without rewriting bindings; union-covered locations follow their own construction exterior (CH-065). | [point attachment adapter](../src/anthroforge/native/point_attachments.py), [material_binding.cpp](../native/src/material_binding.cpp), [surface providers](../src/anthroforge/application/surface_providers.py) | [point attachments](../tests/test_point_attachments.py), [tissue anchor material](../tests/test_tissue_anchor_material.py) |
 | A03 | Fiber attachment fields: dense surface captures, nearest-owner runs, arc-length blending between owners, structural pins and retained material influence. Automatic skeletal supports exclude unrelated tissues; explicitly tissue-backed fields use selected parents (CH-036). Applies across curve engines. | [attachment_weights.cpp](../native/src/attachment_weights.cpp), [attachment fields](../src/anthroforge/native/attachment_fields.py), [support policy](../src/anthroforge/application/fiber_supports.py) | [attachment weights](../tests/test_attachment_weights.py), [attachment fields](../tests/test_attachment_fields.py), [support policy](../tests/test_fiber_support_policy.py) |
 | A04 | Fiber resolution/editing: resolve its current attached shape, edit authored controls, rebind edited endpoints using Current/Any eligible parent policy, preserve unedited pins, then evaluate its path engine. | [fiber bindings](../src/anthroforge/application/fiber_bindings.py), [fiber edit evaluation](../src/anthroforge/application/fiber_edit_evaluation.py), [path_editing.cpp](../native/src/path_editing.cpp) | [fiber editing](../tests/test_fiber_editing.py), [tissue fiber material](../tests/test_tissue_fiber_material.py) |
 | A05 | Automatic attached construction: native nearest-SCP capture for new Anchor/Fiber bindings, independent graph copies, preserved existing Fiber bindings, and native Membrane evaluation under one reserved worker job. One atomic publication/undo; Tissue evaluation remains downstream. | [creation plan](../src/anthroforge/application/attached_creation.py), [worker assembly](../src/anthroforge/application/attached_creation_compute.py), [lifecycle](../src/anthroforge/application/attached_creation_jobs.py) | [conversion](../tests/test_attached_creation.py), [lifecycle](../tests/test_attached_creation_lifecycle.py) |
@@ -119,7 +119,7 @@ Presence in this inventory does not make every mode available on every source.
 | T11 | Height smoothing: cotangent-biharmonic bounded height QP with PIQP, exact boundary/seam/zero-height pins, independent optimality checks and complete-mesh acceptance. Off bypasses the solve. | [smoothing_core.cpp](../native/src/smoothing_core.cpp), [tissue_smoothing.cpp](../native/src/tissue_smoothing.cpp) | [tissue smoothing](../tests/test_tissue_smoothing.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
 | T12 | Geometric relaxation: source-specific static sag; radial tissue iterates gravity, neighbor smoothing and host-surface projection, while sweep/shell use their supported geometric displacement rules. | [tissue_geometric.cpp](../native/src/tissue_geometric.cpp), [tissue_point_relaxation.cpp](../native/src/tissue_point_relaxation.cpp) | [relaxation parity](../tests/test_tissue_relaxation_parity.py) |
 | T13 | Static PBD relaxation: native iterative gravity, shape/volume retention where applicable, slack, constraints and convergence diagnostics. Reuses canonical triangles; not animation or generalized contact. | [tissue_static.cpp](../native/src/tissue_static.cpp), [tissue_relaxation.cpp](../native/src/tissue_relaxation.cpp) | [relaxation parity](../tests/test_tissue_relaxation_parity.py), [relaxation quality](../tests/test_tissue_relaxation_quality.py) |
-| T14 | Material-domain crop: clip corresponding base/output and assemble crop topology while retaining material mappings. Crop edges do not become attachments or zero-inflation boundaries. | [tissue_crop.cpp](../native/src/tissue_crop.cpp), [tissue_crop_envelope.cpp](../native/src/tissue_crop_envelope.cpp) | [tissue crops](../tests/test_tissue_crops.py), [crop workflow](../tests/test_tissue_crop_workflow.py) |
+| T14 | Material-domain crop: retain the accepted cut base across deformation and clip corresponding output while retaining material mappings (CH-065). Crop edges do not become attachments or zero-inflation boundaries. | [tissue_crop.cpp](../native/src/tissue_crop.cpp), [tissue_crop_envelope.cpp](../native/src/tissue_crop_envelope.cpp) | [tissue crops](../tests/test_tissue_crops.py), [crop workflow](../tests/test_tissue_crop_workflow.py) |
 
 ### Stacking
 
@@ -2024,3 +2024,50 @@ average. This is a read-only formula input; no new write channel is introduced.
   nearest reassignment. The [task record](tasks/skeleton-shortcuts-migration.md) identifies
   paired evidence and the delivered artifact. Offscreen evidence is not physical
   interactive acceptance.
+
+### CH-065 — Retain crop material and follow buried union anchors (2026-10-23)
+
+- **Observed:** Humerus/Radius length edits moved live FDS material across a fixed
+  spatial crop plane. Actual active endpoint/field locations were removed. Thumb
+  thickening covered proximal source patches under the metacarpal; all 708 source
+  triangle rows remained identical, ruling out triangulation identity drift.
+- **Approved behavior:** crops follow the accepted material region until the plane
+  is explicitly edited. A buried Boolean anchor follows the same object's exterior
+  while retaining its original stored reference. No other object is a candidate.
+- **Change:** accepted tissue provenance owns `crop_base`; current output is clipped
+  using that retained base. When source sampling changes, the shared native material
+  charts transport new samples into the retained base before clipping; no numerical
+  Python loop or resolution lock is introduced. Existing accepted states use their
+  own saved base. Native
+  Boolean provenance also retains untrimmed source triangle positions and shell-layer
+  identity. If the exact material point is covered, a lazily built per-batch chart BVH
+  selects the nearest exposed point in construction coordinates. Its current triangle
+  transports position and orientation through later deformation; captured offsets
+  remain intact. Fully buried source triangles are covered too.
+- **Preserved:** original geometry/canonical connectivity, explicit bindings, source
+  identity, cancellation, same-object scope, and retained document/history/job ownership.
+  Native handles are not serialized. New optional chart data round-trips as owned
+  mesh provenance and participates in equivalence and memory accounting. Visible
+  material uses the existing exact resolver; source-topology changes still reject.
+- **Evidence:** native Thumb tests cover +5%, +72%, and +200% growth, return to
+  the original shape, affine downstream deformation, offsets and cancellation. Crop
+  tests cover deformation, adaptive sampling, explicit plane edits, undo and reopening.
+  Final Windows gate passes 1,983 tests and five CTests. Original 96-muscle assembly
+  controls 15/16/21 pass actual +5% edits, undo/redo, save/reopen and reversal without
+  changing stored Fiber references. Maximum restored tissue vertex error is 1.8e-12.
+  Two-angle saved-shape comparisons were inspected, including FDS cuts and the seven
+  affected Thumb Fibers. The canonical executable passes the full portable suite and
+  those three actual-assembly control checks, with profiler reports and hidden native
+  rendering. This is background-only evidence, not physical interactive acceptance.
+  Reproduction tools and local artifact paths are in the
+  [task record](tasks/retained-attachment-errors.md).
+- **Additional diagnosed scheduling defect:** profiler evidence showed the Ulna's
+  queued pose job discarded on `formula_input_changed`. Its formula recomputed the
+  same value and did not replace the job; redo later performed that missing update.
+  Pose contracts now use the coordinator's existing queued-input renewal and running
+  input-change restart contracts. A three-SCP public-API regression fails before this
+  change and passes afterward. Temporary shortcut reads remain part of the contract.
+- **Evidence correction:** the historical Thumb exercise added 0.05 to 0.07, about
+  +71%, despite being described as +5%. A fresh exact +5% edit reproduces the seven
+  original failures. Historical raw reports are preserved; the task record corrects
+  the label. No geometry-acceptance claim is based solely on absence of exceptions.

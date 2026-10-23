@@ -50,7 +50,7 @@ External evidence is under `E:/development/WIP_models/shortcut_migration_030_202
 `delivery-front.png/.json`, `compact-edits/`, `blender-edits/` and `failure-15.json`, `failure-16.json`,
 `failure-21.json`. The latter compare the same edits in immutable input and candidate:
 Humerus/Radius length +5% produces the same FDS radial cropped-material failures;
-Thumb metacarpal thickness +5% produces the same seven union-covered fiber bindings.
+Thumb metacarpal thickness +0.05 (about +71%; previously mislabeled +5%) produces the same seven union-covered fiber bindings.
 These are preserved pre-existing limitations, not silently rebound or classified as
 successful edits. Other tested controls settle successfully and full-resource undo passes.
 
@@ -277,7 +277,7 @@ authoring-adapter reference. Native hidden capture of the complete assembly and
 Blender/native pelvis comparisons were visually inspected. Source-shape differences
 remain at the prior skeleton approximation level; see `source-native-shapes.json`.
 
-Actual Humerus/Radius length +5% and Thumb metacarpal thickness +5% encounter retained
+Actual Humerus/Radius length +5% and Thumb metacarpal thickness +0.05 (about +71%; previously mislabeled +5%) encounter retained
 material attachment errors. Independent edits in immutable input reproduce the same
 affected fibers and errors exactly (`failure-15/16/21.json`). These are preserved
 pre-existing crop/union limitations, not silently rebound or relabeled as migration

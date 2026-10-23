@@ -126,3 +126,18 @@ geometry (allow only declared guide engine/consumer-mode changes); qualify actua
 control edits and restoration against donor semantics; inspect hidden rendered views.
 Then complete documentation, combined gate, canonical portable package/source archive,
 and validated main merge. No final project has been delivered.
+
+## Formula-barrier correction and radius preservation
+
+The 600-second radius timeout was reproduced on two drivers plus a queued attachment
+pose, despite an acyclic output graph. CH-062 partitions formula batches around
+evaluated-output barriers, preserving coherent groups and coordinator ownership.
+Regression and focused formula/policy tests pass, including explicit Manual work.
+The new radius run completed. `radius-preservation.json` compares all 619 records
+and 1,325 resources against immutable input: identical connectivity and attachment
+payloads; max mesh drift 3.397e-12. Only the declared six guide definitions and four
+curve-consumption frame/mode changes are allowed by the migration comparison tool.
+
+`pelvic_stage` is now running from that checkpoint. No final delivery or main merge.
+Pending: qualify full mapping and parameter edits, actual shapes, extension docs,
+full gate and canonical portable build. Preserve unrelated root `__init__.py`.

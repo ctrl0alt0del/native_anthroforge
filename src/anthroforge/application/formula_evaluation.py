@@ -6,7 +6,7 @@ from typing import Any
 from anthroforge.core.results import Port
 from anthroforge.native import expressions
 
-from . import dependencies, formula_candidates, formula_inputs
+from . import dependencies, formula_batches, formula_candidates, formula_inputs
 
 
 @dataclass
@@ -20,6 +20,7 @@ class Evaluation:
 
 def evaluate(context: Any, ids: set[str], cancel: Any) -> Evaluation:
     result = Evaluation(context, ids)
+    result.failures.update(formula_batches.failures(context.document, ids))
     graph = dependencies.graph(context.document)
     for key in ids:
         if Port(key, "formula") in graph.blocked:

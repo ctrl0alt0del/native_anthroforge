@@ -11,7 +11,14 @@ from anthroforge.core.scheduling import Workload
 from anthroforge.core.shortcuts import FormulaResult
 from anthroforge.native.mesh import NativeCancellation
 
-from . import dependencies, formula_evaluation, formula_inputs, formula_observation, property_guards
+from . import (
+    dependencies,
+    formula_batches,
+    formula_evaluation,
+    formula_inputs,
+    formula_observation,
+    property_guards,
+)
 from .construction_policy import mode, revisions
 
 
@@ -42,7 +49,37 @@ def schedule(
             for p in formula_inputs.observations(session.document, ids)
             if p.output == "formula"
         }
-    return [request(session, ids)] if ids else []
+    return dispatch(session, ids)
+
+
+def dispatch(session: Any, ids: set[str]) -> list[str]:
+    batches = formula_batches.plan(session.document, overlapping(session, ids))
+    keys = {batch_key(batch) for batch in batches}
+    ports = {Port(key, "formula") for batch in batches for key in batch}
+    for job in session.scheduler.registry.matching("provides", ports):
+        if (
+            job.kind == "formulas"
+            and job.key not in keys
+            and job.id != session.scheduler.publishing
+        ):
+            session.scheduler.cancel_job(job.id, obsolete=True, reason="formula_batch_changed")
+    return [request(session, batch) for batch in batches]
+
+
+def overlapping(session: Any, ids: set[str]) -> set[str]:
+    selected = set(ids)
+    while True:
+        previous = selected.copy()
+        for job in session.scheduler.active_jobs:
+            provided = {p.owner for p in job.provides if p.output == "formula"}
+            if selected & provided and job.id != session.scheduler.publishing:
+                selected |= provided
+        if previous == selected:
+            return selected & formula_inputs.formulas(session.document).keys()
+
+
+def batch_key(ids: set[str]) -> str:
+    return "driving-formulas:" + ",".join(sorted(ids))
 
 
 def request(session: Any, ids: set[str]) -> str:
@@ -53,7 +90,7 @@ def request(session: Any, ids: set[str]) -> str:
     job.cancel = NativeCancellation(session.engine)
     job.interactive, job.priority = session.history.before is not None, session.priority(targets)
     job.publish_during_edit = job.restart_on_redo = job.restart_on_input_change = True
-    job.retry = partial(request, session, ids)
+    job.retry = partial(dispatch, session, ids)
     job.workload = partial(workload, ids)
     job.inputs_key = partial(key, ids=ids)
     job.renew_inputs = partial(contract, ids=ids)
@@ -70,7 +107,7 @@ def make_job(session: Any, ids: set[str], targets: set[str]) -> Job:
         ),
         lambda context, cancel: formula_evaluation.evaluate(context, ids, cancel),
         partial(publish, session),
-        key="driving-formulas",
+        key=batch_key(ids),
         kind="formulas",
     )
 
@@ -84,11 +121,18 @@ def contract(job: Job, document: Any, ids: set[str]) -> None:
     outputs = {Port(value, "formula") for value in ids if value in records}
     outputs |= {property_port(records[value][1].target) for value in ids if value in records}
     observations = formula_inputs.observations(document, ids)
-    valid = {p for p in outputs if p not in graph.blocked}
+    valid = valid_outputs(document, ids, records) - graph.blocked
     job.provides, job.observes = frozenset(outputs), frozenset(observations - outputs)
     job.prerequisites = frozenset(dependencies.closure(graph, valid) - outputs)
     job.reads = frozenset(p.owner for p in observations)
     job.accepted_inputs_key = key(document, ids)
+
+
+def valid_outputs(document: Any, ids: set[str], records: Any) -> set[Port]:
+    valid = ids - formula_batches.failures(document, ids).keys()
+    return {Port(value, "formula") for value in valid} | {
+        property_port(records[value][1].target) for value in valid if value in records
+    }
 
 
 def workload(ids: set[str], document: Any) -> Workload:

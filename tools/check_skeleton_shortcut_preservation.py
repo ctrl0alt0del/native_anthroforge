@@ -93,21 +93,26 @@ class Comparison:
                 self.value(value, after[key], f"{address}/{key}")
 
 
-def compare(source, candidate, output):
+def compare(source, candidate, output, normalize=lambda key, before, after: before):
     engine = GeometryEngine()
     before, resources = read_package(source, engine)
     after, current = read_package(candidate, engine)
     check = Comparison(resources, current)
-    assert before.registry.records.keys() == after.registry.records.keys()
-    for key, item in before.registry.records.items():
-        check.value(asdict(item), asdict(after.object(key)), key)
-    for key in ("workspaces", "junctions", "attachments_enabled", "metres_per_unit"):
-        assert getattr(before, key) == getattr(after, key), key
+    check_records(check, before, after, normalize)
     result = dict(
         records=len(before.registry.records), resources=len(check.resources), **check.maxima
     )
     output.write_text(json.dumps(result, indent=2), encoding="utf-8")
     print(json.dumps(result), flush=True)
+
+
+def check_records(check, before, after, normalize):
+    assert before.registry.records.keys() == after.registry.records.keys()
+    for key, item in before.registry.records.items():
+        current_item = asdict(after.object(key))
+        check.value(normalize(key, asdict(item), current_item), current_item, key)
+    for key in ("workspaces", "junctions", "attachments_enabled", "metres_per_unit"):
+        assert getattr(before, key) == getattr(after, key), key
 
 
 if __name__ == "__main__":

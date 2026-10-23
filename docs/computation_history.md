@@ -1929,3 +1929,24 @@ The same eight-ULP equivalence now guards driven transform fields during ordinar
 attachment pose publication. Native world volume scale is the signed cube root
 of the affine determinant, following Blender 5.0.1 SCALE_AVG, not arithmetic axis
 average. This is a read-only formula input; no new write channel is introduced.
+
+### CH-062 — Separate formula batches at evaluated-output barriers (2026-10-23)
+
+- Observed: adding rib/pelvic radius drivers left the assembly queued for over
+  600 seconds. A two-driver regression reproduced the stall with an acyclic
+  property graph: one batch provided the parent transform while awaiting the
+  child's attachment pose, whose queued calculation awaited that same batch.
+- The formula scheduling adapter now partitions expressions at intervening pose,
+  path and geometry outputs. Direct expression chains can remain batched; coupled
+  candidate groups remain coherent. Batch replacement preserves pending members,
+  and the existing coordinator still owns reservations, capture, cancellation,
+  publication and Manual semantics. Incoherent groups requiring mutually dependent
+  evaluated outputs fail explicitly rather than waiting indefinitely.
+- Evidence: the new regression failed before this change and passes afterward;
+  explicit Manual evaluation across the barrier also finishes. 23 focused formula
+  and attachment tests pass. The real assembly's radius stage now finishes, with
+  identical connectivity/binding payloads and max mesh drift 3.397e-12 against its
+  immutable input. Complete pelvic controls and combined gate remain pending.
+- Reference: Python's [dependency-ready scheduling contract](https://docs.python.org/3/library/graphlib.html)
+  supports waiting for prerequisite completion; the implementation uses the
+  application's existing port graph and coordinator rather than a new scheduler.

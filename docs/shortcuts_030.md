@@ -48,6 +48,11 @@ overrides require one inferred owning SCP; policy configuration does not move an
 
 Expressions distinguish integers and reals: `12` is integer, `12.0` is real and
 division returns real. Use `round`, `floor` or `ceil` explicitly for integer outputs.
+Integers use the native signed 64-bit range. Typed desktop controls preserve exact
+integer text, including values above 2^53, through editing and scrubbing. Integer
+quantities step by one canonical unit: one metre for Length or one radian for Angle.
+The UI displays those quantities in the selected length units or degrees; fractional
+canonical values are rejected. Integer angles recognize their rounded degree display.
 Dimensions are independent of numerical type. Metres (`m`) and radians (`rad`) are
 unit constants; a radius variable declared LENGTH can multiply `cos(t)` directly.
 There are no assignments, loops or arbitrary function calls. See the

@@ -7,6 +7,7 @@ from anthroforge.application.shortcut_ownership import property_owners
 from anthroforge.core.numeric_properties import decode_reference
 from anthroforge.core.shortcuts import implicit_identity
 
+from .quantity_values import QuantityValues, texts
 from .record_model import RecordModel
 from .shortcut_editor import ShortcutEditor
 from .values import qml
@@ -37,6 +38,11 @@ class ShortcutPanel(QObject):
         self.model = RecordModel(self, FIELDS, "key")
         self.catalog = RecordModel(self, (*FIELDS, "exposed"), "key")
         self.editor = ShortcutEditor(self)
+        self.quantities = QuantityValues(self)
+
+    @Property(QObject, constant=True)
+    def quantityValues(self):
+        return self.quantities
 
     @Property(QObject, constant=True)
     def editing(self):
@@ -128,6 +134,13 @@ class ShortcutPanel(QObject):
             self.editor.select(key)
             self.revealRequested.emit()
 
+    @Slot("QVariantMap", int, result=str)
+    def propertyText(self, reference, revision):
+        try:
+            return str(property_operations.get(self.controller.session, reference)["value"])
+        except (ValueError, KeyError):
+            return ""
+
     @Slot()
     def createDriver(self):
         key = self.controller.run("driver.create", {})
@@ -152,7 +165,7 @@ class ShortcutPanel(QObject):
         order.insert(destination, order.pop(index))
         self.controller.run("shortcut.reorder", dict(identities=order))
 
-    @Slot(str, int, float, bool)
+    @Slot(str, int, "QVariant", bool)
     def editValue(self, key, component, value, uniform):
         current = next(
             v for v in shortcut_operations.ordered(self.controller.session.document) if v.id == key
@@ -173,7 +186,7 @@ def numeric_row(value):
     values = value["value"] if isinstance(value["value"], (tuple, list)) else [value["value"]]
     return dict(
         reference=value["reference"],
-        values=values,
+        values=texts(values, value["numeric_type"]),
         numericType=value["numeric_type"],
         dimension=value["dimension"],
         writable=value["writable"],
@@ -237,7 +250,7 @@ def driver_row(session, value):
         key=value["id"],
         label=value["label"],
         reference={},
-        values=[value["value"]],
+        values=texts([value["value"]], value["numeric_type"]),
         numericType=value["numeric_type"],
         dimension=value["dimension"],
         writable=True,

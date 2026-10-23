@@ -148,7 +148,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | R03 | Transactions/history/checkpoints: derive changes, commit/cancel edits, maintain undo/redo restart recipes, choose saveable revisions and validate historical asynchronous captures. | [history](../src/anthroforge/application/history.py), [changes](../src/anthroforge/application/changes.py), [authored jobs](../src/anthroforge/application/authored_jobs.py) | [interleaving](../tests/test_interleaving.py), [capture history](../tests/test_capture_history.py) |
 | R04 | Cache/resource work: keys, immutable leases, hit/miss/eviction, content equivalence and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes and tissue material preparation. | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py) |
 | R05 | Viewport publication/rendering: stage complete native mesh/path/image buffers, switch displayed geometry and picking together, generate controls, perform Qt Quick 3D shading, opacity/depth and selection-outline passes. | [Qt geometry adapters](../native/qt), [outline shader](../native/qt/shaders/outline.frag), [desktop](../src/anthroforge/desktop) | [viewport publication](../tests/test_viewport_publication.py), [capture staging](../tests/test_capture_staging.py), [path presentation](../tests/test_path_presentation.py) |
-| R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
+| R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. Typed integer controls retain exact text through Qt and convert display units before shared command validation (CH-051). | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [quantity transport](../src/anthroforge/desktop/quantity_values.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [integer quantities](../tests/test_integer_quantity_controls.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
 | R07 | Issues checks: evaluate structural/readiness/attachment/dependency diagnostics and optional native collision checks, retain scoped stale evidence, and verify requested repairs. Read-only checks use the common coordinator. | [Issue system](../src/anthroforge/application/issues/system.py), [providers](../src/anthroforge/application/issues/providers.py) | [Issue lifecycle](../tests/test_issue_lifecycle.py), [Issue integration](../tests/test_issue_integration.py) |
 | R08 | Runtime profiling: opt-in Qt/native/application events, monotonic alignment, bounded rings/queues, summaries, model churn, invalidation causes, cache/resource attribution and background trace archive export. | [profiling](../src/anthroforge/profiling), [Qt collector](../native/profiling) | [profiling](../tests/test_profiling.py), [profile diagnostics](../tests/test_profile_diagnostics.py) |
 | R09 | Project persistence: schema-5 writing with schema-4 reading on the 0.3 development branch; encode/decode editable records and accepted resources, atomic saving and background opening. Never serialize native handles or undo history. | [storage](../src/anthroforge/application/storage.py), [resource storage](../src/anthroforge/application/resource_storage.py) | [headless](../tests/test_headless.py), [shortcut foundations](../tests/test_shortcut_foundations.py) |
@@ -1691,3 +1691,29 @@ CH-049 because the integrated pipeline repair already published CH-045.
   solver tolerances are unchanged. Full desktop release qualification remains pending;
   no release or performance gain is claimed.
 - Reference: [Python dataclass replacement](https://docs.python.org/3.12/library/dataclasses.html#dataclasses.replace).
+
+### CH-051 — Preserve typed integers across desktop controls (2026-10-23)
+
+- At `115ffb3`, an actual QML probe displayed authored `9007199254740993` as
+  `9007199254740992`. The native evaluator already preserved int64; the shared
+  numeric widget and Qt real-valued signals rounded input above JavaScript's
+  exact-integer range. Re-selecting Integer on a Parametric variable could also
+  overwrite its exact value with the rounded projection.
+- Integer driver/list/variable values now travel as text. Shared numeric controls
+  keep the existing gesture lifecycle and real-valued signal; an exact-text path
+  performs integer offsets and sends a typed display-quantity payload. The desktop
+  command adapter converts that payload to an ordinary Python integer before the
+  same application command runs. Transport payloads never enter saved documents.
+- UI-only Decimal conversion preserves int64 precision through metre/centimetre/
+  millimetre display factors and the existing degree convention. Integer angles
+  recognize the four-decimal display of a whole canonical radian value; arbitrary
+  fractional canonical inputs remain errors. The common numerical validator now
+  rejects authored integers outside the native signed-64-bit range, including
+  headless driver and variable creation. Native expression evaluation is unchanged.
+- Evidence: the 36-case integer/editor/scrub/architecture group and configured
+  Ruff/mypy checks pass. The production-QML harness exercises exact driver, list
+  and variable text, native formula outputs, repeated type selection, live scrub
+  and one undo action. The ordinary unit/editor harness still passes. The expanded
+  Parametric value row displays the full integer in the inspected offscreen capture.
+  Full combined validation of this checkpoint is pending; no performance or
+  Windows desktop release claim is made.

@@ -51,6 +51,14 @@ to valid UTF-8. Runtime/schema and numerical evaluation contracts are unchanged.
 The [development walkthrough](../shortcuts_030.md) documents current command signatures
 and links the runnable `examples/shortcuts_parametric.json` circle/driver example.
 
+The 2026-10-23 continuation reproduced and fixed QML rounding of typed integers above
+2^53. Driver, list and Parametric variable controls now preserve text through the UI,
+convert integer display units at the Qt boundary and retain the normal scrub/undo
+lifecycle. Re-selecting Integer preserves an existing exact variable value. The shared
+core validator rejects authored values beyond native int64, including headless creation.
+Parametric values have a full-width row so long integers remain readable. See
+[CH-051](../computation_history.md#ch-051--preserve-typed-integers-across-desktop-controls-2026-10-23).
+
 ## Verification
 
 - Linux native build and all five CTests pass after reconciliation.
@@ -67,10 +75,9 @@ and links the runnable `examples/shortcuts_parametric.json` circle/driver exampl
   access; only then was the success report recorded. Logs are
   `build/core/cloud-030-full-gate.log`, `build/core/cloud-030-packaging-resume.log`
   and `build/core/qualification/passed.json`. No source change was needed for the retry.
-- [GitHub run 39873326293](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39873326293)
-  passed Ubuntu and Windows on copy checkpoint `5ce4ca8`. Editor checkpoint `52eb50b`
-  and documentation/example checkpoint `d89c8bd` were still running remotely at
-  00:02 UTC on 2026-10-23. Later documentation-only checkpoints do not change runtime code.
+- [GitHub run 39875752706](https://github.com/ctrl0alt0del/native_anthroforge/actions/runs/39875752706)
+  passed Ubuntu and Windows on previous final checkpoint `115ffb3`; the prior
+  `52eb50b` and `d89c8bd` runs also completed successfully, verified on resume.
   Windows desktop/portable release qualification remains pending; earlier desktop
   results retain their original scope in the desktop handoff.
 - Copy baseline: four regressions failed because controls were absent; consumer
@@ -87,11 +94,16 @@ and links the runnable `examples/shortcuts_parametric.json` circle/driver exampl
 - The headless example completed all 15 operations. Its radius changed from 0.03 to
   0.05 metres, the formula reached `ready`, and the saved project reopened with the
   accepted 64-point closed path and no Qt imports. Log: `build/core/cloud-030-example.jsonl`.
+- Integer continuation: 36 focused cases pass; Ruff and configured mypy pass. Both
+  `tools/shortcuts_integer_acceptance.py` and `tools/shortcuts_editor_acceptance.py`
+  pass offscreen with no QML warnings. `integer-editors.png` was inspected after
+  making the variable value row wide enough for the full number. Logs are ignored
+  `build/core/cloud-030-integer-focused.log`, `cloud-030-int64-qml.log` and
+  `cloud-030-integer-qml.log`. Full validation of these latest changes is pending.
 
 ## Next actions and blockers
 
-1. Inspect the remaining GitHub runs for `52eb50b` and descendants; investigate actual
-   failures before making further changes. Local portable runtime validation is complete.
+1. Run the portable gate on the integer continuation and inspect its GitHub jobs.
 2. Continue catalogue/ordinary-field coverage, full-window interaction and native
    viewport qualification from the desktop handoff. Review indexed/named collection
    reference semantics against the stable-identity contract before release.

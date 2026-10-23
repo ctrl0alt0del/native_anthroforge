@@ -132,7 +132,7 @@ class ShortcutEditor(QObject):
             formula, dict(inputs=[asdict(i) for i in value.inputs if i.name != name])
         )
 
-    @Slot(float)
+    @Slot("QVariant")
     def setValue(self, value):
         self.panel.controller.run("driver.value", dict(driver=self.key, value=value))
 
@@ -189,7 +189,10 @@ def details(value):
     if value is None:
         return {}
     return dict(
-        asdict(value), kind="PROPERTY" if isinstance(value, Shortcut) else "DRIVER", id=value.id
+        asdict(value),
+        kind="PROPERTY" if isinstance(value, Shortcut) else "DRIVER",
+        id=value.id,
+        valueText=str(value.value) if hasattr(value, "value") else "",
     )
 
 

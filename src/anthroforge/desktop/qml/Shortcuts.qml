@@ -75,6 +75,7 @@ ColumnLayout {
             }
             Label { visible: panel.allObjects; text: row.ownerLabel + (uniformValue.unitLabel ? " · "+uniformValue.unitLabel : ""); color: Theme.muted; font.pixelSize: 10; wrapMode: Text.Wrap; Layout.fillWidth: true }
             ShortcutValues {
+                shortcutKey: row.key
                 values: row.values; reference: row.reference; numericType: row.numericType
                 dimension: row.dimension; writable: row.writable
                 onEdited: (component,value) => panel.adapter.editValue(row.key,component,value,false)

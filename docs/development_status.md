@@ -1,7 +1,30 @@
 # AnthroForge development validation
 
-Current qualification is in [VCP performance](#vcp-performance-024).
+Current qualification is in [shortcuts and Parametric curves](#shortcuts-and-parametric-curves-030).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Shortcuts and Parametric curves (0.3.0)
+
+The [0.3 contract](specification_030.md) is implemented in the desktop and headless core.
+The full Windows development gate passes **1,945 tests**, no expected failures, all five
+native CTests, style/function limits, configured typing, numerics and Qt-free doctor.
+The canonical `dist/0.3.0/AnthroForge.dist` passes the complete minimal-PATH portable suite,
+including the new Parametric/driver example and native hidden consumer rendering. A
+separate shipped-executable check qualifies resolution locking and unlocking through
+configuration, property and shortcut commands. The companion source archive is
+`dist/AnthroForge-0.3.0-source.zip`.
+
+[Windows review evidence](research/shortcuts_030/windows_review.md) records actual source
+Blender 5.0.1 Pubis/Ilium and Cheekbone parity, real 0.2.4 assembly compatibility, unchanged
+resource buffers and continued Clavicle editing, production-QML gestures/Undo, complete
+profiler captures, and the separate ownership/coupling review. Schema 4 remains readable;
+saves use schema 5, which the old executable rejects clearly. Parametric point membership,
+weights, formula references and junctions lock resolution rather than silently remapping.
+
+All GUI checks were background/offscreen or invisible native texture captures. No physical
+interactive acceptance, GPU execution timing or input-to-display latency is claimed.
+Source Blender shortcut migration, direct Parametric Fibers and conditional expressions
+remain outside this release. See the [walkthrough and API](shortcuts_030.md).
 
 ## VCP performance (0.2.4)
 

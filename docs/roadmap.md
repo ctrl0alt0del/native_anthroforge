@@ -1,6 +1,6 @@
 # AnthroForge release roadmap
 
-- **0.3 / 0.3.0 — feature branch, qualification in progress:** numerical-property shortcut wrappers,
+- **0.3 / 0.3.0 — qualified:** numerical-property shortcut wrappers,
   explicit controls, driving formulas with inferred ownership and addon attachment-edit
   policies, and the Parametric curve engine. [Contract](specification_030.md),
   [implementation plan](implementation_030.md), [review state](tasks/shortcuts-parametric-030.md).

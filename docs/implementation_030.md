@@ -1,6 +1,6 @@
 # AnthroForge 0.3 — Shortcuts and parametric curves implementation plan
 
-**Status: implementation in progress; no 0.3 release qualification yet.** Current
+**Status: implemented and qualified in 0.3.0.** Current
 implementation and evidence are tracked in the [local review](tasks/shortcuts-parametric-030.md)
 and historical [cloud continuation](tasks/shortcuts-parametric-030-cloud.md).
 The plan below retains the original baseline diagnosis and required acceptance.
@@ -234,7 +234,7 @@ the restricted native typed compiler after candidate comparison; no parser depen
 was added. Formula evaluation, generated-point interaction and schema-4 reading exist
 on the feature branch. [Windows review](research/shortcuts_030/windows_review.md) records
 actual source-addon parity, UI and old-executable compatibility evidence. Release
-qualification remains in progress. The confirmed generated-point reference lock is
+packaging passes the full portable suite. The confirmed generated-point reference lock is
 implemented through shared Parametric validation and property inspection, with direct,
 formula, restoration, Undo and offscreen editor regressions.
 Fixed sampling does not prove analytic continuity, and exact finite-path conversion does

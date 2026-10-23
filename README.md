@@ -6,9 +6,9 @@ and general XYZ Parametric curves. See the [walkthrough](docs/shortcuts_030.md),
 Projects save in schema 5; existing 0.2.4/schema-4 projects remain readable with their
 accepted geometry and attachments preserved. Blender shortcut migration is separate.
 
-Release candidate: the full Windows gate passes 1,945 tests; final portable qualification
-and the main merge are pending. Use [the task record](docs/tasks/shortcuts-parametric-030.md)
-for the exact delivery state.
+The Windows gate passes 1,945 tests and all five native tests. The packaged executable
+passes the full minimal-PATH portable suite and the generated-point resolution-lock check.
+See [delivery evidence and limits](docs/development_status.md#shortcuts-and-parametric-curves-030).
 
 0.2.4 improves tissue editing and evaluation performance: prepared inspection UI,
 incremental collision checks, retained stacking preparation, a smaller height-smoothing

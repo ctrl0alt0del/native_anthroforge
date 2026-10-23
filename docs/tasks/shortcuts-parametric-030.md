@@ -3,7 +3,7 @@
 - Task branch: `codex/shortcuts-parametric-030`
 - Integration branch: `main`
 - Starting revision: `c74b28085c31f894f6ce343265d999da526a6feb`
-- Status: resumed; reviewing Cloud continuation and completing release qualification
+- Status: complete — 0.3.0 implemented and qualified
 - Last updated: 2026-10-23, Europe/Bucharest
 - Active writer: local Codex implementation chat (direct work)
 
@@ -17,51 +17,39 @@ Preserve existing geometry, attachments, scheduling, undo and resource ownership
 
 ## Current state
 
-Cloud continuation `cf7234b` (including main through `0de6a11`) was reviewed on
-`codex/shortcuts-030-cloud-review` and merged into the original feature branch in
-`6f7a048`. Review fixes and qualification tools through `57873c1` are pushed to
-`codex/shortcuts-parametric-030`. Main has not been merged or modified for this release.
+Cloud continuation `cf7234b` (including main through `0de6a11`) was reviewed and merged
+into the original feature branch in `6f7a048`. Local fixes, evidence and final resolution
+policy are pushed. Runtime/package versions are 0.3.0; final production code is the clean
+`7bc0ab2` checkpoint. Subsequent delivery changes are documentation only. The integration target
+is main; all required implementation and qualification work is complete.
 
-Completed review repairs: stable Parametric symbol renaming, persistent numeric scrub
-delegates, safe QObject destruction, drag reordering/cancellation, native integer limits
-and sample diagnostics, Body-aware Auto attachment strategy, scalar/vector shape, and
-complete bounded profiler model discovery. The shared contracts and evidence are in
-[Windows review](../research/shortcuts_030/windows_review.md) and
-[performance qualification](../research/shortcuts_030/performance_qualification.md).
+Implemented: property wrappers and exposure, native typed driving formulas, inferred
+ownership, initiating-wrapper attachment contexts, XYZ Parametric curves, direct engine
+switching, independent exact-path Fiber conversion, full desktop/headless operations and
+schema-4 reading/schema-5 writing. Final review repaired variable renaming, scrub delegates,
+QObject destruction, drag reorder cancellation, native integer limits/diagnostics, Body-aware
+Auto attachments, scalar/vector shape, bounded profiler discovery and point-reference locks.
 
-Real Blender 5.0.1 sources qualify Pubis descendant overrides and Cheekbone backsolve.
-The real 0.2.4 executable and 59-SCP/548-construction-or-tissue assembly qualify unchanged
-loading, resource hashes, continued Clavicle editing and old-reader rejection of schema 5.
-Production-QML mouse harnesses qualify editing, reorder, cancellation and one-action Undo.
-Texture-only D3D11 captures qualify generated curves and consumer geometry while asserting
-that their window stays invisible. No interactive desktop acceptance is claimed.
+The user confirmed resolution locking while generated points have deformer membership,
+weights or formula references. It is enforced through shared configuration, property,
+shortcut, formula and engine-restoration paths; inspection supplies the UI reason. Disabled
+references retain the lock. Clearing an empty selection unlocks without making the Hook
+apply to the entire curve; Undo restores the assignment and lock. No native sampling or
+deformation arithmetic was changed. The expected-failure marker was removed.
 
-The temporary executable under `build/shortcuts-portable-review/AnthroForge.dist` at
-`57873c1` passed the complete portable suite with a minimal PATH, including shortcut
-formulas, Parametric geometry, dependent Body rendering, schema 5 and profiler completeness.
-The final thin circular-body image was inspected. It is a qualification artifact, not an
-additional release distribution. The stable full Windows gate at `57873c1` passed:
-1,928 pytest cases plus the one explicit expected failure below, five CTests, native
-and script style, Ruff/mypy, numerics and Qt-free headless doctor. Documentation-only
-follow-up checked 92 local links with no missing targets. No code changed after that gate.
+**Final evidence:** 1,945 tests pass with no expected failures, all five CTests,
+native/script style and function limits, configured typing, numerics and Qt-free headless
+doctor pass. The complete canonical 0.3.0 minimal-PATH portable suite passes. An additional
+packaged batch verifies configuration/property/shortcut rejection, retained count and
+unlocking on binding removal. Native texture captures were inspected. Earlier work qualifies
+real Blender source attachment parity and real 0.2.4 assembly loading/editing without changing
+source geometry or bindings. Details: [Windows review](../research/shortcuts_030/windows_review.md)
+and [performance evidence](../research/shortcuts_030/performance_qualification.md).
 
-The user confirmed resolution locking for generated-point membership, weights and formula
-references. The shared policy now enforces it through API/property/shortcut/formula writes
-and engine restoration; property inspection supplies the UI reason. Disabled references
-also lock. The regression is now an ordinary passing test, with additional removal/Undo,
-weighted Hook/lattice, formula input/target, recovery and restoration cases. The focused
-26-case run and production-QML editor check pass; the screenshot was inspected. No native
-sampling or deformation arithmetic changed. The final full gate is next.
-
-Final code qualification completed through `9540326`: **1,945 tests passed**, no
-expected failures, all five CTests, native/script style, configured typing, numerics and
-headless doctor. The gate began at `1615e4f`; the empty-membership correction landed
-before its pytest phase and also passed focused checks/typing separately. Runtime and
-build versions now advance to 0.3.0 for final packaging. No main merge yet.
-
-Next: build and qualify the single canonical `dist/0.3.0/AnthroForge.dist`, generate
-`dist/AnthroForge-0.3.0-source.zip`, record final evidence and merge/push the validated
-feature into main. Preserve unrelated root `__init__.py`; all checks stay background-only.
+Delivery is the single `dist/0.3.0/AnthroForge.dist` and companion
+`dist/AnthroForge-0.3.0-source.zip`. Temporary qualification copies remain under `build/`.
+Preserve unrelated root `__init__.py`; no user project or source .blend was rewritten.
+All checks were background/offscreen; physical interactive acceptance is not claimed.
 
 ## Historical pause and implementation checkpoints
 

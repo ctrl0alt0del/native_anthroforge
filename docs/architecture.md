@@ -1,6 +1,6 @@
 # AnthroForge architecture
 
-## 0.3 feature-branch boundaries — qualification in progress
+## 0.3 shortcut and Parametric boundaries
 
 The [confirmed shortcut/Parametric contract](specification_030.md) and
 [implementation plan](implementation_030.md) govern this extension. Lower-level
@@ -20,12 +20,11 @@ Curve authoring is engine-specific: formula definitions and generated points
 cannot be treated as independent authored Bézier controls. Stored definitions, generated
 identities, post-formula deformation, resolution locks for junctions and generated-point references, and exact independent
 Fiber conversion are distinct responsibilities. Schema 5 includes schema-4 loading
-for 0.2.4 projects without blanket recomputation. These boundaries and APIs are not present
-in the released 0.2.4 build. Native expression qualification and actual old-executable
+for 0.2.4 projects without blanket recomputation. Native expression qualification and actual old-executable
 compatibility checks are recorded in the [implementation review](research/shortcuts_030/windows_review.md).
 Generated-point resolution policy is shared by direct, wrapper, formula and engine-switch
-writes; property inspection presents the same reason in desktop editors. Final release
-packaging is still pending.
+writes; property inspection presents the same reason in desktop editors. The canonical
+0.3.0 package passes the portable checks, including native hidden rendering.
 
 ## Current architecture
 

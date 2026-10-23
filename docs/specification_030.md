@@ -1,11 +1,12 @@
 # AnthroForge 0.3 — Shortcuts and parametric curves
 
-**Status: confirmed; implementation and qualification in progress on the feature branch.**
+**Status: implemented and qualified in 0.3.0.**
 This is the authoritative 0.3 product contract. See the [local review](tasks/shortcuts-parametric-030.md)
 for completed checks and final release qualification.
 The [implementation plan](implementation_030.md) defines delivery and evidence; the
 [engineering guidelines](engineering_guidelines.md) govern implementation. The current
-released application remains 0.2.4. This document does not claim runtime qualification.
+released runtime is 0.3.0. The Windows gate passes 1,945 tests; delivery evidence
+is recorded in the linked review.
 
 The [research](shortcuts_030_research.md) and [source inventory](research/shortcuts_030/inventory.md)
 record observed Blender behavior. Where earlier proposals differ, this specification
@@ -142,8 +143,8 @@ inventory contains radius-labelled scale factors. Preserve explicit quantity met
 Names are user-facing symbols; relationships must survive renaming/reordering through
 stable identities. Expose useful errors identifying expression, target and offending input.
 The selected native parser's default grammar, casts or extra capabilities cannot override
-this application contract. Parser selection/qualification is implementation work, not a
-completed finding of the research.
+this application contract. The [qualified native expression service](research/shortcuts_030/expression_qualification.md)
+implements these semantics without adding a third-party parser runtime.
 
 ## 6. Evaluation and failure semantics
 
@@ -298,7 +299,7 @@ manifest-version rewrite.
 | Manually choose a virtual shortcut's owner or backsolve target | Infer one owning SCP from controlled properties; multi-owner controls have none. |
 | Accumulate target-wrapper policies or expand to all formula-target descendants | Only the initiating wrapper's policies, scoped as in the addon. |
 | Reject cyclic definitions or the entire multi-output edit | Retain cyclic/failed dependent values; apply unrelated valid outputs; reject jointly conflicting groups together. |
-| Resolution counts intervals/parameter-unit steps or retains extra junction samples | Uniform generated-point count; any junction locks resolution. |
+| Resolution counts intervals/parameter-unit steps or retains extra junction samples | Uniform generated-point count; junctions and generated-point references lock resolution. |
 | Formula-engine selection requires an editor/preview/accept gate | Immediately restore the stored definition or a straight-line formula. |
 | Restore old hand-edited points when leaving Parametric | Use current generated points; retain formulas for a later return. |
 | Parametric Fiber rest-shape deformation in 0.3 | Independent exact-path Bézier conversion; direct Parametric Fibers deferred. |
@@ -306,7 +307,8 @@ manifest-version rewrite.
 | Reject all existing project formats when introducing schema 5 | Read existing 0.2.4/schema-4 projects; preserve their accepted state. |
 
 The [implementation acceptance matrix](implementation_030.md#acceptance-matrix) is required
-before release. Production code, parser qualification, geometry/attachment parity,
-performance, GUI and package checks remain unperformed by this documentation task.
+before release. The original documentation-consolidation task did not perform runtime
+qualification; the subsequent [implementation review](research/shortcuts_030/windows_review.md)
+records source/native parity, real-project compatibility, profiling and GUI/package checks.
 Release as 0.3.0 only after qualification, with one canonical
 `dist/0.3.0/AnthroForge.dist` and `dist/AnthroForge-0.3.0-source.zip`.

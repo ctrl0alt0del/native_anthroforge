@@ -1849,7 +1849,9 @@ CH-049 because the integrated pipeline repair already published CH-045.
   tests cover direct/property/wrapper edits, disabled membership, Hook/lattice weights,
   formula targets and inputs, formula failure/recovery, Undo, restoration and existing
   consumer locks. The production-QML editor refuses edits while locked and permits them
-  after reference removal. Full gate and final release checks follow this checkpoint.
+  after reference removal. Final qualification passes 1,945 tests with no expected failures,
+  five CTests and the complete 0.3.0 portable suite. The shipped executable independently
+  rejects locked API/property/shortcut edits, retains the old count and unlocks on removal.
 - Reference: Blender's [Hook modifier](https://docs.blender.org/manual/en/latest/modeling/modifiers/deform/hooks.html)
   likewise stores point indices; this supports identifying the membership hazard, not an
   upstream remapping guarantee. Parameter-preserving remapping remains outside 0.3.

@@ -1,21 +1,21 @@
-# Local authoring API, 0.2.4
+# Local authoring API, 0.3.0
 
-## Unreleased 0.3 operations on the feature branch
+## Shortcuts and Parametric curves (0.3.0)
 
-The [development walkthrough and operation signatures](shortcuts_030.md) describe
+The [walkthrough and operation signatures](shortcuts_030.md) describe
 implemented property discovery, shortcut exposure/configuration/editing, driving-formula
-lifecycle and policies, and Parametric definitions/variables. These operations are on
-the 0.3 feature branch; they are unavailable in the released 0.2.4 distribution.
+lifecycle and policies, and Parametric definitions/variables. Desktop and headless clients
+share these operations and their validation.
 
 Ordinary property operations remain below wrappers; wrapper edits alone activate their
 attachment policies. Both respect shared driven-property/type/topology restrictions.
 There is no manual shortcut-owner or backsolve-target parameter. Existing curve-engine,
 Fiber, junction, evaluation and transaction operations share the same command catalogue.
-The feature branch writes schema 5 and reads existing 0.2.4/schema-4 projects.
+0.3.0 writes schema 5 and reads existing 0.2.4/schema-4 projects.
 
 ## Current operations
 
-0.2.4 preserves application operations and schema 4. Existing profile reports now
+Existing operations and the 0.2.4 profiling additions remain available. Reports
 include `tissue_preparations`, `collision_pairs` and `stacking_sessions` resource
 categories and cache events. Stacking storage is a conservative upper bound because
 the pinned solver owns an opaque cache. Preparation uses accepted geometry; no

@@ -1,11 +1,9 @@
-# Shortcuts and Parametric curves — development walkthrough
+# Shortcuts and Parametric curves — 0.3.0 walkthrough
 
-These operations are implemented on the unreleased 0.3 feature branch. The runtime
-version remains 0.2.4 while qualification continues. Follow the
-[cloud task record](tasks/shortcuts-parametric-030-cloud.md) for current evidence and
-remaining work; the [specification](specification_030.md) remains authoritative.
-This branch writes schema 5 and reads schema 4. Keep source projects backed up when
-trying development builds; released 0.2.4 cannot read the new format.
+0.3.0 implements the following desktop and headless operations. See the
+[local review](tasks/shortcuts-parametric-030.md) for delivery evidence; the
+[specification](specification_030.md) remains authoritative. Projects save in schema 5
+and existing schema-4 projects remain readable. Released 0.2.4 cannot read schema 5.
 
 ## Run the example
 

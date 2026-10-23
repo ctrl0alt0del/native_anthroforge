@@ -1,6 +1,6 @@
 # Windows review of the Cloud 0.3 continuation
 
-Work in progress on `codex/shortcuts-parametric-030`; no release claim.
+Qualified 0.3.0 implementation from `codex/shortcuts-parametric-030`.
 
 ## Real addon attachment references
 
@@ -68,7 +68,7 @@ compatibility evidence, not a manifest-version rewrite. Logs/copies are local in
 The real 0.2.4 executable rejects the resulting schema-5 file with exit code 1 and
 `Unsupported AnthroForge project format/version.`
 
-## Final independent qualification checkpoint
+## Earlier independent qualification checkpoint (`57873c1`)
 
 The stable code checkpoint `57873c1` completed `tools/check.ps1`: **1,928 tests passed,
 one strict expected failure**, five CTests passed, native/script style, Ruff/mypy,
@@ -84,9 +84,31 @@ schema-5 persistence, complete profiling and native consumer rendering. The fina
 Body follows its Parametric source without the earlier oversized fixture overlap.
 Rendering used a hidden QQuickRenderControl; no visible desktop interaction is claimed.
 
-The package still identifies as 0.2.4. This is a temporary qualification build, not the
-canonical 0.3.0 release. Main merge, version advancement and final distribution remain
-pending the point-reference decision, repair and affected-path qualification.
+That earlier package identifies as 0.2.4 and remains a temporary qualification build.
+The following final delivery supersedes its unresolved release status.
+
+## Final 0.3.0 qualification
+
+The full Windows gate completed with **1,945 passed**, zero expected failures, five
+CTests, native/script function limits and style, configured typing, numerics and Qt-free
+headless doctor. The final empty-membership refinement also has focused coverage.
+
+Canonical runtime: `dist/0.3.0/AnthroForge.dist/AnthroForge.exe`, built from clean code
+checkpoint `7bc0ab2`. Its version reports 0.3.0 and its complete minimal-PATH portable
+suite passes. A separate packaged command batch rejects resolution edits through the
+configuration, property and shortcut APIs while an endpoint Hook exists, verifies the
+unchanged point count, and permits resizing after removing the binding. Source tests
+also cover native formula publication and retained path samples.
+
+The final native texture capture `build/shortcuts-portable-030/shortcuts.png` was inspected.
+The ring-shaped Body follows the Parametric source; no visible window was opened.
+Offscreen evidence does not establish unperformed physical desktop interaction or
+physical input-to-display latency. Original Blender sources and the assembly remain
+unchanged. No source Blender shortcut migration is included.
+
+Logs are local under `build/shortcuts-gate-1615e4f.log`, `build/shortcuts-portable-030.log`
+and `build/shortcuts-resolution-packaged/`. Documentation updates after `7bc0ab2` do not
+change executable code. The companion source archive is `dist/AnthroForge-0.3.0-source.zip`.
 
 ## Ownership and coupling review
 

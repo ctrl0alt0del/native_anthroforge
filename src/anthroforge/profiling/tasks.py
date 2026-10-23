@@ -17,6 +17,16 @@ def describe(job):
         execution=job.execution,
         obsolete=job.obsolete,
         timing=timing(job),
+        queue=queue_metadata(job),
+    )
+
+
+def queue_metadata(job):
+    return dict(
+        priority=job.priority,
+        interactive_hint=job.interactive,
+        request=asdict(job.urgency) if job.urgency else None,
+        effective=asdict(job.queue_demand) if job.queue_demand else None,
     )
 
 

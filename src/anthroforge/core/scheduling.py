@@ -5,6 +5,28 @@ from typing import Literal
 
 
 @dataclass(frozen=True)
+class RequestUrgency:
+    """Causal edit intent; does not enable inline execution or alter debounce."""
+
+    interactive: bool
+    since: float
+
+
+@dataclass(frozen=True)
+class QueueDemand:
+    """Transient rank, causal age, logical queue age, and donating request identity."""
+
+    priority: int
+    since: float
+    queued: float
+    source: str
+
+    @property
+    def key(self) -> tuple[int, float, float]:
+        return -self.priority, self.since, self.queued
+
+
+@dataclass(frozen=True)
 class StageWorkload:
     kind: str
     points: int = 0

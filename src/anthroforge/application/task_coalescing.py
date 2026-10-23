@@ -5,6 +5,8 @@ from typing import Any
 from anthroforge.core.jobs import Job
 from anthroforge.profiling import tasks as trace
 
+from .task_priorities import merge
+
 
 def renewable(job: Job) -> bool:
     return (
@@ -39,6 +41,7 @@ def reuse(coordinator: Any, request: Job) -> str:
         if compatible(pending, request):
             pending.priority = request.priority
             pending.interactive |= request.interactive
+            merge(pending, request.urgency)
             pending.label = request.label
             trace.event(coordinator.profiler, pending, "coalesced")
             request.retire()

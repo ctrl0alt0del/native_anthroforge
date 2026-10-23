@@ -6,11 +6,15 @@ and general XYZ Parametric curves. See the [walkthrough](docs/shortcuts_030.md),
 Projects save in schema 5; existing 0.2.4/schema-4 projects remain readable with their
 accepted geometry and attachments preserved. Blender shortcut migration is separate.
 
-The Windows gate and final regression run pass 1,972 tests and all five native tests.
+The current Windows gate passes 1,996 tests and all five native tests.
 The packaged executable passes the full minimal-PATH portable suite and the
 generated-point resolution-lock check. The subsequent one-file skeleton migration adds
 retained Bézier construction and an explicit attachment-policy scope for multi-SCP controls.
 See [delivery evidence and limits](docs/development_status.md#shortcuts-and-parametric-curves-030).
+
+Shared priority propagation now keeps dependent pose updates responsive during broad
+shortcut edits. The Ribs Top Radius/Ulna case is qualified with unchanged geometry and
+attachments; see [timings and validation](docs/tasks/task-priority-propagation.md).
 
 0.2.4 improves tissue editing and evaluation performance: prepared inspection UI,
 incremental collision checks, retained stacking preparation, a smaller height-smoothing

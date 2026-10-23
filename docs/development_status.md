@@ -73,11 +73,16 @@ edit/history/reopen checks for all three controls, with profiler captures and hi
 native rendering. GUI evidence is background-only; no physical interaction is claimed.
 The original assembly remains unchanged and does not require manual rebinding.
 
-The follow-up [Ribs Top Radius latency investigation](tasks/ribs-ulna-latency.md)
-reproduces a remaining priority inversion: Ulna's eligible pose waits behind boosted
-Live consumer jobs. Diagnostic prioritization removes that gap with identical final
-geometry. The scheduling correction is not yet implemented; full-QML profiler overhead
-and separate UI refresh costs are recorded with their measurement limits.
+The [Ribs Top Radius investigation](tasks/ribs-ulna-latency.md) is resolved by
+[shared priority propagation](tasks/task-priority-propagation.md). Follow-up/replacement
+jobs retain urgency and logical queue age; urgent consumers lend rank to prerequisites.
+Ulna's headless ready wait falls from 1.56–2.08 s to 13.6 ms. In the final offscreen
+desktop comparison its viewport-model update moves from 77.92 s to 5.17 s (4.14 s
+recording off). All 625 shape/pose records, 914 attachment records/fields and 1,347 saved
+resource bundles match baseline. The Windows gate passes **1,996 tests** and five CTests;
+the canonical executable passes portable and actual-assembly edit/history/reopen checks.
+Hidden native renders were inspected. Physical display latency is untested; UI refresh
+and full-QML collection costs remain separate from this scheduling correction.
 
 ## VCP performance (0.2.4)
 

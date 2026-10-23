@@ -128,6 +128,16 @@ report fields retain schema version 1; trace readers must accept counter events.
 
 ## Overhead and ownership
 
+Task events also include `queue`: the destination workspace priority, local interactive
+execution hint, causal request urgency/age, and last computed effective demand with its
+donating job ID. Demand includes original queue age for replacement/FIFO analysis.
+These timestamps use monotonic seconds, unlike trace event microseconds. A null demand
+means the job has not needed queue ranking (for example immediate inline work).
+`scheduler / prioritize` measures policy calculation separately. Temporary prerequisite
+inheritance changes admission order; it does not preempt workers or bypass readiness.
+See the [Ribs/Ulna comparison](tasks/task-priority-propagation.md) for the distinction
+between required dependency waiting, runnable queue delay and viewport-model adoption.
+
 The recording service is independent of documents, save checkpoints and scheduling.
 Shared boundaries cover commands/transactions, task lifecycle, C ABI calls, UI
 refresh/notification and publication. Qt automatically supplies bindings and source

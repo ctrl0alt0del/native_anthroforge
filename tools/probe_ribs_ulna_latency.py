@@ -9,6 +9,7 @@ from pathlib import Path
 from time import perf_counter
 
 from qualify_retained_attachment_edits import load
+from ribs_ulna_equivalence import attachments
 
 from anthroforge.application import dependencies
 from anthroforge.application.session import Session
@@ -67,6 +68,7 @@ def record(session, output, poses, started, evidence):
     write(output / "jobs.json", [job_record(job) for job in session.scheduler.jobs])
     write(output / "queue.json", evidence)
     write(output / "geometry.json", geometry(session))
+    write(output / "attachments.json", attachments(session))
     print(json.dumps(dict(seconds=elapsed, errors=session.scheduler.errors)), flush=True)
 
 
@@ -105,7 +107,32 @@ def run(source, output):
     output.mkdir(parents=True, exist_ok=True)
     with closing(Session()) as session:
         load(session, source)
+        write(output / "attachments-before.json", attachments(session))
+        write(output / "geometry-before.json", geometry(session))
         capture(session, output)
+        if "--history" in sys.argv:
+            check_history(session, output)
+
+
+def check_history(session, output):
+    expected = attachments(session)
+    for operation, filename in (("undo", "geometry-before.json"), ("redo", "geometry.json")):
+        session.command(operation)
+        session.wait(180)
+        assert geometry(session) == json.loads((output / filename).read_text())
+        assert attachments(session) == expected
+    reopen_saved(session, output)
+    assert geometry(session) == json.loads((output / "geometry.json").read_text())
+    assert attachments(session) == expected and not session.scheduler.errors
+    write(output / "history.json", dict(undo=True, redo=True, reopened=True, unchanged=True))
+
+
+def reopen_saved(session, output):
+    path = output / "roundtrip.anthroforge"
+    session.command("save", path=str(path), blocked_policy="wait")
+    session.wait(180)
+    session.command("open", path=str(path))
+    session.wait(180)
 
 
 if __name__ == "__main__":

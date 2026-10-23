@@ -10,7 +10,7 @@ from uuid import uuid4
 
 from .document import Document
 from .results import Port
-from .scheduling import Assessment, Workload
+from .scheduling import Assessment, QueueDemand, RequestUrgency, Workload
 
 TERMINAL = frozenset(("succeeded", "failed", "cancelled", "obsolete"))
 
@@ -80,6 +80,8 @@ class Job:
     inputs_key: Callable[[Document], Any] | None = None
     accepted_inputs_key: Any = None
     edit_contexts: tuple[str, ...] = ()
+    urgency: RequestUrgency | None = None
+    queue_demand: QueueDemand | None = None
 
     @property
     def active(self) -> bool:

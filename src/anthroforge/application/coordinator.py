@@ -4,16 +4,17 @@ from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from time import perf_counter as monotonic
 from time import sleep
-from typing import Any
+from typing import Any, cast
 
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job, ObsoleteInputs, Restart
 from anthroforge.core.metrics import Metrics
 from anthroforge.core.results import Port
+from anthroforge.core.scheduling import RequestUrgency
 from anthroforge.profiling import causes
 from anthroforge.profiling import tasks as trace
 
-from . import task_coalescing
+from . import task_coalescing, task_priorities
 from .job_registry import JobRegistry
 from .task_execution import InlineBudget, completed_future, execute
 from .task_schedulers import task_schedulers
@@ -43,7 +44,8 @@ class TaskCoordinator:
         self.metrics = Metrics()
         self.task_schedulers = task_schedulers()
         self.inline_budget = InlineBudget(clock)
-        self.coalescing: dict[str, tuple[float, float]] = {}
+        self.coalescing: dict[str, tuple[float, float, RequestUrgency | None]] = {}
+        self.priorities = task_priorities.TaskPriorities()
         self.publishing = ""
         self.publication_contexts: tuple[str, ...] = ()
         self.annotate: Callable[[Job, Document], None] = lambda job, document: None
@@ -63,6 +65,7 @@ class TaskCoordinator:
 
     def submit(self, job: Job) -> str:
         self.annotate(job, self.current())
+        self.priorities.capture(job, self.clock())
         return task_coalescing.reuse(self, job) or self._submit(job)
 
     def _submit(self, job: Job) -> str:
@@ -88,11 +91,13 @@ class TaskCoordinator:
         previous = self.coalescing.pop(job.key, None)
         if previous and self.clock() <= previous[1]:
             job.queued_since = previous[0]
+            task_priorities.merge(job, previous[2])
         for existing in self.registry.matching("key", (job.key,)):
             if job.key and existing.active and existing.id != self.publishing:
                 self._supersede_previous(existing, job)
 
     def _supersede_previous(self, existing: Job, job: Job) -> None:
+        task_priorities.merge(job, existing.urgency)
         if existing.queued_since is not None:
             job.queued_since = min(
                 job.queued_since if job.queued_since is not None else self.clock(),
@@ -185,7 +190,7 @@ class TaskCoordinator:
         if job.state != "queued" or not job.key or job.queued_since is None:
             return
         wait = job.assessment.schedule.max_wait_ms if job.assessment else 0
-        self.coalescing[job.key] = (job.queued_since, self.clock() + wait / 1000)
+        self.coalescing[job.key] = (job.queued_since, self.clock() + wait / 1000, job.urgency)
 
     def invalidate(self, affected: set[str], reason: str = "input_owner_changed") -> None:
         causes.invalidated(self, affected, reason)
@@ -248,6 +253,8 @@ class TaskCoordinator:
 
     def _dispatch(self) -> None:
         running = [job for job in self.active_jobs if job.future is not None]
+        if len(running) >= self.workers:
+            return
         reserved = set().union(*(job.outputs for job in running))
         for job in self.queued():
             if len(running) >= self.workers:
@@ -283,10 +290,16 @@ class TaskCoordinator:
         self.annotate(job, self.current())
 
     def queued(self) -> list[Job]:
-        return sorted(
-            (job for job in self.active_jobs if job.state == "queued"),
-            key=lambda job: (-(job.priority + 100 * job.interactive), job.created),
-        )
+        if self.profiler is not None and self.profiler.active:
+            result = self.profiler.call(
+                "scheduler",
+                "prioritize",
+                self.priorities.ordered,
+                self.registry,
+                _metadata={"active_jobs": len(self.registry.active)},
+            )
+            return cast(list[Job], result)
+        return self.priorities.ordered(self.registry)
 
     def _start(self, job: Job) -> None:
         job.snapshot, job.started = self.current(), monotonic()
@@ -325,7 +338,7 @@ class TaskCoordinator:
                 self._terminal(job, "obsolete" if job.obsolete else "cancelled")
                 return
             result = job.future.result() if job.future else None
-            self._publish(job, result)
+            self.priorities.call(job, self._publish, job, result)
             self._terminal(job, "succeeded")
         except ObsoleteInputs:
             self.cancel_job(job.id, obsolete=True, reason="read_set_changed", restart=True)
@@ -356,7 +369,7 @@ class TaskCoordinator:
         if job.cancel_requested:
             self.metrics.observe("cancel_finish", job.finished - job.cancel_requested)
         job.progress = job.error or state.capitalize()
-        self._cleanup(job, state)
+        self.priorities.call(job, self._cleanup, job, state)
         self.task_schedulers[job.kind].observe(job)
         trace.event(self.profiler, job, job.state)
         self.lifecycle(job, "terminal")

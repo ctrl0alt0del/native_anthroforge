@@ -68,6 +68,26 @@ compatibility evidence, not a manifest-version rewrite. Logs/copies are local in
 The real 0.2.4 executable rejects the resulting schema-5 file with exit code 1 and
 `Unsupported AnthroForge project format/version.`
 
+## Final independent qualification checkpoint
+
+The stable code checkpoint `57873c1` completed `tools/check.ps1`: **1,928 tests passed,
+one strict expected failure**, five CTests passed, native/script style, Ruff/mypy,
+numerics and headless doctor passed. The expected failure is the unresolved generated
+point-reference policy below, not an accepted release limitation.
+
+The executable built from that checkpoint under
+`build/shortcuts-portable-review/AnthroForge.dist` passed the complete
+`tools/check_portable.py --offscreen` suite with a minimal PATH. This includes the
+existing tissue/attachment workflows and new shortcut formulas, Parametric paths,
+schema-5 persistence, complete profiling and native consumer rendering. The final
+`build/shortcuts-portable-check/shortcuts.png` was inspected: the selected thin circular
+Body follows its Parametric source without the earlier oversized fixture overlap.
+Rendering used a hidden QQuickRenderControl; no visible desktop interaction is claimed.
+
+The package still identifies as 0.2.4. This is a temporary qualification build, not the
+canonical 0.3.0 release. Main merge, version advancement and final distribution remain
+pending the point-reference decision, repair and affected-path qualification.
+
 ## Ownership and coupling review
 
 This is a coordinator-authored code review, separate from test counts:

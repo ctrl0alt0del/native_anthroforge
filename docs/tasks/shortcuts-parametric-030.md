@@ -17,64 +17,46 @@ Preserve existing geometry, attachments, scheduling, undo and resource ownership
 
 ## Current state
 
-Desktop resumed at the user's explicit request to review and merge Cloud, finish
-0.3, and merge the qualified result into main. Cloud continuation is
-`origin/codex/shortcuts-parametric-030-cloud` at `cf7234b`; it includes main's
-pipeline fixes through `0de6a11`. Review uses `codex/shortcuts-030-cloud-review`
-before integration into the original feature branch. No release/main merge yet.
+Cloud continuation `cf7234b` (including main through `0de6a11`) was reviewed on
+`codex/shortcuts-030-cloud-review` and merged into the original feature branch in
+`6f7a048`. Review fixes and qualification tools through `57873c1` are pushed to
+`codex/shortcuts-parametric-030`. Main has not been merged or modified for this release.
 
-Windows native rebuild passes. The focused combined shortcut/driver/Parametric/UI
-adapter suite passes 116 cases. Review exposed a variable-rename defect: the old
-Cloud test manually rewrote XYZ equations after renaming, hiding the broken UI
-workflow. Shared operations now preserve symbol references in XYZ/interval text,
-reject removal of still-used symbols and reserved names, and retain native numerical
-evaluation. Added tests cover rename/undo, simultaneous swaps, explicit equation
-replacement, stable property references and native reserved-name agreement.
+Completed review repairs: stable Parametric symbol renaming, persistent numeric scrub
+delegates, safe QObject destruction, drag reordering/cancellation, native integer limits
+and sample diagnostics, Body-aware Auto attachment strategy, scalar/vector shape, and
+complete bounded profiler model discovery. The shared contracts and evidence are in
+[Windows review](../research/shortcuts_030/windows_review.md) and
+[performance qualification](../research/shortcuts_030/performance_qualification.md).
 
-Remaining: complete specification audit, drag reordering, full native-window
-interaction/shape inspection, source-addon attachment parity, representative schema-4
-compatibility, profiler evidence, full Windows gate and portable release qualification.
-Runtime remains 0.2.4. Preserve unrelated root `__init__.py`; background-only checks.
+Real Blender 5.0.1 sources qualify Pubis descendant overrides and Cheekbone backsolve.
+The real 0.2.4 executable and 59-SCP/548-construction-or-tissue assembly qualify unchanged
+loading, resource hashes, continued Clavicle editing and old-reader rejection of schema 5.
+Production-QML mouse harnesses qualify editing, reorder, cancellation and one-action Undo.
+Texture-only D3D11 captures qualify generated curves and consumer geometry while asserting
+that their window stays invisible. No interactive desktop acceptance is claimed.
 
-Further local review: texture-only D3D11 captures show generated curves and dependent
-Body geometry; changing radius updates the body and Undo restores bitwise-identical
-vertices. The renderer asserts its window remains invisible. Real source-file capture
-now qualifies the Pubis-to-Ilium descendant override (including Auto) and Cheekbone
-owner backsolve against Blender 5.0.1. Source hashes remain unchanged. Details and
-limits are in [Windows review evidence](../research/shortcuts_030/windows_review.md).
-Native review also fixes signed-minimum integer literals and actionable Parametric
-sample diagnostics. Escape cancellation cannot restart a reorder while the button
-remains held. Auto strategy now honors curve-deformed Body capability while retaining
-stable fallback for legacy bindings. These checks do not yet establish a release.
+The temporary executable under `build/shortcuts-portable-review/AnthroForge.dist` at
+`57873c1` passed the complete portable suite with a minimal PATH, including shortcut
+formulas, Parametric geometry, dependent Body rendering, schema 5 and profiler completeness.
+The final thin circular-body image was inspected. It is a qualification artifact, not an
+additional release distribution. The stable full Windows gate at `57873c1` passed:
+1,928 pytest cases plus the one explicit expected failure below, five CTests, native
+and script style, Ruff/mypy, numerics and Qt-free headless doctor. Documentation-only
+follow-up checked 92 local links with no missing targets. No code changed after that gate.
 
-Cloud review integrated and pushed to the original feature branch as `6f7a048`.
-The Windows development gate at that checkpoint passed: 1,912 pytest cases, all
-five CTests, native/script style, Ruff/mypy, numerics and headless doctor. Subsequent
-desktop qualification exposed live shortcut value arrays destroying their numeric
-delegates mid-scrub. Values now keep delegates by component index; the shared numeric
-transaction owner handles QObject destruction without disconnecting a dying signal.
-The full production Main-window offscreen mouse harness now passes drag/undo/cancel
-while recording QML/native/task profiling. The platform's window captures omit native
-3D geometry; texture-only D3D rendering is still required for shape acceptance.
+**Pending product decision:** generated point identities follow sample index. Increasing
+resolution can silently move an endpoint Hook to an interior parameter location. The user
+has been asked whether to lock resolution while generated-point membership, weights or
+formula references exist, or to define parameter-preserving remapping. No dependent repair
+has been chosen before the answer. A strict expected-failure regression records the defect;
+it is not release acceptance. Existing junction and consumer-attachment locks still pass.
 
-Drag reorder is implemented with a preview marker, bounded edge scrolling, stable-key
-commit and Escape cancellation. The dedicated production-QML mouse harness passes
-one-action undo/cancel. SVG grip/options icons avoid missing font glyphs.
-
-Pending user choice: Parametric resolution currently reuses generated point identities
-by index; a restricted endpoint Hook can silently become an interior Hook after an
-increase. Asked whether to lock resolution while point membership/weights/formula
-references exist, or design parameter-preserving remapping. No dependent repair has
-been chosen while awaiting the answer. Independent release qualification continues.
-
-Latest local qualification: 1,924 broad tests passed excluding the unresolved
-generated-control membership regression; subsequent focused tests also cover one-element
-numeric collections and engine-switch topology locks. Real 0.2.4 executable/assembly
-compatibility passes both unchanged loading and continued Clavicle editing. A temporary
-portable build lives under `build/shortcuts-portable-review/`, not an extra release dist.
-Its first probe exposed incomplete profiler model coverage at the old QObject budget;
-CH-057 fixes discovery at its shared native boundary and a full-window report now proves
-complete coverage, including dynamically created models. Rebuild/portable rerun pending.
+Next: resolve that choice through the shared policies, remove the expected failure and
+qualify affected UI/API/formula paths. Then finish version/release updates, build the single
+canonical `dist/0.3.0/AnthroForge.dist` plus source archive, and merge/push the fully validated
+feature into main. Runtime/package version remains 0.2.4 until qualification. Preserve the
+unrelated root `__init__.py`; all checks remain background-only.
 
 ## Historical pause and implementation checkpoints
 
@@ -120,7 +102,7 @@ a usable 0.3 release: complete catalogue/context exposure, attachment policies a
 parametric evaluation still need integration and qualification.
 The unrelated untracked root `__init__.py` remains untouched.
 
-## Decisions and relevant files
+### Historical decisions and relevant files
 
 The specification is authoritative. Property edits and wrapper edits are distinct;
 ownership is inferred; only the initiating wrapper applies attachment policies.
@@ -129,7 +111,7 @@ qualification against typed/unit-aware semantics before selection. Any junction
 locks parametric resolution. Parametric-to-Fiber conversion preserves the exact
 accepted finite path as an independent Bezier curve. Older 0.2.4 projects must load.
 
-## Verification
+### Historical verification
 
 The full current pytest run completed with 1,796 passes and one obsolete schema-4-only
 assertion in `test_tissue_contracts`; that assertion now checks schema 5 plus reading 4.
@@ -168,7 +150,7 @@ the inspected capture is local-only `build/shortcuts-panel.png`. Required full t
 native/parity, offscreen GUI and portable packaging have not yet been run.
 Validation stays background-only; no interactive desktop acceptance is implied.
 
-## Next actions
+### Historical next actions (superseded by Current state)
 
 Parametric checkpoint: XYZ/interval expressions and typed variables now evaluate in a
 single native path call. Uniform sampling, direct engine switching/restoration, generated

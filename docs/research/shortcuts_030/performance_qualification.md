@@ -83,7 +83,9 @@ No cache or additional retained document state is introduced.
 The recorder reports its existing observation and memory-accounting limitations;
 it cannot measure GPU execution or physical input-to-display latency. Full-window
 gestures, original-addon geometry/attachment parity, Windows Qt/native viewport
-and portable executable acceptance remain required before a 0.3 release.
+and portable executable checks are now recorded in the
+[Windows review](windows_review.md). The unresolved point-reference policy still
+prevents a 0.3 release.
 
 ## Windows full-window recording (local review, 2026-10-23)
 

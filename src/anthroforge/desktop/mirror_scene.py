@@ -19,8 +19,15 @@ def synchronize(projection):
     }
     for key, row in sources.items():
         row["mirror_settings"] = asdict(document.mirrors.rules.get(key, MirrorRule(key)))
+    publish_markers(controller, sources)
+
+
+def publish_markers(controller, sources):
     prune_cache(controller)
     controller.construction.points.synchronize(sources | controller.mirror_records)
+    controller.marker_model.synchronize_records(
+        [dict(id=row["id"], item=row) for row in controller.markerRows]
+    )
 
 
 def prune_cache(controller):

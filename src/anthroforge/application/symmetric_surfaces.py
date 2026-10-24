@@ -1,5 +1,6 @@
 """Mirrored rows build one source surface, retaining explicit material row ordering."""
 
+from collections import Counter
 from dataclasses import replace
 from typing import Any
 
@@ -26,16 +27,29 @@ def placed(engine: Any, document: Any, item: Any) -> Any:
     )
 
 
-def expand(engine: Any, document: Any, item: Any, rows: Any) -> Any:
+def expand(engine: Any, document: Any, item: Any, rows: Any, cancel: int = 0) -> Any:
     if not item.mirrored_rows:
         return rows
     if not item.mirror_order:
         raise ValueError("Mirrored rows need a captured layout; use Realign.")
+    require_membership(engine, document, item, rows, cancel)
     frame = reflection(engine, document, item)
     return [
         row(engine, rows[abs(index) - 1], frame if index < 0 else IDENTITY)
         for index in item.mirror_order
     ]
+
+
+def require_membership(engine: Any, document: Any, item: Any, rows: Any, cancel: int) -> None:
+    plane = symmetric_paths.plane(document, item.mirror_plane)
+    current = curve_surfaces.mirror_order(
+        engine, rows, placed(engine, document, item), plane, cancel
+    )
+    before = Counter(abs(value) for value in item.mirror_order)
+    if before != Counter(abs(value) for value in current):
+        raise ValueError(
+            "Mirrored-row membership changed at the plane; use Realign before continuing."
+        )
 
 
 def row(engine: Any, source: Any, frame: Any) -> Any:
@@ -56,7 +70,7 @@ def layout(
     world = placed(engine, document, item)
     order = curve_surfaces.mirror_order(engine, rows, world, plane, cancel)
     candidate = replace(item, mirror_order=order, across=())
-    expanded = expand(engine, document, candidate, rows)
+    expanded = expand(engine, document, candidate, rows, cancel)
     _, across = curve_surfaces.layout(engine, expanded, settings(candidate), cancel)
     return replace(candidate, across=tuple(map(int, across)))
 

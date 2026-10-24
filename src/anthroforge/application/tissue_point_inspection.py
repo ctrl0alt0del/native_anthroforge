@@ -59,7 +59,7 @@ def point_report(
     context: Any, item: Any, options: Any, row: Any, config: Any, state: Any
 ) -> dict[str, Any]:
     return dict(
-        target=item.id,
+        target=options.get("spatial_target", item.id),
         stage=options["stage"],
         asset=stages.result(item, options["stage"]).asset,
         triangle=options["triangle"],

@@ -29,20 +29,6 @@ ColumnLayout {
     Connections { target: authoring; function onChanged() { panel.syncSelection(); } }
     UiSection {
         title: panel.item.standalone ? "Curve" : "Primitive"
-        UiButton {
-            objectName: "createSymmetricLoop"; text: "Create symmetric loop"
-            visible: !!panel.curve.id && !panel.curve.closed && !panel.curve.symmetric
-            enabled: !panel.topologyLocked && !workspace.selectedData.readonly
-            Layout.fillWidth: true
-            hint: "Use this open half-path; endpoints must lie on the inherited plane, or document X when unassigned"
-            onClicked: workspace.run("mirror.loop.create",{curve:panel.curve.id})
-        }
-        UiButton {
-            objectName: "createMirroredRowSurface"; text: "Create mirrored-row surface"
-            visible: panel.item.standalone && !!panel.curve.id && !panel.curve.closed
-            Layout.fillWidth: true
-            onClicked: workspace.createConstruction("surface.create",{curves:[panel.curve.id],kind:"LOFT",mirrored_rows:true})
-        }
         Label { visible: !panel.item.standalone; text: ({LOFT:"Ordered curve loft",BODY:"Curve-deformed body",SEGMENT_CHAIN:"Segment chain",IMPORTED:"Imported mesh"})[panel.primitive.kind] || ""; color: Theme.text }
         CurveEngine { objectName: "standaloneEngine"; visible: !!panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
         UiButton { objectName: "editPrimitive"; visible: panel.item.component_editing !== false; text: panel.item.editing ? "Finish editing" : panel.item.standalone ? "Edit Curve" : "Edit Primitive"; checkable: true; checked: panel.item.editing || false; Layout.fillWidth: true; onClicked: authoring.setEditing(!panel.item.editing) }
@@ -58,6 +44,7 @@ ColumnLayout {
         UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.item.id]}) }
     }
     ParametricInspector { curve: panel.curve; visible: panel.item.standalone && panel.curve.engine === "PARAMETRIC" }
+    SymmetricConstruction { curve: panel.curve; topologyLocked: panel.topologyLocked }
     UiSection {
         title: "Curves"; visible: panel.item.editing && panel.curves.length > 0
         UiCombo { id: curveChoice; objectName: "curveChoice"; Layout.fillWidth: true; model: panel.curves; textRole: "name" }

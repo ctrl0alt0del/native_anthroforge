@@ -87,8 +87,8 @@ class Document:
 
 
 def initialize_indexes(document: Document) -> None:
-    from .mirror_resolution import build as mirrors
     from .mirror_graph import install as mirror_graph
+    from .mirror_resolution import build as mirrors
 
     object.__setattr__(document, "_index", build(document, document._index))
     object.__setattr__(document, "_registry", object_registry.build(document, document._registry))

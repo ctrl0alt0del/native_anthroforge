@@ -4,6 +4,7 @@ from contextlib import contextmanager
 from dataclasses import asdict
 from typing import Any
 
+from anthroforge.core.mirroring import parse
 from anthroforge.core.results import geometry_asset
 from anthroforge.core.scheduling import Workload
 from anthroforge.native import stack_inspection
@@ -34,10 +35,19 @@ def signature(context: Any, target: str, options: Any) -> Any:
     participants = tuple(
         (participant(o), frames.world(o.id)) for o in scene.participants(context.document)
     )
-    obstacles = tuple(
-        (o.id, geometry_asset(o), o.matrix, o.geometry_offset) for o in context.document.entities
+    obstacles = obstacle_signature(context.document)
+    return (
+        str(context.document.id),
+        target,
+        options,
+        participants,
+        obstacles,
+        context.document.mirror_rules,
     )
-    return str(context.document.id), target, options, participants, obstacles
+
+
+def obstacle_signature(document: Any) -> Any:
+    return tuple((o.id, geometry_asset(o), o.matrix, o.geometry_offset) for o in document.entities)
 
 
 def participant(item: Any) -> Any:
@@ -62,6 +72,14 @@ def workload(context: Any, target: str, options: Any) -> Workload:
 
 
 def compute(context: Any, target: str, options: Any, cancel: int) -> dict[str, Any]:
+    from .mirror_stack_inspection import reflected
+
+    if parse(target):
+        return reflected(context, target, options, cancel)
+    return compute_source(context, target, options, cancel)
+
+
+def compute_source(context: Any, target: str, options: Any, cancel: int) -> dict[str, Any]:
     item = tissue(context, target)
     with prepare(context, item, cancel) as (captured, native):
         order = selected_order(item, options)
@@ -118,17 +136,28 @@ def selected_order(item: Any, options: Any) -> Any:
 
 
 def describe(context: Any, item: Any, order: Any) -> dict[str, Any]:
-    names = {key: context.document.object(key).name for key in (order.first, order.second)}
-    assets = {key: context.document.object(key).intrinsic_result.asset for key in names}
+    from . import mirror_stacking as mirrors
+
+    names = {key: mirrors.item(context.document, key).name for key in (order.first, order.second)}
+    stages = {key: "final" if parse(key) else "intrinsic" for key in names}
     return dict(
         order=asdict(order),
         names=names,
-        assets=assets,
-        frames={key: context.document.object(key).intrinsic_material.frame for key in names},
+        assets=accepted_assets(context.document, stages),
+        stages=stages,
+        frames={key: mirrors.material(context, key).frame for key in names},
         revision=context.document.revision,
         plan_revision=item.plan_result.revision,
-        method="Production material support masks on accepted intrinsic surfaces",
+        method="Production support masks on source intrinsic / mirrored final surfaces",
     )
+
+
+def accepted_assets(document: Any, stages: Any) -> Any:
+    from .mirror_stacking import item
+
+    return {
+        key: getattr(item(document, key), stage + "_result").asset for key, stage in stages.items()
+    }
 
 
 def footprint(captured: Any, native: Any, order: Any, cancel: int) -> dict[str, Any]:

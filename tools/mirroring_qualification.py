@@ -10,6 +10,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from construction_profile_qualification import shutdown, wait_export
+from profiler_system_load import system_load, system_times
 from PySide6.QtQuickControls2 import QQuickStyle
 from shiboken6 import delete
 from tissue_scene_acceptance import frames, settle
@@ -59,6 +60,7 @@ def picking(controller, first, second, bone):
 def profile(controller, renderer, app, bone, first, second):
     before = [current(controller.session, key) for key in (first, second)]
     controller.session.command("profile.start")
+    load = system_times()
     elapsed = []
     for shift in (0.9, 1.0, 0.85, 0.8):
         started = perf_counter()
@@ -66,11 +68,16 @@ def profile(controller, renderer, app, bone, first, second):
         settle(controller)
         frames(controller, renderer, app)
         elapsed.append((perf_counter() - started) * 1000)
-    controller.session.command("profile.stop", path=str(OUTPUT / "mirroring.afprofile.zip"))
-    assert wait_export(controller, app)["state"] == "saved"
+    finish_profile(controller, app, load)
     for key, expected in zip((first, second), before, strict=True):
         np.testing.assert_array_equal(current(controller.session, key), expected)
     return elapsed
+
+
+def finish_profile(controller, app, load):
+    controller.session.command("profile.stop", path=str(OUTPUT / "mirroring.afprofile.zip"))
+    (OUTPUT / "background-load.json").write_text(json.dumps(system_load(load), indent=2))
+    assert wait_export(controller, app)["state"] == "saved"
 
 
 def modes(controller, renderer, app):
@@ -81,11 +88,25 @@ def modes(controller, renderer, app):
     controller.session.command("save", path=filename, blocked_policy="wait")
 
 
+def updates(controller, renderer, app, bone, target):
+    controller.run("tissue.inflation", dict(target=target, changes=dict(amount=0.08)))
+    capture(controller, renderer, app, "inflation-updated")
+    source = controller.session.document.object(target)
+    mirror = controller.mirror_records[MirrorInstance(target, bone).id]
+    assert mirror["geometry_asset"] == source.result.asset
+    assert mirror["geometry_revision"] == source.result.revision
+    controller.tissue_inspection.configure("rest", "base", "Displacement")
+    settle(controller)
+    capture(controller, renderer, app, "mirrored-displacement")
+    controller.tissue_inspection.configure("", "", "Overlay")
+
+
 def qualify(controller, renderer, app, warnings):
     bone, first, second = prepare(controller)
     capture(controller, renderer, app, "both-before")
     picking(controller, first, second, bone)
     elapsed = profile(controller, renderer, app, bone, first, second)
+    updates(controller, renderer, app, bone, second)
     modes(controller, renderer, app)
     assert not warnings, warnings
     record(elapsed)

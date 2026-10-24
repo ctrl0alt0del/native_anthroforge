@@ -5,7 +5,7 @@ from typing import Any
 
 from anthroforge.core.mirroring import MirrorRule, SharedMirrorTarget, parse, require_source
 
-from . import mirror_policy, workspace_policy
+from . import mirror_junctions, mirror_policy, workspace_policy
 
 
 def queries(session: Any) -> dict[str, Any]:
@@ -18,10 +18,19 @@ def queries(session: Any) -> dict[str, Any]:
         "mirror.source": lambda **a: source(session, **a),
         "mirror.removal.inspect": lambda **a: removal(session, **a),
         "mirror.attachment.shared": lambda **a: shared(session, **a),
+        "mirror.planes": lambda: planes(session),
         "mirror.source.removal.inspect": lambda target: mirror_policy.removing(
             session.document, target
         ),
     }
+
+
+def planes(session: Any) -> list[dict[str, Any]]:
+    return [
+        dict(asdict(rule), name=session.document.object(rule.target).name)
+        for rule in session.document.mirror_rules
+        if rule.enabled or rule.override
+    ]
 
 
 def configure(session: Any, target: str, **values: Any) -> None:
@@ -72,6 +81,7 @@ def describe(document: Any, instance: Any) -> dict[str, Any]:
         axis=rule.axis,
         shift=rule.shift,
         source_revision=getattr(item, "result_generation", item.result.revision),
+        junctions=mirror_junctions.describe(document, instance),
     )
 
 
@@ -99,6 +109,10 @@ def share_target(session: Any, source: str, binding: str, enabled: bool = True) 
     from .mirror_bindings import references
 
     require_source(source)
+    if type(enabled) is not bool:
+        raise ValueError("Target sharing requires a Boolean choice.")
+    if not workspace_policy.included(session.document, session.workspace, source):
+        raise ValueError("The source is outside the focused workspace.")
     if binding not in {key for key, _ in references(session.document.object(source))}:
         raise ValueError("Choose an existing anatomical binding on the source.")
     pair = SharedMirrorTarget(source, binding)

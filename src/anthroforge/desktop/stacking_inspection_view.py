@@ -39,7 +39,8 @@ def rows(tool):
     if not evidence or tool.stage != "intrinsic":
         return [], []
     other = next(key for key in evidence["names"] if key != tool.target)
-    values, resources = scene.stage_rows(tool, "intrinsic", True, other)
+    stage = evidence.get("stages", {}).get(other, "intrinsic")
+    values, resources = scene.stage_rows(tool, stage, True, other)
     for row in values:
         row["related"] = True
         row["color"] = "#68bacf" if other == evidence["order"]["underlying"] else "#e9ae6e"

@@ -12,7 +12,8 @@ ColumnLayout {
         Label { text: panel.item.kind === "PATCH" ? "Closed boundary patch" : panel.item.kind === "BRANCHED" ? "Branched open loft" : "Ordered curve loft"; color: Theme.muted }
         UiCheck { objectName: "surfaceExact"; text: "Preserve evaluated corners"; checked: panel.item.exact ?? true; onClicked: panel.setting("exact",checked) }
         UiCheck { objectName: "surfaceFlip"; text: "Flip normals"; checked: panel.item.flip || false; onClicked: panel.setting("flip",checked) }
-        UiCheck { objectName: "surfaceMirroredRows"; visible: panel.item.kind === "LOFT"; text: "Use mirrored rows"; checked: panel.item.mirrored_rows || false; onClicked: panel.setting("mirrored_rows",checked) }
+        UiCheck { objectName: "surfaceMirroredRows"; visible: panel.item.kind === "LOFT"; text: "Use mirrored rows"; checked: panel.item.mirrored_rows || false; nextCheckState: function() { return checkState; } onClicked: panel.setting("mirrored_rows",!panel.item.mirrored_rows) }
+        MirrorPlaneFields { visible: panel.item.mirrored_rows || false; definition: panel.item.mirror_plane || ({}); onEdited: value=>panel.setting("mirror_plane",value) }
         UiCheck { visible: panel.item.kind === "LOFT"; text: "Connect first and last rows"; checked: panel.item.close_across || false; onClicked: panel.setting("close_across",checked) }
         NumericSetting { visible: panel.item.kind === "LOFT"; label: "Across strips · 0 keeps fitted density"; value: panel.item.strips || 0; decimals: 0; onEdited: value => panel.setting("strips",Math.round(value)) }
         NumericSetting { visible: panel.item.kind === "PATCH"; label: "Patch resolution"; value: panel.item.patch_resolution || 4; decimals: 0; onEdited: value => panel.setting("patch_resolution",Math.round(value)) }

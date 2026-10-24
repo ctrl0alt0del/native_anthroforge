@@ -7,17 +7,17 @@ from types import MappingProxyType
 from typing import Any
 
 from . import deformer_references, junctions, routing_obstacles, tissue_dependencies
+from .anatomical_surfaces import port as surface_port
 from .construction import Control, Curve, Deformer
 from .curve_dependencies import inputs as curve_path_inputs
 from .cycle_analysis import cycles
 from .entities import SCP
 from .mirror_dependencies import inputs as mirror_inputs
 from .mirroring import parse as mirror_instance
-from .surface_references import SurfaceReference
-from .anatomical_surfaces import port as surface_port
 from .object_outputs import output
 from .objects import ObjectRecord
 from .results import Port
+from .surface_references import SurfaceReference
 from .surfaces import Surface
 
 Edges = Mapping[Port, Set[Port]]
@@ -136,8 +136,10 @@ def mirror_edges(edges: dict[Port, set[Port]]) -> dict[Port, set[Port]]:
 
 def instance_edges(instance: Any, ref: Port) -> dict[Port, set[Port]]:
     plane = Port(instance.rule, "mirror")
-    return {ref: {Port(instance.source, ref.output), Port(instance.source, "pose"), plane},
-            plane: set()}
+    return {
+        ref: {Port(instance.source, ref.output), Port(instance.source, "pose"), plane},
+        plane: set(),
+    }
 
 
 def control_edges(controls: tuple[Control, ...]) -> dict[Port, set[Port]]:

@@ -5,7 +5,7 @@ families and missing authoring details, and [known parity findings](addon_parity
 for source-frame, effective-policy and child-anchor fidelity defects. The distinction
 between a supported operation and faithful migration must remain explicit.
 
-## Planned 0.3.5 mirroring — not implemented
+## 0.3.5 source-linked mirroring
 
 The [confirmed contract](specification_035.md) and [implementation plan](implementation_035.md)
 introduce source/rule spatial instances at the typed-reference and surface-provider
@@ -14,8 +14,16 @@ of the corresponding source output; independent mirrored solvers and stacking ar
 Shared controls/resources retain their identity and ownership. Instance-aware attachment
 findings do not deform reflected geometry. The existing coordinator and staged viewport
 must preserve source/mirror revision agreement, accepted-input provenance and resource leases.
-Desktop and headless use the same read-only capabilities and removal policies. These
-paragraphs describe planned architecture, not available operations or measured acceptance.
+Desktop and headless use the same read-only capabilities and removal policies. The
+[runtime walkthrough](mirroring_035.md) describes commands and observed qualification.
+Core owns cached rule/instance resolution and retained conflict planes. Virtual graph
+aliases name source geometry/pose and plane inputs; they are never job writers.
+Providers reuse source resources with reflected frames. Symmetric half-path expansion
+and mirrored-row lofts are native source construction; mirrors have no second solver.
+Frozen measurements distinguish roles, stages and spatial instances. Qt publication
+reuses source leases, reverses render-only indices for negative frames and separates
+read-only capability from workspace dimming. Project schema 6 reads 4/5/6 and stores
+relationships/accepted placement metadata without reflected geometry payloads.
 
 ## 0.3.3 observation and scheduling costs
 

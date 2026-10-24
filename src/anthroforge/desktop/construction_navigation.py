@@ -2,6 +2,7 @@
 
 from anthroforge.core import tissue_presets
 from anthroforge.core.construction import Curve
+from anthroforge.core.mirroring import source
 from anthroforge.core.points import Point
 from anthroforge.core.surfaces import Surface
 
@@ -16,7 +17,7 @@ def edit(controller, target):
 
 
 def focus(controller):
-    item = controller.session.document.registry.anatomy.get(controller.selection)
+    item = controller.session.document.registry.anatomy.get(source(controller.selection))
     if item is not None:
         controller.run("workspace.create", dict(name=item.name, members=[item.id], children=True))
 

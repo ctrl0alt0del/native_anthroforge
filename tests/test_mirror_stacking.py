@@ -78,3 +78,19 @@ def test_every_tissue_stage_is_exact_reflection_and_shares_its_mesh(session):
         np.testing.assert_array_equal(
             np.array(stages.instance_frame(session, target, stage)).reshape(4, 4), expected
         )
+
+
+def test_excluded_provider_intent_allows_rule_removal_and_survives_reactivation(session):
+    bone, first, second = assembly(session)
+    session.command("mirror.configure", target=bone, enabled=True)
+    session.wait()
+    other = MirrorInstance(first, bone).id
+    session.command("tissue.stacking.relationship", target=second, other=other, excluded=True)
+    session.wait()
+    session.command("mirror.configure", target=bone, enabled=False)
+    session.wait()
+    assert session.document.object(second).final_result.status == "ready"
+    assert session.document.object(second).stack_relationships[0].other == other
+    session.command("mirror.configure", target=bone, enabled=True)
+    session.wait()
+    assert other not in session.document.object(second).stack_plan.providers

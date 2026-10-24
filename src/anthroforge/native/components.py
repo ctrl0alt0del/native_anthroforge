@@ -11,6 +11,7 @@ from .mesh import D, GeometryEngine, U, doubles, pointer
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_points_transform", [D, c.c_int, D, D])
+    engine.bind("af_points_constrain_axes", [D, c.c_int, c.POINTER(c.c_int), D, D])
     engine.bind("af_component_pick", [D, c.c_int, D, D, c.c_double, c.c_int])
     engine.bind("af_component_hits", [D, c.c_int, D, D, c.c_double, D])
     engine.bind("af_component_index_create", [D, c.c_int, c.c_int, c.POINTER(c.c_int)], U)
@@ -69,6 +70,23 @@ def transformed(engine: GeometryEngine, points: Any, matrix: Any) -> Any:
     engine.check(
         engine.library.af_points_transform(
             pointer(data), len(data), pointer(frame), pointer(output)
+        )
+    )
+    return output
+
+
+def constrained_axes(engine: GeometryEngine, points: Any, values: dict[str, float]) -> Any:
+    axes = ("X", "Y", "Z")
+    data = doubles(points).reshape((-1, 3))
+    enabled = np.array([axis in values for axis in axes], dtype=np.int32)
+    limits, output = doubles([values.get(axis, 0) for axis in axes]), np.empty_like(data)
+    engine.check(
+        engine.library.af_points_constrain_axes(
+            pointer(data),
+            len(data),
+            enabled.ctypes.data_as(c.POINTER(c.c_int)),
+            pointer(limits),
+            pointer(output),
         )
     )
     return output

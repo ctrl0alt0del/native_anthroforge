@@ -31,7 +31,7 @@ Node {
                 id: heat
                 objectName: "inspectionHeat_"+item.chunk
                 visible: item.active && stageNode.geometryData.kind==="HEAT"
-                geometry: InspectionGeometry { assetId: stageNode.geometryData.kind==="HEAT" ? item.handle : 0; chunk: item.chunk }
+                geometry: InspectionGeometry { assetId: stageNode.geometryData.kind==="HEAT" ? item.handle : 0; chunk: item.chunk; reflected: stageNode.geometryData.trs[6]*stageNode.geometryData.trs[7]*stageNode.geometryData.trs[8] < 0 }
                 property Material original: PrincipledMaterial { baseColor: "white"; vertexColorsEnabled: true; roughness: .8; cullMode: Material.NoCulling }
                 property Material cut: SectionMaterial { vertexColor: true }
                 materials: stageNode.clipped ? cut : original

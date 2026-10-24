@@ -43,6 +43,12 @@ UiScrollView {
                 }
             }
         }
+        RowLayout {
+            visible: !!inspector.selected.mirror_source; Layout.fillWidth: true
+            UiButton { text: "Hide instance"; Layout.fillWidth: true; onClicked: workspace.run("view.hide",{targets:[inspector.selected.id]}) }
+            UiButton { text: "Isolate"; Layout.fillWidth: true; onClicked: workspace.run("view.isolate",{targets:[inspector.selected.id]}) }
+            UiButton { text: "Show all"; Layout.fillWidth: true; onClicked: workspace.run("view.show_all",{}) }
+        }
         MirrorSettings { Layout.fillWidth: true }
         UiButton {
             objectName: "addObjectImage"; text: "Add reference image…"; glyph: "image"; Layout.fillWidth: true

@@ -6,8 +6,8 @@ from typing import Any
 from anthroforge.core.results import Port
 from anthroforge.core.tissues import TissueVCP
 
-from .tissue_stack_scene import participants
 from . import mirror_stacking
+from .tissue_stack_scene import participants
 
 
 def membership(document: Any) -> tuple[str, ...]:
@@ -16,8 +16,12 @@ def membership(document: Any) -> tuple[str, ...]:
 
 
 def original_membership(document: Any) -> tuple[str, ...]:
-    return tuple(sorted(json.dumps((item.id, item.group, item.stack_settings.displacement))
-                        for item in participants(document)))
+    return tuple(
+        sorted(
+            json.dumps((item.id, item.group, item.stack_settings.displacement))
+            for item in participants(document)
+        )
+    )
 
 
 def signature(item: TissueVCP) -> tuple[Any, ...]:

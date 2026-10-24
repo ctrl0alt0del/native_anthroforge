@@ -3,9 +3,9 @@
 from dataclasses import asdict, replace
 from typing import Any
 
+from anthroforge.core.mirroring import source as source_identity
 from anthroforge.core.tissue_stacking import StackRelationship, StackSettings
 from anthroforge.core.tissues import TissueVCP
-from anthroforge.core.mirroring import source as source_identity
 
 from . import object_operations, tissue_fields
 from .tissue_operations import tissue
@@ -32,7 +32,9 @@ def relationship(session: Any, target: str, other: str, **settings: Any) -> None
     install(session, replace(item, stack_relationships=(*existing, row)))
 
 
-def relationship_data(session: Any, item: Any, provider: Any, settings: Any, identity: str = "") -> dict[str, Any]:
+def relationship_data(
+    session: Any, item: Any, provider: Any, settings: Any, identity: str = ""
+) -> dict[str, Any]:
     key = (identity or provider.id, settings.get("side", "a"), settings.get("other_side", "a"))
     previous = next((r for r in item.stack_relationships if pair(r) == key), None)
     data = asdict(previous) if previous else {}

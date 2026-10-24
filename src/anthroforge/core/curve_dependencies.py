@@ -4,9 +4,9 @@ from . import anatomical_surfaces
 from .construction import Curve
 from .curve_engines import RoutingSettings
 from .fibers import Fiber
+from .mirroring import parse, source
 from .results import Port
 from .surface_references import SurfaceReference
-from .mirroring import source, parse
 
 
 def targets(item: Curve) -> set[str]:
@@ -51,10 +51,7 @@ def routing_references(settings: object, objects: tuple[object, ...]) -> set[Sur
     if not isinstance(settings, RoutingSettings) or settings.obstacle_mode != "MANUAL":
         return set()
     tissues = {r.target for r in anatomical_surfaces.defaults((), objects)}
-    return {
-        routing_reference(k, tissues)
-        for k in settings.obstacles
-    }
+    return {routing_reference(k, tissues) for k in settings.obstacles}
 
 
 def routing_reference(value: str, tissues: set[str]) -> SurfaceReference:

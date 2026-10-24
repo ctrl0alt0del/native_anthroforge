@@ -16,22 +16,20 @@ tree nodes, per-object mirror action, detachment or counterpart migration.
 
 ## Current state
 
-Read specifications, engineering rules and current typed model. Starting from main;
-unfinished `codex/parity-workflows-034` and unrelated root `__init__.py` are preserved.
-Research: Qt 6.12 material front faces use counterclockwise winding; reflection/query
-and render orientation must be handled explicitly, not hidden with double-sided shading.
-Foundation implementation now includes typed rules/instances, cached relationship
-resolution, shared provider references/transforms, read-only guards, rule/inspection
-commands and schema-6 relationship storage (reads 4/5/6). Source assets are reused.
-Initial desktop rule controls and viewport projection are in progress, not qualified.
-No independent mirror solvers or authored tree nodes are introduced.
+Runtime coverage is implemented; final release qualification remains pending. Typed
+rules, cached source/rule identities, provider aliases, schema 6 (reads 4/5/6), source
+resource reuse, shared bindings, source-only stacking, symmetric sources, native seam
+constraints and read-only desktop controls are integrated. Measurements and on-demand
+inspection accept reflected identities/stages. Required junction peers share one instance.
+Original 0.3.4 work and unrelated root `__init__.py` remain untouched.
 
 ## Next actions
 
-1. Trace provider/reference, persistence, mutation and viewport ownership boundaries.
-2. Implement foundations with shared API and desktop controls and contract tests.
-3. Integrate reflected queries, relationships, symmetric constructions and lifecycle.
-4. Qualify correctness/performance/packaging; update versions only when complete.
+1. Run final full development gate after current query/junction additions.
+2. Rerun hidden GPU/profile qualification with background-load evidence.
+3. Complete documentation/ownership review, advance versions after runtime qualification.
+4. Build one canonical portable release; run relocated offscreen checks; create source zip.
+5. Record actual evidence, merge validated branch into main and push normally.
 
 ## Verification
 
@@ -94,3 +92,15 @@ this plane-only workload. An actual visual inspection caught read-only dimming a
 negative-transform winding; presentation now separates dimming and reverses render-only
 triangle indices. Reinspected source/mirror images show consistent shading. No reflected
 anatomical mesh asset is generated. Release and packaging remain pending.
+
+### Query and shared-junction checkpoint
+
+A previous full gate passed 2,090 tests, five native CTests and style/type checks;
+newer additions require a final rerun. Focused measurement, inspection, relationship
+and junction checks pass. Latest native build passes five CTests. Hidden full QML
+inspection selected mirrored Tissue/Fiber/Membrane with no warnings. Source-only
+plane edits reused geometry; repeat hidden-GPU timings varied 121–212 ms including
+eight rendered/readback frames, settling and refresh, under uncontrolled background load.
+Production read-only probe: 59 SCPs/96 muscles, 620 instances in 49 ms, settled under
+0.7 s, zero new source geometry assets and no scheduler failures. WIP file not saved.
+Portable release and final full gate are not yet complete.

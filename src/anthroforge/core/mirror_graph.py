@@ -4,9 +4,9 @@ from dataclasses import replace
 from typing import Any
 
 from . import anatomical_surfaces, dependency_graph, routing_obstacles
+from .cycle_analysis import cycles
 from .results import Port
 from .surface_references import SurfaceReference
-from .cycle_analysis import cycles
 
 
 def install(document: Any) -> None:
@@ -17,21 +17,33 @@ def install(document: Any) -> None:
         return
     base = structure.mirror_base or structure.dependencies
     graph = reflected_graph(document, base) if identities else base
-    structure = replace(structure, dependencies=graph, mirror_base=base if identities else None,
-                        mirror_instances=identities)
+    structure = replace(
+        structure,
+        dependencies=graph,
+        mirror_base=base if identities else None,
+        mirror_instances=identities,
+    )
     object.__setattr__(document, "_index", replace(index, structure=structure))
 
 
 def references(document: Any) -> tuple[SurfaceReference, ...]:
-    return tuple(SurfaceReference(value.source, role, value.rule)
-                 for value in document.mirrors.instances.values()
-                 if value.source in document.registry.anatomy
-                 for role in anatomical_surfaces.roles(document.object(value.source), document.registry.records))
+    return tuple(
+        SurfaceReference(value.source, role, value.rule)
+        for value in document.mirrors.instances.values()
+        if value.source in document.registry.anatomy
+        for role in anatomical_surfaces.roles(
+            document.object(value.source), document.registry.records
+        )
+    )
 
 
 def aliases(ref: SurfaceReference) -> set[Port]:
     source = SurfaceReference(ref.target, ref.role)
-    return {anatomical_surfaces.port(source), Port(ref.target, "pose"), Port(ref.instance, "mirror")}
+    return {
+        anatomical_surfaces.port(source),
+        Port(ref.target, "pose"),
+        Port(ref.instance, "mirror"),
+    }
 
 
 def reflected_graph(document: Any, base: Any) -> Any:
@@ -43,8 +55,10 @@ def reflected_graph(document: Any, base: Any) -> Any:
     components = cycles(edges, dependency_graph.reverse(edges))
     excluded = routing_obstacles.remove_cyclic_candidates(edges, added, components)
     keys = base.routing_excluded.keys() | excluded.keys()
-    exclusions = {key: base.routing_excluded.get(key, frozenset()) | excluded.get(key, frozenset())
-                  for key in keys}
+    exclusions = {
+        key: base.routing_excluded.get(key, frozenset()) | excluded.get(key, frozenset())
+        for key in keys
+    }
     signature = (*base.routing_scene, repr(tuple(document.mirrors.instances)))
     return dependency_graph.indexed(edges, exclusions, signature)
 
@@ -56,8 +70,17 @@ def automatic_inputs(document: Any, edges: Any, refs: Any) -> dict[str, set[Surf
             continue
         port = Port(item.id, "path")
         excluded = set(item.engine_settings.excluded_obstacles)
-        values = {ref for ref in refs if ref.role != "TISSUE_BASE" and ref.target not in excluded
-                  and anatomical_surfaces.port(SurfaceReference(ref.target, ref.role)) in edges[port]}
+        values = automatic_references(refs, excluded, edges[port])
         added[item.id] = values
         edges[port].update(routing_obstacles.surface_ports(values))
     return added
+
+
+def automatic_references(refs: Any, excluded: Any, inputs: Any) -> set[SurfaceReference]:
+    return {
+        ref
+        for ref in refs
+        if ref.role != "TISSUE_BASE"
+        and ref.target not in excluded
+        and anatomical_surfaces.port(SurfaceReference(ref.target, ref.role)) in inputs
+    }

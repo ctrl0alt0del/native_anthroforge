@@ -87,5 +87,9 @@ def choices(controller):
 
 def mirror_choice(document, instance):
     item = document.object(instance.source)
-    return dict(id=instance.id, name=item.name + " · mirrored", both_sides=item.both_sides,
-                enabled=item.stacking)
+    return dict(
+        id=instance.id,
+        name=item.name + " · mirrored",
+        both_sides=item.both_sides,
+        enabled=item.stacking,
+    )

@@ -33,7 +33,7 @@ class IssueSystem:
         for provider in (
             *providers.builtins(),
             formulas.provider(),
-            mirroring.provider(),
+            mirroring.provider(session),
             fiber_collisions.provider(session),
             tissue_geometry.provider(session),
         ):

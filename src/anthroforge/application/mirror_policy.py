@@ -83,7 +83,7 @@ def blockers(document: Any, removed: set[str]) -> list[dict[str, str]]:
 
 def add_stacking_blockers(rows: Any, item: Any, removed: set[str]) -> None:
     plan = getattr(getattr(item, "stack_plan", None), "providers", ())
-    intent = tuple(r.other for r in getattr(item, "stack_relationships", ()))
+    intent = tuple(r.other for r in getattr(item, "stack_relationships", ()) if not r.excluded)
     for target in set(plan) | set(intent):
         if target in removed:
             rows[item.id, target] = dict(

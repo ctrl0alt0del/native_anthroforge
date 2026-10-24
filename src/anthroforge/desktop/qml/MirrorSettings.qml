@@ -21,18 +21,21 @@ UiSection {
         objectName: "mirrorChildren"; text: "Mirror children"
         visible: panel.anatomical
         checked: panel.settings.enabled || false
-        onClicked: panel.update({enabled:checked})
+        nextCheckState: function() { return checkState; }
+        onClicked: panel.update({enabled:!panel.settings.enabled})
     }
     UiCheck {
         objectName: "mirrorPlaneOverride"; text: "Override inherited plane"
         visible: !panel.anatomical
         checked: panel.settings.override || false
-        onClicked: panel.update({override:checked})
+        nextCheckState: function() { return checkState; }
+        onClicked: panel.update({override:!panel.settings.override})
     }
     UiCheck {
         objectName: "mirrorInherit"; text: "Inherit parent mirror"
         checked: panel.settings.inherit !== false
-        onClicked: panel.update({inherit:checked})
+        nextCheckState: function() { return checkState; }
+        onClicked: panel.update({inherit:panel.settings.inherit === false})
     }
     RowLayout {
         Layout.fillWidth: true

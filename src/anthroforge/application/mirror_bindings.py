@@ -16,7 +16,9 @@ def references(item: Any) -> tuple[tuple[str, SurfaceReference], ...]:
     if isinstance(item, Anchor):
         return (("binding", item.binding.reference),)
     if isinstance(item, SCP) and item.parent:
-        return (("attachment", SurfaceReference(item.parent, instance=item.attachment.parent_instance)),)
+        return (
+            ("attachment", SurfaceReference(item.parent, instance=item.attachment.parent_instance)),
+        )
     return ()
 
 
@@ -36,10 +38,14 @@ def counterpart(document: Any, instance: Any, key: str, ref: SurfaceReference) -
 
 
 def inspect(session: Any, target: str) -> list[dict[str, Any]]:
+    from .inspection_context import freeze
+    from .mirror_attachment_checks import validate
+
     document = session.document
     if target not in document.mirrors.instances:
         raise ValueError("Choose an existing mirrored instance.")
-    return rows(document, document.mirrors.instances[target])
+    instance = document.mirrors.instances[target]
+    return validate(freeze(session), instance, rows(document, instance))
 
 
 def rows(document: Any, instance: Any) -> list[dict[str, Any]]:

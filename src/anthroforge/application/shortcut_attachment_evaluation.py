@@ -3,7 +3,6 @@
 from dataclasses import replace
 from typing import Any
 
-from anthroforge.core import attachment_provenance
 from anthroforge.core.results import Port
 from anthroforge.native import shortcut_attachments
 
@@ -75,8 +74,9 @@ def prepare(
 
 
 def backsolve(engine: Any, lookup: Any, context: Any, meshes: Any, document: Any) -> None:
-    from . import scp_surface_parents
     from anthroforge.native.attachments import reflected_parent
+
+    from . import scp_surface_parents
 
     child = lookup[context.owner]
     parent = lookup[child.parent]

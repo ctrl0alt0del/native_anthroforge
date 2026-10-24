@@ -3,10 +3,10 @@
 from anthroforge.core import attachment_references
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
+from anthroforge.core.mirroring import parse as mirror_instance
 from anthroforge.core.results import Port, ReadRevision
 from anthroforge.core.tissue_revisions import PHASES
 from anthroforge.core.tissues import TissueVCP
-from anthroforge.core.mirroring import parse as mirror_instance
 
 
 def topology_dependents(document: Document, entity: str) -> tuple[str, ...]:

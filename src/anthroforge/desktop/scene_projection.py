@@ -178,6 +178,7 @@ def selection_record(controller, records):
 
 def initialize(controller):
     from .construction_projection import ConstructionProjection
+    from .record_model import RecordModel
 
     controller.construction = ConstructionProjection(controller)
     controller.scene_projection = SceneProjection(controller)
@@ -185,6 +186,7 @@ def initialize(controller):
     controller._render_rows = []
     controller.mirror_records = {}
     controller._mirror_projection_cache = {}
+    controller.marker_model = RecordModel(controller, ("item",), "id")
     scene_state.picking_inputs(controller, [])
 
 

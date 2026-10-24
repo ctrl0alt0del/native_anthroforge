@@ -7,6 +7,7 @@ from typing import Any
 
 from . import attachment_references
 from .entities import SCP
+from .junctions import members
 from .mirroring import MirrorInstance, MirrorRule
 from .reference_images import ReferenceImage
 from .tissues import TissueVCP
@@ -19,6 +20,7 @@ class MirrorIndex:
     rules: Mapping[str, MirrorRule]
     conflicts: tuple[str, ...] = ()
     placements: Mapping[str, MirrorRule] = field(default_factory=dict)
+    junctions: Mapping[str, tuple[Any, ...]] = field(default_factory=dict)
 
     def plane(self, instance: Any) -> MirrorRule:
         return self.placements.get(instance.id, self.rules[instance.rule])
@@ -57,7 +59,8 @@ def signature(document: Any) -> tuple[Any, ...]:
         )
         for key, v in records.items()
     )
-    return document.mirror_rules, topology
+    groups = tuple(members(document.objects).items()) if document.junctions else ()
+    return document.mirror_rules, topology, document.junctions, groups
 
 
 def build(document: Any, previous: MirrorIndex | None) -> MirrorIndex:
@@ -83,7 +86,16 @@ def frozen_index(
         MappingProxyType(settings),
         conflicts,
         MappingProxyType(placements),
+        junction_index(key[-1]),
     )
+
+
+def junction_index(groups: Any) -> Mapping[str, tuple[Any, ...]]:
+    found: dict[str, list[Any]] = {}
+    for key, refs in groups:
+        for ref in refs:
+            found.setdefault(ref.curve, []).append((key, refs))
+    return MappingProxyType({key: tuple(values) for key, values in found.items()})
 
 
 def retain_conflicts(
@@ -129,14 +141,25 @@ def anatomy_rules(document: Any, settings: dict[str, MirrorRule]) -> dict[str, s
 
 def construction_rules(document: Any, settings: Any, resolved: Any) -> tuple[Any, tuple[str, ...]]:
     records = document.registry.records
+    groups = members(document.objects).values() if document.junctions else ()
     for _ in range(len(records) + 1):
         changed = propagate(records, settings, resolved)
+        changed |= shared_junctions(groups, settings, resolved)
         if not changed:
             break
     conflicts = incompatible(records, settings, resolved)
     for target in conflicts:
         resolved[target] = set()
     return resolved, conflicts
+
+
+def shared_junctions(groups: Any, settings: Any, resolved: Any) -> bool:
+    changed = False
+    for group in groups:
+        choices = set().union(*(resolved.get(ref.curve, set()) for ref in group))
+        for ref in group:
+            changed |= merge(ref.curve, choices, settings, resolved)
+    return changed
 
 
 def propagate(records: Any, settings: Any, resolved: Any) -> bool:

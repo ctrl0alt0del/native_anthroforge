@@ -44,7 +44,11 @@ def result(item: SCP | TissueVCP, role: str) -> EvaluationResult:
 
 def port(reference: SurfaceReference) -> Port:
     names = {"SCP_GEOMETRY": "geometry", "TISSUE_BASE": "base", "TISSUE_FINAL": "final"}
-    owner = MirrorInstance(reference.target, reference.instance).id if reference.instance else reference.target
+    owner = (
+        MirrorInstance(reference.target, reference.instance).id
+        if reference.instance
+        else reference.target
+    )
     return Port(owner, names[reference.role])
 
 
@@ -74,4 +78,8 @@ def defaults(
 def from_port(value: Port) -> SurfaceReference:
     roles = {"geometry": "SCP_GEOMETRY", "base": "TISSUE_BASE", "final": "TISSUE_FINAL"}
     instance = parse(value.owner)
-    return SurfaceReference(instance.source, roles[value.output], instance.rule) if instance else SurfaceReference(value.owner, roles[value.output])
+    return (
+        SurfaceReference(instance.source, roles[value.output], instance.rule)
+        if instance
+        else SurfaceReference(value.owner, roles[value.output])
+    )

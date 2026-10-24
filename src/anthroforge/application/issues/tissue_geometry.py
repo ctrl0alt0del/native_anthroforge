@@ -96,7 +96,7 @@ def source(document: Any, scope: str) -> Any:
         return None
     return (
         str(document.id),
-        document.mirrors.signature,
+        repr(document.mirrors.signature),
         stages.result(item, stage).asset,
         item.matrix,
         poses(document),

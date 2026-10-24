@@ -69,3 +69,13 @@ def test_hiding_source_does_not_hide_its_mirror_and_projection_is_reused(control
     rows = {r["id"]: r for r in controller._render_rows}
     assert rows[instance]["surface_visible"]
     assert not rows[child]["surface_visible"]
+
+
+def test_focusing_mirror_uses_the_shared_source_scope_and_keeps_readonly_selection(controller):
+    root, child, instance = mirrored_cube(controller)
+    controller.select(instance)
+    controller.focusSelection()
+    assert controller.session.workspace.members == (child,)
+    assert controller.selection == instance
+    assert controller.selectedData.get("readonly")
+    assert not controller.selectedData.get("context_dimmed")

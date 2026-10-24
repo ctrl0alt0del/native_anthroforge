@@ -12,8 +12,13 @@ from anthroforge.core.results import Port
 from anthroforge.native.attachments import capture, ordered, propagate
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 
-from . import dependencies, evaluation_batches, shortcut_attachment_evaluation, task_workloads
-from . import scp_surface_parents
+from . import (
+    dependencies,
+    evaluation_batches,
+    scp_surface_parents,
+    shortcut_attachment_evaluation,
+    task_workloads,
+)
 
 if TYPE_CHECKING:
     from .session import Session
@@ -198,7 +203,11 @@ def capture_indices(entities: list[SCP], recaptures: set[str], cancel: Event) ->
 
 
 def capture_safely(
-    engine: GeometryEngine, item: SCP, parent: SCP, meshes: dict[str, Mesh], cancel: int = 0,
+    engine: GeometryEngine,
+    item: SCP,
+    parent: SCP,
+    meshes: dict[str, Mesh],
+    cancel: int = 0,
     reflection: Any = None,
 ) -> SCP:
     try:
@@ -210,7 +219,9 @@ def capture_safely(
 
 def capture_parent(item: SCP, parent: SCP) -> SCP:
     if item.capture_parent_matrix:
-        return replace(parent, matrix=item.capture_parent_matrix, geometry_offset=item.capture_parent_offset)
+        return replace(
+            parent, matrix=item.capture_parent_matrix, geometry_offset=item.capture_parent_offset
+        )
     return parent
 
 

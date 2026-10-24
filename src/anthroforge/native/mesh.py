@@ -174,7 +174,9 @@ class GeometryEngine(NativeEngine):
         self._propagation_signatures(ints)
 
     def _propagation_signatures(self, ints: Any) -> None:
-        arguments = [c.c_int, c.POINTER(U), ints, D, D, D, ints, ints, ints, ints, ints, U, c.POINTER(U)]
+        geometry = [c.c_int, c.POINTER(U), ints, D, D, D]
+        policy = [ints] * 5  # Active, parent/child anchor, follow and strategy arrays.
+        arguments = [*geometry, *policy, U, c.POINTER(U)]
         self.bind("af_propagate", arguments)
         self.bind("af_propagate_spatial", [*arguments, D])
 

@@ -330,14 +330,14 @@ Item {
                 }
             }
             Repeater3D {
-                model: workspace.markerRows
+                model: workspace.markerModel
                 delegate: Model {
-                    required property var modelData
-                    visible: !modelData.asset && modelData.visible
-                    position: Qt.vector3d(modelData.trs[0],modelData.trs[1],modelData.trs[2])
+                    required property var item
+                    visible: !item.asset && item.visible
+                    position: Qt.vector3d(item.trs[0],item.trs[1],item.trs[2])
                     source: "#Sphere"
                     scale: Qt.vector3d(.0003,.0003,.0003)
-                    opacity: modelData.opacity
+                    opacity: item.opacity
                     materials: PrincipledMaterial { baseColor: "#d7bf78" }
                 }
             }

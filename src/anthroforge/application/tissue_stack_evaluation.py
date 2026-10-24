@@ -11,9 +11,9 @@ from anthroforge.native.stacking import StackSession, dependencies, surface
 from anthroforge.native.stacking_leases import acquire
 from anthroforge.native.tissue_stacking import assemble
 
+from . import mirror_stacking
 from . import tissue_stack_policy as policy
 from . import tissue_stack_scene as scene_inputs
-from . import mirror_stacking
 from .tissue_output import TissueOutput
 
 

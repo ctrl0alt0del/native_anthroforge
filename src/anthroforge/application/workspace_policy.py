@@ -39,17 +39,23 @@ def settings(values: dict[str, Any]) -> dict[str, Any]:
 
 
 def members(document: Document, values: list[str], children: bool = False) -> tuple[str, ...]:
-    selected = set(values)
+    selected = source_members(document, values)
     live = document.registry.anatomy.keys()
     if selected - live:
         raise ValueError("Workspace membership requires anatomical SCP/VCP objects.")
     if children:
-        for key in values:
+        for key in tuple(selected):
             if key in document.index.entities:
                 selected |= descendants(document.entities, key)
     if not selected:
         raise ValueError("A focused workspace needs at least one anatomical object.")
     return tuple(sorted(selected))
+
+
+def source_members(document: Document, values: list[str]) -> set[str]:
+    if any(v.startswith("mirror/") and v not in document.mirrors.instances for v in values):
+        raise ValueError("Workspace selection refers to an unavailable mirrored instance.")
+    return {mirror_source(v) for v in values}
 
 
 def available(session: "Session") -> None:

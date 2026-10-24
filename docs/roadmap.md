@@ -1,10 +1,11 @@
 # AnthroForge release roadmap
 
-- **0.3.5 — confirmed, not implemented:** strict source-linked, read-only mirroring,
+- **0.3.5 — implemented, qualification in progress:** strict source-linked, read-only mirroring,
   hierarchy rules, instance-aware surfaces and symmetric construction. Mirrors never
   solve independent geometry. [Specification](specification_035.md),
-  [implementation plan](implementation_035.md). This documentation adds no runtime,
-  migration, format change or release qualification; separate 0.3.4 work is unaffected.
+  [implementation plan](implementation_035.md), [runtime/evidence](mirroring_035.md).
+  Schema 6 reads 4/5/6 without reflected payload duplication. Existing independent
+  counterpart migration and the separate unfinished 0.3.4 branch remain untouched.
 
 - **0.3.3 — qualified:** targeted shortcut metadata/formula observation, immutable
   publication and incremental priority links. [Evidence](shortcuts_033.md).

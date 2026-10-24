@@ -39,6 +39,12 @@ Rectangle {
             }
             UiSection {
                 title: "Presentation"
+                UiCombo {
+                    objectName: "workspaceMirrorDisplay"; Layout.fillWidth: true
+                    model: ["Both sides", "Source only", "Mirror only"]
+                    currentIndex: Math.max(0,["BOTH","SOURCE","MIRROR"].indexOf(workspace.state.mirror_display))
+                    onActivated: workspace.run("workspace.update",{mirror_display:["BOTH","SOURCE","MIRROR"][currentIndex]})
+                }
                 UiCombo { objectName: "presentationPreset"; Layout.fillWidth: true; model: ["Choose preset…","All elements","Shape editing","Surface review","Attachment inspection"]; onActivated: { if(currentIndex) workspace.run("workspace.preset",{name:["","all","shape","surface","attachments"][currentIndex]}); currentIndex=0; } }
                 ColumnLayout {
                     Layout.fillWidth: true; spacing: 4

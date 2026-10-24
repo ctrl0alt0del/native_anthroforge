@@ -4,13 +4,14 @@ from hashlib import blake2b
 from typing import Any
 
 from anthroforge.core.anatomical_surfaces import usable
+from anthroforge.core.mirroring import source as source_identity
 from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import stacking_abi
 from anthroforge.native.resource_cache import ResourceCache
 from anthroforge.native.scene import entity_frame
-from anthroforge.core.mirroring import source as source_identity
-from . import mirror_stacking
 from anthroforge.native.tissue_stacking import MaterialLease
+
+from . import mirror_stacking
 
 
 def participants(document: Any) -> tuple[TissueVCP, ...]:

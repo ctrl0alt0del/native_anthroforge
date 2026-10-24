@@ -1,4 +1,5 @@
 #include "mesh_geometry.h"
+#include "geometry_orientation.h"
 #include <QtGui/QVector3D>
 #include "anthroforge/mesh.h"
 
@@ -28,16 +29,6 @@ void MeshGeometry::configure(const QByteArray& data,const double* bounds) {
     setPrimitiveType(PrimitiveType::Triangles);
     addAttribute(Attribute::PositionSemantic,0,Attribute::F32Type);
     addAttribute(Attribute::NormalSemantic,3*sizeof(float),Attribute::F32Type);
-    orientation(data.size()/(6*sizeof(float)));
+    reflected_indices(*this,data.size()/(6*sizeof(float)),m_reflected);
     setBounds(QVector3D(bounds[0],bounds[1],bounds[2]),QVector3D(bounds[3],bounds[4],bounds[5]));
-}
-void MeshGeometry::orientation(int count) {
-    if(!m_reflected) return;
-    QByteArray indices(count*sizeof(quint32),Qt::Uninitialized);
-    auto* output=reinterpret_cast<quint32*>(indices.data());
-    for(int i=0;i<count;i+=3) {
-        output[i]=i; output[i+1]=i+2; output[i+2]=i+1;
-    }
-    setIndexData(indices);
-    addAttribute(Attribute::IndexSemantic,0,Attribute::U32Type);
 }

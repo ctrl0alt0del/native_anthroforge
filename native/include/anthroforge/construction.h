@@ -56,6 +56,8 @@ AF_API uint64_t af_mesh_restore(const double* vertices, int64_t count, const int
 AF_API int af_matrix_relative(const double* frame, const double* world, double* output);
 AF_API int af_matrix_product(const double* a, const double* b, double* output);
 AF_API int af_points_transform(const double* points, int count, const double* matrix, double* output);
+AF_API int af_points_constrain_axes(const double* points,int count,const int* enabled,
+    const double* values,double* output);
 /* Output capacity: 2*count xyz values; group partitions independent polylines. */
 AF_API int af_polyline_lines(const double* points, int count, int group, int closed,
     const double* matrix, double* output);

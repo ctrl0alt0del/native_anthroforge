@@ -8,6 +8,8 @@ from tissue_authoring_portable import qualify
 from tissue_inspection_portable import qualify as inspect_tissue
 from vcp_visual_portable import qualify as visual_tools
 
+from anthroforge.application.storage import VERSION
+
 
 def tissues(executable, cwd, invoke):
     output = invoke(executable, cwd, "--cli", "run", "examples/tissues.json")
@@ -29,9 +31,9 @@ def verify(state, cwd):
     first, second = items["Layer 1"], items["Layer 2"]
     assert second["stack_plan"]["providers"] == [first["id"]]
     ref = items["Anchor on final tissue"]["binding"]["reference"]
-    assert ref == dict(target=second["id"], role="TISSUE_FINAL")
+    assert ref == dict(target=second["id"], role="TISSUE_FINAL", instance="")
     with ZipFile(cwd / "tissues.anthroforge") as archive:
-        assert json.loads(archive.read("manifest.json"))["version"] == 5
+        assert json.loads(archive.read("manifest.json"))["version"] == VERSION
     return items
 
 

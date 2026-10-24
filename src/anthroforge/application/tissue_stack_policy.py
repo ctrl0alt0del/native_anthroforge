@@ -4,8 +4,8 @@ from typing import Any
 
 from anthroforge.native.stacking_abi import Policy, Settings
 
-from .tissue_stack_scene import identity
 from . import mirror_stacking
+from .tissue_stack_scene import identity
 
 
 def settings(value: Any) -> Settings:
@@ -45,6 +45,8 @@ def available_pair(scene: Any, item: Any, relation: Any) -> tuple[int, int] | No
     first, second = identity(item.id, relation.side), identity(relation.other, relation.other_side)
     if first in scene.domains and second in scene.domains:
         return first, second
+    if relation.excluded:
+        return None  # Negative intent needs no provider geometry and survives rule reactivation.
     if (item.id, relation.side) in scene.leases and (
         relation.other,
         relation.other_side,

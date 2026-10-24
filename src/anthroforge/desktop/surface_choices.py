@@ -2,8 +2,8 @@
 
 from anthroforge.application import surface_providers
 from anthroforge.core import anatomical_surfaces
-from anthroforge.core.results import geometry_asset
 from anthroforge.core.mirroring import MirrorInstance
+from anthroforge.core.results import geometry_asset
 
 
 def rows(controller):

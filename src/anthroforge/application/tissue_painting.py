@@ -49,7 +49,7 @@ def signature(context: Any, target: str, options: Any) -> Any:
 
 
 def prepare(context: Any, target: str, options: Any, cancel: int) -> Any:
-    value, item = field(context, target, options), stages.tissue(context, target)
+    value = field(context, target, options)
     reference = stages.mesh(context, target, "rest") if value.domain == "REST" else None
     others = obstacles(context, options)
     inputs = painting.Inputs(
@@ -57,7 +57,7 @@ def prepare(context: Any, target: str, options: Any, cancel: int) -> Any:
         reference,
         value.domain == "BASE",
         len(value.values),
-        stages.frame(context, item, options["stage"]),
+        stages.instance_frame(context, target, options["stage"]),
         tuple(options["view"]),
         tuple(m for m, _ in others),
         tuple(f for _, f in others),

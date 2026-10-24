@@ -1,0 +1,20 @@
+[
+  {"id":"root","operation":"scp.empty","arguments":{"name":"Mirror source"}},
+  {"id":"bone","operation":"import","arguments":{"path":"examples/primitives/cube.obj","units":0.2,"parent":"$root","name":"Source cube"}},
+  {"operation":"wait"},
+  {"operation":"scp.transform","arguments":{"entity":"$bone.entity_id","values":[0.5,0,0,0,0,0,1,1,1]}},
+  {"operation":"mirror.configure","arguments":{"target":"$root","enabled":true,"axis":"X","shift":0}},
+  {"operation":"mirror.attachment.share","arguments":{"source":"$bone.entity_id","binding":"attachment","enabled":true}},
+  {"id":"instances","operation":"mirror.list","arguments":{"source":"$bone.entity_id"}},
+  {"operation":"mirror.inspect","arguments":{"target":"$instances.0.id"}},
+  {"id":"point","operation":"construction.point.create","arguments":{"name":"Placement witness","position":[-0.7,0,0]}},
+  {"operation":"anchor.create","arguments":{"source":"$point","parent":"$instances.0.id"}},
+  {"operation":"wait"},
+  {"id":"half","operation":"curve.create","arguments":{"name":"Editable half","engine":"POLYLINE","points":[{"position":[0,-0.4,0.3]},{"position":[0.3,0,0.3]},{"position":[0,0.4,0.3]}]}},
+  {"operation":"wait"},
+  {"operation":"mirror.loop.create","arguments":{"curve":"$half","axis":"X","shift":0}},
+  {"operation":"wait"},
+  {"operation":"workspace.update","arguments":{"camera":[0,0,0.1,-20,15,0,2.4],"orthographic":true}},
+  {"operation":"save","arguments":{"path":"mirroring.anthroforge","blocked_policy":"wait"}},
+  {"operation":"inspect"}
+]

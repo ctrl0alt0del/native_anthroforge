@@ -1,6 +1,8 @@
 # AnthroForge 0.3.5 — Mirroring
 
-**Status: Confirmed — not implemented.**
+**Status: Implemented — release qualification in progress.**
+
+Runtime operations, storage and evidence are in the [0.3.5 walkthrough](mirroring_035.md).
 
 This is the authoritative 0.3.5 product contract, consolidated from the confirmed
 mirroring interview. The [implementation plan](implementation_035.md) defines ownership,
@@ -163,8 +165,8 @@ accepted geometry instead of storing duplicate reflected payloads. Restore appea
 and relationships without blanket source recalculation or independent mirror solvers.
 Do not serialize native handles, transient hover state or undo history.
 
-This consolidation assigns no project-schema or package-version change. Future runtime
-format work must document supported versions explicitly and preserve source data; it must
-not silently pair independent objects or claim migration through a compatibility reader.
+The documentation-only consolidation assigned no format change. Runtime storage now
+uses schema 6, reads schemas 4/5/6 and reuses source geometry. It does not pair existing
+independent objects or migrate Blender counterparts. Older applications reject schema 6.
 0.3.5 is complete only after the shared API, desktop, geometry, lifecycle, persistence,
 performance and portable-package evidence in the implementation plan passes.

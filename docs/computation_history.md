@@ -2324,3 +2324,23 @@ average. This is a read-only formula input; no new write channel is introduced.
   routing or relaxation. Four warm plane edits take 121–128 ms including settling,
   refresh and texture readback; this is not physical display latency. Source arrays
   remain exactly equal. Full release/lifecycle/crowded-assembly qualification remains pending.
+
+
+### CH-075 — Instance-aware inspection and shared-junction constraints
+
+- Previous: measurement/inspection callers assumed authored SCP identity; symmetric
+  seam projection could be bypassed by editing another incident junction member.
+- New: shared surface/stage resolution returns source resources and instance frames;
+  native goal/witness transforms preserve numerical evidence without a mirrored solve.
+  Native batched axis projection constrains all incident seam axes atomically before
+  junction expansion. Required junction peers share cached source/rule identities.
+- Why: read-only mirrors must remain usable for measurements and inspection, and any
+  junction edit must preserve the complete source's plane seam.
+- Preserved: retained material references, one-action undo, source numerical algorithms,
+  displayed-revision picking and source resource ownership. Excluded stacking intent is
+  retained without requiring an unavailable provider; active consumers still block removal.
+- Evidence: focused junction, measurement, inspection and relationship tests pass;
+  five native CTests pass. Hidden QML has no warnings. Production assembly reflection
+  creates zero new source geometry assets. Final full/portable gate remains pending.
+- Measurement correction to CH-074: repeated hidden-GPU trials span 121–212 ms with
+  eight rendered/readback frames and uncontrolled background load; not input latency.

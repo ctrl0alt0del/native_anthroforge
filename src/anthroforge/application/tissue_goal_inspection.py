@@ -45,15 +45,16 @@ def calculate(context: Any, item: Any, state: Any, options: Any, cancel: int) ->
 def spatial_rows(context: Any, target: str, rows: Any) -> Any:
     from anthroforge.core.mirroring import parse
     from anthroforge.native.components import transformed
+    from anthroforge.native.mesh import doubles
 
     instance = parse(target)
     if not instance:
         return rows
     frame = context.document.mirrors.plane(context.document.mirrors.instances[target]).frame
-    rows = rows.copy()
+    rows = doubles(rows).copy()
     rows[:, :3] = transformed(context.engine, rows[:, :3], frame)
     rows[:, 3:6] = transformed(context.engine, rows[:, 3:6], frame)
-    return rows
+    return rows.tolist()
 
 
 def attach(payload: Any, item: Any, rows: Any) -> None:

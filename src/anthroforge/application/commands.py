@@ -363,6 +363,15 @@ def file_commands(session: "Session") -> dict[str, Any]:
         "workspace.update": lambda **a: presentation.update_workspace(session, **a),
         "workspace.remove": lambda **a: presentation.remove_workspace(session, **a),
         "workspace.preset": lambda **a: presentation.preset(session, **a),
+        **view_commands(session),
+    }
+
+
+def view_commands(session: "Session") -> dict[str, Any]:
+    return {
+        "view.hide": lambda **a: presentation.hide(session, **a),
+        "view.isolate": lambda **a: presentation.isolate(session, **a),
+        "view.show_all": lambda: presentation.update_workspace(session, hidden=[]),
     }
 
 

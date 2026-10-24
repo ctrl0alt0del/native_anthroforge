@@ -23,7 +23,6 @@ signals:
 private:
     void rebuild();
     void configure(const QByteArray& data,const double* bounds);
-    void orientation(int count);
     qulonglong m_asset=0;
     int m_chunk=0;
     bool m_reflected=false;

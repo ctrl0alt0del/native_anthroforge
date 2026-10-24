@@ -10,21 +10,29 @@ import numpy as np
 
 from anthroforge.core import attachment_provenance
 from anthroforge.core.attachment_strategy import uses_deformation_flow
-from anthroforge.core.entities import SCP, IDENTITY
+from anthroforge.core.entities import IDENTITY, SCP
 from anthroforge.core.results import geometry_asset
 
 from . import surface_queries
-from .mesh import GeometryEngine, Mesh, doubles, pointer
 from .construction import matrix as product
+from .mesh import GeometryEngine, Mesh, doubles, pointer
 
 CHILD_MODES = {"FACE_CENTER": 0, "VERTEX_NEAREST": 1, "OBJECT_ORIGIN": 2}
 
 
 def capture(
-    engine: GeometryEngine, child: SCP, parent: SCP, meshes: dict[str, Mesh], cancel: int = 0,
+    engine: GeometryEngine,
+    child: SCP,
+    parent: SCP,
+    meshes: dict[str, Mesh],
+    cancel: int = 0,
     reflection: Any = None,
 ) -> SCP:
     parent = reflected_parent(engine, child, parent, reflection)
+    return capture_binding(engine, child, parent, meshes, cancel)
+
+
+def capture_binding(engine: Any, child: SCP, parent: SCP, meshes: Any, cancel: int) -> SCP:
     arrays = capture_arrays(child, parent)
     output = np.empty(28)
     query = capture_surface(parent, meshes, child.attachment.parent_mode, cancel)
@@ -37,7 +45,10 @@ def capture(
 
 
 def capture_arrays(child: SCP, parent: SCP) -> Any:
-    return [doubles(v) for v in (child.matrix, parent.matrix, child.geometry_offset, parent.geometry_offset)]
+    return [
+        doubles(v)
+        for v in (child.matrix, parent.matrix, child.geometry_offset, parent.geometry_offset)
+    ]
 
 
 def reflected_parent(engine: Any, child: SCP, parent: SCP, reflection: Any = None) -> SCP:
@@ -106,7 +117,9 @@ def ordered(entities: tuple[SCP, ...]) -> list[SCP]:
     return result
 
 
-def packed(entities: list[SCP], meshes: dict[str, Mesh], active: set[str], reflections: Any = None) -> dict[str, Any]:
+def packed(
+    entities: list[SCP], meshes: dict[str, Mesh], active: set[str], reflections: Any = None
+) -> dict[str, Any]:
     lookup = {item.id: i for i, item in enumerate(entities)}
     return {
         **packed_flags(entities, active),
@@ -116,8 +129,12 @@ def packed(entities: list[SCP], meshes: dict[str, Mesh], active: set[str], refle
         "offsets": doubles([e.geometry_offset for e in entities]),
         "bindings": doubles([e.attachment.binding or (0.0,) * 28 for e in entities]),
         "references": np.array([reference(e, meshes) for e in entities], dtype=np.uint64),
-        "reflections": doubles([reflections.get(e.id, IDENTITY) for e in entities]) if reflections else None,
+        "reflections": reflection_buffer(entities, reflections),
     }
+
+
+def reflection_buffer(entities: list[SCP], reflections: Any) -> Any:
+    return doubles([reflections.get(e.id, IDENTITY) for e in entities]) if reflections else None
 
 
 def reference(entity: SCP, meshes: dict[str, Mesh]) -> int:

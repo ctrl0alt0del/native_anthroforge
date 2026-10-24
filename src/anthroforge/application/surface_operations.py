@@ -117,7 +117,7 @@ def configured(item: Surface, values: dict[str, Any]) -> Surface:
         raise ValueError("Unknown surface setting.")
     if isinstance(values.get("mirror_plane"), dict):
         values = dict(values, mirror_plane=SymmetricHalf(**values["mirror_plane"]))
-    if "mirrored_rows" in values and values["mirrored_rows"] != item.mirrored_rows:
+    if mirror_layout_changed(item, values):
         values = dict(values, mirror_order=(), across=())
     changed = replace(item, **values)
     if "strips" in values and changed.strips:
@@ -129,7 +129,7 @@ def configured(item: Surface, values: dict[str, Any]) -> Surface:
 def update(session: Any, target: str, **options: Any) -> None:
     item = editable(session, target)
     candidate = configured(item, options)
-    if candidate.mirrored_rows != item.mirrored_rows:
+    if mirror_layout_changed(item, options):
         return configure_mirroring(session, candidate)
     object_operations.install(session, candidate)
 
@@ -141,8 +141,21 @@ def configure_mirroring(session: Any, candidate: Surface) -> None:
     authored_jobs.begin(session, partial(surface_jobs.enqueue, session, candidate, True))
 
 
+def mirror_layout_changed(item: Surface, values: dict[str, Any]) -> bool:
+    plane = values.get("mirror_plane", item.mirror_plane)
+    if isinstance(plane, dict):
+        plane = SymmetricHalf(**plane)
+    return values.get("mirrored_rows", item.mirrored_rows) != item.mirrored_rows or (
+        item.mirrored_rows and plane != item.mirror_plane
+    )
+
+
 def realign(session: Any, target: str) -> str:
+    from .construction_policy import require_topology_edit
+
     item = editable(session, target)
+    if item.mirrored_rows:
+        require_topology_edit(session.document, target)
     return authored_jobs.begin(session, partial(surface_jobs.enqueue, session, item, True))
 
 

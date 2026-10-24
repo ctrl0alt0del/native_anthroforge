@@ -20,8 +20,14 @@ class SurfacePoint:
     position: tuple[float, ...]
     frame: tuple[float, ...]
     revision: int
+    role: str = ""
+    stage: str = ""
 
     def __post_init__(self) -> None:
+        if self.role not in ("", "SCP_GEOMETRY", "TISSUE_BASE", "TISSUE_FINAL"):
+            raise ValueError("Invalid measurement surface role.")
+        if self.stage not in ("", "base", "rest", "intrinsic", "final"):
+            raise ValueError("Invalid measurement tissue stage.")
         finite_tuple(self.position, 3)
         finite_tuple(self.frame, 16)
         finite_tuple(self.weights, 3)

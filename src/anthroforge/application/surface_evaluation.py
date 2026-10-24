@@ -68,9 +68,13 @@ def layout(engine: Any, document: Any, resources: Any, item: Surface, cancel: in
     )
 
 
-def alignments(document: Any, resources: Any, item: Surface, values: Any) -> tuple[SurfaceAlignment, ...]:
-    return tuple(stable_alignment(document, resources, use.curve, value)
-                 for use, value in zip(item.curves, values, strict=True))
+def alignments(
+    document: Any, resources: Any, item: Surface, values: Any
+) -> tuple[SurfaceAlignment, ...]:
+    return tuple(
+        stable_alignment(document, resources, use.curve, value)
+        for use, value in zip(item.curves, values, strict=True)
+    )
 
 
 def stable_alignment(document: Any, resources: Any, curve: str, values: Any) -> SurfaceAlignment:
@@ -96,7 +100,7 @@ def evaluate(engine: Any, document: Any, resources: Any, item: Surface, cancel: 
 
 def ordinary(engine: Any, document: Any, resources: Any, item: Surface, cancel: int) -> Any:
     inputs = rows(engine, document, resources, item)
-    inputs = symmetric_surfaces.expand(engine, document, item, inputs)
+    inputs = symmetric_surfaces.expand(engine, document, item, inputs, cancel)
     counts = item.across or (max(1, item.strips) - 1,) * (len(item.curves) - 1)
     mesh = native.geometry(engine, inputs, counts, settings(item), cancel)
     pins = surface_pins.points(document, resources, [use.curve for use in item.curves])

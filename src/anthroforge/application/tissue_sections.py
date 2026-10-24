@@ -21,7 +21,7 @@ def inputs(context: Any, target: str, options: Any) -> list[Any]:
             owner=target,
             stage=name,
             asset=stages.result(item, name).asset,
-            frame=stages.frame(context, item, name),
+            frame=stages.instance_frame(context, target, name),
         )
         for name in names
     ]
@@ -40,7 +40,12 @@ def validate(context: Any, target: str, options: Any) -> None:
 
 
 def validate_surface(context: Any, row: Any) -> None:
-    if row["owner"] not in context.document.registry.records or row["asset"] not in context.assets:
+    from anthroforge.core.mirroring import source
+
+    if (
+        source(row["owner"]) not in context.document.registry.records
+        or row["asset"] not in context.assets
+    ):
         raise ValueError("A displayed section input is no longer retained. Wait for publication.")
 
 

@@ -1,12 +1,16 @@
 # AnthroForge 0.3.5 — Mirroring implementation plan
 
-**Status: Confirmed — not implemented.**
+**Status: Implemented — release qualification in progress.**
+
+See the [runtime walkthrough and observed evidence](mirroring_035.md) and
+[recovery/qualification record](tasks/mirroring-035.md). The original ordered plan
+and acceptance requirements remain below; unperformed interactive checks are not claimed.
 
 Product authority: [specification_035.md](specification_035.md). Follow the
 [engineering guidelines](engineering_guidelines.md) and
 [work-continuity workflow](work_continuity.md). This is an ordered future runtime plan;
-the current delivery is documentation only. No acceptance below has been performed for
-a 0.3.5 runtime, and no release/version/format change is implied by these documents.
+the original delivery was documentation only. Runtime now uses project schema 6 with
+schema-4/5 loading. Qualification status is recorded separately from this original plan.
 
 ## 1. Baseline diagnosis and source inventory
 

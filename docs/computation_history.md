@@ -1,5 +1,21 @@
 # Computation inventory and approach history
 
+## In-progress 0.3.4: retained shortcut owner material anchors
+
+Previously owner backsolve reread a current face/vertex index; Boolean remeshing can
+reuse that index for a different material patch. Pending edit contexts now retain
+the reference geometry asset and native material binding. Resolution uses existing
+material charts, Boolean provenance and exterior following, then translation only.
+Inflation, smoothing and Boolean algorithms are unchanged. Resource ownership retains
+the reference through pending contexts and historical saves.
+
+The remeshed Segment Chain regression in tests/test_shortcut_owner_material.py
+verifies the material point stays fixed and differs from the old face-index result.
+Existing shortcut transaction tests pass. Original Thumb and shoulder parity remain
+unqualified. Migration now captures effective legacy Backsolve policy rather than
+the raw unset flag; standalone defaults remain off.
+
+
 This is the maintained register of **what AnthroForge computes, how it computes it,
 and why an approach changed**. Update the current inventory and add a change record
 in the same change set as the implementation. A passing solver return is not proof

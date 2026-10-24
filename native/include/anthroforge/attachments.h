@@ -47,6 +47,11 @@ AF_API int af_shortcut_owner_anchor(uint64_t child,const double* world,const dou
     const double* offset,int mode,int index,const double* fallback,double* parent_local);
 AF_API int af_shortcut_owner_backsolve(uint64_t child,const double* world,const double* parent,
     const double* offset,int mode,int index,const double* fallback,const double* parent_local,double* output);
+/* Retained material anchors survive Boolean remeshing without face-index reassignment. */
+AF_API int af_shortcut_owner_material_capture(uint64_t child,const double* world,const double* offset,
+    int mode,int index,const double* fallback,double* output);
+AF_API int af_shortcut_owner_material_backsolve(uint64_t reference,uint64_t current,const double* world,
+    const double* parent,const double* offset,const double* record,const double* target,double* output);
 /* Restore unedited structural pins against their own retained material surface snapshots. */
 AF_API int af_attachment_retain_pins(uint64_t path,int knots,const int* pins,const int* targets,
     const double* records,int count,int* owners,double* weights,double* bindings);

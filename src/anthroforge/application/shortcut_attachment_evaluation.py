@@ -79,7 +79,10 @@ def backsolve(engine: Any, lookup: Any, context: Any, meshes: Any) -> None:
     parent = lookup[child.parent]
     anchor = context.anchor
     retained = (anchor.mode, anchor.index, anchor.fallback, anchor.parent_local)
-    matrix = shortcut_attachments.backsolve(engine, child, parent, meshes, retained)
+    if anchor.material_asset:
+        matrix = shortcut_attachments.material_backsolve(engine, child, parent, meshes, anchor)
+    else:
+        matrix = shortcut_attachments.backsolve(engine, child, parent, meshes, retained)
     lookup[child.id] = replace(child, matrix=matrix, status="ready", error="")
 
 

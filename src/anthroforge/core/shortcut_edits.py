@@ -21,6 +21,8 @@ class OwnerAnchor:
     index: int
     fallback: tuple[float, ...]
     parent_local: tuple[float, ...]
+    material_asset: str = ""
+    material_binding: tuple[float, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

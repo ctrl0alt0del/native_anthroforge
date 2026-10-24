@@ -31,15 +31,23 @@ intent and unrelated root `__init__.py`. Validation remains background-only.
 
 ## Current state
 
-Repository inspected; main and origin/main agree at starting revision. No runtime
-changes yet. Existing shoulder frame transfer reduces but does not eliminate error;
-remaining Ribs construction/correspondence must be resolved, not hidden by translation.
-Thumb effective legacy backsolve policy and index-based owner anchor are confirmed defects.
+Effective-policy capture now records legacy unset semantics and applies policies to
+direct wrappers and drivers. Owner backsolve captures a native material binding and
+retains its reference asset through pending contexts, history and saving. Defaults stay off.
+
+Not release complete: schema bump, original Thumb/shoulder qualification, corrected
+assembly and D01–D12 remain pending. Transferring the shoulder flow point in an additional
+experiment leaves the .11088 residual unchanged. Source GeometryNodes resamples cyclic
+guides to 64 points before factor sampling; migrated loft uses 65 shared samples.
 
 ## Verification
 
-Not run for this implementation. Prior diagnostic evidence is historical, under
-`build/shoulder-thumb-parity`; it does not qualify production corrections.
+- Windows native build and all five native tests pass.
+- 13 focused Python tests pass: shortcut transactions, remeshed material owner anchors,
+  migration policies and architecture/function limits. Full Ruff and mypy pass.
+- Native style check is still running. Full gate, GUI, profiler and packaging pending.
+- Background Blender recaptured effective policies from the matching assembly into
+  `build/parity-workflows-034/effective-inventory.json`, without saving the source.
 
 ## Next actions
 

@@ -4,6 +4,7 @@ from anthroforge.application.comparison_geometry import display_frame
 from anthroforge.application.object_frames import Frames
 from anthroforge.application.point_evaluation import position
 from anthroforge.application.workspace_policy import included
+from anthroforge.core.entities import SCP
 from anthroforge.core.object_registry import kind as object_kind
 from anthroforge.core.points import Anchor, Point
 from anthroforge.core.presentation import visible
@@ -38,7 +39,7 @@ def eligible(context, workspace):
 
 
 def category(item):
-    return CATEGORIES.get(object_kind(item), "anatomy")
+    return "geometry" if isinstance(item, SCP) else CATEGORIES.get(object_kind(item), "curves")
 
 
 def retained_frame(context, item, frames):

@@ -137,7 +137,8 @@ def verify_archive(controller, key):
         data = json.loads(archive.read("report.json"))
         assert data["report_id"] == key and data["category"] == "recommendation"
         assert data["description"] == "Recommendation: inspect marked area."
-        assert len(data["annotations"]) == 3 and len(archive.namelist()) == 4
+        expected = 5 if controller.feedback.comparison else 4
+        assert len(data["annotations"]) == 3 and len(archive.namelist()) == expected
         source = QImage.fromData(archive.read("original.png"))
         annotated = QImage.fromData(archive.read("annotated.png"))
     assert source == controller.feedback.image and source.size() == annotated.size()
@@ -219,10 +220,22 @@ def exercise(window, controller):
 
 
 def test_engine(controller, warnings):
+    if "--comparison" in sys.argv:
+        comparison_fixture(controller)
     engine = create_engine(controller, warnings)
     if engine.rootObjects() and "--small" in sys.argv:
         engine.rootObjects()[0].resize(1050, 680)
     return engine
+
+
+def comparison_fixture(controller):
+    session = controller.session
+    curve = session.command("curve.create")
+    session.wait(5)
+    ref = dict(target=curve, path=["engine_settings", "resolution"])
+    key = session.command("shortcut.expose", reference=ref)
+    session.command("shortcut.comparison.capture", shortcut=key)
+    controller.refresh()
 
 
 def run():

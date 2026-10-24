@@ -108,9 +108,9 @@ class GeometryEngine(NativeEngine):
         routing_trace.configure(self)
 
     def _expression_signatures(self) -> None:
-        from . import expressions, parametric, shortcut_attachments
+        from . import comparison, expressions, parametric, shortcut_attachments
 
-        for module in (expressions, parametric, shortcut_attachments):
+        for module in (comparison, expressions, parametric, shortcut_attachments):
             module.configure(self)
 
     def _curve_signatures(self) -> None:

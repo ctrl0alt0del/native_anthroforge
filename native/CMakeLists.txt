@@ -1,5 +1,6 @@
 add_subdirectory(boolean)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
+    src/comparison_fingerprint.cpp
     src/inspection_mapping.cpp src/inspection_compare.cpp src/inspection_buffers.cpp src/inspection_point.cpp
     src/painting.cpp src/painting_mapping.cpp src/painting_projection.cpp src/painting_stroke.cpp
     src/sections.cpp

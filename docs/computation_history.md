@@ -2187,3 +2187,23 @@ average. This is a read-only formula input; no new write channel is introduced.
   screenshots were inspected. The [task record](tasks/shortcut-inspection-031.md) identifies
   local reports and limitations. Native scene inspection is background-only; no physical
   interactive acceptance or measured application speed improvement is claimed.
+
+### CH-069 — Session comparison fingerprints and replay observation (in progress)
+
+- New inspection-only native boundary compares owned accepted mesh/path data. Two
+  FNV-1a-derived 64-bit accumulators detect stored-coordinate changes; oriented
+  triangles are cyclically normalized and sorted so enumeration alone is not a change.
+  This custom pair is not a cryptographic checksum, standardized 128-bit FNV, vertex
+  correspondence, or a tolerance-based shape-equivalence test. Archive validation
+  must use cryptographic checksums independently.
+- Reference: https://www.rfc-editor.org/info/rfc9923 . Hashing and triangle sorting
+  execute in C++ through a cancellable read-only coordinator job. Python orchestrates
+  object-level records. Geometry offsets are included in displayed frames.
+- Baselines own separate resource catalogues without editing document/history. The
+  bounded semantic journal observes public shortcut operations and transaction
+  boundaries; unrelated authored changes explicitly invalidate replay completeness.
+- Preserved: all numerical construction/attachment algorithms, priorities, authored
+  revisions, save checkpoints and project schema. No geometry repair or resampling.
+- Current evidence: ten focused foundation/architecture tests pass, configured mypy
+  passes, and the native build passes five CTests. Desktop comparison, archives,
+  production profiling and portable release acceptance are still pending.

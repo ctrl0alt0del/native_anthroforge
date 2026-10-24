@@ -45,3 +45,8 @@ Release only after qualification: `dist/0.3.2/AnthroForge.dist` and companion so
 ## Recovery
 
 Read this record, AGENTS.md and engineering guidelines. Current first step is foundations.
+
+Foundation checkpoint: session baseline ownership, comparison operations, native mesh/path
+fingerprints, and bounded semantic journal implemented. Ten focused tests and configured
+mypy pass; native build has five passing CTests. No desktop modes/export/replay delivery
+claimed. Next: desktop staged historical geometry and controls, then frozen archives.

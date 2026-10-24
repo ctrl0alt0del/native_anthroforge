@@ -136,6 +136,8 @@ EDITS = {
     "fiber.binding.scope": fiber_operations.binding_scope,
     "fiber.binding.set": fiber_bindings.assign,
     "fiber.binding.remove": fiber_bindings.remove,
+    "fiber.binding.offset": fiber_bindings.normal_offset,
+    "fiber.rebind": fiber_bindings.rebind_all,
     "fiber.supports.configure": fiber_support_operations.configure,
     "image.import": image_operations.import_image,
     "image.replace": image_operations.replace_source,

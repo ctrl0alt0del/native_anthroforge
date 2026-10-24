@@ -24,6 +24,7 @@ ColumnLayout {
     }
     function remove(row) { const changes={}; changes[row.mode]=policy[row.mode].filter(r=>r.target!==row.target || r.role!==row.role); update(changes); }
     Label { text:"Deformation supports"; color:Theme.muted }
+    UiButton { objectName:"fiberRebindAll"; text:"Rebind all points"; hint:"Recapture current positions on their existing targets"; onClicked:workspace.run("fiber.rebind",{curve:panel.curve.id}) }
     UiCheck { objectName:"fiberSupportsAutomatic"; text:"Automatic supports"; checked:panel.policy.automatic; onClicked:panel.update({automatic:checked}); hint:"Extra surfaces that deform the Fiber; routing obstacles are configured separately" }
     SurfaceSelector { id:choice; Layout.fillWidth:true }
     RowLayout {

@@ -9,7 +9,7 @@ import numpy as np
 from anthroforge.core.construction import Curve, CurvePoint
 
 from .construction import HANDLES, curve_records
-from .mesh import D, GeometryEngine, pointer
+from .mesh import D, GeometryEngine, U, doubles, pointer
 
 FIELDS = ("position", "left", "right", "left_mode", "right_mode", "radius", "tilt")
 PROTECTION = frozenset(("stacking_fixed", "protected_crease"))
@@ -17,6 +17,40 @@ PROTECTION = frozenset(("stacking_fixed", "protected_crease"))
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_curve_point_edit", [D, c.c_int, c.c_int, c.c_int, D, c.c_int, D])
+    engine.bind("af_curve_place_points", [D, c.c_int, c.POINTER(c.c_int), D, c.c_int, D, D, U])
+
+
+def place(
+    engine: GeometryEngine, curve: Curve, indices: Any, goals: Any, world: Any, cancel: int
+) -> Curve:
+    data, indices, goals, world = placement_inputs(curve, indices, goals, world)
+    output = np.empty((len(curve.points), 13))
+    args = placement_arguments(data, indices, goals, world, output, cancel)
+    engine.check(engine.library.af_curve_place_points(*args))
+    points = tuple(unpack(p, row) for p, row in zip(curve.points, output, strict=True))
+    return replace(curve, points=points)
+
+
+def placement_inputs(curve: Curve, indices: Any, goals: Any, world: Any) -> Any:
+    indices, goals, world = np.asarray(indices, dtype=np.int32), doubles(goals), doubles(world)
+    if indices.ndim != 1 or goals.shape != (len(indices), 3) or world.size != 16:
+        raise ValueError("Curve placement requires one world-space xyz goal per point index.")
+    return curve_records(curve), indices, goals, world
+
+
+def placement_arguments(
+    data: Any, indices: Any, goals: Any, world: Any, output: Any, cancel: int
+) -> Any:
+    return (
+        pointer(data),
+        len(data),
+        indices.ctypes.data_as(c.POINTER(c.c_int)),
+        pointer(goals),
+        len(indices),
+        pointer(world),
+        pointer(output),
+        cancel,
+    )
 
 
 def point(engine: GeometryEngine, curve: Curve, index: int, options: dict[str, Any]) -> CurvePoint:

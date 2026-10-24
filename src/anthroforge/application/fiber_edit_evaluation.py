@@ -10,7 +10,7 @@ from anthroforge.core.fibers import Fiber, FiberBinding
 from anthroforge.core.results import EvaluationResult
 from anthroforge.native import attachment_fields, construction, curve_editing, path_editing, paths
 
-from . import attachment_assets, fiber_retention, fiber_supports
+from . import attachment_assets, fiber_offset_evaluation, fiber_retention, fiber_supports
 from .path_assets import PathAsset
 
 
@@ -29,6 +29,10 @@ def evaluate(
     opening = resources.paths[item.edit.baseline].authored
     positions = attachment_assets.resolved_points(engine, document, resources.meshes, asset, cancel)
     current = attachment_assets.evaluate(engine, opening, asset, positions, world, cancel)
+    item = fiber_offset_evaluation.prepare(
+        engine, document, resources, item, world, cancel, current
+    )
+    opening = current.authored if item.edit and item.edit.offsets else opening
     path, records = edited_geometry(engine, current, opening, item, cancel)
     return recapture(engine, item, resources, document, EditGeometry(path, records, world), cancel)
 

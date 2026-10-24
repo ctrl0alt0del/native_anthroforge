@@ -14,6 +14,7 @@ class FiberEdit:
     candidates: tuple[SurfaceReference, ...]
     rebind: tuple[str, ...] = ()
     shape: bool = True
+    offsets: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

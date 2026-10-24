@@ -16,6 +16,12 @@ static std::vector<Bezier> read_bezier(const double* data,int count) {
     }
     return result;
 }
+static M4 placement_frame(const double* world,int count,int changed) {
+    const M4 matrix=Eigen::Map<const M4>(world);
+    if(count<2||changed<1||!matrix.allFinite()||!matrix.fullPivLu().isInvertible())
+        throw std::runtime_error("Invalid curve point placement inputs.");
+    return matrix.inverse();
+}
 static V3 auto_direction(const V3& a,const V3& b) {
     const double la=a.norm(),lb=b.norm();
     const V3 direction=a/(la==0?1:la)+b/(lb==0?1:lb);
@@ -251,6 +257,20 @@ int af_curve_handles(double* points,int count,int closed) {
                 points[i*13+6+axis]=curve[i].right[axis];
             }
             points[i*13+11]=curve[i].lm%4+4; points[i*13+12]=curve[i].rm%4+4;
+        }
+        return 0;
+    } catch(const std::exception& e) { af::set_error(e.what()); return 1; }
+}
+int af_curve_place_points(const double* records,int count,const int* indices,const double* goals,
+    int changed,const double* world,double* output,uint64_t cancel) {
+    try {
+        const af::M4 inverse=af::placement_frame(world,count,changed);
+        std::copy_n(records,13*count,output);
+        for(int i=0;i<changed;++i) {
+            af::check_cancel(cancel); const int index=indices[i]; const af::V3 goal(goals+3*i);
+            if(index<0||index>=count||!goal.allFinite()) throw std::runtime_error("Invalid curve point goal.");
+            double* row=output+13*index; const af::V3 delta=af::point(inverse,goal)-af::V3(row);
+            for(int j=0;j<3;++j) { Eigen::Map<af::V3> value(row+3*j); value+=delta; }
         }
         return 0;
     } catch(const std::exception& e) { af::set_error(e.what()); return 1; }

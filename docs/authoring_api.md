@@ -925,3 +925,10 @@ Required pin targets cannot be excluded. Reconfiguration retains current shape a
 captures new fields through the coordinator with normal cancellation/undo semantics.
 Schema 6 persists policy; schemas 4/5 load with existing automatic behavior and retain
 accepted results. This branch is not a qualified 0.3.4 release.
+
+`fiber.rebind(curve)` recaptures all bound points at current resolved positions on
+their existing target roles, as one undo action. It does not silently choose new parents.
+`fiber.binding.offset(curve, point, value)` sets signed normal distance in metres on
+the retained material pin. Native worker evaluation updates controls and handles; the
+point retains its surface reference. Manual-mode pending edits survive save/open.
+Bulk repair proposal/review is still pending; these operations do not establish it.

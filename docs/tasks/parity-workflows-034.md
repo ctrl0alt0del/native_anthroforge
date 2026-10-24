@@ -53,13 +53,22 @@ Policy-only repair stays .00059519: both corrections are necessary. Working copi
 snapshots are in build/parity-workflows-034; source projects remain unchanged. Actual
 render inspection and broader shortcut qualification are still required.
 
+D02 partial/D03 implementation: `fiber.rebind` recaptures all current resolved positions
+on existing targets; `fiber.binding.offset` edits the retained record's signed normal
+component. Worker resolution batches material frames, moves controls/handles natively,
+rebuilds path and preserves the binding. No UI-thread geometry query or nearest rebind.
+Manual pending offset intent persists and remaps during duplication. Ordinary point
+movement supersedes a pending offset request for that point. Bulk repair proposals remain
+unfinished; Rebind All alone does not complete D02.
+
 ## Verification
 
 - Windows native build and all five native tests pass.
 - 13 focused Python tests pass: shortcut transactions, remeshed material owner anchors,
   migration policies and architecture/function limits. Full Ruff and mypy pass.
 - Native style check passed. Full gate, profiler and packaging pending.
-- 51 focused tests passed, then six support/architecture tests including explicit tissue
+- 21 pin/edit/junction/architecture tests passed after D03; full native build/5 tests pass.
+- 51 earlier focused tests passed, then six support/architecture tests including explicit tissue
   supports. Extended offscreen fiber_editor_acceptance passes the real support toggle.
 - construction_editor_acceptance fails on a UiNumberField propertyState binding loop;
   reproduced with the new support component removed in an ignored QML copy. Investigate

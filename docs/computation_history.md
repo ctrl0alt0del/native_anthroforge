@@ -1,5 +1,18 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: authored material-normal pin edits
+
+Existing point dragging uses explicit nearest recapture; that is unsuitable for a
+Normal Offset edit that must retain material identity. New offset intents update the
+record's signed normal component, resolve batched material frames in the worker and
+place authored controls/handles through native af_curve_place_points before existing
+path evaluation. No nearest reassignment, Python numerical fallback, or UI-thread
+material query is introduced. Ordinary point edits supersede pending offset intents.
+Tests cover retained reference, immediate path movement, undo, Manual save/open and
+Rebind All shape/target preservation. Offscreen desktop control activation passed.
+Full profiler/release qualification remains pending.
+
+
 ## In-progress 0.3.4: retained shortcut owner material anchors
 
 Previously owner backsolve reread a current face/vertex index; Boolean remeshing can

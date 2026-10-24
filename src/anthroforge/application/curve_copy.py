@@ -91,6 +91,7 @@ def copied_edit(curve: Fiber, identities: dict[str, str]) -> Any:
         curve.edit,
         candidates=tuple(remap(r, identities) for r in curve.edit.candidates),
         rebind=tuple(identities.get(k, k) for k in curve.edit.rebind),
+        offsets=tuple(identities.get(k, k) for k in curve.edit.offsets),
     )
 
 

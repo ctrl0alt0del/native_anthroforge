@@ -9,7 +9,7 @@ if os.name == "nt":
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QMetaObject, QObject, Qt
+from PySide6.QtCore import Q_ARG, QMetaObject, QObject, Qt
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
@@ -71,6 +71,7 @@ def run():
 def exercise(controller, engine):
     create(controller, engine)
     support_override(controller, engine)
+    pin_controls(controller, engine)
     object_transform_policy(controller, engine.rootObjects()[0])
     editing(controller)
     component_shortcuts(controller, engine.rootObjects()[0])
@@ -221,6 +222,18 @@ def support_override(controller, engine):
     settle(controller)
     item = controller.session.document.object(controller.selection)
     assert not item.support_policy.automatic and item.result.status == "ready"
+    assert not controller.session.scheduler.errors
+
+
+def pin_controls(controller, engine):
+    window = engine.rootObjects()[0]
+    control = find(window, "fiberPinNormalOffset")
+    assert QMetaObject.invokeMethod(control, "edited", Qt.DirectConnection, Q_ARG(float, 0.05))
+    settle(controller)
+    item = controller.session.document.object(controller.selection)
+    assert item.bindings[0].attachment.binding[17] == 0.05
+    assert QMetaObject.invokeMethod(find(window, "fiberRebindAll"), "clicked", Qt.DirectConnection)
+    settle(controller)
     assert not controller.session.scheduler.errors
 
 

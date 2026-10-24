@@ -1,6 +1,9 @@
 """World radius is presentation state, never an anatomical or routing parameter."""
 
+import json
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
+from zipfile import ZipFile
 
 import numpy as np
 import pytest
@@ -75,3 +78,14 @@ def test_radius_validation_and_distinct_workspace_styles(session):
     session.command("fiber.presentation", target=fiber.id, radius=0)
     assert session.workspace.fibers[0].radius == 0
     assert replace(session.workspace, fibers=()) == original
+
+
+def test_repeated_worker_tube_calls_are_all_attributed_without_changing_geometry(session, tmp_path):
+    path = line(session)
+    session.command("profile.start")
+    with ThreadPoolExecutor(4) as workers:
+        meshes = list(workers.map(lambda _: path_display.tube(path, IDENTITY, 0.01), range(32)))
+    result = session.command("profile.stop", path=str(tmp_path / "native.afprofile.zip"), wait=True)
+    with ZipFile(result["path"]) as archive:
+        summary = json.loads(archive.read("summary.json"))
+    assert len(meshes) == summary["durations"]["native/af_path_display_tube"]["count"] == 32

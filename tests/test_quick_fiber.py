@@ -68,6 +68,10 @@ def test_invalid_or_canceled_creation_leaves_no_orphan(session):
     with pytest.raises(ValueError, match="clicked surface"):
         session.command("fiber.place", points=[dict(position=[0, 0, 0])] * 2)
     assert not session.document.objects
+    cancel_creation(session, target)
+
+
+def cancel_creation(session, target):
     job = session.command(
         "fiber.place",
         points=[
@@ -78,3 +82,32 @@ def test_invalid_or_canceled_creation_leaves_no_orphan(session):
     session.scheduler.cancel_job(job)
     session.wait()
     assert not session.document.objects
+
+
+def test_failed_initial_route_never_publishes_a_straight_fiber_or_seed(session):
+    target = cube(session)
+    session.command("import", path=str(CUBE), parent=target, units=1.0)
+    session.wait()
+    session.command(
+        "fiber.place",
+        points=[
+            dict(position=[-0.4, 0, 0.501], target=target),
+            dict(position=[0.4, 0, 0.501], target=target),
+        ],
+    )
+    session.wait()
+    assert not session.document.objects
+    assert any("unrelated surface" in j.error for j in session.scheduler.jobs)
+
+
+def test_quick_routed_fiber_preserves_pin_targets_when_its_parent_moves(session):
+    target = cube(session)
+    fiber = placed(session, target)
+    original = session.resources.paths[fiber.result.asset].path.array()[[0, -1], :3].copy()
+    session.command("scp.transform", entity=target, values=[0, 0, 1, 0, 0, 0, 1, 1, 1])
+    session.wait()
+    changed = session.document.object(fiber.id)
+    assert changed.bindings == fiber.bindings and changed.supports == fiber.supports
+    assert changed.attachment_asset == fiber.attachment_asset
+    current = session.resources.paths[changed.result.asset].path.array()[[0, -1], :3]
+    np.testing.assert_allclose(current, original + [0, 0, 1], atol=1e-12)

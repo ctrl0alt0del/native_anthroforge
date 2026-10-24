@@ -96,6 +96,12 @@ class GeometryEngine(NativeEngine):
         configure_control_geometry(self)
         self._curve_signatures()
         self._inspection_signatures()
+        self._presentation_signatures()
+
+    def _presentation_signatures(self) -> None:
+        from . import path_display
+
+        path_display.configure(self)
 
     def _inspection_signatures(self) -> None:
         from . import inspection, inspection_goals, painting, routing_trace, sections

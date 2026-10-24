@@ -5,6 +5,28 @@ diagnostics only. This is an implementation audit, not a new release plan or a c
 that every Blender shape/update matches. Known shoulder/Thumb differences are recorded
 separately in [confirmed parity findings](addon_parity_findings.md).
 
+## Follow-up implementation status
+
+The table below updates the original audit without rewriting its historical inventory.
+`codex/parity-workflows-034` implements D01–D12 through shared operations and desktop
+entry points. These are integrated feature-branch changes, not a released 0.3.4 build.
+
+| Findings | Implemented follow-up |
+| --- | --- |
+| D01–D04 | Separate Fiber support policy, pin checks/approved repairs, Normal Offset, Rebind All, saved warm-start policy and cold rerouting. |
+| D05 | Active length weight and trial checkpoint controls for Custom/PIQP; collision checks retained. |
+| D06 | Connected body splitting with first SCP/children retained, siblings and shared Hook controls. |
+| D07–D08 | Read-only source-replacement assessments, explicit loss/rebind approval, stale rejection and one-action application for imported SCPs and tissues. |
+| D09 | Existing-tissue preset application with explicit preset/custom constraint ownership. |
+| D10 | Surface-click creation of an already-bound, solved ROUTED Fiber, without an authored draft Curve. |
+| D11 | Per-workspace world-space Fiber radius; native background tubes, staged rendering and displayed-mesh picking. |
+| D12 | One-action ordered selection of all surface sources. |
+
+Recovery, evidence and pending qualification are maintained in
+[the task record](tasks/parity-workflows-034.md). F01's Ribs strip/welding decision remains
+pending; the source shoulder response is not claimed fixed. Mirroring, skin and other
+larger release exclusions below remain unchanged.
+
 ## Method and scope
 
 Inspected the current addon operators, registered RNA properties, UI, and production

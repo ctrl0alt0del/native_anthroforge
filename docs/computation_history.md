@@ -1,5 +1,17 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: display worker attribution qualification
+
+Production qualification keeps source geometry/path hashes, document/attachment records
+and undo unchanged across all 326 Fiber displays. The first recording contained 326 task
+executions but only one native tube span; the library retained a raw ctypes function after
+lazy concurrent declaration. Registering display signatures during existing engine setup
+restored all 326 spans. The qualifier now rejects incomplete reports or mismatched job/call
+counts. Repeated-worker regression covers the boundary. This changes ABI registration, not
+a numerical algorithm or profiler retention. Full gate passed at cc15855; subsequent targeted
+checks pass and the aggregate suite is being rerun. Single-run native mean/max were 1.31/8.11ms;
+collector costs overlap and are not subtracted. These are not GUI-latency or speedup claims.
+
 ### In-progress 0.3.4: world-space Fiber presentation tubes
 
 Fixed pixel-width centerlines had no independent Fiber thickness. Positive-radius Fiber

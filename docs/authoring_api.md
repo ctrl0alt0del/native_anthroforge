@@ -948,7 +948,7 @@ their existing target roles, as one undo action. It does not silently choose new
 `fiber.binding.offset(curve, point, value)` sets signed normal distance in metres on
 the retained material pin. Native worker evaluation updates controls and handles; the
 point retains its surface reference. Manual-mode pending edits survive save/open.
-Bulk repair proposal/review is still pending; these operations do not establish it.
+Bulk repair uses the explicit Issues operations below.
 
 `fiber.pins.check(curves=None)` requests on-demand read-only Issues checks. Query
 `issues.list` with provider `fiber_pins.v1` for proposed per-pin repairs.
@@ -965,3 +965,34 @@ This applies equally to curves and Fibers; route inspection remains read-only.
 consumer order, including branch sources. Desktop Select all source curves replaces
 object selection as one batch without editing construction or entering multi-curve
 component editing. Invalid batch identities leave selection unchanged.
+
+ROUTED `curve.engine_settings(curve, **settings)` includes nonnegative `length_weight`
+(default .9) and integer `checkpoint_steps` (1–1000, default 1). The latter sets native
+trial steps between checkpoints; `accepted_steps` still caps accepted solver updates.
+Neither disables collision validation. Inspection records every trial independently.
+
+`scp.split(entity, points=[interior point IDs])` splits a single whole-guide body into
+sibling SCP segments and shared endpoint Hook controls. The first SCP identity and its
+children remain. Supported guides are open Bézier/polyline, unshared, without curve-stage
+deformers; the SCP needs an anatomical parent. Unsupported constructions reject before
+editing. The operation returns created entity/control IDs and is one undo action.
+
+`scp.mesh.replace.assess(target, path, units=None, y_up=None)` prepares a native candidate
+without editing the document. Inspect `scp.mesh.replace.status()` for token/state/changes;
+`scp.mesh.replace.apply(token, approved=[change keys])` requires every listed approval.
+`scp.mesh.replace.cancel()` releases the candidate. Original import units/axis conventions
+are defaults. Reliable material references remain; incompatible indexed data and required
+recaptures are explicit. Missing approval or a stale assessment leaves the document intact.
+
+`tissue.source.options(target)` lists attached construction. The matching
+`tissue.source.replace.assess(target, source)`, `.status()`, `.apply(token, approved=[])`
+and `.cancel()` workflow supports Anchor/Fiber/Membrane source changes. Reviews identify
+incompatible evaluator/settings/fields/masks, cropping, relationships and recaptures.
+Unavailable Base/Final roles reject actionably; no role is substituted. A successful
+candidate installs prepared tissue stages together without recomputing those same stages;
+consumers update normally. Old source objects remain. Application is one undo action.
+
+`tissue.preset.apply(target, preset)` resets inflation, relaxation and preset-owned
+constraints on an existing compatible tissue. It preserves classification, source,
+custom fields/regions/constraints, cropping, smoothing and stacking intent. Conflicts
+or an incompatible field layout require explicit resolution, without silent discard.

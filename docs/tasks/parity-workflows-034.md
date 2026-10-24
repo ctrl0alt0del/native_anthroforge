@@ -99,18 +99,11 @@ independent work; qualify full frame/correspondence transfer after that decision
 
 1. Resolve F01 after the pending seam decision; compare unchanged baseline and Ribs=3
    analytically and visually. Preserve originals and no silent mesh fallback.
-2. Implement D05 active length weight and meaningful interactive/final budgeting. Native
-   routing currently steps one accepted iteration between cancellation checks; do not
-   add inert controls or weaken collision validation. Custom/PIQP defaults must match.
-3. Implement D06 connected SCP splitting and D07/D08 replacement assessment/approval,
-   preserving reliable references and rejecting stale assessments atomically.
-4. Implement D09 preset ownership/application, D10 direct Fiber placement and D11 native
-   world-radius presentation/picking. Never substitute pixel linewidth for world radius.
-5. Resolve the recorded GUI metadata binding loop without regressing 0.3.3 targeted
-   notification performance; verify with the profiler and offscreen acceptance.
-6. Qualify remaining geometry, undo/save/resources and actual 96-muscle assembly. Save a
+2. D01-D12 and the GUI metadata notification repair are implemented. Continue final
+   integration/ownership review, checking desktop and headless lifecycle coverage.
+3. Qualify remaining geometry, undo/save/resources and actual 96-muscle assembly. Save a
    final corrected copy outside build only after complete acceptance; no mirrored muscles.
-7. Final docs/notices/version, full gates, canonical dist/0.3.4/AnthroForge.dist and source
+4. Final docs/notices/version, full gates, canonical dist/0.3.4/AnthroForge.dist and source
    archive, then validated merge/push. Do not present this task as complete beforehand.
 
 ## Recovery inputs
@@ -330,3 +323,35 @@ made it absent from the scene and was corrected before this checkpoint.
 
 Full development gate, representative assembly/performance qualification, packaging and
 F01 user decision remain pending. No release version advance or main merge.
+
+## Integrated gate and production display qualification
+
+The full development gate passed at cc15855: Ruff/format, configured mypy, native build,
+all five native tests, full native style, PowerShell checks, 2131 pytest cases in 154.91s,
+numerical dependencies and native doctor. Subsequent native-registration/test/docs changes
+have targeted checks passing; a new complete pytest run is in progress.
+
+Offscreen replacement, tissue retarget, SCP split, construction editor and preset tools
+all pass without warning suppression. Actual texture-only radius rendering remains qualified
+separately from modal/controller tests; no foreground desktop or mouse/keyboard takeover.
+
+The corrected local 96-muscle assembly contains 59 SCPs, 326 Fibers, 96 Membranes and 96
+Tissues. All 326 read-only display jobs succeeded; source geometry/path buffers hash exactly
+before/after, and the entire document/attachment records and undo position remain unchanged.
+The profiling report is complete with no losses and zero unattributed native bytes. It
+captures 326 tube calls, averaging 1.31ms and max 8.11ms in this run. Whole first projection/
+submission was 342ms, coordinator work 694ms and CPU-only staging-loop total 58ms. These are
+single-run costs under background validation, not speedup, GPU, frame-rate or input-latency
+claims. Collector cost is recorded separately and is not subtracted from application time.
+
+The first report exposed an attribution gap: 326 successful jobs but only one native tube
+span, and the library ended with a raw ctypes function. New display signatures had been
+registered lazily during concurrent work. Moving registration into the existing native
+engine initialization restored all 326 native spans. The maintained production qualifier
+now requires job/call-count agreement and report completeness; a repeated-worker regression
+also checks full attribution. No profiler event-loss mechanism or numerical kernel changed.
+
+Local evidence: build/parity-workflows-034/fiber-display/assembly-registered/display.afprofile.zip
+and qualification.json, plus the inspected radius captures. The reusable qualifier is
+tools/fiber_display_qualification.py; it opens a copy read-only and writes no source project.
+F01 remains pending; no final corrected assembly, release build or main merge is claimed.

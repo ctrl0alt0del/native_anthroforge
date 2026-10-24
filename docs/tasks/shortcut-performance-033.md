@@ -1,7 +1,7 @@
 # Shortcut performance 0.3.3
 
 - Branch: codex/shortcut-performance-033; baseline: 31fc158; integration: main.
-- Status: implementation and paired profiling complete; final qualification running.
+- Status: implementation and qualification complete.
   Preserve unrelated root __init__.py.
 - Scope: optimize property UI invalidation, formula observation, redundant document
   reconstruction, then priority bookkeeping. No numerical or attachment behavior changes.
@@ -50,3 +50,20 @@ undoable deletions); entries/epochs reset across documents. No geometry resource
 copied into the metadata cache. Native computation, schema, undo/save and urgency rules
 remain unchanged. Source render needs the Windows platform for hidden D3D11; the Qt
 offscreen platform alone cannot initialize that GPU renderer.
+
+## Final qualification
+
+- Full tools/check.ps1 passed: 2,056 tests, five native CTests, Ruff/format, strict typing,
+  native/script style and numerical smoke checks. Gate log records existing non-failing
+  native warnings and Qt property-map deprecation notices.
+- Canonical 0.3.3 executable passed all minimal-PATH portable workflows, including native
+  images, attachments, tissues, profiling, comparisons and isolated replay.
+- Relocated compiled QML harness passed driven-property removal and undo subscription
+  checks. Source editors passed lock/unlock, numerical units and navigation checks; the
+  texture-only D3D11 scene passed consumer update and exact undo. Captures were inspected.
+- Both pre-edit and post-edit fingerprints were checked across every paired production
+  run; all coordinates, relationships and oriented connectivity match. No source project
+  was overwritten. No interactive desktop or physical latency acceptance is claimed.
+- Runtime code is captured by 7af1946; package staging records ab802e9 with tracked changes
+  because the qualification checkpoint was committed during compilation. No runtime code
+  changed after staging; final changes are documentation only.

@@ -57,6 +57,13 @@ GPU performance or full Qt binding attribution. Reports are under
 
 Metadata subscriptions, exposure/driver edits, undo and Hook topology-lock changes pass
 focused regression tests. Offscreen editors and hidden native rendering pass, including
-Parametric consumer updates and exact undo. Final gate and portable delivery are pending. See the
+Parametric consumer updates and exact undo. The complete development gate passes: 2,056
+tests, five native CTests, configured typing/style and numerical smoke checks. The canonical
+Windows executable passes all minimal-PATH portable workflows. A relocated compiled-UI
+harness confirms metadata updates on driver removal and undo. See the
 [task record](tasks/shortcut-performance-033.md). Background/offscreen checks do not establish
 physical display latency or hands-on interaction acceptance.
+
+Delivery: `dist/0.3.3/AnthroForge.dist/AnthroForge.exe` and
+`dist/AnthroForge-0.3.3-source.zip`. Existing Qt property-map deprecation notices and native
+compiler/style warnings remain non-failing; they are not evidence of a clean warning log.

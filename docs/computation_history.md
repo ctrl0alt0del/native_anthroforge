@@ -2215,7 +2215,7 @@ average. This is a read-only formula input; no new write channel is introduced.
   explicit comparison 431�587 ms. These are workload observations, not controlled overhead
   or speedup claims. See the [task record](tasks/shortcut-comparison-032.md).
 
-### CH-070 — Targeted shortcut observation and incremental priority edges (qualification pending)
+### CH-070 — Targeted shortcut observation and incremental priority edges (0.3.3)
 
 - Observed on the 96-muscle assembly: repeated UI property queries on unrelated result
   revisions, 82,096 formula source checks in one Ribs update, duplicate document creation,
@@ -2230,5 +2230,12 @@ average. This is a read-only formula input; no new write channel is introduced.
   temporary urgency donation and queue ordering semantics are preserved.
 - No geometry, attachment, formula language, numerical tolerances, schema or save behavior
   changes. Ownership/coupling and performance qualification are tracked in
-  [the task record](tasks/shortcut-performance-033.md). Initial contract tests and typing pass;
-  production preservation and final delivery evidence are pending.
+  [the task record](tasks/shortcut-performance-033.md). The gate passes 2,056 tests, five native
+  CTests, typing, configured style and numerics; portable and compiled metadata checks pass.
+
+- Twelve paired production trials preserve coordinates, poses, bindings and oriented
+  connectivity. Ribs/Humerus/Radius median headless reductions are 16.9/18.6/20.5%; Thumb's
+  2.9% is small. Offscreen bounded editor work falls 29.5% on average; uncached metadata
+  calls fall from 6,330 to zero during result updates. These are combined changes, not
+  isolated causal estimates for each optimization. Existing Thumb triangle enumeration
+  variation remains. See [measurement scope and limitations](shortcuts_033.md).

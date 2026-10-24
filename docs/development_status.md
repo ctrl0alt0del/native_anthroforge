@@ -1,7 +1,22 @@
 # AnthroForge development validation
 
-Current release qualification is in [shortcut comparison](tasks/shortcut-comparison-032.md).
+Current release qualification is in [shortcut performance](tasks/shortcut-performance-033.md).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Shortcut update performance (0.3.3)
+
+Targeted UI metadata subscriptions, reverse formula reads, conditional immutable-document
+replacement and registry-maintained priority links are implemented. The development gate
+passes 2,056 tests, five native CTests, typing, configured style and numerics. Twelve paired
+production trials retain coordinates, poses, bindings and oriented connectivity. Median
+headless improvements are 16.9% Ribs, 18.6% Humerus and 20.5% Radius; Thumb's 2.9% is small.
+An offscreen 30-tick ABBA workload improves by 29.5% on average, with identical remaining
+job counts. These measurements include profiling overhead and uncontrolled background load.
+
+Full minimal-PATH portable workflows, compiled metadata updates on driver removal/undo,
+source editor tests and hidden native rendering pass. Qt offscreen UI checks do not validate
+GPU output; separate Windows-platform texture-only captures do. No physical interactive
+acceptance or displayed FPS claim is made. See [the evidence](shortcuts_033.md).
 
 ## Shortcut comparison (0.3.2)
 

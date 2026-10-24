@@ -27,6 +27,7 @@ class Attachment:
     vertex_lock: int = -1
     binding: tuple[float, ...] = ()
     material_asset: str = ""
+    parent_instance: str = ""
 
     def __post_init__(self) -> None:
         if self.parent_mode not in ("SURFACE_NEAREST", "OBJECT_ORIGIN"):
@@ -50,6 +51,7 @@ class AttachmentReceipt:
     settings: Attachment
     evaluator_version: int = 0
     effective: Attachment | None = None
+    parent_reflection: tuple[float, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

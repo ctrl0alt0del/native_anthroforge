@@ -2288,3 +2288,19 @@ average. This is a read-only formula input; no new write channel is introduced.
   tests and one automatic mirrored-obstacle routing case pass. Numerical/GUI/parity,
   memory and performance release qualification remain pending. Existing source inflation,
   smoothing and routing objectives are unchanged. See the ongoing task for limitations.
+
+### CH-073 — Reflected stacking providers and SCP spatial attachment parents
+
+- Previous: stacking and SCP propagation assumed authored spatial parents/providers.
+- New: query-only reflected accepted-final material domains reuse source resources;
+  native parent-first SCP propagation composes a retained spatial reflection with the
+  updated parent frame. Geometry and relationship identities remain separate.
+- Why: source consumers must be able to use another object's mirror without generating
+  independently evaluated mirrored geometry or rebinding on plane edits.
+- Preserved: material references, exact constraints, one coordinator, source-only writers,
+  final-role failure semantics and native numerical ownership.
+- Evidence: 24 focused mirror/symmetric/desktop/stacking tests pass; five native CTests
+  pass; mypy passes. Plane edits move the attached original without changing its binding.
+  Shifted stacking fixture exposes 23 contradictory fixed points (up to 0.01 m deficit)
+  and is intentionally rejected. This is not a guarantee that arbitrary supports are feasible.
+- Limits: complete lifecycle, offscreen visuals, profiling and release packaging pending.

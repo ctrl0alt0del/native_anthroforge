@@ -4,6 +4,7 @@ from collections import deque
 from collections.abc import Iterator, Mapping, Set
 from dataclasses import dataclass, field
 from types import MappingProxyType
+from typing import Any
 
 from . import deformer_references, junctions, routing_obstacles, tissue_dependencies
 from .construction import Control, Curve, Deformer
@@ -12,6 +13,8 @@ from .cycle_analysis import cycles
 from .entities import SCP
 from .mirror_dependencies import inputs as mirror_inputs
 from .mirroring import parse as mirror_instance
+from .surface_references import SurfaceReference
+from .anatomical_surfaces import port as surface_port
 from .object_outputs import output
 from .objects import ObjectRecord
 from .results import Port
@@ -72,8 +75,11 @@ def parent_inputs(item: SCP, enabled: bool) -> set[Port]:
     if not item.parent or not enabled:
         return set()
     result = {Port(item.parent, "pose")}
+    if item.attachment.parent_instance:
+        result.add(Port(item.attachment.parent_instance, "mirror"))
     if item.attachment.parent_mode == "SURFACE_NEAREST":
-        result.add(Port(item.parent, "geometry"))
+        ref = SurfaceReference(item.parent, instance=item.attachment.parent_instance)
+        result.add(surface_port(ref))
     return result
 
 
@@ -115,20 +121,23 @@ def build(
 
 def mirror_edges(edges: dict[Port, set[Port]]) -> dict[Port, set[Port]]:
     owners = {p.owner for p in edges}
-    result = {
+    result: dict[Port, set[Port]] = {
         ref: set()
         for values in edges.values()
         for ref in values
         if ref.output == "mirror" and ref.owner in owners
     }
-    for values in tuple(edges.values()):
-        for ref in values:
-            instance = mirror_instance(ref.owner)
-            if instance and instance.source in owners and instance.rule in owners:
-                plane = Port(instance.rule, "mirror")
-                result[ref] = {Port(instance.source, ref.output), Port(instance.source, "pose"), plane}
-                result[plane] = set()
+    for ref in set().union(*edges.values()):
+        instance = mirror_instance(ref.owner)
+        if instance and instance.source in owners and instance.rule in owners:
+            result.update(instance_edges(instance, ref))
     return result
+
+
+def instance_edges(instance: Any, ref: Port) -> dict[Port, set[Port]]:
+    plane = Port(instance.rule, "mirror")
+    return {ref: {Port(instance.source, ref.output), Port(instance.source, "pose"), plane},
+            plane: set()}
 
 
 def control_edges(controls: tuple[Control, ...]) -> dict[Port, set[Port]]:

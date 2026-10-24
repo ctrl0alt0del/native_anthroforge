@@ -48,17 +48,23 @@ def references(value: Any) -> tuple[SurfaceReference, ...]:
         return tuple(ref for item in value for ref in references(item))
     if not is_dataclass(value):
         return ()
-    return tuple(
+    return (*parent_references(value), *tuple(
         ref
         for name in RELATIONSHIPS
         if hasattr(value, name)
         for ref in references(getattr(value, name))
-    )
+    ))
+
+
+def parent_references(value: Any) -> tuple[SurfaceReference, ...]:
+    rule = getattr(getattr(value, "attachment", None), "parent_instance", "")
+    return (SurfaceReference(value.parent, instance=rule),) if rule and value.parent else ()
 
 
 def blockers(document: Any, removed: set[str]) -> list[dict[str, str]]:
-    rows = {}
+    rows: dict[tuple[str, str], dict[str, str]] = {}
     for item in document.registry.records.values():
+        add_stacking_blockers(rows, item, removed)
         for ref in references(item):
             identity = MirrorInstance(ref.target, ref.instance).id if ref.instance else ""
             if identity in removed:
@@ -71,9 +77,19 @@ def blockers(document: Any, removed: set[str]) -> list[dict[str, str]]:
     return list(rows.values())
 
 
+def add_stacking_blockers(rows: Any, item: Any, removed: set[str]) -> None:
+    plan = getattr(getattr(item, "stack_plan", None), "providers", ())
+    intent = tuple(r.other for r in getattr(item, "stack_relationships", ()))
+    for target in set(plan) | set(intent):
+        if target in removed:
+            rows[item.id, target] = dict(id=item.id, name=item.name, instance=target,
+                                        reason="Stacking provider reference")
+
+
 def require_transition(before: Any, after: Any) -> None:
     removed = before.mirrors.instances.keys() - after.mirrors.instances.keys()
-    affected = blockers(after, removed) if removed else []
+    affected = [row for row in blockers(before, removed)
+                if row["id"] in after.registry.records] if removed else []
     if affected:
         names = ", ".join(row["name"] for row in affected)
         raise ValueError("Mirror removal is blocked by referenced consumers: " + names)

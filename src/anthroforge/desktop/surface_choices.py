@@ -3,6 +3,7 @@
 from anthroforge.application import surface_providers
 from anthroforge.core import anatomical_surfaces
 from anthroforge.core.results import geometry_asset
+from anthroforge.core.mirroring import MirrorInstance
 
 
 def rows(controller):
@@ -15,11 +16,12 @@ def row(document, ref):
     result = anatomical_surfaces.result(item, ref.role)
     label = {"SCP_GEOMETRY": "Surface", "TISSUE_BASE": "Base", "TISSUE_FINAL": "Final"}[ref.role]
     available = bool(geometry_asset(item) if ref.role == "SCP_GEOMETRY" else result.asset)
+    identity = MirrorInstance(ref.target, ref.instance).id if ref.instance else ref.target
     return dict(
-        id=ref.target,
+        id=identity,
         role=ref.role,
-        key=ref.target + ":" + ref.role,
-        name=item.name + " · " + label,
+        key=identity + ":" + ref.role,
+        name=item.name + (" · mirrored" if ref.instance else "") + " · " + label,
         ready=available and result.status not in ("failed", "invalid", "cancelled"),
         status=result.status,
         reason=result.error,

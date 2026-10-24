@@ -68,13 +68,16 @@ def duplicate(session: "Session", entity: str, parent: str = "") -> str:
 
 
 def reparent(session: "Session", entity: str, parent: str) -> None:
+    from .scp_surface_parents import selected
+
+    parent, instance = selected(session.document, parent)
     item = session.editable(entity)
     if not item.parent:
         raise ValueError("The root cannot be reparented; wrap it in an empty root instead.")
     parent_for(session, parent)
     if parent in descendants(session.document.entities, entity):
         raise ValueError("Reparenting would create a cycle.")
-    settings = origin_if_empty(session, parent, item.attachment)
+    settings = replace(origin_if_empty(session, parent, item.attachment), parent_instance=instance)
     session.replace_entities({entity: replace(item, parent=parent, attachment=settings)})
     evaluation.request(session, descendants(session.document.entities, entity), {entity})
 

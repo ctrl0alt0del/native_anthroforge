@@ -95,10 +95,11 @@ UiScrollView {
             }
             UiSection {
                 title: "Attachment"; visible: !!inspector.selected.parent
+                MirrorSharing { source: inspector.selected.id || ""; binding: "attachment" }
                 Label { text: "Parent object"; color: Theme.muted; font.pixelSize: 11 }
                 UiCombo {
                     Layout.fillWidth: true; model: inspector.candidates; textRole: "name"; valueRole: "id"
-                    currentIndex: indexOfValue(inspector.selected.parent || "")
+                    currentIndex: indexOfValue(inspector.attachment.parent_instance ? "mirror/"+inspector.attachment.parent_instance+"/"+inspector.selected.parent : inspector.selected.parent || "")
                     hint: "Changing parent preserves the current world pose"
                     onActivated: workspace.run("scp.reparent",{entity:inspector.selected.id,parent:currentValue})
                 }

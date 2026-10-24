@@ -5,6 +5,7 @@ from typing import Any
 
 from anthroforge.core.tissue_stacking import StackRelationship, StackSettings
 from anthroforge.core.tissues import TissueVCP
+from anthroforge.core.mirroring import source as source_identity
 
 from . import object_operations, tissue_fields
 from .tissue_operations import tissue
@@ -19,18 +20,20 @@ def configure(session: Any, target: str, changes: dict[str, Any]) -> None:
 
 
 def relationship(session: Any, target: str, other: str, **settings: Any) -> None:
-    item, provider = tissue(session, target), session.document.object(other)
+    if other.startswith("mirror/") and other not in session.document.mirrors.instances:
+        raise ValueError("Choose an existing mirrored provider.")
+    item, provider = tissue(session, target), session.document.object(source_identity(other))
     if not isinstance(provider, TissueVCP) or provider.id == item.id:
         raise ValueError("Choose a different surface tissue for the relationship.")
-    data = relationship_data(session, item, provider, settings)
+    data = relationship_data(session, item, provider, settings, other)
     row = StackRelationship(other, **data)
     require_available(item, provider, row)
     existing = tuple(r for r in item.stack_relationships if pair(r) != pair(row))
     install(session, replace(item, stack_relationships=(*existing, row)))
 
 
-def relationship_data(session: Any, item: Any, provider: Any, settings: Any) -> dict[str, Any]:
-    key = (provider.id, settings.get("side", "a"), settings.get("other_side", "a"))
+def relationship_data(session: Any, item: Any, provider: Any, settings: Any, identity: str = "") -> dict[str, Any]:
+    key = (identity or provider.id, settings.get("side", "a"), settings.get("other_side", "a"))
     previous = next((r for r in item.stack_relationships if pair(r) == key), None)
     data = asdict(previous) if previous else {}
     data.pop("other", None)
@@ -70,7 +73,7 @@ def require_available(item: TissueVCP, other: TissueVCP, row: StackRelationship)
         row.other_side == "b" and not other.both_sides
     ):
         raise ValueError("The selected tissue has no second inflation side.")
-    for previous in other.stack_relationships:
+    for previous in other.stack_relationships if row.other == other.id else ():
         if pair(previous) == (item.id, row.other_side, row.side):
             raise ValueError(
                 "This relationship is owned by " + other.name + "; edit or remove it there."

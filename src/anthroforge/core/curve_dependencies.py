@@ -52,7 +52,12 @@ def routing_references(settings: object, objects: tuple[object, ...]) -> set[Sur
         return set()
     tissues = {r.target for r in anatomical_surfaces.defaults((), objects)}
     return {
-        SurfaceReference(source(k), "TISSUE_FINAL" if source(k) in tissues else "SCP_GEOMETRY",
-                         parse(k).rule if parse(k) else "")
+        routing_reference(k, tissues)
         for k in settings.obstacles
     }
+
+
+def routing_reference(value: str, tissues: set[str]) -> SurfaceReference:
+    instance = parse(value)
+    role = "TISSUE_FINAL" if source(value) in tissues else "SCP_GEOMETRY"
+    return SurfaceReference(source(value), role, instance.rule if instance else "")

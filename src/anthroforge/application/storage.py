@@ -127,6 +127,7 @@ def decode_pose_receipt(value: Any) -> AttachmentReceipt | None:
     if value is None:
         return None
     data = dict(value)
+    data["parent_reflection"] = tuple(data.get("parent_reflection", ()))
     for key in ("parent_matrix", "parent_offset", "child_matrix", "child_offset"):
         data[key] = tuple(data[key])
     settings = dict(data["settings"])

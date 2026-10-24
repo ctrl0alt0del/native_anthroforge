@@ -2,6 +2,7 @@
 
 from anthroforge.core import attachment_references
 from anthroforge.core.document import Document
+from anthroforge.core.entities import SCP
 from anthroforge.core.results import Port, ReadRevision
 from anthroforge.core.tissue_revisions import PHASES
 from anthroforge.core.tissues import TissueVCP
@@ -81,7 +82,10 @@ def object_port_revision(document: Document, port: Port) -> ReadRevision:
     if port.owner in document.index.controls:
         control = document.control(port.owner)
         return ReadRevision(port.owner, port.output, control.generation, 0)
-    entity = document.entity(port.owner)
+    return entity_revision(document.entity(port.owner), port)
+
+
+def entity_revision(entity: SCP, port: Port) -> ReadRevision:
     if port.output == "pose":
         return ReadRevision(port.owner, port.output, 0, entity.pose_revision)
     return ReadRevision(

@@ -16,7 +16,7 @@ def references(item: Any) -> tuple[tuple[str, SurfaceReference], ...]:
     if isinstance(item, Anchor):
         return (("binding", item.binding.reference),)
     if isinstance(item, SCP) and item.parent:
-        return (("attachment", SurfaceReference(item.parent)),)
+        return (("attachment", SurfaceReference(item.parent, instance=item.attachment.parent_instance)),)
     return ()
 
 

@@ -226,6 +226,10 @@ class Controller(QObject):
     def constructionModel(self):
         return self.construction.model
 
+    @Slot(str, str, result=bool)
+    def mirrorTargetShared(self, source, binding):
+        return self.session.command("mirror.attachment.shared", source=source, binding=binding)
+
     @Property(QObject, constant=True)
     def selectedData(self):
         return self.scene_projection.selected

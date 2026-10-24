@@ -83,6 +83,8 @@ def validate_references(session: "Session", workspace: Workspace, previous: Work
         live = set(session.document.registry.records)
         if field == "members":
             live = set(session.document.registry.anatomy)
+        else:
+            live.update(session.document.mirrors.instances)
         added = set(getattr(workspace, field)) - set(getattr(previous, field))
         if added - live:
             raise ValueError("Workspace references an unknown or incompatible object.")

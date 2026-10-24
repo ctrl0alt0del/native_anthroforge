@@ -22,7 +22,7 @@ def reference_signature(item: SCP | Control) -> tuple[Any, ...]:
         return (ids, bindings, item.kind, item.follow)
     primitive = item.primitive
     targets = primitive_references(primitive) if primitive else None
-    return (ids, bindings, item.parent, item.attachment.parent_mode, targets)
+    return (ids, bindings, item.parent, item.attachment.parent_mode, item.attachment.parent_instance, targets)
 
 
 def primitive_references(primitive: Any) -> tuple[Any, ...]:

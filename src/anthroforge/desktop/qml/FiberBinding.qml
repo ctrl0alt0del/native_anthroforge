@@ -29,4 +29,5 @@ ColumnLayout {
         hint: "Choose eligible surfaces when this bound point is edited"
         onActivated: workspace.run("fiber.binding.scope",{curve:panel.curve.id,point:panel.point.id,scope:currentIndex===1?"ANY_PARENT":"CURRENT_PARENT"})
     }
+    MirrorSharing { visible: !!panel.binding; source: panel.curve.id || ""; binding: panel.point.id || "" }
 }

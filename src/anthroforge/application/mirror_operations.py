@@ -17,21 +17,22 @@ def queries(session: Any) -> dict[str, Any]:
         "mirror.inspect": lambda **a: inspect(session, **a),
         "mirror.source": lambda **a: source(session, **a),
         "mirror.removal.inspect": lambda **a: removal(session, **a),
+        "mirror.attachment.shared": lambda **a: shared(session, **a),
     }
 
 
 def configure(session: Any, target: str, **values: Any) -> None:
     require_source(target)
-    item = session.document.object(target)
+    session.document.object(target)
     if not workspace_policy.included(session.document, session.workspace, target):
         raise ValueError("The source is outside the focused workspace.")
     if values.get("enabled") and target not in session.document.registry.anatomy:
-        raise ValueError(
-            "Mirror Children belongs to anatomical sources, not individual construction."
-        )
+        raise ValueError("Mirror Children requires an anatomical source.")
     old = session.document.mirrors.rules.get(target, MirrorRule(target))
     updated = replace(old, **values)
-    rules = tuple(r for r in session.document.mirror_rules if r.target != item.id)
+    if updated == old:
+        return
+    rules = tuple(r for r in session.document.mirror_rules if r.target != target)
     session.replace_document(mirror_rules=(*rules, updated))
     invalidate(session, target)
 
@@ -39,10 +40,11 @@ def configure(session: Any, target: str, **values: Any) -> None:
 def invalidate(session: Any, target: str) -> None:
     from anthroforge.core.results import Port
 
-    from . import dependent_tasks
+    from . import dependent_tasks, scp_surface_parents
 
     ports = {Port(target, "mirror")}
     session.scheduler.invalidate_ports(ports)
+    scp_surface_parents.invalidate(session, ports)
     dependent_tasks.changed(session, ports, published=False)
 
 
@@ -99,6 +101,10 @@ def share_target(session: Any, source: str, binding: str, enabled: bool = True) 
     pair = SharedMirrorTarget(source, binding)
     existing = tuple(v for v in session.document.shared_mirror_targets if v != pair)
     session.replace_document(shared_mirror_targets=(*existing, pair) if enabled else existing)
+
+
+def shared(session: Any, source: str, binding: str) -> bool:
+    return SharedMirrorTarget(source, binding) in session.document.shared_mirror_targets
 
 
 def source(session: Any, target: str) -> str:

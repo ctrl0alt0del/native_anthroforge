@@ -10,6 +10,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.mirroring import MirrorInstance, MirrorRule
 from anthroforge.core.surface_references import SurfaceReference
+from tests.conftest import CUBE
 
 
 def hierarchy():
@@ -137,3 +138,19 @@ def test_routed_source_automatically_avoids_reflected_obstacle(session):
     assert item.result.status == "ready", item.result.error
     samples = session.resources.paths[item.result.asset].path.array()[:, :2]
     assert np.max(np.linalg.norm(samples - [-2, 0], axis=1)) > .2
+
+
+def test_scp_mirrored_parent_tracks_plane_without_rebinding(session, assembly):
+    root, parent = assembly
+    session.command("mirror.configure", target=root, enabled=True, shift=2)
+    child = session.command("import", path=str(CUBE), units=.05, parent=parent)["entity_id"]
+    session.command("wait")
+    session.command("scp.reparent", entity=child, parent=MirrorInstance(parent, root).id)
+    session.command("wait")
+    before = session.document.entity(child)
+    assert before.status == "ready", before.error
+    session.command("mirror.configure", target=root, shift=3)
+    session.command("wait")
+    after = session.document.entity(child)
+    assert after.status == "ready" and after.attachment == before.attachment, after.error
+    np.testing.assert_allclose(np.array(after.matrix)[[3, 7, 11]] - np.array(before.matrix)[[3, 7, 11]], [2, 0, 0], atol=1e-10)

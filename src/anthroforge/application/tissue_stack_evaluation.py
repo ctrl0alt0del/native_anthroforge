@@ -13,6 +13,7 @@ from anthroforge.native.tissue_stacking import assemble
 
 from . import tissue_stack_policy as policy
 from . import tissue_stack_scene as scene_inputs
+from . import mirror_stacking
 from .tissue_output import TissueOutput
 
 
@@ -97,10 +98,11 @@ def frozen(scene: Any) -> tuple[dict[int, Any], list[Any]]:
     for key, (owner, side) in scene.identities.items():
         if owner == scene.target:
             continue
-        item = scene.document.object(owner)
+        item = mirror_stacking.item(scene.document, owner)
         if not usable_final(item):
             continue
-        value = scene_inputs.lease(scene.resources, item.final_material, side, scene.cancel, True)
+        state = mirror_stacking.material(scene, owner, True)
+        value = scene_inputs.lease(scene.resources, state, side, scene.cancel, True)
         domain = value.domain(key)
         rows[key] = frozen_points(domain)
         leases.append(value)
@@ -166,11 +168,10 @@ def output_points(output: Any, target: str, side: str) -> Any:
 def complete_surfaces(scene: Any, item: Any, final: Any) -> list[Any]:
     meshes, state = scene.resources.meshes, item.intrinsic_material
     rows = [surface(meshes[state.own].mesh, final, state.frame)]
-    for other in scene_inputs.participants(scene.document):
-        if other.id == item.id or not usable_final(other):
+    for owner in {key[0] for key in scene.leases}:
+        if owner == item.id or not usable_final(mirror_stacking.item(scene.document, owner)):
             continue
-        accepted = other.final_material
-        assert accepted is not None
+        accepted = mirror_stacking.material(scene, owner, True)
         rows.append(
             surface(meshes[accepted.own].mesh, meshes[accepted.final].mesh, accepted.frame, False)
         )

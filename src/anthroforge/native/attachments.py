@@ -10,22 +10,22 @@ import numpy as np
 
 from anthroforge.core import attachment_provenance
 from anthroforge.core.attachment_strategy import uses_deformation_flow
-from anthroforge.core.entities import SCP
+from anthroforge.core.entities import SCP, IDENTITY
 from anthroforge.core.results import geometry_asset
 
 from . import surface_queries
 from .mesh import GeometryEngine, Mesh, doubles, pointer
+from .construction import matrix as product
 
 CHILD_MODES = {"FACE_CENTER": 0, "VERTEX_NEAREST": 1, "OBJECT_ORIGIN": 2}
 
 
 def capture(
-    engine: GeometryEngine, child: SCP, parent: SCP, meshes: dict[str, Mesh], cancel: int = 0
+    engine: GeometryEngine, child: SCP, parent: SCP, meshes: dict[str, Mesh], cancel: int = 0,
+    reflection: Any = None,
 ) -> SCP:
-    arrays = [
-        doubles(v)
-        for v in (child.matrix, parent.matrix, child.geometry_offset, parent.geometry_offset)
-    ]
+    parent = reflected_parent(engine, child, parent, reflection)
+    arrays = capture_arrays(child, parent)
     output = np.empty(28)
     query = capture_surface(parent, meshes, child.attachment.parent_mode, cancel)
     handles = (handle(child, meshes), query.mesh.handle if query else handle(parent, meshes))
@@ -34,6 +34,19 @@ def capture(
     )
     engine.check(status)
     return captured(child, parent, output)
+
+
+def capture_arrays(child: SCP, parent: SCP) -> Any:
+    return [doubles(v) for v in (child.matrix, parent.matrix, child.geometry_offset, parent.geometry_offset)]
+
+
+def reflected_parent(engine: Any, child: SCP, parent: SCP, reflection: Any = None) -> SCP:
+    if not child.attachment.parent_instance:
+        return parent
+    reflection = reflection or (child.pose_receipt.parent_reflection if child.pose_receipt else ())
+    if not reflection:
+        raise ValueError("Mirrored parent requires its retained reflection frame.")
+    return replace(parent, matrix=product(engine, reflection, parent.matrix))
 
 
 def captured(child: SCP, parent: SCP, output: Any) -> SCP:
@@ -52,6 +65,7 @@ def capture_surface(parent: SCP, meshes: dict[str, Mesh], mode: str, cancel: int
 def anchor_points(
     engine: GeometryEngine, child: SCP, parent: SCP, mesh: int, reference_handle: int = 0
 ) -> list[float]:
+    parent = reflected_parent(engine, child, parent)
     values = (child.matrix, parent.matrix, parent.geometry_offset, child.attachment.binding)
     arrays, output = [doubles(value) for value in values], np.empty(6)
     engine.check(
@@ -92,7 +106,7 @@ def ordered(entities: tuple[SCP, ...]) -> list[SCP]:
     return result
 
 
-def packed(entities: list[SCP], meshes: dict[str, Mesh], active: set[str]) -> dict[str, Any]:
+def packed(entities: list[SCP], meshes: dict[str, Mesh], active: set[str], reflections: Any = None) -> dict[str, Any]:
     lookup = {item.id: i for i, item in enumerate(entities)}
     return {
         **packed_flags(entities, active),
@@ -102,6 +116,7 @@ def packed(entities: list[SCP], meshes: dict[str, Mesh], active: set[str]) -> di
         "offsets": doubles([e.geometry_offset for e in entities]),
         "bindings": doubles([e.attachment.binding or (0.0,) * 28 for e in entities]),
         "references": np.array([reference(e, meshes) for e in entities], dtype=np.uint64),
+        "reflections": doubles([reflections.get(e.id, IDENTITY) for e in entities]) if reflections else None,
     }
 
 
@@ -134,13 +149,14 @@ def propagate(
     meshes: dict[str, Mesh],
     active: set[str],
     cancel: Event,
+    reflections: Any = None,
 ) -> list[SCP]:
-    active = attachment_provenance.required(entities, active)
+    active = attachment_provenance.required(entities, active, reflections)
     if not active or cancel.is_set():
         return entities
-    data = packed(entities, meshes, active)
+    data = packed(entities, meshes, active, reflections)
     apply_batch(engine, data, len(entities), cancel)
-    return attachment_provenance.accepted(unpacked(entities, data, active), active)
+    return attachment_provenance.accepted(unpacked(entities, data, active), active, reflections)
 
 
 def unpacked(entities: list[SCP], data: dict[str, Any], active: set[str]) -> list[SCP]:
@@ -152,7 +168,8 @@ def unpacked(entities: list[SCP], data: dict[str, Any], active: set[str]) -> lis
 
 def apply_batch(engine: GeometryEngine, data: dict[str, Any], count: int, cancel: Event) -> None:
     integers = ("modes", "follows", "flows", "active", "status")
-    status = engine.library.af_propagate(
+    operation, extra = propagation_operation(engine, data)
+    status = operation(
         count,
         data["meshes"].ctypes.data_as(c.POINTER(c.c_uint64)),
         int_pointer(data["parents"]),
@@ -160,8 +177,15 @@ def apply_batch(engine: GeometryEngine, data: dict[str, Any], count: int, cancel
         *(int_pointer(data[key]) for key in integers),
         getattr(cancel, "handle", 0),
         data["references"].ctypes.data_as(c.POINTER(c.c_uint64)),
+        *extra,
     )
     engine.check(status)
+
+
+def propagation_operation(engine: Any, data: Any) -> Any:
+    if data["reflections"] is None:
+        return engine.library.af_propagate, ()
+    return engine.library.af_propagate_spatial, (pointer(data["reflections"]),)
 
 
 def int_pointer(array: Any) -> Any:

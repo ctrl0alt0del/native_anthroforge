@@ -5,6 +5,7 @@ from typing import Any
 from anthroforge.native.stacking_abi import Policy, Settings
 
 from .tissue_stack_scene import identity
+from . import mirror_stacking
 
 
 def settings(value: Any) -> Settings:
@@ -74,7 +75,7 @@ def selected_regions(scene: Any, relation: Any, cover: int, regions: list[Any]) 
     from .tissue_fields import mesh_domain
 
     owner, _ = scene.identities[cover]
-    state = scene.document.object(owner).intrinsic_material
+    state = mirror_stacking.material(scene, owner)
     topology = mesh_domain(scene.resources.meshes[state.base].mesh)[1]
     parts = {key: i for i, key in enumerate(state.base_state.parts)}
     regions.extend((parts.get(part, 0), face) for part, face in relation.regions)

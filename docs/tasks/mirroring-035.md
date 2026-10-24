@@ -62,3 +62,16 @@ Checkpoint coherent increments and push before long checks or interruptions.
 
 Use existing .venv, native build/load infrastructure and tools/check.ps1.
 No new production anatomy assets belong in Git. Prior source inventory is in the plan.
+
+### Relationship checkpoint
+
+Mirrored accepted-final providers participate in original stacking without mirror writers.
+SCPs can retain material attachments to mirrored geometry; native parent-first propagation
+applies the current reflection frame and plane changes preserve the stored binding.
+The focused mirror, desktop, symmetric construction and stacking suite passes 24 tests;
+mypy passes 400 modules. Latest native build passes all five CTests.
+A deliberately shifted provider is incompatible with 23 fixed receiver boundary points
+(maximum 0.01 m deficit); it remains a rejected constrained configuration, not evidence
+for relaxing structural preservation. Full release qualification remains pending.
+Remaining: seam editing, complete instance presentation/inspection, lifecycle/removal,
+profiler/offscreen evidence, full development gate and one canonical portable build.

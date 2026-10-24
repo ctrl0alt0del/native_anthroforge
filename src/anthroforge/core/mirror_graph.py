@@ -6,6 +6,7 @@ from typing import Any
 from . import anatomical_surfaces, dependency_graph, routing_obstacles
 from .results import Port
 from .surface_references import SurfaceReference
+from .cycle_analysis import cycles
 
 
 def install(document: Any) -> None:
@@ -39,7 +40,7 @@ def reflected_graph(document: Any, base: Any) -> Any:
     edges.update({anatomical_surfaces.port(ref): aliases(ref) for ref in refs})
     edges.update({Port(ref.instance, "mirror"): set() for ref in refs})
     added = automatic_inputs(document, edges, refs)
-    components = dependency_graph.cycles(edges, dependency_graph.reverse(edges))
+    components = cycles(edges, dependency_graph.reverse(edges))
     excluded = routing_obstacles.remove_cyclic_candidates(edges, added, components)
     keys = base.routing_excluded.keys() | excluded.keys()
     exclusions = {key: base.routing_excluded.get(key, frozenset()) | excluded.get(key, frozenset())

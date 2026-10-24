@@ -68,3 +68,15 @@ def test_superseding_radius_hiding_and_zero_radius_release_cached_tubes(controll
     frames(controller)
     assert not display.accepted and not display.model.leases
     assert not display.model.active_rows()
+
+
+def test_deleted_fiber_discards_queued_display_without_resource_errors(controller):
+    key = setup(controller)
+    radius(controller, key, 0.03)
+    controller.session.command("object.delete", target=key)
+    controller.session.wait(5)
+    controller.refresh()
+    frames(controller)
+    assert not controller.fiber_display.accepted and not controller.fiber_display.jobs
+    assert not controller.session.scheduler.errors
+    assert not controller.fiber_display.model.active_rows()

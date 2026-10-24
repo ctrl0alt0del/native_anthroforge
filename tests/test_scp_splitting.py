@@ -108,3 +108,17 @@ def test_split_roundtrip_and_redo_keep_shared_control(session, tmp_path):
     session.command("save", path=str(output), blocked_policy="wait")
     session.command("open", path=str(output))
     check_joint(session, result)
+
+
+def test_split_keeps_a_geometric_child_attached_to_the_first_segment(session):
+    target, source = body(session)
+    child = session.command("import", path=str(CUBE), parent=target, units=0.03)["entity_id"]
+    session.wait(5)
+    before = session.document.entity(child).attachment
+    result = session.command("scp.split", entity=target, points=[source.points[1].id])
+    session.wait(5)
+    item = session.document.entity(child)
+    assert item.parent == result["entities"][0] and item.attachment == before
+    assert item.result.status == "ready" and not session.scheduler.errors
+    check_joint(session, result)
+    assert session.document.entity(child).result.status == "ready"

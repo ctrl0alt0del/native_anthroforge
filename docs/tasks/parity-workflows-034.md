@@ -7,6 +7,20 @@
 - Active writer: desktop implementation session
 - Last updated: 2026-10-24
 
+## Latest recovery state
+
+D01-D12 and F02/F03 are implemented on this task branch. Full development gate passed;
+the latest complete pytest run passes 2136 cases. Actual texture-only Fiber rendering,
+desktop workflow tools and the read-only 96-muscle display qualifier pass. Source projects
+remain untouched. No main merge, package version change or release artifact is delivered.
+
+The only product decision still pending is F01: preserve Blender's separate strip topology
+for migrated Ribs (keep welded lofts as the default), or retain welded Ribs and explicitly
+accept the remaining source-response difference. A focused user question is pending.
+Continue on this branch after that answer; do not assume permission from elapsed time.
+Then qualify shoulder baseline/Ribs=3, deliver the corrected assembly, finish packaging
+and release/merge checks. Historical checkpoints below retain their original limits.
+
 ## Outcome and confirmed decisions
 
 Implement F01-F03 from [parity findings](../addon_parity_findings.md) and D01-D12
@@ -355,3 +369,31 @@ Local evidence: build/parity-workflows-034/fiber-display/assembly-registered/dis
 and qualification.json, plus the inspected radius captures. The reusable qualifier is
 tools/fiber_display_qualification.py; it opens a copy read-only and writes no source project.
 F01 remains pending; no final corrected assembly, release build or main merge is claimed.
+
+## Final independent qualification and ownership review
+
+Latest full pytest: 2136 passed in 155.36s. The prior complete development gate includes
+full native style, all five native tests, dependencies and doctor; no native source has
+changed since that gate. Current Ruff/format/mypy and focused display/architecture checks
+pass. A final change makes dispatch capture explicitly use the owned document snapshot;
+its focused checks pass after the aggregate suite. No interactive acceptance is claimed.
+
+Additional regressions cover initial routing failure without a straight/orphan publication,
+bound quick-Fiber endpoints after parent motion, and an actual geometric child retained
+on the first split SCP through shared-Hook movement. A queued display whose Fiber disappears
+is discarded as obsolete at capture/publication, preserving old display and avoiding a
+missing-resource failure. Prepared resources remain owned until the coordinator retires work.
+
+Final texture-only rendering again passes 5/33 pixel radius checks. The final production
+report under build/parity-workflows-034/fiber-display/final-qualification is complete,
+contains all 326 native calls and passes unchanged source-buffer/document/attachment/undo
+assertions. Measured first projection/submission 345ms, work 737ms, CPU staging total 57ms;
+these single-run observations are not controlled speedup or physical frame-latency evidence.
+
+Coordinator-authored ownership review: numerical geometry stays native; application
+operations own policies/transactions and replacement candidates; the desktop owns display
+intent and staged leases. Quick creation reuses authored publication. Both replacement
+families share lifecycle/approval/read proofs while retaining separate compatibility
+policies. There is one task coordinator and no additional worker pool. Display resources
+cannot become anatomical providers or mutate accepted numerical paths. Remaining end-to-end
+acceptance is the F01 decision/correction, final assembly and canonical release packaging.

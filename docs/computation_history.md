@@ -1,5 +1,15 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: explicit display capture and stale disposal
+
+Display jobs now capture from the dispatch document and reject disappeared/replaced source
+inputs as obsolete before native work or publication. This avoids missing-resource errors
+and preserves displayed accepted geometry during replacement. Native numerical kernels and
+anatomical write contracts are unchanged. Tests cover queued deletion, supersession and
+frame-boundary picking; the aggregate suite passes 2136 tests. Production display qualification
+again retains exact source geometry, attachment records and undo across 326 Fibers. Final
+shoulder parity, corrected assembly delivery and release packaging await the Ribs decision.
+
 ### In-progress 0.3.4: display worker attribution qualification
 
 Production qualification keeps source geometry/path hashes, document/attachment records

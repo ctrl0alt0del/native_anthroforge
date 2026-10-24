@@ -7,7 +7,7 @@ import numpy as np
 from anthroforge.application.curve_sources import world
 from anthroforge.core.entities import IDENTITY
 from anthroforge.core.fiber_presentation import settings
-from anthroforge.core.jobs import Job
+from anthroforge.core.jobs import Job, ObsoleteInputs
 from anthroforge.core.results import Port
 from anthroforge.core.scheduling import Workload
 from anthroforge.native import path_display, scene
@@ -82,7 +82,7 @@ class FiberDisplay:
     def adopt(self, row, token, mesh):
         current = self.desired.get(row["id"])
         if current is None or current_token(self.controller.session, row["id"]) != token:
-            return
+            raise ObsoleteInputs()
         self.accepted[row["id"]] = (token, mesh)
         self.publish_rows()
 
@@ -117,23 +117,23 @@ def signature(row):
     return row["asset"], tuple(row["matrix"]), row["fiber_radius"]
 
 
-def current_token(session, key):
-    item = session.document.registry.construction.get(key)
+def current_token(session, key, document=None):
+    document = document or session.document
+    item = document.registry.construction.get(key)
     if item is None:
         return None
-    return session.document.id, (
+    return document.id, (
         item.result.asset,
-        world(session.engine, session.document, key),
-        settings(session.workspace, key).radius,
+        world(session.engine, document, key),
+        settings(document.workspaces[session.active_workspace], key).radius,
     )
 
 
 def create_job(display, row, token):
-    session = display.controller.session
     return Job(
         "Display " + row["name"],
         frozenset(),
-        lambda _: (session.resources.paths[row["asset"]].path, tuple(row["matrix"])),
+        partial(capture, display, row, token),
         partial(compute, row["fiber_radius"]),
         partial(display.adopt, row, token),
         key="fiber-display:" + row["id"],
@@ -143,8 +143,18 @@ def create_job(display, row, token):
 
 
 def compute(radius, payload, cancel):
+    if payload is None:
+        raise ObsoleteInputs()
     path, frame = payload
     return path_display.tube(path, frame, radius, cancel=cancel.handle)
+
+
+def capture(display, row, token, document):
+    session = display.controller.session
+    if current_token(session, row["id"], document) != token:
+        return None
+    asset = session.resources.paths.get(row["asset"])
+    return (asset.path, tuple(row["matrix"])) if asset else None
 
 
 def workload(session, asset, _):

@@ -30,7 +30,7 @@ from .operations import require_name
 @dataclass(frozen=True)
 class Request:
     seed: Curve
-    binding: Any
+    binding: fiber_operations.FiberCreation
 
 
 def create(session: Any, points: list[dict[str, Any]], owner: str = "", name: str = "Fiber") -> str:

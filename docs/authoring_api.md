@@ -5,6 +5,18 @@ The 0.3.3 performance work adds no public commands. The
 operations from missing convenience/lifecycle operations; known migrated-assembly
 limitations are in [parity findings](addon_parity_findings.md).
 
+## Planned mirroring operations (0.3.5 — not implemented)
+
+See the [confirmed specification](specification_035.md) and
+[implementation plan](implementation_035.md). Future shared operations cover source
+mirror rules/inheritance, plane conflict overrides, instance/source inspection,
+same-target attachment choices, removal blockers, mirrored rows, symmetric loops and
+presentation. This documentation adds no available mirror operations or command signatures.
+Mirrored properties, geometry, controls and shortcuts are read-only through every API
+path. Typed surface references must distinguish the spatial instance and role; mirrored
+geometry always reflects source output, without independent attachment/routing/stacking
+solves. Existing independent counterparts require a separate explicit migration.
+
 ## Shortcut comparison and replay (0.3.2)
 
 `shortcut.comparison.capture(shortcut)` replaces the session-only accepted baseline.

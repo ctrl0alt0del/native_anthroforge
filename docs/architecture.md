@@ -5,6 +5,18 @@ families and missing authoring details, and [known parity findings](addon_parity
 for source-frame, effective-policy and child-anchor fidelity defects. The distinction
 between a supported operation and faithful migration must remain explicit.
 
+## Planned 0.3.5 mirroring — not implemented
+
+The [confirmed contract](specification_035.md) and [implementation plan](implementation_035.md)
+introduce source/rule spatial instances at the typed-reference and surface-provider
+boundaries, not additional authored hierarchy nodes. Every stage is a strict reflection
+of the corresponding source output; independent mirrored solvers and stacking are forbidden.
+Shared controls/resources retain their identity and ownership. Instance-aware attachment
+findings do not deform reflected geometry. The existing coordinator and staged viewport
+must preserve source/mirror revision agreement, accepted-input provenance and resource leases.
+Desktop and headless use the same read-only capabilities and removal policies. These
+paragraphs describe planned architecture, not available operations or measured acceptance.
+
 ## 0.3.3 observation and scheduling costs
 
 The desktop property-query service owns bounded metadata caching and per-object QML

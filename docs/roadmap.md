@@ -1,5 +1,11 @@
 # AnthroForge release roadmap
 
+- **0.3.5 — confirmed, not implemented:** strict source-linked, read-only mirroring,
+  hierarchy rules, instance-aware surfaces and symmetric construction. Mirrors never
+  solve independent geometry. [Specification](specification_035.md),
+  [implementation plan](implementation_035.md). This documentation adds no runtime,
+  migration, format change or release qualification; separate 0.3.4 work is unaffected.
+
 - **0.3.3 — qualified:** targeted shortcut metadata/formula observation, immutable
   publication and incremental priority links. [Evidence](shortcuts_033.md).
   This preserves standalone behavior; [addon parity findings](addon_parity_findings.md)
@@ -37,7 +43,7 @@
   relaxation and surface-based stacking. [Contract](specification_022.md),
   [implementation plan](implementation_022.md), [task](tasks/unified-tissues-022.md).
   Canonical package evidence is recorded with [release validation](development_status.md#unified-tissues-022).
-- **Later releases:** mirroring, skin, legacy Blender conversion, anatomical
+- **Later releases:** skin, legacy Blender conversion, anatomical
   reconstruction/fitting and other explicitly deferred workflows. No version or
   completion date is assigned here. General physical simulation is not a 0.2.2 goal.
 

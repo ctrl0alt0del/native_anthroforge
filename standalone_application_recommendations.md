@@ -2,6 +2,13 @@
 
 Updated: 2026-10-24
 
+The [0.3.5 mirroring specification](docs/specification_035.md) and
+[implementation plan](docs/implementation_035.md) are **confirmed, not implemented**.
+Mirrors are strictly reflected, read-only source instances without extra tree nodes or
+independent solvers. This supersedes earlier recommendations for editable overrides,
+detachment and independently stacked mirrored geometry for this release. Original
+thread inventories and historical measurements remain evidence of their own context.
+
 Shortcut recommendations 1–4 are implemented in the [0.3.1 inspection workflow](docs/shortcuts_031.md)
 and qualified for release. Influence, formula evidence, effective policy and
 propagation status reuse the current algorithms; comparison/replay reporting remains deferred.
@@ -256,7 +263,7 @@ Distinguish original reference anatomy, editable construction, evaluated surface
 
 ### A07 — Model anatomical types, instances, and symmetry separately [P0]
 
-Separate a muscle type from numbered spaces, bilateral instances, and source/mirror relationships. Share definitions and geometry when inputs are equivalent; allow explicit local overrides or detachment. Spatial instances retain distinct picking, collision, and validation identities. Independently evaluated asymmetric stacking must survive mirror refresh. Test reflected normals and winding, and avoid accidental finger/toe instance duplication.
+Separate a muscle type from numbered spaces, bilateral instances, and source/mirror relationships. Spatial instances retain distinct picking, collision, and validation identities. Test reflected normals and winding, and avoid accidental finger/toe instance duplication. For [confirmed 0.3.5](docs/specification_035.md), share source geometry and reflect every stage exactly: no mirror editing, local overrides, detachment or independent stacking evaluation. Earlier thread recommendations proposed those asymmetric capabilities; they are superseded for 0.3.5, not implemented features. Attachment conflicts report findings without reshaping mirrors.
 
 ### A08 — Preserve references through duplication, deletion, and import [P0]
 
@@ -540,7 +547,7 @@ The source material identifies the following assets. This is a preservation chec
 | Native async fiber coordinator and workers | Owned inputs, useful priorities, safe background execution | B05–B07 |
 | Dependency waves, dirty aspects, and publication barriers | Real ordering, readiness checks, targeted propagation | B01–B04, C04 |
 | Request debounce, intent tracking, and deduplication | Preserve correct cases; generalize policy and batch earlier | B03, B05, C01–C03 |
-| Stable source/mirror mapping and shared geometry | Identity reuse and efficient publication; preserve independently evaluated asymmetric results | A03, A07, C05 |
+| Stable source/mirror mapping and shared geometry | Identity reuse and efficient publication; 0.3.5 requires exact source reflection, superseding historical independent asymmetric results | A03, A07, C05 |
 | Callback indexes and shared preparation caches | Targeted consumers, exact-input equivalence, byte budgets | B03, B08–B10 |
 | Free/Controlled behavior and qualified attachment snapping | Existing distinctions, anchors, fallback qualification, and explicit rebind | D01–D05 |
 | Native tightening, intersection queries, height smoothing, vector stacking, and persistent relationships | Integrate their contracts into normal editing and inspection | D07, E03–E04, G01 |
@@ -593,7 +600,7 @@ The user explicitly rejected hard numerical responsiveness thresholds. The figur
 | Abdominal Layer | Protected seams/creases, binding identity, constrained smoothing, and persistence. |
 | Pectoral Pouch and iteration-limit cases | Current-but-unconverged status, constraint behavior, diagnostic location, and recovery. |
 | Inflation-cutoff scene and parameter sweep | Stable attachment domain across sampling changes, validation behavior, and preservation of tissue semantics. |
-| Asymmetric mirror and stacking cases | Independent evaluation per instance; no later refresh replacing solved geometry with a reflected source copy. |
+| Asymmetric mirror and stacking cases | For confirmed 0.3.5, every mirrored stage remains an exact source reflection despite asymmetric surroundings; relationship mismatches report Issues, and originals can use other mirrored providers without self-feedback. Earlier independent-mirror evaluation is historical addon behavior, superseded for this release. |
 | Gluteus/sacrum attachment case | Actual attachment footprint, medial extent, source context, and anatomical validity rather than plausibility in one image. |
 | Intercostal/rib support cases | Representation of gaps, appropriate collision support, stable thickness coordinates, and sufficient local profile control. |
 | Latissimus hook / gastrocnemius tangle / arched fibers | Surface-to-construction explanation, loft order/crop visibility, and separation of planner, solver, and inflation causes. |

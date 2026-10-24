@@ -5,6 +5,11 @@ diagnostics only. This is an implementation audit, not a new release plan or a c
 that every Blender shape/update matches. Known shoulder/Thumb differences are recorded
 separately in [confirmed parity findings](addon_parity_findings.md).
 
+The subsequent [0.3.5 mirroring specification](specification_035.md) is **confirmed,
+not implemented**. Its [plan](implementation_035.md) includes an addon source inventory.
+It intentionally replaces independent mirror solving with strict read-only reflection;
+it does not change this audit's runtime evidence or migrate independent counterparts.
+
 ## Method and scope
 
 Inspected the current addon operators, registered RNA properties, UI, and production
@@ -99,7 +104,7 @@ backsolve must not be hidden by calling that option alone a complete fix.
 
 | System | Audit status |
 | --- | --- |
-| Live mirroring/symmetry across SCPs, Fibers, surfaces and tissues | Deferred major workflow. Independent mirrored bones in migrated projects do not implement it. |
+| Live mirroring/symmetry across SCPs, Fibers, surfaces and tissues | Unimplemented; now confirmed for [0.3.5](specification_035.md), with [planned ownership/acceptance](implementation_035.md). Independent mirrored bones in migrated projects do not implement it. |
 | Draft Skin, collagen/gap fields, remeshing/topology budgets, final-skin reference/deformation and warm skin/topology updates | Deferred skin pipeline. These are not small omissions in tissue inflation. The app's skin-only export policy is a restriction, not evidence of a working skin producer or broad geometry export. |
 | Reusable anatomical package/document/subgraph import and SCP-diff application | Native projects open/save and meshes import; there is no general public merge/append or addon AF package/diff importer. Custom migration scripts do not establish this as a desktop feature. |
 | Non-numeric shortcut exposure and general Blender RNA paths | Addon supports Boolean/enum/string proxy values. Standalone 0.3 deliberately supports numerical wrappers and a restricted formula language; extending that contract is a separate choice. |

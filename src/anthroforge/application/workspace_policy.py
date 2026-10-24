@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import Workspace, descendants
+from anthroforge.core.fiber_presentation import decode as decode_fiber
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.image_presentation import decode as decode_image
 from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
@@ -26,6 +27,7 @@ RECORDS = {
     "bookmarks": decode_bookmark,
     "measurements": decode_measurement,
     "reference_images": decode_image,
+    "fibers": decode_fiber,
 }
 
 
@@ -63,6 +65,16 @@ def validate(session: "Session", workspace: Workspace, index: int) -> None:
         raise ValueError("Named workspaces must retain explicit membership.")
     validate_references(session, workspace, session.document.workspaces[index])
     validate_images(session, workspace, session.document.workspaces[index])
+    validate_fibers(session, workspace, session.document.workspaces[index])
+
+
+def validate_fibers(session: "Session", workspace: Workspace, previous: Workspace) -> None:
+    existing = {style.target for style in previous.fibers}
+    for style in workspace.fibers:
+        if style.target not in existing and not isinstance(
+            session.document.object(style.target), Fiber
+        ):
+            raise ValueError("Fiber appearance requires a Fiber.")
 
 
 def validate_images(session: "Session", workspace: Workspace, previous: Workspace) -> None:

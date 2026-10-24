@@ -576,6 +576,15 @@ surface through confirmed placement, rather than assigned to the nearest default
 The operation returns a job ID. A worker captures attachments and solves the initial
 route before publishing the complete Fiber. No intermediate Curve enters the document;
 cancellation/failure leaves no draft, and successful creation is one undo action.
+
+`fiber.presentation(target, radius)` sets a per-workspace world-space display radius
+in metres; `fiber.presentation.inspect(target)` returns that style. The default is
+0.001 m. Zero uses the ordinary centerline display. These operations preserve authored
+Fiber controls, numerical clearance, attached surfaces, results and anatomical undo.
+Styles persist in the workspace. Desktop tubes are native read-only presentation jobs;
+complete prepared meshes and their picking trees stage together. Radius changes do not
+reroute paths, rebuild tissues or block saving. Positive-radius tubes retain their last
+complete display while a replacement is prepared.
 Omitting bindings uses both open endpoints, or the first closed-curve point, with native
 nearest-ready-SCP capture. Explicit binding rows may omit `target` to use the same
 automatic choice for that point; explicit Tissue Base/Final overrides remain supported.

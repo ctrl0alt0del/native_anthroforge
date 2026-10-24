@@ -29,4 +29,3 @@ Column {
     UiButton { objectName: "placeCursor"; width: 34; height: 34; glyph: "cursor"; checked: toolbar.tool.state.mode==="CURSOR"; hint: "3D cursor · Surface placement and numeric settings"; onClicked: checked ? toolbar.tool.cancel() : toolbar.tool.begin("CURSOR") }
     UiButton { objectName: "createPatchSurface"; width: 34; height: 34; glyph: "patch"; hint: workspace.surfaceAction.hint; enabled: workspace.surfaceAction.enabled; onClicked: workspace.createSurface("AUTO") }
 }
-

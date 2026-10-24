@@ -298,3 +298,35 @@ selection. Twelve focused tests including existing Fiber creation and architectu
 Ruff/configured mypy and actual offscreen QML toolbar/creation/undo acceptance pass.
 No interactive viewport geometry claim is made. Full suite at the preceding checkpoint:
 2118 passed in 153.49 seconds. D11, F01 decision and broad qualification remain pending.
+
+## World-space Fiber display checkpoint
+
+D11 now has per-workspace fiber.presentation/inspect, persisted finite nonnegative radius,
+and an inspector numeric control. Default radius is .001 metres; zero retains centerline
+presentation. Numerical paths, collision clearance, attachments and anatomical undo remain
+unchanged. Fibers remain independently styled in different workspaces.
+
+Native af_path_display_tube transforms accepted centerline samples first, then constructs
+constant-world-radius rings, caps, canonical faces, render chunks, bounds and picking tree.
+The desktop uses read-only jobs in the existing coordinator with a dedicated cost policy,
+retained paths and cancellation. Each visible Fiber retains only its latest accepted tube;
+current/staged meshes remain leased through RenderModel and appear in profiler ownership.
+Positive-radius replacements retain complete current geometry until frame publication;
+exact picking queries that displayed mesh rather than a centerline with pixel width.
+
+Ten focused geometry/presentation/display/architecture tests pass: uniform, nonuniform and
+reflected transforms, bounds, closed seams, schema roundtrip, no numerical invalidation,
+no authored undo changes, retained display, matching frame-boundary picking, superseding
+edits and resource release. Existing 22 quick/Fiber interaction/creation cases also pass.
+Native build/all five tests, Ruff/configured mypy and targeted native style pass.
+
+Texture-only QQuickRenderControl acceptance now renders actual native tubes with no visible
+window. The Qt offscreen platform plugin cannot initialize D3D11 here; the normal Windows
+platform plus texture-only render control works without showing or controlling a window.
+Inspected radius .005/.04 m captures measure 5/33 pixels and exact picking passes. This is
+actual offscreen rendering evidence, not interactive acceptance or assembly performance.
+The new Fiber scene must be a View3D sibling; nesting it below an empty PathScene repeater
+made it absent from the scene and was corrected before this checkpoint.
+
+Full development gate, representative assembly/performance qualification, packaging and
+F01 user decision remain pending. No release version advance or main merge.

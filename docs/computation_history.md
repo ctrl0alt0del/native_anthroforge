@@ -1,5 +1,18 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: world-space Fiber presentation tubes
+
+Fixed pixel-width centerlines had no independent Fiber thickness. Positive-radius Fiber
+display now builds capped 12-sided tubes around transformed accepted paths in native
+read-only coordinator work. Transform scale cannot scale the world radius. Prepared render
+buffers, bounds and exact picking share one staged mesh. The numerical path, attachment
+field and routing clearance are untouched. One accepted mesh per visible Fiber is retained;
+current/staging leases and cache ownership appear in profiler reports. Radius is saved
+per workspace without anatomical history or geometry invalidation. Tests cover reflected
+and nonuniform transforms, closure, persistence, supersession and frame-boundary picking.
+Texture-only Windows rendering (no visible window) shows 5/33 pixel widths for .005/.04 m;
+the shapes were inspected. Assembly cost, full gate and release qualification are pending.
+
 ### In-progress 0.3.4: atomic surface-click Fiber construction
 
 Quick creation composes existing confirmed attachment capture and native routing on an

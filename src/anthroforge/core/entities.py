@@ -5,6 +5,7 @@ from math import isfinite
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from .fiber_presentation import FiberPresentation
 from .image_presentation import ImagePresentation
 from .inspection_views import CameraBookmark, Measurement
 from .presentation import validate_categories
@@ -107,6 +108,7 @@ class Workspace:
     measurements: tuple[Measurement, ...] = ()
     bookmarks: tuple[CameraBookmark, ...] = ()
     reference_images: tuple[ImagePresentation, ...] = ()
+    fibers: tuple[FiberPresentation, ...] = ()
     cursor: tuple[float, ...] = (0.0, 0.0, 0.0)
 
     def __post_init__(self) -> None:
@@ -117,6 +119,8 @@ class Workspace:
         validate_categories(self.unpickable_categories)
         if len({v.target for v in self.reference_images}) != len(self.reference_images):
             raise ValueError("Image appearance must have unique targets.")
+        if len({v.target for v in self.fibers}) != len(self.fibers):
+            raise ValueError("Fiber appearance must have unique targets.")
         if len(self.camera) != 7 or not all(map(isfinite, self.camera)) or self.camera[6] <= 0:
             raise ValueError("Invalid workspace camera.")
         if len(self.cursor) != 3 or not all(map(isfinite, self.cursor)):

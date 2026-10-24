@@ -54,6 +54,7 @@ class ConstructionProjection:
         from . import image_scene, path_scene
 
         resources = self.controller.session.resources
+        self.publish_fibers(resources)
         self.publish_kind(
             "path",
             path_scene.rows(self.controller)
@@ -62,6 +63,12 @@ class ConstructionProjection:
             (*path_scene.resources(self.controller), *self.placeholders.resources()),
         )
         self.publish_kind("image", image_scene.rows(self.controller), resources.images.values())
+
+    def publish_fibers(self, resources):
+        rows = [
+            r for r in self.records.values() if r.get("asset") in resources.paths and r["visible"]
+        ]
+        self.controller.fiber_display.synchronize(rows)
 
     def publish_kind(self, kind, desired, resources):
         if desired != self.rendered.get(kind):

@@ -13,6 +13,7 @@ from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
 from .creation_selection import CreationSelection
 from .drawing_tools import DrawingTools
+from .fiber_display import FiberDisplay
 from .image_tools import ImageTools
 from .inspection_export import InspectionExport
 from .inspection_panel import InspectionPanel
@@ -98,6 +99,7 @@ class Controller(QObject):
             memory_owners(self.feedback, owners)
         for model in self.geometry_models():
             model.memory_owners(owners)
+        self.fiber_display.memory_owners(owners)
         owners["drawing_preview"].update(self.drawing_tools.leases)
         if self.drawing_tools.stroke is not None:
             owners["drawing_preview"].add(self.drawing_tools.stroke)
@@ -108,6 +110,7 @@ class Controller(QObject):
         return (
             self.render_model,
             self.path_model,
+            self.fiber_display.model,
             self.image_model,
             self.tissue_inspection.model,
             self.shortcut_comparison.model,
@@ -120,6 +123,7 @@ class Controller(QObject):
 
         self.render_model, self.path_model = RenderModel(self), RenderModel(self)
         self.image_model = RenderModel(self)
+        self.fiber_display = FiberDisplay(self)
         self.initialize_image_layers()
         self.render_model.activated.connect(self.activate_geometry)
         self.path_model.activated.connect(self.activate_geometry)
@@ -183,6 +187,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def pathModel(self):
         return self.path_model
+
+    @Property(QObject, constant=True)
+    def fiberDisplayModel(self):
+        return self.fiber_display.model
 
     @Property("QVariantMap", notify=changed)
     def conversionState(self):

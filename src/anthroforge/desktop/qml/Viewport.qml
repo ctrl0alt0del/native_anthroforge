@@ -245,6 +245,7 @@ Item {
             opacity: .22
         }
         PathScene { effects: shortcutEffects.data }
+        FiberDisplayScene { effects: shortcutEffects.data }
         Node {
             id: worldScene
             eulerRotation.x: -90

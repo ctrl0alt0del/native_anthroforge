@@ -134,3 +134,11 @@ and construction/stage frames consistently; shared-junction projection runs befo
 atomic member expansion. Existing algorithms remain authoritative for source geometry.
 The mapping/index code intentionally handles relationship metadata in Python; native
 geometry is batched. No blanket Qt dependency was added to Core or headless operations.
+
+
+## Development qualification
+
+The release-candidate development gate passes **2,102 Python tests**, all **five
+native CTests**, typing (405 source files), configured style/function limits,
+numerical checks and doctor. Log: `build/mirroring-035-gate-final.log`.
+The complete portable executable is qualified separately; see the task record.

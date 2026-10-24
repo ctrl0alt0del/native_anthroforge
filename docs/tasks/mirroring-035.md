@@ -119,3 +119,13 @@ Runtime workflows and focused additions pass; release metadata advances to 0.3.5
 the canonical candidate. Final all-source native/static gate remains running, followed
 by full pytest/numerics. Portable qualification and integration are still required;
 this checkpoint is not a release-complete claim. No new numerical dependency is added.
+
+
+### Final development gate
+
+`tools/check.ps1` passed on the release-candidate source: 2,102 Python tests,
+five native CTests, typing for 405 source files, configured native/Python/PowerShell
+style, function limits, numerical checks and doctor (application 0.3.5). Log:
+`build/mirroring-035-gate-final.log`. Runtime code is qualified; the canonical
+Nuitka executable is still building and relocated portable checks remain next.
+Pinned executable source revision is `11a93e8`; later evidence edits change docs only.

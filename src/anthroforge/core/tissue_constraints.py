@@ -35,8 +35,10 @@ class TissueConstraint:
     binding_asset: str = ""
     material_asset: str = ""
     topology: str = ""
+    origin: str = "CUSTOM"
 
     def __post_init__(self) -> None:
+        validate_origin(self.origin)
         if not self.id or not self.mask or self.mode not in ("FIXED", "SOFT"):
             raise ValueError("A tissue constraint needs identity, mask and Fixed/Soft mode.")
         finite_range(self.strength, 0, 1, "Constraint strength")
@@ -49,3 +51,8 @@ class TissueConstraint:
             raise ValueError(
                 "A target-relative region requires an explicit complete material capture."
             )
+
+
+def validate_origin(origin: str) -> None:
+    if origin not in ("CUSTOM", "PRESET"):
+        raise ValueError("Constraint origin must be Custom or Preset.")

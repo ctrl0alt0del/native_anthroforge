@@ -3,7 +3,7 @@
 from dataclasses import asdict
 
 from anthroforge.application.object_frames import Frames
-from anthroforge.core import tissue_policy
+from anthroforge.core import tissue_policy, tissue_presets
 from anthroforge.core.tissue_parts import active
 from anthroforge.core.tissues import TissueVCP
 
@@ -31,6 +31,7 @@ def record(session, item, frame):
     row.update(
         tissue_modes=sorted(tissue_policy.inflation_modes(source)),
         tissue_domain=tissue_policy.domain(source),
+        tissue_presets=tissue_presets.available(source),
         tissue_masks=tissue_policy.region_masks(item),
     )
     return qml(row)
@@ -53,6 +54,7 @@ SCALARS = (
     "id",
     "source",
     "classification",
+    "preset",
     "both_sides",
     "reverse",
     "resolution",

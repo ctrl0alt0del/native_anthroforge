@@ -174,3 +174,22 @@ acceptance from them. An additional plot of actual native mesh triangles before/
 Hook movement was inspected (build/parity-workflows-034/split/native-geometry.png); the shape
 and connected joint are consistent on this fixture. Interactive desktop acceptance remains
 pending. Larger chained/mixed-deformer and incoming attachment cases need broader qualification.
+
+## Existing-tissue preset ownership checkpoint
+
+D09 adds tissue.preset.apply and a direct inspector chooser. It resets inflation across
+existing stable parts/sides, relaxation and explicitly PRESET-owned constraints. Source,
+classification, smoothing, connector settings, fields, custom regions, crop and stacking
+remain. Constraint provenance is serialized; older rows default CUSTOM conservatively.
+Explicit edits/rebinds/unlinks promote preset rows to CUSTOM. Preset creation alone tags
+its own defaults; public constraint creation cannot spoof managed provenance.
+Identical custom/default rows are not duplicated. Obvious contradictory Fixed masks are
+rejected. Existing shared capability/topology policies reject incompatible combinations;
+field-layout changes reject rather than discard custom weights or captured regions.
+Fourteen focused preset/architecture tests pass, including custom-weight package roundtrip,
+legacy provenance, custom conflict rejection, one-action undo and preservation. Extended
+full-desktop offscreen preset acceptance passes direct existing-tissue chooser as well as
+Layer/Pouch creation and Make Independent. Ruff and configured mypy pass.
+The full suite at the preceding split checkpoint passed 2,092 tests in 150.18 seconds;
+this does NOT qualify subsequent preset changes or the complete remaining release.
+D07/D08 reviewed replacement, D10/D11, F01 and broad release qualification remain pending.

@@ -16,6 +16,10 @@ ColumnLayout {
     function inflate(key,value) { inflationDraft.edit(key,value); }
     function connector(width,fullness) { workspace.run("tissue.connector",{target:selected.id,part:part.id,width:width,fullness:fullness}); }
     onItemChanged: if(!item.both_sides) side="a"
+    UiSection {
+        title:"Apply preset"; expanded:false
+        UiCombo { objectName:"tissueApplyPreset"; Layout.fillWidth:true; model:panel.selected.tissue_presets || []; textRole:"name"; valueRole:"id"; currentIndex:Math.max(0,model.findIndex(p=>p.id===panel.item.preset)); hint:"Reset inflation, relaxation and preset-owned constraints. Keep custom fields, regions, construction, crop and stacking."; onActivated:workspace.run("tissue.preset.apply",{target:panel.selected.id,preset:currentValue}) }
+    }
     UiField {
         id: nameField; objectName: "tissueName"; Layout.fillWidth: true; Accessible.name: "Tissue name"
         Binding { target: nameField; property: "text"; when: !nameField.activeFocus; value: panel.selected.name || "" }

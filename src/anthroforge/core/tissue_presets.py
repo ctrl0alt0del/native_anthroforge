@@ -85,7 +85,7 @@ def settings(source: object, preset: str) -> dict[str, Any]:
     return dict(
         parts=(TissuePart(a=side, b=side),),
         relaxation=TissueRelaxation(**relaxation),
-        constraints=tuple(TissueConstraint(mask=m, mode=k, strength=s) for m, k, s in constraints),
+        constraints=preset_constraints(constraints),
         resolution=33 if preset == "RIM" else 24,
         stacking=preset == "MUSCLE" and domain(source) == "SURFACE",
         classification="MUSCLE" if preset == "MUSCLE" else "SOFT_TISSUE",
@@ -96,3 +96,9 @@ def mode(source: object, preset: str) -> str:
     if preset == "MUSCLE" and isinstance(source, Membrane) and source.kind != "PATCH":
         return "DISTRIBUTED"
     return {"POINT": "RADIAL", "CURVE": "PROFILE", "SURFACE": "NORMAL"}[domain(source)]
+
+
+def preset_constraints(values: tuple[tuple[str, str, float], ...]) -> tuple[TissueConstraint, ...]:
+    return tuple(
+        TissueConstraint(mask=m, mode=k, strength=s, origin="PRESET") for m, k, s in values
+    )

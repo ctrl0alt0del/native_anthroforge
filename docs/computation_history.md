@@ -1,5 +1,15 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: explicit preset ownership for tissue resets
+
+Applying defaults to existing tissue now resets authored inflation/relaxation and only
+explicitly preset-owned constraints. Numerical inflation/relaxation kernels are unchanged.
+User region edits and rebindings promote provenance to Custom; legacy untagged rows stay
+Custom. Custom fields, source, crop and stacking are preserved. Incompatible field-layout
+or capability changes reject rather than silently dropping data or selecting a different
+algorithm. Preset and custom-weight roundtrip/undo tests and the offscreen inspector
+chooser passed; full-release and broad assembly qualification remain pending.
+
 ### In-progress 0.3.4: native connected-guide extraction
 
 SCP splitting now resolves Bezier handles on the complete source before separating open

@@ -52,6 +52,8 @@ AF_API int af_shortcut_owner_material_capture(uint64_t child,const double* world
     int mode,int index,const double* fallback,double* output);
 AF_API int af_shortcut_owner_material_backsolve(uint64_t reference,uint64_t current,const double* world,
     const double* parent,const double* offset,const double* record,const double* target,double* output);
+/* Migration retains a source polygon anchor in child-local coordinates without moving its pose. */
+AF_API int af_shortcut_retain_child_anchor(const double* world,const double* record,const double* local,double* output);
 /* Restore unedited structural pins against their own retained material surface snapshots. */
 AF_API int af_attachment_retain_pins(uint64_t path,int knots,const int* pins,const int* targets,
     const double* records,int count,int* owners,double* weights,double* bindings);

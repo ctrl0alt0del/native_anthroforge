@@ -70,6 +70,7 @@ def run():
 
 def exercise(controller, engine):
     create(controller, engine)
+    support_override(controller, engine)
     object_transform_policy(controller, engine.rootObjects()[0])
     editing(controller)
     component_shortcuts(controller, engine.rootObjects()[0])
@@ -207,6 +208,20 @@ def conversion(controller, engine):
     item = controller.session.document.object(controller.selection)
     assert item.engine == "POLYLINE" and len(item.bindings) == 3
     assert item.result.status == "ready", item.result.error
+
+
+def support_override(controller, engine):
+    find(engine.rootObjects()[0], "inspectorHeader").setProperty("shortcuts", False)
+    controller.authoring.setEditing(True)
+    settle(controller)
+    control = find(engine.rootObjects()[0], "fiberSupportsAutomatic")
+    assert control.property("checked")
+    control.setProperty("checked", False)
+    assert QMetaObject.invokeMethod(control, "clicked", Qt.DirectConnection)
+    settle(controller)
+    item = controller.session.document.object(controller.selection)
+    assert not item.support_policy.automatic and item.result.status == "ready"
+    assert not controller.session.scheduler.errors
 
 
 if __name__ == "__main__":

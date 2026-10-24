@@ -7,6 +7,7 @@ from anthroforge.core.construction import Curve, CurvePoint
 from anthroforge.core.curve_engines import fields as curve_fields
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import Attachment
+from anthroforge.core.fiber_support_policy import FiberSupportPolicy
 from anthroforge.core.fibers import Fiber, FiberBinding, FiberEdit
 from anthroforge.core.membranes import Membrane
 from anthroforge.core.object_registry import Authored
@@ -75,8 +76,19 @@ def decode_curve(kind: str, state: dict[str, Any]) -> Curve:
         state["bindings"] = tuple(decode_binding(binding) for binding in state["bindings"])
         state["edit"] = decode_edit(state.get("edit"))
         state["supports"] = tuple(surface_reference_codec.capture(row) for row in state["supports"])
+        state["support_policy"] = decode_support_policy(state.get("support_policy", {}))
         return Fiber(**state)
     return Curve(**state)
+
+
+def decode_support_policy(data: dict[str, Any]) -> FiberSupportPolicy:
+    if set(data) - {"automatic", "included", "excluded"}:
+        raise ValueError("Unknown deformation support policy setting.")
+    fields = {
+        key: tuple(SurfaceReference(**ref) for ref in data.get(key, ()))
+        for key in ("included", "excluded")
+    }
+    return FiberSupportPolicy(automatic=data.get("automatic", True), **fields)
 
 
 def decode_binding(data: dict[str, Any]) -> FiberBinding:

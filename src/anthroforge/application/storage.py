@@ -20,8 +20,8 @@ from .construction_codec import control, entity_construction
 from .resources import Resources
 
 FORMAT = "anthroforge-project"
-VERSION = 5
-READ_VERSIONS = (4, 5)
+VERSION = 6
+READ_VERSIONS = (4, 5, 6)
 STATE_RECORDS = (
     "entities",
     "controls",

@@ -14,6 +14,7 @@ ColumnLayout {
     readonly property var piece: (primitive.pieces || []).find(p => p.curve === curve.id) || {}
     readonly property bool topologyLocked: (item.topology_dependents || []).length > 0
     Layout.fillWidth: true; spacing: 8
+    FiberSupports { curve:panel.curve; visible:panel.curve.bindings !== undefined }
     function primitiveSetting(key,value) { authoring.setting("primitive.update",key,value); }
     function curveSetting(key,value) { const args={entity:item.id,curve:curve.id}; args[key]=value; authoring.edit("curve.update",args); }
     function pointSetting(key,value) { const args={entity:item.id,curve:curve.id,point:point.id}; args[key]=value; authoring.edit("point.update",args); }

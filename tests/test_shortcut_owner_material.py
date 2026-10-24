@@ -56,3 +56,18 @@ def test_material_capture_preserves_original_polygon_center(session):
     frame = material_bindings.frames(meshes["before"], meshes["before"], IDENTITY, [record])
     np.testing.assert_allclose(frame.reshape(4, 4)[:3, 3], retained[3], atol=1e-7)
 
+
+def test_source_child_anchor_transfer_preserves_baseline_pose(session, assembly):
+    from threading import Event
+
+    from anthroforge.native.attachments import propagate
+
+    root, child = assembly
+    before, parent = session.document.entity(child), session.document.entity(root)
+    origin = tuple(v + 0.01 for v in before.attachment.binding[18:21])
+    row = shortcut_attachments.retain_child_anchor(session.engine, before, origin)
+    changed = replace(before, attachment=replace(before.attachment, binding=row))
+    meshes = {key: asset.mesh for key, asset in session.assets.items()}
+    result = propagate(session.engine, [parent, changed], meshes, {child}, Event())[-1]
+    np.testing.assert_allclose(result.matrix, before.matrix, atol=1e-7)
+    assert row[27] == -1 and row[18:21] == origin

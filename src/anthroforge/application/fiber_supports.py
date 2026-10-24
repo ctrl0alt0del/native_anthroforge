@@ -3,9 +3,12 @@
 from dataclasses import replace
 from typing import Any
 
+from anthroforge.core.fiber_support_policy import FiberSupportPolicy
 from anthroforge.native import attachment_fields, components, point_attachments
 
 from . import attachment_assets
+
+DEFAULT_POLICY = FiberSupportPolicy()
 
 
 def deformation_targets(candidates: Any, parents: Any) -> tuple[Any, ...]:
@@ -13,6 +16,11 @@ def deformation_targets(candidates: Any, parents: Any) -> tuple[Any, ...]:
     if any(ref.role != "SCP_GEOMETRY" for ref in explicit):
         return tuple(sorted(explicit))
     return tuple(sorted(explicit | {ref for ref in candidates if ref.role == "SCP_GEOMETRY"}))
+
+
+def selected_targets(candidates: Any, parents: Any, policy: FiberSupportPolicy) -> tuple[Any, ...]:
+    automatic = set(deformation_targets(candidates, parents)) if policy.automatic else set(parents)
+    return tuple(sorted((automatic | set(policy.included)) - set(policy.excluded) | set(parents)))
 
 
 def resolve_parents(
@@ -45,11 +53,23 @@ def automatic_owners(
 
 
 def capture(
-    engine: Any, document: Any, resources: Any, candidates: Any, request: Any, cancel: int
+    engine: Any,
+    document: Any,
+    resources: Any,
+    candidates: Any,
+    request: Any,
+    cancel: int,
+    policy: FiberSupportPolicy = DEFAULT_POLICY,
 ) -> tuple[Any, Any]:
     parents = resolve_parents(engine, document, resources, candidates, request, cancel)
-    targets = deformation_targets(candidates, parents)
+    targets = selected_targets(candidates, parents, policy)
     request = replace(request, parents=[targets.index(parent) for parent in parents])
+    return capture_field(engine, document, resources, targets, request, cancel)
+
+
+def capture_field(
+    engine: Any, document: Any, resources: Any, targets: Any, request: Any, cancel: int
+) -> tuple[Any, Any]:
     surfaces = attachment_assets.surface_inputs(engine, document, resources.meshes, targets, cancel)
     field = attachment_fields.capture(engine, surfaces, request, cancel)
     captures = attachment_assets.captures(engine, document, resources.meshes, targets)

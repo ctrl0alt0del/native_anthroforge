@@ -914,3 +914,14 @@ configure the complete assembly's correspondence after establishing its junction
 Read-only `shortcut.effects`, `shortcut.formulas`, `shortcut.attachment_policy` and
 `shortcut.progress` expose influence, captured numerical evidence, effective policy and
 downstream readiness without edits. See [operation signatures and walkthrough](shortcuts_031.md).
+
+## In-progress 0.3.4: Fiber deformation supports
+
+`fiber.supports.inspect(curve)` returns authored policy, accepted captures and eligible
+surface references without editing. `fiber.supports.configure(curve, policy)` sets
+`automatic` (default true), `included` and `excluded` reference arrays. Each reference
+contains target identity and role. These are deformation supports, not routing obstacles.
+Required pin targets cannot be excluded. Reconfiguration retains current shape and
+captures new fields through the coordinator with normal cancellation/undo semantics.
+Schema 6 persists policy; schemas 4/5 load with existing automatic behavior and retain
+accepted results. This branch is not a qualified 0.3.4 release.

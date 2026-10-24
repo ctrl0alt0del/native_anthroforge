@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from .construction import Curve
 from .entities import Attachment
+from .fiber_support_policy import FiberSupportPolicy
 from .surface_references import CapturedSurface, SurfaceReference
 
 
@@ -48,6 +49,7 @@ class Fiber(Curve):
     attachment_asset: str = ""
     supports: tuple[CapturedSurface, ...] = ()
     edit: FiberEdit | None = None
+    support_policy: FiberSupportPolicy = FiberSupportPolicy()
 
     def __post_init__(self) -> None:
         Curve.__post_init__(self)

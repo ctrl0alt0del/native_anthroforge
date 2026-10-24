@@ -15,6 +15,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_shortcut_owner_backsolve", [*common, D])
     engine.bind("af_shortcut_owner_material_capture", [U, D, D, c.c_int, c.c_int, D, D])
     engine.bind("af_shortcut_owner_material_backsolve", [U, U, D, D, D, D, D, D])
+    engine.bind("af_shortcut_retain_child_anchor", [D, D, D, D])
 
 
 def arguments(child: Any, parent: Any, meshes: Any, anchor: Any) -> tuple[Any, ...]:
@@ -97,3 +98,17 @@ def material_arrays(child: Any, parent: Any, anchor: Any) -> Any:
             anchor.parent_local,
         )
     )
+
+
+def retain_child_anchor(engine: GeometryEngine, child: Any, local: Any) -> tuple[float, ...]:
+    output = np.empty(28)
+    arrays = tuple(doubles(v) for v in (child.matrix, child.attachment.binding, local))
+    if arrays[0].size != 16 or arrays[1].size != 28 or arrays[2].size != 3:
+        raise ValueError("Source child anchor requires a transform, captured binding and xyz.")
+    engine.check(
+        engine.library.af_shortcut_retain_child_anchor(
+            *(pointer(v) for v in arrays),
+            pointer(output),
+        )
+    )
+    return tuple(map(float, output))

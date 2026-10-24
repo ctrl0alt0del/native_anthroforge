@@ -40,12 +40,30 @@ assembly and D01–D12 remain pending. Transferring the shoulder flow point in a
 experiment leaves the .11088 residual unchanged. Source GeometryNodes resamples cyclic
 guides to 64 points before factor sampling; migrated loft uses 65 shared samples.
 
+The shoulder residual is narrowed further: Blender separates loft strips, changing
+Solidify seam normals compared with the welded app loft. At the actual source anchor,
+outer vertices differ .000145 while inner offset vectors differ .131804 before the
+edit and .006680 afterward. Outer-reference transfer worsens the Hook error to .4052
+and was rejected. An asynchronous question asks whether the migrated loft may retain
+source strip boundaries, leaving welded as default. Await the answer before changing it.
+
+Thumb source polygon-center transfer plus effective Backsolve gives max bidirectional
+surface error 7.80384e-6 (previous .00628144), at baseline construction precision.
+Policy-only repair stays .00059519: both corrections are necessary. Working copies and
+snapshots are in build/parity-workflows-034; source projects remain unchanged. Actual
+render inspection and broader shortcut qualification are still required.
+
 ## Verification
 
 - Windows native build and all five native tests pass.
 - 13 focused Python tests pass: shortcut transactions, remeshed material owner anchors,
   migration policies and architecture/function limits. Full Ruff and mypy pass.
-- Native style check is still running. Full gate, GUI, profiler and packaging pending.
+- Native style check passed. Full gate, profiler and packaging pending.
+- 51 focused tests passed, then six support/architecture tests including explicit tissue
+  supports. Extended offscreen fiber_editor_acceptance passes the real support toggle.
+- construction_editor_acceptance fails on a UiNumberField propertyState binding loop;
+  reproduced with the new support component removed in an ignored QML copy. Investigate
+  before final qualification; do not suppress the warning or claim this gate passed.
 - Background Blender recaptured effective policies from the matching assembly into
   `build/parity-workflows-034/effective-inventory.json`, without saving the source.
 

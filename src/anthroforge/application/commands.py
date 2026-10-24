@@ -21,6 +21,7 @@ from . import (
     evaluation,
     fiber_bindings,
     fiber_operations,
+    fiber_support_operations,
     geometry_modifiers,
     image_operations,
     image_presentation,
@@ -135,6 +136,7 @@ EDITS = {
     "fiber.binding.scope": fiber_operations.binding_scope,
     "fiber.binding.set": fiber_bindings.assign,
     "fiber.binding.remove": fiber_bindings.remove,
+    "fiber.supports.configure": fiber_support_operations.configure,
     "image.import": image_operations.import_image,
     "image.replace": image_operations.replace_source,
     "image.instance": image_operations.instance,
@@ -303,16 +305,23 @@ def construction_queries(session: "Session") -> dict[str, Any]:
     return {
         **tissue_queries(session),
         "tissue.stacking.inspect": lambda **a: tissue_stack_operations.inspect(session, **a),
-        "surface.preview": lambda **a: surface_preview.preview(session, **a),
-        "surface.grouping": lambda **a: surface_grouping.inspect(session, **a),
-        "surface.preview.status": lambda: surface_preview.status(session),
-        "surface.preview.cancel": lambda: surface_preview.cancel(session),
+        **surface_queries(session),
         "image.inspect": lambda **a: image_operations.inspect(session, **a),
         "object.inspect": lambda **a: object_operations.inspect(session, **a),
+        "fiber.supports.inspect": lambda **a: fiber_support_operations.inspect(session, **a),
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),
         "control.affected": lambda **a: controls.affected(session, **a),
         "deformer.members": lambda **a: deformers.members(session, **a),
         "junction.inspect": lambda **a: junction_operations.inspect(session, **a),
+    }
+
+
+def surface_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "surface.preview": lambda **a: surface_preview.preview(session, **a),
+        "surface.grouping": lambda **a: surface_grouping.inspect(session, **a),
+        "surface.preview.status": lambda: surface_preview.status(session),
+        "surface.preview.cancel": lambda: surface_preview.cancel(session),
     }
 
 

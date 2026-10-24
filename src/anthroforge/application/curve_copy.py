@@ -71,6 +71,16 @@ def binding_changes(curve: Curve, identities: dict[str, str]) -> dict[str, Any]:
         bindings=bindings,
         supports=tuple(remap_capture(s, identities) for s in curve.supports),
         edit=copied_edit(curve, identities),
+        support_policy=remapped_support_policy(curve, identities),
+    )
+
+
+def remapped_support_policy(curve: Fiber, identities: dict[str, str]) -> Any:
+    policy = curve.support_policy
+    return replace(
+        policy,
+        included=tuple(remap(r, identities) for r in policy.included),
+        excluded=tuple(remap(r, identities) for r in policy.excluded),
     )
 
 

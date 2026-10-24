@@ -18,6 +18,7 @@ def targets(item: Curve) -> set[str]:
     if isinstance(item, Fiber):
         result.update(s.reference.target for s in item.supports)
         result.update(binding.target for binding in item.bindings)
+        result.update(ref.target for ref in item.support_policy.included)
         if item.edit:
             result.update(r.target for r in item.edit.candidates)
     return result
@@ -40,6 +41,7 @@ def references(item: Curve, objects: tuple[object, ...] = ()) -> set[SurfaceRefe
     if isinstance(item, Fiber):
         result.update(s.reference for s in item.supports)
         result.update(b.reference for b in item.bindings)
+        result.update(item.support_policy.included)
         if item.edit:
             result.update(item.edit.candidates)
     return result

@@ -86,6 +86,7 @@ ColumnLayout {
         Label { text: "Control point"; color: Theme.muted }
         FiberBinding { curve: panel.curve; point: panel.point }
         CurveJunction { curve: panel.curve; point: panel.point }
+        UiButton { objectName:"splitSCP"; text:"Split into connected SCPs"; visible:panel.primitive.kind === "BODY"; enabled:!!authoring.selectedComponent.point; hint:"Split at selected interior guide points; keep children on the first segment and join neighboring ends with shared Hooks."; onClicked:authoring.splitSCP() }
         UiCombo { id: pointChoice; objectName: "pointChoice"; Layout.fillWidth: true; model: panel.points.map((p,i)=>"Point "+(i+1)); onActivated: { const rows=authoring.componentRows.filter(r=>r.point===panel.point.id && r.part==="position"); if(rows.length) authoring.selectComponent(rows[0].key,false); } }
         VectorSetting { propertyReference: ({target:panel.curve.id,path:["points","@"+panel.point.id,"position"]}); enabled: panel.curve.engine !== "PARAMETRIC"; length: true; label: "Point position"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
         Repeater {

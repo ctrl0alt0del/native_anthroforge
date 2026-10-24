@@ -16,6 +16,7 @@ PROTECTION = frozenset(("stacking_fixed", "protected_crease"))
 
 
 def configure(engine: GeometryEngine) -> None:
+    engine.bind("af_curve_segment", [D, c.c_int, c.c_int, c.c_int, c.c_int, D, U])
     engine.bind("af_curve_point_edit", [D, c.c_int, c.c_int, c.c_int, D, c.c_int, D])
     engine.bind("af_curve_place_points", [D, c.c_int, c.POINTER(c.c_int), D, c.c_int, D, D, U])
 
@@ -119,3 +120,18 @@ def handle_mode(value: Any) -> str:
     if index != value or not 0 <= index < 2 * len(HANDLES):
         raise ValueError("Invalid native curve handle mode.")
     return HANDLES[index % len(HANDLES)]  # Upper range means handles were resolved natively.
+
+
+def segment(engine: GeometryEngine, curve: Curve, first: int, last: int) -> Curve:
+    data = curve_records(curve)
+    if curve.engine == "POLYLINE":
+        data[:, 11:13] = 3
+    output = np.empty((last - first + 1, 13))
+    engine.check(
+        engine.library.af_curve_segment(
+            pointer(data), len(data), first, last, curve.resolution, pointer(output), 0
+        )
+    )
+    originals = curve.points[first : last + 1]
+    points = tuple(unpack(p, row) for p, row in zip(originals, output, strict=True))
+    return replace(curve, points=points)

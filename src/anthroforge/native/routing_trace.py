@@ -66,7 +66,9 @@ def execute(
     return int(engine.library.af_route_inspect_configured(*args, *execution))
 
 
-def execution_options(inputs: routing.Inputs, settings: RoutingSettings, cancel: int) -> tuple:
+def execution_options(
+    inputs: routing.Inputs, settings: RoutingSettings, cancel: int
+) -> tuple[int, int, int, float, int]:
     warm = inputs.warm.handle if inputs.warm and settings.use_warm_start else 0
     return (
         warm,

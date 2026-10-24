@@ -1,5 +1,17 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: native connected-guide extraction
+
+SCP splitting now resolves Bezier handles on the complete source before separating open
+segments, preserving positions instead of recomputing endpoint auto handles on truncated
+neighbors. Native minimum-twist frame comparison supplies a constant tilt compensation
+for each later segment. One shared Hook per joint drives both endpoint triples.
+This is authoring segmentation, not mesh baking or imported-geometry fallback. Original
+body sampling and deformation kernels are retained. Native guide position/roll tests,
+moving-Hook endpoint coincidence and a plot of actual mesh triangles were checked on a
+curved box fixture. New segment curves start without copied accepted-result provenance.
+Broader assembly/parity and interactive viewport acceptance remain pending.
+
 ### In-progress 0.3.4: active native routing objective and checkpoints
 
 Routing previously hardcoded length weight .9 and stepped one solver trial per native

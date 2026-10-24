@@ -288,3 +288,40 @@ int af_curve_sample(const double* points,int count,int closed,int resolution,int
         return 0;
     } catch(const std::exception& e) { af::set_error(e.what()); return 1; }
 }
+
+namespace af {
+static size_t split_sample_index(const std::vector<Bezier>& points,int first,int resolution) {
+    size_t result=0;
+    for(int i=0;i<first;++i)
+        result+=points[i].rm%4==3&&points[i+1].lm%4==3?1:resolution;
+    return result;
+}
+static double split_roll(const std::vector<Bezier>& source,const std::vector<Bezier>& segment,
+                         int first,int resolution,uint64_t cancel) {
+    if(!first) return 0;
+    const auto reference=body_path(source,false,resolution,cancel);
+    const auto samples=body_path(segment,false,resolution,cancel);
+    const auto& frame=samples.front();
+    const V3 target=reference[split_sample_index(source,first,resolution)].normal;
+    return std::atan2(frame.tangent.dot(frame.normal.cross(target)),frame.normal.dot(target));
+}
+static void write_segment(const std::vector<Bezier>& points,double roll,double* output) {
+    for(size_t i=0;i<points.size();++i) {
+        const auto& p=points[i]; auto* row=output+13*i;
+        for(int axis=0;axis<3;++axis) { row[axis]=p.p[axis]; row[axis+3]=p.left[axis]; row[axis+6]=p.right[axis]; }
+        row[9]=p.radius; row[10]=p.tilt+roll;
+        row[11]=p.lm%4==3?3:2; row[12]=p.rm%4==3?3:2;
+    }
+}
+}
+int af_curve_segment(const double* records,int count,int first,int last,int resolution,
+                     double* output,uint64_t cancel) {
+    try {
+        if(!output||first<0||last>=count||first>=last||resolution<1||resolution>1024)
+            throw std::runtime_error("Invalid curve segment.");
+        auto source=af::read_bezier(records,count); af::handles(source,false);
+        const std::vector<af::Bezier> segment(source.begin()+first,source.begin()+last+1);
+        const double roll=af::split_roll(source,segment,first,resolution,cancel);
+        af::write_segment(segment,roll,output); af::check_cancel(cancel); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}

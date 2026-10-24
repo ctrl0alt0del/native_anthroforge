@@ -282,3 +282,16 @@ def update_tissue_control(session, reference, value):
 
 
 DIRECT_POINTS = {"lattice": update_lattice_point, "tissue_control": update_tissue_control}
+
+
+def split_scp(editor):
+    rows = [
+        row
+        for row in editor.componentRows
+        if row["key"] in editor.selection and row.get("part") == "position"
+    ]
+    points = list(dict.fromkeys(row["point"] for row in rows))
+    result = editor.controller.run("scp.split", dict(entity=editor.state["id"], points=points))
+    if result:
+        editor.setEditing(False)
+        editor.controller.select(result["controls"][-1])

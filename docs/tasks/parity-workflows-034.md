@@ -155,3 +155,22 @@ subsequent queued publication. Construction, Fiber and Surface offscreen accepta
 all pass with their warning assertions intact; seven metadata/architecture tests pass.
 This replaces the earlier recorded construction-editor failure; broader performance
 qualification is still pending.
+
+## Connected SCP splitting checkpoint
+
+D06 adds scp.split(entity, points) and the Primitive inspector action operating on selected
+interior guide points. As in the addon, supported sources are one open Bezier/Polyline
+whole-guide body under an SCP parent, without existing curve deformers or shared consumers.
+The first SCP/source identity and children remain; new SCPs are siblings. Other compatible
+base/geometry bindings share existing controls with remapped target identities.
+Native extraction resolves handles before separating segments and compensates minimum-twist
+roll; authored point identities remain on the first segment and copies receive new identities.
+Each joint is one Hook following the common parent with two endpoint bindings. Newly created
+curves receive fresh result state, never the original curve's accepted source record.
+Tests cover coincident endpoints after moving Hook, hierarchy, atomic rejection, undo/redo,
+save/open and native shape/roll. Offscreen actual-button acceptance passes without warnings.
+Offscreen UI captures did NOT render meshes on this machine; do not claim viewport geometry
+acceptance from them. An additional plot of actual native mesh triangles before/after and
+Hook movement was inspected (build/parity-workflows-034/split/native-geometry.png); the shape
+and connected joint are consistent on this fixture. Interactive desktop acceptance remains
+pending. Larger chained/mixed-deformer and incoming attachment cases need broader qualification.

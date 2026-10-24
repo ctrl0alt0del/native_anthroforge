@@ -71,8 +71,10 @@ class TissueInspectionTools(QObject):
         self.notify()
 
     def synchronize(self):
+        from anthroforge.core.mirroring import source
+
         controller, session = self.controller, self.controller.session
-        item = session.document.registry.records.get(controller.selection)
+        item = session.document.registry.records.get(source(controller.selection))
         self.update_context(self.selection_context(item))
         if not self.target:
             return
@@ -132,7 +134,7 @@ class TissueInspectionTools(QObject):
         return (
             str(session.document.id),
             session.active_workspace,
-            item.id if isinstance(item, TissueVCP) else "",
+            self.controller.selection if isinstance(item, TissueVCP) else "",
         )
 
     def editing_geometry(self):

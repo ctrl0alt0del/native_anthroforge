@@ -26,7 +26,9 @@ def local_frame(engine: Any, document: Any, item: Curve) -> Any:
     return construction.matrix(engine, world, reflected, relative=True)
 
 
-def create(session: Any, curve: str, rule: str = "", axis: str | None = None, shift: float | None = None) -> None:
+def create(
+    session: Any, curve: str, rule: str = "", axis: str | None = None, shift: float | None = None
+) -> None:
     item = object_operations.editable(session, curve)
     if not isinstance(item, Curve) or item.closed or item.symmetric:
         raise ValueError("Select an open Curve or Fiber as the authored half.")
@@ -63,5 +65,13 @@ def expand(engine: Any, document: Any, item: Curve, asset: Any, cancel: int) -> 
     return replace(asset, path=path, authored=authored)
 
 
-def half(item: Any) -> Any:
-    return replace(item, closed=False, symmetric=None) if item.symmetric else item
+def constrain(session: Any, before: Any, item: Any) -> Any:
+    from anthroforge.native.curve_editing import constrain_seams
+
+    if not isinstance(item, Curve) or not item.symmetric or not before.symmetric:
+        return item
+    if item.points == before.points:
+        return item
+    return constrain_seams(
+        session.engine, item, local_frame(session.engine, session.document, item)
+    )

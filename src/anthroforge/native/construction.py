@@ -92,7 +92,9 @@ def resolved_curve(engine: GeometryEngine, curve: Curve, records: Any = None) ->
     records[:, 11:13] %= 4
     if curve.engine == "POLYLINE":
         records[:, 11:13] = 3
-    engine.check(engine.library.af_curve_handles(pointer(records), len(curve.points), curve.closed))
+    engine.check(
+        engine.library.af_curve_handles(pointer(records), len(curve.points), curve.path_closed)
+    )
     return records
 
 

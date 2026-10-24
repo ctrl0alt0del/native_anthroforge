@@ -16,7 +16,12 @@ ColumnLayout {
     }
     UiSection {
         title: panel.anchor ? "Explicit rebind" : "Create attached copy"
-        SurfaceSelector { id: surface; objectName: "pointAttachmentSurface"; target: panel.item.binding?.reference?.target || ""; role: panel.item.binding?.reference?.role || "" }
+        SurfaceSelector {
+            id: surface; objectName: "pointAttachmentSurface"
+            readonly property var ref: panel.item.binding?.reference || ({})
+            target: ref.instance ? "mirror/" + ref.instance + "/" + ref.target : (ref.target || "")
+            role: ref.role || ""
+        }
         UiButton {
             objectName: "createOrRebindAnchor"; Layout.fillWidth: true
             text: panel.anchor ? "Rebind at 3D cursor" : "Create independent Anchor"

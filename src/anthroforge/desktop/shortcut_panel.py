@@ -74,8 +74,10 @@ class ShortcutPanel(QObject):
         self.synchronize()
 
     def selected_owner(self):
+        from anthroforge.core.mirroring import source
+
         session, selected = self.controller.session, self.controller.selection
-        owners = property_owners(session.document, selected) if selected else set()
+        owners = property_owners(session.document, source(selected)) if selected else set()
         return next(iter(owners)) if len(owners) == 1 else ""
 
     def synchronize(self):
@@ -109,7 +111,15 @@ class ShortcutPanel(QObject):
             self.shortcut_row(v) if "reference" in v else driver_row(session, v) for v in values
         ]
         rows = [dict(row, statusText=badge(self, row["key"])) for row in rows]
-        self.model.synchronize_records(rows if self.all or selected else [])
+        self.model.synchronize_records(self.instance_rows(rows) if self.all or selected else [])
+
+    def instance_rows(self, rows):
+        if not self.all and self.controller.selectedData.get("mirror_source"):
+            return [
+                dict(row, writable=False, reason="Mirrored shortcuts are read-only.")
+                for row in rows
+            ]
+        return rows
 
     def shortcut_row(self, value):
         try:

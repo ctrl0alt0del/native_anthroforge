@@ -23,6 +23,8 @@ def scene_signature(document: Document) -> tuple[object, ...]:
         document.objects,
         document.junctions,
         document.attachments_enabled,
+        document.mirror_rules,
+        tuple(document.mirrors.placements.items()),
     )
 
 

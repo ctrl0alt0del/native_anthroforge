@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from anthroforge.core.mirroring import MirrorInstance, parse
 from anthroforge.core.document import Document
+from anthroforge.core.mirroring import MirrorInstance, parse
 
 
 def selected(document: Any, target: str) -> tuple[str, str]:
@@ -19,12 +19,16 @@ def frame(document: Document, item: Any) -> tuple[float, ...]:
     rule = item.attachment.parent_instance
     if MirrorInstance(item.parent, rule).id not in document.mirrors.instances:
         raise ValueError("The parent attachment's mirrored instance is unavailable.")
-    return document.mirrors.rules[rule].frame
+    instance = document.mirrors.instances[MirrorInstance(item.parent, rule).id]
+    return document.mirrors.plane(instance).frame
 
 
 def reflections(document: Any, targets: set[str]) -> dict[str, tuple[float, ...]]:
-    return {key: frame(document, document.entity(key)) for key in targets
-            if document.entity(key).attachment.parent_instance}
+    return {
+        key: frame(document, document.entity(key))
+        for key in targets
+        if document.entity(key).attachment.parent_instance
+    }
 
 
 def receipt(document: Any, child: Any, parent: Any) -> Any:
@@ -39,7 +43,10 @@ def invalidate(session: Any, seeds: Any) -> None:
 
     graph = dependencies.graph(session.document)
     outputs = dependencies.closure(dependencies.reverse(graph), seeds)
-    targets = {p.owner for p in outputs if p.output == "pose"
-               and p.owner in session.document.index.entities}
+    targets = {
+        p.owner
+        for p in outputs
+        if p.output == "pose" and p.owner in session.document.index.entities
+    }
     if targets:
         evaluation.request(session, targets)

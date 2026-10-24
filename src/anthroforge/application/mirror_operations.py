@@ -18,6 +18,9 @@ def queries(session: Any) -> dict[str, Any]:
         "mirror.source": lambda **a: source(session, **a),
         "mirror.removal.inspect": lambda **a: removal(session, **a),
         "mirror.attachment.shared": lambda **a: shared(session, **a),
+        "mirror.source.removal.inspect": lambda target: mirror_policy.removing(
+            session.document, target
+        ),
     }
 
 
@@ -59,7 +62,7 @@ def listing(session: Any, source: str = "") -> list[dict[str, Any]]:
 
 def describe(document: Any, instance: Any) -> dict[str, Any]:
     item = document.object(instance.source)
-    rule = document.mirrors.rules[instance.rule]
+    rule = document.mirrors.plane(instance)
     return dict(
         id=instance.id,
         source=instance.source,

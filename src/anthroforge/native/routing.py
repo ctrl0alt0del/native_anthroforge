@@ -72,7 +72,7 @@ def evaluate(engine: GeometryEngine, inputs: Inputs, cancel: int = 0) -> tuple[P
     options = Options(
         settings.samples,
         settings.accepted_steps,
-        inputs.curve.closed,
+        inputs.curve.path_closed,
         settings.radius,
     )
     return invoke(engine, arrays(inputs), options, inputs.warm, cancel, inputs.backend)

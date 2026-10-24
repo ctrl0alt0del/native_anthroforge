@@ -82,7 +82,7 @@ def evaluate(engine: GeometryEngine, curve: Curve, cancel: int = 0, records: Any
         pointer(records),
         len(curve.points),
         int(curve.engine == "POLYLINE"),
-        curve.closed,
+        curve.path_closed,
         curve.resolution,
         cancel,
     )

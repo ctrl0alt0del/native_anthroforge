@@ -48,12 +48,16 @@ def references(value: Any) -> tuple[SurfaceReference, ...]:
         return tuple(ref for item in value for ref in references(item))
     if not is_dataclass(value):
         return ()
-    return (*parent_references(value), *tuple(
+    return (*parent_references(value), *relationship_references(value))
+
+
+def relationship_references(value: Any) -> tuple[SurfaceReference, ...]:
+    return tuple(
         ref
         for name in RELATIONSHIPS
         if hasattr(value, name)
         for ref in references(getattr(value, name))
-    ))
+    )
 
 
 def parent_references(value: Any) -> tuple[SurfaceReference, ...]:
@@ -82,14 +86,41 @@ def add_stacking_blockers(rows: Any, item: Any, removed: set[str]) -> None:
     intent = tuple(r.other for r in getattr(item, "stack_relationships", ()))
     for target in set(plan) | set(intent):
         if target in removed:
-            rows[item.id, target] = dict(id=item.id, name=item.name, instance=target,
-                                        reason="Stacking provider reference")
+            rows[item.id, target] = dict(
+                id=item.id, name=item.name, instance=target, reason="Stacking provider reference"
+            )
 
 
 def require_transition(before: Any, after: Any) -> None:
     removed = before.mirrors.instances.keys() - after.mirrors.instances.keys()
-    affected = [row for row in blockers(before, removed)
-                if row["id"] in after.registry.records] if removed else []
+    affected = (
+        [row for row in blockers(before, removed) if row["id"] in after.registry.records]
+        if removed
+        else []
+    )
     if affected:
         names = ", ".join(row["name"] for row in affected)
         raise ValueError("Mirror removal is blocked by referenced consumers: " + names)
+
+
+def removing(document: Any, target: str) -> list[dict[str, str]]:
+    removed = {
+        v.id for v in document.mirrors.instances.values() if v.source == target or v.rule == target
+    }
+    rows = blockers(document, removed)
+    rows.extend(
+        dict(id=o.id, name=o.name, reason="Symmetric construction plane", instance="")
+        for o in document.objects
+        if getattr(getattr(o, "symmetric", None), "rule", "") == target
+        or getattr(getattr(o, "mirror_plane", None), "rule", "") == target
+    )
+    return [r for r in rows if r["id"] != target]
+
+
+def require_removal(document: Any, target: str) -> None:
+    rows = removing(document, target)
+    if rows:
+        raise ValueError(
+            "Mirror removal is blocked by referenced consumers: "
+            + ", ".join(row["name"] for row in rows)
+        )

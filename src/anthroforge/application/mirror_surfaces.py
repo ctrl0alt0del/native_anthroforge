@@ -30,7 +30,8 @@ def from_identity(document: Any, target: str) -> SurfaceReference:
 def frame(engine: Any, document: Any, ref: SurfaceReference, source: Any) -> Any:
     if not ref.instance:
         return source
-    return matrix(engine, document.mirrors.rules[ref.instance].frame, source)
+    instance = document.mirrors.instances[MirrorInstance(ref.target, ref.instance).id]
+    return matrix(engine, document.mirrors.plane(instance).frame, source)
 
 
 def references(document: Any) -> tuple[SurfaceReference, ...]:

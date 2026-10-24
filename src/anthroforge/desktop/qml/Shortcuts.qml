@@ -5,6 +5,7 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     property var adapter: workspace.shortcutPanel
+    enabled: !workspace.selectedData.mirror_source
     property bool allObjects: false
     property bool choosing: false
     property bool editing: !!adapter.editing.details.id

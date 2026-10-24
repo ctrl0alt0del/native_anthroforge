@@ -3,6 +3,9 @@
 import numpy as np
 import pytest
 
+from tests.conftest import CUBE
+from tests.test_fiber_creation import bind
+
 
 def curve(session, points, engine="BEZIER"):
     key = session.command("curve.create", points=[dict(position=p) for p in points], engine=engine)
@@ -78,3 +81,35 @@ def test_symmetric_definitions_roundtrip_without_recomputation(session, tmp_path
     session.command("open", path=filename)
     np.testing.assert_array_equal(path(session, key).array(), before)
     assert session.document.object(key).symmetric is not None
+
+
+def test_seam_edit_constrains_position_and_translates_handles_with_one_undo(session):
+    key = curve(session, [(0, 0, 0), (1, 1, 0), (0, 2, 0)])
+    session.command("mirror.loop.create", curve=key)
+    session.command("wait")
+    before, cursor = session.document.object(key), session.history.cursor
+    session.command(
+        "curve.point.update", curve=key, point=before.points[0].id, position=[3, 0.5, 0]
+    )
+    session.command("wait")
+    after = session.document.object(key)
+    assert after.result.status == "ready", after.result.error
+    np.testing.assert_allclose(after.points[0].position, [0, 0.5, 0])
+    assert session.history.cursor == cursor + 1
+    session.command("undo")
+    assert session.document.object(key).points == before.points
+
+
+def test_symmetric_fiber_keeps_closed_binding_contract_and_evaluates_authored_half(session):
+    bone = session.command("import", path=str(CUBE), units=1.0)["entity_id"]
+    session.command("wait")
+    source = curve(session, [(0, -0.5, 0), (0.5, 0, 0), (0, 0.5, 0)], "POLYLINE")
+    item = bind(session, bone, source)
+    session.command("mirror.loop.create", curve=item.id)
+    session.command("wait")
+    assert session.document.object(item.id).result.status == "ready"
+    session.command("fiber.binding.remove", curve=item.id, point=item.points[-1].id)
+    session.command("wait")
+    result = session.document.object(item.id)
+    assert result.result.status == "ready", result.result.error
+    assert len(result.bindings) == 1 and path(session, item.id).closed

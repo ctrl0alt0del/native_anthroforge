@@ -130,8 +130,7 @@ class SceneProjection:
     def parents(self):
         document = self.controller.session.document
         selected = self.controller.selection
-        key = (selected, tuple((e.id, e.parent, e.name) for e in document.entities),
-               tuple(document.mirrors.instances))
+        key = parent_signature(document, selected)
         if key != self._parent_key:
             excluded = descendants(document.entities, selected) if selected else set()
             self._parents = [
@@ -140,6 +139,7 @@ class SceneProjection:
             self._parents.extend(mirror_parents(document, excluded))
             self._parent_key = key
         return self._parents
+
     def synchronize_selection(self):
         controller = self.controller
         records = self.records | controller.construction.records | controller.mirror_records
@@ -151,9 +151,19 @@ class SceneProjection:
 
 
 def mirror_parents(document, excluded):
-    return [dict(id=v.id, name=document.entity(v.source).name + " · mirrored")
-            for v in document.mirrors.instances.values()
-            if v.source in document.index.entities and v.source not in excluded]
+    return [
+        dict(id=v.id, name=document.entity(v.source).name + " · mirrored")
+        for v in document.mirrors.instances.values()
+        if v.source in document.index.entities and v.source not in excluded
+    ]
+
+
+def parent_signature(document, selected):
+    return (
+        selected,
+        tuple((e.id, e.parent, e.name) for e in document.entities),
+        tuple(document.mirrors.instances),
+    )
 
 
 def selection_record(controller, records):
@@ -174,6 +184,7 @@ def initialize(controller):
     controller._state = PropertyProjection(controller)
     controller._render_rows = []
     controller.mirror_records = {}
+    controller._mirror_projection_cache = {}
     scene_state.picking_inputs(controller, [])
 
 
@@ -211,4 +222,5 @@ def render_record(row):
         {name: row[name] for name in names},
         geometry_asset=row.get("geometry_asset", ""),
         geometry_revision=row.get("geometry_revision", 0),
+        context_dimmed=row.get("context_dimmed", row["readonly"]),
     )

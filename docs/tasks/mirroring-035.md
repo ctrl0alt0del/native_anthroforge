@@ -75,3 +75,22 @@ A deliberately shifted provider is incompatible with 23 fixed receiver boundary 
 for relaxing structural preservation. Full release qualification remains pending.
 Remaining: seam editing, complete instance presentation/inspection, lifecycle/removal,
 profiler/offscreen evidence, full development gate and one canonical portable build.
+
+### Interaction and symmetric construction checkpoint
+
+Added cached instance projection, independent visibility, Point/Anchor and control markers,
+read-only source inspectors/shortcuts, searchable removal blockers and retained conflict
+frames (including schema-6 persistence). Symmetric authored endpoints are constrained
+natively without changing their half-path's public closed-Curve/Fiber contract. Native
+field interpolation now supports automatic open tails for internal half-path capture;
+ordinary authored open Fibers still require both endpoint bindings.
+The 32 focused tests plus the function-length guard pass. A preceding full regression
+passed 2,085 tests with only the then-unfixed size guard failing. Latest native build
+passes five CTests. Headless desktop smoke loaded without QML warnings.
+Hidden-GPU qualification and runtime profile are in build/035-mirroring. Hover/click
+agree on mirrored tissue; four plane edits preserve exact source geometry (121–128 ms
+including settle/refresh/readback). Trace has no inflation/routing/relaxation calls in
+this plane-only workload. An actual visual inspection caught read-only dimming and
+negative-transform winding; presentation now separates dimming and reverses render-only
+triangle indices. Reinspected source/mirror images show consistent shading. No reflected
+anatomical mesh asset is generated. Release and packaging remain pending.

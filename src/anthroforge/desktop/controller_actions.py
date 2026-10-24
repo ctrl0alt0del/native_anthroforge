@@ -145,7 +145,8 @@ def selected_bounds(session, selected):
     identity = selected.get("mirror_source", selected["id"])
     center, radius = frame_bounds(session, session.document.object(identity), selected["trs"][6:])
     if selected.get("mirror_source"):
-        plane = session.document.mirrors.rules[selected["mirror_rule"]].frame
+        instance = session.document.mirrors.instances[selected["id"]]
+        plane = session.document.mirrors.plane(instance).frame
         center = session.engine.world_point(plane, center)
     return center, radius
 

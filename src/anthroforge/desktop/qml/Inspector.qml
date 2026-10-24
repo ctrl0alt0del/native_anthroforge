@@ -32,6 +32,17 @@ UiScrollView {
             visible: !!inspector.selected.mirror_source
             onClicked: workspace.select(inspector.selected.mirror_source)
         }
+        UiSection {
+            title: "Mirrored attachments"; visible: !!inspector.selected.mirror_source
+            Repeater {
+                model: inspector.selected.mirror_source ? workspace.mirrorBindings(inspector.selected.id) : []
+                UiDetail {
+                    required property var modelData
+                    label: modelData.binding
+                    value: modelData.status === "mapped" ? "Retained counterpart binding" : modelData.error
+                }
+            }
+        }
         MirrorSettings { Layout.fillWidth: true }
         UiButton {
             objectName: "addObjectImage"; text: "Add reference image…"; glyph: "image"; Layout.fillWidth: true
@@ -159,6 +170,7 @@ UiScrollView {
         ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         ConstructionInspector { id: constructionInspector; onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         TissueInspector { visible: !!inspector.selected.is_tissue; enabled: !inspector.selected.readonly && !workspace.state.waiting }
+        TissueInspection { visible: !!inspector.selected.is_tissue && !!inspector.selected.mirror_source }
         DependencyInspector { visible: !!inspector.selected.id }
         UiNotice { text: inspector.selected.error || ""; error: true }
         Item { implicitHeight: 8 }

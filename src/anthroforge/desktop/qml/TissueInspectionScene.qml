@@ -21,7 +21,7 @@ Node {
                 id: surface
                 objectName: "inspectionSurface_"+stageNode.geometryData.stage+"_"+item.chunk
                 visible: item.active && stageNode.geometryData.kind==="MESH"
-                geometry: MeshGeometry { assetId: stageNode.geometryData.kind==="MESH" ? item.handle : 0; chunk: item.chunk }
+                geometry: MeshGeometry { assetId: stageNode.geometryData.kind==="MESH" ? item.handle : 0; chunk: item.chunk; reflected: stageNode.geometryData.trs[6]*stageNode.geometryData.trs[7]*stageNode.geometryData.trs[8] < 0 }
                 opacity: item.reference ? .3 : evidence.data.reference && evidence.data.mode==="Overlay" ? .7 : 1
                 property Material original: PrincipledMaterial { baseColor: item.color; roughness: .65; cullMode: Material.NoCulling }
                 property Material cut: SectionMaterial { tint: item.color }

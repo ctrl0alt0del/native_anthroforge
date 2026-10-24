@@ -1,12 +1,11 @@
 """Resolve hierarchy rules and required construction without extra authored nodes."""
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any
 
 from . import attachment_references
-from .deformer_references import sources as deformer_sources
 from .entities import SCP
 from .mirroring import MirrorInstance, MirrorRule
 from .reference_images import ReferenceImage
@@ -19,12 +18,15 @@ class MirrorIndex:
     instances: Mapping[str, MirrorInstance]
     rules: Mapping[str, MirrorRule]
     conflicts: tuple[str, ...] = ()
+    placements: Mapping[str, MirrorRule] = field(default_factory=dict)
+
+    def plane(self, instance: Any) -> MirrorRule:
+        return self.placements.get(instance.id, self.rules[instance.rule])
 
 
 def dependencies(item: Any) -> frozenset[str]:
     definition = getattr(item, "primitive", None) or item
     refs = {u.curve for u in getattr(definition, "curves", ())}
-    refs.update(getattr(item, "owners", ()))
     refs.update(attachment_references.targets(item))
     if isinstance(item, TissueVCP):
         refs.add(item.source)
@@ -68,7 +70,33 @@ def build(document: Any, previous: MirrorIndex | None) -> MirrorIndex:
     seeds = anatomy_rules(document, settings)
     resolved, conflicts = construction_rules(document, settings, seeds)
     instances = instance_records(document, resolved)
-    return MirrorIndex(key, MappingProxyType(instances), MappingProxyType(settings), conflicts)
+    placements = retain_conflicts(document, previous, instances, settings, conflicts)
+    return frozen_index(key, instances, settings, conflicts, placements)
+
+
+def frozen_index(
+    key: Any, instances: Any, settings: Any, conflicts: Any, placements: Any
+) -> MirrorIndex:
+    return MirrorIndex(
+        key,
+        MappingProxyType(instances),
+        MappingProxyType(settings),
+        conflicts,
+        MappingProxyType(placements),
+    )
+
+
+def retain_conflicts(
+    document: Any, previous: Any, instances: Any, settings: Any, conflicts: Any
+) -> Any:
+    placements = {key: settings[v.rule] for key, v in instances.items()}
+    if previous is None:
+        return placements
+    for key, instance in previous.instances.items():
+        if instance.source in conflicts and instance.rule in settings:
+            instances[key] = instance
+            placements[key] = previous.plane(instance)
+    return placements
 
 
 def validated_settings(document: Any) -> dict[str, MirrorRule]:
@@ -116,7 +144,9 @@ def propagate(records: Any, settings: Any, resolved: Any) -> bool:
     for key, item in records.items():
         if isinstance(item, ReferenceImage):
             continue
-        choices = inherited_choices(item, settings, resolved) if not isinstance(item, SCP) else set()
+        choices = (
+            inherited_choices(item, settings, resolved) if not isinstance(item, SCP) else set()
+        )
         for ref in required(item):
             choices_for_ref = resolved.get(key, set())
             changed |= merge(ref, choices_for_ref, settings, resolved)
@@ -126,10 +156,12 @@ def propagate(records: Any, settings: Any, resolved: Any) -> bool:
 
 
 def inherited_choices(item: Any, settings: Any, resolved: Any) -> set[str]:
-    return set().union(*(
-        {ref} if ref in settings and settings[ref].enabled else resolved.get(ref, set())
-        for ref in dependencies(item)
-    ))
+    return set().union(
+        *(
+            {ref} if ref in settings and settings[ref].enabled else resolved.get(ref, set())
+            for ref in dependencies(item)
+        )
+    )
 
 
 def merge(key: str, choices: set[str], settings: Any, resolved: Any) -> bool:

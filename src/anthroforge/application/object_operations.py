@@ -43,9 +43,10 @@ def editable(session: "Session", target: str) -> Authored:
 
 
 def install(session: "Session", item: Authored, **related: Any) -> None:
-    from . import junction_operations
+    from . import junction_operations, symmetric_paths
 
     before = editable(session, item.id)
+    item = symmetric_paths.constrain(session, before, item)
     if junction_operations.edit(session, item):
         return
     item = curve_edit_state.prepare(session, before, item)

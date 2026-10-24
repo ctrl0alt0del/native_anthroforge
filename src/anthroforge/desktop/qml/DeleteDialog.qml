@@ -16,6 +16,8 @@ UiDialog {
     function request(entity) {
         const row = workspace.objectRecord(entity);
         if (!row || row.readonly || workspace.state.waiting) return;
+        const blockers=workspace.run("mirror.source.removal.inspect",{target:entity});
+        if (blockers?.length) { affected.show(blockers); return; }
         const plan = workspace.run("object.delete.inspect",{target:entity});
         if (!plan) return;
         target = row; impact = plan;
@@ -31,4 +33,5 @@ UiDialog {
     }
     Label { width: parent.width; text: dialog.explanation + "\n\nAffected: " + (dialog.impact.affected || []).map(r=>r.name).join(", ") + "\n\nYou can undo this action."; wrapMode: Text.WordWrap; color: Theme.text }
     onAccepted: execute()
+    AffectedConsumersDialog { id: affected }
 }

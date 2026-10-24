@@ -17,6 +17,21 @@ PROTECTION = frozenset(("stacking_fixed", "protected_crease"))
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_curve_point_edit", [D, c.c_int, c.c_int, c.c_int, D, c.c_int, D])
+    engine.bind("af_path_constrain_seams", [D, c.c_int, D, D])
+
+
+def constrain_seams(engine: GeometryEngine, curve: Curve, reflection: Any) -> Curve:
+    from .mesh import doubles
+
+    data, frame = curve_records(curve), doubles(reflection)
+    output = np.empty_like(data)
+    engine.check(
+        engine.library.af_path_constrain_seams(
+            pointer(data), len(data), pointer(frame), pointer(output)
+        )
+    )
+    points = tuple(unpack(old, row) for old, row in zip(curve.points, output, strict=True))
+    return replace(curve, points=points)
 
 
 def point(engine: GeometryEngine, curve: Curve, index: int, options: dict[str, Any]) -> CurvePoint:
@@ -50,7 +65,7 @@ def evaluated_edit(
     points = tuple(updated if i == index else p for i, p in enumerate(curve.points))
     replacement = curve_records(replace(curve, points=points))[index]
     fields = sum(1 << bit for bit, name in enumerate(FIELDS) if name in options)
-    apply_edit(engine, data, curve.closed, index, replacement, fields, output)
+    apply_edit(engine, data, curve.path_closed, index, replacement, fields, output)
     return unpack(updated, output)
 
 

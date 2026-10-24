@@ -16,7 +16,7 @@ Repeater3D {
             visible: item.active && geometryData.kind === "MESH"
             pickable: false
             opacity: workspace.shortcutComparison.state.mode === "Overlay" ? .25 : geometryData.readonly ? .08 : 1
-            geometry: MeshGeometry { assetId: geometryData.kind === "MESH" ? item.handle : 0; chunk: item.chunk }
+            geometry: MeshGeometry { assetId: geometryData.kind === "MESH" ? item.handle : 0; chunk: item.chunk; reflected: geometryData.trs[6]*geometryData.trs[7]*geometryData.trs[8] < 0 }
             materials: PrincipledMaterial { baseColor: workspace.shortcutComparison.state.mode === "Overlay" ? "#74d9df" : geometryData.color; roughness: .65; cullMode: Material.NoCulling }
         }
         Model {

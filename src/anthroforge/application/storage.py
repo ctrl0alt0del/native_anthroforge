@@ -78,6 +78,8 @@ def manifest(document: Document, resources: Resources) -> dict[str, Any]:
 
 
 def document_state(document: Document) -> dict[str, Any]:
+    from .mirror_codec import snapshot
+
     state = {
         f.name: getattr(document, f.name) for f in fields(document) if not f.name.startswith("_")
     }
@@ -85,6 +87,7 @@ def document_state(document: Document) -> dict[str, Any]:
     for name in STATE_RECORDS:
         state[name] = [asdict(value) for value in state[name]]
     state["objects"] = [object_codec.encode(value) for value in document.objects]
+    state["mirror_accepted"] = snapshot(document)
     return state
 
 
@@ -159,9 +162,15 @@ def decode_document(data: dict[str, Any]) -> Document:
     data["controls"] = tuple(control(item) for item in data.get("controls", ()))
     data["objects"] = tuple(object_codec.decode(item) for item in data.get("objects", ()))
     data["junctions"] = tuple(decode_junction(item) for item in data.get("junctions", ()))
+    return restored_document(data)
+
+
+def restored_document(data: dict[str, Any]) -> Document:
     if not data["workspaces"]:
         raise ValueError("Project has no workspace.")
-    return Document(**(data | shortcut_codec.document_fields(data) | mirror_fields(data)))
+    mirrors = mirror_fields(data)
+    data.pop("mirror_accepted", None)
+    return Document(**(data | shortcut_codec.document_fields(data) | mirrors))
 
 
 def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resources]:

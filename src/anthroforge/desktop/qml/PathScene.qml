@@ -18,7 +18,7 @@ Repeater3D {
             instancing: AffineInstance {
                 frame: { const m=item.matrix; return [m[0],m[1],m[2],m[3],m[8],m[9],m[10],m[11],-m[4],-m[5],-m[6],-m[7],0,0,0,1]; }
             }
-            opacity: item.readonly ? .12 : 1
+            opacity: (item.context_dimmed ?? item.readonly) ? .12 : 1
             materials: DefaultMaterial {
                 lighting: DefaultMaterial.NoLighting
                 diffuseColor: item.placeholder ? Theme.danger : item.preview ? Theme.success : workspace.selectedObjects.includes(item.id) ? Theme.accent : workspace.hoveredId === item.id ? Theme.curveHoverColor : Theme.curveColor

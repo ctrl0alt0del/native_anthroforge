@@ -226,6 +226,25 @@ class Controller(QObject):
     def constructionModel(self):
         return self.construction.model
 
+    @Property(QObject, constant=True)
+    def pointModel(self):
+        return self.construction.points.model
+
+    @Property("QVariantList", notify=changed)
+    def markerRows(self):
+        from .mirror_scene import presented
+
+        values = [*self.rows, *self.mirror_records.values()]
+        return [
+            v
+            for v in values
+            if not v.get("asset") and not v.get("world_position") and presented(self, v)
+        ]
+
+    @Slot(str, result="QVariantList")
+    def mirrorBindings(self, target):
+        return self.session.command("mirror.attachment.inspect", target=target) if target else []
+
     @Slot(str, str, result=bool)
     def mirrorTargetShared(self, source, binding):
         return self.session.command("mirror.attachment.shared", source=source, binding=binding)

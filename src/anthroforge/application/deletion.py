@@ -20,7 +20,10 @@ if TYPE_CHECKING:
 
 
 def delete(session: "Session", entity: str) -> str:
+    from .mirror_policy import require_removal
+
     item = session.editable(entity)
+    require_removal(session.document, entity)
     children = {e.id for e in session.document.entities if e.parent == entity}
     affected = descendants(session.document.entities, entity)
     session.scheduler.invalidate({entity})

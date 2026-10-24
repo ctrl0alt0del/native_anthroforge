@@ -13,7 +13,7 @@ ColumnLayout {
     Label { text: "Anatomical binding"; color: Theme.muted }
     SurfaceSelector {
         id: target; objectName: "fiberBindingTarget"; Layout.fillWidth: true
-        target: panel.binding?.target || ""
+        target: panel.binding?.instance ? "mirror/" + panel.binding.instance + "/" + panel.binding.target : (panel.binding?.target || "")
         role: panel.binding?.role || ""
     }
     RowLayout {

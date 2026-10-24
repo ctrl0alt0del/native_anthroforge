@@ -389,7 +389,7 @@ static void curve_owner_weights(CurveCapture& value,std::vector<Capture>& surfac
         nearest[i]=capture_point(surfaces,value.points[i],value.forced[i],binding);
     }
     if(af_attachment_weights(positions.data(),nearest.data(),value.nodes,value.pins.data(),int(value.pins.size()),
-        value.source->closed,owners,weights,cancel)) throw std::runtime_error(af_last_error());
+        value.source->closed?1:2,owners,weights,cancel)) throw std::runtime_error(af_last_error());
     for(size_t i=0;i<value.knots.size()*3;++i) {
         const int sample=value.knots[i/3],row=value.nodes+int(i);
         std::copy_n(owners+2*sample,2,owners+2*row); std::copy_n(weights+2*sample,2,weights+2*row);

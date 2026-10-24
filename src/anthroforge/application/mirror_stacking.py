@@ -22,16 +22,20 @@ def material(scene: Any, owner: str, final: bool = False) -> Any:
         raise ValueError("Mirrored stacking needs its source's accepted final surface.")
     if not instance:
         return state
-    frame = scene.document.mirrors.rules[instance.rule].frame
+    frame = scene.document.mirrors.plane(instance).frame
     engine = scene.resources.meshes[state.base].mesh.engine
     return replace(state, frame=matrix(engine, frame, state.frame))
 
 
 def participants(document: Any, target: str = "") -> tuple[Any, ...]:
-    return tuple(v for v in document.mirrors.instances.values()
-                 if v.source != target and isinstance(document.object(v.source), TissueVCP)
-                 and document.object(v.source).stacking
-                 and document.object(v.source).final_material is not None)
+    return tuple(
+        v
+        for v in document.mirrors.instances.values()
+        if v.source != target
+        and isinstance(document.object(v.source), TissueVCP)
+        and document.object(v.source).stacking
+        and document.object(v.source).final_material is not None
+    )
 
 
 def add(scene: Any, families: Any) -> None:
@@ -53,5 +57,8 @@ def add_instance(scene: Any, instance: Any, family: int) -> None:
 
 
 def ports(document: Any, target: str) -> set[Port]:
-    return {value for instance in participants(document, target)
-            for value in (Port(instance.id, "final"), Port(instance.rule, "mirror"))}
+    return {
+        value
+        for instance in participants(document, target)
+        for value in (Port(instance.id, "final"), Port(instance.rule, "mirror"))
+    }

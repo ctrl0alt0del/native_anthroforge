@@ -205,7 +205,7 @@ def ready_surface(item, row):
 
 
 def control_picking_inputs(controller):
-    eligible = [r for r in controller.rows if r["pickable"] and not r["handle"]]
+    eligible = [r for r in controller.markerRows if r["pickable"] and not r["handle"]]
     controller.pick_control_ids = [row["id"] for row in eligible]
     controller.pick_control_points = np.ascontiguousarray(
         [row["trs"][:3] for row in eligible], dtype=np.float64

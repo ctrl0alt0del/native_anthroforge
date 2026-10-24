@@ -7,7 +7,7 @@ from anthroforge.native import scene
 def stage_rows(tool, stage, reference=False, target=""):
     session, target = tool.controller.session, target or tool.target
     item = stages.tissue(session, target)
-    row = stages.row(session, item, stage)
+    row = stages.row(session, item, stage, target)
     if not row["available"]:
         return [], []
     key, kind = row["result"]["asset"], row["kind"]

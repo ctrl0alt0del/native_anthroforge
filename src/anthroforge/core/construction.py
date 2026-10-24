@@ -75,6 +75,11 @@ class Curve(ConstructionObject):
         return self.engine_settings.kind
 
     @property
+    def path_closed(self) -> bool:
+        """Engine input topology; symmetric expansion closes the complete source afterward."""
+        return self.closed and self.symmetric is None
+
+    @property
     def resolution(self) -> int:
         if isinstance(self.engine_settings, ParametricSettings):
             return (

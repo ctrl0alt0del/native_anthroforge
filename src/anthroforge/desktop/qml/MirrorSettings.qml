@@ -11,8 +11,12 @@ UiSection {
     visible: !!selected.id && !selected.mirror_source && selected.kind !== "IMAGE"
     enabled: !selected.readonly && !workspace.state.waiting
     function update(values) {
+        const blockers=workspace.run("mirror.removal.inspect",Object.assign({target:selected.id},values));
+        if (!blockers) return;
+        if (blockers.length) { affected.show(blockers); return; }
         workspace.run("mirror.configure", Object.assign({target:selected.id}, values));
     }
+    AffectedConsumersDialog { id: affected }
     UiCheck {
         objectName: "mirrorChildren"; text: "Mirror children"
         visible: panel.anatomical

@@ -20,6 +20,9 @@ if TYPE_CHECKING:
 
 
 def require_removable(session: "Session", item: Authored) -> None:
+    from .mirror_policy import require_removal
+
+    require_removal(session.document, item.id)
     if isinstance(item, Curve) and any(p.junction for p in item.points):
         raise ValueError("Detach shared junctions before deleting this curve.")
     users = curve_sources.consumers(session.document, {item.id})

@@ -10,6 +10,10 @@ void MeshGeometry::setChunk(int value) {
     if(value==m_chunk) return;
     m_chunk=value; rebuild(); emit meshChanged();
 }
+void MeshGeometry::setReflected(bool value) {
+    if(value==m_reflected) return;
+    m_reflected=value; rebuild(); emit meshChanged();
+}
 void MeshGeometry::rebuild() {
     clear();
     if(!m_asset) { update(); return; }
@@ -24,5 +28,16 @@ void MeshGeometry::configure(const QByteArray& data,const double* bounds) {
     setPrimitiveType(PrimitiveType::Triangles);
     addAttribute(Attribute::PositionSemantic,0,Attribute::F32Type);
     addAttribute(Attribute::NormalSemantic,3*sizeof(float),Attribute::F32Type);
+    orientation(data.size()/(6*sizeof(float)));
     setBounds(QVector3D(bounds[0],bounds[1],bounds[2]),QVector3D(bounds[3],bounds[4],bounds[5]));
+}
+void MeshGeometry::orientation(int count) {
+    if(!m_reflected) return;
+    QByteArray indices(count*sizeof(quint32),Qt::Uninitialized);
+    auto* output=reinterpret_cast<quint32*>(indices.data());
+    for(int i=0;i<count;i+=3) {
+        output[i]=i; output[i+1]=i+2; output[i+2]=i+1;
+    }
+    setIndexData(indices);
+    addAttribute(Attribute::IndexSemantic,0,Attribute::U32Type);
 }

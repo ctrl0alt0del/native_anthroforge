@@ -49,6 +49,20 @@ static EvaluatedPath symmetric_half(const Path& input,const M4& plane,uint64_t c
     return result;
 }
 }
+int af_path_constrain_seams(const double* records,int count,const double* reflection,double* output) {
+    try {
+        if(!records||!output||!reflection||count<3)
+            throw std::runtime_error("Symmetric seam editing requires an authored half and plane.");
+        const af::M4 plane=Eigen::Map<const af::M4>(reflection);
+        std::copy(records,records+count*13,output);
+        for(const int index:{0,count-1}) {
+            double* row=output+index*13; const af::V3 position=Eigen::Map<af::V3>(row);
+            const af::V3 delta=(af::reflected_point(plane,position)-position)*0.5;
+            for(int field=0;field<3;++field) Eigen::Map<af::V3>(row+field*3)+=delta;
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 uint64_t af_path_symmetric(uint64_t handle,const double* reflection,uint64_t cancel) {
     try {
         if(!reflection) throw std::runtime_error("Symmetric-loop reflection is missing.");

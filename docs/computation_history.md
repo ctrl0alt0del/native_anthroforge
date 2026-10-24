@@ -2304,3 +2304,23 @@ average. This is a read-only formula input; no new write channel is introduced.
   Shifted stacking fixture exposes 23 contradictory fixed points (up to 0.01 m deficit)
   and is intentionally rejected. This is not a guarantee that arbitrary supports are feasible.
 - Limits: complete lifecycle, offscreen visuals, profiling and release packaging pending.
+
+### CH-074 — Symmetric source topology and reflection presentation
+
+- Previous: engine closure was assumed identical to the complete Curve/Fiber's closure;
+  read-only presentation also implied dimmed context, and Qt's two-sided shading flipped
+  normals when reflecting unchanged triangle winding.
+- New: typed path_closed distinguishes the editable half's open engine input from its
+  complete closed output. Native seam projection translates endpoint handles together.
+  Internal field capture supports automatic open support tails, while authored open Fiber
+  endpoint validation remains intact. Conflict snapshots retain accepted planes. Desktop
+  projection is cached and shares source leases; Qt reverses render-only triangle indices
+  for negative-determinant frames and treats read-only/dimmed as separate properties.
+- Why: preserve closed single-binding Fiber substitution and strict reflected shape,
+  coherent editing, stable references and correct shading without a second anatomy solve.
+- Evidence: 32 focused tests pass; five native CTests pass; hidden GPU source/mirror
+  snapshots inspected after correcting the observed dark mirror. Picking agrees. Runtime
+  profile records plane edits, stacking discovery and frame work without inflation,
+  routing or relaxation. Four warm plane edits take 121–128 ms including settling,
+  refresh and texture readback; this is not physical display latency. Source arrays
+  remain exactly equal. Full release/lifecycle/crowded-assembly qualification remains pending.

@@ -10,7 +10,7 @@ ColumnLayout {
     Label { text: row.value.expression; color: Theme.text; elide: Text.ElideRight; Layout.fillWidth: true }
     ShortcutDetail { label: "Target"; value: (row.value.target.object_name || "Missing")+" / "+(row.value.target.label || "Unavailable") }
     ShortcutDetail { label: "Accepted"; value: row.value.result ? String(row.value.result.value)+" · "+row.value.result.status : "Unavailable" }
-    ShortcutDetail { label: "Evidence"; value: row.value.captured_revision === null ? "Captured inputs unavailable" : "Captured revision "+row.value.captured_revision }
+    ShortcutDetail { label: "Evidence"; value: row.value.evidence_note || (row.value.captured_revision === null ? "Captured inputs unavailable" : "Captured revision "+row.value.captured_revision) }
     ShortcutDetail { label: "Evaluated"; value: row.value.evaluated_expression ?? "Expression evidence unavailable" }
     ShortcutDetail { label: "Failure"; value: row.value.result?.error || (row.value.enabled ? "None" : "Formula disabled") }
     ListView {

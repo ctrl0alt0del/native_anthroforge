@@ -95,12 +95,45 @@ def run(mode, application):
     try:
         if mode == "editor":
             inspect_editor(controller, warnings)
-        else:
+        elif mode == "scene":
             inspect_scene(controller, warnings, application)
+        else:
+            inspect_anchors(controller, warnings, application)
         assert not warnings, warnings
         (OUTPUT / (mode + ".json")).write_text(json.dumps(dict(passed=True, interactive=False)))
     finally:
         controller.close()
+
+
+def anchor_fixture(controller):
+    source = str(Path("examples/primitives/cube.obj").resolve())
+    root = controller.run("import", dict(path=source, units=0.3))["entity_id"]
+    controller.session.wait(5)
+    child = controller.run("import", dict(path=source, units=0.1, parent=root))["entity_id"]
+    controller.session.wait(5)
+    controller.run("scp.transform", dict(entity=child, values=[0.4, 0, 0, 0, 0, 0, 1, 1, 1]))
+    controller.session.wait(5)
+    ref = dict(target=child, path=["transform", "scale"], component=0)
+    key = controller.run("shortcut.expose", dict(reference=ref))
+    controller.shortcut_panel.configure(True, True, "")
+    controller.cameraRequested.emit([0.2, 0, 0, 65, 0, 0, 1.4], True)
+    return key
+
+
+def inspect_anchors(controller, warnings, application):
+    renderer = Offscreen(controller, warnings)
+    try:
+        key = anchor_fixture(controller)
+        controller.shortcut_panel.editor.select(key)
+        view = controller.shortcut_panel.editor.inspection
+        view.activate(True)
+        view.showEffects(True)
+        image = frames(controller, renderer, application)
+        points = view.snapshot()["lines"]
+        assert len(points) == 2 and all(len(point) == 3 for point in points)
+        assert image.save(str(OUTPUT / "anchor-effects.png"))
+    finally:
+        renderer.close()
 
 
 if __name__ == "__main__":

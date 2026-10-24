@@ -1,4 +1,4 @@
-# Local authoring API, 0.3.0
+# Local authoring API, 0.3.1
 
 ## Shortcuts and Parametric curves (0.3.0)
 
@@ -892,3 +892,8 @@ require resetting correspondence first; there is no silent
 replacement with another interpretation. Default loft authoring is unchanged.
 Adding a branch to an already mapped ordinary loft still requires explicit Realign;
 configure the complete assembly's correspondence after establishing its junctions.
+## Shortcut inspection (0.3.1)
+
+Read-only `shortcut.effects`, `shortcut.formulas`, `shortcut.attachment_policy` and
+`shortcut.progress` expose influence, captured numerical evidence, effective policy and
+downstream readiness without edits. See [operation signatures and walkthrough](shortcuts_031.md).

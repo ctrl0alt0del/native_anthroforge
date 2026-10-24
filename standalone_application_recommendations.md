@@ -1,6 +1,10 @@
 # AnthroForge standalone application: consolidated recommendations
 
-Updated: 2026-10-23
+Updated: 2026-10-24
+
+Shortcut recommendations 1–4 are implemented in the [0.3.1 inspection workflow](docs/shortcuts_031.md)
+and undergoing release qualification. Influence, formula evidence, effective policy and
+propagation status reuse the current algorithms; comparison/replay reporting remains deferred.
 
 The [0.3 specification](docs/specification_030.md) and
 [implementation plan](docs/implementation_030.md) are **implemented and qualified in 0.3.0**. See the [local review](docs/tasks/shortcuts-parametric-030.md).

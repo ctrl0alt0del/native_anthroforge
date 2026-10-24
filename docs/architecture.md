@@ -935,3 +935,17 @@ Final tissue jobs also retain restart contracts: a changed stack plan can switch
 one output to a coupled group, which requires selecting a new evaluator and reservations.
 Desktop command-line project opening uses the same background read/adoption path as File
 Open; the window no longer waits for startup computations before it can be created.
+## Shortcut observation and presentation (0.3.1)
+
+Session-owned shortcut observation records causal IDs independently of attachment-edit
+contexts. Coordinator submission, coalescing, retry and terminal notifications supply
+evidence; the observer does not change reservations, priority, execution or publication.
+The authoritative dependency graph supplies potential influence, while observed publications
+and current output readiness supply completion. Related active work avoids repeated full
+readiness scans. Formula values retain compact evaluation evidence outside document state.
+
+Desktop adapters consume shared inspection operations and incremental models. Optional
+effect masks own their Qt geometry in a lazily loaded scene, reading the same native
+handles as the staged renderer; they release that scene when disabled. Native anchor
+queries use owned revision-qualified inputs through the existing read-only job service.
+No second scheduler, property engine, attachment solver or persistence format is added.

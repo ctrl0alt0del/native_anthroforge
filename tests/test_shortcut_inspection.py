@@ -99,7 +99,7 @@ def test_readiness_survives_edit_pause_and_evaluation(session, assembly, mode):
 
 def test_later_direct_edit_is_not_attributed_to_completed_shortcut(session):
     target = curve(session)
-    key = session.command("shortcut.expose", reference=reference(target))
+    session.command("shortcut.expose", reference=reference(target))
     session.command("shortcut.set", reference=reference(target), value=12)
     session.wait(5)
     serial = session.shortcut_observation.serial

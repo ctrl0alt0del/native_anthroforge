@@ -66,7 +66,7 @@ def outcome(session: Any, record: Any, rows: Any, jobs: Any) -> str:
 
 
 def waiting(session: Any, pending: Any) -> str:
-    if any(r["update_mode"] == "MANUAL" for r in pending):
+    if any(r["update_mode"] == "MANUAL" for r in pending) or manual_inputs(session, pending):
         return "waiting_manual"
     if (
         pending
@@ -75,3 +75,12 @@ def waiting(session: Any, pending: Any) -> str:
     ):
         return "waiting_release"
     return "updating" if pending else "complete"
+
+
+def manual_inputs(session: Any, rows: Any) -> bool:
+    document = session.document
+    return any(
+        key in document.registry.records and mode(document, key) == "MANUAL"
+        for row in rows
+        for key in row["pending"]
+    )

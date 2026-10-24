@@ -1,5 +1,6 @@
 """Named numerical evidence; current values never impersonate historical inputs."""
 
+import json
 from dataclasses import asdict
 from typing import Any
 
@@ -18,9 +19,15 @@ def retain(session: Any, evaluation: Any, results: Any) -> None:
         session.shortcut_observation.formulas[key] = dict(
             revision=results[key].revision,
             document_revision=evaluation.context.document.revision,
-            values=evaluation.evidence.get(key, {}),
+            **bounded_inputs(evaluation.evidence.get(key, {})),
             expression=formula.expression,
         )
+
+
+def bounded_inputs(values: Any) -> dict[str, Any]:
+    if len(json.dumps(values).encode("utf-8")) > 32768:
+        return dict(values={}, omitted="Captured inputs exceed the 32 KiB evidence limit.")
+    return dict(values=values, omitted="")
 
 
 def inspect(session: Any, shortcut: str) -> dict[str, Any]:
@@ -51,6 +58,7 @@ def row(session: Any, driver: Any, formula: Any) -> dict[str, Any]:
         inputs=inputs(session, driver, formula, evidence),
         captured_revision=evidence.get("document_revision"),
         evaluated_expression=evidence.get("expression"),
+        evidence_note=evidence.get("omitted", ""),
         **formula_context(session, formula),
     )
 

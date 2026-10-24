@@ -37,9 +37,9 @@ distinct from current pending work; Ribs completion reports complete without cha
 
 ## Next actions
 
-1. Finish explanatory UI details and verify fixed layouts/overlay revision agreement.
-2. Broaden causal lifecycle coverage and qualify performance on production assembly.
-3. Run complete gates, package canonical 0.3.1, validated merge/push.
+1. Development gate passed: 2,025 pytest, 5 native tests, typing/style/numerics/doctor.
+2. Canonical 0.3.1 packaging and additional production shortcut comparisons are underway.
+3. Verify portable suite, finalize documentation/source archive, validated merge/push.
 
 ## Recovery
 

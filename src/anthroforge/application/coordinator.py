@@ -226,7 +226,14 @@ class TaskCoordinator:
         job = self.registry.by_id[job_id]
         if job.active or job.retry is None:
             raise ValueError("This calculation cannot be retried in its current state.")
-        return job.retry()
+        return self.run_retry(job)
+
+    def run_retry(self, job: Job) -> Any:
+        self.observer(job, "retry_begin")
+        try:
+            return job.retry() if job.retry else None
+        finally:
+            self.observer(job, "retry_end")
 
     def restore(self, surviving: set[int]) -> list[Restart]:
         self.epoch += 1
@@ -384,7 +391,7 @@ class TaskCoordinator:
             if job.cleanup is not None:
                 job.cleanup(state)
             if job.restart_requested and state == "obsolete" and job.retry:
-                job.retry()
+                self.run_retry(job)
         except Exception as error:
             job.state, job.error = "failed", str(error)
             job.obsolete = False

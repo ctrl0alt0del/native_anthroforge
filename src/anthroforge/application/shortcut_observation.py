@@ -32,6 +32,7 @@ class Observation:
         self.pruned: tuple[Any, ...] = ()
         self.graph: Any = None
         self.progress: dict[str, Any] = {}
+        self.retry_causes: list[tuple[str, ...]] = []
 
     def begin(self, shortcut: Any) -> None:
         current = self.records.get(self.active)
@@ -59,6 +60,7 @@ class Observation:
         scheduler = self.session.scheduler
         parent = scheduler.registry.by_id.get(scheduler.publishing)
         causes = set(parent.causes if parent else ())
+        causes.update(self.retry_causes[-1] if self.retry_causes else ())
         if self.active:
             causes.add(self.active)
         for record in self.latest.values():
@@ -69,6 +71,9 @@ class Observation:
         job.causes = tuple(sorted(causes & self.records.keys()))
 
     def event(self, job: Any, phase: str) -> None:
+        if phase.startswith("retry_"):
+            self.retry_event(job, phase)
+            return
         if phase == "requested":
             self.requested(job)
             return
@@ -77,6 +82,12 @@ class Observation:
             if record is not None:
                 observe(record, job, phase)
         self.serial += bool(job.causes)
+
+    def retry_event(self, job: Any, phase: str) -> None:
+        if phase == "retry_begin":
+            self.retry_causes.append(job.causes)
+        else:
+            self.retry_causes.pop()
 
     def finish_gesture(self, cancelled: bool = False) -> None:
         if cancelled and self.active in self.records:

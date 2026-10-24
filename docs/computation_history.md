@@ -10,6 +10,9 @@ Initial inventory: **0.2.2**, source `a93b5149e853eefd71a7875a3885a3a68a1d4a3a`,
 and qualification records, not a claim to reconstruct every earlier commit.
 Subsequent entries must record every computational approach change.
 
+Current observational shortcut work is recorded in CH-068 (R01/R02 and A01 presentation).
+It leaves numerical evaluation and scheduling policy unchanged.
+
 ## Scope and reading guide
 
 The inventory groups operations by computational responsibility, rather than listing
@@ -2144,3 +2147,36 @@ average. This is a read-only formula input; no new write channel is introduced.
   correction `6d9bae8`; reproducible qualification is
   `tools/qualify_shortcut_owner_binding.py`. Local evidence and final qualification
   are tracked in [the task record](tasks/shortcut-owner-binding.md).
+
+### CH-068 — Shortcut influence and runtime propagation evidence (2026-10-24)
+
+- **Observed need:** existing controls exposed formulas and attachment policies but did
+  not explain affected outputs, captured input values, effective bindings or downstream
+  completion. A formula finishing is insufficient evidence that anatomy is up to date.
+- **Old/new:** shared read-only operations now read the existing dependency graph and
+  accepted results. Bounded session-owned evidence observes edit identity, submission,
+  coalescing, retry and publication separately from attachment contexts. Active jobs
+  bypass repeated whole-influence readiness scans; readiness is resolved when work ends
+  or inspection is requested. Numerical inputs are retained with their evaluated expression;
+  current values are separately queried. Historical pending-input provenance does not
+  imply that a currently ready prerequisite still has a calculation running.
+- **Presentation ownership:** optional masks own Qt geometry in a lazily loaded scene,
+  sharing native results under existing viewport leases. Reparenting extra mask nodes
+  between scenes produced empty masks in the first render experiment and was replaced.
+  Native anchor queries run through the existing read-only job service, and markers
+  require current displayed frame/result revisions. No anatomical snapshots are retained.
+- **Preserved:** geometry, connectivity, poses, bindings, numerical algorithms, scheduler
+  priorities/reservations, Manual provenance, undo/save and schema 5. Ribs/Thumb parity
+  behavior remains intentionally untouched. Observation does not schedule downstream work.
+- **Evidence:** tests cover read-only purity, cycle context, retries, paused update modes,
+  cancellation, bounded history and stale input evidence. Numeric field bounds stay fixed
+  in the offscreen editor. Actual D3D11 captures verify downstream outlines and anchor pairs.
+  Against main `00e7339`, the 96-muscle Ribs Top Radius=3 trial has exact before/after
+  geometry and attachment fingerprints. Serial profiled baseline trials: 7.475/7.644 s;
+  refined candidate: 7.914 s. The first candidate took 10.190 s; avoiding repeated readiness
+  work reduced measured observation settlement to 13.36 ms total over 397 calls. The four
+  inspection queries together measured 8.32 ms median. These timings include background
+  variability and profiler perturbation and do not establish a speed improvement.
+- **Qualification:** [task record](tasks/shortcut-inspection-031.md) tracks final gates,
+  package checks and local artifacts. Native scene inspection is background-only; no
+  physical interactive acceptance is claimed.

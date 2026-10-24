@@ -111,3 +111,11 @@ source until explicit evaluation. Qualification trace validation also checks abs
 of independent mirror output writers and inflation/routing/relaxation calls. A final
 hidden-GPU repeat measured 194–343 ms with about 47% system busy time; all observed
 trials span 121–343 ms, including eight GPU frames/readbacks. No low-latency claim.
+
+
+### Release candidate preparation
+
+Runtime workflows and focused additions pass; release metadata advances to 0.3.5 for
+the canonical candidate. Final all-source native/static gate remains running, followed
+by full pytest/numerics. Portable qualification and integration are still required;
+this checkpoint is not a release-complete claim. No new numerical dependency is added.

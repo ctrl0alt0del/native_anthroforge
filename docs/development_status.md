@@ -1,6 +1,7 @@
 # AnthroForge development validation
 
-Current release qualification is in [shortcut performance](tasks/shortcut-performance-033.md).
+Current release qualification is in [mirroring](tasks/mirroring-035.md).
+The [0.3.5 walkthrough](mirroring_035.md) records implementation and observed evidence.
 The earlier sections retain the evidence and limitations of their respective revisions.
 
 The migrated assembly's shoulder attachment-frame and Thumb backsolve/child-anchor

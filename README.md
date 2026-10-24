@@ -1,4 +1,12 @@
-# AnthroForge 0.3.3
+# AnthroForge 0.3.5
+
+0.3.5 adds strict source-linked mirroring for anatomy and required construction,
+read-only instance inspection, shared surface references, mirrored rows and symmetric
+half-path loops. Mirrors reuse source geometry and never run independent tissue or
+routing solvers. See the [workflow and evidence](docs/mirroring_035.md).
+Projects save schema 6 and read schemas 4/5/6. Existing independent opposite-side
+objects are not paired or migrated. The prior unfinished 0.3.4 task remains separate.
+
 
 Shortcut updates reduce repeated property queries, formula observation, document reconstruction
 and priority dependency bookkeeping. See [0.3.3 performance evidence](docs/shortcuts_033.md).
@@ -68,7 +76,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.3.1/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.3.5/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included

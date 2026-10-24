@@ -1,4 +1,4 @@
-# Local authoring API, 0.3.2
+# Local authoring API, 0.3.5
 
 The 0.3.3 performance work adds no public commands. The
 [addon functionality audit](addon_functionality_audit.md) distinguishes supported

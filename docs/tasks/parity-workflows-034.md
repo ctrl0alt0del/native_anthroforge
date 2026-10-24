@@ -1,113 +1,128 @@
-# Attachment parity and audited workflows — 0.3.4
+# Attachment parity and audited workflows - 0.3.4
 
 - Task branch: `codex/parity-workflows-034`
 - Integration branch: `main`
 - Starting revision: `1acb8ae`
-- Status: in progress; not release qualified
+- Status: in progress; NOT release qualified or merge ready
 - Active writer: desktop implementation session
 - Last updated: 2026-10-24
 
-## Outcome and acceptance
+## Outcome and confirmed decisions
 
-Implement confirmed F01–F03 from [parity findings](../addon_parity_findings.md),
-then D01–D12 from [the audit](../addon_functionality_audit.md). Desktop and shared
-headless operations must agree. Preserve existing projects, geometry, attachment
-intent and unrelated root `__init__.py`. Validation remains background-only.
+Implement F01-F03 from [parity findings](../addon_parity_findings.md) and D01-D12
+from [the audit](../addon_functionality_audit.md), through desktop and shared API.
+Preserve geometry, attachment intent, original assets and unrelated root __init__.py.
+Use native numerical work, one coordinator, <=15-line functions, background validation,
+task checkpoints and one canonical release distribution after qualification.
 
-## Confirmed decisions
+- Automatic Fiber supports plus explicit inclusions/exclusions; routing is separate.
+- Replacement review preserves reliable references and requires explicit approval for
+  rebinds, incompatible setting changes and discarded fields/masks.
+- Presets reset inflation, relaxation and preset-owned constraints; preserve custom
+  fields/regions, source, classification, cropping and stacking relationships.
+- SCP splitting keeps first identity/children; other segments become siblings.
+- Tissue retargeting may cross construction families after compatibility review.
+- Quick Fiber defaults ROUTED, binds each clicked point, Shift-click continues and plain
+  click after the first finishes. One undo; no orphan draft on cancellation/failure.
+- Fiber display thickness uses world units, independent of numerical clearance.
+- Planned release 0.3.4; schema 6 now reads 4/5/6 without blanket startup evaluation.
 
-- Automatic Fiber deformation supports with explicit inclusions/exclusions.
-- Replacement assessment preserves reliable references; proposed rebinds, incompatible
-  settings and discarded data require explicit review and one atomic commit.
-- Presets reset inflation, relaxation and preset-owned constraints, preserving custom
-  fields/regions, classification, source, crop and stacking relationships.
-- SCP splitting retains first identity/children; remaining segments become siblings.
-- Tissue retargeting can cross construction families after compatibility review.
-- Quick Fiber defaults to ROUTED and binds every clicked point. Shift-click continues;
-  plain click after the first finishes. One undo action, no orphan drafts.
-- Fiber display radius uses world units and never changes numerical clearance.
-- Planned release 0.3.4; schema 6 reads supported schemas 4/5 without blanket evaluation.
-- Keep one coordinator, native numerical work, <=15-line functions and canonical dist.
+## Implemented checkpoints
 
-## Current state
+- F02: fresh Blender inventories capture effective Backsolve and unset-state evidence.
+  Migration rejects old raw-only inventories and configures both wrappers and drivers.
+  Standalone Backsolve default stays off.
+- F03: owner capture retains a reference geometry asset/material record through pending
+  contexts, history and saves. Native backsolve resolves material provenance instead of
+  rereading a recycled Boolean face index. A native migration adapter transfers original
+  source polygon centers while preserving baseline pose.
+- Actual Thumb +5% thickness: effective policy alone gives .00059519 max surface error;
+  policy plus source polygon anchor gives 7.80384e-6, versus original .00628144. Fixed
+  camera renders were inspected: corrected shape matches source at baseline precision.
+- D01: authored automatic/includes/excludes support policy, API and searchable surface
+  chooser/virtualized override list. Mandatory pin targets cannot be excluded; tissue
+  supports remain independent from routing obstacles. Shared copy/dependency policies
+  and schema-6 persistence include intent.
+- D02: Rebind All retains current resolved positions/targets. On-demand Issues checks
+  validate pins natively in batches and propose qualified current-position rebindings.
+  Paginated review supports selected approval; all proposals validate before one atomic
+  edit. Stale plans reject; existing Issues repair tracking verifies publications.
+- D03: signed Normal Offset edits retain material identity. Workers resolve batched
+  frames and place controls/handles natively before path evaluation. Manual pending
+  intent round trips; ordinary point movement supersedes its pending offset intent.
+- D04: saved use_warm_start and authoritative cold Recalculate from planner. Cold intent
+  belongs to the job, survives retries and is attributed in the profiler. Accepted output
+  remains displayed until success; settings and routing collision rules are preserved.
+- D12: surface.source_ids plus one-action ordered source selection, with a shared batch
+  selection mechanism. No authored edit/undo entry or simultaneous multi-curve editing.
 
-Effective-policy capture now records legacy unset semantics and applies policies to
-direct wrappers and drivers. Owner backsolve captures a native material binding and
-retains its reference asset through pending contexts, history and saving. Defaults stay off.
+## Pending shoulder decision and evidence
 
-Not release complete: schema bump, original Thumb/shoulder qualification, corrected
-assembly and D01–D12 remain pending. Transferring the shoulder flow point in an additional
-experiment leaves the .11088 residual unchanged. Source GeometryNodes resamples cyclic
-guides to 64 points before factor sampling; migrated loft uses 65 shared samples.
+F01 is NOT fixed. Source tangent/point transfer reduces Hook position error from 1.12826
+to .11088 but does not establish parity. Flow-point transfer does not reduce the residual;
+outer-reference transfer worsens it to .4052 and was rejected. Hook membership and actual
+body endpoint continuity are intact. Scapula Shrinkwrap is a different dependency branch.
 
-The shoulder residual is narrowed further: Blender separates loft strips, changing
-Solidify seam normals compared with the welded app loft. At the actual source anchor,
-outer vertices differ .000145 while inner offset vectors differ .131804 before the
-edit and .006680 afterward. Outer-reference transfer worsens the Hook error to .4052
-and was rejected. An asynchronous question asks whether the migrated loft may retain
-source strip boundaries, leaving welded as default. Await the answer before changing it.
+The source builds separate loft strips; the app welds boundaries. Solidify therefore
+uses different seam normals. At the actual source anchor, corresponding outer vertices
+are .000145 apart; inner offset vectors differ .131804 before the edit and .006680 after.
+Source cyclic guides are resampled to 64 then factor sampled into 65 loft columns.
+The dominant observed difference is shell seams, not merely sample count.
 
-Thumb source polygon-center transfer plus effective Backsolve gives max bidirectional
-surface error 7.80384e-6 (previous .00628144), at baseline construction precision.
-Policy-only repair stays .00059519: both corrections are necessary. Working copies and
-snapshots are in build/parity-workflows-034; source projects remain unchanged. Actual
-render inspection and broader shortcut qualification are still required.
+An asynchronous user question is PENDING: preserve source strip boundaries for this
+migrated Ribs only (welded stays default), or keep welded Ribs with a documented response
+mismatch? Do not assume an answer or change the welded contract silently. Continue
+independent work; qualify full frame/correspondence transfer after that decision.
 
-D02 partial/D03 implementation: `fiber.rebind` recaptures all current resolved positions
-on existing targets; `fiber.binding.offset` edits the retained record's signed normal
-component. Worker resolution batches material frames, moves controls/handles natively,
-rebuilds path and preserves the binding. No UI-thread geometry query or nearest rebind.
-Manual pending offset intent persists and remaps during duplication. Ordinary point
-movement supersedes a pending offset request for that point. Bulk repair proposals now use an on-demand Issues provider, owned read snapshots and
-native per-record material validation. Failed pins propose current-position recapture
-on existing targets; missing targets may propose eligible alternatives for explicit
-approval. Batch application validates all read sets first and uses one transaction.
-The modal is paginated/virtualized; Issue details and the Fiber inspector open it.
-Existing Issues repair tracking rechecks after publication.
+## Verification and remaining qualification
 
-D04 adds per-curve warm-start preference and authoritative cold Recalculate from planner.
-Cold intent is a runtime job option, retained through retries, and does not rewrite
-settings or discard accepted output. Profiler spans include cold_start attribution.
+- Full pytest: 2,076 passed in 148.24s at the D01-D04 checkpoint; later source-selection
+  tests and existing interaction/architecture tests: 19 passed. Ruff and mypy pass.
+- Windows native build and all five native tests pass. Full native style passed before
+  later native additions; targeted material/curve/shortcut clang-tidy also passed.
+- Extended offscreen Fiber acceptance passes support toggle, Normal Offset, Rebind All,
+  scan/select/apply repair modal and existing binding/gesture behavior, with no warnings.
+- Extended offscreen surface acceptance passes ordered source selection plus creation,
+  Realign, inspector editing, undo and geometry staging. An obsolete exact-tooltip text
+  assertion was replaced with selection/action behavior.
+- construction_editor_acceptance still reports a UiNumberField.propertyState binding
+  loop. Reproduced with the support component removed in an ignored QML copy; not hidden
+  or claimed passed. Investigate its query/notification boundary before final release.
+- Corrected Thumb profiler report is complete, with no reported losses. One headless
+  update retained about 1.059 seconds; material capture .415ms, material backsolve .212ms.
+  These are single-run measurements, NOT a speedup or desktop responsiveness claim.
+  Profiler inventory cost remains separately attributed; do not subtract it exactly.
+- Full development gate, broader parity/lifecycle cases, profiler workloads and portable
+  package are still pending. Package version remains 0.3.3; no release or main merge.
 
-Thumb correction was rendered and inspected at fixed camera/scale against source and
-original app geometry: build/parity-workflows-034/thumb-correction.png. Corrected shape
-matches source visually; no original anatomy file was saved over.
+## Immediate next actions
 
-D12 is implemented independently of the pending structural replacement work:
-`surface.source_ids` returns ordered source identities (including all branch sources).
-One inspector action uses a validated batch selection operation with one refresh, no
-construction edits and no multi-curve component editing. Offscreen surface acceptance
-passes creation, source group selection, editing, Realign, undo and geometry staging.
-Its obsolete exact tooltip-text assertion was replaced with selection/action behavior.
-
-## Verification
-
-- Windows native build and all five native tests pass.
-- Full pytest: 2,076 passed (148.24s), before final small UI-test adjustments; focused
-  final pin-repair/cold-route/architecture tests pass. Ruff and mypy pass.
-- Extended offscreen Fiber acceptance passes actual support, Normal Offset, Rebind All
-  and modal scan/select/apply controls. Stale proposals reject atomically in API tests.
-- 13 focused Python tests pass: shortcut transactions, remeshed material owner anchors,
-  migration policies and architecture/function limits. Full Ruff and mypy pass.
-- Native style check passed. Full gate, profiler and packaging pending.
-- 21 pin/edit/junction/architecture tests passed after D03; full native build/5 tests pass.
-- 51 earlier focused tests passed, then six support/architecture tests including explicit tissue
-  supports. Extended offscreen fiber_editor_acceptance passes the real support toggle.
-- construction_editor_acceptance fails on a UiNumberField propertyState binding loop;
-  reproduced with the new support component removed in an ignored QML copy. Investigate
-  before final qualification; do not suppress the warning or claim this gate passed.
-- Background Blender recaptured effective policies from the matching assembly into
-  `build/parity-workflows-034/effective-inventory.json`, without saving the source.
-
-## Next actions
-
-1. Export effective addon backsolve policies and regress unset/explicit semantics.
-2. Extend retained owner-anchor resolution through existing material provenance.
-3. Qualify Ribs/shoulder correspondence and corrected migrated assembly.
-4. Deliver D01–D12 in planned order; then full lifecycle, profiler, desktop and package checks.
+1. Resolve F01 after the pending seam decision; compare unchanged baseline and Ribs=3
+   analytically and visually. Preserve originals and no silent mesh fallback.
+2. Implement D05 active length weight and meaningful interactive/final budgeting. Native
+   routing currently steps one accepted iteration between cancellation checks; do not
+   add inert controls or weaken collision validation. Custom/PIQP defaults must match.
+3. Implement D06 connected SCP splitting and D07/D08 replacement assessment/approval,
+   preserving reliable references and rejecting stale assessments atomically.
+4. Implement D09 preset ownership/application, D10 direct Fiber placement and D11 native
+   world-radius presentation/picking. Never substitute pixel linewidth for world radius.
+5. Resolve the recorded GUI metadata binding loop without regressing 0.3.3 targeted
+   notification performance; verify with the profiler and offscreen acceptance.
+6. Qualify remaining geometry, undo/save/resources and actual 96-muscle assembly. Save a
+   final corrected copy outside build only after complete acceptance; no mirrored muscles.
+7. Final docs/notices/version, full gates, canonical dist/0.3.4/AnthroForge.dist and source
+   archive, then validated merge/push. Do not present this task as complete beforehand.
 
 ## Recovery inputs
 
-Use existing paired 96-muscle comparison plan/tools and local build evidence. Do not
-overwrite original anatomy assets or modify the unrelated dirty addon worktree.
-No mirrored muscles, silent mesh fallback, generalized mirroring or skinning in scope.
+Local-only evidence: build/parity-workflows-034 (ignored). Files include fresh
+`effective-inventory.json`, `policy-repaired.anthroforge`, `anchor-repaired.anthroforge`,
+plans, actual Thumb snapshots, `thumb-anchor-distances.json`, `ribs-shell-seams.json`,
+`thumb-correction.png`, and `thumb-correction.afprofile.zip`.
+
+Original paired input:
+E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge
+and E:/development/WIP_models/shortcut_update_parity_20261023/matching_96_muscles.blend.
+Earlier evidence remains in build/shoulder-thumb-parity. Preserve source hashes recorded
+there. External anatomy/binary evidence is not available from Git alone during an outage.
+The addon worktree contains unrelated local edits; do not modify it.

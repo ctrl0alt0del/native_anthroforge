@@ -193,3 +193,27 @@ Layer/Pouch creation and Make Independent. Ruff and configured mypy pass.
 The full suite at the preceding split checkpoint passed 2,092 tests in 150.18 seconds;
 this does NOT qualify subsequent preset changes or the complete remaining release.
 D07/D08 reviewed replacement, D10/D11, F01 and broad release qualification remain pending.
+
+## Mesh replacement headless foundation (desktop integration pending)
+
+D07 shared operations now provide scp.mesh.replace.assess/status/apply/cancel. Assessment
+imports/evaluates owned native geometry and captures proposed bindings in a read-only
+coordinator job. It does not change document/history. One owned candidate is retained.
+A native canonical polygon/index correspondence check distinguishes safe indexed reuse
+from lost correspondence; matching vertex counts alone are insufficient. Existing import
+units/up-axis defaults are reused. Lost indexed bindings/weights and required rebindings
+are listed with stable approval keys. Apply requires all listed approvals, rejects stale
+read sets/authored definitions/incoming relationships, installs the complete record set
+atomically and propagates through existing lifecycle/dependency mechanisms.
+
+Reviewed SCP child recapture preserves pose within floating-point tolerance; Anchor and
+Fiber recapture use shared confirmed placement. Fiber captures mark pins for rebinding
+while temporarily constraining capture to existing targets, restoring authored scope
+preferences afterward. Captured records publish as a complete batch instead of entering
+ordinary point-edit preparation again (which would retain obsolete material references).
+Shared controls survive removal of incompatible indexed bindings. One undo restores source.
+
+Six mesh integration cases plus architecture/preset tests (13 total) pass. Native build
+and all five native tests pass; Ruff and configured mypy pass. Desktop chooser/review,
+additional field/branch/tissue-region/lifecycle evidence and broad qualification remain
+pending; this is an intermediate API checkpoint, not a completed D07 workflow/release.

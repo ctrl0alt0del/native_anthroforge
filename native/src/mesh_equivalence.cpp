@@ -22,3 +22,15 @@ int af_mesh_same_content(uint64_t first,uint64_t second,uint64_t cancel) {
         return a==b||(af::same_geometry(*a,*b,cancel)&&af::same_material(*a,*b));
     } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
 }
+
+int af_mesh_same_topology(uint64_t first,uint64_t second,uint64_t cancel) {
+    try {
+        af::check_cancel(cancel); const auto a=af::mesh(first),b=af::mesh(second);
+        if(a->vertices.rows()!=b->vertices.rows()||a->offsets!=b->offsets) return 0;
+        for(size_t i=0;i<a->corners.size();++i) {
+            af::check_cancel(cancel);
+            if(i>=b->corners.size()||a->corners[i]!=b->corners[i]) return 0;
+        }
+        return a->corners.size()==b->corners.size();
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}

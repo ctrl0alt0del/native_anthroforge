@@ -83,6 +83,7 @@ class Session:
 
         self.tissue_inspection = Inspection()
         self.conversion = ConversionPreview()
+        self.mesh_replacement: Preview[Any] = Preview()
         self.surface_preview: Preview[Candidate] = Preview()
         self.tissue_preview: Preview[TissueCandidate] = Preview()
         self.scheduler = TaskCoordinator(lambda: self.document)
@@ -293,6 +294,7 @@ class Session:
         self.issues.close()
         self.scheduler.close()
         self.conversion = ConversionPreview()
+        self.mesh_replacement = Preview()
         self.surface_preview = Preview()
         self.tissue_preview = Preview()
         if self._engine is not None:

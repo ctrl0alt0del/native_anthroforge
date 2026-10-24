@@ -1,5 +1,19 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: reviewed imported-source replacement
+
+Replacement assessment now evaluates owned candidate geometry and proposed captures on a
+read-only worker snapshot. A native comparison of canonical polygon indices/offsets,
+independent of coordinates/tessellation, determines indexed correspondence. Lost mappings
+require explicit review; matching counts alone are not accepted. Existing confirmed
+placement/capture kernels prepare SCP, Anchor, Fiber and target-region changes; inflation
+and attachment propagation algorithms are unchanged. Fiber pin retention is explicitly
+superseded only for approved recapture, keeping original targets and scope preferences.
+Prepared records publish together, avoiding a second ordinary edit-preparation pass.
+Initial headless cases cover same-source identity/undo, changed topology approval, child
+pose, shared control retention, Anchor/Fiber rebinding and stale rejection. Desktop and
+broader assembly/lifecycle qualification remain pending.
+
 ### In-progress 0.3.4: explicit preset ownership for tissue resets
 
 Applying defaults to existing tissue now resets authored inflation/relaxation and only

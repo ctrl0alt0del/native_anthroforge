@@ -1,12 +1,13 @@
 """Frozen report jobs own their geometry; exports never alter document/save state."""
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 from time import monotonic, sleep
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.jobs import Job
+from anthroforge.native.mesh import NativeCancellation
 
 from . import inspection, measurements, report_archive, task_workloads
 from .inspection_context import InspectionContext, freeze
@@ -21,6 +22,7 @@ class Capture:
     view: dict[str, Any]
     issues: dict[str, Any]
     provisional: bool
+    comparison: Any = None
 
 
 def capture(
@@ -72,11 +74,27 @@ def export(
     wait: bool = False,
     tissue: Any = None,
     route: Any = None,
+    comparison: bool = True,
+    replay: bool = False,
 ) -> dict[str, Any]:
+    target = export_target(session, path)
+    frozen = capture(session, selected, editing, tissue, route)
+    frozen = comparison_options(session, frozen, comparison, replay)
+    return submit_export(session, target, frozen, wait)
+
+
+def export_target(session: Any, path: str) -> Path:
     target = Path(path).resolve()
     validate(session, target)
-    frozen = capture(session, selected, editing, tissue, route)
-    return submit_export(session, target, frozen, wait)
+    return target
+
+
+def comparison_options(session: Any, frozen: Capture, comparison: bool, replay: bool) -> Capture:
+    from .comparison_capture import capture as capture_comparison
+
+    if replay and not comparison:
+        raise ValueError("Replay requires comparison evidence.")
+    return replace(frozen, comparison=capture_comparison(session, replay)) if comparison else frozen
 
 
 def submit_export(session: "Session", target: Path, frozen: Capture, wait: bool) -> dict[str, Any]:
@@ -117,6 +135,7 @@ def create_job(path: Path, frozen: Capture) -> Job:
         writes=False,
         publish_during_edit=True,
         kind="inspection_report",
+        cancel=NativeCancellation(frozen.source.engine),
         workload=lambda _: task_workloads.project_save(
             frozen.source.resources, frozen.source.document
         ),

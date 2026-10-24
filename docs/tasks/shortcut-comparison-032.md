@@ -50,3 +50,11 @@ Foundation checkpoint: session baseline ownership, comparison operations, native
 fingerprints, and bounded semantic journal implemented. Ten focused tests and configured
 mypy pass; native build has five passing CTests. No desktop modes/export/replay delivery
 claimed. Next: desktop staged historical geometry and controls, then frozen archives.
+
+Desktop/export checkpoint: Before/After/Overlay and shared capture controls are connected;
+background native-render harness verifies mode switching and clear/release. Frozen exports
+include paired images, comparison evidence and SHA-256 member checksums. Optional replay
+uses an isolated session and in-memory preferences with a strict operation whitelist.
+Feedback drafts freeze evidence on opening; generic file attachments stream through the
+consumer. 27 focused tests pass. Remaining: real export/feedback UI qualification, broader
+lifecycle/security coverage, production profile/preservation, full gate and packaging.

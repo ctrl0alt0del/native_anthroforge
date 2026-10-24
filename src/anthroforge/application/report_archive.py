@@ -21,6 +21,14 @@ def check(cancel: Event) -> None:
 
 
 def write(path: Path, frozen: Any, metadata: dict[str, Any], cancel: Event) -> str:
+    from . import comparison_archive
+
+    if frozen.comparison is not None:
+        return comparison_archive.write(path, frozen, metadata, cancel)
+    return write_single(path, frozen, metadata, cancel)
+
+
+def write_single(path: Path, frozen: Any, metadata: dict[str, Any], cancel: Event) -> str:
     with tempfile.TemporaryDirectory(prefix="anthroforge-inspection-") as directory:
         root = Path(directory)
         check(cancel)

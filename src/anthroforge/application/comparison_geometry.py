@@ -5,6 +5,7 @@ from typing import Any
 
 from anthroforge.core.object_registry import kind
 from anthroforge.core.points import Anchor, Point
+from anthroforge.core.reference_images import ReferenceImage
 from anthroforge.core.results import geometry_asset
 from anthroforge.native.comparison import fingerprint
 from anthroforge.native.scene import geometry_matrix
@@ -44,6 +45,9 @@ def display_frame(context: Any, item: Any, frames: Any) -> list[float]:
 
 
 def geometry(context: Any, item: Any, cancel: int) -> dict[str, Any]:
+    if isinstance(item, ReferenceImage):
+        asset = context.resources.images[item.source]
+        return dict(kind="IMAGE", fingerprint=f"{asset.digest}:{item.width}:{item.height}")
     if isinstance(item, Point):
         position = item.resolved_position if isinstance(item, Anchor) else ()
         return dict(kind="POINT", fingerprint=str(position or item.position))

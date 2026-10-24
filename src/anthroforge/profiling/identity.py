@@ -3,9 +3,10 @@
 import json
 import subprocess
 from pathlib import Path
+from typing import Any
 
 
-def build_identity():
+def build_identity() -> dict[str, Any]:
     packaged = Path(__file__).resolve().parents[1] / "_runtime" / "build.json"
     if packaged.is_file():
         return json.loads(packaged.read_text(encoding="utf-8"))

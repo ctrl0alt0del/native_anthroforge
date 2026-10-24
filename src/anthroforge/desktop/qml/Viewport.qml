@@ -18,6 +18,7 @@ Item {
         function matches(action, mask) { return false; }
         function shortcut(command) { return ""; }
     }
+    readonly property bool comparisonBefore: workspace.shortcutComparison.before
     property bool gridVisible: true
     property bool xray: false
     property string viewName: "User view"
@@ -81,7 +82,7 @@ Item {
     }
     function cameraDirection(x,y,z) { return view.camera.mapDirectionToScene(Qt.vector3d(x,y,z)); }
     function rayAt(x, y, select, extend) {
-        if(drawing || workspace.tissuePainting.state.active) return {};
+        if(comparisonBefore || drawing || workspace.tissuePainting.state.active) return {};
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
         if(workspace.tissueInspection.state.active) { workspace.tissueInspection.probe(origin,direction,select); return {}; }
         if(workspace.tissueRegionTools.state.active) { workspace.tissueRegionTools.probe(origin,direction,select); return {}; }
@@ -247,7 +248,18 @@ Item {
         Node {
             id: worldScene
             eulerRotation.x: -90
-            TissueInspectionScene { distance: viewport.distance }
+            ShortcutComparisonScene {}
+            Repeater3D {
+                model: workspace.shortcutComparison.state.points || []
+                Model {
+                    required property var modelData
+                    position: Qt.vector3d(modelData.position[0],modelData.position[1],modelData.position[2])
+                    source: "#Sphere"; scale: Qt.vector3d(viewport.gizmoSize*.0012,viewport.gizmoSize*.0012,viewport.gizmoSize*.0012)
+                    pickable: false
+                    materials: DefaultMaterial { diffuseColor: "#74d9df"; lighting: DefaultMaterial.NoLighting }
+                }
+            }
+            TissueInspectionScene { distance: viewport.distance; visible: !viewport.comparisonBefore }
             RouteInspectionScene { distance: viewport.distance }
             Model {
                 objectName: "shortcutAnchorEffects"
@@ -268,6 +280,7 @@ Item {
             }
             PointScene { markerScale: viewport.gizmoSize * 0.0012 }
             ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis }
+            ImageScene { historical: true; layer: "NORMAL"; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis }
             Repeater3D {
                 id: meshRepeater
                 model: workspace.meshModel
@@ -280,10 +293,10 @@ Item {
                     Model {
                         id: meshNode
                         objectName: "surface_" + item.id + "_" + item.chunk
-                        visible: item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id)
+                        visible: !viewport.comparisonBefore && item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id)
                         position: Qt.vector3d(item.geometry_offset[0], item.geometry_offset[1], item.geometry_offset[2])
                         geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk }
-                        opacity: item.readonly ? .08 : authoring.state.editing && item.id === workspace.selectedId && ["LOFT","BODY"].indexOf(authoring.state.primitive?.kind) >= 0 ? .35 : !viewport.xray ? 1 : item.id === workspace.selectedId ? .65 : item.id === workspace.hoveredId ? .5 : .3
+                        opacity: item.readonly ? .08 : workspace.shortcutComparison.state.mode === "Overlay" ? .65 : authoring.state.editing && item.id === workspace.selectedId && ["LOFT","BODY"].indexOf(authoring.state.primitive?.kind) >= 0 ? .35 : !viewport.xray ? 1 : item.id === workspace.selectedId ? .65 : item.id === workspace.hoveredId ? .5 : .3
                         property Material normalMaterial: PrincipledMaterial {
                             baseColor: item.color
                             alphaMode: PrincipledMaterial.Opaque
@@ -303,7 +316,7 @@ Item {
                         scale: Qt.vector3d(item.trs[6],item.trs[7],item.trs[8])
                         Model {
                             objectName: "mask_" + item.key
-                            visible: item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id) && (item.id === workspace.selectedId || (!viewport.xray && !item.readonly))
+                            visible: !viewport.comparisonBefore && item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id) && (item.id === workspace.selectedId || (!viewport.xray && !item.readonly))
                             position: meshNode.position
                             // Each View3D owns its Qt geometry lifetime; both read the same native result.
                             // Sharing meshNode.geometry crashed after delete/recreate in Qt 6.12.
@@ -337,9 +350,10 @@ Item {
     SelectionOutline {
         id: selectionOutline; objectName: "selectionOutline"; anchors.fill: parent
         sourceCamera: view.camera; orthographic: viewport.orthographic
-        visible: !!workspace.selectedData.asset && !!workspace.selectedData.surface_visible
+        visible: !viewport.comparisonBefore && !!workspace.selectedData.asset && !!workspace.selectedData.surface_visible
     }
     AuthoringView {
+        visible: !viewport.comparisonBefore
         anchors.fill: parent; sourceCamera: view.camera
         orthographic: viewport.orthographic; distance: viewport.distance
     }
@@ -380,8 +394,8 @@ Item {
         }
         onDoubleClicked: { if(!viewport.measuring) workspace.frameSelection(); }
     }
-    TransformGizmo { id: gizmo; objectName: "transformGizmo"; anchors.fill: parent; viewport: viewport; enabled: !viewport.measuring }
-    CurveEditor { id: curveEditor; objectName: "curveEditor"; anchors.fill: parent; viewport: viewport; keyboard: viewport.keyboard; enabled: !viewport.measuring }
+    TransformGizmo { id: gizmo; objectName: "transformGizmo"; anchors.fill: parent; viewport: viewport; enabled: !viewport.measuring && !viewport.comparisonBefore; visible: !viewport.comparisonBefore }
+    CurveEditor { id: curveEditor; objectName: "curveEditor"; anchors.fill: parent; viewport: viewport; keyboard: viewport.keyboard; enabled: !viewport.measuring && !viewport.comparisonBefore; visible: !viewport.comparisonBefore }
     CurveFeedback { anchors.fill: parent; viewport: viewport }
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     MeasurementOverlay { id: measurementOverlay; viewport: viewport }

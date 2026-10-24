@@ -11,6 +11,7 @@ from anthroforge.native.mesh import NativeCancellation
 
 from . import comparison_geometry, shortcut_inspection
 from .comparison_journal import Journal
+from .inspection import issue_records
 from .inspection_context import InspectionContext, freeze, scene_signature
 
 
@@ -21,6 +22,7 @@ class Baseline:
     source: InspectionContext
     evidence: dict[str, Any]
     provisional: bool
+    issues: dict[str, Any]
 
 
 class Comparison:
@@ -42,10 +44,7 @@ class Comparison:
         self.serial += 1
 
     def capture(self, shortcut: str) -> None:
-        source, captured = freeze(self.session), evidence(self.session, shortcut)
-        value = Baseline(
-            str(uuid4()), shortcut, source, captured, self.session.history.before is not None
-        )
+        value = make_baseline(self.session, shortcut)
         active = any(job.writes for job in self.session.scheduler.active_jobs)
         self.clear()
         self.baseline = value
@@ -84,6 +83,17 @@ def evidence(session: Any, shortcut: str) -> dict[str, Any]:
             "shortcut.progress",
         )
     }
+
+
+def make_baseline(session: Any, shortcut: str) -> Baseline:
+    return Baseline(
+        str(uuid4()),
+        shortcut,
+        freeze(session),
+        evidence(session, shortcut),
+        session.history.before is not None,
+        issue_records(session),
+    )
 
 
 def create_job(state: Comparison, stamp: Any) -> Job:

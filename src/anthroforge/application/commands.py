@@ -7,6 +7,7 @@ from anthroforge.core.units import convert
 from . import (
     attached_creation,
     comparison_journal,
+    comparison_replay,
     construction_tasks,
     curve_branch_creation,
     curve_consumers,
@@ -341,6 +342,7 @@ def file_commands(session: "Session") -> dict[str, Any]:
     return {
         "save": lambda **a: projects.save(session, **a),
         "inspection.export": lambda **a: inspection_report.export(session, **a),
+        "inspection.replay": lambda **a: comparison_replay.replay(**a),
         "open": lambda **a: projects.open_project(session, **a),
         "workspace.create": lambda **a: presentation.create_workspace(session, **a),
         "workspace.select": lambda **a: presentation.select_workspace(session, **a),

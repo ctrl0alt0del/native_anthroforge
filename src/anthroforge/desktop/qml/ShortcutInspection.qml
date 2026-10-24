@@ -9,6 +9,7 @@ UiSection {
     expanded: adapter.opened
     onExpandedChanged: adapter.activate(expanded && visible)
     onVisibleChanged: adapter.activate(expanded && visible)
+    ShortcutComparison { shortcut: inspector.adapter.shortcutKey }
     ShortcutDetail { label: "Update"; value: inspector.adapter.state.status || "Unavailable" }
     UiCheck { objectName: "shortcutShowEffects"; text: "Show effects"; checked: !!inspector.adapter.state.showEffects; onClicked: inspector.adapter.showEffects(checked) }
     Label { visible: !!inspector.adapter.state.showEffects; text: "Gold: direct · Cyan: downstream\nGreen: authored anchors · Pink: effective anchors"; color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; font.pixelSize: 10 }

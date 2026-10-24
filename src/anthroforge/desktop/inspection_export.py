@@ -12,6 +12,7 @@ class InspectionExport(QObject):
     def __init__(self, controller):
         super().__init__(controller)
         self.controller, self.job, self.path, self.message = controller, None, "", ""
+        self.replay = False
 
     @Property("QVariantMap", notify=changed)
     def state(self):
@@ -40,7 +41,12 @@ class InspectionExport(QObject):
             editing=owner.authoring.editing,
             tissue=self.tissue_options() if tool.target else None,
             route=owner.route_inspection.state if owner.route_inspection.visible else None,
+            replay=self.replay and owner.session.shortcut_comparison.baseline is not None,
         )
+
+    @Slot(bool)
+    def includeReplay(self, enabled):
+        self.replay = enabled
 
     def tissue_options(self):
         owner, tool = self.controller, self.controller.tissue_inspection

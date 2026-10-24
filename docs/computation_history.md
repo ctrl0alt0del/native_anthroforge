@@ -1,5 +1,15 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: atomic surface-click Fiber construction
+
+Quick creation composes existing confirmed attachment capture and native routing on an
+owned worker snapshot. A provisional seed never enters document history; the first accepted
+output is already routed. Every point retains its explicitly clicked surface. Capture and
+routing estimates compose in one coordinator policy; dispatch snapshots include preferences.
+No routing, blending or exterior-placement numerical kernel changed. Headless and desktop
+tests verify obstacle avoidance, explicit targets, cancellation, selection and one-action
+undo. Full offscreen QML toolbar acceptance passes; interactive shapes remain unqualified.
+
 ### In-progress 0.3.4: reviewed tissue retarget and complete-bundle fan-out
 
 Tissue source changes now evaluate existing native phases on an owned read-only snapshot.

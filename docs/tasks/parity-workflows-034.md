@@ -275,3 +275,26 @@ rejected unavailable Base role, field preservation/discard review, package round
 Manual accepted provenance, undo and no duplicate own-stage calculations. Extended mesh
 and tissue retarget offscreen acceptance pass. Broader branches/crops/stacking assemblies,
 full gate/profiling/packaging remain pending. D10/D11 and F01 remain outstanding.
+
+## Quick Fiber creation checkpoint
+
+D10 now has a dedicated Place Fiber toolbar action and shared fiber.place operation.
+Every provisional click uses displayed native surface picking; misses add no point.
+First click starts, Shift-click continues, and plain click from the second point finishes.
+Backspace removes a point; Escape/cancel leaves no authored object. Generic keyboard
+modifier routing is reused. The accepted Fiber is selected after background publication.
+
+An owned provisional polyline exists only inside the worker snapshot. Existing confirmed
+attachment capture binds every clicked point to its explicit target. Existing native
+routing solves the first path before complete publication; no straight placeholder is
+published as accepted ROUTED geometry. The normal authored-job transaction, revision
+proof/retry and history replay remain shared with curve-to-Fiber creation. A dedicated
+creation scheduling policy composes capture and routing estimates in the same coordinator.
+
+Headless tests cover an obstacle-avoiding initial route, explicit target preservation even
+with coincident candidate surfaces, atomic validation, cancellation, undo/redo and no orphan.
+Desktop tests cover misses, hover, continued placement, Backspace, cancellation and accepted
+selection. Twelve focused tests including existing Fiber creation and architecture pass;
+Ruff/configured mypy and actual offscreen QML toolbar/creation/undo acceptance pass.
+No interactive viewport geometry claim is made. Full suite at the preceding checkpoint:
+2118 passed in 153.49 seconds. D11, F01 decision and broad qualification remain pending.

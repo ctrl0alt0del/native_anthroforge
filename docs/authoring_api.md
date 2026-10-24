@@ -568,6 +568,14 @@ and its limits are in [release validation](development_status.md#construction-ob
 ### Fiber creation
 
 `fiber.create(curve, bindings=None, name="Fiber")` starts an asynchronous independent copy.
+
+`fiber.place(points, owner="", name="Fiber")` creates a bound ROUTED Fiber directly.
+Each point requires `position` (world XYZ metres) and its clicked `target`; optional
+`role` selects the anatomical surface explicitly. Every point is bound to its chosen
+surface through confirmed placement, rather than assigned to the nearest default SCP.
+The operation returns a job ID. A worker captures attachments and solves the initial
+route before publishing the complete Fiber. No intermediate Curve enters the document;
+cancellation/failure leaves no draft, and successful creation is one undo action.
 Omitting bindings uses both open endpoints, or the first closed-curve point, with native
 nearest-ready-SCP capture. Explicit binding rows may omit `target` to use the same
 automatic choice for that point; explicit Tissue Base/Final overrides remain supported.

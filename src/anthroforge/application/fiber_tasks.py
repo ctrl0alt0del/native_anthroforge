@@ -170,11 +170,16 @@ def publish(session: "Session", spec: "FiberCreation", origin: int, payload: Any
     ports = inputs(source, spec)
     if revisions(source, ports) != revisions(session.document, ports):
         raise ValueError("Fiber capture inputs changed before publication.")
+    publish_ready(session, origin, payload, ports, partial(enqueue, session, spec, origin))
+
+
+def publish_ready(session: Any, origin: int, payload: Any, ports: Any, restart: Any) -> None:
+    source, item, path, attachment = payload
     key = str(uuid4())
     item = replace(
         item, result=EvaluationResult(key, 1, item.construction_revision, revisions(source, ports))
     )
-    proof = authored_jobs.Capture(item.result.inputs, partial(enqueue, session, spec, origin))
+    proof = authored_jobs.Capture(item.result.inputs, restart)
     authored_jobs.publish(session, origin, partial(merge, item=item), proof)
     session.resources.paths[key] = path
     session.resources.attachments[item.attachment_asset] = attachment

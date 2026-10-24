@@ -8,15 +8,15 @@ and acceptance requirements remain below; unperformed interactive checks are not
 
 Product authority: [specification_035.md](specification_035.md). Follow the
 [engineering guidelines](engineering_guidelines.md) and
-[work-continuity workflow](work_continuity.md). This is an ordered future runtime plan;
-the original delivery was documentation only. Runtime now uses project schema 6 with
+[work-continuity workflow](work_continuity.md). This preserves the ordered runtime plan;
+the original consolidation delivery was documentation only. Runtime now uses project schema 6 with
 schema-4/5 loading. Qualification status is recorded separately from this original plan.
 
 ## 1. Baseline diagnosis and source inventory
 
-The integrated baseline uses typed authored objects, separate accepted results,
+The pre-0.3.5 integrated baseline used typed authored objects, separate accepted results,
 role-aware surface providers, a single coordinator, shared application operations,
-staged viewport resources, Issues and the runtime profiler. It has no live anatomical
+staged viewport resources, Issues and the runtime profiler. It had no live anatomical
 mirror model. Existing migrated opposite-side bones are independent authored objects.
 The separate unfinished 0.3.4 task is not implicitly merged or qualified by this plan.
 
@@ -61,8 +61,8 @@ resource and regression motivations; strict reflection supersedes independent mi
 Extend the shared command catalogue with operation families for rule and inheritance
 configuration, conflict-plane overrides, instance/usage inspection, same-target attachment
 choices, affected-consumer queries, mirrored-row settings, symmetric-loop creation and
-source navigation/presentation. These are **planned families**, not existing command names.
-Finalize concrete catalogue signatures alongside their typed contracts and tests.
+source navigation/presentation. These were the planned operation families. Concrete runtime signatures are documented
+in the [walkthrough](mirroring_035.md#shared-operations), with typed contracts and tests.
 
 Instances expose source/rule identity, plane revision, surface role, source-result
 revision/readiness, reflected frame and resource ownership. Keep geometry readiness
@@ -134,7 +134,7 @@ precedes any state mutation and returns navigable blockers without partial delet
 
 ## 4. Acceptance matrix
 
-| Area | Required future evidence |
+| Area | Required evidence |
 | --- | --- |
 | Rules and identity | Disabled/default rules; inheritance and opt-out; nested sources; all axes/shift; conflicts and explicit overrides; one instance per source/rule, different-rule instances; rename and plane edits retain IDs. |
 | Strict geometry | Compare native reflected source coordinates/frames and corresponding stages under nonuniform transforms; verify winding/normals and tolerance. Asymmetric obstacles/supports never reroute or reshape mirrors; profiler confirms no independent solvers. |
@@ -162,7 +162,7 @@ checks, not runtime acceptance. Update active recommendations, roadmap, architec
 authoring API and addon audit together; preserve historical evidence and label source
 observations separately from confirmed behavior. Validate links and decision coverage.
 
-Future implementation follows task-branch/checkpoint/push and validated-merge practices,
+Runtime delivery follows task-branch/checkpoint/push and validated-merge practices,
 preserving unrelated work and the root legacy `__init__.py`. Keep Python 3.12, C++17 and
 Qt/PySide 6.12.0. Every new function stays within 15 physical lines using cohesive helpers.
 Background-only validation must not take over the user's desktop. Do not claim portable,

@@ -262,3 +262,15 @@ nonfinite output and new collapsed faces. The separate diagnostic API compares c
 connectivity for crossings, reports baseline crossings separately and permits large normal
 rotations. This supersedes the earlier intrinsic rejection of crossed Pouch output;
 it adds no self-contact resolution or automatic solver/preset substitution.
+
+
+## 0.3.5 strict source reflection
+
+Application-owned `path_symmetry.cpp` and `surface_symmetry.cpp` implement the
+confirmed symmetric-source contracts. These adapters use standalone-owned paths,
+frames and meshes; they do not embed Blender object/dependency evaluation. Spatial
+instances reuse accepted source resources and reflected transforms. Render-only
+triangle indices reverse under negative determinants; material connectivity is unchanged.
+Addon inventory and intentional independent-mirror differences are recorded in
+`docs/implementation_035.md`; observed runtime evidence is in `docs/mirroring_035.md`.
+No new third-party dependency is introduced by mirroring.

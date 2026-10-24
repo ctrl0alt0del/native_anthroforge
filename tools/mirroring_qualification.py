@@ -4,6 +4,7 @@ import json
 import sys
 from pathlib import Path
 from time import perf_counter
+from zipfile import ZipFile
 
 import numpy as np
 
@@ -113,15 +114,26 @@ def qualify(controller, renderer, app, warnings):
 
 
 def record(elapsed):
+    verify_trace()
     report = dict(
         plane_edit_wait_refresh_readback_ms=elapsed,
         hover_click_match=True,
         source_geometry_unchanged=True,
-        native_reflection_only=True,
+        no_independent_mirror_solves=True,
         scope="Hidden GPU readback; not physical display/input latency",
     )
     (OUTPUT / "qualification.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report), flush=True)
+
+
+def verify_trace():
+    with ZipFile(OUTPUT / "mirroring.afprofile.zip") as archive:
+        events = json.loads(archive.read("trace.json"))["traceEvents"]
+    forbidden = ("inflate", "inflation", "relax", "af_route_path")
+    calls = {e["name"] for e in events if e.get("cat") == "native"}
+    assert calls and not any(s in name for name in calls for s in forbidden), calls
+    outputs = [key for e in events for key in e.get("args", {}).get("outputs", [])]
+    assert not any(key.startswith("mirror/") for key in outputs), outputs
 
 
 def run(app):

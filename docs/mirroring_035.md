@@ -99,7 +99,7 @@ connectivity and native source geometry remain untouched.
 the initial dimming/winding defect was corrected and captures reinspected. Hover/click
 agree on the displayed mirrored tissue. Plane edits preserve exact source arrays and
 the trace contains no independent mirror inflation, routing or relaxation calls.
-Repeated warm plane edits measured 121–212 ms including settling, refresh and eight
+Repeated warm plane edits measured 121–343 ms including settling, refresh and eight
 GPU frames/readbacks, under variable uncontrolled background load. This is not physical display/input latency or a hard responsiveness guarantee.
 
 The existing 59-SCP/96-muscle assembly produced **620 instances in 49 ms**, settled
@@ -117,3 +117,20 @@ receiver boundaries; mirroring does not weaken preservation constraints.
 Offscreen evidence does not establish interactive acceptance on the user's desktop.
 Qualification never takes over the desktop. See the task record for gate and packaged
 results; historical Blender independently evaluated mirrors are an intentional difference.
+
+
+## Ownership review
+
+Reviewed the implementation separately from its test results: immutable mirror
+identity/rule resolution lives in Core; application policies own reference safety,
+read-only enforcement and source-only dependency aliases. Providers expose spatial
+identity without fabricating SCPs. Numerical seam, frame and query work remains native.
+Desktop projection shares source leases and uses the existing staged RenderModel;
+render winding correction does not modify the document. Serialization stores metadata
+and source results, with no mirrored asset catalogue or worker pool.
+
+Shared cause fixes belong at those boundaries: measurements now resolve surface roles
+and construction/stage frames consistently; shared-junction projection runs before
+atomic member expansion. Existing algorithms remain authoritative for source geometry.
+The mapping/index code intentionally handles relationship metadata in Python; native
+geometry is batched. No blanket Qt dependency was added to Core or headless operations.

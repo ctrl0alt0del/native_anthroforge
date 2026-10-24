@@ -99,8 +99,15 @@ A previous full gate passed 2,090 tests, five native CTests and style/type check
 newer additions require a final rerun. Focused measurement, inspection, relationship
 and junction checks pass. Latest native build passes five CTests. Hidden full QML
 inspection selected mirrored Tissue/Fiber/Membrane with no warnings. Source-only
-plane edits reused geometry; repeat hidden-GPU timings varied 121–212 ms including
+plane edits reused geometry; repeat hidden-GPU timings varied 121–343 ms including
 eight rendered/readback frames, settling and refresh, under uncontrolled background load.
 Production read-only probe: 59 SCPs/96 muscles, 620 instances in 49 ms, settled under
 0.7 s, zero new source geometry assets and no scheduler failures. WIP file not saved.
 Portable release and final full gate are not yet complete.
+
+Repeated-plane resource and Manual-source lifetime tests pass: 16 plane edits add no
+mesh assets, undo restores the prior plane, and Manual mirrors retain the accepted
+source until explicit evaluation. Qualification trace validation also checks absence
+of independent mirror output writers and inflation/routing/relaxation calls. A final
+hidden-GPU repeat measured 194–343 ms with about 47% system busy time; all observed
+trials span 121–343 ms, including eight GPU frames/readbacks. No low-latency claim.

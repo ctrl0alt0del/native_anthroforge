@@ -58,12 +58,28 @@ on existing targets; `fiber.binding.offset` edits the retained record's signed n
 component. Worker resolution batches material frames, moves controls/handles natively,
 rebuilds path and preserves the binding. No UI-thread geometry query or nearest rebind.
 Manual pending offset intent persists and remaps during duplication. Ordinary point
-movement supersedes a pending offset request for that point. Bulk repair proposals remain
-unfinished; Rebind All alone does not complete D02.
+movement supersedes a pending offset request for that point. Bulk repair proposals now use an on-demand Issues provider, owned read snapshots and
+native per-record material validation. Failed pins propose current-position recapture
+on existing targets; missing targets may propose eligible alternatives for explicit
+approval. Batch application validates all read sets first and uses one transaction.
+The modal is paginated/virtualized; Issue details and the Fiber inspector open it.
+Existing Issues repair tracking rechecks after publication.
+
+D04 adds per-curve warm-start preference and authoritative cold Recalculate from planner.
+Cold intent is a runtime job option, retained through retries, and does not rewrite
+settings or discard accepted output. Profiler spans include cold_start attribution.
+
+Thumb correction was rendered and inspected at fixed camera/scale against source and
+original app geometry: build/parity-workflows-034/thumb-correction.png. Corrected shape
+matches source visually; no original anatomy file was saved over.
 
 ## Verification
 
 - Windows native build and all five native tests pass.
+- Full pytest: 2,076 passed (148.24s), before final small UI-test adjustments; focused
+  final pin-repair/cold-route/architecture tests pass. Ruff and mypy pass.
+- Extended offscreen Fiber acceptance passes actual support, Normal Offset, Rebind All
+  and modal scan/select/apply controls. Stale proposals reject atomically in API tests.
 - 13 focused Python tests pass: shortcut transactions, remeshed material owner anchors,
   migration policies and architecture/function limits. Full Ruff and mypy pass.
 - Native style check passed. Full gate, profiler and packaging pending.

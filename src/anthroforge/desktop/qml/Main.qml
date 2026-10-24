@@ -27,7 +27,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: preferencesDialog.visible || surfaceGrouping.visible || reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: pinRepairDialog.visible || preferencesDialog.visible || surfaceGrouping.visible || reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -306,6 +306,8 @@ ApplicationWindow {
     DeleteDialog { id: deleteDialog }
     PreferencesDialog { id: preferencesDialog }
     SurfaceGroupingDialog { id: surfaceGrouping }
+    FiberPinReview { id:pinRepairDialog }
+    Connections { target:workspace.issuePanel; function onPinReviewRequested(curve) { pinRepairDialog.request(curve); } }
     KeyboardManager {
         id: keyboard; window: window; blocked: window.modalOpen || workspace.state.waiting; transforming: viewport.transforming; snapping: viewport.snapping
         numericEditing: numericEdits.active

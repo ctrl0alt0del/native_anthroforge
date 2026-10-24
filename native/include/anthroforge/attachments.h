@@ -29,6 +29,9 @@ AF_API uint64_t af_mesh_triangle_source_restore(uint64_t source,const double* va
 AF_API int af_mesh_basis_copy(uint64_t source,int64_t* records,int64_t count,double* parameters,int64_t size);
 AF_API uint64_t af_mesh_basis_restore(uint64_t source,const int64_t* records,int64_t count,const double* parameters,int64_t size,uint64_t cancel);
 AF_API int af_material_binding_frames(uint64_t reference,uint64_t current,const double* world,int count,const double* records,double* frames,uint64_t cancel);
+/* Read-only advisory validation: one validity flag per record; invalid records do not abort peers. */
+AF_API int af_material_binding_validate(uint64_t reference,uint64_t current,const double* world,
+    int count,const double* records,int* valid,uint64_t cancel);
 AF_API int af_attachment_blend_frames(int count,const double* frames,const double* weights,double* points,uint64_t cancel);
 /* Dense path nodes followed by knot/left/right controls; two weighted influences per row. */
 AF_API int af_curve_attachment_capture(int surfaces,const uint64_t* meshes,const double* frames,

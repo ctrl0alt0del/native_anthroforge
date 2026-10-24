@@ -33,17 +33,29 @@ class ResolvedCurve:
 
 
 def evaluate(
-    engine: Any, document: Any, resources: Any, target: str, cancel: int, backend: str = "CUSTOM"
+    engine: Any,
+    document: Any,
+    resources: Any,
+    target: str,
+    cancel: int,
+    backend: str = "CUSTOM",
+    cold: bool = False,
 ) -> Any:
     item = curve_sources.source(document, target)
-    return evaluate_item(engine, document, resources, item, cancel, backend)
+    return evaluate_item(engine, document, resources, item, cancel, backend, cold)
 
 
 def evaluate_item(
-    engine: Any, document: Any, resources: Any, item: Any, cancel: int, backend: str = "CUSTOM"
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Any,
+    cancel: int,
+    backend: str = "CUSTOM",
+    cold: bool = False,
 ) -> PathEvaluation:
     value = resolve(engine, document, resources, item, cancel)
-    path = engine_path(engine, document, resources, value, cancel, backend)
+    path = engine_path(engine, document, resources, value, cancel, backend, cold)
     return PathEvaluation(path, value.edited, value.attachment)
 
 
@@ -96,12 +108,18 @@ def edited_fiber(
 
 
 def engine_path(
-    engine: Any, document: Any, resources: Any, value: ResolvedCurve, cancel: int, backend: str
+    engine: Any,
+    document: Any,
+    resources: Any,
+    value: ResolvedCurve,
+    cancel: int,
+    backend: str,
+    cold: bool = False,
 ) -> Any:
     item, resolved = value.authored, value.path
     if item.engine == "ROUTED":
         return routing_evaluation.evaluate(
-            engine, document, resources, item, cancel, resolved, backend
+            engine, document, resources, item, cancel, resolved, backend, cold
         )
     return resolved or path_assets.evaluate(engine, item, cancel)
 

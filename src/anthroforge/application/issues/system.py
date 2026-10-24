@@ -4,7 +4,7 @@ from collections.abc import Callable
 from functools import partial
 from typing import TYPE_CHECKING
 
-from . import fiber_collisions, formulas, providers, repairs, tissue_geometry
+from . import fiber_collisions, fiber_pins, formulas, providers, repairs, tissue_geometry
 from .listening import Listening
 from .presentation import Presentation
 from .reporting import Reporting
@@ -34,6 +34,7 @@ class IssueSystem:
             *providers.builtins(),
             formulas.provider(),
             fiber_collisions.provider(session),
+            fiber_pins.provider(session),
             tissue_geometry.provider(session),
         ):
             self.listening.register(provider)

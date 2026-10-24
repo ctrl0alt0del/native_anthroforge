@@ -21,9 +21,10 @@ UiScrollView {
         }
         UiButton { objectName: "issueShowGeometry"; text: "Show geometry"; visible: !!panel.issue.evidence?.witness; enabled: panel.service.state.canNavigate && panel.issue.freshness==="current"; onClicked: panel.service.showGeometry() }
         Repeater {
-            model: panel.issue.fixes || []
+            model: (panel.issue.fixes || []).filter(row=>row.name!=="pin_rebind")
             UiButton { required property var modelData; objectName: "issueFix-"+modelData.name; text: modelData.label; enabled: !panel.issue.repairActive; onClicked: panel.service.run("issues.fix",{identity:panel.issue.id,name:modelData.name}) }
         }
+        UiButton { text:"Review pin repair"; visible:panel.issue.code==="FIBER_PIN_REPAIR_AVAILABLE"; onClicked:panel.service.reviewPins(panel.issue.target) }
         Label { Layout.fillWidth: true; visible: !!panel.issue.repair; text: "Repair: "+(panel.issue.repair || ""); color: Theme.accent; wrapMode: Text.Wrap }
         UiButton { objectName: "issueCancelFix"; text: "Cancel repair"; visible: !!panel.issue.repairActive; onClicked: panel.service.run("issues.cancel_fix",{identity:panel.issue.id}) }
         Repeater {

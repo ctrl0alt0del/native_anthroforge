@@ -130,6 +130,7 @@ class GeometryEngine(NativeEngine):
 
     def _binding_signatures(self) -> None:
         from . import attachment_fields, attachment_weights, path_collisions, point_attachments
+        from .material_bindings import configure as configure_bindings
         from .mesh_quality import configure as configure_quality
         from .routing_scene import configure
         from .surface_queries import configure as configure_queries
@@ -139,6 +140,7 @@ class GeometryEngine(NativeEngine):
         configure(self)
         configure_quality(self)
         configure_queries(self)
+        configure_bindings(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

@@ -31,6 +31,7 @@ class RoutingSettings:
     obstacles: tuple[str, ...] = ()
     obstacle_mode: str = "AUTO"
     excluded_obstacles: tuple[str, ...] = ()
+    use_warm_start: bool = True
     kind: Literal["ROUTED"] = field(default="ROUTED", init=False)
 
     def __post_init__(self) -> None:
@@ -40,6 +41,8 @@ class RoutingSettings:
             raise ValueError("Routing clearance radius must be finite and nonnegative.")
         if self.obstacle_mode not in ("AUTO", "MANUAL"):
             raise ValueError("Choose automatic or manual routing obstacles.")
+        if not isinstance(self.use_warm_start, bool):
+            raise ValueError("Use warm start must be a Boolean.")
         for values in (self.obstacles, self.excluded_obstacles):
             if len(set(values)) != len(values) or any(not key for key in values):
                 raise ValueError("Routing obstacles must be unique object identities.")

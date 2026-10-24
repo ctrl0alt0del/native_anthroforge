@@ -24,6 +24,8 @@ def owners(item: Curve, surfaces: tuple[SurfaceReference, ...]) -> tuple[int, ..
 
 
 def warm_path(item: Curve, asset: PathAsset | None) -> Any:
+    if not getattr(item.engine_settings, "use_warm_start", True):
+        return None
     if asset is None or asset.authored.engine != "ROUTED":
         return None
     before, after = warm_identity(asset.authored), warm_identity(item)
@@ -45,19 +47,22 @@ def evaluate(
     cancel: int,
     warm: Any = None,
     backend: str = "CUSTOM",
+    cold: bool = False,
 ) -> PathAsset:
-    inputs = replace(capture(engine, document, resources, item, warm), backend=backend)
+    inputs = replace(capture(engine, document, resources, item, warm, cold), backend=backend)
     path, report = routing.evaluate(engine, inputs, cancel)
     return PathAsset(path, replace(item, result=EvaluationResult()), report)
 
 
-def capture(engine: Any, document: Any, resources: Any, item: Curve, warm: Any) -> routing.Inputs:
+def capture(
+    engine: Any, document: Any, resources: Any, item: Curve, warm: Any, cold: bool = False
+) -> routing.Inputs:
     surfaces = surface_providers.query_references(
         engine, document, resources.meshes, references(document, item)
     )
     handles, matrices = surface_providers.inputs(engine, document, resources.meshes, surfaces)
     frame = curve_sources.world(engine, document, item.id)
-    warm = warm_path(item, warm or resources.paths.get(item.result.asset))
+    warm = None if cold else warm_path(item, warm or resources.paths.get(item.result.asset))
     return routing.Inputs(
         item, tuple(handles), tuple(matrices), frame, owners(item, surfaces), warm
     )

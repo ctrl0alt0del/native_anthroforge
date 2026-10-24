@@ -1,5 +1,22 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: advisory material-pin assessment and cold routing
+
+Pin repair previously required manual point-by-point recapture. On-demand Issues now
+validate retained material records natively in batches; a failed batch isolates invalid
+records inside C++, retaining peer results and cancellation. Proposed current-position
+rebindings use the existing qualified capture service, without changing authored state.
+Approved batches revalidate source fingerprints and commit atomically through existing
+curve capture/publication and Issues verification. Tests cover unchanged assessment
+state, shape-preserving repair and stale rejection; offscreen modal controls passed.
+
+Warm reuse previously could only be bypassed in read-only inspection. Explicit cold
+routing now passes runtime execution intent through ordinary path jobs; normal settings
+and accepted output remain intact. A saved use_warm_start setting controls future jobs.
+Curve/Fiber tests verify warm/cold inputs and accepted publication. Native routing
+objectives/collision checks are unchanged. Profiler spans record cold_start.
+
+
 ### In-progress 0.3.4: authored material-normal pin edits
 
 Existing point dragging uses explicit nearest recapture; that is unsuitable for a

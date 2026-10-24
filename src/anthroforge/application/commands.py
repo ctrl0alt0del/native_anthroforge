@@ -21,6 +21,7 @@ from . import (
     evaluation,
     fiber_bindings,
     fiber_operations,
+    fiber_pin_repairs,
     fiber_support_operations,
     geometry_modifiers,
     image_operations,
@@ -138,6 +139,7 @@ EDITS = {
     "fiber.binding.remove": fiber_bindings.remove,
     "fiber.binding.offset": fiber_bindings.normal_offset,
     "fiber.rebind": fiber_bindings.rebind_all,
+    "fiber.pins.repair": fiber_pin_repairs.apply,
     "fiber.supports.configure": fiber_support_operations.configure,
     "image.import": image_operations.import_image,
     "image.replace": image_operations.replace_source,
@@ -283,6 +285,7 @@ def direct_commands(session: "Session") -> dict[str, Any]:
         "wait": session.wait,
         "tick": session.scheduler.tick,
         "evaluate": lambda **a: evaluate(session, **a),
+        "curve.reroute": lambda **a: path_tasks.reroute(session, **a),
     }
 
 
@@ -310,11 +313,20 @@ def construction_queries(session: "Session") -> dict[str, Any]:
         **surface_queries(session),
         "image.inspect": lambda **a: image_operations.inspect(session, **a),
         "object.inspect": lambda **a: object_operations.inspect(session, **a),
-        "fiber.supports.inspect": lambda **a: fiber_support_operations.inspect(session, **a),
+        **fiber_queries(session),
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),
         "control.affected": lambda **a: controls.affected(session, **a),
         "deformer.members": lambda **a: deformers.members(session, **a),
         "junction.inspect": lambda **a: junction_operations.inspect(session, **a),
+    }
+
+
+def fiber_queries(session: "Session") -> dict[str, Any]:
+    from .issues import fiber_pins
+
+    return {
+        "fiber.supports.inspect": lambda **a: fiber_support_operations.inspect(session, **a),
+        "fiber.pins.check": lambda **a: fiber_pins.request(session, **a),
     }
 
 

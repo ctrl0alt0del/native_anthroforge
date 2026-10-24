@@ -932,3 +932,14 @@ their existing target roles, as one undo action. It does not silently choose new
 the retained material pin. Native worker evaluation updates controls and handles; the
 point retains its surface reference. Manual-mode pending edits survive save/open.
 Bulk repair proposal/review is still pending; these operations do not establish it.
+
+`fiber.pins.check(curves=None)` requests on-demand read-only Issues checks. Query
+`issues.list` with provider `fiber_pins.v1` for proposed per-pin repairs.
+`fiber.pins.repair(identities=[issue IDs])` explicitly approves selected proposals,
+validates all sources, and applies one transaction. Stale proposals must be rescanned.
+The existing Issues repair lifecycle verifies results after dependent publication.
+
+`curve.reroute(curve)` requests an authoritative cold routed calculation without
+changing authored settings. It preserves accepted geometry until successful publication.
+ROUTED `use_warm_start` defaults true; disabling it makes subsequent calculations cold.
+This applies equally to curves and Fibers; route inspection remains read-only.

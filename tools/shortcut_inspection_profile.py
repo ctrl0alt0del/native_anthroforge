@@ -9,6 +9,8 @@ from pathlib import Path
 from statistics import median
 from time import perf_counter
 
+import numpy as np
+
 from qualify_retained_attachment_edits import load
 from shortcut_parity_app_capture import record
 
@@ -34,7 +36,19 @@ def fingerprint(session):
                 metadata[item.id]["bindings"] = [asdict(b) for b in item.bindings]
                 metadata[item.id]["supports"] = [asdict(s) for s in item.supports]
     geometry = {k: hashlib.sha256(v.tobytes()).hexdigest() for k, v in arrays.items()}
-    return dict(geometry=geometry, relationships=metadata)
+    return dict(geometry=geometry, relationships=metadata, connectivity=connectivity(arrays))
+
+
+def connectivity(arrays):
+    result = {}
+    for key, faces in arrays.items():
+        if key.endswith("__triangles"):
+            starts = np.argmin(faces, axis=1)
+            indices = (starts[:, None] + np.arange(3)) % 3
+            ordered = np.take_along_axis(faces, indices, axis=1)
+            ordered = ordered[np.lexsort(ordered.T[::-1])]
+            result[key] = hashlib.sha256(ordered.tobytes()).hexdigest()
+    return result
 
 
 def shortcut_key(case):

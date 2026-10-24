@@ -1,9 +1,12 @@
 """Shortcut inspection cannot alter anatomy, history or evaluation intent."""
 
 import json
+from dataclasses import replace
 
 import pytest
 
+from anthroforge.application.shortcut_effects import current_pending
+from anthroforge.core.results import EvaluationResult, ReadRevision
 from tests.test_driving_formulas import curve, driver, reference
 
 
@@ -121,3 +124,18 @@ def test_cancelled_gesture_and_new_edit_have_distinct_observations(session, asse
     session.command("shortcut.set", reference=ref, value=3)
     session.wait(5)
     assert session.command("shortcut.progress", shortcut=key)["edit"] != first
+
+
+def test_pending_evidence_respects_tissue_surface_role(session):
+    from tests.test_tissue_workflow import assembly
+
+    _, _, key = assembly(session)
+    item = session.document.object(key)
+    changed = replace(item, base_result=replace(item.base_result, status="pending"))
+    objects = tuple(changed if v.id == key else v for v in session.document.objects)
+    document = replace(session.document, objects=objects)
+    source = ReadRevision(key, "base", item.base_revision, item.base_result.revision)
+    result = EvaluationResult(inputs=(source,), pending=(key,))
+    assert current_pending(document, result) == [key]
+    result = replace(result, inputs=(replace(source, output="final"),))
+    assert current_pending(document, result) == []

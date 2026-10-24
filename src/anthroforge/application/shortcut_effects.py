@@ -64,7 +64,9 @@ def readiness(document: Any, port: Port) -> dict[str, Any]:
         error=getattr(result, "error", ""),
         pending=current_pending(document, result),
         captured_pending=list(getattr(result, "pending", ())),
-        revision=getattr(result, "revision", None),
+        revision=getattr(item, "pose_revision", None)
+        if port.output == "pose"
+        else getattr(result, "revision", None),
     )
 
 
@@ -83,13 +85,18 @@ def output_result(item: Any, output: str) -> Any:
 
 def current_pending(document: Any, result: Any) -> list[str]:
     pending = getattr(result, "pending", ())
-    return [key for key in pending if pending_owner(document, key)]
+    inputs = getattr(result, "inputs", ())
+    return [key for key in pending if pending_owner(document, key, inputs)]
 
 
-def pending_owner(document: Any, key: str) -> bool:
+def pending_owner(document: Any, key: str, inputs: Any) -> bool:
     item = document.registry.records.get(key)
-    value = getattr(item, "result", None)
-    return item is None or getattr(value, "status", "ready") in ("pending", "failed")
+    roles = {r.output for r in inputs if r.owner == key} or {"geometry"}
+    return item is None or any(
+        output_status(item, output_result(item, role), role) in ("pending", "failed")
+        for role in roles
+        if not role.startswith("property:")
+    )
 
 
 def row(session: Any, port: Port, targets: set[str], published: set[Port]) -> dict[str, Any]:

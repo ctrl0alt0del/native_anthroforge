@@ -35,6 +35,20 @@ full readiness scans while related jobs remain active reduced observed status wo
 full development gate and portable release remain. Historical pending provenance is now
 distinct from current pending work; Ribs completion reports complete without changing results.
 
+All four production controls now compared analytically against main: Ribs, Humerus,
+Radius and Thumb. Every vertex, pose and attachment matches exactly. Thumb's Boolean
+triangles differ in enumeration only; oriented connectivity hashes match after canonical
+cyclic rotation and row ordering. Other triangle arrays match byte-for-byte. Reports:
+build/shortcut-inspection-profile/comparison.json, baseline/candidate *.afprofile.zip.
+Median four-query costs: 8.32 / 5.89 / 4.40 / 3.54 ms respectively. Do not claim a speedup;
+these are instrumented, non-isolated timings (Thumb repeat overlapped packaging).
+
+The first package was built successfully. A final read-set qualification additionally
+made pending-input inspection surface-role-aware (tissue base vs final), with a regression
+test. Rebuild the same canonical package before portable validation. New version 0.3.1;
+schema remains 5. Environment was restored with all locked extras and packaging/qt-sdk
+groups after a default uv sync omitted optional dependencies; current runtime pins match.
+
 ## Next actions
 
 1. Development gate passed: 2,025 pytest, 5 native tests, typing/style/numerics/doctor.

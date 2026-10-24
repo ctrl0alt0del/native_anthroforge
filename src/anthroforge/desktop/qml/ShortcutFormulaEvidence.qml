@@ -21,7 +21,7 @@ ColumnLayout {
             width: ListView.view.width-14; height: 54; spacing: 0
             Label { text: modelData.name+" · "+(modelData.object_name || modelData.label || "Missing"); color: Theme.text; elide: Text.ElideMiddle; Layout.fillWidth: true }
             Label { text: "Current: "+String(modelData.value ?? "unavailable")+" · Captured: "+(modelData.captured_available ? String(modelData.captured_value) : "unavailable"); color: Theme.muted; elide: Text.ElideRight; Layout.fillWidth: true }
-            Label { text: (modelData.numeric_type || "")+" · "+(modelData.dimension || "")+" · canonical m/rad"; color: Theme.muted; font.pixelSize: 10; Layout.fillWidth: true }
+            Label { text: (modelData.numeric_type || "")+" · "+(modelData.dimension==="LENGTH" ? "metres" : modelData.dimension==="ANGLE" ? "radians" : "dimensionless"); color: Theme.muted; font.pixelSize: 10; Layout.fillWidth: true }
             TapHandler { onTapped: row.adapter.navigate(modelData.reference?.target || modelData.driver,false) }
         }
     }

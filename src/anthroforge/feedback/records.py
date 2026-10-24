@@ -5,6 +5,8 @@ from dataclasses import asdict, dataclass
 from hashlib import sha256
 from typing import Protocol
 
+from .attachments import FileAttachment
+
 
 @dataclass(frozen=True)
 class Annotation:
@@ -30,6 +32,7 @@ class Report:
     annotations: tuple[Annotation, ...]
     original_png: bytes
     annotated_png: bytes
+    files: tuple[FileAttachment, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -58,8 +61,18 @@ def metadata(report: Report) -> dict[str, object]:
         image=dict(width=report.width, height=report.height, coordinates="source pixels"),
         annotation_color="#ff3434",
         annotations=[asdict(a) for a in report.annotations],
-        attachments={name: sha256(data).hexdigest() for name, data in images(report).items()},
+        attachments=checksums(report),
     )
+
+
+def checksums(report: Report) -> dict[str, str]:
+    result = {name: sha256(data).hexdigest() for name, data in images(report).items()}
+    names = [f.name for f in report.files]
+    if len(names) != len(set(names)) or set(names) & (
+        set(result) | {"report.json", "description.txt"}
+    ):
+        raise ValueError("Duplicate report attachment names.")
+    return dict(result, **{f.name: f.checksum for f in report.files})
 
 
 def images(report: Report) -> dict[str, bytes]:

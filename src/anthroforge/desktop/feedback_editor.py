@@ -15,7 +15,7 @@ from anthroforge.feedback.service import ReportService
 from anthroforge.feedback.storage import LocalReportConsumer
 from anthroforge.profiling.identity import build_identity
 
-from .feedback_paint import prepare
+from . import feedback_comparison
 
 
 class FeedbackEditor(QObject):
@@ -29,6 +29,7 @@ class FeedbackEditor(QObject):
         self.image, self.annotations, self.preview = QImage(), (), None
         self.active, self.capturing, self.error = False, False, ""
         self.id, self.created_at, self.context_json = "", "", "{}"
+        self.comparison, self.include_comparison, self.include_replay = None, True, False
         self.timer = QTimer(self)
         self.timer.setInterval(40)
         self.timer.timeout.connect(self.poll)
@@ -45,6 +46,7 @@ class FeedbackEditor(QObject):
             width=self.image.width(),
             height=self.image.height(),
             destination=self.service.consumer.description,
+            comparison=self.comparison is not None,
         )
 
     @Slot(QObject)
@@ -78,6 +80,8 @@ class FeedbackEditor(QObject):
         self.annotations, self.preview = (), None
         self.id, self.created_at = uuid4().hex, datetime.now(UTC).isoformat()
         self.context_json = json.dumps(capture_context(self.controller), allow_nan=False)
+        self.comparison = feedback_comparison.capture(self.controller)
+        self.include_comparison, self.include_replay = True, False
         self.error, self.active = "", True
 
     def editable(self):
@@ -134,9 +138,23 @@ class FeedbackEditor(QObject):
             return
         self.error = ""
         report = self.envelope(category, description.strip())
-        self.service.start(partial(prepare, report, QImage(self.image)))
+        self.service.start(self.prepare_report(report))
         self.timer.start()
         self.changed.emit()
+
+    def prepare_report(self, report):
+        return partial(
+            feedback_comparison.prepare_report,
+            report,
+            QImage(self.image),
+            self.comparison,
+            self.include_comparison,
+            self.include_replay,
+        )
+
+    @Slot(bool, bool)
+    def comparisonOptions(self, included, replay):
+        self.include_comparison, self.include_replay = included, replay
 
     def envelope(self, category, description):
         return Report(
@@ -163,6 +181,7 @@ class FeedbackEditor(QObject):
             return
         self.active, self.error = False, ""
         self.image, self.annotations, self.preview = QImage(), (), None
+        self.comparison = None
         self.changed.emit()
 
     @Slot()
@@ -173,6 +192,7 @@ class FeedbackEditor(QObject):
     def close(self):
         self.timer.stop()
         self.service.close()
+        self.comparison = None
 
 
 def meaningful(item):

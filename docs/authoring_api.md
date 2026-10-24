@@ -1,4 +1,16 @@
-# Local authoring API, 0.3.1
+# Local authoring API, 0.3.2
+
+## Shortcut comparison and replay (0.3.2)
+
+`shortcut.comparison.capture(shortcut)` replaces the session-only accepted baseline.
+`shortcut.comparison.inspect(refresh=False, wait=False)` reports readiness, replay
+completeness and optional native geometry differences. `shortcut.comparison.clear()`
+releases it without an authored edit. Capture during work is supported and labeled.
+
+`inspection.export` adds `comparison=True` and `replay=False`. Replay explicitly includes
+the complete starting project. `inspection.replay(path, output="")` validates the report
+and executes supported operations in an isolated session with in-memory preferences;
+it never edits the caller's document. See [archive contents, examples and limitations](shortcuts_032.md).
 
 ## Shortcuts and Parametric curves (0.3.0)
 

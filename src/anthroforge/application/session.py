@@ -93,11 +93,13 @@ class Session:
             self.issues.reset()
 
     def attach_shortcut_contexts(self) -> None:
+        from .shortcut_comparison import Comparison
         from .shortcut_contexts import Contexts
         from .shortcut_observation import Observation
 
         self.shortcut_edits = Contexts(self)
         self.shortcut_observation = Observation(self)
+        self.shortcut_comparison = Comparison(self)
         self.scheduler.observer = self.shortcut_observation.event
         self.scheduler.annotate = self.shortcut_edits.annotate
         self.scheduler.before_dispatch = self.shortcut_edits.require
@@ -176,6 +178,7 @@ class Session:
             raise ValueError("Editing is blocked while waiting to save.")
         self.history.begin(self.document)
         self.shortcut_edits.active = ""
+        self.comparison_event("begin")
 
     @measured("transaction", lambda session: session.profiler)
     def commit(self) -> None:
@@ -186,9 +189,11 @@ class Session:
         released(self)
         self.shortcut_edits.active = ""
         self.shortcut_observation.finish_gesture()
+        self.comparison_event("commit")
 
     @measured("transaction", lambda session: session.profiler)
     def cancel(self) -> None:
+        self.comparison_event("cancel")
         self.shortcut_observation.finish_gesture(cancelled=True)
         self.shortcut_edits.active = ""
         self.document = replace(self.history.cancel(), workspaces=self.document.workspaces)
@@ -202,6 +207,7 @@ class Session:
         if self.waiting_save:
             raise ValueError("History is blocked while waiting to save.")
         previous = self.document
+        self.comparison_event("undo" if direction < 0 else "redo")
         self.shortcut_observation.restore()
         self.document = replace(self.history.navigate(direction), workspaces=previous.workspaces)
         self.remember_restarts(self.scheduler.restore(self.history.surviving()))
@@ -256,6 +262,12 @@ class Session:
 
         self.scheduler.wait(timeout)
         collect(self)
+        self.comparison_event("wait")
+
+    def comparison_event(self, operation: str) -> None:
+        from .comparison_journal import record
+
+        record(self, operation)
 
     def describe(self) -> dict[str, Any]:
         return {
@@ -273,6 +285,7 @@ class Session:
         }
 
     def close(self) -> None:
+        self.shortcut_comparison.clear()
         self.issues.close()
         self.scheduler.close()
         self.conversion = ConversionPreview()

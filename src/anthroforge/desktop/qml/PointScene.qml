@@ -8,7 +8,7 @@ Repeater3D {
         required property var item
         readonly property var location: item.world_position || [0,0,0]
         objectName: "constructionPoint_" + item.id
-        visible: !!item.world_position && item.visible
+        visible: !workspace.shortcutComparison.before && !!item.world_position && item.visible
         position: Qt.vector3d(location[0], location[1], location[2])
         source: "#Sphere"
         scale: Qt.vector3d(markerScale, markerScale, markerScale)

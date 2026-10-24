@@ -27,14 +27,14 @@ HARNESS = """
 """
 
 
-def prepare(distribution, project, output):
+def prepare(distribution, project, output, template=HARNESS):
     target = output / "application"
     shutil.copytree(distribution, target, dirs_exist_ok=True)
     with ZipFile(project) as archive:
         document = json.loads(archive.read("manifest.json"))["document"]
     key = document["driving_shortcuts"][0]["id"]
     path = target / "anthroforge/desktop/qml/Main.qml"
-    harness = HARNESS.replace("SHORTCUT_ID", json.dumps(key))
+    harness = template.replace("SHORTCUT_ID", json.dumps(key))
     text = path.read_text(encoding="utf-8")
     path.write_text(text.replace("    id: window", "    id: window\n" + harness), encoding="utf-8")
     return target / "AnthroForge.exe"

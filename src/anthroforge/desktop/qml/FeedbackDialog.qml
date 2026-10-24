@@ -16,6 +16,7 @@ UiDialog {
         target: feedback
         function onReady() {
             description.text=""; annotationText.text=""; category.currentIndex=0;
+            includeComparison.checked=true; includeReplay.checked=false;
             dialog.tool="rectangle"; zoom.currentIndex=0; dialog.open(); description.forceActiveFocus();
         }
     }
@@ -70,6 +71,11 @@ UiDialog {
                 selectionColor: Theme.selection; selectedTextColor: Theme.text; enabled: dialog.editable
                 background: Rectangle { color: Theme.field; border.color: description.activeFocus ? Theme.accent : Theme.border; radius: Theme.radius }
             }
+        }
+        RowLayout {
+            visible: !!feedback.state.comparison
+            UiCheck { id: includeComparison; text: "Include comparison"; checked: true; enabled: dialog.editable; onClicked: feedback.comparisonOptions(checked,includeReplay.checked) }
+            UiCheck { id: includeReplay; text: "Include full starting project for replay"; checked: false; enabled: dialog.editable && includeComparison.checked; onClicked: feedback.comparisonOptions(includeComparison.checked,checked) }
         }
         Label {
             objectName: "feedbackStatus"; Layout.fillWidth: true; wrapMode: Text.WrapAnywhere

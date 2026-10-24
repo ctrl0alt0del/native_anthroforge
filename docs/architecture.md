@@ -1,5 +1,16 @@
 # AnthroForge architecture
 
+## 0.3.2 comparison and evidence ownership
+
+The session comparison service owns one accepted baseline, independent resource catalogue,
+and bounded semantic journal. Existing read-only coordinator jobs own frozen comparison
+and export inputs. Native fingerprints detect changes without defining attachment or vertex
+correspondence. Historical viewport models stage their own leases and never enter picking
+or snapping. Feedback drafts freeze evidence before their modal opens, and the generic
+consumer contract streams owned file attachments. Replay validates its archive and runs
+only whitelisted operations in an isolated session, preserving the active session and user
+preferences. See [the feature contract](shortcuts_032.md) and CH-069.
+
 ## 0.3 shortcut and Parametric boundaries
 
 Migration extensions retain Bézier knot metadata under native Parametric evaluation;

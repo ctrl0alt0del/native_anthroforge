@@ -7,6 +7,7 @@ from pathlib import Path
 from uuid import UUID
 from zipfile import ZIP_DEFLATED, ZipFile
 
+from . import attachments
 from .records import Receipt, Report, images, metadata
 
 
@@ -52,6 +53,8 @@ def archive(path: Path, report: Report) -> None:
         output.writestr("description.txt", report.description.encode("utf-8"))
         for name, data in images(report).items():
             output.writestr(name, data)
+        for attachment in report.files:
+            attachments.write(output, attachment)
     with path.open("r+b") as stream:
         os.fsync(stream.fileno())
 
@@ -61,5 +64,6 @@ def verify_existing(path: Path, report: Report) -> None:
         matches = json.loads(existing.read("report.json")) == metadata(report)
         matches &= all(existing.read(name) == data for name, data in images(report).items())
         matches &= existing.read("description.txt").decode("utf-8") == report.description
+        matches &= all(attachments.verify(existing, item) for item in report.files)
     if not matches:
         raise ValueError("A different report already uses this identity; nothing was overwritten.")

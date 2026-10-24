@@ -6,6 +6,8 @@ from anthroforge.core.units import convert
 
 from . import (
     attached_creation,
+    comparison_journal,
+    comparison_replay,
     construction_tasks,
     curve_branch_creation,
     curve_consumers,
@@ -215,7 +217,7 @@ def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> An
     direct = direct_commands(session)
     if operation not in direct:
         raise ValueError(f"Unknown operation: {operation}")
-    return direct[operation](**arguments)
+    return comparison_journal.direct(session, operation, arguments, direct[operation])
 
 
 def query_handler(operation: str) -> Any:
@@ -254,7 +256,7 @@ def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
     if implicit:
         session.begin()
     try:
-        result = EDITS[operation](session, **arguments)  # type: ignore[operator]
+        result = comparison_journal.edit(session, operation, arguments, EDITS[operation])
         if implicit:
             session.commit()
         return result
@@ -340,6 +342,7 @@ def file_commands(session: "Session") -> dict[str, Any]:
     return {
         "save": lambda **a: projects.save(session, **a),
         "inspection.export": lambda **a: inspection_report.export(session, **a),
+        "inspection.replay": lambda **a: comparison_replay.replay(**a),
         "open": lambda **a: projects.open_project(session, **a),
         "workspace.create": lambda **a: presentation.create_workspace(session, **a),
         "workspace.select": lambda **a: presentation.select_workspace(session, **a),

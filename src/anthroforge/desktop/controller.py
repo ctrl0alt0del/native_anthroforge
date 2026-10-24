@@ -24,6 +24,7 @@ from .object_selection import ObjectSelection
 from .route_inspection_tools import RouteInspectionTools
 from .routing_choices import RoutingChoices
 from .section_tools import SectionTools
+from .shortcut_comparison_view import ShortcutComparisonView
 from .shortcut_panel import ShortcutPanel
 from .surface_creation import SurfaceCreation
 from .tissue_inspection_tools import TissueInspectionTools
@@ -78,6 +79,7 @@ class Controller(QObject):
         self.surface_creation = SurfaceCreation(self)
 
     def initialize_tissue_tools(self):
+        self.shortcut_comparison = ShortcutComparisonView(self)
         self.shortcut_panel = ShortcutPanel(self)
         self.tissue_region_tools = TissueRegionTools(self)
         self.tissue_inspection = TissueInspectionTools(self)
@@ -86,6 +88,10 @@ class Controller(QObject):
         self.route_inspection = RouteInspectionTools(self)
 
     def memory_owners(self, owners):
+        from .feedback_comparison import memory_owners
+
+        if hasattr(self, "feedback"):
+            memory_owners(self.feedback, owners)
         for model in self.geometry_models():
             model.memory_owners(owners)
         owners["drawing_preview"].update(self.drawing_tools.leases)
@@ -95,7 +101,14 @@ class Controller(QObject):
             owners["drawing_preview"].add(self.tissue_painting.preview["resource"])
 
     def geometry_models(self):
-        return self.render_model, self.path_model, self.image_model, self.tissue_inspection.model
+        return (
+            self.render_model,
+            self.path_model,
+            self.image_model,
+            self.tissue_inspection.model,
+            self.shortcut_comparison.model,
+            self.shortcut_comparison.images,
+        )
 
     def initialize_renderers(self):
         from .image_scene import prepare_picking as prepare_images
@@ -220,6 +233,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def shortcutPanel(self):
         return self.shortcut_panel
+
+    @Property(QObject, constant=True)
+    def shortcutComparison(self):
+        return self.shortcut_comparison
 
     @Property(QObject, constant=True)
     def sceneChoices(self):
@@ -482,6 +499,7 @@ class Controller(QObject):
             self.notify()
 
     def refresh_runtime_panels(self):
+        self.shortcut_comparison.synchronize()
         self.creation_selection.synchronize()
         self.issue_panel.synchronize()
         self.shortcut_panel.synchronize()
@@ -547,6 +565,7 @@ class Controller(QObject):
 
     @Slot(str, "QVariantMap", result="QVariant")
     def run(self, operation, arguments):
+        self.shortcut_comparison.editing(operation)
         return actions.run(self, operation, arguments)
 
     @Slot(str, "QVariantMap", result="QVariant")

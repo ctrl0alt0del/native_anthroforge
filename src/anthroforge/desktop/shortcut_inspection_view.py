@@ -39,6 +39,10 @@ class ShortcutInspectionView(QObject):
     def state(self):
         return qml(self.value)
 
+    @Property(str, notify=changed)
+    def shortcutKey(self):
+        return self.editor.key
+
     @Property(bool, notify=changed)
     def opened(self):
         return self.enabled

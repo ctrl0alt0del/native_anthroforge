@@ -43,6 +43,9 @@ RESOURCE_FIELDS = frozenset(
         "attachments",
         "bindings",
         "context",
+        "source",
+        "baseline",
+        "comparison",
     )
 )
 RESOURCE_TYPES = (
@@ -134,6 +137,13 @@ def session_owners(session, output, profiler):
     output["catalogue"].update(bounded(catalogue_resources(session), 4096, profiler))
     preview_owners(session, output)
     inspection_owners(session, output, profiler)
+    comparison_owners(session, output)
+
+
+def comparison_owners(session, output):
+    baseline = session.shortcut_comparison.baseline
+    if baseline:
+        output["comparison_baseline"].update(owned_resources(baseline.source.resources))
 
 
 def preview_owners(session, output):

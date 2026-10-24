@@ -1,7 +1,19 @@
 # AnthroForge development validation
 
-Current qualification is in [shortcut inspection](#shortcut-inspection-031).
+Current release qualification is in [shortcut comparison](tasks/shortcut-comparison-032.md).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Shortcut comparison (0.3.2)
+
+Session baselines, historical views, frozen comparison reports and opt-in isolated replay
+are implemented. The final suite passes 2,049 tests; the development gate also passed
+five native CTests, configured typing, style and numerics. Four production preservation
+trials retain coordinates, poses, bindings and oriented connectivity. Full minimal-PATH
+portable workflows pass, including paired native images and isolated replay. A relocated
+compiled-editor harness verifies capture, view switching, edit-to-After and completed
+comparison. Offscreen software UI captures establish layout only; hidden D3D11 captures
+separately establish rendered geometry. No physical interactive acceptance is claimed.
+See the [walkthrough](shortcuts_032.md) and task record.
 
 ## Shortcut inspection (0.3.1)
 

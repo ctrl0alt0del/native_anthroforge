@@ -11,7 +11,7 @@ Repeater3D {
         Model {
             id: path
             objectName: "path_" + item.id + "_" + item.chunk
-            visible: item.active && item.visible && (item.placeholder || !(authoring.state.editing && workspace.selectedId === item.id))
+            visible: !workspace.shortcutComparison.before && item.active && item.visible && (item.placeholder || !(authoring.state.editing && workspace.selectedId === item.id))
             geometry: PathGeometry { assetId: item.handle; chunk: item.chunk }
             // Instances own the complete application-Z-up to Qt-Y-up frame.
             // Keeping this outside the rotated anatomy node avoids an ambiguous instance root.

@@ -21,11 +21,19 @@ def check(cancel: Event) -> None:
 
 
 def write(path: Path, frozen: Any, metadata: dict[str, Any], cancel: Event) -> str:
+    from . import comparison_archive
+
+    if frozen.comparison is not None:
+        return comparison_archive.write(path, frozen, metadata, cancel)
+    return write_single(path, frozen, metadata, cancel)
+
+
+def write_single(path: Path, frozen: Any, metadata: dict[str, Any], cancel: Event) -> str:
     with tempfile.TemporaryDirectory(prefix="anthroforge-inspection-") as directory:
         root = Path(directory)
         check(cancel)
         write_package(
-            root / "snapshot.anthroforge", frozen.source.document, frozen.source.resources
+            root / "snapshot.anthroforge", frozen.source.document, frozen.source.resources, cancel
         )
         (root / "view.json").write_text(json.dumps(frozen.view), encoding="utf-8")
         render(root, frozen.source.document.revision, cancel)

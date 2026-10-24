@@ -1,4 +1,8 @@
-# AnthroForge 0.3.1
+# AnthroForge 0.3.2
+
+Shortcut comparison adds a session-only baseline, Before/After/Overlay views, paired
+inspection reports and optional isolated replay. Existing bug reports can include frozen
+comparison evidence. See the [0.3.2 walkthrough](docs/shortcuts_032.md).
 
 Shortcut inspection adds affected-output navigation, captured formula evidence, effective
 attachment policies and propagation status, with optional viewport effects. See the

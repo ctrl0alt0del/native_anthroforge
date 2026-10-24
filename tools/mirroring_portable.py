@@ -15,15 +15,19 @@ def mirroring(executable, cwd, invoke):
     inspect_saved(cwd)
     measurements(executable, cwd, invoke, instance)
     state = json.loads(invoke(executable, cwd, "--cli", "inspect", "mirroring.anthroforge"))
-    render(executable, cwd, invoke, state["revision"])
+    render(executable, cwd, invoke, state["revision"], instance["id"])
 
 
-def render(executable, cwd, invoke, revision):
+def render(executable, cwd, invoke, revision, target):
+    view = dict(workspace=0, camera=[0, 0, 0.1, -20, 15, 0, 2.4], orthographic=True)
+    view.update(selected=target, editing=False)
+    (cwd / "mirror-view.json").write_text(json.dumps(view))
     arguments = ("--cli", "render", "mirroring.anthroforge", "mirroring.png")
-    invoke(executable, cwd, *arguments, "--revision", str(revision))
+    invoke(executable, cwd, *arguments, "--revision", str(revision), "--view", "mirror-view.json")
     capture = json.loads((cwd / "mirroring.png.json").read_text())
     assert capture["captured"] and not capture["window_visible"]
     assert capture["scene"]["vertices"] >= 72, capture
+    assert capture["scene"]["selected"] == target and capture["scene"]["orthographic"]
 
 
 def inspect_saved(cwd):

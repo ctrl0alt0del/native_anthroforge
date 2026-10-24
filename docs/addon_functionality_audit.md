@@ -5,8 +5,8 @@ diagnostics only. This is an implementation audit, not a new release plan or a c
 that every Blender shape/update matches. Known shoulder/Thumb differences are recorded
 separately in [confirmed parity findings](addon_parity_findings.md).
 
-The subsequent [0.3.5 mirroring contract](specification_035.md) is implemented;
-release qualification is tracked in the [runtime walkthrough](mirroring_035.md). Its
+The subsequent [0.3.5 mirroring contract](specification_035.md) is implemented and qualified;
+evidence is tracked in the [runtime walkthrough](mirroring_035.md). Its
 [plan](implementation_035.md) preserves the addon inventory. Strict read-only reflection
 replaces independent mirror solving; existing independent counterparts are not migrated.
 The historical audit observations below remain scoped to their recorded revisions.

@@ -4,6 +4,8 @@
 read-only instance inspection, shared surface references, mirrored rows and symmetric
 half-path loops. Mirrors reuse source geometry and never run independent tissue or
 routing solvers. See the [workflow and evidence](docs/mirroring_035.md).
+The development gate passes 2,102 tests and five native CTests; minimal-PATH portable
+and hidden-GPU checks pass. Interactive desktop acceptance is not claimed.
 Projects save schema 6 and read schemas 4/5/6. Existing independent opposite-side
 objects are not paired or migrated. The prior unfinished 0.3.4 task remains separate.
 

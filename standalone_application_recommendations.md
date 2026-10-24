@@ -3,8 +3,7 @@
 Updated: 2026-10-24
 
 The [0.3.5 mirroring specification](docs/specification_035.md) and
-[implementation plan](docs/implementation_035.md) are implemented; final release
-qualification is tracked in the [runtime walkthrough](docs/mirroring_035.md).
+[implementation plan](docs/implementation_035.md) are implemented and qualified; evidence is tracked in the [runtime walkthrough](docs/mirroring_035.md).
 Mirrors are strictly reflected, read-only source instances without extra tree nodes or
 independent solvers. This supersedes earlier recommendations for editable overrides,
 detachment and independently stacked mirrored geometry for this release. Original

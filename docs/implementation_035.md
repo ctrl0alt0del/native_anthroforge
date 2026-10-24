@@ -1,6 +1,6 @@
 # AnthroForge 0.3.5 — Mirroring implementation plan
 
-**Status: Implemented — release qualification in progress.**
+**Status: Implemented and qualified — 0.3.5.**
 
 See the [runtime walkthrough and observed evidence](mirroring_035.md) and
 [recovery/qualification record](tasks/mirroring-035.md). The original ordered plan

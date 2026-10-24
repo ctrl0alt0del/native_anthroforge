@@ -1,6 +1,6 @@
 # AnthroForge release roadmap
 
-- **0.3.5 — implemented, qualification in progress:** strict source-linked, read-only mirroring,
+- **0.3.5 — qualified:** strict source-linked, read-only mirroring,
   hierarchy rules, instance-aware surfaces and symmetric construction. Mirrors never
   solve independent geometry. [Specification](specification_035.md),
   [implementation plan](implementation_035.md), [runtime/evidence](mirroring_035.md).

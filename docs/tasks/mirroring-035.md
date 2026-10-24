@@ -3,9 +3,9 @@
 - Task branch: `codex/mirroring-035`
 - Integration branch: `main`
 - Starting revision: `1696687`
-- Status: in progress; not release-qualified
+- Status: complete; runtime and portable qualification passed
 - Last updated: 2026-10-24, Europe/Bucharest
-- Active writer: local Codex session
+- Active writer: none after validated integration
 
 ## Outcome and acceptance
 
@@ -16,20 +16,24 @@ tree nodes, per-object mirror action, detachment or counterpart migration.
 
 ## Current state
 
-Runtime coverage is implemented; final release qualification remains pending. Typed
-rules, cached source/rule identities, provider aliases, schema 6 (reads 4/5/6), source
-resource reuse, shared bindings, source-only stacking, symmetric sources, native seam
-constraints and read-only desktop controls are integrated. Measurements and on-demand
-inspection accept reflected identities/stages. Required junction peers share one instance.
-Original 0.3.4 work and unrelated root `__init__.py` remain untouched.
+0.3.5 is implemented and qualified. The final development gate passed 2,102 tests,
+five native CTests, typing/style/function limits and numerics. The full minimal-PATH
+portable suite passed on the canonical executable, followed by an extended selected-
+mirror bilateral capture which was visually inspected. No interactive acceptance claim.
+Runtime binary source is pinned to clean `11a93e8`; later changes are documentation
+and an external qualification-tool camera. Source assets and unrelated work are preserved.
 
-## Next actions
+## Delivery and continuation
 
-1. Run final full development gate after current query/junction additions.
-2. Rerun hidden GPU/profile qualification with background-load evidence.
-3. Complete documentation/ownership review, advance versions after runtime qualification.
-4. Build one canonical portable release; run relocated offscreen checks; create source zip.
-5. Record actual evidence, merge validated branch into main and push normally.
+- Canonical executable: `dist/0.3.5/AnthroForge.dist/AnthroForge.exe`.
+- Companion final source: `dist/AnthroForge-0.3.5-source.zip`.
+- User workflow/evidence: [mirroring_035.md](../mirroring_035.md).
+- Gate: `build/mirroring-035-gate-final.log`; portable: `build/035-portable/portable-check.json`.
+- Source/mirror GPU/profile evidence: `build/035-mirroring/`.
+- Validated task branch is ready for normal integration into main; Git history determines
+  whether that merge has already happened. No runtime implementation remains pending.
+- Next work is user testing. Do not revive unfinished 0.3.4 or migrate old counterparts
+  implicitly. Root `__init__.py` remains unrelated and untracked.
 
 ## Verification
 
@@ -129,3 +133,14 @@ style, function limits, numerical checks and doctor (application 0.3.5). Log:
 `build/mirroring-035-gate-final.log`. Runtime code is qualified; the canonical
 Nuitka executable is still building and relocated portable checks remain next.
 Pinned executable source revision is `11a93e8`; later evidence edits change docs only.
+
+
+### Portable release acceptance
+
+The canonical executable built successfully. Full minimal-PATH portable checks pass,
+including existing workflows and new mirroring. An explicit bilateral capture with
+selected mirror also passes; actual image shows both cubes, symmetric loop and correct
+reflection shading/outline. Artifacts are under build/035-portable. Final source/docs
+are copied into the canonical distribution and companion source archive. All evidence
+is background/offscreen; no interactive desktop or full anatomical parity claim.
+Ownership/coupling review is recorded separately in the walkthrough.

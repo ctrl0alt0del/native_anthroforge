@@ -1,6 +1,6 @@
 # AnthroForge 0.3.5 — Mirroring
 
-**Status: Implemented — release qualification in progress.**
+**Status: Implemented and qualified — 0.3.5.**
 
 Runtime operations, storage and evidence are in the [0.3.5 walkthrough](mirroring_035.md).
 

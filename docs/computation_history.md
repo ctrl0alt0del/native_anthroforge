@@ -2344,3 +2344,12 @@ average. This is a read-only formula input; no new write channel is introduced.
   creates zero new source geometry assets. Final full/portable gate remains pending.
 - Measurement correction to CH-074: repeated hidden-GPU trials span 121–343 ms with
   eight rendered/readback frames and uncontrolled background load; not input latency.
+
+
+0.3.5 qualification update (CH-071–075): development gate passes 2,102 Python tests,
+five native CTests, typing, configured style and numerics. The canonical executable
+passes the full minimal-PATH portable suite; source/mirror shaded captures and the
+selected reflected instance were inspected. Source assets remain shared, no mirror
+writers/solvers appear in the plane-edit profile, and repeated plane edits allocate
+no geometry assets. Hidden-GPU results do not establish physical input latency or
+interactive desktop acceptance. See `mirroring_035.md` for evidence and known limits.

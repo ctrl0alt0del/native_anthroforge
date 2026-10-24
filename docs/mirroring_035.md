@@ -1,6 +1,6 @@
 # Mirroring in 0.3.5
 
-Runtime implementation; final portable-package qualification is recorded in the
+Implemented and qualified release; portable-package qualification is recorded in the
 [task record](tasks/mirroring-035.md). The [confirmed contract](specification_035.md)
 remains authoritative. Existing independent opposite-side objects are not paired or migrated.
 
@@ -142,3 +142,20 @@ The release-candidate development gate passes **2,102 Python tests**, all **five
 native CTests**, typing (405 source files), configured style/function limits,
 numerical checks and doctor. Log: `build/mirroring-035-gate-final.log`.
 The complete portable executable is qualified separately; see the task record.
+
+
+## Portable delivery
+
+The canonical `dist/0.3.5/AnthroForge.dist/AnthroForge.exe` passes the complete
+minimal-PATH portable suite, including all existing workflow families and the new
+mirror references, symmetric loops, schema-6 storage and spatial measurements.
+`build/035-portable/portable-check.json` records the result. The extended mirror
+capture selects the mirrored instance with an explicit bilateral camera; both cubes,
+the symmetric loop, reflected shading and selection outline were visually inspected.
+No developer SciPy/Blender/Qt path is required by the shipped executable.
+
+The binary is pinned to runtime source `11a93e8` with no tracked changes at staging;
+later commits add qualification evidence and improve the external portable test camera.
+One companion `dist/AnthroForge-0.3.5-source.zip` contains the final source/docs.
+These are background and hidden-GPU checks, not physical interactive acceptance.
+Existing independent counterparts and the unfinished 0.3.4 parity task remain untouched.

@@ -37,7 +37,7 @@ class PropertyQueries(QObject):
 
     def synchronize(self):
         session = self.panel.controller.session
-        if session is not self.session:
+        if not self.belongs_to(session):
             self.reset(session)
         document = session.document
         if document is self.document:
@@ -49,6 +49,11 @@ class PropertyQueries(QObject):
             self.records[key] = current
             if changed or not equivalent(previous, current):
                 self.invalidate(key)
+
+    def belongs_to(self, session):
+        return session is self.session and (
+            self.document is None or self.document.id == session.document.id
+        )
 
     def update_context(self, document):
         context = (document.index.structure, document.driving_shortcuts, document.shortcuts)

@@ -1,4 +1,7 @@
-# AnthroForge 0.3.2
+# AnthroForge 0.3.3
+
+Shortcut updates reduce repeated property queries, formula observation, document reconstruction
+and priority dependency bookkeeping. See [0.3.3 performance evidence](docs/shortcuts_033.md).
 
 Shortcut comparison adds a session-only baseline, Before/After/Overlay views, paired
 inspection reports and optional isolated replay. Existing bug reports can include frozen

@@ -1,7 +1,8 @@
 # Shortcut performance 0.3.3
 
 - Branch: codex/shortcut-performance-033; baseline: 31fc158; integration: main.
-- Status: implementation started. Preserve unrelated root __init__.py.
+- Status: implementation and paired profiling complete; final qualification running.
+  Preserve unrelated root __init__.py.
 - Scope: optimize property UI invalidation, formula observation, redundant document
   reconstruction, then priority bookkeeping. No numerical or attachment behavior changes.
 - Evidence: build/shortcut-profile-033/summary.json; four production controls, three
@@ -25,3 +26,27 @@ full evaluation checks. Unchanged shortcut contexts no longer reconstruct docume
 The active job registry maintains provider/consumer links; urgency ranking/donation remains
 unchanged. Focused UI, formula, attachment and priority tests pass; mypy passes. Production
 performance/preservation, full gate and packaging remain pending.
+
+## Qualification checkpoint
+
+Three serial paired trials for four production controls preserve coordinates, poses,
+bindings and oriented connectivity. Median headless reductions: Ribs 16.9%, Humerus
+18.6%, Radius 20.5%, Thumb 2.9% (small/no strong claim). Baseline 31fc158, candidate
+ab802e9 plus metadata project-reset hardening; same native library. Thumb retains its
+existing triangle-enumeration nondeterminism. Ulna remains around 1.8 seconds in inspected
+Ribs traces. Raw data: build/shortcut-performance-033/{trials,headless-summary.json}.
+
+Desktop ABBA bounded 30-tick runs average 14.694 -> 10.362 seconds; 492 active jobs
+remain in each, errors empty. Metadata work falls from 6,330 calls/3.38 seconds to zero.
+This is partial offscreen application-boundary evidence, not displayed FPS or total time.
+Four metadata tests and background editor/native texture update/undo checks pass.
+Gate and canonical package build are running; logs in build/shortcut-performance-033.
+
+Ownership review: caches/indexes stay in desktop, session and active registry respectively;
+none owns numerical algorithms or changes publication guards. Graph signatures include
+formula target/input/enabled changes. Registry mutations update both link directions.
+Metadata records are retained only for watched IDs in the current document (including
+undoable deletions); entries/epochs reset across documents. No geometry resources are
+copied into the metadata cache. Native computation, schema, undo/save and urgency rules
+remain unchanged. Source render needs the Windows platform for hidden D3D11; the Qt
+offscreen platform alone cannot initialize that GPU renderer.

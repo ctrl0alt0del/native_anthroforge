@@ -1,3 +1,3 @@
 """AnthroForge standalone; importing this package does not initialize a GUI."""
 
-__version__ = "0.3.2"
+__version__ = "0.3.3"

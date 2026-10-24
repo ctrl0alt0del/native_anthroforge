@@ -1,5 +1,16 @@
 # AnthroForge architecture
 
+## 0.3.3 observation and scheduling costs
+
+The desktop property-query service owns bounded metadata caching and per-object QML
+epochs. Shared property adapters remain authoritative for edit restrictions; value
+bindings remain independent. Session-owned formula invalidation indexes conservative
+read candidates, retaining exact input checks and full structural invalidation. The
+active job registry owns prerequisite links; ranking and temporary urgency donation
+consume those links without changing scheduling policy. Immutable publication avoids
+an unnecessary second document construction when edit contexts are unchanged.
+See [measurements and preservation evidence](shortcuts_033.md) and CH-070.
+
 ## 0.3.2 comparison and evidence ownership
 
 The session comparison service owns one accepted baseline, independent resource catalogue,

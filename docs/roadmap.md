@@ -1,5 +1,14 @@
 # AnthroForge release roadmap
 
+- **0.3.3 — qualified:** targeted shortcut metadata/formula observation, immutable
+  publication and incremental priority links. [Evidence](shortcuts_033.md).
+  This preserves standalone behavior; [addon parity findings](addon_parity_findings.md)
+  remain unresolved. The [functionality audit](addon_functionality_audit.md) records
+  smaller gaps separately from deferred major systems; it is not a release commitment.
+
+- **0.3.2 — qualified:** shortcut baselines, Before/After/Overlay inspection, paired
+  reports and optional isolated replay. [Walkthrough](shortcuts_032.md).
+
 - **0.3.1 — qualified:** shortcut influence, formula evidence, effective
   attachment inspection and downstream propagation status; optional displayed-geometry
   effects. [Walkthrough](shortcuts_031.md), [qualification](tasks/shortcut-inspection-031.md).

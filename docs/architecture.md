@@ -1,5 +1,10 @@
 # AnthroForge architecture
 
+See the [current addon functionality audit](addon_functionality_audit.md) for implemented
+families and missing authoring details, and [known parity findings](addon_parity_findings.md)
+for source-frame, effective-policy and child-anchor fidelity defects. The distinction
+between a supported operation and faithful migration must remain explicit.
+
 ## 0.3.3 observation and scheduling costs
 
 The desktop property-query service owns bounded metadata caching and per-object QML

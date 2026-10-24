@@ -1,5 +1,10 @@
 # Local authoring API, 0.3.2
 
+The 0.3.3 performance work adds no public commands. The
+[addon functionality audit](addon_functionality_audit.md) distinguishes supported
+operations from missing convenience/lifecycle operations; known migrated-assembly
+limitations are in [parity findings](addon_parity_findings.md).
+
 ## Shortcut comparison and replay (0.3.2)
 
 `shortcut.comparison.capture(shortcut)` replaces the session-only accepted baseline.

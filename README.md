@@ -3,6 +3,11 @@
 Shortcut updates reduce repeated property queries, formula observation, document reconstruction
 and priority dependency bookkeeping. See [0.3.3 performance evidence](docs/shortcuts_033.md).
 
+The [addon functionality audit](docs/addon_functionality_audit.md) maps implemented
+workflows, missing details and deferred systems. The migrated assembly still has
+[unresolved shoulder/Thumb parity findings](docs/addon_parity_findings.md); unchanged
+standalone geometry in performance checks does not establish Blender parity.
+
 Shortcut comparison adds a session-only baseline, Before/After/Overlay views, paired
 inspection reports and optional isolated replay. Existing bug reports can include frozen
 comparison evidence. See the [0.3.2 walkthrough](docs/shortcuts_032.md).

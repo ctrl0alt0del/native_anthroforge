@@ -3,6 +3,11 @@
 Current release qualification is in [shortcut performance](tasks/shortcut-performance-033.md).
 The earlier sections retain the evidence and limitations of their respective revisions.
 
+The migrated assembly's shoulder attachment-frame and Thumb backsolve/child-anchor
+differences remain unresolved. See [the confirmed findings](addon_parity_findings.md)
+and [current addon functionality audit](addon_functionality_audit.md). Release tests
+and performance preservation checks do not imply complete addon equivalence.
+
 ## Shortcut update performance (0.3.3)
 
 Targeted UI metadata subscriptions, reverse formula reads, conditional immutable-document

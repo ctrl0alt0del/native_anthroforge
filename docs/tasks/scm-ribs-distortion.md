@@ -3,7 +3,7 @@
 - Task branch: `codex/scm-ribs-distortion`
 - Integration branch: `main`
 - Starting revision: `4ff1ef8`
-- Status: investigation in progress
+- Status: diagnosis complete; no production behavior changed
 - Last updated: 2026-10-25, Europe/Bucharest
 - Active writer: local Codex
 
@@ -41,3 +41,43 @@ Historical matching-addon capture `shortcut_update_parity_20261023/blender/SHORT
 already has a 2.003 maximum adjacent middle-Fiber gap (app current 1.992), versus .171
 baseline. This is existing captured evidence, not a newly executed Blender test.
 No production code/attachment behavior changed. Diagnostic ablations/visual inspection next.
+
+
+## Confirmed scope terminology and causal experiments
+
+User clarification: propagation means the parent-driven Fiber deformation, distinct
+from Bezier/Polyline/ROUTED engines, not task/dependency scheduling. This is the owning
+layer of the reproduced defect. `curve_evaluation.resolve_fiber` resolves the saved
+attachment field; `engine_path` uses that path directly for authored engines and passes
+resolved input to routing. No engine switch or tissue repair is implicated here.
+
+Middle-Fiber experiments use unchanged weights and native `af_attachment_blend_frames`:
+
+| Diagnostic | Largest edge | Largest nonterminal edge | Terminal edge |
+| --- | ---: | ---: | ---: |
+| Production | 1.991823 | .544229 | 1.991823 |
+| Hold automatic Ribs support offset orientation fixed | 1.620306 | .346210 | 1.620306 |
+| Hold automatic Ribs support motion fixed | .171409 | .171409 | .056324 |
+
+Holding Ribs support motion fixed restores baseline middle-Fiber geometry; this is a
+causal ablation, **not a proposed production fix or permission to discard support**.
+Holding only offset orientation fixed reduces sawtooth but leaves the endpoint cliff.
+Ribs surface motion and rotating off-surface offsets both matter. The final Spine pin
+must stay fixed; its neighboring automatic Ribs samples currently carry weight 1.
+The inherited C2 owner-transition rule limits width by adjacent owner-run extents; a
+singleton hard-pin run can collapse its effective sampled blend to the last edge.
+
+Inspected `fiber-comparison.png` and `base-comparison.png`: the before-inflation base
+already exhibits the user's zigzag; the historical matching addon middle Fiber has
+the same end stretch. No runtime settings, source project or attachment references
+were changed. Exact reevaluation hashes agree at every tissue stage; no failed jobs.
+
+## Continuation
+
+The repair/design belongs to parent-driven Fiber deformation: coherent nearby-sample
+support motion and adequate transitions into hard pins, preserving explicit anatomical
+bindings. Rotation-only correction is demonstrably insufficient. A replacement must be
+tested on this failure plus normal edits, actual surfaces and attachments; no new approach
+has yet been qualified. Discuss the approach before changing attachment behavior.
+Background evidence/probe scripts: `build/scm-ribs-distortion/`; original WIP source
+remains intact. Full application gate/rebuild not needed for this investigation-only edit.

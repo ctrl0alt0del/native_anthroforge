@@ -142,3 +142,16 @@ counters, with 54 vs 14 checkpoints at weight .9. Weight 0 changes both routes w
 independent collision checks remain clear. 67 focused routing/parity/warm/inspection/
 architecture tests pass; native build and all five native tests pass; Ruff passes.
 Full integrated gate and remaining D06-D11 workflows are NOT complete.
+
+## Inspector notification repair
+
+The recorded construction-editor binding loop is fixed at PropertyQueries: lazy reads
+update internal metadata/cache revisions but defer QML map notification to one queued
+publication. Controller synchronization still publishes targeted updates immediately.
+No periodic timer/polling or document-wide property broadcast was introduced. Direct
+queries remain fresh; unchanged accepted geometry still reuses cached metadata.
+Regression test verifies fresh lazy reads without synchronous epoch changes and the
+subsequent queued publication. Construction, Fiber and Surface offscreen acceptance
+all pass with their warning assertions intact; seven metadata/architecture tests pass.
+This replaces the earlier recorded construction-editor failure; broader performance
+qualification is still pending.

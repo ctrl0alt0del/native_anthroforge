@@ -2,7 +2,7 @@
 
 from collections import OrderedDict
 
-from PySide6.QtCore import Property, QObject, Signal
+from PySide6.QtCore import Property, QObject, Qt, Signal, Slot
 from PySide6.QtQml import QQmlPropertyMap
 
 from anthroforge.core.numeric_properties import decode_reference
@@ -11,6 +11,7 @@ from anthroforge.core.snapshot_definitions import same
 
 class PropertyQueries(QObject):
     epochsChanged = Signal()
+    publicationRequested = Signal()
 
     def __init__(self, panel):
         super().__init__(panel)
@@ -20,6 +21,9 @@ class PropertyQueries(QObject):
         self.shortcuts = None
         self.serial = 0
         self.document = None
+        self.revisions, self.pending = {}, {}
+        self.reset_pending, self.queued = False, False
+        self.publicationRequested.connect(self.publish, Qt.ConnectionType.QueuedConnection)
 
     @Property(QObject, notify=epochsChanged)
     def versions(self):
@@ -32,16 +36,26 @@ class PropertyQueries(QObject):
         self.document = None
         self.records.clear()
         self.cache.clear()
-        self.epochsChanged.emit()
+        self.revisions.clear()
+        self.pending.clear()
+        self.reset_pending = True
+        self.queue_publication()
         previous.deleteLater()
 
-    def synchronize(self):
+    def synchronize(self, publish=True):
         session = self.panel.controller.session
         if not self.belongs_to(session):
             self.reset(session)
         document = session.document
         if document is self.document:
+            if publish:
+                self.publish()
             return
+        self.observe(document)
+        if publish:
+            self.publish()
+
+    def observe(self, document):
         self.document = document
         changed = self.update_context(document)
         for key, previous in tuple(self.records.items()):
@@ -68,15 +82,32 @@ class PropertyQueries(QObject):
 
     def invalidate(self, key):
         self.serial += 1
-        self.epochs.insert(key, self.serial)
+        self.revisions[key] = self.serial
+        self.pending[key] = self.serial
+        self.queue_publication()
+
+    def queue_publication(self):
+        if not self.queued:
+            self.queued = True
+            self.publicationRequested.emit()
+
+    @Slot()
+    def publish(self):
+        self.queued = False
+        pending, self.pending = self.pending, {}
+        reset, self.reset_pending = self.reset_pending, False
+        if reset:
+            self.epochsChanged.emit()
+        for key, revision in pending.items():
+            self.epochs.insert(key, revision)
 
     def state(self, reference):
         from .shortcut_panel import property_state
 
-        self.synchronize()
+        self.synchronize(publish=False)
         ref = decode_reference(reference)
         self.records[ref.target] = self.session.document.registry.records.get(ref.target)
-        key = (ref, self.epochs.value(ref.target))
+        key = (ref, self.revisions.get(ref.target, 0))
         if key not in self.cache:
             self.cache[key] = property_state(self.session, reference, self.exposed)
         self.cache.move_to_end(key)

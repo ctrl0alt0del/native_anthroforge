@@ -133,7 +133,7 @@ def replay_result(session: Any, journal: Any, output: str) -> dict[str, Any]:
     run_events(session, journal["operations"])
     result = comparison_geometry.compare(before, freeze(session))
     if output:
-        storage.atomic_save(Path(output).resolve(), session.document, session.resources)
+        projects.save(session, output, "wait")
     return dict(
         comparison=result,
         issues=inspection.issue_records(session),

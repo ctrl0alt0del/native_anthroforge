@@ -83,3 +83,25 @@ def test_failed_export_retains_baseline_and_existing_file(session, tmp_path, mon
 
 def fail_render(*args):
     raise ValueError("renderer failed")
+
+
+def test_replay_output_respects_existing_project_lock(session, tmp_path, monkeypatch):
+    path, _, _ = exported(session, tmp_path, monkeypatch)
+    project = tmp_path / "active.anthroforge"
+    session.command("save", path=str(project), blocked_policy="wait")
+    original = project.read_bytes()
+    with pytest.raises(ValueError, match="already open"):
+        session.command("inspection.replay", path=str(path), output=str(project))
+    assert project.read_bytes() == original
+
+
+def test_snapshot_serialization_observes_cancellation(session, tmp_path):
+    from anthroforge.application.storage import write_package
+
+    baseline(session)
+    cancel = Event()
+    cancel.set()
+    with pytest.raises(ValueError, match="cancelled"):
+        write_package(
+            tmp_path / "temporary.anthroforge", session.document, session.resources, cancel
+        )

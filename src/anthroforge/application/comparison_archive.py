@@ -33,7 +33,9 @@ def write(path: Path, frozen: Any, metadata: Any, cancel: Any) -> str:
 def render_capture(root: Path, frozen: Any, cancel: Any) -> Path:
     root.mkdir()
     report_archive.check(cancel)
-    write_package(root / "snapshot.anthroforge", frozen.source.document, frozen.source.resources)
+    write_package(
+        root / "snapshot.anthroforge", frozen.source.document, frozen.source.resources, cancel
+    )
     (root / "view.json").write_text(json.dumps(frozen.view), encoding="utf-8")
     render(root, frozen.source.document.revision, cancel)
     image = json.loads((root / "image.png.json").read_text(encoding="utf-8"))
@@ -95,7 +97,7 @@ def package(path: Path, root: Path, frozen: Any, images: Any, data: Any, cancel:
     (root / "inspection.json").write_text(json.dumps(data, indent=2, allow_nan=False), "utf-8")
     files["inspection.json"] = root / "inspection.json"
     if frozen.comparison.replay:
-        files.update(replay_files(root, frozen))
+        files.update(replay_files(root, frozen, cancel))
     manifest = dict(format="anthroforge-comparison", version=1, application_version=__version__)
     manifest["checksums"] = {key: digest(value, cancel) for key, value in files.items()}
     (root / "manifest.json").write_text(json.dumps(manifest, indent=2), "utf-8")
@@ -103,10 +105,10 @@ def package(path: Path, root: Path, frozen: Any, images: Any, data: Any, cancel:
     archive(path, files, cancel)
 
 
-def replay_files(root: Path, frozen: Any) -> dict[str, Path]:
+def replay_files(root: Path, frozen: Any, cancel: Any) -> dict[str, Path]:
     value = frozen.comparison
     source = value.baseline.source
-    write_package(root / "starting.anthroforge", source.document, source.resources)
+    write_package(root / "starting.anthroforge", source.document, source.resources, cancel)
     journal = dict(
         value.journal,
         routing_backend=source.routing_backend,

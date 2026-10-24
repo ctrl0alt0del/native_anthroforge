@@ -76,3 +76,8 @@ lifecycle/security coverage, production profile/preservation, full gate and pack
 - Review: properties/document state stay independent; native comparison owns bulk scans;
   feedback attachment storage remains consumer-independent. Historical geometry never
   enters picking. Report resource attribution includes baseline, exports and draft leases.
+
+Final source review: full suite passed 2,045 tests. Added two more regression cases for
+replay respecting an already-open output project and cancellation during snapshot writes.
+Snapshot serialization now wraps its existing writer with bounded cancellation checks;
+format and numerical arrays remain unchanged. Final package rebuild includes these fixes.

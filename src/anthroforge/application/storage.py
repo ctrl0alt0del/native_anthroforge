@@ -85,12 +85,15 @@ def document_state(document: Document) -> dict[str, Any]:
     return state
 
 
-def write_package(path: Path, document: Document, resources: Resources) -> None:
+def write_package(path: Path, document: Document, resources: Resources, cancel: Any = None) -> None:
+    from .cancellable_stream import CancellableStream
+
     resources = resources.selected(document)
     data = manifest(document, resources)
-    with zipfile.ZipFile(path, "w", allowZip64=True) as archive:
-        archive.writestr("manifest.json", json.dumps(data, indent=2, allow_nan=False))
-        resource_storage.write(archive, resources)
+    with path.open("w+b") as stream:
+        with zipfile.ZipFile(CancellableStream(stream, cancel), "w", allowZip64=True) as archive:
+            archive.writestr("manifest.json", json.dumps(data, indent=2, allow_nan=False))
+            resource_storage.write(archive, resources)
 
 
 def atomic_save(path: Path, document: Document, resources: Resources) -> None:

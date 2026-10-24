@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 from attached_creation_portable import automatic_construction
 from branch_placement_portable import branches
+from comparison_portable import comparison
 from construction_portable import construction
 from direct_workflow_portable import direct_workflows
 from exterior_placement_portable import exterior_placement
@@ -51,6 +52,7 @@ CHECKS = (
     "stacking footprints, material brush commit/undo, section cutaways and routed Fiber evidence",
     "shortcut formulas, typed Parametric paths, schema-5 results and native consumer rendering",
     "shortcut influence, captured formula inputs, effective policy and propagation completion",
+    "session comparison, paired images, bounded replay journal and isolated replay",
 )
 
 
@@ -157,7 +159,7 @@ def qualification_steps():
 
 
 def construction_steps():
-    return construction, direct_workflows, automatic_construction, branches, shortcuts
+    return construction, direct_workflows, automatic_construction, branches, shortcuts, comparison
 
 
 def deletion(executable, cwd, invoke=invoke):

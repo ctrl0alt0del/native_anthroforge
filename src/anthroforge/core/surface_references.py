@@ -11,6 +11,7 @@ ROLES = frozenset(("SCP_GEOMETRY", "TISSUE_BASE", "TISSUE_FINAL"))
 class SurfaceReference:
     target: str
     role: str = "SCP_GEOMETRY"
+    instance: str = ""
 
     def __post_init__(self) -> None:
         if not self.target or self.role not in ROLES:

@@ -77,6 +77,9 @@ class SceneProjection:
         )
         self.publish_records()
         self.controller.construction.synchronize()
+        from .mirror_scene import synchronize as synchronize_mirrors
+
+        synchronize_mirrors(self)
         self.synchronize_selection()
 
     def publish_records(self):
@@ -139,7 +142,7 @@ class SceneProjection:
 
     def synchronize_selection(self):
         controller = self.controller
-        records = self.records | controller.construction.records
+        records = self.records | controller.construction.records | controller.mirror_records
         controller.object_selection.retain(records)
         self.selected.synchronize(selection_record(controller, records))
         if self.selection != tuple(controller.object_selection.items):
@@ -151,6 +154,8 @@ def selection_record(controller, records):
     row = records.get(controller.selection, {})
     if not row:
         return {}
+    if row.get("mirror_source"):
+        return dict(row, transformable=False, transform_reason="Mirrored instances are read-only.")
     reason = object_reason(controller.session.document.object(controller.selection))
     return dict(row, transformable=not reason, transform_reason=reason)
 
@@ -162,6 +167,7 @@ def initialize(controller):
     controller.scene_projection = SceneProjection(controller)
     controller._state = PropertyProjection(controller)
     controller._render_rows = []
+    controller.mirror_records = {}
     scene_state.picking_inputs(controller, [])
 
 
@@ -176,7 +182,10 @@ def refresh(controller):
 
 
 def publish(controller):
-    rows = [render_record(row) for row in [*controller.rows, *surface_scene.records(controller)]]
+    from .mirror_scene import rows as mirror_rows
+
+    originals = [*controller.rows, *surface_scene.records(controller)]
+    rows = [render_record(row) for row in mirror_rows(controller, originals)]
     rows.extend(surface_scene.preview_rows(controller))
     rows.extend(surface_scene.tissue_preview_rows(controller))
     if rows != controller._render_rows:

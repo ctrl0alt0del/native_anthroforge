@@ -26,7 +26,13 @@ UiScrollView {
             Label { text: "Nothing selected"; font.pixelSize: 15; color: Theme.text; Layout.alignment: Qt.AlignHCenter }
             Label { text: "Select an object in the viewport or outliner to edit its properties."; color: Theme.muted; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.fillWidth: true }
         }
-        Label { visible: !!inspector.selected.readonly; text: "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+        Label { visible: !!inspector.selected.readonly; text: inspector.selected.mirror_source ? "Mirrored instance · read-only" : "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+        UiButton {
+            objectName: "selectMirrorSource"; text: "Select source"; Layout.fillWidth: true
+            visible: !!inspector.selected.mirror_source
+            onClicked: workspace.select(inspector.selected.mirror_source)
+        }
+        MirrorSettings { Layout.fillWidth: true }
         UiButton {
             objectName: "addObjectImage"; text: "Add reference image…"; glyph: "image"; Layout.fillWidth: true
             visible: !!inspector.selected.id && inspector.selected.kind !== "IMAGE"

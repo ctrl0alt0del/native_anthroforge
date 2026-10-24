@@ -6,8 +6,10 @@ from anthroforge.native import paths
 
 
 def rows(controller):
+    from .mirror_scene import path_rows
+
     resources = controller.session.resources.paths
-    return [
+    return path_rows(controller, [
         dict(
             row,
             handle=resources[row["asset"]].path.handle,
@@ -18,7 +20,7 @@ def rows(controller):
         for row in controller.construction.records.values()
         if row["asset"] in resources and row["visible"]
         for chunk in range(resources[row["asset"]].path.chunks)
-    ]
+    ])
 
 
 def resources(controller):

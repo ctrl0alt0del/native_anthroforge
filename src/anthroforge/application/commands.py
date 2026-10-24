@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.units import convert
+from . import mirror_operations
 
 from . import (
     attached_creation,
@@ -64,6 +65,8 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "mirror.configure": mirror_operations.configure,
+    "mirror.attachment.share": mirror_operations.share_target,
     "driver.create": driving_operations.create,
     "driver.configure": driving_operations.configure,
     "driver.value": driving_operations.set_value,
@@ -284,6 +287,10 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
+        "mirror.list": lambda **a: mirror_operations.listing(session, **a),
+        "mirror.inspect": lambda **a: mirror_operations.inspect(session, **a),
+        "mirror.source": lambda **a: mirror_operations.source(session, **a),
+        "mirror.removal.inspect": lambda **a: mirror_operations.removal(session, **a),
         "preferences.get": session.preferences.describe,
         "preferences.set": session.preferences.update,
         "driver.inspect": lambda **a: driving_operations.inspect(session, **a),

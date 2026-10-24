@@ -70,6 +70,9 @@ def revision(document: Document, port: Port) -> ReadRevision:
 
 
 def object_port_revision(document: Document, port: Port) -> ReadRevision:
+    if port.output == "mirror":
+        rule = document.mirrors.rules.get(port.owner)
+        return ReadRevision(port.owner, port.output, 0, 0, (repr(rule),))
     if port.owner in document.registry.authored:
         return object_revision(document, port)
     if port.owner in document.index.controls:

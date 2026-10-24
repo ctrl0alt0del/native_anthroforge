@@ -20,8 +20,8 @@ from .construction_codec import control, entity_construction
 from .resources import Resources
 
 FORMAT = "anthroforge-project"
-VERSION = 5
-READ_VERSIONS = (4, 5)
+VERSION = 6
+READ_VERSIONS = (4, 5, 6)
 STATE_RECORDS = (
     "entities",
     "controls",
@@ -31,6 +31,8 @@ STATE_RECORDS = (
     "driving_shortcuts",
     "formula_results",
     "shortcut_edits",
+    "mirror_rules",
+    "shared_mirror_targets",
 )
 
 
@@ -157,7 +159,9 @@ def decode_document(data: dict[str, Any]) -> Document:
     data["junctions"] = tuple(decode_junction(item) for item in data.get("junctions", ()))
     if not data["workspaces"]:
         raise ValueError("Project has no workspace.")
-    return Document(**(data | shortcut_codec.document_fields(data)))
+    from .mirror_codec import fields as mirror_fields
+
+    return Document(**(data | shortcut_codec.document_fields(data) | mirror_fields(data)))
 
 
 def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resources]:

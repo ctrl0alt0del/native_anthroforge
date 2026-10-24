@@ -182,14 +182,16 @@ def snapping_inputs(controller, rows):
 
 
 def snapping_rows(document, rows):
+    from anthroforge.core.mirroring import source
+
     anatomy = document.registry.anatomy
     return [
         row
         for row in rows
-        if row["id"] in anatomy
+        if source(row["id"]) in anatomy
         and row["surface_visible"]
         and row["handle"]
-        and ready_surface(anatomy[row["id"]], row)
+        and ready_surface(anatomy[source(row["id"])], row)
     ]
 
 

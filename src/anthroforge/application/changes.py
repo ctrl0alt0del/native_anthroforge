@@ -16,6 +16,8 @@ DOCUMENT_FIELDS = (
     "shortcuts",
     "driving_shortcuts",
     "formula_results",
+    "mirror_rules",
+    "shared_mirror_targets",
 )
 
 

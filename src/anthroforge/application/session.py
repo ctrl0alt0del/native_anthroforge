@@ -131,6 +131,9 @@ class Session:
         return 10 if any(included(self.document, self.workspace, key) for key in ids) else 0
 
     def editable(self, entity_id: str) -> SCP:
+        from anthroforge.core.mirroring import require_source
+
+        require_source(entity_id)
         if self.waiting_save:
             raise ValueError("Editing is blocked while waiting to save.")
         if self.workspace.focused and entity_id not in self.workspace.members:
@@ -144,6 +147,9 @@ class Session:
         before = self.document
         self.serial += 1
         updated = replace(self.document, revision=self.serial, **changes)
+        from .mirror_policy import require_transition
+
+        require_transition(before, updated)
         contexts = superseded(self, before, updated)
         if contexts != updated.shortcut_edits:
             updated = replace(updated, shortcut_edits=contexts)

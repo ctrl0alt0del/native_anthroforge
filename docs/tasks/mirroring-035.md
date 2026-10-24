@@ -20,7 +20,11 @@ Read specifications, engineering rules and current typed model. Starting from ma
 unfinished `codex/parity-workflows-034` and unrelated root `__init__.py` are preserved.
 Research: Qt 6.12 material front faces use counterclockwise winding; reflection/query
 and render orientation must be handled explicitly, not hidden with double-sided shading.
-No runtime implementation or acceptance evidence yet.
+Foundation implementation now includes typed rules/instances, cached relationship
+resolution, shared provider references/transforms, read-only guards, rule/inspection
+commands and schema-6 relationship storage (reads 4/5/6). Source assets are reused.
+Initial desktop rule controls and viewport projection are in progress, not qualified.
+No independent mirror solvers or authored tree nodes are introduced.
 
 ## Next actions
 
@@ -31,7 +35,12 @@ No runtime implementation or acceptance evidence yet.
 
 ## Verification
 
-Pending. Checks remain background-only; do not claim interactive acceptance.
+`pytest tests/test_mirroring.py tests/test_construction_objects.py -q`: 28 passed.
+These cover hierarchy/plane identity, exact provider transforms/resource reuse, basic
+read-only behavior, history, persistence and reuse after result publication.
+Style/function-size fixes and complete desktop integration remain pending, along with
+binding propagation, removal coverage, symmetric construction and release acceptance.
+Checks remain background-only; do not claim interactive acceptance.
 Checkpoint coherent increments and push before long checks or interruptions.
 
 ## Recovery inputs

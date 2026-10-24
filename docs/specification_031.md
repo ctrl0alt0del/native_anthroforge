@@ -1,6 +1,6 @@
 # AnthroForge 0.3.1: shortcut inspection
 
-Confirmed; implementation and qualification in progress. This release implements
+Implemented and qualified in 0.3.1 (2026-10-24). This release implements
 influence inspection, formula evidence, effective attachment policies and propagation
 feedback. It does not change geometry or attachment behavior. Ribs/Thumb parity defects
 remain deferred. Comparison and report extensions are deferred; their future defaults
@@ -40,3 +40,5 @@ discarded on document replacement. Schema 5 and existing loading behavior remain
 See [implementation and qualification](implementation_031.md). Inspection must leave
 geometry, poses, bindings, document revisions and undo intact. Release acceptance requires
 actual render inspection, production comparisons, profiling and portable qualification.
+These checks passed with background/offscreen evidence; physical interactive acceptance
+is not claimed. See the [release evidence](tasks/shortcut-inspection-031.md).

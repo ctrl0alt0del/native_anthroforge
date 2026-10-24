@@ -1,6 +1,6 @@
 # AnthroForge release roadmap
 
-- **0.3.1 — qualification in progress:** shortcut influence, formula evidence, effective
+- **0.3.1 — qualified:** shortcut influence, formula evidence, effective
   attachment inspection and downstream propagation status; optional displayed-geometry
   effects. [Walkthrough](shortcuts_031.md), [qualification](tasks/shortcut-inspection-031.md).
   Schema 5, geometry and attachment behavior remain unchanged.

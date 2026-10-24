@@ -10,7 +10,6 @@ from statistics import median
 from time import perf_counter
 
 import numpy as np
-
 from qualify_retained_attachment_edits import load
 from shortcut_parity_app_capture import record
 

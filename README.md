@@ -11,9 +11,10 @@ and general XYZ Parametric curves. See the [walkthrough](docs/shortcuts_030.md),
 Projects save in schema 5; existing 0.2.4/schema-4 projects remain readable with their
 accepted geometry and attachments preserved. Blender shortcut migration is separate.
 
-The current Windows gate passes 1,996 tests and all five native tests.
-The packaged executable passes the full minimal-PATH portable suite and the
-generated-point resolution-lock check. The subsequent one-file skeleton migration adds
+The final 0.3.1 suite passes 2,026 tests and all five native tests; the development gate,
+full minimal-PATH portable suite and background GUI/render checks pass.
+See [0.3.1 delivery evidence and limits](docs/tasks/shortcut-inspection-031.md).
+The earlier one-file skeleton migration adds
 retained Bézier construction and an explicit attachment-policy scope for multi-SCP controls.
 See [delivery evidence and limits](docs/development_status.md#shortcuts-and-parametric-curves-030).
 

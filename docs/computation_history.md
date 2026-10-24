@@ -2177,6 +2177,13 @@ average. This is a read-only formula input; no new write channel is introduced.
   work reduced measured observation settlement to 13.36 ms total over 397 calls. The four
   inspection queries together measured 8.32 ms median. These timings include background
   variability and profiler perturbation and do not establish a speed improvement.
-- **Qualification:** [task record](tasks/shortcut-inspection-031.md) tracks final gates,
-  package checks and local artifacts. Native scene inspection is background-only; no
-  physical interactive acceptance is claimed.
+- **Extended evidence:** Humerus length, Radius length and Thumb thickness comparisons
+  also preserve every vertex, pose and binding. Thumb triangle enumeration varies, but
+  canonical oriented connectivity matches; the other triangle arrays match exactly.
+  Current pending readiness uses the captured read roles, distinguishing a pending tissue
+  base from an accepted final surface. Historical pending evidence remains separately available.
+- **Qualification:** 2,026 final tests, five native CTests, configured typing, style and
+  numerics pass. Portable workflows and a relocated compiled-editor QML harness pass;
+  screenshots were inspected. The [task record](tasks/shortcut-inspection-031.md) identifies
+  local reports and limitations. Native scene inspection is background-only; no physical
+  interactive acceptance or measured application speed improvement is claimed.

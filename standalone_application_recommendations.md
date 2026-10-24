@@ -3,7 +3,7 @@
 Updated: 2026-10-24
 
 Shortcut recommendations 1–4 are implemented in the [0.3.1 inspection workflow](docs/shortcuts_031.md)
-and undergoing release qualification. Influence, formula evidence, effective policy and
+and qualified for release. Influence, formula evidence, effective policy and
 propagation status reuse the current algorithms; comparison/replay reporting remains deferred.
 
 The [0.3 specification](docs/specification_030.md) and

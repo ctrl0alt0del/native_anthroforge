@@ -75,7 +75,18 @@ def comparison_metadata(frozen: Any) -> dict[str, Any]:
         after_provisional=frozen.provisional,
         issues=value.issues,
         before_issues=value.baseline.issues,
-        replay=value.journal if value.replay else dict(included=False),
+        replay=replay_metadata(value),
+    )
+
+
+def replay_metadata(value: Any) -> dict[str, Any]:
+    return (
+        dict(value.journal, included=True)
+        if value.replay
+        else dict(
+            included=False,
+            **{key: item for key, item in value.journal.items() if key != "operations"},
+        )
     )
 
 

@@ -58,3 +58,21 @@ uses an isolated session and in-memory preferences with a strict operation white
 Feedback drafts freeze evidence on opening; generic file attachments stream through the
 consumer. 27 focused tests pass. Remaining: real export/feedback UI qualification, broader
 lifecycle/security coverage, production profile/preservation, full gate and packaging.
+
+## Qualification progress
+
+- Core gate: 2,044 tests and five native CTests passed before final hardening; configured
+  typing, native/script style, numerics and doctor passed. Final suite is running.
+- Real background D3D11 rendering, paired-image export, isolated replay and feedback
+  attachment generation run through tools/shortcut_comparison_acceptance.py. Existing
+  feedback UI regression passes offscreen. No physical interactive acceptance claimed.
+- Production native comparison initially failed on ControlResult (no surface asset).
+  Fixed the generic geometry-availability query at its owning boundary; regression added.
+- All four 96-muscle cases now compare successfully. Baseline capture 24–37 ms; explicit
+  background comparisons 431–587 ms. Coordinates, poses, bindings and oriented connectivity
+  match qualified 0.3.1 evidence. Thumb triangle enumeration alone differs as before.
+  See build/shortcut-comparison-profile/preservation.json and four afprofile archives.
+- Source version is now 0.3.2 for packaging qualification; release/merge not yet complete.
+- Review: properties/document state stay independent; native comparison owns bulk scans;
+  feedback attachment storage remains consumer-independent. Historical geometry never
+  enters picking. Report resource attribution includes baseline, exports and draft leases.

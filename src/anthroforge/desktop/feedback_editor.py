@@ -192,6 +192,7 @@ class FeedbackEditor(QObject):
     def close(self):
         self.timer.stop()
         self.service.close()
+        self.comparison = None
 
 
 def meaningful(item):

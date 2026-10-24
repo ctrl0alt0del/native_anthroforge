@@ -15,8 +15,8 @@ class Journal:
         self.started, self.bytes, self.stopped = monotonic(), 0, False
 
     def invalidate(self, reason: str) -> None:
-        if reason not in self.reasons:
-            self.reasons.append(reason)
+        if reason not in self.reasons and len(self.reasons) < 128:
+            self.reasons.append(reason[:2000])
 
     def append(self, operation: str, arguments: Any = None) -> None:
         if self.stopped:
@@ -24,7 +24,11 @@ class Journal:
         event = dict(
             operation=operation, arguments=arguments or {}, seconds=monotonic() - self.started
         )
-        encoded = json.dumps(event, allow_nan=False)
+        encoded = encode(self, event)
+        if encoded is not None:
+            self.store(encoded)
+
+    def store(self, encoded: str) -> None:
         if len(self.events) >= 10000 or self.bytes + len(encoded.encode()) > 16 * 1024 * 1024:
             self.invalidate("Replay journal limit reached; later edits were not recorded.")
             self.stopped = True
@@ -40,6 +44,15 @@ class Journal:
             bytes=self.bytes,
             stopped=self.stopped,
         )
+
+
+def encode(journal: Journal, event: Any) -> str | None:
+    try:
+        return json.dumps(event, allow_nan=False)
+    except (TypeError, ValueError):
+        journal.invalidate("An operation contained non-serializable arguments.")
+        journal.stopped = True
+        return None
 
 
 def record(session: Any, operation: str, arguments: Any = None, authored: bool = False) -> None:

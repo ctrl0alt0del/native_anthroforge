@@ -25,7 +25,20 @@ def prepare_report(report, image, frozen, included, replay):
     if not included or frozen is None:
         return prepared
     value = replace(frozen, comparison=replace(frozen.comparison, replay=replay))
+
     def writer(path):
         return report_archive.write(path, value, inspection_report.metadata(value), Event())
+
     attachment = materialize("comparison.afinspection.zip", writer)
     return replace(prepared, files=(attachment,))
+
+
+def memory_owners(editor, owners):
+    from anthroforge.profiling.resource_inventory import owned_resources
+
+    frozen = editor.comparison
+    if frozen:
+        owners["feedback_capture"].update(owned_resources(frozen.source.resources))
+        owners["feedback_capture"].update(
+            owned_resources(frozen.comparison.baseline.source.resources)
+        )

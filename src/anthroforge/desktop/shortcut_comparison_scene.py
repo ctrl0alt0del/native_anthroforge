@@ -5,7 +5,7 @@ from anthroforge.application.object_frames import Frames
 from anthroforge.application.point_evaluation import position
 from anthroforge.application.workspace_policy import included
 from anthroforge.core.object_registry import kind as object_kind
-from anthroforge.core.points import Point
+from anthroforge.core.points import Anchor, Point
 from anthroforge.core.presentation import visible
 from anthroforge.core.results import geometry_asset
 from anthroforge.native import scene
@@ -16,21 +16,36 @@ from .construction_projection import CATEGORIES
 def rows(baseline, workspace):
     context = baseline.source
     frames, records, leases = Frames(context.engine, context.document), [], []
-    for item in context.document.registry.records.values():
-        if item.id in workspace.hidden or not visible(workspace, category(item)):
-            continue
+    for item in eligible(context, workspace):
         resource, kind = geometry(context, item)
         if resource is None:
             continue
-        frame = display_frame(context, item, frames)
+        frame = retained_frame(context, item, frames)
+        if frame is None:
+            continue
         metadata = placement(context, item, frame, workspace, kind)
         records.extend(chunks(metadata, resource))
         leases.append(resource)
     return records, leases
 
 
+def eligible(context, workspace):
+    return (
+        item
+        for item in context.document.registry.records.values()
+        if item.id not in workspace.hidden and visible(workspace, category(item))
+    )
+
+
 def category(item):
     return CATEGORIES.get(object_kind(item), "anatomy")
+
+
+def retained_frame(context, item, frames):
+    try:
+        return display_frame(context, item, frames)
+    except ValueError:
+        return None  # Unresolved frames are explicitly reported by the comparison query.
 
 
 def points(baseline, workspace):
@@ -39,6 +54,7 @@ def points(baseline, workspace):
         dict(id=item.id, position=position(context.engine, context.document, item))
         for item in context.document.objects
         if isinstance(item, Point)
+        and (not isinstance(item, Anchor) or item.resolved_position)
         and item.id not in workspace.hidden
         and visible(workspace, category(item))
     ]

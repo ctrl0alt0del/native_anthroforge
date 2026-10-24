@@ -1,7 +1,13 @@
 # AnthroForge development validation
 
-Current qualification is in [shortcut inspection](#shortcut-inspection-031).
+Current release-candidate qualification is in [shortcut comparison](tasks/shortcut-comparison-032.md).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Shortcut comparison (0.3.2)
+
+Session baselines, historical views, frozen comparison reports and opt-in isolated replay
+are implemented. Source checks and four production preservation trials pass; portable
+qualification remains in progress. See the [walkthrough](shortcuts_032.md) and task record.
 
 ## Shortcut inspection (0.3.1)
 

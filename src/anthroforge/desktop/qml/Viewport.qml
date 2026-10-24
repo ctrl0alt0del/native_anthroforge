@@ -40,7 +40,7 @@ Item {
     readonly property bool drawing: workspace.drawingTools.state.active
     readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active || workspace.tissueRegionTools.state.active || workspace.tissueInspection.state.active || workspace.tissuePainting.state.active
     readonly property var selected: authoring.transformData
-    readonly property bool transformAvailable: !!selected.id && !!selected.transformable && !selected.readonly && !workspace.state.waiting
+    readonly property bool transformAvailable: !comparisonBefore && !!selected.id && !!selected.transformable && !selected.readonly && !workspace.state.waiting
     readonly property bool modalTransforming: modalTransform.active
     readonly property bool transforming: gizmo.dragging || curveEditor.dragging || modalTransforming || workspace.drawingTools.state.painting || workspace.tissuePainting.state.dragging
     readonly property bool snapping: keyboard.held("snapSurface") && authoring.active &&
@@ -394,8 +394,8 @@ Item {
         }
         onDoubleClicked: { if(!viewport.measuring) workspace.frameSelection(); }
     }
-    TransformGizmo { id: gizmo; objectName: "transformGizmo"; anchors.fill: parent; viewport: viewport; enabled: !viewport.measuring && !viewport.comparisonBefore; visible: !viewport.comparisonBefore }
-    CurveEditor { id: curveEditor; objectName: "curveEditor"; anchors.fill: parent; viewport: viewport; keyboard: viewport.keyboard; enabled: !viewport.measuring && !viewport.comparisonBefore; visible: !viewport.comparisonBefore }
+    TransformGizmo { id: gizmo; objectName: "transformGizmo"; anchors.fill: parent; viewport: viewport; enabled: !viewport.measuring && !viewport.comparisonBefore }
+    CurveEditor { id: curveEditor; objectName: "curveEditor"; anchors.fill: parent; viewport: viewport; keyboard: viewport.keyboard; enabled: !viewport.measuring && !viewport.comparisonBefore }
     CurveFeedback { anchors.fill: parent; viewport: viewport }
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     MeasurementOverlay { id: measurementOverlay; viewport: viewport }

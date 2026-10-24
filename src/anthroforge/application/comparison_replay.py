@@ -4,7 +4,7 @@ import hashlib
 import json
 import tempfile
 import zipfile
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from time import monotonic, sleep
 from typing import Any
 
@@ -45,7 +45,27 @@ def unpack(path: Path, root: Path, cancel: Any) -> dict[str, Any]:
             copy_checked(archive, name, root / name, checksum, cancel)
     journal = json.loads((root / "replay.json").read_text("utf-8"))
     validate_journal(journal)
+    validate_project(root / "starting.anthroforge")
     return dict(journal)
+
+
+def validate_project(path: Path) -> None:
+    with zipfile.ZipFile(path) as archive:
+        infos = archive.infolist()
+        if sum(info.file_size for info in infos) > 8 * 1024**3:
+            raise ValueError("Replay project exceeds its expanded storage budget.")
+        if len(infos) > 100000 or len({i.filename for i in infos}) != len(infos):
+            raise ValueError("Replay project has duplicate or excessive members.")
+        for info in infos:
+            if unsafe_name(info.filename):
+                raise ValueError("Unsafe replay project member name.")
+        if archive.getinfo("manifest.json").file_size > 64 * 1024**2:
+            raise ValueError("Replay project manifest exceeds its storage budget.")
+
+
+def unsafe_name(value: str) -> bool:
+    name = PurePosixPath(value)
+    return name.is_absolute() or ".." in name.parts or "\\" in value or ":" in value
 
 
 def validate_members(archive: Any) -> None:

@@ -40,4 +40,5 @@ class ControlResult:
 
 def geometry_asset(entity: object) -> str:
     result = getattr(entity, "result", None)
-    return str(result.asset if result and result.asset else getattr(entity, "asset", ""))
+    accepted = getattr(result, "asset", "")
+    return str(accepted or getattr(entity, "asset", ""))

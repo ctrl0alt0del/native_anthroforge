@@ -76,3 +76,13 @@ def test_failed_capture_does_not_discard_previous_baseline(session):
     with pytest.raises(ValueError):
         session.command("shortcut.comparison.capture", shortcut="missing")
     assert session.shortcut_comparison.baseline is old
+
+
+def test_geometry_queries_accept_controls_without_surface_results(session):
+    hook = session.command("control.create")
+    cage = session.command("control.create", kind="LATTICE")
+    baseline(session)
+    result = session.command("shortcut.comparison.inspect", wait=True)
+    assert result["state"] == "succeeded", result["error"]
+    controls = [row for row in result["comparison"]["rows"] if row["id"] in (hook, cage)]
+    assert len(controls) == 2 and all(r["after"]["geometry"]["kind"] == "NONE" for r in controls)

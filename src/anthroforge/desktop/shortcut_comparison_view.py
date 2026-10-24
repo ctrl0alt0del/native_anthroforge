@@ -18,6 +18,8 @@ class ShortcutComparisonView(QObject):
         self.controller, self.mode = controller, "After"
         self.model = RenderModel(self)
         self.images = RenderModel(self)
+        self.model.activated.connect(self.changed)
+        self.images.activated.connect(self.changed)
         self.layers = {name: RenderLayer(self.images, name) for name in ("NORMAL", "FRONT", "BACK")}
         self.stamp, self.value = None, shortcut_comparison.inspect(controller.session)
         self.points = []
@@ -33,11 +35,20 @@ class ShortcutComparisonView(QObject):
 
     @Property("QVariantMap", notify=changed)
     def state(self):
-        return qml(dict(self.value, mode=self.mode, points=self.points))
+        value = dict(self.value, mode=self.mode, points=self.points)
+        result = value.get("comparison", {})
+        value["comparison"] = {key: item for key, item in result.items() if key != "rows"}
+        return qml(value)
 
     @Property(bool, notify=changed)
     def before(self):
-        return self.mode == "Before" and bool(self.value.get("active"))
+        return self.mode == "Before" and bool(self.value.get("active")) and self.ready()
+
+    def ready(self):
+        return all(
+            not model.pending and {r["key"] for r in model.displayed} == set(model.wanted)
+            for model in (self.model, self.images)
+        )
 
     @Slot(str)
     def capture(self, shortcut):

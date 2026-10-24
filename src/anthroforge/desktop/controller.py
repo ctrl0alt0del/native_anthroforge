@@ -88,6 +88,10 @@ class Controller(QObject):
         self.route_inspection = RouteInspectionTools(self)
 
     def memory_owners(self, owners):
+        from .feedback_comparison import memory_owners
+
+        if hasattr(self, "feedback"):
+            memory_owners(self.feedback, owners)
         for model in self.geometry_models():
             model.memory_owners(owners)
         owners["drawing_preview"].update(self.drawing_tools.leases)

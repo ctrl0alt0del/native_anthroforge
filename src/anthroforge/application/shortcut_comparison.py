@@ -1,12 +1,13 @@
 """Session-only baseline and asynchronous comparisons, independent of authored state."""
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from time import monotonic, sleep
 from typing import Any
 from uuid import uuid4
 
 from anthroforge.core.jobs import Job
 from anthroforge.core.scheduling import Workload
+from anthroforge.core.shortcuts import Shortcut
 from anthroforge.native.mesh import NativeCancellation
 
 from . import comparison_geometry, shortcut_inspection
@@ -56,8 +57,9 @@ class Comparison:
     def signature(self) -> Any:
         return (self.baseline.id if self.baseline else "", scene_signature(self.session.document))
 
-    def refresh(self) -> None:
-        if self.baseline is None or self.stamp == self.signature():
+    def refresh(self, retry: bool = False) -> None:
+        failed = self.job and self.job.state in ("failed", "cancelled", "obsolete")
+        if self.baseline is None or (self.stamp == self.signature() and not (retry and failed)):
             return
         if self.job and self.job.active:
             self.session.scheduler.cancel_job(self.job.id, obsolete=True)
@@ -72,6 +74,18 @@ class Comparison:
 
 
 def evidence(session: Any, shortcut: str) -> dict[str, Any]:
+    from . import property_operations, shortcut_effects
+
+    selected = shortcut_effects.selected(session, shortcut)
+    value = (
+        property_operations.read(session, selected.reference)
+        if isinstance(selected, Shortcut)
+        else selected.value
+    )
+    return dict(definition=asdict(selected), value=value, **query_evidence(session, shortcut))
+
+
+def query_evidence(session: Any, shortcut: str) -> dict[str, Any]:
     return {
         name: operation(session, shortcut)
         for name, operation in shortcut_inspection.operations().items()
@@ -145,7 +159,7 @@ def clear(session: Any) -> dict[str, Any]:
 def inspect(session: Any, refresh: bool = False, wait: bool = False) -> dict[str, Any]:
     state = session.shortcut_comparison
     if refresh or wait:
-        state.refresh()
+        state.refresh(retry=refresh)
     if wait and state.job:
         wait_for(session.scheduler, state.job)
     return describe(state)

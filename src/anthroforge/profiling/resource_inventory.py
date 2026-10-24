@@ -43,6 +43,9 @@ RESOURCE_FIELDS = frozenset(
         "attachments",
         "bindings",
         "context",
+        "source",
+        "baseline",
+        "comparison",
     )
 )
 RESOURCE_TYPES = (

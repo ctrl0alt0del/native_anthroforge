@@ -161,9 +161,10 @@ def preview_owners(session, output):
 
 
 def replacement_owners(session, output):
-    candidate = session.mesh_replacement.asset
-    if candidate:
-        output["replacement_preview"].update(owned_resources(candidate.resources))
+    for name in ("mesh_replacement", "tissue_retarget"):
+        candidate = getattr(session, name).asset
+        if candidate:
+            output["replacement_preview"].update(owned_resources(candidate.resources))
 
 
 def inspection_owners(session, output, profiler):

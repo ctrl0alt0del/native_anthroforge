@@ -70,9 +70,9 @@ def choose_source(window):
 
 def approve(controller, window, target):
     cursor = controller.session.history.cursor
-    assert not find(window, "applyMeshReplacement").property("enabled")
-    activate(window, "approveMeshChanges")
-    activate(window, "applyMeshReplacement")
+    assert not find(window, "applyReplacement").property("enabled")
+    activate(window, "approveReplacementChanges")
+    activate(window, "applyReplacement")
     settle(controller)
     assert not window.property("modalOpen")
     assert controller.session.history.cursor == cursor + 1

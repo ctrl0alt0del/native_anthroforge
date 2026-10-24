@@ -133,7 +133,7 @@ def test_rename_and_new_relationships_invalidate_reviews(session):
     token, _ = assessment(session, target, CUBE)
     session.command("scp.empty", parent=target, name="New child")
     assert session.command("scp.mesh.replace.status")["state"] == "stale"
-    with pytest.raises(ValueError, match="relationships changed"):
+    with pytest.raises(ValueError, match="relationships changed|membership changed"):
         session.command("scp.mesh.replace.apply", token=token)
 
 

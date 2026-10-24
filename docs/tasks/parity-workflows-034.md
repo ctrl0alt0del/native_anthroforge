@@ -240,3 +240,38 @@ button/file dialog/review/select-all/apply workflow passes, including automatic 
 safe replacement and one-action undo. Construction and preset offscreen checks also pass.
 Broader branch/region/96-muscle assembly, performance, native style/full gate and packaging
 qualification remain. D08/D10/D11 and F01 are still outstanding; no release/main merge.
+
+## Tissue retarget and common replacement checkpoint
+
+D08 now supports tissue.source.options and tissue.source.replace.assess/status/apply/cancel,
+plus Change construction source, searchable virtualized attached-construction selection,
+shared review and direct safe application. Cross-family evaluator/smoothing/relaxation/
+crop/side/stacking changes are listed explicitly. Compatible fields/regions are preserved;
+incompatible material fields/masks and selected stacking regions require explicit discard
+approval. Target-relative region goals and incoming bindings use shared confirmed capture.
+Sources remain shared live objects; old sources are preserved. Missing surface roles fail
+actionably rather than substituting Final for Base (covered by a regression test).
+
+Worker evaluation reuses the native base/rest/intrinsic/plan/final pipeline and material
+publication records. Complete accepted bundles mark/schedule consumers while excluding
+already prepared outputs; tests assert no redundant own-stage jobs after application.
+Common candidate ownership, snapshot/registry-membership checks, approval validation,
+record publication and the desktop review lifecycle now serve both replacement types.
+Metadata/new incoming references/object creation/deletion stale the candidate. Mesh import
+and tissue capabilities remain separate producer policies; no new worker pool was added.
+
+A Manual-source case exposed false dependency edges: fixed-parent Fiber edits declared
+unused tissue candidates that capture never reads. Support selection is now owned in core
+and shared by capture and dependency declaration. Actual Any-parent searches still declare
+all candidates. The Manual retarget/provenance case and Any-parent read-set regression pass.
+
+Qt qualification found an access violation while a subclass property used an inherited
+notify signal. A dedicated choicesChanged signal fixed it; complete engine/source-picker
+and mesh replacement acceptance pass. No exception suppression or visible desktop input.
+
+Twenty-six focused retarget/support/replacement/architecture tests pass, with Ruff and
+configured mypy. Cases include Surface/Point/Curve changes, incoming Final bindings,
+rejected unavailable Base role, field preservation/discard review, package roundtrip,
+Manual accepted provenance, undo and no duplicate own-stage calculations. Extended mesh
+and tissue retarget offscreen acceptance pass. Broader branches/crops/stacking assemblies,
+full gate/profiling/packaging remain pending. D10/D11 and F01 remain outstanding.

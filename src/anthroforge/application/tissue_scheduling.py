@@ -17,6 +17,12 @@ class TissueTaskScheduler(ConstructionTaskScheduler):
 
 def policies() -> dict[str, TissueTaskScheduler]:
     costs = dict(
-        base=0.001, rest=0.008, intrinsic=0.02, plan=0.01, final=0.03, constraint_capture=0.02
+        base=0.001,
+        rest=0.008,
+        intrinsic=0.02,
+        plan=0.01,
+        final=0.03,
+        constraint_capture=0.02,
+        source_replace=0.069,
     )
     return {"tissue_" + phase: TissueTaskScheduler(phase, cost) for phase, cost in costs.items()}

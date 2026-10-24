@@ -58,6 +58,7 @@ from . import (
     tissue_preset_operations,
     tissue_preview,
     tissue_region_capture,
+    tissue_retarget,
     tissue_stack_operations,
     tissue_strategy_operations,
 )
@@ -119,6 +120,7 @@ EDITS = {
     "tissue.create": tissue_operations.create,
     "tissue.configure": tissue_operations.configure,
     "tissue.preset.apply": tissue_preset_operations.apply,
+    "tissue.source.replace.apply": tissue_retarget.apply,
     "tissue.inflation": tissue_operations.inflation,
     "construction.point.create": point_operations.create,
     "construction.point.update": point_operations.update,
@@ -340,6 +342,10 @@ def surface_queries(session: "Session") -> dict[str, Any]:
     return {
         "surface.source_ids": lambda **a: surface_sources.identities(session, **a),
         "surface.preview": lambda **a: surface_preview.preview(session, **a),
+        "tissue.source.options": lambda **a: tissue_retarget.options(session, **a),
+        "tissue.source.replace.assess": lambda **a: tissue_retarget.assess(session, **a),
+        "tissue.source.replace.status": lambda: tissue_retarget.status(session),
+        "tissue.source.replace.cancel": lambda: tissue_retarget.cancel(session),
         "scp.mesh.replace.assess": lambda **a: mesh_replacement.assess(session, **a),
         "scp.mesh.replace.status": lambda: mesh_replacement.status(session),
         "scp.mesh.replace.cancel": lambda: mesh_replacement.cancel(session),

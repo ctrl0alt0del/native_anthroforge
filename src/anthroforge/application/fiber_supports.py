@@ -4,23 +4,13 @@ from dataclasses import replace
 from typing import Any
 
 from anthroforge.core.fiber_support_policy import FiberSupportPolicy
+from anthroforge.core.fiber_support_policy import deformation_targets as deformation_targets
+from anthroforge.core.fiber_support_policy import selected_targets as selected_targets
 from anthroforge.native import attachment_fields, components, point_attachments
 
 from . import attachment_assets
 
 DEFAULT_POLICY = FiberSupportPolicy()
-
-
-def deformation_targets(candidates: Any, parents: Any) -> tuple[Any, ...]:
-    explicit = set(parents)
-    if any(ref.role != "SCP_GEOMETRY" for ref in explicit):
-        return tuple(sorted(explicit))
-    return tuple(sorted(explicit | {ref for ref in candidates if ref.role == "SCP_GEOMETRY"}))
-
-
-def selected_targets(candidates: Any, parents: Any, policy: FiberSupportPolicy) -> tuple[Any, ...]:
-    automatic = set(deformation_targets(candidates, parents)) if policy.automatic else set(parents)
-    return tuple(sorted((automatic | set(policy.included)) - set(policy.excluded) | set(parents)))
 
 
 def resolve_parents(

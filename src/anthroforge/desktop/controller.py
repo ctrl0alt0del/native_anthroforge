@@ -31,6 +31,7 @@ from .surface_creation import SurfaceCreation
 from .tissue_inspection_tools import TissueInspectionTools
 from .tissue_painting_tools import TissuePaintingTools
 from .tissue_region_tools import TissueRegionTools
+from .tissue_retarget_panel import TissueRetargetPanel
 
 
 class Controller(QObject):
@@ -88,6 +89,7 @@ class Controller(QObject):
         self.tissue_painting = TissuePaintingTools(self)
         self.section_tools = SectionTools(self)
         self.route_inspection = RouteInspectionTools(self)
+        self.tissue_retarget = TissueRetargetPanel(self)
 
     def memory_owners(self, owners):
         from .feedback_comparison import memory_owners
@@ -239,6 +241,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def shortcutComparison(self):
         return self.shortcut_comparison
+
+    @Property(QObject, constant=True)
+    def tissueRetarget(self):
+        return self.tissue_retarget
 
     @Property(QObject, constant=True)
     def meshReplacement(self):
@@ -432,6 +438,7 @@ class Controller(QObject):
         self.refresh_metrics()
         self.issue_panel.synchronize()
         self.mesh_replacement.synchronize()
+        self.tissue_retarget.synchronize()
         self.inspection_panel.synchronize()
         self.inspection_export.synchronize()
         self.refresh_viewport_tools()
@@ -511,6 +518,7 @@ class Controller(QObject):
         self.creation_selection.synchronize()
         self.issue_panel.synchronize()
         self.mesh_replacement.synchronize()
+        self.tissue_retarget.synchronize()
         self.shortcut_panel.synchronize()
 
     @Slot()

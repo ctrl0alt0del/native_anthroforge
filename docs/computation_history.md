@@ -1,5 +1,23 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: reviewed tissue retarget and complete-bundle fan-out
+
+Tissue source changes now evaluate existing native phases on an owned read-only snapshot.
+Capabilities propose explicit incompatible setting/field/region changes; approved results
+publish together. Ready bundle fan-out excludes prepared outputs while marking/scheduling
+consumers, preserving update modes and the single coordinator. Tests verify that applying
+a completed tissue candidate does not recompute its own base/rest/intrinsic/plan/final.
+No inflation, relaxation, stacking or confirmed-placement numerical kernel was replaced.
+
+A pending Manual Fiber retarget failed because fixed-parent edits declared every potential
+tissue candidate, including an unused consumer. Core support selection is now shared with
+capture: fixed searches declare selected supports/parents; actual Any-parent searches
+retain the complete candidate read set. Existing accepted supports remain dependencies.
+Tests cover the observed false-cycle case, accepted Manual provenance and complete reads
+for Any-parent searches. Ordinary Fiber edit/support tests retain geometry behavior.
+Headless roundtrip/undo and offscreen source/review workflows pass; assembly, performance
+and full release qualification remain pending.
+
 ### In-progress 0.3.4: reviewed imported-source replacement
 
 Replacement assessment now evaluates owned candidate geometry and proposed captures on a

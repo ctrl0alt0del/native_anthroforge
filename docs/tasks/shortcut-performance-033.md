@@ -15,3 +15,13 @@
   portable checks. Deliver one canonical 0.3.3 package and source archive after qualification.
 - No visible desktop interaction. No delegation. Research: Qt Quick performance guidance
   https://doc.qt.io/qt-6/qtquick-performance.html .
+
+## Implementation checkpoint
+
+Property metadata has independent QML subscriptions with hidden-field gating and bounded
+metadata/identity caches. Shared property policies still decide writability. A session-owned
+reverse formula read index conservatively narrows candidates; structural changes retain
+full evaluation checks. Unchanged shortcut contexts no longer reconstruct documents.
+The active job registry maintains provider/consumer links; urgency ranking/donation remains
+unchanged. Focused UI, formula, attachment and priority tests pass; mypy passes. Production
+performance/preservation, full gate and packaging remain pending.

@@ -93,11 +93,13 @@ class Session:
             self.issues.reset()
 
     def attach_shortcut_contexts(self) -> None:
+        from .formula_invalidation import FormulaInvalidation
         from .shortcut_comparison import Comparison
         from .shortcut_contexts import Contexts
         from .shortcut_observation import Observation
 
         self.shortcut_edits = Contexts(self)
+        self.formula_invalidation = FormulaInvalidation()
         self.shortcut_observation = Observation(self)
         self.shortcut_comparison = Comparison(self)
         self.scheduler.observer = self.shortcut_observation.event
@@ -142,7 +144,9 @@ class Session:
         before = self.document
         self.serial += 1
         updated = replace(self.document, revision=self.serial, **changes)
-        updated = replace(updated, shortcut_edits=superseded(self, before, updated))
+        contexts = superseded(self, before, updated)
+        if contexts != updated.shortcut_edits:
+            updated = replace(updated, shortcut_edits=contexts)
         require_changes(self, before, updated)
         self.document = updated
         self.history.observe(self.document)

@@ -4,12 +4,15 @@ from collections.abc import Callable, Hashable, Iterable
 
 from anthroforge.core.jobs import Job
 
+from .job_dependencies import JobDependencies
+
 
 class JobRegistry:
     def __init__(self) -> None:
         self.history: list[Job] = []
         self.by_id: dict[str, Job] = {}
         self.active: dict[str, Job] = {}
+        self.dependencies = JobDependencies()
         self.indexes: dict[str, dict[Hashable, set[str]]] = {
             key: {} for key in ("key", "owner", "port", "legacy", "output", "provides")
         }
@@ -34,8 +37,10 @@ class JobRegistry:
         for index, keys in memberships(job).items():
             for key in keys:
                 self.indexes[index].setdefault(key, set()).add(job.id)
+        self.dependencies.add(self, job)
 
     def unindex(self, job: Job) -> None:
+        self.dependencies.remove(job.id)
         for index, keys in memberships(job).items():
             for key in keys:
                 ids = self.indexes[index].get(key)

@@ -29,7 +29,7 @@ def changed(session: Any, before: Any, exclude: frozenset[str] = frozenset()) ->
         return
     dirty = {
         key
-        for key in formula_inputs.formulas(session.document).keys() - exclude
+        for key in session.formula_invalidation.candidates(before, session.document) - exclude
         if source(before, key) != source(session.document, key)
     }
     if dirty:

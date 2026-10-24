@@ -418,6 +418,7 @@ class Controller(QObject):
 
     @measured("ui", lambda owner: owner.session.profiler)
     def notify(self):
+        self.shortcut_panel.property_queries.synchronize()
         self._state.synchronize(self.snapshot())
         self.changed.emit()
         names = {row["id"]: row["name"] for row in self.rows}

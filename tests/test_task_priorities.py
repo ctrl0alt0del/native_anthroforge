@@ -198,3 +198,19 @@ def test_observation_of_accepted_manual_input_is_not_a_wait_or_priority_donation
     submit(queue, base, other, consumer)
     assert labels(coordinator) == ["consumer", "other", "base"]
     assert base.queue_demand.priority == 0
+
+
+def test_late_multiple_providers_and_removal_keep_remaining_donation(queue):
+    coordinator, _ = queue
+    first, second, consumer = task("first"), task("second"), task("consumer", 100)
+    second.provides = first.provides
+    needs(consumer, first)
+    submit(queue, consumer, first, second)
+    coordinator.queued()
+    assert first.queue_demand.priority == second.queue_demand.priority == 100
+    coordinator.cancel_job(first.id)
+    coordinator.queued()
+    assert second.queue_demand.priority == 100
+    coordinator.cancel_job(consumer.id)
+    coordinator.queued()
+    assert second.queue_demand.priority == 0

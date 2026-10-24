@@ -9,8 +9,8 @@ UiSection {
     readonly property var interval: config.interval || {}
     readonly property var variables: config.variables || []
     readonly property var resolutionReference: ({target:curve.id,path:["engine_settings","resolution"]})
-    readonly property var resolutionState: workspace.shortcutPanel.propertyState(resolutionReference,workspace.state.revision)
-    readonly property string samplingReason: authoring.samplingLockReason(curve.id || "",workspace.state.revision)
+    readonly property var resolutionState: visible ? workspace.shortcutPanel.propertyState(resolutionReference,workspace.shortcutPanel.propertyQueries.versions[resolutionReference.target] || 0) : ({})
+    readonly property string samplingReason: visible ? authoring.samplingLockReason(curve.id || "",workspace.shortcutPanel.propertyQueries.versions[curve.id] || 0) : ""
     title: "Parametric equations"
     visible: curve.engine === "PARAMETRIC"
     UiNotice { active: panel.visible; text: panel.curve.result?.status === "failed" && !panel.curve.result?.asset ? "Invalid Parametric curve · straight-line placeholder only; consumers require an accepted path" : "" }

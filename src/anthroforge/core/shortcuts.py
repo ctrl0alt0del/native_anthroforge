@@ -1,6 +1,7 @@
 """Shortcut wrappers and driver intent, separate from property storage and results."""
 
 from dataclasses import dataclass, field
+from functools import lru_cache
 from uuid import NAMESPACE_URL, uuid4, uuid5
 
 from .numeric_properties import PropertyRef, validate_number
@@ -41,6 +42,7 @@ class AttachmentPolicy:
             raise ValueError("A descendant can have only one shortcut override.")
 
 
+@lru_cache(maxsize=4096)
 def implicit_identity(reference: PropertyRef) -> str:
     address = repr((reference.target, reference.path, reference.component))
     return str(uuid5(NAMESPACE_URL, "anthroforge:shortcut:" + address))

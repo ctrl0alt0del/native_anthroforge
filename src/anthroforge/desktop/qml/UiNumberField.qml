@@ -8,7 +8,7 @@ UiField {
     property bool exactText: false
     property var exactOffset: null
     property var propertyReference: ({})
-    readonly property var propertyState: propertyReference?.target ? workspace.shortcutPanel.propertyState(propertyReference,workspace.state.revision) : ({})
+    readonly property var propertyState: visible && propertyReference?.target ? workspace.shortcutPanel.propertyState(propertyReference,workspace.shortcutPanel.propertyQueries.versions[propertyReference.target] || 0) : ({})
     readonly property bool propertyLocked: !!propertyReference?.target && propertyState.writable === false
     property int decimals: 4
     property bool mixed: false

@@ -7,6 +7,7 @@ from anthroforge.application.shortcut_ownership import property_owners
 from anthroforge.core.numeric_properties import decode_reference
 from anthroforge.core.shortcuts import implicit_identity
 
+from .property_queries import PropertyQueries
 from .quantity_values import QuantityValues, texts
 from .record_model import RecordModel
 from .shortcut_editor import ShortcutEditor
@@ -41,6 +42,7 @@ class ShortcutPanel(QObject):
         self.catalog = RecordModel(self, (*FIELDS, "exposed"), "key")
         self.editor = ShortcutEditor(self)
         self.quantities = QuantityValues(self)
+        self.property_queries = PropertyQueries(self)
 
     def display_changed(self):
         self.display_revision += 1
@@ -150,9 +152,13 @@ class ShortcutPanel(QObject):
     @Slot("QVariantMap", int, result="QVariantMap")
     def propertyState(self, reference, revision):
         try:
-            return property_state(self.controller.session, reference)
+            return self.property_queries.state(reference)
         except (ValueError, KeyError):
             return dict(writable=False, reason="Property is unavailable", exposed=False)
+
+    @Property(QObject, constant=True)
+    def propertyQueries(self):
+        return self.property_queries
 
     @Slot("QVariantMap")
     def openDriver(self, reference):
@@ -247,17 +253,31 @@ def discover_for_panel(panel, search):
     return [row for key in targets for row in property_operations.discover(session, key, search)]
 
 
-def property_state(session, reference):
-    value = property_operations.get(session, reference)
-    key = implicit_identity(decode_reference(reference))
-    driver = controlling_driver(session.document, value["driven_by"])
+def property_state(session, reference, exposed=None):
+    from anthroforge.application.property_guards import driven
+
+    ref = decode_reference(reference)
+    value = metadata_descriptor(session.document, ref)
+    formula = driven(session.document, ref)
+    driver = controlling_driver(session.document, formula)
     return dict(
-        writable=value["writable"] and driver is None,
-        reason=value["reason"] or ("Driven by " + driver.label if driver else ""),
-        exposed=any(s.id == key and s.exposed for s in session.document.shortcuts),
+        writable=value.writable and driver is None,
+        reason=value.reason or ("Driven by " + driver.label if driver else ""),
+        exposed=is_exposed(session.document, ref, exposed),
         driver=driver.id if driver else "",
-        formula=value["driven_by"],
+        formula=formula,
     )
+
+
+def metadata_descriptor(document, reference):
+    from anthroforge.application import parametric_policy, property_catalog
+
+    return parametric_policy.descriptor(document, property_catalog.resolve(document, reference))
+
+
+def is_exposed(document, reference, exposed):
+    keys = exposed if exposed is not None else {s.id for s in document.shortcuts if s.exposed}
+    return implicit_identity(reference) in keys
 
 
 def controlling_driver(document, formula):

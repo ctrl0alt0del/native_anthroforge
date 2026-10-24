@@ -32,13 +32,7 @@ def live(job: Job) -> bool:
 
 
 def prerequisites(registry: JobRegistry, active: dict[str, Job]) -> dict[str, set[str]]:
-    edges: dict[str, set[str]] = {key: set() for key in active}
-    for provider in active.values():
-        for port in provider.provides:
-            for key in registry.indexes["port"].get(port, ()):
-                if key in active and key != provider.id and port in active[key].prerequisites:
-                    edges[key].add(provider.id)
-    return edges
+    return registry.dependencies.live(active)
 
 
 def donate(root: Job, edges: dict[str, set[str]], ranks: dict[str, QueueDemand]) -> None:

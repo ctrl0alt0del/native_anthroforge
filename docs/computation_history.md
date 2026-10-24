@@ -2214,3 +2214,21 @@ average. This is a read-only formula input; no new write channel is introduced.
   Thumb differs only in existing triangle enumeration. Capture measured 24–37 ms and
   explicit comparison 431–587 ms. These are workload observations, not controlled overhead
   or speedup claims. See the [task record](tasks/shortcut-comparison-032.md).
+
+### CH-070 â€” Targeted shortcut observation and incremental priority edges (qualification pending)
+
+- Observed on the 96-muscle assembly: repeated UI property queries on unrelated result
+  revisions, 82,096 formula source checks in one Ribs update, duplicate document creation,
+  and repeated rebuilding of active priority dependency edges.
+- Property metadata subscriptions now follow definitions/relationships rather than global
+  result revisions. Invisible numeric fields do not request metadata. Stable shortcut IDs
+  use a bounded pure cache; metadata avoids reading numerical values it does not consume.
+- Formula candidate lookup uses reverse reads owned by the session. Exact before/after
+  source validation remains authoritative; structural changes conservatively inspect all.
+- Publication omits the second immutable-document replacement when shortcut context is
+  unchanged. The job registry updates producer/consumer edges on add/update/removal;
+  temporary urgency donation and queue ordering semantics are preserved.
+- No geometry, attachment, formula language, numerical tolerances, schema or save behavior
+  changes. Ownership/coupling and performance qualification are tracked in
+  [the task record](tasks/shortcut-performance-033.md). Initial contract tests and typing pass;
+  production preservation and final delivery evidence are pending.

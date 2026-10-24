@@ -1,4 +1,9 @@
-# AnthroForge 0.3.0
+# AnthroForge 0.3.1
+
+Shortcut inspection adds affected-output navigation, captured formula evidence, effective
+attachment policies and propagation status, with optional viewport effects. See the
+[0.3.1 walkthrough](docs/shortcuts_031.md). Numerical geometry, attachments and schema 5
+remain unchanged.
 
 0.3 adds numerical-property shortcuts, typed driving formulas, attachment-edit policies
 and general XYZ Parametric curves. See the [walkthrough](docs/shortcuts_030.md),
@@ -6,9 +11,10 @@ and general XYZ Parametric curves. See the [walkthrough](docs/shortcuts_030.md),
 Projects save in schema 5; existing 0.2.4/schema-4 projects remain readable with their
 accepted geometry and attachments preserved. Blender shortcut migration is separate.
 
-The current Windows gate passes 1,996 tests and all five native tests.
-The packaged executable passes the full minimal-PATH portable suite and the
-generated-point resolution-lock check. The subsequent one-file skeleton migration adds
+The final 0.3.1 suite passes 2,026 tests and all five native tests; the development gate,
+full minimal-PATH portable suite and background GUI/render checks pass.
+See [0.3.1 delivery evidence and limits](docs/tasks/shortcut-inspection-031.md).
+The earlier one-file skeleton migration adds
 retained Bézier construction and an explicit attachment-policy scope for multi-SCP controls.
 See [delivery evidence and limits](docs/development_status.md#shortcuts-and-parametric-curves-030).
 
@@ -50,7 +56,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.3.0/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.3.1/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included

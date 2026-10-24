@@ -1,7 +1,28 @@
 # AnthroForge development validation
 
-Current qualification is in [shortcuts and Parametric curves](#shortcuts-and-parametric-curves-030).
+Current qualification is in [shortcut inspection](#shortcut-inspection-031).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Shortcut inspection (0.3.1)
+
+Influence, formula evidence, effective attachment policies and downstream completion are
+implemented in the shared API and existing shortcut editor. Optional Show effects overlays
+use displayed geometry and native anchor queries. See the [walkthrough](shortcuts_031.md)
+and [detailed qualification](tasks/shortcut-inspection-031.md).
+
+The development gate passed; the final suite has **2,026 passing tests**. Five native CTests,
+configured strict typing, style and numerics pass. The canonical executable passes full
+minimal-PATH portable workflows. A relocated package also passes an offscreen editor harness
+against compiled adapters. Actual D3D11 texture captures show effect outlines and anchors;
+numeric field bounds remain stable during source-runtime editor tests. These are background
+checks, not physical interactive acceptance.
+
+Four changes on the 96-muscle assembly preserve every vertex, pose, attachment and oriented
+triangle connectivity against `00e7339`. Thumb Boolean output has different triangle
+enumeration only. Combined inspection queries measured 3.54–8.32 ms median; the profiled,
+non-isolated trials do not establish an application speed improvement. Existing deferred
+Ribs/Thumb addon parity differences remain. Ownership and coupling were separately reviewed:
+inspection owns no scheduling policy, numerical algorithm, attachment policy or persisted state.
 
 ## Shortcuts and Parametric curves (0.3.0)
 

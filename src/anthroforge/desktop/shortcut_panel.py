@@ -23,6 +23,7 @@ FIELDS = (
     "reason",
     "ownerLabel",
     "kind",
+    "statusText",
 )
 
 
@@ -35,10 +36,16 @@ class ShortcutPanel(QObject):
         self.controller = controller
         self.active, self.all, self.search = False, False, ""
         self.signature = None
+        self.display_revision = 0
         self.model = RecordModel(self, FIELDS, "key")
         self.catalog = RecordModel(self, (*FIELDS, "exposed"), "key")
         self.editor = ShortcutEditor(self)
         self.quantities = QuantityValues(self)
+
+    def display_changed(self):
+        self.display_revision += 1
+        self.synchronize()
+        self.editor.inspection.changed.emit()
 
     @Property(QObject, constant=True)
     def quantityValues(self):
@@ -59,6 +66,8 @@ class ShortcutPanel(QObject):
     @Slot(bool, bool, str)
     def configure(self, active, all_objects, search):
         self.active, self.all, self.search = active, all_objects, search
+        if not active:
+            self.editor.inspection.clear()
         self.signature = None
         self.synchronize()
 
@@ -71,17 +80,34 @@ class ShortcutPanel(QObject):
         if not self.active:
             return
         session = self.controller.session
-        signature = (session, session.document.revision, self.controller.selection)
+        self.editor.inspection.synchronize()
+        signature = self.current_signature(session)
         if signature == self.signature:
             return
         self.signature = signature
+        self.refresh_rows()
+        self.editor.synchronize()
+
+    def current_signature(self, session):
+        return (
+            session,
+            session.document.revision,
+            self.controller.selection,
+            session.shortcut_observation.serial,
+            self.display_revision,
+        )
+
+    def refresh_rows(self):
+        from .shortcut_inspection_view import badge
+
+        session = self.controller.session
         selected = "" if self.all else self.selected_owner()
         values = shortcut_operations.listing(session, selected, self.search)
         rows = [
             self.shortcut_row(v) if "reference" in v else driver_row(session, v) for v in values
         ]
+        rows = [dict(row, statusText=badge(self, row["key"])) for row in rows]
         self.model.synchronize_records(rows if self.all or selected else [])
-        self.editor.synchronize()
 
     def shortcut_row(self, value):
         try:
@@ -99,6 +125,7 @@ class ShortcutPanel(QObject):
                 key=key,
                 label=label or value["label"],
                 ownerLabel=owners or "Unassigned",
+                statusText="",
             )
         )
 

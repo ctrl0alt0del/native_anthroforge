@@ -5,6 +5,8 @@ Item {
     id: outline
     required property var sourceCamera
     property bool orthographic: false
+    property real useMaskColors: 0
+    property Component content
     property alias sceneRoot: maskRoot
     View3D {
         id: maskView; anchors.fill: parent
@@ -14,7 +16,10 @@ Item {
             antialiasingMode: SceneEnvironment.MSAA; antialiasingQuality: SceneEnvironment.High
         }
         PresentationCamera { id: rig; sourceCamera: outline.sourceCamera; orthographic: outline.orthographic }
-        Node { id: maskRoot; eulerRotation.x: -90 }
+        Node {
+            id: maskRoot; eulerRotation.x: -90
+            Loader3D { active: outline.visible; sourceComponent: outline.content }
+        }
     }
     ShaderEffectSource {
         id: maskTexture; sourceItem: maskView; hideSource: true; live: outline.visible
@@ -24,6 +29,7 @@ Item {
         anchors.fill: parent
         property var source: maskTexture
         property vector2d texel: Qt.vector2d(1/Math.max(1,width), 1/Math.max(1,height))
+        property real useMaskColors: outline.useMaskColors
         fragmentShader: "qrc:/anthroforge/shaders/outline.frag.qsb"
     }
 }

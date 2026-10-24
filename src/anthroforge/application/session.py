@@ -94,14 +94,18 @@ class Session:
 
     def attach_shortcut_contexts(self) -> None:
         from .shortcut_contexts import Contexts
+        from .shortcut_observation import Observation
 
         self.shortcut_edits = Contexts(self)
+        self.shortcut_observation = Observation(self)
+        self.scheduler.observer = self.shortcut_observation.event
         self.scheduler.annotate = self.shortcut_edits.annotate
         self.scheduler.before_dispatch = self.shortcut_edits.require
 
     def synchronize_services(self) -> None:
         self.issues.synchronize()
         self.shortcut_edits.synchronize()
+        self.shortcut_observation.prune()
 
     @property
     def engine(self) -> GeometryEngine:
@@ -181,9 +185,11 @@ class Session:
 
         released(self)
         self.shortcut_edits.active = ""
+        self.shortcut_observation.finish_gesture()
 
     @measured("transaction", lambda session: session.profiler)
     def cancel(self) -> None:
+        self.shortcut_observation.finish_gesture(cancelled=True)
         self.shortcut_edits.active = ""
         self.document = replace(self.history.cancel(), workspaces=self.document.workspaces)
         self.scheduler.restore(self.history.surviving())
@@ -196,6 +202,7 @@ class Session:
         if self.waiting_save:
             raise ValueError("History is blocked while waiting to save.")
         previous = self.document
+        self.shortcut_observation.restore()
         self.document = replace(self.history.navigate(direction), workspaces=previous.workspaces)
         self.remember_restarts(self.scheduler.restore(self.history.surviving()))
         changed = changed_ids(previous, self.document)

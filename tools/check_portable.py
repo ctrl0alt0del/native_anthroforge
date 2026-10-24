@@ -50,6 +50,7 @@ CHECKS = (
     "accepted tissue stages, displacement, point explanations and advisory geometry reports",
     "stacking footprints, material brush commit/undo, section cutaways and routed Fiber evidence",
     "shortcut formulas, typed Parametric paths, schema-5 results and native consumer rendering",
+    "shortcut influence, captured formula inputs, effective policy and propagation completion",
 )
 
 

@@ -14,8 +14,7 @@ def shortcuts(executable, cwd, invoke):
     (cwd / "shortcuts.json").write_text(json.dumps(requests))
     output = invoke(executable, cwd, "--cli", "run", "shortcuts.json")
     rows = [json.loads(row) for row in output.splitlines() if row.startswith("{")]
-    assert rows and all(row["ok"] for row in rows), rows
-    assert next(r for r in rows if r["id"] == "radius_result")["result"]["value"] == 0.05
+    verify_results(rows)
     geometry(cwd / "shortcuts.anthroforge")
     state = json.loads(invoke(executable, cwd, "--cli", "inspect", "shortcuts.anthroforge"))
     render(executable, cwd, invoke, state)
@@ -32,8 +31,25 @@ def consumer_requests():
         inspect,
         request("body.update", **dimensions),
         request("wait"),
+        *inspection_requests(),
         request("save", path="shortcuts.anthroforge", blocked_policy="wait"),
     ]
+
+
+def inspection_requests():
+    return [
+        dict(id="inspect_" + name, **request("shortcut." + name, shortcut="$radius_driver"))
+        for name in ("effects", "formulas", "attachment_policy", "progress")
+    ]
+
+
+def verify_results(rows):
+    assert rows and all(row["ok"] for row in rows), rows
+    results = {r["id"]: r["result"] for r in rows if "id" in r}
+    assert results["radius_result"]["value"] == 0.05
+    assert results["inspect_effects"]["total"] > 0
+    assert results["inspect_formulas"]["rows"][0]["inputs"][0]["captured_value"] == 0.05
+    assert results["inspect_progress"]["state"] == "complete"
 
 
 def request(operation, **arguments):

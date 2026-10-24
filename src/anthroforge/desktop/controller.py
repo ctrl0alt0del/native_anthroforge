@@ -476,11 +476,15 @@ class Controller(QObject):
         self.refresh_if_needed()
         self.section_tools.synchronize()
         self.route_inspection.synchronize()
-        self.creation_selection.synchronize()
-        self.issue_panel.synchronize()
+        self.refresh_runtime_panels()
         self.tick_count += 1
         if self.tick_count % 15 == 0:
             self.notify()
+
+    def refresh_runtime_panels(self):
+        self.creation_selection.synchronize()
+        self.issue_panel.synchronize()
+        self.shortcut_panel.synchronize()
 
     @Slot()
     def frame_presented(self):
@@ -501,6 +505,7 @@ class Controller(QObject):
         from anthroforge.application.geometry_ownership import collect
 
         collect(self.session)
+        self.shortcut_panel.display_changed()
         self.notify()
 
     def refresh_if_needed(self):

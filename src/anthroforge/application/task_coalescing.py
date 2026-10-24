@@ -43,6 +43,8 @@ def reuse(coordinator: Any, request: Job) -> str:
             pending.interactive |= request.interactive
             merge(pending, request.urgency)
             pending.label = request.label
+            pending.causes = tuple(sorted(set(pending.causes) | set(request.causes)))
+            coordinator.observer(pending, "coalesced")
             trace.event(coordinator.profiler, pending, "coalesced")
             request.retire()
             return str(pending.id)

@@ -1,5 +1,10 @@
 # AnthroForge release roadmap
 
+- **0.3.1 — qualified:** shortcut influence, formula evidence, effective
+  attachment inspection and downstream propagation status; optional displayed-geometry
+  effects. [Walkthrough](shortcuts_031.md), [qualification](tasks/shortcut-inspection-031.md).
+  Schema 5, geometry and attachment behavior remain unchanged.
+
 - **0.3 / 0.3.0 — qualified:** numerical-property shortcut wrappers,
   explicit controls, driving formulas with inferred ownership and addon attachment-edit
   policies, and the Parametric curve engine. [Contract](specification_030.md),

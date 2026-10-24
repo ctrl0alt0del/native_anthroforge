@@ -235,7 +235,10 @@ def query_handler(operation: str) -> Any:
 
 
 def shortcut_queries(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    from .shortcut_inspection import operations
+
     queries: dict[str, Any] = {
+        **operations(),
         "property.discover": property_operations.discover,
         "property.get": property_operations.get,
         "shortcut.inspect": shortcut_operations.inspect,

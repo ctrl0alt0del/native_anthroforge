@@ -23,6 +23,7 @@ Item {
     property string viewName: "User view"
     property string toolMode: "Move"
     property string anchorMode: ""
+    ViewSnapshot { id: shortcutEffects; source: workspace.shortcutPanel.editing.inspectionView }
     property bool orthographic: false
     readonly property vector3d imageViewAxis: Qt.vector3d(view.camera.forward.x, -view.camera.forward.z, view.camera.forward.y)
     readonly property string imageAlignmentAxis: !orthographic ? "" : Math.abs(imageViewAxis.x)>0.999999 ? "X" : Math.abs(imageViewAxis.y)>0.999999 ? "Y" : Math.abs(imageViewAxis.z)>0.999999 ? "Z" : ""
@@ -242,12 +243,29 @@ Item {
             materials: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: "#33363c"; cullMode: Material.NoCulling }
             opacity: .22
         }
-        PathScene {}
+        PathScene { effects: shortcutEffects.data }
         Node {
             id: worldScene
             eulerRotation.x: -90
             TissueInspectionScene { distance: viewport.distance }
             RouteInspectionScene { distance: viewport.distance }
+            Model {
+                objectName: "shortcutAnchorEffects"
+                geometry: ControlGeometry { points: shortcutEffects.data.lines || []; segments: true; stroke: viewport.distance*.0015 }
+                materials: DefaultMaterial { diffuseColor: "#76e6ac"; lighting: DefaultMaterial.NoLighting }
+            }
+            Model {
+                geometry: ControlGeometry { points: shortcutEffects.data.lines || []; radius: viewport.distance*.004 }
+                materials: DefaultMaterial { diffuseColor: "#76e6ac"; lighting: DefaultMaterial.NoLighting }
+            }
+            Model {
+                geometry: ControlGeometry { points: shortcutEffects.data.effective_lines || []; segments: true; stroke: viewport.distance*.0018 }
+                materials: DefaultMaterial { diffuseColor: "#e99afa"; lighting: DefaultMaterial.NoLighting }
+            }
+            Model {
+                geometry: ControlGeometry { points: shortcutEffects.data.effective_lines || []; radius: viewport.distance*.005 }
+                materials: DefaultMaterial { diffuseColor: "#e99afa"; lighting: DefaultMaterial.NoLighting }
+            }
             PointScene { markerScale: viewport.gizmoSize * 0.0012 }
             ImageScene { layer: "NORMAL"; orthographic: viewport.orthographic; viewAxis: viewport.imageViewAxis }
             Repeater3D {
@@ -324,6 +342,12 @@ Item {
     AuthoringView {
         anchors.fill: parent; sourceCamera: view.camera
         orthographic: viewport.orthographic; distance: viewport.distance
+    }
+    SelectionOutline {
+        id: shortcutOutline; objectName: "shortcutEffectsOutline"; anchors.fill: parent
+        sourceCamera: view.camera; orthographic: viewport.orthographic; useMaskColors: 1
+        visible: !!shortcutEffects.data.shown
+        content: Component { ShortcutEffectMeshes { effects: shortcutEffects.data } }
     }
     MouseArea {
         id: navigation

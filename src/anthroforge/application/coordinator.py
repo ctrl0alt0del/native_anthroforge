@@ -40,6 +40,7 @@ class TaskCoordinator:
     def _initialize_scheduling(self, clock: Callable[[], float]) -> None:
         self.service_tick: Callable[[], None] = lambda: None
         self.lifecycle: Callable[[Job, str], None] = lambda job, phase: None
+        self.observer: Callable[[Job, str], None] = lambda job, phase: None
         self.profiler: Any = None
         self.metrics = Metrics()
         self.task_schedulers = task_schedulers()
@@ -65,6 +66,7 @@ class TaskCoordinator:
 
     def submit(self, job: Job) -> str:
         self.annotate(job, self.current())
+        self.observer(job, "requested")
         self.priorities.capture(job, self.clock())
         return task_coalescing.reuse(self, job) or self._submit(job)
 
@@ -78,6 +80,7 @@ class TaskCoordinator:
         job.queued_since = self.clock() if job.queued_since is None else job.queued_since
         self.registry.add(job)
         self.lifecycle(job, "submitted")
+        self.observer(job, "submitted")
         trace.event(self.profiler, job, "queued")
         self._admit(job)
         self._checkpoint()
@@ -223,7 +226,14 @@ class TaskCoordinator:
         job = self.registry.by_id[job_id]
         if job.active or job.retry is None:
             raise ValueError("This calculation cannot be retried in its current state.")
-        return job.retry()
+        return self.run_retry(job)
+
+    def run_retry(self, job: Job) -> Any:
+        self.observer(job, "retry_begin")
+        try:
+            return job.retry() if job.retry else None
+        finally:
+            self.observer(job, "retry_end")
 
     def restore(self, surviving: set[int]) -> list[Restart]:
         self.epoch += 1
@@ -373,6 +383,7 @@ class TaskCoordinator:
         self.task_schedulers[job.kind].observe(job)
         trace.event(self.profiler, job, job.state)
         self.lifecycle(job, "terminal")
+        self.observer(job, "terminal")
         self.registry.finish(job)
 
     def _cleanup(self, job: Job, state: str) -> None:
@@ -380,7 +391,7 @@ class TaskCoordinator:
             if job.cleanup is not None:
                 job.cleanup(state)
             if job.restart_requested and state == "obsolete" and job.retry:
-                job.retry()
+                self.run_retry(job)
         except Exception as error:
             job.state, job.error = "failed", str(error)
             job.obsolete = False

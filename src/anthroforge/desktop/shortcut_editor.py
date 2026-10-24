@@ -8,6 +8,7 @@ from anthroforge.application import driving_operations, property_operations, sho
 from anthroforge.core.shortcuts import Shortcut
 
 from .record_model import RecordModel
+from .shortcut_inspection_view import ShortcutInspectionView
 from .shortcut_policy_editor import ShortcutPolicyEditor
 from .values import qml
 
@@ -19,6 +20,7 @@ class ShortcutEditor(QObject):
         super().__init__(panel)
         self.panel, self.key, self.state = panel, "", {}
         self.policy_editor = ShortcutPolicyEditor(self)
+        self.inspection = ShortcutInspectionView(self)
         self.choices = RecordModel(self, ("key", "label", "reference", "driver"), "key")
         self.rows = RecordModel(
             self,
@@ -42,8 +44,31 @@ class ShortcutEditor(QObject):
     def policies(self):
         return self.policy_editor
 
+    @Property(QObject, constant=True)
+    def inspectionView(self):
+        return self.inspection
+
+    @Property("QVariantMap", notify=changed)
+    def propertyValue(self):
+        from .shortcut_panel import numeric_row
+
+        value = self.selected()
+        if not isinstance(value, Shortcut):
+            return {}
+        return qml(
+            numeric_row(
+                property_operations.get(self.panel.controller.session, asdict(value.reference))
+            )
+        )
+
+    @Slot(int, "QVariant")
+    def editProperty(self, component, value):
+        self.panel.editValue(self.key, component, value, False)
+
     @Slot(str)
     def select(self, key):
+        if key != self.key:
+            self.inspection.clear()
         self.key = key
         self.synchronize()
 
@@ -57,10 +82,13 @@ class ShortcutEditor(QObject):
         if updated != self.state:
             self.state = updated
             self.changed.emit()
+        elif isinstance(value, Shortcut):
+            self.changed.emit()
         self.rows.synchronize_records(
             self.formula_rows(value) if updated.get("kind") == "DRIVER" else []
         )
         self.policy_editor.synchronize()
+        self.inspection.synchronize()
 
     def formula_rows(self, value):
         session = self.panel.controller.session

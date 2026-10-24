@@ -3,6 +3,8 @@ import QtQuick3D
 import AnthroForge.Native 1.0
 
 Repeater3D {
+    property var effects: ({})
+    id: paths
     model: workspace.pathModel
     delegate: Node {
         required property var item
@@ -24,5 +26,16 @@ Repeater3D {
             }
         }
         ResourceLoader { geometries: [path.geometry] }
+        Model {
+            visible: path.visible && !!paths.effects.shown && !!paths.effects.colors?.[item.id]
+            geometry: path.geometry
+            instancing: path.instancing
+            opacity: path.opacity
+            materials: DefaultMaterial {
+                lighting: DefaultMaterial.NoLighting
+                diffuseColor: paths.effects.colors?.[item.id] || "transparent"
+                lineWidth: 4
+            }
+        }
     }
 }

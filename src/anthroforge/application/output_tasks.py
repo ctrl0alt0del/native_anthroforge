@@ -51,5 +51,6 @@ def propagate(session: Any, seeds: set[Port]) -> None:
 
 def producers(document: Any) -> set[Port]:
     roles = set().union(*(role for role, _ in FAMILIES))
-    result = {port for port in dependencies.graph(document) if port.output in roles}
+    result = {port for port in dependencies.graph(document)
+              if port.output in roles and port.owner in document.registry.records}
     return result | {Port(item.id, "geometry") for item in geometry_outputs.items(document)}

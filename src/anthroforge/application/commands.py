@@ -48,6 +48,7 @@ from . import (
     surface_operations,
     surface_preview,
     surface_sources,
+    symmetric_paths,
     tissue_field_operations,
     tissue_operations,
     tissue_painting,
@@ -66,6 +67,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "mirror.loop.create": symmetric_paths.create,
     "mirror.configure": mirror_operations.configure,
     "mirror.attachment.share": mirror_operations.share_target,
     "driver.create": driving_operations.create,

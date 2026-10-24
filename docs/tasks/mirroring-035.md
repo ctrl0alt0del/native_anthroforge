@@ -48,6 +48,13 @@ mirror, desktop, point-interaction and tissue-contract tests. Mypy passed at the
 foundation checkpoint; rerun after subsequent changes is required. CH-071 records the
 actual computational boundary change. Full rerun, complete provider integration,
 symmetric construction, stacking and release acceptance remain pending.
+Native symmetric-half path expansion and mirrored-row ordering now build successfully;
+all five native CTests passed. Seven source-construction tests cover Bézier/polyline/
+routed exact half reflection, invalid input rollback, one-row surface creation,
+direct mirrored-row updates/undo and persistence. Mirrored provider graph aliases now
+let original routed curves avoid reflected obstacles; a dedicated case passes.
+Further work remains on stacking providers, full attachment/query/presentation coverage,
+seam edit constraints, native style, profiling, offscreen visuals and packaging.
 Checks remain background-only; do not claim interactive acceptance.
 Checkpoint coherent increments and push before long checks or interruptions.
 

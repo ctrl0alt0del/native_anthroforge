@@ -47,6 +47,16 @@ class SharedMirrorTarget:
     binding: str
 
 
+@dataclass(frozen=True, slots=True)
+class SymmetricHalf:
+    rule: str = ""
+    axis: str = "X"
+    shift: float = 0.0
+
+    def __post_init__(self) -> None:
+        MirrorRule("half", axis=self.axis, shift=self.shift)
+
+
 def parse(value: str) -> MirrorInstance | None:
     if not value.startswith(PREFIX):
         return None

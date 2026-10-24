@@ -39,6 +39,8 @@ class Structure:
     dependencies: dependency_graph.DependencyGraph
     attachments: bool
     object_links: tuple[Any, ...] = ()
+    mirror_base: dependency_graph.DependencyGraph | None = None
+    mirror_instances: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

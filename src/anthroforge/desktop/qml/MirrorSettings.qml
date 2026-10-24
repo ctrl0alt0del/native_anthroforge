@@ -7,15 +7,23 @@ UiSection {
     title: "Mirror"
     property var selected: workspace.selectedData
     readonly property var settings: selected.mirror_settings || {}
-    visible: !!selected.id && !selected.mirror_source && (!selected.is_construction || selected.is_tissue)
+    readonly property bool anatomical: !selected.is_construction && !selected.is_control
+    visible: !!selected.id && !selected.mirror_source && selected.kind !== "IMAGE"
     enabled: !selected.readonly && !workspace.state.waiting
     function update(values) {
         workspace.run("mirror.configure", Object.assign({target:selected.id}, values));
     }
     UiCheck {
         objectName: "mirrorChildren"; text: "Mirror children"
+        visible: panel.anatomical
         checked: panel.settings.enabled || false
         onClicked: panel.update({enabled:checked})
+    }
+    UiCheck {
+        objectName: "mirrorPlaneOverride"; text: "Override inherited plane"
+        visible: !panel.anatomical
+        checked: panel.settings.override || false
+        onClicked: panel.update({override:checked})
     }
     UiCheck {
         objectName: "mirrorInherit"; text: "Inherit parent mirror"
@@ -24,7 +32,7 @@ UiSection {
     }
     RowLayout {
         Layout.fillWidth: true
-        enabled: panel.settings.enabled || false
+        enabled: panel.settings.enabled || panel.settings.override || false
         Label { text: "Axis"; color: Theme.muted }
         UiCombo {
             objectName: "mirrorAxis"; Layout.fillWidth: true; model: ["X", "Y", "Z"]

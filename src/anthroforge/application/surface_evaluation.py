@@ -9,7 +9,7 @@ from anthroforge.native import curve_surfaces as native
 from anthroforge.native import material_pins
 from anthroforge.native.topology import finalize
 
-from . import consumed_paths, curve_sources, surface_pins
+from . import consumed_paths, curve_sources, surface_pins, symmetric_surfaces
 
 
 def settings(item: Surface) -> native.Settings:
@@ -54,16 +54,23 @@ def correspondence(row: native.Row, value: SurfaceAlignment, indices: dict[str, 
 
 
 def layout(engine: Any, document: Any, resources: Any, item: Surface, cancel: int) -> Surface:
+    if item.mirrored_rows:
+        item = replace(item, mirror_order=(), across=())
     if item.kind == "BRANCHED":
         return replace(item, alignment=(), across=())
     values, across = native.layout(
         engine, rows(engine, document, resources, item, True), settings(item), cancel
     )
-    alignment = tuple(
-        stable_alignment(document, resources, use.curve, value)
-        for use, value in zip(item.curves, values, strict=True)
+    alignment = alignments(document, resources, item, values)
+    candidate = replace(item, alignment=alignment, across=tuple(map(int, across)))
+    return symmetric_surfaces.layout(
+        engine, document, resources, candidate, rows(engine, document, resources, candidate), cancel
     )
-    return replace(item, alignment=alignment, across=tuple(map(int, across)))
+
+
+def alignments(document: Any, resources: Any, item: Surface, values: Any) -> tuple[SurfaceAlignment, ...]:
+    return tuple(stable_alignment(document, resources, use.curve, value)
+                 for use, value in zip(item.curves, values, strict=True))
 
 
 def stable_alignment(document: Any, resources: Any, curve: str, values: Any) -> SurfaceAlignment:
@@ -89,7 +96,9 @@ def evaluate(engine: Any, document: Any, resources: Any, item: Surface, cancel: 
 
 def ordinary(engine: Any, document: Any, resources: Any, item: Surface, cancel: int) -> Any:
     inputs = rows(engine, document, resources, item)
+    inputs = symmetric_surfaces.expand(engine, document, item, inputs)
     counts = item.across or (max(1, item.strips) - 1,) * (len(item.curves) - 1)
     mesh = native.geometry(engine, inputs, counts, settings(item), cancel)
     pins = surface_pins.points(document, resources, [use.curve for use in item.curves])
+    pins = symmetric_surfaces.pins(item, pins)
     return material_pins.capture(mesh, inputs, pins, item.exact, cancel, across=counts)

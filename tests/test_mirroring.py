@@ -120,3 +120,20 @@ def test_plane_change_updates_bound_anchor_without_rebinding(session, assembly):
     np.testing.assert_allclose(
         np.array(after.resolved_position) - before.resolved_position, [2, 0, 0]
     )
+
+
+def test_routed_source_automatically_avoids_reflected_obstacle(session):
+    from tests.conftest import CUBE
+
+    root = session.command("scp.empty", name="Root")
+    bone = session.command("import", path=str(CUBE), units=.5, parent=root)["entity_id"]
+    session.command("wait")
+    session.command("scp.transform", entity=bone, values=[2, 0, 0, 0, 0, 0, 1, 1, 1])
+    key = session.command("curve.create", engine="ROUTED", points=[dict(position=p) for p in [(-2, 0, -2), (-2, 0, 2)]])
+    session.command("wait")
+    session.command("mirror.configure", target=root, enabled=True)
+    session.command("wait")
+    item = session.document.object(key)
+    assert item.result.status == "ready", item.result.error
+    samples = session.resources.paths[item.result.asset].path.array()[:, :2]
+    assert np.max(np.linalg.norm(samples - [-2, 0], axis=1)) > .2

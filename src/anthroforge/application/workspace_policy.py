@@ -7,8 +7,8 @@ from anthroforge.core.entities import Workspace, descendants
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.image_presentation import decode as decode_image
 from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
-from anthroforge.core.points import Anchor
 from anthroforge.core.mirroring import source as mirror_source
+from anthroforge.core.points import Anchor
 
 if TYPE_CHECKING:
     from .session import Session

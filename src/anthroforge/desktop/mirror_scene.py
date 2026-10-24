@@ -15,7 +15,7 @@ def synchronize(projection):
         for key, value in document.mirrors.instances.items()
         if value.source in sources
     }
-    for key, row in projection.records.items():
+    for key, row in sources.items():
         row["mirror_settings"] = asdict(document.mirrors.rules.get(key, MirrorRule(key)))
 
 

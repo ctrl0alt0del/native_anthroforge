@@ -38,7 +38,7 @@ def conflict(document: Any, target: str) -> Issue:
         target=target,
         source=fingerprint(source(document, "document")),
         local_key=target,
-        details="Choose an explicit construction plane override; no parent was selected implicitly.",
+        details="Choose an explicit construction plane override; no parent was chosen implicitly.",
     )
 
 

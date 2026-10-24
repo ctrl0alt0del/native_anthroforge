@@ -11,6 +11,9 @@ AF_API uint64_t af_path_evaluate(const double* records, int count, int engine,
     int closed, int resolution, uint64_t cancel);
 AF_API uint64_t af_path_restore(const double* samples, const double* parameters,
     int count, int closed);
+/* Expand a validated authored half into a closed path without duplicate seam points.
+ * Reflection is expressed in the half's local coordinates; source data is unchanged. */
+AF_API uint64_t af_path_symmetric(uint64_t path,const double* reflection,uint64_t cancel);
 /* XYZ programs share typed inputs beginning with dimensionless t. Closed sampling
  * excludes the interval end; output contains exactly count points and no seam copy. */
 AF_API uint64_t af_parametric_path(const uint64_t* handles,int variables,

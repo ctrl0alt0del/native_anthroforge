@@ -2267,3 +2267,24 @@ average. This is a read-only formula input; no new write channel is introduced.
 - Follow-up work: complete symmetric construction, provider consumers, stacking,
   display/publication lifecycle, UI controls and measured qualification under
   [the task record](tasks/mirroring-035.md).
+
+### CH-072 — Native symmetric source construction (0.3.5, in progress)
+
+- Inventory: C01–C03, G09 and general surface sampling. Source half-path expansion and
+  mirrored-row surfaces are source constructions, not independent mirror evaluation.
+- Added owned C++ path expansion: preserve every accepted half sample, append the
+  reversed reflected interior, retain each seam once and rebuild native presentation
+  and picking buffers. Closure parameters retain authored half identities; the reflected
+  closing domain is derived and not an extra editable knot list. Tangents/normals and
+  tilt are reflected explicitly. Validate seam and one-sided interior before publication.
+- Added C++ mirrored-row ordering using evaluated consumer rows, world-axis centroid
+  distances and stable ordering, matching the inspected addon convention. Plane rows
+  are not duplicated; already-spanning input rows are retained. Layout/material pins
+  are persisted/remapped at the consumer boundary and changes use ordinary transactions.
+- Provider graph aliases express reflected geometry as source output + source pose +
+  plane revision. They are not task producers. Automatic source routing can use reflected
+  obstacles with ordinary read validation and cycle filtering; no mirror route is solved.
+- Evidence so far: five native CTests pass after build; seven focused symmetric-source
+  tests and one automatic mirrored-obstacle routing case pass. Numerical/GUI/parity,
+  memory and performance release qualification remain pending. Existing source inflation,
+  smoothing and routing objectives are unchanged. See the ongoing task for limitations.

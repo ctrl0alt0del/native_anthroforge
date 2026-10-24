@@ -37,7 +37,8 @@ def required(item: Any) -> frozenset[str]:
     if isinstance(item, TissueVCP):
         refs.add(item.source)
     for binding in getattr(item, "deformers", ()):
-        refs.update(deformer_sources(binding))
+        if binding.control:
+            refs.add(binding.control)
     return frozenset(refs)
 
 
@@ -115,7 +116,7 @@ def propagate(records: Any, settings: Any, resolved: Any) -> bool:
     for key, item in records.items():
         if isinstance(item, ReferenceImage):
             continue
-        choices = inherited_choices(item, resolved) if not isinstance(item, SCP) else set()
+        choices = inherited_choices(item, settings, resolved) if not isinstance(item, SCP) else set()
         for ref in required(item):
             choices_for_ref = resolved.get(key, set())
             changed |= merge(ref, choices_for_ref, settings, resolved)
@@ -124,13 +125,16 @@ def propagate(records: Any, settings: Any, resolved: Any) -> bool:
     return changed
 
 
-def inherited_choices(item: Any, resolved: Any) -> set[str]:
-    return set().union(*(resolved.get(ref, set()) for ref in dependencies(item)))
+def inherited_choices(item: Any, settings: Any, resolved: Any) -> set[str]:
+    return set().union(*(
+        {ref} if ref in settings and settings[ref].enabled else resolved.get(ref, set())
+        for ref in dependencies(item)
+    ))
 
 
 def merge(key: str, choices: set[str], settings: Any, resolved: Any) -> bool:
     rule = settings.get(key, MirrorRule(key))
-    if not rule.inherit:
+    if not rule.inherit or rule.enabled:
         return False
     choices = {key} if choices and rule.override else choices
     before = resolved.setdefault(key, set())

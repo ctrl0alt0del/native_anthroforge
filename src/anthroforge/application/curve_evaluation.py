@@ -42,8 +42,11 @@ def evaluate(
 def evaluate_item(
     engine: Any, document: Any, resources: Any, item: Any, cancel: int, backend: str = "CUSTOM"
 ) -> PathEvaluation:
-    value = resolve(engine, document, resources, item, cancel)
+    from . import symmetric_paths
+
+    value = resolve(engine, document, resources, symmetric_paths.half(item), cancel)
     path = engine_path(engine, document, resources, value, cancel, backend)
+    path = symmetric_paths.expand(engine, document, item, path, cancel)
     return PathEvaluation(path, value.edited, value.attachment)
 
 

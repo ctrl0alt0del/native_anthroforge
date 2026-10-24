@@ -11,7 +11,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/hooks.cpp src/lattices.cpp src/shrinkwrap.cpp src/simple_subdivision.cpp src/solidify.cpp src/component_queries.cpp src/curve_deform.cpp
     src/mesh_topology.cpp src/mesh_equivalence.cpp src/curve_frames.cpp src/curve_mapping.cpp src/component_index.cpp
     src/curve_queries.cpp src/influence.cpp src/control_geometry.cpp src/measurement.cpp
-    src/path_registry.cpp src/path_presentation.cpp src/image.cpp src/image_placement.cpp
+    src/path_registry.cpp src/path_presentation.cpp src/path_symmetry.cpp src/image.cpp src/image_placement.cpp
     src/curve_fit.cpp src/drawing.cpp src/placement.cpp src/attachment_weights.cpp src/path_editing.cpp
     src/routing.cpp src/routing_world.cpp src/routing_scene.cpp src/routing_reference.cpp src/routing_solve.cpp
     src/routing_planner.cpp src/routing_candidates.cpp src/routing_surface.cpp src/routing_handoff.cpp
@@ -21,7 +21,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/path_contacts.cpp src/path_collisions.cpp src/path_collision_cache.cpp src/routing_clearance.cpp src/sampling_allocation.cpp src/path_resampling.cpp
     src/routing_pin_graph.cpp src/routing_pin_recovery.cpp src/routing_search.cpp src/routing_warm.cpp
     src/curve_surface.cpp src/surface_inputs.cpp src/surface_sampling.cpp src/surface_alignment.cpp src/surface_correspondence.cpp
-    src/surface_loft.cpp src/surface_patch_projection.cpp src/surface_patch_triangulation.cpp
+    src/surface_loft.cpp src/surface_symmetry.cpp src/surface_patch_projection.cpp src/surface_patch_triangulation.cpp
     src/surface_patch_subdivision.cpp src/surface_patch_fairing.cpp src/surface_patch_coordinates.cpp
     src/surface_branch_inputs.cpp src/surface_branch_sampling.cpp src/surface_branches.cpp
     src/tissue_inflation.cpp src/tissue_profile.cpp src/tissue_directions.cpp src/tissue_validation.cpp src/tissue_refinement.cpp src/tissue_branch_refinement.cpp

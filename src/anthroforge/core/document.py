@@ -88,10 +88,12 @@ class Document:
 
 def initialize_indexes(document: Document) -> None:
     from .mirror_resolution import build as mirrors
+    from .mirror_graph import install as mirror_graph
 
     object.__setattr__(document, "_index", build(document, document._index))
     object.__setattr__(document, "_registry", object_registry.build(document, document._registry))
     object.__setattr__(document, "_mirrors", mirrors(document, document._mirrors))
+    mirror_graph(document)
     index = formula_index.build(
         document.driving_shortcuts, document.formula_results, document._formulas
     )

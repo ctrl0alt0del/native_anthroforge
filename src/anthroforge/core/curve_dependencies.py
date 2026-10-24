@@ -6,12 +6,13 @@ from .curve_engines import RoutingSettings
 from .fibers import Fiber
 from .results import Port
 from .surface_references import SurfaceReference
+from .mirroring import source, parse
 
 
 def targets(item: Curve) -> set[str]:
     settings = item.engine_settings
     result = (
-        set(settings.obstacles)
+        {source(value) for value in settings.obstacles}
         if isinstance(settings, RoutingSettings) and settings.obstacle_mode == "MANUAL"
         else set()
     )
@@ -51,6 +52,7 @@ def routing_references(settings: object, objects: tuple[object, ...]) -> set[Sur
         return set()
     tissues = {r.target for r in anatomical_surfaces.defaults((), objects)}
     return {
-        SurfaceReference(k, "TISSUE_FINAL" if k in tissues else "SCP_GEOMETRY")
+        SurfaceReference(source(k), "TISSUE_FINAL" if source(k) in tissues else "SCP_GEOMETRY",
+                         parse(k).rule if parse(k) else "")
         for k in settings.obstacles
     }

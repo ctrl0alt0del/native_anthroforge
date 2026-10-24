@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from anthroforge.core.dependency_graph import curve_inputs
 from anthroforge.core.jobs import Job
+from anthroforge.core.mirror_dependencies import inputs as mirror_inputs
 from anthroforge.core.results import Port
 from anthroforge.core.surfaces import Surface
 from anthroforge.native.mesh import NativeCancellation
@@ -27,6 +28,7 @@ from .object_revisions import authored
 
 def inputs(document: Any, item: Surface, existing: bool) -> set[Port]:
     seeds = set().union(*(curve_inputs(use, document.objects) for use in item.curves))
+    seeds |= mirror_inputs(item)
     if existing:
         seeds.add(Port(item.id, "geometry"))
     return dep.closure(dep.graph(document), seeds)

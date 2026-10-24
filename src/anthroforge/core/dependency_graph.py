@@ -10,6 +10,8 @@ from .construction import Control, Curve, Deformer
 from .curve_dependencies import inputs as curve_path_inputs
 from .cycle_analysis import cycles
 from .entities import SCP
+from .mirror_dependencies import inputs as mirror_inputs
+from .mirroring import parse as mirror_instance
 from .object_outputs import output
 from .objects import ObjectRecord
 from .results import Port
@@ -113,12 +115,20 @@ def build(
 
 def mirror_edges(edges: dict[Port, set[Port]]) -> dict[Port, set[Port]]:
     owners = {p.owner for p in edges}
-    return {
+    result = {
         ref: set()
         for values in edges.values()
         for ref in values
         if ref.output == "mirror" and ref.owner in owners
     }
+    for values in tuple(edges.values()):
+        for ref in values:
+            instance = mirror_instance(ref.owner)
+            if instance and instance.source in owners and instance.rule in owners:
+                plane = Port(instance.rule, "mirror")
+                result[ref] = {Port(instance.source, ref.output), Port(instance.source, "pose"), plane}
+                result[plane] = set()
+    return result
 
 
 def control_edges(controls: tuple[Control, ...]) -> dict[Port, set[Port]]:
@@ -159,7 +169,9 @@ def object_edges(
         result[pose] = {Port(item.id, "local_pose")} | (
             {Port(item.parent, "pose")} if item.parent else set()
         )
-        result[Port(item.id, output(item))] = construction_inputs(item, objects, shared)
+        result[Port(item.id, output(item))] = construction_inputs(
+            item, objects, shared
+        ) | mirror_inputs(item)
     return result
 
 

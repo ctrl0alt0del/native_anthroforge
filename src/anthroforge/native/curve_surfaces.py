@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 
-from .mesh import D, GeometryEngine, Mesh, U, pointer
+from .mesh import D, GeometryEngine, Mesh, U, doubles, pointer
 from .paths import Path
 
 INT = c.POINTER(c.c_int)
@@ -49,6 +49,30 @@ def configure(engine: GeometryEngine) -> None:
         U,
     )
     surface_branches.configure(engine)
+    configure_symmetry(engine)
+
+
+def configure_symmetry(engine: GeometryEngine) -> None:
+    engine.bind(
+        "af_curve_surface_mirror_order", [c.POINTER(Row), c.c_int, D, c.c_int, c.c_double, INT, U]
+    )
+
+
+def mirror_order(
+    engine: GeometryEngine, rows: list[Row], world: Any, rule: Any, cancel: int
+) -> Any:
+    output = np.empty(2 * len(rows), dtype=np.int32)
+    frame = doubles(world)
+    inputs = (Row * len(rows))(*rows), len(rows), pointer(frame)
+    plane = ("X", "Y", "Z").index(rule.axis), rule.shift
+    count = engine.library.af_curve_surface_mirror_order(
+        *inputs,
+        *plane,
+        output.ctypes.data_as(INT),
+        cancel,
+    )
+    engine.check(count < 0)
+    return tuple(map(int, output[:count]))
 
 
 def row(path: Path, frame: Any, use: Any, origin: float = -1, reverse: bool = False) -> Row:

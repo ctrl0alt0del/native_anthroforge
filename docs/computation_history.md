@@ -2204,6 +2204,13 @@ average. This is a read-only formula input; no new write channel is introduced.
   boundaries; unrelated authored changes explicitly invalidate replay completeness.
 - Preserved: all numerical construction/attachment algorithms, priorities, authored
   revisions, save checkpoints and project schema. No geometry repair or resampling.
-- Current evidence: ten focused foundation/architecture tests pass, configured mypy
-  passes, and the native build passes five CTests. Desktop comparison, archives,
-  production profiling and portable release acceptance are still pending.
+- Generic geometry availability now permits control results without a surface asset;
+  the 96-muscle comparison exposed that assumption. Snapshot serialization uses a
+  cancellable chunked writer without changing the project format or numerical data.
+- Evidence: 2,049 tests, five native CTests and configured style/typing/numerics pass.
+  Source D3D11 captures, feedback UI, paired-image reports, isolated replay, full portable
+  workflows and compiled comparison controls pass background qualification. Four production
+  cases preserve coordinates, poses, bindings and oriented connectivity against 0.3.1;
+  Thumb differs only in existing triangle enumeration. Capture measured 24–37 ms and
+  explicit comparison 431–587 ms. These are workload observations, not controlled overhead
+  or speedup claims. See the [task record](tasks/shortcut-comparison-032.md).

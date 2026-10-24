@@ -67,6 +67,11 @@ Capture/inspect/clear and replay are Qt-free. Image export invokes the existing 
 desktop renderer. Cancellation/failure leaves an existing destination intact and retains
 the baseline for another export.
 
+[The command-file example](../examples/shortcut_comparison.json) creates a radius driver,
+captures a baseline, changes the radius and writes `comparison.afinspection.zip` to the
+working directory. Run it with `AnthroForge.exe --cli run examples/shortcut_comparison.json`.
+The example does not embed the starting project; add `replay: true` explicitly when needed.
+
 ## Ownership and validation
 
 The application comparison service owns accepted snapshots and the bounded journal;

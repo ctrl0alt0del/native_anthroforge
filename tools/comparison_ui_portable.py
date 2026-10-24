@@ -23,7 +23,9 @@ HARNESS = """
             workspace.run("driver.value",{driver:SHORTCUT_ID,value:0.08});
             console.log("AF_EDIT_MODE="+workspace.shortcutComparison.state.mode);
             workspace.shortcutComparison.setMode("Overlay");
+            workspace.run("wait",{});
             workspace.shortcutComparison.compare();
+            workspace.run("shortcut.comparison.inspect",{wait:true});
         }
     }
     Timer {
@@ -47,6 +49,7 @@ def run(distribution, project, output):
     )
     state = json.loads(row)
     assert state["active"] and state["mode"] == "Overlay" and not state["error"], state
+    assert state["state"] == "succeeded", state
     (output / "comparison-ui.json").write_text(json.dumps(dict(passed=True, state=state), indent=2))
 
 

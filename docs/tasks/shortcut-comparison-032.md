@@ -1,7 +1,7 @@
 # Shortcut comparison and reproducible reports 0.3.2
 
 - Branch: `codex/shortcut-comparison-032`; integration: `main`; baseline: `fb299ed`.
-- Status: implementation in progress; local desktop writer, no delegated agents.
+- Status: implementation and qualification complete; local desktop writer, no delegated agents.
 - Preserve unrelated root `__init__.py`. Background-only checks; no visible test windows.
 
 ## Confirmed contract
@@ -36,7 +36,7 @@ Keep functions within 15 physical lines. Record computational boundaries in CH h
 
 ## Verification and delivery
 
-Pending. Cover lifecycle, modes, journal completeness, archives and reports, resource release,
+Completed checks cover lifecycle, modes, journal completeness, archives and reports, resource release,
 headless/no-Qt operation, background native renders and actual packaged workflows.
 Production controls: Ribs, Humerus, Radius, Thumb in the 96-muscle assembly; preserve current
 standalone results. Deferred addon parity discrepancies remain outside scope.
@@ -44,7 +44,7 @@ Release only after qualification: `dist/0.3.2/AnthroForge.dist` and companion so
 
 ## Recovery
 
-Read this record, AGENTS.md and engineering guidelines. Current first step is foundations.
+Read this record, AGENTS.md and engineering guidelines. Implementation and qualification are complete; historical checkpoints follow.
 
 Foundation checkpoint: session baseline ownership, comparison operations, native mesh/path
 fingerprints, and bounded semantic journal implemented. Ten focused tests and configured
@@ -81,3 +81,27 @@ Final source review: full suite passed 2,045 tests. Added two more regression ca
 replay respecting an already-open output project and cancellation during snapshot writes.
 Snapshot serialization now wraps its existing writer with bounded cancellation checks;
 format and numerical arrays remain unchanged. Final package rebuild includes these fixes.
+
+## Final qualification
+
+- Final pytest: **2,049 passed** (`build/comparison-release-tests.log`). Full development
+  gate previously passed all five native CTests, configured typing, style and numerics;
+  final harness-only changes receive style checks separately.
+- Canonical package rebuilt from runtime checkpoint 4ce90bb. Full minimal-PATH portable
+  suite passes (`build/comparison-portable-final.log`), including comparison archive,
+  real paired native renders and isolated replay to a saved project.
+- Relocated compiled UI passes capture, Before/Overlay, edit-to-After, and completed
+  comparison (`build/shortcut-comparison-packaged-ui/comparison-ui.json`). Its software
+  offscreen screenshot verifies layout only; native geometry is verified separately by
+  source D3D11 and packaged hidden render-control captures. No physical UI acceptance.
+- Feedback modal with comparison options passes capture, annotations, retry and cancel
+  (`build/comparison-feedback-dialog-final.log`). Actual layout images were inspected.
+- Separate ownership/coupling review: session service owns baseline/journal, desktop owns
+  historical presentation, native code owns bulk geometry scans, feedback consumers own
+  streamed attachments. Replay uses an isolated session, in-memory preferences and output
+  file locks. No authored schema, numerical algorithm or scheduling policy changed.
+- Production evidence and limitations above remain authoritative. Optional replay includes
+  the complete starting project only with opt-in. Report images are paired Before/After;
+  Overlay is a viewport mode.
+- Delivery: one canonical `dist/0.3.2/AnthroForge.dist`, companion
+  `dist/AnthroForge-0.3.2-source.zip`, and `examples/shortcut_comparison.json`.

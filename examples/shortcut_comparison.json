@@ -1,0 +1,14 @@
+[
+  {"operation":"workspace.update","arguments":{"camera":[0,0,0,70,0,0,0.25],"orthographic":true}},
+  {"id":"circle","operation":"curve.create","arguments":{"name":"Comparison circle","engine":"PARAMETRIC","closed":true,"settings":{"x":"r*cos(t)","y":"r*sin(t)","z":"0*m","resolution":64,"interval":{"end_expression":"2*pi"},"variables":[{"id":"radius","name":"r","dimension":"LENGTH","value":0.03}]}}},
+  {"operation":"wait"},
+  {"id":"driver","operation":"driver.create","arguments":{"label":"Radius","dimension":"LENGTH","value":0.03}},
+  {"operation":"driver.formula.add","arguments":{"driver":"$driver","target":{"target":"$circle","path":["engine_settings","variables","@radius","value"]},"expression":"value"}},
+  {"operation":"wait"},
+  {"operation":"shortcut.comparison.capture","arguments":{"shortcut":"$driver"}},
+  {"operation":"driver.value","arguments":{"driver":"$driver","value":0.05}},
+  {"operation":"wait"},
+  {"operation":"shortcut.comparison.inspect","arguments":{"wait":true}},
+  {"operation":"inspection.export","arguments":{"path":"comparison.afinspection.zip","wait":true}},
+  {"operation":"shortcut.comparison.clear"}
+]

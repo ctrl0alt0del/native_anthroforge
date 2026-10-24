@@ -217,3 +217,26 @@ Six mesh integration cases plus architecture/preset tests (13 total) pass. Nativ
 and all five native tests pass; Ruff and configured mypy pass. Desktop chooser/review,
 additional field/branch/tissue-region/lifecycle evidence and broad qualification remain
 pending; this is an intermediate API checkpoint, not a completed D07 workflow/release.
+
+## Mesh replacement desktop checkpoint
+
+D07 now has Replace source mesh in the Primitive inspector, native file selection and a
+searchable/virtualized approval list with affected names. Assessment remains background
+read-only work. No-effect/safe replacements apply directly as one undo action; a review
+opens only for required rebind/discard actions. Main owns the file dialog so it opens
+from a hidden review; both dialogs participate in the shared modal keyboard guard.
+
+The GUI adapter caches status by session/token/state/document revision and does no idle
+polling or model work when inactive. Metadata edits and newly incoming references now
+mark the assessment stale as well as numerical read changes. Removed records can still
+be described from the retained assessment baseline. Profiler ownership includes native
+resources retained by the replacement candidate. Complete prepared object/entity batches
+publish together, preserving junction consistency and avoiding ordinary edit recapture.
+
+Ten mesh integration tests plus architecture pass (12 total): previous cases plus source
+unit/up-axis preservation, failed/canceled assessment without authored edits, metadata/new
+relationship staleness and non-root owner pose preservation. The offscreen actual inspector
+button/file dialog/review/select-all/apply workflow passes, including automatic subsequent
+safe replacement and one-action undo. Construction and preset offscreen checks also pass.
+Broader branch/region/96-muscle assembly, performance, native style/full gate and packaging
+qualification remain. D08/D10/D11 and F01 are still outstanding; no release/main merge.

@@ -18,6 +18,7 @@ from .inspection_export import InspectionExport
 from .inspection_panel import InspectionPanel
 from .inspection_tools import InspectionTools
 from .issue_panel import IssuePanel
+from .mesh_replacement_panel import MeshReplacementPanel
 from .models import RenderModel
 from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
@@ -77,6 +78,7 @@ class Controller(QObject):
         self.routing_choices = RoutingChoices()
         self.initialize_tissue_tools()
         self.surface_creation = SurfaceCreation(self)
+        self.mesh_replacement = MeshReplacementPanel(self)
 
     def initialize_tissue_tools(self):
         self.shortcut_comparison = ShortcutComparisonView(self)
@@ -237,6 +239,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def shortcutComparison(self):
         return self.shortcut_comparison
+
+    @Property(QObject, constant=True)
+    def meshReplacement(self):
+        return self.mesh_replacement
 
     @Property(QObject, constant=True)
     def sceneChoices(self):
@@ -425,6 +431,7 @@ class Controller(QObject):
         self.activity_model.synchronize(self.session.scheduler.jobs, names)
         self.refresh_metrics()
         self.issue_panel.synchronize()
+        self.mesh_replacement.synchronize()
         self.inspection_panel.synchronize()
         self.inspection_export.synchronize()
         self.refresh_viewport_tools()
@@ -503,6 +510,7 @@ class Controller(QObject):
         self.shortcut_comparison.synchronize()
         self.creation_selection.synchronize()
         self.issue_panel.synchronize()
+        self.mesh_replacement.synchronize()
         self.shortcut_panel.synchronize()
 
     @Slot()

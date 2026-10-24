@@ -26,6 +26,7 @@ from .assets import Asset, imported
 from .construction_evaluator import Evaluation
 from .construction_policy import revisions
 from .evaluation_results import accepted_result
+from .geometry_outputs import anatomical_result
 from .resources import Resources
 from .task_workloads import source_file
 
@@ -168,7 +169,7 @@ def evaluate_candidate(
     resources.meshes[result_key] = Asset(mesh, "generated", "", 1.0, False)
     inputs = dependencies.ports(document, Port(item.id, "geometry"))
     result = accepted_result(document, item, inputs, result_key)
-    item = replace(item, asset=result_key, result=result, status="ready", error="")
+    item = anatomical_result(item, result)
     return item, replace(
         document, entities=tuple(item if e.id == item.id else e for e in document.entities)
     )
@@ -204,7 +205,7 @@ def status(session: Any) -> dict[str, Any]:
         state=state,
         error=value.error,
         matching_topology=candidate.matching if candidate else None,
-        changes=[asdict(row) for row in candidate.changes] if candidate else [],
+        changes=change_rows(session, candidate) if candidate else [],
     )
 
 
@@ -299,3 +300,9 @@ def current(session: Any, value: Any) -> bool:
         return True
     except ValueError:
         return False
+
+
+def change_rows(session: Any, candidate: Candidate) -> list[dict[str, Any]]:
+    return [
+        dict(asdict(row), name=candidate.baseline[row.target].name) for row in candidate.changes
+    ]

@@ -32,6 +32,7 @@ def assess(document: Any, item: Any, matching: bool) -> tuple[Change, ...]:
     rows = [
         Change("rebind:" + child.id, child.id, "REBIND", description(child))
         for child in incoming(document, item.id)
+        if requires_rebind(child)
     ]
     return tuple((*rows, *owned_changes(item), *deformer_changes(item)))
 
@@ -87,3 +88,7 @@ def adjusted(item: Any, changes: tuple[Change, ...]) -> Any:
         attachment = replace(attachment, face_lock=-1, vertex_lock=-1)
     bindings = tuple(b for b in item.deformers if b.id not in removed)
     return replace(item, deformers=bindings, thickness=thickness, attachment=attachment)
+
+
+def requires_rebind(item: Any) -> bool:
+    return not isinstance(item, SCP) or item.attachment.parent_mode == "SURFACE_NEAREST"

@@ -121,3 +121,55 @@ def test_fiber_replacement_retains_pin_targets_and_accepted_shape(session, tmp_p
     assert [b.reference for b in current.bindings] == [b.reference for b in fiber.bindings]
     actual = session.resources.paths[current.result.asset].path.array()
     np.testing.assert_allclose(actual[:, :3], original[:, :3], atol=1e-8)
+
+
+def test_rename_and_new_relationships_invalidate_reviews(session):
+    target = source(session)
+    token, _ = assessment(session, target, CUBE)
+    session.command("scp.rename", entity=target, name="Renamed")
+    assert session.command("scp.mesh.replace.status")["state"] == "stale"
+    with pytest.raises(ValueError, match="definitions changed"):
+        session.command("scp.mesh.replace.apply", token=token)
+    token, _ = assessment(session, target, CUBE)
+    session.command("scp.empty", parent=target, name="New child")
+    assert session.command("scp.mesh.replace.status")["state"] == "stale"
+    with pytest.raises(ValueError, match="relationships changed"):
+        session.command("scp.mesh.replace.apply", token=token)
+
+
+def test_nonroot_owner_recapture_preserves_pose(session, tmp_path):
+    parent = source(session)
+    target = session.command("import", path=str(CUBE), units=0.1, parent=parent)["entity_id"]
+    session.wait(5)
+    before = session.document.entity(target).matrix
+    token, state = assessment(session, target, tetrahedron(tmp_path))
+    assert any(row["action"] == "OWNER_BINDING" for row in state["changes"])
+    apply_review(session, token, state)
+    np.testing.assert_allclose(session.document.entity(target).matrix, before, atol=1e-12)
+
+
+def test_import_units_are_retained_without_extra_prompt(session):
+    target = session.command("import", path=str(CUBE), units=0.01, y_up=True)["entity_id"]
+    session.wait(5)
+    before = session.assets[session.document.entity(target).result.asset].mesh.array(0).copy()
+    token, state = assessment(session, target, CUBE)
+    apply_review(session, token, state)
+    item = session.document.entity(target)
+    source_asset = session.assets[item.primitive.source]
+    assert source_asset.units == 0.01 and source_asset.y_up
+    np.testing.assert_allclose(session.assets[item.result.asset].mesh.array(0), before, atol=1e-14)
+
+
+def test_failed_assessment_and_cancel_leave_no_authored_change(session, tmp_path):
+    target = source(session)
+    before, cursor = session.document, session.history.cursor
+    broken = tmp_path / "broken.obj"
+    broken.write_text("not a mesh")
+    session.command("scp.mesh.replace.assess", target=target, path=str(broken))
+    session.wait(5)
+    assert session.command("scp.mesh.replace.status")["state"] == "failed"
+    assert session.document == before and session.history.cursor == cursor
+    assessment(session, target, CUBE)
+    session.command("scp.mesh.replace.cancel")
+    assert session.command("scp.mesh.replace.status")["state"] == "idle"
+    assert session.document == before and session.history.cursor == cursor

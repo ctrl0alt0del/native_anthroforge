@@ -136,6 +136,7 @@ def session_owners(session, output, profiler):
         output[owner].update(bounded_unique(references, 4096, profiler))
     output["catalogue"].update(bounded(catalogue_resources(session), 4096, profiler))
     preview_owners(session, output)
+    replacement_owners(session, output)
     inspection_owners(session, output, profiler)
     comparison_owners(session, output)
 
@@ -157,6 +158,12 @@ def preview_owners(session, output):
             output["conversion_preview" if name == "conversion" else name].add(
                 getattr(preview.asset, attribute)
             )
+
+
+def replacement_owners(session, output):
+    candidate = session.mesh_replacement.asset
+    if candidate:
+        output["replacement_preview"].update(owned_resources(candidate.resources))
 
 
 def inspection_owners(session, output, profiler):

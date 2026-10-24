@@ -70,6 +70,7 @@ native algorithms and retained material-binding semantics. Final evidence is bel
 | G06 | Hook deformation: bind/reset/recenter transforms, point membership, weights, inversion, strength and distance/custom-curve falloff. Shared influence preparation is native. | [hooks.cpp](../native/src/hooks.cpp), [influence.cpp](../native/src/influence.cpp), [curve_mapping.cpp](../native/src/curve_mapping.cpp) | [primitive parity](../tests/test_primitive_parity.py), [native preparation](../tests/test_native_preparation.py) |
 | G07 | Lattice deformation: grid generation/resizing, interpolation, cage/object frames, weighted influence and Outside behavior. | [lattices.cpp](../native/src/lattices.cpp) | [primitive parity](../tests/test_primitive_parity.py), [anatomical primitives](../tests/test_anatomy_primitives.py) |
 | G08 | Thickness: Blender Simple Solidify behavior, weighted offsets, rims, even thickness, normal handling and clamping. Ordered after applicable deformation; Complex mode is absent. | [solidify.cpp](../native/src/solidify.cpp) | [primitive parity](../tests/test_primitive_parity.py) |
+| G09 | Source-linked spatial reflection (0.3.5 in progress): reuse source assets with a native-composed reflection frame and distinct instance/role references. No independent mirror solver. | [mirror providers](../src/anthroforge/application/mirror_surfaces.py), [relationship resolution](../src/anthroforge/core/mirror_resolution.py) | [mirror contracts](../tests/test_mirroring.py), [desktop projection](../tests/test_mirroring_desktop.py); release qualification pending |
 
 ### Curves and path engines
 
@@ -2211,8 +2212,8 @@ average. This is a read-only formula input; no new write channel is introduced.
   Source D3D11 captures, feedback UI, paired-image reports, isolated replay, full portable
   workflows and compiled comparison controls pass background qualification. Four production
   cases preserve coordinates, poses, bindings and oriented connectivity against 0.3.1;
-  Thumb differs only in existing triangle enumeration. Capture measured 24�37 ms and
-  explicit comparison 431�587 ms. These are workload observations, not controlled overhead
+  Thumb differs only in existing triangle enumeration. Capture measured 24–37 ms and
+  explicit comparison 431–587 ms. These are workload observations, not controlled overhead
   or speedup claims. See the [task record](tasks/shortcut-comparison-032.md).
 
 ### CH-070 — Targeted shortcut observation and incremental priority edges (0.3.3)
@@ -2239,3 +2240,30 @@ average. This is a read-only formula input; no new write channel is introduced.
   calls fall from 6,330 to zero during result updates. These are combined changes, not
   isolated causal estimates for each optimization. Existing Thumb triangle enumeration
   variation remains. See [measurement scope and limitations](shortcuts_033.md).
+
+
+### CH-071 — Strict source-linked mirror providers (0.3.5, in progress)
+
+- Inventory: G03/G09, role-aware A01–A03 inputs and coordinated output provenance.
+- Before: the standalone had no live mirror instances. Surface references identified
+  only an authored object and role; inherited addon paths sometimes solved mirrored
+  Fibers/tissues independently. That behavior contradicts confirmed strict reflection.
+- Now: immutable hierarchy rules and cached source/rule identities resolve required
+  construction. Providers reuse the source mesh and compose its frame with the plane
+  using the existing native matrix boundary. Surface references retain spatial instance
+  identity; mirrored objects have no authored registry/tree nodes or editable properties.
+- Plane revisions are explicit dependency inputs. An Anchor regression initially kept
+  its old position because the new plane port was not a registered graph leaf. Registering
+  that input makes the ordinary binding job follow plane edits without nearest rebinding.
+- Geometry/resource reuse, rule history, save/reopen, read-only viewport selection and
+  display-mode contracts pass focused tests. Schema 6 reads 4/5/6; no duplicate reflected
+  geometry is serialized. Structural mirror findings cannot alter reflected geometry.
+- Initial full regression: 2,063 passed, three failures (function-size guard and two
+  expectations for the deliberately extended reference/schema). Focused fixes now pass
+  26 tests including architecture checks; mypy passes. Full rerun and release qualification
+  remain pending. No responsiveness or full anatomical/portable acceptance claimed.
+- Existing history contained two CP1252 en-dash bytes; normalized those bytes to UTF-8
+  while maintaining this entry, without changing the historical measurement.
+- Follow-up work: complete symmetric construction, provider consumers, stacking,
+  display/publication lifecycle, UI controls and measured qualification under
+  [the task record](tasks/mirroring-035.md).

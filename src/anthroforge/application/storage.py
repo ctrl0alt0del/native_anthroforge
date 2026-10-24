@@ -17,6 +17,7 @@ from anthroforge.native.mesh import GeometryEngine
 
 from . import object_codec, resource_storage, shortcut_codec
 from .construction_codec import control, entity_construction
+from .mirror_codec import fields as mirror_fields
 from .resources import Resources
 
 FORMAT = "anthroforge-project"
@@ -159,8 +160,6 @@ def decode_document(data: dict[str, Any]) -> Document:
     data["junctions"] = tuple(decode_junction(item) for item in data.get("junctions", ()))
     if not data["workspaces"]:
         raise ValueError("Project has no workspace.")
-    from .mirror_codec import fields as mirror_fields
-
     return Document(**(data | shortcut_codec.document_fields(data) | mirror_fields(data)))
 
 

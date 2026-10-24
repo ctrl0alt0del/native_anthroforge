@@ -3,7 +3,7 @@
 from collections.abc import Mapping
 
 from . import tissue_groups
-from .anatomical_surfaces import port
+from .anatomical_surfaces import inputs as surface_inputs
 from .object_outputs import output
 from .objects import ObjectRecord
 from .points import Anchor
@@ -13,7 +13,7 @@ from .tissues import TissueVCP
 
 def inputs(item: ObjectRecord, objects: tuple[ObjectRecord, ...]) -> set[Port]:
     if isinstance(item, Anchor):
-        return {port(item.binding.reference), Port(item.binding.reference.target, "pose")}
+        return surface_inputs(item.binding.reference)
     if isinstance(item, TissueVCP):
         records = {o.id: o for o in objects}
         return source_inputs(item, records) | constraint_inputs(item)
@@ -31,7 +31,7 @@ def constraint_inputs(item: TissueVCP) -> set[Port]:
         value
         for row in item.constraints
         if row.reference is not None
-        for value in (port(row.reference), Port(row.reference.target, "pose"))
+        for value in surface_inputs(row.reference)
     }
 
 

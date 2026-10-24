@@ -3,7 +3,6 @@
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.units import convert
-from . import mirror_operations
 
 from . import (
     attached_creation,
@@ -29,6 +28,7 @@ from . import (
     inspection,
     inspection_report,
     junction_operations,
+    mirror_operations,
     object_operations,
     operations,
     output_tasks,
@@ -60,6 +60,7 @@ from . import (
 from . import control_operations as controls
 from . import deformer_operations as deformers
 from . import primitive_operations as primitives
+from .mirror_policy import require_edit
 
 if TYPE_CHECKING:
     from .session import Session
@@ -255,6 +256,7 @@ def shortcut_queries(session: "Session", operation: str, arguments: dict[str, An
 
 
 def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    require_edit(arguments)
     implicit = session.history.before is None
     if implicit:
         session.begin()
@@ -287,12 +289,8 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
-        "mirror.list": lambda **a: mirror_operations.listing(session, **a),
-        "mirror.inspect": lambda **a: mirror_operations.inspect(session, **a),
-        "mirror.source": lambda **a: mirror_operations.source(session, **a),
-        "mirror.removal.inspect": lambda **a: mirror_operations.removal(session, **a),
-        "preferences.get": session.preferences.describe,
-        "preferences.set": session.preferences.update,
+        **mirror_operations.queries(session),
+        **preference_queries(session),
         "driver.inspect": lambda **a: driving_operations.inspect(session, **a),
         **drawing_commands(session),
         **construction_queries(session),
@@ -303,6 +301,13 @@ def query_commands(session: "Session") -> dict[str, Any]:
         "inspect.snapshot": lambda **a: inspection.snapshot(session, **a),
         "object.delete.inspect": lambda **a: deletion_impact.inspect(session, **a),
         "units.convert": convert,
+    }
+
+
+def preference_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "preferences.get": session.preferences.describe,
+        "preferences.set": session.preferences.update,
     }
 
 

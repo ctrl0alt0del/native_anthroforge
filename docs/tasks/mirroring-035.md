@@ -38,8 +38,16 @@ No independent mirror solvers or authored tree nodes are introduced.
 `pytest tests/test_mirroring.py tests/test_construction_objects.py -q`: 28 passed.
 These cover hierarchy/plane identity, exact provider transforms/resource reuse, basic
 read-only behavior, history, persistence and reuse after result publication.
-Style/function-size fixes and complete desktop integration remain pending, along with
-binding propagation, removal coverage, symmetric construction and release acceptance.
+Added instance-aware Fiber/Anchor capture, plane-input graph leaves and Anchor update
+without rebinding, structural Issues, shared-target inspection, source/mirror display
+modes and removal blockers. Desktop tests confirm read-only viewport selection without
+tree entries. Source/role reference and schema expectations are updated intentionally.
+Initial full regression: 2,063 passed; failures were the function-size guard and two
+reference/schema expectations. Focused fixes now pass 26 tests including architecture,
+mirror, desktop, point-interaction and tissue-contract tests. Mypy passed at the earlier
+foundation checkpoint; rerun after subsequent changes is required. CH-071 records the
+actual computational boundary change. Full rerun, complete provider integration,
+symmetric construction, stacking and release acceptance remain pending.
 Checks remain background-only; do not claim interactive acceptance.
 Checkpoint coherent increments and push before long checks or interruptions.
 

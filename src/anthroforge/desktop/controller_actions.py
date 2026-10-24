@@ -117,8 +117,7 @@ def selection_center(controller):
         return []
     if selected["id"] == "components" or selected.get("is_control"):
         return selected["trs"][:3]
-    item = controller.session.document.object(selected["id"])
-    return frame_bounds(controller.session, item, selected["trs"][6:])[0]
+    return selected_bounds(controller.session, selected)[0]
 
 
 def new_document(controller):
@@ -138,9 +137,17 @@ def frame(controller):
     if selected.get("is_control"):
         controller.frameRequested.emit([*selected["trs"][:3], 1.0])
         return
-    item = controller.session.document.object(selected["id"])
-    center, radius = frame_bounds(controller.session, item, selected["trs"][6:])
+    center, radius = selected_bounds(controller.session, selected)
     controller.frameRequested.emit([*center, max(0.02, radius * 2.5)])
+
+
+def selected_bounds(session, selected):
+    identity = selected.get("mirror_source", selected["id"])
+    center, radius = frame_bounds(session, session.document.object(identity), selected["trs"][6:])
+    if selected.get("mirror_source"):
+        plane = session.document.mirrors.rules[selected["mirror_rule"]].frame
+        center = session.engine.world_point(plane, center)
+    return center, radius
 
 
 def frame_bounds(session, item, scales):

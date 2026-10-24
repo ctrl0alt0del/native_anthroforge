@@ -8,6 +8,7 @@ from anthroforge.core.fibers import Fiber
 from anthroforge.core.image_presentation import decode as decode_image
 from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
 from anthroforge.core.points import Anchor
+from anthroforge.core.mirroring import source as mirror_source
 
 if TYPE_CHECKING:
     from .session import Session
@@ -90,7 +91,7 @@ def validate_references(session: "Session", workspace: Workspace, previous: Work
 def associations(document: Document, target: str) -> set[str]:
     from .curve_sources import consumers
 
-    pending, seen, anatomy = [target], set[str](), set[str]()
+    pending, seen, anatomy = [mirror_source(target)], set[str](), set[str]()
     while pending:
         key = pending.pop()
         if key in seen:

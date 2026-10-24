@@ -26,7 +26,9 @@ def assign(
     scope = scope if scope is not None else old.capture_scope if old else "CURRENT_PARENT"
     ref = requested_surface(session, dict(target=target, role=role))
     validate_targets(session, ((point, ref, scope),))
-    bindings[point] = FiberBinding(point, target, capture_scope=scope, role=ref.role)
+    bindings[point] = FiberBinding(
+        point, ref.target, capture_scope=scope, role=ref.role, instance=ref.instance
+    )
     ordered = tuple(bindings[p.id] for p in item.points if p.id in bindings)
     install(session, replace(item, bindings=ordered))
 

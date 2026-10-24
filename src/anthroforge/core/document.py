@@ -92,5 +92,7 @@ def initialize_indexes(document: Document) -> None:
     object.__setattr__(document, "_index", build(document, document._index))
     object.__setattr__(document, "_registry", object_registry.build(document, document._registry))
     object.__setattr__(document, "_mirrors", mirrors(document, document._mirrors))
-    index = formula_index.build(document.driving_shortcuts, document.formula_results, document._formulas)
+    index = formula_index.build(
+        document.driving_shortcuts, document.formula_results, document._formulas
+    )
     object.__setattr__(document, "_formulas", index)

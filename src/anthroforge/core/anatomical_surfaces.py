@@ -46,6 +46,13 @@ def port(reference: SurfaceReference) -> Port:
     return Port(reference.target, names[reference.role])
 
 
+def inputs(reference: SurfaceReference) -> set[Port]:
+    result = {port(reference), Port(reference.target, "pose")}
+    if reference.instance:
+        result.add(Port(reference.instance, "mirror"))
+    return result
+
+
 def usable(result: EvaluationResult) -> bool:
     return bool(
         result.asset

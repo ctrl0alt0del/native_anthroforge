@@ -32,6 +32,7 @@ def inputs(item: Curve, objects: tuple[object, ...] = ()) -> set[Port]:
         | {Port(item.id, "pose")}
         | {anatomical_surfaces.port(ref) for ref in references(item, objects)}
         | {Port(ref.target, "pose") for ref in references(item, objects)}
+        | {Port(ref.instance, "mirror") for ref in references(item, objects) if ref.instance}
     )
 
 

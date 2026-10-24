@@ -111,6 +111,16 @@ def build(
     return indexed(result, excluded, signature)
 
 
+def mirror_edges(edges: dict[Port, set[Port]]) -> dict[Port, set[Port]]:
+    owners = {p.owner for p in edges}
+    return {
+        ref: set()
+        for values in edges.values()
+        for ref in values
+        if ref.output == "mirror" and ref.owner in owners
+    }
+
+
 def control_edges(controls: tuple[Control, ...]) -> dict[Port, set[Port]]:
     result = {}
     for control in controls:
@@ -127,6 +137,7 @@ def indexed(
     excluded: dict[str, frozenset[str]] | None = None,
     signature: tuple[str, ...] = (),
 ) -> DependencyGraph:
+    result.update(mirror_edges(result))
     consumers = reverse(result)
     return DependencyGraph(
         frozen(result),

@@ -27,8 +27,9 @@ if TYPE_CHECKING:
 
 
 def editable(session: "Session", target: str) -> Authored:
-    from .workspace_policy import included
     from anthroforge.core.mirroring import require_source
+
+    from .workspace_policy import included
 
     require_source(target)
     if session.waiting_save:

@@ -89,11 +89,12 @@ def validate_targets(session: "Session", result: tuple[Any, ...]) -> None:
 
 
 def requested_surface(session: "Session", row: dict[str, Any]) -> SurfaceReference:
-    from anthroforge.core.anatomical_surfaces import reference
+    from .mirror_surfaces import from_identity
 
-    return reference(
-        str(row["target"]), session.document.registry.records, str(row.get("role", ""))
-    )
+    ref = from_identity(session.document, str(row["target"]))
+    role = str(row.get("role", "")) or ref.role
+    ref = replace(ref, role=role, instance=str(row.get("instance", ref.instance)))
+    return surface_providers.normalize(session.document, ref)
 
 
 def binding_scope(session: "Session", curve: str, point: str, scope: str) -> None:

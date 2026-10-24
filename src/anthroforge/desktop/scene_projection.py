@@ -5,7 +5,7 @@ from anthroforge.application.transform_policy import object_reason
 from anthroforge.core.entities import descendants
 from anthroforge.core.results import Port, geometry_asset
 
-from . import scene_state, surface_scene, tissue_projection
+from . import mirror_scene, scene_state, surface_scene, tissue_projection
 from .property_projection import PropertyProjection
 
 
@@ -70,17 +70,16 @@ class SceneProjection:
         self.update_records(changes, full, structural_changes(changes))
         self.prune_records()
         tissue_projection.synchronize(self)
-        self.session, self.cursor, self.workspace = (
-            session,
-            session.changes.serial,
-            session.workspace,
-        )
+        self.remember(session)
         self.publish_records()
         self.controller.construction.synchronize()
-        from .mirror_scene import synchronize as synchronize_mirrors
-
-        synchronize_mirrors(self)
+        mirror_scene.synchronize(self)
         self.synchronize_selection()
+
+    def remember(self, session):
+        self.session = session
+        self.cursor = session.changes.serial
+        self.workspace = session.workspace
 
     def publish_records(self):
         rows = [self.records[key] for key in self.order]

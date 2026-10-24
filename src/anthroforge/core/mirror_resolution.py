@@ -44,8 +44,14 @@ def required(item: Any) -> frozenset[str]:
 def signature(document: Any) -> tuple[Any, ...]:
     records = document.registry.records
     topology = tuple(
-        (key, getattr(v, "parent", ""), dependencies(v), required(v),
-         bool(getattr(v, "symmetric", None)), bool(getattr(v, "mirrored_rows", False)))
+        (
+            key,
+            getattr(v, "parent", ""),
+            dependencies(v),
+            required(v),
+            bool(getattr(v, "symmetric", None)),
+            bool(getattr(v, "mirrored_rows", False)),
+        )
         for key, v in records.items()
     )
     return document.mirror_rules, topology
@@ -57,13 +63,21 @@ def build(document: Any, previous: MirrorIndex | None) -> MirrorIndex:
     key = signature(document)
     if previous is not None and previous.signature == key:
         return previous
-    settings = {r.target: r for r in document.mirror_rules}
-    if len(settings) != len(document.mirror_rules) or settings.keys() - document.registry.records.keys():
-        raise ValueError("Mirror rules require unique existing authored targets.")
+    settings = validated_settings(document)
     seeds = anatomy_rules(document, settings)
     resolved, conflicts = construction_rules(document, settings, seeds)
     instances = instance_records(document, resolved)
     return MirrorIndex(key, MappingProxyType(instances), MappingProxyType(settings), conflicts)
+
+
+def validated_settings(document: Any) -> dict[str, MirrorRule]:
+    settings = {r.target: r for r in document.mirror_rules}
+    unknown = settings.keys() - document.registry.records.keys()
+    if len(settings) != len(document.mirror_rules) or unknown:
+        raise ValueError("Mirror rules require unique existing authored targets.")
+    if any(r.enabled and r.target not in document.registry.anatomy for r in settings.values()):
+        raise ValueError("Mirror Children requires an anatomical source.")
+    return settings
 
 
 def empty(previous: MirrorIndex | None) -> MirrorIndex:
@@ -127,8 +141,10 @@ def merge(key: str, choices: set[str], settings: Any, resolved: Any) -> bool:
 
 def incompatible(records: Any, settings: Any, resolved: Any) -> tuple[str, ...]:
     return tuple(
-        key for key, item in records.items()
-        if attachment_references.targets(item) and len(resolved.get(key, ())) > 1
+        key
+        for key, item in records.items()
+        if attachment_references.targets(item)
+        and len(resolved.get(key, ())) > 1
         and len({(settings[r].axis, settings[r].shift) for r in resolved[key]}) > 1
     )
 

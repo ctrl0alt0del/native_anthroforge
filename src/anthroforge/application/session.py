@@ -20,6 +20,8 @@ from .curve_conversion import ConversionPreview
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
 from .history import History
+from .mirror_policy import require_transition as require_mirror_transition
+from .mirror_policy import retain_settings
 from .preferences import PreferenceStore, load_user_preferences
 from .previews import Preview
 from .resources import Resources
@@ -146,10 +148,8 @@ class Session:
 
         before = self.document
         self.serial += 1
-        updated = replace(self.document, revision=self.serial, **changes)
-        from .mirror_policy import require_transition
-
-        require_transition(before, updated)
+        updated = replace(self.document, revision=self.serial, **retain_settings(before, changes))
+        require_mirror_transition(before, updated)
         contexts = superseded(self, before, updated)
         if contexts != updated.shortcut_edits:
             updated = replace(updated, shortcut_edits=contexts)

@@ -40,7 +40,9 @@ def test_independent_anchor_becomes_selection_and_exposes_explicit_surface_role(
     session.wait()
     controller.refresh()
     assert isinstance(session.document.object(controller.selection), Anchor)
-    assert controller.selectedData["binding"]["reference"] == dict(target=bone, role="SCP_GEOMETRY")
+    assert controller.selectedData["binding"]["reference"] == dict(
+        target=bone, role="SCP_GEOMETRY", instance=""
+    )
     assert not controller.selectedData["transformable"]
     assert controller.surfaceRoles()[0]["role"] == "SCP_GEOMETRY"
 

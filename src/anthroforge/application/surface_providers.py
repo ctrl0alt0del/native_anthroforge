@@ -9,9 +9,9 @@ from anthroforge.core.results import EvaluationResult, Port, geometry_asset
 from anthroforge.core.surface_references import SurfaceReference
 from anthroforge.native.scene import entity_frame
 
+from . import mirror_surfaces
 from .assets import Asset
 from .object_frames import Frames
-from . import mirror_surfaces
 
 
 @dataclass(frozen=True)
@@ -25,11 +25,14 @@ class SurfaceProvider:
 
 
 def references(document: Any) -> tuple[SurfaceReference, ...]:
-    return (*tuple(
-        SurfaceReference(item.id, role)
-        for item in document.registry.anatomy.values()
-        for role in anatomical_surfaces.roles(item, document.registry.records)
-    ), *mirror_surfaces.references(document))
+    return (
+        *tuple(
+            SurfaceReference(item.id, role)
+            for item in document.registry.anatomy.values()
+            for role in anatomical_surfaces.roles(item, document.registry.records)
+        ),
+        *mirror_surfaces.references(document),
+    )
 
 
 def normalize(document: Any, target: str | SurfaceReference) -> SurfaceReference:
@@ -85,7 +88,11 @@ def query_references(
 def ports(document: Any, targets: Any) -> set[Port]:
     refs = [normalize(document, target) for target in targets]
     mirrors = {Port(r.instance, "mirror") for r in refs if r.instance}
-    return {anatomical_surfaces.port(r) for r in refs} | {Port(r.target, "pose") for r in refs} | mirrors
+    return (
+        {anatomical_surfaces.port(r) for r in refs}
+        | {Port(r.target, "pose") for r in refs}
+        | mirrors
+    )
 
 
 def triangle_count(document: Any, meshes: Any, ref: SurfaceReference) -> int:

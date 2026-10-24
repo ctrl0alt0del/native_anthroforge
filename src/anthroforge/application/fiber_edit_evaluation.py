@@ -102,6 +102,7 @@ def captured(before: FiberBinding, index: int, asset: Any) -> FiberBinding:
         before,
         target=target.reference.target,
         role=target.reference.role,
+        instance=target.reference.instance,
         material_asset=target.material_asset,
         attachment=Attachment(child_mode="OBJECT_ORIGIN", binding=binding),
     )

@@ -42,7 +42,7 @@ def invoke(engine: Any, inputs: routing.Inputs, cancel: int) -> int:
     if not isinstance(settings, RoutingSettings) or inputs.backend not in ("CUSTOM", "PIQP"):
         raise ValueError("Route inspection requires ROUTED and a supported backend.")
     options = routing.Options(
-        settings.samples, settings.accepted_steps, inputs.curve.closed, settings.radius
+        settings.samples, settings.accepted_steps, inputs.curve.path_closed, settings.radius
     )
     scene = capture(engine, packed, settings.radius, cancel)
     args = (*routing.arguments(packed)[:4], scene.handle, c.byref(options))

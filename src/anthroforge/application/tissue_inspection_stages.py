@@ -3,6 +3,7 @@
 from dataclasses import asdict
 from typing import Any
 
+from anthroforge.core.mirroring import source
 from anthroforge.core.tissues import TissueVCP
 
 from .object_frames import Frames
@@ -13,7 +14,7 @@ STAGES = dict(
 
 
 def tissue(context: Any, target: str) -> TissueVCP:
-    item = context.document.object(target)
+    item = context.document.object(source(target))
     if not isinstance(item, TissueVCP):
         raise ValueError("Choose a tissue to inspect.")
     return item
@@ -31,10 +32,12 @@ def material(item: TissueVCP, stage: str) -> Any:
 
 def describe(context: Any, target: str) -> dict[str, Any]:
     item = tissue(context, target)
-    return dict(target=target, source=item.source, stages=[row(context, item, s) for s in STAGES])
+    return dict(
+        target=target, source=item.source, stages=[row(context, item, s, target) for s in STAGES]
+    )
 
 
-def row(context: Any, item: TissueVCP, stage: str) -> dict[str, Any]:
+def row(context: Any, item: TissueVCP, stage: str, target: str = "") -> dict[str, Any]:
     value = result(item, stage)
     resource = context.resources.meshes.get(value.asset) or context.resources.paths.get(value.asset)
     kind = "MESH" if value.asset in context.resources.meshes else "PATH" if resource else "POINT"
@@ -46,7 +49,7 @@ def row(context: Any, item: TissueVCP, stage: str) -> dict[str, Any]:
         available=available,
         kind=kind,
         base=base_asset(item, stage),
-        frame=frame(context, item, stage),
+        frame=instance_frame(context, target or item.id, stage),
     )
 
 
@@ -74,6 +77,23 @@ def mesh(context: Any, target: str, stage: str) -> Any:
     return context.resources.meshes[value.asset].mesh
 
 
+def instance_frame(context: Any, target: str, stage: str) -> Any:
+    from anthroforge.core.mirroring import parse
+    from anthroforge.core.surface_references import SurfaceReference
+
+    from .mirror_surfaces import frame as spatial_frame
+
+    item = tissue(context, target)
+    value = frame(context, item, stage)
+    instance = parse(target)
+    if not instance:
+        return value
+    if target not in context.document.mirrors.instances:
+        raise ValueError("This mirrored tissue instance is unavailable.")
+    ref = SurfaceReference(item.id, "TISSUE_FINAL", instance.rule)
+    return spatial_frame(context.engine, context.document, ref, value)
+
+
 def signature(context: Any, target: str, stage: str) -> Any:
     item = tissue(context, target)
     return (
@@ -81,7 +101,7 @@ def signature(context: Any, target: str, stage: str) -> Any:
         target,
         result(item, stage).asset,
         material(item, stage),
-        frame(context, item, stage),
+        instance_frame(context, target, stage),
     )
 
 

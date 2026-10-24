@@ -7,6 +7,7 @@ from typing import Any
 from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.membranes import Membrane
+from anthroforge.core.mirroring import SymmetricHalf
 from anthroforge.core.object_registry import validate_sources
 from anthroforge.core.surfaces import Surface
 
@@ -40,15 +41,23 @@ def definition(
     grouping = options.pop("grouping", None)
     if kind == "AUTO":
         kind, grouping = automatic(session, curves, grouping)
-    item = new_surface(session, curves, kind, name, parent, owner)
-    if grouping is not None:
-        records = session.document.registry.records
-        item = surface_grouping.apply(
-            item, surface_grouping.checked(records, curves, grouping), records
-        )
+    item = new_surface(
+        session, curves, kind, name, parent, owner, options.get("mirrored_rows", False)
+    )
+    item = grouped(session, item, curves, grouping)
     item = configured(item, options)
     validate_sources(item, session.document.registry.records)
     return item
+
+
+def grouped(session: Any, item: Surface, curves: Any, grouping: Any) -> Surface:
+    if grouping is None:
+        return item
+    records = session.document.registry.records
+    result: Surface = surface_grouping.apply(
+        item, surface_grouping.checked(records, curves, grouping), records
+    )
+    return result
 
 
 def automatic(session: Any, curves: list[str], grouping: Any) -> tuple[str, Any]:
@@ -65,9 +74,23 @@ def automatic(session: Any, curves: list[str], grouping: Any) -> tuple[str, Any]
 
 
 def new_surface(
-    session: Any, curves: list[str], kind: str, name: str, parent: str, owner: str
+    session: Any,
+    curves: list[str],
+    kind: str,
+    name: str,
+    parent: str,
+    owner: str,
+    mirrored_rows: bool = False,
 ) -> Surface:
     placement = object_creation.placement(session, parent, owner, None)
+    item = surface_record(session, curves, kind, name, placement, mirrored_rows)
+    uses = tuple(curve_consumers.bind(session, item, key) for key in curves)
+    return replace(item, curves=uses)
+
+
+def surface_record(
+    session: Any, curves: Any, kind: str, name: str, placement: Any, mirrored: bool
+) -> Surface:
     surface_type = (
         Membrane if all(isinstance(session.document.object(k), Fiber) for k in curves) else Surface
     )
@@ -75,10 +98,10 @@ def new_surface(
         name=require_name(name),
         kind=kind,
         curves=tuple(CurveUse(key) for key in curves),
+        mirrored_rows=mirrored,
         **placement,
     )
-    uses = tuple(curve_consumers.bind(session, item, key) for key in curves)
-    return replace(item, curves=uses)
+    return item
 
 
 def editable(session: Any, target: str) -> Surface:
@@ -89,20 +112,50 @@ def editable(session: Any, target: str) -> Surface:
 
 
 def configured(item: Surface, values: dict[str, Any]) -> Surface:
-    if set(values) - {"name", "exact", "strips", "patch_resolution", "close_across", "flip"}:
+    allowed = {"name", "exact", "strips", "patch_resolution", "close_across", "flip"}
+    if set(values) - allowed - {"mirrored_rows", "mirror_plane"}:
         raise ValueError("Unknown surface setting.")
+    if isinstance(values.get("mirror_plane"), dict):
+        values = dict(values, mirror_plane=SymmetricHalf(**values["mirror_plane"]))
+    if mirror_layout_changed(item, values):
+        values = dict(values, mirror_order=(), across=())
     changed = replace(item, **values)
     if "strips" in values and changed.strips:
-        changed = replace(changed, across=(changed.strips - 1,) * (len(changed.curves) - 1))
+        count = len(changed.mirror_order) if changed.mirror_order else len(changed.curves)
+        changed = replace(changed, across=(changed.strips - 1,) * (count - 1))
     return changed
 
 
 def update(session: Any, target: str, **options: Any) -> None:
-    object_operations.install(session, configured(editable(session, target), options))
+    item = editable(session, target)
+    candidate = configured(item, options)
+    if mirror_layout_changed(item, options):
+        return configure_mirroring(session, candidate)
+    object_operations.install(session, candidate)
+
+
+def configure_mirroring(session: Any, candidate: Surface) -> None:
+    from .construction_policy import require_topology_edit
+
+    require_topology_edit(session.document, candidate.id)
+    authored_jobs.begin(session, partial(surface_jobs.enqueue, session, candidate, True))
+
+
+def mirror_layout_changed(item: Surface, values: dict[str, Any]) -> bool:
+    plane = values.get("mirror_plane", item.mirror_plane)
+    if isinstance(plane, dict):
+        plane = SymmetricHalf(**plane)
+    return values.get("mirrored_rows", item.mirrored_rows) != item.mirrored_rows or (
+        item.mirrored_rows and plane != item.mirror_plane
+    )
 
 
 def realign(session: Any, target: str) -> str:
+    from .construction_policy import require_topology_edit
+
     item = editable(session, target)
+    if item.mirrored_rows:
+        require_topology_edit(session.document, target)
     return authored_jobs.begin(session, partial(surface_jobs.enqueue, session, item, True))
 
 
@@ -121,11 +174,11 @@ def source(session: Any, target: str, curve: str, **values: Any) -> None:
 
 
 def order(session: Any, target: str, curves: list[str]) -> None:
-    from .surface_sources import configured as configure_sources
+    from .surface_sources import assign
 
     item = editable(session, target)
     if item.branches:
         raise ValueError("Remove branches before changing the main source order.")
     if len(curves) != len(item.curves) or set(curves) != {u.curve for u in item.curves}:
         raise ValueError("Reordering requires every surface source exactly once.")
-    object_operations.install(session, configure_sources(session, item, curves))
+    assign(session, target, curves)

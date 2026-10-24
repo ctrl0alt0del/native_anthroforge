@@ -5,7 +5,7 @@ from anthroforge.application.transform_policy import object_reason
 from anthroforge.core.entities import descendants
 from anthroforge.core.results import Port, geometry_asset
 
-from . import scene_state, surface_scene, tissue_projection
+from . import mirror_scene, scene_state, surface_scene, tissue_projection
 from .property_projection import PropertyProjection
 
 
@@ -70,14 +70,16 @@ class SceneProjection:
         self.update_records(changes, full, structural_changes(changes))
         self.prune_records()
         tissue_projection.synchronize(self)
-        self.session, self.cursor, self.workspace = (
-            session,
-            session.changes.serial,
-            session.workspace,
-        )
+        self.remember(session)
         self.publish_records()
         self.controller.construction.synchronize()
+        mirror_scene.synchronize(self)
         self.synchronize_selection()
+
+    def remember(self, session):
+        self.session = session
+        self.cursor = session.changes.serial
+        self.workspace = session.workspace
 
     def publish_records(self):
         rows = [self.records[key] for key in self.order]
@@ -128,18 +130,19 @@ class SceneProjection:
     def parents(self):
         document = self.controller.session.document
         selected = self.controller.selection
-        key = (selected, tuple((e.id, e.parent, e.name) for e in document.entities))
+        key = parent_signature(document, selected)
         if key != self._parent_key:
             excluded = descendants(document.entities, selected) if selected else set()
             self._parents = [
                 dict(id=e.id, name=e.name) for e in document.entities if e.id not in excluded
             ]
+            self._parents.extend(mirror_parents(document, excluded))
             self._parent_key = key
         return self._parents
 
     def synchronize_selection(self):
         controller = self.controller
-        records = self.records | controller.construction.records
+        records = self.records | controller.construction.records | controller.mirror_records
         controller.object_selection.retain(records)
         self.selected.synchronize(selection_record(controller, records))
         if self.selection != tuple(controller.object_selection.items):
@@ -147,21 +150,43 @@ class SceneProjection:
             controller.selectionChanged.emit()
 
 
+def mirror_parents(document, excluded):
+    return [
+        dict(id=v.id, name=document.entity(v.source).name + " · mirrored")
+        for v in document.mirrors.instances.values()
+        if v.source in document.index.entities and v.source not in excluded
+    ]
+
+
+def parent_signature(document, selected):
+    return (
+        selected,
+        tuple((e.id, e.parent, e.name) for e in document.entities),
+        tuple(document.mirrors.instances),
+    )
+
+
 def selection_record(controller, records):
     row = records.get(controller.selection, {})
     if not row:
         return {}
+    if row.get("mirror_source"):
+        return dict(row, transformable=False, transform_reason="Mirrored instances are read-only.")
     reason = object_reason(controller.session.document.object(controller.selection))
     return dict(row, transformable=not reason, transform_reason=reason)
 
 
 def initialize(controller):
     from .construction_projection import ConstructionProjection
+    from .record_model import RecordModel
 
     controller.construction = ConstructionProjection(controller)
     controller.scene_projection = SceneProjection(controller)
     controller._state = PropertyProjection(controller)
     controller._render_rows = []
+    controller.mirror_records = {}
+    controller._mirror_projection_cache = {}
+    controller.marker_model = RecordModel(controller, ("item",), "id")
     scene_state.picking_inputs(controller, [])
 
 
@@ -176,7 +201,10 @@ def refresh(controller):
 
 
 def publish(controller):
-    rows = [render_record(row) for row in [*controller.rows, *surface_scene.records(controller)]]
+    from .mirror_scene import rows as mirror_rows
+
+    originals = [*controller.rows, *surface_scene.records(controller)]
+    rows = [render_record(row) for row in mirror_rows(controller, originals)]
     rows.extend(surface_scene.preview_rows(controller))
     rows.extend(surface_scene.tissue_preview_rows(controller))
     if rows != controller._render_rows:
@@ -196,4 +224,5 @@ def render_record(row):
         {name: row[name] for name in names},
         geometry_asset=row.get("geometry_asset", ""),
         geometry_revision=row.get("geometry_revision", 0),
+        context_dimmed=row.get("context_dimmed", row["readonly"]),
     )

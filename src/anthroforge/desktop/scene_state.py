@@ -182,14 +182,16 @@ def snapping_inputs(controller, rows):
 
 
 def snapping_rows(document, rows):
+    from anthroforge.core.mirroring import source
+
     anatomy = document.registry.anatomy
     return [
         row
         for row in rows
-        if row["id"] in anatomy
+        if source(row["id"]) in anatomy
         and row["surface_visible"]
         and row["handle"]
-        and ready_surface(anatomy[row["id"]], row)
+        and ready_surface(anatomy[source(row["id"])], row)
     ]
 
 
@@ -203,7 +205,7 @@ def ready_surface(item, row):
 
 
 def control_picking_inputs(controller):
-    eligible = [r for r in controller.rows if r["pickable"] and not r["handle"]]
+    eligible = [r for r in controller.markerRows if r["pickable"] and not r["handle"]]
     controller.pick_control_ids = [row["id"] for row in eligible]
     controller.pick_control_points = np.ascontiguousarray(
         [row["trs"][:3] for row in eligible], dtype=np.float64

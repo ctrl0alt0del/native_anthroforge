@@ -59,7 +59,7 @@ def request(operation, **arguments):
 def geometry(path):
     with ZipFile(path) as archive:
         state = json.loads(archive.read("manifest.json"))
-        assert state["version"] == 5
+        assert state["version"] == 6
         curve = state["document"]["objects"][0]["state"]
         key = curve["result"]["asset"]
         points = np.load(io.BytesIO(archive.read(f"paths/{key}/samples.npy")))

@@ -9,6 +9,7 @@ from anthroforge.core.curve_uses import CurveUse
 from anthroforge.core.entities import Attachment
 from anthroforge.core.fibers import Fiber, FiberBinding, FiberEdit
 from anthroforge.core.membranes import Membrane
+from anthroforge.core.mirroring import SymmetricHalf
 from anthroforge.core.object_registry import Authored
 from anthroforge.core.points import Anchor, Point
 from anthroforge.core.reference_images import ImageCalibration, ReferenceImage
@@ -54,6 +55,7 @@ def decode(data: dict[str, Any]) -> Authored:
 
 
 def decode_surface(kind: str, state: dict[str, Any]) -> Surface:
+    state["mirror_plane"] = SymmetricHalf(**state.get("mirror_plane", {}))
     state["curves"] = tuple(CurveUse(**tuples(use)) for use in state["curves"])
     state["alignment"] = tuple(
         SurfaceAlignment(**tuples(row)) for row in state.get("alignment", ())
@@ -70,6 +72,7 @@ def decode_image(state: dict[str, Any]) -> ReferenceImage:
 
 def decode_curve(kind: str, state: dict[str, Any]) -> Curve:
     state = curve_fields(state)
+    state["symmetric"] = SymmetricHalf(**state["symmetric"]) if state.get("symmetric") else None
     state["points"] = tuple(CurvePoint(**tuples(point)) for point in state["points"])
     if kind == "fiber":
         state["bindings"] = tuple(decode_binding(binding) for binding in state["bindings"])

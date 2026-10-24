@@ -6,10 +6,16 @@ from typing import Any
 from anthroforge.core.results import Port
 from anthroforge.core.tissues import TissueVCP
 
+from . import mirror_stacking
 from .tissue_stack_scene import participants
 
 
 def membership(document: Any) -> tuple[str, ...]:
+    values = original_membership(document)
+    return (*values, repr(document.mirror_rules)) if document.mirror_rules else values
+
+
+def original_membership(document: Any) -> tuple[str, ...]:
     return tuple(
         sorted(
             json.dumps((item.id, item.group, item.stack_settings.displacement))
@@ -38,6 +44,8 @@ def planning_inputs(item: TissueVCP) -> tuple[Any, ...]:
 
 
 def changed(session: Any, before: Any) -> None:
+    if before.mirror_rules != session.document.mirror_rules:
+        invalidate(session, {v.id for v in participants(session.document)})
 
     old = {o.id: signature(o) for o in before.objects if isinstance(o, TissueVCP)}
     current = {o.id: signature(o) for o in session.document.objects if isinstance(o, TissueVCP)}
@@ -79,4 +87,4 @@ def ports(document: Any, target: str, phase: str) -> set[Port]:
         values |= {
             Port(item.id, output) for item in document.entities for output in ("geometry", "pose")
         }
-    return values | {Port(target, "stack_scope")}
+    return values | {Port(target, "stack_scope")} | mirror_stacking.ports(document, target)

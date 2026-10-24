@@ -27,6 +27,7 @@ class Attachment:
     vertex_lock: int = -1
     binding: tuple[float, ...] = ()
     material_asset: str = ""
+    parent_instance: str = ""
 
     def __post_init__(self) -> None:
         if self.parent_mode not in ("SURFACE_NEAREST", "OBJECT_ORIGIN"):
@@ -50,6 +51,7 @@ class AttachmentReceipt:
     settings: Attachment
     evaluator_version: int = 0
     effective: Attachment | None = None
+    parent_reflection: tuple[float, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -108,11 +110,14 @@ class Workspace:
     bookmarks: tuple[CameraBookmark, ...] = ()
     reference_images: tuple[ImagePresentation, ...] = ()
     cursor: tuple[float, ...] = (0.0, 0.0, 0.0)
+    mirror_display: str = "BOTH"
 
     def __post_init__(self) -> None:
         if not self.name.strip():
             raise ValueError("Workspace name must not be empty.")
         factor(self.display_units)
+        if self.mirror_display not in ("BOTH", "SOURCE", "MIRROR"):
+            raise ValueError("Mirror display must be BOTH, SOURCE or MIRROR.")
         validate_categories(self.hidden_categories)
         validate_categories(self.unpickable_categories)
         if len({v.target for v in self.reference_images}) != len(self.reference_images):

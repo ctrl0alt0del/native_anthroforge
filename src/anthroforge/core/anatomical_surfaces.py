@@ -4,6 +4,7 @@ from collections.abc import Mapping
 
 from .entities import SCP
 from .membranes import Membrane
+from .mirroring import MirrorInstance, parse
 from .results import EvaluationResult, Port
 from .surface_references import SurfaceReference
 from .tissues import TissueVCP
@@ -43,7 +44,19 @@ def result(item: SCP | TissueVCP, role: str) -> EvaluationResult:
 
 def port(reference: SurfaceReference) -> Port:
     names = {"SCP_GEOMETRY": "geometry", "TISSUE_BASE": "base", "TISSUE_FINAL": "final"}
-    return Port(reference.target, names[reference.role])
+    owner = (
+        MirrorInstance(reference.target, reference.instance).id
+        if reference.instance
+        else reference.target
+    )
+    return Port(owner, names[reference.role])
+
+
+def inputs(reference: SurfaceReference) -> set[Port]:
+    result = {port(reference), Port(reference.target, "pose")}
+    if reference.instance:
+        result.add(Port(reference.instance, "mirror"))
+    return result
 
 
 def usable(result: EvaluationResult) -> bool:
@@ -64,4 +77,9 @@ def defaults(
 
 def from_port(value: Port) -> SurfaceReference:
     roles = {"geometry": "SCP_GEOMETRY", "base": "TISSUE_BASE", "final": "TISSUE_FINAL"}
-    return SurfaceReference(value.owner, roles[value.output])
+    instance = parse(value.owner)
+    return (
+        SurfaceReference(instance.source, roles[value.output], instance.rule)
+        if instance
+        else SurfaceReference(value.owner, roles[value.output])
+    )

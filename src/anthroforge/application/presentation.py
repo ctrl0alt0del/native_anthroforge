@@ -84,3 +84,19 @@ def preset(session: "Session", name: str) -> None:
         raise ValueError("Unknown presentation preset.")
     hidden, unpickable = PRESETS[name]
     update_workspace(session, hidden_categories=hidden, unpickable_categories=unpickable)
+
+
+def hide(session: "Session", targets: list[str], hidden: bool = True) -> None:
+    live = session.document.registry.records.keys() | session.document.mirrors.instances.keys()
+    if set(targets) - live:
+        raise ValueError("Presentation requires existing source or instance identities.")
+    values = set(session.workspace.hidden)
+    values = values | set(targets) if hidden else values - set(targets)
+    update_workspace(session, hidden=sorted(values))
+
+
+def isolate(session: "Session", targets: list[str]) -> None:
+    live = session.document.registry.records.keys() | session.document.mirrors.instances.keys()
+    if not targets or set(targets) - live:
+        raise ValueError("Choose existing sources or instances to isolate.")
+    update_workspace(session, hidden=sorted(live - set(targets)), mirror_display="BOTH")

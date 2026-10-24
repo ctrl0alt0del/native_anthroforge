@@ -13,7 +13,7 @@ ColumnLayout {
     Label { text: "Anatomical binding"; color: Theme.muted }
     SurfaceSelector {
         id: target; objectName: "fiberBindingTarget"; Layout.fillWidth: true
-        target: panel.binding?.target || ""
+        target: panel.binding?.instance ? "mirror/" + panel.binding.instance + "/" + panel.binding.target : (panel.binding?.target || "")
         role: panel.binding?.role || ""
     }
     RowLayout {
@@ -29,4 +29,5 @@ ColumnLayout {
         hint: "Choose eligible surfaces when this bound point is edited"
         onActivated: workspace.run("fiber.binding.scope",{curve:panel.curve.id,point:panel.point.id,scope:currentIndex===1?"ANY_PARENT":"CURRENT_PARENT"})
     }
+    MirrorSharing { visible: !!panel.binding; source: panel.curve.id || ""; binding: panel.point.id || "" }
 }

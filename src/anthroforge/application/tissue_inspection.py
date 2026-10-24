@@ -101,7 +101,7 @@ def comparison(context: Any, target: str, options: Any, cancel: int) -> dict[str
         second,
         reference == "base" and stage != "base",
         cancel,
-        stages.frame(context, stages.tissue(context, target), stage),
+        stages.instance_frame(context, target, stage),
     )
     return dict(resource=output, report=comparison_report(output, reference, stage))
 

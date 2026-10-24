@@ -12,7 +12,10 @@ def assign(session: Any, target: str, curves: list[str]) -> None:
     item = surface_operations.editable(session, target)
     if item.branches:
         raise ValueError("Remove branches before replacing the main source list.")
-    object_operations.install(session, configured(session, item, curves))
+    candidate = configured(session, item, curves)
+    if item.mirrored_rows:
+        return surface_operations.configure_mirroring(session, candidate)
+    object_operations.install(session, candidate)
 
 
 def configured(session: Any, item: Any, curves: list[str]) -> Any:
@@ -27,11 +30,12 @@ def configured(session: Any, item: Any, curves: list[str]) -> Any:
         curves=uses,
         alignment=tuple(alignment.get(key, SurfaceAlignment()) for key in curves),
         across=retained_counts(item, curves),
+        mirror_order=() if item.mirrored_rows else item.mirror_order,
     )
 
 
 def retained_counts(item: Any, curves: list[str]) -> tuple[int, ...]:
-    if not item.across:
+    if not item.across or item.mirrored_rows:
         return ()
     old = [use.curve for use in item.curves]
     pairs = (frozenset(pair) for pair in zip(old, old[1:], strict=False))

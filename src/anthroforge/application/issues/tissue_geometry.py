@@ -3,6 +3,7 @@
 from typing import Any
 
 from anthroforge.core.issues import Issue, evidence, fingerprint
+from anthroforge.core.mirroring import source as source_identity
 from anthroforge.core.results import geometry_asset
 from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import inspection as native
@@ -38,13 +39,24 @@ GEOMETRY_FIELDS = frozenset(
 
 
 def scopes(document: Any) -> set[str]:
+    targets = [o.id for o in document.objects if isinstance(o, TissueVCP)]
+    targets.extend(
+        v.id
+        for v in document.mirrors.instances.values()
+        if isinstance(document.object(v.source), TissueVCP)
+    )
     return {
-        o.id + ":" + s
-        for o in document.objects
-        if isinstance(o, TissueVCP)
-        for s in stages.STAGES
-        if stages.result(o, s).asset and (s != "base" or o.base_state.kind == "SURFACE")
+        target + ":" + stage
+        for target in targets
+        for stage in stages.STAGES
+        if stage_available(document.object(source_identity(target)), stage)
     }
+
+
+def stage_available(item: Any, stage: str) -> bool:
+    return bool(
+        stages.result(item, stage).asset and (stage != "base" or item.base_state.kind == "SURFACE")
+    )
 
 
 def provider(session: Any) -> Provider:
@@ -62,7 +74,11 @@ def provider(session: Any) -> Provider:
 
 def affected(document: Any, changes: Any) -> set[str]:
     rows = (*changes.entities.values(), *changes.objects.values())
-    return scopes(document) if any(GEOMETRY_FIELDS & row for row in rows) else set()
+    return (
+        scopes(document)
+        if "mirror_rules" in changes.document or any(GEOMETRY_FIELDS & row for row in rows)
+        else set()
+    )
 
 
 def neighbors(document: Any, target: str) -> list[Any]:
@@ -75,18 +91,23 @@ def neighbors(document: Any, target: str) -> list[Any]:
 
 def source(document: Any, scope: str) -> Any:
     target, stage = scope.rsplit(":", 1)
-    item = document.registry.records.get(target)
+    item = document.registry.records.get(source_identity(target))
     if not isinstance(item, TissueVCP):
         return None
     return (
         str(document.id),
+        repr(document.mirrors.signature),
         stages.result(item, stage).asset,
         item.matrix,
         poses(document),
-        tuple(
-            (o.id, geometry_asset(o), getattr(o, "geometry_offset", ()))
-            for o in neighbors(document, target)
-        ),
+        neighbor_revisions(document, target),
+    )
+
+
+def neighbor_revisions(document: Any, target: str) -> Any:
+    return tuple(
+        (o.id, geometry_asset(o), getattr(o, "geometry_offset", ()))
+        for o in neighbors(document, target)
     )
 
 
@@ -119,7 +140,7 @@ def check(context: Any, scope: str, cancel: Any) -> tuple[Issue, ...]:
     resources = [context.resources.meshes[geometry_asset(o)].mesh for o in others]
     scan = native.findings(
         mesh,
-        stages.frame(context, item, stage),
+        stages.instance_frame(context, target, stage),
         resources,
         [neighbor_frame(context, o) for o in others],
         LIMIT,
@@ -160,21 +181,22 @@ def finding(
 ) -> Issue:
     code = {1: "DEGENERATE_FACE", 2: "SELF_CROSSING", 3: "SURFACE_CROSSING"}[row[0]]
     other = others[row[1]] if row[1] >= 0 else None
-    sample = witness(context, item, stage, other, row, box)
+    sample = witness(context, scope.rsplit(":", 1)[0], stage, other, row, box)
     return make_issue(scope, stamp, item, stage, other, code, index, sample)
 
 
-def witness(context: Any, item: Any, stage: str, other: Any, row: Any, box: Any) -> Any:
-    result = stages.result(item, stage)
+def witness(context: Any, target: str, stage: str, other: Any, row: Any, box: Any) -> Any:
+    result = stages.result(stages.tissue(context, target), stage)
+    frame = stages.instance_frame(context, target, stage)
     return dict(
-        asset=stages.result(item, stage).asset,
+        asset=result.asset,
         triangle=row[2],
         bounds=box,
-        frame=stages.frame(context, item, stage),
-        other=other.id if other else item.id,
-        other_asset=geometry_asset(other) if other else stages.result(item, stage).asset,
+        frame=frame,
+        other=other.id if other else target,
+        other_asset=geometry_asset(other) if other else result.asset,
         other_triangle=row[3],
-        other_frame=neighbor_frame(context, other) if other else stages.frame(context, item, stage),
+        other_frame=neighbor_frame(context, other) if other else frame,
         accepted_revision=result.revision,
         revision=context.document.revision,
     )
@@ -184,6 +206,7 @@ def make_issue(
     scope: str, stamp: str, item: Any, stage: str, other: Any, code: str, index: int, sample: Any
 ) -> Issue:
     fields = issue_fields(item, stage, other, index)
+    fields["target"] = scope.rsplit(":", 1)[0]
     return Issue(
         NAME,
         scope,

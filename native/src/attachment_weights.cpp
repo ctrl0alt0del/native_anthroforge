@@ -75,13 +75,23 @@ static void initialize_owners(const double* points,const int* owners,int count,i
         single_owner(owners[i],targets+2*i,weights+2*i);
     }
 }
+static std::vector<int> field_pins(const int* pins,int pin_count,int count,int topology) {
+    if(topology<0||topology>2) throw std::runtime_error("Invalid attachment field topology.");
+    auto result=attachment_pins(pins,pin_count,count,topology!=0);
+    if(topology==2) {
+        if(result.front()!=0) result.insert(result.begin(),0);
+        if(result.back()!=count-1) result.push_back(count-1);
+    }
+    return result;
+}
 }
 int af_attachment_weights(const double* points,const int* owners,int count,const int* pins,int pin_count,
                           int closed,int* targets,double* weights,uint64_t cancel) {
     try {
-        const auto fixed=af::attachment_pins(pins,pin_count,count,closed!=0);
+        const auto fixed=af::field_pins(pins,pin_count,count,closed);
+        const bool cyclic=closed==1;
         af::initialize_owners(points,owners,count,targets,weights);
-        for(size_t i=0;i<fixed.size()-(closed?0:1);++i) {
+        for(size_t i=0;i<fixed.size()-(cyclic?0:1);++i) {
             const int end=i+1<fixed.size()?fixed[i+1]:fixed.front()+count;
             af::apply_arc(af::attachment_arc(points,owners,count,fixed[i],end,cancel),targets,weights,cancel);
         }

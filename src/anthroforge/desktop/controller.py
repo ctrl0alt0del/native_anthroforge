@@ -227,6 +227,47 @@ class Controller(QObject):
         return self.construction.model
 
     @Property(QObject, constant=True)
+    def pointModel(self):
+        return self.construction.points.model
+
+    @Property(QObject, constant=True)
+    def markerModel(self):
+        return self.marker_model
+
+    @Property("QVariantList", notify=changed)
+    def markerRows(self):
+        from .mirror_scene import presented
+
+        values = [*self.rows, *self.mirror_records.values()]
+        return [
+            v
+            for v in values
+            if not v.get("asset")
+            and not v.get("is_construction")
+            and not v.get("is_tissue")
+            and presented(self, v)
+        ]
+
+    @Slot(str, result="QVariantList")
+    def mirrorBindings(self, target):
+        return self.session.command("mirror.attachment.inspect", target=target) if target else []
+
+    @Slot(result="QVariantList")
+    def mirrorPlanes(self):
+        return self.session.command("mirror.planes")
+
+    @Slot(str, result="QVariantMap")
+    def defaultMirrorPlane(self, source):
+        if not source:
+            return dict(axis="X", shift=0)
+        values = self.session.command("mirror.list", source=source)
+        return dict(rule=values[0]["rule"]) if len(values) == 1 else dict(axis="X", shift=0)
+
+    @Slot(str, str, result=bool)
+    def mirrorTargetShared(self, source, binding):
+        return self.session.command("mirror.attachment.shared", source=source, binding=binding)
+
+    @Property(QObject, constant=True)
     def selectedData(self):
         return self.scene_projection.selected
 
@@ -591,8 +632,10 @@ class Controller(QObject):
 
     @Slot(str, result="QVariantMap")
     def objectRecord(self, target):
-        return self.scene_projection.records.get(target) or self.construction.records.get(
-            target, {}
+        return (
+            self.scene_projection.records.get(target)
+            or self.construction.records.get(target)
+            or self.mirror_records.get(target, {})
         )
 
     @Slot(str, float, str, bool)

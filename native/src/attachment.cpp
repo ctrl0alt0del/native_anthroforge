@@ -229,18 +229,27 @@ int af_anchor_points(uint64_t parent,const double* cw,const double* pw,const dou
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
-int af_propagate(int count,const uint64_t* meshes,const int* parents,double* matrices,const double* offsets,
-    const double* bindings,const int* modes,const int* follows,const int* flows,const int* active,int* status,uint64_t cancel,const uint64_t* references) {
+static af::M4 propagation_parent(const double* matrices,int parent,const double* reflections,int child) {
+    const af::M4 world=Eigen::Map<const af::M4>(matrices+16*parent);
+    return reflections?af::M4(Eigen::Map<const af::M4>(reflections+16*child)*world):world;
+}
+int af_propagate_spatial(int count,const uint64_t* meshes,const int* parents,double* matrices,const double* offsets,
+    const double* bindings,const int* modes,const int* follows,const int* flows,const int* active,int* status,uint64_t cancel,const uint64_t* references,const double* reflections) {
     try {
         for(int i=0;i<count;++i) {
             af::check_cancel(cancel); const int p=parents[i];
             if(p<0||!active[i]) continue;
             if(p>=i||status[p]) { status[i]=1; continue; }
+            const auto frame=propagation_parent(matrices,p,reflections,i);
             status[i]=!af::propagate_one(meshes[p],references?references[i]:0,bindings+28*i,modes[i],follows[i],flows[i],
-                matrices+16*p,offsets+3*p,matrices+16*i,cancel);
+                frame.data(),offsets+3*p,matrices+16*i,cancel);
         }
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_propagate(int count,const uint64_t* meshes,const int* parents,double* matrices,const double* offsets,
+    const double* bindings,const int* modes,const int* follows,const int* flows,const int* active,int* status,uint64_t cancel,const uint64_t* references) {
+    return af_propagate_spatial(count,meshes,parents,matrices,offsets,bindings,modes,follows,flows,active,status,cancel,references,nullptr);
 }
 
 namespace af {
@@ -380,7 +389,7 @@ static void curve_owner_weights(CurveCapture& value,std::vector<Capture>& surfac
         nearest[i]=capture_point(surfaces,value.points[i],value.forced[i],binding);
     }
     if(af_attachment_weights(positions.data(),nearest.data(),value.nodes,value.pins.data(),int(value.pins.size()),
-        value.source->closed,owners,weights,cancel)) throw std::runtime_error(af_last_error());
+        value.source->closed?1:2,owners,weights,cancel)) throw std::runtime_error(af_last_error());
     for(size_t i=0;i<value.knots.size()*3;++i) {
         const int sample=value.knots[i/3],row=value.nodes+int(i);
         std::copy_n(owners+2*sample,2,owners+2*row); std::copy_n(weights+2*sample,2,weights+2*row);

@@ -95,6 +95,11 @@ def expand_curve(session: Any, before: Curve, after: Curve, result: Any, links: 
 def expand_members(
     session: Any, changes: Any, refs: Any, world: Any, junction: str, skip: str = ""
 ) -> None:
+    from .symmetric_junctions import project
+
+    constrained = project(session, refs, world)
+    if constrained is not world:
+        skip, world = "", constrained
     for ref in refs:
         if ref.curve == skip:
             continue

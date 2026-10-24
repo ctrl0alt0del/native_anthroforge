@@ -4,11 +4,10 @@ from dataclasses import asdict
 from typing import Any
 
 from anthroforge.core.inspection_views import Measurement, SurfacePoint, decode_point
-from anthroforge.core.results import geometry_asset
-from anthroforge.native import measurement, scene
+from anthroforge.native import measurement
 from anthroforge.native.mesh import GeometryEngine, Mesh
 
-from . import presentation
+from . import measurement_sources, presentation
 from .inspection_context import InspectionContext
 from .session import Session
 
@@ -22,18 +21,16 @@ def witness(
     return SurfacePoint(**source, triangle=triangle, weights=tuple(weights), position=position)
 
 
-def point(session: Session, entity: str, triangle: int, weights: list[float]) -> dict[str, Any]:
-    item = session.document.entity(entity)
-    asset = geometry_asset(item)
-    if not asset:
-        raise ValueError("This SCP has no accepted surface.")
-    source = dict(
-        entity=entity,
-        asset=asset,
-        frame=scene.entity_frame(session.engine, item),
-        revision=item.result.revision,
-    )
-    value = witness(session.engine, session.assets[asset].mesh, source, triangle, weights)
+def point(
+    session: Session,
+    entity: str,
+    triangle: int,
+    weights: list[float],
+    role: str = "",
+    stage: str = "",
+) -> dict[str, Any]:
+    source = measurement_sources.resolve(session, entity, role, stage)
+    value = witness(session.engine, session.assets[source["asset"]].mesh, source, triangle, weights)
     return asdict(value)
 
 
@@ -55,11 +52,16 @@ def remove(session: Session, measurement: str) -> None:
 
 
 def endpoint(session: Source, value: SurfacePoint) -> dict[str, Any]:
-    item = session.document.index.entities.get(value.entity)
-    stale = item is None or geometry_asset(item) != value.asset
-    if item is not None:
-        stale |= scene.entity_frame(session.engine, item) != value.frame
-    return dict(asdict(value), stale=stale, name=item.name if item else "Deleted SCP")
+    from anthroforge.core.mirroring import parse, source
+
+    item = session.document.registry.records.get(source(value.entity))
+    try:
+        current = measurement_sources.resolve(session, value.entity, value.role, value.stage)
+        stale = current["asset"] != value.asset or current["frame"] != value.frame
+    except ValueError:
+        stale = True
+    name = item.name + (" · mirrored" if parse(value.entity) else "") if item else "Deleted SCP"
+    return dict(asdict(value), stale=stale, name=name)
 
 
 def describe(session: Source, value: Measurement) -> dict[str, Any]:

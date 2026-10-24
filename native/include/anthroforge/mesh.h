@@ -55,6 +55,11 @@ AF_API int af_capture(uint64_t child, uint64_t parent, const double* child_matri
 AF_API int af_propagate(int count, const uint64_t* meshes, const int* parents,
     double* matrices, const double* offsets, const double* bindings, const int* modes,
     const int* follows, const int* flows, const int* active, int* status, uint64_t cancel, const uint64_t* references);
+/* Optional per-child parent reflection frames; output ownership remains original SCPs. */
+AF_API int af_propagate_spatial(int count,const uint64_t* meshes,const int* parents,
+    double* matrices,const double* offsets,const double* bindings,const int* modes,
+    const int* follows,const int* flows,const int* active,int* status,uint64_t cancel,
+    const uint64_t* references,const double* reflections);
 AF_API int af_move_origin(const double* matrix, const double* offset,
     const double* binding, double* updated_matrix, double* updated_offset);
 AF_API int af_anchor_points(uint64_t parent, const double* child_matrix,

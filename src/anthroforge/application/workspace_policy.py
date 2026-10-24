@@ -7,6 +7,7 @@ from anthroforge.core.entities import Workspace, descendants
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.image_presentation import decode as decode_image
 from anthroforge.core.inspection_views import decode_bookmark, decode_measurement
+from anthroforge.core.mirroring import source as mirror_source
 from anthroforge.core.points import Anchor
 
 if TYPE_CHECKING:
@@ -38,17 +39,23 @@ def settings(values: dict[str, Any]) -> dict[str, Any]:
 
 
 def members(document: Document, values: list[str], children: bool = False) -> tuple[str, ...]:
-    selected = set(values)
+    selected = source_members(document, values)
     live = document.registry.anatomy.keys()
     if selected - live:
         raise ValueError("Workspace membership requires anatomical SCP/VCP objects.")
     if children:
-        for key in values:
+        for key in tuple(selected):
             if key in document.index.entities:
                 selected |= descendants(document.entities, key)
     if not selected:
         raise ValueError("A focused workspace needs at least one anatomical object.")
     return tuple(sorted(selected))
+
+
+def source_members(document: Document, values: list[str]) -> set[str]:
+    if any(v.startswith("mirror/") and v not in document.mirrors.instances for v in values):
+        raise ValueError("Workspace selection refers to an unavailable mirrored instance.")
+    return {mirror_source(v) for v in values}
 
 
 def available(session: "Session") -> None:
@@ -82,6 +89,8 @@ def validate_references(session: "Session", workspace: Workspace, previous: Work
         live = set(session.document.registry.records)
         if field == "members":
             live = set(session.document.registry.anatomy)
+        else:
+            live.update(session.document.mirrors.instances)
         added = set(getattr(workspace, field)) - set(getattr(previous, field))
         if added - live:
             raise ValueError("Workspace references an unknown or incompatible object.")
@@ -90,7 +99,7 @@ def validate_references(session: "Session", workspace: Workspace, previous: Work
 def associations(document: Document, target: str) -> set[str]:
     from .curve_sources import consumers
 
-    pending, seen, anatomy = [target], set[str](), set[str]()
+    pending, seen, anatomy = [mirror_source(target)], set[str](), set[str]()
     while pending:
         key = pending.pop()
         if key in seen:

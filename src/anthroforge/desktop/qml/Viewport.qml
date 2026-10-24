@@ -295,8 +295,8 @@ Item {
                         objectName: "surface_" + item.id + "_" + item.chunk
                         visible: !viewport.comparisonBefore && item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id)
                         position: Qt.vector3d(item.geometry_offset[0], item.geometry_offset[1], item.geometry_offset[2])
-                        geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk }
-                        opacity: item.readonly ? .08 : workspace.shortcutComparison.state.mode === "Overlay" ? .65 : authoring.state.editing && item.id === workspace.selectedId && ["LOFT","BODY"].indexOf(authoring.state.primitive?.kind) >= 0 ? .35 : !viewport.xray ? 1 : item.id === workspace.selectedId ? .65 : item.id === workspace.hoveredId ? .5 : .3
+                        geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk; reflected: item.trs[6]*item.trs[7]*item.trs[8] < 0 }
+                        opacity: item.context_dimmed ? .08 : workspace.shortcutComparison.state.mode === "Overlay" ? .65 : authoring.state.editing && item.id === workspace.selectedId && ["LOFT","BODY"].indexOf(authoring.state.primitive?.kind) >= 0 ? .35 : !viewport.xray ? 1 : item.id === workspace.selectedId ? .65 : item.id === workspace.hoveredId ? .5 : .3
                         property Material normalMaterial: PrincipledMaterial {
                             baseColor: item.color
                             alphaMode: PrincipledMaterial.Opaque
@@ -316,11 +316,11 @@ Item {
                         scale: Qt.vector3d(item.trs[6],item.trs[7],item.trs[8])
                         Model {
                             objectName: "mask_" + item.key
-                            visible: !viewport.comparisonBefore && item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id) && (item.id === workspace.selectedId || (!viewport.xray && !item.readonly))
+                            visible: !viewport.comparisonBefore && item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id) && (item.id === workspace.selectedId || (!viewport.xray && !item.context_dimmed))
                             position: meshNode.position
                             // Each View3D owns its Qt geometry lifetime; both read the same native result.
                             // Sharing meshNode.geometry crashed after delete/recreate in Qt 6.12.
-                            geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk }
+                            geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk; reflected: item.trs[6]*item.trs[7]*item.trs[8] < 0 }
                             property Material normalMaterial: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: item.id === workspace.selectedId ? "white" : "black"; cullMode: Material.NoCulling }
                             property Material clippedMaterial: SectionMaterial { tint: item.id === workspace.selectedId ? "white" : "black"; unlit: true }
                             materials: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && workspace.sectionTools.state.wholeScene ? clippedMaterial : normalMaterial
@@ -330,14 +330,14 @@ Item {
                 }
             }
             Repeater3D {
-                model: workspace.treeRows
+                model: workspace.markerModel
                 delegate: Model {
-                    required property var modelData
-                    visible: !modelData.asset && modelData.visible
-                    position: Qt.vector3d(modelData.trs[0],modelData.trs[1],modelData.trs[2])
+                    required property var item
+                    visible: !item.asset && item.visible
+                    position: Qt.vector3d(item.trs[0],item.trs[1],item.trs[2])
                     source: "#Sphere"
                     scale: Qt.vector3d(.0003,.0003,.0003)
-                    opacity: modelData.opacity
+                    opacity: item.opacity
                     materials: PrincipledMaterial { baseColor: "#d7bf78" }
                 }
             }

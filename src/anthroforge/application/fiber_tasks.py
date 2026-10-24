@@ -162,6 +162,7 @@ def captured_binding(point: str, target: Any, scope: str, indices: Any, asset: A
         scope,
         target.role,
         capture.material_asset,
+        target.instance,
     )
 
 

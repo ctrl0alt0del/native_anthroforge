@@ -119,4 +119,4 @@ def test_typed_tissue_records_round_trip_without_runtime_handles():
     for item in document.objects:
         encoded = json.loads(json.dumps(object_codec.encode(item)))
         assert object_codec.decode(encoded) == item
-    assert storage.VERSION == 5 and 4 in storage.READ_VERSIONS
+    assert storage.VERSION == 6 and {4, 5}.issubset(storage.READ_VERSIONS)

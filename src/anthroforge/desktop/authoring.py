@@ -160,7 +160,10 @@ class Authoring(QObject):
 
     @Slot(bool)
     def setEditing(self, enabled):
-        self.editing = enabled and state.component_editing(state.curve_context.owner(self))
+        available = not self.controller.selectedData.get("readonly")
+        self.editing = (
+            enabled and available and state.component_editing(state.curve_context.owner(self))
+        )
         self.selection = []
         self.refresh()
 

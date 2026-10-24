@@ -8,6 +8,8 @@ from .construction import Control
 from .document_index import DocumentIndex, build
 from .entities import SCP, Workspace
 from .junctions import Junction
+from .mirror_resolution import MirrorIndex
+from .mirroring import MirrorRule, SharedMirrorTarget
 from .shortcut_edits import ShortcutEdit
 from .shortcuts import DrivingShortcut, FormulaResult, Shortcut
 
@@ -30,6 +32,9 @@ class Document:
     formula_results: tuple[FormulaResult, ...] = ()
     shortcut_order: tuple[str, ...] = ()
     shortcut_edits: tuple[ShortcutEdit, ...] = ()
+    mirror_rules: tuple[MirrorRule, ...] = ()
+    shared_mirror_targets: tuple[SharedMirrorTarget, ...] = ()
+    _mirrors: MirrorIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _index: DocumentIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _registry: object_registry.ObjectRegistry | None = field(
         default=None, repr=False, compare=False, kw_only=True
@@ -43,13 +48,7 @@ class Document:
             raise ValueError("Document name must not be empty.")
         if self.revision < 0:
             raise ValueError("Document revision must not be negative.")
-        object.__setattr__(self, "_index", build(self, self._index))
-        object.__setattr__(self, "_registry", object_registry.build(self, self._registry))
-        object.__setattr__(
-            self,
-            "_formulas",
-            formula_index.build(self.driving_shortcuts, self.formula_results, self._formulas),
-        )
+        initialize_indexes(self)
         if self.update_mode not in ("LIVE", "ON_RELEASE", "MANUAL"):
             raise ValueError("Invalid document update mode.")
 
@@ -57,6 +56,11 @@ class Document:
         if entity_id not in self.index.entities:
             raise ValueError(f"Unknown SCP: {entity_id}")
         return self.index.entities[entity_id]
+
+    @property
+    def mirrors(self) -> MirrorIndex:
+        assert self._mirrors is not None
+        return self._mirrors
 
     def control(self, control_id: str) -> Control:
         if control_id not in self.index.controls:
@@ -80,3 +84,17 @@ class Document:
     def formula_index(self) -> formula_index.FormulaIndex:
         assert self._formulas is not None
         return self._formulas
+
+
+def initialize_indexes(document: Document) -> None:
+    from .mirror_graph import install as mirror_graph
+    from .mirror_resolution import build as mirrors
+
+    object.__setattr__(document, "_index", build(document, document._index))
+    object.__setattr__(document, "_registry", object_registry.build(document, document._registry))
+    object.__setattr__(document, "_mirrors", mirrors(document, document._mirrors))
+    mirror_graph(document)
+    index = formula_index.build(
+        document.driving_shortcuts, document.formula_results, document._formulas
+    )
+    object.__setattr__(document, "_formulas", index)

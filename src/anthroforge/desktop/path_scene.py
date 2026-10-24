@@ -6,6 +6,12 @@ from anthroforge.native import paths
 
 
 def rows(controller):
+    from .mirror_scene import path_rows
+
+    return path_rows(controller, source_rows(controller))
+
+
+def source_rows(controller):
     resources = controller.session.resources.paths
     return [
         dict(
@@ -30,16 +36,16 @@ def resources(controller):
 def preview_rows(controller):
     from anthroforge.application.curve_conversion import current
 
+    from .mirror_scene import previews
+
     value = controller.session.conversion
     source = controller.construction.records.get(value.target)
-    if (
-        value.state != "ready"
-        or value.asset is None
-        or not source
-        or not current(controller.session, value)
-    ):
+    if not source or not current(controller.session, value):
         return []
-    return [preview_record(source, value, chunk) for chunk in range(value.asset.path.chunks)]
+    if value.state != "ready" or value.asset is None:
+        return []
+    rows = [preview_record(source, value, chunk) for chunk in range(value.asset.path.chunks)]
+    return previews(controller, rows, value.target)
 
 
 def preview_record(source, value, chunk):

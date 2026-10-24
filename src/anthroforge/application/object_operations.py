@@ -27,8 +27,11 @@ if TYPE_CHECKING:
 
 
 def editable(session: "Session", target: str) -> Authored:
+    from anthroforge.core.mirroring import require_source
+
     from .workspace_policy import included
 
+    require_source(target)
     if session.waiting_save:
         raise ValueError("Editing is blocked while waiting to save.")
     item = session.document.object(target)
@@ -40,9 +43,10 @@ def editable(session: "Session", target: str) -> Authored:
 
 
 def install(session: "Session", item: Authored, **related: Any) -> None:
-    from . import junction_operations
+    from . import junction_operations, symmetric_paths
 
     before = editable(session, item.id)
+    item = symmetric_paths.constrain(session, before, item)
     if junction_operations.edit(session, item):
         return
     item = curve_edit_state.prepare(session, before, item)

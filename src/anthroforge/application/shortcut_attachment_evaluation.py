@@ -3,7 +3,6 @@
 from dataclasses import replace
 from typing import Any
 
-from anthroforge.core import attachment_provenance
 from anthroforge.core.results import Port
 from anthroforge.native import shortcut_attachments
 
@@ -69,14 +68,20 @@ def prepare(
             child = lookup[binding.target]
             lookup[child.id] = replace(child, attachment=binding.attachment)
         if context.anchor and context.owner in targets:
-            backsolve(engine, lookup, context, meshes)
+            backsolve(engine, lookup, context, meshes, document)
             owners.add(context.owner)
     return [lookup[v.id] for v in entities], owners
 
 
-def backsolve(engine: Any, lookup: Any, context: Any, meshes: Any) -> None:
+def backsolve(engine: Any, lookup: Any, context: Any, meshes: Any, document: Any) -> None:
+    from anthroforge.native.attachments import reflected_parent
+
+    from . import scp_surface_parents
+
     child = lookup[context.owner]
     parent = lookup[child.parent]
+    frame = scp_surface_parents.frame(document, child) if child.attachment.parent_instance else None
+    parent = reflected_parent(engine, child, parent, frame)
     anchor = context.anchor
     retained = (anchor.mode, anchor.index, anchor.fallback, anchor.parent_local)
     matrix = shortcut_attachments.backsolve(engine, child, parent, meshes, retained)
@@ -98,7 +103,9 @@ def restored(document: Any, lookup: Any, item: Any) -> Any:
     if not item.parent or item.status != "ready":
         return replace(item, attachment=original.attachment)
     restored_item = replace(item, attachment=original.attachment)
-    receipt = attachment_provenance.receipt(restored_item, lookup[item.parent])
+    from .scp_surface_parents import receipt as spatial_receipt
+
+    receipt = spatial_receipt(document, restored_item, lookup[item.parent])
     if item.attachment != original.attachment:
         receipt = replace(receipt, effective=item.attachment)
     return replace(restored_item, pose_receipt=receipt)

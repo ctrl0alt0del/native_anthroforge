@@ -32,6 +32,10 @@ AF_API int af_curve_surface_layout(const AfSurfaceRow* rows,int count,int exact,
  * topology finalization. close_across is independent of along-path closure. */
 AF_API uint64_t af_curve_surface_geometry(const AfSurfaceRow* rows,int count,int exact,
     const int* across,int kind,int patch_resolution,int close_across,int flip,uint64_t cancel);
+/* Signed 1-based source indices: negative reflects the row, positive retains it.
+ * Output capacity is 2*count. Plane-row handling/order follows the addon source. */
+AF_API int af_curve_surface_mirror_order(const AfSurfaceRow* rows,int count,const double* world,
+    int axis,double shift,int* output,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

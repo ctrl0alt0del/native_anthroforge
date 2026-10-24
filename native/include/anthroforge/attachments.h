@@ -5,6 +5,8 @@ extern "C" {
 #endif
 /* Bind-time C2 owner blending from the addon. Each node has at most two influences.
  * Owner -1 denotes an unused second influence. Fixed indices partition arc-length spans. */
+/* Topology: 0 strict open anchors, 1 cyclic, 2 open field with automatic support tails.
+ * Public authored open Fiber policy still requires both endpoint anchors. */
 AF_API int af_attachment_weights(const double* points,const int* owners,int count,
     const int* pins,int pin_count,int closed,int* targets,double* weights,uint64_t cancel);
 /* Generic anatomical point bindings use the existing 28-double attachment record.

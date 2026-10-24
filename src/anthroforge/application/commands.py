@@ -28,6 +28,7 @@ from . import (
     inspection,
     inspection_report,
     junction_operations,
+    mirror_operations,
     object_operations,
     operations,
     output_tasks,
@@ -47,6 +48,7 @@ from . import (
     surface_operations,
     surface_preview,
     surface_sources,
+    symmetric_paths,
     tissue_field_operations,
     tissue_operations,
     tissue_painting,
@@ -59,11 +61,15 @@ from . import (
 from . import control_operations as controls
 from . import deformer_operations as deformers
 from . import primitive_operations as primitives
+from .mirror_policy import require_edit
 
 if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "mirror.loop.create": symmetric_paths.create,
+    "mirror.configure": mirror_operations.configure,
+    "mirror.attachment.share": mirror_operations.share_target,
     "driver.create": driving_operations.create,
     "driver.configure": driving_operations.configure,
     "driver.value": driving_operations.set_value,
@@ -252,6 +258,7 @@ def shortcut_queries(session: "Session", operation: str, arguments: dict[str, An
 
 
 def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
+    require_edit(arguments)
     implicit = session.history.before is None
     if implicit:
         session.begin()
@@ -284,8 +291,8 @@ def direct_commands(session: "Session") -> dict[str, Any]:
 
 def query_commands(session: "Session") -> dict[str, Any]:
     return {
-        "preferences.get": session.preferences.describe,
-        "preferences.set": session.preferences.update,
+        **mirror_operations.queries(session),
+        **preference_queries(session),
         "driver.inspect": lambda **a: driving_operations.inspect(session, **a),
         **drawing_commands(session),
         **construction_queries(session),
@@ -296,6 +303,13 @@ def query_commands(session: "Session") -> dict[str, Any]:
         "inspect.snapshot": lambda **a: inspection.snapshot(session, **a),
         "object.delete.inspect": lambda **a: deletion_impact.inspect(session, **a),
         "units.convert": convert,
+    }
+
+
+def preference_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "preferences.get": session.preferences.describe,
+        "preferences.set": session.preferences.update,
     }
 
 
@@ -349,6 +363,15 @@ def file_commands(session: "Session") -> dict[str, Any]:
         "workspace.update": lambda **a: presentation.update_workspace(session, **a),
         "workspace.remove": lambda **a: presentation.remove_workspace(session, **a),
         "workspace.preset": lambda **a: presentation.preset(session, **a),
+        **view_commands(session),
+    }
+
+
+def view_commands(session: "Session") -> dict[str, Any]:
+    return {
+        "view.hide": lambda **a: presentation.hide(session, **a),
+        "view.isolate": lambda **a: presentation.isolate(session, **a),
+        "view.show_all": lambda: presentation.update_workspace(session, hidden=[]),
     }
 
 

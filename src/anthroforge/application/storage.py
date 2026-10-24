@@ -17,11 +17,12 @@ from anthroforge.native.mesh import GeometryEngine
 
 from . import object_codec, resource_storage, shortcut_codec
 from .construction_codec import control, entity_construction
+from .mirror_codec import fields as mirror_fields
 from .resources import Resources
 
 FORMAT = "anthroforge-project"
-VERSION = 5
-READ_VERSIONS = (4, 5)
+VERSION = 6
+READ_VERSIONS = (4, 5, 6)
 STATE_RECORDS = (
     "entities",
     "controls",
@@ -31,6 +32,8 @@ STATE_RECORDS = (
     "driving_shortcuts",
     "formula_results",
     "shortcut_edits",
+    "mirror_rules",
+    "shared_mirror_targets",
 )
 
 
@@ -75,6 +78,8 @@ def manifest(document: Document, resources: Resources) -> dict[str, Any]:
 
 
 def document_state(document: Document) -> dict[str, Any]:
+    from .mirror_codec import snapshot
+
     state = {
         f.name: getattr(document, f.name) for f in fields(document) if not f.name.startswith("_")
     }
@@ -82,6 +87,7 @@ def document_state(document: Document) -> dict[str, Any]:
     for name in STATE_RECORDS:
         state[name] = [asdict(value) for value in state[name]]
     state["objects"] = [object_codec.encode(value) for value in document.objects]
+    state["mirror_accepted"] = snapshot(document)
     return state
 
 
@@ -124,6 +130,7 @@ def decode_pose_receipt(value: Any) -> AttachmentReceipt | None:
     if value is None:
         return None
     data = dict(value)
+    data["parent_reflection"] = tuple(data.get("parent_reflection", ()))
     for key in ("parent_matrix", "parent_offset", "child_matrix", "child_offset"):
         data[key] = tuple(data[key])
     settings = dict(data["settings"])
@@ -155,9 +162,15 @@ def decode_document(data: dict[str, Any]) -> Document:
     data["controls"] = tuple(control(item) for item in data.get("controls", ()))
     data["objects"] = tuple(object_codec.decode(item) for item in data.get("objects", ()))
     data["junctions"] = tuple(decode_junction(item) for item in data.get("junctions", ()))
+    return restored_document(data)
+
+
+def restored_document(data: dict[str, Any]) -> Document:
     if not data["workspaces"]:
         raise ValueError("Project has no workspace.")
-    return Document(**(data | shortcut_codec.document_fields(data)))
+    mirrors = mirror_fields(data)
+    data.pop("mirror_accepted", None)
+    return Document(**(data | shortcut_codec.document_fields(data) | mirrors))
 
 
 def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resources]:

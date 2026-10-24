@@ -9,6 +9,7 @@ from .construction_values import validate_range as validate_range
 from .curve_engines import BezierSettings, PathSettings, PolylineSettings, RoutingSettings
 from .curve_uses import CurveUse
 from .entities import IDENTITY, validate_matrix
+from .mirroring import SymmetricHalf
 from .objects import ConstructionObject
 from .parametric import ParametricSettings
 from .results import ControlResult
@@ -67,10 +68,16 @@ class Curve(ConstructionObject):
     span: float | None = None
     engine_settings: PathSettings = field(default_factory=BezierSettings)
     parametric_definition: ParametricSettings | None = None
+    symmetric: SymmetricHalf | None = None
 
     @property
     def engine(self) -> str:
         return self.engine_settings.kind
+
+    @property
+    def path_closed(self) -> bool:
+        """Engine input topology; symmetric expansion closes the complete source afterward."""
+        return self.closed and self.symmetric is None
 
     @property
     def resolution(self) -> int:
@@ -99,8 +106,14 @@ class Curve(ConstructionObject):
             (BezierSettings, PolylineSettings, RoutingSettings, ParametricSettings),
         ):
             raise ValueError("Curve requires typed path engine settings.")
-        validate_matrix(self.matrix)
-        validate_range(self.start, self.span)
+        validate_curve_frame(self)
+
+
+def validate_curve_frame(curve: Curve) -> None:
+    validate_matrix(curve.matrix)
+    validate_range(curve.start, curve.span)
+    if curve.symmetric and not curve.closed:
+        raise ValueError("A symmetric half-path is a complete closed curve.")
 
 
 def cyclic(curve: Curve, primitive: "PrimitiveParameters") -> bool:

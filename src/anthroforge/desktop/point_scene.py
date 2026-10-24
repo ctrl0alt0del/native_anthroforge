@@ -8,6 +8,8 @@ from anthroforge.application import point_evaluation
 from anthroforge.core.points import Anchor, Point
 from anthroforge.native import components
 
+from .record_model import RecordModel
+
 
 def metadata(session, item):
     if not isinstance(item, Point):
@@ -25,9 +27,16 @@ class PointScene:
     def __init__(self, controller):
         self.controller, self.rows = controller, []
         self.positions = np.empty((0, 3))
+        self.model = RecordModel(controller, ("item",), "id")
 
     def synchronize(self, records):
-        desired = [r for r in records.values() if r.get("world_position") and r["pickable"]]
+        from .mirror_scene import presented
+
+        visible = [
+            r for r in records.values() if r.get("world_position") and presented(self.controller, r)
+        ]
+        self.model.synchronize_records([dict(id=r["id"], item=r) for r in visible])
+        desired = [r for r in visible if r["pickable"]]
         if self.rows != desired:
             self.rows = desired
             self.positions = np.ascontiguousarray([r["world_position"] for r in desired])

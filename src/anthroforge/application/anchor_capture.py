@@ -5,7 +5,6 @@ from functools import partial
 from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
-from anthroforge.core import anatomical_surfaces
 from anthroforge.core.entities import Attachment
 from anthroforge.core.jobs import Job
 from anthroforge.core.points import Anchor, Point
@@ -44,7 +43,7 @@ def create(session: Any, item: Point, parent: str, role: str, name: str) -> dict
     if not parent and role not in ("", "SCP_GEOMETRY"):
         raise ValueError("Choose an explicit parent for a Tissue surface role.")
     ref = (
-        anatomical_surfaces.reference(parent, session.document.registry.records, role)
+        surface_providers.normalize(session.document, requested_parent(session, parent, role))
         if parent
         else None
     )
@@ -56,10 +55,17 @@ def create(session: Any, item: Point, parent: str, role: str, name: str) -> dict
 
 
 def rebind(session: Any, item: Anchor, parent: str, role: str, position: Any) -> str:
-    ref = anatomical_surfaces.reference(parent, session.document.registry.records, role)
+    ref = requested_parent(session, parent, role)
     location = tuple(position) if position is not None else ()
     spec = Capture(item.id, item.id, ref, item.name, location)
     return authored_jobs.begin(session, partial(enqueue, session, spec))
+
+
+def requested_parent(session: Any, parent: str, role: str) -> SurfaceReference:
+    from .mirror_surfaces import from_identity
+
+    ref = from_identity(session.document, parent)
+    return surface_providers.normalize(session.document, replace(ref, role=role or ref.role))
 
 
 def inputs(document: Any, spec: Capture) -> set[Port]:

@@ -1,4 +1,5 @@
 #include "inspection_geometry.h"
+#include "geometry_orientation.h"
 #include "anthroforge/inspection.h"
 #include <QtGui/QVector3D>
 
@@ -9,6 +10,10 @@ void InspectionGeometry::setAssetId(qulonglong value) {
 void InspectionGeometry::setChunk(int value) {
     if(value==chunk_) return;
     chunk_=value; rebuild(); emit changed();
+}
+void InspectionGeometry::setReflected(bool value) {
+    if(value==reflected_) return;
+    reflected_=value; rebuild(); emit changed();
 }
 void InspectionGeometry::rebuild() {
     clear(); if(!asset_) { update(); return; }
@@ -21,5 +26,6 @@ void InspectionGeometry::configure(const QByteArray& data,const double* bounds) 
     addAttribute(Attribute::PositionSemantic,0,Attribute::F32Type);
     addAttribute(Attribute::NormalSemantic,3*sizeof(float),Attribute::F32Type);
     addAttribute(Attribute::ColorSemantic,6*sizeof(float),Attribute::F32Type);
+    reflected_indices(*this,data.size()/(10*sizeof(float)),reflected_);
     setBounds(QVector3D(bounds[0],bounds[1],bounds[2]),QVector3D(bounds[3],bounds[4],bounds[5]));
 }

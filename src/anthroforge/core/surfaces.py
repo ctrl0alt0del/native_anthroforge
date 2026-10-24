@@ -5,6 +5,7 @@ from math import isfinite
 
 from .construction import integer
 from .curve_uses import CurveUse
+from .mirroring import SymmetricHalf
 from .objects import ConstructionObject
 from .surface_branches import SurfaceBranch
 from .surface_branches import validate as validate_branches
@@ -51,18 +52,31 @@ class Surface(ConstructionObject):
     branches: tuple[SurfaceBranch, ...] = ()
     accepted_kind: str = ""
     accepted_parts: tuple[str, ...] = ()
+    mirrored_rows: bool = False
+    mirror_plane: SymmetricHalf = SymmetricHalf()
+    mirror_order: tuple[int, ...] = ()
 
     def __post_init__(self) -> None:
         ConstructionObject.__post_init__(self)
         if self.kind not in ("LOFT", "PATCH", "BRANCHED"):
             raise ValueError("Unknown surface construction.")
-        required = 1 if self.kind == "PATCH" else 2
+        required = 1 if self.kind == "PATCH" or self.mirrored_rows else 2
         if len(self.curves) < required or (self.kind == "PATCH" and len(self.curves) != 1):
             raise ValueError("Surface requires compatible source curves.")
         if len({use.curve for use in self.curves}) != len(self.curves):
             raise ValueError("A surface cannot consume the same curve twice.")
         validate_layout(self)
         validate_branches(self)
+        validate_mirroring(self)
+
+
+def validate_mirroring(item: Surface) -> None:
+    if item.mirrored_rows and (item.kind != "LOFT" or item.branches):
+        raise ValueError(
+            "Mirrored rows require an ordinary loft; branches and patches are unsupported."
+        )
+    if item.mirror_order and any(not v or abs(v) > len(item.curves) for v in item.mirror_order):
+        raise ValueError("Mirrored row order refers to a missing source.")
 
 
 def validate_layout(item: Surface) -> None:
@@ -71,7 +85,11 @@ def validate_layout(item: Surface) -> None:
     if item.alignment and len(item.alignment) != len(item.curves):
         raise ValueError("Surface correspondence requires one record per source.")
     if item.across and (
-        len(item.across) != len(item.curves) - 1
+        len(item.across)
+        != (
+            len(item.mirror_order) if item.mirrored_rows and item.mirror_order else len(item.curves)
+        )
+        - 1
         or any(not integer(n, 0, 262144) for n in item.across)
     ):
         raise ValueError("Surface density requires one bounded count per adjacent source pair.")

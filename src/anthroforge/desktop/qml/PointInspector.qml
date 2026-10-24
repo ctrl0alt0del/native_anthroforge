@@ -9,13 +9,19 @@ ColumnLayout {
     Layout.fillWidth: true; spacing: Theme.gap
     UiSection {
         title: panel.anchor ? "Anchor" : "Point"
+        MirrorSharing { visible: panel.anchor; source: panel.item.id || ""; binding: "binding" }
         VectorSetting { visible: !panel.anchor; label: "Local position"; length: true; values: panel.item.point_position || [0,0,0]; onEdited: values=>workspace.run("construction.point.update",{target:panel.item.id,position:values}) }
         UiDetail { label: "World position"; value: (panel.item.world_position || []).map(v=>v.toFixed(4)).join(", ")+" m" }
         UiDetail { visible: panel.anchor; label: "Binding"; value: "Retained surface location" }
     }
     UiSection {
         title: panel.anchor ? "Explicit rebind" : "Create attached copy"
-        SurfaceSelector { id: surface; objectName: "pointAttachmentSurface"; target: panel.item.binding?.reference?.target || ""; role: panel.item.binding?.reference?.role || "" }
+        SurfaceSelector {
+            id: surface; objectName: "pointAttachmentSurface"
+            readonly property var ref: panel.item.binding?.reference || ({})
+            target: ref.instance ? "mirror/" + ref.instance + "/" + ref.target : (ref.target || "")
+            role: ref.role || ""
+        }
         UiButton {
             objectName: "createOrRebindAnchor"; Layout.fillWidth: true
             text: panel.anchor ? "Rebind at 3D cursor" : "Create independent Anchor"

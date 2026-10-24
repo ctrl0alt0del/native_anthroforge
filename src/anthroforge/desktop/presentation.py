@@ -21,6 +21,7 @@ def state(controller):
     return dict(
         members=view.members,
         focused=view.focused,
+        mirror_display=view.mirror_display,
         display_units=view.display_units,
         unit_factor=factor(view.display_units),
         hidden_categories=view.hidden_categories,

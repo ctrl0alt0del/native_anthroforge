@@ -12,7 +12,13 @@ from anthroforge.core.results import Port
 from anthroforge.native.attachments import capture, ordered, propagate
 from anthroforge.native.mesh import GeometryEngine, Mesh, NativeCancellation
 
-from . import dependencies, evaluation_batches, shortcut_attachment_evaluation, task_workloads
+from . import (
+    dependencies,
+    evaluation_batches,
+    scp_surface_parents,
+    shortcut_attachment_evaluation,
+    task_workloads,
+)
 
 if TYPE_CHECKING:
     from .session import Session
@@ -138,7 +144,8 @@ def compute_poses(
         engine, document, ordered(document.entities), meshes, targets
     )
     protected = shortcut_attachment_evaluation.protected(document, targets) | owners
-    entities = capture_all(engine, entities, meshes, recaptures - protected, cancel)
+    frames = scp_surface_parents.reflections(document, recaptures - protected)
+    entities = capture_all(engine, entities, meshes, recaptures - protected, cancel, frames)
     return propagate_and_restore(engine, payload, entities, targets, owners, cancel)
 
 
@@ -152,7 +159,8 @@ def propagate_and_restore(
 ) -> list[SCP]:
     document, meshes = payload
     if document.attachments_enabled:
-        entities = propagate(engine, entities, meshes, targets - owners, cancel)
+        frames = scp_surface_parents.reflections(document, targets - owners)
+        entities = propagate(engine, entities, meshes, targets - owners, cancel, frames)
     return shortcut_attachment_evaluation.restore(document, entities, targets)
 
 
@@ -176,31 +184,45 @@ def capture_all(
     meshes: dict[str, Mesh],
     recaptures: set[str],
     cancel: Event,
+    reflections: Any = None,
 ) -> list[SCP]:
-    lookup = {item.id: item for item in entities}
-    token = getattr(cancel, "handle", 0)
-    for index, item in enumerate(entities):
-        if cancel.is_set():
-            return entities
-        if item.id in recaptures and item.parent:
-            entities[index] = capture_safely(engine, item, lookup[item.parent], meshes, token)
+    lookup, frames = {item.id: item for item in entities}, reflections or {}
+    for index in capture_indices(entities, recaptures, cancel):
+        item = entities[index]
+        args = engine, item, lookup[item.parent], meshes
+        entities[index] = capture_safely(*args, getattr(cancel, "handle", 0), frames.get(item.id))
     return entities
 
 
+def capture_indices(entities: list[SCP], recaptures: set[str], cancel: Event) -> Any:
+    for index, item in enumerate(entities):
+        if cancel.is_set():
+            break
+        if item.id in recaptures and item.parent:
+            yield index
+
+
 def capture_safely(
-    engine: GeometryEngine, item: SCP, parent: SCP, meshes: dict[str, Mesh], cancel: int = 0
+    engine: GeometryEngine,
+    item: SCP,
+    parent: SCP,
+    meshes: dict[str, Mesh],
+    cancel: int = 0,
+    reflection: Any = None,
 ) -> SCP:
     try:
-        if item.capture_parent_matrix:
-            parent = replace(
-                parent,
-                matrix=item.capture_parent_matrix,
-                geometry_offset=item.capture_parent_offset,
-            )
-        captured = capture(engine, item, parent, meshes, cancel)
+        captured = capture(engine, item, capture_parent(item, parent), meshes, cancel, reflection)
         return replace(captured, status="ready", error="", capture_parent_matrix=())
     except ValueError as error:
         return replace(item, status="failed", error=str(error))
+
+
+def capture_parent(item: SCP, parent: SCP) -> SCP:
+    if item.capture_parent_matrix:
+        return replace(
+            parent, matrix=item.capture_parent_matrix, geometry_offset=item.capture_parent_offset
+        )
+    return parent
 
 
 def input_ids(document: Document, targets: set[str]) -> set[str]:

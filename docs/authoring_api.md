@@ -1,21 +1,26 @@
-# Local authoring API, 0.3.2
+# Local authoring API, 0.3.5
 
 The 0.3.3 performance work adds no public commands. The
 [addon functionality audit](addon_functionality_audit.md) distinguishes supported
 operations from missing convenience/lifecycle operations; known migrated-assembly
 limitations are in [parity findings](addon_parity_findings.md).
 
-## Planned mirroring operations (0.3.5 — not implemented)
+## Mirroring operations (0.3.5)
 
 See the [confirmed specification](specification_035.md) and
-[implementation plan](implementation_035.md). Future shared operations cover source
+[implementation plan](implementation_035.md). Shared operations cover source
 mirror rules/inheritance, plane conflict overrides, instance/source inspection,
 same-target attachment choices, removal blockers, mirrored rows, symmetric loops and
-presentation. This documentation adds no available mirror operations or command signatures.
+presentation. The [runtime command table and example](mirroring_035.md#shared-operations)
+give concrete signatures, typed references and schema-6 storage behavior.
 Mirrored properties, geometry, controls and shortcuts are read-only through every API
 path. Typed surface references must distinguish the spatial instance and role; mirrored
 geometry always reflects source output, without independent attachment/routing/stacking
 solves. Existing independent counterparts require a separate explicit migration.
+
+`measurement.point(entity, triangle, weights, role="", stage="")` accepts source or
+instance identities and either an anatomical role or an explicit accepted tissue stage.
+Witnesses remain frozen; plane/geometry changes mark them stale rather than rebinding.
 
 ## Shortcut comparison and replay (0.3.2)
 

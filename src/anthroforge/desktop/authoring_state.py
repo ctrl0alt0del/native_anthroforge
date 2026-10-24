@@ -18,9 +18,8 @@ READ_ONLY_PARTS = frozenset(("vertex", "base", "field"))
 
 
 def data(editor):
-    session, selected = editor.controller.session, editor.controller.selection
-    entity = curve_context.owner(editor)
-    control = session.document.index.controls.get(selected)
+    session = editor.controller.session
+    entity, control = inspection_owners(editor)
     item = entity or control
     result = projected_item(item, control is not None)
     result["is_control"] = control is not None
@@ -32,6 +31,19 @@ def data(editor):
     result["deformers"] = binding_records(item)
     result.update(construction_data(entity, session))
     return result
+
+
+def inspection_owners(editor):
+    from anthroforge.core.mirroring import source
+
+    session, selected = editor.controller.session, editor.controller.selection
+    control = session.document.index.controls.get(source(selected))
+    entity = curve_context.owner(editor)
+    if selected != source(selected) and not control:
+        entity = session.document.object(source(selected))
+        if hasattr(entity, "primitive"):
+            entity = for_editing(session, entity)
+    return entity, control
 
 
 def projected_item(item, control):

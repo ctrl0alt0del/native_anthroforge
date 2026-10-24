@@ -23,6 +23,7 @@ class FiberBinding:
     capture_scope: str = "CURRENT_PARENT"
     role: str = "SCP_GEOMETRY"
     material_asset: str = ""
+    instance: str = ""
 
     def __post_init__(self) -> None:
         SurfaceReference(self.target, self.role)
@@ -35,7 +36,7 @@ class FiberBinding:
 
     @property
     def reference(self) -> SurfaceReference:
-        return SurfaceReference(self.target, self.role)
+        return SurfaceReference(self.target, self.role, self.instance)
 
     @property
     def capture(self) -> CapturedSurface:

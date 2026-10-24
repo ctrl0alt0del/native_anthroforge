@@ -1,4 +1,16 @@
 #include "construction_internal.hpp"
+int af_points_constrain_axes(const double* points,int count,const int* enabled,const double* values,double* output) {
+    try {
+        if(!points||!enabled||!values||!output||count<0||!af::V3(values).allFinite())
+            throw std::runtime_error("Axis constraints require finite owned point inputs.");
+        for(int i=0;i<count;++i) {
+            const af::V3 value(points+3*i);
+            if(!value.allFinite()) throw std::runtime_error("Invalid constrained point.");
+            for(int axis=0;axis<3;++axis) output[3*i+axis]=enabled[axis]?values[axis]:value[axis];
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 
 int af_points_transform(const double* points,int count,const double* matrix,double* output) {
     const af::M4 transform=Eigen::Map<const af::M4>(matrix);

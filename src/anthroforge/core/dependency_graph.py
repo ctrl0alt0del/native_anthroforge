@@ -4,15 +4,20 @@ from collections import deque
 from collections.abc import Iterator, Mapping, Set
 from dataclasses import dataclass, field
 from types import MappingProxyType
+from typing import Any
 
 from . import deformer_references, junctions, routing_obstacles, tissue_dependencies
+from .anatomical_surfaces import port as surface_port
 from .construction import Control, Curve, Deformer
 from .curve_dependencies import inputs as curve_path_inputs
 from .cycle_analysis import cycles
 from .entities import SCP
+from .mirror_dependencies import inputs as mirror_inputs
+from .mirroring import parse as mirror_instance
 from .object_outputs import output
 from .objects import ObjectRecord
 from .results import Port
+from .surface_references import SurfaceReference
 from .surfaces import Surface
 
 Edges = Mapping[Port, Set[Port]]
@@ -70,8 +75,11 @@ def parent_inputs(item: SCP, enabled: bool) -> set[Port]:
     if not item.parent or not enabled:
         return set()
     result = {Port(item.parent, "pose")}
+    if item.attachment.parent_instance:
+        result.add(Port(item.attachment.parent_instance, "mirror"))
     if item.attachment.parent_mode == "SURFACE_NEAREST":
-        result.add(Port(item.parent, "geometry"))
+        ref = SurfaceReference(item.parent, instance=item.attachment.parent_instance)
+        result.add(surface_port(ref))
     return result
 
 
@@ -111,6 +119,29 @@ def build(
     return indexed(result, excluded, signature)
 
 
+def mirror_edges(edges: dict[Port, set[Port]]) -> dict[Port, set[Port]]:
+    owners = {p.owner for p in edges}
+    result: dict[Port, set[Port]] = {
+        ref: set()
+        for values in edges.values()
+        for ref in values
+        if ref.output == "mirror" and ref.owner in owners
+    }
+    for ref in set().union(*edges.values()):
+        instance = mirror_instance(ref.owner)
+        if instance and instance.source in owners and instance.rule in owners:
+            result.update(instance_edges(instance, ref))
+    return result
+
+
+def instance_edges(instance: Any, ref: Port) -> dict[Port, set[Port]]:
+    plane = Port(instance.rule, "mirror")
+    return {
+        ref: {Port(instance.source, ref.output), Port(instance.source, "pose"), plane},
+        plane: set(),
+    }
+
+
 def control_edges(controls: tuple[Control, ...]) -> dict[Port, set[Port]]:
     result = {}
     for control in controls:
@@ -127,6 +158,7 @@ def indexed(
     excluded: dict[str, frozenset[str]] | None = None,
     signature: tuple[str, ...] = (),
 ) -> DependencyGraph:
+    result.update(mirror_edges(result))
     consumers = reverse(result)
     return DependencyGraph(
         frozen(result),
@@ -148,7 +180,9 @@ def object_edges(
         result[pose] = {Port(item.id, "local_pose")} | (
             {Port(item.parent, "pose")} if item.parent else set()
         )
-        result[Port(item.id, output(item))] = construction_inputs(item, objects, shared)
+        result[Port(item.id, output(item))] = construction_inputs(
+            item, objects, shared
+        ) | mirror_inputs(item)
     return result
 
 

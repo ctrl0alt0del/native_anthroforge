@@ -16,7 +16,7 @@ Repeater3D {
             objectName: "shortcutMask_"+item.key
             visible: item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id)
             position: Qt.vector3d(item.geometry_offset[0],item.geometry_offset[1],item.geometry_offset[2])
-            geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk }
+            geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk; reflected: item.trs[6]*item.trs[7]*item.trs[8] < 0 }
             property color tint: meshes.effects.colors?.[item.id] || "black"
             property Material normalMaterial: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: mask.tint; cullMode: Material.NoCulling }
             property Material clippedMaterial: SectionMaterial { tint: mask.tint; unlit: true }

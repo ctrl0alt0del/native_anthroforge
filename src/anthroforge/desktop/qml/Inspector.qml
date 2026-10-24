@@ -26,7 +26,30 @@ UiScrollView {
             Label { text: "Nothing selected"; font.pixelSize: 15; color: Theme.text; Layout.alignment: Qt.AlignHCenter }
             Label { text: "Select an object in the viewport or outliner to edit its properties."; color: Theme.muted; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.fillWidth: true }
         }
-        Label { visible: !!inspector.selected.readonly; text: "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+        Label { visible: !!inspector.selected.readonly; text: inspector.selected.mirror_source ? "Mirrored instance · read-only" : "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+        UiButton {
+            objectName: "selectMirrorSource"; text: "Select source"; Layout.fillWidth: true
+            visible: !!inspector.selected.mirror_source
+            onClicked: workspace.select(inspector.selected.mirror_source)
+        }
+        UiSection {
+            title: "Mirrored attachments"; visible: !!inspector.selected.mirror_source
+            Repeater {
+                model: inspector.selected.mirror_source ? workspace.mirrorBindings(inspector.selected.id) : []
+                UiDetail {
+                    required property var modelData
+                    label: modelData.binding
+                    value: modelData.status === "mapped" ? "Retained counterpart binding" : modelData.error
+                }
+            }
+        }
+        RowLayout {
+            visible: !!inspector.selected.mirror_source; Layout.fillWidth: true
+            UiButton { text: "Hide instance"; Layout.fillWidth: true; onClicked: workspace.run("view.hide",{targets:[inspector.selected.id]}) }
+            UiButton { text: "Isolate"; Layout.fillWidth: true; onClicked: workspace.run("view.isolate",{targets:[inspector.selected.id]}) }
+            UiButton { text: "Show all"; Layout.fillWidth: true; onClicked: workspace.run("view.show_all",{}) }
+        }
+        MirrorSettings { Layout.fillWidth: true }
         UiButton {
             objectName: "addObjectImage"; text: "Add reference image…"; glyph: "image"; Layout.fillWidth: true
             visible: !!inspector.selected.id && inspector.selected.kind !== "IMAGE"
@@ -89,10 +112,11 @@ UiScrollView {
             }
             UiSection {
                 title: "Attachment"; visible: !!inspector.selected.parent
+                MirrorSharing { source: inspector.selected.id || ""; binding: "attachment" }
                 Label { text: "Parent object"; color: Theme.muted; font.pixelSize: 11 }
                 UiCombo {
                     Layout.fillWidth: true; model: inspector.candidates; textRole: "name"; valueRole: "id"
-                    currentIndex: indexOfValue(inspector.selected.parent || "")
+                    currentIndex: indexOfValue(inspector.attachment.parent_instance ? "mirror/"+inspector.attachment.parent_instance+"/"+inspector.selected.parent : inspector.selected.parent || "")
                     hint: "Changing parent preserves the current world pose"
                     onActivated: workspace.run("scp.reparent",{entity:inspector.selected.id,parent:currentValue})
                 }
@@ -152,6 +176,7 @@ UiScrollView {
         ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         ConstructionInspector { id: constructionInspector; onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         TissueInspector { visible: !!inspector.selected.is_tissue; enabled: !inspector.selected.readonly && !workspace.state.waiting }
+        TissueInspection { visible: !!inspector.selected.is_tissue && !!inspector.selected.mirror_source }
         DependencyInspector { visible: !!inspector.selected.id }
         UiNotice { text: inspector.selected.error || ""; error: true }
         Item { implicitHeight: 8 }

@@ -4,11 +4,14 @@ from hashlib import blake2b
 from typing import Any
 
 from anthroforge.core.anatomical_surfaces import usable
+from anthroforge.core.mirroring import source as source_identity
 from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import stacking_abi
 from anthroforge.native.resource_cache import ResourceCache
 from anthroforge.native.scene import entity_frame
 from anthroforge.native.tissue_stacking import MaterialLease
+
+from . import mirror_stacking
 
 
 def participants(document: Any) -> tuple[TissueVCP, ...]:
@@ -69,6 +72,7 @@ class StackScene:
         self.failures: dict[str, str] = {}
         for item, family in families(document):
             self.add(item, family)
+        mirror_stacking.add(self, families(document))
 
     def add(self, item: TissueVCP, family: int) -> None:
         state = item.intrinsic_material
@@ -83,12 +87,12 @@ class StackScene:
             self.discard(item.id)
 
     def add_side(self, owner: str, state: Any, side: str, family: int) -> None:
-        value = lease(self.resources, state, side, self.cancel)
+        value = lease(self.resources, state, side, self.cancel, owner.startswith("mirror/"))
         key = identity(owner, side)
         if key in self.identities:
             raise ValueError("Stacking side identity collision.")
         self.leases[owner, side] = value
-        allowance = self.document.object(owner).stack_settings.displacement
+        allowance = self.document.object(source_identity(owner)).stack_settings.displacement
         domain = value.domain(key, family=family, allowance=allowance)
         if domain.triangles:
             self.identities[key], self.domains[key] = (owner, side), domain

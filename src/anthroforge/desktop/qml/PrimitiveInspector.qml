@@ -44,6 +44,7 @@ ColumnLayout {
         UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.item.id]}) }
     }
     ParametricInspector { curve: panel.curve; visible: panel.item.standalone && panel.curve.engine === "PARAMETRIC" }
+    SymmetricConstruction { curve: panel.curve; topologyLocked: panel.topologyLocked }
     UiSection {
         title: "Curves"; visible: panel.item.editing && panel.curves.length > 0
         UiCombo { id: curveChoice; objectName: "curveChoice"; Layout.fillWidth: true; model: panel.curves; textRole: "name" }

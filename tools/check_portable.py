@@ -18,6 +18,7 @@ from exterior_placement_portable import exterior_placement
 from feedback_portable import feedback
 from inspection_portable import inspection
 from issues_portable import issues
+from mirroring_portable import mirroring
 from preferences_portable import preferences
 from profiler_portable import profiling
 from PySide6.QtGui import QImage
@@ -42,7 +43,7 @@ CHECKS = (
     "surface rulers, named cameras and explanatory profile diagnostics",
     "independent fibers, shared lofts and portable embedded reference images",
     "window feedback capture, annotations, inbox preview, text editing and deletion",
-    "schema-5 tissues, attached construction, stacking, native profiling and rendering",
+    "schema-6 tissues, attached construction, stacking, native profiling and rendering",
     "automatic Fiber endpoints, independent copies, undo/redo and shared deletion impact",
     "direct tissue creation with automatic attached construction",
     "branched point creation, automatic surface grouping and membrane conversion",
@@ -50,9 +51,10 @@ CHECKS = (
     "persistent preferences, Custom/PIQP routed curves and fibers, saved/report provenance",
     "accepted tissue stages, displacement, point explanations and advisory geometry reports",
     "stacking footprints, material brush commit/undo, section cutaways and routed Fiber evidence",
-    "shortcut formulas, typed Parametric paths, schema-5 results and native consumer rendering",
+    "shortcut formulas, typed Parametric paths, schema-6 results and native consumer rendering",
     "shortcut influence, captured formula inputs, effective policy and propagation completion",
     "session comparison, paired images, bounded replay journal and isolated replay",
+    "strict mirrors, symmetric loops, instance measurements and schema-6 storage",
 )
 
 
@@ -159,7 +161,15 @@ def qualification_steps():
 
 
 def construction_steps():
-    return construction, direct_workflows, automatic_construction, branches, shortcuts, comparison
+    return (
+        construction,
+        direct_workflows,
+        automatic_construction,
+        branches,
+        shortcuts,
+        comparison,
+        mirroring,
+    )
 
 
 def deletion(executable, cwd, invoke=invoke):

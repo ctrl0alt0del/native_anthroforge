@@ -74,8 +74,22 @@ def settings(item):
 
 
 def choices(controller):
+    from anthroforge.application.mirror_stacking import participants
+
+    document = controller.session.document
+    mirrors = [mirror_choice(document, v) for v in participants(document)]
     return [
         dict(id=item.id, name=item.name, both_sides=item.both_sides, enabled=item.stacking)
         for item in controller.session.document.objects
         if isinstance(item, TissueVCP) and item.base_state.kind == "SURFACE"
-    ]
+    ] + mirrors
+
+
+def mirror_choice(document, instance):
+    item = document.object(instance.source)
+    return dict(
+        id=instance.id,
+        name=item.name + " · mirrored",
+        both_sides=item.both_sides,
+        enabled=item.stacking,
+    )

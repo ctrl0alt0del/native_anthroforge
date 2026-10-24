@@ -17,13 +17,13 @@ def sources(binding: Any) -> tuple[str, ...]:
 
 
 def inputs(binding: Any) -> set[Port]:
-    from .anatomical_surfaces import port
+    from .anatomical_surfaces import inputs as surface_inputs
 
     if not binding.enabled:
         return set()
     if binding.shrinkwrap:
         surface = binding.shrinkwrap.surface
-        return {port(surface), Port(surface.target, "pose")}
+        return surface_inputs(surface)
     if not binding.control:
         return set()
     return {Port(binding.control, "cage" if binding.kind == "LATTICE" else "control")}

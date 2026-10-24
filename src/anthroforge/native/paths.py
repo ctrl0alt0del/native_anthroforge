@@ -14,6 +14,7 @@ INT = c.POINTER(c.c_int)
 
 
 def configure(engine: GeometryEngine) -> None:
+    engine.bind("af_path_symmetric", [U, D, U], U)
     engine.bind("af_path_evaluate", [D, c.c_int, c.c_int, c.c_int, c.c_int, U], U)
     engine.bind("af_path_restore", [D, D, c.c_int, c.c_int], U)
     engine.bind("af_path_info", [U, INT64, D])
@@ -81,7 +82,7 @@ def evaluate(engine: GeometryEngine, curve: Curve, cancel: int = 0, records: Any
         pointer(records),
         len(curve.points),
         int(curve.engine == "POLYLINE"),
-        curve.closed,
+        curve.path_closed,
         curve.resolution,
         cancel,
     )
@@ -98,6 +99,12 @@ def restore(engine: GeometryEngine, samples: Any, parameters: Any, closed: bool)
         pointer(samples), pointer(parameters), len(samples), closed
     )
     return Path(engine, handle)
+
+
+def symmetric(path: Path, reflection: Any, cancel: int = 0) -> Path:
+    frame = doubles(reflection)
+    handle = path.engine.library.af_path_symmetric(path.handle, pointer(frame), cancel)
+    return Path(path.engine, handle)
 
 
 def sample(

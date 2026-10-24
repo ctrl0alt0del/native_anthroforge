@@ -20,7 +20,7 @@ def configure(engine: GeometryEngine) -> None:
 def cubics(engine: GeometryEngine, curve: Curve, frame: Any) -> Any:
     resolved = construction.resolved_curve(engine, curve)
     matrix = construction.matrix(engine, frame, curve.matrix)
-    return control_geometry.cubics(engine, resolved, curve.closed, matrix)
+    return control_geometry.cubics(engine, resolved, curve.path_closed, matrix)
 
 
 class CurveQuery:
@@ -56,7 +56,7 @@ def split(engine: GeometryEngine, curve: Curve, segment: int, parameter: float) 
         data = construction.resolved_curve(engine, curve)
     engine.check(
         engine.library.af_curve_split(
-            pointer(data), len(data), curve.closed, segment, parameter, pointer(output)
+            pointer(data), len(data), curve.path_closed, segment, parameter, pointer(output)
         )
     )
     identities = list(curve.points)

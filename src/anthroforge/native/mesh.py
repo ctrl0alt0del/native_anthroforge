@@ -171,10 +171,14 @@ class GeometryEngine(NativeEngine):
         self.bind("af_move_origin", [D, D, D, D, D])
         self.bind("af_anchor_points", [U, D, D, D, D, D, U])
         ints = c.POINTER(c.c_int)
-        self.bind(
-            "af_propagate",
-            [c.c_int, c.POINTER(U), ints, D, D, D, ints, ints, ints, ints, ints, U, c.POINTER(U)],
-        )
+        self._propagation_signatures(ints)
+
+    def _propagation_signatures(self, ints: Any) -> None:
+        geometry = [c.c_int, c.POINTER(U), ints, D, D, D]
+        policy = [ints] * 5  # Active, parent/child anchor, follow and strategy arrays.
+        arguments = [*geometry, *policy, U, c.POINTER(U)]
+        self.bind("af_propagate", arguments)
+        self.bind("af_propagate_spatial", [*arguments, D])
 
     def check(self, status: int) -> None:
         if status:

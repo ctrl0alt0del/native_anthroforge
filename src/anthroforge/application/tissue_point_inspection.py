@@ -20,20 +20,25 @@ def signature(context: Any, target: str, options: Any) -> Any:
 
 
 def explain(context: Any, target: str, options: Any, cancel: int) -> dict[str, Any]:
+    options = dict(options, spatial_target=target)
     stage, triangle, bary = options["stage"], int(options["triangle"]), options["weights"]
     item, mesh = stages.tissue(context, target), stages.mesh(context, target, stage)
     state = stages.material(item, stage)
     base = context.resources.meshes.get(state.base) if state else None
-    frame = stages.frame(context, item, stage)
+    frame = stages.instance_frame(context, target, stage)
     row = sample(context, item, options, cancel)
     config = accepted_settings(item, state)
     rows = constraint_rows(context, mesh, base, config, state, triangle, bary, cancel)
     report = point_report(context, item, options, row, config, state)
     report.update(constraints=rows, frame=frame)
-    payload = dict(
+    payload = point_payload(report, mesh, frame, triangle, row)
+    return tissue_goal_inspection.enrich(context, config, state, options, payload, cancel)
+
+
+def point_payload(report: Any, mesh: Any, frame: Any, triangle: int, row: Any) -> Any:
+    return dict(
         report=report, lines=native.face_lines(mesh, frame, triangle) + row["glyph"], mesh=mesh
     )
-    return tissue_goal_inspection.enrich(context, config, state, options, payload, cancel)
 
 
 def sample(context: Any, item: Any, options: Any, cancel: int) -> Any:
@@ -43,7 +48,9 @@ def sample(context: Any, item: Any, options: Any, cancel: int) -> Any:
     rest = context.resources.meshes.get(state.rest) if state else None
     query = options["triangle"], options["weights"]
     inputs: dict[str, Any] = dict(
-        rest=rest.mesh if rest else None, cancel=cancel, frame=stages.frame(context, item, stage)
+        rest=rest.mesh if rest else None,
+        cancel=cancel,
+        frame=stages.instance_frame(context, options.get("spatial_target", item.id), stage),
     )
     return native.point(mesh, base.mesh if base else None, *query, **inputs)
 
@@ -52,7 +59,7 @@ def point_report(
     context: Any, item: Any, options: Any, row: Any, config: Any, state: Any
 ) -> dict[str, Any]:
     return dict(
-        target=item.id,
+        target=options.get("spatial_target", item.id),
         stage=options["stage"],
         asset=stages.result(item, options["stage"]).asset,
         triangle=options["triangle"],

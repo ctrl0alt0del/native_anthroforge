@@ -80,6 +80,7 @@ class InspectionTools(QObject):
             asset=row["geometry_asset"],
             frame=tuple(frame),
             revision=row["geometry_revision"],
+            stage=row.get("stage", ""),
         )
         value = measurements.witness(engine, mesh, source, hit["triangle"], hit["weights"])
         return asdict(value)

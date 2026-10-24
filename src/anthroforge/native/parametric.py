@@ -72,7 +72,7 @@ def sample(
     count = curve.engine_settings.resolution
     output = np.empty((count, 13))
     inputs = (handles, len(programs[0].symbols), integers.ctypes.data_as(INT64), pointer(reals))
-    domain = (pointer(metadata), len(curve.points), count, curve.closed, *interval)
+    domain = (pointer(metadata), len(curve.points), count, curve.path_closed, *interval)
     interpolation = interpolation_options(curve.engine_settings)
     handle = engine.library.af_parametric_interpolated_path(
         *inputs, *domain, *interpolation, pointer(output), cancel

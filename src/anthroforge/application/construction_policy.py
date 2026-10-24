@@ -2,6 +2,8 @@
 
 from anthroforge.core import attachment_references
 from anthroforge.core.document import Document
+from anthroforge.core.entities import SCP
+from anthroforge.core.mirroring import parse as mirror_instance
 from anthroforge.core.results import Port, ReadRevision
 from anthroforge.core.tissue_revisions import PHASES
 from anthroforge.core.tissues import TissueVCP
@@ -70,17 +72,35 @@ def revision(document: Document, port: Port) -> ReadRevision:
 
 
 def object_port_revision(document: Document, port: Port) -> ReadRevision:
+    if mirror_instance(port.owner):
+        return mirror_revision(document, port)
+    if port.output == "mirror":
+        rule = document.mirrors.rules.get(port.owner)
+        return ReadRevision(port.owner, port.output, 0, 0, (repr(rule),))
     if port.owner in document.registry.authored:
         return object_revision(document, port)
     if port.owner in document.index.controls:
         control = document.control(port.owner)
         return ReadRevision(port.owner, port.output, control.generation, 0)
-    entity = document.entity(port.owner)
+    return entity_revision(document.entity(port.owner), port)
+
+
+def entity_revision(entity: SCP, port: Port) -> ReadRevision:
     if port.output == "pose":
         return ReadRevision(port.owner, port.output, 0, entity.pose_revision)
     return ReadRevision(
         port.owner, port.output, entity.construction_revision, entity.result.revision
     )
+
+
+def mirror_revision(document: Document, port: Port) -> ReadRevision:
+    from dataclasses import replace
+
+    instance = mirror_instance(port.owner)
+    assert instance is not None
+    source = object_port_revision(document, Port(instance.source, port.output))
+    rule = document.mirrors.rules.get(instance.rule)
+    return replace(source, owner=port.owner, membership=(*source.membership, repr(rule)))
 
 
 def object_revision(document: Document, port: Port) -> ReadRevision:

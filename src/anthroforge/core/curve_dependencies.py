@@ -4,6 +4,7 @@ from . import anatomical_surfaces
 from .construction import Curve
 from .curve_engines import RoutingSettings
 from .fibers import Fiber
+from .mirroring import parse, source
 from .results import Port
 from .surface_references import SurfaceReference
 
@@ -11,7 +12,7 @@ from .surface_references import SurfaceReference
 def targets(item: Curve) -> set[str]:
     settings = item.engine_settings
     result = (
-        set(settings.obstacles)
+        {source(value) for value in settings.obstacles}
         if isinstance(settings, RoutingSettings) and settings.obstacle_mode == "MANUAL"
         else set()
     )
@@ -32,6 +33,7 @@ def inputs(item: Curve, objects: tuple[object, ...] = ()) -> set[Port]:
         | {Port(item.id, "pose")}
         | {anatomical_surfaces.port(ref) for ref in references(item, objects)}
         | {Port(ref.target, "pose") for ref in references(item, objects)}
+        | {Port(ref.instance, "mirror") for ref in references(item, objects) if ref.instance}
     )
 
 
@@ -49,7 +51,10 @@ def routing_references(settings: object, objects: tuple[object, ...]) -> set[Sur
     if not isinstance(settings, RoutingSettings) or settings.obstacle_mode != "MANUAL":
         return set()
     tissues = {r.target for r in anatomical_surfaces.defaults((), objects)}
-    return {
-        SurfaceReference(k, "TISSUE_FINAL" if k in tissues else "SCP_GEOMETRY")
-        for k in settings.obstacles
-    }
+    return {routing_reference(k, tissues) for k in settings.obstacles}
+
+
+def routing_reference(value: str, tissues: set[str]) -> SurfaceReference:
+    instance = parse(value)
+    role = "TISSUE_FINAL" if source(value) in tissues else "SCP_GEOMETRY"
+    return SurfaceReference(source(value), role, instance.rule if instance else "")

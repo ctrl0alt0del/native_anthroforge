@@ -39,7 +39,23 @@ def object_data(obj):
     data["modifiers"] = [scalar_properties(m) for m in obj.modifiers]
     if obj.type == "CURVE":
         data["splines"] = [spline_data(s) for s in obj.data.splines]
+    if obj.type == "MESH" and obj.name == "Thumb":
+        data["mesh"] = mesh_details(obj)
     return data
+
+
+def mesh_details(obj):
+    evaluated = obj.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    mesh = evaluated.to_mesh()
+    try:
+        face = mesh.polygons[6]
+        return dict(
+            vertices=len(mesh.vertices),
+            polygons=len(mesh.polygons),
+            face6=dict(vertices=list(face.vertices), center=list(face.center)),
+        )
+    finally:
+        evaluated.to_mesh_clear()
 
 
 def spline_data(spline):

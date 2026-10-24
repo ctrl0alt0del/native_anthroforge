@@ -18,6 +18,11 @@ static Input input(const double* records,int count,const double* world,const int
     if(!matrix.allFinite()||!matrix.fullPivLu().isInvertible()) throw std::runtime_error("Invalid routing transform.");
     return {records,count,matrix,matrix.inverse(),std::vector<int>(owners,owners+count),*options,cancel};
 }
+static void execution(Input& input,double weight,int checkpoint) {
+    if(!std::isfinite(weight)||weight<0||checkpoint<1||checkpoint>1000)
+        throw std::runtime_error("Invalid routing execution settings.");
+    input.length_weight=weight; input.checkpoint_steps=checkpoint;
+}
 static void resolve_contacts(Input& input,const World& world) {
     for(int i=0;i<input.count;++i) {
         check_cancel(input.cancel);
@@ -62,14 +67,14 @@ static void diagnose(Input& input,const World& scene,Trace& trace,uint64_t warm)
     } catch(const std::exception& error) { check_cancel(input.cancel); trace.error=error.what(); }
 }
 }
-uint64_t af_route_inspect(const double* records,int count,const double* world,const int* owners,
-    uint64_t handle,const AfRoutingOptions* options,uint64_t warm,uint64_t cancel,int backend) {
+uint64_t af_route_inspect_configured(const double* records,int count,const double* world,const int* owners,
+    uint64_t handle,const AfRoutingOptions* options,uint64_t warm,uint64_t cancel,int backend,double weight,int checkpoint) {
     try {
         if(!options) throw std::runtime_error("Routing options are required.");
         const auto scene=af::routing::routing_scene(handle);
         if(scene->radius!=options->radius) throw std::runtime_error("Routing scene clearance changed.");
         auto input=af::routing::input(records,count,world,owners,int(scene->collision->items.size()),options,cancel);
-        input.backend=backend; auto trace=std::make_shared<af::routing::Trace>();
+        input.backend=backend; af::routing::execution(input,weight,checkpoint); auto trace=std::make_shared<af::routing::Trace>();
         af::routing::diagnose(input,*scene,*trace,warm); af::check_cancel(cancel);
         return af::routing::retain_trace(std::move(trace));
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
@@ -84,14 +89,14 @@ uint64_t af_route_path_with_backend(const double* records,int count,const double
         return af::routing::evaluate(input,scene,counters,measures,warm);
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }
-uint64_t af_route_path_in_scene_with_backend(const double* records,int count,const double* world,const int* owners,
-    uint64_t handle,const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel,int backend) {
+uint64_t af_route_path_in_scene_configured(const double* records,int count,const double* world,const int* owners,
+    uint64_t handle,const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel,int backend,double weight,int checkpoint) {
     try {
         if(!counters||!measures||!options) throw std::runtime_error("Routing report and options are required.");
         const auto scene=af::routing::routing_scene(handle);
         if(scene->radius!=options->radius) throw std::runtime_error("Routing scene clearance changed.");
         auto input=af::routing::input(records,count,world,owners,int(scene->collision->items.size()),options,cancel);
-        input.backend=backend;
+        input.backend=backend; af::routing::execution(input,weight,checkpoint);
         return af::routing::evaluate(input,*scene,counters,measures,warm);
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }
@@ -105,4 +110,13 @@ uint64_t af_route_path_in_scene(const double* records,int count,const double* wo
     uint64_t handle,const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel) {
     return af_route_path_in_scene_with_backend(records,count,world,owners,handle,options,
         counters,measures,warm,cancel,AF_ROUTING_CUSTOM);
+}
+
+uint64_t af_route_path_in_scene_with_backend(const double* records,int count,const double* world,const int* owners,
+    uint64_t handle,const AfRoutingOptions* options,int64_t* counters,double* measures,uint64_t warm,uint64_t cancel,int backend) {
+    return af_route_path_in_scene_configured(records,count,world,owners,handle,options,counters,measures,warm,cancel,backend,0.9,1);
+}
+uint64_t af_route_inspect(const double* records,int count,const double* world,const int* owners,
+    uint64_t handle,const AfRoutingOptions* options,uint64_t warm,uint64_t cancel,int backend) {
+    return af_route_inspect_configured(records,count,world,owners,handle,options,warm,cancel,backend,0.9,1);
 }

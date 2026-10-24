@@ -21,11 +21,17 @@ def configure(engine: Any) -> None:
         [D, c.c_int, D, c.POINTER(c.c_int), U, c.POINTER(routing.Options), U, U, c.c_int],
         U,
     )
+    configure_execution(engine)
     engine.bind("af_route_trace_info", [U, INT64, INT64, D])
     engine.bind("af_route_trace_records", [U], INT64)
     engine.bind("af_route_trace_buffer", [U, c.c_int], D)
     engine.bind("af_route_trace_error", [U], c.c_char_p)
     engine.bind("af_route_trace_release", [U], None)
+
+
+def configure_execution(engine: Any) -> None:
+    arguments = engine.library.af_route_inspect.argtypes
+    engine.bind("af_route_inspect_configured", [*arguments, c.c_double, c.c_int], U)
 
 
 def inspect(engine: Any, inputs: routing.Inputs, cancel: int = 0) -> dict[str, Any]:
@@ -46,10 +52,28 @@ def invoke(engine: Any, inputs: routing.Inputs, cancel: int) -> int:
     )
     scene = capture(engine, packed, settings.radius, cancel)
     args = (*routing.arguments(packed)[:4], scene.handle, c.byref(options))
-    return int(
-        engine.library.af_route_inspect(
-            *args, inputs.warm.handle if inputs.warm else 0, cancel, int(inputs.backend == "PIQP")
-        )
+    return execute(engine, args, inputs, settings, cancel)
+
+
+def execute(
+    engine: Any,
+    args: tuple[Any, ...],
+    inputs: routing.Inputs,
+    settings: RoutingSettings,
+    cancel: int,
+) -> int:
+    execution = execution_options(inputs, settings, cancel)
+    return int(engine.library.af_route_inspect_configured(*args, *execution))
+
+
+def execution_options(inputs: routing.Inputs, settings: RoutingSettings, cancel: int) -> tuple:
+    warm = inputs.warm.handle if inputs.warm and settings.use_warm_start else 0
+    return (
+        warm,
+        cancel,
+        int(inputs.backend == "PIQP"),
+        settings.length_weight,
+        settings.checkpoint_steps,
     )
 
 

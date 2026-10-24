@@ -32,9 +32,12 @@ class RoutingSettings:
     obstacle_mode: str = "AUTO"
     excluded_obstacles: tuple[str, ...] = ()
     use_warm_start: bool = True
+    length_weight: float = 0.9
+    checkpoint_steps: int = 1
     kind: Literal["ROUTED"] = field(default="ROUTED", init=False)
 
     def __post_init__(self) -> None:
+        validate_routing_execution(self)
         if not integer(self.samples, 3, 4096) or not integer(self.accepted_steps, 1, 1000):
             raise ValueError("Invalid routing sample or accepted-step budget.")
         if not isfinite(self.radius) or self.radius < 0:
@@ -46,6 +49,13 @@ class RoutingSettings:
         for values in (self.obstacles, self.excluded_obstacles):
             if len(set(values)) != len(values) or any(not key for key in values):
                 raise ValueError("Routing obstacles must be unique object identities.")
+
+
+def validate_routing_execution(settings: RoutingSettings) -> None:
+    if not isfinite(settings.length_weight) or settings.length_weight < 0:
+        raise ValueError("Routing length weight must be finite and nonnegative.")
+    if not integer(settings.checkpoint_steps, 1, 1000):
+        raise ValueError("Routing checkpoint size must be between 1 and 1000 solver trials.")
 
 
 type PathSettings = BezierSettings | PolylineSettings | RoutingSettings | ParametricSettings

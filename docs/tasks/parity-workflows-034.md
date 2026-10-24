@@ -126,3 +126,19 @@ and E:/development/WIP_models/shortcut_update_parity_20261023/matching_96_muscle
 Earlier evidence remains in build/shoulder-thumb-parity. Preserve source hashes recorded
 there. External anatomy/binary evidence is not available from Git alone during an outage.
 The addon worktree contains unrelated local edits; do not modify it.
+
+## Recovery checkpoint: active routing execution controls
+
+D05 now exposes typed length_weight (default .9) and checkpoint_steps (default 1),
+separate from the existing total accepted-step cap. Checkpoints count SOLVER TRIALS,
+not accepted updates; native kernel inspection established this distinction. Both QP
+backends use the selected objective weight, regularization scale and initial penalty.
+Old C ABI entrypoints retain .9/1 defaults; additive configured entrypoints carry settings.
+Inspection always checkpoints each trial for complete evidence. Production report measure
+5 records actual checkpoint count; no intermediate viewport preview is claimed.
+
+Snapped-cube 128-point Fiber, Custom/PIQP: quantum 1 vs 4 gives bit-identical paths and
+counters, with 54 vs 14 checkpoints at weight .9. Weight 0 changes both routes while
+independent collision checks remain clear. 67 focused routing/parity/warm/inspection/
+architecture tests pass; native build and all five native tests pass; Ruff passes.
+Full integrated gate and remaining D06-D11 workflows are NOT complete.

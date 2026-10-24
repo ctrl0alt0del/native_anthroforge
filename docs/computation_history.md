@@ -1,5 +1,19 @@
 # Computation inventory and approach history
 
+### In-progress 0.3.4: active native routing objective and checkpoints
+
+Routing previously hardcoded length weight .9 and stepped one solver trial per native
+checkpoint. Typed settings now configure the length objective and its regularization/
+penalty preparation in both Custom and PIQP. Checkpoint trial quantum is independent
+of the total accepted-step budget. Defaults and original ABI behavior are preserved.
+Inspection retains every trial; production reports checkpoint count in measure 5.
+No collision check, pin constraint, publication rule or solver cap was relaxed.
+Snapped-cube 128-point Fiber: quantum 1/4 produces identical geometry and counters;
+weight 0/.9 changes paths in both backends and retains independently checked clearance.
+67 focused routing, parity, warm-start, inspection and architecture tests pass.
+No preview, speedup or full-release qualification is inferred from these tests.
+
+
 ### In-progress 0.3.4: advisory material-pin assessment and cold routing
 
 Pin repair previously required manual point-by-point recapture. On-demand Issues now

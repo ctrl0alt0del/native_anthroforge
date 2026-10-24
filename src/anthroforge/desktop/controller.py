@@ -577,6 +577,22 @@ class Controller(QObject):
     @Slot(str, bool)
     def select(self, entity, extend=False):
         self.object_selection.choose(entity, extend)
+        self.publish_selection()
+
+    @Slot("QVariantList")
+    def selectObjects(self, identities):
+        if set(identities) - self.session.document.registry.records.keys():
+            raise ValueError("Cannot select an object that is absent from the document.")
+        self.object_selection.replace(identities)
+        self.publish_selection()
+
+    @Slot(str)
+    def selectSurfaceSources(self, target):
+        identities = self.run("surface.source_ids", dict(target=target))
+        if identities is not None:
+            self.selectObjects(identities)
+
+    def publish_selection(self):
         if (
             self.session.tissue_preview.target
             and self.session.tissue_preview.target != self.selection

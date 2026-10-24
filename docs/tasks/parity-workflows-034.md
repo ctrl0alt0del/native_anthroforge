@@ -73,6 +73,13 @@ Thumb correction was rendered and inspected at fixed camera/scale against source
 original app geometry: build/parity-workflows-034/thumb-correction.png. Corrected shape
 matches source visually; no original anatomy file was saved over.
 
+D12 is implemented independently of the pending structural replacement work:
+`surface.source_ids` returns ordered source identities (including all branch sources).
+One inspector action uses a validated batch selection operation with one refresh, no
+construction edits and no multi-curve component editing. Offscreen surface acceptance
+passes creation, source group selection, editing, Realign, undo and geometry staging.
+Its obsolete exact tooltip-text assertion was replaced with selection/action behavior.
+
 ## Verification
 
 - Windows native build and all five native tests pass.

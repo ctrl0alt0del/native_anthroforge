@@ -332,6 +332,7 @@ def fiber_queries(session: "Session") -> dict[str, Any]:
 
 def surface_queries(session: "Session") -> dict[str, Any]:
     return {
+        "surface.source_ids": lambda **a: surface_sources.identities(session, **a),
         "surface.preview": lambda **a: surface_preview.preview(session, **a),
         "surface.grouping": lambda **a: surface_grouping.inspect(session, **a),
         "surface.preview.status": lambda: surface_preview.status(session),

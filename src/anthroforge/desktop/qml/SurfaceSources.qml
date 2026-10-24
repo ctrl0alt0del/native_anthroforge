@@ -13,6 +13,7 @@ UiSection {
         return expanded && item.id ? workspace.surfaceOptions(item.id,"").sources || [] : [];
     }
     title: "Source curves"
+    UiButton { objectName:"selectAllSurfaceSources"; text:"Select all source curves"; Layout.fillWidth:true; enabled:panel.uses.length>0; onClicked:workspace.selectSurfaceSources(panel.item.id) }
     function update(key,value) { const args={target:item.id,curve:use.curve}; args[key]=value; workspace.run("surface.source",args); }
     function move(step) {
         const ids=uses.map(u=>u.curve), index=choice.currentIndex, other=index+step;

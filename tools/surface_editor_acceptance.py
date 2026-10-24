@@ -55,6 +55,7 @@ def create(controller, engine):
 
 
 def inspection(controller, engine, target):
+    select_sources(controller, engine, target)
     realign(controller, engine)
     assert controller.session.document.object(target).result.status == "ready"
     window = engine.rootObjects()[0]
@@ -67,6 +68,17 @@ def inspection(controller, engine, target):
     settle(controller)
     assert not controller.session.document.object(target).flip
     independence(controller, engine, target)
+
+
+def select_sources(controller, engine, target):
+    before = controller.session.document
+    expected = controller.session.command("surface.source_ids", target=target)
+    action(engine, "selectAllSurfaceSources", "clicked")
+    settle(controller)
+    assert controller.selectedObjects == expected
+    assert controller.session.document is before
+    controller.select(target)
+    settle(controller)
 
 
 def realign(controller, engine):
@@ -138,7 +150,7 @@ def additional_sources(controller, engine):
     )
     settle(controller)
     controller.select(third, True)
-    assert "3 selected" in controller.surfaceAction["hint"]
+    assert controller.selectedObjects == [*keys, third] and controller.surfaceAction["enabled"]
     click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
     surface = controller.session.document.object(controller.selection)

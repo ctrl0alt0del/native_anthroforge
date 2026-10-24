@@ -943,3 +943,8 @@ The existing Issues repair lifecycle verifies results after dependent publicatio
 changing authored settings. It preserves accepted geometry until successful publication.
 ROUTED `use_warm_start` defaults true; disabling it makes subsequent calculations cold.
 This applies equally to curves and Fibers; route inspection remains read-only.
+
+`surface.source_ids(target)` returns all source Curve/Fiber identities in stored
+consumer order, including branch sources. Desktop Select all source curves replaces
+object selection as one batch without editing construction or entering multi-curve
+component editing. Invalid batch identities leave selection unchanged.

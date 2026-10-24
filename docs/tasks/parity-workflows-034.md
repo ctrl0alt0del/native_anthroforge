@@ -14,12 +14,13 @@ the latest complete pytest run passes 2136 cases. Actual texture-only Fiber rend
 desktop workflow tools and the read-only 96-muscle display qualifier pass. Source projects
 remain untouched. No main merge, package version change or release artifact is delivered.
 
-The only product decision still pending is F01: preserve Blender's separate strip topology
-for migrated Ribs (keep welded lofts as the default), or retain welded Ribs and explicitly
-accept the remaining source-response difference. A focused user question is pending.
-Continue on this branch after that answer; do not assume permission from elapsed time.
-Then qualify shoulder baseline/Ribs=3, deliver the corrected assembly, finish packaging
-and release/merge checks. Historical checkpoints below retain their original limits.
+The user answered F01: keep welded Ribs and document its construction difference. The
+subsequent request pauses delivery to investigate whether the generated-shell binding
+bypasses exterior capture and whether the anchor is on a rim. That read-only diagnosis
+is recorded below and in addon_parity_findings.md. Do not treat topology acceptance as
+proof that migration/frame discrepancies are resolved. No runtime attachment change or
+source project edit is authorized by this diagnostic request. Historical checkpoints
+below retain their original limits; their pending-question language is superseded.
 
 ## Outcome and confirmed decisions
 
@@ -71,6 +72,9 @@ task checkpoints and one canonical release distribution after qualification.
   selection mechanism. No authored edit/undo entry or simultaneous multi-curve editing.
 
 ## Pending shoulder decision and evidence
+
+Historical checkpoint: the user subsequently chose welded Ribs. See latest state and
+the confirmed-placement follow-up; the question is no longer pending.
 
 F01 is NOT fixed. Source tangent/point transfer reduces Hook position error from 1.12826
 to .11088 but does not establish parity. Flow-point transfer does not reduce the residual;
@@ -397,3 +401,31 @@ families share lifecycle/approval/read proofs while retaining separate compatibi
 policies. There is one task coordinator and no additional worker pool. Display resources
 cannot become anatomical providers or mutate accepted numerical paths. Remaining end-to-end
 acceptance is the F01 decision/correction, final assembly and canonical release packaging.
+
+## Confirmed placement and rim diagnosis after the topology decision
+
+The user chose to keep welded Ribs, then explicitly requested this investigation before
+delivery continues. No production code, project geometry or attachment behavior changed.
+The term "inner shell" was corrected: it identifies the Solidify-generated layer, not
+necessarily a face inside solid material. Source Blender already has that binding.
+
+Fresh confirmed native captures reproduce stored source and app anchors and their selected
+shell triangles. First-hit rays from the Hook origin reach those anchors directly; errors
+are 0 and 4.45e-16. Confirmed validation distances are 0 and 2.78e-17. This fixture provides
+no evidence of an exterior-capture bypass. Current corrected assembly SCP_7 binding equals
+the old captured baseline binding. The one-off migration constructs new attachment settings
+without source bindings and establishes them by evaluation on reconstructed geometry.
+
+Blender binds at vertex 610, exactly on an original strip's Solidify rim edge (distance 0).
+Its frame triangle [610,613,612] is a generated-shell face, not a rim face. App binding
+[408,409,474] has an effectively zero third weight and lies on welded internal edge 408-409.
+It is 2.4347118027 fixture scene units from the remaining rim. That original source boundary
+has been removed by welding. This verifies the rim-location hypothesis in the source while
+rejecting an accidental rim-face-normal explanation. Source-point/tangent recapture remains
+a separate migration fidelity defect; topology acceptance does not prove it is harmless.
+
+Maintained read-only reproducer: tools/qualify_ribs_attachment_surface.py. Local pinned
+results and input hashes: build/parity-workflows-034/ribs-attachment-surface.json. It uses
+native confirmed capture, native ray tests and native nearest-rim geometry queries.
+Ruff/format and both architecture checks pass. Runtime rebuild/full suite were not repeated
+for this diagnostic-only change. Packaging and final assembly delivery have not resumed.

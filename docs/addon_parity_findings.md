@@ -37,8 +37,39 @@ Later seam analysis isolates a further construction difference: Blender's separa
 strips and the app's welded rows produce different Solidify normals. Matched outer
 vertices at the anchor differ by `.000145`, but inner offset vectors differ by `.131804`
 at baseline and `.006680` after the edit. The source samples 64 cyclic points into 65 loft
-columns. Source-strip preservation for migrated Ribs versus retaining welded behavior is
-an unanswered product choice; no arbitrary translation or silent topology change is applied.
+columns. The user chose to retain welded Ribs and document its construction difference
+on 2026-10-24. This does not establish that every remaining attachment-frame discrepancy
+is unavoidable or waive investigation of migration fidelity.
+
+### Confirmed placement and rim follow-up
+
+The earlier phrase "inner shell" meant the negative-offset Solidify-generated layer,
+not an occluded/internal face. It was misleading to infer an exterior-capture defect from
+that label. The source Blender binding already targets that layer. Fresh confirmed native
+captures on both source and standalone geometry reproduce their saved anchor and triangle.
+A ray from the Hook origin toward each anchor hits that anchor first (gaps 0 and 4.45e-16).
+Confirmed queries retain these points (gaps 0 and 2.78e-17); neither is a buried surface
+excluded by exterior-only placement. Negative-offset shell faces can be exposed boundaries.
+
+The user's rim hypothesis is confirmed for the Blender source: its anchor is exactly at
+vertex 610 on a Solidify rim edge (distance 0). The frame's selected triangle is 603,
+vertices [610,613,612], entirely on the generated shell, not a mixed-layer rim triangle.
+The standalone anchor is on triangle 676, vertices [408,409,474], also a generated-shell
+face. Its third barycentric weight is effectively zero: it lies on the welded internal
+seam edge, not on a remaining rim (nearest original rim distance 2.4347118027 in fixture
+scene coordinates). Welding has removed the source's internal strip boundary there.
+
+Thus this is not capture accidentally selecting a rim face. The reference points occupy
+different boundary configurations; thickness displacement and surrounding shell frames
+respond differently. Migration also recaptured rather than preserving the source tangent;
+the earlier source-hint experiment remains a separate, larger contribution to displacement.
+Welding alone has not been proved to explain the complete mismatch.
+
+Read-only reproduction: tools/qualify_ribs_attachment_surface.py takes the paired capture
+root and an output JSON. It records input SHA256s, face/layer, barycentrics, fresh confirmed
+capture, first-hit visibility and native nearest-rim queries. Local output:
+build/parity-workflows-034/ribs-attachment-surface.json. The current repaired assembly's
+SCP_7 binding still equals the captured baseline binding. No runtime or project changed.
 
 ## F02 — Thumb shortcut exported a raw value instead of effective backsolve policy
 

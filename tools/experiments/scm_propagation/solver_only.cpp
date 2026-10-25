@@ -112,3 +112,19 @@ extern "C" __declspec(dllexport) void scm_solver_release(void* handle) {
     delete static_cast<af::routing::World*>(handle);
 }
 extern "C" __declspec(dllexport) const char* scm_solver_error() { return failure.c_str(); }
+
+// Diagnostic only: enumerate every intersecting segment, without an SQP/planner call.
+extern "C" __declspec(dllexport) int scm_surface_contacts(void* handle,const double* points,
+    int count,int* output) {
+    try {
+        const auto& world=*static_cast<af::routing::World*>(handle);
+        const double tolerance=std::max(1e-9,1e-9*world.length);
+        const auto& surfaces=world.collision->items;
+        for(int i=0;i<count-1;++i) for(size_t j=0;j<surfaces.size();++j) {
+            const af::routing::Vec a{points[3*i],points[3*i+1],points[3*i+2]};
+            const af::routing::Vec b{points[3*i+3],points[3*i+4],points[3*i+5]};
+            output[size_t(i)*surfaces.size()+j]=!af::routing::kernel::af_instance_validation_row(surfaces[j],a,b,0,0,0,tolerance).clear;
+        }
+        return 0;
+    } catch(const std::exception& error) { failure=error.what(); return 1; }
+}

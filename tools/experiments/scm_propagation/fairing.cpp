@@ -49,6 +49,14 @@ static Dense differential(const Fairing& f,const std::vector<std::vector<Map>>& 
         result.row(i)+=(t.weights[size_t(i*t.parents+b)]*local_linear(t,transforms[size_t(b)],i)*rest.row(i).transpose()).transpose();
     return result;
 }
+static Dense retain_offsets(const Trial& t,const Points& raw,const Dense& samples) {
+    Dense result(t.rows,3);
+    for(int i=0;i<t.rows;++i) {
+        const int node=i<t.samples?i:(i-t.samples)/3;
+        result.row(i)=samples.row(node)+(raw[size_t(i)]-raw[size_t(node)]).transpose();
+    }
+    return result;
+}
 static Dense reconstructed(Fairing& f,const double* current,const double* goals) {
     const auto& t=*f.trial; const auto transforms=maps(t,nullptr,current);
     auto raw=blended(t,transforms); exact_pins(t,raw,goals);
@@ -58,7 +66,7 @@ static Dense reconstructed(Fairing& f,const double* current,const double* goals)
     const Dense solution=f.factor.solve(rhs);
     if(!solution.allFinite()) throw std::runtime_error("Invalid reconstructed curve.");
     Dense result(t.samples,3); result(f.free,Eigen::all)=solution; result(t.pins,Eigen::all)=pins;
-    return result;
+    return retain_offsets(t,raw,result);
 }
 API void* fair_prepare(void* trial,double fraction) {
     try {
@@ -70,12 +78,20 @@ API void* fair_prepare(void* trial,double fraction) {
 API int fair_evaluate(void* handle,const double* current,const double* goals,double* output) {
     try {
         auto& f=*static_cast<Fairing*>(handle); const auto result=reconstructed(f,current,goals);
-        // This fixture has one sample and three coincident handles per authored polyline point.
-        for(int i=0;i<f.trial->rows;++i) {
-            const int node=i<f.trial->samples?i:(i-f.trial->samples)/3;
-            Eigen::Map<V>(output+3*i)=result.row(node);
-        }
+        for(int i=0;i<f.trial->rows;++i) Eigen::Map<V>(output+3*i)=result.row(i);
         return 0;
     } catch(const std::exception& e) { last_error=e.what(); return 1; }
 }
 API void fair_release(void* handle) { delete static_cast<Fairing*>(handle); }
+
+API void fair_metrics(int count,const double* input,double* output) {
+    const auto points=read(input,count); double length=0,edge=0,angle=0,turn=0;
+    for(int i=1;i<count;++i) {
+        const V a=points[size_t(i)]-points[size_t(i-1)]; length+=a.norm(); edge=std::max(edge,a.norm());
+        if(i<2) continue;
+        const V b=points[size_t(i-1)]-points[size_t(i-2)];
+        const double theta=std::acos(std::clamp(a.dot(b)/std::max(a.norm()*b.norm(),1e-30),-1.0,1.0));
+        angle=std::max(angle,theta); turn+=theta;
+    }
+    output[0]=length; output[1]=edge; output[2]=angle; output[3]=turn;
+}

@@ -10,6 +10,7 @@ from tests.test_routing_layout import CASE, require_clear
 
 
 def scene(session):
+    session.command("preferences.set", routing_conversion_points="ALL_POINTS")
     parent = ""
     for surface in CASE["surfaces"]:
         parent = session.command("import", path=str(CUBE), units=1, parent=parent)["entity_id"]

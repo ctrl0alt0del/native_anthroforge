@@ -85,13 +85,13 @@ def test_shared_topology_lock_applies_to_conversion_and_unlocks(session):
     preview(session, key)
 
 
-def test_routing_defaults_to_all_authored_points(session):
+def test_routing_defaults_to_endpoints(session):
     key = source(session)
     points = session.document.object(key).points
     session.command("curve.conversion.preview", curve=key, engine="ROUTED")
     session.wait(5)
     assert session.conversion.state == "ready", session.conversion.error
-    assert session.conversion.asset.authored.points == points
+    assert session.conversion.asset.authored.points == (points[0], points[-1])
 
 
 def test_routing_rejects_an_explicitly_empty_constraint_selection(session):

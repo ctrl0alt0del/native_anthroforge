@@ -67,8 +67,11 @@ an exhausted bound reports a failure instead of dropping bends or weakening vali
 Bézier points retain handles, handle modes, radius and tilt. Polyline points remain exact.
 Routed editing changes authored routing points, never generated solver samples. Merely
 selecting a curve or entering edit mode cannot fit/resample/change it. Updated user decision,
-2026-10-20: selecting the Path engine applies it directly with one undo action, retaining
-all existing authored control points and allowing the engine to define the path. No separate
+2026-10-20: selecting the Path engine applies it directly with one undo action, allowing
+the engine to define the path. Updated 2026-10-25: switching into ROUTED uses a preference,
+Endpoints only (default) or All curve points. Closed curves keep all points; shared junctions
+and anatomical bindings remain mandatory. Other engine changes retain authored points.
+The choice affects future conversions only, with coherent undo. No separate
 Change path engine button or preview/accept gate is required. This replaces the original
 mandatory preview and structural-point selection workflow. Never promote sampled output
 into authored points during this action. Fibers use their current resolved authored points.

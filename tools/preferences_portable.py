@@ -48,8 +48,32 @@ def preferences(executable, cwd, invoke):
     rows = execute(executable, cwd, invoke, "preferences-reopen", [request("preferences.get")])
     assert rows[0]["result"]["routing_backend"] == "PIQP"
     desktop_preferences(executable, cwd, invoke)
-    reset = [request("preferences.set", routing_backend="CUSTOM")]
+    conversion(executable, cwd, invoke)
+    reset = [
+        request("preferences.set", routing_backend="CUSTOM", routing_conversion_points="ENDPOINTS")
+    ]
     execute(executable, cwd, invoke, "preferences-reset", reset)
+
+
+def conversion(executable, cwd, invoke):
+    for mode, count in (("ENDPOINTS", 2), ("ALL_POINTS", 3)):
+        execute(executable, cwd, invoke, "conversion-" + mode, conversion_commands(mode))
+        with ZipFile(cwd / ("conversion-" + mode + ".anthroforge")) as archive:
+            state = json.loads(archive.read("manifest.json"))["document"]["objects"][0]["state"]
+        assert len(state["points"]) == count and state["engine_settings"]["kind"] == "ROUTED"
+        assert state["result"]["status"] == "ready", state["result"]
+
+
+def conversion_commands(mode):
+    points = [dict(position=p) for p in ((-1, 0, 0), (0, 1, 0), (1, 0, 0))]
+    return [
+        request("preferences.set", routing_conversion_points=mode),
+        dict(id="source", **request("curve.create", points=points)),
+        request("wait"),
+        request("curve.engine", curve="$source", engine="ROUTED"),
+        request("wait"),
+        request("save", path="conversion-" + mode + ".anthroforge", blocked_policy="wait"),
+    ]
 
 
 def desktop_preferences(executable, cwd, invoke):

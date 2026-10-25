@@ -103,7 +103,20 @@ def project_actions(controller, window, report):
     assert controller.project_library.recent.entries[0] == str(target)
     inspect_widths(controller, window, "body", report)
     recent_menu(controller, window, report)
+    missing_recent(controller)
     recovery(controller, window, root, report)
+
+
+def missing_recent(controller):
+    library = controller.project_library
+    absent = str(OUTPUT / "unavailable-project.anthroforge")
+    before, path = controller.session.document, controller.session.path
+    library.remember(absent)
+    library.openRecent(absent)
+    wait_for(controller, lambda: not controller.session.waiting_save)
+    assert controller.session.document is before and controller.session.path == path
+    assert "unavailable-project" in controller.message
+    library.clearRecent()
 
 
 def recent_menu(controller, window, report):
@@ -113,6 +126,22 @@ def recent_menu(controller, window, report):
     invoke(find(window, "recentProjectsMenu"), "open")
     capture(window, "recent-projects", report)
     invoke(find(window, "recentProjectsMenu"), "close")
+    invoke(menu, "close")
+    large_recent(controller, window, report)
+
+
+def large_recent(controller, window, report):
+    for index in range(20):
+        controller.project_library.remember(OUTPUT / f"Anatomical study {index}.anthroforge")
+    menu = open_menu(window, "File")
+    recent = find(window, "recentProjectsMenu")
+    invoke(recent, "open")
+    assert recent.property("height") <= window.height()
+    invoke(recent.property("contentItem"), "positionViewAtEnd")
+    capture(window, "recent-projects-full", report)
+    invoke(find(window, "clearRecentProjects"), "triggered")
+    assert not controller.project_library.recent.entries
+    invoke(recent, "close")
     invoke(menu, "close")
 
 

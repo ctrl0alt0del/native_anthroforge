@@ -116,3 +116,33 @@ Preserve neutral/rest shape, rigid motions, pin references and authored corners;
 SCM, ordinary small edits, large rotations/nonuniform scaling, junctions, loops, sample
 resolution independence and consumer surfaces. Record native profiling and failure
 behavior. No candidate has been implemented or demonstrated to fix the actual case yet.
+
+
+## Authorized non-production comparison experiment
+
+User requested current vs improved vs ROUTED shape/timing on SCM at Ribs Top Radius 3,
+before any production change. Experimental sources live under
+`tools/experiments/scm_propagation/`; standalone native DLL builds only under
+`build/scm-ribs-distortion/native`. It is not linked, imported or registered by the app.
+
+Prototype: cached arc-length kernel weights (width .2 of rest length), eight regional
+affine maps per support, each fit from 64 fixed bind-topology vertices with a fixed-size
+3x3 fit; exact anatomical-pin corrections. No iterative path/global solver. Parent
+canonical vertex/triangle correspondence is checked before using this experiment.
+Neutral-shape error is below 5e-15. All four current consumer stages reproduce the saved
+production results exactly, confirming the comparison pipeline. Existing stages build
+the experimental membrane/inflation/crop without implementation changes.
+
+First fixed-camera plots show greatly reduced sawtooth but a remaining lower bulge.
+Direct ROUTED (73 retained controls) fails: structural routing point intersects another
+surface. Separate endpoint-only ROUTED succeeds; this intentionally changes constraints
+and is not an equivalent engine conversion or a ground-truth anatomy claim. The reference
+retains accepted endpoint bindings and uses persisted material stations for consumer
+correspondence. Results under `build/scm-ribs-distortion/comparison/`.
+
+Initial profiled serial/counterbalanced medians for all three Fiber paths: current
+6.47 ms, prototype 3.53 ms, endpoint-only ROUTED 10.59 s. These are preliminary: native
+instrumentation boundaries differ, so unrecorded timing and full consumer timing must
+be collected before drawing performance conclusions. First native/experimental Python
+build and function-size checks pass. Remaining: rigid-motion/pin checks, quality metrics,
+unrecorded timing, final visual comparison, source preservation and honest recommendation.

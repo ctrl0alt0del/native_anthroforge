@@ -22,7 +22,13 @@ def library():
     lib.trial_error.restype = c.c_char_p
     lib.trial_arcs.argtypes = [INT, INT, D, IP, D]
     lib.trial_parameters.argtypes = [INT, D, INT, D, D]
+    configure_weights(lib)
     return lib
+
+
+def configure_weights(lib):
+    lib.trial_weights.argtypes = [H, D]
+    lib.trial_weights.restype = None
 
 
 def integers(value):

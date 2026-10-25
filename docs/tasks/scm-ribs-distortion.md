@@ -3,7 +3,7 @@
 - Task branch: `codex/scm-ribs-distortion`
 - Integration branch: `main`
 - Starting revision: `4ff1ef8`
-- Status: diagnosis complete; no production behavior changed
+- Status: requested comparison complete; awaiting visual review; production unchanged
 - Last updated: 2026-10-25, Europe/Bucharest
 - Active writer: local Codex
 
@@ -146,3 +146,69 @@ instrumentation boundaries differ, so unrecorded timing and full consumer timing
 be collected before drawing performance conclusions. First native/experimental Python
 build and function-size checks pass. Remaining: rigid-motion/pin checks, quality metrics,
 unrecorded timing, final visual comparison, source preservation and honest recommendation.
+
+
+## Completed comparison — final evidence
+
+Review: `build/scm-ribs-distortion/comparison/review.html` (self-contained images and
+method/timing notes). Matching-camera base/final/context plots and path projections
+were inspected. Final prototype uses cubic B-spline interpolation of regional affine
+maps; the first linear interpolation showed visible joins, so this experimental-only
+refinement makes the transform field C2. No runtime application/library integration.
+
+Final unrecorded measurement includes dynamic parent-vertex packing and unchanged
+consumer stages. Six serial trials cover every ordering permutation; a separate
+12-trial unrecorded run from prepared data agrees with the ordering. Background load
+was uncontrolled. SCM-only, after parent geometry is available; excludes other anatomy,
+scheduling, file IO and viewport publication.
+
+| Method | Three Fiber paths, median | Paths + membrane + tissue, median | Total min–max |
+| --- | ---: | ---: | ---: |
+| Current | 4.289 ms | 21.000 ms | 18.263–23.501 ms |
+| Experimental | 3.713 ms | 16.016 ms | 13.046–18.333 ms |
+| Endpoint-only ROUTED reference | 10,704.927 ms | 10,725.197 ms | 10,496.381–10,963.805 ms |
+
+ROUTED uses CUSTOM, 153 eligible surfaces, 73 requested samples and original path warm
+start. All outputs have 73 samples in this case. This is deliberately two anatomical
+pins per Fiber, not equivalent to direct conversion with all 73 authored constraints.
+Direct conversion fails on an intersecting interior structural point; its failed time
+is not a performance reference. Persisted material correspondence is explicitly mapped
+for the endpoint-only diagnostic; the retained crop consequently has different spatial
+extent after its different path shape. Inspect uncropped base and paths too.
+
+Actual results:
+- Middle-Fiber largest sample gap: 1.991823 -> .171409; total length 9.553 -> 4.513
+  (baseline 3.742). The third Fiber still has a broad lower bulge.
+- Anatomical pin residuals are exactly zero. Neutral and global-rigid sample/control
+  position errors stay below 7e-15. This is not qualification of all path frames/scales.
+- Automatic Ribs support is retained; peak middle-Fiber Ribs weight is .627 and its
+  arc-length integral .309, versus original 1.0/.521. Support was not simply frozen.
+- Advisory transverse self-crossing pairs: base 222 -> 28, final 245 -> 39. No collapsed
+  faces. Endpoint-only ROUTED has 27 base crossings and zero after the retained crop.
+  Touching/coplanar contact and containment are outside that diagnostic.
+- Native path checking reports the original Spine first-segment contact; fresh baseline
+  checks also report segment 0 for all three Fibers. It is not introduced by this trial.
+- Fresh capture directly from the archived source reproduces all eight before/after
+  tissue meshes exactly, including connectivity. Current isolated consumer stages also
+  match the saved production stages exactly. Original source SHA256 remains
+  `308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
+
+Evidence: `packed-summary.json`, `packed-timings.json`, `invariants.json`, `audit.json`,
+`support-audit.json`, `geometry-findings.json`, `production-equivalence.json`,
+`fresh-reproduction.json`, `manifest.json`, `prototype-v2.afprofile.zip` in the comparison
+folder. Earlier profiled timings are attribution evidence only, superseded for speed
+claims by unrecorded runs. Cold prototype cache creation from prepared inputs totals
+about 25 ms including DLL load; source import and anatomical capture are not included.
+
+Verification: standalone C++ build, configured clang-tidy function-size check, experimental
+Python Ruff/format and both architecture tests pass. Embedded report images/values, JS
+syntax and HTML data keys checked. No application rebuild/version/dist change was made;
+production src/native/build definitions remain byte-unchanged from main. A full runtime
+regression gate was not rerun for this isolated experiment. Unrelated __init__.py and
+unfinished 0.3.4 work remain untouched. Tool reproduction instructions are in
+`tools/experiments/scm_propagation/README.md`.
+
+Conclusion: the cheap approximation is substantially cleaner and remains inexpensive
+for this case, but remaining bulge/crossings and untested wider cases prevent claiming
+a complete replacement. No production algorithm change is authorized by this experiment.
+Next action: user reviews the concrete visual comparison before any production design.

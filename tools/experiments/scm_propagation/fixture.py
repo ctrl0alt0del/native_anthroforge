@@ -66,6 +66,8 @@ def one(before, after, key):
     item = before.document.object(key)
     asset = before.resources.attachments[item.attachment_asset]
     field = asset.field
+    if item.engine != "POLYLINE" or field.path.count != len(item.points) or item.parent:
+        raise ValueError("This fixture expects unparented, one-sample-per-point SCM polylines.")
     targets = tuple(dict.fromkeys(s.reference for s in asset.targets))
     data = NS(item=after.document.object(key), asset=asset, field=field, targets=targets)
     data.before, data.current, data.counts = parent_data(before, after, targets)

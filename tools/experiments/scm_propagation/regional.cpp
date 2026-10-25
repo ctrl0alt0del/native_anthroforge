@@ -116,7 +116,10 @@ static std::vector<std::vector<Map>> maps(const Trial& t,const double* before,co
 static V regional(const Trial& t,const std::vector<Map>& maps,int row) {
     const double u=t.arc[size_t(row)]/t.arc[size_t(t.samples-1)]*(t.regions-1);
     const int low=std::clamp(int(u),0,t.regions-2); const double f=u-low;
-    return (1-f)*maps[size_t(low)].apply(t.points[size_t(row)])+f*maps[size_t(low+1)].apply(t.points[size_t(row)]);
+    const double weights[4]{std::pow(1-f,3)/6,(3*f*f*f-6*f*f+4)/6,(-3*f*f*f+3*f*f+3*f+1)/6,f*f*f/6};
+    V result=V::Zero();
+    for(int j=0;j<4;++j) result+=weights[j]*maps[size_t(std::clamp(low+j-1,0,t.regions-1))].apply(t.points[size_t(row)]);
+    return result;
 }
 static Points blended(const Trial& t,const std::vector<std::vector<Map>>& maps) {
     Points result(size_t(t.rows),V::Zero());

@@ -2,7 +2,7 @@
 
 - Branch: `codex/fiber-propagation-methods`, based on the reviewed SCM experiment.
 - Integration: `main`; preserve unfinished 0.3.4 and unrelated root `__init__.py`.
-- Status: implementation and focused qualification complete; final gate, packaging and merge pending.
+- Status: complete. Production integration, full development gate and portable qualification pass.
 
 ## Confirmed contract
 
@@ -50,8 +50,20 @@ sides. Synthetic material records must mark the absent secondary flow binding as
 not zero. Dense (>512 sample) compact filtering uses prefix moments rather than quadratic
 convolution. No silent switch to the old propagation method.
 
-Remaining: full development gate, canonical portable package/source archive, final
-documentation and validated merge.
+Full gate: 2,129 tests, five native CTests, configured style, typing and numerics pass
+(`build/fiber-development-gate.log`). Canonical package builds successfully. Source
+staging was byte-checked against runtime source at `7b65979` and build provenance pinned
+to that commit. Full minimal-PATH portable workflows pass, including both propagation
+methods on routed Fibers, saved preferences, native/profiler metadata, offscreen QML
+and hidden QQuickRenderControl images. The packaged Preferences screenshot was inspected.
+Evidence: `build/fiber-propagation/portable/portable-check.json` and
+`build/fiber-portable.log`. No foreground window was used; these checks do not establish
+physical interactive acceptance. Delivery uses the single canonical
+`dist/0.3.5/AnthroForge.dist` and companion `dist/AnthroForge-0.3.5-source.zip`.
+
+The source assembly SHA256 remains
+`308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
+Only read-only source loading and separate files under `build/` were used.
 
 ## Ownership review
 

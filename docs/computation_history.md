@@ -2455,4 +2455,7 @@ Historical experiment record. Production integration is recorded separately in C
   with weaker peak automatic-support response. Production evidence lives in
   `build/fiber-propagation/`; reproduction is
   [production qualification](../tools/experiments/scm_propagation/production_qualification.py).
-  Final gate/package status is tracked in [the task](tasks/fiber-propagation-methods.md).
+  Qualification: 2,129 Python tests, five native CTests, typing/style/numerical checks,
+  offscreen Preferences and the full minimal-PATH portable suite pass. Both choices are
+  exercised in the executable with profile attribution. Detailed evidence and background-
+  rendering limits are recorded in [the task](tasks/fiber-propagation-methods.md).

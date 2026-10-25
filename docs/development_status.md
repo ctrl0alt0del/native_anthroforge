@@ -4,6 +4,28 @@ Current release qualification is in [mirroring](tasks/mirroring-035.md).
 The [0.3.5 walkthrough](mirroring_035.md) records implementation and observed evidence.
 The earlier sections retain the evidence and limitations of their respective revisions.
 
+## Selectable Fiber propagation (0.3.5 update)
+
+**Smooth Shape Preservation** is the default under Edit → Preferences → Fiber
+propagation; **Local Surface Following** preserves the previous evaluator. Changes affect
+future calculations only. Running jobs and current results remain unchanged.
+
+The development gate passes 2,129 tests, five native CTests, configured typing/style
+and numerical checks. Production SCM paths match the approved smooth experiment within
+7.5e-11 model units, with zero detected crossings in the tested base/inflated stages.
+Matched-camera production renders were inspected. The three-fiber warm median is 2.90 ms
+versus 2.98 ms for local transport; this does not establish a general speedup.
+
+All 326 assembly fibers retain neutral positions within 1.13e-10 model units. The complete
+Ribs Top Radius 3 edit succeeds without calculation failures. Skeletal geometry/poses
+and authored bindings agree between methods; undo, redo and save/reopen reproduce
+accepted results. Offscreen Preferences and the full minimal-PATH portable suite pass,
+including both propagation choices on routed Fibers and profile metadata. The packaged
+dialog was inspected; hidden QQuickRenderControl checks verify rendered geometry separately.
+Evidence paths are tracked in [the task](tasks/fiber-propagation-methods.md). No collision-
+clearance or physical interactive acceptance claim is made. See CH-078 in
+[computation history](computation_history.md).
+
 The migrated assembly's shoulder attachment-frame and Thumb backsolve/child-anchor
 differences remain unresolved. See [the confirmed findings](addon_parity_findings.md)
 and [current addon functionality audit](addon_functionality_audit.md). Release tests

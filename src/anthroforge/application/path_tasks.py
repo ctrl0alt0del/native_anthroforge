@@ -73,7 +73,9 @@ def compute(session: "Session", curve: str, payload: Any, cancel: Any) -> Any:
         curve,
         cancel.handle,
         preferences.routing_backend,
-        _metadata={"target": curve, "routing_backend": preferences.routing_backend},
+        preferences.fiber_propagation,
+        _metadata={"target": curve, "routing_backend": preferences.routing_backend,
+                   "fiber_propagation": preferences.fiber_propagation},
     )
 
 

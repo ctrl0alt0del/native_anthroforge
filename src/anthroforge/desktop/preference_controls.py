@@ -23,6 +23,10 @@ class PreferenceControls(QObject):
     def setRoutingConversionPoints(self, value):
         self.set_preference(routing_conversion_points=value)
 
+    @Slot(str)
+    def setFiberPropagation(self, value):
+        self.set_preference(fiber_propagation=value)
+
     def set_preference(self, **values):
         try:
             self.controller.session.command("preferences.set", **values)

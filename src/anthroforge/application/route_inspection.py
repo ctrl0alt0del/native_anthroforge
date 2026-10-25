@@ -27,9 +27,14 @@ def backend(context: Any) -> str:
     )
 
 
+def propagation(context: Any) -> str:
+    return (context.preferences.value.fiber_propagation if hasattr(context, "preferences")
+            else str(context.fiber_propagation))
+
+
 def signature(context: Any, target: str, options: Any) -> Any:
     validate(context, target, options)
-    return scene_signature(context.document), backend(context)
+    return scene_signature(context.document), backend(context), propagation(context)
 
 
 def workload(context: Any, target: str, options: Any) -> Workload:
@@ -43,7 +48,7 @@ def workload(context: Any, target: str, options: Any) -> Workload:
 def compute(context: Any, target: str, options: Any, cancel: int) -> dict[str, Any]:
     item = curve_sources.source(context.document, target)
     value = curve_evaluation.resolve(
-        context.engine, context.document, context.resources, item, cancel
+        context.engine, context.document, context.resources, item, cancel, propagation(context)
     )
     inputs = routing_evaluation.capture(
         context.engine, context.document, context.resources, value.authored, value.path

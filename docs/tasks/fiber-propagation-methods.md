@@ -24,6 +24,14 @@ must use dispatch-captured policy. No global native method switch or competing s
 
 ## Validation pending
 
+Checkpoint: native sparse reconstruction, capture metadata, preference/UI selection,
+dispatch integration and inspection replay are implemented but not qualified. With
+known capture frames, SCM paths match the approved prototype within 2.2e-10 units.
+Materialize Eigen's sparse solve before assigning an indexed destination. Older captures
+can contain duplicate historical pin surfaces; regional supports must group by anatomical
+surface while exact pin goals retain their own material records. Compatibility and
+neutral-shape precision are under active validation. No release/merge claim.
+
 - Exact reviewed SCM case, production parity with the prototype and local-method parity.
 - Neutral/rigid transforms, open/closed paths, interior pins, handles, junctions, changing
   material topology, cancellation, cache lifetime, save/reopen and preference lifecycle.

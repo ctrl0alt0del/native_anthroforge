@@ -35,6 +35,7 @@ class InspectionContext:
     engine: GeometryEngine
     workspace: Workspace
     routing_backend: str = "CUSTOM"
+    fiber_propagation: str = "SMOOTH_SHAPE"
 
     @property
     def assets(self) -> dict[str, Asset]:
@@ -49,4 +50,5 @@ def freeze(session: "Session") -> InspectionContext:
         session.engine,
         session.workspace,
         session.preferences.value.routing_backend,
+        session.preferences.value.fiber_propagation,
     )

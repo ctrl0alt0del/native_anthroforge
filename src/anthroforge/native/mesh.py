@@ -57,6 +57,7 @@ class GeometryEngine(NativeEngine):
         )
 
     def _query_caches(self) -> None:
+        self.fiber_deformations: ResourceCache[Any] = ResourceCache(64 * 1024 * 1024, 256, "fiber_deformation")
         self.stack_sessions: ResourceCache[Any] = ResourceCache(
             512 * 1024 * 1024, 4, "stack_sessions"
         )
@@ -81,6 +82,7 @@ class GeometryEngine(NativeEngine):
             self.stack_sessions,
             self.tissue_preparations,
             self.expressions,
+            self.fiber_deformations,
         )
 
     def clear_caches(self) -> None:
@@ -129,6 +131,7 @@ class GeometryEngine(NativeEngine):
         self._binding_signatures()
 
     def _binding_signatures(self) -> None:
+        from .fiber_deformation import configure as configure_fiber
         from . import attachment_fields, attachment_weights, path_collisions, point_attachments
         from .mesh_quality import configure as configure_quality
         from .routing_scene import configure
@@ -139,6 +142,7 @@ class GeometryEngine(NativeEngine):
         configure(self)
         configure_quality(self)
         configure_queries(self)
+        configure_fiber(self)
 
     def bind(self, name: str, args: list[Any], result: Any = c.c_int) -> None:
         function = getattr(self.library, name)

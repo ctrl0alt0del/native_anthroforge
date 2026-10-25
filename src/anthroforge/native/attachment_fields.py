@@ -6,6 +6,8 @@ from typing import Any
 
 import numpy as np
 
+from anthroforge.core.entities import IDENTITY
+
 from . import paths, point_attachments
 from .mesh import D, GeometryEngine, U, doubles, pointer
 from .point_attachments import HANDLES, INT
@@ -32,6 +34,8 @@ class Field:
     bindings: Any
     records: Any
     path: paths.Path
+    world: tuple[float, ...] = IDENTITY
+    frames: tuple[tuple[float, ...], ...] = ()
 
     def __post_init__(self) -> None:
         validate_arrays(self)
@@ -83,7 +87,8 @@ def compact(field: Field, surfaces: int) -> tuple[Field, Any]:
     )
     count = field.path.engine.library.af_attachment_compact(*args)
     field.path.engine.check(count < 0)
-    return replace(field, owners=output), used[:count]
+    frames = tuple(field.frames[i] if i < len(field.frames) else (0.0,) * 16 for i in used[:count])
+    return replace(field, owners=output, frames=frames), used[:count]
 
 
 def retain(field: Field, pins: Any, targets: Any, records: Any) -> Field:
@@ -122,7 +127,13 @@ def capture(engine: GeometryEngine, surfaces: Any, spec: Capture, cancel: int = 
     engine.check(
         engine.library.af_curve_attachment_capture(*prefix(surfaces), *arguments, *output, cancel)
     )
-    return Field(owners, weights, bindings, records.copy(), spec.path)
+    return captured_field(spec, surfaces, records, owners, weights, bindings)
+
+
+def captured_field(spec: Capture, surfaces: Any, records: Any, owners: Any, weights: Any, bindings: Any) -> Field:
+    _, source_frames = surfaces
+    frames = tuple(tuple(float(x) for x in frame) for frame in source_frames)
+    return Field(owners, weights, bindings, records.copy(), spec.path, tuple(spec.world), frames)
 
 
 def capture_arguments(spec: Capture, records: Any, world: Any, pins: Any, parents: Any) -> Any:

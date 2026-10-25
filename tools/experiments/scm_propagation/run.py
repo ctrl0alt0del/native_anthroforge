@@ -21,7 +21,8 @@ def write(name, value):
 
 def current(context, data):
     return curve_evaluation.evaluate(
-        context.engine, context.document, context.resources, data.item.id, 0
+        context.engine, context.document, context.resources, data.item.id, 0,
+        propagation="LOCAL_SURFACE"
     ).asset
 
 

@@ -17,8 +17,15 @@ class PreferenceControls(QObject):
 
     @Slot(str)
     def setBackend(self, value):
+        self.set_preference(routing_backend=value)
+
+    @Slot(str)
+    def setRoutingConversionPoints(self, value):
+        self.set_preference(routing_conversion_points=value)
+
+    def set_preference(self, **values):
         try:
-            self.controller.session.command("preferences.set", routing_backend=value)
+            self.controller.session.command("preferences.set", **values)
             self.error = ""
         except (OSError, ValueError) as error:
             self.error = str(error)

@@ -114,7 +114,10 @@ def test_preference_file_contains_only_settings(session):
 
     result = session.command("preferences.set", routing_backend="PIQP")
     data = json.loads(Path(result["path"]).read_text())
-    assert data == {"schema": 1, "values": {"routing_backend": "PIQP"}}
+    assert data == {
+        "schema": 1,
+        "values": {"routing_backend": "PIQP", "routing_conversion_points": "ENDPOINTS"},
+    }
 
 
 def test_conversion_preview_uses_selected_backend_without_committing(session):

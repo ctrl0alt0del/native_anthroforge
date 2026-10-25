@@ -13,6 +13,7 @@ from tests.test_junction_workflow import reference
 
 @pytest.mark.parametrize("closed", [False, True])
 def test_engine_switches_keep_all_authored_points_and_one_undo(session, closed):
+    session.command("preferences.set", routing_conversion_points="ALL_POINTS")
     key = source(session, closed)
     for engine in ("ROUTED", "POLYLINE", "BEZIER"):
         before, cursor = session.document.object(key), session.history.cursor
@@ -23,10 +24,14 @@ def test_engine_switches_keep_all_authored_points_and_one_undo(session, closed):
         assert item.result.status == "ready", item.result.error
         assert item.points == before.points and item.closed == closed
         assert session.history.cursor == cursor + 1
-        session.command("undo")
-        assert session.document.object(key).engine_settings == before.engine_settings
-        session.command("redo")
-        session.wait()
+        replay_switch(session, key, before)
+
+
+def replay_switch(session, key, before):
+    session.command("undo")
+    assert session.document.object(key).engine_settings == before.engine_settings
+    session.command("redo")
+    session.wait()
 
 
 def test_same_engine_and_invalid_engine_leave_document_history_and_jobs_unchanged(session):
@@ -71,6 +76,7 @@ def test_manual_engine_change_retains_accepted_path_until_explicit_evaluation(se
 
 @pytest.mark.parametrize("engine", ["POLYLINE", "ROUTED"])
 def test_fiber_engine_change_uses_resolved_points_without_rebinding(session, engine):
+    session.command("preferences.set", routing_conversion_points="ALL_POINTS")
     target, original = scene(session)
     fiber = bind(session, target, original)
     session.command("scp.transform", entity=target, values=[0, 0, 1, 0, 0, 0, 1, 1, 1])
@@ -100,7 +106,7 @@ def test_engine_change_preserves_explicit_junctions(session):
     session.command("curve.engine", curve=a, engine="ROUTED")
     session.wait()
     after = session.document.object(a)
-    assert after.result.status == "ready" and after.points == before
+    assert after.result.status == "ready" and after.points == (before[0], before[-1])
     assert after.points[0].junction == joint
 
 

@@ -522,8 +522,11 @@ There is no public solver generation selector. `curve.create` accepts `engine` a
 an alias for its typed setting. Curve/Fiber consumers still share the same path contract.
 
 `curve.engine(curve, engine)` directly selects BEZIER, POLYLINE or ROUTED as one undoable
-edit. It retains all authored points, handles and identities; Fiber edits use their current
-resolved authored points and preserve bindings. The chosen engine defines the new path,
+edit. Switching to ROUTED uses the `routing_conversion_points` preference: `ENDPOINTS`
+(default) or `ALL_POINTS`. Closed curves retain all points. Endpoints mode also retains
+shared junctions and anatomical binding points. Other engine switches retain authored
+points, handles and identities; Fiber edits use their current resolved authored points
+and preserve bindings. The chosen engine defines the new path,
 without resampling accepted output. Selecting the current engine is a no-op. A different
 engine starts with its typed defaults (routing samples are at least the authored point
 count), respects shared topology/workspace policies and follows ordinary task/update modes.
@@ -535,7 +538,7 @@ The separate optional preview API supports explicit resampling or point-subset c
 - `curve.conversion.preview(curve, engine, mode="EVALUATED", samples=64, points=None, settings={})`
   starts a read-only coordinator job. EVALUATED resamples the accepted path into editable
   vector-handle points; AUTHORED retains authored points. Routing selects AUTHORED and retains
-  all existing authored points when `points` is omitted. An explicit subset must retain open
+  the preferred routing points when `points` is omitted. An explicit subset must retain open
   endpoints, anatomical bindings and junctions; an explicit empty list fails.
   Sampled conversion retains bound point identities and positions, allocating its exact
   point budget between required anchors in native work. Insufficient budgets fail explicitly.
@@ -759,12 +762,21 @@ part of the initiating undo step; a newer authored curve edit supersedes pending
 
 ## Application preferences (0.2.3)
 
-`preferences.get` returns `routing_backend`, `path`, and any loading `error`.
-`preferences.set` accepts `routing_backend: "CUSTOM" | "PIQP"` and returns updated state
+`preferences.get` returns `routing_backend`, `routing_conversion_points`, `path`, and any loading `error`.
+`preferences.set` accepts `routing_backend: "CUSTOM" | "PIQP"` and
+`routing_conversion_points: "ENDPOINTS" | "ALL_POINTS"` and returns updated state
 after persistence. These are runtime operations: no document revision, undo entry,
 recalculation or checkpoint change. The choice applies at future dispatch, including
 routed Fibers and conversion previews. Running jobs and accepted results remain unchanged.
 `evaluate` explicitly requests fresh calculations.
+
+The conversion-point preference applies only to future switches into ROUTED and optional
+conversion previews without an explicit point list. It does not change existing ROUTED
+curves, ordinary recalculation, or jobs already requested. Closed curves keep all points.
+Mandatory junctions and anatomical bindings are preserved. Removing optional points updates
+consumer material stations for the retained identities in the same undo transaction;
+incoming attachments continue to enforce topology locks. Existing preferences files without
+this field default to `ENDPOINTS` without changing the solver choice.
 
 ```json
 [

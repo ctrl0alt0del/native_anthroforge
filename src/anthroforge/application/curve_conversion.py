@@ -57,7 +57,7 @@ def conversion_spec(
     points: list[str] | None,
     settings: Any,
 ) -> ConversionSpec:
-    chosen = conversion_points(session, curve, points)
+    chosen = conversion_points(session, curve, engine, points)
     if engine == "ROUTED":
         mode = "AUTHORED"
         settings = dict(settings or {})
@@ -65,8 +65,14 @@ def conversion_spec(
     return ConversionSpec(curve, decode(engine, settings), mode, samples, chosen)
 
 
-def conversion_points(session: Any, curve: str, points: list[str] | None) -> tuple[str, ...]:
+def conversion_points(
+    session: Any, curve: str, engine: str, points: list[str] | None
+) -> tuple[str, ...]:
+    from .routing_conversion import point_ids
+
     source = curve_sources.source(session.document, curve)
+    if points is None and engine == "ROUTED":
+        return point_ids(source, session.preferences.value.routing_conversion_points)
     return tuple(p.id for p in source.points) if points is None else tuple(points)
 
 
@@ -172,11 +178,13 @@ def status(session: "Session") -> dict[str, Any]:
 
 
 def accept(session: "Session", token: str) -> None:
+    from . import curve_conversion_state
+
     candidate = require_candidate(session, token).authored
     source = curve_sources.source(session.document, candidate.id)
     construction_policy.require_topology_edit(session.document, candidate.id)
     changed = replace(source, points=candidate.points, engine_settings=candidate.engine_settings)
-    object_operations.install(session, changed)
+    curve_conversion_state.install(session, changed)
     cancel(session)
 
 

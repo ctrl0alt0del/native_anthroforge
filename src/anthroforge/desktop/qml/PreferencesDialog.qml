@@ -31,6 +31,21 @@ UiDialog {
             Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.muted
             text: "Applies to future calculations. Current results stay unchanged. Use Recalculate to update them."
         }
+        Label { text: "CURVE CONVERSION"; color: Theme.muted; font.pixelSize: 11 }
+        RowLayout {
+            Layout.fillWidth: true; spacing: Theme.gap
+            Label { text: "Switch to ROUTED"; color: Theme.text; Layout.fillWidth: true }
+            UiHelp {
+                explanation: "Endpoints only lets the solver find the path between endpoints. Shared junctions and anatomical binding points are also kept. Closed curves keep all points. Applies only to future engine switches."
+            }
+            UiCombo {
+                objectName: "routingConversionPoints"; Layout.preferredWidth: 200
+                model: ["Endpoints only", "All curve points"]
+                currentIndex: preferences.state.routing_conversion_points === "ALL_POINTS" ? 1 : 0
+                onActivated: preferences.setRoutingConversionPoints(currentIndex === 1 ? "ALL_POINTS" : "ENDPOINTS")
+                hint: "Control points retained when switching to the ROUTED engine"
+            }
+        }
         Label { text: "Saved automatically for all projects on this computer."; color: Theme.muted; font.pixelSize: 11 }
         Label {
             objectName: "preferencesError"; Layout.fillWidth: true; Layout.preferredHeight: 50

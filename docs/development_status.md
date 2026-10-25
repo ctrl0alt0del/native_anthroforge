@@ -1,9 +1,20 @@
 # AnthroForge development validation
 
-Current work is [0.3.7 project continuity](usability_037.md), with qualification tracked
+Current release is [0.3.7 project continuity](usability_037.md), with qualification tracked
 in [the task](tasks/usability-037.md). Prior release qualification is in
 [authoring workflows](tasks/workflows-036.md).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Project continuity and UI polish (0.3.7)
+
+Recent projects, configurable separate recovery autosaves and searchable recovery opening
+are integrated with the existing save/undo lifecycle. Menu gaps, long dialog titles,
+deletion lists, shortcut-policy row overlap and primary-inspector ordering are corrected.
+The final suite passes **2,241 tests**; five native CTests, configured style/typing,
+numerical checks and the complete portable suite pass. A production assembly recovery
+matches all 12,561 serialized payloads, including geometry/attachments. Actual offscreen
+layouts at narrow/normal widths and 150% scale and packaged Preferences/recovery screens
+were inspected. No physical interactive desktop acceptance or frame-time guarantee.
 
 ## Audited authoring workflows (0.3.6)
 

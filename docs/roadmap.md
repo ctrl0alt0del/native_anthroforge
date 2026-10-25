@@ -1,6 +1,6 @@
 # AnthroForge release roadmap
 
-- **0.3.7 — qualification in progress:** recent projects, periodic committed recovery
+- **0.3.7 — qualified:** recent projects, periodic committed recovery
   copies and UI polish. [Walkthrough](usability_037.md), [evidence](tasks/usability-037.md).
 
 - **0.3.6 — qualified:** integrates the preserved 0.3.4

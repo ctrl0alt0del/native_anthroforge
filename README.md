@@ -3,7 +3,9 @@
 0.3.7 adds Recent Projects, configurable recovery autosave (every five minutes by
 default), a recovery browser, and layout fixes for menus, dialogs, inspectors and
 shortcut attachment policies. See the [workflow and evidence](docs/usability_037.md).
-Runtime qualification is in progress; schema 6 and numerical geometry remain unchanged.
+Qualified with 2,241 Python tests, five native CTests and the complete minimal-PATH
+portable suite. Schema 6 and numerical geometry remain unchanged. GUI evidence is
+background/offscreen; physical desktop acceptance is not claimed.
 
 0.3.6 integrates the preserved 0.3.4 authoring work with strict mirroring and selectable
 Fiber propagation. It adds Fiber support controls, pin offsets/checks/repairs, cold routing,

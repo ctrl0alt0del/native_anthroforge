@@ -2,7 +2,7 @@
 
 - Task branch: `codex/usability-037`; integration: `main`.
 - Starting revision: `552afe2`.
-- Status: in progress; not release qualified.
+- Status: implemented and runtime-qualified as 0.3.7.
 - Writer: direct desktop task; 2026-10-25 Europe/Bucharest.
 
 ## Outcome
@@ -44,7 +44,7 @@ do not mask controls with unnecessary elision or transient layout changes.
 - Development gate, portable checks and one canonical 0.3.7 distribution/source archive.
 - Preserve unrelated root `__init__.py`; checkpoint/push and validated merge workflow.
 
-## Next actions
+## Initial qualification sequence
 
 1. Complete actual recovery/recent UI tests and audit inspector/menu/dialog clipping.
 2. Fix observed owning-control/layout defects; qualify autosave lifecycle and large files.
@@ -105,3 +105,19 @@ layout checks, production-sized recovery and portable packaging remain pending.
   double to match the extended writer signature. Its disk-failure preservation check
   and all 23 interleaving/autosave tests pass; no runtime correction was required.
 - Aggregate Python rerun is in progress. Remaining numerical/doctor gate stages pass.
+
+## Final runtime qualification
+
+- Final aggregate: **2,241 passed** in 207.23 s. The development gate's native/style/
+  typing stages passed; after correcting the test double, the aggregate Python suite
+  and remaining numerical/doctor stages pass separately. No native/runtime code changed
+  after package revision `a6e57ef`.
+- Full minimal-PATH portable suite passes, including headless geometry workflows,
+  hidden rendering, saved preferences, recent history, compiled recovery creation and
+  discovery, and unchanged manual project bytes. Package version is 0.3.7, Python
+  3.12.12, Qt 6.12.0. All 140 QML/native files match the qualified source.
+- Evidence: build/usability-037/{development-gate.log,pytest-final.log,numerics.log,
+  doctor.json,portable.log,portable/,ui/,policies/,assembly/}. Local artifacts are ignored.
+- Delivery uses one dist/0.3.7/AnthroForge.dist and its corresponding source archive.
+  Final artifact integrity and integration are verified during delivery. Root
+  __init__.py is preserved; no external project file or geometry algorithm was modified.

@@ -1,6 +1,6 @@
 # AnthroForge 0.3.7 — Project continuity and UI polish
 
-Status: implemented; release qualification in progress.
+Status: implemented and runtime-qualified as 0.3.7.
 
 **File → Recent Projects** keeps the latest 20 successfully opened or saved projects
 across launches. Entries show their folder and expose the full path on hover. Opening
@@ -48,8 +48,13 @@ and 326 Fibers) round-trips all 12,561 serialized payloads exactly. The runtime 
 measured 1.58 ms preparation, 4.37 s background execution and 0.09 ms publication in one
 uncontrolled-load run. These are task timings, not frame latency or a speedup comparison.
 Core recovery runs without Qt. Schema 6 and all numerical geometry algorithms remain
-unchanged. Final gate and executable evidence are tracked in the
+unchanged. Development checks pass 2,241 Python tests, five native CTests, configured
+style/typing and numerical/runtime checks. The full minimal-PATH portable suite passes,
+including compiled recovery capture, discovery and original-file preservation. Packaged
+Preferences and recovery captures were inspected. The runtime build is `a6e57ef`;
+later changes concern acceptance tools, a test-double signature and documentation.
+Gate and executable evidence are tracked in the
 [task record](tasks/usability-037.md).
 
 Delivery uses one `dist/0.3.7/AnthroForge.dist` and one
-`dist/AnthroForge-0.3.7-source.zip` after qualification.
+`dist/AnthroForge-0.3.7-source.zip`.

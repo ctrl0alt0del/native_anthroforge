@@ -81,3 +81,38 @@ tested on this failure plus normal edits, actual surfaces and attachments; no ne
 has yet been qualified. Discuss the approach before changing attachment behavior.
 Background evidence/probe scripts: `build/scm-ribs-distortion/`; original WIP source
 remains intact. Full application gate/rebuild not needed for this investigation-only edit.
+
+
+## Research follow-up: candidate replacements, not qualified fixes
+
+The current local formula has smoothstep transitions but does not ensure a coherent
+whole-curve deformation. Singleton endpoint-owner runs can leave no interior sample
+in the transition. Facet-dependent rotated offsets remain discontinuous even with
+smooth owner weights. Neutral-pose reconstruction conceals this until supports deform.
+
+Primary published references inspected:
+- Jacobson et al., [Bounded Biharmonic Weights (2011)](https://homes.cs.washington.edu/~jovan/papers/jacobson-2011-bbw.pdf):
+  bounded smooth bind-time weights; pose-time blending. A curve/arc-length adaptation
+  is a hypothesis, not the published 2D/3D method unchanged. Automatic supports require
+  fidelity terms/handle regions: endpoint-only constraints on this middle Fiber would
+  otherwise favor Spine everywhere and erase Ribs support. Better weights alone do
+  not repair point-dependent target-frame motion.
+- Sumner et al., [Embedded Deformation (2007)](https://cgl.ethz.ch/~sumnerb/research/embdef/Sumner2007EDF.pdf):
+  neighboring transformation consistency in a deformation graph, with near-rigid local
+  maps and positional constraints. Relevant to facet/frame coherence and different
+  consumer representations. Nonlinear; costs, stretch allowance and initialization
+  require testing on our actual parent edits. No injectivity/contact guarantee implied.
+- Sorkine/Alexa, [ARAP (2007)](https://igl.ethz.ch/projects/ARAP/), and
+  [Laplacian Surface Editing (2004)](https://diglib.eg.org/items/ee43c2c6-4956-4ff0-9db1-c946306a5b99):
+  joint detail-preserving reconstruction under constraints. Curves need an appropriate
+  graph/bending/rest-frame adaptation, not a blind call to triangle-mesh ARAP. Plain
+  displacement fairing is not automatically rigid-motion invariant. Existing tissue
+  height smoothing/PBD are different downstream stages, not this missing contract.
+
+Evidence-driven experiments to compare: (A) arc-length-aware bounded support weights
+plus coherent regional parent transport, (B) constrained curve/connected-construction
+reconstruction driven by soft automatic-support goals and exact anatomical pins.
+Preserve neutral/rest shape, rigid motions, pin references and authored corners; test
+SCM, ordinary small edits, large rotations/nonuniform scaling, junctions, loops, sample
+resolution independence and consumer surfaces. Record native profiling and failure
+behavior. No candidate has been implemented or demonstrated to fix the actual case yet.

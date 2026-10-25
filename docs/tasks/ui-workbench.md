@@ -1,6 +1,8 @@
 # UI workbench implementation
 
+- Status: complete; implemented and qualified for normal merge delivery.
 - Branch: `codex/ui-workbench`; integration: `main`; baseline: `9701c8c`.
+- Qualified runtime: `37da18e`; subsequent changes are documentation only.
 - Scope: implement the approved [workbench design](../ui_overhaul_design.md) in 0.3.7.
 - Direct work, no agents. Keep all validation background/offscreen/hidden.
 - Preserve unrelated root `__init__.py`; checkpoint/push and validated merge authorized.
@@ -35,7 +37,7 @@ reuse it with explicit state keys rather than creating a parallel disclosure sys
 Qt's existing SplitView supports persistent sizes; native focus scopes and visibility
 must be tested with the actual keyboard and editing code.
 
-Validation and delivery pending. Preserve all currently reachable actions, including
+The retention checklist included all currently reachable actions, including
 source replacement/split, optional inflation preview, mirror inspection, reports,
 recovery and workspace management; a simpler default must not remove those features.
 
@@ -76,18 +78,60 @@ speedup, full-update completion or physical frame/input latency. Individual bind
 outliers varied (up to 90 ms); inclusive durations were not added together. No profiler
 run overlapped the development gate. Reports: `build/ui-workbench/profiles/` (local).
 
-Full gate is running; package, final action inventory and combined-source qualification
-remain pending. Source/geometry algorithms have not changed.
+At that checkpoint, the full gate, package, final action inventory and combined-source
+qualification were pending. Source/geometry algorithms had not changed.
 
 The full development gate passes 2,248 Python tests, five native CTests, typing/style,
 numerical and runtime checks. The first relocated portable build passes the complete
 minimal-PATH suite, including hidden GPU geometry, reports, mirroring and authoring.
-Final design review added bounded searchable relationship lists (100-consumer search
-and stable-layout acceptance pass). This last QML-only change requires refreshed package
-and desktop checks. All application/native Python/C++ behavior remains unchanged.
+Final design review then added bounded searchable relationship lists (100-consumer search
+and stable-layout acceptance pass). This required refreshed package and desktop checks.
+All application/native Python/C++ behavior remains unchanged.
 
 Navigation completion: Construction search uses a Qt proxy over the existing incremental
 records (no copied authored data or new selection model). Anatomy hover actions and full
 name tooltips restore room for names. Search rename/insert/remove tests pass; real Qt
 tests confirm unchanged selection/document identity and buttons remaining visible when
-the pointer enters them. Final-source profiling and refreshed qualification are next.
+the pointer enters them. Final-source profiling and refreshed qualification follow below.
+
+## Final qualification
+
+- Final Python suite: **2,250 passed**, including search propagation, layout persistence,
+  shared edit restrictions, and existing geometry/attachment contracts. Ruff, format and
+  mypy pass. The complete development gate previously passed 2,248 tests and five native
+  CTests, native style, PowerShell, numerical and runtime checks; only desktop navigation,
+  two tests and documentation changed afterward. Native code is unchanged.
+- Runtime `37da18e` built successfully into the canonical 0.3.7 folder. A relocated copy
+  under `build/ui-workbench/Portable App/` passes the complete minimal-PATH portable suite.
+  It exercises packaged authoring, attachments, tissue stages, mirrors, profiles, reports,
+  and project recovery. Result: `build/ui-workbench/portable-final/portable-check.json`.
+- Final workbench interactions pass at 1440×900, 1050×680 and 150% scale. Text audits
+  find no cropped labels in ten recorded views. Numerical entry/drag/cancel/Undo, tissue
+  previews, Fiber editing, shortcut workflows and inspection remain functional.
+  Action inventory finds **zero removed command IDs, named controls or adapter calls**.
+- Final serial ABBA profile: before **15.106 / 15.562 s**, after **15.259 / 15.710 s**.
+  All captures retain 526 active jobs at the same 30-tick endpoint, with zero calculation
+  errors/property queries, nine model replacements and 15 row insertions/removals.
+  Data-change counts are 1297/1315 before and 1321/1280 after. Reports and comparison:
+  `build/ui-workbench/profiles-final/`. Runs did not overlap builds or test gates.
+  Ranges overlap; two observations per condition and uncontrolled background load do
+  not establish a speedup or rule out small regressions. Individual binding outliers
+  reach 92.6 ms. This is bounded UI workload evidence, not completed-update or frame
+  latency. Inclusive overlapping durations were not summed.
+- UI captures and hidden GPU images were inspected. Offscreen window captures alone do
+  not validate 3D scene pixels; the portable render check uses hidden QQuickRenderControl.
+  Physical desktop interaction, display latency and gaming-load behavior are untested.
+  No visible application windows, physical input or OS registration changes were used.
+
+## Ownership and delivery review
+
+WorkbenchState owns local layout only. ConstructionFilter uses the existing incremental
+model; RelatedObjects owns bounded presentation. Editors, selection, commands, capability
+policies, calculation lifecycle and native geometry retain their original owners. Enum
+labels do not alter command values. No application/core/native source changed. Existing
+public behavior, schema 6 and version 0.3.7 remain intact; root `__init__.py` is preserved.
+
+Documentation links, current-versus-historical qualification and action retention were
+reviewed separately from test results. Delivery uses one canonical
+`dist/0.3.7/AnthroForge.dist` and `dist/AnthroForge-0.3.7-source.zip`. Temporary captures,
+profiles and qualification copies stay under ignored `build/ui-workbench/`.

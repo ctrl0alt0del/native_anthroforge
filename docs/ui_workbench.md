@@ -61,7 +61,7 @@ the application does not create a control for every related object at once.
 
 ## Retention and qualification
 
-| Retained workflow | Evidence required for this delivery |
+| Retained workflow | Qualification performed |
 | --- | --- |
 | Numerical entry/drag, cancellation and one-action Undo | Real Qt events, decimal/comma locales, integer and vector fields |
 | Curve editing and tissue previews across pages | Workbench acceptance asserts edit/draft retention and unchanged document identity |

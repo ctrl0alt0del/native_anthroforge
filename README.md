@@ -7,7 +7,7 @@ the portable app for Windows file associations; shared tooltips wrap long help t
 See the [workflow and evidence](docs/usability_037.md). The
 [workbench](docs/ui_workbench.md) adds Shape / Shortcuts / Inspect pages, viewport-local
 tools, a stable calculation strip, remembered layouts and clearer control labels.
-Qualified with 2,248 Python tests, five native CTests and the complete minimal-PATH
+Qualified with 2,250 Python tests, five native CTests and the complete minimal-PATH
 portable suite. Schema 6 and numerical geometry remain unchanged. GUI evidence is
 background/offscreen; physical desktop acceptance is not claimed.
 

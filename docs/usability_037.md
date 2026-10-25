@@ -82,5 +82,16 @@ lines). OS calls are intercepted for success/failure checks: no Explorer/Setting
 or actual default-app change was performed. Document identity remains unchanged during
 these actions. See the [follow-up record](tasks/preferences-ui-design.md).
 
+The workbench overhaul is qualified at runtime commit `37da18e`: **2,250 Python tests**,
+style/typing and the refreshed full minimal-PATH portable suite pass. The development
+gate also passed all five native CTests and numerical/runtime checks; no native or
+application behavior changed. Actual Qt interactions cover numeric drags, drafts across
+pages, source navigation, bounded 100-consumer search, hover controls and 150% scaling.
+The action inventory found no removed commands or controls. Final ABBA profiles have
+overlapping before/after timings and unchanged model replacement counts; no speedup or
+frame-rate guarantee is claimed. Captures are offscreen and render checks are hidden;
+physical desktop acceptance remains unperformed. See the
+[workbench evidence and ownership review](tasks/ui-workbench.md).
+
 Delivery uses one `dist/0.3.7/AnthroForge.dist` and one
 `dist/AnthroForge-0.3.7-source.zip`.

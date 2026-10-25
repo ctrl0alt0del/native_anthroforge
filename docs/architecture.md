@@ -1075,3 +1075,8 @@ existing inspection adapters activate only when their visible disclosure is open
 UiCombo display labels and UiEnumCombo code/value bindings preserve raw command IDs.
 ViewportHeader and WorkbenchStatus own presentation regions, not application operations.
 No second command, calculation, selection, policy or geometry-lifetime system is added.
+
+ConstructionFilter is a desktop Qt proxy over the existing incremental RecordModel.
+It filters names and kinds without copying authored objects or changing selection.
+RelatedObjects bounds dependency/consumer lists to eight rows with reused delegates
+and search; filtering preserves the list height. Both remain presentation adapters.

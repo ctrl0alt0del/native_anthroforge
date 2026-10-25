@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 from anthroforge.application.preferences import PreferenceStore
+from anthroforge.core.fibers import Fiber
 from tests.test_curve_conversion import source
 from tests.test_fiber_creation import bind, scene
 from tests.test_junction_workflow import reference
@@ -144,3 +145,18 @@ def test_explicit_preview_points_override_default_and_all_points_mode_is_support
         assert session.conversion.asset.authored.points == before.object(key).points
         assert session.document is before
         session.command("curve.conversion.cancel")
+
+
+def test_interior_anatomical_bindings_are_not_discarded_by_endpoints_default(session):
+    target, key = scene(session)
+    points = session.document.object(key).points
+    session.command(
+        "fiber.create", curve=key, bindings=[dict(point=p.id, target=target) for p in points]
+    )
+    session.wait()
+    before = next(o for o in session.document.objects if isinstance(o, Fiber))
+    session.command("curve.engine", curve=before.id, engine="ROUTED")
+    session.wait()
+    after = session.document.object(before.id)
+    assert after.result.status == "ready", after.result.error
+    assert len(after.points) == 3 and after.bindings == before.bindings

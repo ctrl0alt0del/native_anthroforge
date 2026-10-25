@@ -34,7 +34,8 @@ remain enforced. Native solver and attachment behavior were not changed.
 
 ## Verification
 
-42 focused conversion/preference tests pass, plus architecture checks. Ruff and mypy pass.
+Focused conversion/preference tests pass, plus architecture checks. Added coverage verifies
+an interior anatomical binding remains mandatory. Ruff and mypy pass.
 `tools/preferences_acceptance.py` passes offscreen: both choices, persistence, no document
 edits, backend selection and future Fiber dispatch. Preferences screenshot inspected;
 no QML warnings. No desktop takeover or interactive acceptance claimed.
@@ -43,14 +44,19 @@ Read-only local SCM probe on `build/scm-ribs-distortion/after.anthroforge` (Ribs
 all three SCM Fibers convert from 73 points to two, retaining exact stored bindings;
 all three paths, membrane and Tissue finish ready. Evidence:
 `build/routed-conversion-points/scm.json` and `scm.afprofile.zip`. Source project not saved.
-This establishes conversion/lifecycle success, not an improved solver or anatomical fit.
+Actual SCM final geometry was inspected from two fixed cameras (`scm.png`), without saved
+presentation changes. This establishes conversion/lifecycle success, not an improved solver
+or anatomical fit.
 Development gate is running in `build/routed-conversion-points/development-gate.log`;
-native build and all five native CTests passed. Full gate and package checks pending.
+native build, all five native CTests and style checks passed; full Python tests are running.
+Canonical package build succeeded at `dist/0.3.5/AnthroForge.dist/AnthroForge.exe`; the
+offscreen minimal-PATH portable suite is running in `build/routed-conversion-points/portable`.
+Its Preferences coverage includes both conversion policies in the actual executable.
 
 ## Next actions and blockers
 
-1. Complete development gate, inspect SCM output and package the existing canonical version.
-2. Check packaged preference and conversion workflows, then integrate the validated branch.
+1. Complete Python/numerics gate and portable checks.
+2. Update companion source archive and integrate the validated branch.
 
 ## Recovery inputs
 

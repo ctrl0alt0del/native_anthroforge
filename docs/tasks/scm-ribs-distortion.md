@@ -314,8 +314,10 @@ steps do not monotonically improve the loft/inflation because the path objective
 not optimize the assembled tissue surface.
 
 Two serial unrecorded passes in forward/reverse order, from prepared inputs: C2 alone
-2.17 ms paths /12.82 ms complete SCM; C2 +1 step 34.64/48.66 ms; +4 steps 40.82/54.68 ms;
-+24 steps 74.00/87.69 ms. These are descriptive local measurements, not controlled frame
+2.17 ms paths /12.82 ms with tissue; after-C2 +1 step 34.64 ms solver /48.66 ms solver and
+tissue; +4 steps 40.82/54.68 ms; +24 steps 74.00/87.69 ms. After measurements begin with
+the already propagated seed: add the C2 path preparation cost when composing an update.
+These are descriptive local measurements, not controlled frame
 or input latency benchmarks. They exclude scene capture: the two 153-surface scenes cost
 485 ms (edited pose) and 450 ms (baseline). Changed geometry requires the corresponding
 scene. Before variants also pay baseline routing and roughly .2-.3 s recapture once, plus

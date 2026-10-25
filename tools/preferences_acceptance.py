@@ -23,7 +23,7 @@ from anthroforge.desktop.qt_profiler import profiler_application
 from anthroforge.desktop.runtime import native_runtime
 from tests.routed_surface_scene import create
 
-OUTPUT = Path("build/preferences-023").resolve()
+OUTPUT = Path(os.environ.get("AF_PREFERENCE_ACCEPTANCE", "build/preferences-023")).resolve()
 
 
 def backend(controller, key):
@@ -51,7 +51,7 @@ def exercise(controller, window):
     QTest.qWait(100)
     assert window.property("modalOpen")
     choose(window, 1)
-    conversion_choice(controller, window)
+    execution_choices(controller, window)
     assert controller.session.document is before and controller.session.history.cursor == history
     assert backend(controller, objects["fibers"][0]) == "CUSTOM"
     assert window.grabWindow().save(str(OUTPUT / "preferences.png"))
@@ -69,6 +69,19 @@ def conversion_choice(controller, window):
     )
     choose(window, 0, "routingConversionPoints")
     assert controller.session.preferences.value.routing_conversion_points == "ENDPOINTS"
+
+
+def execution_choices(controller, window):
+    conversion_choice(controller, window)
+    assert find(window, "fiberPropagation").property("currentIndex") == 0
+    choose(window, 1, "fiberPropagation")
+    assert controller.session.preferences.value.fiber_propagation == "LOCAL_SURFACE"
+    assert (
+        PreferenceStore(controller.session.preferences.path).value.fiber_propagation
+        == "LOCAL_SURFACE"
+    )
+    choose(window, 0, "fiberPropagation")
+    assert controller.session.preferences.value.fiber_propagation == "SMOOTH_SHAPE"
 
 
 def verify_dispatch(controller, window, objects):

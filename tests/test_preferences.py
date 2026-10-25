@@ -116,7 +116,11 @@ def test_preference_file_contains_only_settings(session):
     data = json.loads(Path(result["path"]).read_text())
     assert data == {
         "schema": 1,
-        "values": {"routing_backend": "PIQP", "routing_conversion_points": "ENDPOINTS"},
+        "values": {
+            "routing_backend": "PIQP",
+            "routing_conversion_points": "ENDPOINTS",
+            "fiber_propagation": "SMOOTH_SHAPE",
+        },
     }
 
 

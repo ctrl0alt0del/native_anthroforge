@@ -139,7 +139,13 @@ def compute(session: "Session", payload: Any, cancel: Any) -> path_assets.PathAs
         edit = FiberEdit(value.source.result.asset, eligible(document, candidate.id))
         candidate = replace(candidate, edit=edit)
     return curve_evaluation.evaluate_item(
-        session.engine, document, resources, candidate, cancel.handle, preferences.routing_backend
+        session.engine,
+        document,
+        resources,
+        candidate,
+        cancel.handle,
+        preferences.routing_backend,
+        preferences.fiber_propagation,
     ).asset
 
 

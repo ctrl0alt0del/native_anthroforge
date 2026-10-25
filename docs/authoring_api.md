@@ -762,13 +762,22 @@ part of the initiating undo step; a newer authored curve edit supersedes pending
 
 ## Application preferences (0.2.3)
 
-`preferences.get` returns `routing_backend`, `routing_conversion_points`, `path`, and any loading `error`.
+`preferences.get` returns `routing_backend`, `routing_conversion_points`, `fiber_propagation`,
+`path`, and any loading `error`.
 `preferences.set` accepts `routing_backend: "CUSTOM" | "PIQP"` and
-`routing_conversion_points: "ENDPOINTS" | "ALL_POINTS"` and returns updated state
+`routing_conversion_points: "ENDPOINTS" | "ALL_POINTS"`, and
+`fiber_propagation: "SMOOTH_SHAPE" | "LOCAL_SURFACE"`, and returns updated state
 after persistence. These are runtime operations: no document revision, undo entry,
 recalculation or checkpoint change. The choice applies at future dispatch, including
 routed Fibers and conversion previews. Running jobs and accepted results remain unchanged.
 `evaluate` explicitly requests fresh calculations.
+
+Fiber propagation defaults to `SMOOTH_SHAPE` (Smooth Shape Preservation), including when
+older preferences omit the setting. `LOCAL_SURFACE` (Local Surface Following) retains
+the original dense surface-frame transport. Both preserve anatomical bindings and are
+independent of the selected curve engine. Smooth propagation does not promise obstacle
+clearance. Selection neither recomputes existing results nor modifies saved projects;
+queued calculations use the choice at dispatch. Inspection/replay retains the captured choice.
 
 The conversion-point preference applies only to future switches into ROUTED and optional
 conversion previews without an explicit point list. It does not change existing ROUTED

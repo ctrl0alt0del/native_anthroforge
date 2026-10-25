@@ -63,17 +63,11 @@ def workload(session: "Session", curve: str, document: Document) -> Workload:
 def compute(session: "Session", curve: str, payload: Any, cancel: Any) -> Any:
     document, resources, preferences = payload
     require_inputs_available(document, curve)
+    inputs = (session.engine, document, resources, curve, cancel.handle)
+    policy = (preferences.routing_backend, preferences.fiber_propagation)
+    metadata = dict(target=curve, routing_backend=policy[0], fiber_propagation=policy[1])
     return document, session.profiler.call(
-        "path",
-        "evaluate",
-        curve_evaluation.evaluate,
-        session.engine,
-        document,
-        resources,
-        curve,
-        cancel.handle,
-        preferences.routing_backend,
-        _metadata={"target": curve, "routing_backend": preferences.routing_backend},
+        "path", "evaluate", curve_evaluation.evaluate, *inputs, *policy, _metadata=metadata
     )
 
 

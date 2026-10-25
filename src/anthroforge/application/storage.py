@@ -15,7 +15,7 @@ from anthroforge.core.entities import SCP, Attachment, AttachmentReceipt, Worksp
 from anthroforge.core.junctions import decode as decode_junction
 from anthroforge.native.mesh import GeometryEngine
 
-from . import object_codec, resource_storage, shortcut_codec
+from . import attachment_storage, object_codec, resource_storage, shortcut_codec
 from .construction_codec import control, entity_construction
 from .mirror_codec import fields as mirror_fields
 from .resources import Resources
@@ -181,4 +181,5 @@ def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resource
         document = decode_document(data["document"])
         resources = resource_storage.read(archive, data, engine)
         resources.require(document)
+        attachment_storage.restore_frame_hints(document, resources, engine)
         return document, resources

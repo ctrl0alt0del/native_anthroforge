@@ -131,6 +131,23 @@ strategy/context; sparse PIQP preparation/solving belongs to `routing_qp_problem
 and `routing_piqp.cpp`. Outer routing remains shared. Accepted path diagnostics retain
 backend provenance; old schema-4 results without this field identify Custom.
 
+Fiber propagation is another dispatch-captured preference, independent of path engines.
+`application/fiber_deformation.py` selects the existing dense resolver or native Smooth Shape
+Preservation. The latter owns regional affine fits, compact support-weight filtering, exact
+pin elimination and sparse differential reconstruction. Preparation is cached with a 64 MiB
+budget, including retained fields and conservative source-geometry ownership. Numerical work
+stays in `native/src/fiber_deformation_*.cpp`; no per-point Python callback or extra worker
+pool is introduced. Profiler native calls and cache events expose preparation and reuse.
+
+New attachment fields retain bind-world and support frames. Older fields retain saved-pose
+hints on loading, without evaluating paths or changing accepted geometry. Native recovery
+validates hints against original capture evidence; a rank-revealing solve preserves the hint
+in unobservable directions. Hard pins retain their own material records, while historical
+captures of the same anatomical surface share a regional deformation source. Neighborhoods
+exclude loose vertices and respect captured tissue sides. Tissue/topology changes use the
+existing material correspondence service. Failure retains accepted output through normal
+job publication; there is no silent switch to the other method.
+
 The [0.2.2 specification](specification_022.md) and [implementation plan](implementation_022.md)
 define the implemented unified TissueVCP, Point/Anchor and Surface/Membrane extension,
 shared surface providers and schema 4. [Validation](development_status.md#unified-tissues-022)

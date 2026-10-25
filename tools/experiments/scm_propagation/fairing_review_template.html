@@ -1,0 +1,46 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>SCM propagation smoothing</title>
+<style>body{font:16px system-ui;background:#171d25;color:#e2e7ee;margin:30px auto;max-width:1500px;padding:0 24px}h1,h2{color:#fff}p{max-width:1000px;line-height:1.6}a{color:#91caff}table{border-collapse:collapse;width:100%}th,td{padding:10px;text-align:left;border-bottom:1px solid #45505c}img{width:100%;background:white}select{font:inherit;padding:8px}.notice{border-left:4px solid #eda855;padding:12px;background:#28303b}section{margin-top:28px}</style>
+<h1>Smoother SCM propagation without ROUTED</h1>
+<p>Same three fibers, same Ribs Top Radius 3, same endpoints and unchanged loft/inflation/crop.
+All candidates are isolated experiments. Production code and source project remain unchanged.</p>
+<p class="notice">The 0.20 reconstruction candidate removes detected transverse self-crossings in this fixture.
+It is not a collision-free routing algorithm or an anatomical acceptance certificate.
+Existing near-endpoint Spine contact remains. All-segment tests found no new intersecting segments.
+Those checks use zero requested clearance; the earlier SQP clearance test is stricter.</p>
+<h2>What changes</h2>
+<p>The earlier C2 prototype smooths support weights and local bone transforms. It still treats each curve point largely independently.
+The new experiment reconstructs the curve as a whole: remain near those support goals, retain the transformed original curvature,
+and satisfy anatomical endpoints exactly. One cached linear factorization, three direct back-substitutions per curve.
+No routing, planner, iterative collision recovery, or inflation change. The value 0.20 controls the smoothing scale in normalized rest arc length;
+it is a tested candidate, not a selected product default.</p>
+<p>Wider support blending alone improves some inflation folds but increases base crossings (28 to 40).
+Reconstruction is the more promising direction in this case. Stronger reconstruction reduces peak automatic support response;
+it does not ignore Ribs. The third fiber retains about 77% of its mean Ribs-induced displacement in an ablation.</p>
+<h2>Unrecorded timings and actual surface findings</h2>
+<table><thead><tr><th>Method</th><th>Three fibers, ms</th><th>Consumer stages, ms</th><th>Base crossings</th><th>Inflated crossings</th><th>Cropped crossings</th></tr></thead><tbody>{{rows}}</tbody></table>
+<p>Median of 14 serial balanced-order trials after warm-up. Prepared parent inputs; includes path adoption and full isolated tissue stages.
+Excludes project loading, dynamic parent packing, bind capture, other anatomy, scheduling and rendering.
+No collision scene is built during propagation. Cached setup took about 5 ms for three curves, with a first-library-load outlier around 30 ms.
+Background load was uncontrolled. This is not frame-latency measurement.</p>
+<p>Endpoints have zero error. Neutral/global-rigid checks including dormant handles differ by at most 7.8e-11.
+No degenerate triangles or truncated finding lists. Crossing checks exclude coplanar contact, touching and containment.</p>
+<section><h2>Matched views</h2><label>Geometry stage <select id="stage"><option value="rest">Inflated, uncropped</option><option value="base">Base, uncropped</option><option value="final">Final, existing crop</option></select></label>
+<p>Both rows use fixed cameras and scale. Crop was already present in the source; no extra crop hides errors.</p>
+<img id="comparison" src="comparison-rest.png" alt="Current, C2 and reconstructed shapes">
+<h2>Weight-blend comparison</h2><img id="weights" src="weights-rest.png" alt="Wider weights versus reconstruction">
+<h2>Bone context</h2><img id="context" src="context-rest.png" alt="Matching shapes with translucent bones">
+<h2>Fiber paths</h2><img src="paths.png" alt="Individual fiber path comparison"></section>
+<h2>Limits and next qualification</h2>
+<p>This fixture has three open Polylines with 73 samples each. Wider sampling, authored corners, interior anatomical pins,
+junctions, loops, shared consumers and nonrigid anatomical edits still need qualification. The probe uses a small dense factorization;
+its matrix is banded, allowing a compact implementation if this approach is selected for production.
+There is no guarantee of obstacle clearance or valid inflated surfaces for arbitrary edits.</p>
+<p>Raw evidence: <a href="quality.json">geometry and curve metrics</a>, <a href="summary.json">timing medians</a>,
+<a href="timings.json">all timing samples</a>, <a href="setup.json">preparation and invariants</a>,
+<a href="all-segment-contacts.json">every contacted segment</a>, <a href="ribs-response.json">Ribs ablation</a>,
+<a href="smoothing.afprofile.zip">runtime profile</a>.</p>
+<p>Research basis: <a href="https://graphics.stanford.edu/courses/cs468-07-winter/Papers/sgp2004_laplace.pdf">Laplacian Surface Editing</a>
+and <a href="https://www.skinning.org/automatic-methods-compressed.pdf">Skinning course</a>.
+This is a curve-specific experiment, not an implementation or parity claim for either publication.</p>
+<script>document.getElementById('stage').addEventListener('change',e=>{for(const id of ['comparison','weights','context'])document.getElementById(id).src=id+'-'+e.target.value+'.png';});</script>
+</html>

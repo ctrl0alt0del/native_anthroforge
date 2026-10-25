@@ -7,7 +7,7 @@ UiDialog {
     objectName: "preferencesDialog"
     title: "Preferences"
     modal: true; anchors.centerIn: parent
-    width: 480
+    width: 560
     standardButtons: Dialog.Close
     onAboutToShow: preferences.refresh()
     ColumnLayout {
@@ -30,6 +30,20 @@ UiDialog {
         Label {
             Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.muted
             text: "Applies to future calculations. Current results stay unchanged. Use Recalculate to update them."
+        }
+        RowLayout {
+            Layout.fillWidth: true; spacing: Theme.gap
+            Label { text: "Fiber propagation"; color: Theme.text; Layout.fillWidth: true }
+            UiHelp {
+                explanation: "Smooth Shape Preservation is the default: spreads support motion while retaining the curve's shape and exact attachment points. Local Surface Following keeps the original per-surface deformation. These methods update fibers when parents change; neither guarantees obstacle clearance. ROUTED remains a separate path engine."
+            }
+            UiCombo {
+                objectName: "fiberPropagation"; Layout.preferredWidth: 260
+                model: ["Smooth Shape Preservation", "Local Surface Following"]
+                currentIndex: preferences.state.fiber_propagation === "LOCAL_SURFACE" ? 1 : 0
+                onActivated: preferences.setFiberPropagation(currentIndex === 1 ? "LOCAL_SURFACE" : "SMOOTH_SHAPE")
+                hint: "Applies to future calculations; current results stay unchanged"
+            }
         }
         Label { text: "CURVE CONVERSION"; color: Theme.muted; font.pixelSize: 11 }
         RowLayout {

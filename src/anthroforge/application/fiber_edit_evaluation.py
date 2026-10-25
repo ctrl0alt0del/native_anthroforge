@@ -10,7 +10,7 @@ from anthroforge.core.fibers import Fiber, FiberBinding
 from anthroforge.core.results import EvaluationResult
 from anthroforge.native import attachment_fields, construction, curve_editing, path_editing, paths
 
-from . import attachment_assets, fiber_retention, fiber_supports
+from . import attachment_assets, fiber_deformation, fiber_retention, fiber_supports
 from .path_assets import PathAsset
 
 
@@ -22,15 +22,35 @@ class EditGeometry:
 
 
 def evaluate(
-    engine: Any, item: Fiber, resources: Any, document: Any, world: Any, cancel: int
+    engine: Any,
+    item: Fiber,
+    resources: Any,
+    document: Any,
+    world: Any,
+    cancel: int,
+    propagation: str = "SMOOTH_SHAPE",
 ) -> Any:
     assert item.edit is not None
-    asset = resources.attachments[item.attachment_asset]
     opening = resources.paths[item.edit.baseline].authored
-    positions = attachment_assets.resolved_points(engine, document, resources.meshes, asset, cancel)
-    current = attachment_assets.evaluate(engine, opening, asset, positions, world, cancel)
+    current = resolved_opening(engine, document, resources, opening, world, cancel, propagation)
     path, records = edited_geometry(engine, current, opening, item, cancel)
     return recapture(engine, item, resources, document, EditGeometry(path, records, world), cancel)
+
+
+def resolved_opening(
+    engine: Any,
+    document: Any,
+    resources: Any,
+    opening: Any,
+    world: Any,
+    cancel: int,
+    propagation: str,
+) -> Any:
+    asset = resources.attachments[opening.attachment_asset]
+    positions = fiber_deformation.resolve(
+        engine, document, resources, opening, asset, cancel, propagation
+    )
+    return attachment_assets.evaluate(engine, opening, asset, positions, world, cancel)
 
 
 def edited_geometry(engine: Any, current: Any, opening: Any, item: Fiber, cancel: int) -> Any:

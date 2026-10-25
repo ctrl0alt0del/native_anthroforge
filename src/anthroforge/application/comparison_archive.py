@@ -112,6 +112,7 @@ def replay_files(root: Path, frozen: Any, cancel: Any) -> dict[str, Path]:
     journal = dict(
         value.journal,
         routing_backend=source.routing_backend,
+        fiber_propagation=source.fiber_propagation,
         application_version=__version__,
         schema_version=1,
     )

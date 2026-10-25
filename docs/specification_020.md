@@ -170,6 +170,14 @@ Capture policy is Current parent (default) or Any eligible parent. Routed curves
 reroute around obstacles; Bézier/polyline fibers retain authored shape and report collisions.
 Failure preserves accepted output and produces an actionable Issue.
 
+Fiber parent-driven deformation is selectable in **Edit → Preferences → Fiber propagation**.
+**Smooth Shape Preservation**, the default, combines regional support motion and cached
+rest-shape reconstruction with exact anatomical pins. **Local Surface Following** retains
+the previous dense surface-frame behavior. Changes apply at future calculation dispatch;
+accepted results, running calculations, project revisions and undo remain unchanged. These
+methods do not change the curve engine or guarantee collision clearance. Closed paths and
+interior bindings use the same attachment contract. See computation record CH-078.
+
 Shared junctions are explicit curve-level identity relationships inherited by fibers.
 Proximity never welds points. A junction edit updates all incident authored records
 atomically, then each engine evaluates. Shared binding identity is explicit; independent

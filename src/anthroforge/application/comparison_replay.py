@@ -122,7 +122,10 @@ def execute(root: Path, journal: Any, output: str) -> dict[str, Any]:
     try:
         document, resources = storage.read_package(root / "starting.anthroforge", session.engine)
         projects.adopt(session, document, resources)
-        session.preferences.update(routing_backend=journal["routing_backend"])
+        session.preferences.update(
+            routing_backend=journal["routing_backend"],
+            fiber_propagation=journal.get("fiber_propagation", "LOCAL_SURFACE"),
+        )
         return replay_result(session, journal, output)
     finally:
         session.close()

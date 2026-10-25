@@ -8,6 +8,7 @@ from anthroforge.core.fibers import Fiber
 from . import (
     attachment_assets,
     curve_sources,
+    fiber_deformation,
     fiber_edit_evaluation,
     junction_bindings,
     junction_evaluation,
@@ -33,31 +34,54 @@ class ResolvedCurve:
 
 
 def evaluate(
-    engine: Any, document: Any, resources: Any, target: str, cancel: int, backend: str = "CUSTOM"
+    engine: Any,
+    document: Any,
+    resources: Any,
+    target: str,
+    cancel: int,
+    backend: str = "CUSTOM",
+    propagation: str = "SMOOTH_SHAPE",
 ) -> Any:
     item = curve_sources.source(document, target)
-    return evaluate_item(engine, document, resources, item, cancel, backend)
+    return evaluate_item(engine, document, resources, item, cancel, backend, propagation)
 
 
 def evaluate_item(
-    engine: Any, document: Any, resources: Any, item: Any, cancel: int, backend: str = "CUSTOM"
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Any,
+    cancel: int,
+    backend: str = "CUSTOM",
+    propagation: str = "SMOOTH_SHAPE",
 ) -> PathEvaluation:
     from . import symmetric_paths
 
-    value = resolve(engine, document, resources, item, cancel)
+    value = resolve(engine, document, resources, item, cancel, propagation)
     path = engine_path(engine, document, resources, value, cancel, backend)
     path = symmetric_paths.expand(engine, document, item, path, cancel)
     return PathEvaluation(path, value.edited, value.attachment)
 
 
-def resolve(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -> ResolvedCurve:
+def resolve(
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Any,
+    cancel: int,
+    propagation: str = "SMOOTH_SHAPE",
+) -> ResolvedCurve:
     if item.engine == "PARAMETRIC":
         return resolve_parametric(engine, document, resources, item, cancel)
-    value = (
-        resolve_fiber(engine, document, resources, item, cancel)
-        if isinstance(item, Fiber)
-        else ResolvedCurve(item)
-    )
+    value = ResolvedCurve(item)
+    if isinstance(item, Fiber):
+        value = resolve_fiber(engine, document, resources, item, cancel, propagation)
+    return resolve_junctions(engine, document, resources, value, cancel)
+
+
+def resolve_junctions(
+    engine: Any, document: Any, resources: Any, value: ResolvedCurve, cancel: int
+) -> ResolvedCurve:
     item, path = junction_evaluation.resolved(
         engine, document, resources, value.authored, cancel, value.path
     )
@@ -75,25 +99,33 @@ def resolve_parametric(
 
 
 def resolve_fiber(
-    engine: Any, document: Any, resources: Any, item: Fiber, cancel: int
+    engine: Any, document: Any, resources: Any, item: Fiber, cancel: int, propagation: str
 ) -> ResolvedCurve:
     item = junction_bindings.resolve(document, resources, item)
     if item.attachment_asset not in resources.attachments:
         raise ValueError("Fiber has no captured attachment field.")
     asset = resources.attachments[item.attachment_asset]
-    positions = attachment_assets.resolved_points(engine, document, resources.meshes, asset, cancel)
     world = curve_sources.world(engine, document, item.id)
     if item.edit:
-        return edited_fiber(engine, document, resources, item, world, cancel)
+        return edited_fiber(engine, document, resources, item, world, cancel, propagation)
+    positions = fiber_deformation.resolve(
+        engine, document, resources, item, asset, cancel, propagation
+    )
     resolved = attachment_assets.evaluate(engine, item, asset, positions, world, cancel)
     return ResolvedCurve(resolved.authored, resolved)
 
 
 def edited_fiber(
-    engine: Any, document: Any, resources: Any, item: Fiber, world: Any, cancel: int
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Fiber,
+    world: Any,
+    cancel: int,
+    propagation: str,
 ) -> ResolvedCurve:
     path, changed, captured = fiber_edit_evaluation.evaluate(
-        engine, item, resources, document, world, cancel
+        engine, item, resources, document, world, cancel, propagation
     )
     return ResolvedCurve(changed, path, changed, captured)
 

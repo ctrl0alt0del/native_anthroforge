@@ -1,5 +1,8 @@
 # AnthroForge release roadmap
 
+- **0.3.7 — qualification in progress:** recent projects, periodic committed recovery
+  copies and UI polish. [Walkthrough](usability_037.md), [evidence](tasks/usability-037.md).
+
 - **0.3.6 — qualified:** integrates the preserved 0.3.4
   D01–D12 workflows and retained-owner attachment corrections with mirroring and smooth
   propagation. No source-project migration or exact welded-Ribs parity claim.

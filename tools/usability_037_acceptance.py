@@ -5,15 +5,13 @@ import os
 from pathlib import Path
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
-OUTPUT = Path("build/usability-037/ui").resolve()
-os.environ["ANTHROFORGE_PREFERENCES_PATH"] = str(OUTPUT / "state/preferences.json")
 
+from activity_acceptance import wait_for
 from PySide6.QtCore import QMetaObject, QPointF, Qt
 from PySide6.QtGui import QFont, QFontDatabase
 from PySide6.QtQml import QQmlEngine, QQmlExpression
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
-from activity_acceptance import wait_for
 from tissue_editor_acceptance import scene, settle
 from ui_acceptance import click, find
 from ui_polish_acceptance import descendants, open_menu
@@ -22,6 +20,8 @@ from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.qt_profiler import profiler_application
 from anthroforge.desktop.runtime import native_runtime
+
+OUTPUT = Path("build/usability-037/ui").resolve()
 
 
 def invoke(item, method):
@@ -215,6 +215,7 @@ def exercise():
 
 def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
+    os.environ["ANTHROFORGE_PREFERENCES_PATH"] = str(OUTPUT / "state/preferences.json")
     QQuickStyle.setStyle("Basic")
     with native_runtime():
         app = profiler_application()

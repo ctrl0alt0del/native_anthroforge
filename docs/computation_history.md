@@ -162,7 +162,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. Typed integer controls retain exact text through Qt and convert display units before shared command validation (CH-051). | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [quantity transport](../src/anthroforge/desktop/quantity_values.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [integer quantities](../tests/test_integer_quantity_controls.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
 | R07 | Issues checks: evaluate structural/readiness/attachment/dependency diagnostics and optional native collision checks, retain scoped stale evidence, and verify requested repairs. Read-only checks use the common coordinator. | [Issue system](../src/anthroforge/application/issues/system.py), [providers](../src/anthroforge/application/issues/providers.py) | [Issue lifecycle](../tests/test_issue_lifecycle.py), [Issue integration](../tests/test_issue_integration.py) |
 | R08 | Runtime profiling: opt-in Qt/native/application events, monotonic alignment, bounded rings/queues, summaries, model churn, invalidation causes, cache/resource attribution and background trace archive export. | [profiling](../src/anthroforge/profiling), [Qt collector](../native/profiling) | [profiling](../tests/test_profiling.py), [profile diagnostics](../tests/test_profile_diagnostics.py) |
-| R09 | Project persistence: schema-5 writing with schema-4 reading on the 0.3 development branch; encode/decode editable records and accepted resources, atomic saving and background opening. Never serialize native handles or undo history. | [storage](../src/anthroforge/application/storage.py), [resource storage](../src/anthroforge/application/resource_storage.py) | [headless](../tests/test_headless.py), [shortcut foundations](../tests/test_shortcut_foundations.py) |
+| R09 | Project persistence: schema-6 writing with schema-4/5/6 reading; encode/decode editable records and accepted resources, atomic saving and background opening. Periodic recovery captures committed snapshots without changing manual save ownership (CH-092). Never serialize native handles or undo history. | [storage](../src/anthroforge/application/storage.py), [resource storage](../src/anthroforge/application/resource_storage.py), [autosave](../src/anthroforge/application/autosave.py) | [headless](../tests/test_headless.py), [shortcut foundations](../tests/test_shortcut_foundations.py), [autosave](../tests/test_autosave.py) |
 | R10 | Inspection/feedback reports: freeze a revision/presentation, hidden GPU capture and archive creation; screenshot annotations, PNG encoding, report preview decoding, atomic text updates and deletion are a separate reporting service. | [inspection report](../src/anthroforge/application/inspection_report.py), [feedback painting](../src/anthroforge/desktop/feedback_paint.py), [feedback storage](../src/anthroforge/feedback/storage.py) | [inspection export](../tests/test_inspection_export.py), [feedback](../tests/test_feedback.py), [feedback inbox](../tests/test_feedback_inbox.py) |
 
 ### Coverage and exclusions
@@ -2651,3 +2651,19 @@ the raw unset flag; standalone defaults remain off.
 - Preserved: one coordinator, resource leases, exact material references, read-only
   mirrors, stale rejection, Manual provenance, undo/save policy and welded-Ribs choice.
   No source-project migration or exact shoulder-addon equivalence is claimed.
+
+### CH-092 — periodic committed recovery snapshots (0.3.7; R03/R09)
+
+Previously saving was exclusively explicit; desktop Save can commit an active gesture.
+Autosave instead selects the existing scheduler checkpoint and the earlier active-edit
+baseline when needed, captures owned resource references at worker dispatch, and writes
+an independent atomic recovery package in the existing worker pool. No geometry kernel,
+attachment behavior, numerical policy or project schema changes. The job is read-only,
+low priority and non-overlapping; cancellation is checked during serialization before
+atomic publication. Recovery discovery/retention runs off the UI thread.
+
+Focused tests cover gestures, pending calculations, dispatch capture, cancellation,
+non-overlap, file ownership, retention and retry. The 96-muscle assembly reproduces all
+12,561 saved payloads exactly. A profiler run measured 1.58 ms preparation, 4.37 seconds
+worker execution and 0.09 ms publication; uncontrolled background load and no frame
+latency inference. See [release evidence](tasks/usability-037.md).

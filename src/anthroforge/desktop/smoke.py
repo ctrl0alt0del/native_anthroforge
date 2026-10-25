@@ -29,6 +29,7 @@ def summary(frame, screenshot, warnings, valid, controller):
         frame=[frame.width(), frame.height()],
         screenshot=screenshot,
         entities=len(controller.session.document.entities) if controller else None,
+        projects=project_status(controller) if controller else None,
     )
 
 
@@ -68,6 +69,11 @@ def settled(app, engine, screenshot, warnings, controller, deadline) -> None:
 
 
 def show_panel(window, controller, panel):
+    if panel == "recovery":
+        from .smoke_projects import start
+
+        start(controller)
+        return
     if panel == "preferences":
         dialog = window.findChild(QObject, "preferencesDialog")
         assert dialog is not None and QMetaObject.invokeMethod(dialog, "open")
@@ -75,3 +81,14 @@ def show_panel(window, controller, panel):
     window.setProperty(panel + "Open", True)
     if panel == "issues" and controller.issue_panel.model.rows:
         controller.issue_panel.selectIssue(controller.issue_panel.model.rows[0]["issueId"])
+
+
+def project_status(controller):
+    library = controller.project_library
+    return dict(
+        recent=library.recent.entries,
+        recovery=library.autosave.last,
+        copies=len(library.recovery_browser.rows),
+        path=str(controller.session.path or ""),
+        dirty=controller.session.document.revision != controller.session.saved_revision,
+    )

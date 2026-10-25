@@ -67,3 +67,16 @@ normal body/Fiber/surface/tissue layouts and keep search-field placement stable.
 32 focused tests pass, including queued dispatch-time capture, non-overlap, cancellation,
 active gestures, checkpoint saves, atomic failure and retention. Full gate, scaled
 layout checks, production-sized recovery and portable packaging remain pending.
+
+## Qualification candidate
+
+- Large assembly recovery is Qt-free; all 12,561 package payloads match explicit saving
+  byte for byte, including geometry and attachments. Profiler: 1.58 ms capture preparation,
+  4.37 s background writing and 0.09 ms publication. This is one uncontrolled-load trial,
+  not an FPS claim. Evidence: build/usability-037/assembly/.
+- Offscreen interaction/layout audit passes at 150% scale too. The shortcut-policy probe
+  reproduced rows requiring 170 px but fixed at 142 px, visibly overlapping descendant
+  labels and controls. Content-sized rows and a scrollbar gutter fix the observed defect.
+- Existing Preferences workflow passes; packaged recovery smoke added and source invocation
+  passes, preserving manual-file bytes. Version metadata advanced to 0.3.7 for qualification.
+- Full development gate running; portable build/suite, final docs and source archive pending.

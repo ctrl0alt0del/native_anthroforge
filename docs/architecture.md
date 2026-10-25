@@ -1041,3 +1041,19 @@ share staged publication and picking uses the displayed frame. Read-only review 
 recognizes both authored identities and mirror output aliases; changed plane revisions
 invalidate assessments. Pin proposals preserve complete surface references, including
 instance identity. These contracts are qualified together in [0.3.6](workflows_036.md).
+
+## Project continuity (0.3.7)
+
+The application-owned Autosave service observes an injected clock and committed-state
+contract; the desktop ProjectLibrary hosts polling and presentation. A low-priority,
+read-only coordinator job captures document/resource ownership at dispatch, serializes
+in the existing worker pool, and atomically publishes an independent recovery file.
+It does not invoke manual Save, commit gestures, block checkpoints or mutate history.
+RecoveryStore owns embedded metadata, discovery and bounded per-project retention.
+Opening a recovery uses normal project adoption, then releases its file lock and marks
+it dirty with no current path. Save As is therefore required; the source stays intact.
+
+RecentProjects owns bounded canonical path history with shared atomic JSON storage.
+It records successful desktop open/save only. All recent/recovery opening uses the
+controller's existing unsaved-document and queued-open safeguards. Preferences remain
+separate from project schemas. See [workflow and evidence](usability_037.md).

@@ -1,7 +1,8 @@
 # AnthroForge development validation
 
-Current release qualification is in [authoring workflows](tasks/workflows-036.md).
-The [0.3.6 walkthrough](workflows_036.md) records implementation and observed evidence.
+Current work is [0.3.7 project continuity](usability_037.md), with qualification tracked
+in [the task](tasks/usability-037.md). Prior release qualification is in
+[authoring workflows](tasks/workflows-036.md).
 The earlier sections retain the evidence and limitations of their respective revisions.
 
 ## Audited authoring workflows (0.3.6)

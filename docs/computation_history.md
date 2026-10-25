@@ -2374,3 +2374,27 @@ interactive desktop acceptance. See `mirroring_035.md` for evidence and known li
   convert from 73 controls to two with stored bindings unchanged; membrane/tissue publish
   successfully and final shapes were inspected. Details in
   [the task](tasks/routed-conversion-points.md); no anatomical-fit or solver-speed claim.
+
+### CH-077 — Experimental SCM propagation reconstruction; not implemented in runtime
+
+- Scope: existing parent-driven Fiber deformation, distinct from path engines and tissue
+  inflation. Production inventory/algorithms remain unchanged.
+- Observed failure: independent support-frame transport creates sharp displacement
+  changes and an endpoint cliff after Ribs Top Radius becomes 3. The earlier isolated
+  C2 prototype reduces sawtooth but retains 28 base/39 inflated crossing pairs.
+- Experiment: native cached differential reconstruction near regional support goals,
+  retaining locally transformed rest curvature and exact anatomical pins. One linear
+  factorization per bind, direct XYZ solves per update; no routing/planner/iterative
+  collision solve. Wider blending alone was tested and increases base crossing pairs.
+- Evidence: at tested scale .20, this SCM fixture has zero detected transverse crossings
+  in base/rest/final, exact endpoints, neutral/global-rigid error below 7.8e-11, and no
+  new contacted bone segments. Original near-Spine contact remains. Three-fiber median
+  path cost is 2.40 ms versus 2.02 ms for C2 and 3.87 ms production; prepared-input,
+  SCM-only timings exclude scheduler/UI/parent capture. Fourteen balanced serial trials.
+- Tradeoffs: weaker peak automatic support response, no clearance guarantee, one fixture
+  only. No anatomical acceptance or release qualification. Dormant Polyline handles
+  were initially collapsed by the test adapter; corrected before final measurements.
+- Sources, objective, ownership review, visual results and reproduction:
+  [SCM investigation](tasks/scm-ribs-distortion.md#active-investigation--smoother-cheap-propagation).
+  Code is isolated under `tools/experiments/scm_propagation`; artifacts remain local under
+  `build/scm-smoothing`. No production integration, source-project edit or package change.

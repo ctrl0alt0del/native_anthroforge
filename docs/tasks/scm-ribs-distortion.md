@@ -3,7 +3,7 @@
 - Task branch: `codex/scm-ribs-distortion`
 - Integration branch: `main`
 - Starting revision: `4ff1ef8`
-- Status: requested comparison complete; awaiting visual review; production unchanged
+- Status: propagation-only smoothing comparison complete; production unchanged
 - Last updated: 2026-10-25, Europe/Bucharest
 - Active writer: local Codex
 
@@ -347,4 +347,82 @@ no planner or iterative optimization. Research basis: Laplacian surface editing 
 smooth skinning weights; this curve adaptation is an experiment, not claimed paper parity.
 Production, source projects and package versions remain unchanged. Validate neutral and
 rigid transformations, endpoints, complete uncropped tissue, bone contacts, and timing.
-Pending evidence is under `build/scm-smoothing/`; code remains on the experiment branch.
+Evidence is under `build/scm-smoothing/`; code remains on the experiment branch.
+
+### Observed result and method
+
+The existing C2 prototype guarantees smooth interpolation of its weights/maps, not a
+bound on curvature or relative motion of adjacent fibers. Widening support interpolation
+from .20 to .35 of rest arc length lowers inflated crossings but increases base crossings.
+It does not adequately address the remaining broad bend and fold.
+
+The more promising experiment adds one curve reconstruction to the regional transport.
+For rest samples p, propagated goals y and local affine maps A, minimize
+`||q-y||_M^2 + ell^4 ||D2 q - A D2 p||_M^2`, with exact anatomical pins eliminated.
+M is rest arc-length quadrature; D2 uses nonuniform stations normalized to 0..1. The
+small positive-definite system is factorized at bind time and solved directly for XYZ.
+There is no planner, nonlinear iteration, contact scene or collision penalty. This is a
+curve-specific differential-coordinate experiment inspired by
+[Laplacian Surface Editing](https://graphics.stanford.edu/courses/cs468-07-winter/Papers/sgp2004_laplace.pdf),
+not a reproduction of that paper's rotation-invariant mesh editor. The role of smooth
+weights is also discussed in the [skinning course](https://www.skinning.org/automatic-methods-compressed.pdf).
+
+The first neutral test failed because the initial adapter collapsed dormant Polyline
+handles onto their knots. Corrected before final runs: transport those offsets with the
+original regional field and add the reconstructed knot displacement. Neutral/global
+rigid errors over samples and stored controls/handles are below 7.8e-11; pin error is zero.
+
+| Method | Path ms, 3 fibers | Consumer ms | Base crossings | Uncropped inflated | Cropped final |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Production | 3.87 | 13.45 | 222 | 245 | 245 |
+| Earlier C2 regional prototype | 2.02 | 11.24 | 28 | 39 | 39 |
+| Wider weights (.35) | 1.92 | 10.28 | 40 | 21 | 21 |
+| Reconstruction ell=.05 | 2.16 | 10.49 | 22 | 18 | 18 |
+| Reconstruction ell=.10 | 2.49 | 10.41 | 10 | 13 | 13 |
+| Reconstruction ell=.20 | 2.40 | 10.29 | 0 | 0 | 0 |
+| Wider weights and ell=.10 | 2.51 | 10.52 | 5 | 16 | 16 |
+
+Fourteen serial balanced-order unrecorded trials after warm-up, prepared parent inputs.
+Times include native transport, direct reconstruction, path adoption and separately
+measured full isolated consumer stages. Exclude parent packing, project loading, bind
+capture, unrelated anatomy, scheduling and viewport. Background load is uncontrolled;
+these are descriptive fixture timings, not whole-app responsiveness evidence. Typical
+cached setup is about 5 ms for three curves; first reconstruction DLL load was about
+30 ms. Profile `smoothing.afprofile.zip` covers path boundaries separately from timing.
+
+Actual base/rest/final shapes inspected from two fixed cameras, plus bone-context views
+and individual path plots. No truncated diagnostics or degenerate triangles. Crossings
+are transverse triangle pairs, not touching/coplanar/containment certification. Strong
+reconstruction reduces the third path length from 7.05 to 4.92 (C2 comparison), removes
+its lower bulge and makes the three paths more coherent in this case. No anatomical
+acceptance claim follows from that reduction.
+
+All-segment native checks against the same 153 surfaces, with zero requested clearance
+and no endpoint exemptions, found the original Spine contacts: segments [0,1], [0],
+[0,1] before the edit. Production/C2 keep those contacts. ell=.20 has [0,1], [0], [0].
+No new intersecting segments were found. This does not satisfy the stricter .002-clearance
+ROUTED contract and does not repair the remaining baseline near-endpoint contact.
+
+Freezing only automatic Ribs support geometry is a diagnostic ablation, not a candidate.
+The third path's mean Ribs-induced displacement is .6393 for C2 and .4934 for ell=.20;
+peak response falls 2.0601 to .7197. Ribs influence remains, with the sharp response
+spread/reduced by curvature regularization. This is a shape-preservation tradeoff.
+
+### Ownership and remaining limits
+
+If selected, reconstruction belongs in the existing native attachment-field evaluator,
+with bind-owned rest operators/factorization and per-update resolved support goals. It
+must not become a second scheduler, recapture bindings during evaluation, or repair
+inflation after the fact. The experimental dense 73-point system is banded; a production
+implementation should retain that compact structure. Every fiber remains independently
+evaluated here; no membrane-wide solve or new sharing is introduced.
+
+This does not qualify loops, interior pins, junctions, arbitrary authored corners,
+different sampling, topology changes, shared consumers or wider anatomical fixtures.
+The .20 scale is a tested candidate, not an approved default. Obstacle avoidance and
+valid inflated surfaces remain unguaranteed for arbitrary edits.
+
+Validation: separate native build and clang-tidy, experiment Ruff/format, both architecture
+tests, exact source hash, production diff and report-link checks. Production algorithms,
+projects, versions and distribution remain unchanged. No full runtime gate or packaged
+GUI acceptance is claimed. `review.html` provides stage switching and all raw evidence.

@@ -96,3 +96,28 @@ retained in the edited resource set. This changes support influences and is not 
 to the original field. Scene capture and baseline recapture costs are reported separately
 from warm execution. All calculations, including SQP iteration and repeated geometry
 queries, remain C++; Python packs inputs, orchestrates calls, exports and renders evidence.
+
+## Propagation-only smoothing experiment
+
+`fairing.cpp` adds a third independent DLL. It combines the existing C2 prototype with
+a cached, exact-pin differential-coordinate reconstruction. No routing or collision
+scene is involved in evaluation. The adapter is limited to the current SCM's open
+73-sample Polylines; it preserves dormant handle offsets rather than collapsing them.
+The .05/.10/.20 reconstruction scales and .20/.35 support widths are experiments,
+not application settings or qualified defaults. See the task record for the objective.
+
+After building `af_scm_fairing` and `af_scm_solver_only`:
+
+```powershell
+.venv/Scripts/python.exe tools/experiments/scm_propagation/fairing_run.py
+.venv/Scripts/python.exe tools/experiments/scm_propagation/fairing_quality.py
+.venv/Scripts/python.exe tools/experiments/scm_propagation/fairing_contacts.py
+.venv/Scripts/python.exe tools/experiments/scm_propagation/fairing_support.py
+.venv/Scripts/python.exe tools/experiments/scm_propagation/fairing_review.py
+```
+
+Results: `build/scm-smoothing/review.html`. The all-segment contact diagnostic reuses
+the earlier solver DLL's surface-capture adapter but calls only native validation,
+never SQP or a planner. Contact checks have zero clearance and no endpoint exemptions;
+do not confuse them with ROUTED's acceptance contract. Diagnostic calls are excluded
+from the 14 balanced-order timing trials. Source and production files stay untouched.

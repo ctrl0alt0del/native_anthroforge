@@ -13,9 +13,9 @@ The historical audit observations below remain scoped to their recorded revision
 ## Follow-up implementation status
 
 The table below updates the original audit without rewriting its historical inventory.
-`codex/parity-workflows-034` implements D01–D12 through shared operations and desktop
-entry points. They are being integrated with mirroring and smooth propagation for
-[0.3.6](tasks/workflows-036.md); no 0.3.4 release was delivered.
+`codex/parity-workflows-034` implemented D01–D12 through shared operations and desktop
+entry points. They are integrated and qualified with mirroring and smooth propagation in
+[0.3.6](workflows_036.md); no 0.3.4 release was delivered.
 
 | Findings | Implemented follow-up |
 | --- | --- |
@@ -28,8 +28,9 @@ entry points. They are being integrated with mirroring and smooth propagation fo
 | D11 | Per-workspace world-space Fiber radius; native background tubes, staged rendering and displayed-mesh picking. |
 | D12 | One-action ordered selection of all surface sources. |
 
-Recovery, evidence and pending qualification are maintained in
-[the historical task record](tasks/parity-workflows-034.md). The user chose welded Ribs;
+Combined qualification is recorded in [the delivery task](tasks/workflows-036.md), with
+donor evidence preserved in [the historical task](tasks/parity-workflows-034.md).
+The user chose welded Ribs;
 exact source shoulder response is not claimed fixed. Mirroring is now implemented;
 skin and other deferred major systems remain outside this integration.
 

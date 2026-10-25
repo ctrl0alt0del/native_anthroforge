@@ -7,7 +7,9 @@ existing-tissue presets, surface-click Fibers, display radius and surface-source
 See the [workflow and evidence](docs/workflows_036.md).
 Projects save schema 6 and read schemas 4/5/6. No project remigration or independent
 counterpart pairing is performed. The accepted welded-Ribs difference remains documented.
-Combined source checks pass; portable release qualification is in progress.
+Qualified with 2,222 Python tests, five native CTests and the full minimal-PATH portable
+suite. Background UI checks and hidden GPU captures pass; no physical interactive
+desktop acceptance is claimed.
 
 
 Shortcut updates reduce repeated property queries, formula observation, document reconstruction

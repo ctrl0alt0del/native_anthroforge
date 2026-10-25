@@ -2640,8 +2640,9 @@ the raw unset flag; standalone defaults remain off.
   Fiber creation preserve dispatch-time backend/propagation preferences. No routing,
   inflation, smoothing, attachment objective or source geometry kernel was replaced.
 - Evidence: full development gate at the integration checkpoint passes 2,220 tests and
-  five native CTests. Additional mirror repair/review/capture regression cases pass;
-  final aggregate rerun and portable qualification are tracked in workflows-036.md.
+  five native CTests. The final aggregate passes 2,222 tests, including mirror
+  repair/review/capture regressions. The full packaged minimal-PATH suite passes;
+  qualification is tracked in [the task](tasks/workflows-036.md).
   Actual hidden GPU tubes, radius differences and source/mirror picks were inspected.
 - Production assembly geometry hashes before/after Ribs=3 and stored attachments exactly
   match prior smooth-propagation evidence. Both propagation methods pass history/reopen.

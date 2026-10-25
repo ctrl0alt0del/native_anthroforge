@@ -1,6 +1,6 @@
 # AnthroForge release roadmap
 
-- **0.3.6 — package qualification in progress:** integrate the preserved 0.3.4
+- **0.3.6 — qualified:** integrates the preserved 0.3.4
   D01–D12 workflows and retained-owner attachment corrections with mirroring and smooth
   propagation. No source-project migration or exact welded-Ribs parity claim.
   [Walkthrough](workflows_036.md), [delivery evidence](tasks/workflows-036.md).

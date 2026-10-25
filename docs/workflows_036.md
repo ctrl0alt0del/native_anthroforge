@@ -1,6 +1,6 @@
 # AnthroForge 0.3.6 — Audited authoring workflows
 
-Status: source integration verified; portable qualification in progress.
+Status: implemented and qualified as 0.3.6.
 This release integrates the preserved `codex/parity-workflows-034` branch with current
 mirroring and Smooth Shape Preservation. There was no separate packaged 0.3.4 release.
 Schema 6 remains current and reads schemas 4/5/6 without blanket recomputation.
@@ -40,9 +40,9 @@ in [parity findings](addon_parity_findings.md) and the [preserved task](tasks/pa
 
 ## Qualification
 
-The combined development gate passes 2,220 Python tests, five CTests, configured style,
-typing and numerical checks. Additional review/mirror regressions are undergoing the
-final aggregate rerun. Background QML tools cover all restored desktop entry points.
+The combined development gate passes five CTests, configured style, typing and numerical
+checks. The final aggregate rerun passes 2,222 Python tests, including review/mirror and
+asynchronous capture regressions. Background QML tools cover all restored desktop entry points.
 Actual hidden GPU images verify radius changes and source/mirror geometry, with matching
 native picks; this does not establish physical interactive desktop acceptance.
 
@@ -53,5 +53,12 @@ measured 359 ms preparation, 768 ms work and 60 ms CPU staging under uncontrolle
 these are neither frame latency nor a speedup claim. Raw reports remain local under
 `build/workflows-036`; the [task record](tasks/workflows-036.md) tracks final evidence.
 
-Final delivery is one `dist/0.3.6/AnthroForge.dist` and one
-`dist/AnthroForge-0.3.6-source.zip` after portable qualification.
+The canonical executable passes the complete minimal-PATH portable suite, including
+headless pin/support/cold-route operations, reviewed source replacement, splitting,
+tissue retargeting/presets, undo/reopen and hidden source/mirror tube captures. The
+packaged native libraries and QML match the qualified source. The runtime build identity
+is `bf29667`; subsequent documentation changes do not change executable behavior.
+
+Delivery is one `dist/0.3.6/AnthroForge.dist` and one
+`dist/AnthroForge-0.3.6-source.zip`. Source archive integrity, included release files
+and matching packaged documentation are checked separately from runtime qualification.

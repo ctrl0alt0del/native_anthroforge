@@ -2,7 +2,7 @@
 
 - Task branch: `codex/workflows-036`; integration: `main`.
 - Starting revision: `c7180ef`; donor branch: `codex/parity-workflows-034` at `e37ff02`.
-- Status: integration in progress; not release qualified.
+- Status: implementation and qualification complete; ready for validated merge to main.
 - Writer: current desktop task, direct work; 2026-10-25 Europe/Bucharest.
 
 ## Contract
@@ -24,7 +24,7 @@ numerical work stays C++ with one coordinator. Keep all functions within 15 line
 Retain donor history and its prior evidence; relabel its completed delivery as 0.3.6.
 Resolve duplicated computation-history IDs without erasing recorded findings.
 
-## Acceptance and current state
+## Integration checkpoint (superseded by final qualification below)
 
 The eleven textual conflicts are reconciled. Shared path execution retains dispatch-time
 propagation preferences and explicit cold routing; offset editing and mirror dependencies
@@ -45,11 +45,12 @@ assembly update/history/save checks and profiler evidence. Package one canonical
 `dist/0.3.6/AnthroForge.dist` with `dist/AnthroForge-0.3.6-source.zip`; do not overwrite
 running installations or use visible desktop input. Existing source projects stay intact.
 
-## Next actions
+## Delivery
 
-1. Run final aggregate tests after mirror/review/capture fixes; rebuild version metadata.
-2. Package canonical 0.3.6; run full portable suite, including new authoring workflows.
-3. Complete release evidence/source archive, then validated merge/push to main.
+The qualified runtime source is `bf29667`, pushed on `codex/workflows-036`.
+Release documentation and the corresponding source archive complete this task branch;
+the authorized final operation is a non-fast-forward merge/push to main. No runtime
+work remains. The unrelated root `__init__.py` and user source projects remain untouched.
 
 Recovery inputs are the donor task record and local `build/parity-workflows-034` evidence,
 plus `build/fiber-propagation` and the source 96-muscle project recorded there.
@@ -78,3 +79,24 @@ plus `build/fiber-propagation` and the source 96-muscle project recorded there.
   accepted geometry/current display have separate ownership, and user projects are intact.
 - Version metadata advanced to 0.3.6 for package qualification. Do not claim portable
   completion until the canonical executable and companion source archive are checked.
+
+## Final qualification
+
+- Final aggregate after all runtime fixes: **2,222 tests passed** (202.60 s), Ruff
+  and mypy passed. Versioned native rebuild passes all five CTests. See
+  `build/workflows-036/pytest-final.log` and `native-final.log`; the complete earlier
+  development gate is retained in `development-gate.log`.
+- Canonical Nuitka build succeeds. Build identity is `bf29667`, clean tracked state,
+  packaged. Native libraries and all packaged QML match the qualified source byte for byte.
+- `check_portable.py` passes the complete suite against
+  `dist/0.3.6/AnthroForge.dist/AnthroForge.exe` with a minimal PATH. Doctor reports
+  0.3.6, Python 3.12.12 and Qt 6.12.0 with the packaged native library. The restored
+  authoring workflows pass, including mirror-aware source replacement, pins/supports,
+  cold routing, split/history, tissue retarget/preset and save/reopen. See
+  `build/workflows-036/portable.log` and `portable/`.
+- Inspected packaged `portable/authoring.png`: selected source and reflected Fiber
+  tubes display together on their separate source/mirror surfaces. Pixel assertions
+  also pass. No visible window or physical interactive acceptance is claimed.
+- Release records, packaged documentation and the canonical companion source archive
+  are checked for matching content and archive integrity. Runtime qualification remains
+  tied to `bf29667`; subsequent edits are documentation only.

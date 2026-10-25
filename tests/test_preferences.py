@@ -120,6 +120,8 @@ def test_preference_file_contains_only_settings(session):
             "routing_backend": "PIQP",
             "routing_conversion_points": "ENDPOINTS",
             "fiber_propagation": "SMOOTH_SHAPE",
+            "autosave_enabled": True,
+            "autosave_minutes": 5,
         },
     }
 

@@ -34,7 +34,7 @@ UiSection {
             required property string target
             required property string label
             required property var policy
-            width: ListView.view.width; height: 142; spacing: 2
+            width: ListView.view.width-16; height: implicitHeight; spacing: 2
             Label { text: row.label; color: Theme.text; Layout.fillWidth: true; wrapMode: Text.Wrap }
             Repeater {
                 model: [

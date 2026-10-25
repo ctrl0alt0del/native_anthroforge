@@ -7,11 +7,22 @@ UiDialog {
     objectName: "preferencesDialog"
     title: "Preferences"
     modal: true; anchors.centerIn: parent
-    width: 560
+    width: Math.min(620, parent.width-48)
+    height: Math.min(implicitHeight, parent.height-48)
     standardButtons: Dialog.Close
     onAboutToShow: preferences.refresh()
+    contentItem: UiScrollView {
+        id: scroller
+        implicitHeight: settings.implicitHeight
+        contentWidth: availableWidth; clip: true
     ColumnLayout {
-        anchors.fill: parent; spacing: Theme.gap
+        id: settings
+        width: scroller.availableWidth; spacing: Theme.gap
+        Label { text: "PROJECTS"; color: Theme.muted; font.pixelSize: 11 }
+        UiCheck { objectName:"autosaveEnabled"; text:"Autosave recovery copies"; checked:preferences.state.autosave_enabled; onClicked:preferences.setAutosaveEnabled(checked) }
+        NumericSetting { objectName:"autosaveMinutes"; label:"Interval · minutes"; decimals:0; minimum:1; maximum:1440; live:false; enabled:preferences.state.autosave_enabled; value:preferences.state.autosave_minutes; onEdited:value=>preferences.setAutosaveMinutes(value) }
+        Label { text:"Keep the latest three copies per project. Active calculations use the latest committed revision."; color:Theme.muted; Layout.fillWidth:true; wrapMode:Text.Wrap }
+        UiButton { objectName:"preferencesRecover"; text:"Recover autosave…"; onClicked:{ dialog.close(); workspace.projectLibrary.showRecovery(); } }
         Label { text: "COMPUTATION"; color: Theme.muted; font.pixelSize: 11 }
         RowLayout {
             Layout.fillWidth: true; spacing: Theme.gap
@@ -60,10 +71,11 @@ UiDialog {
                 hint: "Control points retained when switching to the ROUTED engine"
             }
         }
-        Label { text: "Saved automatically for all projects on this computer."; color: Theme.muted; font.pixelSize: 11 }
+        Label { text: "Preferences apply to all projects on this computer."; color: Theme.muted; font.pixelSize: 11; Layout.fillWidth:true; wrapMode:Text.Wrap }
         Label {
             objectName: "preferencesError"; Layout.fillWidth: true; Layout.preferredHeight: 50
             wrapMode: Text.WordWrap; color: Theme.danger; text: preferences.state.error
         }
+    }
     }
 }

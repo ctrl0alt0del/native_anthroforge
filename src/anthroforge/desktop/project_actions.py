@@ -61,6 +61,7 @@ def save_job(controller, target, snapshot, lock):
 def saved(controller, path, lock, revision):
     projects.finish_save(controller.session, path, lock, revision)
     controller.message = f"Saved revision {revision}: {path.name}"
+    controller.project_library.remember(path)
     controller.pending_save = ""
     controller.session.waiting_save = False
     controller.notify()
@@ -107,6 +108,7 @@ def poll(controller):
             start_open(controller, path)
         else:
             new_document(controller)
+    controller.project_library.poll()
 
 
 def start_open(controller, path):
@@ -131,15 +133,19 @@ def open_job(controller, target, lock):
 
 
 def opened(controller, path, lock, result):
+    adopt_loaded_state(controller, path, lock, result)
+    controller.session.issues.reset()
+    projects.synchronize_loaded(controller.session)
+    controller.selection, controller.last_revision = "", -1
+    controller.refresh()
+    adopted(controller)
+
+
+def adopt_loaded_state(controller, path, lock, result):
     session = controller.session
     session.document, session.resources = result
     session.history = History(session.document)
     session.serial = session.document.revision
     session.active_workspace = 0
     session.waiting_save = False
-    projects.finish_save(session, path, lock, session.serial)
-    session.issues.reset()
-    projects.synchronize_loaded(session)
-    controller.selection, controller.last_revision = "", -1
-    controller.refresh()
-    adopted(controller)
+    controller.project_library.opened(path, lock, session.serial)

@@ -1,4 +1,11 @@
-# AnthroForge 0.3.6
+# AnthroForge 0.3.7
+
+0.3.7 adds Recent Projects, configurable recovery autosave (every five minutes by
+default), a recovery browser, and layout fixes for menus, dialogs, inspectors and
+shortcut attachment policies. See the [workflow and evidence](docs/usability_037.md).
+Qualified with 2,241 Python tests, five native CTests and the complete minimal-PATH
+portable suite. Schema 6 and numerical geometry remain unchanged. GUI evidence is
+background/offscreen; physical desktop acceptance is not claimed.
 
 0.3.6 integrates the preserved 0.3.4 authoring work with strict mirroring and selectable
 Fiber propagation. It adds Fiber support controls, pin offsets/checks/repairs, cold routing,
@@ -86,7 +93,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.3.6/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.3.7/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included

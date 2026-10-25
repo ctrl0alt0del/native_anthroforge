@@ -780,7 +780,7 @@ part of the initiating undo step; a newer authored curve edit supersedes pending
 ## Application preferences (0.2.3)
 
 `preferences.get` returns `routing_backend`, `routing_conversion_points`, `fiber_propagation`,
-`path`, and any loading `error`.
+`autosave_enabled`, `autosave_minutes`, `path`, and any loading `error`.
 `preferences.set` accepts `routing_backend: "CUSTOM" | "PIQP"` and
 `routing_conversion_points: "ENDPOINTS" | "ALL_POINTS"`, and
 `fiber_propagation: "SMOOTH_SHAPE" | "LOCAL_SURFACE"`, and returns updated state
@@ -788,6 +788,14 @@ after persistence. These are runtime operations: no document revision, undo entr
 recalculation or checkpoint change. The choice applies at future dispatch, including
 routed Fibers and conversion previews. Running jobs and accepted results remain unchanged.
 `evaluate` explicitly requests fresh calculations.
+
+From 0.3.7, `preferences.set` also accepts `autosave_enabled` (boolean, default true)
+and `autosave_minutes` (integer 1–1440, default 5). The desktop hosts the periodic
+recovery service; headless scripts can configure the preference but do not implicitly
+start a timer. The Qt-independent application Autosave service shares the coordinator,
+committed checkpoints and cancellable atomic storage. It neither invokes manual Save
+nor mutates document/undo state. See [project continuity](usability_037.md) for retention,
+recovery opening, recent projects and file locations.
 
 Fiber propagation defaults to `SMOOTH_SHAPE` (Smooth Shape Preservation), including when
 older preferences omit the setting. `LOCAL_SURFACE` (Local Surface Following) retains

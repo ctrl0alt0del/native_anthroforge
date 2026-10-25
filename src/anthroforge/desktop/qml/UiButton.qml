@@ -17,8 +17,8 @@ Button {
     hoverEnabled: true
     font.pixelSize: 12
     Accessible.name: hint || text
-    ToolTip.visible: hovered && !!hint
-    ToolTip.text: hint
+    ToolTip.visible: hovered && (!!hint || label.truncated)
+    ToolTip.text: label.truncated ? text + (hint ? "\n" + hint : "") : hint
     ToolTip.delay: 500
     contentItem: Item {
         // Layout rounds child widths to pixels; reserve the full text advance first.

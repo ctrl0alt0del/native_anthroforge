@@ -91,7 +91,9 @@ def document_state(document: Document) -> dict[str, Any]:
     return state
 
 
-def write_package(path: Path, document: Document, resources: Resources, cancel: Any = None) -> None:
+def write_package(
+    path: Path, document: Document, resources: Resources, cancel: Any = None, recovery: Any = None
+) -> None:
     from .cancellable_stream import CancellableStream
 
     resources = resources.selected(document)
@@ -99,19 +101,36 @@ def write_package(path: Path, document: Document, resources: Resources, cancel: 
     with path.open("w+b") as stream:
         with zipfile.ZipFile(CancellableStream(stream, cancel), "w", allowZip64=True) as archive:
             archive.writestr("manifest.json", json.dumps(data, indent=2, allow_nan=False))
+            if recovery is not None:
+                archive.writestr("recovery.json", json.dumps(recovery, allow_nan=False))
             resource_storage.write(archive, resources)
 
 
-def atomic_save(path: Path, document: Document, resources: Resources) -> None:
+def atomic_save(
+    path: Path, document: Document, resources: Resources, cancel: Any = None, recovery: Any = None
+) -> None:
     descriptor, temporary = tempfile.mkstemp(prefix=".anthroforge-", suffix=".tmp", dir=path.parent)
     os.close(descriptor)
     try:
-        write_package(Path(temporary), document, resources)
-        with open(temporary, "r+b") as stream:
-            os.fsync(stream.fileno())
-        os.replace(temporary, path)
+        commit_package(path, Path(temporary), document, resources, cancel, recovery)
     finally:
         Path(temporary).unlink(missing_ok=True)
+
+
+def commit_package(
+    path: Path,
+    temporary: Path,
+    document: Document,
+    resources: Resources,
+    cancel: Any,
+    recovery: Any,
+) -> None:
+    write_package(temporary, document, resources, cancel, recovery)
+    if cancel is not None and cancel.is_set():
+        raise ValueError("Project save cancelled.")
+    with temporary.open("r+b") as stream:
+        os.fsync(stream.fileno())
+    os.replace(temporary, path)
 
 
 def decode_entity(data: dict[str, Any]) -> SCP:

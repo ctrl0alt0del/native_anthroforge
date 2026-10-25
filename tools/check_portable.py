@@ -22,6 +22,7 @@ from issues_portable import issues
 from mirroring_portable import mirroring
 from preferences_portable import preferences
 from profiler_portable import profiling
+from projects_portable import projects
 from PySide6.QtGui import QImage
 from shortcuts_portable import shortcuts
 from tissue_portable import tissues
@@ -57,6 +58,7 @@ CHECKS = (
     "session comparison, paired images, bounded replay journal and isolated replay",
     "strict mirrors, symmetric loops, instance measurements and schema-6 storage",
     "Fiber pins/supports/cold routing, mirrored tubes, SCP split/replacement and tissue retarget",
+    "recent-project history, asynchronous recovery capture and discovery with original retention",
 )
 
 
@@ -140,6 +142,7 @@ def run(executable, cwd, background=False):
     for check in qualification_steps():
         check(executable, cwd, command)
     desktop(executable, cwd, command, background)
+    projects(executable, cwd, command)
     report = portable_report(executable, doctor, background)
     (cwd / "portable-check.json").write_text(json.dumps(report, indent=2))
     print(json.dumps(report))

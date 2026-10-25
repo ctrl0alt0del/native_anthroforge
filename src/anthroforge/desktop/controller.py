@@ -23,6 +23,7 @@ from .mesh_replacement_panel import MeshReplacementPanel
 from .models import RenderModel
 from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
+from .project_library import ProjectLibrary
 from .route_inspection_tools import RouteInspectionTools
 from .routing_choices import RoutingChoices
 from .section_tools import SectionTools
@@ -154,15 +155,23 @@ class Controller(QObject):
         self.selection, self.hovered, self.message = "", "", ""
         self.last_revision, self.last_workspace = -1, -1
         self.rows, self.drag_values, self.pick_ids = [], [], []
-        self.pending_save, self.pending_document = "", None
-        self.temporary_locks = []
+        self._initialize_project_state()
         self.drag_mode = "Move"
         self.last_hit = {}
         self.tick_count = 0
-        self.after_save = None
         self.camera_workspace = None
         self.capture_mode = False
         self.last_frame = monotonic()
+
+    def _initialize_project_state(self):
+        self.pending_save, self.pending_document = "", None
+        self.temporary_locks = []
+        self.after_save = None
+        self.project_library = ProjectLibrary(self)
+
+    @Property(QObject, constant=True)
+    def projectLibrary(self):
+        return self.project_library
 
     @property
     def selection(self):

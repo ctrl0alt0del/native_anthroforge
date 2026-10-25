@@ -14,12 +14,20 @@ undo and running edits. Validation remains background/offscreen only.
 
 ## Decisions and current state
 
-The existing application is 0.3.6. No runtime changes yet. Inspect project load/save,
-background file work, checkpoint lifetime, Preferences and shared QML sizing first.
-Autosave destination/behavior is pending user clarification: separate recovery copies
-(proposed default: every five minutes, latest committed state) versus overwriting the
-named project when calculations finish. Continue Recent Projects and layout inspection
-independently while awaiting that decision.
+The user confirmed separate recovery copies, including untitled projects, every five
+minutes by default using the latest committed state. Preferences expose enable/disable
+and a whole-minute interval. Keep three generated copies per project; no manual project
+overwrite or dirty/undo changes. Recovery opening detaches the file and requires Save As.
+
+Implemented first increment: bounded recent-project history, shared atomic JSON writing,
+Qt-independent autosave scheduling through the existing coordinator, embedded recovery
+metadata/retention, recovery discovery and desktop menu/Preferences controls. Normal
+open/save safeguards remain authoritative. No geometry algorithms or format bump.
+
+Thirty focused persistence/Preferences/architecture tests pass. Initial offscreen QML
+smoke has no warnings; its platform-default fonts are unavailable offscreen, so use the
+existing acceptance tools' explicitly loaded Segoe UI before visual qualification.
+Complete recovery UI/gesture tests, broad layout inspection and release checks remain.
 
 Official Qt Text, Control and Layout documentation is the initial sizing reference.
 Prefer correct implicit sizes, wrapping where useful and stable reserved geometry;
@@ -38,8 +46,8 @@ do not mask controls with unnecessary elision or transient layout changes.
 
 ## Next actions
 
-1. Inspect persistence/Preferences contracts and settle autosave behavior.
-2. Implement and validate integrated project continuity services and UI controls.
-3. Measure layout defects, fix owning controls, qualify and package 0.3.7.
+1. Complete actual recovery/recent UI tests and audit inspector/menu/dialog clipping.
+2. Fix observed owning-control/layout defects; qualify autosave lifecycle and large files.
+3. Run development/portable checks, document and package 0.3.7, then merge/push main.
 
 No external project migration or geometry algorithm changes are requested.

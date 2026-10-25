@@ -2,12 +2,13 @@
 
 import json
 import os
-import tempfile
 from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any
 
 from anthroforge.core.preferences import Preferences
+
+from . import user_json
 
 
 def user_path() -> Path:
@@ -26,17 +27,7 @@ def read(path: Path) -> Preferences:
 
 
 def write(path: Path, value: Preferences) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    data = json.dumps({"schema": 1, "values": asdict(value)}, indent=2) + "\n"
-    descriptor, name = tempfile.mkstemp(prefix=path.name + ".", suffix=".tmp", dir=path.parent)
-    try:
-        with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
-            stream.write(data)
-            stream.flush()
-            os.fsync(stream.fileno())
-        os.replace(name, path)
-    finally:
-        Path(name).unlink(missing_ok=True)
+    user_json.write(path, {"schema": 1, "values": asdict(value)})
 
 
 class PreferenceStore:

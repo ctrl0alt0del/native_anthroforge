@@ -27,6 +27,14 @@ class PreferenceControls(QObject):
     def setFiberPropagation(self, value):
         self.set_preference(fiber_propagation=value)
 
+    @Slot(bool)
+    def setAutosaveEnabled(self, value):
+        self.set_preference(autosave_enabled=value)
+
+    @Slot(int)
+    def setAutosaveMinutes(self, value):
+        self.set_preference(autosave_minutes=value)
+
     def set_preference(self, **values):
         try:
             self.controller.session.command("preferences.set", **values)

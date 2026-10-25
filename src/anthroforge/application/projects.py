@@ -52,6 +52,14 @@ def finish_save(session: "Session", target: Path, lock: FileLock, revision: int)
     return {"status": "saved", "path": str(target), "revision": revision}
 
 
+def finish_recovery(session: "Session", lock: FileLock) -> None:
+    if session.file_lock is not None and session.file_lock is not lock:
+        session.file_lock.close()
+    lock.close()
+    session.path, session.file_lock = None, None
+    session.saved_revision = -1
+
+
 def open_project(session: "Session", path: str) -> dict[str, Any]:
     target = Path(path).resolve(strict=True)
     lock = lock_target(session, target)

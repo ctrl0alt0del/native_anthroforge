@@ -14,6 +14,6 @@ class CancellableStream:
         view = memoryview(data)
         for offset in range(0, len(view), 1024 * 1024):
             if self.cancel is not None and self.cancel.is_set():
-                raise ValueError("Inspection export cancelled.")
+                raise ValueError("Snapshot serialization cancelled.")
             self.stream.write(view[offset : offset + 1024 * 1024])
         return len(view)

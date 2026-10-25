@@ -27,7 +27,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: tissueSourcePicker.visible || tissueRetargetReview.visible || meshReplacementReview.visible || replacementFile.visible || pinRepairDialog.visible || preferencesDialog.visible || surfaceGrouping.visible || reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: recoveryDialog.visible || tissueSourcePicker.visible || tissueRetargetReview.visible || meshReplacementReview.visible || replacementFile.visible || pinRepairDialog.visible || preferencesDialog.visible || surfaceGrouping.visible || reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -58,7 +58,20 @@ ApplicationWindow {
                 Label { objectName: "applicationVersion"; text: Application.version; color: Theme.accent; font.pixelSize: 10 }
                 UiMenuBar {
                     background: Item {}
-                    UiMenu { title: "File"; UiMenuItem { action: newAction } UiMenuItem { action: openAction } MenuSeparator {} UiMenuItem { action: saveAction } UiMenuItem { action: saveAsAction } MenuSeparator {} UiMenuItem { action: importAction } MenuSeparator {} UiMenuItem { objectName: "exportInspectionMenu"; text: "Export inspection report…"; enabled: !workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered: { viewport.storeCamera(); reportDialog.open(); } } }
+                    UiMenu {
+                        title: "File"
+                        UiMenuItem { action: newAction }
+                        UiMenuItem { action: openAction }
+                        RecentProjectsMenu { enabled: !window.modalOpen }
+                        UiMenuItem { objectName:"recoverAutosaveMenu"; text:"Recover autosave…"; enabled:!window.modalOpen; onTriggered:workspace.projectLibrary.showRecovery() }
+                        MenuSeparator {}
+                        UiMenuItem { action: saveAction }
+                        UiMenuItem { action: saveAsAction }
+                        MenuSeparator {}
+                        UiMenuItem { action: importAction }
+                        MenuSeparator {}
+                        UiMenuItem { objectName:"exportInspectionMenu"; text:"Export inspection report…"; enabled:!workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered:{ viewport.storeCamera(); reportDialog.open(); } }
+                    }
                     UiMenu {
                         title: "Edit"
                         UiMenuItem { action: undoAction }
@@ -305,6 +318,8 @@ ApplicationWindow {
     }
     DeleteDialog { id: deleteDialog }
     PreferencesDialog { id: preferencesDialog }
+    RecoveryDialog { id: recoveryDialog }
+    Connections { target:workspace.projectLibrary; function onRecoveryRequested() { recoveryDialog.open(); } }
     SurfaceGroupingDialog { id: surfaceGrouping }
     FileDialog { id:replacementFile; objectName:"replacementFile"; title:"Replace imported source mesh"; nameFilters:["Wavefront mesh (*.obj)"]; onAccepted:workspace.meshReplacement.assess(selectedFile.toString()); onRejected:workspace.meshReplacement.cancel() }
     TissueSourcePicker { id:tissueSourcePicker }

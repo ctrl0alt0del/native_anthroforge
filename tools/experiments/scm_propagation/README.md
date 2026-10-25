@@ -68,3 +68,31 @@ steps with endpoint bindings and current/improved paths as warm-start candidates
 reproduces the first-interior-point rejection with a reduced constraint set and Spine
 alone. These are trace-enabled diagnostic runs, not controlled timing trials. See the
 task record for rejected warm starts, planning costs, and preserved endpoint checks.
+
+## Direct SQP experiment — no planner
+
+The user clarified that the current propagated curve itself must seed a small local solve.
+Normal ROUTED's planner fallback is therefore excluded. `solver_only.cpp` builds a second
+isolated DLL, `af_scm_solver_only.dll`, reusing the production `routing_solve.cpp` stage and
+pinned kernels with owned surface inputs. It calls no planner or warm-start remapping.
+Only two anatomical endpoint pins are fixed. Native failures are reported; the output
+can be visualized as a rejected candidate but is never published into the application.
+
+After building the experiment CMake project, run:
+
+```powershell
+.venv/Scripts/python.exe tools/experiments/scm_propagation/solver_qualification.py
+.venv/Scripts/python.exe tools/experiments/scm_propagation/hybrid_retest.py
+.venv/Scripts/python.exe tools/experiments/scm_propagation/solver_quality.py
+.venv/Scripts/python.exe tools/experiments/scm_propagation/solver_review.py
+```
+
+Results are under `build/scm-solver-only/`. The application endpoint conversion command
+prepares each input, with numerical resolution dispatched directly by the experiment.
+All document objects are Manual inside this isolated setup to prevent unrelated queued
+application calculations. The before variant routes in the baseline pose, captures a new
+propagation field, and then deforms it. New baseline material captures are explicitly
+retained in the edited resource set. This changes support influences and is not identical
+to the original field. Scene capture and baseline recapture costs are reported separately
+from warm execution. All calculations, including SQP iteration and repeated geometry
+queries, remain C++; Python packs inputs, orchestrates calls, exports and renders evidence.

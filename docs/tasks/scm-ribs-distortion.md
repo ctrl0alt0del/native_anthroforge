@@ -281,4 +281,56 @@ this before variant necessarily recaptures support influences for the changed ba
 Compare full uncropped base/rest as well as cropped final shape, stage findings, input
 pins and measured work. Source projects and production code remain unchanged.
 
-Pending: implement/run isolated harness, inspect actual shapes, record timings and limits.
+User correction: the hybrid must not invoke a planner. Normal ROUTED calls were stopped;
+their automatic fallback is not a valid measurement of the requested local refinement.
+
+Completed solver-only experiment: `solver_only.cpp` is a separate DLL which includes the
+unchanged production `routing_solve.cpp` stage, with owned copies of the same 153 surface
+inputs and matching owner/collider IDs, scales, tolerances, reference objective and frames.
+It feeds the exact 73 propagated samples directly into SQP, with two endpoint pins. No
+planner, pre-validation rejection or warm-path resampling runs. Rejected outputs are
+diagnostic candidates only; none were published to the application. The captured runtime
+profile contains zero production route/planner entrypoint calls. Straight-path parity
+against production ROUTED covers all 11 sample channels to 8.44e-15.
+
+Results at Ribs Top Radius 3 (uncropped transverse-crossing pairs, not collision certificates):
+
+| Candidate | Base | Inflated rest | Cropped final | Native path-clearance passes |
+| --- | ---: | ---: | ---: | --- |
+| Current propagation | 222 | 245 | 245 | No post-update solver |
+| Experimental C2 propagation | 28 | 39 | 39 | No post-update solver |
+| C2 then 1 direct SQP step | 27 | 8 | 8 | 2/3 |
+| C2 then 4 direct SQP steps | 0 | 47 | 21 | 2/3 |
+| C2 then 24 direct SQP steps | 0 | 0 | 0 | 2/3 |
+| 1 baseline SQP step, recapture, then C2 deformation | 19 | 45 | 45 | Baseline 3/3; no post-update solve |
+| 4 baseline SQP steps, recapture, then C2 deformation | 9 | 58 | 58 | Baseline 3/3; no post-update solve |
+
+Both original-current-seed after variants were also tested; they retain 227/241 inflated
+crossing pairs at 1/4 steps. The quality of the propagated seed matters. Endpoints remain
+exact for every candidate; no degenerate triangles or truncated finding lists were found.
+The third path misses the SQP clearance check: maximum violation about .00147/.00135 at
+1/4 steps and .000845 at 24. This is separate from tissue-surface self-crossings. More
+steps do not monotonically improve the loft/inflation because the path objective does
+not optimize the assembled tissue surface.
+
+Two serial unrecorded passes in forward/reverse order, from prepared inputs: C2 alone
+2.17 ms paths /12.82 ms complete SCM; C2 +1 step 34.64/48.66 ms; +4 steps 40.82/54.68 ms;
++24 steps 74.00/87.69 ms. These are descriptive local measurements, not controlled frame
+or input latency benchmarks. They exclude scene capture: the two 153-surface scenes cost
+485 ms (edited pose) and 450 ms (baseline). Changed geometry requires the corresponding
+scene. Before variants also pay baseline routing and roughly .2-.3 s recapture once, plus
+the fitted cache; recapturing changes support weights, and amortization across edits is
+not assumed. Shape after deformation did not improve over C2 alone in these before cases.
+
+Evidence: `build/scm-solver-only/review.html` (stage-switchable images), `quality.json`,
+`summary.json`, `timings.json`, `setup.json`, `scene-preparation.json`, `qualification.json`,
+and `hybrid.afprofile.zip`. Actual base/rest/final candidates were inspected in two matched
+cameras. The images mark rejected candidates explicitly. Touching/coplanar contact and
+containment are outside the transverse crossing check.
+
+Validation: isolated DLL build and configured clang-tidy pass; experiment Ruff/format and
+both architecture checks pass. The initial adapter frame conversion differed from ROUTED;
+it was corrected to use the production Z/Y initialization and native frame construction
+before the final timings/shapes were generated. No production source changes, app rebuild,
+version change or merge of this experimental branch into main. Remaining work is a product
+decision about further refinement/clearance investigation, not an approved production fix.

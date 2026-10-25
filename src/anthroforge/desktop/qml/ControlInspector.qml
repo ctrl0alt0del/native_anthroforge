@@ -35,7 +35,7 @@ ColumnLayout {
                 required property int index
                 Layout.fillWidth: true
                 Label { text: ["U","V","W"][index]; color: Theme.muted }
-                UiCombo { Layout.fillWidth: true; model: ["LINEAR","CARDINAL","CATMULL_ROM","BSPLINE"]; currentIndex: model.indexOf((panel.item.interpolation || [])[index]); onActivated: { const values=panel.item.interpolation.slice(); values[index]=currentText; panel.set("interpolation",values); } }
+                UiCombo { enumLabels:true; Layout.fillWidth: true; model: ["LINEAR","CARDINAL","CATMULL_ROM","BSPLINE"]; currentIndex: model.indexOf((panel.item.interpolation || [])[index]); onActivated: { const values=panel.item.interpolation.slice(); values[index]=currentText; panel.set("interpolation",values); } }
             }
         }
         UiCheck { text: "Outside points only"; checked: panel.item.outside || false; onClicked: panel.set("outside",checked) }

@@ -16,7 +16,7 @@ UiSection {
     UiField { id: name; objectName: "tissueFieldName"; Layout.fillWidth: true; placeholderText: "New field name" }
     RowLayout {
         Layout.fillWidth: true
-        UiCombo { id: domain; Layout.fillWidth: true; model: ["BASE","REST"]; hint: "Base samples or inflated-rest vertices" }
+        UiCombo { enumLabels:true; id: domain; Layout.fillWidth: true; model: ["BASE","REST"]; hint: "Base samples or inflated-rest vertices" }
         UiButton { objectName: "tissueFieldCreate"; text: "Create"; enabled: !!name.text.trim(); onClicked: { workspace.run("tissue.field.create",{target:panel.item.id,name:name.text.trim(),domain:domain.currentText}); panel.focused=name.text.trim(); if(panel.chosen) authoring.editTissueField(panel.focused); } }
     }
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Find a field…"; visible: (panel.item.fields?.length || 0)>0 }

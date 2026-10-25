@@ -67,7 +67,7 @@ UiSection {
             UiCombo { id: ownSide; Layout.fillWidth: true; model: panel.item.both_sides?["a","b"]:["a"]; hint: "This tissue side" }
             UiCombo { id: supportSide; Layout.fillWidth: true; model: panel.other.both_sides?["a","b"]:["a"]; hint: "Other tissue side" }
         }
-        UiCombo { id: orderMode; objectName: "tissueStackOrder"; Layout.fillWidth: true; model: ["AUTO","REQUESTED","EXPLICIT"]; currentIndex: Math.max(0,model.indexOf(panel.intent?.mode)); hint: "Requested order must agree with geometry; explicit order still requires validation."; onActivated: panel.saveIntent() }
+        UiCombo { enumLabels:true; id: orderMode; objectName: "tissueStackOrder"; Layout.fillWidth: true; model: ["AUTO","REQUESTED","EXPLICIT"]; currentIndex: Math.max(0,model.indexOf(panel.intent?.mode)); hint: "Requested order must agree with geometry; explicit order still requires validation."; onActivated: panel.saveIntent() }
         UiCombo { id: coverMode; objectName: "tissueStackCover"; Layout.fillWidth: true; visible: orderMode.currentIndex>0; model: ["This tissue covers","Other tissue covers"]; currentIndex: panel.intent?.cover==="OTHER"?1:0; onActivated: panel.saveIntent() }
         UiCheck { id: exclude; objectName: "tissueStackExclude"; text: "Exclude this pair"; checked: panel.intent?.excluded || false; onClicked: panel.saveIntent() }
         Label { visible: !!panel.intent?.regions?.length; text: "Selected support region · "+(panel.intent?.regions?.length || 0)+" faces"; color: Theme.muted }

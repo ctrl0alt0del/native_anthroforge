@@ -49,11 +49,14 @@ def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicatio
 def setup_preferences(controller, engine):
     from .preference_controls import PreferenceControls
     from .system_integration import SystemIntegration
+    from .workbench_state import WorkbenchState
 
     controller.preference_controls = PreferenceControls(controller)
     engine.rootContext().setContextProperty("preferences", controller.preference_controls)
     controller.system_integration = SystemIntegration(controller)
     engine.rootContext().setContextProperty("systemIntegration", controller.system_integration)
+    controller.workbench = WorkbenchState(controller)
+    engine.rootContext().setContextProperty("workbench", controller.workbench)
 
 
 def attach_window(engine, controller, inputs):

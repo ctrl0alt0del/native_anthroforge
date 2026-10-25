@@ -451,9 +451,10 @@ Item {
         anchors.centerIn: parent; width: Math.min(320, parent.width-90); spacing: 14
         visible: workspace.state.object_count === 0 && !viewport.drawing
         Image { source: "icons/mesh.svg"; sourceSize: Qt.size(40,40); opacity: .4; Layout.alignment: Qt.AlignHCenter }
-        Label { text: "Start your assembly"; color: Theme.text; font.pixelSize: 22; Layout.alignment: Qt.AlignHCenter }
-        Label { text: "Import your first primitive, then build its hierarchy and attachments."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; lineHeight: 1.4 }
+        Label { text: "New project"; color: Theme.text; font.pixelSize: 22; Layout.alignment: Qt.AlignHCenter }
+        Label { text: "Import a mesh or start with a curve. Use Create for more construction tools."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; lineHeight: 1.4 }
         UiButton { text: "Import mesh…"; glyph: "import"; primary: true; Layout.alignment: Qt.AlignHCenter; onClicked: viewport.importRequested() }
+        UiButton { objectName:"emptyAddCurve"; text:"Add curve"; glyph:"curve-add"; Layout.alignment:Qt.AlignHCenter; onClicked:workspace.drawingTools.addCurve() }
         Label { text: "OBJ · STL · PLY  /  Ctrl+I"; color: Theme.muted; font.pixelSize: 11; Layout.alignment: Qt.AlignHCenter }
     }
     Timer {

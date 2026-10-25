@@ -23,7 +23,7 @@ ColumnLayout {
     RowLayout {
         visible: !panel.editing; Layout.fillWidth: true
         UiButton {
-            text: panel.choosing ? "Close list" : "Expose property"; Layout.fillWidth: true
+            text: panel.choosing ? "Close list" : "Add property…"; Layout.fillWidth: true
             onClicked: { panel.choosing=!panel.choosing; if(panel.choosing) panel.adapter.discover(""); }
         }
         UiButton { text: "New driver"; Layout.fillWidth: true; onClicked: { panel.allObjects=true; panel.adapter.createDriver(); } }

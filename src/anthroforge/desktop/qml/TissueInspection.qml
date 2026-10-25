@@ -13,7 +13,7 @@ UiSection {
     UiCombo {
         objectName: "tissueInspectStage"; Layout.fillWidth: true; textRole: "label"; model: panel.options
         currentIndex: Math.max(0,model.findIndex(s=>s.stage===panel.state.stage))
-        hint: "View an accepted computation stage without changing tissue settings"
+        hint: "Compare the base, inflated and stacked shapes. This changes only the view."
         onActivated: panel.change(model[currentIndex].stage,panel.state.reference,panel.state.mode)
     }
     UiCombo {

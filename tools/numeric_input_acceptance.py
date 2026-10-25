@@ -28,6 +28,7 @@ def find(window, name):
 
 def reveal(window, name):
     target = find(window, name)
+    expand_sections(target)
     parent = target.parentItem()
     while parent and parent.metaObject().indexOfProperty("contentY") < 0:
         parent = parent.parentItem()
@@ -35,6 +36,15 @@ def reveal(window, name):
         offset = target.mapToItem(parent.property("contentItem"), QPointF()).y()
         parent.setProperty("contentY", max(0, offset - 60))
     QTest.qWait(100)
+
+
+def expand_sections(target):
+    parent = target.parentItem()
+    while parent:
+        if parent.metaObject().indexOfProperty("expanded") >= 0:
+            parent.setProperty("expanded", True)
+        parent = parent.parentItem()
+    QTest.qWait(50)
 
 
 def type_value(window, name, value):

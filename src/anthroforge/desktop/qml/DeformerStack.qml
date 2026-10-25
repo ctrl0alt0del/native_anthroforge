@@ -50,7 +50,7 @@ UiSection {
             VectorSetting { propertyReference: ({target:panel.item.id,path:["deformers","@"+bindingPanel.binding.id,"displacement"]}); visible:bindingPanel.binding.kind==="DISPLACE"; length:true; label:"Local displacement"; values:bindingPanel.binding.displacement || [0,0,0]; onEdited:values=>authoring.edit("modifier.update",{binding:bindingPanel.binding.id,offset:values}) }
             ColumnLayout {
                 visible: bindingPanel.binding.kind === "HOOK"; Layout.fillWidth: true
-                UiCombo { Layout.fillWidth: true; model: ["NONE","CURVE","SMOOTH","SPHERE","ROOT","SHARP","LINEAR","CONSTANT","INVERSE_SQUARE"]; currentIndex: model.indexOf(bindingPanel.binding.falloff); onActivated: bindingPanel.set("falloff",currentText) }
+                UiCombo { enumLabels:true; Layout.fillWidth: true; model: ["NONE","CURVE","SMOOTH","SPHERE","ROOT","SHARP","LINEAR","CONSTANT","INVERSE_SQUARE"]; currentIndex: model.indexOf(bindingPanel.binding.falloff); onActivated: bindingPanel.set("falloff",currentText) }
                 NumericSetting { propertyReference: ({target:panel.item.id,path:["deformers","@"+bindingPanel.binding.id,"radius"]}); length: true; label: "Falloff radius"; value: bindingPanel.binding.radius; onEdited: value => bindingPanel.set("radius",value) }
                 UiCheck { text: "Uniform falloff"; checked: bindingPanel.binding.uniform; onClicked: bindingPanel.set("uniform",checked) }
                 VectorSetting { propertyReference: ({target:panel.item.id,path:["deformers","@"+bindingPanel.binding.id,"center"]}); length: true; label: "Falloff center"; values: bindingPanel.binding.center; onEdited: values => authoring.edit("hook.recenter",{binding:bindingPanel.binding.id,center:values}) }

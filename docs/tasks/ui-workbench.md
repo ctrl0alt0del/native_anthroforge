@@ -38,3 +38,16 @@ must be tested with the actual keyboard and editing code.
 Validation and delivery pending. Preserve all currently reachable actions, including
 source replacement/split, optional inflation preview, mirror inspection, reports,
 recovery and workspace management; a simpler default must not remove those features.
+
+## Shell/editor checkpoint
+
+Implemented the menu/viewport/status shell, context pages and persisted local layout.
+Moved primary tissue shaping ahead of optional settings, grouped Fiber support controls,
+and added display-only enum labels without changing command identifiers. Existing
+editors stay instantiated across pages; document state and computations are untouched.
+
+Source smoke, project recovery/recent workflows at two sizes, architecture checks,
+and initial workbench interactions passed. Added explicit tests for layout persistence,
+enum dispatch, preview retention, on-demand geometry inspection and curve editing.
+Fixed new icon/encoding issues found during these checks. Full gate, profiling,
+portable qualification and final visual/copy review remain pending. No release claim.

@@ -16,42 +16,18 @@ ColumnLayout {
     function inflate(key,value) { inflationDraft.edit(key,value); }
     function connector(width,fullness) { workspace.run("tissue.connector",{target:selected.id,part:part.id,width:width,fullness:fullness}); }
     onItemChanged: if(!item.both_sides) side="a"
-    UiButton { objectName:"retargetTissueSource"; text:"Change construction source"; Layout.fillWidth:true; enabled:!workspace.state.editing && !workspace.state.waiting && !panel.selected.readonly; onClicked:workspace.tissueRetarget.choose(panel.selected.id) }
-    UiSection {
-        title:"Apply preset"; expanded:false
-        UiCombo { objectName:"tissueApplyPreset"; Layout.fillWidth:true; model:panel.selected.tissue_presets || []; textRole:"name"; valueRole:"id"; currentIndex:Math.max(0,model.findIndex(p=>p.id===panel.item.preset)); hint:"Reset inflation, relaxation and preset-owned constraints. Keep custom fields, regions, construction, crop and stacking."; onActivated:workspace.run("tissue.preset.apply",{target:panel.selected.id,preset:currentValue}) }
-    }
-    UiField {
-        id: nameField; objectName: "tissueName"; Layout.fillWidth: true; Accessible.name: "Tissue name"
-        Binding { target: nameField; property: "text"; when: !nameField.activeFocus; value: panel.selected.name || "" }
-        onEditingFinished: if(panel.selected.is_tissue && text !== panel.selected.name) workspace.run("object.rename",{target:panel.selected.id,name:text})
-    }
-    UiButton { objectName: "editTissueSource"; text: "Edit construction source"; glyph: "curve-points"; Layout.fillWidth: true; onClicked: workspace.editConstruction(panel.item.source) }
-    UiButton { objectName: "tissueMakeIndependent"; text: "Make construction independent"; Layout.fillWidth: true; onClicked: workspace.run("consumer.make_independent",{entity:panel.selected.id}) }
-    TissueInspection {}
-    UiField {
-        id: classification; objectName: "tissueClassification"; Layout.fillWidth: true
-        Accessible.name: "Tissue classification"; placeholderText: "Classification"
-        Binding { target: classification; property: "text"; when: !classification.activeFocus; value: panel.item.classification || "" }
-        onEditingFinished: if(text !== panel.item.classification) panel.configure("classification",text)
-    }
     RowLayout {
         Layout.fillWidth: true
         UiCombo { objectName: "tissuePart"; visible: model.length>1; Layout.fillWidth: true; textRole: "label"; model: (panel.item.parts || []).map((p,i)=>({id:p.id,label:i ? "Branch "+i : "Main"})); currentIndex: Math.max(0,model.findIndex(p=>p.id===panel.partId)); onActivated: panel.partId=model[currentIndex].id }
         UiCombo { objectName: "tissueSide"; visible: panel.item.both_sides || false; Layout.fillWidth: true; model: ["Side A","Side B"]; currentIndex: panel.side==="b" ? 1 : 0; onActivated: panel.side=currentIndex===1 ? "b" : "a" }
     }
     UiSection {
-        title: "Inflation"
-        TissueInflationDraft { id: inflationDraft; target: panel.selected.id || ""; part: panel.part.id || "main"; side: panel.side; inflation: panel.part[panel.side]?.inflation || ({}) }
+        title: "Inflation"; stateKey:"tissue/inflation"
         UiCheck { text: "Enabled"; checked: panel.inflation.enabled ?? true; onClicked: panel.inflate("enabled",checked) }
-        UiCombo { objectName: "tissueInflationMode"; Layout.fillWidth: true; model: panel.selected.tissue_modes || []; currentIndex: model.indexOf(panel.inflation.mode); onActivated: panel.inflate("mode",currentText) }
-        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","amount"]}); objectName: "tissueInflationAmount"; label: "Amount"; length: true; value: panel.inflation.amount || 0; onEdited: value => panel.inflate("amount",value) }
+        UiEnumCombo { objectName: "tissueInflationMode"; Layout.fillWidth: true; codes: panel.selected.tissue_modes || []; value:panel.inflation.mode || ""; hint:"Choose how the tissue gains volume"; onChosen:code=>panel.inflate("mode",code) }
+        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","amount"]}); objectName: "tissueInflationAmount"; label: panel.muscleMode ? "Depth" : "Amount"; length: true; value: panel.inflation.amount || 0; onEdited: value => panel.inflate("amount",value) }
         TissueProfile { propertyBase: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","profile"]}); visible: panel.inflation.mode === "SECTION_PROFILE"; profile: panel.inflation.profile || ({}); previewing: inflationDraft.editing; onEdited: value=>panel.inflate("profile",value); onResetRequested: inflationDraft.reset("PROFILE") }
         TissueControl { propertyBase: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation"]}); visible: panel.inflation.mode === "CTRL_POINT"; inflation: panel.inflation; canManipulate: !inflationDraft.editing; onEdited: (key,value)=>panel.inflate(key,value); onResetRequested: inflationDraft.reset("CONTROL"); onEditRequested: authoring.editTissueControl(panel.part.id,panel.side) }
-        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","boundary_band"]}); visible: panel.muscleMode; label: "Boundary band · samples"; value: panel.inflation.boundary_band || 0; onEdited: value => panel.inflate("boundary_band",value) }
-        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","boundary_strength"]}); visible: panel.muscleMode; label: "Boundary attenuation"; value: panel.inflation.boundary_strength || 0; onEdited: value => panel.inflate("boundary_strength",value) }
-        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","boundary_power"]}); objectName: "tissueBoundaryPower"; visible: panel.muscleMode; label: "Boundary power"; minimum: 0.0001; maximum: 1000; value: panel.inflation.boundary_power ?? 1; hint: "Shape the inflation transition away from the boundary"; onEdited: value => panel.inflate("boundary_power",value) }
-        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","length_taper"]}); visible: panel.muscleMode; label: "Longitudinal taper"; value: panel.inflation.length_taper || 0; onEdited: value => panel.inflate("length_taper",value) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","minimum"]}); visible: panel.inflation.mode === "NORMAL"; label: "Minimum thickness"; length: true; value: panel.inflation.minimum || 0; onEdited: value => panel.inflate("minimum",value) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","power"]}); visible: ["NORMAL","PROFILE"].includes(panel.inflation.mode); label: "Profile power"; value: panel.inflation.power ?? 1; onEdited: value => panel.inflate("power",value) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","width"]}); visible: panel.inflation.mode === "PROFILE"; label: "Half-width"; length: true; value: panel.inflation.width || 0; onEdited: value => panel.inflate("width",value) }
@@ -61,9 +37,20 @@ ColumnLayout {
             model: panel.inflation.mode === "RADIAL" ? ["X","Y","Z"] : []
             NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","scale"]}); required property string modelData; required property int index; label: "Scale " + modelData; value: panel.inflation.scale?.[index] ?? 1; onEdited: value => { let scale=Array.from(panel.inflation.scale); scale[index]=value; panel.inflate("scale",scale); } }
         }
+    UiSection { title:"Boundary & taper"; stateKey:"tissue/boundary"; expanded:false
+        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","boundary_band"]}); visible: panel.muscleMode; label: "Boundary band · samples"; value: panel.inflation.boundary_band || 0; onEdited: value => panel.inflate("boundary_band",value) }
+        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","boundary_strength"]}); visible: panel.muscleMode; label: "Boundary attenuation"; value: panel.inflation.boundary_strength || 0; onEdited: value => panel.inflate("boundary_strength",value) }
+        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","boundary_power"]}); objectName: "tissueBoundaryPower"; visible: panel.muscleMode; label: "Boundary power"; minimum: 0.0001; maximum: 1000; value: panel.inflation.boundary_power ?? 1; hint: "Shape the inflation transition away from the boundary"; onEdited: value => panel.inflate("boundary_power",value) }
+        NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","length_taper"]}); visible: panel.muscleMode; label: "Longitudinal taper"; value: panel.inflation.length_taper || 0; onEdited: value => panel.inflate("length_taper",value) }
+
+    }
         UiCheck { visible: panel.selected.tissue_domain !== "POINT"; text: "Reverse side"; checked: panel.item.reverse || false; onClicked: panel.configure("reverse",checked) }
         UiCheck { objectName: "tissueBothSides"; visible: panel.muscleMode; text: "Two-sided envelope"; checked: panel.item.both_sides || false; onClicked: panel.configure("both_sides",checked) }
         TissueSideCopy { visible: panel.muscleMode && panel.item.both_sides; enabled: !inflationDraft.editing; target: panel.selected.id || ""; part: panel.part.id || "main"; multipleParts: (panel.item.parts || []).length>1 }
+    }
+    UiSection { title:"Preview inflation edits"; stateKey:"tissue/preview"; expanded:false
+        TissueInflationDraft { id: inflationDraft; target: panel.selected.id || ""; part: panel.part.id || "main"; side: panel.side; inflation: panel.part[panel.side]?.inflation || ({}) }
+
     }
     UiSection {
         visible: panel.part.id !== "main"; title: "Branch connector"; expanded: false
@@ -77,9 +64,31 @@ ColumnLayout {
     TissueFields { item: panel.item }
     TissueStacking { item: panel.item; visible: panel.selected.tissue_domain === "SURFACE" }
     UiSection {
-        title: "Evaluation"
-        NumericSetting { propertyReference: ({target:panel.selected.id,path:["resolution"]}); label: "Material resolution"; decimals: 0; value: panel.item.resolution || 24; onEdited: value => panel.configure("resolution",Math.round(value)) }
-        UiCombo { Layout.fillWidth: true; model: ["INHERIT","LIVE","ON_RELEASE","MANUAL"]; currentIndex: Math.max(0,model.indexOf(panel.item.update_mode)); onActivated: workspace.run("update_mode",{entity:panel.selected.id,mode:currentText}) }
-        UiButton { text: "Evaluate tissue"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.selected.id]}) }
+        title: "Evaluation"; expanded:false; stateKey:"tissue/evaluation"
+        NumericSetting { propertyReference: ({target:panel.selected.id,path:["resolution"]}); label: "Surface resolution"; decimals: 0; value: panel.item.resolution || 24; onEdited: value => panel.configure("resolution",Math.round(value)) }
+        UiCombo { enumLabels:true; Layout.fillWidth: true; model: ["INHERIT","LIVE","ON_RELEASE","MANUAL"]; currentIndex: Math.max(0,model.indexOf(panel.item.update_mode)); onActivated: workspace.run("update_mode",{entity:panel.selected.id,mode:currentText}) }
+        UiButton { text: "Recalculate"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.selected.id]}) }
+    }
+    UiSection { title:"Source & settings"; stateKey:"tissue/source"; expanded:false
+    UiButton { objectName:"retargetTissueSource"; text:"Change source…"; Layout.fillWidth:true; enabled:!workspace.state.editing && !workspace.state.waiting && !panel.selected.readonly; onClicked:workspace.tissueRetarget.choose(panel.selected.id) }
+    UiSection {
+        title:"Apply preset"; expanded:false
+        UiCombo { objectName:"tissueApplyPreset"; Layout.fillWidth:true; model:panel.selected.tissue_presets || []; textRole:"name"; valueRole:"id"; currentIndex:Math.max(0,model.findIndex(p=>p.id===panel.item.preset)); hint:"Start from a preset configuration. Resets inflation, relaxation and preset-owned constraints.
+Custom fields, regions, source, crop and stacking stay unchanged."; onActivated:workspace.run("tissue.preset.apply",{target:panel.selected.id,preset:currentValue}) }
+    }
+    UiField {
+        id: nameField; objectName: "tissueName"; Layout.fillWidth: true; Accessible.name: "Tissue name"
+        Binding { target: nameField; property: "text"; when: !nameField.activeFocus; value: panel.selected.name || "" }
+        onEditingFinished: if(panel.selected.is_tissue && text !== panel.selected.name) workspace.run("object.rename",{target:panel.selected.id,name:text})
+    }
+    UiButton { objectName: "editTissueSource"; text: "Edit construction"; glyph: "curve-points"; Layout.fillWidth: true; onClicked: workspace.editConstruction(panel.item.source) }
+    UiButton { objectName: "tissueMakeIndependent"; text: "Make source independent"; Layout.fillWidth: true; onClicked: workspace.run("consumer.make_independent",{entity:panel.selected.id}) }
+    UiField {
+        id: classification; objectName: "tissueClassification"; Layout.fillWidth: true
+        Accessible.name: "Tissue classification"; placeholderText: "Classification"
+        Binding { target: classification; property: "text"; when: !classification.activeFocus; value: panel.item.classification || "" }
+        onEditingFinished: if(text !== panel.item.classification) panel.configure("classification",text)
+    }
+
     }
 }

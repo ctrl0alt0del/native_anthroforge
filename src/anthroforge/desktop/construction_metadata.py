@@ -4,6 +4,8 @@ from dataclasses import asdict
 
 from anthroforge.core import tissue_presets
 from anthroforge.core.construction import Curve
+from anthroforge.core.fiber_presentation import settings as fiber_settings
+from anthroforge.core.fibers import Fiber
 from anthroforge.core.image_presentation import settings
 from anthroforge.core.points import Point
 from anthroforge.core.reference_images import ReferenceImage
@@ -20,10 +22,16 @@ def describe(session, item):
         result["tissue_presets"] = tissue_presets.available(item)
     if isinstance(item, Curve):
         result["engine"] = item.engine
+    if isinstance(item, Fiber):
+        result["fiber_radius"] = fiber_settings(session.workspace, item.id).radius
     if isinstance(item, ReferenceImage):
-        result.update(
-            source=item.source,
-            dimensions=[item.width, item.height],
-            image_style=asdict(settings(session.workspace, item.id)),
-        )
+        result.update(image_metadata(session, item))
     return result
+
+
+def image_metadata(session, item):
+    return dict(
+        source=item.source,
+        dimensions=[item.width, item.height],
+        image_style=asdict(settings(session.workspace, item.id)),
+    )

@@ -200,6 +200,22 @@ class RoutingTaskScheduler(AttachmentTaskScheduler):
         return Schedule("worker", cost, reason="Native obstacle routing and constrained solve")
 
 
+class FiberCreationTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        capture = FiberCaptureTaskScheduler().plan(workload, interactive)
+        route = RoutingTaskScheduler().plan(workload, interactive)
+        cost = (capture.estimated_ms or 0) + (route.estimated_ms or 0)
+        return Schedule("worker", cost, reason="Atomic surface binding and initial routed path")
+
+
+class FiberDisplayTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.1 + workload.candidates * 0.01
+        return Schedule(
+            "worker", cost, reason="Render-only native world-radius tube and picking tree"
+        )
+
+
 class InspectionTaskScheduler(SaveProjectTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         return Schedule(reason="Frozen inspection export; file and GPU work stay background")
@@ -256,6 +272,8 @@ def curve_schedulers() -> dict[str, TaskScheduler]:
         "curve_draw": CurveDrawingTaskScheduler(),
         "surface_layout": SurfaceLayoutTaskScheduler(),
         "fiber_capture": FiberCaptureTaskScheduler(),
+        "fiber_create": FiberCreationTaskScheduler(),
+        "fiber_display": FiberDisplayTaskScheduler(),
         "surface_snap": SurfaceQueryTaskScheduler(),
         "fiber_path": FiberPathTaskScheduler(),
     }

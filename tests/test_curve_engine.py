@@ -113,10 +113,10 @@ def test_engine_change_preserves_explicit_junctions(session):
 def block_evaluation(monkeypatch):
     original, gate = path_tasks.compute, Event()
 
-    def blocked(*args):
+    def blocked(*args, **kwargs):
         if args[2][0].object(args[1]).engine == "ROUTED":
             assert gate.wait(5)
-        return original(*args)
+        return original(*args, **kwargs)
 
     monkeypatch.setattr(path_tasks, "compute", blocked)
     return gate
@@ -139,7 +139,7 @@ def test_superseded_engine_job_cannot_publish_and_undo_redo_restarts(session, mo
     assert session.resources.paths[item.result.asset].authored.engine == "POLYLINE"
 
 
-def fail_evaluation(*args):
+def fail_evaluation(*args, **kwargs):
     raise ValueError("Controlled path failure")
 
 

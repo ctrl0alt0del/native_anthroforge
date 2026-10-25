@@ -3,9 +3,16 @@
 from dataclasses import replace
 from typing import Any
 
-from anthroforge.core.surfaces import SurfaceAlignment
+from anthroforge.core.surfaces import Surface, SurfaceAlignment
 
 from . import curve_consumers, object_operations, surface_operations
+
+
+def identities(session: Any, target: str) -> list[str]:
+    item = session.document.object(target)
+    if not isinstance(item, Surface):
+        raise ValueError("Choose a surface or Membrane to inspect its sources.")
+    return [use.curve for use in item.curves]
 
 
 def assign(session: Any, target: str, curves: list[str]) -> None:

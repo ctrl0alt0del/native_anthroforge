@@ -5,6 +5,7 @@ from math import isfinite
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from .fiber_presentation import FiberPresentation
 from .image_presentation import ImagePresentation
 from .inspection_views import CameraBookmark, Measurement
 from .presentation import validate_categories
@@ -109,6 +110,7 @@ class Workspace:
     measurements: tuple[Measurement, ...] = ()
     bookmarks: tuple[CameraBookmark, ...] = ()
     reference_images: tuple[ImagePresentation, ...] = ()
+    fibers: tuple[FiberPresentation, ...] = ()
     cursor: tuple[float, ...] = (0.0, 0.0, 0.0)
     mirror_display: str = "BOTH"
 
@@ -120,12 +122,19 @@ class Workspace:
             raise ValueError("Mirror display must be BOTH, SOURCE or MIRROR.")
         validate_categories(self.hidden_categories)
         validate_categories(self.unpickable_categories)
-        if len({v.target for v in self.reference_images}) != len(self.reference_images):
-            raise ValueError("Image appearance must have unique targets.")
+        validate_presentations(self.reference_images, "Image")
+        validate_presentations(self.fibers, "Fiber")
         if len(self.camera) != 7 or not all(map(isfinite, self.camera)) or self.camera[6] <= 0:
             raise ValueError("Invalid workspace camera.")
         if len(self.cursor) != 3 or not all(map(isfinite, self.cursor)):
             raise ValueError("Cursor needs three finite world coordinates.")
+
+
+def validate_presentations(
+    values: tuple[ImagePresentation, ...] | tuple[FiberPresentation, ...], name: str
+) -> None:
+    if len({v.target for v in values}) != len(values):
+        raise ValueError(f"{name} appearance must have unique targets.")
 
 
 def validate_matrix(matrix: tuple[float, ...]) -> None:

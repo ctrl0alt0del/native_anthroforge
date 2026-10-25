@@ -1,7 +1,9 @@
 # Confirmed addon/standalone parity findings
 
 Recorded 2026-10-24 against standalone runtime `51ff0af` (0.3.3).
-**These are unresolved fidelity findings, not completed repairs.** Preserving the
+These are the original fidelity findings. F01 remains unresolved; F02/F03 have
+fixture-qualified repairs on `codex/parity-workflows-034`, pending release qualification.
+Preserving the
 standalone's existing results in a performance test does not establish Blender parity.
 The [detailed investigation](tasks/shoulder-thumb-parity.md) records captures,
 counterfactuals, source hashes and limitations. See also the broader
@@ -31,7 +33,50 @@ An arbitrary joint translation or a global change to Hook/Shrinkwrap is not supp
 by this evidence. The candidate must preserve the initial scene and be requalified
 after edits, undo/redo, reopening and downstream muscle updates.
 
+Later seam analysis isolates a further construction difference: Blender's separate loft
+strips and the app's welded rows produce different Solidify normals. Matched outer
+vertices at the anchor differ by `.000145`, but inner offset vectors differ by `.131804`
+at baseline and `.006680` after the edit. The source samples 64 cyclic points into 65 loft
+columns. The user chose to retain welded Ribs and document its construction difference
+on 2026-10-24. This does not establish that every remaining attachment-frame discrepancy
+is unavoidable or waive investigation of migration fidelity.
+
+### Confirmed placement and rim follow-up
+
+The earlier phrase "inner shell" meant the negative-offset Solidify-generated layer,
+not an occluded/internal face. It was misleading to infer an exterior-capture defect from
+that label. The source Blender binding already targets that layer. Fresh confirmed native
+captures on both source and standalone geometry reproduce their saved anchor and triangle.
+A ray from the Hook origin toward each anchor hits that anchor first (gaps 0 and 4.45e-16).
+Confirmed queries retain these points (gaps 0 and 2.78e-17); neither is a buried surface
+excluded by exterior-only placement. Negative-offset shell faces can be exposed boundaries.
+
+The user's rim hypothesis is confirmed for the Blender source: its anchor is exactly at
+vertex 610 on a Solidify rim edge (distance 0). The frame's selected triangle is 603,
+vertices [610,613,612], entirely on the generated shell, not a mixed-layer rim triangle.
+The standalone anchor is on triangle 676, vertices [408,409,474], also a generated-shell
+face. Its third barycentric weight is effectively zero: it lies on the welded internal
+seam edge, not on a remaining rim (nearest original rim distance 2.4347118027 in fixture
+scene coordinates). Welding has removed the source's internal strip boundary there.
+
+Thus this is not capture accidentally selecting a rim face. The reference points occupy
+different boundary configurations; thickness displacement and surrounding shell frames
+respond differently. Migration also recaptured rather than preserving the source tangent;
+the earlier source-hint experiment remains a separate, larger contribution to displacement.
+Welding alone has not been proved to explain the complete mismatch.
+
+Read-only reproduction: tools/qualify_ribs_attachment_surface.py takes the paired capture
+root and an output JSON. It records input SHA256s, face/layer, barycentrics, fresh confirmed
+capture, first-hit visibility and native nearest-rim queries. Local output:
+build/parity-workflows-034/ribs-attachment-surface.json. The current repaired assembly's
+SCP_7 binding still equals the captured baseline binding. No runtime or project changed.
+
 ## F02 — Thumb shortcut exported a raw value instead of effective backsolve policy
+
+Current feature-branch status: inventories capture effective policy and unset-property
+evidence, including wrappers and drivers. Raw-only inventories are rejected. Combined
+with F03, the actual Thumb edit reaches `7.80384e-6` maximum bidirectional surface error;
+fixed-camera geometry was inspected. New standalone shortcuts still default Backsolve off.
 
 For Thumb Metacarpal Thickness `0.07000002264976501 -> 0.07350002229213715`, the addon
 actually executes owner backsolve. Its RNA value is `False`, but the property was not
@@ -47,6 +92,11 @@ configure direct property wrappers as well as driving shortcuts. This finding do
 **not** change the standalone's confirmed default of backsolve off for new shortcuts.
 
 ## F03 — Owner backsolve needs consistent child anchors after Boolean remeshing
+
+Current feature-branch status: native owner capture/resolution retains material provenance;
+migration transfers the source polygon center rather than recycling a triangle index.
+The actual Thumb fixture verifies the resulting policy-plus-anchor correction. Wider
+assembly qualification and final corrected-copy delivery remain separate acceptance work.
 
 Backsolve-on alone does not eliminate the Thumb discrepancy. Blender uses quad face 6
 as its child anchor; its four vertices remain the same through the edit. The app

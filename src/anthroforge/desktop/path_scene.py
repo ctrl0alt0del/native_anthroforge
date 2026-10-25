@@ -22,7 +22,7 @@ def source_rows(controller):
             key=f"{row['id']}:{row['asset']}:{chunk}",
         )
         for row in controller.construction.records.values()
-        if row["asset"] in resources and row["visible"]
+        if row["asset"] in resources and row["visible"] and not row.get("fiber_radius", 0)
         for chunk in range(resources[row["asset"]].path.chunks)
     ]
 
@@ -79,7 +79,9 @@ def hits(controller, origin, direction, radius):
         direction,
         radius,
     )
-    return [hit_record(controller.path_ids, row) for row in records]
+    return [
+        hit_record(controller.path_ids, row) for row in records
+    ] + controller.fiber_display.hits(origin, direction)
 
 
 def hit_record(ids, row):

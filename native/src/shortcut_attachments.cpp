@@ -41,6 +41,49 @@ static M4 backsolve(uint64_t child,const double* world,const double* parent,cons
     if(delta.norm()>1e-7) cw.block<3,1>(0,3)+=delta;
     return cw;
 }
+static M4 material_backsolve(uint64_t reference,uint64_t current,const double* world,const double* parent,
+                             const double* offset,const double* record,const double* target) {
+    M4 cw=Eigen::Map<const M4>(world); const M4 pw=Eigen::Map<const M4>(parent);
+    const M4 geometry=geometry_matrix(world,offset); M4 resolved;
+    validate(cw,pw,offset,target);
+    if(af_material_binding_frames(reference,current,geometry.data(),1,record,resolved.data(),0))
+        throw std::runtime_error("Cannot resolve retained shortcut owner material anchor.");
+    const V3 delta=point(pw,V3(target))-resolved.block<3,1>(0,3);
+    if(delta.norm()>1e-7) cw.block<3,1>(0,3)+=delta;
+    return cw;
+}
+}
+
+int af_shortcut_owner_material_capture(uint64_t child,const double* world,const double* offset,
+                                       int mode,int index,const double* fallback,double* output) {
+    try {
+        const af::M4 cw=Eigen::Map<const af::M4>(world),geometry=af::geometry_matrix(world,offset);
+        const af::V3 position=af::shortcut::anchor(child,cw,offset,mode,index,fallback);
+        int forced=0,target=-1;
+        return af_point_attachment_capture(1,&child,geometry.data(),1,position.data(),&forced,&target,output,0);
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_shortcut_owner_material_backsolve(uint64_t reference,uint64_t current,const double* world,
+    const double* parent,const double* offset,const double* record,const double* target,double* output) {
+    try {
+        Eigen::Map<af::M4> result(output);
+        result=af::shortcut::material_backsolve(reference,current,world,parent,offset,record,target);
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_shortcut_retain_child_anchor(const double* world,const double* record,const double* local,double* output) {
+    try {
+        const af::M4 frame=Eigen::Map<const af::M4>(world); const af::V3 goal(local);
+        if(!frame.allFinite()||!goal.allFinite()) throw std::runtime_error("Invalid source child anchor.");
+        const af::M3 rotation=af::rotation(frame);
+        af::M3 basis; basis.col(0)=rotation*af::V3(record+21); basis.col(2)=rotation*af::V3(record+24);
+        basis.col(1)=basis.col(2).cross(basis.col(0));
+        if(!basis.isUnitary(1e-5)) throw std::runtime_error("Invalid captured child attachment frame.");
+        std::copy(record,record+28,output);
+        Eigen::Map<af::V3> offset(output+15),anchor(output+18);
+        offset+=basis.transpose()*frame.block<3,3>(0,0)*(goal-anchor);
+        anchor=goal; output[27]=-1; return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 
 int af_shortcut_owner_anchor(uint64_t child,const double* world,const double* parent,const double* offset,

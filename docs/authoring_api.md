@@ -588,6 +588,23 @@ and its limits are in [release validation](development_status.md#construction-ob
 ### Fiber creation
 
 `fiber.create(curve, bindings=None, name="Fiber")` starts an asynchronous independent copy.
+
+`fiber.place(points, owner="", name="Fiber")` creates a bound ROUTED Fiber directly.
+Each point requires `position` (world XYZ metres) and its clicked `target`; optional
+`role` selects the anatomical surface explicitly. Every point is bound to its chosen
+surface through confirmed placement, rather than assigned to the nearest default SCP.
+The operation returns a job ID. A worker captures attachments and solves the initial
+route before publishing the complete Fiber. No intermediate Curve enters the document;
+cancellation/failure leaves no draft, and successful creation is one undo action.
+
+`fiber.presentation(target, radius)` sets a per-workspace world-space display radius
+in metres; `fiber.presentation.inspect(target)` returns that style. The default is
+0.001 m. Zero uses the ordinary centerline display. These operations preserve authored
+Fiber controls, numerical clearance, attached surfaces, results and anatomical undo.
+Styles persist in the workspace. Desktop tubes are native read-only presentation jobs;
+complete prepared meshes and their picking trees stage together. Radius changes do not
+reroute paths, rebuild tissues or block saving. Positive-radius tubes retain their last
+complete display while a replacement is prepared.
 Omitting bindings uses both open endpoints, or the first closed-curve point, with native
 nearest-ready-SCP capture. Explicit binding rows may omit `target` to use the same
 automatic choice for that point; explicit Tissue Base/Final overrides remain supported.
@@ -952,3 +969,68 @@ configure the complete assembly's correspondence after establishing its junction
 Read-only `shortcut.effects`, `shortcut.formulas`, `shortcut.attachment_policy` and
 `shortcut.progress` expose influence, captured numerical evidence, effective policy and
 downstream readiness without edits. See [operation signatures and walkthrough](shortcuts_031.md).
+
+## In-progress 0.3.4: Fiber deformation supports
+
+`fiber.supports.inspect(curve)` returns authored policy, accepted captures and eligible
+surface references without editing. `fiber.supports.configure(curve, policy)` sets
+`automatic` (default true), `included` and `excluded` reference arrays. Each reference
+contains target identity and role. These are deformation supports, not routing obstacles.
+Required pin targets cannot be excluded. Reconfiguration retains current shape and
+captures new fields through the coordinator with normal cancellation/undo semantics.
+Schema 6 persists policy; schemas 4/5 load with existing automatic behavior and retain
+accepted results. This branch is not a qualified 0.3.4 release.
+
+`fiber.rebind(curve)` recaptures all bound points at current resolved positions on
+their existing target roles, as one undo action. It does not silently choose new parents.
+`fiber.binding.offset(curve, point, value)` sets signed normal distance in metres on
+the retained material pin. Native worker evaluation updates controls and handles; the
+point retains its surface reference. Manual-mode pending edits survive save/open.
+Bulk repair uses the explicit Issues operations below.
+
+`fiber.pins.check(curves=None)` requests on-demand read-only Issues checks. Query
+`issues.list` with provider `fiber_pins.v1` for proposed per-pin repairs.
+`fiber.pins.repair(identities=[issue IDs])` explicitly approves selected proposals,
+validates all sources, and applies one transaction. Stale proposals must be rescanned.
+The existing Issues repair lifecycle verifies results after dependent publication.
+
+`curve.reroute(curve)` requests an authoritative cold routed calculation without
+changing authored settings. It preserves accepted geometry until successful publication.
+ROUTED `use_warm_start` defaults true; disabling it makes subsequent calculations cold.
+This applies equally to curves and Fibers; route inspection remains read-only.
+
+`surface.source_ids(target)` returns all source Curve/Fiber identities in stored
+consumer order, including branch sources. Desktop Select all source curves replaces
+object selection as one batch without editing construction or entering multi-curve
+component editing. Invalid batch identities leave selection unchanged.
+
+ROUTED `curve.engine_settings(curve, **settings)` includes nonnegative `length_weight`
+(default .9) and integer `checkpoint_steps` (1–1000, default 1). The latter sets native
+trial steps between checkpoints; `accepted_steps` still caps accepted solver updates.
+Neither disables collision validation. Inspection records every trial independently.
+
+`scp.split(entity, points=[interior point IDs])` splits a single whole-guide body into
+sibling SCP segments and shared endpoint Hook controls. The first SCP identity and its
+children remain. Supported guides are open Bézier/polyline, unshared, without curve-stage
+deformers; the SCP needs an anatomical parent. Unsupported constructions reject before
+editing. The operation returns created entity/control IDs and is one undo action.
+
+`scp.mesh.replace.assess(target, path, units=None, y_up=None)` prepares a native candidate
+without editing the document. Inspect `scp.mesh.replace.status()` for token/state/changes;
+`scp.mesh.replace.apply(token, approved=[change keys])` requires every listed approval.
+`scp.mesh.replace.cancel()` releases the candidate. Original import units/axis conventions
+are defaults. Reliable material references remain; incompatible indexed data and required
+recaptures are explicit. Missing approval or a stale assessment leaves the document intact.
+
+`tissue.source.options(target)` lists attached construction. The matching
+`tissue.source.replace.assess(target, source)`, `.status()`, `.apply(token, approved=[])`
+and `.cancel()` workflow supports Anchor/Fiber/Membrane source changes. Reviews identify
+incompatible evaluator/settings/fields/masks, cropping, relationships and recaptures.
+Unavailable Base/Final roles reject actionably; no role is substituted. A successful
+candidate installs prepared tissue stages together without recomputing those same stages;
+consumers update normally. Old source objects remain. Application is one undo action.
+
+`tissue.preset.apply(target, preset)` resets inflation, relaxation and preset-owned
+constraints on an existing compatible tissue. It preserves classification, source,
+custom fields/regions/constraints, cropping, smoothing and stacking intent. Conflicts
+or an incompatible field layout require explicit resolution, without silent discard.

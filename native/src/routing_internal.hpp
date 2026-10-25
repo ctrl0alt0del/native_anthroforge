@@ -24,6 +24,8 @@ struct Input {
     uint64_t cancel;
     int backend=AF_ROUTING_CUSTOM;
     Trace* trace=nullptr;
+    double length_weight=0.9;
+    int checkpoint_steps=1;
 };
 struct Reference {
     std::vector<Vec> points;

@@ -89,6 +89,12 @@ AF_API int af_lattice(double* points, int count, const double* cage, const int* 
     const int* interpolation, const double* matrix, double strength, const double* weights,
     const double* cage_weights, uint64_t cancel);
 AF_API int af_lattice_outside(double* cage, const int* resolution);
+/* Batch world-space authored-point placement, translating its handles in the native editor. */
+/* Preserve resolved handles and minimum-twist roll when separating an open guide. */
+AF_API int af_curve_segment(const double* records,int count,int first,int last,int resolution,
+    double* output,uint64_t cancel);
+AF_API int af_curve_place_points(const double* records,int count,const int* indices,const double* goals,
+    int changed,const double* world,double* output,uint64_t cancel);
 AF_API uint64_t af_solidify(uint64_t source, const double* settings, const double* weights, uint64_t cancel);
 #ifdef __cplusplus
 }

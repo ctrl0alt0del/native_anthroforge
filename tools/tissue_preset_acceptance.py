@@ -1,5 +1,6 @@
 """Use the desktop preset chooser without a visible window or desktop input."""
 
+from PySide6.QtCore import QMetaObject, Qt
 from PySide6.QtGui import QFont, QFontDatabase
 from tissue_editor_acceptance import (
     QQuickStyle,
@@ -10,7 +11,7 @@ from tissue_editor_acceptance import (
     scene,
     settle,
 )
-from tissue_relaxation_acceptance import click
+from tissue_relaxation_acceptance import argument, click
 from ui_acceptance import find
 
 
@@ -27,7 +28,23 @@ def inspect(controller, window):
         assert item.preset == name
         qualify(controller, item)
         assert find(window, "tissueClassification").property("text") == "SOFT_TISSUE"
+    apply_existing(controller, window)
     independent(controller, window)
+
+
+def apply_existing(controller, window):
+    target = controller.selection
+    before = controller.session.document.object(target)
+    cursor = controller.session.history.cursor
+    click(window, "Apply presetToggle")
+    combo = find(window, "tissueApplyPreset")
+    combo.setProperty("currentIndex", 1)
+    assert QMetaObject.invokeMethod(combo, "activated", Qt.DirectConnection, argument(1))
+    settle(controller)
+    item = controller.session.document.object(target)
+    assert item.preset == "CUSTOM" and item.source == before.source
+    assert item.classification == before.classification and item.stacking == before.stacking
+    assert controller.session.history.cursor == cursor + 1
 
 
 def qualify(controller, item):

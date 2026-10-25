@@ -26,9 +26,18 @@ Resolve duplicated computation-history IDs without erasing recorded findings.
 
 ## Acceptance and current state
 
-Read-only merge preview reports eleven textual conflicts. All runtime integration,
-regression and release evidence is still pending. Donor's 2,136-test checkpoint does
-not qualify the combined application.
+The eleven textual conflicts are reconciled. Shared path execution retains dispatch-time
+propagation preferences and explicit cold routing; offset editing and mirror dependencies
+remain integrated. Thick Fiber presentation now reflects the same accepted world-space
+tube, including hidden-source/mirror-only display and frame-boundary picking. Mirrors do
+not create additional tube jobs or native geometry. Native compilation and five CTests
+pass; 48 focused integration tests pass, including both propagation methods for offsets,
+Rebind All and support changes. Full development/portable/assembly qualification remains
+pending; donor's 2,136-test checkpoint alone does not qualify the combined application.
+
+Donor computation records were unnumbered preface entries, not duplicate numbered IDs.
+They are retained as CH-079 onward with their historical pending statements explicitly
+scoped to that branch. Existing CH-001–078 references remain unchanged.
 
 Required: focused combined-policy regression tests, full development gate, headless and
 background/offscreen workflow tools, actual rendered shape/picking inspection, production
@@ -38,8 +47,8 @@ running installations or use visible desktop input. Existing source projects sta
 
 ## Next actions
 
-1. Merge the donor onto this branch and reconcile conflicts by owning contract.
-2. Validate combined behavior and fix failures, checkpointing/pushing coherent increments.
+1. Commit/push the reconciled merge checkpoint; run the complete development gate.
+2. Validate desktop/assembly/portable behavior and fix failures, checkpointing progress.
 3. Update release/version documentation, package/qualify, then validated merge to main.
 
 Recovery inputs are the donor task record and local `build/parity-workflows-034` evidence,

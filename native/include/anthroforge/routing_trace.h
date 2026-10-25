@@ -15,6 +15,9 @@ AF_API const int64_t* af_route_trace_records(uint64_t handle);
 AF_API const double* af_route_trace_buffer(uint64_t handle,int kind);
 AF_API const char* af_route_trace_error(uint64_t handle);
 AF_API void af_route_trace_release(uint64_t handle);
+AF_API uint64_t af_route_inspect_configured(const double* records,int count,const double* world,const int* owners,
+    uint64_t scene,const AfRoutingOptions* options,uint64_t warm,uint64_t cancel,int backend,
+    double length_weight,int checkpoint_steps);
 #ifdef __cplusplus
 }
 #endif

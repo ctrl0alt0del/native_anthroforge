@@ -14,6 +14,15 @@ ColumnLayout {
     readonly property var piece: (primitive.pieces || []).find(p => p.curve === curve.id) || {}
     readonly property bool topologyLocked: (item.topology_dependents || []).length > 0
     Layout.fillWidth: true; spacing: 8
+    FiberSupports { curve:panel.curve; visible:panel.curve.bindings !== undefined }
+    NumericSetting {
+        objectName: "fiberDisplayRadius"
+        live: false
+        visible: panel.curve.bindings !== undefined
+        label: "Display radius"; length: true; minimum: 0
+        value: workspace.selectedData.fiber_radius || 0
+        onEdited: value => workspace.run("fiber.presentation", {target:panel.curve.id,radius:value})
+    }
     function primitiveSetting(key,value) { authoring.setting("primitive.update",key,value); }
     function curveSetting(key,value) { const args={entity:item.id,curve:curve.id}; args[key]=value; authoring.edit("curve.update",args); }
     function pointSetting(key,value) { const args={entity:item.id,curve:curve.id,point:point.id}; args[key]=value; authoring.edit("point.update",args); }
@@ -41,6 +50,7 @@ ColumnLayout {
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Cap closed cross-sections"; checked: panel.primitive.caps || false; enabled: !panel.topologyLocked; onClicked: panel.primitiveSetting("caps",checked) }
         UiNotice { active: panel.visible; text: panel.item.result?.status === "pending" ? "Pending changes · last accepted geometry shown" : "" }
         UiNotice { active: panel.visible; text: panel.item.result?.pending?.length>0 ? "Using accepted support · upstream changes pending" : "" }
+        UiButton { objectName:"replaceImportedMesh"; text:"Replace source mesh"; Layout.fillWidth:true; enabled:!workspace.state.editing && !workspace.state.waiting && !workspace.selectedData.readonly; visible:panel.primitive.kind==="IMPORTED"; onClicked:workspace.meshReplacement.choose(panel.item.id) }
         UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.item.id]}) }
     }
     ParametricInspector { curve: panel.curve; visible: panel.item.standalone && panel.curve.engine === "PARAMETRIC" }
@@ -86,6 +96,7 @@ ColumnLayout {
         Label { text: "Control point"; color: Theme.muted }
         FiberBinding { curve: panel.curve; point: panel.point }
         CurveJunction { curve: panel.curve; point: panel.point }
+        UiButton { objectName:"splitSCP"; text:"Split into connected SCPs"; visible:panel.primitive.kind === "BODY"; enabled:!!authoring.selectedComponent.point; hint:"Split at selected interior guide points; keep children on the first segment and join neighboring ends with shared Hooks."; onClicked:authoring.splitSCP() }
         UiCombo { id: pointChoice; objectName: "pointChoice"; Layout.fillWidth: true; model: panel.points.map((p,i)=>"Point "+(i+1)); onActivated: { const rows=authoring.componentRows.filter(r=>r.point===panel.point.id && r.part==="position"); if(rows.length) authoring.selectComponent(rows[0].key,false); } }
         VectorSetting { propertyReference: ({target:panel.curve.id,path:["points","@"+panel.point.id,"position"]}); enabled: panel.curve.engine !== "PARAMETRIC"; length: true; label: "Point position"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
         Repeater {

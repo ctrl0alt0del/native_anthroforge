@@ -1,6 +1,7 @@
 """Exercise the desktop fiber-creation entry point without opening a desktop window."""
 
 import os
+from dataclasses import replace
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 if os.name == "nt":
@@ -9,7 +10,7 @@ if os.name == "nt":
 from pathlib import Path
 
 import numpy as np
-from PySide6.QtCore import QMetaObject, QObject, Qt
+from PySide6.QtCore import Q_ARG, QMetaObject, QObject, Qt
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
@@ -70,6 +71,9 @@ def run():
 
 def exercise(controller, engine):
     create(controller, engine)
+    support_override(controller, engine)
+    pin_controls(controller, engine)
+    review_pins(controller, engine)
     object_transform_policy(controller, engine.rootObjects()[0])
     editing(controller)
     component_shortcuts(controller, engine.rootObjects()[0])
@@ -207,6 +211,63 @@ def conversion(controller, engine):
     item = controller.session.document.object(controller.selection)
     assert item.engine == "POLYLINE" and len(item.bindings) == 3
     assert item.result.status == "ready", item.result.error
+
+
+def support_override(controller, engine):
+    find(engine.rootObjects()[0], "inspectorHeader").setProperty("shortcuts", False)
+    controller.authoring.setEditing(True)
+    settle(controller)
+    control = find(engine.rootObjects()[0], "fiberSupportsAutomatic")
+    assert control.property("checked")
+    control.setProperty("checked", False)
+    assert QMetaObject.invokeMethod(control, "clicked", Qt.DirectConnection)
+    settle(controller)
+    item = controller.session.document.object(controller.selection)
+    assert not item.support_policy.automatic and item.result.status == "ready"
+    assert not controller.session.scheduler.errors
+
+
+def pin_controls(controller, engine):
+    window = engine.rootObjects()[0]
+    control = find(window, "fiberPinNormalOffset")
+    assert QMetaObject.invokeMethod(control, "edited", Qt.DirectConnection, Q_ARG(float, 0.05))
+    settle(controller)
+    item = controller.session.document.object(controller.selection)
+    assert item.bindings[0].attachment.binding[17] == 0.05
+    assert QMetaObject.invokeMethod(find(window, "fiberRebindAll"), "clicked", Qt.DirectConnection)
+    settle(controller)
+    assert not controller.session.scheduler.errors
+
+
+def damage_pin(controller):
+    session = controller.session
+    item = session.document.object(controller.selection)
+    pin = item.bindings[0]
+    record = (999999.0,) * 3 + pin.attachment.binding[3:]
+    binding = replace(pin, attachment=replace(pin.attachment, binding=record))
+    item = replace(item, bindings=(binding, *item.bindings[1:]), generation=item.generation + 1)
+    session.replace_document(
+        objects=tuple(item if o.id == item.id else o for o in session.document.objects)
+    )
+    controller.refresh()
+    return item.id
+
+
+def review_pins(controller, engine):
+    target = damage_pin(controller)
+    controller.issue_panel.reviewPins(target)
+    settle(controller)
+    window = engine.rootObjects()[0]
+    assert window.property("modalOpen")
+    assert QMetaObject.invokeMethod(
+        find(window, "selectFiberPinPage"), "clicked", Qt.DirectConnection
+    )
+    button = find(engine.rootObjects()[0], "applyFiberPinRepairs")
+    assert button.property("enabled")
+    assert QMetaObject.invokeMethod(button, "clicked", Qt.DirectConnection)
+    settle(controller)
+    assert not window.property("modalOpen") and not controller.session.scheduler.errors
+    assert controller.session.document.object(target).bindings[0].attachment.binding[0] != 999999
 
 
 if __name__ == "__main__":

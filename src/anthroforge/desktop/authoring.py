@@ -195,6 +195,12 @@ class Authoring(QObject):
         self.selection = [row["key"] for row in self.componentRows] if selected else []
         self.notify()
 
+    @Slot()
+    def splitSCP(self):
+        from .authoring_actions import split_scp
+
+        split_scp(self)
+
     @Slot(str, bool)
     def members(self, binding, assign):
         from .authoring_actions import binding_members

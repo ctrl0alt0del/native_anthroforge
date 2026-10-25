@@ -89,7 +89,12 @@ def owner_anchor(value: dict[str, Any] | None) -> OwnerAnchor | None:
     if value is None:
         return None
     return OwnerAnchor(
-        **dict(value, fallback=tuple(value["fallback"]), parent_local=tuple(value["parent_local"]))
+        **dict(
+            value,
+            fallback=tuple(value["fallback"]),
+            parent_local=tuple(value["parent_local"]),
+            material_binding=tuple(value.get("material_binding", ())),
+        )
     )
 
 

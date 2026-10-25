@@ -85,6 +85,8 @@ class Session:
 
         self.tissue_inspection = Inspection()
         self.conversion = ConversionPreview()
+        self.mesh_replacement: Preview[Any] = Preview()
+        self.tissue_retarget: Preview[Any] = Preview()
         self.surface_preview: Preview[Candidate] = Preview()
         self.tissue_preview: Preview[TissueCandidate] = Preview()
         self.scheduler = TaskCoordinator(lambda: self.document)
@@ -298,9 +300,7 @@ class Session:
         self.shortcut_comparison.clear()
         self.issues.close()
         self.scheduler.close()
-        self.conversion = ConversionPreview()
-        self.surface_preview = Preview()
-        self.tissue_preview = Preview()
+        self.clear_previews()
         if self._engine is not None:
             self._engine.clear_caches()
             self.profiler.native.detach(self._engine)
@@ -308,6 +308,13 @@ class Session:
             self.profiler.close()
         if self.file_lock:
             self.file_lock.close()
+
+    def clear_previews(self) -> None:
+        self.conversion = ConversionPreview()
+        self.mesh_replacement = Preview()
+        self.tissue_retarget = Preview()
+        self.surface_preview = Preview()
+        self.tissue_preview = Preview()
 
 
 def changed_ids(previous: Document, current: Document) -> set[str]:

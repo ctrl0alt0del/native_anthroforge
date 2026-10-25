@@ -10,7 +10,13 @@ from anthroforge.core.fibers import Fiber, FiberBinding
 from anthroforge.core.results import EvaluationResult
 from anthroforge.native import attachment_fields, construction, curve_editing, path_editing, paths
 
-from . import attachment_assets, fiber_deformation, fiber_retention, fiber_supports
+from . import (
+    attachment_assets,
+    fiber_deformation,
+    fiber_retention,
+    fiber_supports,
+)
+from .fiber_offset_evaluation import prepare as prepare_offsets
 from .path_assets import PathAsset
 
 
@@ -33,6 +39,21 @@ def evaluate(
     assert item.edit is not None
     opening = resources.paths[item.edit.baseline].authored
     current = resolved_opening(engine, document, resources, opening, world, cancel, propagation)
+    return finish_edit(engine, document, resources, item, opening, world, cancel, current)
+
+
+def finish_edit(
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Fiber,
+    opening: Any,
+    world: Any,
+    cancel: int,
+    current: Any,
+) -> Any:
+    item = prepare_offsets(engine, document, resources, item, world, cancel, current)
+    opening = current.authored if item.edit and item.edit.offsets else opening
     path, records = edited_geometry(engine, current, opening, item, cancel)
     return recapture(engine, item, resources, document, EditGeometry(path, records, world), cancel)
 
@@ -84,14 +105,19 @@ def recapture(
     engine: Any, item: Fiber, resources: Any, document: Any, geometry: EditGeometry, cancel: int
 ) -> Any:
     assert item.edit is not None
-    path, records, world = geometry.path, geometry.records, geometry.world
-    targets = item.edit.candidates
-    field, captures = fiber_supports.capture(
-        engine, document, resources, targets, capture_request(item, path, records, world), cancel
-    )
+    field, captures = capture_edit(engine, item, resources, document, geometry, cancel)
     asset = fiber_retention.retain(item, field, captures)
-    changed = edited_fiber(item, records, asset)
-    return PathAsset(path, changed), changed, asset
+    changed = edited_fiber(item, geometry.records, asset)
+    return PathAsset(geometry.path, changed), changed, asset
+
+
+def capture_edit(
+    engine: Any, item: Fiber, resources: Any, document: Any, geometry: Any, cancel: int
+) -> Any:
+    assert item.edit is not None
+    request = capture_request(item, geometry.path, geometry.records, geometry.world)
+    args = engine, document, resources, item.edit.candidates, request, cancel
+    return fiber_supports.capture(*args, item.support_policy)
 
 
 def edited_fiber(item: Fiber, records: Any, asset: Any) -> Fiber:

@@ -13,11 +13,13 @@ from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
 from .creation_selection import CreationSelection
 from .drawing_tools import DrawingTools
+from .fiber_display import FiberDisplay
 from .image_tools import ImageTools
 from .inspection_export import InspectionExport
 from .inspection_panel import InspectionPanel
 from .inspection_tools import InspectionTools
 from .issue_panel import IssuePanel
+from .mesh_replacement_panel import MeshReplacementPanel
 from .models import RenderModel
 from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
@@ -30,6 +32,7 @@ from .surface_creation import SurfaceCreation
 from .tissue_inspection_tools import TissueInspectionTools
 from .tissue_painting_tools import TissuePaintingTools
 from .tissue_region_tools import TissueRegionTools
+from .tissue_retarget_panel import TissueRetargetPanel
 
 
 class Controller(QObject):
@@ -77,6 +80,7 @@ class Controller(QObject):
         self.routing_choices = RoutingChoices()
         self.initialize_tissue_tools()
         self.surface_creation = SurfaceCreation(self)
+        self.mesh_replacement = MeshReplacementPanel(self)
 
     def initialize_tissue_tools(self):
         self.shortcut_comparison = ShortcutComparisonView(self)
@@ -86,6 +90,7 @@ class Controller(QObject):
         self.tissue_painting = TissuePaintingTools(self)
         self.section_tools = SectionTools(self)
         self.route_inspection = RouteInspectionTools(self)
+        self.tissue_retarget = TissueRetargetPanel(self)
 
     def memory_owners(self, owners):
         from .feedback_comparison import memory_owners
@@ -94,6 +99,7 @@ class Controller(QObject):
             memory_owners(self.feedback, owners)
         for model in self.geometry_models():
             model.memory_owners(owners)
+        self.fiber_display.memory_owners(owners)
         owners["drawing_preview"].update(self.drawing_tools.leases)
         if self.drawing_tools.stroke is not None:
             owners["drawing_preview"].add(self.drawing_tools.stroke)
@@ -104,6 +110,7 @@ class Controller(QObject):
         return (
             self.render_model,
             self.path_model,
+            self.fiber_display.model,
             self.image_model,
             self.tissue_inspection.model,
             self.shortcut_comparison.model,
@@ -116,6 +123,7 @@ class Controller(QObject):
 
         self.render_model, self.path_model = RenderModel(self), RenderModel(self)
         self.image_model = RenderModel(self)
+        self.fiber_display = FiberDisplay(self)
         self.initialize_image_layers()
         self.render_model.activated.connect(self.activate_geometry)
         self.path_model.activated.connect(self.activate_geometry)
@@ -179,6 +187,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def pathModel(self):
         return self.path_model
+
+    @Property(QObject, constant=True)
+    def fiberDisplayModel(self):
+        return self.fiber_display.model
 
     @Property("QVariantMap", notify=changed)
     def conversionState(self):
@@ -278,6 +290,14 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def shortcutComparison(self):
         return self.shortcut_comparison
+
+    @Property(QObject, constant=True)
+    def tissueRetarget(self):
+        return self.tissue_retarget
+
+    @Property(QObject, constant=True)
+    def meshReplacement(self):
+        return self.mesh_replacement
 
     @Property(QObject, constant=True)
     def sceneChoices(self):
@@ -466,6 +486,8 @@ class Controller(QObject):
         self.activity_model.synchronize(self.session.scheduler.jobs, names)
         self.refresh_metrics()
         self.issue_panel.synchronize()
+        self.mesh_replacement.synchronize()
+        self.tissue_retarget.synchronize()
         self.inspection_panel.synchronize()
         self.inspection_export.synchronize()
         self.refresh_viewport_tools()
@@ -544,6 +566,8 @@ class Controller(QObject):
         self.shortcut_comparison.synchronize()
         self.creation_selection.synchronize()
         self.issue_panel.synchronize()
+        self.mesh_replacement.synchronize()
+        self.tissue_retarget.synchronize()
         self.shortcut_panel.synchronize()
 
     @Slot()
@@ -618,6 +642,22 @@ class Controller(QObject):
     @Slot(str, bool)
     def select(self, entity, extend=False):
         self.object_selection.choose(entity, extend)
+        self.publish_selection()
+
+    @Slot("QVariantList")
+    def selectObjects(self, identities):
+        if set(identities) - self.session.document.registry.records.keys():
+            raise ValueError("Cannot select an object that is absent from the document.")
+        self.object_selection.replace(identities)
+        self.publish_selection()
+
+    @Slot(str)
+    def selectSurfaceSources(self, target):
+        identities = self.run("surface.source_ids", dict(target=target))
+        if identities is not None:
+            self.selectObjects(identities)
+
+    def publish_selection(self):
         if (
             self.session.tissue_preview.target
             and self.session.tissue_preview.target != self.selection

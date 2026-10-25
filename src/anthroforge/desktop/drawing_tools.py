@@ -2,7 +2,7 @@
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
-from . import branch_placement, drawing_context
+from . import branch_placement, drawing_context, fiber_placement
 from .image_tools import context_owner
 
 DEFAULTS = dict(
@@ -37,6 +37,7 @@ class DrawingTools(QObject):
         self.targets = ()
         self.branch = branch_placement.BranchPlacement(controller)
         self.placement_mode = "POINTS"
+        self.fiber = fiber_placement.FiberPlacement(self)
 
     @Property("QVariantMap", notify=changed)
     def state(self):
@@ -44,7 +45,7 @@ class DrawingTools(QObject):
             active=bool(self.mode),
             mode=self.mode,
             painting=self.painting,
-            count=self.stroke.count if self.stroke else 0,
+            count=self.point_count(),
             hover=self.hover,
             options=self.options,
             branched=self.mode == "BRANCH",
@@ -59,7 +60,7 @@ class DrawingTools(QObject):
         ):
             return
         self.cancel()
-        self.mode = mode if mode in ("DRAW", "POINTS", "BRANCH", "CURSOR") else ""
+        self.mode = mode if mode in ("DRAW", "POINTS", "BRANCH", "CURSOR", "FIBER") else ""
         if self.mode in ("POINTS", "BRANCH"):
             self.placement_mode = self.mode
         self.context = self.signature()
@@ -79,6 +80,7 @@ class DrawingTools(QObject):
 
     def clear_stroke(self):
         self.stroke, self.leases, self.hover, self.painting = None, (), [], False
+        self.fiber.points = []
         self.branch.reset()
         self.resetPreview.emit()
         self.changed.emit()
@@ -145,16 +147,21 @@ class DrawingTools(QObject):
         if not self.mode or self.controller.session.waiting_save:
             return
         try:
-            if self.mode == "CURSOR":
-                self.place_cursor(ray, press)
-            else:
-                self.update_stroke(ray, normal, press)
+            self.dispatch_pointer(ray, normal, press)
         except ValueError as error:
             self.hover = []
             if press:
                 self.controller.message = str(error)
                 self.controller.notify()
         self.changed.emit()
+
+    def dispatch_pointer(self, ray, normal, press):
+        if self.mode == "CURSOR":
+            self.place_cursor(ray, press)
+        elif self.mode == "FIBER":
+            self.fiber.pointer(ray, press)
+        else:
+            self.update_stroke(ray, normal, press)
 
     def update_stroke(self, ray, normal, press):
         if self.mode == "BRANCH" and not self.branch.source:
@@ -189,14 +196,25 @@ class DrawingTools(QObject):
 
     @Slot("QVariantList", "QVariantList", bool)
     def click(self, ray, normal, continue_placement):
-        before = self.stroke.count if self.stroke else 0
+        before = self.point_count()
         self.pointer(ray, normal, True)
-        count = self.stroke.count if self.stroke else 0
-        if self.mode in ("POINTS", "BRANCH") and count > max(1, before) and not continue_placement:
+        count = self.point_count()
+        placement = self.mode in ("POINTS", "BRANCH", "FIBER")
+        if placement and count > max(1, before) and not continue_placement:
             self.finish()
+
+    def point_count(self):
+        if self.mode == "FIBER":
+            return len(self.fiber.points)
+        return self.stroke.count if self.stroke else 0
 
     @Slot()
     def finish(self):
+        if self.mode == "FIBER":
+            return self.fiber.finish()
+        self.finish_curve()
+
+    def finish_curve(self):
         if self.stroke is None or self.stroke.count < (3 if self.options["closed"] else 2):
             self.require_more_points()
             return
@@ -230,6 +248,8 @@ class DrawingTools(QObject):
 
     @Slot()
     def removeLast(self):
+        if self.mode == "FIBER":
+            return self.fiber.pop()
         if self.mode not in ("POINTS", "BRANCH") or self.stroke is None:
             return
         self.stroke.pop()

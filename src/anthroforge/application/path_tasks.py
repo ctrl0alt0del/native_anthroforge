@@ -23,25 +23,25 @@ if TYPE_CHECKING:
     from .session import Session
 
 
-def request(session: "Session", curve: str, interactive: bool = False) -> str:
-    job = make_job(session, curve)
+def request(session: "Session", curve: str, interactive: bool = False, cold: bool = False) -> str:
+    job = make_job(session, curve, cold)
     job.cancel = NativeCancellation(session.engine)
     job.interactive, job.priority = interactive, session.priority({curve})
     job.publish_during_edit = job.restart_on_redo = True
-    job.retry = partial(request, session, curve)
+    job.retry = partial(request, session, curve, interactive=interactive, cold=cold)
     job.cleanup = partial(completed, session, curve, job)
     job.workload = partial(workload, session, curve)
     dep.renewable_contract(job, session.document, {Port(curve, "path")})
     return session.scheduler.submit(job)
 
 
-def make_job(session: "Session", curve: str) -> Job:
+def make_job(session: "Session", curve: str, cold: bool = False) -> Job:
     reads = frozenset(p.owner for p in dep.ports(session.document, Port(curve, "path")))
     return Job(
         "Evaluate " + source(session.document, curve).name,
         frozenset((curve,)),
         lambda document: (document, session.resources.snapshot(), session.preferences.value),
-        partial(compute, session, curve),
+        partial(compute, session, curve, cold=cold),
         partial(publish, session, curve),
         key="path:" + curve,
         kind=path_policy.kind(source(session.document, curve)),
@@ -60,15 +60,26 @@ def workload(session: "Session", curve: str, document: Document) -> Workload:
     )
 
 
-def compute(session: "Session", curve: str, payload: Any, cancel: Any) -> Any:
+def compute(session: "Session", curve: str, payload: Any, cancel: Any, cold: bool = False) -> Any:
     document, resources, preferences = payload
     require_inputs_available(document, curve)
-    inputs = (session.engine, document, resources, curve, cancel.handle)
     policy = (preferences.routing_backend, preferences.fiber_propagation)
-    metadata = dict(target=curve, routing_backend=policy[0], fiber_propagation=policy[1])
-    return document, session.profiler.call(
-        "path", "evaluate", curve_evaluation.evaluate, *inputs, *policy, _metadata=metadata
+    inputs = (session.engine, document, resources, curve, cancel.handle, *policy)
+    metadata = dict(
+        target=curve, routing_backend=policy[0], fiber_propagation=policy[1], cold_start=cold
     )
+    return document, session.profiler.call(
+        "path", "evaluate", curve_evaluation.evaluate, *inputs, cold=cold, _metadata=metadata
+    )
+
+
+def reroute(session: "Session", curve: str) -> str:
+    from .object_operations import editable
+
+    item = editable(session, curve)
+    if not isinstance(item, Curve) or item.engine != "ROUTED":
+        raise ValueError("Choose a routed curve or Fiber to recalculate from the planner.")
+    return request(session, curve, cold=True)
 
 
 def require_inputs_available(document: Document, curve: str) -> None:

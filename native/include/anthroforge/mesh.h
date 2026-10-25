@@ -64,6 +64,8 @@ AF_API int af_move_origin(const double* matrix, const double* offset,
     const double* binding, double* updated_matrix, double* updated_offset);
 AF_API int af_anchor_points(uint64_t parent, const double* child_matrix,
     const double* parent_matrix, const double* parent_offset, const double* binding, double* points, uint64_t reference);
+/* Indexed canonical polygon correspondence, independent of coordinates and tessellation. */
+AF_API int af_mesh_same_topology(uint64_t first,uint64_t second,uint64_t cancel);
 AF_API int af_mesh_same_content(uint64_t first,uint64_t second,uint64_t cancel);
 /* Noncryptographic comparison fingerprint, invariant to oriented triangle enumeration. */
 AF_API int af_comparison_fingerprint(uint64_t handle,int path,uint64_t* output,uint64_t cancel);

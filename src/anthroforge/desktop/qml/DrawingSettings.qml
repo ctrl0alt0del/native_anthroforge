@@ -10,6 +10,11 @@ ColumnLayout {
     readonly property bool capturing: tool.state.count>0
     spacing: Theme.gap
     UiSection {
+        title: "Create Fiber"
+        UiButton { objectName: "beginQuickFiber"; text: "Place Fiber on surfaces"; Layout.fillWidth: true; checked: panel.tool.state.mode==="FIBER"; onClicked: checked ? panel.tool.cancel() : panel.tool.begin("FIBER") }
+        Label { visible: panel.tool.state.mode==="FIBER"; text: "Each point binds to the clicked surface · "+panel.keyboard.modifierName("continuePlacement")+" + click to continue · Plain click finishes from point 2 · Backspace removes a point · Esc cancels"; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+    }
+    UiSection {
         title: "Create curve"
         Label { visible: panel.tool.state.branched; text: "First point joins the nearest visible curve control point."; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         UiButton { text: "Add Curve at cursor"; Layout.fillWidth: true; onClicked: workspace.drawingTools.addCurve() }

@@ -121,3 +121,22 @@ the earlier solver DLL's surface-capture adapter but calls only native validatio
 never SQP or a planner. Contact checks have zero clearance and no endpoint exemptions;
 do not confuse them with ROUTED's acceptance contract. Diagnostic calls are excluded
 from the 14 balanced-order timing trials. Source and production files stay untouched.
+
+## Production policy qualification
+
+The historical experiments above remain independent. The approved .20 reconstruction
+is now integrated as **Smooth Shape Preservation**, with **Local Surface Following**
+retained in Preferences. See CH-078 in `docs/computation_history.md` for contracts,
+compatibility, evidence and limits.
+
+With the before/after fixture and the reviewed `build/scm-smoothing/fair20-*.npz` outputs
+available, run:
+
+```powershell
+.venv/Scripts/python.exe tools/experiments/scm_propagation/production_qualification.py
+```
+
+It invokes the actual application evaluator for both policies, compares the new paths
+to the reviewed prototype, rebuilds the same surface/tissue stages, checks geometric
+findings, records counterbalanced timing and writes a profile under
+`build/fiber-propagation/scm/`. The application does not load any experimental DLL.

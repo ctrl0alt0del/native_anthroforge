@@ -18,9 +18,8 @@ def resolve(
 
 
 def prepare(engine: Any, resources: Any, item: Any, asset: Any, cancel: int) -> Any:
-    pins = sorted(
-        i for i, p in enumerate(item.points) if any(b.point == p.id for b in item.bindings)
-    )
+    bound = {b.point for b in item.bindings}
+    pins = [i for i, p in enumerate(item.points) if p.id in bound]
     meshes = [resources.meshes[t.material_asset].mesh for t in asset.targets]
     references = [t.reference for t in asset.targets]
     groups = [references.index(ref) for ref in references]

@@ -33,9 +33,14 @@ crossings. Profiler and geometry evidence: `build/fiber-propagation/scm/`.
 
 All 326 assembly fibers retain their neutral positions within 1.13e-10 model units.
 The complete Ribs Top Radius 3 update now finishes without calculation errors (7.24 s,
-single trial, not a speedup claim). History/save checks are pending completion.
+single trial, not a speedup claim). Undo, redo and save/reopen reproduce all accepted
+results. Across both policies, skeletal geometry/poses and authored attachment records
+are identical (`full-assembly/equivalence.json`). Production base/final renders were
+inspected from two matched cameras and match the approved smooth silhouette.
 Offscreen Preferences passes, screenshot inspected; no interactive acceptance claim.
 Focused propagation/material/architecture tests: 16 pass. Ruff/format/mypy pass.
+Four additional independent dense-objective tests pass: separate parent movement on
+open/closed nonuniform paths, below and above the prefix-filter threshold.
 
 Compatibility fixes: materialize Eigen's solve before indexed assignment; solve for
 correction relative to the candidate to avoid cancellation; group historical duplicate
@@ -45,8 +50,21 @@ sides. Synthetic material records must mark the absent secondary flow binding as
 not zero. Dense (>512 sample) compact filtering uses prefix moments rather than quadratic
 convolution. No silent switch to the old propagation method.
 
-Remaining: full development gate, actual production geometry visual review, canonical
-portable package/source archive, ownership review, final documentation and validated merge.
+Remaining: full development gate, canonical portable package/source archive, final
+documentation and validated merge.
+
+## Ownership review
+
+The preference is immutable application execution policy captured by existing jobs;
+it does not become authored curve state or acquire its own scheduling system.
+Application orchestration resolves role-aware providers and exact pin goals through
+the existing attachment service. Native preparation owns reference geometry, filtering,
+regional fits and factorization; evaluation reads this immutable state. Cache entries
+retain source geometry and are budgeted through the existing resource/cache profiler.
+The desktop only presents the shared setting. Original local transport remains an
+explicit strategy, never a fallback after new-method failure. Numerical metadata is
+optional on disk; old captures are inspected, not silently rebound. No new dependency
+or solver worker pool was added. Main-thread publication and lifecycle remain unchanged.
 
 - Exact reviewed SCM case, production parity with the prototype and local-method parity.
 - Neutral/rigid transforms, open/closed paths, interior pins, handles, junctions, changing

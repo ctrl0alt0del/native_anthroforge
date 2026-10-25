@@ -90,8 +90,8 @@ native algorithms and retained material-binding semantics. Final evidence is bel
 | --- | --- | --- | --- |
 | A01 | SCP attachments: nearest/ray capture, retained surface/frame/offset records and batched parent-to-child transform propagation. Shortcut transform edits retain existing bindings; ordinary direct transforms still recapture (CH-067). | [attachment.cpp](../native/src/attachment.cpp), [attachment adapter](../src/anthroforge/native/attachments.py), [shortcut capture](../src/anthroforge/application/shortcut_capture.py) | [addon parity](../tests/test_addon_parity.py), [assembly](../tests/test_assembly.py), [shortcut retention](../tests/test_shortcut_retained_bindings.py) |
 | A02 | Anchor/point bindings: capture and resolve explicit SCP or Tissue Base/Final material locations, orientation and offsets. Resolve against accepted deformed material without rewriting bindings; union-covered locations follow their own construction exterior (CH-065). | [point attachment adapter](../src/anthroforge/native/point_attachments.py), [material_binding.cpp](../native/src/material_binding.cpp), [surface providers](../src/anthroforge/application/surface_providers.py) | [point attachments](../tests/test_point_attachments.py), [tissue anchor material](../tests/test_tissue_anchor_material.py) |
-| A03 | Fiber attachment fields: dense surface captures, nearest-owner runs, arc-length blending between owners, structural pins and retained material influence. Automatic skeletal supports exclude unrelated tissues; explicitly tissue-backed fields use selected parents (CH-036). Applies across curve engines. | [attachment_weights.cpp](../native/src/attachment_weights.cpp), [attachment fields](../src/anthroforge/native/attachment_fields.py), [support policy](../src/anthroforge/application/fiber_supports.py) | [attachment weights](../tests/test_attachment_weights.py), [attachment fields](../tests/test_attachment_fields.py), [support policy](../tests/test_fiber_support_policy.py) |
-| A04 | Fiber resolution/editing: resolve its current attached shape, edit authored controls, rebind edited endpoints using Current/Any eligible parent policy, preserve unedited pins, then evaluate its path engine. | [fiber bindings](../src/anthroforge/application/fiber_bindings.py), [fiber edit evaluation](../src/anthroforge/application/fiber_edit_evaluation.py), [path_editing.cpp](../native/src/path_editing.cpp) | [fiber editing](../tests/test_fiber_editing.py), [tissue fiber material](../tests/test_tissue_fiber_material.py) |
+| A03 | Fiber attachment fields: retained surface captures and pins. Smooth Shape Preservation (default) uses regional transport, compact arc-length weights and direct sparse differential reconstruction; Local Surface Following retains the original local-frame algorithm (CH-078). Automatic skeletal supports exclude unrelated tissues; explicitly tissue-backed fields use selected parents (CH-036). Applies across curve engines. | [propagation policy](../src/anthroforge/application/fiber_deformation.py), [native reconstruction](../native/src/fiber_deformation_solve.cpp), [attachment fields](../src/anthroforge/native/attachment_fields.py), [support policy](../src/anthroforge/application/fiber_supports.py) | [propagation contracts](../tests/test_fiber_propagation.py), [dense objective oracle](../tests/test_fiber_reconstruction.py), [support policy](../tests/test_fiber_support_policy.py) |
+| A04 | Fiber resolution/editing: resolve its current attached shape with the captured propagation preference, edit authored controls, rebind edited endpoints using Current/Any eligible parent policy, preserve unedited pins, then evaluate its path engine. | [fiber bindings](../src/anthroforge/application/fiber_bindings.py), [fiber edit evaluation](../src/anthroforge/application/fiber_edit_evaluation.py), [path_editing.cpp](../native/src/path_editing.cpp) | [fiber editing](../tests/test_fiber_editing.py), [tissue fiber material](../tests/test_tissue_fiber_material.py), [propagation lifecycle](../tests/test_fiber_propagation.py) |
 | A05 | Automatic attached construction: native nearest-SCP capture for new Anchor/Fiber bindings, independent graph copies, preserved existing Fiber bindings, and native Membrane evaluation under one reserved worker job. One atomic publication/undo; Tissue evaluation remains downstream. | [creation plan](../src/anthroforge/application/attached_creation.py), [worker assembly](../src/anthroforge/application/attached_creation_compute.py), [lifecycle](../src/anthroforge/application/attached_creation_jobs.py) | [conversion](../tests/test_attached_creation.py), [lifecycle](../tests/test_attached_creation_lifecycle.py) |
 
 ### Surfaces and membranes
@@ -2377,6 +2377,8 @@ interactive desktop acceptance. See `mirroring_035.md` for evidence and known li
 
 ### CH-077 — Experimental SCM propagation reconstruction; not implemented in runtime
 
+Historical experiment record. Production integration is recorded separately in CH-078.
+
 - Scope: existing parent-driven Fiber deformation, distinct from path engines and tissue
   inflation. Production inventory/algorithms remain unchanged.
 - Observed failure: independent support-frame transport creates sharp displacement
@@ -2398,3 +2400,59 @@ interactive desktop acceptance. See `mirroring_035.md` for evidence and known li
   [SCM investigation](tasks/scm-ribs-distortion.md#active-investigation--smoother-cheap-propagation).
   Code is isolated under `tools/experiments/scm_propagation`; artifacts remain local under
   `build/scm-smoothing`. No production integration, source-project edit or package change.
+
+### CH-078 — Selectable Fiber propagation with smooth shape preservation
+
+- Previous: each dense sample follows retained local surface frames and nearest-owner
+  blending. With Ribs Top Radius set to 3, the SCM's abrupt support displacement produces
+  serrated paths and 222 base / 245 inflated crossing pairs. Inflation is downstream of
+  this deformation; changing its solver does not repair the input paths.
+- New: **Smooth Shape Preservation** is the default Preferences policy; **Local Surface
+  Following** keeps the previous evaluator unchanged. Selection applies only to future
+  calculations. Queued jobs capture it at dispatch; running work, accepted results,
+  project revisions and undo are not changed by editing Preferences. The same policy
+  supplies evaluation, current-shape editing, conversion and inspection/replay.
+- Native preparation fits eight regions per support, each using up to 64 incident surface
+  vertices. Ridge-regularized affine fits retain rigid rotation. Cubic B-spline interpolation
+  and compact C2 filtering over 0.2 rest arc length blend support motion; compact endpoint
+  corrections preserve exact anatomical pins. A cached sparse LDLT solve minimizes
+  `||q-y||_M² + 0.2⁴ ||D2 q - A D2 p||_M²` in normalized rest arc length. Pins are eliminated,
+  not penalized. Solve for correction relative to the candidate to reduce floating-point
+  cancellation; preserve each authored handle's transported offset from its path knot.
+- Execution: one native factorization per immutable reference, direct XYZ solves per
+  update; no planner, nonlinear routing, collision repair, Python numerical loop or
+  competing worker pool. Dense compact filtering uses equivalent prefix moments above
+  512 samples. Preparation uses the existing bounded cache (64 MiB / 256 entries),
+  explicit native ownership, cancellation, profiler native calls/cache evidence and
+  dispatch-time method metadata. Degenerate/over-budget failures remain explicit.
+- Retained correspondence: group duplicate historical supports for regional fits while
+  resolving pins from their original material records. New captures store bind frames;
+  legacy captures recover them from saved binding evidence with validated document-frame
+  hints. Underdetermined directions retain the hint rather than unstable covariance
+  inversion. This cannot uniquely reconstruct arbitrary missing history; incompatible
+  captures fail explicitly. Loose mesh vertices and unrelated tissue sides cannot enter
+  regional support fits. Topology changes resolve support vertices through material
+  correspondence, with absent secondary flow bindings correctly encoded.
+- Preserved: attachment targets/roles/records, exact pins, open/closed paths, dormant
+  handles, junctions, current-shape edit transactions, path-engine separation, Manual
+  inputs, failure retention, scheduler/coordinator rules, undo and saving. Mirrors reuse
+  the source result; they acquire no independent propagation.
+- Evidence: production SCM paths match the approved CH-077 candidate within 7.5e-11 model
+  units. Actual base and inflated renders were inspected from two matched cameras; no
+  transverse crossings or degenerates are detected in surface/base/rest/intrinsic/final.
+  Fifteen warm counterbalanced trials give median three-fiber costs 2.90 ms new / 2.98 ms
+  old, consumers 10.16 / 12.40 ms. These are fixture-specific prepared-work measurements,
+  not an application FPS or universal speedup claim.
+- Broader evidence: all 326 migrated assembly fibers preserve neutral positions within
+  1.13e-10 model units. Full assembly Ribs edit has zero calculation failures; all skeletal
+  geometry/poses and authored bindings agree between methods. Undo, redo and reopen
+  reproduce accepted results. A single profiled new-method update takes 7.24 seconds;
+  uncontrolled background load makes this unsuitable for a speedup claim. Independent
+  dense objective tests cover open/closed paths, both sides of the prefix-filter threshold,
+  nonuniform sampling and separate parent movement. Offscreen Preferences is verified.
+- Limits: no clearance, collision-free anatomy, volume, or anatomical-fit guarantee.
+  The SCM's original near-Spine contact remains. The approved tradeoff is smoother shape
+  with weaker peak automatic-support response. Production evidence lives in
+  `build/fiber-propagation/`; reproduction is
+  [production qualification](../tools/experiments/scm_propagation/production_qualification.py).
+  Final gate/package status is tracked in [the task](tasks/fiber-propagation-methods.md).

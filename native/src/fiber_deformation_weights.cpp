@@ -2,11 +2,11 @@
 namespace af::fiber {
 static void constrain(Preparation& v,int row) {
     const int p=nearest_pin(v,v.arc[size_t(row)]);
-        const double w=kernel(distance(v,v.arc[size_t(row)],v.arc[size_t(v.pins[p])])/pin_width(v,int(p)));
-        v.weights.row(row)*=1-w;
-        const int owner=v.pin_owners[p];
-        if(owner<0||owner>=int(v.parents.size())) throw std::runtime_error("Missing fiber pin surface.");
-        v.weights(row,owner)+=w;
+    const double w=kernel(distance(v,v.arc[size_t(row)],v.arc[size_t(v.pins[p])])/pin_width(v,int(p)));
+    v.weights.row(row)*=1-w;
+    const int owner=v.pin_owners[p];
+    if(owner<0||owner>=int(v.parents.size())) throw std::runtime_error("Missing fiber pin surface.");
+    v.weights(row,owner)+=w;
 }
 void prepare_weights(Preparation& v,const AfFiberReference& in,uint64_t cancel) {
     const int n=int(v.path->parameters.size());

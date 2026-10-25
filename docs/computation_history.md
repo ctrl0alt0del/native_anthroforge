@@ -2353,3 +2353,21 @@ selected reflected instance were inspected. Source assets remain shared, no mirr
 writers/solvers appear in the plane-edit profile, and repeated plane edits allocate
 no geometry assets. Hidden-GPU results do not establish physical input latency or
 interactive desktop acceptance. See `mirroring_035.md` for evidence and known limits.
+
+### CH-076 — Preferred ROUTED conversion constraints
+
+- Previous: direct ROUTED switches and previews without a point selection retained every
+  authored point. Migrated dense Free fibers therefore acquired dozens of hard routing pins.
+- New: shared conversion policy uses persistent `routing_conversion_points`: ENDPOINTS
+  by default, or ALL_POINTS. Closed curves retain all points; explicit junctions and
+  anatomical binding points remain mandatory. Explicit preview selections override the
+  preference. Consumer material stations retain surviving identities in the same transaction.
+- Why: the SCM case contained unbound interior Spine contacts, rejected before optimization.
+  A conversion default should not turn every imported shape sample into an intended hard pin.
+- Preserved: native routing algorithm/clearance, actual anatomical bindings, topology locks,
+  update modes, existing accepted results, dispatch/lifecycle safeguards, one-action undo,
+  closed paths and desktop/headless parity. Preferences do not rewrite existing curves.
+- Evidence: focused conversion/preference tests cover both modes, bindings under parent
+  motion, closed curves, junctions, material correspondence, history and preference loading.
+  Further development/offscreen and production SCM checks are recorded in
+  [the task](tasks/routed-conversion-points.md); do not infer shape quality from conversion success.

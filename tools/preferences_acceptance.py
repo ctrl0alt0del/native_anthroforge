@@ -32,8 +32,8 @@ def backend(controller, key):
     return controller.session.resources.paths[item.result.asset].diagnostics.backend
 
 
-def choose(window, index):
-    combo = click(window, "routingBackend")
+def choose(window, index, name="routingBackend"):
+    combo = click(window, name)
     QTest.keyClick(window, Qt.Key.Key_Home)
     if index:
         QTest.keyClick(window, Qt.Key.Key_Down)
@@ -51,10 +51,24 @@ def exercise(controller, window):
     QTest.qWait(100)
     assert window.property("modalOpen")
     choose(window, 1)
+    conversion_choice(controller, window)
     assert controller.session.document is before and controller.session.history.cursor == history
     assert backend(controller, objects["fibers"][0]) == "CUSTOM"
     assert window.grabWindow().save(str(OUTPUT / "preferences.png"))
     verify_dispatch(controller, window, objects)
+
+
+def conversion_choice(controller, window):
+    control = find(window, "routingConversionPoints")
+    assert control.property("currentIndex") == 0
+    choose(window, 1, "routingConversionPoints")
+    assert controller.session.preferences.value.routing_conversion_points == "ALL_POINTS"
+    assert (
+        PreferenceStore(controller.session.preferences.path).value.routing_conversion_points
+        == "ALL_POINTS"
+    )
+    choose(window, 0, "routingConversionPoints")
+    assert controller.session.preferences.value.routing_conversion_points == "ENDPOINTS"
 
 
 def verify_dispatch(controller, window, objects):

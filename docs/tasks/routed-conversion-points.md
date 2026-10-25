@@ -3,7 +3,7 @@
 - Task branch: `codex/routed-conversion-points`
 - Integration branch: `main`
 - Starting revision: `4ff1ef8`
-- Status: in progress
+- Status: pending full validation
 - Last updated: 2026-10-25 Europe/Bucharest
 - Active writer: desktop
 
@@ -25,23 +25,32 @@ the changed conversion default and closed-curve exception.
 
 ## Current state
 
-Existing direct engine switches retain all authored points, including migrated dense
-Free fibers. Native ROUTED treats them as hard constraints. SCM experiments demonstrated
-unbound interior Spine contact prevents conversion before optimization. Existing
-conversion preview already supports explicit point subsets and mandatory-point checks.
-Investigating retained Fiber capture and surface correspondence before reducing points.
+Implemented persistent preference, direct desktop choice and shared guide selection for
+direct/configured/Parametric engine switches and optional previews. Explicit preview lists
+override the preference. Closed paths retain all points; mandatory binding/junction points
+remain. Existing ROUTED settings edits do not remove controls. Point reduction updates
+consumer material stations for retained identities in the same undo action. Topology locks
+remain enforced. Native solver and attachment behavior were not changed.
 
 ## Verification
 
-Pending implementation, relevant contract tests, development gate and offscreen Preferences
-inspection. User desktop must remain untouched. Preserve unrelated root `__init__.py` and
-isolated SCM experiment branch; no experimental kernel promotion.
+42 focused conversion/preference tests pass, plus architecture checks. Ruff and mypy pass.
+`tools/preferences_acceptance.py` passes offscreen: both choices, persistence, no document
+edits, backend selection and future Fiber dispatch. Preferences screenshot inspected;
+no QML warnings. No desktop takeover or interactive acceptance claimed.
+
+Read-only local SCM probe on `build/scm-ribs-distortion/after.anthroforge` (Ribs radius 3):
+all three SCM Fibers convert from 73 points to two, retaining exact stored bindings;
+all three paths, membrane and Tissue finish ready. Evidence:
+`build/routed-conversion-points/scm.json` and `scm.afprofile.zip`. Source project not saved.
+This establishes conversion/lifecycle success, not an improved solver or anatomical fit.
+Development gate is running in `build/routed-conversion-points/development-gate.log`;
+native build and all five native CTests passed. Full gate and package checks pending.
 
 ## Next actions and blockers
 
-1. Implement preference, shared conversion policy and desktop control.
-2. Test curves/Fibers, closed paths, junctions, attached consumers, undo and persistence.
-3. Run development checks, inspect offscreen UI, checkpoint and validated integration.
+1. Complete development gate, inspect SCM output and package the existing canonical version.
+2. Check packaged preference and conversion workflows, then integrate the validated branch.
 
 ## Recovery inputs
 

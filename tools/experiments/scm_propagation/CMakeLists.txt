@@ -11,3 +11,9 @@ target_compile_features(af_scm_solver_only PRIVATE cxx_std_17)
 target_include_directories(af_scm_solver_only PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../../native/include")
 target_include_directories(af_scm_solver_only SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../../native/vendor")
 target_compile_definitions(af_scm_solver_only PRIVATE NOMINMAX EIGEN_MPL2_ONLY EIGEN_DONT_PARALLELIZE)
+
+# Cached differential reconstruction; separate from both production and routing.
+add_library(af_scm_fairing SHARED fairing.cpp)
+target_compile_features(af_scm_fairing PRIVATE cxx_std_17)
+target_include_directories(af_scm_fairing SYSTEM PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../../native/vendor")
+target_compile_definitions(af_scm_fairing PRIVATE NOMINMAX EIGEN_MPL2_ONLY EIGEN_DONT_PARALLELIZE)

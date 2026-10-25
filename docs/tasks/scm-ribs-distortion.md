@@ -336,3 +336,15 @@ it was corrected to use the production Z/Y initialization and native frame const
 before the final timings/shapes were generated. No production source changes, app rebuild,
 version change or merge of this experimental branch into main. Remaining work is a product
 decision about further refinement/clearance investigation, not an approved production fix.
+
+## Active investigation — smoother cheap propagation
+
+The user requests improving the propagation itself, independently of ROUTED. Compare
+the existing C2 regional prototype with wider support blending and a cached linear
+differential reconstruction. The latter retains locally transformed rest curvature,
+soft propagated goals and exact anatomical pins. It is not a collision solver and has
+no planner or iterative optimization. Research basis: Laplacian surface editing and
+smooth skinning weights; this curve adaptation is an experiment, not claimed paper parity.
+Production, source projects and package versions remain unchanged. Validate neutral and
+rigid transformations, endpoints, complete uncropped tissue, bone contacts, and timing.
+Pending evidence is under `build/scm-smoothing/`; code remains on the experiment branch.

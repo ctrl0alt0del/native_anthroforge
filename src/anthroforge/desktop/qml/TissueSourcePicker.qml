@@ -20,7 +20,7 @@ UiDialog {
                 required property var modelData
                 objectName:"tissueSource_"+modelData.id
                 width:ListView.view.width-16
-                text:modelData.name+" · "+modelData.kind+(modelData.current ? " · current" : "")
+                text:modelData.name+" Â· "+modelData.kind+(modelData.current ? " Â· current" : "")
                 alignLeft:true; enabled:!modelData.current
                 onClicked: { dialog.close(); dialog.service.assess(modelData.id); }
             }

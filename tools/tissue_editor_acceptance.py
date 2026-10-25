@@ -64,7 +64,7 @@ def exercise(controller, window):
     settle(controller)
     assert controller.selectedData["status"] == "ready"
     assert not controller.selectedData["transformable"]
-    assert find(window, "tissueName").property("visible")
+    assert find(window, "tissueInflationAmount").property("visible")
 
 
 def run(scenario=exercise):

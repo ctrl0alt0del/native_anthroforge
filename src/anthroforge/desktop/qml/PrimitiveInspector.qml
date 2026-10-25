@@ -14,15 +14,6 @@ ColumnLayout {
     readonly property var piece: (primitive.pieces || []).find(p => p.curve === curve.id) || {}
     readonly property bool topologyLocked: (item.topology_dependents || []).length > 0
     Layout.fillWidth: true; spacing: 8
-    FiberSupports { curve:panel.curve; visible:panel.curve.bindings !== undefined }
-    NumericSetting {
-        objectName: "fiberDisplayRadius"
-        live: false
-        visible: panel.curve.bindings !== undefined
-        label: "Display radius"; length: true; minimum: 0
-        value: workspace.selectedData.fiber_radius || 0
-        onEdited: value => workspace.run("fiber.presentation", {target:panel.curve.id,radius:value})
-    }
     function primitiveSetting(key,value) { authoring.setting("primitive.update",key,value); }
     function curveSetting(key,value) { const args={entity:item.id,curve:curve.id}; args[key]=value; authoring.edit("curve.update",args); }
     function pointSetting(key,value) { const args={entity:item.id,curve:curve.id,point:point.id}; args[key]=value; authoring.edit("point.update",args); }
@@ -37,7 +28,7 @@ ColumnLayout {
     }
     Connections { target: authoring; function onChanged() { panel.syncSelection(); } }
     UiSection {
-        title: panel.item.standalone ? "Curve" : "Primitive"
+        title: panel.item.standalone ? "Curve" : "Primitive"; stateKey:"primitive/main"
         Label { visible: !panel.item.standalone; text: ({LOFT:"Ordered curve loft",BODY:"Curve-deformed body",SEGMENT_CHAIN:"Segment chain",IMPORTED:"Imported mesh"})[panel.primitive.kind] || ""; color: Theme.text }
         CurveEngine { objectName: "standaloneEngine"; visible: !!panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
         UiButton { objectName: "editPrimitive"; visible: panel.item.component_editing !== false; text: panel.item.editing ? "Finish editing" : panel.item.standalone ? "Edit Curve" : "Edit Primitive"; checkable: true; checked: panel.item.editing || false; Layout.fillWidth: true; onClicked: authoring.setEditing(!panel.item.editing) }
@@ -54,6 +45,18 @@ ColumnLayout {
         UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.item.id]}) }
     }
     ParametricInspector { curve: panel.curve; visible: panel.item.standalone && panel.curve.engine === "PARAMETRIC" }
+    UiSection { title:"Fiber supports"; stateKey:"fiber/supports"; visible:panel.curve.bindings !== undefined; expanded:false
+    FiberSupports { curve:panel.curve; visible:panel.curve.bindings !== undefined }
+    NumericSetting {
+        objectName: "fiberDisplayRadius"
+        live: false
+        visible: panel.curve.bindings !== undefined
+        label: "Display radius"; length: true; minimum: 0
+        value: workspace.selectedData.fiber_radius || 0
+        onEdited: value => workspace.run("fiber.presentation", {target:panel.curve.id,radius:value})
+    }
+
+    }
     SymmetricConstruction { curve: panel.curve; topologyLocked: panel.topologyLocked }
     UiSection {
         title: "Curves"; visible: panel.item.editing && panel.curves.length > 0
@@ -105,7 +108,7 @@ ColumnLayout {
                 required property string modelData
                 visible: panel.curve.engine === "BEZIER"
                 Layout.fillWidth: true
-                UiCombo { Layout.fillWidth: true; model: ["AUTO","ALIGNED","FREE","VECTOR"]; currentIndex: Math.max(0,model.indexOf(panel.point[modelData+"_mode"])); onActivated: panel.pointSetting(modelData+"_mode",currentText) }
+                UiCombo { enumLabels:true; Layout.fillWidth: true; model: ["AUTO","ALIGNED","FREE","VECTOR"]; currentIndex: Math.max(0,model.indexOf(panel.point[modelData+"_mode"])); onActivated: panel.pointSetting(modelData+"_mode",currentText) }
                 VectorSetting { propertyReference: ({target:panel.curve.id,path:["points","@"+panel.point.id,modelData]}); length: true; label: modelData === "left" ? "Left handle" : "Right handle"; values: panel.point[modelData] || [0,0,0]; enabled: panel.point[modelData+"_mode"] === "FREE" || panel.point[modelData+"_mode"] === "ALIGNED"; onEdited: values => panel.pointSetting(modelData,values) }
             }
         }
@@ -121,7 +124,7 @@ ColumnLayout {
     }
     UiSection {
         title: "Body piece"; visible: panel.item.editing && !!panel.piece.id
-        UiCombo { Layout.fillWidth: true; model: ["BOX","CYLINDER","CAPSULE"]; currentIndex: Math.max(0,model.indexOf(panel.piece.shape)); enabled: !panel.topologyLocked; onActivated: panel.pieceSetting("shape",currentText) }
+        UiCombo { enumLabels:true; Layout.fillWidth: true; model: ["BOX","CYLINDER","CAPSULE"]; currentIndex: Math.max(0,model.indexOf(panel.piece.shape)); enabled: !panel.topologyLocked; onActivated: panel.pieceSetting("shape",currentText) }
         NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","pieces","@"+panel.piece.id,"width"]}); length: true; label: "Width"; value: panel.piece.width || .1; onEdited: value => panel.pieceSetting("width",value) }
         NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","pieces","@"+panel.piece.id,"depth"]}); length: true; label: "Depth"; value: panel.piece.depth || .1; onEdited: value => panel.pieceSetting("depth",value) }
         UiCheck { text: "Fit entire curve"; checked: panel.piece.fit === undefined || panel.piece.fit; onClicked: panel.pieceSetting("fit",checked) }

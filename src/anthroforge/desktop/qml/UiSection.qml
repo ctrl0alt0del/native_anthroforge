@@ -7,6 +7,10 @@ ColumnLayout {
     property string title: ""
     property string hint: ""
     property bool expanded: true
+    property string stateKey: ""
+    property bool restored: false
+    Component.onCompleted: { if(stateKey) expanded=workbench.expanded(stateKey,expanded); restored=true; }
+    onExpandedChanged: if(restored && stateKey) workbench.setExpanded(stateKey,expanded)
     default property alias contents: body.data
     spacing: Theme.gap
     Layout.fillWidth: true

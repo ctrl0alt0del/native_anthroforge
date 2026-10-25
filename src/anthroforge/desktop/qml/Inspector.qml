@@ -6,6 +6,8 @@ import QtQuick.Dialogs
 UiScrollView {
     id: inspector
     property var selected: workspace.selectedData
+    property string category: ""
+    onCategoryChanged: if(contentItem) contentItem.contentY=0
     readonly property var attachment: selected.attachment || {}
     readonly property var candidates: workspace.sceneChoices.parents
     readonly property bool dialogVisible: colorDialog.visible || constructionInspector.dialogVisible
@@ -27,11 +29,6 @@ UiScrollView {
             Label { text: "Select an object in the viewport or outliner to edit its properties."; color: Theme.muted; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.fillWidth: true }
         }
         Label { visible: !!inspector.selected.readonly; text: inspector.selected.mirror_source ? "Mirrored instance · read-only" : "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-        UiButton {
-            objectName: "selectMirrorSource"; text: "Select source"; Layout.fillWidth: true
-            visible: !!inspector.selected.mirror_source
-            onClicked: workspace.select(inspector.selected.mirror_source)
-        }
         UiSection {
             title: "Mirrored attachments"; visible: !!inspector.selected.mirror_source
             Repeater {
@@ -63,9 +60,10 @@ UiScrollView {
                     onEditingFinished: if (inspector.selected.id && text !== inspector.selected.name) workspace.run("scp.rename",{entity:inspector.selected.id,name:text})
                 }
             }
-            Label { text: (inspector.selected.parent ? "Child SCP" : "Document root") + (inspector.selected.primitive ? "  ·  " + inspector.selected.primitive.kind : "  ·  Empty group"); color: Theme.muted; font.pixelSize: 11 }
+            Label { text: (inspector.selected.parent ? "Child SCP" : "Document root") + (inspector.selected.primitive ? "  ·  " + DisplayNames.label(inspector.selected.primitive.kind) : "  ·  Empty group"); color: Theme.muted; font.pixelSize: 11; Layout.fillWidth:true; wrapMode:Text.Wrap }
+            PrimitiveInspector { visible: !!inspector.selected.primitive }
             UiSection {
-                title: "Transform"; objectName: "transformSection"
+                title: "Transform"; stateKey:"scp/transform"; expanded:false; objectName: "transformSection"
                 Repeater {
                     model: ["Position · "+workspace.state.display_units, "Rotation · °", "Scale"]
                     delegate: ColumnLayout {
@@ -103,7 +101,7 @@ UiScrollView {
                 }
             }
             UiSection {
-                title: "Attachment"; visible: !!inspector.selected.parent
+                title: "Attachment"; stateKey:"scp/attachment"; expanded:false; visible: !!inspector.selected.parent
                 MirrorSharing { source: inspector.selected.id || ""; binding: "attachment" }
                 Label { text: "Parent object"; color: Theme.muted; font.pixelSize: 11 }
                 UiCombo {
@@ -145,7 +143,6 @@ UiScrollView {
                     UiButton { text: "Origin to anchor"; hint: "Move the origin while preserving mesh position"; onClicked: workspace.run("scp.origin",{entity:inspector.selected.id}) }
                 }
             }
-            PrimitiveInspector { visible: !!inspector.selected.primitive }
             UiSection {
                 title: "Display & evaluation"; expanded: false
                 RowLayout {
@@ -168,7 +165,6 @@ UiScrollView {
         ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         ConstructionInspector { id: constructionInspector; onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         TissueInspector { visible: !!inspector.selected.is_tissue; enabled: !inspector.selected.readonly && !workspace.state.waiting }
-        TissueInspection { visible: !!inspector.selected.is_tissue && !!inspector.selected.mirror_source }
         MirrorSettings { Layout.fillWidth: true }
         UiButton {
             objectName: "addObjectImage"; text: "Add reference image…"; glyph: "image"; Layout.fillWidth: true
@@ -177,7 +173,6 @@ UiScrollView {
             hint: "Import an image parented to this object; align it to the current orthographic axis view"
             onClicked: inspector.imageRequested(inspector.selected.id)
         }
-        DependencyInspector { visible: !!inspector.selected.id }
         UiNotice { text: inspector.selected.error || ""; error: true }
         Item { implicitHeight: 8 }
     }

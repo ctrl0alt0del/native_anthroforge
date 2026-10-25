@@ -22,7 +22,7 @@ ColumnLayout {
         const next=workspace.run("tissue.profile.scaled",{profile:basis,factor:value/maximum});
         if(next) edited(next);
     }
-    UiCombo { objectName: "tissueProfileDirection"; Layout.fillWidth: true; model: ["LOCAL","SMOOTH","SECTION"]; currentIndex: Math.max(0,model.indexOf(panel.profile.direction)); onActivated: panel.change("direction",currentText) }
+    UiCombo { enumLabels:true; objectName: "tissueProfileDirection"; Layout.fillWidth: true; model: ["LOCAL","SMOOTH","SECTION"]; currentIndex: Math.max(0,model.indexOf(panel.profile.direction)); onActivated: panel.change("direction",currentText) }
     NumericSetting {
         objectName: "tissueProfileDepth"; label: "Overall depth"; length: true
         minimum: 0; maximum: 10; value: panel.depth; live: !panel.previewing

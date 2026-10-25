@@ -13,7 +13,7 @@ UiSection {
     UiCombo {
         objectName: "tissueInspectStage"; Layout.fillWidth: true; textRole: "label"; model: panel.options
         currentIndex: Math.max(0,model.findIndex(s=>s.stage===panel.state.stage))
-        hint: "View an accepted computation stage without changing tissue settings"
+        hint: "Compare the base, inflated and stacked shapes. This changes only the view."
         onActivated: panel.change(model[currentIndex].stage,panel.state.reference,panel.state.mode)
     }
     UiCombo {
@@ -41,6 +41,7 @@ UiSection {
         id: measurements
         title: "Comparison measurements"; expanded: false
         readonly property var report: panel.state.comparison?.report || ({})
-        Label { Layout.fillWidth: true; text: measurements.report.maximum===undefined ? "Select two surface stages and Displacement." : "Maximum: "+measurements.report.maximum.toPrecision(5)+" m\nMean: "+measurements.report.mean.toPrecision(5)+" m\nRMS: "+measurements.report.rms.toPrecision(5)+" m"; color: Theme.text; wrapMode: Text.WordWrap }
+        function length(value) { return typeof value === "number" && Number.isFinite(value) ? value.toPrecision(5)+" m" : "Unavailable"; }
+        Label { Layout.fillWidth: true; text:"Maximum: "+measurements.length(measurements.report.maximum)+"\nMean: "+measurements.length(measurements.report.mean)+"\nRMS: "+measurements.length(measurements.report.rms); color:Theme.text; wrapMode:Text.WordWrap }
     }
 }

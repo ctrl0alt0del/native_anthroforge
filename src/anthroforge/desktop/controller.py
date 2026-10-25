@@ -245,7 +245,7 @@ class Controller(QObject):
 
     @Property(QObject, constant=True)
     def constructionModel(self):
-        return self.construction.model
+        return self.construction.browser
 
     @Property(QObject, constant=True)
     def pointModel(self):

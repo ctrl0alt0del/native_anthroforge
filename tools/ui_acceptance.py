@@ -68,7 +68,7 @@ def shading_controls(controller, window, output):
 def field_edit(controller, window):
     root = controller.session.document.entities[0].id
     before = controller.session.document.entity(root).matrix
-    field = click(window, "transform0")
+    field = editable_field(window, "transform0")
     QTest.keyClick(window, Qt.Key.Key_A, Qt.KeyboardModifier.ControlModifier)
     QTest.keyClick(window, Qt.Key.Key_2)
     assert field.property("text") == "2"
@@ -78,6 +78,13 @@ def field_edit(controller, window):
     QTest.keyClick(window, Qt.Key.Key_Z, Qt.KeyboardModifier.ControlModifier)
     QTest.qWait(200)
     assert controller.session.document.entity(root).matrix == before
+
+
+def editable_field(window, name):
+    from numeric_input_acceptance import reveal
+
+    reveal(window, name)
+    return click(window, name)
 
 
 def panel_controls(controller, window):

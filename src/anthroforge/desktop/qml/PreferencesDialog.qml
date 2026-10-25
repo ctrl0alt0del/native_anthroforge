@@ -38,25 +38,25 @@ UiDialog {
             Layout.fillWidth: true; spacing: Theme.gap
             Label { text: "ROUTED solver"; color: Theme.text; Layout.fillWidth: true }
             UiHelp {
-                explanation: "Custom is the default. PIQP uses a sparse solver and can be faster for densely sampled routes with many contacts. Neither is faster for every curve."
+                explanation: "Choose the solver that routes curves around obstacles.\nCustom is the default. PIQP can be faster for dense routes with many contacts; neither is faster for every curve."
             }
             UiCombo {
                 objectName: "routingBackend"; Layout.preferredWidth: 200
                 model: ["Custom", "PIQP"]
                 currentIndex: preferences.state.routing_backend === "PIQP" ? 1 : 0
                 onActivated: preferences.setBackend(currentIndex === 1 ? "PIQP" : "CUSTOM")
-                hint: "QP solver used by routed curves and fibers"
+                hint: "Numerical solver used to route curves and fibers around obstacles"
             }
         }
         Label {
             Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.muted
-            text: "Applies to future calculations. Current results stay unchanged. Use Recalculate to update them."
+            text: "Used on the next calculation. Use Recalculate to update current results."
         }
         RowLayout {
             Layout.fillWidth: true; spacing: Theme.gap
             Label { text: "Fiber propagation"; color: Theme.text; Layout.fillWidth: true }
             UiHelp {
-                explanation: "Smooth Shape Preservation is the default: spreads support motion while retaining the curve's shape and exact attachment points. Local Surface Following keeps the original per-surface deformation. These methods update fibers when parents change; neither guarantees obstacle clearance. ROUTED remains a separate path engine."
+                explanation: "Choose how fibers change shape when their supports move.\nSmooth Shape Preservation spreads motion while retaining the curve's shape and attachment points. Local Surface Following deforms the curve separately near each support. Neither guarantees obstacle clearance; Routed is a separate path engine."
             }
             UiCombo {
                 objectName: "fiberPropagation"; Layout.preferredWidth: 260

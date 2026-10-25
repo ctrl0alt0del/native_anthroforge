@@ -47,7 +47,8 @@ dialog's input. Existing confirmation restrictions, editing and calculation beha
 All attached tooltips now use a shared, bounded-width style: short tips stay compact,
 long help wraps, and intentional line breaks are preserved. Hover/focus/click behavior
 stays with the original controls. No per-field popup objects or profiling/polling service
-is added. The [broader UI design](ui_overhaul_design.md) is proposed, not implemented.
+is added. The approved [workbench design](ui_overhaul_design.md) is now implemented;
+see the [current layout and control locations](ui_workbench.md).
 
 ## Evidence and limits
 
@@ -80,6 +81,17 @@ Tooltips measured 134 px for a short tip and at most 380 px for longer examples 
 lines). OS calls are intercepted for success/failure checks: no Explorer/Settings window
 or actual default-app change was performed. Document identity remains unchanged during
 these actions. See the [follow-up record](tasks/preferences-ui-design.md).
+
+The workbench overhaul is qualified at runtime commit `37da18e`: **2,250 Python tests**,
+style/typing and the refreshed full minimal-PATH portable suite pass. The development
+gate also passed all five native CTests and numerical/runtime checks; no native or
+application behavior changed. Actual Qt interactions cover numeric drags, drafts across
+pages, source navigation, bounded 100-consumer search, hover controls and 150% scaling.
+The action inventory found no removed commands or controls. Final ABBA profiles have
+overlapping before/after timings and unchanged model replacement counts; no speedup or
+frame-rate guarantee is claimed. Captures are offscreen and render checks are hidden;
+physical desktop acceptance remains unperformed. See the
+[workbench evidence and ownership review](tasks/ui-workbench.md).
 
 Delivery uses one `dist/0.3.7/AnthroForge.dist` and one
 `dist/AnthroForge-0.3.7-source.zip`.

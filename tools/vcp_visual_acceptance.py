@@ -83,7 +83,7 @@ def cancel_stroke(controller, window):
 
 
 def section(controller, window):
-    click(window, "Inspect tissueToggle")
+    click(window, "inspectTab")
     click(window, "Cross-sectionToggle")
     click(window, "sectionEnabled")
     QTest.qWait(250)

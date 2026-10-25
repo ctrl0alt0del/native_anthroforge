@@ -27,7 +27,7 @@ UiSection {
         }
     }
     Label { text: "XYZ produce metres · t is dimensionless · m and rad are unit constants"; color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true; font.pixelSize: 10 }
-    UiCombo { objectName: "parametricInterpolation"; Layout.fillWidth: true; model: ["POLYLINE","BEZIER"]; currentIndex: model.indexOf(panel.config.interpolation || "POLYLINE"); enabled: !panel.samplingReason; hint: panel.samplingReason; onActivated: panel.setting("interpolation",currentText) }
+    UiCombo { enumLabels:true; objectName: "parametricInterpolation"; Layout.fillWidth: true; model: ["POLYLINE","BEZIER"]; currentIndex: model.indexOf(panel.config.interpolation || "POLYLINE"); enabled: !panel.samplingReason; hint: panel.samplingReason; onActivated: panel.setting("interpolation",currentText) }
     NumericSetting { objectName: "parametricBezierResolution"; propertyReference: ({target:panel.curve.id,path:["engine_settings","bezier_resolution"]}); visible: panel.config.interpolation === "BEZIER"; label: "Bézier samples per segment"; decimals: 0; minimum: 1; maximum: 1024; hint: panel.samplingReason; value: panel.config.bezier_resolution || 24; onEdited: value => panel.setting("bezier_resolution",Math.round(value)) }
     NumericSetting { propertyReference: panel.resolutionReference; objectName: "parametricResolution"; label: "Generated points"; decimals: 0; minimum: panel.curve.closed ? 3 : 2; maximum: 1000000; value: panel.config.resolution || 64; hint: panel.resolutionState.reason || "Uniform parameter sampling; closed curves omit a duplicate seam endpoint"; onEdited: value => panel.setting("resolution",Math.round(value)) }
     Repeater {
@@ -58,8 +58,8 @@ UiSection {
             UiField { Layout.fillWidth: true; text: modelData.label || ""; placeholderText: "Display label (optional)"; onEditingFinished: panel.variable(modelData.id,{label:text}) }
             RowLayout {
                 Layout.fillWidth: true
-                UiCombo { objectName: "parametricVariableType"+modelData.id; model: ["REAL","INTEGER"]; currentIndex: model.indexOf(modelData.numeric_type); Layout.fillWidth: true; onActivated: { const changes={numeric_type:currentText}; if(currentText==="INTEGER" && modelData.numeric_type!=="INTEGER" && Number.isInteger(modelData.value)) changes.value=modelData.value; panel.variable(modelData.id,changes); } }
-                UiCombo { model: ["SCALAR","LENGTH","ANGLE"]; currentIndex: model.indexOf(modelData.dimension); Layout.fillWidth: true; onActivated: panel.variable(modelData.id,{dimension:currentText}) }
+                UiCombo { enumLabels:true; objectName: "parametricVariableType"+modelData.id; model: ["REAL","INTEGER"]; currentIndex: model.indexOf(modelData.numeric_type); Layout.fillWidth: true; onActivated: { const changes={numeric_type:currentText}; if(currentText==="INTEGER" && modelData.numeric_type!=="INTEGER" && Number.isInteger(modelData.value)) changes.value=modelData.value; panel.variable(modelData.id,changes); } }
+                UiCombo { enumLabels:true; model: ["SCALAR","LENGTH","ANGLE"]; currentIndex: model.indexOf(modelData.dimension); Layout.fillWidth: true; onActivated: panel.variable(modelData.id,{dimension:currentText}) }
             }
             RowLayout {
                 Layout.fillWidth: true

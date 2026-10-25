@@ -1,9 +1,27 @@
 # AnthroForge development validation
 
-Current release is [0.3.7 project continuity](usability_037.md), with qualification tracked
-in [the task](tasks/usability-037.md). Prior release qualification is in
+Current release is [0.3.7 project continuity](usability_037.md), including the implemented
+[workbench overhaul](ui_workbench.md), with current qualification tracked in
+[the workbench task](tasks/ui-workbench.md). Prior release qualification is in
 [authoring workflows](tasks/workflows-036.md).
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Workbench overhaul (0.3.7)
+
+Shape / Shortcuts / Inspect pages reuse existing editors, with primary shaping controls
+first, searchable navigation and relationships, local layout persistence and a fixed
+calculation/status strip. No application/core/native geometry, attachment, scheduling,
+undo or project-format implementation changed. The action inventory retains every
+existing command ID, named control and adapter call.
+
+The final Python suite passes **2,250 tests**, plus style/typing checks. The development
+gate also passed all five native CTests, native style and numerical/runtime checks;
+subsequent changes were desktop search/presentation only. Background interaction checks
+cover numerical gestures, previews, curve editing, on-demand inspection, 100-consumer
+search, narrow/normal windows and 150% scale. Serial ABBA profiler comparisons have
+overlapping before/after durations and unchanged model replacement counts. They do not
+establish a speedup, full-update latency or physical frame-time guarantee. Exact runs,
+portable-build evidence and limitations are recorded in the task.
 
 ## Project continuity and UI polish (0.3.7)
 

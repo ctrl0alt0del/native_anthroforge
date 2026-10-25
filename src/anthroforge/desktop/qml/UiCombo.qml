@@ -4,6 +4,8 @@ import QtQuick.Controls
 ComboBox {
     id: control
     property string hint: ""
+    property bool enumLabels: false
+    displayText: enumLabels ? DisplayNames.label(currentText) : currentText
     implicitHeight: Theme.controlHeight; implicitWidth: 150
     font.pixelSize: 12
     leftPadding: 9; rightPadding: 24
@@ -14,9 +16,10 @@ ComboBox {
     FontMetrics { id: metrics; font: control.font }
     function choiceWidth() {
         let result=control.width;
-        for(let i=0;i<control.count;++i) result=Math.max(result,metrics.advanceWidth(control.textAt(i))+2*Theme.gap+8);
+        for(let i=0;i<control.count;++i) result=Math.max(result,metrics.advanceWidth(control.choiceLabel(i))+2*Theme.gap+8);
         return Math.min(result,Math.max(control.width,Overlay.overlay.width-2*Theme.gap));
     }
+    function choiceLabel(index) { return enumLabels ? DisplayNames.label(textAt(index)) : textAt(index); }
     contentItem: Text { text: control.displayText; color: control.enabled ? Theme.text : Theme.muted; font: control.font; verticalAlignment: Text.AlignVCenter; elide: Text.ElideRight }
     indicator: Image {
         source: "icons/chevron-down.svg"
@@ -29,7 +32,7 @@ ComboBox {
         required property int index
         width: ListView.view ? ListView.view.width : control.availableWidth
         height: Math.max(Theme.controlHeight,implicitContentHeight+8); leftPadding: Theme.gap; rightPadding: Theme.gap
-        text: control.textAt(index)
+        text: control.choiceLabel(index)
         font.pixelSize: 12
         highlighted: control.highlightedIndex === index
         contentItem: Text { text: parent.text; font: parent.font; color: Theme.text; verticalAlignment: Text.AlignVCenter; wrapMode: Text.Wrap }

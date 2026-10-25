@@ -70,6 +70,7 @@ ApplicationWindow {
                         MenuSeparator {}
                         UiMenuItem { action: importAction }
                         MenuSeparator {}
+                        UiMenuItem { objectName:"inspectionReportFolder"; text:"Open inspection report folder"; enabled:!!workspace.inspectionExport.state.path && !workspace.inspectionExport.state.busy; onTriggered:workspace.inspectionExport.showFolder() }
                         UiMenuItem { objectName:"exportInspectionMenu"; text:"Export inspection report…"; enabled:!workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered:{ viewport.storeCamera(); reportDialog.open(); } }
                     }
                     UiMenu {
@@ -81,9 +82,22 @@ ApplicationWindow {
                         MenuSeparator {}
                         UiMenuItem { objectName: "preferencesMenu"; text: "Preferences…"; enabled: !window.modalOpen && !workspace.state.editing; onTriggered: preferencesDialog.open() }
                     }
-                    UiMenu { title: "Create"; UiMenuItem { action: tissueAction } }
+                    UiMenu {
+                        title:"Create"
+                        UiMenuItem { text:"Primitive…"; onTriggered:createMenu.popup() }
+                        UiMenuItem { text:"Point at cursor"; onTriggered:workspace.createPoint() }
+                        UiMenuItem { text:"Curve at cursor"; onTriggered:workspace.drawingTools.addCurve() }
+                        UiMenuItem { text:"Place curve points"; onTriggered:workspace.drawingTools.begin("POINTS") }
+                        UiMenuItem { text:"Place branched points"; onTriggered:workspace.drawingTools.begin("BRANCH") }
+                        UiMenuItem { text:"Draw curve"; onTriggered:workspace.drawingTools.begin("DRAW") }
+                        UiMenuItem { text:"Place Fiber on surfaces"; onTriggered:workspace.drawingTools.begin("FIBER") }
+                        UiMenuItem { text:"Surface from selection"; enabled:workspace.surfaceAction.enabled; onTriggered:workspace.createSurface("AUTO") }
+                        UiMenuItem { action:tissueAction }
+                        UiMenuItem { text:"Reference image…"; onTriggered:imageFile.request("",viewport.imageAlignmentAxis) }
+                    }
                     UiMenu {
                         title: "View"
+                        UiMenuItem { objectName:"focusEditorMenu"; text:"Focus editor"; checkable:true; checked:workbench.focusEditor; onTriggered:workbench.setFocusEditor(checked) }
                         UiMenuItem { text: "Frame selected"; shortcutHint: "F"; onTriggered: workspace.frameSelection() }
                         UiMenuItem { objectName: "restoreViewMenu"; text: "Restore view"; shortcutHint: keyboard.shortcut("restoreView"); enabled: viewport.canRestoreView; onTriggered: viewport.restoreView() }
                         UiMenuItem { text: "Orthographic"; checkable: true; checked: viewport.orthographic; onTriggered: viewport.orthographic = checked }
@@ -104,38 +118,18 @@ ApplicationWindow {
                         UiMenuItem { text: "Navigation and shortcuts"; onTriggered: helpDialog.open() }
                     }
                 }
-                Item { Layout.fillWidth: true }
+                Label { text:workspace.documentName; color:Theme.muted; Layout.fillWidth:true; horizontalAlignment:Text.AlignRight; elide:Text.ElideMiddle }
                 ProfileStatus { keyboard: window.keyboardManager }
-                Label { text: "Workspace"; color: Theme.muted; font.pixelSize: 11 }
-                WorkspaceSelector { Layout.preferredWidth: 175 }
-                UiButton { objectName: "manageWorkspace"; text: "Manage…"; enabled: !workspace.state.waiting && !workspace.state.editing; onClicked: workspaceManager.open() }
-                UiButton { objectName: "focusSelection"; text: "Focus"; hint: "Focus selected anatomy and descendants"; enabled: !!workspace.selectedId && !workspace.selectedData.is_construction && !workspace.selectedData.is_control && !workspace.state.waiting; onClicked: workspace.focusSelection() }
-            }
-        }
-        Rectangle {
-            Layout.fillWidth: true; implicitHeight: 42; color: Theme.panel
-            RowLayout {
-                anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10; spacing: 6
-                UiButton { objectName: "createPrimitive"; text: "Create Primitive"; glyph: "plus"; primary: true; enabled: !workspace.state.waiting; onClicked: createMenu.popup() }
-                UiButton { objectName: "createTissueToolbar"; action: tissueAction; glyph: "plus" }
-                UiButton { action: saveAction; glyph: "save"; hint: "Save project (Ctrl+S)" }
-                Rectangle { Layout.leftMargin: 6; Layout.rightMargin: 6; implicitWidth: 1; implicitHeight: 20; color: Theme.border }
-                UiButton { glyph: "undo"; hint: "Undo (Ctrl+Z)"; enabled: undoAction.enabled; onClicked: undoAction.trigger() }
-                UiButton { glyph: "redo"; hint: "Redo (Ctrl+Y)"; enabled: redoAction.enabled; onClicked: redoAction.trigger() }
-                Item { Layout.fillWidth: true }
-                UiCheck { text: "Attachments"; checked: workspace.state.attachments; enabled: !workspace.state.waiting; onClicked: workspace.run("attachments.enable",{enabled:checked}) }
-                Rectangle { implicitWidth: 1; implicitHeight: 20; color: Theme.border; Layout.leftMargin: 8; Layout.rightMargin: 8 }
-                Label { text: "Update"; color: Theme.muted }
-                UiCombo { implicitWidth: 112; model: ["Live","On release","Manual"]; currentIndex: Math.max(0,["LIVE","ON_RELEASE","MANUAL"].indexOf(workspace.state.mode)); hint: "When dependent geometry is recalculated"; onActivated: workspace.run("update_mode",{mode:["LIVE","ON_RELEASE","MANUAL"][currentIndex]}) }
-                UiButton { text: "Recalculate"; hint: "Update pending dependent geometry"; enabled: !workspace.state.waiting; onClicked: workspace.run("evaluate",{}) }
             }
         }
     }
     SplitView {
         id: panels; anchors.fill: parent; orientation: Qt.Horizontal
+        onResizingChanged: if(!resizing && navigationPane.visible) workbench.savePanes(navigationPane.width,inspectorPane.width)
         handle: Rectangle { implicitWidth: 4; color: SplitHandle.hovered || SplitHandle.pressed ? Theme.accent : "#1b1c1f" }
         Rectangle {
-            SplitView.preferredWidth: 240; SplitView.minimumWidth: 195; SplitView.maximumWidth: 440
+            id:navigationPane; visible:!workbench.focusEditor
+            SplitView.preferredWidth: workbench.paneWidth("navigation",210); SplitView.minimumWidth: 195; SplitView.maximumWidth: 440
             color: Theme.panel
             ObjectBrowser {
                 anchors.fill: parent; anchors.margins: Theme.inset; keyboard: window.keyboardManager
@@ -144,24 +138,19 @@ ApplicationWindow {
         }
         ColumnLayout {
             SplitView.fillWidth: true; SplitView.minimumWidth: 300; spacing: 0
-            Rectangle {
-                Layout.fillWidth: true; implicitHeight: 33; color: Theme.header
-                RowLayout {
-                    anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 6; spacing: 6
-                    Label { text: "3D VIEWPORT"; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1; Layout.fillWidth: true }
-                    UiButton { objectName: "addWorldImage"; glyph: "image"; flatStyle: true; hint: "Import a world reference image"+(viewport.imageAlignmentAxis ? " · "+viewport.imageAlignmentAxis+" alignment" : ""); enabled: !workspace.state.waiting && !workspace.state.editing; onClicked: imageFile.request("",viewport.imageAlignmentAxis) }
-                    UiButton { text: viewport.orthographic ? "Orthographic" : "Perspective"; flatStyle: true; hint: "Toggle perspective / orthographic projection (5)"; onClicked: viewport.orthographic = !viewport.orthographic }
-                    UiButton { glyph: "frame"; flatStyle: true; hint: "Frame selected (F)"; onClicked: workspace.frameSelection() }
-                    UiButton { text: "Overlays"; flatStyle: true; onClicked: overlays.open() }
-                }
+            ViewportHeader {
+                viewport:viewport; Layout.fillWidth:true
+                onManageRequested:workspaceManager.open()
+                onImageRequested:imageFile.request("",viewport.imageAlignmentAxis)
+                onOverlaysRequested:overlays.open()
             }
             Item {
                 Layout.fillWidth: true; Layout.fillHeight: true
                 Viewport { id: viewport; objectName: "viewport"; anchors.fill: parent; toolMode: window.activeTool; keyboard: keyboard; onImportRequested: importFile.open() }
-                Item {
-                    anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 10
-                    width: viewportTools.width; height: viewportTools.height
-                    MouseArea { anchors.fill: parent; acceptedButtons: Qt.AllButtons }
+                UiScrollView {
+                    anchors.left:parent.left; anchors.top:parent.top; anchors.bottom:parent.bottom; anchors.margins:8
+                    width:50; contentHeight:viewportTools.height; contentWidth:34
+                    ScrollBar.horizontal.policy:ScrollBar.AlwaysOff
                     Column {
                         id: viewportTools; spacing: 5
                         Repeater {
@@ -170,39 +159,25 @@ ApplicationWindow {
                         }
                         Rectangle { width: 34; height: 1; color: Theme.border }
                         CurveToolbar { keyboard: window.keyboardManager }
+                        Rectangle { width:34; height:1; color:Theme.border }
+                        UiButton { objectName:"createPrimitive"; width:34; height:34; glyph:"plus"; hint:"Create primitive"; enabled:!workspace.state.waiting; onClicked:createMenu.popup() }
+                        UiButton { objectName:"createTissueToolbar"; width:34; height:34; glyph:"mesh"; hint:"Create tissue from selected construction"; enabled:tissueAction.enabled; onClicked:tissueAction.trigger() }
                     }
-                }
-            }
-            Rectangle {
-                Layout.fillWidth: true; implicitHeight: 30; color: Theme.header
-                RowLayout {
-                    anchors.fill: parent; anchors.leftMargin: 7; anchors.rightMargin: 8
-                    UiButton { objectName: "activityToggle"; flatStyle: true; text: (window.activityOpen ? "▾" : "▸") + "  Activity"; onClicked: { window.activityOpen = !window.activityOpen; if(window.activityOpen) window.issuesOpen = false; } }
-                    UiButton { objectName: "issuesToggle"; flatStyle: true; text: (window.issuesOpen ? "▾" : "▸") + "  Issues ("+(workspace.issuePanel.state.count || 0)+")"; hint: workspace.issuePanel.state.summary || "Issue reporting"; onClicked: { window.issuesOpen = !window.issuesOpen; if(window.issuesOpen) window.activityOpen = false; } }
-                    Label { text: window.activeJobCount ? window.activeJobCount + " jobs in progress" : window.jobFailed ? "A calculation failed · open Activity" : "Up to date"; color: window.jobFailed ? Theme.danger : window.activeJobCount ? Theme.accent : Theme.muted; font.pixelSize: 11; Layout.fillWidth: true; elide: Text.ElideRight }
-                    Label { text: workspace.state.object_count + " objects · "+workspace.state.display_units; color: Theme.muted; font.pixelSize: 11 }
                 }
             }
             Rectangle { Layout.fillWidth: true; implicitHeight: window.activityOpen ? 160 : 0; visible: window.activityOpen; color: Theme.panel; Activity { anchors.fill: parent; anchors.margins: 10 } }
             Rectangle { Layout.fillWidth: true; implicitHeight: window.issuesOpen ? 290 : 0; visible: window.issuesOpen; color: Theme.panel; Issues { anchors.fill: parent; anchors.margins: 10 } }
         }
         Rectangle {
-            SplitView.preferredWidth: 310; SplitView.minimumWidth: 280; SplitView.maximumWidth: 500
+            id:inspectorPane
+            SplitView.preferredWidth: workbench.paneWidth("inspector",330); SplitView.minimumWidth: 280; SplitView.maximumWidth: 500
             color: Theme.panel
             ColumnLayout {
                 anchors.fill: parent; spacing: 0
-                Rectangle {
-                    id: inspectorHeader; objectName: "inspectorHeader"; property bool shortcuts: false
-                    Connections { target: workspace.shortcutPanel; function onRevealRequested() { inspectorHeader.shortcuts=true; } }
-                    Layout.fillWidth: true; implicitHeight: 33; color: Theme.header
-                    RowLayout {
-                        anchors.fill: parent; anchors.leftMargin: 8; anchors.rightMargin: 8
-                        Label { text: inspectorHeader.shortcuts ? "SHORTCUTS" : "PROPERTIES"; Layout.fillWidth: true; color: Theme.muted; font.pixelSize: 10; font.letterSpacing: 1 }
-                        UiButton { text: inspectorHeader.shortcuts ? "Properties" : "Shortcuts"; flatStyle: true; onClicked: inspectorHeader.shortcuts=!inspectorHeader.shortcuts }
-                    }
-                }
+                InspectorHeader { id:inspectorHeader }
                 Shortcuts { objectName: "shortcutPanel"; visible: inspectorHeader.shortcuts && !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset }
-                Inspector { id: inspector; objectName: "inspector"; visible: !inspectorHeader.shortcuts && !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity); onImageRequested: parentId => imageFile.request(parentId,viewport.imageAlignmentAxis) }
+                Inspector { category:inspectorHeader.category; id: inspector; objectName: "inspector"; visible: inspectorHeader.page==="Shape" && !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity); onImageRequested: parentId => imageFile.request(parentId,viewport.imageAlignmentAxis) }
+                InspectionPane { objectName:"inspectionPane"; visible:inspectorHeader.page==="Inspect" && !workspace.drawingTools.state.active; Layout.fillWidth:true; Layout.fillHeight:true; Layout.margins:Theme.inset }
                 UiScrollView {
                     id: drawingSettings; visible: workspace.drawingTools.state.active
                     Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; contentWidth: availableWidth
@@ -211,17 +186,7 @@ ApplicationWindow {
             }
         }
     }
-    footer: Rectangle {
-        color: "#25262a"; implicitHeight: 25
-        RowLayout {
-            anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10; spacing: 12
-            Rectangle { implicitWidth: 6; implicitHeight: 6; radius: 3; color: workspace.state.blocked ? Theme.accent : Theme.success }
-            Label { text: workspace.state.message || "Middle/right drag: orbit   ·   Shift-drag: pan   ·   Wheel: zoom"; color: Theme.muted; font.pixelSize: 11; elide: Text.ElideRight; Layout.fillWidth: true }
-            UiButton { enabled: !!workspace.state.message; flatStyle: true; text: "Details"; implicitHeight: 22; onClicked: messageDialog.open() }
-            UiButton { text: "Report folder"; enabled: !!workspace.inspectionExport.state.path && !workspace.inspectionExport.state.busy; implicitHeight: 22; onClicked: workspace.inspectionExport.showFolder() }
-            Label { text: "Rev " + workspace.state.revision + (workspace.state.dirty ? " · Unsaved" : " · Saved"); color: workspace.state.dirty ? Theme.accent : Theme.muted; font.pixelSize: 11 }
-        }
-    }
+    footer: WorkbenchStatus { windowState:window; onDetailsRequested:messageDialog.open() }
     UiNotice { text: workspace.state.message || "" }
     ToastOverlay {}
     UiMenu {

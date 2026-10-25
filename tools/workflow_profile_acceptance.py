@@ -8,6 +8,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from shiboken6 import delete
 from snap_drag_diagnostic import fixture
+from ui_acceptance import click
 
 from anthroforge.desktop.app import create_engine, open_controller
 from anthroforge.desktop.qt_profiler import QtProfiler, profiler_application
@@ -30,9 +31,10 @@ def trials(controller, window):
 
 
 def prepare(window, opened):
+    click(window, "inspectTab" if opened else "shapeTab")
     panel = acceptance.find(window, "dependencyInspector")
     panel.setProperty("expanded", opened)
-    inspector = acceptance.find(window, "inspector")
+    inspector = acceptance.find(window, "inspectionPane")
     QTest.qWait(100)
     inspector.property("contentItem").setProperty("contentY", panel.y() if opened else 0)
     QTest.qWait(100)

@@ -9,9 +9,9 @@ UiSection {
     readonly property var settings: item.relaxation || ({})
     readonly property bool active: supported && settings.mode !== "NONE"
     title: "Relaxation"; expanded: false
-    hint: "Geometric applies the source's sag model. Static PBD solves shape and volume constraints. Neither is animation or physical contact."
+    hint: "Let tissue sag while retaining its shape. Geometric uses a direct deformation; Static PBD iterates shape and volume constraints. This does not simulate animation or contact."
     function change(key,value) { const changes={}; changes[key]=value; workspace.run("tissue.relaxation",{target:item.id,changes:changes}); }
-    UiCombo { objectName: "tissueRelaxationMode"; Layout.fillWidth: true; model: panel.supported ? ["NONE","GEOMETRIC","STATIC_PBD"] : ["NONE"]; currentIndex: Math.max(0,model.indexOf(panel.settings.mode)); onActivated: panel.change("mode",currentText) }
+    UiCombo { enumLabels:true; objectName: "tissueRelaxationMode"; Layout.fillWidth: true; model: panel.supported ? ["NONE","GEOMETRIC","STATIC_PBD"] : ["NONE"]; currentIndex: Math.max(0,model.indexOf(panel.settings.mode)); onActivated: panel.change("mode",currentText) }
     Label { visible: !panel.supported; text: "Muscle inflation uses height smoothing."; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
     ColumnLayout {
         visible: panel.active; Layout.fillWidth: true; spacing: Theme.gap

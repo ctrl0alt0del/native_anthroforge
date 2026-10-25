@@ -47,6 +47,10 @@ AF_API uint64_t af_path_control_deform(uint64_t current,uint64_t opening,uint64_
 /* Render-only closing vertex; bounded chunks share one boundary vertex. */
 AF_API int af_path_chunk(uint64_t handle, int chunk, const float** data, int* count);
 AF_API int af_path_chunk_count(uint64_t handle);
+/* Render-only capped world-space tube. Radius does not inherit transform scale.
+ * Returns an ordinary owned mesh with prepared render buffers and picking tree. */
+AF_API uint64_t af_path_display_tube(uint64_t handle,const double* matrix,
+    double radius,int sides,uint64_t cancel);
 /* One nearest segment hit per path: input index, ray distance, segment, XYZ. */
 AF_API int af_paths_pick(int count, const uint64_t* paths, const double* matrices,
     const double* origin, const double* direction, double radius, double* output);

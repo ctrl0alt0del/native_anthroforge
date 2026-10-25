@@ -25,6 +25,7 @@ Column {
         Text { anchors.right: parent.right; anchors.bottom: parent.bottom; anchors.margins: 2; text: "▾"; color: Theme.muted; font.pixelSize: 8 }
     }
     UiButton { objectName: "drawCurve"; width: 34; height: 34; glyph: "curve-draw"; checked: toolbar.tool.state.mode==="DRAW"; hint: "Draw Curve · Release to finish a stroke"; onClicked: checked ? toolbar.tool.cancel() : toolbar.tool.begin("DRAW") }
+    UiButton { objectName: "placeFiberPoints"; width: 34; height: 34; glyph: "fiber-add"; checked: toolbar.tool.state.mode==="FIBER"; hint: "Place Fiber on surfaces · "+toolbar.keyboard.modifierName("continuePlacement")+" + click to continue; plain click finishes from point 2"; onClicked: checked ? toolbar.tool.cancel() : toolbar.tool.begin("FIBER") }
     UiButton { objectName: "placeCursor"; width: 34; height: 34; glyph: "cursor"; checked: toolbar.tool.state.mode==="CURSOR"; hint: "3D cursor · Surface placement and numeric settings"; onClicked: checked ? toolbar.tool.cancel() : toolbar.tool.begin("CURSOR") }
     UiButton { objectName: "createPatchSurface"; width: 34; height: 34; glyph: "patch"; hint: workspace.surfaceAction.hint; enabled: workspace.surfaceAction.enabled; onClicked: workspace.createSurface("AUTO") }
 }

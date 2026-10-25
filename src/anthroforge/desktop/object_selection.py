@@ -19,3 +19,6 @@ class ObjectSelection:
 
     def retain(self, identities):
         self.items = [key for key in self.items if key in identities]
+
+    def replace(self, identities):
+        self.items = list(dict.fromkeys(key for key in identities if key))

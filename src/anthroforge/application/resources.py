@@ -66,6 +66,11 @@ def referenced(document: Document) -> dict[str, set[str]]:
         for b in context.bindings
         if b.attachment.material_asset
     )
+    result["meshes"].update(
+        c.anchor.material_asset
+        for c in document.shortcut_edits
+        if c.anchor and c.anchor.material_asset
+    )
     return result
 
 

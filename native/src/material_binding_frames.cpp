@@ -96,3 +96,18 @@ int af_attachment_blend_frames(int count,const double* frames,const double* weig
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_material_binding_validate(uint64_t reference,uint64_t current,const double* world,
+    int count,const double* records,int* valid,uint64_t cancel) {
+    try {
+        if(count<1||count>1000000||!records||!valid) throw std::runtime_error("Invalid material validation buffers.");
+        af::check_cancel(cancel); std::vector<double> frames(size_t(count)*16);
+        if(!af_material_binding_frames(reference,current,world,count,records,frames.data(),cancel)) {
+            std::fill_n(valid,count,1); return 0;
+        }
+        for(int i=0;i<count;++i) {
+            af::check_cancel(cancel);
+            valid[i]=!af_material_binding_frames(reference,current,world,1,records+28*i,frames.data(),cancel);
+        }
+        af::check_cancel(cancel); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}

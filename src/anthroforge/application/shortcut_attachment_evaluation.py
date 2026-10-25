@@ -82,10 +82,15 @@ def backsolve(engine: Any, lookup: Any, context: Any, meshes: Any, document: Any
     parent = lookup[child.parent]
     frame = scp_surface_parents.frame(document, child) if child.attachment.parent_instance else None
     parent = reflected_parent(engine, child, parent, frame)
-    anchor = context.anchor
-    retained = (anchor.mode, anchor.index, anchor.fallback, anchor.parent_local)
-    matrix = shortcut_attachments.backsolve(engine, child, parent, meshes, retained)
+    matrix = backsolve_matrix(engine, child, parent, meshes, context.anchor)
     lookup[child.id] = replace(child, matrix=matrix, status="ready", error="")
+
+
+def backsolve_matrix(engine: Any, child: Any, parent: Any, meshes: Any, anchor: Any) -> Any:
+    if anchor.material_asset:
+        return shortcut_attachments.material_backsolve(engine, child, parent, meshes, anchor)
+    retained = (anchor.mode, anchor.index, anchor.fallback, anchor.parent_local)
+    return shortcut_attachments.backsolve(engine, child, parent, meshes, retained)
 
 
 def restore(document: Any, entities: list[Any], targets: set[str]) -> list[Any]:

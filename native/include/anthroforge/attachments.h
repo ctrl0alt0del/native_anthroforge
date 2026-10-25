@@ -31,6 +31,9 @@ AF_API uint64_t af_mesh_triangle_source_restore(uint64_t source,const double* va
 AF_API int af_mesh_basis_copy(uint64_t source,int64_t* records,int64_t count,double* parameters,int64_t size);
 AF_API uint64_t af_mesh_basis_restore(uint64_t source,const int64_t* records,int64_t count,const double* parameters,int64_t size,uint64_t cancel);
 AF_API int af_material_binding_frames(uint64_t reference,uint64_t current,const double* world,int count,const double* records,double* frames,uint64_t cancel);
+/* Read-only advisory validation: one validity flag per record; invalid records do not abort peers. */
+AF_API int af_material_binding_validate(uint64_t reference,uint64_t current,const double* world,
+    int count,const double* records,int* valid,uint64_t cancel);
 AF_API int af_attachment_blend_frames(int count,const double* frames,const double* weights,double* points,uint64_t cancel);
 /* Dense path nodes followed by knot/left/right controls; two weighted influences per row. */
 AF_API int af_curve_attachment_capture(int surfaces,const uint64_t* meshes,const double* frames,
@@ -49,6 +52,13 @@ AF_API int af_shortcut_owner_anchor(uint64_t child,const double* world,const dou
     const double* offset,int mode,int index,const double* fallback,double* parent_local);
 AF_API int af_shortcut_owner_backsolve(uint64_t child,const double* world,const double* parent,
     const double* offset,int mode,int index,const double* fallback,const double* parent_local,double* output);
+/* Retained material anchors survive Boolean remeshing without face-index reassignment. */
+AF_API int af_shortcut_owner_material_capture(uint64_t child,const double* world,const double* offset,
+    int mode,int index,const double* fallback,double* output);
+AF_API int af_shortcut_owner_material_backsolve(uint64_t reference,uint64_t current,const double* world,
+    const double* parent,const double* offset,const double* record,const double* target,double* output);
+/* Migration retains a source polygon anchor in child-local coordinates without moving its pose. */
+AF_API int af_shortcut_retain_child_anchor(const double* world,const double* record,const double* local,double* output);
 /* Restore unedited structural pins against their own retained material surface snapshots. */
 AF_API int af_attachment_retain_pins(uint64_t path,int knots,const int* pins,const int* targets,
     const double* records,int count,int* owners,double* weights,double* bindings);

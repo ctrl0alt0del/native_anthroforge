@@ -15,6 +15,7 @@ from . import (
     parametric_evaluation,
     path_assets,
     routing_evaluation,
+    symmetric_paths,
 )
 
 
@@ -41,9 +42,10 @@ def evaluate(
     cancel: int,
     backend: str = "CUSTOM",
     propagation: str = "SMOOTH_SHAPE",
+    cold: bool = False,
 ) -> Any:
     item = curve_sources.source(document, target)
-    return evaluate_item(engine, document, resources, item, cancel, backend, propagation)
+    return evaluate_item(engine, document, resources, item, cancel, backend, propagation, cold)
 
 
 def evaluate_item(
@@ -54,11 +56,10 @@ def evaluate_item(
     cancel: int,
     backend: str = "CUSTOM",
     propagation: str = "SMOOTH_SHAPE",
+    cold: bool = False,
 ) -> PathEvaluation:
-    from . import symmetric_paths
-
     value = resolve(engine, document, resources, item, cancel, propagation)
-    path = engine_path(engine, document, resources, value, cancel, backend)
+    path = engine_path(engine, document, resources, value, cancel, backend, cold)
     path = symmetric_paths.expand(engine, document, item, path, cancel)
     return PathEvaluation(path, value.edited, value.attachment)
 
@@ -131,12 +132,18 @@ def edited_fiber(
 
 
 def engine_path(
-    engine: Any, document: Any, resources: Any, value: ResolvedCurve, cancel: int, backend: str
+    engine: Any,
+    document: Any,
+    resources: Any,
+    value: ResolvedCurve,
+    cancel: int,
+    backend: str,
+    cold: bool = False,
 ) -> Any:
     item, resolved = value.authored, value.path
     if item.engine == "ROUTED":
         return routing_evaluation.evaluate(
-            engine, document, resources, item, cancel, resolved, backend
+            engine, document, resources, item, cancel, resolved, backend, cold
         )
     return resolved or path_assets.evaluate(engine, item, cancel)
 

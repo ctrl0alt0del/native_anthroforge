@@ -43,6 +43,8 @@ def constraint_add(
     session: Any, target: str, mask: str = "ALL", mode: str = "FIXED", **settings: Any
 ) -> str:
     item = tissue(session, target)
+    if "origin" in settings:
+        raise ValueError("Constraint provenance is managed by tissue presets.")
     row = TissueConstraint(mask=mask, mode=mode, **settings)
     require_source_constraint(row)
     install(session, replace(item, constraints=(*item.constraints, row)))
@@ -56,7 +58,7 @@ def constraint_update(session: Any, target: str, constraint: str, changes: dict[
         raise ValueError("Unknown tissue constraint.")
     if set(changes) - {"mask", "mode", "strength", "feather", "offset"}:
         raise ValueError("Use explicit rebind to change a constraint target.")
-    updated = replace(row, **changes)
+    updated = replace(row, origin="CUSTOM", **changes)
     install(
         session,
         replace(

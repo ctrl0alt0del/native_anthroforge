@@ -30,4 +30,10 @@ ColumnLayout {
         onActivated: workspace.run("fiber.binding.scope",{curve:panel.curve.id,point:panel.point.id,scope:currentIndex===1?"ANY_PARENT":"CURRENT_PARENT"})
     }
     MirrorSharing { visible: !!panel.binding; source: panel.curve.id || ""; binding: panel.point.id || "" }
+    NumericSetting {
+        objectName:"fiberPinNormalOffset"; visible:!!panel.binding?.attachment; label:"Normal Offset"; length:true
+        value:panel.binding?.attachment?.binding?.[17] || 0
+        hint:"Signed surface-normal distance at this retained material point; preserves its target"
+        onEdited:value=>workspace.run("fiber.binding.offset",{curve:panel.curve.id,point:panel.point.id,value:value})
+    }
 }

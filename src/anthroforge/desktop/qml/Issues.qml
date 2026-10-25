@@ -14,6 +14,7 @@ ColumnLayout {
         UiCombo { id: severity; objectName: "issueSeverity"; implicitWidth: 125; model: ["All severities","Errors","Warnings","Information"]; onActivated: panel.filterRows() }
         UiCheck { id: dismissed; objectName: "issueShowDismissed"; text: "Dismissed"; onClicked: panel.filterRows() }
         UiButton { objectName: "issueRecheckAll"; text: "Recheck"; hint: "Run available checks without changing geometry"; onClicked: panel.service.run("issues.recheck",{}) }
+        UiButton { objectName:"reviewAllFiberPins"; text:"Review Fiber pins"; onClicked:panel.service.reviewPins("") }
         UiButton { objectName: "issueCancelChecks"; text: "Cancel"; hint: "Cancel running checks"; enabled: !panel.service.state.complete; onClicked: panel.service.run("issues.cancel",{}) }
     }
     Label { Layout.fillWidth: true; text: panel.service.state.summary || "Not checked"; color: panel.service.state.complete ? Theme.muted : Theme.accent; elide: Text.ElideRight; ToolTip.visible: statusHover.hovered; ToolTip.text: text; HoverHandler { id: statusHover } }

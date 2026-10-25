@@ -10,6 +10,11 @@ FIELDS = ("issueId", "summary", "severity", "targetLabel", "freshness", "dismiss
 
 class IssuePanel(QObject):
     changed = Signal()
+    pinReviewRequested = Signal(str)
+
+    @Slot(str)
+    def reviewPins(self, curve):
+        self.pinReviewRequested.emit(curve)
 
     def __init__(self, controller):
         super().__init__(controller)

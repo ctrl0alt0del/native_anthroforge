@@ -2459,3 +2459,195 @@ Historical experiment record. Production integration is recorded separately in C
   offscreen Preferences and the full minimal-PATH portable suite pass. Both choices are
   exercised in the executable with profile attribution. Detailed evidence and background-
   rendering limits are recorded in [the task](tasks/fiber-propagation-methods.md).
+
+
+## Preserved 0.3.4 workflow evidence, integrated for 0.3.6
+
+The following entries retain branch-time evidence and pending statements. The old
+shoulder decision pause is superseded by the accepted welded-Ribs difference and
+[0.3.6 integration](tasks/workflows-036.md). These are historical checkpoints, not
+claims that a separate 0.3.4 release shipped. Combined qualification is recorded below.
+
+### CH-079 — explicit display capture and stale disposal (preserved 0.3.4 development)
+
+Display jobs now capture from the dispatch document and reject disappeared/replaced source
+inputs as obsolete before native work or publication. This avoids missing-resource errors
+and preserves displayed accepted geometry during replacement. Native numerical kernels and
+anatomical write contracts are unchanged. Tests cover queued deletion, supersession and
+frame-boundary picking; the aggregate suite passes 2136 tests. Production display qualification
+again retains exact source geometry, attachment records and undo across 326 Fibers. Final
+shoulder parity, corrected assembly delivery and release packaging await the Ribs decision.
+
+### CH-080 — display worker attribution qualification (preserved 0.3.4 development)
+
+Production qualification keeps source geometry/path hashes, document/attachment records
+and undo unchanged across all 326 Fiber displays. The first recording contained 326 task
+executions but only one native tube span; the library retained a raw ctypes function after
+lazy concurrent declaration. Registering display signatures during existing engine setup
+restored all 326 spans. The qualifier now rejects incomplete reports or mismatched job/call
+counts. Repeated-worker regression covers the boundary. This changes ABI registration, not
+a numerical algorithm or profiler retention. Full gate passed at cc15855; subsequent targeted
+checks pass and the aggregate suite is being rerun. Single-run native mean/max were 1.31/8.11ms;
+collector costs overlap and are not subtracted. These are not GUI-latency or speedup claims.
+
+### CH-081 — world-space Fiber presentation tubes (preserved 0.3.4 development)
+
+Fixed pixel-width centerlines had no independent Fiber thickness. Positive-radius Fiber
+display now builds capped 12-sided tubes around transformed accepted paths in native
+read-only coordinator work. Transform scale cannot scale the world radius. Prepared render
+buffers, bounds and exact picking share one staged mesh. The numerical path, attachment
+field and routing clearance are untouched. One accepted mesh per visible Fiber is retained;
+current/staging leases and cache ownership appear in profiler reports. Radius is saved
+per workspace without anatomical history or geometry invalidation. Tests cover reflected
+and nonuniform transforms, closure, persistence, supersession and frame-boundary picking.
+Texture-only Windows rendering (no visible window) shows 5/33 pixel widths for .005/.04 m;
+the shapes were inspected. Assembly cost, full gate and release qualification are pending.
+
+### CH-082 — atomic surface-click Fiber construction (preserved 0.3.4 development)
+
+Quick creation composes existing confirmed attachment capture and native routing on an
+owned worker snapshot. A provisional seed never enters document history; the first accepted
+output is already routed. Every point retains its explicitly clicked surface. Capture and
+routing estimates compose in one coordinator policy; dispatch snapshots include preferences.
+No routing, blending or exterior-placement numerical kernel changed. Headless and desktop
+tests verify obstacle avoidance, explicit targets, cancellation, selection and one-action
+undo. Full offscreen QML toolbar acceptance passes; interactive shapes remain unqualified.
+
+### CH-083 — reviewed tissue retarget and complete-bundle fan-out (preserved 0.3.4 development)
+
+Tissue source changes now evaluate existing native phases on an owned read-only snapshot.
+Capabilities propose explicit incompatible setting/field/region changes; approved results
+publish together. Ready bundle fan-out excludes prepared outputs while marking/scheduling
+consumers, preserving update modes and the single coordinator. Tests verify that applying
+a completed tissue candidate does not recompute its own base/rest/intrinsic/plan/final.
+No inflation, relaxation, stacking or confirmed-placement numerical kernel was replaced.
+
+A pending Manual Fiber retarget failed because fixed-parent edits declared every potential
+tissue candidate, including an unused consumer. Core support selection is now shared with
+capture: fixed searches declare selected supports/parents; actual Any-parent searches
+retain the complete candidate read set. Existing accepted supports remain dependencies.
+Tests cover the observed false-cycle case, accepted Manual provenance and complete reads
+for Any-parent searches. Ordinary Fiber edit/support tests retain geometry behavior.
+Headless roundtrip/undo and offscreen source/review workflows pass; assembly, performance
+and full release qualification remain pending.
+
+### CH-084 — reviewed imported-source replacement (preserved 0.3.4 development)
+
+Replacement assessment now evaluates owned candidate geometry and proposed captures on a
+read-only worker snapshot. A native comparison of canonical polygon indices/offsets,
+independent of coordinates/tessellation, determines indexed correspondence. Lost mappings
+require explicit review; matching counts alone are not accepted. Existing confirmed
+placement/capture kernels prepare SCP, Anchor, Fiber and target-region changes; inflation
+and attachment propagation algorithms are unchanged. Fiber pin retention is explicitly
+superseded only for approved recapture, keeping original targets and scope preferences.
+Prepared records publish together, avoiding a second ordinary edit-preparation pass.
+Initial headless cases cover same-source identity/undo, changed topology approval, child
+pose, shared control retention, Anchor/Fiber rebinding and stale rejection. Desktop and
+broader assembly/lifecycle qualification remain pending.
+
+### CH-085 — explicit preset ownership for tissue resets (preserved 0.3.4 development)
+
+Applying defaults to existing tissue now resets authored inflation/relaxation and only
+explicitly preset-owned constraints. Numerical inflation/relaxation kernels are unchanged.
+User region edits and rebindings promote provenance to Custom; legacy untagged rows stay
+Custom. Custom fields, source, crop and stacking are preserved. Incompatible field-layout
+or capability changes reject rather than silently dropping data or selecting a different
+algorithm. Preset and custom-weight roundtrip/undo tests and the offscreen inspector
+chooser passed; full-release and broad assembly qualification remain pending.
+
+### CH-086 — native connected-guide extraction (preserved 0.3.4 development)
+
+SCP splitting now resolves Bezier handles on the complete source before separating open
+segments, preserving positions instead of recomputing endpoint auto handles on truncated
+neighbors. Native minimum-twist frame comparison supplies a constant tilt compensation
+for each later segment. One shared Hook per joint drives both endpoint triples.
+This is authoring segmentation, not mesh baking or imported-geometry fallback. Original
+body sampling and deformation kernels are retained. Native guide position/roll tests,
+moving-Hook endpoint coincidence and a plot of actual mesh triangles were checked on a
+curved box fixture. New segment curves start without copied accepted-result provenance.
+Broader assembly/parity and interactive viewport acceptance remain pending.
+
+### CH-087 — active native routing objective and checkpoints (preserved 0.3.4 development)
+
+Routing previously hardcoded length weight .9 and stepped one solver trial per native
+checkpoint. Typed settings now configure the length objective and its regularization/
+penalty preparation in both Custom and PIQP. Checkpoint trial quantum is independent
+of the total accepted-step budget. Defaults and original ABI behavior are preserved.
+Inspection retains every trial; production reports checkpoint count in measure 5.
+No collision check, pin constraint, publication rule or solver cap was relaxed.
+Snapped-cube 128-point Fiber: quantum 1/4 produces identical geometry and counters;
+weight 0/.9 changes paths in both backends and retains independently checked clearance.
+67 focused routing, parity, warm-start, inspection and architecture tests pass.
+No preview, speedup or full-release qualification is inferred from these tests.
+
+
+### CH-088 — advisory material-pin assessment and cold routing (preserved 0.3.4 development)
+
+Pin repair previously required manual point-by-point recapture. On-demand Issues now
+validate retained material records natively in batches; a failed batch isolates invalid
+records inside C++, retaining peer results and cancellation. Proposed current-position
+rebindings use the existing qualified capture service, without changing authored state.
+Approved batches revalidate source fingerprints and commit atomically through existing
+curve capture/publication and Issues verification. Tests cover unchanged assessment
+state, shape-preserving repair and stale rejection; offscreen modal controls passed.
+
+Warm reuse previously could only be bypassed in read-only inspection. Explicit cold
+routing now passes runtime execution intent through ordinary path jobs; normal settings
+and accepted output remain intact. A saved use_warm_start setting controls future jobs.
+Curve/Fiber tests verify warm/cold inputs and accepted publication. Native routing
+objectives/collision checks are unchanged. Profiler spans record cold_start.
+
+
+### CH-089 — authored material-normal pin edits (preserved 0.3.4 development)
+
+Existing point dragging uses explicit nearest recapture; that is unsuitable for a
+Normal Offset edit that must retain material identity. New offset intents update the
+record's signed normal component, resolve batched material frames in the worker and
+place authored controls/handles through native af_curve_place_points before existing
+path evaluation. No nearest reassignment, Python numerical fallback, or UI-thread
+material query is introduced. Ordinary point edits supersede pending offset intents.
+Tests cover retained reference, immediate path movement, undo, Manual save/open and
+Rebind All shape/target preservation. Offscreen desktop control activation passed.
+Full profiler/release qualification remains pending.
+
+
+### CH-090 — retained shortcut owner material anchors (preserved 0.3.4 development)
+
+Previously owner backsolve reread a current face/vertex index; Boolean remeshing can
+reuse that index for a different material patch. Pending edit contexts now retain
+the reference geometry asset and native material binding. Resolution uses existing
+material charts, Boolean provenance and exterior following, then translation only.
+Inflation, smoothing and Boolean algorithms are unchanged. Resource ownership retains
+the reference through pending contexts and historical saves.
+
+The remeshed Segment Chain regression in tests/test_shortcut_owner_material.py
+verifies the material point stays fixed and differs from the old face-index result.
+Existing shortcut transaction tests pass. Original Thumb and shoulder parity remain
+unqualified. Migration now captures effective legacy Backsolve policy rather than
+the raw unset flag; standalone defaults remain off.
+
+### CH-091 — Integrate audited workflows with strict mirrors and propagation (0.3.6)
+
+- Previous branch boundaries predated strict mirror references and selectable Fiber
+  propagation. Tube display had no instance projection; repaired pins omitted instance
+  identity; generic review validity assumed all output owners were authored objects.
+- New: source tube jobs remain read-only and world-space. Mirror rows reuse the exact
+  same native handle through the reflection frame; both publish together and native
+  picking consumes displayed frames. QML receives list-valued matrices. Saved captures
+  await display preparation before staging rather than omitting unfinished tubes.
+- Complete surface references survive pin proposals and repair. Generic previews accept
+  mirror output aliases but still reject changed planes/revisions. Cold routing and quick
+  Fiber creation preserve dispatch-time backend/propagation preferences. No routing,
+  inflation, smoothing, attachment objective or source geometry kernel was replaced.
+- Evidence: full development gate at the integration checkpoint passes 2,220 tests and
+  five native CTests. The final aggregate passes 2,222 tests, including mirror
+  repair/review/capture regressions. The full packaged minimal-PATH suite passes;
+  qualification is tracked in [the task](tasks/workflows-036.md).
+  Actual hidden GPU tubes, radius differences and source/mirror picks were inspected.
+- Production assembly geometry hashes before/after Ribs=3 and stored attachments exactly
+  match prior smooth-propagation evidence. Both propagation methods pass history/reopen.
+  Display profiling accounts for all 326 native tube calls without changing source
+  buffers or history. Timings include uncontrolled background load, not an FPS claim.
+- Preserved: one coordinator, resource leases, exact material references, read-only
+  mirrors, stale rejection, Manual provenance, undo/save policy and welded-Ribs choice.
+  No source-project migration or exact shoulder-addon equivalence is claimed.

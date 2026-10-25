@@ -126,7 +126,7 @@ def path_rows(controller, originals):
     values = list(originals)
     paths = controller.session.resources.paths
     for row in controller.mirror_records.values():
-        if row.get("asset") not in paths or not row["visible"]:
+        if row.get("asset") not in paths or not row["visible"] or row.get("fiber_radius", 0):
             continue
         path = paths[row["asset"]].path
         values.extend(path_record(row, path, i) for i in range(path.chunks))
@@ -144,6 +144,20 @@ def path_record(row, path, chunk):
         geometry_asset=row["asset"],
         key=f"{row['id']}:{row['asset']}:{chunk}",
     )
+
+
+def fiber_rows(controller, originals):
+    rows = []
+    instances = controller.session.document.mirrors.instances.values()
+    by_source = {}
+    for instance in instances:
+        by_source.setdefault(instance.source, []).append(instance)
+    for row in originals:
+        rows.append(dict(row, visible=presented(controller, row)))
+        for instance in by_source.get(row["id"], ()):
+            mirror = reflected(controller, row, instance)
+            rows.append(dict(mirror, key=row["key"] + ":" + instance.id))
+    return rows
 
 
 def previews(controller, rows, target):

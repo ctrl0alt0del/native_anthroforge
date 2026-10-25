@@ -46,9 +46,7 @@ def unlink(session: Any, target: str, constraint: str) -> None:
     from .tissue_strategy_operations import install
 
     item = tissue(session, target)
-    row = replace(
-        selected(item, constraint), reference=None, material_asset="", binding_asset="", topology=""
-    )
+    row = unbound_region(selected(item, constraint))
     install(
         session,
         replace(
@@ -138,8 +136,20 @@ def merge(document: Any, spec: Capture, row: Any) -> Any:
         name: getattr(row, name)
         for name in ("reference", "material_asset", "binding_asset", "topology")
     }
-    rows = tuple(replace(r, **values) if r.id == row.id else r for r in item.constraints)
+    rows = bound_rows(item, row, values)
     updated = object_revisions.authored(item, replace(item, constraints=rows))
     return replace(
         document, objects=tuple(updated if o.id == item.id else o for o in document.objects)
+    )
+
+
+def bound_rows(item: Any, row: Any, values: Any) -> Any:
+    return tuple(
+        replace(r, origin="CUSTOM", **values) if r.id == row.id else r for r in item.constraints
+    )
+
+
+def unbound_region(row: Any) -> Any:
+    return replace(
+        row, origin="CUSTOM", reference=None, material_asset="", binding_asset="", topology=""
     )

@@ -50,6 +50,10 @@ def retry(session: "Session", issue: Issue) -> tuple[str, ...]:
     return tuple(session.scheduler.registry.by_id.keys() - previous)
 
 
+def rebind_pin(session: "Session", issue: Issue) -> tuple[str, ...]:
+    return tuple(session.command("fiber.pins.repair", identities=[issue.id]))
+
+
 def register(session: "Session") -> None:
     resolution = session.issues.resolution
     codes = ("EVALUATION_FAILED", "OUTPUT_PENDING", "UPSTREAM_PENDING")
@@ -61,6 +65,19 @@ def register(session: "Session") -> None:
         resolution.register(
             Solver(name, label, kinds, partial(applicable, session), partial(invoke, session))
         )
+    register_pin(session)
+
+
+def register_pin(session: "Session") -> None:
+    session.issues.resolution.register(
+        Solver(
+            "pin_rebind",
+            "Apply proposed pin repair",
+            ("FIBER_PIN_REPAIR_AVAILABLE",),
+            partial(can_evaluate, session),
+            partial(rebind_pin, session),
+        )
+    )
 
 
 def tick(session: "Session") -> None:

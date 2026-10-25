@@ -1,8 +1,32 @@
 # AnthroForge development validation
 
-Current release qualification is in [mirroring](tasks/mirroring-035.md).
-The [0.3.5 walkthrough](mirroring_035.md) records implementation and observed evidence.
+Current release qualification is in [authoring workflows](tasks/workflows-036.md).
+The [0.3.6 walkthrough](workflows_036.md) records implementation and observed evidence.
 The earlier sections retain the evidence and limitations of their respective revisions.
+
+## Audited authoring workflows (0.3.6)
+
+The preserved 0.3.4 work is integrated with strict mirroring and selectable Fiber
+propagation. It includes support policy, pin checks/repairs/offsets, cold routing,
+solver controls, body splitting, reviewed SCP/tissue source replacement, tissue presets,
+surface-click Fiber creation, world-space display radius and source selection.
+
+The development gate passes configured style, typing and numerical checks plus five
+native CTests. The final Python suite passes **2,222 tests**. Eight restored workflow
+tools pass in background/offscreen mode. The canonical executable passes the complete
+minimal-PATH portable suite, including the integrated authoring workflows and hidden
+GPU images of source/mirror Fiber tubes. Physical interactive acceptance is not claimed.
+
+Both propagation methods pass the 96-muscle assembly's Ribs Top Radius 3 edit, undo,
+redo and reopen. Smooth-method before/after geometry hashes and stored attachments
+exactly match the preceding release. A 326-Fiber display profile records every tube job
+without changing source geometry, attachments or history. Its uncontrolled-load timings
+are not a responsiveness or speedup claim. Ownership/coupling review confirms one
+coordinator, native numerical work, shared policies and source-resource reuse by mirrors.
+
+The accepted welded-Ribs shoulder difference remains. Retained-owner material binding
+and effective-policy capture corrections are included; actual skeleton remigration is
+not part of this release. See the [workflow](workflows_036.md) and [task evidence](tasks/workflows-036.md).
 
 ## Selectable Fiber propagation (0.3.5 update)
 

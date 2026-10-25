@@ -52,6 +52,13 @@ def configure(engine: GeometryEngine) -> None:
     for name in ("af_route_path", "af_route_path_in_scene"):
         engine.bind(name + "_with_backend", [*getattr(engine.library, name).argtypes, c.c_int], U)
 
+    configure_execution(engine)
+
+
+def configure_execution(engine: GeometryEngine) -> None:
+    arguments = engine.library.af_route_path_in_scene_with_backend.argtypes
+    engine.bind("af_route_path_in_scene_configured", [*arguments, c.c_double, c.c_int], U)
+
 
 def arrays(inputs: Inputs) -> tuple[Any, ...]:
     count = len(inputs.curve.points)
@@ -75,7 +82,8 @@ def evaluate(engine: GeometryEngine, inputs: Inputs, cancel: int = 0) -> tuple[P
         inputs.curve.path_closed,
         settings.radius,
     )
-    return invoke(engine, arrays(inputs), options, inputs.warm, cancel, inputs.backend)
+    warm = inputs.warm if settings.use_warm_start else None
+    return invoke(engine, arrays(inputs), options, warm, cancel, inputs.backend, settings)
 
 
 def invoke(
@@ -85,13 +93,24 @@ def invoke(
     warm: Path | None,
     cancel: int,
     backend: str = "CUSTOM",
+    settings: RoutingSettings | None = None,
 ) -> tuple[Path, Report]:
     scene = capture(engine, packed, options.radius, cancel)
     counters, measures = np.zeros(8, dtype=np.int64), np.zeros(8)
     report_args = (c.byref(options), counters.ctypes.data_as(INT64), pointer(measures))
     args = (*arguments(packed)[:4], scene.handle, *report_args, warm.handle if warm else 0, cancel)
-    handle = engine.library.af_route_path_in_scene_with_backend(*args, int(backend == "PIQP"))
+    handle = execute(engine, args, backend, settings or RoutingSettings())
     return Path(engine, handle), read_report(counters, measures, backend)
+
+
+def execute(
+    engine: GeometryEngine, args: tuple[Any, ...], backend: str, settings: RoutingSettings
+) -> int:
+    return int(
+        engine.library.af_route_path_in_scene_configured(
+            *args, int(backend == "PIQP"), settings.length_weight, settings.checkpoint_steps
+        )
+    )
 
 
 def read_report(counters: Any, measures: Any, backend: str) -> Report:

@@ -114,16 +114,11 @@ def sacrum(session, mappings):
 
 
 def policies(session, mappings, definitions):
+    from skeleton_shortcut_policies import apply
+
     for row in definitions["roots"]["AF_ROOT"]["shortcuts"]:
-        if not row["overrides"] and not row["owner_backsolve"]:
-            continue
-        overrides = [override(r) for r in row["overrides"]]
-        policy = dict(
-            scope=row["owner_id"], backsolve=row["owner_backsolve"], descendants=overrides
-        )
-        session.command(
-            "driver.configure", driver=mappings[row["id"]]["driver"], changes=dict(policy=policy)
-        )
+        if row["id"] in mappings:
+            apply(session, row, mappings[row["id"]])
 
 
 def override(row):

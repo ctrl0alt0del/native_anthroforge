@@ -21,6 +21,9 @@ from . import (
     evaluation,
     fiber_bindings,
     fiber_operations,
+    fiber_pin_repairs,
+    fiber_presentation,
+    fiber_support_operations,
     geometry_modifiers,
     image_operations,
     image_presentation,
@@ -28,6 +31,7 @@ from . import (
     inspection,
     inspection_report,
     junction_operations,
+    mesh_replacement,
     mirror_operations,
     object_operations,
     operations,
@@ -38,6 +42,8 @@ from . import (
     presentation,
     projects,
     property_operations,
+    quick_fiber,
+    scp_splitting,
     segment_operations,
     shortcut_operations,
     shrinkwrap_operations,
@@ -53,8 +59,10 @@ from . import (
     tissue_operations,
     tissue_painting,
     tissue_part_operations,
+    tissue_preset_operations,
     tissue_preview,
     tissue_region_capture,
+    tissue_retarget,
     tissue_stack_operations,
     tissue_strategy_operations,
 )
@@ -119,6 +127,8 @@ EDITS = {
     "tissue.field.remove": tissue_strategy_operations.field_remove,
     "tissue.create": tissue_operations.create,
     "tissue.configure": tissue_operations.configure,
+    "tissue.preset.apply": tissue_preset_operations.apply,
+    "tissue.source.replace.apply": tissue_retarget.apply,
     "tissue.inflation": tissue_operations.inflation,
     "construction.point.create": point_operations.create,
     "construction.point.update": point_operations.update,
@@ -138,9 +148,14 @@ EDITS = {
     "surface.branch.add": surface_branch_operations.add,
     "surface.branch.remove": surface_branch_operations.remove,
     "fiber.create": fiber_operations.create,
+    "fiber.place": quick_fiber.create,
     "fiber.binding.scope": fiber_operations.binding_scope,
     "fiber.binding.set": fiber_bindings.assign,
     "fiber.binding.remove": fiber_bindings.remove,
+    "fiber.binding.offset": fiber_bindings.normal_offset,
+    "fiber.rebind": fiber_bindings.rebind_all,
+    "fiber.pins.repair": fiber_pin_repairs.apply,
+    "fiber.supports.configure": fiber_support_operations.configure,
     "image.import": image_operations.import_image,
     "image.replace": image_operations.replace_source,
     "image.instance": image_operations.instance,
@@ -185,6 +200,8 @@ EDITS = {
     "update_mode": operations.update_mode,
     "import": importing.import_mesh,
     "primitive.create": primitives.create,
+    "scp.split": scp_splitting.split,
+    "scp.mesh.replace.apply": mesh_replacement.apply,
     "primitive.update": primitives.update,
     "curve.update": primitives.curve_update,
     "curve.add": primitives.curve_add,
@@ -286,6 +303,7 @@ def direct_commands(session: "Session") -> dict[str, Any]:
         "wait": session.wait,
         "tick": session.scheduler.tick,
         "evaluate": lambda **a: evaluate(session, **a),
+        "curve.reroute": lambda **a: path_tasks.reroute(session, **a),
     }
 
 
@@ -317,16 +335,42 @@ def construction_queries(session: "Session") -> dict[str, Any]:
     return {
         **tissue_queries(session),
         "tissue.stacking.inspect": lambda **a: tissue_stack_operations.inspect(session, **a),
-        "surface.preview": lambda **a: surface_preview.preview(session, **a),
-        "surface.grouping": lambda **a: surface_grouping.inspect(session, **a),
-        "surface.preview.status": lambda: surface_preview.status(session),
-        "surface.preview.cancel": lambda: surface_preview.cancel(session),
+        **surface_queries(session),
         "image.inspect": lambda **a: image_operations.inspect(session, **a),
         "object.inspect": lambda **a: object_operations.inspect(session, **a),
+        **fiber_queries(session),
+        "fiber.presentation": lambda **a: fiber_presentation.update(session, **a),
+        "fiber.presentation.inspect": lambda **a: fiber_presentation.inspect(session, **a),
         "primitive.inspect": lambda **a: primitives.inspect(session, **a),
         "control.affected": lambda **a: controls.affected(session, **a),
         "deformer.members": lambda **a: deformers.members(session, **a),
         "junction.inspect": lambda **a: junction_operations.inspect(session, **a),
+    }
+
+
+def fiber_queries(session: "Session") -> dict[str, Any]:
+    from .issues import fiber_pins
+
+    return {
+        "fiber.supports.inspect": lambda **a: fiber_support_operations.inspect(session, **a),
+        "fiber.pins.check": lambda **a: fiber_pins.request(session, **a),
+    }
+
+
+def surface_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "surface.source_ids": lambda **a: surface_sources.identities(session, **a),
+        "surface.preview": lambda **a: surface_preview.preview(session, **a),
+        "tissue.source.options": lambda **a: tissue_retarget.options(session, **a),
+        "tissue.source.replace.assess": lambda **a: tissue_retarget.assess(session, **a),
+        "tissue.source.replace.status": lambda: tissue_retarget.status(session),
+        "tissue.source.replace.cancel": lambda: tissue_retarget.cancel(session),
+        "scp.mesh.replace.assess": lambda **a: mesh_replacement.assess(session, **a),
+        "scp.mesh.replace.status": lambda: mesh_replacement.status(session),
+        "scp.mesh.replace.cancel": lambda: mesh_replacement.cancel(session),
+        "surface.grouping": lambda **a: surface_grouping.inspect(session, **a),
+        "surface.preview.status": lambda: surface_preview.status(session),
+        "surface.preview.cancel": lambda: surface_preview.cancel(session),
     }
 
 

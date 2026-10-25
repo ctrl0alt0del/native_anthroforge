@@ -99,4 +99,17 @@ def capture_owner(
     owner = records[context.owner]
     if not context.policy.backsolve or not owner.parent:
         return None
-    return OwnerAnchor(*shortcut_attachments.capture(engine, owner, records[owner.parent], meshes))
+    anchor = OwnerAnchor(
+        *shortcut_attachments.capture(engine, owner, records[owner.parent], meshes)
+    )
+    return material_anchor(engine, owner, meshes, anchor)
+
+
+def material_anchor(engine: Any, owner: Any, meshes: Any, anchor: OwnerAnchor) -> OwnerAnchor:
+    if owner.attachment.child_mode != "OBJECT_ORIGIN" and owner.asset:
+        anchor = replace(
+            anchor,
+            material_asset=owner.asset,
+            material_binding=shortcut_attachments.material_capture(engine, owner, meshes),
+        )
+    return anchor

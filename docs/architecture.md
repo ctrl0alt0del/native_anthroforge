@@ -1013,3 +1013,31 @@ effect masks own their Qt geometry in a lazily loaded scene, reading the same na
 handles as the staged renderer; they release that scene when disabled. Native anchor
 queries use owned revision-qualified inputs through the existing read-only job service.
 No second scheduler, property engine, attachment solver or persistence format is added.
+
+## Audited authoring workflows (0.3.6)
+
+Replacement assessment lifecycle, immutable candidates, revision/registry membership
+proofs, approval lists and atomic authored publication are shared by imported-mesh
+replacement and tissue retargeting. Producer policies own topology/material compatibility
+and explicit losses. Existing native evaluation and confirmed attachment services build
+owned candidate bundles. Prepared outputs are excluded from redundant recomputation while
+consumer fan-out retains update modes, provenance and the existing coordinator.
+
+Quick Fiber creation composes confirmed attachment capture and native routing in one
+authored asynchronous operation. Its seed is worker-local; no ordinary draft object or
+second undo step is introduced. First publication is already a solved ROUTED Fiber.
+
+Fiber radius is per-workspace presentation, separate from authored controls and collision
+clearance. Read-only coordinator work builds native world-space tubes and picking trees.
+Staged RenderModel leases retain current geometry through replacement; source paths and
+display meshes have separate handle domains. Displayed-mesh picking cannot become an
+anatomical surface provider. Cache/current/staging ownership is visible to the profiler.
+Native ABI registration occurs during engine initialization, including display operations,
+so recording observes worker calls consistently. None of these display jobs blocks saving.
+
+Strict Fiber mirrors instance the source's accepted world-space tube through the mirror
+plane; they allocate no additional tubes or numerical path results. Source/mirror chunks
+share staged publication and picking uses the displayed frame. Read-only review validity
+recognizes both authored identities and mirror output aliases; changed plane revisions
+invalidate assessments. Pin proposals preserve complete surface references, including
+instance identity. These contracts are qualified together in [0.3.6](workflows_036.md).

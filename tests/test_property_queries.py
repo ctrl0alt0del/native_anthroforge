@@ -80,3 +80,20 @@ def test_hook_membership_change_unlocks_cached_resolution(controller):
     assert not panel.propertyState(ref, 0)["writable"]
     session.command("deformer.remove", binding=binding)
     assert panel.propertyState(ref, 0)["writable"]
+
+
+def test_lazy_metadata_read_defers_qml_notifications(controller):
+    from PySide6.QtCore import QCoreApplication
+
+    panel = controller.shortcut_panel
+    ref = reference(curve(controller.session))
+    panel.propertyState(ref, 0)
+    panel.property_queries.publish()
+    original = panel.property_queries.epochs.value(ref["target"])
+    controller.session.command("shortcut.expose", reference=ref, exposed=True)
+    assert panel.propertyState(ref, 0)["exposed"]
+    assert panel.property_queries.epochs.value(ref["target"]) == original
+    assert panel.property_queries.pending
+    QCoreApplication.processEvents()
+    assert panel.property_queries.epochs.value(ref["target"]) == panel.property_queries.serial
+    assert not panel.property_queries.pending

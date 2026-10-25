@@ -6,30 +6,30 @@ static double median(std::vector<double> values) {
     std::sort(values.begin(),values.end()); const size_t middle=values.size()/2;
     return values.size()%2?values[middle]:(values[middle-1]+values[middle])*0.5;
 }
-static double regularization_scale(const std::vector<Vec>& points,double epsilon,double floor) {
+static double regularization_scale(const std::vector<Vec>& points,double epsilon,double floor,double length_weight) {
     std::vector<double> diagonal(points.size(),0.01);
     for(size_t i=1;i<points.size();++i) {
         const Vec delta=kernel::sub(points[i],points[i-1]);
-        const double weight=0.45/std::sqrt(kernel::dot(delta,delta)+epsilon*epsilon);
+        const double weight=(0.5*length_weight)/std::sqrt(kernel::dot(delta,delta)+epsilon*epsilon);
         diagonal[i-1]+=weight; diagonal[i]+=weight;
     }
     return std::max(median(diagonal),floor);
 }
-static double initial_penalty(size_t count) {
-    const double weight=0.9*(count-1); std::vector<double> diagonal(count,0.01+2*weight);
+static double initial_penalty(size_t count,double length_weight) {
+    const double weight=length_weight*(count-1); std::vector<double> diagonal(count,0.01+2*weight);
     diagonal.front()-=weight; diagonal.back()-=weight;
     return std::max(1.0,median(diagonal));
 }
 static kernel::AfV3SqpConfig configuration(const World& world,const Span& span,const Input& input) {
     kernel::AfV3SqpConfig value{}; const double radius=input.options.radius;
-    value.length_weight=0.9; value.fidelity_weight=0.01; value.radius=radius;
+    value.length_weight=input.length_weight; value.fidelity_weight=0.01; value.radius=radius;
     value.slack=world.slack; value.numeric_floor=world.floor; value.length_scale=world.length;
     value.epsilon=std::max(world.floor,1e-4*kernel::af_v3_sqp_mean_length(span.reference,0));
     value.fixed_tolerance=1e-4; value.stationarity_tolerance=1e-4; value.relative_energy_tolerance=1e-5;
     value.trust_radius=std::max(8*radius,0.01*world.length); value.min_trust=std::max(0.25*radius,world.floor);
     value.max_trust=std::max(value.trust_radius,0.25*world.length);
-    value.regularization_scale=regularization_scale(span.reference,value.epsilon,world.floor);
-    value.regularization=1e-6*value.regularization_scale; value.penalty=initial_penalty(span.reference.size());
+    value.regularization_scale=regularization_scale(span.reference,value.epsilon,world.floor,input.length_weight);
+    value.regularization=1e-6*value.regularization_scale; value.penalty=initial_penalty(span.reference.size(),input.length_weight);
     value.accepted_cap=input.options.accepted_steps; value.trial_cap=std::max(32,8*value.accepted_cap);
     value.ccd_mode=kernel::AF_V3_SQP_CCD_INDEXED; value.ccd_budget=262143;
     return value;
@@ -95,13 +95,13 @@ static void report(const std::vector<kernel::AfV3SqpJob>& jobs,int64_t* counters
         measures[4]=std::max(measures[4],r.elapsed_ms);
     }
 }
-static bool advance(kernel::AfV3SqpCoordinator* controller,const Input& input) {
+static bool advance(kernel::AfV3SqpCoordinator* controller,const Input& input,int& checkpoints) {
     int done=0,accepted=0,infeasible=0;
     while(!done) {
         check_cancel(input.cancel);
-        if(kernel::af_v3_native_sqp_step(controller,1,&done,&accepted,&infeasible))
+        if(kernel::af_v3_native_sqp_step(controller,input.trace?1:input.checkpoint_steps,&done,&accepted,&infeasible))
             throw std::runtime_error("Routing controller failed.");
-        trace_step(input.trace,*controller);
+        ++checkpoints; trace_step(input.trace,*controller);
     }
     return !infeasible;
 }
@@ -112,8 +112,8 @@ bool solve(std::vector<Span>& spans,const Input& input,int64_t* counters,double*
         jobs.data(),int(jobs.size()),cap,std::max(32,8*cap))),kernel::af_v3_native_sqp_destroy);
     if(!controller) throw std::runtime_error("Routing controller creation failed.");
     trace_begin(input.trace,spans);
-    const bool valid=advance(controller.get(),input);
-    report(jobs,counters,measures);
+    int checkpoints=0; const bool valid=advance(controller.get(),input,checkpoints);
+    report(jobs,counters,measures); measures[5]=checkpoints;
     return valid;
 }
 }

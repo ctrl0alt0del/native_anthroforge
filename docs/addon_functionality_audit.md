@@ -10,6 +10,29 @@ evidence is tracked in the [runtime walkthrough](mirroring_035.md). Its
 [plan](implementation_035.md) preserves the addon inventory. Strict read-only reflection
 replaces independent mirror solving; existing independent counterparts are not migrated.
 The historical audit observations below remain scoped to their recorded revisions.
+## Follow-up implementation status
+
+The table below updates the original audit without rewriting its historical inventory.
+`codex/parity-workflows-034` implemented D01–D12 through shared operations and desktop
+entry points. They are integrated and qualified with mirroring and smooth propagation in
+[0.3.6](workflows_036.md); no 0.3.4 release was delivered.
+
+| Findings | Implemented follow-up |
+| --- | --- |
+| D01–D04 | Separate Fiber support policy, pin checks/approved repairs, Normal Offset, Rebind All, saved warm-start policy and cold rerouting. |
+| D05 | Active length weight and trial checkpoint controls for Custom/PIQP; collision checks retained. |
+| D06 | Connected body splitting with first SCP/children retained, siblings and shared Hook controls. |
+| D07–D08 | Read-only source-replacement assessments, explicit loss/rebind approval, stale rejection and one-action application for imported SCPs and tissues. |
+| D09 | Existing-tissue preset application with explicit preset/custom constraint ownership. |
+| D10 | Surface-click creation of an already-bound, solved ROUTED Fiber, without an authored draft Curve. |
+| D11 | Per-workspace world-space Fiber radius; native background tubes, staged rendering and displayed-mesh picking. |
+| D12 | One-action ordered selection of all surface sources. |
+
+Combined qualification is recorded in [the delivery task](tasks/workflows-036.md), with
+donor evidence preserved in [the historical task](tasks/parity-workflows-034.md).
+The user chose welded Ribs;
+exact source shoulder response is not claimed fixed. Mirroring is now implemented;
+skin and other deferred major systems remain outside this integration.
 
 ## Method and scope
 

@@ -27,8 +27,11 @@ def root_rows():
 
 def shortcut_row(shortcut):
     from anthroforge.core.shortcuts.resolver import resolve_shortcut
+    from anthroforge.core.shortcuts.owner_backsolve import owner_backsolve_enabled
     row = attrs(shortcut, ('id', 'name', 'owner_type', 'owner_id', 'data_path',
                            'vector_mode', 'owner_backsolve'))
+    row['owner_backsolve_effective'] = owner_backsolve_enabled(shortcut)
+    row['owner_backsolve_explicit'] = shortcut.is_property_set('owner_backsolve')
     resolved = resolve_shortcut(shortcut.id_data, bpy.context, shortcut.data_path)
     row['resolved'] = attrs(resolved, ('prop_name', 'index', 'value_type', 'array_length', 'subtype', 'error'))
     row['resolved'].update(resolved_details(resolved))

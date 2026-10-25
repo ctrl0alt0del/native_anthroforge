@@ -1,11 +1,32 @@
 """Owned bind-topology geometry resolves retained material coordinates on current output."""
 
+import ctypes as c
 from typing import Any
 
 import numpy as np
 
-from .mesh import Mesh, doubles, pointer
+from .mesh import D, Mesh, U, doubles, pointer
 from .tissue_shapes import owned
+
+
+def configure(engine: Any) -> None:
+    engine.bind("af_material_binding_validate", [U, U, D, c.c_int, D, c.POINTER(c.c_int), U])
+
+
+def validate(reference: Mesh, current: Mesh, world: Any, records: Any, cancel: int = 0) -> Any:
+    rows, transform = doubles(records), doubles(world)
+    if rows.ndim != 2 or rows.shape[1] != 28 or transform.size != 16:
+        raise ValueError("Material validation requires records and one world frame.")
+    output = np.empty(len(rows), dtype=np.int32)
+    args = reference.handle, current.handle, pointer(transform), len(rows), pointer(rows)
+    reference.engine.check(
+        reference.engine.library.af_material_binding_validate(
+            *args,
+            output.ctypes.data_as(c.POINTER(c.c_int)),
+            cancel,
+        )
+    )
+    return output
 
 
 def resolve(reference: Mesh, current: Mesh, records: Any, cancel: int = 0) -> Mesh:

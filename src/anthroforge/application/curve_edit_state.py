@@ -37,12 +37,14 @@ def prepare[T](session: Any, before: Any, changed: T) -> T:
 
 def prepare_fiber(session: Any, before: Fiber, changed: Fiber) -> Fiber:
     opening = current(session, before)
-    edit = before.edit or baseline(session, before)
+    edit = changed.edit or before.edit or baseline(session, before)
     targets = set(edit.candidates) | {b.reference for b in changed.bindings}
+    moved = moved_anchors(opening, changed)
     edit = replace(
         edit,
         candidates=tuple(sorted(targets)),
-        rebind=tuple(sorted(set(edit.rebind) | moved_anchors(opening, changed))),
+        rebind=tuple(sorted(set(edit.rebind) | moved)),
+        offsets=tuple(k for k in edit.offsets if k not in moved),
         shape=edit.shape or shape_changed(opening, changed),
     )
     return replace(changed, edit=edit)

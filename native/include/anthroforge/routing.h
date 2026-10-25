@@ -29,6 +29,9 @@ AF_API uint64_t af_route_path_with_backend(const double* records,int count,const
 AF_API uint64_t af_route_path_in_scene_with_backend(const double* records,int count,const double* world,
     const int* owners,uint64_t scene,const AfRoutingOptions* options,
     int64_t* counters,double* measures,uint64_t warm,uint64_t cancel,int backend);
+AF_API uint64_t af_route_path_in_scene_configured(const double* records,int count,const double* world,
+    const int* owners,uint64_t scene,const AfRoutingOptions* options,int64_t* counters,double* measures,
+    uint64_t warm,uint64_t cancel,int backend,double length_weight,int checkpoint_steps);
 #ifdef __cplusplus
 }
 #endif

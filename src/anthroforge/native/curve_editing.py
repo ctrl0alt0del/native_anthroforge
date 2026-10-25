@@ -9,15 +9,17 @@ import numpy as np
 from anthroforge.core.construction import Curve, CurvePoint
 
 from .construction import HANDLES, curve_records
-from .mesh import D, GeometryEngine, pointer
+from .mesh import D, GeometryEngine, U, doubles, pointer
 
 FIELDS = ("position", "left", "right", "left_mode", "right_mode", "radius", "tilt")
 PROTECTION = frozenset(("stacking_fixed", "protected_crease"))
 
 
 def configure(engine: GeometryEngine) -> None:
+    engine.bind("af_curve_segment", [D, c.c_int, c.c_int, c.c_int, c.c_int, D, U])
     engine.bind("af_curve_point_edit", [D, c.c_int, c.c_int, c.c_int, D, c.c_int, D])
     engine.bind("af_path_constrain_seams", [D, c.c_int, D, D])
+    engine.bind("af_curve_place_points", [D, c.c_int, c.POINTER(c.c_int), D, c.c_int, D, D, U])
 
 
 def constrain_seams(engine: GeometryEngine, curve: Curve, reflection: Any) -> Curve:
@@ -32,6 +34,39 @@ def constrain_seams(engine: GeometryEngine, curve: Curve, reflection: Any) -> Cu
     )
     points = tuple(unpack(old, row) for old, row in zip(curve.points, output, strict=True))
     return replace(curve, points=points)
+
+
+def place(
+    engine: GeometryEngine, curve: Curve, indices: Any, goals: Any, world: Any, cancel: int
+) -> Curve:
+    data, indices, goals, world = placement_inputs(curve, indices, goals, world)
+    output = np.empty((len(curve.points), 13))
+    args = placement_arguments(data, indices, goals, world, output, cancel)
+    engine.check(engine.library.af_curve_place_points(*args))
+    points = tuple(unpack(p, row) for p, row in zip(curve.points, output, strict=True))
+    return replace(curve, points=points)
+
+
+def placement_inputs(curve: Curve, indices: Any, goals: Any, world: Any) -> Any:
+    indices, goals, world = np.asarray(indices, dtype=np.int32), doubles(goals), doubles(world)
+    if indices.ndim != 1 or goals.shape != (len(indices), 3) or world.size != 16:
+        raise ValueError("Curve placement requires one world-space xyz goal per point index.")
+    return curve_records(curve), indices, goals, world
+
+
+def placement_arguments(
+    data: Any, indices: Any, goals: Any, world: Any, output: Any, cancel: int
+) -> Any:
+    return (
+        pointer(data),
+        len(data),
+        indices.ctypes.data_as(c.POINTER(c.c_int)),
+        pointer(goals),
+        len(indices),
+        pointer(world),
+        pointer(output),
+        cancel,
+    )
 
 
 def point(engine: GeometryEngine, curve: Curve, index: int, options: dict[str, Any]) -> CurvePoint:
@@ -100,3 +135,18 @@ def handle_mode(value: Any) -> str:
     if index != value or not 0 <= index < 2 * len(HANDLES):
         raise ValueError("Invalid native curve handle mode.")
     return HANDLES[index % len(HANDLES)]  # Upper range means handles were resolved natively.
+
+
+def segment(engine: GeometryEngine, curve: Curve, first: int, last: int) -> Curve:
+    data = curve_records(curve)
+    if curve.engine == "POLYLINE":
+        data[:, 11:13] = 3
+    output = np.empty((last - first + 1, 13))
+    engine.check(
+        engine.library.af_curve_segment(
+            pointer(data), len(data), first, last, curve.resolution, pointer(output), 0
+        )
+    )
+    originals = curve.points[first : last + 1]
+    points = tuple(unpack(p, row) for p, row in zip(originals, output, strict=True))
+    return replace(curve, points=points)

@@ -41,13 +41,25 @@ static void pins(Preparation& v,const AfFiberReference& in) {
     }
     if(!std::is_sorted(v.pins.begin(),v.pins.end())) throw std::runtime_error("Fiber pins must be ordered.");
 }
+static void validate_influences(const Preparation& v,const AfFiberReference& in,uint64_t cancel) {
+    for(int i=0;i<v.points.rows()*2;++i) {
+        check_cancel(cancel); const double weight=in.weights[i]; const int owner=in.owners[i];
+        if(!std::isfinite(weight)||weight<0||weight>1) throw std::runtime_error("Invalid fiber influence weight.");
+        if(weight==0) continue;
+        if(owner<0||owner>=in.surfaces) throw std::runtime_error("Invalid fiber support owner.");
+        const auto geometry=mesh(in.meshes[owner]); const double* r=in.bindings+28*i;
+        for(int j=0;j<28;++j) if(!std::isfinite(r[j])) throw std::runtime_error("Nonfinite fiber binding.");
+        for(int j=0;j<3;++j) if(r[j]<0||r[j]>=geometry->vertices.rows()||std::floor(r[j])!=r[j])
+            throw std::runtime_error("Invalid fiber reference triangle.");
+    }
+}
 std::shared_ptr<Preparation> prepare(const AfFiberReference& in,uint64_t cancel) {
     if(in.controls<2||in.controls>100000||in.surfaces<1||in.surfaces>10000||in.pins<1||in.pins>in.controls
-        ||!in.records||!in.world||!in.owners||!in.weights||!in.bindings||!in.meshes||!in.frames||!in.indices||!in.groups)
+        ||!in.records||!in.world||!in.owners||!in.weights||!in.bindings||!in.meshes||!in.frames||!in.indices||!in.groups||!in.hints)
         throw std::runtime_error("Invalid smooth fiber inputs.");
     auto v=std::make_shared<Preparation>(); v->path=path(in.path);
     if(v->path->parameters.size()<2||v->path->parameters.size()>262144) throw std::runtime_error("Invalid smooth fiber sample count.");
-    points(*v,in); arcs(*v); pins(*v,in); check_cancel(cancel);
+    points(*v,in); arcs(*v); pins(*v,in); validate_influences(*v,in,cancel);
     prepare_parents(*v,in,cancel); prepare_weights(*v,in,cancel);
     prepare_reconstruction(*v,cancel); return v;
 }
@@ -61,8 +73,22 @@ V3 curve_point(const Preparation& v,double s) {
 }
 double pin_width(const Preparation& v,int p) {
     double available=v.length;
-    for(size_t i=0;i<v.pins.size();++i) if(int(i)!=p)
-        available=std::min(available,distance(v,v.arc[size_t(v.pins[i])],v.arc[size_t(v.pins[size_t(p)])]));
+    const int count=int(v.pins.size());
+    for(int neighbor:{p-1,p+1}) if(v.path->closed||(neighbor>=0&&neighbor<count)) {
+        const int index=(neighbor+count)%count;
+        if(index!=p) available=std::min(available,distance(v,v.arc[size_t(v.pins[index])],v.arc[size_t(v.pins[p])]));
+    }
     return std::max(std::min(v.width,.45*available),1e-12);
+}
+int nearest_pin(const Preparation& v,double station) {
+    const auto next=std::lower_bound(v.pins.begin(),v.pins.end(),station,
+        [&](int node,double s) { return v.arc[size_t(node)]<s; });
+    const int count=int(v.pins.size()),right=int(next-v.pins.begin());
+    int best=std::min(right,count-1); double value=v.length;
+    for(int candidate:{right-1,right}) if(v.path->closed||(candidate>=0&&candidate<count)) {
+        const int index=(candidate+count)%count; const double d=distance(v,station,v.arc[size_t(v.pins[index])]);
+        if(d<value) { value=d; best=index; }
+    }
+    return best;
 }
 }

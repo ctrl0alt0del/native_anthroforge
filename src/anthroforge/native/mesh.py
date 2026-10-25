@@ -13,6 +13,7 @@ from .resource_cache import ResourceCache
 
 if TYPE_CHECKING:
     from .expressions import Program
+    from .fiber_deformation import Preparation as FiberPreparation
     from .routing_scene import RoutingScene
     from .surface_queries import Query
     from .tissue_preparation import Preparation
@@ -38,6 +39,9 @@ class GeometryEngine(NativeEngine):
         self._query_signatures()
         self._construction_signatures()
         self._resource_caches()
+        self.fiber_deformations: ResourceCache[FiberPreparation] = ResourceCache(
+            64 * 1024 * 1024, 256, "fiber_deformation"
+        )
         self.resource_observer: Any = None
 
     def _resource_caches(self) -> None:
@@ -57,7 +61,6 @@ class GeometryEngine(NativeEngine):
         )
 
     def _query_caches(self) -> None:
-        self.fiber_deformations: ResourceCache[Any] = ResourceCache(64 * 1024 * 1024, 256, "fiber_deformation")
         self.stack_sessions: ResourceCache[Any] = ResourceCache(
             512 * 1024 * 1024, 4, "stack_sessions"
         )
@@ -131,8 +134,8 @@ class GeometryEngine(NativeEngine):
         self._binding_signatures()
 
     def _binding_signatures(self) -> None:
-        from .fiber_deformation import configure as configure_fiber
         from . import attachment_fields, attachment_weights, path_collisions, point_attachments
+        from .fiber_deformation import configure as configure_fiber
         from .mesh_quality import configure as configure_quality
         from .routing_scene import configure
         from .surface_queries import configure as configure_queries

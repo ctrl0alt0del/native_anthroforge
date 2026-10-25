@@ -43,7 +43,7 @@ target_sources(af_native PRIVATE src/expression_lexer.cpp src/expression_types.c
     src/expression_parser.cpp src/expression_values.cpp src/expression_evaluation.cpp src/expression_api.cpp
     src/shortcut_attachments.cpp src/parametric.cpp)
 target_sources(af_native PRIVATE src/fiber_deformation_api.cpp src/fiber_deformation_inputs.cpp
-    src/fiber_deformation_reference.cpp src/fiber_deformation_weights.cpp
+    src/fiber_deformation_reference.cpp src/fiber_deformation_weights.cpp src/fiber_deformation_filter.cpp
     src/fiber_deformation_fit.cpp src/fiber_deformation_solve.cpp)
 
 add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c

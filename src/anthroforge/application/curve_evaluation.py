@@ -8,8 +8,8 @@ from anthroforge.core.fibers import Fiber
 from . import (
     attachment_assets,
     curve_sources,
-    fiber_edit_evaluation,
     fiber_deformation,
+    fiber_edit_evaluation,
     junction_bindings,
     junction_evaluation,
     parametric_evaluation,
@@ -34,16 +34,26 @@ class ResolvedCurve:
 
 
 def evaluate(
-    engine: Any, document: Any, resources: Any, target: str, cancel: int, backend: str = "CUSTOM",
-    propagation: str = "SMOOTH_SHAPE"
+    engine: Any,
+    document: Any,
+    resources: Any,
+    target: str,
+    cancel: int,
+    backend: str = "CUSTOM",
+    propagation: str = "SMOOTH_SHAPE",
 ) -> Any:
     item = curve_sources.source(document, target)
     return evaluate_item(engine, document, resources, item, cancel, backend, propagation)
 
 
 def evaluate_item(
-    engine: Any, document: Any, resources: Any, item: Any, cancel: int, backend: str = "CUSTOM",
-    propagation: str = "SMOOTH_SHAPE"
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Any,
+    cancel: int,
+    backend: str = "CUSTOM",
+    propagation: str = "SMOOTH_SHAPE",
 ) -> PathEvaluation:
     from . import symmetric_paths
 
@@ -53,15 +63,25 @@ def evaluate_item(
     return PathEvaluation(path, value.edited, value.attachment)
 
 
-def resolve(engine: Any, document: Any, resources: Any, item: Any, cancel: int,
-            propagation: str = "SMOOTH_SHAPE") -> ResolvedCurve:
+def resolve(
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Any,
+    cancel: int,
+    propagation: str = "SMOOTH_SHAPE",
+) -> ResolvedCurve:
     if item.engine == "PARAMETRIC":
         return resolve_parametric(engine, document, resources, item, cancel)
-    value = (
-        resolve_fiber(engine, document, resources, item, cancel, propagation)
-        if isinstance(item, Fiber)
-        else ResolvedCurve(item)
-    )
+    value = ResolvedCurve(item)
+    if isinstance(item, Fiber):
+        value = resolve_fiber(engine, document, resources, item, cancel, propagation)
+    return resolve_junctions(engine, document, resources, value, cancel)
+
+
+def resolve_junctions(
+    engine: Any, document: Any, resources: Any, value: ResolvedCurve, cancel: int
+) -> ResolvedCurve:
     item, path = junction_evaluation.resolved(
         engine, document, resources, value.authored, cancel, value.path
     )
@@ -88,13 +108,21 @@ def resolve_fiber(
     world = curve_sources.world(engine, document, item.id)
     if item.edit:
         return edited_fiber(engine, document, resources, item, world, cancel, propagation)
-    positions = fiber_deformation.resolve(engine, document, resources, item, asset, cancel, propagation)
+    positions = fiber_deformation.resolve(
+        engine, document, resources, item, asset, cancel, propagation
+    )
     resolved = attachment_assets.evaluate(engine, item, asset, positions, world, cancel)
     return ResolvedCurve(resolved.authored, resolved)
 
 
 def edited_fiber(
-    engine: Any, document: Any, resources: Any, item: Fiber, world: Any, cancel: int, propagation: str
+    engine: Any,
+    document: Any,
+    resources: Any,
+    item: Fiber,
+    world: Any,
+    cancel: int,
+    propagation: str,
 ) -> ResolvedCurve:
     path, changed, captured = fiber_edit_evaluation.evaluate(
         engine, item, resources, document, world, cancel, propagation

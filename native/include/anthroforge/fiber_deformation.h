@@ -15,6 +15,7 @@ struct AfFiberReference {
     int pins;
     const int* indices; // Authored control indices, not evaluated samples.
     const int* groups; // First capture of each anatomical surface, independent of pin history.
+    const double* hints; // Saved document poses resolve unobservable directions in legacy captures.
 };
 AF_API uint64_t af_fiber_deformation_prepare(const AfFiberReference* input,uint64_t cancel);
 AF_API int af_fiber_deformation_evaluate(uint64_t handle,const uint64_t* meshes,

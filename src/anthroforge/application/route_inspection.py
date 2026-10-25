@@ -28,8 +28,11 @@ def backend(context: Any) -> str:
 
 
 def propagation(context: Any) -> str:
-    return (context.preferences.value.fiber_propagation if hasattr(context, "preferences")
-            else str(context.fiber_propagation))
+    return (
+        context.preferences.value.fiber_propagation
+        if hasattr(context, "preferences")
+        else str(context.fiber_propagation)
+    )
 
 
 def signature(context: Any, target: str, options: Any) -> Any:

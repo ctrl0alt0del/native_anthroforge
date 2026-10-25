@@ -19,7 +19,7 @@ def execute(executable, cwd, invoke, name, commands):
 def construction(backend):
     points = [dict(position=[x, 0, 0]) for x in (-0.50000001, 0.50000001)]
     return [
-        request("preferences.set", routing_backend=backend),
+        request("preferences.set", routing_backend=backend, fiber_propagation=propagation(backend)),
         request("profile.start"),
         request("import", path="examples/primitives/cube.obj", units=1),
         request("wait"),
@@ -28,6 +28,10 @@ def construction(backend):
         request("fiber.create", curve="$curve"),
         *finish_evaluation(backend),
     ]
+
+
+def propagation(backend):
+    return "LOCAL_SURFACE" if backend == "CUSTOM" else "SMOOTH_SHAPE"
 
 
 def finish_evaluation(backend):
@@ -47,6 +51,7 @@ def preferences(executable, cwd, invoke):
         route(executable, cwd, invoke, backend)
     rows = execute(executable, cwd, invoke, "preferences-reopen", [request("preferences.get")])
     assert rows[0]["result"]["routing_backend"] == "PIQP"
+    assert rows[0]["result"]["fiber_propagation"] == "SMOOTH_SHAPE"
     desktop_preferences(executable, cwd, invoke)
     conversion(executable, cwd, invoke)
     reset = [
@@ -100,3 +105,4 @@ def verify(cwd, backend):
         events = json.loads(archive.read("trace.json"))["traceEvents"]
     calls = [e for e in events if e["cat"] == "path" and e["name"] == "evaluate"]
     assert len(calls) >= 2 and all(e["args"]["routing_backend"] == backend for e in calls)
+    assert all(e["args"]["fiber_propagation"] == propagation(backend) for e in calls)

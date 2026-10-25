@@ -1,6 +1,8 @@
 #include "fiber_deformation.hpp"
 #include <Eigen/LU>
+#include <Eigen/SVD>
 #include <map>
+#include <set>
 namespace af::fiber {
 static V3 anchor(const Mesh& mesh,const double* r) {
     V3 p=V3::Zero();
@@ -31,21 +33,41 @@ static Evidence evidence(const Preparation& v,const AfFiberReference& in,int par
     if(e.local.empty()) throw std::runtime_error("Unused fiber reference surface.");
     return e;
 }
+static M3 recovered_linear(const Evidence& e,const V3& a,const V3& b,const M3& prior) {
+    Eigen::MatrixXd x(e.local.size(),3),y(e.local.size(),3);
+    for(size_t i=0;i<e.local.size();++i) {
+        x.row(int(i))=e.local[i]-a;
+        y.row(int(i))=e.world[i]-b-prior*(e.local[i]-a);
+    }
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(x,Eigen::ComputeThinU|Eigen::ComputeThinV);
+    svd.setThreshold(std::max(1e-10,1e-10/std::max(svd.singularValues()[0],1e-30)));
+    const Eigen::MatrixXd correction=svd.solve(y);
+    return prior+correction.transpose();
+}
+static bool matches(const Evidence& e,const M4& frame,double tolerance) {
+    if(frame.isZero()||!frame.allFinite()) return false;
+    for(size_t i=0;i<e.local.size();++i)
+        if((point(frame,e.local[i])-e.world[i]).norm()>tolerance) return false;
+    return true;
+}
 M4 recovered_frame(const Preparation& v,const AfFiberReference& in,int parent) {
     const auto e=evidence(v,in,parent); V3 a=V3::Zero(),b=V3::Zero();
+    const M4 hint=Eigen::Map<const M4>(in.hints+16*parent);
+    if(matches(e,hint,1e-10*std::max(1.0,v.length))) return hint;
     for(size_t i=0;i<e.local.size();++i) { a+=e.local[i]; b+=e.world[i]; }
-    a/=double(e.local.size()); b/=double(e.local.size()); M3 covariance=M3::Zero(),cross=M3::Zero();
-    for(size_t i=0;i<e.local.size();++i) { covariance+=(e.local[i]-a)*(e.local[i]-a).transpose(); cross+=(e.world[i]-b)*(e.local[i]-a).transpose(); }
-    const double ridge=std::max(covariance.trace()*1e-12,1e-16);
-    const M3 linear=(cross+ridge*e.rotation)*(covariance+ridge*M3::Identity()).inverse();
+    a/=double(e.local.size()); b/=double(e.local.size());
+    const M3 prior=hint.isZero()?e.rotation:M3(hint.block<3,3>(0,0));
+    const M3 linear=recovered_linear(e,a,b,prior);
     M4 result=M4::Identity(); result.block<3,3>(0,0)=linear; result.block<3,1>(0,3)=b-linear*a;
     for(size_t i=0;i<e.local.size();++i) if((point(result,e.local[i])-e.world[i]).norm()>1e-6*std::max(1.0,v.length))
         throw std::runtime_error("Older fiber capture cannot recover its bind frame; use Local Surface Following or explicitly rebind.");
     return result;
 }
-static Region region(const Vertices& vertices,const V3& center) {
+static Region region(const Vertices& vertices,const V3& center,const std::vector<bool>& active) {
     std::vector<std::pair<double,int>> nearest;
-    for(int i=0;i<vertices.rows();++i) nearest.emplace_back((vertices.row(i).transpose()-center).squaredNorm(),i);
+    for(int i=0;i<vertices.rows();++i) if(active[size_t(i)])
+        nearest.emplace_back((vertices.row(i).transpose()-center).squaredNorm(),i);
+    if(nearest.empty()) throw std::runtime_error("Fiber support has no surface vertices.");
     const size_t count=std::min(size_t(64),nearest.size());
     std::partial_sort(nearest.begin(),nearest.begin()+count,nearest.end()); Region r; r.center=V3::Zero();
     for(size_t i=0;i<count;++i) { r.ids.push_back(nearest[i].second); r.center+=vertices.row(nearest[i].second); }
@@ -60,6 +82,7 @@ static void vertex_records(Parent& p,const std::map<int,int>& lookup) {
         const auto entry=lookup.find(p.mesh->triangles(face,slot));
         if(entry==lookup.end()||found[size_t(entry->second)]) continue;
         double* r=p.records.data()+28*entry->second;
+        std::fill_n(r+6,3,-1.0); // No secondary flow binding; zero would encode an invalid location.
         for(int j=0;j<3;++j) r[j]=p.mesh->triangles(face,j);
         r[3+slot]=1; r[12]=r[21]=r[26]=1; found[size_t(entry->second)]=true;
     }
@@ -76,6 +99,36 @@ static void compact(Parent& p) {
     for(size_t i=0;i<p.indices.size();++i) selected.row(int(i))=p.vertices.row(p.indices[i]);
     p.vertices=std::move(selected); vertex_records(p,lookup);
 }
+static std::set<int64_t> material_sides(const Parent& p,const Preparation& v,const AfFiberReference& in,int parent) {
+    std::set<int64_t> result;
+    if(p.mesh->tissue.sides.empty()) return result;
+    for(int i=0;i<v.points.rows()*2;++i) if(in.owners[i]==parent&&in.weights[i]>0) {
+        const double* record=in.bindings+28*i;
+        for(int j=0;j<3;++j) {
+            const size_t vertex=size_t(record[j]);
+            result.insert(p.mesh->tissue.sides[vertex]);
+        }
+    }
+    return result;
+}
+static std::vector<bool> active_vertices(const Parent& p,const Preparation& v,const AfFiberReference& in,int parent) {
+    std::vector<bool> active(size_t(p.mesh->vertices.rows()),false);
+    const auto sides=material_sides(p,v,in,parent);
+    for(int i=0;i<p.mesh->triangles.size();++i) {
+        const size_t vertex=size_t(p.mesh->triangles.data()[i]);
+        active[vertex]=sides.empty()||sides.count(p.mesh->tissue.sides[vertex]);
+    }
+    return active;
+}
+static void prepare_regions(Parent& p,const Preparation& v,const std::vector<bool>& active,uint64_t cancel) {
+    p.vertices.resize(p.mesh->vertices.rows(),3);
+    for(int i=0;i<p.vertices.rows();++i) p.vertices.row(i)=point(p.frame,p.mesh->vertices.row(i));
+    for(int j=0;j<8;++j) {
+        check_cancel(cancel);
+        p.regions.push_back(region(p.vertices,curve_point(v,v.length*j/(v.path->closed?8:7)),active));
+    }
+    compact(p);
+}
 void prepare_parents(Preparation& v,const AfFiberReference& in,uint64_t cancel) {
     for(int b=0;b<in.surfaces;++b) {
         check_cancel(cancel); Parent p; p.reference=in.meshes[b]; p.mesh=mesh(p.reference);
@@ -85,10 +138,7 @@ void prepare_parents(Preparation& v,const AfFiberReference& in,uint64_t cancel) 
         if(p.frame.isZero()) p.frame=recovered_frame(v,in,b);
         if(!p.frame.allFinite()||!p.frame.fullPivLu().isInvertible()||p.mesh->vertices.rows()<1)
             throw std::runtime_error("Invalid fiber support reference frame.");
-        p.vertices.resize(p.mesh->vertices.rows(),3);
-        for(int i=0;i<p.vertices.rows();++i) p.vertices.row(i)=point(p.frame,p.mesh->vertices.row(i));
-        for(int j=0;j<8;++j) p.regions.push_back(region(p.vertices,curve_point(v,v.length*j/(v.path->closed?8:7))));
-        compact(p); v.parents.push_back(std::move(p));
+        prepare_regions(p,v,active_vertices(p,v,in,b),cancel); v.parents.push_back(std::move(p));
     }
 }
 }

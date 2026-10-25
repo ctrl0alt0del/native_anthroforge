@@ -1,27 +1,18 @@
 #include "fiber_deformation.hpp"
 namespace af::fiber {
 static void constrain(Preparation& v,int row) {
-    for(size_t p=0;p<v.pins.size();++p) {
+    const int p=nearest_pin(v,v.arc[size_t(row)]);
         const double w=kernel(distance(v,v.arc[size_t(row)],v.arc[size_t(v.pins[p])])/pin_width(v,int(p)));
         v.weights.row(row)*=1-w;
         const int owner=v.pin_owners[p];
         if(owner<0||owner>=int(v.parents.size())) throw std::runtime_error("Missing fiber pin surface.");
         v.weights(row,owner)+=w;
-    }
 }
 void prepare_weights(Preparation& v,const AfFiberReference& in,uint64_t cancel) {
-    const int n=int(v.path->parameters.size()); v.weights=Eigen::MatrixXd::Zero(v.points.rows(),in.surfaces);
-    for(int i=0;i<n;++i) {
-        check_cancel(cancel); double total=0;
-        for(int j=0;j<n;++j) {
-            const double w=kernel(distance(v,v.arc[size_t(i)],v.arc[size_t(j)])/v.width)*v.mass[size_t(j)]; total+=w;
-            for(int k=0;k<2;++k) if(in.weights[2*j+k]>0) {
-                const int owner=in.owners[2*j+k]; if(owner<0||owner>=in.surfaces) throw std::runtime_error("Invalid fiber support owner.");
-                v.weights(i,owner)+=w*in.weights[2*j+k];
-            }
-        }
-        v.weights.row(i)/=std::max(total,1e-30); constrain(v,i);
-    }
+    const int n=int(v.path->parameters.size());
+    if(uint64_t(v.points.rows())*uint64_t(in.surfaces)>8388608) throw std::runtime_error("Fiber support weights exceed the preparation budget.");
+    v.weights=Eigen::MatrixXd::Zero(v.points.rows(),in.surfaces); smooth_weights(v,in,cancel);
+    for(int i=0;i<n;++i) constrain(v,i);
     for(int i=n;i<v.points.rows();++i) v.weights.row(i)=v.weights.row(v.knots[size_t((i-n)/3)]);
 }
 Map interpolated(const Preparation& v,const std::vector<Map>& maps,int row) {

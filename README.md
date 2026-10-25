@@ -55,6 +55,12 @@ applies to future calculations; current results and running jobs stay unchanged.
 Use Recalculate when you want existing routes updated. See the
 [0.2.3 contract](docs/specification_023.md) and [API](docs/authoring_api.md#application-preferences-023).
 
+**Edit → Preferences → Fiber propagation** selects **Smooth Shape Preservation** (default)
+or **Local Surface Following** (the original method). It applies to future calculations;
+current geometry remains visible and unchanged until recalculation. This is independent
+of the curve engine and does not guarantee obstacle clearance. See
+[validation and limits](docs/tasks/fiber-propagation-methods.md).
+
 [0.2.2 unified tissues](docs/specification_022.md) adds attached Point/Anchor and Membrane
 construction, muscle/soft-tissue inflation, relaxation, constraints, cropping and stacking.
 Start with the [tissue walkthrough](docs/tissues_022.md) or [headless example](examples/tissues.json).

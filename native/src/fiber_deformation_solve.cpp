@@ -24,7 +24,8 @@ static void factor(Preparation& v,const Sparse& h,uint64_t cancel) {
     v.coupling.resize(v.free.size(),v.pins.size()); v.coupling.setFromTriplets(coupling.begin(),coupling.end());
     check_cancel(cancel); if(v.free.empty()) return;
     v.factor.compute(matrix); check_cancel(cancel);
-    if(v.factor.info()!=Eigen::Success) throw std::runtime_error("Fiber shape reconstruction factorization failed.");
+    if(v.factor.info()!=Eigen::Success||v.factor.vectorD().minCoeff()<=0)
+        throw std::runtime_error("Fiber shape reconstruction is ill-conditioned; review coincident or excessive samples.");
 }
 void prepare_reconstruction(Preparation& v,uint64_t cancel) {
     const int n=int(v.path->parameters.size()); v.free_index.assign(size_t(n),-1);
@@ -51,8 +52,10 @@ static Vertices raw_points(const Preparation& v,const std::vector<std::vector<Ma
 static void pins(const Preparation& v,Vertices& raw,const double* goals) {
     Vertices delta(v.pins.size(),3);
     for(size_t p=0;p<v.pins.size();++p) delta.row(int(p))=V3(goals+3*p).transpose()-raw.row(v.pins[p]);
-    for(int i=0;i<raw.rows();++i) for(size_t p=0;p<v.pins.size();++p)
+    for(int i=0;i<raw.rows();++i) {
+        const int p=nearest_pin(v,v.arc[size_t(i)]);
         raw.row(i)+=kernel(distance(v,v.arc[size_t(i)],v.arc[size_t(v.pins[p])])/pin_width(v,int(p)))*delta.row(int(p));
+    }
 }
 static Vertices reconstruct(const Preparation& v,const Vertices& raw,const std::vector<M3>& linear,const double* goals,uint64_t cancel) {
     const int n=int(v.path->parameters.size()); Vertices details=v.laplacian*v.points.topRows(n);
@@ -70,6 +73,7 @@ static Vertices reconstruct(const Preparation& v,const Vertices& raw,const std::
     return result;
 }
 void evaluate(const Preparation& v,const uint64_t* meshes,const double* frames,const double* goals,double* output,uint64_t cancel) {
+    for(size_t i=0;i<v.pins.size();++i) if(!V3(goals+3*i).allFinite()) throw std::runtime_error("Nonfinite fiber attachment goal.");
     const auto maps=fit(v,meshes,frames,cancel); std::vector<M3> linear;
     auto raw=raw_points(v,maps,linear,cancel); pins(v,raw,goals);
     const auto result=reconstruct(v,raw,linear,goals,cancel); const int n=int(result.rows());

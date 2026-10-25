@@ -3,7 +3,11 @@
 #include <Eigen/SVD>
 namespace af::fiber {
 static bool same_topology(const Mesh& a,const Mesh& b) {
-    return a.vertices.rows()==b.vertices.rows()&&a.triangles.rows()==b.triangles.rows()
+    return !a.tissue.kind&&!b.tissue.kind&&same_basis(a.basis,b.basis)
+        &&a.material==b.material&&a.material_axes==b.material_axes
+        &&a.triangle_material.origins==b.triangle_material.origins
+        &&a.triangle_material.coordinates==b.triangle_material.coordinates
+        &&a.vertices.rows()==b.vertices.rows()&&a.triangles.rows()==b.triangles.rows()
         &&(a.triangles.array()==b.triangles.array()).all();
 }
 static Vertices current(const Parent& p,uint64_t handle,const M4& frame,uint64_t cancel) {

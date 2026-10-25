@@ -34,8 +34,10 @@ def capture(session: Any, replay: bool = False) -> ComparisonCapture | None:
 
 def journal_snapshot(session: Any) -> dict[str, Any]:
     state = session.shortcut_comparison
-    if (state.baseline.source.routing_backend != session.preferences.value.routing_backend
-            or state.baseline.source.fiber_propagation != session.preferences.value.fiber_propagation):
+    if (
+        state.baseline.source.routing_backend != session.preferences.value.routing_backend
+        or state.baseline.source.fiber_propagation != session.preferences.value.fiber_propagation
+    ):
         state.journal.invalidate("Execution preferences changed after baseline capture.")
     value = dict(state.journal.describe(), operations=state.journal.events)
     if session.history.before is not None:

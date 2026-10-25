@@ -38,6 +38,8 @@ M4 recovered_frame(const Preparation& value,const AfFiberReference& input,int pa
 double distance(const Preparation& value,double a,double b);
 double kernel(double x);
 double pin_width(const Preparation& value,int pin);
+int nearest_pin(const Preparation& value,double station);
+void smooth_weights(Preparation& value,const AfFiberReference& input,uint64_t cancel);
 V3 curve_point(const Preparation& value,double station);
 Map interpolated(const Preparation& value,const std::vector<Map>& maps,int row);
 std::vector<std::vector<Map>> fit(const Preparation& value,const uint64_t* meshes,

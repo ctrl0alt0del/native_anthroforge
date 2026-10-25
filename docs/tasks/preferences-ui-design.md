@@ -2,7 +2,8 @@
 
 - Branch: `codex/preferences-ui-design`; integration: `main`.
 - Baseline: `030719d`; release remains 0.3.7.
-- Status: in progress. Direct work; background/offscreen validation only.
+- Status: implemented and validated; design proposed for review. Direct work;
+  background/offscreen validation only.
 
 ## Confirmed scope
 
@@ -68,3 +69,27 @@ Anatomy/Construction, shortcut scopes, inspector navigation, Preferences and Foc
 editor. No JavaScript exceptions or horizontal overflow. The proposal is unapproved.
 Offscreen Preferences also passes at 150% scale. Package build succeeded at runtime
 commit `3a9ee89`; relocated minimal-PATH validation and full gate are running.
+
+## Final verification and ownership review
+
+- `tools/check.ps1`: passes; 2,246 Python tests and five native CTests, formatting,
+  typing, function limits, numerical imports and native doctor. Existing warnings remain.
+- `tools/preferences_ui_acceptance.py`: passes at 100% and 150% scale. No QML warnings
+  or detected Preferences clipping. Short/long/newline/path tooltips, hover/dismissal,
+  folder launch and registration success/error handling; document identity unchanged.
+- Canonical package built successfully at `3a9ee89`. Full `check_portable.py --offscreen`
+  passes from `build/preferences-ui-design/Portable app`, with minimal PATH. It verifies
+  compiled tooltip wrapping and current-executable registration paths without OS writes.
+- Design interactions pass in headless Edge at 1440/1024/736/360 px; no JS exceptions
+  or horizontal overflow. The phone layout is for design review, not a mobile-app promise.
+- Screenshots inspected for source Preferences, long tooltip, packaged Preferences and
+  the design. Software/offscreen evidence does not certify physical desktop interactions.
+  Explorer/Settings launches and final Windows default selection were not performed.
+- Ownership review: OS effects belong to explicit desktop actions and a narrow registration
+  adapter; recovery reuses its existing store owner. Tooltip styling is shared at the Qt
+  style boundary, leaving caller behavior and Basic controls intact. No geometry, document,
+  undo, schema, scheduler or numerical changes. No new UI framework or per-widget popup.
+
+Runtime changes, proposal and evidence are checkpointed. The unrelated root `__init__.py`
+is preserved. Final delivery replaces the same canonical 0.3.7 folder/source archive;
+the broader UI remains unimplemented pending design review.

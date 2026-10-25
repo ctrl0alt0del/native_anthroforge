@@ -80,3 +80,28 @@ layout checks, production-sized recovery and portable packaging remain pending.
 - Existing Preferences workflow passes; packaged recovery smoke added and source invocation
   passes, preserving manual-file bytes. Version metadata advanced to 0.3.7 for qualification.
 - Full development gate running; portable build/suite, final docs and source archive pending.
+
+## Packaged candidate and design review
+
+- Canonical executable built successfully at clean runtime revision `a6e57ef`; subsequent
+  changes are acceptance-tool coverage. All 140 packaged QML/native files match source.
+- Source layout checks pass with a full 20-entry scrolling Recent Projects menu, explicit
+  clear and unavailable-project opening; failure preserves the loaded document/path.
+- The native gate passes five CTests and configured style. Full Python suite (2,241
+  collected cases) and minimal-PATH portable qualification are running.
+- Ownership review: recovery timing/capture and retention are application services; Qt
+  only presents them. One coordinator owns execution and cancellation. Ordinary save
+  policies remain intact, snapshots retain native resource owners, history is untouched,
+  and recent history owns paths rather than project files. No new worker pool, geometry
+  algorithm or project schema is introduced.
+- First native relink encountered a temporary DLL lock during overlapping validation;
+  serial retry after the GUI process exited succeeds. No user process was closed.
+
+- Full portable suite passed, including compiled autosave/recovery and original-file
+  preservation. Packaged Preferences/recovery captures inspected. No interactive desktop
+  acceptance is claimed; all GUI work remained background/offscreen.
+- Broad gate found one outdated failure-injection mock: corrupt_write accepted three
+  arguments while storage now passes cancellation/recovery context. Updated the test
+  double to match the extended writer signature. Its disk-failure preservation check
+  and all 23 interleaving/autosave tests pass; no runtime correction was required.
+- Aggregate Python rerun is in progress. Remaining numerical/doctor gate stages pass.

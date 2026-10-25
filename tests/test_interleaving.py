@@ -102,6 +102,6 @@ def test_failed_atomic_write_preserves_previous_file(assembly, session, tmp_path
     FileLock(path).close()
 
 
-def corrupt_write(path, document, assets):
+def corrupt_write(path, document, assets, cancel=None, recovery=None):
     path.write_bytes(b"incomplete")
     raise OSError("Injected disk failure")

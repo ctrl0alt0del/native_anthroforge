@@ -47,7 +47,8 @@ dialog's input. Existing confirmation restrictions, editing and calculation beha
 All attached tooltips now use a shared, bounded-width style: short tips stay compact,
 long help wraps, and intentional line breaks are preserved. Hover/focus/click behavior
 stays with the original controls. No per-field popup objects or profiling/polling service
-is added. The [broader UI design](ui_overhaul_design.md) is proposed, not implemented.
+is added. The approved [workbench design](ui_overhaul_design.md) is now implemented;
+see the [current layout and control locations](ui_workbench.md).
 
 ## Evidence and limits
 

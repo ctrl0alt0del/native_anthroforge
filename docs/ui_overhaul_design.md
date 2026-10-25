@@ -1,8 +1,9 @@
 # AnthroForge workbench redesign
 
-Status: **proposal for review**. No production shell or broad copy overhaul is implemented.
-The Preferences actions and shared multiline tooltip style are delivered separately in
-[0.3.7](usability_037.md). This proposal reorganizes existing capabilities; it does not
+Status: **approved design, implemented in 0.3.7**. See the
+[runtime workbench walkthrough](ui_workbench.md) and [qualification](tasks/ui-workbench.md).
+The Preferences actions and shared multiline tooltip style are also delivered in
+[0.3.7](usability_037.md). This design reorganizes existing capabilities; it does not
 change geometry, attachment rules, shortcut ownership or calculation semantics.
 
 ## What the audit found
@@ -117,12 +118,12 @@ effects, binding failures or unit information in the name of brevity.
 | Expose property | Add property… | Show a numerical property as an explicit shortcut. Hiding it does not disable formulas. |
 | “Active calculations use the latest committed revision” | Autosave recovery copies | Save a separate recovery copy periodically. While calculations run, save the latest complete checkpoint; it may predate visible edits. |
 
-These are proposed text changes, not new terminology in persisted data or public API IDs.
+These are display-text conventions, not new terminology in persisted data or public API IDs.
 Before changing a numerical label, trace the actual parameter and unit. For example,
 inflation Amount becomes Depth only in modes where that describes its effect correctly.
 Ellipses mean a further dialog/choice is necessary; direct actions have no trailing ellipsis.
 
-## Phased implementation after design review
+## Reviewed delivery boundaries
 
 | Increment | Owning boundary | Deliverable and evidence |
 | --- | --- | --- |
@@ -139,15 +140,15 @@ conditional replacements of enum strings. Numerical/model behavior is outside th
 Preserve one undo action per gesture, direct engine changes, keyboard abstraction,
 modifier behavior, read-only restrictions, scene revisions and native picking.
 
-Required future acceptance: no inaccessible old actions; no prerequisite clicks added
+Acceptance criteria: no inaccessible old actions; no prerequisite clicks added
 to shaping/creation; no transient field movement; tooltip and focus readability; long
 names and lists; 1050×680/1440×900 and 150% scale; primary inputs visible without scrolling;
 profiler comparison of UI refresh/model churn; offscreen and packaged checks plus honest
 limits on physical interactive evidence. Phone-sized rendering of this design is only
 for reviewing the proposal, not a commitment to a mobile AnthroForge editor.
 
-Review priority: the three inspector pages and placement of advanced relationships.
-The prototype allows exploration before choosing the broader production layout.
+The user approved the three inspector pages and placement of advanced relationships.
+The prototype is retained as design history; the linked runtime walkthrough is current.
 
 ## References and delivered boundary
 

@@ -1066,6 +1066,12 @@ store directory. Neither action participates in document commands, history or sa
 
 AnthroForgeStyle replaces only the attached ToolTip template and falls back to Qt Basic
 for other controls. One shared popup provides bounded plain-text wrapping and theme
-colors; callers retain their hover/focus/click behavior and authored help. The broader
-[workbench proposal](ui_overhaul_design.md) remains a design for review, not implemented
-layout or new application behavior.
+colors; callers retain their hover/focus/click behavior and authored help.
+
+The [workbench](ui_workbench.md) composes existing editors into Shape, Shortcuts and
+Inspect pages. WorkbenchState owns local QSettings layout persistence, separate from
+project/preferences records and undo. Editors remain instantiated across page changes;
+existing inspection adapters activate only when their visible disclosure is open.
+UiCombo display labels and UiEnumCombo code/value bindings preserve raw command IDs.
+ViewportHeader and WorkbenchStatus own presentation regions, not application operations.
+No second command, calculation, selection, policy or geometry-lifetime system is added.

@@ -41,8 +41,10 @@ ColumnLayout {
         delegate: Rectangle {
             id: row
             required property var modelData
+            readonly property bool actionsVisible: rowHover.hovered || modelData.id===workspace.selectedId
             width: hierarchy.width; height: 30; radius: 3
-            color: modelData.id === workspace.selectedId ? Theme.selection : rowMouse.containsMouse ? Theme.hover : "transparent"
+            HoverHandler { id:rowHover }
+            color: modelData.id === workspace.selectedId ? Theme.selection : rowHover.hovered ? Theme.hover : "transparent"
             MouseArea { id: rowMouse; anchors.fill: parent; hoverEnabled: true; onClicked: { hierarchy.forceActiveFocus(); workspace.select(row.modelData.id); } }
             RowLayout {
                 anchors.fill: parent; spacing: 3; anchors.leftMargin: 3 + row.modelData.depth*14; anchors.rightMargin: 4
@@ -55,10 +57,10 @@ ColumnLayout {
                     onClicked: outliner.collapsed = outliner.toggle(outliner.collapsed,row.modelData.id)
                 }
                 Image { source: row.modelData.asset ? "icons/mesh.svg" : "icons/folder.svg"; sourceSize: Qt.size(14,14); opacity: row.modelData.readonly ? .4 : .85 }
-                Label { text: row.modelData.name; Layout.fillWidth: true; elide: Text.ElideRight; color: row.modelData.readonly ? Theme.muted : Theme.text; font.pixelSize: 12 }
-                UiButton { glyph: "eye"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.visible ? .85 : .3; hint: row.modelData.visible ? "Hide object" : "Show object"; onClicked: workspace.run("workspace.update",{hidden:outliner.toggle(workspace.state.hidden,row.modelData.id)}) }
-                UiButton { glyph: "delete"; objectName: "delete_" + row.modelData.id; flatStyle: true; implicitWidth: 23; implicitHeight: 24; enabled: !row.modelData.readonly && !workspace.state.waiting; hint: "Delete, preserving children"; onClicked: outliner.deleteRequested(row.modelData.id) }
-                UiButton { glyph: "target"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.pickable ? .85 : .3; hint: "Toggle viewport picking"; onClicked: workspace.run("workspace.update",{unpickable:outliner.toggle(workspace.state.unpickable,row.modelData.id)}) }
+                Label { text: row.modelData.name; Layout.fillWidth: true; elide: Text.ElideRight; color: row.modelData.readonly ? Theme.muted : Theme.text; font.pixelSize: 12; HoverHandler { id:nameHover } ToolTip.visible:nameHover.hovered && truncated; ToolTip.text:text; ToolTip.delay:500 }
+                UiButton { visible:row.actionsVisible; glyph: "eye"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.visible ? .85 : .3; hint: row.modelData.visible ? "Hide object" : "Show object"; onClicked: workspace.run("workspace.update",{hidden:outliner.toggle(workspace.state.hidden,row.modelData.id)}) }
+                UiButton { visible:row.actionsVisible; glyph: "delete"; objectName: "delete_" + row.modelData.id; flatStyle: true; implicitWidth: 23; implicitHeight: 24; enabled: !row.modelData.readonly && !workspace.state.waiting; hint: "Delete, preserving children"; onClicked: outliner.deleteRequested(row.modelData.id) }
+                UiButton { visible:row.actionsVisible; glyph: "target"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.pickable ? .85 : .3; hint: "Toggle viewport picking"; onClicked: workspace.run("workspace.update",{unpickable:outliner.toggle(workspace.state.unpickable,row.modelData.id)}) }
             }
         }
         Label { anchors.centerIn: parent; width: parent.width-12; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; visible: !outliner.filtered.length; text: search.text ? "No matching objects" : "Your imported objects\nwill appear here."; color: Theme.muted; lineHeight: 1.5 }

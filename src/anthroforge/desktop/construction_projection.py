@@ -6,6 +6,7 @@ from anthroforge.core.object_registry import kind
 from anthroforge.native import scene
 
 from . import surface_scene
+from .construction_filter import ConstructionFilter
 from .construction_metadata import describe
 from .record_model import RecordModel
 from .values import qml
@@ -23,6 +24,7 @@ class ConstructionProjection:
         self.controller, self.records, self.keys = controller, {}, {}
         self.rendered = {}
         self.model = RecordModel(controller, ("item",), "id")
+        self.browser = ConstructionFilter(self.model)
         from .path_placeholders import PathPlaceholders
         from .point_scene import PointScene
 

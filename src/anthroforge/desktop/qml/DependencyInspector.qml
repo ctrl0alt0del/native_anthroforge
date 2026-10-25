@@ -23,13 +23,13 @@ UiSection {
             Layout.fillWidth: true
             Label { text: modelData.output+(modelData.participant ? " · in cycle" : modelData.blocked ? " · blocked upstream" : ""); color: modelData.blocked ? Theme.danger : Theme.accent }
             Label { text: "Driven by"; color: Theme.muted; font.pixelSize: 10 }
-            Repeater { model: modelData.inputs; RelatedObject { required property var modelData; targetId: modelData.owner; label: modelData.name+" · "+modelData.output } }
+            RelatedObjects { objectName:"dependencyInputs_"+modelData.output; rows:modelData.inputs }
             Label { text: "Drives"; color: Theme.muted; font.pixelSize: 10 }
-            Repeater { model: modelData.consumers; RelatedObject { required property var modelData; targetId: modelData.owner; label: modelData.name+" · "+modelData.output } }
+            RelatedObjects { objectName:"dependencyConsumers_"+modelData.output; rows:modelData.consumers }
         }
     }
     Label { text: (panel.detail.topology_locks || []).length ? "Topology locked by" : "Topology is unlocked"; color: Theme.muted }
-    Repeater { model: panel.detail.topology_locks || []; RelatedObject { required property var modelData; targetId: modelData.id; label: modelData.name+" · "+modelData.reason } }
+    RelatedObjects { objectName:"topologyConsumers"; rows:panel.detail.topology_locks || [] }
     UiSection {
         title: "Attachment details"; expanded: false
         UiDetail { label: "Authored"; value: String(panel.detail.generation || 0) }

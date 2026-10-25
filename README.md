@@ -4,9 +4,10 @@
 default), a recovery browser, and layout fixes for menus, dialogs, inspectors and
 shortcut attachment policies. Preferences also opens the autosave folder and registers
 the portable app for Windows file associations; shared tooltips wrap long help text.
-See the [workflow and evidence](docs/usability_037.md). The broader
-[workbench redesign](docs/ui_overhaul_design.md) is a proposal for review.
-Qualified with 2,246 Python tests, five native CTests and the complete minimal-PATH
+See the [workflow and evidence](docs/usability_037.md). The
+[workbench](docs/ui_workbench.md) adds Shape / Shortcuts / Inspect pages, viewport-local
+tools, a stable calculation strip, remembered layouts and clearer control labels.
+Qualified with 2,248 Python tests, five native CTests and the complete minimal-PATH
 portable suite. Schema 6 and numerical geometry remain unchanged. GUI evidence is
 background/offscreen; physical desktop acceptance is not claimed.
 
@@ -76,7 +77,7 @@ of the curve engine and does not guarantee obstacle clearance. See
 [0.2.2 unified tissues](docs/specification_022.md) adds attached Point/Anchor and Membrane
 construction, muscle/soft-tissue inflation, relaxation, constraints, cropping and stacking.
 Start with the [tissue walkthrough](docs/tissues_022.md) or [headless example](examples/tissues.json).
-**Create Tissue** is on the main toolbar and Create menu. Select a Point, Curve or Surface
+**Create Tissue** is on the viewport tool rail and Create menu. Select a Point, Curve or Surface
 (including Anchor, Fiber or Membrane) to create directly. Generic construction obtains
 independent attached copies automatically; source objects remain unchanged. **Create Fiber** is
 available from an ordinary curve's inspector and binds to nearest SCP surfaces by default.

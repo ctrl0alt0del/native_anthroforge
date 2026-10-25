@@ -12,7 +12,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from shiboken6 import delete
 from tissue_editor_acceptance import scene, settle
-from ui_acceptance import click, find
+from ui_acceptance import click, find, resize_panel
 from usability_037_acceptance import findings
 
 from anthroforge.desktop.app import create_engine
@@ -64,6 +64,7 @@ def pages(controller, window, report):
     QTest.qWait(100)
     snapshot(window, "focus-editor", report)
     controller.workbench.setFocusEditor(False)
+    resize_panel(window)
     assert controller.session.document is before
 
 
@@ -120,6 +121,7 @@ def curve(controller, window, report):
     sources = [o for o in controller.session.document.objects if type(o).__name__ == "Curve"]
     controller.select(sources[0].id)
     settle(controller)
+    construction_search(controller, window)
     assert find(window, "inspectorHeader").property("page") == "Shape"
     activate(window, "editPrimitive")
     assert controller.authoring.state["editing"]
@@ -136,17 +138,74 @@ def exercise(application):
     controller, warnings, report = Controller(), [], {}
     engine = create_engine(controller, warnings)
     try:
+        assert engine.rootObjects(), warnings
         window = engine.rootObjects()[0]
         QTest.qWait(200)
-        enum_contract(controller, window)
-        tissue(controller, window, report)
-        curve(controller, window, report)
+        scenarios(controller, window, report)
         assert not warnings, warnings
         (OUTPUT / "layout.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     finally:
         controller.close()
         delete(engine)
         application.processEvents()
+
+
+def scenarios(controller, window, report):
+    enum_contract(controller, window)
+    tissue(controller, window, report)
+    curve(controller, window, report)
+    large_relationships(controller, window, report)
+
+
+def large_relationships(controller, window, report):
+    root = controller.session.document.entities[0].id
+    for index in range(100):
+        controller.session.command("scp.empty", name=f"Consumer {index:03}", parent=root)
+    settle(controller)
+    controller.select(root)
+    click(window, "inspectTab")
+    QTest.qWait(100)
+    filter_relationships(window, report)
+    outliner_hover(controller, window)
+
+
+def construction_search(controller, window):
+    before, selected = controller.session.document, controller.selection
+    field = find(window, "constructionSearch")
+    field.setProperty("text", "fiber")
+    QTest.qWait(80)
+    assert find(window, "constructionList").property("count") == 2
+    field.setProperty("text", "no matching construction")
+    QTest.qWait(80)
+    assert find(window, "constructionList").property("count") == 0
+    field.setProperty("text", "")
+    assert controller.session.document is before and controller.selection == selected
+
+
+def outliner_hover(controller, window):
+    target = next(e.id for e in controller.session.document.entities if e.name == "Consumer 000")
+    button = find(window, "delete_" + target)
+    row = button.parentItem().parentItem()
+    assert not button.isVisible()
+    point = row.mapToScene(QPointF(25, row.height() / 2)).toPoint()
+    QTest.mouseMove(window, point, 20)
+    QTest.qWait(80)
+    assert button.isVisible()
+    point = button.mapToScene(QPointF(button.width() / 2, button.height() / 2)).toPoint()
+    QTest.mouseMove(window, point, 20)
+    QTest.qWait(80)
+    assert button.isVisible()
+
+
+def filter_relationships(window, report):
+    search = reveal(window, "dependencyConsumers_poseSearch")
+    assert search.isVisible()
+    before = search.mapToScene(QPointF(0, 0))
+    search.setProperty("text", "Consumer 099")
+    QTest.qWait(100)
+    assert find(window, "dependencyConsumers_poseList").property("count") == 1
+    assert search.mapToScene(QPointF(0, 0)) == before
+    snapshot(window, "relationship-search", report)
 
 
 def main():

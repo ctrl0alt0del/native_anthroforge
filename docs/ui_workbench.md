@@ -21,6 +21,9 @@ calculation scheduling and project schema remain unchanged.
 | Object count, document revision and display units | Hover Saved/Unsaved in the bottom strip |
 | Profiler, reports and keyboard help | Existing View/Help actions; recording indicator in the menu strip |
 
+Both navigation views offer search. Anatomy row actions appear on hover or selection,
+leaving more room for inactive object names. Clipped names expose their full text on hover.
+
 The inspector remembers the page for each object category. Pane widths, Focus editor
 and named disclosure sections persist locally, beside the preferences file in
 `workbench.ini`. They do not change the project or create Undo entries. **View → Focus
@@ -51,6 +54,10 @@ Menu and selector text uses readable names; persisted codes and command argument
 unchanged. Dynamic calculation messages use the reserved status area or existing toasts,
 not rows inserted between numerical fields. Editors remain instantiated across page
 changes so those changes do not discard active drafts.
+
+Inspect bounds long related-object lists to eight visible rows with scrolling and
+search. Filtering keeps the search field and list height stable. Delegates are reused;
+the application does not create a control for every related object at once.
 
 ## Retention and qualification
 

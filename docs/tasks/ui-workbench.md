@@ -77,4 +77,17 @@ outliers varied (up to 90 ms); inclusive durations were not added together. No p
 run overlapped the development gate. Reports: `build/ui-workbench/profiles/` (local).
 
 Full gate is running; package, final action inventory and combined-source qualification
-remain pending. Source source/geometry algorithms have not changed.
+remain pending. Source/geometry algorithms have not changed.
+
+The full development gate passes 2,248 Python tests, five native CTests, typing/style,
+numerical and runtime checks. The first relocated portable build passes the complete
+minimal-PATH suite, including hidden GPU geometry, reports, mirroring and authoring.
+Final design review added bounded searchable relationship lists (100-consumer search
+and stable-layout acceptance pass). This last QML-only change requires refreshed package
+and desktop checks. All application/native Python/C++ behavior remains unchanged.
+
+Navigation completion: Construction search uses a Qt proxy over the existing incremental
+records (no copied authored data or new selection model). Anatomy hover actions and full
+name tooltips restore room for names. Search rename/insert/remove tests pass; real Qt
+tests confirm unchanged selection/document identity and buttons remaining visible when
+the pointer enters them. Final-source profiling and refreshed qualification are next.

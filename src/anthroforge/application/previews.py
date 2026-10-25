@@ -24,11 +24,12 @@ class Preview[T]:
 
 def current(session: Any, value: Preview[Any]) -> bool:
     document = session.document
+    available = document.registry.records.keys() | document.mirrors.instances.keys()
     if str(document.id) != value.document:
         return False
-    if value.target and value.target not in document.registry.records:
+    if value.target and value.target not in available:
         return False
-    if any(port.owner not in document.registry.records for port in value.ports):
+    if any(port.owner not in available for port in value.ports):
         return False
     return value.reads == revisions(document, value.ports)
 

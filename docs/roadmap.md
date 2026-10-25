@@ -1,11 +1,16 @@
 # AnthroForge release roadmap
 
+- **0.3.6 — package qualification in progress:** integrate the preserved 0.3.4
+  D01–D12 workflows and retained-owner attachment corrections with mirroring and smooth
+  propagation. No source-project migration or exact welded-Ribs parity claim.
+  [Walkthrough](workflows_036.md), [delivery evidence](tasks/workflows-036.md).
+
 - **0.3.5 — qualified:** strict source-linked, read-only mirroring,
   hierarchy rules, instance-aware surfaces and symmetric construction. Mirrors never
   solve independent geometry. [Specification](specification_035.md),
   [implementation plan](implementation_035.md), [runtime/evidence](mirroring_035.md).
   Schema 6 reads 4/5/6 without reflected payload duplication. Existing independent
-  counterpart migration and the separate unfinished 0.3.4 branch remain untouched.
+  counterpart migration remained untouched; the preserved 0.3.4 work is integrated in 0.3.6.
 
 - **0.3.3 — qualified:** targeted shortcut metadata/formula observation, immutable
   publication and incremental priority links. [Evidence](shortcuts_033.md).

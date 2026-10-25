@@ -36,6 +36,7 @@ def proposed(session: Any, identity: str) -> tuple[Any, Any]:
         data["target"],
         record,
         role=data["role"],
+        instance=data.get("instance", ""),
         material_asset=data["material_asset"],
     )
     return issue, binding

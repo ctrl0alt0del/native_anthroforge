@@ -37,6 +37,28 @@ def test_same_mesh_replacement_keeps_identity_and_one_undo(session):
     assert session.document.entity(target).primitive == before.primitive
 
 
+def mirrored_scene(session):
+    root = session.command("scp.empty", name="Root")
+    target = session.command("import", path=str(CUBE), units=1, parent=root)["entity_id"]
+    session.wait()
+    session.command("mirror.configure", target=root, enabled=True)
+    return root, target
+
+
+def test_mirror_aliases_are_valid_review_inputs_and_plane_changes_stale_the_review(session):
+    root, target = mirrored_scene(session)
+    token, state = assessment(session, target, CUBE)
+    assert state["matching_topology"]
+    session.command("mirror.configure", target=root, shift=0.2)
+    assert session.command("scp.mesh.replace.status")["state"] == "stale"
+    with pytest.raises(ValueError, match="current successful"):
+        session.command("scp.mesh.replace.apply", token=token)
+    token, _ = assessment(session, target, CUBE)
+    session.command("scp.mesh.replace.apply", token=token)
+    session.wait()
+    assert session.document.entity(target).result.status == "ready"
+
+
 def tetrahedron(tmp_path):
     path = tmp_path / "tetra.obj"
     path.write_text("v 0 0 0\nv 1 0 0\nv 0 1 0\nv 0 0 1\nf 1 3 2\nf 1 2 4\nf 2 3 4\nf 3 1 4\n")

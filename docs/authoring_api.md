@@ -970,16 +970,18 @@ Read-only `shortcut.effects`, `shortcut.formulas`, `shortcut.attachment_policy` 
 `shortcut.progress` expose influence, captured numerical evidence, effective policy and
 downstream readiness without edits. See [operation signatures and walkthrough](shortcuts_031.md).
 
-## In-progress 0.3.4: Fiber deformation supports
+## Audited authoring workflows (0.3.6): Fiber deformation supports
 
 `fiber.supports.inspect(curve)` returns authored policy, accepted captures and eligible
 surface references without editing. `fiber.supports.configure(curve, policy)` sets
 `automatic` (default true), `included` and `excluded` reference arrays. Each reference
-contains target identity and role. These are deformation supports, not routing obstacles.
+contains target identity, role and optional mirror instance. These are deformation supports,
+not routing obstacles.
 Required pin targets cannot be excluded. Reconfiguration retains current shape and
 captures new fields through the coordinator with normal cancellation/undo semantics.
 Schema 6 persists policy; schemas 4/5 load with existing automatic behavior and retain
-accepted results. This branch is not a qualified 0.3.4 release.
+accepted results. The preserved 0.3.4 implementation is delivered as
+[0.3.6](workflows_036.md), with current package qualification tracked there.
 
 `fiber.rebind(curve)` recaptures all bound points at current resolved positions on
 their existing target roles, as one undo action. It does not silently choose new parents.

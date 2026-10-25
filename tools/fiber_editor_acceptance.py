@@ -26,6 +26,11 @@ from anthroforge.desktop.runtime import native_runtime
 def settle(controller):
     controller.session.wait(10)
     controller.refresh()
+    controller.session.wait(10)
+    for _ in range(8):
+        for model in controller.geometry_models():
+            model.drain()
+        controller.frame_presented()
     QGuiApplication.processEvents()
 
 
@@ -51,7 +56,7 @@ def create(controller, engine):
     fibers = [o for o in controller.session.document.objects if isinstance(o, Fiber)]
     assert len(fibers) == 1, controller.message
     assert fibers[0].id != source and controller.constructionModel.rowCount() == 2
-    assert any(row["id"] == fibers[0].id for row in controller.path_model.wanted.values())
+    assert any(row["id"] == fibers[0].id for row in controller.fiber_display.model.active_rows())
     assert controller.selection == fibers[0].id and not controller.authoring.active
     assert controller.selectedData["kind"] == "FIBER" and not controller.authoring.selection
 

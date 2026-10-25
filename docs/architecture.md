@@ -1014,7 +1014,7 @@ handles as the staged renderer; they release that scene when disabled. Native an
 queries use owned revision-qualified inputs through the existing read-only job service.
 No second scheduler, property engine, attachment solver or persistence format is added.
 
-## Audited workflows (in-progress 0.3.4)
+## Audited authoring workflows (0.3.6)
 
 Replacement assessment lifecycle, immutable candidates, revision/registry membership
 proofs, approval lists and atomic authored publication are shared by imported-mesh
@@ -1034,3 +1034,10 @@ display meshes have separate handle domains. Displayed-mesh picking cannot becom
 anatomical surface provider. Cache/current/staging ownership is visible to the profiler.
 Native ABI registration occurs during engine initialization, including display operations,
 so recording observes worker calls consistently. None of these display jobs blocks saving.
+
+Strict Fiber mirrors instance the source's accepted world-space tube through the mirror
+plane; they allocate no additional tubes or numerical path results. Source/mirror chunks
+share staged publication and picking uses the displayed frame. Read-only review validity
+recognizes both authored identities and mirror output aliases; changed plane revisions
+invalidate assessments. Pin proposals preserve complete surface references, including
+instance identity. These contracts are qualified together in [0.3.6](workflows_036.md).

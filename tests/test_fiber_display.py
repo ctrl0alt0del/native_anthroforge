@@ -80,3 +80,14 @@ def test_deleted_fiber_discards_queued_display_without_resource_errors(controlle
     assert not controller.fiber_display.accepted and not controller.fiber_display.jobs
     assert not controller.session.scheduler.errors
     assert not controller.fiber_display.model.active_rows()
+
+
+def test_saved_capture_waits_for_display_workers_before_geometry_staging(controller):
+    key = setup(controller)
+    radius(controller, key, 0.025)
+    before, cursor = controller.session.document, controller.session.history.cursor
+    controller.fiber_display.prepare_capture()
+    frames(controller)
+    row = controller.fiber_display.model.active_rows()[0]
+    assert row["content"]["radius"] == 0.025
+    assert controller.session.document == before and controller.session.history.cursor == cursor

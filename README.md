@@ -1,13 +1,13 @@
-# AnthroForge 0.3.5
+# AnthroForge 0.3.6
 
-0.3.5 adds strict source-linked mirroring for anatomy and required construction,
-read-only instance inspection, shared surface references, mirrored rows and symmetric
-half-path loops. Mirrors reuse source geometry and never run independent tissue or
-routing solvers. See the [workflow and evidence](docs/mirroring_035.md).
-The development gate passes 2,102 tests and five native CTests; minimal-PATH portable
-and hidden-GPU checks pass. Interactive desktop acceptance is not claimed.
-Projects save schema 6 and read schemas 4/5/6. Existing independent opposite-side
-objects are not paired or migrated. The prior unfinished 0.3.4 task remains separate.
+0.3.6 integrates the preserved 0.3.4 authoring work with strict mirroring and selectable
+Fiber propagation. It adds Fiber support controls, pin offsets/checks/repairs, cold routing,
+solver controls, connected SCP splitting, reviewed mesh/tissue-source replacement,
+existing-tissue presets, surface-click Fibers, display radius and surface-source selection.
+See the [workflow and evidence](docs/workflows_036.md).
+Projects save schema 6 and read schemas 4/5/6. No project remigration or independent
+counterpart pairing is performed. The accepted welded-Ribs difference remains documented.
+Combined source checks pass; portable release qualification is in progress.
 
 
 Shortcut updates reduce repeated property queries, formula observation, document reconstruction
@@ -84,7 +84,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.3.5/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.3.6/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included

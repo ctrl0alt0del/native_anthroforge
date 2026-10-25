@@ -113,6 +113,17 @@ class FiberDisplay:
     def memory_owners(self, owners):
         owners["cache"].update(mesh for _, mesh in self.accepted.values())
 
+    def prepare_capture(self):
+        self.controller.session.wait(180)
+        missing = [
+            key
+            for key, row in self.desired.items()
+            if self.accepted.get(key, (None,))[0]
+            != (self.controller.session.document.id, signature(row))
+        ]
+        if missing:
+            raise ValueError("Fiber display preparation failed for: " + ", ".join(missing))
+
 
 def signature(row):
     return row["asset"], tuple(row["matrix"]), row["fiber_radius"]
@@ -174,7 +185,7 @@ def display_rows(row, token, mesh):
         dict(
             row,
             handle=mesh.handle,
-            matrix=IDENTITY,
+            matrix=list(IDENTITY),
             geometry_asset=token[1][0],
             key=f"{row['id']}:{mesh.handle}:{chunk}",
             chunk=chunk,

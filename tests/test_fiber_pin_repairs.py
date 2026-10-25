@@ -6,11 +6,13 @@ import numpy as np
 import pytest
 
 from anthroforge.application.issues import fiber_pins
+from anthroforge.core.mirroring import MirrorInstance
+from tests.conftest import CUBE
 from tests.test_fiber_creation import bind, path, scene
 
 
-def damaged(session):
-    fiber = bind(session, *scene(session))
+def damaged(session, fiber=None):
+    fiber = fiber or bind(session, *scene(session))
     broken = []
     for binding in fiber.bindings:
         record = (999999.0,) * 3 + binding.attachment.binding[3:]
@@ -65,3 +67,29 @@ def test_healthy_pins_need_no_repair_and_scan_has_no_undo(session):
     count = len(session.history.entries)
     assert not scan(session, fiber)
     assert len(session.history.entries) == count
+
+
+def mirrored_fiber(session):
+    root = session.command("scp.empty", name="Skeleton")
+    target = session.command("import", path=str(CUBE), units=1, parent=root)["entity_id"]
+    session.wait()
+    session.command("mirror.configure", target=root, enabled=True, shift=2)
+    source = session.command(
+        "curve.create", points=[dict(position=[x, 0, 0.7]) for x in (3.6, 4.4)]
+    )
+    session.wait()
+    return bind(session, MirrorInstance(target, root).id, source)
+
+
+def test_repair_retains_mirrored_surface_reference_and_current_shape(session):
+    fiber = damaged(session, mirrored_fiber(session))
+    before = path(session, fiber.id)
+    rows = scan(session, fiber)
+    assert len(rows) == 2
+    session.command("fiber.pins.repair", identities=[r["id"] for r in rows])
+    session.wait()
+    current = session.document.object(fiber.id)
+    assert not session.scheduler.errors
+    assert [b.reference for b in current.bindings] == [b.reference for b in fiber.bindings]
+    np.testing.assert_allclose(path(session, fiber.id), before, atol=1e-10)
+    assert not scan(session, current)

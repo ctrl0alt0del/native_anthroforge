@@ -6,11 +6,12 @@ from PySide6.QtCore import Q_ARG, Q_RETURN_ARG, QMetaObject, QPointF
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
 
+from anthroforge.core.mirroring import MirrorInstance
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.offscreen import Offscreen
 from anthroforge.desktop.runtime import native_runtime
 
-OUTPUT = Path("build/parity-workflows-034/fiber-display")
+OUTPUT = Path("build/workflows-036/fiber-display")
 
 
 def frames(controller, renderer, app):
@@ -25,13 +26,12 @@ def frames(controller, renderer, app):
 
 
 def setup(controller):
-    target = controller.run(
-        "import", dict(path=str(Path("examples/primitives/cube.obj").resolve()), units=1.0)
-    )["entity_id"]
-    controller.session.wait(5)
+    target = support(controller)
     controller.run(
         "fiber.place",
-        dict(points=[dict(position=[x, 0, 0.501], target=target) for x in (-0.4, 0.4)]),
+        dict(
+            owner=target, points=[dict(position=[x, 0, 0.501], target=target) for x in (-0.4, 0.4)]
+        ),
     )
     controller.session.wait(5)
     key = controller.session.document.objects[0].id
@@ -39,6 +39,14 @@ def setup(controller):
     controller.select(key)
     controller.authoring.setEditing(False)
     return key
+
+
+def support(controller):
+    root = controller.run("scp.empty", dict(name="Skeleton"))
+    path = str(Path("examples/primitives/cube.obj").resolve())
+    target = controller.run("import", dict(path=path, units=1, parent=root))["entity_id"]
+    controller.session.wait(5)
+    return target
 
 
 def capture(controller, renderer, app, key, radius):
@@ -74,6 +82,23 @@ def exercise(controller, renderer, app):
     assert controller.fiber_display.hits([0, 0.03, 3], [0, 0, -1])
     assert not controller.message, controller.message
     print(f"Texture-only Fiber radius: narrow={small}px, wide={large}px; exact picking passed.")
+    mirrored(controller, renderer, app, key)
+
+
+def mirrored(controller, renderer, app, key):
+    root = controller.session.document.entities[0].id
+    controller.run("mirror.configure", dict(target=root, enabled=True, shift=1))
+    mirror = MirrorInstance(key, root).id
+    controller.select(mirror)
+    controller.cameraRequested.emit([1, 0, 0.501, -90, 0, 0, 4], True)
+    image = frames(controller, renderer, app)
+    image.save(str(OUTPUT / "source-mirror.png"))
+    rows = {r["id"]: r for r in controller.fiber_display.model.active_rows()}
+    assert rows[key]["handle"] == rows[mirror]["handle"]
+    assert controller.fiber_display.hits([2, 0.03, 3], [0, 0, -1])[0]["id"] == mirror
+    pixel = project(renderer, [2, 0, 0.501])
+    color = image.pixelColor(round(pixel.x()), round(pixel.y()))
+    assert color.red() > 200 and 100 < color.green() < 210 and color.blue() < 180
 
 
 def run(app):

@@ -47,9 +47,34 @@ running installations or use visible desktop input. Existing source projects sta
 
 ## Next actions
 
-1. Commit/push the reconciled merge checkpoint; run the complete development gate.
-2. Validate desktop/assembly/portable behavior and fix failures, checkpointing progress.
-3. Update release/version documentation, package/qualify, then validated merge to main.
+1. Run final aggregate tests after mirror/review/capture fixes; rebuild version metadata.
+2. Package canonical 0.3.6; run full portable suite, including new authoring workflows.
+3. Complete release evidence/source archive, then validated merge/push to main.
 
 Recovery inputs are the donor task record and local `build/parity-workflows-034` evidence,
 plus `build/fiber-propagation` and the source 96-muscle project recorded there.
+
+## Integrated qualification checkpoint
+
+- Merge checkpoint `d8bbbe5` pushed successfully. Native gate and 2,220-test full suite
+  passed; later focused cases add mirrored repair/review and asynchronous capture coverage.
+- Found and fixed actual integration defects: positive-radius mirrors bypassed source
+  presentation; a tuple-valued QML frame hid source tubes; pin proposals lost instance
+  identity; generic previews rejected valid mirror output aliases; saved captures did not
+  wait for read-only display workers. Numerical source algorithms are unchanged.
+- Eight restored workflow tools pass in background/offscreen mode. Actual hidden GPU
+  source/mirror tube captures inspected, with radius and exact-picking assertions. The
+  maintained portable extension also passes against the source runtime; package pending.
+- Production fixture: both SMOOTH_SHAPE and LOCAL_SURFACE pass Ribs=3, undo/redo/reopen.
+  Smooth-method pre/post geometry hashes and all attachment records exactly match the
+  previous release evidence in `build/fiber-propagation/full-assembly/SMOOTH_SHAPE`.
+  Runs took 5.45/5.72 seconds under uncontrolled concurrent validation load; no speedup claim.
+- Display profiler: all 326 jobs and native spans recorded; 326 displayed Fibers, exact
+  source buffers/attachments/history retained. CPU preparation 359 ms, work 768 ms,
+  staging 60 ms; these are not physical frame times. Report and JSON evidence under
+  `build/workflows-036/display-profile`; assembly reports under `full-assembly`.
+- Source architecture review: one coordinator remains; policies and reviews are shared
+  application operations, numerical work stays native, mirrors reuse source resources,
+  accepted geometry/current display have separate ownership, and user projects are intact.
+- Version metadata advanced to 0.3.6 for package qualification. Do not claim portable
+  completion until the canonical executable and companion source archive are checked.

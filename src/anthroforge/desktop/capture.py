@@ -52,6 +52,7 @@ def load_revision(controller, project, revision):
 def draw(app, controller, renderer, settings=None):
     if settings is not None:
         inspection_view(controller, settings)
+    controller.fiber_display.prepare_capture()
     stage_geometry(app, controller, renderer)
     if settings is None and controller.rows:
         controller.select(controller.rows[0]["id"])

@@ -151,6 +151,7 @@ def proposed_binding(context: Any, point: str, ref: Any, record: Any) -> dict[st
         point=point,
         target=ref.target,
         role=ref.role,
+        instance=ref.instance,
         binding=record.tolist(),
         material_asset=resource.asset_id,
     )
@@ -180,5 +181,9 @@ def pin_issue(item: Fiber, index: int, stamp: str, suggested: Any, details: str)
 
 def pin_evidence(binding: Any, suggested: Any) -> str:
     return evidence(
-        point=binding.point, old_target=binding.target, old_role=binding.role, proposal=suggested
+        point=binding.point,
+        old_target=binding.target,
+        old_role=binding.role,
+        old_instance=binding.instance,
+        proposal=suggested,
     )

@@ -1,5 +1,11 @@
 # Attachment parity and audited workflows - 0.3.4
 
+**Historical task record.** The user approved integrating this preserved work as
+[0.3.6](workflows-036.md). Its branch is merged into `codex/workflows-036`; combined
+qualification and final delivery are tracked there. The old delivery pause and pending
+question statements below are historical. Keep welded Ribs; do not claim exact shoulder
+parity or remigrate source projects as part of this integration. No separate 0.3.4 shipped.
+
 - Task branch: `codex/parity-workflows-034`
 - Integration branch: `main`
 - Starting revision: `1acb8ae`

@@ -10,6 +10,7 @@ from pathlib import Path
 
 import numpy as np
 from attached_creation_portable import automatic_construction
+from authoring_workflows_portable import authoring_workflows
 from branch_placement_portable import branches
 from comparison_portable import comparison
 from construction_portable import construction
@@ -55,6 +56,7 @@ CHECKS = (
     "shortcut influence, captured formula inputs, effective policy and propagation completion",
     "session comparison, paired images, bounded replay journal and isolated replay",
     "strict mirrors, symmetric loops, instance measurements and schema-6 storage",
+    "Fiber pins/supports/cold routing, mirrored tubes, SCP split/replacement and tissue retarget",
 )
 
 
@@ -153,10 +155,10 @@ def qualification_steps():
         workflow,
         inspection,
         *construction_steps(),
-        tissues,
         exterior_placement,
         feedback,
         preferences,
+        authoring_workflows,
     )
 
 
@@ -169,6 +171,7 @@ def construction_steps():
         shortcuts,
         comparison,
         mirroring,
+        tissues,
     )
 
 

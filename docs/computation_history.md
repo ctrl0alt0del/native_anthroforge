@@ -2626,4 +2626,27 @@ Existing shortcut transaction tests pass. Original Thumb and shoulder parity rem
 unqualified. Migration now captures effective legacy Backsolve policy rather than
 the raw unset flag; standalone defaults remain off.
 
+### CH-091 — Integrate audited workflows with strict mirrors and propagation (0.3.6)
 
+- Previous branch boundaries predated strict mirror references and selectable Fiber
+  propagation. Tube display had no instance projection; repaired pins omitted instance
+  identity; generic review validity assumed all output owners were authored objects.
+- New: source tube jobs remain read-only and world-space. Mirror rows reuse the exact
+  same native handle through the reflection frame; both publish together and native
+  picking consumes displayed frames. QML receives list-valued matrices. Saved captures
+  await display preparation before staging rather than omitting unfinished tubes.
+- Complete surface references survive pin proposals and repair. Generic previews accept
+  mirror output aliases but still reject changed planes/revisions. Cold routing and quick
+  Fiber creation preserve dispatch-time backend/propagation preferences. No routing,
+  inflation, smoothing, attachment objective or source geometry kernel was replaced.
+- Evidence: full development gate at the integration checkpoint passes 2,220 tests and
+  five native CTests. Additional mirror repair/review/capture regression cases pass;
+  final aggregate rerun and portable qualification are tracked in workflows-036.md.
+  Actual hidden GPU tubes, radius differences and source/mirror picks were inspected.
+- Production assembly geometry hashes before/after Ribs=3 and stored attachments exactly
+  match prior smooth-propagation evidence. Both propagation methods pass history/reopen.
+  Display profiling accounts for all 326 native tube calls without changing source
+  buffers or history. Timings include uncontrolled background load, not an FPS claim.
+- Preserved: one coordinator, resource leases, exact material references, read-only
+  mirrors, stale rejection, Manual provenance, undo/save policy and welded-Ribs choice.
+  No source-project migration or exact shoulder-addon equivalence is claimed.

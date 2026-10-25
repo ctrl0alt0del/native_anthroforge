@@ -295,7 +295,7 @@ ApplicationWindow {
         }
     }
     UiDialog {
-        id: discardDialog; title: "Unsaved changes"; modal: true; anchors.centerIn: parent
+        id: discardDialog; objectName: "discardDialog"; title: "Unsaved changes"; modal: true; anchors.centerIn: parent
         ColumnLayout {
             Label { text: "Save the current project before replacing it, or discard its changes."; width: 330; wrapMode: Text.WordWrap }
             UiButton { text: "Save and continue"; Layout.fillWidth: true; onClicked: { discardDialog.close(); workspace.afterSave(window.replacementPath); window.saveProject(); } }

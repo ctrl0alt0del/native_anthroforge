@@ -51,3 +51,19 @@ do not mask controls with unnecessary elision or transient layout changes.
 3. Run development/portable checks, document and package 0.3.7, then merge/push main.
 
 No external project migration or geometry algorithm changes are requested.
+
+## Layout and lifecycle checkpoint
+
+Recent/recovery interactions pass in the real offscreen QML application. Ordinary
+open and the unsaved-change prompt remain in use. Recovery opens as dirty/untitled
+and is excluded from recent history. Named snapshots use the original filename.
+
+Observed layout defects corrected at their owners: invisible menu rows no longer
+reserve height; dialog titles wrap; deletion uses a searchable affected-object list
+instead of an overflowing paragraph; primary object controls precede optional mirror
+settings. Buttons expose their full label when truncated. Tests inspect narrow and
+normal body/Fiber/surface/tissue layouts and keep search-field placement stable.
+
+32 focused tests pass, including queued dispatch-time capture, non-overlap, cancellation,
+active gestures, checkpoint saves, atomic failure and retention. Full gate, scaled
+layout checks, production-sized recovery and portable packaging remain pending.

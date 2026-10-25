@@ -49,14 +49,6 @@ UiScrollView {
             UiButton { text: "Isolate"; Layout.fillWidth: true; onClicked: workspace.run("view.isolate",{targets:[inspector.selected.id]}) }
             UiButton { text: "Show all"; Layout.fillWidth: true; onClicked: workspace.run("view.show_all",{}) }
         }
-        MirrorSettings { Layout.fillWidth: true }
-        UiButton {
-            objectName: "addObjectImage"; text: "Add reference image…"; glyph: "image"; Layout.fillWidth: true
-            visible: !!inspector.selected.id && inspector.selected.kind !== "IMAGE"
-            enabled: !inspector.selected.readonly && !workspace.state.waiting && !workspace.state.editing
-            hint: "Import an image parented to this object; align it to the current orthographic axis view"
-            onClicked: inspector.imageRequested(inspector.selected.id)
-        }
         ColumnLayout {
             visible: !!inspector.selected.id && !inspector.selected.is_control && !inspector.selected.is_construction && !inspector.selected.is_tissue
             enabled: !inspector.selected.readonly && !workspace.state.waiting
@@ -177,6 +169,14 @@ UiScrollView {
         ConstructionInspector { id: constructionInspector; onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         TissueInspector { visible: !!inspector.selected.is_tissue; enabled: !inspector.selected.readonly && !workspace.state.waiting }
         TissueInspection { visible: !!inspector.selected.is_tissue && !!inspector.selected.mirror_source }
+        MirrorSettings { Layout.fillWidth: true }
+        UiButton {
+            objectName: "addObjectImage"; text: "Add reference image…"; glyph: "image"; Layout.fillWidth: true
+            visible: !!inspector.selected.id && inspector.selected.kind !== "IMAGE"
+            enabled: !inspector.selected.readonly && !workspace.state.waiting && !workspace.state.editing
+            hint: "Import an image parented to this object; align it to the current orthographic axis view"
+            onClicked: inspector.imageRequested(inspector.selected.id)
+        }
         DependencyInspector { visible: !!inspector.selected.id }
         UiNotice { text: inspector.selected.error || ""; error: true }
         Item { implicitHeight: 8 }

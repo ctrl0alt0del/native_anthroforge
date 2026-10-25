@@ -23,7 +23,7 @@ def metadata(document: Document, origin: str) -> dict[str, Any]:
     return dict(
         schema=1,
         group=hashlib.sha256(identity.encode()).hexdigest()[:24],
-        name=document.name,
+        name=Path(origin).stem if origin else document.name,
         origin=origin,
         revision=document.revision,
         created=datetime.now(UTC).isoformat(),

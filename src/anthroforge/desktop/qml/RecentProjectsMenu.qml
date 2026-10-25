@@ -16,7 +16,7 @@ UiMenu {
             onTriggered: workspace.projectLibrary.openRecent(modelData.path)
         }
         onObjectAdded: (index, object) => menu.insertItem(index, object)
-        onObjectRemoved: object => menu.removeItem(object)
+        onObjectRemoved: (index, object) => menu.removeItem(object)
     }
     UiMenuItem { text: "No recent projects"; enabled: false; visible: !workspace.projectLibrary.recentProjects.length }
     MenuSeparator { visible: !!workspace.projectLibrary.recentProjects.length }

@@ -1,18 +1,21 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 
 UiDialog {
     id: dialog
     objectName: "deleteDialog"
     parent: Overlay.overlay
     anchors.centerIn: parent
-    width: 420
+    width: Math.min(520, parent.width-48)
+    height: Math.min(implicitHeight, parent.height-48)
     modal: true
     standardButtons: Dialog.Ok | Dialog.Cancel
     property var target: ({})
     property string explanation: ""
     property var impact: ({})
     title: "Delete “" + (target?.name || "") + "”?"
+    onAboutToShow: { search.text=""; standardButton(Dialog.Ok).text="Delete"; }
     function request(entity) {
         const row = workspace.objectRecord(entity);
         if (!row || row.readonly || workspace.state.waiting) return;
@@ -31,7 +34,24 @@ UiDialog {
         const result = workspace.run(impact.operation, impact.arguments);
         if (typeof result === "string" && result) workspace.select(result);
     }
-    Label { width: parent.width; text: dialog.explanation + "\n\nAffected: " + (dialog.impact.affected || []).map(r=>r.name).join(", ") + "\n\nYou can undo this action."; wrapMode: Text.WordWrap; color: Theme.text }
+    contentItem: ColumnLayout {
+        spacing: Theme.gap
+        Label { text: dialog.explanation; Layout.fillWidth:true; wrapMode:Text.Wrap; color:Theme.text }
+        Label { text:"Affected objects · "+(dialog.impact.affected || []).length; color:Theme.muted }
+        UiField { id:search; objectName:"deleteAffectedSearch"; Layout.fillWidth:true; visible:(dialog.impact.affected || []).length>8; placeholderText:"Search affected objects" }
+        ListView {
+            objectName:"deleteAffectedObjects"; Layout.fillWidth:true; Layout.fillHeight:true
+            Layout.preferredHeight:Math.min(200, (dialog.impact.affected || []).length*32); clip:true; boundsBehavior:Flickable.StopAtBounds
+            model:(dialog.impact.affected || []).filter(row=>row.name.toLowerCase().includes(search.text.toLowerCase()))
+            ScrollBar.vertical:ScrollBar { policy:ScrollBar.AlwaysOn }
+            delegate:Label {
+                required property var modelData
+                width:ListView.view.width-16; padding:5; text:modelData.name
+                color:Theme.text; wrapMode:Text.Wrap
+            }
+        }
+        Label { text:"You can undo this action."; color:Theme.muted }
+    }
     onAccepted: execute()
     AffectedConsumersDialog { id: affected }
 }

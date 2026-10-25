@@ -7,7 +7,7 @@ MenuItem {
     property string shortcutHint: ""
     property string detail: ""
     property string hint: ""
-    implicitHeight: Math.max(Theme.controlHeight, contentItem.implicitHeight + 10)
+    implicitHeight: visible ? Math.max(Theme.controlHeight, contentItem.implicitHeight + 10) : 0
     leftPadding: 28; rightPadding: Theme.inset
     hoverEnabled: true
     ToolTip.visible: hovered && !!hint

@@ -162,3 +162,50 @@ def test_cancelled_serialization_retains_existing_file(session, tmp_path):
 def test_interval_validation(session, minutes):
     with pytest.raises(ValueError, match="whole number"):
         session.command("preferences.set", autosave_minutes=minutes)
+
+
+def hold_reader(session, key):
+    started, release = Event(), Event()
+
+    def execute(document, cancel):
+        started.set()
+        release.wait(5)
+
+    job = Job("Reader", frozenset((key,)), lambda d: d, execute, lambda r: None, writes=False)
+    session.scheduler.submit(job)
+    session.scheduler.tick()
+    assert started.wait(2)
+    return release
+
+
+def test_queued_autosave_captures_at_dispatch_and_never_overlaps(session, tmp_path):
+    saver, now = service(session, tmp_path)
+    root = session.command("scp.empty", name="Earlier")
+    releases = [hold_reader(session, key) for key in ("@a", "@b")]
+    now[0] += 301
+    saver.poll(session)
+    job = saver.job
+    session.command("scp.rename", entity=root, name="Newest at dispatch")
+    now[0] += 301
+    saver.poll(session)
+    assert saver.job is job and not job.started
+    for release in releases:
+        release.set()
+    session.wait(5)
+    assert read_package(Path(saver.last["path"]), session.engine)[0] == session.document
+
+
+def test_project_replacement_cancels_pending_recovery_and_resets_clock(session, tmp_path):
+    saver, now = service(session, tmp_path)
+    session.command("scp.empty", name="Old project")
+    releases = [hold_reader(session, key) for key in ("@a", "@b")]
+    now[0] += 301
+    saver.poll(session)
+    session.scheduler.cancel_job(saver.job.id)
+    for release in releases:
+        release.set()
+    session.wait(5)
+    saver.reset()
+    saver.poll(session)
+    assert saver.job is None and not saver.last and saver.due > now[0]
+    assert not saver.store.scan()[0]

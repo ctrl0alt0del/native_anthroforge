@@ -4,7 +4,7 @@ import QtQuick.Layouts
 
 UiSection {
     id: panel
-    title: "Symmetric construction"
+    title: "Symmetric construction"; expanded:false; stateKey:"curve/symmetry"
     required property var curve
     property bool topologyLocked: false
     readonly property string curveId: curve.id || ""

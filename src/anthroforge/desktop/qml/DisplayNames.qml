@@ -10,7 +10,8 @@ QtObject {
         NORMAL:"Surface normals", PROFILE:"Curve profile", RADIAL:"Radial",
         BEZIER:"Bézier", POLYLINE:"Polyline", ROUTED:"Routed", PARAMETRIC:"Parametric",
         INHERIT:"Inherit", ON_RELEASE:"On release", STATIC_PBD:"Static PBD",
-        AUTO:"Automatic", B_SPLINE:"B-spline", CATMULL_ROM:"Catmull–Rom"
+        AUTO:"Automatic", B_SPLINE:"B-spline", BSPLINE:"B-spline", CATMULL_ROM:"Catmull–Rom",
+        INT:"Integer", FLOAT:"Real number", BOOL:"Boolean"
     })
     function label(code) {
         if(labels[code]) return labels[code];

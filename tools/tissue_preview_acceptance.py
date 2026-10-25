@@ -5,6 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
+from numeric_input_acceptance import reveal
 from PySide6.QtCore import Q_ARG, QMetaObject, Qt
 from PySide6.QtGui import QFont, QFontDatabase
 from tissue_editor_acceptance import (
@@ -30,6 +31,7 @@ def inspect(controller, window):
     exercise(controller, window)
     target, cursor = controller.selection, controller.session.history.cursor
     before = controller.session.document
+    reveal(window, "tissuePreviewStart")
     click(window, "tissuePreviewStart")
     amount(window, 0.08)
     settle(controller)

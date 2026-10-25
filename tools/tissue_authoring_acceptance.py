@@ -129,6 +129,7 @@ def assert_depths(actual, expected):
 
 def profile_preview(controller, window):
     before = profile_value(controller)
+    reveal(window, "tissuePreviewStart")
     click(window, "tissuePreviewStart")
     settle(controller)
     type_value(window, "tissueProfileDepthValue", "0.06")

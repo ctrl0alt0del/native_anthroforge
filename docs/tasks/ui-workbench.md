@@ -51,3 +51,30 @@ and initial workbench interactions passed. Added explicit tests for layout persi
 enum dispatch, preview retention, on-demand geometry inspection and curve editing.
 Fixed new icon/encoding issues found during these checks. Full gate, profiling,
 portable qualification and final visual/copy review remain pending. No release claim.
+
+## Interaction and profiling evidence
+
+Workbench acceptance passes at 1440×900/1050×680 and 150% scale: page changes and Focus
+editor preserve document identity; curve editing and inflation previews survive page
+changes; friendly update-mode labels still dispatch raw enums. Numerical acceptance
+passes decimal/comma entry, dragging, cancel/deactivation and one-action Undo. Tissue
+authoring/preview, Fiber editor, shortcut workflow, section/painting and Preferences
+checks pass. Layout scans found no cropped text in the recorded workbench views.
+
+The moved comparison display exposed per-field notification ordering: maximum could
+arrive before mean/RMS. Presentation now formats unavailable individual values safely.
+Rechecked stage comparison and unchanged anatomy pass. Updated the old relationship
+acceptance fixture to use anatomical workspace members (it previously tried to include
+a Hook, silently failing workspace creation); focused navigation and export now pass.
+
+Serial ABBA recordings, using the actual assembly and Ribs Top Radius=3 with the same
+30 controller ticks, took 15.35/14.59 s before and 14.92/14.49 s after. All captures have
+526 active jobs at the bounded endpoint, no calculation errors, zero property queries,
+9 model replacements, and 15 row insert/remove events each. Data-change counts ranged
+1252–1315. No repeatable regression is demonstrated; these runs do not establish a
+speedup, full-update completion or physical frame/input latency. Individual binding
+outliers varied (up to 90 ms); inclusive durations were not added together. No profiler
+run overlapped the development gate. Reports: `build/ui-workbench/profiles/` (local).
+
+Full gate is running; package, final action inventory and combined-source qualification
+remain pending. Source source/geometry algorithms have not changed.

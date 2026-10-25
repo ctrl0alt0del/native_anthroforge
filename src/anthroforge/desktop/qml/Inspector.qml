@@ -6,6 +6,8 @@ import QtQuick.Dialogs
 UiScrollView {
     id: inspector
     property var selected: workspace.selectedData
+    property string category: ""
+    onCategoryChanged: if(contentItem) contentItem.contentY=0
     readonly property var attachment: selected.attachment || {}
     readonly property var candidates: workspace.sceneChoices.parents
     readonly property bool dialogVisible: colorDialog.visible || constructionInspector.dialogVisible
@@ -27,11 +29,6 @@ UiScrollView {
             Label { text: "Select an object in the viewport or outliner to edit its properties."; color: Theme.muted; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; Layout.fillWidth: true }
         }
         Label { visible: !!inspector.selected.readonly; text: inspector.selected.mirror_source ? "Mirrored instance · read-only" : "Outside this workspace · read-only"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-        UiButton {
-            objectName: "selectMirrorSource"; text: "Select source"; Layout.fillWidth: true
-            visible: !!inspector.selected.mirror_source
-            onClicked: workspace.select(inspector.selected.mirror_source)
-        }
         UiSection {
             title: "Mirrored attachments"; visible: !!inspector.selected.mirror_source
             Repeater {

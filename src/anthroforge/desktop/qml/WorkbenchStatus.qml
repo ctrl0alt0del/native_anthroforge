@@ -17,6 +17,11 @@ Rectangle {
         UiButton { objectName:"recalculate"; text:"Recalculate"; hint:"Update pending geometry"; enabled:!workspace.state.waiting; onClicked:workspace.run("evaluate",{}) }
         Label { text:bar.windowState.activeJobCount ? "Calculating…" : bar.windowState.jobFailed ? "Calculation failed" : "Idle"; color:bar.windowState.jobFailed ? Theme.danger : Theme.muted; Layout.fillWidth:true; elide:Text.ElideRight }
         UiButton { objectName:"operationDetails"; text:"Details"; flatStyle:true; enabled:!!workspace.state.message; hint:workspace.state.message || "Last operation"; onClicked:bar.detailsRequested() }
-        UiButton { text:workspace.state.dirty ? "Unsaved" : "Saved"; flatStyle:true; Layout.preferredWidth:66; hint:workspace.state.object_count+" objects · Revision "+workspace.state.revision+"\nDisplay units: "+workspace.state.display_units; onClicked:bar.detailsRequested() }
+        Label {
+            text:workspace.state.dirty ? "Unsaved" : "Saved"; color:workspace.state.dirty ? Theme.accent : Theme.muted; Layout.preferredWidth:50
+            HoverHandler { id:saveHover }
+            ToolTip.visible:saveHover.hovered; ToolTip.delay:500
+            ToolTip.text:workspace.state.object_count+" objects · Revision "+workspace.state.revision+"\nDisplay units: "+workspace.state.display_units
+        }
     }
 }

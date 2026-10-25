@@ -13,15 +13,8 @@ ColumnLayout {
     function set(key,value) { authoring.setting("control.update",key,value); }
     UiSection {
         title: "Shared control"
-        Label { text: panel.item.kind || ""; color: Theme.accent }
+        Label { text: DisplayNames.label(panel.item.kind); color: Theme.accent }
         UiField { Layout.fillWidth: true; text: panel.item.name || ""; onEditingFinished: panel.set("name",text) }
-        Label { text: "Follows"; color: Theme.muted }
-        UiCombo { objectName: "controlParent"; Layout.fillWidth: true; model: panel.parents; textRole: "name"; valueRole: "id"; currentIndex: indexOfValue(panel.item.follow || ""); onActivated: authoring.edit("control.follow",{control:panel.item.id,entity:currentValue}) }
-        Repeater {
-            model: ["Position", "Rotation · °", "Scale"]
-            VectorSetting { propertyReference: ({target:panel.item.id,path:["transform",["position","rotation","scale"][index]]}); required property int index; required property string modelData; label: modelData; length: index === 0; values: (panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(index*3,index*3+3)
-                onEdited: values => { const trs=(panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(); for(let i=0;i<3;i++) trs[index*3+i]=values[i]; authoring.edit("control.transform",{control:panel.item.id,values:trs}); } }
-        }
         Label { text: "Affected SCPs: " + workspace.treeRows.filter(row=>(workspace.selectedData.affected || []).indexOf(row.id)>=0).map(row=>row.name).join(", "); color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         UiCombo { id: bindTarget; model: panel.scps; textRole: "name"; valueRole: "id"; Layout.fillWidth: true }
         UiButton { text: "Bind to this SCP"; Layout.fillWidth: true; enabled: !!bindTarget.currentValue; onClicked: authoring.edit("deformer.add",{control:panel.item.id,target:{owner:bindTarget.currentValue}}) }
@@ -44,5 +37,14 @@ ColumnLayout {
         UiField { Layout.fillWidth: true; placeholderText: "Cage weights, comma separated"; text: (panel.item.weights || []).join(", "); onEditingFinished: panel.set("weights",text.trim()?text.split(",").map(Number):[]) }
     }
     DeformerStack { item: panel.item; visible: panel.item.kind === "LATTICE" }
+    UiSection { title: "Transform & following"; stateKey:"control/transform"; expanded:false
+        Label { text: "Follows"; color: Theme.muted }
+        UiCombo { objectName: "controlParent"; Layout.fillWidth: true; model: panel.parents; textRole: "name"; valueRole: "id"; currentIndex: indexOfValue(panel.item.follow || ""); onActivated: authoring.edit("control.follow",{control:panel.item.id,entity:currentValue}) }
+        Repeater {
+            model: ["Position", "Rotation · °", "Scale"]
+            VectorSetting { propertyReference: ({target:panel.item.id,path:["transform",["position","rotation","scale"][index]]}); required property int index; required property string modelData; label: modelData; length: index === 0; values: (panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(index*3,index*3+3)
+                onEdited: values => { const trs=(panel.item.trs || [0,0,0,0,0,0,1,1,1]).slice(); for(let i=0;i<3;i++) trs[index*3+i]=values[i]; authoring.edit("control.transform",{control:panel.item.id,values:trs}); } }
+        }
+    }
     UiButton { text: "Delete shared control"; Layout.fillWidth: true; onClicked: panel.deleteRequested(panel.item.id) }
 }

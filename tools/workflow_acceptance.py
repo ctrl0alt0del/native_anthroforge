@@ -46,7 +46,8 @@ def workspace_ui(controller, window, entity, hook):
     units.setProperty("currentIndex", 2)
     QMetaObject.invokeMethod(units, "activated", Qt.ConnectionType.DirectConnection, Q_ARG_INT(2))
     assert controller.session.workspace.display_units == "mm"
-    controller.run("workspace.create", dict(name="Curve work", members=[entity, hook]))
+    controller.run("workspace.create", dict(name="Curve work", members=[entity]))
+    assert controller.session.workspace.focused
     QTest.qWait(150)
     assert window.grabWindow().save(str(OUTPUT / "workspace.png"))
     QMetaObject.invokeMethod(find(window, "workspaceManager"), "close")
@@ -59,7 +60,10 @@ def Q_ARG_INT(value):
 
 
 def units_ui(controller, window, entity):
+    from numeric_input_acceptance import reveal
+
     controller.select(entity)
+    reveal(window, "transform0")
     field = click(window, "transform0")
     field.setProperty("text", "250")
     QTest.keyClick(window, Qt.Key.Key_Return)
@@ -104,7 +108,10 @@ def controls(controller, entity, hook):
 
 
 def navigate(controller, window, root, entity):
+    from numeric_input_acceptance import reveal
+
     cursor = controller.session.history.cursor
+    reveal(window, "relatedSelect_" + root)
     click(window, "relatedSelect_" + root)
     assert controller.selection == root and controller.selectedData.get("readonly")
     assert controller.session.history.cursor == cursor
@@ -112,7 +119,8 @@ def navigate(controller, window, root, entity):
 
 
 def inspect_ui(controller, window):
-    inspector = find(window, "inspector")
+    click(window, "inspectTab")
+    inspector = find(window, "inspectionPane")
     panel = find(window, "dependencyInspector")
     panel.setProperty("expanded", True)
     QTest.qWait(80)

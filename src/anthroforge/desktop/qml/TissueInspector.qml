@@ -37,7 +37,7 @@ ColumnLayout {
             model: panel.inflation.mode === "RADIAL" ? ["X","Y","Z"] : []
             NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","scale"]}); required property string modelData; required property int index; label: "Scale " + modelData; value: panel.inflation.scale?.[index] ?? 1; onEdited: value => { let scale=Array.from(panel.inflation.scale); scale[index]=value; panel.inflate("scale",scale); } }
         }
-    UiSection { title:"Boundary & taper"; stateKey:"tissue/boundary"; expanded:false
+    UiSection { title:"Boundary & taper"; stateKey:"tissue/boundary"; expanded:false; visible:panel.muscleMode
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","boundary_band"]}); visible: panel.muscleMode; label: "Boundary band · samples"; value: panel.inflation.boundary_band || 0; onEdited: value => panel.inflate("boundary_band",value) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","boundary_strength"]}); visible: panel.muscleMode; label: "Boundary attenuation"; value: panel.inflation.boundary_strength || 0; onEdited: value => panel.inflate("boundary_strength",value) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","boundary_power"]}); objectName: "tissueBoundaryPower"; visible: panel.muscleMode; label: "Boundary power"; minimum: 0.0001; maximum: 1000; value: panel.inflation.boundary_power ?? 1; hint: "Shape the inflation transition away from the boundary"; onEdited: value => panel.inflate("boundary_power",value) }

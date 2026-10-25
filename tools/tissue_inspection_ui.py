@@ -20,10 +20,7 @@ def activate(window, name, index):
 def inspect(controller, window):
     exercise(controller, window)
     before = controller.session.document
-    find(window, "tissueInspectionPanel").setProperty("expanded", True)
-    activate(window, "tissueInspectStage", 2)
-    activate(window, "tissueInspectReference", 1)
-    activate(window, "tissueInspectMode", 1)
+    compare_stages(window)
     settle(controller)
     assert controller.tissue_inspection.summary["state"] == "ready"
     click(window, "tissueExplainPoint")
@@ -32,6 +29,14 @@ def inspect(controller, window):
     settle(controller)
     assert controller.session.document is before
     assert window.grabWindow().save("build/tissue-inspection/inspector.png")
+
+
+def compare_stages(window):
+    click(window, "inspectTab")
+    find(window, "tissueInspectionPanel").setProperty("expanded", True)
+    activate(window, "tissueInspectStage", 2)
+    activate(window, "tissueInspectReference", 1)
+    activate(window, "tissueInspectMode", 1)
 
 
 def click(window, name):

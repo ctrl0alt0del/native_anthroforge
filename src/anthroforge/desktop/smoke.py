@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from time import monotonic
 
-from PySide6.QtCore import QMetaObject, QObject, QTimer
+from PySide6.QtCore import QTimer
 
 
 def save_frame(frame, screenshot: str | None) -> bool:
@@ -30,6 +30,7 @@ def summary(frame, screenshot, warnings, valid, controller):
         screenshot=screenshot,
         entities=len(controller.session.document.entities) if controller else None,
         projects=project_status(controller) if controller else None,
+        preferences=getattr(controller, "smoke_preferences", None),
     )
 
 
@@ -75,8 +76,9 @@ def show_panel(window, controller, panel):
         start(controller)
         return
     if panel == "preferences":
-        dialog = window.findChild(QObject, "preferencesDialog")
-        assert dialog is not None and QMetaObject.invokeMethod(dialog, "open")
+        from .smoke_preferences import show
+
+        show(window, controller)
         return
     window.setProperty(panel + "Open", True)
     if panel == "issues" and controller.issue_panel.model.rows:

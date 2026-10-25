@@ -1057,3 +1057,15 @@ RecentProjects owns bounded canonical path history with shared atomic JSON stora
 It records successful desktop open/save only. All recent/recovery opening uses the
 controller's existing unsaved-document and queued-open safeguards. Preferences remain
 separate from project schemas. See [workflow and evidence](usability_037.md).
+
+Explicit OS setup stays in desktop adapters. SystemIntegration registers the current
+packaged executable through the Qt-independent Windows association adapter, then opens
+Default Apps for the user's choice. Only HKCU application/ProgID capabilities are
+written; no UserChoice changes or elevation. RecoveryBrowser owns opening its existing
+store directory. Neither action participates in document commands, history or saving.
+
+AnthroForgeStyle replaces only the attached ToolTip template and falls back to Qt Basic
+for other controls. One shared popup provides bounded plain-text wrapping and theme
+colors; callers retain their hover/focus/click behavior and authored help. The broader
+[workbench proposal](ui_overhaul_design.md) remains a design for review, not implemented
+layout or new application behavior.

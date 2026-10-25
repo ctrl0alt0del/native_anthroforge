@@ -2369,5 +2369,8 @@ interactive desktop acceptance. See `mirroring_035.md` for evidence and known li
   closed paths and desktop/headless parity. Preferences do not rewrite existing curves.
 - Evidence: focused conversion/preference tests cover both modes, bindings under parent
   motion, closed curves, junctions, material correspondence, history and preference loading.
-  Further development/offscreen and production SCM checks are recorded in
-  [the task](tasks/routed-conversion-points.md); do not infer shape quality from conversion success.
+  Full qualification passes 2,114 Python tests, five native CTests, style/typing/numerics,
+  offscreen Preferences and minimal-PATH portable checks. All three actual SCM Fibers
+  convert from 73 controls to two with stored bindings unchanged; membrane/tissue publish
+  successfully and final shapes were inspected. Details in
+  [the task](tasks/routed-conversion-points.md); no anatomical-fit or solver-speed claim.

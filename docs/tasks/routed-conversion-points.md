@@ -3,7 +3,7 @@
 - Task branch: `codex/routed-conversion-points`
 - Integration branch: `main`
 - Starting revision: `4ff1ef8`
-- Status: pending full validation
+- Status: complete
 - Last updated: 2026-10-25 Europe/Bucharest
 - Active writer: desktop
 
@@ -47,16 +47,31 @@ all three paths, membrane and Tissue finish ready. Evidence:
 Actual SCM final geometry was inspected from two fixed cameras (`scm.png`), without saved
 presentation changes. This establishes conversion/lifecycle success, not an improved solver
 or anatomical fit.
-Development gate is running in `build/routed-conversion-points/development-gate.log`;
-native build, all five native CTests and style checks passed; full Python tests are running.
-Canonical package build succeeded at `dist/0.3.5/AnthroForge.dist/AnthroForge.exe`; the
-offscreen minimal-PATH portable suite is running in `build/routed-conversion-points/portable`.
-Its Preferences coverage includes both conversion policies in the actual executable.
+Development gate components passed: lock, Ruff, formatting, mypy (407 modules), native
+build, five native CTests, configured native/script style, 2,114 Python tests, numerics
+imports and native doctor. Initial `tools/check.ps1` run exposed two legacy adaptive-route
+fixtures assuming three retained controls; they now explicitly select ALL_POINTS. The
+focused regression and complete pytest suite were rerun successfully after that test-only
+correction. Evidence: `development-gate.log`, `pytest-final.log`, `numerics.log`, `doctor.log`
+under `build/routed-conversion-points`. Existing Qt deprecation warnings remain.
+
+Canonical package build succeeded at `dist/0.3.5/AnthroForge.dist/AnthroForge.exe`; the full
+offscreen minimal-PATH portable suite passed. Its Preferences checks verify two controls
+for ENDPOINTS and three for ALL_POINTS in the actual executable. Packaged Preferences
+screenshot inspected. Runtime sources are identical to packaged checkpoint `dbfae78`;
+subsequent changes are acceptance coverage and documentation. Native sources are unchanged
+from the integration baseline. No new version or additional distribution was introduced.
+
+Ownership review: shared application conversion policy selects authored guides; only
+desktop presentation depends on Qt. Existing application transactions/coordinator own
+history and evaluation. Consumer correspondence changes share the conversion transaction.
+Native numerical algorithms, retained binding semantics and read validation are unchanged.
+Unrelated `__init__.py`, unfinished 0.3.4 work and SCM experiments remain separate.
 
 ## Next actions and blockers
 
-1. Complete Python/numerics gate and portable checks.
-2. Update companion source archive and integrate the validated branch.
+No remaining implementation work. Companion source archive and packaged documentation
+are refreshed during delivery; branch history records the validated integration.
 
 ## Recovery inputs
 

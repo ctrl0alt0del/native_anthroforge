@@ -59,5 +59,10 @@ class RecoveryBrowser(QObject):
 
     @Slot()
     def showFolder(self):
-        self.store.directory.mkdir(parents=True, exist_ok=True)
-        QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.store.directory)))
+        try:
+            self.store.directory.mkdir(parents=True, exist_ok=True)
+            if not QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.store.directory))):
+                raise OSError(f"Could not open the autosave folder: {self.store.directory}")
+        except OSError as error:
+            self.controller.message = str(error)
+            self.controller.notify()

@@ -91,7 +91,17 @@ def desktop_preferences(executable, cwd, invoke):
         "--screenshot",
         str(cwd / "preferences.png"),
     )
-    assert json.loads(result)["desktop_smoke"]
+    verify_desktop(json.loads(result), executable)
+
+
+def verify_desktop(result, executable):
+    assert result["desktop_smoke"]
+    state = result["preferences"]
+    assert state["executable"] == str(executable) and state["enabled"], state
+    assert state["tooltip"] == "applicationToolTip" and state["visible"], state
+    assert state["width"] <= 380 and state["lines"] > 1, state
+    commands = [v for key, _, v in state["registration"] if key.endswith(r"shell\open\command")]
+    assert commands == [f'"{executable}" --project "%1"'] * 2
 
 
 def verify(cwd, backend):

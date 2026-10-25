@@ -22,7 +22,17 @@ UiDialog {
         UiCheck { objectName:"autosaveEnabled"; text:"Autosave recovery copies"; checked:preferences.state.autosave_enabled; onClicked:preferences.setAutosaveEnabled(checked) }
         NumericSetting { objectName:"autosaveMinutes"; label:"Interval · minutes"; decimals:0; minimum:1; maximum:1440; live:false; enabled:preferences.state.autosave_enabled; value:preferences.state.autosave_minutes; onEdited:value=>preferences.setAutosaveMinutes(value) }
         Label { text:"Keep the latest three copies per project. Active calculations use the latest committed revision."; color:Theme.muted; Layout.fillWidth:true; wrapMode:Text.Wrap }
-        UiButton { objectName:"preferencesRecover"; text:"Recover autosave…"; onClicked:{ dialog.close(); workspace.projectLibrary.showRecovery(); } }
+        RowLayout {
+            Layout.fillWidth:true
+            UiButton { objectName:"preferencesRecover"; text:"Recover autosave…"; onClicked:{ dialog.close(); workspace.projectLibrary.showRecovery(); } }
+            UiButton { objectName:"preferencesAutosaveFolder"; text:"Open autosave folder"; hint:"Browse the recovery copies saved on this computer."; onClicked:workspace.projectLibrary.recoveryBrowser.showFolder() }
+        }
+        UiButton {
+            objectName:"preferencesFileAssociation"; text:"Set file association…"
+            enabled:!systemIntegration.associationUnavailable
+            hint:systemIntegration.associationUnavailable || "Open .anthroforge projects from File Explorer.\nChoose AnthroForge in Windows Default Apps."
+            onClicked:systemIntegration.setupAssociation()
+        }
         Label { text: "COMPUTATION"; color: Theme.muted; font.pixelSize: 11 }
         RowLayout {
             Layout.fillWidth: true; spacing: Theme.gap

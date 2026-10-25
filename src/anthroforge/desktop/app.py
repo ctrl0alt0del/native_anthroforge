@@ -7,7 +7,6 @@ from pathlib import Path
 from PySide6.QtCore import QUrl
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
-from PySide6.QtQuickControls2 import QQuickStyle
 
 from anthroforge import __version__
 from anthroforge.desktop import smoke
@@ -34,6 +33,7 @@ def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicatio
     QGuiApplication.setApplicationVersion(__version__)
     engine = QQmlApplicationEngine()
     engine.addImportPath(str(build_directory() / "qml"))
+    engine.addImportPath(str(Path(__file__).parent / "qml"))
     engine.rootContext().setContextProperty("workspace", controller)
     engine.rootContext().setContextProperty("authoring", controller.authoring)
     setup_profile_controls(controller, engine)
@@ -48,9 +48,12 @@ def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicatio
 
 def setup_preferences(controller, engine):
     from .preference_controls import PreferenceControls
+    from .system_integration import SystemIntegration
 
     controller.preference_controls = PreferenceControls(controller)
     engine.rootContext().setContextProperty("preferences", controller.preference_controls)
+    controller.system_integration = SystemIntegration(controller)
+    engine.rootContext().setContextProperty("systemIntegration", controller.system_integration)
 
 
 def attach_window(engine, controller, inputs):
@@ -133,8 +136,10 @@ def prepare_view(controller, project):
 
 
 def main() -> int:
+    from .style import configure
+
     args = arguments()
-    QQuickStyle.setStyle("Basic")
+    configure()
     with native_runtime():
         return run_application(args)
 

@@ -212,3 +212,57 @@ Conclusion: the cheap approximation is substantially cleaner and remains inexpen
 for this case, but remaining bulge/crossings and untested wider cases prevent claiming
 a complete replacement. No production algorithm change is authorized by this experiment.
 Next action: user reviews the concrete visual comparison before any production design.
+
+## Follow-up: low-step routing and the rejected constraints
+
+User proposed a small routing pass before/after cheap propagation. Production remains
+unchanged. `hybrid_probe.py` uses the existing native route inspection boundary; no
+optimizer or collision-query loop was introduced in Python.
+
+The previous batch-level ROUTED failure description was incomplete. Testing all three
+Fibers separately with all 73 controls gives: first fails, middle succeeds, third fails.
+The failed traces have zero optimization attempts/trials: rejection is in `corridors`
+before SQP, not failure to converge. Every authored control is a fixed routing constraint;
+only the two endpoints are actual anatomical bindings.
+
+`pin_probe.py` batches native advisory checks using 1e-7-long segments at the controls
+(not a signed penetration-depth measurement). On the first/third Fibers, zero-based
+point 1 intersects Spine; it is unbound. Endpoint 0 also has Spine contact, but has the
+appropriate binding. Middle has no control-point hits. Retaining endpoints plus point 1
+reproduces the structural-point rejection, including with Spine as the only obstacle.
+This localizes the offending interior constraint without disabling production checks.
+
+Endpoint-bound hybrids seeded with either current or improved propagation were tested
+at 1 and 4 accepted steps. Every seed failed native warm-start validation and fell back
+to replanning (`warm=false`). All completed, with final traced endpoints exactly equal
+to their input goals. One-step totals for the three paths were 9.64/9.78 seconds;
+four-step totals 10.54/10.05 seconds, respectively. Summed SQP-reported elapsed time was
+about 78-110 ms. These are diagnostic, trace-enabled single passes, with uncontrolled
+background load; they are not a controlled speed benchmark. The major cost lies outside
+the short iterative solve, in validation/planning/preparation. Reducing accepted steps
+does not impose a wall-time limit on those stages (nor on rejected trials).
+
+Interpretation: a hybrid remains a justified experiment, but calling unchanged ROUTED
+with a low step count does not currently exploit the cheap seed. Interior guide points
+must be movable rather than accidental hard constraints; genuine anatomical bindings
+must remain fixed. A useful refinement requires a cheaply obtained admissible seed or
+a separately designed collision-recovery contract. Do not silently grant anatomical
+owner exemptions to the interior controls. Also compare coherent surface shape, not
+only individual collision-free paths, before claiming improvement.
+
+Evidence under comparison: `hybrid-probe.json`, `pin-probe.json`. Captures retain bounded
+native trace records and report truncation; wall timings include diagnostic overhead.
+Ruff/format and explicit 15-line function checks cover both new experiment scripts.
+
+Baseline follow-up (`baseline-route-probe.json`): the first-interior-point Spine contact
+and the first/third direct ROUTED rejections also exist before the radius edit. They are
+not evidence of a new bone penetration caused specifically by setting radius to 3.
+
+A control experiment seeded from the already solved endpoint-only paths accepted the
+middle warm start but still rejected the first/third (`valid-seed-probe.json`). Therefore
+do not describe every rejected warm start as proof that the supplied accepted route was
+invalid: `routing_warm.cpp::remapped` resamples each span by arc length before validation.
+That may cut corners/change contact spacing. This is an observed warm-start inconsistency
+with a source-backed hypothesis, not yet a demonstrated resampling defect. Investigate
+that handoff and near-endpoint Spine contact before choosing collision recovery behavior.
+No exemption expansion or production change was made.

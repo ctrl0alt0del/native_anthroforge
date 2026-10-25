@@ -59,3 +59,12 @@ added as a production dependency. The review is a self-contained local HTML file
 
 Research/diagnosis and results: `docs/tasks/scm-ribs-distortion.md`.
 No project or package version changes; no canonical dist rebuild.
+
+## Low-step routing follow-up
+
+`hybrid_probe.py` records each direct conversion separately, then tests 1/4 accepted
+steps with endpoint bindings and current/improved paths as warm-start candidates.
+`pin_probe.py` localizes control contacts with batched native tiny-segment checks and
+reproduces the first-interior-point rejection with a reduced constraint set and Spine
+alone. These are trace-enabled diagnostic runs, not controlled timing trials. See the
+task record for rejected warm starts, planning costs, and preserved endpoint checks.

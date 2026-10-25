@@ -54,3 +54,17 @@ newline and path tooltips pass. Folder/setup success and failure paths use inter
 OS calls, leave the document identical, and never open Explorer/Settings. Source smoke
 loads the custom style without QML warnings. Full gate/package checks remain pending;
 the broader design remains in progress. Evidence: `build/preferences-ui-design/ui`.
+
+## Design checkpoint
+
+Added [workbench proposal](../ui_overhaul_design.md) and the interactive concept at
+`docs/design/workbench.html`. Production layout/copy remain unchanged. The proposal
+maps existing capabilities into Shape/Shortcuts/Inspect, retains the charcoal/amber
+identity, and includes concrete copy examples and phased acceptance. The schematic
+viewport is explicitly an illustration, not computed geometry.
+
+Headless browser checks pass at 1440, 1024, 736 and 360 px, including selection,
+Anatomy/Construction, shortcut scopes, inspector navigation, Preferences and Focus
+editor. No JavaScript exceptions or horizontal overflow. The proposal is unapproved.
+Offscreen Preferences also passes at 150% scale. Package build succeeded at runtime
+commit `3a9ee89`; relocated minimal-PATH validation and full gate are running.

@@ -266,3 +266,19 @@ That may cut corners/change contact spacing. This is an observed warm-start inco
 with a source-backed hypothesis, not yet a demonstrated resampling defect. Investigate
 that handoff and near-endpoint Spine contact before choosing collision recovery behavior.
 No exemption expansion or production change was made.
+
+## Active follow-up — current endpoint preference and low-step hybrids
+
+User requests repeating the small-step experiment after the endpoint-default conversion
+fix. Main through `1dd7bf3` is merged into this experiment branch; no experiment is promoted
+into production. Reuse the isolated native C2 trial and unchanged native ROUTED backend.
+The earlier `hybrid_probe.py` already manually selected anatomical endpoints, despite
+the later conversation conflating that experiment with the all-control conversion.
+Repeat using the current shared conversion command, explicitly verifying two controls,
+retained bindings and warm-start status. Test 1/4 accepted steps after current/C2
+propagation. Also test routing at the baseline before capturing a new propagation field;
+this before variant necessarily recaptures support influences for the changed baseline.
+Compare full uncropped base/rest as well as cropped final shape, stage findings, input
+pins and measured work. Source projects and production code remain unchanged.
+
+Pending: implement/run isolated harness, inspect actual shapes, record timings and limits.

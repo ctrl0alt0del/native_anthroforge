@@ -17,6 +17,11 @@ DEFAULT_SETTINGS = EnvelopeSettings()
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_skin_fields_create", [D, c.c_int, INT64, c.c_int, BYTE, D, D, c.c_int, U, U], U)
+    engine.bind(
+        "af_skin_fields_sources",
+        [D, c.c_int, INT64, c.c_int, BYTE, D, INT64, c.c_int, D, c.c_int, U, U],
+        U,
+    )
     engine.bind("af_skin_fields_info", [U, INT, D, INT])
     engine.bind("af_skin_fields_copy", [U, c.c_int, D, U])
     engine.bind("af_skin_fields_bytes", [U], U)
@@ -87,9 +92,10 @@ def prepare(
     resolution: int = 220,
     budget: int = 1024**3,
     cancel: int = 0,
+    segments: Any = (),
 ) -> Fields:
     buffers = source_buffers(vertices, faces, skeletal, collagen)
-    return create_fields(engine, buffers, settings, resolution, budget, cancel)
+    return create_fields(engine, buffers, settings, resolution, budget, cancel, segments)
 
 
 def create_fields(
@@ -99,10 +105,34 @@ def create_fields(
     resolution: int,
     budget: int,
     cancel: int,
+    segments: Any = (),
 ) -> Fields:
-    xyz, indices, scp, weights = buffers
     ratios = np.ascontiguousarray(astuple(settings)[:4], dtype=np.float64)
-    arguments = (pointer(xyz), len(xyz), indices.ctypes.data_as(INT64), len(indices))
-    fields = (scp.ctypes.data_as(BYTE), pointer(weights), pointer(ratios))
-    handle = engine.library.af_skin_fields_create(*arguments, *fields, resolution, budget, cancel)
+    arguments = field_arguments(buffers, segment_buffer(segments))
+    handle = engine.library.af_skin_fields_sources(
+        *arguments, pointer(ratios), resolution, budget, cancel
+    )
     return Fields(engine, int(handle))
+
+
+def field_arguments(buffers: tuple[Any, ...], edges: Any) -> tuple[Any, ...]:
+    xyz, indices, scp, weights = buffers
+    return (
+        pointer(xyz),
+        len(xyz),
+        indices.ctypes.data_as(INT64),
+        len(indices),
+        scp.ctypes.data_as(BYTE),
+        pointer(weights),
+        edges.ctypes.data_as(INT64),
+        len(edges),
+    )
+
+
+def segment_buffer(segments: Any) -> Any:
+    edges = np.ascontiguousarray(segments, dtype=np.int64)
+    if edges.shape == (0,):
+        edges = edges.reshape(0, 2)
+    if edges.ndim != 2 or edges.shape[1] != 2:
+        raise ValueError("Skin centerlines require two vertex indices per segment.")
+    return edges

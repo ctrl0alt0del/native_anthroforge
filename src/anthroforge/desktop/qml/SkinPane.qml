@@ -10,6 +10,13 @@ UiScrollView {
     ColumnLayout {
         width: pane.availableWidth; spacing: Theme.gap
         Label { text: "Skin"; color: Theme.text; font.pixelSize:16; font.bold:true }
+        UiButton { objectName:"skinBuildEnvelope"; text:"Build envelope"; Layout.fillWidth:true; onClicked:workspace.run("skin.envelope.build",{}) }
+        UiCombo {
+            objectName:"skinDisplay"; Layout.fillWidth:true; textRole:"label"; valueRole:"id"
+            model:[{id:"AUTO",label:"Show latest skin"},{id:"ENVELOPE",label:"Show envelope"},{id:"TOPOLOGY",label:"Show topology"},{id:"FINAL",label:"Show final skin"},{id:"NONE",label:"Hide skin"}]
+            currentIndex:indexOfValue(pane.state.display || "AUTO")
+            onActivated:workspace.run("workspace.update",{skin_display:currentValue})
+        }
         Label { text: "Envelope"; color: Theme.text; font.bold:true; Layout.topMargin:Theme.gap }
         Repeater {
             model: [

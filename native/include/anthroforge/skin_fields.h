@@ -8,6 +8,10 @@ extern "C" {
    Field kinds: required, full, collagen, combined. All arrays use XYZ row-major grids. */
 AF_API uint64_t af_skin_fields_create(const double* xyz,int vertices,const int64_t* faces,int triangles,
     const uint8_t* scp,const double* collagen,const double* settings,int resolution,uint64_t budget,uint64_t cancel);
+/* Centerlines have no radius and seed the anatomy envelope, not collagen. */
+AF_API uint64_t af_skin_fields_sources(const double* xyz,int vertices,const int64_t* faces,int triangles,
+    const uint8_t* scp,const double* collagen,const int64_t* segments,int segment_count,
+    const double* settings,int resolution,uint64_t budget,uint64_t cancel);
 AF_API int af_skin_fields_info(uint64_t handle,int* shape,double* origin_voxel,int* resolution);
 AF_API int af_skin_fields_copy(uint64_t handle,int kind,double* output,uint64_t capacity);
 AF_API uint64_t af_skin_fields_bytes(uint64_t handle);

@@ -32,6 +32,14 @@ uint64_t af_skin_fields_create(const double* xyz,int vertices,const int64_t* fac
         return af::skin::retain(af::skin::prepare(source,settings,resolution,budget,cancel));
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }
+uint64_t af_skin_fields_sources(const double* xyz,int vertices,const int64_t* faces,int triangles,
+    const uint8_t* scp,const double* collagen,const int64_t* segments,int segment_count,
+    const double* settings,int resolution,uint64_t budget,uint64_t cancel) {
+    try {
+        const af::skin::Source source{xyz,vertices,faces,triangles,scp,collagen,segments,segment_count};
+        return af::skin::retain(af::skin::prepare(source,settings,resolution,budget,cancel));
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
 int af_skin_fields_info(uint64_t handle,int* shape,double* origin_voxel,int* resolution) {
     try {
         if(!shape||!origin_voxel||!resolution) throw std::runtime_error("Missing skin information buffers.");

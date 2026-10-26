@@ -2774,3 +2774,15 @@ Executable dependency probes: Instant Meshes 1.0.0's array API triangulates its 
 when reading them back. Retain the addon's file API; the cube probe preserves 246 quad faces.
 PyTetWild 0.4.2 returns 2,844 tetrahedra using one thread; isolate its temporary file writes.
 These counts qualify callable integration only, not production skin or deformation quality.
+
+### 0.4.0 in progress — bare-Fiber centerline sources
+
+The provisional contributor capture constructed native tubes with an independent 1 mm
+skin radius. The user explicitly chose centerlines only. Capture now retains transformed
+accepted path positions and segment connectivity. Native rasterization seeds those lines;
+a segment AABB supports nearest-source queries and retained bindings distinguish triangle
+and segment elements. There is no display-radius input or degenerate-triangle substitute.
+Mesh-only field/gap/envelope regression tests continue to pass; focused checks also cover
+centerline-only extraction and segment binding. This is an intentional addon difference,
+not claimed bevel-mesh parity. Production anatomy and downstream reference/deformation
+qualification remain pending as part of the unfinished 0.4.0 delivery.

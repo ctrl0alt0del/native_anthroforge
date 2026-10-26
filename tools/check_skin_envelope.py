@@ -93,8 +93,8 @@ def compare_bindings(expected, actual):
         support="support",
     )
     return {
-        name: bool(np.array_equal(values, getattr(expected.binding, fields[name])))
-        for name, values in actual[2].items()
+        name: bool(np.array_equal(actual[2][name], getattr(expected.binding, field)))
+        for name, field in fields.items()
     }
 
 

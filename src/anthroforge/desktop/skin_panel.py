@@ -12,16 +12,19 @@ class SkinPanel(QObject):
         super().__init__(controller)
         self.controller = controller
         self.current = None
+        self.display = ""
         self.values = {}
         controller.changed.connect(self.refresh)
         self.refresh()
 
     def refresh(self):
         skin = self.controller.session.document.skin
-        if skin is self.current:
+        display = self.controller.session.workspace.skin_display
+        if skin is self.current and display == self.display:
             return
         self.current = skin
-        self.values = asdict(skin)
+        self.display = display
+        self.values = asdict(skin) | {"display": display}
         self.changed.emit()
 
     @Property(dict, notify=changed)

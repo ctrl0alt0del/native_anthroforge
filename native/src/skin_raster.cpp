@@ -39,9 +39,21 @@ static void face(const Grid& g,Raster& r,const Triangle& t) {
         for(int v=0;v<=n-u;++v) point(g,r,t,double(u)/n,double(v)/n);
     }
 }
+static void segment(const Grid& g,Raster& r,const Source& source,int edge) {
+    const V3 a(source.vertices+3*source.segments[2LL*edge]);
+    const V3 b(source.vertices+3*source.segments[2LL*edge+1]);
+    const double steps=std::max(1.0,std::ceil((b-a).norm()/(.45*g.voxel)));
+    if(steps>1048576) throw std::runtime_error("Skin segment sampling exceeds supported range.");
+    const int count=int(steps);
+    for(int i=0;i<=count;++i) {
+        if(i%4096==0) check_cancel(g.cancel);
+        r.all[cell(g,a+(b-a)*(double(i)/count))]=1;
+    }
+}
 Raster raster(const Grid& g,const Source& source) {
     Raster result{Mask(g.count),Mask(g.count),std::vector<float>(g.count,INFINITY)};
     for(int f=0;f<source.triangles;++f) { check_cancel(g.cancel); face(g,result,triangle(source,f)); }
+    for(int e=0;e<source.segment_count;++e) { check_cancel(g.cancel); segment(g,result,source,e); }
     result.all=dilate(g,result.all); result.skeletal=dilate(g,result.skeletal);
     return result;
 }

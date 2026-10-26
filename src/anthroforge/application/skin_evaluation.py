@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from anthroforge.native import skin_fields, skin_gaps
+from anthroforge.native.skin_capture import source_counts
 
 from . import skin_assets, skin_capture, worker_memory
 
@@ -38,10 +39,9 @@ def prepare(
     geometry = capture.geometry
     field_inputs = geometry.vertices, geometry.triangles, geometry.skeletal, capture.collagen
     options = document.skin.envelope_settings, TARGET_RESOLUTION, budget, cancel
-    fields = skin_fields.prepare(engine, *field_inputs, *options)
+    fields = skin_fields.prepare(engine, *field_inputs, *options, segments=geometry.segments)
     try:
-        source = geometry.vertices, geometry.triangles, geometry.owners, geometry.policies
-        scene = skin_gaps.create(engine, *source, cancel)
+        scene = prepare_scene(engine, geometry, cancel)
         return fields, scene
     except Exception:
         fields.close()
@@ -54,6 +54,8 @@ def binding_data(bindings: dict[str, Any], capture: Any) -> dict[str, Any]:
         source_vertices=geometry.vertices,
         source_triangles=geometry.triangles,
         source_owners=geometry.owners,
+        source_segments=geometry.segments,
+        source_segment_owners=geometry.segment_owners,
     )
 
 
@@ -69,10 +71,17 @@ def metadata(capture: Any, result: Any, fields: Any) -> dict[str, Any]:
 
 
 def source_metadata(row: Any) -> dict[str, Any]:
+    counts = source_counts(row.mesh, row.identity.kind == "FIBER")
     return dict(
         **asdict(row.identity),
         asset=row.asset,
         frame=row.frame,
-        vertices=row.mesh.counts[0],
-        triangles=row.mesh.counts[3],
+        vertices=counts[0],
+        triangles=counts[1],
+        segments=counts[2],
     )
+
+
+def prepare_scene(engine: Any, geometry: Any, cancel: int) -> Any:
+    source = geometry.vertices, geometry.triangles, geometry.owners, geometry.policies
+    return skin_gaps.create(engine, *source, cancel, geometry.segments, geometry.segment_owners)

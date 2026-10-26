@@ -102,11 +102,12 @@ this job integration passed 2,286 tests (175 seconds). Topology, final deformati
 OBJ, generation viewport display and complete Issues integration remain unfinished.
 
 Skin settings UI now includes symmetry plane, proxy resolution, constraint strength and FAST
-handles. Offscreen decimal/integer edits, vertical navigation and Undo pass. The radius
-question is pending: a separate physical `fiber_radius` defaults to 1 mm while workspace
-display radius stays independent (announced implementation assumption, not a user answer).
-This capture uses the existing native tube constructor; anatomical/Blender tube parity is
-not yet qualified. Preserve this distinction in later acceptance.
+handles. Offscreen decimal/integer edits, vertical navigation and Undo pass.
+The user answered the bare-fiber question: **centerlines only**. The temporary 1 mm
+skin-radius assumption is superseded and removed. Native field, gap-support and binding
+work now accepts explicit segments; triangle sources keep their existing numerical path.
+Centerline capture and binding checks pass, including a centerline-only envelope. Full
+production anatomy, topology/deformation and release qualification remain unfinished.
 App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated root
 `__init__.py` is preserved. Source `.blend` files remain untouched.
 
@@ -128,3 +129,15 @@ Addon root is recorded in the inventory. Windows-only fixtures remain under
 `E:/development/WIP_models`; local presence is not proof of geometry acceptance.
 The containing Git commit identifies this checkpoint; inspect remote reachability
 before resuming from another machine.
+
+### Centerline checkpoint
+
+Forty focused skin/capture/lifecycle/architecture tests pass. Native build and five CTests
+pass; selected native style checks, Ruff and mypy pass. Cube addon comparison remains
+exact (11,703 vertices / 23,180 triangles; all six legacy binding arrays equal). Offscreen
+settings/navigation checks pass. Current broad suite is running in
+`build/skin-040-current-tests.log`; do not claim its result until it completes.
+Skin stage display was connected through existing staged scene rows with per-workspace
+AUTO/Envelope/Topology/Final/Hidden selection; actual envelope viewport rendering still
+needs qualification. Centerline binding kinds are explicit; line-specific coverage and
+intersection diagnostics need separate evidence rather than inheriting triangle results.

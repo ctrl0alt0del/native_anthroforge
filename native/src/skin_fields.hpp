@@ -19,6 +19,7 @@ std::shared_ptr<const Fields> get_fields(uint64_t handle);
 struct Source {
     const double* vertices; int count; const int64_t* faces; int triangles;
     const uint8_t* skeletal; const double* collagen;
+    const int64_t* segments=nullptr; int segment_count=0;
 };
 struct Raster { Mask all,skeletal; std::vector<float> seeds; };
 Grid grid(const Source& source,const double* settings,int resolution,uint64_t budget,uint64_t cancel);

@@ -17,3 +17,13 @@ Compilation of the full header set does not establish binding, quality or final-
 Source capture and coarse scalar fields are separate from these source-aware predicates.
 The first source-port tests preserve gap width, stricter two-sided policy selection,
 winding independence and disjoint patches of a single source.
+
+## Standalone centerline adaptation
+
+The confirmed 0.4.0 policy uses bare-Fiber centerlines, not Blender bevel meshes.
+`af_skin_gap.hpp` now consults an owned segment AABB for nearest-distance/support
+queries; zero-width lines do not claim opposing surface normals. Empty triangle ray
+queries are safe. `af_skin_bind.hpp` preserves the existing triangle-only weighting
+and supports explicit segment identities and linear coordinates. The standalone ABI
+adds element-kind buffers (0 triangle, 1 segment, -1 unbound). Source hashes in
+`sources.json` continue to identify the original addon inputs, not modified copies.

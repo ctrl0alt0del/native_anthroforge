@@ -79,3 +79,11 @@ Keep C++ numerical preparation/optimization and Python orchestration; no Blender
 Python optimizer fallback, duplicate coordinator or per-iteration callbacks. Preserve mirrored
 geometry rules, resource ownership and current selection/editing restrictions. Legacy Blender
 project conversion, general animation editing and new skin algorithms remain separate tasks.
+
+## Confirmed contributor clarification
+
+Bare Fibers contribute their accepted **centerlines only**. Neither workspace display
+thickness nor an invented skin-specific fiber radius enters skin construction. Capture
+uses explicit segments and retains path/segment correspondence separately from surface
+triangle bindings. This intentionally differs from the addon's evaluated bevel meshes.
+Fibers represented by an accepted tissue remain suppressed under the existing source policy.

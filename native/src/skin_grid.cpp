@@ -12,8 +12,16 @@ std::array<int,3> coordinates(const Grid& g,uint64_t n) {
     const int z=int(n%g.shape[2]); n/=g.shape[2];
     return {int(n/g.shape[1]),int(n%g.shape[1]),z};
 }
+static void validate_indices(const Source& s) {
+    for(int64_t i=0;i<3LL*s.triangles;++i) if(s.faces[i]<0||s.faces[i]>=s.count)
+        throw std::runtime_error("Invalid skin triangle index.");
+    for(int64_t i=0;i<2LL*s.segment_count;++i) if(s.segments[i]<0||s.segments[i]>=s.count)
+        throw std::runtime_error("Invalid skin segment index.");
+}
 static std::array<double,6> bounds(const Source& s) {
-    if(!s.vertices||!s.faces||!s.skeletal||!s.collagen||s.count<3||s.triangles<1)
+    if(!s.vertices||!s.collagen||s.count<2||s.triangles<0||s.segment_count<0
+       ||(s.triangles==0&&s.segment_count==0)
+       ||(s.triangles&&(!s.faces||!s.skeletal))||(s.segment_count&&!s.segments))
         throw std::runtime_error("Skin has no usable source geometry.");
     std::array<double,6> b{INFINITY,INFINITY,INFINITY,-INFINITY,-INFINITY,-INFINITY};
     for(int i=0;i<s.count;++i) for(int a=0;a<3;++a) {
@@ -21,8 +29,7 @@ static std::array<double,6> bounds(const Source& s) {
         if(!std::isfinite(v)) throw std::runtime_error("Nonfinite skin source position.");
         b[a]=std::min(b[a],v); b[a+3]=std::max(b[a+3],v);
     }
-    for(int64_t i=0;i<3LL*s.triangles;++i) if(s.faces[i]<0||s.faces[i]>=s.count)
-        throw std::runtime_error("Invalid skin triangle index.");
+    validate_indices(s);
     return b;
 }
 static double padding(const double* s) {

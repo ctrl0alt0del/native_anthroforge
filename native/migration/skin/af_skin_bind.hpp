@@ -1,6 +1,7 @@
 #pragma once
 namespace af_skin {
 inline void nearest_owner(const GapScene& scene,Vec p,int node_id,const std::vector<int>& excluded,Hit& hit) {
+    if(scene.mesh->nodes.empty())return;
     const auto& node=scene.mesh->nodes[node_id]; if(af_bounds_distance(p,node.bounds)>hit.distance)return;
     if(node.left>=0) {
         int a=node.left,b=node.right;
@@ -25,20 +26,38 @@ inline bool visible(const GapScene& scene,Vec p,const Hit& hit) {
     ray_node(*scene.mesh,p,mul(sub(hit.point,p),1/hit.distance),0,hit.face,blocker);
     return blocker.face<0;
 }
-inline void bind_point(const GapScene& scene,Vec p,int* owners,int* triangles,float* bary,float* weights,float& offset,float& support) {
+inline int hit_owner(const GapScene& scene,const Hit& hit) {
+    return hit.segment>=0?scene.lines->owners[hit.segment]:scene.owners[hit.face];
+}
+inline std::vector<Hit> binding_hits(const GapScene& scene,Vec p) {
     std::vector<int> excluded; std::vector<Hit> chosen;
     for(int i=0;i<8 && chosen.size()<4;++i) {
-        Hit hit; nearest_owner(scene,p,0,excluded,hit); if(hit.face<0)break;
-        excluded.push_back(scene.owners[hit.face]); if(visible(scene,p,hit) || chosen.empty())chosen.push_back(hit);
+        Hit hit; nearest_owner(scene,p,0,excluded,hit); nearest_line(scene,p,excluded,hit);
+        if(hit.face<0&&hit.segment<0)break;
+        excluded.push_back(hit_owner(scene,hit));
+        if(visible(scene,p,hit) || chosen.empty())chosen.push_back(hit);
     }
+    return chosen;
+}
+inline void write_binding(const GapScene& scene,const Hit& hit,int& owner,int& element,float* bary) {
+    const Vec bc=hit.segment>=0?Vec{1-hit.parameter,hit.parameter,0}:barycentric(*scene.mesh,hit);
+    owner=hit_owner(scene,hit);
+    element=hit.segment>=0?scene.lines->locals[hit.segment]:scene.local_faces[hit.face];
+    for(int a=0;a<3;++a)bary[a]=float((&bc.x)[a]);
+}
+inline void bind_point(const GapScene& scene,Vec p,int* owners,int* elements,float* bary,float* weights,
+                       float& offset,float& support,int* kinds=nullptr) {
+    const auto chosen=binding_hits(scene,p);
     double sum=0; for(const auto& hit:chosen)sum+=1/std::max(1.e-12,hit.distance*hit.distance);
     offset=0; support=chosen.empty()?0:1;
     for(int i=0;i<4;++i) {
-        owners[i]=triangles[i]=-1; weights[i]=0; for(int a=0;a<3;++a)bary[3*i+a]=0;
-        if(i>=int(chosen.size()))continue; const auto& hit=chosen[i]; Vec bc=barycentric(*scene.mesh,hit);
-        owners[i]=scene.owners[hit.face]; triangles[i]=scene.local_faces[hit.face];
+        owners[i]=elements[i]=-1; weights[i]=0; if(kinds)kinds[i]=-1;
+        for(int a=0;a<3;++a)bary[3*i+a]=0;
+        if(i>=int(chosen.size()))continue; const auto& hit=chosen[i];
+        write_binding(scene,hit,owners[i],elements[i],bary+3*i);
+        if(kinds)kinds[i]=hit.segment>=0?1:0;
         weights[i]=float((1/std::max(1.e-12,hit.distance*hit.distance))/sum);
-        for(int a=0;a<3;++a)bary[3*i+a]=float((&bc.x)[a]); offset+=weights[i]*float(dot(sub(p,hit.point),hit.normal));
+        offset+=weights[i]*float(dot(sub(p,hit.point),hit.normal));
     }
 }
 }

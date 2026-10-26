@@ -3,9 +3,10 @@
 // Source-aware clearance queries. Included after the existing triangle BVH helpers.
 namespace af_skin {
 inline Vec unit(Vec value) { return mul(value,1.0/std::max(norm(value),1.e-30)); }
-struct Hit { Vec point{}, normal{}; double distance=INFINITY; int face=-1; };
+struct Hit { Vec point{}, normal{}; double distance=INFINITY; int face=-1; int segment=-1; double parameter=0; };
 struct GapScene {
     std::unique_ptr<TriangleSnapshot> mesh;
+    std::shared_ptr<::af::skin::Centerlines> lines;
     std::vector<int> owners;
     std::vector<int> local_faces;
     std::vector<unsigned char> used_vertices;
@@ -50,6 +51,7 @@ inline bool ray_box(Vec p,Vec d,const Bounds& box,double limit) {
     return high>0;
 }
 inline void ray_node(const TriangleSnapshot& mesh,Vec p,Vec d,int index,int skip,Hit& hit) {
+    if(mesh.nodes.empty())return;
     const auto& node=mesh.nodes[index]; if(!ray_box(p,d,node.bounds,hit.distance))return;
     if(node.left>=0) { ray_node(mesh,p,d,node.left,skip,hit); ray_node(mesh,p,d,node.right,skip,hit); return; }
     for(int i=node.begin;i<node.end;++i) {
@@ -58,8 +60,17 @@ inline void ray_node(const TriangleSnapshot& mesh,Vec p,Vec d,int index,int skip
         if(distance<hit.distance)hit={add(p,mul(d,distance)),unit(cross(sub(t[1],t[0]),sub(t[2],t[0]))),distance,f};
     }
 }
+inline void nearest_line(const GapScene& scene,Vec p,const std::vector<int>& excluded,Hit& hit) {
+    if(!scene.lines)return;
+    const auto line=scene.lines->nearest(::af::V3(p.x,p.y,p.z),hit.distance,excluded);
+    if(line.segment<0)return;
+    const Vec q{line.point.x(),line.point.y(),line.point.z()};
+    hit={q,unit(sub(p,q)),line.distance,-1,line.segment,line.parameter};
+}
 inline Hit nearest(const GapScene& scene,Vec p,double reach=INFINITY) {
-    Hit hit; hit.distance=reach; nearest_node(*scene.mesh,p,0,hit); return hit;
+    Hit hit; hit.distance=reach;
+    if(!scene.mesh->nodes.empty())nearest_node(*scene.mesh,p,0,hit);
+    nearest_line(scene,p,{},hit); return hit;
 }
 inline void owner_ray(const GapScene& scene,Vec p,Vec d,int index,int skip,int owner,Hit& hit) {
     const auto& mesh=*scene.mesh; const auto& node=mesh.nodes[index];

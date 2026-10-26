@@ -20,6 +20,17 @@ std::shared_ptr<SceneRecord> get_scene(uint64_t handle) {
 static void release(uint64_t handle) {
     std::lock_guard<std::mutex> lock(mutex); scenes.erase(handle);
 }
+static std::unique_ptr<Scene> empty_scene(int sources,const double* policies) {
+    if(sources<1||!policies) throw std::runtime_error("Missing skin source policies.");
+    auto scene=std::make_unique<Scene>(); scene->mesh=std::make_unique<kernel::TriangleSnapshot>();
+    for(int i=0;i<sources;++i) {
+        if(!std::isfinite(policies[3*i])||policies[3*i]<0||!std::isfinite(policies[3*i+1])
+           ||policies[3*i+1]<0||policies[3*i+1]>1) throw std::runtime_error("Invalid skin source policy.");
+        scene->limits.push_back(policies[3*i]); scene->strengths.push_back(policies[3*i+1]);
+        scene->skeletal.push_back(policies[3*i+2]!=0); scene->normal_sign.push_back(0);
+    }
+    return scene;
+}
 static void sample(const Scene& s,const double* points,int count,double reach,double* output,uint64_t cancel) {
     if(!points||!output||count<0||!std::isfinite(reach)||reach<=0)
         throw std::runtime_error("Invalid skin gap query buffers.");
@@ -60,6 +71,33 @@ int af_skin_scene_bind(uint64_t handle,uint64_t mesh,int* owners,int* triangles,
             int(geometry->vertices.rows()),owners,triangles,barycentric,weights,offsets,support);
         af::check_cancel(cancel);
         if(status) throw std::runtime_error("Cannot capture skin source bindings.");
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+
+uint64_t af_skin_scene_sources(const double* xyz,int vertices,const int64_t* faces,int triangles,
+    const int* owners,int sources,const double* policies,const int64_t* segments,int count,const int* segment_owners,uint64_t cancel) {
+    try {
+        af::check_cancel(cancel);
+        auto lines=af::skin::centerlines(xyz,vertices,segments,segment_owners,count,sources,cancel);
+        auto scene=triangles?std::unique_ptr<af::skin::Scene>(static_cast<af::skin::Scene*>(
+            af::routing::kernel::af_skin_gap_create(xyz,vertices,faces,triangles,owners,sources,policies)))
+            :af::skin::empty_scene(sources,policies);
+        if(!scene||(triangles==0&&count==0)) throw std::runtime_error("Skin source geometry is empty or invalid.");
+        scene->lines=std::move(lines); return af::skin::retain(scene.release());
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+int af_skin_scene_bind_sources(uint64_t handle,uint64_t mesh,int* owners,int* elements,
+    float* bary,float* weights,float* offsets,float* support,int* kinds,uint64_t cancel) {
+    try {
+        if(!owners||!elements||!bary||!weights||!offsets||!support||!kinds)
+            throw std::runtime_error("Missing skin source binding buffers.");
+        const af::skin::SceneAccess source(handle,cancel); const auto geometry=af::mesh(mesh);
+        for(int i=0;i<geometry->vertices.rows();++i) {
+            af::check_cancel(cancel);
+            af::routing::kernel::af_skin::bind_point(source.value,af::routing::kernel::load3(geometry->vertices.data()+3LL*i),
+                owners+4LL*i,elements+4LL*i,bary+12LL*i,weights+4LL*i,offsets[i],support[i],kinds+4LL*i);
+        }
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }

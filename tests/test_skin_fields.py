@@ -68,3 +68,26 @@ def test_uniform_scale_preserves_collagen_and_scales_distance():
         np.testing.assert_allclose(first.array(kind) * 1000, scaled.array(kind), atol=1e-10)
     first.close()
     scaled.close()
+
+
+def test_centerline_fields_have_no_radius_or_skeletal_collagen():
+    engine = GeometryEngine()
+    xyz = np.array([[0.0, 0, 0], [1, 0, 0]])
+    inputs = xyz, np.empty((0, 3), dtype=np.int64), np.empty(0, dtype=np.uint8), np.ones(2)
+    fields = prepare(engine, *inputs, resolution=24, segments=[[0, 1]])
+    assert np.isfinite(fields.array(3)).all()
+    np.testing.assert_array_equal(fields.array(2), 1)
+    assert fields.array(3).min() < 0 < fields.array(3).max()
+    with pytest.raises(ValueError, match="segment index"):
+        prepare(engine, *inputs, resolution=24, segments=[[0, 2]])
+    fields.close()
+
+
+def test_empty_segments_leave_surface_fields_exactly_unchanged():
+    engine = GeometryEngine()
+    first = prepare(engine, *source(), resolution=16)
+    second = prepare(engine, *source(), resolution=16, segments=np.empty((0, 2), dtype=np.int64))
+    for kind in range(4):
+        np.testing.assert_array_equal(first.array(kind), second.array(kind))
+    first.close()
+    second.close()

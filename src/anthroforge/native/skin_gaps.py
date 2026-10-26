@@ -8,7 +8,7 @@ import numpy as np
 
 from .mesh import INT64, D, GeometryEngine, Mesh, U, pointer
 from .skin_diagnostics import Diagnostics
-from .skin_fields import INT
+from .skin_fields import INT, segment_buffer
 
 FLOAT = c.POINTER(c.c_float)
 
@@ -21,6 +21,12 @@ class Envelope:
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_skin_scene_create", [D, c.c_int, INT64, c.c_int, INT, c.c_int, D, U], U)
+    engine.bind(
+        "af_skin_scene_sources",
+        [D, c.c_int, INT64, c.c_int, INT, c.c_int, D, INT64, c.c_int, INT, U],
+        U,
+    )
+    engine.bind("af_skin_scene_bind_sources", [U, U, INT, INT, FLOAT, FLOAT, FLOAT, FLOAT, INT, U])
     engine.bind("af_skin_scene_sample", [U, D, c.c_int, c.c_double, D, U])
     engine.bind("af_skin_scene_destroy", [U], None)
     engine.bind("af_skin_envelope_mesh", [U, U, U, D, U], U)
@@ -72,7 +78,9 @@ class Scene:
             a.ctypes.data_as(INT if a.dtype == np.int32 else FLOAT) for a in arrays.values()
         ]
         self.engine.check(
-            self.engine.library.af_skin_scene_bind(self.handle, mesh.handle, *pointers, cancel)
+            self.engine.library.af_skin_scene_bind_sources(
+                self.handle, mesh.handle, *pointers, cancel
+            )
         )
         return arrays
 
@@ -85,6 +93,7 @@ def binding_buffers(count: int) -> dict[str, Any]:
         weights=np.empty((count, 4), dtype=np.float32),
         offsets=np.empty(count, dtype=np.float32),
         support=np.empty(count, dtype=np.float32),
+        kinds=np.empty((count, 4), dtype=np.int32),
     )
 
 
@@ -100,9 +109,33 @@ def buffers(vertices: Any, faces: Any, owners: Any, policies: Any) -> tuple[Any,
 
 
 def create(
-    engine: GeometryEngine, vertices: Any, faces: Any, owners: Any, policies: Any, cancel: int = 0
+    engine: GeometryEngine,
+    vertices: Any,
+    faces: Any,
+    owners: Any,
+    policies: Any,
+    cancel: int = 0,
+    segments: Any = (),
+    segment_owners: Any = (),
 ) -> Scene:
     xyz, triangles, membership, rules = buffers(vertices, faces, owners, policies)
+    lines = line_buffers(segments, segment_owners)
+    return create_scene(engine, (xyz, triangles, membership, rules), lines, cancel)
+
+
+def create_scene(engine: GeometryEngine, buffers: Any, lines: Any, cancel: int) -> Scene:
+    xyz, triangles, membership, rules = buffers
     geometry = (pointer(xyz), len(xyz), triangles.ctypes.data_as(INT64), len(triangles))
-    source = (membership.ctypes.data_as(INT), len(rules), pointer(rules), cancel)
-    return Scene(engine, int(engine.library.af_skin_scene_create(*geometry, *source)))
+    source = (membership.ctypes.data_as(INT), len(rules), pointer(rules))
+    edges = (lines[0].ctypes.data_as(INT64), len(lines[0]), lines[1].ctypes.data_as(INT))
+    return Scene(
+        engine, int(engine.library.af_skin_scene_sources(*geometry, *source, *edges, cancel))
+    )
+
+
+def line_buffers(segments: Any, owners: Any) -> tuple[Any, Any]:
+    edges = segment_buffer(segments)
+    membership = np.ascontiguousarray(owners, dtype=np.int32)
+    if membership.shape != (len(edges),):
+        raise ValueError("Skin source ownership must match segment count.")
+    return edges, membership

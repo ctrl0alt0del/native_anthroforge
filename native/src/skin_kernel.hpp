@@ -3,6 +3,7 @@
 #include <deque>
 #include <string>
 #include "routing_kernel.hpp"
+#include "skin_centerlines.hpp"
 
 namespace af::skin {
 struct KernelCancellation {

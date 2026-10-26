@@ -200,3 +200,15 @@ guidance, invalid samples and cancellation; seven focused tests including budget
 architecture pass. Native rebuild and five CTests pass; selected clang-tidy emits only
 suppressed header warnings. Full topology generation and anatomical acceptance remain
 pending. Next: integrate feature paths, capture/assembly and backend execution.
+
+### FLOW guide recovery checkpoint
+
+Native feature routing matches the addon DLL on the compact control. Accepted tissue
+charts and explicit Fiber paths now have owned native guide capture, including reflected
+frames. Capture uses accepted material kind during pending edits, not the new authored
+kind. Fourteen focused tests pass; configured mypy passes 458 files, Ruff/format pass,
+and native guide clang-tidy reports only suppressed header warnings. The two-row branch
+fixture correctly has no interior FLOW samples, matching the addon rejection; this is
+not proof of successful branched anatomical capture. Four field controls still match
+exactly. No generator integration, full topology acceptance or release qualification yet.
+Next: external backend lifecycle, loop guides/density/assembly, then downstream stages.

@@ -46,8 +46,30 @@ def compare(library, engine, angle, empty=False):
     return dict(
         angle=angle,
         empty=empty,
-        maximum_error=max(float(np.max(np.abs(a - b))) for a, b in zip(expected, actual)),
+        maximum_error=max(
+            float(np.max(np.abs(a - b))) for a, b in zip(expected, actual, strict=True)
+        ),
     )
+
+
+def path_baseline(library, mesh, points):
+    p = np.ctypeslib.ndpointer(np.float64, flags="C_CONTIGUOUS")
+    i = np.ctypeslib.ndpointer(np.int32, flags="C_CONTIGUOUS")
+    library.af_path.argtypes = [p, c.c_int, i, c.c_int, p, c.c_int, i, c.c_int]
+    output = np.empty(mesh.counts[3] * 6, dtype=np.int32)
+    geometry = mesh.array(0), mesh.counts[0], mesh.array(3), mesh.counts[3]
+    count = library.af_path(*geometry, points, len(points), output, len(output))
+    assert count >= 0
+    return output[: count * 2].reshape(-1, 2)
+
+
+def paths(library, engine):
+    mesh, _, _ = fixture(engine, 0.0)
+    points = np.array([[0, 0, 0], [1, 1, 0], [0, 1, 0]], dtype=float)
+    expected = path_baseline(library, mesh, points)
+    actual = skin_flow.route(mesh, points)
+    np.testing.assert_array_equal(actual, expected)
+    return dict(feature_edges=actual.tolist(), exact=True)
 
 
 def main():
@@ -58,6 +80,7 @@ def main():
         compare(library, engine, angle, empty)
         for angle, empty in ((0.4, False), (-0.6, False), (1.2, False), (0.0, True))
     ]
+    results.append(paths(library, engine))
     path = Path("build/skin-040/flow-parity.json")
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(results, indent=2), encoding="utf-8")

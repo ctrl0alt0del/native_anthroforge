@@ -44,3 +44,22 @@ def test_invalid_samples_and_cancel_are_explicit(session):
     cancel.set()
     with pytest.raises(ValueError, match="[Cc]ancel"):
         skin_flow.solve(mesh, prior, samples, cancel.handle)
+
+
+def test_feature_paths_use_mesh_edges_and_separated_selection(session):
+    mesh, _, _ = fixture(session.engine)
+    points = np.array([[0, 0, 0], [1, 1, 0]], dtype=float)
+    edges = skin_flow.route(mesh, points)
+    np.testing.assert_array_equal(edges, [[0, 2]])
+    selected = skin_flow.select_paths(mesh, np.concatenate([points, points]), [0, 2, 4])
+    np.testing.assert_array_equal(selected, [0])
+    with pytest.raises(ValueError, match="two points"):
+        skin_flow.select_paths(mesh, points, [0, -1, 2])
+
+
+def test_feature_paths_honor_cancellation(session):
+    mesh, _, _ = fixture(session.engine)
+    cancel = NativeCancellation(session.engine)
+    cancel.set()
+    with pytest.raises(ValueError, match="[Cc]ancel"):
+        skin_flow.route(mesh, [[0, 0, 0], [1, 1, 0]], cancel.handle)

@@ -2823,3 +2823,14 @@ controls match exactly, including absent guidance. Geometry remains unchanged. T
 qualifies the field adapter only, not complete guided remeshing or production anatomy.
 Hierarchical quad-budget warnings now use the addon's nearest-explicit-parent rule;
 metadata policy remains Python, while numerical density solving will be native.
+
+### Accepted topology guide capture (0.4.0 in progress)
+
+Addon FLOW capture recomputed muscle inflation and sampled grids in Python. The
+standalone adapter resolves accepted uncropped rest material charts and performs
+stencil sampling, frame transformation and feature routing in C++. This avoids a
+second inflation and respects accepted Manual state. Sampling strides, normals and
+empty-interior rejection remain unchanged; explicit Fiber samples retain zero normals.
+Reflection, stencil, two-row rejection and pending-kind tests pass. The compact
+feature path matches the addon DLL exactly. Full branch/anatomical and remesher
+acceptance remain pending; successful guide preparation is not a skin result.

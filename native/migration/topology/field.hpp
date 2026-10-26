@@ -32,7 +32,7 @@ std::vector<int> route(const double*v,const std::vector<std::vector<int>>&graph,
 }
 int path_impl(const double*v,int nv,const int*t,int nt,const double*p,int np,int*out,int capacity){
  std::vector<std::vector<int>>graph(nv);for(int i=0;i<nt;i++)for(int k=0;k<3;k++){int a=t[3*i+k],b=t[3*i+(k+1)%3];graph[a].push_back(b);graph[b].push_back(a);}
- std::vector<int>anchors;for(int j=0;j<np;j++){double best=1e100;int id=-1;for(int i=0;i<nv;i++){double d=(vec(v,i)-vec(p,j)).squaredNorm();if(d<best){best=d;id=i;}}anchors.push_back(id);}
+ std::vector<int>anchors;for(int j=0;j<np;j++){checkpoint();double best=1e100;int id=-1;for(int i=0;i<nv;i++){double d=(vec(v,i)-vec(p,j)).squaredNorm();if(d<best){best=d;id=i;}}anchors.push_back(id);}
  int used=0;for(int i=1;i<np;i++){auto path=route(v,graph,anchors[i-1],anchors[i]);if(path.empty())return -1;
   for(size_t k=1;k<path.size();k++){if(used+2>capacity)return -2;out[used++]=path[k-1];out[used++]=path[k];}}return used/2;
 }
@@ -74,7 +74,7 @@ int af_select_paths(const double*p,const int*offsets,int count,double radius,int
  try{std::vector<std::pair<double,int>>order;std::vector<V>used;int n=0;
   for(int i=0;i<count;i++){double length=0;for(int j=offsets[i]+1;j<offsets[i+1];j++)length+=(vec(p,j)-vec(p,j-1)).norm();order.emplace_back(-length,i);}
   std::sort(order.begin(),order.end());
-  for(auto [length,i]:order){int a=offsets[i],b=offsets[i+1];if(b-a<2||overlaps(p,a,b,used,radius))continue;
+  for(auto [length,i]:order){checkpoint();int a=offsets[i],b=offsets[i+1];if(b-a<2||overlaps(p,a,b,used,radius))continue;
    out[n++]=i;for(int j=a;j<b;j++)used.push_back(vec(p,j));}return n;
  }catch(...){return -1;}
 }

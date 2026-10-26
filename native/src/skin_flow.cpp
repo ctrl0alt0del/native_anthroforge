@@ -56,3 +56,45 @@ int af_skin_flow(uint64_t handle,const double* prior,const double* samples,int c
         af::skin_flow::solve(*mesh,prior,inputs,output,information,cancel); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+
+namespace af::skin_flow {
+static void points(const double* values,int count,uint64_t token) {
+    if(!values || count<2) throw std::runtime_error("A FLOW path needs at least two points.");
+    for(int i=0;i<count;++i) {
+        if(i%4096==0) af::check_cancel(token);
+        if(!V3(values+3LL*i).allFinite()) throw std::runtime_error("Nonfinite FLOW path point.");
+    }
+}
+static void offsets(const int* values,int count,int points) {
+    if(!values || count<1 || values[0]!=0 || values[count]!=points)
+        throw std::runtime_error("Invalid FLOW path offsets.");
+    for(int i=0;i<count;++i) if(values[i]<0 || values[i+1]>points || int64_t(values[i+1])-values[i]<2)
+        throw std::runtime_error("A FLOW path needs at least two points.");
+}
+}
+int af_skin_flow_route(uint64_t handle,const double* points,int count,int* edges,int capacity,uint64_t cancel) {
+    try {
+        const auto mesh=af::mesh(handle); af::skin_flow::points(points,count,cancel);
+        if(!edges||capacity<2||!mesh->triangles.rows()) throw std::runtime_error("Missing FLOW edge capacity.");
+        af::skin_flow::cancellation=cancel;
+        const int size=af::skin_flow::af_path(mesh->vertices.data(),int(mesh->vertices.rows()),
+            mesh->triangles.data(),int(mesh->triangles.rows()),points,count,edges,capacity);
+        af::check_cancel(cancel);
+        if(size<0) throw std::runtime_error("FLOW path exceeded connectivity or work budget.");
+        return size;
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}
+int af_skin_flow_select(uint64_t handle,const double* points,int count,const int* offsets,
+                       int paths,int* selected,uint64_t cancel) {
+    try {
+        const auto mesh=af::mesh(handle); af::skin_flow::points(points,count,cancel);
+        af::skin_flow::offsets(offsets,paths,count);
+        if(!selected||!mesh->vertices.rows()) throw std::runtime_error("Missing FLOW selection mesh or buffer.");
+        const af::V3 extent=mesh->vertices.colwise().maxCoeff()-mesh->vertices.colwise().minCoeff();
+        af::skin_flow::cancellation=cancel;
+        const int size=af::skin_flow::af_select_paths(points,offsets,paths,extent.maxCoeff()*.08,selected);
+        af::check_cancel(cancel);
+        if(size<0) throw std::runtime_error("FLOW feature path selection failed.");
+        return size;
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}

@@ -41,6 +41,9 @@ Existing libigl supplies manifold edge-collapse traversal under its MPL-2.0 noti
 Skin assembly orientation adapts Blender 5.0.1 `bmo_normals.cc` (Blender Authors,
 GPL-2.0-or-later) to owned arrays. The source fingerprint is recorded in the same
 manifest; no Blender object or BMesh runtime is linked.
+Skin half-cut quad triangulation also adapts the convex planar area/perimeter
+criterion in Blender 5.0.1 `bmesh_polygon.cc`, `bmesh_beautify.cc` and
+`polyfill_2d_beautify.cc` (Blender Authors, GPL-2.0-or-later), recorded in that manifest.
 
 | Component | Version/source | License and source |
 | --- | --- | --- |

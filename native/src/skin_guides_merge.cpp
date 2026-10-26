@@ -1,4 +1,5 @@
 #include "skin_guides.hpp"
+#include "skin_loops.hpp"
 #include <map>
 namespace af::skin_guides {
 static void validate(const AFGuideInput& row,uint64_t cancel) {
@@ -49,6 +50,26 @@ Guides merge(const AFGuideInput* inputs,int count,uint64_t cancel) {
         if(result.samples.size()+inputs[i].sample_count>16777216||result.points.size()/3+inputs[i].point_count>16777216)
             throw std::runtime_error("FLOW batch exceeds storage budget.");
         samples(result,inputs[i],i,cancel); paths(result,inputs[i],cancel);
+    }
+    return result;
+}
+static void append_run(Guides& output,const Guides& source,int64_t start,int64_t end) {
+    if(end-start<2) return;
+    output.points.insert(output.points.end(),source.points.begin()+3*start,source.points.begin()+3*end);
+    output.offsets.push_back(int64_t(output.points.size()/3));
+}
+Guides half(const AFGuideInput& input,const double* equation,uint64_t cancel) {
+    const auto plane=skin_loops::plane(equation);
+    if(!plane.enabled) throw std::runtime_error("FLOW clipping requires a symmetry plane.");
+    const auto source=merge(&input,1,cancel); Guides result; result.samples=source.samples; result.regions=source.regions;
+    for(size_t path=1;path<source.offsets.size();++path) {
+        const auto end=source.offsets[path]; auto start=source.offsets[path-1];
+        for(auto i=start;i<end;++i) {
+            if(i%4096==0) check_cancel(cancel);
+            if((V3(source.points.data()+3*i)-plane.origin).dot(plane.normal)<-1e-8) continue;
+            append_run(result,source,start,i); start=i+1;
+        }
+        append_run(result,source,start,end);
     }
     return result;
 }

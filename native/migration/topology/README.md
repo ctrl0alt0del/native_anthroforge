@@ -77,3 +77,10 @@ Annuli retain Blender float-coordinate materialization before cut/stitch: skippi
 this boundary changed tied zipper ordering on symmetric rings. Numerical annulus
 construction still uses double precision; only the accepted patch coordinates round.
 These tests do not establish production anatomy or public workflow acceptance.
+
+Symmetry uses owned triangle half cuts and the convex-planar subset of Blender beauty
+triangulation, with source hashes under `half_mesh_reference`. Reflected output and
+FLOW path clipping preserve the fingerprinted addon production policies. Seven small
+fixtures in `symmetry.json` compare position and oriented connectivity. Duplicate
+zero-area cut triangles on an exact-on-face plane are omitted intentionally. The addon
+prototype `fill_unmatched_boundaries` is not part of the production call graph.

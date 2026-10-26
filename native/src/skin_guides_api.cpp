@@ -1,5 +1,6 @@
 #include "skin_guides.hpp"
 #include "anthroforge/skin_guides.h"
+#include "anthroforge/skin_symmetry.h"
 #include <mutex>
 #include <unordered_map>
 
@@ -58,6 +59,12 @@ void af_skin_guides_release(uint64_t handle) {
 uint64_t af_skin_guides_merge(const AFGuideInput* inputs,int count,uint64_t cancel) {
     try { return af::skin_guides::retain(af::skin_guides::merge(inputs,count,cancel)); }
     catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+uint64_t af_skin_guides_half(const AFGuideInput* input,const double* plane,uint64_t cancel) {
+    try {
+        if(!input) throw std::runtime_error("Missing FLOW clipping inputs.");
+        return af::skin_guides::retain(af::skin_guides::half(*input,plane,cancel));
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }
 int64_t af_skin_guides_regions(uint64_t handle,int64_t* output,int64_t capacity) {
     try {

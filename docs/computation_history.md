@@ -3017,3 +3017,20 @@ control reproduces parity rejection. Closed disconnected components exercise out
 orientation; rendered side-by-side results were inspected. Source geometries remain
 immutable and owned results survive input release. These compact fixtures do not yet
 qualify complete anatomical topology, reference deformation, or the release workflow.
+
+### Shared native skin symmetry preparation (0.4.0 in progress)
+
+Moved addon BMesh half cutting and NumPy symmetry assembly into batched C++. Shared
+edge intersections preserve connected cut boundaries; convex planar cut quads use
+Blender's area/perimeter beauty criterion. Both backends use the same negative-half
+policy, 2%-diagonal boundary snap, cut-plane cap exclusion and 1e-6-diagonal welding.
+FLOW retains all direction samples and only contiguous negative-side path runs of
+at least two points, with the addon 1e-8 exclusion threshold. Original inputs remain
+unchanged. No prototype unmatched-hole filling is introduced into production.
+
+Seven captured addon controls match oriented nondegenerate connectivity; positions
+are exact except oblique clipping (maximum 1.69e-7). An exact-on-face plane exposes
+12 duplicate zero-area triangles in the addon; the new adapter omits those duplicates
+while preserving the two valid triangles. Actual comparison renders were inspected.
+Cancellation, malformed planes, empty halves and FLOW run/provenance checks pass.
+These controls qualify the isolated preparation boundary, not anatomical remeshing.

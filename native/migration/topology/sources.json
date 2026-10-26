@@ -57,5 +57,22 @@
     "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/operators/bmo_normals.cc",
     "sha256": "b6b046e56e3161943b421aa65f66e711b0d3eb9c2e955fda25d6732221608846",
     "license": "GPL-2.0-or-later"
-  }
+  },
+  "half_mesh_reference": [
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/intern/bmesh_polygon.cc",
+      "sha256": "51508da558aa2fe23f2ea46fa737b7f54df61ba6c958841a520e2e721d9e639a",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/tools/bmesh_beautify.cc",
+      "sha256": "14b64837015202f22e6f4272de2ca83cfa969aaa2302f362e47423be4af7b44d",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenlib/intern/polyfill_2d_beautify.cc",
+      "sha256": "8096baf0094107f2b651f2179e570cc1864e0c159d98c999868b12064393d22d",
+      "license": "GPL-2.0-or-later"
+    }
+  ]
 }

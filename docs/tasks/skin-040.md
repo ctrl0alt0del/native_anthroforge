@@ -453,3 +453,23 @@ The prior broad gate predates these kernels; full regression remains pending.
 Next: symmetry input/output, backend orchestration and public topology jobs/UI. Durable
 reference/deformation, shortcut fitting, OBJ export and complete release qualification
 remain unfinished. Keep 0.3.7 package version, feature branch and unrelated __init__.py.
+
+### Native symmetry preparation checkpoint
+
+Added owned half-mesh preparation, planar cut-quad beauty triangulation, reflected
+output with near-boundary snapping/cap exclusion/welding, and native clipping of FLOW
+path runs. Samples and region ownership remain intact. Production source inspection
+confirmed `fill_unmatched_boundaries` is a prototype helper, not called by the current
+addon solver; do not accidentally add it as an automatic repair.
+
+Seven captured controls match nondegenerate oriented connectivity. Six have exact
+positions; the oblique cut differs by at most 1.69e-7 fixture units. At a plane exactly
+on a source face, Blender creates 12 duplicate zero-area cut triangles; the native
+adapter omits them and retains the same two valid surface triangles. This intentional
+structural sanitation is recorded rather than claimed as full index parity. Inspected
+`build/skin-040/ui/symmetry-parity.png`; metrics in `symmetry-parity.json`.
+Eleven focused symmetry/architecture tests pass, as do build/five CTests, selected
+native style, Ruff and configured mypy (479 files). Wider regression remains pending.
+
+Next: bounded Instant Meshes process adapter and complete topology orchestration.
+Public topology, deformation reference/LE/FAST, fitting, export and release remain open.

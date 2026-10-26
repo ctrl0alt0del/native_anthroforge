@@ -16,6 +16,7 @@ from . import (
     skin_proximity,
     skin_proxy,
     skin_stitch,
+    skin_symmetry,
     skin_topology,
 )
 
@@ -33,6 +34,7 @@ MODULES = (
     skin_proximity,
     skin_proxy,
     skin_stitch,
+    skin_symmetry,
     skin_topology,
 )
 

@@ -6,18 +6,18 @@ from typing import Any
 from anthroforge.core import skin_sources
 from anthroforge.native import skin_loops
 
-from . import skin_capture
+from . import skin_path_capture
 
 
 @dataclass(frozen=True)
 class Capture:
-    sources: tuple[skin_capture.Source, ...]
+    sources: tuple[skin_path_capture.Source, ...]
     data: skin_loops.Loops
     warnings: tuple[str, ...]
 
 
 def sources(engine: Any, document: Any, resources: Any, cancel: Any) -> tuple[Any, Any]:
-    rows: list[skin_capture.Source] = []
+    rows: list[skin_path_capture.Source] = []
     warnings: list[str] = []
     for source in skin_sources.candidates(document):
         if source.kind != "FIBER":
@@ -32,8 +32,8 @@ def append(
     try:
         if cancel.is_set():
             raise ValueError("Skin loop capture cancelled.")
-        accepted = skin_capture.fiber(engine, document, resources, source, cancel.handle)
-        if accepted.mesh.closed:
+        accepted = skin_path_capture.capture(engine, document, resources, source)
+        if accepted.path.closed:
             rows.append(accepted)
     except (KeyError, ValueError) as error:
         if cancel.is_set():
@@ -47,7 +47,7 @@ def capture(
 ) -> Capture:
     rows, warnings = sources(engine, document, resources, cancel)
     data = skin_loops.prepare(
-        mesh, [row.mesh for row in rows], [row.frame for row in rows], plane, cancel.handle
+        mesh, [row.path for row in rows], [row.frame for row in rows], plane, cancel.handle
     )
     for row, status in zip(rows, data.statuses, strict=True):
         if status in (1, 3):

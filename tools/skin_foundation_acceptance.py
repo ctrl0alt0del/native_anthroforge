@@ -13,6 +13,8 @@ from shiboken6 import delete
 from ui_acceptance import click, find
 
 from anthroforge.application import skin_evaluation
+from anthroforge.application.skin_operations import settings_for
+from anthroforge.core.fibers import Fiber
 from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.qt_profiler import profiler_application
@@ -113,6 +115,33 @@ def collagen_button(controller, window):
     assert not controller.tissue_painting.state["active"]
 
 
+def fiber_controls(controller, window):
+    fiber = create_fiber(controller.session)
+    controller.refresh()
+    controller.select(fiber.id)
+    controller.run("workspace.update", dict(display_units="mm"))
+    window.resize(1050, 1300)
+    QTest.qWait(100)
+    assert find(window, "skinFiberRadiusValue").isVisible()
+    factor = controller.state["unit_factor"]
+    edit_field(window, "skinFiberRadius", str(0.002 / factor))
+    assert settings_for(controller.session.document.skin, fiber.id).fiber_radius == 0.002
+    assert window.grabWindow().save(str(OUTPUT / "skin-fiber-radius.png"))
+    controller.run("undo", {})
+    assert settings_for(controller.session.document.skin, fiber.id).fiber_radius == 0.001
+
+
+def create_fiber(session):
+    target = session.document.entities[0].id
+    points = [dict(position=p) for p in [[-0.4, 0, 0.7], [0.4, 0, 0.7]]]
+    curve = session.command("curve.create", points=points)
+    session.wait()
+    bindings = [dict(point=p.id, target=target) for p in session.document.object(curve).points]
+    session.command("fiber.create", curve=curve, bindings=bindings)
+    session.wait()
+    return next(item for item in session.document.objects if isinstance(item, Fiber))
+
+
 def exercise(application):
     controller, warnings = Controller(), []
     engine = create_engine(controller, warnings)
@@ -122,6 +151,7 @@ def exercise(application):
         QTest.qWait(100)
         navigation(controller, window)
         envelope(controller, window)
+        fiber_controls(controller, window)
         assert not warnings, warnings
     finally:
         controller.close()

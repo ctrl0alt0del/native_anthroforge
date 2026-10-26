@@ -36,4 +36,4 @@ def test_manual_pending_authored_closure_does_not_replace_accepted_guide(session
     token = NativeCancellation(session.engine)
     rows, warnings = skin_loop_capture.sources(session.engine, document, session.resources, token)
     assert not warnings and [row.identity.owner for row in rows] == [fiber.id]
-    assert rows[0].mesh.closed
+    assert rows[0].path.closed

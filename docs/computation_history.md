@@ -3168,10 +3168,14 @@ instances share the source mesh and reflect it; accepted tissue consumers still 
 their Fibers. Admission estimates account for the expanded mesh; preparation stays on the
 worker. This adds physical extent and surface area relative to the superseded centerlines.
 
-Six source captures match positions within 1e-8 metres and exact connectivity. Counterbalanced
-profiler-off four-Fiber trials at grid resolution 220 measure approximately 2.14 s centerline
-versus 4.10 s bevel for capture/fields/scene/envelope combined. The dominant added cost is
-envelope distance work. All-326-Fiber capture alone is approximately 424 ms; captured arrays
+Six source captures match positions within 1e-8 metres and exact connectivity. The unchanged
+addon sampler accepts all six, selects identical sample indices, and matches area exactly
+in five cases (closed-loop relative difference 1.2e-7). The initial four-Fiber-only envelope
+timing was withdrawn: visual inspection exposed boundary planes in the missing-SCP case,
+not representative anatomical skin. A corrected trial retains the original skeletal context.
+All-326-Fiber capture alone is approximately 424 ms; captured arrays
 are 27.5 MB versus 1.24 MB. This intentionally stresses unsuppressed Fibers and is not full
-assembly latency or total resident memory. Raw trials and a separate profiler report are in
-build/skin-040/fiber-thickness-production. Complete deformation/release acceptance is pending.
+assembly latency or total resident memory. Raw capture trials and the rejected envelope
+experiment are in build/skin-040/fiber-thickness-production. Closed-loop/FLOW guides now
+use a separate accepted-path capture boundary; they do not receive the physical bevel.
+Complete deformation/release acceptance is pending.

@@ -6,7 +6,7 @@ from typing import Any
 from anthroforge.core import skin_sources
 from anthroforge.native import skin_guide_batch, skin_guides
 
-from . import mirror_surfaces, skin_capture, skin_inputs, skin_operations
+from . import mirror_surfaces, skin_inputs, skin_operations, skin_path_capture
 from .object_frames import Frames
 
 
@@ -37,8 +37,8 @@ def tissue(engine: Any, document: Any, resources: Any, source: Any, cancel: int)
 
 
 def fiber(engine: Any, document: Any, resources: Any, source: Any, cancel: int) -> GuideSource:
-    accepted = skin_capture.fiber(engine, document, resources, source, cancel)
-    data = skin_guides.path(accepted.mesh, accepted.frame, cancel)
+    accepted = skin_path_capture.capture(engine, document, resources, source)
+    data = skin_guides.path(accepted.path, accepted.frame, cancel)
     return GuideSource(source, data, (accepted.asset,))
 
 

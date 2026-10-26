@@ -5,8 +5,9 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from anthroforge.application import skin_capture, skin_operations
+from anthroforge.application import skin_capture, skin_operations, skin_topology_capture
 from anthroforge.core.skin import SkinStage
+from anthroforge.native.mesh import NativeCancellation
 from tests.test_fiber_creation import bind, scene
 
 
@@ -47,3 +48,19 @@ def test_mirror_reuses_exact_source_tube(session):
     assert rows[0].frame != rows[1].frame
     assert not len(captured.geometry.segments)
     np.testing.assert_array_equal(rows[0].mesh.array(0), rows[1].mesh.array(0))
+
+
+def test_skin_radius_does_not_thicken_or_replace_flow_guides(session):
+    bone, curve = scene(session)
+    fiber = bind(session, bone, curve)
+    session.command("skin.contributor.configure", owner=fiber.id, values=dict(flow=True))
+    token = NativeCancellation(session.engine)
+    before = skin_topology_capture.capture(
+        session.engine, session.document, session.resources, token
+    )
+    session.command("skin.contributor.configure", owner=fiber.id, values=dict(fiber_radius=0.01))
+    after = skin_topology_capture.capture(
+        session.engine, session.document, session.resources, token
+    )
+    assert not before.warnings and not after.warnings and len(after.sources) == 1
+    np.testing.assert_array_equal(before.data.points, after.data.points)

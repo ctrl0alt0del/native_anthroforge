@@ -7,8 +7,10 @@ from time import perf_counter
 
 import numpy as np
 
+from anthroforge.application import skin_capture as application_capture
 from anthroforge.application.object_frames import Frames
 from anthroforge.application.session import Session
+from anthroforge.core import skin_sources
 from anthroforge.core.entities import IDENTITY
 from anthroforge.core.fibers import Fiber
 from anthroforge.native import skin_capture, skin_fields, skin_gaps
@@ -26,15 +28,24 @@ def load_paths(session, project):
     ]
 
 
-def capture(engine, sources, mode):
+def capture(engine, sources, mode, bones=()):
     paths, frames = zip(*sources, strict=True)
     if mode == "bevel":
-        meshes = [skin_capture.fiber_bevel(path, frame, 0.001) for path, frame in sources]
-        return skin_capture.capture(
-            engine, meshes, [IDENTITY] * len(meshes), [[0.005, 1, 0]] * len(meshes)
-        )
-    return skin_capture.capture_sources(
-        engine, paths, [1] * len(paths), frames, [[0.005, 1, 0]] * len(paths)
+        paths = [skin_capture.fiber_bevel(path, frame, 0.001) for path, frame in sources]
+        frames = [IDENTITY] * len(paths)
+    geometry = [row.mesh for row in bones] + list(paths)
+    transforms = [row.frame for row in bones] + list(frames)
+    kinds = [0] * len(bones) + [int(mode == "centerline")] * len(paths)
+    policies = [[0.005, 1, 1]] * len(bones) + [[0.005, 1, 0]] * len(paths)
+    return skin_capture.capture_sources(engine, geometry, kinds, transforms, policies)
+
+
+def skeletal_context(session):
+    candidates = skin_sources.candidates(session.document)
+    return tuple(
+        application_capture.surface(session.engine, session.document, session.resources, row)
+        for row in candidates
+        if row.kind == "SCP"
     )
 
 
@@ -86,11 +97,14 @@ def envelope(session, geometry, resolution, report):
         scene.close()
 
 
-def trial(session, sources, mode, resolution):
+def trial(session, sources, mode, resolution, bones=()):
     report = dict(
         mode=mode, fibers=len(sources), path_points=sum(path.count for path, _ in sources)
     )
-    geometry = timed(session, "capture_ms", lambda: capture(session.engine, sources, mode), report)
+    geometry = timed(
+        session, "capture_ms", lambda: capture(session.engine, sources, mode, bones), report
+    )
+    report["skeletal_contributors"] = len(bones)
     report["input_vertices"], report["input_triangles"] = (
         len(geometry.vertices),
         len(geometry.triangles),
@@ -100,12 +114,12 @@ def trial(session, sources, mode, resolution):
     return report, output
 
 
-def compare(session, sources, count, resolution, output):
+def compare(session, sources, count, resolution, output, bones=()):
     selected, results, surfaces = sources[:count], [], {}
     for iteration, mode in enumerate(
         ("centerline", "bevel", "bevel", "centerline", "centerline", "bevel")
     ):
-        row, surface = trial(session, selected, mode, resolution)
+        row, surface = trial(session, selected, mode, resolution, bones)
         row["iteration"] = iteration
         results.append(row)
         if surface is not None:
@@ -116,10 +130,11 @@ def compare(session, sources, count, resolution, output):
     return dict(count=count, resolution=resolution, trials=results)
 
 
-def recorded(session, sources, options):
+def recorded(session, sources, options, bones):
     session.command("profile.start")
     rows = [
-        trial(session, sources[:4], mode, options.resolution)[0] for mode in ("centerline", "bevel")
+        trial(session, sources[:4], mode, options.resolution, bones)[0]
+        for mode in ("centerline", "bevel")
     ]
     session.command(
         "profile.stop", path=str(options.output / "fiber-thickness.afprofile.zip"), wait=True
@@ -129,11 +144,12 @@ def recorded(session, sources, options):
 
 def run(session, options):
     sources = load_paths(session, options.project)
+    bones = skeletal_context(session)
     reports = [
         compare(session, sources, count, 0, options.output) for count in (1, 32, len(sources))
     ]
-    reports.append(compare(session, sources, 4, options.resolution, options.output))
-    profiled = recorded(session, sources, options)
+    reports.append(compare(session, sources, 4, options.resolution, options.output, bones))
+    profiled = recorded(session, sources, options, bones)
     payload = dict(
         project=str(options.project), radius_metres=0.001, reports=reports, profiled=profiled
     )

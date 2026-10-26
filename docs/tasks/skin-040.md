@@ -99,12 +99,19 @@ workspace display thickness. Source/mirror pairs share the source tube resource.
 Six Blender controls (straight, bent, closed, duplicate-point and reversal cases) match
 coordinates within 1e-8 metres and exact quad/triangle order. Focused settings, mirror,
 persistence and native checks pass; final static/UI/broader checks remain pending.
-Serial counterbalanced, profiler-off trials on four actual assembly Fibers at grid 220
-take about 2.14 s with centerlines versus 4.10 s with tubes through capture, field, scene
-and envelope construction. Capture-only stress with all 326 accepted Fibers takes about
+The first four-Fiber-only envelope timing was withdrawn after visual inspection: without
+supporting SCPs the output has boundary planes and is not representative skin. A corrected
+serial counterbalanced trial with the original skeletal context is running. Capture-only
+stress with all 326 accepted Fibers takes about
 424 ms and 27.5 MB of captured arrays (not total resident memory). Consumed Fibers remain
 suppressed in production. Separate profiler captures and raw trials are under ignored
-build/skin-040/fiber-thickness-production. Area-sampler and visual qualification are next.
+build/skin-040/fiber-thickness-production (the invalid envelope benchmark is retained as
+rejected evidence). The addon sampler accepts all six fixtures, with identical selected
+indices, five exact area matches and a 1.2e-7 relative closed-loop difference. Offscreen
+radius editing/undo passes. The first broad run passed 2,499 tests and caught two topology
+guide regressions: those callers still expected path handles from the now-mesh capture.
+Separated accepted path capture from physical surfaces for loops and FLOW; focused tests
+now pass, including radius-independent FLOW. Full rerun remains pending.
 This is an incomplete 0.4.0 checkpoint; no release/version bump/main merge is authorized
 by these partial checks. Historical centerline notes below describe superseded checkpoints.
 

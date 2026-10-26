@@ -10,8 +10,14 @@ from anthroforge.core.entities import IDENTITY
 from anthroforge.core.skin import effective_collagen
 from anthroforge.native import skin_capture as native
 
-from . import mirror_surfaces, skin_collagen, skin_inputs, skin_operations, surface_providers
-from .object_frames import Frames
+from . import (
+    mirror_surfaces,
+    skin_collagen,
+    skin_inputs,
+    skin_operations,
+    skin_path_capture,
+    surface_providers,
+)
 
 
 @dataclass(frozen=True)
@@ -39,17 +45,14 @@ def surface(engine: Any, document: Any, resources: Any, source: skin_sources.Sou
 
 
 def fiber(engine: Any, document: Any, resources: Any, source: Any, cancel: int) -> Source:
-    item = document.object(source.owner)
-    if not item.result.asset or item.result.asset not in resources.paths or item.result.error:
-        raise ValueError("Fiber has no accepted path for skin: " + item.name)
-    frame = Frames(engine, document).world(item.id)
-    radius = skin_operations.settings_for(document.skin, item.id).fiber_radius
-    mesh = native.fiber_bevel(resources.paths[item.result.asset].path, frame, radius, cancel)
-    return Source(source, mesh, IDENTITY, item.result.asset, radius)
+    original = skin_path_capture.capture(engine, document, resources, replace(source, instance=""))
+    radius = skin_operations.settings_for(document.skin, source.owner).fiber_radius
+    mesh = native.fiber_bevel(original.path, original.frame, radius, cancel)
+    return Source(source, mesh, IDENTITY, original.asset, radius)
 
 
 def fiber_instance(
-    engine: Any, document: Any, resources: Any, source: Any, cancel: int, cache: Any
+    engine: Any, document: Any, resources: Any, source: Any, cancel: int, cache: dict[str, Source]
 ) -> Source:
     if source.owner not in cache:
         cache[source.owner] = fiber(engine, document, resources, source, cancel)

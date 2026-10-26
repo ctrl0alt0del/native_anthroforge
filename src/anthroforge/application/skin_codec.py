@@ -2,25 +2,24 @@
 
 from typing import Any
 
-from anthroforge.core.results import EvaluationResult, ReadRevision
+from anthroforge.core.results import ReadRevision
 from anthroforge.core.skin import (
     DeformationSettings,
     EnvelopeSettings,
     FittedShortcut,
     Skin,
     SkinContributor,
+    SkinStage,
     TopologySettings,
 )
 
 
-def result(value: dict[str, Any]) -> EvaluationResult:
+def result(value: dict[str, Any]) -> SkinStage:
     reads = tuple(
         ReadRevision(**(row | {"membership": tuple(row.get("membership", ()))}))
         for row in value.get("inputs", ())
     )
-    return EvaluationResult(
-        **(value | {"inputs": reads, "pending": tuple(value.get("pending", ()))})
-    )
+    return SkinStage(**(value | {"inputs": reads, "pending": tuple(value.get("pending", ()))}))
 
 
 def decode(value: dict[str, Any] | None) -> Skin:

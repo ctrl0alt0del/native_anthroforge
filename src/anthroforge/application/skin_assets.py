@@ -44,5 +44,6 @@ def references(skin: Any) -> tuple[set[str], set[str]]:
     meshes = {skin.envelope.asset, skin.topology.asset, skin.final.asset}
     meshes.update(fit.reference for fit in skin.fits)
     buffers = {skin.reference, *(fit.data for fit in skin.fits)}
+    buffers.update(stage.data for stage in (skin.envelope, skin.topology, skin.final))
     buffers.update(item.painted for item in skin.contributors)
     return meshes - {""}, buffers - {""}

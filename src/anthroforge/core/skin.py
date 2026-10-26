@@ -109,14 +109,19 @@ class FittedShortcut:
 
 
 @dataclass(frozen=True, slots=True)
+class SkinStage(EvaluationResult):
+    data: str = ""
+
+
+@dataclass(frozen=True, slots=True)
 class Skin:
     envelope_settings: EnvelopeSettings = field(default_factory=EnvelopeSettings)
     topology_settings: TopologySettings = field(default_factory=TopologySettings)
     deformation_settings: DeformationSettings = field(default_factory=DeformationSettings)
     contributors: tuple[SkinContributor, ...] = ()
-    envelope: EvaluationResult = field(default_factory=EvaluationResult)
-    topology: EvaluationResult = field(default_factory=EvaluationResult)
-    final: EvaluationResult = field(default_factory=EvaluationResult)
+    envelope: SkinStage = field(default_factory=SkinStage)
+    topology: SkinStage = field(default_factory=SkinStage)
+    final: SkinStage = field(default_factory=SkinStage)
     reference: str = ""
     fits: tuple[FittedShortcut, ...] = ()
     construction_stale: bool = False

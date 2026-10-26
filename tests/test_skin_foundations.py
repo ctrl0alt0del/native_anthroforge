@@ -12,6 +12,7 @@ from anthroforge.core.skin import (
     DeformationSettings,
     EnvelopeSettings,
     SkinContributor,
+    SkinStage,
     effective_collagen,
 )
 
@@ -71,6 +72,32 @@ def test_skin_resource_roundtrip_and_checksum(session, tmp_path):
     np.testing.assert_array_equal(resources.skin[asset.digest].arrays["samples"], np.eye(3))
     with ZipFile(path) as archive:
         assert json.loads(archive.read("manifest.json"))["version"] == 7
+
+
+def corrupt_metadata(source, target):
+    with ZipFile(source) as src, ZipFile(target, "w") as dst:
+        for name in src.namelist():
+            data = src.read(name)
+            if name == "manifest.json":
+                manifest = json.loads(data)
+                row = next(iter(manifest["skin_assets"].values()))
+                row["metadata"]["corrupt"] = True
+                data = json.dumps(manifest).encode()
+            dst.writestr(name, data)
+
+
+def test_stage_binding_is_retained_and_corruption_rejected(session, tmp_path):
+    asset = skin_assets.create({"weights": np.ones((4, 4))}, {"kind": "binding"})
+    session.resources.skin[asset.digest] = asset
+    stage = SkinStage(data=asset.digest)
+    session.replace_document(skin=replace(session.document.skin, envelope=stage))
+    path, corrupt = tmp_path / "stage.anthroforge", tmp_path / "corrupt.anthroforge"
+    session.command("save", path=str(path), blocked_policy="wait")
+    document, resources = storage.read_package(path, session.engine)
+    assert document.skin.envelope.data in resources.skin
+    corrupt_metadata(path, corrupt)
+    with pytest.raises(ValueError, match="checksum"):
+        storage.read_package(corrupt, session.engine)
 
 
 def legacy_copy(source, target, version):

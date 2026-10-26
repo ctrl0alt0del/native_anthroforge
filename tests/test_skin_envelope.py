@@ -83,3 +83,15 @@ def test_budget_failure_preserves_fields_and_source_queries():
         scene.envelope(fields, budget=100)
     np.testing.assert_array_equal(fields.array(3), before)
     assert scene.envelope(fields).prepared
+
+
+def test_envelope_source_binding_has_material_support():
+    _engine, fields, scene = prepared()
+    mesh = scene.envelope(fields)
+    binding = scene.bind(mesh)
+    assert np.all(binding["owners"][:, 0] == 0)
+    assert np.all(binding["support"] == 1)
+    assert np.all(binding["triangles"][:, 0] < 12)
+    np.testing.assert_allclose(binding["weights"].sum(axis=1), 1, atol=1e-6)
+    used = binding["weights"] > 0
+    np.testing.assert_allclose(binding["barycentric"].sum(axis=2)[used], 1, atol=1e-6)

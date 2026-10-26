@@ -52,3 +52,14 @@ int af_skin_scene_progress(uint64_t handle,int* values) {
         return af::routing::kernel::af_skin_gap_progress(source->value.get(),values);
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_skin_scene_bind(uint64_t handle,uint64_t mesh,int* owners,int* triangles,
+                       float* barycentric,float* weights,float* offsets,float* support,uint64_t cancel) {
+    try {
+        const af::skin::SceneAccess source(handle,cancel); const auto geometry=af::mesh(mesh);
+        const int status=af::routing::kernel::af_skin_bind(&source.value,geometry->vertices.data(),
+            int(geometry->vertices.rows()),owners,triangles,barycentric,weights,offsets,support);
+        af::check_cancel(cancel);
+        if(status) throw std::runtime_error("Cannot capture skin source bindings.");
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}

@@ -8,6 +8,8 @@ import numpy as np
 from .mesh import INT64, D, GeometryEngine, Mesh, U, pointer
 from .skin_fields import INT
 
+FLOAT = c.POINTER(c.c_float)
+
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_skin_scene_create", [D, c.c_int, INT64, c.c_int, INT, c.c_int, D, U], U)
@@ -15,6 +17,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_skin_scene_destroy", [U], None)
     engine.bind("af_skin_envelope_mesh", [U, U, U, U], U)
     engine.bind("af_skin_scene_progress", [U, INT])
+    engine.bind("af_skin_scene_bind", [U, U, INT, INT, FLOAT, FLOAT, FLOAT, FLOAT, U])
 
 
 class Scene:
@@ -53,6 +56,27 @@ class Scene:
         values = (c.c_int * 3)()
         self.engine.check(self.engine.library.af_skin_scene_progress(self.handle, values))
         return tuple(values)
+
+    def bind(self, mesh: Mesh, cancel: int = 0) -> dict[str, Any]:
+        arrays = binding_buffers(mesh.counts[0])
+        pointers = [
+            a.ctypes.data_as(INT if a.dtype == np.int32 else FLOAT) for a in arrays.values()
+        ]
+        self.engine.check(
+            self.engine.library.af_skin_scene_bind(self.handle, mesh.handle, *pointers, cancel)
+        )
+        return arrays
+
+
+def binding_buffers(count: int) -> dict[str, Any]:
+    return dict(
+        owners=np.empty((count, 4), dtype=np.int32),
+        triangles=np.empty((count, 4), dtype=np.int32),
+        barycentric=np.empty((count, 4, 3), dtype=np.float32),
+        weights=np.empty((count, 4), dtype=np.float32),
+        offsets=np.empty(count, dtype=np.float32),
+        support=np.empty(count, dtype=np.float32),
+    )
 
 
 def buffers(vertices: Any, faces: Any, owners: Any, policies: Any) -> tuple[Any, ...]:

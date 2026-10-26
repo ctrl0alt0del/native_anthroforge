@@ -59,7 +59,7 @@ font-enabled capture inspected at `build/skin-040/ui/skin-settings.png`.
 Native coarse fields now build in the existing library: raster, Euclidean distances,
 26-connected exterior, quantized collagen and combined envelope. Twelve comparisons
 against unmodified addon modules at resolutions 16/32/48 agree within roundoff (1e-12 gate).
-Seven native-adapter/architecture tests pass; native CTests 5/5. No mesh extraction yet.
+Seven initial native-adapter/architecture tests passed; native CTests 5/5.
 Local parity detail: `build/skin-040/field-parity.json`; rerun with
 `tools/check_skin_fields.py <addon-root>`. Full settings and remaining pipelines still pending.
 Gap kernels are pinned with hashes under `native/migration/skin` and compile privately
@@ -67,26 +67,30 @@ without OpenMP. Owned gap-scene sampling passes source gap-policy/winding/same-o
 MC33 C++ extraction is qualified against scikit-image 0.25.2: 6,344 initial cases exact
 in vertices and faces, including binary/ternary cubes and 33-cubed random tiles. Source
 subset pinned with both licenses under `native/vendor/bioimage-cpp`. Current native and
-adapter checks: five CTests and 17 focused Python tests pass. Reconstruction/assembly,
-smoothing/binding and application task integration are not connected yet.
+adapter checks at that checkpoint: five CTests and 17 focused Python tests passed.
 Native reconstruction now connects the field and gap kernels through protected-grid
 preparation, bounded tiled extraction, native stitching, support filtering and eight
 constrained Taubin iterations. Cube, separated-cubes and overlapping-cubes source controls
 match vertices/connectivity exactly. `build/skin-040/envelope-review.png` visually inspected:
 coarse-fixture protrusions occur in both addon and port, so parity is not shape acceptance.
 Running cancellation inside native tile preparation passes and does not poison reuse.
-The five-finger capture comparison is still running as a background source-control job;
-check `build/skin-040-digits-parity.log` and tool process before restarting it. Its command
-is `check_skin_envelope.py <addon> <digits_blend.capture.npz> Thumb,Index,Middle,Ring,Little build/skin-040/digits`.
-Binding/diagnostic bundles, contributor capture, coordinator/publication and UI remain pending.
+The five-finger source-control experiment was stopped after more than 45 CPU-minutes
+inside the addon, before reaching the standalone phase. No performance/geometry result
+exists for that fixture. Log: `build/skin-040-digits-parity.log`. Do not restart blindly:
+add progress/timeout diagnostics first. Its invocation was
+`check_skin_envelope.py <addon> <digits_blend.capture.npz> Thumb,Index,Middle,Ring,Little build/skin-040/digits`.
+Native material binding capture is connected through the source scene. Typed SkinStage
+records own stage-buffer resources; save/read retain them and reject checksum corruption.
+Fourteen binding/foundation/architecture tests and mypy (441 files) pass. Diagnostic
+bundles, contributor capture, coordinator/publication and UI remain pending.
 App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated root
 `__init__.py` is preserved. Source `.blend` files remain untouched.
 
 ## Next actions
 
-1. Finish foundation UI settings, resource/corruption tests and current broad gate.
+1. Finish foundation UI settings and current broad gate; corruption coverage now passes.
 2. Qualify executable topology/tetrahedral dependencies and build maintained native kernels.
-3. Implement native envelope preparation, contributor capture and coordinator pipeline.
+3. Finish native diagnostic bundles, contributor capture and coordinator/publication pipeline.
 4. Continue integrated topology, deformation, fitting, OBJ and full qualification per plan.
 
 All three initial questions are answered. No automatic minimal-bone search or

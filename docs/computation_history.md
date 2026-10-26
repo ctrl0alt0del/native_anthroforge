@@ -2736,5 +2736,12 @@ the same positions and connectivity (11,703/23,180; 20,277/40,252; 3,356/6,574 v
 `tools/check_skin_envelope.py` reproduces the comparisons. Actual paired renders were
 inspected: coarse-grid protrusions are present on both sides. These are preserved source
 behavior, not accepted production skin quality. The anatomical finger fixture remains
-under evaluation. Tests exercise running cancellation, retry, memory rejection and intact
+not qualified: its addon baseline exceeded 45 CPU-minutes and was stopped before the
+standalone phase. Tests exercise running cancellation, retry, memory rejection and intact
 source queries. Binding/quality bundle publication and application integration are pending.
+
+Native binding now retains the addon's four source-owner/local-triangle references,
+barycentric coordinates, weights, normal offsets and support per skin vertex. SkinStage
+resources own the corresponding data independently of native handles. Binding invariants,
+resource round-trip and checksum corruption checks pass; deformation-reference construction
+and production material-update acceptance remain pending.

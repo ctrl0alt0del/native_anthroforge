@@ -36,8 +36,12 @@ def baseline(value):
 def paired_capture(offset):
     value = capture()
     first = value.sources[0]
-    second = replace(first, source_index=1, entity_id="second",
-                     vertices=first.vertices + np.array([offset, 0, 0]))
+    second = replace(
+        first,
+        source_index=1,
+        entity_id="second",
+        vertices=first.vertices + np.array([offset, 0, 0]),
+    )
     xyz = np.concatenate([first.vertices, second.vertices])
     return replace(value, sources=(first, second), lower=xyz.min(0), upper=xyz.max(0))
 
@@ -98,7 +102,7 @@ def selected_capture():
     if len(sys.argv) < 3:
         return capture()
     if sys.argv[2] in ("gap", "contact"):
-        return paired_capture(1.2 if sys.argv[2] == "gap" else .8)
+        return paired_capture(1.2 if sys.argv[2] == "gap" else 0.8)
     value = read_capture(Path(sys.argv[2]))
     names = sys.argv[3].split(",") if len(sys.argv) > 3 else ()
     sources = tuple(s for s in value.sources if not names or s.object_name in names)

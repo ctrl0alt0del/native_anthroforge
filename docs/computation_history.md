@@ -3143,3 +3143,11 @@ Stage timings and source hashes are retained under build/skin-040/bmesh-anatomy;
 are individual qualification runs, not controlled performance benchmarks. Items 3–6
 remain unchanged. This completes the missing Blender conversion boundary, not a new
 simplification or smoothing algorithm. Complete skin release acceptance remains open.
+
+Correction qualification: the full Python/native-backed regression rerun passes 2,487
+tests; native CTests pass 5/5. The initial run had an outdated launcher-test patch target
+and an intermittent inline-scheduling assertion; the latter did not recur in 30 repeats
+or the full rerun, so its original cause is not claimed resolved. Added diagnostic context.
+Ruff, mypy, changed native-file style and dependency checks pass. No packaged or complete
+final-skin deformation acceptance is implied. The centerline deformation-weighting mismatch
+is documented in the task record and awaits discussion; no new weighting was implemented.

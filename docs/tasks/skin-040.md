@@ -33,9 +33,11 @@ needs replacement or a further algorithm change, stop implementation, explain th
 observed blocker and proposed alternative, and wait for the user's decision. This
 overrides general autonomous approach-replacement guidance for this work.
 
-Current recovery: correction checkpoint follows 70a3584; previous broad regression was stopped on request and
-has no passing result. Local lifecycle/probe/acceptance tools remain untracked and must
-be reviewed before inclusion. Root __init__.py is unrelated. No 0.4.0 release/main merge.
+Current recovery: execution/admission corrections are in f0bb41d/a6977e1; pinned BMesh
+integration and anatomical qualification are in ab3aa7b/be63292. The source-normal
+boundary and fixtures are committed. The next-stage centerline weighting question below
+requires the user's decision before continuing reference/deformation implementation.
+Root __init__.py is unrelated. No 0.4.0 release/main merge.
 
 Execution correction: no default process time/memory cutoff; bounded diagnostic tail
 instead of terminating on log volume; process-tree termination handle race fixed;
@@ -55,7 +57,7 @@ reserve CPU/memory for concurrent workers; estimates are reassessed before dispa
 Externally parallel remeshers reserve available CPUs without changing backend settings.
 Large work may run alone even when its estimate exceeds capacity. Waiting remains cancellable;
 bounded inline edits remain available. Forty scheduler/lifecycle/architecture tests pass,
-configured mypy passes 493 files, all five native CTests pass. Full skin regression is running.
+configured mypy passes 493 files, all five native CTests pass. Broad regression is recorded below.
 No reference/deformation/fitting/export acceptance is implied by this checkpoint.
 
 Anatomical preparation qualification found/fixed a missing conversion boundary:
@@ -66,9 +68,13 @@ torso (4,481,616 triangles) both match exact positions/connectivity after all th
 stages: collapse to 64,000 faces, ten smoothing iterations, BMesh half cut. Source
 captures are unchanged. A 2,048-triangle skull region catches the former mismatch.
 Evidence and paired renders: build/skin-040/bmesh-anatomy/. Both skull and torso renders
-inspected. No algorithm replacement was introduced. Broad regression: 2,485 passed,
-two failures under investigation (renderer test patches the old launcher owner; inline
-attachment timing test passes alone and in 30 serial repeats). No release acceptance yet.
+inspected. No algorithm replacement was introduced. First broad run: 2,485 passed,
+two failures. Corrected the renderer test to patch the shared launcher owner. The inline
+attachment timing test passed alone, in 30 serial repeats and in the full rerun; its
+original intermittent cause is not established, and failure diagnostics were added.
+Final full rerun: **2,487 passed**, 3,199 existing Qt deprecation warnings, 356.51 seconds.
+Ruff/format, mypy (493 files), native CTests (5/5), changed native-file style, dependency
+imports and lock checks pass. Complete portable/interactive release acceptance remains open.
 
 Next-stage decision pending: the unmodified addon deformation sampler requires surface
 faces and positive area. A three-point centerline produces `Invalid reference connectivity`;
@@ -79,6 +85,9 @@ would be an additional algorithm adaptation, so reference/deformation implementa
 paused for discussion. Proposed experiment (not implemented/approved): derive Fiber
 influence from its associated envelope area, retain centerline movement targets and
 unchanged surface-contributor weighting. User has been asked; do not silently choose.
+Retained the previously written production-envelope, topology-button and hidden-GPU
+acceptance tools after ownership/static review. Their complete runtime qualification
+against this corrected branch remains pending; do not infer it from their presence.
 
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve

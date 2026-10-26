@@ -1,5 +1,6 @@
 #include "mesh_internal.hpp"
 #include "anthroforge/skin_flow.h"
+#include "skin_loops.hpp"
 #ifdef _MSC_VER
 #pragma warning(push)
 #pragma warning(disable: 4456 4267)
@@ -10,6 +11,10 @@
 #endif
 
 namespace af::skin_flow {
+std::vector<int> closure_route(const Vertices& points,const skin_loops::Graph& graph,int first,int last,uint64_t cancel) {
+    cancellation=cancel; check_cancel(cancel);
+    return route(points.data(),graph,first,last);
+}
 struct Samples { std::vector<double> points,directions,normals; std::vector<int> owners; };
 static Samples unpack(const double* data,int count,uint64_t cancel) {
     if(count<0 || (count && !data)) throw std::runtime_error("Invalid FLOW samples.");

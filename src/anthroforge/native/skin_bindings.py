@@ -10,6 +10,22 @@ from . import (
     skin_flow,
     skin_gaps,
     skin_guides,
+    skin_loops,
+    skin_ownership,
+    skin_proximity,
+    skin_proxy,
+    skin_topology,
+)
+
+MODULES = (
+    process,
+    skin_capture,
+    skin_density,
+    skin_fields,
+    skin_flow,
+    skin_gaps,
+    skin_guides,
+    skin_loops,
     skin_ownership,
     skin_proximity,
     skin_proxy,
@@ -18,17 +34,5 @@ from . import (
 
 
 def configure(engine: Any) -> None:
-    for module in (
-        process,
-        skin_capture,
-        skin_density,
-        skin_fields,
-        skin_flow,
-        skin_gaps,
-        skin_guides,
-        skin_ownership,
-        skin_proximity,
-        skin_proxy,
-        skin_topology,
-    ):
+    for module in MODULES:
         module.configure(engine)

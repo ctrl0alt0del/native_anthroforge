@@ -40,5 +40,12 @@
       "sha256": "2d5728484e755c5eb51e6614b7e1e03c8c7b5dfdf55bd02a1ec3049f6ccff1cf",
       "license": "GPL-2.0-or-later"
     }
-  ]
+  ],
+  "loop_reference": {
+    "adapters/topology/engine/annuli.py": "ccfa7141d911df5c5a06c45432a774a163fed1c67d575f2566971c2e8d3a2d5b",
+    "adapters/topology/engine/guides.py": "95a76135379caf7dc6028fb89af57aad40da902d7062b624da0f474bc2effaaa",
+    "adapters/topology/engine/instant.py": "2c4d187d5e4bbe2563b875ecd3696dc27e4204c83d3b0a6ce4810f56defbe11a",
+    "adapters/topology/engine/layout.py": "ee86a9d9f6d65ab9da38b876cdb5bc99b502c1b1bd80df29e22640cc1dedcd2a",
+    "adapters/topology/solver.py": "264a5062e0fa64820d4359b2c56c8e639ba5075fc9c41b4575273f3640c73020"
+  }
 }

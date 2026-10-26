@@ -369,3 +369,27 @@ The maintained background Blender capture reproduces the committed fixture exact
 
 The public topology workflow, closed guides, transitions/symmetry, reference deformation,
 fitting and export are still pending. This checkpoint does not qualify release 0.4.0.
+
+### Closed guide preparation checkpoint
+
+Closed accepted Fiber paths now have batched native projection, graph closure,
+192-point arclength sampling, duplicate suppression, symmetry classification and
+nested-loop pairing. Capture keeps source/rule identities and accepted Manual paths,
+independently of visibility or the backend. Open paths do not become LOOP guides.
+Unpaired/collapsed projected loops return explicit diagnostics. The existing native
+FLOW shortest-path implementation is reused; point-index ownership is shared between
+skin numerical stages rather than duplicated. No authored path is changed.
+
+Three background addon controls cover planar/curved projection and a large closure
+gap. Pairing, source identities and statuses match; maximum coordinate difference is
+below 1.85e-7. Eight curved-surface samples have different normals at shared edges;
+qualification verifies both normals belong to incident triangles within 3e-6 position,
+rather than loosening all normal checks. Evidence: `build/skin-040/loop-parity.json`.
+Rendered/inspected `build/skin-040/ui/loop-parity.png`. Twenty-five focused ownership,
+refinement, loop, workflow and architecture checks pass; native build/five CTests,
+selected native style, Ruff/format and configured mypy (476 files) pass.
+
+Next: construct direct/planar/radial annulus candidates, preserve symmetry, then cut
+and stitch the generated topology around them. Current loop preparation alone does
+not complete that workflow. Public topology publication, persistent deformation,
+shortcut fitting, export and full release qualification still remain.

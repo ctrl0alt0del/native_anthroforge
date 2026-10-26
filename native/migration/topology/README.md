@@ -36,3 +36,10 @@ and tie ordering differ. Qualification records surface errors rather than falsel
 requiring identical connectivity. Compact captured Blender controls live in
 `tests/fixtures/skin/proxy_decimation.json`; the comparison runner is
 `tools/check_skin_decimation.py`. Broader MC33 evidence remains in ignored build data.
+
+Closed-loop preparation ports addon `annuli.py` and `solver.py` rules to owned C++
+arrays, reusing the maintained native graph route. Fixtures capture Blender's float
+BVH output; native queries can select the other valid incident normal at a mesh edge.
+Coordinate, pairing and incident-normal checks are separated. Run
+`python -m tools.check_skin_loops tests/fixtures/skin/loops.json <report.json>` for
+the maintained numerical comparison. Annulus construction is a subsequent stage.

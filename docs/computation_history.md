@@ -2939,3 +2939,25 @@ equal-cost ordering remain visible on curved symmetric controls (sphere maximum
 Inspected both comparison images under `build/skin-040/decimation`. Local native
 envelope times were 21–145 ms including result preparation; not application timings.
 Complete remesher/guide integration and anatomical qualification remain pending.
+
+### Native closed topology-guide preparation (0.4.0 in progress)
+
+Moved addon Python/SciPy/BVH loop preparation to a batched C++ boundary: nearest
+surface projection, local-gap predicate (twice median edge length), Dijkstra closure,
+192 uniform arclength samples, symmetric classification, Hausdorff duplicate threshold
+(diagonal/160), and ordered compatible pairing. Pairing retains perimeter ratio
+0.2–0.95, planar containment and depth <=0.25 outer radius. The existing maintained
+native FLOW route implementation supplies weighted graph paths; no routing solver or
+new worker pool is introduced. A shared skin point index serves ownership and loops.
+
+Capture uses accepted closed Fiber paths and source/rule frames, including sources
+already represented by tissues. Pending authored closure changes do not reinterpret
+accepted Manual paths. Source arrays/attachments remain untouched. Collapsed/unpaired
+loops are explicit warnings; duplicate loops remain suppressed. Source fixtures and
+the background Blender capture tool are maintained under tests/tools.
+
+Three addon controls match coordinates within 1.85e-7 and match pairing/statuses.
+Eight of 576 curved-surface samples select the other incident triangle at a shared
+edge; both normals are spatially validated instead of claiming exact normal parity.
+Rendered geometry matches in `build/skin-040/ui/loop-parity.png`. This does not yet
+qualify annulus construction, seam stitching or anatomical skin.

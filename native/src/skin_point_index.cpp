@@ -1,6 +1,6 @@
-#include "skin_ownership.hpp"
+#include "skin_point_index.hpp"
 #include <numeric>
-namespace af::skin_ownership {
+namespace af::skin {
 PointIndex::PointIndex(const Vertices& vertices,const std::vector<int>& indices,uint64_t cancel) {
     check_cancel(cancel); elements.resize(indices.size());
     for(size_t i=0;i<indices.size();++i) elements[i]=indices[i];

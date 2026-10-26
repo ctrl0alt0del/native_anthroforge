@@ -302,3 +302,24 @@ Final fixed-snapshot rerun: **2,354 tests pass** (266.80 seconds, 3,199 warnings
 in `build/skin-040-proxy-regression.log`. Ruff/format and configured mypy pass; native
 build/five CTests and selected native style checks pass. This checkpoint does not
 qualify complete 0.4.0 behavior, anatomy, desktop topology publication or packaging.
+
+### Instance-aware topology ownership checkpoint
+
+Added native source sampling, spatial indices, nearest-support attribution, tiny-island
+cleanup, owner-to-budget mapping and nearest-vertex density transfer. Application capture
+follows Fiber/Anchor bindings through Membranes and tissue chains, reusing mirror target
+mapping and explicit midline sharing. Original/reflected samples remain separate while
+budgets retain authored SCP identities. Centerlines contribute vertices/midpoints without
+an invented radius. Missing supports retain explicit nearest-SCP fallback counts.
+
+Sixteen focused ownership/density/architecture tests pass, including the observed mirrored
+overwrite regression, indirect tissue anchoring, midline sharing, cancellation and invalid
+source connectivity. Three direct addon controls (400/1,600/10,000 vertices) have identical
+owner labels: `build/skin-040/ownership-parity.json`. Small-island ties are deterministic
+(lowest owner ID), rather than depending on Python set/Counter iteration. Native build/five
+CTests pass; selected clang-tidy has only suppressed header warnings. Ruff and configured
+mypy pass (470 files). This is attribution evidence, not anatomical topology acceptance.
+
+Next: connect density refinement, proxy decimation, loop patches/symmetry and complete
+backend assembly to public coordinator/UI operations. Persistent deformation, fitting,
+export and complete release qualification remain unfinished. No version bump or main merge.

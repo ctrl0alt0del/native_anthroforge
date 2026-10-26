@@ -2881,3 +2881,22 @@ precision. Four background Blender 5.0.1 fixtures (one/ten iterations, with/with
 isolated vertices) pass within 3e-7. A fixed-camera numerical-mesh comparison was
 rendered and inspected at `build/skin-040/ui/proxy-parity.png`. This verifies compact
 proxy controls, not anatomical shape acceptance or the pending decimation stage.
+
+### Instance-aware native skin ownership (0.4.0 in progress)
+
+Addon attribution uses vertex/triangle-centroid samples, nearest source followed by nearest
+supporting SCP, nearest-SCP fallback, and area-threshold island cleanup (0.0005). These now
+run in C++ using the existing libigl spatial hierarchy; discrete density transfer and
+owner-to-exclusive-budget mapping are also native. Python resolves anatomical relationships
+and packs owned data. The source/rule identity is retained: a diagnostic established that
+addon `_scp_trees` overwrites original samples with their mirror, assigning an original-side
+tissue beside A to B. The new adapter keeps both instances and shares only the authored
+budget identity. It reuses existing mirrored attachment mappings and explicit midline sharing.
+
+Preserved source/support selection and numerical island thresholds. Intentional differences:
+zero-radius Fiber centerlines contribute endpoint/midpoint samples; mirrored overwrite is
+corrected; equal-distance/island-vote ties use stable native indices instead of incidental
+Python set order. No anatomical binding or geometry is edited. Sixteen focused tests pass;
+three direct non-mirrored addon controls up to 10,000 vertices have identical ownership.
+Local native attribution was about 0.3–11 ms on those small controls; this is not an app
+responsiveness measurement. Complete density-driven topology/anatomy remains unqualified.

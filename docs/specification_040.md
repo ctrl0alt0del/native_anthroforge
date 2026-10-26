@@ -82,6 +82,18 @@ project conversion, general animation editing and new skin algorithms remain sep
 
 ## Confirmed contributor clarification
 
+The October 26 correction requires the actual pinned Blender Decimate/BMesh subset for
+proxy simplification and symmetry cutting, rather than approximate replacement algorithms.
+The accepted standalone differences are instance-aware density ownership and deterministic
+ties, accepted material charts and compatible surface-tissue guidance/refinement, bare-Fiber
+centerlines, and native spatial/intersection queries. Their recorded qualification gaps remain
+required work. No additional algorithm changes are authorized without prior discussion.
+
+Production backend execution must not fail solely because it exceeds an arbitrary runtime,
+fixed 4 GiB ceiling or retained-log size. Retain cancellation, owned process lifetime and real
+backend/allocation failures. Use scheduling/admission for resource coordination and bounded
+log retention without terminating the computation. Preserve source numerical thread settings.
+
 Bare Fibers contribute their accepted **centerlines only**. Neither workspace display
 thickness nor an invented skin-specific fiber radius enters skin construction. Capture
 uses explicit segments and retains path/segment correspondence separately from surface

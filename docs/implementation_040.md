@@ -20,7 +20,17 @@ records algorithms/defaults, source provenance and evidence limits. Continue
 Extend the existing coordinator with task policies for envelope, topology, reference, deformation,
 sampling and fitting. Keep dispatch capture, complete revision validation, reservations,
 cancellation, stale rejection, Manual provenance, workspace priorities and save checkpoints.
-External processes are coordinator-owned with process-tree cancellation and resource limits.
+External processes are coordinator-owned with process-tree cancellation and resource-aware
+admission. Normal production runs have no arbitrary time or fixed per-job memory cutoff;
+bounded retained logs never terminate computation. Preserve source numerical thread settings
+and account for them in scheduling. Explicit test limits remain separate from production policy.
+
+The approved correction uses pinned Blender 5.0.1 Decimate and the needed BMesh subset,
+replacing the approximate libigl collapse traversal and custom half clipping. Preserve source
+topology behavior, including degenerate outputs, until a separate change is approved. Accepted
+departures and their qualification requirements are recorded in the specification/task record.
+If the agreed approach needs replacement or a new algorithm change, stop implementation and
+discuss the concrete blocker and alternative with the user before proceeding.
 
 Keep authored inputs, accepted stage results and presentation distinct. Resource leases include
 current state/history/checkpoints/jobs/viewport. Settings changes invalidate construction;

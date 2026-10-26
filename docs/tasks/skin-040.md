@@ -10,6 +10,33 @@
 
 ## Outcome and acceptance
 
+### Resumed implementation: approved corrections, 2026-10-26
+
+User authorizes replacing the approximate proxy collapse and half-mesh clipping with
+the required pinned Blender 5.0.1 Decimate/BMesh implementation subset. Preserve actual
+topology mutation, ordering, tolerances and outputs; do not silently sanitize source
+degeneracies or substitute another algorithm. Verify against addon fixtures and actual
+anatomy before continuing the remaining 0.4.0 workflow.
+
+Accepted departures remain: instance-aware density ownership/deterministic ties;
+accepted material-chart guidance and compatible surface tissues; bare-Fiber centerlines;
+native spatial queries and local triangle predicates (remaining parity limits still need
+qualification). These are the user's accepted items 3–6, not full geometry acceptance.
+
+Revise external execution policy: ordinary work has no arbitrary elapsed-time or 4 GiB
+hard limit. Bounded retained logs must not terminate computation. Preserve cancellation,
+process ownership and genuine failure reporting. Use resource-aware admission/concurrency;
+retain the addon's four-thread tetrahedral setting rather than forcing one thread.
+
+**Approach changes require discussion first.** If this agreed implementation approach
+needs replacement or a further algorithm change, stop implementation, explain the
+observed blocker and proposed alternative, and wait for the user's decision. This
+overrides general autonomous approach-replacement guidance for this work.
+
+Current recovery: HEAD 496fb84; previous broad regression was stopped on request and
+has no passing result. Local lifecycle/probe/acceptance tools remain untracked and must
+be reviewed before inclusion. Root __init__.py is unrelated. No 0.4.0 release/main merge.
+
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve
 anatomy, geometry/attachment behavior and the existing engineering,

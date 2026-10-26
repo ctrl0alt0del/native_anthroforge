@@ -12,6 +12,7 @@ from .mirror_resolution import MirrorIndex
 from .mirroring import MirrorRule, SharedMirrorTarget
 from .shortcut_edits import ShortcutEdit
 from .shortcuts import DrivingShortcut, FormulaResult, Shortcut
+from .skin import Skin
 
 
 @dataclass(frozen=True, slots=True)
@@ -34,6 +35,7 @@ class Document:
     shortcut_edits: tuple[ShortcutEdit, ...] = ()
     mirror_rules: tuple[MirrorRule, ...] = ()
     shared_mirror_targets: tuple[SharedMirrorTarget, ...] = ()
+    skin: Skin = field(default_factory=Skin)
     _mirrors: MirrorIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _index: DocumentIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _registry: object_registry.ObjectRegistry | None = field(

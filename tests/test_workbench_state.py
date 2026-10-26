@@ -36,3 +36,15 @@ def test_invalid_layout_recovers_without_changing_document_defaults(tmp_path):
     assert state.paneWidth("inspector", 330) == 500
     assert not state.expanded("unseen", False)
     assert state.expanded("unseen", True)
+
+
+def test_skin_page_survives_selection_categories_and_restores_previous_page(tmp_path):
+    state = WorkbenchState(path=tmp_path / "layout.ini")
+    state.setPage("TISSUE", "Inspect")
+    state.setPage("TISSUE", "Skin")
+    assert state.page("CURVE") == state.page("SCP") == "Skin"
+    state.settings.sync()
+    restored = WorkbenchState(path=tmp_path / "layout.ini")
+    assert restored.page("TISSUE") == "Skin"
+    restored.setPage("CURVE", "Shape")
+    assert restored.page("TISSUE") == "Inspect"

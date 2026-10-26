@@ -15,6 +15,9 @@ It leaves numerical evaluation and scheduling policy unchanged.
 
 ## Scope and reading guide
 
+0.4.0 skin migration foundations are in progress under CH-093. There is no connected
+standalone skin computation yet; the existing addon is the numerical baseline.
+
 The inventory groups operations by computational responsibility, rather than listing
 every function, command alias or UI button. It includes numerical construction,
 interactive geometry queries, evaluation coordination and supporting workloads.
@@ -2667,3 +2670,22 @@ non-overlap, file ownership, retention and retry. The 96-muscle assembly reprodu
 12,561 saved payloads exactly. A profiler run measured 1.58 ms preparation, 4.37 seconds
 worker execution and 0.09 ms publication; uncontrolled background load and no frame
 latency inference. See [release evidence](tasks/usability-037.md).
+
+### CH-093 — skin migration foundations (0.4.0 in progress; R03/R04/R06)
+
+The previous document had no skin definition, accepted stages or reference ownership.
+Added immutable settings/stage records and checksummed numeric resources, schema-7
+serialization with existing 4–6 readers, resource reachability through history/jobs,
+and profiler accounting. Settings use shared commands/transactions; vertical navigation
+preserves existing editors and the document-level Skin page across selection changes.
+No skin generator or numerical replacement is connected in this checkpoint.
+
+Evidence: 32 targeted foundation/architecture/workbench/legacy-loading tests pass; Ruff,
+format and mypy pass. Offscreen navigation, decimal editing and Undo pass. First full
+suite yielded 2,256 passes and one obsolete schema expectation (7 was previously invalid),
+corrected to 8; rerun pending. Source baseline separately passes 6 fitting, 21 deformation,
+40 topology and 35 skin/gap/tile tests against addon native binaries. These do not qualify
+the standalone numerical port, portable package or production anatomy.
+
+Preserve addon algorithms, settings and warning policies; see the
+[specification](specification_040.md) and [recovery record](tasks/skin-040.md).

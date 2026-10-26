@@ -15,14 +15,14 @@ from anthroforge.core.entities import SCP, Attachment, AttachmentReceipt, Worksp
 from anthroforge.core.junctions import decode as decode_junction
 from anthroforge.native.mesh import GeometryEngine
 
-from . import attachment_storage, object_codec, resource_storage, shortcut_codec
+from . import attachment_storage, object_codec, resource_storage, shortcut_codec, skin_codec
 from .construction_codec import control, entity_construction
 from .mirror_codec import fields as mirror_fields
 from .resources import Resources
 
 FORMAT = "anthroforge-project"
-VERSION = 6
-READ_VERSIONS = (4, 5, 6)
+VERSION = 7
+READ_VERSIONS = (4, 5, 6, 7)
 STATE_RECORDS = (
     "entities",
     "controls",
@@ -87,6 +87,7 @@ def document_state(document: Document) -> dict[str, Any]:
     for name in STATE_RECORDS:
         state[name] = [asdict(value) for value in state[name]]
     state["objects"] = [object_codec.encode(value) for value in document.objects]
+    state["skin"] = asdict(document.skin)
     state["mirror_accepted"] = snapshot(document)
     return state
 
@@ -189,6 +190,7 @@ def restored_document(data: dict[str, Any]) -> Document:
         raise ValueError("Project has no workspace.")
     mirrors = mirror_fields(data)
     data.pop("mirror_accepted", None)
+    data["skin"] = skin_codec.decode(data.get("skin"))
     return Document(**(data | shortcut_codec.document_fields(data) | mirrors))
 
 

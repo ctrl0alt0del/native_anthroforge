@@ -172,16 +172,21 @@ ApplicationWindow {
             id:inspectorPane
             SplitView.preferredWidth: workbench.paneWidth("inspector",330); SplitView.minimumWidth: 280; SplitView.maximumWidth: 500
             color: Theme.panel
-            ColumnLayout {
+            RowLayout {
                 anchors.fill: parent; spacing: 0
+                InspectorNavigation { header: inspectorHeader }
+                ColumnLayout {
+                Layout.fillWidth: true; Layout.fillHeight: true; spacing: 0
                 InspectorHeader { id:inspectorHeader }
                 Shortcuts { objectName: "shortcutPanel"; visible: inspectorHeader.shortcuts && !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset }
                 Inspector { category:inspectorHeader.category; id: inspector; objectName: "inspector"; visible: inspectorHeader.page==="Shape" && !workspace.drawingTools.state.active; Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; onPickAnchor: function(mode) { viewport.anchorMode = mode; }; onDeleteRequested: entity => deleteDialog.request(entity); onImageRequested: parentId => imageFile.request(parentId,viewport.imageAlignmentAxis) }
                 InspectionPane { objectName:"inspectionPane"; visible:inspectorHeader.page==="Inspect" && !workspace.drawingTools.state.active; Layout.fillWidth:true; Layout.fillHeight:true; Layout.margins:Theme.inset }
+                SkinPane { objectName:"skinPane"; visible:inspectorHeader.page==="Skin" && !workspace.drawingTools.state.active; Layout.fillWidth:true; Layout.fillHeight:true; Layout.margins:Theme.inset }
                 UiScrollView {
                     id: drawingSettings; visible: workspace.drawingTools.state.active
                     Layout.fillWidth: true; Layout.fillHeight: true; Layout.margins: Theme.inset; contentWidth: availableWidth
                     DrawingSettings { width: drawingSettings.availableWidth; keyboard: window.keyboardManager }
+                }
                 }
             }
         }

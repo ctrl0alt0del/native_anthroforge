@@ -2,8 +2,9 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: implementation authorized; specification and implementation plan consolidated.
-  First increment: dependency/fixture qualification, then foundation contracts.
+- Status: foundations implemented; full skin workflow remains in progress, not merge-ready.
+  Schema 7, immutable skin resources, shared settings commands and vertical inspector exist.
+  No envelope/topology/deformation/fitting/export pipeline is connected yet.
 - Last updated: 2026-10-26, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
@@ -48,15 +49,22 @@ Initial source qualification: six addon bone-fitting tests and 21 deformation te
 pass under the standalone Python 3.12 environment using the existing addon native DLLs.
 These establish source controls only, not rebuilt-native or application parity. Matching
 `pytetwild==0.4.2` and `pyinstantmeshes==1.0.0` import in this environment.
-App version/schema and all production files remain unchanged. Unrelated root
+Source controls also pass 35 skin/gap/tile and 40 topology tests. These use addon binaries,
+not a rebuilt standalone skin kernel. Source DLLs/projects were not modified.
+Foundation contracts: 17 targeted tests passed. First broad run: 2,256 passed and one
+expected-version test failed because it still rejected newly supported schema 7; corrected
+its unsupported version to 8. Broad rerun pending. Ruff/mypy and function limits passed
+before UI edits. Offscreen skin tab navigation, decimal setting and Undo checks pass;
+font-enabled visual recheck and complete UI settings remain pending.
+App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated root
 `__init__.py` is preserved. Source `.blend` files remain untouched.
 
 ## Next actions
 
-1. Consolidate specification and plan with the full fitting workflow and vertical tabs.
-2. State construction/update invalidation, guide roles, shared-consumer capture and
-   project compatibility explicitly. Use the addon's behavior where applicable.
-3. Qualify paired fixtures and dependencies before integrated native/runtime delivery.
+1. Finish foundation UI settings, resource/corruption tests and current broad gate.
+2. Qualify executable topology/tetrahedral dependencies and build maintained native kernels.
+3. Implement native envelope preparation, contributor capture and coordinator pipeline.
+4. Continue integrated topology, deformation, fitting, OBJ and full qualification per plan.
 
 All three initial questions are answered. No automatic minimal-bone search or
 multi-shortcut rig composition is implied: preserve the existing configurable bone

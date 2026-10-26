@@ -1,6 +1,7 @@
 """Typed path/image inventories keep native handle namespaces distinct from mesh handles."""
 
 from anthroforge.application.image_assets import ImageAsset
+from anthroforge.application.skin_assets import SkinAsset
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.binding_batches import BindingBatch
@@ -26,6 +27,7 @@ def inventories(profiler, owners):
         collision_pairs=typed_inventory(owners, CollisionCache),
         stacking_sessions=dict(typed_inventory(owners, StackSession), upper_bound=True),
         tissue_preparations=typed_inventory(owners, Preparation),
+        skin_buffers=typed_inventory(owners, SkinAsset),
     )
 
 

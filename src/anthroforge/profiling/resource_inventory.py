@@ -5,6 +5,7 @@ from itertools import islice
 
 from anthroforge.application.image_assets import ImageAsset
 from anthroforge.application.resources import Resources as ResourceCatalogue
+from anthroforge.application.skin_assets import SkinAsset
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.binding_batches import BindingBatch
@@ -46,6 +47,7 @@ RESOURCE_FIELDS = frozenset(
         "source",
         "baseline",
         "comparison",
+        "skin",
     )
 )
 RESOURCE_TYPES = (
@@ -60,6 +62,7 @@ RESOURCE_TYPES = (
     CollisionCache,
     StackSession,
     Preparation,
+    SkinAsset,
 )
 
 
@@ -184,6 +187,7 @@ def owned_resources(resources):
     yield from (a.field for a in resources.attachments.values())
     yield from (a.field.path for a in resources.attachments.values())
     yield from resources.bindings.values()
+    yield from resources.skin.values()
 
 
 def bounded_unique(values, limit, profiler):
@@ -219,7 +223,16 @@ def document_resources(session, document, profiler):
     result.extend(images[key] for key in keys["images"] if key in images)
     result.extend(attachment_resources(session, keys["attachments"]))
     result.extend(resources.bindings[k] for k in keys["bindings"] if k in resources.bindings)
-    return result
+    return result + skin_resources(resources, document.skin)
+
+
+def skin_resources(resources, skin):
+    from anthroforge.application.skin_assets import references
+
+    meshes, arrays = references(skin)
+    return [resources.meshes[k].mesh for k in meshes if k in resources.meshes] + [
+        resources.skin[k] for k in arrays if k in resources.skin
+    ]
 
 
 def attachment_resources(session, keys):

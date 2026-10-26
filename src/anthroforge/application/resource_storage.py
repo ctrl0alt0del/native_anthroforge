@@ -20,7 +20,7 @@ from anthroforge.native.binding_batches import BindingBatch
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.native.routing import Report
 
-from . import attachment_storage, image_assets, object_codec
+from . import attachment_storage, image_assets, object_codec, skin_storage
 from .assets import Asset
 from .path_assets import PathAsset
 from .resources import Resources
@@ -35,6 +35,7 @@ def describe(resources: Resources) -> dict[str, Any]:
         "images": {key: {"digest": image.digest} for key, image in resources.images.items()},
         "attachments": attachment_storage.describe(resources.attachments),
         "bindings": list(resources.bindings),
+        "skin_assets": skin_storage.describe(resources.skin),
     }
 
 
@@ -60,6 +61,7 @@ def read_array(archive: zipfile.ZipFile, name: str) -> Any:
 
 
 def write(archive: zipfile.ZipFile, resources: Resources) -> None:
+    skin_storage.write(archive, resources.skin)
     for key, asset in resources.meshes.items():
         write_mesh(archive, key, asset)
     for key, curve in resources.paths.items():
@@ -174,8 +176,10 @@ def read(archive: zipfile.ZipFile, data: Any, engine: GeometryEngine) -> Resourc
         key: attachment_storage.read(archive, key, value, engine)
         for key, value in data.get("attachments", {}).items()
     }
-    bindings = {
-        key: BindingBatch(read_array(archive, f"bindings/{key}.npy"))
-        for key in data.get("bindings", ())
-    }
-    return Resources(meshes, curves, images, attachments, bindings)
+    bindings = read_bindings(archive, data.get("bindings", ()))
+    skin = skin_storage.read(archive, data.get("skin_assets", {}))
+    return Resources(meshes, curves, images, attachments, bindings, skin)
+
+
+def read_bindings(archive: zipfile.ZipFile, keys: Any) -> dict[str, BindingBatch]:
+    return {key: BindingBatch(read_array(archive, f"bindings/{key}.npy")) for key in keys}

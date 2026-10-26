@@ -16,12 +16,17 @@ class WorkbenchState(QObject):
 
     @Slot(str, result=str)
     def page(self, category):
+        if self.settings.value("documentPage", "") == "Skin":
+            return "Skin"
         value = self.settings.value("pages/" + category, "Shape")
         return value if value in ("Shape", "Shortcuts", "Inspect") else "Shape"
 
     @Slot(str, str)
     def setPage(self, category, page):
+        if page == "Skin":
+            self.settings.setValue("documentPage", "Skin")
         if page in ("Shape", "Shortcuts", "Inspect"):
+            self.settings.setValue("documentPage", "")
             self.settings.setValue("pages/" + category, page)
 
     @Slot(str, bool, result=bool)

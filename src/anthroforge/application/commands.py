@@ -47,6 +47,7 @@ from . import (
     segment_operations,
     shortcut_operations,
     shrinkwrap_operations,
+    skin_operations,
     snap_tasks,
     surface_branch_operations,
     surface_correspondence,
@@ -75,6 +76,8 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "skin.configure": skin_operations.configure,
+    "skin.contributor.configure": skin_operations.contributor,
     "mirror.loop.create": symmetric_paths.create,
     "mirror.configure": mirror_operations.configure,
     "mirror.attachment.share": mirror_operations.share_target,
@@ -294,16 +297,23 @@ def direct_commands(session: "Session") -> dict[str, Any]:
     return {
         **file_commands(session),
         **query_commands(session),
+        **history_commands(session),
+        "inspect": session.describe,
+        "skin.inspect": lambda: skin_operations.inspect(session),
+        "wait": session.wait,
+        "tick": session.scheduler.tick,
+        "evaluate": lambda **a: evaluate(session, **a),
+        "curve.reroute": lambda **a: path_tasks.reroute(session, **a),
+    }
+
+
+def history_commands(session: "Session") -> dict[str, Any]:
+    return {
         "begin": session.begin,
         "commit": session.commit,
         "cancel": session.cancel,
         "undo": lambda: session.navigate(-1),
         "redo": lambda: session.navigate(1),
-        "inspect": session.describe,
-        "wait": session.wait,
-        "tick": session.scheduler.tick,
-        "evaluate": lambda **a: evaluate(session, **a),
-        "curve.reroute": lambda **a: path_tasks.reroute(session, **a),
     }
 
 

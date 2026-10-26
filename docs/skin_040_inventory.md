@@ -1,0 +1,171 @@
+# Skin migration inventory for 0.4.0
+
+Status: **source audit and proposed scope; not implemented or release-qualified**.
+The user requested moving the addon's existing skin functionality to the standalone
+application. Release coverage, initial export formats and UI entry point are awaiting
+the current questions. This inventory does not settle those choices.
+
+## Evidence boundary
+
+- Standalone baseline: `6260864`, version 0.3.7, schema 6.
+- Addon inspected: `fae36aba1b208676cf21d7c4a78a20d5b1f68c66` at
+  `C:/Users/alexe/AppData/Roaming/Blender Foundation/Blender/5.0/scripts/addons/anthroforge`.
+  Inspected skin/topology/deformation paths have no local tracked changes.
+- Read production operators, panels, properties, capture, computation, validation and
+  publication, alongside their documentation and tests. Source inspection is not a
+  claim that every fixture currently passes. No Blender project was modified or built.
+- Existing standalone skin-only export rules specify scope; they do not constitute an
+  implemented skin generator/exporter. `native/topology.py` manages mesh connectivity
+  reuse; it is not the missing retopology engine.
+
+## Current addon capabilities
+
+Paths in the source column are relative to the addon root above.
+
+| Area | Current behavior | Source owners |
+| --- | --- | --- |
+| Contributors | Root-scoped evaluated SCPs, muscles, soft tissues/blobs and applicable standalone Fibers; includes source/mirror roles regardless of display visibility. Muscle BASE, controls and existing skin are excluded. Consumed Fibers avoid duplicate contribution when the owning muscle has valid output. | `adapters/draft_skin/capture.py`, `adapters/deformation/capture.py` |
+| Envelope | Minimum distance, additional collagen depth, core radius and falloff, expressed as percentages of model longest axis. A closed generated envelope is distinct from quad topology. | `properties/draft_skin_properties.py`, `core/draft_skin/settings.py`, `core/draft_skin/solver.py` |
+| Collagen | Per-SCP Auto, Uniform and Painted modes. Auto uses name terms ear/cartilage/nasal for zero, otherwise one. Painted weights are absolute; unpainted vertices inherit the scalar. Fill, clear, brush weights and painting are exposed. | `ui/panels/scp_skin_section.py`, `adapters/draft_skin/painting.py`, `core/draft_skin/settings.py` |
+| Gap control | Maximum gap eligible for closing and filling strength, globally and per contributor. Strength does not override maximum gap. Native corridor/exterior tests distinguish protected openings from enclosed voids. Contact at zero separation is allowed by the gap predicate. | `properties/skin_gap.py`, `ui/panels/skin_gap.py`, `core/draft_skin/gap_*`, `native/fiber_ccd/af_skin_*` |
+| Envelope computation | Rasterized required/rest/collagen fields, exterior accessibility, distance transforms, 16 collagen levels, protected fine lattice, marching cubes, supported-component filtering and eight constrained smoothing passes. | `core/draft_skin/raster.py`, `fields.py`, `gap_solver.py`, `gap_tiles.py` |
+| Resolution/resources | Target 220 cells along the longest axis, minimum 160 under the coarse-grid memory rule; protected gaps can require finer sampling. Compact constant/varying tiles reduce memory. Cancellation and resource limits are explicit. | `core/draft_skin/grid.py`, `resources.py`, `native/fiber_ccd/af_skin_tile_*` |
+| Quad construction | QuadWild Muscle FLOW + Paths is the default; Instant Meshes is explicitly selectable. No silent backend fallback. Target count defaults to 8,100 (1,000–500,000), with actual count/limitations reported. | `properties/topology_properties.py`, `core/topology/constants.py`, `quadwild.py`, `adapters/topology/solver.py` |
+| Topology guides | Paired closed Fiber loops produce authored annular patches. Open Fibers can be FLOW guides. Regular muscle material charts contribute direction samples/central paths, including constituent branched patches. | `adapters/topology/capture.py`, `engine/annuli.py`, `engine/guides.py`, `native/topology/field.cpp` |
+| Density | Hierarchical SCP subtree budgets, target validation, adaptive all-quad refinement, optional muscle proximity. Requested counts are targets, not guarantees. | `ui/panels/scp_topology_section.py`, `core/topology/budgets.py`, `density.py`, `adapters/topology/adaptive_refine.py` |
+| Symmetry | None, root-local X/Y/Z or custom origin/normal; solve one half, assemble reflected geometry and retain symmetry correspondence. | `properties/topology_properties.py`, `core/topology/symmetry.py`, `adapters/topology/engine/annuli.py` |
+| Durable reference | Build tetrahedral proxy, anatomical/material samples, embedding, vertex identities and symmetry data. Keep an immutable, serializable reference; disposable solver caches may be reconstructed. Successful reference publication removes the temporary draft. | `core/deformation/reference.py`, `proxy.py`, `adapters/deformation/initialization.py`, `construction.py` |
+| Final skin updates | LE (Linear Elasticity) is default; FAST uses reduced ARAP. Solve from the immutable reference and publish positions only. Connectivity, vertex order and identity remain fixed. Explicit rebuild replaces topology/reference; changing construction settings marks them stale. | `core/deformation/strategy.py`, `pipeline.py`, `native/deformation/elastic.hpp`, `reduced.hpp`, `adapters/deformation/runtime.py` |
+| Contact/quality | Native unilateral contact with symmetry, separate validation of motion from displayed pose, bounded work. Residual intersections, inverted proxy elements and iteration limits are reported. No complete collision/containment guarantee. | `core/deformation/contact.py`, `anatomy_quality.py`, `native/deformation/contact*.hpp` |
+| Lifecycle | Background work, progress/cancellation, input/revision validation and atomic publication retaining previous output on failure. Persistent reference identity and contributor compatibility checked before updates. | `adapters/deformation/request.py`, `publication.py`, `construction.py`, `adapters/job_revision.py` |
+| Legacy workflows | Draft/topology warm updates and preparation of old bindings remain for addon files without a durable reference. They are not the current reference-based final-skin algorithm. | `core/warm_start/`, `adapters/warm_update/`, `ui/panels/warm_update_panel.py` |
+
+## Source/documentation discrepancies to preserve explicitly
+
+Current `core/mesh_issues.py::annotate` rejects empty/nonfinite/malformed meshes and
+unusable indices/faces; it converts measured quality failures into Issues. It is called
+by skin and topology result paths. The unused `gap_solver.require_coverage` helper and
+older statements that every coverage/gap finding rejects publication do not describe
+the current output policy. Gap validators can report a bridge as a failed quality
+predicate without the publication policy rejecting every usable result.
+
+`docs/draft_skin.md` also names an older job protocol, whereas current constants use
+protocol 5. Standalone persistence must have its own contract, not copy historical
+protocol labels. Older memory experiments explicitly failed geometry checks and are
+not accepted-shape reference fixtures.
+
+The current topology workflow may retain usable annuli/fill with explicit open-seam
+warnings when a join fails. It does not silently repair them or claim watertightness.
+Native construction failure, malformed data, cancellation and dependency/resource
+failures preserve earlier output. Any deliberate change to this policy needs an
+explicit product decision and computation-history entry.
+
+## Standalone ownership and porting work
+
+The following is an implementation direction, not a confirmed public API.
+
+| Owner | Work to add/reuse |
+| --- | --- |
+| Core | One document-owned skin definition/output lifecycle, separate authored settings, accepted envelope/topology/reference, source identities and construction freshness. No dummy SCP or TissueVCP. |
+| Application | Contributor selection, reference compatibility, shared operations, construction/update dependencies, revision capture, saving/export policy, undo and lifetime through the existing coordinator. |
+| Native C++ | Port field/raster/distance work, meshing preparation, guide projection/pairing/transitions, density/refinement and deformation preparation/evaluation through owned batched inputs. Reuse maintained native skin/field/LE/FAST kernels and spatial/material services. |
+| Desktop | Skin entry point, primary build/update controls, collagen painting, guide/density editing, stage inspection and Issues using the new workbench. No extra editor or calculation manager. |
+| Packaging | Qualify/pin topology and tetrahedralization dependencies for the app runtime, include source provenance/notices, and exercise a relocated portable build. |
+
+Important migration differences:
+
+- Addon topology construction creates temporary Blender meshes and uses `bmesh`,
+  Blender modifiers, SciPy trees and NumPy geometry loops. Port numerical preparation
+  and assembly as well as the solvers; copying only the final native call is insufficient.
+- Coarse skin fields use SciPy distance transforms/connected-component operations;
+  fine gap fields already have native kernels. Move repeated numerical work to C++
+  without silently changing connectivity conventions, sampling or tolerances.
+- The addon's packaged CPython 3.11 extensions are not interchangeable with the app's
+  Python 3.12. Qualify native library/executable boundaries or matching builds.
+- QuadWild has a maintained command-line path; external processes can be jobs owned
+  by the existing coordinator. Do not recreate per-root Blender services, temp `.blend`
+  capture, polling managers or competing worker pools.
+- Reuse geometry leases, surface roles, material correspondence, immutable results,
+  staged viewport publication, Issues and profiling. Presentation hiding must never
+  remove a contributor or change authored output.
+- Reuse brush interaction and native painting primitives, while giving collagen its
+  own domain/validation. Tissue field semantics must not be reused by pretending an
+  SCP is a TissueVCP.
+- Generalize consumed-Fiber and muscle-chart rules to shared Curve/Fiber/Membrane and
+  TissueVCP relationships. Resolve by supported construction/material capabilities;
+  muscle/fat labels alone must not select a different numerical owner.
+- Existing material domains and instance IDs should identify sources; do not adopt
+  temporary Blender names or new nearest-surface reassignment during updates.
+- Keep the latest accepted output while work runs or fails. Full rebuild and cheap
+  position updates are distinct operations; do not automatically remesh after a shortcut.
+- Legacy warm-start migration, armature baking, rig fitting and Blender-project
+  conversion are separate workflows, not prerequisites for new standalone skin.
+
+## Proposed delivery sequence
+
+1. Confirm scope/UI/export and write the 0.4.0 specification and implementation plan.
+2. Define document settings/results, contributor/reference contracts and lifecycle;
+   establish paired fixtures before changing algorithms.
+3. Deliver native envelope construction, collagen/gap controls and painting through
+   desktop and headless operations; inspect actual output shapes.
+4. Deliver quad construction, loop/FLOW guidance, density and symmetry, retaining
+   warnings and explicit backend selection.
+5. Integrate durable reference and LE/FAST updates, contact diagnostics, stale
+   construction state, cancellation and persistence.
+6. Complete export (if selected), production-assembly profiling, parity/visual checks,
+   documentation and one canonical 0.4.0 package/source archive. Do not advance the
+   release version merely because part of the pipeline is implemented.
+
+No compatibility decision is made here. Existing standalone anatomy files should remain
+usable; the final specification must state its reader/writer rules explicitly.
+
+## Required acceptance inventory
+
+These are future checks; none has been run as 0.4.0 acceptance.
+
+- Contributor capture: source/mirror identity, visibility independence, shared consumed
+  Fibers, missing/failed tissue output, tissue base/final roles and partial anatomy.
+- Collagen defaults/paint/fill/clear and gap inheritance; undo, source deformation,
+  topology locks/remapping decisions and mirror reuse without duplicate authored fields.
+- Envelope parity at multiple scales/translations, protected finger/toe gaps, contact
+  versus penetration, cavities, memory limits and cancellation.
+- QuadWild and Instant Meshes independently, paired loops, open FLOW, branched charts,
+  density budgets, custom symmetry, unpaired guides/open-seam diagnostics, missing
+  dependencies and the explicitly qualified QuadWild process exit exception.
+- Reference preparation failure versus usable construction results; successful rebuild
+  publication must be atomic and must not destroy the previous reference on failure.
+- LE/FAST coordinate updates with exact connectivity/vertex-identity preservation;
+  open-to-contact-to-open sequence, large shortcut changes, solver limits, contributor
+  incompatibility and explicit reinitialization/rebuild.
+- Editing while queued/running, obsolete work, complete publication read validation,
+  Manual inputs, workspace priorities, Undo/Redo, save checkpoints, reopening without
+  blanket recalculation and native resource release.
+- Export only the eligible skin revision; no anatomy/debug content. Quad preservation
+  depends on the chosen format and must be measured in a round trip.
+- Profile capture/preparation, native stages, reference/cache memory, publication and
+  actual UI work separately. Offscreen tests do not establish physical input latency.
+
+Existing addon tests cover these categories in `tests/unit/test_skin_gap_contact.py`,
+`test_skin_tiles.py`, `test_topology.py`, `test_deformation*.py` and Blender tests for
+draft skin, topology, QuadWild and final deformation. Their assertions require review
+against current result/warning policy before being ported unchanged.
+
+Local fixtures discovered, not yet qualified for this release:
+
+- `E:/development/WIP_models/skull_muscles_skin_test.blend` and related sparse-topology cases.
+- `E:/development/WIP_models/draft_skin_gap_controls/preferred_gap_wrap_fine/capture.npz`.
+- `E:/development/WIP_models/draft_skin_gap_controls/local_digits_20261010/` captures.
+- The existing 96-muscle standalone assembly and paired Blender source recorded by
+  the shortcut-parity work. Match identities and units before comparisons.
+
+## External references checked
+
+- [QuadWild-BiMDF source and command-line interface](https://github.com/cgg-bern/quadwild-bimdf)
+  and [release usage](https://github.com/cgg-bern/quadwild-bimdf/blob/main/README_release.md).
+  The addon's pinned version/configuration and native guidance remain the reference;
+  upstream availability alone does not qualify a replacement.
+- [Instant Meshes native entry point](https://github.com/wjakob/instant-meshes/blob/master/src/main.cpp)
+  and [license](https://github.com/wjakob/instant-meshes/blob/master/LICENSE.txt).
+- [libigl deformation/BBW/FAST tutorial](https://libigl.github.io/tutorial/).
+- [Blender remeshing](https://docs.blender.org/manual/en/5.0/modeling/modifiers/generate/remesh.html).
+  Generic remeshing is not the addon's collagen, protected-gap and guided-topology pipeline.

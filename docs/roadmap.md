@@ -1,5 +1,11 @@
 # AnthroForge release roadmap
 
+- **0.4.0 — scoping, not implemented:** migrate the addon's skin envelope, guided
+  topology and final-skin workflow. The [source inventory](skin_040_inventory.md)
+  separates current production behavior from legacy update paths. Release coverage,
+  export formats and UI entry point remain under discussion; see
+  [the task record](tasks/skin-040.md).
+
 - **0.3.7 — qualified:** recent projects, periodic committed recovery
   copies and UI polish. [Walkthrough](usability_037.md), [evidence](tasks/usability-037.md).
 
@@ -52,7 +58,7 @@
   relaxation and surface-based stacking. [Contract](specification_022.md),
   [implementation plan](implementation_022.md), [task](tasks/unified-tissues-022.md).
   Canonical package evidence is recorded with [release validation](development_status.md#unified-tissues-022).
-- **Later releases:** skin, legacy Blender conversion, anatomical
+- **Later releases:** legacy Blender conversion, anatomical
   reconstruction/fitting and other explicitly deferred workflows. No version or
   completion date is assigned here. General physical simulation is not a 0.2.2 goal.
 

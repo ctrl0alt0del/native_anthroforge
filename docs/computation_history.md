@@ -2834,3 +2834,14 @@ empty-interior rejection remain unchanged; explicit Fiber samples retain zero no
 Reflection, stencil, two-row rejection and pending-kind tests pass. The compact
 feature path matches the addon DLL exactly. Full branch/anatomical and remesher
 acceptance remain pending; successful guide preparation is not a skin result.
+
+### Remesher execution ownership (0.4.0 in progress)
+
+External topology execution now has a native Windows Job Object boundary with memory,
+time and log-growth limits and cooperative cancellation on the existing caller's worker.
+Assignment occurs at process creation, preventing startup descendants from escaping
+cleanup. Shutdown waits for root termination and child accounting; inherited handles
+are restricted. No topology algorithm changed. Eight lifecycle tests pass. A verified
+QuadWild 0.0.2 bundle produces the same known abnormal Windows quantizer exit with
+parseable cube output; successful geometry must still be validated and that exit
+reported as a warning. Backend pipeline integration remains pending.

@@ -126,7 +126,9 @@ class GeometryEngine(NativeEngine):
         self._skin_signatures()
 
     def _skin_signatures(self) -> None:
-        from . import skin_capture, skin_fields, skin_flow, skin_gaps, skin_guides
+        from . import process, skin_capture, skin_fields, skin_flow, skin_gaps, skin_guides
+
+        process.configure(self)
 
         skin_fields.configure(self)
         skin_gaps.configure(self)

@@ -212,3 +212,21 @@ fixture correctly has no interior FLOW samples, matching the addon rejection; th
 not proof of successful branched anatomical capture. Four field controls still match
 exactly. No generator integration, full topology acceptance or release qualification yet.
 Next: external backend lifecycle, loop guides/density/assembly, then downstream stages.
+
+### External process ownership checkpoint
+
+Added a Windows native backend runner executed synchronously by the caller's worker.
+Creation assigns the process to a memory-limited Job Object before execution, allows
+only designated standard-stream handles to be inherited, hides windows, and terminates
+children on return/cancellation. Tests exposed asynchronous cleanup; the runner now
+waits for root termination and job accounting before returning. Eight process tests
+cover timeout, cancellation, child cleanup, memory limits, log limits, exit status and
+Unicode/quoted arguments. Architecture checks pass. Windows-only runner qualification
+is explicit; no Linux fallback or additional worker pool.
+
+Verified all 30 pinned addon QuadWild bundle files and copied them into ignored
+`.tools/quadwild`. A real isolated cube trace exits 0; quantization returns the known
+addon Windows code 2147483651 with parseable 26-vertex/24-quad output. Evidence/logs
+are under `build/skin-040/backend-smoke`; this is process qualification, not complete
+topology acceptance. The bundle still needs maintained setup/package integration.
+The full regression is running in `build/skin-040-resume-regression.log`.

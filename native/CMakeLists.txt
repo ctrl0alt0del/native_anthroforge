@@ -4,7 +4,7 @@ set(SKIN_SOURCES src/skin_guides.cpp src/skin_guides_api.cpp src/skin_flow.cpp s
     src/skin_gaps.cpp src/skin_meshing.cpp src/skin_assembly.cpp src/skin_precision.cpp
     src/skin_envelope.cpp src/skin_diagnostics.cpp src/skin_capture.cpp src/skin_centerlines.cpp)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
-    ${SKIN_SOURCES}
+    ${SKIN_SOURCES} src/process_api.cpp src/process_windows.cpp
     src/comparison_fingerprint.cpp
     src/inspection_mapping.cpp src/inspection_compare.cpp src/inspection_buffers.cpp src/inspection_point.cpp
     src/painting.cpp src/painting_mapping.cpp src/painting_projection.cpp src/painting_stroke.cpp

@@ -8,7 +8,7 @@ import numpy as np
 
 from anthroforge.core.skin import EnvelopeSettings
 
-from .mesh import INT64, D, GeometryEngine, U, pointer
+from .mesh import INT64, D, GeometryEngine, Mesh, U, pointer
 
 BYTE = c.POINTER(c.c_uint8)
 INT = c.POINTER(c.c_int)
@@ -21,6 +21,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_skin_fields_copy", [U, c.c_int, D, U])
     engine.bind("af_skin_fields_bytes", [U], U)
     engine.bind("af_skin_fields_destroy", [U], None)
+    engine.bind("af_skin_tile_mesh", [c.POINTER(c.c_float), INT, U], U)
 
 
 class Fields:
@@ -62,6 +63,18 @@ def source_buffers(vertices: Any, faces: Any, skeletal: Any, collagen: Any) -> t
     if scp.shape != (len(indices),) or weights.shape != (len(xyz),):
         raise ValueError("Skin source membership and collagen buffers do not match geometry.")
     return xyz, indices, scp, weights
+
+
+def tile_mesh(engine: GeometryEngine, values: Any, cancel: int = 0) -> Mesh:
+    volume = np.ascontiguousarray(values, dtype=np.float32)
+    if volume.ndim != 3:
+        raise ValueError("Skin tiles require a three-dimensional scalar field.")
+    shape = np.ascontiguousarray(volume.shape, dtype=np.int32)
+    handle = engine.library.af_skin_tile_mesh(
+        volume.ctypes.data_as(c.POINTER(c.c_float)), shape.ctypes.data_as(INT), cancel
+    )
+    engine.check(not handle)
+    return Mesh(engine, int(handle))
 
 
 def prepare(

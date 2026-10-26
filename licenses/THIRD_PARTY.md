@@ -48,6 +48,7 @@ Blender Authors under GPL-2.0-or-later; the adaptation is GPL-3.0-or-later.
 | Radial unit icospheres | Blender 5.0.1 bmesh output | Generated unit templates under native/migration/tissue; capture/version/hash recorded in unit_spheres.json; AnthroForge GPL-3.0-or-later adapter |
 | PCG64 and bounded integer distribution | NumPy 1.26.4 | MIT, Melissa O'Neill, Robert Kern and NumPy Developers; native/vendor/numpy_random/pcg64.h and LICENSE.txt; adapter provenance in native/vendor/numpy_random/PROVENANCE.md |
 | Nuitka | 4.1.1 build/runtime support | Apache-2.0; https://nuitka.net/pages/overview.html |
+| bioimage-cpp MC33 subset | 492ff9b329cfa81af6781bc5b67b7c727eeb0445 | MIT with scikit-image BSD-3-Clause derived tables; full notices and hashes in native/vendor/bioimage-cpp |
 
 Qt source archives for the pinned SDK are available at
 https://download.qt.io/online/qtsdkrepository/all_os/qt/qt6_6120_windows_line_endings_src/qt.qt6.6120/.

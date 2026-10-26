@@ -119,10 +119,17 @@ class GeometryEngine(NativeEngine):
         routing_trace.configure(self)
 
     def _expression_signatures(self) -> None:
-        from . import comparison, expressions, parametric, shortcut_attachments, skin_fields
+        from . import comparison, expressions, parametric, shortcut_attachments
 
-        for module in (comparison, expressions, parametric, shortcut_attachments, skin_fields):
+        for module in (comparison, expressions, parametric, shortcut_attachments):
             module.configure(self)
+        self._skin_signatures()
+
+    def _skin_signatures(self) -> None:
+        from . import skin_fields, skin_gaps
+
+        skin_fields.configure(self)
+        skin_gaps.configure(self)
 
     def _curve_signatures(self) -> None:
         from . import curve_editing, curve_queries, drawing, path_editing, paths, routing, strokes

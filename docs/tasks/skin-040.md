@@ -62,6 +62,13 @@ against unmodified addon modules at resolutions 16/32/48 agree within roundoff (
 Seven native-adapter/architecture tests pass; native CTests 5/5. No mesh extraction yet.
 Local parity detail: `build/skin-040/field-parity.json`; rerun with
 `tools/check_skin_fields.py <addon-root>`. Full settings and remaining pipelines still pending.
+Gap kernels are pinned with hashes under `native/migration/skin` and compile privately
+without OpenMP. Owned gap-scene sampling passes source gap-policy/winding/same-owner cases.
+MC33 C++ extraction is qualified against scikit-image 0.25.2: 6,344 initial cases exact
+in vertices and faces, including binary/ternary cubes and 33-cubed random tiles. Source
+subset pinned with both licenses under `native/vendor/bioimage-cpp`. Current native and
+adapter checks: five CTests and 17 focused Python tests pass. Reconstruction/assembly,
+smoothing/binding and application task integration are not connected yet.
 App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated root
 `__init__.py` is preserved. Source `.blend` files remain untouched.
 

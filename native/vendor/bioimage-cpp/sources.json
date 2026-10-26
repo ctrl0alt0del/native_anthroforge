@@ -1,0 +1,30 @@
+{
+  "url": "https://github.com/computational-cell-analytics/bioimage-cpp",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "c81a36784a3af0106b75c158793f039d74bdda603d45e877ab2289ef177d325c"
+    },
+    {
+      "path": "include\\bioimage_cpp\\array_view.hxx",
+      "sha256": "127793a62b610848066df8d3b742e045feeca89ee05e03cf8a1f84358e5ab31f"
+    },
+    {
+      "path": "include\\bioimage_cpp\\detail\\profile.hxx",
+      "sha256": "4013d94477d89ac83c685bb5438fdfa7acda1ad59cbc72a6e9430ecc155ac626"
+    },
+    {
+      "path": "include\\bioimage_cpp\\mesh\\marching_cubes.hxx",
+      "sha256": "f6d915f8a3c634f4a805f872db88fde65a818d380f1e334a9a39ab56759567da"
+    },
+    {
+      "path": "include\\bioimage_cpp\\mesh\\detail\\mc33_luts.hxx",
+      "sha256": "2b73b506b4735695ee631043e2987e3da89c463c7e95212ad0397bbb65c4bf39"
+    },
+    {
+      "path": "include\\bioimage_cpp\\util\\union_find.hxx",
+      "sha256": "854a7365cdff930e7cdfdf033627ebd2428a8f24562493466cb24cf9f36ba240"
+    }
+  ],
+  "revision": "492ff9b329cfa81af6781bc5b67b7c727eeb0445"
+}

@@ -1,0 +1,67 @@
+{
+  "source": "AnthroForge addon/native/fiber_ccd",
+  "files": [
+    {
+      "name": "af_skin_bind.hpp",
+      "sha256": "65c6dd602940f444cc2245885e87cd38365283d902c4ccef32339b15ac538d2e"
+    },
+    {
+      "name": "af_skin_components.hpp",
+      "sha256": "eaeb8418c00efab5bdb2823bde56c582c7d70eb7825904825adf54b015e44449"
+    },
+    {
+      "name": "af_skin_exterior_precision.hpp",
+      "sha256": "0471abdfbd3e7e49ecd40b8e950469d0245d13e371347a4e831b4de41b74347b"
+    },
+    {
+      "name": "af_skin_finish.hpp",
+      "sha256": "dc740977e51e9a64d6f1d7cd45f639a83c62075c61baab8140de855d09721dce"
+    },
+    {
+      "name": "af_skin_gap_corridors.hpp",
+      "sha256": "ec4fff3dfed09b50e971177513c41a91fac7c90591cac6199e475398f64852e1"
+    },
+    {
+      "name": "af_skin_gap_validation.hpp",
+      "sha256": "af6254a382952a322a7746e7dfde8fed79573367570787986695054780b16649"
+    },
+    {
+      "name": "af_skin_gap.hpp",
+      "sha256": "b94dabff10a433fd8df24e17c5bd098429ef28ca12363cdaa777db38ffc1add5"
+    },
+    {
+      "name": "af_skin_precision.hpp",
+      "sha256": "ed705a7b456bb1fa7b99311a04ae2f70dbea1205910bb55fa859780ead57da48"
+    },
+    {
+      "name": "af_skin_quality.hpp",
+      "sha256": "96e71fe9e11900a0542f056d47135563b092c1124e75666ea8d3c98adaf679ab"
+    },
+    {
+      "name": "af_skin_separation.hpp",
+      "sha256": "20a177d22c4fbd1a7db30de8dfbee2829eeb711569f97bb953f9040aafb9dbdf"
+    },
+    {
+      "name": "af_skin_tile_finish.hpp",
+      "sha256": "ffe24b5954844d104edd90dae547940198c9e4ad59f21c67d9baee463b7ffde0"
+    },
+    {
+      "name": "af_skin_tile_storage.hpp",
+      "sha256": "40cb1eb013465b73a08ad3a5e47436586c152d6c6c5da7275e4ca20295436560"
+    },
+    {
+      "name": "af_skin_tile_wrap.hpp",
+      "sha256": "ddf75a0d69dcc4663fd931a00c7c5e6aa4cec3c5fbf4d516537dc4df870772c9"
+    },
+    {
+      "name": "af_skin_tiles.hpp",
+      "sha256": "a6cc7347a5d09a466032acd9e57ba0ff5b2350e6edb284bf0f6363739694d8f8"
+    },
+    {
+      "name": "af_skin_wrap.hpp",
+      "sha256": "1bbb80e9b00b8badbb8f077f43d9ea08868863bc5f49ff24b0556a47ffd5dff4"
+    }
+  ],
+  "source_commit": "fae36aba1b208676cf21d7c4a78a20d5b1f68c66",
+  "license": "GPL-3.0-or-later"
+}

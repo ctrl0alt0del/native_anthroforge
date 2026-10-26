@@ -12,6 +12,7 @@ AF_API int af_skin_fields_info(uint64_t handle,int* shape,double* origin_voxel,i
 AF_API int af_skin_fields_copy(uint64_t handle,int kind,double* output,uint64_t capacity);
 AF_API uint64_t af_skin_fields_bytes(uint64_t handle);
 AF_API void af_skin_fields_destroy(uint64_t handle);
+AF_API uint64_t af_skin_tile_mesh(const float* values,const int* shape,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

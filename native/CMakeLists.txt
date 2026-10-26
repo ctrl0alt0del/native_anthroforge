@@ -1,6 +1,7 @@
 add_subdirectory(boolean)
 set(SKIN_SOURCES src/skin_grid.cpp src/skin_distance.cpp src/skin_raster.cpp
-    src/skin_exterior.cpp src/skin_collagen.cpp src/skin_fields.cpp src/skin_fields_api.cpp)
+    src/skin_exterior.cpp src/skin_collagen.cpp src/skin_fields.cpp src/skin_fields_api.cpp
+    src/skin_gaps.cpp src/skin_meshing.cpp)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     ${SKIN_SOURCES}
     src/comparison_fingerprint.cpp
@@ -58,6 +59,7 @@ target_link_libraries(af_native PRIVATE af_curve_fit af_boolean)
 target_include_directories(af_native PUBLIC include)
 target_include_directories(af_native PRIVATE migration/smoothing/include)
 target_include_directories(af_native SYSTEM PRIVATE vendor)
+target_include_directories(af_native SYSTEM PRIVATE vendor/bioimage-cpp/include)
 target_compile_definitions(af_native PRIVATE NOMINMAX _USE_MATH_DEFINES EIGEN_MPL2_ONLY EIGEN_DONT_PARALLELIZE)
 target_compile_definitions(af_native PRIVATE AF_NATIVE_BUILD)
 set_target_properties(af_native PROPERTIES CXX_VISIBILITY_PRESET hidden)

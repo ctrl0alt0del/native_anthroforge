@@ -2706,3 +2706,19 @@ remain below 1e-12. Five adapter tests cover collagen endpoints, scale, invalid 
 cancellation, budget rejection and resource release. Existing five CTests pass. These
 are coarse-field checks, not complete skin geometry, production performance or release
 qualification. Gap reconstruction and mesh extraction remain unconnected.
+
+### CH-095 — skin gap queries and native MC33 extraction (0.4.0 in progress; R04)
+
+Pin the maintained addon gap/tile kernels with source hashes and private linkage.
+The source-aware gap query adapter preserves stricter two-sided settings, winding
+independence and single-source disjoint patches. Existing OpenMP directives remain
+inactive; numerical calls execute in the coordinator's worker. Native gap query handles
+are owned and reject released/unknown references.
+
+Replace the addon's Python-driven calls to compiled scikit-image marching cubes with
+a narrow C++17 MC33 adapter over the pinned bioimage-cpp subset. This is the same Lewiner
+case selection, not classic marching cubes. Exact vertices/faces match on 6,344 initial
+source comparisons; committed `tests/test_skin_meshing.py` covers binary/ternary cubes,
+zero degeneracies and full 33-cubed random tiles. Both licenses are retained. Seventeen
+focused tests and five CTests pass. Tile stitching, source support, smoothing and final
+binding are still pending; no complete envelope or production-shape acceptance claimed.

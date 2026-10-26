@@ -29,5 +29,17 @@
       "end": 60730,
       "sha256": "683188faf7020e10d2aef557590071b0fd2d61cf5f3f7aebed7a79995ba561b4"
     }
+  ],
+  "adapted_sources": [
+    {
+      "file": "curve_bevel.cc",
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenkernel/intern/curve_bevel.cc",
+      "source_sha256": "c53aafede0bb0a0895258359519647440c9b6b77cc32d6cda2f8f5b618f6eeb2"
+    },
+    {
+      "file": "displist.cc",
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenkernel/intern/displist.cc",
+      "source_sha256": "1b6f8b444759491494a1e8f5b161823140a8cd542ad057cb00aa1f0b1f481dbc"
+    }
   ]
 }

@@ -100,10 +100,12 @@ Six Blender controls (straight, bent, closed, duplicate-point and reversal cases
 coordinates within 1e-8 metres and exact quad/triangle order. Focused settings, mirror,
 persistence and native checks pass; final static/UI/broader checks remain pending.
 The first four-Fiber-only envelope timing was withdrawn after visual inspection: without
-supporting SCPs the output has boundary planes and is not representative skin. A corrected
-serial counterbalanced trial with the original skeletal context is running. Capture-only
-stress with all 326 accepted Fibers takes about
-424 ms and 27.5 MB of captured arrays (not total resident memory). Consumed Fibers remain
+supporting SCPs the output has boundary planes and is not representative skin. The full-
+skeleton attempt also failed under the benchmark's default 1 GiB assembly budget; it is
+not a completed timing or a production-policy change. Corrected trials use the production
+worker budget and four forearm Fibers with their three actual attachment SCPs. Capture-only
+stress with all 326 accepted Fibers takes about 422 ms and 27.5 MB of captured arrays
+(not total resident memory). Consumed Fibers remain
 suppressed in production. Separate profiler captures and raw trials are under ignored
 build/skin-040/fiber-thickness-production (the invalid envelope benchmark is retained as
 rejected evidence). The addon sampler accepts all six fixtures, with identical selected
@@ -112,6 +114,26 @@ radius editing/undo passes. The first broad run passed 2,499 tests and caught tw
 guide regressions: those callers still expected path handles from the now-mesh capture.
 Separated accepted path capture from physical surfaces for loops and FLOW; focused tests
 now pass, including radius-independent FLOW. Full rerun remains pending.
+
+Corrected performance evidence: `build/skin-040/fiber-thickness-forearm/` contains raw
+trials, NPZ output, paired render, addon precision check and a separate `.afprofile.zip`.
+Three serial counterbalanced profiler-off trials per mode, grid resolution 220, no unit
+rescaling: capture/fields/scene/envelope total median 3.380 s centerlines (3.347–3.463)
+versus 105.773 s tubes (105.545–107.003). The four tubes themselves take 3–4 ms to build/
+capture. Skin triangles rise from 64,006 to 1,585,630. The unmodified addon exterior-gap
+preflight requests a 4.911× finer lattice: coarse voxel 0.0471715, gap width 0.0528283,
+fine voxel 0.00960515 in this project's stored metre coordinates, 564 qualifying faces.
+This confirms inherited gap preservation can dominate the small tube-generation cost;
+no refinement rule, tolerance, gap policy or radius was automatically changed. Paired
+envelopes were visually inspected. This benchmark intentionally omits consuming tissues:
+the saved production assembly has 96 accepted tissues covering all 326 Fibers, so none
+are bare contributors there. Do not extrapolate the benchmark to full-assembly latency.
+Timing includes no UI/publication/reference solve; background machine load was not
+controlled. Separate profiled trials are not used for the medians. The initial profiler
+capture exceeded its default 120-second window and evicted the long span; repeat with
+the existing configurable 600-second capture window before claiming complete trace evidence.
+Ruff/format, mypy (494 files), 5/5 CTests and offscreen metre/mm radius controls pass.
+The corrected full regression rerun is in progress.
 This is an incomplete 0.4.0 checkpoint; no release/version bump/main merge is authorized
 by these partial checks. Historical centerline notes below describe superseded checkpoints.
 

@@ -8,6 +8,7 @@ from time import perf_counter
 import numpy as np
 
 from anthroforge.application import skin_capture as application_capture
+from anthroforge.application import worker_memory
 from anthroforge.application.object_frames import Frames
 from anthroforge.application.session import Session
 from anthroforge.core import skin_sources
@@ -40,23 +41,52 @@ def capture(engine, sources, mode, bones=()):
     return skin_capture.capture_sources(engine, geometry, kinds, transforms, policies)
 
 
-def skeletal_context(session):
+def skeletal_context(session, fibers):
+    parents = {binding.target for fiber in fibers for binding in fiber.bindings}
     candidates = skin_sources.candidates(session.document)
     return tuple(
         application_capture.surface(session.engine, session.document, session.resources, row)
         for row in candidates
-        if row.kind == "SCP"
+        if row.kind == "SCP" and row.owner in parents
     )
+
+
+def selected_fibers(session, prefixes):
+    fibers = [item for item in session.document.objects if isinstance(item, Fiber)]
+    selected = [
+        item
+        for item in fibers
+        if not prefixes or any(item.name.startswith(prefix) for prefix in prefixes)
+    ][:4]
+    if len(selected) != 4:
+        raise ValueError("Choose prefixes covering at least four accepted Fibers.")
+    return selected
+
+
+def region(session, options):
+    selected = selected_fibers(session, options.fiber_prefix)
+    frames = Frames(session.engine, session.document)
+    paths = [
+        (session.resources.paths[item.result.asset].path, frames.world(item.id))
+        for item in selected
+    ]
+    bones = skeletal_context(session, selected)
+    if not bones:
+        raise ValueError("The envelope benchmark requires skeletal context.")
+    names = dict(fibers=[f.name for f in selected], bones=[b.identity.owner for b in bones])
+    print(json.dumps(names), flush=True)
+    return paths, bones
 
 
 def timed(session, name, operation, report):
     start = perf_counter()
     output = session.profiler.call("fiber_skin_benchmark", name, operation)
     report[name] = (perf_counter() - start) * 1000
+    print(json.dumps(dict(stage=name, milliseconds=report[name])), flush=True)
     return output
 
 
-def prepare(engine, geometry, resolution):
+def prepare(engine, geometry, resolution, budget):
     return skin_fields.prepare(
         engine,
         geometry.vertices,
@@ -64,6 +94,7 @@ def prepare(engine, geometry, resolution):
         geometry.skeletal,
         np.ones(len(geometry.vertices)),
         resolution=resolution,
+        budget=budget,
         segments=geometry.segments,
     )
 
@@ -81,20 +112,22 @@ def create_scene(engine, geometry):
 
 
 def envelope(session, geometry, resolution, report):
+    budget = worker_memory.budget()
     fields = timed(
-        session, "fields_ms", lambda: prepare(session.engine, geometry, resolution), report
+        session, "fields_ms", lambda: prepare(session.engine, geometry, resolution, budget), report
     )
     scene = timed(session, "scene_ms", lambda: create_scene(session.engine, geometry), report)
     try:
-        result = timed(session, "envelope_ms", lambda: scene.envelope(fields), report)
-        report["output_vertices"], report["output_triangles"] = (
-            result.mesh.counts[0],
-            result.mesh.counts[3],
-        )
-        return result.mesh.array(0).copy(), result.mesh.array(3).copy()
+        result = timed(session, "envelope_ms", lambda: scene.envelope(fields, budget), report)
+        return freeze_surface(result.mesh, report)
     finally:
         fields.close()
         scene.close()
+
+
+def freeze_surface(mesh, report):
+    report["output_vertices"], report["output_triangles"] = mesh.counts[0], mesh.counts[3]
+    return mesh.array(0).copy(), mesh.array(3).copy()
 
 
 def trial(session, sources, mode, resolution, bones=()):
@@ -131,7 +164,7 @@ def compare(session, sources, count, resolution, output, bones=()):
 
 
 def recorded(session, sources, options, bones):
-    session.command("profile.start")
+    session.command("profile.start", seconds=600)
     rows = [
         trial(session, sources[:4], mode, options.resolution, bones)[0]
         for mode in ("centerline", "bevel")
@@ -144,12 +177,12 @@ def recorded(session, sources, options, bones):
 
 def run(session, options):
     sources = load_paths(session, options.project)
-    bones = skeletal_context(session)
+    selected, bones = region(session, options)
     reports = [
         compare(session, sources, count, 0, options.output) for count in (1, 32, len(sources))
     ]
-    reports.append(compare(session, sources, 4, options.resolution, options.output, bones))
-    profiled = recorded(session, sources, options, bones)
+    reports.append(compare(session, selected, 4, options.resolution, options.output, bones))
+    profiled = recorded(session, selected, options, bones)
     payload = dict(
         project=str(options.project), radius_metres=0.001, reports=reports, profiled=profiled
     )
@@ -163,6 +196,7 @@ def main():
     parser.add_argument("project", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--resolution", type=int, default=64)
+    parser.add_argument("--fiber-prefix", action="append", default=[])
     options = parser.parse_args()
     options.output.mkdir(parents=True, exist_ok=True)
     session = Session("Skin Fiber cost qualification")

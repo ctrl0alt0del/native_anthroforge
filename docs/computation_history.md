@@ -3172,10 +3172,26 @@ Six source captures match positions within 1e-8 metres and exact connectivity. T
 addon sampler accepts all six, selects identical sample indices, and matches area exactly
 in five cases (closed-loop relative difference 1.2e-7). The initial four-Fiber-only envelope
 timing was withdrawn: visual inspection exposed boundary planes in the missing-SCP case,
-not representative anatomical skin. A corrected trial retains the original skeletal context.
+not representative anatomical skin. A subsequent whole-skeleton attempt exhausted the
+benchmark's default 1 GiB assembly budget; it is not a completed comparison. Corrected
+trials use the production worker budget and four forearm Fibers with their attachment SCPs.
 All-326-Fiber capture alone is approximately 424 ms; captured arrays
 are 27.5 MB versus 1.24 MB. This intentionally stresses unsuppressed Fibers and is not full
 assembly latency or total resident memory. Raw capture trials and the rejected envelope
 experiment are in build/skin-040/fiber-thickness-production. Closed-loop/FLOW guides now
 use a separate accepted-path capture boundary; they do not receive the physical bevel.
 Complete deformation/release acceptance is pending.
+
+Corrected grid-220 comparison (`build/skin-040/fiber-thickness-forearm`): three serial
+counterbalanced profiler-off trials per mode give median 3.380 s centerlines versus
+105.773 s tubes through capture/fields/scene/envelope. Output grows from 64,006 to
+1,585,630 triangles; tube capture itself takes 3–4 ms for four Fibers. The original
+addon's exterior precision routine on these exact surface inputs requests 4.911× linear
+refinement (0.0471715 coarse voxel, 0.00960515 fine voxel, 564 qualifying faces). This
+supports the inherited protected-gap grid as the dominant cost increase. Algorithms,
+tolerances and automatic precision remain unchanged; it is not a claimed optimization.
+Both actual envelopes were visually inspected. The four Fibers are deliberately treated
+as bare inputs for the comparison. In the unchanged saved 96-muscle assembly, all 326
+Fibers are consumed by accepted tissues and remain excluded from separate skin capture.
+These measurements exclude publication and persistent deformation; machine background load
+was not controlled. Raw trials, a separate profiler report and the addon check are retained.

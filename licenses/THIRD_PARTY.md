@@ -45,11 +45,11 @@ unchanged in `native/vendor/blender_bevel`; hashes and reconstruction ranges are
 there. Its BLI math dependencies use the existing pinned BMesh subset. The source archive
 contains both the upstream subset and AnthroForge's owned-array adapters.
 
-Skin proxy smoothing and collapse adapt Blender 5.0.1 `MOD_smooth.cc`,
-`bmesh_decimate_collapse.cc` and angle-weighted normals (Blender Authors,
-GPL-2.0-or-later). Source URLs/hashes are recorded in
-`native/migration/topology/sources.json`; adapted sources ship in the source archive.
-Existing libigl supplies manifold edge-collapse traversal under its MPL-2.0 notices.
+Skin proxy smoothing and angle-weighted normals adapt Blender 5.0.1 `MOD_smooth.cc`
+and Mesh normals (Blender Authors, GPL-2.0-or-later). Collapse and symmetry cutting
+use the pinned BMesh subset documented above; the former libigl collapse adapter was
+replaced. Original topology-adaptation provenance remains recorded in
+`native/migration/topology/sources.json`; current adapters ship in the source archive.
 
 Skin assembly orientation adapts Blender 5.0.1 `bmo_normals.cc` (Blender Authors,
 GPL-2.0-or-later) to owned arrays. The source fingerprint is recorded in the same

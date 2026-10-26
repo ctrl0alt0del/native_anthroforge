@@ -12,7 +12,7 @@ set(SKIN_SOURCES src/skin_proximity.cpp src/skin_quads_split.cpp src/skin_quads_
     src/skin_gaps.cpp src/skin_meshing.cpp src/skin_assembly.cpp src/skin_precision.cpp
     src/skin_envelope.cpp src/skin_diagnostics.cpp src/skin_capture.cpp src/skin_centerlines.cpp)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
-    ${SKIN_SOURCES} ${SKIN_PROXY_SOURCES} ${SKIN_LOOP_SOURCES} ${SKIN_ANNULUS_SOURCES} ${SKIN_STITCH_SOURCES} src/process_api.cpp src/process_windows.cpp
+    ${SKIN_SOURCES} ${SKIN_PROXY_SOURCES} ${SKIN_LOOP_SOURCES} ${SKIN_ANNULUS_SOURCES} ${SKIN_STITCH_SOURCES} src/process_api.cpp src/process_windows.cpp src/process_log.cpp
     src/comparison_fingerprint.cpp
     src/inspection_mapping.cpp src/inspection_compare.cpp src/inspection_buffers.cpp src/inspection_point.cpp
     src/painting.cpp src/painting_mapping.cpp src/painting_projection.cpp src/painting_stroke.cpp
@@ -57,6 +57,7 @@ target_sources(af_native PRIVATE src/expression_lexer.cpp src/expression_types.c
     src/shortcut_attachments.cpp src/parametric.cpp)
 target_sources(af_native PRIVATE src/skin_symmetry.cpp src/skin_symmetry_cut.cpp)
 target_sources(af_native PRIVATE src/skin_topology_quality.cpp)
+target_sources(af_native PRIVATE src/process_shutdown.cpp)
 target_sources(af_native PRIVATE src/fiber_deformation_api.cpp src/fiber_deformation_inputs.cpp
     src/fiber_deformation_reference.cpp src/fiber_deformation_weights.cpp src/fiber_deformation_filter.cpp
     src/fiber_deformation_fit.cpp src/fiber_deformation_solve.cpp)

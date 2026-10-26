@@ -20,7 +20,7 @@ HANDLE file(const wchar_t* name,DWORD access,DWORD creation) {
 }
 Process::~Process() {
     if(!value) return;
-    TerminateJobObject(job,1);
+    stop(job);
     WaitForSingleObject(value,INFINITE);
 }
 Job::Job():Handle(CreateJobObjectW(nullptr,nullptr)) {
@@ -28,7 +28,7 @@ Job::Job():Handle(CreateJobObjectW(nullptr,nullptr)) {
 }
 Job::~Job() {
     if(!value) return;
-    TerminateJobObject(value,1);
+    stop(value);
     JOBOBJECT_BASIC_ACCOUNTING_INFORMATION state{};
     while(QueryInformationJobObject(value,JobObjectBasicAccountingInformation,&state,sizeof(state),nullptr)) {
         if(!state.ActiveProcesses) break;
@@ -37,7 +37,8 @@ Job::~Job() {
 }
 void limits(HANDLE job,uint64_t memory) {
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION info{};
-    info.BasicLimitInformation.LimitFlags=JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE|JOB_OBJECT_LIMIT_JOB_MEMORY;
+    info.BasicLimitInformation.LimitFlags=JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+    if(memory) info.BasicLimitInformation.LimitFlags|=JOB_OBJECT_LIMIT_JOB_MEMORY;
     info.JobMemoryLimit=SIZE_T(memory);
     require(SetInformationJobObject(job,JobObjectExtendedLimitInformation,&info,sizeof(info))!=0,"Set backend limits");
 }
@@ -63,14 +64,13 @@ void spawn(const std::wstring& executable,std::wstring command,const std::wstrin
         directory.c_str(),&startup.info.StartupInfo,&info)!=0,"Start backend");
     process.value=info.hProcess; Handle thread(info.hThread);
 }
-uint32_t wait(HANDLE process,HANDLE log,uint64_t milliseconds,uint64_t log_limit,uint64_t cancel) {
+uint32_t wait(HANDLE process,Log& log,uint64_t milliseconds,uint64_t cancel) {
     const auto start=std::chrono::steady_clock::now();
     while(true) {
-        check_cancel(cancel); LARGE_INTEGER size{}; require(GetFileSizeEx(log,&size)!=0,"Read backend log size");
-        if(uint64_t(size.QuadPart)>log_limit) throw std::runtime_error("Backend log limit exceeded.");
-        if(std::chrono::steady_clock::now()-start>std::chrono::milliseconds(milliseconds))
+        check_cancel(cancel); const bool busy=log.drain();
+        if(milliseconds&&std::chrono::steady_clock::now()-start>std::chrono::milliseconds(milliseconds))
             throw std::runtime_error("Backend execution timed out.");
-        const auto state=WaitForSingleObject(process,25);
+        const auto state=WaitForSingleObject(process,busy?0:25);
         require(state!=WAIT_FAILED,"Wait for backend"); if(state==WAIT_OBJECT_0) break;
     }
     DWORD code=0; require(GetExitCodeProcess(process,&code)!=0,"Read backend exit code"); return code;

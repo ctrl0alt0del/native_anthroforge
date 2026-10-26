@@ -1,4 +1,4 @@
-"""Synchronous bounded backend execution on the coordinator-owned worker."""
+"""Owned backend execution; optional run limits and a bounded diagnostic tail."""
 
 import ctypes as c
 import subprocess
@@ -11,8 +11,8 @@ from .mesh import U
 
 @dataclass(frozen=True)
 class Limits:
-    memory: int = 4 * 1024**3
-    milliseconds: int = 600_000
+    memory: int = 0
+    milliseconds: int = 0
     log_bytes: int = 16 * 1024**2
 
 
@@ -28,12 +28,18 @@ class Request:
     limits: Limits = Limits()
 
 
+def validate(limits: Limits) -> None:
+    if not all(type(v) is int and 0 <= v < 2**63 for v in vars(limits).values()):
+        raise ValueError("Backend limits must be nonnegative signed 64-bit integers.")
+    if not limits.log_bytes:
+        raise ValueError("Backend log storage must be positive.")
+
+
 def encode(request: Request) -> tuple[bytes, ...]:
     args = request.arguments
     if not args or not Path(args[0]).is_absolute():
         raise ValueError("Backend executable must be an absolute path.")
-    if not all(isinstance(v, int) and 0 < v < 2**63 for v in vars(request.limits).values()):
-        raise ValueError("Backend limits must be positive signed 64-bit integers.")
+    validate(request.limits)
     paths = str(request.directory.resolve()), str(request.log.resolve())
     text = (args[0], subprocess.list2cmdline(args), *paths)
     if any("\0" in value for value in text):

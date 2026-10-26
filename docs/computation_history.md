@@ -3068,3 +3068,21 @@ including process-tree cancellation, timeout/log/memory limits and bounded outpu
 The source numerical settings remain, with one numerical worker thread instead of four to
 respect coordinator execution ownership. This is not proof of tetrahedral connectivity parity
 or final-skin acceptance. Durable reference and LE/FAST integration are still pending.
+
+### Approved backend execution correction (0.4.0 in progress)
+
+The earlier fixed ten-minute and 4 GiB process limits could reject work that the addon
+continues. Production backend requests now leave these limits disabled; explicitly supplied
+diagnostic limits remain supported. stdout/stderr use a drained native pipe and a bounded
+16 MiB diagnostic tail, plus at most 128 bytes identifying omitted output. Log volume no
+longer terminates numerical work. The coordinator still owns the worker and its complete
+process tree. Shutdown waits for owned process handles, fixing a race where job accounting
+reached zero before a child's termination handle was signalled.
+
+Tetrahedral preparation restores the addon's four-thread setting. This checkpoint does
+not yet complete resource-aware admission or establish tetrahedral geometry parity.
+Fourteen focused Windows process/proxy tests pass, including output flooding, cancellation,
+timeouts explicitly requested by tests, descendant termination, and a real proxy build.
+The production algorithms for accepted items 3–6 remain unchanged. Blender BMesh/Decimate
+subset isolation is underway in a separate ignored build probe; production topology has
+not yet switched, and 0.4.0 remains incomplete.

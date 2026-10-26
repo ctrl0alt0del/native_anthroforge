@@ -33,9 +33,18 @@ needs replacement or a further algorithm change, stop implementation, explain th
 observed blocker and proposed alternative, and wait for the user's decision. This
 overrides general autonomous approach-replacement guidance for this work.
 
-Current recovery: HEAD 496fb84; previous broad regression was stopped on request and
+Current recovery: correction checkpoint follows 70a3584; previous broad regression was stopped on request and
 has no passing result. Local lifecycle/probe/acceptance tools remain untracked and must
 be reviewed before inclusion. Root __init__.py is unrelated. No 0.4.0 release/main merge.
+
+Execution correction: no default process time/memory cutoff; bounded diagnostic tail
+instead of terminating on log volume; process-tree termination handle race fixed;
+tetrahedral thread setting restored to four. Fourteen focused backend/proxy tests pass.
+Resource-aware admission remains unfinished. Full BMesh Decimate/bisect source and required
+topology routines compile under C++17; geometry-only subset probe is linking/running under
+`build/skin-040/bmesh-probe` and still being debugged before any production replacement.
+Original pinned source extraction: `build/skin-040/blender-5.0.1`. Probe is local-only;
+the maintained subset, source manifest, parity and integration are still required.
 
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve

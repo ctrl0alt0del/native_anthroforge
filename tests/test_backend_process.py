@@ -1,4 +1,4 @@
-"""Backend execution owns its entire process tree, timeout and output budget."""
+"""Backend execution owns its process tree, optional run limits and diagnostic tail."""
 
 import ctypes as c
 import sys
@@ -43,10 +43,30 @@ def test_backend_cancel_stops_wait(session, tmp_path):
         timer.join()
 
 
-def test_backend_log_limit_is_enforced(session, tmp_path):
-    code = "import time; print('x'*20000, flush=True); time.sleep(60)"
-    with pytest.raises(ValueError, match="log limit"):
-        run(session.engine, request(tmp_path, code, Limits(log_bytes=1024)))
+def test_backend_log_retention_does_not_terminate_computation(session, tmp_path):
+    code = "print('x'*2000000, flush=True); print('completed', flush=True)"
+    value = request(tmp_path, code, Limits(log_bytes=1024))
+    assert run(session.engine, value) == 0
+    output = value.log.read_bytes()
+    assert len(output) <= 1024 + 128
+    assert b"discarded" in output and output.rstrip().endswith(b"completed")
+
+
+def test_production_defaults_have_no_arbitrary_execution_cutoffs():
+    assert Limits().memory == Limits().milliseconds == 0
+
+
+def test_log_flood_remains_cancellable(session, tmp_path):
+    cancel = NativeCancellation(session.engine)
+    timer = Timer(0.5, cancel.set)
+    value = request(tmp_path, "while True: print('x'*65536, flush=True)", Limits(log_bytes=1024))
+    timer.start()
+    try:
+        with pytest.raises(ValueError, match="[Cc]ancel"):
+            run(session.engine, value, cancel.handle)
+    finally:
+        timer.join()
+    assert value.log.stat().st_size <= 1024 + 128
 
 
 def test_invalid_backend_limits_do_not_create_output(session, tmp_path):

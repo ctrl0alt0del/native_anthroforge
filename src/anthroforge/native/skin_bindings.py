@@ -18,6 +18,7 @@ from . import (
     skin_stitch,
     skin_symmetry,
     skin_topology,
+    skin_validation,
 )
 
 MODULES = (
@@ -36,6 +37,7 @@ MODULES = (
     skin_stitch,
     skin_symmetry,
     skin_topology,
+    skin_validation,
 )
 
 

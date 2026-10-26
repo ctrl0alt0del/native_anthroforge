@@ -3051,3 +3051,20 @@ The evaluated-output import boundary retains the existing generated tessellation
 changing remesher coordinates/connectivity. Incorrect polygon arity remains a failure. This
 boundary and the complete pipeline are still being qualified; no anatomical acceptance or
 deformation/reference behavior is established by these preliminary results.
+
+### Topology diagnostics and isolated proxy preparation (0.4.0 in progress)
+
+Advisory topology analysis now runs in the native worker before publication, preserving
+addon degeneracy thresholds, orientation/manifold/valence checks, guide labels, symmetry
+and 95th-percentile distance tolerance. Findings carry accepted geometry/revision evidence;
+no check repairs output. Self-intersection availability remains null. Captured addon fixtures
+cover eight regular and intentionally malformed cases; shared checks agree. Generated
+remesher OBJ import uses existing generated-mesh triangulation and preserves source polygons,
+while user imports stay strict. Incorrect quad arity remains rejected by both source and port.
+
+The isolated Instant backend matches the source CPython-3.11 fixture in the app's CPython-3.12
+runtime. A shared private process adapter now also owns pinned PyTetWild proxy generation,
+including process-tree cancellation, timeout/log/memory limits and bounded output loading.
+The source numerical settings remain, with one numerical worker thread instead of four to
+respect coordinator execution ownership. This is not proof of tetrahedral connectivity parity
+or final-skin acceptance. Durable reference and LE/FAST integration are still pending.

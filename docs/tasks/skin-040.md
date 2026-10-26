@@ -2,9 +2,9 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: foundations implemented; full skin workflow remains in progress, not merge-ready.
-  Schema 7, immutable skin resources, shared settings commands and vertical inspector exist.
-  No envelope/topology/deformation/fitting/export pipeline is connected yet.
+- Status: envelope and topology pipelines connected; full skin workflow remains in progress,
+  not merge-ready. Schema 7, immutable resources, shared commands and vertical inspector exist.
+  Durable deformation, shortcut fitting, OBJ export and release qualification remain unfinished.
 - Last updated: 2026-10-26, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
@@ -13,7 +13,7 @@
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve
 anatomy, geometry/attachment behavior and the existing engineering,
-checkpoint/push and single-distribution rules. No runtime changes are made yet.
+checkpoint/push and single-distribution rules. Package version remains 0.3.7 during implementation.
 
 ## Decisions and relevant files
 
@@ -504,3 +504,43 @@ No projects, source fixtures or delivered distributions were removed. Keep root 
 Next: complete backend/quality qualification, background visual inspection and lifecycle tests,
 then persistent reference/deformation, fitting, export and full release acceptance. No version
 bump or main merge. Current source changes are an incomplete feature-branch checkpoint.
+
+### Topology quality and isolated proxy checkpoint
+
+The native build now succeeds using temporary outputs at
+`C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native`; all five native CTests pass.
+E: still intermittently rejects writes with error 112/Errno 28 despite reported free space.
+Use `ANTHROFORGE_NATIVE_LIBRARY=<that directory>/bin/af_native.dll` for tests, C: logs,
+and pytest `-p no:cacheprovider` until the drive issue is resolved. Do not delete user assets.
+
+Generated-output import is now qualified: folded generated quads retain their vertices and
+connectivity; malformed arity, repeated indices and invalid indices remain errors. Full and
+symmetric QuadWild and Instant public builds pass, including coherent undo and round trips.
+A captured malformed QuadWild calibration output is also rejected by the addon's reader;
+this is a retained backend limitation, not a new automatic repair or fallback.
+
+Added native advisory topology diagnostics with accepted-revision Issues evidence. Eight
+captured addon controls agree for finite/quad/component/orientation/manifold/degeneracy/valence
+checks. Geometry is not changed by diagnostics. Fidelity reports distances (not squared
+ distances); unavailable self-intersection checks remain explicitly null. Instant CPython
+3.12 output matches the addon's isolated CPython 3.11 geometry/connectivity within 1e-6.
+Fixtures and maintained capture tools are committed; visual integration review is next.
+The existing native adaptive base-count implementation is reused; the duplicate helper from
+the prior checkpoint was removed.
+
+Factored isolated numerical process ownership for Instant and tetrahedral proxy preparation.
+PyTetWild uses source numerical settings with one worker thread under the existing process
+budget/cancellation contract. Its nanobind function is positional-only despite named stubs;
+the adapter is tested on the installed pinned version. This is proxy preparation only, not
+reference/LE/FAST publication. No solver fallback or new public operation is introduced yet.
+
+Verification: topology suite 47 passed, one tetrahedral adapter test initially failed; after
+correcting that binding, all three proxy tests plus both architecture checks passed. The first
+48-dot run could not finish pytest's E: cache write and is not counted as a complete test run.
+Native style passed on changed importer/diagnostics. Broad regression, real anatomy, GUI,
+reference/deformation/fitting/export and portable release remain pending. Preserve __init__.py.
+
+Recovery note: E: also rejected Git loose-object writes. Removed 282 disposable `.obj`
+compiler intermediates (33.5 MB) under verified `build/dev`, after the complete C: build
+and native checks succeeded. Kept libraries, dependencies, source and all user artifacts.
+Git writes then succeeded. The E: development object files will rebuild when needed.

@@ -7,22 +7,6 @@ static void initial_values(const double* initial,int64_t count,double* output) {
         output[i]=initial[i];
     }
 }
-}
-int af_skin_density_base_count(uint64_t handle,const double* lengths,int requested,int reserved,uint64_t cancel) {
-    try {
-        if(!lengths||requested<1||requested>500000||reserved<0) throw std::runtime_error("Invalid topology base budget.");
-        const auto mesh=af::mesh(handle); std::vector<double> areas(mesh->vertices.rows());
-        af::skin_density::areas(*mesh,areas.data(),cancel); double total=0,maximum=0;
-        for(size_t i=0;i<areas.size();++i) {
-            if(i%4096==0) af::check_cancel(cancel);
-            if(!std::isfinite(lengths[i])||lengths[i]<0) throw std::runtime_error("Invalid density length.");
-            total+=areas[i]; maximum=std::max(maximum,lengths[i]);
-        }
-        const double count=std::nearbyint(total/std::max(maximum*maximum,1e-20))+reserved;
-        return int(std::min(double(requested),std::max(1000.,count)));
-    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
-}
-namespace af::skin_density {
 static void report(const std::vector<Region>& regions,double* areas,int* unusable) {
     for(size_t i=0;i<regions.size();++i) {
         const auto& region=regions[i]; areas[i]=region.area;

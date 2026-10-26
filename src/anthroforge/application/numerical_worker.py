@@ -24,14 +24,16 @@ def instant(source: Path, output: Path, count: int) -> None:
 
 
 def execute(args: Any) -> int:
-    operations = {"instant": instant}
+    from .tetrahedral_backend import worker
+
+    operations = {"instant": instant, "tetrahedral": worker}
     operations[args.backend](Path(args.source).resolve(), Path(args.output).resolve(), args.count)
     return 0
 
 
 def add_parser(commands: Any) -> None:
     parser = commands.add_parser("numerical-worker", help="Internal isolated numerical backend")
-    parser.add_argument("backend", choices=("instant",))
+    parser.add_argument("backend", choices=("instant", "tetrahedral"))
     parser.add_argument("source")
     parser.add_argument("output")
     parser.add_argument("count", type=int)

@@ -4,7 +4,7 @@ from dataclasses import asdict
 from typing import Any
 
 from anthroforge.core.entities import IDENTITY
-from anthroforge.native import skin_annuli, skin_symmetry
+from anthroforge.native import skin_annuli, skin_symmetry, skin_validation
 
 from . import (
     skin_assets,
@@ -48,7 +48,15 @@ def evaluate(
 def solve(inputs: Any, sources: Any, loops: Any, guides: Any, cancel: Any) -> ComputedStage:
     try:
         output, backend, attempts = skin_remeshing.run(inputs, cancel)
-        return complete(inputs, output, backend, attempts, sources, loops, guides)
+        quality = skin_validation.evaluate(
+            output.topology,
+            inputs.envelope,
+            inputs.annuli.counts[1],
+            inputs.annuli.counts[2],
+            inputs.plane,
+            cancel.handle,
+        )
+        return complete(inputs, output, backend, attempts, (sources, loops, guides), quality)
     finally:
         inputs.annuli.close()
 
@@ -66,13 +74,14 @@ def arrays(inputs: Any, output: Any, loops: Any) -> dict[str, Any]:
 
 
 def complete(
-    inputs: Any, output: Any, backend: Any, attempts: Any, sources: Any, loops: Any, guides: Any
+    inputs: Any, output: Any, backend: Any, attempts: Any, captures: Any, quality: Any
 ) -> ComputedStage:
-    captures = (sources, loops, guides, inputs.density, backend)
-    warnings = tuple(text for row in captures for text in row.warnings)
+    sources, loops, guides = captures
+    warnings = tuple(text for row in (*captures, inputs.density, backend) for text in row.warnings)
     warnings += (output.warning,) if output.warning else ()
     info = metadata(inputs, output, attempts, sources, loops, guides)
     info["warnings"] = list(dict.fromkeys(warnings))
+    info["topology_quality"] = quality
     return ComputedStage(
         output.topology.mesh, skin_assets.create(arrays(inputs, output, loops), info)
     )

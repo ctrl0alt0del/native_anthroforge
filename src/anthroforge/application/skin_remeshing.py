@@ -8,6 +8,7 @@ from typing import Any
 from anthroforge.native import (
     skin_annuli,
     skin_density,
+    skin_proximity,
     skin_proxy,
     skin_stitch,
     skin_symmetry,
@@ -31,7 +32,7 @@ def initial_target(inputs: Inputs, cancel: Any) -> int:
     reserved = 3 * int(inputs.annuli.counts[1])
     target = int(inputs.settings.target_quads)
     if inputs.density.adaptive:
-        target = skin_density.base_count(
+        target = skin_proximity.base_target(
             inputs.envelope, inputs.density.density.lengths, target, reserved, cancel.handle
         )
     if inputs.settings.backend == "INSTANT":

@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from anthroforge.native import skin_density
+from anthroforge.native import skin_density, skin_proximity
 from anthroforge.native.mesh import NativeCancellation
 from tests.conftest import CUBE
 
@@ -52,8 +52,8 @@ def test_density_rejects_invalid_regions_and_cancels(session):
 
 def test_adaptive_base_reserves_guides_and_respects_full_target(session):
     mesh, _ = fixture(session)
-    assert skin_density.base_count(mesh, np.full(8, 0.05), 8100, 300) == 2700
-    assert skin_density.base_count(mesh, np.full(8, 0.001), 8100, 300) == 8100
-    assert skin_density.base_count(mesh, np.ones(8), 8100, 0) == 1000
+    assert skin_proximity.base_target(mesh, np.full(8, 0.05), 8100, 300) == 2700
+    assert skin_proximity.base_target(mesh, np.full(8, 0.001), 8100, 300) == 8100
+    assert skin_proximity.base_target(mesh, np.ones(8), 8100, 0) == 1000
     with pytest.raises(ValueError, match="length"):
-        skin_density.base_count(mesh, np.full(8, -1), 8100, 0)
+        skin_proximity.base_target(mesh, np.full(8, -1), 8100, 0)

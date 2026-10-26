@@ -7,5 +7,14 @@
     "core/topology/flow_patches.py": "2969f91160a3498e7fc8dbe7f2ea36695454cd508dc8b61faf2d7c868e8b0864",
     "adapters/topology/flow_capture.py": "f144d735c281e4f7bcfce97682b4dee778f88f6734545a7634bfc18f5d82adf7",
     "adapters/topology/muscle_flow.py": "ba224bfb9200432c2efdd9668b88de83db69d0cd3ff634adf87937ca4e5b230e"
+  },
+  "density_reference": {
+    "core/topology/budgets.py": "abde21c82ec19807e90f1cc52cd31cbff99a6a23a77c0d52908cb931217d1fd4",
+    "core/topology/ownership.py": "850f6539c53ca9afb8a7a7a7fa79e3f1270492221ade7fd3430d35abf3de889b"
+  },
+  "proxy_smooth_reference": {
+    "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/modifiers/intern/MOD_smooth.cc",
+    "sha256": "87995c9a6b31be333dc3cc049cb383810e8d8a4df84da552ef31e907e64108c8",
+    "license": "GPL-2.0-or-later"
   }
 }

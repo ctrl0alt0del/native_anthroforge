@@ -48,3 +48,20 @@ def test_patch_graph_failure_is_distinct_from_generic_failure(tmp_path):
     log.write_text("missing input")
     with pytest.raises(ValueError, match="quantization failed"):
         quadwild_steps.check_exit(1, log)
+
+
+def test_accepted_tissue_guides_reach_real_backend(session, tmp_path):
+    from anthroforge.application import skin_topology_capture
+    from tests.test_tissue_workflow import assembly
+
+    assembly(session)
+    cancel = NativeCancellation(session.engine)
+    captured = skin_topology_capture.capture(
+        session.engine, session.document, session.resources, cancel
+    )
+    mesh = session.engine.import_mesh(CUBE, 1, False)
+    context = quadwild_steps.Execution(session.engine, quadwild_bundle.verify(), cancel)
+    result = quadwild_backend.run(context, mesh, captured.data, 64, tmp_path)
+    assert result.statistics["field"]["requested_paths"] == len(captured.data.offsets) - 1
+    assert result.statistics["field"]["requested_paths"] > 0
+    assert result.mesh.counts[1] > 0

@@ -19,6 +19,7 @@ class Density:
 
 
 def configure(engine: Any) -> None:
+    engine.bind("af_skin_proxy_smooth", [U, c.c_double, c.c_int, U], U)
     integer = c.POINTER(c.c_int)
     engine.bind("af_skin_density", [U, integer, D, c.c_int, D, c.c_int, D, D, D, integer, U])
 
@@ -55,3 +56,9 @@ def run(mesh: Mesh, data: tuple[Any, Any, Any], iterations: int, cancel: int) ->
         mesh.engine.library.af_skin_density(*args, initial_pointer, iterations, *outputs, cancel)
     )
     return Density(lengths, areas, totals, unusable)
+
+
+def smooth_proxy(mesh: Mesh, factor: float = 0.42, iterations: int = 10, cancel: int = 0) -> Mesh:
+    handle = mesh.engine.library.af_skin_proxy_smooth(mesh.handle, factor, iterations, cancel)
+    mesh.engine.check(not handle)
+    return Mesh(mesh.engine, handle)

@@ -2870,3 +2870,14 @@ Zero-budget/empty regions remain explicitly unusable, and custom refinement leng
 can enter the same correction stage. Hierarchy and integer reservations remain core
 metadata policy. Three direct addon controls agree within 2.7e-16 in target lengths.
 Source ownership and complete density-driven remeshing are not yet integrated.
+
+### Skin proxy midpoint smoothing (0.4.0 in progress)
+
+The addon applies Blender Smooth to its decimated proxy, factor 0.42 for ten iterations.
+The standalone native adapter preserves that edge-midpoint average, all-axis behavior
+and float evaluation instead of substituting a generic Laplacian. It operates on an
+owned mesh result and retains connectivity; disabled smoothing preserves full original
+precision. Four background Blender 5.0.1 fixtures (one/ten iterations, with/without
+isolated vertices) pass within 3e-7. A fixed-camera numerical-mesh comparison was
+rendered and inspected at `build/skin-040/ui/proxy-parity.png`. This verifies compact
+proxy controls, not anatomical shape acceptance or the pending decimation stage.

@@ -269,3 +269,23 @@ Evidence: `build/skin-040/density-parity.json`. Sixteen focused tests pass; conf
 mypy passes 467 files. Native build/five CTests pass, selected style checks have only
 suppressed header warnings. Ownership assignment, proxy preparation, loop patches,
 symmetry/refinement and coordinator publication remain pending. No release claim.
+
+### Proxy smoothing and connected-guide checks
+
+Accepted tissue guide capture now passes through the real QuadWild backend in a
+focused integration test. Added native Blender midpoint proxy smoothing with four
+Blender 5.0.1 fixtures; five smoothing tests plus the headless/architecture checks
+pass. Inspected rendered parity at `build/skin-040/ui/proxy-parity.png`. Native build
+and five CTests pass; selected clang-tidy reports only suppressed header warnings.
+
+An initial broad run had one headless failure while Python/native ABI edits overlapped
+the active test run (2,348 passed). Rebuilt the matching DLL, confirmed the affected
+headless test passes, and started a fixed-snapshot full rerun in
+`build/skin-040-proxy-regression.log`; read its completed result before claiming success.
+Do not edit runtime bindings or rebuild the native DLL during an active broad run.
+
+Remaining: ownership assignment, decimation, closed-loop patches, symmetry and
+refinement, topology publication, persistent deformation, fitting/export and release.
+Before porting ownership, inspect addon `_scp_trees`: dictionary keys use SCP identity
+while captures can contain reflected instances; determine intended nearest-support
+behavior with a mirrored fixture rather than silently carrying or changing that policy.

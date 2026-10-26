@@ -16,6 +16,7 @@ AF_API int af_skin_annuli_copy(uint64_t handle,double* samples,int64_t* quads,in
 /* samples: XYZ/normal. patches: point offset, segments, quad offset/count, source loops,
    mode (direct/planar/radial), mirror source (-1 none), inversion count. Quad indices global. */
 AF_API void af_skin_annuli_release(uint64_t handle);
+AF_API uint64_t af_skin_cut_guides(uint64_t mesh,uint64_t annuli,const double* plane,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

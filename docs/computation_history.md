@@ -2980,3 +2980,21 @@ fallback paths; they are not full-anatomy acceptance. Reflected-pair, malformed 
 cancellation and owned-lifetime checks pass. Rendered overlays were inspected at
 `build/skin-040/ui/annulus-parity.png`; fixed Z limits avoid exaggerating Blender BVH
 float noise. Annular patches are not yet stitched into a public topology result.
+
+### Native guide cutting and quad transitions (0.4.0 in progress)
+
+Replaced addon Python/SciPy numerical hole selection, ring alignment/resampling,
+balanced zipper assembly, minimum-quality seam selection and staged/centered transition
+construction with owned C++ kernels. Retained 1.08 side footprint versus 1.0 centered
+footprint, 1.8 radius/0.55 depth bounds, count-difference 12 and ratio 1.5 limits,
+P95 aspect 4/max aspect 12 thresholds, symmetry tolerance and exact boundary checks.
+Shared ring projection is reused by nested-loop pairing. Native weld preparation
+retains rounded-cell coordinates and last-face provenance for the forthcoming assembly.
+
+Twelve captured addon cut masks agree exactly. Eight successful transition controls
+agree within 9e-16 in position, with identical quads and diagnostics; two unsupported
+pairs reject for the same parity/symmetry reasons. Rendered overlays are inspected at
+`build/skin-040/ui/stitch-parity.png`. A libigl triangle predicate supplies local
+intersection checks on existing native tessellation; wider coplanar/degenerate BVH
+parity and complete anatomical assembly remain qualification work. No algorithmic
+repair or silent backend substitution is introduced.

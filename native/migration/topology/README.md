@@ -59,3 +59,11 @@ radial stress fixture has coincident rings. These isolate fallback behavior and 
 not claims about ordinary anatomical guides. Run `python -m tools.check_skin_annuli`
 with fixture/report paths. Whole anatomy and subsequent cut/stitch assembly remain
 separate acceptance work.
+
+Hole cutting and transitions port the fingerprinted `instant.py`, `cube.py` and
+`solver.py` production calls. Shared ring projection/alignment and owned quad bundles
+replace NumPy/SciPy/Blender numerical preparation. Compact captures live in
+`tests/fixtures/skin/guide_cuts.json` and `stitch.json`; use the maintained background
+capture/check tools. Their successful cases match source quads exactly. Boundary parity
+and incorrect symmetry-side matches remain errors. Complete mesh assembly and wider
+intersection-predicate equivalence still require qualification.

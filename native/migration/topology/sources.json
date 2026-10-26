@@ -47,5 +47,10 @@
     "adapters/topology/engine/instant.py": "2c4d187d5e4bbe2563b875ecd3696dc27e4204c83d3b0a6ce4810f56defbe11a",
     "adapters/topology/engine/layout.py": "ee86a9d9f6d65ab9da38b876cdb5bc99b502c1b1bd80df29e22640cc1dedcd2a",
     "adapters/topology/solver.py": "264a5062e0fa64820d4359b2c56c8e639ba5075fc9c41b4575273f3640c73020"
+  },
+  "transition_reference": {
+    "adapters/topology/engine/cube.py": "d2824087a94e66b735a7fa4b40d6d4b69e5d5d7a4ec96402da1387ab021aa585",
+    "adapters/topology/engine/instant.py": "2c4d187d5e4bbe2563b875ecd3696dc27e4204c83d3b0a6ce4810f56defbe11a",
+    "adapters/topology/solver.py": "264a5062e0fa64820d4359b2c56c8e639ba5075fc9c41b4575273f3640c73020"
   }
 }

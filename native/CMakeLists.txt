@@ -1,15 +1,17 @@
 add_subdirectory(boolean)
+set(SKIN_STITCH_SOURCES src/skin_stitch_boundary.cpp src/skin_stitch_zipper.cpp src/skin_stitch_centered.cpp
+    src/skin_stitch_weld.cpp src/skin_stitch_quality.cpp src/skin_stitch_transition.cpp src/skin_stitch_api.cpp)
 set(SKIN_PROXY_SOURCES src/skin_decimate_prepare.cpp src/skin_decimate_metric.cpp src/skin_decimate.cpp src/skin_proxy_api.cpp)
 set(SKIN_LOOP_SOURCES src/skin_loops.cpp src/skin_loops_projection.cpp src/skin_loops_closure.cpp src/skin_loops_pairing.cpp)
 set(SKIN_ANNULUS_SOURCES src/skin_annuli.cpp src/skin_annuli_api.cpp src/skin_annuli_result.cpp
-    src/skin_annuli_planar.cpp src/skin_annuli_radial.cpp src/skin_annuli_symmetry.cpp
+    src/skin_annuli_planar.cpp src/skin_annuli_radial.cpp src/skin_annuli_symmetry.cpp src/skin_ring.cpp src/skin_guide_cut.cpp
     vendor/scipy_lsap/rectangular_lsap.cpp)
 set(SKIN_SOURCES src/skin_proximity.cpp src/skin_quads_split.cpp src/skin_quads_result.cpp src/skin_refine_candidates.cpp src/skin_refine.cpp src/skin_point_index.cpp src/skin_ownership_samples.cpp src/skin_ownership.cpp src/skin_ownership_islands.cpp src/skin_ownership_api.cpp src/skin_proxy_smooth.cpp src/skin_density.cpp src/skin_density_api.cpp src/skin_guides_merge.cpp src/skin_features.cpp src/skin_guides.cpp src/skin_guides_api.cpp src/skin_flow.cpp src/skin_grid.cpp src/skin_distance.cpp src/skin_raster.cpp
     src/skin_exterior.cpp src/skin_collagen.cpp src/skin_fields.cpp src/skin_fields_api.cpp
     src/skin_gaps.cpp src/skin_meshing.cpp src/skin_assembly.cpp src/skin_precision.cpp
     src/skin_envelope.cpp src/skin_diagnostics.cpp src/skin_capture.cpp src/skin_centerlines.cpp)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
-    ${SKIN_SOURCES} ${SKIN_PROXY_SOURCES} ${SKIN_LOOP_SOURCES} ${SKIN_ANNULUS_SOURCES} src/process_api.cpp src/process_windows.cpp
+    ${SKIN_SOURCES} ${SKIN_PROXY_SOURCES} ${SKIN_LOOP_SOURCES} ${SKIN_ANNULUS_SOURCES} ${SKIN_STITCH_SOURCES} src/process_api.cpp src/process_windows.cpp
     src/comparison_fingerprint.cpp
     src/inspection_mapping.cpp src/inspection_compare.cpp src/inspection_buffers.cpp src/inspection_point.cpp
     src/painting.cpp src/painting_mapping.cpp src/painting_projection.cpp src/painting_stroke.cpp

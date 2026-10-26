@@ -411,3 +411,25 @@ checks pass. Native build/five CTests, selected clang-tidy, Ruff and configured 
 Next: cutting, transition rings, assembly and backend orchestration. Public topology,
 persistent deformation, shortcut fitting, export and complete release qualification
 remain unfinished. No version bump or main merge; preserve the root __init__.py.
+
+### Guide holes and transition kernels checkpoint
+
+Ported addon guide-hole masks (PCA footprint, depth/radius limits, 1.08 side scale and
+1.0 centered scale), ring alignment, balanced zipper quads, sparse seam candidates,
+staged fallbacks and centered symmetric transitions. Shared ring projection now serves
+both nested-loop pairing and hole cutting. Native transition bundles preserve polygon
+region/guide labels and boundaries. Sources remain unchanged. Quality checks use the
+existing triangulation and libigl triangle intersection predicate; compact fixture
+agreement does not yet establish all Blender BVH edge-case equivalence.
+
+Twelve hole selections exactly match addon face membership. Ten transition cases cover
+sparse/staged/centered results, odd half-strip parity, multistage ratios, quality fallback,
+and parity/wrong-side rejection. All eight successful cases match coordinates within
+9e-16, exact connectivity and quality diagnostics; the two rejected cases match reasons.
+Thirty-three focused tests pass; native build/five CTests, selected style, Ruff and
+configured mypy (478 files) pass. Inspected `build/skin-040/ui/stitch-parity.png`.
+
+The combined topology assembly is next. A draft `skin_stitch_orientation.cpp` exists
+locally but is not compiled or qualified yet; it is intentionally excluded from this
+checkpoint. Public topology integration, symmetry output, reference deformation,
+fitting, export and full release acceptance remain unfinished.

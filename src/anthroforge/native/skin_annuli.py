@@ -34,6 +34,7 @@ def configure(engine: Any) -> None:
     engine.bind("af_skin_annuli_sizes", [U, INT])
     engine.bind("af_skin_annuli_copy", [U, D, INT64, INT, INT])
     engine.bind("af_skin_annuli_release", [U], None)
+    engine.bind("af_skin_cut_guides", [U, U, D, U], U)
 
 
 class Annuli:
@@ -89,3 +90,15 @@ def build(mesh: Mesh, loops: Loops, plane: Any = None, cancel: int = 0) -> Annul
     )
     handle = mesh.engine.library.af_skin_annuli(mesh.handle, c.byref(source), cancel)
     return Annuli(mesh.engine, handle)
+
+
+def cut_guides(mesh: Mesh, annuli: Annuli, plane: Any = None, cancel: int = 0) -> Mesh:
+    equation = None if plane is None else doubles(plane)
+    if equation is not None and equation.shape != (6,):
+        raise ValueError("Guide cut symmetry requires a six-component plane.")
+    if mesh.engine is not annuli.engine:
+        raise ValueError("Guide cuts require one geometry engine.")
+    args = mesh.handle, annuli.handle, None if equation is None else pointer(equation), cancel
+    handle = mesh.engine.library.af_skin_cut_guides(*args)
+    mesh.engine.check(not handle)
+    return Mesh(mesh.engine, handle)

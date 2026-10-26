@@ -20,6 +20,7 @@ Patch direct(Context& context,const Loop& outer,const Loop& inner);
 Patch planar(Context& context,const Loop& outer,const Loop& inner);
 Patch radial(Context& context,const Loop& outer);
 Patch choose(Context& context,const Loop& outer,const Loop& inner);
+Vertices outer_ring(const Patch& patch);
 bool symmetry_candidate(const Loop& outer,const Loop& inner,const Plane& plane);
 void symmetrize(Context& context,Patch& patch);
 void mirror_pairs(Context& context,Patches& patches);

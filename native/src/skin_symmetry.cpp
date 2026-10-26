@@ -50,6 +50,19 @@ uint64_t af_skin_symmetry_half(uint64_t mesh,const double* plane,uint64_t cancel
         return af::retain(af::skin_symmetry::half(*source,af::skin_symmetry::required(plane),cancel));
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }
+int af_skin_symmetry_plane(const double* frame,const double* plane,double* output) {
+    try {
+        if(!frame||!output) throw std::runtime_error("Skin plane requires a transform and output.");
+        const Eigen::Map<const Eigen::Matrix<double,4,4,Eigen::RowMajor>> matrix(frame);
+        const auto local=af::skin_symmetry::required(plane);
+        if(!matrix.allFinite()||std::abs(matrix.block<3,3>(0,0).determinant())<1e-15)
+            throw std::runtime_error("Skin plane transform must be finite and invertible.");
+        const af::V3 origin=matrix.block<3,3>(0,0)*local.origin+matrix.block<3,1>(0,3);
+        const af::V3 normal=(matrix.block<3,3>(0,0).inverse().transpose()*local.normal).normalized();
+        for(int axis=0;axis<3;++axis) { output[axis]=origin[axis]; output[axis+3]=normal[axis]; }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 uint64_t af_skin_symmetry_mirror(uint64_t mesh,const double* plane,uint64_t cancel) {
     try {
         af::check_cancel(cancel); const auto source=af::mesh(mesh); const size_t count=source->offsets.size()-1;

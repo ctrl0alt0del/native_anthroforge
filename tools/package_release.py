@@ -22,6 +22,7 @@ DIST = (
 )
 PACKAGES = (
     "numpy",
+    "pyinstantmeshes",
     "Pillow",
     "PySide6",
     "PySide6_Essentials",

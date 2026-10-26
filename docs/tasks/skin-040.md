@@ -473,3 +473,34 @@ native style, Ruff and configured mypy (479 files). Wider regression remains pen
 
 Next: bounded Instant Meshes process adapter and complete topology orchestration.
 Public topology, deformation reference/LE/FAST, fitting, export and release remain open.
+
+### Topology integration checkpoint — still under qualification
+
+Added bounded Instant Meshes execution through the ordinary executable's private numerical
+worker entry point, sharing OBJ exchange and result contracts with QuadWild. Runtime launcher
+is shared with report rendering. Instant's native options match the addon; no Qt dependency or
+backend substitution. Both remeshers retain process-tree cancellation and limits.
+
+Connected complete topology preparation/assembly through `skin.build` and
+`skin.topology.build`, plus desktop buttons. Shared skin stage policies now use one job lifecycle
+for reservations, dispatch capture, provenance, atomic publication and initiating undo. Native
+helpers resolve the root-local symmetry plane and adaptive initial quad count. Preliminary
+integration: 22/23 topology/density/symmetry/architecture tests pass; the non-symmetric QuadWild
+case failed. Existing envelope/Instant/architecture checks: 8 passed before the latest changes.
+Do not describe these as complete topology qualification.
+
+Investigation found remesher OBJ output was using the user-import tessellator, rejecting folded
+generated quads before advisory quality validation. An evaluated-output importer now reuses
+existing generated tessellation while retaining finite/index/arity checks; build/test pending.
+A second reproduction produced a triangle in QuadWild's smoothed result; this is genuinely
+malformed and must not be accepted or silently substituted. Capture:
+`build/skin-040/anthroforge-topology-cryg9m4b`. Resolve/qualify this before advancing.
+
+Windows intermittently reports error 112 on larger E: writes despite ~75 GB reported free;
+C: writes and small E: writes worked. Deleted only the disposable `build/write-probe.bin`.
+A later 1 MiB E: probe succeeded. Native rebuild now runs serially to reduce pressure.
+No projects, source fixtures or delivered distributions were removed. Keep root __init__.py.
+
+Next: complete backend/quality qualification, background visual inspection and lifecycle tests,
+then persistent reference/deformation, fitting, export and full release acceptance. No version
+bump or main merge. Current source changes are an incomplete feature-branch checkpoint.

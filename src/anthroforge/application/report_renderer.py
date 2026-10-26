@@ -7,6 +7,8 @@ from threading import Event
 from time import monotonic
 from typing import BinaryIO
 
+from .runtime_launcher import launcher
+
 if sys.platform == "win32":
     CREATION_FLAGS = subprocess.CREATE_NO_WINDOW
 else:
@@ -24,13 +26,6 @@ def command(root: Path, revision: int) -> list[str]:
         "--view",
         str(root / "view.json"),
     ]
-
-
-def launcher() -> list[str]:
-    # Nuitka keeps an interpreter-shaped sys.executable; argv[0] names the actual app.
-    if "__compiled__" in globals():
-        return [str(Path(sys.argv[0]).resolve()), "--cli"]
-    return [sys.executable, "-m", "anthroforge"]
 
 
 def render(root: Path, revision: int, cancel: Event) -> None:

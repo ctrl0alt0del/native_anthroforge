@@ -1,5 +1,6 @@
 """One explicit operation catalogue; no active Blender context or Python eval."""
 
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.units import convert
@@ -83,7 +84,9 @@ EDITS = {
     "skin.collagen.set": skin_collagen.set_weights,
     "skin.collagen.fill": skin_collagen.fill,
     "skin.collagen.clear": skin_collagen.clear,
-    "skin.envelope.build": skin_jobs.build_envelope,
+    "skin.envelope.build": partial(skin_jobs.build, stage="envelope"),
+    "skin.topology.build": partial(skin_jobs.build, stage="topology"),
+    "skin.build": skin_jobs.build,
     "skin.configure": skin_operations.configure,
     "skin.contributor.configure": skin_operations.contributor,
     "mirror.loop.create": symmetric_paths.create,

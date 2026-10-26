@@ -48,3 +48,12 @@ def test_density_rejects_invalid_regions_and_cancels(session):
     token.set()
     with pytest.raises(ValueError, match="[Cc]ancel"):
         skin_density.evaluate(mesh, regions, [16, 64], cancel=token.handle)
+
+
+def test_adaptive_base_reserves_guides_and_respects_full_target(session):
+    mesh, _ = fixture(session)
+    assert skin_density.base_count(mesh, np.full(8, 0.05), 8100, 300) == 2700
+    assert skin_density.base_count(mesh, np.full(8, 0.001), 8100, 300) == 8100
+    assert skin_density.base_count(mesh, np.ones(8), 8100, 0) == 1000
+    with pytest.raises(ValueError, match="length"):
+        skin_density.base_count(mesh, np.full(8, -1), 8100, 0)

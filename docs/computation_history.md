@@ -3034,3 +3034,20 @@ are exact except oblique clipping (maximum 1.69e-7). An exact-on-face plane expo
 while preserving the two valid triangles. Actual comparison renders were inspected.
 Cancellation, malformed planes, empty halves and FLOW run/provenance checks pass.
 These controls qualify the isolated preparation boundary, not anatomical remeshing.
+
+### Complete topology execution boundary (0.4.0, qualification in progress)
+
+Composed the qualified native symmetry, density, guide, proxy, refinement and assembly stages
+under one coordinator-owned job. Instant Meshes runs in an isolated matching-runtime process
+with the addon's fixed deterministic/pure-quad options; QuadWild remains the default. Initial
+targets, three-times-annulus reservation, half-domain QuadWild target and one Instant count
+correction follow the source. Both use bounded cancellation and explicit errors. Root-local
+plane transformation and density area aggregation now run in C++; Python orchestrates stages.
+
+Initial public-command tests passed for Instant (full/symmetric) and symmetric QuadWild, with
+undo and project round trips. Full-domain QuadWild exposed the user-import/generated-output
+tessellation mismatch and, separately, a malformed triangle emitted during calibration.
+The evaluated-output import boundary retains the existing generated tessellation rather than
+changing remesher coordinates/connectivity. Incorrect polygon arity remains a failure. This
+boundary and the complete pipeline are still being qualified; no anatomical acceptance or
+deformation/reference behavior is established by these preliminary results.

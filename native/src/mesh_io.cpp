@@ -1,4 +1,5 @@
 #include "mesh_internal.hpp"
+#include "anthroforge/mesh.h"
 #include <igl/readOBJ.h>
 #include <igl/readSTL.h>
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -47,6 +48,17 @@ static Faces read_stl(const std::string& path, Mesh& mesh) {
         faces.push_back({triangles(i,0),triangles(i,1),triangles(i,2)});
     return faces;
 }
+static std::shared_ptr<Mesh> read_evaluated(const std::string& path,int arity,uint64_t cancel) {
+    if(arity!=3&&arity!=4) throw std::runtime_error("Evaluated mesh requires triangles or quads.");
+    check_cancel(cancel); auto result=std::make_shared<Mesh>(); result->generated=true;
+    const auto faces=read_obj(path,*result);
+    if(faces.empty()) throw std::runtime_error("Remesher produced no polygons.");
+    for(const auto& face:faces) {
+        check_cancel(cancel);
+        if(int(face.size())!=arity) throw std::runtime_error("Remesher produced a polygon with incorrect arity.");
+    }
+    prepare_mesh(*result,faces,cancel); return result;
+}
 static Faces read_ply(const std::string& path, Mesh& mesh) {
     std::ifstream stream(std::filesystem::u8path(path),std::ios::binary);
     happly::PLYData ply(stream);
@@ -71,4 +83,10 @@ std::shared_ptr<Mesh> read_mesh(const std::string& path,double units,bool y_up,u
     prepare_mesh(*result,faces,cancel);
     return result;
 }
+}
+uint64_t af_mesh_import_evaluated(const char* path,int arity,uint64_t cancel) {
+    try {
+        if(!path) throw std::runtime_error("Missing evaluated mesh path.");
+        return af::retain(af::read_evaluated(path,arity,cancel));
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

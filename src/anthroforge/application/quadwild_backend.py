@@ -1,6 +1,5 @@
 """QuadWild FLOW pipeline; topology assembly and document publication are separate owners."""
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -8,16 +7,10 @@ from anthroforge.native import skin_flow
 from anthroforge.native.mesh import Mesh
 from anthroforge.native.skin_guides import Guides
 
-from . import quadwild_exchange as exchange
 from . import quadwild_fields, quadwild_steps
+from . import remesher_exchange as exchange
 from .quadwild_steps import Execution, UnsupportedPatchGraph
-
-
-@dataclass(frozen=True)
-class Result:
-    mesh: Mesh
-    warnings: tuple[str, ...]
-    statistics: dict[str, Any]
+from .remeshing_result import Result
 
 
 def calibrate(

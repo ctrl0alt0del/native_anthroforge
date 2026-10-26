@@ -1,23 +1,18 @@
 """Owned envelope computation and binding resources, entirely on the coordinator worker."""
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict
 from typing import Any
 
 from anthroforge.native import skin_fields, skin_gaps
 from anthroforge.native.skin_capture import source_counts
 
 from . import skin_assets, skin_capture, worker_memory
+from .skin_results import ComputedStage
 
 TARGET_RESOLUTION = 220
 
 
-@dataclass(frozen=True)
-class Envelope:
-    mesh: Any
-    data: skin_assets.SkinAsset
-
-
-def evaluate(engine: Any, document: Any, resources: Any, cancel: int) -> Envelope:
+def evaluate(engine: Any, document: Any, resources: Any, cancel: int) -> ComputedStage:
     capture = skin_capture.capture(engine, document, resources, cancel)
     budget = worker_memory.budget()
     fields, scene = prepare(engine, document, capture, budget, cancel)
@@ -27,7 +22,7 @@ def evaluate(engine: Any, document: Any, resources: Any, cancel: int) -> Envelop
         data = skin_assets.create(
             binding_data(bindings, capture), metadata(capture, result, fields)
         )
-        return Envelope(result.mesh, data)
+        return ComputedStage(result.mesh, data)
     finally:
         scene.close()
         fields.close()

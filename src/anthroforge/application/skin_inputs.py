@@ -30,6 +30,19 @@ def envelope(document: Any) -> set[Port]:
     return dependencies.closure(dependencies.graph(document), ports)
 
 
+def construction(document: Any) -> set[Port]:
+    ports = envelope(document) | {Port(str(document.id), "skin_topology_settings")}
+    ports.update(Port(row.id, "pose") for row in document.entities if not row.parent)
+    for source in skin_sources.candidates(document):
+        if source.kind == "TISSUE":
+            ports.update(Port(source.owner, name) for name in ("base", "rest", "intrinsic"))
+    return dependencies.closure(dependencies.graph(document), ports)
+
+
+def topology(document: Any) -> set[Port]:
+    return construction(document) | {Port(str(document.id), "skin_envelope")}
+
+
 def revision(document: Any, port: Port) -> ReadRevision | None:
     if port.owner != str(document.id):
         return None

@@ -4,6 +4,8 @@ import ctypes as c
 from dataclasses import replace
 from typing import Any
 
+import numpy as np
+
 from . import skin_topology
 from .mesh import D, Mesh, U, doubles, pointer
 from .skin_guide_batch import Input, buffers, record
@@ -14,6 +16,18 @@ def configure(engine: Any) -> None:
     engine.bind("af_skin_symmetry_half", [U, D, U], U)
     engine.bind("af_skin_symmetry_mirror", [U, D, U], U)
     engine.bind("af_skin_guides_half", [c.POINTER(Input), D, U], U)
+    engine.bind("af_skin_symmetry_plane", [D, D, D])
+
+
+def world_plane(engine: Any, matrix: Any, plane: Any) -> Any:
+    frame, local = doubles(matrix), equation(plane)
+    if frame.shape not in ((16,), (4, 4)):
+        raise ValueError("Skin symmetry needs a four-by-four root transform.")
+    output = np.empty(6)
+    engine.check(
+        engine.library.af_skin_symmetry_plane(pointer(frame), pointer(local), pointer(output))
+    )
+    return output
 
 
 def equation(plane: Any) -> Any:

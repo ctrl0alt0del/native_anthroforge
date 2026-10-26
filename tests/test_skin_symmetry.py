@@ -15,6 +15,16 @@ DATA = json.loads((Path(__file__).parent / "fixtures/skin/symmetry.json").read_t
 PLANE = [0, 0, 0, 1, 0, 0]
 
 
+def test_local_symmetry_plane_follows_root_with_nonuniform_scale(session):
+    frame = np.array([[2, 1, 0, 3], [0, 3, 0, 4], [0, 0, 4, 5], [0, 0, 0, 1]])
+    result = skin_symmetry.world_plane(session.engine, frame, [1, 2, 3, 1, 1, 0])
+    normal = np.linalg.inv(frame[:3, :3]).T @ [1, 1, 0]
+    np.testing.assert_allclose(result[:3], [7, 10, 17])
+    np.testing.assert_allclose(result[3:], normal / np.linalg.norm(normal))
+    with pytest.raises(ValueError, match="invertible"):
+        skin_symmetry.world_plane(session.engine, np.zeros((4, 4)), PLANE)
+
+
 @pytest.mark.parametrize("row", DATA["cases"])
 def test_symmetry_matches_addon_non_degenerate_surface_and_winding(session, row):
     source, result = evaluate(session.engine, row)

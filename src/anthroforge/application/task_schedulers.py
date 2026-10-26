@@ -250,12 +250,21 @@ def construction_schedulers() -> dict[str, TaskScheduler]:
         **curve_schedulers(),
         **anchor_schedulers(),
         "skin_envelope": SkinEnvelopeTaskScheduler(),
+        "skin_topology": SkinTopologyTaskScheduler(),
+        "skin_construction": SkinTopologyTaskScheduler(),
     }
 
 
 class SkinEnvelopeTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
         return Schedule("worker", reason="Native tiled skin fields, envelope and source bindings")
+
+
+class SkinTopologyTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule(
+            "worker", reason="Bounded native remeshing, density, guides and quad assembly"
+        )
 
 
 def shortcut_schedulers() -> dict[str, TaskScheduler]:

@@ -9,7 +9,7 @@ from typing import Any
 from anthroforge.native import process
 from anthroforge.native.mesh import GeometryEngine, NativeCancellation
 
-from . import quadwild_exchange as exchange
+from . import remesher_exchange as exchange
 
 
 class UnsupportedPatchGraph(ValueError):

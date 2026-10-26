@@ -9,16 +9,17 @@ from anthroforge.native import skin_flow
 from anthroforge.native.skin_guides import Guides
 
 from . import quadwild_exchange as exchange
+from . import remesher_exchange
 from .quadwild_steps import Execution
 
 
 def field(context: Execution, folder: Path, output: Path, guides: Guides) -> tuple[Any, Any]:
-    mesh = exchange.read_mesh(
+    mesh = remesher_exchange.read_mesh(
         context.engine, folder / "mesh_rem.obj", 3, context.cancellation.handle
     )
     prior = exchange.read_field(folder / "mesh_rem.rosy", mesh.counts[3])
     directions, info = skin_flow.solve(mesh, prior, guides.samples, context.cancellation.handle)
-    exchange.write_triangles(output / "mesh.obj", mesh)
+    remesher_exchange.write_triangles(output / "mesh.obj", mesh)
     exchange.write_field(output / "mesh.rosy", directions)
     return mesh, info
 

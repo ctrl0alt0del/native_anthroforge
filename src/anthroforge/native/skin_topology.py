@@ -19,11 +19,18 @@ class Result:
 
 
 def configure(engine: Any) -> None:
+    engine.bind("af_mesh_import_evaluated", [c.c_char_p, c.c_int, U], U)
     engine.bind("af_skin_quads_split", [U, BYTE, INT, INT, U], U)
     engine.bind("af_skin_refine", [U, U, D, INT, INT, c.c_int, c.c_int, D, U], U)
     engine.bind("af_skin_topology_mesh", [U], U)
     engine.bind("af_skin_topology_labels", [U, INT, INT, c.c_int])
     engine.bind("af_skin_topology_release", [U], None)
+
+
+def import_evaluated(engine: Any, path: Any, arity: int, cancel: int = 0) -> Mesh:
+    handle = engine.library.af_mesh_import_evaluated(str(path).encode("utf-8"), arity, cancel)
+    engine.check(not handle)
+    return Mesh(engine, handle)
 
 
 def labels(mesh: Any, regions: Any, guides: Any) -> tuple[Any, Any]:

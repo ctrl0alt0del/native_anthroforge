@@ -22,6 +22,18 @@ def configure(engine: Any) -> None:
     engine.bind("af_skin_proxy_smooth", [U, c.c_double, c.c_int, U], U)
     integer = c.POINTER(c.c_int)
     engine.bind("af_skin_density", [U, integer, D, c.c_int, D, c.c_int, D, D, D, integer, U])
+    engine.bind("af_skin_density_base_count", [U, D, c.c_int, c.c_int, U])
+
+
+def base_count(mesh: Mesh, lengths: Any, requested: int, reserved: int, cancel: int = 0) -> int:
+    values = doubles(lengths)
+    if values.shape != (mesh.counts[0],):
+        raise ValueError("Density lengths must match the envelope vertices.")
+    result = mesh.engine.library.af_skin_density_base_count(
+        mesh.handle, pointer(values), requested, reserved, cancel
+    )
+    mesh.engine.check(result < 0)
+    return int(result)
 
 
 def inputs(mesh: Mesh, regions: Any, budgets: Any, initial: Any) -> tuple[Any, Any, Any]:

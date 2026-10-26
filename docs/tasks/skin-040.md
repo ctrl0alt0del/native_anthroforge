@@ -20,6 +20,9 @@ checkpoint/push and single-distribution rules. No runtime changes are made yet.
   settings, current-versus-legacy behavior, numerical porting work and future evidence.
 - Addon source `fae36aba1b208676cf21d7c4a78a20d5b1f68c66`; inspected skin paths clean.
 - Full current skin pipeline plus shortcut-to-bone fitting is in scope.
+- Confirmed delivery priority: reproduce existing addon behavior first, then improve it
+  in later work. Preserve algorithms/defaults/supported cases while adapting ownership
+  to the standalone architecture; keep proposed enhancements separate from migration.
 - Export starts with OBJ, preserving quads; keep a narrow, extensible format interface.
   OBJ does not serialize rigs. Retain fitted data/preview in the project.
 - Add Skin to the existing right inspector and arrange Shape / Shortcuts / Inspect /

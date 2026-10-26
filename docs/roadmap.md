@@ -1,7 +1,8 @@
 # AnthroForge release roadmap
 
 - **0.4.0 — scope confirmed, not implemented:** migrate the addon's skin envelope,
-  guided topology, final-skin updates and shortcut-to-bone fitting. OBJ is the first
+  guided topology, final-skin updates and shortcut-to-bone fitting. Reproduce existing
+  addon behavior first; behavioral improvements follow the qualified migration. OBJ is the first
   exporter behind an extensible format interface. Skin joins the existing right
   inspector's tabs, arranged vertically. The [source inventory](skin_040_inventory.md)
   separates current behavior from legacy update paths and records local fitting source; see

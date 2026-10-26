@@ -7,6 +7,24 @@ Skin joins Shape, Shortcuts and Inspect in a vertical strip along the left edge 
 the right inspector, following the supplied sketch. This supersedes the proposed
 separate Skin mode or root-only inspector placement.
 
+## Confirmed migration baseline
+
+For 0.4.0, first reproduce the existing addon workflow, algorithms, settings and
+supported behavior. Improvements to that behavior belong to subsequent work, after
+the migrated workflow is usable and compared against the addon. In particular, bone
+fitting retains its configurable budget and independent shortcut fits; automatic bone
+count selection and multi-shortcut composition are not part of this migration.
+
+Adapt implementation ownership to the standalone application: native numerical work,
+the existing coordinator and shared operations replace Blender-specific integration.
+Those architectural adaptations must preserve computational behavior and be verified;
+they do not authorize silent algorithm substitutions or changed quality policies.
+The confirmed vertical inspector and extensible OBJ export remain in scope.
+
+Record observed source defects, parity differences and improvement proposals separately.
+Do not describe source inspection as validation, or silently turn a migration problem
+into an accepted limitation. Establish the cause and evidence for any necessary fix.
+
 ## Evidence boundary
 
 - Standalone baseline: `6260864`, version 0.3.7, schema 6.

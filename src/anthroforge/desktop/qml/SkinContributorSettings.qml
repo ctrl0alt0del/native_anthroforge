@@ -53,6 +53,7 @@ ColumnLayout {
                 hint:"0 keeps skin close to bone; 1 allows the full collagen layer."
                 onEdited:value=>panel.change("collagen",value)
             }
+            TissuePaintingSettings { collagen:true; enabled:!!panel.contributor.surface }
             RowLayout {
                 Layout.fillWidth:true; enabled:!!panel.contributor.surface
                 UiButton { objectName:"skinCollagenFill"; text:"Fill weights"; Layout.fillWidth:true; onClicked:workspace.run("skin.collagen.fill",{owner:panel.contributor.owner}) }

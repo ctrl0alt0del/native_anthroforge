@@ -99,7 +99,18 @@ def contributor_controls(controller, window):
     assert value["collagen_mode"] == "PAINTED" and value["painted"]
     controller.run("undo", {})
     controller.run("undo", {})
+    collagen_button(controller, window)
     assert window.grabWindow().save(str(OUTPUT / "skin-contributor-settings.png"))
+
+
+def collagen_button(controller, window):
+    click(window, "tissueFieldPaint")
+    assert controller.tissue_painting.state["domain"] == "collagen"
+    assert controller.tissue_painting.state["active"]
+    QTest.qWait(100)
+    assert window.grabWindow().save(str(OUTPUT / "skin-collagen-controls.png"))
+    click(window, "tissueFieldPaint")
+    assert not controller.tissue_painting.state["active"]
 
 
 def exercise(application):

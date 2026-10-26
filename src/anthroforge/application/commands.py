@@ -50,6 +50,7 @@ from . import (
     skin_collagen,
     skin_jobs,
     skin_operations,
+    skin_painting,
     snap_tasks,
     surface_branch_operations,
     surface_correspondence,
@@ -78,6 +79,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "skin.collagen.paint.commit": skin_painting.commit,
     "skin.collagen.set": skin_collagen.set_weights,
     "skin.collagen.fill": skin_collagen.fill,
     "skin.collagen.clear": skin_collagen.clear,
@@ -253,7 +255,7 @@ def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> An
 
 
 def query_handler(operation: str) -> Any:
-    if operation.startswith(("tissue.inspect.", "curve.inspect.")):
+    if operation.startswith(("tissue.inspect.", "curve.inspect.", "skin.inspect.")):
         from .tissue_inspection import execute as tissue_inspect
 
         return tissue_inspect

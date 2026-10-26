@@ -28,6 +28,7 @@ def setup(controller):
 def exercise(controller, renderer, app):
     bone = setup(controller)
     assert frames(controller, renderer, app).save(str(OUTPUT / "skin-sources-gpu.png"))
+    painting(controller, renderer, app, bone)
     controller.run("skin.envelope.build", {})
     settle(controller)
     stage = controller.session.document.skin.envelope
@@ -38,6 +39,22 @@ def exercise(controller, renderer, app):
     assert frames(controller, renderer, app).save(str(OUTPUT / "skin-isolated-gpu.png"))
     assert any(row["geometry_asset"] == stage.asset for row in controller.render_model.rows)
     assert not renderer.window.isVisible()
+
+
+def painting(controller, renderer, app, bone):
+    controller.run("skin.collagen.fill", dict(owner=bone, value=0))
+    tool = controller.tissue_painting
+    tool.beginCollagen()
+    tool.setting("radius", 100)
+    camera = [0, 0, 4, 1, 0, 0, 0, 1, 0, 0, 0, -1, 100, 1]
+    tool.pointer([0, 0], camera, True)
+    tool.timer.stop()
+    tool.submit()
+    settle(controller)
+    assert frames(controller, renderer, app).save(str(OUTPUT / "skin-collagen-gpu.png"))
+    assert tool.model.active_rows(), controller.message
+    tool.cancel()
+    controller.run("undo", {})
 
 
 def run(app):

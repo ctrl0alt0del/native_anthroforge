@@ -28,7 +28,7 @@ def definitions() -> dict[str, Query]:
     from . import tissue_sections as sections
 
     return dict(
-        tissue_queries(),
+        dict(tissue_queries(), collagen=collagen_query()),
         stacking=Query(stacking.validate, stacking.signature, stacking.compute, stacking.workload),
         paint=Query(painting.validate, painting.signature, painting.compute, tissue.workload),
         section=Query(sections.validate, sections.signature, sections.compute, sections.workload),
@@ -52,3 +52,9 @@ def tissue_queries() -> dict[str, Query]:
         "comparison": Query(*common, tissue.comparison, tissue.workload),
         "point": Query(tissue.validate, point.signature, point.explain, tissue.workload),
     }
+
+
+def collagen_query() -> Query:
+    from . import skin_painting as collagen
+
+    return Query(collagen.validate, collagen.signature, collagen.compute, collagen.workload)

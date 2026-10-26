@@ -15,7 +15,6 @@ def mesh(session: Any, owner: str) -> Any:
     item = session.document.index.entities.get(owner)
     if item is None:
         raise ValueError("Collagen weights require an SCP.")
-    session.editable(owner)
     asset = geometry_asset(item)
     if not asset or asset not in session.assets:
         raise ValueError("The SCP needs accepted mesh geometry before editing collagen.")
@@ -49,6 +48,7 @@ def publish(session: Any, owner: str, **values: Any) -> None:
 
 
 def set_weights(session: Any, owner: str, values: Any) -> None:
+    session.editable(owner)
     target = mesh(session, owner)
     count, signature = field_domains.mesh_domain(target)
     weights = np.asarray(values, dtype=np.float64)
@@ -72,5 +72,6 @@ def fill(session: Any, owner: str, value: float | None = None) -> None:
 
 
 def clear(session: Any, owner: str) -> None:
+    session.editable(owner)
     mesh(session, owner)
     publish(session, owner, painted="", collagen_mode="UNIFORM")

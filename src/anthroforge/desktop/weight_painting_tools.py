@@ -4,13 +4,13 @@ from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
 from anthroforge.application import tissue_inspection as inspection
 from anthroforge.application.inspection_context import scene_signature
-from anthroforge.application.tissue_painting import field
 
-from . import tissue_painting_view as view
-from .tissue_inspection_tools import displayed_stage
+from . import painting_domains as domains
+from . import skin_painting_view
+from .models import RenderModel
 
 
-class TissuePaintingTools(QObject):
+class WeightPaintingTools(QObject):
     changed = Signal()
 
     def __init__(self, controller):
@@ -18,7 +18,8 @@ class TissuePaintingTools(QObject):
         self.controller, self.name, self.target = controller, "", ""
         self.samples, self.options, self.job, self.commit_job = [], {}, "", ""
         self.dragging, self.document, self.workspace = False, None, None
-        self.preview = None
+        self.preview, self.domain, self.model = None, domains.TISSUE, RenderModel(controller)
+        self.model.activated.connect(self.changed.emit)
         self.radius, self.weight, self.strength, self.falloff, self.through = 40, 1, 1, 1, False
         self.timer = QTimer(self)
         self.timer.setSingleShot(True)
@@ -28,7 +29,7 @@ class TissuePaintingTools(QObject):
     @Property("QVariantMap", notify=changed)
     def state(self):
         return dict(
-            active=bool(self.name),
+            **self.domain_state(),
             name=self.name,
             target=self.target,
             dragging=self.dragging,
@@ -42,13 +43,13 @@ class TissuePaintingTools(QObject):
 
     @Slot(str)
     def begin(self, name):
-        self.attempt(self.start, name)
+        self.attempt(self.start_domain, domains.TISSUE, name)
 
     def start(self, name):
         controller, session = self.controller, self.controller.session
         if session.history.before is not None or session.waiting_save:
             raise ValueError("Finish the current edit before painting.")
-        field(session, controller.selection, dict(name=name))
+        self.domain.validate(controller, name)
         controller.authoring.setEditing(False)
         controller.cancelViewportTools(self)
         controller.section_tools.cancel()
@@ -59,10 +60,29 @@ class TissuePaintingTools(QObject):
         self.changed.emit()
 
     def prepare_view(self):
-        tool = self.controller.tissue_inspection
-        tool.hideStacking()
-        stage = displayed_stage(self.controller.session, self.controller.selection)
-        tool.set_view(stage, "", "Overlay")
+        self.domain.prepare(self.controller)
+
+    def domain_state(self):
+        rows = self.model.active_rows()
+        return dict(
+            active=bool(self.name),
+            domain=self.domain.kind,
+            hiddenOwner=rows[0]["owner"] if rows else "",
+        )
+
+    @Property(QObject, constant=True)
+    def geometry(self):
+        return self.model
+
+    @Slot()
+    def beginCollagen(self):
+        self.attempt(self.start_domain, domains.COLLAGEN, "collagen")
+
+    def start_domain(self, domain, name):
+        domain.validate(self.controller, name)
+        self.cancel()
+        self.domain = domain
+        self.start(name)
 
     @Slot()
     def cancel(self):
@@ -73,10 +93,11 @@ class TissuePaintingTools(QObject):
     @Slot()
     def cancelStroke(self):
         self.timer.stop()
-        inspection.cancel(self.controller.session, "paint")
+        inspection.cancel(self.controller.session, self.domain.kind)
         self.samples, self.job, self.commit_job, self.dragging = [], "", "", False
         self.document = None
         self.preview = None
+        self.model.publish([])
         self.changed.emit()
 
     @Slot(str, "QVariant")
@@ -98,12 +119,12 @@ class TissuePaintingTools(QObject):
     def sample(self, position, camera, press):
         if press:
             self.cancelStroke()
-            self.options = view.capture(self, camera)
+            self.options = self.domain.capture(self, camera)
             self.document, self.dragging = scene_signature(self.controller.session.document), True
         if self.dragging:
             self.append(position)
         elif not self.options or self.options["view"] != camera:
-            self.options = view.capture(self, camera)
+            self.options = self.domain.capture(self, camera)
             self.samples = [list(position)]
         else:
             return
@@ -129,7 +150,7 @@ class TissuePaintingTools(QObject):
             self.through,
         ]
         options = dict(self.options, samples=list(self.samples), brush=brush)
-        value = inspection.start(self.controller.session, "paint", self.target, **options)
+        value = inspection.start(self.controller.session, self.domain.kind, self.target, **options)
         self.job = value["job"]
 
     @Slot()
@@ -155,18 +176,19 @@ class TissuePaintingTools(QObject):
             self.complete()
 
     def retain_preview(self):
-        value = self.controller.session.tissue_inspection.values.get("paint")
+        value = self.controller.session.tissue_inspection.values.get(self.domain.kind)
         if value and value.state == "ready" and value.asset:
             self.preview = value.asset
+        skin_painting_view.publish(self)
 
     def complete(self):
-        value = inspection.status(self.controller.session, "paint")
+        value = inspection.status(self.controller.session, self.domain.kind)
         if value["state"] in ("queued", "running"):
             return
         job = self.commit_job
         self.document, self.commit_job, self.options = None, "", {}
         if value["state"] == "ready":
-            self.controller.run("tissue.field.paint.commit", dict(job=job))
+            self.controller.run(self.domain.commit, dict(job=job))
         elif value.get("error"):
             self.controller.message = value["error"]
             self.controller.changed.emit()

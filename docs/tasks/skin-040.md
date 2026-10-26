@@ -176,3 +176,14 @@ desktop-projection and architecture tests pass; mypy passes (452 files). Offscre
 numeric edit, Fill and Undo passed and the contributor panel capture was inspected.
 Brush strokes, remaining contributor topology controls and subsequent skin stages
 are still pending. No new broad-suite or release qualification is claimed here.
+
+### Collagen brush checkpoint
+
+Collagen painting now shares the native brush, query scheduler and desktop gesture
+lifecycle with tissue weights. Domain policies choose validation/capture/commit; there
+is no second worker pool or Python numerical brush. Read-only previews retain displayed
+geometry, use visible-only or Paint Through, and commit one topology-qualified edit.
+Focused API/desktop tests cover cancellation, stale field rejection, undo and colors.
+Offscreen controls and hidden GPU heat rendering pass; images were inspected. Mypy
+passes 454 files. Full anatomy and the remaining topology/reference/fitting/export
+stages are still pending; this is not 0.4.0 release qualification.

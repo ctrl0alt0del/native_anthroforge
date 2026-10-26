@@ -2,8 +2,8 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: release scope/UI/export confirmed; expanded source inventory complete;
-  detailed specification and implementation plan next. No runtime implementation yet.
+- Status: implementation authorized; specification and implementation plan consolidated.
+  First increment: dependency/fixture qualification, then foundation contracts.
 - Last updated: 2026-10-26, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
@@ -15,6 +15,9 @@ anatomy, geometry/attachment behavior and the existing engineering,
 checkpoint/push and single-distribution rules. No runtime changes are made yet.
 
 ## Decisions and relevant files
+
+- [Specification](../specification_040.md) and [implementation plan](../implementation_040.md)
+  are confirmed. Schema 7 retains readers 4–6; stale export offers explicit accepted/update/cancel.
 
 - [Migration inventory](../skin_040_inventory.md) records production code owners,
   settings, current-versus-legacy behavior, numerical porting work and future evidence.
@@ -41,6 +44,10 @@ Read panels/operators, model/settings, field/gap kernels, topology/guide prepara
 reference/LE/FAST/contact code, bone sampling/fitting/preview/publication and existing
 fixture/test names. Checked official
 upstream APIs. No runtime/parity/GUI qualification or geometry acceptance performed.
+Initial source qualification: six addon bone-fitting tests and 21 deformation tests
+pass under the standalone Python 3.12 environment using the existing addon native DLLs.
+These establish source controls only, not rebuilt-native or application parity. Matching
+`pytetwild==0.4.2` and `pyinstantmeshes==1.0.0` import in this environment.
 App version/schema and all production files remain unchanged. Unrelated root
 `__init__.py` is preserved. Source `.blend` files remain untouched.
 

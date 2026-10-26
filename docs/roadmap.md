@@ -6,7 +6,8 @@
   exporter behind an extensible format interface. Skin joins the existing right
   inspector's tabs, arranged vertically. The [source inventory](skin_040_inventory.md)
   separates current behavior from legacy update paths and records local fitting source; see
-  [the task record](tasks/skin-040.md).
+  [the task record](tasks/skin-040.md). Implementation follows the confirmed
+  [specification](specification_040.md) and [delivery plan](implementation_040.md).
 
 - **0.3.7 — qualified:** recent projects, periodic committed recovery
   copies and UI polish. [Walkthrough](usability_037.md), [evidence](tasks/usability-037.md).

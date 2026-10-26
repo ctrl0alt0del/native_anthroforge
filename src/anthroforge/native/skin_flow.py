@@ -13,6 +13,8 @@ def configure(engine: Any) -> None:
     integers = c.POINTER(c.c_int)
     engine.bind("af_skin_flow_route", [U, D, c.c_int, integers, c.c_int, U])
     engine.bind("af_skin_flow_select", [U, D, c.c_int, integers, c.c_int, integers, U])
+    engine.bind("af_skin_flow_features", [U, integers, c.c_int, integers, U])
+    engine.bind("af_skin_quad_step", [c.c_int, c.c_int, D])
 
 
 def solve(mesh: Mesh, prior: Any, samples: Any, cancel: int = 0) -> tuple[Any, Any]:
@@ -62,3 +64,24 @@ def path_points(points: Any) -> Any:
     if values.ndim != 2 or values.shape[1] != 3:
         raise ValueError("FLOW paths need XYZ points.")
     return values
+
+
+def features(mesh: Mesh, edges: Any, cancel: int = 0) -> Any:
+    values = np.ascontiguousarray(edges, dtype=np.int32)
+    if values.ndim != 2 or values.shape[1] != 2:
+        raise ValueError("FLOW feature edges need pairs of vertex identities.")
+    output = np.empty((len(values), 3), dtype=np.int32)
+    count = mesh.engine.library.af_skin_flow_features(
+        mesh.handle, integers(values), len(values), integers(output), cancel
+    )
+    mesh.engine.check(count < 0)
+    return output[:count]
+
+
+def calibration_step(engine: Any, target: int, count: int, state: Any) -> tuple[Any, int]:
+    values = doubles(state).copy()
+    if values.shape != (2,):
+        raise ValueError("QuadWild calibration needs scale and best count error.")
+    flags = engine.library.af_skin_quad_step(target, count, pointer(values))
+    engine.check(flags < 0)
+    return values, int(flags)

@@ -101,6 +101,7 @@ def copy_documentation():
 
 
 def copy_runtime(runtime):
+    copy_topology_runtime(runtime)
     (runtime / "bin").mkdir(parents=True, exist_ok=True)
     shutil.copy2(STAGE / "build.json", runtime / "build.json")
     for name in ("af_native.dll", "af_viewport.dll", "af_profiler.dll"):
@@ -158,6 +159,13 @@ def package_notices(package, target):
         if source.is_file():
             filename = str(relative).replace("/", "_").replace("\\", "_")
             shutil.copy2(source, target / filename)
+
+
+def copy_topology_runtime(runtime):
+    from anthroforge.application.quadwild_bundle import verify
+
+    shutil.copytree(verify(), runtime / "quadwild", dirs_exist_ok=True)
+    shutil.copytree(ROOT / "src/anthroforge/data", runtime.parent / "data", dirs_exist_ok=True)
 
 
 if __name__ == "__main__":

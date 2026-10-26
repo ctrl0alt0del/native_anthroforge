@@ -63,3 +63,22 @@ def test_feature_paths_honor_cancellation(session):
     cancel.set()
     with pytest.raises(ValueError, match="[Cc]ancel"):
         skin_flow.route(mesh, [[0, 0, 0], [1, 1, 0]], cancel.handle)
+
+
+def test_feature_mapping_matches_first_incident_face_policy(session):
+    mesh, _, _ = fixture(session.engine, 0.0)
+    edges = np.array([[0, 2], [2, 0], [2, 3]], dtype=np.int32)
+    np.testing.assert_array_equal(skin_flow.features(mesh, edges), [[1, 0, 2], [1, 1, 1]])
+    with pytest.raises(ValueError, match="outside"):
+        skin_flow.features(mesh, [[0, 999]])
+
+
+def test_native_calibration_keeps_best_and_stops_at_addon_tolerance(session):
+    state, flags = skin_flow.calibration_step(session.engine, 100, 400, (1, float("inf")))
+    np.testing.assert_allclose(state, [2, 300])
+    assert flags == 1
+    state, flags = skin_flow.calibration_step(session.engine, 100, 110, state)
+    np.testing.assert_allclose(state, [2, 10])
+    assert flags == 3
+    with pytest.raises(ValueError, match="calibration"):
+        skin_flow.calibration_step(session.engine, 0, 100, state)

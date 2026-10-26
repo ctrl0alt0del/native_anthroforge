@@ -230,3 +230,25 @@ addon Windows code 2147483651 with parseable 26-vertex/24-quad output. Evidence/
 are under `build/skin-040/backend-smoke`; this is process qualification, not complete
 topology acceptance. The bundle still needs maintained setup/package integration.
 The full regression is running in `build/skin-040-resume-regression.log`.
+
+### Guided backend checkpoint
+
+The broad regression before the final backend exchange changes passed 2,333 tests
+(181.12 seconds). New focused process/guide/backend/architecture checks pass 27 tests;
+Ruff and configured mypy pass (464 files). Native build/five CTests pass and selected
+clang-tidy reports only suppressed header warnings. Do not conflate this evidence with
+a new broad run after the latest changes.
+
+Added pinned-bundle verification and `tools/setup_quadwild.py` (explicit setup only;
+no runtime download), package-copy support, native feature-face mapping and native
+quad-count calibration. The internal backend preserves four calibration attempts,
+15% target tolerance, invalid-patch warnings and sparse-path retry with direction
+constraints retained. Direct complete addon/standalone cube comparison produces
+identical 98 vertices / 96 quads, zero maximum coordinate error, identical polygons.
+Evidence: `build/skin-040/quadwild-parity/parity.json`. Both retain the target-count
+limitation and known Windows abnormal-exit warning. No anatomical acceptance yet.
+
+This remains internal integration, not a public topology-build command. Next work:
+batch source guide assembly; loop patch preparation; density/proxy/symmetry and
+refinement; coordinator publication and desktop controls; persistent reference and
+LE/FAST; fitting/export; full geometry/GUI/package qualification. Version stays 0.3.7.

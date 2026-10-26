@@ -11,6 +11,9 @@ AF_API int af_skin_flow_route(uint64_t mesh,const double* points,int count,
                              int* edges,int capacity,uint64_t cancel);
 AF_API int af_skin_flow_select(uint64_t mesh,const double* points,int points_count,
                               const int* offsets,int paths,int* selected,uint64_t cancel);
+AF_API int af_skin_flow_features(uint64_t mesh,const int* edges,int count,int* output,uint64_t cancel);
+/* Calibration state: current scale, best absolute quad-count error. Flags: keep=1, done=2. */
+AF_API int af_skin_quad_step(int target,int count,double* state);
 #ifdef __cplusplus
 }
 #endif

@@ -2845,3 +2845,16 @@ are restricted. No topology algorithm changed. Eight lifecycle tests pass. A ver
 QuadWild 0.0.2 bundle produces the same known abnormal Windows quantizer exit with
 parseable cube output; successful geometry must still be validated and that exit
 reported as a warning. Backend pipeline integration remains pending.
+
+### Guided remesher exchange (0.4.0 in progress)
+
+Replaced addon subprocess/file orchestration with the owned backend runner and native
+mesh import. Native feature-face mapping preserves first-incident-face assignment and
+deduplication. Native quad-count calibration retains four attempts, square-root scale
+adjustment and 15% tolerance; Python only sequences external stages and selects
+returned owned meshes. Sparse-path retry preserves all FLOW direction constraints.
+Pinned asset verification uses the original 0.0.2 hashes; setup/package copying adds
+no runtime download or Blender dependency. The complete compact cube pipeline
+matches addon output exactly (98 vertices, 96 quads). The known abnormal Windows
+quantizer exit and unattainable count are explicit warnings. This is backend parity,
+not loop/density/symmetry assembly or anatomical skin qualification.

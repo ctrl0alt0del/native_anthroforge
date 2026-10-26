@@ -1,5 +1,5 @@
 add_subdirectory(boolean)
-set(SKIN_SOURCES src/skin_guides.cpp src/skin_guides_api.cpp src/skin_flow.cpp src/skin_grid.cpp src/skin_distance.cpp src/skin_raster.cpp
+set(SKIN_SOURCES src/skin_features.cpp src/skin_guides.cpp src/skin_guides_api.cpp src/skin_flow.cpp src/skin_grid.cpp src/skin_distance.cpp src/skin_raster.cpp
     src/skin_exterior.cpp src/skin_collagen.cpp src/skin_fields.cpp src/skin_fields_api.cpp
     src/skin_gaps.cpp src/skin_meshing.cpp src/skin_assembly.cpp src/skin_precision.cpp
     src/skin_envelope.cpp src/skin_diagnostics.cpp src/skin_capture.cpp src/skin_centerlines.cpp)

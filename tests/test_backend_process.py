@@ -99,3 +99,15 @@ def test_unicode_paths_and_quoted_arguments(session, tmp_path):
     value = replace(value, arguments=(*value.arguments, 'a "quote"', "back\\slash", ""))
     assert run(session.engine, value) == 0
     assert value.log.read_text().strip() == repr(list(value.arguments[3:]))
+
+
+def test_successful_parent_cannot_leave_background_children(session, tmp_path):
+    code = (
+        "import subprocess,sys; "
+        "p=subprocess.Popen([sys.executable,'-c','import time; time.sleep(60)']); "
+        "print(p.pid,flush=True)"
+    )
+    value = request(tmp_path, code)
+    assert run(session.engine, value) == 0
+    assert_stopped(int(value.log.read_text().strip()))
+    value.log.unlink()

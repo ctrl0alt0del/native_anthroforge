@@ -393,3 +393,21 @@ Next: construct direct/planar/radial annulus candidates, preserve symmetry, then
 and stitch the generated topology around them. Current loop preparation alone does
 not complete that workflow. Public topology publication, persistent deformation,
 shortcut fitting, export and full release qualification still remain.
+
+### Annulus construction checkpoint
+
+Native owned annuli now preserve addon direct/planar/radial selection, projection,
+Fourier smoothing, orientation, inversion metrics and both symmetry policies. The
+unchanged SciPy 1.14.1 assignment kernel is pinned with source hashes/notices; inputs
+are bounded to <=96 columns per ring and run on the existing worker. Numerical patch
+buffers remain native for the upcoming cut/stitch stage; snapshots carry provenance.
+
+Six direct addon controls select the same methods and match coordinates within 1.21e-6,
+with matching connectivity and inversion counts. Reordered/coincident stress guides
+exercise fallbacks but do not qualify anatomy. Nineteen focused annulus/loop/architecture
+checks pass. Native build/five CTests, selected clang-tidy, Ruff and configured mypy
+(477 files) pass. Inspected the rendered overlays in `build/skin-040/ui/annulus-parity.png`.
+
+Next: cutting, transition rings, assembly and backend orchestration. Public topology,
+persistent deformation, shortcut fitting, export and complete release qualification
+remain unfinished. No version bump or main merge; preserve the root __init__.py.

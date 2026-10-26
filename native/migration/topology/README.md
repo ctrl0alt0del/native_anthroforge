@@ -42,4 +42,20 @@ arrays, reusing the maintained native graph route. Fixtures capture Blender's fl
 BVH output; native queries can select the other valid incident normal at a mesh edge.
 Coordinate, pairing and incident-normal checks are separated. Run
 `python -m tools.check_skin_loops tests/fixtures/skin/loops.json <report.json>` for
-the maintained numerical comparison. Annulus construction is a subsequent stage.
+the maintained numerical comparison.
+
+Annulus construction ports the same source's direct/planar/radial candidates, five
+rings, 24–96 columns, inversion-based selection and reflection policies. Low-harmonic
+periodic smoothing uses the equivalent bounded direct Fourier sum (at most 96 samples,
+8 harmonics), rather than introducing another FFT runtime. SciPy 1.14.1's unchanged
+BSD-3-Clause shortest-augmenting-path assignment kernel supplies ring symmetry matching;
+see `native/vendor/scipy_lsap` for sources, hashes and license. It runs synchronously
+on bounded <=96-column inputs inside the owning worker. All other repeated geometry
+queries use the existing native surface and point indices.
+
+`tests/fixtures/skin/annuli.json` records six direct addon controls exercising every
+candidate. The planar stress fixture has deliberately reordered inner points; the
+radial stress fixture has coincident rings. These isolate fallback behavior and are
+not claims about ordinary anatomical guides. Run `python -m tools.check_skin_annuli`
+with fixture/report paths. Whole anatomy and subsequent cut/stitch assembly remain
+separate acceptance work.

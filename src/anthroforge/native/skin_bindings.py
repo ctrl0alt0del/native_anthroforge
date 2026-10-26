@@ -4,6 +4,7 @@ from typing import Any
 
 from . import (
     process,
+    skin_annuli,
     skin_capture,
     skin_density,
     skin_fields,
@@ -19,6 +20,7 @@ from . import (
 
 MODULES = (
     process,
+    skin_annuli,
     skin_capture,
     skin_density,
     skin_fields,

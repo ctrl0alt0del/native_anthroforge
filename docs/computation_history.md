@@ -15,8 +15,9 @@ It leaves numerical evaluation and scheduling policy unchanged.
 
 ## Scope and reading guide
 
-0.4.0 skin migration foundations are in progress under CH-093. There is no connected
-standalone skin computation yet; the existing addon is the numerical baseline.
+0.4.0 skin migration is in progress under CH-093 and the subsequent stage records.
+Envelope construction is connected; complete topology, deformation and fitted-shortcut
+workflows are not yet qualified. The existing addon is the numerical baseline.
 
 The inventory groups operations by computational responsibility, rather than listing
 every function, command alias or UI button. It includes numerical construction,
@@ -2961,3 +2962,21 @@ Eight of 576 curved-surface samples select the other incident triangle at a shar
 edge; both normals are spatially validated instead of claiming exact normal parity.
 Rendered geometry matches in `build/skin-040/ui/loop-parity.png`. This does not yet
 qualify annulus construction, seam stitching or anatomical skin.
+
+### Native annular topology patches (0.4.0 in progress)
+
+Ported addon Python annulus generation into owned native patches: direct interpolation,
+planar polar reconstruction, radial fallback, five projected rings, 24–96 columns,
+whole-patch orientation and inversion-based selection. Planar/radial low-pass fields
+retain 8/6 Fourier harmonics through the equivalent bounded direct sum. SciPy's pinned
+native assignment kernel retains minimum-cost pairing for ring symmetry; all work is
+serial on the coordinator worker. Reflected patch pairs reuse positive-side geometry
+and reversed winding while retaining target source identities. Source paths stay intact.
+
+Six addon controls exercise all three candidates on planar and curved proxy geometry.
+Coordinates agree within 1.21e-6 fixture units; selected methods, source mappings,
+connectivity and inversion counts match. Artificial reordered/coincident rings isolate
+fallback paths; they are not full-anatomy acceptance. Reflected-pair, malformed input,
+cancellation and owned-lifetime checks pass. Rendered overlays were inspected at
+`build/skin-040/ui/annulus-parity.png`; fixed Z limits avoid exaggerating Blender BVH
+float noise. Annular patches are not yet stitched into a public topology result.

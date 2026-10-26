@@ -55,6 +55,7 @@ Existing libigl supplies manifold edge-collapse traversal under its MPL-2.0 noti
 | PCG64 and bounded integer distribution | NumPy 1.26.4 | MIT, Melissa O'Neill, Robert Kern and NumPy Developers; native/vendor/numpy_random/pcg64.h and LICENSE.txt; adapter provenance in native/vendor/numpy_random/PROVENANCE.md |
 | Nuitka | 4.1.1 build/runtime support | Apache-2.0; https://nuitka.net/pages/overview.html |
 | bioimage-cpp MC33 subset | 492ff9b329cfa81af6781bc5b67b7c727eeb0445 | MIT with scikit-image BSD-3-Clause derived tables; full notices and hashes in native/vendor/bioimage-cpp |
+| SciPy rectangular linear assignment | 1.14.1, unchanged two-file kernel by PM Larsen | BSD-3-Clause; source notices/hashes under native/vendor/scipy_lsap; SCIPY-LICENSE.txt |
 
 Qt source archives for the pinned SDK are available at
 https://download.qt.io/online/qtsdkrepository/all_os/qt/qt6_6120_windows_line_endings_src/qt.qt6.6120/.

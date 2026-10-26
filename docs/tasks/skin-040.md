@@ -289,3 +289,16 @@ refinement, topology publication, persistent deformation, fitting/export and rel
 Before porting ownership, inspect addon `_scp_trees`: dictionary keys use SCP identity
 while captures can contain reflected instances; determine intended nearest-support
 behavior with a mirrored fixture rather than silently carrying or changing that policy.
+
+Ownership follow-up evidence: a compact addon diagnostic confirms reflected SCP
+captures overwrite original-side samples in `_scp_trees`. For a tissue sample beside
+original A at x=-2 (candidate bones A/B, B at x=-1), later mirrored captures at x=2/1
+make the addon choose B. The diagnostic uses a tissue sample at (-2,0,0.01) and retains
+all inputs in `build/skin-040/ownership-mirror-diagnostic.json`. This is an ownership
+assignment defect, not an observed skin geometry failure. Preserve instance identity
+when designing the port; qualify original/reflected candidate selection explicitly.
+
+Final fixed-snapshot rerun: **2,354 tests pass** (266.80 seconds, 3,199 warnings)
+in `build/skin-040-proxy-regression.log`. Ruff/format and configured mypy pass; native
+build/five CTests and selected native style checks pass. This checkpoint does not
+qualify complete 0.4.0 behavior, anatomy, desktop topology publication or packaging.

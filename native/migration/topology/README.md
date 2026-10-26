@@ -27,3 +27,12 @@ muscle/fat label. Bare Fiber sampling remains zero-radius. Deterministic ties an
 rejection of malformed boundary graphs are intentional differences from incidental
 Python iteration/exception behavior. Native result bundles own mesh and region/guide
 labels until copied into the shared application resource lifecycle.
+
+Proxy collapse adapts Blender 5.0.1 `bmesh_decimate_collapse.cc` and angle-normal
+calculation (Blender Authors, GPL-2.0-or-later) to owned arrays. libigl's existing
+MPL-2.0 topology traversal is serial; it does not introduce a worker pool. Blender
+metric thresholds/boundary weighting/flip rejection are retained, but edge identity
+and tie ordering differ. Qualification records surface errors rather than falsely
+requiring identical connectivity. Compact captured Blender controls live in
+`tests/fixtures/skin/proxy_decimation.json`; the comparison runner is
+`tools/check_skin_decimation.py`. Broader MC33 evidence remains in ignored build data.

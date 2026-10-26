@@ -23,5 +23,22 @@
     "adapters/topology/adaptive_refine.py": "88084ee28234f1cde54c9997b05e342d88261fe9b0e8f07fe5cc8e6c0cabceb0",
     "adapters/topology/refinement_runtime.py": "72a3785cc0e4fdde3e3d8a3ef32d36ce770f6287517486280bdcdf6ce235ee64",
     "adapters/topology/ownership_capture.py": "144df78fb8d21ede76e94f898f8e27947098407814ea4adb8dbf9aa8293fd741"
-  }
+  },
+  "proxy_collapse_reference": [
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/tools/bmesh_decimate_collapse.cc",
+      "sha256": "7640ac33a23cc45a40614719300f23c0b19c4d1da8a2429c06ab1ea802f4e235",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/intern/bmesh_mesh_normals.cc",
+      "sha256": "4ff61b95aa46f1973ef9d158d0b7b7cc40cf3e38ad0ff474001c371ded6e8953",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenlib/BLI_math_base.hh",
+      "sha256": "2d5728484e755c5eb51e6614b7e1e03c8c7b5dfdf55bd02a1ec3049f6ccff1cf",
+      "license": "GPL-2.0-or-later"
+    }
+  ]
 }

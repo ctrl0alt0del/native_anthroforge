@@ -343,3 +343,29 @@ passes after splitting the boundary traversal helper. Broad regression is next.
 Remaining topology: proxy decimation, loop guide patches, hole/transition assembly,
 full symmetry/backend orchestration and public coordinator/UI integration. Persistent
 reference/deformation, fitting, OBJ export and release qualification remain unfinished.
+
+### Proxy collapse checkpoint (in progress)
+
+The ownership/refinement full development gate passed: 2,371 tests, 3,199 warnings,
+249.58 seconds; native checks and dependency import/doctor checks passed. Log:
+`build/skin-040-ownership-refinement-gate.log`.
+
+Qualified a narrow native proxy decimator using Blender 5.0.1 face-plane quadrics,
+boundary weight 100, flat-region normal/edge cost, placement and face-flip rejection,
+with existing libigl managing topology. This runs serially on the owning worker and
+supports cancellation/memory limits. No Blender object/dependency runtime is included.
+Generic QSlim was compared and not selected: it differs more from Blender on these
+fixtures. The preserved source remains untouched; an unreachable target returns usable
+geometry for an explicit count warning. Malformed/nonmanifold collapse inputs fail.
+
+Six captured Blender controls include an open patch, sphere/ellipsoid and actual MC33
+cube/gap/contact envelopes (6,574–40,252 triangles). The three envelope P95 distances
+to Blender are below 2e-7 of source diagonal; curved symmetric meshes have different
+collapse ordering, with maximum sphere discrepancy 0.00656 diagonal at 75% reduction.
+This is not exact-connectivity parity. Rendered/inspected both fixture comparisons;
+artifact folder: `build/skin-040/decimation`. Fourteen focused checks pass. Native build
+and five CTests pass; selected style, Ruff/format and configured mypy (474 files) pass.
+The maintained background Blender capture reproduces the committed fixture exactly.
+
+The public topology workflow, closed guides, transitions/symmetry, reference deformation,
+fitting and export are still pending. This checkpoint does not qualify release 0.4.0.

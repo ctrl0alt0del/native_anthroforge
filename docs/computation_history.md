@@ -2919,3 +2919,23 @@ connectivity/provenance match, and proximity weights match exactly. The native s
 adaptive controls took roughly 0.2–1.6 ms versus addon 11–53 ms; these are local kernel
 measurements, not whole-app performance. Rendered/inspected matching compact geometry
 is at `build/skin-040/ui/refinement-parity.png`; full anatomy remains pending.
+
+### Native skin proxy collapse (0.4.0 in progress)
+
+The addon uses Blender Decimate before midpoint smoothing. A native owned adapter now
+retains its unweighted face-plane quadrics, boundary weight 100, 1e-8 optimization
+threshold, flat-region cost, float positions, interpolated normals and 0.01 face-flip
+guard. Existing libigl supplies manifold edge-collapse traversal, with serial callbacks
+and cancellation on the coordinator worker. No source geometry or attachment changes.
+The caller can inspect achieved triangle count; unsafe collapses never force a target.
+Preparation/queue storage is bounded and malformed collapse topology is rejected.
+
+Generic QSlim was tested rather than assumed equivalent: its area/regularization/cost
+rules produced larger discrepancies. Six background Blender 5.0.1 captures qualify
+the adapted policy. Open-patch geometry agrees within 2.2e-8 diagonal; MC33 cube/gap/
+contact envelopes have P95 error below 2e-7 diagonal. Different topology traversal and
+equal-cost ordering remain visible on curved symmetric controls (sphere maximum
+0.00656 diagonal at 75% reduction); this is recorded, not claimed as exact parity.
+Inspected both comparison images under `build/skin-040/decimation`. Local native
+envelope times were 21–145 ms including result preparation; not application timings.
+Complete remesher/guide integration and anatomical qualification remain pending.

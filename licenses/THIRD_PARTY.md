@@ -32,6 +32,12 @@ Initial generated-quad tessellation also adapts Blender 5.0.1's degenerate-diago
 test in `mesh_tessellate.cc` / `math_geom.cc`, attributed to NaN Holding BV and
 Blender Authors under GPL-2.0-or-later; the adaptation is GPL-3.0-or-later.
 
+Skin proxy smoothing and collapse adapt Blender 5.0.1 `MOD_smooth.cc`,
+`bmesh_decimate_collapse.cc` and angle-weighted normals (Blender Authors,
+GPL-2.0-or-later). Source URLs/hashes are recorded in
+`native/migration/topology/sources.json`; adapted sources ship in the source archive.
+Existing libigl supplies manifold edge-collapse traversal under its MPL-2.0 notices.
+
 | Component | Version/source | License and source |
 | --- | --- | --- |
 | CPython | 3.12.12 | PSF and bundled notices in CPython-LICENSE.txt; https://www.python.org/downloads/release/python-31212/ |

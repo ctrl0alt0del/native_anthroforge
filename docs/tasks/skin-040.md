@@ -113,10 +113,10 @@ App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated roo
 
 ## Next actions
 
-1. Finish foundation UI settings and current broad gate; corruption coverage now passes.
-2. Qualify executable topology/tetrahedral dependencies and build maintained native kernels.
-3. Finish native diagnostic bundles, contributor capture and coordinator/publication pipeline.
-4. Continue integrated topology, deformation, fitting, OBJ and full qualification per plan.
+1. Finish envelope contributor/painting controls and production-anatomy qualification. Centerline-specific coverage evidence remains distinct from triangle checks.
+2. Integrate qualified topology/tetrahedral dependencies and maintained native numerical preparation.
+3. Deliver durable reference/deformation, shortcut fitting and OBJ through shared API and desktop.
+4. Complete full lifecycle, profiler, geometry and portable-release qualification per plan.
 
 All three initial questions are answered. No automatic minimal-bone search or
 multi-shortcut rig composition is implied: preserve the existing configurable bone
@@ -141,3 +141,25 @@ Skin stage display was connected through existing staged scene rows with per-wor
 AUTO/Envelope/Topology/Final/Hidden selection; actual envelope viewport rendering still
 needs qualification. Centerline binding kinds are explicit; line-specific coverage and
 intersection diagnostics need separate evidence rather than inheriting triangle results.
+
+### Envelope presentation and diagnostic checkpoint
+
+The first full regression run found one profiler attribution regression from the earlier
+provisional tube adapter (2,297 other tests passed). Removed that now-unneeded adapter
+and restored the original display-only native boundary; the targeted profiler test and
+12 related tests now pass. A fresh broad run is in progress in the same current-tests log.
+Skin Issues now consume already-measured stage diagnostics, preserve accepted geometry,
+and clear with Undo; the integrated test passes. Hidden GPU rendering of cube + bare
+Fiber succeeds, with source/envelope/isolated captures under `build/skin-040/ui`.
+The low-resolution envelope visibly retains the known coarse source-control protrusions
+and open regions; these are reported and are not production anatomical acceptance.
+Offscreen UI display/hide and settings checks pass. Workspace display edits intentionally
+do not use document Undo; the initial display test was corrected to restore its workspace
+setting explicitly. Full topology/reference/deformation/fitting/export work remains open.
+
+Final check for this checkpoint: the broad rerun passes **2,299 tests** (183.95 s).
+A closed/reflected-centerline capture test added after that run's collection also passes
+in the focused suite. Ruff/format, mypy, native build/five CTests and selected native style
+checks pass. Cube, separated-cube and overlapping-cube addon controls remain exact in
+geometry/connectivity and all six original binding arrays. Hidden GPU and offscreen UI
+checks pass with the evidence limits above. No release version bump or main merge.

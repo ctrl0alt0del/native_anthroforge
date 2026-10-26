@@ -12,6 +12,7 @@ from PySide6.QtTest import QTest
 from shiboken6 import delete
 from ui_acceptance import click, find
 
+from anthroforge.application import skin_evaluation
 from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.qt_profiler import profiler_application
@@ -58,6 +59,34 @@ def navigation(controller, window):
     assert window.grabWindow().save(str(OUTPUT / "skin-settings.png"))
 
 
+def envelope(controller, window):
+    skin_evaluation.TARGET_RESOLUTION = 24
+    controller.run(
+        "import", dict(path=str(Path("examples/primitives/cube.obj").resolve()), units=1)
+    )
+    controller.session.wait()
+    controller.refresh()
+    controller.cameraRequested.emit([0, 0, 0, -18, 25, 0, 3], False)
+    click(window, "skinBuildEnvelope")
+    controller.session.wait()
+    controller.refresh()
+    QTest.qWait(500)
+    verify_skin_display(controller, window)
+
+
+def verify_skin_display(controller, window):
+    stage = controller.session.document.skin.envelope
+    assert stage.asset, controller.session.scheduler.errors
+    assert any(row["geometry_asset"] == stage.asset for row in controller.render_model.rows)
+    assert window.grabWindow().save(str(OUTPUT / "skin-envelope.png"))
+    controller.run("workspace.update", dict(skin_display="NONE"))
+    QTest.qWait(100)
+    assert not any(row["geometry_asset"] == stage.asset for row in controller.render_model.rows)
+    controller.run("workspace.update", dict(skin_display="AUTO"))
+    QTest.qWait(100)
+    assert any(row["geometry_asset"] == stage.asset for row in controller.render_model.rows)
+
+
 def exercise(application):
     controller, warnings = Controller(), []
     engine = create_engine(controller, warnings)
@@ -66,6 +95,7 @@ def exercise(application):
         window = engine.rootObjects()[0]
         QTest.qWait(100)
         navigation(controller, window)
+        envelope(controller, window)
         assert not warnings, warnings
     finally:
         controller.close()
@@ -82,7 +112,7 @@ def main():
         QFontDatabase.addApplicationFont("C:/Windows/Fonts/segoeui.ttf")
         application.setFont(QFont("Segoe UI"))
         exercise(application)
-    print("Skin settings, vertical tabs and undo passed offscreen; geometry not tested.")
+    print("Skin UI checks passed offscreen; GPU pixels checked separately.")
 
 
 if __name__ == "__main__":

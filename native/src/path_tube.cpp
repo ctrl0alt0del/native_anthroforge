@@ -1,4 +1,4 @@
-// Explicit world-radius tube construction; callers own physical or presentation policy.
+// Presentation-only tube geometry; never anatomical attachment or collision output.
 #include "path_internal.hpp"
 #include <numeric>
 
@@ -42,12 +42,9 @@ static std::shared_ptr<Mesh> path_tube(const Path& path,const M4& frame,double r
     return make_mesh(points,tube_faces(int(samples.size()),sides,path.closed),cancel);
 }
 }
-uint64_t af_path_tube(uint64_t handle,const double* matrix,double radius,int sides,uint64_t cancel) {
+uint64_t af_path_display_tube(uint64_t handle,const double* matrix,double radius,int sides,uint64_t cancel) {
     try {
         if(!matrix) throw std::runtime_error("Tube display needs a world transform.");
         return af::retain(af::path_tube(*af::path(handle),Eigen::Map<const af::M4>(matrix),radius,sides,cancel));
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
-}
-uint64_t af_path_display_tube(uint64_t handle,const double* matrix,double radius,int sides,uint64_t cancel) {
-    return af_path_tube(handle,matrix,radius,sides,cancel);
 }

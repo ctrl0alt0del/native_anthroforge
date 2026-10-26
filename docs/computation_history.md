@@ -2786,3 +2786,9 @@ Mesh-only field/gap/envelope regression tests continue to pass; focused checks a
 centerline-only extraction and segment binding. This is an intentional addon difference,
 not claimed bevel-mesh parity. Production anatomy and downstream reference/deformation
 qualification remain pending as part of the unfinished 0.4.0 delivery.
+
+The centerline AABB stores only its segment endpoints, not a second copy of all scene
+mesh vertices. Skin Issues reuse captured diagnostic metadata rather than repeating
+geometry computation. The provisional general tube wrapper was removed after the full
+regression suite exposed a changed profiler operation name; the established display-only
+native operation and attribution are restored, with its regression test passing.

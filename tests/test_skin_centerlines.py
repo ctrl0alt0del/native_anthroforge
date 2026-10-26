@@ -8,7 +8,9 @@ from anthroforge.application import skin_capture
 from anthroforge.core.fiber_presentation import FiberPresentation
 from anthroforge.native import skin_fields, skin_gaps
 from anthroforge.native.mesh import GeometryEngine
+from anthroforge.native.skin_capture import capture_sources
 from tests.test_fiber_creation import bind, scene
+from tests.test_fiber_presentation import line
 
 
 def line_source(engine):
@@ -71,3 +73,15 @@ def test_workspace_radius_cannot_change_skin_capture(session):
     second = skin_capture.capture(session.engine, changed, session.resources)
     for key in ("vertices", "triangles", "segments", "policies"):
         np.testing.assert_array_equal(getattr(first.geometry, key), getattr(second.geometry, key))
+
+
+def test_closed_centerline_capture_preserves_closure_and_reflected_positions(session):
+    path = line(session, True)
+    matrix = np.eye(4)
+    matrix[0, 0], matrix[2, 2], matrix[0, 3] = -2, 3, 4
+    captured = capture_sources(session.engine, [path], [1], [matrix.ravel()], [[0, 1, 0]])
+    assert captured.triangles.shape == (0, 3)
+    np.testing.assert_array_equal(captured.segments, [[0, 1], [1, 2], [2, 0]])
+    expected = path.array()[:, :3] @ matrix[:3, :3].T + matrix[:3, 3]
+    np.testing.assert_allclose(captured.vertices, expected)
+    np.testing.assert_array_equal(captured.segment_owners, 0)

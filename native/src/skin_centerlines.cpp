@@ -1,4 +1,5 @@
 #include "skin_centerlines.hpp"
+#include <climits>
 
 namespace af::skin {
 static void leaf(const Centerlines& lines,int edge,const V3& p,LineHit& hit) {
@@ -24,28 +25,33 @@ LineHit Centerlines::nearest(const V3& point,double reach,const std::vector<int>
     if(!owners.empty()) query(*this,index.tree,point,excluded,result);
     return result;
 }
-static void elements(Centerlines& lines,const int64_t* edges,const int* owners,int count,int sources,uint64_t cancel) {
+static void endpoint(Centerlines& lines,const double* xyz,int vertices,int64_t vertex,int position) {
+    if(vertex<0||vertex>=vertices) throw std::runtime_error("Invalid skin segment index.");
+    const V3 value(xyz+3*vertex);
+    if(!value.allFinite()) throw std::runtime_error("Nonfinite skin centerline position.");
+    lines.index.vertices.row(position)=value;
+}
+static void elements(Centerlines& lines,const double* xyz,int vertices,const int64_t* edges,
+                     const int* owners,int count,int sources,uint64_t cancel) {
     std::vector<int> totals(sources); lines.index.edges.resize(count,2);
+    lines.index.vertices.resize(2LL*count,3);
     for(int i=0;i<count;++i) {
         if(i%4096==0) check_cancel(cancel);
         if(owners[i]<0||owners[i]>=sources) throw std::runtime_error("Invalid skin centerline owner.");
         lines.owners.push_back(owners[i]); lines.locals.push_back(totals[owners[i]]++);
         for(int j=0;j<2;++j) {
-            const auto vertex=edges[2LL*i+j];
-            if(vertex<0||vertex>=lines.index.vertices.rows()) throw std::runtime_error("Invalid skin segment index.");
-            lines.index.edges(i,j)=int(vertex);
+            endpoint(lines,xyz,vertices,edges[2LL*i+j],2*i+j);
+            lines.index.edges(i,j)=2*i+j;
         }
     }
 }
 std::shared_ptr<Centerlines> centerlines(const double* xyz,int vertices,const int64_t* edges,
     const int* owners,int count,int sources,uint64_t cancel) {
-    if(!xyz||vertices<2||count<0||sources<1||(count&&(!edges||!owners)))
+    if(!xyz||vertices<2||count<0||count>INT_MAX/2||sources<1||(count&&(!edges||!owners)))
         throw std::runtime_error("Missing skin centerline buffers.");
     if(!count) { check_cancel(cancel); return nullptr; }
     auto result=std::make_shared<Centerlines>();
-    result->index.vertices=Eigen::Map<const Vertices>(xyz,vertices,3);
-    if(!result->index.vertices.allFinite()) throw std::runtime_error("Nonfinite skin centerline position.");
-    elements(*result,edges,owners,count,sources,cancel);
+    elements(*result,xyz,vertices,edges,owners,count,sources,cancel);
     if(count) result->index.tree.init(result->index.vertices,result->index.edges);
     check_cancel(cancel); return result;
 }

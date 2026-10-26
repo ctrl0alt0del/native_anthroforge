@@ -3195,3 +3195,14 @@ as bare inputs for the comparison. In the unchanged saved 96-muscle assembly, al
 Fibers are consumed by accepted tissues and remain excluded from separate skin capture.
 These measurements exclude publication and persistent deformation; machine background load
 was not controlled. Raw trials, a separate profiler report and the addon check are retained.
+
+Final qualification: 2,502 regression tests and all five native CTests pass. Offscreen
+radius editing/undo and matched-build hidden GPU source/envelope/isolation views pass;
+actual images were inspected. The complete 600-second diagnostic profiler capture has
+zero truncated events; profiling-on samples are excluded from the timing medians.
+The simple cube/Fiber fixture at grid 24 exposes an unresolved-gap error reproduced
+verbatim by the original addon on identical inputs. Grid 64 builds and displays it;
+production grid 220 was blocked by the contemporaneous available-memory budget.
+No gap rules, tolerances, production resolution or resource policy were changed to
+make these checks pass. This retained source limitation and low-memory test restriction
+remain explicit; complete 0.4.0 deformation and release qualification are still pending.

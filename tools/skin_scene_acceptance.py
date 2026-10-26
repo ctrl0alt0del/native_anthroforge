@@ -4,6 +4,7 @@ from pathlib import Path
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuickControls2 import QQuickStyle
+from skin_topology_render import displayed
 from tissue_scene_acceptance import fiber, frames, settle
 
 from anthroforge.application import skin_evaluation
@@ -15,30 +16,39 @@ OUTPUT = Path("build/skin-040/ui")
 
 
 def setup(controller):
-    skin_evaluation.TARGET_RESOLUTION = 24
+    # Grid 24 cannot resolve this thin-Fiber gap in either the addon or standalone.
+    skin_evaluation.TARGET_RESOLUTION = 64
     path = str(Path("examples/primitives/cube.obj").resolve())
     bone = controller.run("import", dict(path=path, units=1.0))["entity_id"]
     settle(controller)
     fiber(controller, bone, 0.2)
     controller.select(bone)
-    controller.frameSelection()
+    controller.cameraRequested.emit([0, 0, 0, -18, 25, 0, 3], False)
     return bone
 
 
 def exercise(controller, renderer, app):
     bone = setup(controller)
-    assert frames(controller, renderer, app).save(str(OUTPUT / "skin-sources-gpu.png"))
+    asset = controller.session.document.object(bone).result.asset
+    snapshot(controller, renderer, app, asset, "skin-sources-gpu.png")
     painting(controller, renderer, app, bone)
     controller.run("skin.envelope.build", {})
     settle(controller)
     stage = controller.session.document.skin.envelope
     assert stage.asset, controller.session.scheduler.errors
-    assert frames(controller, renderer, app).save(str(OUTPUT / "skin-envelope-gpu.png"))
+    snapshot(controller, renderer, app, stage.asset, "skin-envelope-gpu.png")
     controller.run("workspace.update", dict(hidden=[bone]))
     settle(controller)
-    assert frames(controller, renderer, app).save(str(OUTPUT / "skin-isolated-gpu.png"))
-    assert any(row["geometry_asset"] == stage.asset for row in controller.render_model.rows)
+    snapshot(controller, renderer, app, stage.asset, "skin-isolated-gpu.png")
     assert not renderer.window.isVisible()
+
+
+def snapshot(controller, renderer, app, asset, filename):
+    image = displayed(controller, renderer, app, asset)
+    assert image.pixelColor(640, 560).lightness() > 80, (
+        "Fixture geometry is not visible; verify viewport and numerical DLLs use the same build."
+    )
+    assert image.save(str(OUTPUT / filename))
 
 
 def painting(controller, renderer, app, bone):

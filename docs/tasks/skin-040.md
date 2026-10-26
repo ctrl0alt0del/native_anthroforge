@@ -98,7 +98,7 @@ workspace display thickness. Source/mirror pairs share the source tube resource.
 
 Six Blender controls (straight, bent, closed, duplicate-point and reversal cases) match
 coordinates within 1e-8 metres and exact quad/triangle order. Focused settings, mirror,
-persistence and native checks pass; final static/UI/broader checks remain pending.
+persistence and native checks pass; final static/UI/broader evidence follows below.
 The first four-Fiber-only envelope timing was withdrawn after visual inspection: without
 supporting SCPs the output has boundary planes and is not representative skin. The full-
 skeleton attempt also failed under the benchmark's default 1 GiB assembly budget; it is
@@ -113,7 +113,8 @@ indices, five exact area matches and a 1.2e-7 relative closed-loop difference. O
 radius editing/undo passes. The first broad run passed 2,499 tests and caught two topology
 guide regressions: those callers still expected path handles from the now-mesh capture.
 Separated accepted path capture from physical surfaces for loops and FLOW; focused tests
-now pass, including radius-independent FLOW. Full rerun remains pending.
+now pass, including radius-independent FLOW. The final full rerun passes **2,502 tests**
+(3,199 existing Qt deprecation warnings, 268.94 seconds).
 
 Corrected performance evidence: `build/skin-040/fiber-thickness-forearm/` contains raw
 trials, NPZ output, paired render, addon precision check and a separate `.afprofile.zip`.
@@ -130,10 +131,27 @@ the saved production assembly has 96 accepted tissues covering all 326 Fibers, s
 are bare contributors there. Do not extrapolate the benchmark to full-assembly latency.
 Timing includes no UI/publication/reference solve; background machine load was not
 controlled. Separate profiled trials are not used for the medians. The initial profiler
-capture exceeded its default 120-second window and evicted the long span; repeat with
-the existing configurable 600-second capture window before claiming complete trace evidence.
+capture exceeded its default 120-second window and evicted the long span. A completed
+repeat uses the existing configurable 600-second window, retains both envelope calls and
+reports **zero truncated events**. The default application recording window is unchanged.
 Ruff/format, mypy (494 files), 5/5 CTests and offscreen metre/mm radius controls pass.
-The corrected full regression rerun is in progress.
+The matched-build hidden GPU check passes at diagnostic resolution 64; actual source,
+envelope and isolated images were inspected. The fixture's original grid-24 run fails
+with `Unresolved gap precision`; the **unmodified addon reproduces the exact same error**
+on these inputs, including source triangle IDs and clearance. Production-resolution 220
+could not run this cube fixture under the available-memory budget (~1.5 GB RAM free,
+~540 MB worker allocation). Neither failure was bypassed through a production change.
+Logs: `build/skin-040/fiber-hidden-gpu{,-addon,-production,-matched}.log` and addon JSON.
+The source grid-24 error remains a known algorithm limitation, not a thin-bevel parity defect.
+
+Validation setup correction: a numerical DLL override alone does not redirect the Qt
+viewport's build directory. Loading C: numerical and E: viewport DLLs produced empty
+geometry with apparently active model rows. Rerunning with both using the C: build
+renders the actual geometry. The maintained scene check now waits for displayed assets
+and asserts a visible fixture pixel; a log saying it rendered is insufficient evidence.
+For this temporary build, set `runtime.build_directory` to the C: build **before importing**
+`skin_scene_acceptance`, alongside the numerical-library override. No physical desktop
+interaction or complete packaged-release acceptance is claimed.
 This is an incomplete 0.4.0 checkpoint; no release/version bump/main merge is authorized
 by these partial checks. Historical centerline notes below describe superseded checkpoints.
 

@@ -2752,3 +2752,25 @@ from clean results; findings do not silently reject otherwise usable geometry. C
 separated-cube and overlapping-cube controls also match all six source-binding arrays
 exactly. Eight envelope/architecture tests pass. These checks are worker work; complete
 application publication and anatomical qualification remain pending.
+
+### CH-097 — document skin capture and envelope task (0.4.0 in progress; R04)
+
+Replace Blender object capture with role-aware accepted source leases and one batched native
+world transform/connectivity assembly. C++ retains source-local triangle ordering, reverses
+reflected winding and converts gap ratios using the entire capture bounds. Selection and
+workspace display do not determine contributors. Valid consuming tissues suppress their fibers;
+each reflected instance remains a distinct source. Per-fiber skin radius is an explicit
+physical setting, separate from the app's per-workspace display radius; 1 mm is the initial
+implementation assumption pending the user's preference reply. Shared native tube construction
+is unchanged, but Blender tube parity remains to be qualified.
+
+The envelope command uses the existing coordinator, dispatch-time owned inputs, complete
+read-set validation, retained source/binding buffers and initiating undo history. Low-resolution
+build/undo/redo/save/read and failed rebuild retention tests pass. Native transform tests cover
+reflection, source ownership, relative gap scaling, invalid frames and cancellation. No claim
+of completed skin workflow, anatomical quality or release performance follows from these tests.
+
+Executable dependency probes: Instant Meshes 1.0.0's array API triangulates its generated quads
+when reading them back. Retain the addon's file API; the cube probe preserves 246 quad faces.
+PyTetWild 0.4.2 returns 2,844 tetrahedra using one thread; isolate its temporary file writes.
+These counts qualify callable integration only, not production skin or deformation quality.

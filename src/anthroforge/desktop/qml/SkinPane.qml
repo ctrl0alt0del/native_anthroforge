@@ -29,11 +29,7 @@ UiScrollView {
                 onEdited: value=>pane.change("envelope_settings",modelData.key,value/100)
             }
         }
-        Label { text:"Topology"; color:Theme.text; font.bold:true; Layout.topMargin:Theme.gap }
-        UiCombo { objectName:"skinBackend"; Layout.fillWidth:true; enumLabels:true; model:["QUADWILD","INSTANT"]; currentIndex:model.indexOf(pane.state.topology_settings?.backend); onActivated:pane.change("topology_settings","backend",currentText) }
-        NumericSetting { objectName:"skinQuadCount"; label:"Target quads"; minimum:1000; maximum:500000; decimals:0; value:pane.state.topology_settings?.target_quads || 8100; onEdited:value=>pane.change("topology_settings","target_quads",value) }
-        UiCombo { objectName:"skinRefinement"; Layout.fillWidth:true; enumLabels:true; model:["NONE","MUSCLE_PROXIMITY"]; currentIndex:model.indexOf(pane.state.topology_settings?.refinement); onActivated:pane.change("topology_settings","refinement",currentText) }
-        Label { text:"Deformation"; color:Theme.text; font.bold:true; Layout.topMargin:Theme.gap }
-        UiCombo { objectName:"skinDeformation"; Layout.fillWidth:true; enumLabels:true; model:["LE","FAST"]; currentIndex:model.indexOf(pane.state.deformation_settings?.method); onActivated:pane.change("deformation_settings","method",currentText) }
+        SkinTopologySettings { settings:pane.state.topology_settings; onEdited:(key,value)=>pane.change("topology_settings",key,value) }
+        SkinDeformationSettings { settings:pane.state.deformation_settings; onEdited:(key,value)=>pane.change("deformation_settings",key,value) }
     }
 }

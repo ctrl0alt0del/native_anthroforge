@@ -239,11 +239,23 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "project_save": SaveProjectTaskScheduler(),
         "construction": ConstructionTaskScheduler(),
         **shortcut_schedulers(),
-        **curve_schedulers(),
-        **anchor_schedulers(),
+        **construction_schedulers(),
         "control_pose": ControlPoseTaskScheduler(),
         **inspection_schedulers(),
     }
+
+
+def construction_schedulers() -> dict[str, TaskScheduler]:
+    return {
+        **curve_schedulers(),
+        **anchor_schedulers(),
+        "skin_envelope": SkinEnvelopeTaskScheduler(),
+    }
+
+
+class SkinEnvelopeTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule("worker", reason="Native tiled skin fields, envelope and source bindings")
 
 
 def shortcut_schedulers() -> dict[str, TaskScheduler]:

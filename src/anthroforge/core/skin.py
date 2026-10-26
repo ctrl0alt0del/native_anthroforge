@@ -85,6 +85,7 @@ class SkinContributor:
     density_mode: str = "INHERIT"
     target_quads: int = 1000
     flow: bool = False
+    fiber_radius: float = 0.001
 
     def __post_init__(self) -> None:
         if not self.owner:
@@ -96,6 +97,7 @@ class SkinContributor:
         bounded("gap limit", self.gap_limit_ratio, 0, 1)
         bounded("gap strength", self.gap_strength, 0, 1)
         integer("subtree target quads", self.target_quads, 100, 500000)
+        bounded("fiber skin radius", self.fiber_radius, 0, 1000)
 
 
 @dataclass(frozen=True, slots=True)

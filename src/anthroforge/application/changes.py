@@ -18,6 +18,7 @@ DOCUMENT_FIELDS = (
     "formula_results",
     "mirror_rules",
     "shared_mirror_targets",
+    "skin",
 )
 
 

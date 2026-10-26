@@ -20,14 +20,25 @@ from anthroforge.desktop.runtime import native_runtime
 OUTPUT = Path("build/skin-040/ui").resolve()
 
 
-def edit(window):
-    field = find(window, "skin_gap_limit_ratioValue")
+def edit_field(window, name, text):
+    field = find(window, name + "Value")
     click(window, field.objectName())
     QTest.keyClick(window, Qt.Key.Key_A, Qt.KeyboardModifier.ControlModifier)
-    for character in "0.75":
+    for character in text:
         QTest.keyClick(window, Qt.Key(ord(character)))
     QTest.keyClick(window, Qt.Key.Key_Return)
     QTest.qWait(100)
+
+
+def integer_settings(controller, window):
+    window.resize(1050, 1300)
+    QTest.qWait(100)
+    edit_field(window, "skinQuadCount", "9000")
+    assert controller.session.document.skin.topology_settings.target_quads == 9000
+    edit_field(window, "skinProxyResolution", "32")
+    assert controller.session.document.skin.deformation_settings.proxy_resolution == 32
+    controller.run("undo", {})
+    controller.run("undo", {})
 
 
 def navigation(controller, window):
@@ -37,10 +48,11 @@ def navigation(controller, window):
         QTest.qWait(30)
     assert controller.session.document is before
     assert find(window, "skinPane").isVisible()
-    edit(window)
+    edit_field(window, "skin_gap_limit_ratio", "0.75")
     assert controller.session.document.skin.envelope_settings.gap_limit_ratio == 0.0075
     controller.run("undo", {})
     assert controller.session.document.skin == before.skin
+    integer_settings(controller, window)
     window.resize(1050, 680)
     QTest.qWait(150)
     assert window.grabWindow().save(str(OUTPUT / "skin-settings.png"))

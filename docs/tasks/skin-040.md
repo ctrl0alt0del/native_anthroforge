@@ -88,6 +88,25 @@ findings. Eight envelope/architecture tests pass; mypy (442 files), Ruff and for
 The three source controls also match all six binding arrays exactly, including retained
 source/triangle identities, barycentrics, weights, offsets and support. Contributor capture,
 coordinator/publication and complete UI remain pending. No production skin acceptance.
+Next integrated checkpoint: batched C++ contributor transforms/assembly, reflected winding,
+source indices and absolute gap distances; source-selection policy suppresses fibers represented
+by accepted tissue without consulting viewport visibility. Sixteen foundation/capture tests
+passed. Instant Meshes file API produces 246 actual quads on the dependency cube; its array
+API silently triangulates on readback and is not suitable here. PyTetWild produces 2,844 tets
+with one thread. These are executable dependency probes, not anatomical qualification.
+
+Envelope build now has a shared command (`skin.envelope.build`), native worker task, dispatch
+observations, owned binding/source arrays, coherent undo, and persistence. Three integrated
+job tests pass at resolution 24; production default remains 220. The latest broad run before
+this job integration passed 2,286 tests (175 seconds). Topology, final deformation, fitting,
+OBJ, generation viewport display and complete Issues integration remain unfinished.
+
+Skin settings UI now includes symmetry plane, proxy resolution, constraint strength and FAST
+handles. Offscreen decimal/integer edits, vertical navigation and Undo pass. The radius
+question is pending: a separate physical `fiber_radius` defaults to 1 mm while workspace
+display radius stays independent (announced implementation assumption, not a user answer).
+This capture uses the existing native tube constructor; anatomical/Blender tube parity is
+not yet qualified. Preserve this distinction in later acceptance.
 App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated root
 `__init__.py` is preserved. Source `.blend` files remain untouched.
 

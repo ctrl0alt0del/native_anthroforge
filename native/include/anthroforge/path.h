@@ -51,6 +51,8 @@ AF_API int af_path_chunk_count(uint64_t handle);
  * Returns an ordinary owned mesh with prepared render buffers and picking tree. */
 AF_API uint64_t af_path_display_tube(uint64_t handle,const double* matrix,
     double radius,int sides,uint64_t cancel);
+AF_API uint64_t af_path_tube(uint64_t handle,const double* matrix,
+    double radius,int sides,uint64_t cancel);
 /* One nearest segment hit per path: input index, ray distance, segment, XYZ. */
 AF_API int af_paths_pick(int count, const uint64_t* paths, const double* matrices,
     const double* origin, const double* direction, double radius, double* output);

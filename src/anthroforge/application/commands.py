@@ -47,6 +47,7 @@ from . import (
     segment_operations,
     shortcut_operations,
     shrinkwrap_operations,
+    skin_jobs,
     skin_operations,
     snap_tasks,
     surface_branch_operations,
@@ -76,6 +77,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "skin.envelope.build": skin_jobs.build_envelope,
     "skin.configure": skin_operations.configure,
     "skin.contributor.configure": skin_operations.contributor,
     "mirror.loop.create": symmetric_paths.create,

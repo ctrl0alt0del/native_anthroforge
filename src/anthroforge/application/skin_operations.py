@@ -19,11 +19,18 @@ def configure(session: "Session", section: str, values: dict[str, Any]) -> None:
     if section not in SECTIONS:
         raise ValueError("Unknown skin settings section.")
     skin = session.document.skin
-    settings = replace(getattr(skin, section), **values)
+    settings = replace(getattr(skin, section), **setting_values(values))
     if settings == getattr(skin, section):
         return
     rebuild = section != "deformation_settings" or bool(set(values) - {"method"})
     session.replace_document(skin=invalidate(skin, rebuild, **{section: settings}))
+
+
+def setting_values(values: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: tuple(value) if key in ("plane_origin", "plane_normal") else value
+        for key, value in values.items()
+    }
 
 
 def invalidate(skin: Skin, rebuild: bool, **changes: Any) -> Skin:
@@ -56,8 +63,8 @@ def require_contributor(session: "Session", owner: str, values: dict[str, Any]) 
         raise ValueError("Contributor identity and painted resources use dedicated operations.")
     if owner in session.document.index.entities:
         session.editable(owner)
-        if "flow" in values:
-            raise ValueError("FLOW guides require a Fiber.")
+        if {"flow", "fiber_radius"} & values.keys():
+            raise ValueError("FLOW guides and fiber radius require a Fiber.")
         return
     item = object_operations.editable(session, owner)
     require_construction_settings(item, values)
@@ -66,10 +73,10 @@ def require_contributor(session: "Session", owner: str, values: dict[str, Any]) 
 def require_construction_settings(item: Any, values: dict[str, Any]) -> None:
     if not isinstance(item, (Fiber, TissueVCP)):
         raise ValueError("Skin contributors must be SCPs, tissues or fibers.")
-    if set(values) - {"gap_mode", "gap_limit_ratio", "gap_strength", "flow"}:
+    if set(values) - {"gap_mode", "gap_limit_ratio", "gap_strength", "flow", "fiber_radius"}:
         raise ValueError("Collagen and subtree density require an SCP.")
-    if "flow" in values and not isinstance(item, Fiber):
-        raise ValueError("FLOW guides require a Fiber.")
+    if {"flow", "fiber_radius"} & values.keys() and not isinstance(item, Fiber):
+        raise ValueError("FLOW guides and fiber radius require a Fiber.")
 
 
 def inspect(session: "Session") -> dict[str, Any]:

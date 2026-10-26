@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 namespace af::skin {
@@ -13,7 +14,8 @@ struct Grid {
     int resolution=0;
     uint64_t count=0,cancel=0;
 };
-struct Fields { Grid grid; std::array<Values,4> values; };
+struct Fields { Grid grid; std::array<double,4> ratios{}; std::array<Values,4> values; };
+std::shared_ptr<const Fields> get_fields(uint64_t handle);
 struct Source {
     const double* vertices; int count; const int64_t* faces; int triangles;
     const uint8_t* skeletal; const double* collagen;

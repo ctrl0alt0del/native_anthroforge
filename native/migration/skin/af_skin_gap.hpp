@@ -12,7 +12,8 @@ struct GapScene {
     std::vector<double> limits, strengths;
     std::vector<double> normal_sign;
     std::vector<bool> skeletal;
-    std::atomic<int> cancelled{0},stage{0},done{0},total{0};
+    ::af::skin::KernelCancellation cancelled;
+    std::atomic<int> stage{0},done{0},total{0};
     std::string error;
 };
 inline Hit face_hit(const TriangleSnapshot& mesh, Vec p, int index) {

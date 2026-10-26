@@ -5,7 +5,7 @@ from typing import Any
 
 import numpy as np
 
-from .mesh import INT64, D, GeometryEngine, U, pointer
+from .mesh import INT64, D, GeometryEngine, Mesh, U, pointer
 from .skin_fields import INT
 
 
@@ -13,6 +13,8 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_skin_scene_create", [D, c.c_int, INT64, c.c_int, INT, c.c_int, D, U], U)
     engine.bind("af_skin_scene_sample", [U, D, c.c_int, c.c_double, D, U])
     engine.bind("af_skin_scene_destroy", [U], None)
+    engine.bind("af_skin_envelope_mesh", [U, U, U, U], U)
+    engine.bind("af_skin_scene_progress", [U, INT])
 
 
 class Scene:
@@ -39,6 +41,18 @@ class Scene:
             )
         )
         return output
+
+    def envelope(self, fields: Any, budget: int = 1024**3, cancel: int = 0) -> Mesh:
+        handle = self.engine.library.af_skin_envelope_mesh(
+            fields.handle, self.handle, budget, cancel
+        )
+        self.engine.check(not handle)
+        return Mesh(self.engine, int(handle))
+
+    def progress(self) -> tuple[int, ...]:
+        values = (c.c_int * 3)()
+        self.engine.check(self.engine.library.af_skin_scene_progress(self.handle, values))
+        return tuple(values)
 
 
 def buffers(vertices: Any, faces: Any, owners: Any, policies: Any) -> tuple[Any, ...]:

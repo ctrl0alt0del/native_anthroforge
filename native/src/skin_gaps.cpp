@@ -1,20 +1,18 @@
-#include "skin_kernel.hpp"
-#include "mesh_internal.hpp"
+#include "skin_gap_internal.hpp"
 #include "anthroforge/skin_gaps.h"
 
 namespace af::skin {
-namespace kernel=af::routing::kernel;
-using Scene=kernel::af_skin::GapScene;
 static std::mutex mutex;
-static std::unordered_map<uint64_t,std::shared_ptr<Scene>> scenes;
+static std::unordered_map<uint64_t,std::shared_ptr<SceneRecord>> scenes;
 static uint64_t next_scene=1;
 static uint64_t retain(void* raw) {
     if(!raw) throw std::runtime_error("Cannot prepare skin sources: invalid geometry, policies or allocation.");
-    auto owned=std::shared_ptr<Scene>(static_cast<Scene*>(raw));
+    std::unique_ptr<Scene> input(static_cast<Scene*>(raw));
+    auto owned=std::make_shared<SceneRecord>(); owned->value=std::move(input);
     std::lock_guard<std::mutex> lock(mutex); const auto handle=next_scene++;
     scenes.emplace(handle,std::move(owned)); return handle;
 }
-static std::shared_ptr<Scene> scene(uint64_t handle) {
+std::shared_ptr<SceneRecord> get_scene(uint64_t handle) {
     std::lock_guard<std::mutex> lock(mutex); const auto found=scenes.find(handle);
     if(found==scenes.end()) throw std::runtime_error("Unknown skin source scene.");
     return found->second;
@@ -42,8 +40,15 @@ uint64_t af_skin_scene_create(const double* xyz,int vertices,const int64_t* face
 }
 int af_skin_scene_sample(uint64_t handle,const double* points,int count,double reach,double* output,uint64_t cancel) {
     try {
-        const auto source=af::skin::scene(handle);
-        af::skin::sample(*source,points,count,reach,output,cancel); return 0;
+        const af::skin::SceneAccess source(handle,cancel);
+        af::skin::sample(source.value,points,count,reach,output,cancel); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 void af_skin_scene_destroy(uint64_t handle) { af::skin::release(handle); }
+int af_skin_scene_progress(uint64_t handle,int* values) {
+    try {
+        if(!values) throw std::runtime_error("Missing skin progress buffer.");
+        const auto source=af::skin::get_scene(handle);
+        return af::routing::kernel::af_skin_gap_progress(source->value.get(),values);
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}

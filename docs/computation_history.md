@@ -2722,3 +2722,19 @@ source comparisons; committed `tests/test_skin_meshing.py` covers binary/ternary
 zero degeneracies and full 33-cubed random tiles. Both licenses are retained. Seventeen
 focused tests and five CTests pass. Tile stitching, source support, smoothing and final
 binding are still pending; no complete envelope or production-shape acceptance claimed.
+
+### CH-096 — native protected envelope assembly (0.4.0 in progress; R04)
+
+Move protected-grid selection, tile iteration, five-decimal lattice stitching, source
+component filtering and mesh assembly from addon Python orchestration into C++. Retain
+the maintained tile/gap and eight-iteration constrained Taubin kernels, float32 publication
+rounding and outward orientation. A scoped native cancellation bridge replaces the addon's
+polling worker; each call owns its token lifetime and source-scene access is serialized.
+
+Cube, separated-cubes and overlapping-cubes comparisons against the addon produce exactly
+the same positions and connectivity (11,703/23,180; 20,277/40,252; 3,356/6,574 vertices/faces).
+`tools/check_skin_envelope.py` reproduces the comparisons. Actual paired renders were
+inspected: coarse-grid protrusions are present on both sides. These are preserved source
+behavior, not accepted production skin quality. The anatomical finger fixture remains
+under evaluation. Tests exercise running cancellation, retry, memory rejection and intact
+source queries. Binding/quality bundle publication and application integration are pending.

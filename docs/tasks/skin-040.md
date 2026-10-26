@@ -69,6 +69,16 @@ in vertices and faces, including binary/ternary cubes and 33-cubed random tiles.
 subset pinned with both licenses under `native/vendor/bioimage-cpp`. Current native and
 adapter checks: five CTests and 17 focused Python tests pass. Reconstruction/assembly,
 smoothing/binding and application task integration are not connected yet.
+Native reconstruction now connects the field and gap kernels through protected-grid
+preparation, bounded tiled extraction, native stitching, support filtering and eight
+constrained Taubin iterations. Cube, separated-cubes and overlapping-cubes source controls
+match vertices/connectivity exactly. `build/skin-040/envelope-review.png` visually inspected:
+coarse-fixture protrusions occur in both addon and port, so parity is not shape acceptance.
+Running cancellation inside native tile preparation passes and does not poison reuse.
+The five-finger capture comparison is still running as a background source-control job;
+check `build/skin-040-digits-parity.log` and tool process before restarting it. Its command
+is `check_skin_envelope.py <addon> <digits_blend.capture.npz> Thumb,Index,Middle,Ring,Little build/skin-040/digits`.
+Binding/diagnostic bundles, contributor capture, coordinator/publication and UI remain pending.
 App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated root
 `__init__.py` is preserved. Source `.blend` files remain untouched.
 

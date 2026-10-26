@@ -15,10 +15,11 @@ static void blend(Fields& fields) {
 }
 Fields prepare(const Source& source,const double* settings,int resolution,uint64_t budget,uint64_t cancel) {
     Fields result; result.grid=grid(source,settings,resolution,budget,cancel);
+    std::copy(settings,settings+4,result.ratios.begin());
     const auto& g=result.grid; const auto sampled=raster(g,source);
     result.values[0]=exterior(g,sampled.all,g.length*4.75769634425678/220,g.length*settings[0]);
     result.values[1]=exterior(g,sampled.skeletal,g.length*9.51539268851356/220,g.length*(settings[0]+settings[1]));
     result.values[2]=collagen(g,sampled.seeds,g.length*settings[2],g.length*settings[3]);
-    blend(result); return result;
+    blend(result); result.grid.cancel=0; return result;
 }
 }

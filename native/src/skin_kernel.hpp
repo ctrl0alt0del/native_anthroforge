@@ -4,7 +4,16 @@
 #include <string>
 #include "routing_kernel.hpp"
 
-// Unchanged pinned addon kernels. Legacy exports are translation-unit local.
+namespace af::skin {
+struct KernelCancellation {
+    std::atomic<int> local{0};
+    std::atomic<bool>* external=nullptr;
+    operator bool() const { return local.load()!=0||(external&&external->load()); }
+    KernelCancellation& operator=(int value) { local.store(value); return *this; }
+};
+}
+
+// Pinned addon kernels; cancellation bridge is documented in migration/skin/README.md.
 #if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunknown-pragmas"

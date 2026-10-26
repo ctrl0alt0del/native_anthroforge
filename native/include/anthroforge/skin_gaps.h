@@ -8,6 +8,8 @@ AF_API uint64_t af_skin_scene_create(const double* xyz,int vertices,const int64_
     const int* owners,int sources,const double* policies,uint64_t cancel);
 AF_API int af_skin_scene_sample(uint64_t scene,const double* points,int count,double reach,double* output,uint64_t cancel);
 AF_API void af_skin_scene_destroy(uint64_t scene);
+AF_API int af_skin_scene_progress(uint64_t scene,int* values);
+AF_API uint64_t af_skin_envelope_mesh(uint64_t fields,uint64_t scene,uint64_t budget,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

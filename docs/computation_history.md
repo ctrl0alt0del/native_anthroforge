@@ -2683,9 +2683,26 @@ No skin generator or numerical replacement is connected in this checkpoint.
 Evidence: 32 targeted foundation/architecture/workbench/legacy-loading tests pass; Ruff,
 format and mypy pass. Offscreen navigation, decimal editing and Undo pass. First full
 suite yielded 2,256 passes and one obsolete schema expectation (7 was previously invalid),
-corrected to 8; rerun pending. Source baseline separately passes 6 fitting, 21 deformation,
+corrected to 8; rerun passes 2,258 tests. Source baseline separately passes 6 fitting, 21 deformation,
 40 topology and 35 skin/gap/tile tests against addon native binaries. These do not qualify
 the standalone numerical port, portable package or production anatomy.
 
 Preserve addon algorithms, settings and warning policies; see the
 [specification](specification_040.md) and [recovery record](tasks/skin-040.md).
+
+### CH-094 — native skin coarse-field preparation (0.4.0 in progress; R04)
+
+Addon preparation used NumPy raster batches and SciPy distance/label operations. The
+standalone adapter batches owned source buffers into C++ rasterization, separable exact
+Euclidean distance transforms, 26-connected exterior extraction, six-neighbor dilation
+and sixteen-level collagen propagation. Preserve source settings, ties-to-even raster
+rounding, float32 seed quantization and field blending. Work has shared cancellation and
+the addon's 104-byte-per-cell budget estimate; native result handles have explicit lifetime.
+This removes numerical Python preparation without substituting a different skin model.
+
+Evidence: `tools/check_skin_fields.py` compares all four fields against the unmodified
+addon modules on twelve deterministic triangle fixtures at resolutions 16/32/48; errors
+remain below 1e-12. Five adapter tests cover collagen endpoints, scale, invalid inputs,
+cancellation, budget rejection and resource release. Existing five CTests pass. These
+are coarse-field checks, not complete skin geometry, production performance or release
+qualification. Gap reconstruction and mesh extraction remain unconnected.

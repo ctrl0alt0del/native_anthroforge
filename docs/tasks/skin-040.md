@@ -53,9 +53,15 @@ Source controls also pass 35 skin/gap/tile and 40 topology tests. These use addo
 not a rebuilt standalone skin kernel. Source DLLs/projects were not modified.
 Foundation contracts: 17 targeted tests passed. First broad run: 2,256 passed and one
 expected-version test failed because it still rejected newly supported schema 7; corrected
-its unsupported version to 8. Broad rerun pending. Ruff/mypy and function limits passed
-before UI edits. Offscreen skin tab navigation, decimal setting and Undo checks pass;
-font-enabled visual recheck and complete UI settings remain pending.
+its unsupported version to 8. Broad rerun: 2,258 passed. Ruff/mypy and function limits passed
+for foundations. Offscreen skin tab navigation, decimal setting and Undo checks pass;
+font-enabled capture inspected at `build/skin-040/ui/skin-settings.png`.
+Native coarse fields now build in the existing library: raster, Euclidean distances,
+26-connected exterior, quantized collagen and combined envelope. Twelve comparisons
+against unmodified addon modules at resolutions 16/32/48 agree within roundoff (1e-12 gate).
+Seven native-adapter/architecture tests pass; native CTests 5/5. No mesh extraction yet.
+Local parity detail: `build/skin-040/field-parity.json`; rerun with
+`tools/check_skin_fields.py <addon-root>`. Full settings and remaining pipelines still pending.
 App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated root
 `__init__.py` is preserved. Source `.blend` files remain untouched.
 

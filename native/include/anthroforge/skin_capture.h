@@ -3,6 +3,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+/* Blender-default POLY bevel: 12 ring vertices, minimum twist, open ends. Radius is metres. */
+AF_API uint64_t af_skin_fiber_bevel(uint64_t path,const double* frame,double radius,uint64_t cancel);
 /* Owned mesh leases remain with caller. Output geometry is world-space and outward-oriented.
    Source policies are ratio/strength/SCP; output policies convert ratio to absolute distance. */
 AF_API int af_skin_capture(const uint64_t* meshes,const double* frames,int sources,

@@ -17,6 +17,13 @@ ColumnLayout {
     ColumnLayout {
         enabled: !!panel.contributor.editable
         Layout.fillWidth:true
+        NumericSetting {
+            objectName:"skinFiberRadius"; visible:!!panel.contributor.fiber
+            label:"Skin radius"; length:true; minimum:0.000001; maximum:1
+            value:panel.settings.fiber_radius || 0.001
+            hint:"Radius used when this Fiber contributes to skin. Viewport thickness is separate."
+            onEdited:value=>panel.change("fiber_radius", value)
+        }
         Label { text:"Gap settings"; color:Theme.muted }
         UiCombo {
             objectName:"skinSourceGapMode"; Layout.fillWidth:true

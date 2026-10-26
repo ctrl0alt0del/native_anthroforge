@@ -6,11 +6,12 @@ from typing import Any
 
 import numpy as np
 
-from .mesh import INT64, D, GeometryEngine, U, pointer
+from .mesh import INT64, D, GeometryEngine, Mesh, U, doubles, pointer
 from .skin_fields import BYTE, INT
 
 
 def configure(engine: GeometryEngine) -> None:
+    engine.bind("af_skin_fiber_bevel", [U, D, c.c_double, U], U)
     engine.bind(
         "af_skin_capture_sources",
         [c.POINTER(U), INT, D, c.c_int, INT, D, D, INT64, INT, BYTE, D, INT64, INT, U],
@@ -19,6 +20,15 @@ def configure(engine: GeometryEngine) -> None:
         "af_skin_capture",
         [c.POINTER(U), D, c.c_int, c.c_int, c.c_int, D, D, INT64, INT, BYTE, D, U],
     )
+
+
+def fiber_bevel(path: Any, frame: Any, radius: float, cancel: int = 0) -> Mesh:
+    matrix = doubles(frame)
+    if matrix.shape != (16,):
+        raise ValueError("Fiber skin bevel requires a world transform.")
+    handle = path.engine.library.af_skin_fiber_bevel(path.handle, pointer(matrix), radius, cancel)
+    path.engine.check(not handle)
+    return Mesh(path.engine, handle)
 
 
 @dataclass(frozen=True)

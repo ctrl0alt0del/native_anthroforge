@@ -544,16 +544,16 @@ void project_plane_v3_v3v3(float out[3], const float p[3], const float v_plane[3
 
 
 
-
-
-
-
-
-
-
-
-
-
+void bisect_v3_v3v3v3(float r[3], const float a[3], const float b[3], const float c[3])
+{
+  float d_12[3], d_23[3];
+  sub_v3_v3v3(d_12, b, a);
+  sub_v3_v3v3(d_23, c, b);
+  normalize_v3(d_12);
+  normalize_v3(d_23);
+  add_v3_v3v3(r, d_12, d_23);
+  normalize_v3(r);
+}
 
 
 

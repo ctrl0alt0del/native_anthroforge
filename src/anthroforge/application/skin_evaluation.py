@@ -66,7 +66,7 @@ def metadata(capture: Any, result: Any, fields: Any) -> dict[str, Any]:
 
 
 def source_metadata(row: Any) -> dict[str, Any]:
-    counts = source_counts(row.mesh, row.identity.kind == "FIBER")
+    counts = source_counts(row.mesh, False)
     return dict(
         **asdict(row.identity),
         asset=row.asset,
@@ -74,6 +74,7 @@ def source_metadata(row: Any) -> dict[str, Any]:
         vertices=counts[0],
         triangles=counts[1],
         segments=counts[2],
+        fiber_radius=row.radius,
     )
 
 

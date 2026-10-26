@@ -39,6 +39,12 @@ Initial generated-quad tessellation also adapts Blender 5.0.1's degenerate-diago
 test in `mesh_tessellate.cc` / `math_geom.cc`, attributed to NaN Holding BV and
 Blender Authors under GPL-2.0-or-later; the adaptation is GPL-3.0-or-later.
 
+Skin Fiber bevel adapts Blender 5.0.1 `curve.cc`, `curve_bevel.cc` and `displist.cc`
+(NaN Holding BV and Blender Authors, GPL-2.0-or-later). Four frame functions are retained
+unchanged in `native/vendor/blender_bevel`; hashes and reconstruction ranges are recorded
+there. Its BLI math dependencies use the existing pinned BMesh subset. The source archive
+contains both the upstream subset and AnthroForge's owned-array adapters.
+
 Skin proxy smoothing and collapse adapt Blender 5.0.1 `MOD_smooth.cc`,
 `bmesh_decimate_collapse.cc` and angle-weighted normals (Blender Authors,
 GPL-2.0-or-later). Source URLs/hashes are recorded in

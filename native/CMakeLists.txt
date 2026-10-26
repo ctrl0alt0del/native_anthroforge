@@ -61,6 +61,7 @@ target_sources(af_native PRIVATE src/skin_symmetry.cpp src/skin_symmetry_cut.cpp
 target_sources(af_native PRIVATE src/skin_topology_quality.cpp)
 target_sources(af_native PRIVATE src/process_shutdown.cpp)
 target_sources(af_native PRIVATE src/blender_mesh_normals.cpp)
+target_sources(af_native PRIVATE src/skin_fiber.cpp src/skin_bevel_frames.cpp src/skin_bevel_points.cpp)
 target_sources(af_native PRIVATE src/fiber_deformation_api.cpp src/fiber_deformation_inputs.cpp
     src/fiber_deformation_reference.cpp src/fiber_deformation_weights.cpp src/fiber_deformation_filter.cpp
     src/fiber_deformation_fit.cpp src/fiber_deformation_solve.cpp)

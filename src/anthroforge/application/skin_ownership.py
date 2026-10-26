@@ -75,7 +75,7 @@ def supports(document: Any, source: Source, warnings: set[str]) -> frozenset[Sou
 def offsets(rows: Any) -> tuple[int, ...]:
     values = [0]
     for row in rows:
-        count = source_counts(row.mesh, row.identity.kind == "FIBER")[0]
+        count = source_counts(row.mesh, False)[0]
         values.append(values[-1] + count)
     return tuple(values)
 

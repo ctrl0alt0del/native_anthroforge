@@ -3150,4 +3150,28 @@ and an intermittent inline-scheduling assertion; the latter did not recur in 30 
 or the full rerun, so its original cause is not claimed resolved. Added diagnostic context.
 Ruff, mypy, changed native-file style and dependency checks pass. No packaged or complete
 final-skin deformation acceptance is implied. The centerline deformation-weighting mismatch
-is documented in the task record and awaits discussion; no new weighting was implemented.
+was documented for discussion; no new weighting was implemented. The October 27 decision
+below resolves it by restoring surface inputs.
+
+### Restored thin Fiber skin surfaces (0.4.0 in progress, October 27)
+
+The centerline-only contributor experiment is superseded by the user's decision to restore
+the addon's small-thickness approach. Face-less paths cannot supply the positive-area samples
+required by its persistent deformation reference. Native capture now evaluates the same
+POLY-curve bevel: twelve vertices per ring, minimum-twist frames, source float arithmetic,
+duplicate handling and uncapped open ends. Upstream frame bodies remain unchanged; owned
+array adapters replace Blender objects. No new area-weighting algorithm is introduced.
+
+Skin radius is document-owned per-Fiber data (1 mm default), independent of per-workspace
+display radius. Its edit invalidates construction without changing paths/bindings. Mirrored
+instances share the source mesh and reflect it; accepted tissue consumers still suppress
+their Fibers. Admission estimates account for the expanded mesh; preparation stays on the
+worker. This adds physical extent and surface area relative to the superseded centerlines.
+
+Six source captures match positions within 1e-8 metres and exact connectivity. Counterbalanced
+profiler-off four-Fiber trials at grid resolution 220 measure approximately 2.14 s centerline
+versus 4.10 s bevel for capture/fields/scene/envelope combined. The dominant added cost is
+envelope distance work. All-326-Fiber capture alone is approximately 424 ms; captured arrays
+are 27.5 MB versus 1.24 MB. This intentionally stresses unsuppressed Fibers and is not full
+assembly latency or total resident memory. Raw trials and a separate profiler report are in
+build/skin-040/fiber-thickness-production. Complete deformation/release acceptance is pending.

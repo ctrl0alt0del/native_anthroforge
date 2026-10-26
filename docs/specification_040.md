@@ -85,8 +85,8 @@ project conversion, general animation editing and new skin algorithms remain sep
 The October 26 correction requires the actual pinned Blender Decimate/BMesh subset for
 proxy simplification and symmetry cutting, rather than approximate replacement algorithms.
 The accepted standalone differences are instance-aware density ownership and deterministic
-ties, accepted material charts and compatible surface-tissue guidance/refinement, bare-Fiber
-centerlines, and native spatial/intersection queries. Their recorded qualification gaps remain
+ties, accepted material charts and compatible surface-tissue guidance/refinement, and
+native spatial/intersection queries. Their recorded qualification gaps remain
 required work. No additional algorithm changes are authorized without prior discussion.
 
 Production backend execution must not fail solely because it exceeds an arbitrary runtime,
@@ -94,8 +94,11 @@ fixed 4 GiB ceiling or retained-log size. Retain cancellation, owned process lif
 backend/allocation failures. Use scheduling/admission for resource coordination and bounded
 log retention without terminating the computation. Preserve source numerical thread settings.
 
-Bare Fibers contribute their accepted **centerlines only**. Neither workspace display
-thickness nor an invented skin-specific fiber radius enters skin construction. Capture
-uses explicit segments and retains path/segment correspondence separately from surface
-triangle bindings. This intentionally differs from the addon's evaluated bevel meshes.
-Fibers represented by an accepted tissue remain suppressed under the existing source policy.
+The October 27 decision supersedes centerline-only capture: bare Fibers contribute thin
+surface meshes using the addon's Blender POLY-curve bevel behavior (12 ring vertices,
+minimum-twist frames, open ends). This restores positive-area inputs for the unchanged
+addon deformation sampler. Skin radius defaults to **1 mm**, stored per Fiber in skin
+contributor settings and independent of workspace display radius. Editing it marks skin
+construction stale; it does not alter the accepted Fiber path or anatomical bindings.
+Reflected instances reuse the source tube. Fibers represented by an accepted tissue remain
+suppressed. No envelope-area weighting substitute is introduced.

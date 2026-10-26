@@ -63,8 +63,8 @@ def require_contributor(session: "Session", owner: str, values: dict[str, Any]) 
         raise ValueError("Contributor identity and painted resources use dedicated operations.")
     if owner in session.document.index.entities:
         session.editable(owner)
-        if {"flow"} & values.keys():
-            raise ValueError("FLOW guides require a Fiber.")
+        if {"flow", "fiber_radius"} & values.keys():
+            raise ValueError("FLOW guides and skin radius require a Fiber.")
         return
     item = object_operations.editable(session, owner)
     require_construction_settings(item, values)
@@ -75,10 +75,10 @@ def require_contributor(session: "Session", owner: str, values: dict[str, Any]) 
 def require_construction_settings(item: Any, values: dict[str, Any]) -> None:
     if not isinstance(item, (Fiber, TissueVCP)):
         raise ValueError("Skin contributors must be SCPs, tissues or fibers.")
-    if set(values) - {"gap_mode", "gap_limit_ratio", "gap_strength", "flow"}:
+    if set(values) - {"gap_mode", "gap_limit_ratio", "gap_strength", "flow", "fiber_radius"}:
         raise ValueError("Collagen and subtree density require an SCP.")
-    if {"flow"} & values.keys() and not isinstance(item, Fiber):
-        raise ValueError("FLOW guides require a Fiber.")
+    if {"flow", "fiber_radius"} & values.keys() and not isinstance(item, Fiber):
+        raise ValueError("FLOW guides and skin radius require a Fiber.")
 
 
 def inspect(session: "Session") -> dict[str, Any]:

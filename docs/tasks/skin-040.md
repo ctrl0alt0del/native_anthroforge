@@ -5,7 +5,7 @@
 - Status: envelope and topology pipelines connected; full skin workflow remains in progress,
   not merge-ready. Schema 7, immutable resources, shared commands and vertical inspector exist.
   Durable deformation, shortcut fitting, OBJ export and release qualification remain unfinished.
-- Last updated: 2026-10-26, Europe/Bucharest.
+- Last updated: 2026-10-27, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
 ## Outcome and acceptance
@@ -19,7 +19,7 @@ degeneracies or substitute another algorithm. Verify against addon fixtures and 
 anatomy before continuing the remaining 0.4.0 workflow.
 
 Accepted departures remain: instance-aware density ownership/deterministic ties;
-accepted material-chart guidance and compatible surface tissues; bare-Fiber centerlines;
+accepted material-chart guidance and compatible surface tissues;
 native spatial queries and local triangle predicates (remaining parity limits still need
 qualification). These are the user's accepted items 3–6, not full geometry acceptance.
 
@@ -35,8 +35,8 @@ overrides general autonomous approach-replacement guidance for this work.
 
 Current recovery: execution/admission corrections are in f0bb41d/a6977e1; pinned BMesh
 integration and anatomical qualification are in ab3aa7b/be63292. The source-normal
-boundary and fixtures are committed. The next-stage centerline weighting question below
-requires the user's decision before continuing reference/deformation implementation.
+boundary and fixtures are committed. The user resolved the centerline weighting question
+by restoring thin Fiber surfaces on October 27; current qualification is recorded below.
 Root __init__.py is unrelated. No 0.4.0 release/main merge.
 
 Execution correction: no default process time/memory cutoff; bounded diagnostic tail
@@ -76,18 +76,37 @@ Final full rerun: **2,487 passed**, 3,199 existing Qt deprecation warnings, 356.
 Ruff/format, mypy (493 files), native CTests (5/5), changed native-file style, dependency
 imports and lock checks pass. Complete portable/interactive release acceptance remains open.
 
-Next-stage decision pending: the unmodified addon deformation sampler requires surface
+Resolved next-stage decision: the unmodified addon deformation sampler requires surface
 faces and positive area. A three-point centerline produces `Invalid reference connectivity`;
 the native area routine returns all-zero weights. A triangle using those points succeeds
 with area 0.5. Evidence: build/skin-040/centerline-reference.json, including source hash.
-Bare-Fiber centerlines remain the approved geometry. A new deformation-weighting rule
-would be an additional algorithm adaptation, so reference/deformation implementation is
-paused for discussion. Proposed experiment (not implemented/approved): derive Fiber
-influence from its associated envelope area, retain centerline movement targets and
-unchanged surface-contributor weighting. User has been asked; do not silently choose.
+The user chose to restore the addon's small-thickness surface approach, superseding
+centerline-only capture. The proposed envelope-area weighting experiment was not
+implemented and is not the chosen approach. Deformation sampling stays area-based.
 Retained the previously written production-envelope, topology-button and hidden-GPU
 acceptance tools after ownership/static review. Their complete runtime qualification
 against this corrected branch remains pending; do not infer it from their presence.
+
+### Thin Fiber restoration, October 27
+
+Native capture now builds a Blender-compatible POLY bevel from accepted Fiber paths:
+12-vertex rings, minimum-twist frames, source duplicate handling and uncapped open ends.
+The four unchanged upstream frame functions and required BLI math are pinned by hashes;
+the adapter owns arrays, cancellation and publication. Skin radius defaults to 1 mm,
+is edited in the Skin contributor panel, persists with coherent undo, and does not use
+workspace display thickness. Source/mirror pairs share the source tube resource.
+
+Six Blender controls (straight, bent, closed, duplicate-point and reversal cases) match
+coordinates within 1e-8 metres and exact quad/triangle order. Focused settings, mirror,
+persistence and native checks pass; final static/UI/broader checks remain pending.
+Serial counterbalanced, profiler-off trials on four actual assembly Fibers at grid 220
+take about 2.14 s with centerlines versus 4.10 s with tubes through capture, field, scene
+and envelope construction. Capture-only stress with all 326 accepted Fibers takes about
+424 ms and 27.5 MB of captured arrays (not total resident memory). Consumed Fibers remain
+suppressed in production. Separate profiler captures and raw trials are under ignored
+build/skin-040/fiber-thickness-production. Area-sampler and visual qualification are next.
+This is an incomplete 0.4.0 checkpoint; no release/version bump/main merge is authorized
+by these partial checks. Historical centerline notes below describe superseded checkpoints.
 
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve

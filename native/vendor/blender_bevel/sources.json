@@ -1,0 +1,33 @@
+{
+  "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenkernel/intern/curve.cc",
+  "source_sha256": "6a5c660ab6a447fa08a6154ebbc8e32f34753be05519b85c735759914a36f597",
+  "file": "frames.inc",
+  "sha256": "8c820e47994d83c93cddfc156879782e3cb6e0e3657e45cdf9338154d01db529",
+  "prefix": "// SPDX-FileCopyrightText: 2001-2002 NaN Holding BV. All rights reserved.\n// SPDX-License-Identifier: GPL-2.0-or-later\n// Unmodified Blender 5.0.1 minimum-twist frame functions; see sources.json.\n",
+  "functions": [
+    {
+      "name": "bevel_list_calc_bisect",
+      "start": 50130,
+      "end": 51820,
+      "sha256": "2ddfe9acf1a123dae5742fe6673996fd81f486df397d4512e4168958e77b124e"
+    },
+    {
+      "name": "minimum_twist_between_two_points",
+      "start": 54089,
+      "end": 54581,
+      "sha256": "2740562b5dc17e3655f1534beed4782516866c4cae329fab1a84ecbbc38cb1e1"
+    },
+    {
+      "name": "make_bevel_list_3D_minimum_twist",
+      "start": 54583,
+      "end": 58470,
+      "sha256": "67e6d8e2205d50899741afa9fa83ca14a99fda58ed2902a52b6af9ae77437e95"
+    },
+    {
+      "name": "make_bevel_list_segment_3D",
+      "start": 60112,
+      "end": 60730,
+      "sha256": "683188faf7020e10d2aef557590071b0fd2d61cf5f3f7aebed7a79995ba561b4"
+    }
+  ]
+}

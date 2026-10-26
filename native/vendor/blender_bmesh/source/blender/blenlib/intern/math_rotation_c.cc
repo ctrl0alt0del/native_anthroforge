@@ -38,17 +38,55 @@
 
 
 
+void unit_qt(float q[4])
+{
+  q[0] = 1.0f;
+  q[1] = q[2] = q[3] = 0.0f;
+}
 
+void copy_qt_qt(float q[4], const float a[4])
+{
+  q[0] = a[0];
+  q[1] = a[1];
+  q[2] = a[2];
+  q[3] = a[3];
+}
 
 
 
 
 
 
+void mul_qt_qtqt(float q[4], const float a[4], const float b[4])
+{
+  float t0, t1, t2;
 
+  t0 = a[0] * b[0] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3];
+  t1 = a[0] * b[1] + a[1] * b[0] + a[2] * b[3] - a[3] * b[2];
+  t2 = a[0] * b[2] + a[2] * b[0] + a[3] * b[1] - a[1] * b[3];
+  q[3] = a[0] * b[3] + a[3] * b[0] + a[1] * b[2] - a[2] * b[1];
+  q[0] = t0;
+  q[1] = t1;
+  q[2] = t2;
+}
 
+void mul_qt_v3(const float q[4], float r[3])
+{
+  float t0, t1, t2;
 
+  t0 = -q[1] * r[0] - q[2] * r[1] - q[3] * r[2];
+  t1 = q[0] * r[0] + q[2] * r[2] - q[3] * r[1];
+  t2 = q[0] * r[1] + q[3] * r[0] - q[1] * r[2];
+  r[2] = q[0] * r[2] + q[1] * r[1] - q[2] * r[0];
+  r[0] = t1;
+  r[1] = t2;
 
+  t1 = t0 * -q[1] + r[0] * q[0] - r[1] * q[3] + r[2] * q[2];
+  t2 = t0 * -q[2] + r[1] * q[0] - r[2] * q[1] + r[0] * q[3];
+  r[2] = t0 * -q[3] + r[2] * q[0] - r[0] * q[2] + r[1] * q[1];
+  r[0] = t1;
+  r[1] = t2;
+}
 
 
 
@@ -65,6 +103,10 @@
 
 
 
+float dot_qtqt(const float a[4], const float b[4])
+{
+  return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+}
 
 
 
@@ -96,55 +138,13 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void mul_qt_fl(float q[4], const float f)
+{
+  q[0] *= f;
+  q[1] *= f;
+  q[2] *= f;
+  q[3] *= f;
+}
 
 
 
@@ -191,13 +191,51 @@
 
 
 /* Skip error check, currently only needed by #mat3_to_quat_legacy. */
+static void quat_to_mat3_no_error(float m[3][3], const float q[4])
+{
+  double q0, q1, q2, q3, qda, qdb, qdc, qaa, qab, qac, qbb, qbc, qcc;
 
+  q0 = M_SQRT2 * double(q[0]);
+  q1 = M_SQRT2 * double(q[1]);
+  q2 = M_SQRT2 * double(q[2]);
+  q3 = M_SQRT2 * double(q[3]);
 
+  qda = q0 * q1;
+  qdb = q0 * q2;
+  qdc = q0 * q3;
+  qaa = q1 * q1;
+  qab = q1 * q2;
+  qac = q1 * q3;
+  qbb = q2 * q2;
+  qbc = q2 * q3;
+  qcc = q3 * q3;
 
+  m[0][0] = float(1.0 - qbb - qcc);
+  m[0][1] = float(qdc + qab);
+  m[0][2] = float(-qdb + qac);
 
+  m[1][0] = float(-qdc + qab);
+  m[1][1] = float(1.0 - qaa - qcc);
+  m[1][2] = float(qda + qbc);
 
+  m[2][0] = float(qdb + qac);
+  m[2][1] = float(-qda + qbc);
+  m[2][2] = float(1.0 - qaa - qbb);
+}
 
+void quat_to_mat3(float m[3][3], const float q[4])
+{
+#ifndef NDEBUG
+  float f;
+  if (!((f = dot_qtqt(q, q)) == 0.0f || (fabsf(f - 1.0f) < float(QUAT_EPSILON)))) {
+    fprintf(stderr,
+            "Warning! quat_to_mat3() called with non-normalized: size %.8f *** report a bug ***\n",
+            f);
+  }
+#endif
 
+  quat_to_mat3_no_error(m, q);
+}
 
 
 
@@ -427,58 +465,20 @@
 
 
 
+float normalize_qt(float q[4])
+{
+  const float len = sqrtf(dot_qtqt(q, q));
 
+  if (len != 0.0f) {
+    mul_qt_fl(q, 1.0f / len);
+  }
+  else {
+    q[1] = 1.0f;
+    q[0] = q[2] = q[3] = 0.0f;
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  return len;
+}
 
 
 
@@ -709,117 +709,117 @@
 
 /** \} */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+void vec_to_quat(float q[4], const float vec[3], short axis, const short upflag)
+{
+  const float eps = 1e-4f;
+  float nor[3], tvec[3];
+  float angle, si, co, len;
+
+  BLI_assert(axis >= 0 && axis <= 5);
+  BLI_assert(upflag >= 0 && upflag <= 2);
+
+  /* first set the quat to unit */
+  unit_qt(q);
+
+  len = len_v3(vec);
+
+  if (UNLIKELY(len == 0.0f)) {
+    return;
+  }
+
+  /* rotate to axis */
+  if (axis > 2) {
+    copy_v3_v3(tvec, vec);
+    axis = short(axis - 3);
+  }
+  else {
+    negate_v3_v3(tvec, vec);
+  }
+
+  /* nasty! I need a good routine for this...
+   * problem is a rotation of an Y axis to the negative Y-axis for example.
+   */
+
+  if (axis == 0) { /* x-axis */
+    nor[0] = 0.0;
+    nor[1] = -tvec[2];
+    nor[2] = tvec[1];
+
+    if (fabsf(tvec[1]) + fabsf(tvec[2]) < eps) {
+      nor[1] = 1.0f;
+    }
+
+    co = tvec[0];
+  }
+  else if (axis == 1) { /* y-axis */
+    nor[0] = tvec[2];
+    nor[1] = 0.0;
+    nor[2] = -tvec[0];
+
+    if (fabsf(tvec[0]) + fabsf(tvec[2]) < eps) {
+      nor[2] = 1.0f;
+    }
+
+    co = tvec[1];
+  }
+  else { /* z-axis */
+    nor[0] = -tvec[1];
+    nor[1] = tvec[0];
+    nor[2] = 0.0;
+
+    if (fabsf(tvec[0]) + fabsf(tvec[1]) < eps) {
+      nor[0] = 1.0f;
+    }
+
+    co = tvec[2];
+  }
+  co /= len;
+
+  normalize_v3(nor);
+
+  axis_angle_normalized_to_quat(q, nor, safe_acosf(co));
+
+  if (axis != upflag) {
+    float mat[3][3];
+    float q2[4];
+    const float *fp = mat[2];
+    quat_to_mat3(mat, q);
+
+    if (axis == 0) {
+      if (upflag == 1) {
+        angle = 0.5f * atan2f(fp[2], fp[1]);
+      }
+      else {
+        angle = -0.5f * atan2f(fp[1], fp[2]);
+      }
+    }
+    else if (axis == 1) {
+      if (upflag == 0) {
+        angle = -0.5f * atan2f(fp[2], fp[0]);
+      }
+      else {
+        angle = 0.5f * atan2f(fp[0], fp[2]);
+      }
+    }
+    else {
+      if (upflag == 0) {
+        angle = 0.5f * atan2f(-fp[1], -fp[0]);
+      }
+      else {
+        angle = -0.5f * atan2f(-fp[0], -fp[1]);
+      }
+    }
+
+    co = cosf(angle);
+    si = sinf(angle) / len;
+    q2[0] = co;
+    q2[1] = tvec[0] * si;
+    q2[2] = tvec[1] * si;
+    q2[3] = tvec[2] * si;
+
+    mul_qt_qtqt(q, q2, q);
+  }
+}
 
 #if 0
 
@@ -1048,27 +1048,27 @@
 
 /******************************** Axis Angle *********************************/
 
+void axis_angle_normalized_to_quat(float r[4], const float axis[3], const float angle)
+{
+  const float phi = 0.5f * angle;
+  const float si = sinf(phi);
+  const float co = cosf(phi);
+  BLI_ASSERT_UNIT_V3(axis);
+  r[0] = co;
+  mul_v3_v3fl(r + 1, axis, si);
+}
 
+void axis_angle_to_quat(float r[4], const float axis[3], const float angle)
+{
+  float nor[3];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  if (LIKELY(normalize_v3_v3(nor, axis) != 0.0f)) {
+    axis_angle_normalized_to_quat(r, nor, angle);
+  }
+  else {
+    unit_qt(r);
+  }
+}
 
 
 

@@ -20,3 +20,4 @@ native/vendor/piqp/** -text
 native/migration/stacking/** -text
 native/migration/stacking/sources.json text eol=lf
 native/vendor/blender_bmesh/** -text
+native/vendor/blender_bevel/** -text

@@ -1,11 +1,12 @@
 """Worker-owned skin sources; presentation never chooses physical contributors."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
 
 import numpy as np
 
 from anthroforge.core import skin_sources
+from anthroforge.core.entities import IDENTITY
 from anthroforge.core.skin import effective_collagen
 from anthroforge.native import skin_capture as native
 
@@ -19,6 +20,7 @@ class Source:
     mesh: Any
     frame: tuple[float, ...]
     asset: str
+    radius: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -41,21 +43,33 @@ def fiber(engine: Any, document: Any, resources: Any, source: Any, cancel: int) 
     if not item.result.asset or item.result.asset not in resources.paths or item.result.error:
         raise ValueError("Fiber has no accepted path for skin: " + item.name)
     frame = Frames(engine, document).world(item.id)
-    frame = mirror_surfaces.frame(engine, document, skin_inputs.reference(source), frame)
-    return Source(source, resources.paths[item.result.asset].path, frame, item.result.asset)
+    radius = skin_operations.settings_for(document.skin, item.id).fiber_radius
+    mesh = native.fiber_bevel(resources.paths[item.result.asset].path, frame, radius, cancel)
+    return Source(source, mesh, IDENTITY, item.result.asset, radius)
+
+
+def fiber_instance(
+    engine: Any, document: Any, resources: Any, source: Any, cancel: int, cache: Any
+) -> Source:
+    if source.owner not in cache:
+        cache[source.owner] = fiber(engine, document, resources, source, cancel)
+    original = cache[source.owner]
+    frame = mirror_surfaces.frame(engine, document, skin_inputs.reference(source), IDENTITY)
+    return replace(original, identity=source, frame=frame)
 
 
 def sources(engine: Any, document: Any, resources: Any, cancel: int) -> tuple[Source, ...]:
     selected = skin_sources.selected(document, skin_sources.accepted_tissues(document))
+    fibers: dict[str, Source] = {}
     rows = [
-        fiber(engine, document, resources, row, cancel)
+        fiber_instance(engine, document, resources, row, cancel, fibers)
         if row.kind == "FIBER"
         else surface(engine, document, resources, row)
         for row in selected
     ]
     result = tuple(row for row in rows if row is not None)
     if not result:
-        raise ValueError("Skin needs accepted anatomy or fiber centerlines.")
+        raise ValueError("Skin needs accepted anatomy or Fibers.")
     return result
 
 
@@ -66,7 +80,7 @@ def policy(document: Any, row: Source) -> tuple[float, float, bool]:
 
 
 def weights(document: Any, resources: Any, row: Source, warnings: list[str]) -> Any:
-    count = native.source_counts(row.mesh, row.identity.kind == "FIBER")[0]
+    count = row.mesh.counts[0]
     if row.identity.kind != "SCP":
         return np.ones(count)
     item = document.object(row.identity.owner)
@@ -87,7 +101,7 @@ def capture(engine: Any, document: Any, resources: Any, cancel: int = 0) -> Capt
     geometry = native.capture_sources(
         engine,
         [row.mesh for row in rows],
-        [int(row.identity.kind == "FIBER") for row in rows],
+        [0 for row in rows],
         [row.frame for row in rows],
         [policy(document, row) for row in rows],
         cancel,

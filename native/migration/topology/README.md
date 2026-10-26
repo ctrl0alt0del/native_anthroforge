@@ -14,9 +14,9 @@ Source fingerprints are recorded alongside the original field kernel.
 Skin proxy smoothing follows Blender 5.0.1 `MOD_smooth.cc` (GPL-2.0-or-later), with
 all axes enabled and no vertex-group weights, as used by the addon skin pipeline.
 It averages edge midpoints, uses Blender float arithmetic, and preserves the original
-mesh through an owned result. Canonical edge iteration may change final float rounding;
-four captured Blender fixtures qualify within 3e-7. This is not a replacement for
-the still-pending decimation stage or a general-purpose smoothing modifier.
+mesh through an owned result. It retains Blender edge ordering, including across
+deformation, so smoothing and later tied collapses use the same traversal. This is
+the skin pipeline subset, not a general-purpose smoothing modifier.
 
 Ownership and conforming quad refinement are native ports of the fingerprinted addon
 Python kernels. They retain sample/threshold policies, neighbor edge closure, split
@@ -28,14 +28,17 @@ rejection of malformed boundary graphs are intentional differences from incident
 Python iteration/exception behavior. Native result bundles own mesh and region/guide
 labels until copied into the shared application resource lifecycle.
 
-Proxy collapse adapts Blender 5.0.1 `bmesh_decimate_collapse.cc` and angle-normal
-calculation (Blender Authors, GPL-2.0-or-later) to owned arrays. libigl's existing
-MPL-2.0 topology traversal is serial; it does not introduce a worker pool. Blender
-metric thresholds/boundary weighting/flip rejection are retained, but edge identity
-and tie ordering differ. Qualification records surface errors rather than falsely
-requiring identical connectivity. Compact captured Blender controls live in
-`tests/fixtures/skin/proxy_decimation.json`; the comparison runner is
-`tools/check_skin_decimation.py`. Broader MC33 evidence remains in ignored build data.
+Proxy collapse now uses the pinned Blender 5.0.1 BMesh subset in
+`native/vendor/blender_bmesh`, replacing the earlier libigl topology approximation.
+Retained upstream functions are unchanged; the manifest records omitted unreachable
+definitions and original/retained hashes. Owned geometry adapters preserve source
+float coordinates, edge order, collapse flags and degenerate outputs. Cancellation
+occurs at safe upstream-call boundaries; no extra worker pool is introduced.
+`tests/fixtures/skin/bmesh_decimation.json` contains five Blender controls created
+through Mesh.from_pydata, matching the skin pipeline boundary. Coordinates and
+connectivity match exactly through the application API. The older
+`proxy_decimation.json` retains its BMesh-origin edge-order context and historical
+approximation evidence; it is not an interchangeable input-order oracle.
 
 Closed-loop preparation ports addon `annuli.py` and `solver.py` rules to owned C++
 arrays, reusing the maintained native graph route. Fixtures capture Blender's float
@@ -78,9 +81,9 @@ this boundary changed tied zipper ordering on symmetric rings. Numerical annulus
 construction still uses double precision; only the accepted patch coordinates round.
 These tests do not establish production anatomy or public workflow acceptance.
 
-Symmetry uses owned triangle half cuts and the convex-planar subset of Blender beauty
-triangulation, with source hashes under `half_mesh_reference`. Reflected output and
-FLOW path clipping preserve the fingerprinted addon production policies. Seven small
-fixtures in `symmetry.json` compare position and oriented connectivity. Duplicate
-zero-area cut triangles on an exact-on-face plane are omitted intentionally. The addon
+Symmetry half cutting now calls pinned BMesh bisect and beauty triangulation through
+owned geometry adapters. Reflected output and FLOW path clipping retain the addon
+production policies. Seven small fixtures in `symmetry.json` compare position and
+oriented connectivity, including multiplicity of zero-area triangles on an exact
+source-face plane. Earlier omission of those triangles is superseded. The addon
 prototype `fill_unmatched_boundaries` is not part of the production call graph.

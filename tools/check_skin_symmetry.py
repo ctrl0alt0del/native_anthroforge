@@ -2,6 +2,7 @@
 
 import json
 import sys
+from collections import Counter
 from pathlib import Path
 
 import numpy as np
@@ -21,7 +22,7 @@ def evaluate(engine, row):
 
 
 def oriented(faces):
-    return {min(tuple(np.roll(face, i)) for i in range(len(face))) for face in faces}
+    return Counter(min(tuple(np.roll(face, i)) for i in range(len(face))) for face in faces)
 
 
 def correspondence(actual, expected):
@@ -36,10 +37,11 @@ def compare(mesh, row):
     mapped = mapping[faces]
     valid = np.array([len(set(face)) == len(face) for face in mapped])
     actual = mesh.array(1).reshape(-1, faces.shape[1])
+    actual = correspondence(mesh.array(0), mesh.array(0))[1][actual]
     return dict(
         name=row["name"],
         error=error,
-        connectivity=oriented(actual) == oriented(mapped[valid]),
+        connectivity=oriented(actual) == oriented(mapped),
         degenerate_source_faces=int(np.sum(~valid)),
         faces=len(actual),
     )

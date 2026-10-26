@@ -16,6 +16,7 @@
 #endif
 #include <igl/AABB.h>
 #include <atomic>
+#include <array>
 #include <memory>
 #include <vector>
 #include <string>
@@ -33,6 +34,8 @@ struct Mesh {
     Vertices vertices;
     Triangles triangles;
     std::vector<int64_t> corners, offsets, polygons;
+    // Optional canonical edge ordering retained by topology-changing native kernels.
+    std::vector<std::array<int,2>> ordered_edges;
     std::vector<int64_t> material;
     std::vector<double> material_axes;
     std::vector<double> material_pins;

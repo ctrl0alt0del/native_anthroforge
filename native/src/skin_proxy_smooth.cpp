@@ -1,21 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Algorithm: Blender 5.0.1 MOD_smooth.cc, Blender Authors (2005).
 #include "construction_internal.hpp"
+#include "blender_mesh.hpp"
 #include "anthroforge/skin_density.h"
-#include <set>
 namespace af::skin_proxy {
 using Points=Eigen::Matrix<float,Eigen::Dynamic,3,Eigen::RowMajor>;
-using Edge=std::pair<int64_t,int64_t>;
-static std::set<Edge> edges(const Mesh& mesh,uint64_t cancel) {
-    std::set<Edge> result;
-    for(size_t face=0;face+1<mesh.offsets.size();++face) {
-        if(face%4096==0) check_cancel(cancel);
-        const auto start=mesh.offsets[face],end=mesh.offsets[face+1];
-        for(auto i=start;i<end;++i) result.insert(std::minmax(mesh.corners[i],mesh.corners[i+1<end?i+1:start]));
-    }
-    return result;
-}
-static Points accumulated(const Points& points,const std::set<Edge>& edges,std::vector<int>& counts,uint64_t cancel) {
+using Edge=std::array<int,2>;
+static Points accumulated(const Points& points,const std::vector<Edge>& edges,std::vector<int>& counts,uint64_t cancel) {
     Points result=Points::Zero(points.rows(),3); int visited=0;
     for(const auto& [a,b]:edges) {
         if(visited++%4096==0) check_cancel(cancel);
@@ -24,7 +15,7 @@ static Points accumulated(const Points& points,const std::set<Edge>& edges,std::
     }
     return result;
 }
-static void step(Points& points,const std::set<Edge>& edges,float factor,uint64_t cancel) {
+static void step(Points& points,const std::vector<Edge>& edges,float factor,uint64_t cancel) {
     std::vector<int> counts(points.rows()); const auto sums=accumulated(points,edges,counts,cancel);
     for(int i=0;i<points.rows();++i) {
         if(i%4096==0) check_cancel(cancel);
@@ -33,7 +24,7 @@ static void step(Points& points,const std::set<Edge>& edges,float factor,uint64_
     }
 }
 static std::shared_ptr<Mesh> smooth(const Mesh& mesh,float factor,int iterations,uint64_t cancel) {
-    const auto links=edges(mesh,cancel); Points points=mesh.vertices.cast<float>();
+    const auto links=blender_mesh::edge_order(mesh,cancel); Points points=mesh.vertices.cast<float>();
     for(int i=0;i<iterations;++i) { check_cancel(cancel); step(points,links,factor,cancel); }
     return deform_mesh(mesh,points.cast<double>(),cancel);
 }

@@ -1,5 +1,12 @@
 # Runtime and source notices
 
+## Blender BMesh/Decimate subset
+
+Blender Authors, GPL-2.0-or-later. The pinned v5.0.1 geometry-only subset under
+`native/vendor/blender_bmesh` includes original notices and per-file provenance.
+See its README and `licenses/GPL-2.0.txt`. No Blender executable/runtime is shipped
+as part of this subset.
+
 Release 0.3.0 adds AnthroForge-authored typed native expression compilation/evaluation,
 Parametric sampling, and shortcut/attachment orchestration under GPL-3.0-or-later.
 No muparser or ExprTk production dependency or copied implementation is bundled; their

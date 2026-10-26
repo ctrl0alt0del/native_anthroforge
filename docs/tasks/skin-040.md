@@ -40,11 +40,15 @@ be reviewed before inclusion. Root __init__.py is unrelated. No 0.4.0 release/ma
 Execution correction: no default process time/memory cutoff; bounded diagnostic tail
 instead of terminating on log volume; process-tree termination handle race fixed;
 tetrahedral thread setting restored to four. Fourteen focused backend/proxy tests pass.
-Resource-aware admission remains unfinished. Full BMesh Decimate/bisect source and required
-topology routines compile under C++17; geometry-only subset probe is linking/running under
-`build/skin-040/bmesh-probe` and still being debugged before any production replacement.
-Original pinned source extraction: `build/skin-040/blender-5.0.1`. Probe is local-only;
-the maintained subset, source manifest, parity and integration are still required.
+Resource-aware admission remains unfinished. The maintained Blender 5.0.1 geometry-only
+BMesh subset is now integrated in the C++17 library, replacing approximate Decimate and
+half-cutting. Source hashes and omitted unreachable definitions are recorded in its manifest.
+Five canonical Mesh.from_pydata Decimate controls match exact coordinates/connectivity;
+symmetry comparisons retain source cut degeneracies. Twenty-eight focused parity, ownership,
+density and provenance tests pass. Source edge order is retained through smoothing and
+deformation. Native build succeeds in the C: tree. Broader anatomy, style, lifecycle and
+release acceptance remain pending; do not infer them from the compact fixtures.
+Original extraction/probe remain under ignored build/skin-040; no WIP artifacts were added.
 
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve

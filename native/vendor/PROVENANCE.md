@@ -12,6 +12,13 @@
 These vendored snapshots need no network access during application builds.
 Project function-length rules apply to authored adapters, not unchanged upstream sources.
 
+## Skin BMesh/Decimate
+
+`blender_bmesh/` contains the geometry-only Blender 5.0.1 source subset, with original
+SPDX notices, per-file hashes and reproducible omission ranges. Retained numerical
+functions are unchanged. See [its scope and limitations](blender_bmesh/README.md).
+Adapters and serial task/attribute support remain outside the vendor directory.
+
 ## Curve fitting
 
 `curve_fit_nd/` is unchanged from Blender tag `v5.0.1`, retrieved 2026-10-18:

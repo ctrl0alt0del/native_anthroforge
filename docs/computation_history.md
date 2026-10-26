@@ -3086,3 +3086,26 @@ timeouts explicitly requested by tests, descendant termination, and a real proxy
 The production algorithms for accepted items 3–6 remain unchanged. Blender BMesh/Decimate
 subset isolation is underway in a separate ignored build probe; production topology has
 not yet switched, and 0.4.0 remains incomplete.
+
+### Approved Blender BMesh topology replacement (0.4.0 in progress)
+
+The earlier libigl collapse adapter retained metric formulas but not Blender's topology
+mutation and tie ordering. The custom half cutter also omitted source degenerate triangles.
+Both are now replaced by a pinned Blender 5.0.1 geometry-only BMesh subset. Retained
+upstream function bodies are unchanged; original/retained hashes and omitted unreachable
+definitions permit reconstruction and audit. No Blender runtime or extra worker pool is
+required. Geometry-only custom-data gates reject unsupported attribute access explicitly.
+
+An isolated sphere comparison demonstrated that edge order affects equal-cost collapses.
+The adapter now preserves Blender Mesh.from_pydata edge order and carries it through
+smoothing/deformation. Source float boundaries, collapse flags, bisect/beauty triangulation
+and cut-face multiplicity are retained. Cancellation brackets upstream mutation calls at
+safe boundaries; long-call cancellation latency still requires measurement. An optional
+explicit diagnostic memory limit remains available, but ordinary Decimate work has no
+additional estimated-memory rejection. The addon's tiled-field working budget is unchanged.
+
+Five canonical Blender captures (sphere, ellipsoid, patch, tetrahedron and small nonmanifold
+input) match exact coordinates/connectivity through the native application boundary.
+Twenty-eight focused topology, symmetry, density and provenance tests pass. Earlier
+approximate comparison records remain historical and are superseded by this implementation.
+These compact controls do not establish complete anatomical workflow or release acceptance.

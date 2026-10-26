@@ -47,16 +47,16 @@ def test_proxy_rejects_invalid_settings_budget_and_cancel(session):
         skin_proxy.decimate(source, 32, cancel=token.handle)
 
 
-def test_proxy_cannot_collapse_tetrahedron_but_returns_usable_result(session):
+def test_proxy_tetrahedron_collapse_matches_blender_boundary_behavior(session):
     points = np.array([[1, 1, 1], [-1, -1, 1], [-1, 1, -1], [1, -1, -1]])
     faces = np.array([[0, 1, 2], [0, 3, 1], [0, 2, 3], [1, 3, 2]])
     result = skin_proxy.decimate(mesh(session.engine, points, faces), 1)
-    assert result.counts[1] == 4
-    np.testing.assert_array_equal(result.array(0), points)
+    assert result.counts[1] == 2
 
 
-def test_proxy_rejects_nonmanifold_collapse_input(session):
+def test_proxy_preserves_small_nonmanifold_input_as_blender_modifier_does(session):
     points = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1]])
     faces = np.array([[0, 1, 2], [1, 0, 3], [0, 1, 4]])
-    with pytest.raises(ValueError, match="manifold"):
-        skin_proxy.decimate(mesh(session.engine, points, faces), 1)
+    result = skin_proxy.decimate(mesh(session.engine, points, faces), 1)
+    np.testing.assert_array_equal(result.array(0), points)
+    np.testing.assert_array_equal(result.array(3), faces)

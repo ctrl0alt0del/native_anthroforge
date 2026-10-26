@@ -10,11 +10,11 @@ def configure(engine: Any) -> None:
     engine.bind("af_skin_proxy_decimate", [U, c.c_int, U, U], U)
 
 
-def decimate(mesh: Mesh, target: int, budget: int = 1024**3, cancel: int = 0) -> Mesh:
+def decimate(mesh: Mesh, target: int, budget: int = 0, cancel: int = 0) -> Mesh:
     if type(target) is not int or not 1 <= target <= 2**31 - 1:
         raise ValueError("Skin proxy needs a positive integer face target.")
-    if type(budget) is not int or not 1 <= budget <= 2**63 - 1:
-        raise ValueError("Skin proxy needs a positive memory budget.")
+    if type(budget) is not int or not 0 <= budget <= 2**63 - 1:
+        raise ValueError("Skin proxy needs a nonnegative memory budget (zero disables the limit).")
     handle = mesh.engine.library.af_skin_proxy_decimate(mesh.handle, target, budget, cancel)
     mesh.engine.check(not handle)
     return Mesh(mesh.engine, handle)

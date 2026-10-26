@@ -15,7 +15,7 @@ from anthroforge.native import (
     skin_topology,
 )
 
-from . import instant_backend, quadwild_backend, quadwild_bundle, quadwild_steps, worker_memory
+from . import instant_backend, quadwild_backend, quadwild_bundle, quadwild_steps
 
 
 @dataclass(frozen=True)
@@ -42,7 +42,7 @@ def initial_target(inputs: Inputs, cancel: Any) -> int:
 
 def prepare(inputs: Inputs, cancel: Any) -> Any:
     target = min(300000, max(64000, 2 * inputs.settings.target_quads))
-    proxy = skin_proxy.decimate(inputs.envelope, target, worker_memory.budget(), cancel.handle)
+    proxy = skin_proxy.decimate(inputs.envelope, target, cancel=cancel.handle)
     proxy = skin_density.smooth_proxy(proxy, cancel=cancel.handle)
     if inputs.plane is not None:
         proxy = skin_symmetry.half(proxy, inputs.plane, cancel.handle)

@@ -1,8 +1,10 @@
 add_subdirectory(boolean)
+add_subdirectory(blender)
 set(SKIN_STITCH_SOURCES src/skin_stitch_boundary.cpp src/skin_stitch_zipper.cpp src/skin_stitch_centered.cpp
     src/skin_stitch_weld.cpp src/skin_stitch_quality.cpp src/skin_stitch_transition.cpp src/skin_stitch_api.cpp
     src/skin_stitch_orientation.cpp src/skin_stitch_assembly.cpp src/skin_stitch_mirror.cpp)
-set(SKIN_PROXY_SOURCES src/skin_decimate_prepare.cpp src/skin_decimate_metric.cpp src/skin_decimate.cpp src/skin_proxy_api.cpp)
+set(SKIN_PROXY_SOURCES src/skin_proxy_api.cpp src/blender_mesh.cpp src/blender_edges.cpp
+    src/blender_decimate.cpp src/blender_bisect.cpp src/blender_attributes.cpp src/blender_tasks.cpp)
 set(SKIN_LOOP_SOURCES src/skin_loops.cpp src/skin_loops_projection.cpp src/skin_loops_closure.cpp src/skin_loops_pairing.cpp)
 set(SKIN_ANNULUS_SOURCES src/skin_annuli.cpp src/skin_annuli_api.cpp src/skin_annuli_result.cpp
     src/skin_annuli_planar.cpp src/skin_annuli_radial.cpp src/skin_annuli_symmetry.cpp src/skin_ring.cpp src/skin_guide_cut.cpp
@@ -67,7 +69,7 @@ add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_corners_detect.c
     vendor/curve_fit_nd/intern/generic_heap.c)
 set_target_properties(af_curve_fit PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(af_native PRIVATE af_curve_fit af_boolean)
+target_link_libraries(af_native PRIVATE af_curve_fit af_boolean af_bmesh)
 target_include_directories(af_native PUBLIC include)
 target_include_directories(af_native PRIVATE migration/smoothing/include)
 target_include_directories(af_native SYSTEM PRIVATE vendor)

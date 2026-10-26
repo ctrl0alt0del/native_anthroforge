@@ -26,11 +26,12 @@ def test_local_symmetry_plane_follows_root_with_nonuniform_scale(session):
 
 
 @pytest.mark.parametrize("row", DATA["cases"])
-def test_symmetry_matches_addon_non_degenerate_surface_and_winding(session, row):
+def test_symmetry_matches_addon_surface_winding_and_cut_degeneracies(session, row):
     source, result = evaluate(session.engine, row)
     report = compare(result, row)
     assert report["error"] < 3e-7 and report["connectivity"]
     assert report["degenerate_source_faces"] == (12 if row["name"] == "on-vertices" else 0)
+    assert report["faces"] == len(row["expected"]["faces"])
     np.testing.assert_array_equal(source.array(0), row["vertices"])
 
 

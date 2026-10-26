@@ -47,6 +47,7 @@ from . import (
     segment_operations,
     shortcut_operations,
     shrinkwrap_operations,
+    skin_collagen,
     skin_jobs,
     skin_operations,
     snap_tasks,
@@ -77,6 +78,9 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "skin.collagen.set": skin_collagen.set_weights,
+    "skin.collagen.fill": skin_collagen.fill,
+    "skin.collagen.clear": skin_collagen.clear,
     "skin.envelope.build": skin_jobs.build_envelope,
     "skin.configure": skin_operations.configure,
     "skin.contributor.configure": skin_operations.contributor,

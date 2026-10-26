@@ -72,6 +72,7 @@ def envelope(controller, window):
     controller.refresh()
     QTest.qWait(500)
     verify_skin_display(controller, window)
+    contributor_controls(controller, window)
 
 
 def verify_skin_display(controller, window):
@@ -85,6 +86,20 @@ def verify_skin_display(controller, window):
     controller.run("workspace.update", dict(skin_display="AUTO"))
     QTest.qWait(100)
     assert any(row["geometry_asset"] == stage.asset for row in controller.render_model.rows)
+
+
+def contributor_controls(controller, window):
+    controller.select(controller.session.document.entities[0].id)
+    window.resize(1050, 1600)
+    QTest.qWait(100)
+    edit_field(window, "skinSourceCollagen", "0.35")
+    click(window, "skinCollagenFill")
+    QTest.qWait(100)
+    value = controller.skin_panel.state["contributor"]["settings"]
+    assert value["collagen_mode"] == "PAINTED" and value["painted"]
+    controller.run("undo", {})
+    controller.run("undo", {})
+    assert window.grabWindow().save(str(OUTPUT / "skin-contributor-settings.png"))
 
 
 def exercise(application):

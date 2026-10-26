@@ -9,7 +9,7 @@ from anthroforge.core import skin_sources
 from anthroforge.core.skin import effective_collagen
 from anthroforge.native import skin_capture as native
 
-from . import mirror_surfaces, skin_inputs, skin_operations, surface_providers
+from . import mirror_surfaces, skin_collagen, skin_inputs, skin_operations, surface_providers
 from .object_frames import Frames
 
 
@@ -74,7 +74,7 @@ def weights(document: Any, resources: Any, row: Source, warnings: list[str]) -> 
     if setting.collagen_mode == "PAINTED":
         asset = resources.skin.get(setting.painted)
         values = asset.arrays.get("collagen") if asset else None
-        if values is not None and values.shape == (count,):
+        if skin_collagen.matching(asset, row.mesh):
             return values
         warnings.append(
             "Painted collagen does not match " + item.name + "; using its uniform value."

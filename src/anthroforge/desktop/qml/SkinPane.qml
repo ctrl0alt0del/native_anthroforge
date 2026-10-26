@@ -36,6 +36,7 @@ UiScrollView {
                 onEdited: value=>pane.change("envelope_settings",modelData.key,value/100)
             }
         }
+        SkinContributorSettings { contributor:pane.state.contributor || ({}) }
         SkinTopologySettings { settings:pane.state.topology_settings; onEdited:(key,value)=>pane.change("topology_settings",key,value) }
         SkinDeformationSettings { settings:pane.state.deformation_settings; onEdited:(key,value)=>pane.change("deformation_settings",key,value) }
     }

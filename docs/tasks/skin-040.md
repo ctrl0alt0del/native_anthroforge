@@ -163,3 +163,16 @@ in the focused suite. Ruff/format, mypy, native build/five CTests and selected n
 checks pass. Cube, separated-cube and overlapping-cube addon controls remain exact in
 geometry/connectivity and all six original binding arrays. Hidden GPU and offscreen UI
 checks pass with the evidence limits above. No release version bump or main merge.
+
+### Contributor controls and collagen authoring
+
+Added selected-source gap overrides and SCP Auto/Uniform/Painted collagen controls,
+plus shared `skin.collagen.set`, `.fill`, and `.clear` operations. Clear follows the
+addon by removing the map and choosing Uniform. Filled/all-zero maps are authoritative.
+The common material-domain fingerprint was extracted from tissue field handling;
+collagen capture now detects changed connectivity even when vertex count is unchanged,
+then retains the documented uniform fallback and warning. Ten focused application,
+desktop-projection and architecture tests pass; mypy passes (452 files). Offscreen
+numeric edit, Fill and Undo passed and the contributor panel capture was inspected.
+Brush strokes, remaining contributor topology controls and subsequent skin stages
+are still pending. No new broad-suite or release qualification is claimed here.

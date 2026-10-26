@@ -4,6 +4,8 @@ from dataclasses import asdict
 
 from PySide6.QtCore import Property, QObject, Signal
 
+from . import skin_contributor
+
 
 class SkinPanel(QObject):
     changed = Signal()
@@ -12,21 +14,31 @@ class SkinPanel(QObject):
         super().__init__(controller)
         self.controller = controller
         self.current = None
-        self.display = ""
+        self.display = None
         self.values = {}
         controller.changed.connect(self.refresh)
+        controller.selectionChanged.connect(self.refresh)
         self.refresh()
 
     def refresh(self):
         skin = self.controller.session.document.skin
-        display = self.controller.session.workspace.skin_display
+        session = self.controller.session
+        display = context(self.controller, session)
         if skin is self.current and display == self.display:
             return
         self.current = skin
         self.display = display
-        self.values = asdict(skin) | {"display": display}
+        self.values = asdict(skin) | dict(
+            display=display[0], contributor=skin_contributor.describe(session, display[1])
+        )
         self.changed.emit()
 
     @Property(dict, notify=changed)
     def state(self):
         return self.values
+
+
+def context(controller, session):
+    selected = getattr(getattr(controller, "object_selection", None), "primary", "")
+    item = session.document.registry.records.get(selected)
+    return session.workspace.skin_display, selected, session.workspace, id(item)

@@ -1044,3 +1044,14 @@ consumers update normally. Old source objects remain. Application is one undo ac
 constraints on an existing compatible tissue. It preserves classification, source,
 custom fields/regions/constraints, cropping, smoothing and stacking intent. Conflicts
 or an incompatible field layout require explicit resolution, without silent discard.
+
+
+### Skin contributor authoring (0.4.0 implementation in progress)
+
+`skin.contributor.configure(owner, values)` edits source gap policies and eligible SCP
+collagen/density or Fiber FLOW settings. `skin.collagen.set(owner, values)` stores one
+0..1 weight per accepted SCP vertex with its material-domain identity.
+`skin.collagen.fill(owner, value=None)` fills from the supplied value or SCP default;
+`skin.collagen.clear(owner)` removes the map and selects Uniform. These are shared
+undoable edits and do not change anatomy geometry. They do not imply that the full
+0.4.0 topology/deformation/fitting/export workflow is already implemented.

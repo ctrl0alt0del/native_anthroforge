@@ -2792,3 +2792,13 @@ mesh vertices. Skin Issues reuse captured diagnostic metadata rather than repeat
 geometry computation. The provisional general tube wrapper was removed after the full
 regression suite exposed a changed profiler operation name; the established display-only
 native operation and attribution are restored, with its regression test passing.
+
+### Skin collagen membership qualification (0.4.0 in progress)
+
+Previously provisional collagen capture accepted any map of matching vertex count.
+It now requires the common connectivity/material-domain signature, preserving maps
+through position-only deformation while detecting reordered/replaced domains of the
+same size. A mismatch retains the addon's scalar fallback plus Issue. Shared fill,
+clear and explicit-weight operations own immutable map resources and ordinary undo.
+Focused validation covers zero fields, changed connectivity, invalid inputs and saved
+resource ownership; no collagen numerical blending formula changed.

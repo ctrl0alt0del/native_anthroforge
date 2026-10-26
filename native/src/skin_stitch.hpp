@@ -13,6 +13,7 @@ struct Transition {
     int mode=0,reason=0,shift=0,candidates=1,intersections=0,boundary=0,annulus=0;
     double p95=0,maximum=0;
 };
+struct Assembly { Quads mesh; std::vector<Transition> transitions; std::string warning; };
 std::set<Edge> boundary(const std::vector<Quad>& faces);
 std::vector<std::vector<int64_t>> boundaries(const std::vector<Quad>& faces,uint64_t cancel);
 std::vector<Quad> regular_faces(const Vertices& first,const Vertices& second);
@@ -22,6 +23,8 @@ Quads strip(const Vertices& first,const Vertices& second,std::vector<Quad> faces
 Quads weld(const std::vector<Quads>& parts,double tolerance,bool deduplicate,uint64_t cancel);
 void orient(Quads& mesh,uint64_t cancel);
 void quality(Transition& transition,uint64_t cancel);
+void mirror_transitions(std::vector<Transition>& transitions,const Plane& plane,double diagonal,uint64_t cancel);
+Assembly assemble(Quads source,const skin_annuli::Patches& patches,const Plane& plane,bool allow_unstitched,uint64_t cancel);
 Transition transition(const Vertices& first,const Vertices& second,const Plane& plane,double diagonal,uint64_t cancel);
 std::vector<Quad> paired(const std::vector<Triangle>& triangles);
 Quad join(const Triangle& a,const Triangle& b);

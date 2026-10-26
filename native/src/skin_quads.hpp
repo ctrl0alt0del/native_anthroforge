@@ -8,6 +8,7 @@ namespace af::skin_quads {
 using Quad=std::array<int64_t,4>;
 using Edge=std::pair<int64_t,int64_t>;
 using Mask=std::vector<uint8_t>;
+enum Region { Automatic=0, Transition=1, Guide=2 };
 struct Quads { Points points; std::vector<Quad> faces; std::vector<int> regions,guides; };
 struct Result { std::shared_ptr<Mesh> mesh; std::vector<int> regions,guides; };
 Quads capture(const Mesh& mesh,const int* regions,const int* guides,uint64_t cancel);

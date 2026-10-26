@@ -38,7 +38,7 @@ def test_transition_matches_addon_or_rejects_same_unsupported_pair(session, row)
     np.testing.assert_allclose(result.topology.mesh.array(0), row["points"], atol=1e-12)
     np.testing.assert_array_equal(result.topology.mesh.array(1).reshape(-1, 4), row["faces"])
     compare_diagnostics(result.diagnostics, row["diagnostics"])
-    assert np.all(result.topology.regions == 2) and np.all(result.topology.guides == -1)
+    assert np.all(result.topology.regions == 1) and np.all(result.topology.guides == -1)
 
 
 def test_transition_rejects_cancelled_and_malformed_inputs(session):

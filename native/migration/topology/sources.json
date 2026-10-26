@@ -52,5 +52,10 @@
     "adapters/topology/engine/cube.py": "d2824087a94e66b735a7fa4b40d6d4b69e5d5d7a4ec96402da1387ab021aa585",
     "adapters/topology/engine/instant.py": "2c4d187d5e4bbe2563b875ecd3696dc27e4204c83d3b0a6ce4810f56defbe11a",
     "adapters/topology/solver.py": "264a5062e0fa64820d4359b2c56c8e639ba5075fc9c41b4575273f3640c73020"
+  },
+  "orientation_reference": {
+    "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/operators/bmo_normals.cc",
+    "sha256": "b6b046e56e3161943b421aa65f66e711b0d3eb9c2e955fda25d6732221608846",
+    "license": "GPL-2.0-or-later"
   }
 }

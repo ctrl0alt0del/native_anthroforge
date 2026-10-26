@@ -2998,3 +2998,22 @@ pairs reject for the same parity/symmetry reasons. Rendered overlays are inspect
 intersection checks on existing native tessellation; wider coplanar/degenerate BVH
 parity and complete anatomical assembly remain qualification work. No algorithmic
 repair or silent backend substitution is introduced.
+
+### Complete native skin topology assembly (0.4.0 in progress)
+
+Combined automatic quads, transitions and annuli through native boundary matching,
+paired-transition reflection, quantized welding, last-duplicate provenance and outward
+orientation. Blender 5.0.1 `bmo_normals.cc` is adapted through owned arrays, without
+BMesh. Region labels retain the source contract: automatic 0, transition 1, guide 2.
+QuadWild's explicit unstitched quality fallback preserves source/guide geometry;
+cancellation remains an error and never becomes that fallback. Instant remains strict.
+
+Assembly comparison exposed a meaningful precision boundary: the addon materializes
+annuli into float-coordinate meshes before stitching. Keeping unrounded double points
+changed 4–16 tied transition quads on symmetric fixtures. Restoring that boundary,
+after native annulus evaluation, produces exact positions, oriented connectivity,
+labels and transition diagnostics on five successful captured controls. A sixth
+control reproduces parity rejection. Closed disconnected components exercise outward
+orientation; rendered side-by-side results were inspected. Source geometries remain
+immutable and owned results survive input release. These compact fixtures do not yet
+qualify complete anatomical topology, reference deformation, or the release workflow.

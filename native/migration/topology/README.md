@@ -67,3 +67,13 @@ replace NumPy/SciPy/Blender numerical preparation. Compact captures live in
 capture/check tools. Their successful cases match source quads exactly. Boundary parity
 and incorrect symmetry-side matches remain errors. Complete mesh assembly and wider
 intersection-predicate equivalence still require qualification.
+
+Complete assembly now has source-backed compact qualification in `assembly.json`:
+side/centered/paired transitions, strict parity failure, explicit unstitched warning,
+and disconnected closed components with mixed initial winding. Native welding retains
+last-face region/guide provenance. `bmo_normals.cc` provides the outward seed and
+manifold-neighbor orientation policy; its source fingerprint is in `sources.json`.
+Annuli retain Blender float-coordinate materialization before cut/stitch: skipping
+this boundary changed tied zipper ordering on symmetric rings. Numerical annulus
+construction still uses double precision; only the accepted patch coordinates round.
+These tests do not establish production anatomy or public workflow acceptance.

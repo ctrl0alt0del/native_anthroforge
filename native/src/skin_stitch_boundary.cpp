@@ -37,6 +37,6 @@ Quads strip(const Vertices& first,const Vertices& second,std::vector<Quad> faces
     Quads out; out.faces=std::move(faces);
     for(int i=0;i<first.rows();++i) out.points.push_back(first.row(i));
     for(int i=0;i<second.rows();++i) out.points.push_back(second.row(i));
-    out.regions.assign(out.faces.size(),2); out.guides.assign(out.faces.size(),-1); return out;
+    out.regions.assign(out.faces.size(),skin_quads::Transition); out.guides.assign(out.faces.size(),-1); return out;
 }
 }

@@ -433,3 +433,23 @@ The combined topology assembly is next. A draft `skin_stitch_orientation.cpp` ex
 locally but is not compiled or qualified yet; it is intentionally excluded from this
 checkpoint. Public topology integration, symmetry output, reference deformation,
 fitting, export and full release acceptance remain unfinished.
+
+### Complete assembly checkpoint
+
+The prior orientation draft is now compiled and checked. Added complete native
+assembly, paired transition mapping, welded provenance and Blender-derived outward
+orientation. Fixed swapped guide/transition labels before public integration. Exact
+Blender float materialization of accepted annuli resolves observed symmetric zipper
+tie differences; construction calculations stay double precision.
+
+Six maintained addon fixtures cover side/centered/mirrored joins, strict parity error,
+the explicit unstitched warning and disconnected closed shapes. All five successful
+controls match positions, oriented connectivity, labels and diagnostics exactly.
+Evidence: `build/skin-040/assembly-parity.json`; inspected
+`build/skin-040/ui/assembly-parity.png`. Cancellation and owned-output tests pass.
+Native build/five CTests and selected clang-tidy pass; configured mypy passes 478 files.
+The prior broad gate predates these kernels; full regression remains pending.
+
+Next: symmetry input/output, backend orchestration and public topology jobs/UI. Durable
+reference/deformation, shortcut fitting, OBJ export and complete release qualification
+remain unfinished. Keep 0.3.7 package version, feature branch and unrelated __init__.py.

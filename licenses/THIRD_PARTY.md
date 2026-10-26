@@ -38,6 +38,10 @@ GPL-2.0-or-later). Source URLs/hashes are recorded in
 `native/migration/topology/sources.json`; adapted sources ship in the source archive.
 Existing libigl supplies manifold edge-collapse traversal under its MPL-2.0 notices.
 
+Skin assembly orientation adapts Blender 5.0.1 `bmo_normals.cc` (Blender Authors,
+GPL-2.0-or-later) to owned arrays. The source fingerprint is recorded in the same
+manifest; no Blender object or BMesh runtime is linked.
+
 | Component | Version/source | License and source |
 | --- | --- | --- |
 | CPython | 3.12.12 | PSF and bundled notices in CPython-LICENSE.txt; https://www.python.org/downloads/release/python-31212/ |

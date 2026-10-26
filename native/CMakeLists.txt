@@ -1,6 +1,7 @@
 add_subdirectory(boolean)
 set(SKIN_STITCH_SOURCES src/skin_stitch_boundary.cpp src/skin_stitch_zipper.cpp src/skin_stitch_centered.cpp
-    src/skin_stitch_weld.cpp src/skin_stitch_quality.cpp src/skin_stitch_transition.cpp src/skin_stitch_api.cpp)
+    src/skin_stitch_weld.cpp src/skin_stitch_quality.cpp src/skin_stitch_transition.cpp src/skin_stitch_api.cpp
+    src/skin_stitch_orientation.cpp src/skin_stitch_assembly.cpp src/skin_stitch_mirror.cpp)
 set(SKIN_PROXY_SOURCES src/skin_decimate_prepare.cpp src/skin_decimate_metric.cpp src/skin_decimate.cpp src/skin_proxy_api.cpp)
 set(SKIN_LOOP_SOURCES src/skin_loops.cpp src/skin_loops_projection.cpp src/skin_loops_closure.cpp src/skin_loops_pairing.cpp)
 set(SKIN_ANNULUS_SOURCES src/skin_annuli.cpp src/skin_annuli_api.cpp src/skin_annuli_result.cpp

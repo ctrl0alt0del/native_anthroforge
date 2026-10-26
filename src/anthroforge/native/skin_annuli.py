@@ -51,9 +51,14 @@ class Annuli:
         if getattr(self, "handle", 0):
             self.close()
 
-    def snapshot(self) -> Snapshot:
+    @property
+    def counts(self) -> tuple[int, int, int]:
         sizes = np.empty(3, dtype=np.int32)
         self.engine.check(self.engine.library.af_skin_annuli_sizes(self.handle, integers(sizes)))
+        return int(sizes[0]), int(sizes[1]), int(sizes[2])
+
+    def snapshot(self) -> Snapshot:
+        sizes = np.array(self.counts, dtype=np.int32)
         samples = np.empty((sizes[0], 6))
         quads = np.empty((sizes[1], 4), dtype=np.int64)
         patches = np.empty((sizes[2], 9), dtype=np.int32)

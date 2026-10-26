@@ -63,13 +63,13 @@ def standalone(value):
     started = perf_counter()
     fields = prepare_fields(engine, value, inputs)
     scene = create(engine, *inputs)
-    mesh = scene.envelope(fields)
-    result = mesh.array(0).copy(), mesh.array(1).reshape(-1, 3).copy()
+    mesh = scene.envelope(fields).mesh
+    result = mesh.array(0).copy(), mesh.array(1).reshape(-1, 3).copy(), scene.bind(mesh)
     return result, perf_counter() - started
 
 
 def compare(expected, actual):
-    vertices, faces = actual
+    vertices, faces = actual[:2]
     same_vertices = vertices.shape == expected.vertices.shape
     return dict(
         vertices=len(vertices),
@@ -81,6 +81,21 @@ def compare(expected, actual):
         else None,
         connectivity_equal=np.array_equal(faces, expected.triangles),
     )
+
+
+def compare_bindings(expected, actual):
+    fields = dict(
+        owners="source_indices",
+        triangles="triangle_indices",
+        barycentric="barycentric",
+        weights="weights",
+        offsets="normal_offsets",
+        support="support",
+    )
+    return {
+        name: bool(np.array_equal(values, getattr(expected.binding, fields[name])))
+        for name, values in actual[2].items()
+    }
 
 
 def save(folder, result, expected, actual):
@@ -110,16 +125,27 @@ def selected_capture():
     return replace(value, sources=sources, lower=xyz.min(0), upper=xyz.max(0), resolution=48)
 
 
+def output_folder():
+    if len(sys.argv) > 4:
+        return Path(sys.argv[4])
+    name = sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] in ("gap", "contact") else "cube"
+    return Path("build/skin-040") / name
+
+
 def main():
     sys.path.insert(0, str(Path(sys.argv[1])))
     value = selected_capture()
     expected, source_seconds = baseline(value)
     actual, native_seconds = standalone(value)
     result = compare(expected, actual)
+    result["bindings_equal"] = compare_bindings(expected, actual)
     result.update(source_seconds=source_seconds, native_seconds=native_seconds)
-    folder = Path(sys.argv[4]) if len(sys.argv) > 4 else Path("build/skin-040/cube")
-    save(folder, result, expected, actual)
-    return int(result["maximum_error"] != 0 or not result["connectivity_equal"])
+    save(output_folder(), result, expected, actual)
+    return int(
+        result["maximum_error"] != 0
+        or not result["connectivity_equal"]
+        or not all(result["bindings_equal"].values())
+    )
 
 
 if __name__ == "__main__":

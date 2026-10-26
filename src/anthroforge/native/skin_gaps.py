@@ -1,21 +1,29 @@
 """Owned source-aware gap scene using the maintained addon contact predicates."""
 
 import ctypes as c
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
 
 from .mesh import INT64, D, GeometryEngine, Mesh, U, pointer
+from .skin_diagnostics import Diagnostics
 from .skin_fields import INT
 
 FLOAT = c.POINTER(c.c_float)
+
+
+@dataclass(frozen=True)
+class Envelope:
+    mesh: Mesh
+    diagnostics: Diagnostics
 
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_skin_scene_create", [D, c.c_int, INT64, c.c_int, INT, c.c_int, D, U], U)
     engine.bind("af_skin_scene_sample", [U, D, c.c_int, c.c_double, D, U])
     engine.bind("af_skin_scene_destroy", [U], None)
-    engine.bind("af_skin_envelope_mesh", [U, U, U, U], U)
+    engine.bind("af_skin_envelope_mesh", [U, U, U, D, U], U)
     engine.bind("af_skin_scene_progress", [U, INT])
     engine.bind("af_skin_scene_bind", [U, U, INT, INT, FLOAT, FLOAT, FLOAT, FLOAT, U])
 
@@ -45,12 +53,13 @@ class Scene:
         )
         return output
 
-    def envelope(self, fields: Any, budget: int = 1024**3, cancel: int = 0) -> Mesh:
+    def envelope(self, fields: Any, budget: int = 1024**3, cancel: int = 0) -> Envelope:
+        diagnostics = (c.c_double * 19)()
         handle = self.engine.library.af_skin_envelope_mesh(
-            fields.handle, self.handle, budget, cancel
+            fields.handle, self.handle, budget, diagnostics, cancel
         )
         self.engine.check(not handle)
-        return Mesh(self.engine, int(handle))
+        return Envelope(Mesh(self.engine, int(handle)), Diagnostics(tuple(diagnostics)))
 
     def progress(self) -> tuple[int, ...]:
         values = (c.c_int * 3)()

@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from anthroforge.native.mesh import GeometryEngine, NativeCancellation
+from anthroforge.native.skin_diagnostics import Diagnostics
 from anthroforge.native.skin_fields import prepare
 from anthroforge.native.skin_gaps import create
 
@@ -46,12 +47,12 @@ def prepared(resolution=24):
 
 def test_cube_matches_source_control_counts_and_is_prepared():
     _engine, fields, scene = prepared()
-    mesh = scene.envelope(fields)
+    mesh = scene.envelope(fields).mesh
     assert mesh.prepared
     assert mesh.array(0).shape == (11703, 3)
     assert mesh.array(1).size == 23180 * 3
     assert np.isfinite(mesh.array(0)).all()
-    again = scene.envelope(fields)
+    again = scene.envelope(fields).mesh
     np.testing.assert_array_equal(mesh.array(0), again.array(0))
     np.testing.assert_array_equal(mesh.array(1), again.array(1))
 
@@ -73,7 +74,7 @@ def test_running_tiles_cancel_without_poisoning_scene():
         with pytest.raises(ValueError, match="[Cc]ancel"):
             future.result(timeout=10)
     assert scene.sample([[2.0, 0, 0]], 4).shape == (1, 13)
-    assert scene.envelope(fields).prepared
+    assert scene.envelope(fields).mesh.prepared
 
 
 def test_budget_failure_preserves_fields_and_source_queries():
@@ -82,12 +83,12 @@ def test_budget_failure_preserves_fields_and_source_queries():
     with pytest.raises(ValueError, match="memory budget"):
         scene.envelope(fields, budget=100)
     np.testing.assert_array_equal(fields.array(3), before)
-    assert scene.envelope(fields).prepared
+    assert scene.envelope(fields).mesh.prepared
 
 
 def test_envelope_source_binding_has_material_support():
     _engine, fields, scene = prepared()
-    mesh = scene.envelope(fields)
+    mesh = scene.envelope(fields).mesh
     binding = scene.bind(mesh)
     assert np.all(binding["owners"][:, 0] == 0)
     assert np.all(binding["support"] == 1)
@@ -95,3 +96,23 @@ def test_envelope_source_binding_has_material_support():
     np.testing.assert_allclose(binding["weights"].sum(axis=1), 1, atol=1e-6)
     used = binding["weights"] > 0
     np.testing.assert_allclose(binding["barycentric"].sum(axis=2)[used], 1, atol=1e-6)
+
+
+def test_diagnostics_distinguish_unavailable_from_clean_checks():
+    missing = Diagnostics((0.0,) * 19)
+    assert len(missing.unavailable) == 3
+    assert missing.report()["mesh_quality"] is None
+    assert missing.report()["source_intersections"] is None
+    with pytest.raises(ValueError, match="diagnostic"):
+        Diagnostics((0.0,))
+
+
+def test_envelope_keeps_quality_findings_with_usable_geometry():
+    _engine, fields, scene = prepared()
+    result = scene.envelope(fields)
+    assert result.mesh.prepared
+    assert result.diagnostics.unavailable == ()
+    report = result.diagnostics.report()
+    assert report["mesh_quality"]["finite"] == 1
+    assert report["coverage"]["source_vertices_checked"] == 8
+    assert report["source_intersections"] == 0

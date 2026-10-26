@@ -81,8 +81,13 @@ add progress/timeout diagnostics first. Its invocation was
 `check_skin_envelope.py <addon> <digits_blend.capture.npz> Thumb,Index,Middle,Ring,Little build/skin-040/digits`.
 Native material binding capture is connected through the source scene. Typed SkinStage
 records own stage-buffer resources; save/read retain them and reject checksum corruption.
-Fourteen binding/foundation/architecture tests and mypy (441 files) pass. Diagnostic
-bundles, contributor capture, coordinator/publication and UI remain pending.
+Fourteen binding/foundation/architecture tests passed at the binding checkpoint.
+Native diagnostic bundles now retain quality, gap coverage, source intersections and
+removed-component counts. Named decoding distinguishes unavailable checks from clean
+findings. Eight envelope/architecture tests pass; mypy (442 files), Ruff and format pass.
+The three source controls also match all six binding arrays exactly, including retained
+source/triangle identities, barycentrics, weights, offsets and support. Contributor capture,
+coordinator/publication and complete UI remain pending. No production skin acceptance.
 App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated root
 `__init__.py` is preserved. Source `.blend` files remain untouched.
 

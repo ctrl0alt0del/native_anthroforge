@@ -1,7 +1,8 @@
 add_subdirectory(boolean)
 set(SKIN_SOURCES src/skin_grid.cpp src/skin_distance.cpp src/skin_raster.cpp
     src/skin_exterior.cpp src/skin_collagen.cpp src/skin_fields.cpp src/skin_fields_api.cpp
-    src/skin_gaps.cpp src/skin_meshing.cpp src/skin_assembly.cpp src/skin_precision.cpp src/skin_envelope.cpp)
+    src/skin_gaps.cpp src/skin_meshing.cpp src/skin_assembly.cpp src/skin_precision.cpp
+    src/skin_envelope.cpp src/skin_diagnostics.cpp)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     ${SKIN_SOURCES}
     src/comparison_fingerprint.cpp

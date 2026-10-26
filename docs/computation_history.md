@@ -2745,3 +2745,10 @@ barycentric coordinates, weights, normal offsets and support per skin vertex. Sk
 resources own the corresponding data independently of native handles. Binding invariants,
 resource round-trip and checksum corruption checks pass; deformation-reference construction
 and production material-update acceptance remain pending.
+
+Native envelope results now carry the maintained mesh-quality, coverage/gap and source
+intersection checks alongside geometry. A completion mask separates unavailable checks
+from clean results; findings do not silently reject otherwise usable geometry. Cube,
+separated-cube and overlapping-cube controls also match all six source-binding arrays
+exactly. Eight envelope/architecture tests pass. These checks are worker work; complete
+application publication and anatomical qualification remain pending.

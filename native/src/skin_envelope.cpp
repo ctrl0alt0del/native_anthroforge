@@ -13,10 +13,11 @@ static std::shared_ptr<Mesh> extract(Tiles& tiles,uint64_t budget,uint64_t cance
     const auto& o=tiles.grid.origin;
     return assemble(assembly,V3(o.x,o.y,o.z),tiles.grid.h);
 }
-static std::shared_ptr<Mesh> supported(const Scene& scene,const Mesh& mesh,uint64_t cancel) {
+static std::shared_ptr<Mesh> supported(const Scene& scene,const Mesh& mesh,double* diagnostics,uint64_t cancel) {
     std::vector<uint8_t> keep(mesh.vertices.rows()); int stats[3]{};
     kernel::af_skin::keep_supported_components(scene,mesh.vertices.data(),int(mesh.vertices.rows()),
         mesh.corners.data(),int(mesh.corners.size()/3),keep.data(),stats);
+    diagnostics[18]=stats[1];
     Points points; std::vector<int64_t> remap(keep.size(),-1); Faces faces;
     for(size_t i=0;i<keep.size();++i) if(keep[i]) { remap[i]=int64_t(points.size()); points.push_back(mesh.vertices.row(i)); }
     for(size_t i=0;i<mesh.corners.size();i+=3) if(keep[mesh.corners[i]])
@@ -34,25 +35,27 @@ static void orient(Mesh& mesh) {
         std::swap(mesh.corners[i],mesh.corners[i+2]); mesh.triangles.row(i/3).reverseInPlace();
     }
 }
-std::shared_ptr<Mesh> extract_envelope(Tiles& tiles,uint64_t budget,uint64_t cancel) {
-    const auto raw=extract(tiles,budget,cancel); auto result=supported(*tiles.scene,*raw,cancel);
+std::shared_ptr<Mesh> extract_envelope(Tiles& tiles,uint64_t budget,double* diagnostics,uint64_t cancel) {
+    const auto raw=extract(tiles,budget,cancel); auto result=supported(*tiles.scene,*raw,diagnostics,cancel);
     check_cancel(cancel);
     kernel::af_skin::finish_skin_tiles(tiles,result->vertices.data(),int(result->vertices.rows()),
         result->corners.data(),int(result->corners.size()/3),8);
     result->vertices=result->vertices.cast<float>().cast<double>(); orient(*result);
-    check_cancel(cancel); rebuild_mesh(*result,cancel); return result;
+    diagnose(tiles,*result,diagnostics,cancel); rebuild_mesh(*result,cancel); return result;
 }
-static std::shared_ptr<Mesh> envelope(uint64_t fields,uint64_t source,uint64_t budget,uint64_t cancel) {
+static std::shared_ptr<Mesh> envelope(uint64_t fields,uint64_t source,uint64_t budget,double* diagnostics,uint64_t cancel) {
+    if(!diagnostics) throw std::runtime_error("Missing skin diagnostic buffer.");
+    std::fill(diagnostics,diagnostics+19,0.0);
     const auto input=get_fields(fields); SceneAccess access(source,cancel);
     const uint64_t reserved=input->grid.count*40;
     if(reserved>=budget) throw std::runtime_error("Skin fields exhaust worker memory budget.");
     auto tiles=prepare_tiles(access.value,*input,budget-reserved,cancel);
     const uint64_t storage=tiles->values.bytes()+kernel::af_skin::tile_auxiliary_bytes(*tiles);
     if(storage>=budget-reserved) throw std::runtime_error("Skin tiles exhaust worker memory budget.");
-    return extract_envelope(*tiles,budget-reserved-storage,cancel);
+    return extract_envelope(*tiles,budget-reserved-storage,diagnostics,cancel);
 }
 }
-uint64_t af_skin_envelope_mesh(uint64_t fields,uint64_t scene,uint64_t budget,uint64_t cancel) {
-    try { return af::retain(af::skin::envelope(fields,scene,budget,cancel)); }
+uint64_t af_skin_envelope_mesh(uint64_t fields,uint64_t scene,uint64_t budget,double* diagnostics,uint64_t cancel) {
+    try { return af::retain(af::skin::envelope(fields,scene,budget,diagnostics,cancel)); }
     catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }

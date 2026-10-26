@@ -40,7 +40,7 @@ be reviewed before inclusion. Root __init__.py is unrelated. No 0.4.0 release/ma
 Execution correction: no default process time/memory cutoff; bounded diagnostic tail
 instead of terminating on log volume; process-tree termination handle race fixed;
 tetrahedral thread setting restored to four. Fourteen focused backend/proxy tests pass.
-Resource-aware admission remains unfinished. The maintained Blender 5.0.1 geometry-only
+Resource-aware admission is recorded below. The maintained Blender 5.0.1 geometry-only
 BMesh subset is now integrated in the C++17 library, replacing approximate Decimate and
 half-cutting. Source hashes and omitted unreachable definitions are recorded in its manifest.
 Five canonical Mesh.from_pydata Decimate controls match exact coordinates/connectivity;
@@ -57,6 +57,28 @@ Large work may run alone even when its estimate exceeds capacity. Waiting remain
 bounded inline edits remain available. Forty scheduler/lifecycle/architecture tests pass,
 configured mypy passes 493 files, all five native CTests pass. Full skin regression is running.
 No reference/deformation/fitting/export acceptance is implied by this checkpoint.
+
+Anatomical preparation qualification found/fixed a missing conversion boundary:
+Blender's Decimate uses regular Mesh vertex normals, not recalculated BMesh normals.
+An isolated captured-normal experiment identified this cause; the native adapter now
+ports Mesh's Newell/angle-weighted normal calculation. Skull (428,230 triangles) and
+torso (4,481,616 triangles) both match exact positions/connectivity after all three
+stages: collapse to 64,000 faces, ten smoothing iterations, BMesh half cut. Source
+captures are unchanged. A 2,048-triangle skull region catches the former mismatch.
+Evidence and paired renders: build/skin-040/bmesh-anatomy/. Both skull and torso renders
+inspected. No algorithm replacement was introduced. Broad regression: 2,485 passed,
+two failures under investigation (renderer test patches the old launcher owner; inline
+attachment timing test passes alone and in 30 serial repeats). No release acceptance yet.
+
+Next-stage decision pending: the unmodified addon deformation sampler requires surface
+faces and positive area. A three-point centerline produces `Invalid reference connectivity`;
+the native area routine returns all-zero weights. A triangle using those points succeeds
+with area 0.5. Evidence: build/skin-040/centerline-reference.json, including source hash.
+Bare-Fiber centerlines remain the approved geometry. A new deformation-weighting rule
+would be an additional algorithm adaptation, so reference/deformation implementation is
+paused for discussion. Proposed experiment (not implemented/approved): derive Fiber
+influence from its associated envelope area, retain centerline movement targets and
+unchanged surface-contributor weighting. User has been asked; do not silently choose.
 
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve

@@ -30,7 +30,17 @@ def case(row):
     evaluated.to_mesh_clear()
     bpy.data.objects.remove(obj, do_unlink=True)
     bpy.data.meshes.remove(mesh)
-    return dict(name=row["name"], source=source, result=result, target=row["target"])
+    return captured_case(row, source, result)
+
+
+def captured_case(row, source, result):
+    return dict(
+        name=row["name"],
+        source=source,
+        result=result,
+        target=row["target"],
+        provenance=row.get("provenance", {}),
+    )
 
 
 def small_cases():

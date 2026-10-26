@@ -205,7 +205,9 @@ def test_live_parent_and_child_commit_together_and_undo(assembly, session):
     root, child = assembly
     session.command("begin")
     session.command("scp.transform", entity=root, values=[0, 0, 2, 0, 0, 0, 1, 1, 1])
-    assert session.document.entity(child).matrix[11] == pytest.approx(2)
+    assert session.document.entity(child).matrix[11] == pytest.approx(2), session.scheduler.jobs[
+        -1
+    ].scheduling_details()
     assert session.scheduler.jobs[-1].execution == "inline"
     assert not session.scheduler.blocked
     session.command("commit")

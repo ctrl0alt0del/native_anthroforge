@@ -3125,3 +3125,21 @@ cancellation, coalescing, checkpoint and priority behavior. Profiler lifecycle r
 resource estimates and resource-wait transitions. Bounded inline edits remain available.
 Forty focused scheduler, skin lifecycle and architecture tests pass; native CTests pass 5/5.
 Broader production-anatomy performance and complete release checks remain pending.
+
+### Blender modifier input-normal parity (0.4.0 in progress)
+
+Real skull preparation exposed a difference missed by the initial compact controls.
+The modifier copies regular Mesh vertex normals into BMesh; recomputing BMesh normals
+changes low-cost collapse ordering. Supplying captured Mesh normals to the isolated
+kernel restored identical topology, identifying the actual conversion defect. The
+adapter now preserves Blender's Mesh Newell-face normals, angle-weighted vertex
+accumulation and float normalization before the unchanged BMesh collapse kernel.
+
+Source-backed skull (428,230 triangles) and torso (4,481,616 triangles) controls now
+match exact coordinates/connectivity after collapse, smoothing and half cutting.
+A captured 2,048-triangle skull region distinguishes the old/new conversion: the old
+normal boundary changes vertices by up to 0.02504 source units; the new output is exact.
+Stage timings and source hashes are retained under build/skin-040/bmesh-anatomy; these
+are individual qualification runs, not controlled performance benchmarks. Items 3–6
+remain unchanged. This completes the missing Blender conversion boundary, not a new
+simplification or smoothing algorithm. Complete skin release acceptance remains open.

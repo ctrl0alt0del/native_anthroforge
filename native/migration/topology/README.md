@@ -40,6 +40,16 @@ connectivity match exactly through the application API. The older
 `proxy_decimation.json` retains its BMesh-origin edge-order context and historical
 approximation evidence; it is not an interchangeable input-order oracle.
 
+The modifier receives regular Mesh vertex normals, which differ numerically from
+BMesh's recomputed normals. `blender_mesh_normals.cpp` retains the source Newell-face,
+angle-weighted accumulation and float normalization boundary. The original file is
+fingerprinted under `mesh_normals_reference`. Omitting this step changed collapse
+choices on real anatomy. Captured skull (428,230 input triangles) and torso (4,481,616)
+preparation now match exact coordinates/connectivity after Decimate, Smooth and half
+cutting. The compact `bmesh_normals.json` region fails under the prior conversion and
+passes with the corrected one. Maintained capture/check/render tools operate on
+read-only source captures; build reports retain hashes and stage timings.
+
 Closed-loop preparation ports addon `annuli.py` and `solver.py` rules to owned C++
 arrays, reusing the maintained native graph route. Fixtures capture Blender's float
 BVH output; native queries can select the other valid incident normal at a mesh edge.

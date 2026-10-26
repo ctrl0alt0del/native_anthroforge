@@ -74,5 +74,10 @@
       "sha256": "8096baf0094107f2b651f2179e570cc1864e0c159d98c999868b12064393d22d",
       "license": "GPL-2.0-or-later"
     }
-  ]
+  ],
+  "mesh_normals_reference": {
+    "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenkernel/intern/mesh_normals.cc",
+    "sha256": "34ce0119745e736be55a0899dec8f1ad5b824de8dbdd23c69201ad75cb7dfb62",
+    "license": "GPL-2.0-or-later"
+  }
 }

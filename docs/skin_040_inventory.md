@@ -1,9 +1,11 @@
 # Skin migration inventory for 0.4.0
 
-Status: **source audit and proposed scope; not implemented or release-qualified**.
-The user requested moving the addon's existing skin functionality to the standalone
-application. Release coverage, initial export formats and UI entry point are awaiting
-the current questions. This inventory does not settle those choices.
+Status: **release scope confirmed; source audit, not implemented or release-qualified**.
+The user confirmed the full existing workflow for 0.4.0, including fitting bones to
+reproduce a shortcut. Export starts with OBJ through an extensible format boundary.
+Skin joins Shape, Shortcuts and Inspect in a vertical strip along the left edge of
+the right inspector, following the supplied sketch. This supersedes the proposed
+separate Skin mode or root-only inspector placement.
 
 ## Evidence boundary
 
@@ -11,6 +13,10 @@ the current questions. This inventory does not settle those choices.
 - Addon inspected: `fae36aba1b208676cf21d7c4a78a20d5b1f68c66` at
   `C:/Users/alexe/AppData/Roaming/Blender Foundation/Blender/5.0/scripts/addons/anthroforge`.
   Inspected skin/topology/deformation paths have no local tracked changes.
+- Bone fitting is additional **local, untracked addon work**, not attributable to that
+  commit alone. Inspected its native fitter, capture/publication, UI, docs and tests.
+  [Source fingerprints](skin_040_bone_source.json) record the exact inspected files;
+  this does not claim addon release qualification or standalone parity.
 - Read production operators, panels, properties, capture, computation, validation and
   publication, alongside their documentation and tests. Source inspection is not a
   claim that every fixture currently passes. No Blender project was modified or built.
@@ -36,6 +42,8 @@ Paths in the source column are relative to the addon root above.
 | Symmetry | None, root-local X/Y/Z or custom origin/normal; solve one half, assemble reflected geometry and retain symmetry correspondence. | `properties/topology_properties.py`, `core/topology/symmetry.py`, `adapters/topology/engine/annuli.py` |
 | Durable reference | Build tetrahedral proxy, anatomical/material samples, embedding, vertex identities and symmetry data. Keep an immutable, serializable reference; disposable solver caches may be reconstructed. Successful reference publication removes the temporary draft. | `core/deformation/reference.py`, `proxy.py`, `adapters/deformation/initialization.py`, `construction.py` |
 | Final skin updates | LE (Linear Elasticity) is default; FAST uses reduced ARAP. Solve from the immutable reference and publish positions only. Connectivity, vertex order and identity remain fixed. Explicit rebuild replaces topology/reference; changing construction settings marks them stale. | `core/deformation/strategy.py`, `pipeline.py`, `native/deformation/elastic.hpp`, `reduced.hpp`, `adapters/deformation/runtime.py` |
+| Shortcut bone fitting | Sample one continuous scalar float shortcut through final-skin updates in isolation; fit an independent weighted bone representation. User chooses range, bone budget and odd sample count. Public Scale Aware and authoring-only Single Active strategies remain distinct. | `docs/shortcut_bone_fitting.md`, `core/bone_fitting/`, `adapters/bone_fitting/`, `native/bone_fitting/native.cpp` |
+| Fitted result/preview | Persist weights, transforms, sampled shortcut mapping and error metrics; preview without rerunning anatomy. Preserve original anatomy/skin. Addon publication uses a separate mesh/armature with ordinary channels and FCurves. | `adapters/bone_fitting/rig.py`, `publication.py`, `ui/bone_fitting.py`, `tests/blender/test_bone_fitting.py` |
 | Contact/quality | Native unilateral contact with symmetry, separate validation of motion from displayed pose, bounded work. Residual intersections, inverted proxy elements and iteration limits are reported. No complete collision/containment guarantee. | `core/deformation/contact.py`, `anatomy_quality.py`, `native/deformation/contact*.hpp` |
 | Lifecycle | Background work, progress/cancellation, input/revision validation and atomic publication retaining previous output on failure. Persistent reference identity and contributor compatibility checked before updates. | `adapters/deformation/request.py`, `publication.py`, `construction.py`, `adapters/job_revision.py` |
 | Legacy workflows | Draft/topology warm updates and preparation of old bindings remain for addon files without a durable reference. They are not the current reference-based final-skin algorithm. | `core/warm_start/`, `adapters/warm_update/`, `ui/panels/warm_update_panel.py` |
@@ -60,16 +68,66 @@ Native construction failure, malformed data, cancellation and dependency/resourc
 failures preserve earlier output. Any deliberate change to this policy needs an
 explicit product decision and computation-history entry.
 
+## Confirmed scope additions and fitting limits
+
+The user explicitly includes shortcut-to-bone fitting in 0.4.0; earlier deferral of
+that system in this inventory is superseded. This includes its usable result and
+preview workflow, not only a numerical report. It does not imply a general animation
+editor, automatic anatomical joints, or exporting a rig through OBJ.
+
+Current addon fitting behavior to preserve:
+
+- One continuous scalar float shortcut, with other controls held at captured values.
+  Use the same shortcut operations/policies that produced the anatomical deformation.
+- Increasing range and odd sample count: default nine, UI range 5–33. Fit both endpoints;
+  alternate interior samples are held out for validation. Minimum defines reference pose.
+- Bone budget defaults to four, range 1–64. The algorithm fits weights/transforms for
+  that budget; it does **not** discover a guaranteed minimal number of bones.
+- Scale Aware uses the maintained independent-axis scale fitter with Dem Bones
+  initialization/weight updates, scale bounds 0.25–4 and at most four influences per
+  vertex. Unsupported shear/reflections and invalid weights are structural errors.
+- Single Active remains available to authoring: one moving TRS bone plus a fixed
+  identity background influence. The affine/shear experiment is not a product strategy.
+- Samples must share vertex identities/connectivity. Replay the first sample to detect
+  nondeterminism; record held-out/global/moving-region fit errors rather than claiming
+  arbitrary-parameter accuracy from training error.
+- Clamp outside the sampled interval. Native SLERP predictions supply saved sample keys;
+  addon playback interpolates translation, scale and quaternion channel values linearly.
+  Qualification must compare actual displayed playback, not assume equivalence between
+  interpolation schemes at unmeasured intermediate values.
+- Separately fitted shortcuts are independent; automatic composition is not supported.
+  Fitting cannot repair defects in its sampled target meshes.
+- Isolate capture from the live document; cancellation, stale publication rejection,
+  coherent Undo and save/reopen must include the fitted result and its source provenance.
+
+The app needs typed fitted-bone/weight/control records and native preview evaluation,
+not Blender armatures or driver namespaces. These are derived companion results; they
+must not replace the editable source or introduce Apply/Bake for anatomy primitives.
+Keep them in the project with their reference and diagnostics. OBJ exports skin geometry
+and preserves quad faces; it cannot carry bones, weights or shortcut drivers.
+
+Export must have a narrow format interface over an immutable, validated export snapshot.
+Common currentness, units, source selection and atomic-write rules belong above individual
+writers. OBJ is the first writer; adding another format must not modify skin algorithms
+or require a parallel export workflow. No rig-capable format is silently added in 0.4.0.
+
+The vertical inspector tabs are **Shape / Shortcuts / Inspect / Skin**. Skin is a
+document-level page, accessible without selecting the root. It shares the existing
+inspector; selecting it does not create a new anatomical workspace or mutate geometry.
+Preserve the other pages, drafts, keyboard/focus conventions and local layout state.
+Detailed layout/interaction validation remains part of implementation planning.
+
 ## Standalone ownership and porting work
 
 The following is an implementation direction, not a confirmed public API.
 
 | Owner | Work to add/reuse |
 | --- | --- |
-| Core | One document-owned skin definition/output lifecycle, separate authored settings, accepted envelope/topology/reference, source identities and construction freshness. No dummy SCP or TissueVCP. |
+| Core | One document-owned skin definition/output lifecycle, separate authored settings, accepted envelope/topology/reference, source identities and construction freshness. Typed shortcut-fit results and independent preview controls. No dummy SCP or TissueVCP. |
 | Application | Contributor selection, reference compatibility, shared operations, construction/update dependencies, revision capture, saving/export policy, undo and lifetime through the existing coordinator. |
-| Native C++ | Port field/raster/distance work, meshing preparation, guide projection/pairing/transitions, density/refinement and deformation preparation/evaluation through owned batched inputs. Reuse maintained native skin/field/LE/FAST kernels and spatial/material services. |
-| Desktop | Skin entry point, primary build/update controls, collagen painting, guide/density editing, stage inspection and Issues using the new workbench. No extra editor or calculation manager. |
+| Native C++ | Port field/raster/distance work, meshing preparation, guide projection/pairing/transitions, density/refinement, deformation, bone fitting and repeated preview skinning through owned batched inputs. Reuse maintained native kernels and spatial/material services. |
+| Desktop | Vertical inspector tabs including Skin, build/update/fitting controls, collagen painting, guide/density editing, independent fitted preview, stage inspection and Issues using the existing workbench. No extra editor or calculation manager. |
+| Export adapters | Extensible format interface with OBJ first. Shared export snapshot, eligibility, unit and publication rules remain application-owned. |
 | Packaging | Qualify/pin topology and tetrahedralization dependencies for the app runtime, include source provenance/notices, and exercise a relocated portable build. |
 
 Important migration differences:
@@ -98,12 +156,14 @@ Important migration differences:
   temporary Blender names or new nearest-surface reassignment during updates.
 - Keep the latest accepted output while work runs or fails. Full rebuild and cheap
   position updates are distinct operations; do not automatically remesh after a shortcut.
-- Legacy warm-start migration, armature baking, rig fitting and Blender-project
-  conversion are separate workflows, not prerequisites for new standalone skin.
+- Legacy warm-start migration and Blender-project conversion remain separate from new
+  standalone skin. Shortcut-to-bone fitting is now explicitly included. General rig
+  editing/animation and multi-shortcut composition are not inferred from that inclusion.
 
 ## Proposed delivery sequence
 
-1. Confirm scope/UI/export and write the 0.4.0 specification and implementation plan.
+1. Consolidate the confirmed full scope, vertical tabs and extensible OBJ export into
+   the 0.4.0 specification and implementation plan.
 2. Define document settings/results, contributor/reference contracts and lifecycle;
    establish paired fixtures before changing algorithms.
 3. Deliver native envelope construction, collagen/gap controls and painting through
@@ -112,7 +172,9 @@ Important migration differences:
    warnings and explicit backend selection.
 5. Integrate durable reference and LE/FAST updates, contact diagnostics, stale
    construction state, cancellation and persistence.
-6. Complete export (if selected), production-assembly profiling, parity/visual checks,
+6. Integrate isolated shortcut sampling, native bone fitting, independent result preview,
+   quality inspection and persistent fitted data through shared desktop/headless operations.
+7. Complete OBJ export, production-assembly profiling, parity/visual checks,
    documentation and one canonical 0.4.0 package/source archive. Do not advance the
    release version merely because part of the pipeline is implemented.
 
@@ -137,6 +199,11 @@ These are future checks; none has been run as 0.4.0 acceptance.
 - LE/FAST coordinate updates with exact connectivity/vertex-identity preservation;
   open-to-contact-to-open sequence, large shortcut changes, solver limits, contributor
   incompatibility and explicit reinitialization/rebuild.
+- Bone fitting: Scale Aware and authoring-only Single Active, scalar eligibility,
+  stable sample identity, source preservation, held-out validation, actual preview
+  interpolation, clamping, fitting/capture cancellation, stale results and persisted
+  playback without invoking anatomical calculations. Cover shortcut attachment policies
+  and driving formulas, not only synthetic TRS targets.
 - Editing while queued/running, obsolete work, complete publication read validation,
   Manual inputs, workspace priorities, Undo/Redo, save checkpoints, reopening without
   blanket recalculation and native resource release.
@@ -167,5 +234,11 @@ Local fixtures discovered, not yet qualified for this release:
 - [Instant Meshes native entry point](https://github.com/wjakob/instant-meshes/blob/master/src/main.cpp)
   and [license](https://github.com/wjakob/instant-meshes/blob/master/LICENSE.txt).
 - [libigl deformation/BBW/FAST tutorial](https://libigl.github.io/tutorial/).
+- [Dem Bones source and native interface](https://github.com/electronicarts/dem-bones).
+  Reuse the maintained addon adapter/fitter, not upstream rigid decomposition alone;
+  the addon's scale-aware extension and strategy restrictions matter.
+- [Qt navigation controls](https://doc.qt.io/qt-6/qtquickcontrols-navigation.html).
+  The confirmed vertical strip requires presentation composition; Qt TabBar's position
+  setting is header/footer and is not a vertical-orientation setting.
 - [Blender remeshing](https://docs.blender.org/manual/en/5.0/modeling/modifiers/generate/remesh.html).
   Generic remeshing is not the addon's collagen, protected-gap and guided-topology pipeline.

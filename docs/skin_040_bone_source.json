@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-26",
+  "source_root": "C:\\Users\\alexe\\AppData\\Roaming\\Blender Foundation\\Blender\\5.0\\scripts\\addons\\anthroforge",
+  "addon_head": "fae36aba1b208676cf21d7c4a78a20d5b1f68c66",
+  "provenance": "Local worktree files; bone-fitting modules are untracked, not covered by addon_head. Read-only audit, not qualification.",
+  "files": [
+    {
+      "path": "adapters/authoring/bone_fitting.py",
+      "sha256": "90575d48200c3c534ea17b55c462b30718ae07ea5ba8fc8af4c2b6fd759d614e",
+      "bytes": 497
+    },
+    {
+      "path": "adapters/bone_fitting/__init__.py",
+      "sha256": "841356df8a3c9de7a0b24a5e2420c270710b82af13957c6b8dcc539ec967b07c",
+      "bytes": 38
+    },
+    {
+      "path": "adapters/bone_fitting/capture.py",
+      "sha256": "a63858e9d339d93a0cf7f2255f3c7292c30a3db9c2ba2777dd5850915d904116",
+      "bytes": 2018
+    },
+    {
+      "path": "adapters/bone_fitting/jobs.py",
+      "sha256": "d8d12b3bfc9cd2c6c74b3e139dd6aec78d4b76d01b6f583bb0df1a8b77111225",
+      "bytes": 2780
+    },
+    {
+      "path": "adapters/bone_fitting/publication.py",
+      "sha256": "9163d7ec9950dfd97613b7466158663422d77752ad6aea5e1fa4734b442f82d3",
+      "bytes": 1793
+    },
+    {
+      "path": "adapters/bone_fitting/rig.py",
+      "sha256": "c498b23c14c8303892493d2337fb63cff4d87d36f0236f1e3f5f53d5b0c46c49",
+      "bytes": 4851
+    },
+    {
+      "path": "core/bone_fitting/__init__.py",
+      "sha256": "841356df8a3c9de7a0b24a5e2420c270710b82af13957c6b8dcc539ec967b07c",
+      "bytes": 38
+    },
+    {
+      "path": "core/bone_fitting/model.py",
+      "sha256": "43ff7ba5d18c6e3f818fbcc16611bbcb2156c3e37a85fceb9fdaf676975fdb4f",
+      "bytes": 2056
+    },
+    {
+      "path": "core/bone_fitting/native.py",
+      "sha256": "ed125b52cad46cebaa63179c5608ddcb9027dcaf4bea96d045e9ab0a5f9eae3e",
+      "bytes": 2424
+    },
+    {
+      "path": "core/bone_fitting/pipeline.py",
+      "sha256": "91fcf405425e2d84f9b27a9c14d42ff235a9e9e80c9a2fddea7a9e54cc3266af",
+      "bytes": 3101
+    },
+    {
+      "path": "core/bone_fitting/storage.py",
+      "sha256": "79a6c95eeaec046e287ee20c4121e8bdb140b64d44ad98d9e7d987110aadec2d",
+      "bytes": 883
+    },
+    {
+      "path": "core/bone_fitting/strategies.py",
+      "sha256": "e522bb6ac7602c5ddfd7c130d76bce59994de43578fcc3e9fbf6984afb5e1a17",
+      "bytes": 1115
+    },
+    {
+      "path": "docs/shortcut_bone_fitting.md",
+      "sha256": "6eb061e367eec5579e0f1f933536afd2579426b163aba3d87a00dfdf9d8caff0",
+      "bytes": 4187
+    },
+    {
+      "path": "native/bone_fitting/build_windows.ps1",
+      "sha256": "91496628e8b75fac033975dceeac8c3c058b8d1d425af1da7607baea55a81666",
+      "bytes": 1302
+    },
+    {
+      "path": "native/bone_fitting/native.cpp",
+      "sha256": "d43533fb08a042a9fed1fac2b154b3c7ba6d6d1286483efba86e62d69bc74588",
+      "bytes": 11596
+    },
+    {
+      "path": "native/bone_fitting/vendor/DemBones/ConvexLS.h",
+      "sha256": "940d562242e33aa4946622e51df915474f1272193ddc71c455c1246e2f27ba5f",
+      "bytes": 4850
+    },
+    {
+      "path": "native/bone_fitting/vendor/DemBones/DemBones.h",
+      "sha256": "260aea35f27c51c356368028a17d364974f2222a9fdae9092401c30d6c5b9f36",
+      "bytes": 29333
+    },
+    {
+      "path": "native/bone_fitting/vendor/DemBones/DemBonesExt.h",
+      "sha256": "ba35777060a36bc8d49c8f8fb099f0212f9bf3c98c206f3cba9119467ed01f27",
+      "bytes": 11588
+    },
+    {
+      "path": "native/bone_fitting/vendor/DemBones/Indexing.h",
+      "sha256": "8c62f708e2e5f5ac32f4c45bb2d844f7d0ddf5554c80cc9a97f2c16187fb38e1",
+      "bytes": 4836
+    },
+    {
+      "path": "native/bone_fitting/vendor/DemBones/MatBlocks.h",
+      "sha256": "3e8c43a779f8a050367c9a343db6e7eb10636a041a17536ba4bf9c1cf668d0bd",
+      "bytes": 1335
+    },
+    {
+      "path": "native/bone_fitting/vendor/DEMBONES_LICENSE.md",
+      "sha256": "d364234aa09d71323f57d8f7abe2d1937eab89941869c6729b308c9e9dc4b32a",
+      "bytes": 1779
+    },
+    {
+      "path": "native/bone_fitting/vendor/DEMBONES_VERSION.md",
+      "sha256": "b54e18484699d070ad66ef48ec87596edee9580160232e9437aa068c4e304fd2",
+      "bytes": 846
+    },
+    {
+      "path": "operators/bone_fitting.py",
+      "sha256": "5b41233039f4e452eb3d006e3fb78de37936ae71e811cd50454af5bf711306e5",
+      "bytes": 5144
+    },
+    {
+      "path": "tests/blender/test_bone_fitting.py",
+      "sha256": "5d71af971f4830413d4a143e87cba8be0169878f58b17b43ba9d6eeb70926c4c",
+      "bytes": 3052
+    },
+    {
+      "path": "tests/blender/test_bone_fitting_job.py",
+      "sha256": "6b0f58e21e4124e5b647d7fac73d1d729c14d36c748f76d4e459e425b447a133",
+      "bytes": 2572
+    },
+    {
+      "path": "tests/unit/test_bone_fitting.py",
+      "sha256": "db7fe7feefbeb44767f7bb1db982648ea8cd6b8a80b833f650422361e9d7559e",
+      "bytes": 3102
+    },
+    {
+      "path": "ui/bone_fitting.py",
+      "sha256": "87ce345c379dc08cf8c3969c7b43b3efe122dcfed6e5ee305512e9eb7b8b014a",
+      "bytes": 1402
+    },
+    {
+      "path": "workers/bone_fitting.py",
+      "sha256": "b8b7afde133c684b04bda6781d030d39e583cb8ac07142da6b17b981386ff2c6",
+      "bytes": 1919
+    }
+  ]
+}

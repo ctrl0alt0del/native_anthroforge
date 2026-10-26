@@ -252,3 +252,20 @@ This remains internal integration, not a public topology-build command. Next wor
 batch source guide assembly; loop patch preparation; density/proxy/symmetry and
 refinement; coordinator publication and desktop controls; persistent reference and
 LE/FAST; fitting/export; full geometry/GUI/package qualification. Version stays 0.3.7.
+
+### Guide assembly and density checkpoint
+
+Added native batched guide assembly: distinct source-local patch IDs become distinct
+global FLOW regions, with retained `(source index, local region)` provenance and
+combined path offsets. Capture assembles this data without changing accepted sources.
+Cancellation, invalid buffers and empty inputs are tested.
+
+Ported addon density initialization, lumped vertex areas, median fallback and eight
+log-smoothing/budget-correction iterations to C++. Metadata budget plans preserve
+nearest explicit ancestors and the document remainder. Direct addon comparison on
+three 1,600-vertex controls has maximum length error below 2.7e-16; local native
+runs were below 1 ms, which is kernel evidence, not application profiling.
+Evidence: `build/skin-040/density-parity.json`. Sixteen focused tests pass; configured
+mypy passes 467 files. Native build/five CTests pass, selected style checks have only
+suppressed header warnings. Ownership assignment, proxy preparation, loop patches,
+symmetry/refinement and coordinator publication remain pending. No release claim.

@@ -2858,3 +2858,15 @@ no runtime download or Blender dependency. The complete compact cube pipeline
 matches addon output exactly (98 vertices, 96 quads). The known abnormal Windows
 quantizer exit and unattainable count are explicit warnings. This is backend parity,
 not loop/density/symmetry assembly or anatomical skin qualification.
+
+### Native guide assembly and regional density (0.4.0 in progress)
+
+Topology capture now joins source guide arrays in C++, preserving distinct local
+regions and remapping path offsets with explicit source provenance. Density arithmetic
+previously executed addon NumPy/Python adjacency loops; the standalone native kernel
+retains triangle-lumped areas, square-root area/budget lengths, positive-length median
+fallback, 0.65/0.35 logarithmic smoothing and eight regional count corrections.
+Zero-budget/empty regions remain explicitly unusable, and custom refinement lengths
+can enter the same correction stage. Hierarchy and integer reservations remain core
+metadata policy. Three direct addon controls agree within 2.7e-16 in target lengths.
+Source ownership and complete density-driven remeshing are not yet integrated.

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from anthroforge.core import skin_sources
-from anthroforge.native import skin_guides
+from anthroforge.native import skin_guide_batch, skin_guides
 
 from . import mirror_surfaces, skin_capture, skin_inputs, skin_operations
 from .object_frames import Frames
@@ -21,6 +21,7 @@ class GuideSource:
 class Capture:
     sources: tuple[GuideSource, ...]
     warnings: tuple[str, ...]
+    data: skin_guides.Guides
 
 
 def tissue(engine: Any, document: Any, resources: Any, source: Any, cancel: int) -> GuideSource:
@@ -55,7 +56,7 @@ def selected(document: Any, source: skin_sources.Source) -> bool:
 
 def capture(engine: Any, document: Any, resources: Any, cancel: Any) -> Capture:
     if document.skin.topology_settings.backend != "QUADWILD":
-        return Capture((), ())
+        return complete(engine, (), (), cancel.handle)
     output: list[GuideSource] = []
     warnings: list[str] = []
     for source in skin_sources.candidates(document):
@@ -64,7 +65,7 @@ def capture(engine: Any, document: Any, resources: Any, cancel: Any) -> Capture:
         if cancel.is_set():
             raise ValueError("Topology guide capture cancelled.")
         append(engine, document, resources, source, cancel, output, warnings)
-    return Capture(tuple(output), tuple(warnings))
+    return complete(engine, tuple(output), tuple(warnings), cancel.handle)
 
 
 def append(
@@ -78,3 +79,10 @@ def append(
             raise
         name = document.object(source.owner).name
         warnings.append(f"FLOW unavailable for {name} ({source.instance or 'source'}): {error}")
+
+
+def complete(
+    engine: Any, sources: tuple[GuideSource, ...], warnings: tuple[str, ...], cancel: int
+) -> Capture:
+    data = skin_guide_batch.merge(engine, tuple(row.data for row in sources), cancel)
+    return Capture(sources, warnings, data)

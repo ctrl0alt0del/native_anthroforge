@@ -38,3 +38,17 @@ def test_top_level_budget_does_not_count_descendants_twice():
     assert errors(replace(document, skin=skin)) == (
         "Document: child budgets 6000 exceed 5000 target quads.",
     )
+
+
+def test_plan_assigns_each_owner_to_nearest_override_and_retains_root_remainder():
+    from anthroforge.core.skin_budgets import plan
+
+    value = plan(fixture())
+    mapping = {
+        owner: value.regions[i].owner
+        for owner, i in zip(value.owners, value.owner_regions, strict=True)
+    }
+    assert mapping == {"r": "r", "m": "r", "l": "l", "s": "s"}
+    exclusive = {row.owner: row.exclusive for row in value.regions}
+    assert exclusive == {"r": 1000, "l": 2000, "s": 3000, "": 2100}
+    assert sum(exclusive.values()) == 8100

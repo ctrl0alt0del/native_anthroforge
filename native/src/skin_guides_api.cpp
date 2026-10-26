@@ -54,3 +54,17 @@ int af_skin_guides_copy(uint64_t handle,double* samples,double* points,int64_t* 
 void af_skin_guides_release(uint64_t handle) {
     std::lock_guard<std::mutex> lock(af::skin_guides::mutex); af::skin_guides::registry.erase(handle);
 }
+
+uint64_t af_skin_guides_merge(const AFGuideInput* inputs,int count,uint64_t cancel) {
+    try { return af::skin_guides::retain(af::skin_guides::merge(inputs,count,cancel)); }
+    catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}
+int64_t af_skin_guides_regions(uint64_t handle,int64_t* output,int64_t capacity) {
+    try {
+        const auto value=af::skin_guides::get(handle); const auto count=int64_t(value->regions.size());
+        if(!output&&capacity==0) return count;
+        if(!output||capacity!=count) throw std::runtime_error("Invalid FLOW region buffer.");
+        for(int64_t i=0;i<count;++i) std::copy(value->regions[i].begin(),value->regions[i].end(),output+2*i);
+        return count;
+    } catch(const std::exception& error) { af::set_error(error.what()); return -1; }
+}

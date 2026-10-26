@@ -15,9 +15,14 @@ class Guides:
     samples: Any
     points: Any
     offsets: Any
+    regions: Any = None
 
 
 def configure(engine: Any) -> None:
+    from .skin_guide_batch import Input
+
+    engine.bind("af_skin_guides_merge", [c.POINTER(Input), c.c_int, U], U)
+    engine.bind("af_skin_guides_regions", [U, INT64, c.c_int64], c.c_int64)
     engine.bind("af_skin_guides_charts", [U, U, D, c.c_int, U], U)
     engine.bind("af_skin_guides_path", [U, D, U], U)
     engine.bind("af_skin_guides_sizes", [U, INT64])
@@ -66,4 +71,13 @@ def copy(engine: Any, handle: int) -> Guides:
             handle, pointer(samples), pointer(points), offsets.ctypes.data_as(INT64), sizes
         )
     )
-    return Guides(samples, points, offsets)
+    return Guides(samples, points, offsets, regions(engine, handle))
+
+
+def regions(engine: Any, handle: int) -> Any:
+    method = engine.library.af_skin_guides_regions
+    count = method(handle, None, 0)
+    engine.check(count < 0)
+    output = np.empty((count, 2), dtype=np.int64)
+    engine.check(method(handle, output.ctypes.data_as(INT64), count) < 0)
+    return output

@@ -126,15 +126,9 @@ class GeometryEngine(NativeEngine):
         self._skin_signatures()
 
     def _skin_signatures(self) -> None:
-        from . import process, skin_capture, skin_fields, skin_flow, skin_gaps, skin_guides
+        from .skin_bindings import configure
 
-        process.configure(self)
-
-        skin_fields.configure(self)
-        skin_gaps.configure(self)
-        skin_capture.configure(self)
-        skin_flow.configure(self)
-        skin_guides.configure(self)
+        configure(self)
 
     def _curve_signatures(self) -> None:
         from . import curve_editing, curve_queries, drawing, path_editing, paths, routing, strokes

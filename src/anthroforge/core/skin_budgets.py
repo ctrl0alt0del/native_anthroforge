@@ -1,6 +1,7 @@
 """Hierarchical topology reservations; metadata policy, not numerical density solving."""
 
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Any
 
 
@@ -42,3 +43,40 @@ def errors(document: Any) -> tuple[str, ...]:
             label = document.object(owner).name if owner else "Document"
             result.append(f"{label}: child budgets {reserved} exceed {budget} target quads.")
     return tuple(result)
+
+
+@dataclass(frozen=True)
+class Region:
+    owner: str
+    requested: int
+    exclusive: int
+
+
+@dataclass(frozen=True)
+class Plan:
+    owners: tuple[str, ...]
+    owner_regions: tuple[int, ...]
+    regions: tuple[Region, ...]
+
+
+def region_records(document: Any, rules: Any) -> tuple[Region, ...]:
+    nested, result = children(document, rules), []
+    for owner in (*sorted(rules), ""):
+        requested = (
+            rules[owner].target_quads if owner else document.skin.topology_settings.target_quads
+        )
+        reserved = sum(rules[key].target_quads for key in nested.get(owner, ()))
+        result.append(Region(owner, requested, requested - reserved))
+    return tuple(result)
+
+
+def plan(document: Any) -> Plan:
+    problems = errors(document)
+    if problems:
+        raise ValueError(" ".join(problems))
+    rules = explicit(document)
+    regions = region_records(document, rules)
+    indices = {row.owner: index for index, row in enumerate(regions)}
+    owners = tuple(sorted(document.index.entities))
+    mapped = tuple(indices[key if key in rules else parent(document, key, rules)] for key in owners)
+    return Plan(owners, mapped, regions)

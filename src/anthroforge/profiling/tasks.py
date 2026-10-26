@@ -41,6 +41,7 @@ def event(profiler: Any, job: Any, state: str) -> None:
         if job.assessment:
             metadata["workload"] = asdict(job.assessment.workload)
             metadata["delay_ms"] = job.assessment.schedule.delay_ms
+            metadata["resources"] = asdict(job.assessment.schedule.resources)
         profiler.event("task.lifecycle", state, **metadata)
         if state in ("succeeded", "failed", "obsolete", "cancelled"):
             profiler.resources.release(job.id)

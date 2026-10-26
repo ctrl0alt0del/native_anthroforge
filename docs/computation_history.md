@@ -3109,3 +3109,19 @@ input) match exact coordinates/connectivity through the native application bound
 Twenty-eight focused topology, symmetry, density and provenance tests pass. Earlier
 approximate comparison records remain historical and are superseded by this implementation.
 These compact controls do not establish complete anatomical workflow or release acceptance.
+
+### Resource-aware skin admission (0.4.0 in progress)
+
+Replaced worker-count-only admission with a shared resource policy under the same coordinator.
+Task schedules now declare numerical thread demand and estimated working storage. Skin
+policies use source metadata/BMesh preparation estimates and the unchanged addon tiled-field
+budget; no sample arrays are prepared for assessment. Backends controlling their own
+parallelism reserve available CPU capacity without altering numerical settings. Estimates
+govern concurrent admission only: an isolated job is permitted regardless of its estimate,
+and running jobs have no newly imposed cutoff. Uncertain estimates remain heuristics.
+
+Dispatch reassesses before capturing input, and blocked requests retain ordinary queued,
+cancellation, coalescing, checkpoint and priority behavior. Profiler lifecycle records include
+resource estimates and resource-wait transitions. Bounded inline edits remain available.
+Forty focused scheduler, skin lifecycle and architecture tests pass; native CTests pass 5/5.
+Broader production-anatomy performance and complete release checks remain pending.

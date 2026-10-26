@@ -10,7 +10,7 @@ from anthroforge.core.results import Port
 from anthroforge.core.skin import SkinStage
 from anthroforge.native.mesh import NativeCancellation
 
-from . import authored_jobs, dependencies, skin_stages
+from . import authored_jobs, dependencies, skin_stages, skin_workloads
 from .assets import Asset
 from .construction_policy import revisions
 
@@ -48,6 +48,7 @@ def make_job(session: Any, stage: str, origin: int) -> Job:
         partial(publish, session, stage, origin),
         key="skin-" + stage,
         kind="skin_" + stage,
+        workload=partial(skin_workloads.estimate, session.resources),
     )
 
 

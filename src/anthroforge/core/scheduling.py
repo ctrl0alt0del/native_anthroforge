@@ -57,12 +57,26 @@ class Workload:
 
 
 @dataclass(frozen=True)
+class ResourceDemand:
+    """Admission estimates, not runtime limits; zero threads reserves available CPUs."""
+
+    threads: int = 1
+    memory_bytes: int = 0
+
+    def __post_init__(self) -> None:
+        for value in (self.threads, self.memory_bytes):
+            if type(value) is not int or value < 0:
+                raise ValueError("Task resource estimates require nonnegative integers.")
+
+
+@dataclass(frozen=True)
 class Schedule:
     execution: Literal["inline", "worker"] = "worker"
     estimated_ms: float | None = None
     delay_ms: float = 0.0
     max_wait_ms: float = 0.0
     reason: str = "Background work"
+    resources: ResourceDemand = ResourceDemand()
 
 
 @dataclass(frozen=True)

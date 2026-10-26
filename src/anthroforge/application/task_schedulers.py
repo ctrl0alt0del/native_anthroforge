@@ -6,7 +6,7 @@ from typing import Literal, Protocol
 
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job
-from anthroforge.core.scheduling import Assessment, Schedule, Workload
+from anthroforge.core.scheduling import Assessment, ResourceDemand, Schedule, Workload
 
 INLINE_BUDGET_MS = 2.0
 INLINE_WINDOW_MS = 16.0
@@ -257,13 +257,26 @@ def construction_schedulers() -> dict[str, TaskScheduler]:
 
 class SkinEnvelopeTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
-        return Schedule("worker", reason="Native tiled skin fields, envelope and source bindings")
+        from .worker_memory import budget
+
+        return Schedule(
+            "worker",
+            reason="Native tiled skin fields, envelope and source bindings",
+            resources=ResourceDemand(1, budget() + workload.bytes * 3),
+        )
 
 
 class SkinTopologyTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        # External backends choose their own parallelism; reserve CPUs without changing it.
+        # BMesh and source buffers give a conservative admission heuristic, not a hard cap.
+        from .worker_memory import budget
+
+        estimate = workload.triangles * 2048 + workload.candidates * 512 + workload.bytes
         return Schedule(
-            "worker", reason="Bounded native remeshing, density, guides and quad assembly"
+            "worker",
+            reason="Native remeshing, density, guides and quad assembly",
+            resources=ResourceDemand(0, max(estimate, budget() + workload.bytes * 3)),
         )
 
 

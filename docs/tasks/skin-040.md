@@ -50,6 +50,14 @@ deformation. Native build succeeds in the C: tree. Broader anatomy, style, lifec
 release acceptance remain pending; do not infer them from the compact fixtures.
 Original extraction/probe remain under ignored build/skin-040; no WIP artifacts were added.
 
+Resource admission now belongs to the existing coordinator. Immutable per-task estimates
+reserve CPU/memory for concurrent workers; estimates are reassessed before dispatch capture.
+Externally parallel remeshers reserve available CPUs without changing backend settings.
+Large work may run alone even when its estimate exceeds capacity. Waiting remains cancellable;
+bounded inline edits remain available. Forty scheduler/lifecycle/architecture tests pass,
+configured mypy passes 493 files, all five native CTests pass. Full skin regression is running.
+No reference/deformation/fitting/export acceptance is implied by this checkpoint.
+
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve
 anatomy, geometry/attachment behavior and the existing engineering,

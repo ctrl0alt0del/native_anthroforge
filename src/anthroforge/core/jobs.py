@@ -131,4 +131,5 @@ class Job:
             "reason": self.execution_reason or plan.reason,
             "actual_ms": self.prepare_ms + self.compute_ms + self.publish_ms,
             "workload": asdict(self.assessment.workload),
+            "resources": asdict(plan.resources),
         }

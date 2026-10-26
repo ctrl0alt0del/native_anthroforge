@@ -11,6 +11,8 @@ from . import (
     skin_gaps,
     skin_guides,
     skin_ownership,
+    skin_proximity,
+    skin_topology,
 )
 
 
@@ -24,5 +26,7 @@ def configure(engine: Any) -> None:
         skin_gaps,
         skin_guides,
         skin_ownership,
+        skin_proximity,
+        skin_topology,
     ):
         module.configure(engine)

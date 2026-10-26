@@ -16,5 +16,12 @@
     "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/modifiers/intern/MOD_smooth.cc",
     "sha256": "87995c9a6b31be333dc3cc049cb383810e8d8a4df84da552ef31e907e64108c8",
     "license": "GPL-2.0-or-later"
+  },
+  "refinement_reference": {
+    "core/topology/refine.py": "fcb9a455a452809268f1014af4a9d2dbdebf1a04456c4d793842cd33f50f1468",
+    "core/topology/refinement.py": "0f2f63989ed740864189a38daa5037c6e1474c1cbd52ef02f46495b69b45d9d1",
+    "adapters/topology/adaptive_refine.py": "88084ee28234f1cde54c9997b05e342d88261fe9b0e8f07fe5cc8e6c0cabceb0",
+    "adapters/topology/refinement_runtime.py": "72a3785cc0e4fdde3e3d8a3ef32d36ce770f6287517486280bdcdf6ce235ee64",
+    "adapters/topology/ownership_capture.py": "144df78fb8d21ede76e94f898f8e27947098407814ea4adb8dbf9aa8293fd741"
   }
 }

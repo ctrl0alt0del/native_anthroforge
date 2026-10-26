@@ -323,3 +323,23 @@ mypy pass (470 files). This is attribution evidence, not anatomical topology acc
 Next: connect density refinement, proxy decimation, loop patches/symmetry and complete
 backend assembly to public coordinator/UI operations. Persistent deformation, fitting,
 export and complete release qualification remain unfinished. No version bump or main merge.
+
+### Conforming topology refinement checkpoint
+
+Added owned native topology result bundles, all-quad split closure, adaptive candidate
+selection, symmetric pairing, parity-safe budget search, proximity weighting and base
+target calculation. Application density preparation applies proximity to accepted
+surface-tissue sources before budget correction, preserving ordinary density otherwise.
+Classification does not select the algorithm. No public topology build operation yet.
+
+Direct addon comparison: all 64 small-grid split masks agree in geometry/connectivity
+and parent labels; three adaptive budgets and one symmetry case agree; proximity
+weights are exact. Evidence: `build/skin-040/refinement-parity.json`. Rendered and
+inspected `build/skin-040/ui/refinement-parity.png`; this is a compact kernel fixture,
+not anatomical acceptance. Twelve focused workflow/refinement/architecture tests pass;
+configured mypy passes 473 files, native build/five CTests pass, selected native style
+passes after splitting the boundary traversal helper. Broad regression is next.
+
+Remaining topology: proxy decimation, loop guide patches, hole/transition assembly,
+full symmetry/backend orchestration and public coordinator/UI integration. Persistent
+reference/deformation, fitting, OBJ export and release qualification remain unfinished.

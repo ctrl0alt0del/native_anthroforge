@@ -17,3 +17,13 @@ It averages edge midpoints, uses Blender float arithmetic, and preserves the ori
 mesh through an owned result. Canonical edge iteration may change final float rounding;
 four captured Blender fixtures qualify within 3e-7. This is not a replacement for
 the still-pending decimation stage or a general-purpose smoothing modifier.
+
+Ownership and conforming quad refinement are native ports of the fingerprinted addon
+Python kernels. They retain sample/threshold policies, neighbor edge closure, split
+patterns, parent provenance, two refinement passes and eight budget-search trials.
+Original/reflected ownership samples remain instance-aware; source budget identities
+are shared. Proximity uses accepted surface-tissue capability rather than a semantic
+muscle/fat label. Bare Fiber sampling remains zero-radius. Deterministic ties and safe
+rejection of malformed boundary graphs are intentional differences from incidental
+Python iteration/exception behavior. Native result bundles own mesh and region/guide
+labels until copied into the shared application resource lifecycle.

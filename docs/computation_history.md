@@ -2900,3 +2900,22 @@ Python set order. No anatomical binding or geometry is edited. Sixteen focused t
 three direct non-mirrored addon controls up to 10,000 vertices have identical ownership.
 Local native attribution was about 0.3–11 ms on those small controls; this is not an app
 responsiveness measurement. Complete density-driven topology/anatomy remains unqualified.
+
+### Native conforming topology refinement (0.4.0 in progress)
+
+Migrated addon Python quad refinement, repeated density sampling, candidate scoring,
+symmetry grouping, boundary-parity checks and budget search to C++. Retained the 1.35
+area/density threshold, two passes, eight search trials, opposite/adjacent/four-way
+splits and propagated edge closure. Parent region/guide labels survive subdivision.
+Proximity retains 1%/5% diagonal smoothstep and maximum 1.5 density multiplier, applied
+before eight regional budget corrections. Accepted surface-tissue construction is the
+eligibility boundary; semantic classification does not change evaluation. Missing
+eligible sources warn and preserve ordinary density. No anatomy or source geometry
+is modified. Malformed boundary graphs reject a candidate instead of hanging traversal.
+
+Direct addon comparison covers all 64 masks on six quads, three adaptive budgets
+(99/162/300 resulting quads), symmetry and proximity. Coordinates match within 1e-14,
+connectivity/provenance match, and proximity weights match exactly. The native small
+adaptive controls took roughly 0.2–1.6 ms versus addon 11–53 ms; these are local kernel
+measurements, not whole-app performance. Rendered/inspected matching compact geometry
+is at `build/skin-040/ui/refinement-parity.png`; full anatomy remains pending.

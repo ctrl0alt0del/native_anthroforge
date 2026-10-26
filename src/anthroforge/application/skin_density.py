@@ -7,7 +7,7 @@ from anthroforge.core import skin_budgets
 from anthroforge.native import skin_density as native
 from anthroforge.native import skin_ownership as ownership
 
-from . import skin_ownership
+from . import skin_ownership, skin_refinement
 
 
 @dataclass(frozen=True)
@@ -17,6 +17,16 @@ class Field:
     density: native.Density
     plan: skin_budgets.Plan
     warnings: tuple[str, ...]
+    refinement: dict[str, Any]
+    adaptive: bool
+
+
+@dataclass(frozen=True)
+class Assignment:
+    plan: skin_budgets.Plan
+    support: skin_ownership.Supports
+    owners: ownership.Ownership
+    regions: Any
 
 
 def evaluate(document: Any, captured: Any, mesh: Any, cancel: int = 0) -> Field:
@@ -28,9 +38,45 @@ def evaluate(document: Any, captured: Any, mesh: Any, cancel: int = 0) -> Field:
     ids = ownership.regions(
         mesh.engine, owners.owners, plan.owner_regions, len(plan.regions) - 1, cancel
     )
-    density = native.evaluate(mesh, ids, [row.exclusive for row in plan.regions], cancel=cancel)
-    warnings = (*support.warnings, *fallback_warning(owners), *unusable_regions(plan, density))
-    return Field(owners, ids, density, plan, warnings)
+    return complete(document, captured, mesh, Assignment(plan, support, owners, ids), cancel)
+
+
+def complete(document: Any, captured: Any, mesh: Any, assigned: Assignment, cancel: int) -> Field:
+    proximity = document.skin.topology_settings.refinement != "NONE"
+    budgets = [row.exclusive for row in assigned.plan.regions]
+    density = native.evaluate(
+        mesh, assigned.regions, budgets, iterations=0 if proximity else 8, cancel=cancel
+    )
+    adjusted = skin_refinement.apply(
+        document, captured, assigned.support, mesh, density.lengths, cancel
+    )
+    if proximity:
+        density = native.evaluate(
+            mesh, assigned.regions, budgets, initial=adjusted.lengths, cancel=cancel
+        )
+    adaptive = bool(skin_budgets.explicit(document)) or adjusted.active
+    return result(assigned, density, adjusted, adaptive)
+
+
+def result(assigned: Assignment, density: native.Density, adjusted: Any, adaptive: bool) -> Field:
+    warnings = assignment_warnings(assigned, density) + adjusted.warnings
+    return Field(
+        assigned.owners,
+        assigned.regions,
+        density,
+        assigned.plan,
+        warnings,
+        adjusted.statistics,
+        adaptive,
+    )
+
+
+def assignment_warnings(assigned: Assignment, density: native.Density) -> tuple[str, ...]:
+    return (
+        *assigned.support.warnings,
+        *fallback_warning(assigned.owners),
+        *unusable_regions(assigned.plan, density),
+    )
 
 
 def fallback_warning(owners: ownership.Ownership) -> tuple[str, ...]:

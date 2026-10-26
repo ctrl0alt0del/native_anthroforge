@@ -54,3 +54,19 @@ def test_indirect_tissue_anchor_resolves_to_skeletal_supports(session):
     assert skin_ownership.supports(session.document, Source(child, "TISSUE"), set()) == {
         Source(bone, "SCP")
     }
+
+
+def test_proximity_density_corrects_the_budget_after_tissue_adjustment(session):
+    _, _, tissue = assembly(session)
+    session.command(
+        "skin.configure", section="topology_settings", values={"refinement": "MUSCLE_PROXIMITY"}
+    )
+    before = session.document
+    captured = skin_capture.capture(session.engine, before, session.resources)
+    mesh = session.assets[before.object(tissue).result.asset].mesh
+    field = skin_density.evaluate(before, captured, mesh)
+    assert field.adaptive and field.refinement["tissue_vertices"] > 0
+    assert not field.warnings
+    expected = before.skin.topology_settings.target_quads
+    np.testing.assert_allclose(np.sum(field.density.areas / field.density.lengths**2), expected)
+    assert session.document is before

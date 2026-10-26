@@ -2775,7 +2775,7 @@ when reading them back. Retain the addon's file API; the cube probe preserves 24
 PyTetWild 0.4.2 returns 2,844 tetrahedra using one thread; isolate its temporary file writes.
 These counts qualify callable integration only, not production skin or deformation quality.
 
-### 0.4.0 in progress — bare-Fiber centerline sources
+### 0.4.0 in progress â€” bare-Fiber centerline sources
 
 The provisional contributor capture constructed native tubes with an independent 1 mm
 skin radius. The user explicitly chose centerlines only. Capture now retains transformed
@@ -2802,3 +2802,24 @@ same size. A mismatch retains the addon's scalar fallback plus Issue. Shared fil
 clear and explicit-weight operations own immutable map resources and ordinary undo.
 Focused validation covers zero fields, changed connectivity, invalid inputs and saved
 resource ownership; no collagen numerical blending formula changed.
+
+
+### Shared collagen painting (0.4.0 in progress)
+
+SCP collagen now uses the existing native cached visibility/projection and batched
+brush (T09) through a distinct material-domain policy. No numerical brush algorithm
+changed. Shared read-only inspection jobs own cancellation and stale-result checks;
+release commits one field edit. Auto starts at effective collagen; zero-valued painted
+fields remain authoritative. Twenty-one focused tests, offscreen controls and inspected
+hidden GPU heat rendering pass. Production anatomical skin is not yet qualified.
+
+### Topology FLOW preparation (0.4.0 in progress)
+
+Ported the maintained addon topology field kernel into the standalone native library.
+Preserved fourth-order phase representation, transported neighboring directions,
+robust constraints and 100+3x60 iteration schedule. Added owned mesh inputs, numerical
+validation and cooperative cancellation; no Python optimization. Four direct addon-DLL
+controls match exactly, including absent guidance. Geometry remains unchanged. This
+qualifies the field adapter only, not complete guided remeshing or production anatomy.
+Hierarchical quad-budget warnings now use the addon's nearest-explicit-parent rule;
+metadata policy remains Python, while numerical density solving will be native.

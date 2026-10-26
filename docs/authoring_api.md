@@ -1055,3 +1055,16 @@ collagen/density or Fiber FLOW settings. `skin.collagen.set(owner, values)` stor
 `skin.collagen.clear(owner)` removes the map and selects Uniform. These are shared
 undoable edits and do not change anatomy geometry. They do not imply that the full
 0.4.0 topology/deformation/fitting/export workflow is already implemented.
+
+
+Collagen strokes use `skin.inspect.paint(target, view, samples, brush, expected_asset?,
+obstacles?)`, with the tissue camera/brush arrays. `skin.inspect.status()` and
+`skin.inspect.cancel()` address the collagen preview. `skin.collagen.paint.commit(job)`
+commits a ready, current stroke as one undo action. SCP/workspace write policies apply
+on commit. The Skin panel exposes Paint collagen, visible-only by default, with optional
+Paint Through. Heat colors are temporary resources, never saved geometry.
+
+Selected-source Skin controls also expose SCP subtree quad budgets and open-Fiber FLOW
+guide selection. Closed Fibers use the loop-guide workflow, not the open FLOW flag.
+Nested budget conflicts are shown without preventing users from editing their settings;
+topology generation must validate the complete budget tree before dispatch.

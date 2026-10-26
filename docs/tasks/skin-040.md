@@ -187,3 +187,16 @@ Focused API/desktop tests cover cancellation, stale field rejection, undo and co
 Offscreen controls and hidden GPU heat rendering pass; images were inspected. Mypy
 passes 454 files. Full anatomy and the remaining topology/reference/fitting/export
 stages are still pending; this is not 0.4.0 release qualification.
+
+### Topology preparation checkpoint
+
+The broad post-brush regression run passes 2,313 tests (178.45 seconds). Added
+subtree-budget/FLOW contributor controls and nearest-explicit-ancestor budget warnings;
+offscreen controls pass after correcting tuple-to-QML list conversion. The native
+FLOW cross-field kernel is now namespaced behind owned mesh inputs and cooperative
+cancellation, with source fingerprint retained. Four direct addon-DLL field controls
+match exactly (maximum error zero). Three native-adapter tests cover guidance, no
+guidance, invalid samples and cancellation; seven focused tests including budgets and
+architecture pass. Native rebuild and five CTests pass; selected clang-tidy emits only
+suppressed header warnings. Full topology generation and anatomical acceptance remain
+pending. Next: integrate feature paths, capture/assembly and backend execution.

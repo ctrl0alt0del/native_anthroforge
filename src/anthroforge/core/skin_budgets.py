@@ -1,0 +1,44 @@
+"""Hierarchical topology reservations; metadata policy, not numerical density solving."""
+
+from collections import defaultdict
+from typing import Any
+
+
+def explicit(document: Any) -> dict[str, Any]:
+    return {
+        s.owner: s
+        for s in document.skin.contributors
+        if s.density_mode == "SUBTREE_BUDGET" and s.owner in document.index.entities
+    }
+
+
+def parent(document: Any, owner: str, rules: Any) -> str:
+    seen = {owner}
+    current = document.index.entities[owner].parent
+    while current and current not in seen:
+        if current in rules:
+            return str(current)
+        seen.add(current)
+        current = document.index.entities[current].parent
+    return ""
+
+
+def children(document: Any, rules: Any) -> dict[str, list[str]]:
+    result: dict[str, list[str]] = defaultdict(list)
+    for owner in rules:
+        result[parent(document, owner, rules)].append(owner)
+    return result
+
+
+def errors(document: Any) -> tuple[str, ...]:
+    rules = explicit(document)
+    nested, result = children(document, rules), []
+    for owner, descendants in nested.items():
+        reserved = sum(rules[key].target_quads for key in descendants)
+        budget = (
+            rules[owner].target_quads if owner else document.skin.topology_settings.target_quads
+        )
+        if reserved > budget:
+            label = document.object(owner).name if owner else "Document"
+            result.append(f"{label}: child budgets {reserved} exceed {budget} target quads.")
+    return tuple(result)

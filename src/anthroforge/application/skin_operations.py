@@ -68,6 +68,8 @@ def require_contributor(session: "Session", owner: str, values: dict[str, Any]) 
         return
     item = object_operations.editable(session, owner)
     require_construction_settings(item, values)
+    if values.get("flow") and isinstance(item, Fiber) and item.closed:
+        raise ValueError("Closed Fibers are loop guides; FLOW requires an open Fiber.")
 
 
 def require_construction_settings(item: Any, values: dict[str, Any]) -> None:

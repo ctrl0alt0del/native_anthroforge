@@ -47,3 +47,21 @@ int af_skin_fit_quality(const double* vertices,int count,const double* targets,c
         af::skin::fit::quality(vertices,count,targets,predicted,training,frames,output,cancel); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_skin_fit_sampling(double minimum,double maximum,int count,double* values,int* training) {
+    try {
+        if(!values||!training||!std::isfinite(minimum)||!std::isfinite(maximum)||minimum>=maximum||count<5||count>33||!(count%2))
+            throw std::runtime_error("Fitting requires an increasing range and an odd sample count (5-33).");
+        for(int i=0;i<count;++i) { values[i]=minimum+(maximum-minimum)*i/(count-1); training[i]=int(i%2==0); }
+        values[count-1]=maximum; return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+int af_skin_fit_repeatability(const double* first,const double* replay,int count,double* error) {
+    try {
+        if(!first||!replay||!error||count<1) throw std::runtime_error("Missing repeatability samples.");
+        Eigen::Map<const af::Vertices> a(first,count,3),b(replay,count,3);
+        double extent=(a.colwise().maxCoeff()-a.colwise().minCoeff()).maxCoeff(); *error=(a-b).cwiseAbs().maxCoeff();
+        if(!a.allFinite()||!b.allFinite()||extent<=0||*error>extent*1e-5)
+            throw std::runtime_error("Shortcut replay is not repeatable; fitting stopped.");
+        return 0;
+    } catch(const std::exception& failure) { af::set_error(failure.what()); return 1; }
+}

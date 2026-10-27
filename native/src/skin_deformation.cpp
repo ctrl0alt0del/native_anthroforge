@@ -70,12 +70,37 @@ void embedding(Preparation& p,int* ids,double* weights) {
         }
     }
 }
+template<class Derived> static uint64_t storage(const Eigen::MatrixBase<Derived>& matrix) {
+    return uint64_t(matrix.size())*sizeof(typename Derived::Scalar);
+}
+static uint64_t storage(const S& matrix) {
+    return uint64_t(matrix.data().allocatedSize())*(sizeof(double)+sizeof(int))+
+        uint64_t(matrix.outerSize()+1)*sizeof(int)+(matrix.isCompressed()?0:uint64_t(matrix.outerSize())*sizeof(int));
+}
+static uint64_t fast_storage(const State& s) {
+    const auto& f=s.fast;
+    uint64_t bytes=storage(s.reduced_factor.matrixLDLT())+storage(s.reduced_factor.transpositionsP().indices());
+    bytes+=storage(f.M_KG)+storage(f.Q)+storage(f.Mass_tilde)+storage(f.fixed_dim)+storage(f.interpolated);
+    bytes+=storage(f.M_FullSolve)+storage(f.CSM)+storage(f.CSolveBlock1)+storage(f.L0)+storage(f.Lvel0);
+    bytes+=storage(f.fext)+storage(f.fgrav)+storage(f.Pi_1)+f.free_mask.capacity()/8;
+    for(const auto& matrix:f.CSM_M) bytes+=storage(matrix);
+    return bytes;
+}
+static uint64_t state_storage(const State& s) {
+    uint64_t bytes=storage(s.rest)+storage(s.points)+storage(s.samples)+storage(s.weights)+storage(s.basis)+storage(s.controls);
+    bytes+=storage(s.tets)+storage(s.boundary)+storage(s.owners)+storage(s.handles)+storage(s.groups);
+    bytes+=storage(s.skin)+storage(s.constraints)+storage(s.weighted)+storage(s.block)+storage(s.stiffness)+storage(s.lbs);
+    bytes+=storage(s.reduced_constraints)+storage(s.reduced_hessian)+storage(s.sample_weights)+storage(s.identity);
+    bytes+=s.elements.capacity()*sizeof(Element)+s.edges.capacity()*sizeof(decltype(s.edges)::value_type);
+    for(const auto& edges:s.edges) bytes+=edges.capacity()*sizeof(decltype(s.edges)::value_type::value_type);
+    if(s.method==0) bytes+=storage(s.factor.matrixL().nestedExpression())+storage(s.factor.vectorD())+
+        storage(s.factor.permutationP().indices())+storage(s.factor.permutationPinv().indices());
+    else bytes+=fast_storage(s);
+    return bytes;
+}
 uint64_t bytes(const Preparation& p) {
-    std::lock_guard<std::mutex> lock(p.mutex); const auto& s=p.state;
-    uint64_t result=uint64_t(s.rest.size()+s.points.size()+s.samples.size()+s.weights.size()+s.lbs.nonZeros())*8;
-    result+=uint64_t(s.skin.nonZeros()+s.constraints.nonZeros()+s.block.nonZeros()+s.stiffness.nonZeros())*16;
-    result+=uint64_t(s.reduced_hessian.size()+s.reduced_constraints.nonZeros())*16;
-    result+=uint64_t(s.tets.size()+s.boundary.size())*4+s.elements.size()*sizeof(Element);
-    return result; // Array storage; allocator/factorization overhead is not an exact RSS measurement.
+    std::lock_guard<std::mutex> lock(p.mutex);
+    // Retained buffers and factorization; allocator overhead is not an RSS measurement.
+    return sizeof(Preparation)+state_storage(p.state);
 }
 }

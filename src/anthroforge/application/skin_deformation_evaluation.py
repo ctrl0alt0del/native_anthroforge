@@ -20,10 +20,10 @@ def evaluate(engine: Any, document: Any, resources: Any, cancel: int) -> Compute
     retained = reference(document, resources)
     arrays = retained.arrays
     targets = skin_support_capture.targets(engine, document, resources, retained, cancel)
-    with skin_deformation.Preparation(
-        engine, arrays, document.skin.deformation_settings, cancel
-    ) as solver:
-        proposed, diagnostics, predicted = solver.solve(targets, cancel)
+    solver = skin_deformation.cached(
+        engine, retained.digest, arrays, document.skin.deformation_settings, cancel
+    )
+    proposed, diagnostics, predicted = solver.solve(targets, cancel)
     return finish(engine, document, resources, retained, (proposed, diagnostics, predicted), cancel)
 
 

@@ -16,6 +16,12 @@ AF_API int af_skin_fit_predict(const double* vertices,int count,const double* we
     double* output_matrices,double* output_positions,uint64_t cancel);
 AF_API int af_skin_fit_quality(const double* vertices,int count,const double* targets,const double* predicted,
     const int* training,int frames,double* report,uint64_t cancel);
+AF_API int af_skin_fit_channels(const double* vertices,int count,const double* weights,int bones,const double* matrices,
+    int frames,double* bases,double* channels,uint64_t cancel);
+AF_API int af_skin_fit_playback(const double* vertices,int count,const double* weights,int bones,const double* bases,
+    const double* keys,const double* channels,int frames,double value,double* output,uint64_t cancel);
+AF_API int af_skin_fit_sampling(double minimum,double maximum,int count,double* values,int* training);
+AF_API int af_skin_fit_repeatability(const double* first,const double* replay,int count,double* error);
 #ifdef __cplusplus
 }
 #endif

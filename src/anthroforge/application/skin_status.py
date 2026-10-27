@@ -5,6 +5,9 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from anthroforge.core import skin_sources
+from anthroforge.core.results import Port
+
+from .construction_policy import revisions
 
 
 @dataclass(frozen=True)
@@ -46,8 +49,22 @@ def creation(document: Any, resources: Any) -> dict[str, Eligibility]:
         build=allowed(build),
         envelope=allowed(build),
         topology=allowed(topology),
-        reference=allowed(reference),
+        reference=allowed(reference or pending_reason(document)),
     )
+
+
+def pending_reason(document: Any) -> str:
+    stage = document.skin.pending_topology
+    reads = tuple(r for r in stage.inputs if r.output != "skin_deformation_settings")
+    if not stage.asset or not reads:
+        return ""
+    try:
+        current = revisions(document, {Port(r.owner, r.output) for r in reads})
+        if set(current) == set(reads):
+            return ""
+    except (ValueError, KeyError):
+        pass
+    return "Inputs changed since retained topology was built; rebuild topology before retrying."
 
 
 def operational(document: Any, resources: Any) -> dict[str, Eligibility]:

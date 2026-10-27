@@ -2,7 +2,7 @@
 
 import ctypes as c
 from tempfile import TemporaryDirectory
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -127,3 +127,18 @@ def sample_surface(engine: Any, points: Any, faces: Any, cancel: int = 0) -> tup
     )
     engine.check(count < 0)
     return selected[:count], float(mass[0])
+
+
+def cached(engine: Any, identity: str, arrays: Any, settings: Any, cancel: int = 0) -> Preparation:
+    key = identity, settings
+    found = engine.skin_preparations.get(key)
+    if found is not None:
+        return cast(Preparation, found)
+    value = Preparation(engine, arrays, settings, cancel)
+    return remember(engine, identity, settings, value)
+
+
+def remember(engine: Any, identity: str, settings: Any, value: Preparation) -> Preparation:
+    return cast(
+        Preparation, engine.skin_preparations.store((identity, settings), value, value.bytes)
+    )

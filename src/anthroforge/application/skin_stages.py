@@ -61,6 +61,10 @@ def finish_construction(
 def reference(
     engine: Any, document: Any, resources: Any, cancel: Any, options: Any
 ) -> dict[str, Any]:
+    from .skin_status import pending_reason
+
+    if reason := pending_reason(document):
+        raise ValueError(reason)
     key = document.skin.pending_topology.asset or document.skin.topology.asset
     if not key or key not in resources.meshes:
         raise ValueError("Build skin topology before initializing its deformation reference.")

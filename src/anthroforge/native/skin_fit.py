@@ -27,6 +27,8 @@ def configure(engine: Any) -> None:
     engine.bind("af_skin_fit", [c.POINTER(Input), D, D, D, U])
     engine.bind("af_skin_fit_predict", [D, c.c_int, D, c.c_int, D, D, c.c_int, D, c.c_int, D, D, U])
     engine.bind("af_skin_fit_quality", [D, c.c_int, D, D, INT, c.c_int, D, U])
+    engine.bind("af_skin_fit_sampling", [c.c_double, c.c_double, c.c_int, D, INT])
+    engine.bind("af_skin_fit_repeatability", [D, D, c.c_int, D])
 
 
 def inputs(vertices: Any, quads: Any, targets: Any) -> tuple[Any, Any, Any]:
@@ -95,3 +97,30 @@ def quality(engine: Any, arrays: Any, predicted: Any, cancel: int = 0) -> Any:
     args = pointer(x), len(x), pointer(y), pointer(p), training.ctypes.data_as(INT), len(y)
     engine.check(engine.library.af_skin_fit_quality(*args, pointer(output), cancel))
     return output
+
+
+def sampling(engine: Any, settings: Any) -> tuple[Any, Any]:
+    values, training = np.empty(settings.samples), np.empty(settings.samples, np.int32)
+    engine.check(
+        engine.library.af_skin_fit_sampling(
+            settings.minimum,
+            settings.maximum,
+            settings.samples,
+            pointer(values),
+            training.ctypes.data_as(INT),
+        )
+    )
+    return values, training
+
+
+def repeatability(engine: Any, first: Any, replay: Any) -> float:
+    first, replay = doubles(first), doubles(replay)
+    if first.ndim != 2 or first.shape[1] != 3 or replay.shape != first.shape:
+        raise ValueError("Fitting replay must preserve vertex identity.")
+    error = np.zeros(1)
+    engine.check(
+        engine.library.af_skin_fit_repeatability(
+            pointer(first), pointer(replay), len(first), pointer(error)
+        )
+    )
+    return float(error[0])

@@ -20,27 +20,33 @@ from .task_execution import InlineBudget, completed_future, execute
 from .task_schedulers import task_schedulers
 
 
+def create_executor(workers: int, factory: Any) -> Any:
+    return (
+        factory()
+        if factory is not None
+        else ThreadPoolExecutor(max_workers=workers, thread_name_prefix="anthroforge")
+    )
+
+
 class TaskCoordinator:
     def __init__(
         self,
         current: Callable[[], Document],
         workers: int = 2,
         clock: Callable[[], float] = monotonic,
+        executor_factory: Any = None,
     ) -> None:
         self.current, self.clock = current, clock
         self.registry = JobRegistry()
-        self.pool = ThreadPoolExecutor(max_workers=workers, thread_name_prefix="anthroforge")
+        self.pool = create_executor(workers, executor_factory)
         self.workers = workers
         self.checkpoint = current()
         self.epoch = 0
         self.errors: list[str] = []
-        self.can_publish: Callable[[Job], bool] = lambda job: True
         self._initialize_scheduling(clock)
 
     def _initialize_scheduling(self, clock: Callable[[], float]) -> None:
-        self.service_tick: Callable[[], None] = lambda: None
-        self.lifecycle: Callable[[Job, str], None] = lambda job, phase: None
-        self.observer: Callable[[Job, str], None] = lambda job, phase: None
+        self._initialize_callbacks()
         self.profiler: Any = None
         self.metrics = Metrics()
         self.task_schedulers = task_schedulers()
@@ -52,6 +58,12 @@ class TaskCoordinator:
         self.annotate: Callable[[Job, Document], None] = lambda job, document: None
         self.before_dispatch: Callable[[Job, Document], None] = lambda job, document: None
         self.admission = task_resources.Admission()
+
+    def _initialize_callbacks(self) -> None:
+        self.can_publish: Callable[[Job], bool] = lambda job: True
+        self.service_tick: Callable[[], None] = lambda: None
+        self.lifecycle: Callable[[Job, str], None] = lambda job, phase: None
+        self.observer: Callable[[Job, str], None] = lambda job, phase: None
 
     @property
     def jobs(self) -> list[Job]:

@@ -14,6 +14,9 @@ pytestmark = pytest.mark.skipif(sys.platform != "win32", reason="Pinned QuadWild
 
 def configure(session, backend, symmetry):
     session.command(
+        "skin.configure", section="deformation_settings", values={"proxy_resolution": 8}
+    )
+    session.command(
         "skin.configure",
         section="topology_settings",
         values=dict(backend=backend, symmetry=symmetry, target_quads=1000),
@@ -67,8 +70,6 @@ def test_topology_roundtrip_and_individual_rebuild_preserves_envelope(
 
 
 def test_missing_envelope_fails_without_publishing_partial_topology(session):
-    key = session.command("skin.topology.build")
-    session.wait()
-    job = session.scheduler.registry.by_id[key]
-    assert job.state == "failed" and "envelope" in job.error
+    with pytest.raises(ValueError, match="envelope"):
+        session.command("skin.topology.build")
     assert not session.document.skin.topology.asset

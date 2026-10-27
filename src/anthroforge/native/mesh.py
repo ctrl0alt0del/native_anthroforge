@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from .expressions import Program
     from .fiber_deformation import Preparation as FiberPreparation
     from .routing_scene import RoutingScene
+    from .skin_deformation import Preparation as SkinPreparation
     from .surface_queries import Query
     from .tissue_preparation import Preparation
     from .tissue_stacking import MaterialLease
@@ -39,10 +40,16 @@ class GeometryEngine(NativeEngine):
         self._query_signatures()
         self._construction_signatures()
         self._resource_caches()
+        self._deformation_caches()
+        self.resource_observer: Any = None
+
+    def _deformation_caches(self) -> None:
         self.fiber_deformations: ResourceCache[FiberPreparation] = ResourceCache(
             64 * 1024 * 1024, 256, "fiber_deformation"
         )
-        self.resource_observer: Any = None
+        self.skin_preparations: ResourceCache[SkinPreparation] = ResourceCache(
+            4 * 1024**3, 2, "skin_preparation"
+        )
 
     def _resource_caches(self) -> None:
         self.bases = BaseCache()
@@ -86,6 +93,7 @@ class GeometryEngine(NativeEngine):
             self.tissue_preparations,
             self.expressions,
             self.fiber_deformations,
+            self.skin_preparations,
         )
 
     def clear_caches(self) -> None:

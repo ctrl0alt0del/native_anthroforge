@@ -3324,3 +3324,22 @@ is distinct from actual channel-linear playback, which is not yet integrated. We
 validation and error statistics move from addon Python into C++ without changed thresholds.
 Original DLL fixtures captured; object compilation passes. Numerical parity, actual playback,
 representative anatomy and performance remain unqualified. No release or speed claim.
+
+
+### Skin preparation reuse and isolated fitting samples — 2026-10-27
+
+The default-resolution integration test exposed repeated costly tetrahedral/reference work
+(15 tests: 1664.68 s); production per-update preparation was also being reconstructed. Reuse
+now keys immutable reference identity and all solver settings, with native solve serialization.
+Native retained-byte accounting includes sparse/dense factors and FAST buffers, not allocator
+RSS. Two-entry/four-GiB retention limits evict/bypass without restricting valid computation.
+Fresh/reused LE output is bit-identical on the fixture. Target samples, objectives, tolerances
+and source contact projection are unchanged. Profiling large production updates is pending.
+
+Isolated fitting sessions execute existing shortcut, evaluation and attachment operations on
+the outer coordinator worker; they own document state and caches and borrow only immutable
+resources. Cancellation propagates into nested native calls without starting a competing
+worker pool. A real five-pose translation fixture verifies isolation, fixed topology and
+repeatability. Maintained Scale Aware/Single Active kernels match captured DLL results at
+1e-8, and channel-linear playback matches Blender 5.0.1 positions at 1e-6, including between
+keys/clamping. These fixtures do not establish full anatomical fitting or portable acceptance.

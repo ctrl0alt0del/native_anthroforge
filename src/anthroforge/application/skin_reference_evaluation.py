@@ -56,10 +56,23 @@ def prepare(
     engine: Any, mesh: Any, arrays: Any, info: Any, sources: Any, cancel: int
 ) -> ComputedStage:
     settings = DeformationSettings(**info["settings"])
-    with skin_deformation.Preparation(engine, arrays, settings, cancel) as solver:
-        replay, diagnostics, _ = solver.solve(arrays["samples"], cancel)
-        info["identity_error"] = skin_support.validate_replay(engine, arrays["vertices"], replay)
-        arrays["embedding_ids"], arrays["embedding_weights"] = solver.embedding()
+    solver = skin_deformation.Preparation(engine, arrays, settings, cancel)
+    try:
+        output = accept_reference(engine, mesh, arrays, info, sources, solver, cancel)
+        assert output.reference is not None
+        skin_deformation.remember(engine, output.reference.digest, settings, solver)
+        return output
+    except BaseException:
+        solver.close()
+        raise
+
+
+def accept_reference(
+    engine: Any, mesh: Any, arrays: Any, info: Any, sources: Any, solver: Any, cancel: int
+) -> ComputedStage:
+    replay, diagnostics, _ = solver.solve(arrays["samples"], cancel)
+    info["identity_error"] = skin_support.validate_replay(engine, arrays["vertices"], replay)
+    arrays["embedding_ids"], arrays["embedding_weights"] = solver.embedding()
     reference = skin_assets.create(arrays, info)
     data = skin_assets.create(
         dict(solver_diagnostics=diagnostics),

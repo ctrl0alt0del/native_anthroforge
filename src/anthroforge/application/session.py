@@ -35,14 +35,19 @@ class Session:
         name: str = "Untitled",
         profiler: RuntimeProfiler | None = None,
         preferences: PreferenceStore | None = None,
+        executor_factory: Any = None,
     ) -> None:
-        self.changes, self._document = ChangeJournal(), Document(name=name)
-        self.history = History(self.document)
-        self.resources = Resources()
+        self.initialize_document(name, executor_factory)
         self.preferences = preferences if preferences is not None else load_user_preferences()
         self.initialize_runtime(profiler)
         self._engine: GeometryEngine | None = None
         self.initialize_file_state()
+
+    def initialize_document(self, name: str, executor_factory: Any) -> None:
+        self.changes, self._document = ChangeJournal(), Document(name=name)
+        self.history = History(self.document)
+        self.resources = Resources()
+        self.executor_factory = executor_factory
 
     def initialize_file_state(self) -> None:
         self.serial = 0
@@ -88,12 +93,10 @@ class Session:
         from .tissue_inspection import Inspection
 
         self.tissue_inspection = Inspection()
-        self.conversion = ConversionPreview()
-        self.mesh_replacement: Preview[Any] = Preview()
-        self.tissue_retarget: Preview[Any] = Preview()
-        self.surface_preview: Preview[Candidate] = Preview()
-        self.tissue_preview: Preview[TissueCandidate] = Preview()
-        self.scheduler = TaskCoordinator(lambda: self.document)
+        self.clear_previews()
+        self.scheduler = TaskCoordinator(
+            lambda: self.document, executor_factory=self.executor_factory
+        )
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
         self.attach_shortcut_contexts()
@@ -315,10 +318,10 @@ class Session:
 
     def clear_previews(self) -> None:
         self.conversion = ConversionPreview()
-        self.mesh_replacement = Preview()
-        self.tissue_retarget = Preview()
-        self.surface_preview = Preview()
-        self.tissue_preview = Preview()
+        self.mesh_replacement: Preview[Any] = Preview()
+        self.tissue_retarget: Preview[Any] = Preview()
+        self.surface_preview: Preview[Candidate] = Preview()
+        self.tissue_preview: Preview[TissueCandidate] = Preview()
 
 
 def changed_ids(previous: Document, current: Document) -> set[str]:

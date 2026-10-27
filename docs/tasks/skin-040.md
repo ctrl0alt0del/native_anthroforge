@@ -10,6 +10,32 @@
 
 ## Outcome and acceptance
 
+### Fitter/playback and preparation reuse checkpoint, October 27
+
+The real default-resolution integrated suite finished: 15 passed in 1664.68 seconds.
+Backend proxy construction and LE preparation account for the long wait; read-only stack
+captures show actual numerical work. Later regular topology regression fixtures explicitly
+use proxy resolution 8 to keep lifecycle checks bounded; the default qualification above
+was actually performed at 48. No production resolution/default change.
+
+Native fitting matches original DLL weights/transforms/predictions at 1e-8 for both strategies.
+Native playback matches actual Blender 5.0.1 armatures at keys, intermediate values and
+clamped values (1e-6 positional tolerance). Captured tools/fixtures preserve source provenance.
+SLERP sample prediction and linear TRS-channel playback remain distinct.
+
+Fixed-reference LE/FAST preparations are now cached by reference digest and exact settings;
+owned storage accounting includes factorization and FAST buffers. The retained cache is
+limited to two entries/four GiB; larger preparations still compute and merely bypass retention.
+No job failure limit was introduced. Fresh versus reused LE output is bit-identical in the
+fixture. A worker-owned isolated Session runs the existing coordinator synchronously under
+its parent's reservation/cancellation, without another thread pool or live-document mutation.
+Actual shortcut sampling, repeatability and one-bone compilation pass on fixed cube skin.
+
+Evidence: fit-integration-tests (20 passed), playback-cache-tests (14 passed),
+fit-capture-tests (3 passed), full native builds. Configured mypy and native style are being
+completed after the last edits. Public fit commands, desktop fitting/preview, OBJ export,
+representative anatomy profiling and complete release qualification remain unfinished.
+
 ### Shared readiness and fitting port checkpoint, October 27
 
 SkinStatusProvider now drives the API and Skin controls, with warning-only stale settings,

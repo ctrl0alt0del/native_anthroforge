@@ -101,3 +101,9 @@ PIQP 0.6.4 (PREDICT-EPFL, BSD-2-Clause) supplies native constrained tissue field
 and the optional sparse ROUTED quadratic-subproblem backend.
 See `PIQP-LICENSE`, `PIQP-LDL-LICENSE` and native/vendor/PROVENANCE.md. Complete pinned
 headers, addon numerical adapters and their provenance ship in the companion source archive.
+
+
+The 0.4.0 final-skin port retains the addon's GPL-3.0-or-later LE/FAST/contact kernels
+under `native/migration/deformation`, with original source hashes and documented execution
+adaptations. It reuses libigl and Eigen 3.4.0; the required Eigen SparseExtra/Polynomials
+headers retain MPL-2.0 notices and hashes under `native/vendor/unsupported/sources.json`.

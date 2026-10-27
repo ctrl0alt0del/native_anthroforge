@@ -1,0 +1,31 @@
+{
+  "source": "AnthroForge addon/native/deformation",
+  "revision": "fae36aba1b208676cf21d7c4a78a20d5b1f68c66",
+  "files": [
+    {
+      "name": "model.hpp",
+      "sha256": "db22244f477ffd934883112a9e0dfdbc98f692a53bc21c6a50d003f838a0dc1d"
+    },
+    {
+      "name": "elastic.hpp",
+      "sha256": "1fe0d143a35ed34dc9b13ec16bbfa552564ccdf28b9d3a2d2233e26bd343197f"
+    },
+    {
+      "name": "reduced.hpp",
+      "sha256": "5486bbb72d2949e954f17025a7cea4e5409dcc8da48557f526643648615c048f"
+    },
+    {
+      "name": "contact.hpp",
+      "sha256": "db8e7d34f221e6f2da7aff669c7005999f5cd468654730e8c9ddfbcad4cd9754"
+    },
+    {
+      "name": "contact_geometry.hpp",
+      "sha256": "51d4348980c1734b5e416b31ffe50fcc29d2b01d8675f5c10b3ddd4561677445"
+    },
+    {
+      "name": "native.cpp",
+      "sha256": "c8ad4d1ce1d42adf49b7b655789e15491a605db3b22802c25a4a15be11b232f9",
+      "purpose": "ABI/reference only; not compiled"
+    }
+  ]
+}

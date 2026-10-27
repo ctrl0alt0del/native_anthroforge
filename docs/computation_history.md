@@ -3257,3 +3257,20 @@ Regression checks verify no bare/mirrored Fiber physical capture, no failed-tiss
 and unchanged physical mesh/read revisions after FLOW edits while topology reads change.
 The source-panel layout was inspected offscreen. Complete deformation/fitting/export,
 interactive responsiveness and release qualification remain pending.
+
+
+### Maintained final-skin deformation boundary (October 27, integration in progress)
+
+Ported the addon's LE/FAST, embeddings and original area-CDF anatomical sampling into the
+shared native library. C++ also performs the original normalization/denormalization formerly
+in Python. No objective, material constants, iteration counts or convergence tolerance changes.
+Owned handles replace the separate legacy DLL ABI. Cancellation uses the coordinator token;
+the original whole-job 600-second timeout is removed under the approved execution policy.
+FAST retains BBW and its numerical cache format in an owned temporary directory.
+
+Evidence: compact source-DLL fixtures compare eight poses across LE/FAST, including outside
+proxy embedding, translations, scale and asymmetric movement. Positions/predictions agree at
+1e-9, embeddings at 1e-12, diagnostics at 1e-8; area-CDF indices/mass match. Cancellation does
+not poison subsequent solves; released handles fail explicitly. Seven parity/architecture
+checks and type/style/build checks pass. These are native-boundary results only: durable
+reference, current-anatomy capture, contact integration and end-to-end qualification remain.

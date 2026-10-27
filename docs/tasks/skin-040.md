@@ -44,6 +44,26 @@ and unavailable material addresses. This is structural-guard evidence, not full 
 qualification. The first resumed increment below now replaces thin-Fiber capture.
 Full deformation/fitting/export and release qualification remain unfinished.
 
+### LE/FAST native boundary checkpoint, October 27
+
+Owned preparation, solve, embedding and area-CDF sample selection now call the pinned
+addon kernels inside af_native. C++ performs the donor's normalization and sampling;
+Python packs/validates buffers. Solver state is serialized per handle and disposed
+explicitly. The original numerical iteration counts/tolerances are unchanged.
+Execution adaptation uses coordinator cancellation and omits the old 600-second whole-job
+timeout under the approved policy. FAST retains its original BBW computation/cache format
+inside a preparation-owned temporary folder. Complete runtime caching/reference publication
+is not integrated yet. Contact sources are pinned but not connected in this checkpoint.
+
+Added the required Eigen 3.4.0 SparseExtra/Polynomials modules from the donor vendor;
+existing Eigen version/header identity was verified. Source/DLL hashes accompany the
+compact reference fixture. Eight LE/FAST poses cover identity, translation, scaling and
+asymmetric targets; output/prediction/embedding/diagnostics match the original DLL within
+recorded tolerances. Sample indices and area match. Cancellation/reuse/release checks pass.
+Seven parity/architecture tests, configured mypy (495 files), Ruff and authored native style
+pass. Native build succeeds. Logs: `build/skin-040/deformation-{native-build,native-style,
+parity-tests,mypy}.log`. No desktop/reference workflow or release qualification is claimed.
+
 ### Physical contributors and topology guides separated, October 27
 
 Implemented SCP/Tissue-only physical capture, including mirrored instances, with no Fiber

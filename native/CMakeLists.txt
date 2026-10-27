@@ -1,5 +1,6 @@
 add_subdirectory(boolean)
 add_subdirectory(blender)
+set(SKIN_DEFORMATION_SOURCES src/skin_deformation.cpp src/skin_deformation_api.cpp src/skin_deformation_samples.cpp)
 set(SKIN_STITCH_SOURCES src/skin_stitch_boundary.cpp src/skin_stitch_zipper.cpp src/skin_stitch_centered.cpp
     src/skin_stitch_weld.cpp src/skin_stitch_quality.cpp src/skin_stitch_transition.cpp src/skin_stitch_api.cpp
     src/skin_stitch_orientation.cpp src/skin_stitch_assembly.cpp src/skin_stitch_mirror.cpp)
@@ -14,6 +15,7 @@ set(SKIN_SOURCES src/skin_proximity.cpp src/skin_quads_split.cpp src/skin_quads_
     src/skin_gaps.cpp src/skin_meshing.cpp src/skin_assembly.cpp src/skin_precision.cpp
     src/skin_envelope.cpp src/skin_diagnostics.cpp src/skin_capture.cpp src/skin_centerlines.cpp)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
+    ${SKIN_DEFORMATION_SOURCES}
     ${SKIN_SOURCES} ${SKIN_PROXY_SOURCES} ${SKIN_LOOP_SOURCES} ${SKIN_ANNULUS_SOURCES} ${SKIN_STITCH_SOURCES} src/process_api.cpp src/process_windows.cpp src/process_log.cpp
     src/comparison_fingerprint.cpp
     src/inspection_mapping.cpp src/inspection_compare.cpp src/inspection_buffers.cpp src/inspection_point.cpp

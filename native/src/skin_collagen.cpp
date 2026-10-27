@@ -4,11 +4,14 @@
 #include <cmath>
 
 namespace af::skin {
-static std::vector<int8_t> quantize(const Grid& g,const std::vector<float>& seeds) {
-    std::vector<int8_t> result(g.count,-1);
+struct Levels { std::vector<int8_t> cells; std::array<bool,16> present{}; };
+static Levels quantize(const Grid& g,const std::vector<float>& seeds) {
+    Levels result; result.cells.assign(g.count,-1);
     for(uint64_t i=0;i<g.count;++i) {
         if((i&8191)==0) check_cancel(g.cancel);
-        if(std::isfinite(seeds[i])) result[i]=int8_t(std::nearbyint(std::clamp(seeds[i],0.0f,1.0f)*15.0f));
+        if(!std::isfinite(seeds[i])) continue;
+        const auto level=int8_t(std::nearbyint(std::clamp(seeds[i],0.0f,1.0f)*15.0f));
+        result.cells[i]=level; result.present[level]=true;
     }
     return result;
 }
@@ -20,11 +23,15 @@ static void merge(const Grid& g,Values& result,const Values& distances,double in
     }
 }
 Values collagen(const Grid& g,const std::vector<float>& seeds,double inner,double width) {
-    const auto levels=quantize(g,seeds); Values result(g.count,1.0); Mask mask(g.count);
+    const auto levels=quantize(g,seeds); Values result(g.count,1.0); Mask mask;
     for(int level=0;level<15;++level) {
-        check_cancel(g.cancel); bool found=false;
-        for(uint64_t i=0;i<g.count;++i) { mask[i]=levels[i]==level; found=found||mask[i]; }
-        if(!found) continue;
+        check_cancel(g.cancel);
+        if(!levels.present[level]) continue;
+        mask.resize(g.count);
+        for(uint64_t i=0;i<g.count;++i) {
+            if((i&8191)==0) check_cancel(g.cancel);
+            mask[i]=levels.cells[i]==level;
+        }
         const auto distances=distance(g,dilate(g,mask));
         merge(g,result,distances,inner,width,double(float(level)/15.0f));
     }

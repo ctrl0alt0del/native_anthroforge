@@ -1127,6 +1127,15 @@ cancellation is reported after the team joins. Post-smoothing field release foll
 addon: discard temporary voxel values/flags/coarse copies while retaining the geometry and
 gap constraints required by diagnostics. Algorithms, output policy and budgets are unchanged.
 
+Tile stitching uses contiguous source vertices and a sorted five-decimal key/index array,
+retaining lexicographic final IDs and the first unrounded sample per key. Temporary keys,
+source positions and remapping are released before mesh preparation. Coarse-field EDT lines
+use the same bounded skin team with disjoint outputs and preallocated per-thread scratch;
+axes remain sequential. Collagen skips absent quantization levels, and exterior flood fill
+retains only its unprocessed FIFO frontier. Field equations, connectivity and precision stay
+unchanged. These October 28 source changes also await build/parity/performance qualification;
+bulk stitching's duplicate samples require peak-memory measurement, not an assumed saving.
+
 Immutable resources span document/history/checkpoint/job/display leases. Prepared deformation
 factors use a bounded cache keyed by reference and settings; oversized entries bypass retention,
 not computation. Isolated fit/export sessions own their document and caches and borrow immutable

@@ -24,6 +24,15 @@ input Fields stay intact for inspection/retry. No memory budget or precision is 
 October 28 execution/lifetime changes await build, parity and performance qualification:
 the user has paused all testing while playing. Earlier evidence does not qualify them.
 
+Coarse-field EDT lines now share the pinned kernel's bounded worker policy through
+`skin_execution.cpp`, with scratch allocated before parallel work. This parallelizes
+independent lines only; axis order, distance arithmetic and source field formulas remain
+unchanged. Collagen visits only populated quantization levels. The exterior FIFO frees
+processed entries without changing traversal or connectivity. Tile stitching uses bulk
+rounded-key sorting, matching addon `_stitch`: first unrounded representative and sorted
+final IDs, with unchanged faces and float32 output. These changes also remain unqualified
+while execution is paused. No pinned numerical header was modified for this increment.
+
 Current integration: source-aware gap sampling, protected lattice preparation, tiled
 extraction, stitching, supported-component filtering and constrained smoothing.
 Compilation of the full header set does not establish binding, quality or final-skin qualification.

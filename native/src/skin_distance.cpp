@@ -1,8 +1,14 @@
 #include "skin_fields.hpp"
+#include "skin_execution.hpp"
 #include "mesh_internal.hpp"
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <omp.h>
+
+#ifndef _OPENMP
+#error Skin distance fields require their dedicated OpenMP target.
+#endif
 
 namespace af::skin {
 struct Hull { std::vector<int> sites; Values edges, input, output; };
@@ -28,15 +34,32 @@ static void transform(Hull& h) {
         const double delta=q-h.sites[k]; h.output[q]=delta*delta+h.input[h.sites[k]];
     }
 }
-static void axis(const Grid& g,Values& values,int a) {
-    const uint64_t stride=a==0?uint64_t(g.shape[1])*g.shape[2]:a==1?g.shape[2]:1;
-    const uint64_t block=stride*g.shape[a]; Hull h; h.input.resize(g.shape[a]);
-    for(uint64_t start=0;start<g.count;start+=block) for(uint64_t offset=0;offset<stride;++offset) {
-        if((offset&1023)==0) check_cancel(g.cancel);
-        for(int q=0;q<g.shape[a];++q) h.input[q]=values[start+offset+q*stride];
-        transform(h);
-        for(int q=0;q<g.shape[a];++q) values[start+offset+q*stride]=h.output[q];
+static std::vector<Hull> scratch(int workers,int length) {
+    std::vector<Hull> result(workers);
+    for(auto& h:result) {
+        h.input.resize(length); h.output.resize(length);
+        h.sites.reserve(length); h.edges.reserve(length);
     }
+    return result;
+}
+static void line(Hull& h,Values& values,uint64_t start,uint64_t stride) {
+    for(size_t q=0;q<h.input.size();++q) h.input[q]=values[start+q*stride];
+    transform(h);
+    for(size_t q=0;q<h.output.size();++q) values[start+q*stride]=h.output[q];
+}
+static void axis(const Grid& g,Values& values,int a) {
+    check_cancel(g.cancel);
+    const uint64_t stride=a==0?uint64_t(g.shape[1])*g.shape[2]:a==1?g.shape[2]:1;
+    const auto lines=int64_t(g.count/g.shape[a]); const int workers=field_workers(lines);
+    auto buffers=scratch(workers,g.shape[a]);
+    const auto* cancellation=reinterpret_cast<const Cancellation*>(g.cancel);
+    #pragma omp parallel for schedule(static) num_threads(workers) if(workers>1)
+    for(int64_t i=0;i<lines;++i) {
+        if(cancellation&&cancellation->cancelled.load(std::memory_order_relaxed)) continue;
+        const uint64_t start=(uint64_t(i)/stride)*stride*g.shape[a]+uint64_t(i)%stride;
+        line(buffers[omp_get_thread_num()],values,start,stride);
+    }
+    check_cancel(g.cancel);
 }
 static Values unseeded(const Grid& g) {
     Values result(g.count);

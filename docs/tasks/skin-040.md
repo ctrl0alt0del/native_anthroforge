@@ -2,13 +2,42 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: skin parallelism and temporary-memory source fixes complete; all builds/tests and
+- Status: skin parallelism/lifetime, tile assembly and coarse-field source changes complete.
+  All builds/tests and
   runtime qualification paused while the user is playing. Existing qualification below
   predates these fixes. Keep off main until the changes and rebuilt package are qualified.
 - Last updated: 2026-10-28, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
 ## Outcome and acceptance
+
+### Tile assembly and coarse fields, October 28 — source work, validation paused
+
+User authorized continuing these two areas without resuming tests. Baseline: `68917e0`.
+Tile assembly replaces per-vertex ordered-map insertion with contiguous tile buffers and
+bulk key sorting. Preserve five-decimal lattice keys, lexicographic output ordering, first
+unrounded representative, triangle order/winding, and final float32 world coordinates.
+Coarse fields retain exact separable EDT arithmetic and axis order; independent lines use
+the existing skin team's maximum of four workers with preallocated per-worker scratch.
+Collagen visits only populated levels, in the same ascending order. Exterior flood fill
+retains 26-connectivity and its corner-label rule, releasing processed FIFO entries.
+No changes to precision, grid/budget selection, field formulas, meshing or smoothing.
+
+Added the `native_skin_buffers` CTest target (not run): explicit stitching expectations,
+exhaustive nearest-seed distance oracles, anisotropic/singleton axes, exterior connectivity,
+collagen levels/rounding, dilation and cancellation, under forced one/four-thread execution.
+Test-only mesh/cancellation/execution controls isolate numerical buffers; existing complete
+envelope/binding parity and coordinator tests remain required.
+Static ownership review: one worker policy borrowed from pinned kernels; per-worker hulls
+cannot allocate inside OpenMP; source geometry and authored state remain untouched. Bulk
+assembly retains duplicate boundary samples until sorting, so its peak memory must be
+measured rather than claimed lower. No new memory policy or topology change was introduced.
+
+Source/diff review only. Builds, tests, benchmarks, generation and app runs remain paused.
+No speed/memory measurements or new geometry acceptance claimed. Executable/package remains
+unchanged. Continue on this branch and keep changes off main. After the user resumes, run
+the new CTest, maintained field/envelope addon parity tools, existing cancellation/resource
+tests and controlled production time/peak-memory comparisons before full release checks.
 
 ### Skin execution/lifetime source changes, October 28 — validation paused
 

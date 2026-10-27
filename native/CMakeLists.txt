@@ -1,6 +1,6 @@
 add_subdirectory(boolean)
 add_subdirectory(blender)
-set(SKIN_DEFORMATION_SOURCES src/skin_deformation.cpp src/skin_deformation_api.cpp src/skin_deformation_samples.cpp src/skin_contact.cpp)
+set(SKIN_DEFORMATION_SOURCES src/skin_deformation.cpp src/skin_deformation_api.cpp src/skin_deformation_samples.cpp src/skin_contact.cpp src/skin_support.cpp)
 set(SKIN_STITCH_SOURCES src/skin_stitch_boundary.cpp src/skin_stitch_zipper.cpp src/skin_stitch_centered.cpp
     src/skin_stitch_weld.cpp src/skin_stitch_quality.cpp src/skin_stitch_transition.cpp src/skin_stitch_api.cpp
     src/skin_stitch_orientation.cpp src/skin_stitch_assembly.cpp src/skin_stitch_mirror.cpp)

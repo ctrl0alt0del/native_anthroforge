@@ -3289,5 +3289,16 @@ uncropped muscle inflation supplies deformation targets before relaxation/stacki
 result.faces is used instead of the two-sided result.inflated_faces. On four existing donor
 envelope fixtures, the original sampler chooses zero second-side vertices with those capture
 faces, versus 19 with complete envelope faces. The latter is an experimental comparison,
-not an implemented replacement or proof of final skin quality. Questions are pending; no
-source-selection change, implicit approval, or algorithm substitution has been made.
+not proof of final skin quality. The subsequent explicit user answer approved a preference
+with finished/cropped tissue as default and uncropped inflation as an alternative, and
+sampling both sides. This supersedes the pending decision; solver objectives stay unchanged.
+
+### Skin support source policy and material sampling (October 27, integration in progress)
+
+New references capture the selected preference; existing references retain it. Draft sources
+remain finished tissue. Complete canonical faces supply the original area-CDF sampling,
+including both sides. Native code owns transformed area accumulation, weight normalization,
+and retained-material target resolution. The application owns source identity/provenance.
+No nearest-surface fallback or resampling occurs during updates. Incompatible contributor,
+topology or material identities fail explicitly. Full deformation integration/qualification
+remain pending; source tests are recorded in the task record when completed.

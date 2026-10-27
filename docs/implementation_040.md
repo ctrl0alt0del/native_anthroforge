@@ -36,6 +36,12 @@ Keep authored inputs, accepted stage results and presentation distinct. Resource
 current state/history/checkpoints/jobs/viewport. Settings changes invalidate construction;
 compatible source motion invalidates deformation. Persist the reference, not prepared caches.
 
+Confirmed tissue-source policy: Preferences defaults to finished/cropped tissue, with accepted
+uncropped inflated rest as the alternative. Capture the choice with the immutable reference;
+do not reinterpret existing samples after preference changes. Sample complete two-sided
+surfaces. Verify both policies, retained material positions, reflection and source failures.
+This approved sampling correction does not alter LE/FAST, contact or fitting objectives.
+
 ## October 27 review integration (confirmed; not yet implemented)
 
 The consolidated review is confirmed and runtime work is authorized. Remove physical Fiber

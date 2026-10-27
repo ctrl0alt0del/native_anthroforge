@@ -2,6 +2,7 @@
 
 import json
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 
@@ -110,8 +111,6 @@ def test_in_memory_preferences_do_not_touch_user_settings(tmp_path):
 
 
 def test_preference_file_contains_only_settings(session):
-    from pathlib import Path
-
     result = session.command("preferences.set", routing_backend="PIQP")
     data = json.loads(Path(result["path"]).read_text())
     assert data == {
@@ -122,6 +121,7 @@ def test_preference_file_contains_only_settings(session):
             "fiber_propagation": "SMOOTH_SHAPE",
             "autosave_enabled": True,
             "autosave_minutes": 5,
+            "skin_tissue_surface": "FINISHED",
         },
     }
 

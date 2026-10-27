@@ -47,6 +47,14 @@ vertex identities, order and connectivity. SCP/VCP surfaces drive these position
 guide changes must not trigger automatic retopology. Construction edits can still affect
 skin indirectly through their consuming SCPs/VCPs.
 
+Preferences selects the tissue deformation support: **Finished (cropped)** by default,
+including relaxation and stacking, or **Uncropped inflation**, the accepted inflated rest
+before cropping, relaxation and stacking. Both inflated sides contribute samples. This
+corrects the donor's first-side-only sampling omission; LE/FAST objectives remain unchanged.
+Each immutable reference records its selected source policy. Changing the preference does
+not reinterpret existing material samples; a newly initialized reference uses the new choice.
+Draft skin always uses finished tissue surfaces, independently of this preference.
+
 Retain accepted output on cancellation, malformed results, missing dependencies or failed
 computation. Preserve the addon's usable-result quality-warning policy, including open seams,
 contact findings and iteration limits. Do not claim watertightness or complete collision safety.

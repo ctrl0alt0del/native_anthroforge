@@ -15,7 +15,7 @@ static std::vector<double> areas(const double* xyz,int n,const int* faces,int nf
     }
     return mass;
 }
-static int select(const std::vector<double>& mass,int* out,double* total) {
+int select(const std::vector<double>& mass,int* out,double* total) {
     std::vector<int> keep; std::vector<double> cumulative; *total=0;
     for(int i=0;i<int(mass.size());++i) if(mass[i]>0) { keep.push_back(i); *total+=mass[i]; cumulative.push_back(*total); }
     if(keep.empty()||!std::isfinite(*total)) throw std::runtime_error("Contributor has no nondegenerate material surface.");

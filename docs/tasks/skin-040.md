@@ -44,7 +44,23 @@ and unavailable material addresses. This is structural-guard evidence, not full 
 qualification. The first resumed increment below now replaces thin-Fiber capture.
 Full deformation/fitting/export and release qualification remain unfinished.
 
-### Contact qualification and pending tissue-source decision, October 27
+### Tissue-source decisions confirmed, October 27
+
+The user answered both pending questions explicitly: expose the tissue surface in
+Preferences with finished/cropped as default, and sample both inflated sides. The alternative
+uses accepted uncropped inflated rest before relaxation/stacking. Reference initialization
+captures this choice; existing references retain it, avoiding reinterpretation of their
+material samples. Draft contributors remain finished SCP/VCP surfaces. Implementation resumed.
+No other algorithm or policy change is approved by these answers.
+
+Implemented the version-independent preference and desktop control, plus native area-CDF
+sampling over complete canonical faces, global sample weights, and retained material target
+resolution. Application capture selects accepted finished/rest outputs without Fiber fallback.
+18 support/preference/architecture tests pass; native build and targeted Ruff pass.
+Evidence: `build/skin-040/support-{native-build,tests}.log`. Persistent reference publication,
+full Build Skin, status/fitting/export and offscreen release acceptance remain unfinished.
+
+### Contact qualification and source decision evidence, October 27
 
 Contact projection and symmetry now use the pinned donor kernels through owned arrays and
 coordinator cancellation. Preserve source iteration/tolerance settings, the advisory 60-second
@@ -57,25 +73,25 @@ Logs: `build/skin-040/contact-{native-build,native-style,ctest,mypy,parity-tests
 `build/skin-040/deformation-all-skin-tests.log`. These are boundary/selected regression
 checks, not complete application/portable skin qualification.
 
-**Implementation paused for an explicit policy answer, not presumed approval.**
+**Historical pause, resolved by the explicit answers above.**
 During reference integration, donor `adapters/deformation/muscles.py::material_chart`
 re-evaluates uncropped muscle inflation without relaxation or stacking; its capture uses
 `result.inflated_vertices` with `result.faces`, even when two-sided composition supplies
 separate `inflated_faces`. This differs from the complete physical tissue envelope.
 An original-DLL area/CDF experiment on four retained two-sided envelope fixtures selects
-73–75 samples with zero second-side samples using the donor capture faces. Complete envelope
+73â€“75 samples with zero second-side samples using the donor capture faces. Complete envelope
 faces select 80 samples, including 19 second-side samples. This establishes omitted sampling,
 not the final visual consequence on a production assembly.
 
 Reproduce with `tools/probe_skin_deformation_sources.py ADDON tests/fixtures/tissue OUTPUT`;
 local result: `build/skin-040/deformation-source-policy-probe.json`.
-Pending questions sent to the user:
+Questions sent to the user (now answered above):
 1. Preserve the donor uncropped pre-relaxation/pre-stacking deformation support, or use the
    finished tissue surface? No choice is inferred from the separate draft-skin source policy.
 2. Correct two-sided sampling to use both surfaces, or preserve first-side-only behavior?
 
-No dependent capture policy has been implemented. No reply or elapsed time is approval.
-After the answer: record it in the specification/history, integrate material references and
+At the pause no dependent capture policy had been implemented. No reply or elapsed time is approval.
+Next: integrate the approved preference, material references and
 native sampling/capture, then complete SkinStatusProvider, automatic fixed-topology updates,
 Build Skin/retry publication, fitting, export and release qualification. No main merge/version bump.
 

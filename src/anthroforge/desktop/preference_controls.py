@@ -27,6 +27,10 @@ class PreferenceControls(QObject):
     def setFiberPropagation(self, value):
         self.set_preference(fiber_propagation=value)
 
+    @Slot(str)
+    def setSkinTissueSurface(self, value):
+        self.set_preference(skin_tissue_surface=value)
+
     @Slot(bool)
     def setAutosaveEnabled(self, value):
         self.set_preference(autosave_enabled=value)

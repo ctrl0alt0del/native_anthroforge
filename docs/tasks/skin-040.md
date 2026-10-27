@@ -10,6 +10,20 @@
 
 ## Outcome and acceptance
 
+### Paused for remaining-work review, October 27
+
+The user is stopping for the night. Do not resume implementation automatically. The
+next step is a grilling session about the remaining 0.4.0 work, including bare-Fiber
+centerlines versus tubes, deformation compatibility, outstanding anatomy comparisons,
+and the remaining deformation/fitting/export/release work. Separate implemented,
+qualified, accepted-but-unqualified, and undecided behavior explicitly.
+
+Unanswered questions remain pending. Silence, elapsed time, or the user being away
+never authorizes an algorithm, execution-policy, or default change. Do not infer
+approval from a missed response or add a new memory/time rejection on that basis.
+The existing requirement to discuss approach changes and await an explicit decision
+remains in force. This pause adds no algorithm or product decision.
+
 ### Resumed implementation: approved corrections, 2026-10-26
 
 User authorizes replacing the approximate proxy collapse and half-mesh clipping with

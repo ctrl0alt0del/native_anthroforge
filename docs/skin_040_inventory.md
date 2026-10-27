@@ -1,6 +1,13 @@
 # Skin migration inventory for 0.4.0
 
 Status: **release scope confirmed; source audit, not implemented or release-qualified**.
+
+**October 27 review:** the tables below describe the addon, including its bare-Fiber
+contributors. The confirmed standalone contract now excludes construction from physical
+draft/deformation sources, while retaining topology guidance. This intentional difference
+supersedes the earlier thin-tube experiment; its implementation remains pending. See the
+[current specification](specification_040.md) and [task record](tasks/skin-040.md).
+
 The user confirmed the full existing workflow for 0.4.0, including fitting bones to
 reproduce a shortcut. Export starts with OBJ through an extensible format boundary.
 Skin joins Shape, Shortcuts and Inspect in a vertical strip along the left edge of

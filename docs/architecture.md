@@ -1080,3 +1080,25 @@ ConstructionFilter is a desktop Qt proxy over the existing incremental RecordMod
 It filters names and kinds without copying authored objects or changing selection.
 RelatedObjects bounds dependency/consumer lists to eight rows with reused delegates
 and search; filtering preserves the list height. Both remain presentation adapters.
+
+## Shared operation status providers
+
+**Confirmed design, not implemented.** In 0.4.0, implement only SkinStatusProvider under
+the [skin contract](specification_040.md). The application owns operation-specific readiness,
+blocking reasons, advisory warnings and assessed document/result/reference identities.
+Desktop views subscribe through existing document/result notifications; headless operations
+use the same validation policies. Status reads neither start computation nor mutate state.
+Keep Qt adapters separate from this shared assessment, and avoid polling or parallel status
+stores that can disagree with command validation. Revalidate relevant inputs at execution.
+
+A stale construction setting is not automatically a broken reference: fitting may use an
+existing compatible skin with a warning. Missing skin or incompatible material/vertex
+identities blocks fitting with an explanation. Update and export have their own eligibility;
+do not reduce the provider to a global valid/invalid flag.
+
+For the **next version after 0.4.0**, the user requests applying this pattern to other
+functionalities whose UI derives statuses or operation conditions from workspace/document
+state. Inventory and migrate those consumers at their owning boundaries, reusing established
+notifications and command policies. Preserve feature-specific meanings rather than creating
+one universal manager. This is a documented future direction, not authorization to refactor
+other features during the skin release. See the [roadmap](roadmap.md).

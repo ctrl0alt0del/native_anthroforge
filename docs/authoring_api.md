@@ -1048,6 +1048,12 @@ or an incompatible field layout require explicit resolution, without silent disc
 
 ### Skin contributor authoring (0.4.0 implementation in progress)
 
+**Confirmed replacement, not implemented yet:** the October 27 review makes SCP/VCP
+surfaces the only physical draft/deformation sources. Fiber paths remain available to
+topology guidance. The thin-Fiber/skin-radius behavior described below still exists in
+this development checkpoint but is superseded and must not be treated as the final
+0.4.0 API contract. See [the specification](specification_040.md).
+
 `skin.contributor.configure(owner, values)` edits source gap policies and eligible SCP
 collagen/density or Fiber FLOW/skin-radius settings. Fiber `fiber_radius` is in metres,
 defaults to 0.001, and accepts 0.000001 through 1.0. It controls the thin surface used
@@ -1072,3 +1078,12 @@ Selected-source Skin controls also expose SCP subtree quad budgets and open-Fibe
 guide selection. Closed Fibers use the loop-guide workflow, not the open FLOW flag.
 Nested budget conflicts are shown without preventing users from editing their settings;
 topology generation must validate the complete budget tree before dispatch.
+
+**Planned shared readiness, not an available API yet:** SkinStatusProvider will expose
+operation-specific eligibility, blocking reasons, warnings and assessed skin/reference
+revisions. Desktop subscriptions and headless operations will share these policies.
+Unapplied build settings allow fitting with a warning when the existing reference is
+usable; missing skin or incompatible material/vertex identities prevents fitting. Every
+sample must still validate. No status read initiates computation or edits document state.
+No public status command name is committed by this design note. Wider status-provider
+migration is deferred to the next version after 0.4.0.

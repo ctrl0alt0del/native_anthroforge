@@ -10,7 +10,40 @@
 
 ## Outcome and acceptance
 
+### October 27 grilling decisions — documentation only, implementation still paused
+
+The resumed interview settled Q1-Q9; the user explicitly requested documenting the
+status-provider pattern. The current specification/plan now incorporate these decisions.
+Do not resume runtime work until the user confirms the consolidated understanding.
+
+- Q1/Q4: draft skin uses SCP/VCP surfaces only, not bare Fibers or other construction.
+  Draft generation and topology generation are distinct stages. Preserve the addon's
+  loop/FLOW topology guidance; do not conflate it with physical source capture.
+- Q2: Build Skin runs the complete path through reference preparation. Preserve successful
+  intermediate stages for retry, without unnecessary reconstruction.
+- Q3/Q5: Fit to bones is a button alongside shortcut settings such as attachment overrides.
+  Missing skin disables it with a tooltip. No Build Skin and Fit action or implicit build.
+- Q6: ordinary skin updates and fitting samples preserve vertex identities/order/count
+  and connectivity. Guides do not trigger retopology or independently drive deformation;
+  SCP/VCP outputs remain the physical supports, with their normal construction dependencies.
+- Q7/Q8: usable references with unapplied build settings allow fitting with a warning.
+  Missing/incompatible references disable fitting with an explanatory tooltip. Every
+  sampled pose must validate; no failed sample is replaced by old geometry.
+- Q9: application-owned SkinStatusProvider reports per-operation readiness, blockers,
+  warnings and assessed revisions through existing notifications, shared by UI/headless
+  consumers. No polling or computation from status inspection. Only skin in 0.4.0.
+- Next version: extend this pattern to other UI functionality deriving status/eligibility
+  from workspace/document state. Recorded in roadmap/architecture; not implemented now.
+
+Source inspection plus direct addon guard checks accepted position-only updates and
+compatible anatomy movement, and rejected changed vertex identities, missing contributors
+and unavailable material addresses. This is structural-guard evidence, not full fitting
+qualification. The current branch still contains the superseded thin-Fiber capture until
+implementation resumes. No new geometry result, code change, version or release is claimed.
+
 ### Paused for remaining-work review, October 27
+
+Historical pause request; the interview above has occurred, but runtime remains paused.
 
 The user is stopping for the night. Do not resume implementation automatically. The
 next step is a grilling session about the remaining 0.4.0 work, including bare-Fiber
@@ -354,10 +387,14 @@ App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated roo
 
 ## Next actions
 
-1. Finish envelope contributor/painting controls and production-anatomy qualification. Centerline-specific coverage evidence remains distinct from triangle checks.
-2. Integrate qualified topology/tetrahedral dependencies and maintained native numerical preparation.
-3. Deliver durable reference/deformation, shortcut fitting and OBJ through shared API and desktop.
-4. Complete full lifecycle, profiler, geometry and portable-release qualification per plan.
+1. Obtain confirmation of the consolidated interview before resuming implementation.
+2. Apply the SCP/VCP-only physical-source policy while preserving independent topology
+   guides; remove superseded skin-radius controls and qualify the real anatomy cases.
+3. Complete durable reference/deformation, one-action Build Skin and SkinStatusProvider.
+4. Deliver shortcut-settings fitting controls, shared eligibility/warnings, isolated
+   sampling, saved preview and OBJ through shared API and desktop.
+5. Complete lifecycle, profiler, geometry, background GUI and portable-release qualification.
+   The wider 28-VCP envelope and full production assembly remain qualification work.
 
 All three initial questions are answered. No automatic minimal-bone search or
 multi-shortcut rig composition is implied: preserve the existing configurable bone

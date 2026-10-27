@@ -12,7 +12,7 @@ records algorithms/defaults, source provenance and evidence limits. Continue
 | Owner | Responsibility |
 | --- | --- |
 | Core | Immutable skin settings/results, contributor settings, guides, reference identity and independent fitted results. No dummy anatomy nodes. |
-| Application | Shared operations, contributor capture, invalidation, transactions, reference compatibility, persistence, export policy and publication. |
+| Application | Shared operations, contributor capture, invalidation, transactions, reference compatibility, SkinStatusProvider, persistence, export policy and publication. |
 | Native C++ | Raster/field/distance work, meshing preparation, guides/refinement, tetrahedral preparation, LE/FAST, fitting and preview skinning. |
 | Desktop | Vertical inspector, contextual controls/painting, fit preview and diagnostics through shared APIs. |
 | Export adapters | OBJ writer over a frozen skin snapshot; shared eligibility/units/atomic-write policy above writers. |
@@ -36,6 +36,31 @@ Keep authored inputs, accepted stage results and presentation distinct. Resource
 current state/history/checkpoints/jobs/viewport. Settings changes invalidate construction;
 compatible source motion invalidates deformation. Persist the reference, not prepared caches.
 
+## October 27 review integration (confirmed; not yet implemented)
+
+Before resuming runtime work, finish the consolidated review. Remove physical Fiber
+contribution from shared draft/deformation input policies, not merely from a UI selector.
+Remove obsolete skin-radius controls from that workflow while preserving independent
+accepted path capture for topology guides and ordinary viewport Fiber display. Do not
+fall back to construction geometry when SCP/VCP output is missing.
+
+Implement SkinStatusProvider at the application boundary. Its immutable assessments identify
+the skin/reference revision, operation eligibility, blocking reasons and warnings. Reuse
+document/result notifications; desktop subscriptions adapt them without polling or separate
+eligibility logic. The same shared checks guard headless operations and dispatch-time capture.
+Keep notification wiring separate from numerical work and scheduling; status inspection must
+not initiate either. Distinguish stale build settings from broken deformation references.
+
+Compose Build Skin from the existing coordinated draft/topology stages and reference
+preparation. Preserve complete-stage publication and retry ownership. Put Fit to bones in
+shortcut settings, with read-only readiness from the provider, no implicit skin build, and
+separate saved-fit management/preview in the Skin panel. Check every sample against the same
+fixed skin topology/reference; failed samples do not fall back to old accepted geometry.
+
+Do not retrofit other workspace-dependent status consumers in 0.4.0. That confirmed direction
+belongs to the next version, as recorded in [architecture](architecture.md#shared-operation-status-providers)
+and [roadmap](roadmap.md).
+
 ## Integrated increments
 
 1. **Qualification:** freeze native/source fingerprints, paired fixtures and expected warnings;
@@ -47,7 +72,7 @@ compatible source motion invalidates deformation. Persist the reference, not pre
 4. **Topology:** explicit QuadWild/Instant Meshes, loop/FLOW guides, density, symmetry, native
    assembly/refinement and usable-result warnings. Inspect actual output shapes.
 5. **Deformation:** durable reference, LE/FAST, contact diagnostics, compatibility/invalidation,
-   atomic replacement and failure retention through desktop/headless operations.
+   atomic replacement, SkinStatusProvider and failure retention through desktop/headless operations.
 6. **Fitting:** isolated shortcut sampling, maintained scale-aware/authoring-only Single Active
    fitting, stable sample identities, independent preview, stale provenance and persistence.
 7. **Export/release:** OBJ, examples, regression/parity/performance evidence, portable delivery.
@@ -60,6 +85,15 @@ contributors/paint/guides/budgets, build/update/reinitialize, fit/preview/remove
 
 - Source manifests distinguish clean tracked addon code from local untracked fitting work.
   Keep upstream licenses/configurations. Do not reuse CPython-3.11 extensions in Python 3.12.
+- Bare Fibers/other construction do not contribute draft surfaces or deformation supports;
+  retained loop/FLOW guides still affect explicit topology construction. Associated VCP edits
+  remain legitimate anatomy dependencies. No skin-radius/display-radius coupling survives.
+- Build Skin reaches a usable reference; retry retains successful stages. Fit is located in
+  shortcut settings and disabled for missing skin/incompatible references. Unapplied build
+  settings with a compatible reference produce a warning, not a blanket rejection.
+- SkinStatusProvider agrees across UI and headless calls, reports assessed revisions, updates
+  through existing notifications, and performs no polling/computation/document mutation.
+  Late invalidation and failure within a sampled range cannot publish an invalid fitted result.
 - Match units and identities in paired skin/skull/digit and 96-muscle fixtures. Verify envelope,
   gaps, collagen, loop patches, branched charts, density and symmetry numerically and visually.
 - Preserve connectivity/IDs through large shortcut updates and open-contact-open sequences.

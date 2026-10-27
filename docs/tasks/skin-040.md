@@ -22,8 +22,10 @@ rendering and recovery. Evidence: `build/skin-040/portable-release{,-retry}.log`
 attempts fail at the unchanged cube skin example under fluctuating external RAM pressure;
 neither is recorded as a complete pass. No runtime code changed after the qualified build.
 
-Asked the user when to resume the memory-sensitive check; do not interrupt their running
-game or close applications. Once they are ready, rerun the exact canonical executable:
+User explicitly chose to resume **after finishing playing**. Pause remaining qualification;
+do not interrupt their game or close applications. The in-progress source-archive process
+was stopped and its incomplete ZIP removed. Recreate it after final qualification.
+Once the user is ready, rerun the exact canonical executable:
 `uv run --no-sync python tools/check_portable.py dist/0.4.0/AnthroForge.dist/AnthroForge.exe build/skin-040/portable-release --offscreen`.
 Then update qualification labels, refresh packaged documentation/source archive, validate
 against latest main and merge/push normally. No runtime rebuild is needed unless code changes.

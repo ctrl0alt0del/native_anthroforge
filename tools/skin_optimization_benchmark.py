@@ -126,7 +126,7 @@ def native_output(args, report, scene, fields):
     return arrays
 
 
-def source_part(data, owner):
+def source_part(data, owner, length):
     from core.draft_skin.model import SkinSource
 
     triangles = data["triangles"][data["owners"] == owner]
@@ -135,22 +135,33 @@ def source_part(data, owner):
     kind = "SCP" if policy[2] else "VCP"
     identity = owner, kind, str(owner), "ORIGINAL", str(owner)
     geometry = data["vertices"][lo:hi], triangles - lo, np.ones(hi - lo)
-    source = SkinSource(*identity, *geometry, float(policy[0]), float(policy[1]))
+    source = SkinSource(*identity, *geometry, float(policy[0] / length), float(policy[1]))
     return source, (lo, hi)
 
 
 def source_capture(args, data):
     from core.draft_skin.model import SkinCapture
 
-    parts = [source_part(data, i) for i in range(len(data["policies"]))]
+    length = float(np.ptp(data["vertices"], axis=0).max())
+    parts = [source_part(data, i, length) for i in range(len(data["policies"]))]
     spans = [span for _, span in parts]
     expected = [(0 if i == 0 else spans[i - 1][1], hi) for i, (_, hi) in enumerate(spans)]
     if spans != expected or spans[-1][1] != len(data["vertices"]):
         raise ValueError("Capture must retain complete contiguous source vertex blocks.")
     xyz = data["vertices"]
-    return SkinCapture(
+    capture = SkinCapture(
         "benchmark", tuple(s for s, _ in parts), xyz.min(0), xyz.max(0), "fixed", 0, args.resolution
     )
+    verify_capture(capture, data)
+    return capture
+
+
+def verify_capture(capture, data):
+    from core.draft_skin.gap_native import _arrays
+
+    names = "vertices", "triangles", "owners", "policies"
+    for name, actual in zip(names, _arrays(capture), strict=True):
+        np.testing.assert_array_equal(actual, data[name], err_msg=f"Addon input changed: {name}")
 
 
 def source_binding(binding):

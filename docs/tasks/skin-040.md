@@ -36,6 +36,20 @@ Its native/addon cube smoke checks agree exactly; setup/export are excluded from
 and OS peaks are captured before output hashing/saving. Test-only addon adapter fixes the
 same existing budget argument; no donor numerical implementation is modified.
 
+Full development gate now passes: 2,570 Python tests (313.73 s), six CTests, native style,
+ruff/format, mypy, numerical imports and native doctor. Corrected the benchmark adapter's
+world-distance-to-ratio conversion before production addon comparison: its initial
+`addon-anatomy.json` used a wrong gap width and is explicitly excluded. `verify_capture`
+now requires exact reconstructed vertices, faces, ownership and gap policies.
+
+Controlled native trials are running serially in before/after/after/before/before/after
+order, with BLAS workers fixed to one and profiling disabled. First pair: 235.350 -> 68.585 s
+including bindings; OS peak resident 832.35 -> 720.55 MiB. All fields/output/binding hashes
+and diagnostics agree exactly. Second optimized trial: 69.276 s, identical outputs.
+Initial free RAM was about 2 GiB; later it increased to about 6 GiB. Retain per-trial
+headroom/background-load evidence and inspect the remaining trials before final claims.
+Production addon parity and a separate profiler capture still remain.
+
 ### Tile assembly and coarse fields, October 28 — source work, validation paused
 
 User authorized continuing these two areas without resuming tests. Baseline: `68917e0`.

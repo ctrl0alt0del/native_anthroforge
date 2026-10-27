@@ -6,10 +6,10 @@ from anthroforge.core import skin_sources
 from tests.test_tissue_workflow import assembly
 
 
-def test_valid_tissue_suppresses_its_fibers_once_and_excludes_construction(session):
+def test_skin_uses_anatomy_and_excludes_construction(session):
     bone, membrane, tissue = assembly(session)
     document = session.document
-    sources = skin_sources.selected(document, skin_sources.accepted_tissues(document))
+    sources = skin_sources.contributors(document)
     assert {(source.owner, source.kind) for source in sources} == {
         (bone, "SCP"),
         (tissue, "TISSUE"),
@@ -20,7 +20,7 @@ def test_valid_tissue_suppresses_its_fibers_once_and_excludes_construction(sessi
     assert skin_sources.candidates(hidden) == skin_sources.candidates(document)
 
 
-def test_failed_tissue_does_not_suppress_source_fibers(session):
+def test_failed_tissue_never_falls_back_to_source_fibers(session):
     _bone, membrane, tissue = assembly(session)
     item = session.document.object(tissue)
     failed = replace(
@@ -30,9 +30,10 @@ def test_failed_tissue_does_not_suppress_source_fibers(session):
         session.document,
         objects=tuple(failed if o.id == tissue else o for o in session.document.objects),
     )
-    sources = skin_sources.selected(document, skin_sources.accepted_tissues(document))
+    sources = skin_sources.contributors(document)
     fiber_ids = {use.curve for use in document.object(membrane).curves}
-    assert {source.owner for source in sources if source.kind == "FIBER"} == fiber_ids
+    assert not fiber_ids.intersection(source.owner for source in sources)
+    assert tissue in {source.owner for source in sources}
 
 
 def test_mirror_sources_are_distinct_without_duplicating_the_original(session):
@@ -40,7 +41,7 @@ def test_mirror_sources_are_distinct_without_duplicating_the_original(session):
     session.command("mirror.configure", target=bone, enabled=True)
     session.wait()
     document = session.document
-    sources = skin_sources.selected(document, skin_sources.accepted_tissues(document))
+    sources = skin_sources.contributors(document)
     assert len(sources) == len(set(sources))
     assert sum(source.owner == tissue and not source.instance for source in sources) == 1
     assert all(source.kind != "FIBER" for source in sources)

@@ -1,21 +1,18 @@
 """Worker-owned skin sources; presentation never chooses physical contributors."""
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
 
 from anthroforge.core import skin_sources
-from anthroforge.core.entities import IDENTITY
 from anthroforge.core.skin import effective_collagen
 from anthroforge.native import skin_capture as native
 
 from . import (
-    mirror_surfaces,
     skin_collagen,
     skin_inputs,
     skin_operations,
-    skin_path_capture,
     surface_providers,
 )
 
@@ -26,7 +23,6 @@ class Source:
     mesh: Any
     frame: tuple[float, ...]
     asset: str
-    radius: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -44,35 +40,12 @@ def surface(engine: Any, document: Any, resources: Any, source: skin_sources.Sou
     return Source(source, provider.resource.mesh, provider.frame, provider.asset_id)
 
 
-def fiber(engine: Any, document: Any, resources: Any, source: Any, cancel: int) -> Source:
-    original = skin_path_capture.capture(engine, document, resources, replace(source, instance=""))
-    radius = skin_operations.settings_for(document.skin, source.owner).fiber_radius
-    mesh = native.fiber_bevel(original.path, original.frame, radius, cancel)
-    return Source(source, mesh, IDENTITY, original.asset, radius)
-
-
-def fiber_instance(
-    engine: Any, document: Any, resources: Any, source: Any, cancel: int, cache: dict[str, Source]
-) -> Source:
-    if source.owner not in cache:
-        cache[source.owner] = fiber(engine, document, resources, source, cancel)
-    original = cache[source.owner]
-    frame = mirror_surfaces.frame(engine, document, skin_inputs.reference(source), IDENTITY)
-    return replace(original, identity=source, frame=frame)
-
-
 def sources(engine: Any, document: Any, resources: Any, cancel: int) -> tuple[Source, ...]:
-    selected = skin_sources.selected(document, skin_sources.accepted_tissues(document))
-    fibers: dict[str, Source] = {}
-    rows = [
-        fiber_instance(engine, document, resources, row, cancel, fibers)
-        if row.kind == "FIBER"
-        else surface(engine, document, resources, row)
-        for row in selected
-    ]
-    result = tuple(row for row in rows if row is not None)
+    result = tuple(
+        surface(engine, document, resources, row) for row in skin_sources.contributors(document)
+    )
     if not result:
-        raise ValueError("Skin needs accepted anatomy or Fibers.")
+        raise ValueError("Skin needs accepted SCP or tissue surfaces.")
     return result
 
 

@@ -3,11 +3,9 @@
 from dataclasses import dataclass
 from typing import Any
 
-from .anatomical_surfaces import usable
 from .entities import SCP
 from .fibers import Fiber
 from .results import geometry_asset
-from .surfaces import Surface
 from .tissues import TissueVCP
 
 
@@ -38,31 +36,15 @@ def candidates(document: Any) -> tuple[Source, ...]:
     return tuple(sorted((*source, *mirrored)))
 
 
-def fiber_sources(document: Any, source: str) -> frozenset[str]:
-    item = document.registry.records.get(source)
-    if isinstance(item, Fiber):
-        return frozenset((item.id,))
-    if isinstance(item, Surface):
-        return frozenset(use.curve for use in item.curves)
-    return frozenset()
+def contributors(document: Any) -> tuple[Source, ...]:
+    """Physical draft/deformation sources never fall back to construction objects."""
+    return tuple(source for source in candidates(document) if source.kind != "FIBER")
 
 
-def selected(document: Any, available_tissues: frozenset[Source]) -> tuple[Source, ...]:
-    represented = {
-        (fiber, source.instance)
-        for source in available_tissues
-        for fiber in fiber_sources(document, document.object(source.owner).source)
-    }
+def guides(document: Any) -> tuple[Source, ...]:
+    flow = {row.owner for row in document.skin.contributors if row.flow}
     return tuple(
         source
         for source in candidates(document)
-        if source.kind != "FIBER" or (source.owner, source.instance) not in represented
-    )
-
-
-def accepted_tissues(document: Any) -> frozenset[Source]:
-    return frozenset(
-        source
-        for source in candidates(document)
-        if source.kind == "TISSUE" and usable(document.object(source.owner).final_result)
+        if source.kind == "FIBER" and (document.object(source.owner).closed or source.owner in flow)
     )

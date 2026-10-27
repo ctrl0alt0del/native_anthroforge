@@ -73,7 +73,6 @@ def source_metadata(row: Any) -> dict[str, Any]:
         vertices=counts[0],
         triangles=counts[1],
         segments=counts[2],
-        fiber_radius=row.radius,
     )
 
 

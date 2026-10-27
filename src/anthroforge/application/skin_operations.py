@@ -62,9 +62,7 @@ def require_contributor(session: "Session", owner: str, values: dict[str, Any]) 
     if "owner" in values or "painted" in values:
         raise ValueError("Contributor identity and painted resources use dedicated operations.")
     if owner in session.document.index.entities:
-        session.editable(owner)
-        if {"flow", "fiber_radius"} & values.keys():
-            raise ValueError("FLOW guides and skin radius require a Fiber.")
+        require_scp_settings(session, owner, values)
         return
     item = object_operations.editable(session, owner)
     require_construction_settings(item, values)
@@ -72,13 +70,23 @@ def require_contributor(session: "Session", owner: str, values: dict[str, Any]) 
         raise ValueError("Closed Fibers are loop guides; FLOW requires an open Fiber.")
 
 
+def require_scp_settings(session: "Session", owner: str, values: dict[str, Any]) -> None:
+    session.editable(owner)
+    if "flow" in values:
+        raise ValueError("FLOW guides require a Fiber.")
+    if "fiber_radius" in values:
+        raise ValueError("Fiber skin radius is no longer supported.")
+
+
 def require_construction_settings(item: Any, values: dict[str, Any]) -> None:
     if not isinstance(item, (Fiber, TissueVCP)):
         raise ValueError("Skin contributors must be SCPs, tissues or fibers.")
-    if set(values) - {"gap_mode", "gap_limit_ratio", "gap_strength", "flow", "fiber_radius"}:
+    if isinstance(item, Fiber) and set(values) - {"flow"}:
+        raise ValueError("Fibers support topology FLOW only; not physical skin settings.")
+    if set(values) - {"gap_mode", "gap_limit_ratio", "gap_strength", "flow"}:
         raise ValueError("Collagen and subtree density require an SCP.")
-    if {"flow", "fiber_radius"} & values.keys() and not isinstance(item, Fiber):
-        raise ValueError("FLOW guides and skin radius require a Fiber.")
+    if "flow" in values and not isinstance(item, Fiber):
+        raise ValueError("FLOW guides require a Fiber.")
 
 
 def inspect(session: "Session") -> dict[str, Any]:

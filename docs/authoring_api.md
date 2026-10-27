@@ -1048,17 +1048,14 @@ or an incompatible field layout require explicit resolution, without silent disc
 
 ### Skin contributor authoring (0.4.0 implementation in progress)
 
-**Confirmed replacement, not implemented yet:** the October 27 review makes SCP/VCP
-surfaces the only physical draft/deformation sources. Fiber paths remain available to
-topology guidance. The thin-Fiber/skin-radius behavior described below still exists in
-this development checkpoint but is superseded and must not be treated as the final
-0.4.0 API contract. See [the specification](specification_040.md).
+Physical draft/deformation sources are SCP/VCP surfaces, including reflected instances.
+Fiber paths remain available to topology guidance; missing tissue geometry never causes
+fallback to its construction. See [the specification](specification_040.md).
 
-`skin.contributor.configure(owner, values)` edits source gap policies and eligible SCP
-collagen/density or Fiber FLOW/skin-radius settings. Fiber `fiber_radius` is in metres,
-defaults to 0.001, and accepts 0.000001 through 1.0. It controls the thin surface used
-by skin capture, independently of workspace display radius; changing it marks skin
-construction stale without changing the accepted Fiber path or anatomical bindings.
+`skin.contributor.configure(owner, values)` edits source gap policies, eligible SCP
+collagen/density settings, or Fiber FLOW membership. Fibers accept topology `flow` only,
+not physical skin radius or gap controls. FLOW changes invalidate topology inputs without
+changing physical envelope capture or its input revisions.
 `skin.collagen.set(owner, values)` stores one
 0..1 weight per accepted SCP vertex with its material-domain identity.
 `skin.collagen.fill(owner, value=None)` fills from the supplied value or SCP default;

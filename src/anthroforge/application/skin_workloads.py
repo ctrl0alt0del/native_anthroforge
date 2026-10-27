@@ -9,18 +9,9 @@ from anthroforge.core.scheduling import Workload
 
 def counts(resources: Any, document: Any, source: Any) -> tuple[int, int, int]:
     item = document.object(source.owner)
-    if source.kind == "FIBER":
-        path = resources.paths.get(item.result.asset)
-        return fiber_counts(path.path) if path else (0, 0, 0)
     key = item.final_result.asset if source.kind == "TISSUE" else geometry_asset(item)
     asset = resources.meshes.get(key)
     return mesh_counts(asset.mesh) if asset else (0, 0, 0)
-
-
-def fiber_counts(path: Any) -> tuple[int, int, int]:
-    vertices, triangles = path.count * 12, (path.count - int(not path.closed)) * 24
-    # Upper bound before Blender's duplicate-point removal; includes transient tube storage.
-    return vertices, triangles, path.bytes + vertices * 24 + triangles * 128
 
 
 def mesh_counts(mesh: Any) -> tuple[int, int, int]:
@@ -29,7 +20,7 @@ def mesh_counts(mesh: Any) -> tuple[int, int, int]:
 
 
 def estimate(resources: Any, document: Any) -> Workload:
-    sources = skin_sources.selected(document, skin_sources.accepted_tissues(document))
+    sources = skin_sources.contributors(document)
     sizes = [counts(resources, document, source) for source in sources]
     envelope = resources.meshes.get(document.skin.envelope.asset)
     if envelope:

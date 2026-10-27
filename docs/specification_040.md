@@ -149,8 +149,8 @@ retain the source field-storage controls and genuine allocation-failure handling
 
 The later October 27 interview supersedes both centerline-only and thin-tube contribution:
 bare Fibers do not contribute physical skin geometry or independent deformation support.
-The current thin-tube implementation and measurements remain historical implementation
-evidence until the planned capture change lands; no replacement area-weighting algorithm
+The superseded thin-tube implementation and measurements remain historical evidence;
+physical capture now excludes bare Fibers; no replacement area-weighting algorithm
 is required for excluded sources. Topology paths remain separate and must not be removed
 with the physical-source capture. Workspace Fiber display thickness remains unrelated.
 

@@ -1,4 +1,4 @@
-"""Native centerline queries remain available; production skin uses owned Fiber bevels."""
+"""Native centerline queries remain available; physical skin excludes bare Fibers."""
 
 from dataclasses import replace
 
@@ -50,19 +50,13 @@ def test_centerline_only_envelope_is_finite_and_retains_path_bindings():
     source.close()
 
 
-def test_fiber_capture_contains_owned_tube_mesh(session):
+def test_fiber_capture_contains_neither_tubes_nor_centerlines(session):
     bone, curve = scene(session)
     fiber = bind(session, bone, curve)
     captured = skin_capture.capture(session.engine, session.document, session.resources)
-    index = next(i for i, row in enumerate(captured.sources) if row.identity.owner == fiber.id)
-    assert index in captured.geometry.owners
+    assert {row.identity.owner for row in captured.sources} == {bone}
+    assert all(row.identity.owner != fiber.id for row in captured.sources)
     assert len(captured.geometry.segment_owners) == 0
-    path = session.resources.paths[fiber.result.asset].path
-    row = captured.sources[index]
-    assert row.mesh.counts[0] == path.count * 12 and row.radius == 0.001
-    points = row.mesh.array(0).reshape(path.count, 12, 3)
-    distance = np.linalg.norm(points - path.array()[:, None, :3], axis=2)
-    np.testing.assert_allclose(distance, 0.001, atol=1e-7)
 
 
 def test_workspace_radius_cannot_change_skin_capture(session):

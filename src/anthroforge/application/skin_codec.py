@@ -33,6 +33,13 @@ def decode(value: dict[str, Any] | None) -> Skin:
     data["topology_settings"] = TopologySettings(**topology)
     for name in ("envelope", "topology", "final"):
         data[name] = result(data.get(name, {}))
-    data["contributors"] = tuple(SkinContributor(**row) for row in data.get("contributors", ()))
+    data["contributors"] = tuple(contributor(row) for row in data.get("contributors", ()))
     data["fits"] = tuple(FittedShortcut(**row) for row in data.get("fits", ()))
     return Skin(**data)
+
+
+def contributor(value: dict[str, Any]) -> SkinContributor:
+    # Pre-release schema-7 snapshots may contain the superseded physical Fiber radius.
+    data = dict(value)
+    data.pop("fiber_radius", None)
+    return SkinContributor(**data)

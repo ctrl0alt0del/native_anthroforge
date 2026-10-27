@@ -13,25 +13,20 @@ ColumnLayout {
         const values = {}; values[key] = value;
         workspace.run("skin.contributor.configure", {owner:contributor.owner, values:values});
     }
-    Label { text: "Selected source: " + (panel.contributor.name || ""); color:Theme.text; font.bold:true; Layout.fillWidth:true; wrapMode:Text.Wrap }
+    Label { text: (panel.contributor.fiber ? "Topology guide: " : "Selected source: ") + (panel.contributor.name || ""); color:Theme.text; font.bold:true; Layout.fillWidth:true; wrapMode:Text.Wrap }
     ColumnLayout {
         enabled: !!panel.contributor.editable
         Layout.fillWidth:true
-        NumericSetting {
-            objectName:"skinFiberRadius"; visible:!!panel.contributor.fiber
-            label:"Skin radius"; length:true; minimum:0.000001; maximum:1
-            value:panel.settings.fiber_radius || 0.001
-            hint:"Radius used when this Fiber contributes to skin. Viewport thickness is separate."
-            onEdited:value=>panel.change("fiber_radius", value)
-        }
-        Label { text:"Gap settings"; color:Theme.muted }
+        Label { text:"Gap settings"; color:Theme.muted; visible:!panel.contributor.fiber }
         UiCombo {
             objectName:"skinSourceGapMode"; Layout.fillWidth:true
+            visible:!panel.contributor.fiber
             model:["Use document settings", "Override for this source"]
             currentIndex:panel.settings.gap_mode === "OVERRIDE" ? 1 : 0
             onActivated:panel.change("gap_mode", currentIndex ? "OVERRIDE" : "INHERIT")
         }
         NumericSetting {
+            visible:!panel.contributor.fiber
             label:"Maximum gap to close"; minimum:0; maximum:100
             enabled:panel.settings.gap_mode === "OVERRIDE"
             value:100*(panel.settings.gap_limit_ratio || 0)
@@ -39,6 +34,7 @@ ColumnLayout {
             onEdited:value=>panel.change("gap_limit_ratio", value/100)
         }
         NumericSetting {
+            visible:!panel.contributor.fiber
             label:"Gap filling strength"; minimum:0; maximum:100
             enabled:panel.settings.gap_mode === "OVERRIDE"
             value:100*(panel.settings.gap_strength || 0)
@@ -46,6 +42,7 @@ ColumnLayout {
             onEdited:value=>panel.change("gap_strength", value/100)
         }
         UiCheck {
+            objectName:"skinFiberFlow"
             visible:!!panel.contributor.flow_available
             text:"Use as topology FLOW guide"; checked:!!panel.settings.flow
             onToggled:panel.change("flow", checked)

@@ -3240,3 +3240,20 @@ including preparation/output saving, not a controlled performance comparison. Th
 mesh and image are linked by the task record. No geometry algorithm or source file changed.
 This restores the previously approved execution policy; it does not relax gap constraints
 or introduce a new skin algorithm. Earlier failed anatomy runs are not addon parity evidence.
+
+
+### Physical skin sources separated from topology guides (October 27)
+
+The user confirmed that construction must not physically contribute to draft/final skin.
+Replaced thin-Fiber source capture and failed-tissue fallback with SCP/Tissue-only physical
+providers. Kept closed/FLOW Fiber paths as separate construction dependencies. Envelope
+settings revisions now include only physical-source fields; guide changes affect topology.
+Removed obsolete per-Fiber skin radius controls; known pre-release serialized radius values
+are ignored on read and omitted on subsequent save. Numerical envelope/topology kernels,
+accepted anatomy, material bindings and source assets are unchanged.
+
+Evidence: 219 skin-selected tests, type checks and offscreen FLOW editing/undo pass.
+Regression checks verify no bare/mirrored Fiber physical capture, no failed-tissue fallback,
+and unchanged physical mesh/read revisions after FLOW edits while topology reads change.
+The source-panel layout was inspected offscreen. Complete deformation/fitting/export,
+interactive responsiveness and release qualification remain pending.

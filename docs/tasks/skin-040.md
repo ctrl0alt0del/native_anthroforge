@@ -41,8 +41,26 @@ SCP/VCP contributors from construction guides at capture, dependency and UI boun
 Source inspection plus direct addon guard checks accepted position-only updates and
 compatible anatomy movement, and rejected changed vertex identities, missing contributors
 and unavailable material addresses. This is structural-guard evidence, not full fitting
-qualification. The current branch still contains the superseded thin-Fiber capture until
-implementation resumes. No new geometry result, code change, version or release is claimed.
+qualification. The first resumed increment below now replaces thin-Fiber capture.
+Full deformation/fitting/export and release qualification remain unfinished.
+
+### Physical contributors and topology guides separated, October 27
+
+Implemented SCP/Tissue-only physical capture, including mirrored instances, with no Fiber
+fallback when tissue evaluation fails. Loop/FLOW paths remain topology inputs. FLOW edits
+leave envelope read revisions and captured physical geometry unchanged; topology reads
+observe them. Removed the obsolete radius setting from authoring/UI; pre-release files
+can still load that known field without using or reserializing it.
+
+Validation: 219 skin-selected tests pass (69 Qt warnings), configured mypy passes 494 files,
+and changed-file Ruff/style checks pass. Offscreen controls verify FLOW editing/undo and
+hidden physical controls for Fibers; inspected `build/skin-040/ui/skin-fiber-guide.png`.
+This is layout/control evidence, not interactive or full skin geometry acceptance.
+Logs: `build/skin-040/anatomy-contributors-{tests,mypy,ui}.log`.
+
+Next: durable reference preparation/LE/FAST integration, SkinStatusProvider and final-skin
+updates, shortcut fitting, OBJ export, complete qualification and canonical packaging.
+No native numerical kernel, release version or source project changed in this increment.
 
 ### Paused for remaining-work review, October 27
 

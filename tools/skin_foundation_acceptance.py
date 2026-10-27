@@ -122,13 +122,13 @@ def fiber_controls(controller, window):
     controller.run("workspace.update", dict(display_units="mm"))
     window.resize(1050, 1300)
     QTest.qWait(100)
-    assert find(window, "skinFiberRadiusValue").isVisible()
-    factor = controller.state["unit_factor"]
-    edit_field(window, "skinFiberRadius", str(0.002 / factor))
-    assert settings_for(controller.session.document.skin, fiber.id).fiber_radius == 0.002
-    assert window.grabWindow().save(str(OUTPUT / "skin-fiber-radius.png"))
+    assert find(window, "skinFiberFlow").isVisible()
+    assert not find(window, "skinSourceGapMode").isVisible()
+    click(window, "skinFiberFlow")
+    assert settings_for(controller.session.document.skin, fiber.id).flow
+    assert window.grabWindow().save(str(OUTPUT / "skin-fiber-guide.png"))
     controller.run("undo", {})
-    assert settings_for(controller.session.document.skin, fiber.id).fiber_radius == 0.001
+    assert not settings_for(controller.session.document.skin, fiber.id).flow
 
 
 def create_fiber(session):

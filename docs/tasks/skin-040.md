@@ -219,9 +219,23 @@ Evidence: `build/skin-040/assembly-budget-parity{,-after}.log`; new focused regr
 requires identical output under the 8 MiB field budget. Native build, 214 skin tests,
 16 focused lifecycle/architecture checks, mypy and all five CTests pass. Changed native
 files pass clang-tidy with existing header warnings. Complete cube comparison against the
-addon gives exactly equal positions, connectivity and all six binding arrays. The exact
-failed tissue capture is rerunning with progress/profile recording; its finished geometry
-is not yet qualified. No additional algorithm changes are authorized.
+addon gives exactly equal positions, connectivity and all six binding arrays.
+
+The exact failed tissue capture now **completes**, with input hash unchanged and the same
+~365 MB field budget, at coarse resolution 160. It produces 827,176 vertices / 1,654,392
+triangles. Diagnostics: one component, finite, watertight, orientable, positive volume,
+no degenerates, no exposed source vertices, no crossed source triangles and zero protected
+gap violations across 20,921 checks. The 54 source-source intersections remain advisory;
+this is not a claim of intersection-free source anatomy or a complete release qualification.
+
+Actual mesh and fixed-camera render were inspected:
+`build/skin-040/fiber-thickness-tissues/paired/envelope-corrected.npz` and
+`skin-result-corrected.png`. `result-corrected.json` and `envelope-corrected.afprofile.zip`
+retain the finished diagnostics and trace. One profiled run took 202.93 seconds including
+field preparation/output saving; it is not a controlled speed comparison with prior trials.
+The original 28-VCP case remains input/preflight-only. No source projects were changed.
+This resolves the standalone-only assembly failure on the actual requested two-VCP case;
+it does not justify a new gap algorithm or establish complete tissue/anatomy parity.
 
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve

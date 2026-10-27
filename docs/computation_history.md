@@ -3231,7 +3231,12 @@ Removed the standalone aggregate and mesh-estimate cutoffs, preserving the origi
 field working budget, cancellation, numerical stages and genuine allocation errors. Refresh
 the working budget at reconstruction entry as the addon does. The corrected native build
 completes the same control. All 214 skin tests and five native CTests pass; original-addon
-cube comparison has exact positions, connectivity and all binding arrays. The real tissue
-case is still rerunning; these checks do not establish its completed output yet.
+cube comparison has exact positions, connectivity and all binding arrays. The exact failed
+two-VCP/three-SCP input now completes at the same field budget, with 827,176 vertices /
+1,654,392 triangles. Actual output was rendered and inspected. Diagnostics show one
+watertight orientable component and zero source-coverage/protected-gap violations; 54
+source-source intersections remain advisory. A single profiled run took 202.93 seconds
+including preparation/output saving, not a controlled performance comparison. The trace,
+mesh and image are linked by the task record. No geometry algorithm or source file changed.
 This restores the previously approved execution policy; it does not relax gap constraints
 or introduce a new skin algorithm. Earlier failed anatomy runs are not addon parity evidence.

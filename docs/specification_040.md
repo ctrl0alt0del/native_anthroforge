@@ -93,6 +93,9 @@ Production backend execution must not fail solely because it exceeds an arbitrar
 fixed 4 GiB ceiling or retained-log size. Retain cancellation, owned process lifetime and real
 backend/allocation failures. Use scheduling/admission for resource coordination and bounded
 log retention without terminating the computation. Preserve source numerical thread settings.
+The addon's sparse-field working budget is not a total-process or output-mesh ceiling.
+Do not subtract all retained resources and impose a new estimated assembly-size rejection;
+retain the source field-storage controls and genuine allocation-failure handling.
 
 The October 27 decision supersedes centerline-only capture: bare Fibers contribute thin
 surface meshes using the addon's Blender POLY-curve bevel behavior (12 ring vertices,

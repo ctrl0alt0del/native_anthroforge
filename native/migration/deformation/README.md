@@ -9,7 +9,8 @@ Execution adaptation in model.hpp: check reads the existing job cancellation tok
 not a filesystem sentinel. The old 600-second whole-job timeout is omitted under the
 explicitly approved execution policy. The cancel string is retained only for the original
 BBW cache path. Numerical stopping tolerances/iteration counts are unchanged. Contact's
-advisory work limits are separate; contact integration is not yet qualified.
+advisory work limits remain unchanged. contact.hpp uses the same cancellation-token bridge.
+Compact original-DLL contact cases match; application integration remains unfinished.
 
 C++ adapters perform the original normalization and area-CDF sampling formerly done by
 Python. Mutable factorization state is exclusively leased during calls; serialized project

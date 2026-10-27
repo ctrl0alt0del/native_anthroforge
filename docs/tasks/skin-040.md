@@ -44,6 +44,41 @@ and unavailable material addresses. This is structural-guard evidence, not full 
 qualification. The first resumed increment below now replaces thin-Fiber capture.
 Full deformation/fitting/export and release qualification remain unfinished.
 
+### Contact qualification and pending tissue-source decision, October 27
+
+Contact projection and symmetry now use the pinned donor kernels through owned arrays and
+coordinator cancellation. Preserve source iteration/tolerance settings, the advisory 60-second
+work limit and its storage policy, and all eight diagnostics (including incomplete coverage).
+Three original-DLL cases cover identity, crossing and reopening; corrected positions and
+reports match at 1e-10. Symmetry, disabled symmetry, cancellation and the source storage limit
+are covered. Native build/style, configured mypy (496 files), Python architecture/Ruff,
+229 skin-selected tests (69 Qt warnings) and all five native CTests pass.
+Logs: `build/skin-040/contact-{native-build,native-style,ctest,mypy,parity-tests}.log` and
+`build/skin-040/deformation-all-skin-tests.log`. These are boundary/selected regression
+checks, not complete application/portable skin qualification.
+
+**Implementation paused for an explicit policy answer, not presumed approval.**
+During reference integration, donor `adapters/deformation/muscles.py::material_chart`
+re-evaluates uncropped muscle inflation without relaxation or stacking; its capture uses
+`result.inflated_vertices` with `result.faces`, even when two-sided composition supplies
+separate `inflated_faces`. This differs from the complete physical tissue envelope.
+An original-DLL area/CDF experiment on four retained two-sided envelope fixtures selects
+73–75 samples with zero second-side samples using the donor capture faces. Complete envelope
+faces select 80 samples, including 19 second-side samples. This establishes omitted sampling,
+not the final visual consequence on a production assembly.
+
+Reproduce with `tools/probe_skin_deformation_sources.py ADDON tests/fixtures/tissue OUTPUT`;
+local result: `build/skin-040/deformation-source-policy-probe.json`.
+Pending questions sent to the user:
+1. Preserve the donor uncropped pre-relaxation/pre-stacking deformation support, or use the
+   finished tissue surface? No choice is inferred from the separate draft-skin source policy.
+2. Correct two-sided sampling to use both surfaces, or preserve first-side-only behavior?
+
+No dependent capture policy has been implemented. No reply or elapsed time is approval.
+After the answer: record it in the specification/history, integrate material references and
+native sampling/capture, then complete SkinStatusProvider, automatic fixed-topology updates,
+Build Skin/retry publication, fitting, export and release qualification. No main merge/version bump.
+
 ### LE/FAST native boundary checkpoint, October 27
 
 Owned preparation, solve, embedding and area-CDF sample selection now call the pinned

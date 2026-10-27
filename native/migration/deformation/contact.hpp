@@ -3,11 +3,11 @@
 namespace af_ad {
 struct ContactTask {
     M reference,start,x; I faces; Eigen::VectorXi symmetry;P3 origin,normal;std::vector<ContactRow> rows;
-    std::string cancel;uint64_t budget;double tolerance,reach;int tested=0,passes=0,limited=0;
+    std::string cancel;uint64_t token=0,budget;double tolerance,reach;int tested=0,passes=0,limited=0;
     std::chrono::steady_clock::time_point started=std::chrono::steady_clock::now();
 };
 inline void contact_check(ContactTask& s) {
-    if(!s.cancel.empty() && std::filesystem::exists(s.cancel))throw std::runtime_error("CANCELLED");
+    af::check_cancel(s.token);
     if(std::chrono::duration<double>(std::chrono::steady_clock::now()-s.started).count()>60)s.limited=1;
     if(s.rows.size()*sizeof(ContactRow)>s.budget/4)s.limited=1;
 }

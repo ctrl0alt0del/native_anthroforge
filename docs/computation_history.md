@@ -3274,3 +3274,20 @@ proxy embedding, translations, scale and asymmetric movement. Positions/predicti
 not poison subsequent solves; released handles fail explicitly. Seven parity/architecture
 checks and type/style/build checks pass. These are native-boundary results only: durable
 reference, current-anatomy capture, contact integration and end-to-end qualification remain.
+
+
+### Skin contact boundary and source-capture discrepancy (October 27)
+
+Ported the maintained contact/symmetry kernel into af_native with owned buffers and shared
+cancellation. Preserve numerical passes/sweeps/tolerances, source storage limit, advisory
+work-limit reporting, and explicit incomplete CCD coverage. Original-DLL identity/crossing/
+reopening fixtures match positions and all diagnostics at 1e-10. No complete contact guarantee
+or integrated skin workflow is implied. 229 skin-selected tests and five native CTests pass.
+
+Reference inspection found two source behaviors requiring explicit decisions before alteration:
+uncropped muscle inflation supplies deformation targets before relaxation/stacking, and
+result.faces is used instead of the two-sided result.inflated_faces. On four existing donor
+envelope fixtures, the original sampler chooses zero second-side vertices with those capture
+faces, versus 19 with complete envelope faces. The latter is an experimental comparison,
+not an implemented replacement or proof of final skin quality. Questions are pending; no
+source-selection change, implicit approval, or algorithm substitution has been made.

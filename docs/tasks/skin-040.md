@@ -4,12 +4,42 @@
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
 - Status: envelope and topology pipelines connected; full skin workflow remains in progress,
   not merge-ready. Schema 7, immutable resources, shared commands and vertical inspector exist.
-  Durable deformation, shortcut fitting and OBJ export are integrated. Production assembly,
-  portable packaging and full release qualification remain unfinished.
+  Durable deformation, shortcut fitting and OBJ export are integrated and production assembly
+  checks pass with documented remesher warnings. Final packaging/regression remain unfinished.
 - Last updated: 2026-10-27, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
 ## Outcome and acceptance
+
+### Final regression checkpoint, October 27
+
+Latest complete Python suite: **2,565 passed**, 3,229 existing Qt warnings, 333.39 s.
+Ruff, format, configured mypy (514 files), numerical imports and native doctor pass.
+Native build, five CTests, native style and PowerShell checks passed earlier with the same
+unchanged native sources. The final source changes since that gate are typed fitting
+dispatch, bounded error diagnostics, packaging adapters and acceptance tests.
+
+Version advances to 0.4.0 for the canonical package build after complete development,
+headless, hidden desktop and temporary portable qualification. Final relocated checks
+and companion source archive remain required before merging to main.
+
+### Large deformation and architecture review, October 27
+
+Ribs Top Radius 0.983 -> 3 -> 0.983 succeeds without changing skin IDs, connectivity or
+reference. Forward/reverse take 83.652/84.340 s while regression and hidden rendering also
+run: functional evidence, not isolated timings. Maximum return error is 2.03e-12 project
+metres. Hidden views show the moved shoulders/arms without a topology rebuild. The initial
+openings/roughness remain; no automatic repair is applied.
+
+Ownership review: immutable stage/reference/fit records remain core data; application owns
+capture/readiness/typed dispatch/transactions, native code owns numerical work, and desktop
+adapts shared operations. External process diagnostics survive cleanup without unbounded logs.
+Prepared-factor cache limits bound retention rather than valid computations. Isolated sampling
+borrows immutable resources and the existing reserved worker; preview resources stay outside
+authored history. OBJ is a format adapter over one frozen export revision. Current limitations:
+parent profiling lacks detailed isolated sample-session attribution; source contact coverage
+is incomplete; remesher warning output is not guaranteed watertight. No new numerical approach
+or policy was introduced during qualification. Latest origin/main adds no competing changes.
 
 ### Production update/fitting and portable qualification, October 27
 

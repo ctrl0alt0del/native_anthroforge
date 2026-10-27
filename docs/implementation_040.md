@@ -1,6 +1,6 @@
 # AnthroForge 0.4.0 — Implementation and acceptance
 
-Status: **Confirmed; implementation in progress, not release-qualified**.
+Status: **Implemented; final portable release qualification in progress**.
 
 Implement [the specification](specification_040.md) under the
 [engineering guidelines](engineering_guidelines.md). The [source inventory](skin_040_inventory.md)
@@ -42,15 +42,15 @@ do not reinterpret existing samples after preference changes. Sample complete tw
 surfaces. Verify both policies, retained material positions, reflection and source failures.
 This approved sampling correction does not alter LE/FAST, contact or fitting objectives.
 
-## October 27 review integration (confirmed; not yet implemented)
+## October 27 review integration (implemented; qualification below)
 
-The consolidated review is confirmed and runtime work is authorized. Remove physical Fiber
-contribution from shared draft/deformation input policies, not merely from a UI selector.
-Remove obsolete skin-radius controls from that workflow while preserving independent
+The consolidated review is implemented. Physical Fiber
+contribution is removed from shared draft/deformation input policies, not merely from a UI selector.
+Obsolete skin-radius controls are removed from that workflow while preserving independent
 accepted path capture for topology guides and ordinary viewport Fiber display. Do not
 fall back to construction geometry when SCP/VCP output is missing.
 
-Implement SkinStatusProvider at the application boundary. Its immutable assessments identify
+SkinStatusProvider resides at the application boundary. Its immutable assessments identify
 the skin/reference revision, operation eligibility, blocking reasons and warnings. Reuse
 document/result notifications; desktop subscriptions adapt them without polling or separate
 eligibility logic. The same shared checks guard headless operations and dispatch-time capture.

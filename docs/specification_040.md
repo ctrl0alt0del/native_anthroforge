@@ -1,10 +1,10 @@
 # AnthroForge 0.4.0 — Skin
 
-Status: **Confirmed; implementation in progress, not release-qualified**.
+Status: **Implemented; final portable release qualification in progress**.
 
 October 27 review: the contributor, fitting-readiness and status-provider decisions below
-are confirmed and implementation has resumed following final user review. Existing
-feature-branch behavior is not evidence that these changes are already complete.
+are implemented. Completed evidence and remaining packaging checks are recorded in
+[the task record](tasks/skin-040.md); source parity is not a guarantee of mesh quality.
 
 ## Authority and scope
 

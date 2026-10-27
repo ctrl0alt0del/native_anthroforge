@@ -1,8 +1,8 @@
-# Local authoring API, 0.3.5
+# Local authoring API, 0.4.0
 
 The [skin workflow](skin_workflow.md) and `examples/skin.json` demonstrate the 0.4.0
-development-branch build, fitting, independent playback and OBJ operations. Release
-qualification remains in progress; these are not claims about the installed 0.3.7 build.
+build, fitting, independent playback and OBJ operations. Validation and release packaging
+status are recorded in [the skin task](tasks/skin-040.md).
 
 The 0.3.3 performance work adds no public commands. The
 [addon functionality audit](addon_functionality_audit.md) distinguishes supported
@@ -1050,7 +1050,7 @@ custom fields/regions/constraints, cropping, smoothing and stacking intent. Conf
 or an incompatible field layout require explicit resolution, without silent discard.
 
 
-### Skin contributor authoring (0.4.0 implementation in progress)
+### Skin contributor authoring (0.4.0)
 
 Physical draft/deformation sources are SCP/VCP surfaces, including reflected instances.
 Fiber paths remain available to topology guidance; missing tissue geometry never causes
@@ -1064,8 +1064,7 @@ changing physical envelope capture or its input revisions.
 0..1 weight per accepted SCP vertex with its material-domain identity.
 `skin.collagen.fill(owner, value=None)` fills from the supplied value or SCP default;
 `skin.collagen.clear(owner)` removes the map and selects Uniform. These are shared
-undoable edits and do not change anatomy geometry. They do not imply that the full
-0.4.0 topology/deformation/fitting/export workflow is already implemented.
+undoable edits and do not change anatomy geometry.
 
 
 Collagen strokes use `skin.inspect.paint(target, view, samples, brush, expected_asset?,
@@ -1080,7 +1079,7 @@ guide selection. Closed Fibers use the loop-guide workflow, not the open FLOW fl
 Nested budget conflicts are shown without preventing users from editing their settings;
 topology generation must validate the complete budget tree before dispatch.
 
-**Feature branch implementation; full 0.4.0 qualification pending:** SkinStatusProvider exposes
+SkinStatusProvider exposes
 operation-specific eligibility, blocking reasons, warnings and assessed skin/reference
 revisions through `skin.status`. Desktop subscriptions and headless operations share these policies.
 Unapplied build settings allow fitting with a warning when the existing reference is
@@ -1109,5 +1108,5 @@ and updates/rebuilds skin in an isolated session; `cancel` writes nothing. Only 
 currently supported, with canonical metres/application axes and original polygons/quads.
 Atomic replacement protects an existing destination on error/cancellation. No original
 anatomy, debug objects, bones or weights are included. A missing final skin blocks export.
-The result identifies job, path, captured revision and state. These feature-branch
-operations still require complete 0.4.0 release qualification.
+The result identifies job, path, captured revision and state. See the skin task for
+qualification evidence, remesher quality warnings and offscreen acceptance limits.

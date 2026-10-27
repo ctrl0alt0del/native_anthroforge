@@ -1083,7 +1083,7 @@ and search; filtering preserves the list height. Both remain presentation adapte
 
 ## Shared operation status providers
 
-**Confirmed design, not implemented.** In 0.4.0, implement only SkinStatusProvider under
+**Implemented for skin; broader adoption deferred.** In 0.4.0, SkinStatusProvider follows
 the [skin contract](specification_040.md). The application owns operation-specific readiness,
 blocking reasons, advisory warnings and assessed document/result/reference identities.
 Desktop views subscribe through existing document/result notifications; headless operations
@@ -1102,3 +1102,26 @@ state. Inventory and migrate those consumers at their owning boundaries, reusing
 notifications and command policies. Preserve feature-specific meanings rather than creating
 one universal manager. This is a documented future direction, not authorization to refactor
 other features during the skin release. See the [roadmap](roadmap.md).
+
+## Skin execution and ownership (0.4.0)
+
+Core records separate envelope, topology, immutable reference, current final output and fitted
+results. Application stage jobs use the existing coordinator, typed dependency reads, cancellation
+and complete publication. SkinStatusProvider owns shared readiness; the desktop adapts its
+notifications. Failed reference preparation retains successful pending topology for retry while
+preserving the previous final/reference pair. Source pose updates never imply retopology.
+
+Numerical preparation, geometry queries, LE/FAST/contact, fitting and playback execute in C++.
+External remeshing/tetrahedral processes own temporary inputs and bounded diagnostics, with
+process-tree cancellation and resource-aware admission. They have no arbitrary production timeout.
+Pinned tetrahedral binaries load without Qt, PyVista or VTK. No competing numerical worker pool
+or Python optimization loop is introduced.
+
+Immutable resources span document/history/checkpoint/job/display leases. Prepared deformation
+factors use a bounded cache keyed by reference and settings; oversized entries bypass retention,
+not computation. Isolated fit/export sessions own their document and caches and borrow immutable
+resources. They execute on the reserved coordinator worker and preserve initiating shortcut
+policies. Fitting schedules affected output roles, avoiding needless pose-only geometry rebuilds.
+Independent fitted playback owns transient meshes outside authored state and asset history.
+Profiler snapshots account for retained skin data and preparation; parent fitting traces do not
+fully attribute isolated sample-session internals. This limitation remains explicit.

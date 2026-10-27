@@ -107,3 +107,19 @@ The 0.4.0 final-skin port retains the addon's GPL-3.0-or-later LE/FAST/contact k
 under `native/migration/deformation`, with original source hashes and documented execution
 adaptations. It reuses libigl and Eigen 3.4.0; the required Eigen SparseExtra/Polynomials
 headers retain MPL-2.0 notices and hashes under `native/vendor/unsupported/sources.json`.
+
+Skin topology uses the pinned QuadWild-BiMDF executable and pyinstantmeshes 1.0.0 runtime.
+QuadWild's source/version manifest accompanies the runtime under
+`anthroforge/_runtime/quadwild`; both runtime notices are in `licenses` and topology
+adapter provenance is retained under `native/migration/topology`. No Blender runtime
+is required.
+
+Reference preparation loads the array extension from PyTetWild 0.4.2 and its wheel-owned
+DLLs directly, without importing the package's PyVista/VTK integration. Original wheel
+licenses are copied into the distribution's licenses directory. This changes packaging,
+not the tetrahedral algorithm or its settings. See <https://github.com/pyvista/pytetwild>.
+
+Shortcut fitting includes Dem Bones 1.2.1 (Electronic Arts, BSD-3-Clause), its complete
+`DEMBONES_LICENSE.md`, and the maintained AnthroForge Scale Aware/Single Active adapters.
+Original addon hashes and execution adaptations are recorded under
+`native/migration/bone_fitting`; bundled headers ship in the companion source archive.

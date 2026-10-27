@@ -1,6 +1,6 @@
 # Building and deforming skin
 
-Available on the 0.4.0 development branch; release qualification is still in progress.
+Available in 0.4.0. Qualification evidence and limits are in [the task record](tasks/skin-040.md).
 
 Open **Skin** in the vertical inspector tabs on the right. **Build Skin** creates the
 envelope, generates quad topology and prepares the deformation reference. These stages
@@ -22,6 +22,12 @@ Choose QuadWild or Instant Meshes, the target quad count, refinement and symmetr
 QuadWild uses the supported loop and FLOW guides. Change these construction settings,
 then explicitly rebuild to apply them; moving anatomy does not remesh existing skin.
 Use the display selector to inspect the envelope, topology or final result.
+
+Choose the symmetry axis for the project's actual coordinates; it is not inferred from
+anatomical names. The migrated 96-muscle assembly uses Y. The quad count is a target:
+guide constraints may require more quads. The preserved remesher may return usable output
+with openings or discarded-patch warnings. Inspect those findings before export; completing
+Build Skin does not certify a watertight or intersection-free surface.
 
 If a later build stage fails, inspect its Issue and retry the relevant stage. A failed
 deformation-reference build retains the new topology for retry while preserving any

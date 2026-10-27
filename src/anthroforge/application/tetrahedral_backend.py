@@ -57,10 +57,10 @@ def worker(source: Path, output: Path, resolution: int) -> None:
 
 
 def tetrahedra(vertices: Any, faces: Any, length: float) -> Any:
-    from pytetwild import PyfTetWildWrapper
+    from anthroforge.native.tetrahedral_extension import load
 
     # The pinned nanobind function is positional-only; its named stub differs.
-    native: Any = PyfTetWildWrapper.tetrahedralize_mesh
+    native: Any = load().tetrahedralize_mesh
     settings = True, False, 0.05, length
     controls = 1e-3, 10.0, False, 4, 40, 3, False, False, False
     empty = np.empty((0, 3)), np.empty((0, 4), np.int32), np.empty(0)

@@ -146,7 +146,7 @@ def path_rows(profiler):
 
 
 def merge(meshes, construction):
-    kinds = dict(meshes=meshes, **construction)
+    kinds = compact_kinds(dict(meshes=meshes, **construction))
     totals = {
         key: sum(row[key] for row in kinds.values())
         for key in ("unique_bytes", "allocations", "handles", "total_handles", "unattributed_bytes")
@@ -158,6 +158,12 @@ def merge(meshes, construction):
         limits=meshes["limits"],
         complete=all(row["complete"] for row in kinds.values()),
     )
+
+
+def compact_kinds(kinds):
+    # Shared accounting limitations belong once at the snapshot level. Repeating them
+    # per resource kind wastes the bounded event budget and can drop the whole snapshot.
+    return {name: {k: v for k, v in row.items() if k != "limits"} for name, row in kinds.items()}
 
 
 def merged_owners(kinds):

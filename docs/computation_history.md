@@ -3358,3 +3358,19 @@ session; accepted export serializes the already completed skin. Neither policy c
 anatomy or topology algorithms. Canonical polygons, metre coordinates and application axes
 are written in bounded chunks, with cancellation and atomic destination replacement. Tests
 cover fixed revision, quad preservation, pending Manual source motion and failed-write cleanup.
+
+### Skin qualification boundary fixes — 2026-10-27
+
+Full regression exposed dropped profiler ownership events: repeated per-kind limitations
+exceeded the existing 16-KiB event bound. Shared limitations now live once at the snapshot
+root; accounting, event budget and numerical work are unchanged. Skin Issues also serializes
+stage records before fingerprinting so actual findings reach the provider. The corrected
+complete Python suite passes 2562 tests; native/style checks passed separately.
+
+Packaged tetrahedral workers failed during PyTetWild's unconditional PyVista/VTK import, before
+native computation. Load and bundle the pinned 0.4.2 array extension and its wheel DLLs directly
+using Python's extension loader. No solver settings, threads, inputs, outputs or objective change.
+Both paths load the same binary SHA and satisfy boundary/volume checks. Repeated unchanged
+package calls already vary in cell count (261 versus 220 vertices on one compact probe), also
+varying in a serial experiment; exact tetrahedral index equality is not a supported guarantee.
+Six focused tests and mypy pass. Portable and production anatomy qualification remain pending.

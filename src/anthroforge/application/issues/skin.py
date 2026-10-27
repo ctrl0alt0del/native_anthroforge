@@ -1,6 +1,7 @@
 """Publish already-computed skin findings; never repeat expensive geometry checks."""
 
 import json
+from dataclasses import asdict
 from typing import Any
 
 from anthroforge.core.issues import Issue, evidence, fingerprint
@@ -27,7 +28,7 @@ def source(document: Any, scope: str) -> Any:
         str(document.id),
         skin.construction_stale,
         skin.build_error,
-        tuple((name, getattr(skin, name)) for name in STAGES),
+        tuple((name, asdict(getattr(skin, name))) for name in STAGES),
     )
 
 

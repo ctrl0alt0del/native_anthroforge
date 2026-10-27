@@ -10,6 +10,7 @@ from pathlib import Path
 
 import PySide6
 from boolean_dependencies import copy_notices
+from tetrahedral_bundle import copy_runtime as copy_tetrahedral
 
 from anthroforge import __version__
 from anthroforge.profiling.identity import build_identity
@@ -105,6 +106,7 @@ def copy_documentation():
 
 def copy_runtime(runtime):
     copy_topology_runtime(runtime)
+    copy_tetrahedral(runtime)
     (runtime / "bin").mkdir(parents=True, exist_ok=True)
     shutil.copy2(STAGE / "build.json", runtime / "build.json")
     for name in ("af_native.dll", "af_viewport.dll", "af_profiler.dll", "libomp.dll"):

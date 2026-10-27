@@ -36,7 +36,7 @@ ColumnLayout {
             onCanonicalEdited: value => { section.previewValue=value; section.adapter.preview(value); }
         }
         Slider {
-            Layout.fillWidth: true; from: section.settings.minimum || 0; to: section.settings.maximum || 1
+            Layout.fillWidth: true; from: section.settings.minimum ?? 0; to: section.settings.maximum ?? 1
             value: section.previewValue
             onMoved: { section.previewValue=value; section.adapter.preview(value); }
         }

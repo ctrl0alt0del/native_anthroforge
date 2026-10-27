@@ -11,6 +11,42 @@
 
 ## Outcome and acceptance
 
+### Full regression and first anatomy build, October 27
+
+The complete development gate passed lock/style/type/native build, all five native CTests
+and clang-tidy; its initial Python run found five failures. Fixed two shared causes:
+SkinStage revision fingerprints must serialize records before Issues hashing, and profiler
+ownership snapshots must store shared limitations once rather than repeat them per resource
+kind beyond the existing 16-KiB event limit. Full pytest rerun: **2562 passed**, 348.73 s.
+Additional driver override/backsolve sampling and Qt-free fitting/playback tests pass.
+
+The original 96-muscle project completed default Build Skin in **1511.954 s**, producing
+1,691,842 envelope vertices and 32,958 final quads. Original sources were not saved over.
+Timing evidence: envelope 566.194 s; anatomical binding 377.780 s; process calls total
+376.977 s; ownership 120.456 s (inclusive timings must not be summed across overlapping
+scopes). The initial profile predates the ownership-size fix and reports oversized events;
+its timings remain evidence, but it is not a complete memory capture.
+
+Hidden GPU inspection exposed a fixture setting issue: source counterpart coordinates reflect
+in Y, but default X topology symmetry reflected front/back and duplicated the silhouette.
+The root is translated in X with identity rotation. A Y-plane topology/reference rerun is
+in progress, retaining the envelope. QuadWild also reported discarded patches/openings; these
+remain under inspection. A successful job is not yet anatomical shape acceptance.
+
+The temporary portable package built, and contains msvcp140.dll despite the compiler warning.
+Its first checks reproduced the already-fixed profiler snapshot failure (staged old code).
+Skin workers additionally failed because PyTetWild's package initializer imports PyVista/VTK.
+The numerical boundary now loads/copies the same pinned extension and wheel-owned DLLs directly,
+without that visualization integration. Six focused tests pass and mypy passes 514 files.
+Both loaders use the same binary SHA and pass tetrahedral boundary/volume checks. Independent
+calls to the unchanged package are nondeterministic, including a one-thread experiment, so
+bit-identical tetrahedral cell IDs are not asserted. Production solver arguments are unchanged.
+The updated portable build is running; no release/merge acceptance is claimed.
+
+All outputs are under build/skin-040 or OS temporary folders. Package remains 0.3.7.
+Pending: Y-plane actual-shape acceptance, production updates/fitting, complete relocated
+package checks, final documentation/ownership review and qualified release delivery.
+
 ### Resource/lifecycle qualification checkpoint, October 27
 
 Profiler ownership now includes native skin solver preparations and transient fitted meshes;

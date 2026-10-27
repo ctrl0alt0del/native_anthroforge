@@ -41,7 +41,7 @@ class SkinPanel(QObject):
 
     @Property(dict, notify=changed)
     def state(self):
-        return self.values
+        return qml(self.values)
 
     @Property(dict, notify=changed)
     def readiness(self):

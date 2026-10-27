@@ -25,6 +25,7 @@ from profiler_portable import profiling
 from projects_portable import projects
 from PySide6.QtGui import QImage
 from shortcuts_portable import shortcuts
+from skin_portable import qualify as skin
 from tissue_portable import tissues
 from workflow_portable import workflow
 
@@ -59,6 +60,7 @@ CHECKS = (
     "strict mirrors, symmetric loops, instance measurements and schema-6 storage",
     "Fiber pins/supports/cold routing, mirrored tubes, SCP split/replacement and tissue retarget",
     "recent-project history, asynchronous recovery capture and discovery with original retention",
+    "skin build, native proxy workers, isolated fitting, persisted playback and OBJ quads",
 )
 
 
@@ -175,6 +177,7 @@ def construction_steps():
         comparison,
         mirroring,
         tissues,
+        skin,
     )
 
 

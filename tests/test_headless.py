@@ -51,3 +51,16 @@ def test_issue_workflow_does_not_import_qt_or_blender():
     )
     result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+def test_skin_fitting_and_preview_do_not_import_qt_or_blender():
+    code = (
+        "import sys; from anthroforge.application.session import Session; "
+        "from tests.test_skin_fit_jobs import fit,setup; "
+        "s=Session(); item=fit(s,setup(s)); "
+        "s.command('skin.fit.preview',identity=item.id,value=0.1); s.wait(); "
+        "assert s.command('skin.fit.preview.status')['visible']; s.close(); "
+        "assert not any(n.startswith(('PySide6','shiboken6','bpy','bmesh')) for n in sys.modules)"
+    )
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout + result.stderr

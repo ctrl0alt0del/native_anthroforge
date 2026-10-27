@@ -64,6 +64,7 @@ def run(session, options, report):
     started = perf_counter()
     session.command("open", path=str(options.project))
     session.wait()
+    configure(session, options)
     report["open_seconds"] = perf_counter() - started
     report["contributors"] = len(skin_sources.contributors(session.document))
     report["anatomy"] = len(session.document.registry.anatomy)
@@ -74,11 +75,19 @@ def run(session, options, report):
         stage(session, operation, options.output, report)
 
 
+def configure(session, options):
+    if options.symmetry:
+        session.command(
+            "skin.configure", section="topology_settings", values=dict(symmetry=options.symmetry)
+        )
+
+
 def options():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("project", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--operations", nargs="+", default=["skin.build"])
+    parser.add_argument("--symmetry", choices=("X", "Y", "Z", "NONE"))
     result = parser.parse_args()
     result.output.mkdir(parents=True, exist_ok=True)
     return result

@@ -155,6 +155,43 @@ interaction or complete packaged-release acceptance is claimed.
 This is an incomplete 0.4.0 checkpoint; no release/version bump/main merge is authorized
 by these partial checks. Historical centerline notes below describe superseded checkpoints.
 
+### VCP context follow-up, October 27 — no algorithm changes
+
+User requested the comparison with related VCPs included. Read accepted definitions and
+only the required mesh assets directly from the unchanged 96-muscle project; no source
+recalculation, edits, resaving or workspace-dependent contributor selection. The focused
+case contains the same Humerus/Radius/Index SCPs plus Flexor carpi radialis.L and Pronator
+teres.L. These two accepted VCPs represent five Fibers, including all four from the earlier
+bare-Fiber experiment. Shared contributor policy excludes all five: **zero bare Fibers**.
+Centerline/tube choice therefore makes no difference to this case's skin inputs.
+
+The focused envelope attempt did **not** complete. Its 1,741 source vertices / 3,328
+triangles reached `Skin mesh assembly exceeds worker memory budget`; only ~1.04 GB RAM
+was available at capture. A separate original-addon precision check at the corresponding
+~365 MB budget chooses coarse resolution 160 (target 220), voxel 0.0648608, and detects
+214 gap faces with minimum protected width 0.00504122 m. Its requested fine voxel is
+0.000916585 m, a 70.7635x linear refinement. This is not a completed runtime comparison
+or evidence that final VCP skin looks better/worse. No partial mesh was presented as skin.
+
+A wider inventory includes all 28 accepted VCPs whose source bindings touch those three
+SCPs, plus their other supports: 14 SCPs total, 103 represented Fibers, zero bare Fibers,
+41,055 input vertices / 77,676 triangles. Accepted anatomy was rendered and inspected.
+Its source-addon preflight asks for 100.229x linear refinement (coarse 0.0981261 m,
+fine 0.000979017 m, 1,054 qualifying gap faces). The larger full envelope was not run
+after the focused failure. Do not claim a VCP envelope or extrapolate timings from it.
+
+Evidence lives under `build/skin-040/fiber-thickness-tissues/{paired,related}`: accepted
+input arrays, identity/coverage/hash reports, source preflight values and fixed-camera
+`anatomy-inputs.png` previews explicitly labelled **inputs, not completed skin**. Scripts
+`build/skin-040/check_tissue_context.py`, `check_tissue_precision.py`, and
+`render-tissue-context.py` reproduce this read-only experiment; all functions <=15 lines.
+The input hash for the focused case is
+`7545889f6bbd0ce344d0c60b23ae5b9f381cc7017171ea186e0b9f57f4a0936f`.
+
+This demonstrates gap-refinement cost can remain severe without bare-Fiber tubes. It does
+not establish a new algorithm or justify relaxing protected gaps. Any such change still
+requires the user's discussion/approval under the active migration constraint.
+
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve
 anatomy, geometry/attachment behavior and the existing engineering,

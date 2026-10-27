@@ -3206,3 +3206,14 @@ production grid 220 was blocked by the contemporaneous available-memory budget.
 No gap rules, tolerances, production resolution or resource policy were changed to
 make these checks pass. This retained source limitation and low-memory test restriction
 remain explicit; complete 0.4.0 deformation and release qualification are still pending.
+
+Follow-up VCP-context experiment: adding the two consuming tissues to the same three
+SCPs removes all five represented Fibers from skin input, so centerline/tube variants
+become identical at capture. Nevertheless, this 3,328-triangle input fails mesh assembly
+under the current available-memory budget. The original addon's preflight requests a
+0.000916585 m fine voxel, about 70.76x finer than its memory-selected coarse grid. The
+broader 28-VCP/14-SCP inventory also contains no bare Fibers and requests about 100.23x
+refinement; only inputs/preflight were evaluated for that larger case. Neither is a
+completed skin output. Fixed-camera source previews and exact evidence are recorded in
+the skin task record. This qualifies the earlier performance explanation: the expensive
+gap response is not exclusive to added Fiber thickness. No production algorithm changed.

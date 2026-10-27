@@ -26,5 +26,14 @@ def execute(
     started = monotonic()
     code = process.run(engine, request, cancel.handle)
     if code:
-        raise ValueError(f"{label} failed ({code}); see {log}. Previous output retained.")
+        raise ValueError(f"{label} failed ({code}): {failure_detail(log)} Prior output retained.")
     return dict(exit_code=code, elapsed_seconds=monotonic() - started)
+
+
+def failure_detail(log: Path) -> str:
+    try:
+        with log.open("rb") as stream:
+            stream.seek(max(0, log.stat().st_size - 4096))
+            return stream.read(4096).decode("utf-8", errors="replace").strip()
+    except OSError:
+        return "The numerical worker did not leave readable diagnostics."

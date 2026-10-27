@@ -40,6 +40,15 @@ def schedule(session: Any, targets: set[str], explicit: bool = False) -> None:
         family.schedule(session, targets, explicit=explicit)
 
 
+def schedule_outputs(
+    session: Any, ports: set[Port] | frozenset[Port], explicit: bool = False
+) -> None:
+    for roles, family in FAMILIES:
+        family.schedule(session, {p.owner for p in ports if p.output in roles}, explicit=explicit)
+    geometry = {p.owner for p in ports if p.output == "geometry"}
+    construction_tasks.schedule(session, geometry, explicit=explicit)
+
+
 def propagate(session: Any, seeds: set[Port]) -> None:
     graph = dependencies.graph(session.document)
     outputs = dependencies.frontier(dependencies.reverse(graph), seeds, producers(session.document))

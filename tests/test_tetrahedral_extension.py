@@ -18,8 +18,19 @@ BINARY = (
 
 
 def capture(path, original):
+    subprocess.run(
+        [sys.executable, "-c", code(original), str(path)],
+        cwd=path.parent,
+        check=True,
+        capture_output=True,
+    )
+    with np.load(path) as arrays:
+        return arrays["vertices"], arrays["tets"], str(arrays["digest"])
+
+
+def code(original):
     setup = "from pytetwild import PyfTetWildWrapper; t.load=lambda: PyfTetWildWrapper;"
-    code = (
+    return (
         "import sys,numpy as np; from anthroforge.native import tetrahedral_extension as t;"
         "from anthroforge.application.tetrahedral_backend import tetrahedra;"
         + (setup if original else "")
@@ -28,11 +39,6 @@ def capture(path, original):
         + "p,c=tetrahedra(v,f,0.3); np.savez(sys.argv[1],vertices=p,tets=c,digest=digest);"
         + ("" if original else NO_VISUALIZATION)
     )
-    subprocess.run(
-        [sys.executable, "-c", code, str(path)], cwd=path.parent, check=True, capture_output=True
-    )
-    with np.load(path) as arrays:
-        return arrays["vertices"], arrays["tets"], str(arrays["digest"])
 
 
 def test_array_extension_matches_package_import_without_visualization(tmp_path):

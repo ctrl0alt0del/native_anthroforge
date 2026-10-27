@@ -70,14 +70,32 @@ def targets(engine: Any, document: Any, resources: Any, reference: Any, cancel: 
         for row in identities(document, definitions)
     ]
     arrays = reference.arrays
-    outputs = [
-        resolve(resources, row, definitions[i]["asset"], arrays[f"source_{i}_ids"], cancel)
-        for i, row in enumerate(rows)
-    ]
+    outputs = resolve_all(document, resources, rows, definitions, arrays, cancel)
     return np.concatenate(outputs)
 
 
-def resolve(resources: Any, row: Any, retained: str, ids: Any, cancel: int) -> Any:
+def resolve_all(
+    document: Any, resources: Any, rows: Any, definitions: Any, arrays: Any, cancel: int
+) -> Any:
+    return [
+        resolve(
+            resources,
+            row,
+            definitions[i]["asset"],
+            arrays[f"source_{i}_ids"],
+            cancel,
+            document.object(row.identity.owner).name,
+        )
+        for i, row in enumerate(rows)
+    ]
+
+
+def resolve(resources: Any, row: Any, retained: str, ids: Any, cancel: int, label: str) -> Any:
     if retained not in resources.meshes:
         raise ValueError("Missing retained skin material reference; rebuild the reference.")
-    return skin_support.targets(resources.meshes[retained].mesh, row.mesh, row.frame, ids, cancel)
+    try:
+        return skin_support.targets(
+            resources.meshes[retained].mesh, row.mesh, row.frame, ids, cancel
+        )
+    except ValueError as error:
+        raise ValueError(f"{label}: {error}") from error

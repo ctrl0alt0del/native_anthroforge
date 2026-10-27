@@ -3374,3 +3374,21 @@ Both paths load the same binary SHA and satisfy boundary/volume checks. Repeated
 package calls already vary in cell count (261 versus 220 vertices on one compact probe), also
 varying in a serial experiment; exact tetrahedral index equality is not a supported guarantee.
 Six focused tests and mypy pass. Portable and production anatomy qualification remain pending.
+
+### Preserve typed dependencies during skin fitting — 2026-10-27
+
+Production fitting of Ribs Top Radius failed at the baseline sample with changed Thumb support
+topology. The graph marked Thumb pose only, but isolated capture discarded output roles and
+forced construction of all downstream owners and prerequisites. Its unnecessary Boolean rebuild
+changed vertex indices. Capture now dispatches the existing declared output types through the
+shared family scheduler and requests pose work separately. Genuine geometry changes still rebuild;
+retained-reference validation remains intact. No numerical or attachment policy changed.
+
+Sixteen focused tests pass, including pose-only capture and initiating shortcut policies.
+The actual 96-muscle assembly now completes five-sample/four-bone fitting in 239.685 s;
+repeatability error 2.38e-12, midpoint stored playback 63 ms. Skin connectivity/reference remain
+unchanged during the preceding 34.447-s anatomy update. Hidden rendered output was inspected.
+These measurements are single trials, not performance claims. Worker diagnostics now retain
+the final 4096 log bytes after cleanup; support errors include the source name/sample value.
+The relocated package also passes after direct extension loading; final packaging must include
+this dispatch fix. No unapproved geometry repair or remesher setting change accompanies it.

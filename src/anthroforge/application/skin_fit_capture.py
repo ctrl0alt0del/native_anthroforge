@@ -9,7 +9,6 @@ from anthroforge.core.shortcuts import Shortcut
 from anthroforge.native import skin_fit, topology
 
 from . import (
-    construction_tasks,
     evaluation,
     isolated_execution,
     output_tasks,
@@ -79,8 +78,8 @@ def capture(
 def collect(session: Any, identity: str, settings: Any, cancel: Any) -> Any:
     initial = session.assets[session.document.skin.final.asset].mesh
     values, training = skin_fit.sampling(session.engine, settings)
-    positions = [sample(session, identity, float(v), initial, cancel) for v in values]
-    replay = sample(session, identity, float(values[0]), initial, cancel)
+    positions = [sample_at(session, identity, float(v), initial, cancel) for v in values]
+    replay = sample_at(session, identity, float(values[0]), initial, cancel)
     error = skin_fit.repeatability(session.engine, positions[0], replay)
     arrays = skin_reference_evaluation.geometry(initial)
     arrays.update(
@@ -90,6 +89,13 @@ def collect(session: Any, identity: str, settings: Any, cancel: Any) -> Any:
         raise ValueError("Bone fitting requires quad topology.")
     arrays["quads"] = arrays["corners"].reshape(-1, 4)
     return arrays, error
+
+
+def sample_at(session: Any, identity: str, value: float, initial: Any, cancel: Any) -> Any:
+    try:
+        return sample(session, identity, value, initial, cancel)
+    except ValueError as error:
+        raise ValueError(f"Shortcut sample {value:.9g}: {error}") from error
 
 
 def apply(session: Any, identity: str, value: float) -> Any:
@@ -103,10 +109,9 @@ def apply(session: Any, identity: str, value: float) -> Any:
 
 def update_affected(session: Any, item: Any) -> None:
     ports = shortcut_effects.ports(session.document, item)
-    owners = {port.owner for port in ports}
-    output_tasks.schedule(session, owners, explicit=True)
-    construction_tasks.evaluate(session, list(owners))
-    bones = owners & session.document.index.entities.keys()
+    output_tasks.schedule_outputs(session, ports, explicit=True)
+    bones = {port.owner for port in ports if port.output == "pose"}
+    bones &= session.document.index.entities.keys()
     if bones:
         evaluation.request(session, bones)
 

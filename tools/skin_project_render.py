@@ -9,13 +9,15 @@ from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtTest import QTest
 from tissue_scene_acceptance import frames
 
+from anthroforge.application import projects, storage
 from anthroforge.desktop import offscreen, runtime
 from anthroforge.desktop.controller import Controller
 
 
 def initialize(controller, options):
-    controller.run("open", dict(path=str(options.project)))
-    controller.session.wait()
+    state = storage.read_package(options.project, controller.session.engine)
+    projects.adopt(controller.session, *state)
+    assert controller.session.document.skin.topology.asset, "No accepted skin topology to inspect."
     controller.run("view.hide", dict(targets=list(controller.session.document.registry.records)))
     controller.refresh()
 
@@ -24,10 +26,20 @@ def capture(controller, renderer, application, mesh, output):
     bounds = mesh.bounds
     center = [(bounds[i] + bounds[i + 3]) / 2 for i in range(3)]
     extent = max(bounds[i + 3] - bounds[i] for i in range(3))
-    for name, angles in (("front", (0, 0, 0)), ("oblique", (-15, 30, 0)), ("back", (0, 180, 0))):
+    for name, angles in views():
         controller.cameraRequested.emit([*center, *angles, extent * 1.6], True)
         image = settle(controller, renderer, application, mesh.handle)
         assert image.save(str(output.with_name(output.name + "-" + name + ".png")))
+
+
+def views():
+    return (
+        ("axis-y", (0, 0, 0)),
+        ("oblique", (-15, 30, 0)),
+        ("axis-x", (0, 90, 0)),
+        ("oblique-x", (-15, 120, 0)),
+        ("back", (0, 180, 0)),
+    )
 
 
 def settle(controller, renderer, application, handle):
@@ -56,6 +68,20 @@ def stages(controller, renderer, application, output):
         )
 
 
+def fitted(controller, renderer, application, output):
+    for item in controller.session.document.skin.fits:
+        data = controller.session.resources.skin[item.data].arrays
+        values = data["keys"]
+        for label, value in (("middle", float(values.mean())), ("maximum", float(values.max()))):
+            controller.run("skin.fit.preview", dict(identity=item.id, value=value))
+            controller.session.wait()
+            controller.refresh()
+            candidate = controller.session.skin_fit_preview.asset
+            assert candidate is not None, controller.session.skin_fit_preview.error
+            capture(controller, renderer, application, candidate.mesh, output / ("fit-" + label))
+        controller.run("skin.fit.preview.cancel", {})
+
+
 def run(application, options):
     controller, warnings = Controller(), []
     controller.timer.stop()
@@ -63,6 +89,7 @@ def run(application, options):
     try:
         initialize(controller, options)
         stages(controller, renderer, application, options.output)
+        fitted(controller, renderer, application, options.output)
         assert not warnings, warnings
     finally:
         renderer.close()

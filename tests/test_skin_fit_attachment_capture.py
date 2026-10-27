@@ -5,7 +5,7 @@ from dataclasses import replace
 import numpy as np
 import pytest
 
-from anthroforge.application import skin_assets, skin_fit_capture
+from anthroforge.application import construction_tasks, skin_assets, skin_fit_capture
 from anthroforge.core.skin import SkinStage
 from anthroforge.core.skin_fitting import Settings
 from anthroforge.native.mesh import NativeCancellation
@@ -76,3 +76,27 @@ def backsolve(session, child):
     identity = session.command("shortcut.expose", reference=ref)
     session.command("shortcut.configure", reference=ref, policy=dict(backsolve=True))
     return identity, ref
+
+
+def test_pose_only_sampling_does_not_reconstruct_providers(session, assembly, monkeypatch):
+    root, _ = assembly
+    reference(session, root)
+    ref = dict(target=root, path=["transform", "position"], component=1)
+    identity = session.command("shortcut.expose", reference=ref)
+    calls = []
+    observe_construction(monkeypatch, calls)
+    settings, token = Settings(0, 0.1, samples=5), NativeCancellation(session.engine)
+    skin_fit_capture.capture(
+        session.document, session.resources, session.preferences.value, identity, settings, token
+    )
+    assert not calls, "Pose changes must reuse accepted provider geometry."
+
+
+def observe_construction(monkeypatch, calls):
+    original = construction_tasks.compute_geometry
+
+    def record(session, document, resources, entity, cancel):
+        calls.append(entity)
+        return original(session, document, resources, entity, cancel)
+
+    monkeypatch.setattr(construction_tasks, "compute_geometry", record)

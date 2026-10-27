@@ -11,6 +11,38 @@
 
 ## Outcome and acceptance
 
+### Production update/fitting and portable qualification, October 27
+
+The Y-plane build matches this assembly's left/right axis. Topology has 31,059 vertices
+and 30,864 quads; the retained envelope is unchanged. Topology regeneration took 288.414 s;
+reference preparation includes 76.102 s in the tetrahedral process. Both new profiles are
+complete, without oversized or lost events. Hidden GPU inspection confirms the expected
+body silhouette, with existing roughness/openings: QuadWild discarded 12 patches, and quality
+reports 59 boundary loops, seven components and failed manifold/orientability checks.
+This is usable warning output under the approved source policy, not a watertight avatar.
+
+Ribs Top Radius 0.983 to 1.05 updated skin in 34.447 s, preserving topology and reference.
+The reverse update also passed (27.647 s in an earlier serial run). Full-assembly fitting
+now succeeds: five samples, four bones, 239.685 s; independent midpoint playback 63 ms.
+Repeatability error is 2.38e-12; maximum held-out position error is 0.00759 project metres.
+Saved fitted playback and accepted skin were inspected with hidden D3D11 rendering.
+No anatomy or authored values change during playback. Source files remain untouched.
+
+The first fitting probe exposed dispatch losing output roles: a pose-only Thumb dependency
+was unnecessarily reconstructed and changed its Boolean mesh indices. Sampling now schedules
+declared outputs by role; it does not broaden pose dependencies into geometry rebuilds.
+Sixteen focused regression/architecture checks pass, including shortcut attachment policies
+and pose-only capture. No skin objective, retained-binding rule or attachment policy changed.
+Worker errors now retain bounded stderr text after temporary cleanup; support failures identify
+the source and sample. The full regression is being rerun after these changes.
+
+The temporary portable build passes all minimal-PATH relocated checks, including skin,
+fitting, persistence, OBJ quads, profiler and hidden rendering. It predates the final typed
+dispatch fix and must be rebuilt for release. Offscreen checks do not claim interactive
+acceptance. Large Radius=3 update and final review remain in progress; version stays 0.3.7.
+Fitting's isolated sample-session internals are not fully attributed by the parent profiler;
+the outer fitting duration is measured, not a complete per-sample breakdown.
+
 ### Full regression and first anatomy build, October 27
 
 The complete development gate passed lock/style/type/native build, all five native CTests

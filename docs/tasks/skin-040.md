@@ -2,14 +2,45 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: envelope and topology pipelines connected; full skin workflow remains in progress,
-  not merge-ready. Schema 7, immutable resources, shared commands and vertical inspector exist.
-  Durable deformation, shortcut fitting and OBJ export are integrated and production assembly
-  checks pass with documented remesher warnings. Final packaging/regression remain unfinished.
+- Status: implementation/development checks complete; final release validation blocked by
+  external memory pressure. Canonical package built; all its checks except the skin example
+  pass. The prior qualification package and full production assembly passed that workflow.
+  Keep off main until the exact final executable passes its unchanged skin check.
 - Last updated: 2026-10-27, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
 ## Outcome and acceptance
+
+### Final package hold and recovery instructions, October 27
+
+Canonical executable: `dist/0.4.0/AnthroForge.dist/AnthroForge.exe`, runtime revision
+13e53b54a87ab9aa547032ba7f613531e317a906, clean tracked build. The exact executable passes
+all checks before the skin example and the separately completed remaining checks:
+exterior placement, feedback, Preferences, restored authoring workflows, hidden desktop
+rendering and recovery. Evidence: `build/skin-040/portable-release{,-retry}.log`,
+`portable-remaining.log`, `portable-release/remaining-checks.json`. The two full-suite
+attempts fail at the unchanged cube skin example under fluctuating external RAM pressure;
+neither is recorded as a complete pass. No runtime code changed after the qualified build.
+
+Asked the user when to resume the memory-sensitive check; do not interrupt their running
+game or close applications. Once they are ready, rerun the exact canonical executable:
+`uv run --no-sync python tools/check_portable.py dist/0.4.0/AnthroForge.dist/AnthroForge.exe build/skin-040/portable-release --offscreen`.
+Then update qualification labels, refresh packaged documentation/source archive, validate
+against latest main and merge/push normally. No runtime rebuild is needed unless code changes.
+Preserve the untracked root __init__.py. All source anatomy hashes remain unchanged.
+
+### Canonical package memory-pressure check, October 27
+
+The canonical 0.4.0 executable built from clean tracked revision 13e53b5. Its first
+relocated suite reached the skin example but failed under external memory pressure:
+available physical RAM was about 1.5 GiB, yielding a field budget below 659 MiB. The
+cube's minimum resolution 160 needs 659 MiB under the retained 104-bytes/cell estimate.
+The addon's `grid.choose_resolution` and `solver._preflight` produce the same rejection
+(verified at 500/650-MiB budgets; 1200 MiB selects resolution 190). This is not the former
+standalone-only assembly/output estimate cutoff. No memory policy, numerical setting,
+test fixture or user's running application was changed. Available RAM recovered and the
+same complete portable checks are rerunning. The first failure remains recorded; no
+release/merge claim relies on retrying without explaining its cause.
 
 ### Final regression checkpoint, October 27
 

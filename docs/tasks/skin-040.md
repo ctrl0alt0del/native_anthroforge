@@ -2,14 +2,32 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: implementation/development checks complete; final release validation blocked by
-  external memory pressure. Canonical package built; all its checks except the skin example
-  pass. The prior qualification package and full production assembly passed that workflow.
-  Keep off main until the exact final executable passes its unchanged skin check.
-- Last updated: 2026-10-27, Europe/Bucharest.
+- Status: skin parallelism and temporary-memory fixes in progress; all builds/tests and
+  runtime qualification paused while the user is playing. Existing qualification below
+  predates these fixes. Keep off main until the changes and rebuilt package are qualified.
+- Last updated: 2026-10-28, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
 ## Outcome and acceptance
+
+### Authorized skin execution/lifetime follow-up, October 28 — validation paused
+
+The user authorized restoring lost skin parallelism and the addon's temporary-field
+lifetime, preserving numerical algorithms. Work stays on this unfinished release branch.
+Do not run builds, tests, benchmarks, skin generation or the GUI until the user resumes
+validation after playing. Source review and checkpoint commits are permitted.
+
+Static cause: skin included routing's explicitly serial kernel boundary, disabling the
+addon's OpenMP loops. Separate skin query/kernel compilation from routing, retain the
+source maximum of four threads and declare that demand to the existing coordinator.
+Restore the source field-release call after constrained smoothing and before validation;
+retain source geometry, separators and corridor checks used by diagnostics. Do not
+change precision, budgets, constraints, smoothing, meshing or diagnostic policy.
+
+Required later: native build/style, scheduler and envelope/cancellation/quality/parity
+checks, serial controlled performance and memory comparison on production anatomy,
+then the development gate and a rebuilt canonical portable package. Do not reuse earlier
+passes as evidence for these changes or claim a measured improvement before validation.
 
 ### Final package hold and recovery instructions, October 27
 

@@ -322,6 +322,7 @@ class Session:
         self.tissue_retarget: Preview[Any] = Preview()
         self.surface_preview: Preview[Candidate] = Preview()
         self.tissue_preview: Preview[TissueCandidate] = Preview()
+        self.skin_fit_preview: Preview[Any] = Preview()
 
 
 def changed_ids(previous: Document, current: Document) -> set[str]:

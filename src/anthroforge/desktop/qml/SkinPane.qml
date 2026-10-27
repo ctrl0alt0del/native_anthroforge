@@ -53,5 +53,6 @@ UiScrollView {
             enabled:pane.readiness.update.available; hint:pane.readiness.update.reason
             onClicked:workspace.run("skin.evaluate",{})
         }
+        SkinFits { adapter: workspace.skinPanel.fits }
     }
 }

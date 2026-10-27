@@ -49,6 +49,10 @@ from . import (
     shortcut_operations,
     shrinkwrap_operations,
     skin_collagen,
+    skin_fit_capture,
+    skin_fit_jobs,
+    skin_fit_preview,
+    skin_fit_results,
     skin_jobs,
     skin_operations,
     skin_painting,
@@ -89,6 +93,9 @@ EDITS = {
     "skin.topology.build": partial(skin_jobs.build, stage="topology"),
     "skin.reference.build": partial(skin_jobs.build, stage="reference"),
     "skin.evaluate": skin_update_tasks.evaluate,
+    "skin.fit": skin_fit_jobs.start,
+    "skin.fit.authoring": partial(skin_fit_jobs.start, authoring=True),
+    "skin.fit.remove": skin_fit_results.remove,
     "skin.build": skin_jobs.build,
     "skin.configure": skin_operations.configure,
     "skin.contributor.configure": skin_operations.contributor,
@@ -314,6 +321,7 @@ def direct_commands(session: "Session") -> dict[str, Any]:
         **history_commands(session),
         "inspect": session.describe,
         "skin.inspect": lambda: skin_operations.inspect(session),
+        **skin_fit_queries(session),
         "skin.status": session.skin_status.describe,
         "wait": session.wait,
         "tick": session.scheduler.tick,
@@ -329,6 +337,16 @@ def history_commands(session: "Session") -> dict[str, Any]:
         "cancel": session.cancel,
         "undo": lambda: session.navigate(-1),
         "redo": lambda: session.navigate(1),
+    }
+
+
+def skin_fit_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "skin.fit.inspect": lambda **a: skin_fit_results.inspect(session, **a),
+        "skin.fit.eligibility": lambda **a: skin_fit_capture.describe(session, **a),
+        "skin.fit.preview": lambda **a: skin_fit_preview.request(session, **a),
+        "skin.fit.preview.status": lambda: skin_fit_preview.status(session),
+        "skin.fit.preview.cancel": lambda: skin_fit_preview.cancel(session),
     }
 
 

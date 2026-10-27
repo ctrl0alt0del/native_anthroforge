@@ -35,7 +35,7 @@ def decode(value: dict[str, Any] | None) -> Skin:
     for name in ("envelope", "topology", "pending_topology", "final"):
         data[name] = result(data.get(name, {}))
     data["contributors"] = tuple(contributor(row) for row in data.get("contributors", ()))
-    data["fits"] = tuple(FittedShortcut(**row) for row in data.get("fits", ()))
+    data["fits"] = tuple(fitted(row) for row in data.get("fits", ()))
     return Skin(**data)
 
 
@@ -44,3 +44,8 @@ def contributor(value: dict[str, Any]) -> SkinContributor:
     data = dict(value)
     data.pop("fiber_radius", None)
     return SkinContributor(**data)
+
+
+def fitted(value: dict[str, Any]) -> FittedShortcut:
+    reads = result({"inputs": value.get("inputs", ())}).inputs
+    return FittedShortcut(**(value | {"inputs": reads}))

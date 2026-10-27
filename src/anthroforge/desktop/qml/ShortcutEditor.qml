@@ -11,6 +11,7 @@ ScrollView {
     property string targetFormula: ""
     clip: true
     ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+    SkinFitDialog { id: fitting; adapter: editor.adapter }
     ColumnLayout {
     width: editor.availableWidth
     spacing: Theme.inset
@@ -50,6 +51,12 @@ ScrollView {
         UiButton { text: "Add target"; onClicked: { editor.targetFormula=""; editor.purpose="TARGET"; editor.adapter.discover("","TARGET"); } }
     }
     ShortcutPolicies { Layout.fillWidth: true; adapter: editor.adapter.policies }
+    UiButton {
+        objectName: "shortcutFitBones"; text: "Fit to bones…"; Layout.fillWidth: true
+        enabled: editor.adapter.fitEligibility.available
+        hint: editor.adapter.fitEligibility.reason || (editor.adapter.fitEligibility.warnings || []).join("\n") || "Create a bone-driven skin for this shortcut's range."
+        onClicked: fitting.initialize()
+    }
     ShortcutPropertyValue { visible: editor.details.kind === "PROPERTY"; adapter: editor.adapter; details: editor.details; Layout.fillWidth: true }
     ShortcutInspection { objectName: "shortcutInspection"; Layout.fillWidth: true; adapter: editor.adapter.inspectionView }
     UiButton { visible: editor.details.kind === "DRIVER"; text: "Delete driver"; hint: "Remove this driver and its formulas; retain current target values"; onClicked: editor.adapter.removeDriver() }

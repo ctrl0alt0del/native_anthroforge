@@ -217,6 +217,7 @@ class Controller(QObject):
                 self.session.conversion,
                 self.session.surface_preview,
                 self.session.tissue_preview,
+                self.session.skin_fit_preview,
             )
         )
 

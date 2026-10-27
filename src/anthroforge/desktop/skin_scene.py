@@ -1,5 +1,6 @@
 """Document skin uses existing staged mesh leases without an authored hierarchy node."""
 
+from anthroforge.application.skin_fit_preview import displayed as fitted_preview
 from anthroforge.core.entities import IDENTITY
 
 
@@ -18,11 +19,27 @@ def displayed(session):
 
 def rows(controller):
     session = controller.session
+    preview = fitted_preview(session)
+    if preview is not None:
+        return [preview_row(session, preview)]
     stage = displayed(session)
     if stage is None or stage.asset not in session.assets:
         return []
     mesh = session.assets[stage.asset].mesh
     return [record(session.document, stage, mesh)]
+
+
+def preview_row(session, candidate):
+    return dict(
+        id="skin:" + str(session.document.id),
+        handle=candidate.mesh.handle,
+        chunks=candidate.mesh.counts[4],
+        geometry_asset=session.skin_fit_preview.token,
+        geometry_revision=0,
+        asset="",
+        **placement(),
+        **style(),
+    )
 
 
 def record(document, stage, mesh):

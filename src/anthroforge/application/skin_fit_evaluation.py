@@ -18,10 +18,25 @@ def evaluate(engine: Any, payload: Any, cancel: Any) -> ComputedStage:
     )
     solved = compile_samples(engine, samples, settings, cancel.handle)
     info = metadata(document, identity, settings, repeat, perf_counter() - started)
+    info.update(shortcut_description(document, identity))
     info["rows"] = solved.pop("report")
     data = skin_assets.create(solved, info)
     names = "vertices", "corners", "offsets", "triangles", "polygons"
     return ComputedStage(topology.restore(engine, [samples[k] for k in names]), data)
+
+
+def shortcut_description(document: Any, identity: str) -> Any:
+    from anthroforge.core.shortcuts import Shortcut
+
+    from . import property_catalog
+
+    item = next(s for s in (*document.shortcuts, *document.driving_shortcuts) if s.id == identity)
+    dimension = (
+        item.dimension
+        if not isinstance(item, Shortcut)
+        else property_catalog.resolve(document, item.reference).dimension
+    )
+    return dict(label=item.label, dimension=dimension)
 
 
 def metadata(document: Any, identity: str, settings: Any, repeat: float, seconds: float) -> Any:

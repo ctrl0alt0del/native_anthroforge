@@ -10,6 +10,22 @@
 
 ## Outcome and acceptance
 
+### Fitted-result integration checkpoint, October 27
+
+Public fit jobs now use dispatch captures, complete source/shortcut-definition validation,
+coordinated reservations, cancellation and initiating undo. Persist independent mesh/channel
+resources with input provenance; inspection marks stale snapshots without discarding them.
+Read-only playback coalesces values, retains the previous displayed result during work and
+uses native linear TRS channels without anatomy evaluation or asset-catalogue intermediates.
+The shortcut editor exposes Fit to bones; Skin manages saved fits and playback. UI rendering
+and full dialog interaction are not yet qualified; desktop adapter checks pass.
+
+Evidence: public fit/reload/undo checks pass; three playback lifetime/source tests and the
+desktop fitting adapter pass. Ruff passes and configured mypy passes 511 files. The final
+15-line test-helper adjustment is being rechecked. Native style finished with no failures.
+Export, broader lifecycle/performance, actual GUI rendering, portable qualification and the
+full development gate remain unfinished. No main merge or version bump.
+
 ### Fitter/playback and preparation reuse checkpoint, October 27
 
 The real default-resolution integrated suite finished: 15 passed in 1664.68 seconds.

@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 from math import isfinite
 
-from .results import EvaluationResult
+from .results import EvaluationResult, ReadRevision
 
 
 def bounded(name: str, value: float, lower: float, upper: float) -> None:
@@ -106,6 +106,8 @@ class FittedShortcut:
     data: str
     source_revision: int
     stale: bool = False
+    inputs: tuple[ReadRevision, ...] = ()
+    definitions: str = ""
 
 
 @dataclass(frozen=True, slots=True)

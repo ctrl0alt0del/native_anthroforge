@@ -254,6 +254,8 @@ def construction_schedulers() -> dict[str, TaskScheduler]:
         "skin_construction": SkinTopologyTaskScheduler(),
         "skin_reference": SkinReferenceTaskScheduler(),
         "skin_deformation": SkinDeformationTaskScheduler(),
+        "skin_fit": SkinFitTaskScheduler(),
+        "skin_fit_preview": SkinFitPreviewTaskScheduler(),
     }
 
 
@@ -265,6 +267,27 @@ class SkinReferenceTaskScheduler(MeasuredTaskScheduler):
             "worker",
             reason="Tetrahedral proxy and native LE/FAST reference",
             resources=ResourceDemand(4, budget() + workload.bytes * 3),
+        )
+
+
+class SkinFitTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule(
+            "worker",
+            reason="Isolated shortcut samples and native Scale Aware fitting",
+            resources=ResourceDemand(4, workload.bytes * 12),
+        )
+
+
+class SkinFitPreviewTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + workload.candidates * 0.0003
+        return Schedule(
+            "worker",
+            cost,
+            delay_ms=min(16, cost) if interactive else 0,
+            max_wait_ms=MAX_INTERACTIVE_WAIT_MS,
+            reason="Stored bone-channel skin playback",
         )
 
 

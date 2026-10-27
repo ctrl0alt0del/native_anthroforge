@@ -3343,3 +3343,11 @@ worker pool. A real five-pose translation fixture verifies isolation, fixed topo
 repeatability. Maintained Scale Aware/Single Active kernels match captured DLL results at
 1e-8, and channel-linear playback matches Blender 5.0.1 positions at 1e-6, including between
 keys/clamping. These fixtures do not establish full anatomical fitting or portable acceptance.
+
+Fitted snapshots now publish through the shared authored-job lifecycle with complete source
+and wrapper-definition provenance. Independent playback uses stored channels on the coordinator,
+coalesces superseded values, and retains displayed geometry until a complete replacement is
+ready. It never invokes anatomical evaluation, changes document revisions or stores drag
+intermediates in the document asset catalogue. Source edits mark the snapshot stale; removing
+the original skin does not invalidate independent playback. Public API/undo/persistence and
+desktop adapter tests pass. No interpolation/objective change accompanies this integration.

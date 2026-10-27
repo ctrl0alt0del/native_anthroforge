@@ -13,6 +13,7 @@ def configure(engine: Any) -> None:
     engine.bind("af_skin_support_sample", [U, D, INT, D, D, U])
     engine.bind("af_skin_support_targets", [U, U, D, INT, c.c_int, D, U])
     engine.bind("af_skin_support_weights", [D, INT, c.c_int, D, c.c_int])
+    engine.bind("af_skin_reference_replay", [D, D, c.c_int, D])
 
 
 def frame(value: Any) -> Any:
@@ -20,6 +21,19 @@ def frame(value: Any) -> Any:
     if result.shape != (16,):
         raise ValueError("Skin support requires sixteen world-frame values.")
     return result
+
+
+def validate_replay(engine: Any, reference: Any, replay: Any) -> float:
+    reference, replay = doubles(reference), doubles(replay)
+    if reference.shape != replay.shape or reference.ndim != 2 or reference.shape[1] != 3:
+        raise ValueError("Skin replay requires matching XYZ positions.")
+    error = np.zeros(1)
+    engine.check(
+        engine.library.af_skin_reference_replay(
+            pointer(reference), pointer(replay), len(reference), pointer(error)
+        )
+    )
+    return float(error[0])
 
 
 def sample(mesh: Any, world: Any, cancel: int = 0) -> tuple[Any, Any, float]:

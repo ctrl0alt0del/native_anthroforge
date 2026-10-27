@@ -252,7 +252,32 @@ def construction_schedulers() -> dict[str, TaskScheduler]:
         "skin_envelope": SkinEnvelopeTaskScheduler(),
         "skin_topology": SkinTopologyTaskScheduler(),
         "skin_construction": SkinTopologyTaskScheduler(),
+        "skin_reference": SkinReferenceTaskScheduler(),
+        "skin_deformation": SkinDeformationTaskScheduler(),
     }
+
+
+class SkinReferenceTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        from .worker_memory import budget
+
+        return Schedule(
+            "worker",
+            reason="Tetrahedral proxy and native LE/FAST reference",
+            resources=ResourceDemand(4, budget() + workload.bytes * 3),
+        )
+
+
+class SkinDeformationTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 1 + 0.003 * workload.triangles
+        return Schedule(
+            "worker",
+            cost,
+            delay_ms=min(cost, MAX_INTERACTIVE_WAIT_MS) if interactive else 0,
+            max_wait_ms=MAX_INTERACTIVE_WAIT_MS,
+            reason="Retained anatomical sampling and fixed-topology skin deformation",
+        )
 
 
 class SkinEnvelopeTaskScheduler(MeasuredTaskScheduler):

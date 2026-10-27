@@ -88,3 +88,14 @@ int af_skin_support_weights(const double* masses,const int* counts,int sources,d
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_skin_reference_replay(const double* reference,const double* replay,int count,double* error) {
+    try {
+        if(!reference||!replay||!error||count<1) throw std::runtime_error("Missing skin replay buffers.");
+        const Eigen::Map<const af::Vertices> a(reference,count,3),b(replay,count,3);
+        if(!a.allFinite()||!b.allFinite()) throw std::runtime_error("Nonfinite skin reference replay.");
+        const double extent=std::max(1e-12,(a.colwise().maxCoeff()-a.colwise().minCoeff()).maxCoeff());
+        *error=(a-b).rowwise().norm().maxCoeff();
+        if(*error>extent*1e-6) throw std::runtime_error("Skin reference identity replay exceeded tolerance.");
+        return 0;
+    } catch(const std::exception& e) { af::set_error(e.what()); return 1; }
+}

@@ -55,16 +55,30 @@ def topology(document: Any) -> set[Port]:
     return construction(document) | {Port(str(document.id), "skin_envelope")}
 
 
+def reference_build(document: Any) -> set[Port]:
+    ports = complete_build(document)
+    ports.update(
+        Port(str(document.id), name) for name in ("skin_topology", "skin_pending_topology")
+    )
+    return ports
+
+
+def complete_build(document: Any) -> set[Port]:
+    return construction(document) | {Port(str(document.id), "skin_deformation_settings")}
+
+
 def revision(document: Any, port: Port) -> ReadRevision | None:
     if port.owner != str(document.id):
         return None
+    if port.output == "skin_reference":
+        return ReadRevision(port.owner, port.output, 0, 0, (document.skin.reference,))
     if port.output in ("skin_scope", "skin_guide_scope"):
         select = skin_sources.contributors if port.output == "skin_scope" else skin_sources.guides
         values = tuple(repr(source) for source in select(document))
         return ReadRevision(port.owner, port.output, 0, 0, values)
     if port.output.endswith("_settings") and port.output.startswith("skin_"):
         return settings_revision(document, port)
-    if port.output in ("skin_envelope", "skin_topology", "skin_final"):
+    if port.output in ("skin_envelope", "skin_topology", "skin_pending_topology", "skin_final"):
         result = getattr(document.skin, port.output.removeprefix("skin_"))
         return ReadRevision(port.owner, port.output, result.authored_revision, result.revision)
     raise ValueError("Unknown document skin output: " + port.output)

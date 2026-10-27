@@ -10,7 +10,7 @@ UiScrollView {
     ColumnLayout {
         width: pane.availableWidth; spacing: Theme.gap
         Label { text: "Skin"; color: Theme.text; font.pixelSize:16; font.bold:true }
-        UiButton { objectName:"skinBuild"; text:"Build Skin & Topology"; Layout.fillWidth:true; onClicked:workspace.run("skin.build",{}) }
+        UiButton { objectName:"skinBuild"; text:"Build Skin"; Layout.fillWidth:true; onClicked:workspace.run("skin.build",{}) }
         UiCombo {
             objectName:"skinDisplay"; Layout.fillWidth:true; textRole:"label"; valueRole:"id"
             model:[{id:"AUTO",label:"Show latest skin"},{id:"ENVELOPE",label:"Show envelope"},{id:"TOPOLOGY",label:"Show topology"},{id:"FINAL",label:"Show final skin"},{id:"NONE",label:"Hide skin"}]
@@ -41,5 +41,11 @@ UiScrollView {
         SkinTopologySettings { settings:pane.state.topology_settings; onEdited:(key,value)=>pane.change("topology_settings",key,value) }
         UiButton { objectName:"skinBuildTopology"; text:"Rebuild topology"; Layout.fillWidth:true; enabled:!!pane.state.envelope?.asset; onClicked:workspace.run("skin.topology.build",{}) }
         SkinDeformationSettings { settings:pane.state.deformation_settings; onEdited:(key,value)=>pane.change("deformation_settings",key,value) }
+        UiButton {
+            objectName:"skinBuildReference"; text:"Rebuild deformation reference"; Layout.fillWidth:true
+            enabled:!!pane.state.topology?.asset || !!pane.state.pending_topology?.asset
+            hint:enabled ? "Initialize skin deformation from the current anatomy and topology." : "Build skin topology first."
+            onClicked:workspace.run("skin.reference.build",{})
+        }
     }
 }

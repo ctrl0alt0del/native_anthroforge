@@ -24,6 +24,7 @@ def result(value: dict[str, Any]) -> SkinStage:
 
 def decode(value: dict[str, Any] | None) -> Skin:
     data = dict(value or {})
+    data["reference_sources"] = tuple(data.get("reference_sources", ()))
     data["envelope_settings"] = EnvelopeSettings(**data.get("envelope_settings", {}))
     data["deformation_settings"] = DeformationSettings(**data.get("deformation_settings", {}))
     topology = dict(data.get("topology_settings", {}))
@@ -31,7 +32,7 @@ def decode(value: dict[str, Any] | None) -> Skin:
         if name in topology:
             topology[name] = tuple(topology[name])
     data["topology_settings"] = TopologySettings(**topology)
-    for name in ("envelope", "topology", "final"):
+    for name in ("envelope", "topology", "pending_topology", "final"):
         data[name] = result(data.get(name, {}))
     data["contributors"] = tuple(contributor(row) for row in data.get("contributors", ()))
     data["fits"] = tuple(FittedShortcut(**row) for row in data.get("fits", ()))

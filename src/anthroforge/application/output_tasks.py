@@ -11,6 +11,7 @@ from . import (
     formula_tasks,
     geometry_outputs,
     path_tasks,
+    skin_update_tasks,
     tissue_tasks,
 )
 
@@ -25,11 +26,13 @@ FAMILIES = (
 def pending(session: Any, released: bool = False) -> None:
     for _, family in FAMILIES:
         family.pending(session, released=released)
+    skin_update_tasks.pending(session, released=released)
 
 
 def edited(session: Any, seeds: set[Port]) -> None:
     for _, family in FAMILIES:
         family.edited(session, seeds)
+    skin_update_tasks.edited(session, seeds)
 
 
 def schedule(session: Any, targets: set[str], explicit: bool = False) -> None:
@@ -47,6 +50,7 @@ def propagate(session: Any, seeds: set[Port]) -> None:
     targets = {p.owner for p in outputs if p.output == "geometry"}
     geometry_outputs.pending(session, targets)
     construction_tasks.schedule(session, targets)
+    skin_update_tasks.edited(session, seeds)
 
 
 def producers(document: Any) -> set[Port]:

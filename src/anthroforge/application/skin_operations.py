@@ -24,6 +24,10 @@ def configure(session: "Session", section: str, values: dict[str, Any]) -> None:
         return
     rebuild = section != "deformation_settings" or bool(set(values) - {"method"})
     session.replace_document(skin=invalidate(skin, rebuild, **{section: settings}))
+    if section == "deformation_settings":
+        from . import skin_update_tasks
+
+        skin_update_tasks.pending(session)
 
 
 def setting_values(values: dict[str, Any]) -> dict[str, Any]:

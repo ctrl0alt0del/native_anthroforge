@@ -11,3 +11,11 @@ from .skin_assets import SkinAsset
 class ComputedStage:
     mesh: Mesh
     data: SkinAsset
+    reference: SkinAsset | None = None
+    sources: tuple[str, ...] = ()
+
+
+class IncompleteBuild(Exception):
+    def __init__(self, stages: dict[str, ComputedStage], error: Exception):
+        super().__init__(str(error))
+        self.stages = stages

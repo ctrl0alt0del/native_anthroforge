@@ -121,8 +121,11 @@ class Skin:
     contributors: tuple[SkinContributor, ...] = ()
     envelope: SkinStage = field(default_factory=SkinStage)
     topology: SkinStage = field(default_factory=SkinStage)
+    pending_topology: SkinStage = field(default_factory=SkinStage)
     final: SkinStage = field(default_factory=SkinStage)
     reference: str = ""
+    reference_sources: tuple[str, ...] = ()
+    build_error: str = ""
     fits: tuple[FittedShortcut, ...] = ()
     construction_stale: bool = False
     revision: int = 0

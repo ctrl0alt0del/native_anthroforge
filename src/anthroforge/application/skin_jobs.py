@@ -13,6 +13,7 @@ from anthroforge.native.mesh import NativeCancellation
 from . import authored_jobs, dependencies, skin_stages, skin_workloads
 from .assets import Asset
 from .construction_policy import revisions
+from .skin_results import IncompleteBuild
 
 
 def build(session: Any, stage: str = "construction") -> str:
@@ -43,7 +44,7 @@ def make_job(session: Any, stage: str, origin: int) -> Job:
     return Job(
         skin_stages.POLICIES[stage].title,
         frozenset((str(session.document.id),)),
-        lambda document: (document, session.resources.snapshot()),
+        lambda document: (document, session.resources.snapshot(), session.preferences.value),
         partial(compute, session, stage),
         partial(publish, session, stage, origin),
         key="skin-" + stage,
@@ -53,27 +54,52 @@ def make_job(session: Any, stage: str, origin: int) -> Job:
 
 
 def compute(session: Any, stage: str, payload: Any, cancel: Any) -> Any:
-    document, resources = payload
-    return document, skin_stages.POLICIES[stage].compute(
-        session.engine, document, resources, cancel
-    )
+    document, resources, options = payload
+    try:
+        outputs = skin_stages.POLICIES[stage].compute(
+            session.engine, document, resources, cancel, options
+        )
+        return document, outputs, ""
+    except IncompleteBuild as error:
+        return document, error.stages, str(error)
 
 
 def publish(session: Any, stage: str, origin: int, payload: Any) -> None:
-    document, outputs = payload
+    document, outputs, error = payload
     policy = skin_stages.POLICIES[stage]
     reads = revisions(document, policy.inputs(document))
     if reads != revisions(session.document, policy.inputs(session.document)):
         raise ObsoleteInputs("Skin inputs changed before publication.")
+    outputs = retained_outputs(document, outputs, error)
     stages = {
         name: accepted(document, name, result.data.digest, reads)
         for name, result in outputs.items()
     }
-    proof = authored_jobs.Capture(reads, partial(enqueue, session, stage, origin))
-    authored_jobs.publish(session, origin, partial(merge, stages=stages), proof)
+    install(session, stage, origin, outputs, stages, reads, error)
+    if error:
+        raise ValueError(error)
+
+
+def retained_outputs(document: Any, outputs: Any, error: str) -> Any:
+    if error and document.skin.reference and "topology" in outputs:
+        outputs = dict(outputs)
+        outputs["pending_topology"] = outputs.pop("topology")
+    return outputs
+
+
+def install(
+    session: Any, stage: str, origin: int, outputs: Any, stages: Any, reads: Any, error: str
+) -> None:
     for name, result in outputs.items():
         session.assets[stages[name].asset] = Asset(result.mesh, "generated", "", 1.0, False)
         session.resources.skin[result.data.digest] = result.data
+        if result.reference:
+            session.resources.skin[result.reference.digest] = result.reference
+    proof = authored_jobs.Capture(reads, partial(enqueue, session, stage, origin))
+    final = outputs.get("final")
+    authored_jobs.publish(
+        session, origin, partial(merge, stages=stages, final=final, error=error), proof
+    )
 
 
 def accepted(document: Any, name: str, data: str, reads: Any) -> SkinStage:
@@ -96,11 +122,27 @@ def pending(document: Any, reads: Any) -> tuple[str, ...]:
     )
 
 
-def merge(document: Any, stages: Any) -> Any:
+def merge(document: Any, stages: Any, final: Any = None, error: str = "") -> Any:
     stale = (
         bool(document.skin.reference)
         if "topology" in stages
         else bool(document.skin.topology.asset)
     )
-    skin = replace(document.skin, **stages, construction_stale=stale)
+    skin = replace(document.skin, **stages, construction_stale=stale, build_error=error)
+    if final is not None and final.reference is not None:
+        skin = completed_reference(skin, final, stages)
     return replace(document, skin=skin)
+
+
+def completed_reference(skin: Any, final: Any, stages: Any) -> Any:
+    topology = stages.get(
+        "topology", skin.pending_topology if skin.pending_topology.asset else skin.topology
+    )
+    return replace(
+        skin,
+        reference=final.reference.digest,
+        reference_sources=final.sources,
+        topology=topology,
+        pending_topology=SkinStage(),
+        construction_stale=False,
+    )

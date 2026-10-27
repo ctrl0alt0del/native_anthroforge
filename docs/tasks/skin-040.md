@@ -10,6 +10,26 @@
 
 ## Outcome and acceptance
 
+### Reference/update integration checkpoint, October 27
+
+Persistent references now own source mesh leases, sample identities, proxy/embedding arrays,
+fixed connectivity and symmetry. New `skin.reference.build` and `skin.evaluate` shared operations
+have a desktop reference action. Build Skin now continues through reference preparation.
+Failed initial reference retains topology; failed replacement retains old topology/final/reference
+and separately owns the new pending topology for retry. Undo and persistence cover both.
+Ordinary accepted anatomy output changes enqueue position-only skin work through existing fan-out;
+manual/on-release modes and captured source policy remain intact. The native contact kernel is used.
+
+14 focused reference/update/retry/lifecycle/architecture tests pass, including real proxy builds,
+world-space translation with fixed connectivity, reload, undo/redo and failed replacement.
+Mypy (501 files), repository Ruff/format and targeted native style pass. Earlier expanded selection
+had three test-adapter signature failures, corrected and rerun in the lifecycle selection.
+The real backend/full default-resolution combined-build suite is still running; no pass is claimed.
+Logs: `build/skin-040/{reference-mypy,reference-ruff,reference-format,update-reference-tests,
+reference-integrated-tests}.log`. Deformation preparation currently rebuilds per job; reuse,
+full status-provider/fit/export workflows, performance and desktop/package qualification remain.
+Do not merge or release. User algorithm/policy approval requirement remains active.
+
 ### October 27 grilling decisions — confirmed; implementation resumed
 
 The resumed interview settled Q1-Q9; the user explicitly requested documenting the

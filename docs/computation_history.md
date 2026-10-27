@@ -3302,3 +3302,12 @@ and retained-material target resolution. The application owns source identity/pr
 No nearest-surface fallback or resampling occurs during updates. Incompatible contributor,
 topology or material identities fail explicitly. Full deformation integration/qualification
 remain pending; source tests are recorded in the task record when completed.
+
+Reference preparation and position-only updates are now integrated on the feature branch.
+Immutable references retain the sampled source assets; updates resolve those addresses through
+the existing native material service, then use the unchanged LE/FAST and advisory contact kernels.
+Native identity replay uses the donor's model-relative 1e-6 tolerance. Publication owns complete
+stages; failed replacements retain their successful topology separately for an explicit retry.
+No numerical repair, contributor substitution or automatic retopology was introduced.
+Focused tests cover real proxy initialization, persistence, undo/retry and rigid translation.
+Full assembly/performance/desktop qualification and prepared-factor reuse remain unfinished.

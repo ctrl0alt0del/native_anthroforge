@@ -9,6 +9,7 @@ AF_API int af_skin_support_targets(uint64_t reference,uint64_t current,const dou
     const int* selected,int count,double* positions,uint64_t cancel);
 AF_API int af_skin_support_weights(const double* masses,const int* counts,int sources,
     double* weights,int count);
+AF_API int af_skin_reference_replay(const double* reference,const double* replay,int count,double* error);
 #ifdef __cplusplus
 }
 #endif

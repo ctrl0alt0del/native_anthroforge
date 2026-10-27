@@ -14,7 +14,7 @@ def prepare(session, monkeypatch):
     source = next(iter(session.assets.values())).mesh
     entered, release = Event(), Event()
 
-    def compute(engine, document, resources, cancel):
+    def compute(engine, document, resources, cancel, options):
         entered.set()
         assert release.wait(5)
         data = skin_assets.create({}, dict(target=document.skin.topology_settings.target_quads))

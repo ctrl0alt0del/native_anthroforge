@@ -4,11 +4,35 @@
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
 - Status: envelope and topology pipelines connected; full skin workflow remains in progress,
   not merge-ready. Schema 7, immutable resources, shared commands and vertical inspector exist.
-  Durable deformation, shortcut fitting, OBJ export and release qualification remain unfinished.
+  Durable deformation, shortcut fitting and OBJ export are integrated. Production assembly,
+  portable packaging and full release qualification remain unfinished.
 - Last updated: 2026-10-27, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
 ## Outcome and acceptance
+
+### Resource/lifecycle qualification checkpoint, October 27
+
+Profiler ownership now includes native skin solver preparations and transient fitted meshes;
+cache accounting no longer omits these allocations. Five targeted resource/desktop/architecture
+checks pass. Five fitting cancellation, source supersession, undo/redo/checkpoint and architecture
+checks pass. A cancelled fit cannot publish; a source edit retries with current provenance.
+The checkpoint test compares saved skin content because the initiating authored request creates
+its own revision before dispatch. Single Active saved fits expose their authoring-only refit
+restriction through the shared application assessment.
+
+Hidden D3D11 rendering was rerun with anatomy hidden: the isolated fitted skin is visible,
+and cancellation restores accepted skin. No desktop input or visible window was used.
+Package staging accepts an explicit native-build directory and includes PyTetWild notices.
+Added a compact headless example and workflow guide; execution of the example is pending.
+
+Full development gate is running (native checks/style completed, pytest in progress).
+A separate default-settings Build Skin is running on the 96-muscle source in
+`build/skin-040/assembly`; its 154 accepted physical surfaces contain 206,665 vertices and
+394,862 triangles. Opening took 9.405 seconds. No successful skin build is claimed yet.
+Source SHA256: `308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
+The source is unchanged; all qualification outputs remain under ignored `build/skin-040`.
+Version stays 0.3.7 and the branch stays off main until qualification completes.
 
 ### Export and background fitting inspection checkpoint, October 27
 

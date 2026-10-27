@@ -37,3 +37,15 @@ def remove(session: Any, identity: str) -> None:
     session.replace_document(
         skin=replace(skin, fits=tuple(f for f in skin.fits if f.id != identity))
     )
+
+
+def refit_eligibility(session: Any, identity: str) -> dict[str, Any]:
+    from . import skin_fit_capture
+
+    try:
+        item = inspect(session, identity)
+        if item["report"]["settings"]["strategy"] != "SCALE_AWARE":
+            raise ValueError("Refit Single Active results through the authoring operation.")
+        return skin_fit_capture.describe(session, item["shortcut"])
+    except (ValueError, KeyError) as error:
+        return dict(available=False, reason=str(error), warnings=())

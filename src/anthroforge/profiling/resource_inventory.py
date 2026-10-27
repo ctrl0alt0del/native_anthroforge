@@ -14,6 +14,7 @@ from anthroforge.native.mesh import Mesh
 from anthroforge.native.path_collisions import CollisionCache
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
+from anthroforge.native.skin_deformation import Preparation as SkinPreparation
 from anthroforge.native.stacking import StackSession
 from anthroforge.native.tissue_preparation import Preparation
 from anthroforge.native.tissue_stacking import MaterialLease
@@ -62,6 +63,7 @@ RESOURCE_TYPES = (
     CollisionCache,
     StackSession,
     Preparation,
+    SkinPreparation,
     SkinAsset,
 )
 
@@ -155,6 +157,7 @@ def preview_owners(session, output):
         ("conversion", "path"),
         ("surface_preview", "mesh"),
         ("tissue_preview", "mesh"),
+        ("skin_fit_preview", "mesh"),
     ):
         preview = getattr(session, name)
         if preview.asset is not None:

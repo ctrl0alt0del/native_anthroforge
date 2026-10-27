@@ -73,6 +73,8 @@ class Preparation:
         value = definition(data, settings, self.folder.name)
         self.handle = int(engine.library.af_skin_deformation_prepare(c.byref(value), cancel))
         engine.check(not self.handle)
+        if engine.resource_observer is not None:
+            engine.resource_observer(self)
 
     @property
     def bytes(self) -> int:

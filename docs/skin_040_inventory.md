@@ -1,11 +1,11 @@
 # Skin migration inventory for 0.4.0
 
-Status: **release scope confirmed; source audit, not implemented or release-qualified**.
+Status: **release scope confirmed; implemented on `codex/skin-040`, qualification in progress**.
 
 **October 27 review:** the tables below describe the addon, including its bare-Fiber
 contributors. The confirmed standalone contract now excludes construction from physical
 draft/deformation sources, while retaining topology guidance. This intentional difference
-supersedes the earlier thin-tube experiment; its implementation remains pending. See the
+supersedes the earlier thin-tube experiment and is implemented on the task branch. See the
 [current specification](specification_040.md) and [task record](tasks/skin-040.md).
 
 The user confirmed the full existing workflow for 0.4.0, including fitting bones to
@@ -208,7 +208,9 @@ usable; the final specification must state its reader/writer rules explicitly.
 
 ## Required acceptance inventory
 
-These are future checks; none has been run as 0.4.0 acceptance.
+This is the required acceptance checklist, not a claim that every check has passed.
+The [task record](tasks/skin-040.md) records completed native parity, lifecycle, GUI and
+profiling evidence and the remaining production-assembly and portable-release checks.
 
 - Contributor capture: source/mirror identity, visibility independence, shared consumed
   Fibers, missing/failed tissue output, tissue base/final roles and partial anatomy.

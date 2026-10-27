@@ -16,6 +16,7 @@ from anthroforge.profiling.identity import build_identity
 
 ROOT = Path(__file__).resolve().parents[1]
 STAGE = ROOT / "build" / "package-input"
+NATIVE = Path(os.environ.get("AF_NATIVE_BUILD", ROOT / "build/dev")).resolve()
 DIST = (
     Path(os.environ.get("AF_PACKAGE_OUTPUT", ROOT / "dist" / __version__)).resolve()
     / "AnthroForge.dist"
@@ -23,6 +24,7 @@ DIST = (
 PACKAGES = (
     "numpy",
     "pyinstantmeshes",
+    "pytetwild",
     "Pillow",
     "PySide6",
     "PySide6_Essentials",
@@ -106,9 +108,9 @@ def copy_runtime(runtime):
     (runtime / "bin").mkdir(parents=True, exist_ok=True)
     shutil.copy2(STAGE / "build.json", runtime / "build.json")
     for name in ("af_native.dll", "af_viewport.dll", "af_profiler.dll", "libomp.dll"):
-        shutil.copy2(ROOT / "build/dev/bin" / name, runtime / "bin" / name)
+        shutil.copy2(NATIVE / "bin" / name, runtime / "bin" / name)
     shutil.copytree(
-        ROOT / "build/dev/qml",
+        NATIVE / "qml",
         runtime / "qml",
         dirs_exist_ok=True,
         ignore=shutil.ignore_patterns("*.pdb", "*.lib", "*.exp"),

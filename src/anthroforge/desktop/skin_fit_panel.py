@@ -2,7 +2,7 @@
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
-from anthroforge.application import skin_fit_capture, skin_fit_preview, skin_fit_results
+from anthroforge.application import skin_fit_preview, skin_fit_results
 
 from .record_model import RecordModel
 from .values import qml
@@ -47,9 +47,7 @@ class SkinFitPanel(QObject):
 
     @Property("QVariantMap", notify=changed)
     def refitEligibility(self):
-        return qml(
-            skin_fit_capture.describe(self.controller.session, self.details.get("shortcut", ""))
-        )
+        return qml(skin_fit_results.refit_eligibility(self.controller.session, self.selected))
 
     @Slot(str)
     def select(self, identity):

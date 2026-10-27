@@ -1,5 +1,9 @@
 # Local authoring API, 0.3.5
 
+The [skin workflow](skin_workflow.md) and `examples/skin.json` demonstrate the 0.4.0
+development-branch build, fitting, independent playback and OBJ operations. Release
+qualification remains in progress; these are not claims about the installed 0.3.7 build.
+
 The 0.3.3 performance work adds no public commands. The
 [addon functionality audit](addon_functionality_audit.md) distinguishes supported
 operations from missing convenience/lifecycle operations; known migrated-assembly

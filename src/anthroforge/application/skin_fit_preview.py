@@ -55,7 +55,7 @@ def make_job(session: Any, state: Any, item: Any, value: float) -> Job:
 
 def configure_job(session: Any, state: Any, item: Any, job: Job) -> Job:
     mesh = session.assets[item.reference].mesh
-    job.workload = lambda _: Workload(candidates=mesh.counts[0], triangles=mesh.counts[1])
+    job.workload = lambda _: Workload(candidates=mesh.counts[0], triangles=mesh.counts[3])
     job.cancel = NativeCancellation(session.engine)
     job.cleanup = partial(completed, state, job)
     return job

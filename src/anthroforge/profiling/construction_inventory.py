@@ -9,6 +9,7 @@ from anthroforge.native.inspection import Comparison
 from anthroforge.native.path_collisions import CollisionCache
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
+from anthroforge.native.skin_deformation import Preparation as SkinPreparation
 from anthroforge.native.stacking import StackSession
 from anthroforge.native.strokes import Stroke
 from anthroforge.native.tissue_preparation import Preparation
@@ -28,6 +29,7 @@ def inventories(profiler, owners):
         stacking_sessions=dict(typed_inventory(owners, StackSession), upper_bound=True),
         tissue_preparations=typed_inventory(owners, Preparation),
         skin_buffers=typed_inventory(owners, SkinAsset),
+        skin_preparations=typed_inventory(owners, SkinPreparation),
     )
 
 

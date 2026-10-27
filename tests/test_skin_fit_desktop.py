@@ -19,3 +19,18 @@ def test_shortcut_readiness_saved_fit_selection_and_preview(controller):
     session.wait()
     controller.refresh()
     assert panel.previewState["visible"]
+
+
+def test_authoring_only_result_explains_unavailable_desktop_refit(controller):
+    session = controller.session
+    identity = setup(session)
+    session.command(
+        "skin.fit.authoring",
+        shortcut=identity,
+        settings=dict(minimum=0, maximum=0.2, bones=1, samples=5, strategy="SINGLE_ACTIVE"),
+    )
+    session.wait()
+    panel = controller.skin_panel.fits
+    panel.select(session.document.skin.fits[-1].id)
+    assert not panel.refitEligibility["available"]
+    assert "authoring" in panel.refitEligibility["reason"]

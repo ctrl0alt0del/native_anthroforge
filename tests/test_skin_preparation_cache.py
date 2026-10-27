@@ -1,13 +1,16 @@
 """Reuse only fixed-reference preparation; cache admission never rejects a valid solve."""
 
 import numpy as np
+import pytest
 
 from anthroforge.native import skin_deformation
 from tests.test_skin_reference import build, topology
 
 
-def test_reference_preparation_reused_and_independent_of_target_pose(session):
+@pytest.mark.parametrize("mode", ["LE", "FAST"])
+def test_reference_preparation_reused_and_independent_of_target_pose(session, mode):
     topology(session)
+    session.command("skin.configure", section="deformation_settings", values={"method": mode})
     skin = build(session)
     ref = session.resources.skin[skin.reference]
     settings = skin.deformation_settings

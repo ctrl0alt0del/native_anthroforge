@@ -5,7 +5,9 @@ from dataclasses import asdict
 from PySide6.QtCore import Property, QObject, Signal
 
 from . import skin_contributor
+from .skin_export import SkinExport
 from .skin_fit_panel import SkinFitPanel
+from .values import qml
 
 
 class SkinPanel(QObject):
@@ -18,6 +20,7 @@ class SkinPanel(QObject):
         self.display = None
         self.values = {}
         self.fitting = SkinFitPanel(controller)
+        self.exporting = SkinExport(controller)
         controller.changed.connect(self.refresh)
         controller.selectionChanged.connect(self.refresh)
         self.unsubscribe = controller.session.skin_status.subscribe(self.changed.emit)
@@ -42,11 +45,15 @@ class SkinPanel(QObject):
 
     @Property(dict, notify=changed)
     def readiness(self):
-        return self.controller.session.skin_status.describe()["operations"]
+        return qml(self.controller.session.skin_status.describe()["operations"])
 
     @Property(QObject, constant=True)
     def fits(self):
         return self.fitting
+
+    @Property(QObject, constant=True)
+    def exporter(self):
+        return self.exporting
 
 
 def context(controller, session):

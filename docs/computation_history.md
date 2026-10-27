@@ -3351,3 +3351,10 @@ ready. It never invokes anatomical evaluation, changes document revisions or sto
 intermediates in the document asset catalogue. Source edits mark the snapshot stale; removing
 the original skin does not invalidate independent playback. Public API/undo/persistence and
 desktop adapter tests pass. No interpolation/objective change accompanies this integration.
+
+Skin OBJ export freezes authored inputs and accepted resources at request time. The explicit
+update policy runs existing evaluation/build/deformation operations in a worker-owned isolated
+session; accepted export serializes the already completed skin. Neither policy changes live
+anatomy or topology algorithms. Canonical polygons, metre coordinates and application axes
+are written in bounded chunks, with cancellation and atomic destination replacement. Tests
+cover fixed revision, quad preservation, pending Manual source motion and failed-write cleanup.

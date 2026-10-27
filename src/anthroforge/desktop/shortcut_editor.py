@@ -52,7 +52,7 @@ class ShortcutEditor(QObject):
     def fitEligibility(self):
         from anthroforge.application.skin_fit_capture import describe
 
-        return describe(self.panel.controller.session, self.key)
+        return qml(describe(self.panel.controller.session, self.key))
 
     @Slot("QVariantMap")
     def fit(self, settings):

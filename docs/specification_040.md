@@ -100,7 +100,7 @@ usable deformable skin. If a later stage fails, retain valid intermediate result
 a retry without unnecessarily rebuilding completed stages. Existing output remains protected.
 Use existing painting, numerical controls, Activity and Issues. Transient status never shifts fields.
 
-### Shared skin status (confirmed, not yet implemented)
+### Shared skin status (implemented on feature branch; qualification in progress)
 
 Implement an application-owned, Qt-independent **SkinStatusProvider** for 0.4.0. It exposes
 readiness per operation (including update, fitting and export), blocking reasons, advisory

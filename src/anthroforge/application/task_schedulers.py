@@ -237,11 +237,19 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "image_decode": ImageTaskScheduler(),
         "project_open": OpenProjectTaskScheduler(),
         "project_save": SaveProjectTaskScheduler(),
+        **export_schedulers(),
         "construction": ConstructionTaskScheduler(),
         **shortcut_schedulers(),
         **construction_schedulers(),
         "control_pose": ControlPoseTaskScheduler(),
         **inspection_schedulers(),
+    }
+
+
+def export_schedulers() -> dict[str, TaskScheduler]:
+    return {
+        "skin_export": SaveProjectTaskScheduler(),
+        "skin_export_update": SkinTopologyTaskScheduler(),
     }
 
 

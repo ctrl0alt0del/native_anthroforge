@@ -1,5 +1,7 @@
 """Complete build publishes usable intermediates and protects accepted replacements."""
 
+import pytest
+
 from anthroforge.application import (
     skin_evaluation,
     skin_reference_evaluation,
@@ -65,3 +67,18 @@ def test_complete_build_initializes_reference_in_one_undo(session, monkeypatch):
     session.command("redo")
     session.wait()
     assert session.document.skin == complete
+
+
+def test_pending_topology_is_not_reused_after_source_change(session, monkeypatch):
+    stages(session, monkeypatch)
+    build(session)
+    with monkeypatch.context() as patch:
+        patch.setattr(skin_reference_evaluation, "proxy", fail_proxy)
+        failed_build(session)
+    bone = session.document.entities[0].id
+    session.command("scp.transform", entity=bone, values=[0, 0.1, 0, 0, 0, 0, 1, 1, 1])
+    session.wait()
+    status = session.skin_status.snapshot().operations["reference"]
+    assert not status.available and "Inputs changed" in status.reason
+    with pytest.raises(ValueError, match="Inputs changed"):
+        session.command("skin.reference.build")

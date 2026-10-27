@@ -10,6 +10,23 @@
 
 ## Outcome and acceptance
 
+### Export and background fitting inspection checkpoint, October 27
+
+OBJ export now captures one immutable revision and retained resources, preserves canonical
+metres/application axes and quad connectivity, and atomically replaces the destination.
+An explicit update policy evaluates a worker-owned isolated document; later live edits cannot
+change its captured inputs. No numerical algorithm changed. Headless callers must supply the
+policy; the Skin UI offers accepted versus update/rebuild for pending/stale output.
+Six export/architecture checks pass, including pending Manual motion and cancellation cleanup.
+
+Offscreen fit controls complete their workflow with no QML warnings; hidden D3D11 rendering
+independently verifies displayed fitted-geometry handles and cancellation back to accepted
+skin. Controls-only offscreen screenshots have no 3D pixels and are not geometry evidence.
+The hidden-GPU cube is inspected; anatomical qualification remains. Nine FAST/LE preparation
+reuse, retained-topology retry and architecture checks pass, including changed-source rejection.
+Configured mypy passes 513 files; Ruff/format and function limits pass. Full gate, larger
+anatomy/profiler evidence and portable packaging remain pending; version stays 0.3.7.
+
 ### Fitted-result integration checkpoint, October 27
 
 Public fit jobs now use dispatch captures, complete source/shortcut-definition validation,

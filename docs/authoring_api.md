@@ -1088,3 +1088,22 @@ updates positions while preserving connectivity and the reference's captured tis
 finished/cropped is the default and both sides contribute. Main `skin.build` includes reference
 preparation. Failed replacement retains old output and pending new topology for retry.
 Wider status-provider migration is deferred to the next version after 0.4.0.
+
+`skin.fit(shortcut, settings)` queues isolated sampling and publishes one independent
+result with coherent undo. Settings require `minimum`/`maximum`; optional `bones=4`,
+`samples=9`, `smoothing=1.0` retain addon defaults. Samples must be odd, 5–33; bones 1–64.
+Public strategy is `SCALE_AWARE`; `skin.fit.authoring` additionally permits `SINGLE_ACTIVE`.
+`skin.fit.eligibility(identity)` returns the shared scalar/readiness assessment.
+`skin.fit.inspect(identity)` includes source provenance, stale state and per-sample errors.
+`skin.fit.preview(identity,value)`, `.preview.status()` and `.preview.cancel()` use stored
+linear TRS channels without evaluating anatomy, modifying history or blocking saving.
+`skin.fit.remove(identity)` removes the independent result through normal undo.
+
+`skin.export(path, policy, wait=False)` exports final skin only. Policy is required:
+`accepted` captures the current accepted skin; `update` evaluates a frozen input revision
+and updates/rebuilds skin in an isolated session; `cancel` writes nothing. Only OBJ is
+currently supported, with canonical metres/application axes and original polygons/quads.
+Atomic replacement protects an existing destination on error/cancellation. No original
+anatomy, debug objects, bones or weights are included. A missing final skin blocks export.
+The result identifies job, path, captured revision and state. These feature-branch
+operations still require complete 0.4.0 release qualification.

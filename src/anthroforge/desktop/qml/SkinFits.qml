@@ -49,5 +49,17 @@ ColumnLayout {
             UiButton { text: "Delete fit"; onClicked: section.adapter.remove() }
         }
         Label { text: "Saved snapshot; playback does not recalculate anatomy."; color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true }
+        UiSection {
+            title: "Fit accuracy"; Layout.fillWidth: true
+            Label { text: "Error at sampled values, relative to the captured skin. Held-out samples were not used to fit bones."; color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true }
+            Repeater {
+                model: section.selected.report?.rows || []
+                UiDetail {
+                    required property var modelData
+                    label: Number(modelData.value).toPrecision(4)+(modelData.training ? " · Training" : " · Held-out")
+                    value: "95% error: "+Number(modelData.p95_percent_height).toPrecision(3)+"% of height"
+                }
+            }
+        }
     }
 }

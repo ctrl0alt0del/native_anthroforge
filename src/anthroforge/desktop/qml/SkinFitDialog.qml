@@ -24,12 +24,12 @@ UiDialog {
         spacing: Theme.gap
         Label { text: "Sample this shortcut's range and create an independent bone-driven skin."; wrapMode: Text.Wrap; color: Theme.muted; Layout.fillWidth: true }
         RowLayout {
-            Label { text: "Minimum"; color: Theme.text; Layout.fillWidth: true }
-            UiQuantityField { objectName: "skinFitMinimum"; Layout.preferredWidth: 130; dimension: dialog.adapter.fitEligibility.dimension || "SCALAR"; canonicalValue: dialog.minimum; onCanonicalEdited: value => dialog.minimum=value }
+            Label { text: "Minimum"+(lower.unitLabel ? " · "+lower.unitLabel : ""); color: Theme.text; Layout.fillWidth: true }
+            UiQuantityField { id: lower; objectName: "skinFitMinimum"; Layout.preferredWidth: 130; dimension: dialog.adapter.fitEligibility.dimension || "SCALAR"; canonicalValue: dialog.minimum; onCanonicalEdited: value => dialog.minimum=value }
         }
         RowLayout {
-            Label { text: "Maximum"; color: Theme.text; Layout.fillWidth: true }
-            UiQuantityField { objectName: "skinFitMaximum"; Layout.preferredWidth: 130; dimension: dialog.adapter.fitEligibility.dimension || "SCALAR"; canonicalValue: dialog.maximum; onCanonicalEdited: value => dialog.maximum=value }
+            Label { text: "Maximum"+(upper.unitLabel ? " · "+upper.unitLabel : ""); color: Theme.text; Layout.fillWidth: true }
+            UiQuantityField { id: upper; objectName: "skinFitMaximum"; Layout.preferredWidth: 130; dimension: dialog.adapter.fitEligibility.dimension || "SCALAR"; canonicalValue: dialog.maximum; onCanonicalEdited: value => dialog.maximum=value }
         }
         NumericSetting { label: "Bones"; value: dialog.bones; minimum: 1; maximum: 64; decimals: 0; step: 1; onEdited: value => dialog.bones=value }
         NumericSetting { label: "Samples"; value: dialog.samples; minimum: 5; maximum: 33; decimals: 0; step: 2; hint: "Odd sample count; alternating samples check the fitted result."; onEdited: value => dialog.samples=value }

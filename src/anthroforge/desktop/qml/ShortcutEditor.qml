@@ -52,7 +52,7 @@ ScrollView {
     }
     ShortcutPolicies { Layout.fillWidth: true; adapter: editor.adapter.policies }
     UiButton {
-        objectName: "shortcutFitBones"; text: "Fit to bones…"; Layout.fillWidth: true
+        objectName: "shortcutFitBones"; text: editor.adapter.fitEligibility.warnings?.length ? "⚠ Fit to bones…" : "Fit to bones…"; Layout.fillWidth: true
         enabled: editor.adapter.fitEligibility.available
         hint: editor.adapter.fitEligibility.reason || (editor.adapter.fitEligibility.warnings || []).join("\n") || "Create a bone-driven skin for this shortcut's range."
         onClicked: fitting.initialize()

@@ -17,7 +17,7 @@ install_system_packages() {
     fi
     "${elevate[@]}" apt-get update
     "${elevate[@]}" env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        build-essential ca-certificates git python3-pip \
+        build-essential ca-certificates git python3-pip libomp-dev \
         libegl1 libgl1 libopengl0 libxkbcommon0 libdbus-1-3
 }
 

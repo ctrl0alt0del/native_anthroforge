@@ -19,6 +19,7 @@ from .skin_results import IncompleteBuild
 def build(session: Any, stage: str = "construction") -> str:
     if stage not in skin_stages.POLICIES:
         raise ValueError("Unknown skin build stage.")
+    session.skin_status.require("build" if stage == "construction" else stage)
     return authored_jobs.begin(session, partial(enqueue, session, stage))
 
 

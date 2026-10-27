@@ -18,6 +18,7 @@ class SkinPanel(QObject):
         self.values = {}
         controller.changed.connect(self.refresh)
         controller.selectionChanged.connect(self.refresh)
+        self.unsubscribe = controller.session.skin_status.subscribe(self.changed.emit)
         self.refresh()
 
     def refresh(self):
@@ -36,6 +37,10 @@ class SkinPanel(QObject):
     @Property(dict, notify=changed)
     def state(self):
         return self.values
+
+    @Property(dict, notify=changed)
+    def readiness(self):
+        return self.controller.session.skin_status.describe()["operations"]
 
 
 def context(controller, session):

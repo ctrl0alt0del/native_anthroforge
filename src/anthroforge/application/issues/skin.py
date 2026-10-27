@@ -26,7 +26,8 @@ def source(document: Any, scope: str) -> Any:
     return (
         str(document.id),
         skin.construction_stale,
-        tuple((name, getattr(skin, name).data, getattr(skin, name).pending) for name in STAGES),
+        skin.build_error,
+        tuple((name, getattr(skin, name)) for name in STAGES),
     )
 
 
@@ -50,7 +51,7 @@ def provider(session: Any) -> Provider:
 
 def check(context: Any, scope: str, cancel: Any) -> tuple[Issue, ...]:
     document, assets = context
-    rows = []
+    rows = failure_findings(document)
     for name in STAGES:
         if cancel.is_set():
             break
@@ -59,6 +60,17 @@ def check(context: Any, scope: str, cancel: Any) -> tuple[Issue, ...]:
         if data:
             rows.extend(stage_findings(document, name, stage, json.loads(data.metadata)))
     return tuple(rows)
+
+
+def failure_findings(document: Any) -> list[Issue]:
+    rows = []
+    for name in STAGES:
+        stage = getattr(document.skin, name)
+        if stage.error:
+            rows.append(finding(document, name, "SKIN_STAGE_FAILED", stage.error, {}))
+    if document.skin.build_error:
+        rows.append(finding(document, "build", "SKIN_BUILD_FAILED", document.skin.build_error, {}))
+    return rows
 
 
 def finding(document: Any, name: str, code: str, text: str, details: Any) -> Issue:

@@ -1,5 +1,6 @@
 add_subdirectory(boolean)
 add_subdirectory(blender)
+include(skin_fit.cmake)
 set(SKIN_DEFORMATION_SOURCES src/skin_deformation.cpp src/skin_deformation_api.cpp src/skin_deformation_samples.cpp src/skin_contact.cpp src/skin_support.cpp)
 set(SKIN_STITCH_SOURCES src/skin_stitch_boundary.cpp src/skin_stitch_zipper.cpp src/skin_stitch_centered.cpp
     src/skin_stitch_weld.cpp src/skin_stitch_quality.cpp src/skin_stitch_transition.cpp src/skin_stitch_api.cpp
@@ -73,7 +74,11 @@ add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_corners_detect.c
     vendor/curve_fit_nd/intern/generic_heap.c)
 set_target_properties(af_curve_fit PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(af_native PRIVATE af_curve_fit af_boolean af_bmesh)
+target_link_libraries(af_native PRIVATE af_curve_fit af_boolean af_bmesh af_skin_fit)
+if(AF_OPENMP_RUNTIME)
+    add_custom_command(TARGET af_native POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${AF_OPENMP_RUNTIME}" "$<TARGET_FILE_DIR:af_native>")
+endif()
 target_include_directories(af_native PUBLIC include)
 target_include_directories(af_native PRIVATE migration/smoothing/include)
 target_include_directories(af_native SYSTEM PRIVATE vendor)

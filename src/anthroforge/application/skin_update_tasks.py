@@ -15,6 +15,11 @@ from .assets import Asset
 from .construction_policy import revisions
 
 
+def evaluate(session: Any) -> str:
+    session.skin_status.require("update")
+    return request(session)
+
+
 def inputs(resources: Any, document: Any) -> set[Port]:
     reference = resources.skin.get(document.skin.reference)
     policy = json.loads(reference.metadata)["tissue_surface"] if reference else "FINISHED"

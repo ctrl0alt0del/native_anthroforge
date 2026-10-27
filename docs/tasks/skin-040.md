@@ -10,6 +10,25 @@
 
 ## Outcome and acceptance
 
+### Shared readiness and fitting port checkpoint, October 27
+
+SkinStatusProvider now drives the API and Skin controls, with warning-only stale settings,
+blocking missing/incompatible references, notification subscriptions and read-only inspection.
+Focused status/reference/offscreen-contributor/architecture tests passed (10 tests); configured
+mypy passed (502 files). Later changes additionally guard malformed reference metadata and
+publish failed skin stages in Issues; these need the next regression run.
+
+The maintained Dem Bones 1.2.1 Scale Aware and Single Active kernels are copied with source
+hashes and notices. Native fitting, batch prediction and quality-validation boundaries compile
+as an isolated OpenMP object target; only that target enables OpenMP. Original numerical
+settings are retained; cancellation replaces the old arbitrary whole-job timeout as approved.
+Original-addon DLL fixtures were captured. Fitting parity, full-library link, GUI/API fitting,
+actual channel playback and package qualification are still pending. This is not public fitting.
+
+Default-resolution combined-build tests are still running, now in the fifth real tetrahedral
+proxy build. A read-only stack capture confirms backend computation rather than a coordinator
+deadlock. Their final result has not been claimed. All work remains off main and at 0.3.7.
+
 ### Reference/update integration checkpoint, October 27
 
 Persistent references now own source mesh leases, sample identities, proxy/embedding arrays,

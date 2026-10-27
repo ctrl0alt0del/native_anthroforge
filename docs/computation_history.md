@@ -3311,3 +3311,16 @@ stages; failed replacements retain their successful topology separately for an e
 No numerical repair, contributor substitution or automatic retopology was introduced.
 Focused tests cover real proxy initialization, persistence, undo/retry and rigid translation.
 Full assembly/performance/desktop qualification and prepared-factor reuse remain unfinished.
+
+
+### Skin fitting port checkpoint — 2026-10-27 (qualification pending)
+
+The maintained addon native/bone_fitting kernel and Dem Bones 1.2.1 are now isolated in the
+existing C++ library. Source hashes and adapters are recorded in native/migration/bone_fitting.
+Scale Aware bounds, iterations, maximum influences and four-thread policy are preserved.
+The approved execution-policy change replaces the old 600-second failure with cooperative
+coordinator cancellation. Native batch prediction retains the donor SLERP convention; this
+is distinct from actual channel-linear playback, which is not yet integrated. Weight/transform
+validation and error statistics move from addon Python into C++ without changed thresholds.
+Original DLL fixtures captured; object compilation passes. Numerical parity, actual playback,
+representative anatomy and performance remain unqualified. No release or speed claim.

@@ -58,12 +58,14 @@ class Session:
     def initialize_runtime(self, profiler: RuntimeProfiler | None) -> None:
         from .issues.repairs import register
         from .issues.system import IssueSystem
+        from .skin_status import SkinStatusProvider
 
         self.owns_profiler = profiler is None
         self.profiler = profiler if profiler is not None else RuntimeProfiler()
         self.profiler.resources.sessions.add(self)
         self.initialize_scheduler()
         self.issues = IssueSystem(self)
+        self.skin_status = SkinStatusProvider(self)
         register(self)
 
     @property
@@ -79,6 +81,8 @@ class Session:
         self.changes.record(self._document, value)
         causes.document(self, self._document, value)
         self._document = value
+        if hasattr(self, "skin_status"):
+            self.skin_status.changed()
 
     def initialize_scheduler(self) -> None:
         from .tissue_inspection import Inspection
@@ -288,7 +292,7 @@ class Session:
             "revision": self.document.revision,
             "metres_per_unit": 1.0,
             "entity_count": len(self.document.entities),
-            "skin_available": False,
+            "skin_available": self.skin_status.snapshot().operations["export"].available,
             "entities": [asdict(item) for item in self.document.entities],
             "controls": [asdict(item) for item in self.document.controls],
             "objects": object_descriptions(self.document),

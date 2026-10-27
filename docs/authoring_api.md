@@ -1076,11 +1076,15 @@ guide selection. Closed Fibers use the loop-guide workflow, not the open FLOW fl
 Nested budget conflicts are shown without preventing users from editing their settings;
 topology generation must validate the complete budget tree before dispatch.
 
-**Planned shared readiness, not an available API yet:** SkinStatusProvider will expose
+**Feature branch implementation; full 0.4.0 qualification pending:** SkinStatusProvider exposes
 operation-specific eligibility, blocking reasons, warnings and assessed skin/reference
-revisions. Desktop subscriptions and headless operations will share these policies.
+revisions through `skin.status`. Desktop subscriptions and headless operations share these policies.
 Unapplied build settings allow fitting with a warning when the existing reference is
 usable; missing skin or incompatible material/vertex identities prevents fitting. Every
 sample must still validate. No status read initiates computation or edits document state.
-No public status command name is committed by this design note. Wider status-provider
-migration is deferred to the next version after 0.4.0.
+`skin.reference.build` prepares a durable reference from accepted topology; `skin.evaluate`
+updates positions while preserving connectivity and the reference's captured tissue choice.
+`preferences.set(skin_tissue_surface="FINISHED" | "INFLATED_REST")` affects new references;
+finished/cropped is the default and both sides contribute. Main `skin.build` includes reference
+preparation. Failed replacement retains old output and pending new topology for retry.
+Wider status-provider migration is deferred to the next version after 0.4.0.

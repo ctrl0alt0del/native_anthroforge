@@ -4,6 +4,7 @@ import json
 from dataclasses import replace
 
 import numpy as np
+import pytest
 
 from anthroforge.application import skin_assets, skin_reference_evaluation, storage
 from anthroforge.core.skin import SkinStage
@@ -75,7 +76,6 @@ def test_reference_replacement_failure_keeps_accepted_output(session, monkeypatc
 
 
 def test_missing_topology_blocks_reference_preparation(session):
-    key = session.command("skin.reference.build")
-    session.wait()
-    assert session.scheduler.registry.by_id[key].state == "failed"
+    with pytest.raises(ValueError, match="topology"):
+        session.command("skin.reference.build")
     assert not session.document.skin.reference

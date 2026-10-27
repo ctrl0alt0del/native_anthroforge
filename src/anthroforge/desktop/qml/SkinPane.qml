@@ -5,12 +5,13 @@ import QtQuick.Layouts
 UiScrollView {
     id: pane
     readonly property var state: workspace.skinPanel.state
+    readonly property var readiness: workspace.skinPanel.readiness
     contentWidth: availableWidth
     function change(section,key,value) { const values={}; values[key]=value; workspace.run("skin.configure",{section:section,values:values}); }
     ColumnLayout {
         width: pane.availableWidth; spacing: Theme.gap
         Label { text: "Skin"; color: Theme.text; font.pixelSize:16; font.bold:true }
-        UiButton { objectName:"skinBuild"; text:"Build Skin"; Layout.fillWidth:true; onClicked:workspace.run("skin.build",{}) }
+        UiButton { objectName:"skinBuild"; text:"Build Skin"; Layout.fillWidth:true; enabled:pane.readiness.build.available; hint:pane.readiness.build.reason; onClicked:workspace.run("skin.build",{}) }
         UiCombo {
             objectName:"skinDisplay"; Layout.fillWidth:true; textRole:"label"; valueRole:"id"
             model:[{id:"AUTO",label:"Show latest skin"},{id:"ENVELOPE",label:"Show envelope"},{id:"TOPOLOGY",label:"Show topology"},{id:"FINAL",label:"Show final skin"},{id:"NONE",label:"Hide skin"}]
@@ -39,13 +40,18 @@ UiScrollView {
         }
         SkinContributorSettings { contributor:pane.state.contributor || ({}) }
         SkinTopologySettings { settings:pane.state.topology_settings; onEdited:(key,value)=>pane.change("topology_settings",key,value) }
-        UiButton { objectName:"skinBuildTopology"; text:"Rebuild topology"; Layout.fillWidth:true; enabled:!!pane.state.envelope?.asset; onClicked:workspace.run("skin.topology.build",{}) }
+        UiButton { objectName:"skinBuildTopology"; text:"Rebuild topology"; Layout.fillWidth:true; enabled:pane.readiness.topology.available; hint:pane.readiness.topology.reason; onClicked:workspace.run("skin.topology.build",{}) }
         SkinDeformationSettings { settings:pane.state.deformation_settings; onEdited:(key,value)=>pane.change("deformation_settings",key,value) }
         UiButton {
             objectName:"skinBuildReference"; text:"Rebuild deformation reference"; Layout.fillWidth:true
-            enabled:!!pane.state.topology?.asset || !!pane.state.pending_topology?.asset
-            hint:enabled ? "Initialize skin deformation from the current anatomy and topology." : "Build skin topology first."
+            enabled:pane.readiness.reference.available
+            hint:pane.readiness.reference.reason || "Initialize skin deformation from the current anatomy and topology."
             onClicked:workspace.run("skin.reference.build",{})
+        }
+        UiButton {
+            objectName:"skinUpdate"; text:"Update skin"; Layout.fillWidth:true
+            enabled:pane.readiness.update.available; hint:pane.readiness.update.reason
+            onClicked:workspace.run("skin.evaluate",{})
         }
     }
 }

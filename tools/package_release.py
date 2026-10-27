@@ -105,7 +105,7 @@ def copy_runtime(runtime):
     copy_topology_runtime(runtime)
     (runtime / "bin").mkdir(parents=True, exist_ok=True)
     shutil.copy2(STAGE / "build.json", runtime / "build.json")
-    for name in ("af_native.dll", "af_viewport.dll", "af_profiler.dll"):
+    for name in ("af_native.dll", "af_viewport.dll", "af_profiler.dll", "libomp.dll"):
         shutil.copy2(ROOT / "build/dev/bin" / name, runtime / "bin" / name)
     shutil.copytree(
         ROOT / "build/dev/qml",

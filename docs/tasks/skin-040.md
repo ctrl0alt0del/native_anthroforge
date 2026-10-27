@@ -2,14 +2,39 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: skin parallelism/lifetime, tile assembly and coarse-field source changes complete.
-  All builds/tests and
-  runtime qualification paused while the user is playing. Existing qualification below
-  predates these fixes. Keep off main until the changes and rebuilt package are qualified.
+- Status: user resumed testing on October 28. Building and checking the execution/lifetime,
+  stitching and coarse-field changes; addon parity and controlled time/memory comparison
+  in progress. Keep off main until the changes and rebuilt package are qualified.
 - Last updated: 2026-10-28, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
 ## Outcome and acceptance
+
+### Optimization qualification resumed, October 28
+
+User finished playing and explicitly authorized tests, addon comparison, generation timing
+and peak-memory measurement. This supersedes the testing holds below. Use serial isolated
+processes with fixed inputs/resolution/budget and counterbalanced before/after order.
+Baseline is the canonical package's native DLL, stamped `13e53b5` (native sources unchanged
+through pre-optimization `7ca3b69`), preserved under
+`build/skin-040/optimization-qualification/baseline`. Candidate starts at `43a2824`.
+Retain the recorded DLL hashes, source capture hashes, OS peak working set/commit, stage
+times and exact array comparisons. The saved two-tissue forearm capture is the production
+case; cube/gap/contact controls and coarse-field fixtures qualify parity separately.
+No source projects or the installed executable are changed by these tests.
+
+First resumed evidence: native build and all six CTests pass (including one/four-thread
+buffer oracles); 40 focused Python tests pass. All 12 coarse-field comparisons stay within
+the maintained 1e-12 source tolerance. Cube/gap/contact envelope comparisons have exactly
+equal vertex arrays, connectivity and all six source binding arrays. Full development gate
+is running; these are not yet production performance results.
+
+Added `tools/skin_optimization_benchmark.py`: fresh-process fixed capture, staged generation
+times, Windows OS peak working set and peak commit, native/capture hashes, exact output hashes,
+optional saved arrays and a separate optional profiler capture. No profiler during timed trials.
+Its native/addon cube smoke checks agree exactly; setup/export are excluded from stage sums,
+and OS peaks are captured before output hashing/saving. Test-only addon adapter fixes the
+same existing budget argument; no donor numerical implementation is modified.
 
 ### Tile assembly and coarse fields, October 28 — source work, validation paused
 

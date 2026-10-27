@@ -3,8 +3,8 @@
 Status: **Confirmed; implementation in progress, not release-qualified**.
 
 October 27 review: the contributor, fitting-readiness and status-provider decisions below
-are confirmed but not yet implemented. Runtime work remains paused pending the final
-consolidated review; existing feature-branch behavior is not evidence of these changes.
+are confirmed and implementation has resumed following final user review. Existing
+feature-branch behavior is not evidence that these changes are already complete.
 
 ## Authority and scope
 

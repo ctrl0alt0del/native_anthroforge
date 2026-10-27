@@ -10,11 +10,14 @@
 
 ## Outcome and acceptance
 
-### October 27 grilling decisions — documentation only, implementation still paused
+### October 27 grilling decisions — confirmed; implementation resumed
 
 The resumed interview settled Q1-Q9; the user explicitly requested documenting the
 status-provider pattern. The current specification/plan now incorporate these decisions.
-Do not resume runtime work until the user confirms the consolidated understanding.
+The user explicitly confirmed the consolidated understanding and requested implementation.
+Runtime work resumes on this branch; further algorithm or policy changes still require
+discussion and an explicit answer before implementation. First increment separates physical
+SCP/VCP contributors from construction guides at capture, dependency and UI boundaries.
 
 - Q1/Q4: draft skin uses SCP/VCP surfaces only, not bare Fibers or other construction.
   Draft generation and topology generation are distinct stages. Preserve the addon's
@@ -43,7 +46,7 @@ implementation resumes. No new geometry result, code change, version or release 
 
 ### Paused for remaining-work review, October 27
 
-Historical pause request; the interview above has occurred, but runtime remains paused.
+Historical pause request; the interview and explicit resume above supersede this pause.
 
 The user is stopping for the night. Do not resume implementation automatically. The
 next step is a grilling session about the remaining 0.4.0 work, including bare-Fiber
@@ -387,13 +390,12 @@ App version remains 0.3.7; writer now schema 7 with readers 4–7. Unrelated roo
 
 ## Next actions
 
-1. Obtain confirmation of the consolidated interview before resuming implementation.
-2. Apply the SCP/VCP-only physical-source policy while preserving independent topology
+1. Apply the SCP/VCP-only physical-source policy while preserving independent topology
    guides; remove superseded skin-radius controls and qualify the real anatomy cases.
-3. Complete durable reference/deformation, one-action Build Skin and SkinStatusProvider.
-4. Deliver shortcut-settings fitting controls, shared eligibility/warnings, isolated
+2. Complete durable reference/deformation, one-action Build Skin and SkinStatusProvider.
+3. Deliver shortcut-settings fitting controls, shared eligibility/warnings, isolated
    sampling, saved preview and OBJ through shared API and desktop.
-5. Complete lifecycle, profiler, geometry, background GUI and portable-release qualification.
+4. Complete lifecycle, profiler, geometry, background GUI and portable-release qualification.
    The wider 28-VCP envelope and full production assembly remain qualification work.
 
 All three initial questions are answered. No automatic minimal-bone search or

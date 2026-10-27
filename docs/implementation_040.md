@@ -38,7 +38,7 @@ compatible source motion invalidates deformation. Persist the reference, not pre
 
 ## October 27 review integration (confirmed; not yet implemented)
 
-Before resuming runtime work, finish the consolidated review. Remove physical Fiber
+The consolidated review is confirmed and runtime work is authorized. Remove physical Fiber
 contribution from shared draft/deformation input policies, not merely from a UI selector.
 Remove obsolete skin-radius controls from that workflow while preserving independent
 accepted path capture for topology guides and ordinary viewport Fiber display. Do not

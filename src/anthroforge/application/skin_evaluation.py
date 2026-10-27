@@ -14,10 +14,9 @@ TARGET_RESOLUTION = 220
 
 def evaluate(engine: Any, document: Any, resources: Any, cancel: int) -> ComputedStage:
     capture = skin_capture.capture(engine, document, resources, cancel)
-    budget = worker_memory.budget()
-    fields, scene = prepare(engine, document, capture, budget, cancel)
+    fields, scene = prepare(engine, document, capture, worker_memory.budget(), cancel)
     try:
-        result = scene.envelope(fields, budget, cancel)
+        result = scene.envelope(fields, worker_memory.budget(), cancel)
         bindings = scene.bind(result.mesh, cancel)
         data = skin_assets.create(
             binding_data(bindings, capture), metadata(capture, result, fields)

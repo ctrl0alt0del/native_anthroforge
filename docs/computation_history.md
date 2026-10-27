@@ -3217,3 +3217,19 @@ refinement; only inputs/preflight were evaluated for that larger case. Neither i
 completed skin output. Fixed-camera source previews and exact evidence are recorded in
 the skin task record. This qualifies the earlier performance explanation: the expensive
 gap response is not exclusive to added Fiber thickness. No production algorithm changed.
+
+### Correction: standalone-only envelope assembly rejection (October 27)
+
+The VCP experiment's failure was attributed too broadly to inherited gap refinement.
+Inspection after the user's challenge identified an added execution-policy restriction:
+the port subtracted all retained field/tile storage, then rejected an estimated mesh size
+at 256 bytes/vertex plus 192 bytes/triangle. The addon has no equivalent assembly limit.
+An identical small control with an 8 MiB field budget succeeds in the addon and fails in
+the old port, distinguishing this policy defect from geometric complexity or actual OOM.
+
+Removed the standalone aggregate and mesh-estimate cutoffs, preserving the original sparse
+field working budget, cancellation, numerical stages and genuine allocation errors. Refresh
+the working budget at reconstruction entry as the addon does. The corrected native build
+completes the same control; complete geometry and real tissue-case qualification is pending.
+This restores the previously approved execution policy; it does not relax gap constraints
+or introduce a new skin algorithm. Earlier failed anatomy runs are not addon parity evidence.

@@ -9,13 +9,8 @@ static int64_t vertex(Assembly& output,const V3& point) {
     const auto found=output.vertices.emplace(key,std::make_pair(point,next));
     return found.first->second.second;
 }
-static void budget(const Assembly& output,size_t vertices,size_t faces) {
-    // Includes map nodes, remapping, output points/faces and simultaneous tile buffers.
-    const uint64_t estimate=(output.vertices.size()+vertices)*256+(output.faces.size()+faces)*192;
-    if(estimate>output.budget) throw std::runtime_error("Skin mesh assembly exceeds worker memory budget.");
-}
 void append(Assembly& output,const TileMesh& tile,const std::array<int,3>& start) {
-    check_cancel(output.cancel); budget(output,tile.vertices.size()/3,tile.faces.size()/3);
+    check_cancel(output.cancel);
     std::vector<int64_t> remap; remap.reserve(tile.vertices.size()/3);
     for(size_t i=0;i<tile.vertices.size();i+=3) {
         const V3 p(double(tile.vertices[i])+start[0],double(tile.vertices[i+1])+start[1],double(tile.vertices[i+2])+start[2]);

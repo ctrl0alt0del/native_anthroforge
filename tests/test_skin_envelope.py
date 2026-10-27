@@ -86,6 +86,16 @@ def test_budget_failure_preserves_fields_and_source_queries():
     assert scene.envelope(fields).mesh.prepared
 
 
+def test_field_budget_does_not_reject_mesh_assembly_that_the_addon_completes():
+    _engine, fields, scene = prepared()
+    expected = scene.envelope(fields).mesh
+    # Original addon completes this exact control at an 8 MiB field budget.
+    actual = scene.envelope(fields, budget=8 * 1024**2).mesh
+    assert actual.prepared and actual.counts[3] == 23180
+    np.testing.assert_array_equal(actual.array(0), expected.array(0))
+    np.testing.assert_array_equal(actual.array(1), expected.array(1))
+
+
 def test_envelope_source_binding_has_material_support():
     _engine, fields, scene = prepared()
     mesh = scene.envelope(fields).mesh

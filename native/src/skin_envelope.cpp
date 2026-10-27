@@ -3,8 +3,8 @@
 #include "anthroforge/skin_gaps.h"
 
 namespace af::skin {
-static std::shared_ptr<Mesh> extract(Tiles& tiles,uint64_t budget,uint64_t cancel) {
-    Assembly assembly; assembly.budget=budget; assembly.cancel=cancel;
+static std::shared_ptr<Mesh> extract(Tiles& tiles,uint64_t cancel) {
+    Assembly assembly; assembly.cancel=cancel;
     std::vector<float> values(kernel::af_skin::SKIN_SAMPLES); std::array<int,3> start{};
     for(int i=0;i<int(tiles.surface_tiles.size());++i) {
         check_cancel(cancel); kernel::af_skin::copy_skin_tile(tiles,i,0,start.data(),values.data());
@@ -35,8 +35,8 @@ static void orient(Mesh& mesh) {
         std::swap(mesh.corners[i],mesh.corners[i+2]); mesh.triangles.row(i/3).reverseInPlace();
     }
 }
-std::shared_ptr<Mesh> extract_envelope(Tiles& tiles,uint64_t budget,double* diagnostics,uint64_t cancel) {
-    const auto raw=extract(tiles,budget,cancel); auto result=supported(*tiles.scene,*raw,diagnostics,cancel);
+std::shared_ptr<Mesh> extract_envelope(Tiles& tiles,double* diagnostics,uint64_t cancel) {
+    const auto raw=extract(tiles,cancel); auto result=supported(*tiles.scene,*raw,diagnostics,cancel);
     check_cancel(cancel);
     kernel::af_skin::finish_skin_tiles(tiles,result->vertices.data(),int(result->vertices.rows()),
         result->corners.data(),int(result->corners.size()/3),8);
@@ -47,12 +47,9 @@ static std::shared_ptr<Mesh> envelope(uint64_t fields,uint64_t source,uint64_t b
     if(!diagnostics) throw std::runtime_error("Missing skin diagnostic buffer.");
     std::fill(diagnostics,diagnostics+19,0.0);
     const auto input=get_fields(fields); SceneAccess access(source,cancel);
-    const uint64_t reserved=input->grid.count*40;
-    if(reserved>=budget) throw std::runtime_error("Skin fields exhaust worker memory budget.");
-    auto tiles=prepare_tiles(access.value,*input,budget-reserved,cancel);
-    const uint64_t storage=tiles->values.bytes()+kernel::af_skin::tile_auxiliary_bytes(*tiles);
-    if(storage>=budget-reserved) throw std::runtime_error("Skin tiles exhaust worker memory budget.");
-    return extract_envelope(*tiles,budget-reserved-storage,diagnostics,cancel);
+    // Like the addon, this budget governs sparse fields, not mesh/output allocation.
+    auto tiles=prepare_tiles(access.value,*input,budget,cancel);
+    return extract_envelope(*tiles,diagnostics,cancel);
 }
 }
 uint64_t af_skin_envelope_mesh(uint64_t fields,uint64_t scene,uint64_t budget,double* diagnostics,uint64_t cancel) {

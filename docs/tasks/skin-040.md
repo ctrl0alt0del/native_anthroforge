@@ -188,9 +188,32 @@ input arrays, identity/coverage/hash reports, source preflight values and fixed-
 The input hash for the focused case is
 `7545889f6bbd0ce344d0c60b23ae5b9f381cc7017171ea186e0b9f57f4a0936f`.
 
-This demonstrates gap-refinement cost can remain severe without bare-Fiber tubes. It does
-not establish a new algorithm or justify relaxing protected gaps. Any such change still
-requires the user's discussion/approval under the active migration constraint.
+**Correction after the user's challenge:** the fine-grid measurements are valid, but the
+assembly failure was triggered by an extra standalone-only estimate cutoff, not by a
+demonstrated addon failure or genuine OS allocation failure. The prior explanation
+incorrectly conflated these. Do not use this failed test to claim the addon cannot build
+the same scene. Gap refinement alone does not explain the policy discrepancy below.
+
+### Assembly execution-policy correction — qualification in progress
+
+Code inspection found the port subtracts coarse fields and tile storage from a single
+budget, then applies an additional 256-byte/vertex + 192-byte/triangle assembly estimate
+as a hard rejection. The addon passes its current working budget to sparse field storage
+and imposes no equivalent mesh-assembly ceiling. This is a missed part of the already
+approved execution-policy correction, not an authorized numerical departure.
+
+A discriminating experiment gives both implementations identical cube geometry/fields
+and an 8 MiB field budget: original addon succeeds with 11,703 vertices / 23,180 triangles;
+the prior standalone fails with the same assembly error as the tissue case. After removing
+the extra aggregate/assembly rejection, standalone also succeeds. Original field cache
+limits, cancellation, source geometry algorithms and allocation-error reporting remain.
+Application code now refreshes available field working memory at the reconstruction stage,
+matching the source lifecycle rather than passing a stale preparation estimate.
+
+Evidence: `build/skin-040/assembly-budget-parity{,-after}.log`; new focused regression
+requires identical output under the 8 MiB field budget. Native build passes; focused,
+broader, source-geometry parity and actual tissue-case reruns are still pending. This does
+not establish the full forearm result yet. No additional algorithm changes are authorized.
 
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve

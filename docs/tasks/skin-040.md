@@ -167,18 +167,20 @@ Centerline/tube choice therefore makes no difference to this case's skin inputs.
 
 The focused envelope attempt did **not** complete. Its 1,741 source vertices / 3,328
 triangles reached `Skin mesh assembly exceeds worker memory budget`; only ~1.04 GB RAM
-was available at capture. A separate original-addon precision check at the corresponding
-~365 MB budget chooses coarse resolution 160 (target 220), voxel 0.0648608, and detects
-214 gap faces with minimum protected width 0.00504122 m. Its requested fine voxel is
-0.000916585 m, a 70.7635x linear refinement. This is not a completed runtime comparison
-or evidence that final VCP skin looks better/worse. No partial mesh was presented as skin.
+was available at capture. The initial follow-up precision diagnostic was **invalid**:
+it reconstructed policies with the ratio 0.005 where the native query expects an absolute
+distance. The reported 70.7635x refinement is withdrawn. A corrected original-addon check
+uses the exact captured policies (0.0518886 m), selects coarse resolution 160 at ~365 MB,
+and finds 179 gap faces / minimum width 0.0530292 m. Fine voxel 0.00964168 m represents
+**6.72712x**, not 71x, refinement. No partial mesh was presented as completed skin.
 
 A wider inventory includes all 28 accepted VCPs whose source bindings touch those three
 SCPs, plus their other supports: 14 SCPs total, 103 represented Fibers, zero bare Fibers,
 41,055 input vertices / 77,676 triangles. Accepted anatomy was rendered and inspected.
-Its source-addon preflight asks for 100.229x linear refinement (coarse 0.0981261 m,
-fine 0.000979017 m, 1,054 qualifying gap faces). The larger full envelope was not run
-after the focused failure. Do not claim a VCP envelope or extrapolate timings from it.
+Its initial 100.229x figure had the same diagnostic policy-unit error and is withdrawn.
+The corrected original-addon preflight uses 0.0785009 m gap policy and requests **6.86490x**
+refinement (coarse 0.0981261 m, fine 0.0142939 m, 860 gap faces). The larger full envelope
+was not run after the focused failure. Do not claim a VCP envelope or extrapolate timings.
 
 Evidence lives under `build/skin-040/fiber-thickness-tissues/{paired,related}`: accepted
 input arrays, identity/coverage/hash reports, source preflight values and fixed-camera
@@ -188,11 +190,14 @@ input arrays, identity/coverage/hash reports, source preflight values and fixed-
 The input hash for the focused case is
 `7545889f6bbd0ce344d0c60b23ae5b9f381cc7017171ea186e0b9f57f4a0936f`.
 
-**Correction after the user's challenge:** the fine-grid measurements are valid, but the
-assembly failure was triggered by an extra standalone-only estimate cutoff, not by a
-demonstrated addon failure or genuine OS allocation failure. The prior explanation
-incorrectly conflated these. Do not use this failed test to claim the addon cannot build
-the same scene. Gap refinement alone does not explain the policy discrepancy below.
+**Correction after the user's challenge:** the assembly failure was triggered by an extra
+standalone-only estimate cutoff, not by a demonstrated addon failure or genuine OS
+allocation failure. The prior explanation incorrectly conflated these and overstated
+refinement using the invalid diagnostic above. The actual failed computation did use the
+correct native capture policies; only the follow-up diagnostic reconstructed them wrongly.
+Recaptured complete buffers match the original input hashes exactly. Use the new
+`captured-inputs.npz` and `precision-corrected.json`, not the superseded `precision.json`.
+Do not use this failed test to claim the addon cannot build the same scene.
 
 ### Assembly execution-policy correction — qualification in progress
 
@@ -211,9 +216,12 @@ Application code now refreshes available field working memory at the reconstruct
 matching the source lifecycle rather than passing a stale preparation estimate.
 
 Evidence: `build/skin-040/assembly-budget-parity{,-after}.log`; new focused regression
-requires identical output under the 8 MiB field budget. Native build passes; focused,
-broader, source-geometry parity and actual tissue-case reruns are still pending. This does
-not establish the full forearm result yet. No additional algorithm changes are authorized.
+requires identical output under the 8 MiB field budget. Native build, 214 skin tests,
+16 focused lifecycle/architecture checks, mypy and all five CTests pass. Changed native
+files pass clang-tidy with existing header warnings. Complete cube comparison against the
+addon gives exactly equal positions, connectivity and all six binding arrays. The exact
+failed tissue capture is rerunning with progress/profile recording; its finished geometry
+is not yet qualified. No additional algorithm changes are authorized.
 
 User requests moving existing addon skin functionality into the standalone app for
 0.4.0, including calculating fitted bones/weights to reproduce shortcuts. Preserve

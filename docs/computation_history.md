@@ -3209,14 +3209,14 @@ remain explicit; complete 0.4.0 deformation and release qualification are still 
 
 Follow-up VCP-context experiment: adding the two consuming tissues to the same three
 SCPs removes all five represented Fibers from skin input, so centerline/tube variants
-become identical at capture. Nevertheless, this 3,328-triangle input fails mesh assembly
-under the current available-memory budget. The original addon's preflight requests a
-0.000916585 m fine voxel, about 70.76x finer than its memory-selected coarse grid. The
-broader 28-VCP/14-SCP inventory also contains no bare Fibers and requests about 100.23x
-refinement; only inputs/preflight were evaluated for that larger case. Neither is a
-completed skin output. Fixed-camera source previews and exact evidence are recorded in
-the skin task record. This qualifies the earlier performance explanation: the expensive
-gap response is not exclusive to added Fiber thickness. No production algorithm changed.
+become identical at capture. This 3,328-triangle input hit an added standalone assembly
+estimate cutoff, later diagnosed below. Initial follow-up refinement figures of 70.76x
+and 100.23x were invalid: that diagnostic supplied relative ratios where the native query
+requires resolved absolute gap distances. Corrected original-addon preflight using exact
+captured buffers yields 6.72712x (two VCPs) and 6.86490x (28 VCPs). The actual failed
+computation had used the correct native capture; this diagnostic error affected its
+explanation, not its input. Neither case established a completed skin output. Source
+previews, corrected policies and exact evidence are retained in the skin task record.
 
 ### Correction: standalone-only envelope assembly rejection (October 27)
 
@@ -3230,6 +3230,8 @@ the old port, distinguishing this policy defect from geometric complexity or act
 Removed the standalone aggregate and mesh-estimate cutoffs, preserving the original sparse
 field working budget, cancellation, numerical stages and genuine allocation errors. Refresh
 the working budget at reconstruction entry as the addon does. The corrected native build
-completes the same control; complete geometry and real tissue-case qualification is pending.
+completes the same control. All 214 skin tests and five native CTests pass; original-addon
+cube comparison has exact positions, connectivity and all binding arrays. The real tissue
+case is still rerunning; these checks do not establish its completed output yet.
 This restores the previously approved execution policy; it does not relax gap constraints
 or introduce a new skin algorithm. Earlier failed anatomy runs are not addon parity evidence.

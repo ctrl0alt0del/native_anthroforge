@@ -1,9 +1,31 @@
 #pragma once
+#include <algorithm>
+#include <array>
 #include <atomic>
+#include <chrono>
+#include <cmath>
+#include <condition_variable>
+#include <cstdint>
+#include <cstring>
 #include <deque>
+#include <limits>
+#include <memory>
+#include <mutex>
+#include <numeric>
+#include <queue>
+#include <stdexcept>
 #include <string>
-#include "routing_kernel.hpp"
+#include <thread>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+#include <omp.h>
 #include "skin_centerlines.hpp"
+
+#ifndef _OPENMP
+#error Skin kernels require their dedicated OpenMP target and coordinator CPU reservation.
+#endif
 
 namespace af::skin {
 struct KernelCancellation {
@@ -21,6 +43,7 @@ struct KernelCancellation {
 #pragma clang diagnostic ignored "-Wunused-function"
 #pragma clang diagnostic ignored "-Wunused-parameter"
 #pragma clang diagnostic ignored "-Wunused-variable"
+#pragma clang diagnostic ignored "-Wlogical-op-parentheses"
 #pragma clang diagnostic ignored "-Wmisleading-indentation"
 #pragma clang diagnostic ignored "-Wmissing-field-initializers"
 #elif defined(__GNUC__)
@@ -29,14 +52,19 @@ struct KernelCancellation {
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wparentheses"
 #pragma GCC diagnostic ignored "-Wmisleading-indentation"
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 #elif defined(_MSC_VER)
 #pragma warning(push)
 #pragma warning(disable:4068 4100 4189 4244 4505)
 #endif
-namespace af::routing::kernel {
+namespace af::skin::kernel {
 #define AF_EXPORT static
+// Reuse source triangle predicates in a separate namespace; do not import routing execution.
+#include "../migration/routing/af_roadmap_preparation.hpp"
+#include "../migration/routing/collision_reference.hpp"
+#include "../migration/routing/af_fiber_planner43.hpp"
 #include "../migration/skin/af_skin_gap.hpp"
 #include "../migration/skin/af_skin_wrap.hpp"
 #include "../migration/skin/af_skin_finish.hpp"

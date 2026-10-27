@@ -47,3 +47,29 @@ def test_invalid_queries_and_cancellation():
     scene.close()
     with pytest.raises(ValueError, match="Unknown skin"):
         scene.sample([[0.2, 0, 0]], 4)
+
+
+@pytest.mark.parametrize("reverse,merged", [(False, False), (True, False), (False, True)])
+def test_parallel_batch_preserves_independent_source_gap_results(reverse, merged):
+    scene = create(GeometryEngine(), *planes(reverse, merged))
+    try:
+        points = [[x, y, 0.0] for x in (0.1, 0.2, 0.3) for y in np.linspace(-0.8, 0.8, 24)]
+        expected = np.concatenate([scene.sample([point], 4) for point in points])
+        np.testing.assert_array_equal(scene.sample(points, 4), expected)
+        np.testing.assert_array_equal(scene.sample(points, 4), expected)
+    finally:
+        scene.close()
+
+
+def test_parallel_binding_preserves_serial_membership_weights_and_material_references():
+    engine = GeometryEngine()
+    scene = create(engine, *planes())
+    try:
+        points = np.array([[0.1, -0.3, -0.3], [0.2, -0.2, -0.3], [0.3, -0.3, -0.2]])
+        small = engine.create_mesh(points, [0, 1, 2], [0, 3])
+        large = engine.create_mesh(np.tile(points, (24, 1)), np.arange(72), np.arange(0, 73, 3))
+        expected, actual = scene.bind(small), scene.bind(large)
+        for name, values in expected.items():
+            np.testing.assert_array_equal(actual[name], np.concatenate([values] * 24))
+    finally:
+        scene.close()

@@ -318,7 +318,7 @@ class SkinEnvelopeTaskScheduler(MeasuredTaskScheduler):
         return Schedule(
             "worker",
             reason="Native tiled skin fields, envelope and source bindings",
-            resources=ResourceDemand(1, budget() + workload.bytes * 3),
+            resources=ResourceDemand(4, budget() + workload.bytes * 3),
         )
 
 

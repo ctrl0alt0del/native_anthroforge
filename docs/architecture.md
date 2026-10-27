@@ -1117,6 +1117,16 @@ process-tree cancellation and resource-aware admission. They have no arbitrary p
 Pinned tetrahedral binaries load without Qt, PyVista or VTK. No competing numerical worker pool
 or Python optimization loop is introduced.
 
+The October 28 skin execution fix (source complete, validation paused) isolates the pinned
+gap/tile/binding/quality kernels in an OpenMP object target with a private query namespace.
+Their source limit is four threads; the same coordinator reserves four CPUs for envelope
+jobs and all CPUs for combined builds. Routing retains its serial target. OpenMP cannot
+silently disappear from the skin target. Source triangles and cancellation tokens remain
+owned for the whole call; batched query/binding validation precedes parallel work and
+cancellation is reported after the team joins. Post-smoothing field release follows the
+addon: discard temporary voxel values/flags/coarse copies while retaining the geometry and
+gap constraints required by diagnostics. Algorithms, output policy and budgets are unchanged.
+
 Immutable resources span document/history/checkpoint/job/display leases. Prepared deformation
 factors use a bounded cache keyed by reference and settings; oversized entries bypass retention,
 not computation. Isolated fit/export sessions own their document and caches and borrow immutable

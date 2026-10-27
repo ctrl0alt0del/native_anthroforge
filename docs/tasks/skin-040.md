@@ -2,7 +2,7 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: skin parallelism and temporary-memory fixes in progress; all builds/tests and
+- Status: skin parallelism and temporary-memory source fixes complete; all builds/tests and
   runtime qualification paused while the user is playing. Existing qualification below
   predates these fixes. Keep off main until the changes and rebuilt package are qualified.
 - Last updated: 2026-10-28, Europe/Bucharest.
@@ -10,7 +10,7 @@
 
 ## Outcome and acceptance
 
-### Authorized skin execution/lifetime follow-up, October 28 — validation paused
+### Skin execution/lifetime source changes, October 28 — validation paused
 
 The user authorized restoring lost skin parallelism and the addon's temporary-field
 lifetime, preserving numerical algorithms. Work stays on this unfinished release branch.
@@ -18,11 +18,21 @@ Do not run builds, tests, benchmarks, skin generation or the GUI until the user 
 validation after playing. Source review and checkpoint commits are permitted.
 
 Static cause: skin included routing's explicitly serial kernel boundary, disabling the
-addon's OpenMP loops. Separate skin query/kernel compilation from routing, retain the
-source maximum of four threads and declare that demand to the existing coordinator.
-Restore the source field-release call after constrained smoothing and before validation;
-retain source geometry, separators and corridor checks used by diagnostics. Do not
-change precision, budgets, constraints, smoothing, meshing or diagnostic policy.
+addon's OpenMP loops. Added `af_skin_kernels` for the four skin query/reconstruction
+translation units, with a private skin namespace for the unchanged source query kernels.
+The existing source maximum of four threads matches envelope admission; combined builds
+already reserve all CPUs. Routing remains unchanged and serial. Batched query/binding
+adapters retain finite-input validation and report cancellation only after workers join.
+Restored the source field-release call after constrained smoothing and before validation;
+source geometry, separators and corridor checks remain alive. The unfiltered temporary
+mesh is released after component filtering. Precision, budgets, constraints, smoothing,
+meshing, diagnostics and authored state are unchanged. Pinned numerical headers unchanged.
+
+Authored (not run) regressions compare batched gap queries/binding against serial inputs,
+including winding and single-source disjoint patches, and check coordinator reservation
+before input capture. Existing envelope tests cover repeatability, post-smoothing quality,
+cancellation and resource reuse. A compile guard prevents silently disabling skin OpenMP.
+Only source/diff review performed: no configure/build/lint/test/runtime commands.
 
 Required later: native build/style, scheduler and envelope/cancellation/quality/parity
 checks, serial controlled performance and memory comparison on production anatomy,
@@ -38,15 +48,17 @@ exterior placement, feedback, Preferences, restored authoring workflows, hidden 
 rendering and recovery. Evidence: `build/skin-040/portable-release{,-retry}.log`,
 `portable-remaining.log`, `portable-release/remaining-checks.json`. The two full-suite
 attempts fail at the unchanged cube skin example under fluctuating external RAM pressure;
-neither is recorded as a complete pass. No runtime code changed after the qualified build.
+neither is recorded as a complete pass. At that checkpoint no runtime code had changed;
+the October 28 execution/lifetime changes above now supersede this package's source state.
 
 User explicitly chose to resume **after finishing playing**. Pause remaining qualification;
 do not interrupt their game or close applications. The in-progress source-archive process
 was stopped and its incomplete ZIP removed. Recreate it after final qualification.
 Once the user is ready, rerun the exact canonical executable:
 `uv run --no-sync python tools/check_portable.py dist/0.4.0/AnthroForge.dist/AnthroForge.exe build/skin-040/portable-release --offscreen`.
-Then update qualification labels, refresh packaged documentation/source archive, validate
-against latest main and merge/push normally. No runtime rebuild is needed unless code changes.
+The October 28 source changes now require a native/runtime rebuild before these final
+package checks. Then update qualification labels, refresh packaged documentation/source
+archive, validate against latest main and merge/push normally.
 Preserve the untracked root __init__.py. All source anatomy hashes remain unchanged.
 
 ### Canonical package memory-pressure check, October 27

@@ -1,6 +1,7 @@
 add_subdirectory(boolean)
 add_subdirectory(blender)
 include(skin_fit.cmake)
+include(skin_kernels.cmake)
 set(SKIN_DEFORMATION_SOURCES src/skin_deformation.cpp src/skin_deformation_api.cpp src/skin_deformation_samples.cpp src/skin_contact.cpp src/skin_support.cpp)
 set(SKIN_STITCH_SOURCES src/skin_stitch_boundary.cpp src/skin_stitch_zipper.cpp src/skin_stitch_centered.cpp
     src/skin_stitch_weld.cpp src/skin_stitch_quality.cpp src/skin_stitch_transition.cpp src/skin_stitch_api.cpp
@@ -13,8 +14,7 @@ set(SKIN_ANNULUS_SOURCES src/skin_annuli.cpp src/skin_annuli_api.cpp src/skin_an
     vendor/scipy_lsap/rectangular_lsap.cpp)
 set(SKIN_SOURCES src/skin_proximity.cpp src/skin_quads_split.cpp src/skin_quads_result.cpp src/skin_refine_candidates.cpp src/skin_refine.cpp src/skin_point_index.cpp src/skin_ownership_samples.cpp src/skin_ownership.cpp src/skin_ownership_islands.cpp src/skin_ownership_api.cpp src/skin_proxy_smooth.cpp src/skin_density.cpp src/skin_density_api.cpp src/skin_guides_merge.cpp src/skin_features.cpp src/skin_guides.cpp src/skin_guides_api.cpp src/skin_flow.cpp src/skin_grid.cpp src/skin_distance.cpp src/skin_raster.cpp
     src/skin_exterior.cpp src/skin_collagen.cpp src/skin_fields.cpp src/skin_fields_api.cpp
-    src/skin_gaps.cpp src/skin_meshing.cpp src/skin_assembly.cpp src/skin_precision.cpp
-    src/skin_envelope.cpp src/skin_diagnostics.cpp src/skin_capture.cpp src/skin_centerlines.cpp)
+    src/skin_meshing.cpp src/skin_assembly.cpp src/skin_capture.cpp src/skin_centerlines.cpp)
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     ${SKIN_DEFORMATION_SOURCES}
     ${SKIN_SOURCES} ${SKIN_PROXY_SOURCES} ${SKIN_LOOP_SOURCES} ${SKIN_ANNULUS_SOURCES} ${SKIN_STITCH_SOURCES} src/process_api.cpp src/process_windows.cpp src/process_log.cpp
@@ -74,7 +74,7 @@ add_library(af_curve_fit STATIC vendor/curve_fit_nd/intern/curve_fit_cubic.c
     vendor/curve_fit_nd/intern/curve_fit_corners_detect.c
     vendor/curve_fit_nd/intern/generic_heap.c)
 set_target_properties(af_curve_fit PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(af_native PRIVATE af_curve_fit af_boolean af_bmesh af_skin_fit)
+target_link_libraries(af_native PRIVATE af_curve_fit af_boolean af_bmesh af_skin_fit af_skin_kernels)
 if(AF_OPENMP_RUNTIME)
     add_custom_command(TARGET af_native POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${AF_OPENMP_RUNTIME}" "$<TARGET_FILE_DIR:af_native>")

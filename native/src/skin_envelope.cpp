@@ -36,10 +36,13 @@ static void orient(Mesh& mesh) {
     }
 }
 std::shared_ptr<Mesh> extract_envelope(Tiles& tiles,double* diagnostics,uint64_t cancel) {
-    const auto raw=extract(tiles,cancel); auto result=supported(*tiles.scene,*raw,diagnostics,cancel);
+    auto raw=extract(tiles,cancel); auto result=supported(*tiles.scene,*raw,diagnostics,cancel);
+    raw.reset();
     check_cancel(cancel);
     kernel::af_skin::finish_skin_tiles(tiles,result->vertices.data(),int(result->vertices.rows()),
         result->corners.data(),int(result->corners.size()/3),8);
+    // Match addon finish(): only geometry, source queries and gap constraints survive.
+    kernel::af_skin_tiles_release_field(&tiles);
     result->vertices=result->vertices.cast<float>().cast<double>(); orient(*result);
     diagnose(tiles,*result,diagnostics,cancel); rebuild_mesh(*result,cancel); return result;
 }

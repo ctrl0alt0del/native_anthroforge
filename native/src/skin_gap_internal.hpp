@@ -3,7 +3,6 @@
 #include "mesh_internal.hpp"
 
 namespace af::skin {
-namespace kernel=af::routing::kernel;
 using Scene=kernel::af_skin::GapScene;
 struct SceneRecord { std::unique_ptr<Scene> value; std::mutex mutex; };
 std::shared_ptr<SceneRecord> get_scene(uint64_t handle);

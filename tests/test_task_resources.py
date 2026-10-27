@@ -5,7 +5,7 @@ import pytest
 
 from anthroforge.application.coordinator import TaskCoordinator
 from anthroforge.application.task_resources import Admission
-from anthroforge.application.task_schedulers import MeasuredTaskScheduler
+from anthroforge.application.task_schedulers import MeasuredTaskScheduler, SkinEnvelopeTaskScheduler
 from anthroforge.core.document import Document
 from anthroforge.core.scheduling import ResourceDemand, Schedule, Workload
 from tests.test_scheduler import controlled, pump
@@ -108,3 +108,20 @@ def test_bounded_inline_edit_remains_available_during_heavy_work(setup):
 def test_invalid_resource_estimates_are_rejected(threads, memory):
     with pytest.raises(ValueError):
         ResourceDemand(threads, memory)
+
+
+def test_skin_envelope_reserves_its_native_team_before_input_capture(setup, monkeypatch):
+    coordinator, _, _ = setup
+    monkeypatch.setattr("anthroforge.application.worker_memory.budget", lambda: 0)
+    coordinator.task_schedulers["skin_envelope"] = SkinEnvelopeTaskScheduler()
+    running, release = job(setup, "running", 1)
+    coordinator.tick()
+    request = controlled("skin", "skin", Event(), [])
+    request.kind = "skin_envelope"
+    coordinator.submit(request)
+    coordinator.tick()
+    assert running.snapshot is not None and request.snapshot is None
+    assert request.assessment.schedule.resources.threads == 4
+    assert request.execution_reason == "Waiting for compute capacity"
+    coordinator.cancel_job(request.id)
+    release.set()

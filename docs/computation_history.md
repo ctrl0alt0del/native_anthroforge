@@ -3509,3 +3509,34 @@ are linked from [the task record](tasks/skin-040.md). The maintained
 an initial test-adapter gap-unit error was corrected and that run excluded.
 Canonical portable rebuilding/qualification and the companion source archive remain pending;
 these results do not qualify the older installed executable or complete the 0.4.0 release.
+
+### Whole-body skin comparison — 2026-10-28 (R02, R04; measurement only)
+
+User requested whole-body addon/app comparison after the small forearm result. No production
+algorithm, policy or source geometry changed. Capture all 58 SCP and 96 tissue surfaces from
+the saved 96-muscle assembly through production providers, retaining settings/collagen and
+accepted revisions. Run those identical world-space surfaces through the real Blender 5.0.1
+addon worker runtime and standalone native core. This isolates skin computation rather than
+mixing it with known skeletal migration differences. Construction paths do not contribute.
+
+At unchanged default resolution 220 and fixed 3,687,319,552-byte budget, the gap logic chooses
+0.029121278 fine spacing from 0.145604908 coarse spacing. Three fresh serial runs per engine,
+A/B/B/A/A/B, BLAS one worker, profiler off. Median time: Blender **192.395 s**, app **194.414 s**
+(app +1.05%). Median OS resident peak: **1.489 / 1.414 GiB**; peak commit **1.602 / 1.440 GiB**.
+These include worker-host overhead, not GUI memory. Setup/export/rendering and later topology
+or final-skin stages are excluded. App field/scene/envelope/binding medians are
+0.743/0.226/121.461/72.200 s. Model-relative precision prevents linear extrapolation from
+source count: the full body has about twice the previous forearm output triangles, not 31x.
+
+Exact positions, connectivity and all six common binding arrays agree: 1,691,842 vertices /
+3,384,244 triangles. All trials repeat. Coverage/protected gaps pass; zero unbound vertices.
+Both outputs share **18 four-face non-manifold edges**, no open boundary edges and visible
+banding. Watertight/orientability flags fail; do not equate parity with clean final geometry.
+Five independently rendered camera pairs are pixel-identical and were visually inspected,
+including actual input context. No extra mirrored muscles were synthesized.
+
+Evidence: `build/skin-040/whole-body-comparison/review.html`, comparison/precision/topology JSON,
+per-trial reports and saved arrays. Maintained capture, benchmark and render tools reproduce
+this check. See [task record](tasks/skin-040.md) for provenance and scope. No additional
+application rebuild or full development gate was needed for tooling/documentation changes;
+portable release qualification remains pending.

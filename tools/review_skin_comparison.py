@@ -22,9 +22,9 @@ Every physical contributor in the saved assembly is included;
 no extra opposite-side muscles were synthesized.</p>
 <p><strong>Geometry and all six common binding arrays exactly equal: {same}.</strong>
 Identical accepted world-space anatomy, settings, units and cameras in both engines.</p>
-<p>The mesh has topology warnings: it is not watertight or orientable.
-These are shared output defects, not evidence of a clean final skin.
-Source coverage and protected-gap checks pass.</p>
+<p>Both meshes have 18 non-manifold edges, each shared by four triangles,
+and no open boundary edges. The watertight/orientability checks consequently fail.
+Visible surface banding is shared too. Source coverage and protected-gap checks pass.</p>
 <p class="note">Source: {source}<br>
 Draft generation only: fields, envelope, validation and bindings.
 Excludes project loading, topology generation, final-skin deformation, export and rendering.</p>"""

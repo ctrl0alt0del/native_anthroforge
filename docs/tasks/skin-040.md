@@ -10,7 +10,7 @@
 
 ## Outcome and acceptance
 
-### Whole-body comparison requested, October 28 — running
+### Whole-body comparison, October 28 — complete
 
 The user requested the full body, addon versus app, with matched-angle previews and
 time/memory evidence. Freeze all accepted physical contributors from
@@ -27,19 +27,52 @@ Keep resolution 220 and fixed budget 3,687,319,552 bytes, sampled from the curre
 0.029121278 fine spacing versus 0.145604908 coarse spacing (4,045 gap faces). All captured
 collagen values are 1. No algorithm, precision, source, gap or budget-policy changes.
 
-Artifacts stay under `build/skin-040/whole-body-comparison`. The app timing has started;
-Blender-worker parity, time/peak memory and background matched cameras remain pending.
+Artifacts stay under `build/skin-040/whole-body-comparison`. All six timing runs, direct
+array comparisons and five independently rendered matched-camera pairs are complete.
 `capture_skin_project.py` freezes all production contributors through shared providers;
 the benchmark now preserves captured collagen and settings instead of assuming defaults.
 The comparison isolates skin computation from known migration differences by using
 identical accepted anatomy; it is not a new Blender-project migration parity claim.
 
-First pair completed: app 198.235 s (0.743 fields, 0.229 scene, 123.460 envelope,
-73.803 binding); actual Blender 5.0.1/Python 3.11 addon worker 193.057 s. All vertex,
-triangle and six common binding buffers have identical hashes: 1,691,842 vertices /
-3,384,244 triangles. Source coverage/gap checks pass; the shared mesh is not watertight
-or orientable. Do not hide those defects behind parity success. Second Blender run
-192.067 s; further controlled trials and actual rendered inspection remain pending.
+Three fresh processes per engine, serial A/B/B/A/A/B order, profiling off and BLAS one
+worker. Blender uses its real 5.0.1/Python 3.11 worker host and verified pinned packages;
+app uses Python 3.12 and the optimized native DLL from the previous qualification.
+The same owned input arrays are round-trip checked through the addon capture adapter.
+No Blender/anatomy source projects were modified. Measurements include coarse fields,
+native scene creation, envelope, diagnostics and bindings; exclude host launch, project
+loading/capture, serialization/rendering, quad topology and final deformation.
+
+| Measurement | Blender addon worker | Standalone native core |
+| --- | ---: | ---: |
+| Total median | 192.395 s | 194.414 s |
+| Total range | 192.067–193.057 s | 194.317–198.235 s |
+| Median OS peak working set | 1.489 GiB | 1.414 GiB |
+| Median OS peak commit | 1.602 GiB | 1.440 GiB |
+
+The app is 1.05% slower here, with 5.0% less resident peak. Peaks include each worker
+host's overhead; they are not total GUI-process memory or isolated algorithm allocation.
+App stage medians: fields 0.743 s, scene 0.226 s, envelope 121.461 s, bindings 72.200 s.
+Stage medians need not sum to the median total. Other applications stayed running; a
+transient RAM-headroom drop during app trial 3 is retained in its raw stage observations.
+
+All runs repeat their respective output hashes. Direct array comparisons between the
+first pair establish zero error for **1,691,842 vertices / 3,384,244 triangles** and all six
+common binding arrays. Source coverage and 75,190 protected-gap checks pass, with zero
+unbound vertices in the addon report. Existing source-source intersections: 15,090.
+The shared mesh has **18 non-manifold edges of valence four; no open boundary edges**.
+Its watertight/orientable flags fail. This is parity, not a clean-manifold qualification.
+
+Rendered and visually inspected front, back, left, right and oblique pairs, alongside
+the actual input anatomy. The independently rendered output images are pixel-identical
+at every angle. Visible banding/roughness is shared, and the mostly one-sided musculature
+reflects the saved input. No smoothing, decimation, anatomy completion or masking was
+added to the preview. Front (-X) was verified against sternum/spine/scapula positions.
+
+Open `build/skin-040/whole-body-comparison/review.html` for all angles and raw evidence.
+`comparison.json`, `topology-diagnostics.json`, per-trial JSON/logs, first-pair NPZ arrays,
+capture/precision JSON and PNGs retain reproducible results. Production code and canonical
+distribution remain unchanged. The older installed executable does not contain the measured
+optimizations; this comparison does not complete 0.4.0 portable qualification.
 
 ### Optimization results, October 28 — source/runtime qualified
 

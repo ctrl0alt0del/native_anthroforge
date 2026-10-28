@@ -69,11 +69,11 @@ def camera(scene, bounds):
 
 def views():
     return dict(
-        front=(1, 0, 0),
-        back=(-1, 0, 0),
+        front=(-1, 0, 0),
+        back=(1, 0, 0),
         left=(0, -1, 0),
         right=(0, 1, 0),
-        oblique=(1, -1, 0.4),
+        oblique=(-1, -1, 0.4),
     )
 
 
@@ -87,7 +87,7 @@ def capture(scene, control, output):
 
 
 def main():
-    source, inputs, output = map(Path, sys.argv[sys.argv.index("--") + 1 :])
+    source, inputs, output = [Path(p).resolve() for p in sys.argv[sys.argv.index("--") + 1 :]]
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
     scene.world = bpy.data.worlds.new("Background")

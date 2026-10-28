@@ -116,6 +116,8 @@ def adopt(session: Any, candidate: Any, updated: Document) -> None:
 
 def prepared[T](candidate: T, document: Document) -> T:
     value = cast(Any, candidate)
+    if not value.ready:
+        return candidate
     return cast(T, replace(value, prepared_from=document, prepared_document=value.merge(document)))
 
 

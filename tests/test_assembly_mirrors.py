@@ -54,3 +54,36 @@ def test_repeated_imports_have_independent_boundary_rules(session, tmp_path):
     result = second.merge(destination)
     assert len(result.mirrors.instances) == 6
     assert first.identities["root"] != second.identities["root"]
+
+
+def mirrored_fiber(session, tmp_path):
+    from tests.test_assembly_mapping import captured
+
+    target, fiber, _ = captured(session, tmp_path)
+    document = replace(session.document, mirror_rules=(MirrorRule(target, enabled=True),))
+    path = tmp_path / "mirrored-fiber.anthroforge"
+    storage.atomic_save(path, document, session.resources)
+    source = assembly_source.inspect(str(path), Event())
+    return target, fiber, source
+
+
+def test_inherited_rule_does_not_turn_external_bone_into_an_internal_reference(session, tmp_path):
+    target, fiber, source = mirrored_fiber(session, tmp_path)
+    destination = Document()
+    value = prepared(session, source, [fiber.id], destination=destination)
+    copied = value.merge(destination).object(value.identities[fiber.id])
+    assert value.ready and copied.result.status == "invalid"
+    assert copied.bindings[0].target in {r.id for r in value.references}
+    assert copied.bindings[0].target != value.identities[target]
+
+
+def test_mapped_mirror_owner_keeps_binding_and_read_set_as_a_bone(session, tmp_path):
+    target, fiber, source = mirrored_fiber(session, tmp_path)
+    value = prepared(session, source, [fiber.id], dict(mappings={target: target}))
+    result = value.merge(session.document)
+    copied = result.object(value.identities[fiber.id])
+    assert value.ready and copied.result.status == "ready"
+    assert copied.bindings[0].target == target
+    assert any(r.owner == target and r.output == "geometry" for r in copied.result.inputs)
+    assert not any(r.owner == value.identities[target] for r in copied.result.inputs)
+    assert value.resources.paths[copied.result.asset].authored.bindings[0].target == target

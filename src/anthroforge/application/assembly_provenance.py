@@ -98,15 +98,23 @@ def external_targets(p: Any, owner: str) -> dict[str, str]:
 
 
 def rewrite_input(p: Any, document: Any, value: Any, targets: Any, reverse: Any, owner: str) -> Any:
-    target = targets.get(value.owner, value.owner)
-    updated = property_input(p, value, owner) or replace(value, owner=target)
     original = graph_records.rewritten(value, reverse)
+    updated = remapped_input(p, value, original, targets, owner)
     try:
         old = construction_policy.revision(p.source.document, Port(original.owner, original.output))
         current = construction_policy.revision(document, Port(updated.owner, updated.output))
     except (ValueError, KeyError):
         return updated
     return current if old == original and equivalent_membership(updated, current) else updated
+
+
+def remapped_input(p: Any, value: Any, original: Any, targets: Any, owner: str) -> Any:
+    if value.output == "mirror":
+        return value
+    prop = property_input(p, original, owner)
+    if prop is not None:
+        return replace(value, owner=prop.owner, output=prop.output)
+    return replace(value, owner=targets.get(original.owner, value.owner))
 
 
 def property_input(p: Any, value: Any, owner: str) -> Any:

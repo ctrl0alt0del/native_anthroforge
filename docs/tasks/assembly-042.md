@@ -112,3 +112,13 @@ tests pass; broader production, coupling and portable qualification remain pendi
 Native: `C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native/bin/af_native.dll`.
 Production: `E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge`.
 Artifacts belong under ignored `build/assembly-042`; do not alter production source files.
+
+Final review found and fixed an inherited-mirror namespace collision: an excluded bone may also
+own a copied mirror rule. Import now distinguishes copied authored identities from rule-only
+identities when mapping supports, disabling external outputs and rewriting accepted read sets.
+Regression covers unresolved and mapped Fiber supports with inherited rules. Prepared-index
+reuse now skips candidates with blocking findings instead of trying to validate an incomplete graph.
+All assembly/architecture checks pass; final full-suite rerun follows these corrections.
+The cProfile Import command fell from 0.936 s to 0.184 s (one matched large import each;
+profiler overhead included). Graph adoption itself is 0.070 s; source snapshot release remains
+about 0.109 s. This is publication evidence, not an unprofiled frame-latency guarantee.

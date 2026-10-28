@@ -25,6 +25,10 @@ class Mappings:
     rebind: set[str] = field(default_factory=set)
     rows: list[dict[str, Any]] = field(default_factory=list)
     changed: set[str] = field(default_factory=set)
+    internal: frozenset[str] = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.internal = frozenset(self.identities)
 
     def assess(self, boundaries: Any) -> None:
         for row in boundaries:
@@ -75,7 +79,7 @@ class Mappings:
 
     def patch(self, original: Any, item: Any) -> Any:
         if getattr(original, "id", "") not in self.replacements:
-            return disable_external_outputs(original, item, self.identities)
+            return self.outputs(original, item)
         for ref in graph_records.references(original):
             selected = self.choices_by_reference.get(assembly_graph.boundary_key(original, ref)[0])
             if selected is None:
@@ -83,7 +87,10 @@ class Mappings:
             decision, target = selected
             value = "" if decision.get("action") == "detach" else target
             item = patch_reference(item, ref, decision, value)
-        return disable_external_outputs(original, item, self.identities)
+        return self.outputs(original, item)
+
+    def outputs(self, original: Any, item: Any) -> Any:
+        return disable_external_outputs(original, item, self.identities, self.internal)
 
     def surface(self, reference: SurfaceReference) -> SurfaceReference:
         for replacements in self.replacements.values():
@@ -216,12 +223,12 @@ def require_kind(item: Any, kind: str) -> None:
         raise ValueError("Select a compatible destination object.")
 
 
-def disable_external_outputs(original: Any, item: Any, ids: Any) -> Any:
+def disable_external_outputs(original: Any, item: Any, ids: Any, internal: Any) -> Any:
     from anthroforge.core.shortcuts import DrivingShortcut
 
     if not isinstance(item, DrivingShortcut) or ids.get(original.id) == original.id:
         return item
-    external = {ids.get(f.id, f.id) for f in original.formulas if f.target.target not in ids}
+    external = {ids.get(f.id, f.id) for f in original.formulas if f.target.target not in internal}
     return replace(
         item,
         formulas=tuple(replace(f, enabled=False) if f.id in external else f for f in item.formulas),

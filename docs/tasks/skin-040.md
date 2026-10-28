@@ -10,6 +10,30 @@
 
 ## Outcome and acceptance
 
+### Whole-body comparison requested, October 28 — running
+
+The user requested the full body, addon versus app, with matched-angle previews and
+time/memory evidence. Freeze all accepted physical contributors from
+`skeleton_96_muscles_shortcuts_v001.anthroforge`: **58 SCPs and 96 tissues**, 206,665
+vertices / 394,862 triangles. No anatomical recalculation, source-project save, selection
+filter or construction fallback. This saved assembly has independent bone counterparts
+and 96 authored tissues, not newly synthesized opposite-side muscles.
+
+Capture SHA-256 of the source project is
+`308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
+Use the shared production capture (including actual collagen/settings) in both engines.
+Keep resolution 220 and fixed budget 3,687,319,552 bytes, sampled from the current unchanged
+35%-available-RAM policy. Preflight accepts full resolution; unchanged gap logic requests
+0.029121278 fine spacing versus 0.145604908 coarse spacing (4,045 gap faces). All captured
+collagen values are 1. No algorithm, precision, source, gap or budget-policy changes.
+
+Artifacts stay under `build/skin-040/whole-body-comparison`. The app timing has started;
+Blender-worker parity, time/peak memory and background matched cameras remain pending.
+`capture_skin_project.py` freezes all production contributors through shared providers;
+the benchmark now preserves captured collagen and settings instead of assuming defaults.
+The comparison isolates skin computation from known migration differences by using
+identical accepted anatomy; it is not a new Blender-project migration parity claim.
+
 ### Optimization results, October 28 — source/runtime qualified
 
 All six CTests and the complete development gate pass: 2,570 Python tests, native style,

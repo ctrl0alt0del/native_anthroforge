@@ -72,6 +72,7 @@ def arrays_result(vertices, triangles, binding):
 
 
 def native_prepare(engine, data, args):
+    from anthroforge.core.skin import EnvelopeSettings
     from anthroforge.native.skin_fields import prepare
 
     return prepare(
@@ -79,7 +80,8 @@ def native_prepare(engine, data, args):
         data["vertices"],
         data["triangles"],
         data["skeletal"],
-        np.ones(len(data["vertices"])),
+        data.get("collagen", np.ones(len(data["vertices"]))),
+        settings=EnvelopeSettings(*data.get("settings", ())),
         resolution=args.resolution,
         budget=args.budget,
     )
@@ -140,26 +142,30 @@ def source_part(data, owner, length):
     policy = data["policies"][owner]
     kind = "SCP" if policy[2] else "VCP"
     identity = owner, kind, str(owner), "ORIGINAL", str(owner)
-    geometry = data["vertices"][lo:hi], triangles - lo, np.ones(hi - lo)
+    collagen = data.get("collagen", np.ones(len(data["vertices"])))
+    geometry = data["vertices"][lo:hi], triangles - lo, collagen[lo:hi]
     source = SkinSource(*identity, *geometry, float(policy[0] / length), float(policy[1]))
     return source, (lo, hi)
 
 
 def source_capture(args, data):
-    from core.draft_skin.model import SkinCapture
+    from core.draft_skin.model import SkinCapture, SkinSolverSettings
 
     length = float(np.ptp(data["vertices"], axis=0).max())
     parts = [source_part(data, i, length) for i in range(len(data["policies"]))]
+    verify_spans(parts, data)
+    xyz, settings = data["vertices"], SkinSolverSettings(*data.get("settings", ()))
+    inputs = "benchmark", tuple(s for s, _ in parts), xyz.min(0), xyz.max(0), "fixed", 0
+    capture = SkinCapture(*inputs, args.resolution, settings=settings)
+    verify_capture(capture, data)
+    return capture
+
+
+def verify_spans(parts, data):
     spans = [span for _, span in parts]
     expected = [(0 if i == 0 else spans[i - 1][1], hi) for i, (_, hi) in enumerate(spans)]
     if spans != expected or spans[-1][1] != len(data["vertices"]):
         raise ValueError("Capture must retain complete contiguous source vertex blocks.")
-    xyz = data["vertices"]
-    capture = SkinCapture(
-        "benchmark", tuple(s for s, _ in parts), xyz.min(0), xyz.max(0), "fixed", 0, args.resolution
-    )
-    verify_capture(capture, data)
-    return capture
 
 
 def verify_capture(capture, data):

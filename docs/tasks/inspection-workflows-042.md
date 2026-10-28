@@ -3,7 +3,7 @@
 - Task branch: `codex/inspection-workflows-042`
 - Integration branch: `main`
 - Starting revision: `44a80ab` (qualified 0.4.1 plus recommendation audit)
-- Status: in progress
+- Status: complete; 0.4.2 qualified
 - Updated: 2026-10-28, Europe/Bucharest
 - Active writer: local desktop chat, direct work; no delegation
 
@@ -42,13 +42,12 @@ Keep testing background/offscreen; no desktop control. Preserve root `__init__.p
 All four runtime increments are integrated. The [workflow](../inspection_042.md) documents
 shared replacement status, stage-qualified spatial findings, preview/confirmed and bound-point
 placement explanations, dimensions/sections, sampled containment and temporary neighborhood
-views. Production geometry and attachment behavior remain unchanged. Release qualification
-and canonical packaging are in progress; this is not yet a completed release.
+views. Production geometry and attachment behavior remain unchanged. Development, offscreen
+and relocated portable qualification pass; delivery details are recorded below.
 
 ## Verification
 
-Pending targeted shared API/desktop tests, native diagnostic tests, geometry/attachment
-invariance, development gate, offscreen visual evidence and canonical packaging.
+Final qualification passes; intermediate checkpoints below preserve their actual results.
 Do not claim interactive desktop acceptance from hidden/offscreen checks.
 
 - R01: 30 tests pass across replacement status/view, mesh replacement, tissue retarget
@@ -61,11 +60,11 @@ Do not claim interactive desktop acceptance from hidden/offscreen checks.
 - Ruff passed; mypy found dictionary-union inference in command registration, corrected
   before the next check. Full development gate and GUI/package checks still pending.
 
-## Next actions
+## Delivery scope
 
-1. Finish the final development gate and canonical package qualification.
-2. Record actual results, review ownership/coupling, check documentation links.
-3. Validate against current main, merge/push normally, and deliver one canonical 0.4.2 package.
+All selected runtime work is complete. Other audit entries remain unselected. General
+whole-surface containment proofs, minimum separating translations and globally guaranteed
+escape paths are not claimed by the advisory sampling/local-normal tools.
 
 The containing commit identifies the checkpoint; inspect Git history for push state.
 
@@ -126,3 +125,32 @@ The containing commit identifies the checkpoint; inspect Git history for push st
 - Dimensions/witnesses wait for their corresponding staged geometry. Neighborhood membership
   refreshes on relationship changes. Frozen export restores clipping, axes and its camera.
 - Version is prepared as 0.4.2; final gate and packaging remain. No release/merge claim yet.
+
+## Final qualification and delivery
+
+- `tools/check.ps1` passes: **2,622 Python tests**, **6 native CTests**, native and script
+  style, 15-line limits, Ruff/formatting, mypy, numerical imports and runtime doctor.
+  The earlier stacking helper regression is corrected and its original tests pass.
+- **32 relocated portable checks pass** under minimal PATH with offscreen desktop tests.
+  The new packaged check exports and validates dimensions, qualified sample counts,
+  confirmed-placement evidence, neighborhood membership and a matching PNG/JSON archive.
+- Offscreen 360 px inspection layout and native GPU viewport captures have no QML warnings.
+  Actual 96-muscle assembly neighborhood/section views were rendered and reviewed; Restore
+  retained the identical document/workspace. Testing used no visible desktop windows.
+- Profiler evidence is complete and separates native queries from request wall time.
+  There is no claim of a speedup or physical input/display latency. Diagnostic work is
+  explicit or enabled by the user; stable measurements re-use their accepted projection.
+- Ownership review: eligibility stays with application policies; query strategies use the
+  existing coordinator and read-only revision checks. C++ owns repeated geometry queries.
+  UI owns temporary presentation. Exports own frozen geometry/evidence. No new numerical
+  production algorithm, project schema, scheduler, status manager or automatic repair.
+- Current main was fetched and has no intervening changes. Normal merge/push preserves all
+  checkpoints; the containing commits identify the delivered code. Root `__init__.py` remains
+  unrelated and untracked.
+- Canonical executable: `dist/0.4.2/AnthroForge.dist/AnthroForge.exe`.
+  Companion source: `dist/AnthroForge-0.4.2-source.zip`.
+  Packaged runtime stamp: `ecbac40cf1e699e118ac24bfdcd2d28dd8d1b49c` (later changes are docs).
+  Native DLL SHA-256: `4ab1baafa78efa7c3815fea555ce4f40e6bf3943f5a0ac02f8b89054d947781a`.
+- Evidence: `build/inspection-042-gate-final.log`, `build/inspection-042/portable/portable-check.json`,
+  `build/inspection-042/production.afprofile.zip`, `production-timings.json`, hidden captures
+  and archive-verification output in the same build folder.

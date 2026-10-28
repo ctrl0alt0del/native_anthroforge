@@ -1,6 +1,6 @@
 # AnthroForge release roadmap
 
-- **0.4.2 — selected inspection extensions:** R01–R03 and R06 from the
+- **0.4.2 — qualified inspection extensions:** R01–R03 and R06 from the
   [complete recommendation audit](recommendations_042_audit.md): shared replacement status,
   spatial findings, placement explanation, dimensions/sections and temporary neighborhood
   inspection. [Workflow and limits](inspection_042.md), [qualification](tasks/inspection-workflows-042.md).

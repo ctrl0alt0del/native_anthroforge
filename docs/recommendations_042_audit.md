@@ -1,6 +1,6 @@
 # 0.4.2 preparation: remaining cross-thread recommendations
 
-Status: **coverage audit complete; R01–R03 and R06 selected for 0.4.2**.
+Status: **coverage audit complete; R01–R03 and R06 extensions delivered in 0.4.2**.
 The table below preserves the pre-implementation audit. See [delivery](inspection_042.md)
 and [current validation](tasks/inspection-workflows-042.md) for implemented extensions and limits.
 Audited on 2026-10-28 against 0.4.1, commit

@@ -1,6 +1,6 @@
 """One cancellable import preparation, using the application's existing task coordinator."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import partial
 from typing import Any
 from uuid import uuid4
@@ -21,6 +21,7 @@ class State:
     job: str = ""
     error: str = ""
     document: str = ""
+    inventory: list[dict[str, Any]] = field(default_factory=list)
 
 
 class Assembly:
@@ -83,6 +84,9 @@ class Assembly:
             raise ObsoleteInputs("The import session changed.")
         if kind == "assembly_inspect":
             value.source = result
+            from .assembly_inspection import inventory
+
+            value.inventory = inventory(result)
         else:
             result.reads.require(self.session.document)
             value.candidate = result

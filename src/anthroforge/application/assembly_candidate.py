@@ -6,6 +6,7 @@ from typing import Any
 from anthroforge.core.assembly import ExternalReference, ImportProvenance
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import ObsoleteInputs
+from anthroforge.core.results import Port
 
 from .resources import Resources
 
@@ -71,7 +72,9 @@ def install(session: Any, candidate: Candidate) -> dict[str, Any]:
     keys = (*candidate.additions, "external_references")
     if isinstance(candidate, Candidate):
         keys += ("imports",)
-    session.replace_document(**{key: getattr(updated, key) for key in keys})
+    session.replace_document(
+        accepted_outputs=accepted_outputs(candidate), **{key: getattr(updated, key) for key in keys}
+    )
     return installed(session, candidate)
 
 
@@ -85,3 +88,19 @@ def installed(session: Any, candidate: Any) -> dict[str, Any]:
     jobs = assembly_result_state.schedule(session, candidate)
     provenance = candidate.provenance.id if isinstance(candidate, Candidate) else ""
     return dict(identities=candidate.identities, provenance=provenance, jobs=jobs)
+
+
+def accepted_outputs(candidate: Any) -> frozenset[Port]:
+    from anthroforge.core.tissues import TissueVCP
+
+    formulas = {
+        Port(r.formula, "formula")
+        for r in candidate.additions.get("formula_results", ())
+        if r.status != "pending"
+    }
+    tissues = {
+        Port(v.id, "final")
+        for v in candidate.additions.get("objects", ())
+        if isinstance(v, TissueVCP) and v.final_result.status != "pending"
+    }
+    return frozenset(formulas | tissues)

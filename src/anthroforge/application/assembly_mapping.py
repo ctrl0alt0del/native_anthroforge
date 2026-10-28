@@ -1,6 +1,6 @@
 """Relationship-specific choices; names never substitute for identity or material coordinates."""
 
-from dataclasses import dataclass, field, replace
+from dataclasses import asdict, dataclass, field, replace
 from typing import Any, cast
 from uuid import uuid4
 
@@ -84,9 +84,18 @@ def describe(row: Any, choice: Any) -> dict[str, Any]:
         kind=row.kind,
         relationship=row.relationship,
         role=row.role,
+        instance=row.instance,
+        property=asdict(row.property) if row.property else None,
+        consumers=tuple(dict.fromkeys(owner for owner, _ in row.uses)),
+    ) | choice_details(choice)
+
+
+def choice_details(choice: Any) -> dict[str, Any]:
+    return dict(
         action=choice.get("action", "later"),
         target=choice.get("target", ""),
-        instance=row.instance,
+        target_instance=choice.get("instance", ""),
+        rebind=bool(choice.get("rebind", False)),
     )
 
 

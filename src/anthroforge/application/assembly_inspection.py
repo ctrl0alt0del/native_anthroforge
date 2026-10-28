@@ -26,7 +26,7 @@ def describe(manager: Any) -> dict[str, Any]:
         state=value.state,
         error=value.error,
         job_id=value.job or source.job,
-        inventory=inventory(source.source),
+        inventory=source.inventory,
         **candidate_details(value.candidate),
     )
 
@@ -36,8 +36,8 @@ def candidate_details(candidate: Any) -> dict[str, Any]:
         return {}
     return dict(
         ready=candidate.ready,
-        findings=candidate.findings,
-        evidence=candidate.evidence,
+        findings=list(candidate.findings),
+        evidence=list(candidate.evidence),
         selection=candidate.selection,
         references=[asdict(r) for r in candidate.references],
         mappings=candidate.mappings,

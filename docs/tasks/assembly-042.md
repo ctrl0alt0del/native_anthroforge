@@ -41,13 +41,23 @@ mapping/binding policies and one-action undo. Desktop interaction, complete meta
 broader relationship/lifecycle coverage and production qualification remain unfinished; this
 checkpoint is not a release.
 
+Desktop import/repair entry points are now wired: File menu, searchable virtualized lists,
+automatic preparation, stable footer, explicit rebind evidence, and Issues navigation.
+Offscreen production dialog inspection found and corrected a collapsed list; the populated
+625-record dialog now renders without QML warnings. No interactive acceptance is claimed.
+Production skeleton copying initially caused unintended formula reevaluation and changed the
+clavicle. Shared accepted-output adoption now distinguishes saved results from new edits;
+SCM maps to the copied skeleton without a spurious rebind requirement. This needs broader
+driver, lifecycle, result-provenance and shortcut-response qualification before release.
+
 ## Verification
 
 Initial foundation checks pass. Current API/resource/architecture checks verify
 selected resources, copied accepted definitions, source removal after inspection, persistence,
 undo and cancellation. Mapping tests cover world-preserving parent changes, retained Fiber
 bindings, missing supports, incompatible geometry, and explicit rebind. Focused mypy passes.
-Current focused run: 25 assembly tests pass, plus the two architecture checks; focused mypy passes.
+Current focused run: 25 assembly tests pass, plus desktop selection/undo/idle checks and
+the two architecture checks. Repository mypy passes (562 source files).
 Production smoke: 281 MB / 625-object source inspected in 2.79 s; SCM and required construction
 prepared in 0.69 s, exposing five external relationships. This does not establish geometry parity.
 Production/full-suite qualification remains pending. Baseline: 2,641 Python tests, six native suites and 32 portable checks qualified

@@ -43,16 +43,16 @@ def planning_inputs(item: TissueVCP) -> tuple[Any, ...]:
     )
 
 
-def changed(session: Any, before: Any) -> None:
+def changed(session: Any, before: Any, accepted: frozenset[str] = frozenset()) -> None:
     if before.mirror_rules != session.document.mirror_rules:
-        invalidate(session, {v.id for v in participants(session.document)})
+        invalidate(session, {v.id for v in participants(session.document)} - accepted)
 
     old = {o.id: signature(o) for o in before.objects if isinstance(o, TissueVCP)}
     current = {o.id: signature(o) for o in session.document.objects if isinstance(o, TissueVCP)}
     changes = {key for key in old.keys() | current.keys() if old.get(key) != current.get(key)}
     if not changes:
         return
-    targets = affected(session.document, changes, old, current)
+    targets = affected(session.document, changes, old, current) - accepted
     invalidate(session, targets)
 
 

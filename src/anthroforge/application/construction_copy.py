@@ -1,7 +1,7 @@
 """Independent construction copies with one remapping for internally shared controls."""
 
 from dataclasses import replace
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from uuid import uuid4
 
 from anthroforge.core import graph_records
@@ -49,11 +49,11 @@ def identities(document: Document, entities: set[str], controls: set[str]) -> se
 
 
 def binding(source: Deformer, mapping: dict[str, str]) -> Deformer:
-    return graph_records.rewritten(source, mapping)
+    return cast(Deformer, graph_records.rewritten(source, mapping))
 
 
 def primitive(source: Primitive | None, mapping: dict[str, str]) -> Primitive | None:
-    return graph_records.rewritten(source, mapping)
+    return cast(Primitive | None, graph_records.rewritten(source, mapping))
 
 
 def control(source: Control, mapping: dict[str, str]) -> Control:

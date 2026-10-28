@@ -25,6 +25,7 @@ UiScrollView {
             UiButton { required property var modelData; objectName: "issueFix-"+modelData.name; text: modelData.label; enabled: !panel.issue.repairActive; onClicked: panel.service.run("issues.fix",{identity:panel.issue.id,name:modelData.name}) }
         }
         UiButton { text:"Review pin repair"; visible:panel.issue.code==="FIBER_PIN_REPAIR_AVAILABLE"; onClicked:panel.service.reviewPins(panel.issue.target) }
+        UiButton { objectName:"resolveAssemblyReference"; text:"Resolve references"; visible:panel.issue.code==="UNRESOLVED_IMPORT_REFERENCE"; enabled:panel.service.state.canNavigate; onClicked:workspace.assemblyPanel.resolve(panel.issue.evidence?.reference || "") }
         Label { Layout.fillWidth: true; visible: !!panel.issue.repair; text: "Repair: "+(panel.issue.repair || ""); color: Theme.accent; wrapMode: Text.Wrap }
         UiButton { objectName: "issueCancelFix"; text: "Cancel repair"; visible: !!panel.issue.repairActive; onClicked: panel.service.run("issues.cancel_fix",{identity:panel.issue.id}) }
         Repeater {

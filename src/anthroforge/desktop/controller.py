@@ -11,6 +11,7 @@ from anthroforge.profiling.spans import measured
 from . import controller_actions as actions
 from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
+from .assembly_panel import AssemblyPanel
 from .creation_selection import CreationSelection
 from .display_transforms import DisplayTransforms
 from .drawing_tools import DrawingTools
@@ -88,6 +89,7 @@ class Controller(QObject):
         self.initialize_tissue_tools()
         self.surface_creation = SurfaceCreation(self)
         self.mesh_replacement = MeshReplacementPanel(self)
+        self.assembly_panel = AssemblyPanel(self)
 
     def initialize_tissue_tools(self):
         self.spatial_evidence = SpatialEvidenceTools(self)
@@ -329,6 +331,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def meshReplacement(self):
         return self.mesh_replacement
+
+    @Property(QObject, constant=True)
+    def assemblyPanel(self):
+        return self.assembly_panel
 
     @Property(QObject, constant=True)
     def spatialEvidence(self):
@@ -610,6 +616,7 @@ class Controller(QObject):
             self.notify()
 
     def refresh_runtime_panels(self):
+        self.assembly_panel.synchronize()
         self.spatial_evidence.synchronize()
         self.surface_measurements.synchronize()
         self.neighborhood.synchronize()

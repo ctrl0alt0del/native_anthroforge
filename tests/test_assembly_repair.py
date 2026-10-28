@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from anthroforge.application import assembly_candidate, storage
 from tests.test_assembly_mapping import captured, prepared
 
@@ -38,6 +40,3 @@ def test_pending_surface_evidence_round_trips_without_source(session, tmp_path):
     assert loaded.object(key).result.asset
     assert loaded.external_references
     resources.require(loaded)
-
-
-from pathlib import Path

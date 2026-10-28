@@ -3,7 +3,6 @@
 from collections.abc import Mapping
 
 from .assembly import permits
-
 from .entities import SCP
 from .membranes import Membrane
 from .mirroring import MirrorInstance, parse

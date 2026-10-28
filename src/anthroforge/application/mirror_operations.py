@@ -35,7 +35,7 @@ def planes(session: Any) -> list[dict[str, Any]]:
 
 def plane_name(document: Any, rule: MirrorRule) -> str:
     if rule.scope:
-        return "Imported · " + document.object(rule.scope[0]).name
+        return "Imported · " + str(document.object(rule.scope[0]).name)
     return str(document.object(rule.target).name)
 
 

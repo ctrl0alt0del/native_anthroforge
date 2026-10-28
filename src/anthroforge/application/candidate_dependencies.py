@@ -5,7 +5,13 @@ from typing import Any
 from anthroforge.core.results import Port
 from anthroforge.core.skeleton_update import Finding
 
-from . import candidate_outputs, candidate_reuse, dependencies
+from . import (
+    candidate_batches,
+    candidate_formulas,
+    candidate_outputs,
+    candidate_reuse,
+    dependencies,
+)
 
 
 def evaluate(context: Any, seeds: set[Port], restrict: set[str] | None = None) -> set[Port]:
@@ -15,7 +21,7 @@ def evaluate(context: Any, seeds: set[Port], restrict: set[str] | None = None) -
         graph, pending = remaining(context, seeds, done, restrict)
         if not pending:
             return done
-        ready = sorted((p for p in pending if not (graph.get(p, set()) & pending)), key=order)
+        ready = sorted(candidate_batches.ready(context.document, graph, pending), key=order)
         for port in ready or sorted(pending, key=order):
             failed = dependencies.closure(graph, {port}) & context.failed
             execute(context, port, port in graph.blocked or not ready or bool(failed))
@@ -29,6 +35,7 @@ def remaining(context: Any, seeds: Any, done: Any, restrict: Any) -> Any:
     pending = dependencies.closure(dependencies.reverse(graph), seeds) - done
     if restrict is not None:
         pending = {p for p in pending if p.owner in restrict}
+    context.pending = pending
     return graph, pending
 
 
@@ -48,13 +55,25 @@ def execute(context: Any, port: Port, blocked: bool) -> None:
         perform(context, port, function, blocked)
     except (ValueError, RuntimeError) as error:
         context.check_cancelled()
-        candidate_outputs.failure(context, port, str(error))
-        context.failed.add(port)
-        context.findings.append(failure_finding(context, port, str(error)))
+        record_failure(context, port, str(error))
     context.prepared.add(port)
 
 
+def record_failure(context: Any, port: Port, message: str) -> None:
+    if port.output == "formula":
+        candidate_formulas.failed(context, port, message)
+        return
+    candidate_outputs.failure(context, port, message)
+    context.failed.add(port)
+    context.findings.append(failure_finding(context, port, message))
+
+
 def perform(context: Any, port: Port, function: Any, blocked: bool) -> None:
+    if blocked and port.output == "formula":
+        candidate_formulas.failed(
+            context, port, "A required candidate input failed; accepted values retained."
+        )
+        return
     if blocked:
         raise ValueError("Cyclic or missing dependency; last accepted output retained.")
     if not candidate_reuse.install(context, port):

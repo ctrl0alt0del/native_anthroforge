@@ -79,3 +79,13 @@ Qualified native runtime: `C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-04
 Set `ANTHROFORGE_NATIVE_LIBRARY` to its `bin/af_native.dll` and `AF_NATIVE_BUILD` to that root.
 Use `QT_QPA_PLATFORM=offscreen` for GUI tests. All task artifacts go under ignored
 `build/skeleton-update-042`, not WIP_models. No new distribution names or versions.
+
+Current checkpoint: added native comparison metrics, reviewed world-space attachment
+corrections, coherent formula batches, stale-candidate status, synchronized comparison
+publication, source-resource mirror/skin display and advisory geometry checks. The real
+review window is inspected through hidden QQuickRenderControl (GPU); ordinary platform
+'offscreen' captures test layout but do not render Quick3D on this Windows machine.
+`build/skeleton-update-042/review-gpu.png` shows the translated fixture with no warnings.
+Seven focused placement/native-distance/architecture tests passed before final UI additions.
+Next: qualification of curve/region corrections, full lifecycle and production assembly;
+full development gate and canonical packaging are still outstanding. Keep this task off main.

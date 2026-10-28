@@ -9,6 +9,7 @@ from anthroforge.core.shortcuts import FormulaResult
 from anthroforge.core.skeleton_update import Finding
 
 from . import (
+    candidate_batches,
     entity_revisions,
     formula_evaluation,
     formula_inputs,
@@ -35,6 +36,8 @@ def evaluate(context: Any, keys: set[str], review: bool = False) -> None:
 def allowed(context: Any, result: Any) -> bool:
     valid = True
     for key, value in result.values.items():
+        if key not in context.formula_review:
+            continue
         formula = formula_inputs.formulas(context.document)[key][1]
         current = property_operations.read(result.context, formula.target)
         if property_transforms.equivalent(current, value):
@@ -69,11 +72,26 @@ def accept(context: Any, result: Any) -> None:
         context.prepared.add(port)
         if key in result.failures:
             context.failed.add(port)
-            context.findings.append(
-                Finding("failure:" + key, key, result.failures[key], blocking=True, kind="property")
-            )
+            context.findings.append(failure(context, key, result.failures[key]))
     context.document = replace(context.document, formula_results=tuple(records.values()))
 
 
+def failure(context: Any, key: str, message: str) -> Finding:
+    required = key in context.formula_review
+    return Finding(
+        "failure:" + key, key, message, blocking=required, acknowledge=not required, kind="failure"
+    )
+
+
 def handler(context: Any, port: Port) -> None:
-    evaluate(context, {port.owner})
+    keys = candidate_batches.group(context.document, port, context.pending)
+    evaluate(context, keys, review=bool(keys & context.formula_review))
+    context.completed_batch.update(Port(key, "formula") for key in keys)
+
+
+def failed(context: Any, port: Port, message: str) -> None:
+    keys = candidate_batches.group(context.document, port, context.pending)
+    captured = formula_inputs.Captured(context.document, context.resources, context.engine)
+    result = formula_evaluation.Evaluation(captured, keys, failures=dict.fromkeys(keys, message))
+    accept(context, result)
+    context.completed_batch.update(Port(key, "formula") for key in keys)

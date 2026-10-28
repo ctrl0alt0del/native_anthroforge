@@ -6,6 +6,7 @@ from time import monotonic, sleep
 from typing import Any
 from uuid import uuid4
 
+from anthroforge.core.jobs import ObsoleteInputs
 from anthroforge.native.mesh import NativeCancellation
 
 from . import skeleton_control_review, skeleton_matching, skeleton_preparation
@@ -18,6 +19,7 @@ class SkeletonUpdate:
         self.runtime = Assembly(session)
         self.inventory_key: Any = None
         self.inventory_rows: list[dict[str, Any]] = []
+        self.validated: Any = None
 
     def inspect(self, path: str) -> dict[str, Any]:
         self.runtime.inspect(path)
@@ -65,7 +67,19 @@ class SkeletonUpdate:
     def status(self, wait: bool = False, timeout: float = 300.0) -> dict[str, Any]:
         if wait:
             self.wait(timeout)
+        self.validate()
         return describe(self)
+
+    def validate(self) -> None:
+        state, document = self.runtime.preparation, self.session.document
+        stamp = (id(state.candidate), id(document))
+        if state.state != "ready" or stamp == self.validated:
+            return
+        self.validated = stamp
+        try:
+            state.candidate.reads.require(document)
+        except ObsoleteInputs as error:
+            state.state, state.error = "stale", str(error)
 
     def wait(self, timeout: float) -> None:
         deadline = monotonic() + timeout
@@ -81,7 +95,7 @@ class SkeletonUpdate:
 
 def describe(service: SkeletonUpdate) -> dict[str, Any]:
     source, state = service.runtime.source, service.runtime.preparation
-    return dict(
+    result = dict(
         source=source.token,
         source_state=source.state,
         source_error=source.error,
@@ -92,6 +106,8 @@ def describe(service: SkeletonUpdate) -> dict[str, Any]:
         inventory=inventory(service),
         **details(state.candidate),
     )
+    result["ready"] = state.state == "ready" and bool(result.get("ready"))
+    return result
 
 
 def inventory(service: SkeletonUpdate) -> Any:

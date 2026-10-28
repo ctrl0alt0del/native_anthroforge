@@ -9,7 +9,7 @@ Item {
     property bool overlay: false
     readonly property var cameraState: service.state.camera
     View3D {
-        id: view; anchors.fill: parent
+        id: view; anchors.fill: parent; camera: camera
         environment: SceneEnvironment { clearColor: "#25282d"; backgroundMode: SceneEnvironment.Color; antialiasingMode: SceneEnvironment.MSAA }
         Node {
             position: Qt.vector3d(panel.cameraState[0],panel.cameraState[2],-panel.cameraState[1])
@@ -22,6 +22,8 @@ Item {
             eulerRotation.x: -90
             SkeletonSceneGeometry { service: panel.service; model: panel.side ? panel.service.after : panel.service.before }
             SkeletonSceneGeometry { service: panel.service; model: panel.overlay ? panel.service.before : null; overlay: true }
+            SkeletonAnchors { service: panel.service; side: panel.side }
+            SkeletonAnchors { service: panel.service; side: 0; visible: panel.overlay }
         }
     }
     Label { anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 10; text: panel.overlay ? "Overlay" : panel.side ? "After" : "Before"; color: Theme.text; font.bold: true }

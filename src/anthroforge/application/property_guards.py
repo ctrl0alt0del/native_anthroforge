@@ -48,7 +48,9 @@ def retained_writers(before: Any, after: Any) -> Iterator[tuple[str, Any]]:
 def require_references(session: Any, before: Any, after: Any) -> None:
     for driver in after.driving_shortcuts:
         for formula in driver.formulas:
-            authorized = getattr(session, "formula_reference_authority", frozenset())
+            authorized: frozenset[str] = getattr(
+                session, "formula_reference_authority", frozenset()
+            )
             if not formula.enabled and formula.id in authorized:
                 continue
             references = (formula.target, *(i.property for i in formula.inputs if i.property))
@@ -120,7 +122,7 @@ def publication(
     session: Any, formulas: set[str], disabled: frozenset[str] = frozenset()
 ) -> Iterator[None]:
     previous = session.formula_write_authority
-    references = getattr(session, "formula_reference_authority", frozenset())
+    references: frozenset[str] = getattr(session, "formula_reference_authority", frozenset())
     session.formula_write_authority = frozenset(formulas)
     session.formula_reference_authority = disabled
     try:

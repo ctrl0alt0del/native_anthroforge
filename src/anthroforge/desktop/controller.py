@@ -645,8 +645,10 @@ class Controller(QObject):
         self.last_frame = now
         self._presenting = True
         try:
+            paired = self.skeleton_panel.scene.models
+            ready = not any(model.pending for model in paired)
             for model in self.geometry_models():
-                model.presented()
+                model.presented(ready=ready if model in paired else True)
         finally:
             self._presenting = False
         if self._geometry_dirty:

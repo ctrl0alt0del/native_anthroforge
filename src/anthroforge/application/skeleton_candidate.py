@@ -116,6 +116,6 @@ def reads(context: Any, seeds: set[Port], extra: set[str]) -> Reads:
         readset(context.baseline, keys),
         skeleton_reads.relationships(original, affected),
         context.baseline.attachments_enabled,
-        skeleton_reads.scene(context.baseline),
-        context.baseline.skin,
+        skeleton_reads.observed_scene(context, required),
+        context.baseline.skin if context.baseline.skin.reference else None,
     )

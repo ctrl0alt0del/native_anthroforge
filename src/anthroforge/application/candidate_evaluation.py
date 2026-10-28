@@ -24,6 +24,8 @@ class EvaluationContext:
     options: dict[str, Any] = field(default_factory=dict)
     completed_batch: set[Port] = field(default_factory=set)
     reuse: dict[Port, Any] = field(default_factory=dict)
+    formula_review: set[str] = field(default_factory=set)
+    pending: set[Port] = field(default_factory=set)
 
     @property
     def assets(self) -> Any:

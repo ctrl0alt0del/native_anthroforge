@@ -13,10 +13,10 @@ from . import (
     evaluation,
     object_revisions,
     property_transforms,
-    replacement_bindings,
     replacement_reviews,
     scp_surface_parents,
     skeleton_correspondence,
+    skeleton_placements,
     surface_providers,
 )
 from .entity_revisions import GEOMETRY_FIELDS, differs
@@ -173,10 +173,12 @@ def old_frames(context: Any) -> Any:
 def rebind_dependents(context: Any, changes: Any, options: Any) -> list[dict[str, Any]]:
     evidence: list[dict[str, Any]] = []
     for row in changes:
-        if row.added or row.correspondence == "verified":
+        if row.added:
             continue
         for item in replacement_reviews.incoming(context.baseline, row.target):
             if item.id in context.fixed_poses:
+                continue
+            if row.correspondence == "verified" and item.id not in options.get("placements", {}):
                 continue
             rebind(context, item.id, row.target, options, evidence)
     return evidence
@@ -208,12 +210,4 @@ def rebind_finding(key: str, owner: str, enabled: bool) -> Finding:
 
 
 def rebound_item(context: Any, item: Any, target: str) -> Any:
-    return replacement_bindings.rebound(
-        context.engine,
-        context.baseline,
-        old_frames(context),
-        context.resources,
-        item,
-        target,
-        context.cancel.handle,
-    )
+    return skeleton_placements.apply(context, old_frames(context), item, target)

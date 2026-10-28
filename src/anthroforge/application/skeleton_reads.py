@@ -31,9 +31,18 @@ def control_keys(context: Any, observed: Any) -> set[str]:
     return found
 
 
-def scene(document: Any) -> tuple[Any, ...]:
+def scene(document: Any, scopes: Any = (True, True)) -> tuple[Any, ...]:
     graph = dependencies.graph(document)
-    return graph.routing_scene, tissue_stack_observation.membership(document)
+    return (
+        graph.routing_scene if scopes[0] else None,
+        tissue_stack_observation.membership(document) if scopes[1] else None,
+    )
+
+
+def observed_scene(context: Any, required: Any) -> tuple[Any, ...]:
+    scope = {p.output for p in required}
+    stacking = any(p.output in ("plan", "final") for p in context.prepared)
+    return scene(context.baseline, ("routing_scope" in scope, stacking))
 
 
 def relationships(graph: Any, affected: Any) -> tuple[Any, ...]:
@@ -45,9 +54,10 @@ def relationships(graph: Any, affected: Any) -> tuple[Any, ...]:
 
 
 def require_global(reads: Any, document: Any) -> None:
-    if reads.scene != scene(document):
+    scopes = tuple(value is not None for value in reads.scene)
+    if reads.scene != scene(document, scopes):
         raise ObsoleteInputs("Automatic obstacle or stacking membership changed; prepare again.")
-    if reads.skin != document.skin:
+    if reads.skin is not None and reads.skin != document.skin:
         raise ObsoleteInputs("Skin state changed while preparing this update; prepare again.")
 
 

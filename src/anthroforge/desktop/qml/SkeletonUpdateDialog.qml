@@ -19,7 +19,7 @@ UiDialog {
             UiCombo { objectName: "skeletonViewMode"; model: ["Split","Before","After","Overlay"]; onActivated: dialog.service.comparison.setMode(currentText) }
             UiButton { text: "Frame all"; onClicked: dialog.service.comparison.focus("") }
             Repeater {
-                model: ["bones","fibers","tissues","attachments"]
+                model: ["bones","fibers","tissues","attachments","skin"]
                 UiCheck { required property string modelData; text: modelData === "fibers" ? "Curves / fibers" : modelData[0].toUpperCase()+modelData.slice(1); checked: true; onClicked: dialog.service.comparison.filter(modelData,checked) }
             }
             Item { Layout.fillWidth: true }
@@ -28,19 +28,21 @@ UiDialog {
             Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumHeight: 400
             handle: Rectangle { implicitWidth: 6; color: Theme.border }
             ColumnLayout {
-                SplitView.preferredWidth: 350; SplitView.minimumWidth: 270
+                SplitView.preferredWidth: 410; SplitView.minimumWidth: 340; SplitView.maximumWidth: dialog.width-420
                 UiTabBar {
                     id: details; Layout.fillWidth: true
                     UiTabButton { text: "Bones" }
                     UiTabButton { text: "Links" }
                     UiTabButton { text: "Controls" }
+                    UiTabButton { text: "Affected" }
                     UiTabButton { text: "Review" }
                 }
                 StackLayout {
-                    Layout.fillWidth: true; Layout.fillHeight: true; currentIndex: details.currentIndex
+                    Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumWidth: 0; currentIndex: details.currentIndex
                     SkeletonMatches { service: dialog.service }
                     AssemblyMappings { service: dialog.service; allowUnresolved: false }
                     SkeletonControls { service: dialog.service }
+                    SkeletonAffected { service: dialog.service }
                     SkeletonFindings { service: dialog.service }
                 }
             }
@@ -51,7 +53,7 @@ UiDialog {
                     SkeletonViewport { Layout.fillWidth: true; Layout.fillHeight: true; service: dialog.service.comparison; side: 0; visible: ["Split","Before"].includes(service.state.mode) }
                     SkeletonViewport { Layout.fillWidth: true; Layout.fillHeight: true; service: dialog.service.comparison; side: 1; visible: service.state.mode!=="Before"; overlay: service.state.mode==="Overlay" }
                 }
-                AssemblyEvidence { Layout.fillWidth: true; visible: !!dialog.service.state.evidence?.length; evidence: (dialog.service.state.evidence || []).filter(r=>!dialog.service.state.selection || r.owner===dialog.service.state.selection) }
+                SkeletonAttachments { Layout.fillWidth: true; service: dialog.service }
                 RowLayout {
                     UiCheck { objectName: "skeletonPreviewSkin"; text: "Preview skin update"; enabled: !!dialog.service.state.skin?.available; hint: dialog.service.state.skin?.reason || "Deform existing final skin without changing topology"; checked: !!dialog.service.state.options.preview_skin; onClicked: dialog.service.option("preview_skin",checked) }
                     Label { Layout.fillWidth: true; text: dialog.service.state.skin?.reason || (dialog.service.state.skin?.previewed ? "Skin update prepared" : dialog.service.state.skin?.retained ? "Current skin retained until updated" : ""); color: Theme.muted; wrapMode: Text.Wrap }

@@ -1,5 +1,7 @@
 """One review window over the shared whole-skeleton preparation operations."""
 
+import json
+
 from PySide6.QtCore import Property, QObject, QTimer, QUrl, Signal, Slot
 
 from . import skeleton_projection
@@ -129,7 +131,10 @@ class SkeletonPanel(QObject):
         if stamp == self.signature:
             return
         self.signature = stamp
-        self._state = self.controller.session.skeleton_update.status()
+        self._state = json.loads(json.dumps(self.controller.session.skeleton_update.status()))
+        if self._state.get("state") == "stale":
+            self.queue()
+            return
         skeleton_projection.synchronize(self)
         self.scene.synchronize(runtime.preparation.candidate)
         self.changed.emit()
@@ -157,6 +162,24 @@ class SkeletonPanel(QObject):
     @Slot(str, str, result="QVariantList")
     def propertyChoices(self, key, target):
         return skeleton_projection.control_properties(self, key, target)
+
+    @Slot(str, "QVariantMap", "QVariantList")
+    def correctPlacement(self, owner, point, position):
+        rows = self.options.setdefault("placements", {}).setdefault(owner, {})
+        rows[point["point"]] = dict(
+            position=list(position),
+            target=point["target"],
+            role=point["role"],
+            instance=point.get("instance", ""),
+        )
+        self.options.setdefault("rebind", {})["rebind:" + owner + ":" + point["target"]] = True
+        self.queue()
+
+    @Slot(str, str)
+    def resetPlacement(self, owner, point):
+        rows = self.options.setdefault("placements", {}).get(owner, {})
+        rows.pop(point, None)
+        self.queue()
 
     @Slot(str)
     def selectReference(self, key):

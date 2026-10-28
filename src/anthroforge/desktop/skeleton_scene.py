@@ -11,7 +11,7 @@ from anthroforge.core.entities import SCP
 from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import scene
 
-from . import shortcut_comparison_scene
+from . import shortcut_comparison_scene, skeleton_display
 from .models import RenderModel
 
 
@@ -23,7 +23,7 @@ class SkeletonScene(QObject):
         super().__init__(parent)
         self.controller, self.candidate = controller, None
         self.models = (RenderModel(controller), RenderModel(controller))
-        self.filters = dict(bones=True, fibers=True, tissues=True, attachments=True)
+        self.filters = dict(bones=True, fibers=True, tissues=True, attachments=True, skin=True)
         self.camera = [0.0, 0.0, 0.0, -18.0, 25.0, 8.0]
         self.mode, self.selection, self.picking = "Split", "", [None, None]
         for index, model in enumerate(self.models):
@@ -44,7 +44,9 @@ class SkeletonScene(QObject):
             mode=self.mode,
             filters=self.filters,
             selection=self.selection,
-            anchors=self.anchors(),
+            anchors=skeleton_display.anchors(
+                self.candidate, self.selection, self.filters["attachments"]
+            ),
         )
 
     def synchronize(self, candidate):
@@ -69,9 +71,18 @@ class SkeletonScene(QObject):
         context = InspectionContext(
             document, c.resources, self.controller.session.engine, workspace
         )
+        return self.context_rows(context, workspace)
+
+    def context_rows(self, context, workspace):
+        c, document = self.candidate, context.document
         rows, leases = shortcut_comparison_scene.rows(SimpleNamespace(source=context), workspace)
         affected = {p.owner for p in c.prepared} | {r.target for r in c.changes}
         rows = [r for r in rows if r["id"] in affected and self.visible(document.object(r["id"]))]
+        rows += skeleton_display.mirrors(context, rows)
+        if self.filters["skin"]:
+            extra, owned = skeleton_display.skin(context)
+            rows.extend(extra)
+            leases.extend(owned)
         return rows, leases
 
     def visible(self, item):
@@ -149,12 +160,3 @@ class SkeletonScene(QObject):
             self.selected.emit(key)
             self.changed.emit()
         return key
-
-    def anchors(self):
-        if not self.candidate or not self.filters["attachments"]:
-            return []
-        return [
-            row
-            for row in self.candidate.evidence
-            if not self.selection or row["owner"] == self.selection
-        ]

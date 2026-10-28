@@ -3,6 +3,7 @@
 from dataclasses import replace
 from typing import Any
 
+from anthroforge.core import skin_sources
 from anthroforge.core.results import Port
 from anthroforge.core.skeleton_update import Finding
 
@@ -19,13 +20,19 @@ def assess(context: Any, changes: Any) -> dict[str, Any]:
     result = dict(
         available=not reason, reason=reason, previewed=False, retained=bool(skin.final.asset)
     )
-    if context.options.get("preview_skin") and not reason:
+    if (
+        context.options.get("preview_skin")
+        and not reason
+        and not any(f.blocking for f in context.findings)
+    ):
         preview(context, result)
     return result
 
 
 def compatibility(context: Any, changes: Any) -> str:
-    if context.document.skin.reference and any(r.correspondence != "verified" for r in changes):
+    owners = {r.owner for r in skin_sources.contributors(context.document)}
+    changed = any(r.target in owners and r.correspondence != "verified" for r in changes)
+    if context.document.skin.reference and changed:
         return "Replacement material correspondence changed; rebuild the skin reference explicitly."
     return str(skin_status.assess(context.document, context.resources).operations["update"].reason)
 

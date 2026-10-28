@@ -72,10 +72,10 @@ class RenderModel(QAbstractListModel):
             self.staged_frame = self.frame
 
     @measured("publication", model_profiler)
-    def presented(self):
+    def presented(self, ready=True):
         self.frame += 1
         self._record_displayed()
-        if self.pending or self.staged_frame >= self.frame:
+        if not ready or self.pending or self.staged_frame >= self.frame:
             return
         self._remove_missing(self.wanted)
         for index, row in enumerate(self.rows):

@@ -3745,3 +3745,30 @@ behavior. Import returns jobs launched during adoption as well as after it. No s
 inflation, attachment or correspondence kernel changes. Regression evidence covers source-free
 repair, schema roundtrip, unchanged intrinsic results, mirrors and Manual evaluation; final
 combined qualification is recorded in the task rather than inferred from those local checks.
+
+## 2026-10-29 — Whole-skeleton candidate review (in progress)
+
+Affected inventory: project graph preparation, attachment capture/propagation, formula
+publication, native geometry inspection and viewport staging. Skeleton updates now prepare
+an owned multi-object document through the existing coordinator rather than replacing bones
+sequentially in the live document. Existing numerical propagation, routing, inflation,
+relaxation and stacking kernels are unchanged. Formula evaluation uses existing coherent
+property groups; required construction failures block Apply and dependent failures retain
+accepted output for explicit review.
+
+An unchanged production Thumb exposed ordered-connectivity differences when its saved
+Boolean output was unnecessarily reconstructed. Candidate reuse now checks saved input
+provenance and remapped numerical definitions before retaining that output. Equal counts do
+not establish correspondence. Geometry comparisons use native, deterministic bidirectional
+vertex-to-surface samples (at most 512 per side), explicitly not a Hausdorff bound; material
+displacement is reported separately and only for verified canonical correspondence.
+Explicit anchor corrections use existing current-shape editing/capture, expressed in the
+replacement bone's old frame before ordinary propagation. No attachment target/role is
+silently changed. Paired review scenes retain staged native resources and share a publication
+barrier, camera and zoom; mirrored instances reuse source resources.
+
+Focused evidence: changed-topology Anchor review, corrected placement under a translated
+bone, role-change rejection and distance/correspondence tests pass. The populated review
+window renders actual before/after geometry into a hidden GPU texture without QML warnings.
+Full assembly edits, lifecycle, complete gate and portable qualification remain pending;
+this entry does not claim release acceptance.

@@ -16,6 +16,7 @@ from . import (
     fiber_edit_evaluation,
     object_revisions,
     point_evaluation,
+    replacement_placements,
     tissue_region_goals,
 )
 from .object_frames import Frames
@@ -87,8 +88,10 @@ def fiber(
     cancel: int,
     target: str = "",
     capture: Any = None,
+    placements: Any = None,
 ) -> Fiber:
     current, geometry = fiber_shape(engine, original, document, resources, item, target)
+    current, geometry = replacement_placements.curve(engine, current, geometry, placements, cancel)
     inputs = engine, current, resources, document, geometry, cancel, capture
     return capture_fiber(item, resources, inputs)
 

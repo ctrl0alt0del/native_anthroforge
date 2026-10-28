@@ -15,14 +15,21 @@ from anthroforge.core.entities import SCP, Attachment, AttachmentReceipt, Worksp
 from anthroforge.core.junctions import decode as decode_junction
 from anthroforge.native.mesh import GeometryEngine
 
-from . import attachment_storage, object_codec, resource_storage, shortcut_codec, skin_codec
+from . import (
+    assembly_codec,
+    attachment_storage,
+    object_codec,
+    resource_storage,
+    shortcut_codec,
+    skin_codec,
+)
 from .construction_codec import control, entity_construction
 from .mirror_codec import fields as mirror_fields
 from .resources import Resources
 
 FORMAT = "anthroforge-project"
-VERSION = 7
-READ_VERSIONS = (4, 5, 6, 7)
+VERSION = 8
+READ_VERSIONS = (4, 5, 6, 7, 8)
 STATE_RECORDS = (
     "entities",
     "controls",
@@ -34,6 +41,8 @@ STATE_RECORDS = (
     "shortcut_edits",
     "mirror_rules",
     "shared_mirror_targets",
+    "imports",
+    "external_references",
 )
 
 
@@ -191,7 +200,8 @@ def restored_document(data: dict[str, Any]) -> Document:
     mirrors = mirror_fields(data)
     data.pop("mirror_accepted", None)
     data["skin"] = skin_codec.decode(data.get("skin"))
-    return Document(**(data | shortcut_codec.document_fields(data) | mirrors))
+    assembly = assembly_codec.decode(data)
+    return Document(**(data | shortcut_codec.document_fields(data) | mirrors | assembly))
 
 
 def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resources]:

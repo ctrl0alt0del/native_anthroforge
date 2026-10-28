@@ -3,9 +3,9 @@
 from collections.abc import Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from . import registry_validation
+from . import assembly, registry_validation
 from .construction import Control, Curve
 from .curve_dependencies import targets as curve_targets
 from .deformer_references import sources as deformer_sources
@@ -54,8 +54,10 @@ class ObjectRegistry:
     junctions: tuple[Junction, ...]
     anatomy: Mapping[str, Anatomy]
     authored: Mapping[str, Authored]
+    external: tuple[assembly.ExternalReference, ...] = ()
 
     def get(self, key: str) -> SceneObject:
+        assembly.require_resolved(self.records, key)
         if key not in self.records:
             raise ValueError(f"Unknown object: {key}")
         return self.records[key]
@@ -65,8 +67,12 @@ def build(document: "Document", previous: ObjectRegistry | None) -> ObjectRegist
     if previous is not None and reusable(document, previous):
         return previous
     records, consumers = validated_records(document, previous)
+    return indexed_records(document, records, consumers)
+
+
+def indexed_records(document: "Document", records: Any, consumers: Any) -> ObjectRegistry:
     return ObjectRegistry(
-        MappingProxyType(records),
+        records,
         MappingProxyType({v.id: v for v in document.objects if not isinstance(v, TissueVCP)}),
         document.objects,
         document.entities,
@@ -75,24 +81,29 @@ def build(document: "Document", previous: ObjectRegistry | None) -> ObjectRegist
         document.junctions,
         MappingProxyType({k: v for k, v in records.items() if isinstance(v, (SCP, TissueVCP))}),
         MappingProxyType({v.id: v for v in document.objects}),
+        document.external_references,
     )
 
 
 def validated_records(
     document: "Document", previous: ObjectRegistry | None = None
-) -> tuple[dict[str, SceneObject], Mapping[str, frozenset[str]]]:
+) -> tuple[Mapping[str, SceneObject], Mapping[str, frozenset[str]]]:
     items = (*document.entities, *document.controls, *document.objects)
-    records = {item.id: item for item in items}
+    records = assembly.records({item.id: item for item in items}, document.external_references)
     if len(records) != len(items):
         raise ValueError("Object identities must be unique across all object categories.")
-    if (
-        previous
-        and document.junctions == previous.junctions
-        and registry_validation.reusable(records, previous.records)
-    ):
+    if previous and validation_reusable(document, records, previous):
         return records, previous.consumers
     validate(document, records)
     return records, construction_consumers(document)
+
+
+def validation_reusable(document: "Document", records: Any, previous: ObjectRegistry) -> bool:
+    return (
+        document.external_references is previous.external
+        and document.junctions == previous.junctions
+        and registry_validation.reusable(records, previous.records)
+    )
 
 
 def construction_consumers(document: "Document") -> Mapping[str, frozenset[str]]:
@@ -118,10 +129,11 @@ def reusable(document: "Document", previous: ObjectRegistry | None) -> bool:
         and document.entities is previous.entities
         and document.controls is previous.controls
         and document.junctions is previous.junctions
+        and document.external_references is previous.external
     )
 
 
-def validate(document: "Document", records: dict[str, SceneObject]) -> None:
+def validate(document: "Document", records: Mapping[str, SceneObject]) -> None:
     validate_deformers(document, records)
     validate_junctions(document.junctions, document.objects)
     validate_primitives(document, records)
@@ -132,7 +144,7 @@ def validate(document: "Document", records: dict[str, SceneObject]) -> None:
     validate_point_ids(document)
 
 
-def validate_deformers(document: "Document", records: dict[str, SceneObject]) -> None:
+def validate_deformers(document: "Document", records: Mapping[str, SceneObject]) -> None:
     from .anatomical_surfaces import reference
 
     for owner in document.entities:
@@ -142,7 +154,7 @@ def validate_deformers(document: "Document", records: dict[str, SceneObject]) ->
                 reference(surface.target, records, surface.role)
 
 
-def validate_object(item: Authored, records: dict[str, SceneObject]) -> None:
+def validate_object(item: Authored, records: Mapping[str, SceneObject]) -> None:
     from .tissue_policy import validate as validate_tissue
 
     if isinstance(item, Curve):
@@ -162,11 +174,11 @@ def validate_placement(
         item.parent not in records or isinstance(records[item.parent], ReferenceImage)
     ):
         raise ValueError("Transform parent must exist and cannot be a reference image.")
-    if any(not isinstance(records.get(key), (SCP, TissueVCP)) for key in item.owners):
+    if any(not anatomical_or_external(records, key) for key in item.owners):
         raise ValueError("Workspace associations require anatomical objects.")
 
 
-def validate_primitives(document: "Document", records: dict[str, SceneObject]) -> None:
+def validate_primitives(document: "Document", records: Mapping[str, SceneObject]) -> None:
     for item in document.entities:
         if item.primitive:
             for use in item.primitive.curves:
@@ -174,7 +186,7 @@ def validate_primitives(document: "Document", records: dict[str, SceneObject]) -
                     raise ValueError("Primitive curve source does not exist.")
 
 
-def validate_bindings(item: Curve, records: dict[str, SceneObject]) -> None:
+def validate_bindings(item: Curve, records: Mapping[str, SceneObject]) -> None:
     from .curve_engines import RoutingSettings
 
     excluded = (
@@ -183,7 +195,7 @@ def validate_bindings(item: Curve, records: dict[str, SceneObject]) -> None:
         else ()
     )
     for target in curve_targets(item) | set(excluded):
-        if not isinstance(records.get(target), (SCP, TissueVCP)):
+        if not anatomical_or_external(records, target):
             raise ValueError(
                 "Curve obstacles and fiber bindings require anatomical surface providers."
             )
@@ -234,3 +246,9 @@ def validate_anchor(item: Anchor, records: Mapping[str, SceneObject]) -> None:
 
     target = item.binding.reference
     reference(target.target, records, target.role)
+
+
+def anatomical_or_external(records: Mapping[str, SceneObject], key: str) -> bool:
+    return isinstance(records.get(key), (SCP, TissueVCP)) or assembly.permits(
+        records, key, ("SCP", "TISSUE")
+    )

@@ -5,6 +5,7 @@ from functools import partial
 from typing import TYPE_CHECKING
 
 from . import (
+    assembly,
     fiber_collisions,
     fiber_pins,
     formulas,
@@ -43,6 +44,7 @@ class IssueSystem:
         for provider in (
             *providers.builtins(),
             formulas.provider(),
+            assembly.provider(),
             mirroring.provider(session),
             fiber_collisions.provider(session),
             fiber_pins.provider(session),

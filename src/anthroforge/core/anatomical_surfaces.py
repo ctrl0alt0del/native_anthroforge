@@ -2,6 +2,8 @@
 
 from collections.abc import Mapping
 
+from .assembly import permits
+
 from .entities import SCP
 from .membranes import Membrane
 from .mirroring import MirrorInstance, parse
@@ -27,7 +29,8 @@ def reference(target: str, records: Mapping[str, object], role: str = "") -> Sur
     item = records.get(target)
     selected = role or ("SCP_GEOMETRY" if isinstance(item, SCP) else "TISSUE_FINAL")
     result = SurfaceReference(target, selected)
-    if selected not in roles(item, records):
+    kinds = ("SCP",) if selected == "SCP_GEOMETRY" else ("TISSUE",)
+    if selected not in roles(item, records) and not permits(records, target, kinds):
         raise ValueError(f"Object {target} does not provide the requested {selected} surface.")
     return result
 

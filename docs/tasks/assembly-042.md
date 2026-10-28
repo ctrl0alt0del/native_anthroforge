@@ -27,17 +27,20 @@ Preserve numerical algorithms, source files and unrelated root `__init__.py`.
 
 ## Current state
 
-Repository and copy/persistence/provider boundaries inspected. Implementation starting.
+Initial foundation implemented: schema-8 provenance/reference records, explicit typed field
+adapters, reference-aware registry validation, local missing-input errors and an automatic
+Issues provider. External declarations are not scene objects. No import command/UI yet.
 
 ## Verification
 
-Pending. Baseline: 2,641 Python tests, six native suites and 32 portable checks qualified
+Initial 13 foundation/architecture/resource tests pass; focused Ruff/mypy pass. Full
+qualification pending. Baseline: 2,641 Python tests, six native suites and 32 portable checks qualified
 by the preceding display/cache task. Keep new checks background/offscreen.
 
 ## Next actions and blockers
 
-1. Implement typed references, copy inventory and persistence foundations.
-2. Complete headless graph import/mapping and desktop workflow.
+1. Complete graph closure, copy/resource adapters and headless import/mapping.
+2. Complete lifecycle integration, reference repair and desktop workflow.
 3. Qualify production geometry/lifecycle and rebuild the canonical package/source archive.
 
 ## Recovery inputs

@@ -98,6 +98,9 @@ def document(document: "Document") -> None:
         raise ValueError("Authored identities must be nonempty and unique across the document.")
     controls = {c.id: c for c in document.controls}
     parents, anatomy = transform_parents(document), {e.id for e in document.entities}
+    anatomy |= {
+        r.id for r in document.external_references if not r.target and r.kind in ("SCP", "TISSUE")
+    }
     for control in document.controls:
         control_references(control, parents, anatomy)
     for item in items:

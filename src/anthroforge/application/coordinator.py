@@ -14,7 +14,7 @@ from anthroforge.core.scheduling import RequestUrgency
 from anthroforge.profiling import causes
 from anthroforge.profiling import tasks as trace
 
-from . import task_coalescing, task_priorities, task_resources
+from . import external_references, task_coalescing, task_priorities, task_resources
 from .job_registry import JobRegistry
 from .task_execution import InlineBudget, completed_future, execute
 from .task_schedulers import task_schedulers
@@ -345,6 +345,7 @@ class TaskCoordinator:
         job.snapshot, job.started = self.current(), monotonic()
         job.dispatch_revision = job.snapshot.revision
         job.state, job.progress = "preparing", "Preparing owned input"
+        external_references.require_inputs(job.snapshot, job.observes | job.prerequisites)
         self.before_dispatch(job, job.snapshot)
         payload = trace.call(self.profiler, job, "prepare", job.prepare, job.snapshot)
         job.prepare_ms = (monotonic() - job.started) * 1000

@@ -47,7 +47,7 @@ def references(value: Any) -> tuple[Reference, ...]:
 
 
 def field_references(item: Any, name: str, rule: Field, path: Any) -> list[Reference]:
-    value, role = getattr(item, name), getattr(item, "role", "")
+    value, role = getattr(item, name), rule.role or getattr(item, "role", "")
     instance = getattr(item, "instance", "") if rule.relationship == "support" else ""
     values = enumerate(value) if isinstance(value, tuple) else ((None, value),)
     return [
@@ -58,6 +58,9 @@ def field_references(item: Any, name: str, rule: Field, path: Any) -> list[Refer
 
 
 def make_reference(target: str, rule: Field, path: Any, role: str, instance: str = "") -> Reference:
+    mirror = parse(target) if rule.relationship == "stacking" else None
+    if mirror is not None:
+        target, instance = mirror.source, mirror.rule
     return Reference(target, rule.relationship, rule.required, path, rule.output, role, instance)
 
 

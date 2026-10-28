@@ -3,131 +3,126 @@
 - Task branch: `codex/assembly-042`
 - Integration branch: `main`
 - Starting revision: `de1f475`
-- Status: in progress
+- Status: final stacking-reference audit corrected; repeat release checks pending
 - Last updated: 2026-10-28, Europe/Bucharest
 - Active writer: local Codex
 
-## Outcome and acceptance
+## Outcome and contracts
 
-Implement the confirmed [assembly contract](../assembly_042.md), with desktop and
-headless import, typed graph copies, explicit external mapping, schema 8, repairable
-unresolved references, provenance, and production/portable qualification. Keep 0.4.2.
-Preserve numerical algorithms, source files and unrelated root `__init__.py`.
+Implement the confirmed [assembly contract](../assembly_042.md) through desktop and headless
+operations. Independent editable copies preserve world placement, internal sharing, accepted
+geometry, material bindings and inherited mirror behavior. Excluded transform parents require
+mapping/inclusion/detachment; other external references are declared and repairable. Explicit
+Rebind uses existing exterior/current-shape kernels. External formula writes stay disabled.
+Schema 8 reads 4–7 and persists import provenance/reference evidence. Source skin, workspaces,
+cameras, fitted solutions, history and active calculations are excluded. Keep the single 0.4.2
+distribution and preserve unrelated root `__init__.py`.
 
-## Decisions and relevant files
+## Implementation and ownership
 
-- Independent copies; source world placement; optional attached tissues.
-- Resolve placement parents/follow targets before import. Other references may remain
-  unresolved. Explicit rebind for incompatible material coordinates.
-- Preserve inherited mirror rules at boundaries. External driver outputs remain disabled
-  until explicitly mapped and enabled. Exclude project-wide skin/workspaces/history.
-- Shared application operations, one coordinator, native numerical work, 15-line functions.
-- Search reference: [OpenUSD relationship remapping](https://openusd.org/release/user_guides/namespace_editing.html).
-  Use explicit typed references; no USD dependency or live composition is introduced.
+- Core: immutable provenance/declarations, typed graph adapters and explicit identities.
+- Application: pinned package snapshots, selective resources, graph closure, compatibility,
+  rebind evidence, stale-read rejection, preparation, publication and source-free repair.
+- Native: existing content comparison, transforms, material/exterior queries and capture.
+  No numerical algorithm changes, Python numerical fallback or additional worker pool.
+- Desktop: File import, searchable/virtualized lists, optional provenance suggestions,
+  automatic preparation, stable footer, attachment evidence, Issues navigation and one undo.
+- Existing construction/control copying shares the typed remapper. Result publication uses
+  the normal transaction/coordinator contract and declares retained accepted outputs.
+- Prepared immutable indexes are reused only for their matching destination snapshot.
+  Unrelated changes use the ordinary merge; changed mapped targets reject stale publication.
+- Terminal jobs release captures; import releases the source/preparation after transferring
+  owned resources to document/history/display. Explicit garbage-collection tests verify this.
 
-## Current state
+Separate ownership/coupling review is recorded in [the contract](../assembly_042.md#ownership-review).
+Research reference: [OpenUSD relationship remapping](https://openusd.org/release/user_guides/namespace_editing.html).
+No USD dependency or live project composition was introduced.
 
-Foundation implemented: schema-8 provenance/reference records, explicit typed field adapters,
-reference-aware validation/readiness and automatic Issues. Source inspection pins a package;
-graph closure/selective resource transfer and coordinator-backed headless self-contained
-construction import work with one-action undo. Existing primitive/deformer duplication now
-uses the same typed remapper. Relationship-specific mapping and world-preserving parent
-detachment work. Native full-content comparison rejects merely matching geometry counts;
-explicit Fiber rebind uses existing current-shape capture. Missing references retain visible
-invalid source results and surface evidence for later repair. Inherited mirror planes now use
-explicit boundary scopes without dummy hierarchy nodes. Source/mirror mappings are distinct.
-Reference repair works from retained package evidence after source deletion, through the same
-mapping/binding policies and one-action undo. Desktop interaction, complete metadata provenance,
-broader relationship/lifecycle coverage and production qualification remain unfinished; this
-checkpoint is not a release.
+## Observed failures and corrections
 
-Desktop import/repair entry points are now wired: File menu, searchable virtualized lists,
-automatic preparation, stable footer, explicit rebind evidence, and Issues navigation.
-Offscreen production dialog inspection found and corrected a collapsed list; the populated
-625-record dialog now renders without QML warnings. No interactive acceptance is claimed.
-Production skeleton copying initially caused unintended formula reevaluation and changed the
-clavicle. Shared accepted-output adoption now distinguishes saved results from new edits;
-SCM maps to the copied skeleton without a spurious rebind requirement. This needs broader
-driver, lifecycle, result-provenance and shortcut-response qualification before release.
+1. Copied accepted formulas initially looked like new edits and changed clavicle geometry.
+   Shared accepted-output adoption now preserves saved outputs without spurious reevaluation.
+2. Selective loading omitted normal-reader legacy Fiber capture-frame restoration. That caused
+   shortcut propagation differences. Both readers now reuse the same restoration.
+3. Inherited mirror rule IDs were mistaken for copied bone IDs when the rule owner was excluded.
+   Boundary mapping, external-output disabling and accepted read rewriting now distinguish them.
+4. Origin-attached grouping roots incorrectly requested mesh evidence. They now use the existing
+   native origin anchor. No dummy geometry or new attachment behavior was introduced.
+5. Index reuse initially attempted to merge incomplete candidates. Blocking findings now remain
+   editable in preparation; only ready candidates retain validated merged indexes.
+6. Four old tests asserted schema 7 or rejected schema 8; assertions were updated for the
+   approved format transition. Failed gate logs remain under the ignored evidence directory.
+7. Final audit found accepted automatic stacking providers absent from the graph-copy reference
+   contract. They now retain explicit final-surface evidence, including mirrored instances.
+   Missing providers block planning/final output even during explicit evaluation. Changed
+   providers invalidate stacking stages only; pending results use normal scheduler admission.
+   Equivalent supports preserve accepted geometry. Regression checks cover repair without the
+   source, schema persistence, Manual mode and mirrored targets. No stacking kernel changed.
 
 ## Verification
 
-Initial foundation checks pass. Current API/resource/architecture checks verify
-selected resources, copied accepted definitions, source removal after inspection, persistence,
-undo and cancellation. Mapping tests cover world-preserving parent changes, retained Fiber
-bindings, missing supports, incompatible geometry, and explicit rebind. Focused mypy passes.
-Current focused run: 25 assembly tests pass, plus desktop selection/undo/idle checks and
-the two architecture checks. Repository mypy passes (562 source files).
-Production smoke: 281 MB / 625-object source inspected in 2.79 s; SCM and required construction
-prepared in 0.69 s, exposing five external relationships. This does not establish geometry parity.
-Production/full-suite qualification remains pending. Baseline: 2,641 Python tests, six native suites and 32 portable checks qualified
-by the preceding display/cache task. Keep new checks background/offscreen.
+- Full Python suite: **2,680 passed**, `pytest-qualified.log`, 421.35 s. Two subsequently added
+  API-Issue/resource-lifetime tests also pass in the seven-test command/architecture rerun.
+- Six native suites, native style, Python lint/format/type checks (567 modules), PowerShell
+  parsing/function limits, numerical imports, native doctor and wheel resource checks pass.
+- Assembly-specific tests cover missing/mapped supports, incompatible materials despite equal
+  counts, partial explicit rebind, frame restoration, rule identity, ordinary parents, formulas,
+  stale targets/unrelated edits, cancelled candidates, gesture boundaries, save/reopen, undo/redo,
+  source deletion, reference removal and temporary resource release.
+- Native gate ran before later Python/UI-only changes; no native code changed afterward.
+  Original gate failures and their successful reruns are retained, not represented as a clean
+  first pass. Final portable qualification remains pending below.
 
-## Next actions and blockers
+## Production and visual evidence
 
-Production graph qualification now passes: all 96 tissues imported with explicit bone
-mapping; 492 geometry-bearing records match before and after Ribs Top Radius, Humerus
-Length, Radius Length and Thumb Radius edits. The comparison canonicalizes oriented
-triangle order (Boolean face order can vary), without relaxing positions or orientation.
-Source SHA256 remained `308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
-The initial propagation discrepancy came from selective loading omitting the normal
-reader's legacy capture-frame restoration; both paths now reuse that restoration.
-Raw evidence/profile: ignored `build/assembly-042/production/`. Observed 281 MB inventory
-2.2 s, all-muscle preparation 22.8 s on workers, import/wait 1.74 s with recording enabled.
-No speed claim is made from source/imported shortcut trials: only destination was recorded.
+Immutable source:
+`E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge`
 
-Native gate passed all six suites and native style. Full Python run had 2,666 passing
-tests and four obsolete schema-number assertions, now corrected for schema 8; rerun pending.
-Explicit partial rebind retains other unresolved pins. Imported boundary mirror rules
-are editable without placeholder anatomy. Source-free formula repair is covered, including
-restoring internal formula editability while keeping external outputs disabled. Remaining:
-ownership/readset audit, final GUI/resource checks, documentation, full gate and portable build.
+SHA256: `308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
 
-Lifecycle review added source-free formula repair, mapped input-value invalidation, stale formula
-result reads, workspace gates, separate import undo and disposal of orphaned reference evidence.
-Searchable parent/property selectors and optional unique-provenance suggestions are wired.
-Offscreen 625-object dialog is readable with no QML warnings; a probe-only teardown traceback
-occurred after capture because its controller was destroyed before QML (no interactive claim).
-The full suite reached 2,674 passing / two failing mirror-import evidence tests. Both failures
-were origin-attached grouping parents incorrectly requesting surface evidence; the evidence
-adapter now uses the existing native origin anchor with no geometry requirement. Focused rerun passes.
+The maintained [qualification tool](../../tools/assembly_qualification.py) copies the skeleton
+and all 96 tissues in separate operations with explicit bone mapping. It compares **492**
+geometry-bearing records before and after Ribs Top Radius→3, Humerus Length, Radius Length and
+Thumb Radius edits. Earlier full trials had no differences/errors; the final current-source
+rerun is in progress. Compare poses/world coordinates, path samples, every tissue stage,
+canonical oriented triangles and normalized binding records. Tolerance is 1e-8 m. Raw Boolean
+face enumeration is nondeterministic for Thumb; canonical orientation/connectivity is retained.
+This is source-standalone/import parity, not a new Blender parity claim.
 
-Profiling isolated 0.717 s of repeated graph/index rebuilding in one all-muscle import under
-cProfile. Prepared candidates now retain their validated immutable document indexes and pass
-those through ordinary publication, with destination read-set validation still enforced.
-Unrelated destination changes use the normal merge path. Reprofile and final suite/package pending.
+Matched front/oblique hidden GPU renders show 1,184,586 displayed vertices; the anatomy pixels
+match exactly (viewport rows 90–889 exclude dynamic timing text). The 625-object import dialog
+was inspected offscreen with readable lists and no QML warnings. Initial blank render probes
+mixed the development viewport DLL with a different native geometry DLL; using one matched
+qualified native directory corrected the probe. No source project was changed. A separate
+GUI probe had a teardown-only signal traceback after capture; this was not an interaction test.
+These checks do not establish physical desktop interaction acceptance.
 
-Reference-repair checkpoint: mapped targets, mirror rules and external declarations are in the
-publication read set. Accepted result status is preserved as import provenance; resolving an
-equivalent support restores the accepted result without a new solve. Declared missing formula
-inputs now fail locally and external driver writes remain disabled. Formula/writer and repair
-tests pass; broader production, coupling and portable qualification remain pending.
+## Performance evidence and limits
 
-1. Complete graph closure, copy/resource adapters and headless import/mapping.
-2. Complete lifecycle integration, reference repair and desktop workflow.
-3. Qualify production geometry/lifecycle and rebuild the canonical package/source archive.
+Recorded 281 MB / 625-object inventory takes about 2.2 s. All-muscle preparation takes about
+22 s on existing workers. cProfile identified 0.717 s of redundant document/index rebuilding;
+prepared-index reuse reduced one matched Import command from **0.936 s to 0.184 s**. Adoption
+was 0.070 s, source snapshot disposal 0.109 s. These include profiler overhead and do not
+establish an unprofiled 100 ms latency guarantee. Import plus service waiting was about 0.83 s
+in the corresponding run. Source/imported shortcut times are not an overhead comparison:
+only the destination was recorded. Final rerun also overlaps packaging, so its timings are
+qualification observations rather than isolated performance trials.
 
-## Recovery inputs
+Raw local-only artifacts: `build/assembly-042/production/`, `visuals/`, `assembly-dialog.png`,
+`import-cost/`, `qualification*.log`, `pytest*.log`, `development-gate.log`, `package*.log`.
+The `.afprofile.zip` records preparation, native calls, publication and retained resource data.
+See [computation history](../computation_history.md) for the preserved algorithm contracts.
 
-Native: `C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native/bin/af_native.dll`.
-Production: `E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge`.
-Artifacts belong under ignored `build/assembly-042`; do not alter production source files.
+## Remaining delivery
 
-Final review found and fixed an inherited-mirror namespace collision: an excluded bone may also
-own a copied mirror rule. Import now distinguishes copied authored identities from rule-only
-identities when mapping supports, disabling external outputs and rewriting accepted read sets.
-Regression covers unresolved and mapped Fiber supports with inherited rules. Prepared-index
-reuse now skips candidates with blocking findings instead of trying to validate an incomplete graph.
-All assembly/architecture checks pass; final full-suite rerun follows these corrections.
-The cProfile Import command fell from 0.936 s to 0.184 s (one matched large import each;
-profiler overhead included). Graph adoption itself is 0.070 s; source snapshot release remains
-about 0.109 s. This is publication evidence, not an unprofiled frame-latency guarantee.
+1. Repeat the gate, four-shortcut production qualification and canonical package after the
+   stacking-reference correction. The previous complete production run and all 33 relocated
+   portable checks passed, but do not qualify this subsequent correction.
+2. Run all relocated portable checks, including construction-only assembly, embedded images,
+   source hashing, one-action undo/redo, schema 8, hidden rendering and Qt-free commands.
+3. Refresh documentation status/source archive; verify links and canonical artifacts.
+4. Merge the validated task branch into latest main and push normally. Main was still `de1f475`
+   at the latest fetch. Preserve the untracked root `__init__.py`.
 
-Hidden GPU renders now show the production source and imported assembly in matched front and
-oblique views, with 1,184,586 displayed vertices. The anatomy pixels match exactly in both
-views (viewport rows 90–889 exclude dynamic timing text). Initial blank captures were a test
-runtime mismatch between the native engine DLL and the development viewport plugin; rerunning
-with one matched qualified native directory corrected the probe. Source files were not changed.
-The populated 625-object dialog is also inspected. These are hidden-render/offscreen results,
-not manual desktop interaction acceptance. Core/application/native/desktop ownership review is
-recorded in docs/assembly_042.md; no geometry algorithm or worker pool was introduced.
+Qualified native runtime: `C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native`.
+All temporary qualification outputs belong under ignored build directories, not WIP_models.

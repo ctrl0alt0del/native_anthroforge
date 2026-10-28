@@ -35,6 +35,7 @@ class Field:
     relationship: str = ""
     required: bool = False
     output: str = ""
+    role: str = ""
 
 
 ID, MAPPED, RESOURCE = Field("id"), Field(), Field("resource")
@@ -44,6 +45,7 @@ SOURCE = Field("reference", "construction", True)
 SUPPORT = Field("reference", "support")
 RULE = Field("reference", "mirror")
 PROPERTY = Field("reference", "property")
+STACKING = Field("reference", "stacking", output="final", role="TISSUE_FINAL")
 
 SCHEMAS: dict[type, dict[str, Field]] = {
     ObjectRecord: dict(id=ID, parent=PARENT, owners=OWNER),
@@ -84,10 +86,8 @@ SCHEMAS: dict[type, dict[str, Field]] = {
     tissue_material.TissueMaterialState: dict(
         base=RESOURCE, rest=RESOURCE, own=RESOURCE, final=RESOURCE, crop_base=RESOURCE
     ),
-    tissue_stacking.StackRelationship: dict(
-        other=Field("reference", "stacking", output="final"), regions=Field("pairs")
-    ),
-    tissue_stacking.StackPlan: dict(providers=MAPPED),
+    tissue_stacking.StackRelationship: dict(other=STACKING, regions=Field("pairs")),
+    tissue_stacking.StackPlan: dict(providers=STACKING),
     tissue_stacking.StackOrder: dict(
         first=MAPPED, second=MAPPED, underlying=MAPPED, covering=MAPPED
     ),

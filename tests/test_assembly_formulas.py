@@ -85,7 +85,7 @@ def test_mapping_a_different_input_value_reevaluates_only_valid_internal_outputs
     destination = curve(session, "Different input")
     session.command("property.set", reference=reference(destination), value=7)
     candidate = prepared(session, source, [first], dict(mappings={other: destination}))
-    assert candidate_result(candidate, formula).status == "invalid"
+    assert candidate_result(candidate, formula).status == "pending"
     imported(session, candidate)
     assert session.document.object(candidate.identities[first]).resolution == 9
     assert session.document.object(destination).resolution == 7

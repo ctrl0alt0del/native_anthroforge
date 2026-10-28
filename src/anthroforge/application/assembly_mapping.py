@@ -6,6 +6,7 @@ from uuid import uuid4
 
 from anthroforge.core import anatomical_surfaces, graph_records, numeric_properties
 from anthroforge.core.assembly import ExternalReference, ReferenceUse, declaration
+from anthroforge.core.results import Port
 from anthroforge.core.surface_references import SurfaceReference
 
 from . import assembly_graph, property_catalog
@@ -25,6 +26,7 @@ class Mappings:
     rebind: set[str] = field(default_factory=set)
     rows: list[dict[str, Any]] = field(default_factory=list)
     changed: set[str] = field(default_factory=set)
+    changed_ports: set[Port] = field(default_factory=set)
     internal: frozenset[str] = field(init=False)
 
     def __post_init__(self) -> None:
@@ -90,6 +92,9 @@ class Mappings:
         return self.outputs(original, item)
 
     def outputs(self, original: Any, item: Any) -> Any:
+        from .assembly_stacking import remap_orders
+
+        item = remap_orders(self, original, item)
         return disable_external_outputs(original, item, self.identities, self.internal)
 
     def surface(self, reference: SurfaceReference) -> SurfaceReference:
@@ -206,6 +211,8 @@ def mapped_property(previous: Any, choice: Any, target: str) -> Any:
 
 
 def patch_reference(item: Any, ref: Any, choice: Any, target: str) -> Any:
+    from .assembly_stacking import target_identity
+
     parent = assembly_graph.at(item, ref.path[:-1])
     if isinstance(parent, numeric_properties.PropertyRef):
         value = mapped_property(parent, choice, target)
@@ -213,7 +220,8 @@ def patch_reference(item: Any, ref: Any, choice: Any, target: str) -> Any:
     if ref.relationship == "support" and hasattr(parent, "instance"):
         value = replace(parent, target=target, instance=choice.get("instance", ""))
         return graph_records.replace_at(item, ref.path[:-1], value)
-    return graph_records.replace_at(item, ref.path, target)
+    value = target_identity(ref, choice, target)
+    return graph_records.replace_at(item, ref.path, value)
 
 
 def require_kind(item: Any, kind: str) -> None:

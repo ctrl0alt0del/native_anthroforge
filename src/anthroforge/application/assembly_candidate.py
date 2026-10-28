@@ -94,8 +94,9 @@ def install(session: Any, candidate: Candidate) -> dict[str, Any]:
     updated = candidate.merge(session.document)
     for kind in Resources.__dataclass_fields__:
         getattr(session.resources, kind).update(getattr(candidate.resources, kind))
+    previous_jobs = {job.id for job in session.scheduler.jobs}
     adopt(session, candidate, updated)
-    return installed(session, candidate)
+    return installed(session, candidate, previous_jobs)
 
 
 def adopt(session: Any, candidate: Any, updated: Document) -> None:
@@ -133,14 +134,15 @@ def require_workspace(session: Any, candidate: Any) -> None:
             raise ValueError("Choose a destination or reference owner in the current workspace.")
 
 
-def installed(session: Any, candidate: Any) -> dict[str, Any]:
+def installed(session: Any, candidate: Any, previous_jobs: set[str]) -> dict[str, Any]:
     from . import assembly_result_state, presentation
 
     if isinstance(candidate, Candidate):
         presentation.include_created(
             session, set(candidate.identities.values()) & session.document.registry.records.keys()
         )
-    jobs = assembly_result_state.schedule(session, candidate)
+    assembly_result_state.schedule(session, candidate)
+    jobs = [job.id for job in session.scheduler.jobs if job.id not in previous_jobs]
     provenance = candidate.provenance.id if isinstance(candidate, Candidate) else ""
     return dict(identities=candidate.identities, provenance=provenance, jobs=jobs)
 

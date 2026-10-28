@@ -17,7 +17,7 @@ def retain(preparation: Any) -> None:
     source = preparation.source
     with zipfile.ZipFile(source.path) as archive:
         for index, row in enumerate(preparation.mapping.references):
-            if any(use.relationship == "support" and use.role for use in row.uses):
+            if any(use.relationship in ("support", "stacking") and use.role for use in row.uses):
                 preparation.mapping.references[index] = snapshot(preparation, archive, row)
 
 

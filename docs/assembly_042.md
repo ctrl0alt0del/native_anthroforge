@@ -26,6 +26,10 @@ no extra mandatory Preview/Accept. Preparation follows edits automatically in a 
 Unresolved references persist, remain visible through Issues/Resolve references, and block
 only affected calculations. Retain source geometry for display without presenting it as a
 current successful result. Repair uses the same mapping/capture policy and coherent undo.
+Accepted automatic stacking providers are references too. Missing providers block stacking
+planning/final output; they cannot disappear through recalculation. Mapping a changed provider
+invalidates stacking without rebuilding accepted base/inflation stages. Equivalent providers
+preserve accepted results, and Manual mode waits for explicit evaluation.
 
 ## Relationships and boundaries
 

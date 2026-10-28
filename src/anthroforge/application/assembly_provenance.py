@@ -94,7 +94,10 @@ def rewrite_record(p: Any, document: Any, item: Any, reverse: Any) -> Any:
 
 
 def external_targets(p: Any, owner: str) -> dict[str, str]:
-    return {ref.target: target for ref, _, target in p.mapping.replacements.get(owner, ())}
+    from .assembly_stacking import replacements
+
+    rows = p.mapping.replacements.get(owner, ())
+    return {ref.target: target for ref, _, target in rows} | replacements(rows)
 
 
 def rewrite_input(p: Any, document: Any, value: Any, targets: Any, reverse: Any, owner: str) -> Any:

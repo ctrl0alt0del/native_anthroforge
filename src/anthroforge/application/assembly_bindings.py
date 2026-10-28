@@ -38,6 +38,10 @@ class Bindings:
             cancelled(self.p.cancel)
             if row["action"] == "map" and row["relationship"] == "support":
                 self.support(row)
+            elif row["action"] == "map" and row["relationship"] == "stacking":
+                from .assembly_stacking import assess
+
+                assess(self, row)
         self.roots()
 
     def support(self, row: Any) -> None:

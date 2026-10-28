@@ -20,7 +20,7 @@ UiDialog {
             UiButton { text: "Frame all"; onClicked: dialog.service.comparison.focus("") }
             Repeater {
                 model: ["bones","fibers","tissues","attachments","skin"]
-                UiCheck { required property string modelData; text: modelData === "fibers" ? "Curves / fibers" : modelData[0].toUpperCase()+modelData.slice(1); checked: true; onClicked: dialog.service.comparison.filter(modelData,checked) }
+                UiCheck { required property string modelData; text: modelData === "fibers" ? "Curves / fibers" : modelData[0].toUpperCase()+modelData.slice(1); checked: dialog.service.comparison.state.filters[modelData]; onClicked: dialog.service.comparison.filter(modelData,checked) }
             }
             Item { Layout.fillWidth: true }
         }

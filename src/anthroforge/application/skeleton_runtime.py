@@ -7,6 +7,7 @@ from typing import Any
 from uuid import uuid4
 
 from anthroforge.core.jobs import ObsoleteInputs
+from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
 from . import skeleton_control_review, skeleton_matching, skeleton_preparation
@@ -50,6 +51,7 @@ class SkeletonUpdate:
         job = self.runtime.job(value, worker, "skeleton_prepare")
         job.label = "Compare replacement skeleton and dependent anatomy"
         job.prepare = self.capture
+        job.workload = self.workload
         job.cancel = NativeCancellation(self.session.engine)
         job.cleanup = partial(completed, value, job)
         value.job = job.id
@@ -57,6 +59,16 @@ class SkeletonUpdate:
 
     def capture(self, document: Any) -> Any:
         return document, self.session.resources.snapshot(), self.session.preferences.value
+
+    def workload(self, document: Any) -> Workload:
+        from anthroforge.core.results import geometry_asset
+
+        assets = self.session.assets
+        keys = {geometry_asset(r) for r in document.registry.records.values()}
+        triangles = sum(assets[k].mesh.counts[1] for k in keys if k in assets)
+        return Workload(
+            entities=len(document.entities), affected=len(document.objects), triangles=triangles
+        )
 
     def ready(self, token: str) -> Any:
         return self.runtime.ready(token)

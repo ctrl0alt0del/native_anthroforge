@@ -111,6 +111,7 @@ def retain_driver_ids(p: Any) -> None:
 def replacement(before: SCP, source: SCP) -> SCP:
     fields = ("primitive", "deformers", "thickness", "matrix", "geometry_offset", "asset", "result")
     changes = {key: getattr(source, key) for key in fields}
+    changes["result"] = replace(source.result, revision=before.result.revision)
     item = replace(before, **changes, pose_receipt=None, status="ready", error="")
     return entity_revisions.authored(before, item)
 

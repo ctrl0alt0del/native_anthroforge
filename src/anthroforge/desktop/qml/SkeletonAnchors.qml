@@ -4,7 +4,7 @@ import QtQuick3D
 Repeater3D {
     required property var service
     property int side: 1
-    model: service.state.anchors
+    model: service.anchors
     delegate: Repeater3D {
         required property var modelData
         model: side ? modelData.after : modelData.before

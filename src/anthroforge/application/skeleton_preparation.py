@@ -15,6 +15,7 @@ from . import (
     skeleton_comparison,
     skeleton_controls,
     skeleton_graph,
+    skeleton_placements,
 )
 from .candidate_evaluation import EvaluationContext
 
@@ -30,9 +31,9 @@ def prepare(
     candidate = skeleton_graph.merge(document, p.values, tuple(p.mapping.references))
     context = EvaluationContext(engine, candidate, owned, preferences, cancel, profiler, document)
     context.fixed_poses = frozenset(item.id for item in p.values["entities"])
-    context.options = options
+    context.options = skeleton_placements.normalized(candidate, options)
     context.findings.extend(skeleton_graph.findings(p))
-    return assess(context, p, options)
+    return assess(context, p, context.options)
 
 
 def assess(context: Any, p: Any, options: Any) -> Any:
@@ -116,6 +117,7 @@ def presentation(context: Any, p: Any, skin: Any, changes: Any) -> Any:
         skin=skin,
         mappings=tuple(p.mapping.rows),
         required=required(p),
+        publication_resources=context.resources.selected(context.document),
     )
 
 

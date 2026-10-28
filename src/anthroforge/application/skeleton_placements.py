@@ -20,6 +20,30 @@ from . import (
 )
 
 
+def normalized(document: Any, options: Any) -> dict[str, Any]:
+    result = dict(options, placements={}, rebind=dict(options.get("rebind", {})))
+    for owner, goals in options.get("placements", {}).items():
+        for point, value in goals.items():
+            source, key = canonical(document, owner, point)
+            values = result["placements"].setdefault(source, {})
+            if key in values and values[key] != value:
+                raise ValueError("A shared junction has conflicting placement corrections.")
+            values[key] = dict(value)
+            result["rebind"]["rebind:" + source + ":" + value["target"]] = True
+    return result
+
+
+def canonical(document: Any, owner: str, point: str) -> tuple[str, str]:
+    item = document.object(owner)
+    if not isinstance(item, Fiber):
+        return owner, point
+    selected = next((p for p in item.points if p.id == point), None)
+    if selected and selected.junction:
+        shared = next(j.source for j in document.junctions if j.id == selected.junction)
+        return shared.curve, shared.point
+    return owner, point
+
+
 def apply(context: Any, old_frames: Any, item: Any, target: str) -> Any:
     options = context.options.get("placements", {}).get(item.id, {})
     if not options:

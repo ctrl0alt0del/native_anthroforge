@@ -17,7 +17,7 @@ ColumnLayout {
             Label { Layout.fillWidth: true; text: modelData.message; wrapMode: Text.Wrap; color: modelData.blocking ? Theme.accent : Theme.text }
             UiCheck {
                 text: "Rebind on replacement surface"; visible: modelData.key.startsWith("rebind:")
-                checked: !!panel.service.state.options.rebind?.[modelData.key]
+                checked: !!panel.service.state.options.rebind?.[modelData.key] || modelData.acknowledge
                 onClicked: panel.service.decision("rebind",modelData.key,checked)
             }
             UiCheck {

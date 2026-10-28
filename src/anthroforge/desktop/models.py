@@ -22,6 +22,7 @@ class RenderModel(QAbstractListModel):
         self.frame = 0
         self.staged_frame = 0
         self.displayed = []
+        self.publication_group = None
 
     def roleNames(self):
         return {Qt.ItemDataRole.UserRole + 1: b"item"}
@@ -72,10 +73,12 @@ class RenderModel(QAbstractListModel):
             self.staged_frame = self.frame
 
     @measured("publication", model_profiler)
-    def presented(self, ready=True):
+    def presented(self):
         self.frame += 1
         self._record_displayed()
-        if not ready or self.pending or self.staged_frame >= self.frame:
+        if self.pending or self.staged_frame >= self.frame:
+            return
+        if self.publication_group and not self.publication_group.ready():
             return
         self._remove_missing(self.wanted)
         for index, row in enumerate(self.rows):
@@ -105,6 +108,18 @@ class RenderModel(QAbstractListModel):
                 if key in handles:
                     owners[name].add(value)
                     owners[name].update(getattr(value, "resources", ()))
+
+
+class PublicationGroup:
+    """A frame barrier for related views, independent of their feature/controller."""
+
+    def __init__(self, models):
+        self.models = tuple(models)
+        for model in self.models:
+            model.publication_group = self
+
+    def ready(self):
+        return not any(model.pending for model in self.models)
 
 
 def presentation(previous, current):

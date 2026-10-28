@@ -7,7 +7,8 @@ from anthroforge.application.storage import write_package
 
 def replacement(session, root, tmp_path, offset=2.0):
     item = session.document.entity(root)
-    matrix = session.engine.transform([offset, 0, 0, 0, 0, 0, 1, 1, 1])
+    translation = [offset, 0, 0] if isinstance(offset, (float, int)) else offset
+    matrix = session.engine.transform([*translation, 0, 0, 0, 1, 1, 1])
     source = replace(
         session.document,
         entities=tuple(

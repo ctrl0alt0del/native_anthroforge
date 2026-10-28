@@ -39,7 +39,7 @@ Item {
             const f=2*Math.tan(camera.fieldOfView*Math.PI/360)/height;
             const o=camera.mapPositionToScene(Qt.vector3d(0,0,0));
             const d=camera.mapDirectionToScene(Qt.vector3d((mouse.x-width/2)*f,(height/2-mouse.y)*f,-1));
-            panel.service.pick(panel.side,[o.x,-o.z,o.y],[d.x,-d.z,d.y]);
+            panel.service.pick(panel.side,[o.x,-o.z,o.y],[d.x,-d.z,d.y],f*camera.z*6);
         }
         onDoubleClicked: panel.service.focus("")
     }

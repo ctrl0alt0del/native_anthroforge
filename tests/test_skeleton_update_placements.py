@@ -9,6 +9,8 @@ import pytest
 from anthroforge.application.assets import Asset
 from anthroforge.application.storage import write_package
 from tests.test_anchor_operations import scene
+from tests.test_fiber_creation import path as fiber_path
+from tests.test_fiber_junctions import assert_ready, bindings, connected
 from tests.test_mesh_replacement import tetrahedron
 from tests.test_skeleton_update_commands import prepare, replacement
 from tests.test_skeleton_update_controls import apply
@@ -84,3 +86,17 @@ def test_correction_cannot_silently_change_target_role(session, tmp_path):
             rebind={"rebind:" + anchor.id + ":" + bone: True},
             placements=goals,
         )
+
+
+def test_shared_fiber_correction_uses_junction_source(session, tmp_path):
+    bone, _, first, follower, _ = connected(session)
+    item = session.document.object(follower)
+    pin = item.bindings[0]
+    goal = dict(position=[1.8, 0.1, 0.7], target=pin.target, role=pin.role, instance=pin.instance)
+    goals = {follower: {pin.point: goal}}
+    state = prepare(session, replacement(session, bone, tmp_path), {bone: bone}, placements=goals)
+    assert state["ready"], state
+    apply(session, state)
+    assert_ready(session, first, follower)
+    bindings(session, first, follower)
+    np.testing.assert_allclose(fiber_path(session, first)[0, :3], goal["position"], atol=1e-8)

@@ -17,9 +17,9 @@ struct DistanceStats {
     }
 };
 static void nearest_samples(const Mesh& from,const M4& frame,const Surface& to,DistanceStats& out,uint64_t cancel) {
-    const int64_t count=std::min<int64_t>(512,from.vertices.rows());
+    const int64_t count=std::min<int64_t>(512,static_cast<int64_t>(from.corners.size()));
     for(int64_t i=0;i<count;++i) {
-        check_cancel(cancel); const auto index=i*from.vertices.rows()/count;
+        check_cancel(cancel); const auto index=from.corners[static_cast<size_t>(i*from.corners.size()/count)];
         const auto hit=nearest(to,point(frame,from.vertices.row(index)));
         if(hit.triangle<0) throw std::runtime_error("Comparison surface has no usable triangle.");
         out.add(std::sqrt(hit.distance));

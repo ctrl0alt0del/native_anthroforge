@@ -60,6 +60,7 @@ class Candidate:
     skin: dict[str, Any] = field(default_factory=dict)
     mappings: tuple[Any, ...] = ()
     required: tuple[Any, ...] = ()
+    publication_resources: Any = None
 
     @property
     def ready(self) -> bool:

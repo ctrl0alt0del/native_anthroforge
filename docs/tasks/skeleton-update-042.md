@@ -89,3 +89,17 @@ review window is inspected through hidden QQuickRenderControl (GPU); ordinary pl
 Seven focused placement/native-distance/architecture tests passed before final UI additions.
 Next: qualification of curve/region corrections, full lifecycle and production assembly;
 full development gate and canonical packaging are still outstanding. Keep this task off main.
+
+Latest recovery checkpoint: the unchanged and Humerus-length replacement production trials
+match the ordinary-evaluation reference, and Ribs Top Radius, Humerus Length, Radius Length
+and Thumb Radius follow-up edits have no array differences at 1e-8 m. Reordered same-count
+Tibia requires explicit Rebind. Source hash is unchanged. Profiled preparation is about 10 s;
+Apply is 0.11–0.14 s. Raw evidence is under `build/skeleton-update-042/production/`.
+Lifecycle tests cover unrelated edits, stale inputs, retained failures, source removal,
+cancel ownership and optional fixed-topology skin. Generic PublicationGroup replaces a
+controller-to-skeleton coupling found by the development gate. The gate's 2,715 passes / two
+failures were followed by passing focused regressions for both failures; a final gate is due.
+Full-assembly hidden GPU views render with no warnings, but qualification exposed a 37–39 s
+UI tick when installing the review. Investigation is active; do not claim responsiveness or
+release readiness. Pending: resolve that pause, production cancellation, complete metrics/
+binding inspection, final gate, documentation and canonical portable delivery.

@@ -3,7 +3,6 @@
 from dataclasses import replace
 from types import SimpleNamespace
 
-import numpy as np
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
 from anthroforge.application.inspection_context import InspectionContext
@@ -11,21 +10,24 @@ from anthroforge.core.entities import SCP
 from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import scene
 
-from . import shortcut_comparison_scene, skeleton_display
-from .models import RenderModel
+from . import comparison_picking, shortcut_comparison_scene, skeleton_display
+from .models import PublicationGroup, RenderModel
 
 
 class SkeletonScene(QObject):
     changed = Signal()
     selected = Signal(str)
+    annotationsChanged = Signal()
 
     def __init__(self, controller, parent):
         super().__init__(parent)
         self.controller, self.candidate = controller, None
         self.models = (RenderModel(controller), RenderModel(controller))
+        self.publication = PublicationGroup(self.models)
         self.filters = dict(bones=True, fibers=True, tissues=True, attachments=True, skin=True)
         self.camera = [0.0, 0.0, 0.0, -18.0, 25.0, 8.0]
         self.mode, self.selection, self.picking = "Split", "", [None, None]
+        self.marker_rows = []
         for index, model in enumerate(self.models):
             model.activated.connect(lambda i=index: self.prepare_picking(i))
 
@@ -44,10 +46,17 @@ class SkeletonScene(QObject):
             mode=self.mode,
             filters=self.filters,
             selection=self.selection,
-            anchors=skeleton_display.anchors(
-                self.candidate, self.selection, self.filters["attachments"]
-            ),
         )
+
+    @Property("QVariantList", notify=annotationsChanged)
+    def anchors(self):
+        return self.marker_rows
+
+    def refresh_annotations(self):
+        self.marker_rows = skeleton_display.anchors(
+            self.candidate, self.selection, self.filters["attachments"]
+        )
+        self.annotationsChanged.emit()
 
     def synchronize(self, candidate):
         if candidate is self.candidate:
@@ -59,6 +68,7 @@ class SkeletonScene(QObject):
             self.focus("")
 
     def publish(self):
+        self.refresh_annotations()
         for index, model in enumerate(self.models):
             rows, leases = self.rows(index) if self.candidate else ([], [])
             model.publish(rows, leases)
@@ -121,6 +131,7 @@ class SkeletonScene(QObject):
     @Slot(str)
     def focus(self, key):
         self.selection = key
+        self.refresh_annotations()
         rows = [
             r
             for m in self.models
@@ -140,23 +151,16 @@ class SkeletonScene(QObject):
         self.camera = [*center, *self.camera[3:5], max(0.01, span * 1.8)]
 
     def prepare_picking(self, index):
-        rows = [r for r in self.models[index].active_rows() if r["content"]["kind"] == "MESH"]
-        self.picking[index] = (
-            rows,
-            np.array([r["handle"] for r in rows], dtype=np.uint64),
-            np.array([r["content"]["matrix"] for r in rows], dtype=np.float64),
-        )
+        self.picking[index] = comparison_picking.capture(self.models[index])
 
-    @Slot(int, "QVariantList", "QVariantList", result=str)
-    def pick(self, index, origin, direction):
-        cache = self.picking[index]
-        if not cache or not cache[0]:
-            return ""
-        rows, handles, matrices = cache
-        hits = scene.pick(self.controller.session.engine, handles, matrices, origin, direction)
-        key = rows[int(hits[0][0])]["id"] if hits else ""
+    @Slot(int, "QVariantList", "QVariantList", float, result=str)
+    def pick(self, index, origin, direction, radius):
+        key = comparison_picking.pick(
+            self.controller.session.engine, self.picking[index], origin, direction, radius
+        )
         if key:
             self.selection = key
+            self.refresh_annotations()
             self.selected.emit(key)
             self.changed.emit()
         return key

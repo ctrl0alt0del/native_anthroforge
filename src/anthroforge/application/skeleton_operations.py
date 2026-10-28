@@ -38,7 +38,7 @@ def install(session: Any, candidate: Any, updated: Any) -> None:
     property_guards.require_changes(session, session.document, updated)
     session.scheduler.invalidate_ports(set(candidate.prepared))
     for kind in session.resources.__dataclass_fields__:
-        getattr(session.resources, kind).update(getattr(candidate.resources, kind))
+        getattr(session.resources, kind).update(getattr(candidate.publication_resources, kind))
     names = (*candidate.changed(), *PUBLICATION_FIELDS)
     session.replace_document(
         accepted_outputs=candidate.prepared, **{key: getattr(updated, key) for key in names}

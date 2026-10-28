@@ -16,6 +16,7 @@ ColumnLayout {
             UiButton { text: modelData.name; Layout.fillWidth: true; alignLeft: true; checked: modelData.id===panel.service.state.selection; onClicked: panel.service.select(modelData.id) }
             UiButton { text: "Check geometry"; visible: modelData.after?.geometry?.kind==="MESH"; hint: "Run advisory checks on this candidate's accepted surface"; onClicked: panel.service.option("geometry_checks",[modelData.id]) }
             Label { Layout.fillWidth: true; text: modelData.changes.join(", ") || "Unchanged"; color: Theme.muted; wrapMode: Text.Wrap }
+            Label { Layout.fillWidth: true; visible: !!modelData.after?.result && modelData.after.result.status!=="ready"; text: "Retained output · "+(modelData.after?.result?.error || modelData.after?.result?.status || ""); color: Theme.accent; wrapMode: Text.Wrap }
             Label { Layout.fillWidth: true; text: modelData.distance?.material ? "Material displacement max · "+modelData.distance.material.maximum.toPrecision(4)+" m" : ""; visible: !!text; color: Theme.text; wrapMode: Text.Wrap }
             Label { Layout.fillWidth: true; text: modelData.distance?.geometric ? "Sampled surface distance max · "+modelData.distance.geometric.maximum.toPrecision(4)+" m" : modelData.distance?.unavailable || ""; visible: !!text; color: Theme.muted; wrapMode: Text.Wrap }
             Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Theme.border; Layout.topMargin: 4; Layout.bottomMargin: 4 }

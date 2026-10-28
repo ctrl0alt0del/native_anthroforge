@@ -94,10 +94,9 @@ class Session:
             self.skin_status.changed()
 
     def initialize_scheduler(self) -> None:
-        from .assembly_runtime import Assembly
         from .tissue_inspection import Inspection
 
-        self.assembly = Assembly(self)
+        self.initialize_project_preparation()
         self.tissue_inspection = Inspection()
         self.clear_previews()
         self.scheduler = TaskCoordinator(
@@ -108,6 +107,13 @@ class Session:
         self.attach_shortcut_contexts()
         if hasattr(self, "issues"):
             self.issues.reset()
+
+    def initialize_project_preparation(self) -> None:
+        from .assembly_runtime import Assembly
+        from .skeleton_runtime import SkeletonUpdate
+
+        self.assembly = Assembly(self)
+        self.skeleton_update = SkeletonUpdate(self)
 
     def attach_shortcut_contexts(self) -> None:
         from .formula_invalidation import FormulaInvalidation
@@ -184,7 +190,7 @@ class Session:
     ) -> None:
         from . import formula_observation, routing_membership, tissue_stack_observation
 
-        routing_membership.changed(self, before)
+        routing_membership.changed(self, before, accepted_outputs)
         tissues = frozenset(p.owner for p in accepted_outputs if p.output == "final")
         formulas = frozenset(p.owner for p in accepted_outputs if p.output == "formula")
         tissue_stack_observation.changed(self, before, tissues)
@@ -321,6 +327,7 @@ class Session:
 
     def close(self) -> None:
         self.assembly.cancel()
+        self.skeleton_update.cancel()
         self.shortcut_comparison.clear()
         self.issues.close()
         self.scheduler.close()

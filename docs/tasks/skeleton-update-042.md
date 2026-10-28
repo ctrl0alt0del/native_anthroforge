@@ -5,7 +5,7 @@
 - Starting revision: `5ed212a`
 - Status: in progress; implementation and qualification pending
 - Active writer: local desktop Codex
-- Last updated: 2026-10-28, Europe/Bucharest
+- Last updated: 2026-10-29, Europe/Bucharest
 
 ## Outcome and decisions
 
@@ -26,13 +26,16 @@ report replay creates a separate Session and is not the candidate execution arch
 
 Initial contracts and graph-copy increment is implemented: one-to-one provenance matching,
 ambiguous-match protection, identity-preserving SCP replacement, explicit additions and owned
-candidate evaluation adapters. Evaluator adapters are not yet connected to public operations;
-binding/control review, complete lifecycle/UI/qualification remain unfinished.
+candidate evaluation adapters. Shared inspect/prepare/status/cancel/apply operations now use
+the existing coordinator and owned candidate resources. Initial placement, dependent bone,
+cancel, Apply and undo/redo tests pass. Binding review is started; driver remapping, mirrors,
+complete evaluator coverage, UI and qualification remain unfinished. This checkpoint is not
+release-ready and must remain on the task branch.
 
 ## Verification
 
-`uv run --no-sync pytest tests/test_skeleton_update_contracts.py tests/test_skeleton_update_graph.py tests/test_architecture.py -q`:
-9 passed on Windows with qualified native DLL. Full gate not yet run. Main is synchronized
+`uv run --no-sync pytest tests/test_skeleton_update_contracts.py tests/test_skeleton_update_graph.py tests/test_skeleton_update_commands.py tests/test_architecture.py -q`:
+11 passed on Windows with qualified native DLL. Focused Ruff/mypy checks pass. Full gate not yet run. Main is synchronized
 with origin. Unrelated root `__init__.py` preserved.
 All GUI/testing remains background/offscreen. No interactive acceptance will be claimed.
 

@@ -19,4 +19,5 @@ class AssemblyTaskScheduler(MeasuredTaskScheduler):
 
 
 def policies() -> dict[str, Any]:
-    return {name: AssemblyTaskScheduler() for name in ("assembly_inspect", "assembly_prepare")}
+    names = ("assembly_inspect", "assembly_prepare", "skeleton_prepare")
+    return {name: AssemblyTaskScheduler() for name in names}

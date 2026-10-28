@@ -9,6 +9,7 @@ from . import (
     assembly_copy,
     candidate_dependencies,
     candidate_formulas,
+    candidate_reuse,
     candidate_skin,
     comparison_geometry,
     skeleton_bindings,
@@ -75,6 +76,7 @@ def writer_conflict(context: Any, message: str) -> None:
 def evaluate_construction(context: Any, p: Any, seeds: Any) -> None:
     from anthroforge.core.object_outputs import output
 
+    candidate_reuse.configure(context, p)
     imported = {p.ids[key] for key in p.selection.records}
     inputs = {
         Port(key, output(context.document.object(key)))
@@ -103,8 +105,20 @@ def bundle(context: Any, p: Any, reads: Any, changes: Any, evidence: Any, skin: 
         tuple(context.findings),
         frozenset(context.prepared),
         tuple(evidence),
-        comparison=compare(context),
-        skin=skin,
+        **presentation(context, p, skin),
+    )
+
+
+def presentation(context: Any, p: Any, skin: Any) -> Any:
+    return dict(
+        comparison=compare(context), skin=skin, mappings=tuple(p.mapping.rows), required=required(p)
+    )
+
+
+def required(p: Any) -> tuple[Any, ...]:
+    return tuple(
+        dict(source=k, target=p.ids[k], name=v.name, reason=p.selection.reasons[k])
+        for k, v in p.selection.records.items()
     )
 
 

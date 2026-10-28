@@ -53,6 +53,18 @@ qualification have not run. Do not treat this checkpoint as completed functional
 
 ## Next actions
 
+2026-10-29 continuation: the unchanged production assembly prepares successfully after
+selecting Include for its three pelvic driver frames. Its saved Thumb Boolean mesh has
+the same counts as a fresh reconstruction, but different ordered connectivity. Candidate
+reuse now proves unchanged numerical definitions/accepted input revisions and retains
+that saved resource, instead of rebuilding it and manufacturing a topology change.
+The production candidate has two bone recapture findings; these are not yet accepted
+as a qualified whole-body update. The first comparison window is wired into File and
+the shared operations. Offscreen application smoke reports no warnings; focused reuse,
+attachment-retention, desktop preparation/Apply/Undo/cancel and architecture tests pass.
+Visual review of the dialog, anchor corrections, full lifecycle/skin/group-stack tests,
+production edits/profile comparison, full gate and packaging remain incomplete.
+
 1. Add typed contracts/matching, candidate graph copying and shared lifecycle integration.
 2. Add attachment/property review, isolated dependency evaluation and atomic publication.
 3. Complete shared API/desktop comparison, correction and optional skin preview.

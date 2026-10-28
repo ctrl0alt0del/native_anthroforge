@@ -15,6 +15,7 @@ from . import (
     formula_tasks,
     object_revisions,
     property_operations,
+    property_transforms,
 )
 
 
@@ -36,7 +37,7 @@ def allowed(context: Any, result: Any) -> bool:
     for key, value in result.values.items():
         formula = formula_inputs.formulas(context.document)[key][1]
         current = property_operations.read(result.context, formula.target)
-        if current == value:
+        if property_transforms.equivalent(current, value):
             continue
         valid &= review_value(context, key, formula.target.target, current, value)
     return valid

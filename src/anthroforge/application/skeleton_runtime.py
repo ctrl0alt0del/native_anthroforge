@@ -8,7 +8,7 @@ from uuid import uuid4
 
 from anthroforge.native.mesh import NativeCancellation
 
-from . import skeleton_matching, skeleton_preparation
+from . import skeleton_control_review, skeleton_matching, skeleton_preparation
 from .assembly_runtime import Assembly, State
 
 
@@ -16,6 +16,8 @@ class SkeletonUpdate:
     def __init__(self, session: Any) -> None:
         self.session = session
         self.runtime = Assembly(session)
+        self.inventory_key: Any = None
+        self.inventory_rows: list[dict[str, Any]] = []
 
     def inspect(self, path: str) -> dict[str, Any]:
         self.runtime.inspect(path)
@@ -94,7 +96,13 @@ def describe(service: SkeletonUpdate) -> dict[str, Any]:
 
 def inventory(service: SkeletonUpdate) -> Any:
     source = service.runtime.source.source
-    return skeleton_matching.inventory(source.document, service.session.document) if source else []
+    key = (id(source), service.session.document.entities, service.session.document.imports)
+    if key != service.inventory_key:
+        service.inventory_key = key
+        service.inventory_rows = (
+            skeleton_matching.inventory(source.document, service.session.document) if source else []
+        )
+    return service.inventory_rows
 
 
 def details(candidate: Any) -> dict[str, Any]:
@@ -108,4 +116,7 @@ def details(candidate: Any) -> dict[str, Any]:
         comparison=candidate.comparison,
         skin=candidate.skin,
         identities=candidate.identities,
+        mappings=candidate.mappings,
+        required=candidate.required,
+        controls=skeleton_control_review.rows(candidate.baseline),
     )

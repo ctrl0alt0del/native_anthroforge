@@ -5,6 +5,7 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     required property var service
+    property bool allowUnresolved: true
     readonly property var selected: service.references.find(r=>r.key===service.state.reference) || ({})
     readonly property var matches: service.targets.filter(r=>r.name.toLowerCase().includes(targetSearch.text.toLowerCase()))
     spacing: Theme.gap
@@ -31,7 +32,7 @@ ColumnLayout {
     }
     RowLayout {
         UiButton { text: "Include source"; enabled: !!panel.selected.key && !panel.service.state.repair; onClicked: panel.service.action("include"); hint: "Copy this source and its required construction" }
-        UiButton { text: "Resolve later"; enabled: !!panel.selected.key && panel.selected.relationship!=="parent"; onClicked: panel.service.action("later") }
+        UiButton { text: "Resolve later"; visible: panel.allowUnresolved; enabled: !!panel.selected.key && panel.selected.relationship!=="parent"; onClicked: panel.service.action("later") }
         UiButton { text: "Detach to world"; enabled: panel.selected.relationship==="parent"; onClicked: panel.service.action("detach") }
     }
     UiField { id: targetSearch; Layout.fillWidth: true; placeholderText: "Search destination objects"; enabled: !!panel.selected.key }

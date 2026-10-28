@@ -10,7 +10,9 @@ from anthroforge.native import attachments
 
 from . import (
     assembly_evidence,
+    evaluation,
     object_revisions,
+    property_transforms,
     replacement_bindings,
     replacement_reviews,
     scp_surface_parents,
@@ -57,8 +59,33 @@ def capture_bones(context: Any, changes: Any, options: Any) -> list[dict[str, An
         if locked(item, row) and options.get("clear_locks", {}).get(item.id) is not True:
             context.findings.append(lock_finding(item))
             continue
+        if preserves_pose(context, item):
+            continue
         capture_bone(context, item, row, evidence)
     return evidence
+
+
+def preserves_pose(context: Any, item: Any) -> bool:
+    if not item.attachment.binding:
+        return False
+    resolved = resolved_bone(context, item)
+    same = property_transforms.equivalent
+    valid = (
+        resolved.status == "ready"
+        and same(item.matrix, resolved.matrix)
+        and same(item.geometry_offset, resolved.geometry_offset)
+    )
+    if valid:
+        context.install(replace(item, pose_receipt=resolved.pose_receipt))
+    return valid
+
+
+def resolved_bone(context: Any, item: Any) -> Any:
+    meshes = {key: asset.mesh for key, asset in context.assets.items()}
+    _, rows = evaluation.compute(
+        context.engine, (context.document, meshes), {item.id}, set(), context.cancel
+    )
+    return next(row for row in rows if row.id == item.id)
 
 
 def lock_finding(item: Any) -> Finding:

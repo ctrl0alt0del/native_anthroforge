@@ -33,6 +33,7 @@ from .routing_choices import RoutingChoices
 from .section_tools import SectionTools
 from .shortcut_comparison_view import ShortcutComparisonView
 from .shortcut_panel import ShortcutPanel
+from .skeleton_panel import SkeletonPanel
 from .skin_panel import SkinPanel
 from .spatial_evidence_tools import SpatialEvidenceTools
 from .surface_creation import SurfaceCreation
@@ -88,8 +89,12 @@ class Controller(QObject):
         self.routing_choices = RoutingChoices()
         self.initialize_tissue_tools()
         self.surface_creation = SurfaceCreation(self)
+        self.initialize_project_tools()
+
+    def initialize_project_tools(self):
         self.mesh_replacement = MeshReplacementPanel(self)
         self.assembly_panel = AssemblyPanel(self)
+        self.skeleton_panel = SkeletonPanel(self)
 
     def initialize_tissue_tools(self):
         self.spatial_evidence = SpatialEvidenceTools(self)
@@ -131,7 +136,7 @@ class Controller(QObject):
             self.shortcut_comparison.model,
             self.shortcut_comparison.images,
             self.spatial_evidence.model,
-        )
+        ) + self.skeleton_panel.scene.models
 
     def initialize_renderers(self):
         from .image_scene import prepare_picking as prepare_images
@@ -335,6 +340,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def assemblyPanel(self):
         return self.assembly_panel
+
+    @Property(QObject, constant=True)
+    def skeletonPanel(self):
+        return self.skeleton_panel
 
     @Property(QObject, constant=True)
     def spatialEvidence(self):
@@ -617,6 +626,7 @@ class Controller(QObject):
 
     def refresh_runtime_panels(self):
         self.assembly_panel.synchronize()
+        self.skeleton_panel.synchronize()
         self.spatial_evidence.synchronize()
         self.surface_measurements.synchronize()
         self.neighborhood.synchronize()

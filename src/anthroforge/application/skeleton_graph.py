@@ -24,7 +24,7 @@ from .skeleton_matching import parse
 def selection(document: Any, keys: set[str]) -> Any:
     reasons = {key: "Replacement bone" for key in keys}
     for key in keys:
-        document.entity(key)
+        document.object(key)
     assembly_selection.complete_sources(document, reasons)
     records = {key: document.object(key) for key in reasons}
     if any(isinstance(item, TissueVCP) for item in records.values()):
@@ -43,11 +43,24 @@ def copy(
     if not keys or {m.source for m in matches} & set(additions):
         raise ValueError("Choose distinct matched bones or explicit additions.")
     p = Preparation(source, destination, resources, engine, cancel, options)
-    p.selection = selection(source.document, keys)
+    p.selection = expanded(source.document, keys, options.get("mappings", {}))
     allocate(p, matches)
     p.copy_records()
     retain_destination(p, matches, additions)
     return p
+
+
+def expanded(document: Any, keys: set[str], mappings: Any) -> Any:
+    seeds = set(keys)
+    while True:
+        picked = selection(document, seeds)
+        rows = assembly_graph.boundaries(document, picked)
+        additions = assembly_graph.included_decisions(mappings, rows) - seeds
+        if any(key in document.index.entities for key in additions):
+            raise ValueError("Choose a destination match or an explicit parent for added bones.")
+        if not additions:
+            return picked
+        seeds.update(additions)
 
 
 def allocate(p: Any, matches: Any) -> None:

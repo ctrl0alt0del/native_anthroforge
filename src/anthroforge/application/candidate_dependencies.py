@@ -5,11 +5,11 @@ from typing import Any
 from anthroforge.core.results import Port
 from anthroforge.core.skeleton_update import Finding
 
-from . import candidate_outputs, dependencies
+from . import candidate_outputs, candidate_reuse, dependencies
 
 
 def evaluate(context: Any, seeds: set[Port], restrict: set[str] | None = None) -> set[Port]:
-    done: set[Port] = set()
+    done: set[Port] = set(context.prepared)
     while True:
         context.check_cancelled()
         graph, pending = remaining(context, seeds, done, restrict)
@@ -45,15 +45,20 @@ def execute(context: Any, port: Port, blocked: bool) -> None:
     if function is None:
         return
     try:
-        if blocked:
-            raise ValueError("Cyclic or missing dependency; last accepted output retained.")
-        context.call(port, function)
+        perform(context, port, function, blocked)
     except (ValueError, RuntimeError) as error:
         context.check_cancelled()
         candidate_outputs.failure(context, port, str(error))
         context.failed.add(port)
         context.findings.append(failure_finding(context, port, str(error)))
     context.prepared.add(port)
+
+
+def perform(context: Any, port: Port, function: Any, blocked: bool) -> None:
+    if blocked:
+        raise ValueError("Cyclic or missing dependency; last accepted output retained.")
+    if not candidate_reuse.install(context, port):
+        context.call(port, function)
 
 
 def failure_finding(context: Any, port: Port, message: str) -> Finding:

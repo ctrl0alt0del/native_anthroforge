@@ -23,6 +23,7 @@ class EvaluationContext:
     failed: set[Port] = field(default_factory=set)
     options: dict[str, Any] = field(default_factory=dict)
     completed_batch: set[Port] = field(default_factory=set)
+    reuse: dict[Port, Any] = field(default_factory=dict)
 
     @property
     def assets(self) -> Any:

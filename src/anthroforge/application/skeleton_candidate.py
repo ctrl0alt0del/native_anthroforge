@@ -58,6 +58,8 @@ class Candidate:
     evidence: tuple[dict[str, Any], ...] = ()
     comparison: dict[str, Any] = field(default_factory=dict)
     skin: dict[str, Any] = field(default_factory=dict)
+    mappings: tuple[Any, ...] = ()
+    required: tuple[Any, ...] = ()
 
     @property
     def ready(self) -> bool:

@@ -13,6 +13,23 @@ Subsequent entries must record every computational approach change.
 Current observational shortcut work is recorded in CH-068 (R01/R02 and A01 presentation).
 It leaves numerical evaluation and scheduling policy unchanged.
 
+Whole-skeleton update preparation (0.4.2, in progress, 2026-10-29) extends R01/R02,
+A01–A03 and resource publication. It evaluates an owned candidate through the existing
+coordinator and production attachment/path/tissue/skin evaluators. The live document is
+unchanged until reviewed adoption. No propagation, routing, inflation or stacking kernel
+is replaced. The initial candidate rebuilt all copied geometry and recaptured every bone.
+The unchanged 96-muscle fixture exposed unnecessary Boolean connectivity changes: saved
+and rebuilt Thumb both have 415 vertices/826 triangles, but ordered native topology differs.
+Candidate output reuse now requires unchanged definitions and accepted input revisions;
+it retains the saved payload and publishes translated provenance only after that proof.
+Prepared stages are not evaluated a second time during downstream traversal. Bone recapture
+is skipped only when production propagation already reproduces the requested pose, using
+the existing numerical roundoff equivalence policy. The identical full skeleton now prepares
+without blocking rebinds, with two explicit recapture findings still requiring review.
+Focused regression tests and offscreen application loading pass; full production shape,
+timing, memory, stale-input and portable acceptance remain pending. See
+[task record](tasks/skeleton-update-042.md) for evidence limits.
+
 ## Scope and reading guide
 
 0.4.0 is qualified and accepted; see the skin stage and whole-body records below.

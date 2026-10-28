@@ -3,7 +3,7 @@
 - Task branch: `codex/assembly-042`
 - Integration branch: `main`
 - Starting revision: `de1f475`
-- Status: qualified; documentation/archive finalization and validated merge
+- Status: complete; qualified release merged and pushed to main
 - Last updated: 2026-10-28, Europe/Bucharest
 - Active writer: local Codex
 
@@ -125,11 +125,14 @@ wait 0.671 s. Native-style checks and packaging overlapped, so these remain obse
 a controlled performance comparison. The packaged construction-only screenshot shows both
 curves and its embedded reference image after import/undo/redo/save/reopen.
 
-## Remaining delivery
+## Delivery
 
-1. Refresh the packaged documentation/source archive; verify links and canonical artifacts.
-2. Merge the validated task branch into latest main and push normally. Main was still `de1f475`
-   at the latest fetch. Preserve the untracked root `__init__.py`.
+Merged and pushed to `main` in `f92ea5d`, preserving checkpoint history. Integration main
+remained `de1f475` throughout qualification, so the merged code is the validated tree.
+The canonical release is `dist/0.4.2/AnthroForge.dist/AnthroForge.exe`, with the single companion
+`dist/AnthroForge-0.4.2-source.zip`. Packaged build revision `8762b4b` identifies the final runtime
+code; later commits contain qualification documentation only. Relative documentation links
+pass. The unrelated root `__init__.py` remains untouched and untracked.
 
 Qualified native runtime: `C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native`.
 All temporary qualification outputs belong under ignored build directories, not WIP_models.

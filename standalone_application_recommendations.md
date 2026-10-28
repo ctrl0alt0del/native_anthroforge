@@ -1,6 +1,12 @@
 # AnthroForge standalone application: consolidated recommendations
 
-Updated: 2026-10-24
+Updated: 2026-10-28
+
+For current implementation coverage, see the [0.4.2 preparation audit](docs/recommendations_042_audit.md).
+It checks all 66 requirements and 132 original source items against 0.4.1, separates
+remaining work from deliberate deferrals, and identifies the owning code and evidence.
+The audit is complete; the 0.4.2 implementation scope has not yet been selected.
+Historical release decisions and source proposals below retain their original context.
 
 The [0.3.5 mirroring specification](docs/specification_035.md) and
 [implementation plan](docs/implementation_035.md) are implemented and qualified; evidence is tracked in the [runtime walkthrough](docs/mirroring_035.md).
@@ -11,7 +17,9 @@ thread inventories and historical measurements remain evidence of their own cont
 
 Shortcut recommendations 1–4 are implemented in the [0.3.1 inspection workflow](docs/shortcuts_031.md)
 and qualified for release. Influence, formula evidence, effective policy and
-propagation status reuse the current algorithms; comparison/replay reporting remains deferred.
+propagation status reuse the current algorithms. Comparison, paired reports and optional
+shortcut replay subsequently shipped in [0.3.2](docs/shortcuts_032.md); general replay of
+other authored workflows remains a narrower, separate gap.
 
 The [0.3 specification](docs/specification_030.md) and
 [implementation plan](docs/implementation_030.md) are **implemented and qualified in 0.3.0**. See the [local review](docs/tasks/shortcuts-parametric-030.md).
@@ -275,7 +283,7 @@ Remap complete dependency chains and shared junctions when copying a region. Ide
 
 ### B01 — Use one authoritative anatomical dependency graph [P0]
 
-Represent SCP parameters and geometry, parent/child attachments, fibers, surfaces, muscle bases, inflation, stacking, tissues, mirrors, and diagnostics as explicit dependencies. Run independent branches concurrently where valid. Preserve real parent publication barriers and reject cycles. Example anatomical chains are descriptive, not a universal fixed order; actual relationships determine scheduling.
+Represent SCP parameters and geometry, parent/child attachments, fibers, surfaces, muscle bases, inflation, stacking, tissues, mirrors, and diagnostics as explicit dependencies. Run independent branches concurrently where valid. Preserve real parent publication barriers. Later confirmed contracts allow authored cycles but fail their affected evaluation components with Issues and retained accepted output; unrelated components continue. Example anatomical chains are descriptive, not a universal fixed order; actual relationships determine scheduling.
 
 ### B02 — Distinguish change kinds and invalidate only affected work [P0]
 
@@ -291,7 +299,7 @@ Request a specified geometry version and receive a handle or a structured pendin
 
 ### B05 — Coordinate priorities, concurrency, and queue budgets [P0]
 
-Use one scheduling policy for required dependencies, interactive previews, final evaluation, and advisory checks. Apply the write-reservation, dispatch-time snapshot, coalescing, and save-blocking rules in section 1.4. Reserve resources for input and rendering, prioritize focused work, and batch invalidation/bookkeeping before dispatch. Bound concurrency, retained input snapshots, and unpublished output. Dependency-priority inheritance remains feature-specific and provisional. Debouncing after expensive preparation is too late.
+Use one scheduling policy for required dependencies, interactive previews, final evaluation, and advisory checks. Apply the write-reservation, dispatch-time snapshot, coalescing, and save-blocking rules in section 1.4. Reserve resources for input and rendering, prioritize focused work, and batch invalidation/bookkeeping before dispatch. Bound concurrency, retained input snapshots, and unpublished output. Dependency-priority inheritance is implemented; [0.3.3](docs/shortcuts_033.md) records its incremental maintenance. Debouncing after expensive preparation is too late.
 
 ### B06 — Make the whole computation path eligible for background execution [P0]
 
@@ -497,6 +505,10 @@ Apply the confirmed startup policy: run equivalents of existing addon load compu
 
 ### H03 — Preserve save checkpoints and design for future recovery [P0; recovery deferred]
 
+The deferral below records the original version-one boundary. Separate committed
+recovery autosaves and recovery UI subsequently shipped in [0.3.7](docs/usability_037.md).
+Persisted undo and paused-solver restoration remain deferred.
+
 Implement the exact historical checkpoint and modal save choices in section 1.4. Keep geometry and revision metadata tied to the selected version. A solver failure must not destroy the editing session. Design ownership/serialization so later crash recovery is possible, but actual crash recovery, autosave recovery journals, persisted undo history, and paused-solver recovery are not version-one requirements. Source recommendations for those features remain recorded as future work.
 
 ### H04 — Save intentional presentation and preserve development debug views [P0]
@@ -632,9 +644,13 @@ Other important cautions from the source threads:
 - Blender already supports shared mesh data, selective evaluation, and object alpha. The proposed improvement is consistent ownership and integration, not invention of those capabilities.
 - Standalone execution still requires event loops, synchronization, safe publication boundaries, numerical safeguards, and appropriate parallel granularity.
 
-## 18. Decisions still to make
+## 18. Deferred decisions and provisional rules
 
-The general specification is confirmed. The following decisions were deliberately deferred, not left silently assumed.
+The following list records decisions deferred during the original consolidation,
+not the current implementation backlog. Since then, primitives, the runtime stack,
+ownership/scheduling, the project container, unified TissueVCP and skin OBJ export
+have shipped. See the [0.4.2 audit](docs/recommendations_042_audit.md) for remaining
+work and exclusions. Retain these historical decisions as source context:
 
 1. Implementation sequencing and native integration for the [confirmed 0.1.2 primitives/deformers](docs/primitives_012.md); their product scope and reference examples are settled.
 2. Adopt and validate the recommended stack from the completed [technology analysis](<E:/development/anthroforge/standalone_technology_stack_analysis.md>). The representative viewport experiment, combined runtime packaging, and numerical parity checks remain implementation work; they were not performed by the analysis.

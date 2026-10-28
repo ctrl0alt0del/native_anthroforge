@@ -2,7 +2,7 @@
 
 from dataclasses import asdict
 
-from anthroforge.application import assembly_choices
+from anthroforge.application import assembly_choices, assembly_mapping
 
 
 def synchronize(panel):
@@ -47,14 +47,12 @@ def pending_row(r, choice):
     return dict(
         key=r.id,
         source=r.id,
-        name=r.name,
+        name=r.name + (" · mirrored" if r.source_instance else ""),
         kind=r.kind,
         role=r.uses[0].role,
         relationship=r.uses[0].relationship,
         property=repaired_property(r),
-        action=choice.get("action", "later"),
-        target=choice.get("target", ""),
-        rebind=bool(choice.get("rebind", False)),
+        **assembly_mapping.choice_details(choice),
     )
 
 

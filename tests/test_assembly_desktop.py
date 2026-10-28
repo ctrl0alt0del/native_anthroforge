@@ -37,3 +37,16 @@ def test_idle_panel_does_not_rebuild_source_inventory(controller, tmp_path, monk
     monkeypatch.setattr(controller.session.assembly, "status", fail)
     for _ in range(20):
         panel.synchronize()
+
+
+def test_reference_repair_keeps_mirrored_target_selection_visible():
+    from anthroforge.core.assembly import ExternalReference, ReferenceUse
+    from anthroforge.desktop.assembly_projection import pending_row
+
+    use = ReferenceUse("receiver", "stacking", "final", "TISSUE_FINAL")
+    reference = ExternalReference(
+        "ref", "document", "source", 1, "Tissue", "TISSUE", (use,), source_instance="rule"
+    )
+    row = pending_row(reference, dict(action="map", target="provider", instance="plane"))
+    assert row["name"] == "Tissue · mirrored"
+    assert row["target"] == "provider" and row["target_instance"] == "plane"

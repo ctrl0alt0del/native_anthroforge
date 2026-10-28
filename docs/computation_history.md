@@ -3717,3 +3717,14 @@ These include profiler costs and are not frame-time or disabled-profiler guarant
 The separate ownership review also found an inherited mirror-rule identity being confused with
 its excluded source bone; relationship mapping and accepted input rewriting now distinguish
 those uses. Focused missing/mapped support and formula regressions preserve that distinction.
+
+The final dependency audit found accepted automatic stacking providers were copied as opaque
+metadata. They are now declared references with retained final-surface comparison evidence,
+including explicit mirror instances. Missing active support blocks plan/final output and
+cannot be silently removed by an explicit recalculation. Negative exclusions and disabled
+stacking do not introduce unused prerequisites. Equivalent mapping preserves accepted stages;
+changed providers invalidate plan/final only, with normal pending-state scheduling and Manual
+behavior. Import returns jobs launched during adoption as well as after it. No stacking,
+inflation, attachment or correspondence kernel changes. Regression evidence covers source-free
+repair, schema roundtrip, unchanged intrinsic results, mirrors and Manual evaluation; final
+combined qualification is recorded in the task rather than inferred from those local checks.

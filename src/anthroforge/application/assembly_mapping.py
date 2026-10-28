@@ -113,7 +113,7 @@ def describe(row: Any, choice: Any) -> dict[str, Any]:
     return dict(
         key=row.key,
         source=row.source,
-        name=row.name,
+        name=row.name + (" · mirrored" if row.instance else ""),
         kind=row.kind,
         relationship=row.relationship,
         role=row.role,

@@ -4,6 +4,8 @@ import numpy as np
 
 from anthroforge.native import images
 
+from .inspection_visibility import records
+
 
 def rows(controller):
     resources = controller.session.resources.images
@@ -16,7 +18,7 @@ def rows(controller):
             geometry_asset=row["source"],
             key=f"{row['id']}:{row['source']}:{row['image_style']['depth']}:{chunk}",
         )
-        for row in controller.construction.records.values()
+        for row in records(controller, controller.construction.records.values())
         if row["kind"] == "IMAGE" and row["visible"] and row["source"] in resources
         for chunk in range(resources[row["source"]].chunks)
     ]

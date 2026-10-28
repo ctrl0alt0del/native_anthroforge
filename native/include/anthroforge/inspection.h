@@ -28,6 +28,9 @@ AF_API int af_inspection_face_lines(uint64_t mesh,const double* frame,int triang
 AF_API int af_inspection_metrics(uint64_t mesh,const double* frame,double* values,int64_t* counts,double* lines,uint64_t cancel);
 // Plane basis spans(2), U/V(6); two axis segments; counts: contour points, coplanar, truncated.
 AF_API int af_inspection_section_spans(uint64_t mesh,const double* frame,const double* plane,double* values,double* lines,int64_t* counts,uint64_t cancel);
+// Read-only nearest/ray evidence using the production query mesh and material correspondence.
+// Request: origin(3), direction(3), offset. Returns closest candidate, -1 for no hit, -2 on error.
+AF_API int af_inspection_placement(int count,const uint64_t* meshes,const double* frames,const double* request,int ray,double* rows,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

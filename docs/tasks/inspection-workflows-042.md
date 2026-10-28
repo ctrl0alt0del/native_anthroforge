@@ -80,3 +80,17 @@ The containing commit identifies the checkpoint; inspect Git history for push st
   diagnostics compile; six existing native contract suites pass. Native diagnostic tests,
   UI integration, placement explanation, neighborhood views and full qualification remain.
 - This checkpoint is incomplete and must not merge into main or be released yet.
+
+## Measurement and placement integration checkpoint
+
+- Added native world extents, section spans and scale/topology measurements, with
+  explicitly unavailable volume-containment/penetration classifications.
+- Section inspection now accepts SCP, construction and skin surfaces as well as tissues.
+- Temporary neighborhood isolation uses the existing dependency graph and a presentation
+  filter. A private inspection camera preserves workspace and scheduling state.
+- Placement diagnostics reuse production preview/confirmed query meshes and material
+  correspondence. Ray and current-binding explanations do not recapture or modify bindings.
+- Eleven new API/native/desktop-model tests pass, including a sealed inner cavity,
+  unchanged bound fibers, transformed section spans and Restore semantics.
+- Native build and six contract suites pass. Full style/gate, frozen export completion,
+  offscreen UI inspection, profiling and packaging remain pending; do not release yet.

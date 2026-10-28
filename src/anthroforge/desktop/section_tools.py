@@ -4,6 +4,7 @@ from math import isfinite
 
 from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
+from anthroforge.application import inspection_surfaces
 from anthroforge.application import tissue_inspection as inspection
 from anthroforge.application.inspection_context import scene_signature
 from anthroforge.native import scene
@@ -22,6 +23,7 @@ class SectionTools(QObject):
         self.reports, self.error, self.context, self.requested = [], "", None, None
         self.pick_cache = []
         self.receipt = None
+        self.stage, self.selection = "final", ""
         self.timer = QTimer(self)
         self.timer.setSingleShot(True)
         self.timer.setInterval(60)
@@ -68,13 +70,29 @@ class SectionTools(QObject):
         self.attempt(self.start)
 
     def start(self):
-        controller, session = self.controller, self.controller.session
+        controller = self.controller
         controller.authoring.setEditing(False)
         controller.cancelViewportTools()
-        self.target = controller.selection
         tool = controller.tissue_inspection
-        if not tool.stage:
-            tool.set_view(displayed_stage(session, self.target), "", "Overlay")
+        stage = (
+            tool.stage or displayed_stage(controller.session, controller.selection)
+            if controller.selectedData.get("is_tissue")
+            else "final"
+        )
+        self.start_surface(controller.selection, stage)
+
+    @Slot(str, str)
+    def inspect(self, target, stage):
+        self.attempt(lambda: self.start_surface(target, stage))
+
+    def start_surface(self, target, stage):
+        surface = inspection_surfaces.get(self.controller.session, target, stage)
+        surface.mesh(self.controller.session)
+        self.target, self.stage, self.selection = (
+            surface.target,
+            surface.stage,
+            self.controller.selection,
+        )
         self.enabled = True
         self.center()
         self.synchronize()
@@ -90,16 +108,11 @@ class SectionTools(QObject):
 
     @Slot()
     def center(self):
-        tool = self.controller.tissue_inspection
-        from .tissue_inspection_scene import primary
-
-        row = primary(tool)
-        if row and row["mesh_handle"]:
-            bounds = scene.bounds(
-                self.controller.session.engine, [row["mesh_handle"]], [row["matrix"]]
-            )
-            self.position = (bounds[self.axis] + bounds[3 + self.axis]) * 0.5
-            self.invalidate()
+        session = self.controller.session
+        surface = inspection_surfaces.get(session, self.target, self.stage)
+        bounds = scene.bounds(session.engine, [surface.mesh(session).handle], [surface.frame])
+        self.position = (bounds[self.axis] + bounds[3 + self.axis]) * 0.5
+        self.invalidate()
 
     @Slot(str, "QVariant")
     def setting(self, name, value):
@@ -121,7 +134,7 @@ class SectionTools(QObject):
     def synchronize(self):
         if not self.enabled:
             return
-        if self.controller.selection != self.target or self.controller.authoring.editing:
+        if self.controller.selection != self.selection or self.controller.authoring.editing:
             return self.cancel()
         context = (
             scene_signature(self.controller.session.document),
@@ -142,7 +155,12 @@ class SectionTools(QObject):
             return
         self.requested = list(self.plane)
         inspection.start(
-            self.controller.session, "section", self.target, plane=self.plane, surfaces=surfaces
+            self.controller.session,
+            "section",
+            self.target,
+            stage=self.stage,
+            plane=self.plane,
+            surfaces=surfaces,
         )
 
     def receive(self):

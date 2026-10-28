@@ -6,7 +6,7 @@ from typing import Any
 from anthroforge.core.scheduling import Workload
 from anthroforge.native import sections
 
-from . import tissue_inspection_stages as stages
+from . import inspection_surfaces
 from .inspection_context import scene_signature
 
 
@@ -14,21 +14,16 @@ def inputs(context: Any, target: str, options: Any) -> list[Any]:
     supplied = options.get("surfaces")
     if supplied is not None:
         return list(supplied)
-    item = stages.tissue(context, target)
     names = dict.fromkeys((options["stage"], options.get("reference", options["stage"])))
-    return [
-        dict(
-            owner=target,
-            stage=name,
-            asset=stages.result(item, name).asset,
-            frame=stages.instance_frame(context, target, name),
-        )
-        for name in names
-    ]
+    return [record(inspection_surfaces.get(context, target, name)) for name in names]
+
+
+def record(surface: Any) -> dict[str, Any]:
+    return dict(owner=surface.target, stage=surface.stage, asset=surface.asset, frame=surface.frame)
 
 
 def validate(context: Any, target: str, options: Any) -> None:
-    stages.tissue(context, target)
+    inspection_surfaces.get(context, target, options["stage"]).mesh(context)
     plane = options.get("plane", ())
     if len(plane) != 4 or not all(isfinite(float(v)) for v in plane):
         raise ValueError("A section requires four finite plane coefficients.")
@@ -44,6 +39,7 @@ def validate_surface(context: Any, row: Any) -> None:
 
     if (
         source(row["owner"]) not in context.document.registry.records
+        and row["owner"] != inspection_surfaces.skin_id(context.document)
         or row["asset"] not in context.assets
     ):
         raise ValueError("A displayed section input is no longer retained. Wait for publication.")
@@ -51,7 +47,11 @@ def validate_surface(context: Any, row: Any) -> None:
 
 def signature(context: Any, target: str, options: Any) -> Any:
     validate(context, target, options)
-    return scene_signature(context.document), inputs(context, target, options)
+    return (
+        scene_signature(context.document),
+        context.document.skin,
+        inputs(context, target, options),
+    )
 
 
 def workload(context: Any, target: str, options: Any) -> Workload:

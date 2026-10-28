@@ -201,11 +201,13 @@ def refresh(controller):
 
 
 def publish(controller):
+    from .inspection_visibility import records
     from .mirror_scene import rows as mirror_rows
 
     originals = [*controller.rows, *surface_scene.records(controller)]
     rows = [render_record(row) for row in mirror_rows(controller, originals)]
     rows.extend(auxiliary_rows(controller))
+    rows = records(controller, rows)
     if rows != controller._render_rows:
         controller._render_rows = rows
         controller.render_model.publish(

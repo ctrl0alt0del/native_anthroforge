@@ -11,7 +11,7 @@ UiSection {
         visible: panel.tool.state.enabled; Layout.fillWidth: true
         UiCombo { objectName: "sectionAxis"; Layout.fillWidth: true; model: ["X plane","Y plane","Z plane"]; currentIndex: panel.tool.state.axis; onActivated: panel.tool.setting("axis",currentIndex) }
         NumericSetting { objectName: "sectionPosition"; label: "Plane position · m"; value: panel.tool.state.position; onEdited: value=>panel.tool.setting("position",value) }
-        UiButton { text: "Center on tissue"; Layout.fillWidth: true; onClicked: panel.tool.center() }
+        UiButton { text: "Center on surface"; Layout.fillWidth: true; onClicked: panel.tool.center() }
         UiCheck { text: "Cut away one side"; checked: panel.tool.state.cut; onToggled: panel.tool.setting("cut",checked) }
         UiCheck { text: "Flip visible side"; checked: panel.tool.state.flip; onToggled: panel.tool.setting("flip",checked) }
         UiCheck { text: "Cut surrounding geometry"; checked: panel.tool.state.wholeScene; onToggled: panel.tool.setting("whole_scene",checked) }

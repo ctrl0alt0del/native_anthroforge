@@ -23,9 +23,10 @@ def configure(engine: GeometryEngine) -> None:
 
 
 def configure_checks(engine: GeometryEngine) -> None:
-    from . import inspection_metrics
+    from . import inspection_metrics, inspection_placement
 
     inspection_metrics.configure(engine)
+    inspection_placement.configure(engine)
     engine.bind(
         "af_inspection_findings", [U, D, c.POINTER(U), D, c.c_int, c.c_int, INT64, D, INT64, U]
     )

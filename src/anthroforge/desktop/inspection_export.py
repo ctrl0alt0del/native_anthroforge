@@ -42,12 +42,23 @@ class InspectionExport(QObject):
             tissue=self.tissue_options() if tool.target else None,
             route=owner.route_inspection.state if owner.route_inspection.visible else None,
             replay=self.replay and owner.session.shortcut_comparison.baseline is not None,
-            finding=owner.spatial_evidence.row or None,
+            spatial=self.spatial_options(),
         )
 
     @Slot(bool)
     def includeReplay(self, enabled):
         self.replay = enabled
+
+    def spatial_options(self):
+        owner, view = self.controller, self.controller.neighborhood
+        return dict(
+            finding=owner.spatial_evidence.row or None,
+            measurements=bool(owner.surface_measurements.report),
+            **{owner.placement_inspection.kind: bool(owner.placement_inspection.report)},
+            neighborhood=view.target if view.members else "",
+            camera=view.view_camera[0] if view.view_camera else None,
+            orthographic=view.view_camera[1] if view.view_camera else False,
+        )
 
     def tissue_options(self):
         owner, tool = self.controller, self.controller.tissue_inspection

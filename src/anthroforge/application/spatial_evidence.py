@@ -61,4 +61,4 @@ def issue(session: Any, identity: str) -> dict[str, Any]:
     if row["freshness"] != "current" or not sample:
         raise ValueError("A current spatial finding is required. Check geometry again.")
     current_surface(session, sample)
-    return row
+    return dict(row)

@@ -76,19 +76,21 @@ def export(
     route: Any = None,
     comparison: bool = True,
     replay: bool = False,
-    finding: Any = None,
+    spatial: Any = None,
 ) -> dict[str, Any]:
-    frozen = export_capture(session, path, selected, editing, tissue, route, finding)
+    frozen = export_capture(session, path, selected, editing, tissue, route, spatial)
     frozen = comparison_options(session, frozen, comparison, replay)
     return submit_export(session, Path(path).resolve(), frozen, wait)
 
 
 def export_capture(
-    session: Any, path: str, selected: str, editing: bool, tissue: Any, route: Any, finding: Any
+    session: Any, path: str, selected: str, editing: bool, tissue: Any, route: Any, spatial: Any
 ) -> Capture:
     export_target(session, path)
     frozen = capture(session, selected, editing, tissue, route)
-    capture_finding(session, frozen, finding)
+    from .inspection_spatial_capture import capture as capture_spatial
+
+    capture_spatial(session, frozen, spatial or {})
     return frozen
 
 

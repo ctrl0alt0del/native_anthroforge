@@ -88,6 +88,8 @@ class FiberDisplay:
         self.publish_rows()
 
     def publish_rows(self):
+        from .inspection_visibility import records
+
         rows, resources = [], []
         for key, row in self.desired.items():
             if key not in self.accepted:
@@ -95,7 +97,9 @@ class FiberDisplay:
             token, mesh = self.accepted[key]
             rows.extend(display_rows(row, token, mesh))
             resources.append(mesh)
-        self.model.publish(mirror_scene.fiber_rows(self.controller, rows), resources)
+        self.model.publish(
+            records(self.controller, mirror_scene.fiber_rows(self.controller, rows)), resources
+        )
 
     def hits(self, origin, direction):
         rows = [row for row in self.model.active_rows() if row["visible"] and row["pickable"]]

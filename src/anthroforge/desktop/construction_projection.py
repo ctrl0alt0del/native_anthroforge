@@ -67,17 +67,22 @@ class ConstructionProjection:
         self.publish_kind("image", image_scene.rows(self.controller), resources.images.values())
 
     def publish_fibers(self, resources):
+        from .inspection_visibility import records
+
         mirrored = {
             r["mirror_source"] for r in self.controller.mirror_records.values() if r["visible"]
         }
         rows = [
             r
-            for r in self.records.values()
+            for r in records(self.controller, self.records.values())
             if r.get("asset") in resources.paths and (r["visible"] or r["id"] in mirrored)
         ]
         self.controller.fiber_display.synchronize(rows)
 
     def publish_kind(self, kind, desired, resources):
+        from .inspection_visibility import records
+
+        desired = records(self.controller, desired)
         if desired != self.rendered.get(kind):
             self.rendered[kind] = desired
             getattr(self.controller, kind + "_model").publish(desired, resources)

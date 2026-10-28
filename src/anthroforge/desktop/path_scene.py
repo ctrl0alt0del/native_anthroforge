@@ -4,6 +4,8 @@ import numpy as np
 
 from anthroforge.native import paths
 
+from .inspection_visibility import records
+
 
 def rows(controller):
     from .mirror_scene import path_rows
@@ -21,7 +23,7 @@ def source_rows(controller):
             chunk=chunk,
             key=f"{row['id']}:{row['asset']}:{chunk}",
         )
-        for row in controller.construction.records.values()
+        for row in records(controller, controller.construction.records.values())
         if row["asset"] in resources and row["visible"] and not row.get("fiber_radius", 0)
         for chunk in range(resources[row["asset"]].path.chunks)
     ]

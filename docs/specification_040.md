@@ -1,9 +1,9 @@
 # AnthroForge 0.4.0 — Skin
 
-Status: **Implemented; final portable release qualification in progress**.
+Status: **Implemented and qualified for 0.4.0, with the accepted quality limits below**.
 
 October 27 review: the contributor, fitting-readiness and status-provider decisions below
-are implemented. Completed evidence and remaining packaging checks are recorded in
+are implemented. Completed development, parity and portable evidence is recorded in
 [the task record](tasks/skin-040.md); source parity is not a guarantee of mesh quality.
 
 ## Authority and scope
@@ -100,7 +100,7 @@ usable deformable skin. If a later stage fails, retain valid intermediate result
 a retry without unnecessarily rebuilding completed stages. Existing output remains protected.
 Use existing painting, numerical controls, Activity and Issues. Transient status never shifts fields.
 
-### Shared skin status (implemented on feature branch; qualification in progress)
+### Shared skin status (implemented and qualified)
 
 Implement an application-owned, Qt-independent **SkinStatusProvider** for 0.4.0. It exposes
 readiness per operation (including update, fitting and export), blocking reasons, advisory
@@ -172,3 +172,13 @@ with the physical-source capture. Workspace Fiber display thickness remains unre
 | Any stale construction flag disables fitting | Warn when the existing reference is usable; block actual incompatibility. |
 | UI consumers derive their own skin eligibility | SkinStatusProvider owns shared, operation-specific assessment. |
 | Broad status-provider migration in 0.4.0 | Skin only now; other functionality in the next version. |
+
+## Accepted 0.4.0 quality limits
+
+On October 28 the user accepted the full saved 58-SCP/96-tissue draft comparison for
+0.4.0. Addon and standalone positions, connectivity and source bindings match exactly;
+both retain surface banding and 18 non-manifold edges on that fixture. Those findings
+remain visible diagnostics. They are accepted release limitations, not a guarantee of
+clean topology or permission to change the generation algorithm silently. Follow-up
+quality or algorithm changes require their own agreed scope. Evidence and timing are
+recorded in [the task record](tasks/skin-040.md#whole-body-comparison-october-28--complete).

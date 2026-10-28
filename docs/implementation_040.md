@@ -1,6 +1,6 @@
 # AnthroForge 0.4.0 — Implementation and acceptance
 
-Status: **Implemented; final portable release qualification in progress**.
+Status: **Implemented and qualified for 0.4.0; accepted limits and evidence are in the task record**.
 
 Implement [the specification](specification_040.md) under the
 [engineering guidelines](engineering_guidelines.md). The [source inventory](skin_040_inventory.md)

@@ -2,20 +2,43 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: October 28 optimization build, development gate, production addon parity and
-  repeated performance/memory comparison passed. Canonical portable rebuild/qualification
-  remains pending; keep off main until that release work is complete.
+- Status: Complete release qualification. Development, native/parity, whole-body
+  comparison and rebuilt canonical portable checks pass. Companion source archive
+  verified; user accepted the recorded quality limits and authorized the main merge.
 - Last updated: 2026-10-28, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
 ## Outcome and acceptance
 
+### Optimized canonical portable qualification, October 28 — passed
+
+Rebuilt `dist/0.4.0/AnthroForge.dist` from clean tracked revision `0992a51`, using
+the already qualified optimized native build. Packaged `af_native.dll` exactly matches
+SHA-256 `639cdc5520a9448cb43bc9623f92b1f481e2be6d507baa4d1f231758e11e086b`.
+The only later changes are release documentation. No production code or algorithms changed.
+
+The complete `tools/check_portable.py ... --offscreen` suite passes against this canonical
+executable with a minimal PATH and stripped development environment: all 31 listed areas,
+including skin construction, native proxy workers, fitting, saved playback, quad OBJ export,
+profiles, hidden rendering, recovery and the previous authoring workflows. The prior
+memory-pressure holds below are superseded. Evidence: `build/skin-040/package-optimized.log`,
+`portable-optimized.log`, and `portable-optimized/portable-check.json`.
+Background/offscreen evidence does not establish physical interactive GUI acceptance.
+The earlier 2,570-test development gate and six native CTests cover these unchanged runtime
+sources; tooling additions passed Ruff/format, function-length checks and actual execution.
+
+The companion `dist/AnthroForge-0.4.0-source.zip` contains 23,971 entries, with no duplicate
+names, valid CRCs and byte-identical optimized source files. Final artifact details and
+checksum are in `build/skin-040/source-archive-check.json`; the archive and packaged docs
+are refreshed with this qualification record. One canonical executable directory and one
+companion source archive are retained for 0.4.0.
+
 ### Release acceptance and merge requested, October 28
 
 The user accepted the whole-body result for 0.4.0, including the shared surface banding
 and 18 non-manifold edges, and requested merging into main before starting 0.4.1.
-No repair or algorithm change is authorized by that acceptance. Finish the optimized
-canonical portable rebuild/check and source archive, then merge/push this branch.
+No repair or algorithm change is authorized by that acceptance. The optimized canonical
+portable rebuild/check and source archive are complete; integrate this validated branch.
 The fetched `origin/main` is already an ancestor (73 commits behind at `3e15bbb`), so
 there is no divergent main implementation to reconcile. Preserve the root `__init__.py`.
 0.4.1 scope has been requested from the user; do not invent its feature priorities.

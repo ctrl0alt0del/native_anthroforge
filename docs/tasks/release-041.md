@@ -3,7 +3,7 @@
 - Task branch: `codex/release-041`
 - Integration branch: `main`
 - Starting revision: `9363267` (qualified 0.4.0 merge)
-- Status: in progress; seven audited skin gaps authorized for implementation
+- Status: complete; all seven skin corrections qualified for 0.4.1
 - Last updated: 2026-10-28, Europe/Bucharest
 - Active writer: local desktop chat
 
@@ -59,9 +59,9 @@ introduce a universal status manager, polling, or a second authoritative eligibi
 
 ## Current state and initial inventory
 
-Runtime integration is in progress. Shared effective settings/reset/fit summaries,
+Runtime integration is complete. Shared effective settings/reset/fit summaries,
 reference source selection and Decimate, native budget counts, persistent FAST weights,
-and final diagnostics are connected. Release version changes follow qualification;
+and final diagnostics are connected. Release version is 0.4.1;
 schema 7 remains sufficient for these corrections.
 
 Checkpoint evidence: native build and six CTests pass. The dedicated reference adapter
@@ -102,10 +102,14 @@ ownership counts are native; diagnostic publication is advisory and has no sched
 repair authority. FAST disk products are disposable, atomic and outside document/history.
 Desktop consumes retained reports rather than recomputing or duplicating geometric rules.
 
-Version advanced to 0.4.1 after runtime qualification. The canonical portable executable
-is built; portable checks and final source archive remain pending. Outputs are under
-`build/skin-041`; do not claim release
-acceptance yet. No physical interactive desktop acceptance is claimed.
+Version advanced to 0.4.1 after runtime qualification. All 31 relocated minimal-PATH
+portable checks pass, including shared `skin.report` and `skin.envelope.reset`, native
+workers, fitting, persisted preview and OBJ. Canonical executable:
+`dist/0.4.1/AnthroForge.dist/AnthroForge.exe`; companion archive:
+`dist/AnthroForge-0.4.1-source.zip`. Build stamp `ee373c8` identifies packaged runtime code;
+subsequent changes are qualification tooling/documentation. Outputs, source-archive
+verification and profiler captures are under `build/skin-041`. Background/offscreen UI
+and hidden GPU checks do not establish physical interactive desktop acceptance.
 The following are observed ownership boundaries, not claims that their current results
 are wrong. Existing shared policies should be reused, not replaced with parallel checks.
 
@@ -163,11 +167,11 @@ The full-body comparison matched the addon exactly. Shared banding and 18 non-ma
 edges were accepted for 0.4.0, not repaired. Acceptance does not authorize a new algorithm
 or policy. Preserve the user's requirement to discuss such changes before implementing.
 
-## Next actions and recovery
+## Delivery and recovery
 
-1. Complete the running relocated minimal-PATH portable checks, including new report/reset.
-2. Create and verify the corresponding source archive and final documentation links.
-3. Merge the validated branch into main, push and record the release evidence.
+All authorized runtime work is complete. The containing release commits and normal merge
+identify the delivered revision. The status-provider inventory above is future work and
+must not be inferred as unfinished 0.4.1 scope. Review a new task's scope before continuing.
 
 Preserve the unrelated root `__init__.py`. No new artifacts belong in WIP_models. The
 optimized local native build used for 0.4.0 is

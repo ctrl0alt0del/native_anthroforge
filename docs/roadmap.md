@@ -1,6 +1,6 @@
 # AnthroForge release roadmap
 
-- **0.4.1 — skin audit corrections, release qualification in progress:** restore draft-based
+- **0.4.1 — qualified skin audit corrections:** restore draft-based
   reference preparation, final diagnostics, achieved topology budgets, persistent FAST
   weights, effective inherited settings, envelope reset and moving-region fit summaries.
   See [scope and evidence](tasks/release-041.md) and [workflow](skin_workflow.md).

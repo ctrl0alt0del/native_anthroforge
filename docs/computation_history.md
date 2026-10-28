@@ -16,7 +16,7 @@ It leaves numerical evaluation and scheduling policy unchanged.
 ## Scope and reading guide
 
 0.4.0 is qualified and accepted; see the skin stage and whole-body records below.
-The 0.4.1 audit corrections are implemented; packaging qualification is in progress.
+The 0.4.1 audit corrections and portable qualification are complete.
 The existing addon remains the numerical baseline.
 
 The inventory groups operations by computational responsibility, rather than listing
@@ -3579,7 +3579,7 @@ topology/vertices/anatomical bindings exactly; identity update has 3.55e-15 maxi
 The profiler measures 426 ms of additional diagnostics in a 2.091 s update; these are
 observations under concurrent checks, not an isolated performance claim. Existing 4,706
 crossing pairs remain advisory. Offscreen controls and hidden GPU inspection pass.
-Portable qualification remains pending. Evidence:
+All 31 relocated minimal-PATH portable checks pass. Evidence:
 `build/skin-041/reference-parity`, and [task record](tasks/release-041.md).
 
 Whole-body FAST weight reuse: cold 113.638 s / new-process warm 17.257 s, 128 handles,

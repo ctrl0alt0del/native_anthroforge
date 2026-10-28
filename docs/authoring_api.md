@@ -1143,3 +1143,33 @@ solver/contact diagnostics, bounded intersection witnesses, sampled clearance an
 exclusive-region budgets. Unavailable checks are explicit; these findings do not repair
 or reject output. The query neither schedules work nor mutates document state.
 
+### Cross-project anatomy assembly (0.4.2)
+
+See [workflow and relationship contract](assembly_042.md). These operations work without Qt;
+preparation and numerical rebinding use the existing task coordinator.
+
+| Operation | Arguments and result |
+| --- | --- |
+| `assembly.inspect` | `path`; returns a `source` token and loading state. `wait`/`assembly.status` expose saved inventory. Never opens/adopts the source. |
+| `assembly.prepare` | `source`, `selected` IDs, optional `parent`, `include_attached_tissues`, `rebind_roots`, `mappings`; returns a preparation `token`. |
+| `assembly.status` | Source/preparation states, selection reasons, grouped mappings, blocking findings, unresolved count and original/proposed attachment evidence. |
+| `assembly.cancel` | Releases/cancels preparation without changing the document. |
+| `assembly.import` | `token`; commits a ready current candidate in one undo action. Returns `identities`, `provenance`, unresolved-reference `issues` and affected job IDs. Finish any existing gesture first. |
+| `assembly.references` | Persisted declarations, resolution targets, source identities, roles/properties and affected consumers. |
+| `assembly.resolve` | `mappings` keyed by unresolved reference IDs; prepares repair. Commit its returned token through `assembly.import`. Source file is unnecessary. |
+
+Mappings use the grouped reference `key` returned by status; a source entity ID applies the
+same choice to all its groups. `action: map` takes `target`, optional mirror-rule `instance`,
+optional explicit numerical `property`, and `rebind: true` when desired. `include` expands the
+source graph; `later` retains a declared missing reference; `detach` applies only to ordinary
+parenting/following and preserves world placement. A string mapping is shorthand for `map`.
+Separate groups allow distinct property/role choices. Numerical types, dimensions and component
+counts must match. Mapped external formulas remain disabled until explicitly enabled; normal
+one-writer and edit restrictions still apply.
+
+Headless sequence: inspect → wait → prepare → wait → import. `ready` stays false while a required
+placement/material decision blocks commit. Mapping edits create new candidates; stale tokens
+or destination reads cannot publish. Saved source output for missing/changed inputs is noncurrent.
+Manual remains Manual. Saving emits schema 8 with required assets and provenance, excluding source
+skin/fits, workspaces and cameras. Readers retain schema-4–7 support.
+

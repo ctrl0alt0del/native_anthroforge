@@ -6,6 +6,8 @@ from zipfile import ZipFile
 
 import numpy as np
 
+from anthroforge.application.storage import VERSION
+
 
 def shortcuts(executable, cwd, invoke):
     requests = json.loads((cwd / "examples/shortcuts_parametric.json").read_text())
@@ -59,7 +61,7 @@ def request(operation, **arguments):
 def geometry(path):
     with ZipFile(path) as archive:
         state = json.loads(archive.read("manifest.json"))
-        assert state["version"] == 7
+        assert state["version"] == VERSION
         curve = state["document"]["objects"][0]["state"]
         key = curve["result"]["asset"]
         points = np.load(io.BytesIO(archive.read(f"paths/{key}/samples.npy")))

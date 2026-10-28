@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 
 from . import formula_index, object_registry
+from .assembly import ExternalReference, ImportProvenance
 from .construction import Control
 from .document_index import DocumentIndex, build
 from .entities import SCP, Workspace
@@ -36,6 +37,8 @@ class Document:
     mirror_rules: tuple[MirrorRule, ...] = ()
     shared_mirror_targets: tuple[SharedMirrorTarget, ...] = ()
     skin: Skin = field(default_factory=Skin)
+    imports: tuple[ImportProvenance, ...] = ()
+    external_references: tuple[ExternalReference, ...] = ()
     _mirrors: MirrorIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _index: DocumentIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _registry: object_registry.ObjectRegistry | None = field(

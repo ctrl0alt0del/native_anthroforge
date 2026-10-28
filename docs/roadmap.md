@@ -4,7 +4,10 @@
   [complete recommendation audit](recommendations_042_audit.md): shared replacement status,
   spatial findings, placement explanation, dimensions/sections and temporary neighborhood
   inspection. [Workflow and limits](inspection_042.md), [qualification](tasks/inspection-workflows-042.md).
-  Other audit entries remain unselected.
+  R11/R09 display/cache changes are also qualified; see [evidence](tasks/display-cache-042.md).
+  R13 cross-project assembly is qualified: complete development/portable checks and production
+  geometry/attachment comparisons pass. [Contract](assembly_042.md),
+  [delivery record](tasks/assembly-042.md). Other entries remain unselected.
 
 - **0.4.1 — qualified skin audit corrections:** restore draft-based
   reference preparation, final diagnostics, achieved topology budgets, persistent FAST

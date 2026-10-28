@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 from anthroforge.core.units import convert
 
 from . import (
+    assembly_operations,
     attached_creation,
     comparison_journal,
     comparison_replay,
@@ -87,6 +88,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "assembly.import": assembly_operations.apply,
     "skin.collagen.paint.commit": skin_painting.commit,
     "skin.collagen.set": skin_collagen.set_weights,
     "skin.collagen.fill": skin_collagen.fill,
@@ -302,7 +304,7 @@ def shortcut_queries(session: "Session", operation: str, arguments: dict[str, An
 
 
 def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
-    require_edit(arguments)
+    require_command_edit(session, operation, arguments)
     implicit = session.history.before is None
     if implicit:
         session.begin()
@@ -317,8 +319,15 @@ def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
         raise
 
 
+def require_command_edit(session: "Session", operation: str, arguments: dict[str, Any]) -> None:
+    require_edit(arguments)
+    if operation in {"assembly.import"} and session.history.before is not None:
+        raise ValueError("Finish the current gesture before importing or resolving anatomy.")
+
+
 def direct_commands(session: "Session") -> dict[str, Any]:
     return {
+        **assembly_operations.commands(session),
         **file_commands(session),
         **query_commands(session),
         **history_commands(session),

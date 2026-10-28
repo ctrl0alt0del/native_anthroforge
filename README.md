@@ -5,6 +5,11 @@ placement explanations, world and section dimensions, sampled volume checks and 
 neighborhood inspection with Restore. Find these in **Inspect** and **Skin diagnostics**.
 See [workflow and limits](docs/inspection_042.md). Existing anatomy algorithms remain unchanged.
 
+**File → Import Anatomy from Project…** copies selected anatomy and its required construction
+from another project. Map external supports explicitly, review any requested rebind, or keep
+repairable missing references. Copies are independent; the source stays unchanged. See the
+[assembly walkthrough](docs/assembly_042.md). Projects now save schema 8 and read schemas 4–8.
+
 0.4.1 completes the skin audit: draft-based deformation references, retained solver and
 geometry diagnostics, achieved topology budgets, persistent FAST weights, effective
 inherited values, Reset defaults and moving-region fit summaries. These corrections
@@ -19,7 +24,7 @@ and [qualification evidence](docs/tasks/skin-040.md).
 
 Draft skin uses SCP/VCP surfaces; construction paths guide topology separately. Preferences
 selects finished/cropped tissue (default) or uncropped rest inflation for new references,
-sampling both sides. Projects save schema 7 and read schemas 4–7. Ordinary anatomical
+sampling both sides. The original 0.4.0 delivery saved schema 7 and read schemas 4–7. Ordinary anatomical
 updates preserve skin vertex identities and connectivity. Remesher openings and incomplete
 contact coverage remain explicit limitations; successful construction is not a watertight
 mesh guarantee. GUI evidence is background/offscreen, not physical interactive acceptance.

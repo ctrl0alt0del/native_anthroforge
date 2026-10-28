@@ -1,6 +1,10 @@
 # 0.4.2 preparation: remaining cross-thread recommendations
 
 Status: **coverage audit complete; R01–R03 and R06 extensions delivered in 0.4.2**.
+R09/R11 and R13 are qualified. The [assembly contract](assembly_042.md) has passed production
+comparisons and complete release checks; see [delivery](tasks/assembly-042.md).
+The historical R13 gap below describes the audited baseline, not the current application.
+R14–R17 remain separate.
 The table below preserves the pre-implementation audit. See [delivery](inspection_042.md)
 and [current validation](tasks/inspection-workflows-042.md) for implemented extensions and limits.
 Audited on 2026-10-28 against 0.4.1, commit

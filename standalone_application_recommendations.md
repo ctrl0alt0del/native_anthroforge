@@ -277,6 +277,11 @@ Separate a muscle type from numbered spaces, bilateral instances, and source/mir
 
 Remap complete dependency chains and shared junctions when copying a region. Identify consumers before deleting a referenced entity. Preserve missing references as explicit, inspectable problems. Import and assembly must resolve IDs deliberately rather than guessing by names or proximity.
 
+The 0.4.2 [assembly contract](docs/assembly_042.md) implements independent mixed graphs,
+explicit external mapping and persisted provenance. [Delivery evidence](docs/tasks/assembly-042.md)
+separates production comparisons from release checks. Automatic fitting and synchronization
+remain outside this workflow.
+
 **Category acceptance:** replace geometry and rename entities without losing references; alter display resolution without changing attachment meaning; duplicate a connected region; exercise deletion, missing imports, and asymmetric mirrors; verify units and frames against the same source fixtures.
 
 ## 6. B — Evaluation, scheduling, workers, and caches

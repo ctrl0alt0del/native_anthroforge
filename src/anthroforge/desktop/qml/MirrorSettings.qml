@@ -11,12 +11,35 @@ UiSection {
     visible: !!selected.id && !selected.mirror_source && selected.kind !== "IMAGE"
     enabled: !selected.readonly && !workspace.state.waiting
     function update(values) {
-        const blockers=workspace.run("mirror.removal.inspect",Object.assign({target:selected.id},values));
+        updateRule(selected.id,values);
+    }
+    function updateRule(target,values) {
+        const blockers=workspace.run("mirror.removal.inspect",Object.assign({target:target},values));
         if (!blockers) return;
         if (blockers.length) { affected.show(blockers); return; }
-        workspace.run("mirror.configure", Object.assign({target:selected.id}, values));
+        workspace.run("mirror.configure", Object.assign({target:target}, values));
     }
     AffectedConsumersDialog { id: affected }
+    Repeater {
+        model: panel.selected.mirror_boundaries || []
+        RowLayout {
+            required property var modelData
+            Layout.fillWidth: true
+            Label { text: "Imported plane"; color: Theme.muted }
+            UiCombo {
+                Layout.fillWidth: true; model: ["X","Y","Z"]
+                currentIndex: model.indexOf(modelData.axis)
+                onActivated: panel.updateRule(modelData.target,{axis:currentText})
+                hint: "Shared reflection plane preserved from the source project"
+            }
+            UiNumberField {
+                Layout.fillWidth: true; value: modelData.shift/workspace.state.unit_factor
+                step: .001/workspace.state.unit_factor
+                Accessible.name: "Imported mirror plane shift"
+                onEdited: number => panel.updateRule(modelData.target,{shift:number*workspace.state.unit_factor})
+            }
+        }
+    }
     UiCheck {
         objectName: "mirrorChildren"; text: "Mirror children"
         visible: panel.anatomical

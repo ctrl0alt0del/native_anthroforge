@@ -7,6 +7,7 @@ from typing import Any
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Workspace
 from anthroforge.core.jobs import Job, Restart
+from anthroforge.core.results import Port
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.profiling import RuntimeProfiler, causes
 from anthroforge.profiling.spans import measured
@@ -17,11 +18,11 @@ from .assets import Asset
 from .changes import ChangeJournal
 from .coordinator import TaskCoordinator
 from .curve_conversion import ConversionPreview
+from .document_relationships import retain_settings
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
 from .history import History
 from .mirror_policy import require_transition as require_mirror_transition
-from .mirror_policy import retain_settings
 from .preferences import PreferenceStore, load_user_preferences
 from .previews import Preview
 from .resources import Resources
@@ -93,8 +94,10 @@ class Session:
             self.skin_status.changed()
 
     def initialize_scheduler(self) -> None:
+        from .assembly_runtime import Assembly
         from .tissue_inspection import Inspection
 
+        self.assembly = Assembly(self)
         self.tissue_inspection = Inspection()
         self.clear_previews()
         self.scheduler = TaskCoordinator(
@@ -154,7 +157,15 @@ class Session:
             raise ValueError("This SCP is outside the focused workspace and is read-only.")
         return self.document.entity(entity_id)
 
-    def replace_document(self, **changes: Any) -> None:
+    def replace_document(
+        self, *, accepted_outputs: frozenset[Port] = frozenset(), **changes: Any
+    ) -> None:
+        before = self.document
+        self.document = self.validated_replacement(changes)
+        self.history.observe(self.document)
+        self.observe_replacement(before, accepted_outputs)
+
+    def validated_replacement(self, changes: dict[str, Any]) -> Document:
         from .property_guards import require_changes
         from .shortcut_contexts import superseded
 
@@ -166,16 +177,18 @@ class Session:
         if contexts != updated.shortcut_edits:
             updated = replace(updated, shortcut_edits=contexts)
         require_changes(self, before, updated)
-        self.document = updated
-        self.history.observe(self.document)
-        self.observe_replacement(before)
+        return updated
 
-    def observe_replacement(self, before: Document) -> None:
+    def observe_replacement(
+        self, before: Document, accepted_outputs: frozenset[Port] = frozenset()
+    ) -> None:
         from . import formula_observation, routing_membership, tissue_stack_observation
 
         routing_membership.changed(self, before)
-        tissue_stack_observation.changed(self, before)
-        formula_observation.changed(self, before)
+        tissues = frozenset(p.owner for p in accepted_outputs if p.output == "final")
+        formulas = frozenset(p.owner for p in accepted_outputs if p.output == "formula")
+        tissue_stack_observation.changed(self, before, tissues)
+        formula_observation.changed(self, before, formulas)
 
     def replace_entities(self, changed: dict[str, SCP], authored: bool = True) -> None:
         if authored:
@@ -307,6 +320,7 @@ class Session:
         }
 
     def close(self) -> None:
+        self.assembly.cancel()
         self.shortcut_comparison.clear()
         self.issues.close()
         self.scheduler.close()

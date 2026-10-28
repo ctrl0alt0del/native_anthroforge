@@ -71,7 +71,7 @@ def test_skin_resource_roundtrip_and_checksum(session, tmp_path):
     assert resources.skin[asset.digest].digest == asset.digest
     np.testing.assert_array_equal(resources.skin[asset.digest].arrays["samples"], np.eye(3))
     with ZipFile(path) as archive:
-        assert json.loads(archive.read("manifest.json"))["version"] == 7
+        assert json.loads(archive.read("manifest.json"))["version"] == storage.VERSION
 
 
 def corrupt_metadata(source, target):

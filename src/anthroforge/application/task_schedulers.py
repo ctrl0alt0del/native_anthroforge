@@ -347,7 +347,10 @@ class ShortcutCaptureTaskScheduler(MeasuredTaskScheduler):
 
 
 def inspection_schedulers() -> dict[str, TaskScheduler]:
+    from .assembly_scheduling import policies
+
     return dict(
+        **policies(),
         issue_check=IssueTaskScheduler(),
         inspection_report=InspectionTaskScheduler(),
         tissue_inspection=TissueInspectionTaskScheduler(),

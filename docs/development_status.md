@@ -1,5 +1,15 @@
 # AnthroForge development validation
 
+**0.4.2 cross-project assembly is qualified:** 2,690 Python tests, six native suites,
+style/type/numerical/runtime checks, wheel resources and all 33 relocated portable checks pass.
+The 96-muscle source was copied in two stages with explicit bone mapping; 492 geometry-bearing
+records match before and after four shortcut edits, including retained attachments. Its source
+hash is unchanged. Front/oblique hidden renders match, and the import dialog and packaged
+construction-only result were inspected offscreen. This does not claim physical desktop
+interaction acceptance. See [workflow](assembly_042.md) and [evidence](tasks/assembly-042.md).
+The single canonical 0.4.2 executable and companion source archive include this addition.
+Earlier records follow.
+
 **0.4.2 display/cache optimizations are qualified:** 2,641 Python tests, six native suites,
 configured style/type checks, numerical imports and native runtime checks pass. All 32
 relocated portable checks pass. Serial paired Ribs updates on the 58-SCP/96-tissue assembly

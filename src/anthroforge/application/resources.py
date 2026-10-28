@@ -65,6 +65,12 @@ def referenced(document: Document) -> dict[str, set[str]]:
     opening = tuple(item for context in document.shortcut_edits for item in context.opening)
     result = references((*document.entities, *opening), document.objects)
     result["meshes"].update(shortcut_materials(document))
+    result["meshes"].update(
+        key
+        for r in document.external_references
+        for key in (r.surface_asset, r.surface_base)
+        if key
+    )
     meshes, buffers = skin_references(document.skin)
     result["meshes"].update(meshes)
     result["skin"] = buffers

@@ -4,6 +4,7 @@ from collections.abc import Mapping
 
 from . import tissue_groups
 from .anatomical_surfaces import inputs as surface_inputs
+from .mirroring import source as source_identity
 from .object_outputs import output
 from .objects import ObjectRecord
 from .points import Anchor
@@ -53,7 +54,7 @@ def tissue_edges(item: TissueVCP, records: Mapping[str, ObjectRecord]) -> dict[P
         Port(item.id, "rest"): {Port(item.id, "base")},
         Port(item.id, "intrinsic"): {Port(item.id, "rest")} | constraint_inputs(item),
         Port(item.id, "stack_scope"): set(),
-        Port(item.id, "plan"): {Port(item.id, "intrinsic"), Port(item.id, "stack_scope")},
+        Port(item.id, "plan"): plan_inputs(item, records),
         Port(item.id, "final"): final_inputs(item),
         Port(item.id, "geometry"): {Port(item.id, "final")},
     }
@@ -65,7 +66,22 @@ def final_inputs(item: TissueVCP) -> set[Port]:
     return {Port(item.id, "plan")} | {Port(key, "final") for key in item.stack_plan.providers}
 
 
+def plan_inputs(item: TissueVCP, records: Mapping[str, ObjectRecord]) -> set[Port]:
+    required = {
+        *item.stack_plan.providers,
+        *(r.other for r in item.stack_relationships if not r.excluded),
+    }
+    if not item.stacking:
+        required.clear()
+    missing = {Port(key, "final") for key in required if source_identity(key) not in records}
+    return {Port(item.id, "intrinsic"), Port(item.id, "stack_scope")} | missing
+
+
 def signature(item: ObjectRecord) -> tuple[object, ...]:
     if not isinstance(item, TissueVCP):
         return ()
-    return item.stacking, item.stack_plan.providers
+    return (
+        item.stacking,
+        item.stack_plan.providers,
+        tuple(r.other for r in item.stack_relationships),
+    )

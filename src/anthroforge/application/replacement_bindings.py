@@ -38,13 +38,26 @@ def recapture(
 
 
 def rebound(
-    engine: Any, original: Any, document: Any, resources: Any, item: Any, target: str, cancel: int
+    engine: Any,
+    original: Any,
+    document: Any,
+    resources: Any,
+    item: Any,
+    target: str,
+    cancel: int,
+    capture: Any = None,
+) -> Any:
+    if isinstance(item, Fiber):
+        return fiber(engine, original, document, resources, item, cancel, target, capture)
+    return non_curve(engine, document, resources, item, target, cancel)
+
+
+def non_curve(
+    engine: Any, document: Any, resources: Any, item: Any, target: str, cancel: int
 ) -> Any:
     if isinstance(item, SCP):
         meshes = {key: value.mesh for key, value in resources.meshes.items()}
         return attachments.capture(engine, item, document.entity(item.parent), meshes, cancel)
-    if isinstance(item, Fiber):
-        return fiber(engine, original, document, resources, item, cancel)
     if isinstance(item, Anchor):
         return anchor(engine, document, resources, item, cancel)
     if isinstance(item, TissueVCP):
@@ -66,27 +79,44 @@ def anchor(engine: Any, document: Any, resources: Any, item: Any, cancel: int) -
 
 
 def fiber(
-    engine: Any, original: Any, document: Any, resources: Any, item: Fiber, cancel: int
+    engine: Any,
+    original: Any,
+    document: Any,
+    resources: Any,
+    item: Fiber,
+    cancel: int,
+    target: str = "",
+    capture: Any = None,
 ) -> Fiber:
+    current, geometry = fiber_shape(engine, original, document, resources, item, target)
+    inputs = engine, current, resources, document, geometry, cancel, capture
+    return capture_fiber(item, resources, inputs)
+
+
+def fiber_shape(
+    engine: Any, original: Any, document: Any, resources: Any, item: Fiber, target: str
+) -> Any:
     accepted = resources.paths.get(item.result.asset)
     if accepted is None:
         raise ValueError("Wait for this Fiber's accepted shape before replacing its support.")
-    current = capture_definition(item, accepted, document)
+    current = capture_definition(item, accepted, document, target)
     world = Frames(engine, original).world(item.id)
     geometry = edit_geometry(accepted, world)
-    _, updated, field = fiber_edit_evaluation.recapture(
-        engine, current, resources, document, geometry, cancel
-    )
+    return current, geometry
+
+
+def capture_fiber(item: Fiber, resources: Any, inputs: Any) -> Fiber:
+    _, updated, field = fiber_edit_evaluation.recapture(*inputs)
     resources.attachments[updated.attachment_asset] = field
     return restored_scopes(item, updated)
 
 
-def capture_definition(item: Fiber, accepted: Any, document: Any) -> Fiber:
+def capture_definition(item: Fiber, accepted: Any, document: Any, target: str = "") -> Fiber:
     candidates = (
         *attachment_candidates.eligible(document, item.id),
         *(b.reference for b in item.bindings),
     )
-    pins = tuple(b.point for b in item.bindings)
+    pins = tuple(b.point for b in item.bindings if not target or b.target == target)
     edit = FiberEdit(item.result.asset, tuple(dict.fromkeys(candidates)), rebind=pins, shape=False)
     bindings = tuple(replace(b, capture_scope="CURRENT_PARENT") for b in item.bindings)
     return replace(item, points=accepted.authored.points, edit=edit, bindings=bindings)

@@ -33,6 +33,9 @@ def snapshot(session):
         caches=[cache_state(c) for c in session.engine.caches()],
         history_entries=len(session.history.entries),
         assets=len(session.assets),
+        aggregate=session.engine.cache_budget.report()
+        if hasattr(session.engine, "cache_budget")
+        else {},
     )
 
 
@@ -120,10 +123,11 @@ def final_state(session, output):
         positions(session, output)
 
 
-def run(output, cycles, fiber_mib=64):
+def run(output, cycles, fiber_mib=None):
     plan = environment(output)
     with closing(Session()) as session:
-        session.engine.fiber_deformations.budget = fiber_mib * 1024**2
+        if fiber_mib is not None:
+            session.engine.fiber_deformations.budget = fiber_mib * 1024**2
         load(session, Path(plan["standalone"]))
         write(output, "initial-fingerprint", fingerprint(session))
         sequence(session, plan["cases"], output, cycles)
@@ -138,5 +142,5 @@ if __name__ == "__main__":
     run(
         Path(sys.argv[1]).resolve(),
         int(sys.argv[2]) if len(sys.argv) > 2 else 4,
-        int(sys.argv[3]) if len(sys.argv) > 3 else 64,
+        int(sys.argv[3]) if len(sys.argv) > 3 and not sys.argv[3].startswith("--") else None,
     )

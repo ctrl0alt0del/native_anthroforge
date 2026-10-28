@@ -10,6 +10,8 @@ from tempfile import NamedTemporaryFile
 from typing import Any
 from zipfile import ZIP_STORED, BadZipFile, ZipFile
 
+from . import disk_cache_budget
+
 FORMAT = "anthroforge-bbw-v1"
 FAILURES = (OSError, ValueError, KeyError, TypeError, UnicodeError, BadZipFile)
 
@@ -36,6 +38,7 @@ def restore(identity: str, folder: str) -> str:
     try:
         with ZipFile(directory() / (identity + ".zip")) as archive:
             restore_archive(archive, Path(folder))
+        disk_cache_budget.used(directory() / (identity + ".zip"))
         return "hit"
     except FileNotFoundError:
         return "miss"
@@ -64,15 +67,26 @@ def retain(identity: str, folder: str) -> bool:
         if len(files) != 1:
             return False
         destination = directory() / (identity + ".zip")
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        publish(destination, files[0])
-        return True
+        return retain_product(destination, files[0])
     except FAILURES:
         return False
 
 
+def retain_product(destination: Path, weights: Path) -> bool:
+    with disk_cache_budget.transaction(destination.parent):
+        size = weights.stat().st_size + 4096
+        if size > disk_cache_budget.BUDGET:
+            return False
+        if not disk_cache_budget.trim(destination.parent, size, destination):
+            return False
+        publish(destination, weights)
+    return True
+
+
 def publish(destination: Path, weights: Path) -> None:
-    with NamedTemporaryFile(dir=destination.parent, suffix=".tmp", delete=False) as stream:
+    with NamedTemporaryFile(
+        dir=destination.parent, prefix="af-weights-", suffix=".tmp", delete=False
+    ) as stream:
         pending = Path(stream.name)
     try:
         info = dict(format=FORMAT, name=weights.name, sha256=checksum(weights))

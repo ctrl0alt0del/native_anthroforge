@@ -1,11 +1,13 @@
 """Incremental scene metadata, separate from authored definitions and render leases."""
 
 from anthroforge.application.dependencies import closure
+from anthroforge.application.object_frames import Frames
 from anthroforge.application.transform_policy import object_reason
 from anthroforge.core.entities import descendants
 from anthroforge.core.results import Port, geometry_asset
 
 from . import mirror_scene, scene_state, surface_scene, tissue_projection
+from .construction_changes import ConstructionChanges, relationships_changed
 from .property_projection import PropertyProjection
 
 
@@ -62,19 +64,30 @@ class SceneProjection:
         self.view.synchronize(dict(rows=[], parents=[]))
         self.selection = ()
         self._parent_key, self._parents = None, []
+        self.construction_changes = ConstructionChanges()
 
     def synchronize(self):
         session = self.controller.session
         changes = session.changes.since(self.cursor if session is self.session else -1)
-        full = changes.reset or self.workspace != session.workspace
+        full = structural_changes(changes) or self.workspace != session.workspace
         self.update_records(changes, full, structural_changes(changes))
         self.prune_records()
-        tissue_projection.synchronize(self)
+        self.synchronize_objects(changes, full)
         self.remember(session)
         self.publish_records()
-        self.controller.construction.synchronize()
         mirror_scene.synchronize(self)
         self.synchronize_selection()
+
+    def synchronize_objects(self, changes, full):
+        session = self.controller.session
+        targets = self.construction_changes.targets(session.document, changes, full)
+        if relationships_changed(changes):
+            self.controller.construction.keys.clear()
+            for key in session.document.registry.authored:
+                self.keys.pop(key, None)
+        frames = Frames(session.engine, session.document)
+        tissue_projection.synchronize(self, targets, frames)
+        self.controller.construction.synchronize(targets, frames)
 
     def remember(self, session):
         self.session = session

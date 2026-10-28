@@ -11,12 +11,15 @@ from .construction_projection import record as object_record
 from .values import qml
 
 
-def synchronize(projection):
+def synchronize(projection, targets=None, frames=None):
     session = projection.controller.session
     tissues = {o.id: o for o in session.document.objects if isinstance(o, TissueVCP)}
-    for key, item in tissues.items():
-        frame = Frames(session.engine, session.document).world(key)
-        cache = (item, frame, session.workspace)
+    frames = frames or Frames(session.engine, session.document)
+    for key in tissues:
+        if targets is not None and key not in targets:
+            continue
+        item, frame = tissues[key], frames.world(key)
+        cache = (item, frame, session.workspace, session.document.object(item.source))
         if projection.keys.get(key) != cache:
             projection.records[key] = record(session, item, frame)
             projection.keys[key] = cache

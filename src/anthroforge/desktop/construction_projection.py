@@ -1,6 +1,7 @@
 """Incremental Construction records, separate from the anatomical outliner."""
 
-from anthroforge.application import curve_sources, workspace_policy
+from anthroforge.application import workspace_policy
+from anthroforge.application.object_frames import Frames
 from anthroforge.core import presentation
 from anthroforge.core.object_registry import kind
 from anthroforge.native import scene
@@ -31,13 +32,12 @@ class ConstructionProjection:
         self.points = PointScene(controller)
         self.placeholders = PathPlaceholders()
 
-    def synchronize(self):
+    def synchronize(self, targets=None, frames=None):
         session = self.controller.session
         live = set(session.document.registry.construction) | session.document.index.controls.keys()
         self.records = {key: row for key, row in self.records.items() if key in live}
         self.keys = {key: value for key, value in self.keys.items() if key in live}
-        for item in session.document.registry.construction.values():
-            self.update_record(session, item)
+        self.update_targets(session, targets, frames)
         for item in session.document.controls:
             self.records[item.id] = self.controller.scene_projection.records[item.id]
         self.model.synchronize_records(
@@ -45,8 +45,15 @@ class ConstructionProjection:
         )
         self.points.synchronize(self.records)
 
+    def update_targets(self, session, targets, frames):
+        records = session.document.registry.construction
+        self.frames = frames or Frames(session.engine, session.document)
+        for key in records:
+            if targets is None or key in targets:
+                self.update_record(session, records[key])
+
     def update_record(self, session, item):
-        frame = curve_sources.world(session.engine, session.document, item.id)
+        frame = self.frames.world(item.id)
         owners = workspace_policy.associations(session.document, item.id)
         key = (item, frame, session.workspace, owners)
         if key != self.keys.get(item.id):

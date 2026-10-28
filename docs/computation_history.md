@@ -165,9 +165,9 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | R01 | Dependency/index computation: hierarchy/registry lookup, reference/topology restrictions, output-port graphs, reverse invalidation, SCC cycles, automatic obstacle eligibility and publication-frontier traversal. Reuse immutable structure on value-only edits. | [document index](../src/anthroforge/core/document_index.py), [routing obstacles](../src/anthroforge/core/routing_obstacles.py), [dependent tasks](../src/anthroforge/application/dependent_tasks.py) | [document index](../tests/test_document_index.py), [publication frontier](../tests/test_publication_frontier.py) |
 | R02 | Task assessment/coordination: workload estimates plus measured history, coalescing/delays, causal urgency/age and transitive prerequisite rank, shared inline budget, worker admission, reservations, dispatch-time capture, cancellation and stale-result checks. | [coordinator](../src/anthroforge/application/coordinator.py), [priority policy](../src/anthroforge/application/task_priorities.py), [task schedulers](../src/anthroforge/application/task_schedulers.py), [tissue scheduling](../src/anthroforge/application/tissue_scheduling.py) | [task coordination](../tests/test_task_coordination.py), [priority inheritance](../tests/test_task_priorities.py), [active jobs](../tests/test_active_jobs.py) |
 | R03 | Transactions/history/checkpoints: derive changes, commit/cancel edits, maintain undo/redo restart recipes, choose saveable revisions and validate historical asynchronous captures. | [history](../src/anthroforge/application/history.py), [changes](../src/anthroforge/application/changes.py), [authored jobs](../src/anthroforge/application/authored_jobs.py) | [interleaving](../tests/test_interleaving.py), [capture history](../tests/test_capture_history.py) |
-| R04 | Cache/resource work: keys, immutable leases, hit/miss/eviction, content equivalence and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes, tissue material preparation and skin field/stitching buffers (October 28 numerical/performance qualification below; portable release pending). | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp), [skin envelope](../native/src/skin_envelope.cpp), [skin assembly](../native/src/skin_assembly.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py), [skin buffer contracts](../native/tests/skin_buffers_test.cpp) |
-| R05 | Viewport publication/rendering: stage complete native mesh/path/image buffers, switch displayed geometry and picking together, generate controls, perform Qt Quick 3D shading, opacity/depth and selection-outline passes. | [Qt geometry adapters](../native/qt), [outline shader](../native/qt/shaders/outline.frag), [desktop](../src/anthroforge/desktop) | [viewport publication](../tests/test_viewport_publication.py), [capture staging](../tests/test_capture_staging.py), [path presentation](../tests/test_path_presentation.py) |
-| R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. Typed integer controls retain exact text through Qt and convert display units before shared command validation (CH-051). | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [quantity transport](../src/anthroforge/desktop/quantity_values.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [integer quantities](../tests/test_integer_quantity_controls.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
+| R04 | Cache/resource work: shared-allocation receipts, engine-wide cost-aware budgeting, bounded FAST disk retention, immutable leases and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes, tissue material preparation and skin field/stitching buffers (October 28 numerical/performance qualification below; portable release pending). | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp), [skin envelope](../native/src/skin_envelope.cpp), [skin assembly](../native/src/skin_assembly.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py), [skin buffer contracts](../native/tests/skin_buffers_test.cpp) |
+| R05 | Viewport publication/rendering: stage complete native mesh/path/image buffers, coalesce same-frame activation, reuse displayed transforms, switch displayed geometry and picking together, generate controls, perform Qt Quick 3D shading, opacity/depth and selection-outline passes. | [Qt geometry adapters](../native/qt), [outline shader](../native/qt/shaders/outline.frag), [desktop](../src/anthroforge/desktop) | [viewport publication](../tests/test_viewport_publication.py), [capture staging](../tests/test_capture_staging.py), [path presentation](../tests/test_path_presentation.py) |
+| R06 | UI projection/model work: change-journal-targeted construction with shared frame resolution, incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. Typed integer controls retain exact text through Qt and convert display units before shared command validation (CH-051). | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [quantity transport](../src/anthroforge/desktop/quantity_values.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [integer quantities](../tests/test_integer_quantity_controls.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
 | R07 | Issues checks: evaluate structural/readiness/attachment/dependency diagnostics and optional native collision checks, retain scoped stale evidence, and verify requested repairs. Read-only checks use the common coordinator. | [Issue system](../src/anthroforge/application/issues/system.py), [providers](../src/anthroforge/application/issues/providers.py) | [Issue lifecycle](../tests/test_issue_lifecycle.py), [Issue integration](../tests/test_issue_integration.py) |
 | R08 | Runtime profiling: opt-in Qt/native/application events, monotonic alignment, bounded rings/queues, summaries, model churn, invalidation causes, cache/resource attribution and background trace archive export. | [profiling](../src/anthroforge/profiling), [Qt collector](../native/profiling) | [profiling](../tests/test_profiling.py), [profile diagnostics](../tests/test_profile_diagnostics.py) |
 | R09 | Project persistence: schema-6 writing with schema-4/5/6 reading; encode/decode editable records and accepted resources, atomic saving and background opening. Periodic recovery captures committed snapshots without changing manual save ownership (CH-092). Never serialize native handles or undo history. | [storage](../src/anthroforge/application/storage.py), [resource storage](../src/anthroforge/application/resource_storage.py), [autosave](../src/anthroforge/application/autosave.py) | [headless](../tests/test_headless.py), [shortcut foundations](../tests/test_shortcut_foundations.py), [autosave](../tests/test_autosave.py) |
@@ -3622,3 +3622,52 @@ measurements 0.23–0.35 ms, section spans 0.18–0.23 ms, placement 0.11–0.20
 classification 6.15 ms. Requests took 9–34 ms including orchestration, with unrelated checks
 active. These are observations, not controlled benchmarks or interactive-latency evidence.
 The task record contains complete qualification and remaining evidence limits.
+
+### Display projection and reachability reuse — 2026-10-28 (0.4.2; R04–R06, recommendation R11)
+
+Previously each accepted result revisited all construction records, rebuilt unchanged picking
+transforms and rescanned retained documents. The change journal now selects affected presentation
+records; ordinary transform dependencies remain distinct from anatomical evaluation. One
+frame-resolution cache serves each projection pass. Picking reuses only currently displayed
+transforms, including separate inspection offsets. Frame notifications are coalesced without
+advancing picking ahead of displayed geometry. Reachability reuses immutable-document reference
+sets, retaining no discarded history and still sweeping newly orphaned resources.
+
+Hidden Ribs-to-3 captures reduced construction visits from 132,498 to 549 with identical
+geometry, resolved poses, attachment metadata and oriented connectivity. Serial BAAB trials
+reduce median complete update time from 29.472 s to 23.395 s (20.6%). Background load remains
+uncontrolled; inclusive stage timings cannot be summed. Evidence and limits are in
+[the task record](tasks/display-cache-042.md). No geometry algorithms, scheduling order or
+history policy changed.
+
+### Shared cache allocation budgeting — 2026-10-28 (0.4.2; R04, recommendation R09)
+
+Separate cache byte charges repeatedly included the same meshes; the fiber cache thrashed at 64 MiB,
+and the two-entry FAST cache discarded expensive preparations. Cache admission now records native
+mesh allocation identities and separates fiber-owned operators from shared fields, paths and parent
+meshes. One engine-owned 4 GiB estimated-payload budget bounds the union across caches. Fiber/skin
+preparations share that allowance (entry caps 256/64); other local caps remain. Aggregate pressure
+uses rebuild wall time per retained byte with aging on eviction/hits, following the GreedyDual-Size
+principle; this is a shared-allocation adaptation, not a claim of its original optimality bound.
+Missing timing uses a conservative minimal priority. All collection/cache work stays outside
+numerical algorithms.
+
+FAST disk products use atomic publication and a process-safe writer lock, at most 2 GiB/256 files,
+least-recently-used eviction, and safe bypass under lock/filesystem pressure. Active temporary
+writes are excluded. These are disposable cache limits, never calculation-admission or history
+limits. Recorder inventory now includes fiber preparations, expressions and painting preparations
+and retains bounded 65,536-handle coverage; larger inventories remain explicitly incomplete.
+Estimates exclude Python/allocator/GPU overhead and are not a process-RAM cap.
+
+The 24-edit workload produces 211 fiber builds/2,411 hits without rebuild churn (previously 2,547
+builds/75 hits). The retained deduplicated fiber payload is 105.42 MiB. Matched eight-edit numerical
+comparison preserves bindings and canonical oriented topology, with maximum coordinate delta
+4.09e-14 m; raw Thumb triangle enumeration remains nondeterministic. Returning to a retained
+whole-body FAST preparation takes 0.087 ms instead of a 21.126 s rebuild, with identical
+prediction/diagnostic hashes. This improves reuse, not cold solver speed. Final qualification
+passes 2,641 Python tests, six native suites, configured style/type/numerical checks and 32
+relocated portable checks. Initial failures, successful reruns and limits are recorded in
+[the task record](tasks/display-cache-042.md).
+
+Reference: [Cao and Irani,
+GreedyDual-Size](https://www.usenix.org/legacy/publications/library/proceedings/usits97/full_papers/cao/cao_html/node8.html).

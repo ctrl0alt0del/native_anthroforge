@@ -1,6 +1,15 @@
 # AnthroForge development validation
 
-**0.4.2 is qualified:** 2,622 Python tests, six native suites, configured style/type checks,
+**0.4.2 display/cache optimizations are qualified:** 2,641 Python tests, six native suites,
+configured style/type checks, numerical imports and native runtime checks pass. All 32
+relocated portable checks pass. Serial paired Ribs updates on the 58-SCP/96-tissue assembly
+improve from a 29.472 s median to 23.395 s (20.6% shorter), with identical final geometry,
+poses, attachment metadata and canonical connectivity. Shared allocation budgeting eliminates
+measured fiber cache churn and retains expensive FAST preparations without changing numerical
+algorithms or history. This is not a process-memory reduction or interactive-latency guarantee.
+See [evidence and limits](tasks/display-cache-042.md). Earlier records follow.
+
+**Earlier 0.4.2 inspection qualification:** 2,622 Python tests, six native suites, configured style/type checks,
 Qt-free headless and background/offscreen GUI inspection pass. All 32 relocated portable
 checks pass, including frozen spatial reports. The 58-SCP/96-tissue assembly remains unchanged
 by diagnostics; its neighborhood/section views were inspected. Sample containment and local

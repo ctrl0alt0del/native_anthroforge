@@ -12,6 +12,7 @@ from . import controller_actions as actions
 from . import presentation, project_actions, scene_projection, scene_state
 from .activity_model import ActivityModel
 from .creation_selection import CreationSelection
+from .display_transforms import DisplayTransforms
 from .drawing_tools import DrawingTools
 from .fiber_display import FiberDisplay
 from .image_tools import ImageTools
@@ -149,6 +150,8 @@ class Controller(QObject):
     def initialize_image_layers(self):
         from .render_layer import RenderLayer
 
+        self._presenting = self._geometry_dirty = False
+        self.display_transforms = DisplayTransforms()
         self.image_layers = {
             key: RenderLayer(self.image_model, key) for key in ("NORMAL", "FRONT", "BACK")
         }
@@ -623,11 +626,24 @@ class Controller(QObject):
         now = monotonic()
         self.session.scheduler.metrics.observe("frame_interval", now - self.last_frame)
         self.last_frame = now
-        for model in self.geometry_models():
-            model.presented()
+        self._presenting = True
+        try:
+            for model in self.geometry_models():
+                model.presented()
+        finally:
+            self._presenting = False
+        if self._geometry_dirty:
+            self._geometry_dirty = False
+            self.activate_geometry()
 
     @measured("publication", lambda owner: owner.session.profiler)
     def activate_geometry(self):
+        if self._presenting:
+            self._geometry_dirty = True
+            return
+        self.publish_displayed()
+
+    def publish_displayed(self):
         from .image_scene import prepare_picking as prepare_images
         from .path_scene import prepare_picking
 

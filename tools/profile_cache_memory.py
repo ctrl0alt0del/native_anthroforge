@@ -1,4 +1,4 @@
-"""Expanded settled-state inventory; profiler's ordinary 4096-handle cap stays unchanged."""
+"""Settled-state inventory with a union separating cache-exclusive and document ownership."""
 
 from collections import Counter, defaultdict
 from types import SimpleNamespace
@@ -57,6 +57,6 @@ def detailed(session):
         - report["owners"]["noncache_union"]["bytes"]
     )
     report["note"] = (
-        "Settled states only; fiber solver charges remain separate conservative estimates."
+        "Settled states only; native payload estimates exclude Python/allocator/GPU overhead."
     )
     return report

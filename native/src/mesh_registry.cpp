@@ -41,6 +41,12 @@ void check_cancel(uint64_t token) {
 }
 }
 const char* af_last_error() { return af::last_error.c_str(); }
+int af_mesh_memory_receipt(uint64_t handle,uint64_t* row) {
+    try {
+        if(!row) throw std::runtime_error("Missing mesh memory receipt.");
+        const auto value=af::mesh(handle); af::memory_row(handle,*value,row); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
 uint64_t af_mesh_retained_bytes(const uint64_t* handles,int count) {
     try {
         if(count<0||(count&&!handles)) throw std::runtime_error("Invalid retained mesh handles.");

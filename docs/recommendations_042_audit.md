@@ -47,13 +47,14 @@ R09–R11 now have [production profiling evidence](tasks/profile-cache-display-0
 The measured priority is incremental scene/picking publication (R11), then accurate,
 cost-aware cache ownership/budgeting (R09). No overlapping identical preparation misses
 were observed, so R10 remains unproven. GPU topology reuse is not the demonstrated
-display bottleneck. These mechanisms remain unimplemented; profiling is complete.
+display bottleneck. The [R11/R09 implementation](tasks/display-cache-042.md) now targets
+the measured scene work and cache churn; final qualification is recorded there.
 
 | Item | Existing capability | Remaining work and distinguishing evidence | Requirements |
 | --- | --- | --- | --- |
-| R09 — Aggregate cache budgeting | Individual cache byte/entry limits, ownership tracking, cache events and job resource admission exist. | Coordinate aggregate retained-cache memory instead of independently granting each cache its own allowance; include cost-aware eviction/accounting. The persistent FAST-weight disk cache also has no retention quota. Job memory admission is a different responsibility. Measure long-session retained memory and rebuild/thrashing cost. | B09 |
+| R09 — Aggregate cache budgeting | Implemented: shared allocation receipts, engine-wide cost-aware cache budget and bounded persistent FAST products. | Job memory admission and document/history ownership remain separate. Estimated payload is not process RSS; retained undo growth has not been silently changed. | B09 |
 | R10 — Share identical work already running | Completed native preparations/results are cached; compatible queued requests coalesce. | Reuse identical in-flight preparation across separate consumers. For example, tissue preparation currently performs cache lookup, builds outside the cache, then stores: concurrent misses can both build. This establishes a possible duplicate path, not its frequency or cost. Capture overlapping identical keys before adding shared-job ownership/cancellation machinery. | B03 |
-| R11 — Cheaper display updates | Native render chunks, staged complete publication and shared mirror resources exist. | Reuse unchanged GPU topology and update only changing position/normal data where valid; optionally lower display tessellation/helper detail during navigation. The Qt mesh adapter currently clears and installs a full interleaved chunk after an asset change. Keep computation/attachment geometry unchanged and measure upload/frame time first. | C05, F08 |
+| R11 — Cheaper display updates | Implemented measured subset: incremental construction projection, displayed transform reuse, frame-coalesced publication and cached document reachability. | GPU topology/position-only upload and adaptive display tessellation remain deferred: profiling did not establish those as the relevant cost. Computational/attachment geometry stays unchanged. | C05, F08 |
 | R18 — Close profiling and responsiveness evidence gaps | Input/task/native/UI/frame traces, invalidation reasons, cache events, retained-resource snapshots and production experiments exist. | Extend attribution only where current reports leave consequential native subphases unknown; measure complete gestures on the current combined app in repeatable cold/warm trials. CPU-owned resource estimates omit Qt/GPU/allocator overhead. Actual physical display/input latency is not established by current callbacks. This is measurement work, not proof the app is slow. | I01, I02 |
 
 ### Larger workflows, not minor addon omissions
@@ -108,7 +109,7 @@ requirements.
 | B06 | Covered | Major numerical preparation/evaluation uses owned background inputs and native work. Long-operation responsiveness still needs workload-specific measurement, not an assumption from threading. [Execution](#evaluation-and-performance). |
 | B07 | Covered | Cooperative cancellation, obsolete publication rejection and undo/load/deletion invalidation exist. [Execution](#evaluation-and-performance). |
 | B08 | Covered | Registry/dependency indexes, changesets and incremental notifications exist. [0.3.3 delivery](shortcuts_033.md). |
-| B09 | Partial | Per-cache budgets, ownership and profiler accounting exist. Aggregate budgeting/cost policy and disk-cache retention remain R09. [Cache evidence](#evaluation-and-performance). |
+| B09 | Covered | Aggregate cost-aware cache budgeting, shared ownership receipts and bounded disk retention are implemented. Document/history memory and allocator/GPU usage are separate. [Cache evidence](tasks/display-cache-042.md). |
 | B10 | Covered | Local-space surface/query/preparation reuse, scale/reflection handling and confirmed-query qualification exist. [Execution](#evaluation-and-performance). |
 
 ### C — Interaction and publication

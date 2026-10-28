@@ -44,9 +44,12 @@ class Session:
         self.initialize_file_state()
 
     def initialize_document(self, name: str, executor_factory: Any) -> None:
+        from .geometry_ownership import Reachability
+
         self.changes, self._document = ChangeJournal(), Document(name=name)
         self.history = History(self.document)
         self.resources = Resources()
+        self.reachability = Reachability()
         self.executor_factory = executor_factory
 
     def initialize_file_state(self) -> None:

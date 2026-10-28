@@ -7,7 +7,7 @@ from time import perf_counter_ns
 from weakref import WeakKeyDictionary, WeakSet
 
 from .resource_groups import ResourceGroups
-from .resource_inventory import inventory, payload_resources, session_owners
+from .resource_inventory import inventory, native_resources, payload_resources, session_owners
 
 
 class Resources:
@@ -157,4 +157,4 @@ def retain_cache(owner, cache):
     values = cache.retained()
     owner.update(values)
     for value in values:
-        owner.update(getattr(value, "resources", ()))
+        owner.update(native_resources(value))

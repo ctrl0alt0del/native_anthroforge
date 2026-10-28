@@ -93,7 +93,7 @@ def test_preparation_is_cached_bounded_and_cancellable(session):
     asset = session.resources.attachments[fiber.attachment_asset]
     first, _ = fiber_deformation.prepare(session.engine, session.resources, fiber, asset, 0)
     second, _ = fiber_deformation.prepare(session.engine, session.resources, fiber, asset, 0)
-    assert first is second and first.bytes >= asset.field.bytes
+    assert first is second and first.retained_bytes >= first.bytes + asset.field.bytes
     cache = session.engine.fiber_deformations
     cache.clear()
     cancel = NativeCancellation(session.engine)

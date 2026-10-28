@@ -86,3 +86,19 @@ def test_jpeg_exif_orientation_applied_once_in_portable_source():
     restored = image_assets.decode(original.encoded)
     assert (original.width, original.height) == (2, 4)
     assert original.rgba == restored.rgba and original.digest == restored.digest
+
+
+def test_reachability_reuses_live_snapshots_but_collects_new_orphans(session, monkeypatch):
+    populated(session)
+    calls, original = [], geometry_ownership.referenced
+    monkeypatch.setattr(geometry_ownership, "referenced", lambda d: calls.append(d) or original(d))
+    geometry_ownership.collect(session)
+    count = len(calls)
+    session.resources.paths["orphan"] = session.resources.paths["path"]
+    geometry_ownership.collect(session)
+    assert len(calls) == count and "orphan" not in session.resources.paths
+    session.document = Document()
+    session.history = History(session.document)
+    geometry_ownership.collect(session)
+    retained = geometry_ownership.retained_documents(session)
+    assert set(session.reachability.documents) == {id(d) for d in retained}

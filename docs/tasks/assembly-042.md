@@ -65,6 +65,24 @@ by the preceding display/cache task. Keep new checks background/offscreen.
 
 ## Next actions and blockers
 
+Production graph qualification now passes: all 96 tissues imported with explicit bone
+mapping; 492 geometry-bearing records match before and after Ribs Top Radius, Humerus
+Length, Radius Length and Thumb Radius edits. The comparison canonicalizes oriented
+triangle order (Boolean face order can vary), without relaxing positions or orientation.
+Source SHA256 remained `308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
+The initial propagation discrepancy came from selective loading omitting the normal
+reader's legacy capture-frame restoration; both paths now reuse that restoration.
+Raw evidence/profile: ignored `build/assembly-042/production/`. Observed 281 MB inventory
+2.2 s, all-muscle preparation 22.8 s on workers, import/wait 1.74 s with recording enabled.
+No speed claim is made from source/imported shortcut trials: only destination was recorded.
+
+Native gate passed all six suites and native style. Full Python run had 2,666 passing
+tests and four obsolete schema-number assertions, now corrected for schema 8; rerun pending.
+Explicit partial rebind retains other unresolved pins. Imported boundary mirror rules
+are editable without placeholder anatomy. Source-free formula repair is covered, including
+restoring internal formula editability while keeping external outputs disabled. Remaining:
+ownership/readset audit, final GUI/resource checks, documentation, full gate and portable build.
+
 Reference-repair checkpoint: mapped targets, mirror rules and external declarations are in the
 publication read set. Accepted result status is preserved as import provenance; resolving an
 equivalent support restores the accepted result without a new solve. Declared missing formula

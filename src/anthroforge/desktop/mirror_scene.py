@@ -19,6 +19,7 @@ def synchronize(projection):
     }
     for key, row in sources.items():
         row["mirror_settings"] = asdict(document.mirrors.rules.get(key, MirrorRule(key)))
+        row["mirror_boundaries"] = [asdict(r) for r in document.mirror_rules if key in r.scope]
     publish_markers(controller, sources)
 
 

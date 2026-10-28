@@ -78,3 +78,13 @@ def remapped(value: Any, kind: str, ids: dict[str, str], assets: dict[str, str])
     if kind == "attachments":
         return replace(value, targets=graph_records.rewritten(value.targets, ids, assets))
     return value
+
+
+def restore_legacy_inputs(preparation: Any) -> None:
+    attachment_storage.restore_frame_hints(
+        preparation.source.document, preparation.loaded, preparation.engine
+    )
+    for key, value in preparation.loaded.attachments.items():
+        preparation.resources.attachments[preparation.assets[key]] = remapped(
+            value, "attachments", preparation.ids, preparation.assets
+        )

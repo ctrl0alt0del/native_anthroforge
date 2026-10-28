@@ -202,9 +202,9 @@ def require_kind(item: Any, kind: str) -> None:
 def disable_external_outputs(original: Any, item: Any, ids: Any) -> Any:
     from anthroforge.core.shortcuts import DrivingShortcut
 
-    if not isinstance(item, DrivingShortcut):
+    if not isinstance(item, DrivingShortcut) or ids.get(original.id) == original.id:
         return item
-    external = {ids[f.id] for f in original.formulas if f.target.target not in ids}
+    external = {ids.get(f.id, f.id) for f in original.formulas if f.target.target not in ids}
     return replace(
         item,
         formulas=tuple(replace(f, enabled=False) if f.id in external else f for f in item.formulas),

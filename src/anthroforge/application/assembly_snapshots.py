@@ -26,14 +26,36 @@ def snapshot(p: Any, archive: Any, row: Any) -> Any:
     declaration = next((r for r in source.external_references if r.id == row.source_entity), None)
     if declaration is not None:
         return retained_snapshot(p, archive, row, declaration)
+    return current_snapshot(p, archive, row)
+
+
+def current_snapshot(p: Any, archive: Any, row: Any) -> Any:
     role = next(use.role for use in row.uses if use.role)
-    item = source.object(row.source_entity)
+    item = p.source.document.object(row.source_entity)
     key = surface_asset(item, role)
+    if not key:
+        return row
     load(p, archive, key)
-    provider = surface_providers.snapshot(
-        p.engine, source, p.loaded.meshes, SurfaceReference(item.id, role, row.source_instance)
+    provider = source_provider(p, item.id, role, row.source_instance)
+    return replace(
+        row,
+        surface_asset=p.assets[key],
+        surface_frame=provider.frame,
+        surface_base=retained_base(p, archive, item, role),
     )
-    return replace(row, surface_asset=p.assets[key], surface_frame=provider.frame)
+
+
+def source_provider(p: Any, target: str, role: str, instance: str) -> Any:
+    reference = SurfaceReference(target, role, instance)
+    return surface_providers.snapshot(p.engine, p.source.document, p.loaded.meshes, reference)
+
+
+def retained_base(p: Any, archive: Any, item: Any, role: str) -> str:
+    material = getattr(item, "final_material", None) if role == "TISSUE_FINAL" else None
+    key = material.base if material and material.base_state.kind == "SURFACE" else ""
+    if key:
+        load(p, archive, key)
+    return str(p.assets.get(key, ""))
 
 
 def surface_asset(item: Any, role: str) -> str:
@@ -48,8 +70,13 @@ def retained_snapshot(p: Any, archive: Any, row: Any, original: Any) -> Any:
     if not original.surface_asset:
         return row
     load(p, archive, original.surface_asset)
+    if original.surface_base:
+        load(p, archive, original.surface_base)
     return replace(
-        row, surface_asset=p.assets[original.surface_asset], surface_frame=original.surface_frame
+        row,
+        surface_asset=p.assets[original.surface_asset],
+        surface_frame=original.surface_frame,
+        surface_base=p.assets.get(original.surface_base, ""),
     )
 
 

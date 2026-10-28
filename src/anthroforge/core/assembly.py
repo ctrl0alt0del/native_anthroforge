@@ -33,6 +33,7 @@ class ExternalReference:
     components: int = 0
     surface_asset: str = ""
     surface_frame: tuple[float, ...] = ()
+    surface_base: str = ""
     source_instance: str = ""
     instance: str = ""
 

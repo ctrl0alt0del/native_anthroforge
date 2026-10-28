@@ -102,10 +102,16 @@ def capture_request(item: Fiber, path: Any, records: Any, world: Any) -> Any:
 
 
 def recapture(
-    engine: Any, item: Fiber, resources: Any, document: Any, geometry: EditGeometry, cancel: int
+    engine: Any,
+    item: Fiber,
+    resources: Any,
+    document: Any,
+    geometry: EditGeometry,
+    cancel: int,
+    capture: Any = None,
 ) -> Any:
     assert item.edit is not None
-    field, captures = capture_edit(engine, item, resources, document, geometry, cancel)
+    field, captures = (capture or capture_edit)(engine, item, resources, document, geometry, cancel)
     asset = fiber_retention.retain(item, field, captures)
     changed = edited_fiber(item, geometry.records, asset)
     return PathAsset(geometry.path, changed), changed, asset

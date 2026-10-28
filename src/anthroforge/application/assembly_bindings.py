@@ -32,7 +32,10 @@ class Bindings:
         self.changed: set[tuple[str, str]] = set()
 
     def assess(self) -> None:
+        from .assembly_source import cancelled
+
         for row in self.p.mapping.rows:
+            cancelled(self.p.cancel)
             if row["action"] == "map" and row["relationship"] == "support":
                 self.support(row)
         self.roots()
@@ -133,24 +136,42 @@ class Bindings:
         if (owner, target) in self.changed:
             return
         before = self.document.object(owner)
-        after = replacement_bindings.rebound(
-            self.p.engine, self.document, self.document, self.resources, before, target, self.cancel
-        )
+        after = self.rebound(before, target)
         self.install(after)
         self.record_evidence(before, after, target)
         self.changed.add((owner, target))
 
+    def rebound(self, item: Any, target: str) -> Any:
+        from .assembly_capture import Capture
+
+        inputs = (
+            self.p.engine,
+            self.document,
+            self.document,
+            self.resources,
+            item,
+            target,
+            self.cancel,
+        )
+        return replacement_bindings.rebound(*inputs, Capture(self))
+
     def record_evidence(self, before: Any, after: Any, target: str) -> None:
         original = next(key for key, value in self.p.ids.items() if value == before.id)
         source = self.p.source.document.object(original)
-        previous = assembly_evidence.locations(
-            source, self.source_provider, self.source_meshes, self.cancel
-        )
-        current = assembly_evidence.locations(
-            after, self.destination_provider, self.resources.meshes, self.cancel
-        )
+        previous, current = self.locations(source, True), self.locations(after, False)
         self.evidence.append(
             dict(owner=before.id, target=target, action="rebind", before=previous, after=current)
+        )
+
+    def locations(self, item: Any, source: bool) -> Any:
+        from .assembly_capture import Capture
+
+        provider = self.source_provider if source else Capture(self).provider
+        resources = self.p.loaded if source else self.resources
+        meshes = self.source_meshes if source else self.resources.meshes
+        document = self.p.source.document if source else self.document
+        return assembly_evidence.locations(
+            item, provider, meshes, self.cancel, document, resources.bindings
         )
 
     def destination_provider(self, reference: Any) -> Any:

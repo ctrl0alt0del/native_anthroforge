@@ -4,6 +4,7 @@ import pytest
 
 from anthroforge.application import assembly_candidate, assembly_source, storage
 from tests.test_assembly_mapping import prepared
+from tests.test_assembly_repair import resolve
 from tests.test_driving_formulas import curve, driver, reference
 
 
@@ -57,3 +58,24 @@ def test_mapped_external_output_cannot_overwrite_destination_writer(session, tmp
             formula=formula.id,
             changes=dict(enabled=True),
         )
+
+
+def test_resolving_formula_input_restores_result_and_keeps_external_write_disabled(
+    session, tmp_path
+):
+    source, first, other, key, formula, outgoing = formula_source(session, tmp_path)
+    candidate = prepared(session, source, [first])
+    imported(session, candidate)
+    references = session.document.external_references
+    resolve(session, {r.id: dict(action="map", target=other) for r in references})
+    copied = session.document.formula_index.drivers[candidate.identities[key]]
+    incoming = formula_result(session, candidate.identities[formula])
+    assert incoming.status == "ready", incoming.error
+    assert not next(f for f in copied.formulas if f.id == candidate.identities[outgoing]).enabled
+    session.command("driver.value", driver=copied.id, value=3)
+    session.wait()
+    assert session.document.object(candidate.identities[first]).resolution == 5
+
+
+def formula_result(session, key):
+    return next(r for r in session.document.formula_results if r.formula == key)

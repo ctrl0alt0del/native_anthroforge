@@ -47,6 +47,7 @@ class AssemblyPanel(QObject):
             reference=self.focus,
             target=self.target,
             parent=self.options.get("parent", ""),
+            options=self.options,
             parents=assembly_projection.parents(self),
         )
 
@@ -125,6 +126,9 @@ class AssemblyPanel(QObject):
         if not self.active or self.timer.isActive():
             return
         manager = self.controller.session.assembly
+        if self.stale(manager):
+            self.queue()
+            return
         signature = assembly_projection.signature(manager)
         if signature == self.signature:
             return
@@ -132,6 +136,18 @@ class AssemblyPanel(QObject):
         self._state = manager.status()
         assembly_projection.synchronize(self)
         self.changed.emit()
+
+    def stale(self, manager):
+        from anthroforge.core.jobs import ObsoleteInputs
+
+        candidate = manager.preparation.candidate
+        if candidate is None:
+            return False
+        try:
+            candidate.reads.require(self.controller.session.document)
+        except ObsoleteInputs:
+            return True
+        return False
 
     @Slot(str)
     def selectReference(self, key):

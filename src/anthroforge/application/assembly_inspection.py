@@ -41,4 +41,5 @@ def candidate_details(candidate: Any) -> dict[str, Any]:
         selection=candidate.selection,
         references=[asdict(r) for r in candidate.references],
         mappings=candidate.mappings,
+        unresolved=sum(not r.target for r in candidate.references),
     )

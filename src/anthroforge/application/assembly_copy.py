@@ -8,8 +8,8 @@ from anthroforge.core import graph_records
 from anthroforge.core.assembly import ImportProvenance
 from anthroforge.core.entities import SCP, Attachment
 
-from . import assembly_graph, assembly_resources, assembly_selection
-from .assembly_candidate import Candidate, ReadSet
+from . import assembly_graph, assembly_selection
+from .assembly_candidate import Candidate
 
 
 def selected(source: Any, keys: list[str], attached: bool, mappings: Any) -> Any:
@@ -91,17 +91,10 @@ def provenance(source: Any, ids: Any, mappings: Any = ()) -> ImportProvenance:
 
 
 def copy_closed(source: Any, destination: Any, keys: Any, engine: Any, cancel: Any) -> Candidate:
-    selection, boundaries = selected(source, keys, False, {})
+    from .assembly_preparation import prepare
+    from .resources import Resources
+
+    _, boundaries = selected(source, keys, False, {})
     if boundaries:
         raise ValueError("This graph has external references requiring mapping decisions.")
-    source_resources = assembly_resources.load(source, selection, engine, cancel)
-    ids = assembly_graph.identities(selection, source_resources)
-    resources, assets = assembly_resources.transfer(source_resources, ids)
-    values = additions(source.document, selection, ids, assets)
-    parent = destination_parent(destination, "", bool(assembly_graph.roots(selection)))
-    hierarchy(values, selection, ids, parent)
-    empty = bool(assembly_graph.roots(selection)) and not destination.entities
-    reads = ReadSet(str(destination.id), empty_hierarchy=empty)
-    candidate = Candidate(values, resources, ids, provenance(source, ids), (), reads)
-    candidate.merge(destination)
-    return candidate
+    return prepare(source, keys, {}, engine, (destination, Resources()), cancel)

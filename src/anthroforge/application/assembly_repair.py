@@ -59,7 +59,7 @@ class Preparation:
         self.assets: dict[str, str] = {}
         self.evidence: tuple[dict[str, Any], ...] = ()
         self.values, rows = affected(self.destination, choices)
-        self.ids = {item.id: item.id for values in self.values.values() for item in values}
+        self.ids = owned_identities(self.values)
         self.mapping = Mappings(self.source, self.destination, self.ids, choices)
         self.mapping.assess(rows)
         self.mapping.references = restored_references(self.destination, self.mapping.references)
@@ -90,6 +90,7 @@ class Preparation:
                 for v in getattr(document, group)
                 if v.id in owners - previous
             )
+        self.values["formula_results"] = restored_formulas(self.destination, self.values, owners)
 
     def candidate(self) -> Repair:
         keys = self.mapping.reads | {identity(v) for rows in self.values.values() for v in rows}
@@ -144,6 +145,19 @@ def referring_records(document: Any, targets: set[str]) -> dict[str, Any]:
         )
         for k in groups
     }
+
+
+def owned_identities(values: Any) -> dict[str, str]:
+    return {key: key for rows in values.values() for v in rows for key in graph_records.owned(v)}
+
+
+def restored_formulas(document: Any, values: Any, owners: set[str]) -> tuple[Any, ...]:
+    formulas = {f.id for d in values["driving_shortcuts"] for f in d.formulas} | owners
+    return tuple(
+        assembly_provenance.restore(document, r)
+        for r in document.formula_results
+        if r.formula in formulas
+    )
 
 
 def restored_references(document: Any, references: Any) -> list[Any]:

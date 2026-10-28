@@ -1,7 +1,7 @@
 """Shared mirroring operations; sources are the only editable geometry owners."""
 
 from dataclasses import asdict, replace
-from typing import Any
+from typing import Any, cast
 
 from anthroforge.core.mirroring import MirrorRule, SharedMirrorTarget, parse, require_source
 
@@ -40,19 +40,30 @@ def plane_name(document: Any, rule: MirrorRule) -> str:
 
 
 def configure(session: Any, target: str, **values: Any) -> None:
-    require_source(target)
-    session.document.object(target)
-    if not workspace_policy.included(session.document, session.workspace, target):
-        raise ValueError("The source is outside the focused workspace.")
-    if values.get("enabled") and target not in session.document.registry.anatomy:
+    old = editable_rule(session, target)
+    if set(values) & {"scope", "target"}:
+        raise ValueError("Mirror ownership is managed through the source graph.")
+    if values.get("enabled") and not old.scope and target not in session.document.registry.anatomy:
         raise ValueError("Mirror Children requires an anatomical source.")
-    old = session.document.mirrors.rules.get(target, MirrorRule(target))
     updated = replace(old, **values)
     if updated == old:
         return
     rules = tuple(r for r in session.document.mirror_rules if r.target != target)
     session.replace_document(mirror_rules=(*rules, updated))
     invalidate(session, target)
+
+
+def editable_rule(session: Any, target: str) -> MirrorRule:
+    require_source(target)
+    old = session.document.mirrors.rules.get(target, MirrorRule(target))
+    sources = old.scope or (target,)
+    for key in sources:
+        session.document.object(key)
+    if not any(
+        workspace_policy.included(session.document, session.workspace, key) for key in sources
+    ):
+        raise ValueError("The source is outside the focused workspace.")
+    return cast(MirrorRule, old)
 
 
 def invalidate(session: Any, target: str) -> None:
@@ -96,8 +107,9 @@ def inspect(session: Any, target: str) -> dict[str, Any]:
     if instance:
         return describe(session.document, instance)
     require_source(target)
-    session.document.object(target)
     rule = session.document.mirrors.rules.get(target, MirrorRule(target))
+    if not rule.scope:
+        session.document.object(target)
     return dict(rule=asdict(rule), instances=listing(session, target))
 
 

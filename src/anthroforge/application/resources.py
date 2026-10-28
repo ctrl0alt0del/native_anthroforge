@@ -66,7 +66,10 @@ def referenced(document: Document) -> dict[str, set[str]]:
     result = references((*document.entities, *opening), document.objects)
     result["meshes"].update(shortcut_materials(document))
     result["meshes"].update(
-        r.surface_asset for r in document.external_references if r.surface_asset
+        key
+        for r in document.external_references
+        for key in (r.surface_asset, r.surface_base)
+        if key
     )
     meshes, buffers = skin_references(document.skin)
     result["meshes"].update(meshes)

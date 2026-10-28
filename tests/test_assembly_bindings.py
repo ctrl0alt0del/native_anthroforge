@@ -1,7 +1,9 @@
 from dataclasses import replace
+from threading import Event
 
 import numpy as np
 
+from anthroforge.application import assembly_source, storage
 from anthroforge.application.assets import imported
 from anthroforge.core.document import Document
 from anthroforge.native.mesh import NativeCancellation
@@ -45,3 +47,25 @@ def test_explicit_rebind_prepares_current_shape_and_new_capture(session, tmp_pat
     assert value.ready and value.evidence
     copied = value.merge(destination).object(value.identities[fiber.id])
     assert copied.bindings[0].attachment.binding != fiber.bindings[0].attachment.binding
+
+
+def test_legacy_capture_frames_match_normal_project_loading(session, tmp_path):
+    target, fiber, _ = captured(session, tmp_path)
+    key = fiber.attachment_asset
+    strip_frame_metadata(session, key)
+    path = tmp_path / "legacy-capture.anthroforge"
+    storage.atomic_save(path, session.document, session.resources)
+    _, normal = storage.read_package(path, session.engine)
+    source = assembly_source.inspect(str(path), Event())
+    candidate = prepared(session, source, [fiber.id], dict(mappings={target: target}))
+    copied = candidate.merge(session.document).object(candidate.identities[fiber.id])
+    transferred = candidate.resources.attachments[copied.attachment_asset].field
+    assert transferred.frame_hints == normal.attachments[key].field.frame_hints
+    assert transferred.world == normal.attachments[key].field.world
+
+
+def strip_frame_metadata(session, key):
+    asset = session.resources.attachments[key]
+    session.resources.attachments[key] = replace(
+        asset, field=replace(asset.field, frames=(), frame_hints=())
+    )

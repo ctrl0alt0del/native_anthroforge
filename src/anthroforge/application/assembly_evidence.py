@@ -3,10 +3,13 @@
 from typing import Any
 
 from anthroforge.core.assembly import declaration
+from anthroforge.core.entities import SCP
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.points import Anchor
 from anthroforge.core.results import EvaluationResult, Port
-from anthroforge.native import material_bindings
+from anthroforge.core.surface_references import SurfaceReference
+from anthroforge.core.tissues import TissueVCP
+from anthroforge.native import attachments, material_bindings
 
 from .surface_providers import SurfaceProvider
 
@@ -27,16 +30,82 @@ def retained_provider(document: Any, resources: Any, reference: Any) -> Any:
     )
 
 
-def locations(item: Any, provider: Any, meshes: Any, cancel: int) -> list[dict[str, Any]]:
+def locations(
+    item: Any, provider: Any, meshes: Any, cancel: int, document: Any = None, batches: Any = None
+) -> list[dict[str, Any]]:
     if isinstance(item, Fiber):
-        return [
-            location(b.point, b.reference, b.material_asset, b.attachment, provider, meshes, cancel)
-            for b in item.bindings
-            if b.attachment
-        ]
+        return fiber_locations(item, provider, meshes, cancel)
     if isinstance(item, Anchor):
         return [anchor_location(item, provider, meshes, cancel)]
+    if isinstance(item, SCP):
+        return scp_location(item, provider, meshes, document)
+    if isinstance(item, TissueVCP):
+        return region_locations(item, provider, meshes, batches, cancel)
     return []
+
+
+def fiber_locations(item: Any, provider: Any, meshes: Any, cancel: int) -> list[Any]:
+    return [
+        location(b.point, b.reference, b.material_asset, b.attachment, provider, meshes, cancel)
+        for b in item.bindings
+        if b.attachment
+    ]
+
+
+def scp_location(item: Any, provider: Any, meshes: Any, document: Any) -> list[dict[str, Any]]:
+    if not item.parent or not item.attachment.binding:
+        return []
+    ref = SurfaceReference(item.parent, instance=item.attachment.parent_instance)
+    surface = provider(ref)
+    points = scp_points(item, surface, meshes, document)
+    return [dict(point=item.id, target=item.parent, role=ref.role, position=points[:3])]
+
+
+def scp_points(item: Any, surface: Any, meshes: Any, document: Any) -> Any:
+    key = item.attachment.material_asset
+    material = meshes[key].mesh if key else surface.resource.mesh
+    return attachments.anchor_points(
+        surface.resource.mesh.engine,
+        item,
+        document.entity(item.parent),
+        surface.resource.mesh.handle,
+        material.handle,
+    )
+
+
+def region_locations(item: Any, provider: Any, meshes: Any, batches: Any, cancel: int) -> list[Any]:
+    return [
+        entry
+        for row in item.constraints
+        if row.reference is not None
+        for entry in region(row, provider, meshes, batches, cancel)
+    ]
+
+
+def region(row: Any, provider: Any, meshes: Any, batches: Any, cancel: int) -> list[Any]:
+    records = batches[row.binding_asset].records
+    indices = range(0, len(records), max(1, (len(records) + 15) // 16))
+    surface = provider(row.reference)
+    frames = material_bindings.frames(
+        meshes[row.material_asset].mesh,
+        surface.resource.mesh,
+        surface.frame,
+        records[list(indices)],
+        cancel,
+    )
+    return [
+        region_point(row, i, frame, len(records)) for i, frame in zip(indices, frames, strict=True)
+    ]
+
+
+def region_point(row: Any, index: int, frame: Any, count: int) -> dict[str, Any]:
+    return dict(
+        point=f"{row.id}:{index}",
+        target=row.reference.target,
+        role=row.reference.role,
+        position=frame[[3, 7, 11]].tolist(),
+        region_samples=count,
+    )
 
 
 def anchor_location(item: Any, provider: Any, meshes: Any, cancel: int) -> dict[str, Any]:

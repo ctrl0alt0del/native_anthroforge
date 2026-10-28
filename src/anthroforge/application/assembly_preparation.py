@@ -67,6 +67,7 @@ class Preparation:
         self.mapping.assess(tuple(row for row in rows if row.source not in self.ids))
         self.resources, self.assets = assembly_resources.transfer(self.loaded, self.ids)
         assembly_snapshots.retain(self)
+        assembly_resources.restore_legacy_inputs(self)
 
     def copy(self) -> None:
         values = assembly_copy.source_records(self.source.document, self.selection)

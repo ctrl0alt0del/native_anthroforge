@@ -23,6 +23,17 @@ AF_API int af_inspection_regions(uint64_t target,uint64_t rest,uint64_t base,int
 AF_API int af_inspection_findings(uint64_t target,const double* frame,const uint64_t* others,
     const double* frames,int count,int limit,int64_t* ids,double* bounds,int64_t* total,uint64_t cancel);
 AF_API int af_inspection_face_lines(uint64_t mesh,const double* frame,int triangle,double* lines);
+// World bounds(6), extents(3), edge min/max, minimum area/longest-edge^2, transform condition,
+// offset/extent ratio. Counts: edges, boundary, nonmanifold, orientation conflicts, degenerates.
+AF_API int af_inspection_metrics(uint64_t mesh,const double* frame,double* values,int64_t* counts,double* lines,uint64_t cancel);
+// Plane basis spans(2), U/V(6); two axis segments; counts: contour points, coplanar, truncated.
+AF_API int af_inspection_section_spans(uint64_t mesh,const double* frame,const double* plane,double* values,double* lines,int64_t* counts,uint64_t cancel);
+// Read-only nearest/ray evidence using the production query mesh and material correspondence.
+// Request: origin(3), direction(3), offset. Returns closest candidate, -1 for no hit, -2 on error.
+AF_API int af_inspection_placement(int count,const uint64_t* meshes,const double* frames,const double* request,int ray,double* rows,uint64_t cancel);
+// At most 512 deterministic source-vertex samples. Rows: side, nearest distance, point, nearest point.
+// 0 qualified volume; positive values explain unavailable volume; -1 error/cancel.
+AF_API int af_inspection_volume(uint64_t source,const double* frame,uint64_t volume,const double* volume_frame,int limit,double* rows,int64_t* count,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

@@ -6,6 +6,8 @@ from anthroforge.application.issues.commands import available
 
 
 def target_label(controller, target):
+    if target == "skin:" + str(controller.session.document.id):
+        return "Skin"
     item = controller.session.document.registry.records.get(target)
     return item.name if item else "Document" if not target else "Removed target"
 

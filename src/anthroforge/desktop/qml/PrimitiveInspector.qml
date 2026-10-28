@@ -41,7 +41,7 @@ ColumnLayout {
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Cap closed cross-sections"; checked: panel.primitive.caps || false; enabled: !panel.topologyLocked; onClicked: panel.primitiveSetting("caps",checked) }
         UiNotice { active: panel.visible; text: panel.item.result?.status === "pending" ? "Pending changes · last accepted geometry shown" : "" }
         UiNotice { active: panel.visible; text: panel.item.result?.pending?.length>0 ? "Using accepted support · upstream changes pending" : "" }
-        UiButton { objectName:"replaceImportedMesh"; text:"Replace source mesh"; Layout.fillWidth:true; enabled:!workspace.state.editing && !workspace.state.waiting && !workspace.selectedData.readonly; visible:panel.primitive.kind==="IMPORTED"; onClicked:workspace.meshReplacement.choose(panel.item.id) }
+        UiButton { objectName:"replaceImportedMesh"; text:"Replace source mesh"; Layout.fillWidth:true; enabled:workspace.meshReplacement.eligibility.start?.available || false; hint:workspace.meshReplacement.eligibility.start?.reason || "Replace the imported mesh while reviewing affected attachments."; visible:panel.primitive.kind==="IMPORTED"; onClicked:workspace.meshReplacement.choose(panel.item.id) }
         UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.item.id]}) }
     }
     ParametricInspector { curve: panel.curve; visible: panel.item.standalone && panel.curve.engine === "PARAMETRIC" }

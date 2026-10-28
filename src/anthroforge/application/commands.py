@@ -44,6 +44,7 @@ from . import (
     projects,
     property_operations,
     quick_fiber,
+    replacement_status,
     scp_splitting,
     segment_operations,
     shortcut_operations,
@@ -274,7 +275,7 @@ def query_handler(operation: str) -> Any:
         from .tissue_inspection import execute as tissue_inspect
 
         return tissue_inspect
-    if operation.startswith(("measurement.", "bookmark.")):
+    if operation.startswith(("measurement.", "bookmark.", "geometry.")):
         from .inspection_commands import execute as inspect_command
 
         return inspect_command
@@ -412,9 +413,9 @@ def fiber_queries(session: "Session") -> dict[str, Any]:
 
 def surface_queries(session: "Session") -> dict[str, Any]:
     return {
+        **replacement_queries(session),
         "surface.source_ids": lambda **a: surface_sources.identities(session, **a),
         "surface.preview": lambda **a: surface_preview.preview(session, **a),
-        "tissue.source.options": lambda **a: tissue_retarget.options(session, **a),
         "tissue.source.replace.assess": lambda **a: tissue_retarget.assess(session, **a),
         "tissue.source.replace.status": lambda: tissue_retarget.status(session),
         "tissue.source.replace.cancel": lambda: tissue_retarget.cancel(session),
@@ -424,6 +425,18 @@ def surface_queries(session: "Session") -> dict[str, Any]:
         "surface.grouping": lambda **a: surface_grouping.inspect(session, **a),
         "surface.preview.status": lambda: surface_preview.status(session),
         "surface.preview.cancel": lambda: surface_preview.cancel(session),
+    }
+
+
+def replacement_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "tissue.source.options": lambda **a: tissue_retarget.options(session, **a),
+        "scp.mesh.replace.eligibility": lambda target: replacement_status.describe(
+            session, "mesh_replacement", target
+        ),
+        "tissue.source.replace.eligibility": lambda target: replacement_status.describe(
+            session, "tissue_retarget", target
+        ),
     }
 
 

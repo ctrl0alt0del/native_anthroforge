@@ -16,6 +16,7 @@ from . import (
     previews,
     replacement_assessments,
     replacement_bindings,
+    replacement_status,
 )
 from . import mesh_replacement_policy as policy
 from .assets import Asset, imported
@@ -41,8 +42,7 @@ def selected(session: Any, target: str) -> Any:
 def assess(
     session: Any, target: str, path: str, units: float | None = None, y_up: bool | None = None
 ) -> Any:
-    if session.history.before is not None or session.waiting_save:
-        raise ValueError("Finish the current edit before replacing a source mesh.")
+    replacement_status.assess(session, "mesh_replacement", target).require()
     item = selected(session, target)
     units, y_up = import_settings(session, item, units, y_up)
     source = Path(path).resolve(strict=True)

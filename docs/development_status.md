@@ -1,5 +1,13 @@
 # AnthroForge development validation
 
+**0.4.2 is qualified:** 2,622 Python tests, six native suites, configured style/type checks,
+Qt-free headless and background/offscreen GUI inspection pass. All 32 relocated portable
+checks pass, including frozen spatial reports. The 58-SCP/96-tissue assembly remains unchanged
+by diagnostics; its neighborhood/section views were inspected. Sample containment and local
+normal evidence retain explicit limits. See [workflow](inspection_042.md) and
+[complete qualification](tasks/inspection-workflows-042.md). No interactive desktop acceptance
+or general penetration/containment guarantee is claimed. Earlier records follow.
+
 The 0.4.0 [skin workflow](skin_workflow.md) passes 2,565 Python tests, native/parity,
 style/type, Qt-free headless and hidden GUI checks. A relocated qualification package
 passes the full portable suite; final canonical package checks are tracked in

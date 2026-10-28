@@ -21,8 +21,10 @@ from .inspection_tools import InspectionTools
 from .issue_panel import IssuePanel
 from .mesh_replacement_panel import MeshReplacementPanel
 from .models import RenderModel
+from .neighborhood_tools import NeighborhoodTools
 from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
+from .placement_inspection_tools import PlacementInspectionTools
 from .project_library import ProjectLibrary
 from .route_inspection_tools import RouteInspectionTools
 from .routing_choices import RoutingChoices
@@ -30,7 +32,9 @@ from .section_tools import SectionTools
 from .shortcut_comparison_view import ShortcutComparisonView
 from .shortcut_panel import ShortcutPanel
 from .skin_panel import SkinPanel
+from .spatial_evidence_tools import SpatialEvidenceTools
 from .surface_creation import SurfaceCreation
+from .surface_measurement_tools import SurfaceMeasurementTools
 from .tissue_inspection_tools import TissueInspectionTools
 from .tissue_region_tools import TissueRegionTools
 from .tissue_retarget_panel import TissueRetargetPanel
@@ -85,6 +89,10 @@ class Controller(QObject):
         self.mesh_replacement = MeshReplacementPanel(self)
 
     def initialize_tissue_tools(self):
+        self.spatial_evidence = SpatialEvidenceTools(self)
+        self.surface_measurements = SurfaceMeasurementTools(self)
+        self.neighborhood = NeighborhoodTools(self)
+        self.placement_inspection = PlacementInspectionTools(self)
         self.skin_panel = SkinPanel(self)
         self.shortcut_comparison = ShortcutComparisonView(self)
         self.shortcut_panel = ShortcutPanel(self)
@@ -119,6 +127,7 @@ class Controller(QObject):
             self.tissue_painting.model,
             self.shortcut_comparison.model,
             self.shortcut_comparison.images,
+            self.spatial_evidence.model,
         )
 
     def initialize_renderers(self):
@@ -135,6 +144,7 @@ class Controller(QObject):
         self.image_model.activated.connect(self.activate_geometry)
         prepare_picking(self)
         prepare_images(self)
+        self.surface_measurements.watch_display()
 
     def initialize_image_layers(self):
         from .render_layer import RenderLayer
@@ -261,12 +271,13 @@ class Controller(QObject):
 
     @Property("QVariantList", notify=changed)
     def markerRows(self):
+        from .inspection_visibility import records
         from .mirror_scene import presented
 
         values = [*self.rows, *self.mirror_records.values()]
         return [
             v
-            for v in values
+            for v in records(self, values)
             if not v.get("asset")
             and not v.get("is_construction")
             and not v.get("is_tissue")
@@ -315,6 +326,22 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def meshReplacement(self):
         return self.mesh_replacement
+
+    @Property(QObject, constant=True)
+    def spatialEvidence(self):
+        return self.spatial_evidence
+
+    @Property(QObject, constant=True)
+    def surfaceMeasurements(self):
+        return self.surface_measurements
+
+    @Property(QObject, constant=True)
+    def neighborhoodView(self):
+        return self.neighborhood
+
+    @Property(QObject, constant=True)
+    def placementInspection(self):
+        return self.placement_inspection
 
     @Property(QObject, constant=True)
     def sceneChoices(self):
@@ -394,7 +421,7 @@ class Controller(QObject):
             self.tissue_inspection,
             self.tissue_painting,
         )
-        for tool in tools:
+        for tool in (*tools, self.placement_inspection):
             if tool is not keep:
                 tool.cancel()
 
@@ -580,6 +607,10 @@ class Controller(QObject):
             self.notify()
 
     def refresh_runtime_panels(self):
+        self.spatial_evidence.synchronize()
+        self.surface_measurements.synchronize()
+        self.neighborhood.synchronize()
+        self.placement_inspection.synchronize()
         self.shortcut_comparison.synchronize()
         self.creation_selection.synchronize()
         self.issue_panel.synchronize()
@@ -639,7 +670,13 @@ class Controller(QObject):
 
     @Slot("QVariantList", bool)
     def saveCamera(self, values, orthographic):
-        if not self.session.waiting_save and not self.capture_mode:
+        if self.neighborhood.members:
+            self.neighborhood.view_camera = (list(values), orthographic)
+        if (
+            not self.session.waiting_save
+            and not self.capture_mode
+            and not self.neighborhood.members
+        ):
             self.session.command("workspace.update", camera=values, orthographic=orthographic)
 
     @Slot(str)

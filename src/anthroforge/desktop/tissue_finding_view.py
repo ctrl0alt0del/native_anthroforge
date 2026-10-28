@@ -2,8 +2,7 @@
 
 from math import dist
 
-from anthroforge.application import tissue_inspection_stages as stages
-from anthroforge.native import inspection as native
+from anthroforge.application import spatial_evidence
 
 
 def show(tool, identity):
@@ -37,9 +36,4 @@ def camera_frame(bounds):
 
 
 def lines(session, row, witness):
-    mesh = stages.mesh(session, row["target"], row["stage"])
-    output = native.face_lines(mesh, witness["frame"], witness["triangle"])
-    if witness["other_triangle"] >= 0:
-        resource = session.resources.meshes[witness["other_asset"]].mesh
-        output += native.face_lines(resource, witness["other_frame"], witness["other_triangle"])
-    return output
+    return spatial_evidence.lines(session, witness)

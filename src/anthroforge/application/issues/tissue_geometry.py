@@ -186,20 +186,11 @@ def finding(
 
 
 def witness(context: Any, target: str, stage: str, other: Any, row: Any, box: Any) -> Any:
-    result = stages.result(stages.tissue(context, target), stage)
-    frame = stages.instance_frame(context, target, stage)
-    return dict(
-        asset=result.asset,
-        triangle=row[2],
-        bounds=box,
-        frame=frame,
-        other=other.id if other else target,
-        other_asset=geometry_asset(other) if other else result.asset,
-        other_triangle=row[3],
-        other_frame=neighbor_frame(context, other) if other else frame,
-        accepted_revision=result.revision,
-        revision=context.document.revision,
-    )
+    from .. import inspection_surfaces, spatial_evidence
+
+    surface = inspection_surfaces.get(context, target, stage)
+    neighbor = inspection_surfaces.get(context, other.id) if other else surface
+    return spatial_evidence.witness(context, surface, neighbor, row, box)
 
 
 def make_issue(

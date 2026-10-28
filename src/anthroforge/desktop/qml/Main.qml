@@ -24,6 +24,7 @@ ApplicationWindow {
     property bool activityOpen: false
     property bool issuesOpen: false
     Connections { target: workspace.tissueInspection; function onFindingsRequested() { window.issuesOpen=true; window.activityOpen=false; } }
+    Connections { target: workspace.spatialEvidence; function onFindingsRequested() { window.issuesOpen=true; window.activityOpen=false; } }
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing

@@ -22,7 +22,12 @@ def pick(controller, owner, mesh, frame, origin, direction):
 
 
 def displayed(tool):
+    from anthroforge.application import inspection_surfaces, tissue_sections
+
     rows = tool.controller.tissue_inspection.model.active_rows()
+    if tool.controller.tissue_inspection.target != tool.target or not rows:
+        selected = inspection_surfaces.get(tool.controller.session, tool.target, tool.stage)
+        return [tissue_sections.record(selected)]
     result, seen = [], set()
     for row in rows:
         key = row["owner"], row["stage"]

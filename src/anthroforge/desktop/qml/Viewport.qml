@@ -38,7 +38,7 @@ Item {
     property var preservedCamera: null
     readonly property bool canRestoreView: preservedCamera !== null
     readonly property bool drawing: workspace.drawingTools.state.active
-    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active || workspace.tissueRegionTools.state.active || workspace.tissueInspection.state.active || workspace.tissuePainting.state.active
+    readonly property bool measuring: drawing || workspace.inspectionTools.state.active || workspace.imageTools.state.active || workspace.tissueRegionTools.state.active || workspace.tissueInspection.state.active || workspace.tissuePainting.state.active || workspace.placementInspection.state.active
     readonly property var selected: authoring.transformData
     readonly property bool transformAvailable: !comparisonBefore && !!selected.id && !!selected.transformable && !selected.readonly && !workspace.state.waiting
     readonly property bool modalTransforming: modalTransform.active
@@ -84,6 +84,7 @@ Item {
     function rayAt(x, y, select, extend) {
         if(comparisonBefore || drawing || workspace.tissuePainting.state.active) return {};
         const ray=worldRay(x,y), origin=ray.origin, direction=ray.direction;
+        if(workspace.placementInspection.state.active) { workspace.placementInspection.probe(origin,direction,select); return {}; }
         if(workspace.tissueInspection.state.active) { workspace.tissueInspection.probe(origin,direction,select); return {}; }
         if(workspace.tissueRegionTools.state.active) { workspace.tissueRegionTools.probe(origin,direction,select); return {}; }
         if(workspace.imageTools.state.active) { workspace.imageTools.probe(origin,direction,select); return {}; }
@@ -261,6 +262,9 @@ Item {
                 }
             }
             TissueInspectionScene { distance: viewport.distance; visible: !viewport.comparisonBefore }
+            MeasurementAxes { distance: viewport.distance; visible: !viewport.comparisonBefore }
+            PlacementInspectionScene { distance: viewport.distance; visible: !viewport.comparisonBefore }
+            InspectionScene { distance: viewport.distance; geometryModel: workspace.spatialEvidence.geometry; evidenceSource: workspace.spatialEvidence; sections: false; primaryOpacity: .25; visible: !viewport.comparisonBefore }
             TissueInspectionScene { distance: viewport.distance; geometryModel: workspace.tissuePainting.geometry; annotations: false; visible: !viewport.comparisonBefore }
             RouteInspectionScene { distance: viewport.distance }
             Model {
@@ -309,7 +313,7 @@ Item {
                                             item.id === workspace.hoveredId ? Qt.vector3d(.035,.035,.035) : Qt.vector3d(0,0,0)
                         }
                         property Material clippedMaterial: SectionMaterial { tint: item.color }
-                        materials: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && workspace.sectionTools.state.wholeScene ? clippedMaterial : normalMaterial
+                        materials: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && (workspace.sectionTools.state.wholeScene || workspace.sectionTools.state.target===item.id) ? clippedMaterial : normalMaterial
                     }
                     Node {
                         parent: selectionOutline.sceneRoot
@@ -325,7 +329,7 @@ Item {
                             geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk; reflected: item.trs[6]*item.trs[7]*item.trs[8] < 0 }
                             property Material normalMaterial: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: item.id === workspace.selectedId ? "white" : "black"; cullMode: Material.NoCulling }
                             property Material clippedMaterial: SectionMaterial { tint: item.id === workspace.selectedId ? "white" : "black"; unlit: true }
-                            materials: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && workspace.sectionTools.state.wholeScene ? clippedMaterial : normalMaterial
+                            materials: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && (workspace.sectionTools.state.wholeScene || workspace.sectionTools.state.target===item.id) ? clippedMaterial : normalMaterial
                         }
                     }
                     ResourceLoader { geometries: [meshNode.geometry] }
@@ -402,6 +406,7 @@ Item {
     ModalTransform { id: modalTransform; objectName: "modalTransform"; anchors.fill: parent; viewport: viewport }
     MeasurementOverlay { id: measurementOverlay; viewport: viewport }
     TissueInspectionOverlay { viewport: viewport }
+    MeasurementLabels { anchors.fill:parent; viewport:viewport; visible:!viewport.comparisonBefore }
     ImageCalibrationOverlay { viewport: viewport }
     DrawingOverlay { viewport: viewport }
     TissuePaintingOverlay { viewport: viewport }

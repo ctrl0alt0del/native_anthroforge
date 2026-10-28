@@ -12,6 +12,7 @@ from . import (
     providers,
     repairs,
     skin,
+    surface_geometry,
     tissue_geometry,
 )
 from .listening import Listening
@@ -47,6 +48,7 @@ class IssueSystem:
             fiber_pins.provider(session),
             tissue_geometry.provider(session),
             skin.provider(session),
+            surface_geometry.provider(session),
         ):
             self.listening.register(provider)
 

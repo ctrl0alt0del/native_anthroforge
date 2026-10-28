@@ -1,4 +1,9 @@
-# AnthroForge 0.4.1
+# AnthroForge 0.4.2
+
+0.4.2 adds shared replacement readiness, spatial findings for SCPs/construction/skin,
+placement explanations, world and section dimensions, sampled volume checks and temporary
+neighborhood inspection with Restore. Find these in **Inspect** and **Skin diagnostics**.
+See [workflow and limits](docs/inspection_042.md). Existing anatomy algorithms remain unchanged.
 
 0.4.1 completes the skin audit: draft-based deformation references, retained solver and
 geometry diagnostics, achieved topology budgets, persistent FAST weights, effective

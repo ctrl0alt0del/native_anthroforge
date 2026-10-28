@@ -28,13 +28,50 @@ def definitions() -> dict[str, Query]:
     from . import tissue_sections as sections
 
     return dict(
-        dict(tissue_queries(), collagen=collagen_query()),
+        auxiliary_queries(),
         stacking=Query(stacking.validate, stacking.signature, stacking.compute, stacking.workload),
         paint=Query(painting.validate, painting.signature, painting.compute, tissue.workload),
         section=Query(sections.validate, sections.signature, sections.compute, sections.workload),
         route=Query(route.validate, route.signature, route.compute, route.workload),
         shortcut=shortcut_query(),
     )
+
+
+def measurement_query() -> Query:
+    from . import surface_measurements as measurements
+
+    return Query(
+        measurements.validate, measurements.signature, measurements.compute, measurements.workload
+    )
+
+
+def auxiliary_queries() -> dict[str, Query]:
+    return dict(
+        tissue_queries(),
+        collagen=collagen_query(),
+        measurements=measurement_query(),
+        placement=placement_query(),
+        binding=binding_query(),
+        volume=volume_query(),
+    )
+
+
+def placement_query() -> Query:
+    from . import placement_inspection as placement
+
+    return Query(placement.validate, placement.signature, placement.compute, placement.workload)
+
+
+def binding_query() -> Query:
+    from . import binding_inspection as binding
+
+    return Query(binding.validate, binding.signature, binding.compute, binding.workload)
+
+
+def volume_query() -> Query:
+    from . import volume_inspection as volume
+
+    return Query(volume.validate, volume.signature, volume.compute, volume.workload)
 
 
 def shortcut_query() -> Query:

@@ -1,5 +1,11 @@
 # AnthroForge architecture
 
+0.4.2 extends [shared status and spatial inspection](inspection_042.md). Application-owned
+eligibility is shared by commands and UI. Accepted surface descriptors and witnesses feed
+generic inspection strategies through the existing coordinator. Native diagnostics return
+owned evidence, never authored geometry changes. Desktop filters/cameras remain view-local;
+frozen exports retain matching measurements, section planes, revisions and geometry resources.
+
 See the [current addon functionality audit](addon_functionality_audit.md) for implemented
 families and missing authoring details, and [known parity findings](addon_parity_findings.md)
 for source-frame, effective-policy and child-anchor fidelity defects. The distinction
@@ -1083,7 +1089,7 @@ and search; filtering preserves the list height. Both remain presentation adapte
 
 ## Shared operation status providers
 
-**Implemented for skin; broader adoption deferred.** In 0.4.0, SkinStatusProvider follows
+**Implemented for skin and replacement workflows.** In 0.4.0, SkinStatusProvider follows
 the [skin contract](specification_040.md). The application owns operation-specific readiness,
 blocking reasons, advisory warnings and assessed document/result/reference identities.
 Desktop views subscribe through existing document/result notifications; headless operations
@@ -1096,10 +1102,10 @@ existing compatible skin with a warning. Missing skin or incompatible material/v
 identities blocks fitting with an explanation. Update and export have their own eligibility;
 do not reduce the provider to a global valid/invalid flag.
 
-For the **next version after 0.4.0**, the user requests applying this pattern to other
-functionalities whose UI derives statuses or operation conditions from workspace/document
-state. Inventory and migrate those consumers at their owning boundaries, reusing established
-notifications and command policies. Preserve feature-specific meanings rather than creating
+In **0.4.2**, Replace imported mesh and Change tissue source consume shared start/apply
+eligibility through revision/context-keyed Qt projections. Existing topology/sampling and
+transform restrictions already use shared policies and retain those owners. Future consumers
+must reuse established notifications and command policies. Preserve feature-specific meanings rather than creating
 one universal manager. This is a documented future direction, not authorization to refactor
 other features during the skin release. See the [roadmap](roadmap.md).
 

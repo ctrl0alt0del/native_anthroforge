@@ -2,7 +2,7 @@
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
-from anthroforge.application import replacement_assessments
+from anthroforge.application import replacement_assessments, replacement_status
 
 
 class ReplacementPanel(QObject):
@@ -17,6 +17,7 @@ class ReplacementPanel(QObject):
         self.target, self.shown, self._heading = "", "", heading
         self.active, self.signature = False, None
         self._state, self.arguments = {}, {}
+        self._eligibility, self._eligibility_key, self._eligibility_document = {}, None, None
 
     @Property("QVariantMap", notify=changed)
     def state(self):
@@ -26,8 +27,17 @@ class ReplacementPanel(QObject):
     def heading(self):
         return self._heading
 
+    @Property("QVariantMap", notify=changed)
+    def eligibility(self):
+        return self._eligibility
+
     @Slot(str)
     def choose(self, target):
+        status = replacement_status.assess(self.controller.session, self.slot, target)
+        if not status.available:
+            self.controller.message = status.reason
+            self.controller.notify()
+            return
         if self.active:
             self.cancel()
         self.target = target
@@ -45,6 +55,32 @@ class ReplacementPanel(QObject):
         self.begin(self.arguments)
 
     def synchronize(self):
+        self.synchronize_eligibility()
+        self.synchronize_review()
+
+    def synchronize_eligibility(self):
+        session = self.controller.session
+        key = self.eligibility_key()
+        if key == self._eligibility_key:
+            return
+        self._eligibility_key, self._eligibility_document = key, session.document
+        status = replacement_status.describe(session, self.slot, self.controller.selectedId)
+        if status != self._eligibility:
+            self._eligibility = status
+            self.changed.emit()
+
+    def eligibility_key(self):
+        session = self.controller.session
+        value = getattr(session, self.slot)
+        context = (
+            session.active_workspace,
+            session.waiting_save,
+            session.history.before is not None,
+        )
+        selection = (self.controller.selectedId, value.token, value.state)
+        return session, id(session.document), context, selection
+
+    def synchronize_review(self):
         if not self.active:
             return
         session = self.controller.session

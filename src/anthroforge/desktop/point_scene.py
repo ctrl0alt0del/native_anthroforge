@@ -30,10 +30,13 @@ class PointScene:
         self.model = RecordModel(controller, ("item",), "id")
 
     def synchronize(self, records):
+        from .inspection_visibility import records as project
         from .mirror_scene import presented
 
         visible = [
-            r for r in records.values() if r.get("world_position") and presented(self.controller, r)
+            r
+            for r in project(self.controller, records.values())
+            if r.get("world_position") and presented(self.controller, r)
         ]
         self.model.synchronize_records([dict(id=r["id"], item=r) for r in visible])
         desired = [r for r in visible if r["pickable"]]

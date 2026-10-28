@@ -1,6 +1,8 @@
 # 0.4.2 preparation: remaining cross-thread recommendations
 
-Status: **coverage audit complete; implementation scope not selected**.
+Status: **coverage audit complete; R01–R03 and R06 extensions delivered in 0.4.2**.
+The table below preserves the pre-implementation audit. See [delivery](inspection_042.md)
+and [current validation](tasks/inspection-workflows-042.md) for implemented extensions and limits.
 Audited on 2026-10-28 against 0.4.1, commit
 `6970a5713e2812e5e7962238f6ffe905e28f76be`.
 
@@ -346,5 +348,7 @@ modeling improvements but need numerical/interaction decisions before implementa
 R09–R11 should be selected only after measurements demonstrate a relevant cost. Larger
 assembly/reconstruction work R13–R17 should receive its own agreed specification.
 
-This audit changes documentation only. Geometry, attachments, algorithms, project and
-package versions, preferences and source anatomy files remain unchanged.
+The original audit changed documentation only. Subsequent 0.4.2 work is limited to
+the selected extensions; other entries remain unselected. Whole-surface containment proofs,
+minimum separating translations and guaranteed local exits through arbitrary folded geometry
+remain outside the implemented diagnostics; unavailable conclusions are labeled explicitly.

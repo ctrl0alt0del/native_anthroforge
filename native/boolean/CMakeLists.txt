@@ -17,7 +17,7 @@ FetchContent_Declare(af_query_boost
 FetchContent_MakeAvailable(af_query_cgal af_query_boost)
 file(WRITE "${CMAKE_BINARY_DIR}/boolean-dependencies.json"
     "{\"cgal\":\"${af_query_cgal_SOURCE_DIR}\",\"boost\":\"${af_query_boost_SOURCE_DIR}\"}\n")
-add_library(af_boolean STATIC exterior.cpp qualification.cpp)
+add_library(af_boolean STATIC exterior.cpp qualification.cpp inspection.cpp)
 set_target_properties(af_boolean PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_include_directories(af_boolean SYSTEM PRIVATE ../vendor
     "${af_query_cgal_SOURCE_DIR}/include" "${af_query_boost_SOURCE_DIR}")

@@ -1,4 +1,27 @@
-# Local authoring API, 0.4.1
+# Local authoring API, 0.4.2
+
+## Spatial inspection (0.4.2)
+
+See [workflow and limits](inspection_042.md). These operations are read-only:
+
+| Operation | Arguments / result |
+| --- | --- |
+| `scp.mesh.replace.eligibility`, `tissue.source.replace.eligibility` | `target`; shared start/apply eligibility and reasons. |
+| `geometry.check` | `target`, optional `stage="final"`; explicit advisory Issues request. Use `"skin"` for document skin. |
+| `geometry.finding` | `identity` Issue ID; current stage/asset/frame/triangle witness. |
+| `geometry.measure` | `target`, optional `stage`, `plane=[nx,ny,nz,d]`, `expected_asset`; async world extents, scale/topology and section spans. |
+| `geometry.volume` | `target`, `other`, optional `stage`, `other_stage`; async qualified sample containment and inside distances. |
+| `geometry.placement` | `target` inspection owner, `targets` surface references, `position`, optional `direction` and `offset`; async preview/confirmed comparison. Omit direction for nearest-point inspection. |
+| `geometry.binding.options` | `target`; inspectable retained binding point identities. |
+| `geometry.binding` | `target`, `point`; async explanation against the existing bound support. |
+| `geometry.neighborhood` | `target`; relationship members, explanation and revision. Does not change workspace. |
+
+Async status uses `.status` appended to measure/volume/placement/binding operations. Existing
+`wait` and inspection cancellation apply; query kinds are `measurements`, `volume`, `placement`
+and `binding`. Reports become stale when inputs change. `inspection.export` accepts optional
+`spatial` with active `finding`, `measurements`, `placement` or `binding`, `volume`, and a
+`neighborhood` target. Desktop adds section settings and its private view camera. Export
+validates current evidence before freezing it.
 
 The [skin workflow](skin_workflow.md) and `examples/skin.json` demonstrate the 0.4.0
 build, fitting, independent playback and OBJ operations. Validation and release packaging

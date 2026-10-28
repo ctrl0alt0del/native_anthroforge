@@ -8,13 +8,7 @@ from anthroforge.core import skin_sources
 from anthroforge.core.results import Port
 
 from .construction_policy import revisions
-
-
-@dataclass(frozen=True)
-class Eligibility:
-    available: bool
-    reason: str = ""
-    warnings: tuple[str, ...] = ()
+from .operation_status import Eligibility
 
 
 @dataclass(frozen=True)

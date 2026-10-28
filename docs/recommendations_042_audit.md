@@ -43,6 +43,12 @@ The IDs R01–R18 identify entries in this audit, not approved release requireme
 These are concrete missing mechanisms, **not demonstrated bottlenecks**. Profile a
 representative case before choosing which to implement or claiming a speedup.
 
+R09–R11 now have [production profiling evidence](tasks/profile-cache-display-042.md).
+The measured priority is incremental scene/picking publication (R11), then accurate,
+cost-aware cache ownership/budgeting (R09). No overlapping identical preparation misses
+were observed, so R10 remains unproven. GPU topology reuse is not the demonstrated
+display bottleneck. These mechanisms remain unimplemented; profiling is complete.
+
 | Item | Existing capability | Remaining work and distinguishing evidence | Requirements |
 | --- | --- | --- | --- |
 | R09 — Aggregate cache budgeting | Individual cache byte/entry limits, ownership tracking, cache events and job resource admission exist. | Coordinate aggregate retained-cache memory instead of independently granting each cache its own allowance; include cost-aware eviction/accounting. The persistent FAST-weight disk cache also has no retention quota. Job memory admission is a different responsibility. Measure long-session retained memory and rebuild/thrashing cost. | B09 |

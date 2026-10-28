@@ -1152,3 +1152,27 @@ policies. Fitting schedules affected output roles, avoiding needless pose-only g
 Independent fitted playback owns transient meshes outside authored state and asset history.
 Profiler snapshots account for retained skin data and preparation; parent fitting traces do not
 fully attribute isolated sample-session internals. This limitation remains explicit.
+
+## Cache ownership and display publication (0.4.2)
+
+An engine-owned CacheBudget coordinates existing ResourceCache instances under one admission lock.
+Native immutable mesh allocation receipts deduplicate aliases and resources shared across
+preparations. Local entry/byte caps remain for specialized caches; fiber/skin preparation retention
+shares the aggregate 4 GiB estimated-payload allowance. Aggregate eviction uses lookup-to-admission
+elapsed cost, size and recency aging. Numerical work remains outside cache locks; no shared-flight
+scheduler or competing worker pool is introduced. Documents, history, job payloads and
+displayed/staged resources retain independent leases, so eviction never invalidates those owners.
+Limits concern estimated cache-reachable payload, not process RSS or cache-exclusive memory.
+
+FAST disk products are disposable, checksummed and atomically replaced under a writer lock.
+Retention is bounded to 2 GiB/256 products with access-time LRU. Locked or oversized products bypass
+persistence; solver equations and calculation admission do not change.
+
+Desktop construction projections consume the document change journal and ordinary-transform
+dependencies. Each pass shares frame resolution. Display picking reuses unchanged native transforms
+only while their rows remain displayed; inspection offsets have distinct keys. Multiple model
+activations in one presented frame publish together. Session-owned reachability caches immutable
+document reference sets only while a document has a live current/history/checkpoint/job owner.
+Collection still checks new resources even when the document has not changed.
+
+[Implementation, profiling and qualification](tasks/display-cache-042.md).

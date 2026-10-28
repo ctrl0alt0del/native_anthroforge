@@ -30,7 +30,17 @@ def transaction(folder: Path) -> Any:
             stream.write(b"\0")
             stream.flush()
         acquire(stream)
+        remove_abandoned_staging(folder)
         yield
+
+
+def remove_abandoned_staging(folder: Path) -> None:
+    # Every publisher holds this same OS lock, so no matching write can be active.
+    for path in folder.glob("af-weights-*.tmp"):
+        try:
+            path.unlink()
+        except OSError:
+            pass
 
 
 def products(folder: Path) -> list[Any]:

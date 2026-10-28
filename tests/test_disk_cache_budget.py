@@ -51,3 +51,12 @@ def test_active_budget_writer_causes_safe_cache_bypass(tmp_path, monkeypatch):
     with budget.transaction(skin_weight_cache.directory()):
         assert not skin_weight_cache.retain("contended", str(source))
     assert skin_weight_cache.retain("available", str(source))
+
+
+def test_abandoned_cache_staging_is_removed_only_under_exclusive_lock(tmp_path):
+    abandoned = tmp_path / "af-weights-interrupted.tmp"
+    unrelated = tmp_path / "other.tmp"
+    abandoned.write_bytes(b"interrupted archive")
+    unrelated.write_bytes(b"leave alone")
+    with budget.transaction(tmp_path):
+        assert not abandoned.exists() and unrelated.exists()

@@ -78,9 +78,10 @@ def test_multiple_model_notifications_publish_one_coherent_displayed_frame():
         publish(model, 2, 1)
         model.drain()
     Controller.frame_presented(controller)
-    assert not snapshots
-    Controller.frame_presented(controller)
     assert len(snapshots) == 1
-    assert [rows[0]["handle"] for rows in snapshots[0]] == [2, 2]
-    controller.activate_geometry()
+    assert [rows[0]["handle"] for rows in snapshots[0]] == [1, 1]
+    Controller.frame_presented(controller)
     assert len(snapshots) == 2
+    assert [rows[0]["handle"] for rows in snapshots[1]] == [2, 2]
+    controller.activate_geometry()
+    assert len(snapshots) == 3

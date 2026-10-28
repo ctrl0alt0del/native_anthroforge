@@ -84,7 +84,9 @@ def retain_product(destination: Path, weights: Path) -> bool:
 
 
 def publish(destination: Path, weights: Path) -> None:
-    with NamedTemporaryFile(dir=destination.parent, suffix=".tmp", delete=False) as stream:
+    with NamedTemporaryFile(
+        dir=destination.parent, prefix="af-weights-", suffix=".tmp", delete=False
+    ) as stream:
         pending = Path(stream.name)
     try:
         info = dict(format=FORMAT, name=weights.name, sha256=checksum(weights))

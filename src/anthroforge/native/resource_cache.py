@@ -1,4 +1,4 @@
-"""Engine-owned bounded LRU storage of immutable native resources."""
+"""Local LRU caps and shared cost-aware retention of immutable native resources."""
 
 from collections import OrderedDict
 from threading import RLock, local
@@ -131,11 +131,19 @@ class ResourceCache[T]:
                 key=hex(hash(key)),
                 bytes=size,
                 reason=reason,
-                retained_bytes=self.bytes,
-                entries=len(self.items),
-                budget=self.budget,
-                aggregate_bytes=self.pool.allocations.bytes if self.pool else self.bytes,
+                **self.statistics(key),
             )
+
+    def statistics(self, key: Any) -> dict[str, Any]:
+        receipt = self.receipts.get(key)
+        return dict(
+            retained_bytes=self.bytes,
+            entries=len(self.items),
+            budget=self.budget,
+            aggregate_bytes=self.pool.allocations.bytes if self.pool else self.bytes,
+            aggregate_budget=self.pool.budget if self.pool else self.budget,
+            rebuild_wall_estimate_us=receipt[1] * 1e6 if receipt else None,
+        )
 
     def retained(self) -> tuple[T, ...]:
         with self.lock:

@@ -112,7 +112,7 @@ The trace also supplies Chrome `C` counter events named `geometry_bytes`.
 
 Snapshots occur on existing coordinator ticks at most once per second and at recording
 boundaries. Transient peaks and pre-recording job payloads can be missed. Inventory is
-bounded to 4096 native handles, 256 observed jobs and 4096 weak job references; document
+bounded to 65,536 mesh and 65,536 path handles, 256 observed jobs and 4096 weak job references; document
 walks are bounded too. Truncation and observer failure are explicit losses, not zero
 usage. Weak observations do not keep meshes alive. This is **not process RSS**: Python,
 allocator overhead, Qt copies and GPU/driver allocations are excluded. AABB bytes are
@@ -120,7 +120,8 @@ an estimate based on the native tree's full-binary structure, not an allocator r
 Inventory covers live handles in the observed native libraries; retained handles from
 another session can legitimately appear as unattributed rather than current-document use.
 
-No new memory queries or cache-event collection occur while recording is off. Measured
+Recorder inventories and cache events are disabled while recording is off. Functional
+cache admission still obtains allocation receipts and elapsed-cost estimates. Measured
 inventory and reference-observation cost appears under `manifest.profiler.resource_observation`
 and profiler spans. Inclusive costs overlap and cannot be subtracted exactly. Existing
 timing, completeness and retained-window interpretation still applies. The additive

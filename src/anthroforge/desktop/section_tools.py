@@ -39,6 +39,7 @@ class SectionTools(QObject):
         return dict(
             enabled=self.enabled,
             target=self.target,
+            stage=self.stage,
             axis=self.axis,
             position=self.position,
             flip=self.flip,
@@ -50,6 +51,19 @@ class SectionTools(QObject):
 
     def applies(self, owner):
         return self.enabled and self.cut and (self.whole_scene or owner == self.target)
+
+    def restore(self, settings, report):
+        self.target, self.stage = settings["target"], settings.get("stage", "final")
+        self.enabled, self.axis, self.position = True, settings["axis"], settings["position"]
+        self.flip, self.cut, self.whole_scene = (
+            settings["flip"],
+            settings["cut"],
+            settings["wholeScene"],
+        )
+        self.selection = self.controller.selection
+        self.reports, self.requested = report["surfaces"], report["plane"]
+        self.timer.stop()
+        self.changed.emit()
 
     @Slot(result="QVariantMap")
     def snapshot(self):

@@ -38,7 +38,11 @@ class SpatialEvidenceTools(QObject):
 
     @Slot(result="QVariantMap")
     def snapshot(self):
-        return dict(self.state, lines=self.lines)
+        witness = self.row.get("evidence", {}).get("witness", {})
+        displayed = any(
+            r.get("geometry_asset") == witness.get("asset") for r in self.model.displayed
+        )
+        return dict(self.state, lines=self.lines if displayed else [])
 
     @Slot(str, str)
     def check(self, target, stage):

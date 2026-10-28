@@ -31,6 +31,9 @@ AF_API int af_inspection_section_spans(uint64_t mesh,const double* frame,const d
 // Read-only nearest/ray evidence using the production query mesh and material correspondence.
 // Request: origin(3), direction(3), offset. Returns closest candidate, -1 for no hit, -2 on error.
 AF_API int af_inspection_placement(int count,const uint64_t* meshes,const double* frames,const double* request,int ray,double* rows,uint64_t cancel);
+// At most 512 deterministic source-vertex samples. Rows: side, nearest distance, point, nearest point.
+// 0 qualified volume; positive values explain unavailable volume; -1 error/cancel.
+AF_API int af_inspection_volume(uint64_t source,const double* frame,uint64_t volume,const double* volume_frame,int limit,double* rows,int64_t* count,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

@@ -94,3 +94,19 @@ The containing commit identifies the checkpoint; inspect Git history for push st
   unchanged bound fibers, transformed section spans and Restore semantics.
 - Native build and six contract suites pass. Full style/gate, frozen export completion,
   offscreen UI inspection, profiling and packaging remain pending; do not release yet.
+
+## Qualified-volume and evidence checkpoint
+
+- Added explicit, bounded vertex sampling against CGAL-qualified closed exterior volumes.
+  Reports distinguish inside/boundary/outside and deepest sampled distance. This is not a
+  whole-surface containment proof or a minimum separating translation. Invalid, open,
+  nested and intersecting volumes return an unavailable reason; no production repair changes.
+- Size/section/volume axes, placement witnesses and neighborhood views are integrated in
+  frozen inspection exports. Currentness is validated before freezing. Restore retains
+  section clipping and a private neighborhood camera.
+- New volume and frozen-view tests pass, including mirror orientation, cancellation,
+  stale inputs and 100 idle refreshes without native projection work or new jobs.
+- `tools/check_inspection_042.py` rendered the new viewport and 360 px inspector offscreen
+  without QML warnings or a visible window. Images live in `build/inspection-042/`.
+- Full development gate is running; profiling, final ownership review and canonical
+  packaging remain. This is an incomplete recovery checkpoint, not release acceptance.

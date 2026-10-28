@@ -12,8 +12,8 @@ UiSection {
     function length(v) { return typeof v==="number" ? (v/workspace.state.unit_factor).toPrecision(5)+" "+workspace.state.display_units : "—"; }
     function vector(v) { return v ? v.map(n=>(n/workspace.state.unit_factor).toFixed(4)).join(", ")+" "+workspace.state.display_units : "—"; }
     UiButton { objectName:"inspectPlacement"; text:panel.tool.state.active ? "Finish placement inspection" : "Explain placement at a surface"; Layout.fillWidth:true; checkable:true; checked:panel.tool.state.active; onClicked:panel.tool.toggle(); hint:"Click a surface to compare the fast preview with confirmed exterior placement. No point or attachment is changed." }
-    UiCombo { Layout.fillWidth:true; visible:panel.tool.state.bindings.length>0; model:panel.tool.state.bindings; textRole:"label"; hint:"Inspect the current bound point against its existing support."; onActivated:panel.tool.inspectBinding(model[currentIndex].point) }
-    UiButton { text:"Explain selected binding"; Layout.fillWidth:true; visible:panel.tool.state.bindings.length>0; onClicked:panel.tool.inspectBinding(panel.tool.state.bindings[0].point) }
+    UiCombo { id:bindingChoice; Layout.fillWidth:true; visible:panel.tool.state.bindings.length>0; model:panel.tool.state.bindings; textRole:"label"; hint:"Inspect the current bound point against its existing support."; onActivated:panel.tool.inspectBinding(model[currentIndex].point) }
+    UiButton { text:"Explain selected binding"; Layout.fillWidth:true; visible:panel.tool.state.bindings.length>0; onClicked:panel.tool.inspectBinding(panel.tool.state.bindings[Math.max(0,bindingChoice.currentIndex)].point) }
     UiDetail { label:"Preview"; value:panel.preview.name || "—" }
     UiDetail { label:"Confirmed"; value:panel.confirmed.name || (panel.report.preview ? "No exterior hit" : "—") }
     UiDetail { label:"Preview XYZ"; value:panel.vector(panel.preview.position) }

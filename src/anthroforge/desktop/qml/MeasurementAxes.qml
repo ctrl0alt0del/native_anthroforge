@@ -6,6 +6,10 @@ Node {
     id: root
     required property real distance
     ViewSnapshot { id: evidence; source: workspace.surfaceMeasurements }
+    Model {
+        geometry: ControlGeometry { points:evidence.data.volume || []; segments:true; stroke:root.distance*.0015 }
+        materials: DefaultMaterial { diffuseColor:"#f2ba62"; lighting:DefaultMaterial.NoLighting; cullMode:Material.NoCulling }
+    }
     Repeater3D {
         model: evidence.data.lines?.length ? 5 : 0
         delegate: Model {

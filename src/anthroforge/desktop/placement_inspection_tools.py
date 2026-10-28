@@ -69,9 +69,7 @@ class PlacementInspectionTools(QObject):
             return
         value = session.tissue_inspection.values.get(self.kind)
         context = (
-            (session, session.document.revision, value.job, value.state, id(value.asset))
-            if value
-            else None
+            (session, session.document, value.job, value.state, id(value.asset)) if value else None
         )
         if context == self.context:
             return

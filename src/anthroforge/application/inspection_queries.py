@@ -52,6 +52,7 @@ def auxiliary_queries() -> dict[str, Query]:
         measurements=measurement_query(),
         placement=placement_query(),
         binding=binding_query(),
+        volume=volume_query(),
     )
 
 
@@ -65,6 +66,12 @@ def binding_query() -> Query:
     from . import binding_inspection as binding
 
     return Query(binding.validate, binding.signature, binding.compute, binding.workload)
+
+
+def volume_query() -> Query:
+    from . import volume_inspection as volume
+
+    return Query(volume.validate, volume.signature, volume.compute, volume.workload)
 
 
 def shortcut_query() -> Query:

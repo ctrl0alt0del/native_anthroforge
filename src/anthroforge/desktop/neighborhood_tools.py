@@ -17,6 +17,7 @@ class NeighborhoodTools(QObject):
         self.controller, self.members, self.target = controller, frozenset(), ""
         self.camera, self.context, self.explanation = None, None, ""
         self.view_camera = None
+        self.structure = None
 
     @Property("QVariantMap", notify=changed)
     def state(self):
@@ -38,6 +39,7 @@ class NeighborhoodTools(QObject):
             self.view_camera = self.camera
         self.target, self.members = result["target"], frozenset(result["members"])
         self.context, self.explanation = self.signature(), result["explanation"]
+        self.structure = session.document.index.structure
         self.publish()
         self.frame()
 
@@ -66,7 +68,20 @@ class NeighborhoodTools(QObject):
 
     def synchronize(self):
         if self.members and self.signature() != self.context:
-            self.clear(False)
+            return self.clear(False)
+        if self.members and self.structure is not self.controller.session.document.index.structure:
+            self.update_members()
+
+    def update_members(self):
+        session = self.controller.session
+        self.structure = session.document.index.structure
+        try:
+            row = inspection_neighborhood.describe(session, self.target)
+        except (ValueError, KeyError):
+            return self.clear(True)
+        if self.members != frozenset(row["members"]):
+            self.members = frozenset(row["members"])
+            self.publish()
 
     @Slot()
     def restore(self):
@@ -83,4 +98,5 @@ class NeighborhoodTools(QObject):
         self.target, self.members = row["target"], frozenset(row["members"])
         self.camera = self.view_camera = (camera, orthographic)
         self.context = self.signature()
+        self.structure = self.controller.session.document.index.structure
         self.publish()

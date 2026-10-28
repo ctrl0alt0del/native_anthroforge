@@ -31,6 +31,8 @@ UiSection {
         UiDetail { label:"Nonmanifold"; value:String(panel.report.conditioning?.nonmanifold_edges ?? "—") }
         UiDetail { label:"Winding conflicts"; value:String(panel.report.conditioning?.orientation_conflicts ?? "—") }
         UiDetail { label:"Thin triangles"; value:panel.report.conditioning ? Number(panel.report.conditioning.minimum_triangle_quality).toPrecision(4) : "—" }
-        UiHelp { explanation:"Triangle quality is twice area divided by longest edge squared. Near zero means thin or collapsed triangles. Open or nonmanifold surfaces do not define an unambiguous volume. Containment and penetration depth are unavailable." }
+        UiDetail { label:"Transform condition"; value:panel.report.conditioning ? Number(panel.report.conditioning.transform_condition).toPrecision(4) : "—" }
+        UiHelp { explanation:"Triangle quality is twice area divided by longest edge squared. Near zero means thin or collapsed triangles. A large transform condition means uneven scaling. These are measurements, not automatic repairs." }
     }
+    VolumeInspection { target:panel.target; stage:panel.stage }
 }

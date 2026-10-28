@@ -30,6 +30,10 @@ OPERATIONS = {
         session, "binding", **options
     ),
     "geometry.binding.status": lambda session: tissue_inspection.status(session, "binding"),
+    "geometry.volume": lambda session, **options: tissue_inspection.start(
+        session, "volume", **options
+    ),
+    "geometry.volume.status": lambda session: tissue_inspection.status(session, "volume"),
     "measurement.point": measurements.point,
     "measurement.add": measurements.add,
     "measurement.remove": measurements.remove,

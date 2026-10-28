@@ -54,6 +54,8 @@ class InspectionExport(QObject):
         return dict(
             finding=owner.spatial_evidence.row or None,
             measurements=bool(owner.surface_measurements.report),
+            volume=bool(owner.surface_measurements.volumes.report),
+            section=owner.section_tools.state,
             **{owner.placement_inspection.kind: bool(owner.placement_inspection.report)},
             neighborhood=view.target if view.members else "",
             camera=view.view_camera[0] if view.view_camera else None,

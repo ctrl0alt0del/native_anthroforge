@@ -79,10 +79,9 @@ def inspection_view(controller, settings):
 
 
 def restore_spatial(controller, settings):
+    restore_measurements(controller, settings)
     if settings.get("finding"):
         controller.spatial_evidence.restore(settings["finding"], frozen=True)
-    if settings.get("measurements"):
-        controller.surface_measurements.restore(settings["measurements"])
     placement = settings.get("placement") or settings.get("binding")
     if placement:
         controller.placement_inspection.restore(placement)
@@ -90,6 +89,15 @@ def restore_spatial(controller, settings):
         controller.neighborhood.restore_capture(
             settings["neighborhood"], settings["camera"], settings["orthographic"]
         )
+
+
+def restore_measurements(controller, settings):
+    if settings.get("section"):
+        controller.section_tools.restore(settings["section_settings"], settings["section"])
+    if settings.get("volume"):
+        controller.surface_measurements.volumes.restore(settings["volume"])
+    if settings.get("measurements"):
+        controller.surface_measurements.restore(settings["measurements"])
 
 
 def stage_geometry(app, controller, renderer):

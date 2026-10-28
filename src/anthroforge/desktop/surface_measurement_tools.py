@@ -4,6 +4,8 @@ from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
 from anthroforge.application import inspection_surfaces, tissue_inspection
 
+from .volume_inspection_tools import VolumeInspectionTools
+
 
 class SurfaceMeasurementTools(QObject):
     changed = Signal()
@@ -13,6 +15,9 @@ class SurfaceMeasurementTools(QObject):
         self.controller, self.enabled, self.target, self.stage = controller, False, "", "final"
         self.report, self.context, self.receipt, self.error = {}, None, None, ""
         self.frozen = None
+        self.input_cache = None
+        self.volumes = VolumeInspectionTools(controller)
+        self.volumes.changed.connect(self.changed)
         self.timer = QTimer(self)
         self.timer.setSingleShot(True)
         self.timer.setInterval(60)
@@ -28,10 +33,17 @@ class SurfaceMeasurementTools(QObject):
             error=self.error,
         )
 
+    @Property(QObject, constant=True)
+    def volume(self):
+        return self.volumes
+
     @Slot(result="QVariantMap")
     def snapshot(self):
         return dict(
-            self.state, lines=self.report.get("lines", []), section=self.report.get("section", {})
+            self.state,
+            lines=self.report.get("lines", []),
+            section=self.report.get("section", {}),
+            volume=self.volumes.report.get("lines", []),
         )
 
     @Slot(str, str)
@@ -50,13 +62,30 @@ class SurfaceMeasurementTools(QObject):
 
     def input_key(self):
         session, section = self.controller.session, self.controller.section_tools
+        stamp = self.input_stamp(session, section)
+        if self.input_cache and self.input_cache[0] == stamp:
+            return self.input_cache[1]
         surface = inspection_surfaces.get(session, self.target, self.stage)
         plane = (
             tuple(section.plane) if section.enabled and section.target == surface.target else None
         )
-        return session, surface, plane
+        value = session, surface, plane
+        self.input_cache = stamp, value
+        return value
+
+    def input_stamp(self, session, section):
+        return (
+            session,
+            session.document,
+            self.target,
+            self.stage,
+            section.target,
+            tuple(section.plane),
+            section.enabled,
+        )
 
     def synchronize(self):
+        self.volumes.synchronize()
         if not self.enabled:
             return
         try:
@@ -67,7 +96,11 @@ class SurfaceMeasurementTools(QObject):
                 self.invalidate(key)
             self.receive()
         except (ValueError, KeyError) as error:
-            self.report, self.error = {}, str(error)
+            self.fail(str(error))
+
+    def fail(self, error):
+        if self.report or self.error != error:
+            self.report, self.error = {}, error
             self.changed.emit()
 
     def invalidate(self, key):

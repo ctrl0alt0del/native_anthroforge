@@ -12,11 +12,14 @@ def capture(session: Any, frozen: Any, settings: Any) -> None:
     from .inspection_report import capture_finding
 
     capture_finding(session, frozen, settings.get("finding"))
-    for kind in ("measurements", "placement", "binding"):
+    for kind in ("measurements", "placement", "binding", "volume"):
         if settings.get(kind):
             current_query(session, frozen.view, kind)
     if settings.get("neighborhood"):
         neighborhood(session, frozen.view, settings)
+    if settings.get("section", {}).get("enabled"):
+        current_query(session, frozen.view, "section")
+        frozen.view["section_settings"] = settings["section"]
     frozen.view.update(json.loads(json.dumps(frozen.view, allow_nan=False)))
 
 

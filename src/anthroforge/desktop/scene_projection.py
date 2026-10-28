@@ -69,7 +69,7 @@ class SceneProjection:
     def synchronize(self):
         session = self.controller.session
         changes = session.changes.since(self.cursor if session is self.session else -1)
-        full = changes.reset or self.workspace != session.workspace
+        full = structural_changes(changes) or self.workspace != session.workspace
         self.update_records(changes, full, structural_changes(changes))
         self.prune_records()
         self.synchronize_objects(changes, full)

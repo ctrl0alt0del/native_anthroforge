@@ -9,8 +9,11 @@ from anthroforge.application.skin_assets import SkinAsset
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.binding_batches import BindingBatch
+from anthroforge.native.expressions import Program
+from anthroforge.native.fiber_deformation import Preparation as FiberPreparation
 from anthroforge.native.inspection import Comparison
 from anthroforge.native.mesh import Mesh
+from anthroforge.native.painting import Prepared as PaintPreparation
 from anthroforge.native.path_collisions import CollisionCache
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
@@ -20,6 +23,7 @@ from anthroforge.native.tissue_preparation import Preparation
 from anthroforge.native.tissue_stacking import MaterialLease
 
 LIMITATIONS = [
+    "Fiber operators include factor estimates; shared fields/meshes counted separately",
     "Native mesh/path payload capacities; meshes include estimated full-binary AABB node bytes",
     "Images include owned encoded source and decoded RGBA bytes reachable from observed owners",
     "Routing scene capacities include observed cache/job captures; allocator overhead excluded",
@@ -65,7 +69,12 @@ RESOURCE_TYPES = (
     Preparation,
     SkinPreparation,
     SkinAsset,
+    FiberPreparation,
+    Program,
+    PaintPreparation,
 )
+
+INVENTORY_LIMIT = 65536
 
 
 def payload_resources(value, profiler, group=None):
@@ -138,8 +147,8 @@ def session_owners(session, output, profiler):
             for document in bounded(values, 512, profiler)
             for resource in document_resources(session, document, profiler)
         )
-        output[owner].update(bounded_unique(references, 4096, profiler))
-    output["catalogue"].update(bounded(catalogue_resources(session), 4096, profiler))
+        output[owner].update(bounded_unique(references, INVENTORY_LIMIT, profiler))
+    output["catalogue"].update(bounded(catalogue_resources(session), INVENTORY_LIMIT, profiler))
     preview_owners(session, output)
     replacement_owners(session, output)
     inspection_owners(session, output, profiler)
@@ -296,7 +305,7 @@ def native_rows(profiler):
         if engine.library._handle in libraries:
             continue
         libraries.add(engine.library._handle)
-        found, count = memory.snapshot(engine, max(0, 4096 - len(rows)))
+        found, count = memory.snapshot(engine, max(0, INVENTORY_LIMIT - len(rows)))
         rows.extend([engine.library._handle, *row] for row in found)
         total += count
         if len(found) != count:

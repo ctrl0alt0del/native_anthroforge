@@ -41,15 +41,23 @@ class GeometryEngine(NativeEngine):
         self._construction_signatures()
         self._resource_caches()
         self._deformation_caches()
+        self._cache_budget()
         self.resource_observer: Any = None
 
     def _deformation_caches(self) -> None:
         self.fiber_deformations: ResourceCache[FiberPreparation] = ResourceCache(
-            64 * 1024 * 1024, 256, "fiber_deformation"
+            4 * 1024**3, 256, "fiber_deformation"
         )
         self.skin_preparations: ResourceCache[SkinPreparation] = ResourceCache(
-            4 * 1024**3, 2, "skin_preparation"
+            4 * 1024**3, 64, "skin_preparation"
         )
+
+    def _cache_budget(self) -> None:
+        from .cache_budget import CacheBudget
+
+        self.cache_budget = CacheBudget()
+        for cache in self.caches():
+            self.cache_budget.attach(cache)
 
     def _resource_caches(self) -> None:
         self.bases = BaseCache()

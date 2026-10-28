@@ -15,7 +15,7 @@ from qualify_retained_attachment_edits import load
 from shiboken6 import delete
 from shortcut_inspection_profile import PLAN, fingerprint
 
-from anthroforge.desktop import offscreen, runtime
+from anthroforge.desktop import offscreen, qt_profiler, runtime
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.qt_profiler import QtProfiler, profiler_application
 
@@ -140,6 +140,7 @@ def main():
     os.environ["ANTHROFORGE_PREFERENCES_PATH"] = str(output.parent / "preferences.json")
     build = Path(os.environ["AF_NATIVE_BUILD"]).resolve()
     runtime.build_directory = offscreen.build_directory = lambda: build
+    qt_profiler.build_directory = lambda: build
     QQuickStyle.setStyle("Basic")
     with runtime.native_runtime():
         app = profiler_application()

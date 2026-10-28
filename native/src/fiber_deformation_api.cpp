@@ -17,7 +17,6 @@ uint64_t bytes(const Preparation& p) {
     for(const auto& b:p.parents) {
         result+=uint64_t(b.vertices.size())*8+b.records.size()*8+b.indices.size()*4;
         for(const auto& r:b.regions) result+=sizeof(Region)+r.ids.size()*4;
-        result+=mesh_storage(*b.mesh);
     }
     return result;
 }

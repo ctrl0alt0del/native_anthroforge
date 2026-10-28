@@ -41,11 +41,19 @@ class Preparation:
     ):
         self.engine, self.field, self.meshes = engine, field, tuple(meshes)
         self.handle = create(engine, field, meshes, pins, groups, cancel)
+        self.resources = (field, field.path, *self.meshes)
+        if engine.resource_observer is not None:
+            engine.resource_observer(self)
 
     @property
     def bytes(self) -> int:
-        native = int(self.engine.library.af_fiber_deformation_bytes(self.handle))
-        return int(native + self.field.bytes + self.field.path.bytes)
+        return int(self.engine.library.af_fiber_deformation_bytes(self.handle))
+
+    @property
+    def retained_bytes(self) -> int:
+        from .resource_footprint import footprint
+
+        return sum(footprint(self, self.bytes).values())
 
     def __del__(self) -> None:
         if getattr(self, "handle", 0):
@@ -101,7 +109,7 @@ def prepare(
     if found is not None:
         return found
     value = Preparation(engine, field, meshes, pins, groups, cancel)
-    return engine.fiber_deformations.store(key, value, value.bytes)
+    return engine.fiber_deformations.store(key, value, value.retained_bytes)
 
 
 def evaluate(value: Preparation, handles: Any, frames: Any, goals: Any, cancel: int) -> Any:

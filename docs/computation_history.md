@@ -3629,3 +3629,14 @@ Previously each accepted result revisited all construction records, rebuilt unch
 
 Initial hidden Ribs-to-3 capture reduced construction visits from 132,498 to 549 with identical geometry, resolved poses, attachment metadata and oriented connectivity. Final repeated evidence and limits belong in [the task record](tasks/display-cache-042.md). No geometry algorithms, scheduling order or history policy changed.
 
+
+### Shared cache allocation budgeting — 2026-10-28 (0.4.2; R09)
+
+Separate cache byte charges repeatedly included the same meshes; the fiber cache thrashed at 64 MiB, and the two-entry FAST cache discarded expensive preparations. Cache admission now records native mesh allocation identities and separates fiber-owned operators from shared fields, paths and parent meshes. One engine-owned 4 GiB estimated-payload budget bounds the union across caches. Fiber/skin preparations share that allowance (entry caps 256/64); other local caps remain. Aggregate pressure uses rebuild wall time per retained byte with aging on eviction/hits, following the GreedyDual-Size principle; this is a shared-allocation adaptation, not a claim of its original optimality bound. Missing timing uses a conservative minimal priority. All collection/cache work stays outside numerical algorithms.
+
+FAST disk products use atomic publication and a process-safe writer lock, at most 2 GiB/256 files, least-recently-used eviction, and safe bypass under lock/filesystem pressure. Active temporary writes are excluded. These are disposable cache limits, never calculation-admission or history limits. Recorder inventory now includes fiber preparations, expressions and painting preparations and retains bounded 65,536-handle coverage; larger inventories remain explicitly incomplete. Estimates exclude Python/allocator/GPU overhead and are not a process-RAM cap.
+
+The 24-edit workload produces 211 fiber builds/2,411 hits without rebuild churn (previously 2,547 builds/75 hits). The retained deduplicated fiber payload is 105.42 MiB. Matched eight-edit numerical comparison preserves bindings and canonical oriented topology, with maximum coordinate delta 4.09e-14 m; raw Thumb triangle enumeration remains nondeterministic. Repeated timing, full gate and package qualification remain pending in [the task record](tasks/display-cache-042.md).
+
+Reference: [Cao and Irani, GreedyDual-Size](https://www.usenix.org/legacy/publications/library/proceedings/usits97/full_papers/cao/cao_html/node8.html).
+

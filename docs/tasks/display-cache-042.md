@@ -47,3 +47,10 @@ Use `ANTHROFORGE_NATIVE_LIBRARY=C:/Users/alexe/AppData/Local/Temp/anthroforge-sk
 and `AF_NATIVE_BUILD` pointing to that build directory. The default `build/dev` DLL is
 stale. Production fixtures and baseline profiles are documented in the profiling task.
 Keep new artifacts under ignored `build/display-cache-042`; preserve root `__init__.py`.
+
+## R09 checkpoint
+
+Shared allocation receipts, a 4 GiB aggregate estimated-payload budget with cost-aware aggregate eviction, fiber/skin retention and bounded FAST disk products are implemented. Existing numerical kernels unchanged. Focused cache/native/profile tests pass; expanded production captures report complete inventories without loss. Eight-edit numerical comparison: bindings/canonical topology equal, maximum coordinate delta 4.09e-14 m. Do not compare two-cycle and six-cycle final coordinates directly: the baseline itself has history-dependent repeated-edit differences; matched sequences are required.
+
+Pending: full gate, repeated desktop timings (running serial BAAB), whole-body skin reuse, package and ownership review. Artifacts are under build/display-cache-042. Baseline detached worktree at build/display-cache-042/baseline uses b7c5d99 plus only the shared profiling harness runtime-path correction and the existing canonical pre-change native DLL.
+

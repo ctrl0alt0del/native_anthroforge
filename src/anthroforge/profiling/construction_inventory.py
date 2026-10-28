@@ -5,7 +5,10 @@ from anthroforge.application.skin_assets import SkinAsset
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.binding_batches import BindingBatch
+from anthroforge.native.expressions import Program
+from anthroforge.native.fiber_deformation import Preparation as FiberPreparation
 from anthroforge.native.inspection import Comparison
+from anthroforge.native.painting import Prepared as PaintPreparation
 from anthroforge.native.path_collisions import CollisionCache
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
@@ -17,6 +20,15 @@ from anthroforge.native.tissue_stacking import MaterialLease
 
 
 def inventories(profiler, owners):
+    return dict(
+        ordinary_inventories(profiler, owners),
+        fiber_preparations=typed_inventory(owners, FiberPreparation),
+        expressions=typed_inventory(owners, Program),
+        paint_preparations=typed_inventory(owners, PaintPreparation),
+    )
+
+
+def ordinary_inventories(profiler, owners):
     return dict(
         paths=path_inventory(profiler, owners),
         images=image_inventory(owners),
@@ -132,12 +144,14 @@ def image_bytes(image):
 
 
 def path_rows(profiler):
+    from .resource_inventory import INVENTORY_LIMIT
+
     libraries, rows, total = set(), [], 0
     for engine in profiler.native.engines:
         if engine.library._handle in libraries:
             continue
         libraries.add(engine.library._handle)
-        found, count = memory.path_snapshot(engine, max(0, 4096 - len(rows)))
+        found, count = memory.path_snapshot(engine, max(0, INVENTORY_LIMIT - len(rows)))
         rows.extend([engine.library._handle, *row] for row in found)
         total += count
         if len(found) != count:

@@ -8,6 +8,7 @@ from time import perf_counter, sleep
 
 from construction_profile_qualification import shutdown, wait_export
 from profile_display_attribution import Attribution
+from profile_mesh_adapter import probe
 from profiler_system_load import system_load, system_times
 from PySide6.QtQuickControls2 import QQuickStyle
 from qualify_retained_attachment_edits import load
@@ -73,6 +74,7 @@ def inserted(model, records, first, last):
 def capture(controller, renderer, app, output, case):
     session, records = controller.session, []
     observe(controller.render_model, records)
+    observe(controller.fiber_display.model, records)
     recording = "--unrecorded" not in sys.argv
     if recording:
         session.command("profile.start", memory_mib=512)
@@ -102,6 +104,7 @@ def finish(controller, renderer, app, output, result, recording):
         controller.session.command("profile.stop", path=str(output.with_suffix(".afprofile.zip")))
         assert wait_export(controller, app)["state"] == "saved"
     result["fingerprint"] = fingerprint(controller.session)
+    result["adapter"] = probe(renderer, controller)
     output.with_suffix(".json").write_text(json.dumps(result), encoding="utf-8")
     assert renderer.frame().save(str(output.with_suffix(".png")))
     print(output.name, result["load"], len(result["frames"]), result["errors"], flush=True)

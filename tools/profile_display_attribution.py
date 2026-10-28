@@ -36,6 +36,18 @@ def measured(profiler, original, record):
     return invoke
 
 
+def visited(original, record):
+    @wraps(original)
+    def invoke(owner, session, item):
+        before = owner.records.get(item.id)
+        result = original(owner, session, item)
+        record["calls"] += 1
+        record["changed"] += before is not owner.records.get(item.id)
+        return result
+
+    return invoke
+
+
 class Attribution(ExitStack):
     def __init__(self, profiler):
         super().__init__()
@@ -46,3 +58,11 @@ class Attribution(ExitStack):
             self.enter_context(
                 patch.object(owner, name, measured(profiler, original, self.records[key]))
             )
+        self.observe_visits()
+
+    def observe_visits(self):
+        record = self.records["construction_visits"] = dict(calls=0, changed=0)
+        original = ConstructionProjection.update_record
+        self.enter_context(
+            patch.object(ConstructionProjection, "update_record", visited(original, record))
+        )

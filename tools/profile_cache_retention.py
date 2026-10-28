@@ -5,13 +5,19 @@ import sys
 from contextlib import closing
 from pathlib import Path
 
+import numpy as np
 import psutil
 from profile_cache_memory import detailed
 from profiler_system_load import system_load, system_times
 from qualify_retained_attachment_edits import load
 from shortcut_inspection_profile import PLAN, edit, fingerprint
+from shortcut_parity_app_capture import record
 
+from anthroforge.application.object_frames import Frames
 from anthroforge.application.session import Session
+from anthroforge.core.entities import SCP
+from anthroforge.core.fibers import Fiber
+from anthroforge.core.tissues import TissueVCP
 from anthroforge.profiling.identity import build_identity
 from anthroforge.profiling.resource_inventory import inventory
 
@@ -100,13 +106,28 @@ def environment(output):
     return plan
 
 
-def run(output, cycles):
+def positions(session, output):
+    arrays, frames = {}, Frames(session.engine, session.document)
+    for item in session.document.registry.records.values():
+        if isinstance(item, (SCP, TissueVCP, Fiber)):
+            record(session, item, frames, arrays)
+    np.savez_compressed(output / "positions.npz", **arrays)
+
+
+def final_state(session, output):
+    write(output, "final-fingerprint", fingerprint(session))
+    if "--arrays" in sys.argv:
+        positions(session, output)
+
+
+def run(output, cycles, fiber_mib=64):
     plan = environment(output)
     with closing(Session()) as session:
+        session.engine.fiber_deformations.budget = fiber_mib * 1024**2
         load(session, Path(plan["standalone"]))
         write(output, "initial-fingerprint", fingerprint(session))
         sequence(session, plan["cases"], output, cycles)
-        write(output, "final-fingerprint", fingerprint(session))
+        final_state(session, output)
         navigate(session, output)
         boundary(session, output, "clear-caches", session.engine.clear_caches)
         trial(session, plan["cases"][0], output, "cold-rebuild")
@@ -114,4 +135,8 @@ def run(output, cycles):
 
 
 if __name__ == "__main__":
-    run(Path(sys.argv[1]).resolve(), int(sys.argv[2]) if len(sys.argv) > 2 else 4)
+    run(
+        Path(sys.argv[1]).resolve(),
+        int(sys.argv[2]) if len(sys.argv) > 2 else 4,
+        int(sys.argv[3]) if len(sys.argv) > 3 else 64,
+    )

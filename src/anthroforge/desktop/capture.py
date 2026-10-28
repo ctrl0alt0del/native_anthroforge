@@ -75,6 +75,8 @@ def inspection_view(controller, settings):
     controller.authoring.setEditing(settings["editing"])
     restore(controller, settings.get("tissue"))
     controller.route_inspection.restore(settings.get("route"))
+    if settings.get("finding"):
+        controller.spatial_evidence.restore(settings["finding"], frozen=True)
 
 
 def stage_geometry(app, controller, renderer):

@@ -30,6 +30,7 @@ from .section_tools import SectionTools
 from .shortcut_comparison_view import ShortcutComparisonView
 from .shortcut_panel import ShortcutPanel
 from .skin_panel import SkinPanel
+from .spatial_evidence_tools import SpatialEvidenceTools
 from .surface_creation import SurfaceCreation
 from .tissue_inspection_tools import TissueInspectionTools
 from .tissue_region_tools import TissueRegionTools
@@ -85,6 +86,7 @@ class Controller(QObject):
         self.mesh_replacement = MeshReplacementPanel(self)
 
     def initialize_tissue_tools(self):
+        self.spatial_evidence = SpatialEvidenceTools(self)
         self.skin_panel = SkinPanel(self)
         self.shortcut_comparison = ShortcutComparisonView(self)
         self.shortcut_panel = ShortcutPanel(self)
@@ -119,6 +121,7 @@ class Controller(QObject):
             self.tissue_painting.model,
             self.shortcut_comparison.model,
             self.shortcut_comparison.images,
+            self.spatial_evidence.model,
         )
 
     def initialize_renderers(self):
@@ -315,6 +318,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def meshReplacement(self):
         return self.mesh_replacement
+
+    @Property(QObject, constant=True)
+    def spatialEvidence(self):
+        return self.spatial_evidence
 
     @Property(QObject, constant=True)
     def sceneChoices(self):
@@ -580,6 +587,7 @@ class Controller(QObject):
             self.notify()
 
     def refresh_runtime_panels(self):
+        self.spatial_evidence.synchronize()
         self.shortcut_comparison.synchronize()
         self.creation_selection.synchronize()
         self.issue_panel.synchronize()

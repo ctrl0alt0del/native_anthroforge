@@ -1,7 +1,8 @@
 """Stage resources use the same bounded frame-boundary publication as authored geometry."""
 
 from anthroforge.application import tissue_inspection_stages as stages
-from anthroforge.native import scene
+
+from .inspection_scene import chunks, placement
 
 
 def stage_rows(tool, stage, reference=False, target=""):
@@ -39,40 +40,6 @@ def stage_metadata(session, target, row, reference):
         geometry_revision=row["result"]["revision"],
         status=row["result"]["status"],
     )
-
-
-def placement(session, frame):
-    return dict(
-        matrix=list(frame),
-        trs=session.engine.decompose(frame),
-        quaternion=scene.quaternion(session.engine, frame),
-        geometry_offset=[0, 0, 0],
-        visible=True,
-        surface_pickable=True,
-        surface_visible=True,
-        readonly=True,
-    )
-
-
-def chunks(metadata, resource):
-    count = resource.counts[4] if metadata["kind"] == "MESH" else resource.chunks if resource else 1
-    handle = resource.handle if resource else 0
-    return [
-        dict(
-            metadata,
-            handle=handle,
-            key=f"{metadata['id']}:{metadata['stage']}:{handle}:{i}",
-            chunk=i,
-            mesh_handle=handle if metadata["kind"] == "MESH" else 0,
-            content=content(metadata, handle if metadata["kind"] == "MESH" else 0),
-        )
-        for i in range(count)
-    ]
-
-
-def content(row, mesh_handle):
-    keys = ("stage", "kind", "matrix", "trs", "quaternion")
-    return dict({key: row[key] for key in keys}, mesh_handle=mesh_handle)
 
 
 def rows(tool):

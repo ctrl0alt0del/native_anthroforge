@@ -261,6 +261,7 @@ Item {
                 }
             }
             TissueInspectionScene { distance: viewport.distance; visible: !viewport.comparisonBefore }
+            InspectionScene { distance: viewport.distance; geometryModel: workspace.spatialEvidence.geometry; evidenceSource: workspace.spatialEvidence; sections: false; primaryOpacity: .25; visible: !viewport.comparisonBefore }
             TissueInspectionScene { distance: viewport.distance; geometryModel: workspace.tissuePainting.geometry; annotations: false; visible: !viewport.comparisonBefore }
             RouteInspectionScene { distance: viewport.distance }
             Model {

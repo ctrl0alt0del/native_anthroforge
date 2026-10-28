@@ -42,6 +42,7 @@ class InspectionExport(QObject):
             tissue=self.tissue_options() if tool.target else None,
             route=owner.route_inspection.state if owner.route_inspection.visible else None,
             replay=self.replay and owner.session.shortcut_comparison.baseline is not None,
+            finding=owner.spatial_evidence.row or None,
         )
 
     @Slot(bool)

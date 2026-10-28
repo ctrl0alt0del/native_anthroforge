@@ -2,10 +2,13 @@
 
 from typing import Any
 
-from . import bookmarks, measurements
+from . import bookmarks, measurements, spatial_evidence
+from .issues import surface_geometry
 from .session import Session
 
 OPERATIONS = {
+    "geometry.check": surface_geometry.request,
+    "geometry.finding": spatial_evidence.issue,
     "measurement.point": measurements.point,
     "measurement.add": measurements.add,
     "measurement.remove": measurements.remove,

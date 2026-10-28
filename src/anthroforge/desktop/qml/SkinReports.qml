@@ -13,6 +13,7 @@ UiSection {
     title: "Skin diagnostics"; expanded: false; stateKey: "skin-diagnostics"
     visible: !!reports.final?.geometry || !!reports.topology?.geometry
     hint: "Checks describe the saved result. They do not repair skin. Full findings are in Issues."
+    UiButton { objectName:"checkSkinGeometry"; text:"Locate geometry findings"; Layout.fillWidth:true; hint:"Run an on-demand spatial check of the accepted skin surface."; onClicked:workspace.spatialEvidence.check("skin",section.reports.final?.geometry ? "final" : "topology") }
     UiDetail { label:"Revision"; value:String(section.reports.final?.revision ?? "—") }
     UiDetail { label:"Solve steps"; value:String(section.solver.iterations ?? "—") }
     UiDetail { label:"Minimum J"; value:section.solver.minimum_proxy_j === undefined ? "—" : Number(section.solver.minimum_proxy_j).toPrecision(4) }

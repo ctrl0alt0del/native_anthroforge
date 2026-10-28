@@ -76,11 +76,27 @@ def export(
     route: Any = None,
     comparison: bool = True,
     replay: bool = False,
+    finding: Any = None,
 ) -> dict[str, Any]:
-    target = export_target(session, path)
-    frozen = capture(session, selected, editing, tissue, route)
+    frozen = export_capture(session, path, selected, editing, tissue, route, finding)
     frozen = comparison_options(session, frozen, comparison, replay)
-    return submit_export(session, target, frozen, wait)
+    return submit_export(session, Path(path).resolve(), frozen, wait)
+
+
+def export_capture(
+    session: Any, path: str, selected: str, editing: bool, tissue: Any, route: Any, finding: Any
+) -> Capture:
+    export_target(session, path)
+    frozen = capture(session, selected, editing, tissue, route)
+    capture_finding(session, frozen, finding)
+    return frozen
+
+
+def capture_finding(session: Any, frozen: Capture, finding: Any) -> None:
+    from .spatial_evidence import capture as finding_view
+
+    if finding:
+        frozen.view["finding"] = json.loads(json.dumps(finding_view(session, finding)))
 
 
 def export_target(session: Any, path: str) -> Path:

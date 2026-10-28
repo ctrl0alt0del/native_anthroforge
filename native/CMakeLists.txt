@@ -22,7 +22,7 @@ add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     src/inspection_mapping.cpp src/inspection_compare.cpp src/inspection_buffers.cpp src/inspection_point.cpp
     src/painting.cpp src/painting_mapping.cpp src/painting_projection.cpp src/painting_stroke.cpp
     src/sections.cpp
-    src/inspection_goals.cpp
+    src/inspection_goals.cpp src/inspection_metrics.cpp
     src/surface_query.cpp src/surface_query_closure.cpp src/surface_query_reuse.cpp
     src/mesh_registry.cpp src/transforms.cpp src/spatial.cpp src/ray_queries.cpp src/surface_snap.cpp src/attachment.cpp src/material_domain.cpp src/material_axes.cpp
     src/construction_mesh.cpp src/curves.cpp src/loft.cpp src/curve_body.cpp src/segment_chain.cpp

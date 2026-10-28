@@ -69,3 +69,14 @@ Do not claim interactive desktop acceptance from hidden/offscreen checks.
 4. Release one canonical 0.4.2 package only after acceptance, then validated merge/push.
 
 The containing commit identifies the checkpoint; inspect Git history for push state.
+
+## 2026-10-28 inspection checkpoint
+
+- Confirmed: overall extents and section spans, with visible axes; temporary related-object
+  inspection and Restore, without workspace membership or priority changes.
+- Shared stage-qualified witnesses now cover SCP/construction/skin plus existing tissue
+  findings. Generic staged viewport highlighting and frozen report capture are integrated.
+- 23 focused geometry/view/export checks passed. New native scale/extent/section-span
+  diagnostics compile; six existing native contract suites pass. Native diagnostic tests,
+  UI integration, placement explanation, neighborhood views and full qualification remain.
+- This checkpoint is incomplete and must not merge into main or be released yet.

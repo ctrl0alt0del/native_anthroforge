@@ -1,6 +1,6 @@
 # Cross-project anatomy assembly — confirmed 0.4.2 contract
 
-Status: implementation in progress; not yet qualified.
+Status: implemented; final portable qualification in progress.
 
 ## Workflow
 
@@ -73,3 +73,50 @@ stale inputs, undo/redo/historical saves; schema/asset portability; large search
 construction-only fixtures. Record offscreen limits and separate ownership/coupling review.
 
 Deliver one `dist/0.4.2/AnthroForge.dist` and `dist/AnthroForge-0.4.2-source.zip` after checks.
+
+## Using the import dialog
+
+1. Open the destination and choose **File → Import Anatomy from Project…**.
+2. Select the source file, then choose anatomy or construction. Required sources are checked
+   and locked with their reason; **Include attached tissues** shows the additional tissues.
+3. Select each external relationship and its destination. Search operates on virtualized lists.
+   A unique provenance suggestion is optional; names never authorize a mapping.
+4. For excluded transform parents, choose a destination, Include source, or Detach to world.
+   For incompatible material bindings, enable Rebind and inspect Attachment locations.
+   Orange locations are original; blue locations are proposed, with coordinates in metres.
+5. Click **Import**. Undo removes the whole import; Redo restores it. Missing supports remain
+   visible in Issues. **Resolve references** reopens the same editor without the source file.
+
+The destination parent defaults to the selected SCP or existing root. This does not move the
+imported shapes to that parent. A new anatomical root attachment may need the explicit Rebind
+roots option; its proposed attachment is included in the evidence. No automatic fitting occurs.
+
+## Relationship and resource inventory
+
+| Family | Copy and boundary contract |
+| --- | --- |
+| SCP hierarchy and ordinary transforms | New SCP IDs, subtree closure, world-preserving root placement; ordinary parent/follow choices are required. |
+| Primitive definitions and deformers | Curve uses, pieces, controls, Hook point/handle membership, weights and lattice relationships remap through typed fields. |
+| Curves, Fibers and junctions | Point/variable identities and accepted path definitions copy once; junction participants remain shared within the copy. |
+| Surfaces/Membranes | Source ordering, correspondence stations, branch/part IDs and accepted material data retain their relationships. |
+| Tissue stages/constraints/stacking | Source/base/rest/intrinsic/final resources, region bindings, masks, part IDs and support intent remain distinct. |
+| Attachments | Material geometry, dense fields, capture frames and role/instance references transfer with their metadata. Compatibility uses full native content checks. |
+| Shortcuts and drivers | Wrapper/property paths, nested component IDs, accepted input revisions and policy scope remap; outgoing external formulas stay disabled. |
+| Mirroring | Internal rules remap; inherited boundary rules retain explicit scopes. A rule ID never establishes that its original owning bone was copied. |
+| Images and immutable assets | Only selected/required payloads load; metadata-bearing resources receive independent IDs. Image bytes remain embedded. |
+| Import evidence | Provenance and declared missing references are document data. Source snapshots, preparation state and native handles are transient. |
+
+## Ownership review
+
+The coordinator retains execution and cancellation; assembly has no worker pool or numerical
+algorithm. The core typed remapper is also used by existing construction/control copies.
+Package inspection owns the pinned source; preparation owns loaded resources and a validated
+candidate. Document/history/display ownership takes over on commit; terminal jobs release their
+captures and the source snapshot is disposed. Explicit lifetime tests cover that transfer.
+
+Shared property/surface/dependency boundaries recognize declared unresolved references while
+still rejecting undeclared identities. Desktop controls project those decisions rather than
+implementing independent compatibility rules. Prepared immutable indexes are reusable only when
+the destination snapshot matches; unrelated edits use the ordinary merge path and mapped-target
+changes reject stale publication. Actual geometry, reference and release evidence is recorded
+in [the task record](tasks/assembly-042.md), separately from this ownership review.

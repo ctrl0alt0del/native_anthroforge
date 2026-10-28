@@ -35,3 +35,29 @@ def test_cancelled_candidate_cannot_publish_partial_graph(session, tmp_path):
     session.wait()
     assert session.document is before
     assert session.assembly.preparation.candidate is None
+
+
+def test_import_returns_actionable_issues_for_retained_missing_supports(session, tmp_path):
+    from tests.test_assembly_mapping import captured
+
+    _, fiber, source = captured(session, tmp_path)
+    token = session.command("assembly.inspect", path=source.original)["source"]
+    session.wait()
+    pending = session.command("assembly.prepare", source=token, selected=[fiber.id])
+    session.wait()
+    result = session.command("assembly.import", token=pending["token"])
+    assert result["issues"][0]["code"] == "UNRESOLVED_IMPORT_REFERENCE"
+    assert result["issues"][0]["target"] == result["identities"][fiber.id]
+
+
+def test_import_releases_inspected_source_and_preparation_but_keeps_owned_assets(session, tmp_path):
+    import gc
+    import weakref
+
+    _, token = prepared(session, tmp_path)
+    source = weakref.ref(session.assembly.source.source)
+    candidate = weakref.ref(session.assembly.preparation.candidate)
+    session.command("assembly.import", token=token)
+    gc.collect()
+    assert source() is None and candidate() is None
+    session.resources.require(session.document)

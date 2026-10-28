@@ -1154,7 +1154,7 @@ preparation and numerical rebinding use the existing task coordinator.
 | `assembly.prepare` | `source`, `selected` IDs, optional `parent`, `include_attached_tissues`, `rebind_roots`, `mappings`; returns a preparation `token`. |
 | `assembly.status` | Source/preparation states, selection reasons, grouped mappings, blocking findings, unresolved count and original/proposed attachment evidence. |
 | `assembly.cancel` | Releases/cancels preparation without changing the document. |
-| `assembly.import` | `token`; commits a ready current candidate in one undo action. Returns `identities`, `provenance` and affected job IDs. Finish any existing gesture first. |
+| `assembly.import` | `token`; commits a ready current candidate in one undo action. Returns `identities`, `provenance`, unresolved-reference `issues` and affected job IDs. Finish any existing gesture first. |
 | `assembly.references` | Persisted declarations, resolution targets, source identities, roles/properties and affected consumers. |
 | `assembly.resolve` | `mappings` keyed by unresolved reference IDs; prepares repair. Commit its returned token through `assembly.import`. Source file is unnecessary. |
 

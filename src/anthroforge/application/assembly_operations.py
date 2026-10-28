@@ -7,8 +7,11 @@ from . import assembly_candidate
 
 
 def apply(session: Any, token: str) -> dict[str, Any]:
+    from .issues.assembly import finding
+
     candidate = session.assembly.ready(token)
     result = assembly_candidate.install(session, candidate)
+    result["issues"] = [asdict(finding(r)) for r in candidate.references if not r.target]
     session.assembly.cancel()
     return result
 

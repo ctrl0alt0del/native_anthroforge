@@ -122,3 +122,12 @@ All assembly/architecture checks pass; final full-suite rerun follows these corr
 The cProfile Import command fell from 0.936 s to 0.184 s (one matched large import each;
 profiler overhead included). Graph adoption itself is 0.070 s; source snapshot release remains
 about 0.109 s. This is publication evidence, not an unprofiled frame-latency guarantee.
+
+Hidden GPU renders now show the production source and imported assembly in matched front and
+oblique views, with 1,184,586 displayed vertices. The anatomy pixels match exactly in both
+views (viewport rows 90–889 exclude dynamic timing text). Initial blank captures were a test
+runtime mismatch between the native engine DLL and the development viewport plugin; rerunning
+with one matched qualified native directory corrected the probe. Source files were not changed.
+The populated 625-object dialog is also inspected. These are hidden-render/offscreen results,
+not manual desktop interaction acceptance. Core/application/native/desktop ownership review is
+recorded in docs/assembly_042.md; no geometry algorithm or worker pool was introduced.

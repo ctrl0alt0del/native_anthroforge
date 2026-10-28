@@ -3707,3 +3707,13 @@ wait took 1.74 s with profiling enabled, so whole-assembly commit is not claimed
 100 ms interaction target. Source/imported shortcut times are not an overhead comparison:
 only the destination recorded. Numerical/native, complete suite, offscreen and portable
 qualification status is maintained in [the task record](tasks/assembly-042.md).
+
+Publication profiling exposed two redundant immutable graph/index builds. The worker now
+retains the validated merged candidate; publication reuses those indexes through the existing
+document replacement contract after complete read-set validation. Incomplete candidates remain
+editable findings and are never merged. One matched cProfile import fell from 0.936 s to
+0.184 s; adoption accounts for 0.070 s and source snapshot disposal for 0.109 s in the latter.
+These include profiler costs and are not frame-time or disabled-profiler guarantees.
+The separate ownership review also found an inherited mirror-rule identity being confused with
+its excluded source bone; relationship mapping and accepted input rewriting now distinguish
+those uses. Focused missing/mapped support and formula regressions preserve that distinction.

@@ -18,6 +18,7 @@ class Mappings:
     identities: dict[str, str]
     choices: dict[str, Any]
     replacements: dict[str, list[Any]] = field(default_factory=dict)
+    choices_by_reference: dict[str, tuple[Any, str]] = field(default_factory=dict)
     references: list[ExternalReference] = field(default_factory=list)
     findings: list[dict[str, Any]] = field(default_factory=list)
     reads: set[str] = field(default_factory=set)
@@ -33,6 +34,15 @@ class Mappings:
                 self.add(row, decision)
             except ValueError as error:
                 self.findings.append(dict(reference=row.key, message=str(error), blocking=True))
+        self.suggest()
+
+    def suggest(self) -> None:
+        from .assembly_choices import suggestions
+
+        found = suggestions(self.source.document, self.destination, self.rows)
+        for row in self.rows:
+            if not row.get("instance"):
+                row["suggested"] = found.get(row["key"], "")
 
     def add(self, row: Any, decision: Any) -> None:
         action = decision.get("action", "later")
@@ -41,6 +51,7 @@ class Mappings:
         external = replace(external, instance=decision.get("instance", "") if target else "")
         if action != "detach":
             self.references.append(external)
+        self.choices_by_reference[row.key] = decision, target or external.id
         for owner, ref in row.uses:
             self.replacements.setdefault(owner, []).append((ref, decision, target or external.id))
             if decision.get("rebind", False):
@@ -63,7 +74,13 @@ class Mappings:
         return target
 
     def patch(self, original: Any, item: Any) -> Any:
-        for ref, decision, target in self.replacements.get(getattr(original, "id", ""), ()):
+        if getattr(original, "id", "") not in self.replacements:
+            return disable_external_outputs(original, item, self.identities)
+        for ref in graph_records.references(original):
+            selected = self.choices_by_reference.get(assembly_graph.boundary_key(original, ref)[0])
+            if selected is None:
+                continue
+            decision, target = selected
             value = "" if decision.get("action") == "detach" else target
             item = patch_reference(item, ref, decision, value)
         return disable_external_outputs(original, item, self.identities)

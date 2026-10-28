@@ -18,11 +18,12 @@ UiDialog {
             visible: !dialog.service.state.repair
             UiCheck { text: "Include attached tissues"; checked: !!dialog.service.state.options?.include_attached_tissues; onClicked: dialog.service.option("include_attached_tissues",checked) }
             Label { text: "Destination parent"; color: Theme.muted }
-            UiCombo {
+            UiSearchChoice {
                 objectName: "assemblyParent"; Layout.fillWidth: true
-                model: dialog.service.state.parents || []; textRole: "name"; valueRole: "id"
-                currentIndex: Math.max(0,(dialog.service.state.parents || []).findIndex(r=>r.id===dialog.service.state.parent))
-                onActivated: dialog.service.option("parent",currentValue)
+                choices: dialog.service.state.parents || []; placeholder: "Search destination anatomy"
+                text: choices.find(r=>r.id===dialog.service.state.parent)?.name || choices[0]?.name || "No anatomy parent"
+                enabled: choices.length>0
+                onChosen: row=>dialog.service.option("parent",row.id)
             }
             UiCheck { text: "Rebind roots"; checked: !!dialog.service.state.options?.rebind_roots; onClicked: dialog.service.option("rebind_roots",checked); hint: "Choose new attachment locations for imported SCP roots when their original parent differs" }
         }

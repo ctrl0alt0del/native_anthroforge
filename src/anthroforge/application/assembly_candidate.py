@@ -1,13 +1,15 @@
 """A prepared independent graph, merged into the current destination in one transaction."""
 
 from dataclasses import dataclass, field, replace
-from typing import Any
+from typing import Any, cast
 
 from anthroforge.core.assembly import ExternalReference, ImportProvenance
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import ObsoleteInputs
 from anthroforge.core.results import Port
+from anthroforge.core.tissues import TissueVCP
 
+from .assembly_result_state import CHANGED
 from .resources import Resources
 
 
@@ -28,6 +30,8 @@ class ReadSet:
 
 
 def read_record(document: Any, key: str) -> Any:
+    if key.startswith("formula-result:"):
+        return document.formula_index.results.get(key.removeprefix("formula-result:"))
     if key.startswith("mirror:"):
         return document.mirrors.rules.get(key.removeprefix("mirror:"))
     if key.startswith("external:"):
@@ -64,6 +68,8 @@ class Candidate:
     evidence: tuple[dict[str, Any], ...] = ()
     selection: dict[str, str] = field(default_factory=dict)
     mappings: tuple[dict[str, Any], ...] = ()
+    prepared_from: Document | None = field(default=None, repr=False, compare=False)
+    prepared_document: Document | None = field(default=None, repr=False, compare=False)
 
     @property
     def ready(self) -> bool:
@@ -71,6 +77,8 @@ class Candidate:
 
     def merge(self, document: Document) -> Document:
         self.reads.require(document)
+        if document is self.prepared_from and self.prepared_document is not None:
+            return self.prepared_document
         changes: dict[str, Any] = {
             key: (*getattr(document, key), *value) for key, value in self.additions.items()
         }
@@ -82,16 +90,45 @@ class Candidate:
 def install(session: Any, candidate: Candidate) -> dict[str, Any]:
     if not candidate.ready:
         raise ValueError("Resolve the blocking import findings before importing.")
+    require_workspace(session, candidate)
     updated = candidate.merge(session.document)
     for kind in Resources.__dataclass_fields__:
         getattr(session.resources, kind).update(getattr(candidate.resources, kind))
-    keys = (*candidate.additions, "external_references")
+    adopt(session, candidate, updated)
+    return installed(session, candidate)
+
+
+def adopt(session: Any, candidate: Any, updated: Document) -> None:
+    keys = (
+        *candidate.additions,
+        "external_references",
+        "_index",
+        "_registry",
+        "_mirrors",
+        "_formulas",
+    )
     if isinstance(candidate, Candidate):
         keys += ("imports",)
     session.replace_document(
         accepted_outputs=accepted_outputs(candidate), **{key: getattr(updated, key) for key in keys}
     )
-    return installed(session, candidate)
+
+
+def prepared[T](candidate: T, document: Document) -> T:
+    value = cast(Any, candidate)
+    return cast(T, replace(value, prepared_from=document, prepared_document=value.merge(document)))
+
+
+def require_workspace(session: Any, candidate: Any) -> None:
+    from .workspace_policy import included
+
+    if isinstance(candidate, Candidate):
+        keys = {v.parent for v in candidate.additions.get("entities", ())}
+    else:
+        keys = {use.owner for r in candidate.references for use in r.uses}
+    for key in keys & session.document.registry.records.keys():
+        if not included(session.document, session.workspace, key):
+            raise ValueError("Choose a destination or reference owner in the current workspace.")
 
 
 def installed(session: Any, candidate: Any) -> dict[str, Any]:
@@ -107,12 +144,10 @@ def installed(session: Any, candidate: Any) -> dict[str, Any]:
 
 
 def accepted_outputs(candidate: Any) -> frozenset[Port]:
-    from anthroforge.core.tissues import TissueVCP
-
     formulas = {
         Port(r.formula, "formula")
         for r in candidate.additions.get("formula_results", ())
-        if r.status != "pending"
+        if r.status != "pending" and r.error != CHANGED
     }
     tissues = {
         Port(v.id, "final")

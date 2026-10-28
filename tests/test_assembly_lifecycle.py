@@ -63,3 +63,28 @@ def test_inherited_mirror_rule_is_editable_without_anatomical_placeholder(sessio
     assert rule.target not in session.document.registry.records
     session.command("undo")
     assert session.document.mirrors.rules[rule.target].shift == 0.2
+
+
+def test_import_cannot_merge_into_an_unfinished_gesture(session, tmp_path):
+    from tests.test_assembly_commands import prepared as command_prepared
+
+    _, token = command_prepared(session, tmp_path)
+    session.begin()
+    before = session.document
+    with pytest.raises(ValueError, match="current gesture"):
+        session.command("assembly.import", token=token)
+    assert session.document is before and session.history.before is not None
+    session.cancel()
+    session.command("assembly.import", token=token)
+
+
+def test_removing_last_consumer_releases_missing_reference_with_undo(session, tmp_path):
+    from tests.test_assembly_repair import missing_import
+
+    _, key = missing_import(session, tmp_path)
+    references = session.document.external_references
+    assert references
+    session.command("object.delete", target=key)
+    assert not session.document.external_references
+    session.command("undo")
+    assert session.document.external_references == references

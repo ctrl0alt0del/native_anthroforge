@@ -28,6 +28,7 @@ class AssemblyPanel(QObject):
         self.selected, self.mappings, self.options = set(), {}, {}
         self._state, self._references, self._targets, self._properties = {}, [], [], []
         self.focus, self.target, self.signature = "", {}, None
+        self.checked_document, self.checked_candidate = None, None
         self.anatomy.synchronize([])
         self.construction.synchronize([])
 
@@ -141,12 +142,16 @@ class AssemblyPanel(QObject):
         from anthroforge.core.jobs import ObsoleteInputs
 
         candidate = manager.preparation.candidate
-        if candidate is None:
+        document = self.controller.session.document
+        if candidate is None or (
+            self.checked_document is document and self.checked_candidate is candidate
+        ):
             return False
         try:
-            candidate.reads.require(self.controller.session.document)
+            candidate.reads.require(document)
         except ObsoleteInputs:
             return True
+        self.checked_document, self.checked_candidate = document, candidate
         return False
 
     @Slot(str)

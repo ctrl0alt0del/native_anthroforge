@@ -304,7 +304,7 @@ def shortcut_queries(session: "Session", operation: str, arguments: dict[str, An
 
 
 def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
-    require_edit(arguments)
+    require_command_edit(session, operation, arguments)
     implicit = session.history.before is None
     if implicit:
         session.begin()
@@ -317,6 +317,12 @@ def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
         if implicit and session.history.before is not None:
             session.cancel()
         raise
+
+
+def require_command_edit(session: "Session", operation: str, arguments: dict[str, Any]) -> None:
+    require_edit(arguments)
+    if operation in {"assembly.import"} and session.history.before is not None:
+        raise ValueError("Finish the current gesture before importing or resolving anatomy.")
 
 
 def direct_commands(session: "Session") -> dict[str, Any]:

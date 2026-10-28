@@ -18,11 +18,11 @@ from .assets import Asset
 from .changes import ChangeJournal
 from .coordinator import TaskCoordinator
 from .curve_conversion import ConversionPreview
+from .document_relationships import retain_settings
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
 from .history import History
 from .mirror_policy import require_transition as require_mirror_transition
-from .mirror_policy import retain_settings
 from .preferences import PreferenceStore, load_user_preferences
 from .previews import Preview
 from .resources import Resources

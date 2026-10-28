@@ -22,7 +22,10 @@ def blocked(document: Any) -> set[Port]:
 
 
 def mark(preparation: Any) -> None:
+    from .assembly_formula_inputs import invalidate_changed
+
     document = preparation.candidate().merge(preparation.destination)
+    invalidate_changed(preparation, document)
     affected = blocked(document)
     changed = changed_outputs(document, preparation.mapping.changed)
     for group in ("entities", "objects", "controls"):

@@ -3671,3 +3671,39 @@ relocated portable checks. Initial failures, successful reruns and limits are re
 
 Reference: [Cao and Irani,
 GreedyDual-Size](https://www.usenix.org/legacy/publications/library/proceedings/usits97/full_papers/cao/cao_html/node8.html).
+
+### Independent cross-project graph adoption — 2026-10-28 (0.4.2; A01–A03, G03, R01–R06)
+
+Previously within-document copies remapped a subset of construction while opening a package
+replaced the document and ran its opening policy. Assembly now pins a source snapshot, reads
+selected resources, remaps typed authored and accepted metadata, and prepares external-reference
+decisions on the existing coordinator. Full material content, not geometry counts, determines
+retained-binding compatibility. Explicit Rebind uses the same exterior/current-shape kernels;
+untouched support pins remain retained. No geometric equations, solver, tolerance or sampling
+changes were introduced.
+
+Two observed integration defects were corrected at shared boundaries. Accepted-output adoption
+initially treated copied formulas as new edits and unnecessarily changed clavicle geometry;
+publication now declares retained outputs. Selective loading initially omitted the normal
+reader's legacy Fiber frame hints, causing shortcut propagation differences; both readers now
+use the same restoration. Mapped numerical inputs are checked against accepted read values;
+changed inputs reevaluate through existing Live/On Release/Manual policies, while external
+formula outputs stay disabled. Missing prerequisites block only dependent outputs and retain
+noncurrent source geometry. Reference repair updates owned resource metadata, with no source
+file requirement or blanket evaluation.
+
+Production source: 281 MB / 625 objects / 96 tissues. Qualification copied its skeleton and all
+96 tissues in two operations with explicit bone mapping; 492 geometry-bearing records matched
+before and after Ribs Top Radius→3, Humerus Length, Radius Length and Thumb Radius edits.
+The comparison checks coordinates (absolute tolerance 1e-8 m), poses, every tissue stage,
+oriented connectivity and normalized retained-binding records. Thumb Boolean face enumeration
+can differ while the native geometry fingerprint and oriented connectivity remain equal, as
+previously observed in cache qualification. The source SHA256 is unchanged. Maintained entry:
+[assembly qualification](../tools/assembly_qualification.py); raw local artifacts/profile:
+`build/assembly-042/production/`. Tested branch checkpoint: `3a525e5` plus subsequent lifecycle fixes.
+
+Recorded inventory took about 2.2 s and all-muscle preparation 22.8 s on workers. Import plus
+wait took 1.74 s with profiling enabled, so whole-assembly commit is not claimed to meet a
+100 ms interaction target. Source/imported shortcut times are not an overhead comparison:
+only the destination recorded. Numerical/native, complete suite, offscreen and portable
+qualification status is maintained in [the task record](tasks/assembly-042.md).

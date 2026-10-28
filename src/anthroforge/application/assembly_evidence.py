@@ -31,14 +31,14 @@ def retained_provider(document: Any, resources: Any, reference: Any) -> Any:
 
 
 def locations(
-    item: Any, provider: Any, meshes: Any, cancel: int, document: Any = None, batches: Any = None
+    engine: Any, item: Any, provider: Any, meshes: Any, cancel: int, document: Any, batches: Any
 ) -> list[dict[str, Any]]:
     if isinstance(item, Fiber):
         return fiber_locations(item, provider, meshes, cancel)
     if isinstance(item, Anchor):
         return [anchor_location(item, provider, meshes, cancel)]
     if isinstance(item, SCP):
-        return scp_location(item, provider, meshes, document)
+        return scp_location(engine, item, provider, meshes, document)
     if isinstance(item, TissueVCP):
         return region_locations(item, provider, meshes, batches, cancel)
     return []
@@ -52,24 +52,33 @@ def fiber_locations(item: Any, provider: Any, meshes: Any, cancel: int) -> list[
     ]
 
 
-def scp_location(item: Any, provider: Any, meshes: Any, document: Any) -> list[dict[str, Any]]:
+def scp_location(engine: Any, item: Any, provider: Any, meshes: Any, document: Any) -> list[Any]:
     if not item.parent or not item.attachment.binding:
         return []
     ref = SurfaceReference(item.parent, instance=item.attachment.parent_instance)
-    surface = provider(ref)
-    points = scp_points(item, surface, meshes, document)
-    return [dict(point=item.id, target=item.parent, role=ref.role, position=points[:3])]
+    surface = provider(ref) if item.attachment.parent_mode != "OBJECT_ORIGIN" else None
+    points = scp_points(engine, item, surface, meshes, document)
+    return [
+        dict(
+            point=item.id,
+            target=item.parent,
+            role=ref.role,
+            position=points[3:],
+            requested=points[:3],
+        )
+    ]
 
 
-def scp_points(item: Any, surface: Any, meshes: Any, document: Any) -> Any:
+def scp_points(engine: Any, item: Any, surface: Any, meshes: Any, document: Any) -> Any:
     key = item.attachment.material_asset
-    material = meshes[key].mesh if key else surface.resource.mesh
+    handle = surface.resource.mesh.handle if surface else 0
+    material = meshes[key].mesh.handle if key else handle
     return attachments.anchor_points(
-        surface.resource.mesh.engine,
+        engine,
         item,
         document.entity(item.parent),
-        surface.resource.mesh.handle,
-        material.handle,
+        handle,
+        material,
     )
 
 

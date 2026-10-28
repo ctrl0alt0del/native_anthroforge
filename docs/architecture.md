@@ -1176,3 +1176,32 @@ document reference sets only while a document has a live current/history/checkpo
 Collection still checks new resources even when the document has not changed.
 
 [Implementation, profiling and qualification](tasks/display-cache-042.md).
+
+## Cross-project assembly (0.4.2)
+
+The [assembly contract](assembly_042.md) adds an application-owned import session, not
+a second active document. Package inspection pins a checksummed snapshot and decodes its
+inventory without writer ownership or startup work. Typed graph adapters declare identity,
+relationship and resource fields; existing primitive/control copy helpers share them.
+Selection closure distinguishes required construction and junction participants from optional
+anatomical support. Names and recursive text replacement never establish correspondence.
+
+Preparation uses the existing coordinator. Resources carry separate authored-path,
+capture/material and accepted-result metadata. Selective loading shares the normal reader's
+legacy capture-frame restoration. Native world transforms, full material-content comparison
+and confirmed exterior/current-shape capture kernels remain unchanged. Explicit partial rebind
+recaptures only the chosen support and retains the other pins.
+
+Publication validates destination identity, mapped records/ancestors, mirror rules, formula
+writers and repair inputs; unrelated edits remain valid. Accepted-output adoption distinguishes
+saved formulas/tissue stages from new edits. Changed inputs use existing update policies.
+Imported mirror rules own shared boundary scopes without placeholder anatomy. Mapped external
+driver writes stay disabled. One import/repair owns one undo step, separate from current gestures.
+
+Schema 8 records immutable import provenance and typed external references, with readers for
+4–7. Declared missing references are validation/readiness capabilities, never scene objects.
+Affected outputs remain visibly noncurrent with actionable Issues; unrelated components continue.
+Repair uses retained evidence without the source file. Removing the last consumer releases its
+declaration/evidence from current state; history retains its copy. Source skin, fits, workspaces
+and active calculations never enter the destination. Desktop lists use these same operations,
+virtualized/searchable choices and cached unchanged state.

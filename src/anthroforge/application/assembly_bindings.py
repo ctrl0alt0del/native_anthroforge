@@ -171,7 +171,7 @@ class Bindings:
         meshes = self.source_meshes if source else self.resources.meshes
         document = self.p.source.document if source else self.document
         return assembly_evidence.locations(
-            item, provider, meshes, self.cancel, document, resources.bindings
+            self.p.engine, item, provider, meshes, self.cancel, document, resources.bindings
         )
 
     def destination_provider(self, reference: Any) -> Any:

@@ -60,14 +60,13 @@ def test_mapped_external_output_cannot_overwrite_destination_writer(session, tmp
         )
 
 
-def test_resolving_formula_input_restores_result_and_keeps_external_write_disabled(
-    session, tmp_path
-):
+def test_repaired_input_resumes_without_enabling_external_writes(session, tmp_path):
     source, first, other, key, formula, outgoing = formula_source(session, tmp_path)
     candidate = prepared(session, source, [first])
     imported(session, candidate)
     references = session.document.external_references
     resolve(session, {r.id: dict(action="map", target=other) for r in references})
+    session.wait()
     copied = session.document.formula_index.drivers[candidate.identities[key]]
     incoming = formula_result(session, candidate.identities[formula])
     assert incoming.status == "ready", incoming.error
@@ -79,3 +78,23 @@ def test_resolving_formula_input_restores_result_and_keeps_external_write_disabl
 
 def formula_result(session, key):
     return next(r for r in session.document.formula_results if r.formula == key)
+
+
+def test_mapping_a_different_input_value_reevaluates_only_valid_internal_outputs(session, tmp_path):
+    source, first, other, _, formula, outgoing = formula_source(session, tmp_path)
+    destination = curve(session, "Different input")
+    session.command("property.set", reference=reference(destination), value=7)
+    candidate = prepared(session, source, [first], dict(mappings={other: destination}))
+    assert candidate_result(candidate, formula).status == "invalid"
+    imported(session, candidate)
+    assert session.document.object(candidate.identities[first]).resolution == 9
+    assert session.document.object(destination).resolution == 7
+    assert candidate.identities[outgoing] not in session.document.formula_index.formulas
+
+
+def candidate_result(candidate, formula):
+    return next(
+        r
+        for r in candidate.additions["formula_results"]
+        if r.formula == candidate.identities[formula]
+    )

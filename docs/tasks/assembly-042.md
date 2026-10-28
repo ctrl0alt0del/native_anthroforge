@@ -83,6 +83,20 @@ are editable without placeholder anatomy. Source-free formula repair is covered,
 restoring internal formula editability while keeping external outputs disabled. Remaining:
 ownership/readset audit, final GUI/resource checks, documentation, full gate and portable build.
 
+Lifecycle review added source-free formula repair, mapped input-value invalidation, stale formula
+result reads, workspace gates, separate import undo and disposal of orphaned reference evidence.
+Searchable parent/property selectors and optional unique-provenance suggestions are wired.
+Offscreen 625-object dialog is readable with no QML warnings; a probe-only teardown traceback
+occurred after capture because its controller was destroyed before QML (no interactive claim).
+The full suite reached 2,674 passing / two failing mirror-import evidence tests. Both failures
+were origin-attached grouping parents incorrectly requesting surface evidence; the evidence
+adapter now uses the existing native origin anchor with no geometry requirement. Focused rerun passes.
+
+Profiling isolated 0.717 s of repeated graph/index rebuilding in one all-muscle import under
+cProfile. Prepared candidates now retain their validated immutable document indexes and pass
+those through ordinary publication, with destination read-set validation still enforced.
+Unrelated destination changes use the normal merge path. Reprofile and final suite/package pending.
+
 Reference-repair checkpoint: mapped targets, mirror rules and external declarations are in the
 publication read set. Accepted result status is preserved as import provenance; resolving an
 equivalent support restores the accepted result without a new solve. Declared missing formula

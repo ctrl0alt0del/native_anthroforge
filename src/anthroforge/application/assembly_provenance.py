@@ -85,7 +85,7 @@ def rewrite_record(p: Any, document: Any, item: Any, reverse: Any) -> Any:
     targets = external_targets(p, owner)
     changes = {}
     for name, value in results(item):
-        inputs = tuple(rewrite_input(p, document, r, targets, reverse) for r in value.inputs)
+        inputs = tuple(rewrite_input(p, document, r, targets, reverse, owner) for r in value.inputs)
         updated = replace(value, inputs=inputs)
         if not name:
             return updated
@@ -97,16 +97,22 @@ def external_targets(p: Any, owner: str) -> dict[str, str]:
     return {ref.target: target for ref, _, target in p.mapping.replacements.get(owner, ())}
 
 
-def rewrite_input(p: Any, document: Any, value: Any, targets: Any, reverse: Any) -> Any:
+def rewrite_input(p: Any, document: Any, value: Any, targets: Any, reverse: Any, owner: str) -> Any:
     target = targets.get(value.owner, value.owner)
-    updated = replace(value, owner=target)
+    updated = property_input(p, value, owner) or replace(value, owner=target)
     original = graph_records.rewritten(value, reverse)
     try:
         old = construction_policy.revision(p.source.document, Port(original.owner, original.output))
-        current = construction_policy.revision(document, Port(target, value.output))
+        current = construction_policy.revision(document, Port(updated.owner, updated.output))
     except (ValueError, KeyError):
         return updated
     return current if old == original and equivalent_membership(updated, current) else updated
+
+
+def property_input(p: Any, value: Any, owner: str) -> Any:
+    from .assembly_formula_inputs import remapped
+
+    return remapped(p, value, owner)
 
 
 def equivalent_membership(previous: Any, current: Any) -> bool:

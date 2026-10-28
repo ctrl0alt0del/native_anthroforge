@@ -15,7 +15,7 @@ from . import (
     assembly_result_state,
     assembly_snapshots,
 )
-from .assembly_candidate import Candidate, ReadSet, readset
+from .assembly_candidate import Candidate, ReadSet, prepared, readset
 from .assembly_mapping import Mappings
 from .assembly_placement import Placement
 from .resources import Resources
@@ -54,7 +54,7 @@ class Preparation:
             assembly_provenance.rewrite(self)
             self.saved_outputs = assembly_provenance.outputs(self.values)
             assembly_result_state.mark(self)
-        return self.candidate()
+        return prepared(self.candidate(), self.destination)
 
     def select(self, keys: list[str]) -> None:
         mappings = self.options.get("mappings", {})

@@ -1,6 +1,6 @@
 """Prepare reference repair from the destination's retained evidence, without its source file."""
 
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from types import SimpleNamespace
 from typing import Any
 
@@ -13,7 +13,7 @@ from . import (
     assembly_provenance,
     assembly_result_state,
 )
-from .assembly_candidate import ReadSet, readset
+from .assembly_candidate import ReadSet, prepared, readset
 from .assembly_mapping import Mappings
 from .resources import Resources
 
@@ -29,6 +29,8 @@ class Repair:
     mappings: tuple[Any, ...] = ()
     selection: Any = None
     identities: Any = None
+    prepared_from: Any = field(default=None, repr=False, compare=False)
+    prepared_document: Any = field(default=None, repr=False, compare=False)
 
     @property
     def ready(self) -> bool:
@@ -36,6 +38,8 @@ class Repair:
 
     def merge(self, document: Any) -> Any:
         self.reads.require(document)
+        if document is self.prepared_from and self.prepared_document is not None:
+            return self.prepared_document
         changes = {}
         for group, rows in self.additions.items():
             updated = {identity(item): item for item in rows}
@@ -76,7 +80,7 @@ class Preparation:
             self.include_dependents()
             assembly_provenance.rewrite(self)
             assembly_result_state.mark(self)
-        return self.candidate()
+        return prepared(self.candidate(), self.destination)
 
     def include_dependents(self) -> None:
         document = self.candidate().merge(self.destination)
@@ -93,7 +97,7 @@ class Preparation:
         self.values["formula_results"] = restored_formulas(self.destination, self.values, owners)
 
     def candidate(self) -> Repair:
-        keys = self.mapping.reads | {identity(v) for rows in self.values.values() for v in rows}
+        keys = self.mapping.reads | {read_key(v) for rows in self.values.values() for v in rows}
         keys |= {"external:" + r.id for r in self.mapping.references}
         return Repair(
             self.values,
@@ -116,6 +120,10 @@ def record(document: Any, key: str) -> Any:
 
 def identity(item: Any) -> str:
     return str(getattr(item, "id", getattr(item, "formula", "")))
+
+
+def read_key(item: Any) -> str:
+    return identity(item) if hasattr(item, "id") else "formula-result:" + item.formula
 
 
 def affected(document: Any, choices: Any) -> tuple[Any, Any]:

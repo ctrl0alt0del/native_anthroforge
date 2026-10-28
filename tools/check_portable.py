@@ -9,6 +9,7 @@ from functools import partial
 from pathlib import Path
 
 import numpy as np
+from assembly_portable import assembly
 from attached_creation_portable import automatic_construction
 from authoring_workflows_portable import authoring_workflows
 from branch_placement_portable import branches
@@ -58,11 +59,12 @@ CHECKS = (
     "shortcut formulas, typed Parametric paths, persisted results and native consumer rendering",
     "shortcut influence, captured formula inputs, effective policy and propagation completion",
     "session comparison, paired images, bounded replay journal and isolated replay",
-    "strict mirrors, symmetric loops, instance measurements and schema-7 storage",
+    "strict mirrors, symmetric loops, instance measurements and project storage",
     "Fiber pins/supports/cold routing, mirrored tubes, SCP split/replacement and tissue retarget",
     "recent-project history, asynchronous recovery capture and discovery with original retention",
     "skin build, native proxy workers, isolated fitting, persisted playback and OBJ quads",
     "spatial measures, qualified volume samples, placement explanation and frozen view export",
+    "cross-project assembly, embedded images, one-action undo/redo and schema-8 storage",
 )
 
 
@@ -171,6 +173,7 @@ def qualification_steps():
 def construction_steps():
     return (
         construction,
+        assembly,
         direct_workflows,
         automatic_construction,
         branches,

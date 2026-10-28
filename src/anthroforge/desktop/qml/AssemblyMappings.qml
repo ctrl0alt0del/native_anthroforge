@@ -35,6 +35,12 @@ ColumnLayout {
         UiButton { text: "Detach to world"; enabled: panel.selected.relationship==="parent"; onClicked: panel.service.action("detach") }
     }
     UiField { id: targetSearch; Layout.fillWidth: true; placeholderText: "Search destination objects"; enabled: !!panel.selected.key }
+    UiButton {
+        visible: !!panel.selected.suggested
+        text: "Map provenance match"
+        hint: "Same source identity in a previous import. Review the resulting mapping; names are not used."
+        onClicked: { const row=panel.service.targets.find(r=>r.key===panel.selected.suggested); if(row) panel.service.selectTarget(row); }
+    }
     ListView {
         objectName: "assemblyTargets"
         Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumHeight: 95; clip: true; reuseItems: true
@@ -47,17 +53,17 @@ ColumnLayout {
             onClicked: panel.service.selectTarget(modelData)
         }
     }
-    UiCombo {
+    UiSearchChoice {
         Layout.fillWidth: true; visible: !!panel.selected.property
-        model: panel.service.properties; textRole: "name"; currentIndex: -1
-        displayText: currentIndex<0 ? "Choose a matching numerical property" : currentText
-        onActivated: index=>panel.service.mapTarget(panel.service.properties[index].property)
+        choices: panel.service.properties; placeholder: "Search numerical properties"
+        text: "Choose a matching numerical property"
+        onChosen: row=>panel.service.mapTarget(row.property)
     }
     UiCheck {
         objectName: "assemblyRebind"; text: "Rebind to proposed exterior locations"
         enabled: panel.selected.action==="map" && panel.selected.relationship==="support"
         checked: !!panel.selected.rebind
         onClicked: panel.service.action("rebind")
-        hint: "Use new attachment locations only after reviewing the evidence below"
+        hint: "Review original and proposed positions in the Attachment locations tab"
     }
 }

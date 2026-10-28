@@ -70,7 +70,7 @@ ColumnLayout {
         UiButton { text: "Recalculate"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.selected.id]}) }
     }
     UiSection { title:"Source & settings"; stateKey:"tissue/source"; expanded:false
-    UiButton { objectName:"retargetTissueSource"; text:"Change source…"; Layout.fillWidth:true; enabled:!workspace.state.editing && !workspace.state.waiting && !panel.selected.readonly; onClicked:workspace.tissueRetarget.choose(panel.selected.id) }
+    UiButton { objectName:"retargetTissueSource"; text:"Change source…"; Layout.fillWidth:true; enabled:workspace.tissueRetarget.eligibility.start?.available || false; hint:workspace.tissueRetarget.eligibility.start?.reason || "Choose new attached construction and review affected settings."; onClicked:workspace.tissueRetarget.choose(panel.selected.id) }
     UiSection {
         title:"Apply preset"; expanded:false
         UiCombo { objectName:"tissueApplyPreset"; Layout.fillWidth:true; model:panel.selected.tissue_presets || []; textRole:"name"; valueRole:"id"; currentIndex:Math.max(0,model.findIndex(p=>p.id===panel.item.preset)); hint:"Start from a preset configuration. Resets inflation, relaxation and preset-owned constraints.

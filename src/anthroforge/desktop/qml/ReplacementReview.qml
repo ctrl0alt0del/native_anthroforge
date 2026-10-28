@@ -42,7 +42,7 @@ UiDialog {
             Layout.alignment:Qt.AlignRight
             UiButton { text:"Reassess"; visible:dialog.state.state==="stale"; onClicked:dialog.service.retry() }
             UiButton { text:"Cancel"; onClicked:dialog.service.cancel() }
-            UiButton { objectName:"applyReplacement"; text:"Apply replacement"; enabled:dialog.state.state==="ready" && dialog.selected.length===(dialog.state.changes || []).length; onClicked:dialog.service.apply(dialog.selected) }
+            UiButton { objectName:"applyReplacement"; text:"Apply replacement"; enabled:(dialog.service.eligibility.apply?.available || false) && dialog.selected.length===(dialog.state.changes || []).length; hint:dialog.service.eligibility.apply?.reason || ""; onClicked:dialog.service.apply(dialog.selected) }
         }
     }
 }

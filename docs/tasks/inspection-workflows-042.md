@@ -39,13 +39,27 @@ Keep testing background/offscreen; no desktop control. Preserve root `__init__.p
 
 ## Current state
 
-Initial inventory only. No production implementation or new validation completed.
+R01 first increment implemented: immutable shared Eligibility records, replacement
+start/apply assessment shared by API and Qt, and revision/context-keyed desktop
+projection using existing refresh events. No additional polling, queue or policy manager.
+Replacement approvals, candidate ownership and commits retain their existing semantics.
+The UI presents reasons in existing button hints. R02/R03/R06 remain pending.
 
 ## Verification
 
 Pending targeted shared API/desktop tests, native diagnostic tests, geometry/attachment
 invariance, development gate, offscreen visual evidence and canonical packaging.
 Do not claim interactive desktop acceptance from hidden/offscreen checks.
+
+- R01: 30 tests pass across replacement status/view, mesh replacement, tissue retarget
+  and skin status using the qualified native DLL. Includes one-undo preservation,
+  stale rejection, binding/geometry invariants and no repeated idle status assessment.
+- Initial test invocation selected stale `build/dev/bin/af_native.dll` and failed at
+  the missing skin ABI symbol, before geometry execution. Use
+  `ANTHROFORGE_NATIVE_LIBRARY=C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native/bin/af_native.dll`
+  until building this task's native changes. Never report that initial run as a code regression.
+- Ruff passed; mypy found dictionary-union inference in command registration, corrected
+  before the next check. Full development gate and GUI/package checks still pending.
 
 ## Next actions
 

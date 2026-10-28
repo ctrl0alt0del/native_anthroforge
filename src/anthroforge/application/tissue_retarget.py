@@ -12,7 +12,13 @@ from anthroforge.core.results import Port
 from anthroforge.core.tissue_revisions import PHASES
 from anthroforge.core.tissues import TissueVCP
 
-from . import previews, replacement_assessments, replacement_bindings, tissue_tasks
+from . import (
+    previews,
+    replacement_assessments,
+    replacement_bindings,
+    replacement_status,
+    tissue_tasks,
+)
 from . import tissue_retarget_evaluation as evaluation
 from . import tissue_retarget_policy as policy
 from .replacement_reviews import binding_changes, bundle, install_records
@@ -38,8 +44,7 @@ def options(session: Any, target: str) -> list[dict[str, Any]]:
 
 
 def assess(session: Any, target: str, source: str) -> Any:
-    if session.history.before is not None or session.waiting_save:
-        raise ValueError("Finish the current edit before changing a tissue source.")
+    replacement_status.assess(session, SLOT, target).require()
     item = tissue(session, target)
     tissue_policy.domain(session.document.object(source))
     if item.source == source:

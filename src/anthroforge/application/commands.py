@@ -44,6 +44,7 @@ from . import (
     projects,
     property_operations,
     quick_fiber,
+    replacement_status,
     scp_splitting,
     segment_operations,
     shortcut_operations,
@@ -412,6 +413,7 @@ def fiber_queries(session: "Session") -> dict[str, Any]:
 
 def surface_queries(session: "Session") -> dict[str, Any]:
     return {
+        **replacement_queries(session),
         "surface.source_ids": lambda **a: surface_sources.identities(session, **a),
         "surface.preview": lambda **a: surface_preview.preview(session, **a),
         "tissue.source.options": lambda **a: tissue_retarget.options(session, **a),
@@ -424,6 +426,17 @@ def surface_queries(session: "Session") -> dict[str, Any]:
         "surface.grouping": lambda **a: surface_grouping.inspect(session, **a),
         "surface.preview.status": lambda: surface_preview.status(session),
         "surface.preview.cancel": lambda: surface_preview.cancel(session),
+    }
+
+
+def replacement_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "scp.mesh.replace.eligibility": lambda target: replacement_status.describe(
+            session, "mesh_replacement", target
+        ),
+        "tissue.source.replace.eligibility": lambda target: replacement_status.describe(
+            session, "tissue_retarget", target
+        ),
     }
 
 

@@ -76,7 +76,9 @@ def status(session: Any, slot: str) -> dict[str, Any]:
     )
 
 
-def require(session: Any, slot: str, token: str, approved: list[str]) -> Any:
+def ready(session: Any, slot: str, token: str) -> Any:
+    from .replacement_status import validate_target
+
     value = getattr(session, slot)
     if (
         token != value.token
@@ -86,7 +88,13 @@ def require(session: Any, slot: str, token: str, approved: list[str]) -> Any:
     ):
         raise ValueError("A current successful replacement assessment is required.")
     require_unchanged(session, value.target, value.asset)
-    required = {row.key for row in value.asset.changes}
+    validate_target(session, slot, value.target)
+    return value, value.asset
+
+
+def require(session: Any, slot: str, token: str, approved: list[str]) -> Any:
+    value, candidate = ready(session, slot, token)
+    required = {row.key for row in candidate.changes}
     if len(set(approved)) != len(approved) or set(approved) != required:
         raise ValueError("Explicitly approve every listed rebind or discarded setting.")
-    return value, value.asset
+    return value, candidate

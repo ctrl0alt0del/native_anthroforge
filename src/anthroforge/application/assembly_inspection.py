@@ -40,4 +40,5 @@ def candidate_details(candidate: Any) -> dict[str, Any]:
         evidence=candidate.evidence,
         selection=candidate.selection,
         references=[asdict(r) for r in candidate.references],
+        mappings=candidate.mappings,
     )

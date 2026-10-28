@@ -3,6 +3,7 @@
 from typing import Any
 
 from anthroforge.core.assembly import ExternalReference, ImportProvenance, ReferenceUse
+from anthroforge.core.numeric_properties import decode_reference
 
 
 def decode(data: dict[str, Any]) -> dict[str, Any]:
@@ -19,6 +20,10 @@ def provenance(row: dict[str, Any]) -> ImportProvenance:
 
 
 def reference(row: dict[str, Any]) -> ExternalReference:
+    uses = tuple(
+        ReferenceUse(**(v | dict(path=tuple(v.get("path", ()))))) for v in row.get("uses", ())
+    )
+    prop = decode_reference(row["property"]) if row.get("property") else None
     return ExternalReference(
-        **(row | dict(uses=tuple(ReferenceUse(**v) for v in row.get("uses", ()))))
+        **(row | dict(uses=uses, property=prop, surface_frame=tuple(row.get("surface_frame", ()))))
     )

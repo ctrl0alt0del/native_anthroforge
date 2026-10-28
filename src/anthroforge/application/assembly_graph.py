@@ -31,7 +31,12 @@ def roots(selection: Any) -> tuple[str, ...]:
 
 
 def records(selection: Any) -> tuple[Any, ...]:
-    return (*selection.records.values(), *selection.junctions, *selection.drivers)
+    return (
+        *selection.records.values(),
+        *selection.junctions,
+        *selection.drivers,
+        *selection.shortcuts,
+    )
 
 
 def identities(selection: Any, resources: Any = None) -> dict[str, str]:

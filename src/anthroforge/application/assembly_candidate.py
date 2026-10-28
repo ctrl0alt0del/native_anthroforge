@@ -37,6 +37,7 @@ class Candidate:
     findings: tuple[dict[str, Any], ...] = ()
     evidence: tuple[dict[str, Any], ...] = ()
     selection: dict[str, str] = field(default_factory=dict)
+    mappings: tuple[dict[str, Any], ...] = ()
 
     @property
     def ready(self) -> bool:

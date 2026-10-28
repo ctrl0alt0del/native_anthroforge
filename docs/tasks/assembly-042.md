@@ -31,15 +31,19 @@ Foundation implemented: schema-8 provenance/reference records, explicit typed fi
 reference-aware validation/readiness and automatic Issues. Source inspection pins a package;
 graph closure/selective resource transfer and coordinator-backed headless self-contained
 construction import work with one-action undo. Existing primitive/deformer duplication now
-uses the same typed remapper. External mapping, anatomical root binding, mirrors, reference
-repair and desktop workflow are still unfinished; do not use this checkpoint as a release.
+uses the same typed remapper. Relationship-specific mapping and world-preserving parent
+detachment work. Native full-content comparison rejects merely matching geometry counts;
+explicit Fiber rebind uses existing current-shape capture. Missing references retain visible
+invalid source results and surface evidence for later repair. Mirrors, full rebind evidence,
+reference repair and desktop workflow remain unfinished; do not use this checkpoint as a release.
 
 ## Verification
 
-Initial foundation checks pass. Eight current API/resource/architecture checks verify
+Initial foundation checks pass. Current API/resource/architecture checks verify
 selected resources, copied accepted definitions, source removal after inspection, persistence,
-undo and cancellation. Mapping/production/full-suite qualification is pending. Full
-qualification pending. Baseline: 2,641 Python tests, six native suites and 32 portable checks qualified
+undo and cancellation. Mapping tests cover world-preserving parent changes, retained Fiber
+bindings, missing supports, incompatible geometry, and explicit rebind. Focused mypy passes.
+Production/full-suite qualification remains pending. Baseline: 2,641 Python tests, six native suites and 32 portable checks qualified
 by the preceding display/cache task. Keep new checks background/offscreen.
 
 ## Next actions and blockers

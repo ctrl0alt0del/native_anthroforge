@@ -16,6 +16,7 @@ class Selection:
     reasons: dict[str, str]
     junctions: tuple[Any, ...]
     drivers: tuple[Any, ...]
+    shortcuts: tuple[Any, ...] = ()
 
 
 def expand(document: Any, selected: list[str], attached: bool = False) -> Selection:
@@ -31,7 +32,12 @@ def expand(document: Any, selected: list[str], attached: bool = False) -> Select
     complete_sources(document, reasons)
     picked = {key: records[key] for key in reasons}
     shared = selected_junctions(document, picked)
-    return Selection(picked, reasons, shared, selected_drivers(document, set(picked)))
+    return selection_records(document, picked, reasons, shared)
+
+
+def selection_records(document: Any, picked: Any, reasons: Any, shared: Any) -> Selection:
+    wrappers = tuple(s for s in document.shortcuts if s.reference.target in picked)
+    return Selection(picked, reasons, shared, selected_drivers(document, set(picked)), wrappers)
 
 
 def complete_sources(document: Any, reasons: dict[str, str]) -> None:

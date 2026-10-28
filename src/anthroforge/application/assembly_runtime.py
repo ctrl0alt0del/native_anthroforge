@@ -9,7 +9,7 @@ from anthroforge.core.jobs import Job, ObsoleteInputs
 from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
-from . import assembly_copy, assembly_source
+from . import assembly_preparation, assembly_source
 
 
 @dataclass
@@ -120,5 +120,4 @@ def inspect(path: str, _: Any, cancel: Any) -> Any:
 def prepare(
     source: Any, selected: Any, options: Any, engine: Any, payload: Any, cancel: Any
 ) -> Any:
-    destination, _ = payload
-    return assembly_copy.copy_closed(source, destination, selected, engine, cancel)
+    return assembly_preparation.prepare(source, selected, options, engine, payload, cancel)

@@ -23,17 +23,24 @@ def selected(source: Any, keys: list[str], attached: bool, mappings: Any) -> Any
         seeds |= additions
 
 
-def additions(document: Any, selection: Any, ids: Any, assets: Any) -> dict[str, tuple[Any, ...]]:
+def source_records(document: Any, selection: Any) -> dict[str, tuple[Any, ...]]:
     picked = set(selection.records)
     values = {
         name: tuple(v for v in getattr(document, name) if v.id in picked)
         for name in ("entities", "objects", "controls")
     }
     values.update(junctions=selection.junctions, driving_shortcuts=selection.drivers)
-    values["shortcuts"] = tuple(s for s in document.shortcuts if s.reference.target in picked)
+    values["shortcuts"] = selection.shortcuts
     formulas = {f.id for d in selection.drivers for f in d.formulas}
     values["formula_results"] = tuple(r for r in document.formula_results if r.formula in formulas)
-    return {key: graph_records.rewritten(rows, ids, assets) for key, rows in values.items()}
+    return values
+
+
+def additions(document: Any, selection: Any, ids: Any, assets: Any) -> dict[str, tuple[Any, ...]]:
+    return {
+        key: graph_records.rewritten(rows, ids, assets)
+        for key, rows in source_records(document, selection).items()
+    }
 
 
 def destination_parent(destination: Any, parent: str, required: bool) -> str:

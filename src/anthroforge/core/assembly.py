@@ -5,6 +5,8 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import Any
 
+from .numeric_properties import PropertyRef
+
 
 @dataclass(frozen=True, slots=True)
 class ReferenceUse:
@@ -12,6 +14,7 @@ class ReferenceUse:
     relationship: str
     output: str = "geometry"
     role: str = ""
+    path: tuple[str | int, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,6 +27,12 @@ class ExternalReference:
     kind: str
     uses: tuple[ReferenceUse, ...] = ()
     target: str = ""
+    property: PropertyRef | None = None
+    numeric_type: str = ""
+    dimension: str = ""
+    components: int = 0
+    surface_asset: str = ""
+    surface_frame: tuple[float, ...] = ()
 
     def __post_init__(self) -> None:
         if not all((self.id, self.source_document, self.source_entity, self.kind)):

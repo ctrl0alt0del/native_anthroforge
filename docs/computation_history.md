@@ -3581,3 +3581,8 @@ observations under concurrent checks, not an isolated performance claim. Existin
 crossing pairs remain advisory. Offscreen controls and hidden GPU inspection pass.
 Portable qualification remains pending. Evidence:
 `build/skin-041/reference-parity`, and [task record](tasks/release-041.md).
+
+Whole-body FAST weight reuse: cold 113.638 s / new-process warm 17.257 s, 128 handles,
+identical positions/diagnostics/prediction hash. A single pair during packaging establishes
+reuse, not a controlled speedup estimate. The unchanged BBW iteration-limit messages on
+cold computation remain; caching does not strengthen convergence or geometry guarantees.

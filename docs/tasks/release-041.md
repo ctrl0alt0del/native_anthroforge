@@ -89,8 +89,22 @@ The retained topology has 4,706 crossing pairs; all 256 bounded current witnesse
 occur in the reference. This is not evidence that no additional intersections exist.
 Sampled nearest-normal clearance remains a limited diagnostic, not a volume test.
 
-Version advanced to 0.4.1 after runtime qualification. Portable packaging/checks and final
-source archive remain pending. Outputs are under `build/skin-041`; do not claim release
+Persistent FAST on the same whole-body reference with 128 handles: fresh-process cold
+preparation 113.638 s, warm preparation 17.257 s; combined positions/solver diagnostics/
+predictions have identical SHA-256. One pair with packaging active, not a controlled
+statistical benchmark. The unchanged BBW kernel logged iteration-limit messages during
+cold weights; cache reuse is not a new convergence guarantee. Compact fixtures separately
+cover restart, invalid metadata, checksum damage and unavailable storage.
+
+Ownership/coupling review: effective settings remain a pure shared core/application query;
+reference selection/read dependencies belong to application; numerical diagnostics and
+ownership counts are native; diagnostic publication is advisory and has no scheduler or
+repair authority. FAST disk products are disposable, atomic and outside document/history.
+Desktop consumes retained reports rather than recomputing or duplicating geometric rules.
+
+Version advanced to 0.4.1 after runtime qualification. The canonical portable executable
+is built; portable checks and final source archive remain pending. Outputs are under
+`build/skin-041`; do not claim release
 acceptance yet. No physical interactive desktop acceptance is claimed.
 The following are observed ownership boundaries, not claims that their current results
 are wrong. Existing shared policies should be reused, not replaced with parallel checks.
@@ -108,7 +122,7 @@ do not automatically need an application status provider. `tissue_retarget_polic
 `mesh_replacement_policy.py` assess proposed compatibility changes, not generic action
 availability. Keep these responsibilities distinct.
 
-## Proposed first increment
+## Future status-provider increment (not part of this release)
 
 Start with Change tissue source and Replace imported mesh: the UI and application
 currently express overlapping operation conditions in identifiable places. Establish a
@@ -151,12 +165,9 @@ or policy. Preserve the user's requirement to discuss such changes before implem
 
 ## Next actions and recovery
 
-1. Compare reference proxy inputs with the addon, then integrate source selection,
-   Decimate and complete provenance; test fallback, stale publication, retry and undo.
-2. Complete diagnostics and achieved budgets using shared native numerical boundaries.
-3. Add persistent FAST cache and the effective-setting/reset/fitting UI corrections.
-4. Run focused checks, full development gate, background GUI and portable qualification;
-   update computation history, workflow, version and release evidence before integration.
+1. Complete the running relocated minimal-PATH portable checks, including new report/reset.
+2. Create and verify the corresponding source archive and final documentation links.
+3. Merge the validated branch into main, push and record the release evidence.
 
 Preserve the unrelated root `__init__.py`. No new artifacts belong in WIP_models. The
 optimized local native build used for 0.4.0 is

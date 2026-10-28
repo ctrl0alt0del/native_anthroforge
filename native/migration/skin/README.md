@@ -48,9 +48,12 @@ Source capture and coarse scalar fields are separate from these source-aware pre
 The first source-port tests preserve gap width, stricter two-sided policy selection,
 winding independence and disjoint patches of a single source.
 
-## Standalone centerline adaptation
+## Earlier standalone centerline adaptation
 
-The confirmed 0.4.0 policy uses bare-Fiber centerlines, not Blender bevel meshes.
+This intermediate adaptation was superseded by the October 27 decision: released
+0.4.0 excludes all construction from physical draft/deformation sources. Fiber paths
+can still guide topology. The native query support below remains available internally;
+it does not mean released draft skin includes bare Fibers.
 `af_skin_gap.hpp` now consults an owned segment AABB for nearest-distance/support
 queries; zero-width lines do not claim opposing surface normals. Empty triangle ray
 queries are safe. `af_skin_bind.hpp` preserves the existing triangle-only weighting

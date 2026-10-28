@@ -1,6 +1,8 @@
 # Skin migration inventory for 0.4.0
 
-Status: **release scope confirmed; implemented on `codex/skin-040`, qualification in progress**.
+Status: **0.4.0 implemented, qualified and merged**; accepted limits remain in its
+[task record](tasks/skin-040.md). The [0.4.1 audit corrections](tasks/release-041.md)
+complete reference preparation, diagnostics, budgets, caching and inspector feedback.
 
 **October 27 review:** the tables below describe the addon, including its bare-Fiber
 contributors. The confirmed standalone contract now excludes construction from physical

@@ -46,6 +46,9 @@ def get(session: Any, reference: dict[str, Any]) -> dict[str, Any]:
 
 
 def read(session: Any, reference: numeric.PropertyRef, item: Any = None) -> Any:
+    from anthroforge.core.assembly import require_resolved
+
+    require_resolved(session.document.registry.records, reference.target)
     if reference.path[0] in ("transform", "world_transform"):
         from .property_transforms import read as transform_read
 

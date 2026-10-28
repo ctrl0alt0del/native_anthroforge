@@ -61,18 +61,22 @@ def selected_junctions(document: Any, records: dict[str, Any]) -> tuple[Any, ...
 
 
 def attached_tissues(document: Any, selected: set[str]) -> set[str]:
-    return {
-        item.id
-        for item in document.objects
-        if isinstance(item, TissueVCP) and tissue_supports(document, item.source, set()) & selected
+    supports = {
+        v.id: tissue_supports(document, v.source, set())
+        for v in document.objects
+        if isinstance(v, TissueVCP)
     }
+    found = set(selected)
+    while added := {key for key, targets in supports.items() if targets & found} - found:
+        found |= added
+    return found - selected
 
 
 def tissue_supports(document: Any, key: str, visited: set[str]) -> set[str]:
     if key in visited:
         return set()
     visited.add(key)
-    item = document.object(key)
+    item = document.registry.records.get(key)
     if isinstance(item, Fiber):
         return {binding.target for binding in item.bindings}
     if isinstance(item, TissueVCP):
@@ -94,7 +98,7 @@ def selected_drivers(document: Any, selected: set[str]) -> tuple[Any, ...]:
         driver = index[pending.pop()]
         for formula in driver.formulas:
             for entry in formula.inputs:
-                if entry.driver and entry.driver not in found:
+                if entry.driver in index and entry.driver not in found:
                     found.add(entry.driver)
                     pending.append(entry.driver)
     return tuple(d for d in document.driving_shortcuts if d.id in found)

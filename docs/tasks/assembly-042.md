@@ -65,6 +65,12 @@ by the preceding display/cache task. Keep new checks background/offscreen.
 
 ## Next actions and blockers
 
+Reference-repair checkpoint: mapped targets, mirror rules and external declarations are in the
+publication read set. Accepted result status is preserved as import provenance; resolving an
+equivalent support restores the accepted result without a new solve. Declared missing formula
+inputs now fail locally and external driver writes remain disabled. Formula/writer and repair
+tests pass; broader production, coupling and portable qualification remain pending.
+
 1. Complete graph closure, copy/resource adapters and headless import/mapping.
 2. Complete lifecycle integration, reference repair and desktop workflow.
 3. Qualify production geometry/lifecycle and rebuild the canonical package/source archive.

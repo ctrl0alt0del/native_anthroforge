@@ -2,7 +2,12 @@
 
 from typing import Any
 
-from anthroforge.core.assembly import ExternalReference, ImportProvenance, ReferenceUse
+from anthroforge.core.assembly import (
+    ExternalReference,
+    ImportProvenance,
+    ReferenceUse,
+    RetainedOutput,
+)
 from anthroforge.core.numeric_properties import decode_reference
 
 
@@ -14,6 +19,7 @@ def decode(data: dict[str, Any]) -> dict[str, Any]:
 
 
 def provenance(row: dict[str, Any]) -> ImportProvenance:
+    row = dict(row, outputs=tuple(RetainedOutput(**v) for v in row.get("outputs", ())))
     return ImportProvenance(
         **(row | {key: tuple(map(tuple, row.get(key, ()))) for key in ("identities", "mappings")})
     )

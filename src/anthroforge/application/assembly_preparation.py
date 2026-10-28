@@ -10,13 +10,14 @@ from . import (
     assembly_copy,
     assembly_graph,
     assembly_mirrors,
+    assembly_provenance,
     assembly_resources,
     assembly_result_state,
     assembly_snapshots,
 )
-from .assembly_candidate import Candidate, ReadSet
+from .assembly_candidate import Candidate, ReadSet, readset
 from .assembly_mapping import Mappings
-from .assembly_placement import Placement, frame_reads
+from .assembly_placement import Placement
 from .resources import Resources
 
 
@@ -37,6 +38,7 @@ class Preparation:
     values: dict[str, tuple[Any, ...]] = field(default_factory=dict)
     parent: str = ""
     evidence: tuple[dict[str, Any], ...] = ()
+    saved_outputs: tuple[Any, ...] = ()
 
     def run(self, keys: list[str]) -> Candidate:
         self.select(keys)
@@ -49,6 +51,8 @@ class Preparation:
         candidate = self.candidate()
         if candidate.ready:
             self.evidence = assembly_bindings.assess(self, candidate)
+            assembly_provenance.rewrite(self)
+            self.saved_outputs = assembly_provenance.outputs(self.values)
             assembly_result_state.mark(self)
         return self.candidate()
 
@@ -105,13 +109,11 @@ class Preparation:
             self.resources.attachments[self.assets[key]] = replace(value, targets=targets)
 
     def candidate(self) -> Candidate:
-        mapped = tuple((r.source_entity, r.target) for r in self.mapping.references if r.target)
-        provenance = assembly_copy.provenance(self.source, self.ids, mapped)
         return Candidate(
             self.values,
             self.resources,
             self.ids,
-            provenance,
+            self.provenance(),
             tuple(self.mapping.references),
             self.readset(),
             tuple(self.mapping.findings),
@@ -120,14 +122,16 @@ class Preparation:
             mappings=tuple(self.mapping.rows),
         )
 
+    def provenance(self) -> Any:
+        mapped = tuple((r.source_entity, r.target) for r in self.mapping.references if r.target)
+        return replace(
+            assembly_copy.provenance(self.source, self.ids, mapped), outputs=self.saved_outputs
+        )
+
     def readset(self) -> ReadSet:
         targets = self.mapping.reads | ({self.parent} if self.parent else set())
-        reads = tuple(
-            (key, self.destination.object(key))
-            for key in sorted(frame_reads(self.destination, targets))
-        )
         empty = bool(assembly_graph.roots(self.selection)) and not self.destination.entities
-        return ReadSet(str(self.destination.id), reads, empty)
+        return readset(self.destination, targets, empty)
 
 
 def prepare(

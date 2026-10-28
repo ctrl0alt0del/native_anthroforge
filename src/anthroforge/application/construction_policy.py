@@ -63,10 +63,11 @@ def revisions(document: Document, ports: set[Port]) -> tuple[ReadRevision, ...]:
 
 
 def revision(document: Document, port: Port) -> ReadRevision:
+    from .external_references import revision as external_revision
     from .formula_inputs import revision as formula_revision
     from .skin_inputs import revision as skin_revision
 
-    special = skin_revision(document, port)
+    special = external_revision(document, port) or skin_revision(document, port)
     if special is None and document.driving_shortcuts:
         special = formula_revision(document, port)
     if special is not None:

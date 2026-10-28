@@ -6,10 +6,15 @@ from typing import Any
 
 from anthroforge.core import graph_records
 
-from . import assembly_bindings, assembly_graph, assembly_metadata, assembly_result_state
-from .assembly_candidate import ReadSet
+from . import (
+    assembly_bindings,
+    assembly_graph,
+    assembly_metadata,
+    assembly_provenance,
+    assembly_result_state,
+)
+from .assembly_candidate import ReadSet, readset
 from .assembly_mapping import Mappings
-from .assembly_placement import frame_reads
 from .resources import Resources
 
 
@@ -33,8 +38,10 @@ class Repair:
         self.reads.require(document)
         changes = {}
         for group, rows in self.additions.items():
-            updated = {item.id: item for item in rows}
-            changes[group] = tuple(updated.get(item.id, item) for item in getattr(document, group))
+            updated = {identity(item): item for item in rows}
+            changes[group] = tuple(
+                updated.get(identity(item), item) for item in getattr(document, group)
+            )
         mapped = {r.id: r for r in self.references}
         changes["external_references"] = tuple(
             mapped.get(r.id, r) for r in document.external_references
@@ -59,34 +66,39 @@ class Preparation:
 
     def run(self) -> Repair:
         for group, rows in self.values.items():
-            self.values[group] = tuple(self.mapping.patch(item, item) for item in rows)
+            self.values[group] = tuple(
+                self.mapping.patch(item, assembly_provenance.restore(self.destination, item))
+                for item in rows
+            )
         assembly_metadata.repair(self)
         if self.candidate().ready:
             self.evidence = assembly_bindings.assess(self, self.candidate())
             self.include_dependents()
+            assembly_provenance.rewrite(self)
             assembly_result_state.mark(self)
         return self.candidate()
 
     def include_dependents(self) -> None:
         document = self.candidate().merge(self.destination)
         changed = {v.id for rows in self.values.values() for v in rows}
-        self.mapping.changed.update(changed)
         affected = assembly_result_state.changed_outputs(document, changed)
         owners = {p.owner for p in affected}
         for group in ("entities", "objects", "controls"):
             previous = {v.id for v in self.values[group]}
             self.values[group] += tuple(
-                v for v in getattr(document, group) if v.id in owners - previous
+                assembly_provenance.restore(self.destination, v)
+                for v in getattr(document, group)
+                if v.id in owners - previous
             )
 
     def candidate(self) -> Repair:
-        keys = frame_reads(self.destination, self.mapping.reads | self.ids.keys())
-        reads = tuple((key, record(self.destination, key)) for key in sorted(keys))
+        keys = self.mapping.reads | {identity(v) for rows in self.values.values() for v in rows}
+        keys |= {"external:" + r.id for r in self.mapping.references}
         return Repair(
             self.values,
             self.resources,
             tuple(self.mapping.references),
-            ReadSet(str(self.destination.id), reads),
+            readset(self.destination, keys),
             tuple(self.mapping.findings),
             self.evidence,
             tuple(self.mapping.rows),
@@ -99,6 +111,10 @@ def record(document: Any, key: str) -> Any:
     return next(
         (d for d in document.driving_shortcuts if d.id == key), document.registry.records.get(key)
     )
+
+
+def identity(item: Any) -> str:
+    return str(getattr(item, "id", getattr(item, "formula", "")))
 
 
 def affected(document: Any, choices: Any) -> tuple[Any, Any]:

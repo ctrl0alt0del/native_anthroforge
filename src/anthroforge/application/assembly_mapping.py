@@ -56,6 +56,10 @@ class Mappings:
         target = str(decision.get("target", ""))
         compatible(self.source.document, self.destination, row, decision, target)
         self.reads.add(target)
+        if decision.get("instance"):
+            self.reads.add("mirror:" + decision["instance"])
+        if row.property:
+            self.reads.add("formula_writers")
         return target
 
     def patch(self, original: Any, item: Any) -> Any:

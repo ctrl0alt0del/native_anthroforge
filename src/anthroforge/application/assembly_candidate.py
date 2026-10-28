@@ -30,9 +30,25 @@ class ReadSet:
 def read_record(document: Any, key: str) -> Any:
     if key.startswith("mirror:"):
         return document.mirrors.rules.get(key.removeprefix("mirror:"))
+    if key.startswith("external:"):
+        return next((r for r in document.external_references if r.id == key[9:]), None)
+    if key == "formula_writers":
+        return tuple(
+            (f.id, f.target) for d in document.driving_shortcuts for f in d.formulas if f.enabled
+        )
     return next(
         (v for v in (*document.driving_shortcuts, *document.shortcuts) if v.id == key),
         document.registry.records.get(key),
+    )
+
+
+def readset(document: Any, keys: set[str], empty: bool = False) -> ReadSet:
+    from .assembly_placement import frame_reads
+
+    return ReadSet(
+        str(document.id),
+        tuple((key, read_record(document, key)) for key in sorted(frame_reads(document, keys))),
+        empty,
     )
 
 

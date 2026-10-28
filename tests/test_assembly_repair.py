@@ -20,16 +20,22 @@ def test_repair_without_source_file_is_atomic_and_preserves_original(session, tm
     before = session.document.object(key)
     refs = session.command("assembly.references")
     mappings = {r["id"]: dict(action="map", target=target) for r in refs if not r["target"]}
+    resolve(session, mappings)
+    session.wait()
+    assert session.document.object(key).bindings[0].target == target
+    assert session.document.object(key).result.status == "ready"
+    assert session.document.object(key).result.revision == before.result.revision
+    session.command("undo")
+    assert session.document.object(key) == before
+
+
+def resolve(session, mappings):
     result = session.command("assembly.resolve", mappings=mappings)
     session.wait()
     status = session.command("assembly.status")
     assert status["state"] == "ready", status
     assert status["ready"], status
-    session.command("assembly.import", token=result["token"])
-    session.wait()
-    assert session.document.object(key).bindings[0].target == target
-    session.command("undo")
-    assert session.document.object(key) == before
+    return session.command("assembly.import", token=result["token"])
 
 
 def test_pending_surface_evidence_round_trips_without_source(session, tmp_path):

@@ -41,12 +41,17 @@ def schedule(session: Any, targets: set[str], explicit: bool = False) -> None:
 
 
 def schedule_outputs(
-    session: Any, ports: set[Port] | frozenset[Port], explicit: bool = False
+    session: Any, ports: set[Port] | frozenset[Port], explicit: bool = False, released: bool = False
 ) -> None:
     for roles, family in FAMILIES:
-        family.schedule(session, {p.owner for p in ports if p.output in roles}, explicit=explicit)
+        family.schedule(
+            session,
+            {p.owner for p in ports if p.output in roles},
+            explicit=explicit,
+            released=released,
+        )
     geometry = {p.owner for p in ports if p.output == "geometry"}
-    construction_tasks.schedule(session, geometry, explicit=explicit)
+    construction_tasks.schedule(session, geometry, explicit=explicit, released=released)
 
 
 def propagate(session: Any, seeds: set[Port]) -> None:

@@ -193,6 +193,13 @@ def walk_field(target: str, owner: Any, name: str, path: tuple[str, ...]) -> Ite
 
 
 def resolve(document: Any, reference: numeric.PropertyRef) -> numeric.NumericDescriptor:
+    from .external_references import property_descriptor
+
+    pending = property_descriptor(document, reference)
+    return pending if pending is not None else resolved_object(document, reference)
+
+
+def resolved_object(document: Any, reference: numeric.PropertyRef) -> numeric.NumericDescriptor:
     from .property_transforms import descriptors as transforms
 
     item = document.object(reference.target)

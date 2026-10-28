@@ -44,6 +44,17 @@ class ExternalReference:
 
 
 @dataclass(frozen=True, slots=True)
+class RetainedOutput:
+    owner: str
+    field: str
+    asset: str
+    revision: int
+    generation: int
+    status: str
+    error: str = ""
+
+
+@dataclass(frozen=True, slots=True)
 class ImportProvenance:
     id: str
     source_document: str
@@ -52,6 +63,7 @@ class ImportProvenance:
     source_name: str
     identities: tuple[tuple[str, str], ...] = ()
     mappings: tuple[tuple[str, str], ...] = ()
+    outputs: tuple[RetainedOutput, ...] = ()
 
 
 @dataclass(frozen=True)

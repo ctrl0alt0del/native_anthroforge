@@ -1,20 +1,56 @@
-# AnthroForge 0.4.1 preparation
+# AnthroForge 0.4.1 skin audit completion
 
 - Task branch: `codex/release-041`
 - Integration branch: `main`
 - Starting revision: `9363267` (qualified 0.4.0 merge)
-- Status: in progress; inventory only, no runtime changes
+- Status: in progress; seven audited skin gaps authorized for implementation
 - Last updated: 2026-10-28, Europe/Bucharest
 - Active writer: local desktop chat
 
 ## Outcome and acceptance
 
 The user accepted 0.4.0, requested its merge into main, and requested starting 0.4.1.
-The merge is complete. The previously confirmed next-version direction is broader use
-of operation-specific status providers, following SkinStatusProvider. See
+The merge is complete. On October 28, the user authorized implementing all seven skin
+audit findings below according to the engineering guidelines. This is the current scope.
+The previously confirmed next-version direction is broader use of operation-specific
+status providers, following SkinStatusProvider. See
 [architecture](../architecture.md#shared-operation-status-providers) and
-[roadmap](../roadmap.md). An asynchronous question about additional 0.4.1 priorities
-has not received an answer; do not infer new skin algorithm or quality changes.
+[roadmap](../roadmap.md). The provider inventory below is retained for later integration;
+do not displace the newly authorized skin corrections with that generic refactoring.
+
+## Authorized skin work, ownership and acceptance
+
+1. Restore addon reference preparation: prefer the draft envelope, reduce it with the
+   existing Blender Decimate subset to approximately 64,000 triangles, and tetrahedralize.
+   Preserve explicit initialization without an envelope by using topology as in the addon.
+   Application owns source selection/read dependencies; native code owns geometry.
+   Compare actual proxy input with Blender before connecting the production path.
+2. Complete final-deformation diagnostics: report native convergence/inversion/embedding
+   and contact-motion findings, restore final intersection/baseline comparison and sampled
+   anatomy clearance. Numerical queries stay native; publication/Issues consume retained
+   reports. Findings remain advisory, never a new repair or rejection rule.
+3. Restore achieved subtree topology budgets and the addon's 20% deviation warnings.
+   Native code counts output ownership; application maps counts to named budget regions.
+4. Restore checksummed persistent FAST weight reuse with owned atomic disk-cache IO.
+   Preserve solver settings and in-memory preparation; invalid/unavailable cache falls
+   back to actual computation. Prove reuse across new preparations/processes.
+5. Correct effective inherited gap and Auto collagen presentation through shared resolved
+   settings. Preserve authored override values, scalar defaults and one-action undo.
+6. Add the addon's one-action draft field Reset Defaults through a shared command.
+7. Display active fitted-bone count and moving-region validation error already calculated
+   by the fitter, alongside the existing whole-mesh measurements.
+
+Audit evidence: with document gap 2%/25%, the UI showed 0.5%/100% while capture correctly
+used 2%/25%. Auto Ear collagen showed scalar 1 while capture used 0. A synthetic report
+with 80 FAST steps, negative proxy Jacobian, outside embeddings and motion violations
+generated no Issues. Reference preparation used topology directly; retained FAST files
+were temporary. No production code was changed during the audit.
+
+Preserve approved physical source exclusions, tissue-surface preference, both-side
+sampling, topology identity, retained attachments, cancellation and save/undo semantics.
+Any further algorithm or policy change requires user discussion before implementation.
+Use background/offscreen checks, native/addon comparisons, the development gate and one
+canonical portable release. Store temporary evidence under `build/skin-041`, not WIP_models.
 
 Status assessments must stay read-only, share application policies with command execution,
 and use existing notifications. Preserve operation-specific reasons and warnings, workspace
@@ -23,7 +59,8 @@ introduce a universal status manager, polling, or a second authoritative eligibi
 
 ## Current state and initial inventory
 
-No new release version, project schema, numerical algorithm or UI behavior has changed.
+No runtime changes have been made at this checkpoint. Release version changes follow
+qualification; schema 7 remains sufficient for these corrections.
 The following are observed ownership boundaries, not claims that their current results
 are wrong. Existing shared policies should be reused, not replaced with parallel checks.
 
@@ -83,11 +120,12 @@ or policy. Preserve the user's requirement to discuss such changes before implem
 
 ## Next actions and recovery
 
-1. Incorporate any answer about 0.4.1 priorities; preserve the confirmed provider direction.
-2. Complete caller/event mapping for the first increment, then implement shared assessment
-   and desktop integration with focused contract tests.
-3. Expand only where the inventory establishes duplicated rules or missing shared reasons.
-4. Run relevant headless and background desktop checks, and qualification before release.
+1. Compare reference proxy inputs with the addon, then integrate source selection,
+   Decimate and complete provenance; test fallback, stale publication, retry and undo.
+2. Complete diagnostics and achieved budgets using shared native numerical boundaries.
+3. Add persistent FAST cache and the effective-setting/reset/fitting UI corrections.
+4. Run focused checks, full development gate, background GUI and portable qualification;
+   update computation history, workflow, version and release evidence before integration.
 
 Preserve the unrelated root `__init__.py`. No new artifacts belong in WIP_models. The
 optimized local native build used for 0.4.0 is

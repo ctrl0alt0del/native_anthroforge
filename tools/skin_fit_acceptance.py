@@ -17,7 +17,7 @@ from workbench_acceptance import activate, reveal
 from anthroforge.desktop import app, runtime
 from anthroforge.desktop.controller import Controller
 
-OUTPUT = Path("build/skin-040/ui").resolve()
+OUTPUT = Path(os.environ.get("AF_SKIN_OUTPUT", "build/skin-040/ui")).resolve()
 
 
 def settle(controller):
@@ -59,6 +59,17 @@ def fit(controller, window):
     assert window.grabWindow().save(str(OUTPUT / "fit-preview.png"))
 
 
+def diagnostics(controller, window):
+    before = controller.session.document
+    report = controller.session.command("skin.report")
+    assert "solver" in report["final"]["report"]
+    assert "intersections" in report["final"]["report"]
+    reveal(window, "skinAchievedBudgets")
+    QTest.qWait(100)
+    assert window.grabWindow().save(str(OUTPUT / "skin-diagnostics.png"))
+    assert controller.session.document is before
+
+
 def exercise(application):
     controller, warnings = Controller(), []
     controller.timer.stop()
@@ -78,6 +89,7 @@ def scenarios(controller, window):
     QTest.qWait(200)
     setup_view(controller, window)
     fit(controller, window)
+    diagnostics(controller, window)
 
 
 def main():

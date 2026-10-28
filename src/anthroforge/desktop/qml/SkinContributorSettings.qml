@@ -27,6 +27,7 @@ ColumnLayout {
             onActivated:panel.change("gap_mode", currentIndex ? "OVERRIDE" : "INHERIT")
         }
         NumericSetting {
+            objectName:"skinSourceGapLimit"
             visible:!panel.contributor.fiber
             label:"Maximum gap to close"; minimum:0; maximum:100
             enabled:panel.settings.gap_mode === "OVERRIDE"
@@ -35,6 +36,7 @@ ColumnLayout {
             onEdited:value=>panel.change("gap_limit_ratio", value/100)
         }
         NumericSetting {
+            objectName:"skinSourceGapStrength"
             visible:!panel.contributor.fiber
             label:"Gap filling strength"; minimum:0; maximum:100
             enabled:panel.settings.gap_mode === "OVERRIDE"

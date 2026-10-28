@@ -55,6 +55,7 @@ UiScrollView {
             onClicked:workspace.run("skin.evaluate",{})
         }
         SkinFits { adapter: workspace.skinPanel.fits }
+        SkinReports { reports:pane.state.reports || ({}) }
         SkinExport { }
     }
 }

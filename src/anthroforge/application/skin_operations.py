@@ -104,3 +104,9 @@ def require_construction_settings(item: Any, values: dict[str, Any]) -> None:
 
 def inspect(session: "Session") -> dict[str, Any]:
     return asdict(session.document.skin)
+
+
+def report(session: "Session") -> dict[str, Any]:
+    from . import skin_reports
+
+    return skin_reports.describe(session)

@@ -4,6 +4,8 @@ from dataclasses import asdict
 
 from PySide6.QtCore import Property, QObject, Signal
 
+from anthroforge.application import skin_reports
+
 from . import skin_contributor
 from .skin_export import SkinExport
 from .skin_fit_panel import SkinFitPanel
@@ -35,7 +37,9 @@ class SkinPanel(QObject):
         self.current = skin
         self.display = display
         self.values = asdict(skin) | dict(
-            display=display[0], contributor=skin_contributor.describe(session, display[1])
+            display=display[0],
+            contributor=skin_contributor.describe(session, display[1]),
+            reports=skin_reports.describe(session),
         )
         self.changed.emit()
 

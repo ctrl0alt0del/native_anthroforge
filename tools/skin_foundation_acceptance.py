@@ -5,6 +5,7 @@ from pathlib import Path
 
 os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
+from preferences_acceptance import choose
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QFontDatabase
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -15,12 +16,14 @@ from ui_acceptance import click, find
 from anthroforge.application import skin_evaluation
 from anthroforge.application.skin_operations import settings_for
 from anthroforge.core.fibers import Fiber
+from anthroforge.core.skin import EnvelopeSettings
+from anthroforge.desktop import app, runtime
 from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.qt_profiler import profiler_application
 from anthroforge.desktop.runtime import native_runtime
 
-OUTPUT = Path("build/skin-040/ui").resolve()
+OUTPUT = Path(os.environ.get("AF_SKIN_OUTPUT", "build/skin-040/ui")).resolve()
 
 
 def edit_field(window, name, text):
@@ -94,15 +97,38 @@ def contributor_controls(controller, window):
     controller.select(controller.session.document.entities[0].id)
     window.resize(1050, 1600)
     QTest.qWait(100)
+    effective_controls(controller, window)
+    choose(window, 1, "skinSourceCollagenMode")
     edit_field(window, "skinSourceCollagen", "0.35")
     click(window, "skinCollagenFill")
     QTest.qWait(100)
-    value = controller.skin_panel.state["contributor"]["settings"]
-    assert value["collagen_mode"] == "PAINTED" and value["painted"]
-    controller.run("undo", {})
-    controller.run("undo", {})
+    undo_collagen(controller)
     collagen_button(controller, window)
     assert window.grabWindow().save(str(OUTPUT / "skin-contributor-settings.png"))
+
+
+def undo_collagen(controller):
+    value = controller.skin_panel.state["contributor"]["settings"]
+    assert value["collagen_mode"] == "PAINTED" and value["painted"]
+    for _ in range(3):
+        controller.run("undo", {})
+
+
+def effective_controls(controller, window):
+    before = controller.session.document.skin
+    controller.run(
+        "skin.configure", dict(section="envelope_settings", values=dict(gap_strength=0.25))
+    )
+    QTest.qWait(100)
+    control = find(window, "skinSourceGapStrength")
+    assert control.property("value") == 25 and not control.isEnabled()
+    assert not find(window, "skinSourceCollagen").isEnabled()
+    click(window, "skinResetEnvelope")
+    assert controller.session.document.skin.envelope_settings == EnvelopeSettings()
+    controller.run("undo", {})
+    assert controller.session.document.skin.envelope_settings.gap_strength == 0.25
+    controller.run("undo", {})
+    assert controller.session.document.skin == before
 
 
 def collagen_button(controller, window):
@@ -161,6 +187,7 @@ def exercise(application):
 
 def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
+    configure_native()
     os.environ["ANTHROFORGE_PREFERENCES_PATH"] = str(OUTPUT / "state/preferences.json")
     QQuickStyle.setStyle("Basic")
     with native_runtime():
@@ -169,6 +196,13 @@ def main():
         application.setFont(QFont("Segoe UI"))
         exercise(application)
     print("Skin UI checks passed offscreen; GPU pixels checked separately.")
+
+
+def configure_native():
+    native = os.environ.get("AF_SKIN_BUILD")
+    if native:
+        runtime.build_directory = lambda: Path(native)
+        app.build_directory = runtime.build_directory
 
 
 if __name__ == "__main__":

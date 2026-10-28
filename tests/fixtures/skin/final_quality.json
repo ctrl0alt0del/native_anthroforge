@@ -1,0 +1,373 @@
+{
+  "sources": {
+    "core/mesh_diagnostics.py": "bb9ec6d6a37f0368d9e4a12d0dec6970b0a0c5dc596f110e32b4465daab7efc6",
+    "core/deformation/anatomy_quality.py": "25dbf1ee2dd7d8578c9e316baec1b22593e9ae28977847025cb0e94534103733",
+    "adapters/topology/density_runtime.py": "d6e091b49aa404b1fc7b9c01502eec288aa24f459b3cde4dac6ac64795627e65",
+    "native/fiber_ccd/af_mesh_diagnostics.hpp": "8c457502ee8272fc33f0bda53d1550f4b5866372e9a7e517c13263648dc85153"
+  },
+  "cases": [
+    {
+      "name": "crossing",
+      "vertices": [
+        [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          -1.0
+        ],
+        [
+          0.0,
+          1.0,
+          -1.0
+        ],
+        [
+          0.0,
+          1.0,
+          1.0
+        ],
+        [
+          0.0,
+          -1.0,
+          1.0
+        ]
+      ],
+      "faces": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ]
+      ],
+      "intersections": {
+        "self_intersections": 4,
+        "contact_pairs": 0,
+        "tested_pairs": 4,
+        "intersection_witnesses": [
+          [
+            0,
+            1
+          ],
+          [
+            0,
+            3
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            3
+          ]
+        ],
+        "intersection_tessellation": "triangles; quads split on diagonal 0-2",
+        "intersection_check": "COMPLETE"
+      },
+      "samples": [
+        [
+          0.0,
+          0.0,
+          0.1
+        ],
+        [
+          0.2,
+          0.1,
+          -0.3
+        ],
+        [
+          2.0,
+          1.0,
+          0.4
+        ]
+      ],
+      "clearance": {
+        "warnings": [
+          "Skin-anatomy volume penetration is not fully validated; sampled normal clearance is reported separately."
+        ],
+        "anatomy_clearance": {
+          "samples": 3,
+          "negative_samples": 2,
+          "reference_negative_samples": 2,
+          "minimum": -1.0954451150103321,
+          "maximum_clearance_loss": 0.0184121535834314,
+          "distance_p95": 1.005900603509299,
+          "interpretation": "Nearest-surface normal diagnostic; not a complete skin-anatomy volume intersection check."
+        }
+      }
+    },
+    {
+      "name": "contact",
+      "vertices": [
+        [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        [
+          2.0,
+          -1.0,
+          0.0
+        ],
+        [
+          2.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0
+        ]
+      ],
+      "faces": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ]
+      ],
+      "intersections": {
+        "self_intersections": 0,
+        "contact_pairs": 3,
+        "tested_pairs": 4,
+        "intersection_witnesses": [],
+        "intersection_tessellation": "triangles; quads split on diagonal 0-2",
+        "intersection_check": "COMPLETE"
+      },
+      "samples": [
+        [
+          0.0,
+          0.0,
+          0.1
+        ],
+        [
+          0.2,
+          0.1,
+          -0.3
+        ],
+        [
+          2.0,
+          1.0,
+          0.4
+        ]
+      ],
+      "clearance": {
+        "warnings": [
+          "Skin-anatomy volume penetration is not fully validated; sampled normal clearance is reported separately."
+        ],
+        "anatomy_clearance": {
+          "samples": 3,
+          "negative_samples": 3,
+          "reference_negative_samples": 3,
+          "minimum": -0.447213595499958,
+          "maximum_clearance_loss": 0.04721359549995796,
+          "distance_p95": 0.4324922359499621,
+          "interpretation": "Nearest-surface normal diagnostic; not a complete skin-anatomy volume intersection check."
+        }
+      }
+    },
+    {
+      "name": "separate",
+      "vertices": [
+        [
+          -1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          -1.0,
+          0.0
+        ],
+        [
+          1.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          1.0,
+          0.0
+        ],
+        [
+          -1.0,
+          -1.0,
+          2.0
+        ],
+        [
+          1.0,
+          -1.0,
+          2.0
+        ],
+        [
+          1.0,
+          1.0,
+          2.0
+        ],
+        [
+          -1.0,
+          1.0,
+          2.0
+        ]
+      ],
+      "faces": [
+        [
+          0,
+          1,
+          2,
+          3
+        ],
+        [
+          4,
+          5,
+          6,
+          7
+        ]
+      ],
+      "intersections": {
+        "self_intersections": 0,
+        "contact_pairs": 0,
+        "tested_pairs": 0,
+        "intersection_witnesses": [],
+        "intersection_tessellation": "triangles; quads split on diagonal 0-2",
+        "intersection_check": "COMPLETE"
+      },
+      "samples": [
+        [
+          0.0,
+          0.0,
+          0.1
+        ],
+        [
+          0.2,
+          0.1,
+          -0.3
+        ],
+        [
+          2.0,
+          1.0,
+          0.4
+        ]
+      ],
+      "clearance": {
+        "warnings": [
+          "Skin-anatomy volume penetration is not fully validated; sampled normal clearance is reported separately."
+        ],
+        "anatomy_clearance": {
+          "samples": 3,
+          "negative_samples": 3,
+          "reference_negative_samples": 3,
+          "minimum": -1.0954451150103321,
+          "maximum_clearance_loss": 0.0184121535834314,
+          "distance_p95": 1.015900603509299,
+          "interpretation": "Nearest-surface normal diagnostic; not a complete skin-anatomy volume intersection check."
+        }
+      }
+    }
+  ],
+  "budgets": {
+    "owners": [
+      2,
+      1,
+      2,
+      1,
+      -1,
+      -1,
+      0,
+      1,
+      2,
+      2,
+      1,
+      0,
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    "faces": [
+      [
+        0,
+        1,
+        2,
+        3
+      ],
+      [
+        4,
+        5,
+        6,
+        7
+      ],
+      [
+        8,
+        9,
+        10,
+        11
+      ],
+      [
+        12,
+        13,
+        14,
+        15
+      ]
+    ],
+    "expected": [
+      1,
+      0,
+      2,
+      -1
+    ]
+  }
+}

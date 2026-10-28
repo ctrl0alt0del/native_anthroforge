@@ -98,7 +98,9 @@ def metadata(reference: Any, diagnostics: Any, contact: Any, geometry: Any) -> d
 
 def solver_report(saved: Any, diagnostics: Any) -> dict[str, Any]:
     info = dict(zip(SOLVER, map(float, diagnostics), strict=True))
-    info["iteration_limit_reached"] = saved["settings"]["method"] == "FAST" and diagnostics[0] >= 80
+    info["iteration_limit_reached"] = (
+        saved["settings"]["method"] == "FAST" and info["iterations"] >= 80
+    )
     return info
 
 

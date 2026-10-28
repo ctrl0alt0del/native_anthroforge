@@ -32,7 +32,7 @@ def inspect(session: Any, identity: str) -> dict[str, Any]:
 
 
 def summary(data: Any) -> dict[str, Any]:
-    info = json.loads(data.metadata)
+    info: dict[str, Any] = json.loads(data.metadata)
     background = int(info["settings"]["strategy"] == "SINGLE_ACTIVE")
     info["active_bones"] = data.arrays["weights"].shape[1] - background
     held_out = [row for row in info.get("rows", ()) if not row["training"]]

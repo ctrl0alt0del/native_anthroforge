@@ -11,7 +11,7 @@ from typing import Any
 from zipfile import ZIP_STORED, BadZipFile, ZipFile
 
 FORMAT = "anthroforge-bbw-v1"
-FAILURES = (OSError, ValueError, KeyError, BadZipFile)
+FAILURES = (OSError, ValueError, KeyError, TypeError, UnicodeError, BadZipFile)
 
 
 def directory() -> Path:

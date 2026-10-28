@@ -322,14 +322,21 @@ def direct_commands(session: "Session") -> dict[str, Any]:
         **query_commands(session),
         **history_commands(session),
         "inspect": session.describe,
-        "skin.inspect": lambda: skin_operations.inspect(session),
-        **skin_fit_queries(session),
-        "skin.status": session.skin_status.describe,
-        "skin.export": lambda **a: skin_export.export(session, **a),
+        **skin_queries(session),
         "wait": session.wait,
         "tick": session.scheduler.tick,
         "evaluate": lambda **a: evaluate(session, **a),
         "curve.reroute": lambda **a: path_tasks.reroute(session, **a),
+    }
+
+
+def skin_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "skin.inspect": lambda: skin_operations.inspect(session),
+        "skin.report": lambda: skin_operations.report(session),
+        "skin.status": session.skin_status.describe,
+        "skin.export": lambda **a: skin_export.export(session, **a),
+        **skin_fit_queries(session),
     }
 
 

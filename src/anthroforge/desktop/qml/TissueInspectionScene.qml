@@ -5,10 +5,12 @@ import AnthroForge.Native 1.0
 Node {
     id: root
     required property real distance
+    property var geometryModel: workspace.tissueInspection.geometry
+    property bool annotations: true
     ViewSnapshot { id: evidence; source: workspace.tissueInspection }
     ViewSnapshot { id: section; source: workspace.sectionTools }
     Repeater3D {
-        model: workspace.tissueInspection.geometry
+        model: root.geometryModel
         delegate: Node {
             id: stageNode
             required property var item
@@ -51,12 +53,13 @@ Node {
         }
     }
     Model {
+        visible: root.annotations
         objectName: "stackingFootprint"
         geometry: ControlGeometry { points: evidence.data.footprint || []; segments: true; stroke: root.distance*.001 }
         materials: DefaultMaterial { diffuseColor: "#76e6cc"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }
     }
     Repeater3D {
-        model: section.data.contours || []
+        model: root.annotations ? section.data.contours || [] : []
         delegate: Model {
             required property var modelData
             geometry: ControlGeometry { points: modelData.lines; segments: true; stroke: root.distance*.0015 }
@@ -64,6 +67,7 @@ Node {
         }
     }
     Model {
+        visible: root.annotations
         objectName: "tissueInspectionWitness"
         geometry: ControlGeometry { objectName: "tissueInspectionLines"; points: evidence.data.lines || []; segments: true; stroke: root.distance*.0015 }
         materials: DefaultMaterial { diffuseColor: "#ffe571"; lighting: DefaultMaterial.NoLighting; cullMode: Material.NoCulling }

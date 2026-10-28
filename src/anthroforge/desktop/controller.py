@@ -29,11 +29,12 @@ from .routing_choices import RoutingChoices
 from .section_tools import SectionTools
 from .shortcut_comparison_view import ShortcutComparisonView
 from .shortcut_panel import ShortcutPanel
+from .skin_panel import SkinPanel
 from .surface_creation import SurfaceCreation
 from .tissue_inspection_tools import TissueInspectionTools
-from .tissue_painting_tools import TissuePaintingTools
 from .tissue_region_tools import TissueRegionTools
 from .tissue_retarget_panel import TissueRetargetPanel
+from .weight_painting_tools import WeightPaintingTools
 
 
 class Controller(QObject):
@@ -84,11 +85,12 @@ class Controller(QObject):
         self.mesh_replacement = MeshReplacementPanel(self)
 
     def initialize_tissue_tools(self):
+        self.skin_panel = SkinPanel(self)
         self.shortcut_comparison = ShortcutComparisonView(self)
         self.shortcut_panel = ShortcutPanel(self)
         self.tissue_region_tools = TissueRegionTools(self)
         self.tissue_inspection = TissueInspectionTools(self)
-        self.tissue_painting = TissuePaintingTools(self)
+        self.tissue_painting = WeightPaintingTools(self)
         self.section_tools = SectionTools(self)
         self.route_inspection = RouteInspectionTools(self)
         self.tissue_retarget = TissueRetargetPanel(self)
@@ -114,6 +116,7 @@ class Controller(QObject):
             self.fiber_display.model,
             self.image_model,
             self.tissue_inspection.model,
+            self.tissue_painting.model,
             self.shortcut_comparison.model,
             self.shortcut_comparison.images,
         )
@@ -214,6 +217,7 @@ class Controller(QObject):
                 self.session.conversion,
                 self.session.surface_preview,
                 self.session.tissue_preview,
+                self.session.skin_fit_preview,
             )
         )
 
@@ -295,6 +299,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def shortcutPanel(self):
         return self.shortcut_panel
+
+    @Property(QObject, constant=True)
+    def skinPanel(self):
+        return self.skin_panel
 
     @Property(QObject, constant=True)
     def shortcutComparison(self):

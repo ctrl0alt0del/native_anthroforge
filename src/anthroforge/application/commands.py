@@ -1,5 +1,6 @@
 """One explicit operation catalogue; no active Blender context or Python eval."""
 
+from functools import partial
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.units import convert
@@ -47,6 +48,16 @@ from . import (
     segment_operations,
     shortcut_operations,
     shrinkwrap_operations,
+    skin_collagen,
+    skin_export,
+    skin_fit_capture,
+    skin_fit_jobs,
+    skin_fit_preview,
+    skin_fit_results,
+    skin_jobs,
+    skin_operations,
+    skin_painting,
+    skin_update_tasks,
     snap_tasks,
     surface_branch_operations,
     surface_correspondence,
@@ -75,6 +86,20 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "skin.collagen.paint.commit": skin_painting.commit,
+    "skin.collagen.set": skin_collagen.set_weights,
+    "skin.collagen.fill": skin_collagen.fill,
+    "skin.collagen.clear": skin_collagen.clear,
+    "skin.envelope.build": partial(skin_jobs.build, stage="envelope"),
+    "skin.topology.build": partial(skin_jobs.build, stage="topology"),
+    "skin.reference.build": partial(skin_jobs.build, stage="reference"),
+    "skin.evaluate": skin_update_tasks.evaluate,
+    "skin.fit": skin_fit_jobs.start,
+    "skin.fit.authoring": partial(skin_fit_jobs.start, authoring=True),
+    "skin.fit.remove": skin_fit_results.remove,
+    "skin.build": skin_jobs.build,
+    "skin.configure": skin_operations.configure,
+    "skin.contributor.configure": skin_operations.contributor,
     "mirror.loop.create": symmetric_paths.create,
     "mirror.configure": mirror_operations.configure,
     "mirror.attachment.share": mirror_operations.share_target,
@@ -244,7 +269,7 @@ def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> An
 
 
 def query_handler(operation: str) -> Any:
-    if operation.startswith(("tissue.inspect.", "curve.inspect.")):
+    if operation.startswith(("tissue.inspect.", "curve.inspect.", "skin.inspect.")):
         from .tissue_inspection import execute as tissue_inspect
 
         return tissue_inspect
@@ -294,16 +319,36 @@ def direct_commands(session: "Session") -> dict[str, Any]:
     return {
         **file_commands(session),
         **query_commands(session),
+        **history_commands(session),
+        "inspect": session.describe,
+        "skin.inspect": lambda: skin_operations.inspect(session),
+        **skin_fit_queries(session),
+        "skin.status": session.skin_status.describe,
+        "skin.export": lambda **a: skin_export.export(session, **a),
+        "wait": session.wait,
+        "tick": session.scheduler.tick,
+        "evaluate": lambda **a: evaluate(session, **a),
+        "curve.reroute": lambda **a: path_tasks.reroute(session, **a),
+    }
+
+
+def history_commands(session: "Session") -> dict[str, Any]:
+    return {
         "begin": session.begin,
         "commit": session.commit,
         "cancel": session.cancel,
         "undo": lambda: session.navigate(-1),
         "redo": lambda: session.navigate(1),
-        "inspect": session.describe,
-        "wait": session.wait,
-        "tick": session.scheduler.tick,
-        "evaluate": lambda **a: evaluate(session, **a),
-        "curve.reroute": lambda **a: path_tasks.reroute(session, **a),
+    }
+
+
+def skin_fit_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "skin.fit.inspect": lambda **a: skin_fit_results.inspect(session, **a),
+        "skin.fit.eligibility": lambda **a: skin_fit_capture.describe(session, **a),
+        "skin.fit.preview": lambda **a: skin_fit_preview.request(session, **a),
+        "skin.fit.preview.status": lambda: skin_fit_preview.status(session),
+        "skin.fit.preview.cancel": lambda: skin_fit_preview.cancel(session),
     }
 
 

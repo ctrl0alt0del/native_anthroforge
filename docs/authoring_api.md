@@ -1,4 +1,8 @@
-# Local authoring API, 0.3.5
+# Local authoring API, 0.4.0
+
+The [skin workflow](skin_workflow.md) and `examples/skin.json` demonstrate the 0.4.0
+build, fitting, independent playback and OBJ operations. Validation and release packaging
+status are recorded in [the skin task](tasks/skin-040.md).
 
 The 0.3.3 performance work adds no public commands. The
 [addon functionality audit](addon_functionality_audit.md) distinguishes supported
@@ -1044,3 +1048,65 @@ consumers update normally. Old source objects remain. Application is one undo ac
 constraints on an existing compatible tissue. It preserves classification, source,
 custom fields/regions/constraints, cropping, smoothing and stacking intent. Conflicts
 or an incompatible field layout require explicit resolution, without silent discard.
+
+
+### Skin contributor authoring (0.4.0)
+
+Physical draft/deformation sources are SCP/VCP surfaces, including reflected instances.
+Fiber paths remain available to topology guidance; missing tissue geometry never causes
+fallback to its construction. See [the specification](specification_040.md).
+
+`skin.contributor.configure(owner, values)` edits source gap policies, eligible SCP
+collagen/density settings, or Fiber FLOW membership. Fibers accept topology `flow` only,
+not physical skin radius or gap controls. FLOW changes invalidate topology inputs without
+changing physical envelope capture or its input revisions.
+`skin.collagen.set(owner, values)` stores one
+0..1 weight per accepted SCP vertex with its material-domain identity.
+`skin.collagen.fill(owner, value=None)` fills from the supplied value or SCP default;
+`skin.collagen.clear(owner)` removes the map and selects Uniform. These are shared
+undoable edits and do not change anatomy geometry.
+
+
+Collagen strokes use `skin.inspect.paint(target, view, samples, brush, expected_asset?,
+obstacles?)`, with the tissue camera/brush arrays. `skin.inspect.status()` and
+`skin.inspect.cancel()` address the collagen preview. `skin.collagen.paint.commit(job)`
+commits a ready, current stroke as one undo action. SCP/workspace write policies apply
+on commit. The Skin panel exposes Paint collagen, visible-only by default, with optional
+Paint Through. Heat colors are temporary resources, never saved geometry.
+
+Selected-source Skin controls also expose SCP subtree quad budgets and open-Fiber FLOW
+guide selection. Closed Fibers use the loop-guide workflow, not the open FLOW flag.
+Nested budget conflicts are shown without preventing users from editing their settings;
+topology generation must validate the complete budget tree before dispatch.
+
+SkinStatusProvider exposes
+operation-specific eligibility, blocking reasons, warnings and assessed skin/reference
+revisions through `skin.status`. Desktop subscriptions and headless operations share these policies.
+Unapplied build settings allow fitting with a warning when the existing reference is
+usable; missing skin or incompatible material/vertex identities prevents fitting. Every
+sample must still validate. No status read initiates computation or edits document state.
+`skin.reference.build` prepares a durable reference from accepted topology; `skin.evaluate`
+updates positions while preserving connectivity and the reference's captured tissue choice.
+`preferences.set(skin_tissue_surface="FINISHED" | "INFLATED_REST")` affects new references;
+finished/cropped is the default and both sides contribute. Main `skin.build` includes reference
+preparation. Failed replacement retains old output and pending new topology for retry.
+Wider status-provider migration is deferred to the next version after 0.4.0.
+
+`skin.fit(shortcut, settings)` queues isolated sampling and publishes one independent
+result with coherent undo. Settings require `minimum`/`maximum`; optional `bones=4`,
+`samples=9`, `smoothing=1.0` retain addon defaults. Samples must be odd, 5–33; bones 1–64.
+Public strategy is `SCALE_AWARE`; `skin.fit.authoring` additionally permits `SINGLE_ACTIVE`.
+`skin.fit.eligibility(identity)` returns the shared scalar/readiness assessment.
+`skin.fit.inspect(identity)` includes source provenance, stale state and per-sample errors.
+`skin.fit.preview(identity,value)`, `.preview.status()` and `.preview.cancel()` use stored
+linear TRS channels without evaluating anatomy, modifying history or blocking saving.
+`skin.fit.remove(identity)` removes the independent result through normal undo.
+
+`skin.export(path, policy, wait=False)` exports final skin only. Policy is required:
+`accepted` captures the current accepted skin; `update` evaluates a frozen input revision
+and updates/rebuilds skin in an isolated session; `cancel` writes nothing. Only OBJ is
+currently supported, with canonical metres/application axes and original polygons/quads.
+Atomic replacement protects an existing destination on error/cancellation. No original
+anatomy, debug objects, bones or weights are included. A missing final skin blocks export.
+The result identifies job, path, captured revision and state. See the skin task for
+qualification evidence, remesher quality warnings and offscreen acceptance limits.

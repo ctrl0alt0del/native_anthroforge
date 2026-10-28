@@ -91,6 +91,8 @@ def resources(controller):
         yield controller.session.surface_preview.asset.mesh
     if controller.session.tissue_preview.asset is not None:
         yield controller.session.tissue_preview.asset.mesh
+    if controller.session.skin_fit_preview.asset is not None:
+        yield controller.session.skin_fit_preview.asset.mesh
 
 
 def tissue_preview_rows(controller):

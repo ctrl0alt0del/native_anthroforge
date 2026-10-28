@@ -1,4 +1,17 @@
-# AnthroForge 0.3.7
+# AnthroForge 0.4.0
+
+0.4.0 adds skin envelope generation, guided quad topology, fixed-topology deformation,
+shortcut-to-bone fitting, independent fitted playback and skin-only OBJ export. Open
+**Skin** in the vertical inspector tabs; use **Fit to bones** in shortcut settings.
+See the [skin workflow](docs/skin_workflow.md), [specification](docs/specification_040.md)
+and [qualification evidence](docs/tasks/skin-040.md).
+
+Draft skin uses SCP/VCP surfaces; construction paths guide topology separately. Preferences
+selects finished/cropped tissue (default) or uncropped rest inflation for new references,
+sampling both sides. Projects save schema 7 and read schemas 4–7. Ordinary anatomical
+updates preserve skin vertex identities and connectivity. Remesher openings and incomplete
+contact coverage remain explicit limitations; successful construction is not a watertight
+mesh guarantee. GUI evidence is background/offscreen, not physical interactive acceptance.
 
 0.3.7 adds Recent Projects, configurable recovery autosave (every five minutes by
 default), a recovery browser, and layout fixes for menus, dialogs, inspectors and
@@ -97,7 +110,7 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.3.7/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.4.0/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included

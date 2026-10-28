@@ -49,6 +49,16 @@ class ShortcutEditor(QObject):
         return self.inspection
 
     @Property("QVariantMap", notify=changed)
+    def fitEligibility(self):
+        from anthroforge.application.skin_fit_capture import describe
+
+        return qml(describe(self.panel.controller.session, self.key))
+
+    @Slot("QVariantMap")
+    def fit(self, settings):
+        self.panel.controller.run("skin.fit", dict(shortcut=self.key, settings=settings))
+
+    @Property("QVariantMap", notify=changed)
     def propertyValue(self):
         from .shortcut_panel import numeric_row
 

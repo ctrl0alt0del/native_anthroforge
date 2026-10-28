@@ -66,6 +66,20 @@ UiDialog {
                 hint: "Applies to future calculations; current results stay unchanged"
             }
         }
+        RowLayout {
+            Layout.fillWidth: true; spacing: Theme.gap
+            Label { text: "Skin tissue surface"; color: Theme.text; Layout.fillWidth: true }
+            UiHelp {
+                explanation: "Choose which tissue surface drives skin deformation.\nFinished uses the cropped surface after relaxation and stacking. Uncropped inflation uses the inflated rest shape before those stages. Both sides contribute.\nUsed when building a new skin reference; existing references retain their source choice."
+            }
+            UiCombo {
+                objectName: "skinTissueSurface"; Layout.preferredWidth: 260
+                model: ["Finished (cropped)", "Uncropped inflation"]
+                currentIndex: preferences.state.skin_tissue_surface === "INFLATED_REST" ? 1 : 0
+                onActivated: preferences.setSkinTissueSurface(currentIndex === 1 ? "INFLATED_REST" : "FINISHED")
+                hint: "Tissue surface used by new skin deformation references"
+            }
+        }
         Label { text: "CURVE CONVERSION"; color: Theme.muted; font.pixelSize: 11 }
         RowLayout {
             Layout.fillWidth: true; spacing: Theme.gap

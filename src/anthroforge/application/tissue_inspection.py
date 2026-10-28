@@ -164,7 +164,7 @@ def cancel(session: Any, kind: str = "") -> None:
 
 
 def execute(session: Any, operation: str, arguments: dict[str, Any]) -> Any:
-    commands = dict(operations(session), **route_operations(session))
+    commands = dict(operations(session), **route_operations(session), **skin_operations(session))
     if operation not in commands:
         raise ValueError("Unknown tissue inspection operation.")
     return commands[operation](**arguments)
@@ -191,4 +191,12 @@ def route_operations(session: Any) -> dict[str, Any]:
         "curve.inspect.route": partial(start, session, "route"),
         "curve.inspect.status": partial(status, session, "route"),
         "curve.inspect.cancel": partial(cancel, session, "route"),
+    }
+
+
+def skin_operations(session: Any) -> dict[str, Any]:
+    return {
+        "skin.inspect.paint": partial(start, session, "collagen"),
+        "skin.inspect.status": partial(status, session, "collagen"),
+        "skin.inspect.cancel": partial(cancel, session, "collagen"),
     }

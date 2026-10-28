@@ -14,10 +14,18 @@ from anthroforge.core.scheduling import RequestUrgency
 from anthroforge.profiling import causes
 from anthroforge.profiling import tasks as trace
 
-from . import task_coalescing, task_priorities
+from . import task_coalescing, task_priorities, task_resources
 from .job_registry import JobRegistry
 from .task_execution import InlineBudget, completed_future, execute
 from .task_schedulers import task_schedulers
+
+
+def create_executor(workers: int, factory: Any) -> Any:
+    return (
+        factory()
+        if factory is not None
+        else ThreadPoolExecutor(max_workers=workers, thread_name_prefix="anthroforge")
+    )
 
 
 class TaskCoordinator:
@@ -26,21 +34,19 @@ class TaskCoordinator:
         current: Callable[[], Document],
         workers: int = 2,
         clock: Callable[[], float] = monotonic,
+        executor_factory: Any = None,
     ) -> None:
         self.current, self.clock = current, clock
         self.registry = JobRegistry()
-        self.pool = ThreadPoolExecutor(max_workers=workers, thread_name_prefix="anthroforge")
+        self.pool = create_executor(workers, executor_factory)
         self.workers = workers
         self.checkpoint = current()
         self.epoch = 0
         self.errors: list[str] = []
-        self.can_publish: Callable[[Job], bool] = lambda job: True
         self._initialize_scheduling(clock)
 
     def _initialize_scheduling(self, clock: Callable[[], float]) -> None:
-        self.service_tick: Callable[[], None] = lambda: None
-        self.lifecycle: Callable[[Job, str], None] = lambda job, phase: None
-        self.observer: Callable[[Job, str], None] = lambda job, phase: None
+        self._initialize_callbacks()
         self.profiler: Any = None
         self.metrics = Metrics()
         self.task_schedulers = task_schedulers()
@@ -51,6 +57,13 @@ class TaskCoordinator:
         self.publication_contexts: tuple[str, ...] = ()
         self.annotate: Callable[[Job, Document], None] = lambda job, document: None
         self.before_dispatch: Callable[[Job, Document], None] = lambda job, document: None
+        self.admission = task_resources.Admission()
+
+    def _initialize_callbacks(self) -> None:
+        self.can_publish: Callable[[Job], bool] = lambda job: True
+        self.service_tick: Callable[[], None] = lambda: None
+        self.lifecycle: Callable[[Job, str], None] = lambda job, phase: None
+        self.observer: Callable[[Job, str], None] = lambda job, phase: None
 
     @property
     def jobs(self) -> list[Job]:
@@ -272,7 +285,7 @@ class TaskCoordinator:
             if not self._ready(job, reserved):
                 continue
             self._start(job)
-            if job.active:
+            if job.active and job.future is not None:
                 running.append(job)
                 reserved.update(job.outputs)
 
@@ -312,18 +325,31 @@ class TaskCoordinator:
         return self.priorities.ordered(self.registry)
 
     def _start(self, job: Job) -> None:
+        try:
+            self._assess(job)
+            if self._resources_ready(job):
+                self._prepare(job)
+        except Exception as error:
+            self._failed(job, error)
+
+    def _resources_ready(self, job: Job) -> bool:
+        inline = self.can_publish(job) and self.inline_budget.permits(job)
+        reason = "" if inline else self.admission.waiting(job, self.active_jobs)
+        if reason != job.execution_reason:
+            job.execution_reason = reason
+            if reason:
+                trace.event(self.profiler, job, "resource_wait")
+        return not reason
+
+    def _prepare(self, job: Job) -> None:
         job.snapshot, job.started = self.current(), monotonic()
         job.dispatch_revision = job.snapshot.revision
         job.state, job.progress = "preparing", "Preparing owned input"
-        try:
-            self._assess(job)
-            self.before_dispatch(job, job.snapshot)
-            payload = trace.call(self.profiler, job, "prepare", job.prepare, job.snapshot)
-            job.prepare_ms = (monotonic() - job.started) * 1000
-            self.metrics.observe("prepare", job.prepare_ms / 1000)
-            self._execute(job, payload)
-        except Exception as error:
-            self._failed(job, error)
+        self.before_dispatch(job, job.snapshot)
+        payload = trace.call(self.profiler, job, "prepare", job.prepare, job.snapshot)
+        job.prepare_ms = (monotonic() - job.started) * 1000
+        self.metrics.observe("prepare", job.prepare_ms / 1000)
+        self._execute(job, payload)
 
     def _execute(self, job: Job, payload: Any) -> None:
         if self.can_publish(job) and self.inline_budget.permits(job):

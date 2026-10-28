@@ -1,3 +1,4 @@
+param([string]$BuildDirectory = '')
 . "$PSScriptRoot\common.ps1"
 Push-Location $ProjectRoot
 try {
@@ -5,10 +6,10 @@ try {
     Invoke-Checked uv @('run', '--no-sync', 'ruff', 'check', 'src', 'tests', 'tools')
     Invoke-Checked uv @('run', '--no-sync', 'ruff', 'format', '--check', 'src', 'tests', 'tools')
     Invoke-Checked uv @('run', '--no-sync', 'mypy')
-    & "$PSScriptRoot\build-native.ps1"
-    & "$PSScriptRoot\check-native-style.ps1"
+    & "$PSScriptRoot\build-native.ps1" -BuildDirectory $BuildDirectory
+    & "$PSScriptRoot\check-native-style.ps1" -BuildDirectory $BuildDirectory
     & "$PSScriptRoot\check-script-style.ps1"
-    Invoke-Checked uv @('run', '--no-sync', 'pytest')
+    Invoke-Checked uv @('run', '--no-sync', 'python', '-m', 'pytest')
     Invoke-Checked uv @('run', '--no-sync', 'python', 'tools/check_numerics.py')
     Invoke-Checked uv @('run', '--no-sync', 'anthroforge', 'doctor', '--require-native')
 } finally { Pop-Location }

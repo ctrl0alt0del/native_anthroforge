@@ -18,6 +18,8 @@ from .assets import Asset
 from .attachment_assets import AttachmentAsset
 from .image_assets import ImageAsset
 from .path_assets import PathAsset
+from .skin_assets import SkinAsset
+from .skin_assets import references as skin_references
 from .tissue_material_resources import retain as retain_materials
 
 
@@ -28,6 +30,7 @@ class Resources:
     images: dict[str, ImageAsset] = field(default_factory=dict)
     attachments: dict[str, AttachmentAsset] = field(default_factory=dict)
     bindings: dict[str, BindingBatch] = field(default_factory=dict)
+    skin: dict[str, SkinAsset] = field(default_factory=dict)
 
     def snapshot(self) -> "Resources":
         return Resources(
@@ -36,6 +39,7 @@ class Resources:
             dict(self.images),
             dict(self.attachments),
             dict(self.bindings),
+            dict(self.skin),
         )
 
     def selected(self, document: Document) -> "Resources":
@@ -60,18 +64,25 @@ class Resources:
 def referenced(document: Document) -> dict[str, set[str]]:
     opening = tuple(item for context in document.shortcut_edits for item in context.opening)
     result = references((*document.entities, *opening), document.objects)
-    result["meshes"].update(
+    result["meshes"].update(shortcut_materials(document))
+    meshes, buffers = skin_references(document.skin)
+    result["meshes"].update(meshes)
+    result["skin"] = buffers
+    return result
+
+
+def shortcut_materials(document: Document) -> set[str]:
+    bindings = {
         b.attachment.material_asset
         for context in document.shortcut_edits
         for b in context.bindings
         if b.attachment.material_asset
-    )
-    result["meshes"].update(
+    }
+    return bindings | {
         c.anchor.material_asset
         for c in document.shortcut_edits
         if c.anchor and c.anchor.material_asset
-    )
-    return result
+    }
 
 
 def references(entities: Iterable[SCP], objects: Iterable[Authored]) -> dict[str, set[str]]:

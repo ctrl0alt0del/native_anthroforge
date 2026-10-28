@@ -11,7 +11,7 @@ ColumnLayout {
     property bool shortcuts: page === "Shortcuts"
     onShortcutsChanged: if(shortcuts !== (page==="Shortcuts")) choose(shortcuts ? "Shortcuts" : "Shape")
     onPageChanged: shortcuts=page==="Shortcuts"
-    onCategoryChanged: page=workbench.page(category)
+    onCategoryChanged: if(page!=="Skin") page=workbench.page(category)
     Component.onCompleted: page=workbench.page(category)
     function choose(value) { page=value; workbench.setPage(category,value); }
     Connections { target: workspace.shortcutPanel; function onRevealRequested() { header.choose("Shortcuts"); } }
@@ -25,11 +25,4 @@ ColumnLayout {
     }
     Label { text:DisplayNames.label(header.category)+(header.selected.readonly ? " · Read-only" : ""); visible:!!header.selected.id; color:Theme.muted; Layout.fillWidth:true; Layout.leftMargin:Theme.inset; Layout.rightMargin:Theme.inset }
     UiButton { objectName:"selectMirrorSource"; text:"Select source"; visible:!!header.selected.mirror_source; Layout.fillWidth:true; Layout.leftMargin:Theme.inset; Layout.rightMargin:Theme.inset; onClicked:workspace.select(header.selected.mirror_source) }
-    UiTabBar {
-        Layout.fillWidth:true
-        currentIndex: ["Shape","Shortcuts","Inspect"].indexOf(header.page)
-        UiTabButton { objectName:"shapeTab"; text:"Shape"; onClicked:header.choose("Shape") }
-        UiTabButton { objectName:"shortcutsTab"; text:"Shortcuts"; onClicked:header.choose("Shortcuts") }
-        UiTabButton { objectName:"inspectTab"; text:"Inspect"; onClicked:header.choose("Inspect") }
-    }
 }

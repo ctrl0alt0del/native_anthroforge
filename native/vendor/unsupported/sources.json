@@ -1,0 +1,50 @@
+{
+  "source": "Eigen 3.4.0, maintained addon deformation vendor",
+  "license": "MPL-2.0",
+  "files": [
+    {
+      "path": "unsupported/Eigen/SparseExtra",
+      "sha256": "9d99339f16903526762c35895fd5fba253d0d3752b95a8cc359712b982897864"
+    },
+    {
+      "path": "unsupported/Eigen/src/SparseExtra/BlockOfDynamicSparseMatrix.h",
+      "sha256": "b310e50d14cdf22c899a0c54f0349b7b1e8fabce6e559241cc5bc73cecdcd477"
+    },
+    {
+      "path": "unsupported/Eigen/src/SparseExtra/BlockSparseMatrix.h",
+      "sha256": "ad14cc12a322e1891a2ca10a64b08221b69dba0b8218d2af574e72130f7aa658"
+    },
+    {
+      "path": "unsupported/Eigen/src/SparseExtra/DynamicSparseMatrix.h",
+      "sha256": "29bbdb7b1c80e510e137b66835de410046961319b1f1345f6b3c2bed5d223ba0"
+    },
+    {
+      "path": "unsupported/Eigen/src/SparseExtra/MarketIO.h",
+      "sha256": "b42c85d232d2d7830410952e2348bc10a94d4b5f65f51f9dd951a687473340fa"
+    },
+    {
+      "path": "unsupported/Eigen/src/SparseExtra/MatrixMarketIterator.h",
+      "sha256": "d9baf7c936dd0d66273b5d29c08cf4e085a323ab5fbda926da6e861dc0fd0c91"
+    },
+    {
+      "path": "unsupported/Eigen/src/SparseExtra/RandomSetter.h",
+      "sha256": "5cd9571350b197f755b58ca771281cd647d99bcc19b42ead0d02ba7f8b67336e"
+    },
+    {
+      "path": "unsupported/Eigen/Polynomials",
+      "sha256": "bf512d5db9767c0364fd00a4b987ba506da10ab6914d7dc74bc686f9e6f23420"
+    },
+    {
+      "path": "unsupported/Eigen/src/Polynomials/Companion.h",
+      "sha256": "e74e82c4c65005294ebb3dfc4477b4f527b49fbb2075f4b48a3937bbfa28a5ea"
+    },
+    {
+      "path": "unsupported/Eigen/src/Polynomials/PolynomialSolver.h",
+      "sha256": "3118e898517163f235657160f8370e2c53b38dfeb38750aad99b45503b00aa44"
+    },
+    {
+      "path": "unsupported/Eigen/src/Polynomials/PolynomialUtils.h",
+      "sha256": "f3c2161e65b4209adcb844f55078e04defb0db1f10f5476ed0ab5e645e23e060"
+    }
+  ]
+}

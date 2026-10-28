@@ -113,13 +113,13 @@ class Workspace:
     fibers: tuple[FiberPresentation, ...] = ()
     cursor: tuple[float, ...] = (0.0, 0.0, 0.0)
     mirror_display: str = "BOTH"
+    skin_display: str = "AUTO"
 
     def __post_init__(self) -> None:
         if not self.name.strip():
             raise ValueError("Workspace name must not be empty.")
         factor(self.display_units)
-        if self.mirror_display not in ("BOTH", "SOURCE", "MIRROR"):
-            raise ValueError("Mirror display must be BOTH, SOURCE or MIRROR.")
+        validate_display(self.mirror_display, self.skin_display)
         validate_categories(self.hidden_categories)
         validate_categories(self.unpickable_categories)
         validate_presentations(self.reference_images, "Image")
@@ -128,6 +128,13 @@ class Workspace:
             raise ValueError("Invalid workspace camera.")
         if len(self.cursor) != 3 or not all(map(isfinite, self.cursor)):
             raise ValueError("Cursor needs three finite world coordinates.")
+
+
+def validate_display(mirrors: str, skin: str) -> None:
+    if mirrors not in ("BOTH", "SOURCE", "MIRROR"):
+        raise ValueError("Mirror display must be BOTH, SOURCE or MIRROR.")
+    if skin not in ("AUTO", "ENVELOPE", "TOPOLOGY", "FINAL", "NONE"):
+        raise ValueError("Unknown skin display stage.")
 
 
 def validate_presentations(

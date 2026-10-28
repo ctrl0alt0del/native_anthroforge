@@ -11,7 +11,9 @@ QtObject {
         BEZIER:"Bézier", POLYLINE:"Polyline", ROUTED:"Routed", PARAMETRIC:"Parametric",
         INHERIT:"Inherit", ON_RELEASE:"On release", STATIC_PBD:"Static PBD",
         AUTO:"Automatic", B_SPLINE:"B-spline", BSPLINE:"B-spline", CATMULL_ROM:"Catmull–Rom",
-        INT:"Integer", FLOAT:"Real number", BOOL:"Boolean"
+        INT:"Integer", FLOAT:"Real number", BOOL:"Boolean",
+        QUADWILD:"QuadWild · muscle flow", INSTANT:"Instant Meshes",
+        LE:"Linear elasticity", FAST:"Reduced ARAP", MUSCLE_PROXIMITY:"Muscle proximity"
     })
     function label(code) {
         if(labels[code]) return labels[code];

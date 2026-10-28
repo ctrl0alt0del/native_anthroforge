@@ -35,14 +35,19 @@ class Session:
         name: str = "Untitled",
         profiler: RuntimeProfiler | None = None,
         preferences: PreferenceStore | None = None,
+        executor_factory: Any = None,
     ) -> None:
-        self.changes, self._document = ChangeJournal(), Document(name=name)
-        self.history = History(self.document)
-        self.resources = Resources()
+        self.initialize_document(name, executor_factory)
         self.preferences = preferences if preferences is not None else load_user_preferences()
         self.initialize_runtime(profiler)
         self._engine: GeometryEngine | None = None
         self.initialize_file_state()
+
+    def initialize_document(self, name: str, executor_factory: Any) -> None:
+        self.changes, self._document = ChangeJournal(), Document(name=name)
+        self.history = History(self.document)
+        self.resources = Resources()
+        self.executor_factory = executor_factory
 
     def initialize_file_state(self) -> None:
         self.serial = 0
@@ -58,12 +63,14 @@ class Session:
     def initialize_runtime(self, profiler: RuntimeProfiler | None) -> None:
         from .issues.repairs import register
         from .issues.system import IssueSystem
+        from .skin_status import SkinStatusProvider
 
         self.owns_profiler = profiler is None
         self.profiler = profiler if profiler is not None else RuntimeProfiler()
         self.profiler.resources.sessions.add(self)
         self.initialize_scheduler()
         self.issues = IssueSystem(self)
+        self.skin_status = SkinStatusProvider(self)
         register(self)
 
     @property
@@ -79,17 +86,17 @@ class Session:
         self.changes.record(self._document, value)
         causes.document(self, self._document, value)
         self._document = value
+        if hasattr(self, "skin_status"):
+            self.skin_status.changed()
 
     def initialize_scheduler(self) -> None:
         from .tissue_inspection import Inspection
 
         self.tissue_inspection = Inspection()
-        self.conversion = ConversionPreview()
-        self.mesh_replacement: Preview[Any] = Preview()
-        self.tissue_retarget: Preview[Any] = Preview()
-        self.surface_preview: Preview[Candidate] = Preview()
-        self.tissue_preview: Preview[TissueCandidate] = Preview()
-        self.scheduler = TaskCoordinator(lambda: self.document)
+        self.clear_previews()
+        self.scheduler = TaskCoordinator(
+            lambda: self.document, executor_factory=self.executor_factory
+        )
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
         self.attach_shortcut_contexts()
@@ -288,7 +295,7 @@ class Session:
             "revision": self.document.revision,
             "metres_per_unit": 1.0,
             "entity_count": len(self.document.entities),
-            "skin_available": False,
+            "skin_available": self.skin_status.snapshot().operations["export"].available,
             "entities": [asdict(item) for item in self.document.entities],
             "controls": [asdict(item) for item in self.document.controls],
             "objects": object_descriptions(self.document),
@@ -311,10 +318,11 @@ class Session:
 
     def clear_previews(self) -> None:
         self.conversion = ConversionPreview()
-        self.mesh_replacement = Preview()
-        self.tissue_retarget = Preview()
-        self.surface_preview = Preview()
-        self.tissue_preview = Preview()
+        self.mesh_replacement: Preview[Any] = Preview()
+        self.tissue_retarget: Preview[Any] = Preview()
+        self.surface_preview: Preview[Candidate] = Preview()
+        self.tissue_preview: Preview[TissueCandidate] = Preview()
+        self.skin_fit_preview: Preview[Any] = Preview()
 
 
 def changed_ids(previous: Document, current: Document) -> set[str]:

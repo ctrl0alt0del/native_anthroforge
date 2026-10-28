@@ -15,6 +15,10 @@ It leaves numerical evaluation and scheduling policy unchanged.
 
 ## Scope and reading guide
 
+0.4.0 skin migration is in progress under CH-093 and the subsequent stage records.
+Envelope construction is connected; complete topology, deformation and fitted-shortcut
+workflows are not yet qualified. The existing addon is the numerical baseline.
+
 The inventory groups operations by computational responsibility, rather than listing
 every function, command alias or UI button. It includes numerical construction,
 interactive geometry queries, evaluation coordination and supporting workloads.
@@ -157,7 +161,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | R01 | Dependency/index computation: hierarchy/registry lookup, reference/topology restrictions, output-port graphs, reverse invalidation, SCC cycles, automatic obstacle eligibility and publication-frontier traversal. Reuse immutable structure on value-only edits. | [document index](../src/anthroforge/core/document_index.py), [routing obstacles](../src/anthroforge/core/routing_obstacles.py), [dependent tasks](../src/anthroforge/application/dependent_tasks.py) | [document index](../tests/test_document_index.py), [publication frontier](../tests/test_publication_frontier.py) |
 | R02 | Task assessment/coordination: workload estimates plus measured history, coalescing/delays, causal urgency/age and transitive prerequisite rank, shared inline budget, worker admission, reservations, dispatch-time capture, cancellation and stale-result checks. | [coordinator](../src/anthroforge/application/coordinator.py), [priority policy](../src/anthroforge/application/task_priorities.py), [task schedulers](../src/anthroforge/application/task_schedulers.py), [tissue scheduling](../src/anthroforge/application/tissue_scheduling.py) | [task coordination](../tests/test_task_coordination.py), [priority inheritance](../tests/test_task_priorities.py), [active jobs](../tests/test_active_jobs.py) |
 | R03 | Transactions/history/checkpoints: derive changes, commit/cancel edits, maintain undo/redo restart recipes, choose saveable revisions and validate historical asynchronous captures. | [history](../src/anthroforge/application/history.py), [changes](../src/anthroforge/application/changes.py), [authored jobs](../src/anthroforge/application/authored_jobs.py) | [interleaving](../tests/test_interleaving.py), [capture history](../tests/test_capture_history.py) |
-| R04 | Cache/resource work: keys, immutable leases, hit/miss/eviction, content equivalence and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes and tissue material preparation. | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py) |
+| R04 | Cache/resource work: keys, immutable leases, hit/miss/eviction, content equivalence and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes, tissue material preparation and skin field/stitching buffers (October 28 numerical/performance qualification below; portable release pending). | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp), [skin envelope](../native/src/skin_envelope.cpp), [skin assembly](../native/src/skin_assembly.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py), [skin buffer contracts](../native/tests/skin_buffers_test.cpp) |
 | R05 | Viewport publication/rendering: stage complete native mesh/path/image buffers, switch displayed geometry and picking together, generate controls, perform Qt Quick 3D shading, opacity/depth and selection-outline passes. | [Qt geometry adapters](../native/qt), [outline shader](../native/qt/shaders/outline.frag), [desktop](../src/anthroforge/desktop) | [viewport publication](../tests/test_viewport_publication.py), [capture staging](../tests/test_capture_staging.py), [path presentation](../tests/test_path_presentation.py) |
 | R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. Typed integer controls retain exact text through Qt and convert display units before shared command validation (CH-051). | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [quantity transport](../src/anthroforge/desktop/quantity_values.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [integer quantities](../tests/test_integer_quantity_controls.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
 | R07 | Issues checks: evaluate structural/readiness/attachment/dependency diagnostics and optional native collision checks, retain scoped stale evidence, and verify requested repairs. Read-only checks use the common coordinator. | [Issue system](../src/anthroforge/application/issues/system.py), [providers](../src/anthroforge/application/issues/providers.py) | [Issue lifecycle](../tests/test_issue_lifecycle.py), [Issue integration](../tests/test_issue_integration.py) |
@@ -2667,3 +2671,872 @@ non-overlap, file ownership, retention and retry. The 96-muscle assembly reprodu
 12,561 saved payloads exactly. A profiler run measured 1.58 ms preparation, 4.37 seconds
 worker execution and 0.09 ms publication; uncontrolled background load and no frame
 latency inference. See [release evidence](tasks/usability-037.md).
+
+### CH-093 — skin migration foundations (0.4.0 in progress; R03/R04/R06)
+
+The previous document had no skin definition, accepted stages or reference ownership.
+Added immutable settings/stage records and checksummed numeric resources, schema-7
+serialization with existing 4–6 readers, resource reachability through history/jobs,
+and profiler accounting. Settings use shared commands/transactions; vertical navigation
+preserves existing editors and the document-level Skin page across selection changes.
+No skin generator or numerical replacement is connected in this checkpoint.
+
+Evidence: 32 targeted foundation/architecture/workbench/legacy-loading tests pass; Ruff,
+format and mypy pass. Offscreen navigation, decimal editing and Undo pass. First full
+suite yielded 2,256 passes and one obsolete schema expectation (7 was previously invalid),
+corrected to 8; rerun passes 2,258 tests. Source baseline separately passes 6 fitting, 21 deformation,
+40 topology and 35 skin/gap/tile tests against addon native binaries. These do not qualify
+the standalone numerical port, portable package or production anatomy.
+
+Preserve addon algorithms, settings and warning policies; see the
+[specification](specification_040.md) and [recovery record](tasks/skin-040.md).
+
+### CH-094 — native skin coarse-field preparation (0.4.0 in progress; R04)
+
+Addon preparation used NumPy raster batches and SciPy distance/label operations. The
+standalone adapter batches owned source buffers into C++ rasterization, separable exact
+Euclidean distance transforms, 26-connected exterior extraction, six-neighbor dilation
+and sixteen-level collagen propagation. Preserve source settings, ties-to-even raster
+rounding, float32 seed quantization and field blending. Work has shared cancellation and
+the addon's 104-byte-per-cell budget estimate; native result handles have explicit lifetime.
+This removes numerical Python preparation without substituting a different skin model.
+
+Evidence: `tools/check_skin_fields.py` compares all four fields against the unmodified
+addon modules on twelve deterministic triangle fixtures at resolutions 16/32/48; errors
+remain below 1e-12. Five adapter tests cover collagen endpoints, scale, invalid inputs,
+cancellation, budget rejection and resource release. Existing five CTests pass. These
+are coarse-field checks, not complete skin geometry, production performance or release
+qualification. Gap reconstruction and mesh extraction remain unconnected.
+
+### CH-095 — skin gap queries and native MC33 extraction (0.4.0 in progress; R04)
+
+Pin the maintained addon gap/tile kernels with source hashes and private linkage.
+The source-aware gap query adapter preserves stricter two-sided settings, winding
+independence and single-source disjoint patches. Existing OpenMP directives remain
+inactive; numerical calls execute in the coordinator's worker. Native gap query handles
+are owned and reject released/unknown references.
+
+Replace the addon's Python-driven calls to compiled scikit-image marching cubes with
+a narrow C++17 MC33 adapter over the pinned bioimage-cpp subset. This is the same Lewiner
+case selection, not classic marching cubes. Exact vertices/faces match on 6,344 initial
+source comparisons; committed `tests/test_skin_meshing.py` covers binary/ternary cubes,
+zero degeneracies and full 33-cubed random tiles. Both licenses are retained. Seventeen
+focused tests and five CTests pass. Tile stitching, source support, smoothing and final
+binding are still pending; no complete envelope or production-shape acceptance claimed.
+
+### CH-096 — native protected envelope assembly (0.4.0 in progress; R04)
+
+Move protected-grid selection, tile iteration, five-decimal lattice stitching, source
+component filtering and mesh assembly from addon Python orchestration into C++. Retain
+the maintained tile/gap and eight-iteration constrained Taubin kernels, float32 publication
+rounding and outward orientation. A scoped native cancellation bridge replaces the addon's
+polling worker; each call owns its token lifetime and source-scene access is serialized.
+
+Cube, separated-cubes and overlapping-cubes comparisons against the addon produce exactly
+the same positions and connectivity (11,703/23,180; 20,277/40,252; 3,356/6,574 vertices/faces).
+`tools/check_skin_envelope.py` reproduces the comparisons. Actual paired renders were
+inspected: coarse-grid protrusions are present on both sides. These are preserved source
+behavior, not accepted production skin quality. The anatomical finger fixture remains
+not qualified: its addon baseline exceeded 45 CPU-minutes and was stopped before the
+standalone phase. Tests exercise running cancellation, retry, memory rejection and intact
+source queries. Binding/quality bundle publication and application integration are pending.
+
+Native binding now retains the addon's four source-owner/local-triangle references,
+barycentric coordinates, weights, normal offsets and support per skin vertex. SkinStage
+resources own the corresponding data independently of native handles. Binding invariants,
+resource round-trip and checksum corruption checks pass; deformation-reference construction
+and production material-update acceptance remain pending.
+
+Native envelope results now carry the maintained mesh-quality, coverage/gap and source
+intersection checks alongside geometry. A completion mask separates unavailable checks
+from clean results; findings do not silently reject otherwise usable geometry. Cube,
+separated-cube and overlapping-cube controls also match all six source-binding arrays
+exactly. Eight envelope/architecture tests pass. These checks are worker work; complete
+application publication and anatomical qualification remain pending.
+
+### CH-097 — document skin capture and envelope task (0.4.0 in progress; R04)
+
+Replace Blender object capture with role-aware accepted source leases and one batched native
+world transform/connectivity assembly. C++ retains source-local triangle ordering, reverses
+reflected winding and converts gap ratios using the entire capture bounds. Selection and
+workspace display do not determine contributors. Valid consuming tissues suppress their fibers;
+each reflected instance remains a distinct source. Per-fiber skin radius is an explicit
+physical setting, separate from the app's per-workspace display radius; 1 mm is the initial
+implementation assumption pending the user's preference reply. Shared native tube construction
+is unchanged, but Blender tube parity remains to be qualified.
+
+The envelope command uses the existing coordinator, dispatch-time owned inputs, complete
+read-set validation, retained source/binding buffers and initiating undo history. Low-resolution
+build/undo/redo/save/read and failed rebuild retention tests pass. Native transform tests cover
+reflection, source ownership, relative gap scaling, invalid frames and cancellation. No claim
+of completed skin workflow, anatomical quality or release performance follows from these tests.
+
+Executable dependency probes: Instant Meshes 1.0.0's array API triangulates its generated quads
+when reading them back. Retain the addon's file API; the cube probe preserves 246 quad faces.
+PyTetWild 0.4.2 returns 2,844 tetrahedra using one thread; isolate its temporary file writes.
+These counts qualify callable integration only, not production skin or deformation quality.
+
+### 0.4.0 in progress — bare-Fiber centerline sources
+
+The provisional contributor capture constructed native tubes with an independent 1 mm
+skin radius. The user explicitly chose centerlines only. Capture now retains transformed
+accepted path positions and segment connectivity. Native rasterization seeds those lines;
+a segment AABB supports nearest-source queries and retained bindings distinguish triangle
+and segment elements. There is no display-radius input or degenerate-triangle substitute.
+Mesh-only field/gap/envelope regression tests continue to pass; focused checks also cover
+centerline-only extraction and segment binding. This is an intentional addon difference,
+not claimed bevel-mesh parity. Production anatomy and downstream reference/deformation
+qualification remain pending as part of the unfinished 0.4.0 delivery.
+
+The centerline AABB stores only its segment endpoints, not a second copy of all scene
+mesh vertices. Skin Issues reuse captured diagnostic metadata rather than repeating
+geometry computation. The provisional general tube wrapper was removed after the full
+regression suite exposed a changed profiler operation name; the established display-only
+native operation and attribution are restored, with its regression test passing.
+
+### Skin collagen membership qualification (0.4.0 in progress)
+
+Previously provisional collagen capture accepted any map of matching vertex count.
+It now requires the common connectivity/material-domain signature, preserving maps
+through position-only deformation while detecting reordered/replaced domains of the
+same size. A mismatch retains the addon's scalar fallback plus Issue. Shared fill,
+clear and explicit-weight operations own immutable map resources and ordinary undo.
+Focused validation covers zero fields, changed connectivity, invalid inputs and saved
+resource ownership; no collagen numerical blending formula changed.
+
+
+### Shared collagen painting (0.4.0 in progress)
+
+SCP collagen now uses the existing native cached visibility/projection and batched
+brush (T09) through a distinct material-domain policy. No numerical brush algorithm
+changed. Shared read-only inspection jobs own cancellation and stale-result checks;
+release commits one field edit. Auto starts at effective collagen; zero-valued painted
+fields remain authoritative. Twenty-one focused tests, offscreen controls and inspected
+hidden GPU heat rendering pass. Production anatomical skin is not yet qualified.
+
+### Topology FLOW preparation (0.4.0 in progress)
+
+Ported the maintained addon topology field kernel into the standalone native library.
+Preserved fourth-order phase representation, transported neighboring directions,
+robust constraints and 100+3x60 iteration schedule. Added owned mesh inputs, numerical
+validation and cooperative cancellation; no Python optimization. Four direct addon-DLL
+controls match exactly, including absent guidance. Geometry remains unchanged. This
+qualifies the field adapter only, not complete guided remeshing or production anatomy.
+Hierarchical quad-budget warnings now use the addon's nearest-explicit-parent rule;
+metadata policy remains Python, while numerical density solving will be native.
+
+### Accepted topology guide capture (0.4.0 in progress)
+
+Addon FLOW capture recomputed muscle inflation and sampled grids in Python. The
+standalone adapter resolves accepted uncropped rest material charts and performs
+stencil sampling, frame transformation and feature routing in C++. This avoids a
+second inflation and respects accepted Manual state. Sampling strides, normals and
+empty-interior rejection remain unchanged; explicit Fiber samples retain zero normals.
+Reflection, stencil, two-row rejection and pending-kind tests pass. The compact
+feature path matches the addon DLL exactly. Full branch/anatomical and remesher
+acceptance remain pending; successful guide preparation is not a skin result.
+
+### Remesher execution ownership (0.4.0 in progress)
+
+External topology execution now has a native Windows Job Object boundary with memory,
+time and log-growth limits and cooperative cancellation on the existing caller's worker.
+Assignment occurs at process creation, preventing startup descendants from escaping
+cleanup. Shutdown waits for root termination and child accounting; inherited handles
+are restricted. No topology algorithm changed. Eight lifecycle tests pass. A verified
+QuadWild 0.0.2 bundle produces the same known abnormal Windows quantizer exit with
+parseable cube output; successful geometry must still be validated and that exit
+reported as a warning. Backend pipeline integration remains pending.
+
+### Guided remesher exchange (0.4.0 in progress)
+
+Replaced addon subprocess/file orchestration with the owned backend runner and native
+mesh import. Native feature-face mapping preserves first-incident-face assignment and
+deduplication. Native quad-count calibration retains four attempts, square-root scale
+adjustment and 15% tolerance; Python only sequences external stages and selects
+returned owned meshes. Sparse-path retry preserves all FLOW direction constraints.
+Pinned asset verification uses the original 0.0.2 hashes; setup/package copying adds
+no runtime download or Blender dependency. The complete compact cube pipeline
+matches addon output exactly (98 vertices, 96 quads). The known abnormal Windows
+quantizer exit and unattainable count are explicit warnings. This is backend parity,
+not loop/density/symmetry assembly or anatomical skin qualification.
+
+### Native guide assembly and regional density (0.4.0 in progress)
+
+Topology capture now joins source guide arrays in C++, preserving distinct local
+regions and remapping path offsets with explicit source provenance. Density arithmetic
+previously executed addon NumPy/Python adjacency loops; the standalone native kernel
+retains triangle-lumped areas, square-root area/budget lengths, positive-length median
+fallback, 0.65/0.35 logarithmic smoothing and eight regional count corrections.
+Zero-budget/empty regions remain explicitly unusable, and custom refinement lengths
+can enter the same correction stage. Hierarchy and integer reservations remain core
+metadata policy. Three direct addon controls agree within 2.7e-16 in target lengths.
+Source ownership and complete density-driven remeshing are not yet integrated.
+
+### Skin proxy midpoint smoothing (0.4.0 in progress)
+
+The addon applies Blender Smooth to its decimated proxy, factor 0.42 for ten iterations.
+The standalone native adapter preserves that edge-midpoint average, all-axis behavior
+and float evaluation instead of substituting a generic Laplacian. It operates on an
+owned mesh result and retains connectivity; disabled smoothing preserves full original
+precision. Four background Blender 5.0.1 fixtures (one/ten iterations, with/without
+isolated vertices) pass within 3e-7. A fixed-camera numerical-mesh comparison was
+rendered and inspected at `build/skin-040/ui/proxy-parity.png`. This verifies compact
+proxy controls, not anatomical shape acceptance or the pending decimation stage.
+
+### Instance-aware native skin ownership (0.4.0 in progress)
+
+Addon attribution uses vertex/triangle-centroid samples, nearest source followed by nearest
+supporting SCP, nearest-SCP fallback, and area-threshold island cleanup (0.0005). These now
+run in C++ using the existing libigl spatial hierarchy; discrete density transfer and
+owner-to-exclusive-budget mapping are also native. Python resolves anatomical relationships
+and packs owned data. The source/rule identity is retained: a diagnostic established that
+addon `_scp_trees` overwrites original samples with their mirror, assigning an original-side
+tissue beside A to B. The new adapter keeps both instances and shares only the authored
+budget identity. It reuses existing mirrored attachment mappings and explicit midline sharing.
+
+Preserved source/support selection and numerical island thresholds. Intentional differences:
+zero-radius Fiber centerlines contribute endpoint/midpoint samples; mirrored overwrite is
+corrected; equal-distance/island-vote ties use stable native indices instead of incidental
+Python set order. No anatomical binding or geometry is edited. Sixteen focused tests pass;
+three direct non-mirrored addon controls up to 10,000 vertices have identical ownership.
+Local native attribution was about 0.3–11 ms on those small controls; this is not an app
+responsiveness measurement. Complete density-driven topology/anatomy remains unqualified.
+
+### Native conforming topology refinement (0.4.0 in progress)
+
+Migrated addon Python quad refinement, repeated density sampling, candidate scoring,
+symmetry grouping, boundary-parity checks and budget search to C++. Retained the 1.35
+area/density threshold, two passes, eight search trials, opposite/adjacent/four-way
+splits and propagated edge closure. Parent region/guide labels survive subdivision.
+Proximity retains 1%/5% diagonal smoothstep and maximum 1.5 density multiplier, applied
+before eight regional budget corrections. Accepted surface-tissue construction is the
+eligibility boundary; semantic classification does not change evaluation. Missing
+eligible sources warn and preserve ordinary density. No anatomy or source geometry
+is modified. Malformed boundary graphs reject a candidate instead of hanging traversal.
+
+Direct addon comparison covers all 64 masks on six quads, three adaptive budgets
+(99/162/300 resulting quads), symmetry and proximity. Coordinates match within 1e-14,
+connectivity/provenance match, and proximity weights match exactly. The native small
+adaptive controls took roughly 0.2–1.6 ms versus addon 11–53 ms; these are local kernel
+measurements, not whole-app performance. Rendered/inspected matching compact geometry
+is at `build/skin-040/ui/refinement-parity.png`; full anatomy remains pending.
+
+### Native skin proxy collapse (0.4.0 in progress)
+
+The addon uses Blender Decimate before midpoint smoothing. A native owned adapter now
+retains its unweighted face-plane quadrics, boundary weight 100, 1e-8 optimization
+threshold, flat-region cost, float positions, interpolated normals and 0.01 face-flip
+guard. Existing libigl supplies manifold edge-collapse traversal, with serial callbacks
+and cancellation on the coordinator worker. No source geometry or attachment changes.
+The caller can inspect achieved triangle count; unsafe collapses never force a target.
+Preparation/queue storage is bounded and malformed collapse topology is rejected.
+
+Generic QSlim was tested rather than assumed equivalent: its area/regularization/cost
+rules produced larger discrepancies. Six background Blender 5.0.1 captures qualify
+the adapted policy. Open-patch geometry agrees within 2.2e-8 diagonal; MC33 cube/gap/
+contact envelopes have P95 error below 2e-7 diagonal. Different topology traversal and
+equal-cost ordering remain visible on curved symmetric controls (sphere maximum
+0.00656 diagonal at 75% reduction); this is recorded, not claimed as exact parity.
+Inspected both comparison images under `build/skin-040/decimation`. Local native
+envelope times were 21–145 ms including result preparation; not application timings.
+Complete remesher/guide integration and anatomical qualification remain pending.
+
+### Native closed topology-guide preparation (0.4.0 in progress)
+
+Moved addon Python/SciPy/BVH loop preparation to a batched C++ boundary: nearest
+surface projection, local-gap predicate (twice median edge length), Dijkstra closure,
+192 uniform arclength samples, symmetric classification, Hausdorff duplicate threshold
+(diagonal/160), and ordered compatible pairing. Pairing retains perimeter ratio
+0.2–0.95, planar containment and depth <=0.25 outer radius. The existing maintained
+native FLOW route implementation supplies weighted graph paths; no routing solver or
+new worker pool is introduced. A shared skin point index serves ownership and loops.
+
+Capture uses accepted closed Fiber paths and source/rule frames, including sources
+already represented by tissues. Pending authored closure changes do not reinterpret
+accepted Manual paths. Source arrays/attachments remain untouched. Collapsed/unpaired
+loops are explicit warnings; duplicate loops remain suppressed. Source fixtures and
+the background Blender capture tool are maintained under tests/tools.
+
+Three addon controls match coordinates within 1.85e-7 and match pairing/statuses.
+Eight of 576 curved-surface samples select the other incident triangle at a shared
+edge; both normals are spatially validated instead of claiming exact normal parity.
+Rendered geometry matches in `build/skin-040/ui/loop-parity.png`. This does not yet
+qualify annulus construction, seam stitching or anatomical skin.
+
+### Native annular topology patches (0.4.0 in progress)
+
+Ported addon Python annulus generation into owned native patches: direct interpolation,
+planar polar reconstruction, radial fallback, five projected rings, 24–96 columns,
+whole-patch orientation and inversion-based selection. Planar/radial low-pass fields
+retain 8/6 Fourier harmonics through the equivalent bounded direct sum. SciPy's pinned
+native assignment kernel retains minimum-cost pairing for ring symmetry; all work is
+serial on the coordinator worker. Reflected patch pairs reuse positive-side geometry
+and reversed winding while retaining target source identities. Source paths stay intact.
+
+Six addon controls exercise all three candidates on planar and curved proxy geometry.
+Coordinates agree within 1.21e-6 fixture units; selected methods, source mappings,
+connectivity and inversion counts match. Artificial reordered/coincident rings isolate
+fallback paths; they are not full-anatomy acceptance. Reflected-pair, malformed input,
+cancellation and owned-lifetime checks pass. Rendered overlays were inspected at
+`build/skin-040/ui/annulus-parity.png`; fixed Z limits avoid exaggerating Blender BVH
+float noise. Annular patches are not yet stitched into a public topology result.
+
+### Native guide cutting and quad transitions (0.4.0 in progress)
+
+Replaced addon Python/SciPy numerical hole selection, ring alignment/resampling,
+balanced zipper assembly, minimum-quality seam selection and staged/centered transition
+construction with owned C++ kernels. Retained 1.08 side footprint versus 1.0 centered
+footprint, 1.8 radius/0.55 depth bounds, count-difference 12 and ratio 1.5 limits,
+P95 aspect 4/max aspect 12 thresholds, symmetry tolerance and exact boundary checks.
+Shared ring projection is reused by nested-loop pairing. Native weld preparation
+retains rounded-cell coordinates and last-face provenance for the forthcoming assembly.
+
+Twelve captured addon cut masks agree exactly. Eight successful transition controls
+agree within 9e-16 in position, with identical quads and diagnostics; two unsupported
+pairs reject for the same parity/symmetry reasons. Rendered overlays are inspected at
+`build/skin-040/ui/stitch-parity.png`. A libigl triangle predicate supplies local
+intersection checks on existing native tessellation; wider coplanar/degenerate BVH
+parity and complete anatomical assembly remain qualification work. No algorithmic
+repair or silent backend substitution is introduced.
+
+### Complete native skin topology assembly (0.4.0 in progress)
+
+Combined automatic quads, transitions and annuli through native boundary matching,
+paired-transition reflection, quantized welding, last-duplicate provenance and outward
+orientation. Blender 5.0.1 `bmo_normals.cc` is adapted through owned arrays, without
+BMesh. Region labels retain the source contract: automatic 0, transition 1, guide 2.
+QuadWild's explicit unstitched quality fallback preserves source/guide geometry;
+cancellation remains an error and never becomes that fallback. Instant remains strict.
+
+Assembly comparison exposed a meaningful precision boundary: the addon materializes
+annuli into float-coordinate meshes before stitching. Keeping unrounded double points
+changed 4–16 tied transition quads on symmetric fixtures. Restoring that boundary,
+after native annulus evaluation, produces exact positions, oriented connectivity,
+labels and transition diagnostics on five successful captured controls. A sixth
+control reproduces parity rejection. Closed disconnected components exercise outward
+orientation; rendered side-by-side results were inspected. Source geometries remain
+immutable and owned results survive input release. These compact fixtures do not yet
+qualify complete anatomical topology, reference deformation, or the release workflow.
+
+### Shared native skin symmetry preparation (0.4.0 in progress)
+
+Moved addon BMesh half cutting and NumPy symmetry assembly into batched C++. Shared
+edge intersections preserve connected cut boundaries; convex planar cut quads use
+Blender's area/perimeter beauty criterion. Both backends use the same negative-half
+policy, 2%-diagonal boundary snap, cut-plane cap exclusion and 1e-6-diagonal welding.
+FLOW retains all direction samples and only contiguous negative-side path runs of
+at least two points, with the addon 1e-8 exclusion threshold. Original inputs remain
+unchanged. No prototype unmatched-hole filling is introduced into production.
+
+Seven captured addon controls match oriented nondegenerate connectivity; positions
+are exact except oblique clipping (maximum 1.69e-7). An exact-on-face plane exposes
+12 duplicate zero-area triangles in the addon; the new adapter omits those duplicates
+while preserving the two valid triangles. Actual comparison renders were inspected.
+Cancellation, malformed planes, empty halves and FLOW run/provenance checks pass.
+These controls qualify the isolated preparation boundary, not anatomical remeshing.
+
+### Complete topology execution boundary (0.4.0, qualification in progress)
+
+Composed the qualified native symmetry, density, guide, proxy, refinement and assembly stages
+under one coordinator-owned job. Instant Meshes runs in an isolated matching-runtime process
+with the addon's fixed deterministic/pure-quad options; QuadWild remains the default. Initial
+targets, three-times-annulus reservation, half-domain QuadWild target and one Instant count
+correction follow the source. Both use bounded cancellation and explicit errors. Root-local
+plane transformation and density area aggregation now run in C++; Python orchestrates stages.
+
+Initial public-command tests passed for Instant (full/symmetric) and symmetric QuadWild, with
+undo and project round trips. Full-domain QuadWild exposed the user-import/generated-output
+tessellation mismatch and, separately, a malformed triangle emitted during calibration.
+The evaluated-output import boundary retains the existing generated tessellation rather than
+changing remesher coordinates/connectivity. Incorrect polygon arity remains a failure. This
+boundary and the complete pipeline are still being qualified; no anatomical acceptance or
+deformation/reference behavior is established by these preliminary results.
+
+### Topology diagnostics and isolated proxy preparation (0.4.0 in progress)
+
+Advisory topology analysis now runs in the native worker before publication, preserving
+addon degeneracy thresholds, orientation/manifold/valence checks, guide labels, symmetry
+and 95th-percentile distance tolerance. Findings carry accepted geometry/revision evidence;
+no check repairs output. Self-intersection availability remains null. Captured addon fixtures
+cover eight regular and intentionally malformed cases; shared checks agree. Generated
+remesher OBJ import uses existing generated-mesh triangulation and preserves source polygons,
+while user imports stay strict. Incorrect quad arity remains rejected by both source and port.
+
+The isolated Instant backend matches the source CPython-3.11 fixture in the app's CPython-3.12
+runtime. A shared private process adapter now also owns pinned PyTetWild proxy generation,
+including process-tree cancellation, timeout/log/memory limits and bounded output loading.
+The source numerical settings remain, with one numerical worker thread instead of four to
+respect coordinator execution ownership. This is not proof of tetrahedral connectivity parity
+or final-skin acceptance. Durable reference and LE/FAST integration are still pending.
+
+### Approved backend execution correction (0.4.0 in progress)
+
+The earlier fixed ten-minute and 4 GiB process limits could reject work that the addon
+continues. Production backend requests now leave these limits disabled; explicitly supplied
+diagnostic limits remain supported. stdout/stderr use a drained native pipe and a bounded
+16 MiB diagnostic tail, plus at most 128 bytes identifying omitted output. Log volume no
+longer terminates numerical work. The coordinator still owns the worker and its complete
+process tree. Shutdown waits for owned process handles, fixing a race where job accounting
+reached zero before a child's termination handle was signalled.
+
+Tetrahedral preparation restores the addon's four-thread setting. This checkpoint does
+not yet complete resource-aware admission or establish tetrahedral geometry parity.
+Fourteen focused Windows process/proxy tests pass, including output flooding, cancellation,
+timeouts explicitly requested by tests, descendant termination, and a real proxy build.
+The production algorithms for accepted items 3–6 remain unchanged. Blender BMesh/Decimate
+subset isolation is underway in a separate ignored build probe; production topology has
+not yet switched, and 0.4.0 remains incomplete.
+
+### Approved Blender BMesh topology replacement (0.4.0 in progress)
+
+The earlier libigl collapse adapter retained metric formulas but not Blender's topology
+mutation and tie ordering. The custom half cutter also omitted source degenerate triangles.
+Both are now replaced by a pinned Blender 5.0.1 geometry-only BMesh subset. Retained
+upstream function bodies are unchanged; original/retained hashes and omitted unreachable
+definitions permit reconstruction and audit. No Blender runtime or extra worker pool is
+required. Geometry-only custom-data gates reject unsupported attribute access explicitly.
+
+An isolated sphere comparison demonstrated that edge order affects equal-cost collapses.
+The adapter now preserves Blender Mesh.from_pydata edge order and carries it through
+smoothing/deformation. Source float boundaries, collapse flags, bisect/beauty triangulation
+and cut-face multiplicity are retained. Cancellation brackets upstream mutation calls at
+safe boundaries; long-call cancellation latency still requires measurement. An optional
+explicit diagnostic memory limit remains available, but ordinary Decimate work has no
+additional estimated-memory rejection. The addon's tiled-field working budget is unchanged.
+
+Five canonical Blender captures (sphere, ellipsoid, patch, tetrahedron and small nonmanifold
+input) match exact coordinates/connectivity through the native application boundary.
+Twenty-eight focused topology, symmetry, density and provenance tests pass. Earlier
+approximate comparison records remain historical and are superseded by this implementation.
+These compact controls do not establish complete anatomical workflow or release acceptance.
+
+### Resource-aware skin admission (0.4.0 in progress)
+
+Replaced worker-count-only admission with a shared resource policy under the same coordinator.
+Task schedules now declare numerical thread demand and estimated working storage. Skin
+policies use source metadata/BMesh preparation estimates and the unchanged addon tiled-field
+budget; no sample arrays are prepared for assessment. Backends controlling their own
+parallelism reserve available CPU capacity without altering numerical settings. Estimates
+govern concurrent admission only: an isolated job is permitted regardless of its estimate,
+and running jobs have no newly imposed cutoff. Uncertain estimates remain heuristics.
+
+Dispatch reassesses before capturing input, and blocked requests retain ordinary queued,
+cancellation, coalescing, checkpoint and priority behavior. Profiler lifecycle records include
+resource estimates and resource-wait transitions. Bounded inline edits remain available.
+Forty focused scheduler, skin lifecycle and architecture tests pass; native CTests pass 5/5.
+Broader production-anatomy performance and complete release checks remain pending.
+
+### Blender modifier input-normal parity (0.4.0 in progress)
+
+Real skull preparation exposed a difference missed by the initial compact controls.
+The modifier copies regular Mesh vertex normals into BMesh; recomputing BMesh normals
+changes low-cost collapse ordering. Supplying captured Mesh normals to the isolated
+kernel restored identical topology, identifying the actual conversion defect. The
+adapter now preserves Blender's Mesh Newell-face normals, angle-weighted vertex
+accumulation and float normalization before the unchanged BMesh collapse kernel.
+
+Source-backed skull (428,230 triangles) and torso (4,481,616 triangles) controls now
+match exact coordinates/connectivity after collapse, smoothing and half cutting.
+A captured 2,048-triangle skull region distinguishes the old/new conversion: the old
+normal boundary changes vertices by up to 0.02504 source units; the new output is exact.
+Stage timings and source hashes are retained under build/skin-040/bmesh-anatomy; these
+are individual qualification runs, not controlled performance benchmarks. Items 3–6
+remain unchanged. This completes the missing Blender conversion boundary, not a new
+simplification or smoothing algorithm. Complete skin release acceptance remains open.
+
+Correction qualification: the full Python/native-backed regression rerun passes 2,487
+tests; native CTests pass 5/5. The initial run had an outdated launcher-test patch target
+and an intermittent inline-scheduling assertion; the latter did not recur in 30 repeats
+or the full rerun, so its original cause is not claimed resolved. Added diagnostic context.
+Ruff, mypy, changed native-file style and dependency checks pass. No packaged or complete
+final-skin deformation acceptance is implied. The centerline deformation-weighting mismatch
+was documented for discussion; no new weighting was implemented. The October 27 decision
+below resolves it by restoring surface inputs.
+
+### Restored thin Fiber skin surfaces (0.4.0 in progress, October 27)
+
+The centerline-only contributor experiment is superseded by the user's decision to restore
+the addon's small-thickness approach. Face-less paths cannot supply the positive-area samples
+required by its persistent deformation reference. Native capture now evaluates the same
+POLY-curve bevel: twelve vertices per ring, minimum-twist frames, source float arithmetic,
+duplicate handling and uncapped open ends. Upstream frame bodies remain unchanged; owned
+array adapters replace Blender objects. No new area-weighting algorithm is introduced.
+
+Skin radius is document-owned per-Fiber data (1 mm default), independent of per-workspace
+display radius. Its edit invalidates construction without changing paths/bindings. Mirrored
+instances share the source mesh and reflect it; accepted tissue consumers still suppress
+their Fibers. Admission estimates account for the expanded mesh; preparation stays on the
+worker. This adds physical extent and surface area relative to the superseded centerlines.
+
+Six source captures match positions within 1e-8 metres and exact connectivity. The unchanged
+addon sampler accepts all six, selects identical sample indices, and matches area exactly
+in five cases (closed-loop relative difference 1.2e-7). The initial four-Fiber-only envelope
+timing was withdrawn: visual inspection exposed boundary planes in the missing-SCP case,
+not representative anatomical skin. A subsequent whole-skeleton attempt exhausted the
+benchmark's default 1 GiB assembly budget; it is not a completed comparison. Corrected
+trials use the production worker budget and four forearm Fibers with their attachment SCPs.
+All-326-Fiber capture alone is approximately 424 ms; captured arrays
+are 27.5 MB versus 1.24 MB. This intentionally stresses unsuppressed Fibers and is not full
+assembly latency or total resident memory. Raw capture trials and the rejected envelope
+experiment are in build/skin-040/fiber-thickness-production. Closed-loop/FLOW guides now
+use a separate accepted-path capture boundary; they do not receive the physical bevel.
+Complete deformation/release acceptance is pending.
+
+Corrected grid-220 comparison (`build/skin-040/fiber-thickness-forearm`): three serial
+counterbalanced profiler-off trials per mode give median 3.380 s centerlines versus
+105.773 s tubes through capture/fields/scene/envelope. Output grows from 64,006 to
+1,585,630 triangles; tube capture itself takes 3–4 ms for four Fibers. The original
+addon's exterior precision routine on these exact surface inputs requests 4.911× linear
+refinement (0.0471715 coarse voxel, 0.00960515 fine voxel, 564 qualifying faces). This
+supports the inherited protected-gap grid as the dominant cost increase. Algorithms,
+tolerances and automatic precision remain unchanged; it is not a claimed optimization.
+Both actual envelopes were visually inspected. The four Fibers are deliberately treated
+as bare inputs for the comparison. In the unchanged saved 96-muscle assembly, all 326
+Fibers are consumed by accepted tissues and remain excluded from separate skin capture.
+These measurements exclude publication and persistent deformation; machine background load
+was not controlled. Raw trials, a separate profiler report and the addon check are retained.
+
+Final qualification: 2,502 regression tests and all five native CTests pass. Offscreen
+radius editing/undo and matched-build hidden GPU source/envelope/isolation views pass;
+actual images were inspected. The complete 600-second diagnostic profiler capture has
+zero truncated events; profiling-on samples are excluded from the timing medians.
+The simple cube/Fiber fixture at grid 24 exposes an unresolved-gap error reproduced
+verbatim by the original addon on identical inputs. Grid 64 builds and displays it;
+production grid 220 was blocked by the contemporaneous available-memory budget.
+No gap rules, tolerances, production resolution or resource policy were changed to
+make these checks pass. This retained source limitation and low-memory test restriction
+remain explicit; complete 0.4.0 deformation and release qualification are still pending.
+
+Follow-up VCP-context experiment: adding the two consuming tissues to the same three
+SCPs removes all five represented Fibers from skin input, so centerline/tube variants
+become identical at capture. This 3,328-triangle input hit an added standalone assembly
+estimate cutoff, later diagnosed below. Initial follow-up refinement figures of 70.76x
+and 100.23x were invalid: that diagnostic supplied relative ratios where the native query
+requires resolved absolute gap distances. Corrected original-addon preflight using exact
+captured buffers yields 6.72712x (two VCPs) and 6.86490x (28 VCPs). The actual failed
+computation had used the correct native capture; this diagnostic error affected its
+explanation, not its input. Neither case established a completed skin output. Source
+previews, corrected policies and exact evidence are retained in the skin task record.
+
+### Correction: standalone-only envelope assembly rejection (October 27)
+
+The VCP experiment's failure was attributed too broadly to inherited gap refinement.
+Inspection after the user's challenge identified an added execution-policy restriction:
+the port subtracted all retained field/tile storage, then rejected an estimated mesh size
+at 256 bytes/vertex plus 192 bytes/triangle. The addon has no equivalent assembly limit.
+An identical small control with an 8 MiB field budget succeeds in the addon and fails in
+the old port, distinguishing this policy defect from geometric complexity or actual OOM.
+
+Removed the standalone aggregate and mesh-estimate cutoffs, preserving the original sparse
+field working budget, cancellation, numerical stages and genuine allocation errors. Refresh
+the working budget at reconstruction entry as the addon does. The corrected native build
+completes the same control. All 214 skin tests and five native CTests pass; original-addon
+cube comparison has exact positions, connectivity and all binding arrays. The exact failed
+two-VCP/three-SCP input now completes at the same field budget, with 827,176 vertices /
+1,654,392 triangles. Actual output was rendered and inspected. Diagnostics show one
+watertight orientable component and zero source-coverage/protected-gap violations; 54
+source-source intersections remain advisory. A single profiled run took 202.93 seconds
+including preparation/output saving, not a controlled performance comparison. The trace,
+mesh and image are linked by the task record. No geometry algorithm or source file changed.
+This restores the previously approved execution policy; it does not relax gap constraints
+or introduce a new skin algorithm. Earlier failed anatomy runs are not addon parity evidence.
+
+
+### Physical skin sources separated from topology guides (October 27)
+
+The user confirmed that construction must not physically contribute to draft/final skin.
+Replaced thin-Fiber source capture and failed-tissue fallback with SCP/Tissue-only physical
+providers. Kept closed/FLOW Fiber paths as separate construction dependencies. Envelope
+settings revisions now include only physical-source fields; guide changes affect topology.
+Removed obsolete per-Fiber skin radius controls; known pre-release serialized radius values
+are ignored on read and omitted on subsequent save. Numerical envelope/topology kernels,
+accepted anatomy, material bindings and source assets are unchanged.
+
+Evidence: 219 skin-selected tests, type checks and offscreen FLOW editing/undo pass.
+Regression checks verify no bare/mirrored Fiber physical capture, no failed-tissue fallback,
+and unchanged physical mesh/read revisions after FLOW edits while topology reads change.
+The source-panel layout was inspected offscreen. Complete deformation/fitting/export,
+interactive responsiveness and release qualification remain pending.
+
+
+### Maintained final-skin deformation boundary (October 27, integration in progress)
+
+Ported the addon's LE/FAST, embeddings and original area-CDF anatomical sampling into the
+shared native library. C++ also performs the original normalization/denormalization formerly
+in Python. No objective, material constants, iteration counts or convergence tolerance changes.
+Owned handles replace the separate legacy DLL ABI. Cancellation uses the coordinator token;
+the original whole-job 600-second timeout is removed under the approved execution policy.
+FAST retains BBW and its numerical cache format in an owned temporary directory.
+
+Evidence: compact source-DLL fixtures compare eight poses across LE/FAST, including outside
+proxy embedding, translations, scale and asymmetric movement. Positions/predictions agree at
+1e-9, embeddings at 1e-12, diagnostics at 1e-8; area-CDF indices/mass match. Cancellation does
+not poison subsequent solves; released handles fail explicitly. Seven parity/architecture
+checks and type/style/build checks pass. These are native-boundary results only: durable
+reference, current-anatomy capture, contact integration and end-to-end qualification remain.
+
+
+### Skin contact boundary and source-capture discrepancy (October 27)
+
+Ported the maintained contact/symmetry kernel into af_native with owned buffers and shared
+cancellation. Preserve numerical passes/sweeps/tolerances, source storage limit, advisory
+work-limit reporting, and explicit incomplete CCD coverage. Original-DLL identity/crossing/
+reopening fixtures match positions and all diagnostics at 1e-10. No complete contact guarantee
+or integrated skin workflow is implied. 229 skin-selected tests and five native CTests pass.
+
+Reference inspection found two source behaviors requiring explicit decisions before alteration:
+uncropped muscle inflation supplies deformation targets before relaxation/stacking, and
+result.faces is used instead of the two-sided result.inflated_faces. On four existing donor
+envelope fixtures, the original sampler chooses zero second-side vertices with those capture
+faces, versus 19 with complete envelope faces. The latter is an experimental comparison,
+not proof of final skin quality. The subsequent explicit user answer approved a preference
+with finished/cropped tissue as default and uncropped inflation as an alternative, and
+sampling both sides. This supersedes the pending decision; solver objectives stay unchanged.
+
+### Skin support source policy and material sampling (October 27, integration in progress)
+
+New references capture the selected preference; existing references retain it. Draft sources
+remain finished tissue. Complete canonical faces supply the original area-CDF sampling,
+including both sides. Native code owns transformed area accumulation, weight normalization,
+and retained-material target resolution. The application owns source identity/provenance.
+No nearest-surface fallback or resampling occurs during updates. Incompatible contributor,
+topology or material identities fail explicitly. Full deformation integration/qualification
+remain pending; source tests are recorded in the task record when completed.
+
+Reference preparation and position-only updates are now integrated on the feature branch.
+Immutable references retain the sampled source assets; updates resolve those addresses through
+the existing native material service, then use the unchanged LE/FAST and advisory contact kernels.
+Native identity replay uses the donor's model-relative 1e-6 tolerance. Publication owns complete
+stages; failed replacements retain their successful topology separately for an explicit retry.
+No numerical repair, contributor substitution or automatic retopology was introduced.
+Focused tests cover real proxy initialization, persistence, undo/retry and rigid translation.
+Full assembly/performance/desktop qualification and prepared-factor reuse remain unfinished.
+
+
+### Skin fitting port checkpoint — 2026-10-27 (qualification pending)
+
+The maintained addon native/bone_fitting kernel and Dem Bones 1.2.1 are now isolated in the
+existing C++ library. Source hashes and adapters are recorded in native/migration/bone_fitting.
+Scale Aware bounds, iterations, maximum influences and four-thread policy are preserved.
+The approved execution-policy change replaces the old 600-second failure with cooperative
+coordinator cancellation. Native batch prediction retains the donor SLERP convention; this
+is distinct from actual channel-linear playback, which is not yet integrated. Weight/transform
+validation and error statistics move from addon Python into C++ without changed thresholds.
+Original DLL fixtures captured; object compilation passes. Numerical parity, actual playback,
+representative anatomy and performance remain unqualified. No release or speed claim.
+
+
+### Skin preparation reuse and isolated fitting samples — 2026-10-27
+
+The default-resolution integration test exposed repeated costly tetrahedral/reference work
+(15 tests: 1664.68 s); production per-update preparation was also being reconstructed. Reuse
+now keys immutable reference identity and all solver settings, with native solve serialization.
+Native retained-byte accounting includes sparse/dense factors and FAST buffers, not allocator
+RSS. Two-entry/four-GiB retention limits evict/bypass without restricting valid computation.
+Fresh/reused LE output is bit-identical on the fixture. Target samples, objectives, tolerances
+and source contact projection are unchanged. Profiling large production updates is pending.
+
+Isolated fitting sessions execute existing shortcut, evaluation and attachment operations on
+the outer coordinator worker; they own document state and caches and borrow only immutable
+resources. Cancellation propagates into nested native calls without starting a competing
+worker pool. A real five-pose translation fixture verifies isolation, fixed topology and
+repeatability. Maintained Scale Aware/Single Active kernels match captured DLL results at
+1e-8, and channel-linear playback matches Blender 5.0.1 positions at 1e-6, including between
+keys/clamping. These fixtures do not establish full anatomical fitting or portable acceptance.
+
+Fitted snapshots now publish through the shared authored-job lifecycle with complete source
+and wrapper-definition provenance. Independent playback uses stored channels on the coordinator,
+coalesces superseded values, and retains displayed geometry until a complete replacement is
+ready. It never invokes anatomical evaluation, changes document revisions or stores drag
+intermediates in the document asset catalogue. Source edits mark the snapshot stale; removing
+the original skin does not invalidate independent playback. Public API/undo/persistence and
+desktop adapter tests pass. No interpolation/objective change accompanies this integration.
+
+Skin OBJ export freezes authored inputs and accepted resources at request time. The explicit
+update policy runs existing evaluation/build/deformation operations in a worker-owned isolated
+session; accepted export serializes the already completed skin. Neither policy changes live
+anatomy or topology algorithms. Canonical polygons, metre coordinates and application axes
+are written in bounded chunks, with cancellation and atomic destination replacement. Tests
+cover fixed revision, quad preservation, pending Manual source motion and failed-write cleanup.
+
+### Skin qualification boundary fixes — 2026-10-27
+
+Full regression exposed dropped profiler ownership events: repeated per-kind limitations
+exceeded the existing 16-KiB event bound. Shared limitations now live once at the snapshot
+root; accounting, event budget and numerical work are unchanged. Skin Issues also serializes
+stage records before fingerprinting so actual findings reach the provider. The corrected
+complete Python suite passes 2562 tests; native/style checks passed separately.
+
+Packaged tetrahedral workers failed during PyTetWild's unconditional PyVista/VTK import, before
+native computation. Load and bundle the pinned 0.4.2 array extension and its wheel DLLs directly
+using Python's extension loader. No solver settings, threads, inputs, outputs or objective change.
+Both paths load the same binary SHA and satisfy boundary/volume checks. Repeated unchanged
+package calls already vary in cell count (261 versus 220 vertices on one compact probe), also
+varying in a serial experiment; exact tetrahedral index equality is not a supported guarantee.
+Six focused tests and mypy pass. Portable and production anatomy qualification remain pending.
+
+### Preserve typed dependencies during skin fitting — 2026-10-27
+
+Production fitting of Ribs Top Radius failed at the baseline sample with changed Thumb support
+topology. The graph marked Thumb pose only, but isolated capture discarded output roles and
+forced construction of all downstream owners and prerequisites. Its unnecessary Boolean rebuild
+changed vertex indices. Capture now dispatches the existing declared output types through the
+shared family scheduler and requests pose work separately. Genuine geometry changes still rebuild;
+retained-reference validation remains intact. No numerical or attachment policy changed.
+
+Sixteen focused tests pass, including pose-only capture and initiating shortcut policies.
+The actual 96-muscle assembly now completes five-sample/four-bone fitting in 239.685 s;
+repeatability error 2.38e-12, midpoint stored playback 63 ms. Skin connectivity/reference remain
+unchanged during the preceding 34.447-s anatomy update. Hidden rendered output was inspected.
+These measurements are single trials, not performance claims. Worker diagnostics now retain
+the final 4096 log bytes after cleanup; support errors include the source name/sample value.
+The relocated package also passes after direct extension loading; final packaging must include
+this dispatch fix. No unapproved geometry repair or remesher setting change accompanies it.
+
+### Restore source skin parallelism and field lifetime — 2026-10-28 (R02, R04)
+
+**Initial source-only checkpoint; superseded by October 28 qualification below.**
+Baseline: `7ca3b69` on `codex/skin-040`; no measured performance regression or improvement
+is claimed. Static comparison found that CH-095's serial routing include disabled the
+addon's OpenMP gap/tile/smoothing/binding/quality loops. The port also retained sparse
+voxel fields through validation, whereas addon `core/draft_skin/gap_solver.py:finish`
+calls `tiles.release_field()` immediately after the same eight smoothing iterations.
+
+Replace the shared routing compilation boundary with the dedicated `af_skin_kernels`
+OpenMP object target. It reuses pinned collision/triangle-query headers and skin kernels
+in a private skin namespace; no donor numerical header changes. The source thread cap
+remains four, declared in envelope resource admission under the existing coordinator.
+Combined construction already reserves all CPUs. Routing's serial guard remains intact;
+skin gets a compile-time OpenMP requirement. Batched gap/binding adapters use the same
+per-point calculations and source worker threshold, with validation before dispatch and
+cancellation reported after parallel work joins. No global thread-count mutation or
+separate scheduling queue is introduced.
+
+Call the existing `af_skin_tiles_release_field` after smoothing and before diagnostics,
+retaining source geometry, separators, corridor checks and the caller's borrowed Fields.
+Release the unfiltered mesh after component filtering. Preserve grid/gap precision,
+budgets, meshing/stitching, smoothing iterations, bindings and quality-warning behavior.
+This supersedes CH-095's deliberately inactive OpenMP integration; it does not replace
+the skin algorithm or optimize the separately identified coarse-field/stitching kernels.
+
+Authored but **not run**: scheduler admission regression and batched-versus-serial gap
+and material-binding comparisons. Existing envelope tests and maintained addon parity
+tools cover repeatability, geometry, post-release diagnostics, cancellation and reuse.
+Source review only; no configure, build, linter, tests, benchmark, app run or package update.
+Required after the user resumes: compile/style; source parity including real anatomy;
+controlled elapsed-time/peak-memory comparison and existing release gate. Earlier passed
+tests and the old portable executable do not qualify this change. See the
+[recovery record](tasks/skin-040.md) for the validation hold and next steps.
+
+### Bulk skin stitching and coarse-field execution — 2026-10-28 (R02, R04)
+
+**Initial source-only checkpoint; superseded by October 28 qualification below.** Baseline `68917e0`.
+Static inspection found an ordered-map allocation/lookup for each tile vertex, serial
+independent EDT lines, fifteen full-grid collagen mask scans even when levels were absent,
+and a flood-fill vector reserving/retaining every visited cell. Runtime cost remains an
+unmeasured hypothesis until controlled profiling resumes; no speedup is claimed here.
+
+Replace CH-096's map insertion with contiguous tile accumulation and bulk key sorting,
+following addon `core/draft_skin/gap_tiles.py::_stitch` and NumPy's sorted unique/first-index
+contract. Sort equal keys by original occurrence, preserving the first **unrounded** point.
+Keep nearbyint five-decimal lattice keys, lexicographic final IDs, triangle order/winding,
+world conversion and final float32 rounding. Release key/source/remap buffers before mesh
+preparation. This removes tree nodes, but stores duplicate tile-boundary samples until
+stitching: peak-memory improvement is not guaranteed and must be measured, including
+vector capacities. Marching cubes, supported-component filtering and smoothing are unchanged.
+
+For CH-094 coarse fields, use the same separable parabolic-envelope distance transform,
+with independent lines evaluated by the existing skin OpenMP team (maximum four workers).
+Axis barriers preserve the x/y/z order. Preallocate all per-worker hull capacity before
+entering OpenMP; each worker owns its scratch and disjoint output cells. Read cancellation
+within the loop and throw only after the team joins. Source worker policy remains in the
+pinned kernel; no new pool, global thread setting or coordinator bypass. No floating-point
+reductions, fast math, numerical approximations or resolution changes are introduced.
+
+Quantization records present collagen levels in its existing pass. Skip absent levels and
+allocate a reusable mask only when needed, retaining ascending levels, float32 quantization,
+six-neighbor dilation, EDT and smoothstep/min composition. The exterior flood fill retains
+FIFO traversal, 26-connectivity and the source corner-label-zero rule; a deque releases
+processed entries instead of retaining all visited cell indices. Grid selection, 104-byte
+per-cell admission estimate and memory-budget/failure policy remain unchanged.
+
+Authored, **not run**: `native_skin_buffers` checks stitching order, first representative,
+rounding collisions, signed zeros, faces and cancellation; small exhaustive nearest-seed
+oracles exercise anisotropic/singleton axes, ties, repeated output and empty/full seeds.
+Additional cases check diagonal exterior connectivity, blocked-corner behavior, six-neighbor
+dilation, sparse collagen rounding and endpoint levels. The private target forces one- and
+four-thread execution and substitutes cancellation/mesh-container sinks; it does not qualify
+coordinator admission or establish complete mesh acceptance.
+Existing `tools/check_skin_fields.py`, `tools/check_skin_envelope.py`, envelope tests and
+representative production captures remain mandatory for real fields/geometry/binding parity.
+Only source/diff review is permitted now. After the user resumes, build and run the new
+CTest plus existing parity/cancellation checks, then measure wall time and peak memory
+against `68917e0` in serial, controlled trials before release qualification.
+
+References: [NumPy unique](https://numpy.org/doc/stable/reference/generated/numpy.unique.html),
+[OpenMP worksharing](https://www.openmp.org/spec-html/5.0/openmpsu41.html).
+
+### Skin optimization qualification — 2026-10-28 (R02, R04)
+
+The user resumed testing. The combined parallelism, temporary-field lifetime, bulk stitching
+and coarse-field changes pass the development gate: 2,570 Python tests, six CTests, native
+style, Python checks, numerical imports and native doctor. No production changes were needed
+during qualification. Private buffer tests and actual native API/lifecycle tests both ran.
+
+Compare packaged pre-optimization native `13e53b5` (same native sources as `7ca3b69`) against
+native candidate `43a2824` on the saved three-SCP/two-tissue capture. Three fresh processes per
+build, B/A/A/B/B/A order, fixed resolution 160, budget 364,835,430 bytes, BLAS one worker,
+profiling off. Capture/loading/export are excluded; mesh preparation/validation/binding are
+included. Median generation **234.902 -> 68.585 s (3.425x)**; range 233.060–235.350 versus
+68.542–69.276 s. Median OS peak working set **832.590 -> 720.668 MiB (-13.4%)**, peak commit
+**860.422 -> 730.773 MiB (-15.1%)**. Native fields/envelope/binding medians respectively:
+0.602/203.698/30.645 -> 0.441/59.387/8.733 s. These combined measurements do not isolate each
+optimization's contribution. Other applications remained running; sampled start CPU load
+4.4–17.3% and available RAM 1.83–6.02 GiB varied, but trial results stayed consistent.
+
+All six runs preserve exact fields, geometry, all native binding arrays and diagnostics.
+The unmodified addon produces exactly the same 827,176 vertices, 1,654,392 triangles and
+all six source binding arrays. Production coarse-field differences are at most 2.22e-16;
+12 small field controls at most 4.44e-16. Cube/gap/contact envelope/binding comparisons are
+also exact. The candidate equals the previously visually reviewed mesh; its existing image
+was reinspected without claiming a new GUI/render test. No new anatomical-quality guarantee.
+
+A separate profiler report has no truncated events and records fields 0.445 s, envelope
+59.607 s and binding 9.027 s. It is excluded from timed medians and does not profile GUI
+publication or attribute internal kernel loops. Raw evidence and full method/limitations
+are linked from [the task record](tasks/skin-040.md). The maintained
+[benchmark](../tools/skin_optimization_benchmark.py) checks exact source-input round trips;
+an initial test-adapter gap-unit error was corrected and that run excluded.
+Canonical portable rebuilding/qualification and the companion source archive remain pending;
+these results do not qualify the older installed executable or complete the 0.4.0 release.
+
+### Whole-body skin comparison — 2026-10-28 (R02, R04; measurement only)
+
+User requested whole-body addon/app comparison after the small forearm result. No production
+algorithm, policy or source geometry changed. Capture all 58 SCP and 96 tissue surfaces from
+the saved 96-muscle assembly through production providers, retaining settings/collagen and
+accepted revisions. Run those identical world-space surfaces through the real Blender 5.0.1
+addon worker runtime and standalone native core. This isolates skin computation rather than
+mixing it with known skeletal migration differences. Construction paths do not contribute.
+
+At unchanged default resolution 220 and fixed 3,687,319,552-byte budget, the gap logic chooses
+0.029121278 fine spacing from 0.145604908 coarse spacing. Three fresh serial runs per engine,
+A/B/B/A/A/B, BLAS one worker, profiler off. Median time: Blender **192.395 s**, app **194.414 s**
+(app +1.05%). Median OS resident peak: **1.489 / 1.414 GiB**; peak commit **1.602 / 1.440 GiB**.
+These include worker-host overhead, not GUI memory. Setup/export/rendering and later topology
+or final-skin stages are excluded. App field/scene/envelope/binding medians are
+0.743/0.226/121.461/72.200 s. Model-relative precision prevents linear extrapolation from
+source count: the full body has about twice the previous forearm output triangles, not 31x.
+
+Exact positions, connectivity and all six common binding arrays agree: 1,691,842 vertices /
+3,384,244 triangles. All trials repeat. Coverage/protected gaps pass; zero unbound vertices.
+Both outputs share **18 four-face non-manifold edges**, no open boundary edges and visible
+banding. Watertight/orientability flags fail; do not equate parity with clean final geometry.
+Five independently rendered camera pairs are pixel-identical and were visually inspected,
+including actual input context. No extra mirrored muscles were synthesized.
+
+Evidence: `build/skin-040/whole-body-comparison/review.html`, comparison/precision/topology JSON,
+per-trial reports and saved arrays. Maintained capture, benchmark and render tools reproduce
+this check. See [task record](tasks/skin-040.md) for provenance and scope. No additional
+application rebuild or full development gate was needed for tooling/documentation changes;
+portable release qualification remains pending.

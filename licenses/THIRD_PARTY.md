@@ -1,5 +1,12 @@
 # Runtime and source notices
 
+## Blender BMesh/Decimate subset
+
+Blender Authors, GPL-2.0-or-later. The pinned v5.0.1 geometry-only subset under
+`native/vendor/blender_bmesh` includes original notices and per-file provenance.
+See its README and `licenses/GPL-2.0.txt`. No Blender executable/runtime is shipped
+as part of this subset.
+
 Release 0.3.0 adds AnthroForge-authored typed native expression compilation/evaluation,
 Parametric sampling, and shortcut/attachment orchestration under GPL-3.0-or-later.
 No muparser or ExprTk production dependency or copied implementation is bundled; their
@@ -32,6 +39,25 @@ Initial generated-quad tessellation also adapts Blender 5.0.1's degenerate-diago
 test in `mesh_tessellate.cc` / `math_geom.cc`, attributed to NaN Holding BV and
 Blender Authors under GPL-2.0-or-later; the adaptation is GPL-3.0-or-later.
 
+Skin Fiber bevel adapts Blender 5.0.1 `curve.cc`, `curve_bevel.cc` and `displist.cc`
+(NaN Holding BV and Blender Authors, GPL-2.0-or-later). Four frame functions are retained
+unchanged in `native/vendor/blender_bevel`; hashes and reconstruction ranges are recorded
+there. Its BLI math dependencies use the existing pinned BMesh subset. The source archive
+contains both the upstream subset and AnthroForge's owned-array adapters.
+
+Skin proxy smoothing and angle-weighted normals adapt Blender 5.0.1 `MOD_smooth.cc`
+and Mesh normals (Blender Authors, GPL-2.0-or-later). Collapse and symmetry cutting
+use the pinned BMesh subset documented above; the former libigl collapse adapter was
+replaced. Original topology-adaptation provenance remains recorded in
+`native/migration/topology/sources.json`; current adapters ship in the source archive.
+
+Skin assembly orientation adapts Blender 5.0.1 `bmo_normals.cc` (Blender Authors,
+GPL-2.0-or-later) to owned arrays. The source fingerprint is recorded in the same
+manifest; no Blender object or BMesh runtime is linked.
+Skin half-cut quad triangulation also adapts the convex planar area/perimeter
+criterion in Blender 5.0.1 `bmesh_polygon.cc`, `bmesh_beautify.cc` and
+`polyfill_2d_beautify.cc` (Blender Authors, GPL-2.0-or-later), recorded in that manifest.
+
 | Component | Version/source | License and source |
 | --- | --- | --- |
 | CPython | 3.12.12 | PSF and bundled notices in CPython-LICENSE.txt; https://www.python.org/downloads/release/python-31212/ |
@@ -48,6 +74,8 @@ Blender Authors under GPL-2.0-or-later; the adaptation is GPL-3.0-or-later.
 | Radial unit icospheres | Blender 5.0.1 bmesh output | Generated unit templates under native/migration/tissue; capture/version/hash recorded in unit_spheres.json; AnthroForge GPL-3.0-or-later adapter |
 | PCG64 and bounded integer distribution | NumPy 1.26.4 | MIT, Melissa O'Neill, Robert Kern and NumPy Developers; native/vendor/numpy_random/pcg64.h and LICENSE.txt; adapter provenance in native/vendor/numpy_random/PROVENANCE.md |
 | Nuitka | 4.1.1 build/runtime support | Apache-2.0; https://nuitka.net/pages/overview.html |
+| bioimage-cpp MC33 subset | 492ff9b329cfa81af6781bc5b67b7c727eeb0445 | MIT with scikit-image BSD-3-Clause derived tables; full notices and hashes in native/vendor/bioimage-cpp |
+| SciPy rectangular linear assignment | 1.14.1, unchanged two-file kernel by PM Larsen | BSD-3-Clause; source notices/hashes under native/vendor/scipy_lsap; SCIPY-LICENSE.txt |
 
 Qt source archives for the pinned SDK are available at
 https://download.qt.io/online/qtsdkrepository/all_os/qt/qt6_6120_windows_line_endings_src/qt.qt6.6120/.
@@ -73,3 +101,25 @@ PIQP 0.6.4 (PREDICT-EPFL, BSD-2-Clause) supplies native constrained tissue field
 and the optional sparse ROUTED quadratic-subproblem backend.
 See `PIQP-LICENSE`, `PIQP-LDL-LICENSE` and native/vendor/PROVENANCE.md. Complete pinned
 headers, addon numerical adapters and their provenance ship in the companion source archive.
+
+
+The 0.4.0 final-skin port retains the addon's GPL-3.0-or-later LE/FAST/contact kernels
+under `native/migration/deformation`, with original source hashes and documented execution
+adaptations. It reuses libigl and Eigen 3.4.0; the required Eigen SparseExtra/Polynomials
+headers retain MPL-2.0 notices and hashes under `native/vendor/unsupported/sources.json`.
+
+Skin topology uses the pinned QuadWild-BiMDF executable and pyinstantmeshes 1.0.0 runtime.
+QuadWild's source/version manifest accompanies the runtime under
+`anthroforge/_runtime/quadwild`; both runtime notices are in `licenses` and topology
+adapter provenance is retained under `native/migration/topology`. No Blender runtime
+is required.
+
+Reference preparation loads the array extension from PyTetWild 0.4.2 and its wheel-owned
+DLLs directly, without importing the package's PyVista/VTK integration. Original wheel
+licenses are copied into the distribution's licenses directory. This changes packaging,
+not the tetrahedral algorithm or its settings. See <https://github.com/pyvista/pytetwild>.
+
+Shortcut fitting includes Dem Bones 1.2.1 (Electronic Arts, BSD-3-Clause), its complete
+`DEMBONES_LICENSE.md`, and the maintained AnthroForge Scale Aware/Single Active adapters.
+Original addon hashes and execution adaptations are recorded under
+`native/migration/bone_fitting`; bundled headers ship in the companion source archive.

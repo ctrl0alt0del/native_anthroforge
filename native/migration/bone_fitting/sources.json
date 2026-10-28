@@ -1,0 +1,42 @@
+{
+  "source": "AnthroForge addon/native/bone_fitting",
+  "files": [
+    {
+      "name": "native.cpp",
+      "sha256": "d43533fb08a042a9fed1fac2b154b3c7ba6d6d1286483efba86e62d69bc74588"
+    },
+    {
+      "name": "vendor/DemBones/ConvexLS.h",
+      "sha256": "940d562242e33aa4946622e51df915474f1272193ddc71c455c1246e2f27ba5f"
+    },
+    {
+      "name": "vendor/DemBones/DemBones.h",
+      "sha256": "260aea35f27c51c356368028a17d364974f2222a9fdae9092401c30d6c5b9f36"
+    },
+    {
+      "name": "vendor/DemBones/DemBonesExt.h",
+      "sha256": "ba35777060a36bc8d49c8f8fb099f0212f9bf3c98c206f3cba9119467ed01f27"
+    },
+    {
+      "name": "vendor/DemBones/Indexing.h",
+      "sha256": "8c62f708e2e5f5ac32f4c45bb2d844f7d0ddf5554c80cc9a97f2c16187fb38e1"
+    },
+    {
+      "name": "vendor/DemBones/MatBlocks.h",
+      "sha256": "3e8c43a779f8a050367c9a343db6e7eb10636a041a17536ba4bf9c1cf668d0bd"
+    },
+    {
+      "name": "vendor/DEMBONES_LICENSE.md",
+      "sha256": "d364234aa09d71323f57d8f7abe2d1937eab89941869c6729b308c9e9dc4b32a"
+    },
+    {
+      "name": "vendor/DEMBONES_VERSION.md",
+      "sha256": "b54e18484699d070ad66ef48ec87596edee9580160232e9437aa068c4e304fd2"
+    }
+  ],
+  "adaptations": [
+    "Private namespace/ABI; no legacy exports",
+    "Coordinator cancellation replaces 600-second deadline",
+    "Single Active cancellation between original iterations"
+  ]
+}

@@ -6,7 +6,7 @@ from typing import Literal, Protocol
 
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job
-from anthroforge.core.scheduling import Assessment, Schedule, Workload
+from anthroforge.core.scheduling import Assessment, ResourceDemand, Schedule, Workload
 
 INLINE_BUDGET_MS = 2.0
 INLINE_WINDOW_MS = 16.0
@@ -237,13 +237,103 @@ def task_schedulers() -> dict[str, TaskScheduler]:
         "image_decode": ImageTaskScheduler(),
         "project_open": OpenProjectTaskScheduler(),
         "project_save": SaveProjectTaskScheduler(),
+        **export_schedulers(),
         "construction": ConstructionTaskScheduler(),
         **shortcut_schedulers(),
-        **curve_schedulers(),
-        **anchor_schedulers(),
+        **construction_schedulers(),
         "control_pose": ControlPoseTaskScheduler(),
         **inspection_schedulers(),
     }
+
+
+def export_schedulers() -> dict[str, TaskScheduler]:
+    return {
+        "skin_export": SaveProjectTaskScheduler(),
+        "skin_export_update": SkinTopologyTaskScheduler(),
+    }
+
+
+def construction_schedulers() -> dict[str, TaskScheduler]:
+    return {
+        **curve_schedulers(),
+        **anchor_schedulers(),
+        "skin_envelope": SkinEnvelopeTaskScheduler(),
+        "skin_topology": SkinTopologyTaskScheduler(),
+        "skin_construction": SkinTopologyTaskScheduler(),
+        "skin_reference": SkinReferenceTaskScheduler(),
+        "skin_deformation": SkinDeformationTaskScheduler(),
+        "skin_fit": SkinFitTaskScheduler(),
+        "skin_fit_preview": SkinFitPreviewTaskScheduler(),
+    }
+
+
+class SkinReferenceTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        from .worker_memory import budget
+
+        return Schedule(
+            "worker",
+            reason="Tetrahedral proxy and native LE/FAST reference",
+            resources=ResourceDemand(4, budget() + workload.bytes * 3),
+        )
+
+
+class SkinFitTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        return Schedule(
+            "worker",
+            reason="Isolated shortcut samples and native Scale Aware fitting",
+            resources=ResourceDemand(4, workload.bytes * 12),
+        )
+
+
+class SkinFitPreviewTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 0.2 + workload.candidates * 0.0003
+        return Schedule(
+            "worker",
+            cost,
+            delay_ms=min(16, cost) if interactive else 0,
+            max_wait_ms=MAX_INTERACTIVE_WAIT_MS,
+            reason="Stored bone-channel skin playback",
+        )
+
+
+class SkinDeformationTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        cost = 1 + 0.003 * workload.triangles
+        return Schedule(
+            "worker",
+            cost,
+            delay_ms=min(cost, MAX_INTERACTIVE_WAIT_MS) if interactive else 0,
+            max_wait_ms=MAX_INTERACTIVE_WAIT_MS,
+            reason="Retained anatomical sampling and fixed-topology skin deformation",
+        )
+
+
+class SkinEnvelopeTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        from .worker_memory import budget
+
+        return Schedule(
+            "worker",
+            reason="Native tiled skin fields, envelope and source bindings",
+            resources=ResourceDemand(4, budget() + workload.bytes * 3),
+        )
+
+
+class SkinTopologyTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        # External backends choose their own parallelism; reserve CPUs without changing it.
+        # BMesh and source buffers give a conservative admission heuristic, not a hard cap.
+        from .worker_memory import budget
+
+        estimate = workload.triangles * 2048 + workload.candidates * 512 + workload.bytes
+        return Schedule(
+            "worker",
+            reason="Native remeshing, density, guides and quad assembly",
+            resources=ResourceDemand(0, max(estimate, budget() + workload.bytes * 3)),
+        )
 
 
 def shortcut_schedulers() -> dict[str, TaskScheduler]:

@@ -1,5 +1,27 @@
 # AnthroForge release roadmap
 
+- **Next version after 0.4.0 — confirmed direction, not implemented:** extend shared,
+  operation-specific status providers to other functionality whose UI currently derives
+  readiness, warnings or availability from workspace/document state. Inventory existing
+  consumers and reuse their notifications and shared policies; do not introduce global
+  polling or a universal status manager. The pattern starts with SkinStatusProvider in
+  0.4.0. [Architecture](architecture.md#shared-operation-status-providers).
+
+- **0.4.0 — qualified with accepted quality limits:** migrates the addon's skin envelope,
+  guided topology, final-skin updates and shortcut-to-bone fitting. Reproduce existing
+  addon behavior first; behavioral improvements follow the qualified migration. OBJ is the first
+  exporter behind an extensible format interface. Skin joins the existing right
+  inspector's tabs, arranged vertically. The [source inventory](skin_040_inventory.md)
+  separates current behavior from legacy update paths and records local fitting source; see
+  [the task record](tasks/skin-040.md). Implementation follows the confirmed
+  [specification](specification_040.md) and [delivery plan](implementation_040.md).
+  The October 27 review restricts draft/deformation sources to SCP/VCP surfaces while
+  preserving topology guides, completes one-action Build Skin, places bone fitting in
+  shortcut settings and adds shared SkinStatusProvider readiness. These review changes
+  are implemented and pass the complete portable checks. The full-body draft matches
+  the addon exactly, including accepted banding/non-manifold findings documented in the
+  task record. No wider status-provider migration is included.
+
 - **0.3.7 — qualified:** recent projects, periodic committed recovery
   copies and UI polish. [Walkthrough](usability_037.md), [evidence](tasks/usability-037.md).
 
@@ -52,7 +74,7 @@
   relaxation and surface-based stacking. [Contract](specification_022.md),
   [implementation plan](implementation_022.md), [task](tasks/unified-tissues-022.md).
   Canonical package evidence is recorded with [release validation](development_status.md#unified-tissues-022).
-- **Later releases:** skin, legacy Blender conversion, anatomical
+- **Later releases:** legacy Blender conversion, anatomical
   reconstruction/fitting and other explicitly deferred workflows. No version or
   completion date is assigned here. General physical simulation is not a 0.2.2 goal.
 

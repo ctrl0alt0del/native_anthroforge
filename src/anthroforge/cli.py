@@ -5,6 +5,7 @@ import json
 from collections.abc import Sequence
 from pathlib import Path
 
+from anthroforge.application import numerical_worker
 from anthroforge.application.projects import adopt
 from anthroforge.application.session import Session
 from anthroforge.application.storage import read_package
@@ -20,6 +21,7 @@ def parser() -> argparse.ArgumentParser:
     new.add_argument("--name", default="Untitled")
     authoring_parsers(commands)
     inspection_parser(commands)
+    numerical_worker.add_parser(commands)
     return result
 
 
@@ -49,6 +51,8 @@ def inspection_parser(commands):
 def execute(args: argparse.Namespace) -> int:
     from anthroforge import authoring
 
+    if args.command == "numerical-worker":
+        return numerical_worker.execute(args)
     if args.command == "report":
         return inspection_command(args)
     if args.command in ("run", "serve", "inspect", "render"):

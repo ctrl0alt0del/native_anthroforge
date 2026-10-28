@@ -25,6 +25,7 @@ from profiler_portable import profiling
 from projects_portable import projects
 from PySide6.QtGui import QImage
 from shortcuts_portable import shortcuts
+from skin_portable import qualify as skin
 from tissue_portable import tissues
 from workflow_portable import workflow
 
@@ -45,7 +46,7 @@ CHECKS = (
     "surface rulers, named cameras and explanatory profile diagnostics",
     "independent fibers, shared lofts and portable embedded reference images",
     "window feedback capture, annotations, inbox preview, text editing and deletion",
-    "schema-6 tissues, attached construction, stacking, native profiling and rendering",
+    "tissues, attached construction, stacking, native profiling and rendering",
     "automatic Fiber endpoints, independent copies, undo/redo and shared deletion impact",
     "direct tissue creation with automatic attached construction",
     "branched point creation, automatic surface grouping and membrane conversion",
@@ -53,12 +54,13 @@ CHECKS = (
     "persistent preferences, Custom/PIQP routed curves and fibers, saved/report provenance",
     "accepted tissue stages, displacement, point explanations and advisory geometry reports",
     "stacking footprints, material brush commit/undo, section cutaways and routed Fiber evidence",
-    "shortcut formulas, typed Parametric paths, schema-6 results and native consumer rendering",
+    "shortcut formulas, typed Parametric paths, persisted results and native consumer rendering",
     "shortcut influence, captured formula inputs, effective policy and propagation completion",
     "session comparison, paired images, bounded replay journal and isolated replay",
-    "strict mirrors, symmetric loops, instance measurements and schema-6 storage",
+    "strict mirrors, symmetric loops, instance measurements and schema-7 storage",
     "Fiber pins/supports/cold routing, mirrored tubes, SCP split/replacement and tissue retarget",
     "recent-project history, asynchronous recovery capture and discovery with original retention",
+    "skin build, native proxy workers, isolated fitting, persisted playback and OBJ quads",
 )
 
 
@@ -175,6 +177,7 @@ def construction_steps():
         comparison,
         mirroring,
         tissues,
+        skin,
     )
 
 

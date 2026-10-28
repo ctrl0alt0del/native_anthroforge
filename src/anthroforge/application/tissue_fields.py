@@ -1,18 +1,8 @@
 """Material fields retain their sampled-domain identity across geometry deformation."""
 
-from hashlib import sha256
-from struct import pack
 from typing import Any
 
-from anthroforge.native import material
-
-
-def mesh_domain(mesh: Any) -> tuple[int, str]:
-    digest = sha256(pack("<q", mesh.counts[0]))
-    for kind in (1, 2):
-        digest.update(memoryview(mesh.array(kind)))
-    digest.update(memoryview(material.axes(mesh)))
-    return mesh.counts[0], digest.hexdigest()
+from .field_domains import mesh_domain as mesh_domain
 
 
 def domain(resources: Any, item: Any, name: str) -> tuple[int, str]:

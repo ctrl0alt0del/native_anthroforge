@@ -205,8 +205,7 @@ def publish(controller):
 
     originals = [*controller.rows, *surface_scene.records(controller)]
     rows = [render_record(row) for row in mirror_rows(controller, originals)]
-    rows.extend(surface_scene.preview_rows(controller))
-    rows.extend(surface_scene.tissue_preview_rows(controller))
+    rows.extend(auxiliary_rows(controller))
     if rows != controller._render_rows:
         controller._render_rows = rows
         controller.render_model.publish(
@@ -214,6 +213,16 @@ def publish(controller):
         )
     controller.construction.publish()
     scene_state.control_picking_inputs(controller)
+
+
+def auxiliary_rows(controller):
+    from . import skin_scene
+
+    return [
+        *surface_scene.preview_rows(controller),
+        *surface_scene.tissue_preview_rows(controller),
+        *skin_scene.rows(controller),
+    ]
 
 
 def render_record(row):

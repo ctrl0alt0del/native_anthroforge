@@ -1,0 +1,83 @@
+{
+  "source": "AnthroForge addon/native/topology/field.cpp",
+  "sha256": "1908b7f7e178cd419877623482928d8148958609aa1efb0694ef6c2ae86548a7",
+  "adapters": {
+    "core/topology/quadwild.py": "132ce5e6c7d55de8c002b9ae8364ba60deb6e70fd98ded37d14e7519faee8c87",
+    "core/topology/quadwild_io.py": "3110b2f11a398838a5ba66e42c257f1b169a5e5b5af542b4c7bf32e72407cec9",
+    "core/topology/flow_patches.py": "2969f91160a3498e7fc8dbe7f2ea36695454cd508dc8b61faf2d7c868e8b0864",
+    "adapters/topology/flow_capture.py": "f144d735c281e4f7bcfce97682b4dee778f88f6734545a7634bfc18f5d82adf7",
+    "adapters/topology/muscle_flow.py": "ba224bfb9200432c2efdd9668b88de83db69d0cd3ff634adf87937ca4e5b230e"
+  },
+  "density_reference": {
+    "core/topology/budgets.py": "abde21c82ec19807e90f1cc52cd31cbff99a6a23a77c0d52908cb931217d1fd4",
+    "core/topology/ownership.py": "850f6539c53ca9afb8a7a7a7fa79e3f1270492221ade7fd3430d35abf3de889b"
+  },
+  "proxy_smooth_reference": {
+    "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/modifiers/intern/MOD_smooth.cc",
+    "sha256": "87995c9a6b31be333dc3cc049cb383810e8d8a4df84da552ef31e907e64108c8",
+    "license": "GPL-2.0-or-later"
+  },
+  "refinement_reference": {
+    "core/topology/refine.py": "fcb9a455a452809268f1014af4a9d2dbdebf1a04456c4d793842cd33f50f1468",
+    "core/topology/refinement.py": "0f2f63989ed740864189a38daa5037c6e1474c1cbd52ef02f46495b69b45d9d1",
+    "adapters/topology/adaptive_refine.py": "88084ee28234f1cde54c9997b05e342d88261fe9b0e8f07fe5cc8e6c0cabceb0",
+    "adapters/topology/refinement_runtime.py": "72a3785cc0e4fdde3e3d8a3ef32d36ce770f6287517486280bdcdf6ce235ee64",
+    "adapters/topology/ownership_capture.py": "144df78fb8d21ede76e94f898f8e27947098407814ea4adb8dbf9aa8293fd741"
+  },
+  "proxy_collapse_reference": [
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/tools/bmesh_decimate_collapse.cc",
+      "sha256": "7640ac33a23cc45a40614719300f23c0b19c4d1da8a2429c06ab1ea802f4e235",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/intern/bmesh_mesh_normals.cc",
+      "sha256": "4ff61b95aa46f1973ef9d158d0b7b7cc40cf3e38ad0ff474001c371ded6e8953",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenlib/BLI_math_base.hh",
+      "sha256": "2d5728484e755c5eb51e6614b7e1e03c8c7b5dfdf55bd02a1ec3049f6ccff1cf",
+      "license": "GPL-2.0-or-later"
+    }
+  ],
+  "loop_reference": {
+    "adapters/topology/engine/annuli.py": "ccfa7141d911df5c5a06c45432a774a163fed1c67d575f2566971c2e8d3a2d5b",
+    "adapters/topology/engine/guides.py": "95a76135379caf7dc6028fb89af57aad40da902d7062b624da0f474bc2effaaa",
+    "adapters/topology/engine/instant.py": "2c4d187d5e4bbe2563b875ecd3696dc27e4204c83d3b0a6ce4810f56defbe11a",
+    "adapters/topology/engine/layout.py": "ee86a9d9f6d65ab9da38b876cdb5bc99b502c1b1bd80df29e22640cc1dedcd2a",
+    "adapters/topology/solver.py": "264a5062e0fa64820d4359b2c56c8e639ba5075fc9c41b4575273f3640c73020"
+  },
+  "transition_reference": {
+    "adapters/topology/engine/cube.py": "d2824087a94e66b735a7fa4b40d6d4b69e5d5d7a4ec96402da1387ab021aa585",
+    "adapters/topology/engine/instant.py": "2c4d187d5e4bbe2563b875ecd3696dc27e4204c83d3b0a6ce4810f56defbe11a",
+    "adapters/topology/solver.py": "264a5062e0fa64820d4359b2c56c8e639ba5075fc9c41b4575273f3640c73020"
+  },
+  "orientation_reference": {
+    "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/operators/bmo_normals.cc",
+    "sha256": "b6b046e56e3161943b421aa65f66e711b0d3eb9c2e955fda25d6732221608846",
+    "license": "GPL-2.0-or-later"
+  },
+  "half_mesh_reference": [
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/intern/bmesh_polygon.cc",
+      "sha256": "51508da558aa2fe23f2ea46fa737b7f54df61ba6c958841a520e2e721d9e639a",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/bmesh/tools/bmesh_beautify.cc",
+      "sha256": "14b64837015202f22e6f4272de2ca83cfa969aaa2302f362e47423be4af7b44d",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenlib/intern/polyfill_2d_beautify.cc",
+      "sha256": "8096baf0094107f2b651f2179e570cc1864e0c159d98c999868b12064393d22d",
+      "license": "GPL-2.0-or-later"
+    }
+  ],
+  "mesh_normals_reference": {
+    "url": "https://raw.githubusercontent.com/blender/blender/v5.0.1/source/blender/blenkernel/intern/mesh_normals.cc",
+    "sha256": "34ce0119745e736be55a0899dec8f1ad5b824de8dbdd23c69201ad75cb7dfb62",
+    "license": "GPL-2.0-or-later"
+  }
+}

@@ -1,6 +1,7 @@
 """Typed path/image inventories keep native handle namespaces distinct from mesh handles."""
 
 from anthroforge.application.image_assets import ImageAsset
+from anthroforge.application.skin_assets import SkinAsset
 from anthroforge.native import memory
 from anthroforge.native.attachment_fields import Field
 from anthroforge.native.binding_batches import BindingBatch
@@ -8,6 +9,7 @@ from anthroforge.native.inspection import Comparison
 from anthroforge.native.path_collisions import CollisionCache
 from anthroforge.native.paths import Path
 from anthroforge.native.routing_scene import RoutingScene
+from anthroforge.native.skin_deformation import Preparation as SkinPreparation
 from anthroforge.native.stacking import StackSession
 from anthroforge.native.strokes import Stroke
 from anthroforge.native.tissue_preparation import Preparation
@@ -26,6 +28,8 @@ def inventories(profiler, owners):
         collision_pairs=typed_inventory(owners, CollisionCache),
         stacking_sessions=dict(typed_inventory(owners, StackSession), upper_bound=True),
         tissue_preparations=typed_inventory(owners, Preparation),
+        skin_buffers=typed_inventory(owners, SkinAsset),
+        skin_preparations=typed_inventory(owners, SkinPreparation),
     )
 
 
@@ -142,7 +146,7 @@ def path_rows(profiler):
 
 
 def merge(meshes, construction):
-    kinds = dict(meshes=meshes, **construction)
+    kinds = compact_kinds(dict(meshes=meshes, **construction))
     totals = {
         key: sum(row[key] for row in kinds.values())
         for key in ("unique_bytes", "allocations", "handles", "total_handles", "unattributed_bytes")
@@ -154,6 +158,12 @@ def merge(meshes, construction):
         limits=meshes["limits"],
         complete=all(row["complete"] for row in kinds.values()),
     )
+
+
+def compact_kinds(kinds):
+    # Shared accounting limitations belong once at the snapshot level. Repeating them
+    # per resource kind wastes the bounded event budget and can drop the whole snapshot.
+    return {name: {k: v for k, v in row.items() if k != "limits"} for name, row in kinds.items()}
 
 
 def merged_owners(kinds):

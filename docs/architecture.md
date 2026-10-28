@@ -1080,3 +1080,69 @@ ConstructionFilter is a desktop Qt proxy over the existing incremental RecordMod
 It filters names and kinds without copying authored objects or changing selection.
 RelatedObjects bounds dependency/consumer lists to eight rows with reused delegates
 and search; filtering preserves the list height. Both remain presentation adapters.
+
+## Shared operation status providers
+
+**Implemented for skin; broader adoption deferred.** In 0.4.0, SkinStatusProvider follows
+the [skin contract](specification_040.md). The application owns operation-specific readiness,
+blocking reasons, advisory warnings and assessed document/result/reference identities.
+Desktop views subscribe through existing document/result notifications; headless operations
+use the same validation policies. Status reads neither start computation nor mutate state.
+Keep Qt adapters separate from this shared assessment, and avoid polling or parallel status
+stores that can disagree with command validation. Revalidate relevant inputs at execution.
+
+A stale construction setting is not automatically a broken reference: fitting may use an
+existing compatible skin with a warning. Missing skin or incompatible material/vertex
+identities blocks fitting with an explanation. Update and export have their own eligibility;
+do not reduce the provider to a global valid/invalid flag.
+
+For the **next version after 0.4.0**, the user requests applying this pattern to other
+functionalities whose UI derives statuses or operation conditions from workspace/document
+state. Inventory and migrate those consumers at their owning boundaries, reusing established
+notifications and command policies. Preserve feature-specific meanings rather than creating
+one universal manager. This is a documented future direction, not authorization to refactor
+other features during the skin release. See the [roadmap](roadmap.md).
+
+## Skin execution and ownership (0.4.0)
+
+Core records separate envelope, topology, immutable reference, current final output and fitted
+results. Application stage jobs use the existing coordinator, typed dependency reads, cancellation
+and complete publication. SkinStatusProvider owns shared readiness; the desktop adapts its
+notifications. Failed reference preparation retains successful pending topology for retry while
+preserving the previous final/reference pair. Source pose updates never imply retopology.
+
+Numerical preparation, geometry queries, LE/FAST/contact, fitting and playback execute in C++.
+External remeshing/tetrahedral processes own temporary inputs and bounded diagnostics, with
+process-tree cancellation and resource-aware admission. They have no arbitrary production timeout.
+Pinned tetrahedral binaries load without Qt, PyVista or VTK. No competing numerical worker pool
+or Python optimization loop is introduced.
+
+The October 28 skin execution fix (numerical/runtime qualification complete) isolates the pinned
+gap/tile/binding/quality kernels in an OpenMP object target with a private query namespace.
+Their source limit is four threads; the same coordinator reserves four CPUs for envelope
+jobs and all CPUs for combined builds. Routing retains its serial target. OpenMP cannot
+silently disappear from the skin target. Source triangles and cancellation tokens remain
+owned for the whole call; batched query/binding validation precedes parallel work and
+cancellation is reported after the team joins. Post-smoothing field release follows the
+addon: discard temporary voxel values/flags/coarse copies while retaining the geometry and
+gap constraints required by diagnostics. Algorithms, output policy and budgets are unchanged.
+
+Tile stitching uses contiguous source vertices and a sorted five-decimal key/index array,
+retaining lexicographic final IDs and the first unrounded sample per key. Temporary keys,
+source positions and remapping are released before mesh preparation. Coarse-field EDT lines
+use the same bounded skin team with disjoint outputs and preallocated per-thread scratch;
+axes remain sequential. Collagen skips absent quantization levels, and exterior flood fill
+retains only its unprocessed FIFO frontier. Field equations, connectivity and precision stay
+unchanged. The October 28 build, gate and exact production geometry/binding checks pass.
+The combined fixes measure 3.425x faster generation and 13.4% lower peak working set on the
+three-SCP/two-tissue capture; this does not isolate bulk stitching's contribution or establish
+a whole-body guarantee. See the task record for method/variance. Portable release is pending.
+
+Immutable resources span document/history/checkpoint/job/display leases. Prepared deformation
+factors use a bounded cache keyed by reference and settings; oversized entries bypass retention,
+not computation. Isolated fit/export sessions own their document and caches and borrow immutable
+resources. They execute on the reserved coordinator worker and preserve initiating shortcut
+policies. Fitting schedules affected output roles, avoiding needless pose-only geometry rebuilds.
+Independent fitted playback owns transient meshes outside authored state and asset history.
+Profiler snapshots account for retained skin data and preparation; parent fitting traces do not
+fully attribute isolated sample-session internals. This limitation remains explicit.

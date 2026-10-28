@@ -1,8 +1,13 @@
 # AnthroForge development validation
 
-Current release is [0.3.7 project continuity](usability_037.md), including the implemented
-[workbench overhaul](ui_workbench.md), with current qualification tracked in
-[the workbench task](tasks/ui-workbench.md). Prior release qualification is in
+The 0.4.0 [skin workflow](skin_workflow.md) passes 2,565 Python tests, native/parity,
+style/type, Qt-free headless and hidden GUI checks. A relocated qualification package
+passes the full portable suite; final canonical package checks are tracked in
+[the skin task](tasks/skin-040.md). Full-assembly updates and independent fitting pass
+with unchanged skin connectivity. Remesher quality warnings and incomplete contact
+coverage remain explicit; no watertight-avatar or physical desktop acceptance is claimed.
+The previous release is [0.3.7 project continuity](usability_037.md), including the
+[workbench overhaul](ui_workbench.md). Prior authoring qualification is in
 [authoring workflows](tasks/workflows-036.md).
 The earlier sections retain the evidence and limitations of their respective revisions.
 

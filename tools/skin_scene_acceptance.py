@@ -1,0 +1,91 @@
+"""Hidden GPU skin display evidence; never shows a native window."""
+
+from pathlib import Path
+
+from PySide6.QtGui import QGuiApplication
+from PySide6.QtQuickControls2 import QQuickStyle
+from skin_topology_render import displayed
+from tissue_scene_acceptance import fiber, frames, settle
+
+from anthroforge.application import skin_evaluation
+from anthroforge.desktop.controller import Controller
+from anthroforge.desktop.offscreen import Offscreen
+from anthroforge.desktop.runtime import native_runtime
+
+OUTPUT = Path("build/skin-040/ui")
+
+
+def setup(controller):
+    # Grid 24 cannot resolve this thin-Fiber gap in either the addon or standalone.
+    skin_evaluation.TARGET_RESOLUTION = 64
+    path = str(Path("examples/primitives/cube.obj").resolve())
+    bone = controller.run("import", dict(path=path, units=1.0))["entity_id"]
+    settle(controller)
+    fiber(controller, bone, 0.2)
+    controller.select(bone)
+    controller.cameraRequested.emit([0, 0, 0, -18, 25, 0, 3], False)
+    return bone
+
+
+def exercise(controller, renderer, app):
+    bone = setup(controller)
+    asset = controller.session.document.object(bone).result.asset
+    snapshot(controller, renderer, app, asset, "skin-sources-gpu.png")
+    painting(controller, renderer, app, bone)
+    controller.run("skin.envelope.build", {})
+    settle(controller)
+    stage = controller.session.document.skin.envelope
+    assert stage.asset, controller.session.scheduler.errors
+    snapshot(controller, renderer, app, stage.asset, "skin-envelope-gpu.png")
+    controller.run("workspace.update", dict(hidden=[bone]))
+    settle(controller)
+    snapshot(controller, renderer, app, stage.asset, "skin-isolated-gpu.png")
+    assert not renderer.window.isVisible()
+
+
+def snapshot(controller, renderer, app, asset, filename):
+    image = displayed(controller, renderer, app, asset)
+    assert image.pixelColor(640, 560).lightness() > 80, (
+        "Fixture geometry is not visible; verify viewport and numerical DLLs use the same build."
+    )
+    assert image.save(str(OUTPUT / filename))
+
+
+def painting(controller, renderer, app, bone):
+    controller.run("skin.collagen.fill", dict(owner=bone, value=0))
+    tool = controller.tissue_painting
+    tool.beginCollagen()
+    tool.setting("radius", 100)
+    camera = [0, 0, 4, 1, 0, 0, 0, 1, 0, 0, 0, -1, 100, 1]
+    tool.pointer([0, 0], camera, True)
+    tool.timer.stop()
+    tool.submit()
+    settle(controller)
+    assert frames(controller, renderer, app).save(str(OUTPUT / "skin-collagen-gpu.png"))
+    assert tool.model.active_rows(), controller.message
+    tool.cancel()
+    controller.run("undo", {})
+
+
+def run(app):
+    controller, warnings = Controller(), []
+    renderer = Offscreen(controller, warnings)
+    try:
+        exercise(controller, renderer, app)
+        assert not warnings, warnings
+    finally:
+        renderer.close()
+        controller.close()
+
+
+def main():
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    QQuickStyle.setStyle("Basic")
+    app = QGuiApplication([])
+    with native_runtime():
+        run(app)
+    print("Skin source/envelope/isolated views rendered on a hidden GPU texture.")
+
+
+if __name__ == "__main__":
+    main()

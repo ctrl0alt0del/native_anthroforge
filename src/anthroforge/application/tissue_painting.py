@@ -8,6 +8,7 @@ from . import tissue_fields, tissue_strategy_operations
 from . import tissue_inspection as inspection
 from . import tissue_inspection_stages as stages
 from .inspection_context import scene_signature
+from .weight_painting import obstacles, require_current
 
 
 def field(context: Any, target: str, options: Any) -> Any:
@@ -26,14 +27,6 @@ def validate(context: Any, target: str, options: Any) -> None:
         raise ValueError("Paint the rest, intrinsic or final tissue surface.")
     if len(options.get("samples", ())) not in range(1, 4097):
         raise ValueError("A paint stroke needs 1–4096 pointer samples.")
-
-
-def obstacles(context: Any, options: Any) -> list[Any]:
-    result = []
-    for row in options.get("obstacles", ()):
-        mesh = context.assets[row["asset"]].mesh
-        result.append((mesh, tuple(row["frame"])))
-    return result
 
 
 def signature(context: Any, target: str, options: Any) -> Any:
@@ -90,14 +83,3 @@ def commit(session: Any, job: str) -> None:
     if tuple(weights) != item.values:
         tissue_strategy_operations.field_set(session, value.target, item.name, weights, item.domain)
     inspection.cancel(session, "paint")
-
-
-def require_current(session: Any, value: Any, job: str) -> None:
-    if (
-        not value
-        or value.job != job
-        or value.state != "ready"
-        or not value.asset
-        or not inspection.current(session, value.asset)
-    ):
-        raise ValueError("The stroke is incomplete or its inputs changed. Paint again.")

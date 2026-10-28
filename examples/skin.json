@@ -1,0 +1,17 @@
+[
+  {"id":"bone","operation":"import","arguments":{"path":"examples/primitives/cube.obj","units":1,"name":"Skin example"}},
+  {"operation":"wait"},
+  {"operation":"skin.configure","arguments":{"section":"topology_settings","values":{"backend":"INSTANT","target_quads":1000,"symmetry":"NONE"}}},
+  {"operation":"skin.configure","arguments":{"section":"deformation_settings","values":{"proxy_resolution":8}}},
+  {"operation":"skin.build"},
+  {"operation":"wait"},
+  {"id":"control","operation":"shortcut.expose","arguments":{"reference":{"target":"$bone.entity_id","path":["transform","position"],"component":1},"label":"Move Y"}},
+  {"operation":"skin.fit","arguments":{"shortcut":"$control","settings":{"minimum":0,"maximum":0.2,"bones":1,"samples":5}}},
+  {"operation":"wait"},
+  {"id":"skin","operation":"skin.inspect"},
+  {"operation":"skin.fit.preview","arguments":{"identity":"$skin.fits.0.id","value":0.1}},
+  {"operation":"wait"},
+  {"operation":"skin.fit.preview.cancel"},
+  {"operation":"skin.export","arguments":{"path":"skin.obj","policy":"accepted","wait":true}},
+  {"operation":"save","arguments":{"path":"skin.anthroforge","blocked_policy":"wait"}}
+]

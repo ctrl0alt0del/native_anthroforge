@@ -129,12 +129,12 @@ backsolve must not be hidden by calling that option alone a complete fix.
 | System | Audit status |
 | --- | --- |
 | Live mirroring/symmetry across SCPs, Fibers, surfaces and tissues | Implemented in [0.3.5](mirroring_035.md) as strict source reflection, with shared identities, source-only evaluation and read-only inspection. Independent mirrored bones in migrated projects remain separate. |
-| Draft Skin, collagen/gap fields, remeshing/topology budgets, final-skin reference/deformation and warm skin/topology updates | Deferred skin pipeline. These are not small omissions in tissue inflation. The app's skin-only export policy is a restriction, not evidence of a working skin producer or broad geometry export. |
+| Draft Skin, collagen/gap fields, remeshing/topology budgets, final-skin reference/deformation and warm skin/topology updates | Full current skin workflow is now scoped for [0.4.0](skin_040_inventory.md), not implemented. Legacy update compatibility remains distinguished from the durable-reference path. The app's skin-only export policy is a restriction, not evidence of a working skin producer. |
 | Reusable anatomical package/document/subgraph import and SCP-diff application | Native projects open/save and meshes import; there is no general public merge/append or addon AF package/diff importer. Custom migration scripts do not establish this as a desktop feature. |
 | Non-numeric shortcut exposure and general Blender RNA paths | Addon supports Boolean/enum/string proxy values. Standalone 0.3 deliberately supports numerical wrappers and a restricted formula language; extending that contract is a separate choice. |
-| Shortcuts baked to an armature / shortcut bone fitting | Present in the current local addon worktree, including new UI/native modules, but absent from standalone. It depends on final-skin deformation targets and belongs to a separate major workflow; this audit does not certify that uncommitted addon feature. |
+| Shortcuts baked to an armature / shortcut bone fitting | Explicitly included in [0.4.0](skin_040_inventory.md#confirmed-scope-additions-and-fitting-limits). Present as local untracked addon work, absent from standalone; source fingerprints and fitting limits are recorded. This scope decision does not certify the addon implementation or its future port. |
 | Anatomical reconstruction/fitting, legacy project conversion and arbitrary Blender editing/Geometry Nodes | Deferred or outside the specialized standalone contract. The current one-off migration and limited editable primitives do not imply a general Blender replacement. |
-| Apply/Bake and duplicate-derived-final-mesh authoring | Intentionally unavailable under the standalone editability contract. An addon snapshot operator is not grounds to add destructive baking. |
+| Apply/Bake and duplicate-derived-final-mesh authoring | Destructive Apply/Bake remains unavailable. The explicitly requested 0.4.0 shortcut-fitting workflow adds an independent derived skinning result while retaining editable source anatomy; it does not authorize general snapshot baking. |
 
 ## Recommended sequence for discussion
 

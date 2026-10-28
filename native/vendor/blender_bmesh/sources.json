@@ -1,0 +1,6124 @@
+{
+  "source": "https://github.com/blender/blender",
+  "tag": "v5.0.1",
+  "sources": [
+    "intern/guardedalloc/intern/leak_detector.cc",
+    "intern/guardedalloc/intern/mallocn.cc",
+    "intern/guardedalloc/intern/mallocn_guarded_impl.cc",
+    "intern/guardedalloc/intern/mallocn_lockfree_impl.cc",
+    "intern/guardedalloc/intern/memory_usage.cc",
+    "source/blender/blenlib/intern/BLI_ghash.cc",
+    "source/blender/blenlib/intern/BLI_heap.cc",
+    "source/blender/blenlib/intern/BLI_linklist.cc",
+    "source/blender/blenlib/intern/BLI_memarena.cc",
+    "source/blender/blenlib/intern/BLI_mempool.cc",
+    "source/blender/blenlib/intern/hash_mm2a.cc",
+    "source/blender/blenlib/intern/kdtree_3d.cc",
+    "source/blender/blenlib/intern/listbase.cc",
+    "source/blender/blenlib/intern/math_base.cc",
+    "source/blender/blenlib/intern/math_color.cc",
+    "source/blender/blenlib/intern/math_geom.cc",
+    "source/blender/blenlib/intern/math_geom_inline.cc",
+    "source/blender/blenlib/intern/math_matrix_c.cc",
+    "source/blender/blenlib/intern/math_rotation_c.cc",
+    "source/blender/blenlib/intern/math_vector.cc",
+    "source/blender/blenlib/intern/polyfill_2d.cc",
+    "source/blender/blenlib/intern/polyfill_2d_beautify.cc",
+    "source/blender/blenlib/intern/quadric.cc",
+    "source/blender/blenlib/intern/sort_utils.cc",
+    "source/blender/blenlib/intern/stack.cc",
+    "source/blender/bmesh/intern/bmesh_construct.cc",
+    "source/blender/bmesh/intern/bmesh_core.cc",
+    "source/blender/bmesh/intern/bmesh_delete.cc",
+    "source/blender/bmesh/intern/bmesh_interp.cc",
+    "source/blender/bmesh/intern/bmesh_iterators.cc",
+    "source/blender/bmesh/intern/bmesh_marking.cc",
+    "source/blender/bmesh/intern/bmesh_mesh.cc",
+    "source/blender/bmesh/intern/bmesh_mesh_normals.cc",
+    "source/blender/bmesh/intern/bmesh_mods.cc",
+    "source/blender/bmesh/intern/bmesh_polygon.cc",
+    "source/blender/bmesh/intern/bmesh_query.cc",
+    "source/blender/bmesh/intern/bmesh_structure.cc",
+    "source/blender/bmesh/tools/bmesh_beautify.cc",
+    "source/blender/bmesh/tools/bmesh_bisect_plane.cc",
+    "source/blender/bmesh/tools/bmesh_decimate_collapse.cc"
+  ],
+  "files": {
+    "intern/atomic/atomic_ops.h": {
+      "source_sha256": "f22c47048cde4546bd4ffb815e2c788e51e802cd255d64406d1c06317fa1c73c",
+      "sha256": "f22c47048cde4546bd4ffb815e2c788e51e802cd255d64406d1c06317fa1c73c"
+    },
+    "intern/atomic/intern/atomic_ops_ext.h": {
+      "source_sha256": "9b6499495416eed6c47d05ed887766e5ca4e2234ec426feebe1b6646639121e1",
+      "sha256": "9b6499495416eed6c47d05ed887766e5ca4e2234ec426feebe1b6646639121e1"
+    },
+    "intern/atomic/intern/atomic_ops_msvc.h": {
+      "source_sha256": "0b78e1352cd958ea940d445515f0e9d46ec834aba22f16b1fff9150b9097d9f8",
+      "sha256": "0b78e1352cd958ea940d445515f0e9d46ec834aba22f16b1fff9150b9097d9f8"
+    },
+    "intern/atomic/intern/atomic_ops_utils.h": {
+      "source_sha256": "ec5aeb830ac40cb945cfc9542cd93c63bd34518598956605189d56eca4d8cfdf",
+      "sha256": "ec5aeb830ac40cb945cfc9542cd93c63bd34518598956605189d56eca4d8cfdf"
+    },
+    "intern/guardedalloc/intern/mallocn_inline.hh": {
+      "source_sha256": "a5a35733cc80e1f64b6dae102564f5749e76d25bc9749649e3bb92def4a39a8d",
+      "sha256": "a5a35733cc80e1f64b6dae102564f5749e76d25bc9749649e3bb92def4a39a8d"
+    },
+    "intern/guardedalloc/intern/mallocn_intern.hh": {
+      "source_sha256": "b9af8e3aff4448e8f95e828404d2adac99699dc32ef3191a78e3830e7140fe07",
+      "sha256": "b9af8e3aff4448e8f95e828404d2adac99699dc32ef3191a78e3830e7140fe07"
+    },
+    "intern/guardedalloc/intern/mallocn_intern_function_pointers.hh": {
+      "source_sha256": "5dcc08ebe6e75afa9fe0c2b7ec351bd26e5c03f0f9e3b5892b95b601746637eb",
+      "sha256": "5dcc08ebe6e75afa9fe0c2b7ec351bd26e5c03f0f9e3b5892b95b601746637eb"
+    },
+    "intern/guardedalloc/MEM_guardedalloc.h": {
+      "source_sha256": "618f94de228743d97b6f193353d80ce75aca9d027058cbd6af9ba1d03776803d",
+      "sha256": "618f94de228743d97b6f193353d80ce75aca9d027058cbd6af9ba1d03776803d"
+    },
+    "source/blender/blenkernel/BKE_attribute.h": {
+      "source_sha256": "1fdda682d09baeda3be8e91929f062c10214d82ff958b75439749156fac336b3",
+      "sha256": "1fdda682d09baeda3be8e91929f062c10214d82ff958b75439749156fac336b3"
+    },
+    "source/blender/blenkernel/BKE_attribute.hh": {
+      "source_sha256": "d697fce15f2682e35149878f9da701a08cfa8f6b0a521a25bce3de8146cb1cac",
+      "sha256": "d697fce15f2682e35149878f9da701a08cfa8f6b0a521a25bce3de8146cb1cac"
+    },
+    "source/blender/blenkernel/BKE_attribute_filter.hh": {
+      "source_sha256": "39f3ea21f3a1972accbbf8eab68ce9671265e9fad0b76efb81b07ceef834b01f",
+      "sha256": "39f3ea21f3a1972accbbf8eab68ce9671265e9fad0b76efb81b07ceef834b01f"
+    },
+    "source/blender/blenkernel/BKE_attribute_filters.hh": {
+      "source_sha256": "4fc51b9340e5e6cd4744efed6c6747d50e418bafb84302a67e4118e2fd925e84",
+      "sha256": "4fc51b9340e5e6cd4744efed6c6747d50e418bafb84302a67e4118e2fd925e84"
+    },
+    "source/blender/blenkernel/BKE_attribute_legacy_convert.hh": {
+      "source_sha256": "9abf5fd34513c952be56b68fd6e66e7ddc141c9e953156d95605e3f3515a4509",
+      "sha256": "9abf5fd34513c952be56b68fd6e66e7ddc141c9e953156d95605e3f3515a4509"
+    },
+    "source/blender/blenkernel/BKE_attribute_storage.hh": {
+      "source_sha256": "fe4c30780d1e0b5b2e86bdbb626d7f2b131ee1fedffffde462b8754004244fa4",
+      "sha256": "fe4c30780d1e0b5b2e86bdbb626d7f2b131ee1fedffffde462b8754004244fa4"
+    },
+    "source/blender/blenkernel/BKE_customdata.hh": {
+      "source_sha256": "001678bf9e3052fec7b0f4e4724124de5a884fafdfba3903fe4872b87e021df6",
+      "sha256": "001678bf9e3052fec7b0f4e4724124de5a884fafdfba3903fe4872b87e021df6"
+    },
+    "source/blender/blenkernel/BKE_editmesh.hh": {
+      "source_sha256": "2ee8439ecc02d529953661263379060ddd8b4db7655f60770ae3db5d196bb7e9",
+      "sha256": "2ee8439ecc02d529953661263379060ddd8b4db7655f60770ae3db5d196bb7e9"
+    },
+    "source/blender/blenkernel/BKE_global.hh": {
+      "source_sha256": "b5bab9cfe081125cbfe06c002f6e149126fcd1c11b56a6b448978df9d312ff9d",
+      "sha256": "b5bab9cfe081125cbfe06c002f6e149126fcd1c11b56a6b448978df9d312ff9d"
+    },
+    "source/blender/blenkernel/BKE_mesh.h": {
+      "source_sha256": "f4d50d592e859121e15895b3f00aae2f8b01978a6bae57d1894d683f2a22b84d",
+      "sha256": "f4d50d592e859121e15895b3f00aae2f8b01978a6bae57d1894d683f2a22b84d"
+    },
+    "source/blender/blenkernel/BKE_mesh.hh": {
+      "source_sha256": "fa3d707009f056dab471090ad0bd7fbe4c1fee23e6f7c5c1cb7d5d7d4ce5819a",
+      "sha256": "fa3d707009f056dab471090ad0bd7fbe4c1fee23e6f7c5c1cb7d5d7d4ce5819a"
+    },
+    "source/blender/blenkernel/BKE_mesh_types.hh": {
+      "source_sha256": "ac9525ea361cf20609cead0f3a42607801f8e6766093a39efa99a0da182d7aad",
+      "sha256": "ac9525ea361cf20609cead0f3a42607801f8e6766093a39efa99a0da182d7aad"
+    },
+    "source/blender/blenkernel/BKE_multires.hh": {
+      "source_sha256": "9137ceef3742355dc1f3dbce7c1e5c5c95cfd694b26fc00ac9c2feb8bb89ed62",
+      "sha256": "9137ceef3742355dc1f3dbce7c1e5c5c95cfd694b26fc00ac9c2feb8bb89ed62"
+    },
+    "source/blender/blenkernel/BKE_volume_enums.hh": {
+      "source_sha256": "7270b8edc39356f1eb6d25a7730c166fd6338e659e33ad81c62e176a0b2dada6",
+      "sha256": "7270b8edc39356f1eb6d25a7730c166fd6338e659e33ad81c62e176a0b2dada6"
+    },
+    "source/blender/blenkernel/intern/multires_inline.hh": {
+      "source_sha256": "599dd92797e71e8f9256e87d7d6156916fda45a87f3f8914002e107068eef2a2",
+      "sha256": "599dd92797e71e8f9256e87d7d6156916fda45a87f3f8914002e107068eef2a2"
+    },
+    "source/blender/blenlib/BLI_alloca.h": {
+      "source_sha256": "4130b69a81387a5694e28fa8ff404dba333b474db2c00c3eddc484c02b1ac113",
+      "sha256": "4130b69a81387a5694e28fa8ff404dba333b474db2c00c3eddc484c02b1ac113"
+    },
+    "source/blender/blenlib/BLI_allocator.hh": {
+      "source_sha256": "85c4b244654d076ad4ebf10e52ad326b3d6760cc7014b65f842e67aa562d2246",
+      "sha256": "85c4b244654d076ad4ebf10e52ad326b3d6760cc7014b65f842e67aa562d2246"
+    },
+    "source/blender/blenlib/BLI_any.hh": {
+      "source_sha256": "5b0e4cc9deaccf2552861e9e5109b055367e1f4a35df1d553a4bcbce965b8650",
+      "sha256": "5b0e4cc9deaccf2552861e9e5109b055367e1f4a35df1d553a4bcbce965b8650"
+    },
+    "source/blender/blenlib/BLI_array.hh": {
+      "source_sha256": "d21d466b1f095d4b892fcd7a9c34a94ed41adaa5b79a91b5db406f9d8c764632",
+      "sha256": "d21d466b1f095d4b892fcd7a9c34a94ed41adaa5b79a91b5db406f9d8c764632"
+    },
+    "source/blender/blenlib/BLI_asan.h": {
+      "source_sha256": "0de6a5b18b3290998464b73d316ec06a540872e5d7ebc6f6e3c0d8d7c2c31c0a",
+      "sha256": "0de6a5b18b3290998464b73d316ec06a540872e5d7ebc6f6e3c0d8d7c2c31c0a"
+    },
+    "source/blender/blenlib/BLI_assert.h": {
+      "source_sha256": "df042d19780b88735fb76fd4011f903e93241feaeb316cf43d8ef609a05b1ad5",
+      "sha256": "df042d19780b88735fb76fd4011f903e93241feaeb316cf43d8ef609a05b1ad5"
+    },
+    "source/blender/blenlib/BLI_binary_search.hh": {
+      "source_sha256": "97cb01a3c4d618eac6ffe8f69af2d137d3c9321b291578a439410864a52312f6",
+      "sha256": "97cb01a3c4d618eac6ffe8f69af2d137d3c9321b291578a439410864a52312f6"
+    },
+    "source/blender/blenlib/BLI_bit_bool_conversion.hh": {
+      "source_sha256": "55cf17edbf2abeb44505eec1b680c404c833eb9e9cbb408f9fc194b8a143b151",
+      "sha256": "55cf17edbf2abeb44505eec1b680c404c833eb9e9cbb408f9fc194b8a143b151"
+    },
+    "source/blender/blenlib/BLI_bit_ref.hh": {
+      "source_sha256": "ed0a6032f921dff9be363ded7cef21c91e3741298a99d10a272097f831c77417",
+      "sha256": "ed0a6032f921dff9be363ded7cef21c91e3741298a99d10a272097f831c77417"
+    },
+    "source/blender/blenlib/BLI_bit_span.hh": {
+      "source_sha256": "091b4550c923391c712e3200706127efe4c6623e6d56153ab7ebd0b789e8a292",
+      "sha256": "091b4550c923391c712e3200706127efe4c6623e6d56153ab7ebd0b789e8a292"
+    },
+    "source/blender/blenlib/BLI_bit_vector.hh": {
+      "source_sha256": "55d6e13c64a50d456aec026dccdd20a51f284a3736aeff95ddeae5da1ce2013f",
+      "sha256": "55d6e13c64a50d456aec026dccdd20a51f284a3736aeff95ddeae5da1ce2013f"
+    },
+    "source/blender/blenlib/BLI_bitmap.h": {
+      "source_sha256": "04a942a69f42e50cd610d7d276a9851589f31ccd6db41a17951d36503f8b7aa2",
+      "sha256": "04a942a69f42e50cd610d7d276a9851589f31ccd6db41a17951d36503f8b7aa2"
+    },
+    "source/blender/blenlib/BLI_bounds_types.hh": {
+      "source_sha256": "639cfb28fa5be372674441e5be6b9b247c085726538eb557aa50366e448313c0",
+      "sha256": "639cfb28fa5be372674441e5be6b9b247c085726538eb557aa50366e448313c0"
+    },
+    "source/blender/blenlib/BLI_build_config.h": {
+      "source_sha256": "d70e2745a266a2c06aabb669a89fd71071ddf64bcdb5478b0bcf0344109e7d78",
+      "sha256": "d70e2745a266a2c06aabb669a89fd71071ddf64bcdb5478b0bcf0344109e7d78"
+    },
+    "source/blender/blenlib/BLI_cache_mutex.hh": {
+      "source_sha256": "1ff7a7ddc713f446a96dbd6b2cf7f03fa4a612404622bdf4f92086b4bffcef71",
+      "sha256": "1ff7a7ddc713f446a96dbd6b2cf7f03fa4a612404622bdf4f92086b4bffcef71"
+    },
+    "source/blender/blenlib/BLI_color_types.hh": {
+      "source_sha256": "51277cc372cd2e28445471bf79569e3bfd2bdf560bb5fda22f6c689a07821fb9",
+      "sha256": "51277cc372cd2e28445471bf79569e3bfd2bdf560bb5fda22f6c689a07821fb9"
+    },
+    "source/blender/blenlib/BLI_compiler_attrs.h": {
+      "source_sha256": "59dff4a9053a525118138e63f3e9ca8cb6e1b953c728015c2f57ba129bb621d5",
+      "sha256": "59dff4a9053a525118138e63f3e9ca8cb6e1b953c728015c2f57ba129bb621d5"
+    },
+    "source/blender/blenlib/BLI_compiler_compat.h": {
+      "source_sha256": "d1764e99bf9dc7f60454aea95cd308f17c017e6ec432611202c02ee020cc97f6",
+      "sha256": "d1764e99bf9dc7f60454aea95cd308f17c017e6ec432611202c02ee020cc97f6"
+    },
+    "source/blender/blenlib/BLI_compiler_typecheck.h": {
+      "source_sha256": "928e9d12a35cf1687c31c3b0b1017358121e2393090574415a4cc6653e88627f",
+      "sha256": "928e9d12a35cf1687c31c3b0b1017358121e2393090574415a4cc6653e88627f"
+    },
+    "source/blender/blenlib/BLI_cpp_type.hh": {
+      "source_sha256": "e171a5c647d3d94bd06d1e77d5ee171f59bc1231f697f11edad22b6a09ee2736",
+      "sha256": "e171a5c647d3d94bd06d1e77d5ee171f59bc1231f697f11edad22b6a09ee2736"
+    },
+    "source/blender/blenlib/BLI_devirtualize_parameters.hh": {
+      "source_sha256": "84ccab7a12fea70e608b5f8eeb568da784fac49d50d91cf491949a185007409a",
+      "sha256": "84ccab7a12fea70e608b5f8eeb568da784fac49d50d91cf491949a185007409a"
+    },
+    "source/blender/blenlib/BLI_function_ref.hh": {
+      "source_sha256": "9dbffbb3867288972876df18806a1a8eb08e5f415f421f79648e6ab7479159f1",
+      "sha256": "9dbffbb3867288972876df18806a1a8eb08e5f415f421f79648e6ab7479159f1"
+    },
+    "source/blender/blenlib/BLI_generic_array.hh": {
+      "source_sha256": "bfd49aa0e40264f7390a9d27d09663a4aa33bff3403c4fa15707f2f65c243a84",
+      "sha256": "bfd49aa0e40264f7390a9d27d09663a4aa33bff3403c4fa15707f2f65c243a84"
+    },
+    "source/blender/blenlib/BLI_generic_pointer.hh": {
+      "source_sha256": "2690250a82c7bc741ef311a1b7aaa58b4e54b8b1389e728234353d0850c729a5",
+      "sha256": "2690250a82c7bc741ef311a1b7aaa58b4e54b8b1389e728234353d0850c729a5"
+    },
+    "source/blender/blenlib/BLI_generic_span.hh": {
+      "source_sha256": "deb0109d0dcf130c2f009191644c7381b1aed51f8676124d076a3fd3939f98f2",
+      "sha256": "deb0109d0dcf130c2f009191644c7381b1aed51f8676124d076a3fd3939f98f2"
+    },
+    "source/blender/blenlib/BLI_generic_virtual_array.hh": {
+      "source_sha256": "10135bf3a7639377a7b947d6af257ad73f44c5756f1437d2ed5aaa056acab933",
+      "sha256": "10135bf3a7639377a7b947d6af257ad73f44c5756f1437d2ed5aaa056acab933"
+    },
+    "source/blender/blenlib/BLI_ghash.h": {
+      "source_sha256": "23abafd7425b8d9e3bbcf050bd29890006928bd33940698ed3a958c34a327361",
+      "sha256": "23abafd7425b8d9e3bbcf050bd29890006928bd33940698ed3a958c34a327361"
+    },
+    "source/blender/blenlib/BLI_hash.hh": {
+      "source_sha256": "5783264daa1c4142d2c15efb0ec5e6cd9b260cfb8909438f8b38880b73bf523c",
+      "sha256": "5783264daa1c4142d2c15efb0ec5e6cd9b260cfb8909438f8b38880b73bf523c"
+    },
+    "source/blender/blenlib/BLI_hash_fwd.hh": {
+      "source_sha256": "2581a1d50390a1680e145f5d57efe2aea409586797f5d852871a380e49225ad2",
+      "sha256": "2581a1d50390a1680e145f5d57efe2aea409586797f5d852871a380e49225ad2"
+    },
+    "source/blender/blenlib/BLI_hash_mm2a.hh": {
+      "source_sha256": "5165e42995f5a1825cc2a0bd7c427c734cf40d8286779a9c503e0b99f815043f",
+      "sha256": "5165e42995f5a1825cc2a0bd7c427c734cf40d8286779a9c503e0b99f815043f"
+    },
+    "source/blender/blenlib/BLI_hash_tables.hh": {
+      "source_sha256": "c1026f9f96cb232052b60cf7d460ba9db0b68789ff6a10fe6b6a3ded5b049c1a",
+      "sha256": "c1026f9f96cb232052b60cf7d460ba9db0b68789ff6a10fe6b6a3ded5b049c1a"
+    },
+    "source/blender/blenlib/BLI_heap.h": {
+      "source_sha256": "e5b48e5648ed60435c7822ce6de4913e1403a2d55e596f56d681bc283d1e8464",
+      "sha256": "e5b48e5648ed60435c7822ce6de4913e1403a2d55e596f56d681bc283d1e8464"
+    },
+    "source/blender/blenlib/BLI_implicit_sharing.h": {
+      "source_sha256": "c3e6d2b0c6b23f5ac76651538fc8ca23fc14005cff84c4be3aedbb9dbec951a1",
+      "sha256": "c3e6d2b0c6b23f5ac76651538fc8ca23fc14005cff84c4be3aedbb9dbec951a1"
+    },
+    "source/blender/blenlib/BLI_implicit_sharing.hh": {
+      "source_sha256": "824bee4e691f9ad2eb9642646668179bfd37ba0683f490f180fc11af60881493",
+      "sha256": "824bee4e691f9ad2eb9642646668179bfd37ba0683f490f180fc11af60881493"
+    },
+    "source/blender/blenlib/BLI_implicit_sharing_ptr.hh": {
+      "source_sha256": "19697aa651c03f1ad2d7f82d33f887e8f5416b4300259ad0b76b4d06b6561a56",
+      "sha256": "19697aa651c03f1ad2d7f82d33f887e8f5416b4300259ad0b76b4d06b6561a56"
+    },
+    "source/blender/blenlib/BLI_index_mask.hh": {
+      "source_sha256": "a9f63c5b893459f4520b070b08ebbd0d170c23daf2169a3bf6dc38b1c49ef494",
+      "sha256": "a9f63c5b893459f4520b070b08ebbd0d170c23daf2169a3bf6dc38b1c49ef494"
+    },
+    "source/blender/blenlib/BLI_index_mask_fwd.hh": {
+      "source_sha256": "05926dafac0f675de544c65b30a7a7e17ede4cdd5871300f5561b1de7d3cae6f",
+      "sha256": "05926dafac0f675de544c65b30a7a7e17ede4cdd5871300f5561b1de7d3cae6f"
+    },
+    "source/blender/blenlib/BLI_index_range.hh": {
+      "source_sha256": "96c0d773d2f14cdb39bb99f2abd4d7bb07e74db527eb505732a1976e32fd9d75",
+      "sha256": "96c0d773d2f14cdb39bb99f2abd4d7bb07e74db527eb505732a1976e32fd9d75"
+    },
+    "source/blender/blenlib/BLI_index_ranges_builder_fwd.hh": {
+      "source_sha256": "01677c83e73e7f8741275e63feed82d232b08206141ce43884406a193ab5a6a0",
+      "sha256": "01677c83e73e7f8741275e63feed82d232b08206141ce43884406a193ab5a6a0"
+    },
+    "source/blender/blenlib/BLI_kdopbvh.hh": {
+      "source_sha256": "feeb5e5921af0235816e46957775988d6bd78bf413cacc7064a86aed6b406a02",
+      "sha256": "feeb5e5921af0235816e46957775988d6bd78bf413cacc7064a86aed6b406a02"
+    },
+    "source/blender/blenlib/BLI_kdtree.h": {
+      "source_sha256": "eeb6fa6bed0255119296a361c97d0394c9624245fe6b62cf09186cb528c34fc2",
+      "sha256": "eeb6fa6bed0255119296a361c97d0394c9624245fe6b62cf09186cb528c34fc2"
+    },
+    "source/blender/blenlib/BLI_kdtree_impl.h": {
+      "source_sha256": "f3bcfc83340ecb2e259665de9157fc42d2c62dfc495e0d3ab79f6914279e31df",
+      "sha256": "f3bcfc83340ecb2e259665de9157fc42d2c62dfc495e0d3ab79f6914279e31df"
+    },
+    "source/blender/blenlib/BLI_lazy_threading.hh": {
+      "source_sha256": "27a380d50dffacbe9b73d107822f029dfda4d6c1258342c2ba3934d6dbf5eb70",
+      "sha256": "27a380d50dffacbe9b73d107822f029dfda4d6c1258342c2ba3934d6dbf5eb70"
+    },
+    "source/blender/blenlib/BLI_linear_allocator.hh": {
+      "source_sha256": "30bf16450a08bc4176f297e11665a81c5f2d782c48cdc92210b4626e1a879040",
+      "sha256": "30bf16450a08bc4176f297e11665a81c5f2d782c48cdc92210b4626e1a879040"
+    },
+    "source/blender/blenlib/BLI_linklist.h": {
+      "source_sha256": "1b86046c7e5ac12994191a27c0745b3b6b45b67682bc460163e9d453894a9160",
+      "sha256": "1b86046c7e5ac12994191a27c0745b3b6b45b67682bc460163e9d453894a9160"
+    },
+    "source/blender/blenlib/BLI_linklist_stack.h": {
+      "source_sha256": "63231d20eacfc380215b6e811bccefc046b79b3145fabdcd53cee6ded9cde772",
+      "sha256": "63231d20eacfc380215b6e811bccefc046b79b3145fabdcd53cee6ded9cde772"
+    },
+    "source/blender/blenlib/BLI_listbase.h": {
+      "source_sha256": "c22f207ceb6392ad1a51ba39e41feb57731598135f995cf0a467c9adf1a17b14",
+      "sha256": "c22f207ceb6392ad1a51ba39e41feb57731598135f995cf0a467c9adf1a17b14"
+    },
+    "source/blender/blenlib/BLI_map.hh": {
+      "source_sha256": "686cf7eaada581bccf46068e63ac2f547c3539e72f0636a1403808b038c597a7",
+      "sha256": "686cf7eaada581bccf46068e63ac2f547c3539e72f0636a1403808b038c597a7"
+    },
+    "source/blender/blenlib/BLI_map_slots.hh": {
+      "source_sha256": "cfdea55bec62cca21d83e0b4fbdd94705acf6454298917ace4b8a3cfe40fb845",
+      "sha256": "cfdea55bec62cca21d83e0b4fbdd94705acf6454298917ace4b8a3cfe40fb845"
+    },
+    "source/blender/blenlib/BLI_math_angle_types.hh": {
+      "source_sha256": "9171b8c1ed78f5ac860d3fb92df310fbf50351b14881b5aa5661490c9041b962",
+      "sha256": "9171b8c1ed78f5ac860d3fb92df310fbf50351b14881b5aa5661490c9041b962"
+    },
+    "source/blender/blenlib/BLI_math_axis_angle_types.hh": {
+      "source_sha256": "778b19f78759a72bf2320696642b6a0a5f3e4251e08fcbddce151becd17e21e6",
+      "sha256": "778b19f78759a72bf2320696642b6a0a5f3e4251e08fcbddce151becd17e21e6"
+    },
+    "source/blender/blenlib/BLI_math_base.h": {
+      "source_sha256": "e8bf7cc5b3a95a68a28aa8441a4c700fcfb2f60a353f0cda7b17f3fa059cee8c",
+      "sha256": "e8bf7cc5b3a95a68a28aa8441a4c700fcfb2f60a353f0cda7b17f3fa059cee8c"
+    },
+    "source/blender/blenlib/BLI_math_base.hh": {
+      "source_sha256": "2d5728484e755c5eb51e6614b7e1e03c8c7b5dfdf55bd02a1ec3049f6ccff1cf",
+      "sha256": "2d5728484e755c5eb51e6614b7e1e03c8c7b5dfdf55bd02a1ec3049f6ccff1cf"
+    },
+    "source/blender/blenlib/BLI_math_base_safe.h": {
+      "source_sha256": "16c2fbf43cc5accc08523bfd2ed341fc854ea0d4e54d6a9d09de679a97068cf2",
+      "sha256": "16c2fbf43cc5accc08523bfd2ed341fc854ea0d4e54d6a9d09de679a97068cf2"
+    },
+    "source/blender/blenlib/BLI_math_basis_types.hh": {
+      "source_sha256": "eb6f36029c339fcf424fdea4147a8017e9c830d8a694645cbd99d7e61103af78",
+      "sha256": "eb6f36029c339fcf424fdea4147a8017e9c830d8a694645cbd99d7e61103af78"
+    },
+    "source/blender/blenlib/BLI_math_bits.h": {
+      "source_sha256": "5094390e395c9b258b46301b76dc9f3b36a45f6e61216c47bc6b14975adb1db6",
+      "sha256": "5094390e395c9b258b46301b76dc9f3b36a45f6e61216c47bc6b14975adb1db6"
+    },
+    "source/blender/blenlib/BLI_math_color.h": {
+      "source_sha256": "fb8482d27e1e47fe2bbfef2b13ccca2a8c1a0c748c9da5a49be9884634a43e1e",
+      "sha256": "fb8482d27e1e47fe2bbfef2b13ccca2a8c1a0c748c9da5a49be9884634a43e1e"
+    },
+    "source/blender/blenlib/BLI_math_color.hh": {
+      "source_sha256": "94ef0bbb05c57f4a5f5abaa5cb3afdadc120432b82e31363c867f867a6512d20",
+      "sha256": "94ef0bbb05c57f4a5f5abaa5cb3afdadc120432b82e31363c867f867a6512d20"
+    },
+    "source/blender/blenlib/BLI_math_constants.h": {
+      "source_sha256": "158160d8bc8e2f92e444994c2f5caa8240c940fe51f08d2d3ba982af0de51503",
+      "sha256": "158160d8bc8e2f92e444994c2f5caa8240c940fe51f08d2d3ba982af0de51503"
+    },
+    "source/blender/blenlib/BLI_math_euler_types.hh": {
+      "source_sha256": "2dee7b6032baca31184bbe37e6206fb9cbf4620ebd3a549ae5c15e79b07fd849",
+      "sha256": "2dee7b6032baca31184bbe37e6206fb9cbf4620ebd3a549ae5c15e79b07fd849"
+    },
+    "source/blender/blenlib/BLI_math_geom.h": {
+      "source_sha256": "beca67e8b3e6d0bfec046c6fb70a6c343e96a6364443ccdd0acd3169eb2dc38a",
+      "sha256": "beca67e8b3e6d0bfec046c6fb70a6c343e96a6364443ccdd0acd3169eb2dc38a"
+    },
+    "source/blender/blenlib/BLI_math_inline.h": {
+      "source_sha256": "4e8709e925dc01bed8e1701443d63cdff8171a40068c72415837dc1814005aa7",
+      "sha256": "4e8709e925dc01bed8e1701443d63cdff8171a40068c72415837dc1814005aa7"
+    },
+    "source/blender/blenlib/BLI_math_matrix.h": {
+      "source_sha256": "4718721e8469da9ded0614476ab35de684158287dd097046009fe0a31b666b9a",
+      "sha256": "4718721e8469da9ded0614476ab35de684158287dd097046009fe0a31b666b9a"
+    },
+    "source/blender/blenlib/BLI_math_matrix.hh": {
+      "source_sha256": "f7f499a81bf53de95cc5c2014e97293ca967e7ec7fb299a7a1f5ed8021c005b8",
+      "sha256": "f7f499a81bf53de95cc5c2014e97293ca967e7ec7fb299a7a1f5ed8021c005b8"
+    },
+    "source/blender/blenlib/BLI_math_matrix_types.hh": {
+      "source_sha256": "15facd22c0f4d00800e0ad35e99cd32f115eb6210ca49986fe918d301b02a672",
+      "sha256": "15facd22c0f4d00800e0ad35e99cd32f115eb6210ca49986fe918d301b02a672"
+    },
+    "source/blender/blenlib/BLI_math_numbers.hh": {
+      "source_sha256": "f8283f4608a02f153cb599bdd003a743e2541cc6f29c55852824f7aedd836f82",
+      "sha256": "f8283f4608a02f153cb599bdd003a743e2541cc6f29c55852824f7aedd836f82"
+    },
+    "source/blender/blenlib/BLI_math_quaternion_types.hh": {
+      "source_sha256": "0fed82057853a4aed75ab42c7abfff9af1dc0e43a5495c5ddb883e42c6e5d139",
+      "sha256": "0fed82057853a4aed75ab42c7abfff9af1dc0e43a5495c5ddb883e42c6e5d139"
+    },
+    "source/blender/blenlib/BLI_math_rotation.h": {
+      "source_sha256": "b7dea146f2e2f3c2223242e67cf32dd63340d22e3678548d9a7bec9626c05a96",
+      "sha256": "b7dea146f2e2f3c2223242e67cf32dd63340d22e3678548d9a7bec9626c05a96"
+    },
+    "source/blender/blenlib/BLI_math_rotation_types.hh": {
+      "source_sha256": "028c6b44b1a59c2d6478e36390cc4f4635fdfc55c23cc67e5d797535cdceb279",
+      "sha256": "028c6b44b1a59c2d6478e36390cc4f4635fdfc55c23cc67e5d797535cdceb279"
+    },
+    "source/blender/blenlib/BLI_math_solvers.h": {
+      "source_sha256": "ddcd8354292c2d5bccf21d582c8e84e51e644a1b5b80e922eeef66b111142a17",
+      "sha256": "ddcd8354292c2d5bccf21d582c8e84e51e644a1b5b80e922eeef66b111142a17"
+    },
+    "source/blender/blenlib/BLI_math_vector.h": {
+      "source_sha256": "b876b7f3358ece603b664aeee9be2b7d16f4e0331fbc8dd9948e91f3eff19cd2",
+      "sha256": "b876b7f3358ece603b664aeee9be2b7d16f4e0331fbc8dd9948e91f3eff19cd2"
+    },
+    "source/blender/blenlib/BLI_math_vector.hh": {
+      "source_sha256": "4810164ef448420936b4e0976f4d78f2a56e42c4fef606f43caa92b3869514e0",
+      "sha256": "4810164ef448420936b4e0976f4d78f2a56e42c4fef606f43caa92b3869514e0"
+    },
+    "source/blender/blenlib/BLI_math_vector_types.hh": {
+      "source_sha256": "8ed9a80dc63334cfd02cc2eb245f4addcd75e354882c4d48da38aa88013924e3",
+      "sha256": "8ed9a80dc63334cfd02cc2eb245f4addcd75e354882c4d48da38aa88013924e3"
+    },
+    "source/blender/blenlib/BLI_math_vector_unroll.hh": {
+      "source_sha256": "c99b642f1cf3e1fc98fba8180ca29bb4fd1a5a31d4050abe154528516348379e",
+      "sha256": "c99b642f1cf3e1fc98fba8180ca29bb4fd1a5a31d4050abe154528516348379e"
+    },
+    "source/blender/blenlib/BLI_memarena.h": {
+      "source_sha256": "5dccac2b7725e6ba325aee0a4c8cbd76625cd5ed1fcee96a6fb1c6f4365ed6ef",
+      "sha256": "5dccac2b7725e6ba325aee0a4c8cbd76625cd5ed1fcee96a6fb1c6f4365ed6ef"
+    },
+    "source/blender/blenlib/BLI_memory_counter_fwd.hh": {
+      "source_sha256": "94d537333af4f3993b86c19c5d3df1b0d9b64ab4cafa955a86ff0355fcac69a1",
+      "sha256": "94d537333af4f3993b86c19c5d3df1b0d9b64ab4cafa955a86ff0355fcac69a1"
+    },
+    "source/blender/blenlib/BLI_memory_utils.hh": {
+      "source_sha256": "27054c54394ab1070643fa1aa4dca42bfa17eb783e5ca481b4919347d1aed134",
+      "sha256": "27054c54394ab1070643fa1aa4dca42bfa17eb783e5ca481b4919347d1aed134"
+    },
+    "source/blender/blenlib/BLI_mempool.h": {
+      "source_sha256": "a018c8d8df4c2c06f1a9e5e7b552f57b0db946972330d6aa443b33c6208241bd",
+      "sha256": "a018c8d8df4c2c06f1a9e5e7b552f57b0db946972330d6aa443b33c6208241bd"
+    },
+    "source/blender/blenlib/BLI_mutex.hh": {
+      "source_sha256": "4f819436acbc68fa70aa20677f8c1d38e841603902d45af421b0043ddba2c472",
+      "sha256": "4f819436acbc68fa70aa20677f8c1d38e841603902d45af421b0043ddba2c472"
+    },
+    "source/blender/blenlib/BLI_offset_indices.hh": {
+      "source_sha256": "e4fbe497f8b8dcad82be6487d2e148f01b3c19ff670a38f01e356736e107dee5",
+      "sha256": "e4fbe497f8b8dcad82be6487d2e148f01b3c19ff670a38f01e356736e107dee5"
+    },
+    "source/blender/blenlib/BLI_offset_span.hh": {
+      "source_sha256": "ea65c177c52d740c6337122d0d09ec7dc194ac5dc3ebe2ae3fc33e782dbc9a4e",
+      "sha256": "ea65c177c52d740c6337122d0d09ec7dc194ac5dc3ebe2ae3fc33e782dbc9a4e"
+    },
+    "source/blender/blenlib/BLI_parameter_pack_utils.hh": {
+      "source_sha256": "dc2796d176811b69c19c8867280ddead67fa61acf5f80a8f0e7b3c042b6bd387",
+      "sha256": "dc2796d176811b69c19c8867280ddead67fa61acf5f80a8f0e7b3c042b6bd387"
+    },
+    "source/blender/blenlib/BLI_polyfill_2d.h": {
+      "source_sha256": "f213382bc05cfd233591d4dff66e5af20491131296f5778b413689ab7f09324f",
+      "sha256": "f213382bc05cfd233591d4dff66e5af20491131296f5778b413689ab7f09324f"
+    },
+    "source/blender/blenlib/BLI_polyfill_2d_beautify.h": {
+      "source_sha256": "b34d49b25a3065c1b3c85eca01e9104cb4091f76aad9617864900c876e076c7e",
+      "sha256": "b34d49b25a3065c1b3c85eca01e9104cb4091f76aad9617864900c876e076c7e"
+    },
+    "source/blender/blenlib/BLI_probing_strategies.hh": {
+      "source_sha256": "26c6a1e42c1a7e77c56a5dfcc0e843f43b4b5c2eac781180936cfe40646ae225",
+      "sha256": "26c6a1e42c1a7e77c56a5dfcc0e843f43b4b5c2eac781180936cfe40646ae225"
+    },
+    "source/blender/blenlib/BLI_quadric.h": {
+      "source_sha256": "15f170e60d502cc929675f514602e454b000d6ce142fe90399732cb6503eb33e",
+      "sha256": "15f170e60d502cc929675f514602e454b000d6ce142fe90399732cb6503eb33e"
+    },
+    "source/blender/blenlib/BLI_random_access_iterator_mixin.hh": {
+      "source_sha256": "aa59b73f9c57506ec41f6cb2a7d786bc3133ada825daee7ec194c7dad991798d",
+      "sha256": "aa59b73f9c57506ec41f6cb2a7d786bc3133ada825daee7ec194c7dad991798d"
+    },
+    "source/blender/blenlib/BLI_rect.h": {
+      "source_sha256": "f13175b240bcf5052c996170642f3d3848273f735c8cc5b95a1646435bd98df4",
+      "sha256": "f13175b240bcf5052c996170642f3d3848273f735c8cc5b95a1646435bd98df4"
+    },
+    "source/blender/blenlib/BLI_set.hh": {
+      "source_sha256": "dab2d755eccda54b455d2c47aa1623aedb2d60a4a62ec14595259d642f0fdcae",
+      "sha256": "dab2d755eccda54b455d2c47aa1623aedb2d60a4a62ec14595259d642f0fdcae"
+    },
+    "source/blender/blenlib/BLI_set_slots.hh": {
+      "source_sha256": "e1bc86b0088522e204940fac5355dafbea6ef4ef62f3b7c159fd40f15b80a244",
+      "sha256": "e1bc86b0088522e204940fac5355dafbea6ef4ef62f3b7c159fd40f15b80a244"
+    },
+    "source/blender/blenlib/BLI_shared_cache.hh": {
+      "source_sha256": "e47b2044ceb10ff42f23901bcfcb644a355d5d3bf71ce237e56f573cd625db5c",
+      "sha256": "e47b2044ceb10ff42f23901bcfcb644a355d5d3bf71ce237e56f573cd625db5c"
+    },
+    "source/blender/blenlib/BLI_simd.hh": {
+      "source_sha256": "d196f59ed24faa35d3fd254506bc4998a47572161d7bc484db15b555205b2742",
+      "sha256": "d196f59ed24faa35d3fd254506bc4998a47572161d7bc484db15b555205b2742"
+    },
+    "source/blender/blenlib/BLI_sort_utils.h": {
+      "source_sha256": "c7192ddbc6ce73b2ebe9a301e3e8c258c0a62da38fe6d541152d994cd6e13db0",
+      "sha256": "c7192ddbc6ce73b2ebe9a301e3e8c258c0a62da38fe6d541152d994cd6e13db0"
+    },
+    "source/blender/blenlib/BLI_span.hh": {
+      "source_sha256": "08cc72c2ae9cba86a39b703cc13d796b28630ebc044df07c44dd99c460206a9d",
+      "sha256": "08cc72c2ae9cba86a39b703cc13d796b28630ebc044df07c44dd99c460206a9d"
+    },
+    "source/blender/blenlib/BLI_stack.h": {
+      "source_sha256": "d19390297667e740dc7c6b8986bd410a4c0c9f50a3c039ba1e930bf775c81f20",
+      "sha256": "d19390297667e740dc7c6b8986bd410a4c0c9f50a3c039ba1e930bf775c81f20"
+    },
+    "source/blender/blenlib/BLI_strict_flags.h": {
+      "source_sha256": "170169c2322da390ad0059beacc2544acfe963f81f9a5ccf6b3874d416f0715e",
+      "sha256": "170169c2322da390ad0059beacc2544acfe963f81f9a5ccf6b3874d416f0715e"
+    },
+    "source/blender/blenlib/BLI_string_ref.hh": {
+      "source_sha256": "4772bc7706923cd8921596c92619ee04580342c70fd3c85bb95e3fdc7efaf74c",
+      "sha256": "4772bc7706923cd8921596c92619ee04580342c70fd3c85bb95e3fdc7efaf74c"
+    },
+    "source/blender/blenlib/BLI_struct_equality_utils.hh": {
+      "source_sha256": "880c31af73370ee3d4c2faf2ec3e69e48c1cfaf27c4a895a530e254f198cbcfc",
+      "sha256": "880c31af73370ee3d4c2faf2ec3e69e48c1cfaf27c4a895a530e254f198cbcfc"
+    },
+    "source/blender/blenlib/BLI_sys_types.h": {
+      "source_sha256": "76017b18b4577e4e379e18fbfecfbd508f89ebc1bc01d8a1807d170b9ba285ba",
+      "sha256": "76017b18b4577e4e379e18fbfecfbd508f89ebc1bc01d8a1807d170b9ba285ba"
+    },
+    "source/blender/blenlib/BLI_task.h": {
+      "source_sha256": "40f6c75debca69f90b44287ba002e601c01bbd2ec02127255109142558aacf8a",
+      "sha256": "40f6c75debca69f90b44287ba002e601c01bbd2ec02127255109142558aacf8a"
+    },
+    "source/blender/blenlib/BLI_task.hh": {
+      "source_sha256": "493b0320ecacdef30dfb2fcfc85d4d08b02db228bd1cb4475a3731474f6e24ed",
+      "sha256": "493b0320ecacdef30dfb2fcfc85d4d08b02db228bd1cb4475a3731474f6e24ed"
+    },
+    "source/blender/blenlib/BLI_task_size_hints.hh": {
+      "source_sha256": "b67864929268b8a33fd5b3c59558546a9200898719e3a1f533914f728aaf01eb",
+      "sha256": "b67864929268b8a33fd5b3c59558546a9200898719e3a1f533914f728aaf01eb"
+    },
+    "source/blender/blenlib/BLI_threads.h": {
+      "source_sha256": "b6e26a1e2fcd52c017acc16017cad77b7da3d482cb8755da0e585049e7c3a83d",
+      "sha256": "b6e26a1e2fcd52c017acc16017cad77b7da3d482cb8755da0e585049e7c3a83d"
+    },
+    "source/blender/blenlib/BLI_unique_sorted_indices.hh": {
+      "source_sha256": "e9f9e201adbb12383afb795785281aaafa62d50acc108997b43dc0b40684e9b0",
+      "sha256": "e9f9e201adbb12383afb795785281aaafa62d50acc108997b43dc0b40684e9b0"
+    },
+    "source/blender/blenlib/BLI_unroll.hh": {
+      "source_sha256": "3eaddf6c8c080c8874c87dc04b3cefbabbd1ee3c2600d5eee685a44e50703e0b",
+      "sha256": "3eaddf6c8c080c8874c87dc04b3cefbabbd1ee3c2600d5eee685a44e50703e0b"
+    },
+    "source/blender/blenlib/BLI_utildefines.h": {
+      "source_sha256": "710af7d11d698195e088b1eb6cbf4b92befb489527a0c58f33ce0b1fcae6b312",
+      "sha256": "710af7d11d698195e088b1eb6cbf4b92befb489527a0c58f33ce0b1fcae6b312"
+    },
+    "source/blender/blenlib/BLI_utildefines_stack.h": {
+      "source_sha256": "369472d4bfeba8a2b6a5adc3a71bec1a11bdca303488d33ae23a50e26d62edc8",
+      "sha256": "369472d4bfeba8a2b6a5adc3a71bec1a11bdca303488d33ae23a50e26d62edc8"
+    },
+    "source/blender/blenlib/BLI_utildefines_variadic.h": {
+      "source_sha256": "75abe1737cbff7cb432eec2c0f62f0521b7e16f25b75274419382b226cedf905",
+      "sha256": "75abe1737cbff7cb432eec2c0f62f0521b7e16f25b75274419382b226cedf905"
+    },
+    "source/blender/blenlib/BLI_utility_mixins.hh": {
+      "source_sha256": "5bbe8b99cc4875af7c44ad36b56bb57da5ddef2f799065b354911f13f8404b41",
+      "sha256": "5bbe8b99cc4875af7c44ad36b56bb57da5ddef2f799065b354911f13f8404b41"
+    },
+    "source/blender/blenlib/BLI_vector.hh": {
+      "source_sha256": "2b994b124c57ea2c0d1c4eadc2be9dec93512cbee0fbab345846ef471236ad5c",
+      "sha256": "2b994b124c57ea2c0d1c4eadc2be9dec93512cbee0fbab345846ef471236ad5c"
+    },
+    "source/blender/blenlib/BLI_vector_list.hh": {
+      "source_sha256": "6fe6c7895d30d45bd72ee6aaa88e89dde35e13a32e3735bf2355938b754d00f0",
+      "sha256": "6fe6c7895d30d45bd72ee6aaa88e89dde35e13a32e3735bf2355938b754d00f0"
+    },
+    "source/blender/blenlib/BLI_vector_set.hh": {
+      "source_sha256": "b1ad77afaffe5bbe14aafc2ddeb1a78dea3a53a162e79e4bb7984317ec34e5d3",
+      "sha256": "b1ad77afaffe5bbe14aafc2ddeb1a78dea3a53a162e79e4bb7984317ec34e5d3"
+    },
+    "source/blender/blenlib/BLI_vector_set_slots.hh": {
+      "source_sha256": "00c46c34c92b39941a38b7b32c5b921e00bda61802b088e038f7f5923662f79c",
+      "sha256": "00c46c34c92b39941a38b7b32c5b921e00bda61802b088e038f7f5923662f79c"
+    },
+    "source/blender/blenlib/BLI_virtual_array.hh": {
+      "source_sha256": "671b89835c07bc21a144ed297e852b99951be6c00c12ab3ee791a59e597508e9",
+      "sha256": "671b89835c07bc21a144ed297e852b99951be6c00c12ab3ee791a59e597508e9"
+    },
+    "source/blender/blenlib/BLI_virtual_array_fwd.hh": {
+      "source_sha256": "d485842be68b013f4b3dd610f71a76f4babe00a4aef4c0fe8432834255361cc5",
+      "sha256": "d485842be68b013f4b3dd610f71a76f4babe00a4aef4c0fe8432834255361cc5"
+    },
+    "source/blender/blenlib/intern/BLI_mempool_private.h": {
+      "source_sha256": "e9b72f119fcb66e69aff9c88b1627130bd170b6d61dfedc3246baeb7c8dc8677",
+      "sha256": "e9b72f119fcb66e69aff9c88b1627130bd170b6d61dfedc3246baeb7c8dc8677"
+    },
+    "source/blender/blenlib/intern/kdtree_impl.h": {
+      "source_sha256": "7174b0c4fd91027496303655db416a002cc6625ace132bc2920dfa2b704fe154",
+      "sha256": "7174b0c4fd91027496303655db416a002cc6625ace132bc2920dfa2b704fe154"
+    },
+    "source/blender/blenlib/intern/list_sort_impl.h": {
+      "source_sha256": "6bd9fcd52878d8bddb9f47968c47a9d97118cdf625198d5aafedfaa65ba88b48",
+      "sha256": "6bd9fcd52878d8bddb9f47968c47a9d97118cdf625198d5aafedfaa65ba88b48"
+    },
+    "source/blender/blenlib/intern/math_base_inline.cc": {
+      "source_sha256": "ebcbd3981d2375b18906de9b513a68dda9d80a8f7ee6cb65107820a5cae3100d",
+      "sha256": "ebcbd3981d2375b18906de9b513a68dda9d80a8f7ee6cb65107820a5cae3100d"
+    },
+    "source/blender/blenlib/intern/math_base_safe_inline.cc": {
+      "source_sha256": "c6b252e818ae82c2f9c44a04b5e9d238a6939f950cadfd6e0687dd4f426c2c92",
+      "sha256": "c6b252e818ae82c2f9c44a04b5e9d238a6939f950cadfd6e0687dd4f426c2c92"
+    },
+    "source/blender/blenlib/intern/math_bits_inline.cc": {
+      "source_sha256": "e3077eedfcd50c2b4c4866443d6542506f1298e4142531d91c75ecfeb8061068",
+      "sha256": "e3077eedfcd50c2b4c4866443d6542506f1298e4142531d91c75ecfeb8061068"
+    },
+    "source/blender/blenlib/intern/math_color_inline.cc": {
+      "source_sha256": "8b88a425e0a96509d55f95494c572b7a80c0ddb5de426bf6befea869d966be3d",
+      "sha256": "8b88a425e0a96509d55f95494c572b7a80c0ddb5de426bf6befea869d966be3d"
+    },
+    "source/blender/blenlib/intern/math_geom_inline.cc": {
+      "source_sha256": "3845f43654322a76c859bc794a52794a731b98947f89d3ea68b3780d100251e7",
+      "sha256": "eccb3f93bec137dbde909427c03694ac7dd07e453a28a06833867cca8acb1e14",
+      "omitted": [
+        [
+          593,
+          775
+        ],
+        [
+          777,
+          911
+        ],
+        [
+          913,
+          1076
+        ],
+        [
+          1078,
+          1468
+        ],
+        [
+          1470,
+          1886
+        ],
+        [
+          1888,
+          2106
+        ],
+        [
+          2108,
+          2332
+        ],
+        [
+          2334,
+          2519
+        ],
+        [
+          2521,
+          2706
+        ],
+        [
+          2708,
+          2889
+        ],
+        [
+          3012,
+          3146
+        ],
+        [
+          3147,
+          3404
+        ],
+        [
+          3405,
+          3662
+        ],
+        [
+          3664,
+          4009
+        ],
+        [
+          4011,
+          4356
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/math_vector_inline.cc": {
+      "source_sha256": "ebe00a3f555ab65346f85f59e5ebeee1308d21a897a5136af2e265a25ca9dcac",
+      "sha256": "ebe00a3f555ab65346f85f59e5ebeee1308d21a897a5136af2e265a25ca9dcac"
+    },
+    "source/blender/bmesh/bmesh.hh": {
+      "source_sha256": "946f2226066a1503af8d2ed788956aef22adebb814fc0d727f10c49bc37d9ca1",
+      "sha256": "946f2226066a1503af8d2ed788956aef22adebb814fc0d727f10c49bc37d9ca1"
+    },
+    "source/blender/bmesh/bmesh_class.hh": {
+      "source_sha256": "94bad8e61dbdd3d6f554e980443f27c10d7949196dd125d99019985de922397e",
+      "sha256": "94bad8e61dbdd3d6f554e980443f27c10d7949196dd125d99019985de922397e"
+    },
+    "source/blender/bmesh/bmesh_tools.hh": {
+      "source_sha256": "9fb1aaa921bce4a1ad8238fe01232842512651c60d549421a447f796054a92d3",
+      "sha256": "9fb1aaa921bce4a1ad8238fe01232842512651c60d549421a447f796054a92d3"
+    },
+    "source/blender/bmesh/intern/bmesh_callback_generic.hh": {
+      "source_sha256": "5b4f377f9cf57dd57d498daee4e074c7baac98ff996accdf95468a78e4db6e7c",
+      "sha256": "5b4f377f9cf57dd57d498daee4e074c7baac98ff996accdf95468a78e4db6e7c"
+    },
+    "source/blender/bmesh/intern/bmesh_construct.hh": {
+      "source_sha256": "129fd8fa75944ba5a3cbcdff6ab6d9353d6e41235c78ea7667f47d72caf9b17b",
+      "sha256": "129fd8fa75944ba5a3cbcdff6ab6d9353d6e41235c78ea7667f47d72caf9b17b"
+    },
+    "source/blender/bmesh/intern/bmesh_core.hh": {
+      "source_sha256": "e3d5918c5bf92517f6a1ccdd6329568356fd9abdbf2a4b13e8ca8684054d33e4",
+      "sha256": "e3d5918c5bf92517f6a1ccdd6329568356fd9abdbf2a4b13e8ca8684054d33e4"
+    },
+    "source/blender/bmesh/intern/bmesh_delete.hh": {
+      "source_sha256": "c6f437e6817586a5b2a2616e7d387ef03224e4268d6eaf3da8986a7913effa8a",
+      "sha256": "c6f437e6817586a5b2a2616e7d387ef03224e4268d6eaf3da8986a7913effa8a"
+    },
+    "source/blender/bmesh/intern/bmesh_edgeloop.hh": {
+      "source_sha256": "5f176762982f3fc51e9b14b6b307ca2bb035493d3cb273398bedc4fdb10ac576",
+      "sha256": "5f176762982f3fc51e9b14b6b307ca2bb035493d3cb273398bedc4fdb10ac576"
+    },
+    "source/blender/bmesh/intern/bmesh_error.hh": {
+      "source_sha256": "6db9a514fe3aff9f45a3c47d8053c0af313f509281e604b4115f7c7293b8b990",
+      "sha256": "6db9a514fe3aff9f45a3c47d8053c0af313f509281e604b4115f7c7293b8b990"
+    },
+    "source/blender/bmesh/intern/bmesh_inline.hh": {
+      "source_sha256": "dc0d8daf3a86b096343f32a4b8ed5aabe697db2f4effce58664366cf93f046d9",
+      "sha256": "dc0d8daf3a86b096343f32a4b8ed5aabe697db2f4effce58664366cf93f046d9"
+    },
+    "source/blender/bmesh/intern/bmesh_interp.hh": {
+      "source_sha256": "dbf7da54e4499430b6566ee175b168ca954601d440d1bb133bee1a8c679669c2",
+      "sha256": "dbf7da54e4499430b6566ee175b168ca954601d440d1bb133bee1a8c679669c2"
+    },
+    "source/blender/bmesh/intern/bmesh_iterators.hh": {
+      "source_sha256": "fd0de78698d9f260aba15e2aa5db9f6451b8c9d241fe88769921bd3c6e4193ad",
+      "sha256": "fd0de78698d9f260aba15e2aa5db9f6451b8c9d241fe88769921bd3c6e4193ad"
+    },
+    "source/blender/bmesh/intern/bmesh_iterators_inline.hh": {
+      "source_sha256": "701c35c16554af4dfd19ec17415c0496c58fe0e54618bd5e0dbd5c45027e0eac",
+      "sha256": "701c35c16554af4dfd19ec17415c0496c58fe0e54618bd5e0dbd5c45027e0eac"
+    },
+    "source/blender/bmesh/intern/bmesh_log.hh": {
+      "source_sha256": "9a73a940f7c932387a55e29f5e5697e86b84b684855e1ad7c89823faa057cfd0",
+      "sha256": "9a73a940f7c932387a55e29f5e5697e86b84b684855e1ad7c89823faa057cfd0"
+    },
+    "source/blender/bmesh/intern/bmesh_marking.hh": {
+      "source_sha256": "1807a44e04fec4abb2891d96762183bc1db3f9f3bbea2fa66c1a25186ddf5795",
+      "sha256": "1807a44e04fec4abb2891d96762183bc1db3f9f3bbea2fa66c1a25186ddf5795"
+    },
+    "source/blender/bmesh/intern/bmesh_mesh.hh": {
+      "source_sha256": "09b3a01ad16e82765730303b13bfeb0bf3a518255172eae3fecc816deb97bf85",
+      "sha256": "09b3a01ad16e82765730303b13bfeb0bf3a518255172eae3fecc816deb97bf85"
+    },
+    "source/blender/bmesh/intern/bmesh_mesh_convert.hh": {
+      "source_sha256": "46649330adf37201b5302caa370671f637fce8297b5d80f9c99f3cbce4952830",
+      "sha256": "46649330adf37201b5302caa370671f637fce8297b5d80f9c99f3cbce4952830"
+    },
+    "source/blender/bmesh/intern/bmesh_mesh_debug.hh": {
+      "source_sha256": "8d5bb6df1970fbfc3076af272fa5417f3f3cb308e5f66b97542a26abb596cb5b",
+      "sha256": "8d5bb6df1970fbfc3076af272fa5417f3f3cb308e5f66b97542a26abb596cb5b"
+    },
+    "source/blender/bmesh/intern/bmesh_mesh_duplicate.hh": {
+      "source_sha256": "46e03d9795c63406b6646fbde1a2aaeed69b2f98507f1a74b0342733a0d8a277",
+      "sha256": "46e03d9795c63406b6646fbde1a2aaeed69b2f98507f1a74b0342733a0d8a277"
+    },
+    "source/blender/bmesh/intern/bmesh_mesh_normals.hh": {
+      "source_sha256": "f005a5a67602b816dda4fec47717abcb92ae1a8263f0f29c3a2d4265d8527ca5",
+      "sha256": "f005a5a67602b816dda4fec47717abcb92ae1a8263f0f29c3a2d4265d8527ca5"
+    },
+    "source/blender/bmesh/intern/bmesh_mesh_partial_update.hh": {
+      "source_sha256": "6fc2e87ece1918e806a931fab8350e3f91e7e48de6812b3fe91a73f911d504e4",
+      "sha256": "6fc2e87ece1918e806a931fab8350e3f91e7e48de6812b3fe91a73f911d504e4"
+    },
+    "source/blender/bmesh/intern/bmesh_mesh_tessellate.hh": {
+      "source_sha256": "ebb759d2b9686482ef8564ccdca272ca4a958db3f45cacbedead89c8334d35dc",
+      "sha256": "ebb759d2b9686482ef8564ccdca272ca4a958db3f45cacbedead89c8334d35dc"
+    },
+    "source/blender/bmesh/intern/bmesh_mesh_validate.hh": {
+      "source_sha256": "06462aed805d88bbb9a246ab299b345b098b853ff81d8574c378780e445e0b06",
+      "sha256": "06462aed805d88bbb9a246ab299b345b098b853ff81d8574c378780e445e0b06"
+    },
+    "source/blender/bmesh/intern/bmesh_mods.hh": {
+      "source_sha256": "24bfb55cd45b4e8430b2b8a28b9d21f73596303075818da9ad4678cca77ba7f2",
+      "sha256": "24bfb55cd45b4e8430b2b8a28b9d21f73596303075818da9ad4678cca77ba7f2"
+    },
+    "source/blender/bmesh/intern/bmesh_operator_api.hh": {
+      "source_sha256": "f3c203238fdf9cfeea80103610377d424fad91923b168995beca6bfde64081ee",
+      "sha256": "f3c203238fdf9cfeea80103610377d424fad91923b168995beca6bfde64081ee"
+    },
+    "source/blender/bmesh/intern/bmesh_operator_api_inline.hh": {
+      "source_sha256": "aba82646e2440894da06125befa55ed57108efd5fe60c7a8a27d0d300fbaad8c",
+      "sha256": "aba82646e2440894da06125befa55ed57108efd5fe60c7a8a27d0d300fbaad8c"
+    },
+    "source/blender/bmesh/intern/bmesh_operators.hh": {
+      "source_sha256": "6d1c7edeb9d66e8c1556749704d296042d7b9b0e29c02b053b5122027d38cb2a",
+      "sha256": "6d1c7edeb9d66e8c1556749704d296042d7b9b0e29c02b053b5122027d38cb2a"
+    },
+    "source/blender/bmesh/intern/bmesh_polygon.hh": {
+      "source_sha256": "8692a395c44db7d9cd22e29947a9e206966a8728cde4e7b4a64b2e3b042fd7a2",
+      "sha256": "8692a395c44db7d9cd22e29947a9e206966a8728cde4e7b4a64b2e3b042fd7a2"
+    },
+    "source/blender/bmesh/intern/bmesh_polygon_edgenet.hh": {
+      "source_sha256": "eeea4dca296a1eba8a4046dbac27fb8398e779979b055a82b7534c568b47383c",
+      "sha256": "eeea4dca296a1eba8a4046dbac27fb8398e779979b055a82b7534c568b47383c"
+    },
+    "source/blender/bmesh/intern/bmesh_private.hh": {
+      "source_sha256": "dd2c88b1c137005b58fe69ba81155741fa85c0a88e26db7824eacb0618c34bd4",
+      "sha256": "dd2c88b1c137005b58fe69ba81155741fa85c0a88e26db7824eacb0618c34bd4"
+    },
+    "source/blender/bmesh/intern/bmesh_query.hh": {
+      "source_sha256": "1876d531849fa4ad317d0d2cc7d097ac55d79411bb40bdfd1cfb4e27f1fae56c",
+      "sha256": "1876d531849fa4ad317d0d2cc7d097ac55d79411bb40bdfd1cfb4e27f1fae56c"
+    },
+    "source/blender/bmesh/intern/bmesh_query_inline.hh": {
+      "source_sha256": "4243708db1bc8565d8b25d58ed144dece5d7e17064c793fcd9b9d5f6d80af400",
+      "sha256": "4243708db1bc8565d8b25d58ed144dece5d7e17064c793fcd9b9d5f6d80af400"
+    },
+    "source/blender/bmesh/intern/bmesh_query_uv.hh": {
+      "source_sha256": "2c0949e1f8ce676469c8dd0a18b0cbb67bd72c806298d33e9311ba84c2472a48",
+      "sha256": "2c0949e1f8ce676469c8dd0a18b0cbb67bd72c806298d33e9311ba84c2472a48"
+    },
+    "source/blender/bmesh/intern/bmesh_structure.hh": {
+      "source_sha256": "b4779075e9465d03332aee543c3a45f19cf2e93dd0a07a616156ab470821e612",
+      "sha256": "b4779075e9465d03332aee543c3a45f19cf2e93dd0a07a616156ab470821e612"
+    },
+    "source/blender/bmesh/intern/bmesh_structure_inline.hh": {
+      "source_sha256": "0c747323f89acfa6d459003dff57e7412b492889b3a53aacdc68ee1e02b1fc91",
+      "sha256": "0c747323f89acfa6d459003dff57e7412b492889b3a53aacdc68ee1e02b1fc91"
+    },
+    "source/blender/bmesh/intern/bmesh_uvselect.hh": {
+      "source_sha256": "ea6a116cb51cc1d66659dc28bf15ba0e2bcfc500bc45f9c8f168126d09dc0e89",
+      "sha256": "ea6a116cb51cc1d66659dc28bf15ba0e2bcfc500bc45f9c8f168126d09dc0e89"
+    },
+    "source/blender/bmesh/intern/bmesh_walkers.hh": {
+      "source_sha256": "164190248f6ff4500d1073e77e4ea1388c2e376102a0186589a8619a982179c0",
+      "sha256": "164190248f6ff4500d1073e77e4ea1388c2e376102a0186589a8619a982179c0"
+    },
+    "source/blender/bmesh/tools/bmesh_beautify.hh": {
+      "source_sha256": "33ad8cc3dd3200c54a5dd591e11e01527f01cfcf5b53fdcf71d584c5dadc1c66",
+      "sha256": "33ad8cc3dd3200c54a5dd591e11e01527f01cfcf5b53fdcf71d584c5dadc1c66"
+    },
+    "source/blender/bmesh/tools/bmesh_bevel.hh": {
+      "source_sha256": "fc6ffa68686809339f7c1144c05c6a47d48925c44f763b751deafe9fa3998f75",
+      "sha256": "fc6ffa68686809339f7c1144c05c6a47d48925c44f763b751deafe9fa3998f75"
+    },
+    "source/blender/bmesh/tools/bmesh_bisect_plane.hh": {
+      "source_sha256": "46f5cd90f140608989dfe2d8325eb37c1afa4e059a929bb096fb11078eb297c4",
+      "sha256": "46f5cd90f140608989dfe2d8325eb37c1afa4e059a929bb096fb11078eb297c4"
+    },
+    "source/blender/bmesh/tools/bmesh_boolean.hh": {
+      "source_sha256": "93bcd35bff82df46d031308cd3716e07061f7014c7efa576404dbea11198d9c2",
+      "sha256": "93bcd35bff82df46d031308cd3716e07061f7014c7efa576404dbea11198d9c2"
+    },
+    "source/blender/bmesh/tools/bmesh_decimate.hh": {
+      "source_sha256": "426b26f3b1d9096d507bcc7049beaa8da63bbf4f73d91ac84ba8ada329e638dc",
+      "sha256": "426b26f3b1d9096d507bcc7049beaa8da63bbf4f73d91ac84ba8ada329e638dc"
+    },
+    "source/blender/bmesh/tools/bmesh_edgenet.hh": {
+      "source_sha256": "4e3f9f3b9e7fc8d01da9dd008aa7d2de596d1ceced0672daf35ba11d6ee7e326",
+      "sha256": "4e3f9f3b9e7fc8d01da9dd008aa7d2de596d1ceced0672daf35ba11d6ee7e326"
+    },
+    "source/blender/bmesh/tools/bmesh_edgesplit.hh": {
+      "source_sha256": "1a808196b3b992eb137b0a7e035971d41adefedbd51aef722a669c9452ad0102",
+      "sha256": "1a808196b3b992eb137b0a7e035971d41adefedbd51aef722a669c9452ad0102"
+    },
+    "source/blender/bmesh/tools/bmesh_path.hh": {
+      "source_sha256": "dd80571da785e9751ac302c3b56f616bf324ccfa8c8e90b1fedc8914a5017b1f",
+      "sha256": "dd80571da785e9751ac302c3b56f616bf324ccfa8c8e90b1fedc8914a5017b1f"
+    },
+    "source/blender/bmesh/tools/bmesh_path_region.hh": {
+      "source_sha256": "8bb7dfd6753679058ff3159087ce7c0e2f403491aff946ae0f6a1a8cfcb553a6",
+      "sha256": "8bb7dfd6753679058ff3159087ce7c0e2f403491aff946ae0f6a1a8cfcb553a6"
+    },
+    "source/blender/bmesh/tools/bmesh_path_region_uv.hh": {
+      "source_sha256": "70c2f3ea9e1abd8c7cbd36316ef5056725ae177f3a35c77e0e1958a741817bdd",
+      "sha256": "70c2f3ea9e1abd8c7cbd36316ef5056725ae177f3a35c77e0e1958a741817bdd"
+    },
+    "source/blender/bmesh/tools/bmesh_path_uv.hh": {
+      "source_sha256": "929f76f286d0ce4f41fd26ebee7ac7c6b1baa9f78274c4e2262e03318ea95be8",
+      "sha256": "929f76f286d0ce4f41fd26ebee7ac7c6b1baa9f78274c4e2262e03318ea95be8"
+    },
+    "source/blender/bmesh/tools/bmesh_region_match.hh": {
+      "source_sha256": "3240b91b0b1ac3a53578d7812da03bce670dcfa8bb1d74dbcb2757a93ae864dc",
+      "sha256": "3240b91b0b1ac3a53578d7812da03bce670dcfa8bb1d74dbcb2757a93ae864dc"
+    },
+    "source/blender/bmesh/tools/bmesh_separate.hh": {
+      "source_sha256": "d0b57307bb7b6167e39327292bccb95a99b9357681134de905502c8e74a6a6ab",
+      "sha256": "d0b57307bb7b6167e39327292bccb95a99b9357681134de905502c8e74a6a6ab"
+    },
+    "source/blender/bmesh/tools/bmesh_triangulate.hh": {
+      "source_sha256": "9733fef2ed8ad45afd082d581ca0e8d5a5e5e8de859bc4f27793d7b762191731",
+      "sha256": "9733fef2ed8ad45afd082d581ca0e8d5a5e5e8de859bc4f27793d7b762191731"
+    },
+    "source/blender/makesdna/DNA_action_types.h": {
+      "source_sha256": "81a564addeb317b359b196068c32b36b8c4bb9cfa6095507719e1cc6d6d6b95b",
+      "sha256": "81a564addeb317b359b196068c32b36b8c4bb9cfa6095507719e1cc6d6d6b95b"
+    },
+    "source/blender/makesdna/DNA_armature_types.h": {
+      "source_sha256": "a8f02467d5e2758ea2f6c6dc86c665254857058c90a261e01885c9feaf6f33ee",
+      "sha256": "a8f02467d5e2758ea2f6c6dc86c665254857058c90a261e01885c9feaf6f33ee"
+    },
+    "source/blender/makesdna/DNA_attribute_types.h": {
+      "source_sha256": "9d1b546d4816549ae6e0b50267f0701700789bf4a02d5c310fcf2e9a276b0d39",
+      "sha256": "9d1b546d4816549ae6e0b50267f0701700789bf4a02d5c310fcf2e9a276b0d39"
+    },
+    "source/blender/makesdna/DNA_color_types.h": {
+      "source_sha256": "e4061091ad29ce7c3c4628ccedf81e5f74aec592ef10e244c3a9c4c338b34416",
+      "sha256": "e4061091ad29ce7c3c4628ccedf81e5f74aec592ef10e244c3a9c4c338b34416"
+    },
+    "source/blender/makesdna/DNA_colorband_types.h": {
+      "source_sha256": "c7aab82817f211503024d881adfbec701166413c33c474a44f6491339cf18f52",
+      "sha256": "c7aab82817f211503024d881adfbec701166413c33c474a44f6491339cf18f52"
+    },
+    "source/blender/makesdna/DNA_customdata_types.h": {
+      "source_sha256": "2ef16452a9482e30d4a47206c0e8cf2a601c7c6f5f41981d776ae7eb8179e379",
+      "sha256": "2ef16452a9482e30d4a47206c0e8cf2a601c7c6f5f41981d776ae7eb8179e379"
+    },
+    "source/blender/makesdna/DNA_defs.h": {
+      "source_sha256": "7eaa7ecca1b30967bc9ccfcd2af763b5f827570b5cf319bc63b4a67d49217a3a",
+      "sha256": "7eaa7ecca1b30967bc9ccfcd2af763b5f827570b5cf319bc63b4a67d49217a3a"
+    },
+    "source/blender/makesdna/DNA_freestyle_types.h": {
+      "source_sha256": "1fa36c47eb7c76a3d1cad8abbe131335e74b7a9bce958a43d59e061de79f9e26",
+      "sha256": "1fa36c47eb7c76a3d1cad8abbe131335e74b7a9bce958a43d59e061de79f9e26"
+    },
+    "source/blender/makesdna/DNA_ID.h": {
+      "source_sha256": "540eddf70efeb0ebfe62ab53ac994615b2cbb5c66ca7a99821004e73a5636a4c",
+      "sha256": "540eddf70efeb0ebfe62ab53ac994615b2cbb5c66ca7a99821004e73a5636a4c"
+    },
+    "source/blender/makesdna/DNA_ID_enums.h": {
+      "source_sha256": "e016734689962611932e60f0c6b08846d1a3cbaa3fb0de708fb1ca2a5552cb6b",
+      "sha256": "e016734689962611932e60f0c6b08846d1a3cbaa3fb0de708fb1ca2a5552cb6b"
+    },
+    "source/blender/makesdna/DNA_image_types.h": {
+      "source_sha256": "024cfb7591cde9e3f6b85eb6c66354bb64169385a07c564b0c1eb9abfa24e60a",
+      "sha256": "024cfb7591cde9e3f6b85eb6c66354bb64169385a07c564b0c1eb9abfa24e60a"
+    },
+    "source/blender/makesdna/DNA_layer_types.h": {
+      "source_sha256": "3d701879ee2b1a2fe08c65daa5f97b62f682877ab017b77186ae4863053c4ddc",
+      "sha256": "3d701879ee2b1a2fe08c65daa5f97b62f682877ab017b77186ae4863053c4ddc"
+    },
+    "source/blender/makesdna/DNA_lineart_types.h": {
+      "source_sha256": "bc83b7b2554e1ffe5f3765529672c9ca5e5700767f3f8d7bf6b9b718af37105e",
+      "sha256": "bc83b7b2554e1ffe5f3765529672c9ca5e5700767f3f8d7bf6b9b718af37105e"
+    },
+    "source/blender/makesdna/DNA_listBase.h": {
+      "source_sha256": "6d3197f83dc44b4ef6ae8b61991728eba3f5b99a55a8266297fd72c971e6a227",
+      "sha256": "6d3197f83dc44b4ef6ae8b61991728eba3f5b99a55a8266297fd72c971e6a227"
+    },
+    "source/blender/makesdna/DNA_mesh_types.h": {
+      "source_sha256": "10bdef59176822608ec6eb8cba902e1376f3fe7ee7469bc570ac3edb871650c4",
+      "sha256": "10bdef59176822608ec6eb8cba902e1376f3fe7ee7469bc570ac3edb871650c4"
+    },
+    "source/blender/makesdna/DNA_meshdata_types.h": {
+      "source_sha256": "002a1eca6244cb1cc642086469b14d46df67367467c65eafc0f70bc84506371b",
+      "sha256": "002a1eca6244cb1cc642086469b14d46df67367467c65eafc0f70bc84506371b"
+    },
+    "source/blender/makesdna/DNA_modifier_enums.h": {
+      "source_sha256": "03b8ba98574d31ee45d0560cf29c85ee5cf5ff81253d704cdad71b39fbfdb652",
+      "sha256": "03b8ba98574d31ee45d0560cf29c85ee5cf5ff81253d704cdad71b39fbfdb652"
+    },
+    "source/blender/makesdna/DNA_modifier_types.h": {
+      "source_sha256": "57d6ff64eabf311e6b45b6d56de46a618bb3286e0db4dc9b891f5a11f88fb7a5",
+      "sha256": "57d6ff64eabf311e6b45b6d56de46a618bb3286e0db4dc9b891f5a11f88fb7a5"
+    },
+    "source/blender/makesdna/DNA_movieclip_types.h": {
+      "source_sha256": "f7be2eeaba0a2a1dad3f719b4915151b6d24971f4029aeffc5c112c7bf1d260d",
+      "sha256": "f7be2eeaba0a2a1dad3f719b4915151b6d24971f4029aeffc5c112c7bf1d260d"
+    },
+    "source/blender/makesdna/DNA_object_enums.h": {
+      "source_sha256": "59cec510ccac41b5e3b91be9611817d6cc1552605cee933271f05dcb1737e85f",
+      "sha256": "59cec510ccac41b5e3b91be9611817d6cc1552605cee933271f05dcb1737e85f"
+    },
+    "source/blender/makesdna/DNA_object_types.h": {
+      "source_sha256": "79b0e7564d85564dbe27b8598661d1c5758e35756f2517be8ad58e1a89602c2a",
+      "sha256": "79b0e7564d85564dbe27b8598661d1c5758e35756f2517be8ad58e1a89602c2a"
+    },
+    "source/blender/makesdna/DNA_packedFile_types.h": {
+      "source_sha256": "25d5831c1ec605763d95b94454096495afeb648e07598f8b679943bc125d7a54",
+      "sha256": "25d5831c1ec605763d95b94454096495afeb648e07598f8b679943bc125d7a54"
+    },
+    "source/blender/makesdna/DNA_scene_enums.h": {
+      "source_sha256": "cf3888346eb5b58b8a87b9087c65b4147fa727c7ce2bfd359f550c1ba460dc58",
+      "sha256": "cf3888346eb5b58b8a87b9087c65b4147fa727c7ce2bfd359f550c1ba460dc58"
+    },
+    "source/blender/makesdna/DNA_scene_types.h": {
+      "source_sha256": "01a9bf2e1c2ed38ba9a69fa6901da38e28cbb67b3933615b23d9684345165ab5",
+      "sha256": "01a9bf2e1c2ed38ba9a69fa6901da38e28cbb67b3933615b23d9684345165ab5"
+    },
+    "source/blender/makesdna/DNA_session_uid_types.h": {
+      "source_sha256": "1f074078709b6499e77a9eee43147872ec2e4153912d3daaaf487b3219228eb6",
+      "sha256": "1f074078709b6499e77a9eee43147872ec2e4153912d3daaaf487b3219228eb6"
+    },
+    "source/blender/makesdna/DNA_theme_types.h": {
+      "source_sha256": "a5d0522cfaaba88d46d116ba6ce8ac2cfe925e9082172f6f3072ba417a796290",
+      "sha256": "a5d0522cfaaba88d46d116ba6ce8ac2cfe925e9082172f6f3072ba417a796290"
+    },
+    "source/blender/makesdna/DNA_tracking_types.h": {
+      "source_sha256": "3cd318775480566b27d8570cfd23a7a144a8b8eb936ea3e8cb62919627f72458",
+      "sha256": "3cd318775480566b27d8570cfd23a7a144a8b8eb936ea3e8cb62919627f72458"
+    },
+    "source/blender/makesdna/DNA_userdef_enums.h": {
+      "source_sha256": "2c60c0e454cfd79e09c149a35c23f3376b304f36c2fd05dcfcebd0553ddcf6ab",
+      "sha256": "2c60c0e454cfd79e09c149a35c23f3376b304f36c2fd05dcfcebd0553ddcf6ab"
+    },
+    "source/blender/makesdna/DNA_userdef_types.h": {
+      "source_sha256": "06761a1ce1138a63282cf381f47c4ca839946af6e6c0ebaf8a1540dfdc46f828",
+      "sha256": "06761a1ce1138a63282cf381f47c4ca839946af6e6c0ebaf8a1540dfdc46f828"
+    },
+    "source/blender/makesdna/DNA_vec_types.h": {
+      "source_sha256": "8b742e891f18a2b2a771e50ab8747484fbe0c790ef92cd39d2e83ff2ee8e0c6e",
+      "sha256": "8b742e891f18a2b2a771e50ab8747484fbe0c790ef92cd39d2e83ff2ee8e0c6e"
+    },
+    "source/blender/makesdna/DNA_view2d_types.h": {
+      "source_sha256": "9ea8cbe4d64229f52a970180c88824209665b5cb348559d1349f2166561360e1",
+      "sha256": "9ea8cbe4d64229f52a970180c88824209665b5cb348559d1349f2166561360e1"
+    },
+    "source/blender/makesdna/DNA_view3d_enums.h": {
+      "source_sha256": "0747160a7c134a731761b7501c6f9cd21877033718e301aacd2316dc76da7171",
+      "sha256": "0747160a7c134a731761b7501c6f9cd21877033718e301aacd2316dc76da7171"
+    },
+    "source/blender/makesdna/DNA_view3d_types.h": {
+      "source_sha256": "ce5c3dbbd6aa17e91fb98d08d4b8adf44c101353b00b52f3e81dfdaea9bcac8e",
+      "sha256": "ce5c3dbbd6aa17e91fb98d08d4b8adf44c101353b00b52f3e81dfdaea9bcac8e"
+    },
+    "source/blender/makesdna/DNA_viewer_path_types.h": {
+      "source_sha256": "abbfae4ab03cb374bad68b9f10447d48aa87bd85d146ff28f18224251c259208",
+      "sha256": "abbfae4ab03cb374bad68b9f10447d48aa87bd85d146ff28f18224251c259208"
+    },
+    "intern/guardedalloc/intern/leak_detector.cc": {
+      "source_sha256": "625fbb3ae58743cd4d8d9dd7b90cf4d3332e75303a5fe7ce04258842775a2778",
+      "sha256": "cd05fcca69ac4828566c3bf6121c01c0feee50fc82af5216e46503631ec80720",
+      "omitted": [
+        [
+          1646,
+          2557
+        ],
+        [
+          2559,
+          2622
+        ],
+        [
+          2624,
+          2825
+        ]
+      ]
+    },
+    "intern/guardedalloc/intern/mallocn.cc": {
+      "source_sha256": "e51d37544f0a5b7ef3af81bd62f67813c46d786ddac9e47fb4c7d7a61a5a2bdf",
+      "sha256": "e9780098b12f3f96dd5ae3c43cdc029129516bd9c6beb3f580790f49510b1237",
+      "omitted": [
+        [
+          5271,
+          5344
+        ],
+        [
+          5535,
+          5933
+        ],
+        [
+          5935,
+          7626
+        ],
+        [
+          7628,
+          9054
+        ]
+      ]
+    },
+    "intern/guardedalloc/intern/mallocn_guarded_impl.cc": {
+      "source_sha256": "afc1ef7713ce8109b36e78599753fe0f484ac909b8b3e95c088fa17a9aceb628",
+      "sha256": "ef9a18ae83458ba1a5d3713abf96f26d906c17f94930579280f51c57c244816d",
+      "omitted": [
+        [
+          2783,
+          2899
+        ],
+        [
+          8192,
+          8542
+        ],
+        [
+          8544,
+          8636
+        ],
+        [
+          8638,
+          8707
+        ],
+        [
+          8709,
+          8891
+        ],
+        [
+          8893,
+          10470
+        ],
+        [
+          10472,
+          11496
+        ],
+        [
+          11498,
+          12643
+        ],
+        [
+          12677,
+          12799
+        ],
+        [
+          12801,
+          13061
+        ],
+        [
+          13101,
+          14082
+        ],
+        [
+          14084,
+          15186
+        ],
+        [
+          15188,
+          15676
+        ],
+        [
+          15678,
+          18028
+        ],
+        [
+          18030,
+          18663
+        ],
+        [
+          18665,
+          19153
+        ],
+        [
+          19155,
+          19984
+        ],
+        [
+          19986,
+          20329
+        ],
+        [
+          20331,
+          20890
+        ],
+        [
+          21021,
+          21232
+        ],
+        [
+          21234,
+          21514
+        ],
+        [
+          21516,
+          23926
+        ],
+        [
+          24965,
+          26361
+        ],
+        [
+          26363,
+          26722
+        ],
+        [
+          26730,
+          27169
+        ],
+        [
+          27178,
+          27253
+        ],
+        [
+          27254,
+          27336
+        ],
+        [
+          27337,
+          27416
+        ],
+        [
+          27418,
+          29366
+        ],
+        [
+          34261,
+          34411
+        ],
+        [
+          34413,
+          34522
+        ],
+        [
+          34524,
+          34684
+        ],
+        [
+          34686,
+          34841
+        ],
+        [
+          34858,
+          35055
+        ],
+        [
+          35057,
+          35297
+        ]
+      ]
+    },
+    "intern/guardedalloc/intern/mallocn_lockfree_impl.cc": {
+      "source_sha256": "4a6831cdae57568c8d844a6935f10b9ec8ac3af42bddb36d74e046d4730a0902",
+      "sha256": "4a6831cdae57568c8d844a6935f10b9ec8ac3af42bddb36d74e046d4730a0902",
+      "omitted": []
+    },
+    "intern/guardedalloc/intern/memory_usage.cc": {
+      "source_sha256": "5c6bc0a21ad2985f188fb3f74f51c33989b31035ece429268fe1f79cda2e280c",
+      "sha256": "78be32a3508b90ce2b489e8b461d9ee2b31edfcfc8ca9d4e247c21a7ce70d277",
+      "omitted": [
+        [
+          6139,
+          6285
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/BLI_ghash.cc": {
+      "source_sha256": "43595b0261b1ed7a5f81f2a18caef9f770f3ecc9f2d23d86d932898c4dda3286",
+      "sha256": "f743522ba769abbec8200131d24f6bf9ff7645a7dfd0e4c6db3a9f57c83f8e1a",
+      "omitted": [
+        [
+          1811,
+          1863
+        ],
+        [
+          1863,
+          1918
+        ],
+        [
+          2103,
+          2192
+        ],
+        [
+          2627,
+          3335
+        ],
+        [
+          3377,
+          3470
+        ],
+        [
+          3515,
+          3612
+        ],
+        [
+          3681,
+          3861
+        ],
+        [
+          3969,
+          4483
+        ],
+        [
+          4540,
+          6562
+        ],
+        [
+          6732,
+          7730
+        ],
+        [
+          7732,
+          8950
+        ],
+        [
+          9045,
+          9619
+        ],
+        [
+          9774,
+          10216
+        ],
+        [
+          10473,
+          11142
+        ],
+        [
+          11215,
+          11446
+        ],
+        [
+          11448,
+          11978
+        ],
+        [
+          12133,
+          12596
+        ],
+        [
+          12659,
+          13131
+        ],
+        [
+          13202,
+          13627
+        ],
+        [
+          13629,
+          13844
+        ],
+        [
+          13846,
+          14670
+        ],
+        [
+          14672,
+          15329
+        ],
+        [
+          15411,
+          16149
+        ],
+        [
+          16258,
+          16828
+        ],
+        [
+          16881,
+          17328
+        ],
+        [
+          17357,
+          18596
+        ],
+        [
+          18721,
+          18967
+        ],
+        [
+          18969,
+          19100
+        ],
+        [
+          19102,
+          19243
+        ],
+        [
+          19245,
+          19424
+        ],
+        [
+          19426,
+          19488
+        ],
+        [
+          19490,
+          19578
+        ],
+        [
+          19580,
+          19767
+        ],
+        [
+          19769,
+          20118
+        ],
+        [
+          20120,
+          20320
+        ],
+        [
+          20322,
+          20553
+        ],
+        [
+          20555,
+          20753
+        ],
+        [
+          20755,
+          21221
+        ],
+        [
+          21223,
+          21835
+        ],
+        [
+          21837,
+          22273
+        ],
+        [
+          22275,
+          22822
+        ],
+        [
+          22824,
+          22934
+        ],
+        [
+          22936,
+          23287
+        ],
+        [
+          23289,
+          23693
+        ],
+        [
+          23695,
+          23833
+        ],
+        [
+          23835,
+          24151
+        ],
+        [
+          24153,
+          24222
+        ],
+        [
+          24224,
+          24296
+        ],
+        [
+          24423,
+          24592
+        ],
+        [
+          24594,
+          24975
+        ],
+        [
+          24977,
+          25283
+        ],
+        [
+          25285,
+          25354
+        ],
+        [
+          25478,
+          25739
+        ],
+        [
+          25741,
+          25867
+        ],
+        [
+          25869,
+          26002
+        ],
+        [
+          26004,
+          26075
+        ],
+        [
+          26077,
+          26301
+        ],
+        [
+          26303,
+          26415
+        ],
+        [
+          26417,
+          27037
+        ],
+        [
+          27039,
+          27182
+        ],
+        [
+          27184,
+          27285
+        ],
+        [
+          27287,
+          27428
+        ],
+        [
+          27430,
+          27553
+        ],
+        [
+          27555,
+          27844
+        ],
+        [
+          27846,
+          28009
+        ],
+        [
+          28011,
+          28121
+        ],
+        [
+          28123,
+          28231
+        ],
+        [
+          28233,
+          28311
+        ],
+        [
+          28313,
+          28394
+        ],
+        [
+          28687,
+          28833
+        ],
+        [
+          28835,
+          29220
+        ],
+        [
+          29354,
+          29428
+        ],
+        [
+          29429,
+          29524
+        ],
+        [
+          29526,
+          31940
+        ],
+        [
+          31941,
+          32593
+        ],
+        [
+          32595,
+          32730
+        ],
+        [
+          32731,
+          32873
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/BLI_heap.cc": {
+      "source_sha256": "de8c2529164e0860afc7fbaf11d169110aec94329c1e9834a881ba1e7a544501",
+      "sha256": "8daaf192225ab0628caac04531bcd7192f38ee0a6e011b0bf241f728731a3895",
+      "omitted": [
+        [
+          1441,
+          1496
+        ],
+        [
+          4150,
+          4203
+        ],
+        [
+          5873,
+          5933
+        ],
+        [
+          5935,
+          6003
+        ],
+        [
+          6591,
+          6854
+        ],
+        [
+          7177,
+          7250
+        ],
+        [
+          7323,
+          7871
+        ],
+        [
+          7872,
+          7951
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/BLI_linklist.cc": {
+      "source_sha256": "31a28e8825e414affdcba4bb236efa189ec3cbf0206aa852e21ee46fbf9ebe3d",
+      "sha256": "433cf70fb0f12b8ab3a32c69f2b543cb9bf57f648dece371754c043e0cc79497",
+      "omitted": [
+        [
+          518,
+          651
+        ],
+        [
+          653,
+          859
+        ],
+        [
+          861,
+          1045
+        ],
+        [
+          1047,
+          1188
+        ],
+        [
+          1190,
+          1411
+        ],
+        [
+          1413,
+          2851
+        ],
+        [
+          3161,
+          3342
+        ],
+        [
+          3538,
+          3959
+        ],
+        [
+          3961,
+          4130
+        ],
+        [
+          4132,
+          4322
+        ],
+        [
+          4324,
+          4525
+        ],
+        [
+          4527,
+          4731
+        ],
+        [
+          4984,
+          5282
+        ],
+        [
+          5501,
+          5759
+        ],
+        [
+          5761,
+          5925
+        ],
+        [
+          5927,
+          6090
+        ],
+        [
+          6590,
+          6764
+        ],
+        [
+          6766,
+          7032
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/BLI_memarena.cc": {
+      "source_sha256": "972c8c62454c1ccbcb18d5b9e2a3432f79f212dd759c31ea5de53af6f2ea405f",
+      "sha256": "185554d1bc6946eeff242533ae8142d767f551612ffcdd3a9f5f9dd365e7b506",
+      "omitted": [
+        [
+          918,
+          994
+        ],
+        [
+          1772,
+          1843
+        ],
+        [
+          1845,
+          1917
+        ],
+        [
+          1919,
+          2086
+        ],
+        [
+          3488,
+          3779
+        ],
+        [
+          3781,
+          4975
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/BLI_mempool.cc": {
+      "source_sha256": "cac8d9ceb362c5ebd24ec425dbd8d0240c9f386c6dcd2cbe97c29f3861a40988",
+      "sha256": "75996a32201654caec3d552dca19b7ee79dd6ed66c2549e9dc0eddfedb60d8ba",
+      "omitted": [
+        [
+          3851,
+          3990
+        ],
+        [
+          3992,
+          4127
+        ],
+        [
+          4129,
+          4288
+        ],
+        [
+          14325,
+          14867
+        ],
+        [
+          14869,
+          15389
+        ],
+        [
+          15391,
+          15622
+        ],
+        [
+          15825,
+          16016
+        ],
+        [
+          16018,
+          16907
+        ],
+        [
+          16909,
+          17134
+        ],
+        [
+          19132,
+          21475
+        ],
+        [
+          21485,
+          22651
+        ],
+        [
+          22653,
+          22732
+        ],
+        [
+          22931,
+          23001
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/hash_mm2a.cc": {
+      "source_sha256": "5ca07b4a74b0f54340f61d1fa5604746b723016e3e294506574a1f31670d0f24",
+      "sha256": "b7393a5617f0aff24a579d18e963e0442fd899eefb4e1e8548343aca963c0e26",
+      "omitted": [
+        [
+          701,
+          848
+        ],
+        [
+          849,
+          971
+        ],
+        [
+          972,
+          1326
+        ],
+        [
+          1328,
+          1465
+        ],
+        [
+          1467,
+          1767
+        ],
+        [
+          1769,
+          1894
+        ],
+        [
+          1896,
+          2071
+        ],
+        [
+          2073,
+          2747
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/kdtree_3d.cc": {
+      "source_sha256": "d7afdb01e894f9a5778e560b57032dbaf172d2bebeae5334bb7393e20f32552e",
+      "sha256": "d7afdb01e894f9a5778e560b57032dbaf172d2bebeae5334bb7393e20f32552e",
+      "omitted": []
+    },
+    "source/blender/blenlib/intern/listbase.cc": {
+      "source_sha256": "6d4528b8244fcba3302e9d306acb49ee5a03ebefddf590f3a189fa633630ad9a",
+      "sha256": "d70cf25abbf70f9f8523c66464921cfbf77cbc9993cca0e1db0cd80b8c711ddf",
+      "omitted": [
+        [
+          891,
+          1304
+        ],
+        [
+          1306,
+          2177
+        ],
+        [
+          2179,
+          2561
+        ],
+        [
+          3345,
+          3521
+        ],
+        [
+          3523,
+          4635
+        ],
+        [
+          4637,
+          5724
+        ],
+        [
+          5726,
+          5886
+        ],
+        [
+          5888,
+          6047
+        ],
+        [
+          6301,
+          6531
+        ],
+        [
+          6873,
+          7150
+        ],
+        [
+          7152,
+          7511
+        ],
+        [
+          7513,
+          8381
+        ],
+        [
+          8383,
+          9268
+        ],
+        [
+          9270,
+          9856
+        ],
+        [
+          9858,
+          10525
+        ],
+        [
+          10527,
+          10815
+        ],
+        [
+          10817,
+          11037
+        ],
+        [
+          11267,
+          11517
+        ],
+        [
+          11519,
+          11668
+        ],
+        [
+          11670,
+          11937
+        ],
+        [
+          11939,
+          12206
+        ],
+        [
+          12208,
+          12546
+        ],
+        [
+          12548,
+          12875
+        ],
+        [
+          12877,
+          13226
+        ],
+        [
+          13227,
+          13575
+        ],
+        [
+          13576,
+          13942
+        ],
+        [
+          13944,
+          14393
+        ],
+        [
+          14394,
+          14909
+        ],
+        [
+          14911,
+          15368
+        ],
+        [
+          15716,
+          16120
+        ],
+        [
+          16122,
+          16553
+        ],
+        [
+          16554,
+          17056
+        ],
+        [
+          17058,
+          17826
+        ],
+        [
+          17828,
+          18211
+        ],
+        [
+          18213,
+          18634
+        ],
+        [
+          18636,
+          19017
+        ],
+        [
+          19019,
+          19390
+        ],
+        [
+          19392,
+          19733
+        ],
+        [
+          19735,
+          20075
+        ],
+        [
+          20077,
+          21020
+        ],
+        [
+          21022,
+          21261
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/math_base.cc": {
+      "source_sha256": "a4691269bc62381cd855919f0aff03722f293c6669278a89d0c9da665a475b3e",
+      "sha256": "2317f51c9130f6d59f2c868cce0bb0f33fcb96d86bdb805eb890db55c4f60ca7",
+      "omitted": [
+        [
+          252,
+          444
+        ],
+        [
+          446,
+          1205
+        ],
+        [
+          1207,
+          1364
+        ],
+        [
+          1366,
+          1523
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/math_color.cc": {
+      "source_sha256": "f0c580a21b2ec3d5680e1068cfa383c4ae6a12823ea53b24b75f21b98629a543",
+      "sha256": "4911493add61713723a1feca0f67bdc9844d7eae8b055ad0d12d35d15f5a9b16",
+      "omitted": [
+        [
+          435,
+          846
+        ],
+        [
+          848,
+          1304
+        ],
+        [
+          1306,
+          1434
+        ],
+        [
+          1436,
+          1564
+        ],
+        [
+          1566,
+          2194
+        ],
+        [
+          2196,
+          2713
+        ],
+        [
+          2715,
+          3802
+        ],
+        [
+          3804,
+          5005
+        ],
+        [
+          5007,
+          5129
+        ],
+        [
+          5131,
+          6170
+        ],
+        [
+          6172,
+          6596
+        ],
+        [
+          6598,
+          6726
+        ],
+        [
+          6728,
+          7342
+        ],
+        [
+          7344,
+          8313
+        ],
+        [
+          8315,
+          8457
+        ],
+        [
+          8459,
+          8587
+        ],
+        [
+          8589,
+          9532
+        ],
+        [
+          9534,
+          9676
+        ],
+        [
+          9678,
+          9876
+        ],
+        [
+          9878,
+          10147
+        ],
+        [
+          10149,
+          10503
+        ],
+        [
+          10505,
+          10725
+        ],
+        [
+          10819,
+          10987
+        ],
+        [
+          10989,
+          11146
+        ],
+        [
+          11656,
+          12007
+        ],
+        [
+          12076,
+          12456
+        ],
+        [
+          12528,
+          13500
+        ],
+        [
+          13502,
+          14006
+        ],
+        [
+          14047,
+          14826
+        ],
+        [
+          14828,
+          15062
+        ],
+        [
+          15064,
+          15499
+        ],
+        [
+          15501,
+          15883
+        ],
+        [
+          15885,
+          16134
+        ],
+        [
+          16136,
+          16385
+        ],
+        [
+          16487,
+          16587
+        ],
+        [
+          16589,
+          16691
+        ],
+        [
+          16693,
+          16942
+        ],
+        [
+          16944,
+          17216
+        ],
+        [
+          17218,
+          17566
+        ],
+        [
+          17568,
+          17645
+        ],
+        [
+          17647,
+          18061
+        ],
+        [
+          18063,
+          18262
+        ],
+        [
+          18264,
+          18446
+        ],
+        [
+          18448,
+          18665
+        ],
+        [
+          18667,
+          18884
+        ],
+        [
+          19015,
+          19350
+        ],
+        [
+          19352,
+          19578
+        ],
+        [
+          19788,
+          19956
+        ],
+        [
+          19958,
+          20485
+        ],
+        [
+          20487,
+          21351
+        ],
+        [
+          23387,
+          24668
+        ],
+        [
+          24670,
+          26104
+        ],
+        [
+          26106,
+          26704
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/math_geom.cc": {
+      "source_sha256": "5d9fc42a2a47bec5cada241d8ce81a5ee63e82742f3d4aa575667be3ea7627de",
+      "sha256": "38d43ca32c8356edaf2ae91bf0cdaa0e908186b017f3efbe4690d725977d9951",
+      "omitted": [
+        [
+          1840,
+          1966
+        ],
+        [
+          1968,
+          2189
+        ],
+        [
+          2191,
+          2509
+        ],
+        [
+          2511,
+          2661
+        ],
+        [
+          2663,
+          2844
+        ],
+        [
+          2846,
+          3225
+        ],
+        [
+          3227,
+          3354
+        ],
+        [
+          3356,
+          3515
+        ],
+        [
+          3891,
+          4196
+        ],
+        [
+          4198,
+          4302
+        ],
+        [
+          4304,
+          4410
+        ],
+        [
+          4412,
+          4544
+        ],
+        [
+          4546,
+          4855
+        ],
+        [
+          5119,
+          5320
+        ],
+        [
+          5322,
+          5632
+        ],
+        [
+          5713,
+          6056
+        ],
+        [
+          6058,
+          6422
+        ],
+        [
+          6424,
+          6649
+        ],
+        [
+          6651,
+          6815
+        ],
+        [
+          6898,
+          7090
+        ],
+        [
+          7091,
+          7224
+        ],
+        [
+          7226,
+          7434
+        ],
+        [
+          7436,
+          7585
+        ],
+        [
+          7587,
+          9677
+        ],
+        [
+          9679,
+          10214
+        ],
+        [
+          10216,
+          10751
+        ],
+        [
+          10753,
+          11378
+        ],
+        [
+          11622,
+          11847
+        ],
+        [
+          11849,
+          12079
+        ],
+        [
+          12081,
+          12296
+        ],
+        [
+          12298,
+          12560
+        ],
+        [
+          12561,
+          12854
+        ],
+        [
+          12856,
+          13154
+        ],
+        [
+          13155,
+          13484
+        ],
+        [
+          13486,
+          13722
+        ],
+        [
+          13723,
+          13840
+        ],
+        [
+          13842,
+          14114
+        ],
+        [
+          14115,
+          14234
+        ],
+        [
+          14236,
+          14444
+        ],
+        [
+          14446,
+          14595
+        ],
+        [
+          14597,
+          14789
+        ],
+        [
+          14790,
+          14923
+        ],
+        [
+          14925,
+          16312
+        ],
+        [
+          16314,
+          16836
+        ],
+        [
+          16838,
+          17807
+        ],
+        [
+          17809,
+          18546
+        ],
+        [
+          18683,
+          19290
+        ],
+        [
+          19292,
+          22260
+        ],
+        [
+          22262,
+          22826
+        ],
+        [
+          22977,
+          24858
+        ],
+        [
+          24860,
+          28794
+        ],
+        [
+          28796,
+          29349
+        ],
+        [
+          29362,
+          29831
+        ],
+        [
+          29833,
+          32209
+        ],
+        [
+          32292,
+          33004
+        ],
+        [
+          33006,
+          33538
+        ],
+        [
+          33540,
+          34249
+        ],
+        [
+          34251,
+          35912
+        ],
+        [
+          35914,
+          38580
+        ],
+        [
+          38582,
+          38818
+        ],
+        [
+          38820,
+          39196
+        ],
+        [
+          39198,
+          40202
+        ],
+        [
+          40204,
+          41742
+        ],
+        [
+          41744,
+          42926
+        ],
+        [
+          42928,
+          43398
+        ],
+        [
+          43399,
+          43865
+        ],
+        [
+          43887,
+          44280
+        ],
+        [
+          44282,
+          44701
+        ],
+        [
+          45228,
+          46235
+        ],
+        [
+          46237,
+          47388
+        ],
+        [
+          47390,
+          48565
+        ],
+        [
+          48567,
+          49054
+        ],
+        [
+          49056,
+          49569
+        ],
+        [
+          49571,
+          50644
+        ],
+        [
+          50646,
+          51470
+        ],
+        [
+          51472,
+          53994
+        ],
+        [
+          53996,
+          54622
+        ],
+        [
+          54793,
+          56303
+        ],
+        [
+          56312,
+          57405
+        ],
+        [
+          57407,
+          58026
+        ],
+        [
+          58028,
+          58259
+        ],
+        [
+          58261,
+          58501
+        ],
+        [
+          58503,
+          59073
+        ],
+        [
+          59075,
+          59954
+        ],
+        [
+          59956,
+          60817
+        ],
+        [
+          60819,
+          62685
+        ],
+        [
+          62687,
+          67512
+        ],
+        [
+          67514,
+          68140
+        ],
+        [
+          68415,
+          70001
+        ],
+        [
+          70003,
+          71159
+        ],
+        [
+          71161,
+          72358
+        ],
+        [
+          72360,
+          73095
+        ],
+        [
+          73206,
+          74126
+        ],
+        [
+          74128,
+          74781
+        ],
+        [
+          74783,
+          79680
+        ],
+        [
+          79682,
+          80951
+        ],
+        [
+          80953,
+          82608
+        ],
+        [
+          82610,
+          82966
+        ],
+        [
+          82968,
+          84110
+        ],
+        [
+          84112,
+          85179
+        ],
+        [
+          85181,
+          85810
+        ],
+        [
+          85812,
+          86140
+        ],
+        [
+          86142,
+          86660
+        ],
+        [
+          86662,
+          88031
+        ],
+        [
+          88033,
+          89307
+        ],
+        [
+          89309,
+          89797
+        ],
+        [
+          89799,
+          89988
+        ],
+        [
+          89990,
+          90424
+        ],
+        [
+          90426,
+          90966
+        ],
+        [
+          90968,
+          91433
+        ],
+        [
+          91435,
+          91666
+        ],
+        [
+          92270,
+          92725
+        ],
+        [
+          92727,
+          92870
+        ],
+        [
+          92872,
+          93255
+        ],
+        [
+          93257,
+          93642
+        ],
+        [
+          93644,
+          94009
+        ],
+        [
+          94011,
+          95137
+        ],
+        [
+          95286,
+          95553
+        ],
+        [
+          95555,
+          95715
+        ],
+        [
+          95717,
+          96116
+        ],
+        [
+          96118,
+          96615
+        ],
+        [
+          96617,
+          97648
+        ],
+        [
+          97650,
+          99112
+        ],
+        [
+          100139,
+          100348
+        ],
+        [
+          100392,
+          101175
+        ],
+        [
+          101177,
+          101392
+        ],
+        [
+          101394,
+          102575
+        ],
+        [
+          102577,
+          102897
+        ],
+        [
+          102899,
+          103570
+        ],
+        [
+          103572,
+          104098
+        ],
+        [
+          104100,
+          104676
+        ],
+        [
+          104678,
+          105234
+        ],
+        [
+          105236,
+          107869
+        ],
+        [
+          107871,
+          109747
+        ],
+        [
+          109749,
+          110185
+        ],
+        [
+          110187,
+          111846
+        ],
+        [
+          112517,
+          113048
+        ],
+        [
+          113459,
+          114016
+        ],
+        [
+          114018,
+          116366
+        ],
+        [
+          116368,
+          118702
+        ],
+        [
+          118793,
+          119751
+        ],
+        [
+          119940,
+          120649
+        ],
+        [
+          120651,
+          121398
+        ],
+        [
+          124631,
+          126082
+        ],
+        [
+          126100,
+          126504
+        ],
+        [
+          126506,
+          126811
+        ],
+        [
+          126894,
+          127620
+        ],
+        [
+          127622,
+          128515
+        ],
+        [
+          128517,
+          129206
+        ],
+        [
+          129208,
+          129853
+        ],
+        [
+          129855,
+          130875
+        ],
+        [
+          130877,
+          131941
+        ],
+        [
+          131943,
+          133084
+        ],
+        [
+          133086,
+          134109
+        ],
+        [
+          134111,
+          134491
+        ],
+        [
+          134493,
+          134742
+        ],
+        [
+          134744,
+          135887
+        ],
+        [
+          135889,
+          137014
+        ],
+        [
+          137016,
+          137505
+        ],
+        [
+          137588,
+          138491
+        ],
+        [
+          138493,
+          138914
+        ],
+        [
+          138916,
+          139538
+        ],
+        [
+          139540,
+          139832
+        ],
+        [
+          139834,
+          140163
+        ],
+        [
+          140245,
+          141320
+        ],
+        [
+          141322,
+          142660
+        ],
+        [
+          142662,
+          143636
+        ],
+        [
+          143719,
+          144934
+        ],
+        [
+          145038,
+          149286
+        ],
+        [
+          149288,
+          149755
+        ],
+        [
+          151413,
+          151632
+        ],
+        [
+          151634,
+          152299
+        ],
+        [
+          152885,
+          153679
+        ],
+        [
+          153681,
+          154538
+        ],
+        [
+          154540,
+          156159
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/math_matrix_c.cc": {
+      "source_sha256": "dce76835e3931d00fe995be35c244381ceece521142184f7e66bfa16976f5a7e",
+      "sha256": "16152fb959d8f4c51555b288565012a0c83415fe4b0c447e5bbef559a5a9fa46",
+      "omitted": [
+        [
+          526,
+          594
+        ],
+        [
+          596,
+          664
+        ],
+        [
+          666,
+          761
+        ],
+        [
+          763,
+          916
+        ],
+        [
+          918,
+          1149
+        ],
+        [
+          1151,
+          1386
+        ],
+        [
+          1388,
+          1484
+        ],
+        [
+          1486,
+          1615
+        ],
+        [
+          1617,
+          1713
+        ],
+        [
+          1715,
+          1817
+        ],
+        [
+          1819,
+          2085
+        ],
+        [
+          2087,
+          2503
+        ],
+        [
+          2505,
+          2773
+        ],
+        [
+          2775,
+          3205
+        ],
+        [
+          3207,
+          3597
+        ],
+        [
+          3599,
+          3808
+        ],
+        [
+          3810,
+          3974
+        ],
+        [
+          4057,
+          6304
+        ],
+        [
+          6306,
+          8018
+        ],
+        [
+          8020,
+          8102
+        ],
+        [
+          8104,
+          8187
+        ],
+        [
+          8189,
+          8271
+        ],
+        [
+          8273,
+          8356
+        ],
+        [
+          8358,
+          9182
+        ],
+        [
+          9184,
+          10316
+        ],
+        [
+          10318,
+          11192
+        ],
+        [
+          11194,
+          12068
+        ],
+        [
+          12070,
+          13202
+        ],
+        [
+          13204,
+          13920
+        ],
+        [
+          14050,
+          14163
+        ],
+        [
+          14164,
+          14416
+        ],
+        [
+          14417,
+          14758
+        ],
+        [
+          14759,
+          15172
+        ],
+        [
+          15173,
+          15658
+        ],
+        [
+          15659,
+          16216
+        ],
+        [
+          16217,
+          16846
+        ],
+        [
+          16987,
+          17100
+        ],
+        [
+          17101,
+          17353
+        ],
+        [
+          17354,
+          17695
+        ],
+        [
+          17696,
+          18109
+        ],
+        [
+          18110,
+          18595
+        ],
+        [
+          18596,
+          19153
+        ],
+        [
+          19154,
+          19783
+        ],
+        [
+          19796,
+          20035
+        ],
+        [
+          20037,
+          20112
+        ],
+        [
+          20114,
+          20403
+        ],
+        [
+          20405,
+          20752
+        ],
+        [
+          20754,
+          21109
+        ],
+        [
+          21110,
+          21538
+        ],
+        [
+          21540,
+          21798
+        ],
+        [
+          21800,
+          21992
+        ],
+        [
+          21994,
+          22079
+        ],
+        [
+          22081,
+          22365
+        ],
+        [
+          22367,
+          22683
+        ],
+        [
+          22685,
+          23009
+        ],
+        [
+          23011,
+          23279
+        ],
+        [
+          23281,
+          23492
+        ],
+        [
+          23494,
+          23692
+        ],
+        [
+          23694,
+          24140
+        ],
+        [
+          24142,
+          24221
+        ],
+        [
+          24223,
+          24602
+        ],
+        [
+          24604,
+          24887
+        ],
+        [
+          25410,
+          25485
+        ],
+        [
+          25572,
+          25842
+        ],
+        [
+          25844,
+          26119
+        ],
+        [
+          26121,
+          26264
+        ],
+        [
+          26266,
+          26409
+        ],
+        [
+          26411,
+          26559
+        ],
+        [
+          26561,
+          26699
+        ],
+        [
+          26701,
+          26844
+        ],
+        [
+          26846,
+          26984
+        ],
+        [
+          26986,
+          27179
+        ],
+        [
+          27181,
+          27374
+        ],
+        [
+          27376,
+          27591
+        ],
+        [
+          27593,
+          27808
+        ],
+        [
+          27810,
+          28003
+        ],
+        [
+          28244,
+          28486
+        ],
+        [
+          28488,
+          28841
+        ],
+        [
+          28843,
+          28999
+        ],
+        [
+          29001,
+          29442
+        ],
+        [
+          29444,
+          29600
+        ],
+        [
+          29602,
+          31243
+        ],
+        [
+          31245,
+          31562
+        ],
+        [
+          31564,
+          32038
+        ],
+        [
+          32040,
+          32519
+        ],
+        [
+          32805,
+          33077
+        ],
+        [
+          33079,
+          33365
+        ],
+        [
+          33367,
+          33723
+        ],
+        [
+          33725,
+          34144
+        ],
+        [
+          34146,
+          34495
+        ],
+        [
+          34497,
+          36500
+        ],
+        [
+          36502,
+          38505
+        ],
+        [
+          38589,
+          40377
+        ],
+        [
+          40379,
+          40778
+        ],
+        [
+          41367,
+          42567
+        ],
+        [
+          42569,
+          42752
+        ],
+        [
+          42753,
+          42936
+        ],
+        [
+          42949,
+          43171
+        ],
+        [
+          43173,
+          43395
+        ],
+        [
+          43397,
+          43643
+        ],
+        [
+          43645,
+          43891
+        ],
+        [
+          43893,
+          44126
+        ],
+        [
+          44128,
+          44634
+        ],
+        [
+          44636,
+          44757
+        ],
+        [
+          44759,
+          44893
+        ],
+        [
+          44895,
+          44996
+        ],
+        [
+          44998,
+          45132
+        ],
+        [
+          45134,
+          45334
+        ],
+        [
+          45335,
+          45499
+        ],
+        [
+          45501,
+          45752
+        ],
+        [
+          45754,
+          45999
+        ],
+        [
+          46001,
+          46558
+        ],
+        [
+          46560,
+          48014
+        ],
+        [
+          48016,
+          48124
+        ],
+        [
+          48126,
+          48406
+        ],
+        [
+          48408,
+          49082
+        ],
+        [
+          49165,
+          49393
+        ],
+        [
+          49395,
+          49749
+        ],
+        [
+          49751,
+          49886
+        ],
+        [
+          49888,
+          50023
+        ],
+        [
+          50025,
+          50168
+        ],
+        [
+          50170,
+          50407
+        ],
+        [
+          50409,
+          50503
+        ],
+        [
+          50505,
+          50696
+        ],
+        [
+          50698,
+          50894
+        ],
+        [
+          50896,
+          51277
+        ],
+        [
+          51279,
+          51526
+        ],
+        [
+          51528,
+          51800
+        ],
+        [
+          51802,
+          52001
+        ],
+        [
+          52285,
+          52669
+        ],
+        [
+          52678,
+          52846
+        ],
+        [
+          52848,
+          53100
+        ],
+        [
+          53102,
+          53371
+        ],
+        [
+          53373,
+          54400
+        ],
+        [
+          54402,
+          54553
+        ],
+        [
+          54555,
+          54805
+        ],
+        [
+          54807,
+          55525
+        ],
+        [
+          55527,
+          56275
+        ],
+        [
+          56332,
+          57917
+        ],
+        [
+          57919,
+          58359
+        ],
+        [
+          58481,
+          58734
+        ],
+        [
+          58736,
+          58875
+        ],
+        [
+          58877,
+          59063
+        ],
+        [
+          59065,
+          59284
+        ],
+        [
+          59286,
+          59542
+        ],
+        [
+          59544,
+          60104
+        ],
+        [
+          60106,
+          60624
+        ],
+        [
+          60626,
+          61193
+        ],
+        [
+          61276,
+          61523
+        ],
+        [
+          61525,
+          61871
+        ],
+        [
+          61873,
+          72320
+        ],
+        [
+          72322,
+          72849
+        ],
+        [
+          72851,
+          73208
+        ],
+        [
+          73210,
+          73406
+        ],
+        [
+          73408,
+          73892
+        ],
+        [
+          74475,
+          74787
+        ],
+        [
+          74789,
+          75101
+        ],
+        [
+          75114,
+          75470
+        ],
+        [
+          75472,
+          75846
+        ],
+        [
+          75848,
+          75986
+        ],
+        [
+          75988,
+          76127
+        ],
+        [
+          76129,
+          76293
+        ],
+        [
+          76295,
+          76460
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/math_rotation_c.cc": {
+      "source_sha256": "922acb2de5d18b137a76a40df9ab389bb66563e6b46b810b2be5842d5f30fbd5",
+      "sha256": "2dbdef6d6531f38b5c347f7108dfde9b02e742c0ab880f665d3cdc5d8f29ecf8",
+      "omitted": [
+        [
+          912,
+          1036
+        ],
+        [
+          1223,
+          1321
+        ],
+        [
+          2207,
+          2334
+        ],
+        [
+          2336,
+          2417
+        ],
+        [
+          2539,
+          2685
+        ],
+        [
+          2687,
+          2779
+        ],
+        [
+          2781,
+          2868
+        ],
+        [
+          2870,
+          2984
+        ],
+        [
+          3085,
+          3266
+        ],
+        [
+          3268,
+          3626
+        ],
+        [
+          3628,
+          4181
+        ],
+        [
+          5314,
+          6369
+        ],
+        [
+          6371,
+          9887
+        ],
+        [
+          9889,
+          10171
+        ],
+        [
+          10173,
+          10357
+        ],
+        [
+          10359,
+          10537
+        ],
+        [
+          10539,
+          10723
+        ],
+        [
+          10725,
+          10928
+        ],
+        [
+          10930,
+          12076
+        ],
+        [
+          12289,
+          12390
+        ],
+        [
+          12392,
+          13245
+        ],
+        [
+          13247,
+          13838
+        ],
+        [
+          13840,
+          14060
+        ],
+        [
+          14062,
+          15176
+        ],
+        [
+          15414,
+          15522
+        ],
+        [
+          15524,
+          15646
+        ],
+        [
+          15648,
+          15883
+        ],
+        [
+          15885,
+          16079
+        ],
+        [
+          16469,
+          16649
+        ],
+        [
+          16651,
+          16903
+        ],
+        [
+          16905,
+          17041
+        ],
+        [
+          17043,
+          17262
+        ],
+        [
+          19485,
+          20597
+        ],
+        [
+          20606,
+          21102
+        ],
+        [
+          21104,
+          21642
+        ],
+        [
+          21644,
+          21831
+        ],
+        [
+          21833,
+          22893
+        ],
+        [
+          22895,
+          23097
+        ],
+        [
+          23099,
+          25297
+        ],
+        [
+          25299,
+          25419
+        ],
+        [
+          25994,
+          26712
+        ],
+        [
+          26714,
+          26964
+        ],
+        [
+          26966,
+          27211
+        ],
+        [
+          27213,
+          28201
+        ],
+        [
+          28203,
+          28367
+        ],
+        [
+          28369,
+          28655
+        ],
+        [
+          28657,
+          28838
+        ],
+        [
+          28840,
+          29129
+        ],
+        [
+          29130,
+          29397
+        ],
+        [
+          29399,
+          29688
+        ],
+        [
+          29690,
+          29957
+        ],
+        [
+          29959,
+          30135
+        ],
+        [
+          30137,
+          31191
+        ],
+        [
+          31193,
+          31448
+        ],
+        [
+          31450,
+          31815
+        ],
+        [
+          31898,
+          32158
+        ],
+        [
+          32160,
+          32306
+        ],
+        [
+          32308,
+          32606
+        ],
+        [
+          32689,
+          33267
+        ],
+        [
+          33269,
+          33948
+        ],
+        [
+          34036,
+          34654
+        ],
+        [
+          34656,
+          35052
+        ],
+        [
+          35053,
+          35209
+        ],
+        [
+          35211,
+          35357
+        ],
+        [
+          35358,
+          35486
+        ],
+        [
+          35488,
+          35640
+        ],
+        [
+          35642,
+          36115
+        ],
+        [
+          36117,
+          36568
+        ],
+        [
+          36570,
+          37875
+        ],
+        [
+          37941,
+          38531
+        ],
+        [
+          38532,
+          38735
+        ],
+        [
+          38737,
+          38942
+        ],
+        [
+          40036,
+          40280
+        ],
+        [
+          40282,
+          41044
+        ],
+        [
+          41046,
+          41217
+        ],
+        [
+          41219,
+          42028
+        ],
+        [
+          42099,
+          43026
+        ],
+        [
+          43028,
+          43266
+        ],
+        [
+          43268,
+          43719
+        ],
+        [
+          43720,
+          43900
+        ],
+        [
+          43902,
+          44150
+        ],
+        [
+          44152,
+          44337
+        ],
+        [
+          44339,
+          45083
+        ],
+        [
+          45084,
+          45409
+        ],
+        [
+          45411,
+          45836
+        ],
+        [
+          45837,
+          46240
+        ],
+        [
+          46242,
+          46563
+        ],
+        [
+          46695,
+          47172
+        ],
+        [
+          47174,
+          47742
+        ],
+        [
+          47744,
+          47994
+        ],
+        [
+          47996,
+          48278
+        ],
+        [
+          48717,
+          50445
+        ],
+        [
+          50447,
+          51140
+        ],
+        [
+          51142,
+          52292
+        ],
+        [
+          52294,
+          54077
+        ],
+        [
+          54079,
+          54733
+        ],
+        [
+          54735,
+          56088
+        ],
+        [
+          56090,
+          56177
+        ],
+        [
+          56179,
+          57504
+        ],
+        [
+          57506,
+          58338
+        ],
+        [
+          58340,
+          58457
+        ],
+        [
+          58459,
+          58559
+        ],
+        [
+          58609,
+          58688
+        ],
+        [
+          58690,
+          58803
+        ],
+        [
+          58805,
+          58896
+        ],
+        [
+          58898,
+          59019
+        ],
+        [
+          64680,
+          64766
+        ],
+        [
+          64768,
+          65619
+        ],
+        [
+          65621,
+          66125
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/math_vector.cc": {
+      "source_sha256": "7b197857a487444410eabdf9221fc1c65974081183616db35c02efce01dbf721",
+      "sha256": "330bf34b057c82ffc731bf1c28d5f3d401b7301b09f79bd3aef7c18fee297f60",
+      "omitted": [
+        [
+          680,
+          894
+        ],
+        [
+          1103,
+          1338
+        ],
+        [
+          1340,
+          1807
+        ],
+        [
+          1809,
+          2449
+        ],
+        [
+          2451,
+          2980
+        ],
+        [
+          2982,
+          3258
+        ],
+        [
+          3260,
+          3717
+        ],
+        [
+          3719,
+          4048
+        ],
+        [
+          4050,
+          4575
+        ],
+        [
+          4577,
+          4914
+        ],
+        [
+          4916,
+          5189
+        ],
+        [
+          5354,
+          5484
+        ],
+        [
+          5486,
+          5659
+        ],
+        [
+          5661,
+          5875
+        ],
+        [
+          6143,
+          6383
+        ],
+        [
+          6385,
+          6941
+        ],
+        [
+          7056,
+          7302
+        ],
+        [
+          7304,
+          7542
+        ],
+        [
+          7544,
+          7728
+        ],
+        [
+          7730,
+          8024
+        ],
+        [
+          8026,
+          8264
+        ],
+        [
+          8266,
+          8512
+        ],
+        [
+          8514,
+          8684
+        ],
+        [
+          9127,
+          9556
+        ],
+        [
+          9558,
+          9873
+        ],
+        [
+          9875,
+          10407
+        ],
+        [
+          10409,
+          10746
+        ],
+        [
+          10748,
+          11120
+        ],
+        [
+          11122,
+          11636
+        ],
+        [
+          11638,
+          12241
+        ],
+        [
+          12243,
+          12628
+        ],
+        [
+          12745,
+          12998
+        ],
+        [
+          13255,
+          13450
+        ],
+        [
+          13452,
+          13647
+        ],
+        [
+          13892,
+          14146
+        ],
+        [
+          14148,
+          14455
+        ],
+        [
+          14723,
+          14965
+        ],
+        [
+          15535,
+          15970
+        ],
+        [
+          15972,
+          16084
+        ],
+        [
+          16086,
+          16310
+        ],
+        [
+          16312,
+          17355
+        ],
+        [
+          17357,
+          17581
+        ],
+        [
+          17695,
+          17793
+        ],
+        [
+          17795,
+          17904
+        ],
+        [
+          17906,
+          18026
+        ],
+        [
+          18028,
+          18201
+        ],
+        [
+          18203,
+          18571
+        ],
+        [
+          18573,
+          18867
+        ],
+        [
+          18869,
+          19089
+        ],
+        [
+          19091,
+          19314
+        ],
+        [
+          19316,
+          19539
+        ],
+        [
+          19541,
+          20033
+        ],
+        [
+          20157,
+          20208
+        ],
+        [
+          20210,
+          20525
+        ],
+        [
+          20527,
+          20741
+        ],
+        [
+          20743,
+          21097
+        ],
+        [
+          21099,
+          21209
+        ],
+        [
+          21211,
+          21412
+        ],
+        [
+          21414,
+          21623
+        ],
+        [
+          21625,
+          21841
+        ],
+        [
+          21843,
+          22003
+        ],
+        [
+          22005,
+          22230
+        ],
+        [
+          22232,
+          22454
+        ],
+        [
+          22456,
+          22826
+        ],
+        [
+          22828,
+          22999
+        ],
+        [
+          23001,
+          23244
+        ],
+        [
+          23246,
+          23468
+        ],
+        [
+          23470,
+          23840
+        ],
+        [
+          23842,
+          24064
+        ],
+        [
+          24066,
+          24436
+        ],
+        [
+          24438,
+          24744
+        ],
+        [
+          24746,
+          24904
+        ],
+        [
+          24906,
+          25074
+        ],
+        [
+          25076,
+          25241
+        ],
+        [
+          26173,
+          26406
+        ],
+        [
+          26408,
+          26606
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/polyfill_2d.cc": {
+      "source_sha256": "d07272b8e930b9ea83301470e69f602015857e16cd1690ed24e284a945560307",
+      "sha256": "acc153ac7bb54e5f7c47fc3c4d0d7c4b1b0fb2bb8093f96f1d777bd4adbe306f",
+      "omitted": [
+        [
+          23767,
+          25518
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/polyfill_2d_beautify.cc": {
+      "source_sha256": "8096baf0094107f2b651f2179e570cc1864e0c159d98c999868b12064393d22d",
+      "sha256": "8096baf0094107f2b651f2179e570cc1864e0c159d98c999868b12064393d22d",
+      "omitted": []
+    },
+    "source/blender/blenlib/intern/quadric.cc": {
+      "source_sha256": "3049f6d92db7f787ec9a0b57c3ff875d440e8f78df7f1eaa0bb5a9694d187783",
+      "sha256": "92d3d0ee267ce60927db3164395a5b4518070257376b18c82480ed66a09ac884",
+      "omitted": [
+        [
+          1109,
+          1352
+        ],
+        [
+          2522,
+          2588
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/sort_utils.cc": {
+      "source_sha256": "33463da8c1ac0668f4f8f13e5e3c3bf048672a32a9e1cf93a71b711505242250",
+      "sha256": "febc90cff3be924adc46372de3abf763039359f41b000713be48b9e372130d37",
+      "omitted": [
+        [
+          372,
+          700
+        ],
+        [
+          702,
+          1038
+        ],
+        [
+          1040,
+          1358
+        ],
+        [
+          1360,
+          1686
+        ]
+      ]
+    },
+    "source/blender/blenlib/intern/stack.cc": {
+      "source_sha256": "17298c208f8d43fc7e368b3ff8e8d7139fedc7d0edf6a6901d5427165e49d451",
+      "sha256": "6ae9057ebd56cbcc8eacd8aff73327dc4e68508361edba6f30e0546a75971d09",
+      "omitted": [
+        [
+          919,
+          1065
+        ],
+        [
+          1142,
+          1594
+        ],
+        [
+          1596,
+          2010
+        ],
+        [
+          2012,
+          2160
+        ],
+        [
+          2162,
+          2317
+        ],
+        [
+          2319,
+          2460
+        ],
+        [
+          2462,
+          3150
+        ],
+        [
+          3152,
+          3287
+        ],
+        [
+          3289,
+          3481
+        ],
+        [
+          3483,
+          3691
+        ],
+        [
+          3693,
+          3966
+        ],
+        [
+          3968,
+          4098
+        ],
+        [
+          4100,
+          4547
+        ],
+        [
+          4549,
+          5263
+        ],
+        [
+          5265,
+          5684
+        ],
+        [
+          5686,
+          5876
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_construct.cc": {
+      "source_sha256": "881498652fc10c31e7434e9cee6654712709a915494e08fa3ef093442bd0e627",
+      "sha256": "9b1fb8f0f6df4f92392e33f8f58cfb5ea1fef482f49ad21ad30db2cbda3b8870",
+      "omitted": [
+        [
+          420,
+          722
+        ],
+        [
+          1792,
+          3143
+        ],
+        [
+          5915,
+          7739
+        ],
+        [
+          7741,
+          8567
+        ],
+        [
+          11532,
+          11968
+        ],
+        [
+          12011,
+          13637
+        ],
+        [
+          13639,
+          16002
+        ],
+        [
+          16004,
+          16287
+        ],
+        [
+          16289,
+          17210
+        ],
+        [
+          17212,
+          18436
+        ],
+        [
+          18438,
+          22697
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_core.cc": {
+      "source_sha256": "e14f668d9cb1570856c3afd08b104a4097c9b267a4367beea0e7d56642ad9b64",
+      "sha256": "cd30c7ccdb5ff08edea654c01ace3b33030ed21166c271b8e58a0f287a0b3d16",
+      "omitted": [
+        [
+          1227,
+          2387
+        ],
+        [
+          2512,
+          3640
+        ],
+        [
+          23664,
+          24013
+        ],
+        [
+          25159,
+          26231
+        ],
+        [
+          26697,
+          26858
+        ],
+        [
+          26860,
+          29102
+        ],
+        [
+          29831,
+          30112
+        ],
+        [
+          45367,
+          50184
+        ],
+        [
+          50186,
+          52393
+        ],
+        [
+          52395,
+          55915
+        ],
+        [
+          55917,
+          57046
+        ],
+        [
+          57048,
+          59622
+        ],
+        [
+          59624,
+          63081
+        ],
+        [
+          63804,
+          63912
+        ],
+        [
+          63914,
+          67190
+        ],
+        [
+          67960,
+          68747
+        ],
+        [
+          68749,
+          69733
+        ],
+        [
+          69735,
+          71045
+        ],
+        [
+          71047,
+          71642
+        ],
+        [
+          72413,
+          73180
+        ],
+        [
+          73182,
+          74781
+        ],
+        [
+          74783,
+          79419
+        ],
+        [
+          79421,
+          80179
+        ],
+        [
+          80181,
+          80520
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_delete.cc": {
+      "source_sha256": "945fe5911824380db6627584fc951277c283961d1a429d65003d8fcfeeed6d1d",
+      "sha256": "87d59454fbdd6c7fdf70be47443aa5e182187b8ca0ad86bcb22a3d4d4f05ff7a",
+      "omitted": [
+        [
+          417,
+          671
+        ],
+        [
+          673,
+          927
+        ],
+        [
+          929,
+          1183
+        ],
+        [
+          1185,
+          1466
+        ],
+        [
+          1468,
+          1760
+        ],
+        [
+          1762,
+          4947
+        ],
+        [
+          5308,
+          5555
+        ],
+        [
+          5557,
+          5804
+        ],
+        [
+          5806,
+          6053
+        ],
+        [
+          6055,
+          6329
+        ],
+        [
+          6331,
+          6618
+        ],
+        [
+          6620,
+          9037
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_interp.cc": {
+      "source_sha256": "e5d844bfe6241fed7718a7c1c59f49d528a2a0002a206a65286d4454889c79cf",
+      "sha256": "383e7c579de8828f1c2e863b43cefc9bce5f274524f2040a54d7f032c10489ef",
+      "omitted": [
+        [
+          2510,
+          2613
+        ],
+        [
+          3596,
+          4568
+        ],
+        [
+          4570,
+          5678
+        ],
+        [
+          15100,
+          15566
+        ],
+        [
+          16143,
+          16606
+        ],
+        [
+          19498,
+          21369
+        ],
+        [
+          21371,
+          22382
+        ],
+        [
+          22384,
+          24411
+        ],
+        [
+          24413,
+          24931
+        ],
+        [
+          24933,
+          25491
+        ],
+        [
+          25493,
+          25727
+        ],
+        [
+          25729,
+          26278
+        ],
+        [
+          26280,
+          26511
+        ],
+        [
+          26513,
+          26769
+        ],
+        [
+          26771,
+          27457
+        ],
+        [
+          27459,
+          28154
+        ],
+        [
+          28156,
+          28913
+        ],
+        [
+          28915,
+          30362
+        ],
+        [
+          30364,
+          30593
+        ],
+        [
+          30595,
+          30833
+        ],
+        [
+          30835,
+          32040
+        ],
+        [
+          33767,
+          34171
+        ],
+        [
+          34315,
+          35363
+        ],
+        [
+          35365,
+          37376
+        ],
+        [
+          37378,
+          38084
+        ],
+        [
+          38086,
+          39122
+        ],
+        [
+          39124,
+          39494
+        ],
+        [
+          39496,
+          40082
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_iterators.cc": {
+      "source_sha256": "563a0b5f81d5d8a160d1bf00b3d895c79370535575205dc789c16d2a8d6bcb19",
+      "sha256": "15717f33a8fec06ee8cce08b5347edc9ba38e13d5291b960380b782ba15166c7",
+      "omitted": [
+        [
+          904,
+          1278
+        ],
+        [
+          1280,
+          1597
+        ],
+        [
+          1599,
+          1970
+        ],
+        [
+          1971,
+          2514
+        ],
+        [
+          2516,
+          3747
+        ],
+        [
+          3749,
+          4993
+        ],
+        [
+          4995,
+          5576
+        ],
+        [
+          5578,
+          6301
+        ],
+        [
+          6303,
+          6588
+        ],
+        [
+          6590,
+          7513
+        ],
+        [
+          7515,
+          7797
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_marking.cc": {
+      "source_sha256": "9314e532b39cae683d95960453053a29504155a777c39ff1e4069b3ede05c5ab",
+      "sha256": "2fa8377e17864c5dacc93b68971828b27c834f05d2ec2b83389ab0a7260f351f",
+      "omitted": [
+        [
+          881,
+          1322
+        ],
+        [
+          1324,
+          1765
+        ],
+        [
+          1767,
+          2208
+        ],
+        [
+          2210,
+          2629
+        ],
+        [
+          2631,
+          3162
+        ],
+        [
+          3164,
+          3746
+        ],
+        [
+          3748,
+          3850
+        ],
+        [
+          3852,
+          3954
+        ],
+        [
+          3956,
+          4058
+        ],
+        [
+          4060,
+          4180
+        ],
+        [
+          4197,
+          4445
+        ],
+        [
+          4957,
+          5277
+        ],
+        [
+          5286,
+          5608
+        ],
+        [
+          5921,
+          6232
+        ],
+        [
+          6241,
+          6554
+        ],
+        [
+          6567,
+          6858
+        ],
+        [
+          6860,
+          8334
+        ],
+        [
+          8336,
+          8433
+        ],
+        [
+          8622,
+          9496
+        ],
+        [
+          9498,
+          10503
+        ],
+        [
+          10505,
+          10975
+        ],
+        [
+          10977,
+          11556
+        ],
+        [
+          11558,
+          12137
+        ],
+        [
+          12263,
+          12997
+        ],
+        [
+          13131,
+          14206
+        ],
+        [
+          14208,
+          15323
+        ],
+        [
+          15325,
+          15449
+        ],
+        [
+          15462,
+          17277
+        ],
+        [
+          21504,
+          21973
+        ],
+        [
+          21986,
+          23353
+        ],
+        [
+          23419,
+          24598
+        ],
+        [
+          24600,
+          24888
+        ],
+        [
+          24890,
+          25183
+        ],
+        [
+          25589,
+          25663
+        ],
+        [
+          25665,
+          25860
+        ],
+        [
+          25862,
+          25999
+        ],
+        [
+          26001,
+          26138
+        ],
+        [
+          26140,
+          27203
+        ],
+        [
+          27205,
+          27459
+        ],
+        [
+          27461,
+          27715
+        ],
+        [
+          27717,
+          27936
+        ],
+        [
+          27938,
+          28375
+        ],
+        [
+          28377,
+          29324
+        ],
+        [
+          29326,
+          31095
+        ],
+        [
+          31097,
+          31308
+        ],
+        [
+          31350,
+          31502
+        ],
+        [
+          31784,
+          31943
+        ],
+        [
+          31945,
+          32109
+        ],
+        [
+          32111,
+          32282
+        ],
+        [
+          32284,
+          32465
+        ],
+        [
+          32467,
+          32675
+        ],
+        [
+          32677,
+          32895
+        ],
+        [
+          33016,
+          33321
+        ],
+        [
+          33323,
+          33652
+        ],
+        [
+          33654,
+          34470
+        ],
+        [
+          34472,
+          34760
+        ],
+        [
+          34762,
+          36474
+        ],
+        [
+          38618,
+          40470
+        ],
+        [
+          40799,
+          41119
+        ],
+        [
+          41284,
+          41402
+        ],
+        [
+          41506,
+          41624
+        ],
+        [
+          41626,
+          42404
+        ],
+        [
+          42406,
+          43097
+        ],
+        [
+          43099,
+          43905
+        ],
+        [
+          43907,
+          44607
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_mesh.cc": {
+      "source_sha256": "677e199bdd14c88773ce03e22899ef060d13003d5e48b2ff1f987fb04dfd5e36",
+      "sha256": "71e8b6565e67e1b8657a77f064c90c2dbc52ab7121c08df30ae2bdd8eb486bee",
+      "omitted": [
+        [
+          2302,
+          3432
+        ],
+        [
+          6600,
+          7147
+        ],
+        [
+          7486,
+          8361
+        ],
+        [
+          8363,
+          9636
+        ],
+        [
+          14889,
+          15621
+        ],
+        [
+          15630,
+          17969
+        ],
+        [
+          17971,
+          18185
+        ],
+        [
+          18187,
+          18430
+        ],
+        [
+          18432,
+          18565
+        ],
+        [
+          18567,
+          18700
+        ],
+        [
+          18702,
+          18835
+        ],
+        [
+          18837,
+          19276
+        ],
+        [
+          19278,
+          19506
+        ],
+        [
+          19508,
+          19736
+        ],
+        [
+          19738,
+          19966
+        ],
+        [
+          19968,
+          20282
+        ],
+        [
+          20284,
+          30941
+        ],
+        [
+          30943,
+          38224
+        ],
+        [
+          38226,
+          39073
+        ],
+        [
+          39194,
+          39394
+        ],
+        [
+          39396,
+          39593
+        ],
+        [
+          39595,
+          39751
+        ],
+        [
+          39753,
+          39969
+        ],
+        [
+          39971,
+          40324
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_mesh_normals.cc": {
+      "source_sha256": "4ff61b95aa46f1973ef9d158d0b7b7cc40cf3e38ad0ff474001c371ded6e8953",
+      "sha256": "eb0677d90c47c898bc01ce546a5e96e6cfeeb6a98a3b2d061ca1f6ce6c811480",
+      "omitted": [
+        [
+          9381,
+          10293
+        ],
+        [
+          10295,
+          10514
+        ],
+        [
+          10667,
+          11008
+        ],
+        [
+          11142,
+          12183
+        ],
+        [
+          12268,
+          13139
+        ],
+        [
+          13141,
+          13353
+        ],
+        [
+          13490,
+          14627
+        ],
+        [
+          15120,
+          27370
+        ],
+        [
+          27372,
+          27618
+        ],
+        [
+          31280,
+          35707
+        ],
+        [
+          35836,
+          38139
+        ],
+        [
+          38509,
+          42176
+        ],
+        [
+          42771,
+          43428
+        ],
+        [
+          43430,
+          43977
+        ],
+        [
+          43979,
+          44389
+        ],
+        [
+          44391,
+          45656
+        ],
+        [
+          45658,
+          46811
+        ],
+        [
+          46813,
+          49548
+        ],
+        [
+          49550,
+          51274
+        ],
+        [
+          51582,
+          54995
+        ],
+        [
+          55116,
+          58047
+        ],
+        [
+          58408,
+          61805
+        ],
+        [
+          61807,
+          63029
+        ],
+        [
+          63031,
+          64134
+        ],
+        [
+          64264,
+          64770
+        ],
+        [
+          64772,
+          64820
+        ],
+        [
+          64821,
+          67182
+        ],
+        [
+          67184,
+          69333
+        ],
+        [
+          69580,
+          71566
+        ],
+        [
+          71568,
+          71936
+        ],
+        [
+          72410,
+          73759
+        ],
+        [
+          73768,
+          75451
+        ],
+        [
+          75453,
+          76095
+        ],
+        [
+          76097,
+          77320
+        ],
+        [
+          77322,
+          77969
+        ],
+        [
+          77971,
+          78356
+        ],
+        [
+          78358,
+          78743
+        ],
+        [
+          78745,
+          79130
+        ],
+        [
+          79219,
+          82053
+        ],
+        [
+          82055,
+          82752
+        ],
+        [
+          82754,
+          84966
+        ],
+        [
+          84968,
+          85218
+        ],
+        [
+          85220,
+          85428
+        ],
+        [
+          85577,
+          86733
+        ],
+        [
+          86735,
+          87725
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_mods.cc": {
+      "source_sha256": "4ba5f1c0cab4ec5505fd18ba3e81f1e6572286f7794bec057ae97b4baf5ebdd1",
+      "sha256": "5787635e422f137a9feafd5d661fe1f68fae109d9d180801e230a952a70abc2c",
+      "omitted": [
+        [
+          419,
+          1245
+        ],
+        [
+          1247,
+          5038
+        ],
+        [
+          5040,
+          5481
+        ],
+        [
+          7295,
+          9395
+        ],
+        [
+          9397,
+          11994
+        ],
+        [
+          11996,
+          13259
+        ],
+        [
+          13281,
+          13510
+        ],
+        [
+          16400,
+          16799
+        ],
+        [
+          16801,
+          16913
+        ],
+        [
+          16915,
+          17629
+        ],
+        [
+          17631,
+          18345
+        ],
+        [
+          18347,
+          20801
+        ],
+        [
+          20803,
+          21080
+        ],
+        [
+          21082,
+          24301
+        ],
+        [
+          24303,
+          24420
+        ],
+        [
+          24422,
+          24569
+        ],
+        [
+          24571,
+          24723
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_polygon.cc": {
+      "source_sha256": "51508da558aa2fe23f2ea46fa737b7f54df61ba6c958841a520e2e721d9e639a",
+      "sha256": "551610f48d1b617e7c2c919cfdaaf3076c8bc5cd35aa4ea1f450d093c5a82fbf",
+      "omitted": [
+        [
+          798,
+          996
+        ],
+        [
+          1705,
+          2392
+        ],
+        [
+          2441,
+          2874
+        ],
+        [
+          2876,
+          4136
+        ],
+        [
+          4138,
+          5340
+        ],
+        [
+          5342,
+          5709
+        ],
+        [
+          5711,
+          6248
+        ],
+        [
+          6250,
+          6918
+        ],
+        [
+          6920,
+          7057
+        ],
+        [
+          7059,
+          7352
+        ],
+        [
+          7354,
+          7817
+        ],
+        [
+          7995,
+          9100
+        ],
+        [
+          9102,
+          9377
+        ],
+        [
+          9379,
+          10314
+        ],
+        [
+          10316,
+          10707
+        ],
+        [
+          10709,
+          10941
+        ],
+        [
+          10943,
+          11575
+        ],
+        [
+          11577,
+          12389
+        ],
+        [
+          12391,
+          13224
+        ],
+        [
+          13226,
+          14638
+        ],
+        [
+          14640,
+          15608
+        ],
+        [
+          15610,
+          16337
+        ],
+        [
+          16339,
+          16834
+        ],
+        [
+          16836,
+          17420
+        ],
+        [
+          17422,
+          17680
+        ],
+        [
+          17682,
+          18014
+        ],
+        [
+          18016,
+          18666
+        ],
+        [
+          18974,
+          19546
+        ],
+        [
+          19841,
+          20060
+        ],
+        [
+          20457,
+          21046
+        ],
+        [
+          22891,
+          24031
+        ],
+        [
+          24033,
+          26546
+        ],
+        [
+          26548,
+          26718
+        ],
+        [
+          26720,
+          27176
+        ],
+        [
+          27178,
+          27607
+        ],
+        [
+          27609,
+          27909
+        ],
+        [
+          27911,
+          28103
+        ],
+        [
+          28105,
+          28638
+        ],
+        [
+          35820,
+          39978
+        ],
+        [
+          39980,
+          40306
+        ],
+        [
+          40308,
+          40532
+        ],
+        [
+          40534,
+          40795
+        ],
+        [
+          40797,
+          41012
+        ],
+        [
+          41014,
+          41263
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_query.cc": {
+      "source_sha256": "0e97d1468d3d2f78ff02c17b3f0a86303148b59f0ac4634b8c19a1c7bc0fe4bc",
+      "sha256": "b0e21025b6edbd269aac0ecbd82920265df5ea758588ab8d9ff18b6b335ec8ff",
+      "omitted": [
+        [
+          806,
+          987
+        ],
+        [
+          989,
+          1126
+        ],
+        [
+          1128,
+          1583
+        ],
+        [
+          1585,
+          2102
+        ],
+        [
+          2104,
+          2337
+        ],
+        [
+          2610,
+          3106
+        ],
+        [
+          3108,
+          3945
+        ],
+        [
+          3947,
+          4627
+        ],
+        [
+          4629,
+          5309
+        ],
+        [
+          5311,
+          5578
+        ],
+        [
+          5580,
+          5788
+        ],
+        [
+          5790,
+          6110
+        ],
+        [
+          6112,
+          7228
+        ],
+        [
+          7230,
+          7343
+        ],
+        [
+          7344,
+          7473
+        ],
+        [
+          7899,
+          8601
+        ],
+        [
+          8603,
+          9451
+        ],
+        [
+          9453,
+          9735
+        ],
+        [
+          10662,
+          11584
+        ],
+        [
+          11675,
+          11778
+        ],
+        [
+          11780,
+          12069
+        ],
+        [
+          12356,
+          12575
+        ],
+        [
+          12577,
+          12877
+        ],
+        [
+          12879,
+          13222
+        ],
+        [
+          13224,
+          13297
+        ],
+        [
+          13299,
+          13420
+        ],
+        [
+          13422,
+          13645
+        ],
+        [
+          14208,
+          14290
+        ],
+        [
+          14292,
+          14416
+        ],
+        [
+          14418,
+          14713
+        ],
+        [
+          14715,
+          14999
+        ],
+        [
+          15001,
+          16497
+        ],
+        [
+          16560,
+          17611
+        ],
+        [
+          17613,
+          18186
+        ],
+        [
+          18188,
+          18458
+        ],
+        [
+          18497,
+          18599
+        ],
+        [
+          18601,
+          18881
+        ],
+        [
+          18883,
+          19362
+        ],
+        [
+          19364,
+          20786
+        ],
+        [
+          20788,
+          21094
+        ],
+        [
+          21096,
+          21447
+        ],
+        [
+          21449,
+          21788
+        ],
+        [
+          21790,
+          22085
+        ],
+        [
+          22087,
+          22370
+        ],
+        [
+          22372,
+          22667
+        ],
+        [
+          22669,
+          22952
+        ],
+        [
+          22954,
+          23130
+        ],
+        [
+          23132,
+          23417
+        ],
+        [
+          23419,
+          23743
+        ],
+        [
+          24111,
+          24263
+        ],
+        [
+          24533,
+          24789
+        ],
+        [
+          24791,
+          25130
+        ],
+        [
+          25132,
+          25267
+        ],
+        [
+          25269,
+          25642
+        ],
+        [
+          25644,
+          26017
+        ],
+        [
+          26019,
+          26321
+        ],
+        [
+          26323,
+          26438
+        ],
+        [
+          26440,
+          27663
+        ],
+        [
+          27665,
+          28870
+        ],
+        [
+          28872,
+          29010
+        ],
+        [
+          29012,
+          29373
+        ],
+        [
+          29375,
+          29722
+        ],
+        [
+          29724,
+          30041
+        ],
+        [
+          30043,
+          30855
+        ],
+        [
+          30857,
+          31114
+        ],
+        [
+          31115,
+          31222
+        ],
+        [
+          31224,
+          31808
+        ],
+        [
+          31809,
+          31970
+        ],
+        [
+          31972,
+          32287
+        ],
+        [
+          32288,
+          32409
+        ],
+        [
+          32411,
+          32845
+        ],
+        [
+          32847,
+          33416
+        ],
+        [
+          33418,
+          33525
+        ],
+        [
+          33527,
+          33982
+        ],
+        [
+          33983,
+          34824
+        ],
+        [
+          34826,
+          35244
+        ],
+        [
+          35246,
+          35760
+        ],
+        [
+          35762,
+          36263
+        ],
+        [
+          37825,
+          38141
+        ],
+        [
+          40623,
+          43495
+        ],
+        [
+          43497,
+          43812
+        ],
+        [
+          43814,
+          44707
+        ],
+        [
+          44709,
+          46341
+        ],
+        [
+          46343,
+          46755
+        ],
+        [
+          46757,
+          47169
+        ],
+        [
+          47171,
+          47599
+        ],
+        [
+          47601,
+          47913
+        ],
+        [
+          47915,
+          48067
+        ],
+        [
+          48069,
+          48367
+        ],
+        [
+          48369,
+          48667
+        ],
+        [
+          48669,
+          48963
+        ],
+        [
+          49311,
+          50100
+        ],
+        [
+          50101,
+          50438
+        ],
+        [
+          50440,
+          55011
+        ],
+        [
+          55013,
+          58230
+        ],
+        [
+          58232,
+          60902
+        ],
+        [
+          60904,
+          61486
+        ]
+      ]
+    },
+    "source/blender/bmesh/intern/bmesh_structure.cc": {
+      "source_sha256": "6bce101b8abaca8dd7bc86b25caa6090de37c6e2c3e719ed50ed1fdbad7f9682",
+      "sha256": "cd892fb20de8666d43df18c3d6dc9ab85d2039c5b2b25a34d1f050ece7a595b5",
+      "omitted": [
+        [
+          5928,
+          6253
+        ],
+        [
+          7653,
+          8179
+        ],
+        [
+          8181,
+          8485
+        ],
+        [
+          8781,
+          9363
+        ],
+        [
+          12826,
+          13154
+        ],
+        [
+          13390,
+          14132
+        ]
+      ]
+    },
+    "source/blender/bmesh/tools/bmesh_beautify.cc": {
+      "source_sha256": "14b64837015202f22e6f4272de2ca83cfa969aaa2302f362e47423be4af7b44d",
+      "sha256": "3bb3567151eef3a93f80b0ae51a0352382941ecb0b641213e3d41aece3e8619f",
+      "omitted": [
+        [
+          1307,
+          1469
+        ],
+        [
+          1483,
+          2239
+        ],
+        [
+          2247,
+          2370
+        ],
+        [
+          2399,
+          2486
+        ],
+        [
+          2487,
+          3124
+        ],
+        [
+          3126,
+          3252
+        ],
+        [
+          3254,
+          3382
+        ],
+        [
+          5386,
+          5821
+        ],
+        [
+          5950,
+          6176
+        ],
+        [
+          6246,
+          7812
+        ],
+        [
+          7880,
+          8879
+        ],
+        [
+          8977,
+          12391
+        ]
+      ]
+    },
+    "source/blender/bmesh/tools/bmesh_bisect_plane.cc": {
+      "source_sha256": "6c4e8ad40c914b14ae601ad0b23dc01d3686770a465aed78a4dfdc9e7e62e31e",
+      "sha256": "5771b9bde93d684135576093c1f686e7fc1f483677534ec642924f2a4e28cf44",
+      "omitted": [
+        [
+          3073,
+          3163
+        ]
+      ]
+    },
+    "source/blender/bmesh/tools/bmesh_decimate_collapse.cc": {
+      "source_sha256": "7640ac33a23cc45a40614719300f23c0b19c4d1da8a2429c06ab1ea802f4e235",
+      "sha256": "7640ac33a23cc45a40614719300f23c0b19c4d1da8a2429c06ab1ea802f4e235",
+      "omitted": []
+    }
+  }
+}

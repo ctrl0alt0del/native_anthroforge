@@ -1,6 +1,8 @@
 # Building and deforming skin
 
 Available in 0.4.0. Qualification evidence and limits are in [the task record](tasks/skin-040.md).
+The [0.4.1 audit corrections](tasks/release-041.md) restore the reference proxy preparation,
+diagnostic reporting, budget feedback and persistent FAST weight cache described below.
 
 Open **Skin** in the vertical inspector tabs on the right. **Build Skin** creates the
 envelope, generates quad topology and prepares the deformation reference. These stages
@@ -17,6 +19,10 @@ Envelope settings control skin distance, collagen and gap filling. Distances are
 percentages of the model's longest axis. Select an SCP to set or paint its collagen
 weights and adjust its subtree quad budget. Select a compatible source to override
 its gap settings. Display hiding does not remove physical contributors.
+Inherited gap fields show their effective document values. Automatic collagen shows the
+resolved value and is read-only; select Uniform to enter a custom scalar. Switching modes
+preserves inactive overrides. **Reset defaults** restores all six envelope settings in one
+undo action without clearing source settings, paint, topology settings or saved geometry.
 
 Choose QuadWild or Instant Meshes, the target quad count, refinement and symmetry.
 QuadWild uses the supported loop and FLOW guides. Change these construction settings,
@@ -49,6 +55,21 @@ The deformation controls select Linear Elasticity or FAST and their settings. Pr
 resolution changes require reference rebuilding. Invalid or missing material references
 block updates with an explanation; the application never silently reattaches them.
 
+New references use the draft envelope reduced with the Blender Decimate subset to about
+64,000 triangles, then tetrahedralize it. Final skin topology is retained unchanged. Only
+projects without a draft use topology as the proxy source. Existing saved references are
+not silently rebuilt. FAST retains checksummed weights under
+`%LOCALAPPDATA%/AnthroForge/deformation/anthroforge-bbw-v1`; missing, corrupt or unavailable
+cache files cause normal recomputation. This disposable cache is not project data.
+
+**Skin diagnostics** shows retained solver and geometry findings. Issues explains inverted
+proxy elements, extrapolated embeddings, contact-motion limits and intersections. Reference
+comparisons retain at most 256 intersection witnesses, so an incomplete comparison cannot
+prove the absence of new intersections. Sampled nearest-normal clearance is not a complete
+skin/anatomy volume penetration check. Diagnostics never repair or reject otherwise usable
+skin. The budget list shows achieved exclusive-region quads; deviations above 20% produce
+the addon's advisory warning. Opening this panel does not recalculate geometry.
+
 ## Fit a shortcut to bones
 
 Select a continuous scalar shortcut and click **Fit to bones…** beside its settings.
@@ -64,6 +85,8 @@ Saved fits appear in Skin. Select one and vary its preview value to inspect inde
 playback without recalculating anatomy. **Fit accuracy** lists training and held-out
 errors. Values outside the sampled range clamp to the endpoint. Source changes mark a fit
 stale but keep its saved preview usable. Refitting is explicit; removal is undoable.
+The summary includes the number of active fitted bones and held-out error in the moving
+region, alongside the whole-mesh error. This separates fit accuracy from unaffected anatomy.
 
 ## Save and export
 

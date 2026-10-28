@@ -1,4 +1,10 @@
-# AnthroForge 0.4.0
+# AnthroForge 0.4.1
+
+0.4.1 completes the skin audit: draft-based deformation references, retained solver and
+geometry diagnostics, achieved topology budgets, persistent FAST weights, effective
+inherited values, Reset defaults and moving-region fit summaries. These corrections
+preserve the addon's algorithms and do not repair or reject skin based on diagnostics.
+See the [workflow](docs/skin_workflow.md) and [0.4.1 evidence](docs/tasks/release-041.md).
 
 0.4.0 adds skin envelope generation, guided quad topology, fixed-topology deformation,
 shortcut-to-bone fitting, independent fitted playback and skin-only OBJ export. Open

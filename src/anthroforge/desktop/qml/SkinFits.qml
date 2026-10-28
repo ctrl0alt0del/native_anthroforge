@@ -52,14 +52,15 @@ ColumnLayout {
         UiSection {
             title: "Fit accuracy"; Layout.fillWidth: true
             UiDetail { label:"Active bones"; value:String(section.selected.report?.active_bones ?? "—") }
-            UiDetail { label:"Moving region · worst held-out 95% error"; value:section.selected.report?.moving_validation_p95 == null ? "Unavailable" : Number(section.selected.report.moving_validation_p95).toPrecision(3)+"% of height" }
+            UiDetail { label:"Moving region"; value:section.selected.report?.moving_validation_p95 == null ? "Unavailable" : Number(section.selected.report.moving_validation_p95).toPrecision(3)+"% of height" }
+            UiHelp { explanation:"Worst held-out 95th-percentile error among vertices that move. Error is expressed as a percentage of model height." }
             Label { text: "Error at sampled values, relative to the captured skin. Held-out samples were not used to fit bones."; color: Theme.muted; wrapMode: Text.Wrap; Layout.fillWidth: true }
             Repeater {
                 model: section.selected.report?.rows || []
                 UiDetail {
                     required property var modelData
                     label: Number(modelData.value).toPrecision(4)+(modelData.training ? " · Training" : " · Held-out")
-                    value: "95% error · whole skin: "+Number(modelData.p95_percent_height).toPrecision(3)+"% · moving region: "+Number(modelData.moving_p95_percent_height).toPrecision(3)+"% of height"
+                    value: "Whole: "+Number(modelData.p95_percent_height).toPrecision(3)+"% · Moving: "+Number(modelData.moving_p95_percent_height).toPrecision(3)+"%"
                 }
             }
         }

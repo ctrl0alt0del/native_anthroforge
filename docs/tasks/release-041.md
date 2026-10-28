@@ -73,8 +73,25 @@ Captured addon intersection, contact, clearance and ownership examples pass nati
 FAST weights survive a fresh process with identical outputs; corrupted checksums, invalid
 metadata and unavailable storage fall back to computation. The broad skin suite exposed a
 NumPy boolean serialization defect in new FAST metadata; corrected and rechecked.
-Full gate, whole-body reference/update, offscreen controls and package checks are running
-or pending. Outputs are under `build/skin-041`; do not claim release acceptance yet.
+The development gate passes: 2,598 Python tests, six native CTests, native style, Ruff,
+formatting, mypy and doctor. An additional retained-report reload/no-mutation test passes.
+Offscreen actual-QML checks cover inherited values, Auto collagen, reset/undo, fit controls
+and retained diagnostic inspection. Hidden GPU views show the accepted whole-body result.
+
+Whole-body qualification uses the saved 58-SCP/96-tissue assembly. Reference construction
+takes 83.339 s; the unchanged-input update takes 2.091 s. These are profiled observations
+with other checks active, not controlled speed benchmarks. Of the update, native
+intersection/clearance/topology diagnostics take 188/198/40 ms and existing contact takes
+1,253 ms. Initialization preserves final vertices exactly; identity update differs by at
+most 3.55e-15. Anatomy, bindings and topology remain exact. A Ribs Top Radius 1.05 update
+finishes in 28.397 s including all anatomy; reference and skin topology remain unchanged.
+The retained topology has 4,706 crossing pairs; all 256 bounded current witnesses also
+occur in the reference. This is not evidence that no additional intersections exist.
+Sampled nearest-normal clearance remains a limited diagnostic, not a volume test.
+
+Version advanced to 0.4.1 after runtime qualification. Portable packaging/checks and final
+source archive remain pending. Outputs are under `build/skin-041`; do not claim release
+acceptance yet. No physical interactive desktop acceptance is claimed.
 The following are observed ownership boundaries, not claims that their current results
 are wrong. Existing shared policies should be reused, not replaced with parallel checks.
 

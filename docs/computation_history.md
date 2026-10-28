@@ -16,7 +16,8 @@ It leaves numerical evaluation and scheduling policy unchanged.
 ## Scope and reading guide
 
 0.4.0 is qualified and accepted; see the skin stage and whole-body records below.
-The 0.4.1 audit corrections are in progress. The existing addon remains the numerical baseline.
+The 0.4.1 audit corrections are implemented; packaging qualification is in progress.
+The existing addon remains the numerical baseline.
 
 The inventory groups operations by computational responsibility, rather than listing
 every function, command alias or UI button. It includes numerical construction,
@@ -3540,7 +3541,7 @@ this check. See [task record](tasks/skin-040.md) for provenance and scope. No ad
 application rebuild or full development gate was needed for tooling/documentation changes;
 portable release qualification remains pending.
 
-### Skin audit restoration — 2026-10-28 (0.4.1 in progress; R04)
+### Skin audit restoration — 2026-10-28 (0.4.1; R04)
 
 Observed gaps: deformation initialization tetrahedralized final topology directly instead
 of the addon's reduced draft envelope; final solver/contact arrays were retained without
@@ -3567,10 +3568,16 @@ Metadata/paths/native handles are not added to authored document state. Effectiv
 are shared with UI, draft reset uses one transaction, and fitting exposes existing moving
 region errors and active bone count without changing fitting.
 
-Initial evidence: 26 focused tests and six CTests pass. The actual addon worker reduction
-of the 4.48-million-triangle torso matches the native BMesh port exactly (64,000 triangles).
-33.102 s app / 35.416 s Blender are single-run reduction timings, not end-to-end claims.
+Evidence: the full gate passes 2,598 Python tests and six CTests. The actual addon worker
+reduction of the 4.48-million-triangle torso matches the dedicated reference adapter
+exactly (64,000 triangles). 33.931 s app / 35.416 s Blender are single-run reduction timings,
+not end-to-end claims. Captured addon intersections/contact/clearance and ownership counts
+match native output; persistent FAST restart/corruption checks preserve numerical results.
 Blender must use the same eight hash partitions for an exact ordering comparison; four
-threads produce another valid collapse order. New adapter/diagnostic/cache/budget parity,
-full gate, offscreen interaction and portable qualification remain in progress. Evidence:
+threads produce another valid collapse order. Whole-body reference initialization preserves
+topology/vertices/anatomical bindings exactly; identity update has 3.55e-15 maximum roundoff.
+The profiler measures 426 ms of additional diagnostics in a 2.091 s update; these are
+observations under concurrent checks, not an isolated performance claim. Existing 4,706
+crossing pairs remain advisory. Offscreen controls and hidden GPU inspection pass.
+Portable qualification remains pending. Evidence:
 `build/skin-041/reference-parity`, and [task record](tasks/release-041.md).

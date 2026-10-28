@@ -1,6 +1,6 @@
 # Cross-project anatomy assembly — confirmed 0.4.2 contract
 
-Status: implemented; final portable qualification in progress.
+Status: implemented and qualified in the canonical 0.4.2 distribution.
 
 ## Workflow
 

@@ -3,7 +3,7 @@
 - Task branch: `codex/assembly-042`
 - Integration branch: `main`
 - Starting revision: `de1f475`
-- Status: final stacking-reference audit corrected; repeat release checks pending
+- Status: qualified; documentation/archive finalization and validated merge
 - Last updated: 2026-10-28, Europe/Bucharest
 - Active writer: local Codex
 
@@ -57,21 +57,26 @@ No USD dependency or live project composition was introduced.
    Missing providers block planning/final output even during explicit evaluation. Changed
    providers invalidate stacking stages only; pending results use normal scheduler admission.
    Equivalent supports preserve accepted geometry. Regression checks cover repair without the
-   source, schema persistence, Manual mode and mirrored targets. No stacking kernel changed.
+   source, schema persistence, Manual mode and mirrored targets. Inactive exclusions remain
+   non-blocking. The repair UI preserves the explicit mirrored-target selection. No stacking
+   kernel changed.
 
 ## Verification
 
-- Full Python suite: **2,680 passed**, `pytest-qualified.log`, 421.35 s. Two subsequently added
-  API-Issue/resource-lifetime tests also pass in the seven-test command/architecture rerun.
-- Six native suites, native style, Python lint/format/type checks (567 modules), PowerShell
+- Final full gate: **2,690 passed**, `development-gate-final.log`, 472.94 s; 3,461 existing
+  Qt/dependency deprecation warnings. Earlier failures and successful intermediate reruns remain
+  recorded in the ignored evidence directory.
+- Six native suites, native style, Python lint/format/type checks (568 modules), PowerShell
   parsing/function limits, numerical imports, native doctor and wheel resource checks pass.
 - Assembly-specific tests cover missing/mapped supports, incompatible materials despite equal
   counts, partial explicit rebind, frame restoration, rule identity, ordinary parents, formulas,
   stale targets/unrelated edits, cancelled candidates, gesture boundaries, save/reopen, undo/redo,
   source deletion, reference removal and temporary resource release.
-- Native gate ran before later Python/UI-only changes; no native code changed afterward.
-  Original gate failures and their successful reruns are retained, not represented as a clean
-  first pass. Final portable qualification remains pending below.
+- The final combined gate covers the stacking-reference and UI corrections. Subsequent edits
+  are documentation only. No native numerical implementation changed in this task.
+- All **33 relocated portable checks pass** in `portable-release-final.log`, with minimal PATH,
+  developer Python/Qt/native settings removed, Qt-free headless operations and hidden rendering.
+  The canonical executable matches the tested copy; its build revision is `8762b4b`.
 
 ## Production and visual evidence
 
@@ -83,8 +88,8 @@ SHA256: `308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
 The maintained [qualification tool](../../tools/assembly_qualification.py) copies the skeleton
 and all 96 tissues in separate operations with explicit bone mapping. It compares **492**
 geometry-bearing records before and after Ribs Top Radius→3, Humerus Length, Radius Length and
-Thumb Radius edits. Earlier full trials had no differences/errors; the final current-source
-rerun is in progress. Compare poses/world coordinates, path samples, every tissue stage,
+Thumb Radius edits. The final `qualification-stacking-final.log` rerun has no differences/errors
+in all five comparisons. Compare poses/world coordinates, path samples, every tissue stage,
 canonical oriented triangles and normalized binding records. Tolerance is 1e-8 m. Raw Boolean
 face enumeration is nondeterministic for Thumb; canonical orientation/connectivity is retained.
 This is source-standalone/import parity, not a new Blender parity claim.
@@ -113,15 +118,17 @@ Raw local-only artifacts: `build/assembly-042/production/`, `visuals/`, `assembl
 The `.afprofile.zip` records preparation, native calls, publication and retained resource data.
 See [computation history](../computation_history.md) for the preserved algorithm contracts.
 
+The final runtime report retains all 104,747 events without truncation or declared collector
+loss. It records native/cache/invalidation/resource boundaries; as a headless capture it has
+no Qt frame/input/binding evidence. Final all-muscle preparation was 13.90 s and import plus
+wait 0.671 s. Native-style checks and packaging overlapped, so these remain observations, not
+a controlled performance comparison. The packaged construction-only screenshot shows both
+curves and its embedded reference image after import/undo/redo/save/reopen.
+
 ## Remaining delivery
 
-1. Repeat the gate, four-shortcut production qualification and canonical package after the
-   stacking-reference correction. The previous complete production run and all 33 relocated
-   portable checks passed, but do not qualify this subsequent correction.
-2. Run all relocated portable checks, including construction-only assembly, embedded images,
-   source hashing, one-action undo/redo, schema 8, hidden rendering and Qt-free commands.
-3. Refresh documentation status/source archive; verify links and canonical artifacts.
-4. Merge the validated task branch into latest main and push normally. Main was still `de1f475`
+1. Refresh the packaged documentation/source archive; verify links and canonical artifacts.
+2. Merge the validated task branch into latest main and push normally. Main was still `de1f475`
    at the latest fetch. Preserve the untracked root `__init__.py`.
 
 Qualified native runtime: `C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native`.

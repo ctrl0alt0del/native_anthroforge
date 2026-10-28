@@ -10,6 +10,16 @@
 
 ## Outcome and acceptance
 
+### Release acceptance and merge requested, October 28
+
+The user accepted the whole-body result for 0.4.0, including the shared surface banding
+and 18 non-manifold edges, and requested merging into main before starting 0.4.1.
+No repair or algorithm change is authorized by that acceptance. Finish the optimized
+canonical portable rebuild/check and source archive, then merge/push this branch.
+The fetched `origin/main` is already an ancestor (73 commits behind at `3e15bbb`), so
+there is no divergent main implementation to reconcile. Preserve the root `__init__.py`.
+0.4.1 scope has been requested from the user; do not invent its feature priorities.
+
 ### Whole-body comparison, October 28 — complete
 
 The user requested the full body, addon versus app, with matched-angle previews and

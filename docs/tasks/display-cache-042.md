@@ -3,7 +3,7 @@
 - Task branch: `codex/display-cache-042`
 - Integration branch: `main`
 - Starting revision: `b7c5d99`
-- Status: in progress
+- Status: complete
 - Last updated: 2026-10-28, Europe/Bucharest
 - Active writer: local Codex
 
@@ -27,19 +27,36 @@ undo history, scheduling contracts and staged display/picking correctness intact
 
 ## Current state
 
-R11 implemented: journal-targeted construction/tissue projection, shared frame resolution, displayed-transform reuse, coherent frame publication, and immutable-document reachability caching. Focused regression and architecture checks pass (22 tests); lint and mypy pass. First hidden production capture: 24.167 s, 549 construction visits versus baseline 132,498; exact geometry/pose/attachment fingerprint equality. Full paired timing, delivery checks and R09 remain pending.
+Both increments are implemented and checkpointed. R11 targets construction/tissue projection,
+reuses frames, coalesces publication and caches retained-document reachability. R09 deduplicates
+cache allocations, coordinates aggregate retention and bounds persistent FAST products.
+Production profiling, numerical comparisons and regression qualification are complete.
+The canonical 0.4.2 package is rebuilt and passes all 32
+relocated checks. Root `__init__.py` remains untouched.
 
 ## Verification
 
-Pending focused regression, paired production profiling, development gate, hidden GUI
-and portable checks. No visible desktop interaction.
+Focused regression, paired profiling, hidden rendering, native tests/style, type/lint checks
+and portable checks pass. The final serial suite passes **2,641 tests** in 351.78 s;
+all six native suites, native/Python style, formatting, typing, numerical imports and the
+native-runtime doctor pass. The initial full suite had an external tetrahedral-process access
+violation and a collected older assertion from the new frame-coalescing test. The external
+case and corrected test pass both in isolation and in the complete serial rerun.
+No numerical algorithm, production retry or exception suppression was added for that crash.
+An intervening direct `pytest` launcher could not import repository `tools`; using the
+project's `python -m pytest` entry point resolved collection without code changes.
+The relocated executable passes 32 checks with a minimal PATH. Hidden native GPU images
+show the expected tissue and mirror geometry; ordinary offscreen UI captures establish
+layout only. No physical interactive desktop acceptance is claimed.
 
-## Next actions and blockers
+## Delivery
 
-1. Implement and qualify incremental construction projection, picking and reachability.
-2. Implement native resource receipts, aggregate retention and FAST disk budgeting.
-3. Compare measured workloads, exact/canonical geometry and attachment fingerprints.
-4. Run delivery checks, update evidence and package, merge and push.
+No remaining implementation or qualification work. The canonical executable is
+`dist/0.4.2/AnthroForge.dist/AnthroForge.exe`, with companion
+`dist/AnthroForge-0.4.2-source.zip`. The packaged runtime is revision `890ed85`;
+subsequent changes update qualification documentation only. The source archive includes
+the new implementation/tests and dependency headers, excludes root `__init__.py`, and
+passes ZIP integrity checks. Normal integration preserves the checkpoint history.
 
 ## Recovery inputs
 
@@ -52,7 +69,9 @@ Keep new artifacts under ignored `build/display-cache-042`; preserve root `__ini
 
 Shared allocation receipts, a 4 GiB aggregate estimated-payload budget with cost-aware aggregate eviction, fiber/skin retention and bounded FAST disk products are implemented. Existing numerical kernels unchanged. Focused cache/native/profile tests pass; expanded production captures report complete inventories without loss. Eight-edit numerical comparison: bindings/canonical topology equal, maximum coordinate delta 4.09e-14 m. Do not compare two-cycle and six-cycle final coordinates directly: the baseline itself has history-dependent repeated-edit differences; matched sequences are required.
 
-Pending: full gate, repeated desktop timings (running serial BAAB), whole-body skin reuse, package and ownership review. Artifacts are under build/display-cache-042. Baseline detached worktree at build/display-cache-042/baseline uses b7c5d99 plus only the shared profiling harness runtime-path correction and the existing canonical pre-change native DLL.
+At this checkpoint full qualification was pending; subsequent results follow below.
+Artifacts are under `build/display-cache-042`. The detached baseline worktree uses `b7c5d99`
+plus only the shared profiling harness runtime-path correction and the pre-change native DLL.
 
 ## Production evidence
 
@@ -93,3 +112,24 @@ products totaling 22.69 MiB and does not modify the user's cache.
 
 Raw evidence: paired-summary.json, numerical-parity.json, display-before/after JSON/PNG,
 cache-after and cache-parity traces/arrays, and skin traces under build/display-cache-042.
+
+The final ordinary runtime-profiler capture takes 27.191 s and exports 59,565 events,
+with no losses and an identical final geometry/attachment fingerprint. Recording overhead
+is not subtracted from application time. CPU render submission does not measure GPU time
+or physical display latency. The offscreen evidence does not establish interactive acceptance.
+
+## Ownership and coupling review
+
+- Projection invalidation belongs to the desktop change-journal consumer; geometry evaluation
+  and scheduler ordering remain unchanged. Ordinary transform dependencies are distinct from
+  anatomical attachment relationships. Inspection offsets remain separate picking frames.
+- Session reachability caches only immutable document reference sets. It still sweeps newly
+  orphaned resources and drops cached sets when document/history/checkpoint/job owners disappear.
+- Cache coordination belongs to the native-resource boundary, under one short admission lock.
+  Numerical construction stays outside that lock. Receipts retain identity/size metadata;
+  document/history/job/view leases control lifetime independently of eviction.
+- Aggregate eviction uses a cost/size/aging policy; specialized local caps retain their LRU
+  behavior. Cost is a lookup-to-admission wall estimate, not an exact CPU construction measure.
+- Disk writers use an OS lock; failed/contended persistence never blocks a valid solve.
+  Owned interrupted staging files are cleaned only while no writer can be active. Other
+  temporary files are preserved. No in-flight work-sharing framework was introduced.

@@ -3633,10 +3633,12 @@ transforms, including separate inspection offsets. Frame notifications are coale
 advancing picking ahead of displayed geometry. Reachability reuses immutable-document reference
 sets, retaining no discarded history and still sweeping newly orphaned resources.
 
-Initial hidden Ribs-to-3 capture reduced construction visits from 132,498 to 549 with identical
-geometry, resolved poses, attachment metadata and oriented connectivity. Final repeated evidence and
-limits belong in [the task record](tasks/display-cache-042.md). No geometry algorithms, scheduling
-order or history policy changed.
+Hidden Ribs-to-3 captures reduced construction visits from 132,498 to 549 with identical
+geometry, resolved poses, attachment metadata and oriented connectivity. Serial BAAB trials
+reduce median complete update time from 29.472 s to 23.395 s (20.6%). Background load remains
+uncontrolled; inclusive stage timings cannot be summed. Evidence and limits are in
+[the task record](tasks/display-cache-042.md). No geometry algorithms, scheduling order or
+history policy changed.
 
 ### Shared cache allocation budgeting — 2026-10-28 (0.4.2; R04, recommendation R09)
 
@@ -3660,8 +3662,12 @@ Estimates exclude Python/allocator/GPU overhead and are not a process-RAM cap.
 The 24-edit workload produces 211 fiber builds/2,411 hits without rebuild churn (previously 2,547
 builds/75 hits). The retained deduplicated fiber payload is 105.42 MiB. Matched eight-edit numerical
 comparison preserves bindings and canonical oriented topology, with maximum coordinate delta
-4.09e-14 m; raw Thumb triangle enumeration remains nondeterministic. Repeated timing, full gate and
-package qualification remain pending in [the task record](tasks/display-cache-042.md).
+4.09e-14 m; raw Thumb triangle enumeration remains nondeterministic. Returning to a retained
+whole-body FAST preparation takes 0.087 ms instead of a 21.126 s rebuild, with identical
+prediction/diagnostic hashes. This improves reuse, not cold solver speed. Final qualification
+passes 2,641 Python tests, six native suites, configured style/type/numerical checks and 32
+relocated portable checks. Initial failures, successful reruns and limits are recorded in
+[the task record](tasks/display-cache-042.md).
 
 Reference: [Cao and Irani,
 GreedyDual-Size](https://www.usenix.org/legacy/publications/library/proceedings/usits97/full_papers/cao/cao_html/node8.html).

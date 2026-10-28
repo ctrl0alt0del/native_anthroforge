@@ -4,15 +4,14 @@ from dataclasses import replace
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
+from anthroforge.core import graph_records
 from anthroforge.core.construction import Control, Curve, Deformer, Primitive
-from anthroforge.core.deformer_references import remapped
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP
 from anthroforge.core.results import EvaluationResult, ReadRevision
 
 from . import curve_sources, junction_copies, shortcut_copies
 from .curve_copy_resources import Copies
-from .membership import remap, remap_weights
 
 if TYPE_CHECKING:
     from .session import Session
@@ -50,35 +49,11 @@ def identities(document: Document, entities: set[str], controls: set[str]) -> se
 
 
 def binding(source: Deformer, mapping: dict[str, str]) -> Deformer:
-    target = replace(
-        source.target,
-        owner=mapping.get(source.target.owner, source.target.owner),
-        component=mapping.get(source.target.component, source.target.component),
-    )
-    return replace(
-        source,
-        id=mapping[source.id],
-        control=mapping.get(source.control, source.control),
-        target=target,
-        members=remap(source.members, mapping),
-        weighted_members=remap_weights(source, mapping),
-        shrinkwrap=remapped(source, mapping),
-    )
+    return graph_records.rewritten(source, mapping)
 
 
 def primitive(source: Primitive | None, mapping: dict[str, str]) -> Primitive | None:
-    if source is None:
-        return None
-    curves = tuple(
-        replace(
-            c,
-            curve=mapping[c.id],
-            reference_frame=mapping.get(c.reference_frame, c.reference_frame),
-        )
-        for c in source.curves
-    )
-    pieces = tuple(replace(p, id=mapping[p.id], curve=mapping[p.curve]) for p in source.pieces)
-    return replace(source, curves=curves, pieces=pieces)
+    return graph_records.rewritten(source, mapping)
 
 
 def control(source: Control, mapping: dict[str, str]) -> Control:

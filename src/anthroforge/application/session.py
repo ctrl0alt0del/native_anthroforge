@@ -93,8 +93,10 @@ class Session:
             self.skin_status.changed()
 
     def initialize_scheduler(self) -> None:
+        from .assembly_runtime import Assembly
         from .tissue_inspection import Inspection
 
+        self.assembly = Assembly(self)
         self.tissue_inspection = Inspection()
         self.clear_previews()
         self.scheduler = TaskCoordinator(
@@ -307,6 +309,7 @@ class Session:
         }
 
     def close(self) -> None:
+        self.assembly.cancel()
         self.shortcut_comparison.clear()
         self.issues.close()
         self.scheduler.close()

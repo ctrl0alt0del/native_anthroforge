@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any
 from anthroforge.core.units import convert
 
 from . import (
+    assembly_operations,
     attached_creation,
     comparison_journal,
     comparison_replay,
@@ -87,6 +88,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "assembly.import": assembly_operations.apply,
     "skin.collagen.paint.commit": skin_painting.commit,
     "skin.collagen.set": skin_collagen.set_weights,
     "skin.collagen.fill": skin_collagen.fill,
@@ -319,6 +321,7 @@ def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
 
 def direct_commands(session: "Session") -> dict[str, Any]:
     return {
+        **assembly_operations.commands(session),
         **file_commands(session),
         **query_commands(session),
         **history_commands(session),

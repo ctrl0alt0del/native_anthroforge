@@ -27,13 +27,18 @@ Preserve numerical algorithms, source files and unrelated root `__init__.py`.
 
 ## Current state
 
-Initial foundation implemented: schema-8 provenance/reference records, explicit typed field
-adapters, reference-aware registry validation, local missing-input errors and an automatic
-Issues provider. External declarations are not scene objects. No import command/UI yet.
+Foundation implemented: schema-8 provenance/reference records, explicit typed field adapters,
+reference-aware validation/readiness and automatic Issues. Source inspection pins a package;
+graph closure/selective resource transfer and coordinator-backed headless self-contained
+construction import work with one-action undo. Existing primitive/deformer duplication now
+uses the same typed remapper. External mapping, anatomical root binding, mirrors, reference
+repair and desktop workflow are still unfinished; do not use this checkpoint as a release.
 
 ## Verification
 
-Initial 13 foundation/architecture/resource tests pass; focused Ruff/mypy pass. Full
+Initial foundation checks pass. Eight current API/resource/architecture checks verify
+selected resources, copied accepted definitions, source removal after inspection, persistence,
+undo and cancellation. Mapping/production/full-suite qualification is pending. Full
 qualification pending. Baseline: 2,641 Python tests, six native suites and 32 portable checks qualified
 by the preceding display/cache task. Keep new checks background/offscreen.
 

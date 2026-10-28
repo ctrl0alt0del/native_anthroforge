@@ -144,17 +144,17 @@ def render_rows(rows):
 
 
 def picking_inputs(controller, rows):
-    snapping_inputs(controller, rows)
     from .tissue_inspection_scene import picked_rows
 
-    rows = picked_rows(controller.tissue_inspection, rows)
-    eligible = [row for row in rows if row["surface_pickable"] and row["handle"]]
+    inspected = picked_rows(controller.tissue_inspection, rows)
+    controller.display_transforms.retain((*rows, *inspected))
+    snapping_inputs(controller, rows)
+    eligible = [row for row in inspected if row["surface_pickable"] and row["handle"]]
     controller.pick_rows = {row["id"]: row for row in eligible}
     controller.pick_ids = [row["id"] for row in eligible]
     controller.pick_handles = np.array([row["handle"] for row in eligible], dtype=np.uint64)
     matrices = [
-        scene.geometry_matrix(controller.session.engine, row["matrix"], row["geometry_offset"])
-        for row in eligible
+        controller.display_transforms.matrix(controller.session.engine, r) for r in eligible
     ]
     controller.pick_matrices = np.ascontiguousarray(matrices, dtype=np.float64)
     control_picking_inputs(controller)
@@ -173,10 +173,7 @@ def snapping_inputs(controller, rows):
     controller.snap_ids = [row["id"] for row in eligible]
     controller.snap_handles = np.array([row["handle"] for row in eligible], dtype=np.uint64)
     controller.snap_matrices = np.ascontiguousarray(
-        [
-            scene.geometry_matrix(controller.session.engine, row["matrix"], row["geometry_offset"])
-            for row in eligible
-        ],
+        [controller.display_transforms.matrix(controller.session.engine, row) for row in eligible],
         dtype=np.float64,
     )
 

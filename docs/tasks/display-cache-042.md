@@ -27,7 +27,7 @@ undo history, scheduling contracts and staged display/picking correctness intact
 
 ## Current state
 
-Source/evidence review underway. No runtime changes yet.
+R11 implemented: journal-targeted construction/tissue projection, shared frame resolution, displayed-transform reuse, coherent frame publication, and immutable-document reachability caching. Focused regression and architecture checks pass (22 tests); lint and mypy pass. First hidden production capture: 24.167 s, 549 construction visits versus baseline 132,498; exact geometry/pose/attachment fingerprint equality. Full paired timing, delivery checks and R09 remain pending.
 
 ## Verification
 

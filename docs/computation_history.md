@@ -3622,3 +3622,10 @@ measurements 0.23–0.35 ms, section spans 0.18–0.23 ms, placement 0.11–0.20
 classification 6.15 ms. Requests took 9–34 ms including orchestration, with unrelated checks
 active. These are observations, not controlled benchmarks or interactive-latency evidence.
 The task record contains complete qualification and remaining evidence limits.
+
+### Display projection and reachability reuse — 2026-10-28 (0.4.2; R11)
+
+Previously each accepted result revisited all construction records, rebuilt unchanged picking transforms and rescanned retained documents. The change journal now selects affected presentation records; ordinary transform dependencies remain distinct from anatomical evaluation. One frame-resolution cache serves each projection pass. Picking reuses only currently displayed transforms, including separate inspection offsets. Frame notifications are coalesced without advancing picking ahead of displayed geometry. Reachability reuses immutable-document reference sets, retaining no discarded history and still sweeping newly orphaned resources.
+
+Initial hidden Ribs-to-3 capture reduced construction visits from 132,498 to 549 with identical geometry, resolved poses, attachment metadata and oriented connectivity. Final repeated evidence and limits belong in [the task record](tasks/display-cache-042.md). No geometry algorithms, scheduling order or history policy changed.
+

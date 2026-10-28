@@ -20,6 +20,7 @@ class Boundary:
     role: str
     uses: tuple[tuple[str, graph_records.Reference], ...]
     property: PropertyRef | None = None
+    instance: str = ""
 
 
 def roots(selection: Any) -> tuple[str, ...]:
@@ -44,7 +45,9 @@ def identities(selection: Any, resources: Any = None) -> dict[str, str]:
     if resources:
         values += tuple(p.authored for p in resources.paths.values())
     owned = set().union(*(graph_records.owned(value) for value in values))
-    return {key: str(uuid4()) for key in owned}
+    mapping = {key: str(uuid4()) for key in owned}
+    mapping.update({s.id: graph_records.rewritten(s, mapping).id for s in selection.shortcuts})
+    return mapping
 
 
 def owned(selection: Any) -> set[str]:
@@ -79,7 +82,7 @@ def boundary_key(item: Any, ref: graph_records.Reference) -> tuple[str, Property
     container = at(item, ref.path[:-1])
     prop = container if isinstance(container, PropertyRef) else None
     address = (prop.path, prop.component) if prop else ()
-    return json.dumps((ref.target, ref.relationship, ref.role, address)), prop
+    return json.dumps((ref.target, ref.relationship, ref.role, address, ref.instance)), prop
 
 
 def boundary(document: Any, key: str, source: Any, uses: Any) -> Boundary:
@@ -90,7 +93,9 @@ def boundary(document: Any, key: str, source: Any, uses: Any) -> Boundary:
     else:
         declared = next((v for v in document.external_references if v.id == ref.target), None)
         name, kind = (declared.name, declared.kind) if declared else (ref.target, "REFERENCE")
-    return Boundary(key, ref.target, name, kind, ref.relationship, ref.role, tuple(uses), prop)
+    return Boundary(
+        key, ref.target, name, kind, ref.relationship, ref.role, tuple(uses), prop, ref.instance
+    )
 
 
 def included_decisions(mappings: dict[str, Any], boundaries: tuple[Boundary, ...]) -> set[str]:

@@ -111,12 +111,27 @@ def retain_conflicts(
     return placements
 
 
-def validated_settings(document: Any) -> dict[str, MirrorRule]:
-    settings = {r.target: r for r in document.mirror_rules}
-    unknown = settings.keys() - document.registry.records.keys()
+class ResolvedRules(dict[str, MirrorRule]):
+    def __init__(self, rules: Any) -> None:
+        super().__init__((r.target, r) for r in rules)
+        self.boundaries: dict[str, set[str]] = {}
+        for rule in rules:
+            for key in rule.scope:
+                if rule.enabled:
+                    self.boundaries.setdefault(key, set()).add(rule.target)
+
+
+def validated_settings(document: Any) -> ResolvedRules:
+    settings = ResolvedRules(document.mirror_rules)
+    ordinary = {r.target for r in settings.values() if not r.scope}
+    scoped = {key for r in settings.values() for key in r.scope}
+    unknown = (ordinary | scoped) - document.registry.records.keys()
     if len(settings) != len(document.mirror_rules) or unknown:
         raise ValueError("Mirror rules require unique existing authored targets.")
-    if any(r.enabled and r.target not in document.registry.anatomy for r in settings.values()):
+    if any(
+        r.enabled and not r.scope and r.target not in document.registry.anatomy
+        for r in settings.values()
+    ):
         raise ValueError("Mirror Children requires an anatomical source.")
     return settings
 
@@ -127,15 +142,16 @@ def empty(previous: MirrorIndex | None) -> MirrorIndex:
     return MirrorIndex((), MappingProxyType({}), MappingProxyType({}))
 
 
-def anatomy_rules(document: Any, settings: dict[str, MirrorRule]) -> dict[str, set[str]]:
-    resolved: dict[str, set[str]] = {}
-    sources: dict[str, str] = {}
+def anatomy_rules(document: Any, settings: ResolvedRules) -> dict[str, set[str]]:
+    resolved = {key: set(value) for key, value in settings.boundaries.items()}
+    sources: dict[str, set[str]] = {}
     for key in document.index.structure.order:
         item = document.entity(key)
         rule = settings.get(key, MirrorRule(key))
-        inherited = sources.get(item.parent, "") if rule.inherit else ""
-        sources[key] = key if rule.enabled else inherited
-        resolved[key] = {inherited} if inherited and not rule.enabled else set()
+        inherited = sources.get(item.parent, set()) if rule.inherit else set()
+        inherited = settings.boundaries.get(key, inherited)
+        sources[key] = {key} if rule.enabled else inherited
+        resolved[key] = inherited if inherited and not rule.enabled else set()
     return resolved
 
 
@@ -188,6 +204,8 @@ def inherited_choices(item: Any, settings: Any, resolved: Any) -> set[str]:
 
 
 def merge(key: str, choices: set[str], settings: Any, resolved: Any) -> bool:
+    if key in settings.boundaries:
+        return False
     rule = settings.get(key, MirrorRule(key))
     if not rule.inherit or rule.enabled:
         return False

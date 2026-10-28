@@ -34,8 +34,12 @@ construction import work with one-action undo. Existing primitive/deformer dupli
 uses the same typed remapper. Relationship-specific mapping and world-preserving parent
 detachment work. Native full-content comparison rejects merely matching geometry counts;
 explicit Fiber rebind uses existing current-shape capture. Missing references retain visible
-invalid source results and surface evidence for later repair. Mirrors, full rebind evidence,
-reference repair and desktop workflow remain unfinished; do not use this checkpoint as a release.
+invalid source results and surface evidence for later repair. Inherited mirror planes now use
+explicit boundary scopes without dummy hierarchy nodes. Source/mirror mappings are distinct.
+Reference repair works from retained package evidence after source deletion, through the same
+mapping/binding policies and one-action undo. Desktop interaction, complete metadata provenance,
+broader relationship/lifecycle coverage and production qualification remain unfinished; this
+checkpoint is not a release.
 
 ## Verification
 
@@ -43,6 +47,9 @@ Initial foundation checks pass. Current API/resource/architecture checks verify
 selected resources, copied accepted definitions, source removal after inspection, persistence,
 undo and cancellation. Mapping tests cover world-preserving parent changes, retained Fiber
 bindings, missing supports, incompatible geometry, and explicit rebind. Focused mypy passes.
+Current focused run: 25 assembly tests pass, plus the two architecture checks; focused mypy passes.
+Production smoke: 281 MB / 625-object source inspected in 2.79 s; SCM and required construction
+prepared in 0.69 s, exposing five external relationships. This does not establish geometry parity.
 Production/full-suite qualification remains pending. Baseline: 2,641 Python tests, six native suites and 32 portable checks qualified
 by the preceding display/cache task. Keep new checks background/offscreen.
 

@@ -33,6 +33,8 @@ class ExternalReference:
     components: int = 0
     surface_asset: str = ""
     surface_frame: tuple[float, ...] = ()
+    source_instance: str = ""
+    instance: str = ""
 
     def __post_init__(self) -> None:
         if not all((self.id, self.source_document, self.source_entity, self.kind)):

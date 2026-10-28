@@ -10,7 +10,14 @@ from anthroforge.core.results import geometry_asset
 from anthroforge.core.surface_references import SurfaceReference
 from anthroforge.native import attachments, topology
 
-from . import assembly_graph, replacement_bindings, resource_storage, surface_providers
+from . import (
+    assembly_evidence,
+    assembly_graph,
+    replacement_bindings,
+    resource_storage,
+    surface_providers,
+)
+from .operations import parent_anchor
 
 
 class Bindings:
@@ -22,7 +29,7 @@ class Bindings:
         self.cancel = getattr(preparation.cancel, "handle", 0)
         self.source_meshes = dict(preparation.loaded.meshes)
         self.evidence: list[dict[str, Any]] = []
-        self.changed: set[str] = set()
+        self.changed: set[tuple[str, str]] = set()
 
     def assess(self) -> None:
         for row in self.p.mapping.rows:
@@ -35,16 +42,32 @@ class Bindings:
             row["key"], self.p.mapping.choices.get(row["source"], {})
         )
         choice = choice if isinstance(choice, dict) else dict(target=choice)
+        self.assess_support(row, choice)
+
+    def assess_support(self, row: Any, choice: Any) -> None:
         role = row["role"] or "SCP_GEOMETRY"
-        previous = SurfaceReference(row["source"], role)
+        previous = SurfaceReference(row["source"], role, row.get("instance", ""))
         current = SurfaceReference(row["target"], role, choice.get("instance", ""))
         same = self.equivalent(previous, current)
         captured = self.captured_owners(row)
+        moved = self.source_provider(previous).frame != self.destination_provider(current).frame
+        if not same or moved:
+            self.p.mapping.changed.update(self.affected_owners(row))
         if captured and not same and not choice.get("rebind", False):
             self.require_rebind(row["key"])
         elif captured and choice.get("rebind", False):
             for owner in captured:
                 self.rebind(owner, current.target)
+
+    def affected_owners(self, row: Any) -> set[str]:
+        return {
+            self.p.ids[owner]
+            for owner, values in self.p.mapping.replacements.items()
+            if any(
+                ref.target == row["source"] and ref.relationship == "support"
+                for ref, _, _ in values
+            )
+        }
 
     def require_rebind(self, key: str) -> None:
         self.p.mapping.findings.append(
@@ -62,10 +85,11 @@ class Bindings:
         result = set()
         for owner, replacements in self.p.mapping.replacements.items():
             for ref, _, _target in replacements:
-                if (ref.target, ref.role, ref.relationship) != (
+                if (ref.target, ref.role, ref.relationship, ref.instance) != (
                     row["source"],
                     row["role"],
                     "support",
+                    row.get("instance", ""),
                 ):
                     continue
                 item = self.p.source.document.registry.records.get(owner)
@@ -81,6 +105,15 @@ class Bindings:
         return topology.same_content(source.resource.mesh, target.resource.mesh, self.cancel)
 
     def source_provider(self, reference: SurfaceReference) -> Any:
+        from .assembly_evidence import retained_provider
+
+        document = self.p.source.document
+        retained = retained_provider(document, self.p.loaded, reference)
+        if retained is not None:
+            return retained
+        return self.package_provider(reference)
+
+    def package_provider(self, reference: SurfaceReference) -> Any:
         document = self.p.source.document
         item = document.object(reference.target)
         key = (
@@ -97,7 +130,7 @@ class Bindings:
         return surface_providers.snapshot(self.p.engine, document, self.source_meshes, reference)
 
     def rebind(self, owner: str, target: str) -> None:
-        if owner in self.changed:
+        if (owner, target) in self.changed:
             return
         before = self.document.object(owner)
         after = replacement_bindings.rebound(
@@ -105,17 +138,24 @@ class Bindings:
         )
         self.install(after)
         self.record_evidence(before, after, target)
-        self.changed.add(owner)
+        self.changed.add((owner, target))
 
     def record_evidence(self, before: Any, after: Any, target: str) -> None:
+        original = next(key for key, value in self.p.ids.items() if value == before.id)
+        source = self.p.source.document.object(original)
+        previous = assembly_evidence.locations(
+            source, self.source_provider, self.source_meshes, self.cancel
+        )
+        current = assembly_evidence.locations(
+            after, self.destination_provider, self.resources.meshes, self.cancel
+        )
         self.evidence.append(
-            dict(
-                owner=before.id,
-                target=target,
-                action="rebind",
-                before=locations(before),
-                after=locations(after),
-            )
+            dict(owner=before.id, target=target, action="rebind", before=previous, after=current)
+        )
+
+    def destination_provider(self, reference: Any) -> Any:
+        return surface_providers.snapshot(
+            self.p.engine, self.document, self.resources.meshes, reference
         )
 
     def install(self, item: Any) -> None:
@@ -125,6 +165,8 @@ class Bindings:
         self.document = replace(self.document, **{group: records})
 
     def roots(self) -> None:
+        if getattr(self.p, "selection", None) is None:
+            return
         for key in assembly_graph.roots(self.p.selection):
             item = self.document.entity(self.p.ids[key])
             if not item.parent:
@@ -141,10 +183,15 @@ class Bindings:
             if not self.p.options.get("rebind_roots", False):
                 self.require_rebind("destination_parent")
                 return
-        meshes = {k: a.mesh for k, a in self.resources.meshes.items()}
-        changed = attachments.capture(self.p.engine, item, parent, meshes, self.cancel)
+        changed = self.capture_root(item, parent)
         self.install(changed)
         self.record_evidence(item, changed, parent.id)
+
+    def capture_root(self, item: SCP, parent: SCP) -> SCP:
+        meshes = {k: a.mesh for k, a in self.resources.meshes.items()}
+        return attachments.capture(
+            self.p.engine, anchored(item, parent), parent, meshes, self.cancel
+        )
 
     def root_equivalent(self, source: SCP, parent: SCP) -> bool:
         previous = self.p.source.document.entity(source.parent)
@@ -182,19 +229,11 @@ def retained_root(source: SCP, item: SCP, ids: Any, assets: Any) -> SCP:
     )
 
 
-def locations(item: Any) -> list[dict[str, Any]]:
-    if hasattr(item, "bindings"):
-        return [
-            dict(
-                point=b.point,
-                target=b.target,
-                binding=list(b.attachment.binding) if b.attachment else [],
-            )
-            for b in item.bindings
-        ]
-    if hasattr(item, "binding"):
-        return [dict(position=list(item.resolved_position), target=item.binding.reference.target)]
-    return []
+def anchored(item: SCP, parent: SCP) -> SCP:
+    settings = parent_anchor(parent, item.attachment)
+    if not geometry_asset(item):
+        settings = replace(settings, child_mode="OBJECT_ORIGIN")
+    return replace(item, attachment=settings)
 
 
 def assess(preparation: Any, candidate: Any) -> tuple[dict[str, Any], ...]:

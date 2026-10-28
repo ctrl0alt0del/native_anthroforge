@@ -9,7 +9,7 @@ from anthroforge.core.jobs import Job, ObsoleteInputs
 from anthroforge.core.scheduling import Workload
 from anthroforge.native.mesh import NativeCancellation
 
-from . import assembly_preparation, assembly_source
+from . import assembly_preparation, assembly_repair, assembly_source
 
 
 @dataclass
@@ -41,6 +41,15 @@ class Assembly:
         self.cancel_preparation()
         self.preparation = State(str(uuid4()), state="preparing", document=self.source.document)
         worker = partial(prepare, self.source.source, tuple(selected), options, self.session.engine)
+        self.submit(self.preparation, worker, "assembly_prepare")
+        return self.status()
+
+    def resolve(self, mappings: dict[str, Any]) -> dict[str, Any]:
+        self.cancel_preparation()
+        self.preparation = State(
+            str(uuid4()), state="preparing", document=str(self.session.document.id)
+        )
+        worker = partial(assembly_repair.prepare, self.session.engine, mappings)
         self.submit(self.preparation, worker, "assembly_prepare")
         return self.status()
 

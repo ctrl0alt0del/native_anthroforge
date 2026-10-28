@@ -83,11 +83,11 @@ def reparent(session: "Session", entity: str, parent: str) -> None:
 
 
 def origin_if_empty(session: "Session", parent: str, settings: Attachment) -> Attachment:
-    return (
-        settings
-        if geometry_asset(session.document.entity(parent))
-        else replace(settings, parent_mode="OBJECT_ORIGIN")
-    )
+    return parent_anchor(session.document.entity(parent), settings)
+
+
+def parent_anchor(parent: SCP, settings: Attachment) -> Attachment:
+    return settings if geometry_asset(parent) else replace(settings, parent_mode="OBJECT_ORIGIN")
 
 
 def wrap_root(session: "Session", name: str = "Assembly") -> str:

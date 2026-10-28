@@ -51,7 +51,7 @@ def frame_reads(document: Any, targets: set[str]) -> set[str]:
         key = pending.pop()
         if not key or key in result:
             continue
-        item = document.object(key)
+        item = document.registry.records.get(key)
         result.add(key)
         if not isinstance(item, SCP):
             pending.append(getattr(item, "parent", "") or getattr(item, "follow", ""))

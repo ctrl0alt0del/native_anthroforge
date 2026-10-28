@@ -60,12 +60,14 @@ SCHEMAS: dict[type, dict[str, Field]] = {
     RoutingSettings: dict(obstacles=SUPPORT, excluded_obstacles=SUPPORT),
     parametric.Variable: dict(id=ID),
     fibers.Fiber: dict(attachment_asset=RESOURCE),
-    fibers.FiberBinding: dict(point=MAPPED, target=SUPPORT, material_asset=RESOURCE, instance=RULE),
+    fibers.FiberBinding: dict(
+        point=MAPPED, target=SUPPORT, material_asset=RESOURCE, instance=MAPPED
+    ),
     fibers.FiberEdit: dict(baseline=RESOURCE, rebind=MAPPED, offsets=MAPPED),
-    SurfaceReference: dict(target=SUPPORT, instance=RULE),
+    SurfaceReference: dict(target=SUPPORT, instance=MAPPED),
     SurfaceBinding: dict(material_asset=RESOURCE),
     CapturedSurface: dict(material_asset=RESOURCE),
-    Attachment: dict(material_asset=RESOURCE, parent_instance=RULE),
+    Attachment: dict(material_asset=RESOURCE, parent_instance=MAPPED),
     AttachmentReceipt: dict(parent=MAPPED, parent_asset=RESOURCE),
     junctions.Junction: dict(id=ID),
     junctions.PointRef: dict(curve=SOURCE, point=MAPPED),
@@ -98,7 +100,7 @@ SCHEMAS: dict[type, dict[str, Field]] = {
     shortcuts.AttachmentPolicy: dict(scope=Field("reference", "policy")),
     shortcuts.DescendantOverride: dict(target=Field("reference", "policy")),
     shortcuts.FormulaResult: dict(formula=MAPPED, pending=MAPPED),
-    mirroring.MirrorRule: dict(target=MAPPED),
+    mirroring.MirrorRule: dict(target=MAPPED, scope=MAPPED),
     mirroring.SharedMirrorTarget: dict(source=MAPPED, binding=MAPPED),
     mirroring.SymmetricHalf: dict(rule=RULE),
 }

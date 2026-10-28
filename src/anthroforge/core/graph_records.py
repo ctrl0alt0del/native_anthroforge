@@ -15,6 +15,7 @@ class Reference:
     path: tuple[str | int, ...]
     output: str = ""
     role: str = ""
+    instance: str = ""
 
 
 def walk(value: Any, path: tuple[str | int, ...] = ()) -> Any:
@@ -47,16 +48,17 @@ def references(value: Any) -> tuple[Reference, ...]:
 
 def field_references(item: Any, name: str, rule: Field, path: Any) -> list[Reference]:
     value, role = getattr(item, name), getattr(item, "role", "")
+    instance = getattr(item, "instance", "") if rule.relationship == "support" else ""
     values = enumerate(value) if isinstance(value, tuple) else ((None, value),)
     return [
-        make_reference(key, rule, (*path, name, *(() if i is None else (i,))), role)
+        make_reference(key, rule, (*path, name, *(() if i is None else (i,))), role, instance)
         for i, key in values
         if key
     ]
 
 
-def make_reference(target: str, rule: Field, path: Any, role: str) -> Reference:
-    return Reference(target, rule.relationship, rule.required, path, rule.output, role)
+def make_reference(target: str, rule: Field, path: Any, role: str, instance: str = "") -> Reference:
+    return Reference(target, rule.relationship, rule.required, path, rule.output, role, instance)
 
 
 def rewritten(

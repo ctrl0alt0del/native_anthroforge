@@ -9,6 +9,7 @@ from . import (
     assembly_bindings,
     assembly_copy,
     assembly_graph,
+    assembly_mirrors,
     assembly_resources,
     assembly_result_state,
     assembly_snapshots,
@@ -57,8 +58,9 @@ class Preparation:
         self.selection, rows = assembly_copy.selected(self.source, keys, attached, mappings)
         self.loaded = assembly_resources.load(self.source, self.selection, self.engine, self.cancel)
         self.ids = assembly_graph.identities(self.selection, self.loaded)
+        assembly_mirrors.allocate(self.source.document, self.selection, self.ids)
         self.mapping = Mappings(self.source, self.destination, self.ids, mappings)
-        self.mapping.assess(rows)
+        self.mapping.assess(tuple(row for row in rows if row.source not in self.ids))
         self.resources, self.assets = assembly_resources.transfer(self.loaded, self.ids)
         assembly_snapshots.retain(self)
 
@@ -68,6 +70,12 @@ class Preparation:
         for group, rows in values.items():
             self.values[group] = tuple(self.record(item, placement) for item in rows)
         self.resource_metadata(placement)
+        self.mirrors()
+
+    def mirrors(self) -> None:
+        document = self.source.document
+        self.values["mirror_rules"] = assembly_mirrors.copy(document, self.selection, self.ids)
+        self.values["shared_mirror_targets"] = assembly_mirrors.shared(document, self.ids)
 
     def record(self, item: Any, placement: Placement) -> Any:
         changed = graph_records.rewritten(item, self.ids, self.assets)

@@ -16,12 +16,15 @@ class MirrorRule:
     axis: str = "X"
     shift: float = 0.0
     override: bool = False
+    scope: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.target or self.axis not in ("X", "Y", "Z") or not isfinite(self.shift):
             raise ValueError("Mirror rules require a target, X/Y/Z axis and finite shift.")
         if any(type(v) is not bool for v in (self.enabled, self.inherit, self.override)):
             raise ValueError("Mirror participation settings must be Boolean.")
+        if len(set(self.scope)) != len(self.scope) or any(not key for key in self.scope):
+            raise ValueError("A retained import mirror rule needs distinct boundary sources.")
 
     @property
     def frame(self) -> tuple[float, ...]:

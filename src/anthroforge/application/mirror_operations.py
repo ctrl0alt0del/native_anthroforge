@@ -27,10 +27,16 @@ def queries(session: Any) -> dict[str, Any]:
 
 def planes(session: Any) -> list[dict[str, Any]]:
     return [
-        dict(asdict(rule), name=session.document.object(rule.target).name)
+        dict(asdict(rule), name=plane_name(session.document, rule))
         for rule in session.document.mirror_rules
         if rule.enabled or rule.override
     ]
+
+
+def plane_name(document: Any, rule: MirrorRule) -> str:
+    if rule.scope:
+        return "Imported · " + document.object(rule.scope[0]).name
+    return str(document.object(rule.target).name)
 
 
 def configure(session: Any, target: str, **values: Any) -> None:

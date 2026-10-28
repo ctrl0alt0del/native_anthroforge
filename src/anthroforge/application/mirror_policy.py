@@ -1,6 +1,6 @@
 """Shared removal safety and retained anatomical references for spatial instances."""
 
-from dataclasses import is_dataclass
+from dataclasses import is_dataclass, replace
 from typing import Any
 
 from anthroforge.core.mirroring import MirrorInstance, require_source
@@ -36,9 +36,21 @@ def retain_settings(document: Any, changes: dict[str, Any]) -> dict[str, Any]:
         for group in ("entities", "controls", "objects")
         for v in changes.get(group, getattr(document, group))
     }
-    rules = tuple(r for r in changes.get("mirror_rules", document.mirror_rules) if r.target in live)
-    shared = tuple(r for r in document.shared_mirror_targets if r.source in live)
+    rules = retained_rules(changes.get("mirror_rules", document.mirror_rules), live)
+    shared = tuple(
+        r
+        for r in changes.get("shared_mirror_targets", document.shared_mirror_targets)
+        if r.source in live
+    )
     return dict(changes, mirror_rules=rules, shared_mirror_targets=shared)
+
+
+def retained_rules(rules: Any, live: set[str]) -> tuple[Any, ...]:
+    return tuple(
+        replace(r, scope=tuple(k for k in r.scope if k in live)) if r.scope else r
+        for r in rules
+        if (set(r.scope) & live if r.scope else r.target in live)
+    )
 
 
 def references(value: Any) -> tuple[SurfaceReference, ...]:

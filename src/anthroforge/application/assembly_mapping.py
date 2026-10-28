@@ -5,7 +5,7 @@ from typing import Any, cast
 from uuid import uuid4
 
 from anthroforge.core import anatomical_surfaces, graph_records, numeric_properties
-from anthroforge.core.assembly import ExternalReference, ReferenceUse
+from anthroforge.core.assembly import ExternalReference, ReferenceUse, declaration
 from anthroforge.core.surface_references import SurfaceReference
 
 from . import assembly_graph, property_catalog
@@ -23,6 +23,7 @@ class Mappings:
     reads: set[str] = field(default_factory=set)
     rebind: set[str] = field(default_factory=set)
     rows: list[dict[str, Any]] = field(default_factory=list)
+    changed: set[str] = field(default_factory=set)
 
     def assess(self, boundaries: Any) -> None:
         for row in boundaries:
@@ -37,6 +38,7 @@ class Mappings:
         action = decision.get("action", "later")
         target = self.target(row, decision, action)
         external = declared(self.source.document, row, self.identities, target)
+        external = replace(external, instance=decision.get("instance", "") if target else "")
         if action != "detach":
             self.references.append(external)
         for owner, ref in row.uses:
@@ -65,11 +67,12 @@ class Mappings:
     def surface(self, reference: SurfaceReference) -> SurfaceReference:
         for replacements in self.replacements.values():
             for ref, _choice, target in replacements:
-                if ref.relationship == "support" and (ref.target, ref.role) == (
+                if ref.relationship == "support" and (ref.target, ref.role, ref.instance) == (
                     reference.target,
                     reference.role,
+                    reference.instance,
                 ):
-                    return replace(reference, target=target)
+                    return replace(reference, target=target, instance=_choice.get("instance", ""))
         return cast(SurfaceReference, graph_records.rewritten(reference, self.identities))
 
 
@@ -83,6 +86,7 @@ def describe(row: Any, choice: Any) -> dict[str, Any]:
         role=row.role,
         action=choice.get("action", "later"),
         target=choice.get("target", ""),
+        instance=row.instance,
     )
 
 
@@ -98,6 +102,7 @@ def declared(document: Any, row: Any, ids: Any, target: str) -> ExternalReferenc
         reference_uses(row, ids),
         target,
         row.property,
+        source_instance=row.instance,
         **details,
     )
 
@@ -112,7 +117,8 @@ def reference_uses(row: Any, ids: Any) -> tuple[ReferenceUse, ...]:
 def property_details(document: Any, reference: Any) -> dict[str, Any]:
     if reference is None:
         return {}
-    descriptor = property_catalog.resolve(document, reference)
+    pending = declaration(document.registry.records, reference.target)
+    descriptor = pending or property_catalog.resolve(document, reference)
     return dict(
         numeric_type=descriptor.numeric_type,
         dimension=descriptor.dimension,
@@ -126,19 +132,24 @@ def compatible(source: Any, destination: Any, row: Any, choice: Any, target: str
         property_compatible(source, destination, row.property, choice, target)
     elif row.role:
         anatomical_surfaces.reference(target, destination.registry.records, row.role)
+        from .mirror_surfaces import normalize
+
+        normalize(destination, SurfaceReference(target, row.role, choice.get("instance", "")))
     elif row.relationship in ("association", "policy", "stacking"):
         if target not in destination.registry.anatomy:
             raise ValueError("This relationship requires an anatomical target.")
-    elif row.relationship != "parent" and type(item) is not type(source.object(row.source)):
-        raise ValueError("Select a compatible destination object.")
+    elif row.relationship != "parent":
+        require_kind(item, row.kind)
 
 
 def property_compatible(
     source: Any, destination: Any, reference: Any, choice: Any, target: str
 ) -> None:
-    previous = property_catalog.resolve(source, reference)
+    previous = property_details(source, reference)
     selected = property_catalog.resolve(destination, mapped_property(reference, choice, target))
-    if property_signature(previous) != property_signature(selected):
+    if tuple(
+        previous[k] for k in ("numeric_type", "dimension", "components")
+    ) != property_signature(selected):
         raise ValueError(
             "Mapped properties must have matching numerical types, units and components."
         )
@@ -162,7 +173,17 @@ def patch_reference(item: Any, ref: Any, choice: Any, target: str) -> Any:
     if isinstance(parent, numeric_properties.PropertyRef):
         value = mapped_property(parent, choice, target)
         return graph_records.replace_at(item, ref.path[:-1], value)
+    if ref.relationship == "support" and hasattr(parent, "instance"):
+        value = replace(parent, target=target, instance=choice.get("instance", ""))
+        return graph_records.replace_at(item, ref.path[:-1], value)
     return graph_records.replace_at(item, ref.path, target)
+
+
+def require_kind(item: Any, kind: str) -> None:
+    from anthroforge.core.object_registry import kind as object_kind
+
+    if object_kind(item) != kind:
+        raise ValueError("Select a compatible destination object.")
 
 
 def disable_external_outputs(original: Any, item: Any, ids: Any) -> Any:

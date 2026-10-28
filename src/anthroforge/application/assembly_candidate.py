@@ -22,8 +22,17 @@ class ReadSet:
         if self.empty_hierarchy and document.entities:
             raise ObsoleteInputs("The destination now has anatomy; choose an import parent.")
         for key, value in self.records:
-            if document.registry.records.get(key) != value:
+            if read_record(document, key) != value:
                 raise ObsoleteInputs("A mapped destination changed; prepare the import again.")
+
+
+def read_record(document: Any, key: str) -> Any:
+    if key.startswith("mirror:"):
+        return document.mirrors.rules.get(key.removeprefix("mirror:"))
+    return next(
+        (v for v in (*document.driving_shortcuts, *document.shortcuts) if v.id == key),
+        document.registry.records.get(key),
+    )
 
 
 @dataclass(frozen=True)
@@ -59,6 +68,20 @@ def install(session: Any, candidate: Candidate) -> dict[str, Any]:
     updated = candidate.merge(session.document)
     for kind in Resources.__dataclass_fields__:
         getattr(session.resources, kind).update(getattr(candidate.resources, kind))
-    keys = (*candidate.additions, "imports", "external_references")
+    keys = (*candidate.additions, "external_references")
+    if isinstance(candidate, Candidate):
+        keys += ("imports",)
     session.replace_document(**{key: getattr(updated, key) for key in keys})
-    return dict(identities=candidate.identities, provenance=candidate.provenance.id, jobs=[])
+    return installed(session, candidate)
+
+
+def installed(session: Any, candidate: Any) -> dict[str, Any]:
+    from . import assembly_result_state, presentation
+
+    if isinstance(candidate, Candidate):
+        presentation.include_created(
+            session, set(candidate.identities.values()) & session.document.registry.records.keys()
+        )
+    jobs = assembly_result_state.schedule(session, candidate)
+    provenance = candidate.provenance.id if isinstance(candidate, Candidate) else ""
+    return dict(identities=candidate.identities, provenance=provenance, jobs=jobs)

@@ -31,7 +31,7 @@ def snapshot(p: Any, archive: Any, row: Any) -> Any:
     key = surface_asset(item, role)
     load(p, archive, key)
     provider = surface_providers.snapshot(
-        p.engine, source, p.loaded.meshes, SurfaceReference(item.id, role)
+        p.engine, source, p.loaded.meshes, SurfaceReference(item.id, role, row.source_instance)
     )
     return replace(row, surface_asset=p.assets[key], surface_frame=provider.frame)
 

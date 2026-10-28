@@ -34,6 +34,13 @@ the benchmark now preserves captured collagen and settings instead of assuming d
 The comparison isolates skin computation from known migration differences by using
 identical accepted anatomy; it is not a new Blender-project migration parity claim.
 
+First pair completed: app 198.235 s (0.743 fields, 0.229 scene, 123.460 envelope,
+73.803 binding); actual Blender 5.0.1/Python 3.11 addon worker 193.057 s. All vertex,
+triangle and six common binding buffers have identical hashes: 1,691,842 vertices /
+3,384,244 triangles. Source coverage/gap checks pass; the shared mesh is not watertight
+or orientable. Do not hide those defects behind parity success. Second Blender run
+192.067 s; further controlled trials and actual rendered inspection remain pending.
+
 ### Optimization results, October 28 — source/runtime qualified
 
 All six CTests and the complete development gate pass: 2,570 Python tests, native style,

@@ -24,9 +24,16 @@ The missing boundary is a multi-object candidate evaluation context, not a new o
 Existing mesh replacement evaluates one target and propagates only after commit; existing
 report replay creates a separate Session and is not the candidate execution architecture.
 
+Initial contracts and graph-copy increment is implemented: one-to-one provenance matching,
+ambiguous-match protection, identity-preserving SCP replacement, explicit additions and owned
+candidate evaluation adapters. Evaluator adapters are not yet connected to public operations;
+binding/control review, complete lifecycle/UI/qualification remain unfinished.
+
 ## Verification
 
-Not yet run. Main is synchronized with origin. Unrelated root `__init__.py` preserved.
+`uv run --no-sync pytest tests/test_skeleton_update_contracts.py tests/test_skeleton_update_graph.py tests/test_architecture.py -q`:
+9 passed on Windows with qualified native DLL. Full gate not yet run. Main is synchronized
+with origin. Unrelated root `__init__.py` preserved.
 All GUI/testing remains background/offscreen. No interactive acceptance will be claimed.
 
 ## Next actions

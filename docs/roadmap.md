@@ -1,5 +1,11 @@
 # AnthroForge release roadmap
 
+- **0.4.2 — recommendation audit complete; implementation scope not selected:**
+  [coverage of all 66 requirements and 132 source items](recommendations_042_audit.md)
+  identifies unfinished workflow extensions, performance candidates requiring measurement,
+  and larger deferred assembly/reconstruction work. This is documentation only, not a
+  commitment to implement the entire remaining list or a new release qualification.
+
 - **0.4.1 — qualified skin audit corrections:** restore draft-based
   reference preparation, final diagnostics, achieved topology budgets, persistent FAST
   weights, effective inherited settings, envelope reset and moving-region fit summaries.

@@ -4,7 +4,7 @@ import json
 import os
 from pathlib import Path
 
-from PySide6.QtCore import QSizeF, QUrl
+from PySide6.QtCore import QObject, QSizeF, QUrl
 from PySide6.QtGui import QColor, QGuiApplication
 from PySide6.QtQml import QQmlComponent
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -106,6 +106,7 @@ def inspector(app, controller, renderer):
     panel.setParentItem(renderer.window.contentItem())
     panel.setSize(QSizeF(360, 960))
     settle(app, controller, renderer, "inspector")
+    assert panel.findChild(QObject, "placementNormalDistance").property("value") == "1.5000 m"
     panel.deleteLater()
 
 

@@ -38,9 +38,8 @@ class VolumeInspectionTools(QObject):
         if self.frozen is session.document:
             return
         value = session.tissue_inspection.values.get("volume")
-        stamp = (
-            (session, session.document, value.job, value.state, id(value.asset)) if value else None
-        )
+        state = (value.job, value.state, id(value.asset)) if value else None
+        stamp = session, session.document, state
         if stamp == self.receipt:
             return
         self.receipt = stamp

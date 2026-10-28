@@ -71,7 +71,7 @@ def decorate(tool, values):
 
 
 def place(tool, row, evidence):
-    from . import tissue_inspection_scene as scene
+    from . import inspection_scene as scene
 
     row.update(scene.placement(tool.controller.session, evidence["frames"][row["owner"]]))
     row["content"] = scene.content(row, row["mesh_handle"])

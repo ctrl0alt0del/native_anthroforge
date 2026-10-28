@@ -25,15 +25,15 @@ def inspect(engine: Any, handles: Any, frames: Any, request: Any, ray: bool, can
 
 def record(row: Any) -> dict[str, Any]:
     return dict(
-        hit=row[0] >= 0,
+        hit=bool(row[0] >= 0),
         triangle=int(row[0]),
-        distance=row[1],
+        distance=float(row[1]),
         position=row[2:5].tolist(),
         normal=row[5:8].tolist(),
         accepted=row[8:11].tolist(),
-        signed_normal_distance=row[11],
-        approach_cosine=row[12],
+        signed_normal_distance=float(row[11]),
+        approach_cosine=float(row[12]),
         query_triangle=int(row[13]),
         qualified_copy=bool(row[14]),
-        requested_distance=row[15],
+        requested_distance=float(row[15]),
     )

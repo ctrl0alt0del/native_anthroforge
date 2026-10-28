@@ -1,5 +1,11 @@
 # AnthroForge architecture
 
+0.4.2 extends [shared status and spatial inspection](inspection_042.md). Application-owned
+eligibility is shared by commands and UI. Accepted surface descriptors and witnesses feed
+generic inspection strategies through the existing coordinator. Native diagnostics return
+owned evidence, never authored geometry changes. Desktop filters/cameras remain view-local;
+frozen exports retain matching measurements, section planes, revisions and geometry resources.
+
 See the [current addon functionality audit](addon_functionality_audit.md) for implemented
 families and missing authoring details, and [known parity findings](addon_parity_findings.md)
 for source-frame, effective-policy and child-anchor fidelity defects. The distinction

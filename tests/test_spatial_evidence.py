@@ -1,8 +1,11 @@
 """Shared, revision-qualified surface findings never mutate the inspected document."""
 
+from dataclasses import replace
+
 import pytest
 
 from anthroforge.application import inspection_report, inspection_surfaces
+from anthroforge.core.skin import SkinStage
 from tests.test_tissue_interaction import controller as controller
 
 
@@ -58,3 +61,20 @@ def test_surface_eligibility_rejects_grouping_and_curve(session):
     assert not inspection_surfaces.eligibility(session, root).available
     with pytest.raises(ValueError, match="surface"):
         session.command("geometry.check", target=root)
+
+
+def test_skin_witness_has_own_stage_and_retains_skin_outputs(controller, tmp_path):
+    session = controller.session
+    target = crossing(session, tmp_path)
+    asset = session.document.entity(target).result.asset
+    session.replace_document(skin=replace(session.document.skin, final=SkinStage(asset=asset)))
+    before = session.document
+    row = finding(session, "skin")
+    assert row["target"] == inspection_surfaces.skin_id(before) and row["stage"] == "final"
+    controller.spatial_evidence.show(row["id"])
+    controller.section_tools.inspect("skin", "final")
+    controller.surface_measurements.show("skin", "final")
+    controller.surface_measurements.submit()
+    session.wait()
+    controller.surface_measurements.synchronize()
+    assert session.document is before and controller.surface_measurements.report["extents"]

@@ -144,6 +144,7 @@ class Controller(QObject):
         self.image_model.activated.connect(self.activate_geometry)
         prepare_picking(self)
         prepare_images(self)
+        self.surface_measurements.watch_display()
 
     def initialize_image_layers(self):
         from .render_layer import RenderLayer

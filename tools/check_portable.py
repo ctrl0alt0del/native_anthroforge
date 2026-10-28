@@ -26,6 +26,7 @@ from projects_portable import projects
 from PySide6.QtGui import QImage
 from shortcuts_portable import shortcuts
 from skin_portable import qualify as skin
+from spatial_inspection_portable import spatial_inspection
 from tissue_portable import tissues
 from workflow_portable import workflow
 
@@ -61,6 +62,7 @@ CHECKS = (
     "Fiber pins/supports/cold routing, mirrored tubes, SCP split/replacement and tissue retarget",
     "recent-project history, asynchronous recovery capture and discovery with original retention",
     "skin build, native proxy workers, isolated fitting, persisted playback and OBJ quads",
+    "spatial measures, qualified volume samples, placement explanation and frozen view export",
 )
 
 
@@ -157,8 +159,7 @@ def qualification_steps():
         curve_edits,
         profiling,
         issues,
-        workflow,
-        inspection,
+        *inspection_steps(),
         *construction_steps(),
         exterior_placement,
         feedback,
@@ -179,6 +180,10 @@ def construction_steps():
         tissues,
         skin,
     )
+
+
+def inspection_steps():
+    return workflow, inspection, spatial_inspection
 
 
 def deletion(executable, cwd, invoke=invoke):

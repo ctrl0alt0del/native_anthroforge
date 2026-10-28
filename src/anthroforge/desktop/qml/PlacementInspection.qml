@@ -17,13 +17,16 @@ UiSection {
     UiDetail { label:"Preview"; value:panel.preview.name || "—" }
     UiDetail { label:"Confirmed"; value:panel.confirmed.name || (panel.report.preview ? "No exterior hit" : "—") }
     UiDetail { label:"Preview XYZ"; value:panel.vector(panel.preview.position) }
+    UiDetail { label:"Requested XYZ"; value:panel.vector(panel.report.requested) }
     UiDetail { label:"Accepted XYZ"; value:panel.vector(panel.confirmed.accepted) }
     UiDetail { label:"Displacement"; value:panel.length(panel.report.displacement?.[3]) }
     UiDetail { label:"Support distance"; value:panel.length(panel.report.support_distance) }
+    UiDetail { objectName:"placementNormalDistance"; label:"Normal distance"; value:panel.length(panel.confirmed.hit ? panel.confirmed.signed_normal_distance : undefined) }
+    UiDetail { label:"Preview / confirmed face"; value:panel.preview.hit ? String(panel.preview.triangle)+" / "+(panel.confirmed.hit ? String(panel.confirmed.triangle) : "—") : "—" }
     UiDetail { label:"Approach"; value:panel.confirmed.hit ? (panel.confirmed.approach_cosine < 0 ? "Toward face front" : "From face back or tangent") : "—" }
     UiDetail { label:"Query surface"; value:panel.confirmed.hit ? (panel.confirmed.qualified_copy ? "Exterior copy; original retained" : "Qualified original") : "—" }
     UiDetail { label:"Revision"; value:panel.confirmed.hit ? String(panel.confirmed.revision) : "—" }
-    UiHelp { explanation:"This checks placement now, not the original gesture. Yellow lines show the requested ray and candidate faces. A changed candidate identifies which preview face was excluded or superseded; no automatic repair occurs." }
+    UiHelp { explanation:"This checks placement now, not the original gesture. Yellow lines show the request and candidate faces. Normal distance measures the request along the face normal: positive is in front. It is local approach evidence, not an inside/outside test or a guaranteed escape route. A changed face identifies the preview candidate excluded or superseded by exterior placement." }
     UiNotice { text:panel.report.error || panel.tool.state.error || (panel.tool.state.state==="stale" ? "Surface changed. Click again for current evidence." : ""); error:true }
     UiButton { text:"Locate accepted surface"; enabled:!!panel.confirmed.reference; Layout.fillWidth:true; onClicked:workspace.inspectionPanel.navigate(panel.confirmed.reference.instance || panel.confirmed.reference.target,true) }
     UiButton { text:"Review fiber pin repairs"; visible:workspace.selectedData.kind==="FIBER"; Layout.fillWidth:true; onClicked:workspace.issuePanel.reviewPins(workspace.selectedId) }

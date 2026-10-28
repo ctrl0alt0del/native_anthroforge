@@ -19,6 +19,10 @@ It leaves numerical evaluation and scheduling policy unchanged.
 The 0.4.1 audit corrections and portable qualification are complete.
 The existing addon remains the numerical baseline.
 
+0.4.2 extends advisory inspection (Q05, G03, A01–A03), not production geometry:
+native extents/section spans, scale/topology metrics, existing preview/confirmed placement
+witnesses and bounded qualified-volume samples. See the dated record below.
+
 The inventory groups operations by computational responsibility, rather than listing
 every function, command alias or UI button. It includes numerical construction,
 interactive geometry queries, evaluation coordination and supporting workloads.
@@ -3586,3 +3590,35 @@ Whole-body FAST weight reuse: cold 113.638 s / new-process warm 17.257 s, 128 ha
 identical positions/diagnostics/prediction hash. A single pair during packaging establishes
 reuse, not a controlled speedup estimate. The unchanged BBW iteration-limit messages on
 cold computation remain; caching does not strengthen convergence or geometry guarantees.
+
+### Advisory spatial inspection — 2026-10-28 (0.4.2; Q05, G03, A01–A03)
+
+Previously spatial triangle witnesses were tissue-specific; generic dimensions and section
+spans, unified preview/confirmed placement explanation and qualified sample containment had
+no shared inspection workflow. Production geometry and placement were not defective here.
+
+Added native world bounds/axes, triangle-edge and scale metrics, and U/V contour spans using
+the existing plane-intersection implementation. Added batched placement evidence using the
+same preview/confirmed meshes, snapping offset and original-material mapping as production.
+Added explicit CGAL closed-volume point classification after existing suitability checks,
+with up to 512 deterministic source vertices and nearest distances. Invalid/open/nested/
+intersecting volumes remain unavailable; samples do not establish full containment or a
+minimum separating translation. No automatic repair, inflation, routing, attachment or skin
+algorithm changed. Query cancellation follows the existing coordinator and native checkpoints;
+bulk CGAL stages are not instantaneously interruptible.
+
+Shared application surface/witness contracts retain assets, frames and revisions. Read-only
+jobs freeze inputs at dispatch and reject stale publication. View-local neighborhood filters
+leave workspaces and priorities intact; exports freeze the same evidence and section plane.
+Stable measurement views reuse projection; existing replacement guards now expose their own
+eligibility to both UI and commands, without a new scheduler or status polling loop.
+
+Evidence: sealed-cavity placement agrees with actual confirmed material capture; bindings
+and source vertices remain exact. Transformed/mirrored extents, section spans, closed-volume
+samples, open/nested rejection, cancellation, stale inputs and frozen-view restoration are
+covered in maintained tests. Offscreen QML images show axes/cutaways and placement witnesses.
+A production 58-SCP/96-tissue read-only capture preserved the exact document/history: native
+measurements 0.23–0.35 ms, section spans 0.18–0.23 ms, placement 0.11–0.20 ms and sampled volume
+classification 6.15 ms. Requests took 9–34 ms including orchestration, with unrelated checks
+active. These are observations, not controlled benchmarks or interactive-latency evidence.
+The task record contains complete qualification and remaining evidence limits.

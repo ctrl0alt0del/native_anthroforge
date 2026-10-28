@@ -1,17 +1,17 @@
 # AnthroForge release roadmap
 
-- **0.4.2 — recommendation audit complete; implementation scope not selected:**
-  [coverage of all 66 requirements and 132 source items](recommendations_042_audit.md)
-  identifies unfinished workflow extensions, performance candidates requiring measurement,
-  and larger deferred assembly/reconstruction work. This is documentation only, not a
-  commitment to implement the entire remaining list or a new release qualification.
+- **0.4.2 — selected inspection extensions:** R01–R03 and R06 from the
+  [complete recommendation audit](recommendations_042_audit.md): shared replacement status,
+  spatial findings, placement explanation, dimensions/sections and temporary neighborhood
+  inspection. [Workflow and limits](inspection_042.md), [qualification](tasks/inspection-workflows-042.md).
+  Other audit entries remain unselected.
 
 - **0.4.1 — qualified skin audit corrections:** restore draft-based
   reference preparation, final diagnostics, achieved topology budgets, persistent FAST
   weights, effective inherited settings, envelope reset and moving-region fit summaries.
   See [scope and evidence](tasks/release-041.md) and [workflow](skin_workflow.md).
 
-- **Later status-provider work — confirmed direction, not implemented:** extend shared,
+- **Status-provider direction — replacement integration in 0.4.2:** extend shared,
   operation-specific status providers to other functionality whose UI currently derives
   readiness, warnings or availability from workspace/document state. Inventory existing
   consumers and reuse their notifications and shared policies; do not introduce global

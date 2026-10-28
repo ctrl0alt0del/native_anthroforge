@@ -26,3 +26,9 @@ Cancellation is checked between arrangement stages and during output constructio
 A running exact intersection-remeshing call completes before observing cancellation.
 The query mesh is transient, cached with bounded retained-resource accounting, and
 never replaces authored, displayed, serialized or material-reference geometry.
+
+0.4.2 adds `inspection.cpp`: an AnthroForge-owned, read-only adapter over the pinned
+CGAL `Side_of_triangle_mesh` API. Existing suitability checks reject ambiguous volume
+inputs before point classification. No new package, Boolean algorithm, production
+placement rule or geometry rewrite is introduced. Samples are not whole-mesh containment
+certificates. [API assumptions](https://doc.cgal.org/6.1/Polygon_mesh_processing/index.html).

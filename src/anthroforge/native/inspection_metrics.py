@@ -41,11 +41,11 @@ def report(values: Any, counts: Any, lines: Any) -> dict[str, Any]:
 
 def conditioning(values: Any, counts: Any) -> dict[str, Any]:
     return dict(
-        minimum_edge=values[9],
-        maximum_edge=values[10],
-        minimum_triangle_quality=values[11],
-        transform_condition=values[12],
-        offset_extent_ratio=values[13],
+        minimum_edge=float(values[9]),
+        maximum_edge=float(values[10]),
+        minimum_triangle_quality=float(values[11]),
+        transform_condition=float(values[12]),
+        offset_extent_ratio=float(values[13]),
         edges=int(counts[0]),
         boundary_edges=int(counts[1]),
         nonmanifold_edges=int(counts[2]),

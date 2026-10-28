@@ -16,6 +16,7 @@ class SurfaceMeasurementTools(QObject):
         self.report, self.context, self.receipt, self.error = {}, None, None, ""
         self.frozen = None
         self.input_cache = None
+        self.selection = ""
         self.volumes = VolumeInspectionTools(controller)
         self.volumes.changed.connect(self.changed)
         self.timer = QTimer(self)
@@ -39,18 +40,41 @@ class SurfaceMeasurementTools(QObject):
 
     @Slot(result="QVariantMap")
     def snapshot(self):
+        report = self.report if self.displayed() else {}
         return dict(
             self.state,
-            lines=self.report.get("lines", []),
-            section=self.report.get("section", {}),
+            lines=report.get("lines", []),
+            section=report.get("section", {}),
             volume=self.volumes.report.get("lines", []),
         )
+
+    def displayed(self):
+        selected = self.report.get("surface", {})
+        models = self.display_models()
+        return any(
+            row.get("geometry_asset") == selected.get("asset")
+            and (row.get("owner") or row["id"]) == selected.get("target")
+            for model in models
+            for row in model.displayed
+        )
+
+    def display_models(self):
+        return (
+            self.controller.render_model,
+            self.controller.tissue_inspection.model,
+            self.controller.spatial_evidence.model,
+        )
+
+    def watch_display(self):
+        for model in self.display_models():
+            model.activated.connect(self.changed.emit)
 
     @Slot(str, str)
     def show(self, target, stage):
         self.enabled, self.target, self.stage = True, target, stage
         self.context = None
         self.frozen = None
+        self.selection = self.controller.selection
         self.synchronize()
 
     @Slot()
@@ -88,6 +112,8 @@ class SurfaceMeasurementTools(QObject):
         self.volumes.synchronize()
         if not self.enabled:
             return
+        if self.controller.selection != self.selection:
+            return self.cancel()
         try:
             key = self.input_key()
             if self.frozen == key:
@@ -134,4 +160,5 @@ class SurfaceMeasurementTools(QObject):
         surface = report["surface"]
         self.enabled, self.target, self.stage = True, surface["target"], surface["stage"]
         self.report, self.frozen = report, self.input_key()
+        self.selection = self.controller.selection
         self.changed.emit()

@@ -39,11 +39,11 @@ Keep testing background/offscreen; no desktop control. Preserve root `__init__.p
 
 ## Current state
 
-R01 first increment implemented: immutable shared Eligibility records, replacement
-start/apply assessment shared by API and Qt, and revision/context-keyed desktop
-projection using existing refresh events. No additional polling, queue or policy manager.
-Replacement approvals, candidate ownership and commits retain their existing semantics.
-The UI presents reasons in existing button hints. R02/R03/R06 remain pending.
+All four runtime increments are integrated. The [workflow](../inspection_042.md) documents
+shared replacement status, stage-qualified spatial findings, preview/confirmed and bound-point
+placement explanations, dimensions/sections, sampled containment and temporary neighborhood
+views. Production geometry and attachment behavior remain unchanged. Release qualification
+and canonical packaging are in progress; this is not yet a completed release.
 
 ## Verification
 
@@ -63,10 +63,9 @@ Do not claim interactive desktop acceptance from hidden/offscreen checks.
 
 ## Next actions
 
-1. Trace replacement assessment/guard/desktop refresh events and implement R01.
-2. Establish shared spatial witness ownership and implement R02/R03/R06 integration.
-3. Qualify complete desktop/headless workflows; document evidence and remaining limits.
-4. Release one canonical 0.4.2 package only after acceptance, then validated merge/push.
+1. Finish the final development gate and canonical package qualification.
+2. Record actual results, review ownership/coupling, check documentation links.
+3. Validate against current main, merge/push normally, and deliver one canonical 0.4.2 package.
 
 The containing commit identifies the checkpoint; inspect Git history for push state.
 
@@ -110,3 +109,20 @@ The containing commit identifies the checkpoint; inspect Git history for push st
   without QML warnings or a visible window. Images live in `build/inspection-042/`.
 - Full development gate is running; profiling, final ownership review and canonical
   packaging remain. This is an incomplete recovery checkpoint, not release acceptance.
+
+## Runtime completion and qualification checkpoint
+
+- First full gate: 2,618 passed, three failed. One style failure was a newly added test
+  exceeding 15 lines. Two stacking-view failures exposed a caller left on the former
+  tissue-specific scene helper. Corrected at the shared helper import; all affected tests pass.
+- Seventeen spatial tests and the existing stacking/replacement suites pass. Added skin
+  witness/measurement coverage and cached idle projection checks. Actual QML rendering exposed
+  NumPy scalar presentation; native adapters now return built-in scalar types. JSON exports
+  and the displayed normal-distance field are covered.
+- Profiler evidence: the 58-SCP/96-tissue project remains the identical document/history after
+  all read-only requests. Native metrics/section/placement calls are sub-millisecond; qualified
+  sampled volume classification took 6.15 ms in one run. Complete requests took 9–34 ms, with
+  unrelated checks active. See `build/inspection-042/production-timings.json` and its profile.
+- Dimensions/witnesses wait for their corresponding staged geometry. Neighborhood membership
+  refreshes on relationship changes. Frozen export restores clipping, axes and its camera.
+- Version is prepared as 0.4.2; final gate and packaging remain. No release/merge claim yet.

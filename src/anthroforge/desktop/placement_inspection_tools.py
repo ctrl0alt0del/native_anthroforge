@@ -68,9 +68,8 @@ class PlacementInspectionTools(QObject):
         if self.frozen is not None and self.frozen == scene_signature(session.document):
             return
         value = session.tissue_inspection.values.get(self.kind)
-        context = (
-            (session, session.document, value.job, value.state, id(value.asset)) if value else None
-        )
+        state = (value.job, value.state, id(value.asset)) if value else None
+        context = session, session.document, state
         if context == self.context:
             return
         self.context = context

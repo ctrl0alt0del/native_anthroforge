@@ -1,5 +1,7 @@
 """Diagnostic placement reuses the exact preview/confirmed queries and preserves bindings."""
 
+import json
+
 import numpy as np
 import pytest
 
@@ -35,6 +37,7 @@ def test_ray_inspection_preserves_document_and_binding(session):
     result = inspect_ray(session, target, curve)
     assert result["state"] == "ready", result
     report = result["report"]
+    assert json.loads(json.dumps(report))["confirmed"]["hit"]
     assert report["confirmed"]["approach_cosine"] == pytest.approx(-1)
     assert report["displacement"][3] == pytest.approx(0)
     assert session.document is before and session.history.cursor == history

@@ -51,3 +51,20 @@ def test_mirrored_automatic_provider_maps_to_its_explicit_surface_instance(sessi
     assert candidate.ready and copied.final_result.status == "ready"
     assert MirrorInstance(first, bone).id in copied.stack_plan.providers
     assert any(r.source_instance == bone and r.instance == bone for r in candidate.references)
+
+
+def test_inactive_stack_intent_does_not_block_unaffected_output():
+    from dataclasses import replace
+
+    from anthroforge.core.results import Port
+    from anthroforge.core.tissue_dependencies import plan_inputs
+    from anthroforge.core.tissue_stacking import StackRelationship
+    from anthroforge.core.tissues import TissueVCP
+
+    item = TissueVCP(
+        source="membrane", stacking=True, stack_relationships=(StackRelationship("missing"),)
+    )
+    assert Port("missing", "final") in plan_inputs(item, {})
+    assert Port("missing", "final") not in plan_inputs(replace(item, stacking=False), {})
+    negative = replace(item, stack_relationships=(StackRelationship("missing", excluded=True),))
+    assert Port("missing", "final") not in plan_inputs(negative, {})

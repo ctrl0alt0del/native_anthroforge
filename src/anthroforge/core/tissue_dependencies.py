@@ -67,7 +67,12 @@ def final_inputs(item: TissueVCP) -> set[Port]:
 
 
 def plan_inputs(item: TissueVCP, records: Mapping[str, ObjectRecord]) -> set[Port]:
-    required = {*item.stack_plan.providers, *(r.other for r in item.stack_relationships)}
+    required = {
+        *item.stack_plan.providers,
+        *(r.other for r in item.stack_relationships if not r.excluded),
+    }
+    if not item.stacking:
+        required.clear()
     missing = {Port(key, "final") for key in required if source_identity(key) not in records}
     return {Port(item.id, "intrinsic"), Port(item.id, "stack_scope")} | missing
 

@@ -1,5 +1,12 @@
 # Skin source kernels
 
+0.4.1 imports `af_mesh_diagnostics.hpp` for advisory final-skin intersection checks.
+Its source hash is retained in `sources.json`. Only the cancellation field is adapted
+to `KernelCancellation`; pair thresholds, shared-vertex exclusions, contact counts,
+50-million-pair limit and bounded witnesses are unchanged. Clearance uses the existing
+addon world-nearest query with its original open-surface semantics. These findings
+cannot repair geometry or establish complete volume penetration freedom.
+
 These headers are pinned copies of the maintained addon gap/tile/binding/quality
 kernels at the source revision and hashes in `sources.json`. They remain GPL-3.0-or-later.
 `native/src/skin_kernel.hpp` includes them privately alongside the already-pinned triangle

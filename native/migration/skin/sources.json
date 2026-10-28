@@ -2,6 +2,10 @@
   "source": "AnthroForge addon/native/fiber_ccd",
   "files": [
     {
+      "name": "af_mesh_diagnostics.hpp",
+      "sha256": "8c457502ee8272fc33f0bda53d1550f4b5866372e9a7e517c13263648dc85153"
+    },
+    {
       "name": "af_skin_bind.hpp",
       "sha256": "65c6dd602940f444cc2245885e87cd38365283d902c4ccef32339b15ac538d2e"
     },

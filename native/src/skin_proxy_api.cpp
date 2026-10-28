@@ -10,3 +10,9 @@ uint64_t af_skin_proxy_decimate(uint64_t handle,int target,uint64_t budget,uint6
         return af::retain(af::blender_mesh::decimate(*mesh,target,cancel));
     } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
 }
+uint64_t af_skin_reference_proxy(uint64_t handle,uint64_t cancel) {
+    try {
+        af::check_cancel(cancel); const auto mesh=af::mesh(handle);
+        return af::retain(af::blender_mesh::decimate(*mesh,64000,cancel,0.f));
+    } catch(const std::exception& error) { af::set_error(error.what()); return 0; }
+}

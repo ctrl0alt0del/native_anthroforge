@@ -37,6 +37,7 @@ def edit_reason(session, target):
 
 def topology(item, document):
     return dict(
+        effective=asdict(skin_operations.effective_settings(document, item.id)),
         fiber=isinstance(item, Fiber),
         flow_available=isinstance(item, Fiber) and not item.closed,
         budget_errors=list(skin_budgets.errors(document)),

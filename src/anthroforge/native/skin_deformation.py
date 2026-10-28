@@ -6,6 +6,7 @@ from typing import Any, cast
 
 import numpy as np
 
+from . import skin_weight_cache
 from .mesh import D, U, doubles, pointer
 from .skin_fields import INT
 
@@ -71,8 +72,9 @@ class Preparation:
         data = inputs(arrays)
         self.points, self.samples = len(data[2]), len(data[3])
         value = definition(data, settings, self.folder.name)
-        self.handle = int(engine.library.af_skin_deformation_prepare(c.byref(value), cancel))
-        engine.check(not self.handle)
+        self.handle, self.cache_status = skin_weight_cache.prepare(
+            engine, value, data, settings, self.folder.name, cancel
+        )
         if engine.resource_observer is not None:
             engine.resource_observer(self)
 

@@ -91,3 +91,38 @@ def unusable_regions(plan: skin_budgets.Plan, density: native.Density) -> tuple[
         for row, bad in zip(plan.regions, density.unusable, strict=True)
         if bad
     )
+
+
+def achieved(field: Field, envelope: Any, mesh: Any, cancel: int) -> list[dict[str, Any]]:
+    owners, _ = ownership.sample(
+        envelope, mesh, field.ownership.owners, field.density.lengths, cancel
+    )
+    counts = native.achieved(
+        mesh, owners, field.plan.owner_regions, len(field.plan.regions), cancel
+    )
+    return budget_rows(field, counts)
+
+
+def budget_rows(field: Field, counts: Any) -> list[dict[str, Any]]:
+    return [
+        dict(
+            owner=row.owner,
+            requested=row.requested,
+            exclusive=row.exclusive,
+            actual_exclusive_quads=int(count),
+            area=float(area),
+        )
+        for row, count, area in zip(
+            field.plan.regions, counts, field.density.region_areas, strict=True
+        )
+    ]
+
+
+def budget_warnings(rows: Any) -> tuple[str, ...]:
+    return tuple(
+        f"Topology budget for {row['owner'] or 'root remainder'} resolved to "
+        f"{row['actual_exclusive_quads']}/{row['exclusive']} quads."
+        for row in rows
+        if row["exclusive"]
+        and abs(row["actual_exclusive_quads"] - row["exclusive"]) / row["exclusive"] > 0.2
+    )

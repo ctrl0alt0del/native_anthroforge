@@ -99,6 +99,7 @@ EDITS = {
     "skin.fit.remove": skin_fit_results.remove,
     "skin.build": skin_jobs.build,
     "skin.configure": skin_operations.configure,
+    "skin.envelope.reset": skin_operations.reset_envelope,
     "skin.contributor.configure": skin_operations.contributor,
     "mirror.loop.create": symmetric_paths.create,
     "mirror.configure": mirror_operations.configure,

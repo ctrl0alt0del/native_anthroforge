@@ -54,7 +54,11 @@ def finish_construction(
         *context, output["envelope"].mesh, cancel
     )
     output["final"] = skin_reference_evaluation.initialize(
-        *context, output["topology"].mesh, cancel, options.skin_tissue_surface
+        *context,
+        output["topology"].mesh,
+        cancel,
+        options.skin_tissue_surface,
+        envelope=output["envelope"].mesh,
     )
 
 

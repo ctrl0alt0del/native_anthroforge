@@ -94,3 +94,13 @@ int af_skin_topology_quality(uint64_t handle,uint64_t source,const int* regions,
         af::skin_validation::inspect(*mesh,*envelope,regions,guide_faces,patches,plane,output,cancel); return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_skin_deformed_quality(uint64_t handle,double* output,uint64_t cancel) {
+    try {
+        if(!output) throw std::runtime_error("Missing skin deformation quality output.");
+        af::check_cancel(cancel); const auto mesh=af::mesh(handle);
+        const auto topology=af::skin_validation::edges(*mesh,cancel);
+        std::fill(output,output+16,0); output[0]=mesh->vertices.allFinite(); output[1]=topology.quads;
+        output[5]=topology.degenerates==0; output[15]=topology.degenerates;
+        af::skin_validation::edge_quality(topology,0,output,cancel); return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}

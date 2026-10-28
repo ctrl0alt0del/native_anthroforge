@@ -59,8 +59,20 @@ introduce a universal status manager, polling, or a second authoritative eligibi
 
 ## Current state and initial inventory
 
-No runtime changes have been made at this checkpoint. Release version changes follow
-qualification; schema 7 remains sufficient for these corrections.
+Runtime integration is in progress. Shared effective settings/reset/fit summaries,
+reference source selection and Decimate, native budget counts, persistent FAST weights,
+and final diagnostics are connected. Release version changes follow qualification;
+schema 7 remains sufficient for these corrections.
+
+Checkpoint evidence: native build and six CTests pass; 26 focused Python tests pass,
+including the 15-line limit, reference/update identity, undo, solver parity and UI projection.
+Actual addon reference Decimate on 4,481,616 torso triangles matches existing native
+Decimate exactly at 64,000 triangles (33.102 s app, 35.416 s Blender). Match Blender's
+eight edge-ordering partitions: a four-thread oracle produced different collapse order.
+The new dedicated reference adapter additionally removes topology's 1% floor and
+preserves Blender float conversion even below target; qualification of that adapter,
+new diagnostics, persistent-cache corruption/restart, budget counts, full gate and package
+remain pending. Outputs are under `build/skin-041`; do not claim release acceptance yet.
 The following are observed ownership boundaries, not claims that their current results
 are wrong. Existing shared policies should be reused, not replaced with parallel checks.
 

@@ -25,10 +25,21 @@ def selected(session: Any, identity: str) -> Any:
 
 def inspect(session: Any, identity: str) -> dict[str, Any]:
     item = selected(session, identity)
-    info = json.loads(session.resources.skin[item.data].metadata)
+    info = summary(session.resources.skin[item.data])
     current = matches(session.document, EvaluationResult(inputs=item.inputs))
     stale = item.stale or not current or item.definitions != definition_key(session.document)
     return dict(asdict(item), stale=stale, report=info)
+
+
+def summary(data: Any) -> dict[str, Any]:
+    info = json.loads(data.metadata)
+    background = int(info["settings"]["strategy"] == "SINGLE_ACTIVE")
+    info["active_bones"] = data.arrays["weights"].shape[1] - background
+    held_out = [row for row in info.get("rows", ()) if not row["training"]]
+    info["moving_validation_p95"] = max(
+        (row["moving_p95_percent_height"] for row in held_out), default=None
+    )
+    return info
 
 
 def remove(session: Any, identity: str) -> None:

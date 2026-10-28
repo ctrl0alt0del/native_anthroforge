@@ -161,7 +161,7 @@ explaining performance; a fast native kernel does not imply a responsive applica
 | R01 | Dependency/index computation: hierarchy/registry lookup, reference/topology restrictions, output-port graphs, reverse invalidation, SCC cycles, automatic obstacle eligibility and publication-frontier traversal. Reuse immutable structure on value-only edits. | [document index](../src/anthroforge/core/document_index.py), [routing obstacles](../src/anthroforge/core/routing_obstacles.py), [dependent tasks](../src/anthroforge/application/dependent_tasks.py) | [document index](../tests/test_document_index.py), [publication frontier](../tests/test_publication_frontier.py) |
 | R02 | Task assessment/coordination: workload estimates plus measured history, coalescing/delays, causal urgency/age and transitive prerequisite rank, shared inline budget, worker admission, reservations, dispatch-time capture, cancellation and stale-result checks. | [coordinator](../src/anthroforge/application/coordinator.py), [priority policy](../src/anthroforge/application/task_priorities.py), [task schedulers](../src/anthroforge/application/task_schedulers.py), [tissue scheduling](../src/anthroforge/application/tissue_scheduling.py) | [task coordination](../tests/test_task_coordination.py), [priority inheritance](../tests/test_task_priorities.py), [active jobs](../tests/test_active_jobs.py) |
 | R03 | Transactions/history/checkpoints: derive changes, commit/cancel edits, maintain undo/redo restart recipes, choose saveable revisions and validate historical asynchronous captures. | [history](../src/anthroforge/application/history.py), [changes](../src/anthroforge/application/changes.py), [authored jobs](../src/anthroforge/application/authored_jobs.py) | [interleaving](../tests/test_interleaving.py), [capture history](../tests/test_capture_history.py) |
-| R04 | Cache/resource work: keys, immutable leases, hit/miss/eviction, content equivalence and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes, tissue material preparation and skin field/stitching buffers (October 28 source changes awaiting qualification). | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp), [skin envelope](../native/src/skin_envelope.cpp), [skin assembly](../native/src/skin_assembly.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py), [skin buffer contracts](../native/tests/skin_buffers_test.cpp) |
+| R04 | Cache/resource work: keys, immutable leases, hit/miss/eviction, content equivalence and ownership across document/history/jobs/viewport. Includes Body bases, routing scenes, tissue material preparation and skin field/stitching buffers (October 28 numerical/performance qualification below; portable release pending). | [resource cache](../src/anthroforge/native/resource_cache.py), [base cache](../src/anthroforge/native/base_cache.py), [resources](../src/anthroforge/application/resources.py), [mesh_equivalence.cpp](../native/src/mesh_equivalence.cpp), [skin envelope](../native/src/skin_envelope.cpp), [skin assembly](../native/src/skin_assembly.cpp) | [routing scene cache](../tests/test_routing_scene_cache.py), [tissue material cache](../tests/test_tissue_material_cache.py), [construction resources](../tests/test_construction_resources.py), [skin buffer contracts](../native/tests/skin_buffers_test.cpp) |
 | R05 | Viewport publication/rendering: stage complete native mesh/path/image buffers, switch displayed geometry and picking together, generate controls, perform Qt Quick 3D shading, opacity/depth and selection-outline passes. | [Qt geometry adapters](../native/qt), [outline shader](../native/qt/shaders/outline.frag), [desktop](../src/anthroforge/desktop) | [viewport publication](../tests/test_viewport_publication.py), [capture staging](../tests/test_capture_staging.py), [path presentation](../tests/test_path_presentation.py) |
 | R06 | UI projection/model work: incremental scene/property/outliner/Activity/Issues/choice rows, summaries, display-unit conversion and filtered lists. Preserve identities instead of recreating whole models on every edit. Typed integer controls retain exact text through Qt and convert display units before shared command validation (CH-051). | [scene projection](../src/anthroforge/desktop/scene_projection.py), [property projection](../src/anthroforge/desktop/property_projection.py), [quantity transport](../src/anthroforge/desktop/quantity_values.py), [Activity](../src/anthroforge/desktop/activity_model.py) | [scene changes](../tests/test_scene_changes.py), [integer quantities](../tests/test_integer_quantity_controls.py), [Activity model](../tests/test_activity_model.py), [choice model](../tests/test_choice_model.py) |
 | R07 | Issues checks: evaluate structural/readiness/attachment/dependency diagnostics and optional native collision checks, retain scoped stale evidence, and verify requested repairs. Read-only checks use the common coordinator. | [Issue system](../src/anthroforge/application/issues/system.py), [providers](../src/anthroforge/application/issues/providers.py) | [Issue lifecycle](../tests/test_issue_lifecycle.py), [Issue integration](../tests/test_issue_integration.py) |
@@ -3395,7 +3395,7 @@ this dispatch fix. No unapproved geometry repair or remesher setting change acco
 
 ### Restore source skin parallelism and field lifetime — 2026-10-28 (R02, R04)
 
-**Source changes complete; all execution and qualification paused by the user.**
+**Initial source-only checkpoint; superseded by October 28 qualification below.**
 Baseline: `7ca3b69` on `codex/skin-040`; no measured performance regression or improvement
 is claimed. Static comparison found that CH-095's serial routing include disabled the
 addon's OpenMP gap/tile/smoothing/binding/quality loops. The port also retained sparse
@@ -3430,7 +3430,7 @@ tests and the old portable executable do not qualify this change. See the
 
 ### Bulk skin stitching and coarse-field execution — 2026-10-28 (R02, R04)
 
-**Source implementation only; user has paused all builds and tests.** Baseline `68917e0`.
+**Initial source-only checkpoint; superseded by October 28 qualification below.** Baseline `68917e0`.
 Static inspection found an ordered-map allocation/lookup for each tile vertex, serial
 independent EDT lines, fifteen full-grid collagen mask scans even when levels were absent,
 and a flood-fill vector reserving/retaining every visited cell. Runtime cost remains an
@@ -3475,3 +3475,37 @@ against `68917e0` in serial, controlled trials before release qualification.
 
 References: [NumPy unique](https://numpy.org/doc/stable/reference/generated/numpy.unique.html),
 [OpenMP worksharing](https://www.openmp.org/spec-html/5.0/openmpsu41.html).
+
+### Skin optimization qualification — 2026-10-28 (R02, R04)
+
+The user resumed testing. The combined parallelism, temporary-field lifetime, bulk stitching
+and coarse-field changes pass the development gate: 2,570 Python tests, six CTests, native
+style, Python checks, numerical imports and native doctor. No production changes were needed
+during qualification. Private buffer tests and actual native API/lifecycle tests both ran.
+
+Compare packaged pre-optimization native `13e53b5` (same native sources as `7ca3b69`) against
+native candidate `43a2824` on the saved three-SCP/two-tissue capture. Three fresh processes per
+build, B/A/A/B/B/A order, fixed resolution 160, budget 364,835,430 bytes, BLAS one worker,
+profiling off. Capture/loading/export are excluded; mesh preparation/validation/binding are
+included. Median generation **234.902 -> 68.585 s (3.425x)**; range 233.060–235.350 versus
+68.542–69.276 s. Median OS peak working set **832.590 -> 720.668 MiB (-13.4%)**, peak commit
+**860.422 -> 730.773 MiB (-15.1%)**. Native fields/envelope/binding medians respectively:
+0.602/203.698/30.645 -> 0.441/59.387/8.733 s. These combined measurements do not isolate each
+optimization's contribution. Other applications remained running; sampled start CPU load
+4.4–17.3% and available RAM 1.83–6.02 GiB varied, but trial results stayed consistent.
+
+All six runs preserve exact fields, geometry, all native binding arrays and diagnostics.
+The unmodified addon produces exactly the same 827,176 vertices, 1,654,392 triangles and
+all six source binding arrays. Production coarse-field differences are at most 2.22e-16;
+12 small field controls at most 4.44e-16. Cube/gap/contact envelope/binding comparisons are
+also exact. The candidate equals the previously visually reviewed mesh; its existing image
+was reinspected without claiming a new GUI/render test. No new anatomical-quality guarantee.
+
+A separate profiler report has no truncated events and records fields 0.445 s, envelope
+59.607 s and binding 9.027 s. It is excluded from timed medians and does not profile GUI
+publication or attribute internal kernel loops. Raw evidence and full method/limitations
+are linked from [the task record](tasks/skin-040.md). The maintained
+[benchmark](../tools/skin_optimization_benchmark.py) checks exact source-input round trips;
+an initial test-adapter gap-unit error was corrected and that run excluded.
+Canonical portable rebuilding/qualification and the companion source archive remain pending;
+these results do not qualify the older installed executable or complete the 0.4.0 release.

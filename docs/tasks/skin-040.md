@@ -2,13 +2,67 @@
 
 - Task branch: `codex/skin-040`; integration: `main`.
 - Starting revision: `6260864` (qualified 0.3.7 UI workbench).
-- Status: user resumed testing on October 28. Building and checking the execution/lifetime,
-  stitching and coarse-field changes; addon parity and controlled time/memory comparison
-  in progress. Keep off main until the changes and rebuilt package are qualified.
+- Status: October 28 optimization build, development gate, production addon parity and
+  repeated performance/memory comparison passed. Canonical portable rebuild/qualification
+  remains pending; keep off main until that release work is complete.
 - Last updated: 2026-10-28, Europe/Bucharest.
 - Direct work, no subagents. All execution/validation must remain background/hidden.
 
 ## Outcome and acceptance
+
+### Optimization results, October 28 — source/runtime qualified
+
+All six CTests and the complete development gate pass: 2,570 Python tests, native style,
+ruff/format, mypy, numerical imports and native doctor. No production algorithm or policy
+was changed during qualification. Benchmark adapters remain tooling only.
+
+Three isolated runs per build, in B/A/A/B/B/A order, use the saved three-bone/two-tissue
+forearm capture, resolution 160 and exactly 364,835,430 bytes field budget. Baseline native
+DLL comes from package revision `13e53b5`, with the same native sources as pre-optimization
+`7ca3b69`; candidate native code is `43a2824`. Loading/capture/export and report hashing
+are excluded from the stage sum; bindings and native mesh preparation are included.
+Profiling is off in all six timed trials. These are draft generation measurements,
+not topology generation, GUI latency or complete assembly timings.
+
+| Measurement (median of three) | Before | After |
+| --- | ---: | ---: |
+| Coarse fields | 0.602 s | 0.441 s |
+| Envelope, including validation/preparation | 203.698 s | 59.387 s |
+| Source bindings | 30.645 s | 8.733 s |
+| Total generation | **234.902 s** | **68.585 s** |
+| OS peak working set | **832.590 MiB** | **720.668 MiB** |
+| OS peak process commit | **860.422 MiB** | **730.773 MiB** |
+
+Total speedup is 3.425x (70.8% less time); median resident peak is 13.4% lower and commit
+peak 15.1% lower. Per-stage medians need not sum to the median total. Total ranges are
+233.060–235.350 s before and 68.542–69.276 s after. Other applications were left running:
+start headroom varied 1.83–6.02 GiB and sampled system CPU load 4.4–17.3%. Trials remained
+consistent across that change. This is a measured result for this capture, not a whole-body
+performance guarantee or a separate attribution of every optimization's contribution.
+
+All six runs have exactly equal four coarse fields, vertex/face arrays, seven native binding
+arrays and diagnostics. Unmodified addon reconstruction on the exactly round-tripped inputs
+also gives **827,176 vertices / 1,654,392 triangles**, identical positions/connectivity and
+all six addon binding arrays. Production coarse-field maximum difference versus SciPy is
+2.22e-16; the 12 small source controls stay within 4.44e-16. Cube/gap/contact end-to-end
+comparisons are exact too. The addon reference run took 68.084 s; that single observation
+is not a separate comparative benchmark. Existing source-source intersections remain advisory.
+
+The accepted historical `envelope-corrected.npz` is exactly equal to the candidate positions
+and faces. Reinspected its existing `skin-result-corrected.png`; no new interactive GUI
+acceptance or new render is claimed. Separate profiler capture has zero truncated events
+and attributes 0.445 s to fields, 59.607 s to envelope and 9.027 s to binding. Its 69.081-s
+run is excluded from the timed medians and does not measure internal per-loop or UI costs.
+
+Evidence: `build/skin-040/optimization-qualification/{comparison.json,addon-parity.json,
+anatomy-fields.json,field-parity.json,gate.log,after.afprofile.zip}` plus per-trial JSON/logs
+and first-pair/addon NPZ arrays. Each report records input/DLL hashes, workload, machine,
+headroom and OS peaks before artifact serialization. Invalid `addon-anatomy.json` used
+an adapter gap-unit mistake and is excluded; `addon-anatomy-exact.*` is the verified run.
+
+The current canonical executable remains the older `13e53b5` build. Source optimization
+qualification is complete; a canonical rebuild, portable checks and source archive are
+still required before release/merge. No user's source projects or installed binaries changed.
 
 ### Optimization qualification resumed, October 28
 

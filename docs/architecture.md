@@ -1117,7 +1117,7 @@ process-tree cancellation and resource-aware admission. They have no arbitrary p
 Pinned tetrahedral binaries load without Qt, PyVista or VTK. No competing numerical worker pool
 or Python optimization loop is introduced.
 
-The October 28 skin execution fix (source complete, validation paused) isolates the pinned
+The October 28 skin execution fix (numerical/runtime qualification complete) isolates the pinned
 gap/tile/binding/quality kernels in an OpenMP object target with a private query namespace.
 Their source limit is four threads; the same coordinator reserves four CPUs for envelope
 jobs and all CPUs for combined builds. Routing retains its serial target. OpenMP cannot
@@ -1133,8 +1133,10 @@ source positions and remapping are released before mesh preparation. Coarse-fiel
 use the same bounded skin team with disjoint outputs and preallocated per-thread scratch;
 axes remain sequential. Collagen skips absent quantization levels, and exterior flood fill
 retains only its unprocessed FIFO frontier. Field equations, connectivity and precision stay
-unchanged. These October 28 source changes also await build/parity/performance qualification;
-bulk stitching's duplicate samples require peak-memory measurement, not an assumed saving.
+unchanged. The October 28 build, gate and exact production geometry/binding checks pass.
+The combined fixes measure 3.425x faster generation and 13.4% lower peak working set on the
+three-SCP/two-tissue capture; this does not isolate bulk stitching's contribution or establish
+a whole-body guarantee. See the task record for method/variance. Portable release is pending.
 
 Immutable resources span document/history/checkpoint/job/display leases. Prepared deformation
 factors use a bounded cache keyed by reference and settings; oversized entries bypass retention,

@@ -21,8 +21,9 @@ the same eight smoothing iterations, `af_skin_tiles_release_field` frees varying
 blocks, flags and copied coarse fields before diagnostics, matching addon `finish()`.
 Source geometry, separators and corridor checks remain alive for validation. Borrowed
 input Fields stay intact for inspection/retry. No memory budget or precision is changed.
-October 28 execution/lifetime changes await build, parity and performance qualification:
-the user has paused all testing while playing. Earlier evidence does not qualify them.
+October 28 resumed qualification passes build, six CTests, the development gate and exact
+production vertex/connectivity/binding comparison with the addon. Controlled combined-change
+measurements are recorded in `docs/tasks/skin-040.md`; portable release remains pending.
 
 Coarse-field EDT lines now share the pinned kernel's bounded worker policy through
 `skin_execution.cpp`, with scratch allocated before parallel work. This parallelizes
@@ -30,8 +31,8 @@ independent lines only; axis order, distance arithmetic and source field formula
 unchanged. Collagen visits only populated quantization levels. The exterior FIFO frees
 processed entries without changing traversal or connectivity. Tile stitching uses bulk
 rounded-key sorting, matching addon `_stitch`: first unrounded representative and sorted
-final IDs, with unchanged faces and float32 output. These changes also remain unqualified
-while execution is paused. No pinned numerical header was modified for this increment.
+final IDs, with unchanged faces and float32 output. These changes are included in that
+qualification. No pinned numerical header was modified for this increment.
 
 Current integration: source-aware gap sampling, protected lattice preparation, tiled
 extraction, stitching, supported-component filtering and constrained smoothing.

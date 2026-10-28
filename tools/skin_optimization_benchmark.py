@@ -25,9 +25,15 @@ def arguments():
     parser.add_argument("--save-arrays", action="store_true")
     parser.add_argument("--profile", type=Path)
     args = parser.parse_args()
+    validate_arguments(parser, args)
+    return args
+
+
+def validate_arguments(parser, args):
     if bool(args.library) == bool(args.addon):
         parser.error("Choose exactly one of --library or --addon.")
-    return args
+    if args.profile and args.addon:
+        parser.error("The application profiler is available only with --library.")
 
 
 def memory():
@@ -244,6 +250,8 @@ def main():
     args = arguments()
     with np.load(args.capture, allow_pickle=False) as saved:
         data = {k: saved[k] for k in saved.files}
+    if len(data.get("segments", ())):
+        raise ValueError("This benchmark requires SCP/VCP surface contributors only.")
     report = metadata(args, data)
     output = (native if args.library else addon)(args, data, report)
     save_report(args, report, output)

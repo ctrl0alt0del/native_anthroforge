@@ -25,11 +25,23 @@ Keep project inputs unchanged and all desktop validation hidden/offscreen.
 
 ## Current state
 
-Reviewed cache/resource and rendering boundaries. Measurement tooling and trials pending.
+Experiment tools are implemented. Initial 24-edit runs show cache charges stabilizing
+near 160 MiB while history/process memory grows. Ordinary profiler ownership inventories
+hit their 4096-handle cap; expanded settled-state snapshots provide additional evidence.
+The initial hidden desktop trials show refresh/publication costs dominating CPU render
+submission. No optimization has been applied. Full evidence analysis is pending.
 
 ## Verification
 
-No new runtime measurements yet. No production behavior changes.
+`ruff check`, formatting and both architecture tests pass for the new experiment tools.
+Headless Ribs update: 5.65 s in the pilot. Hidden viewport: 28.95 s without runtime
+recording, 36.18 s with boundary recording. These are preliminary, not paired final
+estimates. The first full Qt capture lost its beginning to ring eviction and timed out
+on collector shutdown; it is diagnostic-only and excluded from complete-trace claims.
+Tools now pump events during stop and allow larger bounded experiment captures.
+The expanded retention trial completed all edits/undo/redo/cache-clear checks, then
+failed on a nonexistent `new` operation; replaced with real project adoption and rerun
+pending. Numerical algorithms and source projects are unchanged.
 
 ## Next actions and blockers
 

@@ -7,7 +7,7 @@ from anthroforge.core.jobs import ObsoleteInputs
 from anthroforge.core.results import Port
 from anthroforge.core.skeleton_update import BoneChange, Finding
 
-from . import dependencies, skeleton_graph
+from . import dependencies, skeleton_graph, skeleton_reads
 from .assembly_candidate import ReadSet, readset
 
 GROUPS = (
@@ -28,12 +28,15 @@ class Reads:
     records: ReadSet
     relationships: tuple[tuple[Port, frozenset[Port], frozenset[Port]], ...]
     attachments_enabled: bool
+    scene: tuple[Any, ...] = ()
+    skin: Any = None
 
     def require(self, document: Any) -> None:
         self.records.require(document)
         graph = dependencies.graph(document)
         if document.attachments_enabled != self.attachments_enabled:
             raise ObsoleteInputs("Attachment evaluation settings changed; prepare again.")
+        skeleton_reads.require_global(self, document)
         for port, inputs, consumers in self.relationships:
             if (
                 graph.get(port, frozenset()) != inputs
@@ -62,13 +65,24 @@ class Candidate:
 
     def merge(self, current: Any) -> Any:
         self.reads.require(current)
-        updates = {
-            name: skeleton_graph.merge_records(getattr(current, name), rows)
-            for name, rows in self.changed().items()
-        }
+        if current is self.baseline:
+            return self.document
+        updates = self.merged_groups(current)
         if self.document.skin != self.baseline.skin:
             updates["skin"] = self.document.skin
+        updates["shortcut_order"] = skeleton_reads.merge_order(self, current)
         return replace(current, **updates)
+
+    def merged_groups(self, current: Any) -> Any:
+        return {
+            name: apply_records(
+                getattr(current, name),
+                getattr(self.baseline, name),
+                getattr(self.document, name),
+                rows,
+            )
+            for name, rows in self.changed().items()
+        }
 
     def changed(self) -> dict[str, tuple[Any, ...]]:
         return {
@@ -82,17 +96,24 @@ def changed_records(before: Any, after: Any) -> tuple[Any, ...]:
     return tuple(item for item in after if records.get(skeleton_graph.identity(item)) != item)
 
 
+def apply_records(current: Any, before: Any, after: Any, rows: Any) -> Any:
+    removed = {skeleton_graph.identity(v) for v in before} - {
+        skeleton_graph.identity(v) for v in after
+    }
+    retained = tuple(v for v in current if skeleton_graph.identity(v) not in removed)
+    return skeleton_graph.merge_records(retained, rows)
+
+
 def reads(context: Any, seeds: set[Port], extra: set[str]) -> Reads:
     graph = dependencies.graph(context.document)
     affected = dependencies.closure(dependencies.reverse(graph), seeds)
     required = dependencies.closure(graph, affected)
-    keys = ({p.owner for p in required} | extra) & context.baseline.registry.records.keys()
+    keys = skeleton_reads.keys(context, required, extra)
     original = dependencies.graph(context.baseline)
-    relationships = tuple(
-        (p, original.get(p, frozenset()), original.consumers.get(p, frozenset()))
-        for p in affected
-        if p in original
-    )
     return Reads(
-        readset(context.baseline, keys), relationships, context.baseline.attachments_enabled
+        readset(context.baseline, keys),
+        skeleton_reads.relationships(original, affected),
+        context.baseline.attachments_enabled,
+        skeleton_reads.scene(context.baseline),
+        context.baseline.skin,
     )

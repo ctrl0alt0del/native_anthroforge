@@ -19,12 +19,14 @@ def replacement(session, root, tmp_path, offset=2.0):
     return path
 
 
-def prepare(session, path, matches):
+def prepare(session, path, matches, **options):
     session.command("skeleton_update.inspect", path=str(path))
     inventory = session.command("skeleton_update.status", wait=True)
-    session.command("skeleton_update.prepare", source=inventory["source"], matches=matches)
+    session.command(
+        "skeleton_update.prepare", source=inventory["source"], matches=matches, **options
+    )
     result = session.command("skeleton_update.status", wait=True)
-    assert result["state"] == "ready", result
+    assert result["state"] == "ready", result.get("error") or result
     return result
 
 

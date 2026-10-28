@@ -5,9 +5,8 @@ from functools import partial
 from typing import Any
 
 from anthroforge.core.entities import SCP
-from anthroforge.core.results import geometry_asset
 from anthroforge.core.skeleton_update import BoneChange, Finding
-from anthroforge.native import attachments, topology
+from anthroforge.native import attachments
 
 from . import (
     assembly_evidence,
@@ -15,6 +14,7 @@ from . import (
     replacement_bindings,
     replacement_reviews,
     scp_surface_parents,
+    skeleton_correspondence,
     surface_providers,
 )
 from .entity_revisions import GEOMETRY_FIELDS, differs
@@ -28,12 +28,14 @@ def changes(context: Any, p: Any) -> tuple[BoneChange, ...]:
         target = p.ids[original.id]
         after = context.document.entity(target)
         before = context.baseline.index.entities.get(target)
-        result.append(change(context, original.id, before, after))
+        compatible = bool(before) and skeleton_correspondence.material(
+            context, p, before, after, original
+        )
+        result.append(change(original.id, before, after, compatible))
     return tuple(result)
 
 
-def change(context: Any, source: str, before: Any, after: Any) -> BoneChange:
-    compatible = matching(context, before, after) if before else False
+def change(source: str, before: Any, after: Any, compatible: bool) -> BoneChange:
     placement = before is None or differs(before, after, ("matrix", "geometry_offset"))
     construction = before is None or differs(before, after, GEOMETRY_FIELDS)
     return BoneChange(
@@ -46,17 +48,8 @@ def change(context: Any, source: str, before: Any, after: Any) -> BoneChange:
     )
 
 
-def matching(context: Any, before: Any, after: Any) -> bool:
-    first, second = geometry_asset(before), geometry_asset(after)
-    if not first or not second:
-        return not first and not second
-    return topology.same_topology(
-        context.assets[first].mesh, context.assets[second].mesh, context.cancel.handle
-    )
-
-
 def capture_bones(context: Any, changes: Any, options: Any) -> list[dict[str, Any]]:
-    evidence = []
+    evidence: list[dict[str, Any]] = []
     for row in changes:
         item = context.document.entity(row.target)
         if not item.parent:
@@ -151,7 +144,7 @@ def old_frames(context: Any) -> Any:
 
 
 def rebind_dependents(context: Any, changes: Any, options: Any) -> list[dict[str, Any]]:
-    evidence = []
+    evidence: list[dict[str, Any]] = []
     for row in changes:
         if row.added or row.correspondence == "verified":
             continue

@@ -8,7 +8,14 @@ from anthroforge.core.entities import SCP
 from anthroforge.core.skeleton_update import Finding
 from anthroforge.core.tissues import TissueVCP
 
-from . import assembly_graph, assembly_resources, assembly_selection, entity_revisions
+from . import (
+    assembly_graph,
+    assembly_resources,
+    assembly_selection,
+    entity_revisions,
+    skeleton_correspondence,
+    skeleton_mirrors,
+)
 from .assembly_mapping import Mappings
 from .assembly_preparation import Preparation
 from .skeleton_matching import parse
@@ -38,7 +45,7 @@ def copy(
     p = Preparation(source, destination, resources, engine, cancel, options)
     p.selection = selection(source.document, keys)
     allocate(p, matches)
-    p.copy()
+    p.copy_records()
     retain_destination(p, matches, additions)
     return p
 
@@ -47,8 +54,11 @@ def allocate(p: Any, matches: Any) -> None:
     p.loaded = assembly_resources.load(p.source, p.selection, p.engine, p.cancel)
     p.ids = assembly_graph.identities(p.selection, p.loaded)
     p.ids.update({m.source: m.target for m in matches})
+    retain_driver_ids(p)
     p.mapping = Mappings(p.source, p.destination, p.ids, p.options.get("mappings", {}))
-    p.mapping.assess(assembly_graph.boundaries(p.source.document, p.selection))
+    skeleton_mirrors.map_rules(p)
+    rows = assembly_graph.boundaries(p.source.document, p.selection)
+    p.mapping.assess(tuple(r for r in rows if r.relationship != "mirror"))
     p.resources, p.assets = assembly_resources.transfer(p.loaded, p.ids)
     assembly_resources.restore_legacy_inputs(p)
 
@@ -65,6 +75,24 @@ def retain_destination(p: Any, matches: Any, additions: Any) -> None:
     p.values.pop("mirror_rules", None)
     p.values.pop("shared_mirror_targets", None)
     p.values.pop("shortcuts", None)
+    retain_drivers(p)
+
+
+def retain_drivers(p: Any) -> None:
+    retained = {d.id for d in p.destination.driving_shortcuts}
+    p.values["driving_shortcuts"] = tuple(
+        replace(d, exposed=False) for d in p.values["driving_shortcuts"] if d.id not in retained
+    )
+    kept = {f.id for d in p.values["driving_shortcuts"] for f in d.formulas}
+    p.values["formula_results"] = tuple(r for r in p.values["formula_results"] if r.formula in kept)
+
+
+def retain_driver_ids(p: Any) -> None:
+    verified = skeleton_correspondence.identities(p.source.document, p.destination)
+    for driver in p.selection.drivers:
+        for key in graph_records.owned(driver):
+            if key in verified:
+                p.ids[key] = verified[key]
 
 
 def replacement(before: SCP, source: SCP) -> SCP:

@@ -8,11 +8,13 @@ from anthroforge.core.results import Port
 from . import (
     assembly_copy,
     candidate_dependencies,
+    candidate_formulas,
+    candidate_skin,
     comparison_geometry,
     skeleton_bindings,
     skeleton_candidate,
+    skeleton_controls,
     skeleton_graph,
-    skin_status,
 )
 from .candidate_evaluation import EvaluationContext
 
@@ -28,13 +30,17 @@ def prepare(
     candidate = skeleton_graph.merge(document, p.values, tuple(p.mapping.references))
     context = EvaluationContext(engine, candidate, owned, preferences, cancel, profiler, document)
     context.fixed_poses = frozenset(item.id for item in p.values["entities"])
+    context.options = options
     context.findings.extend(skeleton_graph.findings(p))
     return assess(context, p, options)
 
 
 def assess(context: Any, p: Any, options: Any) -> Any:
     seeds = {Port(key, name) for key in context.fixed_poses for name in ("pose", "geometry")}
-    if not context.findings:
+    skeleton_controls.reconcile(context, p, options)
+    if not any(f.blocking for f in context.findings):
+        review_formulas(context, p)
+    if not any(f.blocking for f in context.findings):
         evaluate_construction(context, p, seeds)
     changes = skeleton_bindings.changes(context, p)
     evidence = []
@@ -46,22 +52,47 @@ def assess(context: Any, p: Any, options: Any) -> Any:
     return completed(context, p, seeds, changes, evidence)
 
 
+def review_formulas(context: Any, p: Any) -> None:
+    from . import formula_inputs, property_guards
+
+    try:
+        property_guards.validate_writers(context.document)
+    except ValueError as error:
+        writer_conflict(context, str(error))
+        return
+    records = formula_inputs.formulas(context.document)
+    keys = {k for k, (_, f) in records.items() if f.target.target in set(p.ids.values())}
+    if keys:
+        candidate_formulas.evaluate(context, keys, review=True)
+
+
+def writer_conflict(context: Any, message: str) -> None:
+    from anthroforge.core.skeleton_update import Finding
+
+    context.findings.append(Finding("writers", "", message, blocking=True, kind="property"))
+
+
 def evaluate_construction(context: Any, p: Any, seeds: Any) -> None:
+    from anthroforge.core.object_outputs import output
+
     imported = {p.ids[key] for key in p.selection.records}
     inputs = {
-        Port(key, "path") for key in imported if key in context.document.registry.construction
+        Port(key, output(context.document.object(key)))
+        for key in imported
+        if key in context.document.registry.construction
     }
     candidate_dependencies.evaluate(context, seeds | inputs, imported)
 
 
 def completed(context: Any, p: Any, seeds: Any, changes: Any, evidence: Any) -> Any:
+    skin = candidate_skin.assess(context, changes)
     provenance = assembly_copy.provenance(p.source, p.ids)
     context.document = replace(context.document, imports=(*context.document.imports, provenance))
     reads = skeleton_candidate.reads(context, seeds, p.mapping.reads)
-    return bundle(context, p, reads, changes, evidence)
+    return bundle(context, p, reads, changes, evidence, skin)
 
 
-def bundle(context: Any, p: Any, reads: Any, changes: Any, evidence: Any) -> Any:
+def bundle(context: Any, p: Any, reads: Any, changes: Any, evidence: Any, skin: Any) -> Any:
     return skeleton_candidate.Candidate(
         context.baseline,
         context.document,
@@ -73,7 +104,7 @@ def bundle(context: Any, p: Any, reads: Any, changes: Any, evidence: Any) -> Any
         frozenset(context.prepared),
         tuple(evidence),
         comparison=compare(context),
-        skin=skin_impact(context),
+        skin=skin,
     )
 
 
@@ -87,13 +118,4 @@ def compare(context: Any) -> dict[str, Any]:
 
     return comparison_geometry.compare(
         frozen(context.baseline), frozen(context.document), context.cancel.handle
-    )
-
-
-def skin_impact(context: Any) -> dict[str, Any]:
-    status = skin_status.assess(context.document, context.resources)
-    return dict(
-        available=status.operations["update"].available,
-        reason=status.operations["update"].reason,
-        previewed=False,
     )

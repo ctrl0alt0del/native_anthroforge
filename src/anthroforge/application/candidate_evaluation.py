@@ -20,6 +20,9 @@ class EvaluationContext:
     prepared: set[Port] = field(default_factory=set)
     findings: list[Finding] = field(default_factory=list)
     fixed_poses: frozenset[str] = frozenset()
+    failed: set[Port] = field(default_factory=set)
+    options: dict[str, Any] = field(default_factory=dict)
+    completed_batch: set[Port] = field(default_factory=set)
 
     @property
     def assets(self) -> Any:

@@ -32,12 +32,24 @@ cancel, Apply and undo/redo tests pass. Binding review is started; driver remapp
 complete evaluator coverage, UI and qualification remain unfinished. This checkpoint is not
 release-ready and must remain on the task branch.
 
+Second integration checkpoint: destination mirror policy is separated from assembly copying;
+material compatibility requires native connectivity plus authored lineage (or exact content).
+Destination control references are remapped from verified identities; formula value conflicts
+require a deliberate choice. Candidate adapters now include tissue final groups and optional
+fixed-topology skin deformation. Initial Manual tissue preview/adoption tests pass. Complete
+mapping/correction UI, broad lifecycle and production acceptance are still pending.
+
 ## Verification
 
 `uv run --no-sync pytest tests/test_skeleton_update_contracts.py tests/test_skeleton_update_graph.py tests/test_skeleton_update_commands.py tests/test_architecture.py -q`:
 11 passed on Windows with qualified native DLL. Focused Ruff/mypy checks pass. Full gate not yet run. Main is synchronized
 with origin. Unrelated root `__init__.py` preserved.
 All GUI/testing remains background/offscreen. No interactive acceptance will be claimed.
+
+Latest focused run: 27 tests passed (skeleton contracts/commands/controls/dependents,
+architecture, existing shortcut reference lifecycle and assembly mirror tests). Full gate,
+whole-assembly visual/performance evidence, optional skin/group-stack acceptance and portable
+qualification have not run. Do not treat this checkpoint as completed functionality.
 
 ## Next actions
 

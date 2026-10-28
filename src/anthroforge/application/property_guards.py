@@ -48,9 +48,23 @@ def retained_writers(before: Any, after: Any) -> Iterator[tuple[str, Any]]:
 def require_references(session: Any, before: Any, after: Any) -> None:
     for driver in after.driving_shortcuts:
         for formula in driver.formulas:
+            authorized = getattr(session, "formula_reference_authority", frozenset())
+            if not formula.enabled and formula.id in authorized:
+                continue
             references = (formula.target, *(i.property for i in formula.inputs if i.property))
             for ref in references:
-                require_reference(session, before, after, ref, driver.label)
+                if formula.enabled or not retained_missing(before, ref):
+                    require_reference(session, before, after, ref, driver.label)
+
+
+def retained_missing(document: Any, reference: PropertyRef) -> bool:
+    from .property_catalog import resolve
+
+    try:
+        resolve(document, reference)
+        return False
+    except (ValueError, KeyError):
+        return True
 
 
 def require_reference(session: Any, before: Any, after: Any, ref: PropertyRef, label: str) -> None:
@@ -102,10 +116,15 @@ def changed(session: Any, before: Any, after: Any, reference: PropertyRef) -> bo
 
 
 @contextmanager
-def publication(session: Any, formulas: set[str]) -> Iterator[None]:
+def publication(
+    session: Any, formulas: set[str], disabled: frozenset[str] = frozenset()
+) -> Iterator[None]:
     previous = session.formula_write_authority
+    references = getattr(session, "formula_reference_authority", frozenset())
     session.formula_write_authority = frozenset(formulas)
+    session.formula_reference_authority = disabled
     try:
         yield
     finally:
         session.formula_write_authority = previous
+        session.formula_reference_authority = references

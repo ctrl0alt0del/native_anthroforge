@@ -104,7 +104,15 @@ def pose(context: Any, port: Port) -> None:
 
 
 def tissue(context: Any, port: Port) -> None:
-    output = tissue_evaluation.evaluate(
+    from .candidate_tissues import grouped
+
+    if grouped(context, port):
+        return
+    publish_tissue(context, port, compute_tissue(context, port))
+
+
+def compute_tissue(context: Any, port: Port) -> Any:
+    return tissue_evaluation.evaluate(
         context.engine,
         context.document,
         context.resources,
@@ -112,6 +120,9 @@ def tissue(context: Any, port: Port) -> None:
         port.output,
         context.cancel.handle,
     )
+
+
+def publish_tissue(context: Any, port: Port, output: Any) -> None:
     item = context.document.object(port.owner)
     key = tissue_results.register(context, output, port.output)
     reads = dependencies.ports(context.document, port)
@@ -130,8 +141,14 @@ def failure(context: Any, port: Port, message: str) -> None:
 
 
 def handler(document: Any, port: Port) -> Any:
+    if port.output == "formula":
+        from .candidate_formulas import handler as formula
+
+        return formula
     if port.owner not in document.registry.records:
         return None
+    if isinstance(document.object(port.owner), TissueVCP):
+        return tissue if port.output in ("base", "rest", "intrinsic", "plan", "final") else None
     if port.output == "pose":
         return pose if isinstance(document.object(port.owner), SCP) else None
     families = dict(geometry=geometry, path=path, binding=anchor, control=control)

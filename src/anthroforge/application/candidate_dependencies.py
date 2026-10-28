@@ -17,8 +17,10 @@ def evaluate(context: Any, seeds: set[Port], restrict: set[str] | None = None) -
             return done
         ready = sorted((p for p in pending if not (graph.get(p, set()) & pending)), key=order)
         for port in ready or sorted(pending, key=order):
-            execute(context, port, port in graph.blocked or not ready)
+            failed = dependencies.closure(graph, {port}) & context.failed
+            execute(context, port, port in graph.blocked or not ready or bool(failed))
             done.add(port)
+            done.update(context.completed_batch)
             break
 
 
@@ -38,6 +40,7 @@ def order(port: Port) -> tuple[int, str, str]:
 
 
 def execute(context: Any, port: Port, blocked: bool) -> None:
+    context.completed_batch.clear()
     function = candidate_outputs.handler(context.document, port)
     if function is None:
         return
@@ -48,6 +51,7 @@ def execute(context: Any, port: Port, blocked: bool) -> None:
     except (ValueError, RuntimeError) as error:
         context.check_cancelled()
         candidate_outputs.failure(context, port, str(error))
+        context.failed.add(port)
         context.findings.append(failure_finding(context, port, str(error)))
     context.prepared.add(port)
 

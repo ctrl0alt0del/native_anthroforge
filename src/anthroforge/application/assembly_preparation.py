@@ -70,12 +70,15 @@ class Preparation:
         assembly_resources.restore_legacy_inputs(self)
 
     def copy(self) -> None:
+        self.copy_records()
+        self.mirrors()
+
+    def copy_records(self) -> None:
         values = assembly_copy.source_records(self.source.document, self.selection)
         placement = Placement(self.engine, self.source.document, self.destination, self.mapping)
         for group, rows in values.items():
             self.values[group] = tuple(self.record(item, placement) for item in rows)
         self.resource_metadata(placement)
-        self.mirrors()
 
     def mirrors(self) -> None:
         document = self.source.document

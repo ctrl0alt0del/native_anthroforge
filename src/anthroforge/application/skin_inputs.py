@@ -58,7 +58,8 @@ def topology(document: Any) -> set[Port]:
 def reference_build(document: Any) -> set[Port]:
     ports = complete_build(document)
     ports.update(
-        Port(str(document.id), name) for name in ("skin_topology", "skin_pending_topology")
+        Port(str(document.id), name)
+        for name in ("skin_envelope", "skin_topology", "skin_pending_topology")
     )
     return ports
 

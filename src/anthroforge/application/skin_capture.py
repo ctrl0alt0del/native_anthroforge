@@ -50,8 +50,7 @@ def sources(engine: Any, document: Any, resources: Any, cancel: int) -> tuple[So
 
 
 def policy(document: Any, row: Source) -> tuple[float, float, bool]:
-    setting = skin_operations.settings_for(document.skin, row.identity.owner)
-    gap = setting if setting.gap_mode == "OVERRIDE" else document.skin.envelope_settings
+    gap = skin_operations.effective_settings(document, row.identity.owner)
     return gap.gap_limit_ratio, gap.gap_strength, row.identity.kind == "SCP"
 
 

@@ -4,7 +4,7 @@ from dataclasses import asdict, replace
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.fibers import Fiber
-from anthroforge.core.skin import Skin, SkinContributor
+from anthroforge.core.skin import EnvelopeSettings, Skin, SkinContributor, effective_contributor
 from anthroforge.core.tissues import TissueVCP
 
 from . import object_operations
@@ -13,6 +13,15 @@ if TYPE_CHECKING:
     from .session import Session
 
 SECTIONS = ("envelope_settings", "topology_settings", "deformation_settings")
+
+
+def reset_envelope(session: "Session") -> None:
+    configure(session, "envelope_settings", asdict(EnvelopeSettings()))
+
+
+def effective_settings(document: Any, owner: str) -> SkinContributor:
+    settings = settings_for(document.skin, owner)
+    return effective_contributor(document.skin, settings, document.object(owner).name)
 
 
 def configure(session: "Session", section: str, values: dict[str, Any]) -> None:
@@ -95,3 +104,9 @@ def require_construction_settings(item: Any, values: dict[str, Any]) -> None:
 
 def inspect(session: "Session") -> dict[str, Any]:
     return asdict(session.document.skin)
+
+
+def report(session: "Session") -> dict[str, Any]:
+    from . import skin_reports
+
+    return skin_reports.describe(session)

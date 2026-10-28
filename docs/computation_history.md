@@ -15,9 +15,9 @@ It leaves numerical evaluation and scheduling policy unchanged.
 
 ## Scope and reading guide
 
-0.4.0 skin migration is in progress under CH-093 and the subsequent stage records.
-Envelope construction is connected; complete topology, deformation and fitted-shortcut
-workflows are not yet qualified. The existing addon is the numerical baseline.
+0.4.0 is qualified and accepted; see the skin stage and whole-body records below.
+The 0.4.1 audit corrections and portable qualification are complete.
+The existing addon remains the numerical baseline.
 
 The inventory groups operations by computational responsibility, rather than listing
 every function, command alias or UI button. It includes numerical construction,
@@ -3540,3 +3540,49 @@ per-trial reports and saved arrays. Maintained capture, benchmark and render too
 this check. See [task record](tasks/skin-040.md) for provenance and scope. No additional
 application rebuild or full development gate was needed for tooling/documentation changes;
 portable release qualification remains pending.
+
+### Skin audit restoration — 2026-10-28 (0.4.1; R04)
+
+Observed gaps: deformation initialization tetrahedralized final topology directly instead
+of the addon's reduced draft envelope; final solver/contact arrays were retained without
+Issues; final intersection/reference and anatomy-clearance checks were missing; density
+reported requested budgets without achieved counts; FAST weights expired with each
+preparation folder. Inherited gap/Auto collagen fields showed inactive authored values.
+
+Authorized restoration: choose the current draft (fresh output for a combined build),
+fall back to topology only without a draft, and use Blender Decimate at 64,000 triangles.
+The dedicated reference adapter has the addon's zero lower ratio bound, while topology
+keeps its existing 1% bound. Include the envelope in explicit reference-job read sets.
+Final topology and anatomical reference identities remain untouched by this preparation.
+
+Final diagnostics retain native iterations/Jacobian/extrapolation/contact-motion values,
+source intersection witnesses (256, 50-million-pair cap), reference comparison and the
+original sampled clearance formula. Native counts classify achieved quads by majority
+SCP ownership before mapping exclusive regions; warn only beyond the source 20% threshold.
+None of these diagnostics repairs or rejects an otherwise publishable result.
+
+FAST weights now use an atomic checksummed disk product keyed by owned proxy/tetrahedra,
+reference positions and handle count. Invalid/unavailable cache computes normally; no
+solver settings or equations change. The original native weight validation remains active.
+Metadata/paths/native handles are not added to authored document state. Effective settings
+are shared with UI, draft reset uses one transaction, and fitting exposes existing moving
+region errors and active bone count without changing fitting.
+
+Evidence: the full gate passes 2,598 Python tests and six CTests. The actual addon worker
+reduction of the 4.48-million-triangle torso matches the dedicated reference adapter
+exactly (64,000 triangles). 33.931 s app / 35.416 s Blender are single-run reduction timings,
+not end-to-end claims. Captured addon intersections/contact/clearance and ownership counts
+match native output; persistent FAST restart/corruption checks preserve numerical results.
+Blender must use the same eight hash partitions for an exact ordering comparison; four
+threads produce another valid collapse order. Whole-body reference initialization preserves
+topology/vertices/anatomical bindings exactly; identity update has 3.55e-15 maximum roundoff.
+The profiler measures 426 ms of additional diagnostics in a 2.091 s update; these are
+observations under concurrent checks, not an isolated performance claim. Existing 4,706
+crossing pairs remain advisory. Offscreen controls and hidden GPU inspection pass.
+All 31 relocated minimal-PATH portable checks pass. Evidence:
+`build/skin-041/reference-parity`, and [task record](tasks/release-041.md).
+
+Whole-body FAST weight reuse: cold 113.638 s / new-process warm 17.257 s, 128 handles,
+identical positions/diagnostics/prediction hash. A single pair during packaging establishes
+reuse, not a controlled speedup estimate. The unchanged BBW iteration-limit messages on
+cold computation remain; caching does not strengthen convergence or geometry guarantees.

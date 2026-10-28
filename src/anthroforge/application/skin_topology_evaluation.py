@@ -48,17 +48,25 @@ def evaluate(
 def solve(inputs: Any, sources: Any, loops: Any, guides: Any, cancel: Any) -> ComputedStage:
     try:
         output, backend, attempts = skin_remeshing.run(inputs, cancel)
-        quality = skin_validation.evaluate(
-            output.topology,
-            inputs.envelope,
-            inputs.annuli.counts[1],
-            inputs.annuli.counts[2],
-            inputs.plane,
-            cancel.handle,
-        )
+        quality = diagnose(inputs, output, cancel.handle)
         return complete(inputs, output, backend, attempts, (sources, loops, guides), quality)
     finally:
         inputs.annuli.close()
+
+
+def diagnose(inputs: Any, output: Any, cancel: int) -> dict[str, Any]:
+    quality = skin_validation.evaluate(
+        output.topology,
+        inputs.envelope,
+        inputs.annuli.counts[1],
+        inputs.annuli.counts[2],
+        inputs.plane,
+        cancel,
+    )
+    quality["budgets"] = skin_density.achieved(
+        inputs.density, inputs.envelope, output.topology.mesh, cancel
+    )
+    return quality
 
 
 def arrays(inputs: Any, output: Any, loops: Any) -> dict[str, Any]:
@@ -79,9 +87,11 @@ def complete(
     sources, loops, guides = captures
     warnings = tuple(text for row in (*captures, inputs.density, backend) for text in row.warnings)
     warnings += (output.warning,) if output.warning else ()
+    warnings += skin_density.budget_warnings(quality["budgets"])
     info = metadata(inputs, output, attempts, sources, loops, guides)
     info["warnings"] = list(dict.fromkeys(warnings))
     info["topology_quality"] = quality
+    info["budgets"] = quality["budgets"]
     return ComputedStage(
         output.topology.mesh, skin_assets.create(arrays(inputs, output, loops), info)
     )

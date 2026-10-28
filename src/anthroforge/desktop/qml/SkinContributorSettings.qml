@@ -6,6 +6,7 @@ ColumnLayout {
     id: panel
     required property var contributor
     readonly property var settings: contributor.settings || ({})
+    readonly property var effective: contributor.effective || ({})
     visible: !!contributor.owner
     Layout.fillWidth: true
     spacing: Theme.gap
@@ -26,18 +27,20 @@ ColumnLayout {
             onActivated:panel.change("gap_mode", currentIndex ? "OVERRIDE" : "INHERIT")
         }
         NumericSetting {
+            objectName:"skinSourceGapLimit"
             visible:!panel.contributor.fiber
             label:"Maximum gap to close"; minimum:0; maximum:100
             enabled:panel.settings.gap_mode === "OVERRIDE"
-            value:100*(panel.settings.gap_limit_ratio || 0)
+            value:100*(panel.effective.gap_limit_ratio || 0)
             hint:"Percent of model longest axis"
             onEdited:value=>panel.change("gap_limit_ratio", value/100)
         }
         NumericSetting {
+            objectName:"skinSourceGapStrength"
             visible:!panel.contributor.fiber
             label:"Gap filling strength"; minimum:0; maximum:100
             enabled:panel.settings.gap_mode === "OVERRIDE"
-            value:100*(panel.settings.gap_strength || 0)
+            value:100*(panel.effective.gap_strength || 0)
             hint:"Percent of permitted gap filling"
             onEdited:value=>panel.change("gap_strength", value/100)
         }
@@ -78,8 +81,10 @@ ColumnLayout {
                 onActivated:panel.change("collagen_mode",["AUTO","UNIFORM","PAINTED"][currentIndex])
             }
             NumericSetting {
-                objectName:"skinSourceCollagen"; label:"Default collagen"; minimum:0; maximum:1
-                value:panel.settings.collagen === undefined ? 1 : panel.settings.collagen
+                objectName:"skinSourceCollagen"; minimum:0; maximum:1
+                label:panel.settings.collagen_mode === "AUTO" ? "Automatic collagen" : "Default collagen"
+                enabled:panel.settings.collagen_mode !== "AUTO"
+                value:panel.effective.collagen ?? 1
                 hint:"0 keeps skin close to bone; 1 allows the full collagen layer."
                 onEdited:value=>panel.change("collagen",value)
             }

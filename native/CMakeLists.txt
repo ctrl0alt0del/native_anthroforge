@@ -62,6 +62,7 @@ target_sources(af_native PRIVATE src/expression_lexer.cpp src/expression_types.c
     src/shortcut_attachments.cpp src/parametric.cpp)
 target_sources(af_native PRIVATE src/skin_symmetry.cpp src/skin_symmetry_cut.cpp)
 target_sources(af_native PRIVATE src/skin_topology_quality.cpp)
+target_sources(af_native PRIVATE src/skin_budget_counts.cpp)
 target_sources(af_native PRIVATE src/process_shutdown.cpp)
 target_sources(af_native PRIVATE src/blender_mesh_normals.cpp)
 target_sources(af_native PRIVATE src/skin_fiber.cpp src/skin_bevel_frames.cpp src/skin_bevel_points.cpp)

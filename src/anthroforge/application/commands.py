@@ -99,6 +99,7 @@ EDITS = {
     "skin.fit.remove": skin_fit_results.remove,
     "skin.build": skin_jobs.build,
     "skin.configure": skin_operations.configure,
+    "skin.envelope.reset": skin_operations.reset_envelope,
     "skin.contributor.configure": skin_operations.contributor,
     "mirror.loop.create": symmetric_paths.create,
     "mirror.configure": mirror_operations.configure,
@@ -321,14 +322,21 @@ def direct_commands(session: "Session") -> dict[str, Any]:
         **query_commands(session),
         **history_commands(session),
         "inspect": session.describe,
-        "skin.inspect": lambda: skin_operations.inspect(session),
-        **skin_fit_queries(session),
-        "skin.status": session.skin_status.describe,
-        "skin.export": lambda **a: skin_export.export(session, **a),
+        **skin_queries(session),
         "wait": session.wait,
         "tick": session.scheduler.tick,
         "evaluate": lambda **a: evaluate(session, **a),
         "curve.reroute": lambda **a: path_tasks.reroute(session, **a),
+    }
+
+
+def skin_queries(session: "Session") -> dict[str, Any]:
+    return {
+        "skin.inspect": lambda: skin_operations.inspect(session),
+        "skin.report": lambda: skin_operations.report(session),
+        "skin.status": session.skin_status.describe,
+        "skin.export": lambda **a: skin_export.export(session, **a),
+        **skin_fit_queries(session),
     }
 
 

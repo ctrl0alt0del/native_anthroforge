@@ -1,11 +1,17 @@
 # AnthroForge release roadmap
 
-- **Next version after 0.4.0 — confirmed direction, not implemented:** extend shared,
+- **0.4.1 — qualified skin audit corrections:** restore draft-based
+  reference preparation, final diagnostics, achieved topology budgets, persistent FAST
+  weights, effective inherited settings, envelope reset and moving-region fit summaries.
+  See [scope and evidence](tasks/release-041.md) and [workflow](skin_workflow.md).
+
+- **Later status-provider work — confirmed direction, not implemented:** extend shared,
   operation-specific status providers to other functionality whose UI currently derives
   readiness, warnings or availability from workspace/document state. Inventory existing
   consumers and reuse their notifications and shared policies; do not introduce global
   polling or a universal status manager. The pattern starts with SkinStatusProvider in
-  0.4.0. [Architecture](architecture.md#shared-operation-status-providers).
+  0.4.0. [Architecture](architecture.md#shared-operation-status-providers),
+  [initial inventory](tasks/release-041.md). This refactoring is not included in 0.4.1.
 
 - **0.4.0 — qualified with accepted quality limits:** migrates the addon's skin envelope,
   guided topology, final-skin updates and shortcut-to-bone fitting. Reproduce existing

@@ -8,6 +8,13 @@ from .mesh import Mesh, U
 
 def configure(engine: Any) -> None:
     engine.bind("af_skin_proxy_decimate", [U, c.c_int, U, U], U)
+    engine.bind("af_skin_reference_proxy", [U, U], U)
+
+
+def reference(mesh: Mesh, cancel: int = 0) -> Mesh:
+    handle = mesh.engine.library.af_skin_reference_proxy(mesh.handle, cancel)
+    mesh.engine.check(not handle)
+    return Mesh(mesh.engine, handle)
 
 
 def decimate(mesh: Mesh, target: int, budget: int = 0, cancel: int = 0) -> Mesh:

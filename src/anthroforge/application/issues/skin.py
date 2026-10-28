@@ -107,6 +107,12 @@ def stage_evidence(stage: Any, metadata: Any) -> dict[str, Any]:
         geometry=stage.asset,
         quality=metadata.get("quality", {}),
         topology_quality=metadata.get("topology_quality", {}),
+        solver=metadata.get("solver", {}),
+        contact=metadata.get("contact", {}),
+        intersections=metadata.get("intersections", {}),
+        crossing_comparison=metadata.get("crossing_comparison", {}),
+        anatomy_clearance=metadata.get("anatomy_clearance", {}),
+        budgets=metadata.get("budgets", []),
     )
 
 

@@ -19,6 +19,7 @@ UiScrollView {
             onActivated:workspace.run("workspace.update",{skin_display:currentValue})
         }
         Label { text: "Envelope"; color: Theme.text; font.bold:true; Layout.topMargin:Theme.gap }
+        UiButton { objectName:"skinResetEnvelope"; text:"Reset defaults"; hint:"Restore the draft skin offset, collagen and gap settings."; onClicked:workspace.run("skin.envelope.reset",{}) }
         UiButton { objectName:"skinBuildEnvelope"; text:"Rebuild envelope"; Layout.fillWidth:true; onClicked:workspace.run("skin.envelope.build",{}) }
         Repeater {
             model: [
@@ -54,6 +55,7 @@ UiScrollView {
             onClicked:workspace.run("skin.evaluate",{})
         }
         SkinFits { adapter: workspace.skinPanel.fits }
+        SkinReports { reports:pane.state.reports || ({}) }
         SkinExport { }
     }
 }

@@ -1,6 +1,6 @@
 """Document-owned skin construction; no authored anatomical wrapper or native handles."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from math import isfinite
 
 from .results import EvaluationResult, ReadRevision
@@ -143,3 +143,13 @@ def effective_collagen(settings: SkinContributor, name: str) -> float:
     if settings.collagen_mode != "AUTO":
         return settings.collagen
     return 0.0 if any(term in name.lower() for term in ("ear", "cartilage", "nasal")) else 1.0
+
+
+def effective_contributor(skin: Skin, settings: SkinContributor, name: str) -> SkinContributor:
+    gap = settings if settings.gap_mode == "OVERRIDE" else skin.envelope_settings
+    return replace(
+        settings,
+        collagen=effective_collagen(settings, name),
+        gap_limit_ratio=gap.gap_limit_ratio,
+        gap_strength=gap.gap_strength,
+    )

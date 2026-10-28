@@ -6,7 +6,7 @@ from typing import Any
 
 import numpy as np
 
-from .mesh import D, Mesh, U, doubles, pointer
+from .mesh import INT64, D, Mesh, U, doubles, pointer
 from .skin_flow import integers
 
 
@@ -22,6 +22,19 @@ def configure(engine: Any) -> None:
     engine.bind("af_skin_proxy_smooth", [U, c.c_double, c.c_int, U], U)
     integer = c.POINTER(c.c_int)
     engine.bind("af_skin_density", [U, integer, D, c.c_int, D, c.c_int, D, D, D, integer, U])
+    engine.bind("af_skin_budget_counts", [U, integer, integer, c.c_int, c.c_int, INT64, U])
+
+
+def achieved(mesh: Mesh, owners: Any, mapping: Any, count: int, cancel: int = 0) -> Any:
+    ids, regions = (np.ascontiguousarray(a, dtype=np.int32) for a in (owners, mapping))
+    if ids.shape != (mesh.counts[0],) or regions.ndim != 1 or count < 1:
+        raise ValueError("Topology budgets require vertex ownership and region mapping.")
+    result = np.zeros(count, dtype=np.int64)
+    args = mesh.handle, integers(ids), integers(regions), len(regions), count
+    mesh.engine.check(
+        mesh.engine.library.af_skin_budget_counts(*args, result.ctypes.data_as(INT64), cancel)
+    )
+    return result
 
 
 def inputs(mesh: Mesh, regions: Any, budgets: Any, initial: Any) -> tuple[Any, Any, Any]:

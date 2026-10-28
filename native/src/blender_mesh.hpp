@@ -13,6 +13,6 @@ struct Owned {
 std::vector<std::array<int,2>> edge_order(const Mesh& source,uint64_t cancel);
 std::shared_ptr<Mesh> result(BMesh* mesh,uint64_t cancel);
 void input_normals(Owned& input,uint64_t cancel);
-std::shared_ptr<Mesh> decimate(const Mesh& source,int target,uint64_t cancel);
+std::shared_ptr<Mesh> decimate(const Mesh& source,int target,uint64_t cancel,float minimum=.01f);
 std::shared_ptr<Mesh> half(const Mesh& source,const V3& origin,const V3& normal,uint64_t cancel);
 }

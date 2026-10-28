@@ -78,6 +78,7 @@ namespace af::skin::kernel {
 #include "../migration/skin/af_skin_tile_finish.hpp"
 #include "../migration/skin/af_skin_components.hpp"
 #include "../migration/skin/af_skin_gap_validation.hpp"
+#include "../migration/skin/af_mesh_diagnostics.hpp"
 #undef AF_EXPORT
 }
 #if defined(__clang__)

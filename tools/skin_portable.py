@@ -13,7 +13,21 @@ def qualify(executable, cwd, invoke):
     state = json.loads(inspect)
     assert state["skin_available"] and not state["save_blocked"]
     verify_saved(cwd)
+    audit(executable, cwd, invoke)
     preview(executable, cwd, invoke)
+
+
+def audit(executable, cwd, invoke):
+    operations = [dict(operation="skin.report"), dict(operation="skin.envelope.reset")]
+    path = cwd / "skin-audit.json"
+    path.write_text(json.dumps(operations), encoding="utf-8")
+    text = invoke(executable, cwd, "--cli", "run", str(path), "--project", "skin.anthroforge")
+    rows = [json.loads(line) for line in text.splitlines()]
+    assert all(row["ok"] for row in rows)
+    report = rows[0]["result"]
+    assert "solver" in report["final"]["report"]
+    assert "intersections" in report["final"]["report"]
+    assert "budgets" in report["topology"]["report"]
 
 
 def verify_saved(cwd):

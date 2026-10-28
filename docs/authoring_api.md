@@ -1,4 +1,4 @@
-# Local authoring API, 0.4.0
+# Local authoring API, 0.4.1
 
 The [skin workflow](skin_workflow.md) and `examples/skin.json` demonstrate the 0.4.0
 build, fitting, independent playback and OBJ operations. Validation and release packaging
@@ -1085,19 +1085,21 @@ revisions through `skin.status`. Desktop subscriptions and headless operations s
 Unapplied build settings allow fitting with a warning when the existing reference is
 usable; missing skin or incompatible material/vertex identities prevents fitting. Every
 sample must still validate. No status read initiates computation or edits document state.
-`skin.reference.build` prepares a durable reference from accepted topology; `skin.evaluate`
+`skin.reference.build` retains accepted topology and prepares its tetrahedral proxy from
+the Decimate-reduced draft envelope (topology fallback only when no draft exists); `skin.evaluate`
 updates positions while preserving connectivity and the reference's captured tissue choice.
 `preferences.set(skin_tissue_surface="FINISHED" | "INFLATED_REST")` affects new references;
 finished/cropped is the default and both sides contribute. Main `skin.build` includes reference
 preparation. Failed replacement retains old output and pending new topology for retry.
-Wider status-provider migration is deferred to the next version after 0.4.0.
+Wider status-provider migration remains future work, outside 0.4.1.
 
 `skin.fit(shortcut, settings)` queues isolated sampling and publishes one independent
 result with coherent undo. Settings require `minimum`/`maximum`; optional `bones=4`,
 `samples=9`, `smoothing=1.0` retain addon defaults. Samples must be odd, 5–33; bones 1–64.
 Public strategy is `SCALE_AWARE`; `skin.fit.authoring` additionally permits `SINGLE_ACTIVE`.
 `skin.fit.eligibility(identity)` returns the shared scalar/readiness assessment.
-`skin.fit.inspect(identity)` includes source provenance, stale state and per-sample errors.
+`skin.fit.inspect(identity)` includes source provenance, stale state and per-sample errors,
+plus `report.active_bones` and `report.moving_validation_p95` (percent of model height).
 `skin.fit.preview(identity,value)`, `.preview.status()` and `.preview.cancel()` use stored
 linear TRS channels without evaluating anatomy, modifying history or blocking saving.
 `skin.fit.remove(identity)` removes the independent result through normal undo.
@@ -1110,3 +1112,11 @@ Atomic replacement protects an existing destination on error/cancellation. No or
 anatomy, debug objects, bones or weights are included. A missing final skin blocks export.
 The result identifies job, path, captured revision and state. See the skin task for
 qualification evidence, remesher quality warnings and offscreen acceptance limits.
+
+`skin.envelope.reset()` resets the six draft fields in one undo transaction, preserving
+per-source policies and all other settings. `skin.report()` is a read-only query returning
+accepted envelope/topology/final revisions and their retained reports. Reports include
+solver/contact diagnostics, bounded intersection witnesses, sampled clearance and achieved
+exclusive-region budgets. Unavailable checks are explicit; these findings do not repair
+or reject output. The query neither schedules work nor mutates document state.
+

@@ -44,7 +44,7 @@ def validate(context: Any, instance: Any, rows: Any) -> list[dict[str, Any]]:
     return [checked(context, instance, item, row) for row in rows]
 
 
-def checked(context: Any, instance: Any, item: Any, row: Any) -> dict[str, Any]:
+def checked(context: Any, instance: Any, item: Any, row: dict[str, Any]) -> dict[str, Any]:
     if shared(context.document, instance, row):
         return dict(row, binding_mode="source_reflection", surface_contact="not_checked")
     if needs_validation(context.document, instance, row):

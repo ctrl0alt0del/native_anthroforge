@@ -81,7 +81,22 @@ remain for non-shared relationships. Shared supports can still be asymmetric; th
 a surface-contact guarantee. The previous proposal to capture new anchors was withdrawn.
 19 focused tests pass, covering source geometry, shared binding persistence/plane edits,
 missing counterparts and ownership/style limits. Regenerated candidate has 689 mapped
-relationships and no false mismatch rows. Full development gate/package checks pending.
+relationships and no false mismatch rows. All four full-assembly shortcut trials pass again with exact source geometry/bindings and
+no task errors. Gate first stopped on a missing Python return-value parameter type; a
+signature-only annotation fixed that, with no runtime behavior change. Full gate rerun pending.
 
-Next: finish representative shortcut comparisons, package the app, verify hidden captures
-and source hash, deliver one new project under the source migration directory, then merge.
+Canonical 0.4.2 executable built from clean runtime checkpoint `b3d6f898`; subsequent source
+change is a type annotation only. Relocated mirror/Issues and full-assembly checks are running.
+No visible window or desktop input. Development gate is running native style/full tests.
+
+Delivery copied, with matching candidate/delivery SHA256:
+`86c08109700bb6e12de807dca8ef93ba37efe33f0a60dc3c2a87a71cc87be554`.
+Path: `E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_live_mirroring_v001.anthroforge`.
+Original source SHA remains unchanged. Deliverable is 264.9 MiB, schema 9.
+
+Ownership review: correction stays in the shared application inspection policy; geometry,
+retained material bindings and Core serialization are untouched. Migration reuses scoped rules,
+typed reference inspection, selective resource saving and source provider reflection. No new
+mirror worker, graph duplication, numerical approximation or opposite-side driver chains.
+
+Next: finish gate/relocated checks, inspect packaged captures, update source archive and merge.

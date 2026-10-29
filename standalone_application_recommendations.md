@@ -5,8 +5,9 @@ Updated: 2026-10-29
 The [0.5.0 Muscle Paint specification](docs/specification_050.md) is **confirmed, not
 implemented**. It adds area/direction painting that explicitly creates editable Fibers and
 Membranes; it is distinct from existing tissue/skin weight painting. The
-[initial research](docs/muscle_paint_050_research.md) inventories reusable addon algorithms
-and published methods without claiming qualification or changing existing computations.
+[method research](docs/muscle_paint_050_research.md) covers the fourteen identified method
+questions, inventories reusable addon algorithms and records concrete integration gaps and
+approaches, without claiming qualification or changing existing computations.
 
 For current implementation coverage, see the [0.4.2 preparation audit](docs/recommendations_042_audit.md)
 and [0.4.3 authoring parity delivery](docs/authoring_043.md). The latter implements shared

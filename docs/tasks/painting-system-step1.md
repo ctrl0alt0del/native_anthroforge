@@ -3,83 +3,79 @@
 - Task branch: `codex/painting-system-step1`
 - Integration branch: `main`
 - Starting revision: `713d963ecc5cad9aad939141acc140a73180324e`
-- Status: implementation in progress
+- Status: implementation and qualification complete; ready for validated merge
 - Active writer: local implementation session
 - Last updated: 2026-10-30
 
-## Outcome and acceptance
+## Delivered scope
 
-Implement the confirmed shared Painting System, migrating tissue weights and collagen.
-Preserve numerical kernels, existing controls, one-stroke-at-a-time interaction and
-one-action undo. Keep schema 9 and version 0.4.3. Muscle Paint, outer-region painting,
-world-width brushes, envelopes and transient painting history are separate increments.
+Qt-independent, context-owned Painting System for tissue weights and SCP collagen.
+Desktop, Python and JSON clients share begin/append/finish, read-only preview/explicit
+commit, status, paged results and cancellation. Existing inspection/job-commit commands
+remain compatible. The coordinator owns batching, workers, publication and finalization;
+consumer adapters own effects and domain commits. Native numerical kernels are unchanged.
 
-## Decisions and relevant files
+Schema 9 and package version 0.4.3 remain unchanged. This is a foundation increment,
+not Muscle Paint, Paint Outer, envelopes, physical-width brushes or completion of 0.5.0.
+See [design/API/evidence](../painting_system.md) and
+[computation history](../computation_history.md).
 
-The application owns stroke/preview/finalization state per editing context. Explicit
-consumer adapters own effects. The existing coordinator remains the only scheduler;
-native painting calculations and bounded projection cache remain unchanged. Legacy
-inspection and commit operations delegate to the same service. Desktop becomes an adapter.
+## Qualification
 
-## Current state
+- Full `tools/check.ps1` passed: Ruff, formatting, mypy (652 source files), native build,
+  6 CTest checks, native style, PowerShell checks, **2,880 pytest cases**, numerical
+  dependency checks and native doctor. The test suite took 404.24 seconds. Existing
+  Qt deprecation/vendor warnings remain; no failures were hidden or skipped.
+- Qt-free headless strokes, one-action undo/redo, no-op history, finish-before-preview,
+  exact ready-candidate reuse, queued/running cancellation, supersession, failures,
+  context isolation, pending-save publication and saved-state round trips pass.
+- Desktop and authoring candidates match exactly. Mirror/workspace restrictions,
+  frozen input settings, sample/page limits, stale baselines, camera metadata,
+  previous preview retention, exported preview restoration and resource release pass.
+- Serial old/new/new/old trials preserve every scalar array across 36 conditions on
+  a 66,049-vertex dense SCP and the full 96-muscle assembly. Peak unique geometry
+  ownership is unchanged. Small additional upfront baseline-check costs are documented;
+  no speedup is claimed. Timings, variance and source hash are in the design evidence.
+- A fresh temporary executable was relocated and passed **37 portable workflow groups**
+  with minimal PATH and no development Python/Qt settings. The new shared painting
+  sequence and legacy image exports pass alongside the existing complete workflow suite.
+- Actual hidden GPU images were inspected for both consumers at two angles, cancellation,
+  and packaged inspection export. No visible window or physical desktop input was used.
+  This is offscreen/hidden-render evidence, not manual interactive acceptance.
+- Documentation links and UTF-8 were checked. Functions satisfy the 15-line limit.
 
-Shared core/application stroke contracts, explicit consumers, headless operations,
-coordinator finalization, legacy adapters and desktop migration are implemented.
-Native numerical code is unchanged. Follow-up hardening, style/type checks, save
-coordination, resource/performance evidence and packaging remain unfinished.
-Primary checkout contains unrelated unfinished assembly changes;
-work occurs in `build/painting-system-step1` and must not stage those changes.
+## Defects caught during qualification
 
-## Verification
+The initial save-admission helper assumed a live Session and broke captured formula
+contexts. The final shared admission function supports both existing context contracts;
+the complete regression suite passes. An isolated image-export restore adapter still
+called the removed desktop retention method; it now uses the shared service/token and
+has a regression. Legacy commit routes also enforce no merging into another gesture.
+Profiler evidence exposed duplicate field validation, which was removed without dropping
+geometry, field or occluder validation at capture/dispatch/publication.
 
-Focused native/legacy tests: 14 passed. Offscreen desktop painting tests: 6 passed.
-New shared lifecycle tests: 20 passed, including finish-before-preview, undo/redo,
-cancel, changed baseline, paging, no-op, limits and Qt-free execution. Style/type and 15-line checks now pass. Save coordination regression fixed through
-the shared admitted-publication edit boundary. Sixteen further lifecycle cases pass
-(resource release, delayed cancellation, exact candidate reuse, failure and contexts).
-Eight numerical parity matrix cases and pending-save/export checks also pass.
-Hidden GPU captures exist under build/painting/visual; no physical-window interaction.
-Full gate is running (native build/CTest/style complete; full pytest in progress).
-Required: full development gate; dense
-and 96-muscle performance comparison; offscreen images; relocated portable checks.
-No interactive desktop evidence may be claimed.
+## Ownership and coupling review
 
-## Next actions
+Reviewed separately from test success: immutable records belong to Core; context state,
+read validation, cancellation and publication belong to Application; explicit consumer
+composition owns tissue/collagen policy. Desktop captures input and presents leased
+resources. No new numerical algorithm, dependency, worker pool, Qt timer, document-owned
+paint session or accumulating stroke archive was added. Existing projection-cache budgets
+and independent viewport leases remain in use.
 
-1. Complete numerical/client parity matrix and representative profiling.
-2. Run full development gate and hidden-render/relocated portable qualification.
-3. Record evidence and ownership review; merge only validated work.
+## Recovery and delivery
 
-## Recovery inputs
+Worktree: `E:/development/anthroforge/build/painting-system-step1`.
+Runtime package code: `88b2ce24`; later commits contain qualification documentation only.
+Temporary package: `build/painting/package/AnthroForge.dist`.
+Relocated qualification: `build/painting/relocated`; evidence: `build/painting/portable-final`.
+Gate log: `build/painting/gate-final.log`; portable log: `build/painting/portable-final.log`.
+Profiles/arrays: `build/painting/profiles` and `build/painting/final-serial`.
+These local-only artifacts are reproducible with the committed qualification tools and
+the external production fixture identified in the design document; they are not in Git.
 
-Primary repository and reusable environment/native builds: `E:/development/anthroforge`.
-No production anatomy files may be modified. Numerical algorithms must remain unchanged.
-The containing commit identifies this checkpoint; inspect remote reachability.
-
-## Qualification checkpoint — 2026-10-30
-
-Full native rebuild, CTest and native style passed. The first full Python gate reported
-31 formula-related failures: the new save-admission property assumed a live Session
-instead of the existing captured evaluation context. Replaced it with a shared admission
-function that respects that contract. Fifty-four targeted formula/assembly/variant and
-painting tests now pass. One new overlength test helper was also corrected.
-A complete regression rerun remains required. Mypy and formatting pass.
-
-Final serial ABBA comparison has exact scalar-array parity on 36 preview conditions
-across a 66,049-vertex dense SCP and the full 96-muscle assembly. Removed redundant
-tissue-field validation observed in the profiler; geometry checks remain intact.
-Legacy paint commits now share the same no-active-gesture admission as new commits.
-Focused lifecycle/architecture regression: 20 passed. Full gate and temporary package
-qualification are next. Raw results are under `build/painting/final-serial` and profiles
-under `build/painting/profiles`; these local-only artifacts are not in Git.
-
-Relocated qualification found the isolated image renderer still called the removed
-desktop `retain_preview` method. Its restore adapter now requests the shared preview,
-retains its token and synchronizes presentation. The actual failed path has a regression;
-client parity, mirror/workspace restrictions and restored-preview cancellation pass
-(9 focused checks including architecture). Runtime package is being rebuilt; full gate
-continues and portable checks must be rerun before delivery.
-
-Serial ABBA old/new timing and exact-array comparison are running against production
-code at 713d963e (equivalent docs worktree 308ca03d), using the same native library.
-Temporary qualification package and relocated portable suite remain pending.
+Deliver by replacing the existing canonical `dist/0.4.3/AnthroForge.dist` and companion
+source archive, then merge/push the qualified branch. Do not create another distribution
+name. Primary checkout contains unrelated unfinished assembly work and the legacy root
+`__init__.py`; preserve all of it. Recovery copies/hashes of those 12 local files are under
+`build/painting/integration-recovery`. Git ancestry establishes final integration.

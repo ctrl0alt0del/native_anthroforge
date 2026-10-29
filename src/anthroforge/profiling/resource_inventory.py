@@ -53,6 +53,8 @@ RESOURCE_FIELDS = frozenset(
         "baseline",
         "comparison",
         "skin",
+        "layers",
+        "resource",
     )
 )
 RESOURCE_TYPES = (
@@ -186,6 +188,9 @@ def inspection_owners(session, output, profiler):
     for value in session.tissue_inspection.values.values():
         if value.asset:
             output["tissue_inspection"].update(payload_resources(value.asset, profiler))
+    snapshot = session._editing.values.get("inspection_snapshot")
+    if snapshot:
+        output["inspection_capture"].update(payload_resources(snapshot, profiler))
 
 
 def catalogue_resources(session):

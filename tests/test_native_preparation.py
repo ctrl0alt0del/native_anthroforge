@@ -6,10 +6,11 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
+from anthroforge.application import editing_queries
 from anthroforge.core.construction import Control, Deformer, Target
 from anthroforge.core.document import Document
 from anthroforge.core.entities import IDENTITY
-from anthroforge.desktop import authoring_actions, authoring_state
+from anthroforge.desktop import authoring_actions
 from anthroforge.native import components, construction, control_geometry
 from anthroforge.native.mesh import NativeCancellation
 
@@ -109,9 +110,13 @@ def mixed_cage_editor(session):
     matrix = session.engine.transform([1, 2, 3, 15, 25, 35, -2, 3, 1])
     b = replace(a, id="B", matrix=matrix)
     session.document = Document(controls=(a, b), update_mode="MANUAL")
-    rows_a, rows_b = (authoring_state.control_components(session, c) for c in (a, b))
+    rows_a, rows_b = (control_rows(session, c.id) for c in (a, b))
     rows = [row for pair in zip(rows_a, rows_b, strict=True) for row in pair]
     return SimpleNamespace(controller=SimpleNamespace(session=session), drag_rows=rows), (a, b)
+
+
+def control_rows(session, target):
+    return editing_queries.rows(editing_queries.current(session, target, "CONTROL"))
 
 
 def test_grouped_edit_preserves_interleaved_frames_and_cancel(session):
@@ -120,10 +125,7 @@ def test_grouped_edit_preserves_interleaved_frames_and_cancel(session):
     world = np.array([row[1] for row in editor.drag_rows]) + [0.2, -0.3, 0.1]
     session.command("begin")
     authoring_actions.apply_points(editor, world)
-    actual = [
-        authoring_state.control_components(session, session.document.control(c.id))
-        for c in controls
-    ]
+    actual = [control_rows(session, c.id) for c in controls]
     for index, rows in enumerate(actual):
         np.testing.assert_allclose([r[1] for r in rows], world[index::2], atol=1e-12)
     session.command("cancel")

@@ -11,6 +11,18 @@ from .query_projection import plain
 
 MESH_BUFFERS = dict(positions=0, corners=1, offsets=2, triangles=3, triangle_faces=4)
 PATH_BUFFERS = dict(samples=0, parameters=1, positions=0)
+LAYER_FIELDS = (
+    "subject",
+    "kind",
+    "frame",
+    "side",
+    "stage",
+    "status",
+    "reason",
+    "category",
+    "color",
+    "lineage",
+)
 
 
 @dataclass(frozen=True)
@@ -99,19 +111,11 @@ def metadata(layer: Layer) -> dict[str, Any]:
 
 
 def layer_metadata(layer: Layer) -> dict[str, Any]:
-    fields = (
-        "subject",
-        "kind",
-        "frame",
-        "side",
-        "stage",
-        "status",
-        "reason",
-        "category",
-        "color",
-        "lineage",
+    return dict(
+        id=layer.identity,
+        provenance=plain(dict(layer.provenance)),
+        **{key: plain(getattr(layer, key)) for key in LAYER_FIELDS},
     )
-    return dict(id=layer.identity, **{key: plain(getattr(layer, key)) for key in fields})
 
 
 def array(layer: Layer, name: str) -> Any:

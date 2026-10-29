@@ -11,6 +11,7 @@ from pathlib import Path
 import numpy as np
 from assembly_portable import assembly
 from attached_creation_portable import automatic_construction
+from authoring_parity_portable import authoring_parity
 from authoring_workflows_portable import authoring_workflows
 from branch_placement_portable import branches
 from comparison_portable import comparison
@@ -69,6 +70,7 @@ CHECKS = (
     "cross-project assembly, embedded images, one-action undo/redo and schema-9 storage",
     "skeleton replacement, isolated preparation, retained identities and one-action undo/redo",
     "persistent variants, promotion, catalogue, review queue, stages and comparison export",
+    "current components, contextual choices, JSON literals and immutable candidate images/data",
 )
 
 
@@ -192,7 +194,7 @@ def construction_steps():
 
 
 def inspection_steps():
-    return workflow, inspection, spatial_inspection
+    return workflow, inspection, spatial_inspection, authoring_parity
 
 
 def deletion(executable, cwd, invoke=invoke):

@@ -3866,7 +3866,7 @@ attachments, shortcut updates and packaged qualification are recorded in the
 under ignored `build/assembly-live-mirroring`; it is not part of the source archive.
 
 
-## 2026-10-29 — Authoring inspection boundaries (qualification pending)
+## 2026-10-29 â€” Authoring inspection boundaries (qualification pending)
 
 Baseline `31e9138f`. Desktop-only resolved component preparation moves into shared
 application read buffers, preserving current Fiber editing and native transformations.
@@ -3882,3 +3882,11 @@ arrays. The unbundled renderer now respects AF_NATIVE_BUILD, consistent with pac
 qualification tools; bundled runtime selection remains unchanged. A repeat hidden render
 shows the candidate geometry. Broader performance and release checks remain pending in
 [the recovery record](tasks/authoring-fixes-043.md).
+
+Production qualification also exposed a pre-existing preview validity error: formulas and
+drivers were rejected as missing scene objects despite identical captured revisions. The
+shared preview check now uses the existing revision resolver for every dependency-port kind,
+retaining missing-input and revision-change rejection. The 96-muscle SCM inflation preview
+and a driver-edit staleness regression pass. This changes candidate eligibility, not numerical
+evaluation or accepted output. Inspection leases are attributed by the existing recording-only
+resource inventory; no additional polling is introduced.

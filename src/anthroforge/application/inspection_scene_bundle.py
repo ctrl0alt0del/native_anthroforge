@@ -61,6 +61,7 @@ def read_layer(root: Path, engine: Any, row: Any) -> Layer:
     options.update(
         identity=row["id"], frame=tuple(row["frame"]), resource=restore(root, engine, row)
     )
+    options["provenance"] = tuple(row.get("provenance", {}).items())
     return Layer(**options)
 
 

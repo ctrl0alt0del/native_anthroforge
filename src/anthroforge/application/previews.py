@@ -29,9 +29,10 @@ def current(session: Any, value: Preview[Any]) -> bool:
         return False
     if value.target and value.target not in available:
         return False
-    if any(port.owner not in available for port in value.ports):
+    try:
+        return value.reads == revisions(document, value.ports)
+    except (KeyError, ValueError):
         return False
-    return value.reads == revisions(document, value.ports)
 
 
 def completed(value: Preview[Any], job: Job, state: str) -> None:

@@ -41,7 +41,22 @@ def accepted(
         value = reconstruction_views.accepted(ctx, item, stage)
     except ValueError as error:
         value = Layer(target, None, IDENTITY, "NONE", reason=str(error), status="unavailable")
-    return decorate(value, item, side, stage, status)
+    return replace(decorate(value, item, side, stage, status), provenance=provenance(result))
+
+
+def provenance(result: Any) -> tuple[tuple[str, Any], ...]:
+    return tuple(
+        (key, getattr(result, key, ()))
+        for key in (
+            "asset",
+            "authored_revision",
+            "revision",
+            "inputs",
+            "pending",
+            "status",
+            "error",
+        )
+    )
 
 
 def decorate(value: Layer, item: Any, side: str, stage: str, status: str) -> Layer:
@@ -70,10 +85,17 @@ def simple(session: Any, kind: str, state: Any) -> tuple[Layer, ...]:
     resource = value.path if kind == "curve_conversion" else value.mesh
     frame = candidate_frame(session, item)
     layer = Layer(item.id, resource, frame, "PATH" if kind == "curve_conversion" else "MESH")
-    after = (decorate(layer, item, "after", stage, "current"),)
+    after = (prepared_layer(layer, item, stage, state),)
     related = dependents(ctx, state.target) if state.target else ()
     support = context_layers(ctx, item, {r.subject for r in (*before, *after, *related)})
     return mirrored(ctx, (*before, *after, *related, *support))
+
+
+def prepared_layer(layer: Layer, item: Any, stage: str, state: Any) -> Layer:
+    return replace(
+        decorate(layer, item, "after", stage, "current"),
+        provenance=(("inputs", state.reads), ("candidate", state.token)),
+    )
 
 
 def context_layers(ctx: Any, item: Any, included: set[str]) -> tuple[Layer, ...]:
@@ -161,8 +183,8 @@ def skin_layer(candidate: Any, stage: Any, side: str) -> Layer:
         side=side,
         subject="skin",
         category="skin",
-        status="retained" if retained else stage.status,
-        reason=stage.error,
+        status=("retained" if retained else stage.status) if resource else "unavailable",
+        reason=stage.error if resource else "No accepted final skin surface.",
     )
 
 

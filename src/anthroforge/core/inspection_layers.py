@@ -18,3 +18,4 @@ class Layer:
     reason: str = ""
     subject: str = ""
     category: str = "geometry"
+    provenance: tuple[tuple[str, Any], ...] = ()

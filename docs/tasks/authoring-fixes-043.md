@@ -72,3 +72,25 @@ after component bool annotations. Optional prepared skin appears in candidate co
 
 Remaining qualification: stronger capture/export ownership and Qt-free probes, production
 paging/memory/profile measurements, multi-angle render evidence, full gate and portable build.
+
+Qualification follow-up: the first complete suite found a lost LATTICE category alias and
+two old tests calling the removed private component reader. Restored LATTICE/GEOMETRY aliases,
+and migrated those tests to the shared reader. Follow-up 33 tests passed. Full gate is being
+repeated after these changes; the initial run was not a pass (2,812 passed, four failed,
+including a function-length check caught while the qualification script was being written).
+
+The actual 96-muscle assembly exposed an older shared-preview validity bug: formula/driver
+ports were rejected because their owners are not scene objects. Diagnostic showed all
+captured revisions equal, and the document unchanged. Validity now delegates all port kinds
+to the existing revision resolver; missing/changed ports still invalidate. No numerical
+algorithm changes. A driver-backed preview/staleness regression and production SCM preview
+pass. Capture resources now appear under inspection_capture in existing profiler ownership.
+
+Production run (source hash unchanged): 349 component targets, 29,199 rows / 352 pages;
+median 2.03 ms, p95 2.85 ms, maximum 4.32 ms per 256-row page. Captured geometry: 98,648 rows,
+48 pages, median 0.114 ms, maximum 0.497 ms. Thirty captures retain exactly one API snapshot;
+initial 5.23 ms, subsequent about 2.4 ms. Two split-view exports took 2.61/2.21 s including
+isolated render startup. Front/oblique SCM images inspected. System busy fraction 14.6%;
+single diagnostic run, not a controlled speedup claim. No Qt imported into numerical process.
+Evidence: build/authoring-fixes-043/production, plus source-portable mirror image/data test.
+Export lease retirement, canonical buffer round-trip and separate Qt-free subprocess pass.

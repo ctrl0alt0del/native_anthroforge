@@ -13,7 +13,9 @@ from .choice_queries import revision
 from .construction_policy import topology_locks
 from .query_projection import plain
 
-CATEGORIES = frozenset(("CURVE", "BASE", "VERTEX", "CONTROL", "TISSUE_CONTROL", "TISSUE_FIELD"))
+CATEGORIES = frozenset(
+    ("CURVE", "BASE", "VERTEX", "GEOMETRY", "CONTROL", "LATTICE", "TISSUE_CONTROL", "TISSUE_FIELD")
+)
 MEMBERSHIP = frozenset(("vertex", "base", "field"))
 
 

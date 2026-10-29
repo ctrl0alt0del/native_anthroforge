@@ -10,7 +10,7 @@ ColumnLayout {
     UiButton { text: "Mark a region on selected anatomy"; Layout.fillWidth: true; enabled: !!workspace.selectedId; onClicked: workspace.reconstructionCompare.inspect(workspace.selectedId) }
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Search surface regions" }
     ListView {
-        Layout.fillWidth: true; Layout.fillHeight: true; clip: true; reuseItems: true
+        Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumHeight: 150; clip: true; reuseItems: true
         model: (pane.records.regions || []).filter(r=>r.name.toLowerCase().includes(search.text.toLowerCase()))
         delegate: ItemDelegate {
             required property var modelData

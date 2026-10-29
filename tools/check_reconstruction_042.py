@@ -51,6 +51,35 @@ def fixture(controller):
     controller.select(target)
     controller.reconstruction_panel.create()
     controller.reconstruction_panel.run("variant.checkpoint", {"name": "Initial alternative"})
+    populate(session, target)
+
+
+def populate(session, target):
+    variant = session.contexts.visible
+    kind = session.command("catalogue.type.create", name="Sternocleidomastoid", category="Muscle")
+    session.command("catalogue.assign", target=target, type_id=kind, variant=variant, side="LEFT")
+    session.command(
+        "catalogue.region.set",
+        name="Attachment footprint",
+        target=target,
+        variant=variant,
+        triangles=[0, 1],
+    )
+    session.command("catalogue.collection.set", name="Neck reconstruction", members=[target])
+    populate_review(session, target, variant)
+    session.command("reconstruction.queue.add", subject=target, variant=variant, type_id=kind)
+
+
+def populate_review(session, target, variant):
+    session.command(
+        "review.set",
+        subject=target,
+        variant=variant,
+        dimension="ANATOMY",
+        decision="APPROVED",
+        reviewer="Qualification",
+        comment="Independent shape review with retained stage provenance.",
+    )
 
 
 def panel(app, controller, renderer):
@@ -61,18 +90,19 @@ def panel(app, controller, renderer):
     assert item is not None, [e.toString() for e in component.errors()]
     renderer.root.setVisible(False)
     item.setParentItem(renderer.window.contentItem())
-    item.setSize(QSizeF(360, 960))
-    capture_pages(app, controller, renderer)
+    for height in (400, 700, 960):
+        item.setSize(QSizeF(360, height))
+        capture_pages(app, controller, renderer, height)
     release(item)
 
 
-def capture_pages(app, controller, renderer):
+def capture_pages(app, controller, renderer, height):
     for page in ("Variants", "Catalogue", "Regions", "Stages", "Reviews", "Queue"):
         controller.reconstruction_panel.setPage(page)
         for _ in range(5):
             app.processEvents()
             image = renderer.frame()
-        assert image.save(str(OUTPUT / (page.lower() + ".png")))
+        assert image.save(str(OUTPUT / (page.lower() + f"-{height}.png")))
 
 
 def comparison(app, controller, renderer):

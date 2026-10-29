@@ -16,7 +16,7 @@ ColumnLayout {
     }
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Search queue" }
     ListView {
-        Layout.fillWidth: true; Layout.fillHeight: true; clip: true; reuseItems: true
+        Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumHeight: 150; clip: true; reuseItems: true
         model: pane.rows.filter(r=>(r.name+" "+r.owner+" "+r.next_action+" "+r.status).toLowerCase().includes(search.text.toLowerCase()))
         delegate: ItemDelegate {
             required property var modelData

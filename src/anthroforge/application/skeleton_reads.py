@@ -66,5 +66,10 @@ def require_global(reads: Any, document: Any) -> None:
 def merge_order(candidate: Any, current: Any) -> tuple[str, ...]:
     old = candidate.baseline.shortcut_order
     new = candidate.document.shortcut_order
-    changed = dict(zip(old, new, strict=True))
-    return tuple(changed.get(key, key) for key in current.shortcut_order)
+    if old == new:
+        return tuple(current.shortcut_order)
+    available = {
+        v.id for v in (*candidate.document.shortcuts, *candidate.document.driving_shortcuts)
+    }
+    retained = (key for key in current.shortcut_order if key not in old and key in available)
+    return tuple(dict.fromkeys((*new, *retained)))

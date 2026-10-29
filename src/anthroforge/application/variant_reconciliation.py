@@ -17,6 +17,8 @@ GROUPS = (
     "driving_shortcuts",
     "mirror_rules",
     "shared_mirror_targets",
+    "imports",
+    "external_references",
 )
 
 
@@ -49,6 +51,7 @@ def merge(record: Any, baseline: Any, current: Any, accepted: Any, choices: Any)
         before, proposed, live = (getattr(d, group) for d in (baseline, current, accepted))
         changes[group] = reconcile(before, proposed, live, owned, choices, findings)
     changes["formula_results"] = retained_results(current, accepted, changes["driving_shortcuts"])
+    changes["shortcut_order"] = merged_order(current, accepted, changes)
     try:
         return replace(accepted, **changes), findings
     except ValueError as error:
@@ -110,6 +113,15 @@ def retained_results(current: Any, accepted: Any, drivers: Any) -> tuple[Any, ..
         }
     )
     return tuple(results.values())
+
+
+def merged_order(current: Any, accepted: Any, changes: Any) -> tuple[str, ...]:
+    available = {r.id for key in ("shortcuts", "driving_shortcuts") for r in changes[key]}
+    return tuple(
+        dict.fromkeys(
+            k for k in (*accepted.shortcut_order, *current.shortcut_order) if k in available
+        )
+    )
 
 
 def refreshed(record: Any, baseline: Any, current: Any, accepted: Any) -> Any:

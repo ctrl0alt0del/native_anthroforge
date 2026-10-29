@@ -93,3 +93,16 @@ def test_promotion_evaluates_manual_required_formula_failure_as_blocking(session
     assert any(f["blocking"] and f["kind"] == "failure" for f in result["findings"])
     with pytest.raises(ValueError, match="Resolve"):
         apply(session, result)
+
+
+def test_refresh_copies_accepted_driven_support_values_without_rewriting_formulas(session):
+    source, first, second, original = shared_control(session)
+    key = variant(session, first)
+    session.command("variant.leave")
+    session.command("driver.value", driver=original, value=32)
+    session.wait()
+    apply(session, review(session, key, mode="refresh"))
+    session.command("variant.enter", variant=key)
+    assert session.document.object(source).resolution == 32
+    with pytest.raises(ValueError, match="pinned"):
+        session.command("object.rename", target=source, name="Pinned edit")

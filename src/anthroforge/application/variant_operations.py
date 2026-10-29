@@ -5,7 +5,7 @@ from typing import Any
 
 from anthroforge.core.reconstruction import SceneSnapshot, Variant
 
-from . import operations, variant_graph
+from . import operations, variant_graph, variant_policy
 from .editing_contexts import bare
 
 
@@ -31,6 +31,8 @@ def install(session: Any, value: Any) -> None:
 def create(session: Any, subjects: list[str], name: str = "", enter: bool = True) -> dict[str, Any]:
     require_idle(session)
     document = session.document
+    for target in subjects:
+        variant_policy.anatomy(session, target)
     copied, editable, mapping = variant_graph.duplicate(document, session.resources, subjects)
     baseline, current = SceneSnapshot(bare(document)), SceneSnapshot(copied)
     value = state(session)

@@ -19,6 +19,7 @@ def configure(engine: GeometryEngine) -> None:
     )
     engine.bind("af_geometry_matrix", [double_pointer, double_pointer, double_pointer])
     engine.bind("af_scene_bounds", [c.c_int, c.POINTER(c.c_uint64), double_pointer, double_pointer])
+    engine.bind("af_bounds_union", [c.c_int, double_pointer, double_pointer, double_pointer])
     configure_picking(engine)
 
 
@@ -104,6 +105,19 @@ def bounds(engine: GeometryEngine, handles: Any, matrices: Any) -> list[float]:
             meshes.ctypes.data_as(c.POINTER(c.c_uint64)),
             pointer(frames),
             pointer(output),
+        )
+    )
+    return list(output.tolist())
+
+
+def boxes(engine: GeometryEngine, bounds: Any, matrices: Any) -> list[float]:
+    values, frames = doubles(bounds), doubles(matrices)
+    if values.ndim != 2 or values.shape[1] != 6 or frames.size != len(values) * 16:
+        raise ValueError("Bounds require one six-value box and transform per object.")
+    output = np.empty(6)
+    engine.check(
+        engine.library.af_bounds_union(
+            len(values), pointer(values), pointer(frames), pointer(output)
         )
     )
     return list(output.tolist())

@@ -133,25 +133,23 @@ class SkeletonScene(QObject):
     def focus(self, key):
         self.selection = key
         self.refresh_annotations()
-        rows = [
-            r
-            for m in self.models
-            for r in m.wanted.values()
-            if r["kind"] == "MESH" and (not key or r["id"] == key)
-        ]
+        rows = [r for m in self.models for r in m.wanted.values() if not key or r["id"] == key]
         if rows:
             self.fit(rows)
         self.changed.emit()
 
     def fit(self, rows):
-        bounds = scene.bounds(
-            self.controller.session.engine, [r["handle"] for r in rows], [r["matrix"] for r in rows]
-        )
+        bounds = self.bounds(rows)
         center = [(bounds[i] + bounds[i + 3]) * 0.5 for i in range(3)]
         span = max(bounds[i + 3] - bounds[i] for i in range(3))
         self.framed_span = span
         self.needs_layout_fit = not bool(self.viewports)
         self.camera = [*center, *self.camera[3:5], self.fit_distance()]
+
+    def bounds(self, rows):
+        resources = {key: value for model in self.models for key, value in model.leases.items()}
+        boxes = [resources[r["handle"]].bounds if r["handle"] else (0.0,) * 6 for r in rows]
+        return scene.boxes(self.controller.session.engine, boxes, [r["matrix"] for r in rows])
 
     def fit_distance(self):
         aspect = min(self.viewports.values(), default=1.0)

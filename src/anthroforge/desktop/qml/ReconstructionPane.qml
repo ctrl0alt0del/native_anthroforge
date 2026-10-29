@@ -15,9 +15,9 @@ ColumnLayout {
     UiCombo { Layout.fillWidth: true; model: ["Variants","Catalogue","Regions","Stages","Reviews","Queue"]; currentIndex: model.indexOf(pane.service.page); onActivated: pane.service.setPage(currentText) }
     ScrollView {
         id: scroll; Layout.fillWidth: true; Layout.fillHeight: true; clip: true
-        contentWidth: availableWidth
+        contentWidth: availableWidth; contentHeight: pageLoader.implicitHeight
         Loader {
-            width: scroll.availableWidth; height: Math.max(scroll.availableHeight,item ? item.implicitHeight : 0)
+            id: pageLoader; width: scroll.availableWidth
             source: ({Variants:"ReconstructionVariants.qml",Catalogue:"ReconstructionCatalogue.qml",Regions:"ReconstructionRegions.qml",Stages:"ReconstructionStages.qml",Reviews:"ReconstructionReviews.qml",Queue:"ReconstructionQueue.qml"})[pane.service.page] || ""
         }
     }

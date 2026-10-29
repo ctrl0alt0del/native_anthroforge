@@ -30,12 +30,12 @@ ColumnLayout {
     }
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Search review history" }
     ListView {
-        Layout.fillWidth: true; Layout.fillHeight: true; clip: true; reuseItems: true
+        Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumHeight: 150; clip: true; reuseItems: true
         model: (pane.detail.reviews || []).filter(r=>(!workspace.selectedId || r.subject===workspace.selectedId) && (r.comment+" "+r.reviewer+" "+r.dimension).toLowerCase().includes(search.text.toLowerCase())).slice().reverse()
         delegate: ColumnLayout {
             required property var modelData
             width: ListView.view.width-14
-            Label { Layout.fillWidth: true; color: modelData.freshness==="CURRENT" ? Theme.text : Theme.accent; wrapMode: Text.Wrap; text: modelData.dimension.replaceAll("_"," ")+" · "+modelData.decision.replaceAll("_"," ") }
+            Label { Layout.fillWidth: true; color: modelData.freshness==="CURRENT" ? Theme.text : Theme.accent; wrapMode: Text.Wrap; text: modelData.dimension.split("_").join(" ")+" · "+modelData.decision.split("_").join(" ") }
             Label { Layout.fillWidth: true; color: Theme.muted; wrapMode: Text.Wrap; text: modelData.reviewer+" · "+modelData.freshness }
             Label { Layout.fillWidth: true; color: Theme.text; wrapMode: Text.Wrap; text: modelData.comment }
             UiSearchChoice { Layout.fillWidth: true; visible: modelData.evidence.length>0; text: "Save evidence…"; choices: (pane.records.evidence || []).filter(r=>modelData.evidence.includes(r.id)); onChosen: row=>{pane.exportId=row.id; evidenceSave.open();} }

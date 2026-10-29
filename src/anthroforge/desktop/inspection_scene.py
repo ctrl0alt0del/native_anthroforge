@@ -33,5 +33,5 @@ def chunks(metadata, resource):
 
 
 def content(row, mesh_handle):
-    keys = ("stage", "kind", "matrix", "trs", "quaternion")
+    keys = ("stage", "kind", "matrix", "trs", "quaternion", "color")
     return dict({key: row[key] for key in keys}, mesh_handle=mesh_handle)

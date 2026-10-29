@@ -41,6 +41,8 @@ class ReconstructionComparePanel(QObject):
         self.region, self.pending_region = "", None
         try:
             self.options = reconstruction_views.options(self.controller.session, subject)["views"]
+            if not self.options:
+                raise ValueError("This anatomy has no accepted stages to compare yet.")
             self.selections = [self.options[0], self.options[-1]]
             self.submit()
             self.requested.emit()
@@ -93,13 +95,21 @@ class ReconstructionComparePanel(QObject):
 
     @Slot(str)
     def inspectRegion(self, key):
+        try:
+            self.open_region(key)
+        except ValueError as error:
+            self.controller.message = str(error)
+            self.controller.notify()
+
+    def open_region(self, key):
         row = self.controller.session.command("catalogue.region.inspect", region=key)
         self.inspect(row["target"])
         self.region, self.pending_region = key, row
         role = "base" if row["role"] == "TISSUE_BASE" else "final"
-        self.selections[1] = next(
-            r for r in self.options if r["stage"] == role and r["variant"] == row["variant"]
-        )
+        found = [r for r in self.options if r["stage"] == role and r["variant"] == row["variant"]]
+        if not found:
+            raise ValueError("Evaluate this region's surface before redefining it.")
+        self.selections[1] = found[0]
         self.submit()
 
     def show_pending_region(self):

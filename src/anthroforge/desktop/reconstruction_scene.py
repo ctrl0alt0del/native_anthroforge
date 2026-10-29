@@ -4,7 +4,7 @@ from PySide6.QtCore import Property, Slot
 
 from anthroforge.native import inspection, scene, sections
 
-from . import shortcut_comparison_scene
+from . import inspection_scene
 from .skeleton_scene import SkeletonScene
 
 
@@ -40,18 +40,23 @@ class ReconstructionScene(SkeletonScene):
     def rows(self, index):
         rows, leases = [], []
         for layer in self.candidate[index].layers:
-            metadata = dict(
-                id=layer.identity,
-                kind=layer.kind,
-                matrix=layer.frame,
-                trs=self.controller.session.engine.decompose(layer.frame),
-                quaternion=scene.quaternion(self.controller.session.engine, layer.frame),
-                color=layer.color,
-                readonly=True,
-            )
-            rows.extend(shortcut_comparison_scene.chunks(metadata, layer.resource))
-            leases.append(layer.resource)
+            metadata = self.metadata(layer, index)
+            rows.extend(inspection_scene.chunks(metadata, layer.resource))
+            if layer.resource is not None:
+                leases.append(layer.resource)
         return rows, leases
+
+    def metadata(self, layer, index):
+        return dict(
+            id=layer.identity,
+            kind=layer.kind,
+            matrix=layer.frame,
+            trs=self.controller.session.engine.decompose(layer.frame),
+            quaternion=scene.quaternion(self.controller.session.engine, layer.frame),
+            color=layer.color,
+            readonly=True,
+            stage=self.candidate[index].stage,
+        )
 
     def set_sections(self, report):
         self.plane = report.get("plane")

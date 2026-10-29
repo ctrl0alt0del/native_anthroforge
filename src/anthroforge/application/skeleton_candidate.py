@@ -63,6 +63,7 @@ class Candidate:
     mappings: tuple[Any, ...] = ()
     required: tuple[Any, ...] = ()
     publication_resources: Any = None
+    retained_formulas: frozenset[str] = frozenset()
 
     @property
     def ready(self) -> bool:

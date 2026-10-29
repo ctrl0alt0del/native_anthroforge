@@ -35,6 +35,7 @@ def adopt_reviewed(session: Any, candidate: Any, updated: Any) -> None:
     from .property_guards import publication
 
     formulas = {p.owner for p in candidate.prepared if p.output == "formula"}
+    formulas.update(candidate.retained_formulas)
     disabled = frozenset(f.key[8:] for f in candidate.findings if f.key.startswith("disable:"))
     with publication(session, formulas, disabled):
         install(session, candidate, updated)

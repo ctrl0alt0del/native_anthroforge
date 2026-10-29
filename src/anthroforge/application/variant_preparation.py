@@ -116,11 +116,24 @@ def prepare_bindings(context: Any, changes: Any) -> list[Any]:
 
 def bundle(context: Any, owners: Any, seeds: Any, changes: Any, evidence: Any) -> Any:
     skin = candidate_skin.assess(context, changes)
+    borrowed = retained_formulas(context)
+    targets = {context.document.formula_index.formulas[f][1].target.target for f in borrowed}
     reads = skeleton_candidate.reads(
-        context, seeds, owners & context.baseline.registry.records.keys()
+        context, seeds, (owners | targets) & context.baseline.registry.records.keys()
     )
     evidence = skeleton_comparison.attachments(context, evidence)
     return result(context, reads, changes, evidence, skin)
+
+
+def retained_formulas(context: Any) -> frozenset[str]:
+    if context.category != "variant_refresh":
+        return frozenset()
+    return frozenset(
+        f.id
+        for d in context.document.driving_shortcuts
+        for f in d.formulas
+        if f.target.target not in context.editable
+    )
 
 
 def result(context: Any, reads: Any, changes: Any, evidence: Any, skin: Any) -> Any:
@@ -134,7 +147,14 @@ def result(context: Any, reads: Any, changes: Any, evidence: Any, skin: Any) -> 
         tuple(context.findings),
         frozenset(context.prepared),
         tuple(evidence),
+        **publication(context, changes, skin),
+    )
+
+
+def publication(context: Any, changes: Any, skin: Any) -> dict[str, Any]:
+    return dict(
         comparison=skeleton_comparison.describe(context, changes),
         skin=skin,
         publication_resources=context.resources.selected(context.document),
+        retained_formulas=retained_formulas(context),
     )

@@ -76,3 +76,26 @@ def review_evidence(session, subject, stage, evidence):
         reviewer="Reviewer",
         evidence=[evidence],
     )
+
+
+def test_tissue_stage_comparison_uses_material_domain_not_whole_stage_record(session):
+    from tests.test_tissue_workflow import assembly
+
+    _, _, target = assembly(session)
+    session.command(
+        "reconstruction.compare.start",
+        subject=target,
+        before=dict(stage="rest"),
+        after=dict(stage="final"),
+    )
+    state = session.command("reconstruction.compare.status", wait=True)
+    assert state["state"] == "ready", state
+    assert state["report"]["distances"]["material"] is not None
+
+
+def test_comparison_bounds_frame_paths_and_points_through_native_query(session):
+    from anthroforge.native import scene
+
+    frame = session.engine.transform([2, 3, 4, 0, 0, 0, 1, 1, 1])
+    result = scene.boxes(session.engine, [[0, 0, 0, 1, 2, 3], [0] * 6], [frame, frame])
+    assert result == [2, 3, 4, 3, 5, 7]

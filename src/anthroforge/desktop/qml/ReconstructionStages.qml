@@ -31,7 +31,7 @@ ColumnLayout {
     }
     Label { text: "Embedded stages"; color: Theme.text; font.bold: true }
     ListView {
-        Layout.fillWidth: true; Layout.fillHeight: true; clip: true; reuseItems: true
+        Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumHeight: 150; clip: true; reuseItems: true
         model: (pane.records.detail?.stages || []).filter(r=>!workspace.selectedId || r.subject===workspace.selectedId)
         delegate: RowLayout {
             required property var modelData; width: ListView.view.width-14

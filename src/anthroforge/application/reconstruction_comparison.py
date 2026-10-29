@@ -5,11 +5,12 @@ from time import monotonic, sleep
 from typing import Any
 
 from anthroforge.core.jobs import Job
-from anthroforge.native import comparison, sections, topology
+from anthroforge.native import comparison, sections
 from anthroforge.native.mesh import NativeCancellation
 
 from . import reconstruction_views as views
 from .previews import Preview, completed
+from .reconstruction_correspondence import verified
 
 
 class Comparison:
@@ -85,10 +86,9 @@ def compute(plane: Any, pair: Any, cancel: Any) -> Any:
     result = dict(before=views.report(pair[0]), after=views.report(pair[1]), plane=plane)
     if all(len(v.layers) == 1 and v.layers[0].kind == "MESH" for v in pair):
         a, b = (v.layers[0] for v in pair)
-        verified = a.lineage is not None and a.lineage == b.lineage
-        verified = verified and topology.same_topology(a.resource, b.resource, cancel.handle)
+        material = verified(pair[0], pair[1], cancel.handle)
         result["distances"] = comparison.distances(
-            a.resource, a.frame, b.resource, b.frame, verified, cancel.handle
+            a.resource, a.frame, b.resource, b.frame, material, cancel.handle
         )
     if plane:
         result["sections"] = [section(v, plane, cancel.handle) for v in pair]

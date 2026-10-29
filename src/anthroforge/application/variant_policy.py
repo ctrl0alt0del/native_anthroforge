@@ -38,6 +38,15 @@ def included(session: Any, target: str) -> bool:
     return allowed(session, target) and in_workspace(session.document, session.workspace, target)
 
 
+def anatomy(session: Any, target: str) -> None:
+    from .object_operations import editable
+
+    if target in session.document.index.entities:
+        session.editable(target)
+    else:
+        editable(session, target)
+
+
 def command(session: Any, operation: str, arguments: Any) -> None:
     if not session._editing.key:
         return

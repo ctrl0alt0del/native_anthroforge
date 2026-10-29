@@ -31,5 +31,11 @@ Repeater3D {
             materials: DefaultMaterial { diffuseColor: "#b996cc"; lighting: DefaultMaterial.NoLighting; lineWidth: 2 }
         }
         ResourceLoader { geometries: [mesh.geometry,path.geometry] }
+        Model {
+            visible: item.active && geometryData.kind === "POINT"
+            source: "#Sphere"
+            scale: Qt.vector3d(.00005,.00005,.00005)
+            materials: DefaultMaterial { diffuseColor: geometryData.color; lighting: DefaultMaterial.NoLighting }
+        }
     }
 }

@@ -42,7 +42,7 @@ def commands(source, selected):
 def verify(cwd, selected):
     with ZipFile(cwd / "assembled.anthroforge") as archive:
         manifest = json.loads(archive.read("manifest.json"))
-        assert manifest["version"] == 8
+        assert manifest["version"] == 9
         document = manifest["document"]
         assert not document["entities"] and len(document["objects"]) == len(selected)
         copied = {v["state"]["id"] for v in document["objects"]}

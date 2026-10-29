@@ -48,13 +48,20 @@ def capture(session: Any, subject: str, stage: str = "final", variant: str = "")
         layers: tuple[Layer, ...] = (Layer(imported.id, asset.mesh, imported.frame),)
         return View(context, subject, stage, variant, layers, asdict(imported))
     layers = fibers(context, item) if stage == "fibers" else (accepted(context, item, stage),)
-    return View(context, subject, stage, variant, layers, dict(revision=document.revision))
+    return View(context, subject, stage, variant, layers, provenance(session, document, variant))
+
+
+def provenance(session: Any, document: Any, variant: str) -> dict[str, Any]:
+    mapping = records.state(session).variant(variant).construction_map if variant else ()
+    return dict(revision=document.revision, construction_map=mapping)
 
 
 def accepted(context: Any, item: Any, stage: str) -> Layer:
     if isinstance(item, TissueVCP):
         result, frame = stages.result(item, stage), stages.frame(context, item, stage)
         key, lineage = result.asset, stages.material(item, stage)
+        if stage == "base" and item.base_state.kind == "POINT":
+            return Layer(item.id, None, tuple(frame), "POINT", item.color)
     else:
         if stage not in ("geometry", "final"):
             raise ValueError("This object exposes only its accepted geometry.")
@@ -109,7 +116,15 @@ def option(session: Any, subject: str, key: str, name: str) -> Any:
     return [
         dict(id=key + ":" + role, name=name + " · " + role, variant=key, stage=role)
         for role in roles
+        if available(session, subject, role, key)
     ]
+
+
+def available(session: Any, subject: str, stage: str, variant: str) -> bool:
+    try:
+        return bool(capture(session, subject, stage, variant).layers)
+    except ValueError:
+        return False
 
 
 def report(view: View) -> dict[str, Any]:

@@ -6,7 +6,13 @@ from uuid import uuid4
 
 from anthroforge.core.reconstruction import EditingScope
 
-from . import assembly_copy, assembly_graph, assembly_resources, assembly_selection
+from . import (
+    assembly_copy,
+    assembly_graph,
+    assembly_resources,
+    assembly_selection,
+    variant_references,
+)
 from .editing_contexts import bare
 from .resources import references
 from .skeleton_graph import merge_records
@@ -27,14 +33,23 @@ def duplicate(document: Any, resources: Any, subjects: list[str]) -> Any:
     picked = selection(document, subjects)
     ids = assembly_graph.identities(picked)
     ids.update({key: key for key in subjects})
+    external = variant_references.allocate(document, ids)
     assets = copied_metadata(document, resources, picked, ids)
     values = assembly_copy.additions(document, picked, ids, assets)
+    values["external_references"] = variant_references.copy(external, ids)
     changed_drivers = drivers(document, picked, values, ids)
     changes = merged_groups(document, values)
+    changes["shortcut_order"] = copied_order(document, ids)
     editable = tuple(sorted(ids[key] for key in picked.records))
     scope = editing_scope(document, ids, changed_drivers)
     copied = replace(bare(document), editing_scope=scope, **changes)
     return copied, editable, tuple(sorted(ids.items()))
+
+
+def copied_order(document: Any, ids: Any) -> tuple[str, ...]:
+    return tuple(
+        dict.fromkeys((*document.shortcut_order, *(ids.get(k, k) for k in document.shortcut_order)))
+    )
 
 
 def editing_scope(document: Any, ids: Any, changed_drivers: Any) -> EditingScope:

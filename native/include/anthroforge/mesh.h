@@ -47,6 +47,7 @@ AF_API int af_surface_snap(uint64_t mesh, const double* matrix, int triangle, co
 AF_API int af_geometry_matrix(const double* matrix, const double* offset, double* output);
 /* Conservative world bounds from transformed local bounds; O(mesh count). */
 AF_API int af_scene_bounds(int count, const uint64_t* meshes, const double* matrices, double* bounds);
+AF_API int af_bounds_union(int count, const double* boxes, const double* matrices, double* bounds);
 AF_API int af_scene_pick(int count, const uint64_t* meshes, const double* matrices,
     const double* origin, const double* direction, double* hits);
 /* Hit: world distance, polygon, triangle, nearest vertex, world xyz, barycentrics. */

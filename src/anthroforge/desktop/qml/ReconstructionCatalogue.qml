@@ -11,7 +11,7 @@ ColumnLayout {
     property var collection: ({})
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Search anatomical types" }
     ListView {
-        Layout.fillWidth: true; Layout.fillHeight: true; clip: true; reuseItems: true
+        Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumHeight: 150; clip: true; reuseItems: true
         model: (pane.catalogue.types || []).filter(r=>(r.name+" "+r.aliases.join(" ")).toLowerCase().includes(search.text.toLowerCase()))
         delegate: ItemDelegate {
             required property var modelData

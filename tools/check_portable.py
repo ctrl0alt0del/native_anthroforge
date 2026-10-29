@@ -65,7 +65,7 @@ CHECKS = (
     "recent-project history, asynchronous recovery capture and discovery with original retention",
     "skin build, native proxy workers, isolated fitting, persisted playback and OBJ quads",
     "spatial measures, qualified volume samples, placement explanation and frozen view export",
-    "cross-project assembly, embedded images, one-action undo/redo and schema-8 storage",
+    "cross-project assembly, embedded images, one-action undo/redo and schema-9 storage",
     "skeleton replacement, isolated preparation, retained identities and one-action undo/redo",
 )
 

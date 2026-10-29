@@ -58,6 +58,23 @@ maintained production/hidden-render qualification infrastructure.
 
 ## Current checkpoint
 
+Follow-up checkpoint: production Ribs Top Radius=3 after promotion matches an accepted-only
+control run exactly across geometry and retained bindings. The support-refresh trial exposed
+read-only formula publication rejecting borrowed accepted driver values. Candidate publication
+now declares retained formula write authority separately from evaluated outputs, with complete
+target reads. Regression covers driven pinned supports. Full assembly refresh 1.660s, second
+promotion 1.003s (Apply 0.0072s); preview/commit exact, source hash unchanged. Raw profile and
+saved result in build/reconstruction-042/followup. Save17.54s and peak working set4.20GB
+with multiple retained alternative/checkpoint states; no broad speedup claim.
+
+Populated hidden panels at360px wide and400/700/960px high exposed and fixed a ScrollView
+binding loop and unsupported QML replaceAll use. Inspected catalogue/review/queue captures.
+Path/Point comparison framing now uses a native batch of cached bounds, and point bases are
+renderable. Material comparison checks construction lineage plus native topology/material
+domain. External declarations copy independently into variants; repairing one preserves
+accepted references. Project-assembly import is a project operation on accepted anatomy;
+variant reference repair remains supported. Corresponding contract documentation pending.
+
 Latest qualification: 2,750 regression tests passed before the final evidence/region UI
 changes; the new catalogue/assembly/architecture subset passes 11 tests. Configured mypy
 passes 622 sources and ruff passes. Assembly imports now copy catalogue/stage/region/review

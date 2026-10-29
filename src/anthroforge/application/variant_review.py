@@ -11,7 +11,7 @@ from anthroforge.core.reconstruction import SceneSnapshot, Variant
 from anthroforge.core.skeleton_update import require_review
 from anthroforge.native.mesh import NativeCancellation
 
-from . import skeleton_operations, variant_operations, variant_preparation
+from . import skeleton_operations, variant_operations, variant_policy, variant_preparation
 from .assembly_candidate import readset
 from .assembly_runtime import Assembly, State, completed
 from .editing_contexts import bare
@@ -136,6 +136,8 @@ def adopt(session: Any, request: Any, candidate: Any) -> Any:
     if mode == "refresh":
         return refresh(session, record, candidate)
     with session.contexts.use(""):
+        for target in record.subjects:
+            variant_policy.anatomy(session, target)
         updated = candidate.merge(session.document)
         record_state = previous_checkpoint(session, record)
         install(session, candidate, updated, record_state)

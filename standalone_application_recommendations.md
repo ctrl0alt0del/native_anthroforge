@@ -422,6 +422,9 @@ Build candidates against identified clean skeleton assets, then integrate throug
 
 ### E07 — Support lightweight reconstruction variants and explicit promotion [P2]
 
+Implemented in the [0.4.2 reconstruction workflow](docs/reconstruction_042.md): scoped editable
+alternatives, pinned supports, immutable checkpoints, isolated promotion and coherent undo.
+
 Fork transfer, base, or inflation configurations while sharing unchanged skeleton and reference assets through safe ownership. Keep stage checkpoints, settings, evidence, and downstream revisions associated with each variant. Compare variants in the same workspace and promote one explicitly without overwriting accepted work. Editing an upstream stage visibly invalidates its dependent outputs. This consolidates candidate scenes, journals, and screenshots into a controlled project workflow.
 
 **Category acceptance:** compare original and proposed local profiles, asymmetric stacking, constrained smoothing, and tissue deformation; integrate separately built candidates without accidental dependencies; verify that changed supports invalidate affected geometry and review status; fork and reopen variants, promote one, and confirm that accepted alternatives and shared references remain intact.
@@ -470,6 +473,9 @@ Make one inspection request return a matching image and numerical snapshot for a
 
 ### F11 — Compare the complete reconstruction stages [P1]
 
+Implemented in [0.4.2](docs/reconstruction_042.md): embedded Original/Transferred surfaces,
+existing accepted stages, synchronized comparison, verified material metrics and frozen exports.
+
 Keep original reference anatomy, transferred anatomy, authored base, fibers, own inflation, and final stacked output separately inspectable. Provide synchronized cameras, overlays, cross-sections, and displacement comparisons between identified stage revisions. Use these comparisons to locate the first stage where an anatomical shape became wrong, rather than inspecting only the final output. Distinguish genuine stage differences from correspondence or sampling differences and expose missing or invalidated stages.
 
 **Category acceptance:** select a thin fiber behind a transparent muscle with matching hover; reuse a surface pick for a measurement; inspect point-level constraint/provider contributions; switch views and restore manual visibility; compare source and mirror; locate the first defective reconstruction stage; verify that image/measurement snapshots stay consistent during concurrent edits; navigate during computation; test transparency cost separately from picking cost.
@@ -493,6 +499,9 @@ Provide inspect-parent, restore-assignment, change-support, retry, and explicit-
 Support spatial selection, named collections such as needs-tightening, exposure/status filters, and separate unique-type versus instance counts. Link findings and independent review dimensions to the actual geometry revision. Preserve source anatomy and review evidence when transferring or assembling candidates.
 
 ### G05 — Provide a resumable reconstruction catalogue and queue [P2]
+
+Implemented in [0.4.2](docs/reconstruction_042.md): project-local types/instances, collections,
+material regions, separate review dimensions/freshness and explicit human/API ownership.
 
 Track muscle types separately from numbered instances and mirror copies, with approval state, approach version, evidence, remaining work, and explicit work ownership. For the sequential reconstruction workflow, finish and checkpoint one muscle before starting the next eligible unique type. Resume interrupted work from identified checkpoints, prevent duplicate ownership, and show failed or blocked work without losing accepted results. Keep this workflow queue above the geometry scheduler: its sequential ownership policy does not prohibit safe internal native parallelism.
 

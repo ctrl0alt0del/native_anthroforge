@@ -47,7 +47,7 @@ def set_region(session: Any, name: str, target: str, triangles: Any, **options: 
     row = SurfaceRegion(
         require_name(name), target, role, topology, selected, surface.asset_id, variant
     )
-    return save_region(session, row, region)
+    return save_region(session, replace(row, **lineage(session, target, variant)), region)
 
 
 def validate_triangles(surface: Any, triangles: Any) -> tuple[int, ...]:
@@ -70,11 +70,33 @@ def inspect(session: Any, region: str) -> dict[str, Any]:
     row = records.selected(session, "regions", region)
     try:
         surface = provider(session, row.target, row.role, row.variant)
-        valid = mesh_domain(surface.resource.mesh)[1] == row.topology
+        valid = compatible(session, row, surface)
         reason = "" if valid else "Surface topology/material domain changed; redefine this region."
     except ValueError as error:
         valid, reason = False, str(error)
     return dict(asdict(row), available=valid, reason=reason)
+
+
+def lineage(session: Any, target: str, variant: str) -> dict[str, Any]:
+    from anthroforge.core.tissues import TissueVCP
+
+    item = records.scene(session, variant).object(target)
+    if isinstance(item, TissueVCP):
+        return dict(construction="TISSUE", sources=(item.source,), source_asset="")
+    primitive = item.primitive
+    if primitive is None:
+        raise ValueError("This object has no material construction.")
+    sources = tuple(c.curve for c in primitive.curves) + tuple(p.id for p in primitive.pieces)
+    if primitive.chain:
+        sources += tuple(s.id for s in primitive.chain.segments)
+    return dict(construction=primitive.kind, sources=sources, source_asset=primitive.source)
+
+
+def compatible(session: Any, row: SurfaceRegion, surface: Any) -> bool:
+    current = lineage(session, row.target, row.variant)
+    return mesh_domain(surface.resource.mesh)[1] == row.topology and all(
+        getattr(row, key) == value for key, value in current.items()
+    )
 
 
 def remove(session: Any, id: str) -> None:

@@ -16,7 +16,9 @@ RECORDS = dict(
     work=model.ReconstructionWork,
     evidence=model.ReviewEvidence,
 )
-TUPLES = frozenset(("subjects", "editable", "aliases", "members", "triangles", "frame", "evidence"))
+TUPLES = frozenset(
+    ("subjects", "editable", "aliases", "members", "triangles", "frame", "evidence", "sources")
+)
 
 
 def encode_scope(value: Any) -> Any:

@@ -25,6 +25,7 @@ from preferences_portable import preferences
 from profiler_portable import profiling
 from projects_portable import projects
 from PySide6.QtGui import QImage
+from reconstruction_portable import reconstruction
 from shortcuts_portable import shortcuts
 from skeleton_update_portable import skeleton_update
 from skin_portable import qualify as skin
@@ -67,6 +68,7 @@ CHECKS = (
     "spatial measures, qualified volume samples, placement explanation and frozen view export",
     "cross-project assembly, embedded images, one-action undo/redo and schema-9 storage",
     "skeleton replacement, isolated preparation, retained identities and one-action undo/redo",
+    "persistent variants, promotion, catalogue, review queue, stages and comparison export",
 )
 
 
@@ -177,6 +179,7 @@ def construction_steps():
         construction,
         assembly,
         skeleton_update,
+        reconstruction,
         direct_workflows,
         automatic_construction,
         branches,

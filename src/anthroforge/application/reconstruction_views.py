@@ -7,9 +7,10 @@ from anthroforge.core.construction import Curve
 from anthroforge.core.results import geometry_asset
 from anthroforge.core.tissues import TissueVCP
 
-from . import dependencies
+from . import assembly_selection
 from . import reconstruction_state as records
 from . import tissue_inspection_stages as stages
+from .comparison_geometry import display_frame
 from .inspection_context import InspectionContext
 from .object_frames import Frames
 
@@ -65,7 +66,8 @@ def accepted(context: Any, item: Any, stage: str) -> Layer:
     else:
         if stage not in ("geometry", "final"):
             raise ValueError("This object exposes only its accepted geometry.")
-        key, frame = geometry_asset(item), Frames(context.engine, context.document).world(item.id)
+        key = geometry_asset(item)
+        frame = tuple(display_frame(context, item, Frames(context.engine, context.document)))
         lineage = (item.id, key)
     return layer(context, item.id, key, frame, lineage, item.color)
 
@@ -83,10 +85,9 @@ def layer(context: Any, identity: str, key: str, frame: Any, lineage: Any, color
 
 
 def fibers(context: Any, item: Any) -> tuple[Layer, ...]:
-    from anthroforge.core.results import Port
-
-    ports = dependencies.ports(context.document, Port(item.id, "geometry"))
-    curves = [context.document.object(p.owner) for p in ports if p.output == "path"]
+    reasons = {item.id: "Reconstruction source"}
+    assembly_selection.complete_sources(context.document, reasons)
+    curves = [context.document.object(key) for key in reasons]
     frames = Frames(context.engine, context.document)
     return tuple(
         layer(context, c.id, c.result.asset, frames.world(c.id), None, "#b996cc")

@@ -77,6 +77,9 @@ class SurfaceRegion:
     asset: str
     variant: str = ""
     id: str = field(default_factory=identity)
+    sources: tuple[str, ...] = ()
+    source_asset: str = ""
+    construction: str = ""
 
 
 @dataclass(frozen=True, slots=True)

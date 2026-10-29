@@ -1,5 +1,35 @@
 # AnthroForge architecture
 
+## Persistent reconstruction contexts (0.4.2)
+
+[Reconstruction](reconstruction_042.md) uses explicit editing contexts within one Session.
+Each context owns document/history, dependency services and provisional review/comparison
+state. The shared coordinator tags jobs and output reservations with context identity;
+dispatch and publication enter that context on the application thread. All contexts share
+one executor, resource admission and inline budget. Switching pauses inactive authored work.
+Pinned external supports are enforced by shared edit capabilities, not inspector disabling.
+
+Core records hold non-recursive snapshots, variants/checkpoints, types/assignments, material
+regions, stage references, evidence, review decisions and work ownership. Project saves
+project committed context states into schema 9; active gestures, native handles, running
+jobs and undo histories are excluded. Readers accept schemas 4–9. Resource reachability
+includes snapshots, historical regions/stages and embedded evidence; runtime contexts are
+released when no document/history owner needs them and their jobs have finished.
+
+Variant preparation reuses identity-preserving replacement candidates and the shared
+evaluation context. Three-way reconciliation separates accepted edits from variant edits;
+complete read validation precedes one-action adoption. Pinned formula values borrowed from
+accepted anatomy have explicit publication authority and input provenance, separately from
+newly evaluated formula outputs. Normal attachment, routing, inflation, stacking and skin
+algorithms are unchanged. Preparation cannot write into accepted anatomy.
+
+Comparison owns frozen stage resources and view-local cameras/sections. Imported references
+never become anatomical surface providers. C++ computes distances, section contours, batched
+region outlines and transformed bounds. Material displacement additionally requires source
+lineage and matching native material domains. Desktop navigation, hidden capture and headless
+operations use this same state; exporting an image launches the existing isolated renderer.
+The review queue organizes human/API ownership and does not schedule numerical reconstruction.
+
 0.4.2 extends [shared status and spatial inspection](inspection_042.md). Application-owned
 eligibility is shared by commands and UI. Accepted surface descriptors and witnesses feed
 generic inspection strategies through the existing coordinator. Native diagnostics return

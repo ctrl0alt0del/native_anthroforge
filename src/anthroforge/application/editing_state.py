@@ -1,7 +1,9 @@
 """Explicit context-owned application state; resources and the worker pool remain shared."""
 
 from dataclasses import dataclass, field
-from typing import Any, cast
+from typing import Any, Generic, TypeVar, cast
+
+T = TypeVar("T")
 
 
 @dataclass
@@ -10,7 +12,8 @@ class EditingState:
     values: dict[str, Any] = field(default_factory=dict)
 
 
-class ContextField[T]:
+# Nuitka's packaged PEP-695 scope loses T when used by runtime cast().
+class ContextField(Generic[T]):  # noqa: UP046
     def __init__(self, name: str) -> None:
         self.name = name
 

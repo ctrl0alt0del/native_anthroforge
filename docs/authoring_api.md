@@ -1170,8 +1170,9 @@ one-writer and edit restrictions still apply.
 Headless sequence: inspect → wait → prepare → wait → import. `ready` stays false while a required
 placement/material decision blocks commit. Mapping edits create new candidates; stale tokens
 or destination reads cannot publish. Saved source output for missing/changed inputs is noncurrent.
-Manual remains Manual. Saving emits schema 8 with required assets and provenance, excluding source
-skin/fits, workspaces and cameras. Readers retain schema-4–7 support.
+Manual remains Manual. Saving emits schema 9 with required assets and provenance, excluding source
+skin/fits, workspaces and cameras. Readers retain schema-4–8 support. Reconstruction metadata for
+selected anatomy is copied; include saved alternatives explicitly with `variants=[variant_id]`.
 
 ### Whole-skeleton updates (0.4.2)
 
@@ -1204,5 +1205,56 @@ After `status(wait=True)`, review blocking findings and current acknowledgments 
 `ready` means no blocking construction/relationship errors; it does not imply acknowledgments
 have been supplied. Unrelated destination edits can survive; changed reads require preparation
 again. Manual update modes remain unchanged. Retained failures remain explicit failed outputs
-with Issues. Saving uses ordinary schema-8 records; source deletion does not break the result.
+with Issues. Saving uses ordinary records in schema 9; source deletion does not break the result.
+
+### Persistent reconstruction (0.4.2)
+
+See [workflow, ownership and limits](reconstruction_042.md). Operations below are shared by
+desktop and Qt-free callers. Names never substitute for object or material identities.
+
+| Operation | Arguments and behavior |
+| --- | --- |
+| `variant.create` | `subjects=[anatomy_id]`, optional `name`, `enter=True`; copy required editable construction and pin external supports. Return the variant record. |
+| `variant.enter` / `variant.leave` | `variant` for enter; switch the editing context without adopting it into accepted anatomy. Finish a gesture/save first. |
+| `variant.inspect` | Optional `variant`; active ID, saved alternatives, checkpoint and support freshness. |
+| `variant.checkpoint` / `variant.fork` | Checkpoint the active variant with optional `name`; fork takes `variant`, optional `name`, `enter=True`. Checkpoints are read-only. |
+| `variant.rename` / `variant.remove` | `variant`, and `name` for rename; removal respects retained references. |
+| `variant.review.prepare` | `variant`, `mode="promote"` or `"refresh"`; optional explicit conflict/binding choices below. Returns token/job. |
+| `variant.review.status` / `.cancel` | Status accepts `wait=False`, `timeout=300`; changes, blocking findings, skin impact, geometry/anchor evidence. Cancel releases preparation. |
+| `variant.review.apply` | Current `token`, optional `approved=[finding_id]`; revalidate and atomically adopt the reviewed candidate. Returns promotion/checkpoint or refresh identity. |
+| `catalogue.type.create` / `.update` / `.remove` | Create: `name`, optional `category`, `aliases`, `description`; update: `type_id`, `changes`; remove: `type_id`. |
+| `catalogue.assign` / `.assign_many` | `target` or `targets`, `type_id`, optional `side`, `label` (single only), `variant`. Empty type removes assignment. |
+| `catalogue.collection.set` / `.remove` | `name`, `members` (anatomy/region IDs), optional `collection`; remove with `id`. |
+| `catalogue.region.set` / `.inspect` / `.remove` | Set: `target`, `name`, `triangles`, optional `role`, `variant`, existing `region` to redefine. Inspect: `region`; remove: `id`. Retains source/domain proof, no nearest remapping. |
+| `catalogue.inspect` | Project types, assignments, collections and retained region definitions. Use region.inspect for current availability. |
+| `review.set` | `subject`, `dimension`; optional `variant`, `stage`, `region`, `decision`, `reviewer`, `comment`, `evidence=[id]`. Appends history. A nonpending decision requires reviewer. |
+| `review.inspect` | Optional `subject`, `variant`; decisions and independent `CURRENT`, `OUTDATED` or `UNAVAILABLE` freshness. |
+| `reconstruction.queue.add` | `subject`, optional `type_id`, `variant`, `next_action`; returns work ID. |
+| `reconstruction.queue.claim` | `owner`, optional `work`, `takeover=False`; without work claims next eligible item. Type ownership prevents another owner claiming an instance. |
+| `reconstruction.queue.update` | `work`, `owner`, `status`; optional `next_action`, `blocker`, `approach`, `checkpoint`. Status: TODO/ACTIVE/PAUSED/BLOCKED/COMPLETE; blocked requires explanation. |
+| `reconstruction.queue.inspect` | Retained owner/status/resume metadata; does not execute anatomy work. |
+| `reconstruction.stage.import_mesh` | `subject`, `stage="ORIGINAL"` or `"TRANSFERRED"`, `path`, `units`; optional `y_up`, `frame`, `variant`, `name`. Returns stage ID and authored job. |
+| `reconstruction.stage.import_project` | Same stage/subject fields, `path`, `source_entity`, optional `role="final"`; copies a saved mesh stage without recalculation. Saved frame plus optional placement is preserved. |
+| `reconstruction.stage.inspect` / `.remove` | Optional `subject` for inspect; `stage` for remove. Referenced review history protects deletion. |
+| `reconstruction.evidence.import_file` | `path`; embeds PNG/JPEG, `.afinspection.zip` or `.afprofile.zip` with digest/media type, returning ID/job. Wait before using it in a review. |
+| `reconstruction.compare.options` | `subject`; available accepted/variant/reference stages, with names and IDs. |
+| `reconstruction.compare.start` | `subject`, `before` and `after` (`stage`, optional `variant`), optional `plane=[nx,ny,nz,offset]`; freeze owned resources and compute evidence. |
+| `reconstruction.compare.status` / `.cancel` | Status supports `wait`/`timeout`; frozen revision/provenance and available distance/section evidence. |
+| `reconstruction.compare.export` | `path`, six-value `camera=[x,y,z,pitch,yaw,distance]`, optional image/export settings; `wait=True` waits for a self-contained `.afinspection.zip`. The caller remains Qt-free. |
+
+Review dimensions are ANATOMY, ROUTE_COLLISION, ATTACHMENT, STACKING, PERSISTENCE and DISPLAY.
+Decisions are PENDING, APPROVED, REJECTED and NOT_APPLICABLE. They never alter calculation
+acceptance. Region or input changes make old evidence noncurrent without erasing the decision.
+Reference import and comparison return jobs; use `wait` or their status operations before
+reading results. Comparison mesh metrics and mesh section contours do not imply a material
+mapping for point/path views.
+
+Promotion options use the shared replacement review policies: `choices={record_id: "VARIANT"}`
+or `"ACCEPTED"` selects a conflicting record; `rebind={finding_id: true}` requests explicit
+rebinding; `placements={owner_id: {point_id: goal}}` supplies surface corrections through the
+same goal contract as skeleton updates; `preview_skin` requests compatible final-skin evaluation.
+Read the returned
+finding IDs and compatibility reasons before applying. Required failures block; acknowledged
+dependent failures retain accepted geometry and Issues. See tests/test_variant_review.py and
+tests/test_variant_lifecycle.py for executable lifecycle examples.
 

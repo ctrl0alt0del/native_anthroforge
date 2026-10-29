@@ -3791,3 +3791,39 @@ iteration maximum 0.72 s / p95 41 ms). These timings include profiling and GPU r
 do not establish physical presentation latency or a disabled-profiler responsiveness guarantee.
 Raw reports/captures: `build/skeleton-update-042/{production,gui}`; maintained qualification
 tools and the task record identify final gate/portable outcomes.
+
+## 2026-10-29 — Persistent reconstruction contexts (0.4.2; R01–R06, Q05, A01–A03)
+
+Before this change, a project had one editable history and transient replacement candidates;
+retaining alternatives required independent project copies. The new context boundary retains
+non-recursive authored/result snapshots and scoped editing services within the same Session.
+Coordinator reservations, dispatch, callbacks and publication identify their editing context;
+one executor, admission policy and inline budget remain shared. Inactive alternatives pause
+authored jobs. Save/autosave projects committed context state; snapshot/history/job/view
+leases retain shared immutable resources and prune unreferenced runtime contexts.
+
+Promotion and explicit support refresh reuse production candidate evaluation, native material
+correspondence and attachment capture. Three-way reconciliation preserves unrelated accepted
+edits and requires conflict choices. Prepared output is adopted once, not recalculated during
+Apply. No routing, fiber propagation, inflation, relaxation, crop, stacking or skin objective
+changed. Read-only formula targets borrowed during refresh have explicit retained-output
+authority and complete accepted target reads, distinct from newly evaluated formula output.
+This fixed a full-assembly refresh failure without granting ordinary edits access to supports.
+
+Comparison consumes accepted, immutable imported and variant stages. Native queries provide
+geometric distance and mesh sections; material displacement additionally verifies construction
+lineage and canonical material domains. Region availability retains source identities/assets
+and a material-domain signature. Equal counts/connectivity cannot silently transfer a patch
+onto unrelated replacement construction. Batched native cached-bound transforms and region
+outlines replace repeated desktop per-face calls. Fiber-stage presentation follows required
+construction, excluding external support-bone guide curves found during visual qualification.
+
+The 59-SCP/96-muscle SCM trial verifies exact preview/commit geometry and retained bindings,
+Undo, save/reopen, support refresh and subsequent Ribs Top Radius=3 equivalence against an
+accepted-only control run. Initial create/edit/prepare/Apply: 0.105/0.346/1.152/0.0067s;
+refresh: 1.660s; repeated prepare/Apply: 1.003/0.0072s. Peak working set about3.04GB initially
+and4.20GB with retained alternatives/checkpoints. These single profiled trials are not a
+statistical performance comparison. Existing numerical algorithms remain authoritative.
+See [workflow/evidence](reconstruction_042.md) and [recovery record](tasks/reconstruction-042.md)
+for gate, hidden-render and portable status. Queue ownership/review decisions never execute
+or approve numerical anatomy automatically.

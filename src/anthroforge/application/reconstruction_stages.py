@@ -65,6 +65,8 @@ def load_project(engine: Any, entity: str, role: str, path: Path, row: Any, canc
     try:
         item = source.document.object(entity)
         key = result_asset(item, role)
+        if key not in source.metadata["assets"]:
+            raise ValueError("Choose an accepted mesh stage for the reference surface.")
         with zipfile.ZipFile(source.path) as archive:
             asset = resource_storage.read_mesh(archive, key, source.metadata["assets"][key], engine)
         row = project_record(engine, row, source, entity)
@@ -76,14 +78,22 @@ def load_project(engine: Any, entity: str, role: str, path: Path, row: Any, canc
 def project_record(engine: Any, row: Any, source: Any, entity: str) -> Any:
     from anthroforge.native.construction import matrix
 
-    frame = Frames(engine, source.document).world(entity)
     return replace(
         row,
-        frame=tuple(matrix(engine, row.frame, frame)),
+        frame=tuple(matrix(engine, row.frame, source_frame(engine, source.document, entity))),
         source=source.original,
         fingerprint=source.digest,
         source_entity=entity,
         source_revision=source.document.revision,
+    )
+
+
+def source_frame(engine: Any, document: Any, entity: str) -> Any:
+    from anthroforge.native.scene import geometry_matrix
+
+    frame = Frames(engine, document).world(entity)
+    return geometry_matrix(
+        engine, frame, getattr(document.object(entity), "geometry_offset", (0, 0, 0))
     )
 
 

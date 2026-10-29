@@ -1,115 +1,75 @@
-# Persistent variants, anatomical catalogue and reconstruction comparisons
+# Persistent variants, catalogue and reconstruction comparisons
 
-- Task branch: `codex/reconstruction-042`
-- Integration branch: `main`
-- Starting revision: `16f550b`
-- Status: in progress; not qualified
-- Last updated: 2026-10-29 Europe/Bucharest
-- Active writer: local Codex; no subagents authorized
+- Branch: `codex/reconstruction-042`; integration: `main`; starting revision: `16f550b`.
+- Status: implementation complete; final portable qualification in progress. Not merged.
+- Updated: 2026-10-29, Europe/Bucharest. Direct local work; no subagents.
+- Contract/walkthrough: [reconstruction_042.md](../reconstruction_042.md).
+- Preserve unrelated root `__init__.py`; hidden/background testing only.
 
-## Outcome and decisions
+## Implemented
 
-Implement [confirmed contract](../reconstruction_042.md), integrating shared API and desktop
-at each increment. 0.4.2 update, schema 9 with 4–8 readers. Preserve all existing anatomical
-algorithms and unrelated root __init__.py. Background/hidden tests only.
+Schema9 with4–8 readers; immutable typed catalogue/review/stage/region/work records and
+non-recursive variant snapshots. One Session/coordinator/executor serves explicit scoped
+histories, services, reservations and callbacks. Normal tools edit alternatives with pinned
+supports. Checkpoints fork; saves/autosaves project committed contexts; lifetime follows
+document/history/jobs/views. Promotion/refresh reuse isolated evaluation, retained material
+bindings, complete read checks, explicit conflicts and one Undo. Numerical algorithms unchanged.
 
-## Current state
+Dockable Reconstruction panel has Variants/Catalogue/Regions/Stages/Reviews/Queue. Frozen
+split/overlay comparison supports available accepted/variant/imported surfaces and paths,
+shared camera, mesh sections, region selection and inspection export. Imports/evidence are
+embedded; anatomical type ownership and independent review dimensions retain history.
+Assembly copies applicable metadata and explicitly requested variants. Project-assembly
+import belongs in accepted anatomy; scoped reference repair remains allowed.
 
-Added schema-9 reconstruction records/codecs and resource reachability, plus explicit editing
-contexts with separate history/services and coordinator-owned scheduling namespaces. There
-is one executor/resource admission/inline budget. Jobs retain their context identity; callback
-publication runs under that context. Context switching pauses authored work without waiting.
-Runtime variants, committed save/autosave projection, pinned-support policies and basic dockable
-desktop navigation are implemented. Normal tools edit scoped alternatives; immutable checkpoints
-fork independently. Path/attachment metadata copies include archived inputs. Initial promotion/
-support refresh use existing candidate evaluation, precise reads, conflict choices and retained
-previous-anatomy checkpoints, with shared before/after review UI. Catalogue/type/collections/
-regions/reviews/queue API exists with focused tests; desktop, evidence and stages remain unfinished.
-Promotion still needs production qualification, stronger topology lineage proof and support-scope
-lifecycle testing. Do not treat these initial candidates as release-qualified.
+Native batches compute region outlines and transformed cached bounds. Stage frame includes
+geometry-origin offsets. Fiber-stage traversal excludes bone guides. Material regions check
+construction source lineage as well as sampled domain; unrelated same-topology replacement
+requires explicit redefinition. Canonical package remains0.4.2; no new anatomy algorithm.
 
-## Verification
+## Evidence
 
-Focused context/scheduler/active-job tests: 16 passed. Existing skeleton-update command tests:
-3 passed. Context tests cover ordinary edit/Undo isolation, same-identity concurrent jobs and
-non-recursive schema round trips. Relevant mypy checks pass. Python function-limit/import
-architecture checks pass. New variant/desktop tests pass. Regression run stopped at 6 failures
-after 541 passes: formula validation expected a Session-only context and resource reachability
-allocated a fresh projection each pass. Both causes fixed; focused driver/import/replay/resources/
-variant/architecture suite now 27 passed. Broad rerun: 2733 passed, 2 failed solely on schema8
-assertions, updated to9. This run preceded newest catalogue/UI additions. Variant review tests5
-passed (one Undo/checkpoint, explicit conflicts, stale preparation, tissue source sharing and support
-refresh). Catalogue tests4 pass. Embedded reference/evidence import and frozen comparison tests3 pass; UI and export integration remain unfinished. Hidden GPU panel and promotion window render without QML warnings
-or visible windows; comparison framing is too close for narrow split views and needs correction.
+- Full development gate built native and passed native/script style, then pytest reported
+  2,755 passed with one stale 18-line qualification-tool violation. That function was fixed
+  during the run; subsequent architecture and relevant regression suite:19passed.
+  Latest context/lifecycle/architecture:11passed. Ruff/format/configured mypy624sources pass.
+  Numerical dependency imports and doctor pass. Existing6native ctests passed.
+- Source96-muscle assembly unchanged (SHA256
+  308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac).
+  SCM alternative inflation/promote/undo/save/reopen and Ribs Top Radius3 match accepted-only
+  geometry and retained bindings exactly. Explicit support refresh1.660s; second promotion
+  preparation1.003s/Apply.0072s. Initial create.105s/edit.346s/prepare1.152s/Apply.0067s.
+  Peak about3.04GB initially,4.20GB with multiple retained snapshots. Single trials, no speedup claim.
+- Twelve multi-angle hidden GPU comparisons inspected; matching transferred/final shapes,
+  isolated fibers/base, reference/base and rest/final. No QML warnings/visible windows.
+  Populated360px panels at400/700/960height and frozen inspection export also inspected.
+  Qt-free export caller spawns existing hidden renderer. No interactive acceptance claimed.
+- First portable run exposed Nuitka PEP695 type-variable NameError in ContextField.cast.
+  ContextField/SchedulingField now use explicit Generic/TypeVar with scoped UP046 exclusions;
+  source context/lifecycle checks pass. Canonical package rebuild running; must rerun portable.
 
-## Next actions
+## Remaining delivery
 
-1. Finish scope/copy/lifecycle validation and rerun regressions.
-2. Implement refresh/promotion using isolated candidate evaluation and precise read validation.
-3. Deliver catalogue/reviews/regions/queue, imported stages and comparisons.
-4. Qualify production assembly, background GUI, profiler and canonical package; merge/push.
+1. Finish package rebuild and complete relocated portable suite, fixing actual failures.
+2. Verify API docs/examples/links, final source archive and qualification status.
+3. Check latest main, validate combined changes, checkpoint/push and merge/push normally.
+   Do not claim completion until portable/runtime workflows pass.
 
-## Recovery inputs
+## Paths and reproduction
 
-Native: C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native.
-Production: E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge.
-Keep byproducts under ignored build/reconstruction-042. See tools/skeleton_update_* for
-maintained production/hidden-render qualification infrastructure.
+Native: `C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native`.
+Set AF_NATIVE_BUILD and ANTHROFORGE_NATIVE_LIBRARY to its bin/af_native.dll for source checks.
+Hidden GPU QQuickRenderControl requires normal Windows platform (no visible window);
+setting QT_QPA_PLATFORM=offscreen prevents its GPU initialization. The portable harness
+handles offscreen CLI versus hidden renderer platforms itself.
 
-## Current checkpoint
-
-Follow-up checkpoint: production Ribs Top Radius=3 after promotion matches an accepted-only
-control run exactly across geometry and retained bindings. The support-refresh trial exposed
-read-only formula publication rejecting borrowed accepted driver values. Candidate publication
-now declares retained formula write authority separately from evaluated outputs, with complete
-target reads. Regression covers driven pinned supports. Full assembly refresh 1.660s, second
-promotion 1.003s (Apply 0.0072s); preview/commit exact, source hash unchanged. Raw profile and
-saved result in build/reconstruction-042/followup. Save17.54s and peak working set4.20GB
-with multiple retained alternative/checkpoint states; no broad speedup claim.
-
-Populated hidden panels at360px wide and400/700/960px high exposed and fixed a ScrollView
-binding loop and unsupported QML replaceAll use. Inspected catalogue/review/queue captures.
-Path/Point comparison framing now uses a native batch of cached bounds, and point bases are
-renderable. Material comparison checks construction lineage plus native topology/material
-domain. External declarations copy independently into variants; repairing one preserves
-accepted references. Project-assembly import is a project operation on accepted anatomy;
-variant reference repair remains supported. Corresponding contract documentation pending.
-
-Latest qualification: 2,750 regression tests passed before the final evidence/region UI
-changes; the new catalogue/assembly/architecture subset passes 11 tests. Configured mypy
-passes 622 sources and ruff passes. Assembly imports now copy catalogue/stage/region/review
-evidence and explicitly selected variants, with independent identities. Regional reviews retain
-their decision but become outdated after explicit patch redefinition. Hidden inspection export
-passes end to end: corrected comparison/workspace camera conversion, held QML component
-lifetime until capture, and JSON-normalized report metadata. Visually inspected exported split
-view; no Qt imported into the calling headless process.
-
-Production SCM experiment on the 96-muscle assembly: open 5.705s, create variant 0.105s,
-inflation edit 0.346s, prepare/promote 1.152s (Apply 0.0067s), save 12.828s, reopen 10.746s.
-Preview/commit geometry and bindings match exactly; Undo restores accepted state. Source hash
-unchanged. Save peak working set about 3.04GB. Local reports/profile/project are under
-build/reconstruction-042/production. These are not full production or release acceptance.
-
-Remaining: reference/capability audit, populated/narrow GUI and stage availability,
-production support refresh and shortcut follow-up/multiangle previews, docs/coupling review,
-complete gate, canonical package and relocated portable qualification. No release claim yet.
-
-Comparison desktop supports split/overlay, sections, picked material regions, and frozen
-inspection export. Hidden GPU captures of every panel, promotion and comparison are clean;
-corrected framing for narrow split views. Native batched region outlines built and 6 native
-tests pass. Export still needs end-to-end qualification. Shared driver copying now retains
-outside consumers; 5 added lifecycle tests pass for driver isolation/promotion, required
-formula failures, support freshness, removal, and Undo/Redo context resource release.
-Candidate required-output/editable scopes are explicit; stable topology requires native
-connectivity/material and construction-lineage proof. Mirroring relationships merge by typed
-identity. Python lint/function limits pass; remaining type correction applied. Full regression,
-assembly metadata/explicit variant import, populated UI workflows, full96 production profiling,
-and release qualification remain pending.
-
-Explicit persisted EditingScope separates editable variant records from refreshed external supports.
-Catalogue, independent review and resumable queue desktop pages are added; hidden-page verification
-is pending. Immutable stage/evidence imports run through shared authored jobs and embed resources.
-Frozen stage comparisons use existing native distance/section queries, without invented material
-lineage. Focused variant/catalogue/desktop/architecture checks16 pass; embedded import/undo/save/
-comparison checks3 pass. Full assembly, stages UI/export, assembly metadata transfer, lifecycle
-review and release checks still required.
+Production source:
+`E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge`.
+Evidence: `build/reconstruction-042/{production,followup,production-views,gui}`.
+Profiles: production/workflow.afprofile.zip and followup/followup.afprofile.zip.
+Tools: reconstruction_qualification.py, reconstruction_followup.py,
+check_reconstruction_042.py, check_reconstruction_production.py, reconstruction_portable.py.
+Logs: development-gate.log, final-focused.log, package.log, portable.log.
+Run `uv run --no-sync python tools/check_portable.py dist/0.4.2/AnthroForge.dist/AnthroForge.exe
+build/reconstruction-042/portable --offscreen` after package finishes. Canonical archive:
+`uv run --no-sync python tools/source_archive.py`.

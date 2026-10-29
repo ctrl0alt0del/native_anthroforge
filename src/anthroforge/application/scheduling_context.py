@@ -2,12 +2,14 @@
 
 from contextlib import nullcontext
 from dataclasses import dataclass, field
-from typing import Any, cast
+from typing import Any, Generic, TypeVar, cast
 
 from anthroforge.core.document import Document
 
 from .job_registry import JobRegistry
 from .task_priorities import TaskPriorities
+
+T = TypeVar("T")
 
 
 @dataclass
@@ -24,7 +26,8 @@ class SchedulingContext:
     observer: Any = lambda job, phase: None
 
 
-class SchedulingField[T]:
+# Keep runtime cast() type variables visible in the pinned Nuitka build.
+class SchedulingField(Generic[T]):  # noqa: UP046
     def __init__(self, name: str) -> None:
         self.name = name
 

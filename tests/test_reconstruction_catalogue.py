@@ -86,3 +86,16 @@ def test_region_outline_batch_matches_picked_faces(session, assembly):
     mesh = session.assets[item.asset].mesh
     expected = [p for face in (0, 1, 5) for p in inspection.face_lines(mesh, item.matrix, face)]
     np.testing.assert_array_equal(inspection.faces_lines(mesh, item.matrix, [0, 1, 5]), expected)
+
+
+def test_region_requires_source_lineage_even_with_identical_topology(session, assembly):
+    from dataclasses import replace
+
+    target = assembly[1]
+    key = session.command("catalogue.region.set", target=target, name="Patch", triangles=[0])
+    item = session.document.entity(target)
+    session.resources.meshes["replacement"] = session.assets[item.primitive.source]
+    item = replace(item, primitive=replace(item.primitive, source="replacement"))
+    session.replace_entities({target: item})
+    result = session.command("catalogue.region.inspect", region=key)
+    assert not result["available"] and "redefine" in result["reason"]

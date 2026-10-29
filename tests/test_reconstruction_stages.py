@@ -99,3 +99,45 @@ def test_comparison_bounds_frame_paths_and_points_through_native_query(session):
     frame = session.engine.transform([2, 3, 4, 0, 0, 0, 1, 1, 1])
     result = scene.boxes(session.engine, [[0, 0, 0, 1, 2, 3], [0] * 6], [frame, frame])
     assert result == [2, 3, 4, 3, 5, 7]
+
+
+def test_fiber_stage_excludes_support_bone_construction(session):
+    from anthroforge.application.reconstruction_views import capture
+    from tests.test_fiber_creation import bind
+    from tests.test_surface_workflow import curve, surface
+
+    bone = session.command("primitive.create", kind="BODY")
+    session.wait()
+    sources = [bind(session, bone, curve(session, y)).id for y in (0, 0.4)]
+    tissue = session.command("tissue.create", source=surface(session, sources, strips=6))
+    session.wait()
+    layers = capture(session, tissue, "fibers").layers
+    assert {row.identity for row in layers} == set(sources)
+
+
+def test_saved_stage_preserves_geometry_origin_offset(session, assembly, tmp_path):
+    from dataclasses import replace
+
+    from anthroforge.application.reconstruction_views import capture
+
+    target = assembly[1]
+    item = replace(session.document.entity(target), geometry_offset=(2, 3, 4))
+    session.replace_entities({target: item})
+    before = capture(session, target).layers[0].frame
+    source = tmp_path / "offset.anthroforge"
+    session.command("save", path=str(source), blocked_policy="wait")
+    row = import_saved_stage(session, target, source)
+    assert capture(session, target, row["id"]).layers[0].frame == before
+
+
+def import_saved_stage(session, target, source):
+    row = session.command(
+        "reconstruction.stage.import_project",
+        subject=target,
+        source_entity=target,
+        stage="ORIGINAL",
+        path=str(source),
+    )
+    session.wait()
+    assert session.scheduler.registry.by_id[row["job_id"]].state == "succeeded"
+    return row

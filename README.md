@@ -8,12 +8,18 @@ See [workflow and limits](docs/inspection_042.md). Existing anatomy algorithms r
 **File → Import Anatomy from Project…** copies selected anatomy and its required construction
 from another project. Map external supports explicitly, review any requested rebind, or keep
 repairable missing references. Copies are independent; the source stays unchanged. See the
-[assembly walkthrough](docs/assembly_042.md). Projects now save schema 8 and read schemas 4–8.
+[assembly walkthrough](docs/assembly_042.md). Projects now save schema 9 and read schemas 4–9.
 
 **File → Update Skeleton from Project…** compares replacement bones while preserving existing
 SCP identities, names, hierarchy and compatible controls. Review attachment/driver decisions
 and dependent anatomy in synchronized views, then apply the prepared result with one Undo.
 See [skeleton updates](docs/skeleton_update_042.md). Source projects remain unchanged.
+
+**View → Reconstruction** opens persistent alternatives, anatomical types and review work.
+Edit a variant with the ordinary tools, compare its stages, and explicitly promote it to
+accepted anatomy. The panel also records independent review decisions and resumable work,
+and embeds original/transferred reference surfaces. See the
+[reconstruction walkthrough](docs/reconstruction_042.md).
 
 0.4.1 completes the skin audit: draft-based deformation references, retained solver and
 geometry diagnostics, achieved topology budgets, persistent FAST weights, effective

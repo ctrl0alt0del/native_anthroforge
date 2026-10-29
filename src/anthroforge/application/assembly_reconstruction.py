@@ -72,7 +72,7 @@ def identities(state: Any, anatomy: dict[str, str]) -> dict[str, str]:
 
 def remap(row: Any, ids: Any, assets: Any) -> Any:
     scalar = {"id", "target", "subject", "type_id", "variant", "stage", "region"}
-    arrays = {"members", "evidence"}
+    arrays = {"members", "evidence", "sources"}
     values = {}
     for field in fields(row):
         value = getattr(row, field.name)
@@ -80,14 +80,15 @@ def remap(row: Any, ids: Any, assets: Any) -> Any:
             values[field.name] = ids.get(value, value)
         elif field.name in arrays:
             values[field.name] = tuple(ids.get(k, k) for k in value)
-        elif field.name in {"asset", "resource"}:
-            values[field.name] = assets[value]
+        elif field.name in {"asset", "resource", "source_asset"}:
+            values[field.name] = assets[value] if value else ""
     return replace(row, **values)
 
 
 def load_resources(p: Any, state: Any) -> None:
     groups = dict(
-        meshes={r.asset for r in (*state.stages, *state.regions)},
+        meshes={r.asset for r in (*state.stages, *state.regions)}
+        | {r.source_asset for r in state.regions if r.source_asset},
         evidence={r.resource for r in state.evidence},
     )
     with zipfile.ZipFile(p.source.path) as archive:

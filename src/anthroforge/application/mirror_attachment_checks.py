@@ -1,4 +1,4 @@
-"""Retained midline references are validated without changing reflected geometry."""
+"""Validate counterpart frames separately from shared source-reflected bindings."""
 
 from typing import Any
 
@@ -41,10 +41,15 @@ def resolved_frame(context: Any, item: Any, key: str, ref: Any) -> Any:
 def validate(context: Any, instance: Any, rows: Any) -> list[dict[str, Any]]:
     document = context.document
     item = document.object(instance.source)
-    return [
-        measured(context, instance, item, row) if needs_validation(document, instance, row) else row
-        for row in rows
-    ]
+    return [checked(context, instance, item, row) for row in rows]
+
+
+def checked(context: Any, instance: Any, item: Any, row: dict[str, Any]) -> dict[str, Any]:
+    if shared(context.document, instance, row):
+        return dict(row, binding_mode="source_reflection", surface_contact="not_checked")
+    if needs_validation(context.document, instance, row):
+        return measured(context, instance, item, row)
+    return row
 
 
 def shared(document: Any, instance: Any, row: Any) -> bool:
@@ -56,8 +61,6 @@ def shared(document: Any, instance: Any, row: Any) -> bool:
 def needs_validation(document: Any, instance: Any, row: Any) -> bool:
     from anthroforge.core.mirroring import MirrorInstance
 
-    if shared(document, instance, row):
-        return True
     if row["status"] != "mapped":
         return False
     plane = document.mirrors.plane(instance).frame

@@ -25,6 +25,9 @@ with [Qt threading guidance](https://doc.qt.io/qt-6/threads-qobject.html).
 
 ## Public operations
 
+Run `anthroforge run examples/painting.json` from the repository root for a complete
+Qt-free collagen stroke, inspection and save. Tissue-weight usage follows below.
+
 | Operation | Arguments and behavior |
 | --- | --- |
 | `painting.describe` | `consumer`, `target`, consumer options; returns availability/reason, defaults, ranges and supported capabilities without submitting work. |

@@ -55,3 +55,16 @@ No interactive desktop evidence may be claimed.
 Primary repository and reusable environment/native builds: `E:/development/anthroforge`.
 No production anatomy files may be modified. Numerical algorithms must remain unchanged.
 The containing commit identifies this checkpoint; inspect remote reachability.
+
+## Qualification checkpoint — 2026-10-30
+
+Full native rebuild, CTest and native style passed. The first full Python gate reported
+31 formula-related failures: the new save-admission property assumed a live Session
+instead of the existing captured evaluation context. Replaced it with a shared admission
+function that respects that contract. Fifty-four targeted formula/assembly/variant and
+painting tests now pass. One new overlength test helper was also corrected.
+A complete regression rerun remains required. Mypy and formatting pass.
+
+Serial ABBA old/new timing and exact-array comparison are running against production
+code at 713d963e (equivalent docs worktree 308ca03d), using the same native library.
+Temporary qualification package and relocated portable suite remain pending.

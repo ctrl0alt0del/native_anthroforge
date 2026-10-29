@@ -1,0 +1,17 @@
+[
+  {"id":"bone","operation":"import","arguments":{"path":"examples/primitives/cube.obj","units":1}},
+  {"operation":"wait"},
+  {"operation":"skin.collagen.fill","arguments":{"owner":"$bone.entity_id","value":0}},
+  {"operation":"painting.describe","arguments":{"consumer":"collagen","target":"$bone.entity_id"}},
+  {"id":"stroke","operation":"painting.begin","arguments":{
+    "consumer":"collagen","target":"$bone.entity_id",
+    "view":[0,0,4,1,0,0,0,1,0,0,0,-1,100,1],
+    "brush":{"radius":80,"weight":0.7,"strength":0.8,"falloff":1,"through":false}
+  }},
+  {"operation":"painting.append","arguments":{"token":"$stroke.token","samples":[[-20,0],[20,10]]}},
+  {"operation":"painting.finish","arguments":{"token":"$stroke.token"}},
+  {"operation":"wait"},
+  {"operation":"painting.status","arguments":{"token":"$stroke.token"}},
+  {"operation":"painting.result","arguments":{"token":"$stroke.token","limit":4}},
+  {"operation":"save","arguments":{"path":"build/painting/example.anthroforge","blocked_policy":"wait"}}
+]

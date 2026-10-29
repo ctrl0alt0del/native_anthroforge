@@ -5,7 +5,7 @@ from dataclasses import asdict
 from functools import partial
 from typing import Any
 
-from anthroforge.core.painting import Brush
+from anthroforge.core.painting import Brush, brush
 
 from . import painting
 from .painting_consumers import consumer as definition
@@ -36,14 +36,17 @@ def describe(session: Any, consumer: str, target: str, **options: Any) -> dict[s
 
 
 def unavailable(session: Any, consumer: str, target: str, options: Any) -> str:
-    reason = ""
     adapter = definition(consumer)
     try:
+        if "brush" in options:
+            brush(options["brush"])
         adapter.require(session, target)
         adapter.validate(session, target, dict(options, stage=options.get("stage", "final")))
-    except (KeyError, ValueError) as error:
-        reason = str(error)
-    return reason
+    except KeyError:
+        return "The painting target or required surface resource is no longer available."
+    except ValueError as error:
+        return str(error)
+    return ""
 
 
 def capabilities() -> dict[str, Any]:

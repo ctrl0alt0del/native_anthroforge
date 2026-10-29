@@ -4,6 +4,7 @@ from typing import Any
 
 from . import painting
 from .painting_consumers import name
+from .painting_state import current as inputs_current
 from .painting_state import get
 
 
@@ -17,6 +18,8 @@ def status(session: Any, kind: str) -> dict[str, Any]:
     if value is None or value.state == "cancelled":
         return dict(state="idle")
     result = painting.status(session, value.token)
+    if value.state == "committed":
+        result["state"] = "ready" if inputs_current(session, value) else "stale"
     return {key: result[key] for key in ("state", "job", "target", "error", "report")}
 
 

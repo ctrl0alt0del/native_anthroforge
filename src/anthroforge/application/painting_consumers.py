@@ -4,6 +4,8 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
+from anthroforge.core.scheduling import Workload
+
 from . import skin_painting, tissue_painting
 
 ALIASES = {"paint": "tissue_weights", "collagen": "collagen", "tissue_weights": "tissue_weights"}
@@ -29,7 +31,7 @@ def name(kind: str) -> str:
 
 
 def consumer(kind: str) -> Consumer:
-    return collagen() if name(kind) == "collagen" else tissue()
+    return {"collagen": collagen, "tissue_weights": tissue}[name(kind)]()
 
 
 def collagen() -> Consumer:
@@ -75,9 +77,9 @@ def tissue_surface(context: Any, target: str, options: Any) -> Any:
 
 
 def tissue_painting_workload(context: Any, target: str, options: Any) -> Any:
-    from .tissue_inspection import workload
+    from . import tissue_inspection_stages as stages
 
-    return workload(context, target, options)
+    return Workload(triangles=stages.mesh(context, target, options["stage"]).counts[3])
 
 
 def require_tissue(session: Any, target: str) -> None:

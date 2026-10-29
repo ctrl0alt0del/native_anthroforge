@@ -18,6 +18,7 @@ from . import (
     path_tasks,
 )
 from .construction_policy import require_topology_edit
+from .edit_admission import save_blocks_edits
 from .object_removal import install as install_removal
 from .operations import require_name
 from .transform_policy import require_object_transform
@@ -34,7 +35,7 @@ def editable(session: "Session", target: str) -> Authored:
 
     require_source(target)
     require_variant_edit(session, target)
-    if session.save_blocks_edits:
+    if save_blocks_edits(session):
         raise ValueError("Editing is blocked while waiting to save.")
     item = session.document.object(target)
     if not isinstance(item, ObjectRecord):

@@ -48,3 +48,17 @@ pass). Queries preserve authored data/history. No release qualification yet.
 Remaining: broaden restriction/provenance coverage (junctions, driven controls, fields),
 then implement candidate capture/render/export, contextual queries and JSON literals.
 Full gate, production profiling and packaging remain pending.
+
+Candidate checkpoint: all eight source adapters now capture retained resources. Numerical
+paging, canonical connectivity, stale/cancel/replacement/release, export retry and the
+six additional candidate-family probes pass (12 tests; 14 including architecture).
+Full core/application/native mypy passes (636 modules). One hidden GPU surface capture
+was visually inspected; broader multi-angle/production evidence remains pending.
+
+Development rendering exposed mixed native DLL directories: the engine used the qualified
+build while Qt loaded the obsolete build/dev viewport. Desktop runtime now honors
+AF_NATIVE_BUILD when unbundled, matching the existing build/package tools. The repeat
+renders the actual candidate. Packaged runtime still prioritizes its bundled libraries.
+
+Next: contextual queries and JSON literals; finish A1/A2 edge coverage and full qualification.
+No 0.4.3 release or main merge yet.

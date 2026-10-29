@@ -66,7 +66,7 @@ def metadata(frozen: Capture) -> dict[str, Any]:
     )
 
 
-def export(
+def export_document(
     session: "Session",
     path: str,
     selected: str = "",
@@ -81,6 +81,23 @@ def export(
     frozen = export_capture(session, path, selected, editing, tissue, route, spatial)
     frozen = comparison_options(session, frozen, comparison, replay)
     return submit_export(session, Path(path).resolve(), frozen, wait)
+
+
+def export(
+    session: Any,
+    path: str,
+    snapshot: str = "",
+    images: bool = True,
+    view: Any = None,
+    **options: Any,
+) -> dict[str, Any]:
+    if snapshot:
+        from .inspection_snapshot_export import export as export_snapshot
+
+        return export_snapshot(session, path, snapshot, images, view, **options)
+    if not images or view is not None:
+        raise ValueError("images/view options require a captured snapshot.")
+    return export_document(session, path, **options)
 
 
 def export_capture(

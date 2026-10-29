@@ -1,7 +1,7 @@
 """Current editable component read model shared by desktop and headless clients."""
 
-from typing import Any
 from hashlib import sha256
+from typing import Any
 
 from anthroforge.core.component_reads import ComponentRead, component_key
 from anthroforge.core.construction import Control, Curve
@@ -11,6 +11,7 @@ from anthroforge.core.tissues import TissueVCP
 from . import component_buffers as buffers
 from . import component_tissue, curve_edit_state, curve_sources, query_pages
 from .construction_policy import topology_locks
+from .query_projection import plain
 
 CATEGORIES = frozenset(("CURVE", "BASE", "VERTEX", "CONTROL", "TISSUE_CONTROL", "TISSUE_FIELD"))
 MEMBERSHIP = frozenset(("vertex", "base", "field"))
@@ -147,7 +148,7 @@ def report(
         offset=start,
         next_offset=end if end < total else None,
         components=page(value, start, end),
-        provenance=dict(value.provenance),
+        provenance=plain(dict(value.provenance)),
         topology_locks=topology_locks(session.document, target),
     )
 

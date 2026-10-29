@@ -3864,3 +3864,21 @@ through plane edits/save/reopen, and missing counterparts. Full-assembly source 
 attachments, shortcut updates and packaged qualification are recorded in the
 [task record](tasks/assembly-live-mirroring.md). Local numerical and rendered evidence lives
 under ignored `build/assembly-live-mirroring`; it is not part of the source archive.
+
+
+## 2026-10-29 — Authoring inspection boundaries (qualification pending)
+
+Baseline `31e9138f`. Desktop-only resolved component preparation moves into shared
+application read buffers, preserving current Fiber editing and native transformations.
+API pages slice these retained buffers instead of rebuilding or serializing entire meshes.
+Existing candidate resources gain independent snapshot leases; numerical inspection and
+optional isolated rendering do not apply a candidate or start anatomy calculations.
+Canonical polygon and triangle buffers are preserved by native restoration. No attachment,
+propagation, routing, inflation or stacking calculation changes.
+
+The development renderer previously always loaded build/dev while headless geometry could
+use a qualified alternative DLL. This produced a blank scene despite nonempty canonical
+arrays. The unbundled renderer now respects AF_NATIVE_BUILD, consistent with packaging and
+qualification tools; bundled runtime selection remains unchanged. A repeat hidden render
+shows the candidate geometry. Broader performance and release checks remain pending in
+[the recovery record](tasks/authoring-fixes-043.md).

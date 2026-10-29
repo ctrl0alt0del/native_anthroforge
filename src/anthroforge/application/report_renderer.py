@@ -29,9 +29,17 @@ def command(root: Path, revision: int) -> list[str]:
 
 
 def render(root: Path, revision: int, cancel: Event) -> None:
+    execute(root, command(root, revision), cancel)
+
+
+def render_scene(root: Path, cancel: Event) -> None:
+    execute(root, [*launcher(), "render-inspection", str(root), str(root / "image.png")], cancel)
+
+
+def execute(root: Path, arguments: list[str], cancel: Event) -> None:
     with (root / "renderer.log").open("w+b") as log:
         with subprocess.Popen(
-            command(root, revision), stdout=log, stderr=log, creationflags=CREATION_FLAGS
+            arguments, stdout=log, stderr=log, creationflags=CREATION_FLAGS
         ) as process:
             try:
                 wait(process, cancel)

@@ -100,6 +100,7 @@ def completed(state: Any, job: Job, result: str) -> None:
 def status(session: Any) -> dict[str, Any]:
     state, candidate = session.skin_fit_preview, displayed(session)
     return dict(
+        token=state.token,
         state=state.state,
         error=state.error,
         job_id=state.job,

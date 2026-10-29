@@ -31,10 +31,10 @@ def records(controller):
 
 
 def preview_rows(controller):
-    from anthroforge.application.previews import current
+    from anthroforge.application.inspection_sources import available
 
-    value = controller.session.surface_preview
-    if value.state != "ready" or value.asset is None or not current(controller.session, value):
+    value = available(controller.session, "surface")
+    if value is None:
         return []
     return [preview_record(controller.session, value)]
 
@@ -96,12 +96,12 @@ def resources(controller):
 
 
 def tissue_preview_rows(controller):
-    from anthroforge.application.previews import current
+    from anthroforge.application.inspection_sources import available
 
     from .mirror_scene import previews
 
-    value = controller.session.tissue_preview
-    if value.state != "ready" or value.asset is None or not current(controller.session, value):
+    value = available(controller.session, "tissue_inflation")
+    if value is None:
         return []
     rows = [preview_mesh(controller.session, value, value.asset.item, value.asset.mesh)]
     return previews(controller, rows, value.target)

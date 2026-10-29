@@ -129,6 +129,7 @@ class Session:
         from .tissue_inspection import Inspection
 
         self.initialize_project_preparation()
+        self._editing.values.pop("inspection_snapshot", None)
         self.tissue_inspection = Inspection()
         self.clear_previews()
         self.scheduler = TaskCoordinator(
@@ -372,6 +373,7 @@ class Session:
         self.contexts.close()
         self.scheduler.close()
         self.clear_previews()
+        self._editing.values.pop("inspection_snapshot", None)
         if self._engine is not None:
             self._engine.clear_caches()
             self.profiler.native.detach(self._engine)

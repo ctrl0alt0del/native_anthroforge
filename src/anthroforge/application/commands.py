@@ -33,6 +33,7 @@ from . import (
     importing,
     inspection,
     inspection_report,
+    inspection_snapshots,
     junction_operations,
     mesh_replacement,
     mirror_operations,
@@ -485,9 +486,7 @@ def drawing_commands(session: "Session") -> dict[str, Any]:
 def file_commands(session: "Session") -> dict[str, Any]:
     return {
         "save": lambda **a: projects.save(session, **a),
-        "editing.inspect": lambda **a: editing_queries.inspect(session, **a),
-        "inspection.export": lambda **a: inspection_report.export(session, **a),
-        "inspection.replay": lambda **a: comparison_replay.replay(**a),
+        **evidence_commands(session),
         "open": lambda **a: projects.open_project(session, **a),
         "workspace.create": lambda **a: presentation.create_workspace(session, **a),
         "workspace.select": lambda **a: presentation.select_workspace(session, **a),
@@ -495,6 +494,18 @@ def file_commands(session: "Session") -> dict[str, Any]:
         "workspace.remove": lambda **a: presentation.remove_workspace(session, **a),
         "workspace.preset": lambda **a: presentation.preset(session, **a),
         **view_commands(session),
+    }
+
+
+def evidence_commands(session: "Session") -> dict[str, Any]:
+    return {
+        "editing.inspect": lambda **a: editing_queries.inspect(session, **a),
+        "inspection.export": lambda **a: inspection_report.export(session, **a),
+        "inspection.capture": lambda **a: inspection_snapshots.capture(session, **a),
+        "inspection.capture.status": lambda **a: inspection_snapshots.status(session, **a),
+        "inspection.geometry": lambda **a: inspection_snapshots.geometry(session, **a),
+        "inspection.release": lambda **a: inspection_snapshots.release(session, **a),
+        "inspection.replay": lambda **a: comparison_replay.replay(**a),
     }
 
 

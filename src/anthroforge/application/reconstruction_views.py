@@ -4,6 +4,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from anthroforge.core.construction import Curve
+from anthroforge.core.inspection_layers import Layer as Layer
 from anthroforge.core.results import geometry_asset
 from anthroforge.core.tissues import TissueVCP
 
@@ -13,16 +14,6 @@ from . import tissue_inspection_stages as stages
 from .comparison_geometry import display_frame
 from .inspection_context import InspectionContext
 from .object_frames import Frames
-
-
-@dataclass(frozen=True)
-class Layer:
-    identity: str
-    resource: Any
-    frame: tuple[float, ...]
-    kind: str = "MESH"
-    color: str = "#b87d72"
-    lineage: Any = None
 
 
 @dataclass(frozen=True)
@@ -69,7 +60,7 @@ def accepted(context: Any, item: Any, stage: str) -> Layer:
         key = geometry_asset(item)
         frame = tuple(display_frame(context, item, Frames(context.engine, context.document)))
         lineage = (item.id, key)
-    return layer(context, item.id, key, frame, lineage, item.color)
+    return layer(context, item.id, key, frame, lineage, getattr(item, "color", "#b996cc"))
 
 
 def layer(context: Any, identity: str, key: str, frame: Any, lineage: Any, color: str) -> Layer:

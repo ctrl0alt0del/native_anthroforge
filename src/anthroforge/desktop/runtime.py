@@ -10,7 +10,8 @@ def build_directory() -> Path:
     bundled = Path(__file__).resolve().parents[1] / "_runtime"
     if bundled.is_dir():
         return bundled
-    return Path(__file__).resolve().parents[3] / "build" / "dev"
+    default = Path(__file__).resolve().parents[3] / "build" / "dev"
+    return Path(os.environ.get("AF_NATIVE_BUILD", default)).resolve()
 
 
 def native_directories() -> list:

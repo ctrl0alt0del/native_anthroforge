@@ -40,6 +40,9 @@ def authoring_parsers(commands):
 
 
 def inspection_parser(commands):
+    scene = commands.add_parser("render-inspection", help="Render a frozen inspection scene")
+    scene.add_argument("bundle")
+    scene.add_argument("output")
     report = commands.add_parser("report", help="Export a frozen image/metadata inspection archive")
     report.add_argument("project")
     report.add_argument("output")
@@ -55,7 +58,7 @@ def execute(args: argparse.Namespace) -> int:
         return numerical_worker.execute(args)
     if args.command == "report":
         return inspection_command(args)
-    if args.command in ("run", "serve", "inspect", "render"):
+    if args.command in ("run", "serve", "inspect", "render", "render-inspection"):
         return authoring_command(args, authoring)
     if args.command == "new":
         print(json.dumps(Session(args.name).describe(), indent=2))
@@ -66,6 +69,8 @@ def execute(args: argparse.Namespace) -> int:
 
 
 def authoring_command(args, authoring):
+    if args.command == "render-inspection":
+        return inspection_scene_command(args)
     if args.command == "run":
         return authoring.batch(args.file, args.project)
     if args.command == "serve":
@@ -76,6 +81,12 @@ def authoring_command(args, authoring):
     from anthroforge.desktop.capture import capture
 
     return capture(args.project, args.output, args.revision, args.view)
+
+
+def inspection_scene_command(args):
+    from anthroforge.desktop.inspection_capture import capture
+
+    return capture(args.bundle, args.output)
 
 
 def inspection_command(args):

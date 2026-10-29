@@ -21,8 +21,6 @@ def brush(controller):
 
 def preview(controller, tool):
     tool.pointer([0, 0], list(VIEW), True)
-    tool.timer.stop()
-    tool.submit()
     controller.session.wait()
     publish(controller)
 
@@ -60,8 +58,6 @@ def test_pending_paint_replacement_keeps_previous_colors(controller):
     preview(controller, tool)
     previous = primary(controller.tissue_inspection)["handle"]
     tool.pointer([20, 0], list(VIEW), False)
-    tool.timer.stop()
-    tool.submit()
     controller.notify()
     assert primary(controller.tissue_inspection)["handle"] == previous
     tool.cancel()

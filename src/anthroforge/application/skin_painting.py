@@ -9,7 +9,6 @@ from anthroforge.core.skin import effective_collagen
 from anthroforge.native import painting
 
 from . import skin_collagen, skin_operations, surface_providers, weight_painting
-from . import tissue_inspection as inspection
 from .inspection_context import scene_signature
 
 
@@ -22,8 +21,6 @@ def validate(context: Any, target: str, options: Any) -> None:
     value = provider(context, target)
     if options.get("expected_asset", value.asset_id) != value.asset_id:
         raise ValueError("The displayed SCP changed. Paint its current surface again.")
-    if len(options.get("samples", ())) not in range(1, 4097):
-        raise ValueError("A paint stroke needs 1-4096 pointer samples.")
 
 
 def signature(context: Any, target: str, options: Any) -> Any:
@@ -74,7 +71,6 @@ def workload(context: Any, target: str, options: Any) -> Workload:
 
 
 def commit(session: Any, job: str) -> None:
-    value = session.tissue_inspection.values.get("collagen")
-    weight_painting.require_current(session, value, job)
-    skin_collagen.set_weights(session, value.target, value.asset["resource"].values)
-    inspection.cancel(session, "collagen")
+    from .painting_compatibility import commit as apply
+
+    apply(session, "collagen", job)

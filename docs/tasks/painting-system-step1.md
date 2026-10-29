@@ -23,14 +23,20 @@ inspection and commit operations delegate to the same service. Desktop becomes a
 
 ## Current state
 
-Inspected the Qt gesture controller, inspection jobs, native coverage/cache, consumer
-commits, history, context ownership and existing parity tests. Source implementation
-has not started. Primary checkout contains unrelated unfinished assembly changes;
+Shared core/application stroke contracts, explicit consumers, headless operations,
+coordinator finalization, legacy adapters and desktop migration are implemented.
+Native numerical code is unchanged. Follow-up hardening, style/type checks, save
+coordination, resource/performance evidence and packaging remain unfinished.
+Primary checkout contains unrelated unfinished assembly changes;
 work occurs in `build/painting-system-step1` and must not stage those changes.
 
 ## Verification
 
-Not run yet. Required: focused native/headless/UI tests; full development gate; dense
+Focused native/legacy tests: 14 passed. Offscreen desktop painting tests: 6 passed.
+New shared lifecycle tests: 20 passed, including finish-before-preview, undo/redo,
+cancel, changed baseline, paging, no-op, limits and Qt-free execution. Style currently
+has functions over 15 lines; initial mypy found annotation issues being corrected.
+Required: full development gate; dense
 and 96-muscle performance comparison; offscreen images; relocated portable checks.
 No interactive desktop evidence may be claimed.
 

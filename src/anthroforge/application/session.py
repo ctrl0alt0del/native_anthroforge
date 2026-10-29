@@ -54,6 +54,7 @@ class Session:
     shortcut_observation = ContextField[Any]("shortcut_observation")
     shortcut_comparison = ContextField[Any]("shortcut_comparison")
     tissue_inspection = ContextField[Any]("tissue_inspection")
+    painting = ContextField[Any]("painting")
     conversion = ContextField[ConversionPreview]("conversion")
     mesh_replacement = ContextField[Preview[Any]]("mesh_replacement")
     tissue_retarget = ContextField[Preview[Any]]("tissue_retarget")
@@ -289,8 +290,7 @@ class Session:
 
     @measured("transaction", lambda session: session.profiler)
     def navigate(self, direction: int) -> None:
-        if self.waiting_save:
-            raise ValueError("History is blocked while waiting to save.")
+        self.prepare_navigation()
         previous = self.document
         self.comparison_event("undo" if direction < 0 else "redo")
         self.shortcut_observation.restore()
@@ -303,6 +303,11 @@ class Session:
             self.history.replay()
         self.history.recover()
         self.resume_calculations()
+
+    def prepare_navigation(self) -> None:
+        if self.waiting_save:
+            raise ValueError("History is blocked while waiting to save.")
+        self.cancel_painting()
 
     def remember_restarts(self, restarts: list[Restart]) -> None:
         for restart in restarts:
@@ -383,6 +388,7 @@ class Session:
             self.file_lock.close()
 
     def clear_previews(self) -> None:
+        self.reset_painting()
         self._editing.values.pop("component_read", None)
         self._editing.values.pop("query_revision", None)
         self.conversion = ConversionPreview()
@@ -391,6 +397,18 @@ class Session:
         self.surface_preview = Preview()
         self.tissue_preview = Preview()
         self.skin_fit_preview = Preview()
+
+    def cancel_painting(self) -> None:
+        from .painting import cancel
+
+        if self._editing.values.get("painting"):
+            cancel(self)
+
+    def reset_painting(self) -> None:
+        from .painting_state import Painting
+
+        self.cancel_painting()
+        self.painting = Painting()
 
 
 def changed_ids(previous: Document, current: Document) -> set[str]:

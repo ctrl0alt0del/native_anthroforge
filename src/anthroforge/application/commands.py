@@ -41,6 +41,7 @@ from . import (
     object_operations,
     operations,
     output_tasks,
+    painting,
     parametric_operations,
     path_tasks,
     point_operations,
@@ -98,6 +99,7 @@ EDITS = {
     "skeleton_update.apply": skeleton_operations.apply,
     "assembly.import": assembly_operations.apply,
     "skin.collagen.paint.commit": skin_painting.commit,
+    "painting.commit": painting.apply,
     "skin.collagen.set": skin_collagen.set_weights,
     "skin.collagen.fill": skin_collagen.fill,
     "skin.collagen.clear": skin_collagen.clear,
@@ -281,6 +283,14 @@ def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> An
 
 
 def query_handler(operation: str) -> Any:
+    if operation.startswith("painting.") and operation != "painting.commit":
+        from .painting_commands import execute as painting_command
+
+        return painting_command
+    return inspection_query_handler(operation)
+
+
+def inspection_query_handler(operation: str) -> Any:
     if operation.startswith(("tissue.inspect.", "curve.inspect.", "skin.inspect.")):
         from .tissue_inspection import execute as tissue_inspect
 

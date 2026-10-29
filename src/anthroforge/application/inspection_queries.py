@@ -23,14 +23,11 @@ def definition(kind: str) -> Query:
 def definitions() -> dict[str, Query]:
     from . import route_inspection as route
     from . import stacking_inspection as stacking
-    from . import tissue_inspection as tissue
-    from . import tissue_painting as painting
     from . import tissue_sections as sections
 
     return dict(
         auxiliary_queries(),
         stacking=Query(stacking.validate, stacking.signature, stacking.compute, stacking.workload),
-        paint=Query(painting.validate, painting.signature, painting.compute, tissue.workload),
         section=Query(sections.validate, sections.signature, sections.compute, sections.workload),
         route=Query(route.validate, route.signature, route.compute, route.workload),
         shortcut=shortcut_query(),
@@ -48,7 +45,6 @@ def measurement_query() -> Query:
 def auxiliary_queries() -> dict[str, Query]:
     return dict(
         tissue_queries(),
-        collagen=collagen_query(),
         measurements=measurement_query(),
         placement=placement_query(),
         binding=binding_query(),

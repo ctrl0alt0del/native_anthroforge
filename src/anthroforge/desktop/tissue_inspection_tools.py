@@ -117,7 +117,10 @@ class TissueInspectionTools(QObject):
         session = self.controller.session
         values = tuple(
             (k, v.job, v.state, id(v.asset), v.error)
-            for k, v in session.tissue_inspection.values.items()
+            for k, v in (
+                *session.tissue_inspection.values.items(),
+                *session.painting.values.items(),
+            )
         )
         return (
             id(session.document),

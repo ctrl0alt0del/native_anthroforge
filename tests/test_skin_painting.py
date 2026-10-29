@@ -41,7 +41,7 @@ def test_through_paints_both_sides(session, monkeypatch):
     target = imported(session, monkeypatch)
     session.command("skin.collagen.fill", owner=target, value=0)
     request(session, target, True)
-    value = session.tissue_inspection.values["collagen"].asset["resource"].values
+    value = session.painting.values["collagen"].asset["resource"].values
     assert np.all(value > 0)
 
 

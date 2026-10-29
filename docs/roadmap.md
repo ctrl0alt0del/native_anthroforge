@@ -1,5 +1,10 @@
 # AnthroForge release roadmap
 
+- **0.4.3 — authoring parity audit; fixes not implemented:** review desktop workflows
+  against public Python/JSON authoring, including queries and lifecycle behavior.
+  [Findings and proposed responsibilities](authoring_audit_043.md),
+  [evidence](tasks/authoring-parity-043.md). Discuss the confirmed gaps before fixes.
+
 - **0.4.2 — qualified inspection extensions:** R01–R03 and R06 from the
   [complete recommendation audit](recommendations_042_audit.md): shared replacement status,
   spatial findings, placement explanation, dimensions/sections and temporary neighborhood

@@ -1,5 +1,9 @@
 # Local authoring API, 0.4.2
 
+The [0.4.3 UI/authoring audit](authoring_audit_043.md) records current coverage and
+confirmed public-interface gaps. It is an audit, not a claim that the proposed fixes
+or a 0.4.3 runtime have been implemented.
+
 ## Spatial inspection (0.4.2)
 
 See [workflow and limits](inspection_042.md). These operations are read-only:

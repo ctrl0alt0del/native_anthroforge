@@ -73,6 +73,13 @@ Focused lifecycle/architecture regression: 20 passed. Full gate and temporary pa
 qualification are next. Raw results are under `build/painting/final-serial` and profiles
 under `build/painting/profiles`; these local-only artifacts are not in Git.
 
+Relocated qualification found the isolated image renderer still called the removed
+desktop `retain_preview` method. Its restore adapter now requests the shared preview,
+retains its token and synchronizes presentation. The actual failed path has a regression;
+client parity, mirror/workspace restrictions and restored-preview cancellation pass
+(9 focused checks including architecture). Runtime package is being rebuilt; full gate
+continues and portable checks must be rerun before delivery.
+
 Serial ABBA old/new timing and exact-array comparison are running against production
 code at 713d963e (equivalent docs worktree 308ca03d), using the same native library.
 Temporary qualification package and relocated portable suite remain pending.

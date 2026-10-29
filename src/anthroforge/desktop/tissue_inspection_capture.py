@@ -57,9 +57,12 @@ def restore_paint(controller, settings):
     brush = controller.tissue_painting
     brush.begin(options["name"])
     controller.tissue_inspection.set_view(options["stage"], "", "Overlay")
-    controller.session.command("tissue.inspect.paint", target=controller.selection, **options)
+    state = controller.session.command(
+        "painting.preview", consumer="tissue_weights", target=controller.selection, **options
+    )
+    brush.token = state["token"]
     controller.session.wait()
-    brush.retain_preview()
+    brush.synchronize()
 
 
 def restore_section(controller, snapshot):

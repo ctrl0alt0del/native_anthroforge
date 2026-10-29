@@ -3911,7 +3911,11 @@ No resampling, smoothing, new numerical fallback or worker pool was added. The r
 boundary changed so desktop and authoring can share the same behavior. Legacy commands
 and frozen inspection image export delegate to this state.
 
-Focused parity, lifecycle, save and desktop model tests pass. Dense/96-muscle timing,
-profiler and complete portable qualification are tracked in the
-[task record](tasks/painting-system-step1.md); no performance improvement is inferred
-from this refactor alone.
+Focused parity, lifecycle, save and desktop model tests pass. Serial ABBA comparisons
+against production `713d963e` produce identical scalar arrays in all 36 dense/96-muscle
+preview conditions. Profiled peak unique geometry ownership is unchanged. Investigation
+removed duplicate field validation; upfront baseline capture adds a small request cost,
+while native calculation counts/results stay unchanged. Warm wall timings do not establish
+a speedup. See [measured evidence](painting_system.md#qualification-evidence) for timings,
+variance, profiler costs, resource limits and fixture provenance. The
+[task record](tasks/painting-system-step1.md) tracks full gate and portable qualification.

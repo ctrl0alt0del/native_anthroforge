@@ -108,3 +108,65 @@ separately visible through the existing profiler (`painting` task kind).
 
 Muscle Paint, Paint Outer, envelope generation, physical-width brushes, gap interpolation,
 queued consecutive strokes and transient-paint history remain outside this increment.
+
+## Qualification evidence
+
+The numerical baseline is production code at `713d963e`; the comparison checkout
+`308ca03d` has identical application/native code. Candidate runtime is `b306e77f`.
+Both use the same qualified native DLL. No native painting source changed.
+
+`tools/painting_qualification.py` runs serial old/new/new/old trials. Twelve preview
+conditions vary camera projection, sparse/dense sample sequences and Paint Through,
+with explicit occluders. All 36 sets of scalar arrays match bit-for-bit across runs.
+The first two previews per process are cold; the following ten form the warm summary.
+
+| Workload | Values | Old/new warm median | Old/new standard deviation |
+| --- | ---: | ---: | ---: |
+| Dense SCP collagen | 66,049 | 21.24 / 21.11 ms | 5.07 / 4.67 ms |
+| 96-muscle assembly SCP collagen | 10,242 | 66.02 / 70.84 ms | 5.37 / 6.00 ms |
+| 96-muscle assembly tissue REST field | 13,845 | 72.77 / 74.52 ms | 11.65 / 11.49 ms |
+
+These are command-to-ready times, not solver-only times. Variation includes deliberately
+different conditions, so the standard deviation is not a confidence interval for a speed
+claim. Earlier ABBA trials measured assembly collagen at 67.80 / 67.10 ms. System busy
+fractions during final trials were 4.8–12.3%, including the tested application; background
+processes and thermal state were uncontrolled. This refactor does not establish a speedup.
+
+Profiler investigation found redundant validation in the new capture path. Removing it
+reduced material-axis calls from 400 to 224 in the assembly recording (baseline 214).
+New preview creation also checks baseline identity immediately, as required by the new
+stroke contract; the old preview captured it only at dispatch. In separate recorded runs,
+34 preview requests cost 56.52 ms total versus 26.27 ms previously. Native preparation
+remained 24 calls, 1,423.97 versus 1,461.43 ms; native effects remained 24 calls,
+53.31 versus 52.64 ms. These overlapping inclusive timings must not be added or subtracted
+as exact profiler overhead. Cancellation alone averaged 0.13 ms in the recorded assembly;
+unrecorded request/cancel/wait medians were 1.08 ms collagen and 1.57 ms tissue versus
+0.26 / 0.49 ms previously, including the new upfront capture checks.
+
+Commit-and-wait measurements, including downstream evaluation, remained comparable:
+assembly collagen 9.04–10.12 ms and tissue 309.23–314.30 ms, versus 9.04–9.35 ms and
+308.75–314.88 ms. Exact candidate reuse, cancellation during work, supersession, save
+waiting, no-op history, undo/redo, context isolation and resource release have dedicated
+regressions. Desktop candidates match authoring values exactly; mirror and workspace
+edit restrictions are enforced through the shared services.
+
+Measured peak unique geometry ownership was identical: 48,510,644 bytes on the dense
+fixture and 658,979,620 bytes on the assembly. This is profiler-accounted geometry, not
+total process RSS. Dense projection caching retained 47,453,666 bytes in both versions;
+the full explicit assembly exceeds that cache's existing budget and retains no projection
+entry in either version. Repeated previews replace resources rather than accumulating
+an archive; viewport-held owners remain valid until their leases end.
+
+The production input was `skeleton_96_muscles_shortcuts_v001.anthroforge`, SHA256
+`308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
+Its hash was unchanged after every run. Raw arrays, profiles and hidden GPU captures
+are local under `build/painting/`; the committed qualification tools reproduce them
+when that external fixture is available. Actual two-angle preview/cancel images were
+inspected. Hidden/offscreen rendering does not establish interactive user acceptance.
+
+Ownership review is separate from these tests: Core contains immutable inputs only;
+the application owns context state and coordinator jobs; explicit consumer adapters own
+domain validation/effects/commits; Desktop owns input and leased presentation. Legacy
+inspection routes delegate instead of retaining another state machine. No Qt object,
+new worker pool, numerical algorithm, transient project record or stroke archive was added.
+Full gate and relocated executable results are recorded in the recovery task record.

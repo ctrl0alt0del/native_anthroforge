@@ -77,7 +77,7 @@ def accept(context: Any, result: Any) -> None:
 
 
 def failure(context: Any, key: str, message: str) -> Finding:
-    required = key in context.formula_review
+    required = key in context.formula_review or key in context.required
     return Finding(
         "failure:" + key, key, message, blocking=required, acknowledge=not required, kind="failure"
     )

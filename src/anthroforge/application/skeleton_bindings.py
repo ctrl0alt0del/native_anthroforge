@@ -176,12 +176,16 @@ def rebind_dependents(context: Any, changes: Any, options: Any) -> list[dict[str
         if row.added:
             continue
         for item in replacement_reviews.incoming(context.baseline, row.target):
-            if item.id in context.fixed_poses:
+            if not reviewable(context, item.id):
                 continue
             if row.correspondence == "verified" and item.id not in options.get("placements", {}):
                 continue
             rebind(context, item.id, row.target, options, evidence)
     return evidence
+
+
+def reviewable(context: Any, key: str) -> bool:
+    return key not in context.fixed_poses and (context.editable is None or key in context.editable)
 
 
 def rebind(context: Any, owner: str, target: str, options: Any, evidence: Any) -> None:

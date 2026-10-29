@@ -2,7 +2,7 @@
 
 import json
 
-from PySide6.QtCore import Property, QObject, Signal, Slot
+from PySide6.QtCore import Property, QObject, QUrl, Signal, Slot
 
 
 class ReconstructionPanel(QObject):
@@ -14,6 +14,7 @@ class ReconstructionPanel(QObject):
         self._open, self._floating = False, False
         self._signature, self._data = None, "{}"
         self._page = "Variants"
+        self.stage_path = ""
 
     @Property(str, notify=changed)
     def page(self):
@@ -51,8 +52,10 @@ class ReconstructionPanel(QObject):
         session = self.controller.session
         root = session.contexts.scene("")
         signature = (id(root.reconstruction), session.contexts.visible, self._page)
-        if self._page == "Reviews":
-            signature += (id(session.document), id(root))
+        if self._page in ("Reviews", "Variants"):
+            signature += (id(session.document), id(root), self.controller.selection)
+        if self._page == "Stages":
+            signature += (self.stage_path, session.assembly.source.state)
         if signature == self._signature:
             return
         self._signature = signature
@@ -66,10 +69,60 @@ class ReconstructionPanel(QObject):
             "Catalogue": "catalogue.inspect",
             "Reviews": "review.inspect",
             "Queue": "reconstruction.queue.inspect",
+            "Stages": "reconstruction.stage.inspect",
         }
         if self._page in commands:
             result["detail"] = session.command(commands[self._page])
+        result["evidence"] = session.command("reconstruction.evidence.inspect")["evidence"]
+        result["source"] = self.source_state()
+        result["reviewStages"] = self.review_stages() if self._page == "Reviews" else []
         return result
+
+    def review_stages(self):
+        from anthroforge.application.reconstruction_views import options
+
+        try:
+            return options(self.controller.session, self.controller.selection)["views"]
+        except ValueError:
+            return []
+
+    def source_state(self):
+        source = self.controller.session.assembly.source
+        return dict(
+            path=self.stage_path,
+            state=source.state,
+            error=source.error,
+            inventory=source.inventory if self.stage_path.endswith(".anthroforge") else [],
+        )
+
+    @Slot(str)
+    def chooseStageFile(self, url):
+        self.stage_path = QUrl(url).toLocalFile()
+        if self.stage_path.endswith(".anthroforge"):
+            self.controller.run("assembly.inspect", dict(path=self.stage_path))
+        self._signature = None
+        self.synchronize()
+
+    @Slot(str, float, bool, "QVariantList", str, str)
+    def importStage(self, stage, units, y_up, transform, source_entity, role):
+        session = self.controller.session
+        arguments = dict(
+            subject=self.controller.selection,
+            stage=stage,
+            path=self.stage_path,
+            variant=session.contexts.visible,
+            frame=session.engine.transform(transform),
+        )
+        if self.stage_path.endswith(".anthroforge"):
+            arguments.update(source_entity=source_entity, role=role)
+            self.run("reconstruction.stage.import_project", arguments)
+        else:
+            arguments.update(units=units, y_up=y_up)
+            self.run("reconstruction.stage.import_mesh", arguments)
+
+    @Slot(str)
+    def importEvidence(self, url):
+        self.run("reconstruction.evidence.import_file", dict(path=QUrl(url).toLocalFile()))
 
     @Slot(str, str)
     def assignSelection(self, type_id, side):

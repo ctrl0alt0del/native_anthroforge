@@ -4,9 +4,8 @@ from typing import Any
 
 from anthroforge.core.entities import SCP
 from anthroforge.core.object_outputs import output
-from anthroforge.core.results import Port, geometry_asset
+from anthroforge.core.results import Port
 from anthroforge.core.skeleton_update import BoneChange
-from anthroforge.native import topology
 
 from . import (
     candidate_dependencies,
@@ -15,6 +14,7 @@ from . import (
     skeleton_candidate,
     skeleton_comparison,
     skeleton_placements,
+    variant_correspondence,
     variant_reconciliation,
 )
 from .candidate_evaluation import EvaluationContext
@@ -46,18 +46,34 @@ def proposed(
 def evaluate(context: Any, record: Any, baseline: Any, current: Any, mode: str) -> Any:
     owners = variant_reconciliation.scope(record, baseline, current)
     seeds = seeds_for(context.document, owners)
-    changes = changed_surfaces(
-        context, owners if mode == "promote" else set(context.document.registry.anatomy)
-    )
-    context.fixed_poses = (
-        frozenset(k for k in record.subjects if k in context.document.index.entities)
-        if mode == "promote"
-        else frozenset()
-    )
+    configure(context, owners, seeds, mode)
+    evaluate_sources(context, owners, seeds, mode)
+    affected = owners if mode == "promote" else set(context.document.registry.anatomy)
+    changes = changed_surfaces(context, affected, record.construction_map)
     evidence = prepare_bindings(context, changes)
     if not any(row.blocking for row in context.findings):
         candidate_dependencies.evaluate(context, seeds, owners if mode == "refresh" else None)
     return bundle(context, owners, seeds, changes, evidence)
+
+
+def configure(context: Any, owners: Any, seeds: Any, mode: str) -> None:
+    from . import property_guards, skeleton_preparation
+
+    context.category = "variant_" + mode
+    context.required = frozenset(owners | {p.owner for p in seeds if p.output == "formula"})
+    context.editable = frozenset(owners) if mode == "refresh" else None
+    if mode == "promote":
+        context.fixed_poses = frozenset(owners & context.document.index.entities.keys())
+    try:
+        property_guards.validate_writers(context.document)
+    except ValueError as error:
+        skeleton_preparation.writer_conflict(context, str(error))
+
+
+def evaluate_sources(context: Any, owners: Any, seeds: Any, mode: str) -> None:
+    if mode != "promote" or any(f.blocking for f in context.findings):
+        return
+    candidate_dependencies.evaluate(context, seeds, owners | set(context.required))
 
 
 def seeds_for(document: Any, owners: set[str]) -> set[Port]:
@@ -72,13 +88,14 @@ def seeds_for(document: Any, owners: set[str]) -> set[Port]:
     return seeds
 
 
-def changed_surfaces(context: Any, owners: set[str]) -> tuple[Any, ...]:
+def changed_surfaces(context: Any, owners: set[str], pairs: Any) -> tuple[Any, ...]:
     rows = []
+    mapping = {new: old for old, new in pairs}
     for key in sorted(owners & context.document.registry.anatomy.keys()):
         old, new = context.baseline.registry.records.get(key), context.document.object(key)
         if old is new:
             continue
-        compatible = correspondence(context, old, new)
+        compatible = variant_correspondence.verified(context, old, new, mapping)
         placement = isinstance(new, SCP) and (old is None or new.matrix != old.matrix)
         rows.append(
             BoneChange(
@@ -88,17 +105,9 @@ def changed_surfaces(context: Any, owners: set[str]) -> tuple[Any, ...]:
     return tuple(rows)
 
 
-def correspondence(context: Any, old: Any, new: Any) -> bool:
-    a, b = geometry_asset(old) if old else "", geometry_asset(new)
-    if not a or not b:
-        return not a and not b
-    if a == b:
-        return True
-    first, second = context.assets[a].mesh, context.assets[b].mesh
-    return topology.same_content(first, second, context.cancel.handle)
-
-
 def prepare_bindings(context: Any, changes: Any) -> list[Any]:
+    if any(f.blocking for f in context.findings):
+        return []
     bones = tuple(c for c in changes if c.target in context.fixed_poses)
     evidence = skeleton_bindings.capture_bones(context, bones, context.options)
     evidence += skeleton_bindings.rebind_dependents(context, changes, context.options)

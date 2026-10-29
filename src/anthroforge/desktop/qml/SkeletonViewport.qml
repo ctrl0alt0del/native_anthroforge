@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick3D
 import QtQuick.Controls
+import AnthroForge.Native 1.0
 
 Item {
     id: panel
@@ -27,6 +28,16 @@ Item {
             SkeletonSceneGeometry { service: panel.service; model: panel.overlay ? panel.service.before : null; overlay: true }
             SkeletonAnchors { service: panel.service; side: panel.side }
             SkeletonAnchors { service: panel.service; side: 0; visible: panel.overlay }
+            Model {
+                visible: !!panel.service.state.contours
+                geometry: ControlGeometry { points: panel.service.state.contours?.[panel.side] || []; segments: true; stroke: panel.cameraState[5]*.001 }
+                materials: DefaultMaterial { diffuseColor: "#f0c47b"; lighting: DefaultMaterial.NoLighting }
+            }
+            Model {
+                visible: panel.service.state.region?.side === panel.side
+                geometry: ControlGeometry { points: panel.service.state.region?.lines || []; segments: true; stroke: panel.cameraState[5]*.0013 }
+                materials: DefaultMaterial { diffuseColor: "#86e1ad"; lighting: DefaultMaterial.NoLighting }
+            }
         }
     }
     Label { anchors.left: parent.left; anchors.top: parent.top; anchors.margins: 10; text: panel.overlay ? "Overlay" : panel.side ? "After" : "Before"; color: Theme.text; font.bold: true }

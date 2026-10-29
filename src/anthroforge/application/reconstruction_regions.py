@@ -19,6 +19,21 @@ def provider(session: Any, target: str, role: str, variant: str) -> Any:
     )
 
 
+def view_arguments(session: Any, view: Any, name: str, triangles: Any) -> Any:
+    from anthroforge.core.tissues import TissueVCP
+
+    item = view.source.document.object(view.subject)
+    role = "SCP_GEOMETRY"
+    if isinstance(item, TissueVCP):
+        role = "TISSUE_BASE" if view.stage == "base" else "TISSUE_FINAL"
+    current = provider(session, view.subject, role, view.variant)
+    if len(view.layers) != 1 or current.resource.mesh is not view.layers[0].resource:
+        raise ValueError("Choose the current Base or Final surface and refresh this comparison.")
+    return dict(
+        name=name, target=view.subject, role=role, variant=view.variant, triangles=triangles
+    )
+
+
 def set_region(session: Any, name: str, target: str, triangles: Any, **options: Any) -> str:
     if set(options) - {"role", "variant", "region"}:
         raise ValueError("Unknown region setting.")

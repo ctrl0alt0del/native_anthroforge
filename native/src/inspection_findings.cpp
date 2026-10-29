@@ -90,3 +90,16 @@ int af_inspection_face_lines(uint64_t handle,const double* frame,int triangle,do
         return 0;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
+int af_inspection_faces_lines(uint64_t handle,const double* frame,const int64_t* triangles,int count,double* lines) {
+    try {
+        const auto mesh=af::mesh(handle);
+        if(!frame||count<0||count>mesh->triangles.rows()||(count&&(!triangles||!lines)))
+            throw std::runtime_error("Invalid region outline buffers.");
+        for(int i=0;i<count;++i) {
+            if(triangles[i]<0||triangles[i]>=mesh->triangles.rows())
+                throw std::runtime_error("Unknown region triangle.");
+            if(af_inspection_face_lines(handle,frame,static_cast<int>(triangles[i]),lines+18*i)) return 1;
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}

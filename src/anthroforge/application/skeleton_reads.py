@@ -28,6 +28,8 @@ def control_keys(context: Any, observed: Any) -> set[str]:
         after = {v.id: v for v in getattr(context.document, group)}
         found.update(v.id for v in getattr(context.baseline, group) if after.get(v.id) != v)
     found.update("mirror:" + key for key in context.baseline.mirrors.rules)
+    found.add("mirror_relationships")
+    found.add("formula_writers")
     return found
 
 

@@ -10,8 +10,8 @@ from .document_index import DocumentIndex, build
 from .entities import SCP, Workspace
 from .junctions import Junction
 from .mirror_resolution import MirrorIndex
-from .reconstruction import EditingScope, Reconstruction
 from .mirroring import MirrorRule, SharedMirrorTarget
+from .reconstruction import EditingScope, Reconstruction
 from .shortcut_edits import ShortcutEdit
 from .shortcuts import DrivingShortcut, FormulaResult, Shortcut
 from .skin import Skin

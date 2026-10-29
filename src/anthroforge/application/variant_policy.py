@@ -1,15 +1,16 @@
 """Shared editing capabilities keep pinned anatomy read-only in alternative contexts."""
 
+from dataclasses import replace
 from typing import Any
 
-from dataclasses import replace
+from anthroforge.core.document import Document
 
 
 def allowed(session: Any, target: str) -> bool:
     return target not in session.editing_restrictions
 
 
-def retain_scope(before: Any, after: Any) -> Any:
+def retain_scope(before: Document, after: Document) -> Document:
     if before.editing_scope is None or after.editing_scope is not before.editing_scope:
         return after
     from .skeleton_graph import identity

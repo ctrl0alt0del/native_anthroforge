@@ -1,15 +1,16 @@
 """One project save captures committed context states without persisting active jobs."""
 
 from dataclasses import replace
-from typing import Any
+from typing import Any, cast
 
+from anthroforge.core.document import Document
 from anthroforge.core.reconstruction import SceneSnapshot
 
 from .editing_contexts import bare
 from .scheduling_context import all_active
 
 
-def scene(session: Any, key: str, checkpoints: bool) -> Any:
+def scene(session: Any, key: str, checkpoints: bool) -> Document:
     context = session.contexts.states[key]
     current = context.values["document"]
     before = context.values["history"].before
@@ -18,10 +19,10 @@ def scene(session: Any, key: str, checkpoints: bool) -> Any:
         current = scheduling.checkpoint
     if before is not None and before.revision < current.revision:
         current = before
-    return current
+    return cast(Document, current)
 
 
-def project(session: Any, checkpoints: bool = False) -> Any:
+def project(session: Any, checkpoints: bool = False) -> Document:
     contexts = {key: scene(session, key, checkpoints) for key in session.contexts.states}
     accepted = contexts[""]
     state = accepted.reconstruction

@@ -143,6 +143,12 @@ def merge_records(before: tuple[Any, ...], incoming: tuple[Any, ...]) -> tuple[A
 
 
 def identity(item: Any) -> str:
+    from anthroforge.core.mirroring import MirrorRule, SharedMirrorTarget
+
+    if isinstance(item, MirrorRule):
+        return "mirror:" + item.target
+    if isinstance(item, SharedMirrorTarget):
+        return "mirror-sharing:" + item.source + ":" + item.binding
     return str(getattr(item, "id", getattr(item, "formula", "")))
 
 

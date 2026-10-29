@@ -29,14 +29,19 @@ def duplicate(document: Any, resources: Any, subjects: list[str]) -> Any:
     ids.update({key: key for key in subjects})
     assets = copied_metadata(document, resources, picked, ids)
     values = assembly_copy.additions(document, picked, ids, assets)
-    drivers(document, picked, values, ids)
+    changed_drivers = drivers(document, picked, values, ids)
     changes = merged_groups(document, values)
     editable = tuple(sorted(ids[key] for key in picked.records))
-    scope = EditingScope(
-        frozenset(ids.values()), frozenset(document.registry.records) - set(editable)
-    )
+    scope = editing_scope(document, ids, changed_drivers)
     copied = replace(bare(document), editing_scope=scope, **changes)
     return copied, editable, tuple(sorted(ids.items()))
+
+
+def editing_scope(document: Any, ids: Any, changed_drivers: Any) -> EditingScope:
+    from .variant_reconciliation import record_ids
+
+    owned = frozenset(ids.values()) | changed_drivers
+    return EditingScope(owned, frozenset(record_ids(document)) - owned)
 
 
 def merged_groups(document: Any, values: Any) -> dict[str, Any]:
@@ -70,16 +75,24 @@ def complete_metadata(resources: Any, found: Any) -> None:
                 found["meshes"].update(t.material_asset for t in resources.attachments[key].targets)
 
 
-def drivers(document: Any, selection: Any, values: Any, ids: Any) -> None:
-    targets = set(selection.records)
+def drivers(document: Any, selection: Any, values: Any, ids: Any) -> frozenset[str]:
+    targets = set(selection.records) | {row.id for row in selection.drivers}
     cloned = {row.id for row in selection.drivers}
+    replaced = {key for key in targets if ids.get(key) == key}
     replacements = tuple(
-        filtered(row, targets, False) for row in document.driving_shortcuts if row.id in cloned
+        filtered(row, replaced, False) for row in document.driving_shortcuts if row.id in cloned
     )
     copies = tuple(
         filtered(row, {ids[k] for k in targets}, True) for row in values["driving_shortcuts"]
     )
     values["driving_shortcuts"] = replacements + copies
+    retain_driver_results(values, replacements, copies)
+    return frozenset(
+        row.id for row in replacements if row != document.formula_index.drivers[row.id]
+    )
+
+
+def retain_driver_results(values: Any, replacements: Any, copies: Any) -> None:
     old = {f.id for row in replacements for f in row.formulas}
     mapped = {f.id for row in copies for f in row.formulas}
     values["formula_results"] = tuple(

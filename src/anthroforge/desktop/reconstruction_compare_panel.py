@@ -1,0 +1,119 @@
+"""Focused stage comparison, region drafts and file evidence without document editing."""
+
+from PySide6.QtCore import Property, QObject, QUrl, Signal, Slot
+
+from anthroforge.application import reconstruction_regions, reconstruction_views
+
+from .reconstruction_scene import ReconstructionScene
+
+
+class ReconstructionComparePanel(QObject):
+    changed = Signal()
+    requested = Signal()
+
+    def __init__(self, controller):
+        super().__init__(controller)
+        self.controller, self.subject, self.active = controller, "", False
+        self.selections, self.options, self.report = [{}, {}], [], {}
+        self.signature, self.error, self.plane = None, "", None
+        self.scene = ReconstructionScene(controller, self)
+
+    @Property(QObject, constant=True)
+    def comparison(self):
+        return self.scene
+
+    @Property("QVariantMap", notify=changed)
+    def state(self):
+        return dict(
+            subject=self.subject,
+            options=self.options,
+            selections=self.selections,
+            report=self.report,
+            error=self.error,
+            plane=self.plane,
+        )
+
+    @Slot(str)
+    def inspect(self, subject):
+        self.subject, self.active = subject, True
+        try:
+            self.options = reconstruction_views.options(self.controller.session, subject)["views"]
+            self.selections = [self.options[0], self.options[-1]]
+            self.submit()
+            self.requested.emit()
+        except ValueError as error:
+            self.controller.message = str(error)
+            self.controller.notify()
+
+    @Slot(int, "QVariantMap")
+    def choose(self, side, choice):
+        self.selections[side] = dict(choice)
+        self.submit()
+
+    @Slot(bool, int, float, bool)
+    def section(self, enabled, axis, position, flip):
+        sign = -1 if flip else 1
+        self.plane = (
+            [*(sign * int(axis == i) for i in range(3)), -position * sign] if enabled else None
+        )
+        self.submit()
+
+    @Slot()
+    def submit(self):
+        args = [
+            dict(stage=s.get("stage", "final"), variant=s.get("variant", ""))
+            for s in self.selections
+        ]
+        self.controller.run(
+            "reconstruction.compare.start",
+            dict(subject=self.subject, before=args[0], after=args[1], plane=self.plane),
+        )
+        self.scene.selectRegion(-1)
+        self.signature = None
+        self.synchronize()
+
+    def synchronize(self):
+        if not self.active:
+            return
+        service = self.controller.session.reconstruction_comparison
+        value = service.value
+        signature = (id(value), value.state if value else "", id(value.asset) if value else 0)
+        if signature == self.signature:
+            return
+        self.signature = signature
+        state = service.status()
+        self.report, self.error = state.get("report", {}), state.get("error", "")
+        self.scene.synchronize(service.pair)
+        self.scene.set_sections(self.report)
+        self.changed.emit()
+
+    @Slot(str)
+    def saveRegion(self, name):
+        try:
+            self.commit_region(name)
+        except ValueError as error:
+            self.error = str(error)
+            self.changed.emit()
+
+    def commit_region(self, name):
+        if self.scene.patch is None or not self.scene.candidate:
+            raise ValueError("Choose a view and select its surface triangles.")
+        view = self.scene.candidate[self.scene.patch]
+        arguments = reconstruction_regions.view_arguments(
+            self.controller.session, view, name, sorted(self.scene.triangles)
+        )
+        self.controller.run("catalogue.region.set", arguments)
+        self.scene.selectRegion(-1)
+
+    @Slot()
+    def cancel(self):
+        self.active = False
+        self.controller.session.reconstruction_comparison.cancel()
+        self.scene.synchronize(None)
+
+    @Slot(str)
+    def export(self, url):
+        self.controller.run(
+            "reconstruction.compare.export",
+            dict(path=QUrl(url).toLocalFile(), camera=self.scene.camera, mode=self.scene.mode),
+        )

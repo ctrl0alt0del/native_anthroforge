@@ -23,6 +23,7 @@ AF_API int af_inspection_regions(uint64_t target,uint64_t rest,uint64_t base,int
 AF_API int af_inspection_findings(uint64_t target,const double* frame,const uint64_t* others,
     const double* frames,int count,int limit,int64_t* ids,double* bounds,int64_t* total,uint64_t cancel);
 AF_API int af_inspection_face_lines(uint64_t mesh,const double* frame,int triangle,double* lines);
+AF_API int af_inspection_faces_lines(uint64_t mesh,const double* frame,const int64_t* triangles,int count,double* lines);
 // World bounds(6), extents(3), edge min/max, minimum area/longest-edge^2, transform condition,
 // offset/extent ratio. Counts: edges, boundary, nonmanifold, orientation conflicts, degenerates.
 AF_API int af_inspection_metrics(uint64_t mesh,const double* frame,double* values,int64_t* counts,double* lines,uint64_t cancel);

@@ -8,11 +8,11 @@ from typing import Any
 from anthroforge.core.jobs import Job
 from anthroforge.native.mesh import NativeCancellation
 
-from . import authored_jobs, reconstruction_state, task_workloads
+from . import authored_jobs, task_workloads, variant_operations
 
 
 def start(session: Any, path: str, group: str, row: Any, worker: Any) -> dict[str, str]:
-    reconstruction_state.variant_operations.require_idle(session)
+    variant_operations.require_idle(session)
     source = Path(path).resolve(strict=True)
     with session.contexts.use(""):
         session.begin()
@@ -39,7 +39,7 @@ def enqueue(session: Any, path: Path, group: str, row: Any, worker: Any, origin:
         workload=partial(task_workloads.source_file, path),
     )
     job.retry = partial(enqueue, session, path, group, row, worker, origin)
-    return session.scheduler.submit(job)
+    return str(session.scheduler.submit(job))
 
 
 def publish(session: Any, group: str, origin: int, result: Any) -> None:

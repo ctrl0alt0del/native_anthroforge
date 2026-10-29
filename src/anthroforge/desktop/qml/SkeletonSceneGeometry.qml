@@ -16,7 +16,10 @@ Repeater3D {
             visible: item.active && geometryData.kind === "MESH"
             pickable: false; opacity: overlay ? .25 : 1
             geometry: MeshGeometry { assetId: geometryData.kind === "MESH" ? item.handle : 0; chunk: item.chunk; reflected: geometryData.trs[6]*geometryData.trs[7]*geometryData.trs[8] < 0 }
-            materials: PrincipledMaterial {
+            materials: service.state.plane ? clipped : ordinary
+            SectionMaterial { id: clipped; equation: service.state.plane || [0,0,0,0]; tint: geometryData.color }
+            PrincipledMaterial {
+                id: ordinary
                 baseColor: item.id === service.state.selection ? Theme.accent : overlay ? "#72b8ad" : geometryData.color
                 roughness: .65; cullMode: Material.NoCulling
             }

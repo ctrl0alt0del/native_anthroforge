@@ -110,7 +110,7 @@ def inspect(session: Any, subject: str = "") -> Any:
 
 
 def execute(session: Any, operation: str, arguments: Any) -> Any:
-    commands = dict(
+    commands: dict[str, Any] = dict(
         import_mesh=import_mesh, import_project=import_project, inspect=inspect, remove=remove
     )
     name = operation.removeprefix("reconstruction.stage.")

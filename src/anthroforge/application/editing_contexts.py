@@ -95,14 +95,29 @@ class EditingContexts:
 
     def close(self) -> None:
         for key in tuple(self.states):
-            with self.use(key):
-                self.session.assembly.cancel()
-                self.session.skeleton_update.cancel()
-                self.session.variant_review.cancel()
-                self.session.reconstruction_comparison.cancel()
-                self.session.shortcut_comparison.clear()
-                self.session.issues.close()
-                self.session.clear_previews()
+            self.close_context(key)
+
+    def close_context(self, key: str) -> None:
+        with self.use(key):
+            self.session.assembly.cancel()
+            self.session.skeleton_update.cancel()
+            self.session.variant_review.cancel()
+            self.session.reconstruction_comparison.cancel()
+            self.session.shortcut_comparison.clear()
+            self.session.issues.close()
+            self.session.clear_previews()
+
+    def prune(self) -> None:
+        retained = {v.id for v in self.scene("").reconstruction.variants}
+        for key in tuple(self.states):
+            if key in retained or key == self.visible or not self.scene(key).editing_scope:
+                continue
+            self.pause(key)
+            self.close_context(key)
+            if self.session.scheduler.scheduling_contexts[key].registry.active:
+                continue
+            del self.states[key]
+            del self.session.scheduler.scheduling_contexts[key]
 
     def adopt_published(self, document: Document, resources: Any) -> None:
         if any(

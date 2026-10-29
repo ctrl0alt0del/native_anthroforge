@@ -82,7 +82,7 @@ def perform(context: Any, port: Port, function: Any, blocked: bool) -> None:
 
 def failure_finding(context: Any, port: Port, message: str) -> Finding:
     key = "failure:" + port.owner + ":" + port.output
-    required = port.owner in context.fixed_poses
+    required = port.owner in context.fixed_poses or port.owner in context.required
     return Finding(
         key, port.owner, message, blocking=required, acknowledge=not required, kind="failure"
     )

@@ -3,7 +3,7 @@
 from dataclasses import replace
 from types import SimpleNamespace
 
-from PySide6.QtCore import Property, QObject, Signal, Slot
+from PySide6.QtCore import Property, QObject, QTimer, Signal, Slot
 
 from anthroforge.application.inspection_context import InspectionContext
 from anthroforge.core.entities import SCP
@@ -28,7 +28,7 @@ class SkeletonScene(QObject):
         self.camera = [0.0, 0.0, 0.0, -18.0, 25.0, 8.0]
         self.mode, self.selection, self.picking = "Split", "", [None, None]
         self.marker_rows = []
-        self.viewports, self.framed_span = {}, 0.0
+        self.viewports, self.framed_span, self.needs_layout_fit = {}, 0.0, False
         for index, model in enumerate(self.models):
             model.activated.connect(lambda i=index: self.prepare_picking(i))
 
@@ -150,6 +150,7 @@ class SkeletonScene(QObject):
         center = [(bounds[i] + bounds[i + 3]) * 0.5 for i in range(3)]
         span = max(bounds[i + 3] - bounds[i] for i in range(3))
         self.framed_span = span
+        self.needs_layout_fit = not bool(self.viewports)
         self.camera = [*center, *self.camera[3:5], self.fit_distance()]
 
     def fit_distance(self):
@@ -160,6 +161,14 @@ class SkeletonScene(QObject):
     def viewport(self, side, width, height):
         if width > 0 and height > 0:
             self.viewports[side] = width / height
+            if self.needs_layout_fit:
+                QTimer.singleShot(0, self.fit_viewports)
+
+    def fit_viewports(self):
+        if self.needs_layout_fit:
+            self.camera[5] = self.fit_distance()
+            self.needs_layout_fit = False
+            self.changed.emit()
 
     def prepare_picking(self, index):
         self.picking[index] = comparison_picking.capture(self.models[index])

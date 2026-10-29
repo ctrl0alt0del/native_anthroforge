@@ -14,20 +14,27 @@ from .previews import Preview, completed
 
 class Comparison:
     def __init__(self, session: Any) -> None:
-        self.session, self.value, self.pair = session, None, None
+        self.session, self.pair = session, None
+        self.value: Any = None
+        self.project, self.resources = None, None
 
     def start(self, subject: str, before: Any, after: Any, plane: Any = None) -> Any:
         pair = tuple(
             views.capture(self.session, subject, **selection) for selection in (before, after)
         )
         self.cancel()
-        self.pair = pair
+        self.retain(pair)
         value = Preview[Any](target=subject, state="queued")
         self.value = value
         job = self.job(value, pair, plane)
         value.job = job.id
         self.session.scheduler.submit(job)
         return self.status()
+
+    def retain(self, pair: Any) -> None:
+        self.pair = pair
+        self.project = self.session.contexts.project()
+        self.resources = self.session.resources.snapshot()
 
     def job(self, value: Any, pair: Any, plane: Any) -> Job:
         job = Job(
@@ -71,6 +78,7 @@ class Comparison:
         if self.value:
             self.session.scheduler.cancel_job(self.value.job, obsolete=True)
         self.value, self.pair = None, None
+        self.project, self.resources = None, None
 
 
 def compute(plane: Any, pair: Any, cancel: Any) -> Any:
@@ -96,12 +104,15 @@ def section(view: Any, plane: Any, cancel: int) -> Any:
 
 
 def execute(session: Any, operation: str, arguments: Any) -> Any:
+    from .reconstruction_export import export
+
     service = session.reconstruction_comparison
     commands = dict(
         start=service.start,
         status=service.status,
         cancel=service.cancel,
         options=partial(views.options, session),
+        export=partial(export, session),
     )
     name = operation.removeprefix("reconstruction.compare.")
     if name not in commands:

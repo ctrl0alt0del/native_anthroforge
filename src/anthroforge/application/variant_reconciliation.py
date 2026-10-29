@@ -8,17 +8,38 @@ from anthroforge.core.skeleton_update import Finding
 
 from .skeleton_graph import identity
 
-GROUPS = ("entities", "objects", "controls", "junctions", "shortcuts", "driving_shortcuts")
+GROUPS = (
+    "entities",
+    "objects",
+    "controls",
+    "junctions",
+    "shortcuts",
+    "driving_shortcuts",
+    "mirror_rules",
+    "shared_mirror_targets",
+)
+
+
+def record_ids(document: Any) -> set[str]:
+    return {identity(row) for group in GROUPS for row in getattr(document, group)}
 
 
 def scope(record: Any, baseline: Any, current: Any) -> set[str]:
     if current.editing_scope is not None:
-        return set(current.editing_scope.editable)
+        return relationship_scope(set(current.editing_scope.editable), baseline, current)
     owned = set(record.editable) | set(dict(record.construction_map).values())
     for group in GROUPS:
         previous = {identity(v) for v in getattr(baseline, group)}
         owned.update(identity(v) for v in getattr(current, group) if identity(v) not in previous)
     return owned
+
+
+def relationship_scope(owned: set[str], *documents: Any) -> set[str]:
+    result = set(owned)
+    for document in documents:
+        result.update(identity(r) for r in document.mirror_rules if r.target in owned)
+        result.update(identity(r) for r in document.shared_mirror_targets if r.source in owned)
+    return result
 
 
 def merge(record: Any, baseline: Any, current: Any, accepted: Any, choices: Any) -> Any:
@@ -106,4 +127,4 @@ def refreshed(record: Any, baseline: Any, current: Any, accepted: Any) -> Any:
 def refreshed_scope(current: Any, accepted: Any, owned: Any) -> Any:
     from anthroforge.core.reconstruction import EditingScope
 
-    return EditingScope(frozenset(owned), frozenset(accepted.registry.records) - owned)
+    return EditingScope(frozenset(owned), frozenset(record_ids(accepted)) - owned)

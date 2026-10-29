@@ -78,10 +78,12 @@ def select(session: Any, variant: str = "") -> dict[str, Any]:
 
 
 def inspect(session: Any, variant: str = "") -> dict[str, Any]:
+    from .variant_lifecycle import describe
+
     value = state(session)
     return dict(
         active=session.contexts.visible,
-        variants=[asdict(v) for v in value.variants],
+        variants=[describe(session, value, v) for v in value.variants],
         selected=asdict(value.variant(variant)) if variant else None,
     )
 
@@ -141,7 +143,10 @@ def rename(session: Any, variant: str, name: str) -> None:
 
 
 def require_idle(session: Any) -> None:
-    if session.history.before is not None or session.waiting_save:
+    if (
+        any(s.values["history"].before is not None for s in session.contexts.states.values())
+        or session.waiting_save
+    ):
         raise ValueError("Finish the current gesture or save first.")
 
 
@@ -156,6 +161,8 @@ def execute(session: Any, operation: str, arguments: Any) -> Any:
 
 
 def operations_table() -> dict[str, Any]:
+    from .variant_lifecycle import remove
+
     return {
         "create": create,
         "enter": select,
@@ -164,6 +171,7 @@ def operations_table() -> dict[str, Any]:
         "checkpoint": checkpoint,
         "fork": fork,
         "rename": rename,
+        "remove": remove,
     }
 
 

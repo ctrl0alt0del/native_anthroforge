@@ -36,6 +36,12 @@ def read_record(document: Any, key: str) -> Any:
         return document.mirrors.rules.get(key.removeprefix("mirror:"))
     if key.startswith("external:"):
         return next((r for r in document.external_references if r.id == key[9:]), None)
+    return observed_record(document, key)
+
+
+def observed_record(document: Any, key: str) -> Any:
+    if key == "mirror_relationships":
+        return document.mirror_rules, document.shared_mirror_targets
     if key == "formula_writers":
         return tuple(
             (f.id, f.target) for d in document.driving_shortcuts for f in d.formulas if f.enabled

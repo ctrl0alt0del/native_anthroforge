@@ -45,7 +45,7 @@ def capture(session: Any, subject: str, stage: str = "final", variant: str = "")
         if imported.subject != subject:
             raise ValueError("Reference belongs to another anatomical instance.")
         asset = session.resources.meshes[imported.asset]
-        layers = (Layer(imported.id, asset.mesh, imported.frame),)
+        layers: tuple[Layer, ...] = (Layer(imported.id, asset.mesh, imported.frame),)
         return View(context, subject, stage, variant, layers, asdict(imported))
     layers = fibers(context, item) if stage == "fibers" else (accepted(context, item, stage),)
     return View(context, subject, stage, variant, layers, dict(revision=document.revision))

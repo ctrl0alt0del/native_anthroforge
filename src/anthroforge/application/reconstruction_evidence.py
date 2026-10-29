@@ -60,7 +60,9 @@ def inspect(session: Any) -> Any:
 
 
 def execute(session: Any, operation: str, arguments: Any) -> Any:
-    commands = dict(import_file=import_file, inspect=inspect, remove=remove, export=export)
+    commands: dict[str, Any] = dict(
+        import_file=import_file, inspect=inspect, remove=remove, export=export
+    )
     name = operation.removeprefix("reconstruction.evidence.")
     if name not in commands:
         raise ValueError("Unknown evidence operation.")

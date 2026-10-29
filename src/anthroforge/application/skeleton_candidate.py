@@ -20,6 +20,8 @@ GROUPS = (
     "formula_results",
     "imports",
     "external_references",
+    "mirror_rules",
+    "shared_mirror_targets",
 )
 
 
@@ -73,6 +75,8 @@ class Candidate:
         updates = self.merged_groups(current)
         if self.document.skin != self.baseline.skin:
             updates["skin"] = self.document.skin
+        if self.document.editing_scope != self.baseline.editing_scope:
+            updates["editing_scope"] = self.document.editing_scope
         updates["shortcut_order"] = skeleton_reads.merge_order(self, current)
         return replace(current, **updates)
 

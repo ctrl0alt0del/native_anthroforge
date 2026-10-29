@@ -26,6 +26,9 @@ class EvaluationContext:
     reuse: dict[Port, Any] = field(default_factory=dict)
     formula_review: set[str] = field(default_factory=set)
     pending: set[Port] = field(default_factory=set)
+    required: frozenset[str] = frozenset()
+    editable: frozenset[str] | None = None
+    category: str = "skeleton_update"
 
     @property
     def assets(self) -> Any:
@@ -46,12 +49,12 @@ class EvaluationContext:
 
     def check_cancelled(self) -> None:
         if self.cancel.is_set():
-            raise InterruptedError("Skeleton update cancelled.")
+            raise InterruptedError("Candidate evaluation cancelled.")
 
     def call(self, port: Port, function: Any) -> Any:
         self.check_cancelled()
         return self.profiler.call(
-            "skeleton_update",
+            self.category,
             port.output,
             function,
             self,

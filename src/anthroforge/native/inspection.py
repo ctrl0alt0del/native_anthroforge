@@ -19,6 +19,7 @@ def configure(engine: GeometryEngine) -> None:
     engine.bind("af_inspection_point", [U, U, U, c.c_int, D, D, U])
     engine.bind("af_inspection_point_lines", [U, D, D, D])
     engine.bind("af_inspection_face_lines", [U, D, c.c_int, D])
+    engine.bind("af_inspection_faces_lines", [U, D, INT64, c.c_int, D])
     configure_checks(engine)
 
 
@@ -172,6 +173,23 @@ def face_lines(mesh: Mesh, frame: Any, triangle: int) -> list[Any]:
     mesh.engine.check(
         mesh.engine.library.af_inspection_face_lines(
             mesh.handle, pointer(matrix), triangle, pointer(result)
+        )
+    )
+    return list(result.tolist())
+
+
+def faces_lines(mesh: Mesh, frame: Any, triangles: Any) -> list[Any]:
+    indices = np.ascontiguousarray(triangles, dtype=np.int64)
+    matrix, result = doubles(frame), np.empty((len(indices) * 6, 3))
+    if indices.ndim != 1 or matrix.shape != (16,):
+        raise ValueError("Invalid region outline dimensions.")
+    mesh.engine.check(
+        mesh.engine.library.af_inspection_faces_lines(
+            mesh.handle,
+            pointer(matrix),
+            indices.ctypes.data_as(INT64),
+            len(indices),
+            pointer(result),
         )
     )
     return list(result.tolist())

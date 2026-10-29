@@ -20,7 +20,7 @@ ColumnLayout {
         delegate: ItemDelegate {
             required property var modelData
             width: ListView.view.width; highlighted: pane.selected === modelData.id
-            text: modelData.name + (modelData.checkpoint ? " · checkpoint" : "")
+            text: modelData.name + (modelData.checkpoint ? " · checkpoint" : modelData.outdated ? " · supports changed" : "")
             onClicked: { pane.selected=modelData.id; rename.text=modelData.name; }
             onDoubleClicked: service.run(modelData.checkpoint ? "variant.fork" : "variant.enter", {variant:modelData.id})
             contentItem: Label { text: parent.text; wrapMode: Text.WordWrap; color: Theme.text }
@@ -34,6 +34,7 @@ ColumnLayout {
         UiButton { text: "Edit"; enabled: pane.mutableSelection && !workspace.state.editing; hint: pane.selectedRecord?.checkpoint ? "Fork this checkpoint to edit it" : "Edit with the normal anatomy tools"; onClicked: service.run("variant.enter",{variant:pane.selected}) }
         UiButton { text: "Fork"; enabled: !!pane.selected && !workspace.state.editing; onClicked: service.run("variant.fork",{variant:pane.selected}) }
         UiButton { text: "Checkpoint"; enabled: !!pane.records.active && !workspace.state.editing; onClicked: service.run("variant.checkpoint",{}) }
+        UiButton { text: "Remove"; enabled: !!pane.selected && !workspace.state.editing; onClicked: service.run("variant.remove",{variant:pane.selected}) }
     }
     RowLayout {
         Layout.fillWidth: true

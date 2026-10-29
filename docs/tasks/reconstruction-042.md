@@ -58,6 +58,18 @@ maintained production/hidden-render qualification infrastructure.
 
 ## Current checkpoint
 
+Comparison desktop supports split/overlay, sections, picked material regions, and frozen
+inspection export. Hidden GPU captures of every panel, promotion and comparison are clean;
+corrected framing for narrow split views. Native batched region outlines built and 6 native
+tests pass. Export still needs end-to-end qualification. Shared driver copying now retains
+outside consumers; 5 added lifecycle tests pass for driver isolation/promotion, required
+formula failures, support freshness, removal, and Undo/Redo context resource release.
+Candidate required-output/editable scopes are explicit; stable topology requires native
+connectivity/material and construction-lineage proof. Mirroring relationships merge by typed
+identity. Python lint/function limits pass; remaining type correction applied. Full regression,
+assembly metadata/explicit variant import, populated UI workflows, full96 production profiling,
+and release qualification remain pending.
+
 Explicit persisted EditingScope separates editable variant records from refreshed external supports.
 Catalogue, independent review and resumable queue desktop pages are added; hidden-page verification
 is pending. Immutable stage/evidence imports run through shared authored jobs and embed resources.

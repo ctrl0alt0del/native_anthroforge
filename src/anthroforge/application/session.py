@@ -141,8 +141,8 @@ class Session:
             self.issues.reset()
 
     def initialize_project_preparation(self) -> None:
-        from .reconstruction_comparison import Comparison
         from .assembly_runtime import Assembly
+        from .reconstruction_comparison import Comparison
         from .skeleton_runtime import SkeletonUpdate
         from .variant_review import VariantReview
 

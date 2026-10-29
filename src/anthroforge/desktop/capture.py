@@ -11,6 +11,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 from anthroforge.application.projects import adopt
 from anthroforge.application.storage import read_package
 
+from . import reconstruction_capture
 from .controller import Controller
 from .offscreen import Offscreen
 from .runtime import native_runtime
@@ -52,6 +53,8 @@ def load_revision(controller, project, revision):
 def draw(app, controller, renderer, settings=None):
     if settings is not None:
         inspection_view(controller, settings)
+    if settings and settings.get("reconstruction"):
+        return reconstruction_capture.draw(app, controller, renderer, settings)
     controller.fiber_display.prepare_capture()
     stage_geometry(app, controller, renderer)
     if settings is None and controller.rows:

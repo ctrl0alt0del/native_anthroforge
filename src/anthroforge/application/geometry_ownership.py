@@ -32,6 +32,7 @@ def retained_documents(session: "Session") -> list[Document]:
 
 
 def collect(session: "Session") -> None:
+    session.contexts.prune()
     references = session.reachability.references(retained_documents(session))
     for kind in session.resources.__dataclass_fields__:
         used = set().union(*(keys[kind] for keys in references))

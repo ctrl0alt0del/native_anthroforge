@@ -28,6 +28,7 @@ from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
 from .placement_inspection_tools import PlacementInspectionTools
 from .project_library import ProjectLibrary
+from .reconstruction_compare_panel import ReconstructionComparePanel
 from .reconstruction_panel import ReconstructionPanel
 from .route_inspection_tools import RouteInspectionTools
 from .routing_choices import RoutingChoices
@@ -35,7 +36,6 @@ from .section_tools import SectionTools
 from .shortcut_comparison_view import ShortcutComparisonView
 from .shortcut_panel import ShortcutPanel
 from .skeleton_panel import SkeletonPanel
-from .variant_panel import VariantPanel
 from .skin_panel import SkinPanel
 from .spatial_evidence_tools import SpatialEvidenceTools
 from .surface_creation import SurfaceCreation
@@ -43,6 +43,7 @@ from .surface_measurement_tools import SurfaceMeasurementTools
 from .tissue_inspection_tools import TissueInspectionTools
 from .tissue_region_tools import TissueRegionTools
 from .tissue_retarget_panel import TissueRetargetPanel
+from .variant_panel import VariantPanel
 from .weight_painting_tools import WeightPaintingTools
 
 
@@ -99,6 +100,7 @@ class Controller(QObject):
         self.skeleton_panel = SkeletonPanel(self)
         self.variant_panel = VariantPanel(self)
         self.reconstruction_panel = ReconstructionPanel(self)
+        self.reconstruction_compare = ReconstructionComparePanel(self)
 
     def initialize_tissue_tools(self):
         self.spatial_evidence = SpatialEvidenceTools(self)
@@ -143,7 +145,11 @@ class Controller(QObject):
         ) + self.comparison_models()
 
     def comparison_models(self):
-        return self.skeleton_panel.scene.models + self.variant_panel.scene.models
+        return (
+            self.skeleton_panel.scene.models
+            + self.variant_panel.scene.models
+            + self.reconstruction_compare.scene.models
+        )
 
     def initialize_renderers(self):
         from .image_scene import prepare_picking as prepare_images
@@ -355,6 +361,10 @@ class Controller(QObject):
     @Property(QObject, constant=True)
     def reconstructionPanel(self):
         return self.reconstruction_panel
+
+    @Property(QObject, constant=True)
+    def reconstructionCompare(self):
+        return self.reconstruction_compare
 
     @Property(QObject, constant=True)
     def variantPanel(self):
@@ -640,8 +650,7 @@ class Controller(QObject):
             self.notify()
 
     def refresh_runtime_panels(self):
-        self.reconstruction_panel.synchronize()
-        self.variant_panel.synchronize()
+        self.refresh_reconstruction_panels()
         self.assembly_panel.synchronize()
         self.skeleton_panel.synchronize()
         self.spatial_evidence.synchronize()
@@ -654,6 +663,11 @@ class Controller(QObject):
         self.mesh_replacement.synchronize()
         self.tissue_retarget.synchronize()
         self.shortcut_panel.synchronize()
+
+    def refresh_reconstruction_panels(self):
+        self.reconstruction_panel.synchronize()
+        self.variant_panel.synchronize()
+        self.reconstruction_compare.synchronize()
 
     @Slot()
     def frame_presented(self):

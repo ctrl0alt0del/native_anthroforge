@@ -9,7 +9,10 @@ Muscle Paint references checked: 2026-10-29. Tissue reading-list review: 2026-10
 See the [0.5.0 product contract](specification_050.md) and
 [method/capability review](muscle_paint_050_research.md). The review inventories the addon's
 sparse layout and native smooth-base fitter, compares SurfaceBrush, StrokeStrip, SecondSkin,
-line fields, constrained fitting and bounded-error geometry checks, and proposes experiments.
+line fields, constrained fitting and bounded-error geometry checks. Its R1–R14 review
+includes concrete methods for gaps, branching seams, periodic correspondence, physical
+brush/depth policies, adaptive fitting, independent direction accuracy and transient history.
+It identifies current integration gaps and proposes discriminating experiments for each.
 These are research candidates, not implemented or qualified algorithms. The first comparison
 should fit the actual native loft; no new reconstruction dependency is selected.
 

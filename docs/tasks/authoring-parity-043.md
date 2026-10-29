@@ -2,7 +2,7 @@
 
 - Branch: `codex/authoring-parity-043`; integration: `main`.
 - Baseline: `3daa3dee`; writer: local direct work.
-- Status: findings documented; final verification in progress. No runtime fixes.
+- Status: audit complete; fixes await discussion. No runtime changes or 0.4.3 release.
 
 ## Outcome
 
@@ -57,5 +57,23 @@ UI/hidden rendering. The packaged code revision is `b3d6f898`; later baseline ed
 typing/docs/tooling. Evidence is under ignored `build/authoring-parity-043`.
 Full Python suite passed: **2,763 tests, 3577 warnings, 386.40 seconds**; log `pytest.log`
 in that evidence directory. Warnings are existing dependency/Qt deprecations.
-Next: finalize audit-tool lint/function limits and document links; record exact outcomes.
-Then complete the docs/tools-only delivery without changing any runtime behavior.
+Final checks: repository-wide Ruff and formatting pass (1,602 files); mypy passes
+(624 source files); final architecture checks pass, including the 15-line limit.
+All 105 local links in the edited documents resolve; diff whitespace checks pass.
+The full native rebuild/development gate was not rerun: this delivery changes only
+documentation and standalone audit tools. Existing native runtime was exercised by
+the Python and portable suites. No visible windows or desktop input were used.
+
+## Ownership review and next action
+
+Reviewed responsibilities independently of test outcomes. Document edits already enter
+shared application operations. The remaining read-model gaps are not a justification
+for duplicate algorithms in authoring, direct mutable resource publication, or a second
+scheduler. Candidate snapshots belong to existing resource/inspection ownership; JSON
+literal encoding belongs to transport; recovery and feedback retain runtime-service
+ownership outside document history. Desktop-only presentation is identified explicitly.
+
+Checkpoint `2098ed4d` is pushed. Final delivery includes only docs/tools; production
+source, package/schema versions, canonical distribution and user projects are unchanged.
+Preserved unrelated root `__init__.py`. Discuss A1–A6 in the audit before implementing
+fixes; especially define headless autosave/reset and report-image inputs explicitly.

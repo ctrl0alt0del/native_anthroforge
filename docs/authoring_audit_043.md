@@ -72,6 +72,8 @@ The desktop obtains current points through
 [`authoring_state`](../src/anthroforge/desktop/authoring_state.py) also resolves automatic
 handles and component positions for display. Public `inspect.target` supplies frame,
 resource metadata and topology locks, not this resolved editing snapshot.
+Primitive consumers already obtain resolved definitions through `primitive.inspect`;
+that does not provide a standalone Fiber editing query without creating a consumer.
 
 This is **not** evidence that Fiber edits use the wrong algorithm, or that authored
 inspection should be changed to mean evaluated state. An automation client computing

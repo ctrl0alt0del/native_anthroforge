@@ -2,20 +2,21 @@
 
 - Branch: `codex/authoring-parity-043`; integration: `main`.
 - Baseline: `3daa3dee`; writer: local direct work.
-- Status: inventory and behavioral audit in progress.
+- Status: findings documented; final verification in progress. No runtime fixes.
 
 ## Outcome
 
 Validate that the public Python/JSON authoring interface supports the functionality
 exposed by the desktop UI. Trace UI operations to shared application boundaries,
-exercise equivalent workflows and restrictions, and correct demonstrated API gaps.
+exercise equivalent workflows and restrictions, and document demonstrated API gaps.
 Keep numerical algorithms and authored semantics unchanged. Distinguish transient
 desktop presentation/OS integration from document authoring; report any scope ambiguity.
 
 Follow engineering guidelines, 15-line functions, background-only checks, task checkpoints
 and validated merge. Preserve unrelated root `__init__.py` and all user project files.
-No subagents or Jira workflow. Target release is 0.4.3; version/package changes follow
-qualification, with one canonical executable and companion source archive.
+No subagents or Jira workflow. User clarified: **audit first; discuss fixes afterward**. Do not change application
+behavior, package versions or executable distribution during this audit. Findings feed
+the planned 0.4.3 release; qualification uses the current 0.4.2 runtime.
 
 ## Investigation
 
@@ -36,5 +37,25 @@ Use `uv run --no-sync`. Qualified native build:
 Set `AF_NATIVE_BUILD` and `ANTHROFORGE_NATIVE_LIBRARY` consistently for numerical checks.
 Temporary evidence belongs under ignored `build/authoring-parity-043`.
 
-Next: build UI/API inventory, identify concrete unreachable functionality and transport
-differences, then validate/fix at shared owning boundaries. No parity claim made yet.
+## Findings and checks
+
+See [the audit](../authoring_audit_043.md). Static inventory: 364 registered operation
+names, 308 literal UI calls / 244 distinct names, no missing literal operation names.
+Manual review includes dynamic dispatch and direct application/resource helpers.
+Six gap families: current editable state, candidate geometry inspection, contextual
+choices/effective values, JSON literal strings, recovery/project-library lifecycle,
+and user feedback operations. Existing numerical/application implementations remain intact.
+
+Disposable probes reproduced the Fiber current/authored point distinction, `$` literal
+failure, recovery ownership distinction, effective skin settings and candidate status
+without candidate geometry. Tool harness corrections were required (asynchronous Fiber
+creation returns a job ID; Controller selection needs refreshed models); these were
+probe fixes, not application failures or production changes.
+
+Existing relocated 0.4.2 executable passed all 35 portable workflow groups with offscreen
+UI/hidden rendering. The packaged code revision is `b3d6f898`; later baseline edits are
+typing/docs/tooling. Evidence is under ignored `build/authoring-parity-043`.
+Full Python suite passed: **2,763 tests, 3577 warnings, 386.40 seconds**; log `pytest.log`
+in that evidence directory. Warnings are existing dependency/Qt deprecations.
+Next: finalize audit-tool lint/function limits and document links; record exact outcomes.
+Then complete the docs/tools-only delivery without changing any runtime behavior.

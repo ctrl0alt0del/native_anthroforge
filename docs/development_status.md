@@ -1,5 +1,21 @@
 # AnthroForge development validation
 
+**0.4.2 persistent reconstruction is qualified:** variants/checkpoints, explicit promotion,
+catalogue/regions, independent review dimensions, resumable human/API queue and complete
+reference/transferred/accepted-stage comparisons. Full regression rerun: 2,759 passed;
+additional project-open and profiler-context regressions pass. Six native suites, native/
+script style, lint/format/types, numerical imports, native doctor and wheel resources pass.
+All 35 relocated portable checks pass, with final targeted profiler/reconstruction/export
+and packaged-panel checks after the last corrections. Canonical 0.4.2 and source archive
+are updated. See [walkthrough/evidence](reconstruction_042.md).
+
+On the 59-SCP/96-muscle assembly, SCM alternative editing, promotion/undo, save/reopen,
+support refresh and Ribs Top Radius=3 preserve expected geometry and retained bindings.
+Source hash remains unchanged. Three-angle stage comparisons and narrow populated panels
+were inspected through hidden GPU capture. This is background/offscreen evidence, not
+physical interactive acceptance. No anatomical numerical algorithm was changed.
+Earlier records follow.
+
 **0.4.2 whole-skeleton updates are qualified:** 2,722 Python tests, six native suites,
 style/type/numerical/runtime checks and all 34 relocated portable checks pass. The 96-muscle
 assembly passes unchanged, compatible Humerus replacement and reviewed reordered-Tibia trials;

@@ -1,7 +1,7 @@
 # Persistent variants, catalogue and reconstruction comparisons
 
 - Branch: `codex/reconstruction-042`; integration: `main`; starting revision: `16f550b`.
-- Status: implementation complete; final portable qualification in progress. Not merged.
+- Status: complete and qualified for validated integration into main.
 - Updated: 2026-10-29, Europe/Bucharest. Direct local work; no subagents.
 - Contract/walkthrough: [reconstruction_042.md](../reconstruction_042.md).
 - Preserve unrelated root `__init__.py`; hidden/background testing only.
@@ -58,12 +58,19 @@ requires explicit redefinition. Canonical package remains0.4.2; no new anatomy a
   Populated hidden panels pass again. Source Reconstruction smoke passes with Windows
   fonts configured. The smoke CLI now accepts the reconstruction panel selector.
 
-## Remaining delivery
+## Final delivery
 
-1. Rebuild final package; repeat profiling/reconstruction/example checks and inspect panel.
-2. Verify API docs/examples/links, final source archive and qualification status.
-3. Check latest main, validate combined changes, checkpoint/push and merge/push normally.
-   Do not claim completion until portable/runtime workflows pass.
+Full relocated suite:35checks pass. Final code build repeats profiler/reconstruction/export/
+panel checks successfully. Packaged populated panel inspected; variant rows are visible.
+The headless example passes. Final full-assembly profile records39alternative task events
+and unchanged accepted anatomy. Native6suites, styles/types, full2,759test rerun plus focused
+final regressions, numerical imports/doctor and wheel resources pass. Local documentation
+links verified. No interactive acceptance claimed. Ownership/coupling review is in the contract.
+
+Integration baseline remains origin/main16f550b; no competing changes. Canonical executable
+is built from c53ddea2 (all runtime changes), with final delivery documentation refreshed.
+The companion source archive is regenerated from the qualified tree before integration.
+Root __init__.py remains untouched and untracked. Raw evidence stays under ignored build/.
 
 ## Paths and reproduction
 

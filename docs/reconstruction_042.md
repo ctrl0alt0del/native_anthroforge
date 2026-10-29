@@ -1,6 +1,6 @@
 # Persistent reconstruction work — confirmed 0.4.2 contract
 
-Status: implemented; release qualification in progress. See the evidence section below.
+Status: implemented and qualified as a 0.4.2 update. See the evidence and limits below.
 
 ## Product contract
 
@@ -175,4 +175,15 @@ aligned matching surfaces and readable controls. Populated panels were also capt
 included support-bone guides; required-construction traversal corrected it, with a regression.
 Hidden-render evidence does not establish interactive mouse/keyboard usability acceptance.
 
-Full gate and relocated portable results will be recorded before release delivery.
+Development validation: 2,759 tests in the full rerun, plus subsequent focused asynchronous
+opening and profiler/context regressions. Six native suites, native/script style, Python
+lint/format/type checks, numerical imports, native doctor and wheel-resource checks pass.
+The initial gate's function-length failure was corrected and rechecked. All 35 relocated
+portable checks passed; final profiler/reconstruction/export/panel checks also pass after
+the last presentation and attribution corrections. The packaged panel was visually inspected.
+The headless example and a fresh full-assembly context profile pass; the latter attributes
+39 task lifecycle events to the edited alternative while accepted anatomy remains unchanged.
+
+One canonical `dist/0.4.2/AnthroForge.dist` and `dist/AnthroForge-0.4.2-source.zip` contain the
+delivery. Portable tests used a minimal PATH, offscreen windows and hidden GPU capture.
+No physical interactive acceptance or automated anatomical approval is claimed.

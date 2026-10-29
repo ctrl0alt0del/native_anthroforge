@@ -47,6 +47,7 @@ class Session:
     skin_status = ContextField[Any]("skin_status")
     assembly = ContextField[Any]("assembly")
     skeleton_update = ContextField[Any]("skeleton_update")
+    variant_review = ContextField[Any]("variant_review")
     shortcut_edits = ContextField[Any]("shortcut_edits")
     formula_invalidation = ContextField[Any]("formula_invalidation")
     shortcut_observation = ContextField[Any]("shortcut_observation")
@@ -142,9 +143,11 @@ class Session:
     def initialize_project_preparation(self) -> None:
         from .assembly_runtime import Assembly
         from .skeleton_runtime import SkeletonUpdate
+        from .variant_review import VariantReview
 
         self.assembly = Assembly(self)
         self.skeleton_update = SkeletonUpdate(self)
+        self.variant_review = VariantReview(self)
 
     def attach_shortcut_contexts(self) -> None:
         from .formula_invalidation import FormulaInvalidation

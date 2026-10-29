@@ -98,6 +98,7 @@ class EditingContexts:
             with self.use(key):
                 self.session.assembly.cancel()
                 self.session.skeleton_update.cancel()
+                self.session.variant_review.cancel()
                 self.session.shortcut_comparison.clear()
                 self.session.issues.close()
                 self.session.clear_previews()

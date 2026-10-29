@@ -33,4 +33,4 @@ def test_legacy_loading_keeps_accepted_geometry_and_defaults(session, tmp_path):
         assert current.result.asset == fiber.result.asset
         assert current.support_policy.automatic and not current.support_policy.included
         assert not session.scheduler.active_jobs
-    assert storage.VERSION == 8 and {4, 5, 6, 7}.issubset(storage.READ_VERSIONS)
+    assert storage.VERSION == 9 and {4, 5, 6, 7, 8}.issubset(storage.READ_VERSIONS)

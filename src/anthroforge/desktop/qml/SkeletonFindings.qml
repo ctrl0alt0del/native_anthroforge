@@ -27,6 +27,11 @@ ColumnLayout {
                 onClicked: panel.service.decision("clear_locks",modelData.owner,checked)
             }
             RowLayout {
+                visible: modelData.kind === "conflict"
+                UiButton { text: "Keep accepted"; onClicked: panel.service.decision("choices",modelData.owner,"ACCEPTED") }
+                UiButton { text: "Use variant"; onClicked: panel.service.decision("choices",modelData.owner,"VARIANT") }
+            }
+            RowLayout {
                 visible: modelData.key.startsWith("driver_value:")
                 UiButton { text: "Use formula value"; onClicked: panel.service.decision("use_formula_values",modelData.key.slice(13),true) }
                 UiButton { text: "Disable formula"; onClicked: panel.service.decision("disable_formulas",modelData.key.slice(13),true) }

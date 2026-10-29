@@ -145,7 +145,17 @@ def require_idle(session: Any) -> None:
 
 
 def execute(session: Any, operation: str, arguments: Any) -> Any:
-    commands: dict[str, Any] = {
+    if operation.startswith("variant.review."):
+        return review(session, operation.removeprefix("variant.review."), arguments)
+    commands = operations_table()
+    name = operation.removeprefix("variant.")
+    if name not in commands:
+        raise ValueError("Unknown variant operation: " + name)
+    return commands[name](session, **arguments)
+
+
+def operations_table() -> dict[str, Any]:
+    return {
         "create": create,
         "enter": select,
         "leave": select,
@@ -154,7 +164,16 @@ def execute(session: Any, operation: str, arguments: Any) -> Any:
         "fork": fork,
         "rename": rename,
     }
-    name = operation.removeprefix("variant.")
+
+
+def review(session: Any, name: str, arguments: Any) -> Any:
+    service = session.variant_review
+    commands = {
+        "prepare": service.prepare,
+        "status": service.status,
+        "apply": service.apply,
+        "cancel": service.cancel,
+    }
     if name not in commands:
-        raise ValueError("Unknown variant operation: " + name)
-    return commands[name](session, **arguments)
+        raise ValueError("Unknown variant review operation.")
+    return commands[name](**arguments)

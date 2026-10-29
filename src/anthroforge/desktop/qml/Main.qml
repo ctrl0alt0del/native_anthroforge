@@ -315,6 +315,7 @@ ApplicationWindow {
     ReplacementReview { id:tissueRetargetReview; objectName:"tissueRetargetReview"; service:workspace.tissueRetarget }
     MeshReplacementReview { id:meshReplacementReview; onChooseFile:replacementFile.open() }
     SkeletonUpdateDialog { id: skeletonUpdateDialog }
+    VariantReviewDialog {}
     FileDialog { id:skeletonFile; title:"Update Skeleton from Project"; nameFilters:["AnthroForge project (*.anthroforge)"]; onAccepted:workspace.skeletonPanel.inspect(selectedFile.toString()) }
     FileDialog { id:assemblyFile; title:"Import Anatomy from Project"; nameFilters:["AnthroForge project (*.anthroforge)"]; onAccepted:workspace.assemblyPanel.inspect(selectedFile.toString()) }
     AssemblyDialog { id:assemblyDialog }

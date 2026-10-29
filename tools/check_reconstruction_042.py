@@ -34,6 +34,7 @@ def run(app):
     try:
         fixture(controller)
         panel(app, controller, renderer)
+        review(app, controller, renderer)
         assert not renderer.window.isVisible() and not warnings, warnings
         (OUTPUT / "result.json").write_text(json.dumps(dict(warnings=warnings, visible=False)))
     finally:
@@ -63,6 +64,38 @@ def panel(app, controller, renderer):
         app.processEvents()
         image = renderer.frame()
     assert image.save(str(OUTPUT / "variants.png"))
+    item.deleteLater()
+
+
+def review(app, controller, renderer):
+    key = controller.session.contexts.visible
+    controller.variant_panel.inspect(key, "promote")
+    controller.session.variant_review.wait(60)
+    controller.variant_panel.synchronize()
+    path = review_wrapper()
+    component = QQmlComponent(renderer.engine, QUrl.fromLocalFile(str(path)))
+    item = component.create()
+    assert item is not None, [e.toString() for e in component.errors()]
+    render_review(app, controller, renderer, item)
+
+
+def review_wrapper():
+    path = (OUTPUT / "Review.qml").resolve()
+    qml = Path("src/anthroforge/desktop/qml").resolve().as_uri()
+    body = "Item { VariantReviewDialog { Component.onCompleted: open() } }"
+    path.write_text('import QtQuick\nimport "' + qml + '"\n' + body)
+    return path
+
+
+def render_review(app, controller, renderer, item):
+    item.setSize(QSizeF(1280, 960))
+    item.setParentItem(renderer.window.contentItem())
+    for _ in range(12):
+        app.processEvents()
+        controller.process_tick()
+        image = renderer.frame()
+        controller.frame_presented()
+    assert image.save(str(OUTPUT / "promotion.png"))
     item.deleteLater()
 
 

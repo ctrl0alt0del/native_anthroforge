@@ -39,4 +39,9 @@ ColumnLayout {
         UiButton { text: "Fork"; enabled: !!pane.selected && !workspace.state.editing; onClicked: service.run("variant.fork",{variant:pane.selected}) }
         UiButton { text: "Checkpoint"; enabled: !!pane.records.active && !workspace.state.editing; onClicked: service.run("variant.checkpoint",{}) }
     }
+    RowLayout {
+        Layout.fillWidth: true
+        UiButton { text: "Refresh supports"; enabled: !!pane.selected; onClicked: workspace.variantPanel.inspect(pane.selected,"refresh") }
+        UiButton { text: "Promote"; primary: true; enabled: !!pane.selected; onClicked: workspace.variantPanel.inspect(pane.selected,"promote") }
+    }
 }

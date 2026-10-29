@@ -84,7 +84,8 @@ from . import control_operations as controls
 from . import deformer_operations as deformers
 from . import primitive_operations as primitives
 from .mirror_policy import require_edit
-from .variant_operations import execute as variant_command
+from .reconstruction_commands import PREFIXES as RECONSTRUCTION_PREFIXES
+from .reconstruction_commands import execute as reconstruction_command
 from .variant_policy import command as require_variant_command
 
 if TYPE_CHECKING:
@@ -289,7 +290,7 @@ def query_handler(operation: str) -> Any:
         from .issues.commands import execute as issue_command
 
         return issue_command
-    return variant_command if operation.startswith("variant.") else None
+    return reconstruction_command if operation.startswith(RECONSTRUCTION_PREFIXES) else None
 
 
 def shortcut_queries(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:

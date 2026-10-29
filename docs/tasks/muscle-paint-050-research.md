@@ -3,7 +3,7 @@
 - Task branch: `codex/muscle-paint-050-research`
 - Integration branch: `main`
 - Starting revision: `d03db662df92b4730148c665c013db3a0b48bea1`
-- Status: documentation/research complete and validated
+- Status: research expanded after review; in progress
 - Last updated: 2026-10-29, Europe/Bucharest
 - Active writer: local documentation/research session
 
@@ -33,6 +33,17 @@ discriminating experiments and separates observed capabilities from untested app
 Roadmap, recommendations and research index link the new documents. No final algorithm,
 new dependency or implementation plan is selected; no runtime changes are included.
 
+The user correctly identified that the first delivery listed unresolved areas instead of
+researching each one thoroughly. The continuation covers every unresolved method question,
+including projection/coverage, merging, charts/flow, gaps/normals, true branch assembly,
+periodic loops, adaptive fitting, attachment strips, validation and execution/lifetime.
+
+New inspected findings: `surface_correspondence.cpp` and its application adapter reject
+closed explicit material maps; closed alignment preserves a phase/direction but defaults
+to arc-length stations. `surface_branches.cpp` blends a seam correction into child rows,
+so independent patch fitting is not sufficient evidence for the final assembled shape.
+These require researched integration approaches, not a claim that fitting alone solves them.
+
 ## Verification
 
 Read standalone guidelines/work continuity and reviewed the consolidated product contract
@@ -61,7 +72,7 @@ This is documentation-only acceptance, not qualification of Muscle Paint.
 2. Design an implementation plan only after evidence resolves the algorithmic gaps;
    do not silently relax confirmed product policies to accommodate a candidate method.
 
-There is no documentation blocker. Git merge ancestry and remote reachability record
+No production changes are authorized by this research continuation. Git merge ancestry and remote reachability record
 integration status; do not infer runtime completion from this document's task status.
 
 ## Recovery inputs

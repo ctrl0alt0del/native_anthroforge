@@ -3,7 +3,7 @@
 - Task branch: `codex/muscle-paint-050-research`
 - Integration branch: `main`
 - Starting revision: `d03db662df92b4730148c665c013db3a0b48bea1`
-- Status: documentation/research complete; validated, ready to integrate
+- Status: documentation/research complete and validated
 - Last updated: 2026-10-29, Europe/Bucharest
 - Active writer: local documentation/research session
 
@@ -56,11 +56,13 @@ This is documentation-only acceptance, not qualification of Muscle Paint.
 
 ## Next actions and blockers
 
-1. Merge/push validated documentation into main, preserving unrelated work.
-2. For subsequent research, begin E1 against the actual standalone loft, then grouping
+1. For subsequent research, begin E1 against the actual standalone loft, then grouping
    and gaps before branches/closed loops. Experiments are proposed, not executed here.
-3. Design an implementation plan only after evidence resolves the algorithmic gaps;
+2. Design an implementation plan only after evidence resolves the algorithmic gaps;
    do not silently relax confirmed product policies to accommodate a candidate method.
+
+There is no documentation blocker. Git merge ancestry and remote reachability record
+integration status; do not infer runtime completion from this document's task status.
 
 ## Recovery inputs
 

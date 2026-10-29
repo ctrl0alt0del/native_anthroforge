@@ -56,7 +56,7 @@ Primary repository and reusable environment/native builds: `E:/development/anthr
 No production anatomy files may be modified. Numerical algorithms must remain unchanged.
 The containing commit identifies this checkpoint; inspect remote reachability.
 
-## Qualification checkpoint — 2026-10-30
+## Qualification checkpoint â€” 2026-10-30
 
 Full native rebuild, CTest and native style passed. The first full Python gate reported
 31 formula-related failures: the new save-admission property assumed a live Session
@@ -64,6 +64,14 @@ instead of the existing captured evaluation context. Replaced it with a shared a
 function that respects that contract. Fifty-four targeted formula/assembly/variant and
 painting tests now pass. One new overlength test helper was also corrected.
 A complete regression rerun remains required. Mypy and formatting pass.
+
+Final serial ABBA comparison has exact scalar-array parity on 36 preview conditions
+across a 66,049-vertex dense SCP and the full 96-muscle assembly. Removed redundant
+tissue-field validation observed in the profiler; geometry checks remain intact.
+Legacy paint commits now share the same no-active-gesture admission as new commits.
+Focused lifecycle/architecture regression: 20 passed. Full gate and temporary package
+qualification are next. Raw results are under `build/painting/final-serial` and profiles
+under `build/painting/profiles`; these local-only artifacts are not in Git.
 
 Serial ABBA old/new timing and exact-array comparison are running against production
 code at 713d963e (equivalent docs worktree 308ca03d), using the same native library.

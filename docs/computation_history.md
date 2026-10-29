@@ -3892,7 +3892,7 @@ and a driver-edit staleness regression pass. This changes candidate eligibility,
 evaluation or accepted output. Inspection leases are attributed by the existing recording-only
 resource inventory; no additional polling is introduced.
 
-## 2026-10-30 — Shared stroke lifecycle (T09, R01/R02/R06)
+## 2026-10-30 â€” Shared stroke lifecycle (T09, R01/R02/R06)
 
 Previously tissue inspection owned read-only paint jobs while a Qt timer/controller
 owned sample accumulation, release and commit polling. Collagen reused that tissue

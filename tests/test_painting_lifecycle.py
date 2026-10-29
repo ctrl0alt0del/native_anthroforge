@@ -71,6 +71,18 @@ def delayed_compute(original, gate):
     return delayed
 
 
+def test_legacy_commit_cannot_join_another_gesture(session, painting_case):
+    state = session.command("painting.preview", **painting_case, samples=[[0, 0]])
+    session.wait()
+    session.begin()
+    before = session.document
+    prefix = "skin.collagen" if painting_case["consumer"] == "collagen" else "tissue.field"
+    with pytest.raises(ValueError, match="gesture"):
+        session.command(prefix + ".paint.commit", job=state["job"])
+    assert session.document is before and session.history.before is before
+    session.cancel()
+
+
 def test_cancellation_during_native_work_cannot_publish(session, painting_case, monkeypatch):
     gate = Event()
     original = consumers.consumer(painting_case["consumer"]).compute

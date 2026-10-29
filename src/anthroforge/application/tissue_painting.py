@@ -20,21 +20,22 @@ def field(context: Any, target: str, options: Any) -> Any:
     return value
 
 
-def validate(context: Any, target: str, options: Any) -> None:
+def validate(context: Any, target: str, options: Any) -> Any:
     inspection.validate(context, target, options)
-    field(context, target, options)
+    value = field(context, target, options)
     if options["stage"] == "base":
         raise ValueError("Paint the rest, intrinsic or final tissue surface.")
+    return value
 
 
 def signature(context: Any, target: str, options: Any) -> Any:
-    validate(context, target, options)
+    value = validate(context, target, options)
     inspection.expected_asset(context, target, options)
     return (
         scene_signature(context.document),
         target,
         stages.signature(context, target, options["stage"]),
-        field(context, target, options),
+        value,
         tuple((m.handle, frame) for m, frame in obstacles(context, options)),
     )
 

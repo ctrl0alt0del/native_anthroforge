@@ -29,7 +29,6 @@ def create(session: Any, kind: str, target: str, options: Any, interactive: bool
     definition = consumers.consumer(kind)
     definition.require(session, target)
     options, inputs = decode(options)
-    definition.validate(session, target, options)
     value = make_stroke(session, kind, target, options, inputs, interactive)
     previous = session.painting.values.get(consumers.name(kind))
     if previous:

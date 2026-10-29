@@ -337,13 +337,21 @@ def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
         raise
 
 
+ISOLATED_EDITS = frozenset(
+    (
+        "assembly.import",
+        "skeleton_update.apply",
+        "painting.commit",
+        "tissue.field.paint.commit",
+        "skin.collagen.paint.commit",
+    )
+)
+
+
 def require_command_edit(session: "Session", operation: str, arguments: dict[str, Any]) -> None:
     require_edit(arguments)
     require_variant_command(session, operation, arguments)
-    if (
-        operation in {"assembly.import", "skeleton_update.apply", "painting.commit"}
-        and session.history.before is not None
-    ):
+    if operation in ISOLATED_EDITS and session.history.before is not None:
         raise ValueError("Finish the current gesture before committing this operation.")
 
 

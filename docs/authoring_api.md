@@ -1342,3 +1342,10 @@ finding IDs and compatibility reasons before applying. Required failures block; 
 dependent failures retain accepted geometry and Issues. See tests/test_variant_review.py and
 tests/test_variant_lifecycle.py for executable lifecycle examples.
 
+
+## Painting System
+
+Use the shared [painting operations and lifecycle](painting_system.md) for tissue-weight
+and collagen strokes. `painting.finish` commits automatically through the coordinator;
+`Session.wait()` completes it without Qt. `painting.preview` / `painting.commit` support
+explicit read-only preparation. Legacy paint inspection/job-commit commands remain valid.

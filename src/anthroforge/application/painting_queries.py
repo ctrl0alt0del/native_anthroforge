@@ -15,9 +15,15 @@ def state(session: Any, value: Stroke) -> str:
 
 def describe_stroke(session: Any, value: Stroke) -> dict[str, Any]:
     return dict(
-        token=value.token, state=state(session, value), job=value.job,
-        target=value.target, consumer=value.consumer, error=value.error,
-        candidate=value.candidate, sequence=value.sequence, pending=value.finishing,
+        token=value.token,
+        state=state(session, value),
+        job=value.job,
+        target=value.target,
+        consumer=value.consumer,
+        error=value.error,
+        candidate=value.candidate,
+        sequence=value.sequence,
+        pending=value.finishing,
         provenance=asdict(value.provenance),
         report=value.asset.get("report", {}) if value.asset else {},
     )
@@ -31,4 +37,6 @@ def result(session: Any, value: Stroke, offset: int, limit: int, expected: str) 
     if type(offset) is not int or type(limit) is not int or offset < 0 or not 1 <= limit <= 16384:
         raise ValueError("Painting pages require a nonnegative offset and limit 1–16384.")
     count, values = consumer(value.consumer).read(value.asset, offset, limit)
-    return dict(token=value.token, revision=value.candidate, total=count, offset=offset, values=values)
+    return dict(
+        token=value.token, revision=value.candidate, total=count, offset=offset, values=values
+    )

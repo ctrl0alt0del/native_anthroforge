@@ -30,8 +30,9 @@ def execute(session: Any, operation: str, arguments: Any) -> Any:
 
 def describe(session: Any, consumer: str, target: str, **options: Any) -> dict[str, Any]:
     reason = unavailable(session, consumer, target, options)
-    return dict(consumer=consumer, target=target, available=not reason, reason=reason,
-                **capabilities())
+    return dict(
+        consumer=consumer, target=target, available=not reason, reason=reason, **capabilities()
+    )
 
 
 def unavailable(session: Any, consumer: str, target: str, options: Any) -> str:

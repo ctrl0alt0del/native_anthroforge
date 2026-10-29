@@ -21,7 +21,7 @@ class Brush:
 def brush(value: Any = None) -> Brush:
     result = Brush(**value) if isinstance(value, dict) else Brush(*(value or ()))
     ranges = ((1, 4096), (0, 1), (0, 1), (0.05, 20))
-    if result.space != "SCREEN" or not isinstance(result.through, (bool, int)):
+    if result.space != "SCREEN" or result.through not in (False, True):
         raise ValueError("Only screen-space brushes and boolean Paint Through are supported.")
     for number, (low, high) in zip(result.native()[:4], ranges, strict=True):
         if not isfinite(number) or not low <= number <= high:
@@ -51,6 +51,7 @@ class SurfaceReference:
     stage: str
     asset: str
     context: str
+    frame: tuple[float, ...]
 
 
 @dataclass(frozen=True)

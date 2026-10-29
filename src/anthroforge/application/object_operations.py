@@ -34,7 +34,7 @@ def editable(session: "Session", target: str) -> Authored:
 
     require_source(target)
     require_variant_edit(session, target)
-    if session.waiting_save:
+    if session.save_blocks_edits:
         raise ValueError("Editing is blocked while waiting to save.")
     item = session.document.object(target)
     if not isinstance(item, ObjectRecord):

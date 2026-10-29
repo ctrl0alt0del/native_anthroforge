@@ -183,6 +183,12 @@ class Session:
         return self.history.before is None or job.publish_during_edit
 
     @property
+    def save_blocks_edits(self) -> bool:
+        job = self.scheduler.registry.active.get(self.scheduler.publishing)
+        admitted_writer = job is not None and job.writes and job.context == self._editing.key
+        return self.waiting_save and not admitted_writer
+
+    @property
     def workspace(self) -> Workspace:
         return self.document.workspaces[self.active_workspace]
 
@@ -196,7 +202,7 @@ class Session:
 
         require_source(entity_id)
         require_variant_edit(self, entity_id)
-        if self.waiting_save:
+        if self.save_blocks_edits:
             raise ValueError("Editing is blocked while waiting to save.")
         if self.workspace.focused and entity_id not in self.workspace.members:
             raise ValueError("This SCP is outside the focused workspace and is read-only.")
@@ -260,7 +266,7 @@ class Session:
 
     @measured("transaction", lambda session: session.profiler)
     def begin(self) -> None:
-        if self.waiting_save:
+        if self.save_blocks_edits:
             raise ValueError("Editing is blocked while waiting to save.")
         self.history.begin(self.document)
         self.shortcut_edits.active = ""

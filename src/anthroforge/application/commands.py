@@ -341,10 +341,10 @@ def require_command_edit(session: "Session", operation: str, arguments: dict[str
     require_edit(arguments)
     require_variant_command(session, operation, arguments)
     if (
-        operation in {"assembly.import", "skeleton_update.apply"}
+        operation in {"assembly.import", "skeleton_update.apply", "painting.commit"}
         and session.history.before is not None
     ):
-        raise ValueError("Finish the current gesture before importing or resolving anatomy.")
+        raise ValueError("Finish the current gesture before committing this operation.")
 
 
 def direct_commands(session: "Session") -> dict[str, Any]:

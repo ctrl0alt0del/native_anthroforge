@@ -19,6 +19,7 @@ class Consumer:
     apply: Callable[..., Any]
     require: Callable[..., Any]
     read: Callable[..., Any]
+    surface: Callable[..., Any]
 
 
 def name(kind: str) -> str:
@@ -33,17 +34,43 @@ def consumer(kind: str) -> Consumer:
 
 def collagen() -> Consumer:
     return Consumer(
-        "collagen", skin_painting.validate, skin_painting.signature,
-        skin_painting.compute, skin_painting.workload, apply_collagen,
-        require_collagen, read_values,
+        "collagen",
+        skin_painting.validate,
+        skin_painting.signature,
+        skin_painting.compute,
+        skin_painting.workload,
+        apply_collagen,
+        require_collagen,
+        read_values,
+        collagen_surface,
     )
 
 
 def tissue() -> Consumer:
     return Consumer(
-        "paint", tissue_painting.validate, tissue_painting.signature,
-        tissue_painting.compute, tissue_painting_workload, apply_tissue,
-        require_tissue, read_values,
+        "paint",
+        tissue_painting.validate,
+        tissue_painting.signature,
+        tissue_painting.compute,
+        tissue_painting_workload,
+        apply_tissue,
+        require_tissue,
+        read_values,
+        tissue_surface,
+    )
+
+
+def collagen_surface(context: Any, target: str, options: Any) -> Any:
+    value = skin_painting.provider(context, target)
+    return value.asset_id, tuple(value.frame)
+
+
+def tissue_surface(context: Any, target: str, options: Any) -> Any:
+    from . import tissue_inspection_stages as stages
+
+    item = context.document.registry.records[target]
+    return stages.result(item, options["stage"]).asset, stages.instance_frame(
+        context, target, options["stage"]
     )
 
 

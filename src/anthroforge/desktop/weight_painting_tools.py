@@ -149,21 +149,24 @@ class WeightPaintingTools(QObject):
 
     def sample(self, position, camera, press):
         if press:
-            self.cancelStroke()
-            self.options = self.domain.capture(self, camera)
-            result = self.call(
-                "begin",
-                consumer=self.domain.consumer,
-                target=self.target,
-                brush=self.brush_settings(),
-                **self.options,
-            )
-            self.token = result["token"]
+            self.start_stroke(camera)
         if self.dragging:
             self.call("append", token=self.token, samples=[position])
         elif not self.options or self.options["view"] != camera:
             self.hover(position, camera)
         self.changed.emit()
+
+    def start_stroke(self, camera):
+        self.cancelStroke()
+        self.options = self.domain.capture(self, camera)
+        result = self.call(
+            "begin",
+            consumer=self.domain.consumer,
+            target=self.target,
+            brush=self.brush_settings(),
+            **self.options,
+        )
+        self.token = result["token"]
 
     def hover(self, position, camera):
         self.options = self.domain.capture(self, camera)

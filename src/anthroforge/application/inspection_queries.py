@@ -85,9 +85,3 @@ def tissue_queries() -> dict[str, Query]:
         "comparison": Query(*common, tissue.comparison, tissue.workload),
         "point": Query(tissue.validate, point.signature, point.explain, tissue.workload),
     }
-
-
-def collagen_query() -> Query:
-    from . import skin_painting as collagen
-
-    return Query(collagen.validate, collagen.signature, collagen.compute, collagen.workload)

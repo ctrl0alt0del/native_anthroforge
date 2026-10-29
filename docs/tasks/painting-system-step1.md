@@ -34,17 +34,18 @@ work occurs in `build/painting-system-step1` and must not stage those changes.
 
 Focused native/legacy tests: 14 passed. Offscreen desktop painting tests: 6 passed.
 New shared lifecycle tests: 20 passed, including finish-before-preview, undo/redo,
-cancel, changed baseline, paging, no-op, limits and Qt-free execution. Style currently
-has functions over 15 lines; initial mypy found annotation issues being corrected.
+cancel, changed baseline, paging, no-op, limits and Qt-free execution. Style/type and 15-line checks now pass. Save coordination regression fixed through
+the shared admitted-publication edit boundary. Sixteen further lifecycle cases pass
+(resource release, delayed cancellation, exact candidate reuse, failure and contexts).
 Required: full development gate; dense
 and 96-muscle performance comparison; offscreen images; relocated portable checks.
 No interactive desktop evidence may be claimed.
 
 ## Next actions
 
-1. Implement immutable input contracts and context-owned service, then headless lifecycle.
-2. Migrate legacy consumers and desktop; qualify behavior and resource lifetime.
-3. Document API/design, profile, run gate/portable checks, and merge validated work.
+1. Complete numerical/client parity matrix and representative profiling.
+2. Run full development gate and hidden-render/relocated portable qualification.
+3. Record evidence and ownership review; merge only validated work.
 
 ## Recovery inputs
 

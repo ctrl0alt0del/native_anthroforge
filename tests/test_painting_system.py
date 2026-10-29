@@ -153,3 +153,15 @@ def test_previews_use_shared_application_not_qt(session, painting_case):
     session.command("painting.finish", token=token)
     session.wait()
     assert {name for name in sys.modules if name.startswith("PySide6")} == loaded
+
+
+def test_requested_finalization_completes_while_save_waits(session, painting_case):
+    token = begin(session, painting_case)
+    append(session, token)
+    session.command("painting.finish", token=token)
+    session.waiting_save = True
+    session.wait()
+    assert session.command("painting.status", token=token)["state"] == "committed"
+    with pytest.raises(ValueError, match="save"):
+        begin(session, painting_case)
+    session.waiting_save = False

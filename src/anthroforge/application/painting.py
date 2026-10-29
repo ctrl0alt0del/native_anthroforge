@@ -38,7 +38,9 @@ def create(session: Any, kind: str, target: str, options: Any, interactive: bool
     return value
 
 
-def make_stroke(session: Any, kind: str, target: str, options: Any, inputs: Any, interactive: bool) -> Stroke:
+def make_stroke(
+    session: Any, kind: str, target: str, options: Any, inputs: Any, interactive: bool
+) -> Stroke:
     return Stroke(
         consumers.name(kind),
         target,
@@ -62,17 +64,8 @@ def decode(options: Any) -> tuple[dict[str, Any], StrokeInput]:
 
 
 def provenance(session: Any, kind: str, target: str, options: Any) -> Provenance:
-    from anthroforge.core.results import geometry_asset
-
-    from . import tissue_inspection_stages as stages
-
-    item = session.document.registry.records[target]
-    asset = (
-        geometry_asset(item)
-        if consumers.name(kind) == "collagen"
-        else stages.result(item, options["stage"]).asset
-    )
-    surface = SurfaceReference(target, options["stage"], asset, session._editing.key)
+    asset, frame = consumers.consumer(kind).surface(session, target, options)
+    surface = SurfaceReference(target, options["stage"], asset, session._editing.key, tuple(frame))
     return Provenance(str(session.document.id), session.document.revision, surface)
 
 

@@ -25,7 +25,6 @@ class Stroke:
     candidate_sequence: int = -1
     finishing: bool = False
     interactive: bool = False
-    deadline: float | None = None
 
 
 @dataclass

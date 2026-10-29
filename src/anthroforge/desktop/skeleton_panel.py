@@ -10,6 +10,7 @@ from .skeleton_scene import SkeletonScene
 
 class SkeletonPanel(QObject):
     changed = Signal()
+    reviewChanged = Signal()
     requested = Signal()
     finished = Signal()
 
@@ -28,13 +29,15 @@ class SkeletonPanel(QObject):
         self.active, self.signature = False, None
         self.matches, self.options, self.approved = {}, {}, set()
         self._state, self._references, self._targets, self._properties = {}, [], [], []
+        self._affected, self._attachments = [], []
+        self._review_json = "{}"
         self.focus, self.target, self._selection = "", {}, ""
         self.initialized = False
 
     @Property("QVariantMap", notify=changed)
     def state(self):
         return dict(
-            self._state,
+            skeleton_projection.summary(self._state),
             matches=self.matches,
             options=self.options,
             approved=sorted(self.approved),
@@ -43,6 +46,10 @@ class SkeletonPanel(QObject):
             selection=self._selection,
             parents=skeleton_projection.parents(self),
         )
+
+    @Property(str, notify=reviewChanged)
+    def reviewJson(self):
+        return self._review_json
 
     @Property(QObject, constant=True)
     def comparison(self):
@@ -135,8 +142,14 @@ class SkeletonPanel(QObject):
         if self._state.get("state") == "stale":
             self.queue()
             return
+        self.adopt_review(runtime)
+
+    def adopt_review(self, runtime):
+        self._affected, self._attachments = skeleton_projection.review(self._state)
+        self._review_json = skeleton_projection.packet(self)
         skeleton_projection.synchronize(self)
         self.scene.synchronize(runtime.preparation.candidate)
+        self.reviewChanged.emit()
         self.changed.emit()
 
     def stamp(self, runtime):

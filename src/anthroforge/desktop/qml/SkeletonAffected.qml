@@ -5,15 +5,17 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     required property var service
+    required property var review
+    readonly property var viewState: service.state
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Search affected bones, fibers and tissues" }
     ListView {
         Layout.fillWidth: true; Layout.fillHeight: true; clip: true; reuseItems: true
-        model: (panel.service.state.comparison?.rows || []).filter(r=>r.name.toLowerCase().includes(search.text.toLowerCase()))
+        model: (panel.review.affected || []).filter(r=>r.name.toLowerCase().includes(search.text.toLowerCase()))
         ScrollBar.vertical: ScrollBar {}
         delegate: ColumnLayout {
             required property var modelData
             width: ListView.view.width-14
-            UiButton { text: modelData.name; Layout.fillWidth: true; alignLeft: true; checked: modelData.id===panel.service.state.selection; onClicked: panel.service.select(modelData.id) }
+            UiButton { text: modelData.name; Layout.fillWidth: true; alignLeft: true; checked: modelData.id===panel.viewState.selection; onClicked: panel.service.select(modelData.id) }
             UiButton { text: "Check geometry"; visible: modelData.after?.geometry?.kind==="MESH"; hint: "Run advisory checks on this candidate's accepted surface"; onClicked: panel.service.option("geometry_checks",[modelData.id]) }
             Label { Layout.fillWidth: true; text: modelData.changes.join(", ") || "Unchanged"; color: Theme.muted; wrapMode: Text.Wrap }
             Label { Layout.fillWidth: true; visible: !!modelData.after?.result && modelData.after.result.status!=="ready"; text: "Retained output · "+(modelData.after?.result?.error || modelData.after?.result?.status || ""); color: Theme.accent; wrapMode: Text.Wrap }
@@ -22,5 +24,5 @@ ColumnLayout {
             Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Theme.border; Layout.topMargin: 4; Layout.bottomMargin: 4 }
         }
     }
-    Label { Layout.fillWidth: true; wrapMode: Text.Wrap; color: Theme.muted; visible: text.length>0; text: (panel.service.state.comparison?.checks || []).map(r=>r.summary).join("\n") }
+    Label { Layout.fillWidth: true; wrapMode: Text.Wrap; color: Theme.muted; visible: text.length>0; text: (panel.viewState.checks || []).map(r=>r.summary).join("\n") }
 }

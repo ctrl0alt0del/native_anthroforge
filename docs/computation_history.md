@@ -3772,3 +3772,22 @@ bone, role-change rejection and distance/correspondence tests pass. The populate
 window renders actual before/after geometry into a hidden GPU texture without QML warnings.
 Full assembly edits, lifecycle, complete gate and portable qualification remain pending;
 this entry does not claim release acceptance.
+
+Qualification follow-up: unchanged and Humerus-length replacement of the 96-muscle assembly
+matches the ordinary-evaluation reference at 1e-8 m, including retained Fiber bindings.
+Subsequent Ribs Top Radius, Humerus Length, Radius Length and Thumb Radius trials match.
+Reordered same-count Tibia correctly requires Rebind; only its enumeration and explicitly
+reviewed binding records change, while dependent paths/tissue arrays remain equal. Apply
+matches the prepared geometry. Inspection is 1.4–1.8 s, preparation 8.0–9.8 s and adoption
+0.109–0.112 s in the recorded run; peak working set reaches about 1.93 GiB. Three running
+full-scene cancellations finish in 0.088–0.100 s, without live-document edits.
+
+Actual GPU review exposed a separate 37–39 s UI installation pause. Large nested QVariant
+report reads were repeated by ordinary QML bindings. The desktop now transfers one compact,
+cached JSON review snapshot into ordinary JavaScript data, with separate small status and
+selection notifications. Paired RenderModels still stage accepted handles; no anatomy
+algorithm changes. A subsequent profiled installation takes about 0.57 s (hidden-render
+iteration maximum 0.72 s / p95 41 ms). These timings include profiling and GPU readback and
+do not establish physical presentation latency or a disabled-profiler responsiveness guarantee.
+Raw reports/captures: `build/skeleton-update-042/{production,gui}`; maintained qualification
+tools and the task record identify final gate/portable outcomes.

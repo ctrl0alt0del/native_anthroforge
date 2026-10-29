@@ -6,7 +6,9 @@ UiDialog {
     id: dialog
     objectName: "skeletonUpdateDialog"
     property var service: workspace.skeletonPanel
-    readonly property var pendingReviews: (service.state.findings || []).filter(r=>r.acknowledge && !(service.state.approved || []).includes(r.key))
+    readonly property var viewState: service.state
+    readonly property var reviewData: JSON.parse(service.reviewJson)
+    readonly property var pendingReviews: (dialog.viewState.findings || []).filter(r=>r.acknowledge && !(dialog.viewState.approved || []).includes(r.key))
     title: "Update Skeleton from Project"; modal: true; anchors.centerIn: parent
     width: Math.min(1380,parent.width-28); height: Math.min(910,parent.height-28)
     closePolicy: Popup.CloseOnEscape
@@ -39,10 +41,10 @@ UiDialog {
                 }
                 StackLayout {
                     Layout.fillWidth: true; Layout.fillHeight: true; Layout.minimumWidth: 0; currentIndex: details.currentIndex
-                    SkeletonMatches { service: dialog.service }
+                    SkeletonMatches { review: dialog.reviewData; service: dialog.service }
                     AssemblyMappings { service: dialog.service; allowUnresolved: false }
-                    SkeletonControls { service: dialog.service }
-                    SkeletonAffected { service: dialog.service }
+                    SkeletonControls { review: dialog.reviewData; service: dialog.service }
+                    SkeletonAffected { review: dialog.reviewData; service: dialog.service }
                     SkeletonFindings { service: dialog.service }
                 }
             }
@@ -50,13 +52,13 @@ UiDialog {
                 SplitView.fillWidth: true; SplitView.minimumWidth: 360
                 RowLayout {
                     Layout.fillWidth: true; Layout.fillHeight: true; spacing: 2
-                    SkeletonViewport { Layout.fillWidth: true; Layout.fillHeight: true; service: dialog.service.comparison; side: 0; visible: ["Split","Before"].includes(service.state.mode) }
-                    SkeletonViewport { Layout.fillWidth: true; Layout.fillHeight: true; service: dialog.service.comparison; side: 1; visible: service.state.mode!=="Before"; overlay: service.state.mode==="Overlay" }
+                    SkeletonViewport { objectName: "skeletonBeforeView"; Layout.fillWidth: true; Layout.fillHeight: true; service: dialog.service.comparison; side: 0; visible: ["Split","Before"].includes(service.state.mode) }
+                    SkeletonViewport { objectName: "skeletonAfterView"; Layout.fillWidth: true; Layout.fillHeight: true; service: dialog.service.comparison; side: 1; visible: service.state.mode!=="Before"; overlay: service.state.mode==="Overlay" }
                 }
-                SkeletonAttachments { Layout.fillWidth: true; service: dialog.service }
+                SkeletonAttachments { review: dialog.reviewData; Layout.fillWidth: true; service: dialog.service }
                 RowLayout {
-                    UiCheck { objectName: "skeletonPreviewSkin"; text: "Preview skin update"; enabled: !!dialog.service.state.skin?.available; hint: dialog.service.state.skin?.reason || "Deform existing final skin without changing topology"; checked: !!dialog.service.state.options.preview_skin; onClicked: dialog.service.option("preview_skin",checked) }
-                    Label { Layout.fillWidth: true; text: dialog.service.state.skin?.reason || (dialog.service.state.skin?.previewed ? "Skin update prepared" : dialog.service.state.skin?.retained ? "Current skin retained until updated" : ""); color: Theme.muted; wrapMode: Text.Wrap }
+                    UiCheck { objectName: "skeletonPreviewSkin"; text: "Preview skin update"; enabled: !!dialog.viewState.skin?.available; hint: dialog.viewState.skin?.reason || "Deform existing final skin without changing topology"; checked: !!dialog.viewState.options.preview_skin; onClicked: dialog.service.option("preview_skin",checked) }
+                    Label { Layout.fillWidth: true; text: dialog.viewState.skin?.reason || (dialog.viewState.skin?.previewed ? "Skin update prepared" : dialog.viewState.skin?.retained ? "Current skin retained until updated" : ""); color: Theme.muted; wrapMode: Text.Wrap }
                 }
             }
         }
@@ -65,10 +67,10 @@ UiDialog {
             Layout.fillWidth: true; Layout.minimumHeight: 54; Layout.maximumHeight: 54
             Label {
                 Layout.fillWidth: true; color: Theme.muted; wrapMode: Text.Wrap
-                text: dialog.service.state.error || dialog.service.state.source_error || (dialog.service.state.source_state==="loading" ? "Reading replacement project…" : dialog.service.state.state==="preparing" ? "Preparing replacement and dependents…" : dialog.service.state.ready ? dialog.pendingReviews.length ? dialog.pendingReviews.length+" findings need review" : "Ready to apply as one undo action" : "Choose bone matches and resolve blocking findings")
+                text: dialog.viewState.error || dialog.viewState.source_error || (dialog.viewState.source_state==="loading" ? "Reading replacement project…" : dialog.viewState.state==="preparing" ? "Preparing replacement and dependents…" : dialog.viewState.ready ? dialog.pendingReviews.length ? dialog.pendingReviews.length+" findings need review" : "Ready to apply as one undo action" : "Choose bone matches and resolve blocking findings")
             }
             UiButton { text: "Cancel"; onClicked: dialog.close() }
-            UiButton { objectName: "skeletonApply"; text: "Apply update"; primary: true; enabled: !!dialog.service.state.ready && !dialog.pendingReviews.length; onClicked: dialog.service.apply() }
+            UiButton { objectName: "skeletonApply"; text: "Apply update"; primary: true; enabled: !!dialog.viewState.ready && !dialog.pendingReviews.length; onClicked: dialog.service.apply() }
         }
     }
 }

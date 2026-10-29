@@ -20,6 +20,7 @@ from anthroforge.application.object_frames import Frames
 from anthroforge.application.session import Session
 from anthroforge.core.construction import Curve
 from anthroforge.core.entities import SCP
+from anthroforge.core.fibers import Fiber
 from anthroforge.core.tissues import TissueVCP
 
 OUTPUT = Path("build/skeleton-update-042/production")
@@ -50,9 +51,18 @@ def compare(before, after, identities):
             new = after.document.object(target)
             a, b = fidelity.arrays(before, old, frames[0]), fidelity.arrays(after, new, frames[1])
             delta = compare_arrays(a, b)
+            delta.update(binding_difference(old, new, identities, before, after))
             if delta:
                 differences[old.id] = dict(name=old.name, differences=delta)
     return differences
+
+
+def binding_difference(old, new, identities, before, after):
+    if isinstance(old, Fiber):
+        first = fidelity.normalized_bindings(old, identities, before.resources)
+        if first != fidelity.normalized_bindings(new, {}, after.resources):
+            return dict(bindings="Retained material bindings differ")
+    return {}
 
 
 def compare_arrays(a, b):
@@ -145,7 +155,13 @@ def compatible(session, source, expected, label):
     report(label + "-review", state)
     candidate = session.skeleton_update.ready(state["token"])
     differences = compare(expected, candidate_context(session, candidate), candidate.identities)
+    assert not differences, differences
     times["apply_s"] = adopt(session, state)
+    save_result(session, label, times, differences)
+    return candidate.identities
+
+
+def save_result(session, label, times, differences):
     storage.write_package(
         OUTPUT / (label + "-result.anthroforge"), session.document, session.resources
     )
@@ -153,7 +169,6 @@ def compatible(session, source, expected, label):
         label,
         dict(times, differences=differences, peak_memory=psutil.Process().memory_info()._asdict()),
     )
-    return candidate.identities
 
 
 def topology_case(session):
@@ -167,6 +182,9 @@ def topology_case(session):
     report("topology-reviewed", state)
     times["apply_s"] = adopt(session, state)
     report("topology", dict(times, differences=compare(baseline, session, {})))
+    storage.write_package(
+        OUTPUT / "topology-result.anthroforge", session.document, session.resources
+    )
 
 
 def run(source, plan):
@@ -199,9 +217,15 @@ def shortcut_trials(source, destination, identities, plan):
         fidelity.apply_edit(destination, case["mapping"], identities, case["value"])
         source.wait(1800)
         destination.wait(1800)
-        report("shortcut-" + case["id"], dict(differences=compare(source, destination, identities)))
+        verify_shortcut(source, destination, identities, case["id"])
         projects.adopt(source, old.document, old.resources.snapshot())
         projects.adopt(destination, current.document, current.resources.snapshot())
+
+
+def verify_shortcut(source, destination, identities, key):
+    differences = compare(source, destination, identities)
+    report("shortcut-" + key, dict(differences=differences))
+    assert not differences, differences
 
 
 def main():

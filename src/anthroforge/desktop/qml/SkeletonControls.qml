@@ -5,12 +5,14 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     required property var service
+    required property var review
+    readonly property var viewState: service.state
     property var selected: ({})
     property var choices: []
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Search shortcuts and formulas" }
     ListView {
         Layout.fillWidth: true; Layout.fillHeight: true; clip: true; reuseItems: true
-        model: (panel.service.state.controls || []).filter(r=>r.name.toLowerCase().includes(search.text.toLowerCase()))
+        model: (panel.review.controls || []).filter(r=>r.name.toLowerCase().includes(search.text.toLowerCase()))
         ScrollBar.vertical: ScrollBar {}
         delegate: UiButton {
             required property var modelData; width: ListView.view.width-14; alignLeft: true
@@ -21,7 +23,7 @@ ColumnLayout {
     }
     Label { Layout.fillWidth: true; text: panel.selected.name || "Choose a control"; color: Theme.text; wrapMode: Text.Wrap }
     UiSearchChoice {
-        Layout.fillWidth: true; text: "Map to property on…"; choices: (panel.service.state.required || []).concat(panel.service.state.parents || []).map(r=>({id:r.target || r.id,name:r.name}))
+        Layout.fillWidth: true; text: "Map to property on…"; choices: (panel.viewState.required || []).concat(panel.viewState.parents || []).map(r=>({id:r.target || r.id,name:r.name}))
         enabled: !!panel.selected.key
         onChosen: row=>{ panel.choices=panel.service.propertyChoices(panel.selected.key,row.id); }
     }
@@ -32,7 +34,7 @@ ColumnLayout {
     UiCheck {
         text: panel.selected.kind === "shortcut" ? "Remove shortcut" : "Disable formula"
         enabled: !!panel.selected.key
-        checked: (panel.service.state.options[panel.selected.kind === "shortcut" ? "remove_shortcuts" : "disable_formulas"] || []).includes(panel.selected.control)
+        checked: (panel.viewState.options[panel.selected.kind === "shortcut" ? "remove_shortcuts" : "disable_formulas"] || []).includes(panel.selected.control)
         onClicked: panel.service.decision(panel.selected.kind === "shortcut" ? "remove_shortcuts" : "disable_formulas",panel.selected.control,checked)
     }
 }

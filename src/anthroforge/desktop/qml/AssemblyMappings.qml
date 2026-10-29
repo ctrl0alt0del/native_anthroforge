@@ -5,8 +5,9 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     required property var service
+    readonly property var viewState: service.state
     property bool allowUnresolved: true
-    readonly property var selected: service.references.find(r=>r.key===service.state.reference) || ({})
+    readonly property var selected: service.references.find(r=>r.key===panel.viewState.reference) || ({})
     readonly property var matches: service.targets.filter(r=>r.name.toLowerCase().includes(targetSearch.text.toLowerCase()))
     spacing: Theme.gap
     Label { text: "External references"; color: Theme.text; font.bold: true }
@@ -20,7 +21,7 @@ ColumnLayout {
             required property var modelData
             width: ListView.view.width-14; height: 40; alignLeft: true
             text: modelData.name+" · "+modelData.relationship+" · "+(modelData.action==="map" ? "Mapped" : modelData.action==="detach" ? "World" : "Unresolved")
-            checked: modelData.key===panel.service.state.reference
+            checked: modelData.key===panel.viewState.reference
             hint: modelData.name+"\n"+modelData.role
             onClicked: panel.service.selectReference(modelData.key)
         }
@@ -31,7 +32,7 @@ ColumnLayout {
         text: panel.selected.name ? panel.selected.name+" · "+(panel.selected.role || panel.selected.relationship) : "Choose a reference to map"
     }
     RowLayout {
-        UiButton { text: "Include source"; enabled: !!panel.selected.key && !panel.service.state.repair; onClicked: panel.service.action("include"); hint: "Copy this source and its required construction" }
+        UiButton { text: "Include source"; enabled: !!panel.selected.key && !panel.viewState.repair; onClicked: panel.service.action("include"); hint: "Copy this source and its required construction" }
         UiButton { text: "Resolve later"; visible: panel.allowUnresolved; enabled: !!panel.selected.key && panel.selected.relationship!=="parent"; onClicked: panel.service.action("later") }
         UiButton { text: "Detach to world"; enabled: panel.selected.relationship==="parent"; onClicked: panel.service.action("detach") }
     }

@@ -38,3 +38,14 @@ def test_cancel_releases_staged_comparison_and_does_not_edit(controller, tmp_pat
     assert panel.scene.candidate is None
     assert all(not model.wanted and not model.pending for model in panel.scene.models)
     assert controller.session.document is before
+
+
+def test_review_lists_do_not_republish_when_only_selection_changes(controller, tmp_path):
+    panel, key = inspect(controller, tmp_path)
+    notifications = []
+    panel.reviewChanged.connect(lambda: notifications.append(True))
+    before = panel.reviewJson
+    assert before and "comparison" not in panel.state and "evidence" not in panel.state
+    panel.selectObject(key)
+    assert panel.state["selection"] == key and panel.reviewJson is before
+    assert not notifications

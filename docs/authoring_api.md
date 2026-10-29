@@ -1173,3 +1173,36 @@ or destination reads cannot publish. Saved source output for missing/changed inp
 Manual remains Manual. Saving emits schema 8 with required assets and provenance, excluding source
 skin/fits, workspaces and cameras. Readers retain schema-4–7 support.
 
+### Whole-skeleton updates (0.4.2)
+
+See [replacement and review contract](skeleton_update_042.md). These operations are Qt-free
+and share the desktop policies. Source packages are pinned and never adopted as the document.
+
+| Operation | Arguments and result |
+| --- | --- |
+| `skeleton_update.inspect` | `path`; returns loading state/source token. Status exposes one-to-one identity/provenance suggestions; ambiguous matches remain empty. |
+| `skeleton_update.prepare` | `source`, `matches` (source→destination IDs or source/target rows), optional choices below. Returns a new preparation token/job. |
+| `skeleton_update.status` | Optional `wait=False`, `timeout=300`; inventory, readiness, changes, required sources, mapping/property findings, comparison rows, anchor evidence and skin impact. |
+| `skeleton_update.cancel` | Cancel/release the source and candidate; live document/history remain unchanged. |
+| `skeleton_update.apply` | `token`, `approved` (exact current acknowledgment keys); atomically adopts authored records and prepared outputs with one undo action. Returns identity mapping and affected owners. |
+
+Preparation choices: `additions` maps explicitly added source bones to destination parents;
+`mappings` uses assembly's include/map/detach policies for external construction dependencies.
+Required relationships cannot be left unresolved. `property_mappings` maps the reported
+property key to an explicit numerical reference. `disable_formulas`, `use_formula_values` and
+`remove_shortcuts` contain IDs; no writer is disabled implicitly. `clear_locks` maps bone IDs
+to `true`; `rebind` maps reported `rebind:<owner>:<target>` keys to `true`.
+
+`placements` maps owner IDs and bound point IDs to `{position:[x,y,z], target, role, instance}`
+using world metres. Corrections keep the target/role and use existing confirmed capture in
+the replacement geometry's old frame. Shared-junction follower corrections route to their
+designated source; conflicting goals are rejected. `preview_skin=True` uses an existing
+compatible final-skin reference, never regenerating topology. `geometry_checks` lists IDs
+for existing advisory checks. Changed choices cancel obsolete preparation automatically.
+
+After `status(wait=True)`, review blocking findings and current acknowledgments before Apply.
+`ready` means no blocking construction/relationship errors; it does not imply acknowledgments
+have been supplied. Unrelated destination edits can survive; changed reads require preparation
+again. Manual update modes remain unchanged. Retained failures remain explicit failed outputs
+with Issues. Saving uses ordinary schema-8 records; source deletion does not break the result.
+

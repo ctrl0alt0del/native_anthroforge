@@ -5,8 +5,10 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     required property var service
+    required property var review
+    readonly property var viewState: service.state
     property string chosen: ""
-    readonly property var rows: (service.state.evidence || []).filter(r=>!service.state.selection || r.owner===service.state.selection).reduce((all,r)=>all.concat((r.after || []).map(p=>({owner:r.owner,name:r.name || r.owner,point:p,before:(r.before || []).find(b=>b.point===p.point)}))),[])
+    readonly property var rows: (panel.review.attachments || []).filter(r=>!panel.viewState.selection || r.owner===panel.viewState.selection)
     readonly property var selected: rows.find(r=>r.owner+":"+r.point.point===chosen) || ({})
     RowLayout {
         Label { text: "Attachment locations"; color: Theme.text; font.bold: true }
@@ -24,7 +26,7 @@ ColumnLayout {
         VectorSetting {
             label: "Proposed world position"; length: true; live: false
             values: panel.selected.point?.position || [0,0,0]
-            enabled: !!panel.selected.point && panel.selected.point.point!==panel.selected.owner || (!!panel.selected.point && panel.service.state.comparison?.rows?.find(r=>r.id===panel.selected.owner)?.after?.kind==="ANCHOR")
+            enabled: !!panel.selected.editable
             onEdited: values=>panel.service.correctPlacement(panel.selected.owner,panel.selected.point,values)
         }
         UiButton { text: "Reset"; enabled: !!panel.selected.point; onClicked: panel.service.resetPlacement(panel.selected.owner,panel.selected.point.point) }

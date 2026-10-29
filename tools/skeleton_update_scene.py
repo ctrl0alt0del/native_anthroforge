@@ -1,13 +1,12 @@
 """Actual synchronized review views on a hidden GPU texture, never desktop automation."""
 
-import cProfile
 import json
 import os
 import sys
 from pathlib import Path
 from time import perf_counter, sleep
 
-from PySide6.QtCore import QSize, QSizeF, QUrl
+from PySide6.QtCore import QObject, QSize, QSizeF, QUrl
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlComponent
 
@@ -16,7 +15,7 @@ from anthroforge.desktop.controller import Controller
 
 OUTPUT = Path("build/skeleton-update-042/gui")
 QML = Path("src/anthroforge/desktop/qml").resolve()
-ANGLES = (("front", 0, 0), ("side", 0, 90), ("back", 0, 180), ("oblique", -15, 35))
+ANGLES = (("front", 0, 90), ("side", 0, 0), ("back", 0, 270), ("oblique", -15, 55))
 TIMINGS = []
 
 
@@ -66,17 +65,15 @@ def frame(app, controller, renderer):
         controller.frame_presented,
     ):
         started = perf_counter()
-        cpu = cProfile.Profile()
-        cpu.runcall(action)
-        row = dict(
-            phase=action.__name__,
-            seconds=perf_counter() - started,
-            state=controller.skeleton_panel.state.get("state"),
-        )
-        TIMINGS.append(row)
-        if row["seconds"] > 0.3:
-            print("slow phase", row, flush=True)
-            cpu.dump_stats(str(OUTPUT / (action.__name__ + ".pstats")))
+        action()
+        record_phase(action.__name__, started, controller.skeleton_panel.state.get("state"))
+
+
+def record_phase(name, started, state):
+    row = dict(phase=name, seconds=perf_counter() - started, state=state)
+    TIMINGS.append(row)
+    if row["seconds"] > 0.3:
+        print("slow phase", row, flush=True)
 
 
 def require_progress(panel):
@@ -133,6 +130,7 @@ def inspect(app, controller, renderer, replacement, warnings):
     panel.options["mappings"] = {key: dict(action="include") for key in frames}
     elapsed = wait(app, controller, renderer)
     views(app, controller, renderer)
+    verify_views(renderer)
     assert not renderer.window.isVisible() and not warnings, warnings
     evidence(panel, elapsed, warnings)
     controller.session.command("profile.stop", path=str(OUTPUT / "review.afprofile.zip"), wait=True)
@@ -160,6 +158,12 @@ def main():
     app = QGuiApplication([])
     with runtime.native_runtime():
         run(app, sys.argv[1], sys.argv[2])
+
+
+def verify_views(renderer):
+    for name in ("skeletonBeforeView", "skeletonAfterView"):
+        view = renderer.root.findChild(QObject, name)
+        assert view is not None and view.property("visible") and view.property("width") > 200
 
 
 if __name__ == "__main__":

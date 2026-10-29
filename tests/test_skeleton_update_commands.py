@@ -55,3 +55,29 @@ def test_cancel_keeps_live_document_and_releases_candidate(session, assembly, tm
     session.command("skeleton_update.cancel")
     assert session.document is before
     assert session.skeleton_update.runtime.preparation.candidate is None
+
+
+def recaptured_child(session, assembly, tmp_path):
+    from tests.test_skeleton_update_controls import apply
+
+    root, child = assembly
+    state = prepare(
+        session,
+        replacement(session, child, tmp_path),
+        {child: child},
+        mappings={root: dict(action="map", target=root)},
+    )
+    assert state["ready"], state
+    apply(session, state)
+    return session.document.entity(child)
+
+
+def test_recaptured_replacement_pose_survives_next_attachment_evaluation(
+    session, assembly, tmp_path
+):
+    before = recaptured_child(session, assembly, tmp_path)
+    child = before.id
+    session.command("evaluate", entities=[child])
+    session.wait()
+    assert session.document.entity(child).matrix == pytest.approx(before.matrix)
+    assert session.document.entity(child).attachment == before.attachment

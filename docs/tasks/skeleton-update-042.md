@@ -103,3 +103,26 @@ Full-assembly hidden GPU views render with no warnings, but qualification expose
 UI tick when installing the review. Investigation is active; do not claim responsiveness or
 release readiness. Pending: resolve that pause, production cancellation, complete metrics/
 binding inspection, final gate, documentation and canonical portable delivery.
+
+Follow-up: UI pause traced to repeated nested QVariant conversion. Compact cached JSON review
+data reduced installation from ~37 s to ~0.57 s; final paired-view capture is being rerun after
+fixing a visibility binding found by actual image inspection. Full-scene running cancellation
+finishes in 88–100 ms. Repeated production qualification now explicitly includes normalized
+Fiber material bindings: unchanged/compatible and all four shortcut trials have no differences.
+Topology reindexing changes only Tibia enumeration and the reviewed captures; dependent paths
+and tissue arrays remain equal. 33 focused tests pass. Final gate and portable build remain due.
+
+Final review checkpoint: full paired views are confirmed visible, with shared cameras and
+no warnings. The status/list transfer regression is covered; cached native path picking maps
+mirrored hits to source. A replacement bone's recaptured pose survives the next normal
+attachment evaluation. All four production shortcut checks include exact normalized Fiber
+bindings. Source hash is still unchanged. The complete development gate is running. Canonical
+packaging/relocated portable qualification and validated merge are not yet done.
+
+Ownership review (coordinator-authored, separate from tests): shared copy/source contracts own
+identity and resource transfer; candidate state owns unpublished results and preferences; the
+existing coordinator owns scheduling/cancel/publication. No second Session/pool or new anatomy
+kernel is introduced. UI owns compact display projection, and paired rendering uses a generic
+barrier rather than controller knowledge of a feature panel. Existing resource handles remain
+leased across displayed frames. Initial bulk QVariant presentation was rejected on measured
+full-assembly evidence; the cached snapshot interface replaces that path.

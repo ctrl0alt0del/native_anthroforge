@@ -18,7 +18,7 @@ set(SKIN_SOURCES src/skin_proximity.cpp src/skin_quads_split.cpp src/skin_quads_
 add_library(af_native SHARED src/api.cpp src/mesh_io.cpp src/mesh_build.cpp
     ${SKIN_DEFORMATION_SOURCES}
     ${SKIN_SOURCES} ${SKIN_PROXY_SOURCES} ${SKIN_LOOP_SOURCES} ${SKIN_ANNULUS_SOURCES} ${SKIN_STITCH_SOURCES} src/process_api.cpp src/process_windows.cpp src/process_log.cpp
-    src/comparison_fingerprint.cpp
+    src/comparison_fingerprint.cpp src/comparison_distances.cpp
     src/inspection_mapping.cpp src/inspection_compare.cpp src/inspection_buffers.cpp src/inspection_point.cpp
     src/painting.cpp src/painting_mapping.cpp src/painting_projection.cpp src/painting_stroke.cpp
     src/sections.cpp

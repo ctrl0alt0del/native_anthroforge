@@ -21,7 +21,7 @@ UiButton {
             ListView {
                 id: list
                 Layout.fillWidth: true; Layout.fillHeight: true; clip: true; reuseItems: true
-                model: control.choices.filter(row=>row.name.toLowerCase().includes(search.text.toLowerCase()))
+                model: popup.opened ? control.choices.filter(row=>row.name.toLowerCase().includes(search.text.toLowerCase())) : []
                 ScrollBar.vertical: ScrollBar {}
                 delegate: UiButton {
                     required property var modelData

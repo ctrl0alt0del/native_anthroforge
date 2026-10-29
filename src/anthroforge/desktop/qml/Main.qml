@@ -28,7 +28,7 @@ ApplicationWindow {
     property string activeTool: "Move"
     readonly property var keyboardManager: keyboard
     readonly property bool typing: keyboard.typing
-    readonly property bool modalOpen: assemblyFile.visible || assemblyDialog.visible || recoveryDialog.visible || tissueSourcePicker.visible || tissueRetargetReview.visible || meshReplacementReview.visible || replacementFile.visible || pinRepairDialog.visible || preferencesDialog.visible || surfaceGrouping.visible || reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
+    readonly property bool modalOpen: skeletonFile.visible || skeletonUpdateDialog.visible || assemblyFile.visible || assemblyDialog.visible || recoveryDialog.visible || tissueSourcePicker.visible || tissueRetargetReview.visible || meshReplacementReview.visible || replacementFile.visible || pinRepairDialog.visible || preferencesDialog.visible || surfaceGrouping.visible || reportsDialog.visible || feedbackDialog.visible || imageFile.visible || reportDialog.visible || importOptions.visible || saveChoice.visible || waitingDialog.visible || discardDialog.visible || closeDialog.visible || helpDialog.visible || messageDialog.visible || inspector.dialogVisible || deleteDialog.visible || importFile.visible || openDialog.visible || saveDialog.visible
     readonly property int activeJobCount: workspace.activityModel.activeCount
     readonly property bool jobFailed: workspace.activityModel.hasFailures
     function inspectScene(): string { return viewport.inspectScene(); }
@@ -46,6 +46,7 @@ ApplicationWindow {
     Action { id: saveAction; text: "Save"; enabled: !window.modalOpen; onTriggered: window.saveProject() }
     Action { id: saveAsAction; text: "Save as…"; enabled: !window.modalOpen; onTriggered: { viewport.forceActiveFocus(); saveDialog.open(); } }
     Action { id: importAction; text: "Import mesh…"; enabled: !window.modalOpen; onTriggered: importFile.open() }
+    Action { id: skeletonAction; text: "Update Skeleton from Project…"; enabled: !window.modalOpen && !workspace.state.editing && !workspace.state.waiting; onTriggered: skeletonFile.open() }
     Action { id: assemblyAction; text: "Import Anatomy from Project…"; enabled: !window.modalOpen && !workspace.state.editing && !workspace.state.waiting; onTriggered: assemblyFile.open() }
     Action { id: undoAction; text: "Undo"; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("undo",{}) }
     Action { id: redoAction; text: "Redo"; enabled: !window.modalOpen && !window.typing; onTriggered: workspace.run("redo",{}) }
@@ -72,6 +73,7 @@ ApplicationWindow {
                         MenuSeparator {}
                         UiMenuItem { action: importAction }
                         UiMenuItem { objectName:"assemblyImportMenu"; action: assemblyAction }
+                        UiMenuItem { objectName:"skeletonUpdateMenu"; action: skeletonAction }
                         MenuSeparator {}
                         UiMenuItem { objectName:"inspectionReportFolder"; text:"Open inspection report folder"; enabled:!!workspace.inspectionExport.state.path && !workspace.inspectionExport.state.busy; onTriggered:workspace.inspectionExport.showFolder() }
                         UiMenuItem { objectName:"exportInspectionMenu"; text:"Export inspection report…"; enabled:!workspace.inspectionExport.state.busy && !workspace.state.editing; onTriggered:{ viewport.storeCamera(); reportDialog.open(); } }
@@ -298,6 +300,8 @@ ApplicationWindow {
     TissueSourcePicker { id:tissueSourcePicker }
     ReplacementReview { id:tissueRetargetReview; objectName:"tissueRetargetReview"; service:workspace.tissueRetarget }
     MeshReplacementReview { id:meshReplacementReview; onChooseFile:replacementFile.open() }
+    SkeletonUpdateDialog { id: skeletonUpdateDialog }
+    FileDialog { id:skeletonFile; title:"Update Skeleton from Project"; nameFilters:["AnthroForge project (*.anthroforge)"]; onAccepted:workspace.skeletonPanel.inspect(selectedFile.toString()) }
     FileDialog { id:assemblyFile; title:"Import Anatomy from Project"; nameFilters:["AnthroForge project (*.anthroforge)"]; onAccepted:workspace.assemblyPanel.inspect(selectedFile.toString()) }
     AssemblyDialog { id:assemblyDialog }
     FiberPinReview { id:pinRepairDialog }

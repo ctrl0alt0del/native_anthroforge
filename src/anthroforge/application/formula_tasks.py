@@ -1,6 +1,6 @@
 """Formula calculations share coordinator reservations, cancellation and save checkpoints."""
 
-from dataclasses import replace
+from dataclasses import dataclass, replace
 from functools import partial
 from typing import Any
 
@@ -116,16 +116,34 @@ def key(document: Any, ids: set[str]) -> Any:
     return dependencies.graph(document), frozenset(ids & formula_inputs.formulas(document).keys())
 
 
+@dataclass(frozen=True)
+class Contract:
+    provides: frozenset[Port]
+    observes: frozenset[Port]
+    prerequisites: frozenset[Port]
+    reads: frozenset[str]
+    accepted_inputs_key: Any
+
+
 def contract(job: Job, document: Any, ids: set[str]) -> None:
+    value = declaration(document, ids)
+    for name in value.__dataclass_fields__:
+        setattr(job, name, getattr(value, name))
+
+
+def declaration(document: Any, ids: set[str]) -> Contract:
     records, graph = formula_inputs.formulas(document), dependencies.graph(document)
     outputs = {Port(value, "formula") for value in ids if value in records}
     outputs |= {property_port(records[value][1].target) for value in ids if value in records}
     observations = formula_inputs.observations(document, ids)
     valid = valid_outputs(document, ids, records) - graph.blocked
-    job.provides, job.observes = frozenset(outputs), frozenset(observations - outputs)
-    job.prerequisites = frozenset(dependencies.closure(graph, valid) - outputs)
-    job.reads = frozenset(p.owner for p in observations)
-    job.accepted_inputs_key = key(document, ids)
+    return Contract(
+        frozenset(outputs),
+        frozenset(observations - outputs),
+        frozenset(dependencies.closure(graph, valid) - outputs),
+        frozenset(p.owner for p in observations),
+        key(document, ids),
+    )
 
 
 def valid_outputs(document: Any, ids: set[str], records: Any) -> set[Port]:

@@ -50,6 +50,7 @@ from . import (
     segment_operations,
     shortcut_operations,
     shrinkwrap_operations,
+    skeleton_operations,
     skin_collagen,
     skin_export,
     skin_fit_capture,
@@ -88,6 +89,7 @@ if TYPE_CHECKING:
     from .session import Session
 
 EDITS = {
+    "skeleton_update.apply": skeleton_operations.apply,
     "assembly.import": assembly_operations.apply,
     "skin.collagen.paint.commit": skin_painting.commit,
     "skin.collagen.set": skin_collagen.set_weights,
@@ -321,13 +323,17 @@ def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
 
 def require_command_edit(session: "Session", operation: str, arguments: dict[str, Any]) -> None:
     require_edit(arguments)
-    if operation in {"assembly.import"} and session.history.before is not None:
+    if (
+        operation in {"assembly.import", "skeleton_update.apply"}
+        and session.history.before is not None
+    ):
         raise ValueError("Finish the current gesture before importing or resolving anatomy.")
 
 
 def direct_commands(session: "Session") -> dict[str, Any]:
     return {
         **assembly_operations.commands(session),
+        **skeleton_operations.commands(session),
         **file_commands(session),
         **query_commands(session),
         **history_commands(session),

@@ -13,6 +13,23 @@ Subsequent entries must record every computational approach change.
 Current observational shortcut work is recorded in CH-068 (R01/R02 and A01 presentation).
 It leaves numerical evaluation and scheduling policy unchanged.
 
+Whole-skeleton update preparation (0.4.2, in progress, 2026-10-29) extends R01/R02,
+A01–A03 and resource publication. It evaluates an owned candidate through the existing
+coordinator and production attachment/path/tissue/skin evaluators. The live document is
+unchanged until reviewed adoption. No propagation, routing, inflation or stacking kernel
+is replaced. The initial candidate rebuilt all copied geometry and recaptured every bone.
+The unchanged 96-muscle fixture exposed unnecessary Boolean connectivity changes: saved
+and rebuilt Thumb both have 415 vertices/826 triangles, but ordered native topology differs.
+Candidate output reuse now requires unchanged definitions and accepted input revisions;
+it retains the saved payload and publishes translated provenance only after that proof.
+Prepared stages are not evaluated a second time during downstream traversal. Bone recapture
+is skipped only when production propagation already reproduces the requested pose, using
+the existing numerical roundoff equivalence policy. The identical full skeleton now prepares
+without blocking rebinds, with two explicit recapture findings still requiring review.
+Focused regression tests and offscreen application loading pass; full production shape,
+timing, memory, stale-input and portable acceptance remain pending. See
+[task record](tasks/skeleton-update-042.md) for evidence limits.
+
 ## Scope and reading guide
 
 0.4.0 is qualified and accepted; see the skin stage and whole-body records below.
@@ -3728,3 +3745,49 @@ behavior. Import returns jobs launched during adoption as well as after it. No s
 inflation, attachment or correspondence kernel changes. Regression evidence covers source-free
 repair, schema roundtrip, unchanged intrinsic results, mirrors and Manual evaluation; final
 combined qualification is recorded in the task rather than inferred from those local checks.
+
+## 2026-10-29 — Whole-skeleton candidate review (in progress)
+
+Affected inventory: project graph preparation, attachment capture/propagation, formula
+publication, native geometry inspection and viewport staging. Skeleton updates now prepare
+an owned multi-object document through the existing coordinator rather than replacing bones
+sequentially in the live document. Existing numerical propagation, routing, inflation,
+relaxation and stacking kernels are unchanged. Formula evaluation uses existing coherent
+property groups; required construction failures block Apply and dependent failures retain
+accepted output for explicit review.
+
+An unchanged production Thumb exposed ordered-connectivity differences when its saved
+Boolean output was unnecessarily reconstructed. Candidate reuse now checks saved input
+provenance and remapped numerical definitions before retaining that output. Equal counts do
+not establish correspondence. Geometry comparisons use native, deterministic bidirectional
+vertex-to-surface samples (at most 512 per side), explicitly not a Hausdorff bound; material
+displacement is reported separately and only for verified canonical correspondence.
+Explicit anchor corrections use existing current-shape editing/capture, expressed in the
+replacement bone's old frame before ordinary propagation. No attachment target/role is
+silently changed. Paired review scenes retain staged native resources and share a publication
+barrier, camera and zoom; mirrored instances reuse source resources.
+
+Focused evidence: changed-topology Anchor review, corrected placement under a translated
+bone, role-change rejection and distance/correspondence tests pass. The populated review
+window renders actual before/after geometry into a hidden GPU texture without QML warnings.
+Full assembly edits, lifecycle, complete gate and portable qualification remain pending;
+this entry does not claim release acceptance.
+
+Qualification follow-up: unchanged and Humerus-length replacement of the 96-muscle assembly
+matches the ordinary-evaluation reference at 1e-8 m, including retained Fiber bindings.
+Subsequent Ribs Top Radius, Humerus Length, Radius Length and Thumb Radius trials match.
+Reordered same-count Tibia correctly requires Rebind; only its enumeration and explicitly
+reviewed binding records change, while dependent paths/tissue arrays remain equal. Apply
+matches the prepared geometry. Inspection is 1.4–1.8 s, preparation 8.0–9.8 s and adoption
+0.109–0.112 s in the recorded run; peak working set reaches about 1.93 GiB. Three running
+full-scene cancellations finish in 0.088–0.100 s, without live-document edits.
+
+Actual GPU review exposed a separate 37–39 s UI installation pause. Large nested QVariant
+report reads were repeated by ordinary QML bindings. The desktop now transfers one compact,
+cached JSON review snapshot into ordinary JavaScript data, with separate small status and
+selection notifications. Paired RenderModels still stage accepted handles; no anatomy
+algorithm changes. A subsequent profiled installation takes about 0.57 s (hidden-render
+iteration maximum 0.72 s / p95 41 ms). These timings include profiling and GPU readback and
+do not establish physical presentation latency or a disabled-profiler responsiveness guarantee.
+Raw reports/captures: `build/skeleton-update-042/{production,gui}`; maintained qualification
+tools and the task record identify final gate/portable outcomes.

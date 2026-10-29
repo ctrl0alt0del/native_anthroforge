@@ -6,7 +6,7 @@ from anthroforge.core.construction import Curve
 from anthroforge.core.results import Port
 
 
-def changed(session: Any, before: Any) -> None:
+def changed(session: Any, before: Any, prepared: frozenset[Port] = frozenset()) -> None:
     from . import path_tasks
 
     previous = before.index.structure.dependencies.routing_scene
@@ -16,7 +16,7 @@ def changed(session: Any, before: Any) -> None:
     ports = {
         Port(o.id, "routing_scope")
         for o in session.document.objects
-        if isinstance(o, Curve) and o.id in existing
+        if isinstance(o, Curve) and o.id in existing and Port(o.id, "path") not in prepared
     }
     session.scheduler.invalidate_ports(ports, reason="routing_scene_membership_changed")
     path_tasks.edited(session, ports)

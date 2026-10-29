@@ -85,3 +85,20 @@ def test_multiple_model_notifications_publish_one_coherent_displayed_frame():
     assert [rows[0]["handle"] for rows in snapshots[1]] == [2, 2]
     controller.activate_geometry()
     assert len(snapshots) == 3
+
+
+def test_related_views_wait_for_both_complete_stagings():
+    from anthroforge.desktop.models import PublicationGroup
+
+    left, right = initial_model(), initial_model()
+    PublicationGroup((left, right))
+    publish(left, 2, 1)
+    publish(right, 3, 4)
+    left.drain()
+    right.drain()
+    left.presented()
+    assert left.rows[0]["active"] and left.rows[0]["handle"] == 1
+    right.drain()
+    left.presented()
+    right.presented()
+    assert {r["handle"] for r in left.rows if r["active"]} == {2}

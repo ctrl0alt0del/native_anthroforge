@@ -7,7 +7,9 @@
   R11/R09 display/cache changes are also qualified; see [evidence](tasks/display-cache-042.md).
   R13 cross-project assembly is qualified: complete development/portable checks and production
   geometry/attachment comparisons pass. [Contract](assembly_042.md),
-  [delivery record](tasks/assembly-042.md). Other entries remain unselected.
+  [delivery record](tasks/assembly-042.md). R14 whole-skeleton updates are qualified:
+  [contract](skeleton_update_042.md),
+  [qualification](tasks/skeleton-update-042.md). Other entries remain unselected.
 
 - **0.4.1 — qualified skin audit corrections:** restore draft-based
   reference preparation, final diagnostics, achieved topology budgets, persistent FAST

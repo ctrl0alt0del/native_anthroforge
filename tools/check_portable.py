@@ -26,6 +26,7 @@ from profiler_portable import profiling
 from projects_portable import projects
 from PySide6.QtGui import QImage
 from shortcuts_portable import shortcuts
+from skeleton_update_portable import skeleton_update
 from skin_portable import qualify as skin
 from spatial_inspection_portable import spatial_inspection
 from tissue_portable import tissues
@@ -65,6 +66,7 @@ CHECKS = (
     "skin build, native proxy workers, isolated fitting, persisted playback and OBJ quads",
     "spatial measures, qualified volume samples, placement explanation and frozen view export",
     "cross-project assembly, embedded images, one-action undo/redo and schema-8 storage",
+    "skeleton replacement, isolated preparation, retained identities and one-action undo/redo",
 )
 
 
@@ -174,6 +176,7 @@ def construction_steps():
     return (
         construction,
         assembly,
+        skeleton_update,
         direct_workflows,
         automatic_construction,
         branches,

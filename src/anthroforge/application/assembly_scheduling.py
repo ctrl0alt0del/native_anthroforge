@@ -18,5 +18,19 @@ class AssemblyTaskScheduler(MeasuredTaskScheduler):
         )
 
 
+class SkeletonTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Any, interactive: bool) -> Schedule:
+        cost = 2 + workload.affected * 0.5 + workload.triangles * 0.002
+        return Schedule(
+            "worker",
+            cost,
+            reason="Isolated skeleton and dependent evaluation",
+            resources=ResourceDemand(1, workload.triangles * 128),
+        )
+
+
 def policies() -> dict[str, Any]:
-    return {name: AssemblyTaskScheduler() for name in ("assembly_inspect", "assembly_prepare")}
+    names = ("assembly_inspect", "assembly_prepare")
+    return dict(
+        {name: AssemblyTaskScheduler() for name in names}, skeleton_prepare=SkeletonTaskScheduler()
+    )

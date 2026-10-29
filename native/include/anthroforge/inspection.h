@@ -34,6 +34,9 @@ AF_API int af_inspection_placement(int count,const uint64_t* meshes,const double
 // At most 512 deterministic source-vertex samples. Rows: side, nearest distance, point, nearest point.
 // 0 qualified volume; positive values explain unavailable volume; -1 error/cancel.
 AF_API int af_inspection_volume(uint64_t source,const double* frame,uint64_t volume,const double* volume_frame,int limit,double* rows,int64_t* count,uint64_t cancel);
+// Geometric min/max/mean/RMS from <=512 vertices per side; not an exact Hausdorff bound.
+// When verified, material min/max/mean/RMS from every canonical vertex follow. Counts: both sample counts.
+AF_API int af_comparison_distances(uint64_t first,const double* a,uint64_t second,const double* b,int verified,double* values,int64_t* counts,uint64_t cancel);
 #ifdef __cplusplus
 }
 #endif

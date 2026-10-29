@@ -1,5 +1,16 @@
 # AnthroForge development validation
 
+**0.4.2 whole-skeleton updates are qualified:** 2,722 Python tests, six native suites,
+style/type/numerical/runtime checks and all 34 relocated portable checks pass. The 96-muscle
+assembly passes unchanged, compatible Humerus replacement and reviewed reordered-Tibia trials;
+preview/adoption and four subsequent shortcut edits preserve the expected geometry and bindings.
+Source SHA256 is unchanged. Actual paired GPU views were inspected from multiple angles,
+and running full-scene cancellation completes in 88–100 ms. GUI evidence remains hidden/offscreen,
+not physical interactive acceptance. See [workflow](skeleton_update_042.md) and
+[qualification, performance and profiler limits](tasks/skeleton-update-042.md).
+The canonical 0.4.2 executable and companion source archive include this addition.
+Earlier records follow.
+
 **0.4.2 cross-project assembly is qualified:** 2,690 Python tests, six native suites,
 style/type/numerical/runtime checks, wheel resources and all 33 relocated portable checks pass.
 The 96-muscle source was copied in two stages with explicit bone mapping; 492 geometry-bearing

@@ -1205,3 +1205,30 @@ Repair uses retained evidence without the source file. Removing the last consume
 declaration/evidence from current state; history retains its copy. Source skin, fits, workspaces
 and active calculations never enter the destination. Desktop lists use these same operations,
 virtualized/searchable choices and cached unchanged state.
+
+## Whole-skeleton replacement candidates (0.4.2)
+
+[Skeleton updates](skeleton_update_042.md) extend the pinned assembly source and typed
+graph-copy boundaries. Matched SCPs keep destination identity/organization while required
+construction copies independently. Material correspondence requires qualified topology and
+construction provenance, not counts or names. Driver authority, property remapping and
+attachment recapture are explicit review decisions.
+
+`EvaluationContext` owns the candidate document, resource snapshot, captured preferences and
+accepted outputs. Existing output adapters, coherent formula groups and tissue final groups
+run through the single coordinator; candidates never create another Session or worker pool.
+Only affected dependencies evaluate, including Manual outputs for this explicit operation.
+Compatible accepted resources are reused. Failures retain output and require review; required
+skeleton failures block adoption. Skin uses only its existing fixed-topology deformation.
+
+Apply validates affected records, formula/control dependencies, automatic routing/stacking
+membership and skin state, then merges prepared results once through normal transactions.
+Unrelated edits survive; relevant edits stale the candidate. Worker-selected publication
+resources avoid adopting the whole captured history. Undo, checkpoints and displayed leases
+retain their normal ownership. Schema 8 already holds the resulting ordinary records and
+provenance; no preview session enters persistence.
+
+Desktop exposes small status separately from cached review lists. Generic `PublicationGroup`
+coordinates paired RenderModels at a frame boundary. Native picking uses cached displayed
+mesh/path handles, and mirrored hits navigate to their source. Comparison distances are
+native sampled surface distances; verified material displacement is a distinct measurement.

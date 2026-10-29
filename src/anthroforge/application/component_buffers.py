@@ -10,6 +10,7 @@ from anthroforge.native.geometry_modifiers import subdivide
 from anthroforge.native.scene import entity_frame
 
 from . import curve_sources
+from .component_restrictions import curve_reason
 from .control_frames import display_frame
 
 
@@ -40,23 +41,32 @@ def curve(session: Any, item: Any, value: Any) -> Any:
     order = [3, 4, 5, 0, 1, 2, 6, 7, 8] if value.engine == "BEZIER" else [0, 1, 2]
     local = records[:, order].reshape((-1, 3))
     local.flags.writeable = False
-    return buffer(session, local, curve_frame(session, item, value), {}, curve_refs(item, value))
+    return buffer(
+        session, local, curve_frame(session, item, value), {}, curve_refs(session, item, value)
+    )
 
 
-def curve_refs(item: Any, value: Any) -> Any:
+def curve_refs(session: Any, item: Any, value: Any) -> Any:
     parts = ("left", "position", "right") if value.engine == "BEZIER" else ("position",)
     return [
-        dict(
-            owner=item.id,
-            curve=value.id,
-            point=p.id,
-            part=part,
-            index=i * 3 + ("left", "position", "right").index(part),
-            readonly=value.engine == "PARAMETRIC",
-        )
+        curve_reference(session, item, value, p, part, i)
         for i, p in enumerate(value.points)
         for part in parts
     ]
+
+
+def curve_reference(session: Any, item: Any, value: Any, point: Any, part: str, index: int) -> Any:
+    reason = curve_reason(session, value, point, part)
+    return dict(
+        owner=item.id,
+        curve=value.id,
+        point=point.id,
+        part=part,
+        index=index * 3 + ("left", "position", "right").index(part),
+        readonly=bool(reason),
+        reason=reason,
+        junction=point.junction,
+    )
 
 
 def control(session: Any, item: Any) -> Any:

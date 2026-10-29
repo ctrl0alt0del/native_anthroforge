@@ -2,7 +2,7 @@
 
 import json
 
-from anthroforge.application import assembly_choices
+from . import mapping_projection
 
 
 def summary(state):
@@ -80,22 +80,16 @@ def parents(panel):
 
 
 def targets(panel):
-    row = panel.current()
-    return assembly_choices.targets(panel.controller.session.document, row) if row else []
+    return mapping_projection.rows(panel, "skeleton_update")
 
 
 def properties(panel):
-    row = panel.current()
-    if not row.get("property"):
-        return []
-    session = panel.controller.session
-    source = session.skeleton_update.runtime.source.source.document
-    return assembly_choices.properties(source, session.document, row, panel.target["target"])
+    return mapping_projection.rows(
+        panel, "skeleton_update", properties=True, target=panel.target["target"]
+    )
 
 
 def control_properties(panel, key, target):
-    candidate = panel.controller.session.skeleton_update.runtime.preparation.candidate
-    row = next((r for r in panel._state.get("controls", ()) if r["key"] == key), None)
-    if candidate is None or row is None:
-        return []
-    return assembly_choices.properties(candidate.baseline, candidate.document, row, target)
+    return mapping_projection.rows(
+        panel, "skeleton_update", properties=True, reference=key, target=target, controls=True
+    )

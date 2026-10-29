@@ -44,12 +44,12 @@ def view_settings(snapshot: Any, options: Any) -> dict[str, Any]:
         raise ValueError("Choose Before, After, Split or Overlay.")
     if view["mirrors"] not in ("Both", "Source only", "Mirror only"):
         raise ValueError("Unknown mirror presentation.")
-    if len(view["camera"]) != 7 or not all(np_finite(v) for v in view["camera"]):
+    if len(view["camera"]) != 7 or not all(finite_number(v) for v in view["camera"]):
         raise ValueError("An inspection camera needs seven finite values.")
     return dict(json.loads(json.dumps(view, allow_nan=False)))
 
 
-def np_finite(value: Any) -> bool:
+def finite_number(value: Any) -> bool:
     from math import isfinite
 
     return isinstance(value, (int, float)) and isfinite(value)

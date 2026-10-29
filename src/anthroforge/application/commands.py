@@ -8,6 +8,7 @@ from anthroforge.core.units import convert
 from . import (
     assembly_operations,
     attached_creation,
+    authoring_query_commands,
     comparison_journal,
     comparison_replay,
     construction_tasks,
@@ -401,6 +402,7 @@ def query_commands(session: "Session") -> dict[str, Any]:
 
 def preference_queries(session: "Session") -> dict[str, Any]:
     return {
+        **authoring_query_commands.commands(session),
         "preferences.get": session.preferences.describe,
         "preferences.set": session.preferences.update,
     }

@@ -35,7 +35,8 @@ def accepted(
     ctx: Any, target: str, side: str, stage: str = "final", retained: bool = False
 ) -> Layer:
     item = ctx.document.object(target)
-    status = "retained" if retained else getattr(item.result, "status", "ready")
+    result = getattr(item, stage + "_result") if isinstance(item, TissueVCP) else item.result
+    status = "retained" if retained else result.status
     try:
         value = reconstruction_views.accepted(ctx, item, stage)
     except ValueError as error:
@@ -137,7 +138,32 @@ def comparison(session: Any, candidate: Any, targets: Any = None) -> tuple[Layer
             if key in document.registry.records
         )
         rows.extend(mirrored(ctx, values))
-    return tuple(rows)
+    return (*rows, *skin_layers(candidate))
+
+
+def skin_layers(candidate: Any) -> tuple[Layer, ...]:
+    if candidate.baseline.skin == candidate.document.skin:
+        return ()
+    return tuple(
+        skin_layer(candidate, document.skin.final, side)
+        for side, document in (("before", candidate.baseline), ("after", candidate.document))
+    )
+
+
+def skin_layer(candidate: Any, stage: Any, side: str) -> Layer:
+    resource = candidate.resources.meshes.get(stage.asset)
+    retained = side == "after" and stage.asset == candidate.baseline.skin.final.asset
+    return Layer(
+        side + ":skin:final",
+        resource.mesh if resource else None,
+        IDENTITY,
+        "MESH" if resource else "NONE",
+        side=side,
+        subject="skin",
+        category="skin",
+        status="retained" if retained else stage.status,
+        reason=stage.error,
+    )
 
 
 def comparison_targets(candidate: Any) -> set[str]:

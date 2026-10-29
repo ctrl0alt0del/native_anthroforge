@@ -25,6 +25,7 @@ class ComponentRead:
     buffers: tuple[ComponentBuffer, ...]
     provenance: tuple[tuple[str, Any], ...]
     reason: str = ""
+    weight_binding: Any = None
 
 
 def component_key(reference: dict[str, Any]) -> str:

@@ -2,7 +2,9 @@
 
 from dataclasses import asdict
 
-from anthroforge.application import assembly_choices, assembly_mapping
+from anthroforge.application import assembly_mapping
+
+from . import mapping_projection
 
 
 def synchronize(panel):
@@ -70,17 +72,11 @@ def repaired_property(reference):
 
 
 def targets(panel):
-    row = panel.current()
-    return assembly_choices.targets(panel.controller.session.document, row) if row else []
+    return mapping_projection.rows(panel, "assembly")
 
 
 def properties(panel, target):
-    row = panel.current()
-    if not row.get("property"):
-        return []
-    session = panel.controller.session
-    source = session.document if panel.repair else session.assembly.source.source.document
-    return assembly_choices.properties(source, session.document, row, target)
+    return mapping_projection.rows(panel, "assembly", properties=True, target=target)
 
 
 def parents(panel):

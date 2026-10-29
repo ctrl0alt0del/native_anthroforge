@@ -7,26 +7,14 @@ from queue import Empty, SimpleQueue
 from threading import Thread
 
 from anthroforge.application.session import Session
-
-
-def resolve(value, results):
-    if isinstance(value, str) and value.startswith("$"):
-        parts = value[1:].split(".")
-        result = results[parts[0]]
-        for part in parts[1:]:
-            result = result[int(part)] if isinstance(result, (list, tuple)) else result[part]
-        return result
-    if isinstance(value, dict):
-        return {key: resolve(item, results) for key, item in value.items()}
-    if isinstance(value, list):
-        return [resolve(item, results) for item in value]
-    return value
+from anthroforge.authoring_arguments import arguments
+from anthroforge.authoring_arguments import resolve as resolve
 
 
 def dispatch(session, request, results):
     session.scheduler.tick()
-    arguments = resolve(request.get("arguments", {}), results)
-    value = session.command(request["operation"], **arguments)
+    decoded = arguments(request, results)
+    value = session.command(request["operation"], **decoded)
     if "id" in request:
         results[request["id"]] = value
     return {

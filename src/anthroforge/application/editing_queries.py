@@ -1,6 +1,5 @@
 """Current editable component read model shared by desktop and headless clients."""
 
-from hashlib import sha256
 from typing import Any
 
 from anthroforge.core.component_reads import ComponentRead, component_key
@@ -9,7 +8,8 @@ from anthroforge.core.entities import SCP
 from anthroforge.core.tissues import TissueVCP
 
 from . import component_buffers as buffers
-from . import component_tissue, curve_edit_state, curve_sources, query_pages
+from . import component_restrictions, component_tissue, curve_edit_state, curve_sources, query_pages
+from .choice_queries import revision
 from .construction_policy import topology_locks
 from .query_projection import plain
 
@@ -47,6 +47,7 @@ def capture(session: Any, target: Any, category: Any, context: Any) -> Any:
         records,
         tuple(provenance(item, resolved).items()),
         edit_reason(session, item),
+        component_restrictions.weight_binding(session, item, context),
     )
 
 
@@ -56,7 +57,7 @@ def signature(session: Any, target: str, category: str, context: Any) -> str:
         id(session.document),
         query_key(session, target, category, context),
     )
-    return sha256(repr(key).encode()).hexdigest()
+    return revision(session, key)
 
 
 def groups(session: Any, item: Any, category: Any, context: Any) -> Any:
@@ -158,14 +159,14 @@ def page(value: Any, start: Any, end: Any) -> Any:
     preceding = 0
     for group in value.buffers:
         result.extend(
-            component(group, i, value.reason)
+            component(group, i, value.reason, value.weight_binding)
             for i in range(max(0, start - preceding), min(len(group.local), end - preceding))
         )
         preceding += len(group.local)
     return result
 
 
-def component(group: Any, index: Any, reason: Any) -> Any:
+def component(group: Any, index: Any, reason: Any, binding: Any = None) -> Any:
     ref = group.reference(index)
     position_reason = position_restriction(ref, reason)
     return dict(
@@ -176,12 +177,11 @@ def component(group: Any, index: Any, reason: Any) -> Any:
         frame=group.frame,
         position_editable=not position_reason,
         position_reason=position_reason,
-        weight_editable=not reason and ref["part"] == "field",
-        weight_reason=reason,
+        **component_restrictions.weights(ref, binding, reason),
     )
 
 
 def position_restriction(ref: Any, reason: str) -> str:
     if ref["part"] in MEMBERSHIP:
         return reason or "Membership/field point; position editing is unavailable."
-    return reason or ("Generated positions are formula-controlled." if ref.get("readonly") else "")
+    return reason or ref.get("reason", "")

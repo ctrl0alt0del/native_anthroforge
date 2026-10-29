@@ -62,3 +62,13 @@ renders the actual candidate. Packaged runtime still prioritizes its bundled lib
 
 Next: contextual queries and JSON literals; finish A1/A2 edge coverage and full qualification.
 No 0.4.3 release or main merge yet.
+
+Contextual queries and JSON literals implemented: exact preparation/reference tokens qualify
+assembly and skeleton mapping choices; surface-role and skin defaults/effective queries are
+shared with desktop. RFC6901 literal subtrees retain legacy substitutions elsewhere and
+validate paths before command invocation. Component reads now report driven/junction
+restrictions and explicit deformer weights. Latest focused checks: 45 passed; typing passed
+after component bool annotations. Optional prepared skin appears in candidate comparisons.
+
+Remaining qualification: stronger capture/export ownership and Qt-free probes, production
+paging/memory/profile measurements, multi-angle render evidence, full gate and portable build.

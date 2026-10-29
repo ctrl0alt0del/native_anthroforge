@@ -384,6 +384,7 @@ class Session:
 
     def clear_previews(self) -> None:
         self._editing.values.pop("component_read", None)
+        self._editing.values.pop("query_revision", None)
         self.conversion = ConversionPreview()
         self.mesh_replacement = Preview()
         self.tissue_retarget = Preview()

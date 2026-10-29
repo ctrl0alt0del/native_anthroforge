@@ -2,8 +2,8 @@
 
 - Branch: `codex/assembly-live-mirroring`; integration: `main`.
 - Baseline: `395b5b8b`; writer: local direct work.
-- Status: addon policy inspected and shared-target inspection corrected; full-assembly
-  requalification and canonical package checks in progress. Original project untouched.
+- Status: complete and qualified. New project delivered; canonical 0.4.2 package updated.
+  Original project untouched. Validated merge follows the final evidence checkpoint.
 
 ## Authorized outcome
 
@@ -52,7 +52,7 @@ The live counterpart intentionally becomes exact source reflection. No source sh
 
 `tools/qualify_assembly_mirrors.py` verifies reopened source geometry/bindings, then
 Humerus Length 3.1134088, Radius Length 2.5114212, Thumb Metacarpal Thickness 0.0735000
-and Ribs Top Radius 3 against the original file. All source-side geometry and binding
+and Ribs Top Radius 3 against the original file. All source-side geometry (absolute tolerance 1e-8) and retained binding
 comparisons pass, with no task errors. Original SHA256 remains unchanged.
 Single trials: original/mirrored Humerus 2.77/4.41 s, Radius 2.20/3.69 s, Thumb .74/2.21 s,
 Ribs 5.31/8.43 s. These include extra mirror diagnostics; no performance improvement claimed.
@@ -81,13 +81,18 @@ remain for non-shared relationships. Shared supports can still be asymmetric; th
 a surface-contact guarantee. The previous proposal to capture new anchors was withdrawn.
 19 focused tests pass, covering source geometry, shared binding persistence/plane edits,
 missing counterparts and ownership/style limits. Regenerated candidate has 689 mapped
-relationships and no false mismatch rows. All four full-assembly shortcut trials pass again with exact source geometry/bindings and
+relationships and no false mismatch rows. All four full-assembly shortcut trials pass again with source geometry/binding equivalence and
 no task errors. Gate first stopped on a missing Python return-value parameter type; a
-signature-only annotation fixed that, with no runtime behavior change. Full gate rerun pending.
+signature-only annotation fixed that, with no runtime behavior change. Full gate rerun passes.
 
 Canonical 0.4.2 executable built from clean runtime checkpoint `b3d6f898`; subsequent source
-change is a type annotation only. Relocated mirror/Issues and full-assembly checks are running.
-No visible window or desktop input. Development gate is running native style/full tests.
+change is a type annotation only. Relocated mirror/Issues and full-assembly checks passed with minimal PATH and isolated
+preferences. All 563 instances and 689 relationships verified in the delivered executable.
+Hidden front/oblique views visually inspected: 3,711,840 vertices, no warnings, no visible
+window. GUI evidence is hidden/offscreen; physical interactive acceptance is not claimed.
+Full development gate passes 2,763 Python tests, six native CTests, 624-source-file typing,
+style/function limits, numerical import checks and native doctor. No unrelated portable
+workflow rerun is claimed; targeted portable checks cover this correction and the actual file.
 
 Delivery copied, with matching candidate/delivery SHA256:
 `86c08109700bb6e12de807dca8ef93ba37efe33f0a60dc3c2a87a71cc87be554`.
@@ -99,4 +104,9 @@ retained material bindings and Core serialization are untouched. Migration reuse
 typed reference inspection, selective resource saving and source provider reflection. No new
 mirror worker, graph duplication, numerical approximation or opposite-side driver chains.
 
-Next: finish gate/relocated checks, inspect packaged captures, update source archive and merge.
+Evidence: `build/assembly-live-mirroring/development-gate.log`, `portable-result.json`,
+`portable/checks/assembly-check.jsonl`, `front-packaged.png`, `oblique-packaged.png`, and
+`remaining-deleted-references.json` (empty). Source and delivery hashes rechecked after
+packaged reopen; unchanged. Final runtime correction is `b3d6f898`; `30e37b12` adds only
+Python typing and delivery context. Refresh the canonical source archive after this record.
+No pending implementation, geometry migration or required qualification remains.

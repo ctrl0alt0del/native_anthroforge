@@ -1,5 +1,11 @@
 # AnthroForge release roadmap
 
+- **0.5.0 — Muscle Paint, confirmed; not implemented:** directional/perimeter painting
+  on SCPs, explicit generation of editable Fibers/Membranes, existing branches, gap-depth
+  controls and temporary painting history. See the [product contract](specification_050.md)
+  and [initial methods research](muscle_paint_050_research.md). No algorithm is qualified,
+  implementation plan finalized or release version changed by this documentation.
+
 - **0.4.3 — qualified authoring parity A1–A4:** shared current
   components, immutable candidate images/data, compatible choices/effective settings and
   literal JSON strings. [Contract](authoring_043.md), [evidence](tasks/authoring-fixes-043.md).

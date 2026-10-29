@@ -2,7 +2,16 @@
 
 This is a reading list, not a record of qualified production algorithms. Implemented
 calculations and changes belong in [computation history](computation_history.md).
-Last checked: 2026-10-21.
+Muscle Paint references checked: 2026-10-29. Tissue reading-list review: 2026-10-21.
+
+## Muscle Paint: strokes to editable Fibers and Membranes
+
+See the [0.5.0 product contract](specification_050.md) and
+[method/capability review](muscle_paint_050_research.md). The review inventories the addon's
+sparse layout and native smooth-base fitter, compares SurfaceBrush, StrokeStrip, SecondSkin,
+line fields, constrained fitting and bounded-error geometry checks, and proposes experiments.
+These are research candidates, not implemented or qualified algorithms. The first comparison
+should fit the actual native loft; no new reconstruction dependency is selected.
 
 ## Pixar research library
 

@@ -3,7 +3,7 @@
 - Task branch: `codex/muscle-paint-050-research`
 - Integration branch: `main`
 - Starting revision: `d03db662df92b4730148c665c013db3a0b48bea1`
-- Status: in progress
+- Status: documentation/research complete; validated, ready to integrate
 - Last updated: 2026-10-29, Europe/Bucharest
 - Active writer: local documentation/research session
 
@@ -19,27 +19,48 @@ discriminating experiments rather than unsupported success claims.
 
 - [Product specification](../specification_050.md) owns confirmed behavior, including
   session-only paint, explicit generation, existing branches and advisory penetration.
-- Research will distinguish inspected existing code, published evidence and untested
-  applicability to AnthroForge. Native numerical work remains required.
+- [Initial research](../muscle_paint_050_research.md) distinguishes inspected existing code,
+  published evidence and untested applicability. Native numerical work remains required.
 - Isolated checkout: `E:/development/anthroforge/build/muscle-paint-050-docs`.
   The primary checkout has unrelated unfinished muscle-assembly work; leave it intact.
 
 ## Current state
 
-Confirmed requirements consolidated. Research has identified the addon sparse layout
-planner and native smooth-base fitter plus relevant sketch-surfacing literature.
-Detailed method comparison, source verification and integration links remain in progress.
+Confirmed requirements consolidated with superseded proposals explicitly replaced.
+Initial research compares the sparse layout planner, native smooth-base fitter, existing
+standalone drawing/painting/loft boundaries and primary literature. It proposes seven
+discriminating experiments and separates observed capabilities from untested applicability.
+Roadmap, recommendations and research index link the new documents. No final algorithm,
+new dependency or implementation plan is selected; no runtime changes are included.
 
 ## Verification
 
-Read standalone guidelines/work continuity and inspected repository state. No numerical,
-GUI, performance or build checks run or claimed. Documentation-only validation is pending.
+Read standalone guidelines/work continuity and reviewed the consolidated product contract
+against the interview corrections: explicit generation, temporary paint/no extra close
+warning, independent stroke undo, discard triggers, existing branches, explicit closure,
+depth filtering and advisory penetration. Ownership/coupling review keeps paint state,
+native reconstruction, shared attachment policies and publication responsibilities separate.
+
+On Windows, using `E:/development/anthroforge/.venv/Scripts/python.exe`:
+
+- Checked every relative Markdown link in the specification, research and task record:
+  no missing targets. Checked the three index additions against the same files.
+- Checked all 19 full addon source paths cited in code formatting: present.
+- Checked the six recorded SHA-256 values have 64 hexadecimal characters and recorded
+  them from `Get-FileHash`; local addon document modifications are explicitly disclosed.
+- `git diff --check`: passed. Primary-source URLs were opened through web research;
+  the working PIQP documentation URL replaces the inaccessible short domain.
+
+No numerical, GUI, performance, full development-gate or packaging checks run or claimed.
+This is documentation-only acceptance, not qualification of Muscle Paint.
 
 ## Next actions and blockers
 
-1. Complete primary-source research and capability/limitation inventory.
-2. Check decision coverage and links; update roadmap/research index.
-3. Commit/push and merge validated documentation while preserving unrelated work.
+1. Merge/push validated documentation into main, preserving unrelated work.
+2. For subsequent research, begin E1 against the actual standalone loft, then grouping
+   and gaps before branches/closed loops. Experiments are proposed, not executed here.
+3. Design an implementation plan only after evidence resolves the algorithmic gaps;
+   do not silently relax confirmed product policies to accommodate a candidate method.
 
 ## Recovery inputs
 

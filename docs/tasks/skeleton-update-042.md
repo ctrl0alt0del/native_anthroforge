@@ -1,10 +1,11 @@
 # Whole-skeleton updates — 0.4.2
 
-- Status: **Complete and qualified; validated integration follows this record.**
+- Status: **Complete, qualified and merged into main.**
 - Task branch: `codex/skeleton-update-042`
 - Integration branch: `main`
 - Starting revision: `5ed212a`
 - Runtime checkpoint: `c8ca02d` (later edits are documentation only)
+- Validated integration: `7b76336`; no concurrent main changes required reconciliation.
 - Writer/reviewer: local desktop Codex; no independent agent review claimed
 - Date: 2026-10-29, Europe/Bucharest
 

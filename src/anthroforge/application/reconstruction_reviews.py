@@ -19,7 +19,15 @@ def signature(session: Any, subject: str, variant: str, stage: str) -> str:
     document = records.scene(session, variant)
     row = next((s for s in records.state(session).stages if s.id == stage), None)
     if row:
+        if row.subject != subject or row.variant != variant:
+            raise ValueError("Stage does not belong to this subject and variant.")
         return hashlib.sha256(repr(row).encode()).hexdigest()
+    if stage not in ("geometry", "base", "rest", "intrinsic", "final", "fibers"):
+        raise ValueError("Choose an available reconstruction stage.")
+    return live_signature(document, subject, stage)
+
+
+def live_signature(document: Any, subject: str, stage: str) -> str:
     item = document.registry.anatomy.get(subject)
     if item is None:
         return "unavailable"
@@ -38,6 +46,8 @@ def decide(session: Any, subject: str, dimension: str, **options: Any) -> str:
     stamp = signature(session, subject, variant, stage)
     row = Review(subject, dimension, stamp, **options)
     validate(row)
+    for key in row.evidence:
+        records.selected(session, "evidence", key)
     return str(records.upsert(session, "reviews", row))
 
 

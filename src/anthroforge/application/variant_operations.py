@@ -73,16 +73,8 @@ def select(session: Any, variant: str = "") -> dict[str, Any]:
             raise ValueError("Fork a checkpoint before editing it.")
         if variant not in session.contexts.states:
             session.contexts.add(variant, state(session).snapshot(record.current))
-        restrict(session, record)
     session.contexts.select(variant)
     return inspect(session)
-
-
-def restrict(session: Any, record: Variant) -> None:
-    baseline = state(session).snapshot(record.baseline)
-    pinned = frozenset(baseline.registry.records) - frozenset(record.editable)
-    with session.contexts.use(record.id):
-        session.editing_restrictions = pinned
 
 
 def inspect(session: Any, variant: str = "") -> dict[str, Any]:
@@ -110,12 +102,21 @@ def fork(session: Any, variant: str, name: str = "", enter: bool = True) -> dict
     require_idle(session)
     value = state(session)
     source = value.variant(variant)
-    snapshot = SceneSnapshot(value.snapshot(source.current))
+    snapshot, source = fork_snapshot(session, value.snapshot(source.current), source)
     record = continued(source, snapshot, name, False)
     append(session, value, record, (snapshot,))
     if enter:
         select(session, record.id)
     return asdict(record)
+
+
+def fork_snapshot(session: Any, document: Any, source: Variant) -> tuple[SceneSnapshot, Variant]:
+    if document.editing_scope is None:
+        document, owned, mapping = variant_graph.duplicate(
+            document, session.resources, list(source.subjects)
+        )
+        source = replace(source, editable=owned, construction_map=mapping)
+    return SceneSnapshot(document), source
 
 
 def continued(source: Any, snapshot: Any, name: str, checkpoint: bool) -> Any:

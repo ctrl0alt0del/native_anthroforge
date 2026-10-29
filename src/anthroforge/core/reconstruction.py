@@ -15,6 +15,12 @@ def identity() -> str:
 
 
 @dataclass(frozen=True, slots=True)
+class EditingScope:
+    editable: frozenset[str] = frozenset()
+    pinned: frozenset[str] = frozenset()
+
+
+@dataclass(frozen=True, slots=True)
 class SceneSnapshot:
     scene: "Document"
     id: str = field(default_factory=identity)
@@ -90,6 +96,15 @@ class ReconstructionStage:
 
 
 @dataclass(frozen=True, slots=True)
+class ReviewEvidence:
+    name: str
+    resource: str
+    digest: str
+    media_type: str
+    id: str = field(default_factory=identity)
+
+
+@dataclass(frozen=True, slots=True)
 class Review:
     subject: str
     dimension: str
@@ -114,6 +129,7 @@ class ReconstructionWork:
     approach: str = ""
     checkpoint: str = ""
     id: str = field(default_factory=identity)
+    variant: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -127,6 +143,7 @@ class Reconstruction:
     stages: tuple[ReconstructionStage, ...] = ()
     reviews: tuple[Review, ...] = ()
     work: tuple[ReconstructionWork, ...] = ()
+    evidence: tuple[ReviewEvidence, ...] = ()
 
     def variant(self, key: str) -> Variant:
         return cast(Variant, next_record(self.variants, key, "variant"))

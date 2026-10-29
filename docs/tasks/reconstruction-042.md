@@ -39,7 +39,7 @@ allocated a fresh projection each pass. Both causes fixed; focused driver/import
 variant/architecture suite now 27 passed. Broad rerun: 2733 passed, 2 failed solely on schema8
 assertions, updated to9. This run preceded newest catalogue/UI additions. Variant review tests5
 passed (one Undo/checkpoint, explicit conflicts, stale preparation, tissue source sharing and support
-refresh). Catalogue tests4 pass. Hidden GPU panel and promotion window render without QML warnings
+refresh). Catalogue tests4 pass. Embedded reference/evidence import and frozen comparison tests3 pass; UI and export integration remain unfinished. Hidden GPU panel and promotion window render without QML warnings
 or visible windows; comparison framing is too close for narrow split views and needs correction.
 
 ## Next actions
@@ -55,3 +55,13 @@ Native: C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native.
 Production: E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge.
 Keep byproducts under ignored build/reconstruction-042. See tools/skeleton_update_* for
 maintained production/hidden-render qualification infrastructure.
+
+## Current checkpoint
+
+Explicit persisted EditingScope separates editable variant records from refreshed external supports.
+Catalogue, independent review and resumable queue desktop pages are added; hidden-page verification
+is pending. Immutable stage/evidence imports run through shared authored jobs and embed resources.
+Frozen stage comparisons use existing native distance/section queries, without invented material
+lineage. Focused variant/catalogue/desktop/architecture checks16 pass; embedded import/undo/save/
+comparison checks3 pass. Full assembly, stages UI/export, assembly metadata transfer, lifecycle
+review and release checks still required.

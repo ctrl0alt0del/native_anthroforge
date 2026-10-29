@@ -12,6 +12,8 @@ GROUPS = ("entities", "objects", "controls", "junctions", "shortcuts", "driving_
 
 
 def scope(record: Any, baseline: Any, current: Any) -> set[str]:
+    if current.editing_scope is not None:
+        return set(current.editing_scope.editable)
     owned = set(record.editable) | set(dict(record.construction_map).values())
     for group in GROUPS:
         previous = {identity(v) for v in getattr(baseline, group)}
@@ -96,4 +98,12 @@ def refreshed(record: Any, baseline: Any, current: Any, accepted: Any) -> Any:
         rows = {identity(v): v for v in getattr(accepted, group) if identity(v) not in owned}
         rows.update({identity(v): v for v in getattr(current, group) if identity(v) in owned})
         changes[group] = tuple(rows.values())
+    changes["editing_scope"] = refreshed_scope(current, accepted, owned)
+    changes["formula_results"] = retained_results(current, accepted, changes["driving_shortcuts"])
     return replace(current, **changes)
+
+
+def refreshed_scope(current: Any, accepted: Any, owned: Any) -> Any:
+    from anthroforge.core.reconstruction import EditingScope
+
+    return EditingScope(frozenset(owned), frozenset(accepted.registry.records) - owned)

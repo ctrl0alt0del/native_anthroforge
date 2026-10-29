@@ -99,6 +99,7 @@ class EditingContexts:
                 self.session.assembly.cancel()
                 self.session.skeleton_update.cancel()
                 self.session.variant_review.cancel()
+                self.session.reconstruction_comparison.cancel()
                 self.session.shortcut_comparison.clear()
                 self.session.issues.close()
                 self.session.clear_previews()
@@ -135,7 +136,6 @@ def initial_values(document: Document) -> dict[str, Any]:
         changes=ChangeJournal(),
         formula_write_authority=frozenset(),
         formula_observing=False,
-        editing_restrictions=frozenset(),
         active_workspace=0,
         replay_callback=None,
     )

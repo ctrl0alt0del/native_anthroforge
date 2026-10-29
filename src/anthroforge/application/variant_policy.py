@@ -2,9 +2,26 @@
 
 from typing import Any
 
+from dataclasses import replace
+
 
 def allowed(session: Any, target: str) -> bool:
     return target not in session.editing_restrictions
+
+
+def retain_scope(before: Any, after: Any) -> Any:
+    if before.editing_scope is None or after.editing_scope is not before.editing_scope:
+        return after
+    from .skeleton_graph import identity
+    from .variant_reconciliation import GROUPS
+
+    added = set()
+    for group in GROUPS:
+        old, new = getattr(before, group), getattr(after, group)
+        if old is not new:
+            added |= {identity(v) for v in new} - {identity(v) for v in old}
+    scope = replace(before.editing_scope, editable=before.editing_scope.editable | added)
+    return replace(after, editing_scope=scope) if scope != after.editing_scope else after
 
 
 def require(session: Any, target: str) -> None:

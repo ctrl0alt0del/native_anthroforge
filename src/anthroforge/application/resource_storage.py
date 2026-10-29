@@ -36,6 +36,7 @@ def describe(resources: Resources) -> dict[str, Any]:
         "attachments": attachment_storage.describe(resources.attachments),
         "bindings": list(resources.bindings),
         "skin_assets": skin_storage.describe(resources.skin),
+        "evidence_assets": list(resources.evidence),
     }
 
 
@@ -62,6 +63,8 @@ def read_array(archive: zipfile.ZipFile, name: str) -> Any:
 
 def write(archive: zipfile.ZipFile, resources: Resources) -> None:
     skin_storage.write(archive, resources.skin)
+    for key, data in resources.evidence.items():
+        archive.writestr(f"evidence/{key}", data)
     for key, asset in resources.meshes.items():
         write_mesh(archive, key, asset)
     for key, curve in resources.paths.items():
@@ -178,7 +181,8 @@ def read(archive: zipfile.ZipFile, data: Any, engine: GeometryEngine) -> Resourc
     }
     bindings = read_bindings(archive, data.get("bindings", ()))
     skin = skin_storage.read(archive, data.get("skin_assets", {}))
-    return Resources(meshes, curves, images, attachments, bindings, skin)
+    evidence = {key: archive.read(f"evidence/{key}") for key in data.get("evidence_assets", ())}
+    return Resources(meshes, curves, images, attachments, bindings, skin, evidence)
 
 
 def read_bindings(archive: zipfile.ZipFile, keys: Any) -> dict[str, BindingBatch]:

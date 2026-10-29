@@ -28,6 +28,7 @@ class SkeletonScene(QObject):
         self.camera = [0.0, 0.0, 0.0, -18.0, 25.0, 8.0]
         self.mode, self.selection, self.picking = "Split", "", [None, None]
         self.marker_rows = []
+        self.viewports, self.framed_span = {}, 0.0
         for index, model in enumerate(self.models):
             model.activated.connect(lambda i=index: self.prepare_picking(i))
 
@@ -148,7 +149,17 @@ class SkeletonScene(QObject):
         )
         center = [(bounds[i] + bounds[i + 3]) * 0.5 for i in range(3)]
         span = max(bounds[i + 3] - bounds[i] for i in range(3))
-        self.camera = [*center, *self.camera[3:5], max(0.01, span * 1.8)]
+        self.framed_span = span
+        self.camera = [*center, *self.camera[3:5], self.fit_distance()]
+
+    def fit_distance(self):
+        aspect = min(self.viewports.values(), default=1.0)
+        return max(0.01, self.framed_span * 2.2 / min(1.0, aspect))
+
+    @Slot(int, float, float)
+    def viewport(self, side, width, height):
+        if width > 0 and height > 0:
+            self.viewports[side] = width / height
 
     def prepare_picking(self, index):
         self.picking[index] = comparison_picking.capture(self.models[index])

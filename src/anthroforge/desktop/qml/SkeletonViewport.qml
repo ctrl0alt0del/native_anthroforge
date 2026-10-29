@@ -8,6 +8,9 @@ Item {
     property int side: 1
     property bool overlay: false
     readonly property var cameraState: service.state.camera
+    Component.onCompleted: service.viewport(side,width,height)
+    onWidthChanged: service.viewport(side,width,height)
+    onHeightChanged: service.viewport(side,width,height)
     View3D {
         id: view; anchors.fill: parent; camera: camera
         environment: SceneEnvironment { clearColor: "#25282d"; backgroundMode: SceneEnvironment.Color; antialiasingMode: SceneEnvironment.MSAA }

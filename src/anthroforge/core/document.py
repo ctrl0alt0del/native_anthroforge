@@ -10,7 +10,7 @@ from .document_index import DocumentIndex, build
 from .entities import SCP, Workspace
 from .junctions import Junction
 from .mirror_resolution import MirrorIndex
-from .reconstruction import Reconstruction
+from .reconstruction import EditingScope, Reconstruction
 from .mirroring import MirrorRule, SharedMirrorTarget
 from .shortcut_edits import ShortcutEdit
 from .shortcuts import DrivingShortcut, FormulaResult, Shortcut
@@ -41,6 +41,7 @@ class Document:
     imports: tuple[ImportProvenance, ...] = ()
     external_references: tuple[ExternalReference, ...] = ()
     reconstruction: Reconstruction = field(default_factory=Reconstruction)
+    editing_scope: EditingScope | None = None
     _mirrors: MirrorIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _index: DocumentIndex | None = field(default=None, repr=False, compare=False, kw_only=True)
     _registry: object_registry.ObjectRegistry | None = field(

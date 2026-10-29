@@ -14,8 +14,21 @@ RECORDS = dict(
     stages=model.ReconstructionStage,
     reviews=model.Review,
     work=model.ReconstructionWork,
+    evidence=model.ReviewEvidence,
 )
 TUPLES = frozenset(("subjects", "editable", "aliases", "members", "triangles", "frame", "evidence"))
+
+
+def encode_scope(value: Any) -> Any:
+    return dict(editable=sorted(value.editable), pinned=sorted(value.pinned)) if value else None
+
+
+def decode_scope(value: Any) -> Any:
+    return (
+        model.EditingScope(frozenset(value["editable"]), frozenset(value["pinned"]))
+        if value
+        else None
+    )
 
 
 def encode(value: model.Reconstruction) -> dict[str, Any]:

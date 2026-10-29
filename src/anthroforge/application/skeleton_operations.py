@@ -4,7 +4,15 @@ from typing import Any
 
 from anthroforge.core.skeleton_update import require_review
 
-PUBLICATION_FIELDS = ("skin", "shortcut_order", "_index", "_registry", "_mirrors", "_formulas")
+PUBLICATION_FIELDS = (
+    "skin",
+    "shortcut_order",
+    "editing_scope",
+    "_index",
+    "_registry",
+    "_mirrors",
+    "_formulas",
+)
 
 
 def apply(session: Any, token: str, approved: list[str] | None = None) -> dict[str, Any]:

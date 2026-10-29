@@ -32,6 +32,7 @@ class Resources:
     attachments: dict[str, AttachmentAsset] = field(default_factory=dict)
     bindings: dict[str, BindingBatch] = field(default_factory=dict)
     skin: dict[str, SkinAsset] = field(default_factory=dict)
+    evidence: dict[str, bytes] = field(default_factory=dict)
 
     def snapshot(self) -> "Resources":
         return Resources(
@@ -41,6 +42,7 @@ class Resources:
             dict(self.attachments),
             dict(self.bindings),
             dict(self.skin),
+            dict(self.evidence),
         )
 
     def selected(self, document: Document) -> "Resources":

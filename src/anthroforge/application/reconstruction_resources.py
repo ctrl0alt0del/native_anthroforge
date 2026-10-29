@@ -7,6 +7,7 @@ def retain(document: Any, groups: dict[str, set[str]]) -> None:
     from .resources import referenced
 
     state = document.reconstruction
+    groups.setdefault("evidence", set()).update(row.resource for row in state.evidence)
     groups["meshes"].update(row.asset for row in (*state.stages, *state.regions) if row.asset)
     for snapshot in state.snapshots:
         for kind, keys in referenced(snapshot.scene).items():

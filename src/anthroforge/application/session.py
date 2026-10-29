@@ -31,6 +31,7 @@ from .resources import Resources
 from .surface_preview import Candidate
 from .tissue_preview import Candidate as TissueCandidate
 from .variant_policy import require as require_variant_edit
+from .variant_policy import retain_scope
 
 
 class Session:
@@ -40,7 +41,6 @@ class Session:
     active_workspace = ContextField[int]("active_workspace")
     formula_write_authority = ContextField[frozenset[str]]("formula_write_authority")
     formula_reference_authority = ContextField[frozenset[str]]("formula_reference_authority")
-    editing_restrictions = ContextField[frozenset[str]]("editing_restrictions")
     formula_observing = ContextField[bool]("formula_observing")
     replay_callback = ContextField[Any]("replay_callback")
     issues = ContextField[Any]("issues")
@@ -48,6 +48,7 @@ class Session:
     assembly = ContextField[Any]("assembly")
     skeleton_update = ContextField[Any]("skeleton_update")
     variant_review = ContextField[Any]("variant_review")
+    reconstruction_comparison = ContextField[Any]("reconstruction_comparison")
     shortcut_edits = ContextField[Any]("shortcut_edits")
     formula_invalidation = ContextField[Any]("formula_invalidation")
     shortcut_observation = ContextField[Any]("shortcut_observation")
@@ -91,7 +92,6 @@ class Session:
         self.saved_revision = 0
         self.formula_write_authority = frozenset()
         self.formula_observing = False
-        self.editing_restrictions = frozenset()
         self.active_workspace = 0
         self.waiting_save = False
         self.replay_callback = None
@@ -141,6 +141,7 @@ class Session:
             self.issues.reset()
 
     def initialize_project_preparation(self) -> None:
+        from .reconstruction_comparison import Comparison
         from .assembly_runtime import Assembly
         from .skeleton_runtime import SkeletonUpdate
         from .variant_review import VariantReview
@@ -148,6 +149,7 @@ class Session:
         self.assembly = Assembly(self)
         self.skeleton_update = SkeletonUpdate(self)
         self.variant_review = VariantReview(self)
+        self.reconstruction_comparison = Comparison(self)
 
     def attach_shortcut_contexts(self) -> None:
         from .formula_invalidation import FormulaInvalidation
@@ -213,12 +215,18 @@ class Session:
         before = self.document
         self.serial += 1
         updated = replace(self.document, revision=self.serial, **retain_settings(before, changes))
+        updated = retain_scope(before, updated)
         require_mirror_transition(before, updated)
         contexts = superseded(self, before, updated)
         if contexts != updated.shortcut_edits:
             updated = replace(updated, shortcut_edits=contexts)
         require_changes(self, before, updated)
         return updated
+
+    @property
+    def editing_restrictions(self) -> frozenset[str]:
+        scope = self.document.editing_scope
+        return scope.pinned - scope.editable if scope else frozenset()
 
     def observe_replacement(
         self, before: Document, accepted_outputs: frozenset[Port] = frozenset()

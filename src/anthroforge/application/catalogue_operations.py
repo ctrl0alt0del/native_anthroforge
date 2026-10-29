@@ -55,6 +55,23 @@ def assignment(session: Any, target: str, type_id: str, side: str, label: str) -
     return (AnatomicalAssignment(target, type_id, side, label),)
 
 
+def assign_many(session: Any, targets: list[str], **options: Any) -> None:
+    type_id, side = options.get("type_id", ""), options.get("side", "UNSPECIFIED")
+    validate_assignment_targets(session, targets, side, options.get("variant", ""))
+    if type_id:
+        records.selected(session, "types", type_id)
+    rows = tuple(r for r in records.state(session).assignments if r.target not in targets)
+    added = tuple(AnatomicalAssignment(k, type_id, side) for k in dict.fromkeys(targets))
+    records.install(session, assignments=rows + (added if type_id else ()))
+
+
+def validate_assignment_targets(session: Any, targets: Any, side: str, variant: str) -> None:
+    if side not in SIDES:
+        raise ValueError("Invalid instance side.")
+    for key in targets:
+        records.subject(session, key, variant)
+
+
 def collection(session: Any, name: str, members: Any = (), collection: str = "") -> str:
     require_members(session, members)
     row = collection_row(session, name, collection)
@@ -103,6 +120,7 @@ def operations() -> dict[str, Any]:
         "type.update": update_type,
         "type.remove": remove_type,
         "assign": assign,
+        "assign_many": assign_many,
         "collection.set": collection,
         "region.set": reconstruction_regions.set_region,
         "region.inspect": reconstruction_regions.inspect,

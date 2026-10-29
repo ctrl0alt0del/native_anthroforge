@@ -15,13 +15,20 @@ def add(
     session: Any, subject: str, type_id: str = "", variant: str = "", next_action: str = ""
 ) -> str:
     records.subject(session, subject, variant)
+    type_id = type_id or assigned_type(session, subject)
     if type_id:
         records.selected(session, "types", type_id)
     return str(
         records.upsert(
-            session, "work", ReconstructionWork(subject, type_id, next_action=next_action)
+            session,
+            "work",
+            ReconstructionWork(subject, type_id, next_action=next_action, variant=variant),
         )
     )
+
+
+def assigned_type(session: Any, subject: str) -> str:
+    return next((r.type_id for r in records.state(session).assignments if r.target == subject), "")
 
 
 def scope(row: Any) -> str:
@@ -86,7 +93,17 @@ def validate(session: Any, row: Any) -> None:
 
 
 def inspect(session: Any) -> dict[str, Any]:
-    return dict(statuses=STATUSES, work=[asdict(row) for row in records.state(session).work])
+    return dict(
+        statuses=STATUSES, work=[describe(session, row) for row in records.state(session).work]
+    )
+
+
+def describe(session: Any, row: Any) -> dict[str, Any]:
+    try:
+        name = records.subject(session, row.subject, row.variant).name
+    except ValueError:
+        name = "Unavailable anatomy"
+    return dict(asdict(row), name=name)
 
 
 def execute(session: Any, operation: str, arguments: Any) -> Any:

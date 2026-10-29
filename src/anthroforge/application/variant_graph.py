@@ -4,6 +4,8 @@ from dataclasses import replace
 from typing import Any
 from uuid import uuid4
 
+from anthroforge.core.reconstruction import EditingScope
+
 from . import assembly_copy, assembly_graph, assembly_resources, assembly_selection
 from .editing_contexts import bare
 from .resources import references
@@ -28,12 +30,17 @@ def duplicate(document: Any, resources: Any, subjects: list[str]) -> Any:
     assets = copied_metadata(document, resources, picked, ids)
     values = assembly_copy.additions(document, picked, ids, assets)
     drivers(document, picked, values, ids)
-    changes: dict[str, Any] = {
-        key: merge_records(getattr(document, key), rows) for key, rows in values.items()
-    }
-    copied = replace(bare(document), **changes)
+    changes = merged_groups(document, values)
     editable = tuple(sorted(ids[key] for key in picked.records))
+    scope = EditingScope(
+        frozenset(ids.values()), frozenset(document.registry.records) - set(editable)
+    )
+    copied = replace(bare(document), editing_scope=scope, **changes)
     return copied, editable, tuple(sorted(ids.items()))
+
+
+def merged_groups(document: Any, values: Any) -> dict[str, Any]:
+    return {key: merge_records(getattr(document, key), rows) for key, rows in values.items()}
 
 
 def copied_metadata(document: Any, resources: Any, selection: Any, ids: Any) -> dict[str, str]:

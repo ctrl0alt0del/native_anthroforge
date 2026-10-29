@@ -99,6 +99,7 @@ def document_state(document: Document) -> dict[str, Any]:
     state["objects"] = [object_codec.encode(value) for value in document.objects]
     state["skin"] = asdict(document.skin)
     state["reconstruction"] = reconstruction_codec.encode(document.reconstruction)
+    state["editing_scope"] = reconstruction_codec.encode_scope(document.editing_scope)
     state["mirror_accepted"] = snapshot(document)
     return state
 
@@ -203,6 +204,7 @@ def restored_document(data: dict[str, Any]) -> Document:
     data.pop("mirror_accepted", None)
     data["skin"] = skin_codec.decode(data.get("skin"))
     data["reconstruction"] = reconstruction_codec.decode(data.get("reconstruction"))
+    data["editing_scope"] = reconstruction_codec.decode_scope(data.get("editing_scope"))
     assembly = assembly_codec.decode(data)
     return Document(**(data | shortcut_codec.document_fields(data) | mirrors | assembly))
 

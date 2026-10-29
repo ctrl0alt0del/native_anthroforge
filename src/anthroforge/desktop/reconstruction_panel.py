@@ -13,6 +13,16 @@ class ReconstructionPanel(QObject):
         self.controller = controller
         self._open, self._floating = False, False
         self._signature, self._data = None, "{}"
+        self._page = "Variants"
+
+    @Property(str, notify=changed)
+    def page(self):
+        return self._page
+
+    @Slot(str)
+    def setPage(self, page):
+        self._page, self._signature = page, None
+        self.synchronize()
 
     @Property(str, notify=changed)
     def dataJson(self):
@@ -40,12 +50,44 @@ class ReconstructionPanel(QObject):
     def synchronize(self):
         session = self.controller.session
         root = session.contexts.scene("")
-        signature = (id(root.reconstruction), session.contexts.visible)
+        signature = (id(root.reconstruction), session.contexts.visible, self._page)
+        if self._page == "Reviews":
+            signature += (id(session.document), id(root))
         if signature == self._signature:
             return
         self._signature = signature
-        self._data = json.dumps(session.command("variant.inspect"))
+        self._data = json.dumps(self.projection())
         self.changed.emit()
+
+    def projection(self):
+        session = self.controller.session
+        result = session.command("variant.inspect")
+        commands = {
+            "Catalogue": "catalogue.inspect",
+            "Reviews": "review.inspect",
+            "Queue": "reconstruction.queue.inspect",
+        }
+        if self._page in commands:
+            result["detail"] = session.command(commands[self._page])
+        return result
+
+    @Slot(str, str)
+    def assignSelection(self, type_id, side):
+        self.run(
+            "catalogue.assign_many",
+            dict(
+                targets=self.controller.selectedObjects,
+                type_id=type_id,
+                side=side,
+                variant=self.controller.session.contexts.visible,
+            ),
+        )
+
+    @Slot("QVariantList")
+    def selectMembers(self, identities):
+        session = self.controller.session
+        selected = [key for key in identities if key in session.document.registry.records]
+        self.controller.selectObjects(selected)
 
     @Slot()
     def create(self):

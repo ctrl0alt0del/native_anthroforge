@@ -1,7 +1,7 @@
 # Whole-skeleton updates — 0.4.2
 
-Status: **Confirmed contract; implementation in progress.** This document does not claim
-qualification. [Task and evidence](tasks/skeleton-update-042.md).
+Status: **Implemented and qualified in 0.4.2.**
+[Task and evidence](tasks/skeleton-update-042.md).
 
 ## Product contract
 
@@ -60,9 +60,23 @@ and worker pool. Complete read validation includes automatic dependency membersh
 edits obsolete candidates; unrelated edits can survive. No live-document preview mutation.
 At Apply coordinate writers and publish prepared results without unnecessary reevaluation.
 
-Planned API: `skeleton_update.inspect`, `.prepare`, `.status`, `.cancel`, `.apply`.
+Shared API: `skeleton_update.inspect`, `.prepare`, `.status`, `.cancel`, `.apply`.
 Desktop and Qt-free headless clients share policy/transactions; status supports waiting.
 Keep schema 8 using ordinary records and existing provenance; sessions/previews are transient.
+
+### Relationship and resource inventory
+
+| Family | Replacement ownership and qualification boundary |
+| --- | --- |
+| SCP definitions, pose and geometry | Preserve destination identity/hierarchy/presentation; replace source construction/world placement. Review recapture; retain canonical saved meshes when equivalent. |
+| Curves, paths and consumer sampling | Typed independent copies retain within-candidate sharing; unrelated destination consumers keep their original sources. Parametric definitions and accepted paths follow normal copy adapters. |
+| Hooks, lattices, deformers and junctions | Copy required controls/membership once; resolve external following/parenting explicitly. Shared-junction correction follows its designated source. |
+| Fibers, Anchors and constraints | Destination records remain; compatible material references persist. Reviewed incompatible captures use ordinary exterior/current-shape services. Capture assets are owned resources. |
+| Membranes and tissues | Destination source references, crop/material data, fields, intrinsic/final stages and stacking dependencies evaluate through existing adapters. Source tissues are excluded. |
+| Shortcuts/formulas | Retain destination wrappers and typed targets; explicit remap/disable/value authority. Include required construction formulas, never unrelated source shortcut UI. |
+| Mirrors | Preserve destination rules/identities and reflect source output through existing providers. No independently evaluated mirror geometry. |
+| Mesh/path/capture/tissue/skin resources | Snapshot leases during preparation, selected publication resources at commit, normal history/checkpoint/display ownership. No source filename dependency afterward. |
+| Skin, fitted solutions and workspace | Retain destination state. Report compatibility; optional compatible skin deformation only. No source skin, fits, cameras, workspace/history or running jobs. |
 
 ## Delivery and acceptance
 

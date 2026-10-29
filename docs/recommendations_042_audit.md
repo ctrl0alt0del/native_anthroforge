@@ -4,7 +4,9 @@ Status: **coverage audit complete; R01–R03 and R06 extensions delivered in 0.4
 R09/R11 and R13 are qualified. The [assembly contract](assembly_042.md) has passed production
 comparisons and complete release checks; see [delivery](tasks/assembly-042.md).
 The historical R13 gap below describes the audited baseline, not the current application.
-R14–R17 remain separate.
+R14 whole-skeleton updates are implemented and qualified; see the
+[contract](skeleton_update_042.md) and [qualification record](tasks/skeleton-update-042.md).
+R15–R17 remain separate. The R14 row likewise preserves its historical audited baseline.
 The table below preserves the pre-implementation audit. See [delivery](inspection_042.md)
 and [current validation](tasks/inspection-workflows-042.md) for implemented extensions and limits.
 Audited on 2026-10-28 against 0.4.1, commit

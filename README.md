@@ -10,6 +10,11 @@ from another project. Map external supports explicitly, review any requested reb
 repairable missing references. Copies are independent; the source stays unchanged. See the
 [assembly walkthrough](docs/assembly_042.md). Projects now save schema 8 and read schemas 4–8.
 
+**File → Update Skeleton from Project…** compares replacement bones while preserving existing
+SCP identities, names, hierarchy and compatible controls. Review attachment/driver decisions
+and dependent anatomy in synchronized views, then apply the prepared result with one Undo.
+See [skeleton updates](docs/skeleton_update_042.md). Source projects remain unchanged.
+
 0.4.1 completes the skin audit: draft-based deformation references, retained solver and
 geometry diagnostics, achieved topology budgets, persistent FAST weights, effective
 inherited values, Reset defaults and moving-region fit summaries. These corrections

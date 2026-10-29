@@ -1,128 +1,86 @@
 # Whole-skeleton updates — 0.4.2
 
+- Status: **Complete and qualified; validated integration follows this record.**
 - Task branch: `codex/skeleton-update-042`
 - Integration branch: `main`
 - Starting revision: `5ed212a`
-- Status: in progress; implementation and qualification pending
-- Active writer: local desktop Codex
-- Last updated: 2026-10-29, Europe/Bucharest
+- Runtime checkpoint: `c8ca02d` (later edits are documentation only)
+- Writer/reviewer: local desktop Codex; no independent agent review claimed
+- Date: 2026-10-29, Europe/Bucharest
 
-## Outcome and decisions
+## Delivered behavior
 
-Implement the user-approved [whole-skeleton update contract](../skeleton_update_042.md).
-Replace matched SCP construction/placement while preserving destination identities,
-hierarchy, compatible controls, mirror rules and update modes. Independently copy required
-construction; explicitly add unmatched source bones. Keep destination unmatched definitions.
-Prepare and evaluate dependents in isolation, review incompatible bindings and newly failed
-dependents, then commit once with Undo. Existing numerical algorithms remain unchanged.
+[Confirmed contract](../skeleton_update_042.md). File → Update Skeleton from Project prepares
+matched SCP construction/placement while retaining destination identities, organization,
+compatible controls, mirror rules and update modes. Required construction copies independently.
+Bindings and formula conflicts require explicit review; affected dependents evaluate in owned
+candidate state using existing algorithms, including Manual objects. Paired views, placement
+corrections, optional compatible final-skin deformation, findings, Cancel and one-action Apply/
+Undo share the headless operation family. Source packages remain unchanged and are unnecessary
+after adoption. Schema 8 remains unchanged.
 
-## Current state
+## Qualification
 
-Read assembly copying, resource/provenance remapping, individual replacement reviews,
-native capture and propagation, tissue retarget evaluation, coordinator and comparison.
-The missing boundary is a multi-object candidate evaluation context, not a new optimizer.
-Existing mesh replacement evaluates one target and propagates only after commit; existing
-report replay creates a separate Session and is not the candidate execution architecture.
+- `tools/check.ps1 -BuildDirectory C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native`
+  passes: 2,722 pytest cases (368.61 s), six native suites, Ruff/style/function limits, mypy,
+  numerical imports and native runtime doctor. Existing Qt deprecation warnings remain.
+- 34 relocated portable checks pass under a minimal PATH, including the new skeleton operation,
+  Undo/Redo, schema-8 persistence, hidden rendering and Qt-free headless execution.
+- Lifecycle coverage includes unrelated edits, stale reads, retained dependent failures,
+  exact acknowledgment sets, source removal, cancellation/resource ownership and optional
+  fixed-topology skin. A recaptured bone pose survives subsequent ordinary attachment evaluation.
+- Unchanged and Humerus-length production replacements agree with the ordinary evaluation
+  reference. Preview and committed coordinates, poses, tissue stages and oriented connectivity
+  agree at 1e-8 m; normalized retained Fiber binding records agree exactly.
+- Ribs Top Radius→3, Humerus Length, Radius Length and Thumb Radius follow-up trials have no
+  geometry or retained-Fiber-binding differences from the reference.
+- Reordered same-count Tibia correctly requires explicit Rebind. Only its enumeration and
+  reviewed material captures change; dependent paths/tissue coordinates remain equal.
+- Source SHA256 is unchanged. Saved results remain self-contained after source removal.
+- Four actual before/after GPU views and the packaged result were inspected. Paired-view
+  visibility, shared camera/zoom, native displayed-revision picking and zero QML warnings are
+  checked. These are background/hidden results, not physical interactive acceptance.
 
-Initial contracts and graph-copy increment is implemented: one-to-one provenance matching,
-ambiguous-match protection, identity-preserving SCP replacement, explicit additions and owned
-candidate evaluation adapters. Shared inspect/prepare/status/cancel/apply operations now use
-the existing coordinator and owned candidate resources. Initial placement, dependent bone,
-cancel, Apply and undo/redo tests pass. Binding review is started; driver remapping, mirrors,
-complete evaluator coverage, UI and qualification remain unfinished. This checkpoint is not
-release-ready and must remain on the task branch.
+The first full gate reported 2,715 passes and two failures: a tool function-length violation
+and a controller stub exposing direct coupling to the skeleton panel. Both were fixed, with
+focused regressions and the complete successful rerun above. A QML visibility regression found
+by image inspection was also corrected and the paired views recaptured before delivery.
 
-Second integration checkpoint: destination mirror policy is separated from assembly copying;
-material compatibility requires native connectivity plus authored lineage (or exact content).
-Destination control references are remapped from verified identities; formula value conflicts
-require a deliberate choice. Candidate adapters now include tissue final groups and optional
-fixed-topology skin deformation. Initial Manual tissue preview/adoption tests pass. Complete
-mapping/correction UI, broad lifecycle and production acceptance are still pending.
+## Performance and limits
 
-## Verification
+On the 59-SCP / 96-tissue fixture, recorded source inspection takes 1.4–1.8 s, preparation
+8.0–9.8 s and Apply 0.109–0.112 s. Peak working set reaches about 1.93 GiB. Three running
+full-scene cancellations finish in 88–100 ms; live authored state is unchanged.
 
-`uv run --no-sync pytest tests/test_skeleton_update_contracts.py tests/test_skeleton_update_graph.py tests/test_skeleton_update_commands.py tests/test_architecture.py -q`:
-11 passed on Windows with qualified native DLL. Focused Ruff/mypy checks pass. Full gate not yet run. Main is synchronized
-with origin. Unrelated root `__init__.py` preserved.
-All GUI/testing remains background/offscreen. No interactive acceptance will be claimed.
+Initial GUI publication copied a ~1.5 MB nested QVariant report repeatedly, producing a
+37–39 s UI pause. Compact cached review data now crosses into JavaScript once, separate from
+small status/selection updates. Final paired-view run: installation 0.569 s, hidden-render
+iteration maximum 0.733 s and p95 46 ms. These include profiler cost and GPU readback, not
+physical display latency or disabled-profiler guarantees. No anatomy algorithm changed.
 
-Latest focused run: 27 tests passed (skeleton contracts/commands/controls/dependents,
-architecture, existing shortcut reference lifecycle and assembly mirror tests). Full gate,
-whole-assembly visual/performance evidence, optional skin/group-stack acceptance and portable
-qualification have not run. Do not treat this checkpoint as completed functionality.
+The production and GPU profiler manifests mark three and one `resource_payload_limit` losses
+respectively. Detailed memory attribution is therefore incomplete; process peak working-set
+measurements provide coarse memory evidence. Timed events remain usable. Automatic Qt binding
+collection is unavailable in the hidden helper; boundary timings and controlled presentation
+changes diagnosed the pause. No loss-free resource inventory or GPU execution claim is made.
 
-## Next actions
+## Ownership review
 
-2026-10-29 continuation: the unchanged production assembly prepares successfully after
-selecting Include for its three pelvic driver frames. Its saved Thumb Boolean mesh has
-the same counts as a fresh reconstruction, but different ordered connectivity. Candidate
-reuse now proves unchanged numerical definitions/accepted input revisions and retains
-that saved resource, instead of rebuilding it and manufacturing a topology change.
-The production candidate has two bone recapture findings; these are not yet accepted
-as a qualified whole-body update. The first comparison window is wired into File and
-the shared operations. Offscreen application smoke reports no warnings; focused reuse,
-attachment-retention, desktop preparation/Apply/Undo/cancel and architecture tests pass.
-Visual review of the dialog, anchor corrections, full lifecycle/skin/group-stack tests,
-production edits/profile comparison, full gate and packaging remain incomplete.
+Typed assembly copy/source contracts own identity/resource transfer. Candidate EvaluationContext
+owns unpublished document/results/preferences; the existing coordinator owns scheduling,
+cancellation and publication. There is no second Session/pool or new propagation/routing/
+inflation/relaxation/stacking kernel. Read validation includes affected relationships and
+automatic routing/stacking membership. Selected resources transfer at Apply; history and
+staged/displayed frames retain normal leases. UI owns compact presentation. Generic
+PublicationGroup coordinates paired render models without controller knowledge of a feature.
 
-1. Add typed contracts/matching, candidate graph copying and shared lifecycle integration.
-2. Add attachment/property review, isolated dependency evaluation and atomic publication.
-3. Complete shared API/desktop comparison, correction and optional skin preview.
-4. Run contracts, full gate, production profiler/shape tests and portable qualification;
-   update the single canonical distribution, then validated merge/push.
+## Reproduction and artifacts
 
-## Recovery inputs
-
-Production source: `E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge`.
-Source hash: `308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`.
-Qualified native runtime: `C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native`.
-Set `ANTHROFORGE_NATIVE_LIBRARY` to its `bin/af_native.dll` and `AF_NATIVE_BUILD` to that root.
-Use `QT_QPA_PLATFORM=offscreen` for GUI tests. All task artifacts go under ignored
-`build/skeleton-update-042`, not WIP_models. No new distribution names or versions.
-
-Current checkpoint: added native comparison metrics, reviewed world-space attachment
-corrections, coherent formula batches, stale-candidate status, synchronized comparison
-publication, source-resource mirror/skin display and advisory geometry checks. The real
-review window is inspected through hidden QQuickRenderControl (GPU); ordinary platform
-'offscreen' captures test layout but do not render Quick3D on this Windows machine.
-`build/skeleton-update-042/review-gpu.png` shows the translated fixture with no warnings.
-Seven focused placement/native-distance/architecture tests passed before final UI additions.
-Next: qualification of curve/region corrections, full lifecycle and production assembly;
-full development gate and canonical packaging are still outstanding. Keep this task off main.
-
-Latest recovery checkpoint: the unchanged and Humerus-length replacement production trials
-match the ordinary-evaluation reference, and Ribs Top Radius, Humerus Length, Radius Length
-and Thumb Radius follow-up edits have no array differences at 1e-8 m. Reordered same-count
-Tibia requires explicit Rebind. Source hash is unchanged. Profiled preparation is about 10 s;
-Apply is 0.11–0.14 s. Raw evidence is under `build/skeleton-update-042/production/`.
-Lifecycle tests cover unrelated edits, stale inputs, retained failures, source removal,
-cancel ownership and optional fixed-topology skin. Generic PublicationGroup replaces a
-controller-to-skeleton coupling found by the development gate. The gate's 2,715 passes / two
-failures were followed by passing focused regressions for both failures; a final gate is due.
-Full-assembly hidden GPU views render with no warnings, but qualification exposed a 37–39 s
-UI tick when installing the review. Investigation is active; do not claim responsiveness or
-release readiness. Pending: resolve that pause, production cancellation, complete metrics/
-binding inspection, final gate, documentation and canonical portable delivery.
-
-Follow-up: UI pause traced to repeated nested QVariant conversion. Compact cached JSON review
-data reduced installation from ~37 s to ~0.57 s; final paired-view capture is being rerun after
-fixing a visibility binding found by actual image inspection. Full-scene running cancellation
-finishes in 88–100 ms. Repeated production qualification now explicitly includes normalized
-Fiber material bindings: unchanged/compatible and all four shortcut trials have no differences.
-Topology reindexing changes only Tibia enumeration and the reviewed captures; dependent paths
-and tissue arrays remain equal. 33 focused tests pass. Final gate and portable build remain due.
-
-Final review checkpoint: full paired views are confirmed visible, with shared cameras and
-no warnings. The status/list transfer regression is covered; cached native path picking maps
-mirrored hits to source. A replacement bone's recaptured pose survives the next normal
-attachment evaluation. All four production shortcut checks include exact normalized Fiber
-bindings. Source hash is still unchanged. The complete development gate is running. Canonical
-packaging/relocated portable qualification and validated merge are not yet done.
-
-Ownership review (coordinator-authored, separate from tests): shared copy/source contracts own
-identity and resource transfer; candidate state owns unpublished results and preferences; the
-existing coordinator owns scheduling/cancel/publication. No second Session/pool or new anatomy
-kernel is introduced. UI owns compact display projection, and paired rendering uses a generic
-barrier rather than controller knowledge of a feature panel. Existing resource handles remain
-leased across displayed frames. Initial bulk QVariant presentation was rejected on measured
-full-assembly evidence; the cached snapshot interface replaces that path.
+- Source: `E:/development/WIP_models/shortcut_migration_030_20261023/skeleton_96_muscles_shortcuts_v001.anthroforge`
+- SHA256: `308c216c85d9458d83e163bc3ed2ab85338bccd3adeb496981ffe35ec8275dac`
+- Native runtime: `C:/Users/alexe/AppData/Local/Temp/anthroforge-skin-040-native`
+- Tools: `tools/skeleton_update_qualification.py`, `tools/skeleton_update_cancellation.py`,
+  `tools/skeleton_update_scene.py`, `tools/skeleton_update_portable.py`.
+- Local-only reports, source copies, captures and logs: `build/skeleton-update-042/`.
+- Canonical delivery: `dist/0.4.2/AnthroForge.dist` and `dist/AnthroForge-0.4.2-source.zip`.
+- Unrelated root `__init__.py` remains untouched. No WIP_models byproducts were created.

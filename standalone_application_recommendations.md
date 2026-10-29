@@ -2,7 +2,9 @@
 
 Updated: 2026-10-28
 
-For current implementation coverage, see the [0.4.2 preparation audit](docs/recommendations_042_audit.md).
+For current implementation coverage, see the [0.4.2 preparation audit](docs/recommendations_042_audit.md)
+and [0.4.3 authoring parity delivery](docs/authoring_043.md). The latter implements shared
+current-component reads, candidate evidence, contextual queries and JSON literal subtrees.
 It checks all 66 requirements and 132 original source items against 0.4.1, separates
 remaining work from deliberate deferrals, and identifies the owning code and evidence.
 The audit is complete; the 0.4.2 implementation scope has not yet been selected.

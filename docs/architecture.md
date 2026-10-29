@@ -1,5 +1,29 @@
 # AnthroForge architecture
 
+## Shared authoring inspection (0.4.3)
+
+The [authoring parity contract](authoring_043.md) exposes existing editing and preview
+state without creating authored objects. `core.component_reads` owns immutable read records;
+application `editing_queries`, `component_buffers`, `component_tissue` and
+`component_restrictions` resolve positions, native frames, restrictions and provenance.
+Desktop models consume these reads. JSON pages serialize slices of retained buffers, with
+one cached query and changed-input rejection. Raw authored inspection remains separate.
+
+`inspection_sources` qualifies exact tokens; `inspection_candidate_layers` adapts the eight
+existing candidate families to shared `Layer` records. `inspection_snapshots` retains one
+API capture. Existing report jobs hold independent leases, retire through the coordinator,
+and export a versioned inspection scene with canonical geometry. The isolated desktop
+renderer consumes that scene through the existing staged comparison models. It does not
+open/adopt a project or invent dummy anatomy. Source failure or replacement cannot mutate
+a captured layer; unavailable and retained outputs are explicit. Existing profiler resource
+inventory attributes API captures and export payloads without off-recording collection.
+
+`mapping_queries`, `surface_options` and `skin_contributor_queries` expose existing domain
+policies to both clients. Reference IDs come from actual preparations or persisted external
+references; compatibility queries do not bypass publication validation. Transport-only
+`authoring_arguments` implements RFC6901 literal subtrees. Schema 9 and all numerical
+algorithms remain unchanged. See [qualification](tasks/authoring-fixes-043.md).
+
 ## Persistent reconstruction contexts (0.4.2)
 
 [Reconstruction](reconstruction_042.md) uses explicit editing contexts within one Session.

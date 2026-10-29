@@ -1,4 +1,10 @@
-# AnthroForge 0.4.2
+# AnthroForge 0.4.3
+
+0.4.3 exposes current editable components, candidate geometry/images and compatible choices
+through the shared authoring API. JSON requests can preserve literal `$` text with
+`literal_paths`. Geometry algorithms, attachments and project schema 9 remain unchanged.
+See [authoring workflow](docs/authoring_043.md), [API](docs/authoring_api.md) and
+[qualification evidence](docs/tasks/authoring-fixes-043.md).
 
 0.4.2 adds shared replacement readiness, spatial findings for SCPs/construction/skin,
 placement explanations, world and section dimensions, sampled volume checks and temporary

@@ -1,7 +1,9 @@
 # Desktop and authoring audit for 0.4.3
 
-**Audit only — fixes proposed, not implemented.** Reviewed 2026-10-29 against
-`3daa3dee` (0.4.2). This document does not qualify or release 0.4.3.
+**Historical audit**, reviewed 2026-10-29 against `3daa3dee` (0.4.2).
+The findings below preserve that baseline. A1–A4 are now implemented under the
+[0.4.3 contract](authoring_043.md); see [current qualification](tasks/authoring-fixes-043.md).
+A5 recovery/project library and A6 feedback remain outside this delivery.
 
 ## Conclusion and scope
 

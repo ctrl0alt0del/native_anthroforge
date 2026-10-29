@@ -1,0 +1,15 @@
+[
+  {"id":"root","operation":"scp.empty","arguments":{"name":"$reference"},"literal_paths":["/name"]},
+  {"id":"curve","operation":"curve.create","arguments":{"name":"$guide","parent":"$root","points":[{"position":[0,0,0]},{"position":[0,1,0]},{"position":[1,1,0]}]},"literal_paths":["/name"]},
+  {"operation":"wait"},
+  {"id":"page","operation":"editing.inspect","arguments":{"target":"$curve","category":"CURVE","limit":2}},
+  {"operation":"editing.inspect","arguments":{"target":"$curve","category":"CURVE","offset":"$page.next_offset","expected_revision":"$page.revision"}},
+  {"id":"candidate","operation":"curve.conversion.preview","arguments":{"curve":"$curve","engine":"POLYLINE","samples":12}},
+  {"operation":"wait"},
+  {"id":"capture","operation":"inspection.capture","arguments":{"kind":"curve_conversion","token":"$candidate.token"}},
+  {"operation":"curve.conversion.cancel"},
+  {"operation":"inspection.capture.status","arguments":{"snapshot":"$capture.snapshot"}},
+  {"operation":"inspection.geometry","arguments":{"snapshot":"$capture.snapshot","layer":"$capture.layers.0.id","buffer":"samples","limit":4}},
+  {"operation":"inspection.export","arguments":{"snapshot":"$capture.snapshot","path":"curve-candidate.afinspection.zip","images":false,"wait":true}},
+  {"operation":"inspection.release","arguments":{"snapshot":"$capture.snapshot"}}
+]

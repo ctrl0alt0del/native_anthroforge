@@ -4,6 +4,7 @@ import json
 
 import numpy as np
 
+from tests.test_driving_formulas import driver, reference
 from tests.test_parametric_consumers import joined
 from tests.test_tissue_field_editing import create as field
 from tests.test_tissue_interaction import controller as controller
@@ -35,6 +36,20 @@ def test_control_frame_and_imported_weights_are_exposed(session, assembly):
     session.wait()
     result = session.command("editing.inspect", target=bone, context=dict(deformer=binding))
     assert all(r["weight_editable"] and not r["position_editable"] for r in result["components"])
+
+
+def test_lattice_formula_lock_is_shared_with_desktop_rows(session, assembly):
+    from anthroforge.application import editing_queries
+
+    cage = session.command("control.create", kind="LATTICE", entity=assembly[0])
+    session.wait()
+    driver(session, cage, "value * m", value=0.1, path=reference(cage, ("points", "#0"), 0))
+    session.wait()
+    result = session.command("editing.inspect", target=cage, category="CONTROL")
+    assert not result["components"][0]["position_editable"]
+    assert result["components"][1]["position_editable"]
+    rows = editing_queries.rows(editing_queries.current(session, cage, "CONTROL"))
+    assert rows[0][0]["readonly"] and not rows[1][0]["readonly"]
 
 
 def test_tissue_field_points_match_desktop_and_are_weight_only(controller):

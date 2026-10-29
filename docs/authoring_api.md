@@ -1,8 +1,88 @@
-# Local authoring API, 0.4.2
+# Local authoring API, 0.4.3
 
-The [0.4.3 UI/authoring audit](authoring_audit_043.md) records current coverage and
-confirmed public-interface gaps. It is an audit, not a claim that the proposed fixes
-or a 0.4.3 runtime have been implemented.
+The [0.4.3 authoring additions](authoring_043.md) close audit A1–A4: resolved component
+reads, immutable candidate inspection, contextual choices and literal JSON arguments.
+See [qualification status](tasks/authoring-fixes-043.md). The historical
+[UI/authoring audit](authoring_audit_043.md) records the original gaps.
+
+## Current editing and candidates (0.4.3)
+
+These operations use the desktop's application services. They do not apply previews,
+change authored state or request anatomy recalculation. `object.inspect` still returns
+authored definitions; use `editing.inspect` for a moved Fiber's current resolved controls.
+
+| Operation | Arguments and output |
+| --- | --- |
+| `editing.inspect` | `target`, `category="CURVE"`, optional `context`, `offset=0`, `limit=4096`, `expected_revision`. Returns component `key`, `reference`, `local`, `world`, `frame`, position/weight editability and reasons, provenance, topology locks and page signature. |
+| `inspection.capture` | `kind`, exact `token` from a completed current preview/preparation. Returns `snapshot`, source status and layer metadata. |
+| `inspection.capture.status` | `snapshot`. Historical captures remain readable; `current=false` means the live source changed or disappeared. |
+| `inspection.geometry` | `snapshot`, `layer`, `buffer`, `offset=0`, `limit=4096`. Returns `values`, dtype, complete shape, transform and continuation offset. |
+| `inspection.release` | `snapshot`. Releases the API-held capture, independently of an active export or viewport. |
+| `inspection.export` | Existing document-report arguments remain supported. With `snapshot`, accept `path`, `images=true`, optional `view`, `wait=false`. Produces an atomic `.afinspection.zip`; numerical-only exports need no Qt. |
+
+Categories: `CURVE`, `CONTROL` (`LATTICE` alias), `VERTEX` (`GEOMETRY` alias), `BASE`,
+`TISSUE_CONTROL`, `TISSUE_FIELD`. Tissue control context takes `part`/`side`; field context
+takes `field`. For deformer membership/weights provide `context.deformer`. Without a binding,
+ordinary components do not claim weight editability. Generated Parametric controls, driven
+positions, junction followers and membership points retain their ordinary restrictions.
+
+Pages contain 1–16,384 rows. Reuse the returned revision with `expected_revision` for editing
+and choice pages; changed inputs raise an error rather than mix revisions. Snapshot geometry
+is already immutable and uses the snapshot identity instead.
+
+Candidate kinds: `curve_conversion`, `surface`, `tissue_inflation`, `mesh_replacement`,
+`tissue_retarget`, `skin_fit`, `skeleton_update`, `variant_review`. Inflation previews expose
+their computed rest surface. Context and unevaluated dependents are identified separately;
+prepared skin appears when present. Failed/unavailable/superseded candidates cannot be captured.
+One API capture is held per session; creating another replaces it.
+
+Mesh buffers: `positions`, `corners`, `offsets`, `triangles`, `triangle_faces` (native canonical
+topology). Path buffers: `samples` (11 columns), `parameters`, `positions` (first three columns).
+Lengths use metres and right-handed Z-up; `frame` is a row-major local-to-world affine matrix.
+No native handles are exposed.
+
+Snapshot reports use inspection payload **schema 2**, independent of project schema 9.
+`inspection.json` includes candidate/token/revisions, layer roles/status/provenance and buffer
+shapes/dtypes/relative `.npy` paths. Optional `image.png`/`image.png.json` contain the isolated
+render and staged layer evidence. Existing document-report inputs remain schema 1. A renderer
+failure preserves the capture and previous destination for retry.
+
+`view` accepts `mode` (`Before`, `After`, `Split`, `Overlay`), seven-value workspace `camera`,
+`hidden` (layer IDs or categories `bones`, `tissues`, `construction`, `skin`), and `mirrors`
+(`Both`, `Source only`, `Mirror only`). The existing comparison perspective camera shares
+position, orientation and distance between sides and uses its existing 45-degree lens.
+Images are optional; geometry evidence is always included. See
+[the JSON example](../examples/authoring-inspection.json).
+
+## Compatible choices and effective settings (0.4.3)
+
+| Operation | Context |
+| --- | --- |
+| `assembly.mapping.targets` | `token`, `reference` key from that preparation; empty token selects a persisted unresolved reference ID for repair. |
+| `assembly.mapping.properties` | Same context plus destination `target`; returns compatible typed property references. |
+| `skeleton_update.mapping.targets/properties` | Same preparation context. `controls=true` selects destination-control findings from `status.controls`; otherwise use `status.mappings`. |
+| `surface.options` | Supported SCP/tissue roles, mirrored identities, readiness and reasons. |
+| `skin.contributor.inspect` | `owner`; authored defaults, `authored_override`, effective values, editability, FLOW availability, budget findings and revision. Creates no override. |
+| `skin.fit.refit.eligibility` | Fitted-result `identity`; availability, reason and warnings from the desktop policy. |
+
+Mapping/surface lists accept `search`, `offset`, `limit`, `expected_revision`; return `items`,
+`total`, `next_offset`, `revision`. Names aid search only. Compatible kind does not establish
+material correspondence: preparation still checks it and requires explicit Rebind when needed.
+Eligibility queries never bypass later write validation.
+
+## Literal `$` text in JSON requests (0.4.3)
+
+`$result.path` still resolves earlier results. Request-level `literal_paths` contains RFC 6901
+pointers into `arguments` whose subtrees bypass substitution:
+
+```json
+{"operation":"scp.empty","arguments":{"name":"$pelvis","parent":"$root"},"literal_paths":["/name"]}
+```
+
+Only `name` is literal; `parent` resolves normally. `""` marks all arguments literal; `/`
+selects an empty dictionary key. Escape slashes with `~1`, tildes with `~0`; list indices
+must be canonical integers. Invalid/missing paths fail before the command runs. No dictionary
+shape is reserved. Direct Python commands already receive literal strings and remain unchanged.
 
 ## Spatial inspection (0.4.2)
 

@@ -94,3 +94,15 @@ isolated render startup. Front/oblique SCM images inspected. System busy fractio
 single diagnostic run, not a controlled speedup claim. No Qt imported into numerical process.
 Evidence: build/authoring-fixes-043/production, plus source-portable mirror image/data test.
 Export lease retirement, canonical buffer round-trip and separate Qt-free subprocess pass.
+
+Repeated development gate passes: 2,819 tests, six native CTests, Python/PowerShell/native
+style, typing, numerical checks and doctor. Subsequent focused tests cover complete driven
+component/weight restrictions and Manual Fiber provenance; final full-suite repeat pending.
+Desktop live layer render versus isolated exported render: exact pixels for Split/front;
+maximum one 8-bit color level for Overlay/oblique, same layer IDs/camera, hidden windows only.
+Executable JSON example passes. Local links checked. Source inspection/runtime ownership
+review complete: application owns resolution/policies, core immutable records, transport
+literal decoding, native existing transforms, desktop render-only adapter. No new pool,
+geometry evaluator, duplicated property writer or project-schema change.
+
+0.4.3 version is staged for canonical package qualification. Portable release/merge still pending.

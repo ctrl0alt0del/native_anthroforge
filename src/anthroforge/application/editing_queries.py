@@ -8,7 +8,14 @@ from anthroforge.core.entities import SCP
 from anthroforge.core.tissues import TissueVCP
 
 from . import component_buffers as buffers
-from . import component_restrictions, component_tissue, curve_edit_state, curve_sources, query_pages
+from . import (
+    component_provenance,
+    component_restrictions,
+    component_tissue,
+    curve_edit_state,
+    curve_sources,
+    query_pages,
+)
 from .choice_queries import revision
 from .construction_policy import topology_locks
 from .query_projection import plain
@@ -38,19 +45,22 @@ def query_key(session: Any, target: str, category: str, context: Any) -> Any:
 
 def capture(session: Any, target: Any, category: Any, context: Any) -> Any:
     item = session.document.object(target)
-    resolved = (
-        curve_sources.for_editing(session, item)
-        if isinstance(item, SCP)
-        else curve_edit_state.current(session, item)
-    )
+    resolved = resolve(session, item)
     records = groups(session, resolved, category, context)
     return ComponentRead(
         signature(session, target, category, context),
         records,
-        tuple(provenance(item, resolved).items()),
+        tuple(provenance(session.document, item, resolved).items()),
         edit_reason(session, item),
         component_restrictions.weight_binding(session, item, context),
+        component_restrictions.writers(session.document),
     )
+
+
+def resolve(session: Any, item: Any) -> Any:
+    if isinstance(item, SCP):
+        return curve_sources.for_editing(session, item)
+    return curve_edit_state.current(session, item)
 
 
 def signature(session: Any, target: str, category: str, context: Any) -> str:
@@ -103,12 +113,12 @@ def edit_reason(session: Any, item: Any) -> Any:
     return ""
 
 
-def provenance(item: Any, resolved: Any) -> Any:
+def provenance(document: Any, item: Any, resolved: Any) -> Any:
     result = getattr(item, "result", None)
     return dict(
         authored_revision=item.generation,
         accepted_revision=getattr(result, "revision", 0),
-        pending=getattr(result, "pending", ()),
+        pending=component_provenance.pending(document, item),
         status=getattr(result, "status", ""),
         input_revisions=getattr(result, "inputs", ()),
         source="RESOLVED" if resolved is not item else "AUTHORED",
@@ -118,7 +128,11 @@ def provenance(item: Any, resolved: Any) -> Any:
 
 def rows(value: Any) -> Any:
     return [
-        (group.reference(i), group.world[i].tolist(), list(group.local[i]))
+        (
+            component_restrictions.reference(group, i, value.writers),
+            group.world[i].tolist(),
+            list(group.local[i]),
+        )
         for group in value.buffers
         for i in range(len(group.local))
     ]
@@ -161,16 +175,16 @@ def page(value: Any, start: Any, end: Any) -> Any:
     preceding = 0
     for group in value.buffers:
         result.extend(
-            component(group, i, value.reason, value.weight_binding)
+            component(group, i, value)
             for i in range(max(0, start - preceding), min(len(group.local), end - preceding))
         )
         preceding += len(group.local)
     return result
 
 
-def component(group: Any, index: Any, reason: Any, binding: Any = None) -> Any:
-    ref = group.reference(index)
-    position_reason = position_restriction(ref, reason)
+def component(group: Any, index: Any, value: ComponentRead) -> Any:
+    ref = component_restrictions.reference(group, index, value.writers)
+    position_reason = position_restriction(ref, value.reason)
     return dict(
         key=component_key(ref),
         reference=ref,
@@ -179,7 +193,7 @@ def component(group: Any, index: Any, reason: Any, binding: Any = None) -> Any:
         frame=group.frame,
         position_editable=not position_reason,
         position_reason=position_reason,
-        **component_restrictions.weights(ref, binding, reason),
+        **component_restrictions.weights(ref, value.weight_binding, value.reason, value.writers),
     )
 
 

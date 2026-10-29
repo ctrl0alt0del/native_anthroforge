@@ -26,6 +26,7 @@ class ComponentRead:
     provenance: tuple[tuple[str, Any], ...]
     reason: str = ""
     weight_binding: Any = None
+    writers: tuple[tuple[Any, str], ...] = ()
 
 
 def component_key(reference: dict[str, Any]) -> str:

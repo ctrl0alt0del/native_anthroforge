@@ -30,6 +30,7 @@ from .previews import Preview
 from .resources import Resources
 from .surface_preview import Candidate
 from .tissue_preview import Candidate as TissueCandidate
+from .variant_policy import require as require_variant_edit
 
 
 class Session:
@@ -38,6 +39,8 @@ class Session:
     changes = ContextField[ChangeJournal]("changes")
     active_workspace = ContextField[int]("active_workspace")
     formula_write_authority = ContextField[frozenset[str]]("formula_write_authority")
+    formula_reference_authority = ContextField[frozenset[str]]("formula_reference_authority")
+    editing_restrictions = ContextField[frozenset[str]]("editing_restrictions")
     formula_observing = ContextField[bool]("formula_observing")
     replay_callback = ContextField[Any]("replay_callback")
     issues = ContextField[Any]("issues")
@@ -87,6 +90,7 @@ class Session:
         self.saved_revision = 0
         self.formula_write_authority = frozenset()
         self.formula_observing = False
+        self.editing_restrictions = frozenset()
         self.active_workspace = 0
         self.waiting_save = False
         self.replay_callback = None
@@ -184,6 +188,7 @@ class Session:
         from anthroforge.core.mirroring import require_source
 
         require_source(entity_id)
+        require_variant_edit(self, entity_id)
         if self.waiting_save:
             raise ValueError("Editing is blocked while waiting to save.")
         if self.workspace.focused and entity_id not in self.workspace.members:

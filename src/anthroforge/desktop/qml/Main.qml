@@ -102,6 +102,7 @@ ApplicationWindow {
                     }
                     UiMenu {
                         title: "View"
+                        UiMenuItem { objectName:"reconstructionMenu"; text:"Reconstruction"; checkable:true; checked:workspace.reconstructionPanel.opened; onTriggered:workspace.reconstructionPanel.setOpen(checked) }
                         UiMenuItem { objectName:"focusEditorMenu"; text:"Focus editor"; checkable:true; checked:workbench.focusEditor; onTriggered:workbench.setFocusEditor(checked) }
                         UiMenuItem { text: "Frame selected"; shortcutHint: "F"; onTriggered: workspace.frameSelection() }
                         UiMenuItem { objectName: "restoreViewMenu"; text: "Restore view"; shortcutHint: keyboard.shortcut("restoreView"); enabled: viewport.canRestoreView; onTriggered: viewport.restoreView() }
@@ -140,6 +141,12 @@ ApplicationWindow {
                 anchors.fill: parent; anchors.margins: Theme.inset; keyboard: window.keyboardManager
                 onImportRequested: importFile.open(); onDeleteRequested: entity => deleteDialog.request(entity)
             }
+        }
+        Rectangle {
+            visible: workspace.reconstructionPanel.opened && !workspace.reconstructionPanel.floating
+            SplitView.preferredWidth: 320; SplitView.minimumWidth: 290; SplitView.maximumWidth: 520
+            color: Theme.panel
+            Loader { anchors.fill:parent; anchors.margins:Theme.inset; active:parent.visible; sourceComponent:reconstructionContent }
         }
         ColumnLayout {
             SplitView.fillWidth: true; SplitView.minimumWidth: 300; spacing: 0
@@ -195,6 +202,13 @@ ApplicationWindow {
                 }
             }
         }
+    }
+    Component { id:reconstructionContent; ReconstructionPane {} }
+    Window {
+        id:reconstructionWindow; title:"Reconstruction"; width:420; height:700; minimumWidth:320; minimumHeight:400
+        color:Theme.panel; visible:workspace.reconstructionPanel.opened && workspace.reconstructionPanel.floating
+        onClosing:function(event) { event.accepted=false; workspace.reconstructionPanel.setOpen(false); }
+        Loader { anchors.fill:parent; anchors.margins:Theme.inset; active:reconstructionWindow.visible; sourceComponent:reconstructionContent }
     }
     footer: WorkbenchStatus { windowState:window; onDetailsRequested:messageDialog.open() }
     UiNotice { text: workspace.state.message || "" }

@@ -28,6 +28,7 @@ from .numeric_edits import NumericEdits
 from .object_selection import ObjectSelection
 from .placement_inspection_tools import PlacementInspectionTools
 from .project_library import ProjectLibrary
+from .reconstruction_panel import ReconstructionPanel
 from .route_inspection_tools import RouteInspectionTools
 from .routing_choices import RoutingChoices
 from .section_tools import SectionTools
@@ -95,6 +96,7 @@ class Controller(QObject):
         self.mesh_replacement = MeshReplacementPanel(self)
         self.assembly_panel = AssemblyPanel(self)
         self.skeleton_panel = SkeletonPanel(self)
+        self.reconstruction_panel = ReconstructionPanel(self)
 
     def initialize_tissue_tools(self):
         self.spatial_evidence = SpatialEvidenceTools(self)
@@ -346,6 +348,10 @@ class Controller(QObject):
         return self.skeleton_panel
 
     @Property(QObject, constant=True)
+    def reconstructionPanel(self):
+        return self.reconstruction_panel
+
+    @Property(QObject, constant=True)
     def spatialEvidence(self):
         return self.spatial_evidence
 
@@ -576,7 +582,7 @@ class Controller(QObject):
             **self.view_state(),
             "message": self.message,
             "revision": self.session.document.revision,
-            "dirty": self.session.saved_revision != self.session.document.revision,
+            "dirty": self.session.saved_revision != self.session.serial,
             "blocked": self.session.scheduler.blocked,
             "waiting": self.session.waiting_save,
             "publishing": sum(len(m.pending) for m in self.geometry_models()),
@@ -625,6 +631,7 @@ class Controller(QObject):
             self.notify()
 
     def refresh_runtime_panels(self):
+        self.reconstruction_panel.synchronize()
         self.assembly_panel.synchronize()
         self.skeleton_panel.synchronize()
         self.spatial_evidence.synchronize()
@@ -677,6 +684,7 @@ class Controller(QObject):
         projection = self.scene_projection
         if (
             projection.session is not self.session
+            or projection.context != self.session._editing.key
             or projection.cursor != self.session.changes.serial
             or self.last_workspace != self.session.active_workspace
             or getattr(self, "_conversion_key", None) != self.conversion_key()

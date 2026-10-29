@@ -2,6 +2,7 @@
 
 from anthroforge.application import workspace_policy
 from anthroforge.application.object_frames import Frames
+from anthroforge.application.variant_policy import included as variant_included
 from anthroforge.core import presentation
 from anthroforge.core.object_registry import kind
 from anthroforge.native import scene
@@ -114,7 +115,7 @@ def result_record(result):
 
 
 def flags(session, item):
-    readonly = not workspace_policy.included(session.document, session.workspace, item.id)
+    readonly = not variant_included(session, item.id)
     category = CATEGORIES.get(kind(item), "curves")
     visible = item.id not in session.workspace.hidden and presentation.visible(
         session.workspace, category

@@ -85,7 +85,7 @@ class EditingContexts:
         state["history"].observe(projected)
 
     def documents(self) -> list[Document]:
-        result = [self.project(committed=True)]
+        result = []
         for state in self.states.values():
             result.append(state.values["document"])
             result.extend(entry.document for entry in state.values["history"].entries)
@@ -102,6 +102,22 @@ class EditingContexts:
                 self.session.issues.close()
                 self.session.clear_previews()
 
+    def adopt_published(self, document: Document, resources: Any) -> None:
+        if any(
+            key and state.registry.active
+            for key, state in self.session.scheduler.scheduling_contexts.items()
+        ):
+            raise ValueError("Finish context jobs before adopting another project.")
+        self.close()
+        session = self.session
+        session._editing = self.states[""]
+        session._editing.values = initial_values(document)
+        session._document, session.resources = document, resources
+        session.scheduler.context = ""
+        session.scheduler.scheduling_contexts = {"": session.scheduler.scheduling_contexts[""]}
+        initialize_services(session)
+        session.contexts = EditingContexts(session)
+
 
 def bare(document: Document) -> Document:
     return (
@@ -113,11 +129,12 @@ def bare(document: Document) -> Document:
 
 def initial_values(document: Document) -> dict[str, Any]:
     return dict(
-        document=bare(document),
-        history=History(bare(document)),
+        document=document,
+        history=History(document),
         changes=ChangeJournal(),
         formula_write_authority=frozenset(),
         formula_observing=False,
+        editing_restrictions=frozenset(),
         active_workspace=0,
         replay_callback=None,
     )

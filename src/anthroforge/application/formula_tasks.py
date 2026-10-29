@@ -103,7 +103,10 @@ def make_job(session: Any, ids: set[str], targets: set[str]) -> Job:
         "Evaluate driving shortcuts",
         frozenset(targets | ids),
         lambda document: formula_inputs.Captured(
-            document, session.resources.snapshot(), session.engine
+            document,
+            session.resources.snapshot(),
+            session.engine,
+            editing_restrictions=session.editing_restrictions,
         ),
         lambda context, cancel: formula_evaluation.evaluate(context, ids, cancel),
         partial(publish, session),

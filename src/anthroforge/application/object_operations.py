@@ -21,6 +21,7 @@ from .construction_policy import require_topology_edit
 from .object_removal import install as install_removal
 from .operations import require_name
 from .transform_policy import require_object_transform
+from .variant_policy import require as require_variant_edit
 
 if TYPE_CHECKING:
     from .session import Session
@@ -32,6 +33,7 @@ def editable(session: "Session", target: str) -> Authored:
     from .workspace_policy import included
 
     require_source(target)
+    require_variant_edit(session, target)
     if session.waiting_save:
         raise ValueError("Editing is blocked while waiting to save.")
     item = session.document.object(target)

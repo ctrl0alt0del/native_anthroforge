@@ -21,6 +21,7 @@ class Captured:
     engine: Any
     workspace: Workspace = Workspace()
     waiting_save: bool = False
+    editing_restrictions: frozenset[str] = frozenset()
 
     def editable(self, target: str) -> Any:
         return self.document.entity(target)

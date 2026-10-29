@@ -84,6 +84,8 @@ from . import control_operations as controls
 from . import deformer_operations as deformers
 from . import primitive_operations as primitives
 from .mirror_policy import require_edit
+from .variant_operations import execute as variant_command
+from .variant_policy import command as require_variant_command
 
 if TYPE_CHECKING:
     from .session import Session
@@ -287,7 +289,7 @@ def query_handler(operation: str) -> Any:
         from .issues.commands import execute as issue_command
 
         return issue_command
-    return None
+    return variant_command if operation.startswith("variant.") else None
 
 
 def shortcut_queries(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
@@ -323,6 +325,7 @@ def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
 
 def require_command_edit(session: "Session", operation: str, arguments: dict[str, Any]) -> None:
     require_edit(arguments)
+    require_variant_command(session, operation, arguments)
     if (
         operation in {"assembly.import", "skeleton_update.apply"}
         and session.history.before is not None

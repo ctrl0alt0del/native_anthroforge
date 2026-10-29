@@ -59,6 +59,7 @@ class SceneProjection:
     def __init__(self, controller):
         self.controller = controller
         self.session, self.cursor, self.workspace = None, -1, None
+        self.context = ""
         self.records, self.keys, self.order = {}, {}, []
         self.view, self.selected = PropertyProjection(controller), PropertyProjection(controller)
         self.view.synchronize(dict(rows=[], parents=[]))
@@ -68,6 +69,7 @@ class SceneProjection:
 
     def synchronize(self):
         session = self.controller.session
+        self.require_context(session)
         changes = session.changes.since(self.cursor if session is self.session else -1)
         full = structural_changes(changes) or self.workspace != session.workspace
         self.update_records(changes, full, structural_changes(changes))
@@ -77,6 +79,14 @@ class SceneProjection:
         self.publish_records()
         mirror_scene.synchronize(self)
         self.synchronize_selection()
+
+    def require_context(self, session):
+        if self.context == session._editing.key:
+            return
+        self.context, self.cursor, self.workspace = session._editing.key, -1, None
+        self.keys.clear()
+        self.controller.construction.keys.clear()
+        self.construction_changes = ConstructionChanges()
 
     def synchronize_objects(self, changes, full):
         session = self.controller.session

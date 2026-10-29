@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+from . import context_saves
 from .history import History
 from .storage import FileLock, atomic_save, read_package
 
@@ -11,19 +12,15 @@ if TYPE_CHECKING:
 
 
 def save(session: "Session", path: str, blocked_policy: str) -> dict[str, Any]:
-    if session.history.before is not None:
-        raise ValueError("Commit or cancel the active edit before saving.")
+    context_saves.require_committed(session)
     if blocked_policy not in ("wait", "checkpoint", "pending"):
         raise ValueError("Explicit blocked_policy must be wait, checkpoint, or pending.")
     session.scheduler.tick()
-    if session.scheduler.blocked and blocked_policy == "pending":
-        return {
-            "status": "pending",
-            "jobs": [j.id for j in session.scheduler.active_jobs if j.writes],
-        }
+    if context_saves.pending(session) and blocked_policy == "pending":
+        return {"status": "pending", "jobs": context_saves.pending(session)}
     if blocked_policy == "wait":
         session.scheduler.wait(writes_only=True)
-    document = session.scheduler.checkpoint if session.scheduler.blocked else session.document
+    document = context_saves.project(session, checkpoints=blocked_policy == "checkpoint")
     return save_snapshot(session, Path(path).resolve(), document)
 
 

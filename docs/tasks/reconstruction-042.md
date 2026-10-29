@@ -19,20 +19,27 @@ Added schema-9 reconstruction records/codecs and resource reachability, plus exp
 contexts with separate history/services and coordinator-owned scheduling namespaces. There
 is one executor/resource admission/inline budget. Jobs retain their context identity; callback
 publication runs under that context. Context switching pauses authored work without waiting.
-Runtime variants, save/autosave projection, scope policies and desktop are not yet delivered.
+Runtime variants, committed save/autosave projection, pinned-support policies and basic dockable
+desktop navigation are implemented. Normal tools edit scoped alternatives; immutable checkpoints
+fork independently. Path/attachment metadata copies include archived inputs. Promotion, support
+refresh, catalogue/reviews/queue, stages and complete release qualification remain unfinished.
 
 ## Verification
 
 Focused context/scheduler/active-job tests: 16 passed. Existing skeleton-update command tests:
 3 passed. Context tests cover ordinary edit/Undo isolation, same-identity concurrent jobs and
 non-recursive schema round trips. Relevant mypy checks pass. Python function-limit/import
-architecture checks passed before the last small helper edits. Full gate not yet run.
+architecture checks pass. New variant/desktop tests pass. Regression run stopped at 6 failures
+after 541 passes: formula validation expected a Session-only context and resource reachability
+allocated a fresh projection each pass. Both causes fixed; focused driver/import/replay/resources/
+variant/architecture suite now 27 passed. Full gate needs rerun. Hidden GPU panel loads with no
+warnings; initial capture identified missing capture background, corrected (recapture pending).
 
 ## Next actions
 
-1. Add typed reconstruction state and schema-9 codecs/resource reachability.
-2. Introduce explicit editable contexts with one coordinator and scoped publication.
-3. Implement variants, refresh/promotion, catalogue/reviews/regions/queue and comparisons.
+1. Finish scope/copy/lifecycle validation and rerun regressions.
+2. Implement refresh/promotion using isolated candidate evaluation and precise read validation.
+3. Deliver catalogue/reviews/regions/queue, imported stages and comparisons.
 4. Qualify production assembly, background GUI, profiler and canonical package; merge/push.
 
 ## Recovery inputs

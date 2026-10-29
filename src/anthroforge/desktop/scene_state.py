@@ -5,6 +5,8 @@ from time import perf_counter as monotonic
 
 import numpy as np
 
+from anthroforge.application.variant_policy import allowed as variant_allowed
+from anthroforge.application.variant_policy import included as variant_included
 from anthroforge.core.presentation import pickable, visible
 from anthroforge.core.results import geometry_asset
 from anthroforge.native import components, scene
@@ -21,6 +23,7 @@ def record(controller, entity, depth):
     row.update(depth=depth, trs=session.engine.decompose(entity.matrix))
     row["quaternion"] = scene.quaternion(session.engine, entity.matrix)
     row.update(presentation_flags(session.workspace, entity.id))
+    row["readonly"] |= not variant_allowed(session, entity.id)
     row.update(geometry_flags(session.workspace, row))
     row["anchors"] = markers(session, entity)
     row["opacity"] = 0.08 if row["readonly"] else 1.0
@@ -91,10 +94,10 @@ def presentation_flags(workspace, entity):
 
 
 def control_flags(session, control):
-    from anthroforge.application.workspace_policy import associations, included
+    from anthroforge.application.workspace_policy import associations
 
     workspace = session.workspace
-    readonly = not included(session.document, workspace, control.id)
+    readonly = not variant_included(session, control.id)
     flags = dict(
         readonly=readonly,
         visible=control.id not in workspace.hidden,

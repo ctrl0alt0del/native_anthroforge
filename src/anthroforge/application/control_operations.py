@@ -19,6 +19,7 @@ from .object_creation import require_parent
 from .object_frames import Frames
 from .object_removal import install as install_removal
 from .object_removal import retain_frames, retain_objects
+from .variant_policy import require as require_variant_edit
 from .workspace_policy import associations, included
 
 if TYPE_CHECKING:
@@ -35,6 +36,7 @@ def evaluation(session: "Session") -> Evaluation:
 
 
 def editable(session: "Session", control: str) -> Control:
+    require_variant_edit(session, control)
     if session.waiting_save:
         raise ValueError("Editing is blocked while waiting to save.")
     if not included(session.document, session.workspace, control):

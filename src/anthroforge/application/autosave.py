@@ -9,6 +9,7 @@ from anthroforge.core.document import Document
 from anthroforge.core.jobs import Job
 from anthroforge.core.scheduling import Workload
 
+from . import context_saves
 from .recovery import RecoveryStore
 from .resources import Resources
 
@@ -19,9 +20,7 @@ Capture = tuple[Document, Resources, str]
 
 
 def committed(session: "Session") -> Document:
-    snapshot = session.scheduler.checkpoint if session.scheduler.blocked else session.document
-    before = session.history.before
-    return before if before is not None and before.revision < snapshot.revision else snapshot
+    return context_saves.project(session, checkpoints=True)
 
 
 class Autosave:

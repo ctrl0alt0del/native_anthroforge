@@ -3,8 +3,8 @@
 from functools import partial
 from pathlib import Path
 
-from anthroforge.application import projects, task_workloads
-from anthroforge.application.history import History
+from anthroforge.application import context_saves, projects, task_workloads
+from anthroforge.application.scheduling_context import all_active
 from anthroforge.application.storage import atomic_save, read_package
 from anthroforge.core.jobs import Job
 
@@ -17,10 +17,10 @@ def save(controller, path, policy):
     if session.history.before is not None:
         session.commit()
     session.scheduler.tick()
-    if session.scheduler.blocked and not policy:
+    if context_saves.pending(session) and not policy:
         controller.saveChoiceRequested.emit(path)
         return
-    if policy == "wait" and session.scheduler.blocked:
+    if policy == "wait" and context_saves.pending(session):
         session.waiting_save = True
         controller.pending_save = path
         controller.notify()
@@ -31,11 +31,7 @@ def save(controller, path, policy):
 def start_save(controller, path, policy):
     session = controller.session
     target = Path(local_path(path)).resolve()
-    snapshot = (
-        session.scheduler.checkpoint
-        if policy == "checkpoint" and session.scheduler.blocked
-        else session.document
-    )
+    snapshot = context_saves.project(session, checkpoints=policy == "checkpoint")
     lock = projects.lock_target(session, target)
     controller.temporary_locks.append(lock)
     session.scheduler.submit(save_job(controller, target, snapshot, lock))
@@ -90,19 +86,21 @@ def cleanup(controller, lock, state):
 
 
 def queue_document(controller, path):
+    if controller.session.contexts.visible:
+        controller.session.contexts.select("")
     controller.pending_document = path
     controller.session.waiting_save = True
-    for job in controller.session.scheduler.active_jobs:
-        if job.active:
+    for job in all_active(controller.session.scheduler):
+        with controller.session.contexts.use(job.context):
             controller.session.scheduler.cancel_job(job.id)
 
 
 def poll(controller):
     session = controller.session
-    if controller.pending_save and not session.scheduler.blocked:
+    if controller.pending_save and not context_saves.pending(session):
         path, controller.pending_save = controller.pending_save, ""
         start_save(controller, path, "wait")
-    if controller.pending_document is not None and not session.scheduler.active_jobs:
+    if controller.pending_document is not None and not all_active(session.scheduler):
         path, controller.pending_document = controller.pending_document, None
         if path:
             start_open(controller, path)
@@ -143,8 +141,7 @@ def opened(controller, path, lock, result):
 
 def adopt_loaded_state(controller, path, lock, result):
     session = controller.session
-    session.document, session.resources = result
-    session.history = History(session.document)
+    session.contexts.adopt_published(*result)
     session.serial = session.document.revision
     session.active_workspace = 0
     session.waiting_save = False

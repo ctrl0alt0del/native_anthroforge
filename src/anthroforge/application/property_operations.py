@@ -6,6 +6,7 @@ from typing import Any
 from anthroforge.core import numeric_properties as numeric
 
 from . import property_catalog
+from .variant_policy import require as require_variant_edit
 
 
 def discover(
@@ -57,6 +58,7 @@ def read(session: Any, reference: numeric.PropertyRef, item: Any = None) -> Any:
 
 
 def set_value(session: Any, reference: dict[str, Any], value: Any, uniform: bool = False) -> None:
+    require_variant_edit(session, reference["target"])
     selected = property_catalog.resolve(session.document, numeric.decode_reference(reference))
     if uniform and selected.reference.component is None and selected.components > 1:
         value = (value,) * selected.components

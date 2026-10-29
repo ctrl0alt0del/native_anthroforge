@@ -58,6 +58,7 @@ class Job:
     retry: Callable[[], Any] | None = None
     cleanup: Callable[[str], None] | None = None
     kind: str = "generic"
+    context: str = ""
     interactive: bool = False
     workload: Callable[[Document], Workload] = lambda _: Workload()
     assessment: Assessment | None = None

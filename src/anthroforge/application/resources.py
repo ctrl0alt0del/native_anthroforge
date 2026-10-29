@@ -18,6 +18,7 @@ from .assets import Asset
 from .attachment_assets import AttachmentAsset
 from .image_assets import ImageAsset
 from .path_assets import PathAsset
+from .reconstruction_resources import retain as retain_reconstruction
 from .skin_assets import SkinAsset
 from .skin_assets import references as skin_references
 from .tissue_material_resources import retain as retain_materials
@@ -74,6 +75,7 @@ def referenced(document: Document) -> dict[str, set[str]]:
     meshes, buffers = skin_references(document.skin)
     result["meshes"].update(meshes)
     result["skin"] = buffers
+    retain_reconstruction(document, result)
     return result
 
 

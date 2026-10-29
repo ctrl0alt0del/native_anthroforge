@@ -19,6 +19,8 @@ from .changes import ChangeJournal
 from .coordinator import TaskCoordinator
 from .curve_conversion import ConversionPreview
 from .document_relationships import retain_settings
+from .editing_contexts import EditingContexts
+from .editing_state import ContextField, EditingState
 from .entity_revisions import POSE_FIELDS, changed_ports, differs
 from .entity_revisions import authored as authored_entity
 from .history import History
@@ -31,6 +33,29 @@ from .tissue_preview import Candidate as TissueCandidate
 
 
 class Session:
+    _document = ContextField[Document]("document")
+    history = ContextField[History]("history")
+    changes = ContextField[ChangeJournal]("changes")
+    active_workspace = ContextField[int]("active_workspace")
+    formula_write_authority = ContextField[frozenset[str]]("formula_write_authority")
+    formula_observing = ContextField[bool]("formula_observing")
+    replay_callback = ContextField[Any]("replay_callback")
+    issues = ContextField[Any]("issues")
+    skin_status = ContextField[Any]("skin_status")
+    assembly = ContextField[Any]("assembly")
+    skeleton_update = ContextField[Any]("skeleton_update")
+    shortcut_edits = ContextField[Any]("shortcut_edits")
+    formula_invalidation = ContextField[Any]("formula_invalidation")
+    shortcut_observation = ContextField[Any]("shortcut_observation")
+    shortcut_comparison = ContextField[Any]("shortcut_comparison")
+    tissue_inspection = ContextField[Any]("tissue_inspection")
+    conversion = ContextField[ConversionPreview]("conversion")
+    mesh_replacement = ContextField[Preview[Any]]("mesh_replacement")
+    tissue_retarget = ContextField[Preview[Any]]("tissue_retarget")
+    surface_preview = ContextField[Preview[Candidate]]("surface_preview")
+    tissue_preview = ContextField[Preview[TissueCandidate]]("tissue_preview")
+    skin_fit_preview = ContextField[Preview[Any]]("skin_fit_preview")
+
     def __init__(
         self,
         name: str = "Untitled",
@@ -43,10 +68,12 @@ class Session:
         self.initialize_runtime(profiler)
         self._engine: GeometryEngine | None = None
         self.initialize_file_state()
+        self.contexts = EditingContexts(self)
 
     def initialize_document(self, name: str, executor_factory: Any) -> None:
         from .geometry_ownership import Reachability
 
+        self._editing = EditingState()
         self.changes, self._document = ChangeJournal(), Document(name=name)
         self.history = History(self.document)
         self.resources = Resources()
@@ -58,11 +85,11 @@ class Session:
         self.path: Path | None = None
         self.file_lock: Any = None
         self.saved_revision = 0
-        self.formula_write_authority: frozenset[str] = frozenset()
+        self.formula_write_authority = frozenset()
         self.formula_observing = False
         self.active_workspace = 0
         self.waiting_save = False
-        self.replay_callback: Any = None
+        self.replay_callback = None
 
     def initialize_runtime(self, profiler: RuntimeProfiler | None) -> None:
         from .issues.repairs import register
@@ -326,10 +353,7 @@ class Session:
         }
 
     def close(self) -> None:
-        self.assembly.cancel()
-        self.skeleton_update.cancel()
-        self.shortcut_comparison.clear()
-        self.issues.close()
+        self.contexts.close()
         self.scheduler.close()
         self.clear_previews()
         if self._engine is not None:
@@ -342,11 +366,11 @@ class Session:
 
     def clear_previews(self) -> None:
         self.conversion = ConversionPreview()
-        self.mesh_replacement: Preview[Any] = Preview()
-        self.tissue_retarget: Preview[Any] = Preview()
-        self.surface_preview: Preview[Candidate] = Preview()
-        self.tissue_preview: Preview[TissueCandidate] = Preview()
-        self.skin_fit_preview: Preview[Any] = Preview()
+        self.mesh_replacement = Preview()
+        self.tissue_retarget = Preview()
+        self.surface_preview = Preview()
+        self.tissue_preview = Preview()
+        self.skin_fit_preview = Preview()
 
 
 def changed_ids(previous: Document, current: Document) -> set[str]:

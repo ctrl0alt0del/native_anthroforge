@@ -15,15 +15,18 @@ algorithms and unrelated root __init__.py. Background/hidden tests only.
 
 ## Current state
 
-Specification and repository boundaries inspected. Existing skeleton-update candidate
-evaluation and comparison, typed graph copying, resource leases, history and command catalogue
-provide the foundations. Session currently binds one mutable editing context; this is the
-owning boundary to generalize before variants use normal tools.
+Added schema-9 reconstruction records/codecs and resource reachability, plus explicit editing
+contexts with separate history/services and coordinator-owned scheduling namespaces. There
+is one executor/resource admission/inline budget. Jobs retain their context identity; callback
+publication runs under that context. Context switching pauses authored work without waiting.
+Runtime variants, save/autosave projection, scope policies and desktop are not yet delivered.
 
 ## Verification
 
-No runtime changes or new tests yet. Previous main qualification: 2,722 tests, six native
-suites and 34 portable checks. That is baseline evidence, not qualification of this work.
+Focused context/scheduler/active-job tests: 16 passed. Existing skeleton-update command tests:
+3 passed. Context tests cover ordinary edit/Undo isolation, same-identity concurrent jobs and
+non-recursive schema round trips. Relevant mypy checks pass. Python function-limit/import
+architecture checks passed before the last small helper edits. Full gate not yet run.
 
 ## Next actions
 

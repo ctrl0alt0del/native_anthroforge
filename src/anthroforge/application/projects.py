@@ -76,13 +76,15 @@ def open_project(session: "Session", path: str) -> dict[str, Any]:
 
 
 def adopt(session: "Session", document: Any, assets: Any) -> None:
-    session.issues.close()
+    session.contexts.close()
     session.scheduler.close()
+    session._editing = session.contexts.states[""]
     session.document, session.resources = document, assets
     session.history = History(document)
     session.serial = document.revision
     session.initialize_scheduler()
     session.active_workspace = 0
+    session.contexts = type(session.contexts)(session)
 
 
 def synchronize_loaded(session: "Session") -> None:

@@ -20,6 +20,14 @@ def retained_documents(session: "Session") -> list[Document]:
     documents.extend(job.snapshot for job in session.scheduler.active_jobs if job.snapshot)
     if session.history.before:
         documents.append(session.history.before)
+    documents.extend(session.contexts.documents())
+    documents.extend(s.checkpoint for s in session.scheduler.scheduling_contexts.values())
+    documents.extend(
+        j.snapshot
+        for s in session.scheduler.scheduling_contexts.values()
+        for j in s.registry.active.values()
+        if j.snapshot
+    )
     return documents
 
 

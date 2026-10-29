@@ -381,6 +381,7 @@ class Session:
             self.file_lock.close()
 
     def clear_previews(self) -> None:
+        self._editing.values.pop("component_read", None)
         self.conversion = ConversionPreview()
         self.mesh_replacement = Preview()
         self.tissue_retarget = Preview()

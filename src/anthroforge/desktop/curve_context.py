@@ -6,8 +6,6 @@ from anthroforge.application import curve_sources
 from anthroforge.application.curve_edit_state import current
 from anthroforge.core.construction import Curve
 from anthroforge.core.entities import IDENTITY, SCP
-from anthroforge.native import construction
-from anthroforge.native.scene import entity_frame
 
 
 def owner(editor):
@@ -29,10 +27,9 @@ def curves(editor):
 
 
 def frame(session, item, curve=None):
-    if isinstance(item, Curve):
-        return curve_sources.world(session.engine, session.document, item.id)
-    matrix = entity_frame(session.engine, item)
-    return construction.matrix(session.engine, matrix, curve.matrix) if curve else matrix
+    from anthroforge.application.component_buffers import curve_frame
+
+    return curve_frame(session, item, curve)
 
 
 def command(editor, operation, arguments):

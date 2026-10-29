@@ -4,13 +4,12 @@ from dataclasses import fields
 
 from anthroforge.application.control_frames import display_frame
 from anthroforge.application.curve_sources import for_editing
-from anthroforge.core.construction import Curve, body_closed
+from anthroforge.core.component_reads import component_key as component_key
+from anthroforge.core.construction import Curve
 from anthroforge.core.construction_capabilities import component_editing, stable_geometry_members
 from anthroforge.core.entities import IDENTITY
 from anthroforge.core.objects import ConstructionObject
 from anthroforge.core.tissues import TissueVCP
-from anthroforge.native import bodies, components, construction
-from anthroforge.native.scene import entity_frame
 
 from . import curve_context, tissue_components
 
@@ -121,115 +120,23 @@ def selection_center(editor, selected):
 
 
 def curve_components(session, entity, curve):
-    records = construction.resolved_curve(session.engine, curve)
-    local = records[:, [3, 4, 5, 0, 1, 2, 6, 7, 8]].reshape((-1, 3))
-    frame = curve_context.frame(session, entity, curve)
-    world = components.transformed(session.engine, local, frame)
-    refs = curve_refs(entity, curve)
-    rows = list(zip(refs, world.tolist(), local.tolist(), strict=True))
-    return (
-        rows if curve.engine == "BEZIER" else [row for row in rows if row[0]["part"] == "position"]
-    )
+    from anthroforge.application.component_buffers import curve as resolve
+    from anthroforge.application.editing_queries import rows
+    from anthroforge.core.component_reads import ComponentRead
 
-
-def curve_refs(entity, curve):
-    return [
-        dict(
-            owner=entity.id,
-            curve=curve.id,
-            point=p.id,
-            part=part,
-            index=i * 3 + j,
-            readonly=curve.engine == "PARAMETRIC",
-        )
-        for i, p in enumerate(curve.points)
-        for j, part in enumerate(("left", "position", "right"))
-    ]
-
-
-def control_components(session, control):
-    frame = display_frame(session, control)
-    local = control.points if control.kind == "LATTICE" else ((0, 0, 0),)
-    world = components.transformed(session.engine, local, frame)
-    refs = [
-        dict(owner=control.id, index=i, part="lattice" if control.kind == "LATTICE" else "control")
-        for i in range(len(local))
-    ]
-    return list(zip(refs, world.tolist(), local, strict=True))
-
-
-def entity_components(session, entity, category):
-    from anthroforge.core.entities import SCP
-
-    if not isinstance(entity, SCP):
-        return []
-    entity = for_editing(session, entity)
-    if not entity.primitive:
-        return []
-    if entity.primitive.kind == "BODY" and category == "BASE":
-        return [row for p in entity.primitive.pieces for row in base_components(session, entity, p)]
-    if entity.primitive.kind == "IMPORTED":
-        return imported_components(session, entity)
-    return [
-        row for curve in entity.primitive.curves for row in curve_components(session, entity, curve)
-    ]
-
-
-def imported_components(session, entity):
-    mesh = session.assets[entity.primitive.source].mesh
-    world = components.transformed(
-        session.engine, mesh.array(0), entity_frame(session.engine, entity)
-    )
-    return [
-        (dict(owner=entity.id, index=i, part="vertex"), p, local.tolist())
-        for i, (p, local) in enumerate(zip(world.tolist(), mesh.array(0), strict=True))
-    ]
+    return rows(ComponentRead("", (resolve(session, entity, curve),), ()))
 
 
 def components_for(editor):
-    session, selected = editor.controller.session, editor.controller.selection
-    control = session.document.index.controls.get(selected)
-    if control:
-        return control_components(session, control)
-    entity = curve_context.owner(editor)
-    if isinstance(entity, TissueVCP) and editor.editing:
-        return tissue_components.records(editor, entity)
-    if isinstance(entity, Curve) and editor.editing:
-        return curve_components(session, entity, entity)
-    return entity_components(session, entity, editor.category) if entity and editor.editing else []
+    from anthroforge.application import editing_queries
 
-
-def base_components(session, entity, piece):
-    from anthroforge.core.primitive_sampling import count
-
-    density = count(session.document.entity(entity.id).primitive, piece.curve)
-    entity = for_editing(session, entity)
-    curve = next(c for c in entity.primitive.curves if c.id == piece.curve)
-    mesh = bodies.base(
-        session.engine, piece, density, body_closed(piece, curve, entity.primitive), 0
-    )
-    return base_records(session, entity, curve, piece, mesh)
-
-
-def base_records(session, entity, curve, piece, mesh):
-    from anthroforge.native.geometry_modifiers import subdivide
-
-    mesh = subdivide(mesh, piece.subdivision)
-    frame = construction.matrix(session.engine, entity_frame(session.engine, entity), curve.matrix)
-    world = components.transformed(session.engine, mesh.array(0), frame).tolist()
-    return [
-        (dict(owner=entity.id, piece=piece.id, index=i, part="base"), p, local.tolist())
-        for i, (p, local) in enumerate(zip(world, mesh.array(0), strict=True))
-    ]
-
-
-def component_key(reference):
-    fields = (
-        ("owner", "curve", "point", "part")
-        if reference.get("point")
-        else ("owner", "piece", "part", "index")
-    )
-    return ":".join(str(reference.get(key, "")) for key in fields)
+    session, target = editor.controller.session, editor.controller.selection
+    if not target or not (editor.editing or target in session.document.index.controls):
+        return []
+    context = dict(part=editor.tissue_context[0], side=editor.tissue_context[1])
+    if editor.category == "TISSUE_FIELD":
+        context = dict(field=editor.tissue_context[0])
+    return editing_queries.rows(editing_queries.current(session, target, editor.category, context))
 
 
 def retained_selection(editor):

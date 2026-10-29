@@ -40,4 +40,11 @@ Existing shared helpers and native borrowed buffers are authoritative. Reviewed 
 [Qt model/view](https://doc.qt.io/qt-6/model-view-programming.html) and
 [RFC 6901](https://www.rfc-editor.org/info/rfc6901/) for adapter separation and pointer syntax.
 
-Next: introduce typed component queries and move desktop component production to them.
+Checkpoint: shared component buffers and `editing.inspect` now serve the desktop editor.
+Moved-Fiber paired UI/API regression, immutable buffer ownership, bounded paging and
+changed-revision rejection pass (31 targeted runtime tests; architecture and focused mypy
+pass). Queries preserve authored data/history. No release qualification yet.
+
+Remaining: broaden restriction/provenance coverage (junctions, driven controls, fields),
+then implement candidate capture/render/export, contextual queries and JSON literals.
+Full gate, production profiling and packaging remain pending.

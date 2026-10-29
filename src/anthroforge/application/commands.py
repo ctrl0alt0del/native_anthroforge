@@ -20,6 +20,7 @@ from . import (
     drawing_operations,
     drawing_projection,
     driving_operations,
+    editing_queries,
     evaluation,
     fiber_bindings,
     fiber_operations,
@@ -484,6 +485,7 @@ def drawing_commands(session: "Session") -> dict[str, Any]:
 def file_commands(session: "Session") -> dict[str, Any]:
     return {
         "save": lambda **a: projects.save(session, **a),
+        "editing.inspect": lambda **a: editing_queries.inspect(session, **a),
         "inspection.export": lambda **a: inspection_report.export(session, **a),
         "inspection.replay": lambda **a: comparison_replay.replay(**a),
         "open": lambda **a: projects.open_project(session, **a),

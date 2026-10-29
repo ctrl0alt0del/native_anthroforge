@@ -17,6 +17,7 @@ class WeightPaintingTools(QObject):
         super().__init__(controller)
         self.controller, self.name, self.target = controller, "", ""
         self.options, self.token, self.workspace, self.last_error = {}, "", None, ""
+        self.last_position = None
         self.domain, self.model = domains.TISSUE, RenderModel(controller)
         self.model.activated.connect(self.changed.emit)
         self.radius, self.weight, self.strength, self.falloff, self.through = 40, 1, 1, 1, False
@@ -109,6 +110,7 @@ class WeightPaintingTools(QObject):
         if self.token and self.stroke_state():
             self.call("cancel", token=self.token)
         self.options, self.token, self.last_error = {}, "", ""
+        self.last_position = None
         self.model.publish([])
         self.changed.emit()
 
@@ -144,17 +146,26 @@ class WeightPaintingTools(QObject):
 
     @Slot("QVariantList", "QVariantList", bool)
     def pointer(self, position, camera, press):
-        if self.name and not self.stroke_state().get("pending", False):
+        if (
+            self.name
+            and not self.stroke_state().get("pending", False)
+            and not self.controller.session.waiting_save
+        ):
             self.attempt(self.sample, position, camera, press)
 
     def sample(self, position, camera, press):
         if press:
             self.start_stroke(camera)
         if self.dragging:
-            self.call("append", token=self.token, samples=[position])
+            self.append_pointer(position)
         elif not self.options or self.options["view"] != camera:
             self.hover(position, camera)
         self.changed.emit()
+
+    def append_pointer(self, position):
+        if position != self.last_position:
+            self.call("append", token=self.token, samples=[position])
+            self.last_position = list(position)
 
     def start_stroke(self, camera):
         self.cancelStroke()
@@ -194,6 +205,8 @@ class WeightPaintingTools(QObject):
             self.cancel()
         elif state.get("state") in ("stale", "obsolete", "cancelled"):
             self.cancelStroke()
+        elif state.get("state") in ("committed", "failed"):
+            self.options = {}
         self.report(state.get("error", ""))
         skin_painting_view.publish(self)
         self.changed.emit()

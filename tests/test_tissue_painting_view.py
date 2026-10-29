@@ -74,3 +74,18 @@ def test_camera_metadata_save_does_not_cancel_active_stroke(controller):
     publish(controller)
     controller.session.wait()
     assert any(controller.session.document.object(target).fields[0].values)
+
+
+def test_finished_stroke_allows_hover_and_ignores_duplicate_pointer(controller):
+    _, tool = brush(controller)
+    preview(controller, tool)
+    tool.pointer([0, 0], list(VIEW), False)
+    assert tool.stroke_state()["sequence"] == 1
+    tool.release()
+    controller.session.wait()
+    publish(controller)
+    assert not tool.options
+    tool.pointer([0, 0], list(VIEW), False)
+    controller.session.wait()
+    publish(controller)
+    assert tool.preview and not tool.dragging

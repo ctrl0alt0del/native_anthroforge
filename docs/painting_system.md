@@ -40,7 +40,7 @@ with [Qt threading guidance](https://doc.qt.io/qt-6/threads-qobject.html).
 Consumer identifiers are `tissue_weights` and `collagen`. Tissue options include an existing
 field `name` and displayed `stage` (`rest`, `intrinsic`, `final`); BASE/REST is the field's
 material domain, not a replacement for the displayed stage. Collagen uses accepted SCP
-geometry. Optional `expected_asset` must identify the actual displayed resource. `occluders`
+geometry. Optional `expected_asset` must identify the actual displayed resource. `obstacles`
 uses the existing explicit surface/asset/frame records. IDs and revisions are public;
 native handles are never request arguments.
 

@@ -5,7 +5,7 @@
 - Starting revision: `713d963ecc5cad9aad939141acc140a73180324e`
 - Status: implementation in progress
 - Active writer: local implementation session
-- Last updated: 2026-10-29
+- Last updated: 2026-10-30
 
 ## Outcome and acceptance
 
@@ -37,6 +37,9 @@ New shared lifecycle tests: 20 passed, including finish-before-preview, undo/red
 cancel, changed baseline, paging, no-op, limits and Qt-free execution. Style/type and 15-line checks now pass. Save coordination regression fixed through
 the shared admitted-publication edit boundary. Sixteen further lifecycle cases pass
 (resource release, delayed cancellation, exact candidate reuse, failure and contexts).
+Eight numerical parity matrix cases and pending-save/export checks also pass.
+Hidden GPU captures exist under build/painting/visual; no physical-window interaction.
+Full gate is running (native build/CTest/style complete; full pytest in progress).
 Required: full development gate; dense
 and 96-muscle performance comparison; offscreen images; relocated portable checks.
 No interactive desktop evidence may be claimed.

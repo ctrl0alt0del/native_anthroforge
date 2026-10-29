@@ -95,7 +95,7 @@ native algorithms and retained material-binding semantics. Final evidence is bel
 | G06 | Hook deformation: bind/reset/recenter transforms, point membership, weights, inversion, strength and distance/custom-curve falloff. Shared influence preparation is native. | [hooks.cpp](../native/src/hooks.cpp), [influence.cpp](../native/src/influence.cpp), [curve_mapping.cpp](../native/src/curve_mapping.cpp) | [primitive parity](../tests/test_primitive_parity.py), [native preparation](../tests/test_native_preparation.py) |
 | G07 | Lattice deformation: grid generation/resizing, interpolation, cage/object frames, weighted influence and Outside behavior. | [lattices.cpp](../native/src/lattices.cpp) | [primitive parity](../tests/test_primitive_parity.py), [anatomical primitives](../tests/test_anatomy_primitives.py) |
 | G08 | Thickness: Blender Simple Solidify behavior, weighted offsets, rims, even thickness, normal handling and clamping. Ordered after applicable deformation; Complex mode is absent. | [solidify.cpp](../native/src/solidify.cpp) | [primitive parity](../tests/test_primitive_parity.py) |
-| G09 | Source-linked spatial reflection (0.3.5): reuse source assets with a native-composed reflection frame and distinct instance/role references. No independent mirror solver. | [mirror providers](../src/anthroforge/application/mirror_surfaces.py), [relationship resolution](../src/anthroforge/core/mirror_resolution.py) | [mirror contracts](../tests/test_mirroring.py), [desktop projection](../tests/test_mirroring_desktop.py); [runtime qualification](mirroring_035.md) |
+| G09 | Source-linked spatial reflection (0.3.5): reuse source assets with a native-composed reflection frame and distinct instance/role references. Shared targets reflect source bindings without a second anchor/contact claim. No independent mirror solver. | [mirror providers](../src/anthroforge/application/mirror_surfaces.py), [relationship resolution](../src/anthroforge/core/mirror_resolution.py) | [mirror contracts](../tests/test_mirroring.py), [desktop projection](../tests/test_mirroring_desktop.py); [runtime qualification](mirroring_035.md) |
 
 ### Curves and path engines
 
@@ -3835,3 +3835,32 @@ The original primitive workshop opens without warnings after the correction. Pro
 command and boundary events carry editing-context identity; recording boundaries enumerate
 active jobs across contexts, rather than only the visible variant. Neither change alters
 calculation scheduling or accepted geometry.
+
+
+## 2026-10-29 — Shared mirror attachment inspection (G09)
+
+The live-mirror migration of the 96-muscle assembly exposed 182 false relationship
+mismatches. Previously inspection resolved the same material binding on a shared central
+bone twice, reflected one frame and compared it to the original-side frame. This tests
+whether the original anchor lies on the reflection plane, not whether the mirrored
+attachment is valid. No independent opposite-side anchor exists in these records.
+
+The user requested the addon's behavior. Inspection of
+`core/visualization/vcp_mirror_runtime.py` (`_copy_fiber_instance`,
+`_copy_mirror_transform`) and `core/scp_runtime/mirror_scene.py` confirms bone-attached
+fibers and SCPs reflect evaluated source geometry without recapturing central-bone anchors.
+The addon's separate muscle-backed instance evaluation is deliberately not transplanted:
+the confirmed standalone contract requires strict source reflection for all tissue stages.
+
+Shared attachment inspection now describes source reflection explicitly and marks surface
+contact as not checked. It does not run the invalid same-anchor comparison, introduce
+another binding, or claim that asymmetric supports necessarily touch the reflected output.
+Non-shared counterpart/plane checks, source attachment algorithms, offsets and exact
+reflected geometry remain unchanged. The correction belongs in the shared application
+inspection policy used by both API and automatic Issues; no new numerical algorithm.
+
+Baseline: `29261706`. Regression evidence covers shared-anchor inspection, retained bindings
+through plane edits/save/reopen, and missing counterparts. Full-assembly source geometry,
+attachments, shortcut updates and packaged qualification are recorded in the
+[task record](tasks/assembly-live-mirroring.md). Local numerical and rendered evidence lives
+under ignored `build/assembly-live-mirroring`; it is not part of the source archive.

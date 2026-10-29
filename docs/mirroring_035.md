@@ -25,6 +25,12 @@ an explicit midline-sharing choice. Missing counterparts and incompatible retain
 anchors report Issues while the mirror keeps exact source geometry. Rule/source removal
 is blocked by retained consumers; the dialog has search and navigation.
 
+Shared targets follow the addon's bone-attached behavior: reflect the evaluated source
+and its binding without capturing another anchor. Inspection reports `source_reflection`
+and does not claim that contact with an asymmetric support was checked. The old comparison
+against the original-side anchor produced false mismatches and was corrected on October 29.
+Missing counterpart and cross-plane checks remain separate from this shared-target policy.
+
 For a selected open Curve/Fiber, use **Symmetric construction** to choose an existing
 rule or a shifted document-axis plane, then **Create symmetric loop**. Both endpoints
 must already lie on that plane and the interior must remain on one side. Edit the

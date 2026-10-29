@@ -2,8 +2,8 @@
 
 - Branch: `codex/assembly-live-mirroring`; integration: `main`.
 - Baseline: `395b5b8b`; writer: local direct work.
-- Status: candidate and independent qualification complete; awaiting the user's
-  midline-anchor policy answer. No production-code or source-project changes.
+- Status: addon policy inspected and shared-target inspection corrected; full-assembly
+  requalification and canonical package checks in progress. Original project untouched.
 
 ## Authorized outcome
 
@@ -66,20 +66,22 @@ desktop.runtime.build_directory and desktop.offscreen.build_directory to the sam
 `AF_NATIVE_BUILD` when reproducing; import application.session before desktop.capture.
 No interactive desktop input or visible windows were used.
 
-## Pending user decision — do not silently change attachment policy
+## Resolved shared-target behavior
 
-The current SharedMirrorTarget keeps only (source, binding), and mirror validation
-resolves that original-side binding on the same midline target. All 182 shared
-relationships therefore report mismatch. This does not mean 182 actual surface gaps:
-the check compares reflected positions with original-side material coordinates.
-Confirmed exterior-placement probes show source/reflected surface distances broadly
-similar, with genuine existing asymmetry on central geometry; no points were rebound.
+User response: “How it's done in addon? do the same”. Inspected addon
+`vcp_mirror_runtime._copy_fiber_instance/_copy_mirror_transform`, `fiber_instance_runtime.update`
+and `scp_runtime/mirror_scene.py`. Bone-attached fibers and SCPs reflect evaluated source
+geometry without a second capture. Later muscle-backed independent evaluation is outside
+the standalone's confirmed strict-reflection contract and is not copied.
 
-The async question asks whether to add an explicit opposite-side material anchor
-on the same bone for validation, retaining exact reflected geometry and reporting
-real drift, or keep current sharing and its warnings. No answer has arrived yet.
-The user previously requested discussion before changing attachment behavior.
-Keep this branch unmerged and the candidate under build until that choice is resolved.
-If approved, implement through shared mirror binding/lifetime/persistence contracts,
-validate actual gaps versus preserved offsets, qualify source updates and mirrored
-diagnostics, then deliver a new project copy and any required canonical app update.
+The app compared reflected source anchors with the original-side anchor on a shared bone,
+producing 182 false mismatches. Shared inspection now reports `binding_mode=source_reflection`
+and `surface_contact=not_checked`; no rebinding or geometry mutation. Counterpart/plane checks
+remain for non-shared relationships. Shared supports can still be asymmetric; this is not
+a surface-contact guarantee. The previous proposal to capture new anchors was withdrawn.
+19 focused tests pass, covering source geometry, shared binding persistence/plane edits,
+missing counterparts and ownership/style limits. Regenerated candidate has 689 mapped
+relationships and no false mismatch rows. Full development gate/package checks pending.
+
+Next: finish representative shortcut comparisons, package the app, verify hidden captures
+and source hash, deliver one new project under the source migration directory, then merge.

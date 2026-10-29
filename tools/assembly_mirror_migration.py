@@ -102,7 +102,8 @@ def inspect(session, document):
     ]
     report("relationships", rows)
     report("relationship-summary", dict(Counter(r["status"] for r in rows)))
-    probe_midline(session, [r for r in rows if r["status"] == "mismatch"])
+    assert all(r["status"] == "mapped" for r in rows), rows
+    probe_midline(session, [r for r in rows if r.get("binding_mode") == "source_reflection"])
 
 
 def instance_summary(document):

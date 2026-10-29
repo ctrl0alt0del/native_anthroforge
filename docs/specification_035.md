@@ -86,6 +86,13 @@ is an explicit per-attachment choice for shared midline supports; it is not an a
 fallback when a counterpart is missing. Ordinary deformation and plane edits must not
 perform nearest-surface reassignment.
 
+October 29 migration clarification, following the addon's bone-attached mirror path:
+same-target sharing reflects the source binding; it does not create an independently
+captured opposite-side material anchor. Comparing that reflected frame to the original
+side's material frame is not a valid contact test. Inspection identifies this relationship
+as `source_reflection`, with surface contact `not_checked`. Asymmetric support geometry
+may still leave a physical gap; sharing does not certify contact or repair that gap.
+
 These mapped relationships support inspection and validation, not a second deformation
 pass. A missing target or a mismatch against asymmetric supports reports an Issue while
 the exact reflected geometry remains. Distinguish relationship findings from source

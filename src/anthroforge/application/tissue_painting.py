@@ -4,11 +4,11 @@ from typing import Any
 
 from anthroforge.native import painting
 
-from . import tissue_fields, tissue_strategy_operations
+from . import tissue_fields
 from . import tissue_inspection as inspection
 from . import tissue_inspection_stages as stages
 from .inspection_context import scene_signature
-from .weight_painting import obstacles, require_current
+from .weight_painting import obstacles
 
 
 def field(context: Any, target: str, options: Any) -> Any:
@@ -20,23 +20,22 @@ def field(context: Any, target: str, options: Any) -> Any:
     return value
 
 
-def validate(context: Any, target: str, options: Any) -> None:
+def validate(context: Any, target: str, options: Any) -> Any:
     inspection.validate(context, target, options)
-    field(context, target, options)
+    value = field(context, target, options)
     if options["stage"] == "base":
         raise ValueError("Paint the rest, intrinsic or final tissue surface.")
-    if len(options.get("samples", ())) not in range(1, 4097):
-        raise ValueError("A paint stroke needs 1–4096 pointer samples.")
+    return value
 
 
 def signature(context: Any, target: str, options: Any) -> Any:
-    validate(context, target, options)
+    value = validate(context, target, options)
     inspection.expected_asset(context, target, options)
     return (
         scene_signature(context.document),
         target,
         stages.signature(context, target, options["stage"]),
-        field(context, target, options),
+        value,
         tuple((m.handle, frame) for m, frame in obstacles(context, options)),
     )
 
@@ -75,11 +74,6 @@ def compute(context: Any, target: str, options: Any, cancel: int) -> dict[str, A
 
 
 def commit(session: Any, job: str) -> None:
-    value = session.tissue_inspection.values.get("paint")
-    require_current(session, value, job)
-    result = value.asset
-    weights = result["resource"].values.tolist()
-    item = field(session, value.target, result["options"])
-    if tuple(weights) != item.values:
-        tissue_strategy_operations.field_set(session, value.target, item.name, weights, item.domain)
-    inspection.cancel(session, "paint")
+    from .painting_compatibility import commit as apply
+
+    apply(session, "paint", job)

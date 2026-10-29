@@ -58,6 +58,7 @@ class EditingContexts:
 
     def pause(self, key: str) -> None:
         with self.use(key):
+            self.session.cancel_painting()
             for job in self.session.scheduler.active_jobs:
                 if job.writes:
                     self.session.scheduler.cancel_job(job.id, obsolete=True, reason="context_left")

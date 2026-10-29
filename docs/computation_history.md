@@ -143,7 +143,7 @@ Presence in this inventory does not make every mode available on every source.
 | T06 | Anchor-based radial tissue: sphere/ellipsoid construction in the resolved source frame. | [tissue_radial.cpp](../native/src/tissue_radial.cpp) | [tissue shapes](../tests/test_tissue_shapes.py) |
 | T07 | Fiber-based tissue: open/cyclic profile sweep, width/depth/power, resolution, taper, backing and cap construction. | [tissue_profile_sweep.cpp](../native/src/tissue_profile_sweep.cpp) | [tissue shapes](../tests/test_tissue_shapes.py) |
 | T08 | Membrane normal shell: weighted normals, minimum/maximum thickness, power, backing and rims. Missing fields use boundary-distance defaults; explicit all-zero fields remain authoritative. | [tissue_normal_shell.cpp](../native/src/tissue_normal_shell.cpp), [tissue_shape_fields.cpp](../native/src/tissue_shape_fields.cpp) | [tissue shapes](../tests/test_tissue_shapes.py), [shape workflow](../tests/test_tissue_shape_workflow.py) |
-| T09 | Fields and regions: material-domain masks, boundary/geodesic distances, custom values, feathering, region selection/outline geometry and source-domain signature validation. Native visible/through brushes use cached projection and material weights, with one authored commit; goal witnesses share constraint formulas (CH-024/026). | [tissue_masks.cpp](../native/src/tissue_masks.cpp), [tissue_regions.cpp](../native/src/tissue_regions.cpp), [painting.cpp](../native/src/painting.cpp), [inspection_goals.cpp](../native/src/inspection_goals.cpp) | [field editing](../tests/test_tissue_field_editing.py), [painting](../tests/test_tissue_painting.py), [constraint goals](../tests/test_constraint_goal_inspection.py) |
+| T09 | Fields and regions: material-domain masks, boundary/geodesic distances, custom values, feathering, region selection/outline geometry and source-domain signature validation. Native visible/through brushes use cached projection and material weights, with one authored commit through the shared [Painting System](painting_system.md); goal witnesses share constraint formulas (CH-024/026). | [tissue_masks.cpp](../native/src/tissue_masks.cpp), [tissue_regions.cpp](../native/src/tissue_regions.cpp), [painting.cpp](../native/src/painting.cpp), [inspection_goals.cpp](../native/src/inspection_goals.cpp) | [field editing](../tests/test_tissue_field_editing.py), [painting](../tests/test_tissue_painting.py), [constraint goals](../tests/test_constraint_goal_inspection.py) |
 | T10 | Constraint goals: source/target-relative Fixed/Soft regions, material binding resolution, normal offsets, tethers, exact backing and conflicting-goal detection. Constraint enforcement remains active with relaxation None. | [tissue_constraints.cpp](../native/src/tissue_constraints.cpp), [material bindings](../src/anthroforge/native/material_bindings.py) | [target regions](../tests/test_tissue_target_regions.py), [tissue relaxation](../tests/test_tissue_relaxation.py) |
 | T11 | Height smoothing: cotangent-biharmonic bounded height QP with PIQP, exact boundary/seam/zero-height pins, independent optimality checks and complete-mesh acceptance. Off bypasses the solve. | [smoothing_core.cpp](../native/src/smoothing_core.cpp), [tissue_smoothing.cpp](../native/src/tissue_smoothing.cpp) | [tissue smoothing](../tests/test_tissue_smoothing.py), [inflation regression](../tests/test_tissue_inflation_regression.py) |
 | T12 | Geometric relaxation: source-specific static sag; radial tissue iterates gravity, neighbor smoothing and host-surface projection, while sweep/shell use their supported geometric displacement rules. | [tissue_geometric.cpp](../native/src/tissue_geometric.cpp), [tissue_point_relaxation.cpp](../native/src/tissue_point_relaxation.cpp) | [relaxation parity](../tests/test_tissue_relaxation_parity.py) |
@@ -3891,3 +3891,31 @@ retaining missing-input and revision-change rejection. The 96-muscle SCM inflati
 and a driver-edit staleness regression pass. This changes candidate eligibility, not numerical
 evaluation or accepted output. Inspection leases are attributed by the existing recording-only
 resource inventory; no additional polling is introduced.
+
+## 2026-10-30 — Shared stroke lifecycle (T09, R01/R02/R06)
+
+Previously tissue inspection owned read-only paint jobs while a Qt timer/controller
+owned sample accumulation, release and commit polling. Collagen reused that tissue
+inspection state. Headless clients manually paired preview and commit.
+
+Painting now has context-owned application state and explicit tissue-weight/collagen
+consumer adapters. The existing coordinator batches interactive previews at 60 ms and
+owns finalization. Finish reuses an exactly matching ready candidate or computes the
+final sequence, then applies one ordinary transaction. Saves block new input but allow
+already-admitted publishing writers to complete. Superseded payloads are retired;
+viewport resources retain independent leases. No-op strokes create no authored revision.
+
+Screen-space distance to the stroke polyline, maximum coverage, falloff, scalar
+interpolation, visible/through behavior, material mapping and native caches are unchanged.
+No resampling, smoothing, new numerical fallback or worker pool was added. The runtime
+boundary changed so desktop and authoring can share the same behavior. Legacy commands
+and frozen inspection image export delegate to this state.
+
+Focused parity, lifecycle, save and desktop model tests pass. Serial ABBA comparisons
+against production `713d963e` produce identical scalar arrays in all 36 dense/96-muscle
+preview conditions. Profiled peak unique geometry ownership is unchanged. Investigation
+removed duplicate field validation; upfront baseline capture adds a small request cost,
+while native calculation counts/results stay unchanged. Warm wall timings do not establish
+a speedup. See [measured evidence](painting_system.md#qualification-evidence) for timings,
+variance, profiler costs, resource limits and fixture provenance. The
+[task record](tasks/painting-system-step1.md) tracks full gate and portable qualification.

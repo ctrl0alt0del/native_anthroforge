@@ -41,6 +41,7 @@ from . import (
     object_operations,
     operations,
     output_tasks,
+    painting,
     parametric_operations,
     path_tasks,
     point_operations,
@@ -98,6 +99,7 @@ EDITS = {
     "skeleton_update.apply": skeleton_operations.apply,
     "assembly.import": assembly_operations.apply,
     "skin.collagen.paint.commit": skin_painting.commit,
+    "painting.commit": painting.apply,
     "skin.collagen.set": skin_collagen.set_weights,
     "skin.collagen.fill": skin_collagen.fill,
     "skin.collagen.clear": skin_collagen.clear,
@@ -281,6 +283,14 @@ def execute(session: "Session", operation: str, arguments: dict[str, Any]) -> An
 
 
 def query_handler(operation: str) -> Any:
+    if operation.startswith("painting.") and operation != "painting.commit":
+        from .painting_commands import execute as painting_command
+
+        return painting_command
+    return inspection_query_handler(operation)
+
+
+def inspection_query_handler(operation: str) -> Any:
     if operation.startswith(("tissue.inspect.", "curve.inspect.", "skin.inspect.")):
         from .tissue_inspection import execute as tissue_inspect
 
@@ -327,14 +337,22 @@ def edit(session: "Session", operation: str, arguments: dict[str, Any]) -> Any:
         raise
 
 
+ISOLATED_EDITS = frozenset(
+    (
+        "assembly.import",
+        "skeleton_update.apply",
+        "painting.commit",
+        "tissue.field.paint.commit",
+        "skin.collagen.paint.commit",
+    )
+)
+
+
 def require_command_edit(session: "Session", operation: str, arguments: dict[str, Any]) -> None:
     require_edit(arguments)
     require_variant_command(session, operation, arguments)
-    if (
-        operation in {"assembly.import", "skeleton_update.apply"}
-        and session.history.before is not None
-    ):
-        raise ValueError("Finish the current gesture before importing or resolving anatomy.")
+    if operation in ISOLATED_EDITS and session.history.before is not None:
+        raise ValueError("Finish the current gesture before committing this operation.")
 
 
 def direct_commands(session: "Session") -> dict[str, Any]:

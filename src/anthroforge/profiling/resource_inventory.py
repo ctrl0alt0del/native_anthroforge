@@ -185,7 +185,7 @@ def replacement_owners(session, output):
 
 
 def inspection_owners(session, output, profiler):
-    for value in session.tissue_inspection.values.values():
+    for value in (*session.tissue_inspection.values.values(), *session.painting.values.values()):
         if value.asset:
             output["tissue_inspection"].update(payload_resources(value.asset, profiler))
     snapshot = session._editing.values.get("inspection_snapshot")

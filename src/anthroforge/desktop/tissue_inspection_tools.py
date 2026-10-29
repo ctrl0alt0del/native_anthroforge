@@ -115,10 +115,6 @@ class TissueInspectionTools(QObject):
 
     def inspection_stamp(self):
         session = self.controller.session
-        values = tuple(
-            (k, v.job, v.state, id(v.asset), v.error)
-            for k, v in session.tissue_inspection.values.items()
-        )
         return (
             id(session.document),
             self.stage,
@@ -126,7 +122,17 @@ class TissueInspectionTools(QObject):
             self.mode,
             self.context,
             session.issues.repository.revision,
-            values,
+            self.candidate_stamp(),
+        )
+
+    def candidate_stamp(self):
+        session = self.controller.session
+        return tuple(
+            (k, v.job, v.state, id(v.asset), v.error)
+            for k, v in (
+                *session.tissue_inspection.values.items(),
+                *session.painting.values.items(),
+            )
         )
 
     def selection_context(self, item):

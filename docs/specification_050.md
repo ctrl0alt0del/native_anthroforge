@@ -217,3 +217,9 @@ Desktop and headless results must agree through shared policies. Profile capture
 projection, fitting, validation, publication and retained resources separately. Numerical
 success alone does not establish acceptable shapes or interactive latency. Research
 benchmarks on unrelated data do not qualify this workflow.
+
+## Shared foundation increment
+
+[Painting System Step 1](painting_system.md) migrates existing tissue-weight and collagen
+painting onto the shared application lifecycle. It does not implement Muscle Paint or
+complete this release. Package version and project schema remain unchanged.

@@ -354,7 +354,20 @@ def inspection_schedulers() -> dict[str, TaskScheduler]:
         issue_check=IssueTaskScheduler(),
         inspection_report=InspectionTaskScheduler(),
         tissue_inspection=TissueInspectionTaskScheduler(),
+        painting=PaintingTaskScheduler(),
     )
+
+
+class PaintingTaskScheduler(MeasuredTaskScheduler):
+    def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        delay = 60 if interactive else 0
+        return Schedule(
+            "worker",
+            0.2 + workload.triangles * 0.004,
+            delay,
+            delay,
+            reason="Owned paint projection, coverage and stroke effect",
+        )
 
 
 def curve_schedulers() -> dict[str, TaskScheduler]:

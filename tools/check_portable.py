@@ -22,6 +22,7 @@ from feedback_portable import feedback
 from inspection_portable import inspection
 from issues_portable import issues
 from mirroring_portable import mirroring
+from painting_portable import painting
 from preferences_portable import preferences
 from profiler_portable import profiling
 from projects_portable import projects
@@ -71,6 +72,7 @@ CHECKS = (
     "skeleton replacement, isolated preparation, retained identities and one-action undo/redo",
     "persistent variants, promotion, catalogue, review queue, stages and comparison export",
     "current components, contextual choices, JSON literals and immutable candidate images/data",
+    "shared painting lifecycle, automatic headless finish, candidate pages and legacy image export",
 )
 
 
@@ -188,9 +190,12 @@ def construction_steps():
         shortcuts,
         comparison,
         mirroring,
-        tissues,
-        skin,
+        *tissue_steps(),
     )
+
+
+def tissue_steps():
+    return tissues, painting, skin
 
 
 def inspection_steps():

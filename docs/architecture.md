@@ -1286,3 +1286,10 @@ Desktop exposes small status separately from cached review lists. Generic `Publi
 coordinates paired RenderModels at a frame boundary. Native picking uses cached displayed
 mesh/path handles, and mirrored hits navigate to their source. Comparison distances are
 native sampled surface distances; verified material displacement is a distinct measurement.
+
+## Shared painting lifecycle
+
+The [Painting System](painting_system.md) owns context-local stroke state, preview jobs,
+finalization and resource lifetime for tissue weights and collagen. Consumer adapters
+own baseline/eligibility, numerical effect and domain commit. Desktop and headless use
+the same operations; legacy inspection commands delegate. Native kernels are unchanged.

@@ -4,8 +4,6 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from anthroforge.application import skin_collagen, tissue_painting
-
 from . import skin_painting_view, tissue_painting_view
 from .tissue_inspection_tools import displayed_stage
 
@@ -13,14 +11,19 @@ from .tissue_inspection_tools import displayed_stage
 @dataclass(frozen=True)
 class Domain:
     kind: str
-    commit: str
+    consumer: str
     validate: Callable[..., Any]
     prepare: Callable[..., Any]
     capture: Callable[..., Any]
 
 
 def tissue_validate(controller, name):
-    tissue_painting.field(controller.session, controller.selection, dict(name=name))
+    require(
+        controller,
+        "tissue_weights",
+        name=name,
+        stage=displayed_stage(controller.session, controller.selection),
+    )
 
 
 def tissue_prepare(controller):
@@ -31,8 +34,15 @@ def tissue_prepare(controller):
 
 
 def collagen_validate(controller, name):
-    controller.session.editable(controller.selection)
-    skin_collagen.mesh(controller.session, controller.selection)
+    require(controller, "collagen")
+
+
+def require(controller, consumer, **options):
+    value = controller.session.command(
+        "painting.describe", consumer=consumer, target=controller.selection, **options
+    )
+    if not value["available"]:
+        raise ValueError(value["reason"])
 
 
 def collagen_prepare(controller):
@@ -41,14 +51,14 @@ def collagen_prepare(controller):
 
 TISSUE = Domain(
     "paint",
-    "tissue.field.paint.commit",
+    "tissue_weights",
     tissue_validate,
     tissue_prepare,
     tissue_painting_view.capture,
 )
 COLLAGEN = Domain(
     "collagen",
-    "skin.collagen.paint.commit",
+    "collagen",
     collagen_validate,
     collagen_prepare,
     skin_painting_view.capture,

@@ -21,6 +21,10 @@ class Inspection:
 
 
 def start(session: Any, kind: str, target: str, **options: Any) -> dict[str, Any]:
+    if kind in ("paint", "collagen"):
+        from .painting_compatibility import preview
+
+        return preview(session, kind, target, options)
     stage = options.get("stage", "final")
     options = dict(options, stage=stage)
     definition(kind).validate(session, target, options)
@@ -132,6 +136,14 @@ def publish(session: Any, value: Any, kind: str, payload: Any) -> None:
 
 
 def status(session: Any, kind: str) -> dict[str, Any]:
+    if kind in ("paint", "collagen"):
+        from .painting_compatibility import status as paint_status
+
+        return paint_status(session, kind)
+    return inspection_status(session, kind)
+
+
+def inspection_status(session: Any, kind: str) -> dict[str, Any]:
     value = session.tissue_inspection.values.get(kind)
     if value is None:
         return dict(state="idle")
@@ -148,6 +160,10 @@ def status(session: Any, kind: str) -> dict[str, Any]:
 
 
 def current(session: Any, asset: Any) -> bool:
+    if "painting_token" in asset:
+        from .painting_compatibility import current as paint_current
+
+        return paint_current(session, asset)
     try:
         query = definition(asset.get("kind", "comparison"))
         return bool(query.signature(session, asset["target"], asset["options"]) == asset["stamp"])
@@ -156,6 +172,10 @@ def current(session: Any, asset: Any) -> bool:
 
 
 def cancel(session: Any, kind: str = "") -> None:
+    from .painting_compatibility import cancel as cancel_paint
+
+    if not kind or kind in ("paint", "collagen"):
+        cancel_paint(session, kind)
     slots = (kind,) if kind else tuple(session.tissue_inspection.values)
     for key in slots:
         value = session.tissue_inspection.values.pop(key, None)

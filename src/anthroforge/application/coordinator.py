@@ -92,6 +92,10 @@ class TaskCoordinator:
         return tuple(self.registry.active.values())
 
     @property
+    def all_active_jobs(self) -> tuple[Job, ...]:
+        return scheduling_context.all_active(self)
+
+    @property
     def blocked(self) -> bool:
         return any(job.writes for job in self.registry.active.values())
 

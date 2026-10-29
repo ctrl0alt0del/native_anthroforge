@@ -3827,3 +3827,11 @@ statistical performance comparison. Existing numerical algorithms remain authori
 See [workflow/evidence](reconstruction_042.md) and [recovery record](tasks/reconstruction-042.md)
 for gate, hidden-render and portable status. Queue ownership/review decisions never execute
 or approve numerical anatomy automatically.
+
+Qualification also exposed an asynchronous project-adoption cache bug: the accepted context
+name remained empty while its change journal was replaced. Desktop scene and Issues caches
+now track journal identity, so a newly opened document cannot reuse old Hook/lattice rows.
+The original primitive workshop opens without warnings after the correction. Profiler task,
+command and boundary events carry editing-context identity; recording boundaries enumerate
+active jobs across contexts, rather than only the visible variant. Neither change alters
+calculation scheduling or accepted geometry.

@@ -708,6 +708,7 @@ class Controller(QObject):
         projection = self.scene_projection
         if (
             projection.session is not self.session
+            or projection.journal is not self.session.changes
             or projection.context != self.session._editing.key
             or projection.cursor != self.session.changes.serial
             or self.last_workspace != self.session.active_workspace

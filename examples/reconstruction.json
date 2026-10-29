@@ -1,0 +1,17 @@
+[
+  {"id": "bone", "operation": "import", "arguments": {"path": "examples/primitives/cube.obj", "units": 1.0}},
+  {"operation": "wait", "arguments": {}},
+  {"id": "kind", "operation": "catalogue.type.create", "arguments": {"name": "Example bone", "category": "SCP"}},
+  {"operation": "catalogue.assign", "arguments": {"target": "$bone.entity_id", "type_id": "$kind", "side": "LEFT"}},
+  {"id": "alternative", "operation": "variant.create", "arguments": {"subjects": ["$bone.entity_id"], "name": "Placement alternative"}},
+  {"operation": "scp.transform", "arguments": {"entity": "$bone.entity_id", "values": [0.2, 0, 0, 0, 0, 0, 1, 1, 1]}},
+  {"operation": "wait", "arguments": {}},
+  {"id": "checkpoint", "operation": "variant.checkpoint", "arguments": {"name": "Placement reviewed"}},
+  {"operation": "variant.leave", "arguments": {}},
+  {"id": "promotion", "operation": "variant.review.prepare", "arguments": {"variant": "$alternative.id"}},
+  {"operation": "variant.review.status", "arguments": {"wait": true}},
+  {"operation": "variant.review.apply", "arguments": {"token": "$promotion.token"}},
+  {"operation": "review.set", "arguments": {"subject": "$bone.entity_id", "dimension": "DISPLAY", "decision": "PENDING", "comment": "Example only: inspect the placement before approving."}},
+  {"operation": "reconstruction.queue.add", "arguments": {"subject": "$bone.entity_id", "next_action": "Inspect placement"}},
+  {"operation": "save", "arguments": {"path": "reconstruction.anthroforge", "blocked_policy": "wait"}}
+]

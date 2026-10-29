@@ -9,15 +9,19 @@ def describe(job):
         job=job.id,
         kind=job.kind,
         origin=job.origin,
-        epoch=job.epoch,
         revision=job.dispatch_revision,
         outputs=sorted(job.outputs)[:128],
         reads=sorted(job.reads)[:128],
         output_count=len(job.outputs),
-        execution=job.execution,
-        obsolete=job.obsolete,
+        **execution_context(job),
         timing=timing(job),
         queue=queue_metadata(job),
+    )
+
+
+def execution_context(job):
+    return dict(
+        context=job.context, epoch=job.epoch, execution=job.execution, obsolete=job.obsolete
     )
 
 
@@ -69,7 +73,7 @@ def snapshot(session, state):
     if not session.profiler.active:
         return
     document_snapshot(session, state)
-    active = session.scheduler.active_jobs
+    active = session.scheduler.all_active_jobs
     for index, job in enumerate(active):
         if index >= 4096:
             session.profiler.losses["job_snapshot_limit"] += 1
@@ -82,6 +86,7 @@ def document_snapshot(session, state):
         "document",
         state,
         document=str(session.document.id),
+        context=session.contexts.visible,
         revision=session.document.revision,
         entities=len(session.document.entities),
         controls=len(session.document.controls),
@@ -101,6 +106,7 @@ def command_metadata(session: Any, arguments: dict[str, Any]) -> dict[str, Any] 
         return None
     metadata: dict[str, Any] = {
         "document": str(session.document.id),
+        "context": session._editing.key,
         "revision": session.document.revision,
     }
     for key in ("entity", "curve", "point", "control", "binding", "job_id"):

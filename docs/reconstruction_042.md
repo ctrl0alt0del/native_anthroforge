@@ -81,6 +81,9 @@ authority over AnthroForge's explicit promotion/support policies.
 
 Open **View → Reconstruction**. The panel can be docked or detached and has six pages.
 It uses the current anatomical selection; mirrored instances remain read-only sources.
+The [headless example](../examples/reconstruction.json) creates, edits, checkpoints and
+promotes an alternative, then saves a pending review and queue item. Run it with
+`AnthroForge.exe --cli run examples/reconstruction.json` from the portable directory.
 
 1. In **Variants**, create an alternative from selected anatomy. Normal curve, tissue,
    shortcut and transform tools now edit that context. External supports are visible but

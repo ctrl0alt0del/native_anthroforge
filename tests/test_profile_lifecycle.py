@@ -142,3 +142,19 @@ def test_open_keeps_profiler_on_replacement_scheduler(session, tmp_path):
     session.command("profile.stop", path=str(tmp_path / "opened.zip"), wait=True)
     states = {e["name"] for e in events(tmp_path / "opened.zip") if e["cat"] == "task.lifecycle"}
     assert {"queued", "succeeded"} <= states
+
+
+def test_recording_boundaries_include_jobs_from_each_editing_context(session, tmp_path):
+    from dataclasses import replace
+
+    session.contexts.add("alternative", replace(session.document, name="Alternative"))
+    gate, published = Event(), []
+    with session.contexts.use("alternative"):
+        job = controlled("background alternative", "surface", gate, published)
+        session.scheduler.submit(job)
+    session.command("profile.start")
+    session.command("profile.stop", path=str(tmp_path / "contexts.zip"), wait=True)
+    rows = [e for e in events(tmp_path / "contexts.zip") if e["args"].get("job") == job.id]
+    assert {e["name"] for e in rows} >= {"active_at_start", "active_at_stop"}
+    assert {e["args"]["context"] for e in rows} == {"alternative"}
+    gate.set()

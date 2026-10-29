@@ -70,15 +70,16 @@ def settled(app, engine, screenshot, warnings, controller, deadline) -> None:
 
 
 def show_panel(window, controller, panel):
-    if panel == "recovery":
-        from .smoke_projects import start
+    from .smoke_preferences import show
+    from .smoke_projects import start
 
-        start(controller)
-        return
-    if panel == "preferences":
-        from .smoke_preferences import show
-
-        show(window, controller)
+    actions = {
+        "recovery": lambda: start(controller),
+        "preferences": lambda: show(window, controller),
+        "reconstruction": lambda: controller.reconstruction_panel.setOpen(True),
+    }
+    if panel in actions:
+        actions[panel]()
         return
     window.setProperty(panel + "Open", True)
     if panel == "issues" and controller.issue_panel.model.rows:

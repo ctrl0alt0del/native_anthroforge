@@ -43,7 +43,7 @@ class IssuePanel(QObject):
         signature = self.context()
         if signature == self.signature:
             return
-        if self.signature is not None and self.signature[0] is not session:
+        if self.signature is not None and self.signature[0] is not session.changes:
             self.selected, self.offset = "", 0
         self.signature = signature
         self.refresh()
@@ -51,7 +51,7 @@ class IssuePanel(QObject):
     def context(self):
         session = self.controller.session
         return (
-            session,
+            session.changes,
             session.issues.repository.revision,
             self.labels(),
             session.active_workspace,
@@ -61,7 +61,7 @@ class IssuePanel(QObject):
 
     def labels(self):
         session = self.controller.session
-        if self.signature is not None and self.signature[0] is not session:
+        if self.signature is not None and self.signature[0] is not session.changes:
             self.label_cursor = -1
         delta = session.changes.since(self.label_cursor)
         self.label_cursor = session.changes.serial

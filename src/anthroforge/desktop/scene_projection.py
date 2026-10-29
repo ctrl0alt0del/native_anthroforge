@@ -60,6 +60,7 @@ class SceneProjection:
         self.controller = controller
         self.session, self.cursor, self.workspace = None, -1, None
         self.context = ""
+        self.journal = None
         self.records, self.keys, self.order = {}, {}, []
         self.view, self.selected = PropertyProjection(controller), PropertyProjection(controller)
         self.view.synchronize(dict(rows=[], parents=[]))
@@ -81,8 +82,9 @@ class SceneProjection:
         self.synchronize_selection()
 
     def require_context(self, session):
-        if self.context == session._editing.key:
+        if self.context == session._editing.key and self.journal is session.changes:
             return
+        self.journal = session.changes
         self.context, self.cursor, self.workspace = session._editing.key, -1, None
         self.keys.clear()
         self.controller.construction.keys.clear()

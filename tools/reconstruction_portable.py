@@ -20,6 +20,22 @@ def reconstruction(executable, cwd, invoke):
     with ZipFile(cwd / "reconstruction.afinspection.zip") as archive:
         report = json.loads(archive.read("inspection.json"))
         assert report["image"]["captured"] and not report["image"]["window_visible"]
+    desktop(executable, cwd, invoke)
+
+
+def desktop(executable, cwd, invoke):
+    result = invoke(
+        executable,
+        cwd,
+        "--project",
+        "reconstruction.anthroforge",
+        "--smoke-test",
+        "--smoke-panel",
+        "reconstruction",
+        "--screenshot",
+        str(cwd / "reconstruction.png"),
+    )
+    assert json.loads(result)["desktop_smoke"]
 
 
 def commands(target):

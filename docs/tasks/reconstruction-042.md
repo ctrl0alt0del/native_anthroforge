@@ -46,11 +46,17 @@ requires explicit redefinition. Canonical package remains0.4.2; no new anatomy a
   Qt-free export caller spawns existing hidden renderer. No interactive acceptance claimed.
 - First portable run exposed Nuitka PEP695 type-variable NameError in ContextField.cast.
   ContextField/SchedulingField now use explicit Generic/TypeVar with scoped UP046 exclusions;
-  source context/lifecycle checks pass. Canonical package rebuild running; must rerun portable.
+  source context/lifecycle checks pass. Rebuilt executable passed the complete relocated
+  portable suite under minimal PATH, including reconstruction import/promotion/export.
+- Portable project opening exposed a scene-cache epoch bug for controls. Scene and Issues
+  projections now invalidate on change-journal identity, not only context name. Async-open
+  regression and source smoke pass. Full pytest rerun:2,759passed; extra open regression5
+  checks and profiler/context suite10checks pass. Profile boundaries now identify/enumerate
+  jobs across contexts. Final package needs these final attribution/panel-smoke additions.
 
 ## Remaining delivery
 
-1. Finish package rebuild and complete relocated portable suite, fixing actual failures.
+1. Rebuild final package; repeat profiling/reconstruction/example checks and inspect panel.
 2. Verify API docs/examples/links, final source archive and qualification status.
 3. Check latest main, validate combined changes, checkpoint/push and merge/push normally.
    Do not claim completion until portable/runtime workflows pass.

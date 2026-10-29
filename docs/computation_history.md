@@ -3866,7 +3866,7 @@ attachments, shortcut updates and packaged qualification are recorded in the
 under ignored `build/assembly-live-mirroring`; it is not part of the source archive.
 
 
-## 2026-10-29 — Authoring inspection boundaries (qualification pending)
+## 2026-10-29 — Authoring inspection boundaries (0.4.3 qualified)
 
 Baseline `31e9138f`. Desktop-only resolved component preparation moves into shared
 application read buffers, preserving current Fiber editing and native transformations.
@@ -3880,8 +3880,9 @@ The development renderer previously always loaded build/dev while headless geome
 use a qualified alternative DLL. This produced a blank scene despite nonempty canonical
 arrays. The unbundled renderer now respects AF_NATIVE_BUILD, consistent with packaging and
 qualification tools; bundled runtime selection remains unchanged. A repeat hidden render
-shows the candidate geometry. Broader performance and release checks remain pending in
-[the recovery record](tasks/authoring-fixes-043.md).
+shows the candidate geometry. Production profiling, paired desktop/export rendering,
+development and relocated-package checks pass; see
+[the recovery record](tasks/authoring-fixes-043.md) for measurements and evidence limits.
 
 Production qualification also exposed a pre-existing preview validity error: formulas and
 drivers were rejected as missing scene objects despite identical captured revisions. The

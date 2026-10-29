@@ -2,7 +2,7 @@
 
 - Branch: `codex/authoring-fixes-043`; integration: `main`.
 - Baseline: `31e9138f`; writer: local direct work, no delegation.
-- Status: implementation started; no qualification or release claim.
+- Status: complete; 0.4.3 qualified for integration into `main`.
 
 ## Authorized outcome
 
@@ -106,3 +106,52 @@ literal decoding, native existing transforms, desktop render-only adapter. No ne
 geometry evaluator, duplicated property writer or project-schema change.
 
 0.4.3 version is staged for canonical package qualification. Portable release/merge still pending.
+
+## Final qualification — 2026-10-29
+
+The preceding checkpoint notes preserve their original pending status. Final runtime
+revision: `ce08feb6`; packaged metadata records a clean tracked tree at that revision.
+The full suite repeated after the final Manual-state and restriction changes passes:
+**2,821 tests**, 385.91 seconds. The earlier complete development gate also passed six
+native CTests, native/Python/PowerShell style, numerical checks and native doctor; final
+typing passes across 643 modules. One extra test invocation failed at collection because
+`pytest` was invoked directly without the repository on the module path. The documented
+`python -m pytest` invocation above passes; no product change was needed.
+
+The relocated executable passes **all 36 portable workflow groups** with a minimal PATH
+and its bundled native library. This includes the new queries, literal JSON names,
+historical path/mesh captures, exact canonical buffers, and image export after candidate
+cancellation. The packaged mirrored Before/After image was visually inspected. Evidence:
+`build/authoring-fixes-043/portable/portable-check.json` and `candidate.afinspection.zip`.
+No visible test windows or desktop input were used. Hidden QQuickRenderControl pixels
+and offscreen UI checks do not establish hands-on interactive acceptance.
+
+Final production profile: `build/authoring-fixes-043/production-final/production.afprofile.zip`.
+The 96-muscle source remains byte-identical (SHA256
+`86c08109700bb6e12de807dca8ef93ba37efe33f0a60dc3c2a87a71cc87be554`), and document/history
+state is unchanged. The numerical process imports no Qt. Measurements:
+
+| Work | Evidence |
+| --- | --- |
+| Component paging | 349 targets, 29,199 rows / 352 pages; median 2.36 ms, p95 3.15 ms, maximum 4.11 ms per page. |
+| Geometry paging | Exact reconstruction of 98,648 rows / 48 pages; median 0.115 ms, p95 0.449 ms, maximum 0.567 ms. |
+| Capture ownership | Thirty captures retain one API snapshot; median 3.94 ms. Independent export leases survive API release and retire afterward. |
+| Rendering/export | Front/oblique SCM reports: 2.27 / 2.21 seconds including isolated renderer startup. |
+| Native geometry memory | Peak unique 633,647,378 bytes across the loaded assembly/caches; 2,157,736 bytes attributed to shared inspection resources, zero unattributed bytes. Owner totals overlap and must not be summed. |
+
+System busy fraction was 12.65%; other processes and thermal state were uncontrolled.
+These are diagnostic measurements, not a controlled speedup claim. Paired live desktop
+and isolated export scenes use identical layer IDs/cameras: Split/front pixels match
+exactly; Overlay/oblique differs by at most one 8-bit color level. Both were inspected.
+
+Ownership/coupling review is separate from the tests: shared application services own
+resolution and eligibility; immutable records retain resource owners; exports use the
+existing coordinator; JSON literals stay in transport; Qt remains in presentation.
+No numerical algorithm, worker pool, schema, attachment policy or undo contract changed.
+Documentation links and the executable JSON example pass. Recovery/library and feedback
+operations remain outside A1–A4, as agreed.
+
+Delivery: one `dist/0.4.3/AnthroForge.dist`, with the companion
+`dist/AnthroForge-0.4.3-source.zip`. The unrelated root `__init__.py` is preserved and excluded
+from the source archive. Release documentation is refreshed without changing the qualified
+runtime; subsequent commits contain documentation only.

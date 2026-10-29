@@ -1,6 +1,6 @@
 # Authoring parity — 0.4.3
 
-**Confirmed implementation contract — qualification pending.** Closes A1–A4 from
+**Implemented and qualified — 0.4.3.** Closes A1–A4 from
 [the audit](authoring_audit_043.md). Recovery/project-library and feedback commands are
 excluded. Existing document semantics, algorithms and schema 9 remain unchanged.
 
@@ -58,4 +58,6 @@ Core owns immutable references/read records; application owns resolution, snapsh
 policies; native code retains numerical work; desktop owns rendering; transport owns
 literal decoding. Reuse the coordinator, native buffers, caches, staged publication and
 resource leases. No competing pool, timer or compulsory UI step. See
-[task evidence](tasks/authoring-fixes-043.md) before considering any feature qualified.
+[task evidence](tasks/authoring-fixes-043.md) for production, regression and portable checks.
+Desktop evidence uses background/offscreen rendering; no hands-on interactive acceptance
+is claimed. The project format remains schema 9.

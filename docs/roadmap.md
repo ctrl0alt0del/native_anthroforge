@@ -1,6 +1,6 @@
 # AnthroForge release roadmap
 
-- **0.4.3 — authoring parity A1–A4 implemented; qualification pending:** shared current
+- **0.4.3 — qualified authoring parity A1–A4:** shared current
   components, immutable candidate images/data, compatible choices/effective settings and
   literal JSON strings. [Contract](authoring_043.md), [evidence](tasks/authoring-fixes-043.md).
   The [original audit](authoring_audit_043.md) remains historical; A5/A6 are outside this release.

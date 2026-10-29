@@ -3,7 +3,7 @@
 - Task branch: `codex/painting-system-step1`
 - Integration branch: `main`
 - Starting revision: `713d963ecc5cad9aad939141acc140a73180324e`
-- Status: implementation and qualification complete; ready for validated merge
+- Status: complete; integrated into main and qualified for canonical delivery
 - Active writer: local implementation session
 - Last updated: 2026-10-30
 
@@ -44,6 +44,13 @@ See [design/API/evidence](../painting_system.md) and
   This is offscreen/hidden-render evidence, not manual interactive acceptance.
 - Documentation links and UTF-8 were checked. Functions satisfy the 15-line limit.
 
+The installed 0.4.3 contained existing local assembly fixes. They remain uncommitted
+in the original working branch and were preserved in the final executable/source archive.
+The combined working tree passed Ruff, formatting, mypy and **2,885 pytest cases**
+(421.65 seconds), and its rebuilt/relocated executable passed all **37 portable groups**
+again. Packaged input files were checked against those local edits. No unrelated work
+was silently reverted, staged into this feature or included in its remote commits.
+
 ## Defects caught during qualification
 
 The initial save-admission helper assumed a live Session and broke captured formula
@@ -66,16 +73,20 @@ and independent viewport leases remain in use.
 ## Recovery and delivery
 
 Worktree: `E:/development/anthroforge/build/painting-system-step1`.
-Runtime package code: `88b2ce24`; later commits contain qualification documentation only.
+Painting runtime code: `88b2ce24`; later task commits contain qualification documentation only.
+Main integration: `a3bf04e0`. Final runtime build: that revision plus the preserved local
+assembly changes, honestly marked `tracked_changes: true` in its build identity.
 Temporary package: `build/painting/package/AnthroForge.dist`.
 Relocated qualification: `build/painting/relocated`; evidence: `build/painting/portable-final`.
 Gate log: `build/painting/gate-final.log`; portable log: `build/painting/portable-final.log`.
 Profiles/arrays: `build/painting/profiles` and `build/painting/final-serial`.
+Combined checks: `build/painting/combined-gate.log` and `build/painting/portable-combined.log`.
+Delivery hashes: `build/painting/delivery.json`.
 These local-only artifacts are reproducible with the committed qualification tools and
 the external production fixture identified in the design document; they are not in Git.
 
-Deliver by replacing the existing canonical `dist/0.4.3/AnthroForge.dist` and companion
-source archive, then merge/push the qualified branch. Do not create another distribution
-name. Primary checkout contains unrelated unfinished assembly work and the legacy root
-`__init__.py`; preserve all of it. Recovery copies/hashes of those 12 local files are under
-`build/painting/integration-recovery`. Git ancestry establishes final integration.
+Delivery replaces the existing canonical `dist/0.4.3/AnthroForge.dist` and
+`dist/AnthroForge-0.4.3-source.zip`; no additional release distribution name is created.
+Primary checkout remains on its unfinished assembly branch with all unrelated changes
+and the legacy root `__init__.py` preserved. Recovery copies/hashes of those 12 local files
+are under `build/painting/integration-recovery`. Git ancestry establishes integration.

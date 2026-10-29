@@ -53,6 +53,10 @@ requires explicit redefinition. Canonical package remains0.4.2; no new anatomy a
   regression and source smoke pass. Full pytest rerun:2,759passed; extra open regression5
   checks and profiler/context suite10checks pass. Profile boundaries now identify/enumerate
   jobs across contexts. Final package needs these final attribution/panel-smoke additions.
+- Final panel check found Variants ListView collapsed inside the scroll container; added
+  the same minimum height as the other pages and an actual row-count/height assertion.
+  Populated hidden panels pass again. Source Reconstruction smoke passes with Windows
+  fonts configured. The smoke CLI now accepts the reconstruction panel selector.
 
 ## Remaining delivery
 

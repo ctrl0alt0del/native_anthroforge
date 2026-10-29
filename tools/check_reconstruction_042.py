@@ -4,7 +4,7 @@ import json
 import os
 from pathlib import Path
 
-from PySide6.QtCore import QCoreApplication, QEvent, QSizeF, QUrl
+from PySide6.QtCore import QCoreApplication, QEvent, QObject, QSizeF, QUrl
 from PySide6.QtGui import QColor, QGuiApplication
 from PySide6.QtQml import QQmlComponent
 from PySide6.QtQuickControls2 import QQuickStyle
@@ -92,16 +92,19 @@ def panel(app, controller, renderer):
     item.setParentItem(renderer.window.contentItem())
     for height in (400, 700, 960):
         item.setSize(QSizeF(360, height))
-        capture_pages(app, controller, renderer, height)
+        capture_pages(app, controller, renderer, height, item)
     release(item)
 
 
-def capture_pages(app, controller, renderer, height):
+def capture_pages(app, controller, renderer, height, item):
     for page in ("Variants", "Catalogue", "Regions", "Stages", "Reviews", "Queue"):
         controller.reconstruction_panel.setPage(page)
         for _ in range(5):
             app.processEvents()
             image = renderer.frame()
+        if page == "Variants":
+            view = item.findChild(QObject, "variantList")
+            assert view and view.property("height") >= 150 and view.property("count") >= 2
         assert image.save(str(OUTPUT / (page.lower() + f"-{height}.png")))
 
 

@@ -15,7 +15,9 @@ ColumnLayout {
     UiButton { text: "Return to accepted anatomy"; visible: !!pane.records.active; Layout.fillWidth: true; enabled: !workspace.state.editing; onClicked: service.run("variant.leave",{}) }
     UiField { id: search; placeholderText: "Find variants and checkpoints"; Layout.fillWidth: true }
     ListView {
-        id: variants; Layout.fillHeight: true; Layout.fillWidth: true; clip: true
+        id: variants; objectName: "variantList"
+        Layout.fillHeight: true; Layout.fillWidth: true; Layout.minimumHeight: 150
+        clip: true; reuseItems: true
         model: (pane.records.variants || []).filter(row => row.name.toLowerCase().includes(search.text.toLowerCase()))
         delegate: ItemDelegate {
             required property var modelData

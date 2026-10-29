@@ -19,7 +19,9 @@ def arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="anthroforge-desktop")
     parser.add_argument("--smoke-test", action="store_true")
     parser.add_argument(
-        "--smoke-panel", choices=("activity", "issues", "preferences", "recovery"), default=""
+        "--smoke-panel",
+        choices=("activity", "issues", "preferences", "recovery", "reconstruction"),
+        default="",
     )
     parser.add_argument("--screenshot")
     parser.add_argument("--project")

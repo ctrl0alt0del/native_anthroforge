@@ -48,3 +48,41 @@ def test_region_survives_pose_change_without_nearest_remapping(session, assembly
     current = session.command("catalogue.region.inspect", region=key)
     assert current["available"] and current["triangles"] == original["triangles"]
     assert current["asset"] == original["asset"]
+
+
+def test_region_review_keeps_original_decision_and_requires_explicit_redefinition(
+    session, assembly
+):
+    target = assembly[1]
+    region = session.command("catalogue.region.set", target=target, name="Patch", triangles=[0])
+    approve_region(session, target, region)
+    assert session.command("review.inspect")["reviews"][0]["freshness"] == "CURRENT"
+    session.command(
+        "catalogue.region.set", target=target, name="Patch", triangles=[1], region=region
+    )
+    row = session.command("review.inspect")["reviews"][0]
+    assert row["decision"] == "APPROVED" and row["freshness"] == "OUTDATED"
+    with pytest.raises(ValueError, match="history"):
+        session.command("catalogue.region.remove", id=region)
+
+
+def approve_region(session, target, region):
+    session.command(
+        "review.set",
+        subject=target,
+        dimension="ANATOMY",
+        region=region,
+        decision="APPROVED",
+        reviewer="Reviewer",
+    )
+
+
+def test_region_outline_batch_matches_picked_faces(session, assembly):
+    import numpy as np
+
+    from anthroforge.native import inspection
+
+    item = session.document.entity(assembly[1])
+    mesh = session.assets[item.asset].mesh
+    expected = [p for face in (0, 1, 5) for p in inspection.face_lines(mesh, item.matrix, face)]
+    np.testing.assert_array_equal(inspection.faces_lines(mesh, item.matrix, [0, 1, 5]), expected)

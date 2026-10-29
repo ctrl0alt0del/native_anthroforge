@@ -4,6 +4,7 @@ from dataclasses import dataclass, field, replace
 from typing import Any
 
 from anthroforge.core import graph_records
+from anthroforge.core.reconstruction import Reconstruction
 
 from . import (
     assembly_bindings,
@@ -39,15 +40,16 @@ class Preparation:
     parent: str = ""
     evidence: tuple[dict[str, Any], ...] = ()
     saved_outputs: tuple[Any, ...] = ()
+    reconstruction: Reconstruction = field(default_factory=Reconstruction)
+    copy_reconstruction: bool = True
+    identity_overrides: dict[str, str] = field(default_factory=dict)
+    source_cache: Any = None
 
     def run(self, keys: list[str]) -> Candidate:
         self.select(keys)
         self.copy()
-        roots = assembly_graph.roots(self.selection)
-        self.parent = assembly_copy.destination_parent(
-            self.destination, self.options.get("parent", ""), bool(roots)
-        )
-        assembly_copy.hierarchy(self.values, self.selection, self.ids, self.parent)
+        self.prepare_hierarchy()
+        self.prepare_reconstruction()
         candidate = self.candidate()
         if candidate.ready:
             self.evidence = assembly_bindings.assess(self, candidate)
@@ -56,18 +58,34 @@ class Preparation:
             assembly_result_state.mark(self)
         return prepared(self.candidate(), self.destination)
 
+    def prepare_hierarchy(self) -> None:
+        roots = assembly_graph.roots(self.selection)
+        self.parent = assembly_copy.destination_parent(
+            self.destination, self.options.get("parent", ""), bool(roots)
+        )
+        assembly_copy.hierarchy(self.values, self.selection, self.ids, self.parent)
+
     def select(self, keys: list[str]) -> None:
         mappings = self.options.get("mappings", {})
         attached = self.options.get("include_attached_tissues", False)
         self.selection, rows = assembly_copy.selected(self.source, keys, attached, mappings)
-        self.loaded = assembly_resources.load(self.source, self.selection, self.engine, self.cancel)
+        self.loaded = assembly_resources.load(
+            self.source, self.selection, self.engine, self.cancel, self.source_cache
+        )
         self.ids = assembly_graph.identities(self.selection, self.loaded)
+        self.ids.update({k: v for k, v in self.identity_overrides.items() if k in self.ids})
         self.mapping = Mappings(self.source, self.destination, self.ids, mappings)
         assembly_mirrors.allocate(self.source.document, self.selection, self.ids)
         self.mapping.assess(tuple(row for row in rows if row.relationship != "mirror"))
         self.resources, self.assets = assembly_resources.transfer(self.loaded, self.ids)
         assembly_snapshots.retain(self)
         assembly_resources.restore_legacy_inputs(self)
+
+    def prepare_reconstruction(self) -> None:
+        from .assembly_reconstruction import copy
+
+        if self.copy_reconstruction:
+            self.reconstruction = copy(self)
 
     def copy(self) -> None:
         self.copy_records()
@@ -124,6 +142,7 @@ class Preparation:
             evidence=self.evidence,
             selection=self.selection.reasons,
             mappings=tuple(self.mapping.rows),
+            reconstruction=self.reconstruction,
         )
 
     def provenance(self) -> Any:

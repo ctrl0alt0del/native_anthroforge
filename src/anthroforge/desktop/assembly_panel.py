@@ -98,6 +98,15 @@ class AssemblyPanel(QObject):
         self.options[name] = value
         self.queue()
 
+    @Slot("QVariantMap")
+    def toggleVariant(self, row):
+        selected = set(self.options.get("variants", ()))
+        selected.symmetric_difference_update((row["id"],))
+        self.options["variants"] = sorted(selected)
+        if row["id"] in selected:
+            self.selected.update(row["subjects"])
+        self.queue()
+
     def queue(self):
         self._state = dict(self._state, ready=False, state="preparing", error="")
         self.changed.emit()

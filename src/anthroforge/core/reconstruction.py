@@ -116,6 +116,7 @@ class Review:
     comment: str = ""
     evidence: tuple[str, ...] = ()
     id: str = field(default_factory=identity)
+    region: str = ""
 
 
 @dataclass(frozen=True, slots=True)

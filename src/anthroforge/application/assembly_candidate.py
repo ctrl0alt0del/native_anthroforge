@@ -6,6 +6,7 @@ from typing import Any, cast
 from anthroforge.core.assembly import ExternalReference, ImportProvenance
 from anthroforge.core.document import Document
 from anthroforge.core.jobs import ObsoleteInputs
+from anthroforge.core.reconstruction import Reconstruction
 from anthroforge.core.results import Port
 from anthroforge.core.tissues import TissueVCP
 
@@ -76,12 +77,15 @@ class Candidate:
     mappings: tuple[dict[str, Any], ...] = ()
     prepared_from: Document | None = field(default=None, repr=False, compare=False)
     prepared_document: Document | None = field(default=None, repr=False, compare=False)
+    reconstruction: Reconstruction = field(default_factory=Reconstruction)
 
     @property
     def ready(self) -> bool:
         return not any(v.get("blocking", False) for v in self.findings)
 
     def merge(self, document: Document) -> Document:
+        from .assembly_reconstruction import merge
+
         self.reads.require(document)
         if document is self.prepared_from and self.prepared_document is not None:
             return self.prepared_document
@@ -90,6 +94,7 @@ class Candidate:
         }
         changes["imports"] = (*document.imports, self.provenance)
         changes["external_references"] = (*document.external_references, *self.references)
+        changes["reconstruction"] = merge(document.reconstruction, self.reconstruction)
         return replace(document, **changes)
 
 
@@ -115,7 +120,7 @@ def adopt(session: Any, candidate: Any, updated: Document) -> None:
         "_formulas",
     )
     if isinstance(candidate, Candidate):
-        keys += ("imports",)
+        keys += ("imports", "reconstruction")
     session.replace_document(
         accepted_outputs=accepted_outputs(candidate), **{key: getattr(updated, key) for key in keys}
     )

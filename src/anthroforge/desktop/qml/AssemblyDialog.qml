@@ -14,6 +14,13 @@ UiDialog {
     Connections { target: dialog.service; function onRequested() { dialog.open(); } function onFinished() { dialog.close(); } }
     contentItem: ColumnLayout {
         spacing: Theme.gap
+        UiSearchChoice {
+            Layout.fillWidth: true; visible: !dialog.service.state.repair && choices.length > 0
+            choices: dialog.service.state.variants || []
+            text: "Include variants / checkpoints · " + (dialog.service.state.options?.variants || []).length
+            placeholder: "Search alternatives to include"
+            onChosen: row => dialog.service.toggleVariant(row)
+        }
         RowLayout {
             visible: !dialog.service.state.repair
             UiCheck { text: "Include attached tissues"; checked: !!dialog.service.state.options?.include_attached_tissues; onClicked: dialog.service.option("include_attached_tissues",checked) }

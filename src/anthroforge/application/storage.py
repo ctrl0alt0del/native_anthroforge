@@ -210,6 +210,8 @@ def restored_document(data: dict[str, Any]) -> Document:
 
 
 def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resources]:
+    from .reconstruction_evidence import verify
+
     with zipfile.ZipFile(path) as archive:
         data = json.loads(archive.read("manifest.json"))
         if data.get("format") != FORMAT or data.get("version") not in READ_VERSIONS:
@@ -217,5 +219,6 @@ def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resource
         document = decode_document(data["document"])
         resources = resource_storage.read(archive, data, engine)
         resources.require(document)
+        verify(document, resources)
         attachment_storage.restore_frame_hints(document, resources, engine)
         return document, resources

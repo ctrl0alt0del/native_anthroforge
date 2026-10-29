@@ -10,10 +10,13 @@ ColumnLayout {
     readonly property var detail: records.detail || ({})
     property var reviewStage: ({stage:"final",variant:records.active})
     property var evidenceIds: []
+    property string regionId: ""
+    property string exportId: ""
     Label { text: workspace.selectedData.name || "Select anatomy to review"; color: Theme.text; font.bold: true; Layout.fillWidth: true; wrapMode: Text.Wrap }
     UiCombo { id: dimension; Layout.fillWidth: true; model: ["Anatomy","Route / collision","Attachment","Stacking","Persistence","Display"] }
     UiCombo { id: decision; Layout.fillWidth: true; model: ["Pending","Approved","Rejected","Not applicable"] }
     UiSearchChoice { Layout.fillWidth: true; choices: pane.records.reviewStages || []; text: pane.reviewStage.name || "Current final surface"; onChosen: row=>pane.reviewStage=row }
+    UiSearchChoice { Layout.fillWidth: true; choices: [{id:"",name:"Whole anatomy"}].concat((pane.records.regions || []).filter(r=>r.target===workspace.selectedId && r.variant===pane.reviewStage.variant)); text: choices.find(r=>r.id===pane.regionId)?.name || "Whole anatomy"; onChosen: row=>pane.regionId=row.id }
     UiField { id: reviewer; Layout.fillWidth: true; placeholderText: "Reviewer" }
     UiTextArea { id: comment; Layout.fillWidth: true; Layout.preferredHeight: 100; placeholderText: "Review comments" }
     RowLayout {
@@ -23,7 +26,7 @@ ColumnLayout {
     Label { Layout.fillWidth: true; wrapMode: Text.Wrap; color: Theme.muted; text: (pane.records.evidence || []).filter(r=>pane.evidenceIds.includes(r.id)).map(r=>r.name).join(", ") }
     UiButton {
         text: "Record review"; Layout.fillWidth: true; enabled: !!workspace.selectedId && (!!reviewer.text.trim() || decision.currentIndex===0)
-        onClicked: pane.service.run("review.set",{subject:workspace.selectedId,dimension:pane.detail.dimensions[dimension.currentIndex],decision:pane.detail.decisions[decision.currentIndex],variant:pane.reviewStage.variant,stage:pane.reviewStage.stage,reviewer:reviewer.text,comment:comment.text,evidence:pane.evidenceIds})
+        onClicked: pane.service.run("review.set",{subject:workspace.selectedId,dimension:pane.detail.dimensions[dimension.currentIndex],decision:pane.detail.decisions[decision.currentIndex],variant:pane.reviewStage.variant,stage:pane.reviewStage.stage,reviewer:reviewer.text,comment:comment.text,evidence:pane.evidenceIds,region:pane.regionId})
     }
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Search review history" }
     ListView {
@@ -35,9 +38,11 @@ ColumnLayout {
             Label { Layout.fillWidth: true; color: modelData.freshness==="CURRENT" ? Theme.text : Theme.accent; wrapMode: Text.Wrap; text: modelData.dimension.replaceAll("_"," ")+" · "+modelData.decision.replaceAll("_"," ") }
             Label { Layout.fillWidth: true; color: Theme.muted; wrapMode: Text.Wrap; text: modelData.reviewer+" · "+modelData.freshness }
             Label { Layout.fillWidth: true; color: Theme.text; wrapMode: Text.Wrap; text: modelData.comment }
+            UiSearchChoice { Layout.fillWidth: true; visible: modelData.evidence.length>0; text: "Save evidence…"; choices: (pane.records.evidence || []).filter(r=>modelData.evidence.includes(r.id)); onChosen: row=>{pane.exportId=row.id; evidenceSave.open();} }
             Rectangle { Layout.fillWidth: true; implicitHeight: 1; color: Theme.border; Layout.topMargin: 5; Layout.bottomMargin: 5 }
         }
         ScrollBar.vertical: ScrollBar {}
     }
     FileDialog { id: evidenceFile; title: "Embed review evidence"; nameFilters: ["Images and reports (*.png *.jpg *.jpeg *.afinspection.zip *.afprofile.zip)"]; onAccepted: pane.service.importEvidence(selectedFile.toString()) }
+    FileDialog { id: evidenceSave; title: "Save embedded evidence"; fileMode: FileDialog.SaveFile; onAccepted: pane.service.exportEvidence(pane.exportId,selectedFile.toString()) }
 }

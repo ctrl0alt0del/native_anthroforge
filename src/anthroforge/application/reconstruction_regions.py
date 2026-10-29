@@ -75,3 +75,12 @@ def inspect(session: Any, region: str) -> dict[str, Any]:
     except ValueError as error:
         valid, reason = False, str(error)
     return dict(asdict(row), available=valid, reason=reason)
+
+
+def remove(session: Any, id: str) -> None:
+    state = records.state(session)
+    if any(id in c.members for c in state.collections) or any(
+        r.region == id for r in state.reviews
+    ):
+        raise ValueError("This region is used by a collection or review history.")
+    records.remove(session, "regions", id)

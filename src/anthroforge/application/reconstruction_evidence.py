@@ -59,6 +59,12 @@ def inspect(session: Any) -> Any:
     return dict(evidence=[asdict(row) for row in records.state(session).evidence])
 
 
+def verify(document: Any, resources: Any) -> None:
+    for row in document.reconstruction.evidence:
+        if hashlib.sha256(resources.evidence[row.resource]).hexdigest() != row.digest:
+            raise ValueError("Embedded review evidence checksum mismatch: " + row.name)
+
+
 def execute(session: Any, operation: str, arguments: Any) -> Any:
     commands: dict[str, Any] = dict(
         import_file=import_file, inspect=inspect, remove=remove, export=export

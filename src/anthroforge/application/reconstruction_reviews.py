@@ -30,7 +30,7 @@ def signature(session: Any, subject: str, variant: str, stage: str) -> str:
 def live_signature(document: Any, subject: str, stage: str) -> str:
     item = document.registry.anatomy.get(subject)
     if item is None:
-        return "unavailable"
+        raise ValueError("The reviewed anatomical instance is unavailable.")
     role = output(item) if stage in ("geometry", "final") else stage
     ports = dependencies.ports(document, Port(subject, role)) | {Port(subject, "pose")}
     inputs = construction_policy.revisions(document, ports)
@@ -38,17 +38,29 @@ def live_signature(document: Any, subject: str, stage: str) -> str:
 
 
 def decide(session: Any, subject: str, dimension: str, **options: Any) -> str:
-    if set(options) - {"decision", "variant", "stage", "reviewer", "comment", "evidence"}:
+    if set(options) - {"decision", "variant", "stage", "reviewer", "comment", "evidence", "region"}:
         raise ValueError("Unknown review setting.")
     options["evidence"] = tuple(options.get("evidence", ()))
     variant, stage = options.get("variant", ""), options.get("stage", "final")
     records.subject(session, subject, variant)
-    stamp = signature(session, subject, variant, stage)
+    stamp = stamped(session, subject, variant, stage, options.get("region", ""))
     row = Review(subject, dimension, stamp, **options)
     validate(row)
     for key in row.evidence:
         records.selected(session, "evidence", key)
     return str(records.upsert(session, "reviews", row))
+
+
+def stamped(session: Any, subject: str, variant: str, stage: str, region: str = "") -> str:
+    stamp = signature(session, subject, variant, stage)
+    if not region:
+        return stamp
+    from .reconstruction_regions import inspect
+
+    row = inspect(session, region)
+    if row["target"] != subject or row["variant"] != variant or not row["available"]:
+        raise ValueError("Choose an available region belonging to this anatomy and variant.")
+    return hashlib.sha256(repr((stamp, row)).encode()).hexdigest()
 
 
 def validate(row: Review) -> None:
@@ -68,7 +80,7 @@ def inspect(session: Any, subject: str = "", variant: str | None = None) -> dict
 
 def describe(session: Any, row: Review) -> dict[str, Any]:
     try:
-        stamp = signature(session, row.subject, row.variant, row.stage)
+        stamp = stamped(session, row.subject, row.variant, row.stage, row.region)
         freshness = "CURRENT" if stamp == row.signature else "OUTDATED"
     except ValueError:
         freshness = "UNAVAILABLE"

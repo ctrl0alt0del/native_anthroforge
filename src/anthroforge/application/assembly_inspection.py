@@ -27,8 +27,18 @@ def describe(manager: Any) -> dict[str, Any]:
         error=value.error,
         job_id=value.job or source.job,
         inventory=source.inventory,
+        variants=variant_inventory(source.source),
         **candidate_details(value.candidate),
     )
+
+
+def variant_inventory(source: Any) -> list[dict[str, Any]]:
+    if source is None:
+        return []
+    return [
+        dict(id=v.id, name=v.name, subjects=v.subjects, checkpoint=v.checkpoint)
+        for v in source.document.reconstruction.variants
+    ]
 
 
 def candidate_details(candidate: Any) -> dict[str, Any]:

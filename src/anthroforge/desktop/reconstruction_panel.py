@@ -52,7 +52,7 @@ class ReconstructionPanel(QObject):
         session = self.controller.session
         root = session.contexts.scene("")
         signature = (id(root.reconstruction), session.contexts.visible, self._page)
-        if self._page in ("Reviews", "Variants"):
+        if self._page in ("Reviews", "Variants", "Regions"):
             signature += (id(session.document), id(root), self.controller.selection)
         if self._page == "Stages":
             signature += (self.stage_path, session.assembly.source.state)
@@ -67,15 +67,24 @@ class ReconstructionPanel(QObject):
         result = session.command("variant.inspect")
         commands = {
             "Catalogue": "catalogue.inspect",
+            "Regions": "catalogue.inspect",
             "Reviews": "review.inspect",
             "Queue": "reconstruction.queue.inspect",
             "Stages": "reconstruction.stage.inspect",
         }
         if self._page in commands:
             result["detail"] = session.command(commands[self._page])
+        return dict(result, **self.related_records())
+
+    def related_records(self):
+        session = self.controller.session
+        result = {}
         result["evidence"] = session.command("reconstruction.evidence.inspect")["evidence"]
         result["source"] = self.source_state()
         result["reviewStages"] = self.review_stages() if self._page == "Reviews" else []
+        result["regions"] = [
+            vars_region(r) for r in session.contexts.project().reconstruction.regions
+        ]
         return result
 
     def review_stages(self):
@@ -125,6 +134,18 @@ class ReconstructionPanel(QObject):
         self.run("reconstruction.evidence.import_file", dict(path=QUrl(url).toLocalFile()))
 
     @Slot(str, str)
+    def exportEvidence(self, evidence, url):
+        self.run(
+            "reconstruction.evidence.export", dict(evidence=evidence, path=QUrl(url).toLocalFile())
+        )
+
+    @Slot("QVariantMap")
+    def resumeWork(self, row):
+        variant = row.get("variant", "")
+        self.run("variant.enter" if variant else "variant.leave", dict(variant=variant))
+        self.selectMembers([row["subject"]])
+
+    @Slot(str, str)
     def assignSelection(self, type_id, side):
         self.run(
             "catalogue.assign_many",
@@ -164,3 +185,9 @@ class ReconstructionPanel(QObject):
         self._signature = None
         self.synchronize()
         return result
+
+
+def vars_region(row):
+    from dataclasses import asdict
+
+    return asdict(row)

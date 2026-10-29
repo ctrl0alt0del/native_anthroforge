@@ -16,6 +16,7 @@ class ReconstructionComparePanel(QObject):
         self.controller, self.subject, self.active = controller, "", False
         self.selections, self.options, self.report = [{}, {}], [], {}
         self.signature, self.error, self.plane = None, "", None
+        self.region, self.pending_region = "", None
         self.scene = ReconstructionScene(controller, self)
 
     @Property(QObject, constant=True)
@@ -31,11 +32,13 @@ class ReconstructionComparePanel(QObject):
             report=self.report,
             error=self.error,
             plane=self.plane,
+            region=self.region,
         )
 
     @Slot(str)
     def inspect(self, subject):
         self.subject, self.active = subject, True
+        self.region, self.pending_region = "", None
         try:
             self.options = reconstruction_views.options(self.controller.session, subject)["views"]
             self.selections = [self.options[0], self.options[-1]]
@@ -85,7 +88,29 @@ class ReconstructionComparePanel(QObject):
         self.report, self.error = state.get("report", {}), state.get("error", "")
         self.scene.synchronize(service.pair)
         self.scene.set_sections(self.report)
+        self.show_pending_region()
         self.changed.emit()
+
+    @Slot(str)
+    def inspectRegion(self, key):
+        row = self.controller.session.command("catalogue.region.inspect", region=key)
+        self.inspect(row["target"])
+        self.region, self.pending_region = key, row
+        role = "base" if row["role"] == "TISSUE_BASE" else "final"
+        self.selections[1] = next(
+            r for r in self.options if r["stage"] == role and r["variant"] == row["variant"]
+        )
+        self.submit()
+
+    def show_pending_region(self):
+        if self.pending_region is None or not self.report or not self.scene.candidate:
+            return
+        row, self.pending_region = self.pending_region, None
+        if row["available"]:
+            self.scene.show_region(1, row["triangles"])
+        else:
+            self.scene.selectRegion(1)
+            self.error = row["reason"]
 
     @Slot(str)
     def saveRegion(self, name):
@@ -102,8 +127,11 @@ class ReconstructionComparePanel(QObject):
         arguments = reconstruction_regions.view_arguments(
             self.controller.session, view, name, sorted(self.scene.triangles)
         )
+        if self.region:
+            arguments["region"] = self.region
         self.controller.run("catalogue.region.set", arguments)
         self.scene.selectRegion(-1)
+        self.region = ""
 
     @Slot()
     def cancel(self):

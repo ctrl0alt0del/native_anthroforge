@@ -104,7 +104,7 @@ def inspect(session: Any) -> dict[str, Any]:
 def execute(session: Any, operation: str, arguments: Any) -> Any:
     commands = operations()
     name = operation.removeprefix("catalogue.")
-    if name in ("collection.remove", "region.remove"):
+    if name == "collection.remove":
         return records.remove(session, name.split(".")[0] + "s", arguments["id"])
     if name not in commands:
         raise ValueError("Unknown catalogue operation.")
@@ -124,4 +124,5 @@ def operations() -> dict[str, Any]:
         "collection.set": collection,
         "region.set": reconstruction_regions.set_region,
         "region.inspect": reconstruction_regions.inspect,
+        "region.remove": reconstruction_regions.remove,
     }

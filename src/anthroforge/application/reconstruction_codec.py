@@ -83,3 +83,26 @@ def validate(value: model.Reconstruction) -> None:
     for variant in value.variants:
         if {variant.baseline, variant.current} - snapshots:
             raise ValueError("Variant is missing a retained scene snapshot.")
+    validate_links(value)
+
+
+def validate_links(value: model.Reconstruction) -> None:
+    types, variants = {t.id for t in value.types}, {v.id for v in value.variants}
+    if len({a.target for a in value.assignments}) != len(value.assignments):
+        raise ValueError("An anatomical instance has more than one type assignment.")
+    if links(value, ("assignments", "work"), "type_id") - types:
+        raise ValueError("Reconstruction records refer to an unavailable anatomical type.")
+    if links(value, ("regions", "stages", "reviews", "work"), "variant") - variants:
+        raise ValueError("Reconstruction record is missing its variant.")
+    validate_reviews(value)
+
+
+def links(value: model.Reconstruction, groups: tuple[str, ...], attribute: str) -> set[str]:
+    return {getattr(row, attribute) for group in groups for row in getattr(value, group)} - {""}
+
+
+def validate_reviews(value: model.Reconstruction) -> None:
+    evidence, regions = {e.id for e in value.evidence}, {r.id for r in value.regions}
+    for review in value.reviews:
+        if set(review.evidence) - evidence or (review.region and review.region not in regions):
+            raise ValueError("Review evidence or material region is missing.")

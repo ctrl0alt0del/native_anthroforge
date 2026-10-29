@@ -35,7 +35,7 @@ UiDialog {
             UiButton { text: "Mark region in left view"; onClicked: dialog.service.comparison.selectRegion(0) }
             UiButton { text: "Mark region in right view"; onClicked: dialog.service.comparison.selectRegion(1) }
             UiField { id: region; placeholderText: "Region name"; Layout.fillWidth: true; enabled: !!dialog.service.comparison.state.region?.active }
-            UiButton { text: "Save region ("+(dialog.service.comparison.state.region?.count || 0)+")"; enabled: !!region.text.trim() && dialog.service.comparison.state.region?.count>0; onClicked: dialog.service.saveRegion(region.text) }
+            UiButton { text: (dialog.service.state.region ? "Redefine region (" : "Save region (")+(dialog.service.comparison.state.region?.count || 0)+")"; enabled: !!region.text.trim() && dialog.service.comparison.state.region?.count>0; onClicked: dialog.service.saveRegion(region.text) }
             UiButton { text: "Cancel selection"; enabled: !!dialog.service.comparison.state.region?.active; onClicked: dialog.service.comparison.selectRegion(-1) }
         }
         Label {

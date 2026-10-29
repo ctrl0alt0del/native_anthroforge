@@ -38,19 +38,24 @@ def complete_metadata(data: Any, found: dict[str, set[str]]) -> None:
                 found["meshes"].update(t["material_asset"] for t in targets)
 
 
-def load(source: Any, selection: Any, engine: Any, cancel: Any) -> Resources:
+def load(source: Any, selection: Any, engine: Any, cancel: Any, cache: Any = None) -> Resources:
     from .assembly_source import cancelled
 
-    found, result = required(source, selection), Resources()
+    found, result, cache = required(source, selection), Resources(), cache or Resources()
     with zipfile.ZipFile(source.path) as archive:
         for kind, keys in found.items():
             for key in keys:
                 cancelled(cancel)
-                getattr(result, kind)[key] = read_one(archive, source.metadata, engine, kind, key)
+                stored = getattr(cache, kind)
+                if key not in stored:
+                    stored[key] = read_one(archive, source.metadata, engine, kind, key)
+                getattr(result, kind)[key] = stored[key]
     return result
 
 
 def read_one(archive: Any, data: Any, engine: Any, kind: str, key: str) -> Any:
+    if kind == "evidence":
+        return archive.read("evidence/" + key)
     if kind == "bindings":
         return resource_storage.read_bindings(archive, (key,))[key]
     readers = dict(

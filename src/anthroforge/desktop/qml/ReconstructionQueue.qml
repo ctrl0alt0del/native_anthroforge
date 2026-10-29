@@ -30,7 +30,7 @@ ColumnLayout {
     RowLayout {
         UiButton { text: "Claim"; enabled: !!pane.selected && !!owner.text.trim(); onClicked: pane.service.run("reconstruction.queue.claim",{work:pane.selected,owner:owner.text}) }
         UiButton { text: "Take over"; enabled: !!pane.selected && !!owner.text.trim(); hint: "Explicitly take ownership of this anatomical type and its active work"; onClicked: pane.service.run("reconstruction.queue.claim",{work:pane.selected,owner:owner.text,takeover:true}) }
-        UiButton { text: "Select anatomy"; enabled: !!pane.selected; onClicked: pane.service.selectMembers([pane.rows.find(r=>r.id===pane.selected)?.subject]) }
+        UiButton { text: "Open work"; enabled: !!pane.selected; onClicked: pane.service.resumeWork(pane.rows.find(r=>r.id===pane.selected)) }
     }
     UiCombo { id: status; Layout.fillWidth: true; model: pane.records.detail?.statuses || [] }
     UiField { id: nextAction; Layout.fillWidth: true; placeholderText: "Next action" }

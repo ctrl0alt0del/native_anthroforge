@@ -1,5 +1,6 @@
 """Inspection archives freeze both stage selections, provenance, metrics and camera."""
 
+import json
 from dataclasses import replace
 from pathlib import Path
 from typing import Any
@@ -24,10 +25,18 @@ def capture(service: Any, camera: Any, mode: str) -> Any:
         raise ValueError("Choose a supported comparison layout.")
     document, resources = service.project, service.resources
     workspace = replace(
-        document.workspaces[0], camera=tuple(camera or document.workspaces[0].camera)
+        document.workspaces[0], camera=workspace_camera(camera, document.workspaces[0].camera)
     )
     source = InspectionContext(document, resources, service.session.engine, workspace)
-    return inspection_report.Capture(source, presentation(service, workspace, mode), {}, False)
+    view = json.loads(json.dumps(presentation(service, workspace, mode), allow_nan=False))
+    return inspection_report.Capture(source, view, {}, False)
+
+
+def workspace_camera(camera: Any, fallback: Any) -> tuple[float, ...]:
+    values = tuple(camera) if camera is not None else (*fallback[:5], fallback[6])
+    if len(values) != 6:
+        raise ValueError("Comparison camera requires center XYZ, pitch, yaw and distance.")
+    return (*values[:5], 0.0, values[5])
 
 
 def presentation(service: Any, workspace: Any, mode: str) -> Any:

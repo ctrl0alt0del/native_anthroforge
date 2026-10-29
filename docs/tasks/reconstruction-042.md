@@ -58,6 +58,25 @@ maintained production/hidden-render qualification infrastructure.
 
 ## Current checkpoint
 
+Latest qualification: 2,750 regression tests passed before the final evidence/region UI
+changes; the new catalogue/assembly/architecture subset passes 11 tests. Configured mypy
+passes 622 sources and ruff passes. Assembly imports now copy catalogue/stage/region/review
+evidence and explicitly selected variants, with independent identities. Regional reviews retain
+their decision but become outdated after explicit patch redefinition. Hidden inspection export
+passes end to end: corrected comparison/workspace camera conversion, held QML component
+lifetime until capture, and JSON-normalized report metadata. Visually inspected exported split
+view; no Qt imported into the calling headless process.
+
+Production SCM experiment on the 96-muscle assembly: open 5.705s, create variant 0.105s,
+inflation edit 0.346s, prepare/promote 1.152s (Apply 0.0067s), save 12.828s, reopen 10.746s.
+Preview/commit geometry and bindings match exactly; Undo restores accepted state. Source hash
+unchanged. Save peak working set about 3.04GB. Local reports/profile/project are under
+build/reconstruction-042/production. These are not full production or release acceptance.
+
+Remaining: reference/capability audit, populated/narrow GUI and stage availability,
+production support refresh and shortcut follow-up/multiangle previews, docs/coupling review,
+complete gate, canonical package and relocated portable qualification. No release claim yet.
+
 Comparison desktop supports split/overlay, sections, picked material regions, and frozen
 inspection export. Hidden GPU captures of every panel, promotion and comparison are clean;
 corrected framing for narrow split views. Native batched region outlines built and 6 native

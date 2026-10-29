@@ -67,7 +67,7 @@ def panel(app, controller, renderer):
 
 
 def capture_pages(app, controller, renderer):
-    for page in ("Variants", "Catalogue", "Stages", "Reviews", "Queue"):
+    for page in ("Variants", "Catalogue", "Regions", "Stages", "Reviews", "Queue"):
         controller.reconstruction_panel.setPage(page)
         for _ in range(5):
             app.processEvents()

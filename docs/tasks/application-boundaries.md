@@ -80,3 +80,7 @@ Preview transitions already own their contracts; no duplicate framework was intr
 The unused clear-preview lifecycle event and redundant model signal forwarding were removed.
 Issues repair synchronization remains before shortcut cleanup. Full gate and relocated package
 checks are still running/pending; this is not yet a completed delivery.
+
+The maintained authoring audit now consumes the registry directly rather than introspecting
+removed dispatch tables. It reports 385 registered operations, 308 literal desktop calls and
+zero missing registrations, including the extracted view-model directory.

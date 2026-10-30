@@ -263,8 +263,10 @@ read-only and cannot masquerade as accepted construction.
 Preserve the generated Membrane identity on Update. Reuse Fiber/point/junction identities
 where correspondence is verified; allocate new identities for new construction. Remove only
 superseded tool-owned sources that are unreferenced and deletion-eligible. Do not overwrite
-shared sources, move incoming attachments by index guesswork, or bypass topology locks to
-satisfy a requested count. Explain the affected consumers and required ordinary resolution.
+independently owned sources, move incoming attachments by index guesswork, or bypass topology
+locks to satisfy a requested count. Compatible shape updates to generated sources shared by
+other consumers use ordinary dependency propagation; sharing alone is not a new edit ban.
+Explain blocked topology/deletion changes and the affected consumers/ordinary resolution.
 An ordinary manual edit of generated construction discards the painting, per specification.
 
 ## 8. Temporary history, invalidation and persistence

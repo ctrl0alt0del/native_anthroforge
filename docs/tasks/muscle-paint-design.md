@@ -3,7 +3,7 @@
 - Task branch: `codex/muscle-paint-design`
 - Integration branch: `main`
 - Starting revision: `2ec68ce495cecca0e9f635199784b0ea9663b45c`
-- Status: pending validation — documentation only
+- Status: complete — documentation only; local integration
 - Last updated: 2026-10-30, Europe/Bucharest
 - Active writer: current desktop chat; direct work, no delegation
 
@@ -37,13 +37,28 @@ trial, package or project-format change performed.
 
 ## Verification
 
-Pending documentation link/content checks and separate ownership/coupling review.
+- `git diff --check` / staged diff check: passed.
+- UTF-8 Python validation of added Markdown links in the diff from `2ec68ce4`: 42 new
+  local file/anchor links across 10 documents, all resolve. External method references
+  checked against official StrokeStrip, libigl and CGAL sources during research.
+- Content review: every confirmed specification section and all R1–R14 research items
+  have owning boundaries and acceptance scenarios. Status/commands/schema are clearly
+  proposed; current scalar Painting System behavior remains marked implemented.
+- Separate ownership/coupling review: one stroke lifecycle/coordinator, feature adapters,
+  one transient/document history chronology, native numerical preparation, shared cyclic
+  correspondence, typed panel and existing command/service composition. Corrected an
+  overly broad shared-source restriction: compatible generated shape edits still propagate.
+- Changed-path review: documentation only. No application/native tests, build, packaging
+  or interactive geometry acceptance run or claimed for this documentation delivery.
 
 ## Next actions and blockers
 
-1. Verify relative links/anchors and confirmed-behavior coverage; review ownership/coupling.
-2. Correct any contradictions, then integrate documentation locally.
-3. Leave runtime implementation unstarted; future work begins with plan P0.
+1. Runtime implementation remains unstarted; when requested, begin with plan P0's recorded
+   fixtures and discriminating numerical experiments, then P1's shared history contracts.
+2. Proposed schema 10 is needed only with persisted cyclic material maps; no format has
+   changed. Coordinate the schema number if concurrent work uses it first.
+3. Commits/integration are local only under the supplied no-remote instruction. No remote
+   recovery or pushed checkpoint is claimed.
 
 ## Recovery inputs
 

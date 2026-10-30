@@ -42,8 +42,8 @@ def create_cycle(controller):
     settle(controller)
     session.command("control.follow", control=control, entity=control)
     settle(controller)
-    controller.select(entity)
-    controller.frameSelection()
+    controller.selection_view.select(entity)
+    controller.viewport_view.frameSelection()
     return entity, control
 
 

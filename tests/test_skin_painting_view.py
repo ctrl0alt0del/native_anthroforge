@@ -10,7 +10,7 @@ def brush(controller):
     target = cube(controller.session)
     controller.run("skin.collagen.fill", dict(owner=target, value=0))
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     publish(controller)
     tool = controller.tissue_painting
     tool.beginCollagen()
@@ -39,7 +39,7 @@ def test_collagen_cancel_restores_surface(controller):
     _, tool = brush(controller)
     before = controller.session.document
     preview(controller, tool)
-    controller.cancelViewportTools()
+    controller.viewport_view.cancelViewportTools()
     publish(controller)
     assert not tool.state["hiddenOwner"] and not tool.state["active"]
     assert not tool.model.active_rows()

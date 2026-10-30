@@ -30,9 +30,9 @@ def settle(controller):
 
 def setup_view(controller, window):
     identity = setup(controller.session)
-    controller.select(controller.session.document.entities[0].id)
+    controller.selection_view.select(controller.session.document.entities[0].id)
     settle(controller)
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     click(window, "shortcutsTab")
     controller.shortcut_panel.editor.select(identity)
     QTest.qWait(250)

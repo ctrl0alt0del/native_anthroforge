@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -7,15 +8,15 @@ UiScrollView {
     contentWidth:availableWidth; clip:true
     ColumnLayout {
         width:pane.availableWidth; spacing:Theme.gap
-        UiButton { text:"Inspect neighborhood"; Layout.fillWidth:true; enabled:!!workspace.selectedId && !workspace.state.waiting; hint:"Show this object, its sources, supports and attachments. Restore returns to the previous view."; onClicked:workspace.neighborhoodView.inspect() }
-        UiButton { text:"Restore previous view"; Layout.fillWidth:true; visible:workspace.neighborhoodView.state.active; onClicked:workspace.neighborhoodView.restore() }
-        UiButton { text:"Check geometry"; Layout.fillWidth:true; visible:!!workspace.selectedId && !workspace.selectedData.is_tissue; enabled:workspace.spatialEvidence.state.available; hint:enabled ? "Check the accepted surface for crossings and degenerate faces. Results are advisory." : workspace.spatialEvidence.state.reason; onClicked:workspace.spatialEvidence.check(workspace.selectedId,"final") }
-        UiButton { text:"Hide finding"; Layout.fillWidth:true; visible:workspace.spatialEvidence.state.active; onClicked:workspace.spatialEvidence.clear() }
-        SurfaceMeasurements { visible:workspace.spatialEvidence.state.available }
-        TissueSections { visible:workspace.spatialEvidence.state.available && !workspace.selectedData.is_tissue }
+        UiButton { text:"Inspect neighborhood"; Layout.fillWidth:true; enabled:!!App.selection.selectedId && !App.runtime.state.waiting; hint:"Show this object, its sources, supports and attachments. Restore returns to the previous view."; onClicked:App.neighborhoodView.inspect() }
+        UiButton { text:"Restore previous view"; Layout.fillWidth:true; visible:App.neighborhoodView.state.active; onClicked:App.neighborhoodView.restore() }
+        UiButton { text:"Check geometry"; Layout.fillWidth:true; visible:!!App.selection.selectedId && !App.selection.selectedData.is_tissue; enabled:App.spatialEvidence.state.available; hint:enabled ? "Check the accepted surface for crossings and degenerate faces. Results are advisory." : App.spatialEvidence.state.reason; onClicked:App.spatialEvidence.check(App.selection.selectedId,"final") }
+        UiButton { text:"Hide finding"; Layout.fillWidth:true; visible:App.spatialEvidence.state.active; onClicked:App.spatialEvidence.clear() }
+        SurfaceMeasurements { visible:App.spatialEvidence.state.available }
+        TissueSections { visible:App.spatialEvidence.state.available && !App.selection.selectedData.is_tissue }
         PlacementInspection {}
-        TissueInspection { visible:!!workspace.selectedData.is_tissue; expanded:true; stateKey:"inspect/tissue" }
-        DependencyInspector { visible:!!workspace.selectedId; expanded:true; stateKey:"inspect/dependencies" }
-        Label { visible:!workspace.selectedId; text:"Select an object to inspect its result and relationships."; color:Theme.muted; Layout.fillWidth:true; wrapMode:Text.Wrap }
+        TissueInspection { visible:!!App.selection.selectedData.is_tissue; expanded:true; stateKey:"inspect/tissue" }
+        DependencyInspector { visible:!!App.selection.selectedId; expanded:true; stateKey:"inspect/dependencies" }
+        Label { visible:!App.selection.selectedId; text:"Select an object to inspect its result and relationships."; color:Theme.muted; Layout.fillWidth:true; wrapMode:Text.Wrap }
     }
 }

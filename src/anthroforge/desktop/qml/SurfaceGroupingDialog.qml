@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Layouts
 UiDialog {
     id: dialog
     objectName: "surfaceGroupingDialog"
-    readonly property var tool: workspace.surfaceCreation
+    readonly property var tool: App.surfaceCreation
     readonly property var state: tool.state
     title: "Choose surface branches"; width: 490; modal: true
     anchors.centerIn: parent

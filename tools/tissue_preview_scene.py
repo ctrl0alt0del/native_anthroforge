@@ -13,14 +13,14 @@ def exercise(controller, renderer, app):
     target = scene(controller)
     frames(controller, renderer, app)
     before = controller.session.document
-    accepted = controller.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
+    accepted = controller.selection_view.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
     controller.run("tissue.preview", dict(target=target, changes=dict(amount=0.25)))
     settle(controller)
-    assert controller.tissuePreview["state"] == "ready"
+    assert controller.construction_view.tissuePreview["state"] == "ready"
     assert frames(controller, renderer, app).save("build/022-tissue/inflation-preview-gpu.png")
     candidate = next(r for r in controller._render_rows if r["id"].startswith("preview:"))
     assert not candidate["pickable"] and not candidate["surface_pickable"]
-    picked = controller.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
+    picked = controller.selection_view.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
     assert picked == accepted, (picked, accepted)
     cancel(controller, renderer, app, before)
 

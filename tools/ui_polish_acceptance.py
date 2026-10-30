@@ -85,7 +85,7 @@ def disclosure_checks(controller, window):
 
 
 def issue_details(controller, window):
-    controller.replaceDocument("")
+    controller.project_view.replaceDocument("")
     wait_for(controller, lambda: not controller.session.waiting_save)
     issues.create_cycle(controller)
     click(window, "issuesToggle")
@@ -138,7 +138,7 @@ def dialog_deletion(controller, window):
     assert not find(window, "deleteDialog").property("visible")
     assert not controller.session.document.entities
     controller.run("undo", {})
-    controller.select(root)
+    controller.selection_view.select(root)
     assert controller.session.document.entity(root)
 
 

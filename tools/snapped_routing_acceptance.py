@@ -47,7 +47,7 @@ def selector(window, name):
 
 
 def select(controller, window, key, expected):
-    controller.select(key)
+    controller.selection_view.select(key)
     settle(controller)
     assert find(window, "standaloneEngineChoice").property("currentText") == expected, (
         expected,
@@ -125,7 +125,7 @@ def primitive_engine(controller, window, key):
     consumer = controller.run("primitive.from_curves", args)
     assert consumer, controller.message
     settle(controller)
-    controller.select(consumer)
+    controller.selection_view.select(consumer)
     controller.authoring.setEditing(True)
     settle(controller)
     choose(window, 1, "primitiveEngineChoice")

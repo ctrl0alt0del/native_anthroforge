@@ -42,7 +42,7 @@ def create_loft(controller, window):
         dict(entity=entity, curve=curve.id, point=curve.points[0].id, position=[-0.5, -0.15, 0.2]),
     )
     settle(controller)
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     QTest.qWait(150)
     screenshot(window, "loft-edit")
     assert len(controller.authoring.lines) > 100
@@ -58,7 +58,7 @@ def edit_cage(controller, window):
     )
     settle(controller)
     screenshot(window, "lattice-edit")
-    assert controller.selectedData["kind"] == "LATTICE"
+    assert controller.selection_view.selectedData["kind"] == "LATTICE"
     assert len(controller.authoring.lines) == 24
     return cage
 
@@ -68,10 +68,10 @@ def edit_hook(controller, window):
     controller.authoring.selectComponent(key, False)
     controller.authoring.addDeformer("HOOK")
     settle(controller)
-    assert controller.selectedData["kind"] == "HOOK"
-    controller.beginTransform("Move")
-    controller.dragTransform(2, 0.1)
-    controller.endTransform(False)
+    assert controller.selection_view.selectedData["kind"] == "HOOK"
+    controller.viewport_view.beginTransform("Move")
+    controller.viewport_view.dragTransform(2, 0.1)
+    controller.viewport_view.endTransform(False)
     settle(controller)
     screenshot(window, "hook-edit")
 
@@ -82,7 +82,7 @@ def roundtrip(controller, entity):
     settle(controller)
     controller.run("open", dict(path=path))
     settle(controller)
-    controller.select(entity)
+    controller.selection_view.select(entity)
     assert len(controller.session.document.controls) == 2
 
 
@@ -91,7 +91,7 @@ def verify(controller, window):
     entity = create_loft(controller, window)
     cage = edit_cage(controller, window)
     edit_hook(controller, window)
-    controller.select(cage)
+    controller.selection_view.select(cage)
     settle(controller)
     roundtrip(controller, entity)
     screenshot(window, "reopened")

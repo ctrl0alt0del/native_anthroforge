@@ -15,7 +15,7 @@ from anthroforge.desktop.runtime import native_runtime
 def exercise(controller, engine):
     target = controller.run("primitive.create", dict(kind="BODY", shape="BOX"))
     settle(controller)
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.authoring.setEditing(True)
     settle(controller)
     window = engine.rootObjects()[0]
@@ -35,7 +35,7 @@ def verify_components(controller, engine, target):
     settle(controller)
     assert len(controller.authoring.componentRows) == 48
     child = controller.run("scp.empty", dict(name="Child", parent=target))
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
     assert not find(engine.rootObjects()[0], "curveSamples").isEnabled()
     controller.run("scp.delete", dict(entity=child))

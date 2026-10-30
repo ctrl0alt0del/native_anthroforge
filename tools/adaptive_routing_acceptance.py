@@ -34,7 +34,7 @@ def load(controller, source):
     assert session.document.object(key).points == before.points
     path = accepted(session, key)
     assert path.count == 24 and session.document.object(key).engine_settings.samples == 24
-    controller.select(key)
+    controller.selection_view.select(key)
     settle(controller)
     return key, before.points
 
@@ -56,7 +56,7 @@ def conversion(controller, window, key):
 
 
 def sampling_control(controller, window, key):
-    controller.select(key)
+    controller.selection_view.select(key)
     controller.authoring.setEditing(True)
     settle(controller)
     advanced = selector(window, "routingAdvanced")

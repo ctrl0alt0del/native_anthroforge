@@ -9,7 +9,7 @@ from tests.test_tissue_stack_workflow import assembly
 def setup(controller):
     _, provider, receiver = assembly(controller.session)
     controller.refresh()
-    controller.select(receiver)
+    controller.selection_view.select(receiver)
     tool = controller.tissue_inspection
     tool.showStacking(provider, "a", "a")
     controller.session.wait()

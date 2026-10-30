@@ -1,9 +1,10 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 
 Item {
     id: overlay
     required property var viewport
-    readonly property var tool: workspace.tissuePainting
+    readonly property var tool: App.tissuePainting
     anchors.fill: parent
     function direction(x,y,z) {
         const d=viewport.cameraDirection(x,y,z);

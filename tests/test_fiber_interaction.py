@@ -40,7 +40,7 @@ def test_fiber_object_transform_is_rejected_without_history_or_jobs(session, val
 def setup_creation(controller):
     target, source = scene(controller.session)
     controller.refresh()
-    controller.select(source)
+    controller.selection_view.select(source)
     controller.authoring.setEditing(True)
     points = controller.session.document.object(source).points
     bindings = [dict(point=p.id, target=target) for p in (points[0], points[-1])]
@@ -61,11 +61,14 @@ def assert_source_context(controller, source):
 def test_accepted_creation_exits_editing_selects_fiber_and_keeps_one_undo(controller):
     arguments = setup_creation(controller)
     session, cursor = controller.session, controller.session.history.cursor
-    controller.createConstruction("fiber.create", arguments)
+    controller.construction_view.createConstruction("fiber.create", arguments)
     settle(controller)
     fiber = session.document.object(controller.selection)
     assert isinstance(fiber, Fiber) and not controller.authoring.active
-    assert not controller.selectedData["transformable"] and session.history.cursor == cursor + 1
+    assert (
+        not controller.selection_view.selectedData["transformable"]
+        and session.history.cursor == cursor + 1
+    )
     assert not controller.authoring.selection and controller.creation_selection.pending is None
     controller.run("undo", {})
     assert fiber.id not in session.document.registry.records
@@ -77,14 +80,14 @@ def test_accepted_creation_exits_editing_selects_fiber_and_keeps_one_undo(contro
 def test_rejected_creation_preserves_source_edit_context(controller):
     arguments = setup_creation(controller)
     arguments["bindings"] = []
-    assert controller.createConstruction("fiber.create", arguments) is None
+    assert controller.construction_view.createConstruction("fiber.create", arguments) is None
     assert_source_context(controller, arguments["curve"])
 
 
 def test_cancelled_creation_does_not_select_a_missing_fiber(controller, monkeypatch):
     arguments = setup_creation(controller)
     _, release = hold(monkeypatch, fiber_tasks)
-    job = controller.createConstruction("fiber.create", arguments)
+    job = controller.construction_view.createConstruction("fiber.create", arguments)
     controller.run("job.cancel", dict(job_id=job))
     release.set()
     settle(controller)
@@ -99,7 +102,7 @@ def fail_capture(*args):
 def test_failed_capture_does_not_exit_editing(controller, monkeypatch):
     arguments = setup_creation(controller)
     monkeypatch.setattr(fiber_tasks, "compute", fail_capture)
-    job = controller.createConstruction("fiber.create", arguments)
+    job = controller.construction_view.createConstruction("fiber.create", arguments)
     settle(controller)
     assert controller.session.scheduler.registry.by_id[job].state == "failed"
     assert_source_context(controller, arguments["curve"])
@@ -109,9 +112,9 @@ def test_failed_capture_does_not_exit_editing(controller, monkeypatch):
 def test_pending_creation_does_not_steal_a_new_context(controller, monkeypatch, change):
     arguments = setup_creation(controller)
     _, release = hold(monkeypatch, fiber_tasks)
-    controller.createConstruction("fiber.create", arguments)
+    controller.construction_view.createConstruction("fiber.create", arguments)
     if change == "selection":
-        controller.select(controller.session.document.entities[0].id)
+        controller.selection_view.select(controller.session.document.entities[0].id)
     elif change == "editing":
         controller.authoring.setEditing(False)
     else:
@@ -126,7 +129,7 @@ def test_pending_creation_does_not_steal_a_new_context(controller, monkeypatch, 
 def test_superseded_capture_still_selects_its_accepted_fiber(controller, monkeypatch):
     arguments = setup_creation(controller)
     _, release = hold(monkeypatch, fiber_tasks)
-    controller.createConstruction("fiber.create", arguments)
+    controller.construction_view.createConstruction("fiber.create", arguments)
     item = controller.session.document.object(arguments["curve"])
     controller.run(
         "curve.point.update", dict(curve=item.id, point=item.points[1].id, position=[0, 0.4, 0.8])
@@ -139,14 +142,14 @@ def test_superseded_capture_still_selects_its_accepted_fiber(controller, monkeyp
 
 def test_controller_rejects_whole_fiber_gestures_but_allows_components(controller):
     arguments = setup_creation(controller)
-    controller.createConstruction("fiber.create", arguments)
+    controller.construction_view.createConstruction("fiber.create", arguments)
     settle(controller)
     for mode in ("Move", "Rotate", "Scale"):
-        assert not controller.beginTransform(mode)
+        assert not controller.viewport_view.beginTransform(mode)
         assert controller.session.history.before is None
     controller.authoring.setEditing(True)
     point = next(row for row in controller.authoring.componentRows if row["part"] == "position")
     controller.authoring.selectComponent(point["key"], False)
     for mode in ("Move", "Rotate", "Scale"):
-        assert controller.beginTransform(mode)
-        controller.endTransform(True)
+        assert controller.viewport_view.beginTransform(mode)
+        controller.viewport_view.endTransform(True)

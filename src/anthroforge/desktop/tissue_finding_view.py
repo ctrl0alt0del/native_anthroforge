@@ -20,7 +20,7 @@ def show(tool, identity):
 def locate(tool, identity, row, witness):
     if row["freshness"] != "current":
         raise ValueError("This finding is stale. Check geometry again before locating it.")
-    tool.controller.select(row["target"])
+    tool.controller.selection_view.select(row["target"])
     tool.synchronize()
     tool.set_view(row["stage"], "", "Overlay")
     tool.lines = lines(tool.controller.session, row, witness)

@@ -57,7 +57,7 @@ def test_tissue_field_points_match_desktop_and_are_weight_only(controller):
     _, _, tissue = tissue_assembly(session)
     field(session, tissue, domain="REST")
     controller.refresh()
-    controller.select(tissue)
+    controller.selection_view.select(tissue)
     controller.authoring.editTissueField("pins")
     result = session.command(
         "editing.inspect", target=tissue, category="TISSUE_FIELD", context=dict(field="pins")
@@ -72,7 +72,7 @@ def test_tissue_control_query_uses_current_part_side(controller):
     session = controller.session
     _, _, target = tissue_assembly(session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.authoring.editTissueControl("main", "a")
     result = session.command("editing.inspect", target=target, category="TISSUE_CONTROL")
     assert [r["reference"] for r in result["components"]] == [

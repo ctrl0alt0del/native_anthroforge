@@ -11,13 +11,13 @@ def test_neighborhood_includes_attached_fiber_without_changing_workspace(control
     target, curve = scene(session)
     fiber = bind(session, target, curve)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     before, cursor = session.document, session.history.cursor
     controller.neighborhood.inspect()
     assert (
         fiber.id in controller.neighborhood.members and curve not in controller.neighborhood.members
     )
-    controller.saveCamera([0, 0, 0, 0, 0, 0, 12], False)
+    controller.viewport_view.saveCamera([0, 0, 0, 0, 0, 0, 12], False)
     assert session.document is before and session.history.cursor == cursor
     controller.neighborhood.restore()
     assert not controller.neighborhood.members and session.document is before
@@ -26,7 +26,7 @@ def test_neighborhood_includes_attached_fiber_without_changing_workspace(control
 def test_neighborhood_visibility_restores_original_flags(controller):
     target, _ = scene(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     row = hidden_record(target)
     controller.neighborhood.inspect()
     assert inspection_visibility.project(controller, row)["surface_visible"]

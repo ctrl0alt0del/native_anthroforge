@@ -80,4 +80,4 @@ class ProjectLibrary(QObject):
     def openRecent(self, path):
         if path not in self.recent.entries:
             return
-        self.controller.requestDocument(path)
+        self.controller.project_view.requestDocument(path)

@@ -73,7 +73,7 @@ def tooltips(window, report):
 
 
 def folder_actions(controller, window):
-    browser = controller.project_library.recovery_browser
+    browser = controller.project_view.library.recovery_browser
     with patch(
         "anthroforge.desktop.recovery_browser.QDesktopServices.openUrl", return_value=True
     ) as opened:

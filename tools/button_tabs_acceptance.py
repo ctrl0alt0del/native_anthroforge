@@ -106,13 +106,13 @@ def selection_navigation(window, controller, root):
     assert_tab(window, 1)
     curve = controller.selection
     controller.authoring.setEditing(False)
-    controller.select(root)
+    controller.selection_view.select(root)
     QTest.qWait(80)
     assert_tab(window, 0)
-    controller.select(curve)
+    controller.selection_view.select(curve)
     QTest.qWait(80)
     assert_tab(window, 1)
-    controller.select(root)
+    controller.selection_view.select(root)
     QTest.qWait(80)
 
 

@@ -28,7 +28,7 @@ def setup(controller):
         dict(engine="ROUTED", points=[dict(position=p) for p in [[-1, 0, 0], [1, 0, 0]]]),
     )
     settle(controller)
-    controller.select(curve)
+    controller.selection_view.select(curve)
     controller.authoring.setEditing(True)
     settle(controller)
     return curve
@@ -53,9 +53,9 @@ def edit(controller, key, component):
     controller.authoring.selectComponent(component["key"], False)
     assert controller.session.document.revision == revision
     before = controller.session.document.object(key).points
-    assert controller.beginTransform("Move")
-    controller.transformDelta([0, 0.1, 0, 0, 0, 0, 1, 1, 1])
-    controller.endTransform(False)
+    assert controller.viewport_view.beginTransform("Move")
+    controller.viewport_view.transformDelta([0, 0.1, 0, 0, 0, 0, 1, 1, 1])
+    controller.viewport_view.endTransform(False)
     settle(controller)
     assert controller.session.document.object(key).result.status == "ready"
     controller.run("undo", {})

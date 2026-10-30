@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 ColumnLayout {
     id: pane
-    readonly property var service: workspace.reconstructionPanel
+    readonly property var service: App.reconstructionPanel
     spacing: Theme.gap
     RowLayout {
         Layout.fillWidth: true

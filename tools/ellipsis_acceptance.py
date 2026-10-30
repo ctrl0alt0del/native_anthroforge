@@ -81,7 +81,7 @@ def surface(controller, window):
     label_check(window, "Across strips · 0 keeps fitted density")
     screenshot(window, "surface-labels")
     popup_check(window)
-    controller.select(source)
+    controller.selection_view.select(source)
     controller.authoring.setEditing(True)
     settle(controller)
 

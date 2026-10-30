@@ -20,35 +20,35 @@ def controller():
 def test_tissue_is_anatomy_with_mesh_and_no_transform(controller):
     _, source, target = assembly(controller.session)
     controller.refresh()
-    controller.select(target)
-    row = controller.selectedData
+    controller.selection_view.select(target)
+    row = controller.selection_view.selectedData
     assert row["is_tissue"] and not row["is_construction"]
     assert not row["transformable"]
     assert row["handle"] and row["source"] == source
-    assert target in {r["id"] for r in controller.treeRows}
+    assert target in {r["id"] for r in controller.selection_view.treeRows}
     assert target not in controller.construction.records
-    assert controller.selectionCenter()
+    assert controller.viewport_view.selectionCenter()
 
 
 def test_creation_selects_tissue_and_settings_preserve_source(controller):
     _, source, _ = assembly(controller.session)
     controller.refresh()
-    controller.select(source)
-    key = controller.createConstruction("tissue.create", dict(source=source))
+    controller.selection_view.select(source)
+    key = controller.construction_view.createConstruction("tissue.create", dict(source=source))
     controller.session.wait()
     controller.refresh()
     assert controller.selection == key
-    assert controller.selectedData["is_tissue"]
+    assert controller.selection_view.selectedData["is_tissue"]
     controller.run("tissue.configure", dict(target=key, changes=dict(stacking=False)))
     controller.session.wait()
     controller.refresh()
-    assert controller.selectedData["status"] == "ready"
+    assert controller.selection_view.selectedData["status"] == "ready"
 
 
 def test_deleted_tissue_drops_scene_selection_and_undo_restores_record(controller):
     _, _, target = assembly(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.run("object.delete", dict(target=target))
     controller.refresh()
     assert target not in controller.scene_projection.records
@@ -56,5 +56,5 @@ def test_deleted_tissue_drops_scene_selection_and_undo_restores_record(controlle
     controller.run("undo", {})
     controller.session.wait()
     controller.refresh()
-    controller.select(target)
-    assert controller.selectedData["is_tissue"]
+    controller.selection_view.select(target)
+    assert controller.selection_view.selectedData["is_tissue"]

@@ -8,7 +8,11 @@ from anthroforge.core.surfaces import Surface
 
 def selected_curves(controller):
     records = controller.session.document.registry.construction
-    return [key for key in controller.selectedObjects if isinstance(records.get(key), Curve)]
+    return [
+        key
+        for key in controller.selection_view.selectedObjects
+        if isinstance(records.get(key), Curve)
+    ]
 
 
 def surface(controller, kind):
@@ -37,5 +41,5 @@ def create(editor, kind, shape):
         args["curves"] = curves
     entity = controller.run(operation, args)
     if entity:
-        controller.select(entity)
+        controller.selection_view.select(entity)
         editor.setEditing(True)

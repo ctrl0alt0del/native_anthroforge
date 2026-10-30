@@ -12,7 +12,7 @@ def target(controller, stage):
     owner = controller.selection
     if stage == "LATTICE":
         owner = controller.run("control.create", dict(kind="LATTICE", entity=owner))
-        controller.select(owner)
+        controller.selection_view.select(owner)
     controller.authoring.setEditing(True)
     controller.authoring.setCategory(stage)
     return owner

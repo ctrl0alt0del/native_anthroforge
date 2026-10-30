@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Layouts
 UiSection {
     id: panel
     title: "Cross-section"; expanded: false
-    readonly property var tool: workspace.sectionTools
+    readonly property var tool: App.sectionTools
     UiCheck { objectName: "sectionEnabled"; text: "Show section"; checked: panel.tool.state.enabled; onToggled: panel.tool.enable(checked) }
     ColumnLayout {
         visible: panel.tool.state.enabled; Layout.fillWidth: true

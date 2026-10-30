@@ -64,10 +64,7 @@ class Probes:
 
 
 def freeze_activity(controller):
-    if hasattr(controller._state, "synchronize"):
-        controller._state.synchronize(controller.snapshot())
-    else:
-        controller._state = controller.snapshot()
+    controller.runtime_view.synchronize()
     controller.changed.emit()
 
 

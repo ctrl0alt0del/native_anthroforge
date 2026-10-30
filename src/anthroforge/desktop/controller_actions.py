@@ -52,7 +52,7 @@ def command_values(value):
 def start_transform(controller, mode):
     controller.authoring.interaction.clearSnap()
     object_interaction.require_transform(controller)
-    controller.drag_mode = mode
+    controller.viewport_view.drag_mode = mode
     if controller.authoring.active:
         from .authoring_actions import start_transform as start_components
 
@@ -61,14 +61,14 @@ def start_transform(controller, mode):
         return
     object_interaction.editable(controller)
     controller.session.begin()
-    controller.drag_values = list(controller.selectedData["trs"])
-    controller.drag_mode = mode
+    controller.viewport_view.drag_values = list(controller.selection_view.selectedData["trs"])
+    controller.viewport_view.drag_mode = mode
 
 
 def drag_transform(controller, axis, amount):
     from .transform_delta import axis_values
 
-    transform_delta(controller, axis_values(controller.drag_mode, axis, amount))
+    transform_delta(controller, axis_values(controller.viewport_view.drag_mode, axis, amount))
 
 
 def transform_delta(controller, values):
@@ -78,9 +78,9 @@ def transform_delta(controller, values):
         from .authoring_actions import transform_delta as component_delta
 
         return component_delta(controller.authoring, values)
-    if not controller.drag_values or controller.session.history.before is None:
+    if not controller.viewport_view.drag_values or controller.session.history.before is None:
         return
-    result = object_values(controller.session.engine, controller.drag_values, values)
+    result = object_values(controller.session.engine, controller.viewport_view.drag_values, values)
     run(controller, *object_interaction.transform_command(controller, result))
 
 
@@ -92,7 +92,7 @@ def end_transform(controller, cancel=False):
             except ValueError as error:
                 controller.message = str(error)
         run(controller, "cancel" if cancel else "commit", {})
-    controller.drag_values = []
+    controller.viewport_view.drag_values = []
 
 
 def rebase_transform(controller, mode=""):
@@ -106,13 +106,13 @@ def rebase_transform(controller, mode=""):
         controller.authoring.drag_mode = mode or controller.authoring.drag_mode
         capture_transform(controller.authoring)
     else:
-        controller.drag_values = list(controller.selectedData["trs"])
+        controller.viewport_view.drag_values = list(controller.selection_view.selectedData["trs"])
 
 
 def selection_center(controller):
     selected = controller.authoring.transformData
     if not selected:
-        selected = controller.selectedData
+        selected = controller.selection_view.selectedData
     if not selected:
         return []
     if selected["id"] == "components" or selected.get("is_control"):
@@ -130,7 +130,7 @@ def new_document(controller):
 
 
 def frame(controller):
-    selected = controller.selectedData
+    selected = controller.selection_view.selectedData
     if not selected:
         controller.frameRequested.emit([0.0, 0.0, 0.0, 4.0])
         return

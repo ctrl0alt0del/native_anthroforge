@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 
 Item {
     id: overlay
     required property var viewport
-    readonly property var tool: workspace.drawingTools
+    readonly property var tool: App.drawingTools
     readonly property bool active: tool.state.active
     anchors.fill: parent
     Canvas {

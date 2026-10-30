@@ -10,7 +10,7 @@ from tests.test_tissue_stack_workflow import assembly
 def draft(controller):
     _, provider, target = assembly(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     for _ in range(8):
         controller.render_model.drain()
         controller.frame_presented()

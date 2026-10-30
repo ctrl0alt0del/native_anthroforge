@@ -37,13 +37,13 @@ def marker(renderer, image, position):
 
 def exercise(controller, renderer, app):
     target = controller.run("construction.point.create", dict(position=[0.3, 0.2, 0.2]))
-    controller.select("")
+    controller.selection_view.select("")
     image = frames(controller, renderer, app)
     output = Path("build/022-points")
     output.mkdir(parents=True, exist_ok=True)
     image.save(str(output / "point-gpu.png"))
     marker(renderer, image, [0.3, 0.2, 0.2])
-    assert controller.pick([0.3, 0.2, 3], [0, 0, -1], 0, False, 0.03)["id"] == target
+    assert controller.selection_view.pick([0.3, 0.2, 3], [0, 0, -1], 0, False, 0.03)["id"] == target
 
 
 def run(app):

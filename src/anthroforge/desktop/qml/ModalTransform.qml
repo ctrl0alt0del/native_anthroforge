@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 
@@ -10,8 +11,8 @@ Item {
     function begin(mode) {
         if(viewport.keyboard.blocked || !viewport.transformAvailable) return;
         if(!active && viewport.transforming) return;
-        if(active) workspace.rebaseTransform(mode);
-        else if(!workspace.beginTransform(mode)) return;
+        if(active) App.viewport.rebaseTransform(mode);
+        else if(!App.viewport.beginTransform(mode)) return;
         viewport.forceActiveFocus();
         gesture={mode:mode}; rebase();
     }
@@ -34,21 +35,21 @@ Item {
             const amount=g.radius>12?(radius/g.radius-1):((p.x-g.start.x)-(p.y-g.start.y))/120;
             const scale=Math.max(.01,1+amount*factor); values=[0,0,0,0,0,0,scale,scale,scale];
         }
-        workspace.transformDelta(values);
+        App.viewport.transformDelta(values);
     }
     function moveValues(p,factor) {
         const g=gesture, ray=viewport.worldRay(p.x,p.y);
         const shift=viewport.screenTranslationAt({x:p.x-g.start.x,y:p.y-g.start.y},g.pivot).map(n=>n*factor);
-        return authoring.curveInteraction.movement(ray.origin,ray.direction,shift.concat([0,0,0,1,1,1]),viewport.keyboard.held("snapSurface"));
+        return App.authoring.curveInteraction.movement(ray.origin,ray.direction,shift.concat([0,0,0,1,1,1]),viewport.keyboard.held("snapSurface"));
     }
     function rotationValues(p,factor) {
         const g=gesture, angle=Math.atan2(g.center.y-p.y,p.x-g.center.x);
         g.total+=Math.atan2(Math.sin(angle-g.angle),Math.cos(angle-g.angle)); g.angle=angle;
-        return workspace.rotationDelta(g.axis,g.total*180/Math.PI*factor);
+        return App.viewport.rotationDelta(g.axis,g.total*180/Math.PI*factor);
     }
     function finish(cancel) {
         if(!active) return;
-        gesture=null; workspace.endTransform(cancel); authoring.curveInteraction.clearSnap();
+        gesture=null; App.viewport.endTransform(cancel); App.authoring.curveInteraction.clearSnap();
     }
     MouseArea {
         anchors.fill: parent; hoverEnabled: true; acceptedButtons: Qt.LeftButton | Qt.RightButton

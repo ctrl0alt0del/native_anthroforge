@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -9,7 +10,7 @@ ColumnLayout {
     property bool automatic: false
     property var selectedKey: null
     signal activated(var surface)
-    readonly property var rows: { const revision=workspace.state.revision; return workspace.surfaceRoles(); }
+    readonly property var rows: { const revision=App.runtime.state.revision; return App.construction.surfaceRoles(); }
     readonly property var chosen: rows.find(r=>selectedKey!==null ? r.key===selectedKey : r.id===target && r.role===role)
     readonly property var filtered: choices()
     readonly property var current: filtered[choice.currentIndex] || ({})

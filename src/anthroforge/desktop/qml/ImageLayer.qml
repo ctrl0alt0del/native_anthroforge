@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick3D
 
@@ -7,7 +8,7 @@ View3D {
     required property bool orthographic
     required property string depthLayer
     required property vector3d viewAxis
-    visible: workspace.imageLayer(depthLayer).count > 0 || workspace.shortcutComparison.imageLayer(depthLayer).count > 0
+    visible: App.viewport.imageLayer(depthLayer).count > 0 || App.shortcutComparison.imageLayer(depthLayer).count > 0
     camera: rig.camera
     environment: SceneEnvironment {
         backgroundMode: SceneEnvironment.Transparent

@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -23,7 +24,7 @@ UiDialog {
                 required property var modelData
                 width: ListView.view.width; alignLeft: true
                 text: modelData.name; hint: modelData.reason
-                onClicked: { workspace.select(modelData.id); dialog.close(); }
+                onClicked: { App.selection.select(modelData.id); dialog.close(); }
             }
         }
     }

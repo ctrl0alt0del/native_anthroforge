@@ -21,6 +21,7 @@ from PySide6.QtQuick import (
     QSGRendererInterface,
 )
 
+from .qml_bindings import bind
 from .runtime import build_directory
 
 
@@ -41,9 +42,7 @@ class Offscreen:
 
     def configure_engine(self, controller, warnings):
         self.engine.addImportPath(str(build_directory() / "qml"))
-        self.engine.rootContext().setContextProperty("workspace", controller)
-        self.engine.rootContext().setContextProperty("authoring", controller.authoring)
-        self.engine.rootContext().setContextProperty("numericEdits", controller.numeric_edits)
+        bind(self.engine, controller)
         self.engine.warnings.connect(lambda errors: warnings.extend(e.toString() for e in errors))
 
     def load_view(self):

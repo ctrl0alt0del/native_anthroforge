@@ -2,7 +2,7 @@
 
 
 def edit(editor, name):
-    editor.controller.cancelViewportTools()
+    editor.controller.viewport_view.cancelViewportTools()
     editor.tissue_context = (name, "")
     editor.category, editor.editing, editor.selection = "TISSUE_FIELD", True, []
     editor.refresh()

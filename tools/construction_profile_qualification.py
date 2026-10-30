@@ -30,7 +30,7 @@ def prepare(controller, renderer, app):
         session.command("surface.create", curves=sources[:2], name=f"Shared loft {index}", strips=7)
     session.wait(15)
     controller.refresh()
-    controller.select(sources[0])
+    controller.selection_view.select(sources[0])
     controller.authoring.setEditing(True)
     row = next(r for r in controller.authoring.componentRows if r["part"] == "position")
     controller.authoring.selectComponent(row["key"], False)
@@ -39,16 +39,16 @@ def prepare(controller, renderer, app):
 
 def gesture(controller, renderer, app):
     intervals = []
-    assert controller.beginTransform("Move")
+    assert controller.viewport_view.beginTransform("Move")
     for index in range(32):
         started = perf_counter()
-        controller.transformDelta([index * 0.0002, 0, 0, 0, 0, 0, 1, 1, 1])
+        controller.viewport_view.transformDelta([index * 0.0002, 0, 0, 0, 0, 0, 1, 1, 1])
         controller.session.scheduler.tick()
         controller.refresh()
         frames(controller, renderer, app, 1)
         controller.profiler.status()
         intervals.append((perf_counter() - started) * 1000)
-    controller.endTransform(False)
+    controller.viewport_view.endTransform(False)
     controller.session.wait(15)
     controller.refresh()
     return intervals

@@ -43,7 +43,7 @@ def test_shared_check_is_explicit_and_preserves_revision(session, tmp_path):
 def test_witness_retains_exact_stage_and_exports_independently(controller, tmp_path):
     target = crossing(controller.session, tmp_path)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     row = finding(controller.session, target)
     controller.spatial_evidence.show(row["id"])
     assert controller.spatial_evidence.lines and controller.spatial_evidence.state["active"]

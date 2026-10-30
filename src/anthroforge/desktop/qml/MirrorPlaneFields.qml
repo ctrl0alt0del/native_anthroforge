@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     property var definition: ({axis:"X",shift:0,rule:""})
-    readonly property var rules: { const revision=workspace.state.revision; return workspace.mirrorPlanes(); }
+    readonly property var rules: { const revision=App.runtime.state.revision; return App.mirrors.mirrorPlanes(); }
     readonly property var active: rules.find(r=>r.target===definition.rule) || definition
     signal edited(var value)
     Layout.fillWidth: true; spacing: Theme.gap
@@ -25,9 +26,9 @@ ColumnLayout {
         }
         UiNumberField {
             objectName: "symmetryPlaneShift"; Layout.fillWidth: true
-            value: (panel.active.shift || 0)/workspace.state.unit_factor
-            step: .001/workspace.state.unit_factor; Accessible.name: "Symmetry plane shift"
-            onEdited: number=>panel.edited({rule:"",axis:panel.active.axis || "X",shift:number*workspace.state.unit_factor})
+            value: (panel.active.shift || 0)/App.runtime.state.unit_factor
+            step: .001/App.runtime.state.unit_factor; Accessible.name: "Symmetry plane shift"
+            onEdited: number=>panel.edited({rule:"",axis:panel.active.axis || "X",shift:number*App.runtime.state.unit_factor})
         }
     }
 }

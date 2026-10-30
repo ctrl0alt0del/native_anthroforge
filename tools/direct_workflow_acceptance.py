@@ -49,7 +49,7 @@ def curve_scene(controller):
     points = [dict(position=[i * 0.005, 0, 0.6]) for i in range(120)]
     curve = controller.run("curve.create", dict(points=points, engine="POLYLINE"))
     settle(controller)
-    controller.select(curve)
+    controller.selection_view.select(curve)
     controller.authoring.setEditing(False)
     settle(controller)
     return bone, curve
@@ -67,7 +67,7 @@ def fiber(controller, window):
     assert len(controller.session.history.entries) == before + 1
     controller.run("undo", {})
     settle(controller)
-    controller.select(source)
+    controller.selection_view.select(source)
     dense_fiber_options(controller, window)
 
 
@@ -98,25 +98,27 @@ def tissue_and_source(controller, window):
     membrane = controller.selection
     mouse_click(window, "createTissueToolbar")
     settle(controller)
-    assert controller.selectedData["is_tissue"] and not controller.authoring.editing
+    assert controller.selection_view.selectedData["is_tissue"] and not controller.authoring.editing
     click(visible(window, "editTissueSource"))
     settle(controller)
     assert controller.selection == membrane
     click(visible(window, "editSurfaceSource"))
     settle(controller)
-    assert controller.selectedData["kind"] == "FIBER" and controller.authoring.editing
+    assert (
+        controller.selection_view.selectedData["kind"] == "FIBER" and controller.authoring.editing
+    )
     snapshot(window, "edit-source")
 
 
 def tissue_picker(controller, window):
     scene(controller)
     generic = controller.run("construction.point.create", dict(position=[0, 0, 0.7]))
-    controller.select(generic)
+    controller.selection_view.select(generic)
     settle(controller)
     mouse_click(window, "createTissueToolbar")
     settle(controller)
     tissue = controller.session.document.object(controller.selection)
-    assert controller.selectedData["is_tissue"] and tissue.source != generic
+    assert controller.selection_view.selectedData["is_tissue"] and tissue.source != generic
     assert controller.session.document.object(tissue.source).binding
     assert not window.property("modalOpen")
 
@@ -124,7 +126,7 @@ def tissue_picker(controller, window):
 def trace_image(controller, window):
     result = controller.run("image.import", dict(path=image_source(OUTPUT), width=2))
     settle(controller)
-    controller.select(result["object_id"])
+    controller.selection_view.select(result["object_id"])
     settle(controller)
     before = controller.session.history.cursor
     click(visible(window, "traceImage"))
@@ -153,12 +155,12 @@ def verify_traced(controller, before, image):
 
 def members(controller, window):
     bone, _ = curve_scene(controller)
-    controller.select(bone)
+    controller.selection_view.select(bone)
     controller.authoring.setEditing(True)
     controller.authoring.selectComponent(controller.authoring.componentRows[0]["key"], False)
     controller.authoring.addDeformer("HOOK")
     settle(controller)
-    controller.select(bone)
+    controller.selection_view.select(bone)
     controller.authoring.setEditing(False)
     settle(controller)
     buttons = [
@@ -178,7 +180,7 @@ def deletion(controller, window):
     parent = controller.run("scp.empty", dict(name="Root"))
     child = controller.run("scp.empty", dict(name="Child", parent=parent))
     settle(controller)
-    controller.select(child)
+    controller.selection_view.select(child)
     request_delete(window, child)
     assert child not in controller.session.document.registry.records
     assert not find(window, "deleteDialog").property("visible")
@@ -194,7 +196,7 @@ def focus_workspace(controller, window):
     parent = controller.run("scp.empty", dict(name="Root"))
     child = controller.run("scp.empty", dict(name="Child", parent=parent))
     settle(controller)
-    controller.select(parent)
+    controller.selection_view.select(parent)
     click(find(window, "focusSelection"))
     assert set(controller.session.workspace.members) == {parent, child}
     assert controller.session.workspace.name == "Root"

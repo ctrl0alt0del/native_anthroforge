@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Dialogs
 
 UiDialog {
     id: dialog
-    property var service: workspace.reconstructionCompare
+    property var service: App.reconstructionCompare
     title: "Reconstruction comparison"; modal: false; anchors.centerIn: parent
     width: Math.min(1380,parent.width-28); height: Math.min(900,parent.height-28)
     onClosed: service.cancel()

@@ -44,7 +44,7 @@ def choose(window, index, name="routingBackend"):
 
 def exercise(controller, window):
     objects = create(controller.session)
-    controller.select(objects["fibers"][0])
+    controller.selection_view.select(objects["fibers"][0])
     settle(controller)
     before, history = controller.session.document, controller.session.history.cursor
     assert QMetaObject.invokeMethod(find(window, "preferencesMenu"), "triggered")
@@ -92,7 +92,7 @@ def verify_dispatch(controller, window, objects):
     assert not controller.session.scheduler.errors, controller.session.scheduler.errors
     path = controller.session.preferences.path
     assert PreferenceStore(path).value.routing_backend == "PIQP"
-    controller.newDocument()
+    controller.project_view.newDocument()
     assert controller.session.preferences.value.routing_backend == "PIQP"
     report = dict(gui="offscreen", persisted=True, future_dispatch=True, fiber_backend="PIQP")
     (OUTPUT / "ui.json").write_text(json.dumps(report, indent=2))

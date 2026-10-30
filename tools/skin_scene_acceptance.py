@@ -22,7 +22,7 @@ def setup(controller):
     bone = controller.run("import", dict(path=path, units=1.0))["entity_id"]
     settle(controller)
     fiber(controller, bone, 0.2)
-    controller.select(bone)
+    controller.selection_view.select(bone)
     controller.cameraRequested.emit([0, 0, 0, -18, 25, 0, 3], False)
     return bone
 

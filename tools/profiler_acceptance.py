@@ -175,12 +175,12 @@ def document_recording(controller, window):
 
 
 def replace_document(controller, path):
-    controller.replaceDocument(path)
+    controller.project_view.replaceDocument(path)
     for _ in range(400):
         project_actions.poll(controller)
         controller.session.scheduler.tick()
         QTest.qWait(25)
-        if controller.pending_document is None and not controller.session.waiting_save:
+        if controller.project_view.pending_document is None and not controller.session.waiting_save:
             return
     raise AssertionError("Document replacement did not finish")
 

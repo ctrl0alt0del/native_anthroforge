@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 
 Item {
     id: feedback
     required property var viewport
-    readonly property var state: authoring.curveInteraction.state
+    readonly property var state: App.authoring.curveInteraction.state
     readonly property var position: state.snap.point || state.preview.position || null
     readonly property var camera: viewport.cameraState
     readonly property point projected: {
@@ -22,7 +23,7 @@ Item {
     }
     Label {
         x: feedback.projected.x+13; y: feedback.projected.y-24
-        text: feedback.state.snap.id ? "Surface snap · "+(feedback.state.offset>=0?"+":"")+(feedback.state.offset/workspace.state.unit_factor).toFixed(4)+" "+workspace.state.display_units : "Click to insert point"
+        text: feedback.state.snap.id ? "Surface snap · "+(feedback.state.offset>=0?"+":"")+(feedback.state.offset/App.runtime.state.unit_factor).toFixed(4)+" "+App.runtime.state.display_units : "Click to insert point"
         color: feedback.state.snap.id ? Theme.snapColor : Theme.curvePointColor
         font.pixelSize: 11; style: Text.Outline; styleColor: "#24262b"
     }

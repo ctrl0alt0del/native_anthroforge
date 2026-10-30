@@ -8,7 +8,7 @@ def test_skin_source_panel_tracks_selection_and_shared_commands(controller):
     target = cube(controller.session)
     before = controller.session.document
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.refresh()
     state = controller.skin_panel.state["contributor"]
     assert state["owner"] == target and state["scp"] and state["editable"]

@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Layouts
 UiDialog {
     id:dialog
     objectName:"tissueSourcePicker"
-    property var service:workspace.tissueRetarget
+    property var service:App.tissueRetarget
     title:"Choose tissue construction"; modal:true; anchors.centerIn:parent
     width:Math.min(560,parent.width-40); height:Math.min(500,parent.height-40)
     Connections { target:dialog.service; function onSelectionRequested() { search.text=""; dialog.open(); } }

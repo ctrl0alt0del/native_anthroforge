@@ -48,7 +48,7 @@ def current_shape():
         controller.timer.stop()
         _, fiber = moved_fiber(controller.session)
         controller.refresh()
-        controller.select(fiber)
+        controller.selection_view.select(fiber)
         return point_observation(controller, fiber)
 
 
@@ -73,11 +73,11 @@ def recovery_copy():
         controller.timer.stop()
         session = controller.session
         session.command("scp.empty", name="Recovery audit")
-        store = controller.project_library.autosave.store
+        store = controller.project_view.library.autosave.store
         record = store.write(session.document, session.resources, "", Event())
         session.command("open", path=record["path"])
         public = ownership(session)
-        controller.project_library.opened(
+        controller.project_view.library.opened(
             Path(record["path"]), session.file_lock, session.document.revision
         )
         desktop = ownership(session)

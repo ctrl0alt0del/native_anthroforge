@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     Layout.fillWidth: true; spacing: Theme.gap
-    readonly property var tool: workspace.routeInspection
+    readonly property var tool: App.routeInspection
     ViewSnapshot { id: evidence; source: panel.tool }
     readonly property var state: evidence.data
     UiButton { objectName: "inspectRoute"; text: "Inspect route"; Layout.fillWidth: true; enabled: !["queued","running"].includes(panel.state.state); onClicked: panel.tool.start(cold.checked) }

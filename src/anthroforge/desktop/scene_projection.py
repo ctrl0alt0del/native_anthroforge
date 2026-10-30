@@ -168,10 +168,10 @@ class SceneProjection:
     def synchronize_selection(self):
         controller = self.controller
         records = self.records | controller.construction.records | controller.mirror_records
-        controller.object_selection.retain(records)
+        controller.selection_view.objects.retain(records)
         self.selected.synchronize(selection_record(controller, records))
-        if self.selection != tuple(controller.object_selection.items):
-            self.selection = tuple(controller.object_selection.items)
+        if self.selection != tuple(controller.selection_view.objects.items):
+            self.selection = tuple(controller.selection_view.objects.items)
             controller.selectionChanged.emit()
 
 
@@ -207,7 +207,6 @@ def initialize(controller):
 
     controller.construction = ConstructionProjection(controller)
     controller.scene_projection = SceneProjection(controller)
-    controller._state = PropertyProjection(controller)
     controller._render_rows = []
     controller.mirror_records = {}
     controller._mirror_projection_cache = {}

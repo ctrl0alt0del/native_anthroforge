@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -15,11 +16,11 @@ RowLayout {
     property real step: NaN
     property real minimum: -Infinity
     property real maximum: Infinity
-    readonly property real unitFactor: length ? workspace.state.unit_factor : 1
+    readonly property real unitFactor: length ? App.runtime.state.unit_factor : 1
     readonly property bool scrubbing: field.scrubbing
     signal edited(real value)
     Layout.fillWidth: true
-    Label { text: setting.label + (setting.length ? " · " + workspace.state.display_units : ""); color: Theme.muted; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.Wrap; ToolTip.visible: labelHover.hovered && !!setting.hint; ToolTip.text: setting.hint; HoverHandler { id: labelHover } }
+    Label { text: setting.label + (setting.length ? " · " + App.runtime.state.display_units : ""); color: Theme.muted; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.Wrap; ToolTip.visible: labelHover.hovered && !!setting.hint; ToolTip.text: setting.hint; HoverHandler { id: labelHover } }
     UiNumberField {
         id: field; Layout.preferredWidth: 100; selectByMouse: true
         propertyReference: setting.propertyReference

@@ -32,7 +32,7 @@ def fiber(controller, bone, y):
     )
     settle(controller)
     points = controller.session.document.object(source).points
-    controller.createConstruction(
+    controller.construction_view.createConstruction(
         "fiber.create",
         dict(
             curve=source, bindings=[dict(point=p.id, target=bone) for p in (points[0], points[-1])]
@@ -47,9 +47,11 @@ def scene(controller):
     bone = controller.run("import", dict(path=path, units=1.0))["entity_id"]
     settle(controller)
     sources = [fiber(controller, bone, y) for y in (-0.2, 0.2)]
-    controller.createConstruction("surface.create", dict(curves=sources, kind="LOFT"))
+    controller.construction_view.createConstruction(
+        "surface.create", dict(curves=sources, kind="LOFT")
+    )
     settle(controller)
-    assert controller.selectedData["kind"] == "MEMBRANE"
+    assert controller.selection_view.selectedData["kind"] == "MEMBRANE"
 
 
 def exercise(controller, window):
@@ -58,12 +60,12 @@ def exercise(controller, window):
     assert button.property("visible") and button.property("enabled")
     assert QMetaObject.invokeMethod(button, "clicked", Qt.DirectConnection)
     settle(controller)
-    assert controller.selectedData["is_tissue"]
+    assert controller.selection_view.selectedData["is_tissue"]
     target = controller.selection
     controller.run("tissue.configure", dict(target=target, changes=dict(stacking=False)))
     settle(controller)
-    assert controller.selectedData["status"] == "ready"
-    assert not controller.selectedData["transformable"]
+    assert controller.selection_view.selectedData["status"] == "ready"
+    assert not controller.selection_view.selectedData["transformable"]
     assert find(window, "tissueInflationAmount").property("visible")
 
 

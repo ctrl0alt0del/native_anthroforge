@@ -8,7 +8,7 @@ from tests.test_tissue_interaction import controller as controller
 def test_selected_replacement_button_tracks_edit_save_and_selection(controller):
     target = source(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     panel = controller.mesh_replacement
     assert panel.eligibility["start"]["available"]
     controller.session.begin()
@@ -25,7 +25,7 @@ def test_selected_replacement_button_tracks_edit_save_and_selection(controller):
 def test_idle_notifications_do_not_repeat_assessment(controller, monkeypatch):
     target = source(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     calls, original = [], replacement_status.describe
     monkeypatch.setattr(
         replacement_status, "describe", lambda *a: (calls.append(a), original(*a))[1]
@@ -33,6 +33,6 @@ def test_idle_notifications_do_not_repeat_assessment(controller, monkeypatch):
     for _ in range(20):
         controller.mesh_replacement.synchronize()
     assert not calls
-    controller.select("")
+    controller.selection_view.select("")
     assert not controller.mesh_replacement.eligibility["start"]["available"]
     assert calls

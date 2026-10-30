@@ -35,9 +35,12 @@ def setup(controller, window):
     controller.run("workspace.update", dict(cursor=[0, 0, 0.7]))
     click(window, "addConstructionPoint")
     settle(controller)
-    assert controller.selectedData["kind"] == "POINT"
-    controller.frameSelection()
-    assert controller.pick([0, 0, 2], [0, 0, -1], 0, False, 0.04)["id"] == controller.selection
+    assert controller.selection_view.selectedData["kind"] == "POINT"
+    controller.viewport_view.frameSelection()
+    assert (
+        controller.selection_view.pick([0, 0, 2], [0, 0, -1], 0, False, 0.04)["id"]
+        == controller.selection
+    )
     return controller.selection
 
 
@@ -48,7 +51,7 @@ def create_anchor(controller, window, point):
     settle(controller)
     anchor = controller.session.document.object(controller.selection)
     assert isinstance(anchor, Anchor) and anchor.id != point
-    assert not controller.selectedData["transformable"]
+    assert not controller.selection_view.selectedData["transformable"]
     return anchor.id
 
 

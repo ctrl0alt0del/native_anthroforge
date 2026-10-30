@@ -8,7 +8,7 @@ from tests.test_tissue_interaction import controller as controller
 def setup(controller):
     target = create(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     tool = controller.route_inspection
     tool.start(True)
     controller.session.wait()
@@ -29,7 +29,7 @@ def test_route_replay_preserves_selected_record_and_never_recalculates(controlle
     assert tool.index == 0 and tool.snapshot()["paths"]
     assert tool.report == report["report"] and len(controller.session.scheduler.jobs) == jobs
     assert "paths" not in tool.state and "contacts" not in tool.state
-    controller.select("")
+    controller.selection_view.select("")
     tool.synchronize()
     assert not tool.snapshot()["paths"]
 
@@ -48,7 +48,7 @@ def test_authoring_clears_route_overlay_and_cannot_export_old_evidence(controlle
 
 def test_camera_persistence_preserves_live_route_evidence(controller):
     target, tool = setup(controller)
-    controller.saveCamera([0, 0, 0, -35, -25, 0, 2.3], True)
+    controller.viewport_view.saveCamera([0, 0, 0, -35, -25, 0, 2.3], True)
     tool.synchronize()
     assert tool.state["state"] == "ready" and tool.snapshot()["paths"] and tool.index == 0
     frozen = inspection_report.capture(controller.session, target, False, route=tool.state)

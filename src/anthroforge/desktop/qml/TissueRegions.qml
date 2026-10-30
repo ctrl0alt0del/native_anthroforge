@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -10,11 +11,11 @@ UiSection {
     readonly property var selected: item.constraints?.find(r=>r.id===focused)
     title: "Constraints"; expanded: false
     hint: "Fixed cores are exact; feathered surroundings are soft. Structural shell backing remains exact."
-    function change(key,value) { const changes={}; changes[key]=value; workspace.run("tissue.constraint.update",{target:item.id,constraint:focused,changes:changes}); }
+    function change(key,value) { const changes={}; changes[key]=value; App.runtime.run("tissue.constraint.update",{target:item.id,constraint:focused,changes:changes}); }
     RowLayout {
         Layout.fillWidth: true
         UiCombo { id: mask; objectName: "tissueRegionMask"; Layout.fillWidth: true; model: panel.masks }
-        UiButton { objectName: "tissueRegionAdd"; text: "Add"; enabled: !!mask.currentText; onClicked: panel.focused=workspace.run("tissue.constraint.add",{target:panel.item.id,mask:mask.currentText}) || "" }
+        UiButton { objectName: "tissueRegionAdd"; text: "Add"; enabled: !!mask.currentText; onClicked: panel.focused=App.runtime.run("tissue.constraint.add",{target:panel.item.id,mask:mask.currentText}) || "" }
     }
     UiField { id: search; objectName: "tissueRegionSearch"; Layout.fillWidth: true; placeholderText: "Find a region…"; visible: (panel.item.constraints?.length || 0)>0 }
     ListView {
@@ -42,10 +43,10 @@ UiSection {
             SurfaceSelector { id: goal; objectName: "tissueRegionTarget"; target: panel.selected?.reference?.target || ""; role: panel.selected?.reference?.role || "" }
             RowLayout {
                 Layout.fillWidth: true
-                UiButton { objectName: "tissueRegionBind"; text: panel.selected?.reference ? "Rebind" : "Bind target"; enabled: !!goal.current.ready; Layout.fillWidth: true; onClicked: workspace.run("tissue.constraint.bind",{target:panel.item.id,constraint:panel.focused,parent:goal.current.id,role:goal.current.role}) }
-                UiButton { objectName: "tissueRegionUnlink"; text: "Use source"; enabled: !!panel.selected?.reference; onClicked: workspace.run("tissue.constraint.unlink",{target:panel.item.id,constraint:panel.focused}) }
+                UiButton { objectName: "tissueRegionBind"; text: panel.selected?.reference ? "Rebind" : "Bind target"; enabled: !!goal.current.ready; Layout.fillWidth: true; onClicked: App.runtime.run("tissue.constraint.bind",{target:panel.item.id,constraint:panel.focused,parent:goal.current.id,role:goal.current.role}) }
+                UiButton { objectName: "tissueRegionUnlink"; text: "Use source"; enabled: !!panel.selected?.reference; onClicked: App.runtime.run("tissue.constraint.unlink",{target:panel.item.id,constraint:panel.focused}) }
             }
         }
-        UiButton { objectName: "tissueRegionRemove"; text: "Remove region"; glyph: "delete"; Layout.fillWidth: true; onClicked: { workspace.run("tissue.constraint.remove",{target:panel.item.id,constraint:panel.focused}); panel.focused=""; } }
+        UiButton { objectName: "tissueRegionRemove"; text: "Remove region"; glyph: "delete"; Layout.fillWidth: true; onClicked: { App.runtime.run("tissue.constraint.remove",{target:panel.item.id,constraint:panel.focused}); panel.focused=""; } }
     }
 }

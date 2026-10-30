@@ -91,7 +91,7 @@ def document_switch(controller, window):
 
 
 def exercise(controller, window):
-    controller.select(fixture_entities(controller, 0.5))
+    controller.selection_view.select(fixture_entities(controller, 0.5))
     settle(controller)
     window.setProperty("activityOpen", True)
     QTest.qWait(250)

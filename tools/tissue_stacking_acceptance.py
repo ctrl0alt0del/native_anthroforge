@@ -24,7 +24,7 @@ from tests.test_tissue_stack_workflow import assembly, current
 def exercise(controller, window):
     _, provider, target = assembly(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
     click(window, "StackingToggle")
     click(window, "tissueStackChoice_" + provider)

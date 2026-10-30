@@ -27,12 +27,12 @@ def settle(controller):
 def setup(controller):
     key = controller.run("curve.create", {})
     settle(controller)
-    controller.select(key)
+    controller.selection_view.select(key)
     controller.authoring.setEditing(True)
     controller.inspection_panel.activate(True)
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     assert not controller.session.document.entities
-    assert controller.constructionModel.rowCount() == 1
+    assert controller.viewport_view.constructionModel.rowCount() == 1
     assert controller.authoring.componentRows and controller.authoring.lines
     return key
 
@@ -42,9 +42,9 @@ def component_drag(controller, key):
     row = next(r for r in editor.componentRows if r["part"] == "position")
     editor.selectComponent(row["key"], False)
     before = controller.session.history.cursor
-    assert controller.beginTransform("Move")
-    controller.transformDelta([0, 0.2, 0, 0, 0, 0, 1, 1, 1])
-    controller.endTransform(False)
+    assert controller.viewport_view.beginTransform("Move")
+    controller.viewport_view.transformDelta([0, 0.2, 0, 0, 0, 0, 1, 1, 1])
+    controller.viewport_view.endTransform(False)
     settle(controller)
     actual = controller.session.document.object(key).points[0].position
     np.testing.assert_allclose(actual, np.array(row["world"]) + [0, 0.2, 0])
@@ -65,9 +65,9 @@ def insertion(controller, key):
     assert len(controller.session.document.object(key).points) == 3
     assert controller.authoring.selectedComponent["point"]
     controller.authoring.setEditing(False)
-    assert controller.beginTransform("Move")
-    controller.transformDelta([0, 0, 0.3, 0, 0, 0, 1, 1, 1])
-    controller.endTransform(True)
+    assert controller.viewport_view.beginTransform("Move")
+    controller.viewport_view.transformDelta([0, 0, 0.3, 0, 0, 0, 1, 1, 1])
+    controller.viewport_view.endTransform(True)
     assert controller.session.document.object(key).matrix[11] == 0
 
 
@@ -77,20 +77,20 @@ def image_inspector(controller):
     Image.new("RGB", (8, 4), "blue").save(path)
     result = controller.run("image.import", dict(path=str(path)))
     settle(controller)
-    controller.select(result["object_id"])
-    assert controller.selectedData["kind"] == "IMAGE"
-    assert controller.ordinaryParents()
-    assert controller.beginTransform("Move")
-    controller.transformDelta([0, 0, 0.2, 0, 0, 0, 1, 1, 1])
-    controller.endTransform(True)
-    controller.frameSelection()
+    controller.selection_view.select(result["object_id"])
+    assert controller.selection_view.selectedData["kind"] == "IMAGE"
+    assert controller.construction_view.ordinaryParents()
+    assert controller.viewport_view.beginTransform("Move")
+    controller.viewport_view.transformDelta([0, 0, 0.2, 0, 0, 0, 1, 1, 1])
+    controller.viewport_view.endTransform(True)
+    controller.viewport_view.frameSelection()
 
 
 def shared_sources(controller):
     keys = [controller.run("curve.create", {}) for _ in range(2)]
-    controller.select(keys[1])
-    controller.select(keys[0], True)
-    assert controller.selectedObjects == keys[::-1]
+    controller.selection_view.select(keys[1])
+    controller.selection_view.select(keys[0], True)
+    assert controller.selection_view.selectedObjects == keys[::-1]
     controller.authoring.create("LOFT", "CAPSULE")
     settle(controller)
     item = controller.session.document.entity(controller.selection)
@@ -102,14 +102,14 @@ def shared_sources(controller):
 
 def selection_removal(controller, consumer, keys):
     controller.run("scp.delete", dict(entity=consumer))
-    controller.select(keys[0])
-    controller.select(keys[1], True)
+    controller.selection_view.select(keys[0])
+    controller.selection_view.select(keys[1], True)
     controller.run("object.delete", dict(target=keys[1]))
-    assert controller.selectedObjects == [keys[0]]
+    assert controller.selection_view.selectedObjects == [keys[0]]
     controller.run("undo", {})
-    controller.select(keys[1], True)
-    controller.select(keys[0], True)
-    assert controller.selectedObjects == [keys[1]]
+    controller.selection_view.select(keys[1], True)
+    controller.selection_view.select(keys[0], True)
+    assert controller.selection_view.selectedObjects == [keys[1]]
 
 
 def interactions(controller):
@@ -126,25 +126,25 @@ def control_navigation(controller, engine):
     curve = controller.run("curve.create", {})
     control = controller.run("control.create", dict(entity=curve))
     settle(controller)
-    controller.select(control)
+    controller.selection_view.select(control)
     assert control in controller.construction.records
-    assert all(row["id"] != control for row in controller.treeRows)
-    assert controller.selectedData["is_control"]
+    assert all(row["id"] != control for row in controller.selection_view.treeRows)
+    assert controller.selection_view.selectedData["is_control"]
     assert controller.authoring.state["follow"] == curve
     parent = find(engine.rootObjects()[0], "controlParent")
     assert parent.property("currentValue") == curve
     controller.run("object.transform", dict(target=curve, values=[0.4, 0, 0, 0, 0, 0, 1, 1, 1]))
     settle(controller)
-    assert controller.selectedData["trs"][0] == 0.4
+    assert controller.selection_view.selectedData["trs"][0] == 0.4
 
 
 def conversion_preview(controller):
     key = controller.run("curve.create", {})
     settle(controller)
-    controller.select(key)
+    controller.selection_view.select(key)
     result = controller.run("curve.conversion.preview", dict(curve=key, engine="POLYLINE"))
     settle(controller)
-    assert controller.conversionState["state"] == "ready"
+    assert controller.construction_view.conversionState["state"] == "ready"
     rows = [row for row in controller.path_model.wanted.values() if row.get("preview")]
     assert rows and all(not row["pickable"] for row in rows)
     controller.run("curve.conversion.accept", dict(token=result["token"]))
@@ -192,7 +192,7 @@ def image_axis_control(controller, engine):
     target = next(
         row["id"] for row in controller.construction.records.values() if row["kind"] == "IMAGE"
     )
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
     checkbox = find(engine.rootObjects()[0], "imageAxisVisibility")
     checkbox.setProperty("checked", True)

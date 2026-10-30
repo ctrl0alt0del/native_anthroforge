@@ -40,7 +40,7 @@ def test_async_measurement_and_non_tissue_section_preserve_document(controller):
     session = controller.session
     target = source(session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     before, cursor = session.document, session.history.cursor
     controller.section_tools.enable(True)
     controller.surface_measurements.show(target, "final")

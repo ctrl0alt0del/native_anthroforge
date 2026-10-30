@@ -31,7 +31,7 @@ def activate(window, name, index):
 def profile(controller, window):
     exercise(controller, window)
     target = controller.selection
-    modes = controller.selectedData["tissue_modes"]
+    modes = controller.selection_view.selectedData["tissue_modes"]
     activate(window, "tissueInflationMode", modes.index("SECTION_PROFILE"))
     settle(controller)
     assert controller.session.document.object(target).parts[0].a.inflation.profile.initialized
@@ -48,7 +48,7 @@ def enable_envelope(window):
 
 
 def select_control(controller, window):
-    modes = controller.selectedData["tissue_modes"]
+    modes = controller.selection_view.selectedData["tissue_modes"]
     activate(window, "tissueInflationMode", modes.index("CTRL_POINT"))
 
 
@@ -66,7 +66,7 @@ def smoothing(controller, window):
 def branch(controller, window):
     _, target, identity = branched_tissue(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
     activate(window, "tissuePart", 1)
     enable_envelope(window)

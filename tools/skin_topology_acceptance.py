@@ -26,7 +26,7 @@ def setup(controller, window):
         "import", dict(path=str(Path("examples/primitives/cube.obj").resolve()), units=1)
     )
     controller.session.wait()
-    controller.select(bone["entity_id"])
+    controller.selection_view.select(bone["entity_id"])
     controller.run("workspace.update", dict(hidden=[bone["entity_id"]]))
     controller.cameraRequested.emit([0, 0, 0, -18, 25, 0, 3], False)
     controller.run(

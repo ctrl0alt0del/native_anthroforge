@@ -103,7 +103,7 @@ def route(controller, window):
         dict(engine="ROUTED", points=[dict(position=[-0.8, 0, 0]), dict(position=[0.8, 0, 0])]),
     )
     settle(controller)
-    controller.select(key)
+    controller.selection_view.select(key)
     controller.authoring.setEditing(True)
     QTest.qWait(150)
     click(window, "inspectRoute")

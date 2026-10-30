@@ -47,7 +47,7 @@ def setup(controller):
     points = [dict(position=(-2 + 4 * i / 119, -2, 0)) for i in range(120)]
     key = controller.run("curve.create", dict(points=points))
     settle(controller)
-    controller.select(key)
+    controller.selection_view.select(key)
     controller.authoring.setEditing(True)
     settle(controller)
     return key

@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import "GizmoGeometry.js" as Geometry
 import "GizmoPaint.js" as Paint
@@ -10,7 +11,7 @@ Item {
     property var drag: null
     property string signature: ""
     readonly property bool dragging: drag !== null
-    visible: !workspace.shortcutComparison.before && !viewport.measuring && workspace.state.handles && viewport.transformAvailable && !viewport.insertionPreview && !viewport.modalTransforming
+    visible: !App.shortcutComparison.before && !viewport.measuring && App.runtime.state.handles && viewport.transformAvailable && !viewport.insertionPreview && !viewport.modalTransforming
     function refresh() {
         if (!visible) return;
         const selected=viewport.selected, q=selected.quaternion || null;
@@ -21,16 +22,16 @@ Item {
         canvas.requestPaint();
     }
     function cancel() {
-        if(drag) workspace.endTransform(true);
+        if(drag) App.viewport.endTransform(true);
         drag=null; canvas.requestPaint();
-        authoring.curveInteraction.clearSnap();
+        App.authoring.curveInteraction.clearSnap();
     }
     function begin(mouse) {
         if(!geometry || geometry.mode!==viewport.toolMode) {mouse.accepted=false;return;}
         const p=Geometry.point(mouse.x,mouse.y), hit=Geometry.hit(geometry,viewport.toolMode,p);
         if(!hit) {mouse.accepted=false;return;}
         viewport.forceActiveFocus();
-        if(!workspace.beginTransform(viewport.toolMode)) return;
+        if(!App.viewport.beginTransform(viewport.toolMode)) return;
         const angle=hit.kind==="ring"?Geometry.rotationAngle(geometry,hit.axis,p,viewport.worldRay):null;
         drag={start:p,hit:hit,geometry:geometry,mode:viewport.toolMode,total:0,angle:angle};
     }
@@ -44,11 +45,11 @@ Item {
     function updateDrag(p) {
         if(!drag) return;
         let values=Geometry.values(drag,p,viewport.keyboard.held("precision"),viewport.screenTranslation,viewport.worldRay);
-        if(drag.mode==="Move" && authoring.active) {
+        if(drag.mode==="Move" && App.authoring.active) {
             const ray=viewport.worldRay(p.x,p.y);
-            values=authoring.curveInteraction.movement(ray.origin,ray.direction,values,viewport.keyboard.held("snapSurface"));
+            values=App.authoring.curveInteraction.movement(ray.origin,ray.direction,values,viewport.keyboard.held("snapSurface"));
         }
-        workspace.transformDelta(values);
+        App.viewport.transformDelta(values);
     }
     function rebase() {
         if(!drag) return;
@@ -73,7 +74,7 @@ Item {
         cursorShape: gizmo.hover || gizmo.drag ? Qt.SizeAllCursor : Qt.ArrowCursor
         onPressed: mouse => gizmo.begin(mouse)
         onPositionChanged: mouse => gizmo.move(mouse)
-        onReleased: { if(gizmo.drag) workspace.endTransform(false); gizmo.drag=null; authoring.curveInteraction.clearSnap(); }
+        onReleased: { if(gizmo.drag) App.viewport.endTransform(false); gizmo.drag=null; App.authoring.curveInteraction.clearSnap(); }
         onCanceled: gizmo.cancel()
         onWheel: wheel => wheel.accepted=false
         onExited: { gizmo.hover=null; canvas.requestPaint(); }

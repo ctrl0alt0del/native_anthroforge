@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -8,7 +9,7 @@ ColumnLayout {
     required property string part
     property bool multipleParts: false
     Layout.fillWidth: true; spacing: Theme.gap
-    function copy(source,destination) { workspace.run("tissue.side.copy",{target:target,part:part,source:source,destination:destination,all_parts:multipleParts && allParts.checked}); }
+    function copy(source,destination) { App.runtime.run("tissue.side.copy",{target:target,part:part,source:source,destination:destination,all_parts:multipleParts && allParts.checked}); }
     UiCheck { id: allParts; objectName: "tissueCopyAllParts"; visible: panel.multipleParts; text: "Copy across all parts" }
     RowLayout {
         Layout.fillWidth: true

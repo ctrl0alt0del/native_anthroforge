@@ -51,6 +51,6 @@ class InspectionPanel(QObject):
         owner = self.controller
         if owner.session.history.before is not None or owner.session.waiting_save:
             return
-        owner.select(target)
+        owner.selection_view.select(target)
         if frame:
-            owner.frameSelection()
+            owner.viewport_view.frameSelection()

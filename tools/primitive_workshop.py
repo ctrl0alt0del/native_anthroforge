@@ -24,9 +24,9 @@ def capture_entity(controller, window, name, filename):
     entity = next(e for e in controller.session.document.entities if e.name == name)
     assert entity.result.status == "ready"
     assert not entity.primitive or entity.result.asset
-    controller.select(entity.id)
+    controller.selection_view.select(entity.id)
     controller.authoring.setEditing(True)
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     settle(controller)
     QTest.qWait(150)
     screenshot(window, filename)

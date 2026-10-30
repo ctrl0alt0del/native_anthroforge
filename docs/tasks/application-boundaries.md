@@ -45,3 +45,16 @@ history cases plus per-context notifications, replacement and teardown-failure t
 passes across 676 modules. A preliminary full pytest run is ongoing; final qualification is
 still pending. Next: extract desktop view models and register tooling-visible per-engine QML
 interfaces. This checkpoint is deliberately incomplete and remains off main.
+
+Desktop checkpoint: project, selection, viewport, construction, mirror and runtime view models
+own the extracted interaction/state responsibilities. QML uses the typed `AnthroForge.Desktop`
+module and an explicitly bound per-engine `App`; no application context properties or shared
+QML singleton instances remain. Existing feature panels retain their owners and behavior.
+
+Evidence: main-window offscreen loading reports no QML warnings; 46 targeted desktop tests
+passed before final ownership extraction, followed by 16 binding/interaction tests. A preliminary
+full run passed 2,887 tests; two QuadWild checks failed because this worktree lacked the pinned
+`.tools` bundle. Its junction is now restored; rerun remains required. Static metadata generation
+works with the official Qt 6.12 registrar. The maintained API lint check deliberately probes an
+invalid method and records all legacy/dynamic-state diagnostics separately; its complete run is
+pending. Native build, full gate, hidden-render inspection and portable qualification remain pending.

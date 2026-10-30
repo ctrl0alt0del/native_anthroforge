@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,19 +6,19 @@ import QtQuick.Layouts
 UiSection {
     id: panel
     title: "Mirror"
-    property var selected: workspace.selectedData
+    property var selected: App.selection.selectedData
     readonly property var settings: selected.mirror_settings || {}
     readonly property bool anatomical: !selected.is_construction && !selected.is_control
     visible: !!selected.id && !selected.mirror_source && selected.kind !== "IMAGE"
-    enabled: !selected.readonly && !workspace.state.waiting
+    enabled: !selected.readonly && !App.runtime.state.waiting
     function update(values) {
         updateRule(selected.id,values);
     }
     function updateRule(target,values) {
-        const blockers=workspace.run("mirror.removal.inspect",Object.assign({target:target},values));
+        const blockers=App.runtime.run("mirror.removal.inspect",Object.assign({target:target},values));
         if (!blockers) return;
         if (blockers.length) { affected.show(blockers); return; }
-        workspace.run("mirror.configure", Object.assign({target:target}, values));
+        App.runtime.run("mirror.configure", Object.assign({target:target}, values));
     }
     AffectedConsumersDialog { id: affected }
     Repeater {
@@ -33,10 +34,10 @@ UiSection {
                 hint: "Shared reflection plane preserved from the source project"
             }
             UiNumberField {
-                Layout.fillWidth: true; value: modelData.shift/workspace.state.unit_factor
-                step: .001/workspace.state.unit_factor
+                Layout.fillWidth: true; value: modelData.shift/App.runtime.state.unit_factor
+                step: .001/App.runtime.state.unit_factor
                 Accessible.name: "Imported mirror plane shift"
-                onEdited: number => panel.updateRule(modelData.target,{shift:number*workspace.state.unit_factor})
+                onEdited: number => panel.updateRule(modelData.target,{shift:number*App.runtime.state.unit_factor})
             }
         }
     }
@@ -71,16 +72,16 @@ UiSection {
         }
         UiNumberField {
             objectName: "mirrorShift"; Layout.fillWidth: true
-            value: (panel.settings.shift || 0)/workspace.state.unit_factor
-            step: .001/workspace.state.unit_factor
+            value: (panel.settings.shift || 0)/App.runtime.state.unit_factor
+            step: .001/App.runtime.state.unit_factor
             Accessible.name: "Mirror plane shift"
-            onEdited: number => panel.update({shift:number*workspace.state.unit_factor})
+            onEdited: number => panel.update({shift:number*App.runtime.state.unit_factor})
         }
     }
     UiCombo {
         objectName: "mirrorDisplay"; Layout.fillWidth: true
         model: ["Both sides", "Source only", "Mirror only"]
-        currentIndex: Math.max(0,["BOTH","SOURCE","MIRROR"].indexOf(workspace.state.mirror_display || "BOTH"))
-        onActivated: workspace.run("workspace.update",{mirror_display:["BOTH","SOURCE","MIRROR"][currentIndex]})
+        currentIndex: Math.max(0,["BOTH","SOURCE","MIRROR"].indexOf(App.runtime.state.mirror_display || "BOTH"))
+        onActivated: App.runtime.run("workspace.update",{mirror_display:["BOTH","SOURCE","MIRROR"][currentIndex]})
     }
 }

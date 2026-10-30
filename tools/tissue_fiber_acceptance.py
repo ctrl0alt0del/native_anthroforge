@@ -21,7 +21,7 @@ def inspect(controller, window):
         "curve.create", dict(points=[dict(position=[x, 0.2, 0.8]) for x in (-0.3, 0, 0.3)])
     )
     settle(controller)
-    controller.select(source)
+    controller.selection_view.select(source)
     controller.authoring.setEditing(True)
     settle(controller)
     choose_surfaces(controller, window, source, target)
@@ -33,7 +33,7 @@ def inspect(controller, window):
 def choose_surfaces(controller, window, source, target):
     click(window, "Fiber binding optionsToggle")
     settle(controller)
-    rows = controller.surfaceRoles()
+    rows = controller.construction_view.surfaceRoles()
     index = next(
         i for i, row in enumerate(rows) if row["id"] == target and row["role"] == "TISSUE_FINAL"
     )

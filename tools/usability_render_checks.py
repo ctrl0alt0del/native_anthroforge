@@ -35,9 +35,9 @@ def orbit(controller, window, enabled):
 def verify(controller, window):
     hide_context(controller)
     entity, cage = setup(controller)
-    controller.select(entity)
+    controller.selection_view.select(entity)
     controller.authoring.setEditing(False)
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     settle(controller)
     baseline = orbit(controller, window, False)
     outlined = orbit(controller, window, True)

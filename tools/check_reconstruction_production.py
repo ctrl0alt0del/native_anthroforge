@@ -38,7 +38,7 @@ def prepare(controller, source, original):
     initial = reference(session, original, "ORIGINAL")
     transferred = reference(session, source, "TRANSFERRED")
     controller.refresh()
-    controller.select(SCM)
+    controller.selection_view.select(SCM)
     return [
         ("reference-base", initial, dict(stage="base")),
         ("transfer-final", transferred, dict(stage="final")),

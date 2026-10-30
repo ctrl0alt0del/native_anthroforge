@@ -19,7 +19,7 @@ def inspect(controller, window):
     scene(controller)
     source = controller.selection
     for index, name in ((2, "LAYER"), (3, "POUCH")):
-        controller.select(source)
+        controller.selection_view.select(source)
         settle(controller)
         find(window, "tissueCreationPreset").setProperty("currentIndex", index)
         click(window, "createTissue")

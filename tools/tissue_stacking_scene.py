@@ -24,7 +24,7 @@ def prepare(controller):
         key for key in controller.session.document.registry.records if key not in (first, second)
     ]
     controller.run("workspace.update", dict(hidden=hidden))
-    controller.select(second)
+    controller.selection_view.select(second)
     settle(controller)
     controller.cameraRequested.emit([0, 0, 0.725, -12, 20, 0, 1.15], True)
     return first, second
@@ -36,8 +36,8 @@ def capture(controller, renderer, app, name, target):
     assert frames(controller, renderer, app).save(
         str(Path("build/022-tissue") / (name + "-gpu.png"))
     )
-    hover = controller.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
-    clicked = controller.pick([0, 0, 2], [0, 0, -1], 0, True, 0.005)
+    hover = controller.selection_view.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
+    clicked = controller.selection_view.pick([0, 0, 2], [0, 0, -1], 0, True, 0.005)
     assert hover["id"] == clicked["id"] == target
 
 

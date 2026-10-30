@@ -64,7 +64,9 @@ class ReplacementPanel(QObject):
         if key == self._eligibility_key:
             return
         self._eligibility_key, self._eligibility_document = key, session.document
-        status = replacement_status.describe(session, self.slot, self.controller.selectedId)
+        status = replacement_status.describe(
+            session, self.slot, self.controller.selection_view.selectedId
+        )
         if status != self._eligibility:
             self._eligibility = status
             self.changed.emit()
@@ -77,7 +79,7 @@ class ReplacementPanel(QObject):
             session.waiting_save,
             session.history.before is not None,
         )
-        selection = (self.controller.selectedId, value.token, value.state)
+        selection = (self.controller.selection_view.selectedId, value.token, value.state)
         return session, id(session.document), context, selection
 
     def synchronize_review(self):

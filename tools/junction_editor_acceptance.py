@@ -27,7 +27,7 @@ def setup(controller):
     a = controller.run("curve.create", dict(name="Source"))
     b = controller.run("curve.create", dict(name="Follower"))
     settle(controller)
-    controller.select(a)
+    controller.selection_view.select(a)
     controller.authoring.setEditing(True)
     settle(controller)
     return a, b

@@ -63,7 +63,7 @@ def fixture(controller):
     body = session.command("primitive.from_curves", curves=[curve], kind="BODY")
     driver = create_driver(session, curve)
     settle(controller)
-    controller.select(body)
+    controller.selection_view.select(body)
     controller.cameraRequested.emit([0, 0, 0.1, 0, 0, 0, 1.2], True)
     return curve, body, driver
 
@@ -141,7 +141,7 @@ def exercise(controller, window):
     late_model(window)
     gesture_checks(controller, window, curve, driver)
     controller.profile_controls.toggle()
-    controller.select(curve)
+    controller.selection_view.select(curve)
     controller.authoring.setEditing(True)
     find(window, "inspectorHeader").setProperty("shortcuts", False)
     settle(controller)

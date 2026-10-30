@@ -62,7 +62,7 @@ def chain(controller, window):
     assert_value(window, "segmentLength", 0.7)
     controller.authoring.setEditing(True)
     assert not controller.authoring.editing
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     reveal(window, "segmentLength")
     capture(window, "segment-chain")
     return key
@@ -77,7 +77,7 @@ def wrap(controller, window, target):
     number(window, "shrinkwrapOffset", 0.02)
     settle(controller)
     assert controller.session.document.entity(owner).deformers[0].shrinkwrap.offset == 0.02
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     reveal(window, "shrinkwrapOffset")
     capture(window, "shrinkwrap")
 

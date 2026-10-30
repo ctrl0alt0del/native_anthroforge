@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -8,11 +9,11 @@ ColumnLayout {
     signal importRequested()
     signal deleteRequested(string entity)
     property alias currentIndex: tabs.currentIndex
-    readonly property string selected: workspace.selectedId
+    readonly property string selected: App.selection.selectedId
     spacing: Theme.gap
     onSelectedChanged: Qt.callLater(revealSelection)
     function revealSelection() {
-        if(selected) tabs.setCurrentIndex(workspace.selectedData.is_construction || workspace.selectedData.is_control ? 1 : 0);
+        if(selected) tabs.setCurrentIndex(App.selection.selectedData.is_construction || App.selection.selectedData.is_control ? 1 : 0);
     }
     UiTabBar {
         id: tabs

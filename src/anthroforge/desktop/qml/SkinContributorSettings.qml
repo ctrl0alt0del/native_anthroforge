@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -12,7 +13,7 @@ ColumnLayout {
     spacing: Theme.gap
     function change(key, value) {
         const values = {}; values[key] = value;
-        workspace.run("skin.contributor.configure", {owner:contributor.owner, values:values});
+        App.runtime.run("skin.contributor.configure", {owner:contributor.owner, values:values});
     }
     Label { text: (panel.contributor.fiber ? "Topology guide: " : "Selected source: ") + (panel.contributor.name || ""); color:Theme.text; font.bold:true; Layout.fillWidth:true; wrapMode:Text.Wrap }
     ColumnLayout {
@@ -91,8 +92,8 @@ ColumnLayout {
             TissuePaintingSettings { collagen:true; enabled:!!panel.contributor.surface }
             RowLayout {
                 Layout.fillWidth:true; enabled:!!panel.contributor.surface
-                UiButton { objectName:"skinCollagenFill"; text:"Fill weights"; Layout.fillWidth:true; onClicked:workspace.run("skin.collagen.fill",{owner:panel.contributor.owner}) }
-                UiButton { objectName:"skinCollagenClear"; text:"Clear weights"; Layout.fillWidth:true; onClicked:workspace.run("skin.collagen.clear",{owner:panel.contributor.owner}) }
+                UiButton { objectName:"skinCollagenFill"; text:"Fill weights"; Layout.fillWidth:true; onClicked:App.runtime.run("skin.collagen.fill",{owner:panel.contributor.owner}) }
+                UiButton { objectName:"skinCollagenClear"; text:"Clear weights"; Layout.fillWidth:true; onClicked:App.runtime.run("skin.collagen.clear",{owner:panel.contributor.owner}) }
             }
         }
     }

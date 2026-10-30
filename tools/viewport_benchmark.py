@@ -25,7 +25,7 @@ def settle(controller):
 
 def prepare(controller, source):
     controller.capture_mode = True
-    controller.importMesh(source, 0.001, "", False)
+    controller.project_view.importMesh(source, 0.001, "", False)
     settle(controller)
     root = controller.session.document.entities[0].id
     leaf = controller.run("scp.duplicate", {"entity": root, "parent": root})
@@ -33,8 +33,8 @@ def prepare(controller, source):
     for _ in range(30):
         controller.run("scp.duplicate", {"entity": leaf, "parent": root})
         settle(controller)
-    controller.select(root)
-    controller.frameSelection()
+    controller.selection_view.select(root)
+    controller.viewport_view.frameSelection()
     QTest.qWait(500)
     return controller.rows[0]["chunks"]
 

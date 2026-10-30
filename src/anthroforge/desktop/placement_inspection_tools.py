@@ -30,7 +30,7 @@ class PlacementInspectionTools(QObject):
             return
         if self.active:
             return self.cancel()
-        self.controller.cancelViewportTools(self)
+        self.controller.viewport_view.cancelViewportTools(self)
         self.active = True
         self.changed.emit()
 

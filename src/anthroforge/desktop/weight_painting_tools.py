@@ -89,7 +89,7 @@ class WeightPaintingTools(QObject):
         if session.history.before is not None or session.waiting_save:
             raise ValueError("Finish the current edit before painting.")
         controller.authoring.setEditing(False)
-        controller.cancelViewportTools(self)
+        controller.viewport_view.cancelViewportTools(self)
         controller.section_tools.cancel()
         self.domain.prepare(controller)
         self.name, self.target, self.workspace = (

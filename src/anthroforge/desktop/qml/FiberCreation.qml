@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -15,7 +16,7 @@ ColumnLayout {
     function update(row, changes) { const next=Object.assign({},overrides); next[row.id]=Object.assign({},binding(row),changes); overrides=next; }
     function createFiber() {
         const bindings=rows.filter(r=>binding(r).bound).map(r=>({point:r.id,target:binding(r).target,role:binding(r).role}));
-        workspace.createConstruction("fiber.create",{curve:sourceId,bindings:bindings});
+        App.construction.createConstruction("fiber.create",{curve:sourceId,bindings:bindings});
     }
     UiButton { objectName:"createFiberFromCurve"; property string sourceId: panel.sourceId; text:"Create Fiber"; Layout.fillWidth:true; enabled:!!panel.sourceId; hint:"Independent copy · endpoints bind to nearest SCP surfaces"; onClicked:panel.createFiber() }
     UiSection {

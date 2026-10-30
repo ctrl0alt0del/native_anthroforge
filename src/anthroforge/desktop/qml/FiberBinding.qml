@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -18,8 +19,8 @@ ColumnLayout {
     }
     RowLayout {
         Layout.fillWidth: true
-        UiButton { objectName: "setFiberBinding"; text: panel.binding ? "Rebind point" : "Bind point"; Layout.fillWidth: true; enabled: !!target.current.ready; onClicked: workspace.run("fiber.binding.set",{curve:panel.curve.id,point:panel.point.id,target:target.current.id,role:target.current.role}) }
-        UiButton { objectName: "removeFiberBinding"; text: "Remove"; visible: !!panel.binding; enabled: !panel.mandatory; hint: panel.mandatory ? "Keep both open endpoints or one closed anchor bound" : "Remove this point's binding"; onClicked: workspace.run("fiber.binding.remove",{curve:panel.curve.id,point:panel.point.id}) }
+        UiButton { objectName: "setFiberBinding"; text: panel.binding ? "Rebind point" : "Bind point"; Layout.fillWidth: true; enabled: !!target.current.ready; onClicked: App.runtime.run("fiber.binding.set",{curve:panel.curve.id,point:panel.point.id,target:target.current.id,role:target.current.role}) }
+        UiButton { objectName: "removeFiberBinding"; text: "Remove"; visible: !!panel.binding; enabled: !panel.mandatory; hint: panel.mandatory ? "Keep both open endpoints or one closed anchor bound" : "Remove this point's binding"; onClicked: App.runtime.run("fiber.binding.remove",{curve:panel.curve.id,point:panel.point.id}) }
     }
     UiCombo {
         objectName: "fiberBindingScope"; Layout.fillWidth: true
@@ -27,13 +28,13 @@ ColumnLayout {
         model: ["Current parent", "Any eligible parent"]
         currentIndex: panel.binding?.capture_scope === "ANY_PARENT" ? 1 : 0
         hint: "Choose eligible surfaces when this bound point is edited"
-        onActivated: workspace.run("fiber.binding.scope",{curve:panel.curve.id,point:panel.point.id,scope:currentIndex===1?"ANY_PARENT":"CURRENT_PARENT"})
+        onActivated: App.runtime.run("fiber.binding.scope",{curve:panel.curve.id,point:panel.point.id,scope:currentIndex===1?"ANY_PARENT":"CURRENT_PARENT"})
     }
     MirrorSharing { visible: !!panel.binding; source: panel.curve.id || ""; binding: panel.point.id || "" }
     NumericSetting {
         objectName:"fiberPinNormalOffset"; visible:!!panel.binding?.attachment; label:"Normal Offset"; length:true
         value:panel.binding?.attachment?.binding?.[17] || 0
         hint:"Signed surface-normal distance at this retained material point; preserves its target"
-        onEdited:value=>workspace.run("fiber.binding.offset",{curve:panel.curve.id,point:panel.point.id,value:value})
+        onEdited:value=>App.runtime.run("fiber.binding.offset",{curve:panel.curve.id,point:panel.point.id,value:value})
     }
 }

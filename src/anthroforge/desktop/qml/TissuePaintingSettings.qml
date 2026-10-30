@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -6,7 +7,7 @@ ColumnLayout {
     id: panel
     property string fieldName: "collagen"
     property bool collagen: false
-    readonly property var tool: workspace.tissuePainting
+    readonly property var tool: App.tissuePainting
     readonly property bool painting: tool.state.active && tool.state.name===fieldName && tool.state.domain===(collagen ? "collagen" : "paint")
     Layout.fillWidth: true
     UiButton {
@@ -23,7 +24,7 @@ ColumnLayout {
         UiCheck { text: "Paint Through"; checked: panel.tool.state.through; onToggled: panel.tool.setting("through",checked) }
         UiNotice { text: panel.tool.state.pending ? "Finishing weight stroke…" : "" }
         Label { text: panel.collagen ? "Blue 0, gold 0.5, red 1. Drag to paint; release commits one stroke." : "Blue 0 · Gold 0.5 · Red 1. Drag to paint; release commits one stroke. Base weights are shared through tissue thickness."; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-        UiButton { visible: !panel.collagen; text: "Explain constraints at a point"; Layout.fillWidth: true; onClicked: workspace.tissueInspection.explain() }
-        UiButton { visible: !panel.collagen; text: "Show relaxation displacement"; Layout.fillWidth: true; onClicked: { panel.tool.cancel(); workspace.tissueInspection.configure("intrinsic","rest","Displacement"); } }
+        UiButton { visible: !panel.collagen; text: "Explain constraints at a point"; Layout.fillWidth: true; onClicked: App.tissueInspection.explain() }
+        UiButton { visible: !panel.collagen; text: "Show relaxation displacement"; Layout.fillWidth: true; onClicked: { panel.tool.cancel(); App.tissueInspection.configure("intrinsic","rest","Displacement"); } }
     }
 }

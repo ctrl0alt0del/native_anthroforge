@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 UiDialog {
     id: dialog
-    readonly property var service: workspace.variantPanel
+    readonly property var service: App.variantPanel
     readonly property var viewState: service.state
     readonly property var reviewData: JSON.parse(service.reviewJson)
     readonly property var pending: (viewState.findings || []).filter(r=>r.acknowledge && !(viewState.approved || []).includes(r.key))

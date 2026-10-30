@@ -34,14 +34,14 @@ def test_viewport_mirror_is_selectable_but_absent_from_both_trees(controller):
     assert instance not in controller.construction.records
     rows = {r["id"]: r for r in controller._render_rows}
     assert rows[instance]["handle"] == rows[child]["handle"]
-    controller.select(instance)
+    controller.selection_view.select(instance)
     assert controller.selection == instance
-    assert controller.selectedData.get("readonly")
-    assert controller.selectedData.get("mirror_source") == child
-    assert not controller.selectedData.get("transformable")
+    assert controller.selection_view.selectedData.get("readonly")
+    assert controller.selection_view.selectedData.get("mirror_source") == child
+    assert not controller.selection_view.selectedData.get("transformable")
     assert not controller.mirror_records[instance]["context_dimmed"]
-    controller.select(child)
-    assert not controller.selectedData.get("readonly")
+    controller.selection_view.select(child)
+    assert not controller.selection_view.selectedData.get("readonly")
 
 
 def test_display_mode_preserves_computation_and_instance_identity(controller):
@@ -73,9 +73,9 @@ def test_hiding_source_does_not_hide_its_mirror_and_projection_is_reused(control
 
 def test_focusing_mirror_uses_the_shared_source_scope_and_keeps_readonly_selection(controller):
     root, child, instance = mirrored_cube(controller)
-    controller.select(instance)
-    controller.focusSelection()
+    controller.selection_view.select(instance)
+    controller.selection_view.focusSelection()
     assert controller.session.workspace.members == (child,)
     assert controller.selection == instance
-    assert controller.selectedData.get("readonly")
-    assert not controller.selectedData.get("context_dimmed")
+    assert controller.selection_view.selectedData.get("readonly")
+    assert not controller.selection_view.selectedData.get("context_dimmed")

@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,11 +6,11 @@ import QtQuick.Dialogs
 
 UiScrollView {
     id: inspector
-    property var selected: workspace.selectedData
+    property var selected: App.selection.selectedData
     property string category: ""
     onCategoryChanged: if(contentItem) contentItem.contentY=0
     readonly property var attachment: selected.attachment || {}
-    readonly property var candidates: workspace.sceneChoices.parents
+    readonly property var candidates: App.selection.sceneChoices.parents
     readonly property bool dialogVisible: colorDialog.visible || constructionInspector.dialogVisible
     signal pickAnchor(string mode)
     signal deleteRequested(string entity)
@@ -18,7 +19,7 @@ UiScrollView {
     function setAttachment(key, value) {
         const options = {entity:selected.id};
         options[key] = value;
-        workspace.run("scp.attachment",options);
+        App.runtime.run("scp.attachment",options);
     }
     ColumnLayout {
         width: inspector.availableWidth; spacing: 12
@@ -32,7 +33,7 @@ UiScrollView {
         UiSection {
             title: "Mirrored attachments"; visible: !!inspector.selected.mirror_source
             Repeater {
-                model: inspector.selected.mirror_source ? workspace.mirrorBindings(inspector.selected.id) : []
+                model: inspector.selected.mirror_source ? App.mirrors.mirrorBindings(inspector.selected.id) : []
                 UiDetail {
                     required property var modelData
                     label: modelData.binding
@@ -42,13 +43,13 @@ UiScrollView {
         }
         RowLayout {
             visible: !!inspector.selected.mirror_source; Layout.fillWidth: true
-            UiButton { text: "Hide instance"; Layout.fillWidth: true; onClicked: workspace.run("view.hide",{targets:[inspector.selected.id]}) }
-            UiButton { text: "Isolate"; Layout.fillWidth: true; onClicked: workspace.run("view.isolate",{targets:[inspector.selected.id]}) }
-            UiButton { text: "Show all"; Layout.fillWidth: true; onClicked: workspace.run("view.show_all",{}) }
+            UiButton { text: "Hide instance"; Layout.fillWidth: true; onClicked: App.runtime.run("view.hide",{targets:[inspector.selected.id]}) }
+            UiButton { text: "Isolate"; Layout.fillWidth: true; onClicked: App.runtime.run("view.isolate",{targets:[inspector.selected.id]}) }
+            UiButton { text: "Show all"; Layout.fillWidth: true; onClicked: App.runtime.run("view.show_all",{}) }
         }
         ColumnLayout {
             visible: !!inspector.selected.id && !inspector.selected.is_control && !inspector.selected.is_construction && !inspector.selected.is_tissue
-            enabled: !inspector.selected.readonly && !workspace.state.waiting
+            enabled: !inspector.selected.readonly && !App.runtime.state.waiting
             Layout.fillWidth: true; spacing: 10
             RowLayout {
                 Image { source: inspector.selected.asset ? "icons/mesh.svg" : "icons/folder.svg"; sourceSize: Qt.size(19,19) }
@@ -57,7 +58,7 @@ UiScrollView {
                     Accessible.name: "Object name"
                     onAccepted: inspector.parent.forceActiveFocus()
                     Binding { target: nameField; property: "text"; when: !nameField.activeFocus; value: inspector.selected.name || "" }
-                    onEditingFinished: if (inspector.selected.id && text !== inspector.selected.name) workspace.run("scp.rename",{entity:inspector.selected.id,name:text})
+                    onEditingFinished: if (inspector.selected.id && text !== inspector.selected.name) App.runtime.run("scp.rename",{entity:inspector.selected.id,name:text})
                 }
             }
             Label { text: (inspector.selected.parent ? "Child SCP" : "Document root") + (inspector.selected.primitive ? "  ·  " + DisplayNames.label(inspector.selected.primitive.kind) : "  ·  Empty group"); color: Theme.muted; font.pixelSize: 11; Layout.fillWidth:true; wrapMode:Text.Wrap }
@@ -65,7 +66,7 @@ UiScrollView {
             UiSection {
                 title: "Transform"; stateKey:"scp/transform"; expanded:false; objectName: "transformSection"
                 Repeater {
-                    model: ["Position · "+workspace.state.display_units, "Rotation · °", "Scale"]
+                    model: ["Position · "+App.runtime.state.display_units, "Rotation · °", "Scale"]
                     delegate: ColumnLayout {
                         required property int index
                         required property string modelData
@@ -80,7 +81,7 @@ UiScrollView {
                                     id: numericField
                                     required property int index
                                     property int component: groupIndex*3+index
-                                    readonly property real unitFactor: groupIndex===0 ? workspace.state.unit_factor : 1
+                                    readonly property real unitFactor: groupIndex===0 ? App.runtime.state.unit_factor : 1
                                     objectName: "transform" + component
                                     Layout.fillWidth: true; Layout.preferredWidth: 65; Layout.minimumWidth: 50
                                     leftPadding: 23; rightPadding: 4
@@ -92,7 +93,7 @@ UiScrollView {
                                         if (!inspector.selected.trs) return;
                                         const values = inspector.selected.trs.slice();
                                         values[component] = number*unitFactor;
-                                        workspace.run("scp.transform",{entity:inspector.selected.id,values:values});
+                                        App.runtime.run("scp.transform",{entity:inspector.selected.id,values:values});
                                     }
                                 }
                             }
@@ -108,7 +109,7 @@ UiScrollView {
                     Layout.fillWidth: true; model: inspector.candidates; textRole: "name"; valueRole: "id"
                     currentIndex: indexOfValue(inspector.attachment.parent_instance ? "mirror/"+inspector.attachment.parent_instance+"/"+inspector.selected.parent : inspector.selected.parent || "")
                     hint: "Changing parent preserves the current world pose"
-                    onActivated: workspace.run("scp.reparent",{entity:inspector.selected.id,parent:currentValue})
+                    onActivated: App.runtime.run("scp.reparent",{entity:inspector.selected.id,parent:currentValue})
                 }
                 Label { text: "Parent anchor"; color: Theme.muted; font.pixelSize: 11 }
                 UiCombo {
@@ -126,7 +127,7 @@ UiScrollView {
                 RowLayout {
                     enabled: childMode.currentIndex !== 2
                     UiButton { text: "Pick anchor"; glyph: "target"; Layout.fillWidth: true; hint: "Click a face or vertex on this child in the viewport"; onClicked: inspector.pickAnchor(childMode.codes[childMode.currentIndex]) }
-                    UiButton { text: "Clear"; hint: "Remove permanent face and vertex locks"; onClicked: workspace.run("scp.attachment",{entity:inspector.selected.id,face_lock:-1,vertex_lock:-1}) }
+                    UiButton { text: "Clear"; hint: "Remove permanent face and vertex locks"; onClicked: App.runtime.run("scp.attachment",{entity:inspector.selected.id,face_lock:-1,vertex_lock:-1}) }
                 }
                 Label {
                     text: inspector.attachment.face_lock >= 0 ? "Locked to face " + inspector.attachment.face_lock : inspector.attachment.vertex_lock >= 0 ? "Locked to vertex " + inspector.attachment.vertex_lock : "Anchor chosen automatically"
@@ -139,8 +140,8 @@ UiScrollView {
                     onActivated: inspector.setAttachment("strategy",["AUTO","STABLE_SURFACE","DEFORMATION_FLOW"][currentIndex])
                 }
                 RowLayout {
-                    UiButton { text: "Recapture"; Layout.fillWidth: true; hint: "Rebuild the attachment from the current pose"; onClicked: workspace.run("scp.recapture",{entity:inspector.selected.id}) }
-                    UiButton { text: "Origin to anchor"; hint: "Move the origin while preserving mesh position"; onClicked: workspace.run("scp.origin",{entity:inspector.selected.id}) }
+                    UiButton { text: "Recapture"; Layout.fillWidth: true; hint: "Rebuild the attachment from the current pose"; onClicked: App.runtime.run("scp.recapture",{entity:inspector.selected.id}) }
+                    UiButton { text: "Origin to anchor"; hint: "Move the origin while preserving mesh position"; onClicked: App.runtime.run("scp.origin",{entity:inspector.selected.id}) }
                 }
             }
             UiSection {
@@ -153,28 +154,28 @@ UiScrollView {
                 UiCombo {
                     Layout.fillWidth: true; model: ["Use project setting", "Live", "On release", "Manual"]
                     currentIndex: Math.max(0,["INHERIT","LIVE","ON_RELEASE","MANUAL"].indexOf(inspector.selected.update_mode))
-                    onActivated: workspace.run("update_mode",{entity:inspector.selected.id,mode:["INHERIT","LIVE","ON_RELEASE","MANUAL"][currentIndex]})
+                    onActivated: App.runtime.run("update_mode",{entity:inspector.selected.id,mode:["INHERIT","LIVE","ON_RELEASE","MANUAL"][currentIndex]})
                 }
             }
             RowLayout {
                 Layout.fillWidth: true
-                UiButton { text: "Duplicate"; Layout.fillWidth: true; hint: "Create an independent copy"; onClicked: workspace.run("scp.duplicate",{entity:inspector.selected.id}) }
+                UiButton { text: "Duplicate"; Layout.fillWidth: true; hint: "Create an independent copy"; onClicked: App.runtime.run("scp.duplicate",{entity:inspector.selected.id}) }
                 UiButton { text: "Delete"; hint: "Delete this SCP, preserving children"; onClicked: inspector.deleteRequested(inspector.selected.id) }
             }
         }
-        ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !workspace.state.waiting }
-        ConstructionInspector { id: constructionInspector; onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !workspace.state.waiting }
-        TissueInspector { visible: !!inspector.selected.is_tissue; enabled: !inspector.selected.readonly && !workspace.state.waiting }
+        ControlInspector { onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_control; enabled: !inspector.selected.readonly && !App.runtime.state.waiting }
+        ConstructionInspector { id: constructionInspector; onDeleteRequested: entity => inspector.deleteRequested(entity); visible: !!inspector.selected.is_construction; enabled: !inspector.selected.readonly && !App.runtime.state.waiting }
+        TissueInspector { visible: !!inspector.selected.is_tissue; enabled: !inspector.selected.readonly && !App.runtime.state.waiting }
         MirrorSettings { Layout.fillWidth: true }
         UiButton {
             objectName: "addObjectImage"; text: "Add reference image…"; glyph: "image"; Layout.fillWidth: true
             visible: !!inspector.selected.id && inspector.selected.kind !== "IMAGE"
-            enabled: !inspector.selected.readonly && !workspace.state.waiting && !workspace.state.editing
+            enabled: !inspector.selected.readonly && !App.runtime.state.waiting && !App.runtime.state.editing
             hint: "Import an image parented to this object; align it to the current orthographic axis view"
             onClicked: inspector.imageRequested(inspector.selected.id)
         }
         UiNotice { text: inspector.selected.error || ""; error: true }
         Item { implicitHeight: 8 }
     }
-    ColorDialog { id: colorDialog; title: "Object color"; onAccepted: workspace.run("scp.color",{entity:inspector.selected.id,value:selectedColor.toString()}) }
+    ColorDialog { id: colorDialog; title: "Object color"; onAccepted: App.runtime.run("scp.color",{entity:inspector.selected.id,value:selectedColor.toString()}) }
 }

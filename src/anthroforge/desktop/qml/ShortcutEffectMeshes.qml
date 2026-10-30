@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick3D
 import AnthroForge.Native 1.0
@@ -5,7 +6,7 @@ import AnthroForge.Native 1.0
 Repeater3D {
     id: meshes
     required property var effects
-    model: workspace.meshModel
+    model: App.viewport.meshModel
     delegate: Node {
         required property var item
         position: Qt.vector3d(item.trs[0],item.trs[1],item.trs[2])
@@ -14,13 +15,13 @@ Repeater3D {
         Model {
             id: mask
             objectName: "shortcutMask_"+item.key
-            visible: item.active && !(workspace.tissueInspection.state.hiddenOwners || []).includes(item.id)
+            visible: item.active && !(App.tissueInspection.state.hiddenOwners || []).includes(item.id)
             position: Qt.vector3d(item.geometry_offset[0],item.geometry_offset[1],item.geometry_offset[2])
             geometry: MeshGeometry { assetId: item.handle; chunk: item.chunk; reflected: item.trs[6]*item.trs[7]*item.trs[8] < 0 }
             property color tint: meshes.effects.colors?.[item.id] || "black"
             property Material normalMaterial: DefaultMaterial { lighting: DefaultMaterial.NoLighting; diffuseColor: mask.tint; cullMode: Material.NoCulling }
             property Material clippedMaterial: SectionMaterial { tint: mask.tint; unlit: true }
-            materials: workspace.sectionTools.state.enabled && workspace.sectionTools.state.cut && workspace.sectionTools.state.wholeScene ? clippedMaterial : normalMaterial
+            materials: App.sectionTools.state.enabled && App.sectionTools.state.cut && App.sectionTools.state.wholeScene ? clippedMaterial : normalMaterial
         }
     }
 }

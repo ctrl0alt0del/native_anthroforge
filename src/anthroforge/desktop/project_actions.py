@@ -22,7 +22,7 @@ def save(controller, path, policy):
         return
     if policy == "wait" and context_saves.pending(session):
         session.waiting_save = True
-        controller.pending_save = path
+        controller.project_view.pending_save = path
         controller.notify()
         return
     start_save(controller, path, policy)
@@ -33,7 +33,7 @@ def start_save(controller, path, policy):
     target = Path(local_path(path)).resolve()
     snapshot = context_saves.project(session, checkpoints=policy == "checkpoint")
     lock = projects.lock_target(session, target)
-    controller.temporary_locks.append(lock)
+    controller.project_view.temporary_locks.append(lock)
     session.scheduler.submit(save_job(controller, target, snapshot, lock))
 
 
@@ -57,30 +57,30 @@ def save_job(controller, target, snapshot, lock):
 def saved(controller, path, lock, revision):
     projects.finish_save(controller.session, path, lock, revision)
     controller.message = f"Saved revision {revision}: {path.name}"
-    controller.project_library.remember(path)
-    controller.pending_save = ""
+    controller.project_view.library.remember(path)
+    controller.project_view.pending_save = ""
     controller.session.waiting_save = False
     controller.notify()
     continue_after_save(controller)
 
 
 def continue_after_save(controller):
-    action, controller.after_save = controller.after_save, None
+    action, controller.project_view.after_save = controller.project_view.after_save, None
     if action == "@close":
         controller.closeReady.emit()
     elif action is not None:
-        controller.pending_document = action
+        controller.project_view.pending_document = action
         controller.session.waiting_save = True
 
 
 def cleanup(controller, lock, state):
-    if lock in controller.temporary_locks:
-        controller.temporary_locks.remove(lock)
+    if lock in controller.project_view.temporary_locks:
+        controller.project_view.temporary_locks.remove(lock)
     if lock is not controller.session.file_lock:
         lock.close()
     if state != "succeeded":
         controller.session.waiting_save = False
-        controller.pending_save, controller.after_save = "", None
+        controller.project_view.pending_save, controller.project_view.after_save = "", None
         controller.message = "File operation did not complete. See Activity for the error."
         controller.notify()
 
@@ -88,7 +88,7 @@ def cleanup(controller, lock, state):
 def queue_document(controller, path):
     if controller.session.contexts.visible:
         controller.session.contexts.select("")
-    controller.pending_document = path
+    controller.project_view.pending_document = path
     controller.session.waiting_save = True
     for job in all_active(controller.session.scheduler):
         with controller.session.contexts.use(job.context):
@@ -97,22 +97,25 @@ def queue_document(controller, path):
 
 def poll(controller):
     session = controller.session
-    if controller.pending_save and not context_saves.pending(session):
-        path, controller.pending_save = controller.pending_save, ""
+    if controller.project_view.pending_save and not context_saves.pending(session):
+        path, controller.project_view.pending_save = controller.project_view.pending_save, ""
         start_save(controller, path, "wait")
-    if controller.pending_document is not None and not all_active(session.scheduler):
-        path, controller.pending_document = controller.pending_document, None
+    if controller.project_view.pending_document is not None and not all_active(session.scheduler):
+        path, controller.project_view.pending_document = (
+            controller.project_view.pending_document,
+            None,
+        )
         if path:
             start_open(controller, path)
         else:
             new_document(controller)
-    controller.project_library.poll()
+    controller.project_view.library.poll()
 
 
 def start_open(controller, path):
     target = Path(local_path(path)).resolve(strict=True)
     lock = projects.lock_target(controller.session, target)
-    controller.temporary_locks.append(lock)
+    controller.project_view.temporary_locks.append(lock)
     controller.session.scheduler.submit(open_job(controller, target, lock))
 
 
@@ -145,4 +148,4 @@ def adopt_loaded_state(controller, path, lock, result):
     session.serial = session.document.revision
     session.active_workspace = 0
     session.waiting_save = False
-    controller.project_library.opened(path, lock, session.serial)
+    controller.project_view.library.opened(path, lock, session.serial)

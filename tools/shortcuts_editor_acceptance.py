@@ -64,9 +64,9 @@ def prepare(controller):
 def create_engine(controller, curve, warnings):
     engine = QQmlApplicationEngine()
     context = engine.rootContext()
-    context.setContextProperty("workspace", controller)
-    context.setContextProperty("authoring", controller.authoring)
-    context.setContextProperty("numericEdits", controller.numeric_edits)
+    from anthroforge.desktop.qml_bindings import bind
+
+    bind(engine, controller)
     engine.probe_curve = PropertyProjection(engine)
     engine.probe_curve.synchronize(controller.session.document.object(curve))
     context.setContextProperty("probeCurve", engine.probe_curve)

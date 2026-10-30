@@ -53,7 +53,7 @@ class TissueRegionTools(QObject):
 
     def focus(self):
         self.controller.authoring.setEditing(False)
-        self.controller.cancelViewportTools(self)
+        self.controller.viewport_view.cancelViewportTools(self)
 
     def initialize(self, item, other, row):
         previous = previous_relationship(item, row)

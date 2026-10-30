@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Layouts
 UiDialog {
     id: dialog
     objectName: "skeletonUpdateDialog"
-    property var service: workspace.skeletonPanel
+    property var service: App.skeletonPanel
     readonly property var viewState: service.state
     readonly property var reviewData: JSON.parse(service.reviewJson)
     readonly property var pendingReviews: (dialog.viewState.findings || []).filter(r=>r.acknowledge && !(dialog.viewState.approved || []).includes(r.key))

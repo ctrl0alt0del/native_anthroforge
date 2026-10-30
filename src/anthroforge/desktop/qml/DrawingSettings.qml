@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Layouts
 ColumnLayout {
     id: panel
     required property var keyboard
-    readonly property var tool: workspace.drawingTools
+    readonly property var tool: App.drawingTools
     readonly property var options: tool.state.options
     readonly property bool capturing: tool.state.count>0
     spacing: Theme.gap
@@ -17,7 +18,7 @@ ColumnLayout {
     UiSection {
         title: "Create curve"
         Label { visible: panel.tool.state.branched; text: "First point joins the nearest visible curve control point."; color: Theme.muted; wrapMode: Text.WordWrap; Layout.fillWidth: true }
-        UiButton { text: "Add Curve at cursor"; Layout.fillWidth: true; onClicked: workspace.drawingTools.addCurve() }
+        UiButton { text: "Add Curve at cursor"; Layout.fillWidth: true; onClicked: App.drawingTools.addCurve() }
         RowLayout {
             UiButton { text: panel.tool.state.placement_mode==="BRANCH" ? "Branched Points" : "Place Points"; Layout.fillWidth: true; checked: ["POINTS","BRANCH"].includes(panel.tool.state.mode); onClicked: panel.tool.begin(panel.tool.state.placement_mode) }
             UiButton { text: "Draw"; Layout.fillWidth: true; checked: panel.tool.state.mode==="DRAW"; onClicked: panel.tool.begin("DRAW") }
@@ -47,7 +48,7 @@ ColumnLayout {
     }
     UiSection {
         title: "3D cursor"
-        VectorSetting { live: false; label: "World position"; length: true; values: workspace.state.cursor || [0,0,0]; onEdited: values=>workspace.run("workspace.update",{cursor:values}) }
+        VectorSetting { live: false; label: "World position"; length: true; values: App.runtime.state.cursor || [0,0,0]; onEdited: values=>App.runtime.run("workspace.update",{cursor:values}) }
         UiButton { text: "Place on surface"; checked: panel.tool.state.mode==="CURSOR"; Layout.fillWidth: true; onClicked: panel.tool.begin("CURSOR") }
     }
 }

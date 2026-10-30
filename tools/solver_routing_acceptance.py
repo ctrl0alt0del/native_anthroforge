@@ -50,7 +50,7 @@ def select_inputs(window, controller):
 def exercise(controller, engine):
     root, child, key = scene(controller.session)
     controller.refresh()
-    controller.select(key)
+    controller.selection_view.select(key)
     controller.authoring.setEditing(True)
     settle(controller)
     window = engine.rootObjects()[0]
@@ -88,7 +88,7 @@ def verify_automatic(controller, window, source, target):
     controller.run("fiber.create", dict(curve=source, bindings=bindings))
     settle(controller)
     fiber = next(o for o in controller.session.document.objects if isinstance(o, Fiber))
-    controller.select(fiber.id)
+    controller.selection_view.select(fiber.id)
     settle(controller)
     binding_row(window, target)
 

@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,12 +6,12 @@ import QtQuick.Layouts
 UiSection {
     id: panel
     title:"Placement & support"; expanded:false; stateKey:"inspect/placement"
-    readonly property var tool:workspace.placementInspection
+    readonly property var tool:App.placementInspection
     readonly property var report:tool.state.report || ({})
     readonly property var preview:report.preview || ({})
     readonly property var confirmed:report.confirmed || ({})
-    function length(v) { return typeof v==="number" ? (v/workspace.state.unit_factor).toPrecision(5)+" "+workspace.state.display_units : "—"; }
-    function vector(v) { return v ? v.map(n=>(n/workspace.state.unit_factor).toFixed(4)).join(", ")+" "+workspace.state.display_units : "—"; }
+    function length(v) { return typeof v==="number" ? (v/App.runtime.state.unit_factor).toPrecision(5)+" "+App.runtime.state.display_units : "—"; }
+    function vector(v) { return v ? v.map(n=>(n/App.runtime.state.unit_factor).toFixed(4)).join(", ")+" "+App.runtime.state.display_units : "—"; }
     UiButton { objectName:"inspectPlacement"; text:panel.tool.state.active ? "Finish placement inspection" : "Explain placement at a surface"; Layout.fillWidth:true; checkable:true; checked:panel.tool.state.active; onClicked:panel.tool.toggle(); hint:"Click a surface to compare the fast preview with confirmed exterior placement. No point or attachment is changed." }
     UiCombo { id:bindingChoice; Layout.fillWidth:true; visible:panel.tool.state.bindings.length>0; model:panel.tool.state.bindings; textRole:"label"; hint:"Inspect the current bound point against its existing support."; onActivated:panel.tool.inspectBinding(model[currentIndex].point) }
     UiButton { text:"Explain selected binding"; Layout.fillWidth:true; visible:panel.tool.state.bindings.length>0; onClicked:panel.tool.inspectBinding(panel.tool.state.bindings[Math.max(0,bindingChoice.currentIndex)].point) }
@@ -28,8 +29,8 @@ UiSection {
     UiDetail { label:"Revision"; value:panel.confirmed.hit ? String(panel.confirmed.revision) : "—" }
     UiHelp { explanation:"This checks placement now, not the original gesture. Yellow lines show the request and candidate faces. Normal distance measures the request along the face normal: positive is in front. It is local approach evidence, not an inside/outside test or a guaranteed escape route. A changed face identifies the preview candidate excluded or superseded by exterior placement." }
     UiNotice { text:panel.report.error || panel.tool.state.error || (panel.tool.state.state==="stale" ? "Surface changed. Click again for current evidence." : ""); error:true }
-    UiButton { text:"Locate accepted surface"; enabled:!!panel.confirmed.reference; Layout.fillWidth:true; onClicked:workspace.inspectionPanel.navigate(panel.confirmed.reference.instance || panel.confirmed.reference.target,true) }
-    UiButton { text:"Review fiber pin repairs"; visible:workspace.selectedData.kind==="FIBER"; Layout.fillWidth:true; onClicked:workspace.issuePanel.reviewPins(workspace.selectedId) }
+    UiButton { text:"Locate accepted surface"; enabled:!!panel.confirmed.reference; Layout.fillWidth:true; onClicked:App.inspectionPanel.navigate(panel.confirmed.reference.instance || panel.confirmed.reference.target,true) }
+    UiButton { text:"Review fiber pin repairs"; visible:App.selection.selectedData.kind==="FIBER"; Layout.fillWidth:true; onClicked:App.issuePanel.reviewPins(App.selection.selectedId) }
     UiButton { text:"Hide placement evidence"; Layout.fillWidth:true; visible:!!panel.report.preview; onClicked:panel.tool.clear() }
-    RouteInspection { visible:workspace.selectedData.engine==="ROUTED" }
+    RouteInspection { visible:App.selection.selectedData.engine==="ROUTED" }
 }

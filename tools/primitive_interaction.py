@@ -27,7 +27,7 @@ def pointer(window, world, click=False, extend=False):
 
 
 def curve_selection(controller, window, entity):
-    controller.select(entity)
+    controller.selection_view.select(entity)
     controller.authoring.setEditing(True)
     pointer(window, [0, -0.15, 0])
     assert controller.authoring.hover_curve
@@ -42,7 +42,7 @@ def curve_selection(controller, window, entity):
 
 def topology_controls(controller, window, entity):
     child = controller.run("scp.empty", dict(name="Topology dependent", parent=entity))
-    controller.select(entity)
+    controller.selection_view.select(entity)
     settle(controller)
     assert not find(window, "primitiveSamples").isEnabled()
     controller.run("scp.delete", dict(entity=child))
@@ -59,7 +59,7 @@ def imported_hook(controller, window, parent):
     imported = controller.run("import", dict(path=str(source), units=1, parent=parent))
     settle(controller)
     entity = imported["entity_id"]
-    controller.select(entity)
+    controller.selection_view.select(entity)
     controller.authoring.setEditing(True)
     original = source_vertices(controller, entity)
     controller.authoring.selectComponent(controller.authoring.componentRows[0]["key"], False)
@@ -72,14 +72,14 @@ def imported_hook(controller, window, parent):
 
 
 def verify_imported_weight(controller, entity, control, original):
-    controller.select(entity)
+    controller.selection_view.select(entity)
     binding = controller.session.document.entity(entity).deformers[0].id
     controller.authoring.members(binding, False)
     controller.authoring.weights(binding, 0.25)
-    controller.select(control)
-    controller.beginTransform("Move")
-    controller.dragTransform(2, 0.4)
-    controller.endTransform(False)
+    controller.selection_view.select(control)
+    controller.viewport_view.beginTransform("Move")
+    controller.viewport_view.dragTransform(2, 0.4)
+    controller.viewport_view.endTransform(False)
     settle(controller)
     assert_imported_shape(controller, entity, original)
 
@@ -100,7 +100,7 @@ def assert_imported_shape(controller, entity, original):
 
 
 def body_base_hook(controller, window, parent):
-    controller.select(parent)
+    controller.selection_view.select(parent)
     controller.authoring.create("BODY", "CAPSULE")
     settle(controller)
     entity = controller.selection
@@ -110,7 +110,7 @@ def body_base_hook(controller, window, parent):
     settle(controller)
     item = controller.session.document.entity(entity)
     assert item.deformers[0].target.stage == "BASE"
-    controller.select(entity)
+    controller.selection_view.select(entity)
     controller.authoring.setCategory("CURVE")
     isolate_body(controller, entity)
     screenshot(window, "body-base-hook")
@@ -119,12 +119,12 @@ def body_base_hook(controller, window, parent):
 def isolate_body(controller, entity):
     others = [e.id for e in controller.session.document.entities if e.id != entity]
     controller.run("workspace.update", dict(hidden=others))
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     settle(controller)
 
 
 def component_presentation(controller, window, entity):
-    controller.select(entity)
+    controller.selection_view.select(entity)
     row = controller.authoring.componentRows[-2]
     controller.authoring.selectComponent(row["key"], False)
     QTest.qWait(50)
@@ -143,11 +143,11 @@ def followed_control_drag(controller, entity):
     parent = controller.run("scp.empty", dict(name="Rotated support", parent=entity))
     controller.run("scp.transform", dict(entity=parent, values=[0, 0, 0, 0, 0, 90, 1, 1, 1]))
     control = controller.run("control.create", dict(entity=parent))
-    controller.select(control)
+    controller.selection_view.select(control)
     before = stable_frame(controller.session, controller.session.document.control(control))
-    controller.beginTransform("Move")
-    controller.dragTransform(0, 0.2)
-    controller.endTransform(False)
+    controller.viewport_view.beginTransform("Move")
+    controller.viewport_view.dragTransform(0, 0.2)
+    controller.viewport_view.endTransform(False)
     settle(controller)
     after = stable_frame(controller.session, controller.session.document.control(control))
     verify_world_translation(controller, before, after)
@@ -180,7 +180,7 @@ def verify(controller, window):
     controller.authoring.create("LOFT", "")
     settle(controller)
     entity = controller.selection
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     QTest.qWait(150)
     curve_selection(controller, window, entity)
     editing_policies(controller, window, entity)

@@ -35,7 +35,7 @@ def inspect(controller, window):
     click(window, "tissuePreviewStart")
     amount(window, 0.08)
     settle(controller)
-    assert controller.tissuePreview["state"] == "ready"
+    assert controller.construction_view.tissuePreview["state"] == "ready"
     assert controller.session.document == before
     assert controller.session.history.cursor == cursor
     assert any(row["id"].startswith("preview:") for row in controller._render_rows)

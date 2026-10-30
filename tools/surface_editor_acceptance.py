@@ -29,8 +29,8 @@ def sources(controller):
         for y in (-0.2, 0.2)
     ]
     settle(controller)
-    controller.select(keys[0])
-    controller.select(keys[1], True)
+    controller.selection_view.select(keys[0])
+    controller.selection_view.select(keys[1], True)
     return keys
 
 
@@ -48,7 +48,10 @@ def create(controller, engine):
     surface = next(o for o in controller.session.document.objects if isinstance(o, Surface))
     assert controller.selection == surface.id and not controller.authoring.editing
     settle(controller)
-    assert controller.selectedData["kind"] == "SURFACE" and not controller.treeRows
+    assert (
+        controller.selection_view.selectedData["kind"] == "SURFACE"
+        and not controller.selection_view.treeRows
+    )
     assert any(row["id"] == surface.id for row in controller.render_model.wanted.values())
     assert controller.authoring.state["uses"][0]["curve"] == keys[0]
     return surface.id
@@ -75,9 +78,9 @@ def select_sources(controller, engine, target):
     expected = controller.session.command("surface.source_ids", target=target)
     action(engine, "selectAllSurfaceSources", "clicked")
     settle(controller)
-    assert controller.selectedObjects == expected
+    assert controller.selection_view.selectedObjects == expected
     assert controller.session.document is before
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
 
 
@@ -85,7 +88,7 @@ def realign(controller, engine):
     before = len(controller.session.history.entries)
     action(engine, "surfaceRealign", "clicked")
     settle(controller)
-    assert not controller.surfacePreview["token"]
+    assert not controller.construction_view.surfacePreview["token"]
     assert len(controller.session.history.entries) == before + 1
 
 
@@ -134,12 +137,12 @@ def closed_creation(controller, engine):
     from surface_preview_scene import sources
 
     curves = sources(controller)
-    controller.select(curves[0])
-    controller.select(curves[1], True)
+    controller.selection_view.select(curves[0])
+    controller.selection_view.select(curves[1], True)
     before = len(controller.session.document.objects)
     click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
-    assert not controller.surfacePreview["token"]
+    assert not controller.construction_view.surfacePreview["token"]
     assert len(controller.session.document.objects) == before + 1
 
 
@@ -149,8 +152,11 @@ def additional_sources(controller, engine):
         "curve.create", dict(points=[dict(position=[x, 0.6, 0]) for x in (-0.5, 0.5)])
     )
     settle(controller)
-    controller.select(third, True)
-    assert controller.selectedObjects == [*keys, third] and controller.surfaceAction["enabled"]
+    controller.selection_view.select(third, True)
+    assert (
+        controller.selection_view.selectedObjects == [*keys, third]
+        and controller.construction_view.surfaceAction["enabled"]
+    )
     click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
     surface = controller.session.document.object(controller.selection)

@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -7,8 +8,8 @@ UiSection {
     required property var curve
     required property var point
     readonly property var info: {
-        const revision = workspace.state.revision;
-        return expanded && curve.id && point.id ? authoring.junctionOptions(curve.id,point.id) : {};
+        const revision = App.runtime.state.revision;
+        return expanded && curve.id && point.id ? App.authoring.junctionOptions(curve.id,point.id) : {};
     }
     readonly property var candidates: info.curves || []
     readonly property var target: candidates[targetCurve.currentIndex] || {}
@@ -30,9 +31,9 @@ UiSection {
             onClicked: {
                 const here={curve:panel.curve.id,point:panel.point.id};
                 const there={curve:panel.target.id,point:panel.targetPoints[targetPoint.currentIndex].id};
-                workspace.run("junction.create",{source:source.currentIndex===0?here:there,targets:[source.currentIndex===0?there:here]});
+                App.runtime.run("junction.create",{source:source.currentIndex===0?here:there,targets:[source.currentIndex===0?there:here]});
             }
         }
     }
-    UiButton { objectName: "removeJunction"; text: "Detach junction"; visible: !!panel.info.id; Layout.fillWidth: true; hint: "Keep each member's current shape and binding"; onClicked: workspace.run("junction.remove",{junction:panel.info.id}) }
+    UiButton { objectName: "removeJunction"; text: "Detach junction"; visible: !!panel.info.id; Layout.fillWidth: true; hint: "Keep each member's current shape and binding"; onClicked: App.runtime.run("junction.remove",{junction:panel.info.id}) }
 }

@@ -81,7 +81,7 @@ def interrupt(window, cancel):
 
 def transform_checks(controller, window):
     target = controller.run("scp.empty", dict(name="Numeric input"))
-    controller.select(target)
+    controller.selection_view.select(target)
     for locale, text in (("uk_UA", "0.25"), ("ro_RO", "-0.125"), ("en_US", "0,5")):
         QLocale.setDefault(QLocale(locale))
         type_value(window, "transform0", text)
@@ -106,7 +106,7 @@ def transform_drag_checks(controller, window, target, field):
 def primitive_checks(controller, window):
     target = controller.run("primitive.create", dict(kind="BODY", parent=controller.selection))
     assert target, controller.message
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
     type_value(window, "primitiveSamplesValue", "36")
     assert controller.session.document.entity(target).primitive.samples == 36
@@ -132,7 +132,7 @@ def verify(controller, window):
 
 def vector_checks(controller, window):
     source = controller.session.document.entity(controller.selection).primitive.curves[0].curve
-    controller.select(source)
+    controller.selection_view.select(source)
     controller.authoring.setEditing(True)
     settle(controller)
     type_value(window, "vectorPoint position0", "-.125")

@@ -17,7 +17,7 @@ OUTPUT = Path("build/020-skull-scene")
 def exercise(controller, renderer, app):
     targets, curves = create(controller.session, OUTPUT)
     controller.refresh()
-    controller.select(curves[0])
+    controller.selection_view.select(curves[0])
     controller.cameraRequested.emit([0.15, -0.45, 1.35, -10, 30, 0, 3], True)
     assert frames(controller, renderer, app, 20).save(str(OUTPUT / "skull-fibers.png"))
     controller.cameraRequested.emit([0.15, -0.45, 1.35, 0, 0, 0, 3], True)

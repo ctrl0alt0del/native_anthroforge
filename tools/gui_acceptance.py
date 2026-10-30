@@ -55,10 +55,10 @@ def edit_checks(controller, window):
 
 def persistence_checks(controller, output):
     target = output / "gui-assembly.anthroforge"
-    controller.saveProject(str(target), "wait")
+    controller.project_view.saveProject(str(target), "wait")
     wait_until(lambda: controller.session.path == target)
     expected = [e.matrix for e in controller.session.document.entities]
-    controller.replaceDocument(str(target))
+    controller.project_view.replaceDocument(str(target))
     wait_until(lambda: not controller.session.waiting_save, 10)
     assert [e.matrix for e in controller.session.document.entities] == expected
     assert not controller.session.scheduler.errors, controller.session.scheduler.errors

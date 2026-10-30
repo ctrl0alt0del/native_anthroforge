@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -6,7 +7,7 @@ UiSection {
     id: panel
     required property var item
     property string focused: ""
-    readonly property var candidates: { const revision=workspace.state.revision; return workspace.stackingTissues().filter(o=>o.id!==item.id); }
+    readonly property var candidates: { const revision=App.runtime.state.revision; return App.construction.stackingTissues().filter(o=>o.id!==item.id); }
     readonly property var filtered: candidates.filter(o=>o.name.toLowerCase().includes(search.text.toLowerCase()))
     readonly property var other: candidates.find(o=>o.id===focused) || ({})
     readonly property string side: ownSide.currentText || "a"
@@ -15,15 +16,15 @@ UiSection {
     readonly property var evidence: item.stack_plan?.orders?.find(r=>(r.first===focused || r.second===focused))
     title: "Stacking"; expanded: false
     hint: "Surface tissues opt into stacking. Provider surfaces are evaluated first; final geometry remains distinct from intrinsic inflation."
-    function configure(key,value) { const changes={}; changes[key]=value; workspace.run("tissue.stacking.configure",{target:item.id,changes:changes}); }
+    function configure(key,value) { const changes={}; changes[key]=value; App.runtime.run("tissue.stacking.configure",{target:item.id,changes:changes}); }
     function saveIntent() {
-        workspace.run("tissue.stacking.relationship",{target:item.id,other:focused,side:side,other_side:otherSide,mode:orderMode.currentText,cover:coverMode.currentIndex===0?"SELF":"OTHER",excluded:exclude.checked});
+        App.runtime.run("tissue.stacking.relationship",{target:item.id,other:focused,side:side,other_side:otherSide,mode:orderMode.currentText,cover:coverMode.currentIndex===0?"SELF":"OTHER",excluded:exclude.checked});
         orderMode.currentIndex=Qt.binding(()=>Math.max(0,orderMode.model.indexOf(panel.intent?.mode)));
         coverMode.currentIndex=Qt.binding(()=>panel.intent?.cover==="OTHER"?1:0);
         exclude.checked=Qt.binding(()=>panel.intent?.excluded || false);
     }
-    function editRegion() { workspace.tissueRegionTools.begin({other:focused,side:side,other_side:otherSide,mode:orderMode.currentText,cover:coverMode.currentIndex===0?"SELF":"OTHER",excluded:false}); }
-    UiCheck { objectName: "tissueStackingEnabled"; text: "Enable stacking"; checked: panel.item.stacking || false; onClicked: workspace.run("tissue.configure",{target:panel.item.id,changes:{stacking:checked}}) }
+    function editRegion() { App.tissueRegionTools.begin({other:focused,side:side,other_side:otherSide,mode:orderMode.currentText,cover:coverMode.currentIndex===0?"SELF":"OTHER",excluded:false}); }
+    UiCheck { objectName: "tissueStackingEnabled"; text: "Enable stacking"; checked: panel.item.stacking || false; onClicked: App.runtime.run("tissue.configure",{target:panel.item.id,changes:{stacking:checked}}) }
     UiSection {
         title: "Stacking settings"; expanded: false
         Label { text: "Automatic stacking group"; color: Theme.muted }
@@ -31,7 +32,7 @@ UiSection {
             id: group; objectName: "tissueStackGroup"; Layout.fillWidth: true; maximumLength: 256
             placeholderText: "Independent (no group)"; Accessible.name: "Automatic stacking group"
             Binding { target: group; property: "text"; when: !group.activeFocus; value: panel.item.group || "" }
-            onEditingFinished: if(text.trim() !== (panel.item.group || "")) workspace.run("tissue.configure",{target:panel.item.id,changes:{group:text.trim()}})
+            onEditingFinished: if(text.trim() !== (panel.item.group || "")) App.runtime.run("tissue.configure",{target:panel.item.id,changes:{group:text.trim()}})
             ToolTip.visible: hovered; ToolTip.text: "Equal group names skip automatic comparisons. Explicit pair assignments remain available."
         }
         NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","clearance"]}); objectName: "tissueStackClearance"; label: "Clearance"; length: true; value: panel.item.stack_settings?.clearance || 0; onEdited: value=>panel.configure("clearance",value) }
@@ -44,7 +45,7 @@ UiSection {
         NumericSetting { propertyReference: ({target:panel.item.id,path:["stack_settings","adjustment"]}); label: "Maximum adjustment"; length: true; value: panel.item.stack_settings?.adjustment || 0; onEdited: value=>panel.configure("adjustment",value) }
     }
     UiField { id: search; objectName: "tissueStackSearch"; Layout.fillWidth: true; placeholderText: "Find a tissue…" }
-    UiButton { text: "Show received displacement"; Layout.fillWidth: true; enabled: !!panel.item.final_result?.asset; hint: "Compare the accepted final surface with its intrinsic inflation"; onClicked: workspace.tissueInspection.configure("final","intrinsic","Displacement") }
+    UiButton { text: "Show received displacement"; Layout.fillWidth: true; enabled: !!panel.item.final_result?.asset; hint: "Compare the accepted final surface with its intrinsic inflation"; onClicked: App.tissueInspection.configure("final","intrinsic","Displacement") }
     ListView {
         id: list; objectName: "tissueStackList"; Layout.fillWidth: true
         Layout.preferredHeight: Math.min(160,count*32); clip: true; reuseItems: true
@@ -60,8 +61,8 @@ UiSection {
     Label { visible: panel.candidates.length===0; text: "Create another surface tissue to define a relationship."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
     ColumnLayout {
         visible: !!panel.other.id; Layout.fillWidth: true; spacing: Theme.gap
-        UiButton { objectName: "showStackingEffect"; text: "Show stacking effect"; Layout.fillWidth: true; enabled: !!panel.evidence; onClicked: workspace.tissueInspection.showStacking(panel.focused,panel.side,panel.otherSide) }
-        StackingExplanation { evidence: workspace.tissueInspection.state.stacking || ({}); target: panel.item.id || "" }
+        UiButton { objectName: "showStackingEffect"; text: "Show stacking effect"; Layout.fillWidth: true; enabled: !!panel.evidence; onClicked: App.tissueInspection.showStacking(panel.focused,panel.side,panel.otherSide) }
+        StackingExplanation { evidence: App.tissueInspection.state.stacking || ({}); target: panel.item.id || "" }
         RowLayout {
             Layout.fillWidth: true
             UiCombo { id: ownSide; Layout.fillWidth: true; model: panel.item.both_sides?["a","b"]:["a"]; hint: "This tissue side" }
@@ -73,19 +74,19 @@ UiSection {
         Label { visible: !!panel.intent?.regions?.length; text: "Selected support region · "+(panel.intent?.regions?.length || 0)+" faces"; color: Theme.muted }
         UiButton { objectName: "tissueStackRegion"; text: "Select support footprint"; Layout.fillWidth: true; enabled: orderMode.currentIndex>0 && !exclude.checked; hint: "Choose Requested or Explicit order, then select material faces on the covering tissue"; onClicked: panel.editRegion() }
         ColumnLayout {
-            visible: workspace.tissueRegionTools.state.active; Layout.fillWidth: true
+            visible: App.tissueRegionTools.state.active; Layout.fillWidth: true
             Label { text: "Click covering faces to toggle the draft footprint."; color: Theme.muted; Layout.fillWidth: true; wrapMode: Text.WordWrap }
-            UiNotice { active: panel.visible && workspace.tissueRegionTools.state.active; text: workspace.tissueRegionTools.state.error || ""; error: true }
-            UiButton { text: "Use entire footprint"; Layout.fillWidth: true; onClicked: workspace.tissueRegionTools.clear() }
+            UiNotice { active: panel.visible && App.tissueRegionTools.state.active; text: App.tissueRegionTools.state.error || ""; error: true }
+            UiButton { text: "Use entire footprint"; Layout.fillWidth: true; onClicked: App.tissueRegionTools.clear() }
             RowLayout {
                 Layout.fillWidth: true
-                UiButton { objectName: "tissueStackRegionAccept"; text: "Accept region"; enabled: !workspace.tissueRegionTools.state.error; Layout.fillWidth: true; onClicked: workspace.tissueRegionTools.accept() }
-                UiButton { objectName: "tissueStackRegionCancel"; text: "Cancel"; onClicked: workspace.tissueRegionTools.cancel() }
+                UiButton { objectName: "tissueStackRegionAccept"; text: "Accept region"; enabled: !App.tissueRegionTools.state.error; Layout.fillWidth: true; onClicked: App.tissueRegionTools.accept() }
+                UiButton { objectName: "tissueStackRegionCancel"; text: "Cancel"; onClicked: App.tissueRegionTools.cancel() }
             }
         }
         RowLayout {
             Layout.fillWidth: true
-            UiButton { objectName: "tissueStackRemove"; text: "Reset relationship"; glyph: "delete"; hint: "Remove overrides and restore automatic behavior"; enabled: !!panel.intent; onClicked: workspace.run("tissue.stacking.remove",{target:panel.item.id,other:panel.focused,side:panel.side,other_side:panel.otherSide}) }
+            UiButton { objectName: "tissueStackRemove"; text: "Reset relationship"; glyph: "delete"; hint: "Remove overrides and restore automatic behavior"; enabled: !!panel.intent; onClicked: App.runtime.run("tissue.stacking.remove",{target:panel.item.id,other:panel.focused,side:panel.side,other_side:panel.otherSide}) }
         }
         UiNotice { active: panel.visible && !!panel.evidence; text: panel.evidence?.covering ? (panel.evidence.covering===panel.item.id?"This tissue covers the selected tissue":"The selected tissue covers this tissue") : "No accepted stacking order" }
     }

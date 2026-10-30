@@ -53,7 +53,7 @@ def inspect(controller, window):
     controller.issue_panel.selectIssue(rows[0]["issueId"])
     click(window, "issueSelectTarget")
     fiber = controller.selection
-    assert controller.selectedData["kind"] == "FIBER"
+    assert controller.selection_view.selectedData["kind"] == "FIBER"
     click(window, "issueFrameTarget")
     controller.run("object.rename", dict(target=fiber, name="Renamed collision fiber"))
     settle(controller)

@@ -20,7 +20,7 @@ from anthroforge.desktop.runtime import native_runtime
 def controls(controller, window):
     keys, target = create(controller.session)
     settle(controller)
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
     click(controller, window, "BranchesToggle")
     for index in range(2):

@@ -21,7 +21,7 @@ def scene(controller):
     body = controller.run("primitive.from_curves", dict(curves=[curve], kind="BODY"))
     controller.session.wait(5)
     controller.refresh()
-    controller.select(body)
+    controller.selection_view.select(body)
     controller.cameraRequested.emit([0, 0, 0.1, 70, 0, 0, 1.2], True)
     return curve, body
 
@@ -80,7 +80,7 @@ def change_radius(controller, curve):
 
 
 def generated_controls(controller, renderer, application, curve):
-    controller.select(curve)
+    controller.selection_view.select(curve)
     controller.authoring.setEditing(True)
     image = frames(controller, renderer, application)
     assert image.save(str(OUTPUT / "generated-controls.png"))

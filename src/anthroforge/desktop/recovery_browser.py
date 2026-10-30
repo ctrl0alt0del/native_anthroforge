@@ -55,7 +55,7 @@ class RecoveryBrowser(QObject):
     @Slot(str)
     def openCopy(self, path):
         if any(row["path"] == path for row in self.rows) and self.store.owns(Path(path)):
-            self.controller.requestDocument(path)
+            self.controller.project_view.requestDocument(path)
 
     @Slot()
     def showFolder(self):

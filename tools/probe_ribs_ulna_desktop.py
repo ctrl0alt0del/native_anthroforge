@@ -48,7 +48,7 @@ def displayed(controller, output):
 def prepare(controller, app, source):
     load(controller.session, source)
     controller.refresh()
-    controller.select("SCP_2")
+    controller.selection_view.select("SCP_2")
     controller.shortcut_panel.configure(True, False, "")
     settle(controller, app)
 

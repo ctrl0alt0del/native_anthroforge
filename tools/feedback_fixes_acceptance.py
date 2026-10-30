@@ -39,7 +39,7 @@ def setup(controller):
     result = controller.run("import", dict(path="examples/primitives/cube.obj", units=1.0))
     settle(controller)
     target = result["entity_id"]
-    controller.select(target)
+    controller.selection_view.select(target)
     return target
 
 
@@ -128,7 +128,7 @@ def accept_image(window, controller):
 
 
 def image_imports(window, controller, root):
-    controller.select(root)
+    controller.selection_view.select(root)
     controller.run("scp.transform", dict(entity=root, values=[1, 2, 3, 20, 50, 10, 1, 1, 1]))
     settle(controller)
     axis_view(window, "Right")
@@ -151,7 +151,7 @@ def check_import_result(window, controller, item, root):
 
 
 def world_import(window, controller, root):
-    controller.select(root)
+    controller.selection_view.select(root)
     axis_view(window, "Front")
     click(window, "addWorldImage")
     request = controller.image_tools.import_request[1]

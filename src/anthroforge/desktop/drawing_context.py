@@ -19,7 +19,7 @@ def capture(tool, normal):
 
 def surface_inputs(tool):
     controller, options = tool.controller, tool.options
-    selected = set(controller.selectedObjects)
+    selected = set(controller.selection_view.selectedObjects)
     indices = [
         i
         for i, key in enumerate(controller.snap_ids)

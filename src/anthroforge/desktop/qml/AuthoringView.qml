@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick3D
 
@@ -6,7 +7,7 @@ View3D {
     required property var sourceCamera
     required property bool orthographic
     required property real distance
-    visible: authoring.visible || workspace.tissueRegionTools.state.active
+    visible: App.authoring.visible || App.tissueRegionTools.state.active
     camera: rig.camera
     environment: SceneEnvironment {
         backgroundMode: SceneEnvironment.Transparent

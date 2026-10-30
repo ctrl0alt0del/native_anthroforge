@@ -35,7 +35,7 @@ def reference(controller):
     result = controller.run("image.import", dict(path=str(source), width=2))
     controller.session.wait(5)
     controller.refresh()
-    controller.select(result["object_id"])
+    controller.selection_view.select(result["object_id"])
     controller.run("image.presentation", dict(target=result["object_id"], depth="BACK"))
     controller.cameraRequested.emit([0, 0, 0, -90, 0, 0, 3], True)
     return result["object_id"]
@@ -86,7 +86,7 @@ def display_check(controller, renderer, image, curve):
             for y in range(-3, 4)
         ]
         assert any(c.blue() > 190 and c.red() > 150 and c.green() < 190 for c in colors), point
-        hit = controller.pick([point[0], point[1], 3], [0, 0, -1], 0, False, 0.01)
+        hit = controller.selection_view.pick([point[0], point[1], 3], [0, 0, -1], 0, False, 0.01)
         assert hit["id"] == curve.id
 
 

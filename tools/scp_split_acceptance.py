@@ -43,9 +43,9 @@ def setup(controller):
         dict(entity=target, curve=curve.id, index=1, point=dict(position=[0, 0.25, 0.15])),
     )
     settle(controller)
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.authoring.setEditing(True)
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     return target
 
 
@@ -60,7 +60,7 @@ def exercise(controller, engine, target):
     assert button.property("enabled")
     assert QMetaObject.invokeMethod(button, "clicked", Qt.DirectConnection)
     settle(controller)
-    assert controller.selectedData["kind"] == "HOOK"
+    assert controller.selection_view.selectedData["kind"] == "HOOK"
     assert len(controller.session.document.entities) == 3
     assert controller.session.document.entity(target).primitive
     assert window.grabWindow().save(str(OUTPUT / "after.png"))

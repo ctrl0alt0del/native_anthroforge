@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 
@@ -8,7 +9,7 @@ UiField {
     property bool exactText: false
     property var exactOffset: null
     property var propertyReference: ({})
-    readonly property var propertyState: visible && propertyReference?.target ? workspace.shortcutPanel.propertyState(propertyReference,workspace.shortcutPanel.propertyQueries.versions[propertyReference.target] || 0) : ({})
+    readonly property var propertyState: visible && propertyReference?.target ? App.shortcutPanel.propertyState(propertyReference,App.shortcutPanel.propertyQueries.versions[propertyReference.target] || 0) : ({})
     readonly property bool propertyLocked: !!propertyReference?.target && propertyState.writable === false
     property int decimals: 4
     property bool mixed: false
@@ -47,12 +48,12 @@ UiField {
         if(valid) publish(bounded(parsed));
     }
     function cancelEdit() {
-        if(scrubbing && live) numericEdits.cancel();
+        if(scrubbing && live) App.numericEdits.cancel();
         scrubbing=false; textEditing=false; focus=false;
     }
     function beginScrub() {
         if(propertyLocked) return false;
-        if(live && !numericEdits.begin(field)) return false;
+        if(live && !App.numericEdits.begin(field)) return false;
         startValue=value; draft=value; dragStep=step;
         scrubbing=true; forceActiveFocus(); return true;
     }
@@ -63,14 +64,14 @@ UiField {
     }
     function finishScrub() {
         if(!scrubbing) return;
-        if(live) numericEdits.commit(field); else publish(draft);
+        if(live) App.numericEdits.commit(field); else publish(draft);
         scrubbing=false; focus=false;
     }
     onAccepted: commitText()
     onEditingFinished: commitText()
     onEnabledChanged: if(!enabled) cancelEdit()
     Connections {
-        target: numericEdits
+        target: App.numericEdits
         function onFinished(canceled) { if(field.scrubbing) { field.scrubbing=false; field.focus=false; } }
     }
     MouseArea {
@@ -97,8 +98,8 @@ UiField {
     TapHandler { acceptedButtons: Qt.RightButton; enabled: !!field.propertyReference?.target; onTapped: propertyMenu.popup() }
     UiMenu {
         id: propertyMenu
-        UiMenuItem { text: "Go to driving shortcut"; visible: !!field.propertyState.driver; onTriggered: workspace.shortcutPanel.openDriver(field.propertyReference) }
-        UiMenuItem { text: field.propertyState.exposed ? "Hide shortcut" : "Expose as shortcut"; onTriggered: workspace.shortcutPanel.expose(field.propertyReference,"",!field.propertyState.exposed) }
+        UiMenuItem { text: "Go to driving shortcut"; visible: !!field.propertyState.driver; onTriggered: App.shortcutPanel.openDriver(field.propertyReference) }
+        UiMenuItem { text: field.propertyState.exposed ? "Hide shortcut" : "Expose as shortcut"; onTriggered: App.shortcutPanel.expose(field.propertyReference,"",!field.propertyState.exposed) }
     }
     ToolTip.visible: hovered && !scrubbing && !textEditing
     ToolTip.text: propertyState.reason || "Drag left/right to adjust · Click to type" + (propertyReference?.target ? " · Right-click for shortcut" : "")

@@ -46,7 +46,7 @@ def fixture(controller):
     controller.refresh()
     target = result["object_id"]
     controller.run("image.presentation", dict(target=target, opacity=1))
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.cameraRequested.emit([0, 0, 0, -90, 0, 0, 3], True)
     return target
 
@@ -81,9 +81,9 @@ def exercise(controller, renderer, app):
     image = frames(controller, renderer, app)
     image.save(str(OUTPUT / "quadrants-view.png"))
     orientation(renderer, image)
-    hit = controller.pick([-0.5, 0.3, 2], [0, 0, -1], 0, False, 0.02)
+    hit = controller.selection_view.pick([-0.5, 0.3, 2], [0, 0, -1], 0, False, 0.02)
     assert hit["id"] == target and abs(hit["uv"][0] - 0.25) < 1e-8
-    assert controller.pick([-0.5, 0.3, 2], [0, 0, -1], 0, True, 0.02) == hit
+    assert controller.selection_view.pick([-0.5, 0.3, 2], [0, 0, -1], 0, True, 0.02) == hit
     for depth in ("FRONT", "BACK", "NORMAL"):
         controller.run("image.presentation", dict(target=target, depth=depth))
         orientation(renderer, frames(controller, renderer, app))
@@ -116,7 +116,7 @@ def axis_visibility(controller, renderer, app, target):
 def check_axis_view(controller, renderer, image, target, visible):
     color = color_at(renderer, image, [-0.5, 0.3, 0])
     assert (color[0] > 200 and color[1] < 30) == visible, (color, visible)
-    hit = controller.pick([-0.5, 0.3, 2], [0, 0, -1], 0, False, 0.02)
+    hit = controller.selection_view.pick([-0.5, 0.3, 2], [0, 0, -1], 0, False, 0.02)
     assert (hit.get("id") == target) == visible, (hit, visible)
 
 

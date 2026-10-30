@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Layouts
 
@@ -13,6 +14,6 @@ ColumnLayout {
     UiButton {
         objectName: "createTissue"; text: "Create tissue"; Layout.fillWidth: true
         enabled: !!preset.currentValue
-        onClicked: workspace.createConstruction("tissue.create",{source:panel.selected.id,preset:preset.currentValue})
+        onClicked: App.construction.createConstruction("tissue.create",{source:panel.selected.id,preset:preset.currentValue})
     }
 }

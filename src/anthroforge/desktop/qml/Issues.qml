@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 ColumnLayout {
     id: panel
-    readonly property var service: workspace.issuePanel
+    readonly property var service: App.issuePanel
     spacing: 6
     function filterRows() { service.filter(search.text, ["","error","warning","info"][severity.currentIndex], dismissed.checked); }
     GridLayout {

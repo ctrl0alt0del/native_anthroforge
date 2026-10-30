@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick3D
 import AnthroForge.Native 1.0
@@ -5,7 +6,7 @@ import AnthroForge.Native 1.0
 Node {
     id: root
     required property real distance
-    ViewSnapshot { id: evidence; source: workspace.surfaceMeasurements }
+    ViewSnapshot { id: evidence; source: App.surfaceMeasurements }
     Model {
         geometry: ControlGeometry { points:evidence.data.volume || []; segments:true; stroke:root.distance*.0015 }
         materials: DefaultMaterial { diffuseColor:"#f2ba62"; lighting:DefaultMaterial.NoLighting; cullMode:Material.NoCulling }

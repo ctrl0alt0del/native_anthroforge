@@ -114,8 +114,8 @@ def exercise(controller, renderer, app, output):
     plan = json.loads(PLAN.read_text())
     load(controller.session, Path(plan["standalone"]))
     controller.refresh()
-    controller.select("SCP_2")
-    controller.frameSelection()
+    controller.selection_view.select("SCP_2")
+    controller.viewport_view.frameSelection()
     settle(controller, renderer, app)
     capture(controller, renderer, app, output, plan["cases"][0])
 

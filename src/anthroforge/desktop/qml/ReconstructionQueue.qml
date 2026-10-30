@@ -1,17 +1,18 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 ColumnLayout {
     id: pane
-    readonly property var service: workspace.reconstructionPanel
+    readonly property var service: App.reconstructionPanel
     readonly property var records: JSON.parse(service.dataJson)
     readonly property var rows: records.detail?.work || []
     property string selected: ""
     property string checkpoint: ""
     UiField { id: owner; Layout.fillWidth: true; placeholderText: "Your name" }
     RowLayout {
-        UiButton { text: "Add selected"; enabled: !!workspace.selectedId; onClicked: pane.service.run("reconstruction.queue.add",{subject:workspace.selectedId,variant:pane.records.active}) }
+        UiButton { text: "Add selected"; enabled: !!App.selection.selectedId; onClicked: pane.service.run("reconstruction.queue.add",{subject:App.selection.selectedId,variant:pane.records.active}) }
         UiButton { text: "Claim next"; enabled: !!owner.text.trim(); onClicked: {const r=pane.service.run("reconstruction.queue.claim",{owner:owner.text}); if(r?.id) pane.selected=r.id;} }
     }
     UiField { id: search; Layout.fillWidth: true; placeholderText: "Search queue" }

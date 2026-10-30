@@ -11,7 +11,7 @@ from tests.test_tissue_workflow import assembly
 def setup(controller):
     _, _, target = assembly(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     publish(controller)
     return target, controller.tissue_inspection
 
@@ -117,7 +117,7 @@ def test_selection_clear_discards_prepared_inspection_state(controller):
     _, tool = setup(controller)
     tool.set_view("rest", "base", "Overlay")
     publish(controller)
-    controller.select("")
+    controller.selection_view.select("")
     publish(controller)
     state = tool.snapshot()
     assert state["target"] == "" and state["stages"] == [] and state["hiddenOwners"] == []

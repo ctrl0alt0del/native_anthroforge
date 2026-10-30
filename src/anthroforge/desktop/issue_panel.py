@@ -126,6 +126,6 @@ class IssuePanel(QObject):
         if not self._state.get("canNavigate"):
             return
         if target in self.controller.session.document.registry.records:
-            self.controller.select(target)
+            self.controller.selection_view.select(target)
             if frame:
-                self.controller.frameSelection()
+                self.controller.viewport_view.frameSelection()

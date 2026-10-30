@@ -13,9 +13,14 @@ from anthroforge.desktop.runtime import native_runtime
 
 def capture(controller, renderer, app, name):
     settle(controller)
-    assert controller.selectedData["status"] == "ready", controller.session.scheduler.errors
-    assert controller.selectedData["is_tissue"] and not controller.selectedData["transformable"]
-    controller.frameSelection()
+    assert controller.selection_view.selectedData["status"] == "ready", (
+        controller.session.scheduler.errors
+    )
+    assert (
+        controller.selection_view.selectedData["is_tissue"]
+        and not controller.selection_view.selectedData["transformable"]
+    )
+    controller.viewport_view.frameSelection()
     output = Path("build/022-tissue")
     output.mkdir(parents=True, exist_ok=True)
     assert frames(controller, renderer, app).save(str(output / (name + "-gpu.png")))
@@ -34,7 +39,9 @@ def shell(controller, renderer, app):
 def sweep(controller, renderer, app):
     bone = controller.session.document.entities[0].id
     source = fiber(controller, bone, 0)
-    target = controller.createConstruction("tissue.create", dict(source=source, preset="CUSTOM"))
+    target = controller.construction_view.createConstruction(
+        "tissue.create", dict(source=source, preset="CUSTOM")
+    )
     controller.run("tissue.inflation", dict(target=target, changes=dict(amount=0.15, width=0.12)))
     capture(controller, renderer, app, "profile-sweep")
     controller.run("object.delete", dict(target=target))
@@ -43,9 +50,11 @@ def sweep(controller, renderer, app):
 def radial(controller, renderer, app):
     bone = controller.session.document.entities[0].id
     point = controller.run("construction.point.create", dict(position=[0, 0, 0.7]))
-    controller.createConstruction("anchor.create", dict(source=point, parent=bone))
+    controller.construction_view.createConstruction(
+        "anchor.create", dict(source=point, parent=bone)
+    )
     settle(controller)
-    target = controller.createConstruction(
+    target = controller.construction_view.createConstruction(
         "tissue.create", dict(source=controller.selection, preset="CUSTOM")
     )
     controller.run(
@@ -59,7 +68,7 @@ def replacement_cycles(controller, renderer, app):
     for index in range(12):
         old = controller.selection
         controller.run("object.delete", dict(target=old))
-        target = controller.createConstruction(
+        target = controller.construction_view.createConstruction(
             "tissue.create", dict(source=source, preset="CUSTOM")
         )
         controller.run(
@@ -67,7 +76,7 @@ def replacement_cycles(controller, renderer, app):
         )
         settle(controller)
         frames(controller, renderer, app)
-        assert controller.selectedData["status"] == "ready"
+        assert controller.selection_view.selectedData["status"] == "ready"
 
 
 def run(app):

@@ -52,7 +52,7 @@ def test_field_components_pick_and_assign_with_undo_without_vertex_transforms(co
     _, _, target = assembly(controller.session)
     field = create(controller.session, target, domain="REST")
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.authoring.editTissueField("pins")
     editor, before = controller.authoring, controller.session.document
     assert len(editor.componentRows) == len(field.values)

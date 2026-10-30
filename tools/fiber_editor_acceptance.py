@@ -39,7 +39,7 @@ def setup(controller):
     settle(controller)
     source = controller.run("curve.create", {})
     settle(controller)
-    controller.select(source)
+    controller.selection_view.select(source)
     controller.authoring.setEditing(True)
     settle(controller)
     return source
@@ -55,10 +55,13 @@ def create(controller, engine):
     settle(controller)
     fibers = [o for o in controller.session.document.objects if isinstance(o, Fiber)]
     assert len(fibers) == 1, controller.message
-    assert fibers[0].id != source and controller.constructionModel.rowCount() == 2
+    assert fibers[0].id != source and controller.viewport_view.constructionModel.rowCount() == 2
     assert any(row["id"] == fibers[0].id for row in controller.fiber_display.model.active_rows())
     assert controller.selection == fibers[0].id and not controller.authoring.active
-    assert controller.selectedData["kind"] == "FIBER" and not controller.authoring.selection
+    assert (
+        controller.selection_view.selectedData["kind"] == "FIBER"
+        and not controller.authoring.selection
+    )
 
 
 def run():
@@ -153,9 +156,9 @@ def editing(controller):
 
 def drag(controller, fiber, opening):
     cursor = controller.session.history.cursor
-    assert controller.beginTransform("Move")
-    controller.transformDelta([0, 0.2, 0, 0, 0, 0, 1, 1, 1])
-    controller.endTransform(False)
+    assert controller.viewport_view.beginTransform("Move")
+    controller.viewport_view.transformDelta([0, 0.2, 0, 0, 0, 0, 1, 1, 1])
+    controller.viewport_view.endTransform(False)
     settle(controller)
     item = controller.session.document.object(fiber)
     assert item.result.status == "ready", item.result.error

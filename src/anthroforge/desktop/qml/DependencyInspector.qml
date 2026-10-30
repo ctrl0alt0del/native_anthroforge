@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,12 +6,12 @@ import QtQuick.Layouts
 UiSection {
     id: panel
     objectName: "dependencyInspector"; title: "Relationships & attachments"; expanded: false
-    readonly property var detail: workspace.inspectionPanel.detail
+    readonly property var detail: App.inspectionPanel.detail
     readonly property var attachment: detail.attachment || {}
     readonly property var binding: attachment.binding || {}
-    onExpandedChanged: workspace.inspectionPanel.activate(expanded && visible)
-    onVisibleChanged: workspace.inspectionPanel.activate(expanded && visible)
-    function vector(values) { return values ? values.map(v=>(v/workspace.state.unit_factor).toFixed(3)).join(", ")+" "+workspace.state.display_units : "Unavailable"; }
+    onExpandedChanged: App.inspectionPanel.activate(expanded && visible)
+    onVisibleChanged: App.inspectionPanel.activate(expanded && visible)
+    function vector(values) { return values ? values.map(v=>(v/App.runtime.state.unit_factor).toFixed(3)).join(", ")+" "+App.runtime.state.display_units : "Unavailable"; }
     UiDetail { label: "Result"; value: panel.detail.result?.status || "Unavailable" }
     UiDetail { label: "Support"; value: panel.attachment.support_name || panel.attachment.follow || "None" }
     UiDetail { label: "Transform parent"; visible: !!panel.attachment.transform_parent; value: panel.attachment.transform_parent_name || "None" }

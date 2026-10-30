@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,14 +6,14 @@ import QtQuick.Layouts
 Rectangle {
     id: tools
     required property var viewport
-    readonly property var model: workspace.inspectionTools
+    readonly property var model: App.inspectionTools
     property bool expanded: false
     property var expandedMeasurements: []
     width: Math.min(320, viewport.width-24)
     height: expanded ? Math.min(content.implicitHeight+header.height+32, viewport.height-100) : header.height+16
     color: Theme.panel; border.color: Theme.border; radius: 4
-    function xyz(point) { return point.map(v=>(v/workspace.state.unit_factor).toFixed(3)).join(", "); }
-    function saveBookmark() { viewport.storeCamera(); workspace.run("bookmark.add",{name:bookmarkName.text.trim() || "Inspection view"}); }
+    function xyz(point) { return point.map(v=>(v/App.runtime.state.unit_factor).toFixed(3)).join(", "); }
+    function saveBookmark() { viewport.storeCamera(); App.runtime.run("bookmark.add",{name:bookmarkName.text.trim() || "Inspection view"}); }
     function toggleMeasurement(identity) {
         const existing=model.state.measurements.map(row=>row.id);
         const retained=expandedMeasurements.filter(id=>existing.includes(id) && id!==identity);
@@ -23,14 +24,14 @@ Rectangle {
         RowLayout {
             id: header
             UiButton { objectName: "inspectionToolsToggle"; text: "Measurements & views"; flatStyle: true; alignLeft: true; Layout.fillWidth: true; onClicked: tools.expanded=!tools.expanded }
-            UiButton { objectName: "measureSurface"; text: "Ruler"; checked: tools.model.state.active; enabled: !viewport.transforming && !workspace.state.waiting; hint: "Pick two surface points · Esc to finish"; onClicked: { tools.expanded=true; tools.model.toggle(); viewport.forceActiveFocus(); } }
+            UiButton { objectName: "measureSurface"; text: "Ruler"; checked: tools.model.state.active; enabled: !viewport.transforming && !App.runtime.state.waiting; hint: "Pick two surface points · Esc to finish"; onClicked: { tools.expanded=true; tools.model.toggle(); viewport.forceActiveFocus(); } }
         }
         UiScrollView {
             id: scroll; visible: tools.expanded; Layout.fillWidth: true; Layout.fillHeight: true; clip: true; contentWidth: availableWidth
             ColumnLayout {
                 id: content; width: scroll.availableWidth; spacing: Theme.gap
                 Label { visible: tools.model.state.active; Layout.fillWidth: true; elide: Text.ElideRight; color: Theme.accent; text: "Pick "+(tools.model.state.start.entity ? "second" : "first")+" surface point · Esc to finish" }
-                UiDetail { visible: tools.model.state.active; label: "XYZ"; value: tools.model.state.hover.entity && tools.model.state.hover.position ? tools.xyz(tools.model.state.hover.position)+" "+workspace.state.display_units : "Point at a surface" }
+                UiDetail { visible: tools.model.state.active; label: "XYZ"; value: tools.model.state.hover.entity && tools.model.state.hover.position ? tools.xyz(tools.model.state.hover.position)+" "+App.runtime.state.display_units : "Point at a surface" }
                 UiSection {
                     title: "Measurements"; hint: "Pick two surface points with Ruler. Alt-click reaches deeper surfaces. Expand a measurement for XYZ coordinates. Rulers keep fixed coordinates; changed surfaces are marked stale."
                     Label { visible: !tools.model.state.measurements.length; text: "No measurements yet"; color: Theme.muted }
@@ -40,15 +41,15 @@ Rectangle {
                     title: "Named cameras"; hint: "Save the current camera, then use Go to restore it. Restoring a view preserves an active edit."
                 RowLayout {
                     UiField { id: bookmarkName; objectName: "bookmarkName"; Layout.fillWidth: true; placeholderText: "View name" }
-                    UiButton { objectName: "saveBookmark"; text: "Save"; enabled: !workspace.state.waiting; onClicked: tools.saveBookmark() }
+                    UiButton { objectName: "saveBookmark"; text: "Save"; enabled: !App.runtime.state.waiting; onClicked: tools.saveBookmark() }
                 }
                 Repeater {
                     model: tools.model.state.bookmarks
                     RowLayout {
                         required property var modelData
-                        UiField { id: nameField; Layout.fillWidth: true; text: modelData.name; onEditingFinished: { if(text.trim() && text!==modelData.name) workspace.run("bookmark.rename",{bookmark:modelData.id,name:text}); } }
-                        UiButton { objectName: "restoreBookmark"; text: "Go"; enabled: !workspace.state.waiting; onClicked: { tools.model.restoreBookmark(modelData.id); viewport.forceActiveFocus(); } }
-                        UiButton { glyph: "delete"; flatStyle: true; hint: "Remove bookmark"; onClicked: workspace.run("bookmark.remove",{bookmark:modelData.id}) }
+                        UiField { id: nameField; Layout.fillWidth: true; text: modelData.name; onEditingFinished: { if(text.trim() && text!==modelData.name) App.runtime.run("bookmark.rename",{bookmark:modelData.id,name:text}); } }
+                        UiButton { objectName: "restoreBookmark"; text: "Go"; enabled: !App.runtime.state.waiting; onClicked: { tools.model.restoreBookmark(modelData.id); viewport.forceActiveFocus(); } }
+                        UiButton { glyph: "delete"; flatStyle: true; hint: "Remove bookmark"; onClicked: App.runtime.run("bookmark.remove",{bookmark:modelData.id}) }
                     }
                 }
                 }

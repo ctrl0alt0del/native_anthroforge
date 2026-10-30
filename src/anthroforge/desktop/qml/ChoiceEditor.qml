@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -12,7 +13,7 @@ ColumnLayout {
     property string clearLabel: "Clear shown"
     property string resetLabel: "Reset"
     property string summary: choices.counts.chosen+" / "+choices.counts.total+" selected"
-    readonly property var choices: workspace.createChoiceModel(panel)
+    readonly property var choices: App.construction.createChoiceModel(panel)
     signal edited(var values)
     signal focused(string key)
     signal resetRequested()

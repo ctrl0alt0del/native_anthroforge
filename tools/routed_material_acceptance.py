@@ -30,7 +30,7 @@ def prepare(controller):
     visible = set(objects["supports"] + objects["fibers"] + [objects["exact"]])
     hidden = [key for key in controller.session.document.registry.records if key not in visible]
     controller.run("workspace.update", dict(hidden=hidden))
-    controller.select(objects["exact"])
+    controller.selection_view.select(objects["exact"])
     settle(controller)
     controller.cameraRequested.emit([0, 0, 0.3, -20, 25, 0, 4.0], True)
     return objects

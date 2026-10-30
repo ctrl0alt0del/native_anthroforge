@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick3D
 import AnthroForge.Native 1.0
@@ -11,7 +12,7 @@ Node {
     property real primaryOpacity: 1
     property bool annotations: true
     ViewSnapshot { id: evidence; source: root.evidenceSource }
-    ViewSnapshot { id: section; source: workspace.sectionTools }
+    ViewSnapshot { id: section; source: App.sectionTools }
     Repeater3D {
         model: root.geometryModel
         delegate: Node {

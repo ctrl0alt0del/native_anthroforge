@@ -46,7 +46,7 @@ def feedback(controller, target, failure):
 
 def scenario(controller, window):
     target = controller.run("primitive.create", dict(kind="BODY"))
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
     controller.run("update_mode", dict(entity=target, mode="MANUAL"))
     reveal(window, "primitiveSamplesValue")
@@ -84,31 +84,33 @@ def scrub(controller, window, field, target):
 def membrane_action(controller, window):
     _, surface, _ = surface_scene(controller.session)
     controller.refresh()
-    controller.select(surface.id)
+    controller.selection_view.select(surface.id)
     settle(controller)
     cursor = controller.session.history.cursor
     click(visible(window, "surfaceCreateMembrane"))
     settle(controller)
-    assert controller.selectedData["kind"] == "MEMBRANE"
+    assert controller.selection_view.selectedData["kind"] == "MEMBRANE"
     assert controller.session.history.cursor == cursor + 1 and not window.property("modalOpen")
     mouse_click(window, "createTissueToolbar")
     settle(controller)
-    assert controller.selectedData["is_tissue"]
+    assert controller.selection_view.selectedData["is_tissue"]
     assert window.grabWindow().save(str(OUTPUT / "direct-tissue.png"))
 
 
 def generic_surface_action(controller, window):
     _, surface, _ = surface_scene(controller.session)
     controller.refresh()
-    controller.select(surface.id)
+    controller.selection_view.select(surface.id)
     settle(controller)
     cursor = controller.session.history.cursor
     mouse_click(window, "createTissueToolbar")
     settle(controller)
     tissue = controller.session.document.object(controller.selection)
     membrane = controller.session.document.object(tissue.source)
-    assert controller.selectedData["is_tissue"] and membrane.id != surface.id
-    assert all(controller.objectRecord(u.curve)["kind"] == "FIBER" for u in membrane.curves)
+    assert controller.selection_view.selectedData["is_tissue"] and membrane.id != surface.id
+    assert all(
+        controller.selection_view.objectRecord(u.curve)["kind"] == "FIBER" for u in membrane.curves
+    )
     assert controller.session.history.cursor == cursor + 1 and not window.property("modalOpen")
 
 

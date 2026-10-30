@@ -20,8 +20,10 @@ OUTPUT = Path("build/direct-tissue-stable-inspectors")
 def scene(controller):
     _, source, _ = surface_scene(controller.session)
     controller.refresh()
-    controller.select(source.id)
-    result = controller.createConstruction("tissue.create", dict(source=source.id))
+    controller.selection_view.select(source.id)
+    result = controller.construction_view.createConstruction(
+        "tissue.create", dict(source=source.id)
+    )
     settle(controller)
     target = result["object_id"]
     assert controller.selection == target

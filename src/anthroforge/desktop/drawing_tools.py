@@ -65,7 +65,7 @@ class DrawingTools(QObject):
             self.placement_mode = self.mode
         self.context = self.signature()
         self.controller.authoring.setEditing(False)
-        self.controller.cancelViewportTools(self)
+        self.controller.viewport_view.cancelViewportTools(self)
         self.changed.emit()
 
     @Slot()
@@ -90,7 +90,7 @@ class DrawingTools(QObject):
         result = self.controller.run("curve.create", dict(owner=context_owner(self.controller)))
         if result:
             self.cancel()
-            self.controller.select(result)
+            self.controller.selection_view.select(result)
             self.controller.authoring.setEditing(True)
 
     @Slot(str)
@@ -114,7 +114,7 @@ class DrawingTools(QObject):
         ]
         self.created = [key for key in self.created if key not in published]
         if published and not self.mode:
-            self.controller.select(published[-1])
+            self.controller.selection_view.select(published[-1])
 
     @Slot(str, "QVariant")
     def setting(self, key, value):

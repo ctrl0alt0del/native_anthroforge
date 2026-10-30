@@ -48,7 +48,7 @@ def fixture(controller):
     target = session.command("import", path="examples/primitives/cube.obj", units=1)["entity_id"]
     session.wait()
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.reconstruction_panel.create()
     controller.reconstruction_panel.run("variant.checkpoint", {"name": "Initial alternative"})
     populate(session, target)

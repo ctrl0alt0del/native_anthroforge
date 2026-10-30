@@ -24,7 +24,7 @@ def fiber(controller, bone, y):
     )
     settle(controller)
     points = controller.session.document.object(source).points
-    controller.createConstruction(
+    controller.construction_view.createConstruction(
         "fiber.create",
         dict(
             curve=source, bindings=[dict(point=p.id, target=bone) for p in (points[0], points[-1])]
@@ -39,10 +39,12 @@ def scene(controller):
     bone = controller.run("import", dict(path=path, units=1.0))["entity_id"]
     settle(controller)
     sources = [fiber(controller, bone, y) for y in (-0.2, 0.2)]
-    controller.createConstruction("surface.create", dict(curves=sources, kind="LOFT"))
+    controller.construction_view.createConstruction(
+        "surface.create", dict(curves=sources, kind="LOFT")
+    )
     settle(controller)
     source = controller.selection
-    target = controller.createConstruction("tissue.create", dict(source=source))
+    target = controller.construction_view.createConstruction("tissue.create", dict(source=source))
     configure(controller, target)
     return target
 
@@ -54,7 +56,7 @@ def configure(controller, target):
     )
     controller.run("tissue.inflation", dict(target=target, changes=dict(amount=0.14)))
     settle(controller)
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
 
 
 def frames(controller, renderer, app):
@@ -78,10 +80,10 @@ def exercise(controller, renderer, app):
     output = Path("build/022-tissue")
     output.mkdir(parents=True, exist_ok=True)
     assert image.save(str(output / "tissue-gpu.png"))
-    hovered = controller.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
-    clicked = controller.pick([0, 0, 2], [0, 0, -1], 0, True, 0.005)
+    hovered = controller.selection_view.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
+    clicked = controller.selection_view.pick([0, 0, 2], [0, 0, -1], 0, True, 0.005)
     assert hovered["id"] == clicked["id"] == target, (hovered, clicked)
-    assert controller.selectedData["handle"]
+    assert controller.selection_view.selectedData["handle"]
 
 
 def run(app):

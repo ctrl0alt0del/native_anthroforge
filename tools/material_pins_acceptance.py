@@ -20,7 +20,7 @@ def exercise(controller, window):
     scene(controller)
     membrane = controller.session.document.object(controller.selection)
     fiber = membrane.curves[0].curve
-    controller.select(fiber)
+    controller.selection_view.select(fiber)
     controller.authoring.setEditing(True)
     settle(controller)
     for name, attribute in (

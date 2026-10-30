@@ -121,7 +121,7 @@ def layout_checks(controller, window, output):
     assert window.property("activityOpen")
     click(window, "activityToggle")
     window.resize(1050, 680)
-    controller.select(controller.session.document.entities[1].id)
+    controller.selection_view.select(controller.session.document.entities[1].id)
     QTest.qWait(200)
     assert find(window, "viewport").width() >= 300
     assert find(window, "inspector").width() >= 260
@@ -138,7 +138,7 @@ def verify(controller, window, output):
     panel_controls(controller, window)
     resize_panel(window)
     layout_checks(controller, window, output)
-    controller.replaceDocument("")
+    controller.project_view.replaceDocument("")
     QTest.qWait(300)
     assert not controller.session.document.entities
     assert window.grabWindow().save(str(output / "ui-empty.png"))

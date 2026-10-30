@@ -27,7 +27,7 @@ def publish_markers(controller, sources):
     prune_cache(controller)
     controller.construction.points.synchronize(sources | controller.mirror_records)
     controller.marker_model.synchronize_records(
-        [dict(id=row["id"], item=row) for row in controller.markerRows]
+        [dict(id=row["id"], item=row) for row in controller.viewport_view.markerRows]
     )
 
 

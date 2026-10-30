@@ -81,7 +81,7 @@ def grouping(controller, window):
     keys = ambiguous(controller.session)
     settle(controller)
     for index, key in enumerate(keys):
-        controller.select(key, index > 0)
+        controller.selection_view.select(key, index > 0)
     click(window, "createPatchSurface")
     QTest.qWait(100)
     assert window.property("modalOpen")

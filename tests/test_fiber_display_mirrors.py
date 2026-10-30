@@ -34,8 +34,8 @@ def test_mirror_tubes_share_source_geometry_and_pick_reflected_position(controll
     assert len(controller.fiber_display.accepted) == 1
     assert controller.fiber_display.hits([4, 0, 3], [0, 0, -1])[0]["id"] == mirror
     assert not controller.path_model.active_rows()
-    controller.select(mirror)
-    assert controller.selectedData["readonly"]
+    controller.selection_view.select(mirror)
+    assert controller.selection_view.selectedData["readonly"]
 
 
 def test_mirror_only_and_hidden_source_keep_shared_radius_result(controller):

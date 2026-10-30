@@ -70,7 +70,7 @@ class AssemblyPanel(QObject):
         self.reset()
         self.active = True
         path = QUrl(url).toLocalFile() if QUrl(url).isLocalFile() else url
-        selected = self.controller.selectedId
+        selected = self.controller.selection_view.selectedId
         document = self.controller.session.document
         self.options["parent"] = selected if selected in document.index.entities else ""
         self.controller.run("assembly.inspect", dict(path=path))

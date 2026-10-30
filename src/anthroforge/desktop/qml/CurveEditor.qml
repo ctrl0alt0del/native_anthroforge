@@ -1,21 +1,22 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 
 Item {
     id: editor
     required property var viewport
     required property var keyboard
-    readonly property var interaction: authoring.curveInteraction
+    readonly property var interaction: App.authoring.curveInteraction
     readonly property bool dragging: drag !== null
-    readonly property bool previewActive: visible && !workspace.state.hidden_categories.includes("curves") && !workspace.state.unpickable_categories.includes("curves") && keyboard.held("insertPoint") &&
+    readonly property bool previewActive: visible && !App.runtime.state.hidden_categories.includes("curves") && !App.runtime.state.unpickable_categories.includes("curves") && keyboard.held("insertPoint") &&
         !viewport.transforming && !viewport.navigating && viewport.pointerPosition.x >= 0
     property var pending: null
     property var drag: null
     property string signature: ""
-    visible: !workspace.shortcutComparison.before && !viewport.measuring && authoring.visible && authoring.state.editing && authoring.state.category === "CURVE" &&
-        !!authoring.state.curves?.length && !workspace.selectedData.readonly && !keyboard.blocked
+    visible: !App.shortcutComparison.before && !viewport.measuring && App.authoring.visible && App.authoring.state.editing && App.authoring.state.category === "CURVE" &&
+        !!App.authoring.state.curves?.length && !App.selection.selectedData.readonly && !keyboard.blocked
     function refreshPreview() {
         if(!previewActive) { interaction.clearPreview(); signature=""; return; }
-        const p=viewport.pointerPosition, key=JSON.stringify([p,viewport.cameraState,viewport.distance,width,height,workspace.state.revision]);
+        const p=viewport.pointerPosition, key=JSON.stringify([p,viewport.cameraState,viewport.distance,width,height,App.runtime.state.revision]);
         if(key===signature) return;
         signature=key;
         const ray=viewport.worldRay(p.x,p.y);
@@ -34,7 +35,7 @@ Item {
         viewport.pointerPosition=Qt.point(mouse.x,mouse.y);
         if(pending && Math.hypot(mouse.x-pending.x,mouse.y-pending.y)>=4) {
             interaction.beginPointDrag(pending.extend);
-            if(workspace.beginTransform("Move")) drag=pending;
+            if(App.viewport.beginTransform("Move")) drag=pending;
             pending=null;
         }
         updateDrag();
@@ -44,17 +45,17 @@ Item {
         const p=viewport.pointerPosition, ray=viewport.worldRay(p.x,p.y);
         const delta=viewport.screenTranslationAt({x:p.x-drag.x,y:p.y-drag.y},drag.pivot);
         const values=interaction.movement(ray.origin,ray.direction,delta.concat([0,0,0,1,1,1]),keyboard.held("snapSurface"));
-        workspace.transformDelta(values);
+        App.viewport.transformDelta(values);
     }
     function finish(cancel) {
-        if(drag) workspace.endTransform(cancel);
+        if(drag) App.viewport.endTransform(cancel);
         else if(pending && !cancel) interaction.clickPoint(pending.extend);
         drag=null; pending=null; interaction.clearSnap(); signature="";
     }
     function rebase() {
         if(!drag) return;
         const p=viewport.pointerPosition;
-        drag={x:p.x,y:p.y,pivot:authoring.transformData.trs.slice(0,3),extend:drag.extend};
+        drag={x:p.x,y:p.y,pivot:App.authoring.transformData.trs.slice(0,3),extend:drag.extend};
     }
     onPreviewActiveChanged: refreshPreview()
     onVisibleChanged: { if(!visible) { finish(true); interaction.clearPreview(); } }
@@ -70,5 +71,5 @@ Item {
     }
     Timer { interval: 25; repeat: true; running: editor.previewActive; onTriggered: editor.refreshPreview() }
     Connections { target: keyboard; function onModifiersChanged() { editor.updateDrag(); } }
-    Connections { target: authoring; function onGeometryChanged() { editor.signature=""; } }
+    Connections { target: App.authoring; function onGeometryChanged() { editor.signature=""; } }
 }

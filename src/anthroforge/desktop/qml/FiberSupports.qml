@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -14,7 +15,7 @@ ColumnLayout {
     function update(changes) {
         const values=Object.assign({automatic:policy.automatic,included:policy.included,excluded:policy.excluded},changes);
         values.included=references(values.included); values.excluded=references(values.excluded);
-        workspace.run("fiber.supports.configure", {curve:curve.id,policy:values});
+        App.runtime.run("fiber.supports.configure", {curve:curve.id,policy:values});
     }
     function override(mode) {
         const ref={target:choice.current.id,role:choice.current.role};
@@ -24,8 +25,8 @@ ColumnLayout {
     }
     function remove(row) { const changes={}; changes[row.mode]=policy[row.mode].filter(r=>r.target!==row.target || r.role!==row.role); update(changes); }
     Label { text:"Deformation supports"; color:Theme.muted }
-    UiButton { objectName:"fiberRebindAll"; text:"Rebind all points"; hint:"Recapture current positions on their existing targets"; onClicked:workspace.run("fiber.rebind",{curve:panel.curve.id}) }
-    UiButton { objectName:"fiberReviewPins"; text:"Review pin repairs"; onClicked:workspace.issuePanel.reviewPins(panel.curve.id) }
+    UiButton { objectName:"fiberRebindAll"; text:"Rebind all points"; hint:"Recapture current positions on their existing targets"; onClicked:App.runtime.run("fiber.rebind",{curve:panel.curve.id}) }
+    UiButton { objectName:"fiberReviewPins"; text:"Review pin repairs"; onClicked:App.issuePanel.reviewPins(panel.curve.id) }
     UiCheck { objectName:"fiberSupportsAutomatic"; text:"Automatic supports"; checked:panel.policy.automatic; onClicked:panel.update({automatic:checked}); hint:"Extra surfaces that deform the Fiber; routing obstacles are configured separately" }
     SurfaceSelector { id:choice; Layout.fillWidth:true }
     RowLayout {

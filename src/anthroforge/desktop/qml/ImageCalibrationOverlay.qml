@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -6,7 +7,7 @@ Item {
     id: overlay
     required property var viewport
     anchors.fill: parent
-    readonly property var state: workspace.imageTools.state
+    readonly property var state: App.imageTools.state
     visible: state.active
     Repeater {
         model: overlay.state.points
@@ -26,8 +27,8 @@ Item {
             Label { text: overlay.state.points.length < 2 ? "Pick "+(overlay.state.points.length ? "second" : "first")+" image landmark" : "Distance between landmarks"; color: Theme.text }
             NumericSetting { live: false; visible: overlay.state.points.length === 2; label: "Distance"; length: true; value: overlay.distance; onEdited: value => overlay.distance=value }
             RowLayout {
-                UiButton { text: "Calibrate"; primary: true; enabled: overlay.state.points.length===2 && overlay.distance>0; onClicked: workspace.imageTools.accept(overlay.distance) }
-                UiButton { text: "Cancel"; onClicked: workspace.imageTools.cancel() }
+                UiButton { text: "Calibrate"; primary: true; enabled: overlay.state.points.length===2 && overlay.distance>0; onClicked: App.imageTools.accept(overlay.distance) }
+                UiButton { text: "Cancel"; onClicked: App.imageTools.cancel() }
             }
         }
     }

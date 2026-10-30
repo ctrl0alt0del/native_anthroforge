@@ -19,7 +19,9 @@ from ui_acceptance import find
 def inspect(controller, window):
     exercise(controller, window)
     target = controller.selection
-    controller.createConstruction("construction.point.create", dict(position=[0, 0, 0.8]))
+    controller.construction_view.createConstruction(
+        "construction.point.create", dict(position=[0, 0, 0.8])
+    )
     settle(controller)
     choose_final(controller, window, target)
     click(window, "createOrRebindAnchor")
@@ -28,7 +30,7 @@ def inspect(controller, window):
 
 
 def choose_final(controller, window, target):
-    rows = controller.surfaceRoles()
+    rows = controller.construction_view.surfaceRoles()
     choice = next(
         i for i, row in enumerate(rows) if row["id"] == target and row["role"] == "TISSUE_FINAL"
     )

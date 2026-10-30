@@ -20,7 +20,7 @@ from tissue_stacking_acceptance import (
 def exercise(controller, window):
     _, provider, target = assembly(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
     click(window, "StackingToggle")
     click(window, "tissueStackChoice_" + provider)

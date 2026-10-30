@@ -1,9 +1,10 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 
 Canvas {
     id: overlay
     required property var viewport
-    readonly property var evidence: workspace.inspectionTools.state
+    readonly property var evidence: App.inspectionTools.state
     anchors.fill: parent
     function dot(ctx, point, label) {
         if(!viewport.pointInFront(point)) return null;
@@ -27,5 +28,5 @@ Canvas {
         if(evidence.hover.position) dot(ctx,evidence.hover.position,evidence.start.position ? "B" : "A");
         if(evidence.start.position && evidence.hover.position) ruler(ctx,evidence.start.position,evidence.hover.position,"",false);
     }
-    Connections { target: workspace; function onChanged() { overlay.requestPaint(); } }
+    Connections { target: App.runtime; function onChanged() { overlay.requestPaint(); } }
 }

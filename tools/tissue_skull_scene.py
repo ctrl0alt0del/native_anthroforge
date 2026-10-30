@@ -18,7 +18,7 @@ OUTPUT = Path("build/022-tissue/skull")
 def assembly(controller):
     create(controller.session, OUTPUT)
     membrane = next(o for o in controller.session.document.objects if isinstance(o, Membrane))
-    target = controller.createConstruction(
+    target = controller.construction_view.createConstruction(
         "tissue.create", dict(source=membrane.id, name="Skull fixture tissue")
     )
     controller.run("tissue.configure", dict(target=target, changes=dict(stacking=False)))
@@ -30,7 +30,7 @@ def assembly(controller):
 
 def capture(controller, renderer, app):
     target = assembly(controller)
-    controller.select(target)
+    controller.selection_view.select(target)
     for name, angles in (("front", (0, 0)), ("oblique", (-10, 30)), ("side", (0, 75))):
         controller.cameraRequested.emit([0.15, -0.45, 1.35, *angles, 0, 3], True)
         assert frames(controller, renderer, app).save(str(OUTPUT / (name + ".png")))

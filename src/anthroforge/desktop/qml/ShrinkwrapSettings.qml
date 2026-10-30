@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -7,7 +8,7 @@ ColumnLayout {
     property var binding: ({})
     readonly property var settings: binding.shrinkwrap || ({})
     Layout.fillWidth: true
-    function set(key,value) { const args={binding:binding.id}; args[key]=value; authoring.edit("shrinkwrap.update",args); }
+    function set(key,value) { const args={binding:binding.id}; args[key]=value; App.authoring.edit("shrinkwrap.update",args); }
     SurfaceSelector {
         target: panel.settings.surface?.target || ""
         role: panel.settings.surface?.role || ""
@@ -21,5 +22,5 @@ ColumnLayout {
         currentIndex: modes.indexOf(panel.settings.mode)
         onActivated: panel.set("mode",modes[currentIndex])
     }
-    NumericSetting { propertyReference: ({target:authoring.state.id,path:["deformers","@"+panel.binding.id,"shrinkwrap","offset"]}); objectName:"shrinkwrapOffset"; label: "Offset · target local"; length: true; value: panel.settings.offset || 0; onEdited: value=>panel.set("offset",value) }
+    NumericSetting { propertyReference: ({target:App.authoring.state.id,path:["deformers","@"+panel.binding.id,"shrinkwrap","offset"]}); objectName:"shrinkwrapOffset"; label: "Offset · target local"; length: true; value: panel.settings.offset || 0; onEdited: value=>panel.set("offset",value) }
 }

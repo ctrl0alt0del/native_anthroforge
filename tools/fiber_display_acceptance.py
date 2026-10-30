@@ -36,7 +36,7 @@ def setup(controller):
     controller.session.wait(5)
     key = controller.session.document.objects[0].id
     controller.run("workspace.update", dict(hidden=[target]))
-    controller.select(key)
+    controller.selection_view.select(key)
     controller.authoring.setEditing(False)
     return key
 
@@ -89,7 +89,7 @@ def mirrored(controller, renderer, app, key):
     root = controller.session.document.entities[0].id
     controller.run("mirror.configure", dict(target=root, enabled=True, shift=1))
     mirror = MirrorInstance(key, root).id
-    controller.select(mirror)
+    controller.selection_view.select(mirror)
     controller.cameraRequested.emit([1, 0, 0.501, -90, 0, 0, 4], True)
     image = frames(controller, renderer, app)
     image.save(str(OUTPUT / "source-mirror.png"))

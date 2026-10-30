@@ -48,15 +48,15 @@ def fixture(controller):
 def selected_surface(controller, keys):
     session = controller.session
     for index, key in enumerate(keys):
-        controller.select(key, index > 0)
-    controller.createSurface("AUTO")
+        controller.selection_view.select(key, index > 0)
+    controller.construction_view.createSurface("AUTO")
     session.wait()
     controller.refresh()
     surfaces = [o for o in session.document.objects if isinstance(o, Surface)]
     assert surfaces, controller.message
     item = surfaces[-1]
     assert item.kind == "BRANCHED" and item.result.status == "ready"
-    controller.select(item.id)
+    controller.selection_view.select(item.id)
     controller.cameraRequested.emit([0.5, -0.1, 0.1, -65, 15, 0, 2.1], True)
     return item
 
@@ -73,7 +73,7 @@ def membrane(controller, surface):
     hidden = [bone, surface.id, *(u.curve for u in surface.curves)]
     session.command("workspace.update", hidden=hidden)
     controller.refresh()
-    controller.select(item.id)
+    controller.selection_view.select(item.id)
     return item
 
 

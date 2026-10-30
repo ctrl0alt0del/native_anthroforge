@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 
 Item {
     id: root
     required property var viewport
-    ViewSnapshot { id: evidence; source: workspace.surfaceMeasurements }
+    ViewSnapshot { id: evidence; source: App.surfaceMeasurements }
     Repeater {
         model:evidence.data.lines?.length ? 5 : 0
         Label {

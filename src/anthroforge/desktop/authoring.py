@@ -110,7 +110,7 @@ class Authoring(QObject):
     def visible(self):
         return bool(
             self.active
-            and self.controller.selectedData.get("visible")
+            and self.controller.selection_view.selectedData.get("visible")
             and self.controller.session.workspace.handles
         )
 
@@ -118,13 +118,17 @@ class Authoring(QObject):
     def transformData(self):
         selected = self.selectedPoints
         if not self.active or self.state.get("kind") == "HOOK":
-            return self.controller.selectedData.as_dict()
+            return self.controller.selection_view.selectedData.as_dict()
         if not selected:
-            return self.controller.selectedData.as_dict() if self.state.get("is_control") else {}
+            return (
+                self.controller.selection_view.selectedData.as_dict()
+                if self.state.get("is_control")
+                else {}
+            )
         center = state.selection_center(self, selected)
-        readonly = self.controller.selectedData.get("readonly", False) or state.read_only_selection(
-            self
-        )
+        readonly = self.controller.selection_view.selectedData.get(
+            "readonly", False
+        ) or state.read_only_selection(self)
         return dict(
             id="components", trs=[*center, 0, 0, 0, 1, 1, 1], readonly=readonly, transformable=True
         )
@@ -160,7 +164,7 @@ class Authoring(QObject):
 
     @Slot(bool)
     def setEditing(self, enabled):
-        available = not self.controller.selectedData.get("readonly")
+        available = not self.controller.selection_view.selectedData.get("readonly")
         self.editing = (
             enabled and available and state.component_editing(state.curve_context.owner(self))
         )
@@ -272,7 +276,7 @@ class Authoring(QObject):
     def pick(self, origin, direction, radius, depth, select, extend):
         if (
             not self.visible
-            or not self.controller.selectedData.get("pickable")
+            or not self.controller.selection_view.selectedData.get("pickable")
             or not len(self.rows)
         ):
             return False

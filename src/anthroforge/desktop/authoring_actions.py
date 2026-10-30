@@ -21,7 +21,7 @@ def add_deformer(editor, kind):
         control = create_control(editor, kind)
         bind_selection(editor, control, kind)
         controller.run("commit", {})
-        controller.select(control)
+        controller.selection_view.select(control)
     except Exception as error:
         controller.run("cancel", {})
         report_error(controller, error)
@@ -101,8 +101,8 @@ def selected_indices(editor, rows):
 
 
 def enter_members(editor, target):
-    editor.controller.cancelViewportTools()
-    editor.controller.select(target.owner)
+    editor.controller.viewport_view.cancelViewportTools()
+    editor.controller.selection_view.select(target.owner)
     editor.category = target.stage
     editor.setEditing(True)
 
@@ -294,4 +294,4 @@ def split_scp(editor):
     result = editor.controller.run("scp.split", dict(entity=editor.state["id"], points=points))
     if result:
         editor.setEditing(False)
-        editor.controller.select(result["controls"][-1])
+        editor.controller.selection_view.select(result["controls"][-1])

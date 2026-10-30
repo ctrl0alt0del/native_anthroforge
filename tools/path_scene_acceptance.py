@@ -30,7 +30,7 @@ def fixture(controller):
     key = controller.run("curve.create", dict(points=points, name="Standalone path"))
     controller.session.wait(5)
     controller.refresh()
-    controller.select(key)
+    controller.selection_view.select(key)
     controller.cameraRequested.emit([0, 0, 0.25, 0, 0, 0, 2.5], True)
     return key
 
@@ -58,9 +58,9 @@ def exercise(controller, renderer, app):
     assert image.save(str(OUTPUT / "standalone-curve.png"))
     row = controller.path_model.active_rows()[0]
     assert row["id"] == key and row["geometry_revision"] > 0
-    hit = controller.pick([-0.6, -2, 0], [0, 1, 0], 0, False, 0.02)
+    hit = controller.selection_view.pick([-0.6, -2, 0], [0, 1, 0], 0, False, 0.02)
     assert hit["id"] == key
-    assert controller.pick([-0.6, -2, 0], [0, 1, 0], 0, True, 0.02) == hit
+    assert controller.selection_view.pick([-0.6, -2, 0], [0, 1, 0], 0, True, 0.02) == hit
     check_replacement(controller, renderer, app, key)
     frames(controller, renderer, app).save(str(OUTPUT / "edited-curve.png"))
     affine_parenting(controller, renderer, app, key)

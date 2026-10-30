@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -10,7 +11,7 @@ ColumnLayout {
     property string editorName: "routingObstacle"
     readonly property bool automatic: (settings.obstacle_mode || "AUTO")==="AUTO"
     readonly property var options: RoutingOptions.copy(settings)
-    readonly property var rows: { const revision=workspace.state.revision; return workspace.routingChoices(curve.id || "",options); }
+    readonly property var rows: { const revision=App.runtime.state.revision; return App.construction.routingChoices(curve.id || "",options); }
     signal edited(var settings)
     Layout.fillWidth: true; spacing: Theme.gap
     function update(values) {

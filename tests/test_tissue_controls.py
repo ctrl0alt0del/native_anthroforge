@@ -12,7 +12,7 @@ def control(controller):
     controller.run("tissue.inflation", dict(target=target, changes=dict(mode="CTRL_POINT")))
     controller.session.wait()
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     before = controller.session.document
     controller.authoring.editTissueControl("main", "a")
     assert controller.session.document == before
@@ -24,7 +24,10 @@ def test_control_gesture_commits_once_and_keeps_generated_tissue_nontransformabl
     target = control(controller)
     editor, session = controller.authoring, controller.session
     start, cursor = np.asarray(editor.selectedPoints[0]), session.history.cursor
-    assert editor.transformData["transformable"] and not controller.selectedData["transformable"]
+    assert (
+        editor.transformData["transformable"]
+        and not controller.selection_view.selectedData["transformable"]
+    )
     authoring_actions.start_transform(editor, "Move")
     authoring_actions.transform_delta(editor, [0, 0, 0.03, 0, 0, 0, 1, 1, 1])
     session.commit()

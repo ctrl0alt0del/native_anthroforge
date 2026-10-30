@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -11,16 +12,16 @@ ColumnLayout {
     Layout.fillWidth: true; spacing: Theme.gap
     function updateSetting(key,value) {
         const args={curve:curve.id}; args[key]=value;
-        workspace.run("curve.engine_settings",args);
+        App.runtime.run("curve.engine_settings",args);
     }
     NumericSetting {
         propertyReference: ({target:panel.curve.id,path:["engine_settings","radius"]}); objectName: "routingClearance"; label: "Surface clearance"; length: true; value: panel.settings.radius || 0
         hint: "Desired centerline distance from obstacles. Bound or touching authored points may contact their surface. This is not curve thickness."
         onEdited: value=>panel.updateSetting("radius",value)
     }
-    RoutingObstacles { curve: panel.curve; settings: panel.settings; onEdited: values=>workspace.run("curve.engine_settings",{curve:panel.curve.id,obstacle_mode:values.obstacle_mode,obstacles:values.obstacles || [],excluded_obstacles:values.excluded_obstacles || []}) }
+    RoutingObstacles { curve: panel.curve; settings: panel.settings; onEdited: values=>App.runtime.run("curve.engine_settings",{curve:panel.curve.id,obstacle_mode:values.obstacle_mode,obstacles:values.obstacles || [],excluded_obstacles:values.excluded_obstacles || []}) }
     RouteInspection { }
-    UiButton { objectName:"routingColdRecalculate"; text:"Recalculate from planner"; Layout.fillWidth:true; hint:"Run an authoritative cold calculation; keep the accepted path until success"; onClicked:workspace.run("curve.reroute",{curve:panel.curve.id}) }
+    UiButton { objectName:"routingColdRecalculate"; text:"Recalculate from planner"; Layout.fillWidth:true; hint:"Run an authoritative cold calculation; keep the accepted path until success"; onClicked:App.runtime.run("curve.reroute",{curve:panel.curve.id}) }
     UiButton { id: advanced; objectName: "routingAdvanced"; text: checked ? "▾  Advanced" : "▸  Advanced"; checkable: true; flatStyle: true }
     ColumnLayout {
         visible: advanced.checked; Layout.fillWidth: true

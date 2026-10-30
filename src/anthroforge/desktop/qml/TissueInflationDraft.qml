@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -13,7 +14,7 @@ ColumnLayout {
     property string resetKind: ""
     readonly property bool editing: draft !== null
     readonly property var values: Object.assign({}, inflation, resolved, draft || {})
-    readonly property var preview: workspace.tissuePreview
+    readonly property var preview: App.construction.tissuePreview
     readonly property string selection: target + ":" + part + ":" + side
     Layout.fillWidth: true; spacing: Theme.gap
     onSelectionChanged: if(editing) cancel()
@@ -25,22 +26,22 @@ ColumnLayout {
     }
     function request(reset) {
         if(reset) resetKind=reset;
-        return workspace.run("tissue.preview",{target:target,part:part,side:side,changes:draft,reset:resetKind});
+        return App.runtime.run("tissue.preview",{target:target,part:part,side:side,changes:draft,reset:resetKind});
     }
     function edit(key,value) {
         const changes=Object.assign({},draft || {}); changes[key]=value;
         if(editing) { draft=changes; request(""); }
-        else workspace.run("tissue.inflation",{target:target,part:part,side:side,changes:changes});
+        else App.runtime.run("tissue.inflation",{target:target,part:part,side:side,changes:changes});
     }
     function reset(kind) {
         if(editing) request(kind);
-        else workspace.run(kind==="PROFILE" ? "tissue.profile.reset" : "tissue.control.reset",{target:target,part:part,side:side});
+        else App.runtime.run(kind==="PROFILE" ? "tissue.profile.reset" : "tissue.control.reset",{target:target,part:part,side:side});
     }
     function start() { resolved={}; draft={}; if(!request("")) draft=null; }
-    function cancel() { draft=null; resolved={}; resetKind=""; workspace.run("tissue.preview.cancel",{}); }
+    function cancel() { draft=null; resolved={}; resetKind=""; App.runtime.run("tissue.preview.cancel",{}); }
     function accept() {
-        workspace.run("tissue.preview.accept",{token:preview.token});
-        if(workspace.tissuePreview.state==="idle") { draft=null; resolved={}; resetKind=""; }
+        App.runtime.run("tissue.preview.accept",{token:preview.token});
+        if(App.construction.tissuePreview.state==="idle") { draft=null; resolved={}; resetKind=""; }
     }
     RowLayout {
         Layout.fillWidth: true

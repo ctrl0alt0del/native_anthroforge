@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 ColumnLayout {
     id: panel
-    readonly property var item: authoring.state
+    readonly property var item: App.authoring.state
     readonly property var primitive: item.primitive || {}
     readonly property var curves: item.curves || []
     readonly property var curve: curves[curveChoice.currentIndex] || {}
@@ -14,25 +15,25 @@ ColumnLayout {
     readonly property var piece: (primitive.pieces || []).find(p => p.curve === curve.id) || {}
     readonly property bool topologyLocked: (item.topology_dependents || []).length > 0
     Layout.fillWidth: true; spacing: 8
-    function primitiveSetting(key,value) { authoring.setting("primitive.update",key,value); }
-    function curveSetting(key,value) { const args={entity:item.id,curve:curve.id}; args[key]=value; authoring.edit("curve.update",args); }
-    function pointSetting(key,value) { const args={entity:item.id,curve:curve.id,point:point.id}; args[key]=value; authoring.edit("point.update",args); }
-    function pieceSetting(key,value) { const args={entity:item.id,piece:piece.id}; args[key]=value; authoring.edit("body.update",args); }
+    function primitiveSetting(key,value) { App.authoring.setting("primitive.update",key,value); }
+    function curveSetting(key,value) { const args={entity:item.id,curve:curve.id}; args[key]=value; App.authoring.edit("curve.update",args); }
+    function pointSetting(key,value) { const args={entity:item.id,curve:curve.id,point:point.id}; args[key]=value; App.authoring.edit("point.update",args); }
+    function pieceSetting(key,value) { const args={entity:item.id,piece:piece.id}; args[key]=value; App.authoring.edit("body.update",args); }
     function syncSelection() {
-        const selected=authoring.selectedComponent;
+        const selected=App.authoring.selectedComponent;
         if(!selected.curve || !selected.point) return;
         const curveIndex=panel.curves.findIndex(c=>c.id===selected.curve);
         if(curveIndex<0) return;
         curveChoice.currentIndex=curveIndex;
         pointChoice.currentIndex=panel.curves[curveIndex].points.findIndex(p=>p.id===selected.point);
     }
-    Connections { target: authoring; function onChanged() { panel.syncSelection(); } }
+    Connections { target: App.authoring; function onChanged() { panel.syncSelection(); } }
     UiSection {
         title: panel.item.standalone ? "Curve" : "Primitive"; stateKey:"primitive/main"
         Label { visible: !panel.item.standalone; text: ({LOFT:"Ordered curve loft",BODY:"Curve-deformed body",SEGMENT_CHAIN:"Segment chain",IMPORTED:"Imported mesh"})[panel.primitive.kind] || ""; color: Theme.text }
         CurveEngine { objectName: "standaloneEngine"; visible: !!panel.item.standalone; curve: panel.curve; enabled: !panel.topologyLocked }
-        UiButton { objectName: "editPrimitive"; visible: panel.item.component_editing !== false; text: panel.item.editing ? "Finish editing" : panel.item.standalone ? "Edit Curve" : "Edit Primitive"; checkable: true; checked: panel.item.editing || false; Layout.fillWidth: true; onClicked: authoring.setEditing(!panel.item.editing) }
-        UiCombo { visible: panel.item.editing && panel.primitive.kind === "BODY"; Layout.fillWidth: true; model: ["Curve controls", "Base vertices · Hook assignment"]; currentIndex: panel.item.category === "BASE" ? 1 : 0; onActivated: authoring.setCategory(currentIndex === 1 ? "BASE" : "CURVE") }
+        UiButton { objectName: "editPrimitive"; visible: panel.item.component_editing !== false; text: panel.item.editing ? "Finish editing" : panel.item.standalone ? "Edit Curve" : "Edit Primitive"; checkable: true; checked: panel.item.editing || false; Layout.fillWidth: true; onClicked: App.authoring.setEditing(!panel.item.editing) }
+        UiCombo { visible: panel.item.editing && panel.primitive.kind === "BODY"; Layout.fillWidth: true; model: ["Curve controls", "Base vertices · Hook assignment"]; currentIndex: panel.item.category === "BASE" ? 1 : 0; onActivated: App.authoring.setCategory(currentIndex === 1 ? "BASE" : "CURVE") }
         Label { visible: panel.topologyLocked; text: "Topology locked by child or surface attachments"; color: Theme.accent; wrapMode: Text.WordWrap; Layout.fillWidth: true }
         NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","samples"]}); objectName: "primitiveSamples"; visible: !panel.item.standalone && ["BODY","LOFT"].includes(panel.primitive.kind); label: "Samples"; value: panel.primitive.samples || 32; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.primitiveSetting("samples",Math.round(value)) }
         NumericSetting { propertyReference: ({target:panel.item.id,path:["primitive","strips"]}); visible: panel.primitive.kind === "LOFT"; label: "Across each strip"; value: panel.primitive.strips || 1; decimals: 0; enabled: !panel.topologyLocked; onEdited: value => panel.primitiveSetting("strips",Math.round(value)) }
@@ -41,8 +42,8 @@ ColumnLayout {
         UiCheck { visible: panel.primitive.kind === "LOFT"; text: "Cap closed cross-sections"; checked: panel.primitive.caps || false; enabled: !panel.topologyLocked; onClicked: panel.primitiveSetting("caps",checked) }
         UiNotice { active: panel.visible; text: panel.item.result?.status === "pending" ? "Pending changes · last accepted geometry shown" : "" }
         UiNotice { active: panel.visible; text: panel.item.result?.pending?.length>0 ? "Using accepted support · upstream changes pending" : "" }
-        UiButton { objectName:"replaceImportedMesh"; text:"Replace source mesh"; Layout.fillWidth:true; enabled:workspace.meshReplacement.eligibility.start?.available || false; hint:workspace.meshReplacement.eligibility.start?.reason || "Replace the imported mesh while reviewing affected attachments."; visible:panel.primitive.kind==="IMPORTED"; onClicked:workspace.meshReplacement.choose(panel.item.id) }
-        UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.item.id]}) }
+        UiButton { objectName:"replaceImportedMesh"; text:"Replace source mesh"; Layout.fillWidth:true; enabled:App.meshReplacement.eligibility.start?.available || false; hint:App.meshReplacement.eligibility.start?.reason || "Replace the imported mesh while reviewing affected attachments."; visible:panel.primitive.kind==="IMPORTED"; onClicked:App.meshReplacement.choose(panel.item.id) }
+        UiButton { text: panel.item.standalone ? "Recalculate curve" : "Recalculate this SCP"; Layout.fillWidth: true; onClicked: App.runtime.run("evaluate",{entities:[panel.item.id]}) }
     }
     ParametricInspector { curve: panel.curve; visible: panel.item.standalone && panel.curve.engine === "PARAMETRIC" }
     UiSection { title:"Fiber supports"; stateKey:"fiber/supports"; visible:panel.curve.bindings !== undefined; expanded:false
@@ -52,8 +53,8 @@ ColumnLayout {
         live: false
         visible: panel.curve.bindings !== undefined
         label: "Display radius"; length: true; minimum: 0
-        value: workspace.selectedData.fiber_radius || 0
-        onEdited: value => workspace.run("fiber.presentation", {target:panel.curve.id,radius:value})
+        value: App.selection.selectedData.fiber_radius || 0
+        onEdited: value => App.runtime.run("fiber.presentation", {target:panel.curve.id,radius:value})
     }
 
     }
@@ -63,28 +64,28 @@ ColumnLayout {
         UiCombo { id: curveChoice; objectName: "curveChoice"; Layout.fillWidth: true; model: panel.curves; textRole: "name" }
         ColumnLayout {
             visible: !panel.item.standalone; Layout.fillWidth: true
-            UiCombo { Layout.fillWidth: true; model: ["Shape and transform","Shape only"]; currentIndex: panel.use.mode === "SHAPE_ONLY" ? 1 : 0; hint: "Switching preserves current placement"; onActivated: workspace.run("primitive.curve_mode",{entity:panel.item.id,curve:panel.curve.id,mode:currentIndex===1?"SHAPE_ONLY":"SHAPE_AND_TRANSFORM"}) }
-            UiCheck { text: "Reverse direction"; checked: panel.use.reverse || false; onClicked: workspace.run("primitive.curve_reverse",{entity:panel.item.id,curve:panel.curve.id,enabled:checked}) }
-            UiCheck { objectName:"curveSampleOverride"; text:"Override sample count"; enabled:!panel.topologyLocked; checked:panel.use.samples!==null && panel.use.samples!==undefined; onClicked:workspace.run("consumer.sampling",{entity:panel.item.id,curve:panel.curve.id,samples:checked ? panel.primitive.samples : null}) }
-            NumericSetting { objectName:"curveSamples"; visible:!!panel.use.samples; label:panel.primitive.kind==="LOFT" ? "Minimum loft samples" : "Curve samples"; decimals:0; value:panel.use.samples || 32; enabled:!panel.topologyLocked; onEdited:value=>workspace.run("consumer.sampling",{entity:panel.item.id,curve:panel.curve.id,samples:Math.round(value)}) }
+            UiCombo { Layout.fillWidth: true; model: ["Shape and transform","Shape only"]; currentIndex: panel.use.mode === "SHAPE_ONLY" ? 1 : 0; hint: "Switching preserves current placement"; onActivated: App.runtime.run("primitive.curve_mode",{entity:panel.item.id,curve:panel.curve.id,mode:currentIndex===1?"SHAPE_ONLY":"SHAPE_AND_TRANSFORM"}) }
+            UiCheck { text: "Reverse direction"; checked: panel.use.reverse || false; onClicked: App.runtime.run("primitive.curve_reverse",{entity:panel.item.id,curve:panel.curve.id,enabled:checked}) }
+            UiCheck { objectName:"curveSampleOverride"; text:"Override sample count"; enabled:!panel.topologyLocked; checked:panel.use.samples!==null && panel.use.samples!==undefined; onClicked:App.runtime.run("consumer.sampling",{entity:panel.item.id,curve:panel.curve.id,samples:checked ? panel.primitive.samples : null}) }
+            NumericSetting { objectName:"curveSamples"; visible:!!panel.use.samples; label:panel.primitive.kind==="LOFT" ? "Minimum loft samples" : "Curve samples"; decimals:0; value:panel.use.samples || 32; enabled:!panel.topologyLocked; onEdited:value=>App.runtime.run("consumer.sampling",{entity:panel.item.id,curve:panel.curve.id,samples:Math.round(value)}) }
             Label { Layout.fillWidth: true; wrapMode: Text.WordWrap; color: Theme.muted; text: "Used by: "+(panel.use.users || []).map(u=>u.name).join(", ") }
             RowLayout {
-                UiButton { text: "Select source"; onClicked: workspace.select(panel.curve.id) }
-                UiButton { text: "Make independent"; hint: "Copy this consumer's source with new identities"; onClicked: workspace.run("primitive.make_independent",{entity:panel.item.id,curve:panel.curve.id}) }
+                UiButton { text: "Select source"; onClicked: App.selection.select(panel.curve.id) }
+                UiButton { text: "Make independent"; hint: "Copy this consumer's source with new identities"; onClicked: App.runtime.run("primitive.make_independent",{entity:panel.item.id,curve:panel.curve.id}) }
             }
         }
         RowLayout {
             visible: !panel.item.standalone
-            UiButton { text: "Add"; enabled: !panel.topologyLocked; onClicked: authoring.edit("curve.add",{entity:panel.item.id}) }
-            UiButton { text: "Copy"; enabled: !panel.topologyLocked; onClicked: authoring.edit("curve.add",{entity:panel.item.id,source:panel.curve.id}) }
-            UiButton { text: "Remove"; enabled: !panel.topologyLocked; onClicked: authoring.edit("curve.remove",{entity:panel.item.id,curve:panel.curve.id}) }
+            UiButton { text: "Add"; enabled: !panel.topologyLocked; onClicked: App.authoring.edit("curve.add",{entity:panel.item.id}) }
+            UiButton { text: "Copy"; enabled: !panel.topologyLocked; onClicked: App.authoring.edit("curve.add",{entity:panel.item.id,source:panel.curve.id}) }
+            UiButton { text: "Remove"; enabled: !panel.topologyLocked; onClicked: App.authoring.edit("curve.remove",{entity:panel.item.id,curve:panel.curve.id}) }
         }
         RowLayout {
             visible: !panel.item.standalone
             Repeater {
                 model: [-1,1]
                 UiButton { required property int modelData; text: modelData<0 ? "Earlier" : "Later"; enabled: !panel.topologyLocked && curveChoice.currentIndex+modelData>=0 && curveChoice.currentIndex+modelData<panel.curves.length
-                    onClicked: { const ids=panel.curves.map(c=>c.id), i=curveChoice.currentIndex, j=i+modelData; [ids[i],ids[j]]=[ids[j],ids[i]]; authoring.edit("curve.order",{entity:panel.item.id,curves:ids}); curveChoice.currentIndex=j; } }
+                    onClicked: { const ids=panel.curves.map(c=>c.id), i=curveChoice.currentIndex, j=i+modelData; [ids[i],ids[j]]=[ids[j],ids[i]]; App.authoring.edit("curve.order",{entity:panel.item.id,curves:ids}); curveChoice.currentIndex=j; } }
             }
         }
         UiCheck { text: "Closed curve"; checked: panel.curve.closed || false; enabled: !panel.topologyLocked; onClicked: panel.curveSetting("closed",checked) }
@@ -99,8 +100,8 @@ ColumnLayout {
         Label { text: "Control point"; color: Theme.muted }
         FiberBinding { curve: panel.curve; point: panel.point }
         CurveJunction { curve: panel.curve; point: panel.point }
-        UiButton { objectName:"splitSCP"; text:"Split into connected SCPs"; visible:panel.primitive.kind === "BODY"; enabled:!!authoring.selectedComponent.point; hint:"Split at selected interior guide points; keep children on the first segment and join neighboring ends with shared Hooks."; onClicked:authoring.splitSCP() }
-        UiCombo { id: pointChoice; objectName: "pointChoice"; Layout.fillWidth: true; model: panel.points.map((p,i)=>"Point "+(i+1)); onActivated: { const rows=authoring.componentRows.filter(r=>r.point===panel.point.id && r.part==="position"); if(rows.length) authoring.selectComponent(rows[0].key,false); } }
+        UiButton { objectName:"splitSCP"; text:"Split into connected SCPs"; visible:panel.primitive.kind === "BODY"; enabled:!!App.authoring.selectedComponent.point; hint:"Split at selected interior guide points; keep children on the first segment and join neighboring ends with shared Hooks."; onClicked:App.authoring.splitSCP() }
+        UiCombo { id: pointChoice; objectName: "pointChoice"; Layout.fillWidth: true; model: panel.points.map((p,i)=>"Point "+(i+1)); onActivated: { const rows=App.authoring.componentRows.filter(r=>r.point===panel.point.id && r.part==="position"); if(rows.length) App.authoring.selectComponent(rows[0].key,false); } }
         VectorSetting { propertyReference: ({target:panel.curve.id,path:["points","@"+panel.point.id,"position"]}); enabled: panel.curve.engine !== "PARAMETRIC"; length: true; label: "Point position"; values: panel.point.position || [0,0,0]; onEdited: values => panel.pointSetting("position",values) }
         Repeater {
             model: ["left","right"]
@@ -118,8 +119,8 @@ ColumnLayout {
         UiCheck { objectName: "pointProtectedCrease"; text: "Protect crease"; checked: panel.point.protected_crease || false; hint: "Retain this structural point during tissue stacking"; onClicked: panel.pointSetting("protected_crease",checked) }
         RowLayout {
             enabled: panel.curve.engine !== "PARAMETRIC"
-            UiButton { text: "Insert point"; onClicked: { const p=(panel.point.position || [0,0,0]).slice(); p[0]+=.1; authoring.edit("point.insert",{entity:panel.item.id,curve:panel.curve.id,index:pointChoice.currentIndex+1,point:{position:p}}); } }
-            UiButton { text: "Remove point"; enabled: panel.points.length>(panel.curve.closed?3:2); onClicked: authoring.edit("point.remove",{entity:panel.item.id,curve:panel.curve.id,point:panel.point.id}) }
+            UiButton { text: "Insert point"; onClicked: { const p=(panel.point.position || [0,0,0]).slice(); p[0]+=.1; App.authoring.edit("point.insert",{entity:panel.item.id,curve:panel.curve.id,index:pointChoice.currentIndex+1,point:{position:p}}); } }
+            UiButton { text: "Remove point"; enabled: panel.points.length>(panel.curve.closed?3:2); onClicked: App.authoring.edit("point.remove",{entity:panel.item.id,curve:panel.curve.id,point:panel.point.id}) }
         }
     }
     UiSection {

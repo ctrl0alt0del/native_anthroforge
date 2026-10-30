@@ -47,7 +47,7 @@ def fixture_entities(controller, height):
 
 def fixture(controller, window, height):
     body = fixture_entities(controller, height)
-    controller.select(body)
+    controller.selection_view.select(body)
     controller.authoring.setEditing(True)
     window.resize(1500, 950)
     controller.cameraRequested.emit([0, 0, 0, -90, 0, 0, 3], True)

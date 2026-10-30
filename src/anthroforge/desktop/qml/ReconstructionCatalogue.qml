@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 ColumnLayout {
     id: pane
-    readonly property var service: workspace.reconstructionPanel
+    readonly property var service: App.reconstructionPanel
     readonly property var records: JSON.parse(service.dataJson)
     readonly property var catalogue: records.detail || ({})
     property string typeId: ""
@@ -35,17 +36,17 @@ ColumnLayout {
     Label { text: "Selected anatomy"; color: Theme.text; font.bold: true }
     RowLayout {
         UiCombo { id: side; Layout.fillWidth: true; model: ["Unspecified","Left","Right","Midline"] }
-        UiButton { text: "Assign type"; enabled: !!pane.typeId && workspace.selectedObjects.length>0; onClicked: pane.service.assignSelection(pane.typeId,side.currentText.toUpperCase()) }
-        UiButton { text: "Clear"; enabled: workspace.selectedObjects.length>0; onClicked: pane.service.assignSelection("","UNSPECIFIED") }
+        UiButton { text: "Assign type"; enabled: !!pane.typeId && App.selection.selectedObjects.length>0; onClicked: pane.service.assignSelection(pane.typeId,side.currentText.toUpperCase()) }
+        UiButton { text: "Clear"; enabled: App.selection.selectedObjects.length>0; onClicked: pane.service.assignSelection("","UNSPECIFIED") }
     }
-    Label { Layout.fillWidth: true; color: Theme.muted; wrapMode: Text.Wrap; text: (pane.catalogue.assignments || []).filter(r=>workspace.selectedObjects.includes(r.target)).map(r=>(pane.catalogue.types || []).find(t=>t.id===r.type_id)?.name+" · "+r.side).join("\n") }
-    UiField { placeholderText: "Instance label"; Layout.fillWidth: true; enabled: workspace.selectedObjects.length===1; text: (pane.catalogue.assignments || []).find(r=>r.target===workspace.selectedId)?.label || ""; onEditingFinished: {const a=(pane.catalogue.assignments || []).find(r=>r.target===workspace.selectedId); if(a) pane.service.run("catalogue.assign",{target:a.target,type_id:a.type_id,side:a.side,label:text,variant:pane.records.active});} }
+    Label { Layout.fillWidth: true; color: Theme.muted; wrapMode: Text.Wrap; text: (pane.catalogue.assignments || []).filter(r=>App.selection.selectedObjects.includes(r.target)).map(r=>(pane.catalogue.types || []).find(t=>t.id===r.type_id)?.name+" · "+r.side).join("\n") }
+    UiField { placeholderText: "Instance label"; Layout.fillWidth: true; enabled: App.selection.selectedObjects.length===1; text: (pane.catalogue.assignments || []).find(r=>r.target===App.selection.selectedId)?.label || ""; onEditingFinished: {const a=(pane.catalogue.assignments || []).find(r=>r.target===App.selection.selectedId); if(a) pane.service.run("catalogue.assign",{target:a.target,type_id:a.type_id,side:a.side,label:text,variant:pane.records.active});} }
     UiField { id: collectionName; Layout.fillWidth: true; placeholderText: "Collection name" }
-    UiButton { text: "Collect selected anatomy"; Layout.fillWidth: true; enabled: !!collectionName.text.trim() && workspace.selectedObjects.length>0; onClicked: pane.service.run("catalogue.collection.set",{name:collectionName.text,members:workspace.selectedObjects}) }
+    UiButton { text: "Collect selected anatomy"; Layout.fillWidth: true; enabled: !!collectionName.text.trim() && App.selection.selectedObjects.length>0; onClicked: pane.service.run("catalogue.collection.set",{name:collectionName.text,members:App.selection.selectedObjects}) }
     UiSearchChoice { Layout.fillWidth: true; text: pane.collection.name || "Find a collection"; choices: pane.catalogue.collections || []; onChosen: row=>{pane.collection=row; collectionName.text=row.name; pane.service.selectMembers(row.members);} }
     RowLayout {
         UiButton { text: "Rename"; enabled: !!pane.collection.id && !!collectionName.text.trim(); onClicked: pane.service.run("catalogue.collection.set",{collection:pane.collection.id,name:collectionName.text,members:pane.collection.members}) }
-        UiButton { text: "Replace members"; enabled: !!pane.collection.id; hint: "Use the current anatomical selection as this collection's members"; onClicked: pane.service.run("catalogue.collection.set",{collection:pane.collection.id,name:collectionName.text,members:workspace.selectedObjects}) }
+        UiButton { text: "Replace members"; enabled: !!pane.collection.id; hint: "Use the current anatomical selection as this collection's members"; onClicked: pane.service.run("catalogue.collection.set",{collection:pane.collection.id,name:collectionName.text,members:App.selection.selectedObjects}) }
         UiButton { text: "Remove"; enabled: !!pane.collection.id; onClicked: {pane.service.run("catalogue.collection.remove",{id:pane.collection.id});pane.collection={};} }
     }
 }

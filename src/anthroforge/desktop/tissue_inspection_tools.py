@@ -223,7 +223,7 @@ class TissueInspectionTools(QObject):
     def arm(self):
         if self.controller.session.history.before is not None:
             raise ValueError("Finish the current edit before selecting an inspection point.")
-        self.controller.cancelViewportTools(self)
+        self.controller.viewport_view.cancelViewportTools(self)
         self.armed = not self.armed
         self.finding, self.lines = "", []
         self.notify()

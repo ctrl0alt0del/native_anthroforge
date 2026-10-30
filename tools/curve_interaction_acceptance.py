@@ -45,7 +45,7 @@ def fixture(controller, window):
     entity = controller.run("primitive.create", dict(kind="LOFT", parent=root))
     targets = [cube(controller, root, x, z) for x, z in ((-0.55, -0.6), (0.55, -0.3))]
     controller.run("scp.transform", dict(entity=entity, values=[0, 0, 0.3, 0, 0, 20, 1.2, 0.8, 1]))
-    controller.select(entity)
+    controller.selection_view.select(entity)
     controller.authoring.setEditing(True)
     settle(controller)
     window.resize(1500, 950)

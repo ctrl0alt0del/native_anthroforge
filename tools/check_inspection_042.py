@@ -34,7 +34,7 @@ def fixture(controller):
     target = session.command("import", path="examples/primitives/cube.obj", units=1)["entity_id"]
     session.wait()
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     return target
 
 
@@ -67,7 +67,7 @@ def settle(app, controller, renderer, name):
 
 
 def qualify(app, controller, renderer, target):
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     controller.section_tools.enable(True)
     controller.section_tools.request()
     controller.surface_measurements.show(target, "final")
@@ -95,7 +95,6 @@ def placement(app, controller, renderer):
 
 def inspector(app, controller, renderer):
     controller.workbench = WorkbenchState(controller, OUTPUT / "workbench.ini")
-    renderer.engine.rootContext().setContextProperty("workbench", controller.workbench)
     for key in ("inspect/size", "inspect/placement"):
         controller.workbench.setExpanded(key, True)
     renderer.root.setVisible(False)

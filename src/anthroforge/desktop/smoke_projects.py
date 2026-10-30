@@ -12,7 +12,7 @@ def start(controller):
     session = controller.session
     session.command("preferences.set", autosave_enabled=True)
     session.replace_document(name="Recovery smoke edit")
-    saver = controller.project_library.autosave
+    saver = controller.project_view.library.autosave
     saver.poll(session)
     saver.due = 0
     saver.poll(session)
@@ -20,9 +20,9 @@ def start(controller):
 
 
 def show_when_saved(controller):
-    saver = controller.project_library.autosave
+    saver = controller.project_view.library.autosave
     if saver.job is not None:
         QTimer.singleShot(50, lambda: show_when_saved(controller))
         return
     if saver.last:
-        controller.project_library.showRecovery()
+        controller.project_view.library.showRecovery()

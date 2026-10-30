@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Dialogs
 
@@ -7,8 +8,8 @@ FileDialog {
     title: "Import reference image"
     nameFilters: ["Reference images (*.png *.jpg *.jpeg)"]
     function request(parentId,axis) {
-        if(workspace.imageTools.prepareImport(parentId,axis)) open();
+        if(App.imageTools.prepareImport(parentId,axis)) open();
     }
-    onAccepted: workspace.imageTools.acceptImport(selectedFile.toString())
-    onRejected: workspace.imageTools.cancelImport()
+    onAccepted: App.imageTools.acceptImport(selectedFile.toString())
+    onRejected: App.imageTools.cancelImport()
 }

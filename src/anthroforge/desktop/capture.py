@@ -58,8 +58,8 @@ def draw(app, controller, renderer, settings=None):
     controller.fiber_display.prepare_capture()
     stage_geometry(app, controller, renderer)
     if settings is None and controller.rows:
-        controller.select(controller.rows[0]["id"])
-        controller.frameSelection()
+        controller.selection_view.select(controller.rows[0]["id"])
+        controller.viewport_view.frameSelection()
     for _ in range(3):
         app.processEvents()
         image = renderer.frame()
@@ -74,7 +74,7 @@ def inspection_view(controller, settings):
     session.active_workspace = settings["workspace"]
     controller.refresh()
     controller.cameraRequested.emit(settings["camera"], settings["orthographic"])
-    controller.select(settings["selected"])
+    controller.selection_view.select(settings["selected"])
     controller.authoring.setEditing(settings["editing"])
     restore(controller, settings.get("tissue"))
     controller.route_inspection.restore(settings.get("route"))

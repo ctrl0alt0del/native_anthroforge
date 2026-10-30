@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -9,14 +10,14 @@ UiSection {
     readonly property var interval: config.interval || {}
     readonly property var variables: config.variables || []
     readonly property var resolutionReference: ({target:curve.id,path:["engine_settings","resolution"]})
-    readonly property var resolutionState: visible ? workspace.shortcutPanel.propertyState(resolutionReference,workspace.shortcutPanel.propertyQueries.versions[resolutionReference.target] || 0) : ({})
-    readonly property string samplingReason: visible ? authoring.samplingLockReason(curve.id || "",workspace.shortcutPanel.propertyQueries.versions[curve.id] || 0) : ""
+    readonly property var resolutionState: visible ? App.shortcutPanel.propertyState(resolutionReference,App.shortcutPanel.propertyQueries.versions[resolutionReference.target] || 0) : ({})
+    readonly property string samplingReason: visible ? App.authoring.samplingLockReason(curve.id || "",App.shortcutPanel.propertyQueries.versions[curve.id] || 0) : ""
     title: "Parametric equations"
     visible: curve.engine === "PARAMETRIC"
     UiNotice { active: panel.visible; text: panel.curve.result?.status === "failed" && !panel.curve.result?.asset ? "Invalid Parametric curve · straight-line placeholder only; consumers require an accepted path" : "" }
-    function configure(changes) { workspace.run("curve.parametric.configure",{curve:curve.id,changes:changes}); }
+    function configure(changes) { App.runtime.run("curve.parametric.configure",{curve:curve.id,changes:changes}); }
     function setting(name,value) { const changes={}; changes[name]=value; configure(changes); }
-    function variable(id,changes) { workspace.run("curve.parametric.variable.update",{curve:curve.id,variable:id,changes:changes}); }
+    function variable(id,changes) { App.runtime.run("curve.parametric.variable.update",{curve:curve.id,variable:id,changes:changes}); }
     Repeater {
         model: ["x","y","z"]
         RowLayout {
@@ -42,7 +43,7 @@ UiSection {
     RowLayout {
         Layout.fillWidth: true
         Label { text: "Variables"; color: Theme.text; Layout.fillWidth: true }
-        UiButton { objectName: "addParametricVariable"; text: "+ Variable"; onClicked: { let i=1; while(panel.variables.some(v=>v.name==="v"+i)) ++i; workspace.run("curve.parametric.variable.add",{curve:panel.curve.id,name:"v"+i}); } }
+        UiButton { objectName: "addParametricVariable"; text: "+ Variable"; onClicked: { let i=1; while(panel.variables.some(v=>v.name==="v"+i)) ++i; App.runtime.run("curve.parametric.variable.add",{curve:panel.curve.id,name:"v"+i}); } }
     }
     ListView {
         objectName: "parametricVariables"; Layout.fillWidth: true; Layout.preferredHeight: Math.min(440,count*160)
@@ -53,7 +54,7 @@ UiSection {
             RowLayout {
                 Layout.fillWidth: true
                 UiField { Layout.fillWidth: true; text: modelData.name; placeholderText: "Expression name"; onEditingFinished: panel.variable(modelData.id,{name:text}) }
-                UiButton { text: "×"; hint: "Remove variable"; onClicked: workspace.run("curve.parametric.variable.remove",{curve:panel.curve.id,variable:modelData.id}) }
+                UiButton { text: "×"; hint: "Remove variable"; onClicked: App.runtime.run("curve.parametric.variable.remove",{curve:panel.curve.id,variable:modelData.id}) }
             }
             UiField { Layout.fillWidth: true; text: modelData.label || ""; placeholderText: "Display label (optional)"; onEditingFinished: panel.variable(modelData.id,{label:text}) }
             RowLayout {
@@ -63,7 +64,7 @@ UiSection {
             }
             RowLayout {
                 Layout.fillWidth: true
-                UiQuantityField { id: variableValue; objectName: "parametricVariable"+modelData.id; propertyReference: ({target:panel.curve.id,path:["engine_settings","variables","@"+modelData.id,"value"]}); Layout.fillWidth: true; canonicalValue: workspace.shortcutPanel.propertyText(propertyReference,workspace.state.revision); numericType: modelData.numeric_type; dimension: modelData.dimension; onCanonicalEdited: value => panel.variable(modelData.id,{value:value}) }
+                UiQuantityField { id: variableValue; objectName: "parametricVariable"+modelData.id; propertyReference: ({target:panel.curve.id,path:["engine_settings","variables","@"+modelData.id,"value"]}); Layout.fillWidth: true; canonicalValue: App.shortcutPanel.propertyText(propertyReference,App.runtime.state.revision); numericType: modelData.numeric_type; dimension: modelData.dimension; onCanonicalEdited: value => panel.variable(modelData.id,{value:value}) }
                 Label { text: variableValue.unitLabel; color: Theme.muted; Layout.preferredWidth: 20 }
             }
         }

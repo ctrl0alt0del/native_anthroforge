@@ -94,7 +94,7 @@ def verify_skin_display(controller, window):
 
 
 def contributor_controls(controller, window):
-    controller.select(controller.session.document.entities[0].id)
+    controller.selection_view.select(controller.session.document.entities[0].id)
     window.resize(1050, 1600)
     QTest.qWait(100)
     effective_controls(controller, window)
@@ -144,7 +144,7 @@ def collagen_button(controller, window):
 def fiber_controls(controller, window):
     fiber = create_fiber(controller.session)
     controller.refresh()
-    controller.select(fiber.id)
+    controller.selection_view.select(fiber.id)
     controller.run("workspace.update", dict(display_units="mm"))
     window.resize(1050, 1300)
     QTest.qWait(100)

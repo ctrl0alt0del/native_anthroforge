@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick3D
 import AnthroForge.Native 1.0
 
 Node {
     required property real distance
-    ViewSnapshot { id: evidence; source: workspace.routeInspection }
+    ViewSnapshot { id: evidence; source: App.routeInspection }
     Repeater3D {
         model: evidence.data.paths || []
         delegate: Model {

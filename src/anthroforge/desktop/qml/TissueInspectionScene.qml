@@ -1,6 +1,7 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 
 InspectionScene {
-    geometryModel: workspace.tissueInspection.geometry
-    evidenceSource: workspace.tissueInspection
+    geometryModel: App.tissueInspection.geometry
+    evidenceSource: App.tissueInspection
 }

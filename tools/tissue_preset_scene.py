@@ -16,7 +16,9 @@ def membranes(controller, renderer, app):
     source = controller.session.document.object(original).source
     controller.run("object.delete", dict(target=original))
     for preset in ("LAYER", "POUCH"):
-        target = controller.createConstruction("tissue.create", dict(source=source, preset=preset))
+        target = controller.construction_view.createConstruction(
+            "tissue.create", dict(source=source, preset=preset)
+        )
         if preset == "POUCH":
             controller.run("tissue.relaxation", dict(target=target, changes=dict(mode="NONE")))
         controller.run("tissue.configure", dict(target=target, changes=dict(reverse=True)))
@@ -43,7 +45,9 @@ def pouch(controller, renderer, app, target):
 def paths(controller, renderer, app):
     membrane = next(o for o in controller.session.document.objects if isinstance(o, Membrane))
     source = membrane.curves[0].curve
-    controller.createConstruction("tissue.create", dict(source=source, preset="RIM"))
+    controller.construction_view.createConstruction(
+        "tissue.create", dict(source=source, preset="RIM")
+    )
     capture(controller, renderer, app, "preset-rim")
 
 

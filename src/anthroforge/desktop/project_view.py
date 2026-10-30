@@ -4,12 +4,12 @@ from PySide6.QtCore import QTimer
 
 
 def prepare(controller, project):
-    controller.camera_workspace = None
-    controller.restore_camera()
+    controller.viewport_view.camera_workspace = None
+    controller.viewport_view.restore_camera()
     if project and controller.session.document.entities:
-        controller.select(controller.session.document.entities[0].id)
+        controller.selection_view.select(controller.session.document.entities[0].id)
         if controller.session.workspace.camera == (0.0, 0.0, 0.0, -20.0, 25.0, 0.0, 4.0):
-            QTimer.singleShot(100, controller.frameSelection)
+            QTimer.singleShot(100, controller.viewport_view.frameSelection)
 
 
 def adopted(controller):

@@ -34,19 +34,19 @@ def fixture(controller):
     controller.session.wait(5)
     target = next(o.id for o in controller.session.document.objects if isinstance(o, Surface))
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.cameraRequested.emit([0, 0, 0, 0, 0, 0, 2.5], True)
     return target, keys
 
 
 def pick(controller, target):
-    hit = controller.pick([0, -2, 0], [0, 1, 0], 0, False, 0.02)
+    hit = controller.selection_view.pick([0, -2, 0], [0, 1, 0], 0, False, 0.02)
     assert hit.get("id") == target, (
         hit,
         controller.pick_ids,
         controller.render_model.active_rows(),
     )
-    assert controller.pick([0, -2, 0], [0, 1, 0], 0, True, 0.02) == hit
+    assert controller.selection_view.pick([0, -2, 0], [0, 1, 0], 0, True, 0.02) == hit
     assert target not in controller.snap_ids
 
 

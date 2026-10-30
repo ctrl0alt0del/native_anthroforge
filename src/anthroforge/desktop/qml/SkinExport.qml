@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -8,7 +9,7 @@ UiButton {
     objectName: "skinExport"
     text: "Export skin…"
     Layout.fillWidth: true
-    property var panel: workspace.skinPanel
+    property var panel: App.skinPanel
     property string destination: ""
     enabled: panel.readiness.export.available && !panel.exporter.busy
     hint: panel.readiness.export.reason || "Export final skin as OBJ, in metres."
@@ -18,7 +19,7 @@ UiButton {
         defaultSuffix: "obj"; nameFilters: ["Wavefront OBJ (*.obj)"]
         onAccepted: {
             button.destination=selectedFile.toString();
-            if(button.panel.readiness.export.warnings.length || workspace.state.blocked) policy.open();
+            if(button.panel.readiness.export.warnings.length || App.runtime.state.blocked) policy.open();
             else button.panel.exporter.start(button.destination,"accepted");
         }
     }

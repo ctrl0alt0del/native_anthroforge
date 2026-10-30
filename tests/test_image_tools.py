@@ -7,11 +7,11 @@ from tests.test_reference_images import source
 
 def test_parent_and_owner_are_captured_before_file_picker(controller, tmp_path):
     parent = controller.run("scp.empty", dict(name="Parent"))
-    controller.select(parent)
+    controller.selection_view.select(parent)
     tool = controller.image_tools
     assert tool.prepareImport(parent, "X")
     other = controller.run("curve.create", {})
-    controller.select(other)
+    controller.selection_view.select(other)
     tool.acceptImport(source(tmp_path))
     settle(controller)
     item = controller.session.document.object(controller.selection)
@@ -21,7 +21,7 @@ def test_parent_and_owner_are_captured_before_file_picker(controller, tmp_path):
 
 def test_world_import_never_implicitly_parents_to_selection(controller, tmp_path):
     parent = controller.run("scp.empty", dict(name="Parent"))
-    controller.select(parent)
+    controller.selection_view.select(parent)
     assert controller.image_tools.prepareImport("", "Z")
     controller.image_tools.acceptImport(source(tmp_path))
     settle(controller)

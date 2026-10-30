@@ -175,7 +175,7 @@ def verify_root_deleted(controller, root, before):
     controller.run("undo", {})
     settle(controller)
     assert controller.session.document.entity(root)
-    controller.select(root)
+    controller.selection_view.select(root)
 
 
 def tree_delete(controller, window):
@@ -196,7 +196,7 @@ def curve_presentation(controller, window):
     )
     controller.authoring.create("BODY", "CAPSULE")
     settle(controller)
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     click(window, "toolMove")
     QTest.keyClick(window, Qt.Key.Key_1)
     surface = find(window, "surface_" + controller.selection + "_0")
@@ -276,7 +276,7 @@ def fixture():
     controller.run("scp.transform", dict(entity=child, values=[1, 0, 0, 0, 0, 0, 0.2, 0.2, 0.2]))
     controller.run("scp.transform", dict(entity=root, values=[0, 0, 0, 0, 0, 25, 1, 1, 1]))
     settle(controller)
-    controller.select(root)
+    controller.selection_view.select(root)
     return controller
 
 

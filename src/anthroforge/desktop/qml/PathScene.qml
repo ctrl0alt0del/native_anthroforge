@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick3D
 import AnthroForge.Native 1.0
@@ -5,13 +6,13 @@ import AnthroForge.Native 1.0
 Repeater3D {
     property var effects: ({})
     id: paths
-    model: workspace.pathModel
+    model: App.viewport.pathModel
     delegate: Node {
         required property var item
         Model {
             id: path
             objectName: "path_" + item.id + "_" + item.chunk
-            visible: !workspace.shortcutComparison.before && item.active && item.visible && (item.placeholder || !(authoring.state.editing && workspace.selectedId === item.id))
+            visible: !App.shortcutComparison.before && item.active && item.visible && (item.placeholder || !(App.authoring.state.editing && App.selection.selectedId === item.id))
             geometry: PathGeometry { assetId: item.handle; chunk: item.chunk }
             // Instances own the complete application-Z-up to Qt-Y-up frame.
             // Keeping this outside the rotated anatomy node avoids an ambiguous instance root.
@@ -21,7 +22,7 @@ Repeater3D {
             opacity: (item.context_dimmed ?? item.readonly) ? .12 : 1
             materials: DefaultMaterial {
                 lighting: DefaultMaterial.NoLighting
-                diffuseColor: item.placeholder ? Theme.danger : item.preview ? Theme.success : workspace.selectedObjects.includes(item.id) ? Theme.accent : workspace.hoveredId === item.id ? Theme.curveHoverColor : Theme.curveColor
+                diffuseColor: item.placeholder ? Theme.danger : item.preview ? Theme.success : App.selection.selectedObjects.includes(item.id) ? Theme.accent : App.selection.hoveredId === item.id ? Theme.curveHoverColor : Theme.curveColor
                 lineWidth: 2
             }
         }

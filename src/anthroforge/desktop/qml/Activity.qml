@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -9,7 +10,7 @@ ColumnLayout {
         objectName: "activityList"
         Layout.fillWidth: true; Layout.fillHeight: true
         clip: true
-        model: workspace.activityModel
+        model: App.activityModel
         spacing: 4
         delegate: RowLayout {
             id: jobRow
@@ -29,19 +30,19 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Label { text: jobRow.label + " · " + jobRow.jobState; color: jobRow.error ? "#edab91" : "#bbcede"; elide: Text.ElideRight; Layout.fillWidth: true }
                 Label { text: jobRow.error || jobRow.progress + " · " + jobRow.elapsed.toFixed(2) + " s · " + jobRow.targets; color: "#839aaf"; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
-                Label { visible: workspace.state.diagnostics; text: jobRow.scheduling; color: Theme.muted; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
+                Label { visible: App.runtime.state.diagnostics; text: jobRow.scheduling; color: Theme.muted; font.pixelSize: 10; elide: Text.ElideRight; Layout.fillWidth: true }
             }
             UiButton {
                 visible: jobRow.retryable
                 objectName: "retryJob-" + jobRow.jobId
                 text: "Retry"
-                onClicked: workspace.run("job.retry",{job_id:jobRow.jobId})
+                onClicked: App.runtime.run("job.retry",{job_id:jobRow.jobId})
             }
             UiButton {
                 visible: jobRow.cancellable
                 objectName: "cancelJob-" + jobRow.jobId
                 text: "Cancel"
-                onClicked: workspace.run("job.cancel",{job_id:jobRow.jobId})
+                onClicked: App.runtime.run("job.cancel",{job_id:jobRow.jobId})
             }
         }
     }

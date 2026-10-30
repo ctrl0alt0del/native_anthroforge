@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -6,12 +7,12 @@ UiSection {
     id: editor
     required property var selected
     objectName: "objectTransform"
-    enabled: !!selected.transformable && !selected.readonly && !workspace.state.waiting
+    enabled: !!selected.transformable && !selected.readonly && !App.runtime.state.waiting
     title: selected.parent ? "Local transform" : "Transform"
     function setGroup(group,values) {
         const transformed=selected.local_trs.slice();
         transformed.splice(group*3,3,...values);
-        workspace.run("object.transform",{target:selected.id,values:transformed});
+        App.runtime.run("object.transform",{target:selected.id,values:transformed});
     }
     VectorSetting { propertyReference: ({target:editor.selected.id,path:["transform","position"]}); label: "Position"; length: true; values: editor.selected.local_trs?.slice(0,3) || [0,0,0]; onEdited: values => editor.setGroup(0,values) }
     VectorSetting { label: "Rotation · °"; step: 1; values: editor.selected.local_trs?.slice(3,6) || [0,0,0]; onEdited: values => editor.setGroup(1,values) }

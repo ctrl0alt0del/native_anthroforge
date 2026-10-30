@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -10,18 +11,18 @@ UiDialog {
     parent: Overlay.overlay
     modal: true; focus: true; closePolicy: Popup.NoAutoClose
     width: Math.min(1200,parent.width-40); height: Math.min(820,parent.height-40)
-    readonly property var status: reportBrowser.state
+    readonly property var status: App.reportBrowser.state
     property bool editingDescription: false
-    onOpened: { zoom.currentIndex=0; reportBrowser.refresh(); }
-    onClosed: { editingDescription=false; reportBrowser.dismiss(); }
-    Connections { target: reportBrowser; function onDescriptionSaved() { dialog.editingDescription=false; } }
+    onOpened: { zoom.currentIndex=0; App.reportBrowser.refresh(); }
+    onClosed: { editingDescription=false; App.reportBrowser.dismiss(); }
+    Connections { target: App.reportBrowser; function onDescriptionSaved() { dialog.editingDescription=false; } }
     ColumnLayout {
         anchors.fill: parent; spacing: Theme.gap
         RowLayout {
             Layout.fillWidth: true
             Label { text: dialog.status.count + " saved reports"; color: Theme.muted }
             Item { Layout.fillWidth: true }
-            UiButton { objectName: "reportsRefresh"; text: "Refresh"; enabled: !dialog.status.busy && !dialog.editingDescription; onClicked: reportBrowser.refresh() }
+            UiButton { objectName: "reportsRefresh"; text: "Refresh"; enabled: !dialog.status.busy && !dialog.editingDescription; onClicked: App.reportBrowser.refresh() }
         }
         RowLayout {
             Layout.fillWidth: true; Layout.fillHeight: true; spacing: Theme.inset
@@ -30,7 +31,7 @@ UiDialog {
                 color: Theme.field; border.color: Theme.border; radius: Theme.radius
                 ListView {
                     id: reports; objectName: "reportsList"; anchors.fill: parent; anchors.margins: 1
-                    clip: true; reuseItems: true; spacing: 1; model: reportBrowser.reports
+                    clip: true; reuseItems: true; spacing: 1; model: App.reportBrowser.reports
                     ScrollBar.vertical: ScrollBar {}
                     delegate: ItemDelegate {
                         required property string key
@@ -40,7 +41,7 @@ UiDialog {
                         required property string error
                         width: reports.width; height: 82; padding: Theme.inset
                         enabled: !dialog.status.busy && !dialog.editingDescription; highlighted: dialog.status.key===key
-                        onClicked: { zoom.currentIndex=0; reportBrowser.select(key); }
+                        onClicked: { zoom.currentIndex=0; App.reportBrowser.select(key); }
                         background: Rectangle { color: parent.highlighted ? Theme.selection : parent.hovered ? Theme.hover : "transparent" }
                         contentItem: ColumnLayout {
                             spacing: 4
@@ -67,7 +68,7 @@ UiDialog {
                         contentHeight: zoom.currentIndex===0 ? height : Math.max(height,dialog.status.height)
                         ScrollBar.horizontal: ScrollBar {}
                         ScrollBar.vertical: ScrollBar {}
-                        ReportImage { objectName: "reportPreviewImage"; width: imageView.contentWidth; height: imageView.contentHeight; image: reportBrowser.image }
+                        ReportImage { objectName: "reportPreviewImage"; width: imageView.contentWidth; height: imageView.contentHeight; image: App.reportBrowser.image }
                     }
                     Label { anchors.centerIn: parent; visible: dialog.status.width===0; text: dialog.status.busy ? "Loading…" : "Select a report to preview"; color: Theme.muted }
                 }
@@ -75,7 +76,7 @@ UiDialog {
                     Layout.fillWidth: true
                     Label { text: "Description"; color: Theme.muted; Layout.fillWidth: true }
                     UiButton { objectName: "reportEditCancel"; text: "Discard"; visible: dialog.editingDescription; enabled: !dialog.status.busy; onClicked: dialog.editingDescription=false }
-                    UiButton { objectName: "reportEditSave"; text: "Save text"; primary: true; visible: dialog.editingDescription; enabled: !dialog.status.busy && !!description.text.trim(); onClicked: reportBrowser.saveDescription(description.text) }
+                    UiButton { objectName: "reportEditSave"; text: "Save text"; primary: true; visible: dialog.editingDescription; enabled: !dialog.status.busy && !!description.text.trim(); onClicked: App.reportBrowser.saveDescription(description.text) }
                 }
                 UiScrollView {
                     Layout.fillWidth: true; Layout.preferredHeight: 130
@@ -109,7 +110,7 @@ UiDialog {
             RowLayout {
                 Layout.alignment: Qt.AlignRight
                 UiButton { objectName: "reportDeleteCancel"; text: "Cancel"; onClicked: removal.close() }
-                UiButton { objectName: "reportDeleteConfirm"; text: "Delete report"; onClicked: { const key=removal.reportKey; removal.close(); reportBrowser.deleteReport(key); } }
+                UiButton { objectName: "reportDeleteConfirm"; text: "Delete report"; onClicked: { const key=removal.reportKey; removal.close(); App.reportBrowser.deleteReport(key); } }
             }
         }
     }

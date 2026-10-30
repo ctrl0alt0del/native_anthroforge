@@ -18,7 +18,7 @@ from tests.test_tissue_parts_workflow import branched_tissue
 def exercise(controller, renderer, app):
     _, target, branch = branched_tissue(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.run("tissue.inflation", dict(target=target, changes=dict(amount=0.15)))
     controller.run("tissue.connector", dict(target=target, part=branch, width=0.3, fullness=0.03))
     controller.run("tissue.configure", dict(target=target, changes=dict(both_sides=True)))

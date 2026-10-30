@@ -20,7 +20,7 @@ def fixture(controller):
     controller.run("surface.branch.add", dict(target=target, boundary=keys[0], curves=keys[2:]))
     controller.session.wait()
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.cameraRequested.emit([0.5, -0.1, 0.1, -65, 15, 0, 2.1], True)
     return keys, target
 

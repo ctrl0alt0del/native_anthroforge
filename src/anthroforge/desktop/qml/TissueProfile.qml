@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -19,7 +20,7 @@ ColumnLayout {
         const basis=scaleBasis || profile;
         const maximum=Math.max(...basis.depths);
         if(maximum<=0) return;
-        const next=workspace.run("tissue.profile.scaled",{profile:basis,factor:value/maximum});
+        const next=App.runtime.run("tissue.profile.scaled",{profile:basis,factor:value/maximum});
         if(next) edited(next);
     }
     UiCombo { enumLabels:true; objectName: "tissueProfileDirection"; Layout.fillWidth: true; model: ["LOCAL","SMOOTH","SECTION"]; currentIndex: Math.max(0,model.indexOf(panel.profile.direction)); onActivated: panel.change("direction",currentText) }
@@ -28,7 +29,7 @@ ColumnLayout {
         minimum: 0; maximum: 10; value: panel.depth; live: !panel.previewing
         enabled: panel.depth>0 || panel.scaleBasis!==null
         hint: "Scale all four station depths proportionally. For an all-zero profile, set a station depth or reset first."
-        onScrubbingChanged: panel.scaleBasis=scrubbing ? workspace.run("tissue.profile.scaled",{profile:panel.profile,factor:1}) : null
+        onScrubbingChanged: panel.scaleBasis=scrubbing ? App.runtime.run("tissue.profile.scaled",{profile:panel.profile,factor:1}) : null
         onEdited: value=>panel.scale(value)
     }
     Repeater {

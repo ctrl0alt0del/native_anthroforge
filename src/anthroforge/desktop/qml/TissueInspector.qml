@@ -1,10 +1,11 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 ColumnLayout {
     id: panel
-    readonly property var selected: workspace.selectedData
+    readonly property var selected: App.selection.selectedData
     readonly property var item: selected.tissue_settings || ({})
     property string partId: "main"
     property string side: "a"
@@ -12,9 +13,9 @@ ColumnLayout {
     readonly property var inflation: inflationDraft.values
     readonly property bool muscleMode: ["DISTRIBUTED","CTRL_POINT","SECTION_PROFILE"].includes(inflation.mode)
     Layout.fillWidth: true; spacing: Theme.gap
-    function configure(key,value) { const changes={}; changes[key]=value; workspace.run("tissue.configure",{target:selected.id,changes:changes}); }
+    function configure(key,value) { const changes={}; changes[key]=value; App.runtime.run("tissue.configure",{target:selected.id,changes:changes}); }
     function inflate(key,value) { inflationDraft.edit(key,value); }
-    function connector(width,fullness) { workspace.run("tissue.connector",{target:selected.id,part:part.id,width:width,fullness:fullness}); }
+    function connector(width,fullness) { App.runtime.run("tissue.connector",{target:selected.id,part:part.id,width:width,fullness:fullness}); }
     onItemChanged: if(!item.both_sides) side="a"
     RowLayout {
         Layout.fillWidth: true
@@ -27,7 +28,7 @@ ColumnLayout {
         UiEnumCombo { objectName: "tissueInflationMode"; Layout.fillWidth: true; codes: panel.selected.tissue_modes || []; value:panel.inflation.mode || ""; hint:"Choose how the tissue gains volume"; onChosen:code=>panel.inflate("mode",code) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","amount"]}); objectName: "tissueInflationAmount"; label: panel.muscleMode ? "Depth" : "Amount"; length: true; value: panel.inflation.amount || 0; onEdited: value => panel.inflate("amount",value) }
         TissueProfile { propertyBase: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","profile"]}); visible: panel.inflation.mode === "SECTION_PROFILE"; profile: panel.inflation.profile || ({}); previewing: inflationDraft.editing; onEdited: value=>panel.inflate("profile",value); onResetRequested: inflationDraft.reset("PROFILE") }
-        TissueControl { propertyBase: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation"]}); visible: panel.inflation.mode === "CTRL_POINT"; inflation: panel.inflation; canManipulate: !inflationDraft.editing; onEdited: (key,value)=>panel.inflate(key,value); onResetRequested: inflationDraft.reset("CONTROL"); onEditRequested: authoring.editTissueControl(panel.part.id,panel.side) }
+        TissueControl { propertyBase: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation"]}); visible: panel.inflation.mode === "CTRL_POINT"; inflation: panel.inflation; canManipulate: !inflationDraft.editing; onEdited: (key,value)=>panel.inflate(key,value); onResetRequested: inflationDraft.reset("CONTROL"); onEditRequested: App.authoring.editTissueControl(panel.part.id,panel.side) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","minimum"]}); visible: panel.inflation.mode === "NORMAL"; label: "Minimum thickness"; length: true; value: panel.inflation.minimum || 0; onEdited: value => panel.inflate("minimum",value) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","power"]}); visible: ["NORMAL","PROFILE"].includes(panel.inflation.mode); label: "Profile power"; value: panel.inflation.power ?? 1; onEdited: value => panel.inflate("power",value) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"inflation","width"]}); visible: panel.inflation.mode === "PROFILE"; label: "Half-width"; length: true; value: panel.inflation.width || 0; onEdited: value => panel.inflate("width",value) }
@@ -57,8 +58,8 @@ ColumnLayout {
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,"connector_width"]}); label: "Width"; value: panel.part.connector_width ?? 0.25; onEdited: value=>panel.connector(value,panel.part.connector_fullness) }
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["parts","@"+panel.part.id,"connector_fullness"]}); label: "Fullness"; length: true; value: panel.part.connector_fullness || 0; onEdited: value=>panel.connector(panel.part.connector_width,value) }
     }
-    TissueSmoothing { propertyBase: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"smoothing"]}); visible: panel.muscleMode; settings: panel.part[panel.side]?.smoothing || ({}); diagnostic: panel.item.diagnostics?.find(d=>d.stage==="rest" && d.part===panel.part.id && d.side===panel.side); onEdited: (key,value)=>{const changes={}; changes[key]=value; workspace.run("tissue.smoothing",{target:panel.selected.id,part:panel.part.id,side:panel.side,changes:changes});} }
-    TissueCrop { propertyBase: ({target:panel.selected.id,path:["crop"]}); visible: panel.muscleMode; settings: panel.item.crop || ({}); onEdited: (key,value)=>{const changes={}; changes[key]=value; workspace.run("tissue.crop",{target:panel.selected.id,changes:changes});} }
+    TissueSmoothing { propertyBase: ({target:panel.selected.id,path:["parts","@"+panel.part.id,panel.side,"smoothing"]}); visible: panel.muscleMode; settings: panel.part[panel.side]?.smoothing || ({}); diagnostic: panel.item.diagnostics?.find(d=>d.stage==="rest" && d.part===panel.part.id && d.side===panel.side); onEdited: (key,value)=>{const changes={}; changes[key]=value; App.runtime.run("tissue.smoothing",{target:panel.selected.id,part:panel.part.id,side:panel.side,changes:changes});} }
+    TissueCrop { propertyBase: ({target:panel.selected.id,path:["crop"]}); visible: panel.muscleMode; settings: panel.item.crop || ({}); onEdited: (key,value)=>{const changes={}; changes[key]=value; App.runtime.run("tissue.crop",{target:panel.selected.id,changes:changes});} }
     TissueRelaxation { item: panel.item; supported: !panel.muscleMode }
     TissueRegions { item: panel.item; masks: panel.selected.tissue_masks || [] }
     TissueFields { item: panel.item }
@@ -66,23 +67,23 @@ ColumnLayout {
     UiSection {
         title: "Evaluation"; expanded:false; stateKey:"tissue/evaluation"
         NumericSetting { propertyReference: ({target:panel.selected.id,path:["resolution"]}); label: "Surface resolution"; decimals: 0; value: panel.item.resolution || 24; onEdited: value => panel.configure("resolution",Math.round(value)) }
-        UiCombo { enumLabels:true; Layout.fillWidth: true; model: ["INHERIT","LIVE","ON_RELEASE","MANUAL"]; currentIndex: Math.max(0,model.indexOf(panel.item.update_mode)); onActivated: workspace.run("update_mode",{entity:panel.selected.id,mode:currentText}) }
-        UiButton { text: "Recalculate"; Layout.fillWidth: true; onClicked: workspace.run("evaluate",{entities:[panel.selected.id]}) }
+        UiCombo { enumLabels:true; Layout.fillWidth: true; model: ["INHERIT","LIVE","ON_RELEASE","MANUAL"]; currentIndex: Math.max(0,model.indexOf(panel.item.update_mode)); onActivated: App.runtime.run("update_mode",{entity:panel.selected.id,mode:currentText}) }
+        UiButton { text: "Recalculate"; Layout.fillWidth: true; onClicked: App.runtime.run("evaluate",{entities:[panel.selected.id]}) }
     }
     UiSection { title:"Source & settings"; stateKey:"tissue/source"; expanded:false
-    UiButton { objectName:"retargetTissueSource"; text:"Change source…"; Layout.fillWidth:true; enabled:workspace.tissueRetarget.eligibility.start?.available || false; hint:workspace.tissueRetarget.eligibility.start?.reason || "Choose new attached construction and review affected settings."; onClicked:workspace.tissueRetarget.choose(panel.selected.id) }
+    UiButton { objectName:"retargetTissueSource"; text:"Change source…"; Layout.fillWidth:true; enabled:App.tissueRetarget.eligibility.start?.available || false; hint:App.tissueRetarget.eligibility.start?.reason || "Choose new attached construction and review affected settings."; onClicked:App.tissueRetarget.choose(panel.selected.id) }
     UiSection {
         title:"Apply preset"; expanded:false
         UiCombo { objectName:"tissueApplyPreset"; Layout.fillWidth:true; model:panel.selected.tissue_presets || []; textRole:"name"; valueRole:"id"; currentIndex:Math.max(0,model.findIndex(p=>p.id===panel.item.preset)); hint:"Start from a preset configuration. Resets inflation, relaxation and preset-owned constraints.
-Custom fields, regions, source, crop and stacking stay unchanged."; onActivated:workspace.run("tissue.preset.apply",{target:panel.selected.id,preset:currentValue}) }
+Custom fields, regions, source, crop and stacking stay unchanged."; onActivated:App.runtime.run("tissue.preset.apply",{target:panel.selected.id,preset:currentValue}) }
     }
     UiField {
         id: nameField; objectName: "tissueName"; Layout.fillWidth: true; Accessible.name: "Tissue name"
         Binding { target: nameField; property: "text"; when: !nameField.activeFocus; value: panel.selected.name || "" }
-        onEditingFinished: if(panel.selected.is_tissue && text !== panel.selected.name) workspace.run("object.rename",{target:panel.selected.id,name:text})
+        onEditingFinished: if(panel.selected.is_tissue && text !== panel.selected.name) App.runtime.run("object.rename",{target:panel.selected.id,name:text})
     }
-    UiButton { objectName: "editTissueSource"; text: "Edit construction"; glyph: "curve-points"; Layout.fillWidth: true; onClicked: workspace.editConstruction(panel.item.source) }
-    UiButton { objectName: "tissueMakeIndependent"; text: "Make source independent"; Layout.fillWidth: true; onClicked: workspace.run("consumer.make_independent",{entity:panel.selected.id}) }
+    UiButton { objectName: "editTissueSource"; text: "Edit construction"; glyph: "curve-points"; Layout.fillWidth: true; onClicked: App.construction.editConstruction(panel.item.source) }
+    UiButton { objectName: "tissueMakeIndependent"; text: "Make source independent"; Layout.fillWidth: true; onClicked: App.runtime.run("consumer.make_independent",{entity:panel.selected.id}) }
     UiField {
         id: classification; objectName: "tissueClassification"; Layout.fillWidth: true
         Accessible.name: "Tissue classification"; placeholderText: "Classification"

@@ -61,7 +61,11 @@ class CurveInteraction(QObject):
     @Slot("QVariantList", "QVariantList")
     def updatePreview(self, origin, direction):
         editor = self.editor
-        eligible = self.query and editor.visible and editor.controller.selectedData.get("pickable")
+        eligible = (
+            self.query
+            and editor.visible
+            and editor.controller.selection_view.selectedData.get("pickable")
+        )
         if not eligible or editor.controller.session.history.before is not None:
             return self.clearPreview()
         started = perf_counter()
@@ -96,7 +100,7 @@ class CurveInteraction(QObject):
     @Slot("QVariantList", "QVariantList", float, bool, result="QVariantMap")
     def pressPoint(self, origin, direction, radius, extend):
         editor = self.editor
-        if not editor.visible or not editor.controller.selectedData.get("pickable"):
+        if not editor.visible or not editor.controller.selection_view.selectedData.get("pickable"):
             return {}
         index = editor._point_index.pick(origin, direction, radius)
         ref = editor.rows[index][0] if 0 <= index < len(editor.rows) else {}
@@ -226,7 +230,9 @@ def make_query(session, entity, curves):
 def insert_point(controller, preview):
     args = {key: preview[key] for key in ("curve", "segment", "parameter")}
     operation = (
-        "curve.subdivide" if controller.selectedData.get("is_construction") else "curve.split"
+        "curve.subdivide"
+        if controller.selection_view.selectedData.get("is_construction")
+        else "curve.split"
     )
     if operation == "curve.split":
         args["entity"] = controller.selection

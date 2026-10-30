@@ -72,7 +72,7 @@ def tissue(controller, window, report):
     scene(controller)
     activate(window, "createTissueToolbar")
     settle(controller)
-    assert controller.selectedData["is_tissue"]
+    assert controller.selection_view.selectedData["is_tissue"]
     for width, height in ((1440, 900), (1050, 680)):
         window.resize(width, height)
         snapshot(window, f"tissue-{width}", report)
@@ -119,7 +119,7 @@ def enum_contract(controller, window):
 
 def curve(controller, window, report):
     sources = [o for o in controller.session.document.objects if type(o).__name__ == "Curve"]
-    controller.select(sources[0].id)
+    controller.selection_view.select(sources[0].id)
     settle(controller)
     construction_search(controller, window)
     assert find(window, "inspectorHeader").property("page") == "Shape"
@@ -162,7 +162,7 @@ def large_relationships(controller, window, report):
     for index in range(100):
         controller.session.command("scp.empty", name=f"Consumer {index:03}", parent=root)
     settle(controller)
-    controller.select(root)
+    controller.selection_view.select(root)
     click(window, "inspectTab")
     QTest.qWait(100)
     filter_relationships(window, report)

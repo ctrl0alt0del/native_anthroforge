@@ -114,7 +114,7 @@ class ShortcutPanel(QObject):
         self.model.synchronize_records(self.instance_rows(rows) if self.all or selected else [])
 
     def instance_rows(self, rows):
-        if not self.all and self.controller.selectedData.get("mirror_source"):
+        if not self.all and self.controller.selection_view.selectedData.get("mirror_source"):
             return [
                 dict(row, writable=False, reason="Mirrored shortcuts are read-only.")
                 for row in rows

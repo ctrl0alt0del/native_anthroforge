@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 
 // Bindings own key choices and focus policy; consumers handle semantic commands.
@@ -21,8 +22,8 @@ Item {
     signal offsetRequested(real steps)
     signal offsetReset()
     property var pointerBindings: ({resetSurfaceOffset:Qt.MiddleButton})
-    Binding { target: heldInput; property: "wheelCapture"; value: manager.snapping && !manager.blocked && !manager.typing }
-    Binding { target: heldInput; property: "buttonCapture"; value: manager.snapping && !manager.blocked && !manager.typing ? manager.pointerBindings.resetSurfaceOffset : 0 }
+    Binding { target: App.heldInput; property: "wheelCapture"; value: manager.snapping && !manager.blocked && !manager.typing }
+    Binding { target: App.heldInput; property: "buttonCapture"; value: manager.snapping && !manager.blocked && !manager.typing ? manager.pointerBindings.resetSurfaceOffset : 0 }
     property var modifierBindings: ({insertPoint:Qt.ShiftModifier, snapSurface:Qt.ControlModifier,
         extendSelection:Qt.ControlModifier, precision:Qt.ShiftModifier, pan:Qt.ShiftModifier,
         deeperSelection:Qt.AltModifier, continuePlacement:Qt.ShiftModifier})
@@ -30,7 +31,7 @@ Item {
         const binding=modifierBindings[action];
         return [{flag:Qt.ControlModifier,name:"Ctrl"},{flag:Qt.ShiftModifier,name:"Shift"},{flag:Qt.AltModifier,name:"Alt"}].filter(row=>(binding & row.flag)!==0).map(row=>row.name).join("+");
     }
-    readonly property int modifiers: blocked || typing ? 0 : heldInput.modifiers
+    readonly property int modifiers: blocked || typing ? 0 : App.heldInput.modifiers
     readonly property var modifierPrefixes: ["", "Shift+", "Ctrl+", "Alt+", "Ctrl+Shift+", "Ctrl+Alt+", "Alt+Shift+", "Ctrl+Alt+Shift+"]
     function held(action) { return matches(action, modifiers); }
     function shortcut(command) { return bindings.find(binding => binding.command===command)?.key || ""; }
@@ -44,10 +45,10 @@ Item {
         const excluded=binding.excludeModifiers || [];
         return modifierPrefixes.filter(prefix=>parts.every(part=>prefix.includes(part+"+")) && !excluded.some(part=>prefix.includes(part+"+"))).map(prefix=>prefix+key);
     }
-    onBlockedChanged: { if(blocked) heldInput.clear(); }
-    onTypingChanged: { if(typing) heldInput.clear(); }
+    onBlockedChanged: { if(blocked) App.heldInput.clear(); }
+    onTypingChanged: { if(typing) App.heldInput.clear(); }
     Connections {
-        target: heldInput
+        target: App.heldInput
         function onCanceled() { manager.canceled(); }
         function onWheelTurned(steps) { manager.offsetRequested(steps); }
         function onButtonTriggered() { manager.offsetReset(); }

@@ -34,7 +34,7 @@ def setup(controller):
     session.command("evaluate", entities=[body.id])
     session.wait(timeout=10)
     controller.refresh()
-    controller.select(body.id)
+    controller.selection_view.select(body.id)
     controller.authoring.setEditing(True)
     return curve
 
@@ -64,7 +64,7 @@ def select_middle(controller, curve):
 
 
 def exercise(controller, window, curve):
-    controller.frameSelection()
+    controller.viewport_view.frameSelection()
     inspector = find(window, "inspector")
     selection = select_middle(controller, curve)
     for visible, height in ((True, 0.1), (False, 0.2)):

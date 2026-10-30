@@ -35,7 +35,7 @@ def scene(controller):
     settle(controller)
     controller.run("import", dict(path="examples/primitives/cube.obj", units=0.1, parent=target))
     settle(controller)
-    controller.select(target)
+    controller.selection_view.select(target)
     return target
 
 

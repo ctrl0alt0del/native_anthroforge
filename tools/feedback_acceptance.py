@@ -186,7 +186,7 @@ def capture_failure(controller):
 
     controller.feedback.capture(SimpleNamespace(grabWindow=lambda: QImage()))
     assert (
-        controller.state["message"] == controller.message
+        controller.runtime_view.state["message"] == controller.message
         and "Screenshot failed" in controller.message
     )
     assert not controller.feedback.active and controller.feedback.image.isNull()

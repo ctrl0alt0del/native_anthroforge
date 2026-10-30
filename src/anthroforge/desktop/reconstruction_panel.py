@@ -150,7 +150,7 @@ class ReconstructionPanel(QObject):
         self.run(
             "catalogue.assign_many",
             dict(
-                targets=self.controller.selectedObjects,
+                targets=self.controller.selection_view.selectedObjects,
                 type_id=type_id,
                 side=side,
                 variant=self.controller.session.contexts.visible,
@@ -161,14 +161,14 @@ class ReconstructionPanel(QObject):
     def selectMembers(self, identities):
         session = self.controller.session
         selected = [key for key in identities if key in session.document.registry.records]
-        self.controller.selectObjects(selected)
+        self.controller.selection_view.selectObjects(selected)
 
     @Slot()
     def create(self):
         session = self.controller.session
         subjects = [
             key
-            for key in self.controller.selectedObjects
+            for key in self.controller.selection_view.selectedObjects
             if key in session.document.registry.anatomy
         ]
         self.run("variant.create", dict(subjects=subjects))

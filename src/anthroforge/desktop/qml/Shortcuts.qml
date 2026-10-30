@@ -1,11 +1,12 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
 ColumnLayout {
     id: panel
-    property var adapter: workspace.shortcutPanel
-    enabled: !workspace.selectedData.mirror_source
+    property var adapter: App.shortcutPanel
+    enabled: !App.selection.selectedData.mirror_source
     property bool allObjects: false
     property bool choosing: false
     property bool editing: !!adapter.editing.details.id

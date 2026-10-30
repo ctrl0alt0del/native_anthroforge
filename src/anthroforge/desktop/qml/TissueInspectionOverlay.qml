@@ -1,9 +1,10 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 
 Canvas {
     id: overlay
     required property var viewport
-    ViewSnapshot { id: evidence; source: workspace.tissueInspection }
+    ViewSnapshot { id: evidence; source: App.tissueInspection }
     readonly property var lines: (evidence.data.lines || []).concat(evidence.data.footprint || [])
     anchors.fill: parent
     visible: lines.length > 0

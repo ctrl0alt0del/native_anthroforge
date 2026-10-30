@@ -10,7 +10,7 @@ from tests.test_tissue_painting_native import VIEW
 def brush(controller):
     target = setup(controller.session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     tool = controller.tissue_painting
     tool.begin("paint")
     publish(controller)
@@ -46,7 +46,7 @@ def test_escape_discards_paint_and_keeps_original_weights(controller):
     target, tool = brush(controller)
     before = controller.session.document
     preview(controller, tool)
-    controller.cancelViewportTools()
+    controller.viewport_view.cancelViewportTools()
     publish(controller)
     assert controller.session.document is before and not tool.name
     assert primary(controller.tissue_inspection)["kind"] == "MESH"
@@ -66,7 +66,7 @@ def test_pending_paint_replacement_keeps_previous_colors(controller):
 def test_camera_metadata_save_does_not_cancel_active_stroke(controller):
     target, tool = brush(controller)
     preview(controller, tool)
-    controller.saveCamera([0, 0, 0, -35, -25, 0, 2.3], True)
+    controller.viewport_view.saveCamera([0, 0, 0, -35, -25, 0, 2.3], True)
     tool.synchronize()
     assert tool.dragging and tool.preview
     tool.release()

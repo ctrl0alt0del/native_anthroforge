@@ -18,7 +18,7 @@ def inspect(controller, window):
     target = controller.selection
     original = controller.session.document.object(target)
     source = new_anchor(controller)
-    controller.select(target)
+    controller.selection_view.select(target)
     settle(controller)
     activate(window, "retargetTissueSource")
     settle(controller)

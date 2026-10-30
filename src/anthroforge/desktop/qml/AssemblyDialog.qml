@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Layouts
 UiDialog {
     id: dialog
     objectName: "assemblyDialog"
-    property var service: workspace.assemblyPanel
+    property var service: App.assemblyPanel
     title: service.state.repair ? "Resolve imported references" : "Import Anatomy from Project"
     modal: true; anchors.centerIn: parent
     width: Math.min(1100,parent.width-40); height: Math.min(840,parent.height-40)

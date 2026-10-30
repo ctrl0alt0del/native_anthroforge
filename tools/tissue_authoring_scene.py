@@ -23,7 +23,7 @@ def grouped(controller, renderer, app):
 def profile(controller, renderer, app, first, second):
     hidden = [key for key in controller.session.document.registry.records if key != first]
     controller.run("workspace.update", dict(hidden=hidden))
-    controller.select(first)
+    controller.selection_view.select(first)
     controller.run(
         "tissue.inflation", dict(target=first, changes=dict(mode="SECTION_PROFILE", amount=0.12))
     )

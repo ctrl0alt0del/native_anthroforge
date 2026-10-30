@@ -47,7 +47,7 @@ def schedule(
 
 def ready(controller) -> bool:
     return controller is None or (
-        controller.pending_document is None
+        controller.project_view.pending_document is None
         and not controller.session.waiting_save
         and not controller.session.scheduler.active_jobs
         and not any(model.pending for model in controller.geometry_models())
@@ -87,7 +87,7 @@ def show_panel(window, controller, panel):
 
 
 def project_status(controller):
-    library = controller.project_library
+    library = controller.project_view.library
     return dict(
         recent=library.recent.entries,
         recovery=library.autosave.last,

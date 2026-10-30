@@ -8,7 +8,7 @@ from tests.test_tissue_interaction import controller as controller
 
 def measure(controller, target):
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.section_tools.enable(True)
     controller.section_tools.request()
     controller.surface_measurements.show(target, "final")

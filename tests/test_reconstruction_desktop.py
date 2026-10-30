@@ -8,7 +8,7 @@ def imported(controller):
     key = controller.session.command("import", path=str(CUBE), units=1.0)["entity_id"]
     controller.session.wait()
     controller.refresh()
-    controller.select(key)
+    controller.selection_view.select(key)
     return key
 
 
@@ -19,10 +19,10 @@ def test_variant_panel_edits_through_normal_controller_and_restores_accepted(con
     panel.create()
     assert json.loads(panel.dataJson)["active"]
     controller.run("scp.rename", dict(entity=key, name="Variant bone"))
-    assert controller.selectedData["name"] == "Variant bone"
+    assert controller.selection_view.selectedData["name"] == "Variant bone"
     panel.run("variant.leave", {})
     assert not json.loads(panel.dataJson)["active"]
-    assert controller.selectedData["name"] == original
+    assert controller.selection_view.selectedData["name"] == original
 
 
 def test_panel_idle_does_not_rebuild_metadata(controller, monkeypatch):

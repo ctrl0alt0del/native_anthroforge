@@ -12,7 +12,7 @@ def test_moved_fiber_matches_desktop_and_keeps_authored_state(controller):
     session = controller.session
     _, target = moved_fiber(session)
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     controller.authoring.setEditing(True)
     before, cursor = session.document, session.history.cursor
     result = session.command("editing.inspect", target=target)

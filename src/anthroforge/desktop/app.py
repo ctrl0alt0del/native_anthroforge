@@ -34,18 +34,23 @@ def arguments() -> argparse.Namespace:
 def create_engine(controller: Controller, warnings: list[str]) -> QQmlApplicationEngine:
     QGuiApplication.setApplicationVersion(__version__)
     engine = QQmlApplicationEngine()
-    engine.addImportPath(str(build_directory() / "qml"))
-    engine.addImportPath(str(Path(__file__).parent / "qml"))
-    engine.rootContext().setContextProperty("workspace", controller)
-    engine.rootContext().setContextProperty("authoring", controller.authoring)
-    setup_profile_controls(controller, engine)
-    setup_preferences(controller, engine)
-    inputs = InputState(engine)
-    engine.rootContext().setContextProperty("heldInput", inputs)
-    engine.warnings.connect(lambda errors: warnings.extend(error.toString() for error in errors))
+    inputs = configure_engine(controller, engine, warnings)
     engine.load(QUrl.fromLocalFile(str(Path(__file__).parent / "qml" / "Main.qml")))
     attach_window(engine, controller, inputs)
     return engine
+
+
+def configure_engine(controller, engine, warnings):
+    from .qml_bindings import bind
+
+    engine.addImportPath(str(build_directory() / "qml"))
+    engine.addImportPath(str(Path(__file__).parent / "qml"))
+    setup_profile_controls(controller, engine)
+    setup_preferences(controller, engine)
+    inputs = InputState(engine)
+    bind(engine, controller, inputs)
+    engine.warnings.connect(lambda errors: warnings.extend(error.toString() for error in errors))
+    return inputs
 
 
 def setup_preferences(controller, engine):
@@ -54,11 +59,8 @@ def setup_preferences(controller, engine):
     from .workbench_state import WorkbenchState
 
     controller.preference_controls = PreferenceControls(controller)
-    engine.rootContext().setContextProperty("preferences", controller.preference_controls)
     controller.system_integration = SystemIntegration(controller)
-    engine.rootContext().setContextProperty("systemIntegration", controller.system_integration)
     controller.workbench = WorkbenchState(controller)
-    engine.rootContext().setContextProperty("workbench", controller.workbench)
 
 
 def attach_window(engine, controller, inputs):
@@ -75,11 +77,9 @@ def attach_window(engine, controller, inputs):
 def setup_profile_controls(controller, engine):
     from .profile_controls import ProfileControls
 
-    engine.rootContext().setContextProperty("numericEdits", controller.numeric_edits)
     controller.profile_controls = ProfileControls(
         controller, getattr(controller, "qt_profiler", None)
     )
-    engine.rootContext().setContextProperty("performance", controller.profile_controls)
     setup_feedback_controls(controller, engine)
 
 
@@ -93,8 +93,6 @@ def setup_feedback_controls(controller, engine):
     assert FeedbackCanvas  # Import registers the QML-painted annotation component.
     controller.feedback = FeedbackEditor(controller)
     controller.report_browser = ReportBrowser(controller, LocalReportInbox())
-    engine.rootContext().setContextProperty("feedback", controller.feedback)
-    engine.rootContext().setContextProperty("reportBrowser", controller.report_browser)
 
 
 def launch(args: argparse.Namespace, app: QGuiApplication, profiler=None) -> int:

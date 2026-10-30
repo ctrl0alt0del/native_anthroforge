@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -7,7 +8,7 @@ ColumnLayout {
     signal importRequested()
     signal deleteRequested(string entity)
     property var collapsed: []
-    readonly property var rows: workspace.treeRows
+    readonly property var rows: App.selection.treeRows
     readonly property var filtered: rows.filter(row => accepts(row))
     spacing: 8
     function accepts(row) {
@@ -29,7 +30,7 @@ ColumnLayout {
         Layout.fillWidth: true; Layout.topMargin: 3
         Label { text: "OUTLINER"; font.pixelSize: 10; font.bold: true; font.letterSpacing: 1; color: Theme.muted; Layout.fillWidth: true }
         Label { text: outliner.rows.length; color: Theme.muted; font.pixelSize: 11 }
-        UiButton { glyph: "plus"; hint: "Add an empty group under the selected SCP"; enabled: !workspace.state.waiting; onClicked: workspace.run("scp.empty", {name:"Group",parent:workspace.selectedId}) }
+        UiButton { glyph: "plus"; hint: "Add an empty group under the selected SCP"; enabled: !App.runtime.state.waiting; onClicked: App.runtime.run("scp.empty", {name:"Group",parent:App.selection.selectedId}) }
     }
     UiField { id: search; objectName: "outlinerSearch"; Layout.fillWidth: true; placeholderText: "Search objects…"; Accessible.name: "Search hierarchy"; onAccepted: hierarchy.forceActiveFocus() }
     ListView {
@@ -41,11 +42,11 @@ ColumnLayout {
         delegate: Rectangle {
             id: row
             required property var modelData
-            readonly property bool actionsVisible: rowHover.hovered || modelData.id===workspace.selectedId
+            readonly property bool actionsVisible: rowHover.hovered || modelData.id===App.selection.selectedId
             width: hierarchy.width; height: 30; radius: 3
             HoverHandler { id:rowHover }
-            color: modelData.id === workspace.selectedId ? Theme.selection : rowHover.hovered ? Theme.hover : "transparent"
-            MouseArea { id: rowMouse; anchors.fill: parent; hoverEnabled: true; onClicked: { hierarchy.forceActiveFocus(); workspace.select(row.modelData.id); } }
+            color: modelData.id === App.selection.selectedId ? Theme.selection : rowHover.hovered ? Theme.hover : "transparent"
+            MouseArea { id: rowMouse; anchors.fill: parent; hoverEnabled: true; onClicked: { hierarchy.forceActiveFocus(); App.selection.select(row.modelData.id); } }
             RowLayout {
                 anchors.fill: parent; spacing: 3; anchors.leftMargin: 3 + row.modelData.depth*14; anchors.rightMargin: 4
                 UiButton {
@@ -58,16 +59,16 @@ ColumnLayout {
                 }
                 Image { source: row.modelData.asset ? "icons/mesh.svg" : "icons/folder.svg"; sourceSize: Qt.size(14,14); opacity: row.modelData.readonly ? .4 : .85 }
                 Label { text: row.modelData.name; Layout.fillWidth: true; elide: Text.ElideRight; color: row.modelData.readonly ? Theme.muted : Theme.text; font.pixelSize: 12; HoverHandler { id:nameHover } ToolTip.visible:nameHover.hovered && truncated; ToolTip.text:text; ToolTip.delay:500 }
-                UiButton { visible:row.actionsVisible; glyph: "eye"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.visible ? .85 : .3; hint: row.modelData.visible ? "Hide object" : "Show object"; onClicked: workspace.run("workspace.update",{hidden:outliner.toggle(workspace.state.hidden,row.modelData.id)}) }
-                UiButton { visible:row.actionsVisible; glyph: "delete"; objectName: "delete_" + row.modelData.id; flatStyle: true; implicitWidth: 23; implicitHeight: 24; enabled: !row.modelData.readonly && !workspace.state.waiting; hint: "Delete, preserving children"; onClicked: outliner.deleteRequested(row.modelData.id) }
-                UiButton { visible:row.actionsVisible; glyph: "target"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.pickable ? .85 : .3; hint: "Toggle viewport picking"; onClicked: workspace.run("workspace.update",{unpickable:outliner.toggle(workspace.state.unpickable,row.modelData.id)}) }
+                UiButton { visible:row.actionsVisible; glyph: "eye"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.visible ? .85 : .3; hint: row.modelData.visible ? "Hide object" : "Show object"; onClicked: App.runtime.run("workspace.update",{hidden:outliner.toggle(App.runtime.state.hidden,row.modelData.id)}) }
+                UiButton { visible:row.actionsVisible; glyph: "delete"; objectName: "delete_" + row.modelData.id; flatStyle: true; implicitWidth: 23; implicitHeight: 24; enabled: !row.modelData.readonly && !App.runtime.state.waiting; hint: "Delete, preserving children"; onClicked: outliner.deleteRequested(row.modelData.id) }
+                UiButton { visible:row.actionsVisible; glyph: "target"; flatStyle: true; implicitWidth: 23; implicitHeight: 24; opacity: row.modelData.pickable ? .85 : .3; hint: "Toggle viewport picking"; onClicked: App.runtime.run("workspace.update",{unpickable:outliner.toggle(App.runtime.state.unpickable,row.modelData.id)}) }
             }
         }
         Label { anchors.centerIn: parent; width: parent.width-12; wrapMode: Text.WordWrap; horizontalAlignment: Text.AlignHCenter; visible: !outliner.filtered.length; text: search.text ? "No matching objects" : "Your imported objects\nwill appear here."; color: Theme.muted; lineHeight: 1.5 }
     }
     RowLayout {
         Layout.fillWidth: true
-        UiButton { text: "Import"; glyph: "import"; Layout.fillWidth: true; enabled: !workspace.state.waiting; onClicked: outliner.importRequested() }
-        UiButton { text: "Group root"; hint: "Wrap the current root in a new assembly group"; enabled: !workspace.state.waiting; onClicked: workspace.run("scp.wrap_root",{name:"Assembly"}) }
+        UiButton { text: "Import"; glyph: "import"; Layout.fillWidth: true; enabled: !App.runtime.state.waiting; onClicked: outliner.importRequested() }
+        UiButton { text: "Group root"; hint: "Wrap the current root in a new assembly group"; enabled: !App.runtime.state.waiting; onClicked: App.runtime.run("scp.wrap_root",{name:"Assembly"}) }
     }
 }

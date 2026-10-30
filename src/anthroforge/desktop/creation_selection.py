@@ -12,7 +12,7 @@ class CreationSelection:
             session.document.id,
             session.active_workspace,
             session.scheduler.epoch,
-            tuple(controller.selectedObjects),
+            tuple(controller.selection_view.selectedObjects),
             controller.authoring.editing,
         )
 
@@ -47,7 +47,7 @@ class CreationSelection:
     def accept(self, target):
         self.pending = None
         self.controller.authoring.setEditing(False)
-        self.controller.select(target)
+        self.controller.selection_view.select(target)
 
 
 def created_target(result, job):

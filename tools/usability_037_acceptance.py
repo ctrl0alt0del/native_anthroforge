@@ -95,12 +95,12 @@ def inspect_contents(window, name, report):
 
 def project_actions(controller, window, report):
     root = controller.run("primitive.create", dict(kind="BODY"))
-    controller.select(root)
+    controller.selection_view.select(root)
     settle(controller)
     target = OUTPUT / "Long project name with the same anatomy.anthroforge"
-    controller.saveProject(str(target), "wait")
+    controller.project_view.saveProject(str(target), "wait")
     settle(controller)
-    assert controller.project_library.recent.entries[0] == str(target)
+    assert controller.project_view.library.recent.entries[0] == str(target)
     inspect_widths(controller, window, "body", report)
     recent_menu(controller, window, report)
     missing_recent(controller)
@@ -108,7 +108,7 @@ def project_actions(controller, window, report):
 
 
 def missing_recent(controller):
-    library = controller.project_library
+    library = controller.project_view.library
     absent = str(OUTPUT / "unavailable-project.anthroforge")
     before, path = controller.session.document, controller.session.path
     library.remember(absent)
@@ -120,7 +120,7 @@ def missing_recent(controller):
 
 
 def recent_menu(controller, window, report):
-    library = controller.project_library
+    library = controller.project_view.library
     library.remember(OUTPUT / "another folder" / Path(library.recent.entries[0]).name)
     menu = open_menu(window, "File")
     invoke(find(window, "recentProjectsMenu"), "open")
@@ -132,7 +132,7 @@ def recent_menu(controller, window, report):
 
 def large_recent(controller, window, report):
     for index in range(20):
-        controller.project_library.remember(OUTPUT / f"Anatomical study {index}.anthroforge")
+        controller.project_view.library.remember(OUTPUT / f"Anatomical study {index}.anthroforge")
     menu = open_menu(window, "File")
     recent = find(window, "recentProjectsMenu")
     invoke(recent, "open")
@@ -140,7 +140,7 @@ def large_recent(controller, window, report):
     invoke(recent.property("contentItem"), "positionViewAtEnd")
     capture(window, "recent-projects-full", report)
     invoke(find(window, "clearRecentProjects"), "triggered")
-    assert not controller.project_library.recent.entries
+    assert not controller.project_view.library.recent.entries
     invoke(recent, "close")
     invoke(menu, "close")
 
@@ -148,12 +148,12 @@ def large_recent(controller, window, report):
 def recovery(controller, window, root, report):
     controller.run("scp.rename", dict(entity=root, name="Recovered anatomy"))
     settle(controller)
-    saver = controller.project_library.autosave
+    saver = controller.project_view.library.autosave
     saver.due = 0
     saver.poll(controller.session)
     settle(controller)
     assert saver.last and not saver.error
-    controller.project_library.showRecovery()
+    controller.project_view.library.showRecovery()
     settle(controller)
     capture(window, "recovery-copies", report)
     assert find(window, "recoveryCopies").property("count") >= 1
@@ -163,15 +163,15 @@ def recovery(controller, window, root, report):
 def recovered_open(controller, window, path):
     invoke(find(window, "recoveryDialog"), "close")
     before = controller.session.document
-    controller.project_library.recovery_browser.openCopy(path)
+    controller.project_view.library.recovery_browser.openCopy(path)
     QTest.qWait(80)
     assert find(window, "discardDialog").property("visible")
     invoke(find(window, "discardDialog"), "close")
-    controller.replaceDocument(path)
+    controller.project_view.replaceDocument(path)
     wait_for(controller, lambda: not controller.session.waiting_save)
     assert controller.session.document == before
     assert controller.session.path is None and controller.session.saved_revision == -1
-    assert path not in controller.project_library.recent.entries
+    assert path not in controller.project_view.library.recent.entries
 
 
 def preferences(controller, window, report):
@@ -190,7 +190,7 @@ def long_delete(controller, window, report):
     for index in range(24):
         controller.run("scp.empty", dict(parent=root, name=f"Attachment boundary number {index}"))
     settle(controller)
-    controller.select(root)
+    controller.selection_view.select(root)
     find(window, "viewport").forceActiveFocus()
     QTest.keyClick(window, Qt.Key.Key_Delete)
     QTest.qWait(100)
@@ -210,18 +210,18 @@ def search_delete(window):
 
 
 def construction(controller, window, report):
-    controller.replaceDocument("")
+    controller.project_view.replaceDocument("")
     wait_for(controller, lambda: not controller.session.waiting_save)
     scene(controller)
     inspect_widths(controller, window, "surface", report)
     surface = controller.selection
     source = controller.session.document.object(surface).curves[0].curve
-    controller.select(source)
+    controller.selection_view.select(source)
     controller.authoring.setEditing(True)
     inspect_widths(controller, window, "fiber", report)
     controller.authoring.setEditing(False)
-    controller.select(surface)
-    controller.createConstruction("tissue.create", dict(source=surface))
+    controller.selection_view.select(surface)
+    controller.construction_view.createConstruction("tissue.create", dict(source=surface))
     inspect_widths(controller, window, "tissue", report)
 
 

@@ -33,7 +33,7 @@ def prepare(controller):
         key for key in controller.session.document.registry.records if key not in (first, second)
     ]
     controller.run("workspace.update", dict(hidden=hidden))
-    controller.select(MirrorInstance(second, bone).id)
+    controller.selection_view.select(MirrorInstance(second, bone).id)
     settle(controller)
     controller.cameraRequested.emit([0.8, 0, 0.725, -20, 15, 0, 3.5], True)
     return bone, first, second
@@ -49,12 +49,12 @@ def capture(controller, renderer, app, name):
 
 def picking(controller, first, second, bone):
     target = MirrorInstance(second, bone).id
-    hover = controller.pick([1.6, 0, 2], [0, 0, -1], 0, False, 0.005)
-    clicked = controller.pick([1.6, 0, 2], [0, 0, -1], 0, True, 0.005)
+    hover = controller.selection_view.pick([1.6, 0, 2], [0, 0, -1], 0, False, 0.005)
+    clicked = controller.selection_view.pick([1.6, 0, 2], [0, 0, -1], 0, True, 0.005)
     assert hover["id"] == clicked["id"] == target, (hover, clicked)
-    assert controller.selectedData.get("readonly")
+    assert controller.selection_view.selectedData.get("readonly")
     assert target not in controller.scene_projection.records
-    source = controller.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
+    source = controller.selection_view.pick([0, 0, 2], [0, 0, -1], 0, False, 0.005)
     assert source["id"] == second, source
 
 

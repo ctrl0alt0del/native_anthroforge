@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -11,10 +12,10 @@ ColumnLayout {
     property bool live: true
     property int decimals: 4
     property real step: length ? 0.001 : 0.01
-    readonly property real unitFactor: length ? workspace.state.unit_factor : 1
+    readonly property real unitFactor: length ? App.runtime.state.unit_factor : 1
     signal edited(var values)
     Layout.fillWidth: true
-    Label { text: setting.label + (setting.length ? " · " + workspace.state.display_units : ""); color: Theme.muted; font.pixelSize: 11 }
+    Label { text: setting.label + (setting.length ? " · " + App.runtime.state.display_units : ""); color: Theme.muted; font.pixelSize: 11 }
     RowLayout {
         Repeater {
             model: 3

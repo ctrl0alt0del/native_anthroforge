@@ -35,8 +35,8 @@ def fixture(controller):
     settle(controller)
     hook = session.command("control.create", entity=entity, name="Shared hook")
     settle(controller)
-    controller.select(entity)
-    controller.frameSelection()
+    controller.selection_view.select(entity)
+    controller.viewport_view.frameSelection()
     return root, entity, hook
 
 
@@ -62,7 +62,7 @@ def Q_ARG_INT(value):
 def units_ui(controller, window, entity):
     from numeric_input_acceptance import reveal
 
-    controller.select(entity)
+    controller.selection_view.select(entity)
     reveal(window, "transform0")
     field = click(window, "transform0")
     field.setProperty("text", "250")
@@ -98,13 +98,13 @@ def controls(controller, entity, hook):
     cage = controller.run("control.create", dict(entity=entity, kind="LATTICE"))
     settle(controller)
     controller.run("workspace.update", dict(hidden_categories=["handles", "hooks"]))
-    controller.select(cage)
+    controller.selection_view.select(cage)
     assert controller.authoring.visualLayers["links"]
     assert hook not in controller.pick_control_ids
     controller.run("workspace.update", dict(unpickable_categories=["cages"]))
     assert controller.authoring._point_index.pick([0, 0, 10], [0, 0, -1], 100, 0) == -1
     controller.run("workspace.preset", dict(name="all"))
-    controller.select(entity)
+    controller.selection_view.select(entity)
 
 
 def navigate(controller, window, root, entity):
@@ -113,9 +113,9 @@ def navigate(controller, window, root, entity):
     cursor = controller.session.history.cursor
     reveal(window, "relatedSelect_" + root)
     click(window, "relatedSelect_" + root)
-    assert controller.selection == root and controller.selectedData.get("readonly")
+    assert controller.selection == root and controller.selection_view.selectedData.get("readonly")
     assert controller.session.history.cursor == cursor
-    controller.select(entity)
+    controller.selection_view.select(entity)
 
 
 def inspect_ui(controller, window):

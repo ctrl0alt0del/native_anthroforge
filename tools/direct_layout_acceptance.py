@@ -49,7 +49,7 @@ def inspect(controller, window):
     scale = os.environ.get("QT_SCALE_FACTOR", "1")
     width = int(os.environ.get("AF_LAYOUT_WIDTH", "1920" if scale == "2" else "1440"))
     window.resize(width, 1027 if scale == "2" else 900)
-    controller.select(controller.run("scp.empty", dict(name="Selected anatomy")))
+    controller.selection_view.select(controller.run("scp.empty", dict(name="Selected anatomy")))
     settle(controller)
     labels = {"Save", "Manage…", "Focus", "Recalculate", "Ruler", "Create Tissue"}
     checked = [b for b in buttons(window) if b.property("text") in labels]

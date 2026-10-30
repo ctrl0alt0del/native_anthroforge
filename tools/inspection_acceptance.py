@@ -27,7 +27,7 @@ def fixture(controller):
         "import", dict(path=str(Path("examples/primitives/cube.obj").resolve()), units=1)
     )
     settle(controller)
-    controller.select(result["entity_id"])
+    controller.selection_view.select(result["entity_id"])
     controller.cameraRequested.emit([0, 0, 0, 0, 0, 0, 3], True)
     QTest.qWait(100)
     return result["entity_id"]
@@ -132,7 +132,7 @@ def editable_body(controller):
     root = controller.session.document.entities[0].id
     entity = controller.run("primitive.create", dict(kind="BODY", parent=root))
     settle(controller)
-    controller.select(entity)
+    controller.selection_view.select(entity)
     controller.authoring.setEditing(True)
     controller.cameraRequested.emit([0, 0, 0, -90, 0, 0, 3], True)
     QTest.qWait(120)

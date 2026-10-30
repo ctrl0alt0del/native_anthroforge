@@ -77,7 +77,7 @@ def profile_value(controller):
 
 def profile(controller, window):
     exercise(controller, window)
-    modes = controller.selectedData["tissue_modes"]
+    modes = controller.selection_view.selectedData["tissue_modes"]
     activate(window, "tissueInflationMode", modes.index("SECTION_PROFILE"))
     settle(controller)
     type_value(window, "tissueProfileDepthValue", "0.04")
@@ -136,7 +136,8 @@ def profile_preview(controller, window):
     settle(controller)
     assert profile_value(controller) == before
     assert_depths(
-        controller.tissuePreview["settings"]["profile"]["depths"], (0.03, 0.06, 0.06, 0.03)
+        controller.construction_view.tissuePreview["settings"]["profile"]["depths"],
+        (0.03, 0.06, 0.06, 0.03),
     )
     click(window, "tissuePreviewCancel")
     settle(controller)

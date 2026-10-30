@@ -37,7 +37,7 @@ def create_route(controller):
     )
     session.wait()
     controller.refresh()
-    controller.select(target)
+    controller.selection_view.select(target)
     return target
 
 

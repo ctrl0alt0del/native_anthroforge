@@ -86,11 +86,11 @@ class SectionTools(QObject):
     def start(self):
         controller = self.controller
         controller.authoring.setEditing(False)
-        controller.cancelViewportTools()
+        controller.viewport_view.cancelViewportTools()
         tool = controller.tissue_inspection
         stage = (
             tool.stage or displayed_stage(controller.session, controller.selection)
-            if controller.selectedData.get("is_tissue")
+            if controller.selection_view.selectedData.get("is_tissue")
             else "final"
         )
         self.start_surface(controller.selection, stage)

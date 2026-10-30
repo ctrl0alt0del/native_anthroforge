@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -5,7 +6,7 @@ import QtQuick.Layouts
 UiSection {
     id: panel
     objectName: "tissueInspectionPanel"; title: "Inspect tissue"; expanded: false
-    readonly property var tools: workspace.tissueInspection
+    readonly property var tools: App.tissueInspection
     readonly property var state: tools.state
     readonly property var options: [{stage:"",label:"Current result"}].concat((state.stages || []).filter(s=>s.available))
     readonly property bool hasMesh: !state.stage || (state.stages || []).some(s=>s.stage===state.stage && s.available && s.kind==="MESH")

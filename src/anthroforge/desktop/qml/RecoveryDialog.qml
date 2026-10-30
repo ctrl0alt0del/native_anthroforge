@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -10,7 +11,7 @@ UiDialog {
     width: Math.min(720, parent.width - 48)
     height: Math.min(540, parent.height - 48)
     standardButtons: Dialog.Close
-    readonly property var browser: workspace.projectLibrary.recoveryBrowser
+    readonly property var browser: App.projectLibrary.recoveryBrowser
     onAboutToShow: { search.text=""; browser.refresh(); }
     ColumnLayout {
         anchors.fill: parent; spacing: Theme.gap

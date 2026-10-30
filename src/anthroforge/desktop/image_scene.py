@@ -65,10 +65,10 @@ def hits(controller, origin, direction):
 
 
 def view_mask(controller, rows, frames):
-    projection = "orthographic" if controller.viewport_orthographic else "perspective"
+    projection = "orthographic" if controller.viewport_view.orthographic else "perspective"
     restricted = [row["image_style"].get("only_axis_aligned", False) for row in rows]
     aligned = (
-        images.aligned(controller.session.engine, frames, controller.viewport_direction)
+        images.aligned(controller.session.engine, frames, controller.viewport_view.direction)
         if any(restricted)
         else ()
     )

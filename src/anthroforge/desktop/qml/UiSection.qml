@@ -1,3 +1,4 @@
+import AnthroForge.Desktop 1.0
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -9,8 +10,8 @@ ColumnLayout {
     property bool expanded: true
     property string stateKey: ""
     property bool restored: false
-    Component.onCompleted: { if(stateKey) expanded=workbench.expanded(stateKey,expanded); restored=true; }
-    onExpandedChanged: if(restored && stateKey) workbench.setExpanded(stateKey,expanded)
+    Component.onCompleted: { if(stateKey) expanded=App.workbench.expanded(stateKey,expanded); restored=true; }
+    onExpandedChanged: if(restored && stateKey) App.workbench.setExpanded(stateKey,expanded)
     default property alias contents: body.data
     spacing: Theme.gap
     Layout.fillWidth: true

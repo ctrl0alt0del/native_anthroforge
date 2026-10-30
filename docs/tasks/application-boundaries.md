@@ -1,6 +1,6 @@
 # Application ownership boundaries
 
-Status: implemented and qualified; final integration/delivery in progress.
+Status: completed, qualified, merged into main and delivered.
 
 ## Scope and recovery
 
@@ -129,3 +129,19 @@ Local evidence: `build/refactor/development-gate.log`, `gate-recheck.log`, `comb
 and `portable.log`; full portable summary is `build/portable/portable-check.json`.
 Runtime build identity is `8bc5cd8e` plus preserved unrelated assembly edits, honestly marked
 `tracked_changes: true`. Later commits change audit/tooling/recovery documentation only.
+
+
+## Delivery
+
+Main integration: `ed042809`, with later delivery-record documentation only. The canonical
+`E:/development/anthroforge/dist/0.4.3/AnthroForge.dist` contains the qualified combined build;
+all 3,410 copied files were byte-verified. The single companion source archive is
+`dist/AnthroForge-0.4.3-source.zip`, generated from the corresponding combined source and
+updated documentation. Runtime/source hashes are retained in local `build/refactor/delivery.json`.
+No second release distribution or version bump was created.
+
+Primary checkout stays on `codex/remaining-muscle-assembly` with the preserved unrelated work
+unstaged. The root `__init__.py` remains untouched. Recovery files and original hashes remain
+under this task's ignored `build/integration-recovery`. No unfinished runtime work remains for
+this refactor; dynamic QML payload typing and manual interactive acceptance are the documented
+evidence boundaries, not claims made by the static/offscreen checks.

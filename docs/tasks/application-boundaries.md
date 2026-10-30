@@ -90,3 +90,13 @@ fixtures still modeled Controller-owned pending projects, and SkinPanel dynamica
 the former `object_selection`. The production lookup now uses the explicit selection owner;
 fixtures use ProjectView. All five targeted regression/engine-isolation checks pass. Search
 found no other stale dynamic state lookups. Final complete-suite confirmation remains pending.
+
+Primary-checkout integration for qualification: `codex/remaining-muscle-assembly` was
+fast-forwarded to `8bc5cd8e` (main has not advanced). All 12 unrelated inputs were backed up
+under `build/application-boundaries/build/integration-recovery`. Ten unchanged unrelated
+files retain their original bytes; all local computation-history additions were verified.
+The existing operation-aware mirror guard moved from the retired commands helper to
+`command_execution.require`, passing `command.name`; that remains an unrelated local edit,
+not part of this branch's commits. The temporary stash was verified/restored and removed.
+Fourteen combined local assembly/mirror/registry regressions pass. A temporary combined package
+is building under `build/application-boundaries/build/package`; installed files remain intact.

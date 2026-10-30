@@ -117,18 +117,13 @@ class Authoring(QObject):
     @Property("QVariantMap", notify=changed)
     def transformData(self):
         selected = self.selectedPoints
+        data = self.controller.selection_view.selectedData
         if not self.active or self.state.get("kind") == "HOOK":
-            return self.controller.selection_view.selectedData.as_dict()
+            return data.as_dict()
         if not selected:
-            return (
-                self.controller.selection_view.selectedData.as_dict()
-                if self.state.get("is_control")
-                else {}
-            )
+            return data.as_dict() if self.state.get("is_control") else {}
         center = state.selection_center(self, selected)
-        readonly = self.controller.selection_view.selectedData.get(
-            "readonly", False
-        ) or state.read_only_selection(self)
+        readonly = data.get("readonly", False) or state.read_only_selection(self)
         return dict(
             id="components", trs=[*center, 0, 0, 0, 1, 1, 1], readonly=readonly, transformable=True
         )

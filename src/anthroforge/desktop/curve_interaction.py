@@ -61,11 +61,8 @@ class CurveInteraction(QObject):
     @Slot("QVariantList", "QVariantList")
     def updatePreview(self, origin, direction):
         editor = self.editor
-        eligible = (
-            self.query
-            and editor.visible
-            and editor.controller.selection_view.selectedData.get("pickable")
-        )
+        data = editor.controller.selection_view.selectedData
+        eligible = self.query and editor.visible and data.get("pickable")
         if not eligible or editor.controller.session.history.before is not None:
             return self.clearPreview()
         started = perf_counter()

@@ -21,9 +21,8 @@ def scene(controller):
     _, source, _ = surface_scene(controller.session)
     controller.refresh()
     controller.selection_view.select(source.id)
-    result = controller.construction_view.createConstruction(
-        "tissue.create", dict(source=source.id)
-    )
+    create = controller.construction_view.createConstruction
+    result = create("tissue.create", dict(source=source.id))
     settle(controller)
     target = result["object_id"]
     assert controller.selection == target

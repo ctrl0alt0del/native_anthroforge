@@ -27,7 +27,6 @@ def attach(session: Any) -> Service:
         "previews",
         (
             (Event.INTERACTION_CANCEL, partial(painting.cancel, session)),
-            (Event.CLEAR_PREVIEWS, partial(clear, session)),
             (Event.CLOSE, partial(close, session)),
         ),
     )

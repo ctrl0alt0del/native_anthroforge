@@ -58,3 +58,25 @@ full run passed 2,887 tests; two QuadWild checks failed because this worktree la
 works with the official Qt 6.12 registrar. The maintained API lint check deliberately probes an
 invalid method and records all legacy/dynamic-state diagnostics separately; its complete run is
 pending. Native build, full gate, hidden-render inspection and portable qualification remain pending.
+
+Qualification checkpoint: all 185 QML files pass the registered-model API check (46 model
+classes), including intentional invalid-method detection. The Windows gate now runs it.
+Existing dynamic property maps and legacy QML style warnings remain reported, not silently
+classified as typed coverage. Native CTest passes all six groups. Offscreen workbench and
+shortcut-editor interactions pass; actual hidden GPU tissue/collagen painting and cancelled
+previews were inspected. Foreground/manual interactive acceptance has not been performed.
+
+Serial ABBA dispatch trials (`preferences.get`, seven batches of 10,000 per process) measured
+baseline medians 15.77/16.07 us and candidate medians 2.78/2.68 us. Batch ranges were
+15.27–17.47 us baseline and 2.63–2.81 us candidate. Native style checking was running in the
+background; these figures establish only removal of dispatch overhead, not application or
+geometry speedup. Each process also released 30 sessions with separate candidate contexts;
+headless imports remained Qt-free. Reproducible tool: `application_boundary_qualification.py`.
+
+Ownership review: feature declarations own variation, executor owns cross-cutting mechanics,
+context participants own service cleanup, per-engine view models own desktop interaction.
+Controller retains composition/staged publication. Existing readiness providers and generic
+Preview transitions already own their contracts; no duplicate framework was introduced.
+The unused clear-preview lifecycle event and redundant model signal forwarding were removed.
+Issues repair synchronization remains before shortcut cleanup. Full gate and relocated package
+checks are still running/pending; this is not yet a completed delivery.

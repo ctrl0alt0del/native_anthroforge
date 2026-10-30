@@ -65,10 +65,8 @@ def test_accepted_creation_exits_editing_selects_fiber_and_keeps_one_undo(contro
     settle(controller)
     fiber = session.document.object(controller.selection)
     assert isinstance(fiber, Fiber) and not controller.authoring.active
-    assert (
-        not controller.selection_view.selectedData["transformable"]
-        and session.history.cursor == cursor + 1
-    )
+    assert not controller.selection_view.selectedData["transformable"]
+    assert session.history.cursor == cursor + 1
     assert not controller.authoring.selection and controller.creation_selection.pending is None
     controller.run("undo", {})
     assert fiber.id not in session.document.registry.records

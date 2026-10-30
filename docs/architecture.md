@@ -368,7 +368,7 @@ excluded from UI and APIs.
   has exactly one root; an empty document is valid.
 - application/session.py owns the current revision, immutable native mesh assets, history
   and scheduler. Commands are explicit and independent of viewport selection or Blender.
-- application/commands.py is the shared UI/headless catalogue. Transactions collapse
+- `application/command_sets/` declares feature-owned operations; `commands.py` exposes the cached shared UI/headless catalogue. Transactions collapse
   repeated drag updates into one undo step; cancellation restores authored state.
 - application/coordinator.py owns dispatch, output reservations, coalescing, priorities,
   safe cancellation, publication and save checkpoints. Jobs acquire their input revision
@@ -1293,3 +1293,33 @@ The [Painting System](painting_system.md) owns context-local stroke state, previ
 finalization and resource lifetime for tissue weights and collagen. Consumer adapters
 own baseline/eligibility, numerical effect and domain commit. Desktop and headless use
 the same operations; legacy inspection commands delegate. Native kernels are unchanged.
+
+
+## Command, context-service and desktop ownership
+
+Feature command declarations are immutable `Command` records with an explicit `Policy`.
+`command_execution` owns permission/variant guards, isolated-gesture admission, implicit
+transactions and comparison journaling; `commands` wraps dispatch with profiling. Domain-owned
+transactions and read-only candidate preparation retain their existing policies. Registration
+is explicit, rejects duplicate names and resolves service methods against the current editing
+context at dispatch. New feature operations do not add prefix branches to shared execution.
+
+Each editing context composes a `Lifecycle` from named participants for preparation, shortcuts,
+Issues, skin status and previews. Participants register only their required event callbacks;
+Session announces lifecycle events and retains typed service accessors. The registry is not a
+service locator. Close attempts all cleanup callbacks, releases them and is idempotent. Existing
+`Preview` state transitions, coordinator ownership and status-provider contracts remain in use;
+there is no competing preview state machine or scheduler.
+
+Desktop Controller composes panels and coordinates staged publication/refresh. Project,
+selection, viewport, construction, mirror and runtime view models own their interaction and
+presentation contracts. QML imports `AnthroForge.Desktop 1.0`; the typed `App` composition is
+explicitly bound per QQmlEngine. It neither owns domain behavior nor stores a process-global
+session. Panel types are uncreatable from QML, and separate engines retain separate sessions.
+
+`tools/check_qml.py` generates metadata from the registered models using Qt's tools, checks
+all QML files and verifies that a deliberately invalid method is rejected. Registered model
+API diagnostics fail the Windows development gate. Full diagnostics are retained: dynamic
+`PropertyProjection` keys, QVariant payloads and legacy QML style warnings are not claimed to
+be statically validated. Background runtime and hidden-render checks cover those bindings.
+Core/application mypy coverage remains distinct from this desktop interface check.

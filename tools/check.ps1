@@ -9,6 +9,9 @@ try {
     & "$PSScriptRoot\build-native.ps1" -BuildDirectory $BuildDirectory
     & "$PSScriptRoot\check-native-style.ps1" -BuildDirectory $BuildDirectory
     & "$PSScriptRoot\check-script-style.ps1"
+    $qmlCheck = @('run', '--no-sync', 'python', 'tools/check_qml.py')
+    if ($BuildDirectory) { $qmlCheck += @('--native', $BuildDirectory) }
+    Invoke-Checked uv $qmlCheck
     Invoke-Checked uv @('run', '--no-sync', 'python', '-m', 'pytest')
     Invoke-Checked uv @('run', '--no-sync', 'python', 'tools/check_numerics.py')
     Invoke-Checked uv @('run', '--no-sync', 'anthroforge', 'doctor', '--require-native')

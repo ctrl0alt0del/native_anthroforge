@@ -14,11 +14,13 @@ if TYPE_CHECKING:
 
 
 class RuntimeView(QObject):
+    changed = Signal()
     metricsChanged = Signal()
 
     def __init__(self, controller: Controller) -> None:
         super().__init__(controller)
         self.controller = controller
+        controller.changed.connect(self.changed)
         self._state = PropertyProjection(self)
         self._metrics: dict[str, Any] = {}
 

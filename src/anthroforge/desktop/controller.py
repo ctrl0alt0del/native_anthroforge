@@ -47,7 +47,6 @@ from .weight_painting_tools import WeightPaintingTools
 
 class Controller(QObject):
     changed = Signal()
-    metricsChanged = Signal()
     selectionChanged = Signal()
     treeChanged = Signal()
     saveChoiceRequested = Signal(str)

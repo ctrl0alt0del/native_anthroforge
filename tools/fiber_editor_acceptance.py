@@ -58,10 +58,8 @@ def create(controller, engine):
     assert fibers[0].id != source and controller.viewport_view.constructionModel.rowCount() == 2
     assert any(row["id"] == fibers[0].id for row in controller.fiber_display.model.active_rows())
     assert controller.selection == fibers[0].id and not controller.authoring.active
-    assert (
-        controller.selection_view.selectedData["kind"] == "FIBER"
-        and not controller.authoring.selection
-    )
+    assert controller.selection_view.selectedData["kind"] == "FIBER"
+    assert not controller.authoring.selection
 
 
 def run():

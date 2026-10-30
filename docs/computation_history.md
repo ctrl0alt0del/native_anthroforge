@@ -3919,3 +3919,15 @@ while native calculation counts/results stay unchanged. Warm wall timings do not
 a speedup. See [measured evidence](painting_system.md#qualification-evidence) for timings,
 variance, profiler costs, resource limits and fixture provenance. The
 [task record](tasks/painting-system-step1.md) tracks full gate and portable qualification.
+
+
+### 2026-10-30 — Shared application lifecycle and typed desktop interfaces
+
+Execution boundaries only: feature command tables replace central string-prefix routing and
+per-call dictionaries. One executor retains existing guards, transaction ownership, comparison
+journals and profiling. Context participants now own service reactions and teardown; desktop
+models own project/selection/viewport state behind per-engine typed QML composition. No geometry,
+attachment, native painting, skin or tissue algorithms change, and no additional worker pool or
+scheduling policy is introduced. Baseline: `db492517`; checkpoints: `004f33ed`, `eef41faf`,
+`46f46d74`. Registry/lifecycle and isolated-engine regression tests exercise preserved contracts.
+Full qualification and performance evidence: [recovery record](tasks/application-boundaries.md).

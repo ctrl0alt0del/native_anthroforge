@@ -12,8 +12,8 @@ def attach(session: Any) -> None:
     session.services = Lifecycle()
     for factory in (
         preparation_lifecycle.attach,
-        shortcut_lifecycle.attach,
         issue_lifecycle.attach,
+        shortcut_lifecycle.attach,
         attach_skin_status,
         preview_lifecycle.attach,
     ):

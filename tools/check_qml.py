@@ -23,17 +23,17 @@ def arguments():
 def lint(options, paths, name):
     report = options.output / f"{name}.json"
     command = [str(options.qt / "bin/qmllint.exe"), "--ignore-settings"]
-    for path in (
-        options.output / "qml",
-        options.native / "qml",
-        ROOT / "src/anthroforge/desktop/qml",
-    ):
+    for path in import_paths(options):
         command += ["-I", str(path)]
     process = subprocess.run(
         [*command, "--json", str(report), *map(str, paths)], capture_output=True, text=True
     )
     (options.output / f"{name}.log").write_text(process.stdout + process.stderr, encoding="utf-8")
     return json.loads(report.read_text(encoding="utf-8"))["files"]
+
+
+def import_paths(options):
+    return (options.output / "qml", options.native / "qml", ROOT / "src/anthroforge/desktop/qml")
 
 
 def interface_failure(warning, names):
@@ -74,9 +74,7 @@ def main():
     failures = findings(files, names)
     for path, warning in failures:
         print(f"{path}:{warning['line']}: {warning['message']}")
-    print(
-        f"Checked {len(paths)} QML files / {len(names)} registered model types; {len(failures)} API errors."
-    )
+    print(f"Checked {len(paths)} QML files / {len(names)} model types; {len(failures)} API errors.")
     print(f"Full diagnostics (including dynamic state and legacy QML warnings): {options.output}")
     return bool(failures)
 

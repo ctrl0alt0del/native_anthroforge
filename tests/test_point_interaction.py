@@ -36,15 +36,13 @@ def test_independent_anchor_becomes_selection_and_exposes_explicit_surface_role(
     session.wait()
     controller.construction_view.createPoint()
     source = controller.selection
-    controller.construction_view.createConstruction(
-        "anchor.create", dict(source=source, parent=bone)
-    )
+    create = controller.construction_view.createConstruction
+    create("anchor.create", dict(source=source, parent=bone))
     session.wait()
     controller.refresh()
     assert isinstance(session.document.object(controller.selection), Anchor)
-    assert controller.selection_view.selectedData["binding"]["reference"] == dict(
-        target=bone, role="SCP_GEOMETRY", instance=""
-    )
+    reference = dict(target=bone, role="SCP_GEOMETRY", instance="")
+    assert controller.selection_view.selectedData["binding"]["reference"] == reference
     assert not controller.selection_view.selectedData["transformable"]
     assert controller.construction_view.surfaceRoles()[0]["role"] == "SCP_GEOMETRY"
 

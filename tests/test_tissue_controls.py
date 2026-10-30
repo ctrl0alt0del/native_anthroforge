@@ -24,10 +24,8 @@ def test_control_gesture_commits_once_and_keeps_generated_tissue_nontransformabl
     target = control(controller)
     editor, session = controller.authoring, controller.session
     start, cursor = np.asarray(editor.selectedPoints[0]), session.history.cursor
-    assert (
-        editor.transformData["transformable"]
-        and not controller.selection_view.selectedData["transformable"]
-    )
+    assert editor.transformData["transformable"]
+    assert not controller.selection_view.selectedData["transformable"]
     authoring_actions.start_transform(editor, "Move")
     authoring_actions.transform_delta(editor, [0, 0, 0.03, 0, 0, 0, 1, 1, 1])
     session.commit()
@@ -35,6 +33,10 @@ def test_control_gesture_commits_once_and_keeps_generated_tissue_nontransformabl
     value = session.document.object(target).parts[0].a.inflation.control
     np.testing.assert_allclose(value, start + [0, 0, 0.03], atol=1e-12)
     assert session.history.cursor == cursor + 1
+    assert_control_undo(session, target)
+
+
+def assert_control_undo(session, target):
     session.command("undo")
     session.wait()
     assert not session.document.object(target).parts[0].a.inflation.control

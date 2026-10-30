@@ -153,15 +153,17 @@ def additional_sources(controller, engine):
     )
     settle(controller)
     controller.selection_view.select(third, True)
-    assert (
-        controller.selection_view.selectedObjects == [*keys, third]
-        and controller.construction_view.surfaceAction["enabled"]
-    )
+    assert controller.selection_view.selectedObjects == [*keys, third]
+    assert controller.construction_view.surfaceAction["enabled"]
     click(engine.rootObjects()[0], "createPatchSurface")
     settle(controller)
     surface = controller.session.document.object(controller.selection)
     assert [use.curve for use in surface.curves] == [*keys, third]
     assert surface.kind == "LOFT" and surface.result.status == "ready"
+    assert_surface_undo(controller, surface)
+
+
+def assert_surface_undo(controller, surface):
     controller.run("undo", {})
     assert surface.id not in controller.session.document.registry.records
 

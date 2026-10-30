@@ -27,7 +27,7 @@ Qt 6.12 compiler-specific archive location. It retains aqt checksum verification
 | Command | Purpose |
 | --- | --- |
 | ./tools/build-native.ps1 | Native rebuild and CTest |
-| ./tools/check.ps1 | Lock, Ruff, configured mypy, native/style checks, pytest, numerical imports, doctor |
+| ./tools/check.ps1 | Lock, Ruff, configured mypy, native/style checks, QML model APIs, pytest, numerical imports, doctor |
 | uv run --no-sync python -m anthroforge run examples/assembly.json | Create and save the example assembly |
 | uv run --no-sync python tools/gui_acceptance.py assembly.anthroforge | Real QQuickWindow drag/undo and save/reopen |
 | uv run --no-sync python tools/scheduling_acceptance.py assembly.anthroforge | Parent/child coherence during real viewport drags, timing and captures |
@@ -157,3 +157,12 @@ Summarize the saved results with `tools/activity_evidence.py <comparison-directo
 <output.json> [--confirmation <final-run-directory>]`. It preserves per-run variance
 and capture completeness/retention,
 separates Activity notifications from other models, and does not sum nested durations.
+
+
+The Windows gate runs `tools/check_qml.py` after building the native QML module. It uses the
+pinned Qt 6.12 SDK registrar/linter and generates tooling files under `build/qml-check`.
+The check rejects registered panel API errors, tests its own invalid-method detection and
+writes the complete QML diagnostics separately. Dynamic property-map fields and existing
+QML style diagnostics remain runtime-tested; a passing API check is not a claim that all QML
+warnings are eliminated. The temporary AST normalization works around Qt 6.12 metaobjectdump's
+handling of `from . import module`; it never changes or executes production source.

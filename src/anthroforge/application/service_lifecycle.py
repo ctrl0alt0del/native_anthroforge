@@ -15,7 +15,6 @@ class Event(Enum):
     GESTURE_BEGIN = auto()
     GESTURE_COMMITTED = auto()
     GESTURE_CANCELING = auto()
-    CLEAR_PREVIEWS = auto()
     CLOSE = auto()
 
 

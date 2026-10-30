@@ -104,9 +104,8 @@ def tissue_and_source(controller, window):
     assert controller.selection == membrane
     click(visible(window, "editSurfaceSource"))
     settle(controller)
-    assert (
-        controller.selection_view.selectedData["kind"] == "FIBER" and controller.authoring.editing
-    )
+    assert controller.selection_view.selectedData["kind"] == "FIBER"
+    assert controller.authoring.editing
     snapshot(window, "edit-source")
 
 

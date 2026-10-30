@@ -99,30 +99,3 @@ def inspect(session: Any) -> dict[str, Any]:
     value = records.state(session)
     groups = ("types", "assignments", "collections", "regions")
     return {key: [asdict(row) for row in getattr(value, key)] for key in groups}
-
-
-def execute(session: Any, operation: str, arguments: Any) -> Any:
-    commands = operations()
-    name = operation.removeprefix("catalogue.")
-    if name == "collection.remove":
-        return records.remove(session, name.split(".")[0] + "s", arguments["id"])
-    if name not in commands:
-        raise ValueError("Unknown catalogue operation.")
-    return commands[name](session, **arguments)
-
-
-def operations() -> dict[str, Any]:
-    from . import reconstruction_regions
-
-    return {
-        "inspect": inspect,
-        "type.create": create_type,
-        "type.update": update_type,
-        "type.remove": remove_type,
-        "assign": assign,
-        "assign_many": assign_many,
-        "collection.set": collection,
-        "region.set": reconstruction_regions.set_region,
-        "region.inspect": reconstruction_regions.inspect,
-        "region.remove": reconstruction_regions.remove,
-    }

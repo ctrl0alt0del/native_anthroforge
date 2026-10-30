@@ -8,23 +8,6 @@ from anthroforge.core.mirroring import MirrorRule, SharedMirrorTarget, parse, re
 from . import mirror_junctions, mirror_policy, workspace_policy
 
 
-def queries(session: Any) -> dict[str, Any]:
-    from .mirror_bindings import inspect as bindings
-
-    return {
-        "mirror.attachment.inspect": lambda **a: bindings(session, **a),
-        "mirror.list": lambda **a: listing(session, **a),
-        "mirror.inspect": lambda **a: inspect(session, **a),
-        "mirror.source": lambda **a: source(session, **a),
-        "mirror.removal.inspect": lambda **a: removal(session, **a),
-        "mirror.attachment.shared": lambda **a: shared(session, **a),
-        "mirror.planes": lambda: planes(session),
-        "mirror.source.removal.inspect": lambda target: mirror_policy.removing(
-            session.document, target
-        ),
-    }
-
-
 def planes(session: Any) -> list[dict[str, Any]]:
     return [
         dict(asdict(rule), name=plane_name(session.document, rule))

@@ -47,13 +47,10 @@ def anatomy(session: Any, target: str) -> None:
         editable(session, target)
 
 
-def command(session: Any, operation: str, arguments: Any) -> None:
+def command(session: Any, arguments: Any, *, project_scope: bool = False) -> None:
     if not session._editing.key:
         return
-    if operation.startswith("skin.") or operation in {
-        "attachments.enable",
-        "skeleton_update.apply",
-    }:
+    if project_scope:
         raise ValueError("Project-wide operations belong to accepted anatomy.")
     for name in ("entity", "target", "control", "curve", "surface"):
         key = arguments.get(name)

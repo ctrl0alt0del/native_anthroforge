@@ -1,0 +1,57 @@
+"""Anatomy operation declarations; common execution lives in command_execution."""
+
+from .. import (
+    curve_consumers,
+    curve_independence,
+    mesh_replacement,
+    operations,
+    replacement_status,
+    scp_splitting,
+    segment_operations,
+)
+from .. import primitive_operations as primitives
+from ..command_contracts import direct, edit
+
+COMMANDS = (
+    edit("chain.configure", segment_operations.configure),
+    edit("chain.segment", segment_operations.segment),
+    edit("chain.resize", segment_operations.resize),
+    edit("primitive.from_curves", curve_consumers.from_curves),
+    edit("primitive.curve_mode", curve_consumers.transform_mode),
+    edit("primitive.curve_reverse", curve_consumers.reverse),
+    edit("primitive.make_independent", curve_independence.make_independent),
+    edit("scp.empty", operations.empty),
+    edit("scp.rename", operations.rename),
+    edit("scp.color", operations.color),
+    edit("scp.delete", operations.delete),
+    edit("scp.duplicate", operations.duplicate),
+    edit("scp.reparent", operations.reparent),
+    edit("scp.wrap_root", operations.wrap_root),
+    edit("scp.transform", operations.transform),
+    edit("scp.attachment", operations.attachment),
+    edit("scp.recapture", operations.recapture),
+    edit("scp.origin", operations.move_origin),
+    edit("attachments.enable", operations.toggle_attachments, project_scope=True),
+    edit("primitive.create", primitives.create),
+    edit("scp.split", scp_splitting.split),
+    edit("scp.mesh.replace.apply", mesh_replacement.apply),
+    edit("primitive.update", primitives.update),
+    edit("curve.update", primitives.curve_update),
+    edit("curve.add", primitives.curve_add),
+    edit("curve.remove", primitives.curve_remove),
+    edit("curve.order", primitives.curve_order),
+    edit("curve.split", primitives.curve_split),
+    edit("point.update", primitives.point_update),
+    edit("point.insert", primitives.point_insert),
+    edit("point.remove", primitives.point_remove),
+    edit("body.update", primitives.piece_update),
+    edit("thickness.update", primitives.thickness),
+    direct("primitive.inspect", lambda session, **a: primitives.inspect(session, **a)),
+    direct("scp.mesh.replace.assess", lambda session, **a: mesh_replacement.assess(session, **a)),
+    direct("scp.mesh.replace.status", lambda session: mesh_replacement.status(session)),
+    direct("scp.mesh.replace.cancel", lambda session: mesh_replacement.cancel(session)),
+    direct(
+        "scp.mesh.replace.eligibility",
+        lambda session, target: replacement_status.describe(session, "mesh_replacement", target),
+    ),
+)

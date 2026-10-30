@@ -53,13 +53,3 @@ def install(session: Any, candidate: Any, updated: Any) -> None:
         accepted_outputs=candidate.prepared, **{key: getattr(updated, key) for key in names}
     )
     skin_update_tasks.pending(session)
-
-
-def commands(session: Any) -> dict[str, Any]:
-    service = session.skeleton_update
-    return {
-        "skeleton_update.inspect": service.inspect,
-        "skeleton_update.prepare": service.prepare,
-        "skeleton_update.status": service.status,
-        "skeleton_update.cancel": service.cancel,
-    }

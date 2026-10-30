@@ -104,11 +104,3 @@ def describe(session: Any, row: Any) -> dict[str, Any]:
     except ValueError:
         name = "Unavailable anatomy"
     return dict(asdict(row), name=name)
-
-
-def execute(session: Any, operation: str, arguments: Any) -> Any:
-    commands: dict[str, Any] = {"add": add, "claim": claim, "update": update, "inspect": inspect}
-    name = operation.removeprefix("reconstruction.queue.")
-    if name not in commands:
-        raise ValueError("Unknown reconstruction queue operation.")
-    return commands[name](session, **arguments)

@@ -85,10 +85,3 @@ def describe(session: Any, row: Review) -> dict[str, Any]:
     except ValueError:
         freshness = "UNAVAILABLE"
     return dict(asdict(row), freshness=freshness)
-
-
-def execute(session: Any, operation: str, arguments: Any) -> Any:
-    commands: dict[str, Any] = {"review.set": decide, "review.inspect": inspect}
-    if operation not in commands:
-        raise ValueError("Unknown review operation.")
-    return commands[operation](session, **arguments)

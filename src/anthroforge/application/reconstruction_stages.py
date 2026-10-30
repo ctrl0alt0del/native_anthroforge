@@ -117,13 +117,3 @@ def remove(session: Any, stage: str) -> None:
 def inspect(session: Any, subject: str = "") -> Any:
     rows = records.state(session).stages
     return dict(stages=[asdict(row) for row in rows if not subject or row.subject == subject])
-
-
-def execute(session: Any, operation: str, arguments: Any) -> Any:
-    commands: dict[str, Any] = dict(
-        import_mesh=import_mesh, import_project=import_project, inspect=inspect, remove=remove
-    )
-    name = operation.removeprefix("reconstruction.stage.")
-    if name not in commands:
-        raise ValueError("Unknown stage operation.")
-    return commands[name](session, **arguments)

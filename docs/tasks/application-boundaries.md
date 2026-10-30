@@ -25,4 +25,13 @@ Status: implementation in progress; not qualified or merged.
 
 Research: Qt's QML singleton/type registration documentation and model ownership guidance; Fowler's dependency injection discussion. Context properties are not inherently uncheckable in newer Qt: verify the actual toolchain rather than repeat that audit claim.
 
-No checks run yet for this task. Next: inspect exact command policies and preserve regression cases before replacing dispatch.
+First checkpoint: immutable, explicit feature command declarations now cover 385 operations,
+including profiler controls. Shared execution owns permission/variant checks, isolated-gesture
+admission, implicit transactions, comparison recording and profiling. Project-wide scope is
+declared by the feature. Removed superseded prefix routers and per-call bound-command tables.
+Service methods resolve the active context at dispatch. No numerical behavior changed.
+
+Evidence so far: 68 targeted registry, painting, skin, assembly, variant and query tests pass;
+mypy passes across 670 modules. Full development/UI/package qualification remains pending.
+Next: integrate context-owned lifecycle subscriptions and typed service accessors, then extract
+desktop responsibilities. This checkpoint is deliberately incomplete and remains off main.

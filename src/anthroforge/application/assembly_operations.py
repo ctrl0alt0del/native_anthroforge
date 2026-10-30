@@ -28,14 +28,3 @@ def require_scope(session: Any, candidate: Any) -> None:
         for row in candidate.references:
             for use in row.uses:
                 require(session, use.owner)
-
-
-def commands(session: Any) -> dict[str, Any]:
-    return {
-        "assembly.inspect": session.assembly.inspect,
-        "assembly.prepare": session.assembly.prepare,
-        "assembly.status": session.assembly.status,
-        "assembly.cancel": session.assembly.cancel,
-        "assembly.references": lambda: [asdict(r) for r in session.document.external_references],
-        "assembly.resolve": session.assembly.resolve,
-    }

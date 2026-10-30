@@ -101,20 +101,3 @@ def section(view: Any, plane: Any, cancel: int) -> Any:
         for entry in view.layers
         if entry.kind == "MESH"
     ]
-
-
-def execute(session: Any, operation: str, arguments: Any) -> Any:
-    from .reconstruction_export import export
-
-    service = session.reconstruction_comparison
-    commands = dict(
-        start=service.start,
-        status=service.status,
-        cancel=service.cancel,
-        options=partial(views.options, session),
-        export=partial(export, session),
-    )
-    name = operation.removeprefix("reconstruction.compare.")
-    if name not in commands:
-        raise ValueError("Unknown reconstruction comparison operation.")
-    return commands[name](**arguments)

@@ -11,8 +11,6 @@ from anthroforge.core.results import Port
 from anthroforge.native.mesh import GeometryEngine
 from anthroforge.profiling import RuntimeProfiler, causes
 from anthroforge.profiling.spans import measured
-from anthroforge.profiling.tasks import command_metadata
-from anthroforge.profiling.tasks import operation as profile_operation
 
 from .assets import Asset
 from .changes import ChangeJournal
@@ -336,17 +334,7 @@ class Session:
     def command(self, operation: str, **arguments: Any) -> Any:
         from .commands import execute
 
-        if operation.startswith("profile."):
-            return profile_operation(self, operation, arguments)
-        return self.profiler.call(
-            "command",
-            operation,
-            execute,
-            self,
-            operation,
-            arguments,
-            _metadata=command_metadata(self, arguments),
-        )
+        return execute(self, operation, arguments)
 
     def wait(self, timeout: float | None = None) -> None:
         from .geometry_ownership import collect

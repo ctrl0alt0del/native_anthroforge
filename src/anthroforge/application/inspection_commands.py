@@ -1,5 +1,6 @@
 """Explicit presentation operations shared by desktop and headless inspection."""
 
+from collections.abc import Callable
 from typing import Any
 
 from . import (
@@ -11,9 +12,8 @@ from . import (
     tissue_inspection,
 )
 from .issues import surface_geometry
-from .session import Session
 
-OPERATIONS = {
+OPERATIONS: dict[str, Callable[..., Any]] = {
     "geometry.check": surface_geometry.request,
     "geometry.finding": spatial_evidence.issue,
     "geometry.measure": lambda session, **options: tissue_inspection.start(
@@ -44,9 +44,3 @@ OPERATIONS = {
     "bookmark.remove": bookmarks.remove,
     "bookmark.list": bookmarks.inspect,
 }
-
-
-def execute(session: Session, operation: str, arguments: dict[str, Any]) -> Any:
-    if operation not in OPERATIONS:
-        raise ValueError("Unknown inspection operation: " + operation)
-    return OPERATIONS[operation](session, **arguments)  # type: ignore[operator]

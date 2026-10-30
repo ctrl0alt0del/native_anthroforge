@@ -1,6 +1,6 @@
 # Application ownership boundaries
 
-Status: implementation in progress; not qualified or merged.
+Status: implemented and qualified; final integration/delivery in progress.
 
 ## Scope and recovery
 
@@ -107,3 +107,25 @@ source staging retained deleted files from older builds; staging now replaces it
 source subtree with a verified build-local path. A temporary-directory check confirms removed
 files disappear and original sources stay intact. This packaging-tool change does not change
 runtime code. Relocated qualification is running against the completed combined executable.
+
+
+## Final qualification
+
+- Clean branch: **2,895 pytest tests passed** (451.11 s); combined primary tree preserving
+  local assembly fixes: **2,900 passed** (437.12 s). No skipped geometry checks in these runs.
+- Development gate: lock, Ruff/format, configured mypy (676 modules), six native CTest groups,
+  native/script style, all 185 QML files' registered-model API checks, numerical imports and
+  native doctor pass. The complete first gate found the three documented regressions; the
+  corrected complete pytest run and remaining gate stages passed afterward.
+- All **37 relocated portable workflow groups** pass with minimal PATH and developer Qt/Python
+  variables removed. Actual hidden GPU painting/export images and offscreen panel captures
+  were inspected. This does not claim foreground/manual interactive acceptance.
+- Registry audit: 385 operations, 308 literal desktop calls, zero missing registrations.
+- Function limit and UTF-8 source checks pass. No project schema, package version, numerical
+  algorithm, worker-pool or user workflow changes.
+
+Local evidence: `build/refactor/development-gate.log`, `gate-recheck.log`, `combined-gate.log`,
+`qml-check.log`, `workbench.log`, `shortcuts-editor.log`, `painting-visual.log`, dispatch JSONs,
+and `portable.log`; full portable summary is `build/portable/portable-check.json`.
+Runtime build identity is `8bc5cd8e` plus preserved unrelated assembly edits, honestly marked
+`tracked_changes: true`. Later commits change audit/tooling/recovery documentation only.

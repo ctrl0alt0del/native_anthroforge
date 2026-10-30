@@ -4,8 +4,11 @@
   on SCPs, explicit generation of editable Fibers/Membranes, existing branches, gap-depth
   controls and temporary painting history. See the [product contract](specification_050.md)
   and [method research](muscle_paint_050_research.md), covering all fourteen identified
-  method/integration questions. No algorithm is qualified,
-  implementation plan finalized or release version changed by this documentation.
+  method/integration questions. The proposed [implementation design](design_050.md) and
+  [ordered plan](implementation_050.md) extend the implemented Painting System, with
+  transient history, native fitting, branch/loop integration and evidence-led qualification.
+  No Muscle Paint algorithm or release is qualified by these documents. Schema 10 for
+  explicit cyclic material maps is proposed for implementation; current projects remain 9.
 
 - **0.4.3 — qualified authoring parity A1–A4:** shared current
   components, immutable candidate images/data, compatible choices/effective settings and

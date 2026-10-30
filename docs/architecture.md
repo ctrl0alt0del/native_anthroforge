@@ -1294,6 +1294,12 @@ finalization and resource lifetime for tissue weights and collagen. Consumer ada
 own baseline/eligibility, numerical effect and domain commit. Desktop and headless use
 the same operations; legacy inspection commands delegate. Native kernels are unchanged.
 
+The [proposed Muscle Paint design](design_050.md) extends this owner with typed geometric
+stroke inputs and domain-owned temporary drafts. It proposes optional transient contributions
+to the existing history chronology and shared periodic surface correspondence, with native
+sheet/fit work and feature-owned command/status/UI adapters. These are planned boundaries,
+not current behavior; delivery and acceptance are in [the implementation plan](implementation_050.md).
+
 
 ## Command, context-service and desktop ownership
 

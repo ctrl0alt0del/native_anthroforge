@@ -6,6 +6,10 @@ defines behavior, not a qualified reconstruction algorithm or implementation pla
 No package version, project schema or existing computation changes with this delivery.
 Research and experimental algorithm choices must remain distinguishable from this contract.
 
+The proposed [implementation design](design_050.md) and [ordered plan](implementation_050.md)
+now describe ownership, concrete methods, transient history, periodic correspondence and
+qualification. They are not an implementation or geometry-acceptance claim.
+
 ## 1. Outcome and existing contracts
 
 Users paint an intended muscle base over SCPs and gaps, then explicitly generate an

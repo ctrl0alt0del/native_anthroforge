@@ -4,6 +4,10 @@ Implemented foundation for tissue weights and SCP collagen; qualification is rec
 in [the task record](tasks/painting-system-step1.md). This is not completion of Muscle
 Paint or 0.5.0. Package version 0.4.3 and project schema 9 are unchanged.
 
+The proposed [Muscle Paint design](design_050.md) and [implementation plan](implementation_050.md)
+extend this foundation for physical-width multisurface strokes and temporary draft history.
+Those extensions are not implemented; the current scalar-paint contracts below remain valid.
+
 ## Responsibility and extension boundary
 
 `core.painting` defines immutable brush, stroke-input, surface-reference and provenance

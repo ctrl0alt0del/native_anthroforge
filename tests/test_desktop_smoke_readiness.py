@@ -7,7 +7,7 @@ from anthroforge.desktop.smoke import ready
 
 def controller():
     return SimpleNamespace(
-        pending_document=None,
+        project_view=SimpleNamespace(pending_document=None),
         session=SimpleNamespace(waiting_save=False, scheduler=SimpleNamespace(active_jobs=[])),
         geometry_models=lambda: [],
     )
@@ -16,9 +16,9 @@ def controller():
 def test_smoke_waits_for_document_and_scheduled_work():
     value = controller()
     assert ready(value)
-    value.pending_document = "assembly.anthroforge"
+    value.project_view.pending_document = "assembly.anthroforge"
     assert not ready(value)
-    value.pending_document, value.session.waiting_save = None, True
+    value.project_view.pending_document, value.session.waiting_save = None, True
     assert not ready(value)
     value.session.waiting_save, value.session.scheduler.active_jobs = False, [object()]
     assert not ready(value)

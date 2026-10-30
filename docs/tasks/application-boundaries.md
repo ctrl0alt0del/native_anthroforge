@@ -84,3 +84,9 @@ checks are still running/pending; this is not yet a completed delivery.
 The maintained authoring audit now consumes the registry directly rather than introspecting
 removed dispatch tables. It reports 385 registered operations, 308 literal desktop calls and
 zero missing registrations, including the extracted view-model directory.
+
+The first complete gate reached 2,892 passes and three failures: two smoke-readiness test
+fixtures still modeled Controller-owned pending projects, and SkinPanel dynamically looked up
+the former `object_selection`. The production lookup now uses the explicit selection owner;
+fixtures use ProjectView. All five targeted regression/engine-isolation checks pass. Search
+found no other stale dynamic state lookups. Final complete-suite confirmation remains pending.

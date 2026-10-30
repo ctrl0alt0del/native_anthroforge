@@ -61,6 +61,6 @@ class SkinPanel(QObject):
 
 
 def context(controller, session):
-    selected = getattr(getattr(controller, "object_selection", None), "primary", "")
+    selected = controller.selection
     item = session.document.registry.records.get(selected)
     return session.workspace.skin_display, selected, session.workspace, id(item)

@@ -13,6 +13,7 @@ from .changes import ChangeJournal
 from .editing_state import EditingState
 from .history import History
 from .scheduling_context import SchedulingContext
+from .service_lifecycle import Event
 
 
 class EditingContexts:
@@ -58,7 +59,7 @@ class EditingContexts:
 
     def pause(self, key: str) -> None:
         with self.use(key):
-            self.session.cancel_painting()
+            self.session.services.emit(Event.INTERACTION_CANCEL)
             for job in self.session.scheduler.active_jobs:
                 if job.writes:
                     self.session.scheduler.cancel_job(job.id, obsolete=True, reason="context_left")
@@ -100,13 +101,7 @@ class EditingContexts:
 
     def close_context(self, key: str) -> None:
         with self.use(key):
-            self.session.assembly.cancel()
-            self.session.skeleton_update.cancel()
-            self.session.variant_review.cancel()
-            self.session.reconstruction_comparison.cancel()
-            self.session.shortcut_comparison.clear()
-            self.session.issues.close()
-            self.session.clear_previews()
+            self.session.services.close()
 
     def prune(self) -> None:
         retained = {v.id for v in self.scene("").reconstruction.variants}
@@ -158,15 +153,6 @@ def initial_values(document: Document) -> dict[str, Any]:
 
 
 def initialize_services(session: Any) -> None:
-    from .issues.repairs import register
-    from .issues.system import IssueSystem
-    from .skin_status import SkinStatusProvider
-    from .tissue_inspection import Inspection
+    from .context_services import attach
 
-    session.initialize_project_preparation()
-    session.clear_previews()
-    session.tissue_inspection = Inspection()
-    session.attach_shortcut_contexts()
-    session.issues = IssueSystem(session)
-    session.skin_status = SkinStatusProvider(session)
-    register(session)
+    attach(session)

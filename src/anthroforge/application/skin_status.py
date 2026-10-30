@@ -9,6 +9,14 @@ from anthroforge.core.results import Port
 
 from .construction_policy import revisions
 from .operation_status import Eligibility
+from .service_lifecycle import Event, Service
+
+
+def attach(session: Any) -> Service:
+    if not hasattr(session, "skin_status"):
+        session.skin_status = SkinStatusProvider(session)
+    session.skin_status.changed()
+    return Service("skin_status", ((Event.DOCUMENT_CHANGED, session.skin_status.changed),))
 
 
 @dataclass(frozen=True)

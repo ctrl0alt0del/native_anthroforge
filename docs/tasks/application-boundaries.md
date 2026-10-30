@@ -33,5 +33,15 @@ Service methods resolve the active context at dispatch. No numerical behavior ch
 
 Evidence so far: 68 targeted registry, painting, skin, assembly, variant and query tests pass;
 mypy passes across 670 modules. Full development/UI/package qualification remains pending.
-Next: integrate context-owned lifecycle subscriptions and typed service accessors, then extract
-desktop responsibilities. This checkpoint is deliberately incomplete and remains off main.
+Second increment: explicit context-owned lifecycle subscriptions now initialize services for
+root/variant contexts and own gesture/history reactions, document notifications, synchronization
+and teardown. Named typed accessors remain on Session; no service lookup registry is exposed.
+Preview teardown cancels owned work and drops inspection/query leases. Skin-status subscriptions
+survive ordinary project adoption. Cleanup attempts every registered close handler even if one
+fails, and is idempotent.
+
+Lifecycle evidence: 48 targeted tests pass, including existing painting, assembly, variant and
+history cases plus per-context notifications, replacement and teardown-failure tests. Mypy
+passes across 676 modules. A preliminary full pytest run is ongoing; final qualification is
+still pending. Next: extract desktop view models and register tooling-visible per-engine QML
+interfaces. This checkpoint is deliberately incomplete and remains off main.

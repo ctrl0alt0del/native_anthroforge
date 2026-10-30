@@ -1,8 +1,10 @@
 """The single application API used by UI, CLI, automation and tests."""
 
+from __future__ import annotations
+
 from dataclasses import asdict, replace
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.document import Document
 from anthroforge.core.entities import SCP, Workspace
@@ -27,13 +29,29 @@ from .mirror_policy import require_transition as require_mirror_transition
 from .preferences import PreferenceStore, load_user_preferences
 from .previews import Preview
 from .resources import Resources
+from .service_lifecycle import Event, Lifecycle
 from .surface_preview import Candidate
 from .tissue_preview import Candidate as TissueCandidate
 from .variant_policy import require as require_variant_edit
 from .variant_policy import retain_scope
 
+if TYPE_CHECKING:
+    from .assembly_runtime import Assembly
+    from .formula_invalidation import FormulaInvalidation
+    from .issues.system import IssueSystem
+    from .painting_state import Painting
+    from .reconstruction_comparison import Comparison as ReconstructionComparison
+    from .shortcut_comparison import Comparison as ShortcutComparison
+    from .shortcut_contexts import Contexts as ShortcutContexts
+    from .shortcut_observation import Observation
+    from .skeleton_runtime import SkeletonUpdate
+    from .skin_status import SkinStatusProvider
+    from .tissue_inspection import Inspection
+    from .variant_review import VariantReview
+
 
 class Session:
+    services = ContextField[Lifecycle]("services")
     _document = ContextField[Document]("document")
     history = ContextField[History]("history")
     changes = ContextField[ChangeJournal]("changes")
@@ -42,18 +60,20 @@ class Session:
     formula_reference_authority = ContextField[frozenset[str]]("formula_reference_authority")
     formula_observing = ContextField[bool]("formula_observing")
     replay_callback = ContextField[Any]("replay_callback")
-    issues = ContextField[Any]("issues")
-    skin_status = ContextField[Any]("skin_status")
-    assembly = ContextField[Any]("assembly")
-    skeleton_update = ContextField[Any]("skeleton_update")
-    variant_review = ContextField[Any]("variant_review")
-    reconstruction_comparison = ContextField[Any]("reconstruction_comparison")
-    shortcut_edits = ContextField[Any]("shortcut_edits")
-    formula_invalidation = ContextField[Any]("formula_invalidation")
-    shortcut_observation = ContextField[Any]("shortcut_observation")
-    shortcut_comparison = ContextField[Any]("shortcut_comparison")
-    tissue_inspection = ContextField[Any]("tissue_inspection")
-    painting = ContextField[Any]("painting")
+    issues: ContextField[IssueSystem] = ContextField("issues")
+    skin_status: ContextField[SkinStatusProvider] = ContextField("skin_status")
+    assembly: ContextField[Assembly] = ContextField("assembly")
+    skeleton_update: ContextField[SkeletonUpdate] = ContextField("skeleton_update")
+    variant_review: ContextField[VariantReview] = ContextField("variant_review")
+    reconstruction_comparison: ContextField[ReconstructionComparison] = ContextField(
+        "reconstruction_comparison"
+    )
+    shortcut_edits: ContextField[ShortcutContexts] = ContextField("shortcut_edits")
+    formula_invalidation: ContextField[FormulaInvalidation] = ContextField("formula_invalidation")
+    shortcut_observation: ContextField[Observation] = ContextField("shortcut_observation")
+    shortcut_comparison: ContextField[ShortcutComparison] = ContextField("shortcut_comparison")
+    tissue_inspection: ContextField[Inspection] = ContextField("tissue_inspection")
+    painting: ContextField[Painting] = ContextField("painting")
     conversion = ContextField[ConversionPreview]("conversion")
     mesh_replacement = ContextField[Preview[Any]]("mesh_replacement")
     tissue_retarget = ContextField[Preview[Any]]("tissue_retarget")
@@ -97,17 +117,10 @@ class Session:
         self.replay_callback = None
 
     def initialize_runtime(self, profiler: RuntimeProfiler | None) -> None:
-        from .issues.repairs import register
-        from .issues.system import IssueSystem
-        from .skin_status import SkinStatusProvider
-
         self.owns_profiler = profiler is None
         self.profiler = profiler if profiler is not None else RuntimeProfiler()
         self.profiler.resources.sessions.add(self)
         self.initialize_scheduler()
-        self.issues = IssueSystem(self)
-        self.skin_status = SkinStatusProvider(self)
-        register(self)
 
     @property
     def assets(self) -> dict[str, Asset]:
@@ -122,54 +135,21 @@ class Session:
         self.changes.record(self._document, value)
         causes.document(self, self._document, value)
         self._document = value
-        if hasattr(self, "skin_status"):
-            self.skin_status.changed()
+        if hasattr(self, "services"):
+            self.services.emit(Event.DOCUMENT_CHANGED)
 
     def initialize_scheduler(self) -> None:
-        from .tissue_inspection import Inspection
+        from .context_services import attach
 
-        self.initialize_project_preparation()
-        self._editing.values.pop("inspection_snapshot", None)
-        self.tissue_inspection = Inspection()
-        self.clear_previews()
         self.scheduler = TaskCoordinator(
             lambda: self.document, executor_factory=self.executor_factory
         )
         self.scheduler.profiler = self.profiler
         self.scheduler.can_publish = self.can_publish
-        self.attach_shortcut_contexts()
-        if hasattr(self, "issues"):
-            self.issues.reset()
-
-    def initialize_project_preparation(self) -> None:
-        from .assembly_runtime import Assembly
-        from .reconstruction_comparison import Comparison
-        from .skeleton_runtime import SkeletonUpdate
-        from .variant_review import VariantReview
-
-        self.assembly = Assembly(self)
-        self.skeleton_update = SkeletonUpdate(self)
-        self.variant_review = VariantReview(self)
-        self.reconstruction_comparison = Comparison(self)
-
-    def attach_shortcut_contexts(self) -> None:
-        from .formula_invalidation import FormulaInvalidation
-        from .shortcut_comparison import Comparison
-        from .shortcut_contexts import Contexts
-        from .shortcut_observation import Observation
-
-        self.shortcut_edits = Contexts(self)
-        self.formula_invalidation = FormulaInvalidation()
-        self.shortcut_observation = Observation(self)
-        self.shortcut_comparison = Comparison(self)
-        self.scheduler.observer = self.shortcut_observation.event
-        self.scheduler.annotate = self.shortcut_edits.annotate
-        self.scheduler.before_dispatch = self.shortcut_edits.require
+        attach(self)
 
     def synchronize_services(self) -> None:
-        self.issues.synchronize()
-        self.shortcut_edits.synchronize()
-        self.shortcut_observation.prune()
+        self.services.emit(Event.SYNCHRONIZE)
 
     @property
     def engine(self) -> GeometryEngine:
@@ -262,8 +242,7 @@ class Session:
         if save_blocks_edits(self):
             raise ValueError("Editing is blocked while waiting to save.")
         self.history.begin(self.document)
-        self.shortcut_edits.active = ""
-        self.comparison_event("begin")
+        self.services.emit(Event.GESTURE_BEGIN)
 
     @measured("transaction", lambda session: session.profiler)
     def commit(self) -> None:
@@ -272,32 +251,27 @@ class Session:
         from .operations import released
 
         released(self)
-        self.shortcut_edits.active = ""
-        self.shortcut_observation.finish_gesture()
-        self.comparison_event("commit")
+        self.services.emit(Event.GESTURE_COMMITTED)
 
     @measured("transaction", lambda session: session.profiler)
     def cancel(self) -> None:
-        self.comparison_event("cancel")
-        self.shortcut_observation.finish_gesture(cancelled=True)
-        self.shortcut_edits.active = ""
+        self.services.emit(Event.GESTURE_CANCELING)
         self.document = replace(self.history.cancel(), workspaces=self.document.workspaces)
         self.scheduler.restore(self.history.surviving())
         self.replay_callback = None
-        self.issues.reset()
+        self.services.emit(Event.HISTORY_RESTORED)
         self.resume_calculations()
 
     @measured("transaction", lambda session: session.profiler)
     def navigate(self, direction: int) -> None:
         self.prepare_navigation()
         previous = self.document
-        self.comparison_event("undo" if direction < 0 else "redo")
-        self.shortcut_observation.restore()
+        self.services.emit(Event.HISTORY_BEGIN, direction)
         self.document = replace(self.history.navigate(direction), workspaces=previous.workspaces)
         self.remember_restarts(self.scheduler.restore(self.history.surviving()))
         changed = changed_ids(previous, self.document)
         self.scheduler.invalidate(changed)
-        self.issues.reset()
+        self.services.emit(Event.HISTORY_RESTORED)
         if direction > 0:
             self.history.replay()
         self.history.recover()
@@ -306,7 +280,7 @@ class Session:
     def prepare_navigation(self) -> None:
         if self.waiting_save:
             raise ValueError("History is blocked while waiting to save.")
-        self.cancel_painting()
+        self.services.emit(Event.INTERACTION_CANCEL)
 
     def remember_restarts(self, restarts: list[Restart]) -> None:
         for restart in restarts:
@@ -366,8 +340,6 @@ class Session:
     def close(self) -> None:
         self.contexts.close()
         self.scheduler.close()
-        self.clear_previews()
-        self._editing.values.pop("inspection_snapshot", None)
         if self._engine is not None:
             self._engine.clear_caches()
             self.profiler.native.detach(self._engine)
@@ -375,29 +347,6 @@ class Session:
             self.profiler.close()
         if self.file_lock:
             self.file_lock.close()
-
-    def clear_previews(self) -> None:
-        self.reset_painting()
-        self._editing.values.pop("component_read", None)
-        self._editing.values.pop("query_revision", None)
-        self.conversion = ConversionPreview()
-        self.mesh_replacement = Preview()
-        self.tissue_retarget = Preview()
-        self.surface_preview = Preview()
-        self.tissue_preview = Preview()
-        self.skin_fit_preview = Preview()
-
-    def cancel_painting(self) -> None:
-        from .painting import cancel
-
-        if self._editing.values.get("painting"):
-            cancel(self)
-
-    def reset_painting(self) -> None:
-        from .painting_state import Painting
-
-        self.cancel_painting()
-        self.painting = Painting()
 
 
 def changed_ids(previous: Document, current: Document) -> set[str]:

@@ -39,17 +39,21 @@ def stage():
     STAGE.mkdir(parents=True, exist_ok=True)
     (STAGE / "build.json").write_text(json.dumps(dict(build_identity(), packaged=True)))
     shutil.copy2(ROOT / "launch.py", STAGE / "AnthroForge.py")
-    shutil.copytree(
-        ROOT / "src/anthroforge",
-        STAGE / "anthroforge",
-        dirs_exist_ok=True,
-        ignore=shutil.ignore_patterns("__pycache__"),
-    )
+    stage_sources()
     config = configparser.ConfigParser()
     config.read(Path(PySide6.__file__).parent / "scripts/deploy_lib/default.spec")
     configure(config)
     with (STAGE / "pysidedeploy.spec").open("w") as stream:
         config.write(stream)
+
+
+def stage_sources():
+    target = STAGE / "anthroforge"
+    if not target.resolve().is_relative_to(STAGE.resolve()):
+        raise ValueError("Package source staging must stay inside the build stage.")
+    if target.exists():
+        shutil.rmtree(target)
+    shutil.copytree(ROOT / "src/anthroforge", target, ignore=shutil.ignore_patterns("__pycache__"))
 
 
 def configure(config):

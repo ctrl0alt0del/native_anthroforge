@@ -100,3 +100,10 @@ The existing operation-aware mirror guard moved from the retired commands helper
 not part of this branch's commits. The temporary stash was verified/restored and removed.
 Fourteen combined local assembly/mirror/registry regressions pass. A temporary combined package
 is building under `build/application-boundaries/build/package`; installed files remain intact.
+
+The combined temporary package completed. Its compilation report contains all seven new
+view-model modules and neither retired dispatcher module. Packaging inspection found that
+source staging retained deleted files from older builds; staging now replaces its owned
+source subtree with a verified build-local path. A temporary-directory check confirms removed
+files disappear and original sources stay intact. This packaging-tool change does not change
+runtime code. Relocated qualification is running against the completed combined executable.

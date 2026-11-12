@@ -30,6 +30,9 @@ Replaced the project-specific instructions with four general sections covering r
 implementation, continuity and validation. Reduced the source checkout's 1,054 words to
 575 (about 45%). Preserved the local structural-warning edit as a general ownership rule.
 Existing project documents stay intact; no runtime or computational behavior changed.
+The source checkout's AGENTS.md now matches the reviewed version. Its active branch,
+staging and unrelated tracked edits were preserved; this copy remains an uncommitted
+change on the separate assembly branch until that branch incorporates the cleanup.
 
 ## Verification
 
@@ -42,8 +45,8 @@ Existing project documents stay intact; no runtime or computational behavior cha
 
 ## Next actions and blockers
 
-1. Commit and push the reviewed documentation; integrate against the latest main.
-2. Update the source AGENTS.md while preserving unrelated work and its active branch.
+1. Integrate the reviewed documentation against the latest main and verify the remote tip.
+2. Archive the temporary worktree after successful integration.
 
 ## Recovery inputs
 

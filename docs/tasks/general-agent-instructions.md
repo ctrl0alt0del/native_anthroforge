@@ -3,7 +3,7 @@
 - Task branch: `codex/general-agent-instructions`
 - Integration branch: `main`
 - Starting revision: `2ec68ce495cecca0e9f635199784b0ea9663b45c`
-- Status: in progress
+- Status: ready to integrate
 - Last updated: 2026-11-12, Europe/Bucharest
 - Active writer: desktop chat editing general agent instructions
 
@@ -26,17 +26,24 @@ sound design, meaningful validation and careful handling of existing work.
 
 ## Current state
 
-Analysis complete; rewrite and content review pending. Existing project documents stay intact.
+Replaced the project-specific instructions with four general sections covering research,
+implementation, continuity and validation. Reduced the source checkout's 1,054 words to
+575 (about 45%). Preserved the local structural-warning edit as a general ownership rule.
+Existing project documents stay intact; no runtime or computational behavior changed.
 
 ## Verification
 
-Pending content review, removal checks and `git diff --check`. Documentation-only change;
-application tests, GUI checks and packaging are not required.
+- Passed manual content review against the requested scope and preserved preferences.
+- Passed `git diff --check` on Windows for the rewritten instructions and this record.
+- A search of AGENTS.md found no product names, technology mandates, repository paths,
+  build commands or repository-specific authorization from the previous version.
+- Reviewed the local AGENTS.md link and opened the official documentation link.
+- Application tests, GUI checks and packaging were not run: documentation-only change.
 
 ## Next actions and blockers
 
-1. Rewrite and review the instructions; verify preserved preferences and removed specifics.
-2. Commit, push and integrate the reviewed documentation; update the source AGENTS.md.
+1. Commit and push the reviewed documentation; integrate against the latest main.
+2. Update the source AGENTS.md while preserving unrelated work and its active branch.
 
 ## Recovery inputs
 

@@ -1349,9 +1349,3 @@ Use the shared [painting operations and lifecycle](painting_system.md) for tissu
 and collagen strokes. `painting.finish` commits automatically through the coordinator;
 `Session.wait()` completes it without Qt. `painting.preview` / `painting.commit` support
 explicit read-only preparation. Legacy paint inspection/job-commit commands remain valid.
-
-Muscle Paint operation families are **planned, not available**. See the
-[proposed interfaces](design_050.md#10-shared-api-and-desktop-design) and
-[delivery plan](implementation_050.md). Their stroke finish would edit a temporary draft;
-only explicit Generate/Update would create ordinary document construction. Existing
-tissue-weight/collagen commands retain their documented commit behavior.

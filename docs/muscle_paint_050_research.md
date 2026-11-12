@@ -1,9 +1,5 @@
 # Muscle Paint 0.5.0 — method research and applicability
 
-The subsequent [implementation design](design_050.md) and [delivery plan](implementation_050.md)
-turn these findings into proposed contracts and experiments. Research qualification limits
-below remain in force; the linked documents do not establish numerical or runtime acceptance.
-
 **Status: research, not implementation or algorithm qualification.** Checked 2026-10-29.
 The [confirmed specification](specification_050.md) owns product behavior. This document
 compares inspected code and primary sources, then proposes experiments. No new numerical,

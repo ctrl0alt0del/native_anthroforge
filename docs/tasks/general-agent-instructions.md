@@ -3,7 +3,7 @@
 - Task branch: `codex/general-agent-instructions`
 - Integration branch: `main`
 - Starting revision: `2ec68ce495cecca0e9f635199784b0ea9663b45c`
-- Status: ready to integrate
+- Status: complete
 - Last updated: 2026-11-12, Europe/Bucharest
 - Active writer: desktop chat editing general agent instructions
 
@@ -33,6 +33,10 @@ Existing project documents stay intact; no runtime or computational behavior cha
 The source checkout's AGENTS.md now matches the reviewed version. Its active branch,
 staging and unrelated tracked edits were preserved; this copy remains an uncommitted
 change on the separate assembly branch until that branch incorporates the cleanup.
+The cleanup is integrated. An integration mistake also published the pre-existing local
+documentation commits `ffe39e58` and `d3e1b948`; their content changes were reverted without
+rewriting history. The final change from the starting remote main contains only AGENTS.md
+and this task record. The original commits and files remain on the source assembly branch.
 
 ## Verification
 
@@ -42,13 +46,17 @@ change on the separate assembly branch until that branch incorporates the cleanu
   build commands or repository-specific authorization from the previous version.
 - Reviewed the local AGENTS.md link and opened the official documentation link.
 - Application tests, GUI checks and packaging were not run: documentation-only change.
+- Verified the final diff against starting revision `2ec68ce4` contains only the two
+  intended documentation files; the unrelated documentation content matches that revision.
 
 ## Next actions and blockers
 
-1. Integrate the reviewed documentation against the latest main and verify the remote tip.
-2. Archive the temporary worktree after successful integration.
+No implementation or validation work remains. Verify the correction push and archive
+the temporary worktree; Git ancestry establishes integration.
 
 ## Recovery inputs
 
 No external assets or environment setup needed. Preserve all unrelated source-checkout edits.
+To publish the separate design work later, account for its integration revert: merging
+the original commits again will not reapply their content automatically.
 The containing commit identifies this checkpoint; inspect remote reachability for push status.

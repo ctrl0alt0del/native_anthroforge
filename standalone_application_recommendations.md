@@ -8,10 +8,6 @@ Membranes; it is distinct from existing tissue/skin weight painting. The
 [method research](docs/muscle_paint_050_research.md) covers the fourteen identified method
 questions, inventories reusable addon algorithms and records concrete integration gaps and
 approaches, without claiming qualification or changing existing computations.
-The [proposed implementation design](docs/design_050.md) and
-[ordered implementation plan](docs/implementation_050.md) now assign those methods to
-shared owners, usable increments and explicit acceptance evidence. Runtime delivery and
-algorithm qualification remain pending.
 
 For current implementation coverage, see the [0.4.2 preparation audit](docs/recommendations_042_audit.md)
 and [0.4.3 authoring parity delivery](docs/authoring_043.md). The latter implements shared

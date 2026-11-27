@@ -79,6 +79,7 @@ def inspect_fiber(key):
     return [
         named("pins", "issues.list", filters=dict(provider="fiber_pins.v1")),
         named("supports", "fiber.supports.inspect", curve=key),
+        request("workspace.update", skin_display="NONE"),
         request("fiber.presentation", target=key, radius=0.03),
         named("appearance", "fiber.presentation.inspect", target=key),
         request("save", path="authoring.anthroforge", blocked_policy="wait"),

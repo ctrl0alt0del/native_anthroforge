@@ -14,7 +14,7 @@ def reconstruction(executable, cwd, invoke):
     with ZipFile(cwd / "reconstruction.anthroforge") as archive:
         manifest = json.loads(archive.read("manifest.json"))
         metadata = manifest["document"]["reconstruction"]
-        assert manifest["version"] == 9 and len(metadata["variants"]) == 3
+        assert manifest["version"] == 10 and len(metadata["variants"]) == 3
         assert metadata["reviews"][0]["decision"] == "APPROVED"
     run(executable, cwd, invoke, "reconstruction-export", comparisons(child))
     with ZipFile(cwd / "reconstruction.afinspection.zip") as archive:

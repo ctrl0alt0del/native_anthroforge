@@ -1,7 +1,11 @@
 """Ordered content prefixes and failed-worker resources survive real job publication."""
 
 import json
+import shutil
+import subprocess
+import sys
 from dataclasses import replace
+from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
@@ -159,3 +163,27 @@ def test_vcp_checkpoint_retains_regional_material_and_rejects_partial_state(tmp_
     (tmp_path / "solve/relaxation/rest.bin").unlink()
     with pytest.raises(ValueError, match="material checkpoint"):
         surface_files(tmp_path)
+
+
+def test_packaged_adapter_imports_without_top_level_source_package(tmp_path):
+    source = Path(__file__).parents[1] / "src/anthroforge/avbd_runtime"
+    target = tmp_path / "anthroforge/avbd_runtime"
+    shutil.copytree(source, target, ignore=shutil.ignore_patterns("__pycache__"))
+    result = subprocess.run(
+        [sys.executable, "-I", str(target / "bootstrap.py"), "--help"],
+        capture_output=True,
+        text=True,
+        timeout=15,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "runtime" in result.stdout and "folder" in result.stdout
+
+
+def test_runtime_environment_version_change_invalidates_checkpoint_identity(tmp_path):
+    folder = tmp_path / ".venv/Lib/site-packages/numerical-1.dist-info"
+    folder.mkdir(parents=True)
+    metadata = folder / "METADATA"
+    metadata.write_text("Version: 1")
+    before = identity.runtime(tmp_path)
+    metadata.write_text("Version: 20")
+    assert identity.runtime(tmp_path) != before

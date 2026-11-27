@@ -181,6 +181,31 @@ global scheduler assertions exposed low-resolution FIELD gap failures in unrelat
 cases; those tests now assert the requested accepted attachment results. Origin/main remains
 277af232 after fetch. No user decision is pending; do not merge until qualification completes.
 
+Portable AVBD qualification exposed source-package shadowing by the external environment.
+The standalone adapter bootstrap now imports its own local package directly, without requiring
+the compiled application's top-level Python source package. A regression reproduces the
+packaged layout. Fresh packaged AVBD construction, missing-runtime failure, saved checkpoint
+reuse and Final deformation preserving Draft/topology all pass (`skin_pipeline_portable.py`).
+Runtime identity additionally includes environment lock/configuration and installed distribution
+metadata, conservatively invalidating reuse after a numerical dependency version change.
+
+Nine Final repair/timing/status tests pass: Live/On Release/Manual behavior, typed repair without
+a mode cycle, retained final/fit resources, numerical failure without rebuild looping, and empty
+anatomy with undo. The empty status now explicitly displays “No contributing anatomy.” The
+latest combined checkpoint/repair/architecture group passes 18 tests. The full run reached 98%;
+remaining observed failures are old schema-version or pre-automatic-Draft assumptions. A
+27-test reference/topology/foundations/repair group passes after those corrections.
+The general relocated-package run reached its final authoring workflow; its Fiber pixel check
+now explicitly hides skin, since default AUTO correctly displays Draft over those tubes.
+Refresh the compiled package for the latest status/runtime-identity changes before final QA.
+
+The fourth complete suite finished: 2,943 passed and 14 failed in 1,072.10 seconds.
+The failures were obsolete global-error, pre-automatic-Draft or schema-version assertions;
+their focused reruns pass, with a final cached-failure rerun still in progress. The latest
+Ruff/format check passes for 1,739 Python files, strict mypy passes 710 modules, and the
+tissue-contract/architecture group passes 11 tests. This checkpoint precedes the final
+compiled-package refresh; portable qualification and the final evidence review remain pending.
+
 ## Recovery inputs
 
 The newer builder source was inspected at

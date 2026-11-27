@@ -1343,7 +1343,8 @@ requirements permit repair; numerical errors do not imply reconstruction.
 AVBD runs through the existing native subprocess boundary with an owned Python adapter and
 an explicitly configured external numerical environment. Immutable checkpoint bundles retain
 warm material state and complete ordered prefixes. Prefix identity includes source bytes,
-recipe, normalization, adapter protocol and numerical runtime source/binary fingerprints.
+recipe, normalization, adapter protocol, numerical runtime source/binary fingerprints and
+the runtime's lock/configuration and installed Python distribution metadata.
 Schema 10 stores mode/configuration and checkpoint references. Ordinary saves project away
 checkpoints; extended `.anthroforgex` saves retain durable checkpoints, including those in
 saved reconstruction snapshots. Atomic save chooses the policy from the final filename.

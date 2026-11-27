@@ -12,6 +12,7 @@ from anthroforge.application import skin_builder_configuration as builders
 from anthroforge.core.skin import (
     DeformationSettings,
     EnvelopeSettings,
+    Skin,
     SkinStage,
     effective_collagen,
 )
@@ -122,9 +123,9 @@ def test_previous_schema_keeps_geometry_and_empty_skin(session, assembly, tmp_pa
     original = session.document
     legacy_copy(saved, old, version)
     document, resources = storage.read_package(old, session.engine)
-    assert document == original
+    assert replace(document, skin=original.skin) == original
     key = document.entity(root).result.asset
     np.testing.assert_array_equal(
         resources.meshes[key].mesh.array(0), session.assets[key].mesh.array(0)
     )
-    assert not document.skin.final.asset and not document.skin.reference
+    assert document.skin == Skin()

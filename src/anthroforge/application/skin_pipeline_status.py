@@ -17,15 +17,17 @@ PHASES = dict(
     failed="Skin update failed",
     blocked="Skin update blocked",
     current="Requested skin is current",
+    empty="No contributing anatomy",
 )
 
 
 def describe(session: Any) -> dict[str, Any]:
     runtime = session.skin_pipeline
     jobs = runtime.active()
-    current_phase = phase(runtime, jobs)
+    state = readiness(session)
+    current_phase = "empty" if not jobs and state["sources"] == "empty" else phase(runtime, jobs)
     stage = jobs[0].kind.removeprefix("skin_") if jobs else ""
-    return readiness(session) | dict(
+    return state | dict(
         mode=session.document.skin.update_mode,
         phase=current_phase,
         stage=stage,

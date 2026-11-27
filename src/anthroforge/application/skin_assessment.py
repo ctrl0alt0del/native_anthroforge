@@ -92,7 +92,7 @@ def reference(document: Any, resources: Any) -> Assessment:
 def sources(document: Any, resources: Any) -> Assessment:
     rows = skin_sources.contributors(document)
     if not rows:
-        return Assessment(Condition.EMPTY, "No physical anatomy contributors.")
+        return Assessment(Condition.EMPTY, "No contributing anatomy.")
     policy = tissue_policy(document, resources)
     for row in rows:
         state = source(document.object(row.owner), resources, policy)

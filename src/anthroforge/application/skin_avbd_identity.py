@@ -17,7 +17,7 @@ def file_digest(path: Path, size: int, modified: int) -> str:
 
 
 def runtime(root: Path) -> str:
-    files = list((root / "tools/runtime/skin").glob("*.py"))
+    files = list((root / "tools/runtime/skin").glob("*.py")) + environment_files(root)
     for directory in ("build/avbd-envelope/cuda-native", "build/quality-mesh"):
         files.extend((root / directory).rglob("*.exe"))
         files.extend((root / directory).rglob("*.dll"))
@@ -28,6 +28,18 @@ def runtime(root: Path) -> str:
             (path.relative_to(root).as_posix(), file_digest(path, stat.st_size, stat.st_mtime_ns))
         )
     return digest(dict(protocol=PROTOCOL, runtime=records))
+
+
+def environment_files(root: Path) -> list[Path]:
+    environment = root / ".venv"
+    files = [root / "uv.lock", root / "pyproject.toml", environment / "pyvenv.cfg"]
+    libraries = (
+        environment / "Lib/site-packages",
+        *(environment / "lib").glob("python*/site-packages"),
+    )
+    for directory in libraries:
+        files.extend(directory.glob("*.dist-info/METADATA"))
+    return [path for path in files if path.is_file()]
 
 
 def digest(value: Any) -> str:

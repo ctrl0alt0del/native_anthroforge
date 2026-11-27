@@ -1,5 +1,6 @@
 """Check a relocated distribution with a minimal PATH and no developer Qt/Python settings."""
 
+import io
 import json
 import os
 import shutil
@@ -7,6 +8,7 @@ import subprocess
 import sys
 from functools import partial
 from pathlib import Path
+from zipfile import ZipFile
 
 import numpy as np
 from assembly_portable import assembly
@@ -68,7 +70,7 @@ CHECKS = (
     "recent-project history, asynchronous recovery capture and discovery with original retention",
     "skin build, native proxy workers, isolated fitting, persisted playback and OBJ quads",
     "spatial measures, qualified volume samples, placement explanation and frozen view export",
-    "cross-project assembly, embedded images, one-action undo/redo and schema-9 storage",
+    "cross-project assembly, embedded images, one-action undo/redo and schema-10 storage",
     "skeleton replacement, isolated preparation, retained identities and one-action undo/redo",
     "persistent variants, promotion, catalogue, review queue, stages and comparison export",
     "current components, contextual choices, JSON literals and immutable candidate images/data",
@@ -135,7 +137,7 @@ def render(executable, cwd, revision, invoke=invoke):
 def verify_capture(cwd, revision):
     capture = json.loads((cwd / "capture.png.json").read_text())
     assert capture["captured"] and capture["revision"] == revision
-    assert capture["scene"]["vertices"] == 72 and not capture["window_visible"]
+    assert capture["scene"]["vertices"] == assembly_vertices(cwd) and not capture["window_visible"]
     verify_geometry_pixels(cwd / "capture.png")
 
 
@@ -144,8 +146,17 @@ def verify_geometry_pixels(path):
     assert not image.isNull()
     pixels = np.frombuffer(image.constBits(), np.uint8).reshape(image.height(), image.width(), 4)
     red, green, blue = (pixels[:, :, i].astype(int) for i in range(3))
-    foreground = (green - red > 10) & (green > blue) & (green > 90)
-    assert np.count_nonzero(foreground) > 10000, "Missing expected cube surface pixels"
+    foreground = (red - green > 10) & (green - blue > 10) & (red > 90)
+    assert np.count_nonzero(foreground) > 10000, "Missing expected automatic Draft surface pixels"
+
+
+def assembly_vertices(cwd):
+    with ZipFile(cwd / "assembly.anthroforge") as archive:
+        skin = json.loads(archive.read("manifest.json"))["document"]["skin"]
+        assert skin["update_mode"] == "DRAFT" and skin["envelope"]["asset"]
+        key = skin["envelope"]["asset"]
+        triangles = np.load(io.BytesIO(archive.read(f"assets/{key}/triangles.npy")))
+    return 72 + triangles.size
 
 
 def run(executable, cwd, background=False):

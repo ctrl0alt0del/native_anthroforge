@@ -21,6 +21,7 @@ def configure(session, backend, symmetry):
         section="topology_settings",
         values=dict(backend=backend, symmetry=symmetry, target_quads=1000),
     )
+    return session.document.skin.envelope
 
 
 def build(session, command="skin.build"):
@@ -40,13 +41,13 @@ def test_combined_topology_build_has_owned_quads_and_coherent_undo(
     session, monkeypatch, backend, symmetry
 ):
     imported(session, monkeypatch)
-    configure(session, backend, symmetry)
+    before = configure(session, backend, symmetry)
     stage, report = build(session)
     envelope = session.document.skin.envelope
     assert report["settings"]["backend"] == backend and report["attempts"]
     assert envelope.asset and report["requested_quads"] == 1000
     session.command("undo")
-    assert not session.document.skin.topology.asset and not session.document.skin.envelope.asset
+    assert (session.document.skin.topology.asset, session.document.skin.envelope) == ("", before)
     session.command("redo")
     session.wait()
     assert session.document.skin.topology == stage and session.document.skin.envelope == envelope

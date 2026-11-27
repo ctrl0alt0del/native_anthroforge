@@ -135,14 +135,20 @@ numerical fallback was introduced.
 
 ## Bundled-runtime qualification — November 27, 2026
 
-Release `63b468e9` was relocated across drives to a path containing spaces. With a Windows-only
+Release candidate `63b468e9` was relocated across drives to a path containing spaces. With a Windows-only
 PATH and no developer Python/Qt/AVBD settings, the executable completed fresh SCP generation,
 an attached limb and a muscle case. SCP/VCP checkpoints were published. The portable pipeline
 check also passed damaged-bundle failure retention, compatible checkpoint reuse with an invalid
 external override, ordinary-save checkpoint omission, Final construction and direct deformation
 with unchanged Draft/topology/reference. The saved Final fixture contains 1,054 quads.
 
-The canonical `dist/0.4.3/AnthroForge.dist/AnthroForge.exe` was then launched normally, without
+The complete portable pipeline check passed again on final release `59adb7a4`, including
+damaged runtime metadata together with missing application build metadata. Compiled discovery
+still rejected the incomplete bundle instead of selecting a developer runtime, and retained
+the accepted Draft. The full development gate passed 3,010 Python tests and six native tests;
+the final discovery guard then passed 29 focused AVBD/runtime/checkpoint tests, lint and typing.
+
+The final canonical `dist/0.4.3/AnthroForge.dist/AnthroForge.exe` was launched normally, without
 arguments or environment setup. Through its visible UI, an embedded bone-and-muscle fixture
 was opened and its builder changed from FIELD to AVBD. The visible envelope changed; the panel
 reported **Applied: AVBD** and **Requested skin is current**. Saving and reading the result

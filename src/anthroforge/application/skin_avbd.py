@@ -21,7 +21,7 @@ def execute(engine: Any, folder: Path, cancel: int, installed: tuple[Path, Path]
     root, python = installed
     output = folder / "output"
     bootstrap = Path(__file__).resolve().parents[1] / "avbd_runtime/bootstrap.py"
-    args = (str(python), "-I", str(bootstrap), str(root), str(folder))
+    args = (str(python), "-I", "-B", str(bootstrap), str(root), str(folder))
     log = folder / "worker.log"
     code = process.run(engine, process.Request(args, root, log), cancel)
     if code:

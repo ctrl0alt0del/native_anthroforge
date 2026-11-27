@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from anthroforge.application import skin_avbd
 from anthroforge.application import skin_avbd_identity as identity
 from anthroforge.application import skin_avbd_runtime as runtime
 
@@ -71,3 +72,13 @@ def test_bundled_checkpoint_identity_tracks_dependencies_not_location(tmp_path):
     assert identity.runtime(second) == initial
     (second / "manifest.json").write_text('{"files": {"solver": "new-solver-digest"}}')
     assert identity.runtime(second) != initial
+
+
+def test_worker_starts_isolated_without_writing_bytecode(tmp_path, monkeypatch):
+    requests = []
+    monkeypatch.setattr(skin_avbd.process, "run", lambda engine, req, cancel: requests.append(req))
+    monkeypatch.setattr(skin_avbd, "accepted_path", lambda output: output / "skin")
+    python = tmp_path / "python/python.exe"
+    result = skin_avbd.execute(None, tmp_path / "job", 0, (tmp_path, python))
+    assert result == tmp_path / "job/output/skin"
+    assert requests[0].arguments[:3] == (str(python), "-I", "-B")

@@ -4023,3 +4023,16 @@ SkinPanel filters unchanged eligibility before emitting QML signals. An intermed
 probe demonstrated why that presentation filter matters: forwarding every notification pushed
 camera callbacks above 25 ms despite cached geometry. Final callbacks returned below 1.86 ms;
 the existing lifecycle contracts and a new unchanged-panel regression pass.
+
+## CH-099 — Contiguous anatomy tree presentation (2026-11-27)
+
+The outliner previously filtered breadth-first scene rows, so expanded children followed
+their parent's siblings. SceneProjection now derives an iterative depth-first presentation
+from the authored anatomy registry and visible parent links. Sibling order is retained;
+parents outside the anatomy panel leave tissues as visible roots. The pass takes linear
+time and space in the anatomy row count. It leaves document storage, breadth-first index,
+render order and geometry evaluation unchanged. Changing the shared index order was
+rejected because the defect belongs to presentation. Controller regressions cover nested
+order, reparent/undo, selection, controls and tissues; native-window acceptance covers
+collapse/reopen and search. No new performance speedup is claimed. See the
+[qualification and delivery record](tasks/anatomy-tree-order.md).

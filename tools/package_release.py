@@ -7,8 +7,10 @@ import os
 import shutil
 import sys
 from pathlib import Path
+from tempfile import mkdtemp
 
 import PySide6
+from avbd_bundle import stage as stage_avbd
 from boolean_dependencies import copy_notices
 from tetrahedral_bundle import copy_runtime as copy_tetrahedral
 
@@ -37,6 +39,8 @@ PACKAGES = (
 
 def stage():
     STAGE.mkdir(parents=True, exist_ok=True)
+    runtime = stage_avbd(Path(mkdtemp(prefix="avbd-", dir=STAGE.parent)) / "runtime")
+    (STAGE / "avbd.json").write_text(json.dumps(str(runtime)), encoding="utf-8")
     (STAGE / "build.json").write_text(json.dumps(dict(build_identity(), packaged=True)))
     shutil.copy2(ROOT / "launch.py", STAGE / "AnthroForge.py")
     stage_sources()
@@ -100,6 +104,8 @@ def finish():
 
 
 def copy_avbd_adapter():
+    runtime = Path(json.loads((STAGE / "avbd.json").read_text(encoding="utf-8")))
+    shutil.copytree(runtime, DIST / "anthroforge/_runtime/avbd", dirs_exist_ok=True)
     shutil.copytree(
         ROOT / "src/anthroforge/avbd_runtime",
         DIST / "anthroforge/avbd_runtime",

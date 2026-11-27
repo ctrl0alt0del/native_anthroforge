@@ -4,6 +4,7 @@ import argparse
 import zipfile
 from pathlib import Path
 
+from avbd_sources import include_source
 from boolean_dependencies import archive_headers
 
 from anthroforge import __version__
@@ -27,17 +28,28 @@ def sources():
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--output", type=Path, default=ROOT / f"dist/AnthroForge-{__version__}-source.zip"
-    )
-    target = parser.parse_args().output
+    target, runtime = arguments()
     target.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(target, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sources():
             archive.write(path, "anthroforge/" + path.relative_to(ROOT).as_posix())
         archive_headers(archive)
+        include_source(archive, runtime)
     print(target)
+
+
+def arguments():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--output", type=Path, default=ROOT / f"dist/AnthroForge-{__version__}-source.zip"
+    )
+    parser.add_argument(
+        "--avbd-runtime",
+        type=Path,
+        default=ROOT / f"dist/{__version__}/AnthroForge.dist/anthroforge/_runtime/avbd",
+    )
+    args = parser.parse_args()
+    return args.output, args.avbd_runtime
 
 
 if __name__ == "__main__":

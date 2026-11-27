@@ -105,6 +105,19 @@ suffixes. Preserve other versions. The companion source archive is
 `dist/AnthroForge-<version>-source.zip` and is replaced too.
 Packaging includes QML, native libraries, examples and notices. Historical validation
 records retain the paths used at the time; they are not instructions to create variants.
+Windows packaging also requires `AF_AVBD_SOURCE` pointing to the qualified AVBD build
+inputs (the existing `ANTHROFORGE_AVBD_RUNTIME` development setting is accepted at build
+time). `tools/avbd_bundle.py` stages a private CPython 3.12 image, the installed dependency
+closure, worker sources, native executables and app-local VC runtime. It does not copy the
+development venv or editable-install paths. Packaging fails if those inputs are missing.
+The resulting app requires neither setting nor checkout. `manifest.json` records exact
+file hashes, installed versions and the source revision/dirty state; `avbd-sources.zip`
+preserves the actual numerical sources and vendor headers, including uncommitted build
+inputs. Never replace those inputs silently with a different solver revision.
+Run `tools/skin_pipeline_portable.py PATH_TO_EXE OUTPUT_DIR` against a disposable relocated
+package to check fresh AVBD generation, damaged-bundle recovery, checkpoint reuse and Final
+updates with a minimal PATH. It temporarily damages/restores that copy's manifest to test
+failure retention. Normal-launch GUI generation remains a separate acceptance check.
 `AF_PACKAGE_OUTPUT` remains available for temporary qualification under `build/` or the
 OS temporary directory. Temporary and worktree outputs do not count as delivered builds:
 promote the complete qualified package to the main project's canonical folder and verify

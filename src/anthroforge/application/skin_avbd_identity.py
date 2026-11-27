@@ -17,6 +17,14 @@ def file_digest(path: Path, size: int, modified: int) -> str:
 
 
 def runtime(root: Path) -> str:
+    manifest = root / "manifest.json"
+    if manifest.is_file():
+        stat = manifest.stat()
+        return digest((PROTOCOL, file_digest(manifest, stat.st_size, stat.st_mtime_ns)))
+    return development_runtime(root)
+
+
+def development_runtime(root: Path) -> str:
     files = list((root / "tools/runtime/skin").glob("*.py")) + environment_files(root)
     for directory in ("build/avbd-envelope/cuda-native", "build/quality-mesh"):
         files.extend((root / directory).rglob("*.exe"))

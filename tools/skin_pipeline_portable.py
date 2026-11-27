@@ -1,4 +1,4 @@
-"""Qualify the relocated app's exclusive modes and separately configured AVBD worker."""
+"""Qualify the relocated app's modes and bundled AVBD worker without developer settings."""
 
 import json
 import subprocess
@@ -50,6 +50,16 @@ def verify_source(values):
 
 
 def unavailable(executable, cwd):
+    manifest = executable.parent / "anthroforge/_runtime/avbd/manifest.json"
+    original = manifest.read_bytes()
+    try:
+        manifest.write_text("{}", encoding="utf-8")
+        verify_unavailable(executable, cwd)
+    finally:
+        manifest.write_bytes(original)
+
+
+def verify_unavailable(executable, cwd):
     commands = [
         request("skin.inspect", "before"),
         request("skin.envelope.build"),
@@ -61,7 +71,7 @@ def unavailable(executable, cwd):
     values = invoke(executable, cwd, "unavailable", commands, project=project)
     assert values["before"]["envelope"] == values["after"]["envelope"]
     state = values["status"]["pipeline"]
-    assert state["phase"] == "failed" and state["can_retry"] and "unavailable" in state["reason"]
+    assert state["phase"] == "failed" and state["can_retry"] and "incomplete" in state["reason"]
 
 
 def resumed(executable, cwd, runtime):
@@ -109,14 +119,14 @@ def final_mode(executable, cwd, runtime, bone):
 
 
 def main():
-    executable, cwd, runtime = (Path(arg).resolve() for arg in sys.argv[1:4])
+    executable, cwd = (Path(arg).resolve() for arg in sys.argv[1:3])
     cwd.mkdir(parents=True, exist_ok=True)
-    values = invoke(executable, cwd, "source", source(executable), runtime)
+    values = invoke(executable, cwd, "source", source(executable))
     verify_source(values)
     unavailable(executable, cwd)
-    resumed(executable, cwd, runtime)
-    final_mode(executable, cwd, runtime, values["bone"]["entity_id"])
-    report = dict(passed=True, executable=str(executable), external_runtime=str(runtime))
+    resumed(executable, cwd, cwd / "invalid-external-runtime")
+    final_mode(executable, cwd, "", values["bone"]["entity_id"])
+    report = dict(passed=True, executable=str(executable), bundled_runtime=True)
     (cwd / "qualification.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     print(json.dumps(report))
 

@@ -1,7 +1,6 @@
 """Optional AVBD runtime adapter. All mutable run state belongs to one worker job."""
 
 import json
-import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
@@ -10,22 +9,12 @@ import numpy as np
 
 from anthroforge.native import process
 
-from . import skin_avbd_capture, skin_avbd_checkpoints
+from . import skin_avbd_capture, skin_avbd_checkpoints, skin_avbd_runtime
 from .skin_draft_build import CheckpointFailure, DraftOutput, DraftRequest
-
-WORKER = Path("tools/runtime/skin/application_worker.py")
 
 
 def runtime() -> tuple[Path, Path]:
-    root = Path(
-        os.environ.get("ANTHROFORGE_AVBD_RUNTIME", Path(__file__).resolve().parents[3])
-    ).resolve()
-    python = root / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
-    if not python.is_file() or not (root / WORKER).is_file():
-        raise ValueError(
-            "AVBD experimental runtime unavailable. Set ANTHROFORGE_AVBD_RUNTIME to its worktree."
-        )
-    return root, python
+    return skin_avbd_runtime.installed()
 
 
 def execute(engine: Any, folder: Path, cancel: int, installed: tuple[Path, Path]) -> Path:

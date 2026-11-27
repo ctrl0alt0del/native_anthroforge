@@ -1356,10 +1356,21 @@ its applied configuration. Final failures preserve accepted output and fits. Typ
 requirements permit repair; numerical errors do not imply reconstruction.
 
 AVBD runs through the existing native subprocess boundary with an owned Python adapter and
-an explicitly configured external numerical environment. Immutable checkpoint bundles retain
+a private packaged numerical runtime. `skin_avbd_runtime` owns discovery: packaged builds
+require their own manifest/interpreter/solver files and never fall back to a development
+override. Source runs retain explicit external-runtime configuration. CPython's relative
+`._pth` file confines worker imports to the bundle; the adapter removes external native-library
+and Python overrides and gives subprocesses a private runtime plus Windows system PATH.
+Workers keep mutable job state outside the installation. Packaging copies qualified numerical
+sources/binaries without changing their algorithms and records every file's SHA-256, package
+versions and source provenance. The corresponding sources and dependency notices accompany
+the runtime and source archive. Immutable checkpoint bundles retain
 warm material state and complete ordered prefixes. Prefix identity includes source bytes,
 recipe, normalization, adapter protocol, numerical runtime source/binary fingerprints and
-the runtime's lock/configuration and installed Python distribution metadata.
+the runtime's lock/configuration and installed Python distribution metadata. Packaged prefix
+identities use the complete runtime manifest, covering interpreter, wheels and native helpers,
+independently of installation location. Moving a bundle preserves compatibility; changing
+runtime content invalidates old prefixes while preserving the saved accepted mesh.
 Schema 10 stores mode/configuration and checkpoint references. Ordinary saves project away
 checkpoints; extended `.anthroforgex` saves retain durable checkpoints, including those in
 saved reconstruction snapshots. Atomic save chooses the policy from the final filename.

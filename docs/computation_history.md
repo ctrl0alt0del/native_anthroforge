@@ -4036,3 +4036,23 @@ rejected because the defect belongs to presentation. Controller regressions cove
 order, reparent/undo, selection, controls and tissues; native-window acceptance covers
 collapse/reopen and search. No new performance speedup is claimed. See the
 [qualification and delivery record](tasks/anatomy-tree-order.md).
+
+## CH-100 — Self-contained packaged AVBD execution (2026-11-27)
+
+Portable 0.4.3 shipped only the checkpoint adapter and failed before generation unless a
+developer supplied an external runtime checkout. Packaging now owns a private CPython
+image, wheel dependency closure, qualified Python orchestration and native solvers.
+The existing native subprocess boundary, job-owned files, solver algorithms, admission,
+checkpoint collection and acceptance rules remain unchanged. Source development retains
+its explicit override; packaged discovery requires its own complete runtime.
+
+Relative isolated interpreter paths and private/system subprocess PATH remove developer
+environment coupling. Runtime manifests fingerprint all copied inputs, so relocation
+preserves checkpoint compatibility and changes to dependencies invalidate prefixes.
+External-checkout checkpoints rebuild conservatively; accepted saved surfaces remain.
+Copying an editable venv was rejected because its launcher and paths are not portable;
+compiling a second worker would unnecessarily alter dynamic imports/subprocess entry points.
+Prototype evidence: a fresh cube generated an accepted AVBD Draft and durable SCP checkpoint
+through the application; the numerical module graph loaded from private paths with a minimal
+PATH. Full package/GUI qualification and limitations are tracked in the
+[delivery record](tasks/bundled-avbd-runtime.md). No speedup or broader GPU compatibility is claimed.

@@ -21,9 +21,14 @@ Qt model/view ordering and notification contracts were reviewed in the
 
 ## Validation and next actions
 
-Add a regression for sibling and nested expansion order, validate other projected anatomy
-types and reparenting, inspect native-window interaction, run the development gate, then
-package and qualify the app. Deliver the same version to
+The controller regression reproduced the breadth-first failure before the fix. The four
+new cases and related scene/tissue/index checks pass (15 tests). Native-window mouse
+acceptance passes nested collapse, reopen, search while collapsed, authored sibling order
+and retained selection; expanded screenshot visually inspected. The acceptance tool
+settles hover layout before clicking the expand button. Ruff/format and the 15-line
+function limit pass. See [CH-099](../computation_history.md) for the preserved boundaries.
+
+Next: run the complete development gate, package and qualify the app. Deliver the same version to
 `E:/development/anthroforge/dist/0.4.3/AnthroForge.dist` with its matching source archive.
 
 The canonical app is currently running. Preserve its session and ask the user to close

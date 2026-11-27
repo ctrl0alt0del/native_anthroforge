@@ -56,6 +56,22 @@ def control_relationships_changed(changes):
     )
 
 
+def anatomy_rows(document, records):
+    anatomy = document.registry.anatomy
+    children = {}
+    for key in anatomy:
+        row = records[key]
+        parent = row["parent"] if row["parent"] in anatomy else ""
+        children.setdefault(parent, []).append(row)
+    pending = [(row, 0) for row in reversed(children.get("", ()))]
+    result = []
+    while pending:
+        row, depth = pending.pop()
+        result.append(dict(row, depth=depth))
+        pending.extend((child, depth + 1) for child in reversed(children.get(row["id"], ())))
+    return result
+
+
 class SceneProjection:
     def __init__(self, controller):
         self.controller = controller
@@ -125,9 +141,8 @@ class SceneProjection:
 
     def publish_records(self):
         rows = [self.records[key] for key in self.order]
-        self.view.synchronize(
-            dict(rows=[r for r in rows if not r["is_control"]], parents=self.parents())
-        )
+        anatomy = anatomy_rows(self.controller.session.document, self.records)
+        self.view.synchronize(dict(rows=anatomy, parents=self.parents()))
         self.controller.rows = rows
 
     def prune_records(self):

@@ -1,5 +1,10 @@
 # AnthroForge 0.4.3
 
+**Confirmed future feature:** [automatic Draft/Final skin pipeline](docs/specification_skin_pipeline.md).
+The specification includes mode transitions, automatic prerequisite repair, builder
+specialization, data ownership and acceptance diagrams. It is not a release or
+implementation-completion claim.
+
 0.4.3 exposes current editable components, candidate geometry/images and compatible choices
 through the shared authoring API. JSON requests can preserve literal `$` text with
 `literal_paths`. Geometry algorithms, attachments and project schema 9 remain unchanged.

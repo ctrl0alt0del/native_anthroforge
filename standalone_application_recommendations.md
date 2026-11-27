@@ -1,6 +1,12 @@
 # AnthroForge standalone application: consolidated recommendations
 
-Updated: 2026-10-29
+Updated: 2026-11-27
+
+The [automatic skin pipeline specification](docs/specification_skin_pipeline.md) is
+**confirmed, not implemented**. It defines exclusive Draft/Final update modes,
+automatic prerequisite repair, builder-owned pending/applied settings and shared
+coordinator ownership. Its diagrams and acceptance matrix preserve the distinction
+between agreed behavior and currently available implementation.
 
 The [0.5.0 Muscle Paint specification](docs/specification_050.md) is **confirmed, not
 implemented**. It adds area/direction painting that explicitly creates editable Fibers and

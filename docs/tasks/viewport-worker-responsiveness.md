@@ -79,7 +79,9 @@ The captured job configuration controls that claim; pending UI builder selection
 ## Delivery and integration
 
 Runtime source revision: `79371b77`. Final portable executable (local-only):
-`build/viewport-ready/AnthroForge app/AnthroForge.exe`.
+`E:/development/anthroforge/dist/0.4.3/AnthroForge.dist/AnthroForge.exe`.
+Promoted from the qualified `build/viewport-ready/AnthroForge app` package and checked
+at the canonical destination; see [delivery record](canonical-dist-delivery.md).
 The audit, diagrams, remaining synchronous candidates and CPU limits are in
 [main_thread_cpu_audit.md](../main_thread_cpu_audit.md); computation record is CH-098.
 

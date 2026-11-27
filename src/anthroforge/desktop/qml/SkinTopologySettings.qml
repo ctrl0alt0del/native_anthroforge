@@ -7,6 +7,7 @@ ColumnLayout {
     required property var settings
     signal edited(string key, var value)
     Layout.fillWidth:true
+    function focusCount() { quadCount.focusValue() }
     function component(key,index,value) {
         const vector=editor.settings[key].slice(); vector[index]=value;
         editor.edited(key,vector);
@@ -19,7 +20,7 @@ ColumnLayout {
         hint:"Algorithm used to create the skin's quad mesh."
         onActivated:editor.edited("backend",currentValue)
     }
-    NumericSetting { objectName:"skinQuadCount"; label:"Target quads"; minimum:1000; maximum:500000; decimals:0; value:editor.settings?.target_quads || 8100; onEdited:value=>editor.edited("target_quads",value) }
+    NumericSetting { id:quadCount; objectName:"skinQuadCount"; label:"Document target quads"; minimum:1000; maximum:500000; decimals:0; value:editor.settings?.target_quads || 8100; onEdited:value=>editor.edited("target_quads",value) }
     Label { text:"Refinement"; color:Theme.muted }
     UiCombo {
         objectName:"skinRefinement"; Layout.fillWidth:true; enumLabels:true; model:["NONE","MUSCLE_PROXIMITY"]

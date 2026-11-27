@@ -92,6 +92,20 @@ def topology(item: Any, document: Any) -> dict[str, Any]:
         fiber=isinstance(item, Fiber),
         flow_available=isinstance(item, Fiber) and not item.closed,
         budget_errors=list(skin_budgets.errors(document)),
+        budget=budget_context(document, item.id) if isinstance(item, SCP) else {},
+    )
+
+
+def budget_context(document: Any, owner: str) -> dict[str, Any]:
+    rules = skin_budgets.explicit(document)
+    ancestor = skin_budgets.parent(document, owner, rules)
+    count = (
+        rules[ancestor].target_quads if ancestor else document.skin.topology_settings.target_quads
+    )
+    return dict(
+        owner=ancestor,
+        name=document.object(ancestor).name if ancestor else "Document",
+        target_quads=count,
     )
 
 

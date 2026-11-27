@@ -3,7 +3,7 @@
 - Task branch: `codex/skin-count-controls`
 - Integration branch: `main`
 - Starting revision: `1ed75b8b`
-- Status: implementation in progress
+- Status: implementation and source acceptance passed; development gate and packaging pending
 - Last updated: November 27, 2026, Europe/Bucharest
 - Active writer: desktop skin count controls chat
 
@@ -27,11 +27,30 @@ runtime: target vertices determine an edge length, so achieved counts are approx
 
 ## Validation and next steps
 
-Implement authoring, worker capture, checkpoint invalidation and UI separation. Test
-defaults, invalid values, persistence/undo, builder isolation, ancestor budgets, changed
-root count, later growth and checkpoint reuse. Run the development gate, inspect the UI,
-build/qualify and promote the complete 0.4.3 package and matching source archive. Commit,
-push and merge after validation. No tests or new build completed yet.
+Authoring, worker capture, checkpoint invalidation and UI separation are implemented.
+Focused tests cover defaults, invalid values, persistence/undo, builder isolation, ancestor
+budgets, applied-versus-pending capture, checkpoint invalidation and later-route delegation.
+The initial 33 focused tests passed; after the clearance retry correction, the affected
+25-test group and mypy passed. Ruff/format checks passed. Functions remain within 15 lines.
+
+Real source numerical acceptance: default 402 reproduced the old cube connectivity exactly
+and coordinates within 1e-10. Targets 402/602/802 yielded 468/777/1,024 vertices respectively.
+At target 802, adding a VCP grew 1,024 vertices / 2,044 triangles to 1,229 / 2,454. Therefore
+the target is approximate and is not a cap on later refinement. The first higher-target
+trials failed native clearance while reporting no outside/crossing faces; the original
+retry omitted that case. The corrected retry uses the existing feature-preserving native
+method with the same target and clearance checks. Self-intersections, degeneracy and unrelated
+tool failures remain errors. Initial failed jobs retained accepted meshes as expected.
+
+`tools/skin_count_acceptance.py` passed QTest root editing/undo, ancestor selection,
+document-budget focus/editing, subtree editing and narrow-window scrolling. Captures were
+visually inspected; offscreen viewport pixels are not geometry evidence. Local-only records
+are in `build/skin-count-controls/{qualified,ui-final}`; failed pre-fix jobs remain in
+`numerical`. The full development gate is running (`development-gate.log`).
+
+Next: finish the gate, compile a clean checkpoint, qualify the packaged worker and native
+window, replace canonical 0.4.3 plus source archive, then merge/push main. Preserve unrelated
+source edits and any open user project. Small fixtures do not establish whole-body quality.
 
 ## Recovery inputs
 

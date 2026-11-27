@@ -9,7 +9,7 @@ ColumnLayout {
     required property var contributor
     readonly property var settings: contributor.settings || ({})
     readonly property var effective: contributor.effective || ({})
-    visible: !!contributor.owner
+    visible: fieldBuilder && !!contributor.owner && !contributor.fiber
     Layout.fillWidth: true
     spacing: Theme.gap
     function change(key, value) {
@@ -45,33 +45,6 @@ ColumnLayout {
             value:100*(panel.effective.gap_strength || 0)
             hint:"Percent of permitted gap filling"
             onEdited:value=>panel.change("gap_strength", value/100)
-        }
-        UiCheck {
-            objectName:"skinFiberFlow"
-            visible:!!panel.contributor.flow_available
-            text:"Use as topology FLOW guide"; checked:!!panel.settings.flow
-            onToggled:panel.change("flow", checked)
-        }
-        ColumnLayout {
-            visible:!!panel.contributor.scp; Layout.fillWidth:true
-            Label { text:"Topology density"; color:Theme.muted }
-            UiCombo {
-                objectName:"skinSourceDensityMode"; Layout.fillWidth:true
-                model:["Use parent budget", "Set subtree budget"]
-                currentIndex:panel.settings.density_mode === "SUBTREE_BUDGET" ? 1 : 0
-                onActivated:panel.change("density_mode", currentIndex ? "SUBTREE_BUDGET" : "INHERIT")
-            }
-            NumericSetting {
-                label:"Subtree target quads"; minimum:100; maximum:500000; decimals:0
-                enabled:panel.settings.density_mode === "SUBTREE_BUDGET"
-                value:panel.settings.target_quads || 1000
-                onEdited:value=>panel.change("target_quads", Math.round(value))
-            }
-            Label {
-                visible:!!(panel.contributor.budget_errors || []).length
-                text:(panel.contributor.budget_errors || []).join("\n")
-                color:Theme.muted; Layout.fillWidth:true; wrapMode:Text.Wrap
-            }
         }
         ColumnLayout {
             visible:panel.fieldBuilder && !!panel.contributor.scp; Layout.fillWidth:true

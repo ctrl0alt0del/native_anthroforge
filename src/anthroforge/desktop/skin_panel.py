@@ -79,6 +79,8 @@ def authored(skin):
     data["configuration_state"] = configuration_state(skin)
     if skin.draft_settings.backend == "FIELD":
         data["envelope_settings"] = asdict(skin_builder_configuration.decode(skin).settings)
+    if skin.draft_settings.backend == "AVBD":
+        data["avbd_settings"] = asdict(skin_builder_configuration.decode(skin))
     return data
 
 

@@ -9,6 +9,10 @@ UiScrollView {
     readonly property var readiness: App.skinPanel.readiness
     contentWidth: availableWidth
     function change(section,key,value) { const values={}; values[key]=value; App.runtime.run("skin.configure",{section:section,values:values}); }
+    function editTopologyBudget() {
+        contentItem.contentY = Math.max(0, Math.min(topologySettings.y, contentHeight - availableHeight));
+        topologySettings.focusCount();
+    }
     ColumnLayout {
         width: pane.availableWidth; spacing: Theme.gap
         Label { text: "Skin"; color: Theme.text; font.pixelSize:16; font.bold:true }
@@ -53,6 +57,13 @@ UiScrollView {
         }
         UiButton { objectName:"skinResetEnvelope"; visible:pane.state.draft_settings?.backend !== "AVBD"; text:"Reset defaults"; hint:"Restore the draft skin offset, collagen and gap settings."; onClicked:App.runtime.run("skin.envelope.reset",{}) }
         UiButton { objectName:"skinBuildEnvelope"; enabled:pane.readiness.envelope.available; hint:pane.readiness.envelope.reason; text:"Rebuild envelope"; Layout.fillWidth:true; onClicked:App.runtime.run("skin.envelope.build",{}) }
+        NumericSetting {
+            objectName:"skinRootVertices"; visible:pane.state.draft_settings?.backend === "AVBD"
+            label:"Initial root vertices"; minimum:4; maximum:500000; decimals:0; step:1; live:false
+            value:pane.state.avbd_settings?.root_vertices ?? 402
+            hint:"Target for the first envelope only. Later SCP/VCP stages can add vertices and triangles. Rebuild envelope to apply."
+            onEdited:value=>pane.change("draft_settings","root_vertices",Math.round(value))
+        }
         Repeater {
             model: pane.state.draft_settings?.backend === "AVBD" ? [] : [
                 {key:"minimum_offset_ratio",label:"Minimum skin distance",maximum:2},
@@ -72,7 +83,11 @@ UiScrollView {
             }
         }
         SkinContributorSettings { fieldBuilder:pane.state.draft_settings?.backend !== "AVBD"; contributor:pane.state.contributor || ({}) }
-        SkinTopologySettings { settings:pane.state.topology_settings; onEdited:(key,value)=>pane.change("topology_settings",key,value) }
+        SkinTopologySettings { id:topologySettings; settings:pane.state.topology_settings; onEdited:(key,value)=>pane.change("topology_settings",key,value) }
+        SkinTopologyContributorSettings {
+            contributor:pane.state.contributor || ({})
+            onEditDocumentBudget:pane.editTopologyBudget()
+        }
         UiButton { objectName:"skinBuildTopology"; text:"Rebuild topology"; Layout.fillWidth:true; enabled:pane.readiness.topology.available; hint:pane.readiness.topology.reason; onClicked:App.runtime.run("skin.topology.build",{}) }
         SkinDeformationSettings { settings:pane.state.deformation_settings; onEdited:(key,value)=>pane.change("deformation_settings",key,value) }
         UiButton {

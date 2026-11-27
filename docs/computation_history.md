@@ -4061,3 +4061,21 @@ The compiled application rejects an incomplete private image even when build met
 missing; it retains the accepted Draft and never falls back to a developer checkout.
 Full package/GUI qualification and limitations are tracked in the
 [delivery record](tasks/bundled-avbd-runtime.md). No speedup or broader GPU compatibility is claimed.
+
+## CH-101 — Authored initial AVBD root density (2026-11-27)
+
+The native root mesher already accepted a target vertex count, but its orchestration fixed
+that input at 402. The AVBD builder now owns a saved `root_vertices` value, captured with
+the job and included in the ordered checkpoint identity. An application-owned initial
+stage specializes root seed preparation; later Follow/Limb/Region and VCP stages delegate
+to the qualified runtime unchanged. Both ordinary and feature-preserving root remeshing
+use the same target. Default 402, geometric admission and accepted-result retention remain.
+This parameter controls initial edge-length sampling, not an exact mesh size or future cap.
+Higher-target cube trials exposed that the existing feature-preserving retry skipped native
+clearance-only rejections (no outside or crossing faces). Root orchestration now retries
+those explicit hull-admission failures too; self-intersections, degeneracy and unrelated
+tool errors still fail, and the retry must pass the same native clearance/admission checks.
+Converting it into quad budgets or a silently inferred triangle count was rejected because
+those are separate quantities. Editing the independent runtime checkout or using an ambient
+environment override was avoided. UI controls now separate Draft initialization from the
+document/subtree topology allocation. Evidence and limits: [task record](tasks/skin-count-controls.md).

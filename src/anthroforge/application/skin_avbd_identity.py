@@ -71,7 +71,7 @@ def mesh_digests(path: Path) -> list[str]:
 def prefixes(folder: Path, runtime_id: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
     recipe = json.loads((folder / "recipe.json").read_text())
     meshes = mesh_digests(folder / "bones.bin")
-    current = digest((runtime_id, (folder / "frame.bin").read_bytes().hex()))
+    current = initial_identity(folder, runtime_id, recipe)
     bones, tissues = [], []
     for row in recipe["bones"]:
         current = digest((current, row, meshes[row["mesh_index"]]))
@@ -83,3 +83,8 @@ def prefixes(folder: Path, runtime_id: str) -> tuple[tuple[str, ...], tuple[str,
         current = digest((current, row, geometry))
         tissues.append(current)
     return tuple(bones), tuple(tissues)
+
+
+def initial_identity(folder: Path, runtime_id: str, recipe: Any) -> str:
+    frame = (folder / "frame.bin").read_bytes().hex()
+    return digest((runtime_id, frame, recipe.get("root_vertices", 402)))

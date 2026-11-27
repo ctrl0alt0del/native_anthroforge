@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 
-from . import worker
+from . import root_seed, worker
 
 FILES = ("input.bin", "local-input/input.bin", "local-input/frame.bin")
 SURFACE = ("latest.bin", "faces.bin")
@@ -20,21 +20,28 @@ WARM = (
 )
 
 
-def run(recipe: Any, output: Path, resume: Any) -> Any:
+def run(recipe: Any, output: Path, resume: Any, root_vertices: int = 402) -> Any:
     root = output / "bones"
     root.mkdir()
     run = worker.module("skin_bone_run").BoneRun(root, recipe)
+    run.stages = root_seed.stages(root, run.meshes, recipe.frame, root_vertices)
     restore(run, resume.get("SCP"))
+    complete(run, output)
+    return run
+
+
+def complete(run: Any, output: Path) -> None:
     remaining = run.steps[len(run.rows) :]
     for route, steps in groupby(remaining, key=lambda step: step.route):
         worker.module("skin_run_settings").options(True, hand=route == "region")
-        with worker.module("local_skin_stage").shared_worker(root, len(run.rows), route) as process:
+        with worker.module("local_skin_stage").shared_worker(
+            run.root, len(run.rows), route
+        ) as process:
             for step in steps:
                 run.add(step, process)
                 checkpoint(run, output)
     worker.module("skin_run_settings").options(True, hand=run.steps[-1].route == "region")
-    worker.write(root / "stages.json", run.rows)
-    return run
+    worker.write(run.root / "stages.json", run.rows)
 
 
 def restore(run: Any, record: Any) -> None:

@@ -32,14 +32,28 @@ updates keep using that applied builder; Retry uses the failed selection.
 
 FIELD envelope settings control skin distance, collagen and gap filling. Distances are
 percentages of the model's longest axis. Select an SCP to set or paint its collagen
-weights and adjust its subtree quad budget. Select a compatible source to override
+weights. Select a compatible source to override
 its gap settings. Display hiding does not remove physical contributors.
 Inherited gap fields show their effective document values. Automatic collagen shows the
 resolved value and is read-only; select Uniform to enter a custom scalar. Switching modes
 preserves inactive overrides. **Reset defaults** restores all six envelope settings in one
 undo action without clearing source settings, paint, topology settings or saved geometry.
 
-Choose QuadWild or Instant Meshes, the target quad count, refinement and symmetry.
+AVBD exposes **Initial root vertices** (default 402). This is the existing native sampling
+target for the first envelope only; it is not a triangle count or a cap on later SCP/VCP
+refinement. Achieved counts depend on geometry. Edit it and **Rebuild envelope** to apply;
+automatic anatomy edits continue using the last successfully applied configuration. A
+changed root target invalidates all dependent construction checkpoints. Old projects
+without this setting use 402. Native geometry admission and failure retention still apply.
+
+Under **Topology**, choose QuadWild or Instant Meshes, **Document target quads**, refinement
+and symmetry. The selected SCP's **Set subtree budget** reserves quads inside the nearest
+explicit ancestor's allocation, or inside the document total when none exists. **Inherit
+topology budget** shares that enclosing budget with siblings. The panel identifies its
+source/value and lets you select that ancestor or focus the document total. A root SCP's
+subtree allocation does not replace the document total. These budgets affect quad topology,
+independently of Draft initialization. Fiber FLOW controls also belong to Topology.
+
 QuadWild uses the supported loop and FLOW guides. Change these construction settings,
 then explicitly rebuild to apply them. Compatible Final updates preserve topology;
 changed contributor/material identities can require reconstruction. The default display

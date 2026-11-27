@@ -7,7 +7,7 @@ from typing import Any
 
 from .skin_draft import BuilderConfiguration
 from .skin_limb import SkinLimb
-from .skin_validation import choice
+from .skin_validation import choice, integer
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,8 +28,10 @@ class AvbdContributor:
 class AvbdConfiguration:
     plan: str = "{}"
     contributors: tuple[AvbdContributor, ...] = ()
+    root_vertices: int = 402
 
     def __post_init__(self) -> None:
+        integer("initial root vertices", self.root_vertices, 4, 500000)
         value = json.loads(self.plan)
         if not isinstance(value, dict) or value.keys() - {"bones", "muscles", "normalization"}:
             raise ValueError("AVBD plan accepts bones, muscles and normalization.")

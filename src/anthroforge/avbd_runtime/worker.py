@@ -32,20 +32,26 @@ def main() -> int:
 
 
 def execute(args: Any) -> int:
-    sys.path.insert(0, str(args.runtime))
-    recipe = module("skin_recipe").load(args.folder / "recipe.json", args.folder)
-    module("skin_experiment").configure(recipe.frame)
+    recipe, root_vertices = load_recipe(args)
     output = args.folder / "output"
     output.mkdir()
     try:
         module("skin_tissue_run").preflight(recipe.muscles)
-        skeleton = bones.run(recipe, output, read(args.folder / "resume.json"))
+        skeleton = bones.run(recipe, output, read(args.folder / "resume.json"), root_vertices)
         skin = tissues.run(skeleton, recipe, output, read(args.folder / "resume.json"))
         write(output / "result.json", dict(accepted=True, skin=str(skin)))
         return 0
     except Exception as error:
         write(output / "result.json", dict(accepted=False, error=str(error)))
         return 1
+
+
+def load_recipe(args: Any) -> tuple[Any, int]:
+    sys.path.insert(0, str(args.runtime))
+    path = args.folder / "recipe.json"
+    recipe = module("skin_recipe").load(path, args.folder)
+    module("skin_experiment").configure(recipe.frame)
+    return recipe, read(path).get("root_vertices", 402)
 
 
 def receipt(output: Path, kind: str, index: int, files: Any, state: Any) -> None:

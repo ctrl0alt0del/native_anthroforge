@@ -150,5 +150,10 @@ def stage(folder: Path, request: DraftRequest) -> None:
         for i, row in enumerate(bones)
     ]
     muscles = [write_tissue(folder, table, row, i, request) for i, row in enumerate(tissues)]
-    recipe = dict(bones=steps, muscles=muscles, frame="frame.bin", meshes="bones.bin")
+    recipe = recipe_settings(request) | dict(bones=steps, muscles=muscles)
     (folder / "recipe.json").write_text(json.dumps(recipe, allow_nan=False), encoding="utf-8")
+
+
+def recipe_settings(request: DraftRequest) -> Stage:
+    settings = decode(request.document.skin.draft_settings.configuration("AVBD"))
+    return dict(frame="frame.bin", meshes="bones.bin", root_vertices=settings.root_vertices)

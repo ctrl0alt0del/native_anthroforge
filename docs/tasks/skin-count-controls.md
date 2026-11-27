@@ -3,7 +3,7 @@
 - Task branch: `codex/skin-count-controls`
 - Integration branch: `main`
 - Starting revision: `1ed75b8b`
-- Status: implementation and source acceptance passed; development gate and packaging pending
+- Status: source, package and normal-launch acceptance passed; full regression gate and delivery pending
 - Last updated: November 27, 2026, Europe/Bucharest
 - Active writer: desktop skin count controls chat
 
@@ -46,11 +46,27 @@ tool failures remain errors. Initial failed jobs retained accepted meshes as exp
 document-budget focus/editing, subtree editing and narrow-window scrolling. Captures were
 visually inspected; offscreen viewport pixels are not geometry evidence. Local-only records
 are in `build/skin-count-controls/{qualified,ui-final}`; failed pre-fix jobs remain in
-`numerical`. The full development gate is running (`development-gate.log`).
+`numerical`. The full development gate is running (`development-gate-resumed.log`). The
+initial gate passed the Python static checks, six native CTests, native style, PowerShell
+parsing and function limits, then stopped because its default Qt SDK path was absent in
+this worktree. The remaining gate resumed with the installed SDK explicitly selected;
+QML validation passed (187 files, 46 models, zero API errors).
 
-Next: finish the gate, compile a clean checkpoint, qualify the packaged worker and native
-window, replace canonical 0.4.3 plus source archive, then merge/push main. Preserve unrelated
-source edits and any open user project. Small fixtures do not establish whole-body quality.
+The compiled package contains clean implementation revision
+`67b7d41b76622b9b3b945a4b29e29ddb74154a2f`. Its executable SHA-256 is
+`AB53766B5B7B7D0CB2726AE9812BB81732B6EA3A6E183889CDF32A65ECDEC9C6`.
+Relocated-package acceptance passed without developer environment settings: fresh AVBD
+generation, failure retention, checkpoint reuse, ordinary save, Final construction and
+direct update, changed-root prefix invalidation, and VCP growth. A normal native-window
+launch then opened a separate fixture, edited the root target to 802, rebuilt the envelope
+and saved an accepted 1,024-vertex / 2,044-triangle mesh. Topology controls and inherited
+document budget were visually inspected in that window. The saved test app was closed.
+Package and native-window evidence is local-only under
+`E:/development/anthroforge/build/skin-count-controls-release`.
+
+Next: finish the full regression gate, replace canonical 0.4.3 plus source archive, then
+merge/push main. Preserve unrelated source edits and any open user project. Small fixtures
+do not establish whole-body quality.
 
 ## Recovery inputs
 

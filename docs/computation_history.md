@@ -17,6 +17,11 @@ Automatic skin targets (2026-11-27) extend R01/R02/R03/R04/R06 with exclusive Dr
 planning, applied builder configuration and immutable AVBD prefix checkpoints. The dated
 record below describes preserved solvers, replay equivalence and qualification limits.
 
+CH-098 updates R02/R04/R06/R07 with semantic camera invalidation, shared readiness caching,
+owned worker preparation, bounded desktop completion and builder-owned CPU admission.
+R03 history/publication contracts and existing numerical kernels remain unchanged.
+See [the execution audit](main_thread_cpu_audit.md) for measurements and remaining main-thread work.
+
 Whole-skeleton update preparation (0.4.2, in progress, 2026-10-29) extends R01/R02,
 A01–A03 and resource publication. It evaluates an owned candidate through the existing
 coordinator and production attachment/path/tissue/skin evaluators. The live document is
@@ -3974,7 +3979,7 @@ show the saved Draft and Final surfaces; the low-cost topology fixture does not 
 surface quality. Raw captures and timing reports are local-only. The full gate and portable
 qualification remain tracked in [the task record](tasks/skin-pipeline.md).
 
-## 2026-11-27 — Camera invalidation, owned preparation and CPU admission
+## CH-098 — Camera invalidation, owned preparation and CPU admission (2026-11-27)
 
 Baseline: `60b64ec4`. Camera saves previously scheduled mirror checks, invalidated scene
 caches and repeated skin readiness traversal. Semantic workspace deltas, anatomical mirror

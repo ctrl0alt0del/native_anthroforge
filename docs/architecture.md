@@ -1215,7 +1215,8 @@ consume camera-only saves without rebuilding geometry. Scene cache keys omit cam
 orthographic fields; shared skin readiness keys retain immutable domain inputs and builder
 configuration. Mirroring observes anatomical inputs, including pose, and excludes workspace
 presentation. Status subscriptions retain document-change notifications; the skin panel filters
-unchanged eligibility before emitting QML signals. Inspection resource selection and captured skin read-revision preparation run
+unchanged eligibility before emitting QML signals. Inspection resource selection and captured
+skin read-revision preparation run
 on owned workers; live validation and atomic installation stay on the session owner.
 Desktop completion has a shared 2 ms admission window with rotating context order; one
 atomic result may overrun it. The common pool admits up to four jobs, bounded by logical

@@ -3,7 +3,7 @@
 - Task branch: `codex/viewport-worker-responsiveness`
 - Integration branch: `main`
 - Starting revision: `60b64ec4`
-- Status: implementation in progress
+- Status: implementation and qualification complete; integration pending
 - Last updated: 2026-11-27, Europe/Bucharest
 - Active writer: desktop chat, primary agent only
 
@@ -23,7 +23,7 @@ skin panel context computes readiness before its unchanged-state guard. On synth
 256-cube scenes, maximum UI ticks were 162 ms, and 112 ms with only mirror invalidation
 suppressed. These are Qt event-loop measurements, not rendered-frame measurements.
 
-The coordinator already has two worker threads. Capture, admission, publication and UI
+The baseline coordinator had two worker threads. Capture, admission, publication and UI
 projection run on its owning thread; four bounded interactive policies allow inline work.
 Use the existing coordinator and status owner rather than adding competing worker queues.
 
@@ -38,7 +38,7 @@ window; each result remains atomic and contexts rotate to avoid starvation.
 
 CPU audit: ordinary attachment/routing/tissue native translation units are serial per job;
 skin fields and fitting are separate OpenMP targets with up to four threads. The default
-coordinator's two workers therefore do not imply two-core execution for every operation.
+coordinator's original two workers therefore did not imply two-core execution for every operation.
 The default pool now admits up to four jobs, bounded by CPU count minus one logical CPU
 of headroom. Native-team and memory demands remain shared across editing contexts. Final
 deformation now reserves its four-thread quality kernel. This is admission headroom, not
@@ -46,57 +46,55 @@ OS affinity or a hard limit on external numerical processes.
 DraftBuilder also owns CPU estimates: FIELD claims four and AVBD claims exclusive capacity.
 The captured job configuration controls that claim; pending UI builder selection cannot change it.
 
-## Verification so far
+## Verification
 
-- Focused camera/mirror/status/projection tests: 25 passed.
-- Issue lifecycle/integration and tissue inspection tests: 21 passed.
-- Ruff and mypy passed before the later worker/publication changes; rerun required.
-- Same local 256-cube Qt event-loop probe: camera-triggered jobs 7 to 0; maximum camera
-  tick 162.29 to 2.22 ms, p95 93.14 to 0.78 ms. No rendered-frame claim. Raw baseline is
-  in the prior probe directory; candidate is `build/viewport-responsiveness/probe-results.json`.
-- Skin update/topology/automatic-pipeline and painting checks: 21 passed.
-- Ownership, publication budget/fairness/shutdown, CPU admission and camera checks: 30 passed.
-- Configured Ruff and mypy (711 files) pass. An accidental `mypy src` invocation included
-  excluded untyped desktop modules and produced unrelated errors; the configured gate is authoritative.
-- CPU field probe on Ryzen 9 7900X3D (12 physical / 24 logical): four resolution-220 fields,
-  one/two/four workers took 4.66/2.64/1.71 s and used 3.02/5.73/11.00 effective cores.
-  Each field retained about 301 MB. These direct native measurements do not bypass admission
-  in the app; the GUI probe below exercises the actual coordinator.
-- Rendered Qt viewport under four coordinated jobs (12 resolution-220 field builds): no
-  camera-triggered domain jobs; camera callbacks max 1.83 ms. Frame p95/max 45.56/75.16 ms
-  versus idle 40.35/67.15 ms. This synthetic overlapping-cube scene is not a whole-body FPS claim.
-  Screenshot inspected; raw results in `build/viewport-worker-review`.
-- Native build and six CTests, native style checks and PowerShell checks pass. QML check
-  initially failed because its default SDK path is checkout-local; resumed with explicit
-  shared SDK path and passed (186 QML files / 46 types, zero API errors). Full pytest is running.
-- Camera keyboard/buttons/menu, restore, focus/rebinding, workspace and persistence acceptance
-  passed with a resolution-24 setup fixture. The original production-resolution setup exceeded
-  that older script's four-second settle deadline before reaching its camera assertions.
-- Portable app built from `78c6ad41`; relocated minimal-PATH suite passed. A separate
-  packaged camera/mirror command probe passed: zero camera jobs, real rule edit still starts jobs.
-- Main-thread/CPU audit and architecture/computation history have been written. They explicitly
-  retain synchronous API candidates and note GIL, rendering and atomic-publication limits.
-- Builder-specific admission correction passed the focused resource/skin/automatic/builder/AVBD
-  checks, Ruff, configured mypy and function-length review. Full-suite and package requalification
-  for this final correction are pending; earlier package evidence remains valid for its revision.
-- Full suite completed: 2,991 passed, two service-lifecycle failures in 983.01 s. They exposed
-  a compatibility regression: cache invalidation was incorrectly suppressing existing document
-  notifications. Notifications are restored while cached geometry readiness remains reusable.
-  Both failures and the final affected camera/status/resource/skin/worker/budget group pass:
-  70 tests, including unchanged-panel notification coverage. This is a complete run followed
-  by verified corrections, not a second clean full run.
-- Numerical-boundary and native doctor checks passed. Final `e2bd01e5` relocated general suite,
-  AVBD Draft/Final/update workflow and zero-camera-job probe passed. A rebuilt package for the
-  notification correction and repeated latency measurements are the remaining qualification.
-- Final view-owned notification filter preserves application subscriptions and avoids QML
-  reevaluation. Repeated camera probe: zero jobs, max tick 2.12 ms / p95 0.79 ms. Rendered
-  callbacks max 1.85 ms under four native jobs; frame p95/max 47.94/78.30 ms, not a 60 FPS claim.
-  Final package rebuild and focused portable checks are pending; production Qt mode acceptance runs.
+- Complete Python run: **2,991 passed, two failed** in 983.01 s (2,993 collected).
+  Both failures exposed suppressed document-change notifications. The application contract
+  is restored; SkinPanel filters unchanged eligibility before signaling QML. The final
+  affected group, including both failures and all new admission/view regressions, passes
+  **70 tests**. This is a complete run followed by verified corrections, not a second clean full run.
+- Ruff/format, function-length review, configured mypy (711 files), lock consistency,
+  native build, six CTests, native style and PowerShell checks pass. QML validation passes
+  (186 files / 46 model types, zero API errors), as do numerical-boundary and native doctor checks.
+  QML initially needed an explicit shared SDK path; the checkout-local default was absent.
+- Production Qt acceptance passes FIELD builds, Draft/Final switching, retained topology,
+  pending settings, AVBD failure/Retry, stable status and extended reopening. UI captures inspected.
+  Camera restore/keyboard/buttons/menu/focus/workspace/persistence acceptance passes with a
+  resolution-24 fixture. Its older production fixture exceeded the four-second setup deadline.
+- Final 256-cube event-loop probe: camera jobs **7 to 0**, maximum tick **162.29 to 2.12 ms**,
+  p95 **93.14 to 0.79 ms**. This probe has no rendered frames.
+- CPU probe on Ryzen 9 7900X3D (12 physical / 24 logical): four resolution-220 fields with
+  one/two/four workers took **4.66/2.64/1.71 s**, using **3.02/5.73/11.00 effective cores**.
+  Each field reports about 301 MB. These are single direct-native batches, not universal speedups.
+- Final rendered probe during four coordinated jobs: zero camera jobs, camera callbacks max
+  **1.85 ms**, frame p95/max **47.94/78.30 ms** versus idle **37.56/72.12 ms**. Screenshots
+  inspected. The synthetic overlapping-cube fixture does not establish whole-body performance or 60 FPS.
+- Complete relocated minimal-PATH portable suite passed at `e2bd01e5`, including skin fitting,
+  painting, mirroring, reports, assembly, persistence and hidden rendering. After the notification
+  correction, rebuilt `79371b77` passed focused minimal-PATH native-window/primitive/render,
+  project-adoption/recovery, zero-camera-job and full AVBD Draft/Final/update qualification.
+  Final packaged camera changes start zero jobs; a real mirror-rule edit starts three.
+- Existing AF-41 symmetry behavior was outside scope. Native numerical algorithms are unchanged.
 
-## Next actions
+## Delivery and integration
 
-1. Finish the full pytest/numerical/doctor checks and relocated application qualification.
-2. Record final evidence, review diff and integrate after validation. Origin/main still at baseline.
+Runtime source revision: `79371b77`. Final portable executable (local-only):
+`build/viewport-ready/AnthroForge app/AnthroForge.exe`.
+The audit, diagrams, remaining synchronous candidates and CPU limits are in
+[main_thread_cpu_audit.md](../main_thread_cpu_audit.md); computation record is CH-098.
+
+Qualification is complete. Final fetch/review and normal integration into main remain.
+The unrelated dirty root checkout and the external AVBD runtime are unchanged.
+
+## Local evidence
+
+- `build/viewport-responsiveness`: gate, corrections, native/doctor, CPU and portable logs.
+- `build/viewport-worker-review`: final rendered probe and screenshot.
+- `build/viewport-skin-gui-review`: production mode/status/Retry screenshots.
+- `build/viewport-final-review`: complete portable qualification before notification correction.
+- `build/viewport-release-review`, `viewport-release-camera-review`, `viewport-release-skin-review`:
+  final executable qualification, native-window screenshots and receipts.
+- Prior baseline probe location is below. Generated packages, environments and raw outputs are ignored.
 
 ## Recovery inputs
 

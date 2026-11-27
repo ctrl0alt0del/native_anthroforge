@@ -79,6 +79,19 @@ The captured job configuration controls that claim; pending UI builder selection
 - Builder-specific admission correction passed the focused resource/skin/automatic/builder/AVBD
   checks, Ruff, configured mypy and function-length review. Full-suite and package requalification
   for this final correction are pending; earlier package evidence remains valid for its revision.
+- Full suite completed: 2,991 passed, two service-lifecycle failures in 983.01 s. They exposed
+  a compatibility regression: cache invalidation was incorrectly suppressing existing document
+  notifications. Notifications are restored while cached geometry readiness remains reusable.
+  Both failures and the final affected camera/status/resource/skin/worker/budget group pass:
+  70 tests, including unchanged-panel notification coverage. This is a complete run followed
+  by verified corrections, not a second clean full run.
+- Numerical-boundary and native doctor checks passed. Final `e2bd01e5` relocated general suite,
+  AVBD Draft/Final/update workflow and zero-camera-job probe passed. A rebuilt package for the
+  notification correction and repeated latency measurements are the remaining qualification.
+- Final view-owned notification filter preserves application subscriptions and avoids QML
+  reevaluation. Repeated camera probe: zero jobs, max tick 2.12 ms / p95 0.79 ms. Rendered
+  callbacks max 1.85 ms under four native jobs; frame p95/max 47.94/78.30 ms, not a 60 FPS claim.
+  Final package rebuild and focused portable checks are pending; production Qt mode acceptance runs.
 
 ## Next actions
 

@@ -19,6 +19,10 @@ omit camera/orthographic fields. Shared skin readiness is cached by domain input
 configuration; camera saves neither invalidate it nor dirty the planner. Visibility/membership,
 model edits, mirror rules and builder changes still invalidate their respective outputs.
 Camera persistence, save revisions, undo and Draft/Final contracts are preserved.
+Status subscribers continue receiving document-change notifications; cache reuse does not
+suppress the existing project-replacement or editing-context subscription contract.
+SkinPanel compares cached eligibility values before signaling QML, so unchanged camera saves
+do not reevaluate its controls. The application subscription remains independent of this view filter.
 
 ```mermaid
 flowchart LR
@@ -162,9 +166,9 @@ Host: Ryzen 9 7900X3D, 12 physical / 24 logical cores, Windows, CPython 3.12, Qt
 
 | Probe | Observation |
 |---|---|
-| Same 256-cube Qt event-loop probe before/after camera fixes | Camera-started jobs 7 to 0. Maximum tick 162.29 to 2.22 ms; p95 93.14 to 0.78 ms. No rendered frames in this probe. |
+| Same 256-cube Qt event-loop probe before/after camera fixes | Camera-started jobs 7 to 0. Final maximum tick 162.29 to 2.12 ms; p95 93.14 to 0.79 ms. No rendered frames in this probe. |
 | Four independent resolution-220 fields, one/two/four workers | Wall 4.66 / 2.64 / 1.71 s; process CPU 14.06 / 15.11 / 18.83 s; effective cores 3.02 / 5.73 / 11.00. About 301 MB per field. Direct native probe, one measured batch per setting. |
-| Rendered viewport, 64 overlapping cubes plus mirrors, four coordinated jobs building 12 resolution-220 fields | No camera-started jobs. Camera callback max 1.83 ms. Frame p95/max 45.56/75.16 ms under work versus 40.35/67.15 ms idle. Process CPU 40.55 s over 4.50 s, including rendering. |
+| Rendered viewport, 64 overlapping cubes plus mirrors, four coordinated jobs building 12 resolution-220 fields | No camera-started jobs. Final camera callback max 1.85 ms. Frame p95/max 47.94/78.30 ms under work versus 37.56/72.12 ms idle. Process CPU 42.58 s over 4.50 s, including rendering. Jobs settle after the sampled window. |
 
 This synthetic fixture establishes neither whole-body performance nor 60 FPS. Reproduce the
 maintained GUI probe with `uv run --no-sync python tools/viewport_worker_acceptance.py` and the

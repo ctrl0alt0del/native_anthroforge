@@ -43,6 +43,18 @@ def test_camera_save_keeps_skin_assessment_cached(controller, monkeypatch):
     assert controller.session.skin_status.pipeline_inputs() is status
 
 
+def test_camera_save_does_not_rebroadcast_unchanged_skin_panel(controller):
+    mirrored_cube(controller)
+    controller.session.command("wait")
+    controller.refresh()
+    notifications = []
+    controller.skin_panel.changed.connect(lambda: notifications.append(True))
+    controller.viewport_view.saveCamera([1, 0, 0, -20, 25, 0, 4], False)
+    controller.tick()
+    controller.notify()
+    assert not notifications
+
+
 def unexpected_assessment(*args):
     raise AssertionError("Camera/notification repeated a geometry-dependent skin assessment")
 

@@ -1214,7 +1214,8 @@ Camera and worker responsiveness (2026-11-27): workspace field deltas let scene 
 consume camera-only saves without rebuilding geometry. Scene cache keys omit camera and
 orthographic fields; shared skin readiness keys retain immutable domain inputs and builder
 configuration. Mirroring observes anatomical inputs, including pose, and excludes workspace
-presentation. Inspection resource selection and captured skin read-revision preparation run
+presentation. Status subscriptions retain document-change notifications; the skin panel filters
+unchanged eligibility before emitting QML signals. Inspection resource selection and captured skin read-revision preparation run
 on owned workers; live validation and atomic installation stay on the session owner.
 Desktop completion has a shared 2 ms admission window with rotating context order; one
 atomic result may overrun it. The common pool admits up to four jobs, bounded by logical

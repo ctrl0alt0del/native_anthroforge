@@ -161,8 +161,7 @@ class SkinStatusProvider:
         return lambda: self.listeners.remove(callback)
 
     def changed(self) -> None:
-        if not self.refresh_key():
-            return
+        self.refresh_key()
         for callback in tuple(self.listeners):
             callback()
 

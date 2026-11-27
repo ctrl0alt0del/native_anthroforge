@@ -20,10 +20,17 @@ UiScrollView {
             onActivated:App.runtime.run("workspace.update",{skin_display:currentValue})
         }
         Label { text: "Envelope"; color: Theme.text; font.bold:true; Layout.topMargin:Theme.gap }
-        UiButton { objectName:"skinResetEnvelope"; text:"Reset defaults"; hint:"Restore the draft skin offset, collagen and gap settings."; onClicked:App.runtime.run("skin.envelope.reset",{}) }
-        UiButton { objectName:"skinBuildEnvelope"; text:"Rebuild envelope"; Layout.fillWidth:true; onClicked:App.runtime.run("skin.envelope.build",{}) }
+        UiCombo {
+            objectName:"skinDraftBuilder"; Layout.fillWidth:true; textRole:"label"; valueRole:"id"
+            model:[{id:"FIELD",label:"Field envelope"},{id:"AVBD",label:"AVBD (experimental)"}]
+            currentIndex:model.findIndex(option => option.id === (pane.state.draft_settings?.backend || "FIELD"))
+            hint:"Choose how to build the draft surface for this project."
+            onActivated:pane.change("draft_settings","backend",currentValue)
+        }
+        UiButton { objectName:"skinResetEnvelope"; visible:pane.state.draft_settings?.backend !== "AVBD"; text:"Reset defaults"; hint:"Restore the draft skin offset, collagen and gap settings."; onClicked:App.runtime.run("skin.envelope.reset",{}) }
+        UiButton { objectName:"skinBuildEnvelope"; enabled:pane.readiness.envelope.available; hint:pane.readiness.envelope.reason; text:"Rebuild envelope"; Layout.fillWidth:true; onClicked:App.runtime.run("skin.envelope.build",{}) }
         Repeater {
-            model: [
+            model: pane.state.draft_settings?.backend === "AVBD" ? [] : [
                 {key:"minimum_offset_ratio",label:"Minimum skin distance",maximum:2},
                 {key:"collagen_depth_ratio",label:"Collagen depth",maximum:4},
                 {key:"collagen_core_ratio",label:"Collagen core radius",maximum:5},
@@ -40,7 +47,7 @@ UiScrollView {
                 onEdited: value=>pane.change("envelope_settings",modelData.key,value/100)
             }
         }
-        SkinContributorSettings { contributor:pane.state.contributor || ({}) }
+        SkinContributorSettings { fieldBuilder:pane.state.draft_settings?.backend !== "AVBD"; contributor:pane.state.contributor || ({}) }
         SkinTopologySettings { settings:pane.state.topology_settings; onEdited:(key,value)=>pane.change("topology_settings",key,value) }
         UiButton { objectName:"skinBuildTopology"; text:"Rebuild topology"; Layout.fillWidth:true; enabled:pane.readiness.topology.available; hint:pane.readiness.topology.reason; onClicked:App.runtime.run("skin.topology.build",{}) }
         SkinDeformationSettings { settings:pane.state.deformation_settings; onEdited:(key,value)=>pane.change("deformation_settings",key,value) }

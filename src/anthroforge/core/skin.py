@@ -4,6 +4,8 @@ from dataclasses import dataclass, field, replace
 from math import isfinite
 
 from .results import EvaluationResult, ReadRevision
+from .skin_draft import DraftSettings
+from .skin_limb import SkinLimb
 
 
 def bounded(name: str, value: float, lower: float, upper: float) -> None:
@@ -85,10 +87,15 @@ class SkinContributor:
     density_mode: str = "INHERIT"
     target_quads: int = 1000
     flow: bool = False
+    build_mode: str = "INHERIT"
+    limb: SkinLimb | None = None
 
     def __post_init__(self) -> None:
         if not self.owner:
             raise ValueError("Skin contributor requires a source identity.")
+        choice("skin building mode", self.build_mode, ("INHERIT", "FOLLOW", "FILL"))
+        if self.limb is not None and not isinstance(self.limb, SkinLimb):
+            raise ValueError("Invalid limb settings.")
         choice("collagen mode", self.collagen_mode, ("AUTO", "UNIFORM", "PAINTED"))
         choice("gap mode", self.gap_mode, ("INHERIT", "OVERRIDE"))
         choice("density mode", self.density_mode, ("INHERIT", "SUBTREE_BUDGET"))
@@ -131,6 +138,7 @@ class Skin:
     fits: tuple[FittedShortcut, ...] = ()
     construction_stale: bool = False
     revision: int = 0
+    draft_settings: DraftSettings = field(default_factory=DraftSettings)
 
     def __post_init__(self) -> None:
         if len({item.owner for item in self.contributors}) != len(self.contributors):

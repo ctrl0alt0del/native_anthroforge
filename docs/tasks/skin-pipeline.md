@@ -53,7 +53,15 @@ publication, AVBD prefix reuse and ordinary/extended project persistence. Comple
 
 ## Current state and verification
 
-Research and source inspection completed. No implementation checks have run yet.
+Imported the 31 required application/model/desktop/native adapter baseline files from
+the existing AVBD worktree. Its numerical runtime remains an explicit external runtime
+dependency while checkpoint integration is being implemented. No experiments or removals
+were copied into this task.
+
+Baseline check: `pytest tests/test_skin_draft_builder.py tests/test_scp_skin_policy.py
+tests/test_skin_effective_settings.py tests/test_skin_job_lifecycle.py -q` passed 24 tests
+on the imported content, using the existing AVBD worktree native DLL. A fresh native
+build and full qualification remain pending.
 Existing runtime evidence is not evidence for this feature. The specification remains
 marked implementation pending until the complete outcome is qualified.
 

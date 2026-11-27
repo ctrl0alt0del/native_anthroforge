@@ -7,9 +7,10 @@ from anthroforge.core import skin_budgets
 from anthroforge.core.entities import SCP
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.results import geometry_asset
+from anthroforge.core.skin_tree import preorder
 from anthroforge.core.tissues import TissueVCP
 
-from . import choice_queries, skin_operations
+from . import choice_queries, skin_limb_geometry, skin_operations
 
 
 def inspect(session: Any, owner: str) -> dict[str, Any]:
@@ -27,6 +28,7 @@ def describe(session: Any, item: Any, reason: str) -> dict[str, Any]:
         name=item.name,
         scp=isinstance(item, SCP),
         **topology(item, session.document),
+        draft=draft(session, item) if isinstance(item, SCP) else {},
         editable=not reason,
         reason=reason,
         surface=bool(geometry_asset(item)),
@@ -34,6 +36,26 @@ def describe(session: Any, item: Any, reason: str) -> dict[str, Any]:
         settings=asdict(skin_operations.settings_for(session.document.skin, owner)),
         authored_override=any(r.owner == owner for r in session.document.skin.contributors),
     )
+
+
+def draft(session: Any, item: Any) -> dict[str, Any]:
+    doc = session.document
+    policy = next(state for owner, state in preorder(doc) if owner == item.id)
+    data = dict(
+        mode=policy.mode,
+        mode_source=doc.object(policy.mode_owner).name if policy.mode_owner else "",
+        limb_source=doc.object(policy.limb_owner).name if policy.limb_owner else "",
+        child=bool(item.parent),
+    )
+    return data | auto_dimensions(session, item) if policy.limb_owner == item.id else data
+
+
+def auto_dimensions(session: Any, item: Any) -> dict[str, Any]:
+    try:
+        radius = skin_limb_geometry.dimensions(session.engine, item, session.resources.meshes)
+        return dict(auto_rest=radius, auto_boundary=0.75 * radius)
+    except (ValueError, KeyError) as error:
+        return dict(radius_reason=str(error))
 
 
 def edit_reason(session: Any, target: str) -> str:

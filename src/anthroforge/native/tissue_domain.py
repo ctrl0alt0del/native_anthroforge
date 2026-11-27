@@ -10,8 +10,23 @@ from .mesh import INT64, D, GeometryEngine, Mesh, U, doubles, pointer
 
 def configure(engine: GeometryEngine) -> None:
     engine.bind("af_mesh_tissue_sizes", [U, INT64])
+    engine.bind("af_mesh_tissue_base_samples", [U, D, c.c_int64, D, c.c_int64, U])
     engine.bind("af_mesh_tissue_copy", [U, INT64, c.c_int64, D, c.c_int64])
     engine.bind("af_mesh_tissue_restore", [U, INT64, c.c_int64, D, c.c_int64, U], U)
+
+
+def base_samples(mesh: Mesh, base: Any, cancel: int = 0) -> Any:
+    points = np.ascontiguousarray(base, dtype=np.float64)
+    if points.ndim != 2 or points.shape[1] != 3:
+        raise ValueError("Expected XYZ base coordinates.")
+    result = np.empty((mesh.counts[0], 3))
+    status = mesh.engine.library.af_mesh_tissue_base_samples(
+        mesh.handle, pointer(points), len(points), pointer(result), len(result), cancel
+    )
+    if status == 2:
+        return None
+    mesh.engine.check(status)
+    return result
 
 
 def arrays(mesh: Mesh) -> tuple[Any, Any]:

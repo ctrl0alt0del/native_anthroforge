@@ -5,6 +5,7 @@ from typing import Any
 from anthroforge.core import anatomical_surfaces, skin_sources
 from anthroforge.core.results import Port, ReadRevision
 from anthroforge.core.surface_references import SurfaceReference
+from anthroforge.core.tissues import TissueVCP
 
 from . import dependencies
 
@@ -37,6 +38,11 @@ def envelope(document: Any) -> set[Port]:
     candidates = skin_sources.contributors(document)
     ports = set().union(*(source_ports(source) for source in candidates))
     ports |= {Port(str(document.id), name) for name in ("skin_scope", "skin_envelope_settings")}
+    if document.skin.draft_settings.backend == "AVBD":
+        for src in candidates:
+            if src.kind == "TISSUE":
+                ref = SurfaceReference(src.owner, "TISSUE_BASE", src.instance)
+                ports.update(anatomical_surfaces.inputs(ref))
     return dependencies.closure(dependencies.graph(document), ports)
 
 
@@ -85,6 +91,17 @@ def revision(document: Any, port: Port) -> ReadRevision | None:
     raise ValueError("Unknown document skin output: " + port.output)
 
 
+def build_signature(document: Any) -> tuple[str, ...]:
+    tree = [(e.id, e.parent, e.attachment) for e in document.entities]
+    settings = [
+        (r.owner, r.build_mode, r.limb)
+        for r in document.skin.contributors
+        if r.limb or r.build_mode != "INHERIT"
+    ]
+    tissues = [o.id for o in document.objects if isinstance(o, TissueVCP)]
+    return tuple(map(repr, (document.skin.draft_settings, tree, settings, tissues)))
+
+
 def settings_revision(document: Any, port: Port) -> ReadRevision:
     settings = getattr(document.skin, port.output.removeprefix("skin_"))
     if port.output == "skin_envelope_settings":
@@ -96,4 +113,7 @@ def settings_revision(document: Any, port: Port) -> ReadRevision:
         )
     else:
         rows = document.skin.contributors
-    return ReadRevision(port.owner, port.output, 0, 0, (repr(settings), repr(rows)))
+    signature: tuple[str, ...] = (repr(settings), repr(rows))
+    if port.output == "skin_envelope_settings" and document.skin.draft_settings.backend != "FIELD":
+        signature += build_signature(document)
+    return ReadRevision(port.owner, port.output, 0, 0, signature)

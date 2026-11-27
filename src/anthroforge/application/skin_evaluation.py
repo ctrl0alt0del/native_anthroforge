@@ -1,12 +1,11 @@
 """Owned envelope computation and binding resources, entirely on the coordinator worker."""
 
-from dataclasses import asdict
 from typing import Any
 
 from anthroforge.native import skin_fields, skin_gaps
-from anthroforge.native.skin_capture import source_counts
 
-from . import skin_assets, skin_capture, worker_memory
+from . import skin_assets, skin_avbd, skin_capture, worker_memory
+from .skin_draft_build import DraftBuilder, DraftRequest
 from .skin_results import ComputedStage
 
 TARGET_RESOLUTION = 220
@@ -14,32 +13,38 @@ TARGET_RESOLUTION = 220
 
 def evaluate(engine: Any, document: Any, resources: Any, cancel: int) -> ComputedStage:
     capture = skin_capture.capture(engine, document, resources, cancel)
-    fields, scene = prepare(engine, document, capture, worker_memory.budget(), cancel)
+    scene = prepare_scene(engine, capture.geometry, cancel)
     try:
-        result = scene.envelope(fields, worker_memory.budget(), cancel)
-        bindings = scene.bind(result.mesh, cancel)
-        data = skin_assets.create(
-            binding_data(bindings, capture), metadata(capture, result, fields)
+        key = document.skin.draft_settings.backend
+        builder = BUILDERS[key]
+        mesh, details = builder.build(
+            DraftRequest(engine, document, resources, cancel, capture, scene)
         )
-        return ComputedStage(result.mesh, data)
+        bindings = scene.bind(mesh, cancel)
+        info = metadata(capture) | details | dict(builder=key, builder_version=builder.version)
+        return ComputedStage(mesh, skin_assets.create(binding_data(bindings, capture), info))
     finally:
         scene.close()
-        fields.close()
 
 
-def prepare(
-    engine: Any, document: Any, capture: skin_capture.Capture, budget: int, cancel: int
-) -> Any:
+def field_surface(request: DraftRequest) -> tuple[Any, dict[str, Any]]:
+    capture = request.capture
     geometry = capture.geometry
-    field_inputs = geometry.vertices, geometry.triangles, geometry.skeletal, capture.collagen
-    options = document.skin.envelope_settings, TARGET_RESOLUTION, budget, cancel
-    fields = skin_fields.prepare(engine, *field_inputs, *options, segments=geometry.segments)
+    inputs = geometry.vertices, geometry.triangles, geometry.skeletal, capture.collagen
+    budget = worker_memory.budget()
+    options = request.document.skin.envelope_settings, TARGET_RESOLUTION, budget, request.cancel
+    fields = skin_fields.prepare(request.engine, *inputs, *options, segments=geometry.segments)
     try:
-        scene = prepare_scene(engine, geometry, cancel)
-        return fields, scene
-    except Exception:
+        result = request.scene.envelope(fields, budget, request.cancel)
+        details = dict(
+            quality=result.diagnostics.report(), resolution=fields.resolution, voxel=fields.voxel
+        )
+        return result.mesh, details
+    finally:
         fields.close()
-        raise
+
+
+BUILDERS = {"FIELD": DraftBuilder(1, field_surface), "AVBD": DraftBuilder(3, skin_avbd.build)}
 
 
 def binding_data(bindings: dict[str, Any], capture: Any) -> dict[str, Any]:
@@ -53,26 +58,11 @@ def binding_data(bindings: dict[str, Any], capture: Any) -> dict[str, Any]:
     )
 
 
-def metadata(capture: Any, result: Any, fields: Any) -> dict[str, Any]:
+def metadata(capture: Any) -> dict[str, Any]:
     return dict(
         kind="envelope_binding",
-        sources=[source_metadata(row) for row in capture.sources],
-        quality=result.diagnostics.report(),
+        sources=[skin_capture.source_metadata(row) for row in capture.sources],
         warnings=list(capture.warnings),
-        resolution=fields.resolution,
-        voxel=fields.voxel,
-    )
-
-
-def source_metadata(row: Any) -> dict[str, Any]:
-    counts = source_counts(row.mesh, False)
-    return dict(
-        **asdict(row.identity),
-        asset=row.asset,
-        frame=row.frame,
-        vertices=counts[0],
-        triangles=counts[1],
-        segments=counts[2],
     )
 
 

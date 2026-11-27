@@ -12,6 +12,8 @@ from anthroforge.core.skin import (
     SkinStage,
     TopologySettings,
 )
+from anthroforge.core.skin_draft import DraftSettings
+from anthroforge.core.skin_limb import SkinLimb
 
 
 def result(value: dict[str, Any]) -> SkinStage:
@@ -25,13 +27,10 @@ def result(value: dict[str, Any]) -> SkinStage:
 def decode(value: dict[str, Any] | None) -> Skin:
     data = dict(value or {})
     data["reference_sources"] = tuple(data.get("reference_sources", ()))
+    data["draft_settings"] = DraftSettings(**data.get("draft_settings", {}))
     data["envelope_settings"] = EnvelopeSettings(**data.get("envelope_settings", {}))
     data["deformation_settings"] = DeformationSettings(**data.get("deformation_settings", {}))
-    topology = dict(data.get("topology_settings", {}))
-    for name in ("plane_origin", "plane_normal"):
-        if name in topology:
-            topology[name] = tuple(topology[name])
-    data["topology_settings"] = TopologySettings(**topology)
+    data["topology_settings"] = decode_topology(data.get("topology_settings", {}))
     for name in ("envelope", "topology", "pending_topology", "final"):
         data[name] = result(data.get(name, {}))
     data["contributors"] = tuple(contributor(row) for row in data.get("contributors", ()))
@@ -39,10 +38,20 @@ def decode(value: dict[str, Any] | None) -> Skin:
     return Skin(**data)
 
 
+def decode_topology(values: dict[str, Any]) -> TopologySettings:
+    topology = dict(values)
+    for name in ("plane_origin", "plane_normal"):
+        if name in topology:
+            topology[name] = tuple(topology[name])
+    return TopologySettings(**topology)
+
+
 def contributor(value: dict[str, Any]) -> SkinContributor:
     # Pre-release schema-7 snapshots may contain the superseded physical Fiber radius.
     data = dict(value)
     data.pop("fiber_radius", None)
+    if data.get("limb") is not None:
+        data["limb"] = SkinLimb(**data["limb"])
     return SkinContributor(**data)
 
 

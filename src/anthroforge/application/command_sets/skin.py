@@ -32,6 +32,7 @@ COMMANDS = (
     edit("skin.fit.remove", skin_fit_results.remove, project_scope=True),
     edit("skin.build", skin_jobs.build, project_scope=True),
     edit("skin.configure", skin_operations.configure, project_scope=True),
+    edit("skin.draft.plan.import", skin_operations.import_draft_plan, project_scope=True),
     edit("skin.envelope.reset", skin_operations.reset_envelope, project_scope=True),
     edit("skin.contributor.configure", skin_operations.contributor, project_scope=True),
     direct("skin.inspect", lambda session: skin_operations.inspect(session)),

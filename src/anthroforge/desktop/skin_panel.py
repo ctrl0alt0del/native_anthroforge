@@ -2,11 +2,12 @@
 
 from dataclasses import asdict
 
-from PySide6.QtCore import Property, QObject, Signal
+from PySide6.QtCore import Property, QObject, Signal, Slot
 
 from anthroforge.application import skin_reports
 
 from . import skin_contributor
+from .controller_actions import local_path
 from .skin_export import SkinExport
 from .skin_fit_panel import SkinFitPanel
 from .values import qml
@@ -43,6 +44,10 @@ class SkinPanel(QObject):
         )
         self.changed.emit()
 
+    @Slot(str)
+    def importDraftPlan(self, path):
+        self.controller.run("skin.draft.plan.import", {"path": local_path(path)})
+
     @Property(dict, notify=changed)
     def state(self):
         return qml(self.values)
@@ -63,4 +68,10 @@ class SkinPanel(QObject):
 def context(controller, session):
     selected = controller.selection
     item = session.document.registry.records.get(selected)
-    return session.workspace.skin_display, selected, session.workspace, id(item)
+    return (
+        session.workspace.skin_display,
+        selected,
+        session.workspace,
+        id(item),
+        id(session.document.index.entities),
+    )

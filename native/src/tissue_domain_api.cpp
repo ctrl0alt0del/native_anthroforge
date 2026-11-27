@@ -1,6 +1,21 @@
 #include "construction_internal.hpp"
 #include "anthroforge/tissue.h"
 
+int af_mesh_tissue_base_samples(uint64_t output,const double* base,int64_t count,double* xyz,int64_t vertices,uint64_t cancel) {
+    try {
+        const auto mesh=af::mesh(output); const auto& d=mesh->tissue;
+        if(d.kind!=4 && d.kind!=5 && d.kind!=3) return 2;
+        if(!base || !xyz || d.source_count!=count || mesh->vertices.rows()!=vertices)
+            throw std::runtime_error("Base surface differs from accepted tissue material domain.");
+        Eigen::Map<const af::Vertices> source(base,count,3); Eigen::Map<af::Vertices> dest(xyz,vertices,3);
+        for(int64_t i=0;i<vertices;++i) {
+            af::check_cancel(cancel); dest.row(i).setZero();
+            for(auto j=d.offsets[i];j<d.offsets[i+1];++j) dest.row(i)+=d.weights[j]*source.row(d.indices[j]);
+        }
+        return 0;
+    } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
+}
+
 int af_mesh_tissue_sizes(uint64_t source,int64_t* sizes) {
     try {
         if(!sizes) throw std::runtime_error("Missing tissue domain size buffer.");

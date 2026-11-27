@@ -19,6 +19,7 @@ RowLayout {
     readonly property real unitFactor: length ? App.runtime.state.unit_factor : 1
     readonly property bool scrubbing: field.scrubbing
     signal edited(real value)
+    function focusValue() { field.forceActiveFocus(); field.selectAll() }
     Layout.fillWidth: true
     Label { text: setting.label + (setting.length ? " · " + App.runtime.state.display_units : ""); color: Theme.muted; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.Wrap; ToolTip.visible: labelHover.hovered && !!setting.hint; ToolTip.text: setting.hint; HoverHandler { id: labelHover } }
     UiNumberField {

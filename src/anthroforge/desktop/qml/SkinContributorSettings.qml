@@ -5,6 +5,7 @@ import QtQuick.Layouts
 
 ColumnLayout {
     id: panel
+    property bool fieldBuilder: true
     required property var contributor
     readonly property var settings: contributor.settings || ({})
     readonly property var effective: contributor.effective || ({})
@@ -19,17 +20,17 @@ ColumnLayout {
     ColumnLayout {
         enabled: !!panel.contributor.editable
         Layout.fillWidth:true
-        Label { text:"Gap settings"; color:Theme.muted; visible:!panel.contributor.fiber }
+        Label { text:"Gap settings"; color:Theme.muted; visible:panel.fieldBuilder && !panel.contributor.fiber }
         UiCombo {
             objectName:"skinSourceGapMode"; Layout.fillWidth:true
-            visible:!panel.contributor.fiber
+            visible:panel.fieldBuilder && !panel.contributor.fiber
             model:["Use document settings", "Override for this source"]
             currentIndex:panel.settings.gap_mode === "OVERRIDE" ? 1 : 0
             onActivated:panel.change("gap_mode", currentIndex ? "OVERRIDE" : "INHERIT")
         }
         NumericSetting {
             objectName:"skinSourceGapLimit"
-            visible:!panel.contributor.fiber
+            visible:panel.fieldBuilder && !panel.contributor.fiber
             label:"Maximum gap to close"; minimum:0; maximum:100
             enabled:panel.settings.gap_mode === "OVERRIDE"
             value:100*(panel.effective.gap_limit_ratio || 0)
@@ -38,7 +39,7 @@ ColumnLayout {
         }
         NumericSetting {
             objectName:"skinSourceGapStrength"
-            visible:!panel.contributor.fiber
+            visible:panel.fieldBuilder && !panel.contributor.fiber
             label:"Gap filling strength"; minimum:0; maximum:100
             enabled:panel.settings.gap_mode === "OVERRIDE"
             value:100*(panel.effective.gap_strength || 0)
@@ -73,7 +74,7 @@ ColumnLayout {
             }
         }
         ColumnLayout {
-            visible:!!panel.contributor.scp; Layout.fillWidth:true
+            visible:panel.fieldBuilder && !!panel.contributor.scp; Layout.fillWidth:true
             Label { text:"Collagen"; color:Theme.muted }
             UiCombo {
                 objectName:"skinSourceCollagenMode"; Layout.fillWidth:true

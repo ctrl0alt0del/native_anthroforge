@@ -59,6 +59,8 @@ AF_API int af_tissue_control_default(uint64_t source,int part,double* point);
 AF_API uint64_t af_tissue_source_mesh(uint64_t source,const double* matrix,uint64_t cancel);
 AF_API uint64_t af_tissue_refine_grid(uint64_t source,int resolution,uint64_t cancel);
 AF_API int af_mesh_tissue_sizes(uint64_t source,int64_t* sizes);
+// Evaluate world-space base coordinates at each output material sample. Returns 2 for no surface map.
+AF_API int af_mesh_tissue_base_samples(uint64_t output,const double* base,int64_t count,double* xyz,int64_t vertices,uint64_t cancel);
 AF_API int af_mesh_tissue_copy(uint64_t source,int64_t* data,int64_t count,double* weights,int64_t entries);
 AF_API uint64_t af_mesh_tissue_restore(uint64_t source,const int64_t* data,int64_t count,const double* weights,int64_t entries,uint64_t cancel);
 #ifdef __cplusplus

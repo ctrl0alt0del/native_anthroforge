@@ -63,6 +63,7 @@ UiScrollView {
             }
             Label { text: (inspector.selected.parent ? "Child SCP" : "Document root") + (inspector.selected.primitive ? "  ·  " + DisplayNames.label(inspector.selected.primitive.kind) : "  ·  Empty group"); color: Theme.muted; font.pixelSize: 11; Layout.fillWidth:true; wrapMode:Text.Wrap }
             PrimitiveInspector { visible: !!inspector.selected.primitive }
+            ScpSkinSettings { source: App.skinPanel.state.contributor || ({}) }
             UiSection {
                 title: "Transform"; stateKey:"scp/transform"; expanded:false; objectName: "transformSection"
                 Repeater {

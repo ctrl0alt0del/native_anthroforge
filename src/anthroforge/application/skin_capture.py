@@ -1,12 +1,12 @@
 """Worker-owned skin sources; presentation never chooses physical contributors."""
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 
 import numpy as np
 
 from anthroforge.core import skin_sources
-from anthroforge.core.skin import effective_collagen
+from anthroforge.core.skin import SkinContributor, effective_collagen
 from anthroforge.native import skin_capture as native
 
 from . import (
@@ -49,17 +49,20 @@ def sources(engine: Any, document: Any, resources: Any, cancel: int) -> tuple[So
     return result
 
 
-def policy(document: Any, row: Source) -> tuple[float, float, bool]:
-    gap = skin_operations.effective_settings(document, row.identity.owner)
+def policy(
+    document: Any, row: Source, setting: SkinContributor | None = None
+) -> tuple[float, float, bool]:
+    setting = setting or skin_operations.settings_for(document.skin, row.identity.owner)
+    gap = setting if setting.gap_mode == "OVERRIDE" else document.skin.envelope_settings
     return gap.gap_limit_ratio, gap.gap_strength, row.identity.kind == "SCP"
 
 
-def weights(document: Any, resources: Any, row: Source, warnings: list[str]) -> Any:
-    count = row.mesh.counts[0]
+def weights(
+    document: Any, resources: Any, row: Source, warnings: list[str], setting: SkinContributor
+) -> Any:
     if row.identity.kind != "SCP":
-        return np.ones(count)
+        return np.ones(row.mesh.counts[0])
     item = document.object(row.identity.owner)
-    setting = skin_operations.settings_for(document.skin, item.id)
     if setting.collagen_mode == "PAINTED":
         asset = resources.skin.get(setting.painted)
         values = asset.arrays.get("collagen") if asset else None
@@ -68,19 +71,44 @@ def weights(document: Any, resources: Any, row: Source, warnings: list[str]) -> 
         warnings.append(
             "Painted collagen does not match " + item.name + "; using its uniform value."
         )
-    return np.full(count, effective_collagen(setting, item.name))
+    return np.full(row.mesh.counts[0], effective_collagen(setting, item.name))
 
 
 def capture(engine: Any, document: Any, resources: Any, cancel: int = 0) -> Capture:
     rows = sources(engine, document, resources, cancel)
-    geometry = native.capture_sources(
+    lookup = {s.owner: s for s in document.skin.contributors}
+    settings = [
+        lookup.get(row.identity.owner) or SkinContributor(row.identity.owner) for row in rows
+    ]
+    geometry = captured_geometry(engine, document, rows, settings, cancel)
+    if document.skin.draft_settings.backend == "AVBD":
+        return Capture(geometry, rows, None, ())
+    warnings: list[str] = []
+    collagen = [
+        weights(document, resources, row, warnings, setting)
+        for row, setting in zip(rows, settings, strict=True)
+    ]
+    return Capture(geometry, rows, np.concatenate(collagen), tuple(warnings))
+
+
+def captured_geometry(engine: Any, document: Any, rows: Any, settings: Any, cancel: int) -> Any:
+    return native.capture_sources(
         engine,
         [row.mesh for row in rows],
         [0 for row in rows],
         [row.frame for row in rows],
-        [policy(document, row) for row in rows],
+        [policy(document, row, setting) for row, setting in zip(rows, settings, strict=True)],
         cancel,
     )
-    warnings: list[str] = []
-    collagen = np.concatenate([weights(document, resources, row, warnings) for row in rows])
-    return Capture(geometry, rows, collagen, tuple(warnings))
+
+
+def source_metadata(row: Any) -> dict[str, Any]:
+    counts = native.source_counts(row.mesh, False)
+    return dict(
+        **asdict(row.identity),
+        asset=row.asset,
+        frame=row.frame,
+        vertices=counts[0],
+        triangles=counts[1],
+        segments=counts[2],
+    )

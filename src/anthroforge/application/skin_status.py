@@ -4,7 +4,7 @@ import json
 from dataclasses import asdict, dataclass
 from typing import Any
 
-from anthroforge.core import skin_sources
+from anthroforge.core import anatomical_surfaces, skin_sources
 from anthroforge.core.results import Port
 
 from .construction_policy import revisions
@@ -40,7 +40,7 @@ def assess(document: Any, resources: Any) -> Status:
 
 def creation(document: Any, resources: Any) -> dict[str, Eligibility]:
     skin = document.skin
-    build = "" if skin_sources.contributors(document) else "Add SCP or tissue geometry first."
+    build = draft_reason(document)
     topology = "" if skin.envelope.asset in resources.meshes else "Build a skin envelope first."
     reference = (
         ""
@@ -53,6 +53,29 @@ def creation(document: Any, resources: Any) -> dict[str, Eligibility]:
         topology=allowed(topology),
         reference=allowed(reference or pending_reason(document)),
     )
+
+
+def draft_reason(document: Any) -> str:
+    sources = skin_sources.contributors(document)
+    if not sources:
+        return "Add SCP or tissue geometry first."
+    from .skin_evaluation import BUILDERS
+
+    key = document.skin.draft_settings.backend
+    if key not in BUILDERS:
+        return f"The selected draft builder {key} is unavailable."
+    return avbd_requirements(document, sources) if key == "AVBD" else ""
+
+
+def avbd_requirements(document: Any, sources: Any) -> str:
+    if not any(s.kind == "SCP" for s in sources):
+        return "AVBD draft construction needs an SCP root."
+    for row in sources:
+        if row.kind == "TISSUE":
+            item = document.object(row.owner)
+            if "TISSUE_BASE" not in anatomical_surfaces.roles(item, document.registry.records):
+                return f"AVBD needs corresponding base and finished surfaces for {item.name}."
+    return ""
 
 
 def pending_reason(document: Any) -> str:

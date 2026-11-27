@@ -105,10 +105,11 @@ and `build/skin-portable-final`. Executable: `build/skin-relocated-final/AnthroF
 
 ## Numerical reuse evidence and limits
 
-The external AVBD numerical implementation was not replaced. The application owns input capture,
-worker isolation, checkpoint files, validation and publication. It explicitly requires a configured
-AVBD runtime; the portable package includes the adapter, not that external numerical environment.
-FIELD and the other packaged native tools remain available independently.
+The AVBD numerical implementation was not replaced. The application owns input capture,
+worker isolation, checkpoint files, validation and publication. The initial qualification used
+an explicitly configured external runtime. The November 27 packaging change below bundles
+that numerical environment; source development retains its explicit override. FIELD and the
+other packaged native tools remain available independently.
 
 - Three-SCP resume versus fresh construction: identical connectivity; coordinates within `1e-10`.
   The observed resumed trial took 4.65 s versus 7.74 s for fresh construction.
@@ -131,3 +132,25 @@ archive after reuse was 141,129 bytes with no checkpoints. This is storage accou
 peak-memory bound for larger anatomy. Ordinary files and recovery copies
 retain accepted project results but omit construction checkpoints. No cache eviction policy or
 numerical fallback was introduced.
+
+## Bundled-runtime qualification — November 27, 2026
+
+Release `63b468e9` was relocated across drives to a path containing spaces. With a Windows-only
+PATH and no developer Python/Qt/AVBD settings, the executable completed fresh SCP generation,
+an attached limb and a muscle case. SCP/VCP checkpoints were published. The portable pipeline
+check also passed damaged-bundle failure retention, compatible checkpoint reuse with an invalid
+external override, ordinary-save checkpoint omission, Final construction and direct deformation
+with unchanged Draft/topology/reference. The saved Final fixture contains 1,054 quads.
+
+The canonical `dist/0.4.3/AnthroForge.dist/AnthroForge.exe` was then launched normally, without
+arguments or environment setup. Through its visible UI, an embedded bone-and-muscle fixture
+was opened and its builder changed from FIELD to AVBD. The visible envelope changed; the panel
+reported **Applied: AVBD** and **Requested skin is current**. Saving and reading the result
+confirmed 690 finite vertices and 1,376 triangles. This is an actual native-window acceptance,
+separate from automated/headless tests.
+
+All 8,536 bundled files passed SHA-256 verification, 1,166 file-backed modules loaded exclusively
+inside the private runtime, and generation left its files unchanged. Evidence is local-only in
+`E:/development/anthroforge/build/bundled-avbd-release-check`, including the normal-launch
+screenshot, saved project, mesh counts and route receipts. These small fixtures establish the
+deployment boundary, not whole-body shape quality or compatibility with other GPU architectures.

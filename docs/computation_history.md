@@ -4052,7 +4052,10 @@ preserves checkpoint compatibility and changes to dependencies invalidate prefix
 External-checkout checkpoints rebuild conservatively; accepted saved surfaces remain.
 Copying an editable venv was rejected because its launcher and paths are not portable;
 compiling a second worker would unnecessarily alter dynamic imports/subprocess entry points.
-Prototype evidence: a fresh cube generated an accepted AVBD Draft and durable SCP checkpoint
-through the application; the numerical module graph loaded from private paths with a minimal
-PATH. Full package/GUI qualification and limitations are tracked in the
+Release evidence (`63b468e9`, baseline `ec2f786b`): the relocated executable generated SCP,
+limb and VCP cases with a minimal PATH, retained/reused checkpoints and completed fixed-topology
+Final updates. Normal canonical launch plus UI builder selection produced visible, accepted
+AVBD skin with 690 finite vertices and 1,376 triangles. Bundle file hashes stayed unchanged
+after generation and imported numerical modules resolved exclusively inside the image.
+Full package/GUI qualification and limitations are tracked in the
 [delivery record](tasks/bundled-avbd-runtime.md). No speedup or broader GPU compatibility is claimed.

@@ -3,7 +3,7 @@
 - Task branch: `codex/bundled-avbd-runtime`
 - Integration branch: `main`
 - Starting revision: `ec2f786b`
-- Status: implementation complete; package and full qualification in progress
+- Status: package delivered and normal-launch GUI passed; full regression gate in progress
 - Last updated: November 27, 2026, Europe/Bucharest
 - Active writer: desktop AVBD packaging chat
 
@@ -44,17 +44,35 @@ Official references: [CPython Windows embedding](https://docs.python.org/3.12/us
 
 ## Current state and next steps
 
-Discovery/retention tests: 16 passed; application mypy passed. The private interpreter loaded
-the AVBD dependency graph (1,231 modules) with only bundle-local import paths and a Windows-only
-PATH. A fresh cube completed actual AVBD generation through the application pipeline using
-the private runtime, publishing an accepted Draft and durable SCP checkpoint. This was a
-source-app prototype check, not packaged or GUI acceptance.
+Discovery/retention tests and mypy passed. Native build, six CTests, native/PowerShell style and
+186-file QML API validation passed; the full Python suite is still running (past 74%).
+The candidate was rebuilt at clean revision `63b468e9` to include the explicit `-I -B` worker
+flags. A reused, deployment-mutated PySide spec was rejected by its safe-path check during
+the rebuild; regenerating it through the normal configuration function resolved that attempt.
+
+Relocated executable: minimal-PATH generation passed for root SCP, attached limb and VCP.
+The complete portable pipeline check passed fresh construction, missing-bundle failure
+retention, checkpoint reuse, ordinary save and Final deformation with fixed topology/reference.
+All 8,536 runtime files match their manifest; 1,166 file-backed imported modules stay within
+the private image. No files were added or changed by generation.
+
+Canonical package promoted to `E:/development/anthroforge/dist/0.4.3/AnthroForge.dist`.
+Executable SHA-256: `9c7155d7475f3f766c45ce1c04ed0f7d09c34364e4bbcb079f23ff2e835685f9`.
+Previous complete package retained at `build/bundled-avbd-delivery-20261127/previous-build`.
+Normal launch without arguments/environment setup passed: open embedded bone/muscle fixture,
+select AVBD in the UI, observe changed skin and current/applied status, save. Saved GUI mesh:
+690 finite vertices / 1,376 triangles. The headless Final fixture has 1,054 quads. The test app
+is open on the saved test project; do not replace executable files while it is running.
 
 Exact runtime input revision is `b3b92969a39dbf4d1322e4f376f26fd425006445`, with independently
 dirty source inputs recorded by file hashes and preserved in the corresponding source ZIP.
-Build outputs/evidence are local-only under `build/bundled-avbd-review`.
-Remaining: full development gate, release build, relocated package verification and actual
-normal-launch GUI skin generation; canonical promotion/source archive; merge/push main.
+Build logs are local-only under the implementation checkout's `build/bundled-avbd-review`;
+portable/GUI evidence is under `E:/development/anthroforge/build/bundled-avbd-release-check`.
+The first prototype source-archive experiment included unnecessary Boost test/docs data and
+was stopped; the qualified bundle archives the used headers/licenses instead.
+Remaining: await development gate exec session `25061`, refresh canonical source archive and
+qualification docs, review final diff, commit/push and merge/push main. Native solver/GPU
+requirements are unchanged; this task does not establish whole-body numerical quality.
 
 ## Recovery inputs
 

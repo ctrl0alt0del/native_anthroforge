@@ -13,7 +13,7 @@ from PySide6.QtTest import QTest
 from shiboken6 import delete
 from ui_acceptance import click, find
 
-from anthroforge.application import skin_evaluation
+from anthroforge.application import skin_builder_configuration, skin_field_builder
 from anthroforge.application.skin_operations import settings_for
 from anthroforge.core.fibers import Fiber
 from anthroforge.core.skin import EnvelopeSettings
@@ -55,7 +55,7 @@ def navigation(controller, window):
     assert controller.session.document is before
     assert find(window, "skinPane").isVisible()
     edit_field(window, "skin_gap_limit_ratio", "0.75")
-    assert controller.session.document.skin.envelope_settings.gap_limit_ratio == 0.0075
+    assert field_settings(controller).gap_limit_ratio == 0.0075
     controller.run("undo", {})
     assert controller.session.document.skin == before.skin
     integer_settings(controller, window)
@@ -65,7 +65,7 @@ def navigation(controller, window):
 
 
 def envelope(controller, window):
-    skin_evaluation.TARGET_RESOLUTION = 24
+    skin_field_builder.TARGET_RESOLUTION = 24
     controller.run(
         "import", dict(path=str(Path("examples/primitives/cube.obj").resolve()), units=1)
     )
@@ -124,9 +124,9 @@ def effective_controls(controller, window):
     assert control.property("value") == 25 and not control.isEnabled()
     assert not find(window, "skinSourceCollagen").isEnabled()
     click(window, "skinResetEnvelope")
-    assert controller.session.document.skin.envelope_settings == EnvelopeSettings()
+    assert field_settings(controller) == EnvelopeSettings()
     controller.run("undo", {})
-    assert controller.session.document.skin.envelope_settings.gap_strength == 0.25
+    assert field_settings(controller).gap_strength == 0.25
     controller.run("undo", {})
     assert controller.session.document.skin == before
 
@@ -203,6 +203,10 @@ def configure_native():
     if native:
         runtime.build_directory = lambda: Path(native)
         app.build_directory = runtime.build_directory
+
+
+def field_settings(controller):
+    return skin_builder_configuration.decode(controller.session.document.skin, "FIELD").settings
 
 
 if __name__ == "__main__":

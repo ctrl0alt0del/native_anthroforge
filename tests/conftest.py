@@ -14,9 +14,10 @@ def isolated_preferences(tmp_path, monkeypatch):
 
 @pytest.fixture
 def session(monkeypatch):
-    from anthroforge.application import skin_field_builder
+    from anthroforge.application import skin_field_builder, worker_memory
 
     monkeypatch.setattr(skin_field_builder, "TARGET_RESOLUTION", 24)
+    monkeypatch.setattr(worker_memory, "budget", lambda: 64 * 1024**2)
     value = Session("Fixture")
     yield value
     value.close()

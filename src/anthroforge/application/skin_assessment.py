@@ -127,18 +127,35 @@ def required(document: Any, resources: Any, stage: str) -> Assessment:
         else skin_stages.POLICIES[stage].inputs(document)
     )
     for port in inputs:
-        item = document.registry.records.get(port.owner)
-        result = getattr(item, port.output + "_result", None)
-        if result is not None and port.output in ("base", "rest", "intrinsic", "final"):
-            state = required_result(item.name, port.output, result, resources)
-            if state.condition != Condition.READY:
-                return state
+        state = required_port(document, resources, port)
+        if state.condition != Condition.READY:
+            return state
+    return Assessment()
+
+
+def required_port(document: Any, resources: Any, port: Port) -> Assessment:
+    item = document.registry.records.get(port.owner) or document.index.entities.get(port.owner)
+    result = getattr(item, port.output + "_result", None)
+    if result is not None and port.output in ("base", "rest", "intrinsic", "final"):
+        return required_result(item.name, port.output, result, resources)
+    result = result or getattr(item, "result", None)
+    if result is not None:
+        return result_status(item.name, port.output, result)
+    return Assessment()
+
+
+def result_status(name: str, role: str, result: Any) -> Assessment:
+    if result.error or result.status in ("failed", "invalid", "cancelled"):
+        return Assessment(Condition.FAILED, f"{name} {role}: {result.error or result.status}")
+    if result.status == "pending" or result.pending:
+        return Assessment(Condition.WAITING, f"Waiting for {name} {role}.")
     return Assessment()
 
 
 def required_result(name: str, role: str, result: Any, resources: Any) -> Assessment:
-    if result.error or result.status in ("failed", "invalid", "cancelled"):
-        return Assessment(Condition.FAILED, f"{name} {role}: {result.error or result.status}")
-    if result.status == "pending" or result.asset not in resources.meshes:
+    state = result_status(name, role, result)
+    if state.condition != Condition.READY:
+        return state
+    if result.asset not in resources.meshes:
         return Assessment(Condition.WAITING, f"Waiting for {name} {role}.")
     return Assessment()

@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 
-from . import skin_avbd_worker as worker
+from . import worker
 
 FILES = ("input.bin", "local-input/input.bin", "local-input/frame.bin")
 SURFACE = ("latest.bin", "faces.bin")
@@ -32,6 +32,7 @@ def run(recipe: Any, output: Path, resume: Any) -> Any:
             for step in steps:
                 run.add(step, process)
                 checkpoint(run, output)
+    worker.module("skin_run_settings").options(True, hand=run.steps[-1].route == "region")
     worker.write(root / "stages.json", run.rows)
     return run
 

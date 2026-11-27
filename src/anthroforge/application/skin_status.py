@@ -171,7 +171,9 @@ class SkinStatusProvider:
         return self.value
 
     def describe(self) -> dict[str, Any]:
-        return asdict(self.snapshot())
+        from .skin_pipeline_status import describe
+
+        return asdict(self.snapshot()) | dict(pipeline=describe(self.session))
 
     def require(self, operation: str) -> None:
         status = self.snapshot().operations[operation]

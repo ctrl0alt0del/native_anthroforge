@@ -43,7 +43,7 @@ def test_drivers_across_attachment_pose_finish_and_read_current_output(session, 
     assert position(session, target) == position(session, child, "world_transform")
     session.command("driver.value", driver=key, value=3.0)
     session.wait(5)
-    assert not session.scheduler.errors
+    assert result(session, first).status == result(session, second).status == "ready"
     assert position(session, target) == position(session, child, "world_transform")
 
 

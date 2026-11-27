@@ -44,13 +44,15 @@ class RepairRequired(ValueError):
         self.stage = stage
 
 
-def plan(mode: str, inputs: Inputs) -> Plan:
+def plan(mode: str, inputs: Inputs, handoff: bool = False) -> Plan:
     if inputs.sources.condition != Condition.READY:
         return Plan(reason=inputs.sources.reason)
     if mode == "DRAFT":
         return draft_plan(inputs.draft)
     if mode != "FINAL":
         raise ValueError("Unknown skin target mode.")
+    if handoff and inputs.draft.condition != Condition.READY:
+        return draft_plan(inputs.draft)
     return final_plan(inputs)
 
 

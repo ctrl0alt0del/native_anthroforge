@@ -23,6 +23,19 @@ UiScrollView {
             text:pane.state.configuration_state || ""; color:Theme.muted
             elide:Text.ElideRight; maximumLineCount:1
         }
+        Label {
+            objectName:"skinPipelineState"; Layout.fillWidth:true
+            text:pane.state.pipeline?.label || ""; color:Theme.muted
+            elide:Text.ElideRight; maximumLineCount:1
+            ToolTip.visible:statusHover.hovered && !!pane.state.pipeline?.reason
+            ToolTip.text:pane.state.pipeline?.reason || ""
+            HoverHandler { id:statusHover }
+        }
+        UiButton {
+            objectName:"skinRetry"; text:"Retry skin update"; Layout.fillWidth:true
+            enabled:!!pane.state.pipeline?.can_retry
+            onClicked:App.runtime.run("skin.retry",{})
+        }
         UiButton { objectName:"skinBuild"; text:"Build Skin"; Layout.fillWidth:true; enabled:pane.readiness.build.available; hint:pane.readiness.build.reason; onClicked:App.runtime.run("skin.build",{}) }
         UiCombo {
             objectName:"skinDisplay"; Layout.fillWidth:true; textRole:"label"; valueRole:"id"

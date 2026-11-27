@@ -100,8 +100,7 @@ def publish(session: Any, intent: Any, payload: Any) -> None:
     if reads != revisions(session.document, inputs(session.resources, session.document)):
         raise ObsoleteInputs("Skin anatomical inputs changed before publication.")
     if isinstance(output, RepairRequired):
-        session.skin_pipeline.repair = output.stage
-        session.skin_pipeline.reason = str(output)
+        session.skin_pipeline.require_repair(output.stage, str(output))
         return
     install(session, document, output, reads)
 

@@ -190,7 +190,9 @@ def test_parameter_edit_during_build_remains_pending(session, monkeypatch):
     session.scheduler.tick()
     assert entered.wait(5)
     try:
-        session.command("skin.configure", section="envelope_settings", values=dict(gap_strength=0.3))
+        session.command(
+            "skin.configure", section="envelope_settings", values=dict(gap_strength=0.3)
+        )
     finally:
         release.set()
     session.wait()

@@ -7,7 +7,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-PROTOCOL = 1
+PROTOCOL = 3
 
 
 @lru_cache(maxsize=2048)

@@ -5,7 +5,7 @@ from pathlib import Path
 from time import perf_counter
 from typing import Any
 
-from . import skin_avbd_worker as worker
+from . import worker
 
 
 def run(bones: Any, recipe: Any, output: Path, resume: Any) -> Path:
@@ -45,10 +45,26 @@ def make_chain(inputs: Any, root: Path, record: Any) -> Any:
 
 
 def checkpoint(chain: Any, output: Path) -> None:
-    files = {"skin/" + name: chain.skin / name for name in ("latest.bin", "faces.bin")}
+    files = surface_files(chain.skin)
     for key, folder in chain.prior.items():
         for name in ("collider.bin", "collider-bounds.json"):
             files[f"prior/{key}/{name}"] = folder / name
     rows = [{k: v for k, v in row.items() if k not in ("parent", "skin")} for row in chain.stages]
     state = dict(stages=rows, passages=chain.passages, prior=list(chain.prior))
     worker.receipt(output, "VCP", len(rows) - 1, files, state)
+
+
+def surface_files(skin: Path) -> dict[str, Path]:
+    names = ["latest.bin", "faces.bin"]
+    if (skin / "regions").is_dir():
+        names += [
+            "validated/latest.bin",
+            "validated/faces.bin",
+            "solve/relaxation/rest.bin",
+            "regions/limb-labels.bin",
+            "regions/limb-corners.bin",
+        ]
+    files = {"skin/" + name: skin / name for name in names}
+    if any(not path.is_file() for path in files.values()):
+        raise ValueError("Incomplete accepted VCP material checkpoint.")
+    return files

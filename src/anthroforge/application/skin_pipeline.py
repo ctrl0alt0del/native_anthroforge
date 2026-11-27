@@ -57,10 +57,13 @@ class Pipeline:
     def __init__(self, session: Any) -> None:
         self.session, self.epoch = session, 0
         self.armed = self.desired = self.transition = self.manual = False
+        self.handoff = False
         self.dirty = True
         self.pending_config: Any = None
         self.retry_config: Any = None
         self.repair = self.failed_stage = ""
+        self.attempted_repairs: set[str] = set()
+        self.repair_key: Any = None
         self.last_key = anatomy_key(session.document)
         self.before = session.document
         self.previous_jobs: set[str] = set()
@@ -97,6 +100,7 @@ class Pipeline:
             self.pending_config = current.skin.draft_settings.configuration()
             self.repair, self.desired, self.armed = "envelope", True, True
         if current.skin.update_mode != self.before.skin.update_mode:
+            self.handoff = current.skin.update_mode == "FINAL"
             if current.skin.update_mode == "DRAFT":
                 self.invalidate()
             self.desired = self.transition = self.armed = True
@@ -130,7 +134,7 @@ class Pipeline:
         config = self.pending_config or builders.automatic(self.session.document.skin)
         doc = builders.projected(self.session.document, config)
         state = skin_assessment.assess(doc, self.session.resources)
-        planned = plan(doc.skin.update_mode, state)
+        planned = plan(doc.skin.update_mode, state, self.handoff)
         self.reason = planned.reason
         stage = self.repair or planned.stage
         if not self.ready(doc, state, stage):
@@ -153,6 +157,8 @@ class Pipeline:
 
     def dispatch(self, stage: str, config: Any) -> str:
         session = self.session
+        if stage != "envelope":
+            self.handoff = False
         intent = skin_job_intents.capture(session, stage, True, config)
         if stage == "deformation":
             return str(skin_update_tasks.request(session, interactive=self.live(), intent=intent))
@@ -182,6 +188,7 @@ class Pipeline:
 
     def explicit(self, stage: str) -> None:
         self.invalidate()
+        self.handoff = False
         self.manual, self.armed = True, True
         self.desired = self.transition = False
         if stage != "envelope":
@@ -212,11 +219,25 @@ class Pipeline:
 
     def invalidate(self) -> None:
         self.epoch += 1
+        self.attempted_repairs.clear()
         for job in self.active():
             self.session.scheduler.cancel_job(job.id, obsolete=True, reason="skin_target_changed")
 
+    def require_repair(self, stage: str, reason: str) -> None:
+        if stage not in ("construction", "reference"):
+            raise ValueError("Unsupported skin prerequisite repair stage: " + stage)
+        key = anatomy_key(self.session.document), self.session.document.skin.deformation_settings
+        if key != self.repair_key:
+            self.attempted_repairs.clear()
+        self.repair_key = key
+        if stage in self.attempted_repairs:
+            raise ValueError("Skin prerequisite repair made no progress: " + reason)
+        self.attempted_repairs.add(stage)
+        self.repair, self.reason = stage, reason
+
     def restored(self) -> None:
         self.invalidate()
+        self.handoff = False
         self.pending_config, self.repair = None, ""
         self.last_key = anatomy_key(self.session.document)
         self.armed = self.desired = self.dirty = True

@@ -122,9 +122,40 @@ case was observed in `test_junction_identity` after duplicated BODY SCPs change;
 places the active worker inside FIELD envelope construction. This is not yet diagnosed as
 a particular native loop. The full suite is incomplete and must not be reported passed.
 
-Next: diagnose and bound the FIELD long-running case without weakening geometry validation;
-finish handoff/readiness/status edge cases; qualify multi-stage AVBD reuse; finish the full
-development gate, real GUI and packaged runtime checks. No user decision is pending.
+The FIELD probe observed adaptive refinement to approximately 375 million cells rather
+than an established infinite loop. General Session tests now use a 64 MiB worker budget
+as well as resolution 24; production remains unchanged. A second slow case exposed missing
+upstream readiness checks: Draft now waits on the complete dependency closure, including
+Manual membranes/curves. All five material/persistence regressions passed in 4.69 seconds
+after that correction. No numerical approximation or fallback was added to FIELD.
+
+Final handoff now requires a current Draft even when an older reference remains compatible.
+Automatic Retry retains its captured configuration, and repeated prerequisite repair for
+unchanged effective inputs reports failure rather than cycling. The shared read-only status
+projection exposes mode, phase, stage, readiness and Retry in headless and desktop clients.
+Seventeen planning/edge checks and 21 combined lifecycle/status/transport checks passed.
+Ruff, formatting, lock consistency, numerical imports and native doctor passed; strict mypy
+passed 710 modules. New/modified Python functions passed the 15-line audit.
+
+Real numerical reuse qualification: a resumed three-SCP build has identical connectivity
+and coordinates within 1e-10 of fresh construction. A full 27-SCP fixture plus the first VCP
+completed. The initial VCP append comparison exposed missing regional material in the bundle:
+connectivity matched but positions differed by up to 0.053. Retaining validated geometry,
+regional labels/corners and rest geometry fixes the cause; checkpoint protocol is now 3.
+The corrected appended second VCP (12.83 s) matches replay of both VCPs (18.10 s), including
+connectivity and coordinates within 1e-10. This comparison reused the same accepted skeletal
+checkpoint. Eight checkpoint tests now include incomplete regional material rejection.
+
+The worker adapter is now a small owned source package under `avbd_runtime`, launched using
+the explicitly configured external AVBD Python interpreter with `-I`. Packaging copies this
+adapter; numerical dependencies remain in the configured runtime, separate from desktop Qt.
+The new bootstrap passed build/save/reopen/reuse smoke qualification. Qualification scripts,
+raw captures and reports are local-only under `build/` and owned temporary directories.
+
+Next: finish the full development gate (third full run is active), resolve remaining
+regressions, finish actual GUI inspection, and qualify the portable build. The first package
+build started before the checkpoint protocol-3 fix and needs a source refresh/rebuild before
+final qualification. Native style checking is active. No user decision is pending.
 
 ## Recovery inputs
 

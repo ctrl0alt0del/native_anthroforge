@@ -13,7 +13,7 @@ from PySide6.QtTest import QTest
 from shiboken6 import delete
 from ui_acceptance import click
 
-from anthroforge.application import skin_evaluation
+from anthroforge.application import skin_field_builder
 from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.qt_profiler import profiler_application
@@ -21,7 +21,7 @@ from anthroforge.desktop.runtime import native_runtime
 
 
 def setup(controller, window):
-    skin_evaluation.TARGET_RESOLUTION = 220
+    skin_field_builder.TARGET_RESOLUTION = 220
     bone = controller.run(
         "import", dict(path=str(Path("examples/primitives/cube.obj").resolve()), units=1)
     )

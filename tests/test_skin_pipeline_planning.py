@@ -26,6 +26,11 @@ def test_compatible_final_update_preserves_stale_draft():
     assert plan("FINAL", state(draft=STALE, final_current=True)).stage == ""
 
 
+def test_explicit_final_handoff_waits_for_current_draft_even_with_retained_reference():
+    assert plan("FINAL", state(draft=STALE), handoff=True).stage == "envelope"
+    assert plan("FINAL", state(draft=READY), handoff=True).stage == "deformation"
+
+
 @pytest.mark.parametrize(
     "draft,topology,reference,expected",
     [

@@ -1,5 +1,6 @@
 """Owned checkpoint orchestration around the installed, unchanged numerical runtime."""
 
+import argparse
 import importlib
 import json
 import sys
@@ -7,8 +8,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
-from . import skin_avbd_worker_bones as bones
-from . import skin_avbd_worker_tissues as tissues
+from . import bones, tissues
 
 
 @cache
@@ -24,10 +24,11 @@ def read(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def add_parser(commands: Any) -> None:
-    parser = commands.add_parser("skin-avbd-worker", help="Run an isolated AVBD draft job")
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("runtime", type=Path)
     parser.add_argument("folder", type=Path)
+    return execute(parser.parse_args())
 
 
 def execute(args: Any) -> int:

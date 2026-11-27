@@ -12,6 +12,7 @@ from anthroforge.application import skin_avbd_checkpoints as checkpoints
 from anthroforge.application import skin_avbd_identity as identity
 from anthroforge.application import skin_checkpoint_assets as assets
 from anthroforge.application.skin_draft_build import CheckpointFailure, DraftOutput
+from anthroforge.avbd_runtime.tissues import surface_files
 from anthroforge.core.skin_checkpoints import Checkpoint
 from tests.test_skin_jobs import imported
 
@@ -55,9 +56,6 @@ def test_appended_vcp_reuses_combined_prefix_but_earlier_edit_replays_skeleton(t
     record = bundle("VCP", "c", old[1][-1]).checkpoint
     assert old[0] == new[0] and old[1] == new[1][:1]
     assert checkpoints.latest_tissue((record,), new[1]) == record
-    (tmp_path / "new/tissue-0/muscle.bin").write_bytes(
-        (tmp_path / "new/tissue-0/base.bin").read_bytes() + b"unused"
-    )
     changed = captures(tmp_path / "changed", tissues=("different", "d"))
     assert checkpoints.latest_tissue((record,), changed[1]) is None
 
@@ -136,3 +134,28 @@ def test_successful_checkpoint_is_retained_by_undo_redo_and_owned_resources(sess
 def test_checkpoint_receipt_cannot_escape_owned_worker_directory(tmp_path):
     with pytest.raises(ValueError, match="inside"):
         checkpoints.owned_file(tmp_path, "../foreign.bin")
+
+
+def regional_material(tmp_path):
+    names = (
+        "latest.bin",
+        "faces.bin",
+        "validated/latest.bin",
+        "validated/faces.bin",
+        "solve/relaxation/rest.bin",
+        "regions/limb-labels.bin",
+        "regions/limb-corners.bin",
+    )
+    for name in names:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(b"owned")
+    return names
+
+
+def test_vcp_checkpoint_retains_regional_material_and_rejects_partial_state(tmp_path):
+    names = regional_material(tmp_path)
+    assert set(surface_files(tmp_path)) == {"skin/" + name for name in names}
+    (tmp_path / "solve/relaxation/rest.bin").unlink()
+    with pytest.raises(ValueError, match="material checkpoint"):
+        surface_files(tmp_path)

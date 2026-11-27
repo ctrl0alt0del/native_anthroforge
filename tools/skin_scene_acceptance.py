@@ -7,7 +7,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 from skin_topology_render import displayed
 from tissue_scene_acceptance import fiber, frames, settle
 
-from anthroforge.application import skin_evaluation
+from anthroforge.application import skin_field_builder
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.offscreen import Offscreen
 from anthroforge.desktop.runtime import native_runtime
@@ -17,7 +17,7 @@ OUTPUT = Path("build/skin-040/ui")
 
 def setup(controller):
     # Grid 24 cannot resolve this thin-Fiber gap in either the addon or standalone.
-    skin_evaluation.TARGET_RESOLUTION = 64
+    skin_field_builder.TARGET_RESOLUTION = 64
     path = str(Path("examples/primitives/cube.obj").resolve())
     bone = controller.run("import", dict(path=path, units=1.0))["entity_id"]
     settle(controller)

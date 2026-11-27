@@ -4,7 +4,7 @@ from dataclasses import asdict
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
-from anthroforge.application import skin_builder_configuration, skin_reports
+from anthroforge.application import skin_builder_configuration, skin_pipeline_status, skin_reports
 
 from . import skin_contributor
 from .controller_actions import local_path
@@ -41,6 +41,7 @@ class SkinPanel(QObject):
             display=display[0],
             contributor=skin_contributor.describe(session, display[1]),
             reports=skin_reports.describe(session),
+            pipeline=skin_pipeline_status.describe(session),
         )
         self.changed.emit()
 
@@ -90,4 +91,5 @@ def context(controller, session):
         session.workspace,
         id(item),
         id(session.document.index.entities),
+        tuple(skin_pipeline_status.describe(session).items()),
     )

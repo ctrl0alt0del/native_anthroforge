@@ -88,6 +88,7 @@ def finish():
     if not (DIST / "AnthroForge.exe").is_file():
         raise RuntimeError("Deployment did not produce AnthroForge.exe.")
     copy_runtime(DIST / "anthroforge/_runtime")
+    copy_avbd_adapter()
     shutil.copytree(
         ROOT / "src/anthroforge/desktop/qml", DIST / "anthroforge/desktop/qml", dirs_exist_ok=True
     )
@@ -96,6 +97,15 @@ def finish():
     copy_qt_notices()
     licenses()
     print(DIST / "AnthroForge.exe")
+
+
+def copy_avbd_adapter():
+    shutil.copytree(
+        ROOT / "src/anthroforge/avbd_runtime",
+        DIST / "anthroforge/avbd_runtime",
+        dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns("__pycache__"),
+    )
 
 
 def copy_documentation():

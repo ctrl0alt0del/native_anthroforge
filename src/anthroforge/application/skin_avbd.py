@@ -11,7 +11,6 @@ import numpy as np
 from anthroforge.native import process
 
 from . import skin_avbd_capture, skin_avbd_checkpoints
-from .runtime_launcher import launcher
 from .skin_draft_build import CheckpointFailure, DraftOutput, DraftRequest
 
 WORKER = Path("tools/runtime/skin/application_worker.py")
@@ -30,9 +29,10 @@ def runtime() -> tuple[Path, Path]:
 
 
 def execute(engine: Any, folder: Path, cancel: int, installed: tuple[Path, Path]) -> Path:
-    root, _ = installed
+    root, python = installed
     output = folder / "output"
-    args = (*launcher(), "skin-avbd-worker", str(root), str(folder))
+    bootstrap = Path(__file__).resolve().parents[1] / "avbd_runtime/bootstrap.py"
+    args = (str(python), "-I", str(bootstrap), str(root), str(folder))
     log = folder / "worker.log"
     code = process.run(engine, process.Request(args, root, log), cancel)
     if code:

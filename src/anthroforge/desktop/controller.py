@@ -79,6 +79,7 @@ class Controller(QObject):
     def initialize_session(self):
         self.profiler = RuntimeProfiler()
         self.session = Session(profiler=self.profiler)
+        self.session.scheduler.publication_budget_ms = 2.0
         scene.configure(self.session.engine)
         self.initialize_tools()
         self.profiler.resources.views[self] = WeakMethod(self.memory_owners)
@@ -322,6 +323,7 @@ class Controller(QObject):
 
     def refresh_if_needed(self):
         projection = self.scene_projection
+        projection.consume_camera_changes()
         if (
             projection.session is not self.session
             or projection.journal is not self.session.changes

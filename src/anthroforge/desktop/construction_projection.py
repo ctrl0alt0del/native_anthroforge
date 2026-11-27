@@ -56,7 +56,9 @@ class ConstructionProjection:
     def update_record(self, session, item):
         frame = self.frames.world(item.id)
         owners = workspace_policy.associations(session.document, item.id)
-        key = (item, frame, session.workspace, owners)
+        from .workspace_projection import scene_key
+
+        key = (item, frame, scene_key(session.workspace), owners)
         if key != self.keys.get(item.id):
             self.records[item.id], self.keys[item.id] = record(session, item, frame), key
 

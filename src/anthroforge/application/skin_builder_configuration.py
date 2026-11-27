@@ -64,7 +64,7 @@ def automatic(skin: Skin) -> BuilderConfiguration:
 def projected(document: Any, config: BuilderConfiguration) -> Any:
     settings = document.skin.draft_settings.updated(config)
     skin = replace(document.skin, draft_settings=replace(settings, backend=config.builder))
-    return replace(document, skin=skin)
+    return document if skin == document.skin else replace(document, skin=skin)
 
 
 def retained(skin: Any) -> set[str]:

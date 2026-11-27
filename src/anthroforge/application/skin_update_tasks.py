@@ -74,8 +74,8 @@ def make_job(session: Any, intent: Any) -> Job:
     return Job(
         "Update skin",
         frozenset((str(session.document.id),)),
-        lambda doc: (intent.project(doc), session.resources.snapshot()),
-        partial(compute, session.engine),
+        lambda doc: (doc, session.resources.snapshot()),
+        partial(compute, session.engine, intent),
         partial(publish, session, intent),
         key="skin-update",
         kind="skin_deformation",
@@ -83,20 +83,20 @@ def make_job(session: Any, intent: Any) -> Job:
     )
 
 
-def compute(engine: Any, payload: Any, cancel: Any) -> Any:
+def compute(engine: Any, intent: Any, payload: Any, cancel: Any) -> Any:
     document, resources = payload
+    document = intent.project(document)
+    reads = revisions(document, inputs(resources, document))
     try:
-        return document, skin_deformation_evaluation.evaluate(
-            engine, document, resources, cancel.handle
-        )
+        output = skin_deformation_evaluation.evaluate(engine, document, resources, cancel.handle)
+        return document, output, reads
     except RepairRequired as repair:
-        return document, repair
+        return document, repair, reads
 
 
 def publish(session: Any, intent: Any, payload: Any) -> None:
-    document, output = payload
+    document, output, reads = payload
     skin_job_intents.require(session, intent, "deformation")
-    reads = revisions(document, inputs(session.resources, document))
     if reads != revisions(session.document, inputs(session.resources, session.document)):
         raise ObsoleteInputs("Skin anatomical inputs changed before publication.")
     if isinstance(output, RepairRequired):

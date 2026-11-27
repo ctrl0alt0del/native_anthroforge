@@ -76,6 +76,8 @@ class TaskCoordinator:
         self.annotate = lambda job, document: None
         self.before_dispatch = lambda job, document: None
         self.admission = task_resources.Admission()
+        self.publication_budget_ms: float | None = None
+        self.publication_deadline, self.publications, self.tick_cursor = float("inf"), 0, 0
 
     def _initialize_callbacks(self) -> None:
         self.can_publish: Callable[[Job], bool] = lambda job: True
@@ -289,9 +291,22 @@ class TaskCoordinator:
     def tick_context(self) -> None:
         for job in self.active_jobs:
             if self._finishable(job):
+                if not self.publication_ready():
+                    break
                 self._finish(job)
+                self.publications += 1
         self._dispatch()
         self._checkpoint()
+
+    def begin_publication_window(self) -> None:
+        budget = self.publication_budget_ms
+        self.publication_deadline = (
+            self.clock() + budget / 1000 if budget is not None else float("inf")
+        )
+        self.publications = 0
+
+    def publication_ready(self) -> bool:
+        return self.publications == 0 or self.clock() < self.publication_deadline
 
     def _finishable(self, job: Job) -> bool:
         done = job.future.done() if job.future else job.restart_requested

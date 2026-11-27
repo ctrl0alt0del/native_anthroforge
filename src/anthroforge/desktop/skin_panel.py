@@ -88,7 +88,6 @@ def context(controller, session):
     return (
         session.workspace.skin_display,
         selected,
-        session.workspace,
         id(item),
         id(session.document.index.entities),
         tuple(skin_pipeline_status.describe(session).items()),

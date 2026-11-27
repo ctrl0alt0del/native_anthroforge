@@ -7,6 +7,7 @@ from typing import Any
 from anthroforge.core import skin_sources
 from anthroforge.core.results import Port
 
+from . import skin_state_inputs
 from .construction_policy import revisions
 from .operation_status import Eligibility
 from .service_lifecycle import Event, Service
@@ -149,8 +150,10 @@ def export_warnings(skin: Any) -> tuple[str, ...]:
 class SkinStatusProvider:
     def __init__(self, session: Any):
         self.session = session
-        self.key: tuple[int, int] | None = None
+        self.key: Any = None
         self.value: Status | None = None
+        self.pipeline_value: Any = None
+        self.pipeline_configuration: Any = None
         self.listeners: list[Any] = []
 
     def subscribe(self, callback: Any) -> Any:
@@ -158,17 +161,44 @@ class SkinStatusProvider:
         return lambda: self.listeners.remove(callback)
 
     def changed(self) -> None:
-        self.key = None
+        if not self.refresh_key():
+            return
         for callback in tuple(self.listeners):
             callback()
 
+    def refresh_key(self) -> bool:
+        key = (
+            skin_state_inputs.key(self.session.document),
+            skin_state_inputs.resource_key(self.session.resources),
+        )
+        if self.key == key:
+            return False
+        self.key, self.value, self.pipeline_value = key, None, None
+        return True
+
     def snapshot(self) -> Status:
         document, resources = self.session.document, self.session.resources
-        key = id(document), id(resources)
-        if self.key != key or self.value is None:
+        self.refresh_key()
+        if self.value is None:
             self.value = assess(document, resources)
-            self.key = key
+        elif self.value.document_revision != document.revision:
+            from dataclasses import replace
+
+            self.value = replace(self.value, document_revision=document.revision)
         return self.value
+
+    def pipeline_inputs(self, configuration: Any = None) -> Any:
+        from . import skin_assessment
+        from . import skin_builder_configuration as builders
+
+        self.refresh_key()
+        document = self.session.document
+        configuration = configuration or builders.automatic(document.skin)
+        if self.pipeline_value is None or self.pipeline_configuration != configuration:
+            projected = builders.projected(document, configuration)
+            self.pipeline_value = skin_assessment.assess(projected, self.session.resources)
+            self.pipeline_configuration = configuration
+        return self.pipeline_value
 
     def describe(self) -> dict[str, Any]:
         from .skin_pipeline_status import describe

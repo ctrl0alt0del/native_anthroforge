@@ -11,7 +11,7 @@ from anthroforge.native import scene
 from anthroforge.native.mesh import NativeCancellation
 
 from .. import tissue_inspection_stages as stages
-from ..inspection_context import freeze
+from ..inspection_context import capture, prepare
 from ..object_frames import Frames
 from .providers import Provider
 
@@ -66,9 +66,10 @@ def provider(session: Any) -> Provider:
         affected,
         source,
         check,
-        lambda _: freeze(session),
+        lambda _: capture(session),
         lambda: NativeCancellation(session.engine),
         automatic=False,
+        prepare=prepare,
     )
 
 

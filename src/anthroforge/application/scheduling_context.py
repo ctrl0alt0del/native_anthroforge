@@ -60,11 +60,21 @@ def pending(coordinator: Any, writes_only: bool) -> bool:
 
 def tick(coordinator: Any) -> None:
     coordinator.service_tick()
-    for key in tuple(coordinator.scheduling_contexts):
+    coordinator.begin_publication_window()
+    for key in tick_order(coordinator):
         with coordinator.context_scope(key):
             coordinator.tick_context()
     coordinator.service_tick()
     coordinator.sample_resources()
+
+
+def tick_order(coordinator: Any) -> tuple[str, ...]:
+    keys = tuple(coordinator.scheduling_contexts)
+    if coordinator.publication_budget_ms is None or not keys:
+        return keys
+    start = coordinator.tick_cursor % len(keys)
+    coordinator.tick_cursor += 1
+    return keys[start:] + keys[:start]
 
 
 def close(coordinator: Any) -> None:

@@ -7,6 +7,8 @@ from anthroforge.core import presentation
 from anthroforge.core.mirroring import MirrorRule
 from anthroforge.native import components, construction, scene
 
+from .workspace_projection import scene_key
+
 
 def synchronize(projection):
     controller = projection.controller
@@ -41,7 +43,7 @@ def prune_cache(controller):
 
 def cached(controller, source, instance):
     rule = controller.session.document.mirrors.plane(instance)
-    key = (dict(source), rule, controller.session.workspace)
+    key = (dict(source), rule, scene_key(controller.session.workspace))
     previous = controller._mirror_projection_cache.get(instance.id)
     if previous is None or previous[0] != key:
         previous = key, reflected(controller, source, instance)

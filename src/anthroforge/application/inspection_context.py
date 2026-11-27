@@ -1,6 +1,6 @@
 """Owned read-only inputs allow inspection workers to outlive document edits."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 
 from anthroforge.core.document import Document
@@ -43,12 +43,20 @@ class InspectionContext:
 
 
 def freeze(session: "Session") -> InspectionContext:
-    resources = session.resources.selected(session.document)
+    return prepare(capture(session))
+
+
+def capture(session: "Session") -> InspectionContext:
+    """Retain allocations on the owner thread; traversal belongs to the consumer."""
     return InspectionContext(
         session.document,
-        resources,
+        session.resources.snapshot(),
         session.engine,
         session.workspace,
         session.preferences.value.routing_backend,
         session.preferences.value.fiber_propagation,
     )
+
+
+def prepare(context: InspectionContext) -> InspectionContext:
+    return replace(context, resources=context.resources.selected(context.document))

@@ -2,9 +2,6 @@
 
 from typing import Any
 
-from . import skin_assessment
-from . import skin_builder_configuration as builders
-
 STAGES = dict(
     envelope="Draft",
     construction="skin pipeline",
@@ -38,8 +35,7 @@ def describe(session: Any) -> dict[str, Any]:
 
 
 def readiness(session: Any) -> dict[str, Any]:
-    config = builders.automatic(session.document.skin)
-    state = skin_assessment.assess(builders.projected(session.document, config), session.resources)
+    state = session.skin_status.pipeline_inputs()
     return {
         name: getattr(state, name).condition
         for name in ("sources", "draft", "topology", "reference")

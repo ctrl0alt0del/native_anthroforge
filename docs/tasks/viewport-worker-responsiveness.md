@@ -29,7 +29,28 @@ Use the existing coordinator and status owner rather than adding competing worke
 
 ## Current state
 
-Initial task record only. No implementation changes or acceptance checks yet.
+Implemented camera field deltas, mirror input invalidation and pose-aware source validation,
+camera-only projection consumption, camera-independent scene caches and shared cached skin
+readiness. Camera-only edits retain persistence and do not invoke the skin planner.
+Inspection resource validation/source preparation and captured skin read-revision assembly
+have moved to owned worker inputs. Desktop result publication has a shared 2 ms admission
+window; each result remains atomic and contexts rotate to avoid starvation.
+
+CPU audit: ordinary attachment/routing/tissue native translation units are serial per job;
+skin fields and fitting are separate OpenMP targets with up to four threads. The default
+coordinator's two workers therefore do not imply two-core execution for every operation.
+CPU scheduling changes and rendered/packaged acceptance are still pending.
+
+## Verification so far
+
+- Focused camera/mirror/status/projection tests: 25 passed.
+- Issue lifecycle/integration and tissue inspection tests: 21 passed.
+- Ruff and mypy passed before the later worker/publication changes; rerun required.
+- Same local 256-cube Qt event-loop probe: camera-triggered jobs 7 to 0; maximum camera
+  tick 162.29 to 2.22 ms, p95 93.14 to 0.78 ms. No rendered-frame claim. Raw baseline is
+  in the prior probe directory; candidate is `build/viewport-responsiveness/probe-results.json`.
+- Skin update/topology/automatic-pipeline and painting checks are running at checkpoint time.
+- Full gate, CPU scaling, production scene, GUI and packaging checks have not yet run.
 
 ## Next actions
 

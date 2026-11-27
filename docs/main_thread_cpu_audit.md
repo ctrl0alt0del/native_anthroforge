@@ -134,6 +134,7 @@ without assuming every job consumes one core.
 |---|---|
 | Ordinary attachment, routing and tissue native translation units | Serial per native call. Independent jobs can overlap. `EIGEN_DONT_PARALLELIZE` prevents hidden Eigen teams. |
 | Dedicated skin fields/gaps/diagnostics/binding kernels | Separate OpenMP target, native team cap four; some small loops stay serial. |
+| AVBD Draft builder | External runtime owns its team sizes. Builder policy reserves all admission capacity, rather than inheriting FIELD's four-thread claim. The captured builder determines the claim even if pending UI selection changes. |
 | Skin reference and fitting | Native/child numerical work; reserve four CPUs. Fitting's isolated session uses `WorkerExecutor` on the already-reserved worker, without a nested pool. |
 | Final deformation | Serial phases plus parallel skin-quality diagnostics; now reserves four CPUs instead of one. |
 | Combined construction/topology/downstream and updated export | Reserve all admission capacity because external backends choose their own parallelism. Process isolation alone does not limit CPU usage. |

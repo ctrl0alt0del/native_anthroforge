@@ -78,7 +78,9 @@ def make_job(session: Any, stage: str, origin: int, intent: Any) -> Job:
         partial(publish, session, stage, origin, intent),
         key="skin-" + stage,
         kind="skin_" + stage,
-        workload=partial(skin_workloads.estimate, session.resources),
+        workload=partial(
+            skin_workloads.estimate, session.resources, builder=intent.configuration.builder
+        ),
     )
 
 

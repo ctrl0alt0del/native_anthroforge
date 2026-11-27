@@ -43,6 +43,8 @@ The default pool now admits up to four jobs, bounded by CPU count minus one logi
 of headroom. Native-team and memory demands remain shared across editing contexts. Final
 deformation now reserves its four-thread quality kernel. This is admission headroom, not
 OS affinity or a hard limit on external numerical processes.
+DraftBuilder also owns CPU estimates: FIELD claims four and AVBD claims exclusive capacity.
+The captured job configuration controls that claim; pending UI builder selection cannot change it.
 
 ## Verification so far
 
@@ -70,10 +72,13 @@ OS affinity or a hard limit on external numerical processes.
 - Camera keyboard/buttons/menu, restore, focus/rebinding, workspace and persistence acceptance
   passed with a resolution-24 setup fixture. The original production-resolution setup exceeded
   that older script's four-second settle deadline before reaching its camera assertions.
-- Portable app built from `78c6ad41`; relocated minimal-PATH suite is running. A separate
+- Portable app built from `78c6ad41`; relocated minimal-PATH suite passed. A separate
   packaged camera/mirror command probe passed: zero camera jobs, real rule edit still starts jobs.
 - Main-thread/CPU audit and architecture/computation history have been written. They explicitly
   retain synchronous API candidates and note GIL, rendering and atomic-publication limits.
+- Builder-specific admission correction passed the focused resource/skin/automatic/builder/AVBD
+  checks, Ruff, configured mypy and function-length review. Full-suite and package requalification
+  for this final correction are pending; earlier package evidence remains valid for its revision.
 
 ## Next actions
 

@@ -3993,6 +3993,12 @@ Final deformation now reserves its four-thread quality kernel. Native algorithms
 OpenMP configuration and external runtime thread limits are unchanged. Isolated fitting
 retains its existing reserved-worker executor rather than creating a nested pool.
 
+The final audit also found that AVBD inherited FIELD's four-thread Draft claim despite
+launching an independently threaded external runtime. DraftBuilder now owns its CPU claim:
+four for FIELD and exclusive admission for AVBD. Workload metadata follows the job's captured
+builder configuration, independently of pending UI selection. This avoids oversubscription
+without changing the external solver's numerical or runtime settings.
+
 Measured on a Ryzen 9 7900X3D: the same 256-cube event-loop probe changed from seven camera
 jobs to zero and maximum ticks from 162.29 to 2.22 ms. Four resolution-220 fields took
 4.66/2.64/1.71 s with one/two/four workers, using 3.02/5.73/11.00 effective cores. The actual

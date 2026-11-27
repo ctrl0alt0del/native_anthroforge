@@ -62,6 +62,7 @@ BUILDERS = {
         skin_field_capture.capture,
         field.reason,
         field_signature,
+        worker_threads=4,
     ),
     "AVBD": DraftBuilder(
         3,
@@ -71,5 +72,6 @@ BUILDERS = {
         skin_avbd_capture.capture,
         avbd.reason,
         avbd.signature,
+        worker_threads=0,
     ),
 }

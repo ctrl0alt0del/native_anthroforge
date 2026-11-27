@@ -315,12 +315,13 @@ class SkinDeformationTaskScheduler(MeasuredTaskScheduler):
 
 class SkinEnvelopeTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        from .skin_workloads import native_threads
         from .worker_memory import budget
 
         return Schedule(
             "worker",
             reason="Native tiled skin fields, envelope and source bindings",
-            resources=ResourceDemand(4, budget() + workload.bytes * 3),
+            resources=ResourceDemand(native_threads(workload), budget() + workload.bytes * 3),
         )
 
 

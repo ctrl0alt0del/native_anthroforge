@@ -4,7 +4,7 @@ from dataclasses import asdict, replace
 
 import pytest
 
-from anthroforge.application import skin_builder_codec, skin_codec, skin_inputs
+from anthroforge.application import skin_builder_codec, skin_codec, skin_inputs, skin_pipeline
 from anthroforge.application import skin_builder_configuration as builders
 from anthroforge.core.skin import Skin, SkinContributor
 from anthroforge.core.skin_draft import AppliedDraftConfiguration, DraftSettings, configuration
@@ -32,6 +32,16 @@ def test_inactive_invalid_parameters_are_not_validated_by_another_builder():
     assert builders.retained(skin) == set()
     with pytest.raises(ValueError):
         builders.decode(skin, "FIELD")
+
+
+def test_inactive_avbd_settings_do_not_enter_field_dependencies_or_validation(session):
+    initial = session.document
+    invalid = configuration("AVBD", dict(plan="invalid numerical plan"))
+    skin = replace(initial.skin, draft_settings=DraftSettings("FIELD", (invalid,)))
+    changed = replace(initial, skin=skin)
+    assert builders.decode(changed.skin).settings.gap_strength == 1
+    assert skin_inputs.envelope(initial) == skin_inputs.envelope(changed)
+    assert skin_pipeline.builder_key(initial) == skin_pipeline.builder_key(changed)
 
 
 def test_automatic_capture_uses_applied_record_and_preserves_pending_edits(session):

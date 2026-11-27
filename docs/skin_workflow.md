@@ -61,7 +61,8 @@ previously accepted final skin and reference.
 With **Update final skin** selected and a reference available, ordinary anatomical updates move skin vertices while
 preserving their identities and connectivity. Live, On Release and Manual update modes
 remain available. **Update skin** explicitly evaluates the current anatomy against the
-retained reference. It does not generate new topology.
+retained reference. A typed incompatibility can request required construction through the
+same pipeline; compatible evaluation preserves topology.
 
 Preferences chooses the tissue surface used by new references: **Finished** is the
 default and follows cropping, relaxation and stacking; **Inflated rest** uses uncropped
@@ -120,6 +121,9 @@ of the saved parent-first SCP order followed by VCP order. Changed geometry, ord
 configuration, normalization or runtime identity invalidates the affected suffix. Checkpoint
 resources belong to document/history and are checksummed; transient failed VCP prefixes
 are retained only in the current session.
+
+Automatic recovery copies use the ordinary format: accepted results remain recoverable,
+but construction checkpoints must be rebuilt. Use an extended project save to retain them.
 
 AVBD requires its separately installed experimental numerical runtime. Set
 `ANTHROFORGE_AVBD_RUNTIME` to the runtime worktree containing its `.venv`,

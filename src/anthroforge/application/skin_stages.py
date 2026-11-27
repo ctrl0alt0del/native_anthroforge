@@ -92,7 +92,9 @@ def downstream(
     return output
 
 
-def initialize_topology(context: Any, topology: Any, cancel: Any, options: Any) -> Any:
+def initialize_topology(
+    context: tuple[Any, Any, Any], topology: Any, cancel: Any, options: Any
+) -> Any:
     return skin_reference_evaluation.initialize(
         *context, topology.mesh, cancel, options.skin_tissue_surface
     )

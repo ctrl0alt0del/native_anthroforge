@@ -23,6 +23,7 @@ from . import (
     resource_storage,
     shortcut_codec,
     skin_builder_codec,
+    skin_checkpoint_storage,
     skin_codec,
 )
 from .construction_codec import control, entity_construction
@@ -106,11 +107,24 @@ def document_state(document: Document) -> dict[str, Any]:
 
 
 def write_package(
-    path: Path, document: Document, resources: Resources, cancel: Any = None, recovery: Any = None
+    path: Path,
+    document: Document,
+    resources: Resources,
+    cancel: Any = None,
+    recovery: Any = None,
+    extended: bool | None = None,
+) -> None:
+    format_extended = skin_checkpoint_storage.extended(path) if extended is None else extended
+    document = skin_checkpoint_storage.project(document, format_extended)
+    resources = resources.selected(document)
+    write_archive(path, document, resources, cancel, recovery)
+
+
+def write_archive(
+    path: Path, document: Document, resources: Resources, cancel: Any, recovery: Any
 ) -> None:
     from .cancellable_stream import CancellableStream
 
-    resources = resources.selected(document)
     data = manifest(document, resources)
     with path.open("w+b") as stream:
         with zipfile.ZipFile(CancellableStream(stream, cancel), "w", allowZip64=True) as archive:
@@ -139,7 +153,13 @@ def commit_package(
     cancel: Any,
     recovery: Any,
 ) -> None:
-    write_package(temporary, document, resources, cancel, recovery)
+    write_package(
+        temporary, document, resources, cancel, recovery, skin_checkpoint_storage.extended(path)
+    )
+    commit_archive(path, temporary, cancel)
+
+
+def commit_archive(path: Path, temporary: Path, cancel: Any) -> None:
     if cancel is not None and cancel.is_set():
         raise ValueError("Project save cancelled.")
     with temporary.open("r+b") as stream:
@@ -220,6 +240,7 @@ def read_package(path: Path, engine: GeometryEngine) -> tuple[Document, Resource
         document = decode_document(data["document"])
         resources = resource_storage.read(archive, data, engine)
         resources.require(document)
+        skin_checkpoint_storage.require(document, resources)
         verify(document, resources)
         attachment_storage.restore_frame_hints(document, resources, engine)
         return document, resources

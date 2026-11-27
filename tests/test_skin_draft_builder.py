@@ -16,6 +16,7 @@ from anthroforge.application import (
 )
 from anthroforge.application.construction_policy import revisions
 from anthroforge.application.skin_avbd_capture import indexed_surfaces, stage_lists
+from anthroforge.application.skin_draft_build import DraftOutput
 from anthroforge.core.results import Port
 from anthroforge.core.skin_avbd_settings import decode
 from tests.test_skin_jobs import build, imported
@@ -33,7 +34,7 @@ def check_builder_result(request):
     order, tissues = stage_lists(request.document, table, {})
     assert not tissues and order[0]["id"] in table
     source = request.capture.sources[0]
-    return source.mesh, dict(quality={}, observed=order)
+    return DraftOutput(source.mesh, dict(quality={}, observed=order))
 
 
 def install_builder(monkeypatch):

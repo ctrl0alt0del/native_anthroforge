@@ -8,7 +8,7 @@ from anthroforge.core.entities import SCP
 from anthroforge.core.results import Port, geometry_asset
 from anthroforge.core.skin_pipeline import Assessment, Condition, Inputs
 
-from . import skin_inputs, skin_status, skin_update_tasks
+from . import skin_inputs, skin_stages, skin_status, skin_update_tasks
 from .construction_policy import revisions
 
 
@@ -93,19 +93,52 @@ def sources(document: Any, resources: Any) -> Assessment:
     rows = skin_sources.contributors(document)
     if not rows:
         return Assessment(Condition.EMPTY, "No physical anatomy contributors.")
+    policy = tissue_policy(document, resources)
     for row in rows:
-        state = source(document.object(row.owner), resources)
+        state = source(document.object(row.owner), resources, policy)
         if state.condition != Condition.READY:
             return state
     return Assessment()
 
 
-def source(item: Any, resources: Any) -> Assessment:
-    result = item.result if isinstance(item, SCP) else item.final_result
+def source(item: Any, resources: Any, policy: str = "FINISHED") -> Assessment:
+    result = skin_status.source_result(item, "SCP" if isinstance(item, SCP) else "TISSUE", policy)
     error = result.error or (item.error if isinstance(item, SCP) else "")
     if error or result.status in ("failed", "invalid", "cancelled"):
         return Assessment(Condition.FAILED, f"{item.name}: {error or result.status}")
     pending_pose = isinstance(item, SCP) and bool(item.parent) and item.status != "ready"
-    if result.status == "pending" or pending_pose or geometry_asset(item) not in resources.meshes:
+    asset = geometry_asset(item) if isinstance(item, SCP) else result.asset
+    if result.status == "pending" or pending_pose or asset not in resources.meshes:
         return Assessment(Condition.WAITING, f"Waiting for {item.name}.")
+    return Assessment()
+
+
+def tissue_policy(document: Any, resources: Any) -> str:
+    data = resources.skin.get(document.skin.reference)
+    if document.skin.update_mode == "FINAL" and data:
+        return str(json.loads(data.metadata).get("tissue_surface", "FINISHED"))
+    return "FINISHED"
+
+
+def required(document: Any, resources: Any, stage: str) -> Assessment:
+    inputs = (
+        skin_update_tasks.inputs(resources, document)
+        if stage == "deformation"
+        else skin_stages.POLICIES[stage].inputs(document)
+    )
+    for port in inputs:
+        item = document.registry.records.get(port.owner)
+        result = getattr(item, port.output + "_result", None)
+        if result is not None and port.output in ("base", "rest", "intrinsic", "final"):
+            state = required_result(item.name, port.output, result, resources)
+            if state.condition != Condition.READY:
+                return state
+    return Assessment()
+
+
+def required_result(name: str, role: str, result: Any, resources: Any) -> Assessment:
+    if result.error or result.status in ("failed", "invalid", "cancelled"):
+        return Assessment(Condition.FAILED, f"{name} {role}: {result.error or result.status}")
+    if result.status == "pending" or result.asset not in resources.meshes:
+        return Assessment(Condition.WAITING, f"Waiting for {name} {role}.")
     return Assessment()

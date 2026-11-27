@@ -39,7 +39,9 @@ class SystemIntegration(QObject):
             target = windows_associations.register(self.executable)
             if not QDesktopServices.openUrl(QUrl(target)):
                 raise OSError("Open Windows Settings → Apps → Default apps and choose AnthroForge.")
-            self.controller.message = "In Windows Settings, choose AnthroForge for .anthroforge."
+            self.controller.message = (
+                "In Windows Settings, choose AnthroForge for .anthroforge and .anthroforgex."
+            )
         except (OSError, ValueError) as error:
             self.controller.message = str(error)
         self.controller.notify()

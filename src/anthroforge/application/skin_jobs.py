@@ -12,9 +12,17 @@ from anthroforge.core.skin import SkinStage
 from anthroforge.core.skin_draft import AppliedDraftConfiguration
 from anthroforge.native.mesh import NativeCancellation
 
-from . import authored_jobs, dependencies, skin_job_intents, skin_stages, skin_workloads
+from . import (
+    authored_jobs,
+    dependencies,
+    skin_checkpoint_assets,
+    skin_job_intents,
+    skin_stages,
+    skin_workloads,
+)
 from .assets import Asset
 from .construction_policy import revisions
+from .skin_draft_build import CheckpointFailure
 from .skin_results import IncompleteBuild
 
 
@@ -80,13 +88,20 @@ def compute(session: Any, stage: str, payload: Any, cancel: Any) -> Any:
         outputs = skin_stages.POLICIES[stage].compute(
             session.engine, document, resources, cancel, options
         )
-        return document, outputs, ""
+        return result_payload(document, outputs)
     except IncompleteBuild as error:
-        return document, error.stages, str(error)
+        return result_payload(document, error.stages, str(error))
+    except CheckpointFailure as error:
+        return document, {}, str(error), error.checkpoints
+
+
+def result_payload(document: Any, outputs: Any, error: str = "") -> Any:
+    checkpoints = tuple(c for output in outputs.values() for c in output.checkpoints)
+    return document, outputs, error, checkpoints
 
 
 def publish(session: Any, stage: str, origin: int, intent: Any, payload: Any) -> None:
-    document, outputs, error = payload
+    document, outputs, error, checkpoints = payload
     skin_job_intents.require(session, intent, stage)
     policy = skin_stages.POLICIES[stage]
     inputs = partial(skin_job_intents.inputs, intent, policy)
@@ -96,7 +111,7 @@ def publish(session: Any, stage: str, origin: int, intent: Any, payload: Any) ->
         raise ObsoleteInputs("Skin inputs changed before publication.")
     outputs = retained_outputs(document, outputs, error)
     stages = accepted_stages(document, outputs, reads)
-    install(session, (stage, origin, intent), outputs, stages, reads, error)
+    install(session, (stage, origin, intent), outputs, stages, reads, error, checkpoints)
     if error:
         raise ValueError(error)
 
@@ -115,20 +130,28 @@ def retained_outputs(document: Any, outputs: Any, error: str) -> Any:
     return outputs
 
 
-def install(session: Any, request: Any, outputs: Any, stages: Any, reads: Any, error: str) -> None:
+def install(
+    session: Any, request: Any, outputs: Any, stages: Any, reads: Any, error: str, checkpoints: Any
+) -> None:
     stage, origin, intent = request
     retain_resources(session, outputs, stages)
+    for bundle in checkpoints:
+        session.resources.skin[bundle.asset.digest] = bundle.asset
+    proof = publication_proof(session, request, reads)
+    applied = applied_configuration(intent, outputs.get("envelope"))
+    results = dict(stages=stages, final=outputs.get("final"), error=error, applied=applied)
+    merge_result = partial(merge, **results, checkpoints=checkpoints)
+    authored_jobs.publish(session, origin, merge_result, proof)
+
+
+def publication_proof(session: Any, request: Any, reads: Any) -> Any:
+    stage, origin, intent = request
     retry = (
         partial(session.skin_pipeline.resume, stage, intent.configuration)
         if intent.automatic
         else retry_callback(session, stage, origin, intent)
     )
-    proof = authored_jobs.Capture(reads, retry, projection=intent.project)
-    applied = applied_configuration(intent, outputs.get("envelope"))
-    merge_result = partial(
-        merge, stages=stages, final=outputs.get("final"), error=error, applied=applied
-    )
-    authored_jobs.publish(session, origin, merge_result, proof)
+    return authored_jobs.Capture(reads, retry, projection=intent.project)
 
 
 def retain_resources(session: Any, outputs: Any, stages: Any) -> None:
@@ -170,19 +193,25 @@ def pending(document: Any, reads: Any) -> tuple[str, ...]:
 
 
 def merge(
-    document: Any, stages: Any, final: Any = None, error: str = "", applied: Any = None
+    document: Any,
+    stages: Any,
+    final: Any = None,
+    error: str = "",
+    applied: Any = None,
+    checkpoints: Any = (),
 ) -> Any:
-    stale = (
-        bool(document.skin.reference)
-        if "topology" in stages
-        else bool(document.skin.topology.asset)
-    )
-    skin = replace(document.skin, **stages, construction_stale=stale, build_error=error)
+    skin = merge_stages(document.skin, stages, error)
+    skin = skin_checkpoint_assets.retained(skin, checkpoints)
     if applied is not None:
         skin = replace(skin, applied_draft=applied, migration_draft=None)
     if final is not None and final.reference is not None:
         skin = completed_reference(skin, final, stages)
     return replace(document, skin=retain_pending_configuration(skin))
+
+
+def merge_stages(skin: Any, stages: Any, error: str) -> Any:
+    stale = bool(skin.reference if "topology" in stages else skin.topology.asset)
+    return replace(skin, **stages, construction_stale=stale, build_error=error)
 
 
 def retain_pending_configuration(skin: Any) -> Any:

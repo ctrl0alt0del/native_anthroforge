@@ -10,8 +10,9 @@ import numpy as np
 
 from anthroforge.native import process
 
-from . import skin_avbd_capture
-from .skin_draft_build import DraftRequest
+from . import skin_avbd_capture, skin_avbd_checkpoints
+from .runtime_launcher import launcher
+from .skin_draft_build import CheckpointFailure, DraftOutput, DraftRequest
 
 WORKER = Path("tools/runtime/skin/application_worker.py")
 
@@ -29,10 +30,9 @@ def runtime() -> tuple[Path, Path]:
 
 
 def execute(engine: Any, folder: Path, cancel: int, installed: tuple[Path, Path]) -> Path:
-    root, python = installed
+    root, _ = installed
     output = folder / "output"
-    options = ("--recipe", str(folder / "recipe.json"), "--captures", str(folder))
-    args = (str(python), "-I", str(root / WORKER), str(output), *options)
+    args = (*launcher(), "skin-avbd-worker", str(root), str(folder))
     log = folder / "worker.log"
     code = process.run(engine, process.Request(args, root, log), cancel)
     if code:
@@ -72,16 +72,28 @@ def mesh_from_output(engine: Any, skin: Path) -> Any:
     return engine.create_mesh(points, triangles.ravel(), np.arange(0, triangles.size + 1, 3))
 
 
-def build(request: DraftRequest) -> tuple[Any, dict[str, Any]]:
+def build(request: DraftRequest) -> DraftOutput:
     installed = runtime()
     with TemporaryDirectory(prefix="afskin-") as tmp:
         folder = Path(tmp).resolve()
         skin_avbd_capture.stage(folder, request)
+        prepared = skin_avbd_checkpoints.prepare(folder, request, installed[0])
+        return run_build(request, folder, installed, prepared)
+
+
+def run_build(request: DraftRequest, folder: Path, installed: Any, prepared: Any) -> DraftOutput:
+    try:
         skin = execute(request.engine, folder, request.cancel, installed)
         mesh = mesh_from_output(request.engine, skin)
         evidence = stage_evidence(folder / "output")
+    except Exception as error:
+        checkpoints = skin_avbd_checkpoints.collect(folder, prepared, False)
+        raise CheckpointFailure(error, checkpoints) from error
     unavailable = ["mesh_quality", "coverage", "source_intersections"]
-    return mesh, dict(quality=dict(unavailable=unavailable), construction=evidence)
+    checkpoints = skin_avbd_checkpoints.collect(folder, prepared, True)
+    return DraftOutput(
+        mesh, dict(quality=dict(unavailable=unavailable), construction=evidence), checkpoints
+    )
 
 
 def stage_evidence(output: Path) -> dict[str, Any]:

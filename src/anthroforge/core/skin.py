@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from math import isfinite
 
 from .results import EvaluationResult, ReadRevision
+from .skin_checkpoints import Checkpoint
 from .skin_draft import AppliedDraftConfiguration, BuilderConfiguration, DraftSettings
 from .skin_field import EnvelopeSettings as EnvelopeSettings
 from .skin_field import effective_collagen as effective_collagen
@@ -98,6 +99,7 @@ class Skin:
     update_mode: str = "DRAFT"
     applied_draft: AppliedDraftConfiguration | None = None
     migration_draft: BuilderConfiguration | None = None
+    checkpoints: tuple[Checkpoint, ...] = ()
 
     def __post_init__(self) -> None:
         choice("skin update mode", self.update_mode, ("DRAFT", "FINAL"))

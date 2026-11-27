@@ -20,7 +20,19 @@ def unchanged(config: Any, contributor: Any, name: str) -> Any:
 
 
 def field_signature(document: Any) -> tuple[str, ...]:
-    return (repr(document.skin.draft_settings.configuration("FIELD")),)
+    from anthroforge.core import skin_sources
+
+    record = document.skin.draft_settings.configuration("FIELD")
+    config = skin_field.decode(record)
+    settings = {row.owner: row for row in config.contributors}
+    effective = tuple(
+        skin_field.effective_collagen(
+            settings.get(row.owner, skin_field.FieldContributor(row.owner)),
+            document.object(row.owner).name,
+        )
+        for row in skin_sources.contributors(document)
+    )
+    return repr(record), repr(effective)
 
 
 FIELD_SETTINGS = BuilderSettingsPolicy(

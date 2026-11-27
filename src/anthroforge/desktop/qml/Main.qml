@@ -243,8 +243,14 @@ ApplicationWindow {
     ReportBrowser { id: reportsDialog; anchors.centerIn: parent }
     UiDialog { id: messageDialog; title: "Last operation"; modal: true; anchors.centerIn: parent; width: Math.min(560, window.width-80); standardButtons: Dialog.Close; Label { width: parent.width; text: App.runtime.state.message; wrapMode: Text.WrapAnywhere; color: Theme.text } }
     FileDialog { id: importFile; title: "Import primitive mesh"; nameFilters: ["Mesh files (*.obj *.stl *.ply)"]; onAccepted: { window.chosenImport = selectedFile.toString(); importUnits.currentIndex = 0; importOptions.open(); } }
-    FileDialog { id: openDialog; title: "Open AnthroForge project"; nameFilters: ["AnthroForge project (*.anthroforge)"]; onAccepted: App.project.requestDocument(selectedFile.toString()) }
-    FileDialog { id: saveDialog; title: "Save AnthroForge project"; fileMode: FileDialog.SaveFile; defaultSuffix: "anthroforge"; nameFilters: ["AnthroForge project (*.anthroforge)"]; onAccepted: App.project.saveProject(selectedFile.toString(),""); onRejected: App.project.cancelSaveWait() }
+    FileDialog { id: openDialog; title: "Open AnthroForge project"; nameFilters: ["AnthroForge projects (*.anthroforge *.anthroforgex)"]; onAccepted: App.project.requestDocument(selectedFile.toString()) }
+    FileDialog {
+        id: saveDialog; title: "Save AnthroForge project"; fileMode: FileDialog.SaveFile
+        defaultSuffix:selectedNameFilter.index === 1 ? "anthroforgex" : "anthroforge"
+        nameFilters:["AnthroForge project (*.anthroforge)", "AnthroForge project with skin checkpoints (*.anthroforgex)"]
+        onAccepted:App.project.saveProject(selectedFile.toString(),"")
+        onRejected:App.project.cancelSaveWait()
+    }
     UiDialog {
         id: importOptions; title: "Import primitive"; modal: true; anchors.centerIn: parent; width: 420
         ColumnLayout {
@@ -318,8 +324,8 @@ ApplicationWindow {
     SkeletonUpdateDialog { id: skeletonUpdateDialog }
     VariantReviewDialog {}
     ReconstructionCompareDialog {}
-    FileDialog { id:skeletonFile; title:"Update Skeleton from Project"; nameFilters:["AnthroForge project (*.anthroforge)"]; onAccepted:App.skeletonPanel.inspect(selectedFile.toString()) }
-    FileDialog { id:assemblyFile; title:"Import Anatomy from Project"; nameFilters:["AnthroForge project (*.anthroforge)"]; onAccepted:App.assemblyPanel.inspect(selectedFile.toString()) }
+    FileDialog { id:skeletonFile; title:"Update Skeleton from Project"; nameFilters:["AnthroForge projects (*.anthroforge *.anthroforgex)"]; onAccepted:App.skeletonPanel.inspect(selectedFile.toString()) }
+    FileDialog { id:assemblyFile; title:"Import Anatomy from Project"; nameFilters:["AnthroForge projects (*.anthroforge *.anthroforgex)"]; onAccepted:App.assemblyPanel.inspect(selectedFile.toString()) }
     AssemblyDialog { id:assemblyDialog }
     FiberPinReview { id:pinRepairDialog }
     Connections { target:App.issuePanel; function onPinReviewRequested(curve) { pinRepairDialog.request(curve); } }

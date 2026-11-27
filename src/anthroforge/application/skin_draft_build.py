@@ -9,6 +9,7 @@ from anthroforge.native.mesh import GeometryEngine, Mesh
 from anthroforge.native.skin_gaps import Scene
 
 from .skin_capture import Capture
+from .skin_checkpoint_assets import Bundle
 
 
 @dataclass(frozen=True)
@@ -19,6 +20,19 @@ class DraftRequest:
     cancel: int
     capture: Capture
     scene: Scene
+
+
+@dataclass(frozen=True)
+class DraftOutput:
+    mesh: Mesh
+    details: dict[str, Any]
+    checkpoints: tuple[Bundle, ...] = ()
+
+
+class CheckpointFailure(Exception):
+    def __init__(self, error: Exception, checkpoints: tuple[Bundle, ...]):
+        super().__init__(str(error))
+        self.checkpoints = checkpoints
 
 
 @dataclass(frozen=True)
@@ -35,7 +49,7 @@ class BuilderSettingsPolicy:
 @dataclass(frozen=True)
 class DraftBuilder:
     version: int
-    build: Callable[[DraftRequest], tuple[Mesh, dict[str, Any]]]
+    build: Callable[[DraftRequest], DraftOutput]
     settings: BuilderSettingsPolicy
     inputs: Callable[..., Any]
     capture: Callable[..., Capture]

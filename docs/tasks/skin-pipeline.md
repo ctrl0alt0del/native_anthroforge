@@ -98,10 +98,33 @@ still required. The clean native/Qt build in `build/skin-pipeline` succeeded and
 CTest checks passed. Typed native material/topology incompatibility assertions passed.
 QML API validation passed for 186 files and 46 model types. This is not visual QA.
 
-Next: finish lifecycle edge cases (late results, history, no-build-on-open, source readiness,
-retry suppression), qualify the typed native compatibility result, then implement owned AVBD
-prefix checkpoints and ordinary/extended persistence. Runtime packaging, full suite and real
-GUI inspection are pending. No user decision is pending.
+Checkpoint integration now owns portable file bundles with per-file checksums, ordered
+content-prefix identities, runtime/binary identity and warm SCP material state. One complete
+matching SCP prefix and an eligible complete/transient VCP prefix seed an isolated worker;
+the existing external numerical implementation is unchanged. Accepted partial checkpoints
+can publish on later-stage failure without promoting the failed builder or replacing Draft.
+History retains resources, ordinary archives omit checkpoints, and extended archives retain
+durable SCP stages and the complete combined VCP checkpoint. Open/import dialogs and Windows
+registration support both extensions. Schema 10 remains backward-readable from versions 4–9.
+
+Validation: 7 new checkpoint protocol/publication tests passed; 6 storage/checksum tests
+passed; the configuration/automatic/creation group passed 37 tests. Strict mypy passed all
+707 modules. The real installed AVBD runtime built one cube SCP in 11.20 s, then a saved
+extended project reopened without computation and reused the same checkpoint in 2.15 s.
+The local qualification script/log/archive are ignored under `build/`; this limited smoke
+case is not whole-anatomy or multi-stage qualification. External runtime provenance and
+availability requirements remain explicit; it is not bundled into the portable app yet.
+
+The full pytest run exposed unrelated creation tests asserting global scheduler success
+despite expected background Draft gap-precision failures at the reduced test resolution.
+The affected creation helper now checks failures of the requested object. A long-running
+case was observed in `test_junction_identity` after duplicated BODY SCPs change; py-spy
+places the active worker inside FIELD envelope construction. This is not yet diagnosed as
+a particular native loop. The full suite is incomplete and must not be reported passed.
+
+Next: diagnose and bound the FIELD long-running case without weakening geometry validation;
+finish handoff/readiness/status edge cases; qualify multi-stage AVBD reuse; finish the full
+development gate, real GUI and packaged runtime checks. No user decision is pending.
 
 ## Recovery inputs
 

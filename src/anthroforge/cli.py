@@ -5,7 +5,7 @@ import json
 from collections.abc import Sequence
 from pathlib import Path
 
-from anthroforge.application import numerical_worker
+from anthroforge.application import numerical_worker, skin_avbd_worker
 from anthroforge.application.projects import adopt
 from anthroforge.application.session import Session
 from anthroforge.application.storage import read_package
@@ -22,6 +22,7 @@ def parser() -> argparse.ArgumentParser:
     authoring_parsers(commands)
     inspection_parser(commands)
     numerical_worker.add_parser(commands)
+    skin_avbd_worker.add_parser(commands)
     return result
 
 
@@ -54,12 +55,18 @@ def inspection_parser(commands):
 def execute(args: argparse.Namespace) -> int:
     from anthroforge import authoring
 
+    if args.command == "skin-avbd-worker":
+        return skin_avbd_worker.execute(args)
     if args.command == "numerical-worker":
         return numerical_worker.execute(args)
     if args.command == "report":
         return inspection_command(args)
     if args.command in ("run", "serve", "inspect", "render", "render-inspection"):
         return authoring_command(args, authoring)
+    return diagnostic_command(args)
+
+
+def diagnostic_command(args: argparse.Namespace) -> int:
     if args.command == "new":
         print(json.dumps(Session(args.name).describe(), indent=2))
         return 0

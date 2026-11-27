@@ -39,10 +39,18 @@ def attach(session: Any) -> Service:
 
 
 def anatomy_key(document: Any) -> Any:
+    document = builders.projected(document, builders.automatic(document.skin))
     sources = skin_sources.contributors(document)
     ports = set().union(*(skin_inputs.source_ports(row) for row in sources))
     ports |= {Port(row.owner, "base") for row in sources if row.kind == "TISSUE"}
-    return sources, revisions(document, ports)
+    return sources, revisions(document, ports), builder_key(document)
+
+
+def builder_key(document: Any) -> Any:
+    from .skin_builder_registry import BUILDERS
+
+    builder = BUILDERS.get(document.skin.draft_settings.backend)
+    return builder.signature(document) if builder else ()
 
 
 class Pipeline:
@@ -51,6 +59,7 @@ class Pipeline:
         self.armed = self.desired = self.transition = self.manual = False
         self.dirty = True
         self.pending_config: Any = None
+        self.retry_config: Any = None
         self.repair = self.failed_stage = ""
         self.last_key = anatomy_key(session.document)
         self.before = session.document
@@ -124,11 +133,23 @@ class Pipeline:
         planned = plan(doc.skin.update_mode, state)
         self.reason = planned.reason
         stage = self.repair or planned.stage
-        if state.sources.condition != Condition.READY or not stage:
-            self.desired = bool(stage)
+        if not self.ready(doc, state, stage):
             return
         self.repair = ""
         self.dispatch(stage, config)
+
+    def ready(self, document: Any, state: Any, stage: str) -> bool:
+        if state.sources.condition != Condition.READY or not stage:
+            self.desired = state.sources.condition == Condition.WAITING
+            return False
+        if stage in ("envelope", "construction") and state.draft.condition == Condition.UNAVAILABLE:
+            self.reason, self.desired = state.draft.reason, False
+            return False
+        required = skin_assessment.required(document, self.session.resources, stage)
+        if required.condition != Condition.READY:
+            self.reason = required.reason
+            return False
+        return True
 
     def dispatch(self, stage: str, config: Any) -> str:
         session = self.session
@@ -142,15 +163,17 @@ class Pipeline:
         if intent.epoch != self.epoch:
             return
         if state in ("failed", "cancelled"):
-            self.failed(job)
+            self.failed(job, intent)
         elif state == "succeeded":
             self.pending_config = None
+            self.failed_stage, self.retry_config = "", None
             self.desired = intent.automatic
             if self.session.document.skin.update_mode == "DRAFT" or job.kind != "skin_envelope":
                 self.transition = False
 
-    def failed(self, job: Any) -> None:
+    def failed(self, job: Any, intent: Any) -> None:
         self.failed_stage = job.kind.removeprefix("skin_")
+        self.retry_config = intent.configuration
         self.pending_config = None
         previous = anatomy_key(job.snapshot) if job.snapshot else self.last_key
         self.desired = previous != anatomy_key(self.session.document)
@@ -167,7 +190,7 @@ class Pipeline:
 
     def retry(self) -> str:
         self.invalidate()
-        self.pending_config = self.session.document.skin.draft_settings.configuration()
+        self.pending_config = self.retry_config or builders.automatic(self.session.document.skin)
         self.repair = self.failed_stage
         self.desired = self.transition = self.armed = self.dirty = True
         self.request()

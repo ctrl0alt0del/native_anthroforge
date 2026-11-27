@@ -11,6 +11,7 @@ from anthroforge.core.skin import (
     SkinStage,
     TopologySettings,
 )
+from anthroforge.core.skin_checkpoints import Checkpoint
 
 from . import skin_builder_codec
 
@@ -34,6 +35,7 @@ def decode(value: dict[str, Any] | None) -> Skin:
         data[name] = result(data.get(name, {}))
     data["contributors"] = tuple(contributor(row) for row in data.get("contributors", ()))
     data["fits"] = tuple(fitted(row) for row in data.get("fits", ()))
+    data["checkpoints"] = tuple(Checkpoint(**row) for row in data.get("checkpoints", ()))
     return Skin(**data)
 
 

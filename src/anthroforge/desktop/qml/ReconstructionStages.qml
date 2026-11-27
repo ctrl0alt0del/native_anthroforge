@@ -10,7 +10,7 @@ ColumnLayout {
     readonly property var records: JSON.parse(service.dataJson)
     property string sourceEntity: ""
     property var placement: [0,0,0,0,0,0,1,1,1]
-    readonly property bool project: (records.source?.path || "").endsWith(".anthroforge")
+    readonly property bool project: /\.anthroforgex?$/i.test(records.source?.path || "")
     Label { text: App.selection.selectedData.name || "Select anatomy"; color: Theme.text; wrapMode: Text.Wrap; Layout.fillWidth: true }
     UiButton { text: "Compare stages and variants"; Layout.fillWidth: true; enabled: !!App.selection.selectedId; onClicked: App.reconstructionCompare.inspect(App.selection.selectedId) }
     UiSection {
@@ -41,5 +41,5 @@ ColumnLayout {
         }
         ScrollBar.vertical: ScrollBar {}
     }
-    FileDialog { id: file; title: "Import reconstruction reference"; nameFilters: ["Meshes or projects (*.obj *.stl *.ply *.anthroforge)"]; onAccepted: pane.service.chooseStageFile(selectedFile.toString()) }
+    FileDialog { id: file; title: "Import reconstruction reference"; nameFilters: ["Meshes or projects (*.obj *.stl *.ply *.anthroforge *.anthroforgex)"]; onAccepted: pane.service.chooseStageFile(selectedFile.toString()) }
 }

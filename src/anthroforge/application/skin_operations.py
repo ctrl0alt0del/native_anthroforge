@@ -6,11 +6,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from anthroforge.core.fibers import Fiber
-from anthroforge.core.skin import EnvelopeSettings, Skin, SkinContributor, effective_contributor
-from anthroforge.core.skin_limb import SkinLimb
+from anthroforge.core.skin import EnvelopeSettings, Skin, SkinContributor
 from anthroforge.core.tissues import TissueVCP
 
-from . import object_operations
+from . import object_operations, skin_builder_configuration, skin_configuration_operations
 
 if TYPE_CHECKING:
     from .session import Session
@@ -29,23 +28,36 @@ def import_draft_plan(session: "Session", path: str) -> None:
     configure(session, "draft_settings", {"plan": plan})
 
 
-def effective_settings(document: Any, owner: str) -> SkinContributor:
-    settings = settings_for(document.skin, owner)
-    return effective_contributor(document.skin, settings, document.object(owner).name)
+def effective_settings(document: Any, owner: str) -> Any:
+    return skin_builder_configuration.effective(document.skin, owner, document.object(owner).name)
 
 
 def configure(session: "Session", section: str, values: dict[str, Any]) -> None:
     validate_section(section, values)
     skin = session.document.skin
+    if section in ("draft_settings", "envelope_settings"):
+        configure_builder(session, section, values)
+        return
     settings = replace(getattr(skin, section), **setting_values(values))
     if settings == getattr(skin, section):
         return
     rebuild = section != "deformation_settings" or bool(set(values) - {"method"})
     session.replace_document(skin=invalidate(skin, rebuild, **{section: settings}))
     if section == "deformation_settings":
-        from . import skin_update_tasks
+        request_update(session)
 
-        skin_update_tasks.pending(session)
+
+def configure_builder(session: "Session", section: str, values: dict[str, Any]) -> None:
+    skin = session.document.skin
+    updated = skin_configuration_operations.configure(skin, section, values)
+    if updated != skin:
+        session.replace_document(skin=skin_configuration_operations.changed(skin, updated))
+
+
+def request_update(session: "Session") -> None:
+    from . import skin_update_tasks
+
+    skin_update_tasks.pending(session)
 
 
 def validate_section(section: str, values: dict[str, Any]) -> None:
@@ -80,17 +92,18 @@ def invalidate(skin: Skin, rebuild: bool, **changes: Any) -> Skin:
 def contributor(session: "Session", owner: str, values: dict[str, Any]) -> None:
     require_contributor(session, owner, values)
     skin = session.document.skin
-    previous = settings_for(skin, owner)
-    changed = change_settings(previous, values)
-    if changed == previous and any(row.owner == owner for row in skin.contributors):
-        return
-    rows = {row.owner: row for row in skin.contributors} | {owner: changed}
-    session.replace_document(skin=invalidate(skin, True, contributors=tuple(rows.values())))
+    updated, common = skin_builder_configuration.contributor(skin, owner, values)
+    if common:
+        previous = settings_for(skin, owner)
+        changed = change_settings(previous, common)
+        rows = {row.owner: row for row in skin.contributors} | {owner: changed}
+        updated = replace(updated, contributors=tuple(rows.values()))
+    if updated != skin:
+        changed_skin = skin_configuration_operations.changed(skin, updated)
+        session.replace_document(skin=invalidate(updated, True) if common else changed_skin)
 
 
 def change_settings(previous: SkinContributor, values: dict[str, Any]) -> SkinContributor:
-    if isinstance(values.get("limb"), dict):
-        values = values | {"limb": replace(previous.limb or SkinLimb(), **values["limb"])}
     return replace(previous, **values)
 
 

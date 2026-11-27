@@ -3,6 +3,7 @@
 from collections import defaultdict
 from typing import Any
 
+from anthroforge.core.skin_avbd_settings import decode
 from anthroforge.core.skin_tree import preorder
 
 from . import skin_limb_geometry
@@ -26,7 +27,8 @@ def ordered_sources(document: Any, table: Any) -> tuple[list[Any], list[str]]:
 
 
 def compile_steps(request: Any, rows: Any, table: Any) -> list[dict[str, Any]]:
-    declarations = {r.owner: r for r in request.document.skin.contributors}
+    config = decode(request.document.skin.draft_settings.configuration("AVBD"))
+    declarations = {r.owner: r for r in config.contributors}
     bases: dict[tuple[str, str], Any] = {}
     return [compile_step(request, row, table[row["id"]][0], declarations, bases) for row in rows]
 

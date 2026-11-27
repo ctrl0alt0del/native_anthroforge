@@ -2,13 +2,12 @@
 
 from typing import Any
 
-from anthroforge.native import skin_fields, skin_gaps
+from anthroforge.native import skin_gaps
 
-from . import skin_assets, skin_avbd, skin_capture, worker_memory
-from .skin_draft_build import DraftBuilder, DraftRequest
+from . import skin_assets, skin_capture
+from .skin_builder_registry import BUILDERS as BUILDERS
+from .skin_draft_build import DraftRequest
 from .skin_results import ComputedStage
-
-TARGET_RESOLUTION = 220
 
 
 def evaluate(engine: Any, document: Any, resources: Any, cancel: int) -> ComputedStage:
@@ -25,26 +24,6 @@ def evaluate(engine: Any, document: Any, resources: Any, cancel: int) -> Compute
         return ComputedStage(mesh, skin_assets.create(binding_data(bindings, capture), info))
     finally:
         scene.close()
-
-
-def field_surface(request: DraftRequest) -> tuple[Any, dict[str, Any]]:
-    capture = request.capture
-    geometry = capture.geometry
-    inputs = geometry.vertices, geometry.triangles, geometry.skeletal, capture.collagen
-    budget = worker_memory.budget()
-    options = request.document.skin.envelope_settings, TARGET_RESOLUTION, budget, request.cancel
-    fields = skin_fields.prepare(request.engine, *inputs, *options, segments=geometry.segments)
-    try:
-        result = request.scene.envelope(fields, budget, request.cancel)
-        details = dict(
-            quality=result.diagnostics.report(), resolution=fields.resolution, voxel=fields.voxel
-        )
-        return result.mesh, details
-    finally:
-        fields.close()
-
-
-BUILDERS = {"FIELD": DraftBuilder(1, field_surface), "AVBD": DraftBuilder(3, skin_avbd.build)}
 
 
 def binding_data(bindings: dict[str, Any], capture: Any) -> dict[str, Any]:

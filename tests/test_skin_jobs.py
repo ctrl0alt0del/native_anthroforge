@@ -2,12 +2,12 @@
 
 import json
 
-from anthroforge.application import skin_evaluation, storage
+from anthroforge.application import skin_field_builder, storage
 from tests.conftest import CUBE
 
 
 def imported(session, monkeypatch):
-    monkeypatch.setattr(skin_evaluation, "TARGET_RESOLUTION", 24)
+    monkeypatch.setattr(skin_field_builder, "TARGET_RESOLUTION", 24)
     entity = session.command("import", path=str(CUBE), units=1.0)["entity_id"]
     session.wait()
     return entity

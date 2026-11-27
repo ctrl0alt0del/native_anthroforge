@@ -7,8 +7,9 @@ import numpy as np
 
 from anthroforge.core.results import geometry_asset
 from anthroforge.core.skin import bounded
+from anthroforge.core.skin_field import settings_for
 
-from . import field_domains, skin_assets, skin_operations
+from . import field_domains, skin_assets, skin_builder_configuration, skin_configuration_operations
 
 
 def mesh(session: Any, owner: str) -> Any:
@@ -37,14 +38,12 @@ def matching(asset: Any, mesh: Any) -> bool:
 
 def publish(session: Any, owner: str, **values: Any) -> None:
     skin = session.document.skin
-    previous = skin_operations.settings_for(skin, owner)
+    previous = settings_for(skin, owner)
     changed = replace(previous, **values)
-    rows = {row.owner: row for row in skin.contributors} | {owner: changed}
     if changed == previous:
         return
-    session.replace_document(
-        skin=skin_operations.invalidate(skin, True, contributors=tuple(rows.values()))
-    )
+    updated, _ = skin_builder_configuration.contributor(skin, owner, values)
+    session.replace_document(skin=skin_configuration_operations.changed(skin, updated))
 
 
 def set_weights(session: Any, owner: str, values: Any) -> None:
@@ -65,7 +64,7 @@ def set_weights(session: Any, owner: str, values: Any) -> None:
 
 def fill(session: Any, owner: str, value: float | None = None) -> None:
     target = mesh(session, owner)
-    setting = skin_operations.settings_for(session.document.skin, owner)
+    setting = settings_for(session.document.skin, owner)
     value = setting.collagen if value is None else value
     bounded("collagen", value, 0, 1)
     set_weights(session, owner, np.full(target.counts[0], value))

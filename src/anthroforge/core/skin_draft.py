@@ -1,35 +1,53 @@
-"""Authored selection of the algorithm that builds the project's draft surface."""
+"""Opaque immutable builder records; algorithms own their parameter schemas."""
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Any
+
+
+@dataclass(frozen=True, slots=True)
+class BuilderConfiguration:
+    builder: str
+    parameters: str = "{}"
+
+    def __post_init__(self) -> None:
+        if not isinstance(self.builder, str) or not self.builder.strip():
+            raise ValueError("A draft builder needs an identifier.")
+        data = json.loads(self.parameters)
+        if not isinstance(data, dict):
+            raise ValueError("Builder parameters must be an object.")
+        encoded = json.dumps(data, sort_keys=True, allow_nan=False, separators=(",", ":"))
+        object.__setattr__(self, "parameters", encoded)
+
+    def values(self) -> dict[str, Any]:
+        return dict(json.loads(self.parameters))
 
 
 @dataclass(frozen=True, slots=True)
 class DraftSettings:
     backend: str = "FIELD"
-    plan: str = "{}"
+    configurations: tuple[BuilderConfiguration, ...] = ()
 
     def __post_init__(self) -> None:
         if not isinstance(self.backend, str) or not self.backend.strip():
             raise ValueError("A draft builder needs an identifier.")
-        value = json.loads(self.plan)
-        if not isinstance(value, dict) or value.keys() - {"bones", "muscles", "normalization"}:
-            raise ValueError("AVBD plan accepts bones, muscles and normalization.")
-        for key in ("bones", "muscles"):
-            if key in value:
-                validate_rows(key, value[key])
-        object.__setattr__(self, "plan", json.dumps(value, sort_keys=True, allow_nan=False))
+        if len({row.builder for row in self.configurations}) != len(self.configurations):
+            raise ValueError("Builder configurations must have unique identifiers.")
+
+    def configuration(self, builder: str = "") -> BuilderConfiguration:
+        key = builder or self.backend
+        return next((r for r in self.configurations if r.builder == key), BuilderConfiguration(key))
+
+    def updated(self, value: BuilderConfiguration) -> "DraftSettings":
+        rows = {r.builder: r for r in self.configurations} | {value.builder: value}
+        return replace(self, configurations=tuple(rows[key] for key in sorted(rows)))
 
 
-def validate_rows(key: str, rows: Any) -> None:
-    if not isinstance(rows, list):
-        raise ValueError(f"AVBD {key} must be an ordered list.")
-    fields = {"id", "route", "settings", "joint"} if key == "bones" else {"id", "frames"}
-    ids = set()
-    for row in rows:
-        if not isinstance(row, dict) or row.keys() - fields or not isinstance(row.get("id"), str):
-            raise ValueError(f"Invalid AVBD {key} stage. Allowed fields: {sorted(fields)}")
-        if not row["id"] or row["id"] in ids:
-            raise ValueError(f"Empty or duplicate AVBD {key} identity: {row['id']}")
-        ids.add(row["id"])
+@dataclass(frozen=True, slots=True)
+class AppliedDraftConfiguration:
+    configuration: BuilderConfiguration
+    builder_version: int
+
+
+def configuration(builder: str, values: dict[str, Any]) -> BuilderConfiguration:
+    return BuilderConfiguration(builder, json.dumps(values, allow_nan=False))

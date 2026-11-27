@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 
 from anthroforge.core.mirroring import MirrorInstance
+from anthroforge.core.skin_avbd_settings import decode
 from anthroforge.core.surface_references import SurfaceReference
 from anthroforge.core.tissues import TissueVCP
 from anthroforge.native import skin_capture, tissue_domain
@@ -17,6 +18,15 @@ from .skin_draft_build import DraftRequest
 
 Stage = dict[str, Any]
 SurfaceTable = dict[str, tuple[Any, Any, Any, int]]
+
+
+def capture(engine: Any, document: Any, resources: Any, cancel: int = 0) -> Any:
+    from . import skin_capture as sources
+
+    rows = sources.sources(engine, document, resources, cancel)
+    policies = [(0.0, 0.0, row.identity.kind == "SCP") for row in rows]
+    geometry = sources.geometry(engine, rows, policies, cancel)
+    return sources.Capture(geometry, rows, None, ())
 
 
 def identity(source: Any) -> str:
@@ -60,7 +70,8 @@ def stage_lists(document: Any, table: SurfaceTable, plan: Stage) -> tuple[list[S
     if not bones:
         raise ValueError("AVBD draft construction needs an SCP root.")
     if "bones" in plan:
-        if any(r.limb or r.build_mode != "INHERIT" for r in document.skin.contributors):
+        settings = decode(document.skin.draft_settings.configuration("AVBD"))
+        if any(r.limb or r.build_mode != "INHERIT" for r in settings.contributors):
             raise ValueError("Developer plan conflicts with authored SCP skin settings.")
         rows = ordered_rows(plan, "bones", [key for key, _ in bones])
     else:
@@ -127,7 +138,7 @@ def write_tissue(
 
 
 def stage(folder: Path, request: DraftRequest) -> None:
-    plan = json.loads(request.document.skin.draft_settings.plan)
+    plan = json.loads(decode(request.document.skin.draft_settings.configuration("AVBD")).plan)
     table = indexed_surfaces(request.capture)
     bones, tissues = stage_lists(request.document, table, plan)
     if "bones" not in plan:

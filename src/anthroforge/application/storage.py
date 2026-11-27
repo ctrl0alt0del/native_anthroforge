@@ -22,6 +22,7 @@ from . import (
     reconstruction_codec,
     resource_storage,
     shortcut_codec,
+    skin_builder_codec,
     skin_codec,
 )
 from .construction_codec import control, entity_construction
@@ -29,8 +30,8 @@ from .mirror_codec import fields as mirror_fields
 from .resources import Resources
 
 FORMAT = "anthroforge-project"
-VERSION = 9
-READ_VERSIONS = (4, 5, 6, 7, 8, 9)
+VERSION = 10
+READ_VERSIONS = (4, 5, 6, 7, 8, 9, 10)
 STATE_RECORDS = (
     "entities",
     "controls",
@@ -97,7 +98,7 @@ def document_state(document: Document) -> dict[str, Any]:
     for name in STATE_RECORDS:
         state[name] = [asdict(value) for value in state[name]]
     state["objects"] = [object_codec.encode(value) for value in document.objects]
-    state["skin"] = asdict(document.skin)
+    state["skin"] = skin_builder_codec.encode(document.skin)
     state["reconstruction"] = reconstruction_codec.encode(document.reconstruction)
     state["editing_scope"] = reconstruction_codec.encode_scope(document.editing_scope)
     state["mirror_accepted"] = snapshot(document)

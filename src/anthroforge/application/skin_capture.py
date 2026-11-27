@@ -3,18 +3,10 @@
 from dataclasses import asdict, dataclass
 from typing import Any
 
-import numpy as np
-
 from anthroforge.core import skin_sources
-from anthroforge.core.skin import SkinContributor, effective_collagen
 from anthroforge.native import skin_capture as native
 
-from . import (
-    skin_collagen,
-    skin_inputs,
-    skin_operations,
-    surface_providers,
-)
+from . import skin_inputs, surface_providers
 
 
 @dataclass(frozen=True)
@@ -49,55 +41,21 @@ def sources(engine: Any, document: Any, resources: Any, cancel: int) -> tuple[So
     return result
 
 
-def policy(
-    document: Any, row: Source, setting: SkinContributor | None = None
-) -> tuple[float, float, bool]:
-    setting = setting or skin_operations.settings_for(document.skin, row.identity.owner)
-    gap = setting if setting.gap_mode == "OVERRIDE" else document.skin.envelope_settings
-    return gap.gap_limit_ratio, gap.gap_strength, row.identity.kind == "SCP"
-
-
-def weights(
-    document: Any, resources: Any, row: Source, warnings: list[str], setting: SkinContributor
-) -> Any:
-    if row.identity.kind != "SCP":
-        return np.ones(row.mesh.counts[0])
-    item = document.object(row.identity.owner)
-    if setting.collagen_mode == "PAINTED":
-        asset = resources.skin.get(setting.painted)
-        values = asset.arrays.get("collagen") if asset else None
-        if skin_collagen.matching(asset, row.mesh):
-            return values
-        warnings.append(
-            "Painted collagen does not match " + item.name + "; using its uniform value."
-        )
-    return np.full(row.mesh.counts[0], effective_collagen(setting, item.name))
-
-
 def capture(engine: Any, document: Any, resources: Any, cancel: int = 0) -> Capture:
-    rows = sources(engine, document, resources, cancel)
-    lookup = {s.owner: s for s in document.skin.contributors}
-    settings = [
-        lookup.get(row.identity.owner) or SkinContributor(row.identity.owner) for row in rows
-    ]
-    geometry = captured_geometry(engine, document, rows, settings, cancel)
-    if document.skin.draft_settings.backend == "AVBD":
-        return Capture(geometry, rows, None, ())
-    warnings: list[str] = []
-    collagen = [
-        weights(document, resources, row, warnings, setting)
-        for row, setting in zip(rows, settings, strict=True)
-    ]
-    return Capture(geometry, rows, np.concatenate(collagen), tuple(warnings))
+    from .skin_builder_registry import BUILDERS
+
+    return BUILDERS[document.skin.draft_settings.backend].capture(
+        engine, document, resources, cancel
+    )
 
 
-def captured_geometry(engine: Any, document: Any, rows: Any, settings: Any, cancel: int) -> Any:
+def geometry(engine: Any, rows: Any, policies: Any, cancel: int) -> Any:
     return native.capture_sources(
         engine,
         [row.mesh for row in rows],
         [0 for row in rows],
         [row.frame for row in rows],
-        [policy(document, row, setting) for row, setting in zip(rows, settings, strict=True)],
+        policies,
         cancel,
     )
 

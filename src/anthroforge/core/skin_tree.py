@@ -4,7 +4,7 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from .skin import SkinContributor
+from .skin_avbd_settings import AvbdContributor, decode
 
 if TYPE_CHECKING:
     from .document import Document
@@ -17,7 +17,7 @@ class Policy:
     limb_owner: str = ""
 
 
-def override(parent: Policy, settings: SkinContributor | None) -> Policy:
+def override(parent: Policy, settings: AvbdContributor | None) -> Policy:
     if settings is None:
         return parent
     explicit = settings.build_mode != "INHERIT"
@@ -30,7 +30,8 @@ def override(parent: Policy, settings: SkinContributor | None) -> Policy:
 
 def preorder(document: "Document") -> Iterator[tuple[str, Policy]]:
     children = document.index.structure.children
-    settings = {row.owner: row for row in document.skin.contributors}
+    config = decode(document.skin.draft_settings.configuration("AVBD"))
+    settings = {row.owner: row for row in config.contributors}
     stack = [(owner, Policy()) for owner in reversed(children.get("", ()))]
     while stack:
         owner, parent = stack.pop()

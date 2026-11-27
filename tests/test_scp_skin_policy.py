@@ -8,10 +8,11 @@ import numpy as np
 import pytest
 
 from anthroforge.application import skin_avbd_capture, skin_capture, storage
+from anthroforge.application import skin_builder_configuration as builders
 from anthroforge.application.skin_inputs import build_signature
 from anthroforge.application.skin_stage_policy import ordered_sources
 from anthroforge.core.entities import SCP
-from anthroforge.core.skin import SkinContributor
+from anthroforge.core.skin_avbd_settings import AvbdConfiguration, AvbdContributor, decode
 from anthroforge.core.skin_limb import SkinLimb
 from anthroforge.core.skin_tree import preorder
 
@@ -36,14 +37,14 @@ def tree_nodes():
 
 def authored_tree(session):
     rows = (
-        SkinContributor("root", build_mode="FILL"),
-        SkinContributor("arm", limb=SkinLimb()),
-        SkinContributor("digit", limb=SkinLimb(), build_mode="FOLLOW"),
+        AvbdContributor("root", build_mode="FILL"),
+        AvbdContributor("arm", limb=SkinLimb()),
+        AvbdContributor("digit", limb=SkinLimb(), build_mode="FOLLOW"),
     )
     return replace(
         session.document,
         entities=tuple(tree_nodes()),
-        skin=replace(session.document.skin, contributors=rows),
+        skin=builders.store(session.document.skin, "AVBD", AvbdConfiguration(contributors=rows)),
     )
 
 
@@ -54,8 +55,11 @@ def test_tree_includes_empty_groups_and_nested_limbs(session):
     assert (found["arm"].mode_owner, found["arm"].limb_owner) == ("root", "arm")
     assert (found["tip"].mode_owner, found["tip"].limb_owner) == ("digit", "digit")
     assert (found["left"].mode, found["left"].limb_owner) == ("FILL", "")
-    reduced = replace(
-        doc.skin, contributors=tuple(r for r in doc.skin.contributors if r.owner != "arm")
+    config = decode(doc.skin.draft_settings.configuration("AVBD"))
+    reduced = builders.store(
+        doc.skin,
+        "AVBD",
+        replace(config, contributors=tuple(r for r in config.contributors if r.owner != "arm")),
     )
     assert dict(preorder(replace(doc, skin=reduced)))["tip"] == found["tip"]
 
@@ -80,19 +84,27 @@ def test_reparent_changes_policy_signature(session):
     assert build_signature(doc) != build_signature(new)
 
 
+def select_avbd(session):
+    skin = session.document.skin
+    session.replace_document(
+        skin=replace(skin, draft_settings=replace(skin.draft_settings, backend="AVBD"))
+    )
+
+
 def test_authored_limb_persists_edits_and_undo(session, assembly, tmp_path):
     root, child = assembly
     change(session, root, build_mode="FILL")
     change(session, child, limb={"rest_radius": 0.4})
     change(session, child, limb={"boundary_radius": 0.2})
     session.command("undo")
+    select_avbd(session)
     report = session.command("skin.contributor.inspect", owner=child)
     assert report["draft"]["mode_source"] == session.document.entity(root).name
     assert report["settings"]["limb"]["boundary_radius"] is None
     path = tmp_path / "limb.anthroforge"
     session.command("save", path=str(path), blocked_policy="wait")
     loaded, _ = storage.read_package(path, session.engine)
-    assert loaded.skin.contributors == session.document.skin.contributors
+    assert loaded.skin.draft_settings == session.document.skin.draft_settings
 
 
 def capture_recipe(session, path):
@@ -131,8 +143,11 @@ def test_invalid_limb_settings_leave_state_untouched(session, assembly):
 
 def test_explicit_fill_starts_new_region_and_follow_leaves_it(session):
     doc = authored_tree(session)
-    extra = SkinContributor("right", build_mode="FILL")
-    skin = replace(doc.skin, contributors=(*doc.skin.contributors, extra))
+    extra = AvbdContributor("right", build_mode="FILL")
+    config = decode(doc.skin.draft_settings.configuration("AVBD"))
+    skin = builders.store(
+        doc.skin, "AVBD", replace(config, contributors=(*config.contributors, extra))
+    )
     policies = dict(preorder(replace(doc, skin=skin)))
     assert policies["arm"].mode_owner == "right"
     assert policies["digit"].mode == "FOLLOW"
@@ -144,7 +159,12 @@ def test_fill_capture_reports_declaring_and_affected_scp(session, assembly, tmp_
     change(session, child, build_mode="FILL")
     with pytest.raises(ValueError, match=f"Fill Region {child} at {child}"):
         capture_recipe(session, tmp_path)
-    assert session.document.skin.contributors[-1].build_mode == "FILL"
+    assert (
+        decode(session.document.skin.draft_settings.configuration("AVBD"))
+        .contributors[-1]
+        .build_mode
+        == "FILL"
+    )
 
 
 def test_material_radius_only_scales_new_limb_material(session, assembly, tmp_path):

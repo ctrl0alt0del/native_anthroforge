@@ -48,5 +48,7 @@ def references(skin: Any) -> tuple[set[str], set[str]]:
     buffers = {skin.reference, *(fit.data for fit in skin.fits)}
     buffers.update(stage.data for stage in (skin.envelope, skin.topology, skin.final))
     buffers.add(skin.pending_topology.data)
-    buffers.update(item.painted for item in skin.contributors)
+    from .skin_builder_configuration import retained
+
+    buffers.update(retained(skin))
     return meshes - {""}, buffers - {""}

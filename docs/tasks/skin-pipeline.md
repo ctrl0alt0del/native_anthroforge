@@ -67,8 +67,21 @@ marked implementation pending until the complete outcome is qualified.
 
 ## Next actions and blockers
 
-Import the minimal existing builder integration, establish test environment, then
-implement configuration ownership and behavioral tests. No user decision is pending.
+Configuration ownership is implemented: FIELD and AVBD have separate immutable parameter
+records, capture policies, validation and dependency signatures. Common contributor records
+contain topology settings only. Pending, applied and unknown legacy provenance are distinct;
+the legacy migration freezes saved builder settings without inventing an accepted revision.
+Painted data remains reachable through pending and applied configurations.
+
+Validation: 45 focused configuration, migration, capture, builder and job tests passed;
+strict mypy passed for all 695 checked source files. These checks use the existing native
+DLL, not a fresh build. Numerical behavior is unchanged. The initial failures were test
+coupling to the former FIELD resolution constant and an assertion on a pre-undo snapshot;
+the tests now inspect the owning policy and current document. GUI and packaging are pending.
+
+Next: typed stage assessments and the skin planner, then lifecycle and UI integration.
+Automatic scheduling, promotion on publication, checkpoint persistence and the mode switch
+are not implemented yet. No user decision is pending.
 
 ## Recovery inputs
 

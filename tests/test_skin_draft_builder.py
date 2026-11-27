@@ -16,8 +16,8 @@ from anthroforge.application import (
 )
 from anthroforge.application.construction_policy import revisions
 from anthroforge.application.skin_avbd_capture import indexed_surfaces, stage_lists
-from anthroforge.application.skin_draft_build import DraftBuilder
 from anthroforge.core.results import Port
+from anthroforge.core.skin_avbd_settings import decode
 from tests.test_skin_jobs import build, imported
 from tests.test_tissue_workflow import assembly as tissue_assembly
 
@@ -36,11 +36,19 @@ def check_builder_result(request):
     return source.mesh, dict(quality={}, observed=order)
 
 
+def install_builder(monkeypatch):
+    monkeypatch.setitem(
+        skin_evaluation.BUILDERS,
+        "AVBD",
+        replace(skin_evaluation.BUILDERS["AVBD"], version=1, build=check_builder_result),
+    )
+
+
 def test_opt_in_is_persisted_and_field_survives_switch(session, monkeypatch, tmp_path):
     imported(session, monkeypatch)
     assert skin_codec.decode({}).draft_settings.backend == "FIELD"
     field = build(session)
-    monkeypatch.setitem(skin_evaluation.BUILDERS, "AVBD", DraftBuilder(1, check_builder_result))
+    install_builder(monkeypatch)
     choose(session, "AVBD")
     assert session.document.skin.envelope == field
     avbd = build(session)
@@ -67,21 +75,26 @@ def test_unavailable_worker_keeps_accepted_draft_and_selection(session, monkeypa
     assert json.loads(session.resources.skin[build(session).data].metadata)["builder"] == "FIELD"
 
 
-def test_plan_import_is_owned_and_revisions_follow_selected_builder(session, tmp_path):
-    bone, _, tissue = tissue_assembly(session)
-    previous = session.document
+def import_plan(session, tmp_path, bone, tissue):
     f = tmp_path / "plan.json"
     f.write_text(json.dumps(dict(bones=[dict(id=bone)], muscles=[dict(id=tissue, frames=40)])))
     choose(session, "AVBD")
     session.command("skin.draft.plan.import", path=str(f))
     f.unlink()
+
+
+def test_plan_import_is_owned_and_revisions_follow_selected_builder(session, tmp_path):
+    bone, _, tissue = tissue_assembly(session)
+    previous = session.document
+    import_plan(session, tmp_path, bone, tissue)
     document = session.document
-    assert json.loads(document.skin.draft_settings.plan)["muscles"][0]["frames"] == 40
+    plan = json.loads(decode(document.skin.draft_settings.configuration("AVBD")).plan)
+    assert plan["muscles"][0]["frames"] == 40
     assert Port(tissue, "base") in skin_inputs.envelope(document)
     p = Port(str(document.id), "skin_envelope_settings")
     assert revisions(previous, {p}) != revisions(document, {p})
     session.command("undo")
-    assert session.document.skin.draft_settings.plan == "{}"
+    assert decode(session.document.skin.draft_settings.configuration("AVBD")).plan == "{}"
 
 
 def test_explicit_plan_cannot_silently_drop_a_bone(session, monkeypatch):

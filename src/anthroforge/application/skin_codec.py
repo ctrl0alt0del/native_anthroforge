@@ -5,15 +5,14 @@ from typing import Any
 from anthroforge.core.results import ReadRevision
 from anthroforge.core.skin import (
     DeformationSettings,
-    EnvelopeSettings,
     FittedShortcut,
     Skin,
     SkinContributor,
     SkinStage,
     TopologySettings,
 )
-from anthroforge.core.skin_draft import DraftSettings
-from anthroforge.core.skin_limb import SkinLimb
+
+from . import skin_builder_codec
 
 
 def result(value: dict[str, Any]) -> SkinStage:
@@ -27,8 +26,8 @@ def result(value: dict[str, Any]) -> SkinStage:
 def decode(value: dict[str, Any] | None) -> Skin:
     data = dict(value or {})
     data["reference_sources"] = tuple(data.get("reference_sources", ()))
-    data["draft_settings"] = DraftSettings(**data.get("draft_settings", {}))
-    data["envelope_settings"] = EnvelopeSettings(**data.get("envelope_settings", {}))
+    data.update(skin_builder_codec.upgrade(data))
+    data.pop("envelope_settings", None)
     data["deformation_settings"] = DeformationSettings(**data.get("deformation_settings", {}))
     data["topology_settings"] = decode_topology(data.get("topology_settings", {}))
     for name in ("envelope", "topology", "pending_topology", "final"):
@@ -49,9 +48,11 @@ def decode_topology(values: dict[str, Any]) -> TopologySettings:
 def contributor(value: dict[str, Any]) -> SkinContributor:
     # Pre-release schema-7 snapshots may contain the superseded physical Fiber radius.
     data = dict(value)
-    data.pop("fiber_radius", None)
-    if data.get("limb") is not None:
-        data["limb"] = SkinLimb(**data["limb"])
+    from .skin_avbd_configuration import FIELDS as AVBD_FIELDS
+    from .skin_field_configuration import FIELDS as FIELD_FIELDS
+
+    for name in AVBD_FIELDS | FIELD_FIELDS | {"fiber_radius"}:
+        data.pop(name, None)
     return SkinContributor(**data)
 
 

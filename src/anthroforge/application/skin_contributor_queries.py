@@ -10,7 +10,7 @@ from anthroforge.core.results import geometry_asset
 from anthroforge.core.skin_tree import preorder
 from anthroforge.core.tissues import TissueVCP
 
-from . import choice_queries, skin_limb_geometry, skin_operations
+from . import choice_queries, skin_builder_configuration, skin_limb_geometry, skin_operations
 
 
 def inspect(session: Any, owner: str) -> dict[str, Any]:
@@ -23,19 +23,39 @@ def inspect(session: Any, owner: str) -> dict[str, Any]:
 
 def describe(session: Any, item: Any, reason: str) -> dict[str, Any]:
     owner = item.id
-    return dict(
+    data = dict(
         owner=owner,
         name=item.name,
         scp=isinstance(item, SCP),
         **topology(item, session.document),
-        draft=draft(session, item) if isinstance(item, SCP) else {},
         editable=not reason,
         reason=reason,
         surface=bool(geometry_asset(item)),
         revision=choice_queries.revision(session, owner),
-        settings=asdict(skin_operations.settings_for(session.document.skin, owner)),
-        authored_override=any(r.owner == owner for r in session.document.skin.contributors),
+        settings=settings(session.document.skin, owner),
     )
+    return data | builder_details(session, item)
+
+
+def builder_details(session: Any, item: Any) -> dict[str, Any]:
+    from .skin_builder_registry import BUILDERS
+
+    skin = session.document.skin
+    selected = skin.draft_settings.backend
+    rows = list(skin.contributors)
+    if selected in BUILDERS:
+        rows += list(skin_builder_configuration.decode(skin).contributors)
+    details = draft(session, item) if isinstance(item, SCP) and selected == "AVBD" else {}
+    return dict(draft=details, authored_override=any(r.owner == item.id for r in rows))
+
+
+def settings(skin: Any, owner: str) -> dict[str, Any]:
+    from .skin_builder_registry import BUILDERS
+
+    common = asdict(skin_operations.settings_for(skin, owner))
+    if skin.draft_settings.backend in BUILDERS:
+        common.update(asdict(skin_builder_configuration.settings_for(skin, owner)))
+    return common
 
 
 def draft(session: Any, item: Any) -> dict[str, Any]:
@@ -68,8 +88,17 @@ def edit_reason(session: Any, target: str) -> str:
 
 def topology(item: Any, document: Any) -> dict[str, Any]:
     return dict(
-        effective=asdict(skin_operations.effective_settings(document, item.id)),
+        effective=effective(document, item.id),
         fiber=isinstance(item, Fiber),
         flow_available=isinstance(item, Fiber) and not item.closed,
         budget_errors=list(skin_budgets.errors(document)),
     )
+
+
+def effective(document: Any, owner: str) -> dict[str, Any]:
+    from .skin_builder_registry import BUILDERS
+
+    if document.skin.draft_settings.backend not in BUILDERS:
+        return settings(document.skin, owner)
+    common = asdict(skin_operations.settings_for(document.skin, owner))
+    return common | asdict(skin_operations.effective_settings(document, owner))

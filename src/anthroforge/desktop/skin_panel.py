@@ -4,7 +4,7 @@ from dataclasses import asdict
 
 from PySide6.QtCore import Property, QObject, Signal, Slot
 
-from anthroforge.application import skin_reports
+from anthroforge.application import skin_builder_configuration, skin_reports
 
 from . import skin_contributor
 from .controller_actions import local_path
@@ -37,7 +37,7 @@ class SkinPanel(QObject):
             return
         self.current = skin
         self.display = display
-        self.values = asdict(skin) | dict(
+        self.values = authored(skin) | dict(
             display=display[0],
             contributor=skin_contributor.describe(session, display[1]),
             reports=skin_reports.describe(session),
@@ -63,6 +63,13 @@ class SkinPanel(QObject):
     @Property(QObject, constant=True)
     def exporter(self):
         return self.exporting
+
+
+def authored(skin):
+    data = asdict(skin)
+    if skin.draft_settings.backend == "FIELD":
+        data["envelope_settings"] = asdict(skin_builder_configuration.decode(skin).settings)
+    return data
 
 
 def context(controller, session):

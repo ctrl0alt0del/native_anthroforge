@@ -22,6 +22,22 @@ class DraftRequest:
 
 
 @dataclass(frozen=True)
+class BuilderSettingsPolicy:
+    configuration: Callable[..., Any]
+    configure: Callable[..., Any]
+    contributor: Callable[..., Any]
+    configure_contributor: Callable[..., Any]
+    contributor_fields: frozenset[str]
+    effective: Callable[..., Any]
+    resources: Callable[..., set[str]]
+
+
+@dataclass(frozen=True)
 class DraftBuilder:
     version: int
     build: Callable[[DraftRequest], tuple[Mesh, dict[str, Any]]]
+    settings: BuilderSettingsPolicy
+    inputs: Callable[..., Any]
+    capture: Callable[..., Capture]
+    reason: Callable[..., str]
+    signature: Callable[..., tuple[str, ...]]

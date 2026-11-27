@@ -5,19 +5,8 @@ from typing import Any
 from anthroforge.core import anatomical_surfaces, skin_sources
 from anthroforge.core.results import Port, ReadRevision
 from anthroforge.core.surface_references import SurfaceReference
-from anthroforge.core.tissues import TissueVCP
 
 from . import dependencies
-
-ENVELOPE_FIELDS = (
-    "owner",
-    "collagen_mode",
-    "collagen",
-    "painted",
-    "gap_mode",
-    "gap_limit_ratio",
-    "gap_strength",
-)
 
 
 def reference(source: skin_sources.Source) -> SurfaceReference:
@@ -35,14 +24,10 @@ def source_ports(source: skin_sources.Source) -> set[Port]:
 
 
 def envelope(document: Any) -> set[Port]:
-    candidates = skin_sources.contributors(document)
-    ports = set().union(*(source_ports(source) for source in candidates))
+    from .skin_builder_registry import BUILDERS
+
+    ports = BUILDERS[document.skin.draft_settings.backend].inputs(document)
     ports |= {Port(str(document.id), name) for name in ("skin_scope", "skin_envelope_settings")}
-    if document.skin.draft_settings.backend == "AVBD":
-        for src in candidates:
-            if src.kind == "TISSUE":
-                ref = SurfaceReference(src.owner, "TISSUE_BASE", src.instance)
-                ports.update(anatomical_surfaces.inputs(ref))
     return dependencies.closure(dependencies.graph(document), ports)
 
 
@@ -92,28 +77,17 @@ def revision(document: Any, port: Port) -> ReadRevision | None:
 
 
 def build_signature(document: Any) -> tuple[str, ...]:
-    tree = [(e.id, e.parent, e.attachment) for e in document.entities]
-    settings = [
-        (r.owner, r.build_mode, r.limb)
-        for r in document.skin.contributors
-        if r.limb or r.build_mode != "INHERIT"
-    ]
-    tissues = [o.id for o in document.objects if isinstance(o, TissueVCP)]
-    return tuple(map(repr, (document.skin.draft_settings, tree, settings, tissues)))
+    from .skin_avbd_configuration import signature
+
+    return signature(document)
 
 
 def settings_revision(document: Any, port: Port) -> ReadRevision:
-    settings = getattr(document.skin, port.output.removeprefix("skin_"))
+    from .skin_builder_registry import BUILDERS
+
     if port.output == "skin_envelope_settings":
-        owners = {source.owner for source in skin_sources.contributors(document)}
-        rows = tuple(
-            tuple(getattr(row, key) for key in ENVELOPE_FIELDS)
-            for row in document.skin.contributors
-            if row.owner in owners
-        )
+        signature = BUILDERS[document.skin.draft_settings.backend].signature(document)
     else:
-        rows = document.skin.contributors
-    signature: tuple[str, ...] = (repr(settings), repr(rows))
-    if port.output == "skin_envelope_settings" and document.skin.draft_settings.backend != "FIELD":
-        signature += build_signature(document)
+        settings = getattr(document.skin, port.output.removeprefix("skin_"))
+        signature = (repr(settings), repr(document.skin.contributors))
     return ReadRevision(port.owner, port.output, 0, 0, signature)

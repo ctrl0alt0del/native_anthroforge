@@ -39,7 +39,10 @@ window; each result remains atomic and contexts rotate to avoid starvation.
 CPU audit: ordinary attachment/routing/tissue native translation units are serial per job;
 skin fields and fitting are separate OpenMP targets with up to four threads. The default
 coordinator's two workers therefore do not imply two-core execution for every operation.
-CPU scheduling changes and rendered/packaged acceptance are still pending.
+The default pool now admits up to four jobs, bounded by CPU count minus one logical CPU
+of headroom. Native-team and memory demands remain shared across editing contexts. Final
+deformation now reserves its four-thread quality kernel. This is admission headroom, not
+OS affinity or a hard limit on external numerical processes.
 
 ## Verification so far
 
@@ -49,15 +52,25 @@ CPU scheduling changes and rendered/packaged acceptance are still pending.
 - Same local 256-cube Qt event-loop probe: camera-triggered jobs 7 to 0; maximum camera
   tick 162.29 to 2.22 ms, p95 93.14 to 0.78 ms. No rendered-frame claim. Raw baseline is
   in the prior probe directory; candidate is `build/viewport-responsiveness/probe-results.json`.
-- Skin update/topology/automatic-pipeline and painting checks are running at checkpoint time.
-- Full gate, CPU scaling, production scene, GUI and packaging checks have not yet run.
+- Skin update/topology/automatic-pipeline and painting checks: 21 passed.
+- Ownership, publication budget/fairness/shutdown, CPU admission and camera checks: 30 passed.
+- Configured Ruff and mypy (711 files) pass. An accidental `mypy src` invocation included
+  excluded untyped desktop modules and produced unrelated errors; the configured gate is authoritative.
+- CPU field probe on Ryzen 9 7900X3D (12 physical / 24 logical): four resolution-220 fields,
+  one/two/four workers took 4.66/2.64/1.71 s and used 3.02/5.73/11.00 effective cores.
+  Each field retained about 301 MB. These direct native measurements do not bypass admission
+  in the app; the GUI probe below exercises the actual coordinator.
+- Rendered Qt viewport under four coordinated jobs (12 resolution-220 field builds): no
+  camera-triggered domain jobs; camera callbacks max 1.83 ms. Frame p95/max 45.56/75.16 ms
+  versus idle 40.35/67.15 ms. This synthetic overlapping-cube scene is not a whole-body FPS claim.
+  Screenshot inspected; raw results in `build/viewport-worker-review`.
+- Full gate is running. Portable package and final architecture/audit documentation remain.
 
 ## Next actions
 
-1. Add regression cases and implement semantic camera/domain invalidation and status caching.
-2. Audit and reduce synchronous capture/publication; verify native CPU policies and ownership.
-3. Measure baseline/candidate, run development gate and actual viewport/packaged acceptance.
-4. Update architecture/computation history, checkpoint, reconcile and integrate after validation.
+1. Finish the development gate and portable application qualification.
+2. Record main-thread audit, CPU limits, measured results and preserved contracts.
+3. Review final diff, reconcile upstream and integrate after validation.
 
 ## Recovery inputs
 

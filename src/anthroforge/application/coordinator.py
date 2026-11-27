@@ -52,12 +52,13 @@ class TaskCoordinator:
     def __init__(
         self,
         current: Callable[[], Document],
-        workers: int = 2,
+        workers: int | None = None,
         clock: Callable[[], float] = monotonic,
         executor_factory: Any = None,
     ) -> None:
         self.current, self.clock = current, clock
         scheduling_context.initialize(self, current())
+        workers = task_resources.default_workers() if workers is None else workers
         self.pool = create_executor(workers, executor_factory)
         self.workers = workers
         self.errors: list[str] = []

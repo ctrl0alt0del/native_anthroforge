@@ -50,7 +50,11 @@ def start(session: Any, shortcut: str, settings: dict[str, Any], authoring: bool
 
 
 def inputs(session: Any, document: Any) -> set[Port]:
-    return skin_update_tasks.inputs(session.resources, document) | {
+    return captured_inputs(session.resources, document)
+
+
+def captured_inputs(resources: Any, document: Any) -> set[Port]:
+    return skin_update_tasks.inputs(resources, document) | {
         Port(str(document.id), "skin_final"),
         *(Port(item.id, "driver") for item in document.driving_shortcuts),
     }
@@ -91,14 +95,16 @@ def capture(session: Any, shortcut: str, settings: Settings, document: Any) -> A
 
 
 def compute(engine: Any, payload: Any, cancel: Any) -> Any:
-    return payload, skin_fit_evaluation.evaluate(engine, payload, cancel)
+    document, resources, *_ = payload
+    reads = revisions(document, captured_inputs(resources, document))
+    return payload, skin_fit_evaluation.evaluate(engine, payload, cancel), reads
 
 
 def publish(session: Any, identity: str, origin: int, result: Any) -> None:
-    payload, output = result
+    payload, output, reads = result
     document, _, _, shortcut, settings = payload
     restart = partial(enqueue, session, shortcut, settings, identity, origin)
-    proof = Capture(revisions(document, inputs(session, document)), restart, definitions(document))
+    proof = Capture(reads, restart, definitions(document))
     if not proof.matches(session.document):
         raise ObsoleteInputs("Fitting source changed before publication.")
     asset = str(uuid4())

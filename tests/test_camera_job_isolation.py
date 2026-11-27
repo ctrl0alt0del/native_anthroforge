@@ -64,7 +64,9 @@ def test_mirror_read_set_rejects_pose_changes_but_accepts_camera(controller):
         document, workspaces=(replace(document.workspaces[0], camera=(1, 0, 0, 0, 0, 0, 4)),)
     )
     assert mirroring.source(camera, "document") == captured
-    moved = replace(document.entity(root), name="Changed source label")
+    matrix = list(document.entity(root).matrix)
+    matrix[3] += 1
+    moved = replace(document.entity(root), matrix=tuple(matrix))
     changed = replace(document, entities=(moved, *document.entities[1:]))
     assert mirroring.source(changed, "document") != captured
 

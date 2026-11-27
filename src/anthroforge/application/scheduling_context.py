@@ -84,4 +84,5 @@ def close(coordinator: Any) -> None:
             for job in coordinator.active_jobs:
                 coordinator.cancel_job(job.id, reason="session_closed")
     coordinator.pool.shutdown(wait=True, cancel_futures=True)
+    coordinator.publication_budget_ms = None
     coordinator.tick()

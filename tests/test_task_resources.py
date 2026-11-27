@@ -125,3 +125,21 @@ def test_skin_envelope_reserves_its_native_team_before_input_capture(setup, monk
     assert request.execution_reason == "Waiting for compute capacity"
     coordinator.cancel_job(request.id)
     release.set()
+
+
+@pytest.mark.parametrize("cpus,capacity,workers", [(None, 1, 1), (1, 1, 1), (2, 1, 1), (24, 23, 4)])
+def test_default_capacity_leaves_headroom_and_bounds_job_concurrency(
+    monkeypatch, cpus, capacity, workers
+):
+    from anthroforge.application import task_resources
+
+    monkeypatch.setattr(task_resources.os, "cpu_count", lambda: cpus)
+    assert task_resources.compute_capacity() == capacity
+    assert task_resources.default_workers() == workers
+
+
+def test_final_skin_deformation_reserves_quality_kernel_team():
+    from anthroforge.application.task_schedulers import SkinDeformationTaskScheduler
+
+    plan = SkinDeformationTaskScheduler().plan(Workload(bytes=100), False)
+    assert plan.resources == ResourceDemand(4, 300)

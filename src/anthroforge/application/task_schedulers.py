@@ -309,6 +309,7 @@ class SkinDeformationTaskScheduler(MeasuredTaskScheduler):
             delay_ms=min(cost, MAX_INTERACTIVE_WAIT_MS) if interactive else 0,
             max_wait_ms=MAX_INTERACTIVE_WAIT_MS,
             reason="Retained anatomical sampling and fixed-topology skin deformation",
+            resources=ResourceDemand(4, workload.bytes * 3),
         )
 
 

@@ -98,14 +98,17 @@ source path and output JSON path. Use `--disable-autoexec` with background Blend
 Never save either original .blend file. Native source provenance is recorded in
 [BLENDER_PRIMITIVES.md](../native/migration/BLENDER_PRIMITIVES.md).
 
-The default portable folder is `dist/<version>/AnthroForge.dist`, using the application
-version (currently `dist/0.2.1/AnthroForge.dist`). Keep exactly one delivery per version:
-rebuilds replace that version's previous output, with no feature/task suffixes. The
-companion source archive is `dist/AnthroForge-<version>-source.zip` and is replaced too.
+Every completed app build must be delivered to `dist/<version>/AnthroForge.dist` in the
+user's main project directory, using the application version. A new version gets a new
+folder; an unchanged version replaces its previous complete build, with no feature/task
+suffixes. Preserve other versions. The companion source archive is
+`dist/AnthroForge-<version>-source.zip` and is replaced too.
 Packaging includes QML, native libraries, examples and notices. Historical validation
 records retain the paths used at the time; they are not instructions to create variants.
 `AF_PACKAGE_OUTPUT` remains available for temporary qualification under `build/` or the
-OS temporary directory. It is not a workaround for an installed executable holding files
+OS temporary directory. Temporary and worktree outputs do not count as delivered builds:
+promote the complete qualified package to the main project's canonical folder and verify
+it there before reporting delivery. It is not a workaround for an executable holding files
 open: stage/check there, then replace the canonical delivery only after the app closes.
 Never stop a running application or discard unsaved work merely to publish a build.
 `uv run --no-sync python tools/primitive_acceptance.py --workshop` runs the complete

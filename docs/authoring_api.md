@@ -1361,6 +1361,8 @@ Desktop and headless clients use the same saved mode and coordinator lifecycle:
 | `skin.retry` | Retry the failed stage and its captured builder configuration; newer pending parameter edits are not applied implicitly. |
 | `skin.build` | Select Final and explicitly build the full pipeline in one undo action. |
 | `skin.configure`, `section="draft_settings"`, `values={"backend":"FIELD"}` or `{"backend":"AVBD"}` | Selecting a builder immediately requests automatic Draft. Builder parameter edits stay pending until successfully applied. |
+| `skin.configure`, `section="draft_settings"`, `values={"root_vertices":802}` with AVBD selected | Sets the initial root sampling target (integer 4–500000, default 402). Apply with `skin.envelope.build`, then `wait`. It affects only the first envelope; later SCP/VCP stages can increase the mesh count. |
+| `skin.configure`, `section="topology_settings"`, `values={"target_quads":8100}` | Sets the document's quad topology target, independently of Draft initialization. Subtree reservations draw from this total or their nearest explicit ancestor budget. |
 
 Automatic edits use the last applied builder configuration. Automatic Draft jobs reject
 user cancellation through `job.cancel`; internal invalidation still rejects obsolete results.

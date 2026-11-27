@@ -3,7 +3,7 @@
 - Task branch: `codex/skin-count-controls`
 - Integration branch: `main`
 - Starting revision: `1ed75b8b`
-- Status: source, package and normal-launch acceptance passed; full regression gate and delivery pending
+- Status: implementation, validation and canonical delivery complete; ready for main integration
 - Last updated: November 27, 2026, Europe/Bucharest
 - Active writer: desktop skin count controls chat
 
@@ -46,11 +46,13 @@ tool failures remain errors. Initial failed jobs retained accepted meshes as exp
 document-budget focus/editing, subtree editing and narrow-window scrolling. Captures were
 visually inspected; offscreen viewport pixels are not geometry evidence. Local-only records
 are in `build/skin-count-controls/{qualified,ui-final}`; failed pre-fix jobs remain in
-`numerical`. The full development gate is running (`development-gate-resumed.log`). The
+`numerical`. The full development gate passed (`development-gate-resumed.log`). The
 initial gate passed the Python static checks, six native CTests, native style, PowerShell
 parsing and function limits, then stopped because its default Qt SDK path was absent in
 this worktree. The remaining gate resumed with the installed SDK explicitly selected;
 QML validation passed (187 files, 46 models, zero API errors).
+All 3,027 pytest tests passed in 1,025.08 seconds (4,437 warnings). Numerical imports and
+`doctor --require-native` passed. The final diff review found no additional code changes.
 
 The compiled package contains clean implementation revision
 `67b7d41b76622b9b3b945a4b29e29ddb74154a2f`. Its executable SHA-256 is
@@ -64,9 +66,17 @@ document budget were visually inspected in that window. The saved test app was c
 Package and native-window evidence is local-only under
 `E:/development/anthroforge/build/skin-count-controls-release`.
 
-Next: finish the full regression gate, replace canonical 0.4.3 plus source archive, then
-merge/push main. Preserve unrelated source edits and any open user project. Small fixtures
-do not establish whole-body quality.
+The complete qualified package replaced
+`E:/development/anthroforge/dist/0.4.3/AnthroForge.dist`; its executable hash matches the
+normal-launch candidate above. The previous package and source archive are preserved in
+`E:/development/anthroforge/build/skin-count-controls-delivery-20261127`. Other versions
+and unrelated source edits were preserved. Small fixtures do not establish whole-body quality.
+
+The matching `dist/AnthroForge-0.4.3-source.zip` was refreshed and verified: ZIP CRC checks
+passed, new adapter/QML/API documentation match the source, and exact runtime sources,
+manifest and notices are present. Packaged documentation includes this final acceptance record.
+
+Next: merge/push main and verify remote ancestry; no implementation or validation work remains.
 
 ## Recovery inputs
 

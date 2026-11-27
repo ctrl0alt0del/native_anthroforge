@@ -24,7 +24,7 @@ def verify_files(root):
 def probe_environment():
     excluded = ("PYTHON", "QT_", "QML_", "ANTHROFORGE_", "AF_")
     environment = {k: v for k, v in os.environ.items() if not k.upper().startswith(excluded)}
-    system = Path(environment["SystemRoot"])
+    system = Path(os.environ["SystemRoot"])
     environment["PATH"] = os.pathsep.join((str(system / "System32"), str(system)))
     return environment
 

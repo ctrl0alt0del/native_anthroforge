@@ -147,7 +147,7 @@ def required_port(document: Any, resources: Any, port: Port) -> Assessment:
 def result_status(name: str, role: str, result: Any) -> Assessment:
     if result.error or result.status in ("failed", "invalid", "cancelled"):
         return Assessment(Condition.FAILED, f"{name} {role}: {result.error or result.status}")
-    if result.status == "pending" or result.pending:
+    if result.status == "pending" or getattr(result, "pending", ()):
         return Assessment(Condition.WAITING, f"Waiting for {name} {role}.")
     return Assessment()
 

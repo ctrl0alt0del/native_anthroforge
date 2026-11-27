@@ -4,10 +4,18 @@ Available in 0.4.0. Qualification evidence and limits are in [the task record](t
 The [0.4.1 audit corrections](tasks/release-041.md) restore the reference proxy preparation,
 diagnostic reporting, budget feedback and persistent FAST weight cache described below.
 
-Open **Skin** in the vertical inspector tabs on the right. **Build Skin** creates the
-envelope, generates quad topology and prepares the deformation reference. These stages
-can take substantial time on a full assembly. Activity shows the running job and allows
-cancellation; previously accepted geometry stays visible while it runs.
+Open **Skin** in the vertical inspector tabs on the right. **Update final skin** selects
+the saved update target. With the checkbox off, committed SCP/VCP edits automatically
+update Draft once required anatomy is ready. Draft does not rebuild during dragging.
+With it on, the pipeline first waits for current Draft, then prepares or updates Final.
+Compatible subsequent edits move final vertices while keeping Draft and topology fixed.
+If Final explicitly requires new Draft or topology, the pipeline builds that prerequisite
+automatically. **Build Skin** selects Final and explicitly rebuilds in one undo action.
+
+Activity shows progress; previously accepted geometry remains available. Automatic Draft
+jobs cannot be cancelled by the user. The application still invalidates obsolete work after
+mode/history changes. **Retry skin update** retries a failed request with its captured
+configuration. Failed numerical solves retain accepted output and report their reason.
 
 Only SCP and tissue surfaces contribute physical volume. Curves, Fibers and other
 construction do not thicken the envelope. Closed Fiber paths and enabled FLOW guides
@@ -15,7 +23,14 @@ can still guide the separate topology stage.
 
 ## Shape and topology
 
-Envelope settings control skin distance, collagen and gap filling. Distances are
+Choose **Field envelope** or **AVBD (experimental)**. Selecting a builder immediately
+requests Draft construction. Each builder owns its parameters: skin distance, collagen
+and gap filling belong to FIELD, and are hidden for AVBD. Other parameter edits remain
+pending until an explicit successful rebuild applies them. Automatic anatomy updates use
+the last successfully applied configuration. If switching builders fails, later anatomy
+updates keep using that applied builder; Retry uses the failed selection.
+
+FIELD envelope settings control skin distance, collagen and gap filling. Distances are
 percentages of the model's longest axis. Select an SCP to set or paint its collagen
 weights and adjust its subtree quad budget. Select a compatible source to override
 its gap settings. Display hiding does not remove physical contributors.
@@ -26,8 +41,10 @@ undo action without clearing source settings, paint, topology settings or saved 
 
 Choose QuadWild or Instant Meshes, the target quad count, refinement and symmetry.
 QuadWild uses the supported loop and FLOW guides. Change these construction settings,
-then explicitly rebuild to apply them; moving anatomy does not remesh existing skin.
-Use the display selector to inspect the envelope, topology or final result.
+then explicitly rebuild to apply them. Compatible Final updates preserve topology;
+changed contributor/material identities can require reconstruction. The default display
+follows Draft/Final mode. Explicit stage selection, hidden skin and fit previews remain
+independent presentation choices.
 
 Choose the symmetry axis for the project's actual coordinates; it is not inferred from
 anatomical names. The migrated 96-muscle assembly uses Y. The quad count is a target:
@@ -41,7 +58,7 @@ previously accepted final skin and reference.
 
 ## Deformation
 
-After the reference exists, ordinary anatomical updates move skin vertices while
+With **Update final skin** selected and a reference available, ordinary anatomical updates move skin vertices while
 preserving their identities and connectivity. Live, On Release and Manual update modes
 remain available. **Update skin** explicitly evaluates the current anatomy against the
 retained reference. It does not generate new topology.
@@ -52,8 +69,9 @@ inflation before relaxation and stacking. Both inflated sides contribute. Existi
 references retain their captured choice until explicitly rebuilt.
 
 The deformation controls select Linear Elasticity or FAST and their settings. Proxy
-resolution changes require reference rebuilding. Invalid or missing material references
-block updates with an explanation; the application never silently reattaches them.
+resolution changes require reference rebuilding. Explicit material or topology incompatibility
+requests the required upstream construction. A failed numerical solve is reported as failure;
+it is not treated as permission to reconstruct everything.
 
 New references use the draft envelope reduced with the Blender Decimate subset to about
 64,000 triangles, then tetrahedralize it. Final skin topology is retained unchanged. Only
@@ -90,9 +108,24 @@ region, alongside the whole-mesh error. This separates fit accuracy from unaffec
 
 ## Save and export
 
-Projects retain skin definitions, reference data and fitted results. Opening a saved
-project restores accepted output without rebuilding everything. Schema 7 reads existing
-schema-4–6 anatomy projects and saves new edits in schema 7.
+Projects retain skin definitions, reference data, requested mode, pending/applied builder
+configuration and fitted results. Opening restores saved output without starting calculations.
+Schema 10 reads versions 4–10. Legacy Draft without applied provenance remains explicitly
+unknown until a successful build; migration does not invent a successful configuration.
+
+Ordinary **`.anthroforge`** files omit construction checkpoints. Extended **`.anthroforgex`**
+files additionally retain one eligible checkpoint per SCP and the complete combined VCP
+checkpoint. Save preserves the chosen format. AVBD reuses only a complete compatible prefix
+of the saved parent-first SCP order followed by VCP order. Changed geometry, ordering,
+configuration, normalization or runtime identity invalidates the affected suffix. Checkpoint
+resources belong to document/history and are checksummed; transient failed VCP prefixes
+are retained only in the current session.
+
+AVBD requires its separately installed experimental numerical runtime. Set
+`ANTHROFORGE_AVBD_RUNTIME` to the runtime worktree containing its `.venv`,
+`tools/runtime/skin` modules and built native tools. The desktop/portable application ships
+the worker adapter, not these numerical dependencies. An unavailable runtime is reported
+without replacing accepted Draft. FIELD does not require this runtime.
 
 **Export OBJ…** writes only the skin mesh, retaining polygon/quad connectivity in metres
 and application axes. It does not export anatomy, fit bones, weights or drivers. For

@@ -1349,3 +1349,26 @@ Use the shared [painting operations and lifecycle](painting_system.md) for tissu
 and collagen strokes. `painting.finish` commits automatically through the coordinator;
 `Session.wait()` completes it without Qt. `painting.preview` / `painting.commit` support
 explicit read-only preparation. Legacy paint inspection/job-commit commands remain valid.
+
+## Automatic skin targets
+
+Desktop and headless clients use the same saved mode and coordinator lifecycle:
+
+| Operation | Behavior |
+| --- | --- |
+| `skin.update_mode`, `mode="DRAFT"` or `"FINAL"` | One undoable target switch. Draft updates after committed anatomy edits; Final hands off through current Draft and then preserves compatible topology. |
+| `skin.status` | Read-only `pipeline` state: mode, phase, stage, reason, readiness conditions, `can_retry` and label. Polling does not submit work. |
+| `skin.retry` | Retry the failed stage and its captured builder configuration; newer pending parameter edits are not applied implicitly. |
+| `skin.build` | Select Final and explicitly build the full pipeline in one undo action. |
+| `skin.configure`, `section="draft_settings"`, `values={"backend":"FIELD"}` or `{"backend":"AVBD"}` | Selecting a builder immediately requests automatic Draft. Builder parameter edits stay pending until successfully applied. |
+
+Automatic edits use the last applied builder configuration. Automatic Draft jobs reject
+user cancellation through `job.cancel`; internal invalidation still rejects obsolete results.
+Final follows project Live/On Release/Manual policy. Explicit evaluation can force a Manual
+update. Required producer outputs must be ready; a Manual prerequisite is not silently forced.
+Use `wait` to await admitted work, and inspect pipeline readiness for blocked prerequisites.
+
+Save/open accept `.anthroforge` and `.anthroforgex`. Both use schema 10 and retain accepted
+skin, saved target and pending/applied configuration; extended files also retain durable AVBD
+checkpoints. Opening starts no calculations. See [the skin workflow](skin_workflow.md) for
+builder/runtime requirements, parameter isolation and failure behavior.

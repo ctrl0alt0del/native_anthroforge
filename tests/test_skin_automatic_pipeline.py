@@ -190,12 +190,14 @@ def test_parameter_edit_during_build_remains_pending(session, monkeypatch):
     session.scheduler.tick()
     assert entered.wait(5)
     try:
-        session.command(
-            "skin.configure", section="envelope_settings", values=dict(gap_strength=0.3)
-        )
+        configure_pending_gap(session)
     finally:
         release.set()
     session.wait()
     applied = builders.projected(session.document, builders.automatic(session.document.skin))
     assert builders.decode(applied.skin).settings.gap_strength == 1
     assert builders.decode(session.document.skin).settings.gap_strength == 0.3
+
+
+def configure_pending_gap(session):
+    session.command("skin.configure", section="envelope_settings", values=dict(gap_strength=0.3))

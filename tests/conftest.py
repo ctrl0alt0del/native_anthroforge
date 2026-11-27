@@ -12,12 +12,16 @@ def isolated_preferences(tmp_path, monkeypatch):
     monkeypatch.setenv("ANTHROFORGE_PREFERENCES_PATH", str(tmp_path / "preferences.json"))
 
 
-@pytest.fixture
-def session(monkeypatch):
+@pytest.fixture(autouse=True)
+def bounded_skin_workers(monkeypatch):
     from anthroforge.application import skin_field_builder, worker_memory
 
     monkeypatch.setattr(skin_field_builder, "TARGET_RESOLUTION", 24)
     monkeypatch.setattr(worker_memory, "budget", lambda: 64 * 1024**2)
+
+
+@pytest.fixture
+def session():
     value = Session("Fixture")
     yield value
     value.close()

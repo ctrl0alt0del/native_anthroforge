@@ -1323,3 +1323,29 @@ API diagnostics fail the Windows development gate. Full diagnostics are retained
 `PropertyProjection` keys, QVariant payloads and legacy QML style warnings are not claimed to
 be statically validated. Background runtime and hidden-render checks cover those bindings.
 Core/application mypy coverage remains distinct from this desktop interface check.
+
+## Exclusive skin target planning
+
+`core.skin_pipeline` plans Draft/Final targets from typed source, Draft, topology and reference
+assessments. `application.skin_pipeline` owns requested intent, committed-edit catch-up,
+handoff, captured Retry and prerequisite repair. It is a context service, not an executor:
+the existing TaskCoordinator retains queues, reservations, workers, cancellation and publication.
+Automatic construction observes accepted main anatomy; variant/candidate contexts do not
+request live Draft. Saved documents restore unarmed and do not compute merely on opening.
+
+FIELD and AVBD own separate configuration, capture, signatures and validation policies.
+Common contributors contain topology settings only. Pending settings, applied configuration,
+legacy unknown provenance, accepted geometry and worker-owned inputs are separate values.
+Captured epochs and read revisions reject late publication; successful Draft alone promotes
+its applied configuration. Final failures preserve accepted output and fits. Typed compatibility
+requirements permit repair; numerical errors do not imply reconstruction.
+
+AVBD runs through the existing native subprocess boundary with an owned Python adapter and
+an explicitly configured external numerical environment. Immutable checkpoint bundles retain
+warm material state and complete ordered prefixes. Prefix identity includes source bytes,
+recipe, normalization, adapter protocol and numerical runtime source/binary fingerprints.
+Schema 10 stores mode/configuration and checkpoint references. Ordinary saves project away
+checkpoints; extended `.anthroforgex` saves retain durable checkpoints, including those in
+saved reconstruction snapshots. Atomic save chooses the policy from the final filename.
+See [the specification](specification_skin_pipeline.md), [workflow](skin_workflow.md) and
+[qualification record](tasks/skin-pipeline.md).

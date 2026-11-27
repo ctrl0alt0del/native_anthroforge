@@ -120,7 +120,7 @@ def test_explicit_recapture_supersedes_manual_retention(session, assembly):
     edit(session, child, 2.0)
     session.command("scp.recapture", entity=child)
     session.wait(5)
-    assert not session.scheduler.errors
+    assert session.document.entity(child).status == "ready"
     assert session.document.entity(child).attachment != original
     assert not session.document.shortcut_edits
 

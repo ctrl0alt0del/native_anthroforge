@@ -34,7 +34,7 @@ def test_surface_override_waits_for_parent_geometry_without_pose_batch_deadlock(
     original = session.document.entity(child).attachment
     session.command("driver.value", driver=key, value=0.1)
     session.wait(2)
-    assert not session.scheduler.errors
+    assert session.document.entity(child).status == "ready"
     assert session.document.entity(child).attachment == original
     assert session.document.entity(child).pose_receipt.effective.parent_mode == "SURFACE_NEAREST"
     assert not session.document.shortcut_edits

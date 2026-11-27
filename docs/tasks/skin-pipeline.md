@@ -152,10 +152,34 @@ adapter; numerical dependencies remain in the configured runtime, separate from 
 The new bootstrap passed build/save/reopen/reuse smoke qualification. Qualification scripts,
 raw captures and reports are local-only under `build/` and owned temporary directories.
 
-Next: finish the full development gate (third full run is active), resolve remaining
-regressions, finish actual GUI inspection, and qualify the portable build. The first package
-build started before the checkpoint protocol-3 fix and needs a source refresh/rebuild before
-final qualification. Native style checking is active. No user decision is pending.
+The full gate exposed a shared readiness assumption: ControlResult has status but no pending
+field. The readiness adapter now handles both control and geometry outputs; 40 construction,
+control, editing and interleaving tests pass. Mirror/paint undo tests now distinguish accepted
+anatomy from automatically produced skin resources; 17 focused tests pass. Frame-publication
+helpers wait for actual staged geometry instead of eight frames; 19 desktop placement/painting
+checks pass at production FIELD resolution. The shared test budget now also covers Controller
+sessions (resolution 24 / 64 MiB); production remains 220 / its normal resource budget.
+The third full run was stopped after 72% to apply these fixes. The fourth run is active.
+
+Actual Qt mode/Retry acceptance passed with default FIELD resolution 220 and real external AVBD.
+It covers Final deformation retaining Draft/topology, Draft catch-up, unapplied parameters,
+failed builder selection, successful captured Retry, stable control bounds and extended reopen.
+Normal/narrow layouts and separate hidden GPU Draft/Final captures were visually inspected.
+`tools/skin_pipeline_acceptance.py` and `tools/skin_pipeline_render.py` reproduce this workflow;
+local evidence is under `build/skin-pipeline-ui/modes`. No whole-body visual quality claim.
+Native style, PowerShell style, Ruff, formatting, the architecture/function audit and configured
+strict mypy (710 files) pass. The package was rebuilt with the protocol-3 adapter/readiness
+fix; the missing local QuadWild bundle was installed using its verified existing assets.
+The packaging notice collector now honors AF_NATIVE_BUILD rather than assuming build/dev.
+The rebuilt app is being tested from `build/skin-relocated/AnthroForge app` with minimal PATH.
+An additional 21 primitive/shortcut and 13 architecture/retained-binding tests pass after
+the narrowed domain assertions. Ruff and formatting pass for all 1,737 Python files.
+
+Next: finish the fourth full run, verify the isolated regression corrections, qualify the
+portable build, finish the AC evidence mapping and final diff review. The earlier full run's
+global scheduler assertions exposed low-resolution FIELD gap failures in unrelated shortcut
+cases; those tests now assert the requested accepted attachment results. Origin/main remains
+277af232 after fetch. No user decision is pending; do not merge until qualification completes.
 
 ## Recovery inputs
 

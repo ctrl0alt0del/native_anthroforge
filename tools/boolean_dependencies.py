@@ -1,6 +1,7 @@
 """Distribute exact-arithmetic headers and upstream notices used by the native build."""
 
 import json
+import os
 import shutil
 from pathlib import Path
 
@@ -8,7 +9,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def dependencies():
-    manifest = ROOT / "build/dev/boolean-dependencies.json"
+    build = Path(os.environ.get("AF_NATIVE_BUILD", ROOT / "build/dev"))
+    manifest = build / "boolean-dependencies.json"
     if not manifest.is_file():
         raise RuntimeError("Build native first to identify the Boolean dependency sources.")
     return {name: Path(path) for name, path in json.loads(manifest.read_text()).items()}

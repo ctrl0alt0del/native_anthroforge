@@ -3,7 +3,8 @@
 import numpy as np
 import pytest
 
-from anthroforge.application import skin_capture, skin_collagen, skin_operations, storage
+from anthroforge.application import skin_capture, skin_collagen, storage
+from anthroforge.core.skin_field import settings_for
 from tests.test_skin_jobs import imported
 
 
@@ -11,13 +12,13 @@ def test_fill_clear_and_undo_preserve_source_geometry(session, monkeypatch):
     owner = imported(session, monkeypatch)
     item = session.document.object(owner)
     session.command("skin.collagen.fill", owner=owner, value=0.25)
-    setting = skin_operations.settings_for(session.document.skin, owner)
+    setting = settings_for(session.document.skin, owner)
     assert setting.collagen_mode == "PAINTED" and setting.painted
     np.testing.assert_array_equal(session.resources.skin[setting.painted].arrays["collagen"], 0.25)
     session.command("skin.collagen.clear", owner=owner)
-    assert skin_operations.settings_for(session.document.skin, owner).collagen_mode == "UNIFORM"
+    assert settings_for(session.document.skin, owner).collagen_mode == "UNIFORM"
     session.command("undo")
-    assert skin_operations.settings_for(session.document.skin, owner) == setting
+    assert settings_for(session.document.skin, owner) == setting
     assert session.document.object(owner) == item
 
 
@@ -30,7 +31,7 @@ def test_zero_field_is_authoritative_and_survives_roundtrip(session, monkeypatch
     session.command("save", path=str(path), blocked_policy="wait")
     session.wait()
     document, resources = storage.read_package(path, session.engine)
-    setting = skin_operations.settings_for(document.skin, owner)
+    setting = settings_for(document.skin, owner)
     assert setting.painted in resources.skin
     np.testing.assert_array_equal(resources.skin[setting.painted].arrays["collagen"], 0)
 
@@ -50,7 +51,7 @@ def test_membership_validation_detects_same_count_different_connectivity(session
     owner = imported(session, monkeypatch)
     session.command("skin.collagen.fill", owner=owner, value=0.3)
     mesh = skin_collagen.mesh(session, owner)
-    setting = skin_operations.settings_for(session.document.skin, owner)
+    setting = settings_for(session.document.skin, owner)
     data = session.resources.skin[setting.painted]
     assert skin_collagen.matching(data, mesh)
     corners = mesh.array(1).copy()

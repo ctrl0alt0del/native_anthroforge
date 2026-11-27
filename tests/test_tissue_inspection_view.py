@@ -4,6 +4,7 @@ import pytest
 
 from anthroforge.application import inspection_report
 from anthroforge.desktop import tissue_inspection_scene as scene
+from tests.gui_publication import publish as publish
 from tests.test_tissue_interaction import controller as controller
 from tests.test_tissue_workflow import assembly
 
@@ -14,12 +15,6 @@ def setup(controller):
     controller.selection_view.select(target)
     publish(controller)
     return target, controller.tissue_inspection
-
-
-def publish(controller):
-    for _ in range(8):
-        controller.process_tick()
-        controller.frame_presented()
 
 
 def test_switching_buffer_types_retains_old_render_contract_until_frame_boundary(controller):

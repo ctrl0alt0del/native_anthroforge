@@ -8,16 +8,25 @@ from typing import Any
 from anthroforge.core import skin_sources
 from anthroforge.core.jobs import Job, ObsoleteInputs
 from anthroforge.core.results import Port
+from anthroforge.core.skin_pipeline import RepairRequired
 from anthroforge.native.mesh import NativeCancellation
 
-from . import dependencies, skin_deformation_evaluation, skin_inputs, skin_jobs, skin_workloads
+from . import (
+    dependencies,
+    skin_deformation_evaluation,
+    skin_inputs,
+    skin_job_intents,
+    skin_jobs,
+    skin_workloads,
+)
 from .assets import Asset
 from .construction_policy import revisions
 
 
 def evaluate(session: Any) -> str:
-    session.skin_status.require("update")
-    return request(session)
+    if not skin_sources.contributors(session.document):
+        raise ValueError("No contributing anatomy for skin evaluation.")
+    return str(session.skin_pipeline.evaluate())
 
 
 def inputs(resources: Any, document: Any) -> set[Port]:
@@ -35,14 +44,15 @@ def inputs(resources: Any, document: Any) -> set[Port]:
     return dependencies.closure(dependencies.graph(document), ports)
 
 
-def request(session: Any, interactive: bool = False) -> str:
+def request(session: Any, interactive: bool = False, intent: Any = None) -> str:
     skin_deformation_evaluation.reference(session.document, session.resources)
-    job = make_job(session)
+    intent = intent or skin_job_intents.capture(session, "deformation", True)
+    job = make_job(session, intent)
     job.cancel = NativeCancellation(session.engine)
     job.interactive = interactive
-    job.publish_during_edit = job.restart_on_redo = job.restart_on_input_change = True
-    job.retry = partial(request, session)
-    job.cleanup = partial(completed, session, job)
+    job.publish_during_edit = interactive
+    job.retry = session.skin_pipeline.retry
+    job.cleanup = partial(completed, session, job, intent)
     configure(job, session)
     return str(session.scheduler.submit(job))
 
@@ -60,13 +70,13 @@ def renew(job: Job, document: Any, observe: Any) -> None:
     job.prerequisites = job.observes
 
 
-def make_job(session: Any) -> Job:
+def make_job(session: Any, intent: Any) -> Job:
     return Job(
         "Update skin",
         frozenset((str(session.document.id),)),
-        lambda doc: (doc, session.resources.snapshot()),
+        lambda doc: (intent.project(doc), session.resources.snapshot()),
         partial(compute, session.engine),
-        partial(publish, session),
+        partial(publish, session, intent),
         key="skin-update",
         kind="skin_deformation",
         workload=partial(skin_workloads.estimate, session.resources),
@@ -75,16 +85,27 @@ def make_job(session: Any) -> Job:
 
 def compute(engine: Any, payload: Any, cancel: Any) -> Any:
     document, resources = payload
-    return document, skin_deformation_evaluation.evaluate(
-        engine, document, resources, cancel.handle
-    )
+    try:
+        return document, skin_deformation_evaluation.evaluate(
+            engine, document, resources, cancel.handle
+        )
+    except RepairRequired as repair:
+        return document, repair
 
 
-def publish(session: Any, payload: Any) -> None:
+def publish(session: Any, intent: Any, payload: Any) -> None:
     document, output = payload
+    skin_job_intents.require(session, intent, "deformation")
     reads = revisions(document, inputs(session.resources, document))
     if reads != revisions(session.document, inputs(session.resources, session.document)):
         raise ObsoleteInputs("Skin anatomical inputs changed before publication.")
+    if isinstance(output, RepairRequired):
+        session.skin_pipeline.require_repair(output.stage, str(output))
+        return
+    install(session, document, output, reads)
+
+
+def install(session: Any, document: Any, output: Any, reads: Any) -> None:
     skin = session.document.skin
     stage = replace(
         skin_jobs.accepted(document, "final", output.data.digest, reads),
@@ -95,7 +116,10 @@ def publish(session: Any, payload: Any) -> None:
     session.replace_document(skin=replace(skin, final=stage))
 
 
-def completed(session: Any, job: Job, state: str) -> None:
+def completed(session: Any, job: Job, intent: Any, state: str) -> None:
+    session.skin_pipeline.completed(job, intent, state)
+    if intent.epoch != session.skin_pipeline.epoch:
+        return
     if state == "failed":
         skin = session.document.skin
         result = replace(skin.final, status="failed", error=job.error)
@@ -103,20 +127,8 @@ def completed(session: Any, job: Job, state: str) -> None:
 
 
 def edited(session: Any, seeds: set[Port]) -> None:
-    skin = session.document.skin
-    if not skin.reference or not seeds.intersection(inputs(session.resources, session.document)):
-        return
-    if skin.final.status != "pending":
-        session.replace_document(
-            skin=replace(skin, final=replace(skin.final, status="pending", error=""))
-        )
-    pending(session)
+    session.skin_pipeline.changed()
 
 
 def pending(session: Any, released: bool = False) -> None:
-    skin = session.document.skin
-    if not skin.reference or skin.final.status != "pending":
-        return
-    mode = session.document.update_mode
-    if mode == "LIVE" or (released and mode == "ON_RELEASE"):
-        request(session, interactive=not released)
+    session.skin_pipeline.changed()

@@ -2,7 +2,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from time import sleep
+from time import monotonic, sleep
 
 import pytest
 
@@ -33,11 +33,20 @@ def request(server, operation, **arguments):
 def test_headless_server_publishes_while_waiting_for_input(server):
     cube = Path(__file__).resolve().parents[1] / "examples/primitives/cube.obj"
     request(server, "import", path=str(cube), units=1)
-    sleep(0.2)
-    result = request(server, "inspect")
+    result = published(server)
     assert result["entity_count"] == 1 and not result["save_blocked"]
     request(server, "scp.rename", entity=result["entities"][0]["id"], name="Renamed")
     assert request(server, "inspect")["entities"][0]["name"] == "Renamed"
+
+
+def published(server):
+    deadline = monotonic() + 15
+    while monotonic() < deadline:
+        sleep(0.05)
+        result = request(server, "inspect")
+        if result["entity_count"] == 1 and not result["save_blocked"]:
+            return result
+    pytest.fail("The headless server did not publish background results while idle.")
 
 
 def test_batch_splits_curve_referenced_from_inspection(session):

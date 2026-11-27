@@ -1,17 +1,19 @@
 # Automatic skin pipeline — Draft and Final modes
 
-**Status: Confirmed feature requirements; implementation and qualification pending.**
+**Status: Implemented and qualified; see the evidence and limits below.**
 
 Confirmed by the user on **2026-11-27** after the refinement and grilling interview
-through Q30. This document is the durable specification of that agreement. It does not
-assign a release number, change a project schema, select a new numerical algorithm,
-or claim that the feature is implemented.
+through Q30. This document is the durable specification of that agreement. The requirements
+do not select a new numerical algorithm or assign a release number. Concrete schema mapping,
+implementation evidence and qualification limits are recorded in the documents below.
 
 The [existing skin specification](specification_040.md), [skin workflow](skin_workflow.md),
 [application architecture](architecture.md) and
 [engineering guidelines](engineering_guidelines.md) remain applicable except where the
 explicit changes below supersede their earlier behavior. The
-[documentation task record](tasks/skin-pipeline-spec.md) records delivery verification.
+[documentation task record](tasks/skin-pipeline-spec.md) records the original specification
+delivery. [Implementation qualification](skin_pipeline_validation.md) maps all acceptance
+cases to executable evidence; the [implementation record](tasks/skin-pipeline.md) tracks integration.
 
 ## 1. Outcome, scope and terminology
 
@@ -687,7 +689,9 @@ it does not mutate the applied snapshot before acceptance.
 
 Persist mode and configuration distinctions with accepted resources through the existing
 project lifecycle. Keep ordinary project data, computation checkpoints and transient
-jobs distinct. This feature does not assign a new archive format or schema version.
+jobs distinct. The implementation maps these records to schema 10, with ordinary
+`.anthroforge` and extended `.anthroforgex` archives as documented in the
+[storage workflow](skin_workflow.md).
 
 Migration must preserve legacy builder settings and accepted assets, default absent mode
 to Draft, and avoid computation on open. Implementation must specify and test how legacy
@@ -764,8 +768,8 @@ The mode switch does not turn a draft-only document into an exportable final.
 
 ## 10. Acceptance scenarios and traceability
 
-The tests below are required behavior checks for implementation. They have **not** been
-executed as part of this specification delivery. Use deterministic scheduling controls
+The tests below are required behavior checks for implementation. Execution evidence is
+recorded in [implementation qualification](skin_pipeline_validation.md). Use deterministic scheduling controls
 for interleavings and representative numerical fixtures for geometry/reuse qualification.
 
 | Case | Scenario and observable result | Requirements |
@@ -845,8 +849,8 @@ fact-finding also inspected the separate **codex/avbd-envelope-cpu** worktree at
 b3b92969, including substantial uncommitted integration. Its working files cannot be
 reconstructed from that commit alone.
 
-The following is an inspection baseline, not a statement that the requirements above
-are implemented:
+The following records the pre-implementation inspection baseline. The completed changes
+and verification of these gaps are documented in [qualification](skin_pipeline_validation.md):
 
 | Observed mechanism | Gap relevant to this feature |
 | --- | --- |
@@ -892,9 +896,10 @@ mandatory manual recovery cycle.
 
 ## 13. Delivery and implementation boundary
 
-This delivery creates the specification and diagrams only. It does not change application
-code, persisted archives, numerical solvers, source correspondence rules, export output,
-build packaging or release versions.
+The original specification delivery created requirements and diagrams only. The subsequent
+implementation adds the shared planner, isolated builder configuration and schema-10
+ordinary/extended archive mapping. [Qualification](skin_pipeline_validation.md) records the
+implemented acceptance cases, actual desktop/portable checks and numerical limits.
 
 Before implementation is reported complete, qualification must cover the acceptance matrix,
 representative resource use, current and legacy archive behavior, actual desktop interaction,

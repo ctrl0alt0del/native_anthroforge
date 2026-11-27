@@ -8,16 +8,6 @@ from anthroforge.core.surface_references import SurfaceReference
 
 from . import dependencies
 
-ENVELOPE_FIELDS = (
-    "owner",
-    "collagen_mode",
-    "collagen",
-    "painted",
-    "gap_mode",
-    "gap_limit_ratio",
-    "gap_strength",
-)
-
 
 def reference(source: skin_sources.Source) -> SurfaceReference:
     role = "SCP_GEOMETRY" if source.kind == "SCP" else "TISSUE_FINAL"
@@ -34,8 +24,9 @@ def source_ports(source: skin_sources.Source) -> set[Port]:
 
 
 def envelope(document: Any) -> set[Port]:
-    candidates = skin_sources.contributors(document)
-    ports = set().union(*(source_ports(source) for source in candidates))
+    from .skin_builder_registry import BUILDERS
+
+    ports = BUILDERS[document.skin.draft_settings.backend].inputs(document)
     ports |= {Port(str(document.id), name) for name in ("skin_scope", "skin_envelope_settings")}
     return dependencies.closure(dependencies.graph(document), ports)
 
@@ -71,12 +62,11 @@ def complete_build(document: Any) -> set[Port]:
 def revision(document: Any, port: Port) -> ReadRevision | None:
     if port.owner != str(document.id):
         return None
-    if port.output == "skin_reference":
-        return ReadRevision(port.owner, port.output, 0, 0, (document.skin.reference,))
+    if port.output in ("skin_reference", "skin_update_mode"):
+        value = getattr(document.skin, port.output.removeprefix("skin_"))
+        return ReadRevision(port.owner, port.output, 0, 0, (value,))
     if port.output in ("skin_scope", "skin_guide_scope"):
-        select = skin_sources.contributors if port.output == "skin_scope" else skin_sources.guides
-        values = tuple(repr(source) for source in select(document))
-        return ReadRevision(port.owner, port.output, 0, 0, values)
+        return scope_revision(document, port)
     if port.output.endswith("_settings") and port.output.startswith("skin_"):
         return settings_revision(document, port)
     if port.output in ("skin_envelope", "skin_topology", "skin_pending_topology", "skin_final"):
@@ -85,15 +75,24 @@ def revision(document: Any, port: Port) -> ReadRevision | None:
     raise ValueError("Unknown document skin output: " + port.output)
 
 
+def scope_revision(document: Any, port: Port) -> ReadRevision:
+    select = skin_sources.contributors if port.output == "skin_scope" else skin_sources.guides
+    values = tuple(repr(source) for source in select(document))
+    return ReadRevision(port.owner, port.output, 0, 0, values)
+
+
+def build_signature(document: Any) -> tuple[str, ...]:
+    from .skin_avbd_configuration import signature
+
+    return signature(document)
+
+
 def settings_revision(document: Any, port: Port) -> ReadRevision:
-    settings = getattr(document.skin, port.output.removeprefix("skin_"))
+    from .skin_builder_registry import BUILDERS
+
     if port.output == "skin_envelope_settings":
-        owners = {source.owner for source in skin_sources.contributors(document)}
-        rows = tuple(
-            tuple(getattr(row, key) for key in ENVELOPE_FIELDS)
-            for row in document.skin.contributors
-            if row.owner in owners
-        )
+        signature = BUILDERS[document.skin.draft_settings.backend].signature(document)
     else:
-        rows = document.skin.contributors
-    return ReadRevision(port.owner, port.output, 0, 0, (repr(settings), repr(rows)))
+        settings = getattr(document.skin, port.output.removeprefix("skin_"))
+        signature = (repr(settings), repr(document.skin.contributors))
+    return ReadRevision(port.owner, port.output, 0, 0, signature)

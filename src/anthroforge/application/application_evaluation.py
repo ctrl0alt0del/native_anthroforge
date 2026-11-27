@@ -20,4 +20,6 @@ def evaluate(session: "Session", entities: list[str] | None = None) -> str:
         for item in session.document.entities
         if item.status == "edited" or not item.attachment.binding
     }
-    return evaluation.request(session, targets & session.document.index.entities.keys(), captures)
+    job = evaluation.request(session, targets & session.document.index.entities.keys(), captures)
+    session.skin_pipeline.evaluate()
+    return job

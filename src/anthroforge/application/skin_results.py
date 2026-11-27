@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from anthroforge.native.mesh import Mesh
 
 from .skin_assets import SkinAsset
+from .skin_checkpoint_assets import Bundle
 
 
 @dataclass(frozen=True)
@@ -13,6 +14,7 @@ class ComputedStage:
     data: SkinAsset
     reference: SkinAsset | None = None
     sources: tuple[str, ...] = ()
+    checkpoints: tuple[Bundle, ...] = ()
 
 
 class IncompleteBuild(Exception):

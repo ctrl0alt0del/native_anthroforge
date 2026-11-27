@@ -203,6 +203,7 @@ class TaskCoordinator:
         job = self.registry.by_id[job_id]
         if not job.active:
             return
+        job.require_cancellation(reason)
         job.restart_requested = restart and job.restart_on_input_change and job.retry is not None
         causes.cancellation(self, job, reason, replacement)
         self._cancel_active(job, obsolete)

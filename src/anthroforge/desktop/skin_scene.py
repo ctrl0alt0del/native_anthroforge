@@ -2,19 +2,19 @@
 
 from anthroforge.application.skin_fit_preview import displayed as fitted_preview
 from anthroforge.core.entities import IDENTITY
+from anthroforge.core.skin_sources import contributors
 
 
 def displayed(session):
     mode = session.workspace.skin_display
-    names = ("final", "topology", "envelope") if mode == "AUTO" else (mode.lower(),)
-    return next(
-        (
-            getattr(session.document.skin, name)
-            for name in names
-            if name != "none" and getattr(session.document.skin, name).asset
-        ),
-        None,
+    skin = session.document.skin
+    name = (
+        ("envelope" if skin.update_mode == "DRAFT" else "final") if mode == "AUTO" else mode.lower()
     )
+    if name == "none" or (name == "envelope" and not contributors(session.document)):
+        return None
+    stage = getattr(skin, name)
+    return stage if stage.asset else None
 
 
 def rows(controller):

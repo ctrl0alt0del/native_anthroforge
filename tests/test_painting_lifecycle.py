@@ -133,9 +133,10 @@ def test_undo_cancels_uncommitted_work(session, painting_case):
     append(session, token)
     session.command("painting.finish", token=token)
     session.command("undo")
-    after = session.document
+    after, cursor = session.document, session.history.cursor
     session.wait()
-    assert session.document is after and not session.painting.active
+    assert not session.painting.active and session.history.cursor == cursor
+    assert session.document.object(painting_case["target"]) == after.object(painting_case["target"])
 
 
 def test_geometry_changes_hide_old_preview(session, painting_case):

@@ -76,7 +76,8 @@ def test_mirror_mutation_rejected_and_history_restores_rule(session, assembly):
 def test_mirror_metadata_roundtrip_without_extra_geometry(session, assembly, tmp_path):
     root, child = assembly
     session.command("mirror.configure", target=root, enabled=True)
-    assets = set(session.assets)
+    session.wait()
+    assets = set(session.resources.selected(session.document).meshes)
     path = str(tmp_path / "mirrored.anthroforge")
     session.command("save", path=path, blocked_policy="wait")
     session.command("open", path=path)

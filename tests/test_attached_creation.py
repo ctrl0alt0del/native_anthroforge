@@ -18,7 +18,10 @@ def created(session, operation, **arguments):
     if job:
         target = next(iter(job.outputs))
     session.wait()
-    assert not session.scheduler.errors, session.scheduler.errors
+    failures = [
+        j.error for j in session.scheduler.jobs if target in j.outputs and j.state == "failed"
+    ]
+    assert not failures, failures
     return session.document.object(target)
 
 

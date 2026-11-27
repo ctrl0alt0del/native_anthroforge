@@ -2,6 +2,7 @@
 
 from typing import Any
 
+from anthroforge.core.skin_pipeline import RepairRequired
 from anthroforge.native import construction, skin_contact, skin_deformation, topology
 
 from . import skin_assets, skin_final_diagnostics, skin_support_capture, worker_memory
@@ -57,5 +58,5 @@ def original(engine: Any, arrays: Any, current: Any, cancel: int) -> Any:
         engine, [arrays[k] for k in ("vertices", "corners", "offsets", "triangles", "polygons")]
     )
     if not topology.same_topology(base, current, cancel):
-        raise ValueError("Skin vertex identity/connectivity changed; rebuild its reference.")
+        raise RepairRequired("reference", "Skin vertex identity/connectivity changed.")
     return base

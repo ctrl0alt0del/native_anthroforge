@@ -1,6 +1,7 @@
 """Reflection follows accepted source lifetime, without creating derived mesh catalogues."""
 
 from anthroforge.application import surface_providers
+from anthroforge.application.skin_assets import references
 from anthroforge.core.surface_references import SurfaceReference
 from tests.test_tissue_stack_workflow import assembly
 
@@ -8,16 +9,21 @@ from tests.test_tissue_stack_workflow import assembly
 def test_repeated_plane_edits_reuse_source_assets_and_restore_plane_on_undo(session, assembly):
     root, child = assembly
     session.command("mirror.configure", target=root, enabled=True)
-    accepted = set(session.assets)
+    accepted = non_skin_assets(session)
     source = session.document.entity(child)
     for shift in (0.5, 0.8, 1.0, 2.0) * 4:
         session.command("mirror.configure", target=root, shift=shift)
         session.wait()
-    assert set(session.assets) == accepted
+    assert non_skin_assets(session) == accepted
     assert session.document.entity(child) is source
     session.command("undo")
     session.wait()
     assert session.document.mirrors.rules[root].shift == 1.0
+
+
+def non_skin_assets(session):
+    retained = set().union(*(references(e.document.skin)[0] for e in session.history.entries))
+    return set(session.assets) - retained
 
 
 def provider(session, ref):

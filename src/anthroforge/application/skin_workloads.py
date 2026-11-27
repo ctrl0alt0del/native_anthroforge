@@ -19,9 +19,16 @@ def mesh_counts(mesh: Any) -> tuple[int, int, int]:
     return vertices, triangles, vertices * 24 + triangles * 24 + corners * 8 + (faces + 1) * 8
 
 
+def base_counts(resources: Any, document: Any, sources: Any) -> list[tuple[int, int, int]]:
+    keys = [document.object(s.owner).base_result.asset for s in sources if s.kind == "TISSUE"]
+    return [mesh_counts(resources.meshes[key].mesh) for key in keys if key in resources.meshes]
+
+
 def estimate(resources: Any, document: Any) -> Workload:
     sources = skin_sources.contributors(document)
     sizes = [counts(resources, document, source) for source in sources]
+    if document.skin.draft_settings.backend == "AVBD":
+        sizes.extend(base_counts(resources, document, sources))
     envelope = resources.meshes.get(document.skin.envelope.asset)
     if envelope:
         sizes.append(mesh_counts(envelope.mesh))

@@ -6,9 +6,10 @@ import numpy as np
 
 from anthroforge.core.scheduling import Workload
 from anthroforge.core.skin import effective_collagen
+from anthroforge.core.skin_field import settings_for
 from anthroforge.native import painting
 
-from . import skin_collagen, skin_operations, surface_providers, weight_painting
+from . import skin_collagen, surface_providers, weight_painting
 from .inspection_context import scene_signature
 
 
@@ -27,13 +28,13 @@ def signature(context: Any, target: str, options: Any) -> Any:
     validate(context, target, options)
     return (
         scene_signature(context.document),
-        skin_operations.settings_for(context.document.skin, target),
+        settings_for(context.document.skin, target),
         tuple((m.handle, f) for m, f in weight_painting.obstacles(context, options)),
     )
 
 
 def baseline(context: Any, target: str, mesh: Any) -> Any:
-    setting = skin_operations.settings_for(context.document.skin, target)
+    setting = settings_for(context.document.skin, target)
     data = context.resources.skin.get(setting.painted)
     if setting.collagen_mode == "PAINTED" and skin_collagen.matching(data, mesh):
         return data.arrays["collagen"]

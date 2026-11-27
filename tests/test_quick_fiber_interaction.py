@@ -5,6 +5,7 @@ from PySide6.QtCore import QCoreApplication
 
 from anthroforge.core.fibers import Fiber
 from anthroforge.desktop.controller import Controller
+from tests.gui_publication import publish
 from tests.test_quick_fiber import cube
 
 
@@ -25,9 +26,7 @@ def click(tool, x, continued=False):
 def settle(controller):
     controller.session.wait(5)
     controller.refresh()
-    for _ in range(8):
-        controller.render_model.drain()
-        controller.frame_presented()
+    publish(controller)
 
 
 def test_surface_clicks_continue_finish_and_select_bound_routed_fiber(controller):

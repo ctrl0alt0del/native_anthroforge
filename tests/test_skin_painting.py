@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from anthroforge.application import skin_operations
+from anthroforge.core.skin_field import settings_for
 from tests.test_skin_jobs import imported
 from tests.test_tissue_painting_native import VIEW
 
@@ -29,7 +29,7 @@ def test_readonly_preview_then_one_undo(session, monkeypatch):
     job = request(session, target)
     assert session.document is before and len(session.history.entries) == count
     session.command("skin.collagen.paint.commit", job=job)
-    setting = skin_operations.settings_for(session.document.skin, target)
+    setting = settings_for(session.document.skin, target)
     weights = session.resources.skin[setting.painted].arrays["collagen"]
     assert np.any(weights > 0) and np.any(weights == 0)
     assert len(session.history.entries) == count + 1

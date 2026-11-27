@@ -19,6 +19,8 @@ from .. import (
 from ..command_contracts import direct, edit, method, query
 
 COMMANDS = (
+    edit("skin.update_mode", skin_operations.update_mode, project_scope=True),
+    edit("skin.retry", method("skin_pipeline.retry"), project_scope=True),
     edit("skin.collagen.paint.commit", skin_painting.commit, isolated=True, project_scope=True),
     edit("skin.collagen.set", skin_collagen.set_weights, project_scope=True),
     edit("skin.collagen.fill", skin_collagen.fill, project_scope=True),
@@ -32,6 +34,7 @@ COMMANDS = (
     edit("skin.fit.remove", skin_fit_results.remove, project_scope=True),
     edit("skin.build", skin_jobs.build, project_scope=True),
     edit("skin.configure", skin_operations.configure, project_scope=True),
+    edit("skin.draft.plan.import", skin_operations.import_draft_plan, project_scope=True),
     edit("skin.envelope.reset", skin_operations.reset_envelope, project_scope=True),
     edit("skin.contributor.configure", skin_operations.contributor, project_scope=True),
     direct("skin.inspect", lambda session: skin_operations.inspect(session)),

@@ -40,7 +40,7 @@ def assess(document: Any, resources: Any) -> Status:
 
 def creation(document: Any, resources: Any) -> dict[str, Eligibility]:
     skin = document.skin
-    build = "" if skin_sources.contributors(document) else "Add SCP or tissue geometry first."
+    build = draft_reason(document)
     topology = "" if skin.envelope.asset in resources.meshes else "Build a skin envelope first."
     reference = (
         ""
@@ -53,6 +53,18 @@ def creation(document: Any, resources: Any) -> dict[str, Eligibility]:
         topology=allowed(topology),
         reference=allowed(reference or pending_reason(document)),
     )
+
+
+def draft_reason(document: Any) -> str:
+    sources = skin_sources.contributors(document)
+    if not sources:
+        return "Add SCP or tissue geometry first."
+    from .skin_evaluation import BUILDERS
+
+    key = document.skin.draft_settings.backend
+    if key not in BUILDERS:
+        return f"The selected draft builder {key} is unavailable."
+    return BUILDERS[key].reason(document)
 
 
 def pending_reason(document: Any) -> str:
@@ -159,7 +171,9 @@ class SkinStatusProvider:
         return self.value
 
     def describe(self) -> dict[str, Any]:
-        return asdict(self.snapshot())
+        from .skin_pipeline_status import describe
+
+        return asdict(self.snapshot()) | dict(pipeline=describe(self.session))
 
     def require(self, operation: str) -> None:
         status = self.snapshot().operations[operation]

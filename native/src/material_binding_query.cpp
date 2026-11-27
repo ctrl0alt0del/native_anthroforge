@@ -66,7 +66,7 @@ Weights material_coordinates(const Index& index,const Weights& query,int64_t sid
         return value;
     }
     if(side==2&&mesh.tissue.kind==5) return material_coordinates(index,query,1,cancel,inside);
-    throw std::runtime_error("Retained tissue material location is outside the current surface; restore the crop or explicitly rebind.");
+    throw MaterialUnavailable("Retained tissue material location is outside the current surface; restore the crop or explicitly rebind.");
 }
 V3 material_point(const Index& index,const Weights& query,int64_t side,uint64_t cancel,bool inside) {
     V3 value=V3::Zero();

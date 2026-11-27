@@ -45,6 +45,7 @@ if TYPE_CHECKING:
     from .shortcut_contexts import Contexts as ShortcutContexts
     from .shortcut_observation import Observation
     from .skeleton_runtime import SkeletonUpdate
+    from .skin_pipeline import Pipeline
     from .skin_status import SkinStatusProvider
     from .tissue_inspection import Inspection
     from .variant_review import VariantReview
@@ -62,6 +63,7 @@ class Session:
     replay_callback = ContextField[Any]("replay_callback")
     issues: ContextField[IssueSystem] = ContextField("issues")
     skin_status: ContextField[SkinStatusProvider] = ContextField("skin_status")
+    skin_pipeline: ContextField[Pipeline] = ContextField("skin_pipeline")
     assembly: ContextField[Assembly] = ContextField("assembly")
     skeleton_update: ContextField[SkeletonUpdate] = ContextField("skeleton_update")
     variant_review: ContextField[VariantReview] = ContextField("variant_review")

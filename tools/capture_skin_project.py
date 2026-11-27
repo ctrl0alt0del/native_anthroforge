@@ -13,6 +13,7 @@ import numpy as np
 
 from anthroforge.application import (
     resource_storage,
+    skin_builder_configuration,
     skin_capture,
     skin_storage,
     storage,
@@ -61,7 +62,7 @@ def source_metadata(document, row):
 
 def save(options, document, captured, started):
     arrays = dict(vars(captured.geometry), collagen=captured.collagen)
-    arrays["settings"] = np.array(astuple(document.skin.envelope_settings))
+    arrays["settings"] = np.array(astuple(field_settings(document)))
     options.output.mkdir(parents=True, exist_ok=True)
     np.savez(options.output / "inputs.npz", **arrays)
     report = describe(options, document, captured, arrays)
@@ -78,7 +79,7 @@ def describe(options, document, captured, arrays):
         sources=[source_metadata(document, row) for row in captured.sources],
         counts=dict(Counter(row.identity.kind for row in captured.sources)),
         mirror_instances=sum(bool(row.identity.instance) for row in captured.sources),
-        settings=asdict(document.skin.envelope_settings),
+        settings=asdict(field_settings(document)),
         warnings=captured.warnings,
         **geometry_metadata(captured.geometry, arrays),
     )
@@ -107,6 +108,12 @@ def main():
         resources = load_resources(archive, manifest, document, engine)
         captured = skin_capture.capture(engine, document, resources)
         save(options, document, captured, started)
+
+
+def field_settings(document):
+    if document.skin.draft_settings.backend != "FIELD":
+        raise ValueError("This diagnostic capture requires a FIELD draft builder.")
+    return skin_builder_configuration.decode(document.skin, "FIELD").settings
 
 
 if __name__ == "__main__":

@@ -28,8 +28,10 @@ def file_entries(command: str, icon: str) -> tuple[Entry, ...]:
         (program + r"\DefaultIcon", "", icon),
         (program + r"\shell\open\command", "", command),
         (CLASSES + r"\.anthroforge\OpenWithProgids", PROGID, ""),
+        (CLASSES + r"\.anthroforgex\OpenWithProgids", PROGID, ""),
         (application, "FriendlyAppName", NAME),
         (application + r"\SupportedTypes", ".anthroforge", ""),
+        (application + r"\SupportedTypes", ".anthroforgex", ""),
         (application + r"\shell\open\command", "", command),
     )
 
@@ -40,6 +42,7 @@ def application_entries(icon: str) -> tuple[Entry, ...]:
         (CAPABILITIES, "ApplicationDescription", "Create and edit anatomical models."),
         (CAPABILITIES, "ApplicationIcon", icon),
         (CAPABILITIES + r"\FileAssociations", ".anthroforge", PROGID),
+        (CAPABILITIES + r"\FileAssociations", ".anthroforgex", PROGID),
         (r"Software\RegisteredApplications", NAME, CAPABILITIES),
     )
 

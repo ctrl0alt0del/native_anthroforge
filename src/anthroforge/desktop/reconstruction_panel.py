@@ -101,13 +101,15 @@ class ReconstructionPanel(QObject):
             path=self.stage_path,
             state=source.state,
             error=source.error,
-            inventory=source.inventory if self.stage_path.endswith(".anthroforge") else [],
+            inventory=source.inventory
+            if self.stage_path.lower().endswith((".anthroforge", ".anthroforgex"))
+            else [],
         )
 
     @Slot(str)
     def chooseStageFile(self, url):
         self.stage_path = QUrl(url).toLocalFile()
-        if self.stage_path.endswith(".anthroforge"):
+        if self.stage_path.lower().endswith((".anthroforge", ".anthroforgex")):
             self.controller.run("assembly.inspect", dict(path=self.stage_path))
         self._signature = None
         self.synchronize()
@@ -122,7 +124,7 @@ class ReconstructionPanel(QObject):
             variant=session.contexts.visible,
             frame=session.engine.transform(transform),
         )
-        if self.stage_path.endswith(".anthroforge"):
+        if self.stage_path.lower().endswith((".anthroforge", ".anthroforgex")):
             arguments.update(source_entity=source_entity, role=role)
             self.run("reconstruction.stage.import_project", arguments)
         else:

@@ -10,6 +10,7 @@ import pytest
 from anthroforge.application import skin_inputs
 from anthroforge.application import skin_reference_evaluation as reference
 from anthroforge.core.results import Port
+from anthroforge.core.skin import SkinStage
 from anthroforge.native import skin_proxy
 from tests.test_skin_reference import build, topology
 from tools.check_skin_assembly import quads
@@ -32,7 +33,7 @@ def test_reference_uses_existing_envelope_and_declares_its_revision(session):
     assert any(read.output == "skin_envelope" for read in accepted.final.inputs)
 
 
-def test_combined_build_uses_fresh_envelope_and_fallback_is_explicit(session):
+def test_combined_build_uses_fresh_envelope(session):
     topology(session)
     skin = session.document.skin
     target = session.assets[skin.topology.asset].mesh
@@ -41,7 +42,14 @@ def test_combined_build_uses_fresh_envelope_and_fallback_is_explicit(session):
         fresh,
         "draft_envelope",
     )
-    assert reference.proxy_source(session.document, session.resources, target, None) == (
+
+
+def test_topology_fallback_requires_absent_draft(session):
+    topology(session)
+    skin = replace(session.document.skin, envelope=SkinStage())
+    document = replace(session.document, skin=skin)
+    target = session.assets[skin.topology.asset].mesh
+    assert reference.proxy_source(document, session.resources, target, None) == (
         target,
         "topology_fallback",
     )

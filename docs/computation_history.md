@@ -13,6 +13,10 @@ Subsequent entries must record every computational approach change.
 Current observational shortcut work is recorded in CH-068 (R01/R02 and A01 presentation).
 It leaves numerical evaluation and scheduling policy unchanged.
 
+Automatic skin targets (2026-11-27) extend R01/R02/R03/R04/R06 with exclusive Draft/Final
+planning, applied builder configuration and immutable AVBD prefix checkpoints. The dated
+record below describes preserved solvers, replay equivalence and qualification limits.
+
 Whole-skeleton update preparation (0.4.2, in progress, 2026-10-29) extends R01/R02,
 A01–A03 and resource publication. It evaluates an owned candidate through the existing
 coordinator and production attachment/path/tissue/skin evaluators. The live document is
@@ -3931,3 +3935,41 @@ attachment, native painting, skin or tissue algorithms change, and no additional
 scheduling policy is introduced. Baseline: `db492517`; checkpoints: `004f33ed`, `eef41faf`,
 `46f46d74`. Registry/lifecycle and isolated-engine regression tests exercise preserved contracts.
 Full qualification and performance evidence: [recovery record](tasks/application-boundaries.md).
+
+## 2026-11-27 — Automatic skin targets and AVBD prefix reuse
+
+Baseline: `277af232`. The previous main branch exposed explicit construction and compatible
+final deformation without an exclusive requested target. The imported AVBD boundary came from
+`b3b92969` plus the separately maintained runtime worktree's working files; its full numerical
+environment cannot be reconstructed from that revision alone.
+
+The skin-domain planner now assesses typed prerequisites, waits for committed upstream output,
+and requests the necessary producer through the existing coordinator. Final deformation preserves
+Draft/topology when compatible; declared incompatibility permits reconstruction. Failure alone
+does not. Pending configuration is separated from last-applied immutable configuration, and
+builder policies own source dependencies. FIELD collagen/gap behavior and native solver math
+are unchanged. Main accepted anatomy, history, read-revision guards, reservations and resource
+ownership remain authoritative. Automatic Draft intentionally becomes non-user-cancelable.
+
+AVBD previously restarted its application run without retained application checkpoints. The owned
+adapter now captures complete parent-first SCP prefixes and the complete combined VCP prefix,
+including warm material, contacts, obstacles and geometry. It rejects incompatible prefix hashes
+and replays the affected suffix. Ordinary files omit checkpoints; extended files keep durable
+checkpoints. Worker inputs and temporary paths are owned; checkpoint bytes have independent
+checksums and document/history references. A subprocess isolates the configured numerical runtime
+from desktop Qt. No experimental solver was copied into the application or substituted for FIELD.
+
+Evidence: three-SCP resumed/fresh output has identical connectivity and coordinates within
+1e-10. A 27-SCP fixture with a VCP completed. The initial second-VCP append comparison exposed
+missing regional material: connectivity matched, positions differed by up to 0.053. Retaining
+validated geometry, regional labels/corners and rest geometry corrected that omission; protocol 3
+invalidates older bundles. Corrected append took 12.83 s versus 18.10 s to replay both VCPs from
+the same accepted skeleton, with identical connectivity and coordinates within 1e-10. These are
+single local trials, not a whole-application speed claim or a whole-body anatomical qualification.
+
+Automated protocol/storage tests cover prefix changes, partial failures, checksum/path validation
+and undo. Qt acceptance exercises production FIELD resolution 220, Final/Draft handoff, retained
+topology, pending settings, unavailable AVBD/Retry and extended reopening. Hidden GPU captures
+show the saved Draft and Final surfaces; the low-cost topology fixture does not establish whole-body
+surface quality. Raw captures and timing reports are local-only. The full gate and portable
+qualification remain tracked in [the task record](tasks/skin-pipeline.md).

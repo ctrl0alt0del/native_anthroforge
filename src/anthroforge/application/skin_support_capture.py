@@ -8,6 +8,7 @@ import numpy as np
 
 from anthroforge.core import skin_sources
 from anthroforge.core.preferences import Preferences
+from anthroforge.core.skin_pipeline import RepairRequired
 from anthroforge.native import skin_support
 
 from . import mirror_surfaces, skin_assets, skin_capture, skin_inputs, surface_providers
@@ -58,7 +59,7 @@ def identities(document: Any, definitions: Any) -> Any:
         skin_sources.Source(**{k: r[k] for k in ("owner", "kind", "instance")}) for r in definitions
     )
     if identities != skin_sources.contributors(document):
-        raise ValueError("Skin contributors changed; rebuild the reference.")
+        raise RepairRequired("construction", "Skin contributors changed; rebuild draft skin.")
     return identities
 
 
@@ -92,10 +93,12 @@ def resolve_all(
 
 def resolve(resources: Any, row: Any, retained: str, ids: Any, cancel: int, label: str) -> Any:
     if retained not in resources.meshes:
-        raise ValueError("Missing retained skin material reference; rebuild the reference.")
+        raise RepairRequired("construction", "Missing retained skin material reference.")
     try:
         return skin_support.targets(
             resources.meshes[retained].mesh, row.mesh, row.frame, ids, cancel
         )
+    except RepairRequired as error:
+        raise RepairRequired(error.stage, f"{label}: {error}") from error
     except ValueError as error:
         raise ValueError(f"{label}: {error}") from error

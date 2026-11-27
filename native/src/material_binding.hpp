@@ -4,6 +4,7 @@
 #include <map>
 
 namespace af::binding {
+struct MaterialUnavailable:std::runtime_error { using std::runtime_error::runtime_error; };
 using Weights=std::map<int64_t,double>;
 struct Index {
     const Mesh& current;

@@ -60,6 +60,10 @@ def execute(args: argparse.Namespace) -> int:
         return inspection_command(args)
     if args.command in ("run", "serve", "inspect", "render", "render-inspection"):
         return authoring_command(args, authoring)
+    return diagnostic_command(args)
+
+
+def diagnostic_command(args: argparse.Namespace) -> int:
     if args.command == "new":
         print(json.dumps(Session(args.name).describe(), indent=2))
         return 0

@@ -8,23 +8,25 @@ import numpy as np
 import pytest
 
 from anthroforge.application import skin_assets, storage
+from anthroforge.application import skin_builder_configuration as builders
 from anthroforge.core.skin import (
     DeformationSettings,
     EnvelopeSettings,
-    SkinContributor,
+    Skin,
     SkinStage,
     effective_collagen,
 )
+from anthroforge.core.skin_field import FieldContributor
 
 
 def test_settings_use_shared_undo_and_reject_invalid_values(session):
     original = session.document
     session.command("skin.configure", section="envelope_settings", values={"gap_limit_ratio": 0.01})
-    assert session.document.skin.envelope_settings.gap_limit_ratio == 0.01
+    assert builders.decode(session.document.skin, "FIELD").settings.gap_limit_ratio == 0.01
     session.command("undo")
     assert session.document.skin == original.skin
     session.command("redo")
-    assert session.document.skin.envelope_settings.gap_limit_ratio == 0.01
+    assert builders.decode(session.document.skin, "FIELD").settings.gap_limit_ratio == 0.01
     before = session.document
     with pytest.raises(ValueError, match="finite"):
         session.command(
@@ -35,10 +37,10 @@ def test_settings_use_shared_undo_and_reject_invalid_values(session):
 
 def test_addon_defaults_and_validation_are_preserved():
     assert EnvelopeSettings().minimum_offset_ratio == 1.189424086064195 / 220
-    assert effective_collagen(SkinContributor("a"), "Ear cartilage") == 0
-    assert effective_collagen(SkinContributor("a"), "Femur") == 1
+    assert effective_collagen(FieldContributor("a"), "Ear cartilage") == 0
+    assert effective_collagen(FieldContributor("a"), "Femur") == 1
     assert (
-        effective_collagen(SkinContributor("a", collagen_mode="UNIFORM", collagen=0.3), "Ear")
+        effective_collagen(FieldContributor("a", collagen_mode="UNIFORM", collagen=0.3), "Ear")
         == 0.3
     )
     assert DeformationSettings(fast_handles=1024).fast_handles == 1024
@@ -121,9 +123,9 @@ def test_previous_schema_keeps_geometry_and_empty_skin(session, assembly, tmp_pa
     original = session.document
     legacy_copy(saved, old, version)
     document, resources = storage.read_package(old, session.engine)
-    assert document == original
+    assert replace(document, skin=original.skin) == original
     key = document.entity(root).result.asset
     np.testing.assert_array_equal(
         resources.meshes[key].mesh.array(0), session.assets[key].mesh.array(0)
     )
-    assert not document.skin.final.asset and not document.skin.reference
+    assert document.skin == Skin()

@@ -15,7 +15,7 @@ def test_empty_status_does_not_initialize_native_or_mutate_session(session):
     assert not first.operations["fit"].available and not first.operations["export"].available
     assert session.document is before and tuple(session.history.entries) == history
     assert session._engine is engine and not session.scheduler.blocked
-    with pytest.raises(ValueError, match="reference"):
+    with pytest.raises(ValueError, match="contributing anatomy"):
         session.command("skin.evaluate")
 
 

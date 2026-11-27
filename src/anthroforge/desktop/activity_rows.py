@@ -11,7 +11,7 @@ def job_row(job, names, now):
         elapsed=round((job.finished or now) - (job.started or job.created), 2),
         targets=", ".join(names.get(key) or "Project" for key in sorted(job.outputs)),
         retryable=job.retryable,
-        cancellable=job.active,
+        cancellable=job.active and job.user_cancelable,
         scheduling=scheduling_text(job),
     )
 

@@ -1,13 +1,14 @@
 """Deformation reference lifecycle, source ownership and reload without recomputation."""
 
 import json
-from dataclasses import replace
+from dataclasses import asdict, replace
 
 import numpy as np
 import pytest
 
 from anthroforge.application import skin_assets, skin_reference_evaluation, storage
 from anthroforge.core.skin import SkinStage
+from anthroforge.core.skin_sources import contributors
 from tests.conftest import CUBE
 
 
@@ -15,7 +16,7 @@ def topology(session):
     key = session.command("import", path=str(CUBE), units=1)["entity_id"]
     session.wait()
     mesh = session.document.entity(key).result.asset
-    data = skin_assets.create({}, {})
+    data = skin_assets.create({}, dict(sources=[asdict(r) for r in contributors(session.document)]))
     session.resources.skin[data.digest] = data
     skin = session.document.skin
     settings = replace(skin.deformation_settings, proxy_resolution=8)

@@ -14,7 +14,6 @@ from . import (
     skin_remeshing,
     skin_topology_capture,
 )
-from .skin_evaluation import source_metadata
 from .skin_results import ComputedStage
 
 
@@ -101,7 +100,7 @@ def metadata(
     inputs: Any, output: Any, attempts: Any, sources: Any, loops: Any, guides: Any
 ) -> dict[str, Any]:
     return details(inputs, output, attempts) | dict(
-        sources=[source_metadata(row) for row in sources.sources],
+        sources=[skin_capture.source_metadata(row) for row in sources.sources],
         loops=[asdict(row.identity) for row in loops.sources],
         flow=[asdict(row.identity) for row in guides.sources],
     )

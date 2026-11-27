@@ -71,6 +71,7 @@ class Job:
     publish_ms: float = 0.0
     reads: frozenset[str] = frozenset()
     publish_during_edit: bool = False
+    user_cancelable: bool = True
     restart_on_redo: bool = False
     restart_on_input_change: bool = False
     restart_requested: bool = False
@@ -93,6 +94,10 @@ class Job:
     def retryable(self) -> bool:
         return self.retry is not None and self.state in ("failed", "cancelled")
 
+    def require_cancellation(self, reason: str) -> None:
+        if reason == "explicit_cancel" and not self.user_cancelable:
+            raise ValueError("Automatic draft skin work cannot be cancelled by the user.")
+
     def retire(self) -> None:
         if self.snapshot is not None:
             self.dispatch_revision = self.snapshot.revision
@@ -105,18 +110,18 @@ class Job:
             self.retry = None
 
     def describe(self) -> dict[str, Any]:
-        end = self.finished or monotonic()
         return {
             "id": self.id,
             "label": self.label,
             "state": self.state,
             "outputs": sorted(self.outputs),
             "error": self.error,
-            "elapsed": end - (self.started or self.created),
+            "elapsed": (self.finished or monotonic()) - (self.started or self.created),
             "progress": self.progress,
             "obsolete": self.obsolete,
             "writes": self.writes,
             "retryable": self.retryable,
+            "cancelable": self.user_cancelable and self.active,
             "scheduling": self.scheduling_details(),
         }
 

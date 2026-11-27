@@ -1,34 +1,16 @@
 """Document-owned skin construction; no authored anatomical wrapper or native handles."""
 
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from math import isfinite
 
 from .results import EvaluationResult, ReadRevision
-
-
-def bounded(name: str, value: float, lower: float, upper: float) -> None:
-    if isinstance(value, bool) or not isfinite(value) or not lower <= value <= upper:
-        raise ValueError(f"{name} must be finite and between {lower} and {upper}.")
-
-
-def choice(name: str, value: str, allowed: tuple[str, ...]) -> None:
-    if value not in allowed:
-        raise ValueError(f"Unsupported {name}: {value}.")
-
-
-@dataclass(frozen=True, slots=True)
-class EnvelopeSettings:
-    minimum_offset_ratio: float = 1.189424086064195 / 220.0
-    collagen_depth_ratio: float = (3.1717975628378534 - 1.189424086064195) / 220.0
-    collagen_core_ratio: float = 4.75769634425678 / 220.0
-    collagen_falloff_ratio: float = (13.480139642060877 - 4.75769634425678) / 220.0
-    gap_limit_ratio: float = 0.005
-    gap_strength: float = 1.0
-
-    def __post_init__(self) -> None:
-        limits = (0.02, 0.04, 0.05, 0.10, 1.0, 1.0)
-        for name, limit in zip(self.__dataclass_fields__, limits, strict=True):
-            bounded(name, getattr(self, name), 0, limit)
+from .skin_checkpoints import Checkpoint
+from .skin_draft import AppliedDraftConfiguration, BuilderConfiguration, DraftSettings
+from .skin_field import EnvelopeSettings as EnvelopeSettings
+from .skin_field import effective_collagen as effective_collagen
+from .skin_validation import bounded as bounded
+from .skin_validation import choice as choice
+from .skin_validation import integer as integer
 
 
 @dataclass(frozen=True, slots=True)
@@ -52,12 +34,6 @@ class TopologySettings:
             raise ValueError("Skin symmetry plane requires a nonzero normal.")
 
 
-def integer(name: str, value: int, lower: int, upper: int) -> None:
-    if type(value) is not int:
-        raise ValueError(f"{name} requires an integer.")
-    bounded(name, value, lower, upper)
-
-
 @dataclass(frozen=True, slots=True)
 class DeformationSettings:
     method: str = "LE"
@@ -76,12 +52,6 @@ class DeformationSettings:
 @dataclass(frozen=True, slots=True)
 class SkinContributor:
     owner: str
-    collagen_mode: str = "AUTO"
-    collagen: float = 1.0
-    painted: str = ""
-    gap_mode: str = "INHERIT"
-    gap_limit_ratio: float = 0.005
-    gap_strength: float = 1.0
     density_mode: str = "INHERIT"
     target_quads: int = 1000
     flow: bool = False
@@ -89,12 +59,7 @@ class SkinContributor:
     def __post_init__(self) -> None:
         if not self.owner:
             raise ValueError("Skin contributor requires a source identity.")
-        choice("collagen mode", self.collagen_mode, ("AUTO", "UNIFORM", "PAINTED"))
-        choice("gap mode", self.gap_mode, ("INHERIT", "OVERRIDE"))
         choice("density mode", self.density_mode, ("INHERIT", "SUBTREE_BUDGET"))
-        bounded("collagen", self.collagen, 0, 1)
-        bounded("gap limit", self.gap_limit_ratio, 0, 1)
-        bounded("gap strength", self.gap_strength, 0, 1)
         integer("subtree target quads", self.target_quads, 100, 500000)
 
 
@@ -117,7 +82,6 @@ class SkinStage(EvaluationResult):
 
 @dataclass(frozen=True, slots=True)
 class Skin:
-    envelope_settings: EnvelopeSettings = field(default_factory=EnvelopeSettings)
     topology_settings: TopologySettings = field(default_factory=TopologySettings)
     deformation_settings: DeformationSettings = field(default_factory=DeformationSettings)
     contributors: tuple[SkinContributor, ...] = ()
@@ -131,25 +95,15 @@ class Skin:
     fits: tuple[FittedShortcut, ...] = ()
     construction_stale: bool = False
     revision: int = 0
+    draft_settings: DraftSettings = field(default_factory=DraftSettings)
+    update_mode: str = "DRAFT"
+    applied_draft: AppliedDraftConfiguration | None = None
+    migration_draft: BuilderConfiguration | None = None
+    checkpoints: tuple[Checkpoint, ...] = ()
 
     def __post_init__(self) -> None:
+        choice("skin update mode", self.update_mode, ("DRAFT", "FINAL"))
         if len({item.owner for item in self.contributors}) != len(self.contributors):
             raise ValueError("Skin contributor settings must have unique owners.")
         if len({item.id for item in self.fits}) != len(self.fits):
             raise ValueError("Fitted shortcut results must have unique identities.")
-
-
-def effective_collagen(settings: SkinContributor, name: str) -> float:
-    if settings.collagen_mode != "AUTO":
-        return settings.collagen
-    return 0.0 if any(term in name.lower() for term in ("ear", "cartilage", "nasal")) else 1.0
-
-
-def effective_contributor(skin: Skin, settings: SkinContributor, name: str) -> SkinContributor:
-    gap = settings if settings.gap_mode == "OVERRIDE" else skin.envelope_settings
-    return replace(
-        settings,
-        collagen=effective_collagen(settings, name),
-        gap_limit_ratio=gap.gap_limit_ratio,
-        gap_strength=gap.gap_strength,
-    )

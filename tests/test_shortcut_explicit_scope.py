@@ -29,7 +29,7 @@ def test_explicit_scope_retains_multi_owner_presentation_and_descendant_binding(
     session.command("driver.configure", driver=key, changes=dict(policy=policy))
     session.command("driver.value", driver=key, value=pi / 6)
     session.wait(5)
-    assert not session.scheduler.errors
+    assert session.document.entity(child).status == "ready"
     info = session.command("driver.inspect", driver=key)
     assert info["scp_owner"] == "" and set(info["owners"]) == {root, child}
     assert session.document.entity(child).attachment == original

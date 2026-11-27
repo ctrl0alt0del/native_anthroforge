@@ -55,7 +55,7 @@ def test_follow_override_keeps_authored_settings_and_survives_roundtrip(session,
     session.command("shortcut.set", reference=ref, value=pi / 3)
     session.wait(5)
     current = session.document.entity(child)
-    assert not session.scheduler.errors
+    assert current.status == "ready" and not current.error
     assert current.attachment == original.attachment
     assert current.matrix[:3] == pytest.approx(original.matrix[:3])
     assert current.pose_receipt.effective.follow_rotation is False

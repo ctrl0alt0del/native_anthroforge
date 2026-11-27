@@ -23,7 +23,7 @@ def test_export_freezes_accepted_skin_and_preserves_quads(session, tmp_path):
     path = tmp_path / "skin.obj"
     before = session.document
     result = session.command("skin.export", path=str(path), policy="accepted")
-    session.replace_document(name="Edited after request")
+    session.command("skin.update_mode", mode="DRAFT")
     session.wait()
     points, faces = read(path)
     np.testing.assert_array_equal(points, mesh.array(0))

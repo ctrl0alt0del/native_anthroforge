@@ -206,7 +206,13 @@ def test_cross_scp_endpoints_stay_connected_and_removal_is_local(session):
     session.command("wait", timeout=5)
     assert not session.document.entity(first).deformers
     assert session.document.entity(second).deformers[0].id == bindings[1]
-    assert not session.scheduler.errors
+    assert_connected_results_ready(session, first, second, control)
+
+
+def assert_connected_results_ready(session, first, second, control):
+    results = [session.document.entity(key).result for key in (first, second)]
+    results.append(session.document.control(control).result)
+    assert all(result.status == "ready" and not result.error for result in results)
 
 
 def write_legacy(path, session):

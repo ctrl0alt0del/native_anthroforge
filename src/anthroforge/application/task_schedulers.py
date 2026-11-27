@@ -260,6 +260,7 @@ def construction_schedulers() -> dict[str, TaskScheduler]:
         "skin_envelope": SkinEnvelopeTaskScheduler(),
         "skin_topology": SkinTopologyTaskScheduler(),
         "skin_construction": SkinTopologyTaskScheduler(),
+        "skin_downstream": SkinTopologyTaskScheduler(),
         "skin_reference": SkinReferenceTaskScheduler(),
         "skin_deformation": SkinDeformationTaskScheduler(),
         "skin_fit": SkinFitTaskScheduler(),

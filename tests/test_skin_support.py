@@ -6,6 +6,7 @@ import pytest
 from anthroforge.application import skin_support_capture as capture
 from anthroforge.core import skin_sources
 from anthroforge.core.entities import IDENTITY
+from anthroforge.core.skin_pipeline import RepairRequired
 from anthroforge.native import skin_deformation, skin_support, tissue_parts
 from anthroforge.native.mesh import NativeCancellation
 from tests.test_skin_capture import triangle
@@ -48,9 +49,9 @@ def test_missing_identity_and_cancellation_do_not_rebind(session):
     bigger = session.engine.create_mesh(
         [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]], [0, 1, 2, 3], [0, 4]
     )
-    with pytest.raises(ValueError, match="topology changed"):
+    with pytest.raises(RepairRequired, match="topology changed"):
         skin_support.targets(mesh, bigger, IDENTITY, [0])
-    with pytest.raises(ValueError, match="identity"):
+    with pytest.raises(RepairRequired, match="identity"):
         skin_support.targets(mesh, mesh, IDENTITY, [9])
     token = NativeCancellation(session.engine)
     token.set()

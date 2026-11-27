@@ -39,6 +39,7 @@ class Provider:
     capture: Callable[[Document], Any] | None = None
     cancellation: Callable[[], Event] | None = None
     automatic: bool = True
+    prepare: Callable[[Any], Any] | None = None
 
 
 def item(document: Document, scope: str) -> Any:

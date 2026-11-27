@@ -11,7 +11,7 @@ from anthroforge.native.mesh import NativeCancellation
 
 from .. import attachment_assets, attachment_candidates, curve_sources, surface_providers
 from ..construction_policy import revisions
-from ..inspection_context import freeze
+from ..inspection_context import capture, prepare
 from .providers import Provider
 
 NAME = "fiber_pins.v1"
@@ -45,9 +45,10 @@ def provider(session: Any) -> Provider:
         lambda d, _: scopes(d),
         source,
         check,
-        lambda _: freeze(session),
+        lambda _: capture(session),
         lambda: NativeCancellation(session.engine),
         automatic=False,
+        prepare=prepare,
     )
 
 

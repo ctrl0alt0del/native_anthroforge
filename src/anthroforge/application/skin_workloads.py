@@ -1,10 +1,20 @@
 """Skin admission uses resource metadata only, without preparing geometry on the UI thread."""
 
+from dataclasses import dataclass
 from typing import Any
 
 from anthroforge.core import skin_sources
 from anthroforge.core.results import geometry_asset
 from anthroforge.core.scheduling import Workload
+
+
+@dataclass(frozen=True)
+class SkinWorkload(Workload):
+    worker_threads: int = 0
+
+
+def native_threads(workload: Workload) -> int:
+    return workload.worker_threads if isinstance(workload, SkinWorkload) else 4
 
 
 def counts(resources: Any, document: Any, source: Any) -> tuple[int, int, int]:
@@ -24,17 +34,26 @@ def base_counts(resources: Any, document: Any, sources: Any) -> list[tuple[int, 
     return [mesh_counts(resources.meshes[key].mesh) for key in keys if key in resources.meshes]
 
 
-def estimate(resources: Any, document: Any) -> Workload:
-    sources = skin_sources.contributors(document)
+def sizes_for(resources: Any, document: Any, sources: Any, builder: str) -> Any:
     sizes = [counts(resources, document, source) for source in sources]
-    if document.skin.draft_settings.backend == "AVBD":
+    if builder == "AVBD":
         sizes.extend(base_counts(resources, document, sources))
     envelope = resources.meshes.get(document.skin.envelope.asset)
     if envelope:
         sizes.append(mesh_counts(envelope.mesh))
-    return Workload(
+    return sizes
+
+
+def estimate(resources: Any, document: Any, builder: str = "") -> Workload:
+    from .skin_builder_registry import BUILDERS
+
+    builder = builder or document.skin.draft_settings.backend
+    sources = skin_sources.contributors(document)
+    sizes = sizes_for(resources, document, sources, builder)
+    return SkinWorkload(
         entities=len(sources),
         candidates=sum(row[0] for row in sizes),
         triangles=sum(row[1] for row in sizes),
         bytes=sum(row[2] for row in sizes),
+        worker_threads=BUILDERS[builder].worker_threads,
     )

@@ -125,3 +125,52 @@ def test_skin_envelope_reserves_its_native_team_before_input_capture(setup, monk
     assert request.execution_reason == "Waiting for compute capacity"
     coordinator.cancel_job(request.id)
     release.set()
+
+
+@pytest.mark.parametrize("cpus,capacity,workers", [(None, 1, 1), (1, 1, 1), (2, 1, 1), (24, 23, 4)])
+def test_default_capacity_leaves_headroom_and_bounds_job_concurrency(
+    monkeypatch, cpus, capacity, workers
+):
+    from anthroforge.application import task_resources
+
+    monkeypatch.setattr(task_resources.os, "cpu_count", lambda: cpus)
+    assert task_resources.compute_capacity() == capacity
+    assert task_resources.default_workers() == workers
+
+
+def test_final_skin_deformation_reserves_quality_kernel_team():
+    from anthroforge.application.task_schedulers import SkinDeformationTaskScheduler
+
+    plan = SkinDeformationTaskScheduler().plan(Workload(bytes=100), False)
+    assert plan.resources == ResourceDemand(4, 300)
+
+
+@pytest.mark.parametrize("builder,threads", [("FIELD", 4), ("AVBD", 0)])
+def test_draft_claims_follow_captured_builder_not_pending_selection(session, builder, threads):
+    from anthroforge.application import skin_job_intents, skin_jobs
+    from anthroforge.application.skin_builder_configuration import projected
+    from anthroforge.core.skin_draft import configuration
+
+    intent = skin_job_intents.Intent(configuration(builder, {}), session.skin_pipeline.epoch)
+    job = skin_jobs.make_job(session, "envelope", 0, intent)
+    pending = "AVBD" if builder == "FIELD" else "FIELD"
+    document = projected(session.document, configuration(pending, {}))
+    workload = job.workload(document)
+    assert SkinEnvelopeTaskScheduler().plan(workload, False).resources.threads == threads
+
+
+def test_external_draft_waits_for_other_native_work(setup, monkeypatch):
+    from anthroforge.application.skin_workloads import SkinWorkload
+
+    coordinator, _, _ = setup
+    coordinator.admission = Admission(lambda: 24, lambda: 10**12)
+    coordinator.task_schedulers["skin_envelope"] = SkinEnvelopeTaskScheduler()
+    monkeypatch.setattr("anthroforge.application.worker_memory.budget", lambda: 0)
+    _, release = job(setup, "native")
+    coordinator.tick()
+    request, _ = job(setup, "external")
+    request.kind, request.workload = "skin_envelope", lambda _: SkinWorkload(worker_threads=0)
+    coordinator.tick()
+    assert request.snapshot is None and request.execution_reason == "Waiting for compute capacity"
+    coordinator.cancel_job(request.id)
+    release.set()

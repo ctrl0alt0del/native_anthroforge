@@ -24,10 +24,18 @@ class SkinPanel(QObject):
         self.values = {}
         self.fitting = SkinFitPanel(controller)
         self.exporting = SkinExport(controller)
+        self.operations = controller.session.skin_status.snapshot().operations
         controller.changed.connect(self.refresh)
         controller.selectionChanged.connect(self.refresh)
-        self.unsubscribe = controller.session.skin_status.subscribe(self.changed.emit)
+        self.unsubscribe = controller.session.skin_status.subscribe(self.status_changed)
         self.refresh()
+
+    def status_changed(self):
+        operations = self.controller.session.skin_status.snapshot().operations
+        if operations == self.operations:
+            return
+        self.operations = operations
+        self.changed.emit()
 
     def refresh(self):
         skin = self.controller.session.document.skin
@@ -88,7 +96,6 @@ def context(controller, session):
     return (
         session.workspace.skin_display,
         selected,
-        session.workspace,
         id(item),
         id(session.document.index.entities),
         tuple(skin_pipeline_status.describe(session).items()),

@@ -19,6 +19,7 @@ DOCUMENT_FIELDS = (
     "mirror_rules",
     "shared_mirror_targets",
     "skin",
+    "external_references",
 )
 
 
@@ -29,14 +30,25 @@ class DocumentChanges:
     controls: dict[str, set[str]] = field(default_factory=dict)
     document: set[str] = field(default_factory=set)
     objects: dict[str, set[str]] = field(default_factory=dict)
+    workspaces: dict[int, set[str]] = field(default_factory=dict)
 
     def include(self, other: "DocumentChanges") -> None:
         self.reset |= other.reset
         self.document.update(other.document)
-        for name in ("entities", "controls", "objects"):
+        for name in ("entities", "controls", "objects", "workspaces"):
             target = getattr(self, name)
             for key, values in getattr(other, name).items():
                 target.setdefault(key, set()).update(values)
+
+    def only_workspace(self, names: set[str]) -> bool:
+        return bool(self.workspaces) and not (
+            self.reset
+            or self.entities
+            or self.controls
+            or self.objects
+            or self.document - {"workspaces"}
+            or any(values - names for values in self.workspaces.values())
+        )
 
 
 def changed_fields(before: Any, after: Any) -> set[str]:
@@ -73,6 +85,7 @@ class ChangeJournal:
             record_changes(before.index.controls, after.index.controls),
             {name for name in DOCUMENT_FIELDS if getattr(before, name) != getattr(after, name)},
             record_changes(before.registry.authored, after.registry.authored),
+            workspace_changes(before.workspaces, after.workspaces),
         )
         record_order(delta, before, after)
         self.records.append((self.serial, delta))
@@ -94,3 +107,12 @@ def record_order(delta: DocumentChanges, before: Document, after: Document) -> N
         old, new = getattr(before, name), getattr(after, name)
         if old is not new and tuple(v.id for v in old) != tuple(v.id for v in new):
             delta.document.add(name + ".order")
+
+
+def workspace_changes(before: Any, after: Any) -> dict[int, set[str]]:
+    if before is after:
+        return {}
+    from itertools import zip_longest
+
+    changes = {i: changed_fields(a, b) for i, (a, b) in enumerate(zip_longest(before, after))}
+    return {key: value for key, value in changes.items() if value}

@@ -9,8 +9,8 @@ from anthroforge.core.scheduling import Workload
 from anthroforge.native import inspection as native
 from anthroforge.native.mesh import NativeCancellation
 
+from . import inspection_context
 from . import tissue_inspection_stages as stages
-from .inspection_context import freeze
 from .inspection_queries import definition
 from .previews import Preview, completed
 
@@ -63,7 +63,7 @@ def inspection_job(session: Any, value: Any, kind: str, options: Any) -> Job:
 
 def capture(session: Any, value: Any, kind: str, options: Any, document: Any) -> Any:
     value.state = "running"
-    context = freeze(session)
+    context = inspection_context.capture(session)
     return context, value.target, definition(kind).signature(context, value.target, options)
 
 
@@ -92,6 +92,7 @@ def signature(context: Any, target: str, options: Any) -> Any:
 
 def compute(kind: str, options: Any, captured: Any, cancellation: Any) -> Any:
     context, target, stamp = captured
+    context = inspection_context.prepare(context)
     result = definition(kind).compute(context, target, options, cancellation.handle)
     return context, target, options, stamp, result
 

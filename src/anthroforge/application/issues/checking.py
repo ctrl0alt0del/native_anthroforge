@@ -1,6 +1,6 @@
 """Batched read-only checks submitted to the application's task coordinator."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import partial
 from threading import Event
 from typing import TYPE_CHECKING, Any
@@ -68,12 +68,13 @@ def prepare(
     checks = tuple(listener.reporting.begin(provider.name, scope) for scope in selected)
     listener.tickets[job_id] = checks
     context = provider.capture(document) if provider.capture else document
-    return Input(document, checks, tuple(provider.source(document, s) for s in selected), context)
+    return Input(document, checks, (), context)
 
 
 def compute(
     provider: Provider, captured: Input, cancel: Event
 ) -> tuple[Input, tuple[Outcome, ...]]:
+    captured = prepare_checks(provider, captured)
     rows = []
     for check in captured.checks:
         if cancel.is_set():
@@ -81,6 +82,12 @@ def compute(
         context = captured.document if captured.context is None else captured.context
         rows.append(check_scope(provider, context, check.scope, cancel))
     return captured, tuple(rows)
+
+
+def prepare_checks(provider: Provider, captured: Input) -> Input:
+    context = provider.prepare(captured.context) if provider.prepare else captured.context
+    sources = tuple(provider.source(captured.document, check.scope) for check in captured.checks)
+    return replace(captured, sources=sources, context=context)
 
 
 def check_scope(provider: Provider, document: Document, scope: str, cancel: Event) -> Outcome:

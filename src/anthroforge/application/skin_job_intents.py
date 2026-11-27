@@ -38,7 +38,7 @@ def require(session: Any, intent: Intent, stage: str) -> None:
 
 def prepare(session: Any, intent: Intent, stage: str, document: Any) -> tuple[Any, Any, Any]:
     require(session, intent, stage)
-    return intent.project(document), session.resources.snapshot(), session.preferences.value
+    return document, session.resources.snapshot(), session.preferences.value
 
 
 def inputs(intent: Intent, policy: Any, document: Any) -> Any:

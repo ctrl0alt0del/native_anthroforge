@@ -9,6 +9,7 @@ from anthroforge.core.results import Port, geometry_asset
 from . import mirror_scene, scene_state, surface_scene, tissue_projection
 from .construction_changes import ConstructionChanges, relationships_changed
 from .property_projection import PropertyProjection
+from .workspace_projection import scene_key
 
 
 def entity_key(entity, parent, workspace):
@@ -20,7 +21,7 @@ def entity_key(entity, parent, workspace):
         geometry_asset(entity),
         entity.primitive.kind if entity.primitive else None,
         support,
-        workspace,
+        scene_key(workspace),
     )
 
 
@@ -72,7 +73,9 @@ class SceneProjection:
         session = self.controller.session
         self.require_context(session)
         changes = session.changes.since(self.cursor if session is self.session else -1)
-        full = structural_changes(changes) or self.workspace != session.workspace
+        full = structural_changes(changes) or scene_key(self.workspace) != scene_key(
+            session.workspace
+        )
         self.update_records(changes, full, structural_changes(changes))
         self.prune_records()
         self.synchronize_objects(changes, full)
@@ -89,6 +92,20 @@ class SceneProjection:
         self.keys.clear()
         self.controller.construction.keys.clear()
         self.construction_changes = ConstructionChanges()
+
+    def consume_camera_changes(self):
+        session = self.controller.session
+        if (
+            self.session is not session
+            or self.journal is not session.changes
+            or self.context != session._editing.key
+            or self.controller.last_workspace != session.active_workspace
+        ):
+            return False
+        if not session.changes.since(self.cursor).only_workspace({"camera", "orthographic"}):
+            return False
+        self.remember(session)
+        return True
 
     def synchronize_objects(self, changes, full):
         session = self.controller.session

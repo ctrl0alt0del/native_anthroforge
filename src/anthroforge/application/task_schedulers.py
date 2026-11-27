@@ -309,17 +309,19 @@ class SkinDeformationTaskScheduler(MeasuredTaskScheduler):
             delay_ms=min(cost, MAX_INTERACTIVE_WAIT_MS) if interactive else 0,
             max_wait_ms=MAX_INTERACTIVE_WAIT_MS,
             reason="Retained anatomical sampling and fixed-topology skin deformation",
+            resources=ResourceDemand(4, workload.bytes * 3),
         )
 
 
 class SkinEnvelopeTaskScheduler(MeasuredTaskScheduler):
     def plan(self, workload: Workload, interactive: bool) -> Schedule:
+        from .skin_workloads import native_threads
         from .worker_memory import budget
 
         return Schedule(
             "worker",
             reason="Native tiled skin fields, envelope and source bindings",
-            resources=ResourceDemand(4, budget() + workload.bytes * 3),
+            resources=ResourceDemand(native_threads(workload), budget() + workload.bytes * 3),
         )
 
 

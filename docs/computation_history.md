@@ -17,6 +17,11 @@ Automatic skin targets (2026-11-27) extend R01/R02/R03/R04/R06 with exclusive Dr
 planning, applied builder configuration and immutable AVBD prefix checkpoints. The dated
 record below describes preserved solvers, replay equivalence and qualification limits.
 
+CH-098 updates R02/R04/R06/R07 with semantic camera invalidation, shared readiness caching,
+owned worker preparation, bounded desktop completion and builder-owned CPU admission.
+R03 history/publication contracts and existing numerical kernels remain unchanged.
+See [the execution audit](main_thread_cpu_audit.md) for measurements and remaining main-thread work.
+
 Whole-skeleton update preparation (0.4.2, in progress, 2026-10-29) extends R01/R02,
 A01–A03 and resource publication. It evaluates an owned candidate through the existing
 coordinator and production attachment/path/tissue/skin evaluators. The live document is
@@ -3973,3 +3978,48 @@ topology, pending settings, unavailable AVBD/Retry and extended reopening. Hidde
 show the saved Draft and Final surfaces; the low-cost topology fixture does not establish whole-body
 surface quality. Raw captures and timing reports are local-only. The full gate and portable
 qualification remain tracked in [the task record](tasks/skin-pipeline.md).
+
+## CH-098 — Camera invalidation, owned preparation and CPU admission (2026-11-27)
+
+Baseline: `60b64ec4`. Camera saves previously scheduled mirror checks, invalidated scene
+caches and repeated skin readiness traversal. Semantic workspace deltas, anatomical mirror
+inputs, camera-independent cache keys and shared readiness caching remove those paths.
+Pose-aware mirror publication validation also rejects late results after geometry edits.
+
+Inspection resource validation/source preparation and captured skin intent/read-revision
+assembly now use owned worker payloads. Current-state validation, undo/resource publication
+and Qt mutation remain on the session owner. A desktop 2 ms completion admission window
+defers later results and rotates contexts; it does not preempt atomic publication. Shutdown
+drains cancelled completions without that budget.
+
+The fixed two-worker default becomes a CPU-aware pool capped at four, with one logical CPU
+of admission headroom. Per-job native teams and memory estimates still govern concurrency;
+Final deformation now reserves its four-thread quality kernel. Native algorithms, global
+OpenMP configuration and external runtime thread limits are unchanged. Isolated fitting
+retains its existing reserved-worker executor rather than creating a nested pool.
+
+The final audit also found that AVBD inherited FIELD's four-thread Draft claim despite
+launching an independently threaded external runtime. DraftBuilder now owns its CPU claim:
+four for FIELD and exclusive admission for AVBD. Workload metadata follows the job's captured
+builder configuration, independently of pending UI selection. This avoids oversubscription
+without changing the external solver's numerical or runtime settings.
+
+Measured on a Ryzen 9 7900X3D: the same 256-cube event-loop probe changed from seven camera
+jobs to zero and final maximum ticks from 162.29 to 2.12 ms. Four resolution-220 fields took
+4.66/2.64/1.71 s with one/two/four workers, using 3.02/5.73/11.00 effective cores. The actual
+rendered probe under four jobs had camera callbacks below 1.86 ms but frame gaps up to
+78.30 ms: no claim of 60 FPS or whole-body performance. More worker threads cannot remove
+Python GIL contention, atomic publication cost or rendering bottlenecks.
+
+Rejected alternatives: globally parallelizing pinned kernels, blindly creating a worker for
+every logical CPU, moving Qt/session mutation off-owner, and dropping validation to meet a
+timer budget. Remaining synchronous candidates, full job inventory, evidence limits and
+official threading references: [audit](main_thread_cpu_audit.md). Qualification and recovery:
+[task record](tasks/viewport-worker-responsiveness.md).
+
+Full regression testing exposed two subscription-contract failures caused by suppressing
+notifications along with cache invalidation. The application now retains all notifications;
+SkinPanel filters unchanged eligibility before emitting QML signals. An intermediate rendered
+probe demonstrated why that presentation filter matters: forwarding every notification pushed
+camera callbacks above 25 ms despite cached geometry. Final callbacks returned below 1.86 ms;
+the existing lifecycle contracts and a new unchanged-panel regression pass.

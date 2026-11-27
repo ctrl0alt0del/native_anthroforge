@@ -55,3 +55,4 @@ class DraftBuilder:
     capture: Callable[..., Capture]
     reason: Callable[..., str]
     signature: Callable[..., tuple[str, ...]]
+    worker_threads: int = 0

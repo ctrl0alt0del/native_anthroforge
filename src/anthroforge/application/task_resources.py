@@ -9,6 +9,16 @@ from anthroforge.core.scheduling import ResourceDemand
 from .worker_memory import available
 
 
+def compute_capacity() -> int:
+    """Leave one logical CPU of admission headroom for presentation and the OS."""
+    return max(1, (os.cpu_count() or 1) - 1)
+
+
+def default_workers() -> int:
+    """Four native jobs scale on the measured host; avoid unbounded snapshot concurrency."""
+    return min(4, compute_capacity())
+
+
 def demand(job: Job) -> ResourceDemand:
     return job.assessment.schedule.resources if job.assessment else ResourceDemand()
 
@@ -19,7 +29,9 @@ def threads(row: ResourceDemand, capacity: int) -> int:
 
 class Admission:
     def __init__(
-        self, cpus: Callable[[], int | None] = os.cpu_count, memory: Callable[[], int] = available
+        self,
+        cpus: Callable[[], int | None] = compute_capacity,
+        memory: Callable[[], int] = available,
     ) -> None:
         self.cpus, self.memory = cpus, memory
 

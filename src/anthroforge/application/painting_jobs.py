@@ -6,7 +6,7 @@ from typing import Any
 from anthroforge.core.jobs import Job
 from anthroforge.native.mesh import NativeCancellation
 
-from .inspection_context import freeze
+from . import inspection_context
 from .painting_consumers import consumer
 from .painting_state import require_current
 
@@ -42,7 +42,7 @@ def create_job(session: Any, value: Any, options: Any, cached: Any) -> Job:
 def capture(session: Any, value: Any, options: Any, cached: Any, document: Any) -> Any:
     require_current(session, value)
     value.state = "running"
-    return (None if cached else freeze(session)), cached
+    return (None if cached else inspection_context.capture(session)), cached
 
 
 def compute(kind: str, target: str, options: Any, captured: Any, cancel: Any) -> Any:
@@ -50,7 +50,9 @@ def compute(kind: str, target: str, options: Any, captured: Any, cancel: Any) ->
     return (
         cached
         if cached is not None
-        else consumer(kind).compute(context, target, options, cancel.handle)
+        else consumer(kind).compute(
+            inspection_context.prepare(context), target, options, cancel.handle
+        )
     )
 
 

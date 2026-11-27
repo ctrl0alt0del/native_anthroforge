@@ -74,38 +74,41 @@ def make_job(session: Any, stage: str, origin: int, intent: Any) -> Job:
         skin_stages.POLICIES[stage].title,
         frozenset((str(session.document.id),)),
         partial(skin_job_intents.prepare, session, intent, stage),
-        partial(compute, session, stage),
+        partial(compute, session.engine, stage, intent),
         partial(publish, session, stage, origin, intent),
         key="skin-" + stage,
         kind="skin_" + stage,
-        workload=partial(skin_workloads.estimate, session.resources),
+        workload=partial(
+            skin_workloads.estimate, session.resources, builder=intent.configuration.builder
+        ),
     )
 
 
-def compute(session: Any, stage: str, payload: Any, cancel: Any) -> Any:
+def compute(engine: Any, stage: str, intent: Any, payload: Any, cancel: Any) -> Any:
     document, resources, options = payload
+    document = intent.project(document)
+    reads = revisions(
+        document, skin_job_intents.inputs(intent, skin_stages.POLICIES[stage], document)
+    )
     try:
-        outputs = skin_stages.POLICIES[stage].compute(
-            session.engine, document, resources, cancel, options
-        )
-        return result_payload(document, outputs)
+        outputs = skin_stages.POLICIES[stage].compute(engine, document, resources, cancel, options)
+        return result_payload(document, outputs, reads)
     except IncompleteBuild as error:
-        return result_payload(document, error.stages, str(error))
+        return result_payload(document, error.stages, reads, str(error))
     except CheckpointFailure as error:
-        return document, {}, str(error), error.checkpoints
+        return document, {}, str(error), error.checkpoints, reads
 
 
-def result_payload(document: Any, outputs: Any, error: str = "") -> Any:
+def result_payload(document: Any, outputs: Any, reads: Any, error: str = "") -> Any:
     checkpoints = tuple(c for output in outputs.values() for c in output.checkpoints)
-    return document, outputs, error, checkpoints
+    return document, outputs, error, checkpoints, reads
 
 
 def publish(session: Any, stage: str, origin: int, intent: Any, payload: Any) -> None:
-    document, outputs, error, checkpoints = payload
+    document, outputs, error, checkpoints, reads = payload
     skin_job_intents.require(session, intent, stage)
     policy = skin_stages.POLICIES[stage]
     inputs = partial(skin_job_intents.inputs, intent, policy)
-    reads = revisions(document, inputs(document))
     current = intent.project(session.document)
     if reads != revisions(current, inputs(current)):
         raise ObsoleteInputs("Skin inputs changed before publication.")

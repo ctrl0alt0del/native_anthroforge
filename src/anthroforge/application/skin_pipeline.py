@@ -13,6 +13,7 @@ from . import (
     skin_job_intents,
     skin_jobs,
     skin_stages,
+    skin_state_inputs,
     skin_update_tasks,
 )
 from . import skin_builder_configuration as builders
@@ -68,9 +69,12 @@ class Pipeline:
         self.before = session.document
         self.previous_jobs: set[str] = set()
         self.reason = ""
+        self.observed_inputs = skin_state_inputs.key(session.document)
 
     def changed(self) -> None:
-        self.dirty = True
+        current = skin_state_inputs.key(self.session.document)
+        self.dirty |= current != self.observed_inputs
+        self.observed_inputs = current
 
     def begin(self) -> None:
         self.before = self.session.document
@@ -133,7 +137,7 @@ class Pipeline:
     def request(self) -> None:
         config = self.pending_config or builders.automatic(self.session.document.skin)
         doc = builders.projected(self.session.document, config)
-        state = skin_assessment.assess(doc, self.session.resources)
+        state = self.session.skin_status.pipeline_inputs(config)
         planned = plan(doc.skin.update_mode, state, self.handoff)
         self.reason = planned.reason
         stage = self.repair or planned.stage

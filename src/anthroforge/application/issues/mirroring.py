@@ -1,6 +1,5 @@
 """Cheap structural mirror findings are independent of reflected geometry readiness."""
 
-from dataclasses import asdict
 from threading import Event
 from typing import Any
 
@@ -11,20 +10,14 @@ from .providers import Provider
 
 
 def source(document: Any, scope: str) -> Any:
-    return repr(document.mirrors.signature), repr(shared_state(document))
-
-
-def shared_state(document: Any) -> Any:
-    return tuple(
-        (
-            asdict(v),
-            document.object(v.source),
-            tuple(
-                document.object(ref.target)
-                for _, ref in mirror_bindings.references(document.object(v.source))
-            ),
-        )
-        for v in document.shared_mirror_targets
+    return (
+        document.entities,
+        document.controls,
+        document.objects,
+        document.mirror_rules,
+        document.shared_mirror_targets,
+        document.junctions,
+        document.attachments_enabled,
     )
 
 
@@ -105,13 +98,22 @@ def missing(document: Any, row: Any) -> Issue:
 
 
 def provider(session: Any) -> Provider:
-    from ..inspection_context import freeze
+    from ..inspection_context import capture, prepare
 
     return Provider(
         "mirroring.v1",
         lambda d: {"document"} if d.mirror_rules else set(),
-        lambda d, c: {"document"} if c.document or c.objects or c.entities or c.controls else set(),
+        affected,
         source,
         check,
-        lambda _: freeze(session),
+        lambda _: capture(session),
+        prepare=prepare,
     )
+
+
+def affected(document: Any, changes: Any) -> set[str]:
+    settings = {"mirror_rules", "shared_mirror_targets", "junctions", "attachments_enabled"}
+    relevant = (
+        changes.document & settings or changes.objects or changes.entities or changes.controls
+    )
+    return {"document"} if relevant else set()

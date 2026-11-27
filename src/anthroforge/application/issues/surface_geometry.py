@@ -10,7 +10,7 @@ from anthroforge.native import inspection
 from anthroforge.native.mesh import NativeCancellation
 
 from .. import inspection_surfaces, spatial_evidence
-from ..inspection_context import freeze
+from ..inspection_context import capture, prepare
 from . import tissue_geometry
 from .providers import Provider
 
@@ -40,9 +40,10 @@ def provider(session: Any) -> Provider:
         affected,
         source,
         check,
-        lambda _: freeze(session),
+        lambda _: capture(session),
         lambda: NativeCancellation(session.engine),
         automatic=False,
+        prepare=prepare,
     )
 
 

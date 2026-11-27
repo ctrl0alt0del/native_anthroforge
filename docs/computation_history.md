@@ -3973,3 +3973,35 @@ topology, pending settings, unavailable AVBD/Retry and extended reopening. Hidde
 show the saved Draft and Final surfaces; the low-cost topology fixture does not establish whole-body
 surface quality. Raw captures and timing reports are local-only. The full gate and portable
 qualification remain tracked in [the task record](tasks/skin-pipeline.md).
+
+## 2026-11-27 — Camera invalidation, owned preparation and CPU admission
+
+Baseline: `60b64ec4`. Camera saves previously scheduled mirror checks, invalidated scene
+caches and repeated skin readiness traversal. Semantic workspace deltas, anatomical mirror
+inputs, camera-independent cache keys and shared readiness caching remove those paths.
+Pose-aware mirror publication validation also rejects late results after geometry edits.
+
+Inspection resource validation/source preparation and captured skin intent/read-revision
+assembly now use owned worker payloads. Current-state validation, undo/resource publication
+and Qt mutation remain on the session owner. A desktop 2 ms completion admission window
+defers later results and rotates contexts; it does not preempt atomic publication. Shutdown
+drains cancelled completions without that budget.
+
+The fixed two-worker default becomes a CPU-aware pool capped at four, with one logical CPU
+of admission headroom. Per-job native teams and memory estimates still govern concurrency;
+Final deformation now reserves its four-thread quality kernel. Native algorithms, global
+OpenMP configuration and external runtime thread limits are unchanged. Isolated fitting
+retains its existing reserved-worker executor rather than creating a nested pool.
+
+Measured on a Ryzen 9 7900X3D: the same 256-cube event-loop probe changed from seven camera
+jobs to zero and maximum ticks from 162.29 to 2.22 ms. Four resolution-220 fields took
+4.66/2.64/1.71 s with one/two/four workers, using 3.02/5.73/11.00 effective cores. The actual
+rendered probe under four jobs had camera callbacks below 1.83 ms but frame gaps up to
+75.16 ms: no claim of 60 FPS or whole-body performance. More worker threads cannot remove
+Python GIL contention, atomic publication cost or rendering bottlenecks.
+
+Rejected alternatives: globally parallelizing pinned kernels, blindly creating a worker for
+every logical CPU, moving Qt/session mutation off-owner, and dropping validation to meet a
+timer budget. Remaining synchronous candidates, full job inventory, evidence limits and
+official threading references: [audit](main_thread_cpu_audit.md). Qualification and recovery:
+[task record](tasks/viewport-worker-responsiveness.md).

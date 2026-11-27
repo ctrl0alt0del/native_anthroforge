@@ -64,13 +64,21 @@ OS affinity or a hard limit on external numerical processes.
   camera-triggered domain jobs; camera callbacks max 1.83 ms. Frame p95/max 45.56/75.16 ms
   versus idle 40.35/67.15 ms. This synthetic overlapping-cube scene is not a whole-body FPS claim.
   Screenshot inspected; raw results in `build/viewport-worker-review`.
-- Full gate is running. Portable package and final architecture/audit documentation remain.
+- Native build and six CTests, native style checks and PowerShell checks pass. QML check
+  initially failed because its default SDK path is checkout-local; resumed with explicit
+  shared SDK path and passed (186 QML files / 46 types, zero API errors). Full pytest is running.
+- Camera keyboard/buttons/menu, restore, focus/rebinding, workspace and persistence acceptance
+  passed with a resolution-24 setup fixture. The original production-resolution setup exceeded
+  that older script's four-second settle deadline before reaching its camera assertions.
+- Portable app built from `78c6ad41`; relocated minimal-PATH suite is running. A separate
+  packaged camera/mirror command probe passed: zero camera jobs, real rule edit still starts jobs.
+- Main-thread/CPU audit and architecture/computation history have been written. They explicitly
+  retain synchronous API candidates and note GIL, rendering and atomic-publication limits.
 
 ## Next actions
 
-1. Finish the development gate and portable application qualification.
-2. Record main-thread audit, CPU limits, measured results and preserved contracts.
-3. Review final diff, reconcile upstream and integrate after validation.
+1. Finish the full pytest/numerical/doctor checks and relocated application qualification.
+2. Record final evidence, review diff and integrate after validation. Origin/main still at baseline.
 
 ## Recovery inputs
 

@@ -1179,8 +1179,9 @@ or Python optimization loop is introduced.
 
 The October 28 skin execution fix (numerical/runtime qualification complete) isolates the pinned
 gap/tile/binding/quality kernels in an OpenMP object target with a private query namespace.
-Their source limit is four threads; the same coordinator reserves four CPUs for envelope
-jobs and all CPUs for combined builds. Routing retains its serial target. OpenMP cannot
+Their source limit is four threads; the same coordinator reserves four CPUs for envelope,
+reference, fitting and final-deformation jobs, and all CPUs for combined builds. Routing
+retains its serial target. OpenMP cannot
 silently disappear from the skin target. Source triangles and cancellation tokens remain
 owned for the whole call; batched query/binding validation precedes parallel work and
 cancellation is reported after the team joins. Post-smoothing field release follows the
@@ -1208,6 +1209,18 @@ Profiler snapshots account for retained skin data and preparation; parent fittin
 fully attribute isolated sample-session internals. This limitation remains explicit.
 
 ## Cache ownership and display publication (0.4.2)
+
+Camera and worker responsiveness (2026-11-27): workspace field deltas let scene projection
+consume camera-only saves without rebuilding geometry. Scene cache keys omit camera and
+orthographic fields; shared skin readiness keys retain immutable domain inputs and builder
+configuration. Mirroring observes anatomical inputs, including pose, and excludes workspace
+presentation. Inspection resource selection and captured skin read-revision preparation run
+on owned workers; live validation and atomic installation stay on the session owner.
+Desktop completion has a shared 2 ms admission window with rotating context order; one
+atomic result may overrun it. The common pool admits up to four jobs, bounded by logical
+CPU count minus one, with per-kind native-team and memory reservations.
+See [the execution and CPU audit](main_thread_cpu_audit.md) for all registered job families,
+remaining synchronous candidates, measured limits and ownership diagrams.
 
 An engine-owned CacheBudget coordinates existing ResourceCache instances under one admission lock.
 Native immutable mesh allocation receipts deduplicate aliases and resources shared across

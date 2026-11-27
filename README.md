@@ -148,12 +148,14 @@ native parity, profiling, offscreen interaction and relocated portable evidence.
 A standalone anatomical construction editor for Windows, built with a shared Python
 application core, C++ geometry and attachment kernels, and a Qt Quick 3D desktop.
 
-Open **AnthroForge.exe** in the complete portable folder `dist/0.4.0/AnthroForge.dist`.
+Open **AnthroForge.exe** in the complete portable folder `dist/0.4.3/AnthroForge.dist`.
 Builds use `dist/<version>/AnthroForge.dist`, replacing the previous build of the same version.
 Do not add feature/task suffixes. Running installations remain intact until closed.
 Start with [the walkthrough](docs/quickstart.md) and the included
 [cube fixture](examples/primitives/cube.obj). Keep the entire distribution folder
 together. The executable supports desktop use and a numerical headless JSON API.
+The packaged AVBD skin builder includes its numerical runtime; no environment variable,
+Python installation or separate checkout is needed. See [skin workflow](docs/skin_workflow.md).
 
 Start construction with [the curves/fibers/images walkthrough](docs/construction_020.md)
 or [the shared API example](examples/construction.json). Curves use Bézier, exact polyline

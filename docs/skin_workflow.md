@@ -125,11 +125,13 @@ are retained only in the current session.
 Automatic recovery copies use the ordinary format: accepted results remain recoverable,
 but construction checkpoints must be rebuilt. Use an extended project save to retain them.
 
-AVBD requires its separately installed experimental numerical runtime. Set
-`ANTHROFORGE_AVBD_RUNTIME` to the runtime worktree containing its `.venv`,
-`tools/runtime/skin` modules and built native tools. The desktop/portable application ships
-the worker adapter, not these numerical dependencies. An unavailable runtime is reported
-without replacing accepted Draft. FIELD does not require this runtime.
+The Windows portable app includes AVBD's interpreter, numerical dependencies and native
+solvers. Launch **AnthroForge.exe** from the complete app folder; no Python installation,
+environment variable or separate runtime checkout is needed. Keep the `_runtime/avbd`
+folder with the app when moving it. An incomplete bundle reports an error without replacing
+accepted Draft. AVBD remains experimental and retains its NVIDIA GPU/driver requirements.
+Source development can still select a qualified runtime with `ANTHROFORGE_AVBD_RUNTIME`;
+packaged applications ignore that override. FIELD remains independent of AVBD.
 
 **Export OBJ…** writes only the skin mesh, retaining polygon/quad connectivity in metres
 and application axes. It does not export anatomy, fit bones, weights or drivers. For

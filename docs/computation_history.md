@@ -4036,3 +4036,28 @@ rejected because the defect belongs to presentation. Controller regressions cove
 order, reparent/undo, selection, controls and tissues; native-window acceptance covers
 collapse/reopen and search. No new performance speedup is claimed. See the
 [qualification and delivery record](tasks/anatomy-tree-order.md).
+
+## CH-100 — Self-contained packaged AVBD execution (2026-11-27)
+
+Portable 0.4.3 shipped only the checkpoint adapter and failed before generation unless a
+developer supplied an external runtime checkout. Packaging now owns a private CPython
+image, wheel dependency closure, qualified Python orchestration and native solvers.
+The existing native subprocess boundary, job-owned files, solver algorithms, admission,
+checkpoint collection and acceptance rules remain unchanged. Source development retains
+its explicit override; packaged discovery requires its own complete runtime.
+
+Relative isolated interpreter paths and private/system subprocess PATH remove developer
+environment coupling. Runtime manifests fingerprint all copied inputs, so relocation
+preserves checkpoint compatibility and changes to dependencies invalidate prefixes.
+External-checkout checkpoints rebuild conservatively; accepted saved surfaces remain.
+Copying an editable venv was rejected because its launcher and paths are not portable;
+compiling a second worker would unnecessarily alter dynamic imports/subprocess entry points.
+Release evidence (final `59adb7a4`, baseline `ec2f786b`): the relocated executable generated SCP,
+limb and VCP cases with a minimal PATH, retained/reused checkpoints and completed fixed-topology
+Final updates. Normal canonical launch plus UI builder selection produced visible, accepted
+AVBD skin with 690 finite vertices and 1,376 triangles. Bundle file hashes stayed unchanged
+after generation and imported numerical modules resolved exclusively inside the image.
+The compiled application rejects an incomplete private image even when build metadata is
+missing; it retains the accepted Draft and never falls back to a developer checkout.
+Full package/GUI qualification and limitations are tracked in the
+[delivery record](tasks/bundled-avbd-runtime.md). No speedup or broader GPU compatibility is claimed.

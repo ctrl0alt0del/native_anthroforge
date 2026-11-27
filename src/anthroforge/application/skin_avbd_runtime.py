@@ -9,7 +9,7 @@ WORKER = Path("tools/runtime/skin/application_worker.py")
 
 
 def installed() -> tuple[Path, Path]:
-    if (PACKAGE / "build.json").is_file():
+    if "__compiled__" in globals() or (PACKAGE / "build.json").is_file():
         return bundled(PACKAGE / "avbd")
     root = Path(os.environ.get("ANTHROFORGE_AVBD_RUNTIME", PACKAGE.parents[2])).resolve()
     python = root / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")

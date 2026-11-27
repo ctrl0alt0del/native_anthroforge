@@ -31,6 +31,23 @@ def test_packaged_runtime_ignores_external_override(tmp_path, monkeypatch):
     assert runtime.installed() == (root, root / "python/python.exe")
 
 
+def test_compiled_runtime_ignores_override_when_build_metadata_is_missing(tmp_path, monkeypatch):
+    root = package(tmp_path, monkeypatch)
+    (runtime.PACKAGE / "build.json").unlink()
+    monkeypatch.setitem(runtime.__dict__, "__compiled__", object())
+    monkeypatch.setenv("ANTHROFORGE_AVBD_RUNTIME", str(tmp_path / "external"))
+    assert runtime.installed() == (root, root / "python/python.exe")
+
+
+def test_compiled_runtime_does_not_fall_back_without_either_manifest(tmp_path, monkeypatch):
+    root = package(tmp_path, monkeypatch)
+    (runtime.PACKAGE / "build.json").unlink()
+    (root / "manifest.json").unlink()
+    monkeypatch.setitem(runtime.__dict__, "__compiled__", object())
+    with pytest.raises(ValueError, match="Reinstall the complete app folder"):
+        runtime.installed()
+
+
 @pytest.mark.parametrize("missing", ("manifest.json", "python/python.exe", str(runtime.WORKER)))
 def test_incomplete_package_never_uses_external_runtime(tmp_path, monkeypatch, missing):
     root = package(tmp_path, monkeypatch)

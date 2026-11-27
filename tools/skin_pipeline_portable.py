@@ -51,11 +51,15 @@ def verify_source(values):
 
 def unavailable(executable, cwd):
     manifest = executable.parent / "anthroforge/_runtime/avbd/manifest.json"
+    identity = manifest.parents[1] / "build.json"
+    build = identity.read_bytes()
     original = manifest.read_bytes()
     try:
+        identity.unlink()
         manifest.write_text("{}", encoding="utf-8")
         verify_unavailable(executable, cwd)
     finally:
+        identity.write_bytes(build)
         manifest.write_bytes(original)
 
 

@@ -116,7 +116,7 @@ preserves the actual numerical sources and vendor headers, including uncommitted
 inputs. Never replace those inputs silently with a different solver revision.
 Run `tools/skin_pipeline_portable.py PATH_TO_EXE OUTPUT_DIR` against a disposable relocated
 package to check fresh AVBD generation, damaged-bundle recovery, checkpoint reuse and Final
-updates with a minimal PATH. It temporarily damages/restores that copy's manifest to test
+updates with a minimal PATH. It temporarily damages/restores that copy's manifests to test
 failure retention. Normal-launch GUI generation remains a separate acceptance check.
 `AF_PACKAGE_OUTPUT` remains available for temporary qualification under `build/` or the
 OS temporary directory. Temporary and worktree outputs do not count as delivered builds:

@@ -3,7 +3,7 @@
 - Task branch: `codex/bundled-avbd-runtime`
 - Integration branch: `main`
 - Starting revision: `ec2f786b`
-- Status: package delivered and normal-launch GUI passed; full regression gate in progress
+- Status: normal-launch GUI passed; final missing-metadata guard rebuild in progress
 - Last updated: November 27, 2026, Europe/Bucharest
 - Active writer: desktop AVBD packaging chat
 
@@ -37,6 +37,10 @@ and verify actual GUI generation as well as isolated runtime/package checks.
 - BR-6: Package checkpoint identity uses the complete manifest, including interpreter,
   wheels, helpers and source provenance. It is independent of installation location.
   Old external-runtime checkpoints conservatively rebuild; accepted saved meshes survive.
+- BR-7: Final review found build-metadata deletion could select development discovery.
+  Use Nuitka's documented module `__compiled__` marker as well as build metadata. Two
+  regressions failed before the one-line correction; the packaged damaged-bundle check
+  now removes build identity too. Rebuild/retest before final delivery.
 
 Official references: [CPython Windows embedding](https://docs.python.org/3.12/using/windows.html#the-embeddable-package),
 [Qt deployment](https://doc.qt.io/qtforpython-6/deployment/deployment-pyside6-deploy.html),
@@ -70,7 +74,8 @@ Build logs are local-only under the implementation checkout's `build/bundled-avb
 portable/GUI evidence is under `E:/development/anthroforge/build/bundled-avbd-release-check`.
 The first prototype source-archive experiment included unnecessary Boost test/docs data and
 was stopped; the qualified bundle archives the used headers/licenses instead.
-Remaining: await development gate exec session `25061`, refresh canonical source archive and
+Remaining: await development gate exec session `25061`, finish final guard rebuild and repeat
+packaged/UI acceptance, refresh canonical source archive and
 qualification docs, review final diff, commit/push and merge/push main. Native solver/GPU
 requirements are unchanged; this task does not establish whole-body numerical quality.
 

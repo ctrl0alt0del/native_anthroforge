@@ -28,11 +28,23 @@ and retained selection; expanded screenshot visually inspected. The acceptance t
 settles hover layout before clicking the expand button. Ruff/format and the 15-line
 function limit pass. See [CH-099](../computation_history.md) for the preserved boundaries.
 
-Next: run the complete development gate, package and qualify the app. Deliver the same version to
+- Native build, six CTests, native style and PowerShell checks pass. Ruff/format, mypy
+  (711 files), lock consistency and QML validation pass; full pytest is still running.
+- Standalone runtime `e25a9f52` was built cleanly and relocated to the main checkout's
+  ignored `build/anatomy-tree-delivery-20261127/AnthroForge.dist`. All 3,424 files match
+  the source package by SHA-256 (421,411,838 bytes).
+- Minimal-PATH native doctor, primitive creation/inspection/render and GUI smoke pass.
+  A packaged native window verified collapse as Root/Arm/Leg/Foot and reopening as
+  Root/Arm/Upper/Hand/Lower/Leg/Foot. The generated test project was saved before closing.
+- The first empty-group fixture used surface attachments and correctly failed packaged
+  warning-free startup. The acceptance fixture now uses Object Origin attachments. Its
+  source GUI and packaged startup were rerun successfully; application code is unchanged.
+
+Next: finish the full regression gate, then deliver the same version to
 `E:/development/anthroforge/dist/0.4.3/AnthroForge.dist` with its matching source archive.
 
-The canonical app is currently running. Preserve its session and ask the user to close
-it only after a qualified replacement is ready. The user's main checkout contains
+Recheck the canonical app before publication; preserve any running session and ask the
+user to close it only after a qualified replacement is ready. The user's main checkout contains
 unrelated assembly changes; implementation uses the clean existing instructions worktree.
 
 ## Recovery inputs

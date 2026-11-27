@@ -8,7 +8,7 @@ from PySide6.QtTest import QTest
 from shiboken6 import delete
 from ui_acceptance import click, find
 
-from anthroforge.core.entities import SCP
+from anthroforge.core.entities import SCP, Attachment
 from anthroforge.desktop.app import create_engine
 from anthroforge.desktop.controller import Controller
 from anthroforge.desktop.qt_profiler import profiler_application
@@ -29,7 +29,12 @@ def entities():
         ("lower", "arm"),
         ("hand", "upper"),
     ]
-    return tuple(SCP(key.title(), id=key, parent=parent) for key, parent in links)
+    return tuple(group(key, parent) for key, parent in links)
+
+
+def group(key, parent):
+    anchor = Attachment(parent_mode="OBJECT_ORIGIN", child_mode="OBJECT_ORIGIN")
+    return SCP(key.title(), id=key, parent=parent, attachment=anchor)
 
 
 def setup(controller):

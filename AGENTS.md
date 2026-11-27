@@ -30,6 +30,7 @@
 
 ## Validation and delivery
 
+- Deliver every completed app build to the user's main project directory at `dist/<version>/AnthroForge.dist`. A new version gets a new folder; an unchanged version replaces its existing complete build. Promote qualified worktree or temporary builds to this location before reporting delivery, and preserve other versions. Refresh the matching `dist/AnthroForge-<version>-source.zip` archive too.
 - Verify the requested outcome and relevant failure cases through observable behavior. Run checks appropriate to the change; documentation-only edits need content and link review rather than an application rebuild.
 - Support performance claims with representative measurements and visual or interactive claims with actual inspection. Report automated, GUI and packaging checks separately; passing tests alone does not establish design quality.
 - Review the final diff for scope, correctness and maintainability. Report what changed, validation results, remaining limitations and any uncommitted or unpushed task work accurately.

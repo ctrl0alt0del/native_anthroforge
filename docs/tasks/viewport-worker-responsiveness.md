@@ -3,7 +3,7 @@
 - Task branch: `codex/viewport-worker-responsiveness`
 - Integration branch: `main`
 - Starting revision: `60b64ec4`
-- Status: implementation and qualification complete; integration pending
+- Status: complete; merged and pushed to main
 - Last updated: 2026-11-27, Europe/Bucharest
 - Active writer: desktop chat, primary agent only
 
@@ -83,7 +83,7 @@ Runtime source revision: `79371b77`. Final portable executable (local-only):
 The audit, diagrams, remaining synchronous candidates and CPU limits are in
 [main_thread_cpu_audit.md](../main_thread_cpu_audit.md); computation record is CH-098.
 
-Qualification is complete. Final fetch/review and normal integration into main remain.
+Qualification is complete. Merged and pushed to main as `042807de` on 2026-11-27.
 The unrelated dirty root checkout and the external AVBD runtime are unchanged.
 
 ## Local evidence

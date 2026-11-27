@@ -17,6 +17,13 @@ if TYPE_CHECKING:
 SECTIONS = ("draft_settings", "envelope_settings", "topology_settings", "deformation_settings")
 
 
+def update_mode(session: "Session", mode: str) -> None:
+    skin = session.document.skin
+    updated = replace(skin, update_mode=mode)
+    if updated != skin:
+        session.replace_document(skin=updated)
+
+
 def reset_envelope(session: "Session") -> None:
     configure(session, "envelope_settings", asdict(EnvelopeSettings()))
 

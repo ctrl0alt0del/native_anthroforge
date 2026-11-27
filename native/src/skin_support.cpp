@@ -3,6 +3,7 @@
 #include "material_binding.hpp"
 
 namespace af::skin::support {
+struct Incompatible:std::runtime_error { using std::runtime_error::runtime_error; };
 static M4 frame(const double* input) {
     if(!input) throw std::runtime_error("Missing skin support frame.");
     const M4 value=Eigen::Map<const M4>(input);
@@ -33,11 +34,11 @@ static std::vector<double> masses(const Mesh& mesh,const Vertices& xyz,uint64_t 
 static void validate(const Mesh& before,const Mesh& after,const int* ids,int count) {
     if(!ids||count<1||count>80) throw std::runtime_error("Invalid retained skin support samples.");
     if(before.tissue.kind!=after.tissue.kind||before.tissue.source_count!=after.tissue.source_count)
-        throw std::runtime_error("Skin support material identity changed; rebuild the reference.");
+        throw Incompatible("Skin support material identity changed; rebuild draft skin.");
     if(before.tissue.kind<3&&(before.vertices.rows()!=after.vertices.rows()||before.corners!=after.corners||before.offsets!=after.offsets))
-        throw std::runtime_error("Skin support topology changed; rebuild the reference.");
+        throw Incompatible("Skin support topology changed; rebuild draft skin.");
     for(int i=0;i<count;++i) if(ids[i]<0||ids[i]>=before.vertices.rows())
-        throw std::runtime_error("Skin support sample identity is unavailable.");
+        throw Incompatible("Skin support sample identity is unavailable.");
 }
 static V3 position(const Mesh& before,const binding::Index& after,int id,uint64_t cancel) {
     if(&before==&after.current||before.tissue.kind<3) return after.current.vertices.row(id);
@@ -78,6 +79,8 @@ int af_skin_support_targets(uint64_t reference,uint64_t current,const double* ma
         if(!out) throw std::runtime_error("Missing skin support output.");
         const auto before=af::mesh(reference),after=af::mesh(current);
         af::skin::support::targets(*before,*after,af::skin::support::frame(matrix),ids,count,out,cancel); return 0;
+    } catch(const af::skin::support::Incompatible& error) { af::set_error(error.what()); return 2;
+    } catch(const af::binding::MaterialUnavailable& error) { af::set_error(error.what()); return 2;
     } catch(const std::exception& error) { af::set_error(error.what()); return 1; }
 }
 int af_skin_support_weights(const double* masses,const int* counts,int sources,double* weights,int count) {

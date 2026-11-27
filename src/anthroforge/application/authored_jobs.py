@@ -1,7 +1,7 @@
 """Async authored publication belongs to its initiating undo step, across later edits."""
 
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from functools import partial
 from typing import TYPE_CHECKING, Any
 
@@ -19,8 +19,10 @@ if TYPE_CHECKING:
 class Capture:
     reads: tuple[ReadRevision, ...]
     restart: Callable[[], Any]
+    projection: Callable[[Document], Document] | None = field(default=None, kw_only=True)
 
     def matches(self, document: Document) -> bool:
+        document = self.projection(document) if self.projection else document
         return matches(document, EvaluationResult(inputs=self.reads))
 
 

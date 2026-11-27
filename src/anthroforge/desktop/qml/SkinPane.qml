@@ -12,10 +12,21 @@ UiScrollView {
     ColumnLayout {
         width: pane.availableWidth; spacing: Theme.gap
         Label { text: "Skin"; color: Theme.text; font.pixelSize:16; font.bold:true }
+        UiCheck {
+            objectName:"skinFinalMode"; text:"Update final skin"; Layout.fillWidth:true
+            checked:pane.state.update_mode === "FINAL"
+            hint:"Off: update Draft after anatomy edits. On: update the final pipeline."
+            onClicked:App.runtime.run("skin.update_mode",{mode:checked ? "FINAL" : "DRAFT"})
+        }
+        Label {
+            objectName:"skinConfigurationState"; Layout.fillWidth:true
+            text:pane.state.configuration_state || ""; color:Theme.muted
+            elide:Text.ElideRight; maximumLineCount:1
+        }
         UiButton { objectName:"skinBuild"; text:"Build Skin"; Layout.fillWidth:true; enabled:pane.readiness.build.available; hint:pane.readiness.build.reason; onClicked:App.runtime.run("skin.build",{}) }
         UiCombo {
             objectName:"skinDisplay"; Layout.fillWidth:true; textRole:"label"; valueRole:"id"
-            model:[{id:"AUTO",label:"Show latest skin"},{id:"ENVELOPE",label:"Show envelope"},{id:"TOPOLOGY",label:"Show topology"},{id:"FINAL",label:"Show final skin"},{id:"NONE",label:"Hide skin"}]
+            model:[{id:"AUTO",label:"Follow Draft / Final mode"},{id:"ENVELOPE",label:"Show draft skin"},{id:"TOPOLOGY",label:"Show topology"},{id:"FINAL",label:"Show final skin"},{id:"NONE",label:"Hide skin"}]
             currentIndex:indexOfValue(pane.state.display || "AUTO")
             onActivated:App.runtime.run("workspace.update",{skin_display:currentValue})
         }

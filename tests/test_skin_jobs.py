@@ -64,6 +64,7 @@ def test_failed_rebuild_keeps_accepted_envelope(session, monkeypatch):
 
 def test_envelope_findings_are_advisory_and_owned_by_accepted_revision(session, monkeypatch):
     imported(session, monkeypatch)
+    previous = session.document.skin.envelope
     stage = build(session)
     rows = session.issues.presentation.query({"provider": "skin.v1"})["records"]
     assert rows and all(row["stage"] == "envelope" for row in rows)
@@ -71,4 +72,5 @@ def test_envelope_findings_are_advisory_and_owned_by_accepted_revision(session, 
     assert session.document.skin.envelope == stage
     session.command("undo")
     session.wait()
-    assert not session.issues.presentation.query({"provider": "skin.v1"})["records"]
+    rows = session.issues.presentation.query({"provider": "skin.v1"})["records"]
+    assert rows and all(row["evidence"]["geometry"] == previous.asset for row in rows)

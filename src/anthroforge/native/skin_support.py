@@ -5,6 +5,8 @@ from typing import Any
 
 import numpy as np
 
+from anthroforge.core.skin_pipeline import RepairRequired
+
 from .mesh import D, U, doubles, pointer
 from .skin_fields import INT
 
@@ -57,9 +59,11 @@ def targets(reference: Any, current: Any, world: Any, ids: Any, cancel: int = 0)
         raise ValueError("Skin sample identities must be a flat array.")
     output = np.empty((len(ids), 3))
     args = reference.handle, current.handle, pointer(matrix), ids.ctypes.data_as(INT), len(ids)
-    current.engine.check(
-        current.engine.library.af_skin_support_targets(*args, pointer(output), cancel)
-    )
+    code = current.engine.library.af_skin_support_targets(*args, pointer(output), cancel)
+    if code == 2:
+        reason = current.engine.library.af_last_error().decode("utf-8", errors="replace")
+        raise RepairRequired("construction", reason)
+    current.engine.check(code)
     return output
 
 

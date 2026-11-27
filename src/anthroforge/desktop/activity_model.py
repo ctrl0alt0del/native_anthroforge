@@ -4,6 +4,8 @@ from time import perf_counter
 
 from PySide6.QtCore import Property, Qt, Signal
 
+from anthroforge.core.jobs import TERMINAL
+
 from .activity_rows import job_row
 from .record_model import RecordModel
 
@@ -47,7 +49,7 @@ class ActivityModel(RecordModel):
         self.update_summary()
 
     def update_summary(self):
-        active = sum(row["cancellable"] for row in self.rows)
+        active = sum(row["jobState"] not in TERMINAL for row in self.rows)
         failed = any(row["jobState"] == "failed" for row in self.rows)
         if (active, failed) != (self._active, self._failed):
             self._active, self._failed = active, failed

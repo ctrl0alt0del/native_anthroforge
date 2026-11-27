@@ -67,9 +67,18 @@ class SkinPanel(QObject):
 
 def authored(skin):
     data = asdict(skin)
+    data["configuration_state"] = configuration_state(skin)
     if skin.draft_settings.backend == "FIELD":
         data["envelope_settings"] = asdict(skin_builder_configuration.decode(skin).settings)
     return data
+
+
+def configuration_state(skin):
+    applied = skin.applied_draft
+    if applied is None:
+        return "Saved draft provenance unknown" if skin.envelope.asset else "No accepted draft yet"
+    pending = skin.draft_settings.configuration() != applied.configuration
+    return f"Applied: {applied.configuration.builder}" + (" · settings pending" if pending else "")
 
 
 def context(controller, session):

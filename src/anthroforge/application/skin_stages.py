@@ -78,7 +78,30 @@ def reference(
     return {"final": output}
 
 
+def downstream(
+    engine: Any, document: Any, resources: Any, cancel: Any, options: Any
+) -> dict[str, Any]:
+    output = topology(engine, document, resources, cancel, options)
+    try:
+        context = engine, document, resources
+        output["final"] = initialize_topology(context, output["topology"], cancel, options)
+    except Exception as error:
+        if cancel.is_set():
+            raise
+        raise IncompleteBuild(output, error) from error
+    return output
+
+
+def initialize_topology(context: Any, topology: Any, cancel: Any, options: Any) -> Any:
+    return skin_reference_evaluation.initialize(
+        *context, topology.mesh, cancel, options.skin_tissue_surface
+    )
+
+
 POLICIES = {
+    "downstream": Policy(
+        "Build final skin", ("topology", "final"), skin_inputs.reference_build, downstream
+    ),
     "reference": Policy(
         "Prepare skin reference", ("final",), skin_inputs.reference_build, reference
     ),

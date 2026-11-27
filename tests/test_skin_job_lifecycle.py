@@ -59,13 +59,14 @@ def test_superseded_skin_job_and_history_use_their_own_captured_settings(session
 
 def test_cancellation_and_undo_do_not_publish_half_a_skin_build(session, monkeypatch):
     entered, release = prepare(session, monkeypatch)
+    previous = session.document.skin.envelope
     key = start(session, entered)
     try:
         session.command("job.cancel", job_id=key)
     finally:
         release.set()
     session.wait()
-    assert not session.document.skin.envelope.asset and not session.document.skin.topology.asset
+    assert session.document.skin.envelope == previous and not session.document.skin.topology.asset
     assert session.scheduler.registry.by_id[key].state == "cancelled"
     session.command("undo")
     session.command("redo")
@@ -75,13 +76,14 @@ def test_cancellation_and_undo_do_not_publish_half_a_skin_build(session, monkeyp
 
 def test_undo_during_skin_build_requires_explicit_redo_to_restart(session, monkeypatch):
     entered, release = prepare(session, monkeypatch)
+    previous = session.document.skin.envelope
     start(session, entered)
     try:
         session.command("undo")
     finally:
         release.set()
     session.wait()
-    assert not session.document.skin.envelope.asset and not session.document.skin.topology.asset
+    assert session.document.skin.envelope == previous and not session.document.skin.topology.asset
     session.command("redo")
     session.wait()
     assert accepted_target(session) == 8100

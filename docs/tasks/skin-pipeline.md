@@ -79,9 +79,29 @@ DLL, not a fresh build. Numerical behavior is unchanged. The initial failures we
 coupling to the former FIELD resolution constant and an assertion on a pre-undo snapshot;
 the tests now inspect the owning policy and current document. GUI and packaging are pending.
 
-Next: typed stage assessments and the skin planner, then lifecycle and UI integration.
-Automatic scheduling, promotion on publication, checkpoint persistence and the mode switch
-are not implemented yet. No user decision is pending.
+The next increment adds typed stage assessments, a skin-domain planner hosted by the
+existing lifecycle, committed Draft updates, exclusive Final routing, applied configuration
+promotion and captured intent checks. Generic cancellation now respects a per-job capability;
+automatic draft construction cannot be user-cancelled. Activity counts active jobs separately
+from cancellation availability. The UI has a saved mode checkbox and mode-driven AUTO display.
+
+Eight new integration tests passed for initial automatic draft/undo, committed-edit timing,
+applied-versus-pending configuration, cancellation rejection, failed builder-selection recovery
+and Final deformation preserving Draft, late-final rejection, reopening without work and
+edits while building. The planning/job/builder/retry group passed 31 tests; the expanded
+configuration/planner/Activity group passed 40. Ten focused mode/status/deformation tests
+also passed against the fresh DLL, after preserving explicit Update's forced evaluation.
+Strict mypy passed 699 source files. These are intermediate checks, not full qualification.
+The shared pytest Session fixture uses FIELD resolution 24 to bound repeated automatic
+construction; the shipped resolution remains 220. Real default-resolution qualification is
+still required. The clean native/Qt build in `build/skin-pipeline` succeeded and all six
+CTest checks passed. Typed native material/topology incompatibility assertions passed.
+QML API validation passed for 186 files and 46 model types. This is not visual QA.
+
+Next: finish lifecycle edge cases (late results, history, no-build-on-open, source readiness,
+retry suppression), qualify the typed native compatibility result, then implement owned AVBD
+prefix checkpoints and ordinary/extended persistence. Runtime packaging, full suite and real
+GUI inspection are pending. No user decision is pending.
 
 ## Recovery inputs
 

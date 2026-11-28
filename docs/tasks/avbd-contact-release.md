@@ -118,6 +118,31 @@ macros were disabled. Guard those final diagnostic calls with the same
 `AF_CONTAINMENT_AUDIT || AF_RECOVERY_TRIAL` condition as their declarations and include.
 This restores both build configurations without changing enabled diagnostics or solving.
 
+The 21 affected native targets now compile. The exact 70-collider solve runs, and the
+native continuation passes the deltoid's complete movement/fill/clearance sequence.
+At this checkpoint it has accepted 194 muscles. `vcp-parity-v3.json` confirms byte-identical
+positions, faces, velocity and contacts on the previously accepted large-muscle control.
+The staged v3 runtime passes 8,536 file checks and 1,166 isolated imports.
+
+D10 — The native continuation holds Python DLLs in the previous temporary package, so
+an attempted in-place package refresh encountered Windows file locks. The canonical
+distribution is untouched. Finish into a fresh `package-v3/AnthroForge.dist` instead,
+then qualify and promote that complete package. The continuation and the fresh packaged
+full run may overlap: this RTX 4080 has 16 GiB, with about 3.3 GiB used during continuation,
+and each solver retains its existing 2 GiB owned-memory bound. Record those final timings
+as contended qualification, not as an isolated performance benchmark. This overlap avoids
+serially waiting for the entire remainder before restarting application validation; no
+runtime fingerprint or checkpoint acceptance rule is changed.
+
+The separate final v3 package has completed official `package_release.finish()` and
+passed all 8,536 file checks and 1,166 isolated imports. A fresh Authoring run is active
+under `full-project-v3` (app PID 32724, diagnostics `afskin-zusm4lf_`), starting from the
+original-input copy. `full_progress_v3.py` monitors it. The native continuation is active
+under `muscles-v3` (worker PID 8536, 206 muscles accepted at this checkpoint); monitor with
+`v3_progress.py`. Do not duplicate either job. Only `package-v3/AnthroForge.dist` is the
+current delivery candidate; the previous temporary `package` remains a diagnostic runtime.
+GUI verification, final saved-file audit, source archive and canonical promotion remain.
+
 ## Verification
 
 Passed: native compilation, targeted policy tests, four successful parity/geometry/resource

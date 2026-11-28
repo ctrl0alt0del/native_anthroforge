@@ -4125,4 +4125,9 @@ This changes input admission, not numerical settings or geometric acceptance. Te
 64/65/70/323 meshes and malformed input. The previously accepted large-muscle fixture
 remains byte-identical for positions, triangles, velocity and contacts; the 70-collider
 fixture now reaches solving but needs the existing fill fallback to pass clearance.
-All affected workers are being rebuilt; complete full-project validation remains pending.
+All affected workers compile, including an optional diagnostic feature-guard correction
+needed by the legacy containment configuration. The complete native continuation accepts
+all 265 muscles: 159 already clear, 63 movement and 43 local fill. Its final mesh contains
+103,059 vertices and 206,114 triangles. A fresh final packaged run has completed all
+58 bones with byte-identical numerical outputs and is validating the full muscle sequence;
+the final saved document and release promotion remain pending.

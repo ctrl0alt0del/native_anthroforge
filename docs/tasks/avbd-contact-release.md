@@ -143,6 +143,28 @@ under `muscles-v3` (worker PID 8536, 206 muscles accepted at this checkpoint); m
 current delivery candidate; the previous temporary `package` remains a diagnostic runtime.
 GUI verification, final saved-file audit, source archive and canonical promotion remain.
 
+Final v3 GUI verification now passes: ordinary no-argument launch with cleaned environment,
+open `gui/generation-probe-v3.anthroforge`, click Rebuild envelope, observe Applied AVBD /
+Requested skin is current / Idle, save revision 32, and close the owned window. The saved
+project contains the accepted envelope, and `gui/v3-generation.png` plus accessibility
+text retain the observed result. This small GUI probe briefly overlapped the two larger
+qualification jobs; its duration is not a performance measurement. The fresh full run
+has accepted 28 bones, and the native continuation has accepted 214 muscles at this point.
+
+The v3 native continuation is complete and accepted: all 265 muscle entities match recipe
+order, with 159 already-clear, 63 movement and 43 local-fill stages. Final mesh has 103,059
+vertices and 206,114 triangles; all points are finite and all indices valid. Minimum
+recorded clearance is 0.06361128 (required 0.06324186). The last 75 stages took 1,846.94 s
+wall time, partly overlapping the fresh packaged run. `muscles-v3/qualification.json`
+retains this evidence. This is complete numerical qualification using the explicit
+accepted prefix; it is not a claim that the final app document has been saved yet.
+
+The fresh v3 packaged run has completed all 58 bones (1,010.73 s stage wall time under
+qualification contention). Every bone's position, face, velocity and contact checkpoint
+is byte-identical to v2. It has accepted 23 muscles at this checkpoint. The initial 14
+muscle outputs, collider files and acceptance routes also match v2 exactly. Continue
+monitoring `full_progress_v3.py`; all remaining work depends on this app run finishing.
+
 ## Verification
 
 Passed: native compilation, targeted policy tests, four successful parity/geometry/resource

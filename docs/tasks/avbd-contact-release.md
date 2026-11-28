@@ -69,7 +69,7 @@ performance and sleeping experiments are in `build/avbd-performance-20261128` an
 | Packaged v1 | 58 bones in 1,236.24 s; 2 already-clear muscles; unbatched key cap failed on muscle 2 | `R/full-project` |
 | Packaged v2 | 58 bones in 895.73 s; 190 muscles; 70-collider deltoid hit the reader cap; 4,272.42 s total | `R/full-project-final` |
 | Native v3 continuation | All 265 muscles accepted, in recipe order; 159 already clear, 63 movement, 43 local fill | `R/muscles-v3/qualification.json` |
-| Fresh packaged v3 | All 58 bones accepted; full muscle sequence still running | `R/full-project-v3` |
+| Fresh packaged v3 | All 58 bones and 191 muscles accepted, including the 70-collider deltoid; still running | `R/full-project-v3` |
 
 The v1/v2 harness files named `complete-result.anthroforgex` are partial failure documents,
 not completed skin results. Do not deliver them. The v2 native diagnostic continuation
@@ -97,8 +97,8 @@ storage-first imports hit an existing circular module import, not a solver failu
   contention. A 2.3-million cache fits at reduced candidate preference; 2.8 million correctly
   rejects insufficient workspace. Maximum full bone-chain owned GPU memory: 2,113,992,300 bytes.
 - All 58 bone checkpoints match across v1/v2/v3. Previously accepted large-muscle replay
-  matches byte for byte after D8. The first 14 fresh v3 muscle checkpoints match v2; the
-  complete common 190-stage prefix will be compared after the fresh run reaches it.
+  matches byte for byte after D8. All 190 common fresh v3/v2 muscle checkpoints match exactly:
+  accepted positions/triangles, collider data/bounds and acceptance routes/frames/attempts.
 - Development gate: lock/static/type/format, native build, six native CTests, native style,
   PowerShell, QML (187 files, 46 models, zero API errors), numerical imports and native
   doctor pass. Missing worktree-local Qt SDK was handled by explicitly using the installed SDK.

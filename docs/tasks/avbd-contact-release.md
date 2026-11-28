@@ -40,13 +40,32 @@ runtime baseline, not to the older tracked native branch alone. The complete bas
 delta will be retained in the shipped `avbd-sources.zip`. Application release packaging
 and its full development gate are running; full-document and GUI qualification are pending.
 
+The fresh portable build is complete at `build/avbd-release-20261128/package/AnthroForge.dist`
+in the main project directory. Build identity is clean application revision `906b0499`;
+executable SHA-256 is `cdf6b61b5fdf33a47135386d025359d5d06537caf8b33bc78207e4fb42962e44`.
+Both candidate and fresh package pass 8,536 manifest file checks and 1,166 isolated import
+checks. A normal launch with no command-line options and no external runtime configuration
+has been visually inspected; GUI evidence is in the local task's `gui` folder.
+
+The full model is running through packaged Authoring on a preserved input copy. To overlap
+compilation, it uses the previously compiled application with the new complete runtime;
+`git diff 67b7d41b HEAD -- src native tools pyproject.toml uv.lock launch.py` was empty.
+The fresh executable will also validate the resulting document. The full run passed the
+previously failing Fibula stage (index 37) and has accepted 43 bone stages so far; muscle
+processing has not started. Hard-linked diagnostic files survive worker cleanup under
+`full-project/diagnostics/afskin-kgvzb7n3`. Run `progress.py` or inspect `authoring.jsonl`
+and `exit.json` in the local task folder before resuming; do not start a duplicate solve.
+
 ## Verification
 
 Passed: native compilation, targeted policy tests, four successful parity/geometry/resource
 cases and explicit insufficient-workspace rejection. Forty changed/test/harness functions
-are within 15 physical lines. Pending: complete document through Authoring, application
-development gate, clean-environment bundle verification, normal GUI launch, promotion and
-source archive verification.
+are within 15 physical lines (50 after orchestration/report additions). Python static
+checks, six native CTests, native style and PowerShell checks pass. The combined gate hit
+the known absent worktree-local Qt SDK path; its remaining stages resumed using the
+installed SDK explicitly. QML validation passes (187 files, 46 model types, zero API
+errors); the complete pytest suite is in progress. Pending: full-document completion,
+remaining development checks, GUI generation, promotion and source archive verification.
 
 ## Next actions and blockers
 

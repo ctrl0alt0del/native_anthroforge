@@ -69,9 +69,21 @@ vertex-ID bounds and all capacity/geometry checks. The exact formerly failing mu
 now completes 63 frames in 12.80 s, reaches the full pose and passes native containment,
 crossing, clearance, self-intersection and degeneracy checks. No muscle radius, mobility,
 material or acceptance policy changed. A native-worker continuation using the explicit
-accepted 58-bone/two-muscle fixture is running under `muscles-v2`; it has passed 10 muscles
-so far. This is numerical qualification, not a bypass of packaged runtime identities.
-Runtime v2 packaging is in progress; complete fresh packaged qualification remains pending.
+accepted 58-bone/two-muscle fixture passed 22 muscle instances under `muscles-v2`, including
+movement and the existing regional-fill/shield fallback. The current owned diagnostic
+process tree was intentionally stopped after that qualification, rather than duplicating
+the remainder of the final application run. Its stop receipt preserves the accepted count
+and process identity. This is numerical qualification, not a bypass of runtime identities.
+
+Runtime v2 packaging is complete in the same temporary package directory. Its VCP solver
+SHA-256 is `fc5bea5a5455f4ba943ef348f3cc9d20abbf1ce565e309fd4b7016b68ca577f7`.
+The final full project is now running from a fresh original-input copy through the fresh
+packaged executable (PID recorded in `full-project-final/process.json`, initially 46624).
+Diagnostics are retained in `full-project-final/diagnostics/afskin-ndrs650c`.
+Use `final_progress.py`, `full-project-final/authoring.jsonl`, `stderr.log` and `exit.json`
+to resume monitoring. Do not start another solve. Changed runtime fingerprints correctly
+invalidate old application prefixes; the final run rebuilds from the root. It has accepted
+four bone stages at this checkpoint. Final package hash/import verification is also running.
 
 The normal GUI v1 control rebuilt the small bone-and-muscle document, reached current
 state, saved `gui/generation-probe.anthroforge`, and was closed. It must be repeated for

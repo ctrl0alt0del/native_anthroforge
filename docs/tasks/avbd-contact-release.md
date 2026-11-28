@@ -87,7 +87,8 @@ stages are now accepted in 895.73 s of stage wall time (14 min 56 s). All four n
 checkpoint files for every bone are byte-identical to v1. Native audits report zero
 self-intersections, outside vertices, crossings and degenerate faces; radius guard
 violations are zero, and maximum owned GPU bytes are 2,113,992,300 (below 2 GiB).
-Forty of 265 muscle instances are accepted at this checkpoint. Final v2 package
+153 of 265 muscle instances are accepted at this checkpoint (69 already clear,
+49 movement, 35 local fill; 2,935.99 s total muscle stage wall time). Final v2 package
 verification passes all 8,536 file hashes/sizes and 1,166 isolated imports.
 
 The normal GUI v1 control rebuilt the small bone-and-muscle document, reached current
